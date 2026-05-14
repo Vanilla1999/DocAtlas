@@ -16,7 +16,7 @@ install: pipx install docmancer --python python3.13
 
 Compress documentation context so coding agents spend tokens on code, not docs. Fetch from public sites (GitBook, Mintlify, GitHub, generic web), index locally with SQLite FTS5, and retrieve compact context packs with source attribution. No API keys, no vector database, no background daemons on the core path.
 
-**MIT open source.** The CLI is the full product: add docs, query them, and install skills into coding agents, all running locally on your machine. An optional benchmarking harness (`docmancer bench`) compares retrieval backends (FTS, Qdrant vector, RLM) on your own corpus.
+**MIT open source.** The CLI is the full product: add docs, query them, install skills into coding agents, and expose installed API packs through MCP, all running locally on your machine.
 
 ## When to Use
 
@@ -24,7 +24,6 @@ Compress documentation context so coding agents spend tokens on code, not docs. 
 - User references docs from a public site (GitBook, Mintlify, or any web-hosted docs).
 - You need to verify version-specific API behavior or check exact method signatures.
 - User asks you to search or query previously ingested documentation.
-- User wants to benchmark or compare retrieval quality on their own docs.
 
 ## Workflow
 
@@ -103,25 +102,6 @@ docmancer install <agent>
 
 Supported agents: `claude-code`, `claude-desktop`, `cline`, `cursor`, `codex`, `codex-app`, `codex-desktop`, `gemini`, `github-copilot`, `opencode`. Add `--project` for project-local installation instead of global.
 
-### Benchmarking
-
-`docmancer bench` compares retrieval backends over the same canonical chunks with reproducible artifacts. FTS ships in core; Qdrant and RLM are experimental extras.
-
-```bash
-docmancer bench init
-docmancer bench dataset create --from-corpus <dir> --size 30 --name <name>
-docmancer bench dataset create --from-legacy <path.json> --name <name>
-docmancer bench dataset validate <path>
-docmancer bench run --backend <fts|qdrant|rlm> --dataset <name> [--run-id ...] [--k-retrieve ...] [--k-answer ...] [--timeout-s ...]
-docmancer bench compare <run_id> <run_id> [...]
-docmancer bench report <run_id>
-docmancer bench list
-```
-
-Artifacts per run live under `.docmancer/bench/runs/<run_id>/` (`config.snapshot.yaml`, `retrievals.jsonl`, `answers.jsonl`, `metrics.json`, `report.md`, `traces/`). A content-hashed `ingest_hash` prevents comparing runs across drifted corpora.
-
-Optional extras: `pipx install 'docmancer[vector]'` (Qdrant), `pipx install 'docmancer[rlm]'` (RLM), `pipx install 'docmancer[judge]'` (LLM-as-judge answer scoring via ragas).
-
 ## API tools via MCP (when packs are installed)
 
 If the user has run `docmancer install-pack <pkg>@<version>` (e.g. `open-meteo@v1` for the keyless weather demo), the agent host launches a local stdio MCP server (`docmancer mcp serve`) that exposes exactly two meta-tools:
@@ -146,7 +126,6 @@ Run `docmancer mcp doctor` to verify which credential source resolves for each i
 ## Common Mistakes
 
 - Do not use `docmancer ingest`; it is deprecated. Use `docmancer add` instead.
-- Do not use `docmancer eval` or `docmancer dataset generate/eval`; they were removed. Use `docmancer bench run` and `docmancer bench dataset create`.
+- Legacy evaluation command surfaces have been removed.
 - Do not run `docmancer query` before adding a source with `docmancer add`. Check `docmancer list` first.
 - Do not assume docs are indexed. Always verify with `docmancer list` before querying.
-- Do not mix runs from different corpora in `docmancer bench compare` without understanding the `ingest_hash` guard; if you need to, pass `--allow-mixed-ingest` explicitly.

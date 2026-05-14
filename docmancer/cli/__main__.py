@@ -15,7 +15,7 @@ from docmancer.cli.commands import (
     setup_cmd,
     update_cmd,
 )
-from docmancer.cli.help import DocmancerCommand, DocmancerGroup, HELP_CONTEXT_SETTINGS, format_examples
+from docmancer.cli.help import DocmancerGroup, HELP_CONTEXT_SETTINGS, format_examples
 from docmancer.cli.mcp_commands import (
     install_pack_cmd,
     mcp_group,
@@ -38,7 +38,6 @@ def _show_version(ctx: click.Context, param: click.Parameter, value: bool) -> No
         "docmancer add https://docs.example.com",
         "docmancer update",
         'docmancer query "How do I authenticate?"',
-        "docmancer bench run --backend fts --dataset my-dataset",
         "docmancer install claude-code",
         "docmancer install github-copilot --project",
     ),
@@ -76,46 +75,6 @@ cli.add_command(ingest_cmd, "ingest")
 cli.add_command(mcp_group, "mcp")
 cli.add_command(install_pack_cmd, "install-pack")
 cli.add_command(uninstall_pack_cmd, "uninstall")
-
-
-# Hard-fail stubs for commands that moved to `docmancer bench`.
-@click.command(
-    "eval",
-    cls=DocmancerCommand,
-    context_settings=HELP_CONTEXT_SETTINGS,
-    short_help="Moved. Use 'docmancer bench run'.",
-)
-def _removed_eval_cmd():
-    """Removed. Evaluation now lives under `docmancer bench`."""
-    raise click.ClickException(
-        "This command moved. Use: docmancer bench run --backend fts --dataset <name>"
-    )
-
-
-@click.command(
-    "dataset",
-    cls=DocmancerCommand,
-    context_settings={**HELP_CONTEXT_SETTINGS, "ignore_unknown_options": True, "allow_extra_args": True},
-    short_help="Moved. Use 'docmancer bench dataset'.",
-)
-@click.argument("args", nargs=-1, required=False)
-def _removed_dataset_group(args):
-    """Removed. Dataset commands now live under `docmancer bench dataset`."""
-    raise click.ClickException(
-        "This command moved. Use: docmancer bench dataset create / docmancer bench run"
-    )
-
-
-cli.add_command(_removed_eval_cmd, "eval")
-cli.add_command(_removed_dataset_group, "dataset")
-
-
-try:
-    from docmancer.bench.cli import bench_group
-
-    cli.add_command(bench_group, "bench")
-except ImportError:
-    pass
 
 
 if __name__ == "__main__":

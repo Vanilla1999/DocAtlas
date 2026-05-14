@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.10] - Unreleased
+### Removed
+
+- **`docmancer bench`:** removed the benchmarking CLI group and the `docmancer.bench` package.
+- **Bench-only optional extras:** removed `docmancer[bench]`, `docmancer[vector]`, `docmancer[rlm]`, `docmancer[judge]`, `docmancer[llm]`, and `docmancer[ragas]`.
+- **Config:** removed supported `bench:` and legacy `eval:` config schema fields. YAML files that still contain those keys load with a deprecation warning and ignore them.
+- **Legacy stubs:** removed the top-level `docmancer eval` and `docmancer dataset` bench-pointer commands.
+
 ## [0.4.9] - 2026-04-28
 ### Added
 

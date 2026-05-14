@@ -7,7 +7,7 @@ from docmancer.core.sqlite_store import SQLiteStore
 
 
 def test_list_sections_for_embedding_matches_fts_sections(tmp_path: Path):
-    """Vector/RLM backends must see the exact same chunks FTS indexes."""
+    """Embedding consumers must see the exact same chunks FTS indexes."""
     db = tmp_path / "docmancer.db"
     store = SQLiteStore(str(db))
     store.add_documents([

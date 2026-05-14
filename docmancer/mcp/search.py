@@ -1,8 +1,6 @@
 """Tool Search corpus + ranking (spec 2.7 / D10).
 
-v1 uses a lightweight token-overlap scorer. Embedding-backed ranking
-(FastEmbed) is a drop-in replacement once the optional vector extra is
-known to be installed; we deliberately avoid hard-importing it so
+v1 uses a lightweight token-overlap scorer. Keep this dependency-light so
 `docmancer mcp serve` works in a minimal install.
 """
 from __future__ import annotations

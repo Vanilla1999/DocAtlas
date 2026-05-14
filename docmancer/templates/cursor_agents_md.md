@@ -4,7 +4,7 @@
 
 Docmancer compresses documentation context so coding agents spend tokens on code, not on rereading raw docs. Docs are fetched from public sites, indexed locally with SQLite FTS5, and returned as compact context packs with source attribution. No API keys, no vector database, no background daemons on the core path.
 
-**MIT open source.** Everything runs locally. An optional benchmarking harness (`docmancer bench`) compares retrieval backends on your own corpus.
+**MIT open source.** Everything runs locally. The core path has no API keys, no vector database, and no background daemon.
 
 Executable: `{{DOCS_KIT_CMD}}`
 
@@ -36,23 +36,6 @@ Use docmancer when the user asks about library docs, API references, vendor docs
 - `docmancer doctor`
 - `docmancer fetch <url> --output <dir>`
 
-## Benchmarking retrieval (optional, compare FTS, vector, and RLM backends)
-
-- `docmancer bench init`
-- `docmancer bench dataset use lenny` (zero-config built-in dataset; corpus fetched once, cached)
-- `docmancer bench dataset list-builtin`
-- `docmancer bench dataset create --from-corpus <dir> --size 30 --name <name> --provider auto`
-- `docmancer bench dataset create --from-corpus <dir> --size 30 --name <name> --provider heuristic` (no-LLM fallback)
-- `docmancer bench dataset validate <path>`
-- `docmancer bench run --backend fts --dataset <name>`
-- `docmancer bench run --backend qdrant --dataset <name>` (experimental, `docmancer[vector]`)
-- `docmancer bench run --backend rlm --dataset <name>` (experimental, `docmancer[rlm]`)
-- `docmancer bench compare <run_id_a> <run_id_b>`
-- `docmancer bench report <run_id>`
-- `docmancer bench list`
-
-Artifacts live under `.docmancer/bench/runs/<run_id>/`. A content-hashed `ingest_hash` stops `bench compare` from mixing runs against drifted corpora unless you pass `--allow-mixed-ingest`.
-
 ## API tools via MCP (when packs are installed)
 
 If the user has run `docmancer install-pack <pkg>@<version>`, Cursor launches `docmancer mcp serve` (auto-registered during `docmancer install cursor`). Two meta-tools are exposed:
@@ -67,4 +50,4 @@ Destructive calls are blocked unless the user installed the pack with `--allow-d
 ## Common mistakes
 
 - Do not run `docmancer query` before adding a source with `docmancer add`. Check `docmancer list` first.
-- Do not use the old `docmancer eval` or `docmancer dataset generate/eval` commands; they were removed. Use `docmancer bench run`, `docmancer bench dataset create`, or `docmancer bench dataset use lenny`.
+- Legacy evaluation command surfaces have been removed.

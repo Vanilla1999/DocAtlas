@@ -7,7 +7,7 @@ description: Search local documentation context packs with docmancer CLI. Use wh
 
 Compress documentation context so coding agents spend tokens on code, not on rereading raw docs. Docmancer fetches docs from public sites, indexes them locally with SQLite FTS5, and returns compact context packs with source attribution. No API keys required on the core path.
 
-**MIT open source.** Everything runs locally. An optional benchmarking harness (`docmancer bench`) compares retrieval backends on your own corpus.
+**MIT open source.** Everything runs locally. The core path has no API keys, no vector database, and no background daemon.
 
 Executable: `{{DOCS_KIT_CMD}}`
 
@@ -34,26 +34,6 @@ Executable: `{{DOCS_KIT_CMD}}`
 
 `query` prints estimated raw docs tokens, context-pack tokens, percent saved, and agentic runway. Prefer the compact default first.
 
-## Benchmarking retrieval (optional)
-
-The `bench` namespace compares retrieval backends (FTS, vector, and an RLM path) on the same corpus and question set.
-
-- `docmancer bench init`: scaffold `.docmancer/bench/{datasets,runs}/`.
-- `docmancer bench dataset use lenny`: install the zero-config built-in dataset. Fetches the corpus from GitHub once and caches it at `~/.docmancer/bench/corpora/lenny/`; reruns reuse the cache.
-- `docmancer bench dataset list-builtin`: list available built-in datasets.
-- `docmancer bench dataset create --from-corpus <dir> --size 30 --name <name> --provider auto`: generate grounded questions with an LLM (Anthropic, OpenAI, Gemini, or Ollama).
-- `docmancer bench dataset create --from-corpus <dir> --size 30 --name <name> --provider heuristic`: no-LLM fallback using markdown headings.
-- `docmancer bench dataset create --from-legacy <path.json> --name <name>`: convert a legacy `eval_dataset.json`.
-- `docmancer bench dataset validate <path>`: schema-check a dataset.
-- `docmancer bench run --backend fts --dataset <name>`: run the stable SQLite FTS backend (core install).
-- `docmancer bench run --backend qdrant --dataset <name>`: run the experimental vector backend (`docmancer[vector]`).
-- `docmancer bench run --backend rlm --dataset <name>`: run the experimental RLM backend (`docmancer[rlm]`).
-- `docmancer bench compare <run_id_a> <run_id_b> [...]`: side-by-side comparison report.
-- `docmancer bench report <run_id>`: reprint a single-run report in clean terminal text.
-- `docmancer bench list`: list local datasets and runs.
-
-Every run writes `config.snapshot.yaml`, `retrievals.jsonl`, `answers.jsonl`, `metrics.json`, `report.md`, and `traces/` under `.docmancer/bench/runs/<run_id>/`. A content-hashed `ingest_hash` stops `bench compare` from mixing runs against drifted corpora unless you pass `--allow-mixed-ingest`.
-
 ## API tools via MCP (when packs are installed)
 
 If the user has run `docmancer install-pack <pkg>@<version>`, Claude Desktop launches `docmancer mcp serve`. Two meta-tools are exposed:
@@ -68,4 +48,4 @@ Destructive calls are blocked unless the user installed the pack with `--allow-d
 ## Common mistakes
 
 - Do not run `docmancer query` before adding a source with `docmancer add`. Check `docmancer list` first.
-- Do not use the old `docmancer eval` or `docmancer dataset generate/eval` commands; they were removed. Use `docmancer bench run`, `docmancer bench dataset create`, or `docmancer bench dataset use lenny`.
+- Legacy evaluation command surfaces have been removed.

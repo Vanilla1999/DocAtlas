@@ -524,11 +524,11 @@ class SQLiteStore:
         return [entry["source"] for entry in self.list_sources_with_dates()]
 
     def list_sections_for_embedding(self) -> list[dict]:
-        """Return canonical section chunks for vector/RLM backends.
+        """Return canonical section chunks for embedding-based consumers.
 
-        Emits the same chunks the FTS backend indexes, so all bench backends
-        see identical boundaries (see PRD "Benchmark Fairness"). Each row has:
-        section_id (int), source, chunk_index, title, level, text,
+        Emits the same chunks the FTS index stores, so future embedding
+        features can reuse identical section boundaries. Each row has:
+        section_id (int), source, chunk_index, title, level, text, and
         token_estimate.
         """
         with self._connect() as conn:

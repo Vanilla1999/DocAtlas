@@ -89,7 +89,7 @@ docmancer uninstall open-meteo@v1
 
 ## Commands
 
-The full CLI surface (docs RAG, API MCP packs, `setup` / `install`, bench, and the rest) is documented in the repo wiki: **[Commands](./wiki/Commands.md)**.
+The full CLI surface (docs RAG, API MCP packs, `setup` / `install`, and the rest) is documented in the repo wiki: **[Commands](./wiki/Commands.md)**.
 
 ---
 

@@ -74,14 +74,36 @@ def test_query_budget_must_be_reasonable():
         QueryConfig(default_budget=0)
 
 
-def test_default_config_has_bench():
-    config = DocmancerConfig()
-    assert config.bench is not None
-    assert config.bench.backends.k_retrieve == 10
-    assert config.bench.backends.k_answer == 5
+def test_config_from_yaml_ignores_obsolete_bench_key(tmp_path):
+    config_file = tmp_path / "docmancer.yaml"
+    config_file.write_text(
+        """
+bench:
+  runs_dir: .docmancer/bench/runs
+index:
+  db_path: .docmancer/docmancer.db
+"""
+    )
+
+    with pytest.warns(DeprecationWarning, match="bench config is obsolete"):
+        config = DocmancerConfig.from_yaml(config_file)
+
+    assert not hasattr(config, "bench")
+    assert config.index.db_path == str((tmp_path / ".docmancer" / "docmancer.db").resolve())
 
 
-def test_config_with_bench_from_dict():
-    config = DocmancerConfig(bench={"judge_provider": "openai", "backends": {"k_retrieve": 20}})
-    assert config.bench.judge_provider == "openai"
-    assert config.bench.backends.k_retrieve == 20
+def test_config_from_yaml_ignores_obsolete_eval_key(tmp_path):
+    config_file = tmp_path / "docmancer.yaml"
+    config_file.write_text(
+        """
+eval: null
+index:
+  db_path: .docmancer/docmancer.db
+"""
+    )
+
+    with pytest.warns(DeprecationWarning, match="eval config is obsolete"):
+        config = DocmancerConfig.from_yaml(config_file)
+
+    assert not hasattr(config, "bench")
+    assert config.index.db_path == str((tmp_path / ".docmancer" / "docmancer.db").resolve())

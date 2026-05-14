@@ -48,7 +48,7 @@ def test_install_claude_code_creates_rebooted_skill_file():
         content = skill_file.read_text()
         assert "allowed-tools" in content
         assert "docmancer add" in content
-        assert "docmancer bench" in content
+        assert "docmancer bench" not in content
         assert "docmancer ingest" not in content
         # Pre-bench registry narrative concepts must stay gone.
         assert "vault" not in content.lower()
@@ -99,7 +99,7 @@ def test_install_github_copilot_project_creates_repo_instructions():
         copilot_content = copilot_md.read_text()
         assert "docmancer query" in copilot_content
         assert "MIT open source" in copilot_content
-        assert "docmancer bench" in copilot_content
+        assert "docmancer bench" not in copilot_content
         assert "--expand page" in copilot_content
         assert "docmancer:start" in agents_md.read_text()
         assert "github.copilot.chat.codeGeneration.useInstructionFiles" in vscode_settings.read_text()

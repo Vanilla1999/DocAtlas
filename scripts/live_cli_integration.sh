@@ -32,10 +32,6 @@ RUN_CRAWL4AI_VARIANT="${DOCMANCER_RUN_CRAWL4AI_VARIANT:-0}"
 RUN_GITHUB_BLOB="${DOCMANCER_RUN_GITHUB_BLOB:-1}"
 GITHUB_BLOB_URL="${DOCMANCER_GITHUB_BLOB_URL:-https://github.com/pytest-dev/pytest/blob/main/README.rst}"
 RUN_FETCH_STEP="${DOCMANCER_RUN_FETCH_STEP:-1}"
-RUN_BENCH_QDRANT="${DOCMANCER_RUN_BENCH_QDRANT:-0}"
-RUN_BENCH_RLM="${DOCMANCER_RUN_BENCH_RLM:-0}"
-BENCH_DATASET_NAME="${DOCMANCER_BENCH_DATASET_NAME:-mydocs}"
-BENCH_CORPUS_OVERRIDE="${DOCMANCER_BENCH_CORPUS_DIR:-}"
 SKIP_NETWORK="${DOCMANCER_SKIP_NETWORK:-0}"
 # Set to 1 to keep the temp dir for inspection; default removes it on every exit.
 KEEP_TMP="${DOCMANCER_KEEP_TMP:-0}"
@@ -124,137 +120,6 @@ run_live_add() {
 capture_first_source() {
   "${CLI_CMD[@]}" list --all --config "$CONFIG_PATH" \
     | awk 'NF >= 2 && $0 !~ /^No sources indexed yet\.$/ {print $NF; exit}'
-}
-
-ensure_bench_corpus_dir() {
-  local corpus_dir=""
-  if [[ -n "$BENCH_CORPUS_OVERRIDE" ]]; then
-    corpus_dir="$BENCH_CORPUS_OVERRIDE"
-    if [[ ! -d "$corpus_dir" ]]; then
-      print_warn "DOCMANCER_BENCH_CORPUS_DIR is not a directory: $corpus_dir"
-    elif find "$corpus_dir" -type f -name '*.md' -print -quit | grep -q .; then
-      printf '%s\n' "$corpus_dir"
-      return
-    else
-      print_warn "DOCMANCER_BENCH_CORPUS_DIR has no markdown files: $corpus_dir"
-    fi
-  fi
-
-  corpus_dir="$ROOT_DIR/../docs"
-  if find "$corpus_dir" -type f -name '*.md' -print -quit | grep -q .; then
-    printf '%s\n' "$corpus_dir"
-    return
-  fi
-
-  corpus_dir="$FETCH_DIR"
-  if find "$corpus_dir" -type f -name '*.md' -print -quit | grep -q .; then
-    printf '%s\n' "$corpus_dir"
-    return
-  fi
-
-  corpus_dir="$PROJECT_DIR/bench-corpus"
-  mkdir -p "$corpus_dir"
-  cat > "$corpus_dir/bun-smoke.md" <<'EOF'
-# Bun smoke dataset
-
-Bun is a JavaScript runtime, package manager, test runner, and bundler.
-
-## Install Bun
-
-Install Bun with the official installer, then use bun install to install dependencies.
-
-## Run tests
-
-Use bun test to run tests.
-EOF
-  printf '%s\n' "$corpus_dir"
-}
-
-fill_bench_dataset_questions() {
-  # Rewrite the scaffold's placeholder `ground_truth_sources` with URLs
-  # actually present in the live SQLite index, so retrieval metrics
-  # (MRR / hit / recall / precision) measure something real instead of
-  # matching zero against the scaffold's local markdown paths.
-  local dataset_path="$1"
-  local config_path="$2"
-  "$VENV_PYTHON" - "$dataset_path" "$config_path" <<'PY'
-import sqlite3
-import sys
-from pathlib import Path
-
-import yaml
-
-dataset_path = Path(sys.argv[1])
-config_path = Path(sys.argv[2])
-
-from docmancer.core.config import DocmancerConfig
-
-config = DocmancerConfig.from_yaml(config_path)
-db_path = str(config.index.db_path)
-
-# Pull the real indexed sources and pick the best-matching one per question
-# via cheap keyword overlap against source + title.
-conn = sqlite3.connect(f"file:{db_path}?mode=ro", uri=True)
-try:
-    rows = conn.execute(
-        "SELECT sources.source, COALESCE(sections.title, '') "
-        "FROM sources LEFT JOIN sections ON sections.source_id = sources.id "
-        "GROUP BY sources.source"
-    ).fetchall()
-finally:
-    conn.close()
-
-available = [(src, title) for src, title in rows if src]
-
-
-def pick_source(keywords):
-    best = None
-    best_score = -1
-    for source, title in available:
-        haystack = f"{source} {title}".lower()
-        score = sum(1 for kw in keywords if kw in haystack)
-        if score > best_score:
-            best = source
-            best_score = score
-    return best
-
-
-seed = [
-    (
-        "q_bun_install",
-        "How do I install Bun?",
-        "Install Bun with the official installer.",
-        ["install", "installation", "quickstart"],
-    ),
-    (
-        "q_bun_tests",
-        "How do I run tests with Bun?",
-        "Use bun test to run tests.",
-        ["test", "bun-test", "run"],
-    ),
-]
-
-data = yaml.safe_load(dataset_path.read_text(encoding="utf-8")) or {}
-questions = []
-for qid, question, answer, keywords in seed:
-    picked = pick_source(keywords) if available else None
-    entry = {
-        "id": qid,
-        "question": question,
-        "expected_answer": answer,
-        "accepted_answers": [answer],
-        "ground_truth_sources": [picked] if picked else [],
-        "tags": ["factual", "bun"],
-    }
-    questions.append(entry)
-data["questions"] = questions
-
-dataset_path.write_text(yaml.safe_dump(data, sort_keys=False), encoding="utf-8")
-print(
-    f"Filled bench dataset questions in {dataset_path} "
-    f"(bound ground_truth_sources to {len(available)} indexed sources)"
-)
-PY
 }
 
 create_fake_mcp_registry() {
@@ -348,37 +213,6 @@ print(f"Wrote fake MCP registry pack to {pack}")
 PY
 }
 
-_sdk_importable() {
-  # Returns 0 if the given Python module can be imported by the test venv.
-  "$VENV_PYTHON" -c "import $1" >/dev/null 2>&1
-}
-
-detect_llm_provider() {
-  # A provider is only considered "configured" when both its env var is set
-  # AND its Python SDK is importable by the test venv. Without the second
-  # check, `bench dataset create --provider auto` will error out when the
-  # SDK is missing even though a key is set. See
-  # scripts/live_cli_integration_20260421_150024.log:1734-1738.
-  if [[ -n "${ANTHROPIC_API_KEY:-}" ]] && _sdk_importable anthropic; then
-    printf 'anthropic\n'
-    return
-  fi
-  if [[ -n "${OPENAI_API_KEY:-}" ]] && _sdk_importable openai; then
-    printf 'openai\n'
-    return
-  fi
-  if [[ -n "${GEMINI_API_KEY:-}" ]] && _sdk_importable google.genai; then
-    printf 'gemini\n'
-    return
-  fi
-  if [[ -n "${OLLAMA_HOST:-}" ]] || command -v ollama >/dev/null 2>&1; then
-    # Ollama uses base httpx; no SDK check needed.
-    printf 'ollama\n'
-    return
-  fi
-  printf '\n'
-}
-
 print_banner "docmancer live CLI integration"
 echo "Repo root: $ROOT_DIR"
 echo "Using venv python: $VENV_PYTHON"
@@ -399,10 +233,6 @@ print_info "Alternate web strategy: $RUN_WEB_VARIANTS"
 print_info "Browser fallback variant: $RUN_BROWSER_VARIANT"
 print_info "Crawl4AI variant: $RUN_CRAWL4AI_VARIANT"
 print_info "GitHub blob URL test: $RUN_GITHUB_BLOB ($GITHUB_BLOB_URL)"
-print_info "Bench dataset name: $BENCH_DATASET_NAME"
-print_info "Bench corpus override: ${BENCH_CORPUS_OVERRIDE:-<default ../docs>}"
-print_info "Bench qdrant backend: $RUN_BENCH_QDRANT"
-print_info "Bench rlm backend: $RUN_BENCH_RLM"
 print_info "Skip all network work: $SKIP_NETWORK"
 print_info "Keep temporary files: $KEEP_TMP"
 print_info "Require editable reinstall: $REQUIRE_REFRESH"
@@ -411,7 +241,6 @@ if [[ "$SKIP_NETWORK" == "1" ]]; then
 else
   print_info "MCP pack install uses the zero-config resolver: local cache, hosted registry, then Open-Meteo OpenAPI fallback."
 fi
-print_info "Legacy eval/dataset stubs should point at docmancer bench."
 
 cd "$ROOT_DIR"
 
@@ -436,19 +265,13 @@ fi
 run "$VENV_PYTHON" -c "import docmancer, sys; print('python=', sys.executable); print('docmancer=', docmancer.__file__)"
 
 print_banner "CLI help surface"
-print_info "Checking top-level help plus local indexing, MCP, pack install, bench, install, and maintenance commands."
+print_info "Checking top-level help plus local indexing, MCP, pack install, install, and maintenance commands."
 run "${CLI_CMD[@]}" --help
-for command in setup add update query list inspect remove doctor init install fetch ingest mcp install-pack uninstall bench dataset eval; do
+for command in setup add update query list inspect remove doctor init install fetch ingest mcp install-pack uninstall; do
   run "${CLI_CMD[@]}" "$command" --help
 done
 for command in serve doctor list enable disable remove; do
   run "${CLI_CMD[@]}" mcp "$command" --help
-done
-for command in init run compare report list dataset; do
-  run "${CLI_CMD[@]}" bench "$command" --help
-done
-for command in create validate use list-builtin; do
-  run "${CLI_CMD[@]}" bench dataset "$command" --help
 done
 
 print_banner "Initialize isolated config"
@@ -635,63 +458,6 @@ run "${CLI_CMD[@]}" list --config "$CONFIG_PATH"
 run "${CLI_CMD[@]}" list --all --config "$CONFIG_PATH"
 run "${CLI_CMD[@]}" query "How do I parametrize a fixture?" --limit 5 --config "$CONFIG_PATH" || true
 run "${CLI_CMD[@]}" query "How do I parametrize a fixture?" --limit 1 --expand page --config "$CONFIG_PATH" || true
-
-print_banner "Bench local indexed corpus"
-print_info "First exercise the zero-config built-in Lenny flow from the README, then exercise custom-corpus dataset generation."
-BENCH_CORPUS_DIR="$(ensure_bench_corpus_dir)"
-BENCH_DATASET_PATH="$PROJECT_DIR/.docmancer/bench/datasets/$BENCH_DATASET_NAME/dataset.yaml"
-BENCH_PROVIDER="$(detect_llm_provider)"
-(
-  cd "$PROJECT_DIR"
-  run "${CLI_CMD[@]}" bench init --config "$CONFIG_PATH"
-  run "${CLI_CMD[@]}" bench dataset list-builtin --config "$CONFIG_PATH"
-  print_info "Installing the built-in Lenny dataset and corpus into the isolated config."
-  run "${CLI_CMD[@]}" bench dataset use lenny --yes --config "$CONFIG_PATH"
-  run "${CLI_CMD[@]}" bench run --backend fts --dataset lenny --run-id lenny_fts --config "$CONFIG_PATH"
-  run "${CLI_CMD[@]}" bench report lenny_fts --config "$CONFIG_PATH"
-  if [[ "$RUN_BENCH_QDRANT" == "1" ]]; then
-    print_info "Running qdrant bench backend. Requires the vector extra in the current venv."
-    run "${CLI_CMD[@]}" bench run --backend qdrant --dataset lenny --run-id lenny_qdrant --config "$CONFIG_PATH"
-    run "${CLI_CMD[@]}" bench report lenny_qdrant --config "$CONFIG_PATH"
-  fi
-  if [[ "$RUN_BENCH_RLM" == "1" ]]; then
-    print_info "Running rlm bench backend. Requires the rlm extra and a working upstream rlms setup."
-    run "${CLI_CMD[@]}" bench run --backend rlm --dataset lenny --run-id lenny_rlm --config "$CONFIG_PATH"
-    run "${CLI_CMD[@]}" bench report lenny_rlm --config "$CONFIG_PATH"
-  fi
-  if [[ "$RUN_BENCH_QDRANT" == "1" && "$RUN_BENCH_RLM" == "1" ]]; then
-    run "${CLI_CMD[@]}" bench compare lenny_fts lenny_qdrant lenny_rlm --config "$CONFIG_PATH"
-  elif [[ "$RUN_BENCH_QDRANT" == "1" ]]; then
-    run "${CLI_CMD[@]}" bench compare lenny_fts lenny_qdrant --config "$CONFIG_PATH"
-  elif [[ "$RUN_BENCH_RLM" == "1" ]]; then
-    run "${CLI_CMD[@]}" bench compare lenny_fts lenny_rlm --config "$CONFIG_PATH"
-  fi
-  run "${CLI_CMD[@]}" bench list --config "$CONFIG_PATH"
-
-  print_info "Creating a bench dataset scaffold from markdown corpus: $BENCH_CORPUS_DIR"
-  if [[ -n "$BENCH_PROVIDER" ]]; then
-    print_info "Using README auto-provider flow via detected provider with importable SDK: $BENCH_PROVIDER"
-    run "${CLI_CMD[@]}" bench dataset create --from-corpus "$BENCH_CORPUS_DIR" --size 2 --name "$BENCH_DATASET_NAME" --provider auto --config "$CONFIG_PATH"
-  else
-    print_info "No configured LLM provider with an importable SDK detected; verifying the README auto-provider failure path first."
-    print_info "(If an API key is set but the provider SDK is missing, install the full bench stack with: pipx install 'docmancer[bench]' --force)"
-    if "${CLI_CMD[@]}" bench dataset create --from-corpus "$BENCH_CORPUS_DIR" --size 2 --name "$BENCH_DATASET_NAME" --provider auto --config "$CONFIG_PATH"; then
-      print_warn "Expected --provider auto to fail without configured providers, but it succeeded."
-      exit 1
-    fi
-    print_info "Falling back to heuristic generation for the no-key smoke path."
-    run "${CLI_CMD[@]}" bench dataset create --from-corpus "$BENCH_CORPUS_DIR" --size 2 --name "$BENCH_DATASET_NAME" --provider heuristic --config "$CONFIG_PATH"
-    run fill_bench_dataset_questions "$BENCH_DATASET_PATH" "$CONFIG_PATH"
-  fi
-  run "${CLI_CMD[@]}" bench dataset validate "$BENCH_DATASET_PATH"
-  run "${CLI_CMD[@]}" bench run --backend fts --dataset "$BENCH_DATASET_NAME" --run-id mydocs_fts --config "$CONFIG_PATH"
-  run "${CLI_CMD[@]}" bench report mydocs_fts --config "$CONFIG_PATH"
-  run "${CLI_CMD[@]}" bench list --config "$CONFIG_PATH"
-  run "${CLI_CMD[@]}" bench remove "$BENCH_DATASET_NAME" mydocs_fts --config "$CONFIG_PATH"
-  run "${CLI_CMD[@]}" bench list --config "$CONFIG_PATH"
-  run "${CLI_CMD[@]}" bench reset --config "$CONFIG_PATH"
-  run "${CLI_CMD[@]}" bench list --config "$CONFIG_PATH"
-)
 
 print_banner "Update all indexed sources"
 print_info "Refreshing every currently indexed source in the isolated database."

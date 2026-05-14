@@ -10,4 +10,3 @@ web_fetch:
   workers: 8
   default_page_cap: 500
   browser_fallback: false
-eval: null

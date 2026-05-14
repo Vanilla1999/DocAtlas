@@ -2,7 +2,7 @@
 
 Docmancer compresses documentation context so coding agents spend tokens on code, not on rereading raw docs. Docs are fetched from public sites, indexed locally with SQLite FTS5, and returned as compact context packs with source attribution. No API keys, no vector database, no background daemons on the core path.
 
-**MIT open source.** Everything runs locally. An optional benchmarking harness (`docmancer bench`) compares retrieval backends on your own corpus.
+**MIT open source.** Everything runs locally. The core path has no API keys, no vector database, and no background daemon.
 
 Executable: `{{DOCS_KIT_CMD}}`
 
@@ -39,29 +39,5 @@ docmancer fetch <url> --output <dir>
 `query` prints estimated raw docs tokens, context-pack tokens, percent saved, and agentic runway. Prefer the compact default. Use `--expand` for adjacent sections; use `--expand page` only when the surrounding page is necessary.
 
 `add` supports documentation URLs, GitHub repositories with README and docs markdown, local directories, markdown files, and text files. Extracted markdown/json remains inspectable under the configured `.docmancer/extracted` directory.
-
-## Benchmarking retrieval (optional)
-
-The `bench` namespace compares retrieval backends (FTS, vector, and an RLM path) on the same corpus and question set. FTS ships in core; the others are experimental extras.
-
-```bash
-docmancer bench init
-docmancer bench dataset use lenny                                          # built-in zero-config dataset (fetched once, then cached)
-docmancer bench dataset create --from-corpus <dir> --size 30 --name <name> --provider auto
-docmancer bench dataset validate <path>
-docmancer bench run --backend fts --dataset <name>
-docmancer bench compare <run_id_a> <run_id_b>
-docmancer bench report <run_id>
-docmancer bench list
-docmancer bench dataset list-builtin
-```
-
-Artifacts live under `.docmancer/bench/runs/<run_id>/`. A content-hashed `ingest_hash` stops `bench compare` from mixing runs against drifted corpora unless you pass `--allow-mixed-ingest`.
-
-Experimental backends require optional extras:
-
-- `pipx install 'docmancer[vector]'`
-- `pipx install 'docmancer[rlm]'`
-- `pipx install 'docmancer[judge]'`
 
 When documentation context is relevant, do not rely only on model memory or latest-only hosted docs. Query docmancer first, then cite or summarize the relevant local sections in the response.
