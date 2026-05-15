@@ -4,7 +4,8 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.5.0] - 2026-05-14
+## [0.5.0] - Unreleased
+
 ### Added
 
 - **Local-first RAG pipeline:** `docmancer ingest` now indexes PDF, DOCX, RTF, and HTML in addition to Markdown and plain text via new loaders under `docmancer/connectors/parsers/`. Install with `pip install docmancer[local]` for the optional parser dependencies.
@@ -33,6 +34,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - **Legacy stubs:** removed the top-level `docmancer eval` and `docmancer dataset` bench-pointer commands.
 
 ## [0.4.9] - 2026-04-28
+
 ### Added
 
 - **Open-Meteo built-in pack:** **`KnownOpenAPIRegistry`** can compile **`open-meteo@v1`** from the upstream OpenAPI **YAML** (override URL with **`DOCMANCER_OPEN_METEO_OPENAPI_URL`**). Injects **`servers`**, a stable **`operationId`** for **`/v1/forecast`**, and a no-auth contract so **`install-pack`** demos work without credentials.
@@ -58,6 +60,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - **`scripts/live_cli_integration.sh`:** **`mcp remove`** help surface and post-reinstall removal flow.
 
 ## [0.4.8] - 2026-04-28
+
 ### Added
 
 - **`docmancer.mcp.registry`:** **`default_registry()`** composes **`LocalRegistry`** (under **`~/.docmancer/registry/`** or **`DOCMANCER_REGISTRY_DIR`**), **`HostedRegistry`** (artifact API at **`DOCMANCER_REGISTRY_API_URL`** or **`https://docmancer.dev`** by default), and **`KnownOpenAPIRegistry`** (Stripe pack compiled from public OpenAPI when prebuilt artifacts are missing; override source with **`DOCMANCER_STRIPE_OPENAPI_URL`**).
@@ -75,6 +78,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - **`test_mcp_registry_fallback`:** hosted vs local chain, Stripe **`build_openapi_pack`** smoke, and **`default_registry()`** integration.
 
 ## [0.4.7] - 2026-04-28
+
 ### Added
 
 - **Default local pack registry:** **`~/.docmancer/registry/`** is created via **`ensure_dirs()`** and used when **`DOCMANCER_REGISTRY_DIR`** is unset. New **`paths.registry_dir()`** centralizes resolution (override still wins).
@@ -86,6 +90,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - **Wiki:** **`Configuration.md`** documents default **`~/.docmancer/registry/`** for **`install-pack`**; **`Troubleshooting.md`** removes the duplicated bench-specific FAQ (bench install paths remain in README, prior releases, and **`docmancer bench --help`**).
 
 ## [0.4.6] - 2026-04-27
+
 ### Added
 
 - **RLM bench backend controls:** new flags on **`docmancer bench run`** to keep RLM runs bounded and debuggable. **`--rlm-max-iterations`** caps the root LM's iteration count per question (docmancer default **6**; upstream **`rlm.RLM`** default is **30**). **`--rlm-verbose`** enables the upstream rich trace. **`--rlm-log-dir PATH`** wires an **`RLMLogger`** so each completion writes a **`.jsonl`** trajectory that can be opened in the upstream visualizer. Matching fields added to **`BenchBackendConfig`** (**`rlm_max_iterations`**, **`rlm_verbose`**, **`rlm_log_dir`**).
@@ -109,6 +114,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - **MCP:** new **`tests/test_mcp_*.py`** modules covering CLI wiring, dispatcher, installers, executors, credentials, idempotency, doctor, paths, logging, slug parsing, SHA verification, and agent **`install`** MCP handshake behavior.
 
 ## [0.4.5] - 2026-04-21
+
 ### Added
 
 - **`docmancer bench remove`:** delete local bench **datasets** and/or **run** directories under **`.docmancer/bench/`** (optional **`--dataset`** / **`--run`** to restrict which side is removed). Does not drop SQLite index rows or cached built-in corpora.
@@ -132,6 +138,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - **`test_runner_and_report`:** per-question loader merges retrievals/answers with dataset expected answers; single-run markdown renders the **Per-question results** table; **`bench compare --csv`** emits metrics + per-question sections; legacy runs without **`dataset_path`** in the snapshot still load with empty expected answers.
 
 ## [0.4.4] - 2026-04-21
+
 ### Added
 
 - **`docmancer[bench]`** optional extra: one install path for **vector + rlm + judge + llm** (full local bench stack). **`docmancer[vector]`** and **`docmancer[rlm]`** now include **`docmancer[llm]`** so Qdrant question generation and RLM answering have provider SDKs in the same venv.
@@ -150,6 +157,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - **`test_qdrant_backend`**, **`test_rlm_backend`**, **`test_answer_overlap_fallback`**, **`test_cli_config_flag_surface`**, and extended provider / metrics tests.
 
 ## [0.4.3] - 2026-04-21
+
 ### Added
 
 - **`bench dataset use`:** optional **`--no-ingest`** to skip indexing the corpus; by default the command ingests the resolved corpus into the SQLite index (with **skip when already fully indexed** detection for **`.md`** / **`.txt`** sources) so **`bench run`** can retrieve without a separate **`docmancer add`**.
@@ -183,6 +191,7 @@ Release highlights: built-in **`docmancer bench dataset use lenny`** for a zero-
 - **`tests/bench/`:** corpora resolution, LLM provider wiring, question generation, and related CLI coverage.
 
 ## [0.4.1] - 2026-04-21
+
 ## [0.4.0] - 2026-04-20
 
 Release highlights: local **`docmancer bench`** (FTS, optional Qdrant + RLM), removal of the hosted registry CLI and **`eval`**, and config deprecations for **`registry:`** / **`eval:`** with migration notes below.
@@ -210,6 +219,7 @@ Release highlights: local **`docmancer bench`** (FTS, optional Qdrant + RLM), re
 - Install extras: `docmancer[judge]` is the new name for `docmancer[ragas]`. The old name works for this release only.
 
 ## [0.3.4] - 2026-04-15
+
 ### Added
 
 - **`docmancer add`:** after indexing, prints **SQLite** and **extracted** paths with **on-disk sizes** and a total storage line (in addition to the section count).
@@ -229,6 +239,7 @@ Release highlights: local **`docmancer bench`** (FTS, optional Qdrant + RLM), re
 - **`test_cli`:** ingest output includes storage summary paths and sizes.
 
 ## [0.3.3] - 2026-04-15
+
 ### Added
 
 - **`docmancer install github-copilot`:** writes user **`~/.copilot/copilot-instructions.md`**, or with **`--project`** writes **`.github/copilot-instructions.md`**, merges the Cursor-style **`AGENTS.md`** block when needed, and sets **`github.copilot.chat.codeGeneration.useInstructionFiles`** in **`.vscode/settings.json`** so repository instructions load in VS Code.
@@ -247,6 +258,7 @@ Release highlights: local **`docmancer bench`** (FTS, optional Qdrant + RLM), re
 - **`test_install_cmd`:** **`test_install_github_copilot_project_creates_repo_instructions`** and **`test_setup_detects_vscode_and_installs_github_copilot_project_files`**.
 
 ## [0.3.2] - 2026-04-14
+
 ### Added
 
 - **`pull` pack arguments:** HTTPS **registry pack page** URLs (for example `https://www.docmancer.dev/registry/<name>` with optional **`?version=`**) are normalized to **`name`** / **`name@version`** before download, so you can paste a link from the website.
@@ -261,6 +273,7 @@ Release highlights: local **`docmancer bench`** (FTS, optional Qdrant + RLM), re
 - **`test_registry_cli`:** **`test_registry_page_url_can_be_used_as_pack_ref`** covers **`_split_pack_ref`** for registry URLs with and without **`version`**.
 
 ## [0.3.1] - 2026-04-14
+
 ### Added
 
 - **Registry CLI:** **`search`**, **`pull`**, **`packs`**, **`packs sync`**, **`publish`**, **`audit`**, and **`auth`** (**`login`**, **`logout`**, **`status`**, optional **`--token`**) backed by a registry HTTP client and local pack cache under **`registry.cache_dir`**.
@@ -276,6 +289,7 @@ Release highlights: local **`docmancer bench`** (FTS, optional Qdrant + RLM), re
 - **`test_fetcher_github`**, **`test_sitemap`**, **`test_web_fetcher`**, and related suites extended for the factory and GitHub fetch behavior.
 
 ## [0.3.0] - 2026-04-12
+
 This release replaces the 0.2.x vector stack with a **SQLite FTS5** section index and reframes the CLI around **context packs** for agents. Treat it as a clean upgrade: re-index sources with **`docmancer add`** / **`docmancer update`** after installing.
 
 ### Breaking
@@ -324,6 +338,7 @@ This release replaces the 0.2.x vector stack with a **SQLite FTS5** section inde
 - **`test_config`:** legacy **`vector_store.local_path`** pointing at a **directory** resolves to **`.docmancer/docmancer.db`** under the config parent.
 
 ## [0.2.3] - 2026-04-10
+
 ### Added
 
 - **`docmancer obsidian`:** **`discover`**, **`sync`** (including **`--all`** and **`--pick`**), **`status`**, and **`list`** for Obsidian vault discovery, incremental sync, and inventory.
@@ -349,6 +364,7 @@ This release replaces the 0.2.x vector stack with a **SQLite FTS5** section inde
 - **`test_vault_open`:** aligned with refactors.
 
 ## [0.2.2] - 2026-04-08
+
 ### Added
 
 - **`vault.license`** in **`docmancer.yaml`** (**`VaultConfig`**, **`VAULT_LICENSE`**): required before **`vault publish`**; written to the vault **card** and enforced with a clear CLI error when missing.
@@ -369,6 +385,7 @@ This release replaces the 0.2.x vector stack with a **SQLite FTS5** section inde
 - Extended **`test_vault_cli`**, **`test_vault_installer`**, **`test_vault_lint`**, **`test_vault_operations`**, and **`test_vault_packaging`** for publish/install/lint/packaging behavior.
 
 ## [0.2.1] - 2026-04-07
+
 ### Changed
 
 - **README:** Vault-first quickstart, **Two Workflows** (research vaults vs quick docs **`ingest`**), Obsidian adoption (**`vault open`**), refreshed hero line and benefit bullets, wiki TOC link.
@@ -449,6 +466,7 @@ This release adds an optional **knowledge vault** workflow on top of the existin
 - **`test_freshness.py`**, **`test_obsidian.py`**, **`test_obsidian_integration.py`**, **`test_scanner_obsidian.py`** for Obsidian init, discovery, and scan-on-query behavior; expanded **`test_cli`**, **`test_vault_cli`**, **`test_vault_operations`**, and **`test_qdrant_store`** for **`query`**, cross-vault warnings, registry updates, and payload index handling.
 
 ## [0.1.11] - 2026-04-03
+
 ### Added
 
 - **`docmancer install cline`:** installs the shared **`skill.md`** template under **`~/.cline/skills/docmancer/SKILL.md`** for the Cline VS Code extension (Cline Skills); use **`--project`** for **`.cline/skills/docmancer/SKILL.md`** in the current directory.
@@ -462,6 +480,7 @@ This release adds an optional **knowledge vault** workflow on top of the existin
 - **Tests:** CLI version tests assert against **`docmancer._version.__version__`** instead of a hard-coded string.
 
 ## [0.1.10] - 2026-04-03
+
 ### Added
 
 - **`ingestion` config:** **`workers`** (default between 1 and 4, capped by **`os.cpu_count()`**), **`embed_queue_size`** (default **`4`**), overridable via **`docmancer.yaml`** / **`INGESTION_*`** env vars.
@@ -480,6 +499,7 @@ This release adds an optional **knowledge vault** workflow on top of the existin
 - **`scripts/live_cli_integration.sh`:** extended coverage for the new ingest and fetch paths.
 
 ## [0.1.9] - 2026-04-01
+
 ### Added
 
 - **`display_path()`** in **`docmancer/cli/ui.py`:** formats paths for CLI output using **`~/...`** under the user home directory, **`./...`** when under the current working directory, and sensible fallbacks for relative paths and URLs.
@@ -490,6 +510,7 @@ This release adds an optional **knowledge vault** workflow on top of the existin
 - **Ingest logging** uses each document’s **`source`** (page or file path) for chunk/embed/store progress lines instead of preferring **`docset_root`**, so multi-page ingests show the concrete URL or path being processed.
 
 ## [0.1.8] - 2026-04-01
+
 ### Added
 
 - **`embedding` config:** `batch_size` (default `256`), `parallel` (default `0` for all cores), and `lazy_load` (default `true`), overridable via `docmancer.yaml` / `EMBEDDING_*` env vars; passed through **FastEmbed** dense and sparse embedders.
@@ -504,11 +525,13 @@ This release adds an optional **knowledge vault** workflow on top of the existin
 - **Skills / templates:** Note **`embedding.batch_size` / `parallel` / `lazy_load`** for large ingests and expanded **`doctor`** behavior.
 
 ## [0.1.7] - 2026-04-01
+
 ### Documentation
 
 - **README:** Refreshed hero (tighter value proposition, benefit checklist, table-of-contents link); expanded **The Problem** with contrast to cloud doc tools; new **Why Local** section with a table on local-first indexing versus common concerns; updated closing line.
 
 ## [0.1.6] - 2026-03-31
+
 ### Added
 
 - **Docset grouping:** `docset_root` metadata on ingested URL documents (GitBook/Mintlify `llms.txt` paths, web fetcher) stored in Qdrant payloads; **`docmancer list`** defaults to **one row per doc site** (newest ingest time). Use **`docmancer list --all`** for every stored page/file source.
@@ -529,6 +552,7 @@ This release adds an optional **knowledge vault** workflow on top of the existin
 - **Qdrant deletes:** use a **scroll probe** before `delete` so “no matches” no longer reports success when nothing was removed.
 
 ## [0.1.5] - 2026-03-30
+
 ### Added
 
 - **`web` ingest provider** and **`WebFetcher`:** generic pipeline for public doc sites that are not GitBook/Mintlify: homepage platform detection, discovery (`llms-full.txt`, `llms.txt`, sitemap, nav strategies), URL normalization and doc filtering, **robots.txt** checks, rate limiting and redirect tracking, HTML extraction via **trafilatura** and **markdownify**, content deduplication, and rich metadata. Optional **Playwright** fallback for JS-heavy pages (`docmancer ingest --browser`); install with **`pip install docmancer[browser]`** (or equivalent extras).
@@ -544,12 +568,14 @@ This release adds an optional **knowledge vault** workflow on top of the existin
 - **README:** Updated for **`auto` / `web`** ingest, new CLI options, optional browser extra, and dependency/stack notes (structure trimmed vs. earlier long-form hero).
 
 ## [0.1.4] - 2026-03-30
+
 ### Changed
 
 - **README:** Wizard logo next to the project title (`readme-assets/wizard-logo.png`, synced from the website mascot); MIT license badge via GitHub, explicit Python 3.11 / 3.12 / 3.13 badge; centered title uses HTML `<h1>` with the icon; PyPI version and CI badges unchanged.
 - **CLI / skills:** Replaced em dashes with colons, commas, or semicolons in `docmancer init` output, the `install` command docstring, and skill templates (`skill.md`, Claude Code/Desktop, Cursor `AGENTS.md` fragment) for clearer plain-text rendering.
 
 ## [0.1.3] - 2026-03-30
+
 ### Added
 
 - Shared CLI branding module (`docmancer/cli/ui.py`): ASCII banner, tagline, and helpers for TTY-aware color.
