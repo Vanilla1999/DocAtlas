@@ -6,6 +6,7 @@ from docmancer.cli.commands import (
     doctor_cmd,
     fetch_cmd,
     ingest_cmd,
+    ingest_uspto_cmd,
     init_cmd,
     inspect_cmd,
     install_cmd,
@@ -21,6 +22,7 @@ from docmancer.cli.mcp_commands import (
     mcp_group,
     uninstall_pack_cmd,
 )
+from docmancer.cli.qdrant_commands import qdrant_group
 
 
 def _show_version(ctx: click.Context, param: click.Parameter, value: bool) -> None:
@@ -35,6 +37,7 @@ def _show_version(ctx: click.Context, param: click.Parameter, value: bool) -> No
     context_settings=HELP_CONTEXT_SETTINGS,
     epilog=format_examples(
         "docmancer setup",
+        "docmancer ingest ./docs",
         "docmancer add https://docs.example.com",
         "docmancer update",
         'docmancer query "How do I authenticate?"',
@@ -72,9 +75,11 @@ cli.add_command(init_cmd, "init")
 cli.add_command(fetch_cmd, "fetch")
 cli.add_command(install_cmd, "install")
 cli.add_command(ingest_cmd, "ingest")
+cli.add_command(ingest_uspto_cmd, "ingest-uspto")
 cli.add_command(mcp_group, "mcp")
 cli.add_command(install_pack_cmd, "install-pack")
 cli.add_command(uninstall_pack_cmd, "uninstall")
+cli.add_command(qdrant_group, "qdrant")
 
 
 if __name__ == "__main__":

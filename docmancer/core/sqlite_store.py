@@ -10,6 +10,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Iterable
 
+from docmancer.core.chunking import chunk_paragraphs
 from docmancer.core.models import Document, RetrievedChunk
 
 
@@ -78,6 +79,71 @@ def _split_sections(content: str) -> list[tuple[str, int, str]]:
     return sections
 
 
+def _split_sections_with_anchors(content: str) -> list[tuple[str, int, str, str]]:
+    matches = list(HEADING_RE.finditer(content))
+    if not matches:
+        stripped = content.strip()
+        return [("Document", 1, stripped, "Document")] if stripped else []
+
+    sections: list[tuple[str, int, str, str]] = []
+    if matches[0].start() > 0:
+        intro = content[: matches[0].start()].strip()
+        if intro:
+            sections.append(("Introduction", 1, intro, "Introduction"))
+
+    heading_stack: list[tuple[int, str]] = []
+    for index, match in enumerate(matches):
+        level = len(match.group(1))
+        title = match.group(2).strip()
+        while heading_stack and heading_stack[-1][0] >= level:
+            heading_stack.pop()
+        heading_stack.append((level, title))
+        start = match.start()
+        end = matches[index + 1].start() if index + 1 < len(matches) else len(content)
+        text = content[start:end].strip()
+        if text:
+            sections.append((title, level, text, " > ".join(item for _, item in heading_stack)))
+    return sections
+
+
+def _sections_for_document(doc: Document) -> list[tuple[str, int, str, dict[str, str]]]:
+    metadata = dict(doc.metadata or {})
+    strategy = str(metadata.get("chunking_strategy") or "heading")
+    chunk_size = int(metadata.get("chunk_size") or 800)
+    chunk_overlap = int(metadata.get("chunk_overlap") or 100)
+
+    if strategy == "paragraph":
+        title = str(metadata.get("title") or Path(doc.source).stem or "Document")
+        chunks = chunk_paragraphs(doc.content, chunk_size=chunk_size, chunk_overlap=chunk_overlap)
+        sections: list[tuple[str, int, str, dict[str, str]]] = []
+        for index, text in enumerate(chunks):
+            page_match = re.search(r"##\s+Page\s+(\d+)", text)
+            anchor = f"Page {page_match.group(1)}" if page_match else f"{title} chunk {index + 1}"
+            sections.append((title, 1, text, {"anchor": anchor}))
+        return sections
+
+    if strategy == "single":
+        # Atomic-record sources (e.g. USPTO case files): the whole document is one
+        # section. We do not split on headings — heading-aware splitting would
+        # otherwise carve each record into two or three sub-sections, which is
+        # the wrong shape for "match the mark against every case file".
+        title = str(metadata.get("title") or Path(doc.source).stem or "Document")
+        anchor = str(metadata.get("anchor") or title)
+        text = doc.content.strip()
+        if not text:
+            return []
+        return [(title, 1, text, {"anchor": anchor})]
+
+    return [
+        (title, level, text, {"anchor": anchor})
+        for title, level, text, anchor in _split_sections_with_anchors(doc.content)
+    ]
+
+
+def _chunk_hash(text: str) -> str:
+    return hashlib.sha256(text.encode("utf-8")).hexdigest()
+
+
 class SQLiteStore:
     def __init__(self, db_path: str | Path, extracted_dir: str | Path | None = None):
         self.db_path = Path(db_path).expanduser()
@@ -125,6 +191,11 @@ class SQLiteStore:
                     level INTEGER NOT NULL,
                     text TEXT NOT NULL,
                     token_estimate INTEGER NOT NULL,
+                    source_path TEXT,
+                    document_title TEXT,
+                    format TEXT,
+                    anchor TEXT,
+                    content_hash TEXT,
                     metadata_json TEXT NOT NULL DEFAULT '{}'
                 );
 
@@ -138,6 +209,32 @@ class SQLiteStore:
 
                 """
             )
+            self._ensure_nullable_column(conn, "sections", "source_path", "TEXT")
+            self._ensure_nullable_column(conn, "sections", "document_title", "TEXT")
+            self._ensure_nullable_column(conn, "sections", "format", "TEXT")
+            self._ensure_nullable_column(conn, "sections", "anchor", "TEXT")
+            self._ensure_nullable_column(conn, "sections", "content_hash", "TEXT")
+            conn.executescript(
+                """
+                CREATE TABLE IF NOT EXISTS embedding_upserts (
+                    chunk_id INTEGER NOT NULL,
+                    qdrant_collection TEXT NOT NULL,
+                    content_hash TEXT,
+                    embedding_hash TEXT,
+                    upserted_at TEXT NOT NULL,
+                    status TEXT NOT NULL DEFAULT 'ok',
+                    PRIMARY KEY (chunk_id, qdrant_collection)
+                );
+                CREATE INDEX IF NOT EXISTS idx_embedding_upserts_collection
+                    ON embedding_upserts(qdrant_collection);
+                """
+            )
+
+    @staticmethod
+    def _ensure_nullable_column(conn: sqlite3.Connection, table: str, column: str, declaration: str) -> None:
+        existing = {row["name"] for row in conn.execute(f"PRAGMA table_info({table})")}
+        if column not in existing:
+            conn.execute(f"ALTER TABLE {table} ADD COLUMN {column} {declaration}")
 
     def add_documents(self, documents: Iterable[Document], recreate: bool = False) -> IndexResult:
         docs = list(documents)
@@ -151,6 +248,44 @@ class SQLiteStore:
             for doc in docs:
                 section_count += self._add_document(conn, doc)
             return IndexResult(sources=len(docs), sections=section_count)
+
+    def add_documents_stream(
+        self,
+        documents: Iterable[Document],
+        *,
+        recreate: bool = False,
+        batch_size: int = 1000,
+        progress_callback=None,
+    ) -> IndexResult:
+        """Stream-ingest an iterable of documents, committing in batches.
+
+        Use this for atomic-record corpora (USPTO case files, court filings,
+        product catalogs) where the iterator would yield millions of records
+        and ``list(documents)`` would OOM. Commits every ``batch_size`` rows
+        so a killed process loses at most one batch.
+        """
+        section_count = 0
+        source_count = 0
+        conn = self._connect()
+        try:
+            if recreate:
+                conn.execute("DELETE FROM sections_fts")
+                conn.execute("DELETE FROM sections")
+                conn.execute("DELETE FROM sources")
+                conn.commit()
+            for doc in documents:
+                section_count += self._add_document(conn, doc)
+                source_count += 1
+                if source_count % batch_size == 0:
+                    conn.commit()
+                    if progress_callback is not None:
+                        progress_callback(source_count, section_count)
+            conn.commit()
+        finally:
+            conn.close()
+        if progress_callback is not None:
+            progress_callback(source_count, section_count)
+        return IndexResult(sources=source_count, sections=section_count)
 
     def _add_document(self, conn: sqlite3.Connection, doc: Document) -> int:
         metadata = dict(doc.metadata or {})
@@ -215,13 +350,31 @@ class SQLiteStore:
             source_id = int(cursor.lastrowid)
 
         section_count = 0
-        for chunk_index, (title, level, text) in enumerate(_split_sections(doc.content)):
-            section_meta = {**metadata, "section_title": title, "section_level": level}
+        source_path = str(metadata.get("source_path") or doc.source)
+        document_title = str(metadata.get("title") or Path(doc.source).stem or "Document")
+        format_name = str(metadata.get("format") or "")
+        for chunk_index, (title, level, text, chunk_meta) in enumerate(_sections_for_document(doc)):
+            anchor = str(chunk_meta.get("anchor") or title)
+            content_hash = _chunk_hash(text)
+            section_meta = {
+                **metadata,
+                "section_title": title,
+                "section_level": level,
+                "source_path": source_path,
+                "document_title": document_title,
+                "document_title_hash": hashlib.sha1(
+                    (document_title or "").encode("utf-8")
+                ).hexdigest()[:16],
+                "format": format_name,
+                "anchor": anchor,
+                "content_hash": content_hash,
+            }
             cursor = conn.execute(
                 """
                 INSERT INTO sections
-                    (source_id, source, chunk_index, title, level, text, token_estimate, metadata_json)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                    (source_id, source, chunk_index, title, level, text, token_estimate,
+                     source_path, document_title, format, anchor, content_hash, metadata_json)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     source_id,
@@ -231,6 +384,11 @@ class SQLiteStore:
                     level,
                     text,
                     estimate_tokens(text),
+                    source_path,
+                    document_title,
+                    format_name,
+                    anchor,
+                    content_hash,
                     json.dumps(section_meta, ensure_ascii=False),
                 ),
             )
@@ -341,6 +499,7 @@ class SQLiteStore:
             metadata.update(
                 {
                     "title": row["title"],
+                    "section_id": int(row["id"]),
                     "token_estimate": int(row["token_estimate"]),
                     "docmancer_tokens": token_total,
                     "raw_tokens": raw_tokens,
@@ -350,6 +509,54 @@ class SQLiteStore:
             )
             # FTS5 bm25 is lower-is-better. Present a positive rank-like score.
             score = max(0.0, 1.0 - (index * 0.05))
+            results.append(
+                RetrievedChunk(
+                    source=row["source"],
+                    chunk_index=int(row["chunk_index"]),
+                    text=row["text"],
+                    score=score,
+                    metadata=metadata,
+                )
+            )
+        return results
+
+    def fetch_sections_by_id(
+        self,
+        section_ids: list[int],
+        *,
+        budget: int = 2400,
+    ) -> list[RetrievedChunk]:
+        """Hydrate ``RetrievedChunk`` objects from raw section ids, preserving order."""
+        if not section_ids:
+            return []
+        placeholders = ",".join("?" * len(section_ids))
+        with self._connect() as conn:
+            rows = {
+                int(row["id"]): row
+                for row in conn.execute(
+                    f"""
+                    SELECT s.id, s.source, s.chunk_index, s.title, s.text,
+                           s.token_estimate, s.metadata_json
+                    FROM sections s
+                    WHERE s.id IN ({placeholders})
+                    """,
+                    section_ids,
+                )
+            }
+        results: list[RetrievedChunk] = []
+        used_tokens = 0
+        for rank, sid in enumerate(section_ids):
+            row = rows.get(int(sid))
+            if row is None:
+                continue
+            tok = int(row["token_estimate"] or 0)
+            if used_tokens and used_tokens + tok > budget:
+                break
+            used_tokens += tok
+            metadata = json.loads(row["metadata_json"] or "{}")
+            metadata.setdefault("title", row["title"])
+            metadata.setdefault("section_id", int(row["id"]))
+            score = max(0.0, 1.0 - (rank * 0.05))
             results.append(
                 RetrievedChunk(
                     source=row["source"],
@@ -491,11 +698,30 @@ class SQLiteStore:
         with self._connect() as conn:
             sources = conn.execute("SELECT COUNT(*) AS count FROM sources").fetchone()["count"]
             sections = conn.execute("SELECT COUNT(*) AS count FROM sections").fetchone()["count"]
+            format_rows = conn.execute(
+                """
+                SELECT COALESCE(NULLIF(format, ''), 'unknown') AS format, COUNT(*) AS count
+                FROM sections
+                GROUP BY COALESCE(NULLIF(format, ''), 'unknown')
+                ORDER BY format
+                """
+            ).fetchall()
+            source_format_rows = conn.execute(
+                """
+                SELECT COALESCE(NULLIF(json_extract(metadata_json, '$.format'), ''), 'unknown') AS format,
+                       COUNT(*) AS count
+                FROM sources
+                GROUP BY COALESCE(NULLIF(json_extract(metadata_json, '$.format'), ''), 'unknown')
+                ORDER BY format
+                """
+            ).fetchall()
         return {
             "collection_exists": self.db_path.exists(),
             "sources_count": int(sources),
             "points_count": int(sections),
             "sections_count": int(sections),
+            "sources_by_format": {str(row["format"]): int(row["count"]) for row in source_format_rows},
+            "sections_by_format": {str(row["format"]): int(row["count"]) for row in format_rows},
             "db_path": str(self.db_path),
             "extracted_dir": str(self.extracted_dir),
         }
@@ -523,6 +749,164 @@ class SQLiteStore:
     def list_sources(self) -> list[str]:
         return [entry["source"] for entry in self.list_sources_with_dates()]
 
+    def list_embedding_upserts(self, collection: str) -> dict[int, dict]:
+        """Return ``{chunk_id: {content_hash, embedding_hash, status}}`` for a collection."""
+        with self._connect() as conn:
+            rows = conn.execute(
+                """
+                SELECT chunk_id, content_hash, embedding_hash, upserted_at, status
+                FROM embedding_upserts
+                WHERE qdrant_collection = ?
+                """,
+                (collection,),
+            )
+            return {
+                int(row["chunk_id"]): {
+                    "content_hash": row["content_hash"] or "",
+                    "embedding_hash": row["embedding_hash"] or "",
+                    "upserted_at": row["upserted_at"] or "",
+                    "status": row["status"] or "",
+                }
+                for row in rows
+            }
+
+    def record_embedding_upserts(
+        self,
+        collection: str,
+        records: list[dict],
+    ) -> None:
+        """Insert/replace rows in ``embedding_upserts``.
+
+        Each record needs ``chunk_id``, ``content_hash``, ``embedding_hash``,
+        and optionally ``status`` (defaults to "ok").
+        """
+        now = datetime.now(timezone.utc).isoformat(timespec="seconds")
+        with self._connect() as conn:
+            conn.executemany(
+                """
+                INSERT INTO embedding_upserts
+                    (chunk_id, qdrant_collection, content_hash, embedding_hash, upserted_at, status)
+                VALUES (?, ?, ?, ?, ?, ?)
+                ON CONFLICT(chunk_id, qdrant_collection) DO UPDATE SET
+                    content_hash = excluded.content_hash,
+                    embedding_hash = excluded.embedding_hash,
+                    upserted_at = excluded.upserted_at,
+                    status = excluded.status
+                """,
+                [
+                    (
+                        int(r["chunk_id"]),
+                        collection,
+                        r.get("content_hash") or "",
+                        r.get("embedding_hash") or "",
+                        now,
+                        r.get("status") or "ok",
+                    )
+                    for r in records
+                ],
+            )
+
+    def delete_embedding_upserts(self, collection: str, chunk_ids: list[int]) -> int:
+        if not chunk_ids:
+            return 0
+        placeholders = ",".join("?" * len(chunk_ids))
+        with self._connect() as conn:
+            cur = conn.execute(
+                f"DELETE FROM embedding_upserts "
+                f"WHERE qdrant_collection = ? AND chunk_id IN ({placeholders})",
+                (collection, *chunk_ids),
+            )
+            return cur.rowcount or 0
+
+    def adjacent_section_ids(self, section_id: int, *, mode: str = "adjacent") -> list[int]:
+        """Return neighboring section ids for hybrid-mode neighbor expansion.
+
+        ``mode="adjacent"`` returns the prev + next sections within the same
+        source. ``mode="page"`` returns every section belonging to the same
+        source as the target.
+        """
+        with self._connect() as conn:
+            row = conn.execute(
+                "SELECT source, chunk_index FROM sections WHERE id = ?",
+                (int(section_id),),
+            ).fetchone()
+            if not row:
+                return []
+            source = row["source"]
+            chunk_index = int(row["chunk_index"])
+            if mode == "page":
+                rows = conn.execute(
+                    """
+                    SELECT id, chunk_index FROM sections
+                    WHERE source = ? AND id != ?
+                    ORDER BY chunk_index
+                    """,
+                    (source, int(section_id)),
+                )
+                return [int(r["id"]) for r in rows]
+            # default: adjacent (prev + next)
+            rows = conn.execute(
+                """
+                SELECT id, chunk_index FROM sections
+                WHERE source = ? AND chunk_index IN (?, ?)
+                ORDER BY chunk_index
+                """,
+                (source, chunk_index - 1, chunk_index + 1),
+            )
+            return [int(r["id"]) for r in rows]
+
+    def document_title_hashes_for(self, section_ids: list[int]) -> dict[int, str]:
+        """Return ``{section_id: document_title_hash}`` for hierarchical retrieval.
+
+        Pulled from ``metadata_json`` because the field is loader-set and
+        not promoted to a top-level column. Empty hash means the loader
+        did not record one (USPTO atomic records, etc.) and the section
+        should not participate in document-level grouping.
+        """
+        if not section_ids:
+            return {}
+        placeholders = ",".join("?" * len(section_ids))
+        out: dict[int, str] = {}
+        with self._connect() as conn:
+            for row in conn.execute(
+                f"SELECT id, metadata_json FROM sections WHERE id IN ({placeholders})",
+                section_ids,
+            ):
+                try:
+                    md = json.loads(row["metadata_json"] or "{}")
+                except json.JSONDecodeError:
+                    md = {}
+                doc_hash = md.get("document_title_hash") or md.get("docset_root") or ""
+                if doc_hash:
+                    out[int(row["id"])] = str(doc_hash)
+        return out
+
+    def distinct_document_count(self) -> int:
+        """Return the number of distinct documents in the index.
+
+        Mirrors what ``document_title_hash`` would group by: the hash is
+        derived from ``document_title``, so counting distinct
+        non-empty ``document_title`` values is equivalent and avoids a
+        scan through ``metadata_json``.
+        """
+        with self._connect() as conn:
+            row = conn.execute(
+                "SELECT COUNT(DISTINCT document_title) AS n "
+                "FROM sections WHERE document_title IS NOT NULL AND document_title <> ''"
+            ).fetchone()
+            return int(row["n"]) if row else 0
+
+    def section_count_grouped_by_format(self) -> dict[str, int]:
+        with self._connect() as conn:
+            rows = conn.execute(
+                """
+                SELECT COALESCE(NULLIF(format, ''), 'unknown') AS fmt, COUNT(*) AS n
+                FROM sections
+                GROUP BY fmt
+                """
+            )
+            return {row["fmt"]: int(row["n"]) for row in rows}
+
     def list_sections_for_embedding(self) -> list[dict]:
         """Return canonical section chunks for embedding-based consumers.
 
@@ -534,7 +918,8 @@ class SQLiteStore:
         with self._connect() as conn:
             rows = conn.execute(
                 """
-                SELECT id, source, chunk_index, title, level, text, token_estimate
+                SELECT id, source, chunk_index, title, level, text, token_estimate,
+                       source_path, document_title, format, anchor, content_hash
                 FROM sections
                 ORDER BY source, chunk_index
                 """
@@ -548,6 +933,11 @@ class SQLiteStore:
                     "level": int(row["level"] or 0),
                     "text": str(row["text"] or ""),
                     "token_estimate": int(row["token_estimate"] or 0),
+                    "source_path": str(row["source_path"] or ""),
+                    "document_title": str(row["document_title"] or ""),
+                    "format": str(row["format"] or ""),
+                    "anchor": str(row["anchor"] or ""),
+                    "content_hash": str(row["content_hash"] or ""),
                 }
                 for row in rows
             ]
@@ -556,6 +946,19 @@ class SQLiteStore:
         with self._connect() as conn:
             row = conn.execute("SELECT content FROM sources WHERE source = ?", (source,)).fetchone()
             return str(row["content"]) if row else None
+
+    def has_source_content_hash(self, source: str, content_hash: str) -> bool:
+        if not content_hash:
+            return False
+        with self._connect() as conn:
+            row = conn.execute("SELECT metadata_json FROM sources WHERE source = ?", (source,)).fetchone()
+        if not row:
+            return False
+        try:
+            metadata = json.loads(row["metadata_json"] or "{}")
+        except json.JSONDecodeError:
+            return False
+        return metadata.get("content_hash") == content_hash
 
     def delete_docset(self, docset_root: str) -> bool:
         with self._connect() as conn:

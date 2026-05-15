@@ -3,6 +3,7 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+WORKSPACE_ROOT="$(cd "$ROOT_DIR/.." && pwd)"
 
 # Command to run a quick smoke test: DOCMANCER_RUN_FETCH_STEP=0 DOCMANCER_RUN_GITHUB_BLOB=0 DOCMANCER_LIVE_MAX_PAGES=1 scripts/live_cli_integration.sh
 
@@ -32,10 +33,23 @@ RUN_CRAWL4AI_VARIANT="${DOCMANCER_RUN_CRAWL4AI_VARIANT:-0}"
 RUN_GITHUB_BLOB="${DOCMANCER_RUN_GITHUB_BLOB:-1}"
 GITHUB_BLOB_URL="${DOCMANCER_GITHUB_BLOB_URL:-https://github.com/pytest-dev/pytest/blob/main/README.rst}"
 RUN_FETCH_STEP="${DOCMANCER_RUN_FETCH_STEP:-1}"
+RUN_LOCAL_CORPUS="${DOCMANCER_RUN_LOCAL_CORPUS:-1}"
+RUN_LOCAL_PDF_CORPUS="${DOCMANCER_RUN_LOCAL_PDF_CORPUS:-1}"
+BUILD_TEST_CORPUS="${DOCMANCER_BUILD_TEST_CORPUS:-0}"
+TEST_CORPUS_SCRIPT="$WORKSPACE_ROOT/scripts/build-test-corpus.py"
+TEST_CORPUS_MD_DIR="$WORKSPACE_ROOT/test-corpora/stories-md"
+TEST_CORPUS_PDF_DIR="$WORKSPACE_ROOT/test-corpora/stories-pdf"
 SKIP_NETWORK="${DOCMANCER_SKIP_NETWORK:-0}"
 # Set to 1 to keep the temp dir for inspection; default removes it on every exit.
 KEEP_TMP="${DOCMANCER_KEEP_TMP:-0}"
 REQUIRE_REFRESH="${DOCMANCER_REQUIRE_REFRESH:-0}"
+# Opt-in: exercise the full vector-retrieval stack end-to-end. Off by default
+# because it downloads the pinned Qdrant binary (~60 MB) on first run and
+# pulls FastEmbed dense + SPLADE models (~500 MB) into the test HOME. The
+# default local-corpus path covers the new CLI *surface* (qdrant status,
+# help, etc.) without spawning anything. The later live add path may still
+# start managed Qdrant because URL ingestion uses vector sync by default.
+RUN_VECTOR_STACK="${DOCMANCER_RUN_VECTOR_STACK:-0}"
 
 if [[ ! -x "$VENV_PYTHON" ]]; then
   echo "Missing repo venv at $VENV_PYTHON"
@@ -52,6 +66,9 @@ LOCAL_REGISTRY_DIR="$TMP_ROOT/local-registry"
 CONFIG_PATH="$PROJECT_DIR/docmancer.yaml"
 
 cleanup() {
+  if [[ -x "$VENV_PYTHON" ]]; then
+    "$VENV_PYTHON" -m docmancer qdrant down >/dev/null 2>&1 || true
+  fi
   if [[ "$KEEP_TMP" == "1" ]]; then
     echo
     echo "Temporary files kept at: $TMP_ROOT"
@@ -229,11 +246,15 @@ print_info "Local crawl cap: $MAX_PAGES page(s), $FETCH_WORKERS worker(s)"
 print_info "Local crawl provider: $ADD_PROVIDER"
 print_info "Local crawl strategy: ${ADD_STRATEGY:-<default>}"
 print_info "Fetch markdown step: $RUN_FETCH_STEP"
+print_info "Local story corpus ingest: $RUN_LOCAL_CORPUS"
+print_info "Local PDF corpus ingest: $RUN_LOCAL_PDF_CORPUS"
+print_info "Build test corpus if missing: $BUILD_TEST_CORPUS"
 print_info "Alternate web strategy: $RUN_WEB_VARIANTS"
 print_info "Browser fallback variant: $RUN_BROWSER_VARIANT"
 print_info "Crawl4AI variant: $RUN_CRAWL4AI_VARIANT"
 print_info "GitHub blob URL test: $RUN_GITHUB_BLOB ($GITHUB_BLOB_URL)"
 print_info "Skip all network work: $SKIP_NETWORK"
+print_info "Vector retrieval stack (Qdrant + FastEmbed): $RUN_VECTOR_STACK"
 print_info "Keep temporary files: $KEEP_TMP"
 print_info "Require editable reinstall: $REQUIRE_REFRESH"
 if [[ "$SKIP_NETWORK" == "1" ]]; then
@@ -267,8 +288,11 @@ run "$VENV_PYTHON" -c "import docmancer, sys; print('python=', sys.executable); 
 print_banner "CLI help surface"
 print_info "Checking top-level help plus local indexing, MCP, pack install, install, and maintenance commands."
 run "${CLI_CMD[@]}" --help
-for command in setup add update query list inspect remove doctor init install fetch ingest mcp install-pack uninstall; do
+for command in setup add update query list inspect remove doctor init install fetch ingest mcp install-pack uninstall qdrant; do
   run "${CLI_CMD[@]}" "$command" --help
+done
+for command in up down status upgrade logs; do
+  run "${CLI_CMD[@]}" qdrant "$command" --help
 done
 for command in serve doctor list enable disable remove; do
   run "${CLI_CMD[@]}" mcp "$command" --help
@@ -433,6 +457,80 @@ print_info "The local index should still be empty before any live crawl."
 run "${CLI_CMD[@]}" doctor --config "$CONFIG_PATH"
 run "${CLI_CMD[@]}" list --config "$CONFIG_PATH"
 
+if [[ "$RUN_LOCAL_CORPUS" == "1" ]]; then
+  print_banner "Local story corpus ingest"
+  if [[ "$BUILD_TEST_CORPUS" == "1" || ! -d "$TEST_CORPUS_MD_DIR" || -z "$(find "$TEST_CORPUS_MD_DIR" -maxdepth 1 -name '*.md' -print -quit 2>/dev/null)" ]]; then
+    if [[ ! -f "$TEST_CORPUS_SCRIPT" ]]; then
+      print_warn "Missing corpus builder at $TEST_CORPUS_SCRIPT"
+      exit 1
+    fi
+    print_info "Building local story corpus from Project Gutenberg sources."
+    run python3 "$TEST_CORPUS_SCRIPT"
+  fi
+
+  if [[ ! -d "$TEST_CORPUS_MD_DIR" ]]; then
+    print_warn "Missing Markdown story corpus at $TEST_CORPUS_MD_DIR"
+    exit 1
+  fi
+  print_info "Indexing Markdown story corpus from $TEST_CORPUS_MD_DIR via docmancer ingest --no-vectors"
+  print_info "FTS5-only here so the default fast path does not download FastEmbed models. Set DOCMANCER_RUN_VECTOR_STACK=1 to exercise the full hybrid path."
+  run "${CLI_CMD[@]}" ingest "$TEST_CORPUS_MD_DIR" --recreate --no-vectors --config "$CONFIG_PATH"
+  run "${CLI_CMD[@]}" inspect --config "$CONFIG_PATH"
+  run "${CLI_CMD[@]}" list --all --config "$CONFIG_PATH"
+  run "${CLI_CMD[@]}" query "curiouser" --limit 3 --mode lexical --explain --config "$CONFIG_PATH"
+fi
+
+if [[ "$RUN_LOCAL_PDF_CORPUS" == "1" ]]; then
+  print_banner "Local PDF story corpus ingest"
+  if [[ ! -d "$TEST_CORPUS_PDF_DIR" || -z "$(find "$TEST_CORPUS_PDF_DIR" -maxdepth 1 -name '*.pdf' -print -quit 2>/dev/null)" ]]; then
+    if [[ "$BUILD_TEST_CORPUS" == "1" && -f "$TEST_CORPUS_SCRIPT" ]]; then
+      print_info "Building local PDF story corpus because no PDFs were found."
+      run python3 "$TEST_CORPUS_SCRIPT"
+    else
+      print_warn "Missing PDF story corpus at $TEST_CORPUS_PDF_DIR. Run: python3 $TEST_CORPUS_SCRIPT"
+      exit 1
+    fi
+  fi
+  print_info "Indexing PDF story corpus from $TEST_CORPUS_PDF_DIR via docmancer ingest --no-vectors"
+  run "${CLI_CMD[@]}" ingest "$TEST_CORPUS_PDF_DIR" --recreate --no-vectors --config "$CONFIG_PATH"
+  run "${CLI_CMD[@]}" inspect --config "$CONFIG_PATH"
+  run "${CLI_CMD[@]}" list --all --config "$CONFIG_PATH"
+  run "${CLI_CMD[@]}" query "Sherlock Holmes hound baskervilles" --limit 3 --config "$CONFIG_PATH"
+fi
+
+print_banner "Qdrant lifecycle command surface"
+print_info "qdrant status: must report not-running on a fresh isolated HOME."
+run "${CLI_CMD[@]}" qdrant status
+run "${CLI_CMD[@]}" qdrant status --json
+print_info "qdrant up --docker: emits a compose snippet, does not spawn the managed binary."
+run "${CLI_CMD[@]}" qdrant up --docker
+print_info "qdrant down: must be a clean no-op when nothing is running."
+run "${CLI_CMD[@]}" qdrant down
+
+if [[ "$RUN_VECTOR_STACK" == "1" ]]; then
+  print_banner "Vector stack end-to-end (Qdrant + FastEmbed + hybrid retrieval)"
+  if [[ "$SKIP_NETWORK" == "1" ]]; then
+    print_warn "DOCMANCER_RUN_VECTOR_STACK=1 and DOCMANCER_SKIP_NETWORK=1 are incompatible (need to download the Qdrant binary and FastEmbed models). Skipping."
+  elif [[ ! -d "$TEST_CORPUS_MD_DIR" ]]; then
+    print_warn "Missing Markdown story corpus at $TEST_CORPUS_MD_DIR; vector stack run requires it."
+  else
+    print_info "Starting managed Qdrant in the isolated DOCMANCER_HOME ($DOCMANCER_HOME/qdrant)."
+    run "${CLI_CMD[@]}" qdrant up
+    run "${CLI_CMD[@]}" qdrant status
+    print_info "Re-ingesting the story corpus with vectors enabled. First run pulls FastEmbed models into $HOME/.docmancer/models."
+    run "${CLI_CMD[@]}" ingest "$TEST_CORPUS_MD_DIR" --recreate --config "$CONFIG_PATH"
+    run "${CLI_CMD[@]}" inspect --config "$CONFIG_PATH"
+    print_info "Hybrid retrieval should surface contributions from at least two signals."
+    run "${CLI_CMD[@]}" query "curiouser" --mode hybrid --explain --limit 3 --config "$CONFIG_PATH"
+    run "${CLI_CMD[@]}" query "curiouser" --mode dense --explain --limit 3 --config "$CONFIG_PATH"
+    print_info "Stopping the managed Qdrant so we leave no daemon behind."
+    run "${CLI_CMD[@]}" qdrant down
+    run "${CLI_CMD[@]}" qdrant status
+  fi
+else
+  print_info "Skipping the explicit vector-stack query round-trip (DOCMANCER_RUN_VECTOR_STACK=0). A later live URL add may still start managed Qdrant for vector sync."
+fi
+
 if [[ "$SKIP_NETWORK" == "1" ]]; then
   print_banner "Network steps skipped"
   print_info "DOCMANCER_SKIP_NETWORK=1, stopping before fetch and live add."
@@ -456,12 +554,12 @@ run "${CLI_CMD[@]}" inspect --config "$CONFIG_PATH"
 run "${CLI_CMD[@]}" doctor --config "$CONFIG_PATH"
 run "${CLI_CMD[@]}" list --config "$CONFIG_PATH"
 run "${CLI_CMD[@]}" list --all --config "$CONFIG_PATH"
-run "${CLI_CMD[@]}" query "How do I parametrize a fixture?" --limit 5 --config "$CONFIG_PATH" || true
-run "${CLI_CMD[@]}" query "How do I parametrize a fixture?" --limit 1 --expand page --config "$CONFIG_PATH" || true
+run "${CLI_CMD[@]}" query "assert statements" --limit 5 --config "$CONFIG_PATH" || true
+run "${CLI_CMD[@]}" query "assert statements" --limit 1 --expand page --config "$CONFIG_PATH" || true
 
 print_banner "Update all indexed sources"
 print_info "Refreshing every currently indexed source in the isolated database."
-run "${CLI_CMD[@]}" update --config "$CONFIG_PATH"
+run "${CLI_CMD[@]}" update --max-pages "$MAX_PAGES" --config "$CONFIG_PATH"
 run "${CLI_CMD[@]}" inspect --config "$CONFIG_PATH"
 
 if [[ "$RUN_WEB_VARIANTS" == "1" ]]; then
@@ -573,6 +671,8 @@ print_banner "Remove all data"
 print_info "Clearing the isolated index to verify removal behavior and final doctor output."
 run "${CLI_CMD[@]}" remove --all --config "$CONFIG_PATH"
 run "${CLI_CMD[@]}" list --config "$CONFIG_PATH"
+print_info "Stopping any managed Qdrant started by vector sync before the final doctor check."
+run "${CLI_CMD[@]}" qdrant down
 run "${CLI_CMD[@]}" doctor --config "$CONFIG_PATH"
 
 print_banner "Live CLI integration finished"

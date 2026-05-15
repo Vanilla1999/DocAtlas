@@ -21,9 +21,9 @@
 
 Use `--project` with `claude-code`, `gemini`, `cline`, or `github-copilot` to install under the current working directory (`.claude/skills/...`, `.gemini/skills/...`, `.cline/skills/...`, or `.github/copilot-instructions.md`). This is useful when different projects need different docmancer configurations.
 
-## MCP server registration
+## Advanced MCP Server Registration
 
-In addition to writing the skill file, `docmancer install <agent>` (and `docmancer setup`) registers the local MCP server into the agent's MCP config so installed API packs are immediately available. The entry is written idempotently; reruns do not duplicate it.
+In addition to writing the skill file, `docmancer install <agent>` (and `docmancer setup`) can register the local MCP server into the agent's MCP config so installed API packs are available. This is only needed for the advanced API-pack surface; local docs retrieval uses the CLI commands taught by the skill file. The entry is written idempotently, so reruns do not duplicate it.
 
 | Agent | MCP config file written |
 |-------|--------------------------|
@@ -45,20 +45,21 @@ The entry has the shape:
 }
 ```
 
-Add per-pack credentials (e.g. `<PACKAGE>_API_KEY`) to the `env: {}` block when launching from a GUI-launched agent (Cursor, Claude Desktop) that does not inherit the shell environment. Shell-launched agents (Claude Code, Codex CLI) read process env directly. Keyless packs like `open-meteo` skip the `env` block entirely. See [Configuration › MCP runtime](./Configuration.md#mcp-runtime) for the full credential resolution order.
+Add per-pack credentials (e.g. `<PACKAGE>_API_KEY`) to the `env: {}` block when launching from a GUI-launched agent (Cursor, Claude Desktop) that does not inherit the shell environment. Shell-launched agents (Claude Code, Codex CLI) read process env directly. Keyless packs like `open-meteo` skip the `env` block entirely. See [Configuration > MCP runtime](./Configuration.md#mcp-runtime) for the full credential resolution order.
 
 ## What the skill teaches agents
 
 Installed skills cover the core workflow:
 
-- `docmancer add` to index new documentation sources
+- `docmancer ingest` to index local documentation sources
+- `docmancer add` to index URL documentation sources
 - `docmancer update` to refresh existing sources
 - `docmancer query` to get compact context packs with token savings
 - `docmancer list`, `docmancer inspect`, `docmancer remove`, `docmancer doctor` for index management
-- `docmancer install-pack <pkg>@<version>` to install API MCP packs; the registered `docmancer mcp serve` exposes them through the Tool Search pattern (`docmancer_search_tools`, `docmancer_call_tool`)
-- `docmancer mcp doctor` and `docmancer mcp list` to verify pack state and credentials
+- Advanced only: `docmancer install-pack <pkg>@<version>` installs API MCP packs, and the registered `docmancer mcp serve` exposes them through the Tool Search pattern (`docmancer_search_tools`, `docmancer_call_tool`)
+- Advanced only: `docmancer mcp doctor` and `docmancer mcp list` verify pack state and credentials
 
-Agents learn to call `docmancer query` for grounded answers instead of relying on stale training data, and to call MCP packs through the resolved tool name (e.g. `open_meteo__v1__forecast`) for live API work without losing track of the pinned version.
+Agents learn to call `docmancer query` for grounded answers instead of relying on stale training data. If API packs are installed, agents can also call MCP packs through the resolved tool name (for example `open_meteo__v1__forecast`) for live API work without losing track of the pinned version.
 
 ## Shared index
 

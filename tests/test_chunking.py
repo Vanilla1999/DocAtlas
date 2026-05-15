@@ -1,6 +1,7 @@
 """Tests for structure-aware markdown chunking."""
 from docmancer.core.chunking import (
     chunk_text,
+    chunk_paragraphs,
     chunk_markdown,
     _is_list_heavy,
     _fence_ranges,
@@ -20,6 +21,16 @@ def test_chunk_text_uses_overlap():
     chunks = chunk_text(text, chunk_size=400, chunk_overlap=100)
     assert len(chunks) == 3
     assert all(chunks)
+
+
+def test_chunk_paragraphs_prefers_paragraph_boundaries():
+    text = "\n\n".join(f"Paragraph {index} " + ("word " * 20) for index in range(8))
+
+    chunks = chunk_paragraphs(text, chunk_size=180, chunk_overlap=20)
+
+    assert len(chunks) > 1
+    assert all(chunk.strip() for chunk in chunks)
+    assert all("Paragraph" in chunk for chunk in chunks)
 
 
 def test_chunk_markdown_empty():

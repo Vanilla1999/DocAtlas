@@ -26,6 +26,72 @@ def chunk_text(text: str, chunk_size: int = 800, chunk_overlap: int = 120) -> li
     return _sliding_window(normalized, chunk_size, chunk_overlap)
 
 
+def chunk_paragraphs(
+    text: str,
+    chunk_size: int = 800,
+    chunk_overlap: int = 100,
+) -> list[str]:
+    """Chunk plain prose by paragraph, falling back to overlapping windows.
+
+    The existing chunk sizes are character budgets. Keep that behavior for
+    compatibility until token-aware chunking is introduced across the package.
+    """
+    if not text.strip():
+        return []
+    if chunk_overlap >= chunk_size:
+        raise ValueError("chunk_overlap must be smaller than chunk_size")
+
+    paragraphs = [part.strip() for part in re.split(r"\n\s*\n+", text) if part.strip()]
+    if not paragraphs:
+        return chunk_text(text, chunk_size=chunk_size, chunk_overlap=chunk_overlap)
+
+    chunks: list[str] = []
+    current: list[str] = []
+    current_len = 0
+
+    for paragraph in paragraphs:
+        normalized = " ".join(paragraph.split())
+        if not normalized:
+            continue
+        if len(normalized) > chunk_size:
+            if current:
+                chunks.append("\n\n".join(current))
+                current = []
+                current_len = 0
+            chunks.extend(_sliding_window(normalized, chunk_size, chunk_overlap))
+            continue
+
+        paragraph_len = len(normalized)
+        separator_len = 2 if current else 0
+        if current and current_len + separator_len + paragraph_len > chunk_size:
+            chunks.append("\n\n".join(current))
+            current = [normalized]
+            current_len = paragraph_len
+        else:
+            current.append(normalized)
+            current_len += separator_len + paragraph_len
+
+    if current:
+        chunks.append("\n\n".join(current))
+
+    if len(chunks) <= 1:
+        return chunks
+
+    overlapped: list[str] = []
+    previous_tail = ""
+    for chunk in chunks:
+        if previous_tail:
+            candidate = f"{previous_tail}\n\n{chunk}"
+            if len(candidate) <= chunk_size + chunk_overlap:
+                overlapped.append(candidate)
+            else:
+                overlapped.append(chunk)
+        else:
+            overlapped.append(chunk)
+        previous_tail = chunk[-chunk_overlap:].strip() if chunk_overlap else ""
+    return [chunk for chunk in overlapped if chunk]
+
+
 # ---------------------------------------------------------------------------
 # Markdown-aware chunking
 # ---------------------------------------------------------------------------

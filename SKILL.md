@@ -14,41 +14,59 @@ install: pipx install docmancer --python python3.13
 
 # docmancer
 
-Compress documentation context so coding agents spend tokens on code, not docs. Fetch from public sites (GitBook, Mintlify, GitHub, generic web), index locally with SQLite FTS5, and retrieve compact context packs with source attribution. No API keys, no vector database, no background daemons on the core path.
+Docmancer compresses documentation context so coding agents spend tokens on code, not on rereading raw docs. It ingests local files, fetches public docs, indexes everything locally with SQLite FTS5, and returns compact context packs with source attribution. The core retrieval path needs no API keys, vector database, hosted query API, or background daemon.
 
-**MIT open source.** The CLI is the full product: add docs, query them, install skills into coding agents, and expose installed API packs through MCP, all running locally on your machine.
+**MIT open source.** The CLI runs locally and is intended for source-grounded documentation lookup.
 
 ## When to Use
 
-- User asks about a third-party library, SDK, or API and you need accurate, up-to-date documentation.
-- User references docs from a public site (GitBook, Mintlify, or any web-hosted docs).
-- You need to verify version-specific API behavior or check exact method signatures.
-- User asks you to search or query previously ingested documentation.
+- User asks about a third-party library, SDK, or API and you need accurate documentation.
+- User references docs from a public site, GitHub repository, or local files.
+- You need to verify version-specific API behavior or exact method signatures.
+- User asks you to search or query previously indexed documentation.
 
 ## Workflow
 
-1. **Check if docs are already indexed:** `docmancer list`
-2. **If missing and the user approves the source:** `docmancer add <url-or-path>`
-3. **Query for relevant context:** `docmancer query "<question>"`
-4. **Use the returned context** to ground your response with source-attributed sections.
+1. **Check indexed docs:** `docmancer list`
+2. **Query existing docs:** `docmancer query "<question>"`
+3. **Index local docs if needed:** `docmancer ingest <path>`
+4. **Fetch URL docs if needed:** `docmancer add <url>`
+5. **Use the returned context** to ground your response with source-attributed sections.
 
-## Commands
+## Core Commands
 
-### Add Documentation
+### Ingest Local Documentation
 
 ```bash
-docmancer add <url-or-path>
+docmancer ingest ./docs
 ```
 
-Fetch and index docs from a URL or local path. Auto-detects the docs platform.
+Use `ingest` for local files and directories.
 
 | Flag | Purpose |
 |------|---------|
-| `--provider <auto\|gitbook\|mintlify\|web\|github>` | Force a specific provider (default: auto) |
-| `--strategy <strategy>` | Force discovery strategy (llms-full.txt, sitemap.xml, nav-crawl) |
-| `--max-pages <n>` | Cap pages fetched (default: 500) |
+| `--include <glob>` | Include only matching relative paths |
+| `--exclude <glob>` | Exclude matching relative paths |
+| `--format <format>` | Restrict to formats such as `md`, `txt`, `pdf`, `docx`, `rtf`, or `html` |
+| `--recursive / --no-recursive` | Recurse through directories |
+| `--skip-known` | Skip files whose content hash is already indexed |
+| `--recreate` | Drop and rebuild the index |
+
+### Add URL Documentation
+
+```bash
+docmancer add https://docs.example.com
+```
+
+Use `add` for documentation URLs and GitHub repositories.
+
+| Flag | Purpose |
+|------|---------|
+| `--provider <auto\|gitbook\|mintlify\|web\|github>` | Force a specific provider |
+| `--strategy <strategy>` | Force discovery strategy |
+| `--max-pages <n>` | Cap pages fetched |
 | `--browser` | Playwright fallback for JS-heavy sites |
-| `--recreate` | Drop and rebuild the index for this source |
+| `--recreate` | Drop and rebuild the index |
 
 ### Query Documentation
 
@@ -60,72 +78,38 @@ Returns a compact markdown context pack with source attribution and token saving
 
 | Flag | Purpose |
 |------|---------|
-| `--budget <n>` | Max estimated output tokens (default: 2400) |
+| `--budget <n>` | Max estimated output tokens |
 | `--limit <n>` | Max sections to return |
 | `--expand` | Include adjacent sections around matches |
 | `--expand page` | Include full page content within budget |
-| `--format <markdown\|json>` | Output format (default: markdown) |
-
-### Update Sources
-
-```bash
-docmancer update [source]
-```
-
-Re-fetch and re-index all sources, or a specific one. Use when docs may have changed upstream.
+| `--format <markdown\|json>` | Output format |
 
 ### Manage Sources
 
 | Command | Purpose |
 |---------|---------|
 | `docmancer list` | Show indexed documentation sources |
-| `docmancer list --all` | Show every stored page/file |
-| `docmancer inspect` | Show index stats and extract locations |
+| `docmancer list --all` | Show every stored page or file |
+| `docmancer inspect` | Show index stats, format counts, and extract locations |
 | `docmancer remove <source>` | Remove a source or docset root |
 | `docmancer remove --all` | Clear the entire index |
-
-### Setup and Diagnostics
-
-| Command | Purpose |
-|---------|---------|
-| `docmancer setup` | Create config/database and install detected agent skills |
-| `docmancer setup --all` | Install all agent integrations non-interactively |
-| `docmancer doctor` | Check config, index health, and agent skill installs |
+| `docmancer update [source]` | Re-fetch and re-index all sources, or one specific source |
+| `docmancer doctor` | Check config, loader availability, index health, and agent skill installs |
 | `docmancer init` | Create project-local `docmancer.yaml` |
 | `docmancer fetch <url> --output <dir>` | Download docs to markdown files without indexing |
 
-### Agent Integration
+## Advanced: API Tools via MCP
 
-```bash
-docmancer install <agent>
-```
+Only use the MCP surface if the user is explicitly working with installed API packs. If the user has run `docmancer install-pack <pkg>@<version>`, the agent host can launch `docmancer mcp serve` and expose two meta-tools:
 
-Supported agents: `claude-code`, `claude-desktop`, `cline`, `cursor`, `codex`, `codex-app`, `codex-desktop`, `gemini`, `github-copilot`, `opencode`. Add `--project` for project-local installation instead of global.
+- `docmancer_search_tools(query, package?, limit?)`
+- `docmancer_call_tool(name, args)`
 
-## API tools via MCP (when packs are installed)
-
-If the user has run `docmancer install-pack <pkg>@<version>` (e.g. `open-meteo@v1` for the keyless weather demo), the agent host launches a local stdio MCP server (`docmancer mcp serve`) that exposes exactly two meta-tools:
-
-- `docmancer_search_tools(query, package?, limit?)`: search for tools by task description. Always call this first to discover the fully qualified tool name and its input schema.
-- `docmancer_call_tool(name, args)`: invoke a specific tool returned from search.
-
-Workflow when the user asks to do something against a real API:
-
-1. Call `docmancer_search_tools` with a short task description (and `package` if you know which pack is in use). The top match returns its full input schema inlined.
-2. Validate that the returned `safety` block is acceptable. If `destructive: true`, the call is blocked unless the user has installed with `--allow-destructive`.
-3. Call `docmancer_call_tool` with the fully qualified `name` and an `args` object that conforms to the inlined schema.
-4. If the response includes `_docmancer.idempotency_key`, retry with the same `args._docmancer_idempotency_key` to deduplicate safely.
-
-Credential setup the user may need (only for packs that require it, not for `open-meteo`):
-
-- Shell-launched agents (Claude Code, Codex CLI): `export <PACK>_API_KEY=...` in the shell.
-- GUI-launched agents (Cursor, Claude Desktop): edit the agent's MCP config and add `"env": {"<PACK>_API_KEY": "..."}` under the `docmancer` server entry, or write `~/.docmancer/secrets/<package>.env` with `<PACK>_API_KEY=...`.
-
-Run `docmancer mcp doctor` to verify which credential source resolves for each installed pack.
+For API tasks, search first, inspect the returned schema and safety block, then call the resolved tool. Destructive calls are blocked unless the pack was installed with `--allow-destructive`. Run `docmancer mcp doctor` when pack credentials need verification.
 
 ## Common Mistakes
 
-- Do not use `docmancer ingest`; it is deprecated. Use `docmancer add` instead.
-- Legacy evaluation command surfaces have been removed.
-- Do not run `docmancer query` before adding a source with `docmancer add`. Check `docmancer list` first.
+- Do not use `docmancer add` for new local files. Use `docmancer ingest <path>`.
+- Do not use `docmancer ingest` for URLs. Use `docmancer add <url>`.
+- Do not run `docmancer query` before checking indexed sources with `docmancer list`.
 - Do not assume docs are indexed. Always verify with `docmancer list` before querying.

@@ -48,13 +48,14 @@ def test_install_claude_code_creates_rebooted_skill_file():
         content = skill_file.read_text()
         assert "allowed-tools" in content
         assert "docmancer add" in content
+        assert "docmancer ingest" in content
         assert "docmancer bench" not in content
-        assert "docmancer ingest" not in content
+        assert content.index("docmancer query") < content.index("Advanced: API Tools via MCP")
         # Pre-bench registry narrative concepts must stay gone.
         assert "vault" not in content.lower()
         assert "docmancer pull" not in content
         assert "docmancer search" not in content
-        assert "registry" not in content.lower()
+        assert "from the registry" not in content.lower()
 
 
 def test_install_codex_creates_native_and_shared_skills():
@@ -79,7 +80,10 @@ def test_install_cursor_creates_agents_md_fallback():
         assert result.exit_code == 0, result.output
         agents_md = fake_home / ".cursor" / "AGENTS.md"
         assert agents_md.exists()
-        assert "docmancer add" in agents_md.read_text()
+        content = agents_md.read_text()
+        assert "docmancer ingest" in content
+        assert "docmancer add" in content
+        assert content.index("docmancer query") < content.index("Advanced: API Tools via MCP")
 
 
 def test_install_github_copilot_project_creates_repo_instructions():
@@ -98,7 +102,7 @@ def test_install_github_copilot_project_creates_repo_instructions():
         assert vscode_settings.exists()
         copilot_content = copilot_md.read_text()
         assert "docmancer query" in copilot_content
-        assert "MIT open source" in copilot_content
+        assert "docmancer ingest" in copilot_content
         assert "docmancer bench" not in copilot_content
         assert "--expand page" in copilot_content
         assert "docmancer:start" in agents_md.read_text()
@@ -133,7 +137,10 @@ def test_install_claude_desktop_creates_zip():
         assert zip_path.exists()
         with zipfile.ZipFile(zip_path) as zf:
             assert "docmancer/Skill.md" in zf.namelist()
-            assert "docmancer add" in zf.read("docmancer/Skill.md").decode()
+            content = zf.read("docmancer/Skill.md").decode()
+            assert "docmancer ingest" in content
+            assert "docmancer add" in content
+            assert content.index("docmancer query") < content.index("Advanced: API Tools via MCP")
 
 
 def test_setup_all_creates_config_db_and_installs_skills():

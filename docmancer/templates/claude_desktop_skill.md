@@ -5,9 +5,7 @@ description: Search local documentation context packs with docmancer CLI. Use wh
 
 # docmancer
 
-Compress documentation context so coding agents spend tokens on code, not on rereading raw docs. Docmancer fetches docs from public sites, indexes them locally with SQLite FTS5, and returns compact context packs with source attribution. No API keys required on the core path.
-
-**MIT open source.** Everything runs locally. The core path has no API keys, no vector database, and no background daemon.
+Docmancer compresses documentation context so coding agents spend tokens on code, not on rereading raw docs. It ingests local files, fetches public docs, indexes everything locally with SQLite FTS5, and returns compact context packs with source attribution.
 
 Executable: `{{DOCS_KIT_CMD}}`
 
@@ -17,13 +15,15 @@ Executable: `{{DOCS_KIT_CMD}}`
 
 1. Run `docmancer list` to see indexed docs.
 2. Run `docmancer query "question"` when relevant docs are present.
-3. If docs are missing and the user approves the source, run `docmancer add <url-or-path>` to index it locally.
-4. Use returned sections as source-grounded context for the answer or code change.
+3. If local docs are missing and the user approves the path, run `docmancer ingest <path>`.
+4. If URL docs are missing and the user approves the source, run `docmancer add <url>`.
+5. Use returned sections as source-grounded context for the answer or code change.
 
-## Core commands
+## Core Commands
 
 - `docmancer setup`: create config, database, and agent integrations.
-- `docmancer add <url-or-path>`: index documentation from a URL, GitHub repository, local directory, markdown file, or text file.
+- `docmancer ingest <path>`: index local files or directories.
+- `docmancer add <url>`: fetch and index documentation from a URL or GitHub repository.
 - `docmancer update [source]`: re-fetch and re-index all sources, or one specific source.
 - `docmancer query "question"`: return a compact markdown context pack.
 - `docmancer query "question" --expand`: include adjacent sections.
@@ -34,18 +34,19 @@ Executable: `{{DOCS_KIT_CMD}}`
 
 `query` prints estimated raw docs tokens, context-pack tokens, percent saved, and agentic runway. Prefer the compact default first.
 
-## API tools via MCP (when packs are installed)
+## Advanced: API Tools via MCP
 
-If the user has run `docmancer install-pack <pkg>@<version>`, Claude Desktop launches `docmancer mcp serve`. Two meta-tools are exposed:
+Only use the MCP surface if the user is explicitly working with installed API packs. If the user has run `docmancer install-pack <pkg>@<version>`, Claude Desktop can launch `docmancer mcp serve` and expose two meta-tools:
 
-- `docmancer_search_tools(query, package?, limit?)`: discover tools by task; top match returns its input schema inlined.
-- `docmancer_call_tool(name, args)`: invoke a tool returned by search.
+- `docmancer_search_tools(query, package?, limit?)`
+- `docmancer_call_tool(name, args)`
 
 Claude Desktop is GUI-launched, so shell `export` will not propagate. Add credentials to the `env` block under the `docmancer` server in `claude_desktop_config.json`, or write `~/.docmancer/secrets/<package>.env`. Run `docmancer mcp doctor` to verify.
 
-Destructive calls are blocked unless the user installed the pack with `--allow-destructive`. Non-idempotent successes return `_docmancer.idempotency_key`; retry with `args._docmancer_idempotency_key` to deduplicate.
+Destructive calls are blocked unless the user installed the pack with `--allow-destructive`.
 
-## Common mistakes
+## Common Mistakes
 
-- Do not run `docmancer query` before adding a source with `docmancer add`. Check `docmancer list` first.
-- Legacy evaluation command surfaces have been removed.
+- Do not use `docmancer add` for new local files. Use `docmancer ingest <path>`.
+- Do not use `docmancer ingest` for URLs. Use `docmancer add <url>`.
+- Do not run `docmancer query` before checking indexed sources with `docmancer list`.

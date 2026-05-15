@@ -121,3 +121,21 @@ class TestRedirectTracker:
             "https://example.com/docs/a",
         )
         assert tracker.predict_final_url("http://example.com/docs/v7/b") is None
+
+    def test_root_prefix_redirect_does_not_double_slash(self):
+        tracker = RedirectTracker(min_observations=3)
+        tracker.record_redirect(
+            "https://docs.example.com/how-to/assert.html",
+            "https://docs.example.com/en/stable/how-to/assert.html",
+        )
+        tracker.record_redirect(
+            "https://docs.example.com/how-to/fixtures.html",
+            "https://docs.example.com/en/stable/how-to/fixtures.html",
+        )
+        tracker.record_redirect(
+            "https://docs.example.com/how-to/parametrize.html",
+            "https://docs.example.com/en/stable/how-to/parametrize.html",
+        )
+
+        predicted = tracker.predict_final_url("https://docs.example.com/how-to/tmp_path.html")
+        assert predicted == "https://docs.example.com/en/stable/how-to/tmp_path.html"

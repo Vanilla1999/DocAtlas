@@ -123,7 +123,7 @@ docmancer install-pack <package>@<version> --allow-destructive
 
 ### Tool returns `missing_credentials`
 
-The dispatcher tried every source in the four-source order (per-call override → process env → agent-config env → user-managed env file) and none resolved. For shell-launched agents, export the env var and restart the agent. For GUI-launched agents (Cursor, Claude Desktop), add the env var to the `env: {}` block in the agent's `mcp.json`, or write it to `~/.docmancer/secrets/<package>.env`. `docmancer mcp doctor` reports which source resolved each credential.
+The dispatcher tried every configured credential source and none resolved. For shell-launched agents, export the env var and restart the agent. For GUI-launched agents (Cursor, Claude Desktop), add the env var to the `env: {}` block in the agent's `mcp.json`. `docmancer mcp doctor` reports which source resolved each credential.
 
 ### `docmancer mcp doctor` reports SHA-256 mismatch
 
@@ -141,3 +141,33 @@ The HTTP executor percent-encodes path parameters as one segment, so values like
 ### `docmancer install-pack` rejects the spec with `path traversal`
 
 Pack and version components cannot contain `..`, NUL, backslashes, absolute paths, or (for the version component) a leading `@`. This protects the storage root from escape via crafted registry metadata. The npm scope form (`@scope/pkg`) is allowed in the package name, but the version cannot start with `@`.
+
+## Hybrid retrieval and Qdrant
+
+### macOS asks "qdrant is attempting to connect to ec2-...amazonaws.com"
+
+That is Qdrant's own anonymous telemetry, not docmancer. The managed lifecycle spawns Qdrant with `QDRANT__TELEMETRY_DISABLED=true`, so the prompt should not appear from new spawns. If you see it from an older manually started binary, deny the prompt (Qdrant runs fine offline) and restart with `docmancer qdrant down && docmancer qdrant up`.
+
+### `docmancer ingest` does not embed anything
+
+The default ingest path embeds + upserts vectors via the managed local Qdrant. If you see FTS5-only behaviour, check:
+
+- `DOCMANCER_AUTO_VECTORS=0` is set in env (or `--no-vectors` was passed). Unset the env var to re-enable.
+- The configured embeddings provider is a cloud one (`openai`, `voyage`, `cohere`) but its API key env var is missing. Docmancer falls back to FTS5-only and logs the missing key; set the env var or switch to `embeddings.provider: fastembed`.
+- The Qdrant binary is unavailable for your platform. Run `docmancer doctor` to see the platform matrix decision. `SqliteVecStore` is used as a fallback when possible.
+
+### `PermissionError: qdrant collection 'X' already exists on http://... but does not carry the docmancer ownership sentinel`
+
+You pointed `vector_store.collection` at a collection that docmancer did not create. We refuse to write into a collection that lacks our sentinel, so a future `delete_collection` cannot wipe a shared dataset. Either drop the existing collection through the Qdrant client, point `vector_store.collection` at a different name, or rename your collection.
+
+### `docmancer query --mode hybrid` says "lexical-fallback" or returns no contributions
+
+The dispatcher fell back to lexical because either the vector store could not be reached, the embeddings provider failed to load, or no Qdrant collection exists yet. Run `docmancer doctor` to see Qdrant + embeddings status, and `docmancer ingest --recreate` once to populate the collection.
+
+### `Section count drifts from vector count after `ingest --recreate``
+
+This should not happen: `sync_vector_store` prunes orphaned vector points and `embedding_upserts` rows for chunk ids that have vanished from SQLite. If `docmancer doctor` reports drift, run `docmancer ingest --recreate` once more to re-reconcile, then file an issue with the drift numbers.
+
+### macOS Apple Silicon: managed Qdrant won't start
+
+Confirm with `file ~/.docmancer/qdrant/qdrant` that the binary is `arm64` if you are on Apple Silicon. The `qdrant_manager` selects the right artefact from the verified matrix, but a mixed-arch venv can pick the wrong path. Reinstall the binary with `docmancer qdrant upgrade`.

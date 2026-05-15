@@ -54,6 +54,7 @@ class FakeDocmancerConfig:
 PUBLIC_COMMAND_HELP_CASES = [
     ("setup", ["docmancer setup --all"]),
     ("add", ["docmancer add https://docs.example.com"]),
+    ("ingest", ["docmancer ingest ./docs", "--format"]),
     ("query", ["docmancer query", "--expand", "--format json"]),
     ("list", ["docmancer list"]),
     ("install", ["docmancer install claude-code", "--project"]),
@@ -69,6 +70,7 @@ def test_cli_help():
     assert "Compress documentation context" in result.output
     assert "add" in result.output
     assert "setup" in result.output
+    assert "mcp" not in result.output
 
 
 def test_version_flag_outputs_compact_version():
@@ -86,10 +88,10 @@ def test_public_commands_have_examples_in_help():
             assert fragment in result.output
 
 
-def test_ingest_points_to_add():
+def test_ingest_url_points_to_add():
     result = CliRunner().invoke(cli, ["ingest", "https://docs.example.com"])
     assert result.exit_code != 0
-    assert "Use: docmancer add <url-or-path>" in result.output
+    assert "Use `docmancer add` for URLs." in result.output
 
 
 def test_cli_init_creates_project_sqlite_config(tmp_path):
@@ -170,6 +172,47 @@ def test_add_shows_total_and_calls_agent(tmp_path):
     assert f"Index: {display_path(db_path)} (2.0 KB)" in result.output
     assert f"Extracted docs: {display_path(extracted_dir)} (1.0 KB)" in result.output
     mock_agent.add.assert_called_once_with(str(tmp_path), recreate=False)
+    assert "local paths now belong to `docmancer ingest`" in result.output
+
+
+def test_ingest_shows_total_and_calls_agent(tmp_path):
+    runner = CliRunner()
+    fake_config = MagicMock()
+    with patch("docmancer.cli.commands._load_config", return_value=fake_config), \
+         patch("docmancer.cli.commands._get_agent_class") as mock_agent_cls:
+        mock_agent = MagicMock()
+        mock_agent.ingest.return_value = 7
+        mock_agent.collection_stats.return_value = {}
+        mock_agent_cls.return_value = lambda config: mock_agent
+
+        result = runner.invoke(
+            cli,
+            [
+                "ingest",
+                str(tmp_path),
+                "--include",
+                "guides/**",
+                "--exclude",
+                "**/draft*",
+                "--format",
+                "md",
+                "--no-recursive",
+                "--skip-known",
+            ],
+        )
+
+    assert result.exit_code == 0
+    assert "Total: 7 sections indexed" in result.output
+    mock_agent.ingest.assert_called_once_with(
+        str(tmp_path),
+        recreate=False,
+        include=("guides/**",),
+        exclude=("**/draft*",),
+        formats=("md",),
+        recursive=False,
+        skip_known=True,
+        with_vectors=True,
+    )
 
 
 def test_add_url_applies_fetch_worker_override():
@@ -285,3 +328,27 @@ def test_doctor_runs():
         result = CliRunner().invoke(cli, ["doctor"])
     assert result.exit_code == 0
     assert "SQLite" in result.output
+    assert "Local loaders" in result.output
+
+
+def test_inspect_shows_sections_by_format():
+    fake_config = MagicMock()
+    fake_config.index.db_path = "/tmp/docmancer.db"
+    fake_agent = MagicMock()
+    fake_agent.collection_stats.return_value = {
+        "collection_exists": True,
+        "sources_count": 2,
+        "sections_count": 3,
+        "sources_by_format": {"markdown": 1, "pdf": 1},
+        "sections_by_format": {"markdown": 1, "pdf": 2},
+        "extracted_dir": "/tmp/extracted",
+    }
+    with patch("docmancer.cli.commands._load_config", return_value=fake_config), \
+         patch("docmancer.cli.commands._create_agent_or_raise_lock_error", return_value=fake_agent):
+        result = CliRunner().invoke(cli, ["inspect"])
+
+    assert result.exit_code == 0
+    assert "Sources by format:" in result.output
+    assert "Sections by format:" in result.output
+    assert "markdown: 1" in result.output
+    assert "pdf: 2" in result.output

@@ -14,7 +14,7 @@ from docmancer.mcp.manifest import Manifest
 from docmancer.mcp.registry import UnsupportedSpecError, compile_pack_from_url
 
 
-@click.group(name="mcp", help="Manage the local Docmancer MCP server and installed packs.")
+@click.group(name="mcp", hidden=True, help="Manage the local Docmancer MCP server and installed packs.")
 def mcp_group() -> None:
     pass
 

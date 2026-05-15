@@ -130,10 +130,13 @@ class RedirectTracker:
         base = f"{orig_parsed.scheme}://{orig_parsed.netloc}"
         common_prefix_path = "/".join(orig_segments[:prefix_len])
 
-        orig_prefix = f"{base}/{common_prefix_path}/{'/'.join(orig_mid)}".rstrip("/")
-        final_prefix = f"{base}/{common_prefix_path}"
-        if final_mid:
-            final_prefix = f"{final_prefix}/{'/'.join(final_mid)}"
-        final_prefix = final_prefix.rstrip("/")
+        def build_prefix(*parts: str) -> str:
+            path = "/".join(part.strip("/") for part in parts if part.strip("/"))
+            if path:
+                return f"{base}/{path}"
+            return base
+
+        orig_prefix = build_prefix(common_prefix_path, "/".join(orig_mid))
+        final_prefix = build_prefix(common_prefix_path, "/".join(final_mid))
 
         return (orig_prefix, final_prefix)

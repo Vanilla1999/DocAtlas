@@ -1,3 +1,4 @@
+import json
 from unittest.mock import MagicMock
 
 from docmancer.agent import DocmancerAgent
@@ -96,6 +97,63 @@ def test_ingest_reads_markdown_directory(tmp_path):
 
     assert count == 1
     assert agent.list_sources()
+
+
+def test_ingest_mixed_format_directory_records_chunk_metadata(tmp_path):
+    docs = tmp_path / "docs"
+    docs.mkdir()
+    (docs / "auth.md").write_text("# Auth\n\nToken docs.", encoding="utf-8")
+    (docs / "notes.txt").write_text("First paragraph about rabbits.\n\nSecond paragraph about tea.", encoding="utf-8")
+    (docs / "page.html").write_text(
+        "<html><body><main><h1>Tea</h1><p>Mad Hatter tea party notes.</p></main></body></html>",
+        encoding="utf-8",
+    )
+    (docs / "rich.rtf").write_text(r"{\rtf1\ansi Cheshire cat notes.}", encoding="utf-8")
+
+    agent = DocmancerAgent(config=_config(tmp_path))
+    count = agent.ingest(docs, recreate=True)
+
+    assert count >= 4
+    results = agent.query("Mad Hatter tea party", budget=1200)
+    assert results
+    sections = agent.store.list_sections_for_embedding()
+    assert {section["format"] for section in sections} >= {"markdown", "txt", "html", "rtf"}
+    assert all(section["source_path"] for section in sections)
+    assert all(section["document_title"] for section in sections)
+    assert all(section["content_hash"] for section in sections)
+
+
+def test_ingest_filters_formats_and_non_recursive(tmp_path):
+    docs = tmp_path / "docs"
+    nested = docs / "nested"
+    nested.mkdir(parents=True)
+    (docs / "keep.txt").write_text("Top-level text about tokens.", encoding="utf-8")
+    (docs / "skip.md").write_text("# Skip\n\nMarkdown.", encoding="utf-8")
+    (nested / "nested.txt").write_text("Nested text.", encoding="utf-8")
+
+    agent = DocmancerAgent(config=_config(tmp_path))
+    count = agent.ingest(docs, recreate=True, formats=("txt",), recursive=False)
+
+    assert count == 1
+    assert agent.list_sources() == [str(docs / "keep.txt")]
+
+
+def test_ingest_skips_bad_file_and_writes_report(tmp_path, monkeypatch):
+    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
+    docs = tmp_path / "docs"
+    docs.mkdir()
+    (docs / "good.md").write_text("# Good\n\nToken docs.", encoding="utf-8")
+    (docs / "bad.pdf").write_bytes(b"not a pdf")
+
+    agent = DocmancerAgent(config=_config(tmp_path))
+    count = agent.ingest(docs, recreate=True)
+
+    assert count == 1
+    assert agent.last_ingest_report_path is not None
+    report = json.loads(agent.last_ingest_report_path.read_text())
+    assert report["skipped_count"] == 1
+    assert report["skipped"][0]["path"].endswith("bad.pdf")
+    assert report["skipped"][0]["exception_type"]
 
 
 def test_ingest_url_logs_post_fetch_summary(caplog, tmp_path):

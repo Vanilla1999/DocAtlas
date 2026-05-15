@@ -5,4 +5,5 @@ from docmancer.core.models import Document
 
 class DocumentLoader(Protocol):
     supported_extensions: list[str]
+    chunking_strategy: str
     def load(self, path: Path) -> Document: ...

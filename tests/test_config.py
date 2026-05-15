@@ -20,6 +20,19 @@ def test_config_from_dict():
     assert config.query.default_budget == 1800
 
 
+def test_loader_format_config_overrides_defaults():
+    config = DocmancerConfig(
+        loaders={
+            "default_chunk_size": 900,
+            "default_chunk_overlap": 90,
+            "formats": {"pdf": {"chunk_size": 700, "chunk_overlap": 70}},
+        }
+    )
+
+    assert config.loaders.settings_for("pdf") == (700, 70)
+    assert config.loaders.settings_for("txt") == (900, 90)
+
+
 def test_config_from_yaml_resolves_relative_paths(tmp_path):
     config_file = tmp_path / "docmancer.yaml"
     config_file.write_text(
@@ -50,16 +63,143 @@ def test_old_vector_store_path_is_translated(tmp_path):
     config_file = tmp_path / "docmancer.yaml"
     config_file.write_text("vector_store:\n  local_path: .docmancer/old.db\n")
 
-    config = DocmancerConfig.from_yaml(config_file)
+    with pytest.warns(DeprecationWarning, match="vector_store.db_path/local_path"):
+        config = DocmancerConfig.from_yaml(config_file)
 
     assert config.index.db_path == str((tmp_path / ".docmancer" / "old.db").resolve())
+
+
+def test_new_vector_store_qdrant_block_parses(tmp_path):
+    config_file = tmp_path / "docmancer.yaml"
+    config_file.write_text(
+        """
+vector_store:
+  provider: qdrant
+  url: http://localhost:6333
+  collection: foo
+"""
+    )
+
+    config = DocmancerConfig.from_yaml(config_file)
+
+    assert config.vector_store.provider == "qdrant"
+    assert config.vector_store.url == "http://localhost:6333"
+    assert config.vector_store.collection == "foo"
+
+
+def test_new_vector_store_collection_only_defaults_provider(tmp_path):
+    config_file = tmp_path / "docmancer.yaml"
+    config_file.write_text("vector_store:\n  collection: foo\n")
+
+    config = DocmancerConfig.from_yaml(config_file)
+
+    assert config.vector_store.provider == "qdrant"
+    assert config.vector_store.collection == "foo"
+
+
+def test_mixed_legacy_and_new_vector_store_raises(tmp_path):
+    config_file = tmp_path / "docmancer.yaml"
+    config_file.write_text(
+        """
+vector_store:
+  local_path: .docmancer/old.db
+  provider: qdrant
+"""
+    )
+
+    with pytest.raises(ValueError, match="mixes legacy fields"):
+        DocmancerConfig.from_yaml(config_file)
+
+
+def test_embeddings_and_retrieval_defaults():
+    config = DocmancerConfig()
+    assert config.embeddings.provider == "fastembed"
+    assert config.embeddings.model == "BAAI/bge-base-en-v1.5"
+    assert config.embeddings.dimensions == 768
+    assert config.embeddings.batch_size == 64
+    assert config.embeddings.sparse_model is None
+    assert config.retrieval.default_mode == "lexical"
+    assert config.retrieval.fusion.method == "rrf"
+    assert config.retrieval.fusion.rrf_k == 60
+    assert config.retrieval.fusion.weights == {}
+
+
+def test_bare_yaml_keeps_default_mode_lexical(tmp_path):
+    """A YAML file with no vector_store block must stay on FTS5 retrieval."""
+    config_file = tmp_path / "docmancer.yaml"
+    config_file.write_text(
+        """
+index:
+  db_path: .docmancer/docmancer.db
+"""
+    )
+    config = DocmancerConfig.from_yaml(config_file)
+    assert config.retrieval.default_mode == "lexical"
+
+
+def test_explicit_qdrant_vector_store_flips_to_hybrid(tmp_path):
+    config_file = tmp_path / "docmancer.yaml"
+    config_file.write_text(
+        """
+vector_store:
+  provider: qdrant
+"""
+    )
+    config = DocmancerConfig.from_yaml(config_file)
+    assert config.retrieval.default_mode == "hybrid"
+
+
+def test_explicit_default_mode_overrides_auto_flip(tmp_path):
+    config_file = tmp_path / "docmancer.yaml"
+    config_file.write_text(
+        """
+vector_store:
+  provider: qdrant
+retrieval:
+  default_mode: lexical
+"""
+    )
+    config = DocmancerConfig.from_yaml(config_file)
+    assert config.retrieval.default_mode == "lexical"
+
+
+def test_embeddings_and_retrieval_blocks_parse(tmp_path):
+    config_file = tmp_path / "docmancer.yaml"
+    config_file.write_text(
+        """
+embeddings:
+  provider: fastembed
+  model: BAAI/bge-small-en-v1.5
+  dimensions: 384
+  batch_size: 32
+retrieval:
+  default_mode: hybrid
+  fusion:
+    method: weighted
+    rrf_k: 50
+    weights:
+      lexical: 1.0
+      dense: 1.0
+"""
+    )
+
+    config = DocmancerConfig.from_yaml(config_file)
+
+    assert config.embeddings.model == "BAAI/bge-small-en-v1.5"
+    assert config.embeddings.dimensions == 384
+    assert config.embeddings.batch_size == 32
+    assert config.retrieval.default_mode == "hybrid"
+    assert config.retrieval.fusion.method == "weighted"
+    assert config.retrieval.fusion.rrf_k == 50
+    assert config.retrieval.fusion.weights == {"lexical": 1.0, "dense": 1.0}
 
 
 def test_old_qdrant_directory_path_uses_sqlite_default(tmp_path):
     config_file = tmp_path / "docmancer.yaml"
     config_file.write_text("vector_store:\n  local_path: .docmancer/qdrant\n")
 
-    config = DocmancerConfig.from_yaml(config_file)
+    with pytest.warns(DeprecationWarning, match="vector_store.db_path/local_path"):
+        config = DocmancerConfig.from_yaml(config_file)
 
     assert config.index.db_path == str((tmp_path / ".docmancer" / "docmancer.db").resolve())
 

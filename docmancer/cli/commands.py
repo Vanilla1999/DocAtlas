@@ -6,8 +6,10 @@ import logging
 import shlex
 import shutil
 import sys
+import warnings
 import zipfile
 from datetime import datetime, timezone
+from importlib.util import find_spec
 from pathlib import Path
 
 import click
@@ -123,6 +125,55 @@ def _describe_index(config) -> str:
     return f"SQLite FTS5 at {display_path(config.index.db_path)}"
 
 
+def _run_dispatch_query(
+    *,
+    agent,
+    config,
+    query: str,
+    mode: str,
+    limit: int | None,
+    budget: int | None,
+    expand: str | None,
+):
+    """Build a RetrievalDispatcher, run it, return (chunks, contributions).
+
+    Falls back to lexical-only if the embeddings provider or vector store
+    cannot be initialised; this keeps the CLI usable on FTS5-only installs.
+    """
+    try:
+        from docmancer.embeddings import get_embeddings_provider
+        from docmancer.retrieval.dispatch import RetrievalDispatcher
+        from docmancer.runtime.qdrant_manager import ensure_running
+        from docmancer.stores.base import get_vector_store
+    except ImportError:
+        return agent.query(query, limit=limit, budget=budget, expand=expand), {}
+
+    vs_config = config.vector_store
+    if vs_config.provider == "qdrant" and not vs_config.url:
+        resolution = ensure_running()
+        if resolution.fallback or not resolution.url:
+            vs_config = vs_config.model_copy(update={"provider": "sqlite-vec"})
+        else:
+            vs_config = vs_config.model_copy(update={"url": resolution.url})
+
+    try:
+        vector_store = get_vector_store(vs_config, embeddings_dim=config.embeddings.dimensions)
+        provider = get_embeddings_provider(config.embeddings)
+    except Exception:
+        return agent.query(query, limit=limit, budget=budget, expand=expand), {}
+
+    collection = agent._vector_collection_name()
+    dispatcher = RetrievalDispatcher(
+        store=agent.store,
+        config=config,
+        vector_store=vector_store,
+        provider=provider,
+        collection=collection,
+    )
+    result = dispatcher.run(query, mode=mode, limit=limit, budget=budget, expand=expand)
+    return result.chunks, result.contributions
+
+
 def _format_size(num_bytes: int) -> str:
     if num_bytes < 1024:
         return f"{num_bytes} B"
@@ -208,6 +259,19 @@ def _emit_status_line(message: str, state: str = "ok", indent: int = 2) -> None:
 def _emit_next_step(text: str) -> None:
     click.echo()
     click.echo(_style("  Next:", fg="bright_green", bold=True) + f" {text}")
+
+
+def _loader_availability() -> list[tuple[str, bool, str]]:
+    checks = [
+        ("txt", find_spec("charset_normalizer") is not None, "reinstall docmancer; charset-normalizer ships in core"),
+        ("pdf", find_spec("pypdf") is not None, "reinstall docmancer; pypdf ships in core"),
+        ("pdf fallback", find_spec("pdfplumber") is not None, "reinstall docmancer; pdfplumber ships in core"),
+        ("docx", find_spec("docx") is not None, "reinstall docmancer; python-docx ships in core"),
+        ("rtf", find_spec("striprtf") is not None, "reinstall docmancer; striprtf ships in core"),
+        ("html", True, "built in"),
+        ("markdown", True, "built in"),
+    ]
+    return checks
 
 
 class _IngestLogFormatter(logging.Formatter):
@@ -403,10 +467,8 @@ def init_cmd(directory: str | None):
 @click.command(
     cls=DocmancerCommand,
     context_settings=HELP_CONTEXT_SETTINGS,
-    short_help="Add docs to the local SQLite index.",
+    short_help="Add URL docs to the local SQLite index.",
     epilog=format_examples(
-        "docmancer add ./docs",
-        "docmancer add ./README.md",
         "docmancer add https://docs.example.com",
         "docmancer add https://github.com/owner/repo",
         "docmancer add https://docs.example.com --max-pages 200",
@@ -436,7 +498,7 @@ def add_cmd(
     browser: bool,
     fetch_workers: int | None,
 ):
-    """Add documents from a file, directory, or URL."""
+    """Add documents from a documentation URL or GitHub repository."""
     config_path = _effective_config(config_path)
     _configure_ingest_logging()
 
@@ -457,8 +519,22 @@ def add_cmd(
                 browser=browser,
             )
         else:
+            warnings.warn(
+                "docmancer add for local files is deprecated. Use docmancer ingest <path>. "
+                "The compatibility path will be removed after the 0.4.x line.",
+                DeprecationWarning,
+                stacklevel=2,
+            )
+            click.echo(
+                "Warning: local paths now belong to `docmancer ingest`. "
+                "`docmancer add ./path` still works during the 0.4.x compatibility window.",
+                err=True,
+            )
             total = agent.add(path, recreate=recreate)
         _emit_index_summary(total, agent)
+        if getattr(agent, "last_ingest_skips", None):
+            report_path = getattr(agent, "last_ingest_report_path", None)
+            click.echo(f"Skipped {len(agent.last_ingest_skips)} file(s). Report: {display_path(report_path)}")
     except (FileNotFoundError, ValueError) as e:
         click.echo(f"Error: {e}", err=True)
         sys.exit(1)
@@ -556,12 +632,68 @@ def update_cmd(
 
 @click.command(
     cls=DocmancerCommand,
-    context_settings={**HELP_CONTEXT_SETTINGS, "ignore_unknown_options": True, "allow_extra_args": True},
-    short_help="Deprecated. Use 'docmancer add'.",
+    context_settings=HELP_CONTEXT_SETTINGS,
+    short_help="Index local files into the SQLite index.",
+    epilog=format_examples(
+        "docmancer ingest ./docs",
+        "docmancer ingest ./README.md",
+        "docmancer ingest ./docs --format md --format pdf",
+        "docmancer ingest ./docs --include 'guides/**' --exclude '**/draft*'",
+    ),
 )
-def ingest_cmd():
-    """Deprecated command retained only to explain the breaking transition."""
-    raise click.ClickException("docmancer ingest has been removed from the primary CLI. Use: docmancer add <url-or-path>")
+@click.argument("path")
+@click.option("--recreate", is_flag=True, help="Recreate the collection first.")
+@click.option("--include", "include_patterns", multiple=True, help="Glob pattern to include, relative to the ingest root.")
+@click.option("--exclude", "exclude_patterns", multiple=True, help="Glob pattern to exclude, relative to the ingest root.")
+@click.option(
+    "--format",
+    "formats",
+    multiple=True,
+    type=click.Choice(["md", "markdown", "txt", "pdf", "docx", "rtf", "html", "htm"], case_sensitive=False),
+    help="Restrict ingest to one or more file formats.",
+)
+@click.option("--recursive/--no-recursive", default=True, show_default=True, help="Recurse through directories.")
+@click.option("--skip-known", is_flag=True, help="Skip files whose content hash is already indexed.")
+@click.option("--no-vectors", is_flag=True, help="Index FTS5 only; skip embedding/vector upsert.")
+@click.option("--config", "config_path", default=None, help="Path to docmancer.yaml.")
+def ingest_cmd(
+    path: str,
+    recreate: bool,
+    include_patterns: tuple[str, ...],
+    exclude_patterns: tuple[str, ...],
+    formats: tuple[str, ...],
+    recursive: bool,
+    skip_known: bool,
+    no_vectors: bool,
+    config_path: str | None,
+):
+    """Index local files or directories."""
+    if path.startswith(("http://", "https://")):
+        raise click.ClickException("Use `docmancer add` for URLs.")
+
+    config_path = _effective_config(config_path)
+    _configure_ingest_logging()
+    config = _load_config(config_path)
+    agent = _get_agent_class()(config=config)
+
+    try:
+        total = agent.ingest(
+            path,
+            recreate=recreate,
+            include=include_patterns,
+            exclude=exclude_patterns,
+            formats=formats,
+            recursive=recursive,
+            skip_known=skip_known,
+            with_vectors=not no_vectors,
+        )
+        _emit_index_summary(total, agent)
+        if getattr(agent, "last_ingest_skips", None):
+            report_path = getattr(agent, "last_ingest_report_path", None)
+            click.echo(f"Skipped {len(agent.last_ingest_skips)} file(s). Report: {display_path(report_path)}")
+    except (FileNotFoundError, ValueError) as e:
+        click.echo(f"Error: {e}", err=True)
+        sys.exit(1)
 
 
 @click.command(
@@ -611,6 +743,89 @@ def fetch_cmd(url: str, output_dir: str):
 @click.command(
     cls=DocmancerCommand,
     context_settings=HELP_CONTEXT_SETTINGS,
+    short_help="Stream-ingest a USPTO trademark XML / ZIP bulk file.",
+    epilog=format_examples(
+        "docmancer ingest-uspto apc18840407-20240102-xx.xml",
+        "docmancer ingest-uspto bulk-trademarks-2024.zip --include-dead",
+        "docmancer ingest-uspto daily.xml.gz --no-vectors --batch-size 5000",
+    ),
+)
+@click.argument("path", type=click.Path(exists=True, dir_okay=False, readable=True))
+@click.option("--recreate", is_flag=True, help="Clear the index before ingesting.")
+@click.option("--include-dead", is_flag=True, help="Index dead/abandoned marks too (default: live only).")
+@click.option("--no-vectors", is_flag=True, help="Skip embedding/vector upsert; index FTS5 only.")
+@click.option("--batch-size", default=1000, type=int, show_default=True, help="Commit batch size for streaming ingest.")
+@click.option("--limit", default=None, type=int, help="Stop after N records (smoke testing).")
+@click.option("--config", "config_path", default=None, help="Path to docmancer.yaml.")
+def ingest_uspto_cmd(
+    path: str,
+    recreate: bool,
+    include_dead: bool,
+    no_vectors: bool,
+    batch_size: int,
+    limit: int | None,
+    config_path: str | None,
+):
+    """Stream USPTO trademark case-files into the local index.
+
+    Accepts an `.xml`, `.xml.gz`, or `.zip` archive containing the USPTO bulk
+    trademark XML. Each `<case-file>` becomes one Section in SQLite (no
+    heading splitting). Memory stays flat thanks to streaming iterparse and
+    batched SQLite commits.
+    """
+    from docmancer.connectors.fetchers.uspto_tm import (
+        ParseStats,
+        iter_uspto_documents,
+    )
+
+    config_path = _effective_config(config_path)
+    _configure_ingest_logging()
+    config = _load_config(config_path)
+    agent = _get_agent_class()(config=config)
+
+    stats = ParseStats()
+
+    def _records():
+        count = 0
+        for doc in iter_uspto_documents(path, live_only=not include_dead, stats=stats):
+            yield doc
+            count += 1
+            if limit is not None and count >= limit:
+                break
+
+    def _progress(sources: int, sections: int) -> None:
+        click.echo(
+            f"  ... {sources} record(s) ingested ({stats.parsed} parsed, "
+            f"{stats.skipped_dead} skipped dead, {stats.failed} failed)"
+        )
+
+    try:
+        total = agent.ingest_records(
+            _records(),
+            recreate=recreate,
+            batch_size=batch_size,
+            with_vectors=not no_vectors,
+            progress_callback=_progress,
+        )
+    except Exception as exc:
+        click.echo(f"USPTO ingest failed: {type(exc).__name__}: {exc}", err=True)
+        sys.exit(1)
+
+    click.echo()
+    click.echo(f"Parsed:        {stats.parsed}")
+    click.echo(f"Emitted:       {stats.emitted}")
+    click.echo(f"Skipped dead:  {stats.skipped_dead}")
+    click.echo(f"Failed:        {stats.failed}")
+    if stats.failures_by_reason:
+        click.echo("Failure reasons:")
+        for reason, count in sorted(stats.failures_by_reason.items()):
+            click.echo(f"  {reason}: {count}")
+    click.echo(f"Sections indexed: {total}")
+
+
+@click.command(
+    cls=DocmancerCommand,
+    context_settings=HELP_CONTEXT_SETTINGS,
     short_help="Show collection stats.",
     epilog=format_examples(
         "docmancer inspect",
@@ -628,7 +843,17 @@ def inspect_cmd(config_path: str | None):
     click.echo(f"Index: {display_path(config.index.db_path)}")
     click.echo(f"Exists: {stats.get('collection_exists', False)}")
     click.echo(f"Sources: {stats.get('sources_count', 0)}")
+    sources_by_format = stats.get("sources_by_format") or {}
+    if sources_by_format:
+        click.echo("Sources by format:")
+        for format_name, count in sorted(sources_by_format.items()):
+            click.echo(f"  {format_name}: {count}")
     click.echo(f"Sections: {stats.get('sections_count', 0)}")
+    sections_by_format = stats.get("sections_by_format") or {}
+    if sections_by_format:
+        click.echo("Sections by format:")
+        for format_name, count in sorted(sections_by_format.items()):
+            click.echo(f"  {format_name}: {count}")
     click.echo(f"Extracted: {display_path(stats.get('extracted_dir', ''))}")
 
 
@@ -683,7 +908,72 @@ def doctor_cmd(config_path: str | None):
         _emit_status_line(str(exc), state="error")
     else:
         if not Path(config.index.db_path).exists():
-            _emit_status_line("No docs indexed yet (run: docmancer add <url-or-path>)", state="warn")
+            _emit_status_line("No docs indexed yet (run: docmancer ingest <path> or docmancer add <url>)", state="warn")
+
+    click.echo()
+    click.echo(_style("  Local loaders", fg="white", bold=True))
+    for label, available, hint in _loader_availability():
+        if available:
+            _emit_status_line(f"{label}: available", indent=4)
+        else:
+            _emit_status_line(f"{label}: missing ({hint})", state="warn", indent=4)
+
+    click.echo()
+    click.echo(_style("  Vector retrieval", fg="white", bold=True))
+    try:
+        from docmancer.runtime.qdrant_manager import QdrantManager  # noqa: F401
+        qdrant_status = QdrantManager().status()
+        if qdrant_status["alive"] and qdrant_status["owned"]:
+            _emit_status_line(
+                f"qdrant: running (pid {qdrant_status['pid']}, port {qdrant_status['port']}, version {qdrant_status['version']})",
+                indent=4,
+            )
+        elif qdrant_status["alive"]:
+            _emit_status_line("qdrant: running but not docmancer-owned", state="warn", indent=4)
+        else:
+            _emit_status_line(
+                "qdrant: not running (start with: docmancer qdrant up)",
+                state="warn",
+                indent=4,
+            )
+    except ImportError:
+        _emit_status_line("qdrant: skipping (reinstall docmancer; qdrant-client ships in core)", state="warn", indent=4)
+
+    try:
+        import fastembed  # type: ignore  # noqa: F401
+
+        _emit_status_line(
+            f"embeddings: provider={config.embeddings.provider} model={config.embeddings.model}",
+            indent=4,
+        )
+    except ImportError:
+        _emit_status_line("embeddings: fastembed missing (reinstall docmancer; fastembed ships in core)", state="warn", indent=4)
+
+    # Highlight vector/lexical drift if both stores have populated this DB.
+    try:
+        sections_total = agent.store.collection_stats().get("sections_count", 0)
+        from docmancer.runtime.qdrant_manager import QdrantManager
+        from docmancer.stores.base import get_vector_store
+
+        vs_config = config.vector_store
+        if vs_config.provider == "qdrant" and QdrantManager().status().get("healthy"):
+            url = QdrantManager().status().get("url")
+            if url:
+                vs_config = vs_config.model_copy(update={"url": url})
+                store = get_vector_store(vs_config, embeddings_dim=config.embeddings.dimensions)
+                collection = agent._vector_collection_name()
+                try:
+                    points = store.count(collection)
+                    if sections_total and abs(points - sections_total) > 0:
+                        _emit_status_line(
+                            f"drift: sections={sections_total} vs vector_points={points}",
+                            state="warn",
+                            indent=4,
+                        )
+                except Exception:
+                    pass
+    except Exception:
+        pass
 
     # Skill install status
     click.echo()
@@ -730,6 +1020,13 @@ def doctor_cmd(config_path: str | None):
     help="Include adjacent sections around matches. Add 'page' after the flag for the full page.",
 )
 @click.option("output_format", "--format", type=click.Choice(["markdown", "json"], case_sensitive=False), default="markdown", show_default=True)
+@click.option(
+    "--mode",
+    type=click.Choice(["lexical", "dense", "sparse", "hybrid"], case_sensitive=False),
+    default=None,
+    help="Retrieval mode. Default reads from retrieval.default_mode in config.",
+)
+@click.option("--explain", is_flag=True, help="Show per-source rank contributions for each result.")
 @click.pass_context
 def query_cmd(
     ctx: click.Context,
@@ -739,6 +1036,8 @@ def query_cmd(
     budget: int | None,
     expand: str | None,
     output_format: str,
+    mode: str | None,
+    explain: bool,
 ):
     """Return a compact docs context pack from the local SQLite index."""
     import json as _json
@@ -753,7 +1052,20 @@ def query_cmd(
     config_path = _effective_config(config_path)
     config = _load_config(config_path)
     agent = _get_agent_class()(config=config)
-    chunks = agent.query(text, limit=limit, budget=budget, expand=expand)
+    effective_mode = (mode or config.retrieval.default_mode or "lexical").lower()
+    contributions: dict = {}
+    if effective_mode == "lexical":
+        chunks = agent.query(text, limit=limit, budget=budget, expand=expand)
+    else:
+        chunks, contributions = _run_dispatch_query(
+            agent=agent,
+            config=config,
+            query=text,
+            mode=effective_mode,
+            limit=limit,
+            budget=budget,
+            expand=expand,
+        )
 
     if not chunks:
         click.echo("No results found.")
@@ -796,6 +1108,14 @@ def query_cmd(
         if meta.get("title"):
             click.echo(f"    section: {meta['title']}")
         click.echo(f"    tokens: ~{meta.get('token_estimate', 0)}")
+        if explain:
+            sid = meta.get("section_id")
+            contrib = contributions.get(sid) if sid is not None else None
+            if contrib:
+                parts = ", ".join(f"{src}#{rank}" for src, rank in sorted(contrib.items()))
+                click.echo(f"    explain: {parts}")
+            elif effective_mode == "lexical":
+                click.echo("    explain: lexical#1")
         click.echo(body)
         click.echo("---")
 

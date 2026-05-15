@@ -4,11 +4,31 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.4.10] - Unreleased
+## [0.5.0] - Unreleased
+### Added
+
+- **Local-first RAG pipeline:** `docmancer ingest` now indexes PDF, DOCX, RTF, and HTML in addition to Markdown and plain text via new loaders under `docmancer/connectors/parsers/`. Install with `pip install docmancer[local]` for the optional parser dependencies.
+- **Vector store abstraction:** new `VectorStore` interface with `SqliteVecStore` (small-scale fallback) and `QdrantStore` (named dense vector, optional sparse, gRPC bulk upsert, ownership sentinel) under `docmancer[vector]`.
+- **Managed Qdrant lifecycle:** `docmancer qdrant {up,down,status,upgrade,logs}` brings a docmancer-owned Qdrant up against the pinned `v1.14.1` release with platform-aware binary acquisition, PID/runtime files, port selection under `filelock`, telemetry disabled, and a clean `SqliteVecStore` fallback when the platform is unsupported.
+- **Embeddings providers:** local FastEmbed (default `BAAI/bge-base-en-v1.5`) plus optional cloud stubs (`embeddings-voyage`, `embeddings-openai`, `embeddings-cohere`). Content-hash-keyed embeddings cache avoids re-embedding unchanged chunks.
+- **Hybrid retrieval:** `docmancer query --mode {lexical,dense,sparse,hybrid} --explain` dispatches across FTS5, dense, and sparse signals and fuses with RRF (weighted or vanilla). Default mode auto-flips to `hybrid` when a Qdrant store is configured.
+- **Hierarchical retrieval auto-enable:** `retrieval.hierarchical.auto` (default `true`) makes the dispatcher decide per-index. When the SQLite index contains at least `retrieval.hierarchical.auto_min_documents` (default `10`) distinct documents, the two-stage pass turns on without needing `enabled: true`. Explicit `enabled: true` still forces it on, and `auto: false` restores the legacy off-unless-enabled behaviour.
+- **Router recipes doc page:** new `/docs/router-recipes` covers regex-driven `retrieval.routers` patterns (live-version pinning, Nice trademark classes, multi-product docset routing, SDK routing). `retrieval.routers` stays empty by default; recipes are opt-in per index.
+- **Eval harness:** small story-corpus harness under `docmancer/eval/` for smoke-comparing retrieval modes; not the production TTAB harness.
+- **`doctor`:** now reports loader availability, Qdrant status, embeddings provider, and vector/lexical drift.
+
+### Changed
+
+- **`ingest`:** new `--no-vectors` flag for FTS5-only runs. Default `ingest` auto-syncs vectors when an opt-in is present (`DOCMANCER_QDRANT_URL`, `DOCMANCER_AUTO_VECTORS=1`, or an installed managed binary); otherwise it is a silent no-op so first runs do not trigger background downloads or firewall prompts.
+- **`inspect`:** groups section counts by format and warns on section/vector-store drift once vectors are indexed.
+- **Safety: foreign Qdrant collections.** `QdrantStore.ensure_collection` now refuses to write the docmancer ownership sentinel into a pre-existing collection that does not already carry it. Users pointing `vector_store.collection` at a shared or pre-existing collection get a clear `PermissionError` instead of silently sharing it.
+- **Safety: stale vector cleanup.** `sync_vector_store` now prunes vector-store points and `embedding_upserts` rows for chunk ids that have vanished from SQLite (e.g. after `ingest --recreate` or source removal), so dense/hybrid retrieval cannot resurrect points with no SQLite section to hydrate. Reported as `pruned=N` in the agent log.
+- **Safety: bare YAML stays lexical.** `retrieval.default_mode` now only auto-flips to `hybrid` when the YAML explicitly opts in by including a non-empty `vector_store:` block. Configs that only set `index:` retain FTS5-only behaviour and never trigger managed-Qdrant lifecycle code.
+
 ### Removed
 
 - **`docmancer bench`:** removed the benchmarking CLI group and the `docmancer.bench` package.
-- **Bench-only optional extras:** removed `docmancer[bench]`, `docmancer[vector]`, `docmancer[rlm]`, `docmancer[judge]`, `docmancer[llm]`, and `docmancer[ragas]`.
+- **Bench-only optional extras:** removed `docmancer[bench]`, `docmancer[rlm]`, `docmancer[judge]`, `docmancer[llm]`, and `docmancer[ragas]`. (Note: `docmancer[vector]` is reintroduced here as the new vector/embeddings extra.)
 - **Config:** removed supported `bench:` and legacy `eval:` config schema fields. YAML files that still contain those keys load with a deprecation warning and ignore them.
 - **Legacy stubs:** removed the top-level `docmancer eval` and `docmancer dataset` bench-pointer commands.
 

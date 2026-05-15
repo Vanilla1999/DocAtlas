@@ -1,13 +1,13 @@
 # Supported Sources
 
-This page covers two distinct surfaces:
+This page covers two surfaces:
 
-- **Docs RAG sources** consumed by `docmancer add` and indexed into the local SQLite FTS5 store.
-- **MCP pack sources** compiled by the pipeline into version-pinned API tool surfaces and installed by `docmancer install-pack`.
+- **Docs sources** consumed by `docmancer ingest` or `docmancer add` and indexed into the local SQLite FTS5 store.
+- **Advanced MCP pack sources** compiled by the pipeline into version-pinned API tool surfaces and installed by `docmancer install-pack`.
 
 For how each surface fits into the overall system, see [Architecture](./Architecture.md).
 
-## Docs RAG source types
+## Docs Source Types
 
 | Source | Strategy | Command |
 |--------|----------|---------|
@@ -15,11 +15,33 @@ For how each surface fits into the overall system, see [Architecture](./Architec
 | Mintlify sites | `--provider mintlify` or `auto`: `/llms-full.txt` then `/llms.txt` then `/sitemap.xml` | `docmancer add <url>` |
 | Generic web docs | `--provider web`: generic crawler for non-GitBook / non-Mintlify sites | `docmancer add <url>` |
 | GitHub repos | `--provider github`: fetches README and docs markdown | `docmancer add <github-url>` |
-| Local `.md` / `.txt` | Read from disk and index | `docmancer add ./path/to/files` |
+| Local Markdown, text, HTML, PDF, DOCX, or RTF | Read from disk and index | `docmancer ingest ./path/to/files` |
 
 When using `auto` (the default), docmancer detects the provider automatically based on the site's response headers and content.
 
-## Add options
+### Local file formats
+
+All loaders ship in the core install.
+
+| Format | Loader notes |
+|--------|--------------|
+| `.md` / `.markdown` | Heading-aware chunker. |
+| `.txt` | Paragraph + sliding-window chunker; encoding auto-sniffed via `charset-normalizer`. |
+| `.html` / `.htm` | Readability-based extraction reused from the URL fetcher. |
+| `.pdf` | `pypdf` first, falls back to `pdfplumber` when extraction quality is poor; page numbers captured per chunk. |
+| `.docx` | `python-docx`; heading styles mapped to Markdown levels. |
+| `.rtf` | `striprtf`; paragraph splits only. |
+
+## Local Ingest Options
+
+- `--include <glob>` includes only matching paths relative to the ingest root.
+- `--exclude <glob>` excludes matching paths relative to the ingest root.
+- `--format <format>` restricts ingest to one or more supported file formats.
+- `--recursive / --no-recursive` controls directory traversal.
+- `--skip-known` skips files whose content hash is already indexed.
+- `--no-vectors` skips the embedding + vector upsert path for FTS5-only ingest.
+
+## URL Add Options
 
 - `--provider` forces a specific provider instead of auto-detection.
 - `--strategy` forces a specific discovery strategy (for example `llms-full.txt`, `sitemap.xml`, or `nav-crawl`) instead of letting the provider decide.
@@ -49,7 +71,7 @@ All sources follow the same indexing path regardless of origin:
 
 For configuration options that control query budget and retrieval behavior, see [Configuration](./Configuration.md).
 
-## MCP pack source types
+## Advanced MCP Pack Source Types
 
 The pipeline compiles version-pinned MCP packs from these public source standards. The CLI installs the resulting packs with `docmancer install-pack <package>@<version>`.
 
@@ -61,4 +83,4 @@ The pipeline compiles version-pinned MCP packs from these public source standard
 | **Sphinx `objects.inv`** | Parses the zlib-compressed inventory format and emits `noop_doc` operations per documented object. | `noop_doc` |
 | **`python_import` (opt-in)** | Lets a pack run a Python callable in a subprocess against a venv-detected interpreter. Must be installed with `--allow-execute`. | `python_import` |
 
-Per-source curation lives at `pipeline/overrides/{package}/`. Hand-authored overrides let maintainers pin a curated tool subset, set wire-pinned headers (for APIs that ship dated versions in a header), declare bearer or API-key auth shapes, and force form encoding on endpoints whose upstream spec is incomplete. For long-tail packs without a hand-curated override, the pipeline ranks operations heuristically (tag order × inverse param count × deprecation × CRUD floor).
+Per-source curation lives at `pipeline/overrides/{package}/`. Hand-authored overrides let maintainers pin a curated tool subset, set wire-pinned headers (for APIs that ship dated versions in a header), declare bearer or API-key auth shapes, and force form encoding on endpoints whose upstream spec is incomplete. For long-tail packs without a hand-curated override, the pipeline ranks operations heuristically using tag order, inverse param count, deprecation, and a CRUD floor.
