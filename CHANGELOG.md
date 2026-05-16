@@ -4,8 +4,7 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.5.2] - Unreleased
-
+## [0.5.2] - 2026-05-16
 ### Added
 
 - **`docmancer clear`:** removes docmancer-owned state in one step: `~/.docmancer/` (config, SQLite FTS5 index, extracted docs, embeddings cache, managed Qdrant storage, MCP packs), `~/.cache/fastembed/`, and any `~/.cache/huggingface/hub/models--Qdrant--*` paths the qdrant_client embedding helper has pulled. Stops managed Qdrant first when it is running. Flags: `--yes`, `--dry-run`, `--keep-config` (keep `~/.docmancer/docmancer.yaml`), `--keep-models` (skip FastEmbed and Hugging Face caches). Other publishers' Hugging Face caches are not touched.
