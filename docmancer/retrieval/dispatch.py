@@ -30,6 +30,20 @@ class DispatchResult:
     contributions: dict[Any, dict[str, int]] = field(default_factory=dict)
     mode_used: str = "lexical"
     candidate_counts: dict[str, int] = field(default_factory=dict)
+    failures: dict[str, str] = field(default_factory=dict)
+
+
+class HybridRetrievalError(RuntimeError):
+    """Raised when one or more non-lexical retrievers fail in strict mode."""
+
+    def __init__(self, failures: dict[str, str]) -> None:
+        self.failures = dict(failures)
+        parts = "; ".join(f"{src}: {msg}" for src, msg in failures.items())
+        super().__init__(
+            f"hybrid retrieval failed in {len(failures)} source(s): {parts}. "
+            f"Pass --allow-degraded to fall back to the remaining signals, or "
+            f"run `docmancer doctor` to diagnose."
+        )
 
 
 class RetrievalDispatcher:
@@ -60,8 +74,14 @@ class RetrievalDispatcher:
         budget: int | None = None,
         expand: str | None = None,
         filters: dict | None = None,
+        allow_degraded: bool = False,
     ) -> DispatchResult:
-        effective_mode = (mode or self.config.retrieval.default_mode or "lexical").lower()
+        configured_mode = getattr(getattr(self.config, "retrieval", None), "default_mode", None)
+        effective_mode = (
+            mode
+            or (configured_mode if isinstance(configured_mode, str) else None)
+            or "lexical"
+        ).lower()
         limit = limit or self.config.query.default_limit
         budget = budget or self.config.query.default_budget
         per_source_limit = max(limit * 3, 20)
@@ -96,21 +116,33 @@ class RetrievalDispatcher:
                 budget=budget,
                 filters=merged_filters,
                 expand=retrieval_expand,
+                allow_degraded=allow_degraded,
             )
 
-        candidate_lists, raw_counts = self._fan_out(
+        ready_failure = self._vector_readiness_failure(effective_mode)
+        if ready_failure and not allow_degraded:
+            raise HybridRetrievalError(ready_failure)
+
+        candidate_lists, raw_counts, failures = self._fan_out(
             query=query,
             mode=effective_mode,
             per_source_limit=per_source_limit,
             filters=merged_filters,
         )
 
+        if failures and effective_mode != "lexical" and not allow_degraded:
+            raise HybridRetrievalError(failures)
+
         if not candidate_lists:
+            if ready_failure and allow_degraded:
+                raw_counts.update({source: 0 for source in ready_failure})
+                failures.update(ready_failure)
             chunks = self.store.query(query, limit=limit, budget=budget, expand=retrieval_expand)
             return DispatchResult(
                 chunks=chunks,
                 mode_used="lexical-fallback",
                 candidate_counts=raw_counts,
+                failures=failures,
             )
 
         fusion_method = self.config.retrieval.fusion.method or "rrf"
@@ -141,6 +173,7 @@ class RetrievalDispatcher:
             contributions=contributions,
             mode_used=effective_mode,
             candidate_counts=raw_counts,
+            failures=failures,
         )
 
     def _hierarchical_active(self, hcfg: Any) -> bool:
@@ -173,6 +206,20 @@ class RetrievalDispatcher:
             )
         return active
 
+    def _vector_readiness_failure(self, mode: str) -> dict[str, str]:
+        if mode == "lexical" or self.vector_store is None or not self.collection:
+            return {}
+        count_fn = getattr(self.vector_store, "count", None)
+        if not callable(count_fn):
+            return {}
+        try:
+            points = int(count_fn(self.collection))
+        except Exception as exc:
+            return {"vector": f"{type(exc).__name__}: {exc}"}
+        if points <= 0:
+            return {"vector": f"collection {self.collection!r} has no indexed vectors"}
+        return {}
+
     # ------------------ hierarchical retrieval ------------------
 
     def _run_hierarchical(
@@ -184,21 +231,32 @@ class RetrievalDispatcher:
         budget: int,
         filters: dict | None,
         expand: str | None,
+        allow_degraded: bool = False,
     ) -> DispatchResult:
         """Two-stage retrieval: top documents first, then top sections inside them."""
         hcfg = self.config.retrieval.hierarchical
         candidate_pool = int(hcfg.candidate_pool)
+        ready_failure = self._vector_readiness_failure(mode)
+        if ready_failure and not allow_degraded:
+            raise HybridRetrievalError(ready_failure)
 
         # Stage 1: cast a wide net and aggregate by document_title_hash.
-        stage1_candidates, stage1_counts = self._fan_out(
+        stage1_candidates, stage1_counts, stage1_failures = self._fan_out(
             query=query,
             mode=mode,
             per_source_limit=candidate_pool,
             filters=filters,
         )
+        if stage1_failures and mode != "lexical" and not allow_degraded:
+            raise HybridRetrievalError(stage1_failures)
         if not stage1_candidates:
             chunks = self.store.query(query, limit=limit, budget=budget, expand=expand)
-            return DispatchResult(chunks=chunks, mode_used="lexical-fallback", candidate_counts=stage1_counts)
+            return DispatchResult(
+                chunks=chunks,
+                mode_used="lexical-fallback",
+                candidate_counts=stage1_counts,
+                failures=stage1_failures,
+            )
 
         doc_scores: dict[str, float] = {}
         for source, shaped in stage1_candidates.items():
@@ -220,12 +278,14 @@ class RetrievalDispatcher:
         # Stage 2: re-retrieve dense + sparse filtered to those documents.
         stage2_filters = dict(filters or {})
         stage2_filters["document_title_hash"] = {"in": top_docs}
-        stage2_candidates, stage2_counts = self._fan_out(
+        stage2_candidates, stage2_counts, stage2_failures = self._fan_out(
             query=query,
             mode=mode,
             per_source_limit=max(limit * 3, hcfg.sections_per_document * hcfg.documents_limit),
             filters=stage2_filters,
         )
+        if stage2_failures and mode != "lexical" and not allow_degraded:
+            raise HybridRetrievalError(stage2_failures)
         if not stage2_candidates:
             return self._fuse_and_hydrate(stage1_candidates, limit=limit, budget=budget, expand=expand, counts=stage1_counts, mode=mode)
         return self._fuse_and_hydrate(
@@ -352,7 +412,7 @@ class RetrievalDispatcher:
         mode: str,
         per_source_limit: int,
         filters: dict | None,
-    ) -> tuple[dict[str, list[Any]], dict[str, int]]:
+    ) -> tuple[dict[str, list[Any]], dict[str, int], dict[str, str]]:
         from .dense import dense_search
         from .lexical import lexical_search
         from .sparse import sparse_search
@@ -405,15 +465,17 @@ class RetrievalDispatcher:
                     filters=filters,
                 )
             else:
-                return {}, {}
+                return {}, {}, {}
 
             candidate_lists: dict[str, list[Any]] = {}
             counts: dict[str, int] = {}
+            failures: dict[str, str] = {}
             for source, fut in tasks.items():
                 try:
                     hits = fut.result()
                 except Exception as exc:
                     logger.warning("retrieval source %s failed: %s", source, exc)
+                    failures[source] = f"{type(exc).__name__}: {exc}"
                     hits = []
                 if not hits:
                     counts[source] = 0
@@ -422,7 +484,7 @@ class RetrievalDispatcher:
                 if shaped:
                     candidate_lists[source] = shaped
                     counts[source] = len(shaped)
-        return candidate_lists, counts
+        return candidate_lists, counts, failures
 
     def _hydrate(self, section_ids: list[int], *, budget: int) -> list:
         if not section_ids:
@@ -464,6 +526,7 @@ def dispatch_query(
     budget: int | None = None,
     expand: str | None = None,
     filters: dict | None = None,
+    allow_degraded: bool = False,
 ) -> DispatchResult:
     dispatcher = RetrievalDispatcher(
         store=store,
@@ -472,4 +535,12 @@ def dispatch_query(
         provider=provider,
         collection=collection,
     )
-    return dispatcher.run(query, mode=mode, limit=limit, budget=budget, expand=expand, filters=filters)
+    return dispatcher.run(
+        query,
+        mode=mode,
+        limit=limit,
+        budget=budget,
+        expand=expand,
+        filters=filters,
+        allow_degraded=allow_degraded,
+    )

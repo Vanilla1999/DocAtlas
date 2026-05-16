@@ -11,7 +11,7 @@ from docmancer.core.config import (
 )
 from docmancer.core.models import Document
 from docmancer.core.sqlite_store import SQLiteStore
-from docmancer.retrieval.dispatch import RetrievalDispatcher
+from docmancer.retrieval.dispatch import HybridRetrievalError, RetrievalDispatcher
 from docmancer.stores.base import VectorHit
 
 
@@ -33,6 +33,25 @@ class FakeVectorStore:
         key = _filter_key(filters)
         self.calls.append({"mode": mode, "filters": filters, "limit": limit})
         return list(self._hits_by_filter.get((mode, key), []))[:limit]
+
+
+class FailingVectorStore(FakeVectorStore):
+    def __init__(self):
+        super().__init__({})
+
+    def count(self, collection):
+        return 1
+
+    def search(self, collection, query_vector, *, limit, filters=None, sparse_vector=None, mode="dense"):
+        raise ValueError("Vector dimension error: expected dim: 768, got 384")
+
+
+class EmptyVectorStore(FakeVectorStore):
+    def __init__(self):
+        super().__init__({})
+
+    def count(self, collection):
+        return 0
 
 
 class FakeProvider:
@@ -134,6 +153,49 @@ def test_router_invalid_regex_is_skipped(tmp_path):
         store=store, config=config, vector_store=vstore, provider=FakeProvider(), collection="c"
     ).run("hello world", mode="dense", limit=1)
     assert vstore.calls[0]["filters"] == {"ok": True}
+
+
+def test_dense_failure_is_hard_error_by_default(tmp_path):
+    config, store = _agent(tmp_path)
+    _populate(store, [("Doc", "doc", "# Doc\n\nalpha.\n")])
+    dispatcher = RetrievalDispatcher(
+        store=store,
+        config=config,
+        vector_store=FailingVectorStore(),
+        provider=FakeProvider(),
+        collection="c",
+    )
+    with pytest.raises(HybridRetrievalError, match="Vector dimension error"):
+        dispatcher.run("alpha", mode="dense", limit=1)
+
+
+def test_dense_failure_can_degrade_when_requested(tmp_path):
+    config, store = _agent(tmp_path)
+    _populate(store, [("Doc", "doc", "# Doc\n\nalpha.\n")])
+    dispatcher = RetrievalDispatcher(
+        store=store,
+        config=config,
+        vector_store=FailingVectorStore(),
+        provider=FakeProvider(),
+        collection="c",
+    )
+    result = dispatcher.run("alpha", mode="dense", limit=1, allow_degraded=True)
+    assert result.mode_used == "lexical-fallback"
+    assert "dense" in result.failures
+
+
+def test_empty_vector_collection_is_hard_error(tmp_path):
+    config, store = _agent(tmp_path)
+    _populate(store, [("Doc", "doc", "# Doc\n\nalpha.\n")])
+    dispatcher = RetrievalDispatcher(
+        store=store,
+        config=config,
+        vector_store=EmptyVectorStore(),
+        provider=FakeProvider(),
+        collection="c",
+    )
+    with pytest.raises(HybridRetrievalError, match="no indexed vectors"):
+        dispatcher.run("alpha", mode="hybrid", limit=1)
 
 
 # ---------------- hierarchical retrieval ----------------

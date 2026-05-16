@@ -119,10 +119,12 @@ vector_store:
     assert config.vector_store.collection == "knowledge_base"
 
 
-def test_legacy_embedding_block_migrates_to_embeddings(tmp_path):
+def test_legacy_embedding_block_is_dropped(tmp_path):
     """Pre-0.5.0 configs used `embedding:` (singular). The new schema is
-    `embeddings:` (plural). Rename transparently so users do not lose
-    their provider/model selection on upgrade."""
+    `embeddings:` (plural). The legacy block is silently dropped so the
+    new defaults (e.g. bge-base-en-v1.5) take effect; we do not migrate
+    the value because the old default of bge-small would otherwise
+    defeat the upgrade."""
     config_file = tmp_path / "docmancer.yaml"
     config_file.write_text(
         """
@@ -132,11 +134,11 @@ embedding:
 """
     )
 
-    with pytest.warns(DeprecationWarning, match="`embedding:` config block is deprecated"):
-        config = DocmancerConfig.from_yaml(config_file)
+    config = DocmancerConfig.from_yaml(config_file)
 
+    # New defaults take effect; the legacy small model is not preserved.
     assert config.embeddings.provider == "fastembed"
-    assert config.embeddings.model == "BAAI/bge-small-en-v1.5"
+    assert config.embeddings.model == "BAAI/bge-base-en-v1.5"
 
 
 def test_embeddings_and_retrieval_defaults():

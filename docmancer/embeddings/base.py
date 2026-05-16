@@ -112,6 +112,7 @@ def embed_with_cache(
     *,
     cache: EmbeddingsCache | None,
     model: str | None = None,
+    progress_callback=None,
 ) -> list[list[float]]:
     """Embed ``texts``, satisfying cache hits and only calling the provider for misses."""
     if cache is None:
@@ -126,6 +127,8 @@ def embed_with_cache(
         bs = max(1, provider.max_batch_size)
         for start in range(0, len(miss_texts), bs):
             computed.extend(provider.embed(miss_texts[start : start + bs]))
+            if progress_callback is not None:
+                progress_callback(min(start + bs, len(miss_texts)), len(miss_texts))
         for i, vec in zip(miss_idx, computed):
             vectors[i] = vec
             cache.put(keys[i], vec)

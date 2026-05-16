@@ -52,7 +52,8 @@ def _make_doc(source: str, content: str) -> Document:
     return Document(source=source, content=content, metadata={"format": "markdown"})
 
 
-def test_sync_prunes_vectors_for_removed_sections(tmp_path):
+def test_sync_prunes_vectors_for_removed_sections(tmp_path, monkeypatch):
+    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
     config = _config(tmp_path)
     store = SQLiteStore(config.index.db_path)
     vector_store = get_vector_store(config.vector_store, embeddings_dim=DIM)

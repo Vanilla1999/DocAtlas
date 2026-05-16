@@ -41,7 +41,7 @@ Use `ingest` for local files and directories.
 | `--format <format>` | Restrict to formats such as `md`, `txt`, `pdf`, `docx`, `rtf`, or `html` |
 | `--recursive / --no-recursive` | Recurse through directories |
 | `--skip-known` | Skip files whose content hash is already indexed |
-| `--recreate` | Drop and rebuild the index |
+| `--recreate` | Drop and rebuild the index; when vector sync is enabled, drops the vector collection first so embedder or dimension changes rebuild cleanly |
 
 ## Add URL Documentation
 
@@ -74,6 +74,7 @@ Primary command. Returns a compact markdown context pack with source attribution
 | `--expand` | Include adjacent sections around matches |
 | `--expand page` | Include the full matching page within the budget |
 | `--format <markdown\|json>` | Output format |
+| `--allow-degraded` | In dense, sparse, or hybrid modes, fall back to remaining signals (for example lexical) when vector retrieval fails instead of exiting with an error |
 
 ## Manage Sources
 
@@ -85,6 +86,7 @@ Primary command. Returns a compact markdown context pack with source attribution
 | `docmancer update [source]` | Re-fetch and re-index all sources, or one specific source |
 | `docmancer remove <source>` | Remove a source or docset root |
 | `docmancer remove --all` | Clear the entire index |
+| `docmancer clear` | Wipe docmancer home, model caches used by docmancer, and managed Qdrant data (destructive; use `--dry-run`, `--keep-config`, or `--keep-models` as needed) |
 | `docmancer doctor` | Check config, loader availability, index health, and installed skills |
 | `docmancer fetch <url> --output <dir>` | Download docs to markdown without indexing |
 

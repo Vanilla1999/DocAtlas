@@ -3,6 +3,7 @@ import click
 from docmancer import __version__
 from docmancer.cli.commands import (
     add_cmd,
+    clear_cmd,
     doctor_cmd,
     fetch_cmd,
     ingest_cmd,
@@ -70,6 +71,7 @@ cli.add_command(query_cmd, "query")
 cli.add_command(inspect_cmd, "inspect")
 cli.add_command(list_cmd, "list")
 cli.add_command(remove_cmd, "remove")
+cli.add_command(clear_cmd, "clear")
 cli.add_command(doctor_cmd, "doctor")
 cli.add_command(init_cmd, "init")
 cli.add_command(fetch_cmd, "fetch")

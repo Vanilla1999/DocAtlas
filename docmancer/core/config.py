@@ -170,20 +170,12 @@ class DocmancerConfig(BaseModel):
 
         data.pop("packs", None)
 
-        # Legacy singular `embedding:` block from pre-0.5.0 configs. The new
-        # schema uses plural `embeddings:`. Migrate transparently so users
-        # upgrading from an older Docmancer install do not silently lose
-        # their embedding provider / model selection.
-        if "embedding" in data and "embeddings" not in data:
-            warnings.warn(
-                "`embedding:` config block is deprecated; renamed to `embeddings:`. "
-                "The old block has been migrated automatically.",
-                DeprecationWarning,
-                stacklevel=2,
-            )
-            data["embeddings"] = data.pop("embedding")
-        elif "embedding" in data:
-            data.pop("embedding", None)
+        # Pre-0.5.0 used `embedding:` (singular). The new schema is plural
+        # `embeddings:`. We do not migrate the value: the old block usually
+        # pinned a smaller model (`bge-small-en-v1.5`) that defeats the
+        # 0.5.0 default upgrade to `bge-base-en-v1.5`. Silently drop the
+        # legacy block so the new defaults take effect.
+        data.pop("embedding", None)
 
         if isinstance(data.get("vector_store"), dict):
             vector_store = data["vector_store"]

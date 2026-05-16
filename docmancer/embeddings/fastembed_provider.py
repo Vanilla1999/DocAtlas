@@ -33,11 +33,22 @@ class FastEmbedProvider(EmbeddingsProvider):
     def __init__(self, config: "EmbeddingsConfig") -> None:
         self._config = config
         self.model_name = config.model
+        # Treat the config dimension as a *hint* only. The real dimension
+        # comes from probing the loaded ONNX model on first use, because
+        # FastEmbed's model registry can resolve a configured name to a
+        # different ONNX artifact (different size/quantisation), and we
+        # must not trust a stale or speculative value when sizing the
+        # Qdrant collection.
         self.dimensions = int(config.dimensions or 768)
+        self._dimensions_resolved = False
         self.max_batch_size = int(getattr(config, "batch_size", 64) or 64)
         self._dense: Any | None = None
         self._sparse: Any | None = None
         self.cache = EmbeddingsCache(config.cache)
+
+    @property
+    def sparse_model_name(self) -> str:
+        return self._config.sparse_model or "prithivida/Splade_PP_en_v1"
 
     def _ensure_dense(self) -> Any:
         if self._dense is None:
@@ -48,8 +59,35 @@ class FastEmbedProvider(EmbeddingsProvider):
                     "fastembed is required for the FastEmbed provider; "
                     "reinstall docmancer; this dependency ships in core."
                 ) from exc
-            self._dense = TextEmbedding(model_name=self.model_name, cache_dir=_fastembed_cache_dir())
+            cache_dir = _fastembed_cache_dir()
+            if cache_dir and not Path(cache_dir).exists() and not os.environ.get("HF_TOKEN"):
+                logger.warning(
+                    "FastEmbed first run may download dense and sparse models from Hugging Face. "
+                    "HF_TOKEN is not set; set a read token if downloads are slow or throttled."
+                )
+            self._dense = TextEmbedding(model_name=self.model_name, cache_dir=cache_dir)
+            self._resolve_dimension(self._dense)
         return self._dense
+
+    def _resolve_dimension(self, dense: Any) -> None:
+        """Probe the loaded model so ``self.dimensions`` reflects reality.
+
+        Called once after ``TextEmbedding`` is constructed. We try metadata
+        first (cheap), then fall back to a single throwaway embedding. If
+        both fail we keep the config hint; ingest will still catch any
+        mismatch when it asserts upserts landed.
+        """
+        if self._dimensions_resolved:
+            return
+        try:
+            for vec in dense.embed(["dim-probe"]):
+                resolved = int(len(list(vec)))
+                if resolved > 0:
+                    self.dimensions = resolved
+                break
+        except Exception:
+            pass
+        self._dimensions_resolved = True
 
     def _ensure_sparse(self) -> Any:
         if self._sparse is None:

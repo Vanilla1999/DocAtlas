@@ -125,6 +125,15 @@ def _describe_index(config) -> str:
     return f"SQLite FTS5 at {display_path(config.index.db_path)}"
 
 
+def _effective_retrieval_mode(mode: str | None, config) -> str:
+    if mode:
+        return mode.lower()
+    configured = getattr(getattr(config, "retrieval", None), "default_mode", None)
+    if isinstance(configured, str) and configured:
+        return configured.lower()
+    return "lexical"
+
+
 def _run_dispatch_query(
     *,
     agent,
@@ -134,19 +143,22 @@ def _run_dispatch_query(
     limit: int | None,
     budget: int | None,
     expand: str | None,
+    allow_degraded: bool = False,
 ):
-    """Build a RetrievalDispatcher, run it, return (chunks, contributions).
+    """Build a RetrievalDispatcher, run it, return (chunks, contributions, failures).
 
     Falls back to lexical-only if the embeddings provider or vector store
-    cannot be initialised; this keeps the CLI usable on FTS5-only installs.
+    cannot be *constructed*. Runtime retrieval failures (dimension mismatch,
+    Qdrant down) propagate to the caller in non-lexical modes unless the caller
+    sets ``allow_degraded=True``.
     """
     try:
         from docmancer.embeddings import get_embeddings_provider
-        from docmancer.retrieval.dispatch import RetrievalDispatcher
+        from docmancer.retrieval.dispatch import HybridRetrievalError, RetrievalDispatcher
         from docmancer.runtime.qdrant_manager import ensure_running
         from docmancer.stores.base import get_vector_store
     except ImportError:
-        return agent.query(query, limit=limit, budget=budget, expand=expand), {}
+        return agent.query(query, limit=limit, budget=budget, expand=expand), {}, {}
 
     vs_config = config.vector_store
     if vs_config.provider == "qdrant" and not vs_config.url:
@@ -159,8 +171,11 @@ def _run_dispatch_query(
     try:
         vector_store = get_vector_store(vs_config, embeddings_dim=config.embeddings.dimensions)
         provider = get_embeddings_provider(config.embeddings)
-    except Exception:
-        return agent.query(query, limit=limit, budget=budget, expand=expand), {}
+    except Exception as exc:
+        failures = {"vector": f"{type(exc).__name__}: {exc}"}
+        if allow_degraded:
+            return agent.query(query, limit=limit, budget=budget, expand=expand), {}, failures
+        raise HybridRetrievalError(failures) from exc
 
     collection = agent._vector_collection_name()
     dispatcher = RetrievalDispatcher(
@@ -170,8 +185,15 @@ def _run_dispatch_query(
         provider=provider,
         collection=collection,
     )
-    result = dispatcher.run(query, mode=mode, limit=limit, budget=budget, expand=expand)
-    return result.chunks, result.contributions
+    result = dispatcher.run(
+        query,
+        mode=mode,
+        limit=limit,
+        budget=budget,
+        expand=expand,
+        allow_degraded=allow_degraded,
+    )
+    return result.chunks, result.contributions, result.failures
 
 
 def _format_size(num_bytes: int) -> str:
@@ -287,6 +309,8 @@ class _IngestLogFormatter(logging.Formatter):
             return _style("[fetch] ", fg="bright_green", bold=True) + message
         if lower.startswith("chunking ") or lower.startswith("built "):
             return _style("[chunk] ", fg="yellow", bold=True) + message
+        if lower.startswith("embedding ") or lower.startswith("vectors:"):
+            return _style("[embed] ", fg="bright_cyan", bold=True) + message
         if lower.startswith("indexing "):
             return _style("[index] ", fg="magenta", bold=True) + message
         if lower.startswith("stored ") or lower.startswith("persisting batch "):
@@ -304,6 +328,8 @@ def _configure_ingest_logging() -> None:
     root = logging.getLogger()
     root.handlers = [handler]
     root.setLevel(logging.INFO)
+    for noisy_logger in ("httpx", "httpcore", "qdrant_client"):
+        logging.getLogger(noisy_logger).setLevel(logging.WARNING)
 
 
 def _emit_install_summary(
@@ -676,6 +702,9 @@ def ingest_cmd(
     config = _load_config(config_path)
     agent = _get_agent_class()(config=config)
 
+    if recreate and not no_vectors:
+        _drop_vector_collection(config, agent)
+
     try:
         total = agent.ingest(
             path,
@@ -694,6 +723,38 @@ def ingest_cmd(
     except (FileNotFoundError, ValueError) as e:
         click.echo(f"Error: {e}", err=True)
         sys.exit(1)
+
+
+def _drop_vector_collection(config, agent) -> None:
+    """Best-effort: remove the Qdrant collection + persisted meta so the
+    next ingest rebuilds at the current embedder dimension.
+
+    Silent on missing-collection / Qdrant-down: callers use this defensively
+    before re-ingest, and a missing collection is success, not failure.
+    """
+    try:
+        from docmancer.core import index_meta
+        from docmancer.runtime.qdrant_manager import ensure_running
+        from docmancer.stores.base import get_vector_store
+    except ImportError:
+        return
+
+    collection = agent._vector_collection_name()
+    vs_config = config.vector_store
+    if vs_config.provider == "qdrant" and not vs_config.url:
+        resolution = ensure_running()
+        if not resolution.url:
+            index_meta.drop(collection)
+            return
+        vs_config = vs_config.model_copy(update={"url": resolution.url})
+
+    try:
+        store = get_vector_store(vs_config, embeddings_dim=config.embeddings.dimensions)
+        store.delete_collection(collection)
+    except Exception as exc:
+        logger = logging.getLogger(__name__)
+        logger.debug("could not drop vector collection %r: %s", collection, exc)
+    index_meta.drop(collection)
 
 
 @click.command(
@@ -920,6 +981,7 @@ def doctor_cmd(config_path: str | None):
 
     click.echo()
     click.echo(_style("  Vector retrieval", fg="white", bold=True))
+    qdrant_status = None
     try:
         from docmancer.runtime.qdrant_manager import QdrantManager  # noqa: F401
         qdrant_status = QdrantManager().status()
@@ -948,25 +1010,69 @@ def doctor_cmd(config_path: str | None):
         )
     except ImportError:
         _emit_status_line("embeddings: fastembed missing (reinstall docmancer; fastembed ships in core)", state="warn", indent=4)
+    if config.embeddings.provider == "fastembed":
+        if os.environ.get("HF_TOKEN"):
+            _emit_status_line("HF_TOKEN: set", indent=4)
+        else:
+            _emit_status_line(
+                "HF_TOKEN: not set (first-run Hugging Face model downloads may be throttled)",
+                state="warn",
+                indent=4,
+            )
 
     # Highlight vector/lexical drift if both stores have populated this DB.
     try:
         sections_total = agent.store.collection_stats().get("sections_count", 0)
-        from docmancer.runtime.qdrant_manager import QdrantManager
+        from docmancer.core import index_meta
         from docmancer.stores.base import get_vector_store
 
         vs_config = config.vector_store
-        if vs_config.provider == "qdrant" and QdrantManager().status().get("healthy"):
-            url = QdrantManager().status().get("url")
+        if vs_config.provider == "qdrant" and qdrant_status and qdrant_status.get("healthy"):
+            url = qdrant_status.get("url")
             if url:
                 vs_config = vs_config.model_copy(update={"url": url})
                 store = get_vector_store(vs_config, embeddings_dim=config.embeddings.dimensions)
                 collection = agent._vector_collection_name()
                 try:
                     points = store.count(collection)
+                    _emit_status_line(f"collection: {collection} ({points} vector point(s))", indent=4)
+                    if sections_total and points == 0:
+                        _emit_status_line(
+                            "collection has no indexed vectors; re-run ingest or rebuild with --recreate",
+                            state="error",
+                            indent=4,
+                        )
                     if sections_total and abs(points - sections_total) > 0:
                         _emit_status_line(
                             f"drift: sections={sections_total} vs vector_points={points}",
+                            state="warn",
+                            indent=4,
+                        )
+                    meta = (
+                        getattr(store, "collection_metadata", lambda _collection: None)(collection)
+                        or index_meta.get(collection)
+                    )
+                    if meta:
+                        meta_provider = getattr(meta, "provider", None) or meta.get("provider")
+                        meta_model = getattr(meta, "model", None) or meta.get("model")
+                        meta_dim = getattr(meta, "dim", None) or meta.get("dim")
+                        _emit_status_line(
+                            f"collection embedder: provider={meta_provider} model={meta_model} dim={meta_dim}",
+                            indent=4,
+                        )
+                        if (
+                            str(meta_provider) != str(config.embeddings.provider)
+                            or str(meta_model) != str(config.embeddings.model)
+                            or int(meta_dim or 0) != int(config.embeddings.dimensions or 0)
+                        ):
+                            _emit_status_line(
+                                "embedder mismatch: configured embeddings do not match the collection; rebuild with docmancer ingest <path> --recreate",
+                                state="error",
+                                indent=4,
+                            )
+                    else:
+                        _emit_status_line(
+                            "collection embedder metadata missing; rebuild with docmancer ingest <path> --recreate",
                             state="warn",
                             indent=4,
                         )
@@ -1027,6 +1133,12 @@ def doctor_cmd(config_path: str | None):
     help="Retrieval mode. Default reads from retrieval.default_mode in config.",
 )
 @click.option("--explain", is_flag=True, help="Show per-source rank contributions for each result.")
+@click.option(
+    "--allow-degraded",
+    is_flag=True,
+    default=False,
+    help="In non-lexical modes, fall back to remaining signals if a retriever fails instead of erroring.",
+)
 @click.pass_context
 def query_cmd(
     ctx: click.Context,
@@ -1038,9 +1150,11 @@ def query_cmd(
     output_format: str,
     mode: str | None,
     explain: bool,
+    allow_degraded: bool,
 ):
     """Return a compact docs context pack from the local SQLite index."""
     import json as _json
+    from docmancer.retrieval.dispatch import HybridRetrievalError
 
     if expand and ctx.args:
         if ctx.args == ["page"]:
@@ -1052,20 +1166,26 @@ def query_cmd(
     config_path = _effective_config(config_path)
     config = _load_config(config_path)
     agent = _get_agent_class()(config=config)
-    effective_mode = (mode or config.retrieval.default_mode or "lexical").lower()
+    effective_mode = _effective_retrieval_mode(mode, config)
     contributions: dict = {}
+    failures: dict[str, str] = {}
     if effective_mode == "lexical":
         chunks = agent.query(text, limit=limit, budget=budget, expand=expand)
     else:
-        chunks, contributions = _run_dispatch_query(
-            agent=agent,
-            config=config,
-            query=text,
-            mode=effective_mode,
-            limit=limit,
-            budget=budget,
-            expand=expand,
-        )
+        try:
+            chunks, contributions, failures = _run_dispatch_query(
+                agent=agent,
+                config=config,
+                query=text,
+                mode=effective_mode,
+                limit=limit,
+                budget=budget,
+                expand=expand,
+                allow_degraded=allow_degraded,
+            )
+        except HybridRetrievalError as exc:
+            click.echo(f"Error: {exc}", err=True)
+            sys.exit(2)
 
     if not chunks:
         click.echo("No results found.")
@@ -1087,6 +1207,8 @@ def query_cmd(
                     "raw_tokens": raw_tokens,
                     "savings_percent": savings,
                     "runway_multiplier": runway,
+                    "degraded": bool(failures),
+                    "failures": failures,
                     "results": [chunk.model_dump() for chunk in chunks],
                 },
                 ensure_ascii=False,
@@ -1099,6 +1221,9 @@ def query_cmd(
         f"Context pack: ~{docmancer_tokens} tokens vs ~{raw_tokens} raw docs tokens "
         f"({savings}% less docs overhead, {runway}x agentic runway)"
     )
+    if failures:
+        for source, failure in failures.items():
+            click.echo(f"Warning: {source} retriever degraded: {failure}", err=True)
     click.echo("---")
 
     for i, chunk in enumerate(chunks, start=1):
@@ -1116,6 +1241,9 @@ def query_cmd(
                 click.echo(f"    explain: {parts}")
             elif effective_mode == "lexical":
                 click.echo("    explain: lexical#1")
+            elif failures:
+                failure_parts = "; ".join(f"{src}: {msg}" for src, msg in sorted(failures.items()))
+                click.echo(f"    explain: degraded retrieval ({failure_parts})")
         click.echo(body)
         click.echo("---")
 
@@ -1160,6 +1288,145 @@ def remove_cmd(source: str | None, remove_all: bool, config_path: str | None):
             click.echo(f"Removed source: {source}")
     else:
         click.echo(f"No data found for source: {source}", err=True)
+        sys.exit(1)
+
+
+def _dir_size_bytes(path: Path) -> int:
+    """Best-effort recursive size for a file or directory. Permission errors
+    are skipped silently so a single unreadable file does not abort the scan."""
+    if not path.exists():
+        return 0
+    if path.is_file() or path.is_symlink():
+        try:
+            return path.stat().st_size
+        except OSError:
+            return 0
+    total = 0
+    for child in path.rglob("*"):
+        try:
+            if child.is_file() and not child.is_symlink():
+                total += child.stat().st_size
+        except OSError:
+            continue
+    return total
+
+
+def _format_size(n: int) -> str:
+    f = float(n)
+    for unit in ("B", "KB", "MB", "GB"):
+        if f < 1024:
+            return f"{f:.1f} {unit}"
+        f /= 1024
+    return f"{f:.1f} TB"
+
+
+@click.command(
+    cls=DocmancerCommand,
+    context_settings=HELP_CONTEXT_SETTINGS,
+    short_help="Remove all docmancer state from this machine.",
+    epilog=format_examples(
+        "docmancer clear",
+        "docmancer clear --yes",
+        "docmancer clear --dry-run",
+        "docmancer clear --keep-config",
+        "docmancer clear --keep-models",
+    ),
+)
+@click.option("--yes", "-y", "assume_yes", is_flag=True, help="Skip the confirmation prompt.")
+@click.option("--dry-run", is_flag=True, help="Print what would be deleted without removing anything.")
+@click.option("--keep-config", is_flag=True, help="Preserve ~/.docmancer/docmancer.yaml.")
+@click.option(
+    "--keep-models",
+    is_flag=True,
+    help="Skip the FastEmbed / Qdrant-hosted HuggingFace model caches.",
+)
+def clear_cmd(assume_yes: bool, dry_run: bool, keep_config: bool, keep_models: bool) -> None:
+    """Remove every docmancer-related directory from this machine.
+
+    Removes (by default):
+
+    \b
+    - ~/.docmancer/ (config, SQLite FTS5 index, extracted docs, embeddings cache,
+      managed Qdrant storage, MCP packs)
+    - ~/.cache/fastembed/ (FastEmbed ONNX model cache)
+    - ~/.cache/huggingface/hub/models--Qdrant--* (Qdrant-published models that
+      docmancer pulled via the qdrant_client embedding helper)
+
+    The managed Qdrant process is stopped first if it is running. Other tools'
+    HuggingFace caches (non-Qdrant publishers) are left untouched.
+    """
+    home = Path.home()
+
+    docmancer_home = home / ".docmancer"
+    targets: list[Path] = []
+
+    if docmancer_home.exists():
+        if keep_config:
+            for child in sorted(docmancer_home.iterdir()):
+                if child.name == "docmancer.yaml":
+                    continue
+                targets.append(child)
+        else:
+            targets.append(docmancer_home)
+
+    if not keep_models:
+        fastembed_cache = home / ".cache" / "fastembed"
+        if fastembed_cache.exists():
+            targets.append(fastembed_cache)
+        hf_hub = home / ".cache" / "huggingface" / "hub"
+        if hf_hub.exists():
+            for child in sorted(hf_hub.iterdir()):
+                if child.name.startswith("models--Qdrant--"):
+                    targets.append(child)
+
+    if not targets:
+        click.echo("Nothing to remove. Docmancer state is already clear.")
+        return
+
+    sizes = {t: _dir_size_bytes(t) for t in targets}
+    total = sum(sizes.values())
+
+    click.echo("Will remove:")
+    for t in targets:
+        click.echo(f"  {_format_size(sizes[t]):>10}  {t}")
+    click.echo(f"  {'-' * 10}")
+    click.echo(f"  {_format_size(total):>10}  total")
+
+    if dry_run:
+        click.echo("\nDry run; no changes made.")
+        return
+
+    if not assume_yes:
+        click.confirm("\nRemove all of this?", abort=True)
+
+    # Stop the managed Qdrant before deleting its storage so the binary
+    # is not still writing into ~/.docmancer/qdrant as we remove it.
+    try:
+        from docmancer.runtime.qdrant_manager import QdrantManager
+
+        mgr = QdrantManager()
+        if mgr.stop():
+            click.echo("Stopped managed qdrant.")
+    except Exception as exc:  # noqa: BLE001
+        click.echo(f"Warning: could not stop managed qdrant: {exc}", err=True)
+
+    removed = 0
+    failed: list[tuple[Path, str]] = []
+    for t in targets:
+        try:
+            if t.is_dir() and not t.is_symlink():
+                shutil.rmtree(t)
+            else:
+                t.unlink()
+            removed += sizes[t]
+        except OSError as exc:
+            failed.append((t, str(exc)))
+
+    click.echo(f"Removed {_format_size(removed)} of docmancer state.")
+    if failed:
+        click.echo("Some paths could not be removed:", err=True)
+        for path, msg in failed:
+            click.echo(f"  {path}: {msg}", err=True)
         sys.exit(1)
 
 

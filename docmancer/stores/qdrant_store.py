@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import warnings
 from typing import Any
 
 from .base import VectorHit, VectorPoint, VectorStore
@@ -11,6 +12,10 @@ from .base import VectorHit, VectorPoint, VectorStore
 _OWNERSHIP_POINT_ID = 0
 _OWNERSHIP_PAYLOAD_KEY = "_docmancer_owned"
 _OWNERSHIP_WORKSPACE_KEY = "_docmancer_workspace"
+_META_PROVIDER_KEY = "_docmancer_embedder_provider"
+_META_MODEL_KEY = "_docmancer_embedder_model"
+_META_DIM_KEY = "_docmancer_embedder_dim"
+_META_SPARSE_MODEL_KEY = "_docmancer_sparse_model"
 
 _PAYLOAD_INDEX_FIELDS = (
     "source_path",
@@ -64,18 +69,22 @@ class QdrantStore(VectorStore):
         QdrantClient, qm = _import_qdrant()
         self._qm = qm
         self._QdrantClient = QdrantClient
-        self._client = QdrantClient(url=self._url, api_key=self._api_key)
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", message=".*Qdrant client version.*")
+            self._client = QdrantClient(url=self._url, api_key=self._api_key)
         self._grpc_client: Any = None
 
     # ---------- internal helpers ----------
 
     def _bulk_client(self):
         if self._grpc_client is None:
-            self._grpc_client = self._QdrantClient(
-                url=self._url,
-                api_key=self._api_key,
-                prefer_grpc=True,
-            )
+            with warnings.catch_warnings():
+                warnings.filterwarnings("ignore", message=".*Qdrant client version.*")
+                self._grpc_client = self._QdrantClient(
+                    url=self._url,
+                    api_key=self._api_key,
+                    prefer_grpc=True,
+                )
         return self._grpc_client
 
     def _build_vectors_config(self, dimensions: int, options: dict):
@@ -116,12 +125,21 @@ class QdrantStore(VectorStore):
                 # Index may already exist on a re-ensure; ignore duplicates.
                 pass
 
-    def _write_sentinel(self, collection: str) -> None:
+    def _write_sentinel(self, collection: str, meta: dict[str, Any] | None = None) -> None:
         qm = self._qm
         payload = {
             _OWNERSHIP_PAYLOAD_KEY: True,
             _OWNERSHIP_WORKSPACE_KEY: _workspace_id(self._url, collection),
         }
+        if meta:
+            payload.update(
+                {
+                    _META_PROVIDER_KEY: str(meta.get("provider") or ""),
+                    _META_MODEL_KEY: str(meta.get("model") or ""),
+                    _META_DIM_KEY: int(meta.get("dim") or self._embeddings_dim),
+                    _META_SPARSE_MODEL_KEY: str(meta.get("sparse_model") or ""),
+                }
+            )
         # Sentinel uses a zero vector. We have to supply the named "dense"
         # vector since the collection is configured with a named vector slot.
         dense = [0.0] * self._embeddings_dim
@@ -151,6 +169,32 @@ class QdrantStore(VectorStore):
             if payload.get(_OWNERSHIP_PAYLOAD_KEY) is True:
                 return True
         return False
+
+    def collection_metadata(self, collection: str) -> dict[str, Any] | None:
+        """Return embedder metadata recorded on the ownership sentinel."""
+        try:
+            records = self._client.retrieve(
+                collection_name=collection,
+                ids=[_OWNERSHIP_POINT_ID],
+                with_payload=True,
+                with_vectors=False,
+            )
+        except Exception:
+            return None
+        for rec in records or []:
+            payload = getattr(rec, "payload", None) or {}
+            if payload.get(_OWNERSHIP_PAYLOAD_KEY) is not True:
+                continue
+            dim = payload.get(_META_DIM_KEY)
+            if not payload.get(_META_PROVIDER_KEY) and not payload.get(_META_MODEL_KEY) and dim is None:
+                return None
+            return {
+                "provider": payload.get(_META_PROVIDER_KEY) or "",
+                "model": payload.get(_META_MODEL_KEY) or "",
+                "dim": int(dim or 0),
+                "sparse_model": payload.get(_META_SPARSE_MODEL_KEY) or None,
+            }
+        return None
 
     def _to_filter(self, filters: dict | None):
         if not filters:
@@ -186,6 +230,7 @@ class QdrantStore(VectorStore):
     ) -> None:
         qm = self._qm
         merged = {**self.options, **(options or {})}
+        docmancer_meta = merged.pop("docmancer_meta", None)
 
         existing = None
         try:
@@ -223,6 +268,8 @@ class QdrantStore(VectorStore):
                 )
             # Re-ensure: collection is ours, just refresh payload indexes.
             self._create_payload_indexes(name)
+            if docmancer_meta:
+                self._write_sentinel(name, docmancer_meta)
             return
 
         vectors_config, quantization_config = self._build_vectors_config(dimensions, merged)
@@ -240,8 +287,12 @@ class QdrantStore(VectorStore):
             sparse_vectors_config=sparse_vectors_config,
             quantization_config=quantization_config,
         )
+        # Sync our cached dimension to the collection we just created so the
+        # ownership sentinel (and any later writes that use it) match the
+        # actual schema. Callers may have passed a stale hint at __init__.
+        self._embeddings_dim = int(dimensions)
         self._create_payload_indexes(name)
-        self._write_sentinel(name)
+        self._write_sentinel(name, docmancer_meta)
 
     def upsert(
         self,

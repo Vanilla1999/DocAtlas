@@ -4,6 +4,29 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.2] - Unreleased
+
+### Added
+
+- **`docmancer clear`:** removes docmancer-owned state in one step: `~/.docmancer/` (config, SQLite FTS5 index, extracted docs, embeddings cache, managed Qdrant storage, MCP packs), `~/.cache/fastembed/`, and any `~/.cache/huggingface/hub/models--Qdrant--*` paths the qdrant_client embedding helper has pulled. Stops managed Qdrant first when it is running. Flags: `--yes`, `--dry-run`, `--keep-config` (keep `~/.docmancer/docmancer.yaml`), `--keep-models` (skip FastEmbed and Hugging Face caches). Other publishers' Hugging Face caches are not touched.
+- **Embedder metadata for vector collections:** `index-meta.json` under the docmancer home directory plus embedder fields on the docmancer Qdrant ownership sentinel, so ingest and query can detect a collection built with a different provider, dense model, vector dimension, or sparse model than the current configuration (`IndexMismatchError` with rebuild guidance).
+- **`docmancer query --allow-degraded`:** in dense, sparse, or hybrid modes, vector construction failures, empty collections, or Qdrant read errors raise `HybridRetrievalError` by default; the flag opts into lexical (or partial-signal) fallback and surfaces per-source failure messages.
+
+### Changed
+
+- **Config:** legacy singular `embedding:` YAML is dropped instead of renamed to `embeddings:`, so upgrades do not keep pinning the pre-0.5.0 default small dense model when the 0.5.x stack expects `BAAI/bge-base-en-v1.5`.
+- **`ingest --recreate`:** best-effort deletes the configured Qdrant collection and clears persisted embedder metadata before re-ingest so model or dimension changes rebuild from a clean collection.
+- **Vector sync:** Qdrant collection size uses the live FastEmbed-reported dense dimension (config is a hint only); after bulk upsert, point counts are verified so dimension mismatches against stale collections fail loudly instead of reporting success with an empty index; embedding batches log `embedding sections N/M` progress; `embed_with_cache` accepts an optional progress callback.
+- **`DocmancerAgent` ingest:** vector indexing failure after a successful FTS5 ingest now raises `RuntimeError` instead of only logging a warning.
+- **Hybrid retrieval CLI:** vector store or embeddings provider construction errors propagate in non-lexical modes unless `--allow-degraded` is set; `_run_dispatch_query` returns structured failure details for degraded paths.
+- **Ingest logging:** `[embed]` styling for embedding-related lines; `httpx`, `httpcore`, and `qdrant_client` loggers default to WARNING during ingest to cut noise.
+- **`doctor`:** reuses a single managed Qdrant status probe; reports collection point counts, embedder metadata from the sentinel or sidecar, an error when the collection has zero vectors while SQLite has sections, and whether `HF_TOKEN` is set for FastEmbed downloads.
+- **`QdrantStore`:** suppresses qdrant-client library version mismatch warnings; ownership sentinel payload stores embedder metadata; `collection_metadata()` reads it for pipeline checks.
+
+### Fixed
+
+- **Hybrid query token metrics:** lexical hydration used by the hybrid dispatcher now fills the same pack-level token estimate metadata as the pure lexical path, so default CLI output no longer shows near-zero token totals for hybrid results.
+
 ## [0.5.1] - 2026-05-16
 ### Fixed
 

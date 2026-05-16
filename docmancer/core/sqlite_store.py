@@ -543,7 +543,7 @@ class SQLiteStore:
                     section_ids,
                 )
             }
-        results: list[RetrievedChunk] = []
+        selected_rows: list[tuple[int, sqlite3.Row]] = []
         used_tokens = 0
         for rank, sid in enumerate(section_ids):
             row = rows.get(int(sid))
@@ -553,9 +553,26 @@ class SQLiteStore:
             if used_tokens and used_tokens + tok > budget:
                 break
             used_tokens += tok
+            selected_rows.append((rank, row))
+
+        # Compute pack-level token metrics so the hybrid dispatcher returns
+        # the same shape as the lexical path. Without these, the CLI prints
+        # "~0 tokens" / "~0 raw tokens" because nothing else sets them.
+        raw_tokens = self._raw_token_total([row["source"] for _, row in selected_rows])
+        token_total = used_tokens
+        savings = 0.0 if raw_tokens <= 0 else max(0.0, 100.0 * (1 - (token_total / raw_tokens)))
+        runway = 1.0 if token_total <= 0 else raw_tokens / token_total
+
+        results: list[RetrievedChunk] = []
+        for rank, row in selected_rows:
             metadata = json.loads(row["metadata_json"] or "{}")
             metadata.setdefault("title", row["title"])
             metadata.setdefault("section_id", int(row["id"]))
+            metadata["token_estimate"] = int(row["token_estimate"] or 0)
+            metadata["docmancer_tokens"] = token_total
+            metadata["raw_tokens"] = raw_tokens
+            metadata["savings_percent"] = round(savings, 1)
+            metadata["runway_multiplier"] = round(runway, 2)
             score = max(0.0, 1.0 - (rank * 0.05))
             results.append(
                 RetrievedChunk(

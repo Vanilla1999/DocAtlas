@@ -84,7 +84,7 @@ class DocmancerAgent:
             try:
                 self._sync_vectors_if_enabled()
             except Exception as exc:
-                logger.warning("vector indexing failed (FTS5 ingest still succeeded): %s", exc)
+                raise RuntimeError(f"vector indexing failed after FTS5 ingest: {exc}") from exc
         return result.sections
 
     def ingest_records(
@@ -117,7 +117,7 @@ class DocmancerAgent:
             try:
                 self._sync_vectors_if_enabled()
             except Exception as exc:
-                logger.warning("vector indexing failed (FTS5 ingest still succeeded): %s", exc)
+                raise RuntimeError(f"vector indexing failed after FTS5 ingest: {exc}") from exc
         return result.sections
 
     def _vector_collection_name(self) -> str:

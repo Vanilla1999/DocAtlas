@@ -8,9 +8,10 @@ from __future__ import annotations
 
 import hashlib
 import logging
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from typing import TYPE_CHECKING
 
+from docmancer.core import index_meta
 from docmancer.embeddings.base import (
     EmbeddingsCache,
     EmbeddingsProvider,
@@ -84,13 +85,64 @@ def sync_vector_store(
     sections = store.list_sections_for_embedding()
     cache = EmbeddingsCache(config.embeddings.cache)
 
+    # Resolve the real dimension from the live provider rather than trusting
+    # the config field. FastEmbed can map a configured model name to a
+    # different ONNX artifact at load time; sizing the Qdrant collection from
+    # the config hint is the original silent-failure mode.
+    if hasattr(provider, "_ensure_dense"):
+        try:
+            provider._ensure_dense()  # type: ignore[attr-defined]
+        except Exception:
+            pass
+    resolved_dim = int(getattr(provider, "dimensions", 0) or 0)
+    if resolved_dim <= 0:
+        resolved_dim = int(config.embeddings.dimensions or 768)
+
+    sparse_model = (
+        getattr(provider, "sparse_model_name", None)
+        if include_sparse
+        else None
+    )
+    want_meta = index_meta.CollectionMeta(
+        provider=str(getattr(provider, "name", "unknown")),
+        model=str(getattr(provider, "model_name", "")),
+        dim=resolved_dim,
+        sparse_model=(str(sparse_model) if sparse_model else None),
+        created_at=index_meta.now_iso(),
+    )
+    # Refuse to operate on a collection that was built with a different
+    # embedder. Prefer metadata on the Qdrant ownership sentinel, then fall
+    # back to the sidecar used by older builds.
+    vector_meta = getattr(vector_store, "collection_metadata", lambda _collection: None)(collection)
+    if vector_meta:
+        have_meta = index_meta.CollectionMeta(
+            provider=str(vector_meta.get("provider") or ""),
+            model=str(vector_meta.get("model") or ""),
+            dim=int(vector_meta.get("dim") or 0),
+            sparse_model=(str(vector_meta.get("sparse_model")) if vector_meta.get("sparse_model") else None),
+            created_at="",
+        )
+        if (
+            have_meta.provider != want_meta.provider
+            or have_meta.model != want_meta.model
+            or int(have_meta.dim) != int(want_meta.dim)
+            or (have_meta.sparse_model or None) != (want_meta.sparse_model or None)
+        ):
+            raise index_meta.IndexMismatchError(collection, want_meta, have_meta)
+    else:
+        have_meta = index_meta.get(collection)
+        if have_meta is not None:
+            index_meta.assert_match(collection, want_meta)
+
     # Ensure the collection exists *before* pruning so we have somewhere to
     # delete from on a totally fresh install with an empty SQLite section table.
     vector_store.ensure_collection(
         collection,
-        dimensions=int(config.embeddings.dimensions or provider.dimensions or 768),
+        dimensions=resolved_dim,
         sparse=include_sparse,
+        options={"docmancer_meta": asdict(want_meta)},
     )
+    index_meta.put(collection, want_meta)
 
     existing = store.list_embedding_upserts(collection)
     current_ids = {int(sec["section_id"]) for sec in sections}
@@ -123,6 +175,17 @@ def sync_vector_store(
         pending.append(sec)
 
     if not pending:
+        try:
+            count_after = int(vector_store.count(collection))
+        except Exception:
+            count_after = 0
+        expected_total = len(current_ids)
+        if expected_total > 0 and count_after < expected_total:
+            raise RuntimeError(
+                f"vector index {collection!r} is incomplete: expected {expected_total} "
+                f"indexed points but the vector store reports {count_after}. Rebuild with "
+                f"`docmancer ingest <path> --recreate`."
+            )
         return SyncResult(
             embedded=0,
             upserted=0,
@@ -142,6 +205,9 @@ def sync_vector_store(
         texts,
         cache=cache,
         model=getattr(provider, "model_name", provider.name),
+        progress_callback=lambda done, total: logger.info(
+            "embedding sections %d/%d", done, total
+        ),
     )
 
     sparse_vectors: list = []
@@ -168,8 +234,33 @@ def sync_vector_store(
             )
         )
 
+    try:
+        count_before = int(vector_store.count(collection))
+    except Exception:
+        count_before = 0
+
     bulk = len(points) >= 512
     vector_store.upsert(collection, points, bulk=bulk)
+
+    # Verify upserts actually landed. Bulk gRPC upserts return without
+    # waiting; if Qdrant rejected the batch (typically a dimension mismatch
+    # against a stale collection) the call still looks like it succeeded.
+    # We compare counts and refuse to record bookkeeping for points that
+    # never made it. Without this check, ingest reports upserted=N while
+    # the collection stays effectively empty.
+    try:
+        count_after = int(vector_store.count(collection))
+    except Exception:
+        count_after = count_before
+    expected_total = len(current_ids)
+    if expected_total > 0 and count_after < max(1, expected_total):
+        raise RuntimeError(
+            f"vector upsert into {collection!r} did not land: expected {expected_total} "
+            f"indexed points but the vector store reports {count_after}. The most common cause is "
+            f"a dimension or model mismatch against an existing collection. Rebuild with "
+            f"`docmancer ingest <path> --recreate` or `docmancer clear --keep-config "
+            f"--keep-models` to wipe the index."
+        )
 
     store.record_embedding_upserts(
         collection,

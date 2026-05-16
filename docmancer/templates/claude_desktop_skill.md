@@ -29,6 +29,8 @@ Executable: `{{DOCS_KIT_CMD}}`
 - `docmancer query "question" --expand`: include adjacent sections.
 - `docmancer query "question" --expand page`: include the full matching page within the budget.
 - `docmancer query "question" --format json`: return machine-readable context.
+- `docmancer query "question" --allow-degraded`: in dense, sparse, or hybrid modes, fall back when vector retrieval fails instead of erroring.
+- `docmancer clear --dry-run`: preview wiping docmancer home and related caches (`--yes` to run for real; see `--keep-config` and `--keep-models`).
 - `docmancer list`, `docmancer inspect`, `docmancer remove`, `docmancer doctor`: manage the local index.
 - `docmancer fetch <url> --output <dir>`: download docs to markdown without indexing.
 
