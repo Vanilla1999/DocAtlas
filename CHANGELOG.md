@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.1] - Unreleased
+
+### Fixed
+
+- **Config migration: forgive mixed legacy + new `vector_store` shapes.** Pre-0.5.0 installs left configs with both `local_path` / `db_path` (legacy) and `provider` / `url` / `collection` (new), so a fresh 0.5.0 setup against a leftover `~/.docmancer/docmancer.yaml` failed with `ValueError: vector_store config mixes legacy fields ... with new fields ...; pick one shape.` The mixed-shape case now warns and drops the legacy fields instead of raising; managed Qdrant ignores user-supplied `local_path` since the binary lives under `~/.docmancer/qdrant`.
+- **Config migration: rename `vector_store.collection_name` to `collection`.** Pre-0.5.0 configs used `collection_name`; the new schema uses `collection`. Rename transparently so the user's Qdrant collection name is preserved across upgrades instead of silently dropped to the default.
+- **Config migration: rename `embedding:` block to `embeddings:`.** Pre-0.5.0 configs used the singular `embedding:` block. The new schema uses `embeddings:`. Migrate transparently so the user's provider / model selection survives an upgrade.
+
+### Changed
+
+- **README:** refreshed the hero **`readme-assets/demo.gif`** demo recording.
+
 ## [0.5.0] - 2026-05-15
 ### Added
 

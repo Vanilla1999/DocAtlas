@@ -97,18 +97,46 @@ def test_new_vector_store_collection_only_defaults_provider(tmp_path):
     assert config.vector_store.collection == "foo"
 
 
-def test_mixed_legacy_and_new_vector_store_raises(tmp_path):
+def test_mixed_legacy_and_new_vector_store_migrates(tmp_path):
+    """A leftover pre-0.5.0 vector_store with both legacy and new fields must
+    parse: drop the legacy fields, keep the new ones, and warn. The hard
+    error this used to raise stranded users upgrading from older installs."""
     config_file = tmp_path / "docmancer.yaml"
     config_file.write_text(
         """
 vector_store:
-  local_path: .docmancer/old.db
   provider: qdrant
+  url: ''
+  collection_name: knowledge_base
+  local_path: /tmp/qdrant
 """
     )
 
-    with pytest.raises(ValueError, match="mixes legacy fields"):
-        DocmancerConfig.from_yaml(config_file)
+    with pytest.warns(DeprecationWarning, match="both legacy fields .* and new fields"):
+        config = DocmancerConfig.from_yaml(config_file)
+
+    assert config.vector_store.provider == "qdrant"
+    assert config.vector_store.collection == "knowledge_base"
+
+
+def test_legacy_embedding_block_migrates_to_embeddings(tmp_path):
+    """Pre-0.5.0 configs used `embedding:` (singular). The new schema is
+    `embeddings:` (plural). Rename transparently so users do not lose
+    their provider/model selection on upgrade."""
+    config_file = tmp_path / "docmancer.yaml"
+    config_file.write_text(
+        """
+embedding:
+  provider: fastembed
+  model: BAAI/bge-small-en-v1.5
+"""
+    )
+
+    with pytest.warns(DeprecationWarning, match="`embedding:` config block is deprecated"):
+        config = DocmancerConfig.from_yaml(config_file)
+
+    assert config.embeddings.provider == "fastembed"
+    assert config.embeddings.model == "BAAI/bge-small-en-v1.5"
 
 
 def test_embeddings_and_retrieval_defaults():

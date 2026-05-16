@@ -170,17 +170,56 @@ class DocmancerConfig(BaseModel):
 
         data.pop("packs", None)
 
+        # Legacy singular `embedding:` block from pre-0.5.0 configs. The new
+        # schema uses plural `embeddings:`. Migrate transparently so users
+        # upgrading from an older Docmancer install do not silently lose
+        # their embedding provider / model selection.
+        if "embedding" in data and "embeddings" not in data:
+            warnings.warn(
+                "`embedding:` config block is deprecated; renamed to `embeddings:`. "
+                "The old block has been migrated automatically.",
+                DeprecationWarning,
+                stacklevel=2,
+            )
+            data["embeddings"] = data.pop("embedding")
+        elif "embedding" in data:
+            data.pop("embedding", None)
+
         if isinstance(data.get("vector_store"), dict):
             vector_store = data["vector_store"]
+
+            # Pre-0.5.0 configs used `collection_name` for the Qdrant
+            # collection name; the new schema uses `collection`. Rename
+            # before legacy/new field detection so the rename does not
+            # itself count as a legacy/new shape mix.
+            if "collection_name" in vector_store and "collection" not in vector_store:
+                vector_store["collection"] = vector_store.pop("collection_name")
+            else:
+                vector_store.pop("collection_name", None)
+
             present_keys = set(vector_store.keys())
             has_legacy = bool(present_keys & _LEGACY_VECTOR_STORE_FIELDS)
             has_new = bool(present_keys & _NEW_VECTOR_STORE_FIELDS)
+
             if has_legacy and has_new:
-                raise ValueError(
-                    "vector_store config mixes legacy fields (db_path/local_path) with new "
-                    "fields (provider/url/collection/api_key_env/options); pick one shape."
+                # Forgiving migration: keep the new fields (provider, url,
+                # collection, ...) and drop the legacy ones. The managed
+                # Qdrant lifecycle owns its storage path under
+                # `~/.docmancer/qdrant`; a user-supplied legacy `local_path`
+                # is ignored. This used to be a hard error, but in practice
+                # it strands anyone upgrading from a pre-0.5.0 install with
+                # a leftover `~/.docmancer/docmancer.yaml`.
+                warnings.warn(
+                    "vector_store has both legacy fields (db_path/local_path) and new fields "
+                    "(provider/url/collection/api_key_env/options); keeping the new fields and "
+                    "dropping the legacy ones. Managed Qdrant ignores local_path; the binary "
+                    "lives under ~/.docmancer/qdrant.",
+                    DeprecationWarning,
+                    stacklevel=2,
                 )
-            if has_legacy and not has_new:
+                vector_store.pop("db_path", None)
+                vector_store.pop("local_path", None)
+            elif has_legacy:
                 warnings.warn(
                     "vector_store.db_path/local_path is deprecated; move SQLite paths to "
                     "index.db_path and use vector_store.provider for the new vector store.",
