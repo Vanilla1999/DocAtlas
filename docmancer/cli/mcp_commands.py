@@ -26,6 +26,13 @@ def mcp_serve_cmd() -> None:
     serve()
 
 
+@mcp_group.command("docs-serve")
+def mcp_docs_serve_cmd() -> None:
+    """Run the stdio MCP documentation server."""
+    from docmancer.mcp.docs_server import serve
+    serve()
+
+
 @mcp_group.command("doctor")
 def mcp_doctor_cmd() -> None:
     """Health-check the local MCP setup."""

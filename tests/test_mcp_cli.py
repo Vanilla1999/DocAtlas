@@ -22,7 +22,7 @@ def test_mcp_command_group_registered():
     runner = CliRunner()
     result = runner.invoke(cli, ["mcp", "--help"])
     assert result.exit_code == 0
-    for sub in ("serve", "doctor", "list", "enable", "disable"):
+    for sub in ("serve", "docs-serve", "doctor", "list", "enable", "disable"):
         assert sub in result.output
 
 

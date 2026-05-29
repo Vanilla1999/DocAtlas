@@ -15,4 +15,6 @@ downloaded-docs/
 /release-patch-pypi.sh
 /repush-release-tag.sh
 docs/
+!docmancer/docs/
+!docmancer/docs/*.py
 scripts/*.log
