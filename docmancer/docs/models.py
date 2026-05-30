@@ -77,6 +77,7 @@ class DocsTarget:
     path_prefixes: list[str] = field(default_factory=list)
     max_pages: int = 200
     browser: bool = False
+    doc_format: str | None = None
     warnings: list[str] = field(default_factory=list)
 
 

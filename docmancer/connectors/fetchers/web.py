@@ -49,6 +49,7 @@ logger = logging.getLogger(__name__)
 _DEFAULT_TIMEOUT = 30.0
 _DEFAULT_USER_AGENT = "docmancer/1.0 (+https://github.com/docmancer/docmancer)"
 _DIRECT_TEXT_SUFFIXES = {".md", ".txt"}
+_DIRECT_DARTDOC_SUFFIXES = ("-class.html", "-library.html", "-mixin.html", "-enum.html")
 
 
 @dataclass(slots=True)
@@ -83,6 +84,7 @@ class WebFetcher:
         respect_robots: bool = True,
         delay: float = 0.5,
         workers: int = 8,
+        doc_format: str | None = None,
     ):
         self._timeout = timeout
         self._max_pages = max_pages
@@ -91,6 +93,7 @@ class WebFetcher:
         self._respect_robots = respect_robots
         self._delay = delay
         self._workers = max(1, workers)
+        self._doc_format = doc_format
 
     def _client_kwargs(self) -> dict:
         return {
@@ -116,6 +119,14 @@ class WebFetcher:
         with httpx.Client(**self._client_kwargs()) as client:
             if self._is_direct_text_url(base_url):
                 return [self._fetch_direct_text_page(base_url, client)]
+            if self._is_direct_dartdoc_url(base_url):
+                page = self._fetch_dartdoc_direct_page(base_url, base_url, client, Platform.GENERIC)
+                if page is None:
+                    raise ValueError(
+                        f"Dartdoc page {base_url!r} had no extractable article content. "
+                        "Try concrete class/library seed URLs or browser=true."
+                    )
+                return [page.document]
 
             # Step 1: Fetch homepage and detect platform
             platform, root_html, root_headers = self._fetch_and_detect(base_url, client)
@@ -169,6 +180,17 @@ class WebFetcher:
         path = urlparse(url).path.lower()
         return any(path.endswith(suffix) for suffix in _DIRECT_TEXT_SUFFIXES)
 
+    def _is_dartdoc_url(self, url: str) -> bool:
+        if self._doc_format == "dartdoc":
+            return True
+        parsed = urlparse(url)
+        host = parsed.netloc.lower()
+        path = parsed.path.lower()
+        return host == "api.flutter.dev" or (host == "pub.dev" and path.startswith("/documentation/"))
+
+    def _is_direct_dartdoc_url(self, url: str) -> bool:
+        return self._is_dartdoc_url(url) and urlparse(url).path.lower().endswith(_DIRECT_DARTDOC_SUFFIXES)
+
     def _fetch_direct_text_page(self, url: str, client: httpx.Client) -> Document:
         """Fetch an exact markdown/text docs URL without running site discovery."""
         try:
@@ -210,6 +232,23 @@ class WebFetcher:
                 "word_count": len(content.split()),
                 "fetched_at": fetched_at,
             },
+        )
+
+    def _fetch_dartdoc_direct_page(
+        self,
+        url: str,
+        base_url: str,
+        client: httpx.Client,
+        platform: Platform,
+    ) -> _FetchedPage | None:
+        return self._fetch_page(
+            DiscoveredUrl(url=url, strategy=DiscoveryStrategy.NAV_CRAWL),
+            base_url,
+            platform,
+            robots=None,
+            rate_limiter=RateLimiter(delay=0.0),
+            redirect_tracker=RedirectTracker(),
+            redirect_lock=threading.Lock(),
         )
 
     def _fetch_and_detect(
@@ -298,9 +337,17 @@ class WebFetcher:
                 logger.info("Fetched %s (%d words)", page.document.source, len(page.document.content.split()))
 
         if not documents:
+            last_url = unique_discovered[-1].url if unique_discovered else base_url
+            if self._is_dartdoc_url(base_url):
+                raise ValueError(
+                    f"Extraction failed for {len(unique_discovered)} page(s). Last URL: {last_url}. "
+                    "Dartdoc root/index page had no extractable article content; use concrete "
+                    "class/library seed URLs or enable dartdoc index discovery. Browser fallback "
+                    "remains optional with browser=true."
+                )
             raise ValueError(
-                f"Discovered {len(discovered)} URL(s) at {base_url!r} but could not "
-                "extract content from any of them."
+                f"Extraction failed for {len(unique_discovered)} page(s). Last URL: {last_url}. "
+                "Try class/library seed URLs or browser=true."
             )
 
         return documents
@@ -365,7 +412,8 @@ class WebFetcher:
             raw_html = resp.text
 
         if looks_like_html(raw_html):
-            content = extract_content(raw_html, url=url)
+            doc_format = "dartdoc" if self._is_dartdoc_url(url) else None
+            content = extract_content(raw_html, url=url, doc_format=doc_format)
             meta = extract_metadata(raw_html)
             section_path = extract_section_path(raw_html)
             fmt = "markdown"

@@ -26,6 +26,7 @@ def build_fetcher(
     respect_robots: bool = True,
     delay: float = 0.5,
     workers: int = 8,
+    doc_format: str | None = None,
 ):
     """Build the fetcher shared by the CLI and registry pipeline."""
     concrete = detect_fetcher_provider(url, provider)
@@ -64,4 +65,5 @@ def build_fetcher(
         respect_robots=respect_robots,
         delay=delay,
         workers=workers,
+        doc_format=doc_format,
     )

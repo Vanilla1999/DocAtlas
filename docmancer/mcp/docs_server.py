@@ -135,6 +135,7 @@ TOOLS: list[dict[str, Any]] = [
                             "path_prefixes": {"type": ["array", "null"], "items": {"type": "string"}},
                             "max_pages": {"type": ["integer", "null"]},
                             "browser": {"type": ["boolean", "null"]},
+                            "doc_format": {"type": ["string", "null"]},
                             "warnings": {"type": ["array", "null"], "items": {"type": "string"}},
                         },
                         "required": ["library"],

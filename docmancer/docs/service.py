@@ -585,6 +585,7 @@ class LibraryDocsService:
             path_prefixes=list(value.get("path_prefixes") or []),
             max_pages=int(value.get("max_pages") or 200),
             browser=bool(value.get("browser") or False),
+            doc_format=value.get("doc_format"),
             warnings=list(value.get("warnings") or []),
         )
 
@@ -604,6 +605,7 @@ class LibraryDocsService:
             "path_prefixes": list(target.path_prefixes),
             "max_pages": target.max_pages,
             "browser": target.browser,
+            "doc_format": target.doc_format,
             "warnings": list(target.warnings),
         }
 
@@ -621,6 +623,7 @@ class LibraryDocsService:
             path_prefixes=list(spec.get("path_prefixes") or []),
             max_pages=int(spec.get("max_pages") or 200),
             browser=bool(spec.get("browser") or False),
+            doc_format=spec.get("doc_format"),
             warnings=list(spec.get("warnings") or []),
         )
 
@@ -1056,11 +1059,16 @@ class LibraryDocsService:
                         if self.jobs.cancellation_requested(job_id):
                             aborted = True
                             raise KeyboardInterrupt("Docs prefetch job cancelled.")
+                        add_kwargs: dict[str, Any] = {
+                            "max_pages": per_url_max_pages,
+                            "browser": target.browser,
+                        }
+                        if target.doc_format:
+                            add_kwargs["doc_format"] = target.doc_format
                         pages = self._agent_instance(record).add(
                             url,
                             recreate=False,
-                            max_pages=per_url_max_pages,
-                            browser=target.browser,
+                            **add_kwargs,
                         )
                         if isinstance(pages, int):
                             pages_indexed += pages

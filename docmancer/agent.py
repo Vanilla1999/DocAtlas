@@ -337,6 +337,7 @@ class DocmancerAgent:
         strategy: str | None = None,
         browser: bool = False,
         url: str | None = None,
+        doc_format: str | None = None,
     ):
         if fetcher is not None:
             return fetcher
@@ -352,6 +353,7 @@ class DocmancerAgent:
             strategy=strategy,
             browser=browser,
             workers=self.config.web_fetch.workers,
+            doc_format=doc_format,
         )
 
     def _auto_detect_provider(self, url: str) -> str:
@@ -386,6 +388,7 @@ class DocmancerAgent:
         max_pages: int = 500,
         strategy: str | None = None,
         browser: bool = False,
+        doc_format: str | None = None,
     ) -> int:
         f = self._get_fetcher(
             provider,
@@ -394,6 +397,7 @@ class DocmancerAgent:
             strategy=strategy,
             browser=browser,
             url=url,
+            doc_format=doc_format,
         )
         documents = f.fetch(url)
         logger.info("Fetched %d document(s); starting index", len(documents))
@@ -407,6 +411,7 @@ class DocmancerAgent:
         max_pages: int = 500,
         strategy: str | None = None,
         browser: bool = False,
+        doc_format: str | None = None,
     ) -> list[Document]:
         f = self._get_fetcher(
             provider,
@@ -415,6 +420,7 @@ class DocmancerAgent:
             strategy=strategy,
             browser=browser,
             url=url,
+            doc_format=doc_format,
         )
         return f.fetch(url)
 

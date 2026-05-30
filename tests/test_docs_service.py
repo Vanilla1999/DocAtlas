@@ -965,6 +965,32 @@ def test_prefetch_docs_targets_async_returns_job_id_immediately(tmp_path, monkey
     agent.release.set()
 
 
+def test_prefetch_docs_targets_passes_doc_format_to_agent(tmp_path, monkeypatch):
+    agent = FakeAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+
+    result = service.prefetch_docs_targets(
+        [
+            {
+                "library": "go_router-api",
+                "ecosystem": "pub",
+                "version": "17.2.3",
+                "source_type": "api",
+                "doc_format": "dartdoc",
+                "seed_urls": [
+                    "https://pub.dev/documentation/go_router/17.2.3/go_router/ShellRoute-class.html"
+                ],
+                "allowed_domains": ["pub.dev"],
+                "path_prefixes": ["/documentation/go_router/17.2.3/"],
+            }
+        ],
+    )
+
+    assert result.status == "ok"
+    assert agent.add_kwargs[0]["doc_format"] == "dartdoc"
+    assert agent.add_kwargs[0]["browser"] is False
+
+
 def test_docs_job_status_changes_to_succeeded_and_tracks_counts(tmp_path, monkeypatch):
     agent = FakeAgent()
     service = _service(tmp_path, monkeypatch, agent)
