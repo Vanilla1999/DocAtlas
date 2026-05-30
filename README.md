@@ -88,6 +88,9 @@ Tools:
 - `prefetch_library_docs`
 - `prefetch_project_docs`
 - `list_library_docs`
+- `get_docs_job_status`
+- `list_docs_jobs`
+- `cancel_docs_job`
 
 The docs server uses the same local ingest, index, update, and query path as the CLI. It keeps a small persistent library registry in the Docmancer SQLite database. Libraries are stale when they have never been refreshed or when `last_refreshed_at` is older than 30 days. `get_library_docs` refreshes stale docs before querying, and `force_refresh: true` refreshes even fresh docs.
 
@@ -100,6 +103,55 @@ Pass `docs_url` the first time you ask for an unknown library. The server only r
   "docs_url": "https://docs.pytest.org/"
 }
 ```
+
+### Prefetch progress
+
+Long-running docs prefetch operations can run synchronously or asynchronously.
+
+By default, `prefetch_docs_targets` and `prefetch_docs_manifest` run synchronously (`async: false`) and return after downloading/indexing finishes. Synchronous results include final metrics such as `duration_ms`, `pages_indexed`, `pages_failed`, `chunks_indexed`, `targets_completed`, and `targets_failed`.
+
+Pass `async: true` to start a background job and return immediately:
+
+```json
+{
+  "targets": [
+    {
+      "library": "riverpod-guides",
+      "ecosystem": "web",
+      "version": "latest",
+      "source_type": "guides",
+      "seed_urls": ["https://riverpod.dev/docs/introduction/getting_started"],
+      "allowed_domains": ["riverpod.dev"],
+      "path_prefixes": ["/docs/"]
+    }
+  ],
+  "async": true
+}
+```
+
+The async response contains a job id:
+
+```json
+{
+  "job_id": "string",
+  "status": "running",
+  "message": "Started docs prefetch job."
+}
+```
+
+Poll progress with `get_docs_job_status`:
+
+```json
+{
+  "job_id": "string"
+}
+```
+
+Job status includes target/page/chunk counters, current target, compact per-target summaries, warnings, errors, timestamps, and phases such as `validating`, `resolving`, `fetching`, `indexing`, `finalizing`, and `done`.
+
+Use `list_docs_jobs` to see recent jobs, optionally filtered by `status`, and `cancel_docs_job` to request cancellation. Cancellation is checked between targets/pages; an in-progress indexing step may finish before the job stops.
+
+Async jobs are in-memory and process-local. Jobs disappear when the MCP server process restarts, and the in-memory history is capped at 100 jobs. Polling with `get_docs_job_status` is the reliable progress path. MCP progress notifications are not implemented. `chunks_indexed` may be approximate because the current indexing API reports pages, not exact chunk counts.
 
 ### Versioned documentation
 

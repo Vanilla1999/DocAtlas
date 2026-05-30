@@ -19,6 +19,7 @@ TOOLS: list[dict[str, Any]] = [
                 "library": {"type": "string"},
                 "ecosystem": {"type": ["string", "null"]},
                 "version": {"type": ["string", "null"]},
+                "source_type": {"type": ["string", "null"]},
                 "docs_url": {"type": ["string", "null"]},
                 "docs_url_template": {"type": ["string", "null"]},
             },
@@ -36,6 +37,7 @@ TOOLS: list[dict[str, Any]] = [
                 "tokens": {"type": ["integer", "null"]},
                 "ecosystem": {"type": ["string", "null"]},
                 "version": {"type": ["string", "null"]},
+                "source_type": {"type": ["string", "null"]},
                 "docs_url": {"type": ["string", "null"]},
                 "docs_url_template": {"type": ["string", "null"]},
                 "force_refresh": {"type": ["boolean", "null"]},
@@ -54,6 +56,7 @@ TOOLS: list[dict[str, Any]] = [
                 "ecosystem": {"type": ["string", "null"]},
                 "version": {"type": ["string", "null"]},
                 "versions": {"type": ["array", "null"], "items": {"type": "string"}},
+                "source_type": {"type": ["string", "null"]},
                 "docs_url": {"type": ["string", "null"]},
                 "docs_url_template": {"type": ["string", "null"]},
                 "force": {"type": ["boolean", "null"]},
@@ -70,12 +73,140 @@ TOOLS: list[dict[str, Any]] = [
                 "library": {"type": "string"},
                 "ecosystem": {"type": ["string", "null"]},
                 "versions": {"type": ["array", "null"], "items": {"type": "string"}},
+                "source_type": {"type": ["string", "null"]},
                 "docs_url": {"type": ["string", "null"]},
                 "docs_url_template": {"type": ["string", "null"]},
                 "force_refresh": {"type": ["boolean", "null"]},
                 "continue_on_error": {"type": ["boolean", "null"]},
             },
             "required": ["library"],
+        },
+    },
+
+
+    {
+        "name": "validate_docs_manifest",
+        "description": "Validate a docmancer.docs.yaml manifest without fetching documentation.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "manifest_path": {"type": "string"},
+                "project_path": {"type": ["string", "null"]},
+                "targets": {"type": ["array", "null"], "items": {"type": "string"}},
+            },
+            "required": ["manifest_path"],
+        },
+    },
+    {
+        "name": "prefetch_docs_manifest",
+        "description": "Validate and prefetch documentation targets declared in docmancer.docs.yaml.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "manifest_path": {"type": "string"},
+                "project_path": {"type": ["string", "null"]},
+                "targets": {"type": ["array", "null"], "items": {"type": "string"}},
+                "force_refresh": {"type": ["boolean", "null"]},
+                "continue_on_error": {"type": ["boolean", "null"]},
+                "async": {"type": ["boolean", "null"]},
+            },
+            "required": ["manifest_path"],
+        },
+    },
+    {
+        "name": "prefetch_docs_targets",
+        "description": "Download and index one or more explicit documentation targets.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "targets": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "library": {"type": "string"},
+                            "ecosystem": {"type": ["string", "null"]},
+                            "version": {"type": ["string", "null"]},
+                            "source_type": {"type": ["string", "null"]},
+                            "docs_url": {"type": ["string", "null"]},
+                            "docs_url_template": {"type": ["string", "null"]},
+                            "seed_urls": {"type": ["array", "null"], "items": {"type": "string"}},
+                            "allowed_domains": {"type": ["array", "null"], "items": {"type": "string"}},
+                            "path_prefixes": {"type": ["array", "null"], "items": {"type": "string"}},
+                            "max_pages": {"type": ["integer", "null"]},
+                            "browser": {"type": ["boolean", "null"]},
+                            "warnings": {"type": ["array", "null"], "items": {"type": "string"}},
+                        },
+                        "required": ["library"],
+                    },
+                },
+                "force_refresh": {"type": ["boolean", "null"]},
+                "continue_on_error": {"type": ["boolean", "null"]},
+                "async": {"type": ["boolean", "null"]},
+            },
+            "required": ["targets"],
+        },
+    },
+
+    {
+        "name": "get_docs_job_status",
+        "description": "Return persistent progress for one docs indexing/prefetch job.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {"job_id": {"type": "string"}},
+            "required": ["job_id"],
+        },
+    },
+    {
+        "name": "list_docs_jobs",
+        "description": "List docs indexing/prefetch jobs, optionally filtered by status.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "status": {"type": ["string", "null"]},
+                "limit": {"type": ["integer", "null"]},
+            },
+        },
+    },
+    {
+        "name": "cancel_docs_job",
+        "description": "Request cancellation for a docs indexing/prefetch job.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {"job_id": {"type": "string"}},
+            "required": ["job_id"],
+        },
+    },
+
+    {
+        "name": "inspect_library_docs",
+        "description": "Inspect one exact documentation target by canonical id.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {"canonical_id": {"type": "string"}},
+            "required": ["canonical_id"],
+        },
+    },
+    {
+        "name": "remove_library_docs",
+        "description": "Remove one exact documentation target by canonical id.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {"canonical_id": {"type": "string"}},
+            "required": ["canonical_id"],
+        },
+    },
+    {
+        "name": "prune_library_docs",
+        "description": "Prune old documentation targets with dry-run support.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "library": {"type": ["string", "null"]},
+                "keep_versions": {"type": ["array", "null"], "items": {"type": "string"}},
+                "older_than_days": {"type": ["integer", "null"]},
+                "dry_run": {"type": ["boolean", "null"]},
+            },
         },
     },
     {
@@ -140,6 +271,7 @@ async def _run_async(service: LibraryDocsService) -> None:
                             args.get("version"),
                             args.get("docs_url"),
                             args.get("docs_url_template"),
+                            args.get("source_type"),
                         )
                     ),
                 )
@@ -155,6 +287,7 @@ async def _run_async(service: LibraryDocsService) -> None:
                             version=args.get("version"),
                             docs_url=args.get("docs_url"),
                             docs_url_template=args.get("docs_url_template"),
+                            source_type=args.get("source_type"),
                             force_refresh=bool(args.get("force_refresh") or False),
                             project_path=args.get("project_path"),
                         )
@@ -171,6 +304,7 @@ async def _run_async(service: LibraryDocsService) -> None:
                             docs_url=args.get("docs_url"),
                             versions=args.get("versions"),
                             docs_url_template=args.get("docs_url_template"),
+                            source_type=args.get("source_type"),
                             force=bool(args.get("force") if args.get("force") is not None else True),
                         )
                     ),
@@ -185,12 +319,100 @@ async def _run_async(service: LibraryDocsService) -> None:
                             versions=args.get("versions"),
                             docs_url=args.get("docs_url"),
                             docs_url_template=args.get("docs_url_template"),
+                            source_type=args.get("source_type"),
                             force_refresh=bool(args.get("force_refresh") or False),
                             continue_on_error=bool(
                                 args.get("continue_on_error")
                                 if args.get("continue_on_error") is not None
                                 else True
                             ),
+                        )
+                    ),
+                )
+            if name == "validate_docs_manifest":
+                return _json_text(
+                    mcp_types,
+                    asdict(
+                        service.validate_docs_manifest(
+                            args["manifest_path"],
+                            project_path=args.get("project_path"),
+                            targets=args.get("targets"),
+                        )
+                    ),
+                )
+            if name == "prefetch_docs_manifest":
+                return _json_text(
+                    mcp_types,
+                    asdict(
+                        service.prefetch_docs_manifest(
+                            args["manifest_path"],
+                            project_path=args.get("project_path"),
+                            targets=args.get("targets"),
+                            force_refresh=bool(args.get("force_refresh") or False),
+                            continue_on_error=bool(
+                                args.get("continue_on_error")
+                                if args.get("continue_on_error") is not None
+                                else True
+                            ),
+                            async_=bool(args.get("async") or False),
+                        )
+                    ),
+                )
+            if name == "prefetch_docs_targets":
+                return _json_text(
+                    mcp_types,
+                    asdict(
+                        service.prefetch_docs_targets(
+                            args.get("targets") or [],
+                            force_refresh=bool(args.get("force_refresh") or False),
+                            continue_on_error=bool(
+                                args.get("continue_on_error")
+                                if args.get("continue_on_error") is not None
+                                else True
+                            ),
+                            async_=bool(args.get("async") or False),
+                        )
+                    ),
+                )
+            if name == "get_docs_job_status":
+                job = service.get_docs_job_status(args["job_id"])
+                if job is None:
+                    return _json_text(mcp_types, {"job_id": args["job_id"], "status": "not_found"})
+                return _json_text(mcp_types, asdict(job))
+            if name == "list_docs_jobs":
+                jobs = service.list_docs_jobs(status=args.get("status"), limit=args.get("limit"))
+                return _json_text(
+                    mcp_types,
+                    {
+                        "jobs": [
+                            {
+                                "job_id": job.job_id,
+                                "kind": job.kind,
+                                "status": job.status,
+                                "phase": job.phase,
+                                "message": job.message,
+                                "started_at": job.started_at,
+                                "updated_at": job.updated_at,
+                            }
+                            for job in jobs
+                        ]
+                    },
+                )
+            if name == "cancel_docs_job":
+                return _json_text(mcp_types, asdict(service.cancel_docs_job(args["job_id"])))
+            if name == "inspect_library_docs":
+                return _json_text(mcp_types, asdict(service.inspect_library_docs(args["canonical_id"])))
+            if name == "remove_library_docs":
+                return _json_text(mcp_types, asdict(service.remove_library_docs(args["canonical_id"])))
+            if name == "prune_library_docs":
+                return _json_text(
+                    mcp_types,
+                    asdict(
+                        service.prune_library_docs(
+                            library=args.get("library"),
+                            keep_versions=args.get("keep_versions") or [],
+                            older_than_days=int(args.get("older_than_days") or 90),
+                            dry_run=bool(args.get("dry_run") if args.get("dry_run") is not None else True),
                         )
                     ),
                 )
