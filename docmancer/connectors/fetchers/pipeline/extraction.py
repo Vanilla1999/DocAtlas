@@ -14,6 +14,7 @@ import re
 
 from bs4 import BeautifulSoup, Tag
 from markdownify import MarkdownConverter
+from docmancer.docs.dartdoc import DARTDOC_ENTITY_SUFFIXES
 
 logger = logging.getLogger(__name__)
 
@@ -182,7 +183,7 @@ def _extract_dartdoc_index(soup: BeautifulSoup) -> str:
         text = link.get_text(" ", strip=True)
         if not text:
             continue
-        if any(token in href for token in ("-class.html", "-library.html", "-mixin.html", "-enum.html")):
+        if any(token in href for token in DARTDOC_ENTITY_SUFFIXES):
             links.append(f"- [{text}]({href})")
     if not links:
         return ""

@@ -42,6 +42,7 @@ from docmancer.connectors.fetchers.pipeline.redirect import RedirectTracker
 from docmancer.connectors.fetchers.pipeline.robots import RobotsChecker
 from docmancer.core.html_utils import looks_like_html
 from docmancer.core.models import Document
+from docmancer.docs.dartdoc import DARTDOC_ENTITY_SUFFIXES
 
 logger = logging.getLogger(__name__)
 
@@ -49,7 +50,7 @@ logger = logging.getLogger(__name__)
 _DEFAULT_TIMEOUT = 30.0
 _DEFAULT_USER_AGENT = "docmancer/1.0 (+https://github.com/docmancer/docmancer)"
 _DIRECT_TEXT_SUFFIXES = {".md", ".txt"}
-_DIRECT_DARTDOC_SUFFIXES = ("-class.html", "-library.html", "-mixin.html", "-enum.html")
+_DIRECT_DARTDOC_SUFFIXES = DARTDOC_ENTITY_SUFFIXES
 
 
 @dataclass(slots=True)
@@ -85,6 +86,7 @@ class WebFetcher:
         delay: float = 0.5,
         workers: int = 8,
         doc_format: str | None = None,
+        progress_callback=None,
     ):
         self._timeout = timeout
         self._max_pages = max_pages
@@ -94,6 +96,15 @@ class WebFetcher:
         self._delay = delay
         self._workers = max(1, workers)
         self._doc_format = doc_format
+        self._progress_callback = progress_callback
+
+    def _emit_progress(self, event: dict) -> None:
+        if not self._progress_callback:
+            return
+        try:
+            self._progress_callback(event)
+        except Exception:
+            logger.debug("progress callback failed", exc_info=True)
 
     def _client_kwargs(self) -> dict:
         return {
@@ -141,6 +152,7 @@ class WebFetcher:
                     self._delay = max(self._delay, crawl_delay)
 
             # Step 3: Discover page URLs
+            self._emit_progress({"phase": "discovering", "message": f"Discovering URLs from {base_url}", "url": base_url})
             discovered = discover_urls(
                 base_url=base_url,
                 client=client,
@@ -163,6 +175,15 @@ class WebFetcher:
                     f"Could not discover any documentation pages at {base_url!r}. "
                     f"No /llms-full.txt, /llms.txt, sitemap, or navigable links found.{hint}"
                 )
+            self._emit_progress(
+                {
+                    "phase": "discovering",
+                    "message": f"Discovered {len(discovered)} URLs",
+                    "url": base_url,
+                    "discovered_pages": len(discovered),
+                    "total_pages": len(discovered),
+                }
+            )
 
             # Step 4: Handle llms-full.txt (content already available)
             if (
@@ -324,8 +345,19 @@ class WebFetcher:
             ]
             deduplicator.reset()
             for future in as_completed(futures):
+                completed_fetches = getattr(self, "_completed_fetches", 0) + 1
+                self._completed_fetches = completed_fetches
                 page = future.result()
                 if page is None:
+                    self._emit_progress(
+                        {
+                            "phase": "fetching",
+                            "message": f"Fetched {completed_fetches}/{len(unique_discovered)} pages",
+                            "fetched_pages": completed_fetches,
+                            "failed_pages": 1,
+                            "total_pages": len(unique_discovered),
+                        }
+                    )
                     continue
                 if deduplicator.is_url_duplicate(page.final_url):
                     logger.debug("Skipped %s (duplicate final URL)", page.document.source)
@@ -335,6 +367,15 @@ class WebFetcher:
                     continue
                 documents.append(page.document)
                 logger.info("Fetched %s (%d words)", page.document.source, len(page.document.content.split()))
+                self._emit_progress(
+                    {
+                        "phase": "fetching",
+                        "message": f"Fetched {completed_fetches}/{len(unique_discovered)} pages",
+                        "url": page.document.source,
+                        "fetched_pages": completed_fetches,
+                        "total_pages": len(unique_discovered),
+                    }
+                )
 
         if not documents:
             last_url = unique_discovered[-1].url if unique_discovered else base_url
@@ -363,6 +404,7 @@ class WebFetcher:
         redirect_lock: threading.Lock,
     ) -> _FetchedPage | None:
         url = normalize_url(disc.url)
+        self._emit_progress({"phase": "fetching", "message": f"Fetching {url}", "url": url})
         if robots and not robots.can_fetch(url):
             logger.debug("Skipped %s (blocked by robots.txt)", url)
             return None
@@ -380,6 +422,7 @@ class WebFetcher:
                 resp = client.get(fetch_url)
             except httpx.RequestError as exc:
                 logger.warning("Failed to fetch %s: %s", fetch_url, exc)
+                self._emit_progress({"phase": "fetching", "message": f"Fetch failed: {url}", "url": url})
                 return None
 
             if resp.status_code == 404 and predicted_url and fetch_url == predicted_url:
@@ -398,6 +441,7 @@ class WebFetcher:
                 return None
             if resp.status_code != 200:
                 logger.debug("Skipped %s (status %d)", fetch_url, resp.status_code)
+                self._emit_progress({"phase": "fetching", "message": f"Fetch failed with status {resp.status_code}: {url}", "url": url})
                 return None
 
             rate_limiter.reset_backoff(fetch_url)

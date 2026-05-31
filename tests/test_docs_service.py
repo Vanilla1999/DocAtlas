@@ -7,6 +7,8 @@ import time
 
 from docmancer.core.config import DocmancerConfig
 from docmancer.core.models import RetrievedChunk
+from docmancer.docs.dartdoc import discover_pub_dartdoc_seed_urls, normalize_pub_dartdoc_target
+from docmancer.docs.models import DocsTarget
 from docmancer.docs.project import ProjectMetadataReader
 from docmancer.docs.registry import LibraryRegistry
 from docmancer.docs.service import DocsJobTracker, LibraryDocsService
@@ -89,6 +91,17 @@ class AlwaysFailingAgent(FakeAgent):
         self.add_calls.append(docs_url)
         self.add_kwargs.append(kwargs)
         raise RuntimeError("indexer exploded")
+
+
+class ProgressAgent(FakeAgent):
+    def add(self, docs_url: str, recreate: bool = False, **kwargs) -> int:
+        self.add_calls.append(docs_url)
+        self.add_kwargs.append(kwargs)
+        cb = kwargs.get("progress_callback")
+        if cb:
+            cb({"phase": "fetching", "message": "Fetching page", "url": docs_url, "fetched_pages": 1, "total_pages": 1})
+            cb({"phase": "indexing", "message": "Indexed page", "url": docs_url, "indexed_pages": 1, "total_pages": 1})
+        return 1
 
 
 class MixedVersionFakeAgent(FakeAgent):
@@ -196,6 +209,55 @@ def test_mcp_exposes_prefetch_library_docs():
 
 def test_mcp_exposes_prefetch_project_docs():
     assert "prefetch_project_docs" in {tool["name"] for tool in TOOLS}
+    tool = next(tool for tool in TOOLS if tool["name"] == "prefetch_project_docs")
+    assert "async" in tool["inputSchema"]["properties"]
+
+
+def test_pub_dartdoc_discovery_finds_class_pages():
+    html = '<a href="go_router/ShellRoute-class.html">ShellRoute</a><a href="go_router/GoRouter-class.html">GoRouter</a>'
+    urls = discover_pub_dartdoc_seed_urls("go_router", "17.2.3", html, "https://pub.dev/documentation/go_router/17.2.3/")
+    assert urls == [
+        "https://pub.dev/documentation/go_router/17.2.3/go_router/ShellRoute-class.html",
+        "https://pub.dev/documentation/go_router/17.2.3/go_router/GoRouter-class.html",
+    ]
+
+
+def test_pub_dartdoc_discovery_finds_supported_entity_pages_and_libraries():
+    html = """
+    <a href="pkg/Foo-mixin.html">Foo</a>
+    <a href="pkg/Bar-enum.html">Bar</a>
+    <a href="pkg/Baz-extension.html">Baz</a>
+    <a href="pkg/Qux-typedef.html">Qux</a>
+    <a href="pkg/doThing-function.html">doThing</a>
+    <a href="pkg/value-constant.html">value</a>
+    <a href="pkg/prop-property.html">prop</a>
+    <a href="pkg/">pkg</a>
+    """
+    urls = discover_pub_dartdoc_seed_urls("sample", "1.0.0", html, "https://pub.dev/documentation/sample/1.0.0/")
+    assert urls[-1] == "https://pub.dev/documentation/sample/1.0.0/pkg/"
+    assert len(urls) == 8
+
+
+def test_pub_dartdoc_discovery_empty_returns_no_seeds():
+    assert discover_pub_dartdoc_seed_urls("pkg", "1.0.0", "<html></html>", "https://pub.dev/documentation/pkg/1.0.0/") == []
+
+
+def test_pub_dartdoc_discovery_dedupes_and_stays_inside_prefix():
+    html = """
+    <a href="pkg/Foo-class.html">Foo</a>
+    <a href="pkg/Foo-class.html#x">Foo again</a>
+    <a href="https://pub.dev/documentation/other/1.0.0/other/Other-class.html">Other</a>
+    <a href="https://example.com/pkg/Foo-class.html">External</a>
+    """
+    urls = discover_pub_dartdoc_seed_urls("pkg", "1.0.0", html, "https://pub.dev/documentation/pkg/1.0.0/")
+    assert urls == ["https://pub.dev/documentation/pkg/1.0.0/pkg/Foo-class.html"]
+
+
+def test_normalize_pub_dartdoc_target_infers_defaults():
+    target = normalize_pub_dartdoc_target(DocsTarget(library="go_router", ecosystem="pub", version="17.2.3"))
+    assert target.doc_format == "dartdoc"
+    assert target.allowed_domains == ["pub.dev"]
+    assert target.path_prefixes == ["/documentation/go_router/17.2.3/"]
 
 
 def test_mcp_exposes_prefetch_docs_targets():
@@ -547,6 +609,7 @@ def test_prefetch_project_docs_prefetches_only_selected_packages(tmp_path, monke
     project = _flutter_project(tmp_path)
     agent = FakeAgent()
     service = _service(tmp_path, monkeypatch, agent)
+    monkeypatch.setattr(service, "_discover_pub_dartdoc_target", lambda target, warnings, job_id=None, canonical_id=None: target)
 
     result = service.prefetch_project_docs(
         str(project),
@@ -557,6 +620,7 @@ def test_prefetch_project_docs_prefetches_only_selected_packages(tmp_path, monke
     assert len(result.results) == 1
     assert result.results[0].library_id == "pub:go_router@14.8.1:api"
     assert agent.add_calls == ["https://pub.dev/documentation/go_router/14.8.1/"]
+    assert agent.add_kwargs[0]["doc_format"] == "dartdoc"
 
 
 def test_prefetch_project_docs_missing_package_returns_warning(tmp_path, monkeypatch):
@@ -570,10 +634,26 @@ def test_prefetch_project_docs_missing_package_returns_warning(tmp_path, monkeyp
         include_packages=["missing_pkg"],
     )
 
-    assert result.results[0].status == "needs_docs_url"
-    assert "Package was not found in pubspec.lock." in result.results[0].message
+    assert result.results == []
     assert "missing_pkg: Package was not found in pubspec.lock." in result.warnings
     assert agent.add_calls == []
+
+
+def test_prefetch_project_docs_async_returns_job_id(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    agent = SlowAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+    monkeypatch.setattr(service, "_discover_pub_dartdoc_target", lambda target, warnings, job_id=None, canonical_id=None: target)
+
+    result = service.prefetch_project_docs(str(project), include_flutter=False, include_packages=["go_router"], async_=True)
+
+    assert result.job_id
+    assert result.status == "running"
+    assert agent.entered.wait(timeout=1)
+    status = service.get_docs_job_status(result.job_id)
+    assert status is not None
+    assert status.kind == "prefetch_project_docs"
+    agent.release.set()
 
 
 def test_fresh_library_does_not_refresh(tmp_path, monkeypatch):
@@ -880,6 +960,7 @@ def test_existing_stale_lock_file_does_not_block_refresh(tmp_path, monkeypatch):
 def test_prefetch_docs_targets_mixed_targets(tmp_path, monkeypatch):
     agent = FakeAgent()
     service = _service(tmp_path, monkeypatch, agent)
+    monkeypatch.setattr(service, "_discover_pub_dartdoc_target", lambda target, warnings, job_id=None, canonical_id=None: target)
 
     result = service.prefetch_docs_targets(
         [
@@ -1039,6 +1120,49 @@ def test_docs_job_status_changes_to_succeeded_and_tracks_counts(tmp_path, monkey
             "message": None,
         }
     ]
+
+
+def test_progress_callback_updates_current_url_and_events(tmp_path, monkeypatch):
+    agent = ProgressAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+
+    result = service.prefetch_docs_targets(
+        [
+            {
+                "library": "riverpod-guides",
+                "ecosystem": "web",
+                "version": "latest",
+                "source_type": "guides",
+                "seed_urls": ["https://riverpod.dev/docs/intro"],
+                "allowed_domains": ["riverpod.dev"],
+                "path_prefixes": ["/docs/"],
+            }
+        ],
+        async_=True,
+    )
+
+    for _ in range(50):
+        status = service.get_docs_job_status(result.job_id)
+        if status and status.status == "succeeded":
+            break
+        time.sleep(0.02)
+    status = service.get_docs_job_status(result.job_id)
+    assert status is not None
+    assert status.current_url == "https://riverpod.dev/docs/intro"
+    assert status.fetched_pages == 1
+    assert status.indexed_pages == 1
+    assert any(event.get("phase") == "fetching" for event in status.events)
+
+
+def test_job_events_are_capped_to_last_50(tmp_path, monkeypatch):
+    service = _service(tmp_path, monkeypatch)
+    job = service.jobs.create("prefetch_docs_targets")
+    for index in range(60):
+        service.jobs.append_event(job.job_id, {"phase": "fetching", "message": f"event {index}"})
+    status = service.get_docs_job_status(job.job_id)
+    assert status is not None
+    assert len(status.events) == 50
+    assert status.events[0]["message"] == "event 10"
 
 
 def test_docs_job_failed_page_increments_errors_and_failed_pages(tmp_path, monkeypatch):
@@ -1206,6 +1330,7 @@ def test_invalid_job_id_returns_not_found(tmp_path, monkeypatch):
 def test_prefetch_docs_targets_docs_url_template_target(tmp_path, monkeypatch):
     agent = FakeAgent()
     service = _service(tmp_path, monkeypatch, agent)
+    monkeypatch.setattr(service, "_discover_pub_dartdoc_target", lambda target, warnings, job_id=None, canonical_id=None: target)
 
     result = service.prefetch_docs_targets(
         [
@@ -1227,6 +1352,7 @@ def test_prefetch_docs_targets_docs_url_template_target(tmp_path, monkeypatch):
 def test_prefetch_docs_targets_duplicate_canonical_id(tmp_path, monkeypatch):
     agent = FakeAgent()
     service = _service(tmp_path, monkeypatch, agent)
+    monkeypatch.setattr(service, "_discover_pub_dartdoc_target", lambda target, warnings, job_id=None, canonical_id=None: target)
 
     result = service.prefetch_docs_targets(
         [
@@ -1398,6 +1524,7 @@ def test_prefetch_docs_manifest_resolves_project_version_from_pubspec_lock(tmp_p
     project = _flutter_project(tmp_path)
     agent = FakeAgent()
     service = _service(tmp_path, monkeypatch, agent)
+    monkeypatch.setattr(service, "_discover_pub_dartdoc_target", lambda target, warnings, job_id=None, canonical_id=None: target)
     manifest = _write_manifest(
         project / "docmancer.docs.yaml",
         """
@@ -1459,6 +1586,7 @@ targets:
 def test_prefetch_docs_manifest_target_selection_by_id(tmp_path, monkeypatch):
     agent = FakeAgent()
     service = _service(tmp_path, monkeypatch, agent)
+    monkeypatch.setattr(service, "_discover_pub_dartdoc_target", lambda target, warnings, job_id=None, canonical_id=None: target)
     manifest = _write_manifest(
         tmp_path / "docmancer.docs.yaml",
         """
@@ -1856,5 +1984,5 @@ def test_prefetch_project_docs_continue_false_aborts_on_missing_package(tmp_path
         continue_on_error=False,
     )
 
-    assert [item.library_id for item in result.results] == ["missing_pkg"]
+    assert result.results == []
     assert agent.add_calls == []

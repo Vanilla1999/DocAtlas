@@ -7,6 +7,7 @@ import os
 import hashlib
 import fnmatch
 from pathlib import Path
+from typing import Any, Callable
 from datetime import datetime, timezone
 
 import httpx
@@ -338,6 +339,7 @@ class DocmancerAgent:
         browser: bool = False,
         url: str | None = None,
         doc_format: str | None = None,
+        progress_callback: Callable[[dict[str, Any]], None] | None = None,
     ):
         if fetcher is not None:
             return fetcher
@@ -354,6 +356,7 @@ class DocmancerAgent:
             browser=browser,
             workers=self.config.web_fetch.workers,
             doc_format=doc_format,
+            progress_callback=progress_callback,
         )
 
     def _auto_detect_provider(self, url: str) -> str:
@@ -389,6 +392,7 @@ class DocmancerAgent:
         strategy: str | None = None,
         browser: bool = False,
         doc_format: str | None = None,
+        progress_callback: Callable[[dict[str, Any]], None] | None = None,
     ) -> int:
         f = self._get_fetcher(
             provider,
@@ -398,10 +402,30 @@ class DocmancerAgent:
             browser=browser,
             url=url,
             doc_format=doc_format,
+            progress_callback=progress_callback,
         )
         documents = f.fetch(url)
         logger.info("Fetched %d document(s); starting index", len(documents))
-        return self.ingest_documents(documents, recreate=recreate)
+        if progress_callback:
+            progress_callback(
+                {
+                    "phase": "indexing",
+                    "message": f"Indexing {len(documents)} documents",
+                    "indexed_pages": 0,
+                    "total_pages": len(documents),
+                }
+            )
+        indexed = self.ingest_documents(documents, recreate=recreate)
+        if progress_callback:
+            progress_callback(
+                {
+                    "phase": "indexing",
+                    "message": f"Indexed {indexed} documents",
+                    "indexed_pages": indexed,
+                    "total_pages": len(documents),
+                }
+            )
+        return indexed
 
     def fetch_documents(
         self,
@@ -412,6 +436,7 @@ class DocmancerAgent:
         strategy: str | None = None,
         browser: bool = False,
         doc_format: str | None = None,
+        progress_callback: Callable[[dict[str, Any]], None] | None = None,
     ) -> list[Document]:
         f = self._get_fetcher(
             provider,
@@ -421,6 +446,7 @@ class DocmancerAgent:
             browser=browser,
             url=url,
             doc_format=doc_format,
+            progress_callback=progress_callback,
         )
         return f.fetch(url)
 

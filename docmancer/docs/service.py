@@ -12,6 +12,7 @@ import uuid
 from urllib.parse import urlparse
 
 import yaml
+import httpx
 
 from filelock import FileLock
 
@@ -21,6 +22,7 @@ from docmancer.docs.models import DocsChunk, DocsInspectResult, DocsJob, DocsJob
 from docmancer.docs.project import ProjectMetadataReader
 from docmancer.docs.registry import LibraryRecord, LibraryRegistry
 from docmancer.docs.resolver import canonical_library_id, normalize_library_name, normalize_version
+from docmancer.docs.dartdoc import discover_pub_dartdoc_seed_urls, is_pub_dartdoc_target, normalize_pub_dartdoc_target, pub_dartdoc_root_url
 from docmancer.mcp import paths
 
 STALE_AFTER_DAYS = 30
@@ -103,6 +105,17 @@ class DocsJobTracker:
             errors = list(job.errors)
             errors.append(error)
         self.update(job_id, errors=errors)
+
+    def append_event(self, job_id: str, event: dict[str, Any], max_events: int = 50) -> None:
+        now = datetime.now(timezone.utc).isoformat(timespec="seconds")
+        event = dict(event)
+        event.setdefault("at", now)
+        with self._lock:
+            job = self._jobs.get(job_id)
+            if job is None:
+                return
+            events = [*job.events, event][-max_events:]
+        self.update(job_id, events=events, last_event_at=now)
 
     def get(self, job_id: str) -> DocsJob | None:
         with self._lock:
@@ -692,6 +705,67 @@ class LibraryDocsService:
                     return [], f"URL path is outside path_prefixes: {url}"
         return urls, None
 
+    def _progress_callback_for(self, job_id: str | None, canonical_id: str):
+        if not job_id:
+            return None
+
+        def _callback(event: dict[str, Any]) -> None:
+            phase = event.get("phase") or "fetching"
+            url = event.get("url") or event.get("current_url")
+            changes: dict[str, Any] = {
+                "phase": phase,
+                "current_target": canonical_id,
+                "message": event.get("message") or phase,
+            }
+            if url:
+                changes["current_url"] = str(url)
+            current = self.jobs.get(job_id)
+            if event.get("total_pages") is not None:
+                changes["total_pages"] = max(int(event["total_pages"]), current.total_pages if current else 0)
+            if event.get("discovered_pages") is not None:
+                changes["discovered_pages"] = int(event["discovered_pages"])
+            if event.get("fetched_pages") is not None:
+                changes["fetched_pages"] = int(event["fetched_pages"])
+                changes["completed_pages"] = int(event["fetched_pages"])
+            if event.get("indexed_pages") is not None:
+                changes["indexed_pages"] = int(event["indexed_pages"])
+            if event.get("failed_pages") is not None and current:
+                changes["failed_pages"] = current.failed_pages + int(event["failed_pages"])
+            self.jobs.update(job_id, **changes)
+            self.jobs.append_event(job_id, event)
+
+        return _callback
+
+    def _discover_pub_dartdoc_target(self, target: DocsTarget, warnings: list[str], job_id: str | None = None, canonical_id: str | None = None) -> DocsTarget:
+        if not is_pub_dartdoc_target(target):
+            return target
+        target = normalize_pub_dartdoc_target(target)
+        version = normalize_version(target.version) or "latest"
+        root_url = pub_dartdoc_root_url(target.library, version)
+        if job_id:
+            self.jobs.update(job_id, phase="discovering", current_target=canonical_id, current_url=root_url, message=f"Discovering Dartdoc seed URLs for {target.library}.")
+            self.jobs.append_event(job_id, {"phase": "discovering", "message": f"Discovering Dartdoc seed URLs for {target.library}", "url": root_url})
+        try:
+            with httpx.Client(timeout=30.0, follow_redirects=True, headers={"User-Agent": "docmancer/1.0"}) as client:
+                resp = client.get(root_url)
+            if resp.status_code != 200:
+                raise ValueError(f"status {resp.status_code}")
+            seeds = discover_pub_dartdoc_seed_urls(target.library, version, resp.text, root_url, max_seed_urls=target.max_pages or 50)
+        except Exception as exc:
+            warning = f"{target.library}: could not discover pub.dev Dartdoc seed URLs ({exc}); falling back to root URL."
+            warnings.append(warning)
+            target = replace(target, warnings=[*target.warnings, warning])
+            return target
+        if not seeds:
+            warning = f"{target.library}: no pub.dev Dartdoc seed URLs discovered; falling back to root URL."
+            warnings.append(warning)
+            target = replace(target, warnings=[*target.warnings, warning])
+            return target
+        if job_id:
+            self.jobs.update(job_id, discovered_pages=len(seeds), total_pages=max((self.jobs.get(job_id).total_pages if self.jobs.get(job_id) else 0), len(seeds)), message=f"Discovered {len(seeds)} Dartdoc seed URLs for {target.library}.")
+            self.jobs.append_event(job_id, {"phase": "discovering", "message": f"Discovered {len(seeds)} Dartdoc seed URLs", "url": root_url, "discovered_pages": len(seeds), "total_pages": len(seeds)})
+        return replace(target, docs_url=None, docs_url_template=None, seed_urls=seeds)
+
 
     @staticmethod
     def _merge_manifest_defaults(defaults: dict[str, Any], target: dict[str, Any]) -> dict[str, Any]:
@@ -960,6 +1034,7 @@ class LibraryDocsService:
                     current_target=canonical_id,
                     message=f"Resolving target {index}/{len(raw_targets)}.",
                 )
+                self.jobs.append_event(job_id, {"phase": "resolving", "message": f"Target {index}/{len(raw_targets)} started", "target": canonical_id})
 
             if canonical_id in seen:
                 targets_failed += 1
@@ -984,6 +1059,7 @@ class LibraryDocsService:
                 continue
             seen.add(canonical_id)
 
+            target = self._discover_pub_dartdoc_target(target, warnings, job_id=job_id, canonical_id=canonical_id)
             urls, error = self._target_urls(target)
             if error:
                 targets_failed += 1
@@ -1055,6 +1131,7 @@ class LibraryDocsService:
                             total_pages=(self.jobs.get(job_id).total_pages if self.jobs.get(job_id) else 0) + len(urls),
                             message=f"Fetching target {index}/{len(raw_targets)}.",
                         )
+                    progress_callback = self._progress_callback_for(job_id, record.library_id)
                     for url_index, url in enumerate(urls, start=1):
                         if self.jobs.cancellation_requested(job_id):
                             aborted = True
@@ -1065,6 +1142,9 @@ class LibraryDocsService:
                         }
                         if target.doc_format:
                             add_kwargs["doc_format"] = target.doc_format
+                        if progress_callback:
+                            add_kwargs["progress_callback"] = progress_callback
+                            progress_callback({"phase": "fetching", "message": f"Fetching seed URL {url_index}/{len(urls)}", "url": url, "total_pages": len(urls)})
                         pages = self._agent_instance(record).add(
                             url,
                             recreate=False,
@@ -1082,6 +1162,7 @@ class LibraryDocsService:
                                 total_chunks=max(self.jobs.get(job_id).total_chunks if self.jobs.get(job_id) else 0, pages_indexed_total),
                                 message=f"Indexed {url_index}/{len(urls)} seed URLs.",
                             )
+                            self.jobs.append_event(job_id, {"phase": "indexing", "message": f"Indexed seed URL {url_index}/{len(urls)}", "url": url})
                 except KeyboardInterrupt:
                     if job_id:
                         self.jobs.append_warning(job_id, "Docs prefetch job cancelled before the current target was marked ready.")
@@ -1165,6 +1246,7 @@ class LibraryDocsService:
                         phase="indexing",
                         message=f"Indexed target {index}/{len(raw_targets)}.",
                     )
+                    self.jobs.append_event(job_id, {"phase": "indexing", "message": f"Target {index}/{len(raw_targets)} finished", "target": record.library_id})
 
         failed = sum(1 for result in results if result.status == "failed")
         if aborted:
@@ -1351,39 +1433,30 @@ class LibraryDocsService:
         include_packages: list[str] | None = None,
         force_refresh: bool = False,
         continue_on_error: bool = True,
-    ) -> ProjectPrefetchResult:
+        async_: bool = False,
+    ) -> ProjectPrefetchResult | DocsJobStartResult:
         metadata = self.read_project_metadata(project_path)
-        results: list[RefreshResult] = []
         warnings = list(metadata.warnings)
+        targets: list[DocsTarget] = []
 
         if include_flutter:
             flutter_version = self._flutter_docs_version_for(metadata.flutter_version, metadata.flutter_channel)
             if flutter_version:
                 if metadata.flutter_version and flutter_version == "stable":
                     warnings.append(FLUTTER_CHANNEL_DOCS_WARNING.format(version=metadata.flutter_version))
-                result = self.refresh_docs(
-                    "flutter-api",
+                targets.append(DocsTarget(
+                    library="flutter-api",
                     ecosystem="flutter",
                     version=flutter_version,
                     source_type="api",
                     docs_url=self._flutter_docs_url_for(metadata.flutter_version, metadata.flutter_channel),
-                    force=force_refresh,
-                )
-                results.append(result)
-                if not continue_on_error and result.status in {"failed", "needs_docs_url"}:
-                    return ProjectPrefetchResult(project=metadata, results=results, warnings=warnings)
+                    allowed_domains=["api.flutter.dev", "main-api.flutter.dev"],
+                    doc_format="dartdoc",
+                ))
             else:
                 warnings.append(NO_PROJECT_VERSION_WARNING)
-                result = RefreshResult(
-                    library_id="flutter-api",
-                    status="needs_docs_url",
-                    docs_url=None,
-                    last_refreshed_at=None,
-                    message=NO_PROJECT_VERSION_WARNING,
-                )
-                results.append(result)
                 if not continue_on_error:
-                    return ProjectPrefetchResult(project=metadata, results=results, warnings=warnings)
+                    return ProjectPrefetchResult(project=metadata, results=[], warnings=warnings)
 
         if include_dart:
             warnings.append("Dart SDK documentation version detection is not implemented.")
@@ -1392,30 +1465,47 @@ class LibraryDocsService:
             version = metadata.packages.get(package)
             if not version:
                 warnings.append(f"{package}: {PACKAGE_NOT_FOUND_WARNING}")
-                result = RefreshResult(
-                    library_id=package,
-                    status="needs_docs_url",
-                    docs_url=None,
-                    last_refreshed_at=None,
-                    message=PACKAGE_NOT_FOUND_WARNING,
-                )
-                results.append(result)
                 if not continue_on_error:
                     break
                 continue
-            result = self.refresh_docs(
-                package,
+            targets.append(DocsTarget(
+                library=package,
                 ecosystem="pub",
                 version=version,
-                docs_url_template=PUB_DOCS_URL_TEMPLATE,
+                docs_url=pub_dartdoc_root_url(package, version),
                 source_type="api",
-                force=force_refresh,
-            )
-            results.append(result)
-            if not continue_on_error and result.status in {"failed", "needs_docs_url"}:
-                break
+                doc_format="dartdoc",
+                allowed_domains=["pub.dev"],
+                path_prefixes=[f"/documentation/{package}/{version}/"],
+            ))
 
-        return ProjectPrefetchResult(project=metadata, results=results, warnings=warnings)
+        if async_:
+            job = self.jobs.create("prefetch_project_docs")
+            self.jobs.update(job.job_id, status="running", message="Started project docs prefetch job.", total_targets=len(targets))
+            threading.Thread(
+                target=self._run_prefetch_docs_targets_job,
+                args=(job.job_id, targets, force_refresh, continue_on_error),
+                daemon=True,
+            ).start()
+            return DocsJobStartResult(job_id=job.job_id, status="running", message="Started project docs prefetch job.")
+
+        batch = self._prefetch_docs_targets_sync(targets, force_refresh=force_refresh, continue_on_error=continue_on_error)
+        results = [
+            RefreshResult(
+                library_id=item.canonical_id,
+                status=item.status,
+                docs_url=item.docs_url,
+                last_refreshed_at=None,
+                version=item.version,
+                source_type=item.source_type,
+                message=item.message,
+                pages_indexed=item.pages_indexed,
+                targets_completed=1 if item.status in {"ready", "skipped"} else 0,
+                targets_failed=1 if item.status == "failed" else 0,
+            )
+            for item in batch.results
+        ]
+        return ProjectPrefetchResult(project=metadata, results=results, warnings=[*warnings, *batch.warnings])
 
 
     def _index_size_for(self, record: LibraryRecord) -> int:

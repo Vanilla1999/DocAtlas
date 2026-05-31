@@ -78,6 +78,7 @@ TOOLS: list[dict[str, Any]] = [
                 "docs_url_template": {"type": ["string", "null"]},
                 "force_refresh": {"type": ["boolean", "null"]},
                 "continue_on_error": {"type": ["boolean", "null"]},
+                "async": {"type": ["boolean", "null"]},
             },
             "required": ["library"],
         },
@@ -233,6 +234,7 @@ TOOLS: list[dict[str, Any]] = [
                 "include_packages": {"type": ["array", "null"], "items": {"type": "string"}},
                 "force_refresh": {"type": ["boolean", "null"]},
                 "continue_on_error": {"type": ["boolean", "null"]},
+                "async": {"type": ["boolean", "null"]},
             },
             "required": ["project_path"],
         },
@@ -327,6 +329,7 @@ async def _run_async(service: LibraryDocsService) -> None:
                                 if args.get("continue_on_error") is not None
                                 else True
                             ),
+                            async_=bool(args.get("async") or False),
                         )
                     ),
                 )
@@ -442,6 +445,7 @@ async def _run_async(service: LibraryDocsService) -> None:
                                 if args.get("continue_on_error") is not None
                                 else True
                             ),
+                            async_=bool(args.get("async") or False),
                         )
                     ),
                 )

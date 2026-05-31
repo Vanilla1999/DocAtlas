@@ -119,6 +119,10 @@ class DocsJob:
     completed_targets: int = 0
     failed_targets: int = 0
     current_target: str | None = None
+    current_url: str | None = None
+    discovered_pages: int = 0
+    fetched_pages: int = 0
+    indexed_pages: int = 0
     total_pages: int = 0
     completed_pages: int = 0
     failed_pages: int = 0
@@ -128,8 +132,10 @@ class DocsJob:
     warnings: list[str] = field(default_factory=list)
     errors: list[str] = field(default_factory=list)
     target_results: list[dict[str, Any]] = field(default_factory=list)
+    events: list[dict[str, Any]] = field(default_factory=list)
     started_at: str | None = None
     updated_at: str | None = None
+    last_event_at: str | None = None
     finished_at: str | None = None
 
 
