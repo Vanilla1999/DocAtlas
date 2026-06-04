@@ -145,7 +145,7 @@ def _run_dispatch_query(
     expand: str | None,
     allow_degraded: bool = False,
 ):
-    """Build a RetrievalDispatcher, run it, return (chunks, contributions, failures).
+    """Build a RetrievalDispatcher and return chunks plus trace metadata.
 
     Falls back to lexical-only if the embeddings provider or vector store
     cannot be *constructed*. Runtime retrieval failures (dimension mismatch,
@@ -158,7 +158,8 @@ def _run_dispatch_query(
         from docmancer.runtime.qdrant_manager import ensure_running
         from docmancer.stores.base import get_vector_store
     except ImportError:
-        return agent.query(query, limit=limit, budget=budget, expand=expand), {}, {}
+        chunks = agent.query(query, limit=limit, budget=budget, expand=expand)
+        return chunks, {}, {}, "lexical", {"lexical": len(chunks)}
 
     vs_config = config.vector_store
     if vs_config.provider == "qdrant" and not vs_config.url:
@@ -174,7 +175,8 @@ def _run_dispatch_query(
     except Exception as exc:
         failures = {"vector": f"{type(exc).__name__}: {exc}"}
         if allow_degraded:
-            return agent.query(query, limit=limit, budget=budget, expand=expand), {}, failures
+            chunks = agent.query(query, limit=limit, budget=budget, expand=expand)
+            return chunks, {}, failures, "lexical", {"lexical": len(chunks)}
         raise HybridRetrievalError(failures) from exc
 
     collection = agent._vector_collection_name()
@@ -193,7 +195,7 @@ def _run_dispatch_query(
         expand=expand,
         allow_degraded=allow_degraded,
     )
-    return result.chunks, result.contributions, result.failures
+    return result.chunks, result.contributions, result.failures, result.mode_used, result.candidate_counts
 
 
 def _format_size(num_bytes: int) -> str:
@@ -1134,6 +1136,12 @@ def doctor_cmd(config_path: str | None):
 )
 @click.option("--explain", is_flag=True, help="Show per-source rank contributions for each result.")
 @click.option(
+    "--explain-json",
+    type=click.Path(dir_okay=False, writable=True, path_type=str),
+    default=None,
+    help="Write a structured retrieval/packing explain trace JSON artifact.",
+)
+@click.option(
     "--allow-degraded",
     is_flag=True,
     default=False,
@@ -1150,6 +1158,7 @@ def query_cmd(
     output_format: str,
     mode: str | None,
     explain: bool,
+    explain_json: str | None,
     allow_degraded: bool,
 ):
     """Return a compact docs context pack from the local SQLite index."""
@@ -1169,11 +1178,19 @@ def query_cmd(
     effective_mode = _effective_retrieval_mode(mode, config)
     contributions: dict = {}
     failures: dict[str, str] = {}
+    candidate_counts: dict[str, int] = {}
+    mode_used = effective_mode
+    from docmancer.eval.trace import build_explain_trace, elapsed_ms, started_timer, validate_explain_trace
+
+    trace_start = started_timer()
     if effective_mode == "lexical":
         chunks = agent.query(text, limit=limit, budget=budget, expand=expand)
+        contributions = {c.metadata.get("section_id"): {"lexical": idx + 1} for idx, c in enumerate(chunks) if (c.metadata or {}).get("section_id") is not None}
+        candidate_counts = {"lexical": len(chunks)}
+        mode_used = "lexical"
     else:
         try:
-            chunks, contributions, failures = _run_dispatch_query(
+            chunks, contributions, failures, mode_used, candidate_counts = _run_dispatch_query(
                 agent=agent,
                 config=config,
                 query=text,
@@ -1190,6 +1207,23 @@ def query_cmd(
     if not chunks:
         click.echo("No results found.")
         sys.exit(1)
+
+    trace_latency_ms = elapsed_ms(trace_start)
+    if explain_json:
+        trace = build_explain_trace(
+            query=text,
+            selected_mode=mode_used,
+            chunks=chunks,
+            limit=limit,
+            budget=budget or config.query.default_budget,
+            expand=expand,
+            contributions=contributions,
+            candidate_counts=candidate_counts,
+            failures=failures,
+            latency_ms=trace_latency_ms,
+        )
+        validate_explain_trace(trace)
+        Path(explain_json).write_text(_json.dumps(trace, ensure_ascii=False, indent=2), encoding="utf-8")
 
     meta = chunks[0].metadata or {}
     savings = meta.get("savings_percent", 0)
@@ -1209,6 +1243,7 @@ def query_cmd(
                     "runway_multiplier": runway,
                     "degraded": bool(failures),
                     "failures": failures,
+                    "mode_used": mode_used,
                     "results": [chunk.model_dump() for chunk in chunks],
                 },
                 ensure_ascii=False,
@@ -1246,6 +1281,65 @@ def query_cmd(
                 click.echo(f"    explain: degraded retrieval ({failure_parts})")
         click.echo(body)
         click.echo("---")
+
+
+@click.command(
+    cls=DocmancerCommand,
+    context_settings=HELP_CONTEXT_SETTINGS,
+    short_help="Run retrieval quality evals.",
+    epilog=format_examples(
+        "docmancer eval golden.yaml",
+        "docmancer eval golden.json --format json",
+        "docmancer eval golden.yaml --source-health",
+    ),
+)
+@click.argument("dataset", type=click.Path(exists=True, dir_okay=False, path_type=str))
+@click.option("--config", "config_path", default=None, help="Path to docmancer.yaml.")
+@click.option("--mode", type=click.Choice(["lexical", "dense", "sparse", "hybrid"], case_sensitive=False), default="lexical", show_default=True)
+@click.option("--limit", default=10, type=int, show_default=True, help="Maximum sections per eval query.")
+@click.option("--budget", default=10_000, type=int, show_default=True, help="Maximum estimated output tokens per eval query.")
+@click.option("output_format", "--format", type=click.Choice(["text", "json"], case_sensitive=False), default="text", show_default=True)
+@click.option("--source-health", is_flag=True, default=False, help="Include a basic source/index health report.")
+@click.option("--allow-degraded/--strict", default=True, show_default=True, help="Allow degraded non-lexical retrieval during evals.")
+def eval_cmd(
+    dataset: str,
+    config_path: str | None,
+    mode: str,
+    limit: int,
+    budget: int,
+    output_format: str,
+    source_health: bool,
+    allow_degraded: bool,
+):
+    """Evaluate retrieval quality against a golden dataset."""
+    from docmancer.eval.health import source_health_report
+    from docmancer.eval.runner import format_eval_report, run_retrieval_eval
+
+    config_path = _effective_config(config_path)
+    config = _load_config(config_path)
+    agent = _get_agent_class()(config=config)
+    report = run_retrieval_eval(
+        dataset_path=dataset,
+        agent=agent,
+        config=config,
+        mode=mode,
+        limit=limit,
+        budget=budget,
+        allow_degraded=allow_degraded,
+    )
+    if source_health:
+        report["source_health"] = source_health_report(agent)
+    if output_format == "json":
+        click.echo(json.dumps(report, ensure_ascii=False, indent=2))
+        return
+    click.echo(format_eval_report(report))
+    if source_health:
+        health = report["source_health"]
+        click.echo("---")
+        click.echo(
+            f"Source health: sources={health['sources_count']} sections={health['sections_count']} "
+            f"empty={health['empty_sections']} sparse={health['sparse_sections']} duplicates={health['duplicate_content_hashes']}"
+        )
 
 
 @click.command(

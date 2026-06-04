@@ -1,12 +1,12 @@
 <div align="center">
 
-**Local docs context for coding agents.**
+**Local, version-aware docs runtime for coding agents.**
 
 [![PyPI version](https://img.shields.io/pypi/v/docmancer?style=for-the-badge)](https://pypi.org/project/docmancer/)
 [![License: MIT](https://img.shields.io/github/license/docmancer/docmancer?style=for-the-badge)](https://github.com/docmancer/docmancer/blob/main/LICENSE)
 [![Python 3.11 | 3.12 | 3.13](https://img.shields.io/badge/python-3.11%20|%203.12%20|%203.13-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://pypi.org/project/docmancer/)
 
-[Install](#install) | [First run](#first-run) | [What you get](#what-you-get) | [Wiki](./wiki/Home.md)
+[Install](#install) | [Quickstart lanes](#quickstart-lanes) | [What you get](#what-you-get) | [Docs MCP server](#documentation-mcp-server) | [Wiki](./wiki/Home.md)
 
 <img src="readme-assets/demo.gif" alt="Local docs ingest and query demo" style="width: 67%; max-width: 720px; height: auto;" />
 
@@ -14,7 +14,9 @@
 
 ---
 
-Docmancer turns any pile of docs into a hybrid-search index your coding agent can query through a simple CLI. Point it at a folder of Markdown / PDF / DOCX / RTF / HTML, or at a docs URL (GitBook, Mintlify, generic web, GitHub), and ask questions in natural language. Results come back as compact context packs with source attribution, sized to fit a token budget.
+Docmancer gives coding agents local, version-aware docs context. It indexes repo docs, docs sites, package references, and private documentation into compact context packs with source attribution, then serves them locally through a CLI or MCP docs server.
+
+The main product is **Docmancer Docs**: a local docs runtime that lets agents answer from the documentation your project actually uses instead of relying on model memory, latest-only hosted pages, or repeated WebFetch calls. **Docmancer Packs** are the advanced layer: version-pinned API action tools for agents that need to call APIs, not just read docs.
 
 A fresh install ships everything you need: SQLite FTS5, a docmancer-owned local Qdrant for dense and sparse vectors, FastEmbed for embeddings (no API key), and a hybrid retriever that fuses lexical, dense, and sparse signals with Reciprocal Rank Fusion.
 
@@ -26,7 +28,11 @@ pipx install docmancer    # Python 3.11, 3.12, or 3.13
 
 If `pipx` picks an unsupported interpreter, pin one: `pipx install docmancer --python python3.13`.
 
-## First run
+## Quickstart lanes
+
+Pick the lane that matches what you want your agent to do.
+
+### 1. Local Docs / CLI query
 
 Three commands take you from a fresh install to a grounded query:
 
@@ -45,9 +51,42 @@ docmancer add https://docs.pytest.org
 docmancer query "How do I parametrize a fixture?" --mode hybrid
 ```
 
+### 2. Versioned MCP Docs
+
+Run the docs MCP server when you want an agent to resolve and query registered library docs from inside its normal tool loop:
+
+```bash
+docmancer mcp docs-serve
+```
+
+Register docs once, then query them without repeating the URL:
+
+```json
+{
+  "library": "pytest",
+  "topic": "parametrize fixture",
+  "docs_url": "https://docs.pytest.org/"
+}
+```
+
+Later calls can use just the library and topic. Project-aware version resolution currently focuses on Flutter/Dart metadata such as `.fvmrc` and `pubspec.lock`; other ecosystems are roadmap items.
+
+### 3. Action Packs
+
+When an agent needs to call APIs, install a version-pinned pack:
+
+```bash
+docmancer install-pack open-meteo@v1
+docmancer mcp serve
+```
+
+Packs are an advanced workflow. Start with Docs when your goal is grounded answers from local/version-aware documentation.
+
 ## What you get
 
-**Hybrid search by default.** `query` fans out across SQLite FTS5 (lexical, BM25-reranked), Qdrant dense vectors (FastEmbed `bge-base-en-v1.5`), and SPLADE sparse vectors, then fuses results with Reciprocal Rank Fusion. The token budget keeps responses small so your agent has room for actual work:
+**Local, version-aware docs context.** Docmancer can keep separate entries for package versions, channels, and sources. MCP docs responses include version metadata such as requested/resolved version and whether the docs snapshot is exact.
+
+**Compact context packs.** Results are source-grounded sections, not raw pages. The token budget keeps responses small so your agent has room for actual work:
 
 ```text
 Context pack: ~900 tokens vs ~4800 raw docs tokens (81.2% less docs overhead, 5.33x agentic runway)
@@ -55,13 +94,15 @@ Context pack: ~900 tokens vs ~4800 raw docs tokens (81.2% less docs overhead, 5.
 
 **No API keys required.** FastEmbed runs locally. The optional OpenAI / Voyage / Cohere providers exist if you want them; if the key is missing, ingest falls back to FTS5-only and warns rather than aborting.
 
+**Hybrid search by default.** `query` fans out across SQLite FTS5 (lexical, BM25-reranked), Qdrant dense vectors (FastEmbed `bge-base-en-v1.5`), and SPLADE sparse vectors, then fuses results with Reciprocal Rank Fusion.
+
 **Inspectable.** Every section is written to `~/.docmancer/extracted/` as Markdown plus JSON. `docmancer inspect` shows index stats. `docmancer query --explain` shows which signal (lexical / dense / sparse) placed each result.
 
 **Agent integration built in.** `docmancer setup` drops skill files for Claude Code, Cursor, Codex, Cline, Claude Desktop, Gemini, GitHub Copilot, and OpenCode. Your agent can call `docmancer query` directly from its conversation loop.
 
 ## Documentation MCP server
 
-Docmancer also has a minimal Context7-style MCP mode for library docs:
+Docmancer Docs includes a Context7-style MCP server for local, version-aware library documentation:
 
 ```bash
 docmancer mcp docs-serve
@@ -87,14 +128,17 @@ Tools:
 - `refresh_library_docs`
 - `prefetch_library_docs`
 - `prefetch_project_docs`
+- `prefetch_docs_targets`
+- `prefetch_docs_manifest`
 - `list_library_docs`
+- `inspect_library_docs`
 - `get_docs_job_status`
 - `list_docs_jobs`
 - `cancel_docs_job`
 
 The docs server uses the same local ingest, index, update, and query path as the CLI. It keeps a small persistent library registry in the Docmancer SQLite database. Libraries are stale when they have never been refreshed or when `last_refreshed_at` is older than 30 days. `get_library_docs` refreshes stale docs before querying, and `force_refresh: true` refreshes even fresh docs.
 
-Pass `docs_url` the first time you ask for an unknown library. The server only resolves existing registry entries or explicit URLs; it does not guess package documentation URLs.
+Pass `docs_url` the first time you ask for an unknown library. After registration, later queries can use the stored source and do not need the URL again. The server resolves existing registry entries, project-aware versions, or explicit URLs; it does not guess arbitrary package documentation URLs.
 
 ```json
 {
@@ -155,13 +199,13 @@ Async jobs are in-memory and process-local. Jobs disappear when the MCP server p
 
 ### Versioned documentation
 
-Docs MCP can keep separate local entries per library version. Canonical ids use `library@version`, for example:
+Docs MCP can keep separate local entries per library version. Canonical ids include source identity and version metadata, for example:
 
-- `go_router@14.8.1`
-- `go_router@16.2.0`
-- `go_router@latest`
-- `flutter-api@stable`
-- `flutter-api@main`
+- `pub:go_router@14.8.1:api`
+- `pub:go_router@16.2.0:api`
+- `pub:go_router@latest:api`
+- `flutter:flutter-api@stable:api`
+- `flutter:flutter-api@main:api`
 
 Use `prefetch_library_docs` to download and index multiple versions ahead of time:
 

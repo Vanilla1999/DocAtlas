@@ -248,7 +248,31 @@ class LibraryDocsService:
                 source_type=source_type,
                 now=self._now(),
                 status="available",
+                requested_version=normalized_version,
+                resolved_version=normalized_version,
+                version_source="explicit" if normalized_version else None,
+                version_confidence="high" if normalized_version else None,
+                version_inferred=normalized_version is None,
             )
+        if record is None:
+            candidates = self.registry.find_candidates(library, ecosystem, normalized_version, source_type)
+            if len(candidates) == 1:
+                record = candidates[0]
+            elif len(candidates) > 1:
+                return LibraryInfo(
+                    library_id=None,
+                    library=library,
+                    ecosystem=ecosystem,
+                    version=normalized_version,
+                    docs_url=docs_url,
+                    docs_url_template=docs_url_template,
+                    source_type=source_type,
+                    status="ambiguous",
+                    local=False,
+                    stale=True,
+                    message="Multiple registered documentation sources match this library. Choose one candidate and retry.",
+                    candidates=[self._candidate_payload(candidate) for candidate in candidates],
+                )
         if record is None:
             return LibraryInfo(
                 library_id=None,
@@ -262,6 +286,8 @@ class LibraryDocsService:
                 stale=True,
                 message="Pass docs_url or docs_url_template with version to register and ingest this library.",
             )
+        if docs_url is None and docs_url_template and normalized_version:
+            docs_url = self._render_docs_url(docs_url_template, library, normalized_version)
         if docs_url and docs_url != record.docs_url:
             record = self.registry.upsert(
                 library=record.name,
@@ -272,22 +298,90 @@ class LibraryDocsService:
                 source_type=source_type,
                 now=self._now(),
                 status="available",
+                requested_version=record.requested_version,
+                resolved_version=record.resolved_version,
+                version_source=record.version_source,
+                version_confidence=record.version_confidence,
+                version_inferred=record.version_inferred,
             )
         stale = self._is_stale(record.last_refreshed_at)
         return LibraryInfo(
             library_id=record.library_id,
+            source_id=record.source_id,
+            canonical_id=record.canonical_id,
             library=record.name,
             ecosystem=record.ecosystem,
             version=record.version,
             source_type=record.source_type,
             docs_url=record.docs_url,
             docs_url_template=record.docs_url_template,
+            docs_url_resolved=record.docs_url_resolved,
+            docs_snapshot_exact=record.docs_snapshot_exact,
+            requested_version=record.requested_version,
+            resolved_version=record.resolved_version,
+            version_source=record.version_source,
+            version_confidence=record.version_confidence,
+            version_inferred=record.version_inferred,
             status=record.status or "available",
             local=record.last_refreshed_at is not None,
             stale=stale,
             last_refreshed_at=record.last_refreshed_at,
             message=record.last_error,
         )
+
+    @staticmethod
+    def _candidate_payload(record: LibraryRecord) -> dict[str, Any]:
+        return {
+            "source_id": record.source_id,
+            "canonical_id": record.canonical_id,
+            "library_id": record.library_id,
+            "library": record.name,
+            "ecosystem": record.ecosystem,
+            "version": record.version,
+            "source_type": record.source_type,
+            "docs_url": record.docs_url,
+            "arguments_patch": {
+                "library": record.library_id,
+                "source_type": record.source_type,
+            },
+        }
+
+    @staticmethod
+    def _docs_policy(status: str, *, has_registered_source: bool) -> dict[str, Any]:
+        if status == "ambiguous":
+            return {"direct_webfetch": "forbidden", "reason_code": "registry_candidates_exist"}
+        if has_registered_source:
+            return {"direct_webfetch": "forbidden", "reason_code": "registered_source_exists"}
+        return {"direct_webfetch": "discovery_only", "reason_code": "no_registered_source"}
+
+    def _docs_identity(self, info: LibraryInfo | None, *, docs_url_source: str | None = None) -> dict[str, Any]:
+        return {
+            "source_id": info.source_id if info else None,
+            "canonical_id": info.canonical_id if info else None,
+            "library": info.library if info else None,
+            "ecosystem": info.ecosystem if info else None,
+            "version": info.version if info else None,
+            "docs_url": info.docs_url if info else None,
+            "docs_url_source": docs_url_source,
+            "selected_by": "registry" if docs_url_source == "registry" else None,
+            "docs_snapshot_exact": info.docs_snapshot_exact if info else None,
+        }
+
+    @staticmethod
+    def _docs_request(input_args: dict[str, Any], info: LibraryInfo | None = None) -> dict[str, Any]:
+        effective = dict(input_args)
+        if info:
+            effective.update(
+                {
+                    "library": info.library,
+                    "ecosystem": info.ecosystem,
+                    "version": info.version,
+                    "source_type": info.source_type,
+                    "docs_url": info.docs_url,
+                    "docs_url_template": info.docs_url_template,
+                }
+            )
+        return {"input": input_args, "effective": effective}
 
     def _record_from_info(self, info: LibraryInfo) -> LibraryRecord | None:
         if info.library_id is None:
@@ -323,15 +417,45 @@ class LibraryDocsService:
             return "stable"
         return None
 
+    @staticmethod
+    def _docs_exactness(docs_snapshot_exact: bool | None, docs_url: str | None, docs_url_template: str | None) -> str:
+        if docs_snapshot_exact:
+            return "exact_snapshot"
+        if docs_url or docs_url_template:
+            return "exact_version_url"
+        return "no_docs"
+
+    @staticmethod
+    def _project_resolution_summary(metadata: ProjectMetadata) -> dict[str, int]:
+        exact_versions = sum(1 for item in metadata.dependencies if item.resolved_version and item.version_source.endswith("exact"))
+        best_effort_docs = sum(1 for item in metadata.dependencies if item.source_kind != "registry")
+        return {
+            "dependencies_seen": len(metadata.dependencies),
+            "exact_versions": exact_versions,
+            "best_effort_docs": best_effort_docs,
+            "no_docs": 0,
+        }
+
+    def _dependency_observation_for(self, metadata: ProjectMetadata, library: str, ecosystem: str | None) -> Any | None:
+        candidates = [item for item in metadata.dependencies if item.package_name == library]
+        if ecosystem:
+            candidates = [item for item in candidates if item.ecosystem == ecosystem]
+        if candidates:
+            return next((item for item in candidates if item.resolved_version), candidates[0])
+        rust_key = metadata.packages.get(f"rust:{library}")
+        if rust_key and ecosystem in {None, "rust"}:
+            return next((item for item in metadata.dependencies if item.ecosystem == "rust" and item.package_name == library), None)
+        return None
+
     def _project_version_for(
         self,
         *,
         library: str,
         ecosystem: str | None,
         project_path: str | None,
-    ) -> tuple[str | None, str | None, str | None, list[str], str | None, bool | None]:
+    ) -> tuple[str | None, str | None, str | None, list[str], str | None, bool | None, str | None, str | None]:
         if not project_path:
-            return None, None, None, [], None, None
+            return None, None, None, [], None, None, None, None
         metadata = self.read_project_metadata(project_path)
         warnings = list(metadata.warnings)
         if self._is_flutter_library(library):
@@ -346,20 +470,42 @@ class LibraryDocsService:
                     warnings,
                     metadata.flutter_version or metadata.flutter_channel,
                     False,
+                    "project_flutter_sdk",
+                    "flutter_api_current_channel",
                 )
             warnings.append(NO_PROJECT_VERSION_WARNING)
-            return None, None, None, warnings, None, None
+            return None, None, None, warnings, None, None, None, None
+
+        observation = self._dependency_observation_for(metadata, library, ecosystem)
+        if observation and observation.ecosystem == "rust":
+            if observation.source_kind != "registry":
+                warnings.append(f"{library}: Rust path/git dependencies cannot be bound to docs.rs exactly.")
+                return None, None, None, warnings, observation.specifier_raw, False, observation.version_source, "no_docs"
+            if observation.resolved_version:
+                return (
+                    observation.resolved_version,
+                    f"https://docs.rs/{library}/{observation.resolved_version}/",
+                    None,
+                    warnings,
+                    observation.specifier_raw or observation.resolved_version,
+                    True,
+                    observation.version_source,
+                    "docs_rs",
+                )
+            warnings.append(NO_PROJECT_VERSION_WARNING)
+            return None, None, None, warnings, observation.specifier_raw, False, observation.version_source, "no_docs"
 
         if ecosystem == "pub" or library in metadata.packages:
             version = metadata.packages.get(library)
             if version:
-                return version, None, PUB_DOCS_URL_TEMPLATE, warnings, version, True
+                source = observation.version_source if observation else "lockfile_exact"
+                return version, None, PUB_DOCS_URL_TEMPLATE, warnings, version, True, source, "pub_dartdoc"
             warnings.append(PACKAGE_NOT_FOUND_WARNING)
             warnings.append(NO_PROJECT_VERSION_WARNING)
-            return None, None, None, warnings, None, None
+            return None, None, None, warnings, None, None, None, None
 
         warnings.append(NO_PROJECT_VERSION_WARNING)
-        return None, None, None, warnings, None, None
+        return None, None, None, warnings, None, None, None, None
 
     @staticmethod
     def _join_warnings(*items: str | None, extra: list[str] | None = None) -> str | None:
@@ -1296,27 +1442,76 @@ class LibraryDocsService:
         force_refresh: bool = False,
         project_path: str | None = None,
     ) -> DocsResult:
+        input_args = {
+            "library": library,
+            "topic": topic,
+            "tokens": tokens,
+            "ecosystem": ecosystem,
+            "version": version,
+            "source_type": source_type,
+            "docs_url": docs_url,
+            "docs_url_template": docs_url_template,
+            "force_refresh": force_refresh,
+            "project_path": project_path,
+        }
+        input_docs_url = docs_url
+        input_docs_url_template = docs_url_template
         project_warnings: list[str] = []
         requested_version = version
         version_source = "explicit" if version is not None else None
         docs_snapshot_exact: bool | None = None
+        docs_binding_source: str | None = None
         if version is None and project_path:
-            project_version, project_docs_url, project_template, project_warnings, requested_version, docs_snapshot_exact = self._project_version_for(
+            project_version, project_docs_url, project_template, project_warnings, requested_version, docs_snapshot_exact, project_version_source, docs_binding_source = self._project_version_for(
                 library=library,
                 ecosystem=ecosystem,
                 project_path=project_path,
             )
             if project_version:
                 version = project_version
-                version_source = "project"
+                version_source = project_version_source or "project"
                 docs_url = docs_url or project_docs_url
                 docs_url_template = docs_url_template or project_template
         elif version is not None and ecosystem == "pub":
             docs_snapshot_exact = True
+            docs_binding_source = "pub_dartdoc" if docs_url or docs_url_template else None
+        elif version is not None and ecosystem == "rust":
+            docs_snapshot_exact = True
+            docs_binding_source = "docs_rs" if docs_url or docs_url_template else None
         if ecosystem is None and self._is_flutter_library(library):
             ecosystem = "flutter"
 
         info = self.resolve_library(library, ecosystem, version, docs_url, docs_url_template, source_type)
+        docs_url_source = "input" if input_docs_url or input_docs_url_template else ("registry" if info.docs_url or info.docs_url_template else None)
+        if info.status == "ambiguous":
+            warnings = self._join_warnings("ambiguous_library", extra=project_warnings)
+            return DocsResult(
+                library_id="",
+                library=library,
+                version=version,
+                topic=topic,
+                refreshed=False,
+                stale_before_refresh=True,
+                warning=warnings,
+                last_refreshed_at=None,
+                results=[],
+                warnings=[warnings] if warnings else [],
+                requested_version=requested_version,
+                resolved_version=version,
+                version_source=version_source,
+                docs_snapshot_exact=docs_snapshot_exact,
+                docs_exactness=self._docs_exactness(docs_snapshot_exact, docs_url, docs_url_template),
+                docs_binding_source=docs_binding_source,
+                confidence="high" if version_source in {"explicit", "lockfile_exact", "manifest_exact"} else None,
+                status="ambiguous",
+                decision="choose_candidate",
+                request=self._docs_request(input_args),
+                identity=self._docs_identity(info),
+                policy=self._docs_policy("ambiguous", has_registered_source=True),
+                diagnostics={"warnings": [{"code": "ambiguous_library", "blocking": True}]},
+                next_actions=["Choose one candidate and retry get_library_docs with its arguments_patch."],
+                candidates=info.candidates,
+            )
         if info.library_id is None:
             warning = self._join_warnings("needs_docs_url", extra=project_warnings)
             warnings = [warning] if warning else []
@@ -1335,7 +1530,47 @@ class LibraryDocsService:
                 resolved_version=version,
                 version_source=version_source,
                 docs_snapshot_exact=docs_snapshot_exact,
+                docs_exactness=self._docs_exactness(docs_snapshot_exact, docs_url, docs_url_template),
+                docs_binding_source=docs_binding_source,
+                confidence="high" if version_source in {"explicit", "lockfile_exact", "manifest_exact"} else None,
+                status="needs_input",
+                decision="retry_same_tool",
+                request=self._docs_request(input_args),
+                identity=self._docs_identity(info),
+                policy=self._docs_policy("needs_input", has_registered_source=False),
+                diagnostics={"warnings": [{"code": "needs_docs_url", "blocking": True}]},
+                next_actions=["Retry get_library_docs with docs_url, or call prefetch_library_docs/prefetch_docs_targets to register this source."],
             )
+
+        requested_version = requested_version if requested_version is not None else info.requested_version
+        version_source = version_source if version_source is not None else info.version_source
+        docs_snapshot_exact = docs_snapshot_exact if docs_snapshot_exact is not None else info.docs_snapshot_exact
+        docs_binding_source = docs_binding_source or ("registry" if info.docs_url or info.docs_url_template else None)
+        docs_exactness = self._docs_exactness(docs_snapshot_exact, info.docs_url, info.docs_url_template)
+        confidence = info.version_confidence or ("high" if version_source in {"explicit", "lockfile_exact", "manifest_exact"} else None)
+        if info.library_id and (
+            requested_version != info.requested_version
+            or version_source != info.version_source
+            or docs_snapshot_exact != info.docs_snapshot_exact
+        ):
+            updated_record = self.registry.upsert(
+                library=info.library,
+                ecosystem=info.ecosystem,
+                version=info.version,
+                docs_url=info.docs_url,
+                docs_url_template=info.docs_url_template,
+                source_type=info.source_type,
+                now=self._now(),
+                status=info.status,
+                last_refreshed_at=info.last_refreshed_at,
+                requested_version=requested_version,
+                resolved_version=info.resolved_version or info.version,
+                version_source=version_source,
+                version_confidence=confidence,
+                version_inferred=version_source != "explicit",
+                docs_snapshot_exact=docs_snapshot_exact,
+            )
+            info = self.resolve_library(updated_record.library_id, source_type=updated_record.source_type)
 
         stale_before = info.stale
         refreshed = False
@@ -1345,8 +1580,20 @@ class LibraryDocsService:
         if project_warnings:
             warning = self._join_warnings(warning, extra=project_warnings)
         warnings = [warning] if warning else []
+        diagnostic_warnings: list[dict[str, Any]] = []
+        if docs_url_source == "registry":
+            diagnostic_warnings.append({"code": "used_registry_docs_url", "blocking": False})
+        if warning:
+            diagnostic_warnings.append({"code": warning, "blocking": False})
         if force_refresh or stale_before:
-            result = self.refresh_docs(info.library_id, ecosystem=None, docs_url=docs_url, source_type=info.source_type, force=force_refresh)
+            result = self.refresh_docs(
+                info.library_id,
+                ecosystem=None,
+                docs_url=info.docs_url,
+                docs_url_template=info.docs_url_template,
+                source_type=info.source_type,
+                force=force_refresh,
+            )
             refreshed = result.status == "updated"
             if result.status in {"failed", "needs_docs_url"}:
                 warning = result.status if not result.message else f"{result.status}: {result.message}"
@@ -1368,6 +1615,16 @@ class LibraryDocsService:
                         resolved_version=info.version,
                         version_source=version_source,
                         docs_snapshot_exact=docs_snapshot_exact,
+                        docs_exactness=docs_exactness,
+                        docs_binding_source=docs_binding_source,
+                        confidence=confidence,
+                        status="error",
+                        decision="stop",
+                        request=self._docs_request(input_args, info),
+                        identity=self._docs_identity(info, docs_url_source=docs_url_source),
+                        policy=self._docs_policy("error", has_registered_source=True),
+                        diagnostics={"warnings": diagnostic_warnings},
+                        next_actions=["Retry get_library_docs with force_refresh=false if local docs are usable, or refresh/register the source again."],
                     )
 
         latest = self.resolve_library(info.library_id, source_type=info.source_type)
@@ -1389,6 +1646,15 @@ class LibraryDocsService:
                 resolved_version=info.version,
                 version_source=version_source,
                 docs_snapshot_exact=docs_snapshot_exact,
+                docs_exactness=docs_exactness,
+                docs_binding_source=docs_binding_source,
+                confidence=confidence,
+                status="success",
+                decision="answer_returned",
+                request=self._docs_request(input_args, info),
+                identity=self._docs_identity(info, docs_url_source=docs_url_source),
+                policy=self._docs_policy("success", has_registered_source=True),
+                diagnostics={"warnings": diagnostic_warnings},
             )
         query = f"{info.library} {topic}".strip() if topic else info.library
         chunks = self._agent_instance(record).query(query, budget=tokens or DEFAULT_DOC_TOKENS)
@@ -1420,9 +1686,18 @@ class LibraryDocsService:
             ],
             warnings=warnings,
             requested_version=requested_version,
-            resolved_version=latest.version,
+            resolved_version=latest.resolved_version or latest.version,
             version_source=version_source,
             docs_snapshot_exact=docs_snapshot_exact,
+            docs_exactness=docs_exactness,
+            docs_binding_source=docs_binding_source,
+            confidence=confidence,
+            status="success",
+            decision="answer_returned",
+            request=self._docs_request(input_args, info),
+            identity=self._docs_identity(info, docs_url_source=docs_url_source),
+            policy=self._docs_policy("success", has_registered_source=True),
+            diagnostics={"warnings": diagnostic_warnings},
         )
 
     def prefetch_project_docs(
@@ -1430,6 +1705,7 @@ class LibraryDocsService:
         project_path: str,
         include_flutter: bool = True,
         include_dart: bool = False,
+        include_rust: bool = True,
         include_packages: list[str] | None = None,
         force_refresh: bool = False,
         continue_on_error: bool = True,
@@ -1456,15 +1732,33 @@ class LibraryDocsService:
             else:
                 warnings.append(NO_PROJECT_VERSION_WARNING)
                 if not continue_on_error:
-                    return ProjectPrefetchResult(project=metadata, results=[], warnings=warnings)
+                    return ProjectPrefetchResult(
+                        project=metadata,
+                        results=[],
+                        warnings=warnings,
+                        detected_ecosystems=metadata.detected_ecosystems,
+                        resolution_summary=self._project_resolution_summary(metadata),
+                    )
 
         if include_dart:
             warnings.append("Dart SDK documentation version detection is not implemented.")
 
         for package in include_packages or []:
+            rust_version = metadata.packages.get(f"rust:{package}")
+            if rust_version and include_rust:
+                targets.append(DocsTarget(
+                    library=package,
+                    ecosystem="rust",
+                    version=rust_version,
+                    docs_url=f"https://docs.rs/{package}/{rust_version}/",
+                    source_type="api",
+                    allowed_domains=["docs.rs"],
+                    path_prefixes=[f"/{package}/{rust_version}/"],
+                ))
+                continue
             version = metadata.packages.get(package)
             if not version:
-                warnings.append(f"{package}: {PACKAGE_NOT_FOUND_WARNING}")
+                warnings.append(f"{package}: Package was not found in project lockfiles.")
                 if not continue_on_error:
                     break
                 continue
@@ -1505,7 +1799,13 @@ class LibraryDocsService:
             )
             for item in batch.results
         ]
-        return ProjectPrefetchResult(project=metadata, results=results, warnings=[*warnings, *batch.warnings])
+        return ProjectPrefetchResult(
+            project=metadata,
+            results=results,
+            warnings=[*warnings, *batch.warnings],
+            detected_ecosystems=metadata.detected_ecosystems,
+            resolution_summary=self._project_resolution_summary(metadata),
+        )
 
 
     def _index_size_for(self, record: LibraryRecord) -> int:
@@ -1539,12 +1839,20 @@ class LibraryDocsService:
             return DocsInspectResult(canonical_id=canonical_id, status="missing", message="library docs target not found")
         return DocsInspectResult(
             canonical_id=record.library_id,
+            source_id=record.source_id,
             status=record.status or "available",
             library=record.name,
             ecosystem=record.ecosystem,
             version=record.version,
             source_type=record.source_type,
             docs_url=record.docs_url,
+            docs_url_resolved=record.docs_url_resolved,
+            docs_snapshot_exact=record.docs_snapshot_exact,
+            requested_version=record.requested_version,
+            resolved_version=record.resolved_version,
+            version_source=record.version_source,
+            version_confidence=record.version_confidence,
+            version_inferred=record.version_inferred,
             last_refreshed_at=record.last_refreshed_at,
             stale=self._is_stale(record.last_refreshed_at),
             size_bytes=self._index_size_for(record),

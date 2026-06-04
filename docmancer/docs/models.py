@@ -8,16 +8,26 @@ from typing import Any
 class LibraryInfo:
     library_id: str | None
     library: str
+    source_id: str | None = None
+    canonical_id: str | None = None
     ecosystem: str | None = None
     version: str | None = None
     source_type: str | None = None
     docs_url: str | None = None
     docs_url_template: str | None = None
+    docs_url_resolved: str | None = None
+    docs_snapshot_exact: bool | None = None
+    requested_version: str | None = None
+    resolved_version: str | None = None
+    version_source: str | None = None
+    version_confidence: str | None = None
+    version_inferred: bool | None = None
     status: str = "needs_docs_url"
     local: bool = False
     stale: bool = False
     last_refreshed_at: str | None = None
     message: str | None = None
+    candidates: list[dict[str, Any]] = field(default_factory=list)
 
 
 @dataclass(frozen=True)
@@ -45,6 +55,20 @@ class DocsResult:
     resolved_version: str | None = None
     version_source: str | None = None
     docs_snapshot_exact: bool | None = None
+    docs_exactness: str | None = None
+    docs_binding_source: str | None = None
+    confidence: str | None = None
+    tool: str = "get_library_docs"
+    schema_version: str = "2.0-mvp"
+    status: str = "success"
+    decision: str = "answer_returned"
+    request: dict[str, Any] = field(default_factory=dict)
+    identity: dict[str, Any] = field(default_factory=dict)
+    policy: dict[str, Any] = field(default_factory=dict)
+    diagnostics: dict[str, Any] = field(default_factory=dict)
+    next_actions: list[str] = field(default_factory=list)
+    result: Any = None
+    candidates: list[dict[str, Any]] = field(default_factory=list)
 
 
 @dataclass(frozen=True)
@@ -166,11 +190,19 @@ class DocsManifestValidationResult:
 class DocsInspectResult:
     canonical_id: str
     status: str
+    source_id: str | None = None
     library: str | None = None
     ecosystem: str | None = None
     version: str | None = None
     source_type: str | None = None
     docs_url: str | None = None
+    docs_url_resolved: str | None = None
+    docs_snapshot_exact: bool | None = None
+    requested_version: str | None = None
+    resolved_version: str | None = None
+    version_source: str | None = None
+    version_confidence: str | None = None
+    version_inferred: bool | None = None
     last_refreshed_at: str | None = None
     stale: bool = False
     pages: int = 0
@@ -196,6 +228,20 @@ class DocsPruneResult:
 
 
 @dataclass(frozen=True)
+class DependencyObservation:
+    ecosystem: str
+    package_name: str
+    workspace_member: str | None = None
+    dependency_group: str = "dependencies"
+    specifier_kind: str = "unknown"
+    specifier_raw: str | None = None
+    resolved_version: str | None = None
+    version_source: str = "unknown"
+    source_kind: str = "registry"
+    warnings: list[str] = field(default_factory=list)
+
+
+@dataclass(frozen=True)
 class ProjectMetadata:
     project_path: str
     flutter_version: str | None = None
@@ -203,6 +249,8 @@ class ProjectMetadata:
     dart_version: str | None = None
     packages: dict[str, str] = field(default_factory=dict)
     direct_dependencies: list[str] = field(default_factory=list)
+    dependencies: list[DependencyObservation] = field(default_factory=list)
+    detected_ecosystems: list[str] = field(default_factory=list)
     warnings: list[str] = field(default_factory=list)
 
 
@@ -211,3 +259,5 @@ class ProjectPrefetchResult:
     project: ProjectMetadata
     results: list[RefreshResult] = field(default_factory=list)
     warnings: list[str] = field(default_factory=list)
+    detected_ecosystems: list[str] = field(default_factory=list)
+    resolution_summary: dict[str, int] = field(default_factory=dict)

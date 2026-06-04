@@ -1,10 +1,12 @@
 # Architecture
 
+Docmancer is a local, version-aware docs runtime for coding agents. It has two product layers: **Docmancer Docs**, the primary docs context/runtime layer, and **Docmancer Packs**, the advanced API action-tool layer.
+
 Docmancer runs two cooperating local pipelines.
 
-The **docs-RAG pipeline** fetches documentation with `docmancer add` (URL) or `docmancer ingest` (local files), normalizes it into sections, indexes those sections in a local SQLite FTS5 database plus a managed local Qdrant for dense and sparse vectors, and retrieves compact context packs on `docmancer query` through a hybrid dispatcher with RRF fusion. No hosted query API; the only background process is the docmancer-owned Qdrant.
+The primary **Docmancer Docs pipeline** fetches documentation with `docmancer add` (URL), `docmancer ingest` (local files), or the docs MCP server's prefetch tools, normalizes it into sections, indexes those sections in a local SQLite FTS5 database plus a managed local Qdrant for dense and sparse vectors, and retrieves compact context packs through the CLI or MCP docs tools. No hosted query API; the only background process is the docmancer-owned Qdrant.
 
-The **MCP runtime** installs version-pinned API packs from a registry with `docmancer install-pack <package>@<version>`, then exposes every installed pack to your agent through a single shared stdio MCP server (`docmancer mcp serve`) using the Tool Search pattern: two meta-tools regardless of how many packs you install. The dispatcher enforces auth, destructive-call gating, schema validation, idempotency-key auto-injection and reuse, version pinning on the wire, and SHA-256 verification of every artifact before install.
+The advanced **Docmancer Packs runtime** installs version-pinned API packs from a registry with `docmancer install-pack <package>@<version>`, then exposes every installed pack to your agent through a single shared stdio MCP server (`docmancer mcp serve`) using the Tool Search pattern: two meta-tools regardless of how many packs you install. The dispatcher enforces auth, destructive-call gating, schema validation, idempotency-key auto-injection and reuse, version pinning on the wire, and SHA-256 verification of every artifact before install.
 
 For the full command reference, see [Commands](./Commands.md). For configuration options, see [Configuration](./Configuration.md).
 
@@ -48,7 +50,15 @@ The output of `docmancer query` is a compact context pack: the top matching sect
 
 This feedback loop makes the compression value visible on every query.
 
-## MCP runtime
+## Docs MCP runtime
+
+`docmancer mcp docs-serve` exposes the docs runtime to coding agents as MCP tools. It uses the same local ingest, index, update, and query path as the CLI, plus a persistent SQLite registry for known documentation sources.
+
+The registry stores source identity separately from versioned entries. A source such as `pub:go_router:api` can have multiple canonical entries such as `pub:go_router@14.8.1:api`, `pub:go_router@16.2.0:api`, or `pub:go_router@latest:api`. Responses expose version metadata including requested version, resolved version, source/confidence, and whether the indexed docs are an exact snapshot.
+
+For project-aware dependency docs, the docs MCP server can inspect project metadata such as Flutter/Dart `.fvmrc` and `pubspec.lock` to choose the documentation version used by the repo.
+
+## Packs MCP runtime
 
 `docmancer install-pack <package>@<version>` downloads the pack's five artifacts (`contract.json`, `tools.curated.json`, `tools.full.json`, `auth.schema.json`, `provenance.json`) plus a `manifest.json` with SHA-256s, verifies every artifact hash, and writes them under `~/.docmancer/servers/<package>@<version>/`. The package is added to `~/.docmancer/mcp/manifest.json` with per-package state (mode = curated/expanded, allow_destructive, allow_execute, enabled).
 

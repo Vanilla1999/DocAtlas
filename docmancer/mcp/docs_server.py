@@ -12,7 +12,7 @@ from docmancer.docs.service import LibraryDocsService
 TOOLS: list[dict[str, Any]] = [
     {
         "name": "resolve_library_id",
-        "description": "Resolve a documentation library from the local registry or explicit docs_url.",
+        "description": "Resolve a documentation library from the local registry or explicit docs_url. Registered sources should be reused instead of direct WebFetch.",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -28,7 +28,7 @@ TOOLS: list[dict[str, Any]] = [
     },
     {
         "name": "get_library_docs",
-        "description": "Ingest or refresh a library if needed, then query its local documentation.",
+        "description": "Resolve from the local registry, ingest or refresh if needed, then query local documentation. If a registered source exists, do not use direct WebFetch; retry with returned candidates/next_actions on ambiguous or needs_input responses.",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -224,13 +224,14 @@ TOOLS: list[dict[str, Any]] = [
     },
     {
         "name": "prefetch_project_docs",
-        "description": "Read a Flutter/Dart project and prefetch docs for selected dependencies.",
+        "description": "Read a Flutter/Dart/Rust project and prefetch docs for selected dependencies.",
         "inputSchema": {
             "type": "object",
             "properties": {
                 "project_path": {"type": "string"},
                 "include_flutter": {"type": ["boolean", "null"]},
                 "include_dart": {"type": ["boolean", "null"]},
+                "include_rust": {"type": ["boolean", "null"]},
                 "include_packages": {"type": ["array", "null"], "items": {"type": "string"}},
                 "force_refresh": {"type": ["boolean", "null"]},
                 "continue_on_error": {"type": ["boolean", "null"]},
@@ -438,6 +439,11 @@ async def _run_async(service: LibraryDocsService) -> None:
                                 else True
                             ),
                             include_dart=bool(args.get("include_dart") or False),
+                            include_rust=bool(
+                                args.get("include_rust")
+                                if args.get("include_rust") is not None
+                                else True
+                            ),
                             include_packages=args.get("include_packages") or [],
                             force_refresh=bool(args.get("force_refresh") or False),
                             continue_on_error=bool(

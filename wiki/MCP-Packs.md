@@ -1,5 +1,7 @@
 # MCP Packs
 
+MCP Packs are Docmancer's advanced product layer. If your goal is source-grounded answers from documentation, start with Docmancer Docs: `docmancer ingest`, `docmancer add`, `docmancer query`, or `docmancer mcp docs-serve`. Use Packs when an agent needs version-pinned API action tools.
+
 MCP packs are version-pinned tool bundles compiled from public API documentation sources such as OpenAPI, GraphQL introspection, TypeDoc, and Sphinx. Installed packs are exposed to agents through one local stdio server, `docmancer mcp serve`, using two meta-tools:
 
 - `docmancer_search_tools(query, package?, limit?)` searches across enabled packs and returns the best matching tool with its input schema.

@@ -1,3 +1,4 @@
+import json
 import os
 from pathlib import Path
 from unittest.mock import MagicMock, patch
@@ -304,6 +305,40 @@ def test_query_json_output():
 
     assert result.exit_code == 0
     assert '"savings_percent": 80' in result.output
+
+
+def test_query_writes_explain_json(tmp_path):
+    fake_config = MagicMock()
+    fake_config.query.default_budget = 1200
+    fake_agent = MagicMock()
+    fake_agent.query.return_value = [
+        MagicMock(
+            model_dump=lambda: {"source": "doc.md", "text": "result"},
+            text="result",
+            score=1.0,
+            source="doc.md",
+            metadata={
+                "title": "Auth",
+                "section_id": 42,
+                "token_estimate": 10,
+                "docmancer_tokens": 10,
+                "raw_tokens": 50,
+                "savings_percent": 80,
+                "runway_multiplier": 5,
+            },
+        )
+    ]
+    trace_path = tmp_path / "trace.json"
+    with patch("docmancer.cli.commands._load_config", return_value=fake_config), \
+         patch("docmancer.cli.commands._get_agent_class", return_value=lambda config: fake_agent):
+        result = CliRunner().invoke(cli, ["query", "Auth tokens", "--explain-json", str(trace_path)])
+
+    assert result.exit_code == 0, result.output
+    trace = json.loads(trace_path.read_text())
+    assert trace["schema_version"] == 1
+    assert trace["query_normalization"]["normalized"] == "auth tokens"
+    assert trace["selected_mode"] == "lexical"
+    assert trace["packing"]["docmancer_tokens"] == 10
 
 
 def test_display_path_shortens_home_and_cwd(tmp_path):
