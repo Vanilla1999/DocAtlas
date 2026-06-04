@@ -366,6 +366,26 @@ def test_doctor_runs():
     assert "Local loaders" in result.output
 
 
+def test_doctor_json_and_list_checks():
+    fake_config = MagicMock()
+    fake_config.index.db_path = "/tmp/docmancer.db"
+    fake_agent = MagicMock()
+    fake_agent.collection_stats.return_value = {"sources_count": 0, "sections_count": 0, "extracted_dir": "/tmp/extracted"}
+    with patch("docmancer.cli.commands._load_config", return_value=fake_config), \
+         patch("docmancer.cli.commands._get_agent_class", return_value=lambda config: fake_agent):
+        result = CliRunner().invoke(cli, ["doctor", "--json", "--check", "sources"])
+
+    assert result.exit_code == 0, result.output
+    payload = json.loads(result.output)
+    assert payload["profile"] == "cli-docs"
+    assert all(check["group"] == "sources" for check in payload["checks"])
+    assert payload["issues"][0]["fix_command"] == "docmancer ingest ./docs"
+
+    checks = CliRunner().invoke(cli, ["doctor", "--list-checks"])
+    assert checks.exit_code == 0
+    assert "mcp-docs" in checks.output
+
+
 def test_inspect_shows_sections_by_format():
     fake_config = MagicMock()
     fake_config.index.db_path = "/tmp/docmancer.db"

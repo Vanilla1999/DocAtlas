@@ -18,7 +18,7 @@ from filelock import FileLock
 
 from docmancer.agent import DocmancerAgent
 from docmancer.core.config import DocmancerConfig
-from docmancer.docs.models import DocsChunk, DocsInspectResult, DocsJob, DocsJobCancelResult, DocsJobStartResult, DocsManifestValidationResult, DocsPruneResult, DocsRemoveResult, DocsResult, DocsTarget, DocsTargetResult, DocsTargetsPrefetchResult, LibraryInfo, ProjectMetadata, ProjectPrefetchResult, RefreshResult
+from docmancer.docs.models import DocsChunk, DocsInspectResult, DocsJob, DocsJobCancelResult, DocsJobStartResult, DocsManifestValidationResult, DocsPruneResult, DocsRemoveResult, DocsResult, DocsSourceResolution, DocsTarget, DocsTargetResult, DocsTargetsPrefetchResult, LibraryInfo, ProjectMetadata, ProjectPrefetchResult, RefreshResult
 from docmancer.docs.project import ProjectMetadataReader
 from docmancer.docs.registry import LibraryRecord, LibraryRegistry
 from docmancer.docs.resolver import canonical_library_id, normalize_library_name, normalize_version
@@ -288,14 +288,43 @@ class LibraryDocsService:
             )
         if docs_url is None and docs_url_template and normalized_version:
             docs_url = self._render_docs_url(docs_url_template, library, normalized_version)
-        if docs_url and docs_url != record.docs_url:
+        input_resolved_url = docs_url or (
+            self._render_docs_url(docs_url_template, library, normalized_version)
+            if docs_url_template and normalized_version
+            else None
+        )
+        if input_resolved_url and record.docs_url_resolved and input_resolved_url != record.docs_url_resolved:
+            return LibraryInfo(
+                library_id=record.library_id,
+                source_id=record.source_id,
+                canonical_id=record.canonical_id,
+                library=record.name,
+                ecosystem=record.ecosystem,
+                version=record.version,
+                source_type=record.source_type,
+                docs_url=record.docs_url,
+                docs_url_template=record.docs_url_template,
+                docs_url_resolved=record.docs_url_resolved,
+                docs_snapshot_exact=record.docs_snapshot_exact,
+                requested_version=record.requested_version,
+                resolved_version=record.resolved_version,
+                version_source=record.version_source,
+                version_confidence=record.version_confidence,
+                version_inferred=record.version_inferred,
+                status="docs_url_conflict",
+                local=record.last_refreshed_at is not None,
+                stale=self._is_stale(record.last_refreshed_at),
+                last_refreshed_at=record.last_refreshed_at,
+                message="Input docs_url conflicts with the registered docs locator. Use the registered source or explicitly refresh/re-register it.",
+            )
+        if input_resolved_url and not record.docs_url_resolved:
             record = self.registry.upsert(
                 library=record.name,
                 ecosystem=record.ecosystem,
                 version=record.version,
                 docs_url=docs_url,
                 docs_url_template=docs_url_template,
-                source_type=source_type,
+                source_type=record.source_type,
                 now=self._now(),
                 status="available",
                 requested_version=record.requested_version,
@@ -303,6 +332,7 @@ class LibraryDocsService:
                 version_source=record.version_source,
                 version_confidence=record.version_confidence,
                 version_inferred=record.version_inferred,
+                docs_snapshot_exact=record.docs_snapshot_exact,
             )
         stale = self._is_stale(record.last_refreshed_at)
         return LibraryInfo(
@@ -387,6 +417,46 @@ class LibraryDocsService:
         if info.library_id is None:
             return None
         return self.registry.get(info.library_id, None, source_type=info.source_type)
+
+    def _resolve_docs_source(
+        self,
+        library: str,
+        ecosystem: str | None,
+        version: str | None,
+        docs_url: str | None,
+        docs_url_template: str | None,
+        source_type: str | None,
+        *,
+        input_docs_url: str | None = None,
+        input_docs_url_template: str | None = None,
+    ) -> DocsSourceResolution:
+        """Resolve the effective source before asking the caller for docs_url.
+
+        Registered sources own their stored locator. That lets
+        get_library_docs(library, topic) use a unique existing docs_url without
+        forcing the caller to remember it, while unknown sources still produce a
+        genuine needs_docs_url response.
+        """
+        info = self.resolve_library(library, ecosystem, version, docs_url, docs_url_template, source_type)
+        docs_url_source = (
+            "input"
+            if input_docs_url or input_docs_url_template
+            else ("registry" if info.library_id and (info.docs_url or info.docs_url_template) else None)
+        )
+        diagnostics: dict[str, Any] = {
+            "resolver": {
+                "status": info.status,
+                "selected_by": "registry" if docs_url_source == "registry" else docs_url_source,
+                "stored_locator": info.docs_url or info.docs_url_template,
+                "candidate_count": len(info.candidates),
+            }
+        }
+        return DocsSourceResolution(
+            info=info,
+            docs_url_source=docs_url_source,
+            has_registered_source=info.library_id is not None or info.status == "ambiguous",
+            diagnostics=diagnostics,
+        )
 
     @staticmethod
     def _render_docs_url(template: str, library: str, version: str) -> str:
@@ -1481,8 +1551,18 @@ class LibraryDocsService:
         if ecosystem is None and self._is_flutter_library(library):
             ecosystem = "flutter"
 
-        info = self.resolve_library(library, ecosystem, version, docs_url, docs_url_template, source_type)
-        docs_url_source = "input" if input_docs_url or input_docs_url_template else ("registry" if info.docs_url or info.docs_url_template else None)
+        resolution = self._resolve_docs_source(
+            library,
+            ecosystem,
+            version,
+            docs_url,
+            docs_url_template,
+            source_type,
+            input_docs_url=input_docs_url,
+            input_docs_url_template=input_docs_url_template,
+        )
+        info = resolution.info
+        docs_url_source = resolution.docs_url_source
         if info.status == "ambiguous":
             warnings = self._join_warnings("ambiguous_library", extra=project_warnings)
             return DocsResult(
@@ -1508,9 +1588,38 @@ class LibraryDocsService:
                 request=self._docs_request(input_args),
                 identity=self._docs_identity(info),
                 policy=self._docs_policy("ambiguous", has_registered_source=True),
-                diagnostics={"warnings": [{"code": "ambiguous_library", "blocking": True}]},
+                diagnostics={**resolution.diagnostics, "warnings": [{"code": "ambiguous_library", "blocking": True}]},
                 next_actions=["Choose one candidate and retry get_library_docs with its arguments_patch."],
                 candidates=info.candidates,
+            )
+        if info.status == "docs_url_conflict":
+            warning = self._join_warnings("docs_url_conflict", extra=project_warnings)
+            return DocsResult(
+                library_id=info.library_id or "",
+                library=info.library,
+                version=info.version,
+                topic=topic,
+                refreshed=False,
+                stale_before_refresh=info.stale,
+                warning=warning,
+                last_refreshed_at=info.last_refreshed_at,
+                source_type=info.source_type,
+                results=[],
+                warnings=[warning] if warning else [],
+                requested_version=requested_version if requested_version is not None else info.requested_version,
+                resolved_version=info.resolved_version or info.version,
+                version_source=version_source if version_source is not None else info.version_source,
+                docs_snapshot_exact=docs_snapshot_exact if docs_snapshot_exact is not None else info.docs_snapshot_exact,
+                docs_exactness=self._docs_exactness(info.docs_snapshot_exact, info.docs_url, info.docs_url_template),
+                docs_binding_source=docs_binding_source or "registry",
+                confidence=info.version_confidence,
+                status="needs_input",
+                decision="retry_same_tool",
+                request=self._docs_request(input_args, info),
+                identity=self._docs_identity(info, docs_url_source="registry"),
+                policy=self._docs_policy("needs_input", has_registered_source=True),
+                diagnostics={**resolution.diagnostics, "warnings": [{"code": "docs_url_conflict", "blocking": True}]},
+                next_actions=["Retry get_library_docs without docs_url to use the registered source, or explicitly refresh/re-register the docs target."],
             )
         if info.library_id is None:
             warning = self._join_warnings("needs_docs_url", extra=project_warnings)
@@ -1537,8 +1646,8 @@ class LibraryDocsService:
                 decision="retry_same_tool",
                 request=self._docs_request(input_args),
                 identity=self._docs_identity(info),
-                policy=self._docs_policy("needs_input", has_registered_source=False),
-                diagnostics={"warnings": [{"code": "needs_docs_url", "blocking": True}]},
+                policy=self._docs_policy("needs_input", has_registered_source=resolution.has_registered_source),
+                diagnostics={**resolution.diagnostics, "warnings": [{"code": "needs_docs_url", "blocking": True}]},
                 next_actions=["Retry get_library_docs with docs_url, or call prefetch_library_docs/prefetch_docs_targets to register this source."],
             )
 
@@ -1623,7 +1732,7 @@ class LibraryDocsService:
                         request=self._docs_request(input_args, info),
                         identity=self._docs_identity(info, docs_url_source=docs_url_source),
                         policy=self._docs_policy("error", has_registered_source=True),
-                        diagnostics={"warnings": diagnostic_warnings},
+                        diagnostics={**resolution.diagnostics, "warnings": diagnostic_warnings},
                         next_actions=["Retry get_library_docs with force_refresh=false if local docs are usable, or refresh/register the source again."],
                     )
 
@@ -1654,7 +1763,7 @@ class LibraryDocsService:
                 request=self._docs_request(input_args, info),
                 identity=self._docs_identity(info, docs_url_source=docs_url_source),
                 policy=self._docs_policy("success", has_registered_source=True),
-                diagnostics={"warnings": diagnostic_warnings},
+                diagnostics={**resolution.diagnostics, "warnings": diagnostic_warnings},
             )
         query = f"{info.library} {topic}".strip() if topic else info.library
         chunks = self._agent_instance(record).query(query, budget=tokens or DEFAULT_DOC_TOKENS)
@@ -1697,7 +1806,7 @@ class LibraryDocsService:
             request=self._docs_request(input_args, info),
             identity=self._docs_identity(info, docs_url_source=docs_url_source),
             policy=self._docs_policy("success", has_registered_source=True),
-            diagnostics={"warnings": diagnostic_warnings},
+            diagnostics={**resolution.diagnostics, "warnings": diagnostic_warnings},
         )
 
     def prefetch_project_docs(

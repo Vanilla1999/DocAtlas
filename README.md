@@ -30,19 +30,35 @@ If `pipx` picks an unsupported interpreter, pin one: `pipx install docmancer --p
 
 ## Quickstart lanes
 
-Pick the lane that matches what you want your agent to do.
+Pick the lane that matches the outcome you want. First success comes before optimization: the default setup path is local-first and works without an API key.
 
-### 1. Local Docs / CLI query
+### 1. Index docs for CLI and coding agents
 
-Three commands take you from a fresh install to a grounded query:
+Fastest first success uses lexical retrieval now, then you can opt into local hybrid later:
 
 ```bash
-docmancer setup                                     # config + database + agent skills
+docmancer setup --profile cli-docs --yes            # config + database, no prompt
 docmancer ingest ./docs                             # index local files
-docmancer query "How do I authenticate?" --explain  # hybrid search across the index
+docmancer query "How do I authenticate?" --explain  # grounded local context
 ```
 
-`setup` creates `~/.docmancer/` with the config and SQLite database, auto-detects installed coding agents, and installs their skill files. On the first `ingest`, docmancer downloads the pinned Qdrant binary (~60 MB) and the FastEmbed models (~500 MB) into `~/.docmancer/`. After that, ingest stays offline.
+`setup` creates `~/.docmancer/` with the config and SQLite database, then prints a readiness summary and the next best command. To connect an agent non-interactively:
+
+```bash
+docmancer setup --profile agent --agent claude-code --yes
+```
+
+Prefer a project-local config and no vector/model downloads during first run?
+
+```bash
+docmancer setup --project-local --offline --vectors off --yes
+```
+
+When you are ready for higher-quality retrieval, switch to local hybrid:
+
+```bash
+docmancer setup --retrieval-profile local-hybrid --yes
+```
 
 Prefer to index a docs site instead of local files?
 
@@ -56,6 +72,7 @@ docmancer query "How do I parametrize a fixture?" --mode hybrid
 Run the docs MCP server when you want an agent to resolve and query registered library docs from inside its normal tool loop:
 
 ```bash
+docmancer setup --profile mcp-docs --yes
 docmancer mcp docs-serve
 ```
 
@@ -96,7 +113,9 @@ Context pack: ~900 tokens vs ~4800 raw docs tokens (81.2% less docs overhead, 5.
 
 **Hybrid search by default.** `query` fans out across SQLite FTS5 (lexical, BM25-reranked), Qdrant dense vectors (FastEmbed `bge-base-en-v1.5`), and SPLADE sparse vectors, then fuses results with Reciprocal Rank Fusion.
 
-**Inspectable.** Every section is written to `~/.docmancer/extracted/` as Markdown plus JSON. `docmancer inspect` shows index stats. `docmancer query --explain` shows which signal (lexical / dense / sparse) placed each result.
+**Inspectable.** Every section is written to `~/.docmancer/extracted/` as Markdown plus JSON. `docmancer list` shows source status, freshness, content counts, vector state, failures, and next actions. `docmancer inspect <source>` shows a source card. `docmancer query --explain` or `--explain-json trace.json` shows why results were selected.
+
+**Actionable diagnostics.** `docmancer doctor` answers “what prevents docs context in this path?” with severity, impact, exact fix command, expected result, restart requirement, and auto-fix availability. Use `docmancer doctor --json`, `--list-checks`, or `--check sources` for automation.
 
 **Agent integration built in.** `docmancer setup` drops skill files for Claude Code, Cursor, Codex, Cline, Claude Desktop, Gemini, GitHub Copilot, and OpenCode. Your agent can call `docmancer query` directly from its conversation loop.
 

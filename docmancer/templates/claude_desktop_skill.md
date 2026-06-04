@@ -19,6 +19,8 @@ Executable: `{{DOCS_KIT_CMD}}`
 4. If URL docs are missing and the user approves the source, run `docmancer add <url>`.
 5. Use returned sections as source-grounded context for the answer or code change.
 
+For MCP docs tools, registered sources are registry-owned. If `get_library_docs` returns candidates or `next_actions`, retry through Docmancer with the returned `arguments_patch`/guidance. Never WebFetch registered docs before that Docmancer retry.
+
 ## Core Commands
 
 - `docmancer setup`: create config, database, and agent integrations.
@@ -52,3 +54,4 @@ Destructive calls are blocked unless the user installed the pack with `--allow-d
 - Do not use `docmancer add` for new local files. Use `docmancer ingest <path>`.
 - Do not use `docmancer ingest` for URLs. Use `docmancer add <url>`.
 - Do not run `docmancer query` before checking indexed sources with `docmancer list`.
+- Do not WebFetch registered docs when Docmancer returns candidates or retry guidance. Retry Docmancer first.

@@ -160,3 +160,30 @@ def test_eval_cli_json_report(tmp_path):
     payload = json.loads(result.output)
     assert payload["metrics"]["hit_at"]["5"] == 1.0
     assert payload["source_health"]["sources_count"] == 1
+
+
+def test_list_and_inspect_operational_state(tmp_path):
+    config = _config(tmp_path)
+    agent = DocmancerAgent(config=config)
+    agent.ingest_documents(
+        [Document(source="docs/auth.md", content="# Auth\n\nAuthenticate with OAuth tokens.", metadata={"format": "markdown"})],
+        recreate=True,
+        with_vectors=False,
+    )
+    config_path = tmp_path / "docmancer.yaml"
+    config_path.write_text(yaml.safe_dump(config.model_dump()))
+
+    list_result = CliRunner().invoke(cli, ["--config", str(config_path), "list", "--format", "json"])
+
+    assert list_result.exit_code == 0, list_result.output
+    cards = json.loads(list_result.output)
+    assert cards[0]["source"] == "docs/auth.md"
+    assert cards[0]["status"] in {"ready", "degraded"}
+    assert "next_action" in cards[0]
+
+    inspect_result = CliRunner().invoke(cli, ["--config", str(config_path), "inspect", "auth.md", "--json"])
+
+    assert inspect_result.exit_code == 0, inspect_result.output
+    card = json.loads(inspect_result.output)
+    assert card["source"] == "docs/auth.md"
+    assert "details" in card

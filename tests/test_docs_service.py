@@ -242,6 +242,13 @@ def test_mcp_exposes_prefetch_library_docs():
     assert "prefetch_library_docs" in {tool["name"] for tool in TOOLS}
 
 
+def test_mcp_get_library_docs_guides_retry_before_webfetch():
+    tool = next(tool for tool in TOOLS if tool["name"] == "get_library_docs")
+
+    assert "Registered sources do not require docs_url" in tool["description"]
+    assert "never WebFetch registered docs before that retry" in tool["description"]
+
+
 def test_mcp_exposes_prefetch_project_docs():
     assert "prefetch_project_docs" in {tool["name"] for tool in TOOLS}
     tool = next(tool for tool in TOOLS if tool["name"] == "prefetch_project_docs")
@@ -627,6 +634,56 @@ def test_registered_web_docs_uses_registry_docs_url(tmp_path, monkeypatch):
     assert result.identity["docs_url_source"] == "registry"
 
 
+def test_registered_web_docs_reports_resolver_diagnostics(tmp_path, monkeypatch):
+    agent = FakeAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+    service.resolve_library("pytest", docs_url="https://docs.pytest.org/")
+
+    result = service.get_docs("pytest", topic="fixtures")
+
+    assert result.diagnostics["resolver"] == {
+        "status": "available",
+        "selected_by": "registry",
+        "stored_locator": "https://docs.pytest.org/",
+        "candidate_count": 0,
+    }
+
+
+def test_registered_web_docs_conflicting_input_url_blocks_without_mutation(tmp_path, monkeypatch):
+    agent = FakeAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+    service.resolve_library("pytest", docs_url="https://docs.pytest.org/")
+
+    result = service.get_docs("pytest", topic="fixtures", docs_url="https://example.com/pytest/")
+
+    assert result.status == "needs_input"
+    assert result.decision == "retry_same_tool"
+    assert result.warning == "docs_url_conflict"
+    assert {"code": "docs_url_conflict", "blocking": True} in result.diagnostics["warnings"]
+    assert result.policy["direct_webfetch"] == "forbidden"
+    assert result.identity["docs_url"] == "https://docs.pytest.org/"
+    assert agent.add_calls == []
+    assert service.registry.get("pytest").docs_url == "https://docs.pytest.org/"
+
+
+def test_registered_docs_without_locator_can_accept_input_url(tmp_path, monkeypatch):
+    agent = FakeAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+    service.registry.upsert(
+        library="pytest",
+        ecosystem=None,
+        docs_url=None,
+        now=datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        status="available",
+    )
+
+    result = service.get_docs("pytest", topic="fixtures", docs_url="https://docs.pytest.org/")
+
+    assert result.status == "success"
+    assert agent.add_calls == ["https://docs.pytest.org/"]
+    assert service.registry.get("pytest").docs_url == "https://docs.pytest.org/"
+
+
 def test_success_response_includes_effective_identity(tmp_path, monkeypatch):
     agent = FakeAgent()
     service = _service(tmp_path, monkeypatch, agent)
@@ -667,6 +724,7 @@ def test_ambiguous_versions_return_candidates(tmp_path, monkeypatch):
         "pub:go_router@16.2.0:api",
     }
     assert result.policy["direct_webfetch"] == "forbidden"
+    assert result.diagnostics["resolver"]["candidate_count"] == 2
     assert agent.add_calls == []
 
 

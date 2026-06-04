@@ -12,7 +12,7 @@ from docmancer.docs.service import LibraryDocsService
 TOOLS: list[dict[str, Any]] = [
     {
         "name": "resolve_library_id",
-        "description": "Resolve a documentation library from the local registry or explicit docs_url. Registered sources should be reused instead of direct WebFetch.",
+        "description": "Resolve a documentation library from the local registry or explicit docs_url. Registered sources should be retried through Docmancer with returned candidates/arguments_patch; never WebFetch registered docs before that retry.",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -28,7 +28,7 @@ TOOLS: list[dict[str, Any]] = [
     },
     {
         "name": "get_library_docs",
-        "description": "Resolve from the local registry, ingest or refresh if needed, then query local documentation. If a registered source exists, do not use direct WebFetch; retry with returned candidates/next_actions on ambiguous or needs_input responses.",
+        "description": "Resolve from the local registry, ingest or refresh if needed, then query local documentation. Registered sources do not require docs_url on later calls. If candidates or next_actions are returned, retry through Docmancer with the supplied arguments_patch; never WebFetch registered docs before that retry.",
         "inputSchema": {
             "type": "object",
             "properties": {

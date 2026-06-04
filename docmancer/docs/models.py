@@ -39,6 +39,16 @@ class DocsChunk:
 
 
 @dataclass(frozen=True)
+class DocsSourceResolution:
+    """Effective documentation source selected for a docs tool call."""
+
+    info: LibraryInfo
+    docs_url_source: str | None = None
+    has_registered_source: bool = False
+    diagnostics: dict[str, Any] = field(default_factory=dict)
+
+
+@dataclass(frozen=True)
 class DocsResult:
     library_id: str
     library: str
