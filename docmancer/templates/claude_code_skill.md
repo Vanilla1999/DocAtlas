@@ -40,6 +40,7 @@ Use the returned `recommended_next_actions`:
 
 - `ingest_project_docs` indexes local project docs; ask briefly unless local indexing was already approved.
 - `get_project_docs` queries indexed project-owned docs and returns source class, file path, heading, and stale/next-action guidance. Use it before WebFetch for repo-specific architecture, implementation, roadmap, ADR, or README questions.
+- `create_reviewable_project_doc` is a manual agent/user action, not hidden memory: if no project docs exist, ask the user before studying the codebase and creating `ARCHITECTURE.md`; then run `inspect_project_docs`, `ingest_project_docs`, and `get_project_docs`.
 - `prefetch_project_docs` fetches exact dependency docs from manifests/lockfiles; ask before running because it may use the network.
 - Do not write official architecture or ADR into hidden memory. Official project docs should remain files in the repo.
 

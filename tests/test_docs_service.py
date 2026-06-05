@@ -568,6 +568,23 @@ def test_ingest_project_docs_no_candidates_returns_no_project_docs(tmp_path, mon
     assert "No project-owned docs candidates" in (result.message or "")
 
 
+def test_inspect_project_docs_recommends_architecture_bootstrap_when_no_docs(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+
+    result = service.inspect_project_docs(str(project))
+
+    action = result.recommended_next_actions[-1]
+    assert action["action"] == "create_reviewable_project_doc"
+    assert action["requires_confirmation"] is True
+    assert action["preferred_path"] == "ARCHITECTURE.md"
+    assert "ARCHITECTURE.md" in action["suggested_paths"]
+    assert action["after"][0]["tool"] == "inspect_project_docs"
+    assert action["after"][1]["tool"] == "ingest_project_docs"
+    assert action["after"][2]["tool"] == "get_project_docs"
+    assert "reviewable ARCHITECTURE.md" in (result.agent_guidance or "")
+
+
 def test_query_project_docs_filters_by_project_path_and_source_class(tmp_path, monkeypatch):
     (tmp_path / "a").mkdir()
     (tmp_path / "b").mkdir()
@@ -687,7 +704,38 @@ def test_get_project_docs_returns_no_project_docs_next_action(tmp_path, monkeypa
     assert result.reason == "no_project_docs"
     assert result.results == []
     assert result.candidate_sources == []
-    assert result.next_actions[0]["tool"] == "inspect_project_docs"
+    assert result.next_actions[0]["action"] == "create_reviewable_project_doc"
+    assert result.next_actions[0]["preferred_path"] == "ARCHITECTURE.md"
+    assert result.next_actions[0]["requires_confirmation"] is True
+    assert result.next_actions[0]["after"][0]["tool"] == "inspect_project_docs"
+    assert result.next_actions[0]["after"][1]["tool"] == "ingest_project_docs"
+    assert "ARCHITECTURE.md" in (result.message or "")
+
+
+def test_architecture_bootstrap_file_is_discovered_indexed_and_queryable(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+
+    empty = service.inspect_project_docs(str(project))
+    assert empty.candidate_sources == []
+    assert empty.recommended_next_actions[-1]["preferred_path"] == "ARCHITECTURE.md"
+
+    (project / "ARCHITECTURE.md").write_text(
+        "# Architecture\n\nBootstrapArchitectureAnswer uses repository-local reviewable docs.",
+        encoding="utf-8",
+    )
+    discovered = service.inspect_project_docs(str(project))
+    assert discovered.candidate_sources[0]["path"] == "ARCHITECTURE.md"
+    assert discovered.candidate_sources[0]["reason"] == "architecture"
+
+    ingest = service.ingest_project_docs(str(project), with_vectors=False)
+    assert ingest.status == "success"
+    assert ingest.indexed_sources[0]["path"] == "ARCHITECTURE.md"
+
+    answer = service.get_project_docs(str(project), "BootstrapArchitectureAnswer", tokens=1200, limit=3)
+    assert answer.status == "success"
+    assert answer.results[0].path == "ARCHITECTURE.md"
+    assert "BootstrapArchitectureAnswer" in answer.results[0].content
 
 
 def test_project_reader_emits_normalized_pub_dependency_observations(tmp_path):

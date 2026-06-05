@@ -524,6 +524,37 @@ class LibraryDocsService:
                 current.append(merged)
         return current, stale, ignored
 
+    @staticmethod
+    def _create_project_docs_next_action(root: Path, query: str | None = None) -> dict[str, Any]:
+        get_project_docs_args = {"project_path": str(root)}
+        if query:
+            get_project_docs_args["query"] = query
+        return {
+            "action": "create_reviewable_project_doc",
+            "requires_confirmation": True,
+            "preferred_path": "ARCHITECTURE.md",
+            "suggested_paths": ["ARCHITECTURE.md", "README.md", "docs/architecture.md"],
+            "reason": "No official project docs files were discovered. Ask the user before creating a reviewable architecture doc in the repository.",
+            "agent_guidance": "If the user approves, inspect the codebase, create ARCHITECTURE.md as a normal reviewable file, then call inspect_project_docs and ingest_project_docs before answering repo-specific architecture questions.",
+            "after": [
+                {
+                    "tool": "inspect_project_docs",
+                    "requires_confirmation": False,
+                    "arguments_patch": {"project_path": str(root)},
+                },
+                {
+                    "tool": "ingest_project_docs",
+                    "requires_confirmation": False,
+                    "arguments_patch": {"project_path": str(root)},
+                },
+                {
+                    "tool": "get_project_docs",
+                    "requires_confirmation": False,
+                    "arguments_patch": get_project_docs_args,
+                },
+            ],
+        }
+
     def inspect_project_docs(self, project_path: str) -> ProjectDocsInspectResult:
         root = Path(project_path).expanduser().resolve()
         metadata = self.read_project_metadata(str(root))
@@ -553,11 +584,7 @@ class LibraryDocsService:
                 "reason": "Exact dependency versions found in project lockfiles; fetching docs may use network.",
             })
         if not candidate_sources:
-            recommended_next_actions.append({
-                "tool": "create_project_docs_files",
-                "requires_confirmation": True,
-                "reason": "No official project docs files were discovered. Create reviewable docs files before indexing.",
-            })
+            recommended_next_actions.append(self._create_project_docs_next_action(root))
         project_docs = {
             "found": candidate_sources,
             "indexed": indexed_sources,
@@ -581,7 +608,7 @@ class LibraryDocsService:
             stale_sources=stale_sources,
             ignored_sources=ignored_sources,
             recommended_next_actions=recommended_next_actions,
-            agent_guidance="Call get_project_docs for repo-specific questions after project docs are indexed. If docs are missing or stale, call ingest_project_docs first. Ask before network dependency docs fetches.",
+            agent_guidance="Call get_project_docs for repo-specific questions after project docs are indexed. If docs are missing, ask before creating a reviewable ARCHITECTURE.md, then inspect and ingest it. If docs are stale, call ingest_project_docs first. Ask before network dependency docs fetches.",
             warnings=metadata.warnings,
         )
 
@@ -705,12 +732,10 @@ class LibraryDocsService:
                 answer_available=False,
                 warnings=metadata.warnings,
                 next_actions=[{
-                    "tool": "inspect_project_docs",
-                    "requires_confirmation": False,
-                    "arguments_patch": {"project_path": str(root)},
-                    "reason": "No project-owned docs candidates were discovered for this repository.",
+                    **self._create_project_docs_next_action(root, query),
+                    "reason": "No project-owned docs candidates were discovered for this repository. Create a reviewable architecture doc before indexing.",
                 }],
-                message="No project-owned docs were found. Create reviewable docs files, then run inspect_project_docs and ingest_project_docs.",
+                message="No project-owned docs were found. Ask before creating a reviewable ARCHITECTURE.md, then run inspect_project_docs and ingest_project_docs.",
             )
 
         if not indexed_sources_all:

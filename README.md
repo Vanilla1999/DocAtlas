@@ -180,6 +180,8 @@ Recommended MCP workflow inside a repo:
 2. If project docs are found and local indexing is approved, call `ingest_project_docs` to index only reviewable project-doc candidates. It does not ingest source code, dependency directories, or build outputs.
 3. For repo-specific architecture, implementation, ADR, roadmap, or README questions, call `get_project_docs` before WebFetch. Results include source class, file path, heading path, freshness metadata, and `next_actions` when docs are missing, stale, or not indexed.
 
+If no project docs are found, Docmancer returns a manual `create_reviewable_project_doc` next action with `preferred_path: "ARCHITECTURE.md"`. Ask the user before creating it, have the coding agent study the repo and write `ARCHITECTURE.md` as a normal reviewable file, then run `inspect_project_docs`, `ingest_project_docs`, and `get_project_docs`. Do not store the generated architecture in hidden memory; keep it in the repo so humans can review and edit it.
+
 Example `get_project_docs` response shape:
 
 ```json
