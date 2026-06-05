@@ -228,6 +228,8 @@ class DocmancerAgent:
         recursive: bool = True,
         skip_known: bool = False,
         with_vectors: bool = True,
+        metadata: dict[str, Any] | None = None,
+        metadata_for_file: Callable[[Path], dict[str, Any]] | None = None,
     ) -> int:
         path = Path(path)
         if not path.exists():
@@ -269,6 +271,10 @@ class DocmancerAgent:
                     "content_hash",
                     hashlib.sha256(document.content.encode("utf-8")).hexdigest(),
                 )
+                if metadata:
+                    document.metadata.update(metadata)
+                if metadata_for_file:
+                    document.metadata.update(metadata_for_file(file_path))
                 if skip_known and self.store.has_source_content_hash(
                     document.source,
                     str(document.metadata.get("content_hash") or ""),
@@ -456,12 +462,14 @@ class DocmancerAgent:
         limit: int | None = None,
         budget: int | None = None,
         expand: str | None = None,
+        filters: dict[str, Any] | None = None,
     ) -> list[RetrievedChunk]:
         return self.store.query(
             text,
             limit=limit or self.config.query.default_limit,
             budget=budget or self.config.query.default_budget,
             expand=expand if expand is not None else self.config.query.default_expand,
+            filters=filters,
         )
 
     def query_context(
@@ -473,13 +481,14 @@ class DocmancerAgent:
         limit: int | None = None,
         budget: int | None = None,
         expand: str | None = None,
+        filters: dict[str, Any] | None = None,
     ) -> str:
         """Query the index and return a formatted context string.
 
         Combines :meth:`query` and :func:`~docmancer.context.format_context`
         into a single call for convenience.
         """
-        chunks = self.query(text, limit=limit, budget=budget, expand=expand)
+        chunks = self.query(text, limit=limit, budget=budget, expand=expand, filters=filters)
         from docmancer.context import format_context
 
         return format_context(chunks, style=style, include_sources=include_sources)

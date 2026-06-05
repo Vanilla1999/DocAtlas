@@ -144,6 +144,9 @@ Tools:
 
 - `resolve_library_id`
 - `get_library_docs`
+- `inspect_project_docs`
+- `ingest_project_docs`
+- `get_project_docs`
 - `refresh_library_docs`
 - `prefetch_library_docs`
 - `prefetch_project_docs`
@@ -166,6 +169,36 @@ Pass `docs_url` the first time you ask for an unknown library. After registratio
   "docs_url": "https://docs.pytest.org/"
 }
 ```
+
+### Project docs for coding agents
+
+If you thought Docmancer was only like Context7, this is the extra local-first lane: Docmancer can also give agents the docs this repository actually uses. Project docs stay as reviewable files in your repo (`README`, `docs/`, `wiki/`, `ARCHITECTURE`, ADRs, roadmap, runbooks); Docmancer indexes them locally and returns source-attributed context before an agent falls back to WebFetch or generic hosted docs.
+
+Recommended MCP workflow inside a repo:
+
+1. Call `inspect_project_docs` first. It is read-only and reports discovered project docs, dependency manifests/lockfiles, indexed docs, stale docs, ignored indexed docs, and recommended next actions.
+2. If project docs are found and local indexing is approved, call `ingest_project_docs` to index only reviewable project-doc candidates. It does not ingest source code, dependency directories, or build outputs.
+3. For repo-specific architecture, implementation, ADR, roadmap, or README questions, call `get_project_docs` before WebFetch. Results include source class, file path, heading path, freshness metadata, and `next_actions` when docs are missing, stale, or not indexed.
+
+Example `get_project_docs` response shape:
+
+```json
+{
+  "tool": "get_project_docs",
+  "status": "success",
+  "answer_available": true,
+  "results": [
+    {
+      "source_class": "project_file",
+      "path": "docs/architecture.md",
+      "heading_path": "Architecture > MCP workflow",
+      "stale": false
+    }
+  ]
+}
+```
+
+If `get_project_docs` returns `not_indexed`, `stale`, `no_results`, or `no_project_docs`, follow its `next_actions` instead of guessing or writing official architecture into hidden memory. Official project knowledge should remain files in the repo.
 
 ### Prefetch progress
 

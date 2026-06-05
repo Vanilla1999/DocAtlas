@@ -1,10 +1,18 @@
 # Docmancer: функциональная выжимка и контекст для планирования развития
 
-Цель этого документа — дать сильной модели сжатый, но достаточно полный контекст по текущему состоянию Docmancer, чтобы она могла наметить дальнейший план развития продукта, архитектуры и UX.
+Цель этого документа — дать сильной модели сжатый, но достаточно полный контекст по текущему состоянию Docmancer, чтобы она могла не повторять уже выполненный roadmap, а найти следующий стратегический рычаг развития продукта, архитектуры и UX.
+
+Важно: предыдущий roadmap уже был частично/в значительной степени реализован. Следующий запрос к сильной модели должен быть не “составь roadmap с нуля”, а “сделай gap-analysis текущего Docmancer против Context7 и предложи следующий wedge, который делает Docmancer заметно лучше, а не просто сложнее”.
 
 ## 1. Короткое позиционирование
 
 **Docmancer** — локальный инструмент для превращения документации в компактный, source-grounded контекст для coding agents.
+
+Более точное текущее позиционирование:
+
+> **Docmancer is a local, version-aware docs runtime for coding agents.**
+
+Основной продуктовый слой — **Docmancer Docs**: локальный runtime для документации проекта, приватных docs, публичных docs-сайтов и version-aware library docs. **Docmancer Packs** — advanced слой для version-pinned API action tools; он важен, но не должен быть hero narrative.
 
 Он умеет:
 
@@ -17,6 +25,8 @@
 - отдельно предоставлять MCP runtime для version-pinned API tool packs.
 
 Ключевая идея: **агент тратит контекст на работу с кодом, а не на перечитывание полной документации**.
+
+Ключевое отличие от Context7, которое стоит развивать: Context7 хорошо даёт публичные docs библиотек; Docmancer должен давать агенту docs, которые реально относятся к проекту: local/private project docs + exact/project-aware dependency docs + source/version metadata.
 
 ## 2. Основные пользовательские сценарии
 
@@ -97,6 +107,34 @@ docmancer ingest ./path/to/docs
 - `--recreate`;
 - `--no-vectors`.
 
+### 2.3.1. Project-owned docs: документация самого проекта
+
+Docmancer можно использовать не только для library docs, но и как локальный docs layer для конкретного проекта.
+
+Типичный набор source-of-truth файлов:
+
+- `README.md`;
+- `docs/**/*.md`;
+- `wiki/**/*.md`;
+- `ARCHITECTURE.md` / `docs/Architecture.md`;
+- ADR / roadmap / onboarding / runbooks;
+- generated docs, если они лежат в проекте и reviewable.
+
+Рекомендуемый принцип: **официальная архитектура и проектная документация должны жить как файлы в repo**, потому что это даёт git history, diff, review, blame, rollback и переносимость. Docmancer не должен заменять такие файлы внутренними SQLite-записями; он должен индексировать их и делать удобными для агента.
+
+Правильная схема:
+
+```text
+нейронка/человек создаёт или обновляет docs/Architecture.md
+  -> Docmancer ingest/index
+  -> агент спрашивает через query/MCP
+  -> получает compact grounded context с source attribution
+```
+
+Docmancer-only записи могут быть полезны для временной/local memory: session summaries, investigation notes, приватные заметки пользователя, гипотезы агента. Но архитектура, security model, API contracts, onboarding и ADR почти всегда должны быть version-controlled файлами.
+
+Возможный будущий продуктовый flow: `write_project_doc(..., mode="propose_patch")` или `project docs memory`, где Docmancer помогает создать/обновить файл и сразу переиндексирует его, но не прячет официальный source of truth в базу.
+
 ### 2.4. Agent integration
 
 `docmancer setup` умеет устанавливать skill files / инструкции для агентских окружений.
@@ -129,7 +167,10 @@ docmancer mcp docs-serve
 - `refresh_library_docs`;
 - `prefetch_library_docs`;
 - `prefetch_project_docs`;
+- `prefetch_docs_targets`;
+- `prefetch_docs_manifest`;
 - `list_library_docs`;
+- `inspect_library_docs`;
 - `get_docs_job_status`;
 - `list_docs_jobs`;
 - `cancel_docs_job`.
@@ -141,7 +182,8 @@ Docs server использует тот же локальный ingest/index/que
 - stale docs считаются те, которые никогда не refresh-ились или старше 30 дней;
 - `get_library_docs` refresh-ит stale docs перед query;
 - `force_refresh: true` принудительно refresh-ит даже fresh docs;
-- для unknown library нужно явно передавать `docs_url`; сервер не угадывает URL документации.
+- для unknown library нужно явно передавать `docs_url`; сервер не должен угадывать arbitrary docs URL без источника/registry;
+- registered docs могут query-иться без повторной передачи `docs_url` — stored source locator должен использоваться автоматически.
 
 Пример:
 
@@ -153,7 +195,7 @@ Docs server использует тот же локальный ingest/index/que
 }
 ```
 
-### 2.6. Versioned documentation
+### 2.6. Versioned documentation и registry identity
 
 Docs MCP умеет хранить разные версии одной библиотеки как отдельные entries:
 
@@ -162,6 +204,24 @@ Docs MCP умеет хранить разные версии одной библ
 - `go_router@latest`;
 - `flutter-api@stable`;
 - `flutter-api@main`.
+
+В более строгой текущей модели используются canonical ids вида:
+
+- `pub:go_router@14.8.1:api`;
+- `pub:go_router@16.2.0:api`;
+- `pub:go_router@latest:api`;
+- `flutter:flutter-api@stable:api`;
+- `web:riverpod-guides@latest:guides`.
+
+Responses должны явно показывать:
+
+- `canonical_id`;
+- `source_id` / source identity, если применимо;
+- `requested_version`;
+- `resolved_version`;
+- `docs_snapshot_exact`;
+- source/version confidence;
+- stored docs locator: `docs_url`, `docs_url_template`, `seed_urls`, `allowed_domains`, `path_prefixes`, `doc_format`.
 
 Для prefetch нескольких версий используется:
 
@@ -180,6 +240,8 @@ Docs MCP умеет хранить разные версии одной библ
 - Docmancer читает `.fvmrc` для Flutter hints;
 - читает `pubspec.lock` для exact package versions;
 - explicit `version` всегда приоритетнее project metadata.
+
+Возможный следующий wedge: **Project-aware Docs Autopilot**. Агент не угадывает library id/version/docs URL, а передаёт `project_path`; Docmancer читает lockfile/metadata, выбирает exact dependency docs, prefetch-ит их при необходимости и возвращает answer с source/version exactness. Это может стать главным отличием от Context7: “docs your project actually uses”.
 
 ### 2.7. Dartdoc / Flutter docs support
 
@@ -520,7 +582,7 @@ web_fetch:
 - `plugfox` — 383 страницы с `https://plugfox.dev/`;
 - `flutter-adaptive-responsive` — 90 страниц с `https://docs.flutter.dev/ui/adaptive-responsive`.
 
-Было обнаружено поведенческое UX/API место:
+Было обнаружено поведенческое UX/API место, которое стало одним из главных inputs для roadmap:
 
 - для custom web-sourced libraries `get_library_docs` может вернуть warning `needs_docs_url`, если вызвать его только с `library`, без `docs_url`;
 - при этом library уже может быть в registry, но agent/tool caller не обязательно понимает, что надо повторить вызов с сохранённым `docs_url`;
@@ -528,6 +590,10 @@ web_fetch:
 - желаемое поведение: если docs target зарегистрирован как web source, `get_library_docs` либо сам использует stored `docs_url`, либо agent guidance явно требует сначала resolve/list registry и повторить запрос с `docs_url`, а не идти в WebFetch.
 
 Это важный сигнал для планирования: **MCP docs UX должен минимизировать случаи, где агенту надо знать внутренние нюансы registry/docs_url**.
+
+Судя по текущему состоянию README/тестов/кода, этот roadmap уже был существенно продвинут: появились `inspect_library_docs`, `prefetch_docs_targets`, `prefetch_docs_manifest`, canonical ids, version/exactness metadata, regression tests вокруг `needs_docs_url`, async job progress и richer diagnostics. Поэтому сильной модели не нужно снова советовать “убрать needs_docs_url trap” как основной следующий milestone; теперь нужно проверить, что это действительно стабильно в агентском loop, и найти следующий leverage point.
+
+Новый live product question из обсуждения: **может ли Docmancer быть docs layer не только для libraries, но и для project-owned docs?** Ответ: да, через `ingest`/`query`, но UX пока не выражен так явно, как Context7-style `get_library_docs`. Это может быть важным направлением: сделать project docs first-class для агента, не заменяя файлы в repo.
 
 ## 11. Сильные стороны продукта
 
@@ -541,6 +607,8 @@ web_fetch:
 8. **Agent integrations.** Skills для нескольких популярных agent tools.
 9. **Support for many source types.** Local files, docs sites, GitHub, API specs.
 10. **Good CLI surface.** Команды покрывают setup, ingest, query, update, inspect, doctor, qdrant, mcp.
+11. **Project-owned docs support.** Можно индексировать README/wiki/docs/architecture/ADR конкретного проекта и отвечать по ним как по grounded local knowledge.
+12. **Potential Context7 wedge.** Context7 силён в public library lookup; Docmancer может быть сильнее в комбинации “project docs + exact dependency docs + private/local docs”.
 
 ## 12. Потенциальные слабые места / зоны развития
 
@@ -555,7 +623,7 @@ web_fetch:
 
 ### 12.2. MCP docs server UX
 
-Проблема `needs_docs_url` показывает, что агентский API может быть слишком требовательным к caller-у.
+Историческая проблема `needs_docs_url` показала, что агентский API может быть слишком требовательным к caller-у. Значительная часть remediation уже реализована или запланирована в деталях; следующий риск — не наличие одного warning, а общий MCP flow: понимает ли агент, когда использовать registered docs, когда prefetch, когда inspect, когда query, и когда WebFetch действительно допустим.
 
 Возможные улучшения:
 
@@ -564,6 +632,8 @@ web_fetch:
 - `resolve_library_id` должен возвращать canonical id + stored docs_url + source_type;
 - добавить explicit `inspect_library_docs` в стандартный happy path для agents;
 - сделать fallback policy: never direct WebFetch while registered docs source exists.
+
+Новая формулировка UX цели: агент должен предпочитать Docmancer автоматически, потому что tool descriptions и response shapes ведут его к полезному следующему вызову. Если docs есть локально или могут быть получены из project metadata, агент не должен угадывать URL и не должен уходить в WebFetch до Docmancer retry/inspect.
 
 ### 12.3. Registry / source identity
 
@@ -632,14 +702,66 @@ Generic docs crawling всегда сложен:
 - stale docs dashboard;
 - failed pages report with retry plan.
 
+### 12.8. Project docs UX gap
+
+Сейчас документация самого проекта поддерживается технически через `docmancer ingest ./docs` и `docmancer query`, но продуктово это не выглядит как отдельный Context7-style сценарий.
+
+Проблема: пользователь естественно спрашивает “можно ли сделать доку по проекту?”, а текущий API разделяет:
+
+- `ingest/query` — project-owned docs;
+- `prefetch_project_docs` — dependency docs по lockfile/project metadata;
+- `get_library_docs` — library docs.
+
+Это правильно архитектурно, но может быть неочевидно агенту и пользователю.
+
+Потенциальные улучшения:
+
+- documented lane: “Project-owned docs”;
+- MCP tool или wrapper вида `get_project_docs({ project_path, topic })`;
+- `prefetch_project_docs` переименовать/уточнить как dependency docs, либо добавить отдельный `prefetch_project_dependency_docs` alias;
+- project source profile: README/wiki/docs/ADR/architecture detection;
+- local project memory как secondary layer, но official docs остаются файлами.
+
+Критический продуктовый принцип: **Docmancer не должен превращаться в скрытую CMS для официальной архитектуры проекта**. Он должен индексировать и обслуживать файлы, а для write flows — предлагать patches/files, которые можно review-ить в git.
+
+### 12.9. Context7 comparison gap
+
+Context7 всё ещё может выигрывать по:
+
+- perceived coverage популярных библиотек;
+- простоте mental model: resolve id -> get docs;
+- отсутствию setup/ingest friction;
+- hosted/public docs availability;
+- привычности для агентов и пользователей.
+
+Docmancer не должен пытаться стать hosted clone Context7. Более сильная стратегия — выиграть там, где Context7 структурно слабее:
+
+- private/local docs;
+- project-owned docs;
+- exact project dependency versions;
+- offline/local-first;
+- inspectable extraction;
+- source/version exactness;
+- eval/trace/doctor;
+- ability to combine project architecture + dependency docs in one grounded context.
+
 ## 13. Вопросы для сильной модели при планировании roadmap
+
+Важное изменение framing: не просить сильную модель “придумать roadmap Docmancer” заново. Нужно просить её провести **gap-analysis текущего состояния против Context7** и выбрать следующий leverage point после уже выполненного roadmap.
+
+Рекомендуемый главный вопрос:
+
+> Как сделать Docmancer заметно лучше Context7 для coding agents, сохранив local-first модель и не превращаясь в hosted public docs clone?
+
+Гипотеза, которую нужно проверить: следующий strongest wedge — **Project-aware Docs Autopilot**: Docmancer отвечает не просто по публичной библиотеке, а по docs, которые реально относятся к проекту: project-owned files + exact dependency docs from lockfiles + source/version exactness.
 
 ### Product strategy
 
-1. Что должно быть главным positioning: local docs RAG, Context7 alternative, API MCP packs или all-in-one agent docs runtime?
-2. Нужно ли разделить docs-RAG и API packs в messaging / CLI / docs?
-3. Какой ICP: individual coding-agent users, teams, OSS maintainers, enterprise devtools?
+1. Где Context7 всё ещё явно лучше Docmancer с точки зрения агента/пользователя?
+2. Где Docmancer может стать meaningfully better, а не просто equal?
+3. Должен ли главный positioning быть “Context7 alternative” или “docs your project actually uses”?
 4. Какие 3 use cases должны быть polished до уровня “wow”?
+5. Какие anti-goals нужны, чтобы не размазать фокус?
 
 ### Agent UX
 
@@ -647,6 +769,8 @@ Generic docs crawling всегда сложен:
 2. Как должен выглядеть ideal MCP docs workflow: resolve -> inspect -> query -> cite?
 3. Нужно ли auto-resolve docs_url/version/ecosystem из registry без участия агента?
 4. Как структурировать warnings так, чтобы LLM не ошибалась с remediation?
+5. Нужен ли first-class `get_project_docs({ project_path, topic })`?
+6. Как tool descriptions должны объяснять разницу между project-owned docs, project dependency docs и library docs?
 
 ### Retrieval quality
 
@@ -662,6 +786,8 @@ Generic docs crawling всегда сложен:
 2. Как улучшить Dartdoc / Flutter / pub.dev path?
 3. Нужна ли автоиндексация package docs по `pubspec.lock`, `package.json`, `requirements.txt`, `Cargo.toml`, etc.?
 4. Как лучше обрабатывать multi-page docs с плохой навигацией?
+5. Нужно ли автообнаружение project-owned docs: README, docs, wiki, ADR, architecture?
+6. Как сделать write/update project docs flow безопасным: propose patch to file, then ingest?
 
 ### Versioning
 
@@ -684,9 +810,17 @@ Generic docs crawling всегда сложен:
 3. Как сделать `doctor` actionable enough?
 4. Какой minimal happy path должен быть для нового пользователя за 5 минут?
 
+### Project docs / local memory
+
+1. Должны ли official project docs всегда оставаться файлами в repo?
+2. Есть ли место для local-only Docmancer memory: session summaries, investigation notes, private user notes?
+3. Как объединять official docs + local memory + dependency docs в одном query result без путаницы доверия?
+4. Нужно ли явно маркировать source class: `project_file`, `local_memory`, `dependency_docs`, `public_docs`, `pack_docs`?
+5. Как сделать так, чтобы агент не записывал архитектурные галлюцинации в hidden DB вместо reviewable file?
+
 ## 14. Возможные направления roadmap
 
-Ниже не окончательный план, а направления, которые стоит оценить.
+Ниже не окончательный план, а направления, которые стоит оценить. Первые пункты старого roadmap уже частично/существенно реализованы, поэтому их нужно рассматривать как stabilization/verification, а не как новый главный стратегический milestone.
 
 ### A. Polish MCP docs server до agent-proof UX
 
@@ -702,6 +836,24 @@ Generic docs crawling всегда сложен:
 - Расширить на npm, Python, Rust, Go.
 - Команда вида: `docmancer prefetch-project-docs .`.
 - Auto version pinning и docs_url_template per ecosystem.
+
+Это кандидат на следующий основной wedge, если сильная модель подтвердит, что он лучше конкурирует с Context7: “Docmancer gives agents docs for the dependencies your project actually uses”.
+
+Приоритет экосистем может быть таким:
+
+1. Flutter/Dart/pub.dev — уже есть база, нужно polish/hardening.
+2. Rust/docs.rs — deterministic и хорошо подходит для exact version docs.
+3. Python/PyPI/ReadTheDocs — высокий спрос, но сложнее discovery.
+4. npm — огромный спрос, но messy; лучше после стабилизации identity/discovery.
+
+### B2. Project-owned docs as first-class agent workflow
+
+- Явный quickstart/lane: “Index this project’s docs for your coding agent”.
+- Auto-detect docs candidates: `README.md`, `docs/`, `wiki/`, `ARCHITECTURE.md`, `adr/`, `roadmap/`.
+- `get_project_docs({ project_path, topic })` или аналогичный MCP wrapper поверх local query.
+- `inspect_project_docs({ project_path })`: какие файлы indexed, stale, missing, excluded.
+- `write_project_doc(..., mode="propose_patch")`: если добавлять write flow, он должен создавать reviewable file diff, не hidden DB mutation.
+- Unified query может возвращать source classes: project file, dependency docs, local memory.
 
 ### C. Retrieval quality and evaluation
 
@@ -736,11 +888,21 @@ Generic docs crawling всегда сложен:
   - “Use versioned package docs via MCP”;
   - “Install API tool packs”.
 
+### G. Context7 comparison / coverage strategy
+
+- Не строить hosted query plane как основной путь.
+- Не пытаться вручную покрыть весь npm/Python ecosystem до стабилизации project-aware discovery.
+- Вместо “global hosted registry” развивать local manifests, docs_url templates, ecosystem adapters и user/project-specific prefetch.
+- Минимальная curated registry может быть полезна для demos и popular libraries, но не должна стать главным продуктовым dependency.
+- Coverage success лучше измерять не числом известных библиотек, а долей successful grounded docs sessions в реальных проектах.
+
 ## 15. Самый важный контекст для планирования
 
-Docmancer уже имеет сильную техническую базу: local indexing, hybrid search, source-attributed context packs, MCP integrations, versioned docs, Qdrant lifecycle, safety gates для API tools.
+Docmancer уже имеет сильную техническую базу: local indexing, hybrid search, source-attributed context packs, MCP integrations, versioned docs, registry identity, Qdrant lifecycle, eval/doctor foundations и safety gates для API tools.
 
-Основной риск не в отсутствии возможностей, а в **сложности UX и смешении нескольких мощных поверхностей**. Следующий этап развития, вероятно, должен быть сфокусирован на:
+Основной риск не в отсутствии возможностей, а в **сложности UX и смешении нескольких мощных поверхностей**. Следующий этап развития не должен просто добавлять features. Он должен выбрать wedge, который делает Docmancer очевидно полезнее Context7 в реальном агентском workflow.
+
+Старый roadmap-фокус:
 
 1. agent-proof workflows;
 2. надёжном source/version resolution;
@@ -748,4 +910,106 @@ Docmancer уже имеет сильную техническую базу: loca
 4. простом first-run experience;
 5. ясном product positioning.
 
-Если сильная модель будет строить roadmap, ей стоит просить её не просто “добавить features”, а выбрать стратегический фокус и превратить существующую мощную систему в predictable product для coding agents.
+Этот фокус остаётся важным, но многие части уже реализованы или начаты. Новый planning prompt должен просить сильную модель:
+
+1. оценить текущий Docmancer против Context7;
+2. определить, где Context7 всё ещё выигрывает;
+3. определить, где Docmancer может выиграть структурно;
+4. выбрать один next 30-day milestone;
+5. разложить его на PR sequence;
+6. назвать anti-goals.
+
+Наиболее перспективная гипотеза: **Project-aware Docs Autopilot**.
+
+```text
+Context7 gives agents public library docs.
+Docmancer should give agents the docs this project actually uses:
+  - project-owned docs from repo files;
+  - private/local docs;
+  - exact dependency docs from lockfiles;
+  - source/version exactness;
+  - compact context packs with attribution.
+```
+
+Если сильная модель будет строить дальнейший roadmap, ей стоит просить её не просто “добавить features”, а выбрать стратегический фокус и превратить существующую мощную систему в predictable product для coding agents.
+
+## 16. Рекомендуемый prompt для сильной модели
+
+```text
+You are a senior product + engineering strategist for developer tools and coding-agent infrastructure.
+
+We are building Docmancer.
+
+Current positioning:
+Docmancer is a local, version-aware docs runtime for coding agents. It indexes project docs, private docs, public docs sites, package references, and serves compact source-grounded context packs through CLI and MCP. It is local-first and does not require a hosted query API by default.
+
+The strategic comparison target is Context7:
+- Context7 is very easy for agents: resolve library id, then get library docs.
+- It has strong perceived coverage and low-friction MCP UX.
+- It is good at public library docs lookup.
+- It is less focused on private/local docs, project-owned docs, project-specific dependency versions, offline usage, and source/version exactness.
+
+Docmancer current capabilities:
+- CLI setup, ingest, add, query, list, inspect, doctor, fetch, update, clear.
+- Local project docs ingestion: README, docs, wiki, architecture, ADR, roadmap, private docs.
+- Public docs fetching: GitBook, Mintlify, generic web docs, GitHub, llms.txt/llms-full.txt, sitemap, nav crawl, optional browser fallback.
+- Hybrid retrieval: SQLite FTS5 + dense vectors + sparse vectors + RRF, with explain/explain-json.
+- Local Qdrant lifecycle with sqlite-vec fallback.
+- MCP docs server: resolve_library_id, get_library_docs, refresh_library_docs, prefetch_library_docs, prefetch_project_docs, prefetch_docs_targets, prefetch_docs_manifest, list/inspect library docs, docs jobs.
+- Registry/versioning: canonical ids, requested/resolved version, docs_snapshot_exact, stored docs_url reuse.
+- Flutter/Dart project-aware docs path: .fvmrc and pubspec.lock.
+- Eval/doctor foundations.
+- Advanced Docmancer Packs layer for version-pinned API action tools, but Packs are not the hero product.
+
+Important product principle:
+Official project architecture/docs should remain files in the repo, not hidden records in Docmancer DB. Docmancer should index and serve them. Write flows should propose file patches and then ingest, not silently mutate hidden knowledge.
+
+Previously planned roadmap items included:
+1. Kill needs_docs_url trap.
+2. Stabilize registry/source identity.
+3. Split Docs vs Packs narrative.
+4. Project-aware version resolution.
+5. Retrieval eval and observability.
+6. First-run DX / doctor.
+
+Many of these are now partially or mostly implemented. Do not repeat this roadmap as if starting from zero.
+
+Task:
+Perform a sharp strategic gap analysis of current Docmancer vs Context7 and recommend what to do next.
+
+Focus questions:
+1. Where does Context7 still clearly beat Docmancer from an agent/user perspective?
+2. Where can Docmancer become meaningfully better than Context7, not just equal?
+3. Is Project-aware Docs Autopilot the right next wedge?
+4. Should project-owned docs become a first-class MCP workflow, e.g. get_project_docs({ project_path, topic })?
+5. How should Docmancer combine project-owned docs, local/private memory, and exact dependency docs without confusing trust/source boundaries?
+6. What MCP tool UX changes would make agents prefer Docmancer automatically?
+7. What coverage/registry strategy should Docmancer use without becoming a hosted Context7 clone?
+8. What should we explicitly NOT build yet?
+9. What metrics should decide success?
+10. What is the concrete PR sequence?
+
+Constraints:
+- Keep Docmancer local-first.
+- Do not require hosted query API.
+- Do not make Packs the hero product.
+- Avoid broad schema rewrites unless justified.
+- Prefer small PRs with tests.
+- Optimize for coding agents actually using MCP tools correctly.
+- Optimize for trust: source attribution, version exactness, no silent wrong docs.
+- Optimize for first useful answer.
+- Official project docs should be reviewable files, not hidden DB-only knowledge.
+
+Please return:
+A. One-sentence strategic thesis.
+B. Top 5 gaps vs Context7.
+C. Top 5 unfair advantages Docmancer should lean into.
+D. Recommended next 30-day milestone.
+E. 10 concrete PRs in order.
+F. 3 demo scenarios that would convince users.
+G. MCP tool/API changes, if any.
+H. Registry/coverage strategy.
+I. Evaluation metrics and thresholds.
+J. Risks and anti-goals.
+K. If you had to choose only ONE thing to build next, what is it and why?
+```

@@ -28,7 +28,7 @@ TOOLS: list[dict[str, Any]] = [
     },
     {
         "name": "get_library_docs",
-        "description": "Resolve from the local registry, ingest or refresh if needed, then query local documentation. Registered sources do not require docs_url on later calls. If candidates or next_actions are returned, retry through Docmancer with the supplied arguments_patch; never WebFetch registered docs before that retry.",
+        "description": "Resolve from the local registry, ingest or refresh if needed, then query local documentation. Registered sources do not require docs_url on later calls. If working inside a repository or answering repo-specific architecture/implementation questions, call inspect_project_docs first so Docmancer can discover local project docs and exact dependency metadata. If candidates or next_actions are returned, retry through Docmancer with the supplied arguments_patch; never WebFetch registered docs before that retry.",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -151,6 +151,45 @@ TOOLS: list[dict[str, Any]] = [
     },
 
     {
+        "name": "inspect_project_docs",
+        "description": "Call this first when working inside a repository and the user asks to use Docmancer, asks about project architecture, asks how this repo works, or expects Context7-like docs help. This read-only tool discovers local project docs and exact dependency metadata, then returns recommended next actions.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "project_path": {"type": "string"},
+            },
+            "required": ["project_path"],
+        },
+    },
+    {
+        "name": "ingest_project_docs",
+        "description": "Index discovered project-owned docs files for a repository. This only ingests reviewable local docs candidates such as README, docs/, wiki/, ARCHITECTURE, ADR, and roadmap; it does not ingest source code, dependency directories, or build outputs. Call inspect_project_docs first to show candidates and get user confirmation if required.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "project_path": {"type": "string"},
+                "skip_known": {"type": ["boolean", "null"]},
+                "with_vectors": {"type": ["boolean", "null"]},
+            },
+            "required": ["project_path"],
+        },
+    },
+    {
+        "name": "get_project_docs",
+        "description": "Query indexed project-owned docs for one repository using project-scoped filters. Use this before WebFetch or generic library docs for repo-specific architecture, conventions, runbooks, ADRs, README, roadmap, or wiki questions. If docs are missing or not indexed, this returns structured next_actions instead of a generic failure.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "project_path": {"type": "string"},
+                "query": {"type": "string"},
+                "tokens": {"type": ["integer", "null"]},
+                "limit": {"type": ["integer", "null"]},
+                "expand": {"type": ["string", "null"]},
+            },
+            "required": ["project_path", "query"],
+        },
+    },
+    {
         "name": "get_docs_job_status",
         "description": "Return persistent progress for one docs indexing/prefetch job.",
         "inputSchema": {
@@ -224,7 +263,7 @@ TOOLS: list[dict[str, Any]] = [
     },
     {
         "name": "prefetch_project_docs",
-        "description": "Read a Flutter/Dart/Rust project and prefetch docs for selected dependencies.",
+        "description": "Read a Flutter/Dart/Rust project and prefetch exact dependency documentation from project manifests/lockfiles. This is for dependency docs, not project-owned README/docs/wiki files; call inspect_project_docs first to discover local project docs. May fetch from the network, so ask for confirmation before running unless the user already approved dependency docs prefetch.",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -376,6 +415,32 @@ async def _run_async(service: LibraryDocsService) -> None:
                                 else True
                             ),
                             async_=bool(args.get("async") or False),
+                        )
+                    ),
+                )
+            if name == "inspect_project_docs":
+                return _json_text(mcp_types, asdict(service.inspect_project_docs(args["project_path"])))
+            if name == "ingest_project_docs":
+                return _json_text(
+                    mcp_types,
+                    asdict(
+                        service.ingest_project_docs(
+                            args["project_path"],
+                            skip_known=bool(args.get("skip_known") if args.get("skip_known") is not None else True),
+                            with_vectors=bool(args.get("with_vectors") if args.get("with_vectors") is not None else True),
+                        )
+                    ),
+                )
+            if name == "get_project_docs":
+                return _json_text(
+                    mcp_types,
+                    asdict(
+                        service.get_project_docs(
+                            args["project_path"],
+                            args["query"],
+                            tokens=args.get("tokens"),
+                            limit=args.get("limit"),
+                            expand=args.get("expand"),
                         )
                     ),
                 )

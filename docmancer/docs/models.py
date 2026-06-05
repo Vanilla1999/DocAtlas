@@ -4,6 +4,18 @@ from dataclasses import dataclass, field
 from typing import Any
 
 
+SOURCE_CLASS_PROJECT_FILE = "project_file"
+SOURCE_CLASS_LOCAL_MEMORY = "local_memory"
+SOURCE_CLASS_DEPENDENCY_DOCS = "dependency_docs"
+SOURCE_CLASS_PUBLIC_DOCS = "public_docs"
+SOURCE_CLASSES = {
+    SOURCE_CLASS_PROJECT_FILE,
+    SOURCE_CLASS_LOCAL_MEMORY,
+    SOURCE_CLASS_DEPENDENCY_DOCS,
+    SOURCE_CLASS_PUBLIC_DOCS,
+}
+
+
 @dataclass(frozen=True)
 class LibraryInfo:
     library_id: str | None
@@ -36,6 +48,16 @@ class DocsChunk:
     content: str
     source: str | None
     url: str | None
+
+
+@dataclass(frozen=True)
+class ProjectDocsChunk(DocsChunk):
+    source_class: str | None = None
+    path: str | None = None
+    heading_path: str | None = None
+    content_hash: str | None = None
+    mtime_ns: int | None = None
+    stale: bool = False
 
 
 @dataclass(frozen=True)
@@ -252,6 +274,16 @@ class DependencyObservation:
 
 
 @dataclass(frozen=True)
+class ProjectDocsCandidate:
+    path: str
+    source_class: str = SOURCE_CLASS_PROJECT_FILE
+    reason: str = "project_docs"
+    size_bytes: int = 0
+    mtime_ns: int | None = None
+    content_hash: str | None = None
+
+
+@dataclass(frozen=True)
 class ProjectMetadata:
     project_path: str
     flutter_version: str | None = None
@@ -260,6 +292,7 @@ class ProjectMetadata:
     packages: dict[str, str] = field(default_factory=dict)
     direct_dependencies: list[str] = field(default_factory=list)
     dependencies: list[DependencyObservation] = field(default_factory=list)
+    docs_candidates: list[ProjectDocsCandidate] = field(default_factory=list)
     detected_ecosystems: list[str] = field(default_factory=list)
     warnings: list[str] = field(default_factory=list)
 
@@ -271,3 +304,48 @@ class ProjectPrefetchResult:
     warnings: list[str] = field(default_factory=list)
     detected_ecosystems: list[str] = field(default_factory=list)
     resolution_summary: dict[str, int] = field(default_factory=dict)
+
+
+@dataclass(frozen=True)
+class ProjectDocsInspectResult:
+    project_detected: bool
+    project_path: str
+    project_type: list[str] = field(default_factory=list)
+    project_docs: dict[str, Any] = field(default_factory=dict)
+    dependency_sources: dict[str, Any] = field(default_factory=dict)
+    candidate_sources: list[dict[str, Any]] = field(default_factory=list)
+    indexed_sources: list[dict[str, Any]] = field(default_factory=list)
+    stale_sources: list[dict[str, Any]] = field(default_factory=list)
+    ignored_sources: list[dict[str, Any]] = field(default_factory=list)
+    recommended_next_actions: list[dict[str, Any]] = field(default_factory=list)
+    agent_guidance: str | None = None
+    warnings: list[str] = field(default_factory=list)
+
+
+@dataclass(frozen=True)
+class ProjectDocsIngestResult:
+    status: str
+    project: ProjectMetadata
+    candidate_count: int = 0
+    indexed_sources: list[dict[str, Any]] = field(default_factory=list)
+    skipped_sources: list[dict[str, Any]] = field(default_factory=list)
+    sections_indexed: int = 0
+    warnings: list[str] = field(default_factory=list)
+    message: str | None = None
+
+
+@dataclass(frozen=True)
+class ProjectDocsResult:
+    project_path: str
+    query: str
+    status: str = "success"
+    tool: str = "get_project_docs"
+    results: list[ProjectDocsChunk] = field(default_factory=list)
+    warnings: list[str] = field(default_factory=list)
+    candidate_sources: list[dict[str, Any]] = field(default_factory=list)
+    indexed_sources: list[dict[str, Any]] = field(default_factory=list)
+    stale_sources: list[dict[str, Any]] = field(default_factory=list)
+    next_actions: list[dict[str, Any]] = field(default_factory=list)
+    answer_available: bool = True
+    reason: str | None = None
+    message: str | None = None

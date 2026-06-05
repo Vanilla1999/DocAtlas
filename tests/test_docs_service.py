@@ -1,14 +1,18 @@
 from __future__ import annotations
 
+from dataclasses import asdict
 from datetime import datetime, timedelta, timezone
+import hashlib
+import json
 from pathlib import Path
 from threading import Event, Thread
 import time
 
 from docmancer.core.config import DocmancerConfig
 from docmancer.core.models import RetrievedChunk
+from docmancer.agent import DocmancerAgent
 from docmancer.docs.dartdoc import discover_pub_dartdoc_seed_urls, normalize_pub_dartdoc_target
-from docmancer.docs.models import DocsTarget
+from docmancer.docs.models import DocsTarget, SOURCE_CLASS_PROJECT_FILE
 from docmancer.docs.project import ProjectMetadataReader
 from docmancer.docs.registry import LibraryRegistry
 from docmancer.docs.service import DocsJobTracker, LibraryDocsService
@@ -159,6 +163,19 @@ def _service(tmp_path, monkeypatch, agent: FakeAgent | None = None) -> LibraryDo
     )
 
 
+def _service_with_real_agent(tmp_path, monkeypatch) -> LibraryDocsService:
+    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
+    config = DocmancerConfig()
+    config.index.db_path = str(tmp_path / "docmancer.db")
+    config.index.extracted_dir = str(tmp_path / "extracted")
+    return LibraryDocsService(
+        config=config,
+        registry=LibraryRegistry(config.index.db_path),
+        agent=DocmancerAgent(config=config),
+        job_tracker=DocsJobTracker(),
+    )
+
+
 def _old_iso(days: int = 31) -> str:
     return (datetime.now(timezone.utc) - timedelta(days=days)).isoformat(timespec="seconds")
 
@@ -246,6 +263,8 @@ def test_mcp_get_library_docs_guides_retry_before_webfetch():
     tool = next(tool for tool in TOOLS if tool["name"] == "get_library_docs")
 
     assert "Registered sources do not require docs_url" in tool["description"]
+    assert "call inspect_project_docs first" in tool["description"]
+    assert "repo-specific architecture" in tool["description"]
     assert "never WebFetch registered docs before that retry" in tool["description"]
 
 
@@ -253,6 +272,9 @@ def test_mcp_exposes_prefetch_project_docs():
     assert "prefetch_project_docs" in {tool["name"] for tool in TOOLS}
     tool = next(tool for tool in TOOLS if tool["name"] == "prefetch_project_docs")
     assert "async" in tool["inputSchema"]["properties"]
+    assert "dependency docs" in tool["description"]
+    assert "not project-owned README/docs/wiki files" in tool["description"]
+    assert "May fetch from the network" in tool["description"]
 
 
 def test_pub_dartdoc_discovery_finds_class_pages():
@@ -306,6 +328,46 @@ def test_mcp_exposes_prefetch_docs_targets():
     assert "prefetch_docs_targets" in {tool["name"] for tool in TOOLS}
 
 
+def test_mcp_exposes_inspect_project_docs_with_discovery_first_guidance():
+    tool = next(tool for tool in TOOLS if tool["name"] == "inspect_project_docs")
+
+    assert "Call this first" in tool["description"]
+    assert "Context7-like" in tool["description"]
+    assert tool["inputSchema"]["required"] == ["project_path"]
+
+
+def test_mcp_exposes_ingest_project_docs():
+    tool = next(tool for tool in TOOLS if tool["name"] == "ingest_project_docs")
+
+    assert "Index discovered project-owned docs files" in tool["description"]
+    assert "does not ingest source code" in tool["description"]
+    assert tool["inputSchema"]["required"] == ["project_path"]
+    assert "skip_known" in tool["inputSchema"]["properties"]
+    assert "with_vectors" in tool["inputSchema"]["properties"]
+
+
+def test_mcp_exposes_get_project_docs_with_project_scoped_guidance():
+    tool = next(tool for tool in TOOLS if tool["name"] == "get_project_docs")
+
+    assert "project-scoped filters" in tool["description"]
+    assert "before WebFetch" in tool["description"]
+    assert "next_actions" in tool["description"]
+    assert tool["inputSchema"]["required"] == ["project_path", "query"]
+
+
+def test_agent_templates_include_project_docs_discovery_guidance():
+    template_dir = Path(__file__).resolve().parents[1] / "docmancer" / "templates"
+
+    for name in ("skill.md", "claude_code_skill.md", "claude_desktop_skill.md"):
+        text = (template_dir / name).read_text(encoding="utf-8")
+        assert "Project Docs Discovery with MCP" in text
+        assert "inspect_project_docs(project_path=\".\")" in text
+        assert "expects Context7-like help" in text
+        assert "prefetch_project_docs` fetches exact dependency docs" in text
+        assert "Official project docs should remain files in the repo" in text
+        assert "Do not skip `inspect_project_docs`" in text
+
+
 def test_mcp_exposes_docs_job_tools():
     names = {tool["name"] for tool in TOOLS}
     assert "get_docs_job_status" in names
@@ -333,6 +395,299 @@ def test_project_reader_reads_pubspec_lock_versions(tmp_path):
 
     assert metadata.packages["go_router"] == "14.8.1"
     assert metadata.packages["riverpod"] == "2.6.1"
+
+
+def test_project_reader_discovers_project_owned_docs(tmp_path):
+    project = _flutter_project(tmp_path)
+    (project / "README.md").write_text("# App", encoding="utf-8")
+    (project / "ARCHITECTURE.md").write_text("# Architecture", encoding="utf-8")
+    (project / "docs").mkdir()
+    (project / "docs" / "testing.md").write_text("# Testing", encoding="utf-8")
+    (project / "wiki").mkdir()
+    (project / "wiki" / "Architecture.md").write_text("# Wiki architecture", encoding="utf-8")
+    (project / "adr").mkdir()
+    (project / "adr" / "0001-record.md").write_text("# ADR", encoding="utf-8")
+    (project / "roadmap").mkdir()
+    (project / "roadmap" / "08.md").write_text("# Roadmap", encoding="utf-8")
+    (project / "lib").mkdir()
+    (project / "lib" / "main.md").write_text("# Source adjacent docs should not be default", encoding="utf-8")
+
+    metadata = ProjectMetadataReader().read(project)
+
+    by_path = {candidate.path: candidate for candidate in metadata.docs_candidates}
+    assert by_path["README.md"].reason == "root_readme"
+    assert by_path["ARCHITECTURE.md"].reason == "architecture"
+    assert by_path["docs/testing.md"].reason == "docs_dir"
+    assert by_path["wiki/Architecture.md"].reason == "architecture"
+    assert by_path["adr/0001-record.md"].reason == "adr"
+    assert by_path["roadmap/08.md"].reason == "roadmap"
+    assert "lib/main.md" not in by_path
+    assert all(candidate.source_class == "project_file" for candidate in metadata.docs_candidates)
+
+
+def test_project_reader_excludes_dependency_and_build_dirs_from_docs(tmp_path):
+    project = _flutter_project(tmp_path)
+    (project / "README.md").write_text("# App", encoding="utf-8")
+    for directory in ("node_modules", ".venv", "build", ".git"):
+        nested = project / directory / "docs"
+        nested.mkdir(parents=True)
+        (nested / "README.md").write_text("# Hidden", encoding="utf-8")
+
+    metadata = ProjectMetadataReader().read(project)
+
+    paths = {candidate.path for candidate in metadata.docs_candidates}
+    assert paths == {"README.md"}
+
+
+def test_project_docs_candidate_has_stable_serializable_shape_and_freshness(tmp_path):
+    project = _flutter_project(tmp_path)
+    body = "# App\n"
+    (project / "README.md").write_text(body, encoding="utf-8")
+
+    metadata = ProjectMetadataReader().read(project)
+
+    candidate = next(item for item in metadata.docs_candidates if item.path == "README.md")
+    assert candidate.source_class == SOURCE_CLASS_PROJECT_FILE
+    assert candidate.size_bytes == len(body.encode("utf-8"))
+    assert candidate.mtime_ns is not None
+    assert candidate.content_hash == f"sha256:{hashlib.sha256(body.encode('utf-8')).hexdigest()}"
+    assert asdict(candidate) == {
+        "path": "README.md",
+        "source_class": "project_file",
+        "reason": "root_readme",
+        "size_bytes": len(body.encode("utf-8")),
+        "mtime_ns": candidate.mtime_ns,
+        "content_hash": candidate.content_hash,
+    }
+
+
+def test_inspect_project_docs_returns_candidates_dependency_sources_and_next_actions(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    (project / "README.md").write_text("# App", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+
+    result = service.inspect_project_docs(str(project))
+
+    assert result.project_detected is True
+    assert result.project_path == str(project.resolve())
+    assert "flutter" in result.project_type
+    assert result.project_docs["found"][0]["path"] == "README.md"
+    assert result.candidate_sources == result.project_docs["found"]
+    assert result.project_docs["indexed"] == []
+    assert result.project_docs["stale"] == []
+    assert result.dependency_sources["manifests_found"] == ["pubspec.yaml"]
+    assert result.dependency_sources["lockfiles_found"] == ["pubspec.lock"]
+    assert result.dependency_sources["exact_versions_available"] is True
+    assert result.dependency_sources["network_fetch_required"] is True
+    action_tools = [action["tool"] for action in result.recommended_next_actions]
+    assert action_tools == ["ingest_project_docs", "prefetch_project_docs"]
+    assert result.recommended_next_actions[0]["requires_confirmation"] is False
+    assert result.recommended_next_actions[1]["requires_confirmation"] is True
+    assert "ingest_project_docs" in (result.agent_guidance or "")
+
+
+def test_inspect_project_docs_reports_indexed_and_stale_sources(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    readme = project / "README.md"
+    readme.write_text("# App\n\nOriginal project docs.", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+    service.ingest_project_docs(str(project), with_vectors=False)
+
+    indexed = service.inspect_project_docs(str(project))
+
+    assert indexed.project_docs["indexed"][0]["path"] == "README.md"
+    assert indexed.project_docs["stale"] == []
+    assert indexed.indexed_sources[0]["source_class"] == SOURCE_CLASS_PROJECT_FILE
+
+    readme.write_text("# App\n\nUpdated project docs.", encoding="utf-8")
+    stale = service.inspect_project_docs(str(project))
+
+    assert stale.project_docs["stale"][0]["path"] == "README.md"
+    assert "content_hash_changed" in stale.project_docs["stale"][0]["stale_reasons"]
+    assert stale.recommended_next_actions[0]["tool"] == "ingest_project_docs"
+
+
+def test_ingest_project_docs_indexes_only_discovered_candidates_with_metadata(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    (project / "README.md").write_text("# App\n\nIntro", encoding="utf-8")
+    (project / "docs").mkdir()
+    (project / "docs" / "testing.md").write_text("# Testing\n\nRun tests.", encoding="utf-8")
+    (project / "lib").mkdir()
+    (project / "lib" / "main.md").write_text("# Source docs should be ignored", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+
+    result = service.ingest_project_docs(str(project), with_vectors=False)
+
+    assert result.status == "success"
+    assert result.candidate_count == 2
+    assert result.sections_indexed == 2
+    assert {item["path"] for item in result.indexed_sources} == {"README.md", "docs/testing.md"}
+    assert result.skipped_sources == []
+    assert "Indexed 2 project docs" in (result.message or "")
+
+    with service._agent_instance().store._connect() as conn:
+        rows = conn.execute("SELECT source, metadata_json FROM sources ORDER BY source").fetchall()
+    sources = {Path(row["source"]).relative_to(project).as_posix(): row for row in rows}
+    assert set(sources) == {"README.md", "docs/testing.md"}
+    metadata = json.loads(sources["README.md"]["metadata_json"])
+    assert metadata["source_class"] == "project_file"
+    assert metadata["project_docs"] is True
+    assert metadata["project_path"] == str(project.resolve())
+    assert metadata["project_doc_path"] == "README.md"
+    assert metadata["project_doc_reason"] == "root_readme"
+
+
+def test_ingest_project_docs_is_idempotent_with_skip_known(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    (project / "README.md").write_text("# App\n", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+
+    first = service.ingest_project_docs(str(project), with_vectors=False)
+    second = service.ingest_project_docs(str(project), with_vectors=False)
+
+    assert first.status == "success"
+    assert first.sections_indexed == 1
+    assert second.status == "failed"
+    assert second.sections_indexed == 0
+    assert len(second.skipped_sources) == 1
+    assert second.skipped_sources[0]["exception_type"] == "SkippedKnownFile"
+    with service._agent_instance().store._connect() as conn:
+        assert conn.execute("SELECT COUNT(*) FROM sources").fetchone()[0] == 1
+        assert conn.execute("SELECT COUNT(*) FROM sections").fetchone()[0] == 1
+
+
+def test_ingest_project_docs_no_candidates_returns_no_project_docs(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    service = _service(tmp_path, monkeypatch)
+
+    result = service.ingest_project_docs(str(project), with_vectors=False)
+
+    assert result.status == "no_project_docs"
+    assert result.candidate_count == 0
+    assert result.sections_indexed == 0
+    assert "No project-owned docs candidates" in (result.message or "")
+
+
+def test_query_project_docs_filters_by_project_path_and_source_class(tmp_path, monkeypatch):
+    (tmp_path / "a").mkdir()
+    (tmp_path / "b").mkdir()
+    project_a = _flutter_project(tmp_path / "a")
+    project_b = _flutter_project(tmp_path / "b")
+    (project_a / "README.md").write_text("# Runbook\n\nSharedTopic alpha migration uses blue toggles.", encoding="utf-8")
+    (project_b / "README.md").write_text("# Runbook\n\nSharedTopic beta migration uses red toggles.", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+    service.ingest_project_docs(str(project_a), with_vectors=False)
+    service.ingest_project_docs(str(project_b), with_vectors=False)
+
+    chunks = service.query_project_docs(str(project_a), "SharedTopic migration toggles", tokens=1200, limit=5)
+
+    assert chunks
+    assert all(chunk.metadata["project_path"] == str(project_a.resolve()) for chunk in chunks)
+    assert all(chunk.metadata["source_class"] == SOURCE_CLASS_PROJECT_FILE for chunk in chunks)
+    assert all(chunk.metadata["project_docs"] is True for chunk in chunks)
+    assert any("alpha migration" in chunk.text for chunk in chunks)
+    assert not any("beta migration" in chunk.text for chunk in chunks)
+
+
+def test_project_query_does_not_return_non_project_docs_with_same_terms(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    (project / "README.md").write_text("# Architecture\n\nNeedleTerm project answer lives here.", encoding="utf-8")
+    unrelated = tmp_path / "unrelated.md"
+    unrelated.write_text("# Architecture\n\nNeedleTerm public docs answer should not leak.", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+    service._agent_instance().ingest(unrelated, with_vectors=False)
+    service.ingest_project_docs(str(project), with_vectors=False)
+
+    chunks = service.query_project_docs(str(project), "NeedleTerm Architecture", tokens=1200, limit=5)
+
+    assert chunks
+    assert all(chunk.metadata.get("project_path") == str(project.resolve()) for chunk in chunks)
+    assert any("project answer" in chunk.text for chunk in chunks)
+    assert not any("public docs answer" in chunk.text for chunk in chunks)
+
+
+def test_get_project_docs_returns_scoped_docs_result(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    (project / "README.md").write_text("# Architecture\n\nProjectAnswer uses the local ADR flow.", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+    service.ingest_project_docs(str(project), with_vectors=False)
+
+    result = service.get_project_docs(str(project), "ProjectAnswer ADR", tokens=1200, limit=3)
+
+    assert result.status == "success"
+    assert result.tool == "get_project_docs"
+    assert result.project_path == str(project.resolve())
+    assert result.results
+    assert result.results[0].source is not None
+    assert result.results[0].source_class == SOURCE_CLASS_PROJECT_FILE
+    assert result.results[0].path == "README.md"
+    assert result.results[0].heading_path == "Architecture"
+    assert result.results[0].content_hash is not None
+    assert result.results[0].mtime_ns is not None
+    assert "ProjectAnswer" in result.results[0].content
+    assert result.indexed_sources[0]["path"] == "README.md"
+    assert result.next_actions == []
+
+
+def test_get_project_docs_returns_ingest_next_action_when_candidates_not_indexed(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    (project / "README.md").write_text("# Architecture\n\nProject docs exist but are not indexed.", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+
+    result = service.get_project_docs(str(project), "Architecture", tokens=1200, limit=3)
+
+    assert result.status == "not_indexed"
+    assert result.answer_available is False
+    assert result.reason == "project_docs_not_indexed"
+    assert result.results == []
+    assert result.candidate_sources[0]["path"] == "README.md"
+    assert result.next_actions[0]["tool"] == "ingest_project_docs"
+    assert result.next_actions[0]["arguments_patch"] == {"project_path": str(project.resolve())}
+
+
+def test_get_project_docs_distinguishes_indexed_no_results_from_not_indexed(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    (project / "README.md").write_text("# Architecture\n\nKnown project docs topic.", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+    service.ingest_project_docs(str(project), with_vectors=False)
+
+    result = service.get_project_docs(str(project), "UnrelatedNeedleThatDoesNotExist", tokens=1200, limit=3)
+
+    assert result.status == "no_results"
+    assert result.answer_available is False
+    assert result.reason == "no_project_docs_results"
+    assert result.indexed_sources[0]["path"] == "README.md"
+    assert result.next_actions[0]["tool"] == "inspect_project_docs"
+
+
+def test_get_project_docs_reports_stale_project_docs(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    readme = project / "README.md"
+    readme.write_text("# Architecture\n\nOriginal ProjectStaleAnswer.", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+    service.ingest_project_docs(str(project), with_vectors=False)
+
+    readme.write_text("# Architecture\n\nUpdated ProjectStaleAnswer.", encoding="utf-8")
+    result = service.get_project_docs(str(project), "ProjectStaleAnswer", tokens=1200, limit=3)
+
+    assert result.status == "stale"
+    assert result.reason == "project_docs_stale"
+    assert result.stale_sources[0]["path"] == "README.md"
+    assert result.next_actions[0]["tool"] == "ingest_project_docs"
+
+
+def test_get_project_docs_returns_no_project_docs_next_action(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+
+    result = service.get_project_docs(str(project), "Architecture", tokens=1200, limit=3)
+
+    assert result.status == "no_project_docs"
+    assert result.answer_available is False
+    assert result.reason == "no_project_docs"
+    assert result.results == []
+    assert result.candidate_sources == []
+    assert result.next_actions[0]["tool"] == "inspect_project_docs"
 
 
 def test_project_reader_emits_normalized_pub_dependency_observations(tmp_path):

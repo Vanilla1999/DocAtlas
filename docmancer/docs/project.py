@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import re
 from pathlib import Path
@@ -7,7 +8,51 @@ from typing import Any
 
 import yaml
 
-from docmancer.docs.models import DependencyObservation, ProjectMetadata
+from docmancer.docs.models import DependencyObservation, ProjectDocsCandidate, ProjectMetadata, SOURCE_CLASS_PROJECT_FILE
+
+
+DOC_FILE_EXTENSIONS = {".md", ".mdx", ".rst", ".txt", ".adoc"}
+EXCLUDED_DIR_NAMES = {
+    ".git",
+    ".hg",
+    ".svn",
+    ".dart_tool",
+    ".pytest_cache",
+    ".ruff_cache",
+    ".mypy_cache",
+    ".tox",
+    ".venv",
+    "venv",
+    "env",
+    "node_modules",
+    "build",
+    "dist",
+    "target",
+    ".next",
+    ".turbo",
+    "coverage",
+    "htmlcov",
+    "__pycache__",
+}
+ROOT_DOC_FILES = {
+    "readme": "root_readme",
+    "architecture": "architecture",
+    "arch": "architecture",
+    "changelog": "changelog",
+    "contributing": "contributing",
+    "security": "security",
+    "license": "license",
+}
+DOC_DIRECTORIES = {
+    "docs": "docs_dir",
+    "doc": "docs_dir",
+    "wiki": "wiki",
+    "adr": "adr",
+    "adrs": "adr",
+    "roadmap": "roadmap",
+    "runbooks": "runbook",
+    "runbook": "runbook",
+}
 
 
 class ProjectMetadataReader:
@@ -18,6 +63,7 @@ class ProjectMetadataReader:
         packages, pub_observations = self._read_pubspec_lock(root / "pubspec.lock", warnings)
         direct_dependencies, pub_manifest_observations = self._read_pubspec_yaml(root / "pubspec.yaml", warnings)
         cargo_packages, rust_observations = self._read_cargo(root, warnings)
+        docs_candidates = self.discover_docs(root, warnings)
         all_packages = {**packages, **cargo_packages}
         dependencies = [*pub_observations, *pub_manifest_observations, *rust_observations]
         detected_ecosystems = sorted({item.ecosystem for item in dependencies})
@@ -31,9 +77,120 @@ class ProjectMetadataReader:
             packages=all_packages,
             direct_dependencies=direct_dependencies,
             dependencies=dependencies,
+            docs_candidates=docs_candidates,
             detected_ecosystems=detected_ecosystems,
             warnings=warnings,
         )
+
+    def discover_docs(self, project_path: str | Path, warnings: list[str] | None = None) -> list[ProjectDocsCandidate]:
+        root = Path(project_path).expanduser().resolve()
+        warnings = warnings if warnings is not None else []
+        if not root.exists():
+            warnings.append(f"Project path not found: {root}")
+            return []
+        if not root.is_dir():
+            warnings.append(f"Project path is not a directory: {root}")
+            return []
+
+        candidates: dict[str, ProjectDocsCandidate] = {}
+        for child in sorted(root.iterdir(), key=lambda item: item.name.lower()):
+            if child.name in EXCLUDED_DIR_NAMES:
+                continue
+            if child.is_file() and self._is_root_doc_file(child):
+                self._add_candidate(candidates, root, child, self._root_doc_reason(child))
+            elif child.is_dir() and child.name.lower() in DOC_DIRECTORIES:
+                self._discover_docs_in_dir(candidates, root, child, DOC_DIRECTORIES[child.name.lower()])
+        return sorted(candidates.values(), key=lambda item: item.path)
+
+    def _discover_docs_in_dir(
+        self,
+        candidates: dict[str, ProjectDocsCandidate],
+        root: Path,
+        directory: Path,
+        reason: str,
+    ) -> None:
+        for path in sorted(directory.rglob("*"), key=lambda item: str(item.relative_to(root)).lower()):
+            if self._is_excluded_path(path, root):
+                continue
+            if path.is_file() and self._is_docs_file(path):
+                self._add_candidate(candidates, root, path, self._nested_doc_reason(path, reason))
+
+    def _add_candidate(self, candidates: dict[str, ProjectDocsCandidate], root: Path, path: Path, reason: str) -> None:
+        try:
+            resolved = path.resolve()
+            resolved.relative_to(root)
+        except (OSError, ValueError):
+            return
+        try:
+            relative = path.relative_to(root).as_posix()
+        except ValueError:
+            return
+        if any(part in EXCLUDED_DIR_NAMES for part in Path(relative).parts):
+            return
+        try:
+            stat = path.stat()
+            size_bytes = stat.st_size
+            mtime_ns = stat.st_mtime_ns
+        except OSError:
+            size_bytes = 0
+            mtime_ns = None
+        candidates[relative] = ProjectDocsCandidate(
+            path=relative,
+            source_class=SOURCE_CLASS_PROJECT_FILE,
+            reason=reason,
+            size_bytes=size_bytes,
+            mtime_ns=mtime_ns,
+            content_hash=self._content_hash(path),
+        )
+
+    @staticmethod
+    def _content_hash(path: Path) -> str | None:
+        digest = hashlib.sha256()
+        try:
+            with path.open("rb") as handle:
+                for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+                    digest.update(chunk)
+        except OSError:
+            return None
+        return f"sha256:{digest.hexdigest()}"
+
+    @staticmethod
+    def _is_docs_file(path: Path) -> bool:
+        name = path.name.lower()
+        if name in {"license", "copying"}:
+            return True
+        return path.suffix.lower() in DOC_FILE_EXTENSIONS
+
+    def _is_root_doc_file(self, path: Path) -> bool:
+        if not self._is_docs_file(path):
+            return False
+        stem = path.stem.lower()
+        return stem in ROOT_DOC_FILES or stem.startswith("readme")
+
+    @staticmethod
+    def _root_doc_reason(path: Path) -> str:
+        stem = path.stem.lower()
+        if stem.startswith("readme"):
+            return "root_readme"
+        return ROOT_DOC_FILES.get(stem, "root_doc")
+
+    @staticmethod
+    def _nested_doc_reason(path: Path, fallback: str) -> str:
+        lower_parts = {part.lower() for part in path.parts}
+        stem = path.stem.lower()
+        if stem in {"architecture", "arch"} or "architecture" in lower_parts:
+            return "architecture"
+        if "adr" in lower_parts or "adrs" in lower_parts:
+            return "adr"
+        return fallback
+
+    @staticmethod
+    def _is_excluded_path(path: Path, root: Path) -> bool:
+        try:
+            relative_parts = path.relative_to(root).parts
+        except ValueError:
+            return True
+        return any(part in EXCLUDED_DIR_NAMES for part in relative_parts)
 
     def _read_fvmrc(self, path: Path, warnings: list[str]) -> tuple[str | None, str | None]:
         if not path.exists():

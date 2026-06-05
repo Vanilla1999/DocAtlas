@@ -5,6 +5,7 @@ from datetime import datetime, timedelta, timezone
 from typing import Any
 from ipaddress import ip_address
 from pathlib import Path
+import json
 import shutil
 import threading
 import time
@@ -18,7 +19,7 @@ from filelock import FileLock
 
 from docmancer.agent import DocmancerAgent
 from docmancer.core.config import DocmancerConfig
-from docmancer.docs.models import DocsChunk, DocsInspectResult, DocsJob, DocsJobCancelResult, DocsJobStartResult, DocsManifestValidationResult, DocsPruneResult, DocsRemoveResult, DocsResult, DocsSourceResolution, DocsTarget, DocsTargetResult, DocsTargetsPrefetchResult, LibraryInfo, ProjectMetadata, ProjectPrefetchResult, RefreshResult
+from docmancer.docs.models import DocsChunk, DocsInspectResult, DocsJob, DocsJobCancelResult, DocsJobStartResult, DocsManifestValidationResult, DocsPruneResult, DocsRemoveResult, DocsResult, DocsSourceResolution, DocsTarget, DocsTargetResult, DocsTargetsPrefetchResult, LibraryInfo, ProjectDocsChunk, ProjectDocsIngestResult, ProjectDocsInspectResult, ProjectDocsResult, ProjectMetadata, ProjectPrefetchResult, RefreshResult
 from docmancer.docs.project import ProjectMetadataReader
 from docmancer.docs.registry import LibraryRecord, LibraryRegistry
 from docmancer.docs.resolver import canonical_library_id, normalize_library_name, normalize_version
@@ -464,6 +465,344 @@ class LibraryDocsService:
 
     def read_project_metadata(self, project_path: str) -> ProjectMetadata:
         return self.project_reader.read(project_path)
+
+    def _indexed_project_doc_sources(self, project_path: str) -> list[dict[str, Any]]:
+        root = Path(project_path).expanduser().resolve()
+        agent = self._agent_instance()
+        rows: list[dict[str, Any]] = []
+        with agent.store._connect() as conn:
+            for row in conn.execute(
+                """
+                SELECT source, metadata_json, ingested_at
+                FROM sources
+                WHERE json_extract(metadata_json, '$.project_path') = ?
+                  AND json_extract(metadata_json, '$.source_class') = 'project_file'
+                  AND json_extract(metadata_json, '$.project_docs') = 1
+                ORDER BY source
+                """,
+                (str(root),),
+            ):
+                metadata = json.loads(row["metadata_json"] or "{}")
+                rows.append({
+                    "source": row["source"],
+                    "path": metadata.get("project_doc_path") or metadata.get("source_path"),
+                    "source_class": metadata.get("source_class"),
+                    "content_hash": metadata.get("project_doc_content_hash"),
+                    "mtime_ns": metadata.get("project_doc_mtime_ns"),
+                    "reason": metadata.get("project_doc_reason"),
+                    "ingested_at": row["ingested_at"],
+                })
+        return rows
+
+    @staticmethod
+    def _partition_project_doc_state(
+        candidates: list[dict[str, Any]],
+        indexed_sources: list[dict[str, Any]],
+    ) -> tuple[list[dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]]]:
+        candidate_by_path = {item.get("path"): item for item in candidates if item.get("path")}
+        indexed_by_path = {item.get("path"): item for item in indexed_sources if item.get("path")}
+        current: list[dict[str, Any]] = []
+        stale: list[dict[str, Any]] = []
+        ignored: list[dict[str, Any]] = []
+        for path, indexed in indexed_by_path.items():
+            candidate = candidate_by_path.get(path)
+            if not candidate:
+                ignored.append({**indexed, "stale": True, "reason": "indexed_source_not_discovered"})
+                continue
+            stale_reasons: list[str] = []
+            if candidate.get("content_hash") != indexed.get("content_hash"):
+                stale_reasons.append("content_hash_changed")
+            if candidate.get("mtime_ns") != indexed.get("mtime_ns"):
+                stale_reasons.append("mtime_changed")
+            merged = {**indexed, "candidate": candidate, "stale": bool(stale_reasons)}
+            if stale_reasons:
+                merged["stale_reasons"] = stale_reasons
+                merged["current_content_hash"] = candidate.get("content_hash")
+                merged["current_mtime_ns"] = candidate.get("mtime_ns")
+                stale.append(merged)
+            else:
+                current.append(merged)
+        return current, stale, ignored
+
+    def inspect_project_docs(self, project_path: str) -> ProjectDocsInspectResult:
+        root = Path(project_path).expanduser().resolve()
+        metadata = self.read_project_metadata(str(root))
+        candidate_sources = [asdict(item) for item in metadata.docs_candidates]
+        indexed_sources_all = self._indexed_project_doc_sources(str(root))
+        indexed_sources, stale_sources, ignored_sources = self._partition_project_doc_state(candidate_sources, indexed_sources_all)
+        manifests_found = [name for name in ("pubspec.yaml", "Cargo.toml") if (root / name).exists()]
+        lockfiles_found = [name for name in ("pubspec.lock", "Cargo.lock") if (root / name).exists()]
+        exact_versions_available = any(item.resolved_version for item in metadata.dependencies)
+        recommended_next_actions: list[dict[str, Any]] = []
+        if stale_sources:
+            recommended_next_actions.append({
+                "tool": "ingest_project_docs",
+                "requires_confirmation": False,
+                "reason": "Some indexed project docs are stale; re-index reviewable docs files.",
+            })
+        elif candidate_sources and len(indexed_sources) < len(candidate_sources):
+            recommended_next_actions.append({
+                "tool": "ingest_project_docs",
+                "requires_confirmation": False,
+                "reason": "Project docs found but not indexed.",
+            })
+        if exact_versions_available:
+            recommended_next_actions.append({
+                "tool": "prefetch_project_docs",
+                "requires_confirmation": True,
+                "reason": "Exact dependency versions found in project lockfiles; fetching docs may use network.",
+            })
+        if not candidate_sources:
+            recommended_next_actions.append({
+                "tool": "create_project_docs_files",
+                "requires_confirmation": True,
+                "reason": "No official project docs files were discovered. Create reviewable docs files before indexing.",
+            })
+        project_docs = {
+            "found": candidate_sources,
+            "indexed": indexed_sources,
+            "stale": stale_sources,
+            "ignored": ignored_sources,
+        }
+        dependency_sources = {
+            "manifests_found": manifests_found,
+            "lockfiles_found": lockfiles_found,
+            "exact_versions_available": exact_versions_available,
+            "network_fetch_required": exact_versions_available,
+        }
+        return ProjectDocsInspectResult(
+            project_detected=root.exists() and root.is_dir(),
+            project_path=str(root),
+            project_type=metadata.detected_ecosystems,
+            project_docs=project_docs,
+            dependency_sources=dependency_sources,
+            candidate_sources=candidate_sources,
+            indexed_sources=indexed_sources,
+            stale_sources=stale_sources,
+            ignored_sources=ignored_sources,
+            recommended_next_actions=recommended_next_actions,
+            agent_guidance="Call get_project_docs for repo-specific questions after project docs are indexed. If docs are missing or stale, call ingest_project_docs first. Ask before network dependency docs fetches.",
+            warnings=metadata.warnings,
+        )
+
+    def ingest_project_docs(
+        self,
+        project_path: str,
+        *,
+        skip_known: bool = True,
+        with_vectors: bool = True,
+    ) -> ProjectDocsIngestResult:
+        root = Path(project_path).expanduser().resolve()
+        metadata = self.read_project_metadata(str(root))
+        warnings = list(metadata.warnings)
+        candidates = list(metadata.docs_candidates)
+        if not candidates:
+            return ProjectDocsIngestResult(
+                status="no_project_docs",
+                project=metadata,
+                candidate_count=0,
+                warnings=warnings,
+                message="No project-owned docs candidates were discovered.",
+            )
+
+        candidate_by_abs = {(root / item.path).resolve(): item for item in candidates}
+        include = tuple(item.path for item in candidates)
+
+        def _metadata_for_file(path: Path) -> dict[str, Any]:
+            candidate = candidate_by_abs.get(path.resolve())
+            result: dict[str, Any] = {
+                "project_path": str(root),
+                "source_class": "project_file",
+                "project_docs": True,
+            }
+            if candidate:
+                result.update({
+                    "project_doc_path": candidate.path,
+                    "project_doc_reason": candidate.reason,
+                    "project_doc_content_hash": candidate.content_hash,
+                    "project_doc_mtime_ns": candidate.mtime_ns,
+                })
+            return result
+
+        agent = self._agent_instance()
+        try:
+            sections_indexed = agent.ingest(
+                root,
+                include=include,
+                recursive=True,
+                skip_known=skip_known,
+                with_vectors=with_vectors,
+                metadata={"project_path": str(root), "source_class": "project_file", "project_docs": True},
+                metadata_for_file=_metadata_for_file,
+            )
+        except ValueError as exc:
+            return ProjectDocsIngestResult(
+                status="failed",
+                project=metadata,
+                candidate_count=len(candidates),
+                indexed_sources=[],
+                skipped_sources=getattr(agent, "last_ingest_skips", []),
+                sections_indexed=0,
+                warnings=[*warnings, str(exc)],
+                message=str(exc),
+            )
+
+        return ProjectDocsIngestResult(
+            status="success",
+            project=metadata,
+            candidate_count=len(candidates),
+            indexed_sources=[asdict(item) for item in candidates],
+            skipped_sources=getattr(agent, "last_ingest_skips", []),
+            sections_indexed=sections_indexed,
+            warnings=warnings,
+            message=f"Indexed {len(candidates)} project docs candidate(s).",
+        )
+
+    def query_project_docs(
+        self,
+        project_path: str,
+        query: str,
+        *,
+        tokens: int | None = None,
+        limit: int | None = None,
+        expand: str | None = None,
+        source_class: str = "project_file",
+    ):
+        root = Path(project_path).expanduser().resolve()
+        return self._agent_instance().query(
+            query,
+            limit=limit,
+            budget=tokens or DEFAULT_DOC_TOKENS,
+            expand=expand,
+            filters={
+                "project_path": str(root),
+                "source_class": source_class,
+                "project_docs": True,
+            },
+        )
+
+    def get_project_docs(
+        self,
+        project_path: str,
+        query: str,
+        *,
+        tokens: int | None = None,
+        limit: int | None = None,
+        expand: str | None = None,
+    ) -> ProjectDocsResult:
+        root = Path(project_path).expanduser().resolve()
+        metadata = self.read_project_metadata(str(root))
+        candidate_sources = [asdict(item) for item in metadata.docs_candidates]
+        indexed_sources_all = self._indexed_project_doc_sources(str(root))
+        indexed_sources, stale_sources, ignored_sources = self._partition_project_doc_state(candidate_sources, indexed_sources_all)
+
+        if not candidate_sources:
+            return ProjectDocsResult(
+                project_path=str(root),
+                query=query,
+                status="no_project_docs",
+                reason="no_project_docs",
+                answer_available=False,
+                warnings=metadata.warnings,
+                next_actions=[{
+                    "tool": "inspect_project_docs",
+                    "requires_confirmation": False,
+                    "arguments_patch": {"project_path": str(root)},
+                    "reason": "No project-owned docs candidates were discovered for this repository.",
+                }],
+                message="No project-owned docs were found. Create reviewable docs files, then run inspect_project_docs and ingest_project_docs.",
+            )
+
+        if not indexed_sources_all:
+            return ProjectDocsResult(
+                project_path=str(root),
+                query=query,
+                status="not_indexed",
+                reason="project_docs_not_indexed",
+                answer_available=False,
+                warnings=metadata.warnings,
+                candidate_sources=candidate_sources,
+                next_actions=[{
+                    "tool": "ingest_project_docs",
+                    "requires_confirmation": False,
+                    "arguments_patch": {"project_path": str(root)},
+                    "reason": "Project docs candidates were discovered but have not been indexed.",
+                }],
+                message="Project docs candidates exist but are not indexed. Run ingest_project_docs, then retry get_project_docs.",
+            )
+
+        chunks = self.query_project_docs(str(root), query, tokens=tokens, limit=limit, expand=expand)
+        seen_sources: set[str] = set()
+        result_indexed_sources = []
+        for chunk in chunks:
+            source = chunk.source
+            if source in seen_sources:
+                continue
+            seen_sources.add(source)
+            result_indexed_sources.append({
+                "source": source,
+                "path": (chunk.metadata or {}).get("project_doc_path"),
+                "source_class": (chunk.metadata or {}).get("source_class"),
+                "content_hash": (chunk.metadata or {}).get("project_doc_content_hash"),
+                "mtime_ns": (chunk.metadata or {}).get("project_doc_mtime_ns"),
+            })
+        stale_paths = {item.get("path") for item in stale_sources}
+        results = [
+            ProjectDocsChunk(
+                title=(chunk.metadata or {}).get("title"),
+                content=chunk.text,
+                source=chunk.source,
+                url=None,
+                source_class=(chunk.metadata or {}).get("source_class"),
+                path=(chunk.metadata or {}).get("project_doc_path") or (chunk.metadata or {}).get("source_path"),
+                heading_path=(chunk.metadata or {}).get("anchor") or (chunk.metadata or {}).get("title"),
+                content_hash=(chunk.metadata or {}).get("project_doc_content_hash"),
+                mtime_ns=(chunk.metadata or {}).get("project_doc_mtime_ns"),
+                stale=((chunk.metadata or {}).get("project_doc_path") in stale_paths),
+            )
+            for chunk in chunks
+        ]
+        next_actions: list[dict[str, Any]] = []
+        if stale_sources:
+            next_actions.append({
+                "tool": "ingest_project_docs",
+                "requires_confirmation": False,
+                "arguments_patch": {"project_path": str(root)},
+                "reason": "Some indexed project docs are stale; re-index before relying on repo-specific answers.",
+            })
+        if results:
+            return ProjectDocsResult(
+                project_path=str(root),
+                query=query,
+                status="stale" if stale_sources else "success",
+                reason="project_docs_stale" if stale_sources else None,
+                answer_available=True,
+                results=results,
+                warnings=metadata.warnings,
+                candidate_sources=candidate_sources,
+                indexed_sources=result_indexed_sources or indexed_sources,
+                stale_sources=stale_sources,
+                next_actions=next_actions,
+                message=f"Returned {len(results)} project docs result(s)." + (" Some indexed project docs are stale." if stale_sources else ""),
+            )
+        return ProjectDocsResult(
+            project_path=str(root),
+            query=query,
+            status="stale" if stale_sources else "no_results",
+            reason="project_docs_stale" if stale_sources else "no_project_docs_results",
+            answer_available=False,
+            warnings=metadata.warnings,
+            candidate_sources=candidate_sources,
+            indexed_sources=indexed_sources,
+            stale_sources=stale_sources,
+            next_actions=[{
+                "tool": "ingest_project_docs" if stale_sources else "inspect_project_docs",
+                "requires_confirmation": False,
+                "arguments_patch": {"project_path": str(root)},
+                "reason": "Project docs are stale; re-index and retry." if stale_sources else "Project docs are indexed, but no indexed project docs matched this query. Inspect candidates or refine the query.",
+            }],
+            message="Indexed project docs exist, but no results matched this query." + (" Some indexed docs are stale." if stale_sources else ""),
+        )
 
     @staticmethod
     def _is_flutter_library(library: str) -> bool:
