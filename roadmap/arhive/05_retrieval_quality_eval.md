@@ -155,3 +155,15 @@ Do not add hosted API requirement to default local-first stack.
 - version-policy scorer tests;
 - signature scorer tests;
 - packer support-coverage tests.
+
+## Riverpod benchmark learnings
+
+The first Riverpod Context7-vs-Docmancer eval (`eval/riverpod_golden.yaml`) exposed the next retrieval-quality priorities:
+
+- **source hygiene before ranking**: indexing `https://riverpod.dev` pulled translated mirrors (`/ru/`, `/ja/`, `/zh-Hans/`, etc.) and polluted top-K;
+- **source diversity**: top results often repeat many sections from one source instead of covering distinct relevant pages;
+- **version correctness**: indexing latest `riverpod.dev` did not exercise exact `nbo` Riverpod 2.6.x docs; Pub Dartdoc exact-version ingestion needs hardening;
+- **degradation observability**: `hybrid` eval printed sparse vector failures to stderr, but item `failures` stayed empty;
+- **eval depth**: `required_facts` and `forbidden_versions` are present in schema but not yet scored.
+
+Detailed follow-up PR plan: [`09_riverpod_context7_benchmark_followups.md`](09_riverpod_context7_benchmark_followups.md).

@@ -119,6 +119,67 @@ def test_offline_retrieval_eval_tiny_corpus(tmp_path):
     assert report["metrics"]["mrr"] > 0
 
 
+def test_eval_scores_facts_forbidden_versions_and_diversity(tmp_path):
+    agent = _agent(tmp_path)
+    dataset = tmp_path / "golden.yaml"
+    dataset.write_text(
+        yaml.safe_dump(
+            {
+                "items": [
+                    {
+                        "id": "auth",
+                        "query": "OAuth tokens",
+                        "taxonomy_class": "exact_api_signature",
+                        "expected_sources": ["auth.md"],
+                        "required_facts": ["OAuth tokens"],
+                        "forbidden_versions": ["Riverpod 3.0"],
+                        "forbidden_sources": ["missing.md"],
+                    }
+                ]
+            }
+        )
+    )
+
+    report = run_retrieval_eval(dataset_path=str(dataset), agent=agent, config=agent.config, limit=5)
+    item = report["items"][0]
+
+    assert item["required_facts"] == {"OAuth tokens": True}
+    assert item["required_facts_passed"] is True
+    assert item["forbidden_checks_passed"] is True
+    assert item["token_metrics"]["docmancer_tokens"] > 0
+    assert "unique_sources_at_5" in item["source_diversity"]
+    assert item["locale_contamination"]["locale_contamination_count"] == 0
+
+
+def test_eval_flags_forbidden_versions(tmp_path):
+    config = _config(tmp_path)
+    agent = DocmancerAgent(config=config)
+    agent.ingest_documents(
+        [Document(source="https://riverpod.dev/docs/whats_new", content="# What's new\n\nRiverpod 3.0 changed APIs.", metadata={"format": "markdown"})],
+        recreate=True,
+    )
+    dataset = tmp_path / "golden.yaml"
+    dataset.write_text(
+        yaml.safe_dump(
+            {
+                "items": [
+                    {
+                        "id": "forbidden",
+                        "query": "Riverpod changed APIs",
+                        "taxonomy_class": "migration_version_specific",
+                        "forbidden_versions": ["Riverpod 3.0"],
+                    }
+                ]
+            }
+        )
+    )
+
+    report = run_retrieval_eval(dataset_path=str(dataset), agent=agent, config=config, limit=5)
+
+    assert report["items"][0]["forbidden_checks_passed"] is False
+    assert report["items"][0]["forbidden_version_hits"][0]["versions"] == ["Riverpod 3.0"]
+
+
 def test_source_health_report_counts_sparse_sections(tmp_path):
     agent = _agent(tmp_path)
 

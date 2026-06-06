@@ -100,3 +100,23 @@ Suggested initial targets:
 - no source-code/dependency directories ingested by default project docs discovery;
 - Hit@5 baseline established before optimizing retrieval;
 - 100% of `project_docs_not_indexed` responses include `inspect_project_docs` / `ingest_project_docs` remediation.
+
+## Riverpod dependency-docs benchmark
+
+The Riverpod RiverEval is the first concrete dependency-docs benchmark for the project-aware lane:
+
+- dataset: `eval/riverpod_golden.yaml`;
+- Docmancer output: `eval/results/docmancer_riverpod_results.json`;
+- comparison report: `eval/riverpod_benchmark_report.md`.
+
+Findings relevant to project-aware dependency docs:
+
+- Docmancer was close on public guide retrieval (`Hit@1=0.8`, `MRR=0.8`) but lost to Context7 on corpus cleanliness and snippet presentation.
+- The benchmark did not yet prove the exact-version advantage because it indexed `riverpod.dev` latest, not exact Pub Dartdoc pages for `nbo`'s Riverpod 2.6.x packages.
+- To make Docmancer structurally better than Context7 for Flutter projects, the next iteration must combine:
+  - clean docs ingest (no locale mirrors by default);
+  - exact Pub package docs from `pubspec.lock`;
+  - project-owned docs (`ARCHITECTURE.md`, ADRs, README) in the same answer path;
+  - source-class/version attribution in context packs.
+
+Follow-up roadmap: [`../09_riverpod_context7_benchmark_followups.md`](../09_riverpod_context7_benchmark_followups.md).

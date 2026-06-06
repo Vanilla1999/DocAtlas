@@ -155,3 +155,15 @@ Scope:
 - Explain project-owned docs vs project dependency docs vs library docs.
 - Show official docs as files principle.
 - Tell agents/users to start with `inspect_project_docs` in a repo.
+
+## Follow-up PR lane — Riverpod benchmark hardening
+
+The Riverpod Context7-vs-Docmancer benchmark created a concrete follow-up lane after the project-docs MVP:
+
+1. Clean Docusaurus/web ingest: avoid locale mirror pollution by default and expose path filters.
+2. Add source diversity/MMR in top-K packing.
+3. Harden exact Pub Dartdoc ingestion for project dependencies from `pubspec.lock`.
+4. Report hybrid/sparse degradation in eval JSON instead of stderr-only warnings.
+5. Upgrade eval scoring for `required_facts`, forbidden versions, token metrics, source diversity, and Context7 snapshots.
+
+Detailed plan: [`../09_riverpod_context7_benchmark_followups.md`](../09_riverpod_context7_benchmark_followups.md).

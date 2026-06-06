@@ -1,0 +1,500 @@
+/home/viadmin/.local/share/uv/tools/docmancer/lib/python3.12/site-packages/qdrant_client/qdrant_remote.py:282: UserWarning: Qdrant client version 1.18.0 is incompatible with server version 1.14.1. Major versions should match and minor version difference must not exceed 1. Set check_compatibility=False to skip version check.
+  show_warning(
+retrieval source sparse failed: Unexpected Response: 400 (Bad Request)
+Raw response content:
+b'{"status":{"error":"Wrong input: Vector with name `sparse` is not configured in this collection, available names: dense"},"time":0.000060064}'
+retrieval source sparse failed: Unexpected Response: 400 (Bad Request)
+Raw response content:
+b'{"status":{"error":"Wrong input: Vector with name `sparse` is not configured in this collection, available names: dense"},"time":0.000039649}'
+/home/viadmin/.local/share/uv/tools/docmancer/lib/python3.12/site-packages/qdrant_client/qdrant_remote.py:282: UserWarning: Qdrant client version 1.18.0 is incompatible with server version 1.14.1. Major versions should match and minor version difference must not exceed 1. Set check_compatibility=False to skip version check.
+  show_warning(
+retrieval source sparse failed: Unexpected Response: 400 (Bad Request)
+Raw response content:
+b'{"status":{"error":"Wrong input: Vector with name `sparse` is not configured in this collection, available names: dense"},"time":0.000059575}'
+retrieval source sparse failed: Unexpected Response: 400 (Bad Request)
+Raw response content:
+b'{"status":{"error":"Wrong input: Vector with name `sparse` is not configured in this collection, available names: dense"},"time":0.000056406}'
+/home/viadmin/.local/share/uv/tools/docmancer/lib/python3.12/site-packages/qdrant_client/qdrant_remote.py:282: UserWarning: Qdrant client version 1.18.0 is incompatible with server version 1.14.1. Major versions should match and minor version difference must not exceed 1. Set check_compatibility=False to skip version check.
+  show_warning(
+retrieval source sparse failed: Unexpected Response: 400 (Bad Request)
+Raw response content:
+b'{"status":{"error":"Wrong input: Vector with name `sparse` is not configured in this collection, available names: dense"},"time":0.000030933}'
+retrieval source sparse failed: Unexpected Response: 400 (Bad Request)
+Raw response content:
+b'{"status":{"error":"Wrong input: Vector with name `sparse` is not configured in this collection, available names: dense"},"time":0.000063553}'
+/home/viadmin/.local/share/uv/tools/docmancer/lib/python3.12/site-packages/qdrant_client/qdrant_remote.py:282: UserWarning: Qdrant client version 1.18.0 is incompatible with server version 1.14.1. Major versions should match and minor version difference must not exceed 1. Set check_compatibility=False to skip version check.
+  show_warning(
+retrieval source sparse failed: Unexpected Response: 400 (Bad Request)
+Raw response content:
+b'{"status":{"error":"Wrong input: Vector with name `sparse` is not configured in this collection, available names: dense"},"time":0.000060921}'
+retrieval source sparse failed: Unexpected Response: 400 (Bad Request)
+Raw response content:
+b'{"status":{"error":"Wrong input: Vector with name `sparse` is not configured in this collection, available names: dense"},"time":0.000030277}'
+/home/viadmin/.local/share/uv/tools/docmancer/lib/python3.12/site-packages/qdrant_client/qdrant_remote.py:282: UserWarning: Qdrant client version 1.18.0 is incompatible with server version 1.14.1. Major versions should match and minor version difference must not exceed 1. Set check_compatibility=False to skip version check.
+  show_warning(
+retrieval source sparse failed: Unexpected Response: 400 (Bad Request)
+Raw response content:
+b'{"status":{"error":"Wrong input: Vector with name `sparse` is not configured in this collection, available names: dense"},"time":0.000054436}'
+retrieval source sparse failed: Unexpected Response: 400 (Bad Request)
+Raw response content:
+b'{"status":{"error":"Wrong input: Vector with name `sparse` is not configured in this collection, available names: dense"},"time":0.000041828}'
+{
+  "schema_version": 1,
+  "dataset": "eval/riverpod_golden.yaml",
+  "corpus_snapshot": "riverpod-river-eval-v1",
+  "mode": "hybrid",
+  "metrics": {
+    "queries": 5,
+    "hit_at": {
+      "1": 0.8,
+      "3": 0.8,
+      "5": 0.8,
+      "10": 0.8
+    },
+    "mrr": 0.8,
+    "latency_ms": {
+      "p50": 1101.742816000069,
+      "p95": 1625.3536740000527
+    }
+  },
+  "items": [
+    {
+      "id": "rp_provider_lifecycle",
+      "query": "Riverpod 2.6 autodispose with ref.keepAlive — when does the provider actually get disposed and how do you control its lifetime?",
+      "taxonomy_class": "conceptual_guide",
+      "mode_used": "hybrid/hierarchical",
+      "first_hit_rank": 1,
+      "hit_at_5": true,
+      "latency_ms": 1625.354,
+      "failures": {},
+      "results": [
+        {
+          "rank": 1,
+          "source": "https://riverpod.dev/docs/concepts2/auto_dispose",
+          "title": "Automatic disposal | Riverpod",
+          "section_id": 86,
+          "relevant": true
+        },
+        {
+          "rank": 2,
+          "source": "https://riverpod.dev/docs/whats_new",
+          "title": "What's new in Riverpod 3.0 | Riverpod",
+          "section_id": 295,
+          "relevant": false
+        },
+        {
+          "rank": 3,
+          "source": "https://riverpod.dev/docs/from_provider/motivation",
+          "title": "Motivation | Riverpod",
+          "section_id": 112,
+          "relevant": false
+        },
+        {
+          "rank": 4,
+          "source": "https://riverpod.dev/docs/from_provider/provider_vs_riverpod",
+          "title": "Provider vs Riverpod | Riverpod",
+          "section_id": 207,
+          "relevant": false
+        },
+        {
+          "rank": 5,
+          "source": "https://riverpod.dev/docs/concepts2/auto_dispose",
+          "title": "Automatic disposal | Riverpod",
+          "section_id": 81,
+          "relevant": true
+        },
+        {
+          "rank": 6,
+          "source": "https://riverpod.dev/docs/concepts2/auto_dispose",
+          "title": "Automatic disposal | Riverpod",
+          "section_id": 85,
+          "relevant": true
+        },
+        {
+          "rank": 7,
+          "source": "https://riverpod.dev/docs/concepts2/auto_dispose",
+          "title": "Automatic disposal | Riverpod",
+          "section_id": 87,
+          "relevant": true
+        },
+        {
+          "rank": 8,
+          "source": "https://riverpod.dev/docs/whats_new",
+          "title": "What's new in Riverpod 3.0 | Riverpod",
+          "section_id": 294,
+          "relevant": false
+        },
+        {
+          "rank": 9,
+          "source": "https://riverpod.dev/docs/whats_new",
+          "title": "What's new in Riverpod 3.0 | Riverpod",
+          "section_id": 296,
+          "relevant": false
+        },
+        {
+          "rank": 10,
+          "source": "https://riverpod.dev/docs/from_provider/motivation",
+          "title": "Motivation | Riverpod",
+          "section_id": 111,
+          "relevant": false
+        },
+        {
+          "rank": 11,
+          "source": "https://riverpod.dev/docs/from_provider/motivation",
+          "title": "Motivation | Riverpod",
+          "section_id": 113,
+          "relevant": false
+        },
+        {
+          "rank": 12,
+          "source": "https://riverpod.dev/docs/from_provider/provider_vs_riverpod",
+          "title": "Provider vs Riverpod | Riverpod",
+          "section_id": 206,
+          "relevant": false
+        },
+        {
+          "rank": 13,
+          "source": "https://riverpod.dev/docs/concepts2/auto_dispose",
+          "title": "Automatic disposal | Riverpod",
+          "section_id": 82,
+          "relevant": true
+        }
+      ]
+    },
+    {
+      "id": "rp_family_code_example",
+      "query": "Riverpod family modifier with FutureProvider — show code example with a parameter for fetching user-specific data",
+      "taxonomy_class": "code_example",
+      "mode_used": "hybrid/hierarchical",
+      "first_hit_rank": 1,
+      "hit_at_5": true,
+      "latency_ms": 1302.516,
+      "failures": {},
+      "results": [
+        {
+          "rank": 1,
+          "source": "https://riverpod.dev/docs/concepts2/family",
+          "title": "Family | Riverpod",
+          "section_id": 65,
+          "relevant": true
+        },
+        {
+          "rank": 2,
+          "source": "https://riverpod.dev/docs/concepts2/family",
+          "title": "Family | Riverpod",
+          "section_id": 66,
+          "relevant": true
+        },
+        {
+          "rank": 3,
+          "source": "https://riverpod.dev/docs/concepts2/family",
+          "title": "Family | Riverpod",
+          "section_id": 68,
+          "relevant": true
+        },
+        {
+          "rank": 4,
+          "source": "https://riverpod.dev/docs/concepts2/family",
+          "title": "Family | Riverpod",
+          "section_id": 64,
+          "relevant": true
+        },
+        {
+          "rank": 5,
+          "source": "https://riverpod.dev/ja/docs/whats_new",
+          "title": "What's new in Riverpod 3.0 | Riverpod",
+          "section_id": 779,
+          "relevant": false
+        },
+        {
+          "rank": 6,
+          "source": "https://riverpod.dev/docs/concepts2/family",
+          "title": "Family | Riverpod",
+          "section_id": 67,
+          "relevant": true
+        },
+        {
+          "rank": 7,
+          "source": "https://riverpod.dev/ja/docs/whats_new",
+          "title": "What's new in Riverpod 3.0 | Riverpod",
+          "section_id": 780,
+          "relevant": false
+        }
+      ]
+    },
+    {
+      "id": "rp_notifier_vs_asyncnotifier",
+      "query": "Riverpod Notifier vs AsyncNotifier — what are the API differences and how do you migrate from StateNotifier to Notifier?",
+      "taxonomy_class": "migration_version_specific",
+      "mode_used": "hybrid/hierarchical",
+      "first_hit_rank": 1,
+      "hit_at_5": true,
+      "latency_ms": 1101.743,
+      "failures": {},
+      "results": [
+        {
+          "rank": 1,
+          "source": "https://riverpod.dev/docs/migration/from_state_notifier",
+          "title": "From `StateNotifier` | Riverpod",
+          "section_id": 250,
+          "relevant": true
+        },
+        {
+          "rank": 2,
+          "source": "https://riverpod.dev/docs/migration/from_state_notifier",
+          "title": "From `StateNotifier` | Riverpod",
+          "section_id": 241,
+          "relevant": true
+        },
+        {
+          "rank": 3,
+          "source": "https://riverpod.dev/zh-Hans/docs/migration/from_state_notifier",
+          "title": "从 `StateNotifier` 迁移 | Riverpod",
+          "section_id": 1099,
+          "relevant": false
+        },
+        {
+          "rank": 4,
+          "source": "https://riverpod.dev/docs/migration/from_state_notifier",
+          "title": "From `StateNotifier` | Riverpod",
+          "section_id": 243,
+          "relevant": true
+        },
+        {
+          "rank": 5,
+          "source": "https://riverpod.dev/docs/migration/from_state_notifier",
+          "title": "From `StateNotifier` | Riverpod",
+          "section_id": 251,
+          "relevant": true
+        },
+        {
+          "rank": 6,
+          "source": "https://riverpod.dev/docs/migration/from_state_notifier",
+          "title": "From `StateNotifier` | Riverpod",
+          "section_id": 249,
+          "relevant": true
+        },
+        {
+          "rank": 7,
+          "source": "https://riverpod.dev/docs/migration/from_state_notifier",
+          "title": "From `StateNotifier` | Riverpod",
+          "section_id": 242,
+          "relevant": true
+        },
+        {
+          "rank": 8,
+          "source": "https://riverpod.dev/zh-Hans/docs/migration/from_state_notifier",
+          "title": "从 `StateNotifier` 迁移 | Riverpod",
+          "section_id": 1100,
+          "relevant": false
+        },
+        {
+          "rank": 9,
+          "source": "https://riverpod.dev/docs/migration/from_state_notifier",
+          "title": "From `StateNotifier` | Riverpod",
+          "section_id": 244,
+          "relevant": true
+        },
+        {
+          "rank": 10,
+          "source": "https://riverpod.dev/docs/migration/from_state_notifier",
+          "title": "From `StateNotifier` | Riverpod",
+          "section_id": 252,
+          "relevant": true
+        }
+      ]
+    },
+    {
+      "id": "rp_ref_watch_listen",
+      "query": "Riverpod 2.6 ref.watch vs ref.listen — what are the lifecycle differences and when should you use each pattern?",
+      "taxonomy_class": "conceptual_guide",
+      "mode_used": "hybrid/hierarchical",
+      "first_hit_rank": null,
+      "hit_at_5": false,
+      "latency_ms": 1034.225,
+      "failures": {},
+      "results": [
+        {
+          "rank": 1,
+          "source": "https://riverpod.dev/docs/from_provider/provider_vs_riverpod",
+          "title": "Provider vs Riverpod | Riverpod",
+          "section_id": 200,
+          "relevant": false
+        },
+        {
+          "rank": 2,
+          "source": "https://riverpod.dev/ru/docs/whats_new",
+          "title": "What's new in Riverpod 3.0 | Riverpod",
+          "section_id": 966,
+          "relevant": false
+        },
+        {
+          "rank": 3,
+          "source": "https://riverpod.dev/docs/migration/from_state_notifier",
+          "title": "From `StateNotifier` | Riverpod",
+          "section_id": 247,
+          "relevant": false
+        },
+        {
+          "rank": 4,
+          "source": "https://riverpod.dev/es/docs/whats_new",
+          "title": "What's new in Riverpod 3.0 | Riverpod",
+          "section_id": 555,
+          "relevant": false
+        },
+        {
+          "rank": 5,
+          "source": "https://riverpod.dev/docs/concepts2/observers",
+          "title": "ProviderObservers | Riverpod",
+          "section_id": 78,
+          "relevant": false
+        },
+        {
+          "rank": 6,
+          "source": "https://riverpod.dev/docs/from_provider/provider_vs_riverpod",
+          "title": "Provider vs Riverpod | Riverpod",
+          "section_id": 201,
+          "relevant": false
+        },
+        {
+          "rank": 7,
+          "source": "https://riverpod.dev/ru/docs/whats_new",
+          "title": "What's new in Riverpod 3.0 | Riverpod",
+          "section_id": 965,
+          "relevant": false
+        },
+        {
+          "rank": 8,
+          "source": "https://riverpod.dev/docs/migration/from_state_notifier",
+          "title": "From `StateNotifier` | Riverpod",
+          "section_id": 246,
+          "relevant": false
+        },
+        {
+          "rank": 9,
+          "source": "https://riverpod.dev/docs/migration/from_state_notifier",
+          "title": "From `StateNotifier` | Riverpod",
+          "section_id": 248,
+          "relevant": false
+        },
+        {
+          "rank": 10,
+          "source": "https://riverpod.dev/es/docs/whats_new",
+          "title": "What's new in Riverpod 3.0 | Riverpod",
+          "section_id": 554,
+          "relevant": false
+        },
+        {
+          "rank": 11,
+          "source": "https://riverpod.dev/docs/concepts2/observers",
+          "title": "ProviderObservers | Riverpod",
+          "section_id": 79,
+          "relevant": false
+        }
+      ]
+    },
+    {
+      "id": "rp_autodispose_generator",
+      "query": "Riverpod riverpod_generator 2.6 — show @riverpod annotation with autodispose using the code generator pattern",
+      "taxonomy_class": "code_example",
+      "mode_used": "hybrid/hierarchical",
+      "first_hit_rank": 1,
+      "hit_at_5": true,
+      "latency_ms": 966.453,
+      "failures": {},
+      "results": [
+        {
+          "rank": 1,
+          "source": "https://riverpod.dev/docs/concepts/about_code_generation",
+          "title": "About code generation | Riverpod",
+          "section_id": 177,
+          "relevant": true
+        },
+        {
+          "rank": 2,
+          "source": "https://riverpod.dev/docs/introduction/getting_started",
+          "title": "Getting started | Riverpod",
+          "section_id": 130,
+          "relevant": false
+        },
+        {
+          "rank": 3,
+          "source": "https://riverpod.dev/docs/from_provider/quickstart",
+          "title": "Quickstart | Riverpod",
+          "section_id": 162,
+          "relevant": false
+        },
+        {
+          "rank": 4,
+          "source": "https://riverpod.dev/ar/docs/introduction/getting_started",
+          "title": "الشروع في العمل مع Riverpod | Riverpod",
+          "section_id": 320,
+          "relevant": false
+        },
+        {
+          "rank": 5,
+          "source": "https://riverpod.dev/fr/docs/from_provider/quickstart",
+          "title": "Quickstart | Riverpod",
+          "section_id": 578,
+          "relevant": false
+        },
+        {
+          "rank": 6,
+          "source": "https://riverpod.dev/docs/concepts/about_code_generation",
+          "title": "About code generation | Riverpod",
+          "section_id": 176,
+          "relevant": true
+        },
+        {
+          "rank": 7,
+          "source": "https://riverpod.dev/docs/concepts/about_code_generation",
+          "title": "About code generation | Riverpod",
+          "section_id": 178,
+          "relevant": true
+        },
+        {
+          "rank": 8,
+          "source": "https://riverpod.dev/docs/introduction/getting_started",
+          "title": "Getting started | Riverpod",
+          "section_id": 129,
+          "relevant": false
+        },
+        {
+          "rank": 9,
+          "source": "https://riverpod.dev/docs/introduction/getting_started",
+          "title": "Getting started | Riverpod",
+          "section_id": 131,
+          "relevant": false
+        },
+        {
+          "rank": 10,
+          "source": "https://riverpod.dev/docs/from_provider/quickstart",
+          "title": "Quickstart | Riverpod",
+          "section_id": 161,
+          "relevant": false
+        },
+        {
+          "rank": 11,
+          "source": "https://riverpod.dev/ar/docs/introduction/getting_started",
+          "title": "الشروع في العمل مع Riverpod | Riverpod",
+          "section_id": 319,
+          "relevant": false
+        },
+        {
+          "rank": 12,
+          "source": "https://riverpod.dev/ar/docs/introduction/getting_started",
+          "title": "الشروع في العمل مع Riverpod | Riverpod",
+          "section_id": 321,
+          "relevant": false
+        },
+        {
+          "rank": 13,
+          "source": "https://riverpod.dev/fr/docs/from_provider/quickstart",
+          "title": "Quickstart | Riverpod",
+          "section_id": 577,
+          "relevant": false
+        }
+      ]
+    }
+  ]
+}

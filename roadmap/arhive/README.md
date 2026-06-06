@@ -16,16 +16,17 @@
 
 ## Рекомендуемый порядок чтения
 
-1. [`00_overview.md`](arhive/00_overview.md) — общая стратегия, эпики, очередность.
-2. [`01_agent_proof_mcp_docs_ux.md`](arhive/01_agent_proof_mcp_docs_ux.md) — первый engineering epic: убрать `needs_docs_url` trap.
-3. [`02_registry_source_identity.md`](arhive/02_registry_source_identity.md) — data model и identity rules для registry.
-4. [`03_product_positioning.md`](arhive/03_product_positioning.md) — product packaging: Docs vs Packs.
-5. [`04_project_aware_version_resolution.md`](arhive/04_project_aware_version_resolution.md) — project-aware dependency docs.
-6. [`05_retrieval_quality_eval.md`](arhive/05_retrieval_quality_eval.md) — eval framework и observability.
-7. [`06_first_run_dx_doctor.md`](arhive/06_first_run_dx_doctor.md) — first-run DX, `doctor`, onboarding.
-8. [`07_pr_sequence.md`](arhive/07_pr_sequence.md) — рекомендуемый порядок PR и milestones.
-9. [`08_next_wedge_project_docs.md`](./08_next_wedge_project_docs.md) — entrypoint новой roadmap-гипотезы после выполнения базового roadmap.
-10. [`08_project_docs/`](./08_project_docs/) — разложение 08 на отдельные implementation files: framing, agent-discoverable onboarding, MCP/CLI surface, PR sequence, demos/evals/metrics, open questions.
+1. [`00_overview.md`](00_overview.md) — общая стратегия, эпики, очередность.
+2. [`01_agent_proof_mcp_docs_ux.md`](01_agent_proof_mcp_docs_ux.md) — первый engineering epic: убрать `needs_docs_url` trap.
+3. [`02_registry_source_identity.md`](02_registry_source_identity.md) — data model и identity rules для registry.
+4. [`03_product_positioning.md`](03_product_positioning.md) — product packaging: Docs vs Packs.
+5. [`04_project_aware_version_resolution.md`](04_project_aware_version_resolution.md) — project-aware dependency docs.
+6. [`05_retrieval_quality_eval.md`](05_retrieval_quality_eval.md) — eval framework и observability.
+7. [`06_first_run_dx_doctor.md`](06_first_run_dx_doctor.md) — first-run DX, `doctor`, onboarding.
+8. [`07_pr_sequence.md`](07_pr_sequence.md) — рекомендуемый порядок PR и milestones.
+9. [`08_next_wedge_project_docs.md`](08_next_wedge_project_docs.md) — entrypoint новой roadmap-гипотезы после выполнения базового roadmap.
+10. [`08_project_docs/`](08_project_docs/) — разложение 08 на отдельные implementation files: framing, agent-discoverable onboarding, MCP/CLI surface, PR sequence, demos/evals/metrics, open questions.
+11. [`09_riverpod_context7_benchmark_followups.md`](09_riverpod_context7_benchmark_followups.md) — выводы Riverpod Context7-vs-Docmancer benchmark и PR plan по source hygiene, exact Pub Dartdoc, diversity и eval observability.
 
 ## Обновление после первичного roadmap
 

@@ -167,11 +167,12 @@ class RetrievalDispatcher:
                 budget_cap=limit * 3,
             )
 
-        chunks = self._hydrate(section_ids, budget=budget)
+        chunks = self._limit_sections_per_source(self._hydrate(section_ids, budget=budget))
+        reported_mode = self._degraded_mode_name(effective_mode, candidate_lists, failures)
         return DispatchResult(
             chunks=chunks,
             contributions=contributions,
-            mode_used=effective_mode,
+            mode_used=reported_mode,
             candidate_counts=raw_counts,
             failures=failures,
         )
@@ -315,7 +316,7 @@ class RetrievalDispatcher:
             section_ids = self._expand_section_ids(
                 section_ids, mode=expand, budget_cap=limit * 3
             )
-        chunks = self._hydrate(section_ids, budget=budget)
+        chunks = self._limit_sections_per_source(self._hydrate(section_ids, budget=budget))
         return DispatchResult(
             chunks=chunks,
             contributions=contributions,
@@ -490,6 +491,29 @@ class RetrievalDispatcher:
         if not section_ids:
             return []
         return self.store.fetch_sections_by_id(section_ids, budget=budget)
+
+    def _limit_sections_per_source(self, chunks: list[Any]) -> list[Any]:
+        max_per_source = getattr(self.config.retrieval, "max_sections_per_source", None)
+        if not max_per_source:
+            return chunks
+        counts: dict[str, int] = {}
+        out: list[Any] = []
+        for chunk in chunks:
+            source = str(getattr(chunk, "source", "") or "")
+            count = counts.get(source, 0)
+            if count >= int(max_per_source):
+                continue
+            counts[source] = count + 1
+            out.append(chunk)
+        return out
+
+    def _degraded_mode_name(self, mode: str, candidate_lists: dict[str, list[Any]], failures: dict[str, str]) -> str:
+        if not failures:
+            return mode
+        if not candidate_lists:
+            return f"{mode}/lexical_fallback_degraded"
+        signals = "_".join(sorted(candidate_lists.keys()))
+        return f"{mode}/{signals}_degraded"
 
 
 def _shape_for_fusion(source: str, hits: list[Any]) -> list[dict]:
