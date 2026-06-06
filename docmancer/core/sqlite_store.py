@@ -15,6 +15,7 @@ from docmancer.core.models import Document, RetrievedChunk
 
 
 HEADING_RE = re.compile(r"^(#{1,6})\s+(.+?)\s*$", re.MULTILINE)
+FENCED_CODE_RE = re.compile(r"^ {0,3}(`{3,}|~{3,})([^\n]*)\n(.*?)^ {0,3}\1\s*$", re.MULTILINE | re.DOTALL)
 
 # Keywords that indicate boilerplate/legal content.  Matched against
 # normalized title words so numbered headings like "12. Miscellaneous"
@@ -142,6 +143,52 @@ def _sections_for_document(doc: Document) -> list[tuple[str, int, str, dict[str,
 
 def _chunk_hash(text: str) -> str:
     return hashlib.sha256(text.encode("utf-8")).hexdigest()
+
+
+def _code_snippets(text: str, *, limit: int = 3, max_chars: int = 1200) -> list[dict[str, str]]:
+    snippets: list[dict[str, str]] = []
+    for match in FENCED_CODE_RE.finditer(text):
+        language = match.group(2).strip().split()[0] if match.group(2).strip() else ""
+        code = match.group(3).strip()
+        if not code:
+            continue
+        snippets.append({"language": language, "code": code[:max_chars]})
+        if len(snippets) >= limit:
+            break
+    return snippets or _code_like_snippets(text, max_chars=max_chars)
+
+
+def _code_like_snippets(text: str, *, max_chars: int = 1200) -> list[dict[str, str]]:
+    lines = [line.strip() for line in text.splitlines()]
+    code_lines: list[str] = []
+    for line in lines:
+        stripped = line.strip("`").strip()
+        if not stripped:
+            if code_lines and code_lines[-1] != "":
+                code_lines.append("")
+            continue
+        if _looks_like_code_line(stripped):
+            code_lines.append(stripped)
+        elif code_lines and code_lines[-1] != "":
+            code_lines.append("")
+
+    while code_lines and code_lines[-1] == "":
+        code_lines.pop()
+    compact = "\n".join(code_lines).strip()
+    meaningful = [line for line in code_lines if line]
+    if len(meaningful) < 3 or len(compact) < 40:
+        return []
+    return [{"language": "", "code": compact[:max_chars]}]
+
+
+def _looks_like_code_line(line: str) -> bool:
+    code_tokens = (
+        "=>", "{", "}", ";", "(", ")", "=", "<", ">", "//",
+        "final ", "class ", "Future", "Provider", "ref.", "return ", "await ", "async",
+    )
+    if line.startswith(("#", "- ", "* ", "|")):
+        return False
+    return any(token in line for token in code_tokens)
 
 
 class SQLiteStore:
@@ -369,6 +416,10 @@ class SQLiteStore:
                 "anchor": anchor,
                 "content_hash": content_hash,
             }
+            snippets = _code_snippets(text)
+            if snippets:
+                section_meta["code_snippets"] = snippets
+                section_meta["has_code_snippet"] = True
             cursor = conn.execute(
                 """
                 INSERT INTO sections

@@ -233,6 +233,22 @@ def test_add_url_applies_fetch_worker_override():
     mock_agent.add.assert_called_once()
 
 
+def test_update_url_replaces_existing_docset_before_readding():
+    runner = CliRunner()
+    fake_config = MagicMock()
+    fake_agent = MagicMock()
+    fake_agent.list_sources_with_dates.return_value = [{"source": "https://docs.example.com"}]
+    fake_agent.add.return_value = 7
+
+    with patch("docmancer.cli.commands._load_config", return_value=fake_config), \
+         patch("docmancer.cli.commands._get_agent_class", return_value=lambda config: fake_agent):
+        result = runner.invoke(cli, ["update", "https://docs.example.com"])
+
+    assert result.exit_code == 0, result.output
+    fake_agent.remove_source.assert_called_once_with("https://docs.example.com")
+    fake_agent.add.assert_called_once_with("https://docs.example.com", recreate=False, max_pages=500, browser=False)
+
+
 def test_query_outputs_savings_by_default():
     runner = CliRunner()
     fake_config = MagicMock()

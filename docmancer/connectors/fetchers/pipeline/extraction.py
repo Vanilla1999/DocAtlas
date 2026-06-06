@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import logging
 import re
+from urllib.parse import urljoin
 
 from bs4 import BeautifulSoup, Tag
 from markdownify import MarkdownConverter
@@ -267,7 +268,7 @@ def extract_content(html: str, url: str | None = None, doc_format: str | None = 
     return result
 
 
-def extract_metadata(html: str) -> dict[str, str | None]:
+def extract_metadata(html: str, url: str | None = None) -> dict[str, str | None]:
     """Extract page metadata (title, description, lang, canonical) from HTML.
 
     Returns:
@@ -296,7 +297,9 @@ def extract_metadata(html: str) -> dict[str, str | None]:
     canonical_url = None
     link_canonical = soup.find("link", attrs={"rel": "canonical"})
     if link_canonical and isinstance(link_canonical, Tag):
-        canonical_url = link_canonical.get("href")
+        canonical_href = link_canonical.get("href")
+        if canonical_href:
+            canonical_url = urljoin(url, str(canonical_href)) if url else str(canonical_href)
 
     author = None
     for attr in ("author", "article:author"):

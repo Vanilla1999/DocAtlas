@@ -156,6 +156,61 @@ class TestWebFetcherNavCrawl:
             assert "word_count" in doc.metadata
             assert "fetched_at" in doc.metadata
 
+    def test_page_source_uses_in_scope_canonical_url(self):
+        page_html = PAGE_HTML.replace(
+            'href="https://example.com/docs/intro"',
+            'href="https://example.com/docs/intro/"',
+        )
+
+        def mock_get(url, **kwargs):
+            if "llms-full.txt" in url or ("llms.txt" in url and "full" not in url):
+                return _mock_response("", status=404, content_type="text/plain")
+            if "robots.txt" in url:
+                return _mock_response("User-agent: *\nAllow: /", content_type="text/plain")
+            if "sitemap" in url:
+                return _mock_response("", status=404)
+            if "/docs/intro" in url:
+                return _mock_response(page_html)
+            return _mock_response(HOMEPAGE_HTML.replace('/docs/guide', '/blog/post'))
+
+        mock_client = _make_mock_client(mock_get)
+
+        with patch("docmancer.connectors.fetchers.web.httpx.Client", return_value=mock_client):
+            fetcher = WebFetcher(max_pages=10, delay=0.0)
+            docs = fetcher.fetch("https://example.com/docs")
+
+        assert len(docs) == 1
+        assert docs[0].source == "https://example.com/docs/intro"
+        assert docs[0].metadata["canonical_url"] == "https://example.com/docs/intro"
+
+    def test_duplicate_canonical_pages_are_deduplicated(self):
+        page_a = PAGE_HTML.replace(
+            'href="https://example.com/docs/intro"',
+            'href="https://example.com/docs/canonical"',
+        )
+        page_b = page_a.replace("Introduction", "Introduction Copy")
+
+        def mock_get(url, **kwargs):
+            if "llms-full.txt" in url or ("llms.txt" in url and "full" not in url):
+                return _mock_response("", status=404, content_type="text/plain")
+            if "robots.txt" in url:
+                return _mock_response("User-agent: *\nAllow: /", content_type="text/plain")
+            if "sitemap" in url:
+                return _mock_response("", status=404)
+            if "/docs/intro" in url:
+                return _mock_response(page_a)
+            if "/docs/guide" in url:
+                return _mock_response(page_b)
+            return _mock_response(HOMEPAGE_HTML)
+
+        mock_client = _make_mock_client(mock_get)
+
+        with patch("docmancer.connectors.fetchers.web.httpx.Client", return_value=mock_client):
+            fetcher = WebFetcher(max_pages=10, delay=0.0)
+            docs = fetcher.fetch("https://example.com/docs")
+
+        assert [doc.source for doc in docs].count("https://example.com/docs/canonical") == 1
+
 
 class TestWebFetcherErrors:
     def test_no_pages_raises_error(self):

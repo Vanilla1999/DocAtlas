@@ -36,6 +36,7 @@ from docmancer.connectors.fetchers.pipeline.filtering import (
     infer_docset_root,
     is_docs_url,
     normalize_url,
+    resolve_url,
 )
 from docmancer.connectors.fetchers.pipeline.rate_limit import RateLimiter
 from docmancer.connectors.fetchers.pipeline.redirect import RedirectTracker
@@ -362,6 +363,9 @@ class WebFetcher:
                 if deduplicator.is_url_duplicate(page.final_url):
                     logger.debug("Skipped %s (duplicate final URL)", page.document.source)
                     continue
+                if page.document.source != page.final_url and deduplicator.is_url_duplicate(page.document.source):
+                    logger.debug("Skipped %s (duplicate canonical URL)", page.document.source)
+                    continue
                 if deduplicator.is_content_duplicate(page.document.content):
                     logger.debug("Skipped %s (duplicate content)", page.document.source)
                     continue
@@ -458,7 +462,7 @@ class WebFetcher:
         if looks_like_html(raw_html):
             doc_format = "dartdoc" if self._is_dartdoc_url(url) else None
             content = extract_content(raw_html, url=url, doc_format=doc_format)
-            meta = extract_metadata(raw_html)
+            meta = extract_metadata(raw_html, url=final_url)
             section_path = extract_section_path(raw_html)
             fmt = "markdown"
         else:
@@ -477,9 +481,10 @@ class WebFetcher:
                 content = browser_content
 
         content_hash = ContentDeduplicator.content_hash(content)
-        canonical = meta.get("canonical_url") or url
+        canonical = normalize_url(resolve_url(str(meta.get("canonical_url")), final_url)) if meta.get("canonical_url") else url
+        source_url = canonical if is_docs_url(canonical, base_url) else url
         doc = Document(
-            source=url,
+            source=source_url,
             content=content,
             metadata={
                 "format": fmt,

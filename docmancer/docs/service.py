@@ -19,7 +19,7 @@ from filelock import FileLock
 
 from docmancer.agent import DocmancerAgent
 from docmancer.core.config import DocmancerConfig
-from docmancer.docs.models import DocsChunk, DocsInspectResult, DocsJob, DocsJobCancelResult, DocsJobStartResult, DocsManifestValidationResult, DocsPruneResult, DocsRemoveResult, DocsResult, DocsSourceResolution, DocsTarget, DocsTargetResult, DocsTargetsPrefetchResult, LibraryInfo, ProjectDocsChunk, ProjectDocsIngestResult, ProjectDocsInspectResult, ProjectDocsResult, ProjectMetadata, ProjectPrefetchResult, RefreshResult
+from docmancer.docs.models import DocsChunk, DocsInspectResult, DocsJob, DocsJobCancelResult, DocsJobStartResult, DocsManifestValidationResult, DocsPruneResult, DocsRemoveResult, DocsResult, DocsSourceResolution, DocsTarget, DocsTargetResult, DocsTargetsPrefetchResult, LibraryInfo, ProjectContextResult, ProjectDocsChunk, ProjectDocsIngestResult, ProjectDocsInspectResult, ProjectDocsResult, ProjectMetadata, ProjectPrefetchResult, RefreshResult
 from docmancer.docs.project import ProjectMetadataReader
 from docmancer.docs.registry import LibraryRecord, LibraryRegistry
 from docmancer.docs.resolver import canonical_library_id, normalize_library_name, normalize_version
@@ -778,6 +778,7 @@ class LibraryDocsService:
                 content=chunk.text,
                 source=chunk.source,
                 url=None,
+                metadata=chunk.metadata or {},
                 source_class=(chunk.metadata or {}).get("source_class"),
                 path=(chunk.metadata or {}).get("project_doc_path") or (chunk.metadata or {}).get("source_path"),
                 heading_path=(chunk.metadata or {}).get("anchor") or (chunk.metadata or {}).get("title"),
@@ -828,6 +829,290 @@ class LibraryDocsService:
             }],
             message="Indexed project docs exist, but no results matched this query." + (" Some indexed docs are stale." if stale_sources else ""),
         )
+
+    def get_project_context(
+        self,
+        project_path: str,
+        question: str,
+        *,
+        tokens: int | None = None,
+        limit: int | None = None,
+        expand: str | None = None,
+        library: str | None = None,
+        libraries: list[str] | None = None,
+        ecosystem: str | None = None,
+        version: str | None = None,
+        mode: str = "auto",
+    ) -> ProjectContextResult:
+        """Return a repo-grounded context pack with a compact Trust Contract.
+
+        MVP behavior is deliberately small: always query project-owned docs and,
+        when a dependency is requested or detectable from the question, include one
+        dependency docs query through the existing library-docs resolver.
+        """
+        mode = mode.lower()
+        if mode not in {"auto", "project-only", "deps-only", "public-docs"}:
+            raise ValueError("mode must be one of: auto, project-only, deps-only, public-docs")
+        root = Path(project_path).expanduser().resolve()
+        metadata = self.read_project_metadata(str(root))
+        project_docs = None
+        if mode in {"auto", "project-only"}:
+            project_docs = self.get_project_docs(str(root), question, tokens=tokens, limit=limit, expand=expand)
+
+        selected_dependency = library or (libraries[0] if libraries else None) or self._dependency_mentioned_in_question(metadata, question)
+        dependency_docs: DocsResult | None = None
+        if selected_dependency and mode in {"auto", "deps-only", "public-docs"}:
+            dependency_docs = self.get_docs(
+                selected_dependency,
+                topic=question,
+                tokens=tokens,
+                ecosystem=ecosystem,
+                version=version,
+                project_path=str(root),
+            )
+
+        trust_contract = self._project_context_trust_contract(
+            project_docs=project_docs,
+            dependency_docs=dependency_docs,
+            requested_library=selected_dependency,
+            mode=mode,
+        )
+        warnings = [*(project_docs.warnings if project_docs else [])]
+        if dependency_docs:
+            warnings.extend(dependency_docs.warnings)
+        next_actions = [*(project_docs.next_actions if project_docs else [])]
+        if dependency_docs:
+            next_actions.extend(
+                {"tool": dependency_docs.tool, "reason": action}
+                for action in dependency_docs.next_actions
+            )
+        context_pack = self._project_context_pack(project_docs=project_docs, dependency_docs=dependency_docs)
+        metrics = self._project_context_metrics(context_pack=context_pack, project_docs=project_docs, dependency_docs=dependency_docs)
+        answer_available = bool(project_docs and project_docs.answer_available) or bool(dependency_docs and dependency_docs.results)
+        status = "success" if answer_available else (project_docs.status if project_docs else dependency_docs.status if dependency_docs else "no_results")
+        if (project_docs and project_docs.status == "stale") or (dependency_docs and dependency_docs.stale_before_refresh):
+            status = "stale"
+        reason = "trusted_context_available" if answer_available else "no_trusted_context"
+        return ProjectContextResult(
+            project_path=str(root),
+            question=question,
+            status=status,
+            answer_available=answer_available,
+            mode=mode,
+            reason=reason,
+            context_pack=context_pack,
+            project_docs=project_docs,
+            dependency_docs=dependency_docs,
+            trust_contract=trust_contract,
+            warnings=warnings,
+            next_actions=next_actions,
+            metrics=metrics,
+            message="Returned project context with Trust Contract." if answer_available else (project_docs.message if project_docs else "No trusted context matched this question."),
+        )
+
+    @staticmethod
+    def _project_context_pack(
+        *,
+        project_docs: ProjectDocsResult | None,
+        dependency_docs: DocsResult | None,
+    ) -> list[dict[str, Any]]:
+        pack: list[dict[str, Any]] = []
+        if project_docs:
+            for item in project_docs.results:
+                token_estimate = max(1, len(item.content) // 4) if item.content else 0
+                pack.append({
+                    "source_class": "project_doc",
+                    "path": item.path,
+                    "url": item.url,
+                    "title": item.title,
+                    "heading_path": item.heading_path,
+                    "freshness": "stale" if item.stale else "current",
+                    "why_selected": "matches repo-owned project documentation for the question",
+                    "content": item.content,
+                    "token_estimate": token_estimate,
+                })
+                snippet = LibraryDocsService._context_pack_snippet(item)
+                if snippet:
+                    pack[-1]["snippet"] = snippet
+                    pack[-1]["surrounding_context"] = item.content
+        if dependency_docs:
+            for item in dependency_docs.results:
+                token_estimate = max(1, len(item.content) // 4) if item.content else 0
+                pack.append({
+                    "source_class": "dependency_doc",
+                    "dependency": dependency_docs.library,
+                    "requested_version": dependency_docs.requested_version,
+                    "resolved_version": dependency_docs.resolved_version or dependency_docs.version,
+                    "version_source": dependency_docs.version_source,
+                    "docs_exactness": dependency_docs.docs_exactness,
+                    "docs_binding_source": dependency_docs.docs_binding_source,
+                    "confidence": dependency_docs.confidence,
+                    "url": item.url,
+                    "source": item.source,
+                    "title": item.title,
+                    "freshness": "stale" if dependency_docs.stale_before_refresh else "current",
+                    "why_selected": "dependency docs resolved through Docmancer registry/project metadata",
+                    "content": item.content,
+                    "token_estimate": token_estimate,
+                })
+                snippet = LibraryDocsService._context_pack_snippet(item)
+                if snippet:
+                    pack[-1]["snippet"] = snippet
+                    pack[-1]["surrounding_context"] = item.content
+        return pack
+
+    @staticmethod
+    def _context_pack_snippet(item: DocsChunk) -> dict[str, Any] | None:
+        metadata = item.metadata or {}
+        snippets = metadata.get("code_snippets") or []
+        snippet = snippets[0] if snippets and isinstance(snippets[0], dict) else None
+        if not snippet:
+            return None
+        code = str(snippet.get("code") or "").strip()
+        if not code:
+            return None
+        language = str(snippet.get("language") or "").strip() or None
+        title = item.title or metadata.get("title") or "section"
+        return {
+            "language": language,
+            "code": code,
+            "why_relevant": f"code example extracted from matching {title} section",
+        }
+
+    @staticmethod
+    def _project_context_metrics(
+        *,
+        context_pack: list[dict[str, Any]],
+        project_docs: ProjectDocsResult | None,
+        dependency_docs: DocsResult | None,
+    ) -> dict[str, Any]:
+        source_classes = [item.get("source_class") for item in context_pack]
+        return {
+            "context_pack_items": len(context_pack),
+            "selected_source_count": len(context_pack),
+            "project_result_count": len(project_docs.results) if project_docs else 0,
+            "dependency_result_count": len(dependency_docs.results) if dependency_docs else 0,
+            "token_estimate": sum(int(item.get("token_estimate") or 0) for item in context_pack),
+            "source_classes": sorted({str(item) for item in source_classes if item}),
+        }
+
+    @staticmethod
+    def _dependency_mentioned_in_question(metadata: ProjectMetadata, question: str) -> str | None:
+        normalized_question = question.lower().replace("-", "_")
+        for dependency in metadata.dependencies:
+            name = dependency.package_name
+            if name.lower() in normalized_question or name.lower().replace("-", "_") in normalized_question:
+                return name
+        return None
+
+    @staticmethod
+    def _project_context_trust_contract(
+        *,
+        project_docs: ProjectDocsResult | None,
+        dependency_docs: DocsResult | None,
+        requested_library: str | None,
+        mode: str,
+    ) -> dict[str, Any]:
+        selected_sources: list[dict[str, Any]] = []
+        rejected_sources: list[dict[str, Any]] = []
+        risky_sources: list[dict[str, Any]] = []
+        warnings: list[dict[str, Any]] = []
+        next_actions: list[dict[str, Any]] = []
+
+        if project_docs:
+            for source in project_docs.indexed_sources:
+                selected_sources.append({
+                    "source_class": "project_file",
+                    "path": source.get("path"),
+                    "source": source.get("source"),
+                    "freshness": "current",
+                    "reason": "repo-owned project docs matched the question",
+                    "why_selected": "repo-owned project docs matched the question",
+                    "trust_level": "trusted",
+                })
+            for source in project_docs.stale_sources:
+                risky = {
+                    "source_class": "project_file",
+                    "path": source.get("path"),
+                    "reason_code": "project_docs_stale",
+                    "reason": "Indexed project docs differ from current repo files.",
+                    "risk_level": "medium",
+                }
+                risky_sources.append(risky)
+                warnings.append(risky)
+            next_actions.extend(project_docs.next_actions)
+        elif mode in {"deps-only", "public-docs"}:
+            risky_sources.append({
+                "source_class": "project_file",
+                "reason_code": "project_docs_skipped",
+                "reason": f"Project docs were skipped because mode={mode}.",
+                "risk_level": "low",
+            })
+
+        if dependency_docs:
+            if dependency_docs.results:
+                selected_sources.append({
+                    "source_class": "dependency_docs",
+                    "library": dependency_docs.library,
+                    "requested_version": dependency_docs.requested_version,
+                    "version": dependency_docs.resolved_version or dependency_docs.version,
+                    "resolved_version": dependency_docs.resolved_version or dependency_docs.version,
+                    "version_source": dependency_docs.version_source,
+                    "docs_exactness": dependency_docs.docs_exactness,
+                    "docs_binding_source": dependency_docs.docs_binding_source,
+                    "confidence": dependency_docs.confidence,
+                    "freshness": "stale" if dependency_docs.stale_before_refresh else "current",
+                    "reason": "dependency docs resolved through Docmancer registry/project metadata",
+                    "why_selected": "dependency docs resolved through Docmancer registry/project metadata",
+                    "trust_level": "trusted" if dependency_docs.docs_exactness == "exact" else "best_effort",
+                })
+            for warning in dependency_docs.warnings:
+                risky = {
+                    "source_class": "dependency_docs",
+                    "library": dependency_docs.library,
+                    "reason_code": warning,
+                    "reason": warning,
+                    "risk_level": "medium",
+                }
+                risky_sources.append(risky)
+                warnings.append(risky)
+            if dependency_docs.status in {"needs_input", "ambiguous", "error"}:
+                rejected_sources.append({
+                    "source_class": "dependency_docs",
+                    "library": dependency_docs.library,
+                    "reason_code": dependency_docs.status,
+                    "reason": dependency_docs.warning or "Dependency docs were not safe to use.",
+                    "risk_level": "high",
+                })
+            next_actions.extend({"tool": dependency_docs.tool, "reason": action} for action in dependency_docs.next_actions)
+        elif requested_library:
+            rejected_sources.append({
+                "source_class": "dependency_docs",
+                "library": requested_library,
+                "reason_code": "not_resolved",
+                "reason": "Requested dependency docs were not resolved.",
+                "risk_level": "high",
+            })
+            next_actions.append({
+                "tool": "prefetch_project_docs",
+                "requires_confirmation": True,
+                "reason": "Fetch dependency docs before retrying project context.",
+            })
+
+        return {
+            "schema_version": "trust-contract-1.0-mvp",
+            "selected_sources": selected_sources,
+            "trusted_sources": selected_sources,
+            "rejected_sources": rejected_sources,
+            "risky_sources": risky_sources,
+            "rejected_or_risky_sources": [*rejected_sources, *risky_sources],
+            "warnings": warnings,
+            "next_actions": next_actions,
+            "policy": {
+                "direct_webfetch": "forbidden" if selected_sources else "discovery_only",
+                "reason_code": "trusted_context_available" if selected_sources else "no_trusted_context",
+            },
+        }
 
     @staticmethod
     def _is_flutter_library(library: str) -> bool:
@@ -1320,6 +1605,10 @@ class LibraryDocsService:
         if not is_pub_dartdoc_target(target):
             return target
         target = normalize_pub_dartdoc_target(target)
+        if job_id:
+            # Async jobs should reach indexing promptly. Keep live Dartdoc seed
+            # discovery on the synchronous path where callers wait for the full result.
+            return target
         version = normalize_version(target.version) or "latest"
         root_url = pub_dartdoc_root_url(target.library, version)
         if job_id:
@@ -2154,6 +2443,7 @@ class LibraryDocsService:
                     content=chunk.text,
                     source=chunk.source,
                     url=chunk.source if chunk.source.startswith(("http://", "https://")) else None,
+                    metadata=chunk.metadata or {},
                 )
                 for chunk in chunks
             ],

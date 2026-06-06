@@ -48,6 +48,7 @@ class DocsChunk:
     content: str
     source: str | None
     url: str | None
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass(frozen=True)
@@ -348,4 +349,24 @@ class ProjectDocsResult:
     next_actions: list[dict[str, Any]] = field(default_factory=list)
     answer_available: bool = True
     reason: str | None = None
+    message: str | None = None
+
+
+@dataclass(frozen=True)
+class ProjectContextResult:
+    project_path: str
+    question: str
+    status: str = "success"
+    tool: str = "get_project_context"
+    schema_version: str = "1.0-mvp"
+    answer_available: bool = True
+    mode: str = "auto"
+    reason: str | None = None
+    context_pack: list[dict[str, Any]] = field(default_factory=list)
+    project_docs: ProjectDocsResult | None = None
+    dependency_docs: DocsResult | None = None
+    trust_contract: dict[str, Any] = field(default_factory=dict)
+    warnings: list[str] = field(default_factory=list)
+    next_actions: list[dict[str, Any]] = field(default_factory=list)
+    metrics: dict[str, Any] = field(default_factory=dict)
     message: str | None = None

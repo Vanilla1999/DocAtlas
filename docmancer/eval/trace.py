@@ -49,13 +49,23 @@ def build_explain_trace(
             {
                 "rank": rank,
                 "source": chunk.source,
+                "canonical_url": meta.get("canonical_url"),
                 "title": meta.get("title"),
                 "section_id": section_id,
+                "source_class": meta.get("source_class"),
+                "ecosystem": meta.get("ecosystem"),
+                "library": meta.get("library"),
+                "version": meta.get("version") or meta.get("resolved_version"),
+                "version_source": meta.get("version_source"),
+                "has_code_snippet": bool(meta.get("has_code_snippet") or meta.get("code_snippets")),
                 "score": float(getattr(chunk, "score", 0.0)),
                 "token_estimate": int(meta.get("token_estimate") or 0),
                 "fusion_contributions": contributions.get(section_id, {}) if section_id is not None else {},
             }
         )
+    warnings = []
+    if failures:
+        warnings.append({"kind": "degraded_retrieval", "sources": sorted(failures)})
     return {
         "schema_version": TRACE_SCHEMA_VERSION,
         "query_normalization": {"original": query, "normalized": normalize_query(query)},
@@ -66,7 +76,7 @@ def build_explain_trace(
         "expansion": {"mode": expand or "none"},
         "packing": {"limit": limit, "budget": budget, "result_count": len(chunks), "docmancer_tokens": doc_tokens, "raw_tokens": raw_tokens},
         "results": result_items,
-        "warnings": [],
+        "warnings": warnings,
         "failures": failures,
         "timing": {"total_ms": latency_ms},
     }

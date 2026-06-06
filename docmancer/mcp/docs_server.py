@@ -190,6 +190,26 @@ TOOLS: list[dict[str, Any]] = [
         },
     },
     {
+        "name": "get_project_context",
+        "description": "Return one repo-grounded context pack for a coding question. Combines indexed project-owned docs with one exact dependency docs source when requested/detectable, and always returns a compact Trust Contract with selected, rejected, and risky sources plus next_actions.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "project_path": {"type": "string"},
+                "question": {"type": "string"},
+                "tokens": {"type": ["integer", "null"]},
+                "limit": {"type": ["integer", "null"]},
+                "expand": {"type": ["string", "null"]},
+                "library": {"type": ["string", "null"]},
+                "libraries": {"type": ["array", "null"], "items": {"type": "string"}},
+                "ecosystem": {"type": ["string", "null"]},
+                "version": {"type": ["string", "null"]},
+                "mode": {"type": ["string", "null"], "enum": ["auto", "project-only", "deps-only", "public-docs", None]},
+            },
+            "required": ["project_path", "question"],
+        },
+    },
+    {
         "name": "get_docs_job_status",
         "description": "Return persistent progress for one docs indexing/prefetch job.",
         "inputSchema": {
@@ -441,6 +461,24 @@ async def _run_async(service: LibraryDocsService) -> None:
                             tokens=args.get("tokens"),
                             limit=args.get("limit"),
                             expand=args.get("expand"),
+                        )
+                    ),
+                )
+            if name == "get_project_context":
+                return _json_text(
+                    mcp_types,
+                    asdict(
+                        service.get_project_context(
+                            args["project_path"],
+                            args["question"],
+                            tokens=args.get("tokens"),
+                            limit=args.get("limit"),
+                            expand=args.get("expand"),
+                            library=args.get("library"),
+                            libraries=args.get("libraries"),
+                            ecosystem=args.get("ecosystem"),
+                            version=args.get("version"),
+                            mode=args.get("mode") or "auto",
                         )
                     ),
                 )

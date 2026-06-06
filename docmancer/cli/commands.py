@@ -923,6 +923,7 @@ def update_cmd(
         try:
             if src.startswith(("http://", "https://")):
                 click.echo(f"Updating {src}...")
+                agent.remove_source(src)
                 total = agent.add(src, recreate=False, max_pages=max_pages, browser=browser)
             else:
                 if not Path(src).exists():
@@ -1457,6 +1458,138 @@ def query_cmd(
                 click.echo(f"    explain: degraded retrieval ({failure_parts})")
         click.echo(body)
         click.echo("---")
+
+
+def _format_context_explain(result) -> str:
+    contract = result.trust_contract or {}
+
+    def label(source: dict) -> str:
+        return str(source.get("path") or source.get("library") or source.get("source") or source.get("url") or source.get("canonical_id") or "unknown")
+
+    def reason(source: dict) -> str:
+        return str(source.get("why_selected") or source.get("reason") or source.get("reason_code") or source.get("message") or "not specified")
+
+    lines = [f"Trusted context for: {result.question}", "", "Used:"]
+    selected = contract.get("selected_sources") or []
+    if selected:
+        for source in selected:
+            lines.append(f"  [{source.get('source_class', 'source')}] {label(source)}")
+            lines.append(f"    why: {reason(source)}")
+            if source.get("freshness"):
+                lines.append(f"    freshness: {source['freshness']}")
+            if source.get("docs_exactness"):
+                lines.append(f"    docs_exactness: {source['docs_exactness']}")
+            if source.get("version_source"):
+                lines.append(f"    version_source: {source['version_source']}")
+    else:
+        lines.append("  none")
+    lines.extend(["", "Rejected / risky:"])
+    rejected_or_risky = [*(contract.get("rejected_sources") or []), *(contract.get("risky_sources") or [])]
+    if rejected_or_risky:
+        for source in rejected_or_risky:
+            lines.append(f"  [{source.get('source_class', 'source')}] {label(source)}")
+            lines.append(f"    reason: {reason(source)}")
+    else:
+        lines.append("  none")
+    lines.extend(["", "Warnings:"])
+    warnings = contract.get("warnings") or []
+    if warnings:
+        for warning in warnings:
+            lines.append(f"  - {warning.get('message') if isinstance(warning, dict) else warning}")
+    else:
+        lines.append("  none")
+    lines.extend(["", "Next actions:"])
+    next_actions = contract.get("next_actions") or result.next_actions or []
+    if next_actions:
+        for action in next_actions:
+            if isinstance(action, dict):
+                tool = action.get("tool") or "action"
+                why = action.get("reason") or action.get("message") or "not specified"
+                lines.append(f"  - {tool}: {why}")
+            else:
+                lines.append(f"  - {action}")
+    else:
+        lines.append("  none")
+    return "\n".join(lines)
+
+
+@click.command(
+    cls=DocmancerCommand,
+    context_settings=HELP_CONTEXT_SETTINGS,
+    short_help="Return repo-grounded context with a Trust Contract.",
+    epilog=format_examples(
+        'docmancer context . "How should I test go_router changes?"',
+        'docmancer context . "How should I test go_router changes?" --library go_router --format json',
+        'docmancer context . "Architecture rules" --explain',
+    ),
+)
+@click.argument("project_path", type=click.Path(exists=True, file_okay=False, path_type=str))
+@click.argument("question")
+@click.option("--config", "config_path", default=None, help="Path to docmancer.yaml.")
+@click.option("--tokens", default=None, type=int, help="Maximum estimated output tokens.")
+@click.option("--limit", default=None, type=int, help="Maximum sections to return.")
+@click.option("--expand", default=None, type=click.Choice(["adjacent", "page"], case_sensitive=False), help="Expand adjacent sections or full page context.")
+@click.option("--library", default=None, help="Dependency library to include in the context pack.")
+@click.option("--libraries", multiple=True, help="Additional dependency libraries. The MVP uses the first value when --library is omitted.")
+@click.option("--ecosystem", default=None, help="Dependency ecosystem, for example pub or rust.")
+@click.option("--version", default=None, help="Dependency docs version.")
+@click.option("--mode", default="auto", type=click.Choice(["auto", "project-only", "deps-only", "public-docs"], case_sensitive=False), show_default=True)
+@click.option("output_format", "--format", type=click.Choice(["text", "json"], case_sensitive=False), default="text", show_default=True)
+@click.option("--explain", is_flag=True, help="Print selected, rejected, and risky source decisions.")
+def context_cmd(
+    project_path: str,
+    question: str,
+    config_path: str | None,
+    tokens: int | None,
+    limit: int | None,
+    expand: str | None,
+    library: str | None,
+    libraries: tuple[str, ...],
+    ecosystem: str | None,
+    version: str | None,
+    mode: str,
+    output_format: str,
+    explain: bool,
+):
+    """Return project docs plus optional dependency docs in one context pack."""
+    from dataclasses import asdict
+    from docmancer.docs.service import LibraryDocsService
+
+    config = _load_config(_effective_config(config_path))
+    result = LibraryDocsService(config=config).get_project_context(
+        project_path,
+        question,
+        tokens=tokens,
+        limit=limit,
+        expand=expand,
+        library=library,
+        libraries=list(libraries) or None,
+        ecosystem=ecosystem,
+        version=version,
+        mode=mode,
+    )
+    payload = asdict(result)
+    if output_format == "json":
+        click.echo(json.dumps(payload, ensure_ascii=False, indent=2))
+        return
+    click.echo(f"Project context: {result.status}")
+    click.echo(f"Trust Contract: {len(result.trust_contract.get('selected_sources', []))} selected, {len(result.trust_contract.get('rejected_sources', []))} rejected, {len(result.trust_contract.get('risky_sources', []))} risky")
+    if result.project_docs and result.project_docs.results:
+        click.echo("--- project docs ---")
+        for item in result.project_docs.results:
+            click.echo(f"[{item.path or item.source}] {item.title or ''}".rstrip())
+            click.echo(item.content)
+    if result.dependency_docs and result.dependency_docs.results:
+        click.echo("--- dependency docs ---")
+        for item in result.dependency_docs.results:
+            click.echo(f"[{item.source}] {item.title or ''}".rstrip())
+            click.echo(item.content)
+    if explain:
+        click.echo("--- explain ---")
+        click.echo(_format_context_explain(result))
+    if result.next_actions:
+        click.echo("--- next actions ---")
+        click.echo(json.dumps(result.next_actions, ensure_ascii=False, indent=2))
 
 
 @click.command(

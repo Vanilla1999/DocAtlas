@@ -247,6 +247,11 @@ class TestExtractMetadata:
         meta = extract_metadata(SIMPLE_HTML)
         assert meta["canonical_url"] == "https://example.com/docs/getting-started"
 
+    def test_resolves_relative_canonical_against_page_url(self):
+        html = '<html><head><link rel="canonical" href="/docs/page"></head><body></body></html>'
+        meta = extract_metadata(html, url="https://example.com/docs/page?utm_source=x")
+        assert meta["canonical_url"] == "https://example.com/docs/page"
+
     def test_missing_metadata(self):
         meta = extract_metadata("<html><body><p>No meta</p></body></html>")
         assert meta["title"] is None or meta["title"] == ""

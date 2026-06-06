@@ -7,12 +7,16 @@ import json
 from pathlib import Path
 from threading import Event, Thread
 import time
+from unittest.mock import MagicMock, patch
 
+from click.testing import CliRunner
+
+from docmancer.cli.__main__ import cli
 from docmancer.core.config import DocmancerConfig
 from docmancer.core.models import RetrievedChunk
 from docmancer.agent import DocmancerAgent
 from docmancer.docs.dartdoc import discover_pub_dartdoc_seed_urls, normalize_pub_dartdoc_target
-from docmancer.docs.models import DocsTarget, SOURCE_CLASS_PROJECT_FILE
+from docmancer.docs.models import DocsChunk, DocsResult, DocsTarget, ProjectContextResult, SOURCE_CLASS_PROJECT_FILE
 from docmancer.docs.project import ProjectMetadataReader
 from docmancer.docs.registry import LibraryRegistry
 from docmancer.docs.service import DocsJobTracker, LibraryDocsService
@@ -355,6 +359,16 @@ def test_mcp_exposes_get_project_docs_with_project_scoped_guidance():
     assert tool["inputSchema"]["required"] == ["project_path", "query"]
 
 
+def test_mcp_exposes_get_project_context_with_trust_contract():
+    tool = next(tool for tool in TOOLS if tool["name"] == "get_project_context")
+
+    assert "Trust Contract" in tool["description"]
+    assert "selected, rejected, and risky sources" in tool["description"]
+    assert tool["inputSchema"]["required"] == ["project_path", "question"]
+    assert "mode" in tool["inputSchema"]["properties"]
+    assert "libraries" in tool["inputSchema"]["properties"]
+
+
 def test_agent_templates_include_project_docs_discovery_guidance():
     template_dir = Path(__file__).resolve().parents[1] / "docmancer" / "templates"
 
@@ -644,6 +658,174 @@ def test_get_project_docs_returns_scoped_docs_result(tmp_path, monkeypatch):
     assert "ProjectAnswer" in result.results[0].content
     assert result.indexed_sources[0]["path"] == "README.md"
     assert result.next_actions == []
+
+
+def test_get_project_context_returns_trust_contract_for_project_docs(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    (project / "README.md").write_text("# Architecture\n\nProjectContextAnswer uses local ADRs.", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+    service.ingest_project_docs(str(project), with_vectors=False)
+
+    result = service.get_project_context(str(project), "ProjectContextAnswer ADR", tokens=1200, limit=3)
+
+    assert result.status == "success"
+    assert result.tool == "get_project_context"
+    assert result.project_docs is not None
+    assert result.project_docs.results
+    assert result.context_pack[0]["source_class"] == "project_doc"
+    assert result.context_pack[0]["token_estimate"] > 0
+    assert result.metrics["project_result_count"] == 1
+    selected = result.trust_contract["selected_sources"]
+    assert selected[0]["source_class"] == "project_file"
+    assert selected[0]["trust_level"] == "trusted"
+    assert result.trust_contract["trusted_sources"] == selected
+    assert result.trust_contract["policy"]["direct_webfetch"] == "forbidden"
+
+
+def test_get_project_context_can_return_project_and_dependency_context(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    (project / "README.md").write_text("# Routing\n\nUse AppRouter wrappers with GoRouter.", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+    service.ingest_project_docs(str(project), with_vectors=False)
+    monkeypatch.setattr(
+        service,
+        "get_docs",
+        lambda *args, **kwargs: DocsResult(
+            library_id="pub:go_router@14.8.1:api",
+            library="go_router",
+            version="14.8.1",
+            topic=kwargs.get("topic"),
+            refreshed=False,
+            stale_before_refresh=False,
+            warning=None,
+            last_refreshed_at=None,
+            results=[DocsChunk(title="GoRouter", content="Use GoRouter ShellRoute APIs.", source="https://pub.dev/documentation/go_router/14.8.1/", url="https://pub.dev/documentation/go_router/14.8.1/")],
+            requested_version="project-version",
+            resolved_version="14.8.1",
+            version_source="lockfile_exact",
+            docs_exactness="exact_version_url",
+            docs_binding_source="pub_dartdoc_template",
+            confidence="very_high",
+        ),
+    )
+
+    result = service.get_project_context(str(project), "How should AppRouter use go_router?", tokens=1200, limit=3)
+
+    assert result.answer_available is True
+    assert result.project_docs is not None
+    assert result.dependency_docs is not None
+    assert {item["source_class"] for item in result.context_pack} == {"project_doc", "dependency_doc"}
+    assert result.metrics["project_result_count"] >= 1
+    assert result.metrics["dependency_result_count"] >= 1
+    selected_classes = {item["source_class"] for item in result.trust_contract["selected_sources"]}
+    assert selected_classes == {"project_file", "dependency_docs"}
+
+
+def test_get_project_context_includes_snippet_object_when_metadata_has_code(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    (project / "README.md").write_text("# Routing\n\nUse AppRouter wrappers.", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+    service.ingest_project_docs(str(project), with_vectors=False)
+    monkeypatch.setattr(
+        service,
+        "get_docs",
+        lambda *args, **kwargs: DocsResult(
+            library_id="pub:go_router@14.8.1:api",
+            library="go_router",
+            version="14.8.1",
+            topic=kwargs.get("topic"),
+            refreshed=False,
+            stale_before_refresh=False,
+            warning=None,
+            last_refreshed_at=None,
+            results=[
+                DocsChunk(
+                    title="GoRouter example",
+                    content="Example prose plus code.",
+                    source="https://pub.dev/documentation/go_router/14.8.1/",
+                    url="https://pub.dev/documentation/go_router/14.8.1/",
+                    metadata={"code_snippets": [{"language": "dart", "code": "final router = GoRouter(routes: []);"}]},
+                )
+            ],
+            requested_version="project-version",
+            resolved_version="14.8.1",
+            version_source="lockfile_exact",
+            docs_exactness="exact_version_url",
+            docs_binding_source="pub_dartdoc_template",
+            confidence="very_high",
+        ),
+    )
+
+    result = service.get_project_context(str(project), "GoRouter example", library="go_router")
+
+    dependency_item = next(item for item in result.context_pack if item["source_class"] == "dependency_doc")
+    assert dependency_item["snippet"] == {
+        "language": "dart",
+        "code": "final router = GoRouter(routes: []);",
+        "why_relevant": "code example extracted from matching GoRouter example section",
+    }
+    assert dependency_item["surrounding_context"] == "Example prose plus code."
+
+
+def test_get_project_context_deps_only_skips_project_docs(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    service = _service(tmp_path, monkeypatch)
+
+    result = service.get_project_context(str(project), "go_router APIs", library="go_router", mode="deps-only")
+
+    assert result.mode == "deps-only"
+    assert result.project_docs is None
+    assert any(item["reason_code"] == "project_docs_skipped" for item in result.trust_contract["risky_sources"])
+
+
+def test_context_cli_outputs_json_and_explain(tmp_path):
+    project = tmp_path / "project"
+    project.mkdir()
+    fake_config = DocmancerConfig()
+    fake_result = ProjectContextResult(
+        project_path=str(project),
+        question="How?",
+        trust_contract={"selected_sources": [], "rejected_sources": [], "risky_sources": [], "warnings": [], "next_actions": []},
+    )
+
+    with patch("docmancer.cli.commands._load_config", return_value=fake_config), \
+         patch("docmancer.docs.service.LibraryDocsService") as service_cls:
+        service_cls.return_value.get_project_context.return_value = fake_result
+        result = CliRunner().invoke(cli, ["context", str(project), "How?", "--format", "json", "--mode", "project-only"])
+
+    assert result.exit_code == 0, result.output
+    payload = json.loads(result.output)
+    assert payload["trust_contract"]["selected_sources"] == []
+    service_cls.return_value.get_project_context.assert_called_once()
+    assert service_cls.return_value.get_project_context.call_args.kwargs["mode"] == "project-only"
+
+
+def test_context_cli_explain_outputs_human_readable_trust_contract(tmp_path):
+    project = tmp_path / "project"
+    project.mkdir()
+    fake_config = DocmancerConfig()
+    fake_result = ProjectContextResult(
+        project_path=str(project),
+        question="How?",
+        trust_contract={
+            "selected_sources": [{"source_class": "project_file", "path": "docs/architecture.md", "why_selected": "matched local rule", "freshness": "current"}],
+            "rejected_sources": [{"source_class": "dependency_doc", "library": "go_router latest", "reason": "wrong_version_risk"}],
+            "risky_sources": [],
+            "warnings": [],
+            "next_actions": [],
+        },
+    )
+
+    with patch("docmancer.cli.commands._load_config", return_value=fake_config), \
+         patch("docmancer.docs.service.LibraryDocsService") as service_cls:
+        service_cls.return_value.get_project_context.return_value = fake_result
+        result = CliRunner().invoke(cli, ["context", str(project), "How?", "--explain"])
+
+    assert result.exit_code == 0, result.output
+    assert "Trusted context for: How?" in result.output
+    assert "[project_file] docs/architecture.md" in result.output
+    assert "Rejected / risky:" in result.output
+    assert "wrong_version_risk" in result.output
 
 
 def test_get_project_docs_returns_ingest_next_action_when_candidates_not_indexed(tmp_path, monkeypatch):
