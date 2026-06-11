@@ -19,7 +19,7 @@ from filelock import FileLock
 
 from docmancer.agent import DocmancerAgent
 from docmancer.core.config import DocmancerConfig
-from docmancer.docs.models import DocsChunk, DocsInspectResult, DocsJob, DocsJobCancelResult, DocsJobStartResult, DocsManifestValidationResult, DocsPruneResult, DocsRemoveResult, DocsResult, DocsSourceResolution, DocsTarget, DocsTargetResult, DocsTargetsPrefetchResult, LibraryInfo, ProjectContextResult, ProjectDocsChunk, ProjectDocsIngestResult, ProjectDocsInspectResult, ProjectDocsResult, ProjectMetadata, ProjectPrefetchResult, RefreshResult
+from docmancer.docs.models import DocsChunk, DocsInspectResult, DocsJob, DocsJobCancelResult, DocsJobStartResult, DocsManifestValidationResult, DocsPruneResult, DocsRemoveResult, DocsResult, DocsSourceResolution, DocsTarget, DocsTargetResult, DocsTargetsPrefetchResult, LibraryInfo, ProjectContextResult, ProjectDocsBootstrapResult, ProjectDocsChunk, ProjectDocsIngestResult, ProjectDocsInspectResult, ProjectDocsResult, ProjectMetadata, ProjectPrefetchResult, RefreshResult
 from docmancer.docs.project import ProjectMetadataReader
 from docmancer.docs.registry import LibraryRecord, LibraryRegistry
 from docmancer.docs.resolver import canonical_library_id, normalize_library_name, normalize_version
@@ -525,7 +525,65 @@ class LibraryDocsService:
         return current, stale, ignored
 
     @staticmethod
-    def _create_project_docs_next_action(root: Path, query: str | None = None) -> dict[str, Any]:
+    def _has_high_level_project_overview(candidates: list[dict[str, Any]]) -> bool:
+        for candidate in candidates:
+            reason = str(candidate.get("reason") or "")
+            path = Path(str(candidate.get("path") or ""))
+            stem = path.stem.lower()
+            parts = {part.lower() for part in path.parts}
+            if reason in {"root_readme", "architecture"}:
+                return True
+            if stem in {"overview", "introduction", "intro", "index", "readme"}:
+                return True
+            if "overview" in parts or "architecture" in parts:
+                return True
+        return False
+
+    def _project_dependency_docs_state(self, metadata: ProjectMetadata) -> dict[str, Any]:
+        exact_dependencies = [item for item in metadata.dependencies if item.resolved_version and item.source_kind == "registry"]
+        prefetched = []
+        missing = []
+        for dependency in exact_dependencies:
+            record = self.registry.get(
+                dependency.package_name,
+                ecosystem=dependency.ecosystem,
+                version=dependency.resolved_version,
+                source_type="api",
+            )
+            item = {
+                "library": dependency.package_name,
+                "ecosystem": dependency.ecosystem,
+                "version": dependency.resolved_version,
+                "version_source": dependency.version_source,
+            }
+            if record and record.status == "available":
+                prefetched.append({**item, "canonical_id": record.canonical_id})
+            else:
+                missing.append(item)
+        available = bool(exact_dependencies)
+        dependency_next_action: dict[str, Any] = {}
+        if missing:
+            dependency_next_action = {
+                "type": "ask_user_to_prefetch_dependency_docs",
+                "tool_after_confirmation": "prefetch_project_docs",
+                "alias_tool_after_confirmation": "prefetch_project_dependency_docs",
+                "requires_confirmation": True,
+                "confirmation_reason": "network_fetch",
+                "arguments_patch": {"project_path": metadata.project_path},
+                "user_message": "I found dependency manifests/lockfiles. I can fetch exact documentation for the dependency versions used by this project. This may use the network. Proceed?",
+            }
+        return {
+            "dependency_docs_available": available,
+            "dependency_docs_prefetched": available and not missing,
+            "dependency_docs_prefetched_count": len(prefetched),
+            "dependency_docs_missing_count": len(missing),
+            "dependency_docs_prefetched_sources": prefetched,
+            "dependency_docs_missing_sources": missing,
+            "dependency_next_action": dependency_next_action,
+        }
+
+    @staticmethod
+    def _create_project_docs_next_action(root: Path, query: str | None = None, *, reason: str | None = None) -> dict[str, Any]:
         get_project_docs_args = {"project_path": str(root)}
         if query:
             get_project_docs_args["query"] = query
@@ -534,7 +592,7 @@ class LibraryDocsService:
             "requires_confirmation": True,
             "preferred_path": "ARCHITECTURE.md",
             "suggested_paths": ["ARCHITECTURE.md", "README.md", "docs/architecture.md"],
-            "reason": "No official project docs files were discovered. Ask the user before creating a reviewable architecture doc in the repository.",
+            "reason": reason or "No official project docs files were discovered. Ask the user before creating a reviewable architecture doc in the repository.",
             "agent_guidance": "If the user approves, inspect the codebase, create ARCHITECTURE.md as a normal reviewable file, then call inspect_project_docs and ingest_project_docs before answering repo-specific architecture questions.",
             "after": [
                 {
@@ -555,15 +613,74 @@ class LibraryDocsService:
             ],
         }
 
+    @staticmethod
+    def _project_docs_structured_next_action(
+        *,
+        reason_code: str,
+        root: Path,
+        query: str | None = None,
+    ) -> tuple[dict[str, Any], bool, str | None, dict[str, Any], str, str | None]:
+        project_args = {"project_path": str(root)}
+        ingest_args = {"project_path": str(root), "skip_known": False, "with_vectors": True}
+        if reason_code == "project_docs_stale":
+            return (
+                {"type": "ingest_project_docs", "tool": "ingest_project_docs"},
+                False,
+                None,
+                ingest_args,
+                "Indexed project documentation is stale. Call ingest_project_docs before answering project-level questions.",
+                None,
+            )
+        if reason_code == "project_docs_found_not_indexed":
+            return (
+                {"type": "ingest_project_docs", "tool": "ingest_project_docs"},
+                False,
+                None,
+                ingest_args,
+                "Project documentation files were found but are not indexed. Call ingest_project_docs before answering project-level questions.",
+                None,
+            )
+        if reason_code in {"no_project_docs", "architecture_doc_creation_recommended"}:
+            agent_message = "No reviewable project docs were found. Ask the user whether to create ARCHITECTURE.md as a repository file, then inspect and ingest it after creation."
+            user_message = "Project documentation was not found. Create ARCHITECTURE.md as a reviewable file?"
+            if reason_code == "architecture_doc_creation_recommended":
+                agent_message = "Project docs exist, but no high-level architecture or overview document was found. Ask the user before creating ARCHITECTURE.md as a repository file, then inspect and ingest it after creation."
+                user_message = "I could not find a high-level project architecture document. Do you want me to inspect the repository and create ARCHITECTURE.md as a reviewable file?"
+            return (
+                {
+                    "type": "ask_user_to_create_project_doc",
+                    "suggested_file": "ARCHITECTURE.md",
+                    "handled_by": "coding_agent",
+                },
+                True,
+                "repo_write",
+                project_args,
+                agent_message,
+                user_message,
+            )
+        get_context_args = {"project_path": str(root)}
+        if query:
+            get_context_args["question"] = query
+        return (
+            {"type": "get_project_context", "tool": "get_project_context"},
+            False,
+            None,
+            get_context_args,
+            "Project documentation is indexed and ready. Use get_project_context or get_project_docs for repo-specific questions.",
+            None,
+        )
+
     def inspect_project_docs(self, project_path: str) -> ProjectDocsInspectResult:
         root = Path(project_path).expanduser().resolve()
         metadata = self.read_project_metadata(str(root))
         candidate_sources = [asdict(item) for item in metadata.docs_candidates]
         indexed_sources_all = self._indexed_project_doc_sources(str(root))
         indexed_sources, stale_sources, ignored_sources = self._partition_project_doc_state(candidate_sources, indexed_sources_all)
+        has_high_level_overview = self._has_high_level_project_overview(candidate_sources)
         manifests_found = [name for name in ("pubspec.yaml", "Cargo.toml") if (root / name).exists()]
         lockfiles_found = [name for name in ("pubspec.lock", "Cargo.lock") if (root / name).exists()]
-        exact_versions_available = any(item.resolved_version for item in metadata.dependencies)
+        dependency_docs_state = self._project_dependency_docs_state(metadata)
+        exact_versions_available = dependency_docs_state["dependency_docs_available"]
         recommended_next_actions: list[dict[str, Any]] = []
         if stale_sources:
             recommended_next_actions.append({
@@ -585,21 +702,46 @@ class LibraryDocsService:
             })
         if not candidate_sources:
             recommended_next_actions.append(self._create_project_docs_next_action(root))
+        elif not has_high_level_overview:
+            recommended_next_actions.append(self._create_project_docs_next_action(
+                root,
+                reason="Project docs exist, but no high-level architecture or overview document was discovered. Ask the user before creating a reviewable ARCHITECTURE.md file.",
+            ))
+        if stale_sources:
+            reason_code = "project_docs_stale"
+        elif not candidate_sources:
+            reason_code = "no_project_docs"
+        elif not has_high_level_overview:
+            reason_code = "architecture_doc_creation_recommended"
+        elif len(indexed_sources) < len(candidate_sources):
+            reason_code = "project_docs_found_not_indexed"
+        else:
+            reason_code = "project_docs_ready"
+        next_action, requires_confirmation, confirmation_reason, arguments_patch, agent_message, user_message = self._project_docs_structured_next_action(
+            reason_code=reason_code,
+            root=root,
+        )
         project_docs = {
             "found": candidate_sources,
             "indexed": indexed_sources,
             "stale": stale_sources,
             "ignored": ignored_sources,
+            "high_level_overview_found": has_high_level_overview,
         }
         dependency_sources = {
             "manifests_found": manifests_found,
             "lockfiles_found": lockfiles_found,
             "exact_versions_available": exact_versions_available,
             "network_fetch_required": exact_versions_available,
+            **dependency_docs_state,
         }
         return ProjectDocsInspectResult(
             project_detected=root.exists() and root.is_dir(),
             project_path=str(root),
+            reason_code=reason_code,
+            next_action=next_action,
+            requires_confirmation=requires_confirmation,
+            confirmation_reason=confirmation_reason,
             project_type=metadata.detected_ecosystems,
             project_docs=project_docs,
             dependency_sources=dependency_sources,
@@ -608,6 +750,9 @@ class LibraryDocsService:
             stale_sources=stale_sources,
             ignored_sources=ignored_sources,
             recommended_next_actions=recommended_next_actions,
+            arguments_patch=arguments_patch,
+            agent_message=agent_message,
+            user_message=user_message,
             agent_guidance="Call get_project_docs for repo-specific questions after project docs are indexed. If docs are missing, ask before creating a reviewable ARCHITECTURE.md, then inspect and ingest it. If docs are stale, call ingest_project_docs first. Ask before network dependency docs fetches.",
             warnings=metadata.warnings,
         )
@@ -685,6 +830,103 @@ class LibraryDocsService:
             message=f"Indexed {len(candidates)} project docs candidate(s).",
         )
 
+    def bootstrap_project_docs(self, project_path: str, question: str | None = None) -> ProjectDocsBootstrapResult:
+        root = Path(project_path).expanduser().resolve()
+        actions_taken: list[dict[str, Any]] = []
+        initial = self.inspect_project_docs(str(root))
+        actions_taken.append({"tool": "inspect_project_docs", "arguments_patch": {"project_path": str(root)}})
+        inspect_result = initial
+        ingest_result: ProjectDocsIngestResult | None = None
+        warnings = list(initial.warnings)
+
+        if initial.reason_code in {"project_docs_found_not_indexed", "project_docs_stale"}:
+            ingest_result = self.ingest_project_docs(str(root), skip_known=False, with_vectors=True)
+            actions_taken.append({
+                "tool": "ingest_project_docs",
+                "arguments_patch": {"project_path": str(root), "skip_known": False, "with_vectors": True},
+                "status": ingest_result.status,
+            })
+            warnings.extend(ingest_result.warnings)
+            inspect_result = self.inspect_project_docs(str(root))
+            actions_taken.append({"tool": "inspect_project_docs", "arguments_patch": {"project_path": str(root)}, "reason": "post_ingest_verification"})
+
+        dependency_action = inspect_result.dependency_sources.get("dependency_next_action") if inspect_result.dependency_sources else None
+        metadata = self.read_project_metadata(str(root))
+        dependency_requested = bool(question and self._dependency_mentioned_in_question(metadata, question))
+        if dependency_requested and dependency_action:
+            return ProjectDocsBootstrapResult(
+                project_path=str(root),
+                question=question,
+                status="confirmation_required",
+                reason_code="dependency_docs_prefetch_confirmation_required",
+                actions_taken=actions_taken,
+                next_action=dependency_action,
+                requires_confirmation=True,
+                confirmation_reason="network_fetch",
+                arguments_patch=dependency_action.get("arguments_patch") or {"project_path": str(root)},
+                inspect_result=inspect_result,
+                ingest_result=ingest_result,
+                agent_message="Project docs are ready, but this question mentions a dependency whose exact docs are not prefetched. Ask before fetching dependency docs from the network.",
+                user_message=dependency_action.get("user_message"),
+                warnings=warnings,
+            )
+
+        if inspect_result.requires_confirmation:
+            return ProjectDocsBootstrapResult(
+                project_path=str(root),
+                question=question,
+                status="confirmation_required",
+                reason_code=inspect_result.reason_code,
+                actions_taken=actions_taken,
+                next_action=inspect_result.next_action,
+                requires_confirmation=True,
+                confirmation_reason=inspect_result.confirmation_reason,
+                arguments_patch=inspect_result.arguments_patch,
+                inspect_result=inspect_result,
+                ingest_result=ingest_result,
+                agent_message=inspect_result.agent_message,
+                user_message=inspect_result.user_message,
+                warnings=warnings,
+            )
+
+        if inspect_result.reason_code == "project_docs_ready":
+            next_action, _, _, arguments_patch, agent_message, _ = self._project_docs_structured_next_action(
+                reason_code="project_docs_ready",
+                root=root,
+                query=question,
+            )
+            return ProjectDocsBootstrapResult(
+                project_path=str(root),
+                question=question,
+                status="ready",
+                reason_code="project_docs_ready",
+                actions_taken=actions_taken,
+                next_action=next_action,
+                requires_confirmation=False,
+                arguments_patch=arguments_patch,
+                inspect_result=inspect_result,
+                ingest_result=ingest_result,
+                agent_message=agent_message,
+                warnings=warnings,
+            )
+
+        return ProjectDocsBootstrapResult(
+            project_path=str(root),
+            question=question,
+            status="blocked",
+            reason_code=inspect_result.reason_code,
+            actions_taken=actions_taken,
+            next_action=inspect_result.next_action,
+            requires_confirmation=inspect_result.requires_confirmation,
+            confirmation_reason=inspect_result.confirmation_reason,
+            arguments_patch=inspect_result.arguments_patch,
+            inspect_result=inspect_result,
+            ingest_result=ingest_result,
+            agent_message=inspect_result.agent_message or "Project docs are not ready after safe bootstrap actions.",
+            user_message=inspect_result.user_message,
+            warnings=warnings,
+        )
+
     def query_project_docs(
         self,
         project_path: str,
@@ -724,10 +966,20 @@ class LibraryDocsService:
         indexed_sources, stale_sources, ignored_sources = self._partition_project_doc_state(candidate_sources, indexed_sources_all)
 
         if not candidate_sources:
+            next_action, requires_confirmation, confirmation_reason, arguments_patch, _, user_message = self._project_docs_structured_next_action(
+                reason_code="no_project_docs",
+                root=root,
+                query=query,
+            )
             return ProjectDocsResult(
                 project_path=str(root),
                 query=query,
                 status="no_project_docs",
+                reason_code="no_project_docs",
+                next_action=next_action,
+                requires_confirmation=requires_confirmation,
+                confirmation_reason=confirmation_reason,
+                arguments_patch=arguments_patch,
                 reason="no_project_docs",
                 answer_available=False,
                 warnings=metadata.warnings,
@@ -735,14 +987,24 @@ class LibraryDocsService:
                     **self._create_project_docs_next_action(root, query),
                     "reason": "No project-owned docs candidates were discovered for this repository. Create a reviewable architecture doc before indexing.",
                 }],
-                message="No project-owned docs were found. Ask before creating a reviewable ARCHITECTURE.md, then run inspect_project_docs and ingest_project_docs.",
+                message=user_message or "No project-owned docs were found. Ask before creating a reviewable ARCHITECTURE.md, then run inspect_project_docs and ingest_project_docs.",
             )
 
         if not indexed_sources_all:
+            next_action, requires_confirmation, confirmation_reason, arguments_patch, _, _ = self._project_docs_structured_next_action(
+                reason_code="project_docs_found_not_indexed",
+                root=root,
+                query=query,
+            )
             return ProjectDocsResult(
                 project_path=str(root),
                 query=query,
                 status="not_indexed",
+                reason_code="project_docs_found_not_indexed",
+                next_action=next_action,
+                requires_confirmation=requires_confirmation,
+                confirmation_reason=confirmation_reason,
+                arguments_patch=arguments_patch,
                 reason="project_docs_not_indexed",
                 answer_available=False,
                 warnings=metadata.warnings,
@@ -789,7 +1051,16 @@ class LibraryDocsService:
             for chunk in chunks
         ]
         next_actions: list[dict[str, Any]] = []
+        next_action: dict[str, Any] = {}
+        requires_confirmation = False
+        confirmation_reason = None
+        arguments_patch: dict[str, Any] = {}
         if stale_sources:
+            next_action, requires_confirmation, confirmation_reason, arguments_patch, _, _ = self._project_docs_structured_next_action(
+                reason_code="project_docs_stale",
+                root=root,
+                query=query,
+            )
             next_actions.append({
                 "tool": "ingest_project_docs",
                 "requires_confirmation": False,
@@ -801,6 +1072,11 @@ class LibraryDocsService:
                 project_path=str(root),
                 query=query,
                 status="stale" if stale_sources else "success",
+                reason_code="project_docs_stale" if stale_sources else "project_docs_ready",
+                next_action=next_action,
+                requires_confirmation=requires_confirmation,
+                confirmation_reason=confirmation_reason,
+                arguments_patch=arguments_patch,
                 reason="project_docs_stale" if stale_sources else None,
                 answer_available=True,
                 results=results,
@@ -811,10 +1087,27 @@ class LibraryDocsService:
                 next_actions=next_actions,
                 message=f"Returned {len(results)} project docs result(s)." + (" Some indexed project docs are stale." if stale_sources else ""),
             )
+        reason_code = "project_docs_stale" if stale_sources else "no_project_docs_results"
+        if stale_sources:
+            next_action, requires_confirmation, confirmation_reason, arguments_patch, _, _ = self._project_docs_structured_next_action(
+                reason_code="project_docs_stale",
+                root=root,
+                query=query,
+            )
+        else:
+            next_action = {"type": "inspect_project_docs", "tool": "inspect_project_docs"}
+            requires_confirmation = False
+            confirmation_reason = None
+            arguments_patch = {"project_path": str(root)}
         return ProjectDocsResult(
             project_path=str(root),
             query=query,
             status="stale" if stale_sources else "no_results",
+            reason_code=reason_code,
+            next_action=next_action,
+            requires_confirmation=requires_confirmation,
+            confirmation_reason=confirmation_reason,
+            arguments_patch=arguments_patch,
             reason="project_docs_stale" if stale_sources else "no_project_docs_results",
             answer_available=False,
             warnings=metadata.warnings,

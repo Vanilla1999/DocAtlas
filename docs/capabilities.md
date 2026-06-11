@@ -33,16 +33,16 @@ This section is a practical map of what Docmancer can do today and which tool or
 
 | Need | Current capability | CLI / MCP entrypoint | Current boundary |
 |---|---|---|---|
-| Query local repo docs | Discover, ingest, stale-check, and query README/docs/wiki/ADR/roadmap files. | `inspect_project_docs`, `ingest_project_docs`, `get_project_docs`; CLI `docmancer ingest`, `docmancer query`. | Project docs must be indexed before they can be trusted. |
+| Query local repo docs | Discover, ingest, stale-check, bootstrap, and query README/docs/wiki/ADR/roadmap files. | `inspect_project_docs`, `ingest_project_docs`, `bootstrap_project_docs`, `get_project_docs`, `get_project_context`; CLI `docmancer ingest`, `docmancer query`. | Project docs must be indexed before they can be trusted; bootstrap stops before repo writes. |
 | Query public docs locally | Fetch, normalize, index, and query public docs sites. | CLI `docmancer add`, `docmancer query`; MCP `get_library_docs`, `prefetch_library_docs`. | First query requires indexing unless the source is already registered/indexed. |
-| Use exact dependency versions | Read supported project metadata and prefetch/query docs for resolved versions. | `inspect_project_docs`, `prefetch_project_docs`, `get_library_docs(project_path=...)`. | Strongest current support is Dart/Flutter and Rust metadata; broader ecosystems need cautious `best_effort` labeling. |
+| Use exact dependency versions | Read supported project metadata and prefetch/query docs for resolved versions. | `inspect_project_docs`, `prefetch_project_dependency_docs`, `prefetch_project_docs`, `get_library_docs(project_path=...)`. | Strongest current support is Dart/Flutter and Rust metadata; dependency-docs prefetch may use the network and is separate from project-owned docs ingest. |
 | Avoid repeated WebFetch | Register sources once, then query local indexes. | `resolve_library_id`, `get_library_docs`, `list_library_docs`; CLI `docmancer list`. | If no registered or confidently resolved docs source exists, user may still need to provide a docs URL. |
 | Keep docs private/local | Index local files and private docs without sending content to hosted docs services. | CLI `docmancer ingest`; MCP `ingest_project_docs`. | Cloud embedding extras are optional; default retrieval stack can stay local. |
 | Get compact context for agents | Return sections with headings, source attribution, extracted snippets, metadata, and token estimates. | CLI `docmancer query`, `docmancer context`; MCP query tools and `get_project_context`. | Snippets are extracted from source docs, not synthesized. |
 | Run long docs indexing safely | Start async prefetch jobs and poll progress. | `prefetch_library_docs(async=true)`, `prefetch_docs_targets(async=true)`, `get_docs_job_status`. | Large public sites still need sane max pages, allowed domains, and source hygiene. |
 | Diagnose docs runtime | Check config, storage, SQLite, Qdrant, indexes, agents, and MCP state. | CLI `docmancer doctor`, `docmancer qdrant status`; MCP `mcp doctor`. | Doctor output should continue moving toward more explicit severity/fix commands. |
 
-Important current boundary: `get_project_context(project_path, question)` is available as a compact MVP for combining indexed project-owned docs with one resolved dependency-doc source and a Trust Contract. It still depends on project docs being indexed and exact dependency docs being registered or resolvable.
+Important current boundary: `get_project_context(project_path, question)` is available as a compact MVP for combining indexed project-owned docs with one resolved dependency-doc source and a Trust Contract. `bootstrap_project_docs(project_path, question?)` is the safe onboarding shortcut before `get_project_context`; it can inspect and ingest/refresh existing reviewable docs, but it stops before repository writes and dependency-docs network fetches.
 
 ## Core capabilities
 
@@ -308,6 +308,8 @@ This enables workflows like:
 - prefetch dependency docs for a project before a coding task;
 - expose version provenance on every docs response.
 
+Use `prefetch_project_dependency_docs` for this dependency-docs prefetch flow. The older compatible tool name `prefetch_project_docs` does the same thing, but despite the name it does not ingest project-owned README/docs/wiki files.
+
 Every docs response can include:
 
 - `requested_version`;
@@ -373,12 +375,15 @@ When docs are stale, MCP responses include stale indicators and recommended next
 
 The project docs tools are designed so an agent can guide itself:
 
-1. call `inspect_project_docs(project_path=...)`;
-2. discover README/docs/wiki/roadmap/ADR candidates;
-3. if not indexed, call or recommend `ingest_project_docs`;
-4. if stale, recommend re-ingest;
-5. if no docs exist, suggest creating a reviewable `ARCHITECTURE.md`;
-6. then answer repo-specific questions with `get_project_docs`.
+1. call `bootstrap_project_docs(project_path=..., question=...)` for the safe happy path, or call `inspect_project_docs(project_path=...)` for the explicit low-level flow;
+2. discover README/docs/wiki/roadmap/ADR candidates and dependency metadata;
+3. if docs are not indexed, follow `reason_code = project_docs_found_not_indexed` and call `ingest_project_docs`;
+4. if docs are stale, follow `reason_code = project_docs_stale` and call `ingest_project_docs`;
+5. if no docs exist, follow `reason_code = no_project_docs`, ask the user, and have the coding agent create a reviewable `ARCHITECTURE.md` only after confirmation;
+6. if docs exist but no high-level overview/architecture doc is found, follow `reason_code = architecture_doc_creation_recommended` and ask before creating `ARCHITECTURE.md`;
+7. then answer repo-specific questions with `get_project_context` or `get_project_docs`.
+
+Project-docs responses include `reason_code`, `next_action`, optional `next_actions` / `recommended_next_actions`, `requires_confirmation`, `confirmation_reason`, `arguments_patch`, and optional agent/user messages so agents can follow the flow without guessing.
 
 This avoids generic answers when the repo already documents its architecture or conventions.
 
@@ -411,8 +416,11 @@ Project docs tools:
 |---|---|
 | `inspect_project_docs` | Discover project docs and dependency metadata. |
 | `ingest_project_docs` | Index reviewable project docs. |
-| `get_project_docs` | Query project-owned docs. |
-| `prefetch_project_docs` | Prefetch exact dependency docs from manifests/lockfiles. |
+| `bootstrap_project_docs` | Safely inspect, ingest/refresh existing reviewable docs, and inspect again; stops before repo writes or dependency network fetches. |
+| `get_project_docs` | Query project-owned docs and return structured remediation when docs are missing, stale, not indexed, or unmatched. |
+| `get_project_context` | Return a repo-grounded context pack with a Trust Contract, project docs, and one exact dependency-doc source when requested/detectable; supports `mode` values `auto`, `project-only`, `deps-only`, and `public-docs`. |
+| `prefetch_project_docs` | Historical name for prefetching exact dependency docs from manifests/lockfiles; not project-owned docs ingest. |
+| `prefetch_project_dependency_docs` | Clear alias for `prefetch_project_docs`; prefer this name in new agent instructions. |
 
 Manifest and batch tools:
 
@@ -652,23 +660,25 @@ MCP flow:
 
 ```json
 {
-  "tool": "inspect_project_docs",
-  "arguments": {"project_path": "/path/to/repo"}
+  "tool": "bootstrap_project_docs",
+  "arguments": {
+    "project_path": "/path/to/repo",
+    "question": "How should authentication work in this project?"
+  }
 }
 ```
 
-If docs are found but not indexed or stale, the response includes next actions such as:
+If you need the lower-level flow, start with `inspect_project_docs`. If docs are found but not indexed or stale, the response includes a structured `reason_code` and `next_action` such as:
 
 ```json
 {
-  "next_actions": [
-    {
-      "tool": "ingest_project_docs",
-      "requires_confirmation": false,
-      "arguments_patch": {"project_path": "/path/to/repo"},
-      "reason": "Project docs found but not indexed."
-    }
-  ]
+  "reason_code": "project_docs_found_not_indexed",
+  "next_action": {
+    "type": "ingest_project_docs",
+    "tool": "ingest_project_docs"
+  },
+  "requires_confirmation": false,
+  "arguments_patch": {"project_path": "/path/to/repo"}
 }
 ```
 
@@ -676,10 +686,10 @@ After ingest:
 
 ```json
 {
-  "tool": "get_project_docs",
+  "tool": "get_project_context",
   "arguments": {
     "project_path": "/path/to/repo",
-    "query": "How should authentication work in this project?",
+    "question": "How should authentication work in this project?",
     "tokens": 3000
   }
 }
@@ -786,15 +796,14 @@ The inspection response can show dependency metadata:
     "manifests_found": ["pubspec.yaml"],
     "lockfiles_found": ["pubspec.lock"],
     "exact_versions_available": true,
-    "network_fetch_required": true
-  },
-  "recommended_next_actions": [
-    {
+    "dependency_next_action": {
+      "type": "ask_user_to_prefetch_dependency_docs",
       "tool": "prefetch_project_docs",
+      "alias_tool_after_confirmation": "prefetch_project_dependency_docs",
       "requires_confirmation": true,
-      "reason": "Exact dependency versions found; fetching docs may use network."
+      "confirmation_reason": "network_fetch"
     }
-  ]
+  }
 }
 ```
 
@@ -802,7 +811,7 @@ After approval for network docs fetching:
 
 ```json
 {
-  "tool": "prefetch_project_docs",
+  "tool": "prefetch_project_dependency_docs",
   "arguments": {
     "project_path": "/path/to/flutter_app",
     "include_flutter": true,
@@ -899,7 +908,7 @@ Implementation decision:
 - Do not copy latest-only examples if they conflict with the resolved version.
 ```
 
-Current boundary: Docmancer can provide both evidence sets, but a single shipped tool that automatically merges and ranks them together is still a roadmap item.
+Current boundary: `get_project_context` can return project-doc and one dependency-doc evidence set in one Trust Contract, but agents should still run `bootstrap_project_docs` or `inspect_project_docs` first and follow any returned confirmation gates before relying on the combined context.
 
 ### Example 5 - Async prefetch for large docs work
 
@@ -1072,20 +1081,19 @@ Current saved suites:
 
 The tests check Docmancer artifacts and normalized Context7 snapshots for matching query IDs, Hit@1/Hit@5/MRR, snippet presence, and locale contamination.
 
-### Example 10 - What Docmancer does not yet do as one command
+### Example 10 - Current high-level orchestration boundary
 
-The following flow is the intended replacement-level UX, but it is not currently a single shipped command/tool:
+`get_project_context` is the shipped high-level context-pack tool, but it deliberately does not silently perform every setup action. Agents should still use `bootstrap_project_docs` or the explicit inspect/ingest flow first:
 
 ```text
 get_project_context(project_path, question)
-  -> inspect project docs
-  -> detect dependency versions
-  -> ingest/prefetch what is missing
-  -> query project docs and dependency docs
-  -> return one merged ranked context pack
+  -> query indexed project docs
+  -> optionally query one requested/detected exact dependency-doc source
+  -> return one compact Trust Contract with selected/rejected/risky sources
+  -> include warnings and next_actions for missing, stale, or non-exact docs
 ```
 
-Today, agents can perform this workflow by composing existing tools. The missing piece is a single high-level orchestrator that makes this automatic and ranks project-owned docs plus dependency docs together.
+It does not create repository docs, silently ingest stale project docs, or prefetch dependency docs from the network. Those actions remain explicit through `next_action`, `arguments_patch`, and confirmation gates.
 
 ## Docmancer Packs capabilities
 

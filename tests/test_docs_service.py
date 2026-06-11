@@ -281,6 +281,15 @@ def test_mcp_exposes_prefetch_project_docs():
     assert "May fetch from the network" in tool["description"]
 
 
+def test_mcp_exposes_prefetch_project_dependency_docs_alias():
+    tool = next(tool for tool in TOOLS if tool["name"] == "prefetch_project_dependency_docs")
+
+    assert tool["inputSchema"]["required"] == ["project_path"]
+    assert "Alias for prefetch_project_docs" in tool["description"]
+    assert "dependency documentation from project manifests/lockfiles" in tool["description"]
+    assert "May fetch from the network" in tool["description"]
+
+
 def test_pub_dartdoc_discovery_finds_class_pages():
     html = '<a href="go_router/ShellRoute-class.html">ShellRoute</a><a href="go_router/GoRouter-class.html">GoRouter</a>'
     urls = discover_pub_dartdoc_seed_urls("go_router", "17.2.3", html, "https://pub.dev/documentation/go_router/17.2.3/")
@@ -337,6 +346,9 @@ def test_mcp_exposes_inspect_project_docs_with_discovery_first_guidance():
 
     assert "Call this first" in tool["description"]
     assert "Context7-like" in tool["description"]
+    assert "reason_code" in tool["description"]
+    assert "next_action" in tool["description"]
+    assert "Follow next_action" in tool["description"]
     assert tool["inputSchema"]["required"] == ["project_path"]
 
 
@@ -345,9 +357,20 @@ def test_mcp_exposes_ingest_project_docs():
 
     assert "Index discovered project-owned docs files" in tool["description"]
     assert "does not ingest source code" in tool["description"]
+    assert "does not ingest" in tool["description"]
+    assert "dependency docs" in tool["description"]
     assert tool["inputSchema"]["required"] == ["project_path"]
     assert "skip_known" in tool["inputSchema"]["properties"]
     assert "with_vectors" in tool["inputSchema"]["properties"]
+
+
+def test_mcp_exposes_bootstrap_project_docs_with_safe_stops():
+    tool = next(tool for tool in TOOLS if tool["name"] == "bootstrap_project_docs")
+
+    assert tool["inputSchema"]["required"] == ["project_path"]
+    assert "never writes repository files" in tool["description"]
+    assert "never fetches dependency docs from the network" in tool["description"]
+    assert "confirmation_required" in tool["description"]
 
 
 def test_mcp_exposes_get_project_docs_with_project_scoped_guidance():
@@ -355,6 +378,8 @@ def test_mcp_exposes_get_project_docs_with_project_scoped_guidance():
 
     assert "project-scoped filters" in tool["description"]
     assert "before WebFetch" in tool["description"]
+    assert "reason_code" in tool["description"]
+    assert "next_action" in tool["description"]
     assert "next_actions" in tool["description"]
     assert tool["inputSchema"]["required"] == ["project_path", "query"]
 
@@ -364,6 +389,7 @@ def test_mcp_exposes_get_project_context_with_trust_contract():
 
     assert "Trust Contract" in tool["description"]
     assert "selected, rejected, and risky sources" in tool["description"]
+    assert "after inspect_project_docs" in tool["description"]
     assert tool["inputSchema"]["required"] == ["project_path", "question"]
     assert "mode" in tool["inputSchema"]["properties"]
     assert "libraries" in tool["inputSchema"]["properties"]
@@ -486,6 +512,15 @@ def test_inspect_project_docs_returns_candidates_dependency_sources_and_next_act
     assert result.project_path == str(project.resolve())
     assert "flutter" in result.project_type
     assert result.project_docs["found"][0]["path"] == "README.md"
+    assert result.reason_code == "project_docs_found_not_indexed"
+    assert result.next_action == {"type": "ingest_project_docs", "tool": "ingest_project_docs"}
+    assert result.requires_confirmation is False
+    assert result.confirmation_reason is None
+    assert result.arguments_patch["project_path"] == str(project.resolve())
+    assert result.arguments_patch["skip_known"] is False
+    assert result.arguments_patch["with_vectors"] is True
+    assert "not indexed" in (result.agent_message or "")
+    assert result.user_message is None
     assert result.candidate_sources == result.project_docs["found"]
     assert result.project_docs["indexed"] == []
     assert result.project_docs["stale"] == []
@@ -493,6 +528,16 @@ def test_inspect_project_docs_returns_candidates_dependency_sources_and_next_act
     assert result.dependency_sources["lockfiles_found"] == ["pubspec.lock"]
     assert result.dependency_sources["exact_versions_available"] is True
     assert result.dependency_sources["network_fetch_required"] is True
+    assert result.dependency_sources["dependency_docs_available"] is True
+    assert result.dependency_sources["dependency_docs_prefetched"] is False
+    assert result.dependency_sources["dependency_docs_missing_count"] >= 2
+    dependency_action = result.dependency_sources["dependency_next_action"]
+    assert dependency_action["type"] == "ask_user_to_prefetch_dependency_docs"
+    assert dependency_action["tool_after_confirmation"] == "prefetch_project_docs"
+    assert dependency_action["alias_tool_after_confirmation"] == "prefetch_project_dependency_docs"
+    assert dependency_action["requires_confirmation"] is True
+    assert dependency_action["confirmation_reason"] == "network_fetch"
+    assert dependency_action["arguments_patch"] == {"project_path": str(project.resolve())}
     action_tools = [action["tool"] for action in result.recommended_next_actions]
     assert action_tools == ["ingest_project_docs", "prefetch_project_docs"]
     assert result.recommended_next_actions[0]["requires_confirmation"] is False
@@ -509,6 +554,9 @@ def test_inspect_project_docs_reports_indexed_and_stale_sources(tmp_path, monkey
 
     indexed = service.inspect_project_docs(str(project))
 
+    assert indexed.reason_code == "project_docs_ready"
+    assert indexed.next_action == {"type": "get_project_context", "tool": "get_project_context"}
+    assert indexed.requires_confirmation is False
     assert indexed.project_docs["indexed"][0]["path"] == "README.md"
     assert indexed.project_docs["stale"] == []
     assert indexed.indexed_sources[0]["source_class"] == SOURCE_CLASS_PROJECT_FILE
@@ -517,6 +565,10 @@ def test_inspect_project_docs_reports_indexed_and_stale_sources(tmp_path, monkey
     stale = service.inspect_project_docs(str(project))
 
     assert stale.project_docs["stale"][0]["path"] == "README.md"
+    assert stale.reason_code == "project_docs_stale"
+    assert stale.next_action == {"type": "ingest_project_docs", "tool": "ingest_project_docs"}
+    assert stale.requires_confirmation is False
+    assert stale.arguments_patch["project_path"] == str(project.resolve())
     assert "content_hash_changed" in stale.project_docs["stale"][0]["stale_reasons"]
     assert stale.recommended_next_actions[0]["tool"] == "ingest_project_docs"
 
@@ -588,6 +640,17 @@ def test_inspect_project_docs_recommends_architecture_bootstrap_when_no_docs(tmp
 
     result = service.inspect_project_docs(str(project))
 
+    assert result.reason_code == "no_project_docs"
+    assert result.next_action == {
+        "type": "ask_user_to_create_project_doc",
+        "suggested_file": "ARCHITECTURE.md",
+        "handled_by": "coding_agent",
+    }
+    assert result.requires_confirmation is True
+    assert result.confirmation_reason == "repo_write"
+    assert result.arguments_patch == {"project_path": str(project.resolve())}
+    assert "No reviewable project docs" in (result.agent_message or "")
+    assert "ARCHITECTURE.md" in (result.user_message or "")
     action = result.recommended_next_actions[-1]
     assert action["action"] == "create_reviewable_project_doc"
     assert action["requires_confirmation"] is True
@@ -597,6 +660,122 @@ def test_inspect_project_docs_recommends_architecture_bootstrap_when_no_docs(tmp
     assert action["after"][1]["tool"] == "ingest_project_docs"
     assert action["after"][2]["tool"] == "get_project_docs"
     assert "reviewable ARCHITECTURE.md" in (result.agent_guidance or "")
+
+
+def test_inspect_project_docs_recommends_architecture_when_docs_lack_overview(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    (project / "runbooks").mkdir()
+    (project / "runbooks" / "deploy.md").write_text("# Deploy\n\nDeployment steps only.", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+    service.ingest_project_docs(str(project), with_vectors=False)
+
+    result = service.inspect_project_docs(str(project))
+
+    assert result.reason_code == "architecture_doc_creation_recommended"
+    assert result.project_docs["high_level_overview_found"] is False
+    assert result.next_action == {
+        "type": "ask_user_to_create_project_doc",
+        "suggested_file": "ARCHITECTURE.md",
+        "handled_by": "coding_agent",
+    }
+    assert result.requires_confirmation is True
+    assert result.confirmation_reason == "repo_write"
+    assert result.arguments_patch == {"project_path": str(project.resolve())}
+    assert "high-level project architecture document" in (result.user_message or "")
+    action = result.recommended_next_actions[-1]
+    assert action["action"] == "create_reviewable_project_doc"
+    assert action["preferred_path"] == "ARCHITECTURE.md"
+    assert "no high-level architecture or overview" in action["reason"]
+
+
+def test_inspect_project_docs_treats_readme_as_high_level_overview(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    (project / "README.md").write_text("# App\n\nProject overview.", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+    service.ingest_project_docs(str(project), with_vectors=False)
+
+    result = service.inspect_project_docs(str(project))
+
+    assert result.reason_code == "project_docs_ready"
+    assert result.project_docs["high_level_overview_found"] is True
+
+
+def test_inspect_project_docs_reports_prefetched_dependency_docs(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    (project / "README.md").write_text("# App\n\nProject overview.", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+    now = service._now()
+    for package in ("go_router", "riverpod"):
+        version = "14.8.1" if package == "go_router" else "2.6.1"
+        service.registry.upsert(
+            library=package,
+            ecosystem="pub",
+            version=version,
+            source_type="api",
+            docs_url=f"https://pub.dev/documentation/{package}/{version}/",
+            now=now,
+            status="available",
+            last_refreshed_at=now,
+        )
+
+    result = service.inspect_project_docs(str(project))
+
+    assert result.dependency_sources["dependency_docs_available"] is True
+    assert result.dependency_sources["dependency_docs_prefetched"] is True
+    assert result.dependency_sources["dependency_docs_prefetched_count"] == 2
+    assert result.dependency_sources["dependency_docs_missing_count"] == 0
+    assert result.dependency_sources["dependency_next_action"] == {}
+
+
+def test_bootstrap_project_docs_ingests_existing_docs_and_returns_ready(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    (project / "README.md").write_text("# App\n\nBootstrap ready overview.", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+
+    result = service.bootstrap_project_docs(str(project), question="How is the app organized?")
+
+    assert result.status == "ready"
+    assert result.reason_code == "project_docs_ready"
+    assert [action["tool"] for action in result.actions_taken] == [
+        "inspect_project_docs",
+        "ingest_project_docs",
+        "inspect_project_docs",
+    ]
+    assert result.ingest_result is not None
+    assert result.ingest_result.status == "success"
+    assert result.next_action == {"type": "get_project_context", "tool": "get_project_context"}
+    assert result.requires_confirmation is False
+    assert result.arguments_patch == {"project_path": str(project.resolve()), "question": "How is the app organized?"}
+
+
+def test_bootstrap_project_docs_stops_before_repo_write(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+
+    result = service.bootstrap_project_docs(str(project), question="Explain the architecture")
+
+    assert result.status == "confirmation_required"
+    assert result.reason_code == "no_project_docs"
+    assert result.next_action["type"] == "ask_user_to_create_project_doc"
+    assert result.requires_confirmation is True
+    assert result.confirmation_reason == "repo_write"
+    assert [action["tool"] for action in result.actions_taken] == ["inspect_project_docs"]
+
+
+def test_bootstrap_project_docs_stops_before_dependency_network_fetch(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    (project / "README.md").write_text("# App\n\nBootstrap ready overview.", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+    service.ingest_project_docs(str(project), with_vectors=False)
+
+    result = service.bootstrap_project_docs(str(project), question="How should we use go_router?")
+
+    assert result.status == "confirmation_required"
+    assert result.reason_code == "dependency_docs_prefetch_confirmation_required"
+    assert result.next_action["type"] == "ask_user_to_prefetch_dependency_docs"
+    assert result.next_action["tool_after_confirmation"] == "prefetch_project_docs"
+    assert result.requires_confirmation is True
+    assert result.confirmation_reason == "network_fetch"
 
 
 def test_query_project_docs_filters_by_project_path_and_source_class(tmp_path, monkeypatch):
@@ -680,6 +859,43 @@ def test_get_project_context_returns_trust_contract_for_project_docs(tmp_path, m
     assert selected[0]["trust_level"] == "trusted"
     assert result.trust_contract["trusted_sources"] == selected
     assert result.trust_contract["policy"]["direct_webfetch"] == "forbidden"
+
+
+def test_get_project_context_before_ingest_returns_actionable_remediation(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    (project / "README.md").write_text("# Architecture\n\nProject docs exist but are not indexed.", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+
+    result = service.get_project_context(str(project), "Architecture", tokens=1200, limit=3)
+
+    assert result.status == "not_indexed"
+    assert result.answer_available is False
+    assert result.project_docs is not None
+    assert result.project_docs.reason_code == "project_docs_found_not_indexed"
+    assert result.next_actions[0]["tool"] == "ingest_project_docs"
+    assert result.next_actions[0]["arguments_patch"] == {"project_path": str(project.resolve())}
+    assert result.trust_contract["next_actions"][0]["tool"] == "ingest_project_docs"
+    assert "not indexed" in (result.message or "")
+
+
+def test_bootstrap_project_docs_refreshes_stale_docs_before_context(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    readme = project / "README.md"
+    readme.write_text("# Architecture\n\nOriginal stale acceptance text.", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+    service.ingest_project_docs(str(project), with_vectors=False)
+    readme.write_text("# Architecture\n\nFreshAcceptanceNeedle text.", encoding="utf-8")
+
+    bootstrap = service.bootstrap_project_docs(str(project), question="FreshAcceptanceNeedle")
+    context = service.get_project_context(str(project), "FreshAcceptanceNeedle", tokens=1200, limit=3)
+
+    assert bootstrap.status == "ready"
+    assert bootstrap.reason_code == "project_docs_ready"
+    assert any(action["tool"] == "ingest_project_docs" for action in bootstrap.actions_taken)
+    assert context.answer_available is True
+    assert context.project_docs is not None
+    assert context.project_docs.results
+    assert "FreshAcceptanceNeedle" in context.project_docs.results[0].content
 
 
 def test_get_project_context_can_return_project_and_dependency_context(tmp_path, monkeypatch):
@@ -838,6 +1054,10 @@ def test_get_project_docs_returns_ingest_next_action_when_candidates_not_indexed
     assert result.status == "not_indexed"
     assert result.answer_available is False
     assert result.reason == "project_docs_not_indexed"
+    assert result.reason_code == "project_docs_found_not_indexed"
+    assert result.next_action == {"type": "ingest_project_docs", "tool": "ingest_project_docs"}
+    assert result.requires_confirmation is False
+    assert result.arguments_patch == {"project_path": str(project.resolve()), "skip_known": False, "with_vectors": True}
     assert result.results == []
     assert result.candidate_sources[0]["path"] == "README.md"
     assert result.next_actions[0]["tool"] == "ingest_project_docs"
@@ -855,6 +1075,10 @@ def test_get_project_docs_distinguishes_indexed_no_results_from_not_indexed(tmp_
     assert result.status == "no_results"
     assert result.answer_available is False
     assert result.reason == "no_project_docs_results"
+    assert result.reason_code == "no_project_docs_results"
+    assert result.next_action == {"type": "inspect_project_docs", "tool": "inspect_project_docs"}
+    assert result.requires_confirmation is False
+    assert result.arguments_patch == {"project_path": str(project.resolve())}
     assert result.indexed_sources[0]["path"] == "README.md"
     assert result.next_actions[0]["tool"] == "inspect_project_docs"
 
@@ -871,6 +1095,10 @@ def test_get_project_docs_reports_stale_project_docs(tmp_path, monkeypatch):
 
     assert result.status == "stale"
     assert result.reason == "project_docs_stale"
+    assert result.reason_code == "project_docs_stale"
+    assert result.next_action == {"type": "ingest_project_docs", "tool": "ingest_project_docs"}
+    assert result.requires_confirmation is False
+    assert result.arguments_patch == {"project_path": str(project.resolve()), "skip_known": False, "with_vectors": True}
     assert result.stale_sources[0]["path"] == "README.md"
     assert result.next_actions[0]["tool"] == "ingest_project_docs"
 
@@ -884,6 +1112,15 @@ def test_get_project_docs_returns_no_project_docs_next_action(tmp_path, monkeypa
     assert result.status == "no_project_docs"
     assert result.answer_available is False
     assert result.reason == "no_project_docs"
+    assert result.reason_code == "no_project_docs"
+    assert result.next_action == {
+        "type": "ask_user_to_create_project_doc",
+        "suggested_file": "ARCHITECTURE.md",
+        "handled_by": "coding_agent",
+    }
+    assert result.requires_confirmation is True
+    assert result.confirmation_reason == "repo_write"
+    assert result.arguments_patch == {"project_path": str(project.resolve())}
     assert result.results == []
     assert result.candidate_sources == []
     assert result.next_actions[0]["action"] == "create_reviewable_project_doc"

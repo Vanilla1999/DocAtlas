@@ -311,6 +311,10 @@ class ProjectPrefetchResult:
 class ProjectDocsInspectResult:
     project_detected: bool
     project_path: str
+    reason_code: str | None = None
+    next_action: dict[str, Any] = field(default_factory=dict)
+    requires_confirmation: bool = False
+    confirmation_reason: str | None = None
     project_type: list[str] = field(default_factory=list)
     project_docs: dict[str, Any] = field(default_factory=dict)
     dependency_sources: dict[str, Any] = field(default_factory=dict)
@@ -319,6 +323,9 @@ class ProjectDocsInspectResult:
     stale_sources: list[dict[str, Any]] = field(default_factory=list)
     ignored_sources: list[dict[str, Any]] = field(default_factory=list)
     recommended_next_actions: list[dict[str, Any]] = field(default_factory=list)
+    arguments_patch: dict[str, Any] = field(default_factory=dict)
+    agent_message: str | None = None
+    user_message: str | None = None
     agent_guidance: str | None = None
     warnings: list[str] = field(default_factory=list)
 
@@ -336,11 +343,35 @@ class ProjectDocsIngestResult:
 
 
 @dataclass(frozen=True)
+class ProjectDocsBootstrapResult:
+    project_path: str
+    question: str | None = None
+    status: str = "ready"
+    tool: str = "bootstrap_project_docs"
+    reason_code: str | None = None
+    actions_taken: list[dict[str, Any]] = field(default_factory=list)
+    next_action: dict[str, Any] = field(default_factory=dict)
+    requires_confirmation: bool = False
+    confirmation_reason: str | None = None
+    arguments_patch: dict[str, Any] = field(default_factory=dict)
+    inspect_result: ProjectDocsInspectResult | None = None
+    ingest_result: ProjectDocsIngestResult | None = None
+    agent_message: str | None = None
+    user_message: str | None = None
+    warnings: list[str] = field(default_factory=list)
+
+
+@dataclass(frozen=True)
 class ProjectDocsResult:
     project_path: str
     query: str
     status: str = "success"
     tool: str = "get_project_docs"
+    reason_code: str | None = None
+    next_action: dict[str, Any] = field(default_factory=dict)
+    requires_confirmation: bool = False
+    confirmation_reason: str | None = None
+    arguments_patch: dict[str, Any] = field(default_factory=dict)
     results: list[ProjectDocsChunk] = field(default_factory=list)
     warnings: list[str] = field(default_factory=list)
     candidate_sources: list[dict[str, Any]] = field(default_factory=list)

@@ -152,7 +152,7 @@ TOOLS: list[dict[str, Any]] = [
 
     {
         "name": "inspect_project_docs",
-        "description": "Call this first when working inside a repository and the user asks to use Docmancer, asks about project architecture, asks how this repo works, or expects Context7-like docs help. This read-only tool discovers local project docs and exact dependency metadata, then returns recommended next actions.",
+        "description": "Call this first when working inside a repository and the user asks to use Docmancer, asks about project architecture, asks how this repo works, or expects Context7-like docs help. This read-only tool discovers local project docs and exact dependency metadata, then returns reason_code, next_action, arguments_patch, and any required user confirmation. Follow next_action before generic code search, public docs, or WebFetch.",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -163,7 +163,7 @@ TOOLS: list[dict[str, Any]] = [
     },
     {
         "name": "ingest_project_docs",
-        "description": "Index discovered project-owned docs files for a repository. This only ingests reviewable local docs candidates such as README, docs/, wiki/, ARCHITECTURE, ADR, and roadmap; it does not ingest source code, dependency directories, or build outputs. Call inspect_project_docs first to show candidates and get user confirmation if required.",
+        "description": "Index discovered project-owned docs files for a repository when inspect_project_docs returns next_action.type=ingest_project_docs. This only ingests reviewable local docs candidates such as README, docs/, wiki/, ARCHITECTURE, ADR, and roadmap; it does not ingest source code, dependency directories, build outputs, or dependency docs. Call inspect_project_docs first to show candidates and get user confirmation if required.",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -175,8 +175,20 @@ TOOLS: list[dict[str, Any]] = [
         },
     },
     {
+        "name": "bootstrap_project_docs",
+        "description": "Safely prepare project-owned docs for a repository question. This tool may inspect project docs and ingest/refresh existing reviewable README/docs/wiki/ARCHITECTURE/ADR files, but it never writes repository files and never fetches dependency docs from the network. If repo writes or dependency-doc network fetches are needed, it stops with confirmation_required, next_action, and arguments_patch.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "project_path": {"type": "string"},
+                "question": {"type": ["string", "null"]},
+            },
+            "required": ["project_path"],
+        },
+    },
+    {
         "name": "get_project_docs",
-        "description": "Query indexed project-owned docs for one repository using project-scoped filters. Use this before WebFetch or generic library docs for repo-specific architecture, conventions, runbooks, ADRs, README, roadmap, or wiki questions. If docs are missing or not indexed, this returns structured next_actions instead of a generic failure.",
+        "description": "Query indexed project-owned docs for one repository using project-scoped filters. Use this before WebFetch or generic library docs for repo-specific architecture, conventions, runbooks, ADRs, README, roadmap, or wiki questions. If docs are missing, stale, not indexed, or do not match, this returns structured reason_code, next_action, next_actions, and arguments_patch instead of a generic failure.",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -191,7 +203,7 @@ TOOLS: list[dict[str, Any]] = [
     },
     {
         "name": "get_project_context",
-        "description": "Return one repo-grounded context pack for a coding question. Combines indexed project-owned docs with one exact dependency docs source when requested/detectable, and always returns a compact Trust Contract with selected, rejected, and risky sources plus next_actions.",
+        "description": "Return one repo-grounded context pack for a coding question after inspect_project_docs and any required ingest_project_docs step. Combines indexed project-owned docs with one exact dependency docs source when requested/detectable, and always returns a compact Trust Contract with selected, rejected, and risky sources plus next_actions.",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -284,6 +296,24 @@ TOOLS: list[dict[str, Any]] = [
     {
         "name": "prefetch_project_docs",
         "description": "Read a Flutter/Dart/Rust project and prefetch exact dependency documentation from project manifests/lockfiles. This is for dependency docs, not project-owned README/docs/wiki files; call inspect_project_docs first to discover local project docs. May fetch from the network, so ask for confirmation before running unless the user already approved dependency docs prefetch.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "project_path": {"type": "string"},
+                "include_flutter": {"type": ["boolean", "null"]},
+                "include_dart": {"type": ["boolean", "null"]},
+                "include_rust": {"type": ["boolean", "null"]},
+                "include_packages": {"type": ["array", "null"], "items": {"type": "string"}},
+                "force_refresh": {"type": ["boolean", "null"]},
+                "continue_on_error": {"type": ["boolean", "null"]},
+                "async": {"type": ["boolean", "null"]},
+            },
+            "required": ["project_path"],
+        },
+    },
+    {
+        "name": "prefetch_project_dependency_docs",
+        "description": "Alias for prefetch_project_docs with clearer naming. Read a Flutter/Dart/Rust project and prefetch exact dependency documentation from project manifests/lockfiles. This is for dependency docs, not project-owned README/docs/wiki files. May fetch from the network, so ask for confirmation before running unless the user already approved dependency docs prefetch.",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -451,6 +481,11 @@ async def _run_async(service: LibraryDocsService) -> None:
                         )
                     ),
                 )
+            if name == "bootstrap_project_docs":
+                return _json_text(
+                    mcp_types,
+                    asdict(service.bootstrap_project_docs(args["project_path"], question=args.get("question"))),
+                )
             if name == "get_project_docs":
                 return _json_text(
                     mcp_types,
@@ -530,7 +565,7 @@ async def _run_async(service: LibraryDocsService) -> None:
                     limit=args.get("limit"),
                 )
                 return _json_text(mcp_types, {"libraries": [asdict(item) for item in libraries]})
-            if name == "prefetch_project_docs":
+            if name in {"prefetch_project_docs", "prefetch_project_dependency_docs"}:
                 return _json_text(
                     mcp_types,
                     asdict(

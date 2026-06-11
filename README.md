@@ -146,14 +146,20 @@ Tools:
 - `get_library_docs`
 - `inspect_project_docs`
 - `ingest_project_docs`
+- `bootstrap_project_docs`
 - `get_project_docs`
+- `get_project_context`
 - `refresh_library_docs`
 - `prefetch_library_docs`
 - `prefetch_project_docs`
+- `prefetch_project_dependency_docs`
 - `prefetch_docs_targets`
 - `prefetch_docs_manifest`
+- `validate_docs_manifest`
 - `list_library_docs`
 - `inspect_library_docs`
+- `remove_library_docs`
+- `prune_library_docs`
 - `get_docs_job_status`
 - `list_docs_jobs`
 - `cancel_docs_job`
@@ -176,11 +182,14 @@ If you thought Docmancer was only like Context7, this is the extra local-first l
 
 Recommended MCP workflow inside a repo:
 
-1. Call `inspect_project_docs` first. It is read-only and reports discovered project docs, dependency manifests/lockfiles, indexed docs, stale docs, ignored indexed docs, and recommended next actions.
-2. If project docs are found and local indexing is approved, call `ingest_project_docs` to index only reviewable project-doc candidates. It does not ingest source code, dependency directories, or build outputs.
-3. For repo-specific architecture, implementation, ADR, roadmap, or README questions, call `get_project_docs` before WebFetch. Results include source class, file path, heading path, freshness metadata, and `next_actions` when docs are missing, stale, or not indexed.
+1. Prefer `bootstrap_project_docs(project_path, question?)` for the safe happy path. It can inspect, ingest or refresh existing reviewable docs, and inspect again.
+2. If using lower-level tools, call `inspect_project_docs` first. It is read-only and reports discovered project docs, dependency manifests/lockfiles, indexed docs, stale docs, ignored indexed docs, `reason_code`, `next_action`, and `arguments_patch`.
+3. If `reason_code` is `project_docs_found_not_indexed` or `project_docs_stale`, call `ingest_project_docs` to index only reviewable project-doc candidates. It does not ingest source code, dependency directories, build outputs, or dependency docs.
+4. For repo-specific architecture, implementation, ADR, roadmap, or README questions, call `get_project_context` or `get_project_docs` before WebFetch. `get_project_context` returns a compact Trust Contract with selected/rejected/risky sources, optional dependency-doc evidence, `mode` (`auto`, `project-only`, `deps-only`, or `public-docs`), source class, file path, heading path, freshness metadata, and structured next actions when docs are missing, stale, not indexed, or unmatched.
 
-If no project docs are found, Docmancer returns a manual `create_reviewable_project_doc` next action with `preferred_path: "ARCHITECTURE.md"`. Ask the user before creating it, have the coding agent study the repo and write `ARCHITECTURE.md` as a normal reviewable file, then run `inspect_project_docs`, `ingest_project_docs`, and `get_project_docs`. Do not store the generated architecture in hidden memory; keep it in the repo so humans can review and edit it.
+If no project docs are found, or if docs exist but no high-level overview/architecture doc is discovered, Docmancer returns `requires_confirmation: true` with `confirmation_reason: "repo_write"` and a next action to ask before creating `ARCHITECTURE.md`. Have the coding agent study the repo and write `ARCHITECTURE.md` as a normal reviewable file only after approval, then run `inspect_project_docs`, `ingest_project_docs`, and `get_project_context` / `get_project_docs`. Do not store the generated architecture in hidden memory; keep it in the repo so humans can review and edit it.
+
+Dependency docs are separate from project-owned docs. `prefetch_project_docs` is the historical name for reading supported manifests/lockfiles and prefetching exact dependency documentation. Prefer the clearer alias `prefetch_project_dependency_docs` in new agent instructions. Because this may fetch from the network, ask for confirmation unless the user already approved dependency-docs prefetch.
 
 Example `get_project_docs` response shape:
 
@@ -200,7 +209,12 @@ Example `get_project_docs` response shape:
 }
 ```
 
-If `get_project_docs` returns `not_indexed`, `stale`, `no_results`, or `no_project_docs`, follow its `next_actions` instead of guessing or writing official architecture into hidden memory. Official project knowledge should remain files in the repo.
+If `get_project_docs`, `get_project_context`, or `bootstrap_project_docs` returns `project_docs_found_not_indexed`, `project_docs_stale`, `no_project_docs_results`, `no_project_docs`, or `architecture_doc_creation_recommended`, follow its structured `next_action`, `next_actions`, or `arguments_patch` instead of guessing or writing official architecture into hidden memory. Official project knowledge should remain files in the repo.
+
+More details:
+
+- [`docs/mcp-docs-server.md`](./docs/mcp-docs-server.md)
+- [`docs/project-docs-mcp-workflow.md`](./docs/project-docs-mcp-workflow.md)
 
 ### Prefetch progress
 
