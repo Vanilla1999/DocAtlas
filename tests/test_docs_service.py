@@ -406,6 +406,41 @@ def test_agent_templates_include_project_docs_discovery_guidance():
         assert "prefetch_project_docs` fetches exact dependency docs" in text
         assert "Official project docs should remain files in the repo" in text
         assert "Do not skip `inspect_project_docs`" in text
+        assert "docs/INDEX.md" in text
+        assert "canonical map of project-owned docs" in text
+        assert "verification loop" in text
+        assert "confirm expected files are cited" in text
+
+
+def test_project_docs_workflow_documents_index_template_and_verification_loop():
+    docs = Path(__file__).resolve().parents[1] / "docs" / "project-docs-mcp-workflow.md"
+    text = docs.read_text(encoding="utf-8")
+
+    assert "## Maintained docs index" in text
+    assert "docs/INDEX.md" in text
+    assert "# Documentation Index" in text
+    assert "canonical map of maintained project-owned documentation" in text
+    assert "Generated or tooling docs to ignore" in text
+    assert "indexed_source_not_discovered" in text
+    assert "## Post-ingestion verification loop" in text
+    assert "inspect_project_docs(project_path)" in text
+    assert "ingest_project_docs(project_path, skip_known=false, with_vectors=true)" in text
+    assert "Confirm the expected files are cited" in text
+    assert "get_project_context(project_path" in text
+
+
+def test_mcp_docs_server_documents_index_and_smoke_test_loop():
+    docs = Path(__file__).resolve().parents[1] / "docs" / "mcp-docs-server.md"
+    text = docs.read_text(encoding="utf-8")
+
+    assert "## Maintained docs index and verification" in text
+    assert "docs/INDEX.md" in text
+    assert "canonical map of official project-owned docs" in text
+    assert "inspect_project_docs(project_path)" in text
+    assert "ingest_project_docs(project_path, skip_known=false, with_vectors=true)" in text
+    assert "confirm expected files appear" in text
+    assert "indexed_source_not_discovered" in text
+    assert "Treat maintained `docs/INDEX.md` as the canonical map" in text
 
 
 def test_mcp_exposes_docs_job_tools():
@@ -2694,6 +2729,31 @@ targets:
 
     assert result.valid is False
     assert "allowed_domains is required" in result.errors[0]
+
+
+def test_validate_docs_manifest_warns_for_pub_package_landing_page(tmp_path, monkeypatch):
+    service = _service(tmp_path, monkeypatch)
+    manifest = _write_manifest(
+        tmp_path / "docmancer.docs.yaml",
+        """
+version: 1
+targets:
+  - id: go-router-package
+    library: go_router
+    ecosystem: pub
+    version: 14.8.1
+    docs_url: https://pub.dev/packages/go_router
+    allowed_domains:
+      - pub.dev
+""",
+    )
+
+    result = service.validate_docs_manifest(str(manifest))
+
+    assert result.valid is True
+    assert result.warnings == [
+        "go_router: Prefer exact pub.dev API docs such as https://pub.dev/documentation/go_router/14.8.1/ over package landing pages."
+    ]
 
 
 def test_prefetch_docs_manifest_resolves_project_version_from_pubspec_lock(tmp_path, monkeypatch):

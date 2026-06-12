@@ -100,6 +100,22 @@ If no project docs exist, or if the repo has docs but no high-level overview/arc
 
 If dependency docs are available from manifests/lockfiles but missing locally, Docmancer should not silently fetch from the network. It returns a confirmation-required dependency-docs prefetch action.
 
+## Maintained docs index and verification
+
+For multi-doc repositories, recommend a maintained `docs/INDEX.md` as the canonical map of official project-owned docs. It should link root docs, architecture docs, ADRs, module/package docs, runbooks, investigation notes, and explicitly list generated/tooling docs that should be ignored. Agents should treat that index as evidence of which nested docs are intentional and maintained.
+
+After docs are added, moved, refreshed, or reorganized, use this smoke-test loop before relying on answers:
+
+```text
+inspect_project_docs(project_path)
+-> ingest_project_docs(project_path, skip_known=false, with_vectors=true) when docs are new or stale
+-> inspect_project_docs(project_path) again
+-> get_project_context/get_project_docs with 2-3 project-specific questions
+-> confirm expected files appear in selected_sources, indexed_sources, or result chunks
+```
+
+If expected files are missing, fix links in `docs/INDEX.md` or root docs, move maintained docs into discovered docs locations, update discovery/manifest entries, then re-ingest and repeat the smoke test. If a response reports `indexed_source_not_discovered`, it means the indexed file was not selected by the current discovery pass; it is not automatically deleted, invalid, or irrelevant.
+
 ## Structured project-docs contract
 
 Project-docs MCP responses use a stable structured contract so agents can follow the next step without guessing:
@@ -134,3 +150,5 @@ Current project-docs `reason_code` values:
 - Do not create or edit `ARCHITECTURE.md` without user confirmation.
 - Do not run dependency-docs prefetch without user confirmation when it may fetch from the network.
 - Keep official project knowledge as reviewable files in the repository, not hidden agent memory.
+- Treat maintained `docs/INDEX.md` as the canonical map of project-owned docs when present.
+- After docs are added, moved, or refreshed, recommend the post-ingestion verification loop and confirm expected files are cited.

@@ -1,33 +1,35 @@
 # Docmancer Roadmap
 
-This folder contains the current active roadmap for making Docmancer a practical Context7 replacement for repo-aware coding-agent work.
+This roadmap focuses on improving how users and AI agents apply Docmancer correctly. Most core capabilities already exist: MCP tools, project-doc inspection, project context packs, dependency docs, manifests, stale-source detection, and generated agent instructions.
 
-The product thesis:
+The remaining work is mostly about UX, wording, guardrails, examples, and verification flows.
 
-> Docmancer is not docs search. Docmancer is repo-grounded context resolution for agents.
+## Roadmap files
 
-Short version:
+- [01-agent-mcp-workflow.md](01-agent-mcp-workflow.md) — make the existing inspect-first workflow harder for agents to skip.
+- [02-source-taxonomy.md](02-source-taxonomy.md) — explain and surface the existing separation between project docs, dependency docs, and source code.
+- [03-documentation-index.md](03-documentation-index.md) — add canonical `docs/INDEX.md` guidance for projects with scattered docs.
+- [04-curated-dependency-docs.md](04-curated-dependency-docs.md) — improve warnings and examples for exact official dependency documentation URLs.
+- [05-stale-and-ignored-sources.md](05-stale-and-ignored-sources.md) — make source-status messages easier to understand and act on.
+- [06-verification-loop.md](06-verification-loop.md) — document a smoke-test loop after ingesting or refreshing docs.
 
-> Context7 gives docs. Docmancer resolves trusted context.
+## Framing
 
-## Recommended reading order
+Do not treat this roadmap as a list of missing core features. Treat it as a set of improvements to the existing system.
 
-1. [`20_context7_replacement_strategy.md`](20_context7_replacement_strategy.md) - overview and product strategy.
-2. [`21_trusted_context_contract.md`](21_trusted_context_contract.md) - Trust Contract schema and selected/rejected source semantics.
-3. [`22_get_project_context_mvp.md`](22_get_project_context_mvp.md) - first shippable `get_project_context` / `docmancer context` slice.
-4. [`23_source_resolution_and_rejection.md`](23_source_resolution_and_rejection.md) - official source discovery, confidence, and rejection reasons.
-5. [`24_exact_version_and_project_context_benchmarks.md`](24_exact_version_and_project_context_benchmarks.md) - benchmarks that prove the wedge against Context7.
-6. [`25_snippet_and_explain_context.md`](25_snippet_and_explain_context.md) - snippet-first output and `--explain` UX.
-7. [`26_platform_hardening_after_wedge.md`](26_platform_hardening_after_wedge.md) - install, backup, security, and other later platform work.
+Each roadmap item should answer:
 
-## First implementation focus
+1. What already exists?
+2. What still causes misuse or confusion?
+3. What UX/documentation/guardrail improvement is needed?
+4. How do we know the improvement worked?
 
-Do not start with P2P sync, GUI, cloud backup, or a broad local clone of Context7.
+## Expected outcome
 
-Start with:
+After these items are completed, agents should be less likely to produce broad ungrounded summaries and more likely to:
 
-1. `get_project_context(project_path, question)` response schema.
-2. Trust Contract with trusted and rejected/risky sources.
-3. Minimal orchestrator that combines project docs plus one exact dependency docs source.
-4. `docmancer context ... --explain` output.
-5. A benchmark where Context7-only is weaker because it uses latest docs or ignores a local project rule.
+1. inspect project documentation first;
+2. query the correct source type;
+3. explain stale or ignored sources accurately;
+4. prefer exact official dependency docs;
+5. verify that expected docs are retrievable after changes.

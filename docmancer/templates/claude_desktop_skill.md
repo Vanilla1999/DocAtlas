@@ -36,6 +36,14 @@ Use the returned `recommended_next_actions`:
 
 For repo-specific implementation or architecture answers, use `get_project_docs` after `inspect_project_docs`/`ingest_project_docs` before WebFetch. If `get_project_docs` reports `not_indexed`, `stale`, or `no_project_docs`, follow its `next_actions` instead of guessing. For dependency API questions in a project, prefer exact dependency docs discovered from the project before latest-only hosted docs.
 
+Golden path for repo questions: `inspect_project_docs` -> `ingest_project_docs` when requested -> `get_project_context` -> review the Trust Contract -> inspect source code only for current implementation facts. Bad path: answer from generic package docs or WebFetch before checking project-owned docs.
+
+Evidence types must stay separate: project docs prove repository architecture, decisions, runbooks, and conventions; dependency docs prove external package APIs; source code proves current implementation. Do not use dependency docs as proof of repo-specific architecture.
+
+If `source_state_guidance` mentions `indexed_source_not_discovered`, do not treat that as automatically deleted or invalid. It means an indexed source was not selected by the current project-doc discovery pass; link it from `docs/INDEX.md` or root docs, move it under a discovered docs location, adjust discovery, or refresh/remove obsolete index entries.
+
+When a repository has many docs, treat a maintained `docs/INDEX.md` as the canonical map of project-owned docs. After docs are added, refreshed, or reorganized, recommend a verification loop: `inspect_project_docs` -> `ingest_project_docs` if needed -> `inspect_project_docs` again -> ask smoke-test questions with `get_project_context`/`get_project_docs` and confirm expected files are cited.
+
 ## Core Commands
 
 - `docmancer setup`: create config, database, and agent integrations.
@@ -72,3 +80,4 @@ Destructive calls are blocked unless the user installed the pack with `--allow-d
 - Do not WebFetch registered docs when Docmancer returns candidates or retry guidance. Retry Docmancer first.
 - Do not skip `inspect_project_docs` when the user asks to use Docmancer inside a repo or expects Context7-like help.
 - Do not use `prefetch_project_docs` for project-owned files; it is for dependency docs from project metadata/lockfiles.
+- Do not cite dependency docs as evidence for project-specific architecture or implementation.

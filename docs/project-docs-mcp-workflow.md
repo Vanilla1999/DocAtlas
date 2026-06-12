@@ -126,6 +126,92 @@ for exact dependency documentation from manifests/lockfiles.
 
 Prefer `prefetch_project_dependency_docs` in new instructions because it makes the behavior explicit.
 
+## Maintained docs index
+
+For repositories with more than a few documentation files, keep a reviewable documentation map at:
+
+```text
+docs/INDEX.md
+```
+
+Docmancer can discover common root docs and documentation directories without this file, but a maintained index makes intent explicit for both humans and agents. Treat `docs/INDEX.md` as the canonical map of project-owned docs: it should link the files that are official, maintained, and safe to use as project evidence.
+
+Copy-paste template:
+
+```markdown
+# Documentation Index
+
+This file is the canonical map of maintained project-owned documentation.
+
+## Start here
+
+- [README](../README.md) — product/project overview and setup.
+- [Architecture](../ARCHITECTURE.md) — high-level architecture and major decisions.
+
+## Architecture and decisions
+
+- [Architecture overview](architecture.md) — current system shape and boundaries.
+- [ADR index](adr/README.md) — accepted architecture decision records.
+
+## Modules and packages
+
+- [Backend module](../packages/backend/README.md) — backend-specific conventions.
+- [Frontend module](../packages/frontend/README.md) — frontend-specific conventions.
+
+## Runbooks
+
+- [Deploy runbook](runbooks/deploy.md) — release and rollback steps.
+- [Incident runbook](runbooks/incidents.md) — operational response steps.
+
+## Investigation notes
+
+- [Investigations](investigations/README.md) — time-bound research notes. Mark each note with owner/date/status.
+
+## Generated or tooling docs to ignore
+
+- `build/`, `dist/`, `coverage/`, `.dart_tool/`, `node_modules/`, `.venv/` — generated, dependency, or tooling output.
+- Link a generated file here only if humans intentionally maintain it as project documentation.
+
+## Maintenance rules
+
+- Add new official docs here when they are created or moved.
+- Remove or mark stale docs when decisions change.
+- After reorganizing docs, run the Docmancer verification loop: inspect, ingest/refresh if needed, then ask smoke-test questions and confirm expected files are cited.
+```
+
+When an expected nested document is missing from results, first check whether it is linked from root docs or `docs/INDEX.md`, lives under a discovered docs location, or needs a discovery/manifest update. If `inspect_project_docs` reports `indexed_source_not_discovered`, do not assume the indexed file is deleted or invalid: it means the current discovery pass did not select it as a project-doc candidate. Link it from `docs/INDEX.md` or root docs, move it under a discovered docs location, adjust discovery, or refresh/remove obsolete index entries.
+
+## Post-ingestion verification loop
+
+After adding, moving, refreshing, or reorganizing project docs, verify that discovery, indexing, and retrieval agree before relying on answers.
+
+Checklist:
+
+1. Run `inspect_project_docs(project_path)`.
+   - Confirm the expected files appear in `project_docs.found`.
+   - Check `project_docs.ignored`, `project_docs.stale`, and `source_state_guidance` before assuming a file is bad or missing.
+2. If docs are new or stale, run `ingest_project_docs(project_path, skip_known=false, with_vectors=true)`.
+3. Run `inspect_project_docs(project_path)` again.
+   - Confirm `reason_code` is `project_docs_ready` or follow the returned `next_action`.
+4. Ask two or three project-specific smoke-test questions with `get_project_context` or `get_project_docs`.
+   - Use terms that should only appear in the expected docs.
+   - Confirm the expected files are cited in `selected_sources`, `indexed_sources`, or result chunks.
+5. If expected files are not cited, fix the source map instead of guessing:
+   - add or correct links in `docs/INDEX.md` or root docs;
+   - move maintained docs under `docs/`, `wiki/`, ADR, roadmap, or runbook-style locations;
+   - update discovery configuration or `docmancer.docs.yaml` manifest entries if the docs are external dependency/public docs;
+   - re-run ingestion/refresh and repeat the smoke test.
+
+Suggested smoke-test questions:
+
+```text
+get_project_context(project_path, "What is the architecture decision for <unique ADR term>?")
+get_project_context(project_path, "How do we deploy <unique service/module name>?")
+get_project_docs(project_path, "<unique heading or phrase from docs/INDEX.md target>")
+```
+
+Agents should recommend this verification loop whenever docs were just added, refreshed, reorganized, or when a user expected a source that was not cited.
+
 ## Example response handling
 
 Example: docs exist but are not indexed.

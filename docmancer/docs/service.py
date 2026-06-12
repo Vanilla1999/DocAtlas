@@ -495,6 +495,27 @@ class LibraryDocsService:
         return rows
 
     @staticmethod
+    def _source_state_guidance() -> dict[str, Any]:
+        return {
+            "stale_source": {
+                "meaning": "An indexed project-doc source differs from the current file on disk.",
+                "next_action": "Run ingest_project_docs, then retry inspect_project_docs or get_project_context.",
+            },
+            "indexed_source_not_discovered": {
+                "meaning": "The source exists in the index, but the current discovery pass did not select it as a project-doc candidate. This does not by itself mean the file is deleted or invalid.",
+                "next_action": "Link the file from docs/INDEX.md or root docs, move it under a discovered docs location, adjust discovery, or re-ingest after removing obsolete index entries.",
+            },
+            "ignored_generated_or_tooling_doc": {
+                "meaning": "Generated, build, dependency, or tooling docs are not treated as reviewable project-owned docs by default.",
+                "next_action": "Usually no action is required. If the file is official project documentation, link it from docs/INDEX.md or move it to a reviewable docs location.",
+            },
+            "missing_expected_source": {
+                "meaning": "A document the user expected was not selected or cited.",
+                "next_action": "Check inspect_project_docs output, docs/INDEX.md links, discovery scope, manifest entries, and ingestion freshness.",
+            },
+        }
+
+    @staticmethod
     def _partition_project_doc_state(
         candidates: list[dict[str, Any]],
         indexed_sources: list[dict[str, Any]],
@@ -507,7 +528,13 @@ class LibraryDocsService:
         for path, indexed in indexed_by_path.items():
             candidate = candidate_by_path.get(path)
             if not candidate:
-                ignored.append({**indexed, "stale": True, "reason": "indexed_source_not_discovered"})
+                ignored.append({
+                    **indexed,
+                    "stale": True,
+                    "reason": "indexed_source_not_discovered",
+                    "meaning": "This source exists in the index, but current project-doc discovery did not select it as a candidate.",
+                    "recommended_next_action": "Link it from docs/INDEX.md or root docs, move it under a discovered docs location, adjust discovery, or refresh/remove obsolete index entries.",
+                })
                 continue
             stale_reasons: list[str] = []
             if candidate.get("content_hash") != indexed.get("content_hash"):
@@ -754,6 +781,7 @@ class LibraryDocsService:
             agent_message=agent_message,
             user_message=user_message,
             agent_guidance="Call get_project_docs for repo-specific questions after project docs are indexed. If docs are missing, ask before creating a reviewable ARCHITECTURE.md, then inspect and ingest it. If docs are stale, call ingest_project_docs first. Ask before network dependency docs fetches.",
+            source_state_guidance=self._source_state_guidance(),
             warnings=metadata.warnings,
         )
 
@@ -1084,6 +1112,8 @@ class LibraryDocsService:
                 candidate_sources=candidate_sources,
                 indexed_sources=result_indexed_sources or indexed_sources,
                 stale_sources=stale_sources,
+                ignored_sources=ignored_sources,
+                source_state_guidance=self._source_state_guidance(),
                 next_actions=next_actions,
                 message=f"Returned {len(results)} project docs result(s)." + (" Some indexed project docs are stale." if stale_sources else ""),
             )
@@ -1114,6 +1144,8 @@ class LibraryDocsService:
             candidate_sources=candidate_sources,
             indexed_sources=indexed_sources,
             stale_sources=stale_sources,
+            ignored_sources=ignored_sources,
+            source_state_guidance=self._source_state_guidance(),
             next_actions=[{
                 "tool": "ingest_project_docs" if stale_sources else "inspect_project_docs",
                 "requires_confirmation": False,
@@ -1863,6 +1895,26 @@ class LibraryDocsService:
                     return [], f"URL path is outside path_prefixes: {url}"
         return urls, None
 
+    @staticmethod
+    def _dependency_docs_url_guidance(target: DocsTarget) -> list[str]:
+        urls = list(target.seed_urls)
+        if target.docs_url:
+            urls.insert(0, target.docs_url)
+        elif target.docs_url_template:
+            version = normalize_version(target.version) or "latest"
+            urls.insert(0, target.docs_url_template.format(library=target.library, version=version))
+
+        warnings: list[str] = []
+        for url in urls:
+            parsed = urlparse(url)
+            if parsed.hostname == "pub.dev" and parsed.path.startswith("/packages/"):
+                version = normalize_version(target.version) or "latest"
+                warnings.append(
+                    f"{target.library}: Prefer exact pub.dev API docs such as "
+                    f"https://pub.dev/documentation/{target.library}/{version}/ over package landing pages."
+                )
+        return warnings
+
     def _progress_callback_for(self, job_id: str | None, canonical_id: str):
         if not job_id:
             return None
@@ -2021,6 +2073,7 @@ class LibraryDocsService:
             if error:
                 errors.append(f"{target_id or canonical_id}: {error}")
                 continue
+            warnings.extend(self._dependency_docs_url_guidance(target))
             docs_targets.append(target)
 
         if selected:

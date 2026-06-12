@@ -327,6 +327,7 @@ class ProjectDocsInspectResult:
     agent_message: str | None = None
     user_message: str | None = None
     agent_guidance: str | None = None
+    source_state_guidance: dict[str, Any] = field(default_factory=dict)
     warnings: list[str] = field(default_factory=list)
 
 
@@ -377,6 +378,8 @@ class ProjectDocsResult:
     candidate_sources: list[dict[str, Any]] = field(default_factory=list)
     indexed_sources: list[dict[str, Any]] = field(default_factory=list)
     stale_sources: list[dict[str, Any]] = field(default_factory=list)
+    ignored_sources: list[dict[str, Any]] = field(default_factory=list)
+    source_state_guidance: dict[str, Any] = field(default_factory=dict)
     next_actions: list[dict[str, Any]] = field(default_factory=list)
     answer_available: bool = True
     reason: str | None = None
