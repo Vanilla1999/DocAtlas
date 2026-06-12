@@ -3,10 +3,12 @@ from __future__ import annotations
 
 import asyncio
 import json
-from dataclasses import asdict
 from typing import Any
 
 from docmancer.docs.service import LibraryDocsService
+from docmancer.docs.interfaces.mcp.docs_tools import handle_library_tool, library_tools
+from docmancer.docs.interfaces.mcp.prefetch_tools import handle_prefetch_tool, prefetch_tools
+from docmancer.docs.interfaces.mcp.project_tools import handle_project_tool, project_tools
 
 
 TOOLS: list[dict[str, Any]] = [
@@ -331,6 +333,10 @@ TOOLS: list[dict[str, Any]] = [
     },
 ]
 
+LIBRARY_TOOLS = library_tools(TOOLS)
+PROJECT_TOOLS = project_tools(TOOLS)
+PREFETCH_TOOLS = prefetch_tools(TOOLS)
+
 
 def _json_text(mcp_types: Any, payload: dict[str, Any]) -> list[Any]:
     return [mcp_types.TextContent(type="text", text=json.dumps(payload, ensure_ascii=False))]
@@ -354,245 +360,10 @@ async def _run_async(service: LibraryDocsService) -> None:
     async def _call_tool(name: str, arguments: dict[str, Any]) -> list[mcp_types.TextContent]:
         try:
             args = arguments or {}
-            if name == "resolve_library_id":
-                return _json_text(
-                    mcp_types,
-                    asdict(
-                        service.resolve_library(
-                            args["library"],
-                            args.get("ecosystem"),
-                            args.get("version"),
-                            args.get("docs_url"),
-                            args.get("docs_url_template"),
-                            args.get("source_type"),
-                        )
-                    ),
-                )
-            if name == "get_library_docs":
-                return _json_text(
-                    mcp_types,
-                    asdict(
-                        service.get_docs(
-                            args["library"],
-                            topic=args.get("topic"),
-                            tokens=args.get("tokens"),
-                            ecosystem=args.get("ecosystem"),
-                            version=args.get("version"),
-                            docs_url=args.get("docs_url"),
-                            docs_url_template=args.get("docs_url_template"),
-                            source_type=args.get("source_type"),
-                            force_refresh=bool(args.get("force_refresh") or False),
-                            project_path=args.get("project_path"),
-                        )
-                    ),
-                )
-            if name == "refresh_library_docs":
-                return _json_text(
-                    mcp_types,
-                    asdict(
-                        service.refresh_docs(
-                            args["library"],
-                            ecosystem=args.get("ecosystem"),
-                            version=args.get("version"),
-                            docs_url=args.get("docs_url"),
-                            versions=args.get("versions"),
-                            docs_url_template=args.get("docs_url_template"),
-                            source_type=args.get("source_type"),
-                            force=bool(args.get("force") if args.get("force") is not None else True),
-                        )
-                    ),
-                )
-            if name == "prefetch_library_docs":
-                return _json_text(
-                    mcp_types,
-                    asdict(
-                        service.prefetch_docs(
-                            args["library"],
-                            ecosystem=args.get("ecosystem"),
-                            versions=args.get("versions"),
-                            docs_url=args.get("docs_url"),
-                            docs_url_template=args.get("docs_url_template"),
-                            source_type=args.get("source_type"),
-                            force_refresh=bool(args.get("force_refresh") or False),
-                            continue_on_error=bool(
-                                args.get("continue_on_error")
-                                if args.get("continue_on_error") is not None
-                                else True
-                            ),
-                            async_=bool(args.get("async") or False),
-                        )
-                    ),
-                )
-            if name == "validate_docs_manifest":
-                return _json_text(
-                    mcp_types,
-                    asdict(
-                        service.validate_docs_manifest(
-                            args["manifest_path"],
-                            project_path=args.get("project_path"),
-                            targets=args.get("targets"),
-                        )
-                    ),
-                )
-            if name == "prefetch_docs_manifest":
-                return _json_text(
-                    mcp_types,
-                    asdict(
-                        service.prefetch_docs_manifest(
-                            args["manifest_path"],
-                            project_path=args.get("project_path"),
-                            targets=args.get("targets"),
-                            force_refresh=bool(args.get("force_refresh") or False),
-                            continue_on_error=bool(
-                                args.get("continue_on_error")
-                                if args.get("continue_on_error") is not None
-                                else True
-                            ),
-                            async_=bool(args.get("async") or False),
-                        )
-                    ),
-                )
-            if name == "prefetch_docs_targets":
-                return _json_text(
-                    mcp_types,
-                    asdict(
-                        service.prefetch_docs_targets(
-                            args.get("targets") or [],
-                            force_refresh=bool(args.get("force_refresh") or False),
-                            continue_on_error=bool(
-                                args.get("continue_on_error")
-                                if args.get("continue_on_error") is not None
-                                else True
-                            ),
-                            async_=bool(args.get("async") or False),
-                        )
-                    ),
-                )
-            if name == "inspect_project_docs":
-                return _json_text(mcp_types, asdict(service.inspect_project_docs(args["project_path"])))
-            if name == "ingest_project_docs":
-                return _json_text(
-                    mcp_types,
-                    asdict(
-                        service.ingest_project_docs(
-                            args["project_path"],
-                            skip_known=bool(args.get("skip_known") if args.get("skip_known") is not None else True),
-                            with_vectors=bool(args.get("with_vectors") if args.get("with_vectors") is not None else True),
-                        )
-                    ),
-                )
-            if name == "bootstrap_project_docs":
-                return _json_text(
-                    mcp_types,
-                    asdict(service.bootstrap_project_docs(args["project_path"], question=args.get("question"))),
-                )
-            if name == "get_project_docs":
-                return _json_text(
-                    mcp_types,
-                    asdict(
-                        service.get_project_docs(
-                            args["project_path"],
-                            args["query"],
-                            tokens=args.get("tokens"),
-                            limit=args.get("limit"),
-                            expand=args.get("expand"),
-                        )
-                    ),
-                )
-            if name == "get_project_context":
-                return _json_text(
-                    mcp_types,
-                    asdict(
-                        service.get_project_context(
-                            args["project_path"],
-                            args["question"],
-                            tokens=args.get("tokens"),
-                            limit=args.get("limit"),
-                            expand=args.get("expand"),
-                            library=args.get("library"),
-                            libraries=args.get("libraries"),
-                            ecosystem=args.get("ecosystem"),
-                            version=args.get("version"),
-                            mode=args.get("mode") or "auto",
-                        )
-                    ),
-                )
-            if name == "get_docs_job_status":
-                job = service.get_docs_job_status(args["job_id"])
-                if job is None:
-                    return _json_text(mcp_types, {"job_id": args["job_id"], "status": "not_found"})
-                return _json_text(mcp_types, asdict(job))
-            if name == "list_docs_jobs":
-                jobs = service.list_docs_jobs(status=args.get("status"), limit=args.get("limit"))
-                return _json_text(
-                    mcp_types,
-                    {
-                        "jobs": [
-                            {
-                                "job_id": job.job_id,
-                                "kind": job.kind,
-                                "status": job.status,
-                                "phase": job.phase,
-                                "message": job.message,
-                                "started_at": job.started_at,
-                                "updated_at": job.updated_at,
-                            }
-                            for job in jobs
-                        ]
-                    },
-                )
-            if name == "cancel_docs_job":
-                return _json_text(mcp_types, asdict(service.cancel_docs_job(args["job_id"])))
-            if name == "inspect_library_docs":
-                return _json_text(mcp_types, asdict(service.inspect_library_docs(args["canonical_id"])))
-            if name == "remove_library_docs":
-                return _json_text(mcp_types, asdict(service.remove_library_docs(args["canonical_id"])))
-            if name == "prune_library_docs":
-                return _json_text(
-                    mcp_types,
-                    asdict(
-                        service.prune_library_docs(
-                            library=args.get("library"),
-                            keep_versions=args.get("keep_versions") or [],
-                            older_than_days=int(args.get("older_than_days") or 90),
-                            dry_run=bool(args.get("dry_run") if args.get("dry_run") is not None else True),
-                        )
-                    ),
-                )
-            if name == "list_library_docs":
-                libraries = service.list_libraries(
-                    stale_only=bool(args.get("stale_only") or False),
-                    limit=args.get("limit"),
-                )
-                return _json_text(mcp_types, {"libraries": [asdict(item) for item in libraries]})
-            if name in {"prefetch_project_docs", "prefetch_project_dependency_docs"}:
-                return _json_text(
-                    mcp_types,
-                    asdict(
-                        service.prefetch_project_docs(
-                            args["project_path"],
-                            include_flutter=bool(
-                                args.get("include_flutter")
-                                if args.get("include_flutter") is not None
-                                else True
-                            ),
-                            include_dart=bool(args.get("include_dart") or False),
-                            include_rust=bool(
-                                args.get("include_rust")
-                                if args.get("include_rust") is not None
-                                else True
-                            ),
-                            include_packages=args.get("include_packages") or [],
-                            force_refresh=bool(args.get("force_refresh") or False),
-                            continue_on_error=bool(
-                                args.get("continue_on_error")
-                                if args.get("continue_on_error") is not None
-                                else True
-                            ),
-                            async_=bool(args.get("async") or False),
-                        )
-                    ),
-                )
+            for handler in (handle_library_tool, handle_prefetch_tool, handle_project_tool):
+                payload = handler(name, args, service)
+                if payload is not None:
+                    return _json_text(mcp_types, payload)
         except Exception as exc:
             return _json_text(mcp_types, {"status": "failed", "message": str(exc)})
         return _json_text(mcp_types, {"status": "failed", "message": f"unknown tool: {name}"})

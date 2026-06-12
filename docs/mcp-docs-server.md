@@ -18,6 +18,21 @@ Docmancer's MCP docs server has three main lanes:
 
 Project-owned docs and dependency docs are intentionally separate. `ingest_project_docs` indexes files that already live in the repository. `prefetch_project_docs` / `prefetch_project_dependency_docs` fetch dependency documentation from the network based on manifests or lockfiles.
 
+Implementation note for maintainers: the public MCP tool names and schemas remain centralized in `docmancer/mcp/docs_server.py`, while tool handling is split by lane under `docmancer/docs/interfaces/mcp/`:
+
+- `docs_tools.py` handles library-docs tools;
+- `project_tools.py` handles project-owned docs and project dependency-docs tools;
+- `prefetch_tools.py` handles manifest, target prefetch, and job tools.
+
+This split is internal only; MCP clients should see the same tool names and response shapes.
+
+Internal application-service wiring is also intentionally split behind the compatibility facade in
+`docmancer/docs/service.py`. Public MCP tools call stable facade methods, while focused helpers under
+`docmancer/docs/application/` own smaller concerns such as target resolution, manifest validation,
+prefetch execution, registry operations, and project dependency-version resolution. Maintainers should
+prefer adding new behavior to the focused helper for that concern and keep the facade as wiring plus
+backwards compatibility.
+
 ## MCP client configuration
 
 Example client config:
