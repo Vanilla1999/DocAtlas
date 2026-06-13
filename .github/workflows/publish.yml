@@ -37,11 +37,11 @@ jobs:
 
       - name: Run smoke CLI checks
         run: |
-          python -m docmancer --help
+          doc-atlas --help
           TMP_DIR="$(mktemp -d)"
-          python -m docmancer init --dir "$TMP_DIR"
+          doc-atlas init --dir "$TMP_DIR"
           test -f "$TMP_DIR/docmancer.yaml"
-          python -m docmancer doctor --config "$TMP_DIR/docmancer.yaml"
+          doc-atlas doctor --config "$TMP_DIR/docmancer.yaml"
 
       - name: Build artifacts
         run: python -m build --no-isolation

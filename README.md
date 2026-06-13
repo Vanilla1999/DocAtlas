@@ -1,10 +1,12 @@
 <div align="center">
 
+# DocAtlas
+
 **Local, version-aware docs runtime for coding agents.**
 
-[![PyPI version](https://img.shields.io/pypi/v/docmancer?style=for-the-badge)](https://pypi.org/project/docmancer/)
-[![License: MIT](https://img.shields.io/github/license/docmancer/docmancer?style=for-the-badge)](https://github.com/docmancer/docmancer/blob/main/LICENSE)
-[![Python 3.11 | 3.12 | 3.13](https://img.shields.io/badge/python-3.11%20|%203.12%20|%203.13-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://pypi.org/project/docmancer/)
+[![PyPI version](https://img.shields.io/pypi/v/doc-atlas?style=for-the-badge)](https://pypi.org/project/doc-atlas/)
+[![License: MIT](https://img.shields.io/github/license/Vanilla1999/DocAtlas?style=for-the-badge)](https://github.com/Vanilla1999/DocAtlas/blob/main/LICENSE)
+[![Python 3.11 | 3.12 | 3.13](https://img.shields.io/badge/python-3.11%20|%203.12%20|%203.13-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://pypi.org/project/doc-atlas/)
 
 [Install](#install) | [Quickstart lanes](#quickstart-lanes) | [What you get](#what-you-get) | [Docs MCP server](#documentation-mcp-server) | [Wiki](./wiki/Home.md)
 
@@ -14,19 +16,42 @@
 
 ---
 
-Docmancer gives coding agents local, version-aware docs context. It indexes repo docs, docs sites, package references, and private documentation into compact context packs with source attribution, then serves them locally through a CLI or MCP docs server.
+DocAtlas gives coding agents local, version-aware docs context. It indexes repo docs, docs sites, package references, and private documentation into compact context packs with source attribution, then serves them locally through a CLI or MCP docs server.
 
-The main product is **Docmancer Docs**: a local docs runtime that lets agents answer from the documentation your project actually uses instead of relying on model memory, latest-only hosted pages, or repeated WebFetch calls. **Docmancer Packs** are the advanced layer: version-pinned API action tools for agents that need to call APIs, not just read docs.
+DocAtlas is distributed on PyPI as `doc-atlas`. The installed command is `doc-atlas`.
 
-A fresh install ships everything you need: SQLite FTS5, a docmancer-owned local Qdrant for dense and sparse vectors, FastEmbed for embeddings (no API key), and a hybrid retriever that fuses lexical, dense, and sparse signals with Reciprocal Rank Fusion.
+The main product is **DocAtlas Docs**: a local docs runtime that lets agents answer from the documentation your project actually uses instead of relying on model memory, latest-only hosted pages, or repeated WebFetch calls. **DocAtlas Packs** are the advanced layer: version-pinned API action tools for agents that need to call APIs, not just read docs.
+
+A fresh install ships everything you need: SQLite FTS5, a DocAtlas-managed local Qdrant for dense and sparse vectors, FastEmbed for embeddings (no API key), and a hybrid retriever that fuses lexical, dense, and sparse signals with Reciprocal Rank Fusion.
 
 ## Install
 
-```bash
-pipx install docmancer    # Python 3.11, 3.12, or 3.13
+Use DocAtlas with MCP clients without a separate global install:
+
+```json
+{
+  "mcpServers": {
+    "doc-atlas": {
+      "command": "uvx",
+      "args": ["doc-atlas", "mcp", "docs-serve"]
+    }
+  }
+}
 ```
 
-If `pipx` picks an unsupported interpreter, pin one: `pipx install docmancer --python python3.13`.
+Or install the CLI globally:
+
+```bash
+pipx install doc-atlas    # Python 3.11, 3.12, or 3.13
+```
+
+If `pipx` picks an unsupported interpreter, pin one: `pipx install doc-atlas --python python3.13`.
+
+After installation, run commands with `doc-atlas`:
+
+```bash
+doc-atlas --help
+```
 
 ## Quickstart lanes
 
@@ -37,34 +62,34 @@ Pick the lane that matches the outcome you want. First success comes before opti
 Fastest first success uses lexical retrieval now, then you can opt into local hybrid later:
 
 ```bash
-docmancer setup --profile cli-docs --yes            # config + database, no prompt
-docmancer ingest ./docs                             # index local files
-docmancer query "How do I authenticate?" --explain  # grounded local context
+doc-atlas setup --profile cli-docs --yes            # config + database, no prompt
+doc-atlas ingest ./docs                             # index local files
+doc-atlas query "How do I authenticate?" --explain  # grounded local context
 ```
 
 `setup` creates `~/.docmancer/` with the config and SQLite database, then prints a readiness summary and the next best command. To connect an agent non-interactively:
 
 ```bash
-docmancer setup --profile agent --agent claude-code --yes
+doc-atlas setup --profile agent --agent claude-code --yes
 ```
 
 Prefer a project-local config and no vector/model downloads during first run?
 
 ```bash
-docmancer setup --project-local --offline --vectors off --yes
+doc-atlas setup --project-local --offline --vectors off --yes
 ```
 
 When you are ready for higher-quality retrieval, switch to local hybrid:
 
 ```bash
-docmancer setup --retrieval-profile local-hybrid --yes
+doc-atlas setup --retrieval-profile local-hybrid --yes
 ```
 
 Prefer to index a docs site instead of local files?
 
 ```bash
-docmancer add https://docs.pytest.org
-docmancer query "How do I parametrize a fixture?" --mode hybrid
+doc-atlas add https://docs.pytest.org
+doc-atlas query "How do I parametrize a fixture?" --mode hybrid
 ```
 
 ### 2. Versioned MCP Docs
@@ -72,9 +97,10 @@ docmancer query "How do I parametrize a fixture?" --mode hybrid
 Run the docs MCP server when you want an agent to resolve and query registered library docs from inside its normal tool loop:
 
 ```bash
-docmancer setup --profile mcp-docs --yes
-docmancer mcp docs-serve
+uvx doc-atlas mcp docs-serve
 ```
+
+If you installed the CLI with `pipx install doc-atlas`, you can run `doc-atlas mcp docs-serve` directly.
 
 Register docs once, then query them without repeating the URL:
 
@@ -93,15 +119,15 @@ Later calls can use just the library and topic. Project-aware version resolution
 When an agent needs to call APIs, install a version-pinned pack:
 
 ```bash
-docmancer install-pack open-meteo@v1
-docmancer mcp serve
+doc-atlas install-pack open-meteo@v1
+doc-atlas mcp serve
 ```
 
 Packs are an advanced workflow. Start with Docs when your goal is grounded answers from local/version-aware documentation.
 
 ## What you get
 
-**Local, version-aware docs context.** Docmancer can keep separate entries for package versions, channels, and sources. MCP docs responses include version metadata such as requested/resolved version and whether the docs snapshot is exact.
+**Local, version-aware docs context.** DocAtlas can keep separate entries for package versions, channels, and sources. MCP docs responses include version metadata such as requested/resolved version and whether the docs snapshot is exact.
 
 **Compact context packs.** Results are source-grounded sections, not raw pages. The token budget keeps responses small so your agent has room for actual work:
 
@@ -113,18 +139,18 @@ Context pack: ~900 tokens vs ~4800 raw docs tokens (81.2% less docs overhead, 5.
 
 **Hybrid search by default.** `query` fans out across SQLite FTS5 (lexical, BM25-reranked), Qdrant dense vectors (FastEmbed `bge-base-en-v1.5`), and SPLADE sparse vectors, then fuses results with Reciprocal Rank Fusion.
 
-**Inspectable.** Every section is written to `~/.docmancer/extracted/` as Markdown plus JSON. `docmancer list` shows source status, freshness, content counts, vector state, failures, and next actions. `docmancer inspect <source>` shows a source card. `docmancer query --explain` or `--explain-json trace.json` shows why results were selected.
+**Inspectable.** Every section is written to `~/.docmancer/extracted/` as Markdown plus JSON. `doc-atlas list` shows source status, freshness, content counts, vector state, failures, and next actions. `doc-atlas inspect <source>` shows a source card. `doc-atlas query --explain` or `--explain-json trace.json` shows why results were selected.
 
-**Actionable diagnostics.** `docmancer doctor` answers “what prevents docs context in this path?” with severity, impact, exact fix command, expected result, restart requirement, and auto-fix availability. Use `docmancer doctor --json`, `--list-checks`, or `--check sources` for automation.
+**Actionable diagnostics.** `doc-atlas doctor` answers “what prevents docs context in this path?” with severity, impact, exact fix command, expected result, restart requirement, and auto-fix availability. Use `doc-atlas doctor --json`, `--list-checks`, or `--check sources` for automation.
 
-**Agent integration built in.** `docmancer setup` drops skill files for Claude Code, Cursor, Codex, Cline, Claude Desktop, Gemini, GitHub Copilot, and OpenCode. Your agent can call `docmancer query` directly from its conversation loop.
+**Agent integration built in.** `doc-atlas setup` drops skill files for Claude Code, Cursor, Codex, Cline, Claude Desktop, Gemini, GitHub Copilot, and OpenCode. Your agent can call `doc-atlas query` directly from its conversation loop.
 
 ## Documentation MCP server
 
-Docmancer Docs includes a Context7-style MCP server for local, version-aware library documentation:
+DocAtlas Docs includes a Context7-style MCP server for local, version-aware library documentation:
 
 ```bash
-docmancer mcp docs-serve
+uvx doc-atlas mcp docs-serve
 ```
 
 Example MCP client config:
@@ -132,8 +158,21 @@ Example MCP client config:
 ```json
 {
   "mcpServers": {
-    "docmancer-docs": {
-      "command": "docmancer",
+    "doc-atlas": {
+      "command": "uvx",
+      "args": ["doc-atlas", "mcp", "docs-serve"]
+    }
+  }
+}
+```
+
+If `doc-atlas` is already installed globally, this local command config also works:
+
+```json
+{
+  "mcpServers": {
+    "doc-atlas": {
+      "command": "doc-atlas",
       "args": ["mcp", "docs-serve"]
     }
   }
@@ -164,7 +203,7 @@ Tools:
 - `list_docs_jobs`
 - `cancel_docs_job`
 
-The docs server uses the same local ingest, index, update, and query path as the CLI. It keeps a small persistent library registry in the Docmancer SQLite database. Libraries are stale when they have never been refreshed or when `last_refreshed_at` is older than 30 days. `get_library_docs` refreshes stale docs before querying, and `force_refresh: true` refreshes even fresh docs.
+The docs server uses the same local ingest, index, update, and query path as the CLI. It keeps a small persistent library registry in the DocAtlas SQLite database. Libraries are stale when they have never been refreshed or when `last_refreshed_at` is older than 30 days. `get_library_docs` refreshes stale docs before querying, and `force_refresh: true` refreshes even fresh docs.
 
 Pass `docs_url` the first time you ask for an unknown library. After registration, later queries can use the stored source and do not need the URL again. The server resolves existing registry entries, project-aware versions, or explicit URLs; it does not guess arbitrary package documentation URLs.
 
@@ -178,7 +217,7 @@ Pass `docs_url` the first time you ask for an unknown library. After registratio
 
 ### Project docs for coding agents
 
-If you thought Docmancer was only like Context7, this is the extra local-first lane: Docmancer can also give agents the docs this repository actually uses. Project docs stay as reviewable files in your repo (`README`, `docs/`, `wiki/`, `ARCHITECTURE`, ADRs, roadmap, runbooks); Docmancer indexes them locally and returns source-attributed context before an agent falls back to WebFetch or generic hosted docs.
+If you thought DocAtlas was only like Context7, this is the extra local-first lane: DocAtlas can also give agents the docs this repository actually uses. Project docs stay as reviewable files in your repo (`README`, `docs/`, `wiki/`, `ARCHITECTURE`, ADRs, roadmap, runbooks); DocAtlas indexes them locally and returns source-attributed context before an agent falls back to WebFetch or generic hosted docs.
 
 Recommended MCP workflow inside a repo:
 
@@ -187,7 +226,7 @@ Recommended MCP workflow inside a repo:
 3. If `reason_code` is `project_docs_found_not_indexed` or `project_docs_stale`, call `ingest_project_docs` to index only reviewable project-doc candidates. It does not ingest source code, dependency directories, build outputs, or dependency docs.
 4. For repo-specific architecture, implementation, ADR, roadmap, or README questions, call `get_project_context` or `get_project_docs` before WebFetch. `get_project_context` returns a compact Trust Contract with selected/rejected/risky sources, optional dependency-doc evidence, `mode` (`auto`, `project-only`, `deps-only`, or `public-docs`), source class, file path, heading path, freshness metadata, and structured next actions when docs are missing, stale, not indexed, or unmatched.
 
-If no project docs are found, or if docs exist but no high-level overview/architecture doc is discovered, Docmancer returns `requires_confirmation: true` with `confirmation_reason: "repo_write"` and a next action to ask before creating `ARCHITECTURE.md`. Have the coding agent study the repo and write `ARCHITECTURE.md` as a normal reviewable file only after approval, then run `inspect_project_docs`, `ingest_project_docs`, and `get_project_context` / `get_project_docs`. Do not store the generated architecture in hidden memory; keep it in the repo so humans can review and edit it.
+If no project docs are found, or if docs exist but no high-level overview/architecture doc is discovered, DocAtlas returns `requires_confirmation: true` with `confirmation_reason: "repo_write"` and a next action to ask before creating `ARCHITECTURE.md`. Have the coding agent study the repo and write `ARCHITECTURE.md` as a normal reviewable file only after approval, then run `inspect_project_docs`, `ingest_project_docs`, and `get_project_context` / `get_project_docs`. Do not store the generated architecture in hidden memory; keep it in the repo so humans can review and edit it.
 
 Dependency docs are separate from project-owned docs. `prefetch_project_docs` is the historical name for reading supported manifests/lockfiles and prefetching exact dependency documentation. Prefer the clearer alias `prefetch_project_dependency_docs` in new agent instructions. Because this may fetch from the network, ask for confirmation unless the user already approved dependency-docs prefetch.
 
@@ -388,7 +427,7 @@ For Flutter, keep the stable API docs and main API docs as separate versions:
 
 Flutter channels can be represented directly as `version: "stable"` and `version: "main"`. Keep the API docs separate from the broader Flutter website if you need channel-specific API answers.
 
-If `.fvmrc` contains a pinned Flutter SDK such as `3.24.5`, Docmancer uses it as a project version hint, but it does not create `flutter-api@3.24.5` for `https://api.flutter.dev/`. That URL is current stable API docs, so the canonical id is `flutter-api@stable`, `docs_snapshot_exact` is `false`, and the response warns that the docs are not an exact archived snapshot.
+If `.fvmrc` contains a pinned Flutter SDK such as `3.24.5`, DocAtlas uses it as a project version hint, but it does not create `flutter-api@3.24.5` for `https://api.flutter.dev/`. That URL is current stable API docs, so the canonical id is `flutter-api@stable`, `docs_snapshot_exact` is `false`, and the response warns that the docs are not an exact archived snapshot.
 
 For pub.dev package APIs, prefer explicit package versions plus `latest`:
 
@@ -417,4 +456,4 @@ The wiki is the authoritative reference for everything else. Pick a page based o
 | **[MCP Packs](./wiki/MCP-Packs.md)** | Version-pinned API tool packs |
 | **[Troubleshooting](./wiki/Troubleshooting.md)** | Common errors and fixes |
 
-[Wiki home](./wiki/Home.md) | [Changelog](./CHANGELOG.md) | [PyPI](https://pypi.org/project/docmancer/)
+[Wiki home](./wiki/Home.md) | [Changelog](./CHANGELOG.md) | [PyPI](https://pypi.org/project/doc-atlas/)
