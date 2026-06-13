@@ -42,6 +42,11 @@ class ProjectDocsState:
                     "content_hash": metadata.get("project_doc_content_hash"),
                     "mtime_ns": metadata.get("project_doc_mtime_ns"),
                     "reason": metadata.get("project_doc_reason"),
+                    "doc_scope": metadata.get("doc_scope") or "project",
+                    "module_id": metadata.get("module_id"),
+                    "module_name": metadata.get("module_name"),
+                    "module_path": metadata.get("module_path"),
+                    "module_type": metadata.get("module_type"),
                     "ingested_at": row["ingested_at"],
                 })
         return rows

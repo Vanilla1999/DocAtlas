@@ -592,6 +592,174 @@ def test_get_project_docs_returns_scoped_docs_result(tmp_path, monkeypatch):
     assert result.next_actions == []
 
 
+def test_inspect_project_docs_lists_discovered_modules(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    (project / "README.md").write_text("# App", encoding="utf-8")
+    module_docs = project / "packages" / "backend" / "docs"
+    module_docs.mkdir(parents=True)
+    (project / "packages" / "backend" / "README.md").write_text("# Backend", encoding="utf-8")
+    (module_docs / "architecture.md").write_text("# Backend architecture", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+
+    result = service.inspect_project_docs(str(project))
+
+    modules = result.project_docs["modules"]
+    assert modules == [{
+        "module_id": "packages/backend",
+        "module_name": "backend",
+        "module_path": "packages/backend",
+        "module_type": "package",
+        "doc_count": 2,
+        "docs": ["packages/backend/README.md", "packages/backend/docs/architecture.md"],
+    }]
+
+
+def test_get_project_docs_can_filter_by_module_path(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    (project / "README.md").write_text("# Architecture\n\nRootProjectAnswer only.", encoding="utf-8")
+    backend = project / "packages" / "backend"
+    frontend = project / "packages" / "frontend"
+    backend.mkdir(parents=True)
+    frontend.mkdir(parents=True)
+    (backend / "README.md").write_text("# Backend\n\nSharedNeedle BackendOnlyAnswer.", encoding="utf-8")
+    (frontend / "README.md").write_text("# Frontend\n\nSharedNeedle FrontendOnlyAnswer.", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+    service.ingest_project_docs(str(project), with_vectors=False)
+
+    result = service.get_project_docs(str(project), "SharedNeedle", module_path="packages/backend", tokens=1200, limit=3)
+
+    assert result.status == "success"
+    assert result.results
+    assert all(item.module_path == "packages/backend" for item in result.results)
+    assert all(item.doc_scope == "module" for item in result.results)
+    assert any("BackendOnlyAnswer" in item.content for item in result.results)
+    assert not any("FrontendOnlyAnswer" in item.content for item in result.results)
+
+
+def test_ingested_module_metadata_roundtrips_to_inspect_and_results(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    (project / "README.md").write_text("# Architecture\n\nRootProjectAnswer only.", encoding="utf-8")
+    module = project / "services" / "auth"
+    module.mkdir(parents=True)
+    (module / "README.md").write_text("# Auth service\n\nAuthRoundtripNeedle module docs.", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+
+    ingest = service.ingest_project_docs(str(project), with_vectors=False)
+    inspect = service.inspect_project_docs(str(project))
+    result = service.get_project_docs(str(project), "AuthRoundtripNeedle", module="auth", tokens=1200, limit=3)
+
+    assert ingest.status == "success"
+    assert inspect.project_docs["indexed_modules"] == [{
+        "module_id": "services/auth",
+        "module_name": "auth",
+        "module_path": "services/auth",
+        "module_type": "service",
+        "doc_count": 1,
+        "docs": ["services/auth/README.md"],
+    }]
+    assert result.status == "success"
+    assert result.results
+    assert result.results[0].module_id == "services/auth"
+    assert result.results[0].module_name == "auth"
+    assert result.results[0].module_path == "services/auth"
+    assert result.results[0].module_type == "service"
+    assert result.indexed_sources[0]["doc_scope"] == "module"
+    assert result.indexed_sources[0]["module_path"] == "services/auth"
+
+
+def test_get_project_docs_can_filter_by_module_name_exact_match(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    (project / "README.md").write_text("# Architecture\n\nRootProjectAnswer only.", encoding="utf-8")
+    backend = project / "packages" / "backend"
+    frontend = project / "packages" / "frontend"
+    backend.mkdir(parents=True)
+    frontend.mkdir(parents=True)
+    (backend / "README.md").write_text("# Backend\n\nSharedNeedle BackendOnlyAnswer.", encoding="utf-8")
+    (frontend / "README.md").write_text("# Frontend\n\nSharedNeedle FrontendOnlyAnswer.", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+    service.ingest_project_docs(str(project), with_vectors=False)
+
+    result = service.get_project_docs(str(project), "SharedNeedle", module="backend", tokens=1200, limit=3)
+
+    assert result.status == "success"
+    assert result.results
+    assert all(item.module_path == "packages/backend" for item in result.results)
+    assert any("BackendOnlyAnswer" in item.content for item in result.results)
+    assert not any("FrontendOnlyAnswer" in item.content for item in result.results)
+
+
+def test_get_project_docs_returns_structured_module_ambiguity(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    for parent in ("packages", "services"):
+        module = project / parent / "auth"
+        module.mkdir(parents=True)
+        (module / "README.md").write_text(f"# {parent} auth", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+
+    result = service.get_project_docs(str(project), "auth", module="auth", tokens=1200, limit=3)
+
+    assert result.status == "module_ambiguous"
+    assert result.reason_code == "module_ambiguous"
+    assert result.answer_available is False
+    assert result.next_actions[0]["arguments_patch"] == {"project_path": str(project.resolve())}
+
+
+def test_get_project_docs_returns_structured_module_not_found(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    (project / "README.md").write_text("# App", encoding="utf-8")
+    module = project / "packages" / "backend"
+    module.mkdir(parents=True)
+    (module / "README.md").write_text("# Backend", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+
+    result = service.get_project_docs(str(project), "auth", module_path="services/auth", tokens=1200, limit=3)
+
+    assert result.status == "module_not_found"
+    assert result.reason_code == "module_not_found"
+    assert result.answer_available is False
+    assert result.next_action == {"type": "inspect_project_docs", "tool": "inspect_project_docs"}
+    assert result.arguments_patch == {"project_path": str(project.resolve())}
+
+
+def test_get_project_docs_reports_stale_module_docs(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    (project / "README.md").write_text("# Architecture\n\nRootProjectAnswer only.", encoding="utf-8")
+    module = project / "packages" / "backend"
+    module.mkdir(parents=True)
+    doc = module / "README.md"
+    doc.write_text("# Backend\n\nStaleNeedle first version.", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+    service.ingest_project_docs(str(project), with_vectors=False)
+    time.sleep(0.01)
+    doc.write_text("# Backend\n\nStaleNeedle changed version.", encoding="utf-8")
+
+    result = service.get_project_docs(str(project), "StaleNeedle", module_path="packages/backend", tokens=1200, limit=3)
+
+    assert result.status == "stale"
+    assert result.reason_code == "project_docs_stale"
+    assert result.stale_sources
+    assert result.stale_sources[0]["candidate"]["module_path"] == "packages/backend"
+    assert result.next_actions[0]["tool"] == "ingest_project_docs"
+
+
+def test_get_project_docs_project_scope_preserves_backward_compatibility(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    (project / "README.md").write_text("# Architecture\n\nSharedNeedle RootProjectAnswer.", encoding="utf-8")
+    module = project / "packages" / "backend"
+    module.mkdir(parents=True)
+    (module / "README.md").write_text("# Backend\n\nSharedNeedle BackendOnlyAnswer.", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+    service.ingest_project_docs(str(project), with_vectors=False)
+
+    result = service.get_project_docs(str(project), "SharedNeedle", scope="project", tokens=1200, limit=5)
+
+    assert result.status == "success"
+    assert result.results
+    assert all(item.doc_scope == "project" for item in result.results)
+    assert any("RootProjectAnswer" in item.content for item in result.results)
+    assert not any("BackendOnlyAnswer" in item.content for item in result.results)
+
+
 def test_get_project_context_returns_trust_contract_for_project_docs(tmp_path, monkeypatch):
     project = _flutter_project(tmp_path)
     (project / "README.md").write_text("# Architecture\n\nProjectContextAnswer uses local ADRs.", encoding="utf-8")
@@ -612,6 +780,30 @@ def test_get_project_context_returns_trust_contract_for_project_docs(tmp_path, m
     assert selected[0]["trust_level"] == "trusted"
     assert result.trust_contract["trusted_sources"] == selected
     assert result.trust_contract["policy"]["direct_webfetch"] == "forbidden"
+
+
+def test_get_project_context_preserves_module_metadata_in_pack_and_trust_contract(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    (project / "README.md").write_text("# Architecture\n\nRootProjectAnswer only.", encoding="utf-8")
+    module = project / "services" / "auth"
+    module.mkdir(parents=True)
+    (module / "README.md").write_text("# Auth\n\nContextModuleNeedle AuthContextAnswer.", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+    service.ingest_project_docs(str(project), with_vectors=False)
+
+    result = service.get_project_context(str(project), "ContextModuleNeedle", module_path="services/auth", scope="module", mode="project-only", tokens=1200, limit=3)
+
+    assert result.status == "success"
+    assert result.project_docs is not None
+    assert result.project_docs.results[0].module_path == "services/auth"
+    assert result.context_pack[0]["doc_scope"] == "module"
+    assert result.context_pack[0]["module_id"] == "services/auth"
+    assert result.context_pack[0]["module_name"] == "auth"
+    assert result.context_pack[0]["module_path"] == "services/auth"
+    assert result.context_pack[0]["module_type"] == "service"
+    selected = result.trust_contract["selected_sources"]
+    assert selected[0]["doc_scope"] == "module"
+    assert selected[0]["module_path"] == "services/auth"
 
 
 def test_get_project_context_before_ingest_returns_actionable_remediation(tmp_path, monkeypatch):

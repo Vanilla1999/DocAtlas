@@ -1,6 +1,6 @@
 # Docmancer capabilities
 
-Docmancer is a **local, version-aware documentation runtime for coding agents**. It indexes repository docs, public docs sites, package references, and private documentation into compact context packs, then serves that context locally through a CLI or an MCP docs server.
+Docmancer is a **local, project-aware, version-aware documentation runtime for coding agents**. It indexes repository docs, monorepo module docs, public docs sites, package references, and private documentation into compact context packs, then serves that context locally through a CLI or an MCP docs server.
 
 The project has two product layers:
 
@@ -14,6 +14,7 @@ Coding agents often answer from model memory, latest-only web docs, repeated Web
 - answers can be stale or version-wrong;
 - the same docs are fetched repeatedly;
 - project-specific README/docs/ADR context is ignored;
+- monorepo package/app/service docs are hard for agents to target safely;
 - raw pages waste token budget;
 - private/local documentation is not available to hosted docs services;
 - agents do not always know which docs source/version they should trust.
@@ -23,7 +24,7 @@ Docmancer solves this by making documentation a local, inspectable, version-awar
 - docs are indexed once and queried many times;
 - results are compact sections, not full raw pages;
 - every answer can include source attribution and version provenance;
-- project docs and dependency docs can be queried in the same agent workflow;
+- project docs, module docs, and dependency docs can be queried in the same agent workflow;
 - registered sources let agents avoid direct WebFetch once docs are known;
 - local hybrid retrieval works without API keys by default.
 
@@ -33,7 +34,8 @@ This section is a practical map of what Docmancer can do today and which tool or
 
 | Need | Current capability | CLI / MCP entrypoint | Current boundary |
 |---|---|---|---|
-| Query local repo docs | Discover, ingest, stale-check, bootstrap, and query README/docs/wiki/ADR/roadmap files. | `inspect_project_docs`, `ingest_project_docs`, `bootstrap_project_docs`, `get_project_docs`, `get_project_context`; CLI `docmancer ingest`, `docmancer query`. | Project docs must be indexed before they can be trusted; bootstrap stops before repo writes. |
+| Query local repo docs | Discover, ingest, stale-check, bootstrap, and query README/docs/wiki/ADR/roadmap files plus module/package docs in monorepos. | `inspect_project_docs`, `ingest_project_docs`, `bootstrap_project_docs`, `get_project_docs`, `get_project_context`; CLI `docmancer ingest`, `docmancer query`. | Project docs must be indexed before they can be trusted; bootstrap stops before repo writes. |
+| Query a specific module | Use module-aware project-doc filters for packages, apps, services, crates, libraries, and similar module roots. | `get_project_docs(module_path=..., scope="module")`, `get_project_context(module_path=..., scope="module")`. | Module matching is exact; ambiguous module names return structured clarification instead of a guessed answer. |
 | Query public docs locally | Fetch, normalize, index, and query public docs sites. | CLI `docmancer add`, `docmancer query`; MCP `get_library_docs`, `prefetch_library_docs`. | First query requires indexing unless the source is already registered/indexed. |
 | Use exact dependency versions | Read supported project metadata and prefetch/query docs for resolved versions. | `inspect_project_docs`, `prefetch_project_dependency_docs`, `prefetch_project_docs`, `get_library_docs(project_path=...)`. | Strongest current support is Dart/Flutter and Rust metadata; dependency-docs prefetch may use the network and is separate from project-owned docs ingest. |
 | Avoid repeated WebFetch | Register sources once, then query local indexes. | `resolve_library_id`, `get_library_docs`, `list_library_docs`; CLI `docmancer list`. | If no registered or confidently resolved docs source exists, user may still need to provide a docs URL. |
@@ -42,7 +44,7 @@ This section is a practical map of what Docmancer can do today and which tool or
 | Run long docs indexing safely | Start async prefetch jobs and poll progress. | `prefetch_library_docs(async=true)`, `prefetch_docs_targets(async=true)`, `get_docs_job_status`. | Large public sites still need sane max pages, allowed domains, and source hygiene. |
 | Diagnose docs runtime | Check config, storage, SQLite, Qdrant, indexes, agents, and MCP state. | CLI `docmancer doctor`, `docmancer qdrant status`; MCP `mcp doctor`. | Doctor output should continue moving toward more explicit severity/fix commands. |
 
-Important current boundary: `get_project_context(project_path, question)` is available as a compact MVP for combining indexed project-owned docs with one resolved dependency-doc source and a Trust Contract. `bootstrap_project_docs(project_path, question?)` is the safe onboarding shortcut before `get_project_context`; it can inspect and ingest/refresh existing reviewable docs, but it stops before repository writes and dependency-docs network fetches.
+Important current boundary: `get_project_context(project_path, question)` is available as a compact MVP for combining indexed project-owned docs with one resolved dependency-doc source and a Trust Contract. `bootstrap_project_docs(project_path, question?)` is the safe onboarding shortcut before `get_project_context`; it can inspect and ingest/refresh existing reviewable docs, including module docs, but it stops before repository writes and dependency-docs network fetches.
 
 ## Core capabilities
 
@@ -350,6 +352,21 @@ Project docs candidates include:
 - `roadmap/`;
 - `runbooks/`.
 
+For monorepos, module docs are also discovered under common module parent directories:
+
+| Parent directory | Module type |
+|---|---|
+| `packages/*` | package |
+| `apps/*` | app |
+| `services/*` | service |
+| `modules/*` | module |
+| `libs/*` | library |
+| `crates/*` | crate |
+| `plugins/*` | plugin |
+| `components/*` | component |
+
+Within each module root, Docmancer looks for maintained docs such as `README*`, `ARCHITECTURE*`, `CHANGELOG*`, `CONTRIBUTING*`, `docs/`, `doc/`, ADR folders, and runbook folders. Module docs are tagged with `doc_scope="module"`, `module_id`, `module_name`, `module_path`, and `module_type`; root repository docs remain `doc_scope="project"`.
+
 Excluded by default:
 
 - `.git`;
@@ -377,13 +394,15 @@ The project docs tools are designed so an agent can guide itself:
 
 1. call `bootstrap_project_docs(project_path=..., question=...)` for the safe happy path, or call `inspect_project_docs(project_path=...)` for the explicit low-level flow;
 2. discover README/docs/wiki/roadmap/ADR candidates and dependency metadata;
-3. if docs are not indexed, follow `reason_code = project_docs_found_not_indexed` and call `ingest_project_docs`;
-4. if docs are stale, follow `reason_code = project_docs_stale` and call `ingest_project_docs`;
-5. if no docs exist, follow `reason_code = no_project_docs`, ask the user, and have the coding agent create a reviewable `ARCHITECTURE.md` only after confirmation;
-6. if docs exist but no high-level overview/architecture doc is found, follow `reason_code = architecture_doc_creation_recommended` and ask before creating `ARCHITECTURE.md`;
-7. then answer repo-specific questions with `get_project_context` or `get_project_docs`.
+3. inspect `project_docs.modules` and `project_docs.indexed_modules` when the question is module-specific;
+4. if docs are not indexed, follow `reason_code = project_docs_found_not_indexed` and call `ingest_project_docs`;
+5. if docs are stale, follow `reason_code = project_docs_stale` and call `ingest_project_docs`;
+6. if no docs exist, follow `reason_code = no_project_docs`, ask the user, and have the coding agent create a reviewable `ARCHITECTURE.md` only after confirmation;
+7. if docs exist but no high-level overview/architecture doc is found, follow `reason_code = architecture_doc_creation_recommended` and ask before creating `ARCHITECTURE.md`;
+8. then answer repo-specific questions with `get_project_context` or `get_project_docs`;
+9. for module-specific questions, prefer `module_path="packages/backend"` plus `scope="module"`; if a module name is ambiguous, ask the user to choose instead of guessing.
 
-Project-docs responses include `reason_code`, `next_action`, optional `next_actions` / `recommended_next_actions`, `requires_confirmation`, `confirmation_reason`, `arguments_patch`, and optional agent/user messages so agents can follow the flow without guessing.
+Project-docs responses include `reason_code`, `next_action`, optional `next_actions` / `recommended_next_actions`, `requires_confirmation`, `confirmation_reason`, `arguments_patch`, and optional agent/user messages so agents can follow the flow without guessing. Module-specific failures use structured reason codes such as `module_not_found`, `module_ambiguous`, and `no_module_docs`.
 
 This avoids generic answers when the repo already documents its architecture or conventions.
 
@@ -417,8 +436,8 @@ Project docs tools:
 | `inspect_project_docs` | Discover project docs and dependency metadata. |
 | `ingest_project_docs` | Index reviewable project docs. |
 | `bootstrap_project_docs` | Safely inspect, ingest/refresh existing reviewable docs, and inspect again; stops before repo writes or dependency network fetches. |
-| `get_project_docs` | Query project-owned docs and return structured remediation when docs are missing, stale, not indexed, or unmatched. |
-| `get_project_context` | Return a repo-grounded context pack with a Trust Contract, project docs, and one exact dependency-doc source when requested/detectable; supports `mode` values `auto`, `project-only`, `deps-only`, and `public-docs`. |
+| `get_project_docs` | Query project-owned docs and return structured remediation when docs are missing, stale, not indexed, unmatched, or module-ambiguous; supports `module`, `module_path`, and `scope`. |
+| `get_project_context` | Return a repo-grounded context pack with a Trust Contract, project docs, and one exact dependency-doc source when requested/detectable; supports `mode` values `auto`, `project-only`, `deps-only`, and `public-docs`, plus `module`, `module_path`, and `scope`. |
 | `prefetch_project_docs` | Historical name for prefetching exact dependency docs from manifests/lockfiles; not project-owned docs ingest. |
 | `prefetch_project_dependency_docs` | Clear alias for `prefetch_project_docs`; prefer this name in new agent instructions. |
 
@@ -1266,8 +1285,8 @@ These are roadmap/eval items, not changes to the core product direction.
 | Context packs | Compact results, source attribution, token savings, expansion modes. |
 | Registry | Persistent docs source identity, aliases, versions, refresh status. |
 | Version awareness | `.fvmrc`, `pubspec.lock`, `pubspec.yaml`, `Cargo.toml`, `Cargo.lock`. |
-| Project docs | Discover, ingest, query, stale-check README/docs/wiki/ADR/roadmap. |
-| Project-aware workflow | Current tools can be composed to query project docs and dependency docs; a single merged `get_project_context`-style tool is roadmap. |
+| Project docs | Discover, ingest, query, stale-check README/docs/wiki/ADR/roadmap and monorepo module docs. |
+| Project-aware workflow | Query project docs, module docs, and dependency docs with `bootstrap_project_docs`, `get_project_docs`, and the shipped `get_project_context` context-pack tool. |
 | MCP docs | Resolve/query/refresh/prefetch/list/inspect/prune docs through MCP. |
 | Manifests | `docmancer.docs.yaml` validation and batch prefetch. |
 | Jobs | Async docs indexing jobs with status/progress/cancellation. |

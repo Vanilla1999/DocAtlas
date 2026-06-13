@@ -53,6 +53,16 @@ DOC_DIRECTORIES = {
     "runbooks": "runbook",
     "runbook": "runbook",
 }
+MODULE_ROOT_DIRECTORIES = {
+    "packages": "package",
+    "apps": "app",
+    "services": "service",
+    "modules": "module",
+    "libs": "library",
+    "crates": "crate",
+    "plugins": "plugin",
+    "components": "component",
+}
 
 
 class ProjectMetadataReader:
@@ -100,7 +110,52 @@ class ProjectMetadataReader:
                 self._add_candidate(candidates, root, child, self._root_doc_reason(child))
             elif child.is_dir() and child.name.lower() in DOC_DIRECTORIES:
                 self._discover_docs_in_dir(candidates, root, child, DOC_DIRECTORIES[child.name.lower()])
+            elif child.is_dir() and child.name.lower() in MODULE_ROOT_DIRECTORIES:
+                self._discover_module_docs(candidates, root, child, MODULE_ROOT_DIRECTORIES[child.name.lower()])
         return sorted(candidates.values(), key=lambda item: item.path)
+
+    def _discover_module_docs(
+        self,
+        candidates: dict[str, ProjectDocsCandidate],
+        root: Path,
+        modules_directory: Path,
+        module_type: str,
+    ) -> None:
+        for module_root in sorted(modules_directory.iterdir(), key=lambda item: item.name.lower()):
+            if module_root.name in EXCLUDED_DIR_NAMES or not module_root.is_dir():
+                continue
+            try:
+                module_path = module_root.relative_to(root).as_posix()
+            except ValueError:
+                continue
+            module_name = module_root.name
+            for child in sorted(module_root.iterdir(), key=lambda item: item.name.lower()):
+                if child.name in EXCLUDED_DIR_NAMES:
+                    continue
+                if child.is_file() and self._is_root_doc_file(child):
+                    self._add_candidate(
+                        candidates,
+                        root,
+                        child,
+                        self._root_doc_reason(child),
+                        doc_scope="module",
+                        module_id=module_path,
+                        module_name=module_name,
+                        module_path=module_path,
+                        module_type=module_type,
+                    )
+                elif child.is_dir() and child.name.lower() in DOC_DIRECTORIES:
+                    self._discover_docs_in_dir(
+                        candidates,
+                        root,
+                        child,
+                        DOC_DIRECTORIES[child.name.lower()],
+                        doc_scope="module",
+                        module_id=module_path,
+                        module_name=module_name,
+                        module_path=module_path,
+                        module_type=module_type,
+                    )
 
     def _discover_docs_in_dir(
         self,
@@ -108,14 +163,42 @@ class ProjectMetadataReader:
         root: Path,
         directory: Path,
         reason: str,
+        *,
+        doc_scope: str = "project",
+        module_id: str | None = None,
+        module_name: str | None = None,
+        module_path: str | None = None,
+        module_type: str | None = None,
     ) -> None:
         for path in sorted(directory.rglob("*"), key=lambda item: str(item.relative_to(root)).lower()):
             if self._is_excluded_path(path, root):
                 continue
             if path.is_file() and self._is_docs_file(path):
-                self._add_candidate(candidates, root, path, self._nested_doc_reason(path, reason))
+                self._add_candidate(
+                    candidates,
+                    root,
+                    path,
+                    self._nested_doc_reason(path, reason),
+                    doc_scope=doc_scope,
+                    module_id=module_id,
+                    module_name=module_name,
+                    module_path=module_path,
+                    module_type=module_type,
+                )
 
-    def _add_candidate(self, candidates: dict[str, ProjectDocsCandidate], root: Path, path: Path, reason: str) -> None:
+    def _add_candidate(
+        self,
+        candidates: dict[str, ProjectDocsCandidate],
+        root: Path,
+        path: Path,
+        reason: str,
+        *,
+        doc_scope: str = "project",
+        module_id: str | None = None,
+        module_name: str | None = None,
+        module_path: str | None = None,
+        module_type: str | None = None,
+    ) -> None:
         try:
             resolved = path.resolve()
             resolved.relative_to(root)
@@ -141,6 +224,11 @@ class ProjectMetadataReader:
             size_bytes=size_bytes,
             mtime_ns=mtime_ns,
             content_hash=self._content_hash(path),
+            doc_scope=doc_scope,
+            module_id=module_id,
+            module_name=module_name,
+            module_path=module_path,
+            module_type=module_type,
         )
 
     @staticmethod

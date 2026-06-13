@@ -59,6 +59,11 @@ class ProjectDocsChunk(DocsChunk):
     content_hash: str | None = None
     mtime_ns: int | None = None
     stale: bool = False
+    doc_scope: str = "project"
+    module_id: str | None = None
+    module_name: str | None = None
+    module_path: str | None = None
+    module_type: str | None = None
 
 
 @dataclass(frozen=True)
@@ -282,6 +287,11 @@ class ProjectDocsCandidate:
     size_bytes: int = 0
     mtime_ns: int | None = None
     content_hash: str | None = None
+    doc_scope: str = "project"
+    module_id: str | None = None
+    module_name: str | None = None
+    module_path: str | None = None
+    module_type: str | None = None
 
 
 @dataclass(frozen=True)

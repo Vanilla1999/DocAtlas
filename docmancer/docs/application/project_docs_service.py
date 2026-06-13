@@ -68,6 +68,60 @@ class ProjectDocsService:
         return self.project_state.project_dependency_docs_state(metadata)
 
     @staticmethod
+    def _module_summaries(sources: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        modules: dict[str, dict[str, Any]] = {}
+        for source in sources:
+            if source.get("doc_scope") != "module" or not source.get("module_path"):
+                continue
+            module_path = str(source["module_path"])
+            summary = modules.setdefault(
+                module_path,
+                {
+                    "module_id": source.get("module_id") or module_path,
+                    "module_name": source.get("module_name") or Path(module_path).name,
+                    "module_path": module_path,
+                    "module_type": source.get("module_type") or "module",
+                    "doc_count": 0,
+                    "docs": [],
+                },
+            )
+            summary["doc_count"] += 1
+            summary["docs"].append(source.get("path"))
+        return sorted(modules.values(), key=lambda item: item["module_path"])
+
+    @staticmethod
+    def _resolve_module_filter(
+        module_summaries: list[dict[str, Any]],
+        *,
+        module: str | None = None,
+        module_path: str | None = None,
+    ) -> tuple[str | None, dict[str, Any] | None]:
+        requested = module_path or module
+        if not requested:
+            return None, None
+        matches = [
+            item for item in module_summaries
+            if item.get("module_path") == requested
+            or item.get("module_id") == requested
+            or (module_path is None and item.get("module_name") == requested)
+        ]
+        if not matches:
+            return None, {
+                "reason_code": "module_not_found",
+                "message": f"Module {requested!r} was not found in discovered project docs.",
+                "available_modules": module_summaries,
+            }
+        paths = {str(item.get("module_path")) for item in matches if item.get("module_path")}
+        if len(paths) > 1:
+            return None, {
+                "reason_code": "module_ambiguous",
+                "message": f"Module name {requested!r} matches multiple module paths. Retry with module_path.",
+                "matches": matches,
+                "available_modules": module_summaries,
+            }
+        return next(iter(paths)), None
+
+    @staticmethod
 
     def _create_project_docs_next_action(root: Path, query: str | None = None, *, reason: str | None = None) -> dict[str, Any]:
         return create_project_docs_next_action(root, query, reason=reason)
@@ -141,6 +195,8 @@ class ProjectDocsService:
             "stale": stale_sources,
             "ignored": ignored_sources,
             "high_level_overview_found": has_high_level_overview,
+            "modules": self._module_summaries(candidate_sources),
+            "indexed_modules": self._module_summaries(indexed_sources),
         }
         dependency_sources = {
             "manifests_found": manifests_found,
@@ -210,6 +266,11 @@ class ProjectDocsService:
                     "project_doc_reason": candidate.reason,
                     "project_doc_content_hash": candidate.content_hash,
                     "project_doc_mtime_ns": candidate.mtime_ns,
+                    "doc_scope": candidate.doc_scope,
+                    "module_id": candidate.module_id,
+                    "module_name": candidate.module_name,
+                    "module_path": candidate.module_path,
+                    "module_type": candidate.module_type,
                 })
             return result
 
@@ -353,18 +414,25 @@ class ProjectDocsService:
         limit: int | None = None,
         expand: str | None = None,
         source_class: str = "project_file",
+        scope: str | None = None,
+        module_path: str | None = None,
     ):
         root = Path(project_path).expanduser().resolve()
+        filters: dict[str, Any] = {
+            "project_path": str(root),
+            "source_class": source_class,
+            "project_docs": True,
+        }
+        if scope:
+            filters["doc_scope"] = scope
+        if module_path:
+            filters["module_path"] = module_path
         return self._agent_instance().query(
             query,
             limit=limit,
             budget=tokens or DEFAULT_DOC_TOKENS,
             expand=expand,
-            filters={
-                "project_path": str(root),
-                "source_class": source_class,
-                "project_docs": True,
-            },
+            filters=filters,
         )
 
     def get_project_docs(
@@ -375,14 +443,70 @@ class ProjectDocsService:
         tokens: int | None = None,
         limit: int | None = None,
         expand: str | None = None,
+        module: str | None = None,
+        module_path: str | None = None,
+        scope: str | None = None,
     ) -> ProjectDocsResult:
         if hasattr(self.facade, "_project_get_project_docs_impl"):
-            return self.facade._project_get_project_docs_impl(project_path, query, tokens=tokens, limit=limit, expand=expand)
+            return self.facade._project_get_project_docs_impl(project_path, query, tokens=tokens, limit=limit, expand=expand, module=module, module_path=module_path, scope=scope)
         root = Path(project_path).expanduser().resolve()
+        if scope and scope not in {"project", "module", "all"}:
+            raise ValueError("scope must be one of: project, module, all")
         metadata = self.read_project_metadata(str(root))
         candidate_sources = [asdict(item) for item in metadata.docs_candidates]
+        module_summaries = self._module_summaries(candidate_sources)
+        resolved_module_path, module_error = self._resolve_module_filter(module_summaries, module=module, module_path=module_path)
+        if module_error:
+            return ProjectDocsResult(
+                project_path=str(root),
+                query=query,
+                status=module_error["reason_code"],
+                reason_code=module_error["reason_code"],
+                next_action={"type": "inspect_project_docs", "tool": "inspect_project_docs"},
+                arguments_patch={"project_path": str(root)},
+                reason=module_error["reason_code"],
+                answer_available=False,
+                warnings=metadata.warnings,
+                candidate_sources=candidate_sources,
+                source_state_guidance=self._source_state_guidance(),
+                next_actions=[{
+                    "tool": "inspect_project_docs",
+                    "requires_confirmation": False,
+                    "arguments_patch": {"project_path": str(root)},
+                    "reason": "Inspect available modules, then retry with an exact module_path.",
+                }],
+                message=module_error["message"],
+            )
+        query_scope = scope if scope != "all" else None
+        if resolved_module_path:
+            query_scope = "module"
         indexed_sources_all = self._indexed_project_doc_sources(str(root))
         indexed_sources, stale_sources, ignored_sources = self._partition_project_doc_state(candidate_sources, indexed_sources_all)
+        if query_scope:
+            candidate_sources = [item for item in candidate_sources if item.get("doc_scope") == query_scope]
+            indexed_sources = [item for item in indexed_sources if item.get("doc_scope") == query_scope]
+            stale_sources = [item for item in stale_sources if (item.get("candidate") or item).get("doc_scope") == query_scope]
+            ignored_sources = [item for item in ignored_sources if item.get("doc_scope") == query_scope]
+        if resolved_module_path:
+            candidate_sources = [item for item in candidate_sources if item.get("module_path") == resolved_module_path]
+            indexed_sources = [item for item in indexed_sources if item.get("module_path") == resolved_module_path]
+            stale_sources = [item for item in stale_sources if (item.get("candidate") or item).get("module_path") == resolved_module_path]
+            ignored_sources = [item for item in ignored_sources if item.get("module_path") == resolved_module_path]
+            if not candidate_sources:
+                return ProjectDocsResult(
+                    project_path=str(root),
+                    query=query,
+                    status="no_module_docs",
+                    reason_code="no_module_docs",
+                    next_action={"type": "inspect_project_docs", "tool": "inspect_project_docs"},
+                    arguments_patch={"project_path": str(root)},
+                    reason="no_module_docs",
+                    answer_available=False,
+                    warnings=metadata.warnings,
+                    candidate_sources=[asdict(item) for item in metadata.docs_candidates],
+                    source_state_guidance=self._source_state_guidance(),
+                    message=f"Module {resolved_module_path!r} exists, but no module docs were discovered for this scope.",
+                )
 
         if not candidate_sources:
             next_action, requires_confirmation, confirmation_reason, arguments_patch, _, user_message = self._project_docs_structured_next_action(
@@ -437,7 +561,7 @@ class ProjectDocsService:
                 message="Project docs candidates exist but are not indexed. Run ingest_project_docs, then retry get_project_docs.",
             )
 
-        chunks = self.query_project_docs(str(root), query, tokens=tokens, limit=limit, expand=expand)
+        chunks = self.query_project_docs(str(root), query, tokens=tokens, limit=limit, expand=expand, scope=query_scope, module_path=resolved_module_path)
         seen_sources: set[str] = set()
         result_indexed_sources = []
         for chunk in chunks:
@@ -451,6 +575,11 @@ class ProjectDocsService:
                 "source_class": (chunk.metadata or {}).get("source_class"),
                 "content_hash": (chunk.metadata or {}).get("project_doc_content_hash"),
                 "mtime_ns": (chunk.metadata or {}).get("project_doc_mtime_ns"),
+                "doc_scope": (chunk.metadata or {}).get("doc_scope") or "project",
+                "module_id": (chunk.metadata or {}).get("module_id"),
+                "module_name": (chunk.metadata or {}).get("module_name"),
+                "module_path": (chunk.metadata or {}).get("module_path"),
+                "module_type": (chunk.metadata or {}).get("module_type"),
             })
         stale_paths = {item.get("path") for item in stale_sources}
         results = [
@@ -466,6 +595,11 @@ class ProjectDocsService:
                 content_hash=(chunk.metadata or {}).get("project_doc_content_hash"),
                 mtime_ns=(chunk.metadata or {}).get("project_doc_mtime_ns"),
                 stale=((chunk.metadata or {}).get("project_doc_path") in stale_paths),
+                doc_scope=(chunk.metadata or {}).get("doc_scope") or "project",
+                module_id=(chunk.metadata or {}).get("module_id"),
+                module_name=(chunk.metadata or {}).get("module_name"),
+                module_path=(chunk.metadata or {}).get("module_path"),
+                module_type=(chunk.metadata or {}).get("module_type"),
             )
             for chunk in chunks
         ]

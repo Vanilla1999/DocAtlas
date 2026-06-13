@@ -120,8 +120,8 @@ def test_project_docs_service_delegates_get_query_options():
     facade = FakeProjectFacade()
     service = ProjectDocsService(facade)
 
-    assert service.get_project_docs("/repo", "architecture", tokens=100, limit=2, expand="page") == "get-result"
-    assert facade.calls == [("get", "/repo", "architecture", {"tokens": 100, "limit": 2, "expand": "page"})]
+    assert service.get_project_docs("/repo", "architecture", tokens=100, limit=2, expand="page", module_path="packages/api", scope="module") == "get-result"
+    assert facade.calls == [("get", "/repo", "architecture", {"tokens": 100, "limit": 2, "expand": "page", "module": None, "module_path": "packages/api", "scope": "module"})]
 
 
 def test_project_reader_reads_pubspec_lock_versions(tmp_path):
@@ -159,6 +159,7 @@ def test_project_reader_discovers_project_owned_docs(tmp_path):
     assert by_path["roadmap/08.md"].reason == "roadmap"
     assert "lib/main.md" not in by_path
     assert all(candidate.source_class == "project_file" for candidate in metadata.docs_candidates)
+    assert all(candidate.doc_scope == "project" for candidate in metadata.docs_candidates)
 
 
 def test_project_reader_excludes_dependency_and_build_dirs_from_docs(tmp_path):
@@ -173,6 +174,38 @@ def test_project_reader_excludes_dependency_and_build_dirs_from_docs(tmp_path):
 
     paths = {candidate.path for candidate in metadata.docs_candidates}
     assert paths == {"README.md"}
+
+
+def test_project_reader_discovers_module_owned_docs(tmp_path):
+    project = _flutter_project(tmp_path)
+    (project / "README.md").write_text("# App", encoding="utf-8")
+    backend_docs = project / "packages" / "backend" / "docs"
+    backend_docs.mkdir(parents=True)
+    (project / "packages" / "backend" / "README.md").write_text("# Backend", encoding="utf-8")
+    (backend_docs / "architecture.md").write_text("# Backend architecture", encoding="utf-8")
+    web = project / "apps" / "web"
+    web.mkdir(parents=True)
+    (web / "README.md").write_text("# Web", encoding="utf-8")
+    auth_docs = project / "services" / "auth" / "docs"
+    auth_docs.mkdir(parents=True)
+    (auth_docs / "token-lifecycle.md").write_text("# Tokens", encoding="utf-8")
+    ignored_docs = project / "packages" / "ignored" / "src"
+    ignored_docs.mkdir(parents=True)
+    (ignored_docs / "notes.md").write_text("# Not module docs", encoding="utf-8")
+
+    metadata = ProjectMetadataReader().read(project)
+
+    by_path = {candidate.path: candidate for candidate in metadata.docs_candidates}
+    assert by_path["README.md"].doc_scope == "project"
+    assert by_path["packages/backend/README.md"].doc_scope == "module"
+    assert by_path["packages/backend/README.md"].module_id == "packages/backend"
+    assert by_path["packages/backend/README.md"].module_name == "backend"
+    assert by_path["packages/backend/README.md"].module_path == "packages/backend"
+    assert by_path["packages/backend/README.md"].module_type == "package"
+    assert by_path["packages/backend/docs/architecture.md"].reason == "architecture"
+    assert by_path["apps/web/README.md"].module_type == "app"
+    assert by_path["services/auth/docs/token-lifecycle.md"].module_type == "service"
+    assert "packages/ignored/src/notes.md" not in by_path
 
 
 def test_project_docs_candidate_has_stable_serializable_shape_and_freshness(tmp_path):
@@ -194,6 +227,11 @@ def test_project_docs_candidate_has_stable_serializable_shape_and_freshness(tmp_
         "size_bytes": len(body.encode("utf-8")),
         "mtime_ns": candidate.mtime_ns,
         "content_hash": candidate.content_hash,
+        "doc_scope": "project",
+        "module_id": None,
+        "module_name": None,
+        "module_path": None,
+        "module_type": None,
     }
 
 

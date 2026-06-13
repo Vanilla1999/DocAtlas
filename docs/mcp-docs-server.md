@@ -13,7 +13,7 @@ Use this server when a coding agent needs local, source-grounded documentation c
 Docmancer's MCP docs server has three main lanes:
 
 1. **Library docs** — resolve, fetch, refresh, prefetch, inspect, and query public or registered documentation sources.
-2. **Project-owned docs** — discover, ingest, stale-check, and query reviewable repository docs such as `README.md`, `docs/`, `wiki/`, `ARCHITECTURE.md`, ADRs, runbooks, and roadmap files.
+2. **Project-owned docs** — discover, ingest, stale-check, and query reviewable repository docs such as `README.md`, `docs/`, `wiki/`, `ARCHITECTURE.md`, ADRs, runbooks, roadmap files, and module/package docs in monorepos.
 3. **Dependency docs from project metadata** — read supported manifests/lockfiles and prefetch exact dependency documentation for the versions the project actually uses.
 
 Project-owned docs and dependency docs are intentionally separate. `ingest_project_docs` indexes files that already live in the repository. `prefetch_project_docs` / `prefetch_project_dependency_docs` fetch dependency documentation from the network based on manifests or lockfiles.
@@ -70,8 +70,8 @@ For registered sources, agents should retry through Docmancer using returned can
 | `inspect_project_docs` | Read-only discovery of local project docs and exact dependency metadata. Call this first inside a repository unless using `bootstrap_project_docs`. |
 | `ingest_project_docs` | Index discovered reviewable project-owned docs after `inspect_project_docs` recommends it. Does not ingest source code, dependency directories, build outputs, or dependency docs. |
 | `bootstrap_project_docs` | Safe high-level onboarding for a repository question: inspect, ingest or refresh existing reviewable docs, then inspect again. Stops before repo writes or dependency-docs network fetches. |
-| `get_project_docs` | Query indexed project-owned docs for repo-specific architecture, conventions, runbooks, ADRs, README, roadmap, or wiki questions. Missing, stale, not-indexed, or unmatched docs return structured next actions. |
-| `get_project_context` | Return a compact repo-grounded context pack after inspect/ingest. It combines project docs with one exact dependency-doc source when requested/detectable and includes a Trust Contract plus `next_actions`. Supports `mode`: `auto`, `project-only`, `deps-only`, or `public-docs`. |
+| `get_project_docs` | Query indexed project-owned docs for repo-specific architecture, conventions, runbooks, ADRs, README, roadmap, wiki, or module/package questions. Supports optional `module`, `module_path`, and `scope`; missing, stale, not-indexed, unmatched, or ambiguous docs return structured next actions. |
+| `get_project_context` | Return a compact repo-grounded context pack after inspect/ingest. It combines project docs with one exact dependency-doc source when requested/detectable and includes a Trust Contract plus `next_actions`. Supports `mode`: `auto`, `project-only`, `deps-only`, or `public-docs`; also supports optional `module`, `module_path`, and `scope` for module-scoped context. |
 
 ## Dependency-docs project tools
 
@@ -110,6 +110,24 @@ inspect_project_docs(project_path)
 -> if reason_code is project_docs_stale: ingest_project_docs(project_path)
 -> if reason_code is project_docs_ready: get_project_context(project_path, question)
 ```
+
+For module-specific questions in monorepos, inspect first so the agent can see discovered modules, then query with an exact `module_path` when possible:
+
+```text
+inspect_project_docs(project_path)
+-> project_docs.modules / project_docs.indexed_modules
+-> get_project_context(project_path, question, module_path="services/auth", scope="module")
+```
+
+`get_project_docs` and `get_project_context` accept:
+
+| Argument | Meaning |
+|---|---|
+| `module_path` | Exact module path such as `packages/backend`, `apps/web`, or `services/auth`. Prefer this when known. |
+| `module` | Exact module id or module name. If the same name appears under multiple parents, Docmancer returns `module_ambiguous`; agents must ask the user instead of choosing silently. |
+| `scope` | `project`, `module`, or `all`. A resolved module automatically scopes retrieval to module docs. |
+
+If a user asks a vague module question such as “How does auth work?” and multiple modules could match, agents should ask which module to use or whether to search across all project docs. They should not infer the target from code paths or model memory.
 
 If no project docs exist, or if the repo has docs but no high-level overview/architecture doc, Docmancer should not silently write repository files. It returns a confirmation-required remediation path so the coding agent can ask the user before creating a reviewable `ARCHITECTURE.md`.
 
@@ -156,6 +174,9 @@ Current project-docs `reason_code` values:
 | `project_docs_ready` | Project docs are discovered and current. | Call `get_project_context` or `get_project_docs`. |
 | `architecture_doc_creation_recommended` | Docs exist but no high-level overview/architecture doc was discovered. | Ask before creating `ARCHITECTURE.md`; then inspect and ingest. |
 | `no_project_docs_results` | Project docs are indexed but the query returned no matching sections. | Inspect project docs and refine/remediate before guessing. |
+| `module_not_found` | A requested `module` or `module_path` was not found among discovered module docs. | Inspect available modules and retry with an exact `module_path`, or ask the user whether to search all project docs. |
+| `module_ambiguous` | A requested module name matches more than one module path. | Ask the user to choose a module path; do not choose silently. |
+| `no_module_docs` | The module target exists in the module-resolution flow, but no maintained docs were available for the requested module scope. | Do not invent architecture; optionally fall back to project-level docs or ask before creating module README/ARCHITECTURE docs. |
 
 ## Safety rules for agents
 
@@ -163,6 +184,8 @@ Current project-docs `reason_code` values:
 - Do not WebFetch project architecture/conventions before trying project-owned docs.
 - Do not treat `prefetch_project_docs` as project-owned docs ingest; it is dependency-docs prefetch.
 - Do not create or edit `ARCHITECTURE.md` without user confirmation.
+- Do not create or edit module README/ARCHITECTURE docs without user confirmation.
+- Do not silently choose between ambiguous modules; retry with exact `module_path` after user clarification.
 - Do not run dependency-docs prefetch without user confirmation when it may fetch from the network.
 - Keep official project knowledge as reviewable files in the repository, not hidden agent memory.
 - Treat maintained `docs/INDEX.md` as the canonical map of project-owned docs when present.

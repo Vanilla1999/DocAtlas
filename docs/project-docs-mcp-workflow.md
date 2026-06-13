@@ -1,6 +1,6 @@
 # Project docs MCP workflow
 
-Project docs are the reviewable documentation files that belong to a repository: `README.md`, `docs/`, `wiki/`, `ARCHITECTURE.md`, ADRs, runbooks, roadmap files, and similar files. Docmancer can discover, index, stale-check, and query those files through MCP so coding agents answer from the repo's own docs before falling back to generic public documentation.
+Project docs are the reviewable documentation files that belong to a repository: `README.md`, `docs/`, `wiki/`, `ARCHITECTURE.md`, ADRs, runbooks, roadmap files, module/package docs, and similar files. Docmancer can discover, index, stale-check, and query those files through MCP so coding agents answer from the repo's own docs before falling back to generic public documentation.
 
 ## Use this workflow when
 
@@ -9,6 +9,8 @@ Use project-docs MCP tools when the user asks about:
 - how this repository works;
 - architecture, conventions, runbooks, ADRs, or roadmap;
 - repo-specific implementation guidance;
+- package, app, service, crate, library, or feature-area docs inside a monorepo;
+- deploy/runbook or conventions for a specific module;
 - project-owned docs as context for a code change;
 - a Context7-like docs workflow but grounded in the local repository.
 
@@ -19,6 +21,18 @@ For most agents, the simplest safe flow is:
 ```text
 bootstrap_project_docs(project_path, question?)
 get_project_context(project_path, question)
+```
+
+For module-specific questions where the exact module path is known, keep the same onboarding step and scope the context query:
+
+```text
+bootstrap_project_docs(project_path, question?)
+get_project_context(
+  project_path,
+  question,
+  module_path="services/auth",
+  scope="module"
+)
 ```
 
 `bootstrap_project_docs` is intentionally conservative. It may:
@@ -69,6 +83,61 @@ or, for project docs only:
 get_project_docs(project_path, query)
 ```
 
+For module-specific queries, use exact module filters:
+
+```text
+get_project_docs(
+  project_path,
+  query,
+  module_path="packages/backend",
+  scope="module"
+)
+```
+
+`inspect_project_docs` exposes `project_docs.modules` for discovered module docs and `project_docs.indexed_modules` for indexed module docs. Each module summary includes `module_id`, `module_name`, `module_path`, `module_type`, `doc_count`, and `docs`.
+
+## Module docs workflow
+
+Use module docs when the user asks about a specific package, app, service, crate, library, module, feature-area, deploy/runbook, or module-specific convention.
+
+Common discovered module roots include:
+
+```text
+packages/*
+apps/*
+services/*
+modules/*
+libs/*
+crates/*
+plugins/*
+components/*
+```
+
+Within each module root, Docmancer looks for maintained docs such as `README*`, `ARCHITECTURE*`, `CHANGELOG*`, `CONTRIBUTING*`, `docs/`, `doc/`, ADR folders, and runbook folders. It does not index source code as module docs.
+
+Prefer `module_path` over `module` when known:
+
+| Argument | Use |
+|---|---|
+| `module_path="services/auth"` | Exact and unambiguous. Preferred for agent retries. |
+| `module="auth"` | Exact module id/name lookup. May return `module_ambiguous`. |
+| `scope="module"` | Restrict retrieval to module docs. A resolved module path also implies module scope. |
+| `scope="project"` | Restrict retrieval to repo-level docs. |
+| `scope="all"` | Search both repo-level and module docs. |
+
+If the request is vague and multiple modules could match, the agent must ask the user instead of choosing silently:
+
+```text
+I found multiple possible modules:
+1. services/auth
+2. packages/auth-client
+3. apps/web
+
+Which one should I use, or should I search all project docs?
+```
+
+If the requested module has no maintained docs, do not invent architecture. The agent may search project-level docs if appropriate, or ask before creating reviewable module documentation such as `services/auth/README.md` or `services/auth/ARCHITECTURE.md`.
+
 ## Confirmation gates
 
 Project-docs onboarding has explicit safety gates.
@@ -76,6 +145,7 @@ Project-docs onboarding has explicit safety gates.
 | Gate | `confirmation_reason` | Why it exists |
 |---|---|---|
 | Repository write | `repo_write` | Creating or editing `ARCHITECTURE.md` changes official project docs and must be reviewable by the user. |
+| Module docs write | `repo_write` | Creating or editing module README/ARCHITECTURE docs changes official module knowledge and must be reviewable by the user. |
 | Dependency-docs network fetch | `network_fetch` | Prefetching dependency docs may download external documentation and should not happen silently. |
 
 When `requires_confirmation` is `true`, the agent should explain the proposed action and ask the user before continuing.
@@ -157,6 +227,7 @@ This file is the canonical map of maintained project-owned documentation.
 
 - [Backend module](../packages/backend/README.md) — backend-specific conventions.
 - [Frontend module](../packages/frontend/README.md) — frontend-specific conventions.
+- [Auth service](../services/auth/README.md) — authentication service architecture and runbook.
 
 ## Runbooks
 
@@ -208,6 +279,8 @@ Suggested smoke-test questions:
 get_project_context(project_path, "What is the architecture decision for <unique ADR term>?")
 get_project_context(project_path, "How do we deploy <unique service/module name>?")
 get_project_docs(project_path, "<unique heading or phrase from docs/INDEX.md target>")
+get_project_docs(project_path, "<unique module phrase>", module_path="<module>", scope="module")
+get_project_context(project_path, "<module-specific question>", module_path="<module>", scope="module")
 ```
 
 Agents should recommend this verification loop whenever docs were just added, refreshed, reorganized, or when a user expected a source that was not cited.
@@ -231,6 +304,23 @@ Example: docs exist but are not indexed.
 ```
 
 The agent should call `ingest_project_docs` with the provided arguments.
+
+Example: module name is ambiguous.
+
+```json
+{
+  "status": "module_ambiguous",
+  "reason_code": "module_ambiguous",
+  "answer_available": false,
+  "next_action": {
+    "type": "inspect_project_docs",
+    "tool": "inspect_project_docs"
+  },
+  "message": "Module name 'auth' matches multiple module paths. Retry with module_path."
+}
+```
+
+The agent should show the candidate module paths from `inspect_project_docs` and ask which one to use.
 
 Example: no high-level architecture doc.
 

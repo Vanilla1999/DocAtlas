@@ -57,6 +57,7 @@ def test_project_context_service_returns_selected_project_and_dependency_section
     assert result.metrics["source_classes"] == ["dependency_doc", "project_doc"]
     assert result.trust_contract["policy"]["direct_webfetch"] == "forbidden"
     assert ("docs", "go_router", {"topic": "use go_router", "tokens": 1200, "ecosystem": None, "version": None, "project_path": "/repo"}) in facade.calls
+    assert ("project", "/repo", "use go_router", {"tokens": 1200, "limit": 3, "expand": None, "module": None, "module_path": None, "scope": None}) in facade.calls
 
 
 def test_project_context_service_deps_only_skips_project_docs_and_marks_risk():

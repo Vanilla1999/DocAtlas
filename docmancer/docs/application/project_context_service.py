@@ -25,6 +25,9 @@ class ProjectContextService:
         libraries: list[str] | None = None,
         ecosystem: str | None = None,
         version: str | None = None,
+        module: str | None = None,
+        module_path: str | None = None,
+        scope: str | None = None,
         mode: str = "auto",
     ) -> ProjectContextResult:
         mode = mode.lower()
@@ -34,7 +37,7 @@ class ProjectContextService:
         metadata = self.facade.read_project_metadata(str(root))
         project_docs = None
         if mode in {"auto", "project-only"}:
-            project_docs = self.facade.get_project_docs(str(root), question, tokens=tokens, limit=limit, expand=expand)
+            project_docs = self.facade.get_project_docs(str(root), question, tokens=tokens, limit=limit, expand=expand, module=module, module_path=module_path, scope=scope)
 
         selected_dependency = library or (libraries[0] if libraries else None) or self.dependency_mentioned_in_question(metadata, question)
         dependency_docs: DocsResult | None = None
@@ -101,6 +104,11 @@ def project_context_pack(*, project_docs: ProjectDocsResult | None, dependency_d
             token_estimate = max(1, len(item.content) // 4) if item.content else 0
             pack.append({
                 "source_class": "project_doc",
+                "doc_scope": item.doc_scope,
+                "module_id": item.module_id,
+                "module_name": item.module_name,
+                "module_path": item.module_path,
+                "module_type": item.module_type,
                 "path": item.path,
                 "url": item.url,
                 "title": item.title,
