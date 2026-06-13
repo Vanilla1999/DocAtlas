@@ -1,10 +1,13 @@
 name: Publish to PyPI
 
 on:
+  release:
+    types: [published]
   push:
     tags:
       # Glob (not regex): three-part semver tags like v0.1.1
       - "v*.*.*"
+      - "*.*.*"
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
@@ -24,11 +27,13 @@ jobs:
         run: pip install -e ".[dev]" build twine "hatchling<1.27"
 
       - name: Verify tag matches package version
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name || github.ref_name }}
         run: |
-          TAG="${GITHUB_REF_NAME#v}"
+          TAG="${RELEASE_TAG#v}"
           PKG="$(python -c "from docmancer._version import __version__; print(__version__)")"
           if [[ "$TAG" != "$PKG" ]]; then
-            echo "::error::Git tag $GITHUB_REF_NAME does not match docmancer._version ($PKG). Bump docmancer/_version.py before tagging."
+            echo "::error::Git tag $RELEASE_TAG does not match docmancer._version ($PKG). Bump docmancer/_version.py before tagging."
             exit 1
           fi
 
@@ -79,8 +84,6 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     environment: release
-    permissions:
-      id-token: write
     steps:
       - name: Download dist artifacts
         uses: actions/download-artifact@v4
@@ -90,3 +93,5 @@ jobs:
 
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          password: ${{ secrets.PYPI_API_TOKEN }}
