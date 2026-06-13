@@ -5,6 +5,7 @@ from __future__ import annotations
 from docmancer.connectors.fetchers.pipeline.extraction import (
     DocsMarkdownConverter,
     extract_content,
+    extract_dartdoc_content,
     extract_metadata,
     extract_section_path,
 )
@@ -116,6 +117,43 @@ print("hello")
 ```
 """
 
+DARTDOC_SIZED_BOX_HTML = """
+<html><body>
+<nav><a>Classes</a><a>Widget</a></nav>
+<main id="dartdoc-main-content" class="main-content">
+<h1>SizedBox class</h1>
+<section class="desc markdown"><p>A box with a specified size.</p></section>
+<section class="constructors"><h2>Constructors</h2>
+<dl><dt><code>SizedBox({double? width, double? height, Widget? child})</code></dt>
+<dd>Creates a fixed size box.</dd></dl></section>
+<section class="properties"><h2>Properties</h2><dl><dt><code>width</code></dt><dd>The requested width.</dd></dl></section>
+</main>
+<footer>Flutter footer</footer>
+</body></html>
+"""
+
+DARTDOC_SHELL_ROUTE_HTML = """
+<html><body><aside>Navigation</aside>
+<main class="content">
+<h1>ShellRoute class</h1>
+<p>A route that displays a UI shell around matching child routes.</p>
+<h2>Example</h2>
+<pre><code class="language-dart">ShellRoute(
+  builder: (context, state, child) => Scaffold(body: child),
+)</code></pre>
+</main></body></html>
+"""
+
+DARTDOC_PROVIDER_HTML = """
+<html><body>
+<div id="dartdoc-main-content">
+<h1>Provider class</h1>
+<p>A provider that synchronously creates a value.</p>
+<h2>Methods</h2><dl><dt><code>select</code></dt><dd>Filters rebuilds.</dd></dl>
+</div>
+</body></html>
+"""
+
 
 # ---------------------------------------------------------------------------
 # extract_content tests
@@ -161,6 +199,32 @@ class TestExtractContent:
         result = extract_content("")
         assert isinstance(result, str)
 
+    def test_dartdoc_sized_box_extracts_class_content(self):
+        result = extract_dartdoc_content(DARTDOC_SIZED_BOX_HTML)
+
+        assert "SizedBox class" in result
+        assert "A box with a specified size" in result
+        assert "Constructors" in result
+        assert "SizedBox({double? width" in result
+        assert "width" in result
+        assert "Flutter footer" not in result
+
+    def test_dartdoc_go_router_extracts_example(self):
+        result = extract_dartdoc_content(DARTDOC_SHELL_ROUTE_HTML)
+
+        assert "ShellRoute class" in result
+        assert "UI shell" in result
+        assert "ShellRoute(" in result
+        assert "Scaffold(body: child)" in result
+        assert "Navigation" not in result
+
+    def test_dartdoc_riverpod_extracts_provider_description(self):
+        result = extract_content(DARTDOC_PROVIDER_HTML, doc_format="dartdoc")
+
+        assert "Provider class" in result
+        assert "synchronously creates a value" in result
+        assert "select" in result
+
 
 # ---------------------------------------------------------------------------
 # extract_metadata tests
@@ -182,6 +246,11 @@ class TestExtractMetadata:
     def test_extracts_canonical(self):
         meta = extract_metadata(SIMPLE_HTML)
         assert meta["canonical_url"] == "https://example.com/docs/getting-started"
+
+    def test_resolves_relative_canonical_against_page_url(self):
+        html = '<html><head><link rel="canonical" href="/docs/page"></head><body></body></html>'
+        meta = extract_metadata(html, url="https://example.com/docs/page?utm_source=x")
+        assert meta["canonical_url"] == "https://example.com/docs/page"
 
     def test_missing_metadata(self):
         meta = extract_metadata("<html><body><p>No meta</p></body></html>")

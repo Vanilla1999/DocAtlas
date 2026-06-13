@@ -4,7 +4,9 @@ from docmancer import __version__
 from docmancer.cli.commands import (
     add_cmd,
     clear_cmd,
+    context_cmd,
     doctor_cmd,
+    eval_cmd,
     fetch_cmd,
     ingest_cmd,
     ingest_uspto_cmd,
@@ -68,6 +70,8 @@ cli.add_command(setup_cmd, "setup")
 cli.add_command(add_cmd, "add")
 cli.add_command(update_cmd, "update")
 cli.add_command(query_cmd, "query")
+cli.add_command(context_cmd, "context")
+cli.add_command(eval_cmd, "eval")
 cli.add_command(inspect_cmd, "inspect")
 cli.add_command(list_cmd, "list")
 cli.add_command(remove_cmd, "remove")

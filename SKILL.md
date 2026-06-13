@@ -33,6 +33,8 @@ Docmancer compresses documentation context so coding agents spend tokens on code
 4. **Fetch URL docs if needed:** `docmancer add <url>`
 5. **Use the returned context** to ground your response with source-attributed sections.
 
+For MCP docs tools, registered sources are registry-owned. If `get_library_docs` returns candidates or `next_actions`, retry through Docmancer with the returned `arguments_patch`/guidance. Never WebFetch registered docs before that Docmancer retry.
+
 ## Core Commands
 
 ### Ingest Local Documentation
@@ -113,3 +115,4 @@ For API tasks, search first, inspect the returned schema and safety block, then 
 - Do not use `docmancer ingest` for URLs. Use `docmancer add <url>`.
 - Do not run `docmancer query` before checking indexed sources with `docmancer list`.
 - Do not assume docs are indexed. Always verify with `docmancer list` before querying.
+- Do not WebFetch registered docs when Docmancer returns candidates or retry guidance. Retry Docmancer first.

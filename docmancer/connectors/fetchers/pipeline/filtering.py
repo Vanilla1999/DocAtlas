@@ -81,6 +81,7 @@ def normalize_url(url: str) -> str:
 
 
 _ROOT_HINT_SEGMENTS = {"docs", "doc", "documentation", "api", "reference", "sdk", "cli"}
+_LOCALE_PREFIXES = {"ar", "bn", "de", "es", "fr", "it", "ja", "ko", "ru", "tr", "zh-hans"}
 
 
 def infer_docset_root(url: str) -> str | None:
@@ -182,6 +183,14 @@ def is_docs_url(url: str, base_url: str) -> bool:
     scope_path = _infer_scope_path(base_parsed.path.rstrip("/"))
     url_path = parsed.path.rstrip("/")
     if scope_path and not url_path.startswith(scope_path):
+        return False
+
+    # Default web/Docusaurus ingest should not pull translated mirrors when
+    # the seed is the canonical English root. Users can still opt into a
+    # locale by seeding that locale path directly, e.g. /ru/docs.
+    url_parts = [part.lower() for part in parsed.path.split("/") if part]
+    base_parts = [part.lower() for part in base_parsed.path.split("/") if part]
+    if url_parts and url_parts[0] in _LOCALE_PREFIXES and not (base_parts and base_parts[0] in _LOCALE_PREFIXES):
         return False
 
     # Must not match blocklist

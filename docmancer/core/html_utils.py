@@ -36,6 +36,18 @@ def _table_to_text(table_html: str) -> str:
     return "\n".join(lines)
 
 
+def _code_language(pre_html: str) -> str:
+    match = re.search(r'class=["\'][^"\']*(?:language-|lang-)([A-Za-z0-9_+-]+)', pre_html)
+    return match.group(1) if match else ""
+
+
+def _pre_to_fence(pre_html: str) -> str:
+    text = _decode_entities(_TAG_RE.sub("", pre_html)).strip()
+    if not text:
+        return ""
+    return f"\n```{_code_language(pre_html)}\n{text}\n```\n"
+
+
 def clean_html(content: str) -> str:
     """Convert inline HTML in document content to clean plain text.
 
@@ -56,6 +68,14 @@ def clean_html(content: str) -> str:
     content = re.sub(
         r"<table[^>]*>.*?</table>",
         lambda m: _table_to_text(m.group(0)) + "\n",
+        content,
+        flags=re.DOTALL | re.IGNORECASE,
+    )
+
+    # Preserve examples as fenced code before stripping generic tags.
+    content = re.sub(
+        r"<pre[^>]*>.*?</pre>",
+        lambda m: _pre_to_fence(m.group(0)),
         content,
         flags=re.DOTALL | re.IGNORECASE,
     )

@@ -15,6 +15,14 @@ downloaded-docs/
 /release-patch-pypi.sh
 /repush-release-tag.sh
 docs/
+!docs/
+docs/*
+!docs/capabilities.md
+!docs/context7-docmancer-comparison.md
+!docs/DOCMANCER_PRODUCT_BRIEF.md
+!docs/mcp-docs-server.md
+!docs/project-docs-demo.md
+!docs/project-docs-mcp-workflow.md
 !docmancer/docs/
 !docmancer/docs/*.py
 scripts/*.log

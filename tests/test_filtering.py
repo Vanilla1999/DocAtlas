@@ -143,6 +143,14 @@ class TestIsDocsUrl:
     def test_search_blocked(self):
         assert not is_docs_url("https://example.com/search?q=test", "https://example.com")
 
+    def test_default_ingest_excludes_locale_mirrors(self):
+        assert is_docs_url("https://riverpod.dev/docs/concepts2/refs", "https://riverpod.dev")
+        assert not is_docs_url("https://riverpod.dev/ru/docs/concepts2/refs", "https://riverpod.dev")
+        assert not is_docs_url("https://riverpod.dev/zh-Hans/docs/concepts2/refs", "https://riverpod.dev")
+
+    def test_locale_seed_can_ingest_locale_paths(self):
+        assert is_docs_url("https://riverpod.dev/ru/docs/concepts2/refs", "https://riverpod.dev/ru/docs")
+
 
 # ---------------------------------------------------------------------------
 # resolve_url tests

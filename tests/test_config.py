@@ -152,6 +152,7 @@ def test_embeddings_and_retrieval_defaults():
     assert config.retrieval.fusion.method == "rrf"
     assert config.retrieval.fusion.rrf_k == 60
     assert config.retrieval.fusion.weights == {}
+    assert config.retrieval.max_sections_per_source == 2
 
 
 def test_bare_yaml_keeps_default_mode_lexical(tmp_path):

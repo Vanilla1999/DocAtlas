@@ -11,9 +11,11 @@ from __future__ import annotations
 
 import logging
 import re
+from urllib.parse import urljoin
 
 from bs4 import BeautifulSoup, Tag
 from markdownify import MarkdownConverter
+from docmancer.docs.dartdoc import DARTDOC_ENTITY_SUFFIXES
 
 logger = logging.getLogger(__name__)
 
@@ -34,6 +36,36 @@ _NOISE_SELECTORS = [
     ".page-nav",
     ".theme-doc-footer",
     "[role='navigation']",
+]
+
+_DARTDOC_MAIN_SELECTORS = [
+    "#dartdoc-main-content",
+    "main",
+    ".main-content",
+    ".content",
+    "article",
+    "[role='main']",
+]
+
+_DARTDOC_NOISE_SELECTORS = [
+    "nav",
+    "header",
+    "footer",
+    "aside",
+    "script",
+    "style",
+    "noscript",
+    "svg",
+    ".sidebar",
+    ".sidebar-offcanvas-left",
+    ".sidebar-offcanvas-right",
+    ".breadcrumbs",
+    ".self-name",
+    ".footer",
+    ".version-note",
+    ".source-link",
+    "#dartdoc-sidebar-left",
+    "#dartdoc-sidebar-right",
 ]
 
 
@@ -145,6 +177,58 @@ def _extract_with_markdownify(html: str) -> str:
     return _normalize_whitespace(md)
 
 
+def _extract_dartdoc_index(soup: BeautifulSoup) -> str:
+    links = []
+    for link in soup.find_all("a", href=True):
+        href = str(link.get("href") or "")
+        text = link.get_text(" ", strip=True)
+        if not text:
+            continue
+        if any(token in href for token in DARTDOC_ENTITY_SUFFIXES):
+            links.append(f"- [{text}]({href})")
+    if not links:
+        return ""
+    title_tag = soup.find("h1") or soup.find("title")
+    title = title_tag.get_text(" ", strip=True) if title_tag else "Dartdoc index"
+    return _normalize_whitespace("\n".join([f"# {title}", "", *links[:200]]))
+
+
+def extract_dartdoc_content(html: str, url: str | None = None) -> str:
+    """Extract Dartdoc class/library content without browser rendering."""
+    if not html or not html.strip():
+        return ""
+
+    soup = BeautifulSoup(html, "html.parser")
+    for selector in _DARTDOC_NOISE_SELECTORS:
+        for el in soup.select(selector):
+            el.decompose()
+
+    target = None
+    for selector in _DARTDOC_MAIN_SELECTORS:
+        candidate = soup.select_one(selector)
+        if candidate and candidate.get_text(" ", strip=True):
+            target = candidate
+            break
+
+    if target is None:
+        target = soup.body or soup
+
+    converter = DocsMarkdownConverter(
+        heading_style="ATX",
+        bullets="-",
+        strong_em_symbol="*",
+        code_language="",
+        escape_underscores=False,
+        strip=["img"],
+    )
+    md = converter.convert_soup(BeautifulSoup(str(target), "html.parser"))
+    md = _normalize_whitespace(md)
+    if md and len(md.split()) >= 5:
+        return md
+
+    return _extract_dartdoc_index(soup)
+
+
 def _normalize_whitespace(text: str) -> str:
     """Collapse excessive blank lines and strip trailing whitespace."""
     text = re.sub(r"\n{3,}", "\n\n", text)
@@ -152,7 +236,7 @@ def _normalize_whitespace(text: str) -> str:
     return "\n".join(lines).strip()
 
 
-def extract_content(html: str, url: str | None = None) -> str:
+def extract_content(html: str, url: str | None = None, doc_format: str | None = None) -> str:
     """Extract main documentation content from HTML, returning clean Markdown.
 
     Uses trafilatura as the primary extractor. Falls back to markdownify
@@ -169,6 +253,11 @@ def extract_content(html: str, url: str | None = None) -> str:
     if not html or not html.strip():
         return ""
 
+    if doc_format == "dartdoc":
+        result = extract_dartdoc_content(html, url=url)
+        if result:
+            return result
+
     # Primary: trafilatura
     result = _extract_with_trafilatura(html, url)
     if result:
@@ -179,7 +268,7 @@ def extract_content(html: str, url: str | None = None) -> str:
     return result
 
 
-def extract_metadata(html: str) -> dict[str, str | None]:
+def extract_metadata(html: str, url: str | None = None) -> dict[str, str | None]:
     """Extract page metadata (title, description, lang, canonical) from HTML.
 
     Returns:
@@ -208,7 +297,9 @@ def extract_metadata(html: str) -> dict[str, str | None]:
     canonical_url = None
     link_canonical = soup.find("link", attrs={"rel": "canonical"})
     if link_canonical and isinstance(link_canonical, Tag):
-        canonical_url = link_canonical.get("href")
+        canonical_href = link_canonical.get("href")
+        if canonical_href:
+            canonical_url = urljoin(url, str(canonical_href)) if url else str(canonical_href)
 
     author = None
     for attr in ("author", "article:author"):

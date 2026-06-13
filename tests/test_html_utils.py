@@ -50,6 +50,12 @@ class TestCleanHtmlBlockStripping:
         assert "italic" in result
         assert "<b>" not in result
 
+    def test_preserves_pre_code_as_fenced_markdown(self):
+        html = '<pre><code class="language-python">print("hello")</code></pre>'
+        result = clean_html(html)
+        assert "```python" in result
+        assert 'print("hello")' in result
+
     def test_strips_noscript_content(self):
         html = '<p>Hello</p><noscript><img src="track.gif"></noscript><p>World</p>'
         result = clean_html(html)

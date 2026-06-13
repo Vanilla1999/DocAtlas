@@ -1,6 +1,6 @@
 # Commands
 
-Reference for the main docs-RAG commands, vector lifecycle commands, and advanced MCP pack commands. For how these fit into the overall system, see [Architecture](./Architecture.md). For configuration that affects command defaults, see [Configuration](./Configuration.md).
+Reference for the main Docmancer Docs runtime commands, vector lifecycle commands, docs MCP tools, and advanced MCP pack commands. For how these fit into the overall system, see [Architecture](./Architecture.md). For configuration that affects command defaults, see [Configuration](./Configuration.md).
 
 ## Core commands
 
@@ -61,9 +61,30 @@ Reference for the main docs-RAG commands, vector lifecycle commands, and advance
 | `--max-pages <n>` | Maximum pages to fetch when refreshing web sources (default: 500). |
 | `--browser` | Enable Playwright browser fallback for JS-heavy sites. |
 
+## Docs MCP server
+
+`docmancer mcp docs-serve` runs the local, version-aware documentation MCP server. Agents use it to resolve registered library docs, fetch or refresh stale docs, prefetch project dependencies, and query compact context packs without leaving their tool loop.
+
+Core docs MCP tools include:
+
+- `resolve_library_id`
+- `get_library_docs`
+- `refresh_library_docs`
+- `prefetch_library_docs`
+- `prefetch_project_docs`
+- `prefetch_docs_targets`
+- `prefetch_docs_manifest`
+- `list_library_docs`
+- `inspect_library_docs`
+- `get_docs_job_status`
+- `list_docs_jobs`
+- `cancel_docs_job`
+
+Register unknown docs with an explicit `docs_url` or `docs_url_template`; later queries can use the stored registry entry without repeating the URL. Versioned entries use canonical ids such as `pub:go_router@14.8.1:api` and expose source/version metadata in responses.
+
 ## MCP pack commands
 
-`docmancer install-pack` installs version-pinned API MCP packs, and `docmancer mcp` manages the local MCP server and installed packs. This is an advanced surface that is not required for local docs retrieval. See [MCP Packs](./MCP-Packs.md) for the full reference and [Architecture > MCP runtime](./Architecture.md#mcp-runtime) for dispatch internals.
+`docmancer install-pack` installs version-pinned API MCP packs, and `docmancer mcp` manages the local MCP server and installed packs. This is an advanced surface that is not required for local docs retrieval. See [MCP Packs](./MCP-Packs.md) for the full reference and [Architecture > Packs MCP runtime](./Architecture.md#packs-mcp-runtime) for dispatch internals.
 
 | Command | Description |
 |---------|-------------|

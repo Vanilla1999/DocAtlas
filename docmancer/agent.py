@@ -7,6 +7,7 @@ import os
 import hashlib
 import fnmatch
 from pathlib import Path
+from typing import Any, Callable
 from datetime import datetime, timezone
 
 import httpx
@@ -227,6 +228,8 @@ class DocmancerAgent:
         recursive: bool = True,
         skip_known: bool = False,
         with_vectors: bool = True,
+        metadata: dict[str, Any] | None = None,
+        metadata_for_file: Callable[[Path], dict[str, Any]] | None = None,
     ) -> int:
         path = Path(path)
         if not path.exists():
@@ -268,6 +271,10 @@ class DocmancerAgent:
                     "content_hash",
                     hashlib.sha256(document.content.encode("utf-8")).hexdigest(),
                 )
+                if metadata:
+                    document.metadata.update(metadata)
+                if metadata_for_file:
+                    document.metadata.update(metadata_for_file(file_path))
                 if skip_known and self.store.has_source_content_hash(
                     document.source,
                     str(document.metadata.get("content_hash") or ""),
@@ -337,6 +344,8 @@ class DocmancerAgent:
         strategy: str | None = None,
         browser: bool = False,
         url: str | None = None,
+        doc_format: str | None = None,
+        progress_callback: Callable[[dict[str, Any]], None] | None = None,
     ):
         if fetcher is not None:
             return fetcher
@@ -352,6 +361,8 @@ class DocmancerAgent:
             strategy=strategy,
             browser=browser,
             workers=self.config.web_fetch.workers,
+            doc_format=doc_format,
+            progress_callback=progress_callback,
         )
 
     def _auto_detect_provider(self, url: str) -> str:
@@ -386,6 +397,8 @@ class DocmancerAgent:
         max_pages: int = 500,
         strategy: str | None = None,
         browser: bool = False,
+        doc_format: str | None = None,
+        progress_callback: Callable[[dict[str, Any]], None] | None = None,
     ) -> int:
         f = self._get_fetcher(
             provider,
@@ -394,10 +407,31 @@ class DocmancerAgent:
             strategy=strategy,
             browser=browser,
             url=url,
+            doc_format=doc_format,
+            progress_callback=progress_callback,
         )
         documents = f.fetch(url)
         logger.info("Fetched %d document(s); starting index", len(documents))
-        return self.ingest_documents(documents, recreate=recreate)
+        if progress_callback:
+            progress_callback(
+                {
+                    "phase": "indexing",
+                    "message": f"Indexing {len(documents)} documents",
+                    "indexed_pages": 0,
+                    "total_pages": len(documents),
+                }
+            )
+        indexed = self.ingest_documents(documents, recreate=recreate)
+        if progress_callback:
+            progress_callback(
+                {
+                    "phase": "indexing",
+                    "message": f"Indexed {indexed} documents",
+                    "indexed_pages": indexed,
+                    "total_pages": len(documents),
+                }
+            )
+        return indexed
 
     def fetch_documents(
         self,
@@ -407,6 +441,8 @@ class DocmancerAgent:
         max_pages: int = 500,
         strategy: str | None = None,
         browser: bool = False,
+        doc_format: str | None = None,
+        progress_callback: Callable[[dict[str, Any]], None] | None = None,
     ) -> list[Document]:
         f = self._get_fetcher(
             provider,
@@ -415,6 +451,8 @@ class DocmancerAgent:
             strategy=strategy,
             browser=browser,
             url=url,
+            doc_format=doc_format,
+            progress_callback=progress_callback,
         )
         return f.fetch(url)
 
@@ -424,12 +462,14 @@ class DocmancerAgent:
         limit: int | None = None,
         budget: int | None = None,
         expand: str | None = None,
+        filters: dict[str, Any] | None = None,
     ) -> list[RetrievedChunk]:
         return self.store.query(
             text,
             limit=limit or self.config.query.default_limit,
             budget=budget or self.config.query.default_budget,
             expand=expand if expand is not None else self.config.query.default_expand,
+            filters=filters,
         )
 
     def query_context(
@@ -441,13 +481,14 @@ class DocmancerAgent:
         limit: int | None = None,
         budget: int | None = None,
         expand: str | None = None,
+        filters: dict[str, Any] | None = None,
     ) -> str:
         """Query the index and return a formatted context string.
 
         Combines :meth:`query` and :func:`~docmancer.context.format_context`
         into a single call for convenience.
         """
-        chunks = self.query(text, limit=limit, budget=budget, expand=expand)
+        chunks = self.query(text, limit=limit, budget=budget, expand=expand, filters=filters)
         from docmancer.context import format_context
 
         return format_context(chunks, style=style, include_sources=include_sources)

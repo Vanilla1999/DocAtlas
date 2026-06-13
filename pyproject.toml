@@ -3,12 +3,24 @@ requires = ["hatchling<1.27"]
 build-backend = "hatchling.build"
 
 [project]
-name = "docmancer"
+name = "doc-atlas"
 dynamic = ["version"]
-description = "Compress local documentation context for coding agents."
+description = "Local, version-aware documentation runtime for coding agents."
 readme = "README.md"
 license = { file = "LICENSE" }
 requires-python = ">=3.11,<3.14"
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Documentation",
+    "Topic :: Software Development :: Documentation",
+]
 dependencies = [
     "pydantic>=2.0.0",
     "pydantic-settings>=2.2.1",
@@ -42,7 +54,14 @@ embeddings-openai = ["openai>=1.0.0"]
 embeddings-cohere = ["cohere>=5.0.0"]
 
 [project.scripts]
-"docmancer" = "docmancer.cli.__main__:cli"
+"doc-atlas" = "docmancer.cli.__main__:cli"
+
+[project.urls]
+Homepage = "https://github.com/Vanilla1999/DocAtlas"
+Repository = "https://github.com/Vanilla1999/DocAtlas"
+Documentation = "https://github.com/Vanilla1999/DocAtlas/tree/main/wiki"
+Issues = "https://github.com/Vanilla1999/DocAtlas/issues"
+Changelog = "https://github.com/Vanilla1999/DocAtlas/blob/main/CHANGELOG.md"
 
 [tool.hatch.version]
 path = "docmancer/_version.py"

@@ -36,12 +36,14 @@ from docmancer.connectors.fetchers.pipeline.filtering import (
     infer_docset_root,
     is_docs_url,
     normalize_url,
+    resolve_url,
 )
 from docmancer.connectors.fetchers.pipeline.rate_limit import RateLimiter
 from docmancer.connectors.fetchers.pipeline.redirect import RedirectTracker
 from docmancer.connectors.fetchers.pipeline.robots import RobotsChecker
 from docmancer.core.html_utils import looks_like_html
 from docmancer.core.models import Document
+from docmancer.docs.dartdoc import DARTDOC_ENTITY_SUFFIXES
 
 logger = logging.getLogger(__name__)
 
@@ -49,6 +51,7 @@ logger = logging.getLogger(__name__)
 _DEFAULT_TIMEOUT = 30.0
 _DEFAULT_USER_AGENT = "docmancer/1.0 (+https://github.com/docmancer/docmancer)"
 _DIRECT_TEXT_SUFFIXES = {".md", ".txt"}
+_DIRECT_DARTDOC_SUFFIXES = DARTDOC_ENTITY_SUFFIXES
 
 
 @dataclass(slots=True)
@@ -83,6 +86,8 @@ class WebFetcher:
         respect_robots: bool = True,
         delay: float = 0.5,
         workers: int = 8,
+        doc_format: str | None = None,
+        progress_callback=None,
     ):
         self._timeout = timeout
         self._max_pages = max_pages
@@ -91,6 +96,16 @@ class WebFetcher:
         self._respect_robots = respect_robots
         self._delay = delay
         self._workers = max(1, workers)
+        self._doc_format = doc_format
+        self._progress_callback = progress_callback
+
+    def _emit_progress(self, event: dict) -> None:
+        if not self._progress_callback:
+            return
+        try:
+            self._progress_callback(event)
+        except Exception:
+            logger.debug("progress callback failed", exc_info=True)
 
     def _client_kwargs(self) -> dict:
         return {
@@ -116,6 +131,14 @@ class WebFetcher:
         with httpx.Client(**self._client_kwargs()) as client:
             if self._is_direct_text_url(base_url):
                 return [self._fetch_direct_text_page(base_url, client)]
+            if self._is_direct_dartdoc_url(base_url):
+                page = self._fetch_dartdoc_direct_page(base_url, base_url, client, Platform.GENERIC)
+                if page is None:
+                    raise ValueError(
+                        f"Dartdoc page {base_url!r} had no extractable article content. "
+                        "Try concrete class/library seed URLs or browser=true."
+                    )
+                return [page.document]
 
             # Step 1: Fetch homepage and detect platform
             platform, root_html, root_headers = self._fetch_and_detect(base_url, client)
@@ -130,6 +153,7 @@ class WebFetcher:
                     self._delay = max(self._delay, crawl_delay)
 
             # Step 3: Discover page URLs
+            self._emit_progress({"phase": "discovering", "message": f"Discovering URLs from {base_url}", "url": base_url})
             discovered = discover_urls(
                 base_url=base_url,
                 client=client,
@@ -152,6 +176,15 @@ class WebFetcher:
                     f"Could not discover any documentation pages at {base_url!r}. "
                     f"No /llms-full.txt, /llms.txt, sitemap, or navigable links found.{hint}"
                 )
+            self._emit_progress(
+                {
+                    "phase": "discovering",
+                    "message": f"Discovered {len(discovered)} URLs",
+                    "url": base_url,
+                    "discovered_pages": len(discovered),
+                    "total_pages": len(discovered),
+                }
+            )
 
             # Step 4: Handle llms-full.txt (content already available)
             if (
@@ -168,6 +201,17 @@ class WebFetcher:
     def _is_direct_text_url(url: str) -> bool:
         path = urlparse(url).path.lower()
         return any(path.endswith(suffix) for suffix in _DIRECT_TEXT_SUFFIXES)
+
+    def _is_dartdoc_url(self, url: str) -> bool:
+        if self._doc_format == "dartdoc":
+            return True
+        parsed = urlparse(url)
+        host = parsed.netloc.lower()
+        path = parsed.path.lower()
+        return host == "api.flutter.dev" or (host == "pub.dev" and path.startswith("/documentation/"))
+
+    def _is_direct_dartdoc_url(self, url: str) -> bool:
+        return self._is_dartdoc_url(url) and urlparse(url).path.lower().endswith(_DIRECT_DARTDOC_SUFFIXES)
 
     def _fetch_direct_text_page(self, url: str, client: httpx.Client) -> Document:
         """Fetch an exact markdown/text docs URL without running site discovery."""
@@ -210,6 +254,23 @@ class WebFetcher:
                 "word_count": len(content.split()),
                 "fetched_at": fetched_at,
             },
+        )
+
+    def _fetch_dartdoc_direct_page(
+        self,
+        url: str,
+        base_url: str,
+        client: httpx.Client,
+        platform: Platform,
+    ) -> _FetchedPage | None:
+        return self._fetch_page(
+            DiscoveredUrl(url=url, strategy=DiscoveryStrategy.NAV_CRAWL),
+            base_url,
+            platform,
+            robots=None,
+            rate_limiter=RateLimiter(delay=0.0),
+            redirect_tracker=RedirectTracker(),
+            redirect_lock=threading.Lock(),
         )
 
     def _fetch_and_detect(
@@ -285,22 +346,53 @@ class WebFetcher:
             ]
             deduplicator.reset()
             for future in as_completed(futures):
+                completed_fetches = getattr(self, "_completed_fetches", 0) + 1
+                self._completed_fetches = completed_fetches
                 page = future.result()
                 if page is None:
+                    self._emit_progress(
+                        {
+                            "phase": "fetching",
+                            "message": f"Fetched {completed_fetches}/{len(unique_discovered)} pages",
+                            "fetched_pages": completed_fetches,
+                            "failed_pages": 1,
+                            "total_pages": len(unique_discovered),
+                        }
+                    )
                     continue
                 if deduplicator.is_url_duplicate(page.final_url):
                     logger.debug("Skipped %s (duplicate final URL)", page.document.source)
+                    continue
+                if page.document.source != page.final_url and deduplicator.is_url_duplicate(page.document.source):
+                    logger.debug("Skipped %s (duplicate canonical URL)", page.document.source)
                     continue
                 if deduplicator.is_content_duplicate(page.document.content):
                     logger.debug("Skipped %s (duplicate content)", page.document.source)
                     continue
                 documents.append(page.document)
                 logger.info("Fetched %s (%d words)", page.document.source, len(page.document.content.split()))
+                self._emit_progress(
+                    {
+                        "phase": "fetching",
+                        "message": f"Fetched {completed_fetches}/{len(unique_discovered)} pages",
+                        "url": page.document.source,
+                        "fetched_pages": completed_fetches,
+                        "total_pages": len(unique_discovered),
+                    }
+                )
 
         if not documents:
+            last_url = unique_discovered[-1].url if unique_discovered else base_url
+            if self._is_dartdoc_url(base_url):
+                raise ValueError(
+                    f"Extraction failed for {len(unique_discovered)} page(s). Last URL: {last_url}. "
+                    "Dartdoc root/index page had no extractable article content; use concrete "
+                    "class/library seed URLs or enable dartdoc index discovery. Browser fallback "
+                    "remains optional with browser=true."
+                )
             raise ValueError(
-                f"Discovered {len(discovered)} URL(s) at {base_url!r} but could not "
-                "extract content from any of them."
+                f"Extraction failed for {len(unique_discovered)} page(s). Last URL: {last_url}. "
+                "Try class/library seed URLs or browser=true."
             )
 
         return documents
@@ -316,6 +408,7 @@ class WebFetcher:
         redirect_lock: threading.Lock,
     ) -> _FetchedPage | None:
         url = normalize_url(disc.url)
+        self._emit_progress({"phase": "fetching", "message": f"Fetching {url}", "url": url})
         if robots and not robots.can_fetch(url):
             logger.debug("Skipped %s (blocked by robots.txt)", url)
             return None
@@ -333,6 +426,7 @@ class WebFetcher:
                 resp = client.get(fetch_url)
             except httpx.RequestError as exc:
                 logger.warning("Failed to fetch %s: %s", fetch_url, exc)
+                self._emit_progress({"phase": "fetching", "message": f"Fetch failed: {url}", "url": url})
                 return None
 
             if resp.status_code == 404 and predicted_url and fetch_url == predicted_url:
@@ -351,6 +445,7 @@ class WebFetcher:
                 return None
             if resp.status_code != 200:
                 logger.debug("Skipped %s (status %d)", fetch_url, resp.status_code)
+                self._emit_progress({"phase": "fetching", "message": f"Fetch failed with status {resp.status_code}: {url}", "url": url})
                 return None
 
             rate_limiter.reset_backoff(fetch_url)
@@ -365,8 +460,9 @@ class WebFetcher:
             raw_html = resp.text
 
         if looks_like_html(raw_html):
-            content = extract_content(raw_html, url=url)
-            meta = extract_metadata(raw_html)
+            doc_format = "dartdoc" if self._is_dartdoc_url(url) else None
+            content = extract_content(raw_html, url=url, doc_format=doc_format)
+            meta = extract_metadata(raw_html, url=final_url)
             section_path = extract_section_path(raw_html)
             fmt = "markdown"
         else:
@@ -385,9 +481,10 @@ class WebFetcher:
                 content = browser_content
 
         content_hash = ContentDeduplicator.content_hash(content)
-        canonical = meta.get("canonical_url") or url
+        canonical = normalize_url(resolve_url(str(meta.get("canonical_url")), final_url)) if meta.get("canonical_url") else url
+        source_url = canonical if is_docs_url(canonical, base_url) else url
         doc = Document(
-            source=url,
+            source=source_url,
             content=content,
             metadata={
                 "format": fmt,

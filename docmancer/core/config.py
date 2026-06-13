@@ -122,6 +122,7 @@ class RetrievalConfig(BaseSettings):
     expand: str | None = None
     budget: int | None = None
     limit: int | None = None
+    max_sections_per_source: int | None = Field(default=2, ge=1)
     model_config = SettingsConfigDict(env_prefix="DOCMANCER_RETRIEVAL_", extra="ignore")
 
 

@@ -157,3 +157,36 @@ def test_setup_all_creates_config_db_and_installs_skills():
         assert (fake_home / ".docmancer" / "docmancer.yaml").exists()
         assert (fake_home / ".codex" / "skills" / "docmancer" / "SKILL.md").exists()
         assert (fake_home / ".docmancer" / "exports" / "claude-desktop" / "docmancer.zip").exists()
+
+
+def test_setup_yes_offline_project_local_prints_readiness_summary():
+    runner = CliRunner()
+    with runner.isolated_filesystem() as tmp_dir:
+        fake_home = _home(tmp_dir)
+        fake_agent = MagicMock()
+        fake_agent.collection_stats.return_value = {"sources_count": 0, "sections_count": 0}
+        with patch("docmancer.cli.commands.Path.home", return_value=fake_home), \
+             patch("docmancer.core.config.Path.home", return_value=fake_home), \
+             patch("docmancer.cli.commands._get_agent_class", return_value=lambda config: fake_agent):
+            result = runner.invoke(cli, ["setup", "--yes", "--offline", "--vectors", "off", "--project-local"])
+
+        assert result.exit_code == 0, result.output
+        assert Path("docmancer.yaml").exists()
+        assert "Ready now" in result.output
+        assert "Next best command" in result.output
+        assert "docmancer ingest ./docs" in result.output
+
+
+def test_setup_mcp_docs_prints_docs_server_command():
+    runner = CliRunner()
+    with runner.isolated_filesystem() as tmp_dir:
+        fake_home = _home(tmp_dir)
+        fake_agent = MagicMock()
+        fake_agent.collection_stats.return_value = {"sources_count": 0, "sections_count": 0}
+        with patch("docmancer.cli.commands.Path.home", return_value=fake_home), \
+             patch("docmancer.core.config.Path.home", return_value=fake_home), \
+             patch("docmancer.cli.commands._get_agent_class", return_value=lambda config: fake_agent):
+            result = runner.invoke(cli, ["setup", "--profile", "mcp-docs", "--yes"])
+
+        assert result.exit_code == 0, result.output
+        assert "docmancer mcp docs-serve" in result.output

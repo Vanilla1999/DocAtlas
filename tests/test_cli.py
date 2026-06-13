@@ -1,3 +1,4 @@
+import json
 import os
 from pathlib import Path
 from unittest.mock import MagicMock, patch
@@ -232,6 +233,22 @@ def test_add_url_applies_fetch_worker_override():
     mock_agent.add.assert_called_once()
 
 
+def test_update_url_replaces_existing_docset_before_readding():
+    runner = CliRunner()
+    fake_config = MagicMock()
+    fake_agent = MagicMock()
+    fake_agent.list_sources_with_dates.return_value = [{"source": "https://docs.example.com"}]
+    fake_agent.add.return_value = 7
+
+    with patch("docmancer.cli.commands._load_config", return_value=fake_config), \
+         patch("docmancer.cli.commands._get_agent_class", return_value=lambda config: fake_agent):
+        result = runner.invoke(cli, ["update", "https://docs.example.com"])
+
+    assert result.exit_code == 0, result.output
+    fake_agent.remove_source.assert_called_once_with("https://docs.example.com")
+    fake_agent.add.assert_called_once_with("https://docs.example.com", recreate=False, max_pages=500, browser=False)
+
+
 def test_query_outputs_savings_by_default():
     runner = CliRunner()
     fake_config = MagicMock()
@@ -306,6 +323,40 @@ def test_query_json_output():
     assert '"savings_percent": 80' in result.output
 
 
+def test_query_writes_explain_json(tmp_path):
+    fake_config = MagicMock()
+    fake_config.query.default_budget = 1200
+    fake_agent = MagicMock()
+    fake_agent.query.return_value = [
+        MagicMock(
+            model_dump=lambda: {"source": "doc.md", "text": "result"},
+            text="result",
+            score=1.0,
+            source="doc.md",
+            metadata={
+                "title": "Auth",
+                "section_id": 42,
+                "token_estimate": 10,
+                "docmancer_tokens": 10,
+                "raw_tokens": 50,
+                "savings_percent": 80,
+                "runway_multiplier": 5,
+            },
+        )
+    ]
+    trace_path = tmp_path / "trace.json"
+    with patch("docmancer.cli.commands._load_config", return_value=fake_config), \
+         patch("docmancer.cli.commands._get_agent_class", return_value=lambda config: fake_agent):
+        result = CliRunner().invoke(cli, ["query", "Auth tokens", "--explain-json", str(trace_path)])
+
+    assert result.exit_code == 0, result.output
+    trace = json.loads(trace_path.read_text())
+    assert trace["schema_version"] == 1
+    assert trace["query_normalization"]["normalized"] == "auth tokens"
+    assert trace["selected_mode"] == "lexical"
+    assert trace["packing"]["docmancer_tokens"] == 10
+
+
 def test_display_path_shortens_home_and_cwd(tmp_path):
     fake_home = tmp_path / "home"
     fake_home.mkdir()
@@ -329,6 +380,26 @@ def test_doctor_runs():
     assert result.exit_code == 0
     assert "SQLite" in result.output
     assert "Local loaders" in result.output
+
+
+def test_doctor_json_and_list_checks():
+    fake_config = MagicMock()
+    fake_config.index.db_path = "/tmp/docmancer.db"
+    fake_agent = MagicMock()
+    fake_agent.collection_stats.return_value = {"sources_count": 0, "sections_count": 0, "extracted_dir": "/tmp/extracted"}
+    with patch("docmancer.cli.commands._load_config", return_value=fake_config), \
+         patch("docmancer.cli.commands._get_agent_class", return_value=lambda config: fake_agent):
+        result = CliRunner().invoke(cli, ["doctor", "--json", "--check", "sources"])
+
+    assert result.exit_code == 0, result.output
+    payload = json.loads(result.output)
+    assert payload["profile"] == "cli-docs"
+    assert all(check["group"] == "sources" for check in payload["checks"])
+    assert payload["issues"][0]["fix_command"] == "docmancer ingest ./docs"
+
+    checks = CliRunner().invoke(cli, ["doctor", "--list-checks"])
+    assert checks.exit_code == 0
+    assert "mcp-docs" in checks.output
 
 
 def test_inspect_shows_sections_by_format():

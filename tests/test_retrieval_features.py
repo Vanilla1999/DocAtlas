@@ -9,7 +9,7 @@ from docmancer.core.config import (
     QueryRouter,
     VectorStoreConfig,
 )
-from docmancer.core.models import Document
+from docmancer.core.models import Document, RetrievedChunk
 from docmancer.core.sqlite_store import SQLiteStore
 from docmancer.retrieval.dispatch import HybridRetrievalError, RetrievalDispatcher
 from docmancer.stores.base import VectorHit
@@ -33,6 +33,14 @@ class FakeVectorStore:
         key = _filter_key(filters)
         self.calls.append({"mode": mode, "filters": filters, "limit": limit})
         return list(self._hits_by_filter.get((mode, key), []))[:limit]
+
+
+class DenseOnlyVectorStore(FakeVectorStore):
+    def collection_metadata(self, collection):
+        return {"provider": "fake", "model": "fake", "dim": 4, "sparse_model": None}
+
+    def count(self, collection):
+        return 1
 
 
 class FailingVectorStore(FakeVectorStore):
@@ -198,6 +206,25 @@ def test_empty_vector_collection_is_hard_error(tmp_path):
         dispatcher.run("alpha", mode="hybrid", limit=1)
 
 
+def test_hybrid_skips_sparse_when_collection_is_dense_only(tmp_path):
+    config, store = _agent(tmp_path)
+    _populate(store, [("Doc", "doc", "# Doc\n\nalpha.")])
+    section_id = int(store.list_sections_for_embedding()[0]["section_id"])
+    vstore = DenseOnlyVectorStore(hits_by_filter={("dense", None): [_hit(section_id)]})
+
+    result = RetrievalDispatcher(
+        store=store,
+        config=config,
+        vector_store=vstore,
+        provider=FakeProvider(),
+        collection="c",
+    ).run("alpha", mode="hybrid", limit=1)
+
+    assert "sparse" not in result.candidate_counts
+    assert "sparse" not in result.failures
+    assert [call["mode"] for call in vstore.calls] == ["dense"]
+
+
 # ---------------- hierarchical retrieval ----------------
 
 
@@ -337,3 +364,169 @@ def test_hybrid_neighbor_expansion_pulls_adjacent_sections(tmp_path):
     # Hybrid mode now returns the hit plus its two neighbors.
     chunk_indices = {c.chunk_index for c in result.chunks}
     assert chunk_indices.issuperset({sections[0]["chunk_index"], sections[2]["chunk_index"]})
+
+
+def test_lexical_compact_results_limit_sections_per_source_by_default(tmp_path):
+    config, store = _agent(tmp_path)
+    docs = []
+    for i in range(5):
+        docs.append((f"Alpha {i}", "doc-a", f"# Alpha {i}\n\nalpha repeated evidence {i}."))
+    docs.append(("Beta", "doc-b", "# Beta\n\nalpha useful beta evidence."))
+    _populate(store, docs)
+
+    result = RetrievalDispatcher(store=store, config=config).run("alpha evidence", mode="lexical", limit=5)
+
+    assert len([chunk for chunk in result.chunks if chunk.source == "doc-a"]) <= 2
+    assert any(chunk.source == "doc-b" for chunk in result.chunks)
+
+
+def test_expand_bypasses_sections_per_source_cap(tmp_path):
+    config, store = _agent(tmp_path)
+    _populate(store, [("Big Doc", "big-doc", "# Big Doc\n\n## A\nalpha.\n\n## B\nalpha.\n\n## C\nalpha.\n")])
+
+    result = RetrievalDispatcher(store=store, config=config).run("alpha", mode="lexical", limit=3, expand="adjacent")
+
+    assert len([chunk for chunk in result.chunks if chunk.source == "big-doc"]) >= 3
+
+
+def test_intent_rerank_prefers_matching_api_docs_page(tmp_path):
+    config, store = _agent(tmp_path)
+    dispatcher = RetrievalDispatcher(store=store, config=config)
+    migration = RetrievedChunk(
+        source="https://example.com/docs/migration/from_state_notifier",
+        chunk_index=0,
+        text="Lifecycle differences mention ref.watch and ref.listen in migration examples.",
+        score=1.0,
+        metadata={"canonical_url": "https://example.com/docs/migration/from_state_notifier", "title": "Lifecycle differences"},
+    )
+    refs = RetrievedChunk(
+        source="https://example.com/docs/concepts2/refs",
+        chunk_index=1,
+        text="Refs explain when to listen to providers.",
+        score=0.9,
+        metadata={
+            "canonical_url": "https://example.com/docs/concepts2/refs",
+            "title": "Ref.watch",
+            "document_title": "Refs",
+            "anchor": "Refs > Ref.watch > Ref.listen",
+        },
+    )
+
+    reranked = dispatcher._rerank_intent_matches(
+        "ref.watch vs ref.listen lifecycle differences",
+        [migration, refs],
+    )
+
+    assert reranked[0].source == "https://example.com/docs/concepts2/refs"
+
+
+def test_api_term_matches_are_appended_from_lexical_search(tmp_path):
+    config, store = _agent(tmp_path)
+    _populate(
+        store,
+        [
+            ("Migration", "https://example.com/docs/migration", "# Migration\n\nLifecycle differences."),
+            ("Refs", "https://example.com/docs/concepts2/refs", "# Refs\n\n## Ref.watch\nUse ref.watch.\n\n## Ref.listen\nUse ref.listen."),
+        ],
+    )
+    dispatcher = RetrievalDispatcher(store=store, config=config)
+    initial = [
+        RetrievedChunk(
+            source="https://example.com/docs/migration",
+            chunk_index=0,
+            text="Lifecycle differences.",
+            score=1.0,
+            metadata={"section_id": 999, "canonical_url": "https://example.com/docs/migration"},
+        )
+    ]
+
+    chunks = dispatcher._append_api_term_matches("ref.watch vs ref.listen", initial, budget=3000)
+
+    assert any(chunk.source == "https://example.com/docs/concepts2/refs" for chunk in chunks)
+
+
+def test_intent_rerank_prefers_tutorial_for_basic_example_query(tmp_path):
+    config, store = _agent(tmp_path)
+    dispatcher = RetrievalDispatcher(store=store, config=config)
+    advanced = RetrievedChunk(
+        source="https://fastapi.tiangolo.com/tutorial/dependencies/dependencies-with-yield",
+        chunk_index=0,
+        text="Advanced dependencies with yield and HTTPException examples.",
+        score=1.0,
+        metadata={"title": "Dependencies with yield - FastAPI"},
+    )
+    tutorial = RetrievedChunk(
+        source="https://fastapi.tiangolo.com/tutorial/dependencies",
+        chunk_index=1,
+        text="Use Depends with common_parameters in a path operation.",
+        score=0.9,
+        metadata={"title": "Dependencies - FastAPI"},
+    )
+
+    reranked = dispatcher._rerank_intent_matches(
+        "FastAPI basic Depends example in a path operation",
+        [advanced, tutorial],
+    )
+
+    assert reranked[0].source == "https://fastapi.tiangolo.com/tutorial/dependencies"
+
+
+def test_intent_rerank_prefers_testing_tutorial_over_reference(tmp_path):
+    config, store = _agent(tmp_path)
+    dispatcher = RetrievalDispatcher(store=store, config=config)
+    reference = RetrievedChunk(
+        source="https://fastapi.tiangolo.com/reference/testclient",
+        chunk_index=0,
+        text="Reference details for TestClient methods.",
+        score=1.0,
+        metadata={"title": "Test Client - TestClient - FastAPI"},
+    )
+    tutorial = RetrievedChunk(
+        source="https://fastapi.tiangolo.com/tutorial/testing",
+        chunk_index=1,
+        text="from fastapi.testclient import TestClient\nclient = TestClient(app)\nassert response.status_code == 200",
+        score=0.9,
+        metadata={"title": "Testing - FastAPI"},
+    )
+
+    reranked = dispatcher._rerank_intent_matches(
+        "FastAPI test app with fastapi.testclient.TestClient client and pytest assertions",
+        [reference, tutorial],
+    )
+
+    assert reranked[0].source == "https://fastapi.tiangolo.com/tutorial/testing"
+
+
+def test_snippet_aware_rerank_prefers_matching_code_example(tmp_path):
+    config, store = _agent(tmp_path)
+    dispatcher = RetrievalDispatcher(store=store, config=config)
+    prose = RetrievedChunk(
+        source="https://example.com/reference/testclient",
+        chunk_index=0,
+        text="Reference prose about TestClient behavior and response objects.",
+        score=1.0,
+        metadata={"title": "TestClient reference"},
+    )
+    snippet = RetrievedChunk(
+        source="https://example.com/tutorial/testing",
+        chunk_index=1,
+        text="Testing example.",
+        score=0.9,
+        metadata={
+            "title": "Testing tutorial",
+            "has_code_snippet": True,
+            "code_snippets": [
+                {
+                    "language": "python",
+                    "code": "from fastapi.testclient import TestClient\nclient = TestClient(app)\nassert response.status_code == 200",
+                }
+            ],
+        },
+    )
+
+    reranked = dispatcher._rerank_intent_matches(
+        "FastAPI TestClient pytest code example with assert",
+        [prose, snippet],
+    )
+
+    assert reranked[0].source == "https://example.com/tutorial/testing"

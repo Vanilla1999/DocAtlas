@@ -5,6 +5,7 @@ import json
 import logging
 import shlex
 import shutil
+import sqlite3
 import sys
 import warnings
 import zipfile
@@ -134,6 +135,288 @@ def _effective_retrieval_mode(mode: str | None, config) -> str:
     return "lexical"
 
 
+SETUP_PROFILES = ["cli-docs", "agent", "mcp-docs", "api-packs"]
+RETRIEVAL_PROFILES = ["local-hybrid", "lexical-now", "cloud"]
+DOCTOR_SEVERITIES = ["BLOCKER", "DEGRADED", "WARN", "INFO"]
+DOCTOR_CHECK_GROUPS = ["config", "storage", "sqlite", "qdrant", "embeddings", "vectors", "sources", "extraction", "agent", "mcp-docs", "cloud"]
+
+
+def _write_config_yaml(config, config_file: Path) -> None:
+    import yaml as _yaml
+
+    config_file.parent.mkdir(parents=True, exist_ok=True)
+    config_file.write_text(_yaml.safe_dump(config.model_dump(), sort_keys=False), encoding="utf-8")
+
+
+def _apply_setup_retrieval_profile(config, retrieval_profile: str, *, offline: bool = False, vectors: str | None = None):
+    profile = retrieval_profile.lower()
+    vectors = (vectors or "auto").lower()
+    if offline or vectors == "off" or profile == "lexical-now":
+        config.retrieval.default_mode = "lexical"
+    elif profile == "local-hybrid":
+        config.retrieval.default_mode = "hybrid"
+        config.vector_store.provider = "qdrant"
+        config.embeddings.provider = "fastembed"
+    elif profile == "cloud":
+        config.retrieval.default_mode = "hybrid"
+    return config
+
+
+def _agent_install_path(target: str, *, project: bool = False) -> Path:
+    home = Path.home()
+    normalized = target.lower()
+    if normalized == "claude-code":
+        return Path(".claude") / "skills" / "docmancer" / "SKILL.md" if project else home / ".claude" / "skills" / "docmancer" / "SKILL.md"
+    if normalized == "cursor":
+        return home / ".cursor" / "skills" / "docmancer" / "SKILL.md"
+    if normalized == "cline":
+        return Path(".cline") / "skills" / "docmancer" / "SKILL.md" if project else _get_cline_skill_path()
+    if normalized in {"codex", "codex-app", "codex-desktop"}:
+        return _get_codex_skill_path()
+    if normalized == "gemini":
+        return Path(".gemini") / "skills" / "docmancer" / "SKILL.md" if project else _get_gemini_skill_path()
+    if normalized == "github-copilot":
+        return Path(".github") / "copilot-instructions.md" if project else _get_copilot_user_instructions_path()
+    if normalized == "opencode":
+        return home / ".config" / "opencode" / "skills" / "docmancer" / "SKILL.md"
+    if normalized == "claude-desktop":
+        return _get_user_config_dir() / "exports" / "claude-desktop" / "docmancer.zip"
+    return home / ".docmancer" / normalized
+
+
+def _source_rows(config, *, grouped: bool = True) -> list[dict]:
+    db_path = Path(config.index.db_path)
+    if not db_path.exists():
+        return []
+    group_expr = "COALESCE(NULLIF(s.docset_root, ''), s.source)" if grouped else "s.source"
+    try:
+        with sqlite3.connect(db_path) as conn:
+            conn.row_factory = sqlite3.Row
+            rows = conn.execute(
+                f"""
+                SELECT
+                    {group_expr} AS source,
+                    MAX(s.ingested_at) AS ingested_at,
+                    COALESCE(NULLIF(json_extract(s.metadata_json, '$.format'), ''), sec.format, 'unknown') AS type,
+                    COUNT(sec.id) AS sections,
+                    SUM(CASE WHEN LENGTH(TRIM(COALESCE(sec.text, ''))) = 0 THEN 1 ELSE 0 END) AS empty_sections,
+                    SUM(CASE WHEN LENGTH(TRIM(COALESCE(sec.text, ''))) < 80 THEN 1 ELSE 0 END) AS sparse_sections,
+                    SUM(CASE WHEN up.status IS NOT NULL AND up.status != 'ok' THEN 1 ELSE 0 END) AS vector_failures,
+                    SUM(CASE WHEN up.chunk_id IS NOT NULL THEN 1 ELSE 0 END) AS vector_rows
+                FROM sources s
+                LEFT JOIN sections sec ON sec.source_id = s.id
+                LEFT JOIN embedding_upserts up ON up.chunk_id = sec.id
+                GROUP BY {group_expr}
+                ORDER BY MAX(s.ingested_at) DESC, {group_expr}
+                """
+            ).fetchall()
+    except sqlite3.Error:
+        return []
+    return [dict(row) for row in rows]
+
+
+def _parse_dt(value: str | None) -> datetime | None:
+    if not value:
+        return None
+    try:
+        return datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError:
+        return None
+
+
+def _freshness_label(ingested_at: str | None) -> tuple[str, bool]:
+    parsed = _parse_dt(ingested_at)
+    if parsed is None:
+        return "unknown", False
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=timezone.utc)
+    days = max(0, (datetime.now(timezone.utc) - parsed).days)
+    if days == 0:
+        return "today", False
+    return f"stale {days}d", days >= 30
+
+
+def _operational_source_card(row: dict) -> dict:
+    sections = int(row.get("sections") or 0)
+    empty = int(row.get("empty_sections") or 0)
+    sparse = int(row.get("sparse_sections") or 0)
+    failures = int(row.get("vector_failures") or 0)
+    vector_rows = int(row.get("vector_rows") or 0)
+    freshness, stale = _freshness_label(row.get("ingested_at"))
+    vectors = "none"
+    if vector_rows and vector_rows == sections:
+        vectors = "ok"
+    elif vector_rows:
+        vectors = "drift"
+    status = "ready"
+    next_action = f"docmancer query \"question about {row.get('source', 'docs')}\""
+    if failures:
+        status = "failed"
+        next_action = f"docmancer update {row.get('source', '')}".strip()
+    elif stale or vectors == "drift" or empty or sparse:
+        status = "degraded"
+        next_action = f"docmancer update {row.get('source', '')}".strip()
+    elif sections == 0:
+        status = "failed"
+        next_action = f"docmancer remove {row.get('source', '')}".strip()
+    return {
+        "source": row.get("source") or "unknown",
+        "type": row.get("type") or "unknown",
+        "status": status,
+        "freshness": freshness,
+        "content": f"{sections} sections",
+        "vectors": vectors,
+        "failures": failures,
+        "next_action": next_action,
+        "details": {"sections": sections, "empty_sections": empty, "sparse_sections": sparse, "ingested_at": row.get("ingested_at")},
+    }
+
+
+def _agent_installed_targets() -> list[str]:
+    installed: list[str] = []
+    for target in INSTALL_TARGETS:
+        if _agent_install_path(target, project=(target == "github-copilot")).exists() or _agent_install_path(target).exists():
+            installed.append(target)
+    return installed
+
+
+def _doctor_issue(code: str, group: str, severity: str, impact: str, fix_command: str, expected_result: str, *, restart_required: bool = False, auto_fix: bool = False) -> dict:
+    return {
+        "code": code,
+        "group": group,
+        "severity": severity,
+        "impact": impact,
+        "fix_command": fix_command,
+        "expected_result": expected_result,
+        "restart_required": restart_required,
+        "auto_fix": auto_fix,
+    }
+
+
+def _collect_doctor_report(config, config_path: str | None, *, profile: str = "cli-docs") -> dict:
+    if config_path:
+        effective_config = Path(config_path).resolve()
+    elif Path("docmancer.yaml").exists():
+        effective_config = Path("docmancer.yaml").resolve()
+    else:
+        effective_config = _get_user_config_path()
+    issues: list[dict] = []
+    checks: list[dict] = []
+
+    def add_check(group: str, status: str, message: str) -> None:
+        checks.append({"group": group, "status": status, "message": message})
+
+    if effective_config.exists():
+        add_check("config", "ok", f"Config exists at {effective_config}")
+    else:
+        add_check("config", "failed", f"Config missing at {effective_config}")
+        issues.append(_doctor_issue("CONFIG_MISSING", "config", "BLOCKER", "Docmancer has no config to load paths and retrieval defaults.", "docmancer setup --yes", "docmancer.yaml exists and doctor can read it.", auto_fix=True))
+
+    db_path = Path(config.index.db_path)
+    add_check("storage", "ok" if db_path.parent.exists() else "failed", f"Index path: {db_path}")
+    try:
+        import sqlite3 as _sqlite3
+        with _sqlite3.connect(db_path) as conn:
+            conn.execute("CREATE VIRTUAL TABLE IF NOT EXISTS fts5_doctor_check USING fts5(value)")
+            conn.execute("DROP TABLE IF EXISTS fts5_doctor_check")
+        add_check("sqlite", "ok", "SQLite FTS5 is available")
+    except Exception as exc:  # noqa: BLE001
+        add_check("sqlite", "failed", str(exc))
+        issues.append(_doctor_issue("SQLITE_FTS5_MISSING", "sqlite", "BLOCKER", "Lexical search cannot work without SQLite FTS5.", "Use a Python build with SQLite FTS5, then rerun docmancer setup --yes", "doctor shows SQLite FTS5 available."))
+
+    stats = {"sources_count": 0, "sections_count": 0, "extracted_dir": str(getattr(config.index, "extracted_dir", ""))}
+    try:
+        agent = _get_agent_class()(config=config)
+        stats = agent.collection_stats()
+        sources = int(stats.get("sources_count", 0) or 0)
+        sections = int(stats.get("sections_count", 0) or 0)
+        add_check("sources", "ok" if sources else "empty", f"{sources} source(s), {sections} section(s)")
+        if sources == 0:
+            issues.append(_doctor_issue("NO_SOURCES", "sources", "BLOCKER" if profile == "cli-docs" else "DEGRADED", "Queries have no documentation context to return.", "docmancer ingest ./docs", "docmancer list shows at least one ready source."))
+    except Exception as exc:  # noqa: BLE001
+        add_check("storage", "failed", str(exc))
+        issues.append(_doctor_issue("INDEX_OPEN_FAILED", "storage", "BLOCKER", "The local index cannot be opened.", "docmancer setup --yes", "doctor can read collection stats."))
+
+    for label, available, hint in _loader_availability():
+        add_check("extraction", "ok" if available else "missing", f"{label}: {'available' if available else hint}")
+        if not available:
+            issues.append(_doctor_issue(f"LOADER_{label.upper().replace(' ', '_')}_MISSING", "extraction", "WARN", f"{label} documents may not extract correctly.", f"pip install docmancer", f"{label} loader is available."))
+
+    retrieval_mode = _effective_retrieval_mode(None, config)
+    if retrieval_mode != "lexical":
+        if find_spec("fastembed") is None:
+            issues.append(_doctor_issue("FASTEMBED_MISSING", "embeddings", "DEGRADED", "Dense/sparse retrieval cannot embed queries locally.", "pip install docmancer", "doctor shows embeddings provider available."))
+        add_check("embeddings", "ok" if find_spec("fastembed") else "missing", f"provider={config.embeddings.provider} model={config.embeddings.model}")
+        try:
+            from docmancer.runtime.qdrant_manager import QdrantManager
+
+            qdrant_status = QdrantManager().status()
+            add_check("qdrant", "ok" if qdrant_status.get("alive") else "missing", "qdrant running" if qdrant_status.get("alive") else "qdrant not running")
+            if not qdrant_status.get("alive"):
+                issues.append(_doctor_issue("QDRANT_NOT_RUNNING", "qdrant", "DEGRADED", "Hybrid/vector retrieval falls back or fails depending on --allow-degraded.", "docmancer qdrant up", "doctor shows qdrant running.", auto_fix=True))
+        except Exception as exc:  # noqa: BLE001
+            add_check("qdrant", "failed", str(exc))
+
+    installed_agents = _agent_installed_targets()
+    add_check("agent", "ok" if installed_agents else "missing", f"installed: {', '.join(installed_agents) if installed_agents else 'none'}")
+    if profile == "agent" and not installed_agents:
+        issues.append(_doctor_issue("AGENT_NOT_INSTALLED", "agent", "BLOCKER", "The selected agent path cannot see Docmancer instructions.", "docmancer install codex", "doctor shows at least one installed agent integration.", restart_required=True, auto_fix=True))
+
+    severity_rank = {name: i for i, name in enumerate(DOCTOR_SEVERITIES)}
+    worst = min((severity_rank.get(issue["severity"], 99) for issue in issues), default=severity_rank["INFO"])
+    return {
+        "profile": profile,
+        "config_path": str(effective_config),
+        "index": str(db_path),
+        "retrieval_mode": retrieval_mode,
+        "stats": stats,
+        "checks": checks,
+        "issues": issues,
+        "status": DOCTOR_SEVERITIES[worst] if issues else "OK",
+    }
+
+
+def _emit_doctor_report(report: dict) -> None:
+    _emit_brand_header("docmancer doctor", "What prevents docs context in the selected path?")
+    click.echo(_style("  Selected path", fg="white", bold=True))
+    _emit_status_line(f"profile: {report['profile']}")
+    _emit_status_line(f"retrieval: {report['retrieval_mode']}")
+    _emit_status_line(f"Config: {display_path(report['config_path'])}")
+    _emit_status_line(f"Index: SQLite FTS5 at {display_path(report['index'])}")
+    stats = report.get("stats") or {}
+    _emit_status_line(f"Sources indexed: {stats.get('sources_count', 0)}")
+    _emit_status_line(f"Sections indexed: {stats.get('sections_count', 0)}")
+    _emit_status_line(f"Inspectable extracts: {display_path(stats.get('extracted_dir', ''))}")
+
+    grouped: dict[str, list[dict]] = {}
+    for check in report["checks"]:
+        grouped.setdefault(check["group"], []).append(check)
+    for group in DOCTOR_CHECK_GROUPS:
+        checks = grouped.get(group)
+        if not checks:
+            continue
+        click.echo()
+        display_group = "Local loaders" if group == "extraction" else group
+        click.echo(_style(f"  {display_group}", fg="white", bold=True))
+        for check in checks:
+            state = "ok" if check["status"] == "ok" else "warn" if check["status"] in {"empty", "missing"} else "error"
+            _emit_status_line(check["message"], state=state, indent=4)
+
+    if report["issues"]:
+        click.echo()
+        click.echo(_style("  Issues", fg="white", bold=True))
+        for issue in report["issues"]:
+            click.echo(f"    [{issue['severity']}] {issue['code']} ({issue['group']})")
+            click.echo(f"      Impact: {issue['impact']}")
+            click.echo(f"      Fix command: {issue['fix_command']}")
+            click.echo(f"      Expected result: {issue['expected_result']}")
+            click.echo(f"      Restart required: {'yes' if issue['restart_required'] else 'no'}")
+            click.echo(f"      Auto-fix: {'yes' if issue['auto_fix'] else 'no'}")
+    else:
+        click.echo()
+        _emit_status_line("No blockers for selected path.")
+
+
 def _run_dispatch_query(
     *,
     agent,
@@ -145,7 +428,7 @@ def _run_dispatch_query(
     expand: str | None,
     allow_degraded: bool = False,
 ):
-    """Build a RetrievalDispatcher, run it, return (chunks, contributions, failures).
+    """Build a RetrievalDispatcher and return chunks plus trace metadata.
 
     Falls back to lexical-only if the embeddings provider or vector store
     cannot be *constructed*. Runtime retrieval failures (dimension mismatch,
@@ -158,7 +441,8 @@ def _run_dispatch_query(
         from docmancer.runtime.qdrant_manager import ensure_running
         from docmancer.stores.base import get_vector_store
     except ImportError:
-        return agent.query(query, limit=limit, budget=budget, expand=expand), {}, {}
+        chunks = agent.query(query, limit=limit, budget=budget, expand=expand)
+        return chunks, {}, {}, "lexical", {"lexical": len(chunks)}
 
     vs_config = config.vector_store
     if vs_config.provider == "qdrant" and not vs_config.url:
@@ -174,7 +458,8 @@ def _run_dispatch_query(
     except Exception as exc:
         failures = {"vector": f"{type(exc).__name__}: {exc}"}
         if allow_degraded:
-            return agent.query(query, limit=limit, budget=budget, expand=expand), {}, failures
+            chunks = agent.query(query, limit=limit, budget=budget, expand=expand)
+            return chunks, {}, failures, "lexical", {"lexical": len(chunks)}
         raise HybridRetrievalError(failures) from exc
 
     collection = agent._vector_collection_name()
@@ -193,7 +478,7 @@ def _run_dispatch_query(
         expand=expand,
         allow_degraded=allow_degraded,
     )
-    return result.chunks, result.contributions, result.failures
+    return result.chunks, result.contributions, result.failures, result.mode_used, result.candidate_counts
 
 
 def _format_size(num_bytes: int) -> str:
@@ -638,6 +923,7 @@ def update_cmd(
         try:
             if src.startswith(("http://", "https://")):
                 click.echo(f"Updating {src}...")
+                agent.remove_source(src)
                 total = agent.add(src, recreate=False, max_pages=max_pages, browser=browser)
             else:
                 if not Path(src).exists():
@@ -890,17 +1176,57 @@ def ingest_uspto_cmd(
     short_help="Show collection stats.",
     epilog=format_examples(
         "docmancer inspect",
+        "docmancer inspect pytest --vectors",
+        "docmancer inspect pytest --json",
         "docmancer inspect --config ./docmancer.yaml",
     ),
 )
+@click.argument("source", required=False)
+@click.option("--failed", "show_failed", is_flag=True, default=False, help="Show failure-focused details for the source.")
+@click.option("--vectors", "show_vectors", is_flag=True, default=False, help="Show retrieval/vector state for the source.")
+@click.option("--extraction", "show_extraction", is_flag=True, default=False, help="Show extraction/content state for the source.")
+@click.option("--json", "json_output", is_flag=True, default=False, help="Emit source card as JSON.")
 @click.option("--config", "config_path", default=None, help="Path to docmancer.yaml.")
-def inspect_cmd(config_path: str | None):
-    """Show collection stats and configuration."""
+def inspect_cmd(source: str | None, show_failed: bool, show_vectors: bool, show_extraction: bool, json_output: bool, config_path: str | None):
+    """Show collection stats or a source operational card."""
     config_path = _effective_config(config_path)
     config = _load_config(config_path)
     agent = _create_agent_or_raise_lock_error(config)
 
+    if source:
+        cards = [_operational_source_card(row) for row in _source_rows(config, grouped=False)]
+        matches = [card for card in cards if source in card["source"]]
+        if not matches:
+            raise click.ClickException(f"No indexed source matches {source!r}.")
+        card = matches[0]
+        if json_output:
+            click.echo(json.dumps(card, ensure_ascii=False, indent=2))
+            return
+        click.echo(f"Source: {card['source']}")
+        click.echo(f"Type: {card['type']}")
+        click.echo(f"Status: {card['status']}")
+        click.echo(f"Freshness: {card['freshness']}")
+        click.echo(f"Content: {card['content']}")
+        click.echo(f"Vectors: {card['vectors']}")
+        click.echo(f"Failures: {card['failures']}")
+        details = card["details"]
+        if show_extraction or not (show_failed or show_vectors):
+            click.echo("Extraction:")
+            click.echo(f"  empty sections: {details['empty_sections']}")
+            click.echo(f"  sparse sections: {details['sparse_sections']}")
+        if show_vectors or not (show_failed or show_extraction):
+            click.echo("Retrieval/vector state:")
+            click.echo(f"  vectors: {card['vectors']}")
+        if show_failed:
+            click.echo("Failures:")
+            click.echo(f"  vector failures: {card['failures']}")
+        click.echo(f"Fix command: {card['next_action']}")
+        return
+
     stats = agent.collection_stats()
+    if json_output:
+        click.echo(json.dumps(stats, ensure_ascii=False, indent=2))
+        return
     click.echo(f"Index: {display_path(config.index.db_path)}")
     click.echo(f"Exists: {stats.get('collection_exists', False)}")
     click.echo(f"Sources: {stats.get('sources_count', 0)}")
@@ -921,185 +1247,38 @@ def inspect_cmd(config_path: str | None):
 @click.command(
     cls=DocmancerCommand,
     context_settings=HELP_CONTEXT_SETTINGS,
-    short_help="Check config, connectivity, and installed skills.",
+    short_help="Diagnose docs-context readiness.",
     epilog=format_examples(
         "docmancer doctor",
+        "docmancer doctor --profile agent",
+        "docmancer doctor --json",
+        "docmancer doctor --list-checks",
+        "docmancer doctor --check sources",
         "docmancer doctor --config ./docmancer.yaml",
     ),
 )
 @click.option("--config", "config_path", default=None, help="Path to docmancer.yaml.")
-def doctor_cmd(config_path: str | None):
-    """Check environment, connectivity, and installed skill status."""
+@click.option("--profile", type=click.Choice(SETUP_PROFILES, case_sensitive=False), default="cli-docs", show_default=True, help="Goal/path to diagnose.")
+@click.option("--json", "json_output", is_flag=True, default=False, help="Emit structured doctor report as JSON.")
+@click.option("--list-checks", is_flag=True, default=False, help="List available doctor check groups and exit.")
+@click.option("--check", "checks", multiple=True, type=click.Choice(DOCTOR_CHECK_GROUPS, case_sensitive=False), help="Only show one check group. Can be repeated.")
+def doctor_cmd(config_path: str | None, profile: str, json_output: bool, list_checks: bool, checks: tuple[str, ...]):
+    """Diagnose what blocks documentation context for a selected path."""
+    if list_checks:
+        for group in DOCTOR_CHECK_GROUPS:
+            click.echo(group)
+        return
     config_path = _effective_config(config_path)
     config = _load_config(config_path)
-    home = Path.home()
-    _emit_brand_header("docmancer doctor", "Check binary, config, archive, and installed skills.")
-
-    # Binary resolution
-    resolved_bin = shutil.which("docmancer")
-    # Detect the actual executable running this process (handles python -m docmancer).
-    current_exe = str(Path(sys.executable).resolve())
-    is_module_invocation = not resolved_bin or str(Path(resolved_bin).resolve()) != current_exe
-
-    if resolved_bin:
-        _emit_status_line(f"docmancer binary: {display_path(resolved_bin)}")
-    else:
-        _emit_status_line("docmancer not found on PATH (install with: pipx install docmancer --python python3.13)", state="warn")
-
-    if is_module_invocation:
-        _emit_status_line(f"running via: {current_exe} -m docmancer")
-
-    # Effective config
-    if config_path:
-        effective_config = Path(config_path)
-    elif Path("docmancer.yaml").exists():
-        effective_config = Path("docmancer.yaml")
-    else:
-        effective_config = _get_user_config_path()
-    _emit_status_line(f"Config: {display_path(effective_config)}")
-
-    _emit_status_line(f"Index: {_describe_index(config)}")
-    try:
-        agent = _get_agent_class()(config=config)
-        stats = agent.collection_stats()
-        _emit_status_line(f"Sources indexed: {stats.get('sources_count', 0)}")
-        _emit_status_line(f"Sections indexed: {stats.get('sections_count', 0)}")
-        _emit_status_line(f"Inspectable extracts: {display_path(stats.get('extracted_dir', ''))}")
-    except RuntimeError as exc:
-        _emit_status_line(str(exc), state="error")
-    else:
-        if not Path(config.index.db_path).exists():
-            _emit_status_line("No docs indexed yet (run: docmancer ingest <path> or docmancer add <url>)", state="warn")
-
-    click.echo()
-    click.echo(_style("  Local loaders", fg="white", bold=True))
-    for label, available, hint in _loader_availability():
-        if available:
-            _emit_status_line(f"{label}: available", indent=4)
-        else:
-            _emit_status_line(f"{label}: missing ({hint})", state="warn", indent=4)
-
-    click.echo()
-    click.echo(_style("  Vector retrieval", fg="white", bold=True))
-    qdrant_status = None
-    try:
-        from docmancer.runtime.qdrant_manager import QdrantManager  # noqa: F401
-        qdrant_status = QdrantManager().status()
-        if qdrant_status["alive"] and qdrant_status["owned"]:
-            _emit_status_line(
-                f"qdrant: running (pid {qdrant_status['pid']}, port {qdrant_status['port']}, version {qdrant_status['version']})",
-                indent=4,
-            )
-        elif qdrant_status["alive"]:
-            _emit_status_line("qdrant: running but not docmancer-owned", state="warn", indent=4)
-        else:
-            _emit_status_line(
-                "qdrant: not running (start with: docmancer qdrant up)",
-                state="warn",
-                indent=4,
-            )
-    except ImportError:
-        _emit_status_line("qdrant: skipping (reinstall docmancer; qdrant-client ships in core)", state="warn", indent=4)
-
-    try:
-        import fastembed  # type: ignore  # noqa: F401
-
-        _emit_status_line(
-            f"embeddings: provider={config.embeddings.provider} model={config.embeddings.model}",
-            indent=4,
-        )
-    except ImportError:
-        _emit_status_line("embeddings: fastembed missing (reinstall docmancer; fastembed ships in core)", state="warn", indent=4)
-    if config.embeddings.provider == "fastembed":
-        if os.environ.get("HF_TOKEN"):
-            _emit_status_line("HF_TOKEN: set", indent=4)
-        else:
-            _emit_status_line(
-                "HF_TOKEN: not set (first-run Hugging Face model downloads may be throttled)",
-                state="warn",
-                indent=4,
-            )
-
-    # Highlight vector/lexical drift if both stores have populated this DB.
-    try:
-        sections_total = agent.store.collection_stats().get("sections_count", 0)
-        from docmancer.core import index_meta
-        from docmancer.stores.base import get_vector_store
-
-        vs_config = config.vector_store
-        if vs_config.provider == "qdrant" and qdrant_status and qdrant_status.get("healthy"):
-            url = qdrant_status.get("url")
-            if url:
-                vs_config = vs_config.model_copy(update={"url": url})
-                store = get_vector_store(vs_config, embeddings_dim=config.embeddings.dimensions)
-                collection = agent._vector_collection_name()
-                try:
-                    points = store.count(collection)
-                    _emit_status_line(f"collection: {collection} ({points} vector point(s))", indent=4)
-                    if sections_total and points == 0:
-                        _emit_status_line(
-                            "collection has no indexed vectors; re-run ingest or rebuild with --recreate",
-                            state="error",
-                            indent=4,
-                        )
-                    if sections_total and abs(points - sections_total) > 0:
-                        _emit_status_line(
-                            f"drift: sections={sections_total} vs vector_points={points}",
-                            state="warn",
-                            indent=4,
-                        )
-                    meta = (
-                        getattr(store, "collection_metadata", lambda _collection: None)(collection)
-                        or index_meta.get(collection)
-                    )
-                    if meta:
-                        meta_provider = getattr(meta, "provider", None) or meta.get("provider")
-                        meta_model = getattr(meta, "model", None) or meta.get("model")
-                        meta_dim = getattr(meta, "dim", None) or meta.get("dim")
-                        _emit_status_line(
-                            f"collection embedder: provider={meta_provider} model={meta_model} dim={meta_dim}",
-                            indent=4,
-                        )
-                        if (
-                            str(meta_provider) != str(config.embeddings.provider)
-                            or str(meta_model) != str(config.embeddings.model)
-                            or int(meta_dim or 0) != int(config.embeddings.dimensions or 0)
-                        ):
-                            _emit_status_line(
-                                "embedder mismatch: configured embeddings do not match the collection; rebuild with docmancer ingest <path> --recreate",
-                                state="error",
-                                indent=4,
-                            )
-                    else:
-                        _emit_status_line(
-                            "collection embedder metadata missing; rebuild with docmancer ingest <path> --recreate",
-                            state="warn",
-                            indent=4,
-                        )
-                except Exception:
-                    pass
-    except Exception:
-        pass
-
-    # Skill install status
-    click.echo()
-    click.echo(_style("  Installed skills", fg="white", bold=True))
-    skill_locations = [
-        ("claude-code", "claude-code", home / ".claude" / "skills" / "docmancer" / "SKILL.md"),
-        ("cursor", "cursor", home / ".cursor" / "skills" / "docmancer" / "SKILL.md"),
-        ("cline", "cline", _get_cline_skill_path()),
-        ("codex", "codex", _get_codex_skill_path()),
-        ("codex-shared", "codex", _get_shared_agent_skill_path()),
-        ("gemini", "gemini", _get_gemini_skill_path()),
-        ("github-copilot", "github-copilot", _get_copilot_user_instructions_path()),
-        ("opencode", "opencode", home / ".config" / "opencode" / "skills" / "docmancer" / "SKILL.md"),
-        ("claude-desktop", "claude-desktop", _get_user_config_dir() / "exports" / "claude-desktop" / "docmancer.zip"),
-    ]
-    for label, install_target, path in skill_locations:
-        if path.exists():
-            _emit_status_line(f"{label}: {display_path(path)}", indent=4)
-        else:
-            _emit_status_line(f"{label}: not installed (run: docmancer install {install_target})", state="warn", indent=4)
+    report = _collect_doctor_report(config, config_path, profile=profile.lower())
+    if checks:
+        selected = {check.lower() for check in checks}
+        report["checks"] = [check for check in report["checks"] if check["group"] in selected]
+        report["issues"] = [issue for issue in report["issues"] if issue["group"] in selected]
+    if json_output:
+        click.echo(json.dumps(report, ensure_ascii=False, indent=2))
+        return
+    _emit_doctor_report(report)
 
 
 
@@ -1134,6 +1313,12 @@ def doctor_cmd(config_path: str | None):
 )
 @click.option("--explain", is_flag=True, help="Show per-source rank contributions for each result.")
 @click.option(
+    "--explain-json",
+    type=click.Path(dir_okay=False, writable=True, path_type=str),
+    default=None,
+    help="Write a structured retrieval/packing explain trace JSON artifact.",
+)
+@click.option(
     "--allow-degraded",
     is_flag=True,
     default=False,
@@ -1150,6 +1335,7 @@ def query_cmd(
     output_format: str,
     mode: str | None,
     explain: bool,
+    explain_json: str | None,
     allow_degraded: bool,
 ):
     """Return a compact docs context pack from the local SQLite index."""
@@ -1169,11 +1355,19 @@ def query_cmd(
     effective_mode = _effective_retrieval_mode(mode, config)
     contributions: dict = {}
     failures: dict[str, str] = {}
+    candidate_counts: dict[str, int] = {}
+    mode_used = effective_mode
+    from docmancer.eval.trace import build_explain_trace, elapsed_ms, started_timer, validate_explain_trace
+
+    trace_start = started_timer()
     if effective_mode == "lexical":
         chunks = agent.query(text, limit=limit, budget=budget, expand=expand)
+        contributions = {c.metadata.get("section_id"): {"lexical": idx + 1} for idx, c in enumerate(chunks) if (c.metadata or {}).get("section_id") is not None}
+        candidate_counts = {"lexical": len(chunks)}
+        mode_used = "lexical"
     else:
         try:
-            chunks, contributions, failures = _run_dispatch_query(
+            chunks, contributions, failures, mode_used, candidate_counts = _run_dispatch_query(
                 agent=agent,
                 config=config,
                 query=text,
@@ -1190,6 +1384,23 @@ def query_cmd(
     if not chunks:
         click.echo("No results found.")
         sys.exit(1)
+
+    trace_latency_ms = elapsed_ms(trace_start)
+    if explain_json:
+        trace = build_explain_trace(
+            query=text,
+            selected_mode=mode_used,
+            chunks=chunks,
+            limit=limit,
+            budget=budget or config.query.default_budget,
+            expand=expand,
+            contributions=contributions,
+            candidate_counts=candidate_counts,
+            failures=failures,
+            latency_ms=trace_latency_ms,
+        )
+        validate_explain_trace(trace)
+        Path(explain_json).write_text(_json.dumps(trace, ensure_ascii=False, indent=2), encoding="utf-8")
 
     meta = chunks[0].metadata or {}
     savings = meta.get("savings_percent", 0)
@@ -1209,6 +1420,7 @@ def query_cmd(
                     "runway_multiplier": runway,
                     "degraded": bool(failures),
                     "failures": failures,
+                    "mode_used": mode_used,
                     "results": [chunk.model_dump() for chunk in chunks],
                 },
                 ensure_ascii=False,
@@ -1246,6 +1458,197 @@ def query_cmd(
                 click.echo(f"    explain: degraded retrieval ({failure_parts})")
         click.echo(body)
         click.echo("---")
+
+
+def _format_context_explain(result) -> str:
+    contract = result.trust_contract or {}
+
+    def label(source: dict) -> str:
+        return str(source.get("path") or source.get("library") or source.get("source") or source.get("url") or source.get("canonical_id") or "unknown")
+
+    def reason(source: dict) -> str:
+        return str(source.get("why_selected") or source.get("reason") or source.get("reason_code") or source.get("message") or "not specified")
+
+    lines = [f"Trusted context for: {result.question}", "", "Used:"]
+    selected = contract.get("selected_sources") or []
+    if selected:
+        for source in selected:
+            lines.append(f"  [{source.get('source_class', 'source')}] {label(source)}")
+            lines.append(f"    why: {reason(source)}")
+            if source.get("freshness"):
+                lines.append(f"    freshness: {source['freshness']}")
+            if source.get("docs_exactness"):
+                lines.append(f"    docs_exactness: {source['docs_exactness']}")
+            if source.get("version_source"):
+                lines.append(f"    version_source: {source['version_source']}")
+    else:
+        lines.append("  none")
+    lines.extend(["", "Rejected / risky:"])
+    rejected_or_risky = [*(contract.get("rejected_sources") or []), *(contract.get("risky_sources") or [])]
+    if rejected_or_risky:
+        for source in rejected_or_risky:
+            lines.append(f"  [{source.get('source_class', 'source')}] {label(source)}")
+            lines.append(f"    reason: {reason(source)}")
+    else:
+        lines.append("  none")
+    lines.extend(["", "Warnings:"])
+    warnings = contract.get("warnings") or []
+    if warnings:
+        for warning in warnings:
+            lines.append(f"  - {warning.get('message') if isinstance(warning, dict) else warning}")
+    else:
+        lines.append("  none")
+    lines.extend(["", "Next actions:"])
+    next_actions = contract.get("next_actions") or result.next_actions or []
+    if next_actions:
+        for action in next_actions:
+            if isinstance(action, dict):
+                tool = action.get("tool") or "action"
+                why = action.get("reason") or action.get("message") or "not specified"
+                lines.append(f"  - {tool}: {why}")
+            else:
+                lines.append(f"  - {action}")
+    else:
+        lines.append("  none")
+    return "\n".join(lines)
+
+
+@click.command(
+    cls=DocmancerCommand,
+    context_settings=HELP_CONTEXT_SETTINGS,
+    short_help="Return repo-grounded context with a Trust Contract.",
+    epilog=format_examples(
+        'docmancer context . "How should I test go_router changes?"',
+        'docmancer context . "How should I test go_router changes?" --library go_router --format json',
+        'docmancer context . "Architecture rules" --explain',
+    ),
+)
+@click.argument("project_path", type=click.Path(exists=True, file_okay=False, path_type=str))
+@click.argument("question")
+@click.option("--config", "config_path", default=None, help="Path to docmancer.yaml.")
+@click.option("--tokens", default=None, type=int, help="Maximum estimated output tokens.")
+@click.option("--limit", default=None, type=int, help="Maximum sections to return.")
+@click.option("--expand", default=None, type=click.Choice(["adjacent", "page"], case_sensitive=False), help="Expand adjacent sections or full page context.")
+@click.option("--library", default=None, help="Dependency library to include in the context pack.")
+@click.option("--libraries", multiple=True, help="Additional dependency libraries. The MVP uses the first value when --library is omitted.")
+@click.option("--ecosystem", default=None, help="Dependency ecosystem, for example pub or rust.")
+@click.option("--version", default=None, help="Dependency docs version.")
+@click.option("--mode", default="auto", type=click.Choice(["auto", "project-only", "deps-only", "public-docs"], case_sensitive=False), show_default=True)
+@click.option("output_format", "--format", type=click.Choice(["text", "json"], case_sensitive=False), default="text", show_default=True)
+@click.option("--explain", is_flag=True, help="Print selected, rejected, and risky source decisions.")
+def context_cmd(
+    project_path: str,
+    question: str,
+    config_path: str | None,
+    tokens: int | None,
+    limit: int | None,
+    expand: str | None,
+    library: str | None,
+    libraries: tuple[str, ...],
+    ecosystem: str | None,
+    version: str | None,
+    mode: str,
+    output_format: str,
+    explain: bool,
+):
+    """Return project docs plus optional dependency docs in one context pack."""
+    from dataclasses import asdict
+    from docmancer.docs.service import LibraryDocsService
+
+    config = _load_config(_effective_config(config_path))
+    result = LibraryDocsService(config=config).get_project_context(
+        project_path,
+        question,
+        tokens=tokens,
+        limit=limit,
+        expand=expand,
+        library=library,
+        libraries=list(libraries) or None,
+        ecosystem=ecosystem,
+        version=version,
+        mode=mode,
+    )
+    payload = asdict(result)
+    if output_format == "json":
+        click.echo(json.dumps(payload, ensure_ascii=False, indent=2))
+        return
+    click.echo(f"Project context: {result.status}")
+    click.echo(f"Trust Contract: {len(result.trust_contract.get('selected_sources', []))} selected, {len(result.trust_contract.get('rejected_sources', []))} rejected, {len(result.trust_contract.get('risky_sources', []))} risky")
+    if result.project_docs and result.project_docs.results:
+        click.echo("--- project docs ---")
+        for item in result.project_docs.results:
+            click.echo(f"[{item.path or item.source}] {item.title or ''}".rstrip())
+            click.echo(item.content)
+    if result.dependency_docs and result.dependency_docs.results:
+        click.echo("--- dependency docs ---")
+        for item in result.dependency_docs.results:
+            click.echo(f"[{item.source}] {item.title or ''}".rstrip())
+            click.echo(item.content)
+    if explain:
+        click.echo("--- explain ---")
+        click.echo(_format_context_explain(result))
+    if result.next_actions:
+        click.echo("--- next actions ---")
+        click.echo(json.dumps(result.next_actions, ensure_ascii=False, indent=2))
+
+
+@click.command(
+    cls=DocmancerCommand,
+    context_settings=HELP_CONTEXT_SETTINGS,
+    short_help="Run retrieval quality evals.",
+    epilog=format_examples(
+        "docmancer eval golden.yaml",
+        "docmancer eval golden.json --format json",
+        "docmancer eval golden.yaml --source-health",
+    ),
+)
+@click.argument("dataset", type=click.Path(exists=True, dir_okay=False, path_type=str))
+@click.option("--config", "config_path", default=None, help="Path to docmancer.yaml.")
+@click.option("--mode", type=click.Choice(["lexical", "dense", "sparse", "hybrid"], case_sensitive=False), default="lexical", show_default=True)
+@click.option("--limit", default=10, type=int, show_default=True, help="Maximum sections per eval query.")
+@click.option("--budget", default=10_000, type=int, show_default=True, help="Maximum estimated output tokens per eval query.")
+@click.option("output_format", "--format", type=click.Choice(["text", "json"], case_sensitive=False), default="text", show_default=True)
+@click.option("--source-health", is_flag=True, default=False, help="Include a basic source/index health report.")
+@click.option("--allow-degraded/--strict", default=True, show_default=True, help="Allow degraded non-lexical retrieval during evals.")
+def eval_cmd(
+    dataset: str,
+    config_path: str | None,
+    mode: str,
+    limit: int,
+    budget: int,
+    output_format: str,
+    source_health: bool,
+    allow_degraded: bool,
+):
+    """Evaluate retrieval quality against a golden dataset."""
+    from docmancer.eval.health import source_health_report
+    from docmancer.eval.runner import format_eval_report, run_retrieval_eval
+
+    config_path = _effective_config(config_path)
+    config = _load_config(config_path)
+    agent = _get_agent_class()(config=config)
+    report = run_retrieval_eval(
+        dataset_path=dataset,
+        agent=agent,
+        config=config,
+        mode=mode,
+        limit=limit,
+        budget=budget,
+        allow_degraded=allow_degraded,
+    )
+    if source_health:
+        report["source_health"] = source_health_report(agent)
+    if output_format == "json":
+        click.echo(json.dumps(report, ensure_ascii=False, indent=2))
+        return
+    click.echo(format_eval_report(report))
+    if source_health:
+        health = report["source_health"]
+        click.echo("---")
+        click.echo(
+            f"Source health: sources={health['sources_count']} sections={health['sections_count']} "
+            f"empty={health['empty_sections']} sparse={health['sparse_sections']} duplicates={health['duplicate_content_hashes']}"
+        )
 
 
 @click.command(
@@ -1437,22 +1840,46 @@ def clear_cmd(assume_yes: bool, dry_run: bool, keep_config: bool, keep_models: b
     epilog=format_examples(
         "docmancer list",
         "docmancer list --all",
+        "docmancer list --stale",
+        "docmancer list --vectors=drift",
+        "docmancer list --format json",
         "docmancer list --config ./docmancer.yaml",
     ),
 )
 @click.option("--all", "show_all", is_flag=True, default=False, help="Show every stored page/file source.")
+@click.option("--stale", is_flag=True, default=False, help="Only show stale sources (30+ days old).")
+@click.option("--failed", is_flag=True, default=False, help="Only show sources with failures.")
+@click.option("--vectors", type=click.Choice(["ok", "none", "drift"], case_sensitive=False), default=None, help="Filter by vector state.")
+@click.option("output_format", "--format", type=click.Choice(["table", "json"], case_sensitive=False), default="table", show_default=True)
 @click.option("--config", "config_path", default=None, help="Path to docmancer.yaml.")
-def list_cmd(show_all: bool, config_path: str | None):
-    """List all indexed sources with their indexing dates."""
+def list_cmd(show_all: bool, stale: bool, failed: bool, vectors: str | None, output_format: str, config_path: str | None):
+    """List indexed sources with operational state and next actions."""
     config_path = _effective_config(config_path)
     config = _load_config(config_path)
     agent = _create_agent_or_raise_lock_error(config)
-    entries = agent.list_sources_with_dates() if show_all else agent.list_grouped_sources_with_dates()
-    if not entries:
+    agent.collection_stats()
+    cards = [_operational_source_card(row) for row in _source_rows(config, grouped=not show_all)]
+    if stale:
+        cards = [card for card in cards if str(card["freshness"]).startswith("stale")]
+    if failed:
+        cards = [card for card in cards if card["status"] == "failed" or int(card["failures"] or 0) > 0]
+    if vectors:
+        cards = [card for card in cards if card["vectors"] == vectors.lower()]
+    if output_format == "json":
+        click.echo(json.dumps(cards, ensure_ascii=False, indent=2))
+        return
+    if not cards:
         click.echo("No sources indexed yet.")
         return
-    for entry in entries:
-        click.echo(f"{entry['ingested_at']}  {entry['source']}")
+    click.echo(f"{'SOURCE':<28} {'TYPE':<9} {'STATUS':<9} {'FRESHNESS':<12} {'CONTENT':<14} {'VECTORS':<8} {'FAILURES':<8} NEXT ACTION")
+    for card in cards:
+        source = str(card["source"])
+        if len(source) > 27:
+            source = source[:24] + "..."
+        click.echo(
+            f"{source:<28} {str(card['type'])[:8]:<9} {card['status']:<9} {card['freshness']:<12} "
+            f"{card['content']:<14} {card['vectors']:<8} {str(card['failures']):<8} {card['next_action']}"
+        )
 
 
 @click.command(
@@ -1717,12 +2144,54 @@ def _ensure_config_and_db(config_path: str | None) -> Path:
     return config_file
 
 
+def _ensure_project_config() -> Path:
+    config_file = Path("docmancer.yaml").resolve()
+    if not config_file.exists():
+        config = _build_user_bootstrap_config()
+        config.index.db_path = str((Path.cwd() / ".docmancer" / "docmancer.db").resolve())
+        config.index.extracted_dir = str((Path.cwd() / ".docmancer" / "extracted").resolve())
+        _write_config_yaml(config, config_file)
+    config = _get_config_class().from_yaml(config_file)
+    agent = _get_agent_class()(config=config)
+    agent.collection_stats()
+    return config_file
+
+
+def _emit_setup_readiness_summary(config, *, selected_agents: list[str], profile: str) -> None:
+    try:
+        agent = _get_agent_class()(config=config)
+        stats = agent.collection_stats()
+    except Exception:  # noqa: BLE001
+        stats = {"sources_count": 0, "sections_count": 0}
+    sources = int(stats.get("sources_count", 0) or 0)
+    mode = _effective_retrieval_mode(None, config)
+    installed_agents = selected_agents or _agent_installed_targets()
+    click.echo()
+    click.echo(_style("Ready now", fg="white", bold=True))
+    click.echo(f"  CLI query ............. {'yes' if sources else 'after ingest'}")
+    click.echo(f"  Local hybrid .......... {'ready' if mode == 'hybrid' else 'off'}")
+    click.echo(f"  Coding agent .......... {'installed' if installed_agents else 'not installed'}")
+    click.echo(f"  MCP docs server ....... {'run docmancer mcp docs-serve' if profile == 'mcp-docs' else 'not configured'}")
+    click.echo()
+    click.echo(_style("Next best command", fg="white", bold=True))
+    if sources:
+        click.echo('  docmancer query "How do I authenticate?"')
+    elif profile == "mcp-docs":
+        click.echo("  docmancer mcp docs-serve")
+    else:
+        click.echo("  docmancer ingest ./docs")
+
+
 @click.command(
     cls=DocmancerCommand,
     context_settings=HELP_CONTEXT_SETTINGS,
     short_help="Set up docmancer for local agent docs retrieval.",
     epilog=format_examples(
         "docmancer setup",
+        "docmancer setup --yes",
+        "docmancer setup --profile agent --agent claude-code --yes",
+        "docmancer setup --offline --vectors off --yes",
+        "docmancer setup --project-local --yes",
         "docmancer setup --all",
         "docmancer setup --agent codex --agent claude-desktop",
         "docmancer setup --agent github-copilot",
@@ -1730,37 +2199,62 @@ def _ensure_config_and_db(config_path: str | None) -> Path:
 )
 @click.option("--all", "install_all", is_flag=True, default=False, help="Install every supported agent integration non-interactively.")
 @click.option("--agent", "agents", multiple=True, type=click.Choice(INSTALL_TARGETS, case_sensitive=False), help="Agent integration to install. Can be repeated.")
+@click.option("--profile", type=click.Choice(SETUP_PROFILES, case_sensitive=False), default="cli-docs", show_default=True, help="Goal/path to set up.")
+@click.option("--retrieval-profile", type=click.Choice(RETRIEVAL_PROFILES, case_sensitive=False), default="lexical-now", show_default=True, help="Retrieval readiness profile.")
+@click.option("--yes", "assume_yes", is_flag=True, default=False, help="Non-interactive defaults; never prompt.")
+@click.option("--offline", is_flag=True, default=False, help="Avoid network/model setup and prefer lexical retrieval.")
+@click.option("--vectors", type=click.Choice(["auto", "on", "off"], case_sensitive=False), default="auto", show_default=True, help="Vector setup policy.")
+@click.option("--project-local", is_flag=True, default=False, help="Create/use ./docmancer.yaml and project-local state.")
 @click.option("--config", "config_path", default=None, help="Path to docmancer.yaml.")
-def setup_cmd(install_all: bool, agents: tuple[str, ...], config_path: str | None):
-    """Create the local index and install selected agent integrations.
+def setup_cmd(
+    install_all: bool,
+    agents: tuple[str, ...],
+    profile: str,
+    retrieval_profile: str,
+    assume_yes: bool,
+    offline: bool,
+    vectors: str,
+    project_local: bool,
+    config_path: str | None,
+):
+    """Create the local index and optionally connect agents/MCP.
 
-    This bootstraps `docmancer.yaml`, initializes the local SQLite index, and
-    installs one or more agent skill/instruction files. Use `--agent` to pick
-    explicit targets such as `codex`, `claude-code`, or `github-copilot`.
+    Goal-first profiles focus on outcomes: CLI querying, coding-agent context,
+    MCP docs serving, or future API packs. `lexical-now` gives first success
+    without model downloads; `local-hybrid` prepares higher-quality retrieval.
     """
     config_path = _effective_config(config_path)
-    config_file = _ensure_config_and_db(config_path)
-    _emit_brand_header("docmancer setup", "Create the SQLite index and connect coding agents.")
+    config_file = _ensure_project_config() if project_local and config_path is None else _ensure_config_and_db(config_path)
+    _emit_brand_header("docmancer setup", "Choose an outcome, then get first docs context fast.")
     _emit_status_line(f"Config: {display_path(config_file)}")
     config = _get_config_class().from_yaml(config_file)
+    config = _apply_setup_retrieval_profile(config, retrieval_profile, offline=offline, vectors=vectors)
+    _write_config_yaml(config, config_file)
     _emit_status_line(f"SQLite index: {display_path(config.index.db_path)}")
+    _emit_status_line(f"Profile: {profile.lower()}")
+    _emit_status_line(f"Retrieval profile: {retrieval_profile.lower()} (mode={config.retrieval.default_mode})")
 
     selected = [agent.lower() for agent in agents]
     if install_all:
         selected = list(INSTALL_TARGETS)
+    elif profile.lower() == "agent" and not selected:
+        detected = _detect_setup_targets()
+        selected = detected or ([] if assume_yes else ["codex"])
     elif not selected:
         detected = _detect_setup_targets()
         if detected:
             selected = detected
-        elif click.confirm("No agent installs detected. Install Codex skill?", default=True):
+        elif not assume_yes and click.confirm("No agent installs detected. Install Codex skill?", default=True):
             selected = ["codex"]
 
     if not selected:
-        _emit_next_step("Run `docmancer add <url-or-path>` to index documentation locally.")
+        _emit_setup_readiness_summary(config, selected_agents=[], profile=profile.lower())
         return
 
     for target in dict.fromkeys(selected):
         ctx = click.get_current_context()
         ctx.invoke(install_cmd, agent=target, project=(target == "github-copilot"), config_path=str(config_file))
+
+    _emit_setup_readiness_summary(config, selected_agents=list(dict.fromkeys(selected)), profile=profile.lower())
 
     _emit_next_step("Run `docmancer add <url-or-path>`, then `docmancer query \"your question\"`.")

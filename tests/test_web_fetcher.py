@@ -47,6 +47,26 @@ to get up and running quickly with all the essential features.</p>
 </main>
 </body></html>"""
 
+DARTDOC_ROOT_HTML = """<!DOCTYPE html>
+<html><body>
+<nav><a href="/flutter/widgets/SizedBox-class.html">SizedBox</a></nav>
+<main><h1>Flutter API</h1><p>Loading...</p></main>
+</body></html>"""
+
+DARTDOC_SIZED_BOX_HTML = """<!DOCTYPE html>
+<html><body>
+<nav><a>Navigation</a></nav>
+<main id="dartdoc-main-content">
+<h1>SizedBox class</h1>
+<p>A box with a specified size.</p>
+<h2>Constructors</h2>
+<dl><dt><code>SizedBox({double? width, double? height})</code></dt><dd>Creates a fixed size box.</dd></dl>
+<h2>Properties</h2><dl><dt><code>width</code></dt><dd>The requested width.</dd></dl>
+</main>
+</body></html>"""
+
+DARTDOC_EMPTY_HTML = """<!DOCTYPE html><html><body><nav><a href="/a">A</a></nav><main></main></body></html>"""
+
 LLMS_FULL_CONTENT = "# Full Documentation\n\n" + ("This is comprehensive documentation content. " * 100)
 
 
@@ -136,6 +156,61 @@ class TestWebFetcherNavCrawl:
             assert "word_count" in doc.metadata
             assert "fetched_at" in doc.metadata
 
+    def test_page_source_uses_in_scope_canonical_url(self):
+        page_html = PAGE_HTML.replace(
+            'href="https://example.com/docs/intro"',
+            'href="https://example.com/docs/intro/"',
+        )
+
+        def mock_get(url, **kwargs):
+            if "llms-full.txt" in url or ("llms.txt" in url and "full" not in url):
+                return _mock_response("", status=404, content_type="text/plain")
+            if "robots.txt" in url:
+                return _mock_response("User-agent: *\nAllow: /", content_type="text/plain")
+            if "sitemap" in url:
+                return _mock_response("", status=404)
+            if "/docs/intro" in url:
+                return _mock_response(page_html)
+            return _mock_response(HOMEPAGE_HTML.replace('/docs/guide', '/blog/post'))
+
+        mock_client = _make_mock_client(mock_get)
+
+        with patch("docmancer.connectors.fetchers.web.httpx.Client", return_value=mock_client):
+            fetcher = WebFetcher(max_pages=10, delay=0.0)
+            docs = fetcher.fetch("https://example.com/docs")
+
+        assert len(docs) == 1
+        assert docs[0].source == "https://example.com/docs/intro"
+        assert docs[0].metadata["canonical_url"] == "https://example.com/docs/intro"
+
+    def test_duplicate_canonical_pages_are_deduplicated(self):
+        page_a = PAGE_HTML.replace(
+            'href="https://example.com/docs/intro"',
+            'href="https://example.com/docs/canonical"',
+        )
+        page_b = page_a.replace("Introduction", "Introduction Copy")
+
+        def mock_get(url, **kwargs):
+            if "llms-full.txt" in url or ("llms.txt" in url and "full" not in url):
+                return _mock_response("", status=404, content_type="text/plain")
+            if "robots.txt" in url:
+                return _mock_response("User-agent: *\nAllow: /", content_type="text/plain")
+            if "sitemap" in url:
+                return _mock_response("", status=404)
+            if "/docs/intro" in url:
+                return _mock_response(page_a)
+            if "/docs/guide" in url:
+                return _mock_response(page_b)
+            return _mock_response(HOMEPAGE_HTML)
+
+        mock_client = _make_mock_client(mock_get)
+
+        with patch("docmancer.connectors.fetchers.web.httpx.Client", return_value=mock_client):
+            fetcher = WebFetcher(max_pages=10, delay=0.0)
+            docs = fetcher.fetch("https://example.com/docs")
+
+        assert [doc.source for doc in docs].count("https://example.com/docs/canonical") == 1
+
 
 class TestWebFetcherErrors:
     def test_no_pages_raises_error(self):
@@ -219,3 +294,63 @@ class TestDiscovery:
 
         assert [item.strategy for item in discovered] == [DiscoveryStrategy.NAV_CRAWL, DiscoveryStrategy.NAV_CRAWL]
         assert [item.url for item in discovered] == ["https://example.com/docs/a", "https://example.com/docs/b"]
+
+
+class TestWebFetcherDartdoc:
+    def test_direct_dartdoc_class_page_without_browser(self):
+        def mock_get(url, **kwargs):
+            assert url == "https://api.flutter.dev/flutter/widgets/SizedBox-class.html"
+            return _mock_response(DARTDOC_SIZED_BOX_HTML)
+
+        mock_client = _make_mock_client(mock_get)
+
+        with patch("docmancer.connectors.fetchers.web.httpx.Client", return_value=mock_client):
+            fetcher = WebFetcher(max_pages=10, browser=False, doc_format="dartdoc")
+            docs = fetcher.fetch("https://api.flutter.dev/flutter/widgets/SizedBox-class.html")
+
+        assert len(docs) == 1
+        assert "SizedBox class" in docs[0].content
+        assert "Constructors" in docs[0].content
+        assert "width" in docs[0].content
+        assert fetcher._browser is False
+
+    def test_dartdoc_root_empty_does_not_fail_when_seed_page_succeeds(self):
+        def mock_get(url, **kwargs):
+            if url.endswith("llms-full.txt") or url.endswith("llms.txt") or "sitemap" in url:
+                return _mock_response("", status=404, content_type="text/plain")
+            if url.endswith("robots.txt"):
+                return _mock_response("User-agent: *\nAllow: /", content_type="text/plain")
+            if url == "https://api.flutter.dev":
+                return _mock_response(DARTDOC_ROOT_HTML)
+            if url == "https://api.flutter.dev/flutter/widgets/SizedBox-class.html":
+                return _mock_response(DARTDOC_SIZED_BOX_HTML)
+            return _mock_response("", status=404)
+
+        mock_client = _make_mock_client(mock_get)
+
+        with patch("docmancer.connectors.fetchers.web.httpx.Client", return_value=mock_client):
+            fetcher = WebFetcher(max_pages=10, browser=False, doc_format="dartdoc", delay=0.0)
+            docs = fetcher.fetch("https://api.flutter.dev")
+
+        assert len(docs) == 1
+        assert docs[0].source == "https://api.flutter.dev/flutter/widgets/SizedBox-class.html"
+        assert "SizedBox class" in docs[0].content
+
+    def test_dartdoc_all_empty_reports_structured_failure(self):
+        def mock_get(url, **kwargs):
+            if url.endswith("llms-full.txt") or url.endswith("llms.txt") or "sitemap" in url:
+                return _mock_response("", status=404, content_type="text/plain")
+            if url.endswith("robots.txt"):
+                return _mock_response("User-agent: *\nAllow: /", content_type="text/plain")
+            if url == "https://pub.dev/documentation/empty/latest":
+                return _mock_response('<nav><a href="/documentation/empty/latest/empty/Empty-class.html">Empty</a></nav>')
+            if url.endswith("Empty-class.html"):
+                return _mock_response(DARTDOC_EMPTY_HTML)
+            return _mock_response("", status=404)
+
+        mock_client = _make_mock_client(mock_get)
+
+        with patch("docmancer.connectors.fetchers.web.httpx.Client", return_value=mock_client):
+            fetcher = WebFetcher(max_pages=10, browser=False, doc_format="dartdoc", delay=0.0)
+            with pytest.raises(ValueError, match="Dartdoc root/index page had no extractable article content"):
+                fetcher.fetch("https://pub.dev/documentation/empty/latest")

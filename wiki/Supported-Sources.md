@@ -2,8 +2,8 @@
 
 This page covers two surfaces:
 
-- **Docs sources** consumed by `docmancer ingest` or `docmancer add` and indexed into the local SQLite FTS5 store.
-- **Advanced MCP pack sources** compiled by the pipeline into version-pinned API tool surfaces and installed by `docmancer install-pack`.
+- **Docmancer Docs sources** consumed by `docmancer ingest`, `docmancer add`, or docs MCP prefetch tools and indexed into the local docs runtime.
+- **Advanced Docmancer Packs sources** compiled by the pipeline into version-pinned API tool surfaces and installed by `docmancer install-pack`.
 
 For how each surface fits into the overall system, see [Architecture](./Architecture.md).
 
