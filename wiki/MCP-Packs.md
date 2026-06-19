@@ -1,18 +1,18 @@
 # MCP Packs
 
-MCP Packs are Docmancer's advanced product layer. If your goal is source-grounded answers from documentation, start with Docmancer Docs: `docmancer ingest`, `docmancer add`, `docmancer query`, or `docmancer mcp docs-serve`. Use Packs when an agent needs version-pinned API action tools.
+MCP Packs are Docmancer's advanced product layer. If your goal is source-grounded answers from documentation, start with Docmancer Docs: `doc-atlas ingest`, `doc-atlas add`, `doc-atlas query`, or `doc-atlas mcp docs-serve`. Use Packs when an agent needs version-pinned API action tools.
 
-MCP packs are version-pinned tool bundles compiled from public API documentation sources such as OpenAPI, GraphQL introspection, TypeDoc, and Sphinx. Installed packs are exposed to agents through one local stdio server, `docmancer mcp serve`, using two meta-tools:
+MCP packs are version-pinned tool bundles compiled from public API documentation sources such as OpenAPI, GraphQL introspection, TypeDoc, and Sphinx. Installed packs are exposed to agents through one local stdio server, `doc-atlas mcp serve`, using two meta-tools:
 
 - `docmancer_search_tools(query, package?, limit?)` searches across enabled packs and returns the best matching tool with its input schema.
 - `docmancer_call_tool(name, args)` invokes a specific fully qualified tool name returned by search.
 
-Agents launch `docmancer mcp serve` automatically from their MCP config; humans use the management commands below to install, enable/disable, and inspect packs.
+Agents launch `doc-atlas mcp serve` automatically from their MCP config; humans use the management commands below to install, enable/disable, and inspect packs.
 
 ## Install a Pack
 
 ```bash
-docmancer install-pack open-meteo@v1
+doc-atlas install-pack open-meteo@v1
 ```
 
 `install-pack` resolves artifacts in this order:
@@ -35,22 +35,22 @@ Package specs parse from the rightmost `@`, so scoped names like `@scope/pkg@1.2
 ## Manage Packs
 
 ```bash
-docmancer mcp doctor
-docmancer mcp list
-docmancer mcp disable open-meteo --version v1
-docmancer mcp enable open-meteo --version v1
-docmancer uninstall open-meteo@v1
+doc-atlas mcp doctor
+doc-atlas mcp list
+doc-atlas mcp disable open-meteo --version v1
+doc-atlas mcp enable open-meteo --version v1
+doc-atlas uninstall open-meteo@v1
 ```
 
 | Command | Description |
 |---------|-------------|
-| `docmancer mcp serve` | Run the stdio MCP server. Agents launch this. |
-| `docmancer mcp doctor` | Verify pack artifacts, credential resolution, and agent config registrations. |
-| `docmancer mcp list` | Show installed packs, curated or expanded mode, tool counts, and destructive gate state. |
-| `docmancer mcp enable <pkg> [--version <v>]` | Re-enable a disabled pack without reinstalling it. |
-| `docmancer mcp disable <pkg> [--version <v>]` | Hide a pack from the dispatcher without removing it on disk. |
-| `docmancer mcp remove <pkg>[@<version>]` | Remove an installed pack from the MCP manifest and disk cache. |
-| `docmancer uninstall <pkg>[@<version>]` | Alias for removing an installed pack. |
+| `doc-atlas mcp serve` | Run the stdio MCP server. Agents launch this. |
+| `doc-atlas mcp doctor` | Verify pack artifacts, credential resolution, and agent config registrations. |
+| `doc-atlas mcp list` | Show installed packs, curated or expanded mode, tool counts, and destructive gate state. |
+| `doc-atlas mcp enable <pkg> [--version <v>]` | Re-enable a disabled pack without reinstalling it. |
+| `doc-atlas mcp disable <pkg> [--version <v>]` | Hide a pack from the dispatcher without removing it on disk. |
+| `doc-atlas mcp remove <pkg>[@<version>]` | Remove an installed pack from the MCP manifest and disk cache. |
+| `doc-atlas uninstall <pkg>[@<version>]` | Alias for removing an installed pack. |
 
 ## Runtime Behavior
 
@@ -82,9 +82,9 @@ Call logs are written to `~/.docmancer/mcp/calls.jsonl`. Logs record argument ke
 Open-Meteo is a public read-only weather API that needs no API key, so it is the cleanest pack smoke test:
 
 ```bash
-docmancer install-pack open-meteo@v1
-docmancer mcp doctor
-docmancer mcp list
+doc-atlas install-pack open-meteo@v1
+doc-atlas mcp doctor
+doc-atlas mcp list
 ```
 
 After installation, agents can search for the forecast tool with `docmancer_search_tools` and call it with `docmancer_call_tool`.

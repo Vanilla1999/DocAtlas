@@ -230,6 +230,18 @@ def context_pack_snippet(item: DocsChunk) -> dict[str, Any] | None:
 
 def project_why_selected(item: Any) -> str:
     path = normalize_doc_path(getattr(item, "path", None))
+    metadata = getattr(item, "metadata", None) or {}
+    ranking = metadata.get("project_ranking") if isinstance(metadata, dict) else None
+    ranking_reasons = ranking.get("reasons") if isinstance(ranking, dict) else None
+    if ranking_reasons:
+        base_reason = _project_source_kind_reason(path)
+        reasons = [str(reason) for reason in ranking_reasons if reason]
+        return "; ".join([base_reason, *reasons])
+
+    return _project_source_kind_reason(path)
+
+
+def _project_source_kind_reason(path: str) -> str:
     if path.endswith("readme.md"):
         return "selected as high-level project overview / usage documentation"
     if path.endswith("contributing.md"):

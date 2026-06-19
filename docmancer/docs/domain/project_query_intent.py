@@ -1,0 +1,54 @@
+from __future__ import annotations
+
+from dataclasses import dataclass
+
+
+@dataclass(frozen=True)
+class ProjectQueryIntent:
+    name: str
+    broad: bool = False
+    wants_release_history: bool = False
+    wants_docs_mcp: bool = False
+    wants_packs_mcp: bool = False
+    wants_architecture: bool = False
+    wants_how_to: bool = False
+    wants_troubleshooting: bool = False
+
+
+def classify_project_query_intent(question: str) -> ProjectQueryIntent:
+    q = (question or "").lower().replace("-", " ").replace("_", " ")
+
+    def has_any(terms: list[str]) -> bool:
+        return any(term in q for term in terms)
+
+    wants_architecture = has_any(["architecture", "architectural", "project structure", "structured", "structure", "layout", "components", "design", "overview"])
+    wants_how_to = has_any(["how do i", "how to", "how does", "usage", "use", "setup", "configure", "config", "install", "quickstart", "getting started"])
+    wants_ingestion = has_any(["ingest", "ingestion", "index", "indexing", "indexed", "retrieval", "retrieve", "chunk", "chunking", "embedding", "vector", "fts", "qdrant"])
+    wants_release = has_any(["changelog", "release", "released", "changed", "added", "removed", "breaking", "migration", "version history", "what changed", "recently changed"])
+    explicit_release = has_any(["changelog", "release", "version history", "what changed", "recently changed"])
+    wants_troubleshooting = has_any(["error", "bug", "fail", "failed", "why doesn't", "why does not", "not working", "stale", "missing", "diagnose", "doctor", "fix", "troubleshoot"])
+    wants_docs_mcp = has_any(["docs mcp", "documentation mcp", "mcp docs", "docs serve", "docs serve", "get project context", "get project docs", "get library docs", "resolve library id", "context7"])
+    wants_packs_mcp = has_any(["pack", "packs", "action pack", "api action", "install pack", "call api"])
+    mentions_mcp = "mcp" in q
+
+    if explicit_release or (wants_release and not wants_how_to and not wants_architecture):
+        return ProjectQueryIntent(name="release_history", wants_release_history=True)
+    if wants_docs_mcp and not wants_packs_mcp:
+        return ProjectQueryIntent(name="docs_mcp", wants_docs_mcp=True, wants_how_to=wants_how_to)
+    if wants_packs_mcp and not wants_docs_mcp:
+        return ProjectQueryIntent(name="packs_mcp", wants_packs_mcp=True, wants_how_to=wants_how_to)
+    if mentions_mcp and not wants_docs_mcp and not wants_packs_mcp:
+        return ProjectQueryIntent(name="mcp_disambiguation", broad=True, wants_docs_mcp=True, wants_packs_mcp=True, wants_how_to=wants_how_to)
+    if wants_docs_mcp and wants_packs_mcp:
+        return ProjectQueryIntent(name="mcp_disambiguation", broad=True, wants_docs_mcp=True, wants_packs_mcp=True, wants_how_to=wants_how_to)
+    if wants_ingestion and wants_how_to:
+        return ProjectQueryIntent(name="ingestion_how_to", wants_how_to=True)
+    if wants_ingestion:
+        return ProjectQueryIntent(name="ingestion_internals", wants_architecture=True)
+    if wants_architecture:
+        return ProjectQueryIntent(name="architecture", broad=True, wants_architecture=True)
+    if wants_troubleshooting:
+        return ProjectQueryIntent(name="troubleshooting", wants_troubleshooting=True)
+    if wants_how_to:
+        return ProjectQueryIntent(name="how_to", wants_how_to=True)
+    return ProjectQueryIntent(name="general")

@@ -19,9 +19,9 @@ project docs, module docs, dependency docs, exact versions, local/private source
 Текущие поверхности продукта:
 
 1. **Docs-RAG / context packs**
-   - `docmancer ingest`
-   - `docmancer add`
-   - `docmancer query`
+   - `doc-atlas ingest`
+   - `doc-atlas add`
+   - `doc-atlas query`
    - compact context packs
    - local SQLite/Qdrant/FastEmbed
    - agent skill integrations

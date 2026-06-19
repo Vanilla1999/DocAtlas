@@ -37,7 +37,7 @@ The benchmark compared:
 | Source | `/websites/riverpod_dev` hosted corpus | `https://riverpod.dev` indexed locally |
 | Version | latest Riverpod docs | latest Riverpod docs |
 | Corpus size | 402 snippets | 135 pages, 1202 sections |
-| Setup time | 0s | ~2 min for `docmancer add` + indexing |
+| Setup time | 0s | ~2 min for `doc-atlas add` + indexing |
 | Offline after setup | No | Yes |
 
 Important limitation: this was a public-docs parity test, not a full exact-version/project-aware test. The benchmark did not yet prove Docmancer's strongest advantage: resolving and querying the exact dependency documentation from a project lockfile.

@@ -160,6 +160,26 @@ def test_why_selected_mentions_release_history_for_changelog():
     assert "release" in project_why_selected(item).lower()
 
 
+def test_reranked_context_pack_why_selected_includes_intent_and_ranking_reason():
+    facade = FakeProjectContextFacade()
+    facade.project_docs = ProjectDocsResult(
+        project_path="/repo",
+        query="architecture",
+        results=[
+            ProjectDocsChunk(title="Changelog", content="changes", source="/repo/CHANGELOG.md", url=None, path="CHANGELOG.md", heading_path="Added", metadata={"score": 0.99}),
+            ProjectDocsChunk(title="Architecture", content="pipeline", source="/repo/wiki/Architecture.md", url=None, path="wiki/Architecture.md", heading_path="Architecture > Pipeline", metadata={"score": 0.80}),
+        ],
+    )
+
+    result = ProjectContextService(facade).get_project_context("/repo", "What is the architecture of docmancer?", mode="project-only", limit=2)
+    architecture_item = next(item for item in result.context_pack if item["path"] == "wiki/Architecture.md")
+
+    why = architecture_item["why_selected"].lower()
+    assert "architecture" in why
+    assert "boosted" in why
+    assert "source diversity" in why
+
+
 def test_compact_project_context_exposes_answer_outline_and_diagnostics():
     result = _compact_project_context({
         "project_path": "/repo",

@@ -2,8 +2,8 @@
 
 This page covers two surfaces:
 
-- **Docmancer Docs sources** consumed by `docmancer ingest`, `docmancer add`, or docs MCP prefetch tools and indexed into the local docs runtime.
-- **Advanced Docmancer Packs sources** compiled by the pipeline into version-pinned API tool surfaces and installed by `docmancer install-pack`.
+- **Docmancer Docs sources** consumed by `doc-atlas ingest`, `doc-atlas add`, or docs MCP prefetch tools and indexed into the local docs runtime.
+- **Advanced Docmancer Packs sources** compiled by the pipeline into version-pinned API tool surfaces and installed by `doc-atlas install-pack`.
 
 For how each surface fits into the overall system, see [Architecture](./Architecture.md).
 
@@ -11,11 +11,11 @@ For how each surface fits into the overall system, see [Architecture](./Architec
 
 | Source | Strategy | Command |
 |--------|----------|---------|
-| GitBook sites | `--provider gitbook`: `/llms-full.txt` then `/llms.txt` | `docmancer add <url>` |
-| Mintlify sites | `--provider mintlify` or `auto`: `/llms-full.txt` then `/llms.txt` then `/sitemap.xml` | `docmancer add <url>` |
-| Generic web docs | `--provider web`: generic crawler for non-GitBook / non-Mintlify sites | `docmancer add <url>` |
-| GitHub repos | `--provider github`: fetches README and docs markdown | `docmancer add <github-url>` |
-| Local Markdown, text, HTML, PDF, DOCX, or RTF | Read from disk and index | `docmancer ingest ./path/to/files` |
+| GitBook sites | `--provider gitbook`: `/llms-full.txt` then `/llms.txt` | `doc-atlas add <url>` |
+| Mintlify sites | `--provider mintlify` or `auto`: `/llms-full.txt` then `/llms.txt` then `/sitemap.xml` | `doc-atlas add <url>` |
+| Generic web docs | `--provider web`: generic crawler for non-GitBook / non-Mintlify sites | `doc-atlas add <url>` |
+| GitHub repos | `--provider github`: fetches README and docs markdown | `doc-atlas add <github-url>` |
+| Local Markdown, text, HTML, PDF, DOCX, or RTF | Read from disk and index | `doc-atlas ingest ./path/to/files` |
 
 When using `auto` (the default), docmancer detects the provider automatically based on the site's response headers and content.
 
@@ -51,10 +51,10 @@ All loaders ship in the core install.
 
 ## Updating sources
 
-Run `docmancer update` to re-fetch and re-index all existing sources. To update a single source:
+Run `doc-atlas update` to re-fetch and re-index all existing sources. To update a single source:
 
 ```bash
-docmancer update https://docs.example.com
+doc-atlas update https://docs.example.com
 ```
 
 Docmancer detects which content changed and updates only the affected sections. See [Commands](./Commands.md) for the full option reference.
@@ -73,7 +73,7 @@ For configuration options that control query budget and retrieval behavior, see 
 
 ## Advanced MCP Pack Source Types
 
-The pipeline compiles version-pinned MCP packs from these public source standards. The CLI installs the resulting packs with `docmancer install-pack <package>@<version>`.
+The pipeline compiles version-pinned MCP packs from these public source standards. The CLI installs the resulting packs with `doc-atlas install-pack <package>@<version>`.
 
 | Source standard | What the pipeline does | Executor in the pack |
 |-----------------|------------------------|----------------------|

@@ -6,19 +6,19 @@ Reference for the main Docmancer Docs runtime commands, vector lifecycle command
 
 | Command | Description |
 |---------|-------------|
-| `docmancer setup` | Create config and SQLite database, auto-detect installed agents, and install skill files. Use `--all` for non-interactive installation. |
-| `docmancer ingest <path>` | Index local files or directories. Supports Markdown, text, HTML, PDF, DOCX, and RTF out of the box. Embeds and upserts vectors alongside FTS5 by default; add `--no-vectors` for FTS5-only. |
-| `docmancer add <url>` | Fetch URL documentation, normalize into sections, and index with SQLite FTS5. Supports GitBook, Mintlify, generic web, and GitHub. See [Supported Sources](./Supported-Sources.md). |
-| `docmancer update` | Re-fetch and re-index all existing docs sources. Pass a specific source to update only that one. |
-| `docmancer query "<text>"` | Search the index and return a compact context pack within a token budget. Shows token savings and agentic runway. |
-| `docmancer list` | List indexed docsets with ingestion dates. Use `--all` to show individual sources. |
-| `docmancer inspect` | Show SQLite index stats, source counts, and extract locations. |
-| `docmancer remove [source]` | Remove an indexed source or docset root. Use `--all` to clear everything. |
-| `docmancer doctor` | Health check: config, SQLite FTS5 availability, index stats, and installed agent skills. |
-| `docmancer init` | Create a project-local `docmancer.yaml` for a project-specific index. |
-| `docmancer install <agent>` | Install a skill file for a single agent manually. See [Install Targets](./Install-Targets.md). |
-| `docmancer fetch <url>` | Download documentation to local Markdown files (default output dir `docmancer-docs/`). Does not update the SQLite index. |
-| `docmancer qdrant {up,down,status,upgrade,logs}` | Manage the local Qdrant process used for dense + sparse + hybrid retrieval. See [Qdrant lifecycle](#qdrant-lifecycle) below. |
+| `doc-atlas setup` | Create config and SQLite database, auto-detect installed agents, and install skill files. Use `--all` for non-interactive installation. |
+| `doc-atlas ingest <path>` | Index local files or directories. Supports Markdown, text, HTML, PDF, DOCX, and RTF out of the box. Embeds and upserts vectors alongside FTS5 by default; add `--no-vectors` for FTS5-only. |
+| `doc-atlas add <url>` | Fetch URL documentation, normalize into sections, and index with SQLite FTS5. Supports GitBook, Mintlify, generic web, and GitHub. See [Supported Sources](./Supported-Sources.md). |
+| `doc-atlas update` | Re-fetch and re-index all existing docs sources. Pass a specific source to update only that one. |
+| `doc-atlas query "<text>"` | Search the index and return a compact context pack within a token budget. Shows token savings and agentic runway. |
+| `doc-atlas list` | List indexed docsets with ingestion dates. Use `--all` to show individual sources. |
+| `doc-atlas inspect` | Show SQLite index stats, source counts, and extract locations. |
+| `doc-atlas remove [source]` | Remove an indexed source or docset root. Use `--all` to clear everything. |
+| `doc-atlas doctor` | Health check: config, SQLite FTS5 availability, index stats, and installed agent skills. |
+| `doc-atlas init` | Create a project-local `docmancer.yaml` for a project-specific index. |
+| `doc-atlas install <agent>` | Install a skill file for a single agent manually. See [Install Targets](./Install-Targets.md). |
+| `doc-atlas fetch <url>` | Download documentation to local Markdown files (default output dir `docmancer-docs/`). Does not update the SQLite index. |
+| `doc-atlas qdrant {up,down,status,upgrade,logs}` | Manage the local Qdrant process used for dense + sparse + hybrid retrieval. See [Qdrant lifecycle](#qdrant-lifecycle) below. |
 
 ## Query options
 
@@ -63,7 +63,7 @@ Reference for the main Docmancer Docs runtime commands, vector lifecycle command
 
 ## Docs MCP server
 
-`docmancer mcp docs-serve` runs the local, version-aware documentation MCP server. Agents use it to resolve registered library docs, fetch or refresh stale docs, prefetch project dependencies, and query compact context packs without leaving their tool loop.
+`doc-atlas mcp docs-serve` runs the local, version-aware documentation MCP server. Agents use it to resolve registered library docs, fetch or refresh stale docs, prefetch project dependencies, and query compact context packs without leaving their tool loop.
 
 Core docs MCP tools include:
 
@@ -84,17 +84,17 @@ Register unknown docs with an explicit `docs_url` or `docs_url_template`; later 
 
 ## MCP pack commands
 
-`docmancer install-pack` installs version-pinned API MCP packs, and `docmancer mcp` manages the local MCP server and installed packs. This is an advanced surface that is not required for local docs retrieval. See [MCP Packs](./MCP-Packs.md) for the full reference and [Architecture > Packs MCP runtime](./Architecture.md#packs-mcp-runtime) for dispatch internals.
+`doc-atlas install-pack` installs version-pinned API MCP packs, and `doc-atlas mcp` manages the local MCP server and installed packs. This is an advanced surface that is not required for local docs retrieval. See [MCP Packs](./MCP-Packs.md) for the full reference and [Architecture > Packs MCP runtime](./Architecture.md#packs-mcp-runtime) for dispatch internals.
 
 | Command | Description |
 |---------|-------------|
-| `docmancer install-pack <pkg>@<version>` | Install a pack from the registry. Verifies SHA-256 of every artifact and registers it in `~/.docmancer/mcp/manifest.json`. Spec parses from the rightmost `@` so npm-scoped names like `@scope/pkg@1.2.3` work. |
-| `docmancer uninstall <pkg>[@<version>]` | Remove an installed pack (all versions if no version given). |
-| `docmancer mcp serve` | Run the stdio MCP server. Agents launch this; humans usually do not. |
-| `docmancer mcp list` | Show installed packs with mode (curated/expanded), per-pack tool counts, and destructive gate state (`block` or `ALLOW`). |
-| `docmancer mcp doctor` | Verify pack SHA-256s, credential resolution per scheme, and agent-config registrations. Reports actionable warnings. |
-| `docmancer mcp enable <pkg> [--version <v>]` | Re-enable a previously disabled pack without reinstalling. |
-| `docmancer mcp disable <pkg> [--version <v>]` | Hide a pack from the dispatcher's tool surface without removing it on disk. |
+| `doc-atlas install-pack <pkg>@<version>` | Install a pack from the registry. Verifies SHA-256 of every artifact and registers it in `~/.docmancer/mcp/manifest.json`. Spec parses from the rightmost `@` so npm-scoped names like `@scope/pkg@1.2.3` work. |
+| `doc-atlas uninstall <pkg>[@<version>]` | Remove an installed pack (all versions if no version given). |
+| `doc-atlas mcp serve` | Run the stdio MCP server. Agents launch this; humans usually do not. |
+| `doc-atlas mcp list` | Show installed packs with mode (curated/expanded), per-pack tool counts, and destructive gate state (`block` or `ALLOW`). |
+| `doc-atlas mcp doctor` | Verify pack SHA-256s, credential resolution per scheme, and agent-config registrations. Reports actionable warnings. |
+| `doc-atlas mcp enable <pkg> [--version <v>]` | Re-enable a previously disabled pack without reinstalling. |
+| `doc-atlas mcp disable <pkg> [--version <v>]` | Hide a pack from the dispatcher's tool surface without removing it on disk. |
 
 ### install-pack options
 
@@ -111,15 +111,15 @@ When the agent calls `docmancer_call_tool`, the dispatcher resolves the slug `pa
 
 ## Qdrant lifecycle
 
-The `docmancer qdrant` group manages a docmancer-owned local Qdrant process. The default `docmancer ingest` runs the full hybrid path: on first ingest it downloads the pinned Qdrant binary, starts it in the background, and embeds + upserts vectors alongside FTS5. Use `ingest --no-vectors` (or set `DOCMANCER_AUTO_VECTORS=0`) for FTS5-only runs.
+The `doc-atlas qdrant` group manages a docmancer-owned local Qdrant process. The default `doc-atlas ingest` runs the full hybrid path: on first ingest it downloads the pinned Qdrant binary, starts it in the background, and embeds + upserts vectors alongside FTS5. Use `ingest --no-vectors` (or set `DOCMANCER_AUTO_VECTORS=0`) for FTS5-only runs.
 
 | Subcommand | Description |
 |------------|-------------|
-| `docmancer qdrant up` | Download the pinned Qdrant binary (currently `v1.14.1`) to `~/.docmancer/qdrant/qdrant` if absent, start it in the background, write a PID + runtime metadata file, and spawn with telemetry disabled (`QDRANT__TELEMETRY_DISABLED=true`). Pass `--port` to pin a specific port, or `--docker` to print a `docker compose` snippet instead of running the managed binary. |
-| `docmancer qdrant down` | Stop a docmancer-managed process. Refuses to touch a PID file docmancer did not write. |
-| `docmancer qdrant status` | Report pid, port, url, alive, docmancer-ownership, healthy, and version. Add `--json` for raw JSON. |
-| `docmancer qdrant upgrade` | Swap the managed binary in-place against the same on-disk storage. Refuses to run against a live docmancer-owned process without `--force`. Cross-version storage migration is not automated. |
-| `docmancer qdrant logs` | Tail the managed binary's stdout (or stderr with `--stderr`) from `~/.docmancer/qdrant/logs/`. |
+| `doc-atlas qdrant up` | Download the pinned Qdrant binary (currently `v1.14.1`) to `~/.docmancer/qdrant/qdrant` if absent, start it in the background, write a PID + runtime metadata file, and spawn with telemetry disabled (`QDRANT__TELEMETRY_DISABLED=true`). Pass `--port` to pin a specific port, or `--docker` to print a `docker compose` snippet instead of running the managed binary. |
+| `doc-atlas qdrant down` | Stop a docmancer-managed process. Refuses to touch a PID file docmancer did not write. |
+| `doc-atlas qdrant status` | Report pid, port, url, alive, docmancer-ownership, healthy, and version. Add `--json` for raw JSON. |
+| `doc-atlas qdrant upgrade` | Swap the managed binary in-place against the same on-disk storage. Refuses to run against a live docmancer-owned process without `--force`. Cross-version storage migration is not automated. |
+| `doc-atlas qdrant logs` | Tail the managed binary's stdout (or stderr with `--stderr`) from `~/.docmancer/qdrant/logs/`. |
 
 Environment overrides:
 

@@ -14,10 +14,10 @@ Executable: `{{DOCS_KIT_CMD}}`
 ## Workflow
 
 1. If the user is working inside a repository and asks to use Docmancer, asks how this project works, asks about architecture, or compares Docmancer to Context7, start with project docs discovery.
-2. Run `docmancer list` to see indexed docs.
-3. Run `docmancer query "question"` when relevant docs are present.
-4. If local docs are missing and the user approves the path, run `docmancer ingest <path>`.
-5. If URL docs are missing and the user approves the source, run `docmancer add <url>`.
+2. Run `doc-atlas list` to see indexed docs.
+3. Run `doc-atlas query "question"` when relevant docs are present.
+4. If local docs are missing and the user approves the path, run `doc-atlas ingest <path>`.
+5. If URL docs are missing and the user approves the source, run `doc-atlas add <url>`.
 6. Use returned sections as source-grounded context for the answer or code change.
 
 For MCP docs tools, registered sources are registry-owned. If `get_library_docs` returns candidates or `next_actions`, retry through Docmancer with the returned `arguments_patch`/guidance. Never WebFetch registered docs before that Docmancer retry.
@@ -46,37 +46,37 @@ When a repository has many docs, treat a maintained `docs/INDEX.md` as the canon
 
 ## Core Commands
 
-- `docmancer setup`: create config, database, and agent integrations.
-- `docmancer ingest <path>`: index local files or directories.
-- `docmancer add <url>`: fetch and index documentation from a URL or GitHub repository.
-- `docmancer update [source]`: re-fetch and re-index all sources, or one specific source.
-- `docmancer query "question"`: return a compact markdown context pack.
-- `docmancer query "question" --expand`: include adjacent sections.
-- `docmancer query "question" --expand page`: include the full matching page within the budget.
-- `docmancer query "question" --format json`: return machine-readable context.
-- `docmancer query "question" --allow-degraded`: in dense, sparse, or hybrid modes, fall back when vector retrieval fails instead of erroring.
-- `docmancer clear --dry-run`: preview wiping docmancer home and related caches (`--yes` to run for real; see `--keep-config` and `--keep-models`).
-- `docmancer list`, `docmancer inspect`, `docmancer remove`, `docmancer doctor`: manage the local index.
-- `docmancer fetch <url> --output <dir>`: download docs to markdown without indexing.
+- `doc-atlas setup`: create config, database, and agent integrations.
+- `doc-atlas ingest <path>`: index local files or directories.
+- `doc-atlas add <url>`: fetch and index documentation from a URL or GitHub repository.
+- `doc-atlas update [source]`: re-fetch and re-index all sources, or one specific source.
+- `doc-atlas query "question"`: return a compact markdown context pack.
+- `doc-atlas query "question" --expand`: include adjacent sections.
+- `doc-atlas query "question" --expand page`: include the full matching page within the budget.
+- `doc-atlas query "question" --format json`: return machine-readable context.
+- `doc-atlas query "question" --allow-degraded`: in dense, sparse, or hybrid modes, fall back when vector retrieval fails instead of erroring.
+- `doc-atlas clear --dry-run`: preview wiping docmancer home and related caches (`--yes` to run for real; see `--keep-config` and `--keep-models`).
+- `doc-atlas list`, `doc-atlas inspect`, `doc-atlas remove`, `doc-atlas doctor`: manage the local index.
+- `doc-atlas fetch <url> --output <dir>`: download docs to markdown without indexing.
 
 `query` prints estimated raw docs tokens, context-pack tokens, percent saved, and agentic runway. Prefer the compact default first.
 
 ## Advanced: API Tools via MCP
 
-Only use the MCP surface if the user is explicitly working with installed API packs. If the user has run `docmancer install-pack <pkg>@<version>`, Claude Desktop can launch `docmancer mcp serve` and expose two meta-tools:
+Only use the MCP surface if the user is explicitly working with installed API packs. If the user has run `doc-atlas install-pack <pkg>@<version>`, Claude Desktop can launch `doc-atlas mcp serve` and expose two meta-tools:
 
 - `docmancer_search_tools(query, package?, limit?)`
 - `docmancer_call_tool(name, args)`
 
-Claude Desktop is GUI-launched, so shell `export` will not propagate. Add credentials to the `env` block under the `docmancer` server in `claude_desktop_config.json`, or write `~/.docmancer/secrets/<package>.env`. Run `docmancer mcp doctor` to verify.
+Claude Desktop is GUI-launched, so shell `export` will not propagate. Add credentials to the `env` block under the `docmancer` server in `claude_desktop_config.json`, or write `~/.docmancer/secrets/<package>.env`. Run `doc-atlas mcp doctor` to verify.
 
 Destructive calls are blocked unless the user installed the pack with `--allow-destructive`.
 
 ## Common Mistakes
 
-- Do not use `docmancer add` for new local files. Use `docmancer ingest <path>`.
-- Do not use `docmancer ingest` for URLs. Use `docmancer add <url>`.
-- Do not run `docmancer query` before checking indexed sources with `docmancer list`.
+- Do not use `doc-atlas add` for new local files. Use `doc-atlas ingest <path>`.
+- Do not use `doc-atlas ingest` for URLs. Use `doc-atlas add <url>`.
+- Do not run `doc-atlas query` before checking indexed sources with `doc-atlas list`.
 - Do not WebFetch registered docs when Docmancer returns candidates or retry guidance. Retry Docmancer first.
 - Do not skip `inspect_project_docs` when the user asks to use Docmancer inside a repo or expects Context7-like help.
 - Do not use `prefetch_project_docs` for project-owned files; it is for dependency docs from project metadata/lockfiles.

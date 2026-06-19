@@ -1,6 +1,6 @@
 # Configuration
 
-**Resolution order:** `--config` flag, then `./docmancer.yaml` in the current directory, then `~/.docmancer/docmancer.yaml` (auto-created by `docmancer setup`). For details on what each command does, see [Commands](./Commands.md).
+**Resolution order:** `--config` flag, then `./docmancer.yaml` in the current directory, then `~/.docmancer/docmancer.yaml` (auto-created by `doc-atlas setup`). For details on what each command does, see [Commands](./Commands.md).
 
 ## Configuration Reference
 
@@ -41,7 +41,7 @@ These settings control the SQLite FTS5 index described in [Architecture](./Archi
 
 ### Vector store
 
-A fresh install runs hybrid retrieval by default: ingest auto-starts a managed Qdrant and embeds chunks with FastEmbed. The `vector_store:` block tunes how that store is configured. Set `DOCMANCER_AUTO_VECTORS=0` (or run `docmancer ingest --no-vectors`) for FTS5-only behaviour.
+A fresh install runs hybrid retrieval by default: ingest auto-starts a managed Qdrant and embeds chunks with FastEmbed. The `vector_store:` block tunes how that store is configured. Set `DOCMANCER_AUTO_VECTORS=0` (or run `doc-atlas ingest --no-vectors`) for FTS5-only behaviour.
 
 | Key | Default | What it controls |
 |-----|---------|------------------|
@@ -200,12 +200,12 @@ Pick one. **Never commit a real key.**
 export OPENAI_API_KEY="sk-..."
 ```
 
-Reload the shell and `docmancer doctor` will report `embeddings: provider=openai ...` without warning.
+Reload the shell and `doc-atlas doctor` will report `embeddings: provider=openai ...` without warning.
 
 **2. Inline for a single command**: best for one-off CI runs.
 
 ```bash
-OPENAI_API_KEY=sk-... docmancer ingest ./docs
+OPENAI_API_KEY=sk-... doc-atlas ingest ./docs
 ```
 
 ### What happens when a key is missing
@@ -245,4 +245,4 @@ Set `OPENAI_API_KEY` (see [API keys](#api-keys) above).
 ## Notes
 
 - Relative `index.db_path` values are resolved relative to the location of `docmancer.yaml`, not the current shell directory.
-- Project-local configs are created by `docmancer init` and point to `.docmancer/docmancer.db` inside the project.
+- Project-local configs are created by `doc-atlas init` and point to `.docmancer/docmancer.db` inside the project.

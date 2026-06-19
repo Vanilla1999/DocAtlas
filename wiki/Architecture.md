@@ -4,9 +4,9 @@ Docmancer is a local, version-aware docs runtime for coding agents. It has two p
 
 Docmancer runs two cooperating local pipelines.
 
-The primary **Docmancer Docs pipeline** fetches documentation with `docmancer add` (URL), `docmancer ingest` (local files), or the docs MCP server's prefetch tools, normalizes it into sections, indexes those sections in a local SQLite FTS5 database plus a managed local Qdrant for dense and sparse vectors, and retrieves compact context packs through the CLI or MCP docs tools. No hosted query API; the only background process is the docmancer-owned Qdrant.
+The primary **Docmancer Docs pipeline** fetches documentation with `doc-atlas add` (URL), `doc-atlas ingest` (local files), or the docs MCP server's prefetch tools, normalizes it into sections, indexes those sections in a local SQLite FTS5 database plus a managed local Qdrant for dense and sparse vectors, and retrieves compact context packs through the CLI or MCP docs tools. No hosted query API; the only background process is the docmancer-owned Qdrant.
 
-The advanced **Docmancer Packs runtime** installs version-pinned API packs from a registry with `docmancer install-pack <package>@<version>`, then exposes every installed pack to your agent through a single shared stdio MCP server (`docmancer mcp serve`) using the Tool Search pattern: two meta-tools regardless of how many packs you install. The dispatcher enforces auth, destructive-call gating, schema validation, idempotency-key auto-injection and reuse, version pinning on the wire, and SHA-256 verification of every artifact before install.
+The advanced **Docmancer Packs runtime** installs version-pinned API packs from a registry with `doc-atlas install-pack <package>@<version>`, then exposes every installed pack to your agent through a single shared stdio MCP server (`doc-atlas mcp serve`) using the Tool Search pattern: two meta-tools regardless of how many packs you install. The dispatcher enforces auth, destructive-call gating, schema validation, idempotency-key auto-injection and reuse, version pinning on the wire, and SHA-256 verification of every artifact before install.
 
 For the full command reference, see [Commands](./Commands.md). For configuration options, see [Configuration](./Configuration.md).
 
@@ -43,11 +43,11 @@ Components:
     - **Query-aware routing** (`retrieval.routers: [...]`) walks an ordered list of regex matchers; the first match merges its declared filters into the dispatcher filters for that call, for example routing API-reference queries to `source_path_prefix=api`.
 - **Neighbor expansion** plumbs through hybrid mode the same way as lexical: after the top section ids are picked, prev/next siblings are appended so partial bullets arrive with their surrounding context.
 
-`docmancer query --mode {lexical,dense,sparse,hybrid} --explain` exposes the mode and shows per-source rank contributions (e.g. `lexical#1, dense#3, sparse#2`) under each result.
+`doc-atlas query --mode {lexical,dense,sparse,hybrid} --explain` exposes the mode and shows per-source rank contributions (e.g. `lexical#1, dense#3, sparse#2`) under each result.
 
 ## Context packs
 
-The output of `docmancer query` is a compact context pack: the top matching sections, their heading paths, source URLs, version/timestamp metadata, and a token estimate. Each query also reports:
+The output of `doc-atlas query` is a compact context pack: the top matching sections, their heading paths, source URLs, version/timestamp metadata, and a token estimate. Each query also reports:
 
 - **Tokens saved** versus the raw full-page docs context
 - **Agentic runway multiplier** showing how much more context budget is available for actual work
@@ -93,7 +93,14 @@ The resolution happens in `LibraryDocsService.get_docs()` when `project_path` is
 
 ## Docs MCP runtime
 
-`docmancer mcp docs-serve` exposes the docs runtime to coding agents as MCP tools. It uses the same local ingest, index, update, and query path as the CLI, plus the persistent SQLite registry for known documentation sources.
+`doc-atlas mcp docs-serve` exposes the docs runtime to coding agents as MCP tools. It uses the same local ingest, index, update, and query path as the CLI, plus the persistent SQLite registry for known documentation sources.
+
+For repository-specific questions, agents should call `bootstrap_project_docs(project_path, question?)` first, then `get_project_context(project_path, question)`. `get_project_context` returns an `answer_outline` with a recommended reading order, a Trust Contract (`selected_sources` plus the shorter `selected` alias), and each context item has both flat metadata and nested `source` / `section` objects. Agents should cite trusted sources from the Trust Contract, prefer the nested metadata for machine reads, and treat `CHANGELOG.md` as primary evidence only for release-history or "what changed" questions.
+
+If the user asks broadly about "the MCP server", distinguish the two surfaces explicitly:
+
+- **Docs MCP server:** `doc-atlas mcp docs-serve` provides documentation/project/dependency context tools such as `get_library_docs` and `get_project_context`.
+- **MCP Packs runtime:** `doc-atlas mcp serve` exposes installed API action packs through `docmancer_search_tools` and `docmancer_call_tool`.
 
 The server exposes the following tools:
 
@@ -246,9 +253,9 @@ This creates an agent-discoverable onboarding path where the agent guides itself
 
 ## Packs MCP runtime
 
-`docmancer install-pack <package>@<version>` downloads the pack's five artifacts (`contract.json`, `tools.curated.json`, `tools.full.json`, `auth.schema.json`, `provenance.json`) plus a `manifest.json` with SHA-256s, verifies every artifact hash, and writes them under `~/.docmancer/servers/<package>@<version>/`. The package is added to `~/.docmancer/mcp/manifest.json` with per-package state (mode = curated/expanded, allow_destructive, allow_execute, enabled).
+`doc-atlas install-pack <package>@<version>` downloads the pack's five artifacts (`contract.json`, `tools.curated.json`, `tools.full.json`, `auth.schema.json`, `provenance.json`) plus a `manifest.json` with SHA-256s, verifies every artifact hash, and writes them under `~/.docmancer/servers/<package>@<version>/`. The package is added to `~/.docmancer/mcp/manifest.json` with per-package state (mode = curated/expanded, allow_destructive, allow_execute, enabled).
 
-When an agent launches `docmancer mcp serve` (registered automatically by `docmancer setup` or `install <agent>`), the server exposes exactly **two** tools to the agent regardless of how many packs are installed:
+When an agent launches `doc-atlas mcp serve` (registered automatically by `doc-atlas setup` or `install <agent>`), the server exposes exactly **two** tools to the agent regardless of how many packs are installed:
 
 - `docmancer_search_tools(query, package?, limit)`: token-overlap search across the curated (or full) tool surfaces of every enabled pack. Returns name, description, safety, and inlined `inputSchema` for the top match (lazy schema fetch for the rest).
 - `docmancer_call_tool(name, args)`: dispatches the resolved tool through the matching executor.
@@ -277,7 +284,7 @@ Per-library locks (`filelock`-based under `~/.docmancer/locks/`) serialize refre
 Docs (library):
   GitBook / Mintlify / web / GitHub / local files
     -> SQLite FTS5 sections + Qdrant vectors (per-library index)
-    -> docmancer query / get_library_docs
+    -> doc-atlas query / get_library_docs
     -> context pack + token savings + version provenance
 
 Docs (project-aware):
@@ -297,15 +304,15 @@ Manifest:
     -> batch prefetch with job tracking
 
 Agents:
-  docmancer setup
+  doc-atlas setup
     -> skill files for Claude Code, Cursor, Codex, Cline, Gemini, OpenCode,
        GitHub Copilot, and Claude Desktop
 
 MCP packs:
-  docmancer install-pack <pkg>@<version>
+  doc-atlas install-pack <pkg>@<version>
     -> contract.json, tools.curated.json, tools.full.json, auth.schema.json,
        provenance.json, manifest SHA-256s
-    -> docmancer mcp serve
+    -> doc-atlas mcp serve
     -> docmancer_search_tools + docmancer_call_tool
 ```
 

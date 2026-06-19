@@ -1,6 +1,6 @@
 ---
 name: docmancer
-description: Search and query local documentation knowledge bases using docmancer CLI. Use when the user asks about third-party library docs, API references, vendor documentation, version-specific API behavior, GitBook or Mintlify public docs, offline or local doc search, or needs to ground agent responses in up-to-date external documentation.
+description: Search and query local documentation knowledge bases using the DocAtlas CLI. Use when the user asks about third-party library docs, API references, vendor documentation, version-specific API behavior, GitBook or Mintlify public docs, offline or local doc search, or needs to ground agent responses in up-to-date external documentation.
 version: 0.4.6
 author: docmancer
 tags:
@@ -12,7 +12,7 @@ tags:
 install: pipx install docmancer --python python3.13
 ---
 
-# docmancer
+# DocAtlas / docmancer
 
 Docmancer compresses documentation context so coding agents spend tokens on code, not on rereading raw docs. It ingests local files, fetches public docs, indexes everything locally with SQLite FTS5, and returns compact context packs with source attribution. The core retrieval path needs no API keys, vector database, hosted query API, or background daemon.
 
@@ -27,10 +27,10 @@ Docmancer compresses documentation context so coding agents spend tokens on code
 
 ## Workflow
 
-1. **Check indexed docs:** `docmancer list`
-2. **Query existing docs:** `docmancer query "<question>"`
-3. **Index local docs if needed:** `docmancer ingest <path>`
-4. **Fetch URL docs if needed:** `docmancer add <url>`
+1. **Check indexed docs:** `doc-atlas list`
+2. **Query existing docs:** `doc-atlas query "<question>"`
+3. **Index local docs if needed:** `doc-atlas ingest <path>`
+4. **Fetch URL docs if needed:** `doc-atlas add <url>`
 5. **Use the returned context** to ground your response with source-attributed sections.
 
 For MCP docs tools, registered sources are registry-owned. If `get_library_docs` returns candidates or `next_actions`, retry through Docmancer with the returned `arguments_patch`/guidance. Never WebFetch registered docs before that Docmancer retry.
@@ -40,7 +40,7 @@ For MCP docs tools, registered sources are registry-owned. If `get_library_docs`
 ### Ingest Local Documentation
 
 ```bash
-docmancer ingest ./docs
+doc-atlas ingest ./docs
 ```
 
 Use `ingest` for local files and directories.
@@ -57,7 +57,7 @@ Use `ingest` for local files and directories.
 ### Add URL Documentation
 
 ```bash
-docmancer add https://docs.example.com
+doc-atlas add https://docs.example.com
 ```
 
 Use `add` for documentation URLs and GitHub repositories.
@@ -73,7 +73,7 @@ Use `add` for documentation URLs and GitHub repositories.
 ### Query Documentation
 
 ```bash
-docmancer query "<question>"
+doc-atlas query "<question>"
 ```
 
 Returns a compact markdown context pack with source attribution and token savings. This is the primary command agents should call.
@@ -90,29 +90,40 @@ Returns a compact markdown context pack with source attribution and token saving
 
 | Command | Purpose |
 |---------|---------|
-| `docmancer list` | Show indexed documentation sources |
-| `docmancer list --all` | Show every stored page or file |
-| `docmancer inspect` | Show index stats, format counts, and extract locations |
-| `docmancer remove <source>` | Remove a source or docset root |
-| `docmancer remove --all` | Clear the entire index |
-| `docmancer update [source]` | Re-fetch and re-index all sources, or one specific source |
-| `docmancer doctor` | Check config, loader availability, index health, and agent skill installs |
-| `docmancer init` | Create project-local `docmancer.yaml` |
-| `docmancer fetch <url> --output <dir>` | Download docs to markdown files without indexing |
+| `doc-atlas list` | Show indexed documentation sources |
+| `doc-atlas list --all` | Show every stored page or file |
+| `doc-atlas inspect` | Show index stats, format counts, and extract locations |
+| `doc-atlas remove <source>` | Remove a source or docset root |
+| `doc-atlas remove --all` | Clear the entire index |
+| `doc-atlas update [source]` | Re-fetch and re-index all sources, or one specific source |
+| `doc-atlas doctor` | Check config, loader availability, index health, and agent skill installs |
+| `doc-atlas init` | Create project-local `docmancer.yaml` |
+| `doc-atlas fetch <url> --output <dir>` | Download docs to markdown files without indexing |
 
 ## Advanced: API Tools via MCP
 
-Only use the MCP surface if the user is explicitly working with installed API packs. If the user has run `docmancer install-pack <pkg>@<version>`, the agent host can launch `docmancer mcp serve` and expose two meta-tools:
+Only use the MCP surface if the user is explicitly working with installed API packs. If the user has run `doc-atlas install-pack <pkg>@<version>`, the agent host can launch `doc-atlas mcp serve` and expose two meta-tools:
 
 - `docmancer_search_tools(query, package?, limit?)`
 - `docmancer_call_tool(name, args)`
 
-For API tasks, search first, inspect the returned schema and safety block, then call the resolved tool. Destructive calls are blocked unless the pack was installed with `--allow-destructive`. Run `docmancer mcp doctor` when pack credentials need verification.
+For API tasks, search first, inspect the returned schema and safety block, then call the resolved tool. Destructive calls are blocked unless the pack was installed with `--allow-destructive`. Run `doc-atlas mcp doctor` when pack credentials need verification.
+
+## Recommended MCP Docs Workflow for Agents
+
+For repository-specific architecture, conventions, runbooks, roadmap, README/wiki, or module-doc questions, use the Docs MCP tools before generic WebFetch or model memory:
+
+1. Call `bootstrap_project_docs(project_path, question?)` first. It safely inspects and syncs reviewable project-owned docs; it stops before repo writes or dependency-doc network fetches.
+2. Call `get_project_context(project_path, question)` for the answer context pack.
+3. Read `answer_outline.recommended_reading_order` before composing the answer.
+4. Use `trust_contract.selected` / `trust_contract.selected_sources` to cite trusted sources. Treat `CHANGELOG.md` as primary only for release-history/change questions.
+5. Prefer nested `context_pack[].source` and `context_pack[].section` metadata; the flat fields are kept for compatibility.
+6. If the user asks vaguely about "the MCP server", distinguish `doc-atlas mcp docs-serve` (documentation context) from `doc-atlas mcp serve` (installed MCP Packs/API action tools).
 
 ## Common Mistakes
 
-- Do not use `docmancer add` for new local files. Use `docmancer ingest <path>`.
-- Do not use `docmancer ingest` for URLs. Use `docmancer add <url>`.
-- Do not run `docmancer query` before checking indexed sources with `docmancer list`.
-- Do not assume docs are indexed. Always verify with `docmancer list` before querying.
+- Do not use `doc-atlas add` for new local files. Use `doc-atlas ingest <path>`.
+- Do not use `doc-atlas ingest` for URLs. Use `doc-atlas add <url>`.
+- Do not run `doc-atlas query` before checking indexed sources with `doc-atlas list`.
+- Do not assume docs are indexed. Always verify with `doc-atlas list` before querying.
 - Do not WebFetch registered docs when Docmancer returns candidates or retry guidance. Retry Docmancer first.

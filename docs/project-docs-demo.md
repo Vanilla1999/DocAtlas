@@ -7,7 +7,7 @@ This demo shows the local-first workflow for answering repository-specific quest
 Start the MCP docs server:
 
 ```bash
-docmancer mcp docs-serve
+doc-atlas mcp docs-serve
 ```
 
 Inside the Docmancer repository, ask the agent a repo-specific question such as:

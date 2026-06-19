@@ -1,21 +1,21 @@
 # Install Targets
 
-`docmancer setup` auto-detects installed coding agents and installs skill files in one pass. For manual per-agent installation, use `docmancer install <agent>`. See [Commands](./Commands.md) for the full option reference and [Architecture](./Architecture.md) for how agents fit into the system.
+`doc-atlas setup` auto-detects installed coding agents and installs skill files in one pass. For manual per-agent installation, use `doc-atlas install <agent>`. See [Commands](./Commands.md) for the full option reference and [Architecture](./Architecture.md) for how agents fit into the system.
 
 ## Skill locations
 
 | Command | Where the skill lands |
 |---------|-----------------------|
-| `docmancer install claude-code` | `~/.claude/skills/docmancer/SKILL.md` |
-| `docmancer install cline` | `~/.cline/skills/docmancer/SKILL.md` |
-| `docmancer install codex` | `~/.codex/skills/docmancer/SKILL.md` (also mirrors to `~/.agents/skills/docmancer/SKILL.md`) |
-| `docmancer install codex-app` | `~/.codex/skills/docmancer/SKILL.md` (Codex app variant) |
-| `docmancer install codex-desktop` | `~/.codex/skills/docmancer/SKILL.md` (Codex desktop variant) |
-| `docmancer install cursor` | `~/.cursor/skills/docmancer/SKILL.md` + marked block in `~/.cursor/AGENTS.md` when needed |
-| `docmancer install opencode` | `~/.config/opencode/skills/docmancer/SKILL.md` |
-| `docmancer install gemini` | `~/.gemini/skills/docmancer/SKILL.md` |
-| `docmancer install claude-desktop` | `~/.docmancer/exports/claude-desktop/docmancer.zip`: upload via **Customize > Skills** |
-| `docmancer install github-copilot` | `~/.copilot/copilot-instructions.md` (user) or `.github/copilot-instructions.md` (with `--project`) |
+| `doc-atlas install claude-code` | `~/.claude/skills/docmancer/SKILL.md` |
+| `doc-atlas install cline` | `~/.cline/skills/docmancer/SKILL.md` |
+| `doc-atlas install codex` | `~/.codex/skills/docmancer/SKILL.md` (also mirrors to `~/.agents/skills/docmancer/SKILL.md`) |
+| `doc-atlas install codex-app` | `~/.codex/skills/docmancer/SKILL.md` (Codex app variant) |
+| `doc-atlas install codex-desktop` | `~/.codex/skills/docmancer/SKILL.md` (Codex desktop variant) |
+| `doc-atlas install cursor` | `~/.cursor/skills/docmancer/SKILL.md` + marked block in `~/.cursor/AGENTS.md` when needed |
+| `doc-atlas install opencode` | `~/.config/opencode/skills/docmancer/SKILL.md` |
+| `doc-atlas install gemini` | `~/.gemini/skills/docmancer/SKILL.md` |
+| `doc-atlas install claude-desktop` | `~/.docmancer/exports/claude-desktop/docmancer.zip`: upload via **Customize > Skills** |
+| `doc-atlas install github-copilot` | `~/.copilot/copilot-instructions.md` (user) or `.github/copilot-instructions.md` (with `--project`) |
 
 ## Project-local installs
 
@@ -23,7 +23,7 @@ Use `--project` with `claude-code`, `gemini`, `cline`, or `github-copilot` to in
 
 ## Advanced MCP Server Registration
 
-In addition to writing the skill file, `docmancer install <agent>` (and `docmancer setup`) can register the local MCP server into the agent's MCP config so installed API packs are available. This is only needed for the advanced API-pack surface; local docs retrieval uses the CLI commands taught by the skill file. The entry is written idempotently, so reruns do not duplicate it.
+In addition to writing the skill file, `doc-atlas install <agent>` (and `doc-atlas setup`) can register the local MCP server into the agent's MCP config so installed API packs are available. This is only needed for the advanced API-pack surface; local docs retrieval uses the CLI commands taught by the skill file. The entry is written idempotently, so reruns do not duplicate it.
 
 | Agent | MCP config file written |
 |-------|--------------------------|
@@ -51,15 +51,15 @@ Add per-pack credentials (e.g. `<PACKAGE>_API_KEY`) to the `env: {}` block when 
 
 Installed skills cover the core workflow:
 
-- `docmancer ingest` to index local documentation sources
-- `docmancer add` to index URL documentation sources
-- `docmancer update` to refresh existing sources
-- `docmancer query` to get compact context packs with token savings
-- `docmancer list`, `docmancer inspect`, `docmancer remove`, `docmancer doctor` for index management
-- Advanced only: `docmancer install-pack <pkg>@<version>` installs API MCP packs, and the registered `docmancer mcp serve` exposes them through the Tool Search pattern (`docmancer_search_tools`, `docmancer_call_tool`)
-- Advanced only: `docmancer mcp doctor` and `docmancer mcp list` verify pack state and credentials
+- `doc-atlas ingest` to index local documentation sources
+- `doc-atlas add` to index URL documentation sources
+- `doc-atlas update` to refresh existing sources
+- `doc-atlas query` to get compact context packs with token savings
+- `doc-atlas list`, `doc-atlas inspect`, `doc-atlas remove`, `doc-atlas doctor` for index management
+- Advanced only: `doc-atlas install-pack <pkg>@<version>` installs API MCP packs, and the registered `doc-atlas mcp serve` exposes them through the Tool Search pattern (`docmancer_search_tools`, `docmancer_call_tool`)
+- Advanced only: `doc-atlas mcp doctor` and `doc-atlas mcp list` verify pack state and credentials
 
-Agents learn to call `docmancer query` for grounded answers instead of relying on stale training data. If API packs are installed, agents can also call MCP packs through the resolved tool name (for example `open_meteo__v1__forecast`) for live API work without losing track of the pinned version.
+Agents learn to call `doc-atlas query` for grounded answers instead of relying on stale training data. If API packs are installed, agents can also call MCP packs through the resolved tool name (for example `open_meteo__v1__forecast`) for live API work without losing track of the pinned version.
 
 ## Shared index
 

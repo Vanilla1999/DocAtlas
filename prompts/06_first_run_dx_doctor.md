@@ -6,12 +6,12 @@
 
 Docmancer — local-first docs context tool. У него есть:
 
-- `docmancer setup`;
-- `docmancer ingest`;
-- `docmancer add`;
-- `docmancer query`;
-- `docmancer doctor`;
-- `docmancer inspect`;
+- `doc-atlas setup`;
+- `doc-atlas ingest`;
+- `doc-atlas add`;
+- `doc-atlas query`;
+- `doc-atlas doctor`;
+- `doc-atlas inspect`;
 - managed Qdrant lifecycle;
 - FastEmbed model cache;
 - local SQLite;
@@ -42,14 +42,14 @@ Docmancer — local-first docs context tool. У него есть:
    - Project-local config.
 
 3. **Setup UX**
-   - Что должен делать `docmancer setup`.
+   - Что должен делать `doc-atlas setup`.
    - Что спрашивать интерактивно.
    - Что делать non-interactive.
    - Как объяснять downloads.
    - Как объяснять local-first/no API keys.
 
 4. **Doctor redesign**
-   - Что должен проверять `docmancer doctor`.
+   - Что должен проверять `doc-atlas doctor`.
    - Как сделать output action-oriented.
    - Как группировать severity.
    - Как давать exact remediation commands.

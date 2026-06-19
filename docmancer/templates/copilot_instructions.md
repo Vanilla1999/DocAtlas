@@ -10,31 +10,31 @@ Use docmancer when the user asks about library docs, API references, vendor docs
 
 ## Workflow
 
-1. Run `docmancer list` to see indexed docs.
-2. Run `docmancer query "question"` when relevant docs are present.
-3. If local docs are missing and the user approves the path, run `docmancer ingest <path>`.
-4. If URL docs are missing and the user approves the source, run `docmancer add <url>`.
+1. Run `doc-atlas list` to see indexed docs.
+2. Run `doc-atlas query "question"` when relevant docs are present.
+3. If local docs are missing and the user approves the path, run `doc-atlas ingest <path>`.
+4. If URL docs are missing and the user approves the source, run `doc-atlas add <url>`.
 5. Use the returned sections as source-grounded context for the answer or code change.
 
 ## Core Commands
 
 ```bash
-docmancer setup
-docmancer ingest ./docs
-docmancer add https://docs.example.com
-docmancer update
-docmancer query "how to authenticate"
-docmancer query "how to authenticate" --limit 10
-docmancer query "how to authenticate" --expand
-docmancer query "how to authenticate" --expand page
-docmancer query "how to authenticate" --format json
-docmancer query "how to authenticate" --allow-degraded
-docmancer clear --dry-run
-docmancer list
-docmancer inspect
-docmancer remove <source>
-docmancer doctor
-docmancer fetch <url> --output <dir>
+doc-atlas setup
+doc-atlas ingest ./docs
+doc-atlas add https://docs.example.com
+doc-atlas update
+doc-atlas query "how to authenticate"
+doc-atlas query "how to authenticate" --limit 10
+doc-atlas query "how to authenticate" --expand
+doc-atlas query "how to authenticate" --expand page
+doc-atlas query "how to authenticate" --format json
+doc-atlas query "how to authenticate" --allow-degraded
+doc-atlas clear --dry-run
+doc-atlas list
+doc-atlas inspect
+doc-atlas remove <source>
+doc-atlas doctor
+doc-atlas fetch <url> --output <dir>
 ```
 
 `query` prints estimated raw docs tokens, context-pack tokens, percent saved, and agentic runway. Prefer the compact default. Use `--expand` for adjacent sections; use `--expand page` only when the surrounding page is necessary. Use `--allow-degraded` in dense, sparse, or hybrid modes when vector retrieval is down or misconfigured and you still need lexical results.

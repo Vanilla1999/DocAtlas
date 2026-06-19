@@ -7,7 +7,7 @@
 | **Source** | `/websites/riverpod_dev` (hosted) | `https://riverpod.dev` (locally indexed) |
 | **Riverpod version** | latest (riverpod.dev) | latest (riverpod.dev) |
 | **Contents** | 402 snippets | 135 pages, 1202 sections |
-| **Setup time** | 0s | ~2 min (docmancer add + indexing) |
+| **Setup time** | 0s | ~2 min (doc-atlas add + indexing) |
 | **Offline ready** | No | Yes |
 
 ## Retrieval Quality Metrics
@@ -108,7 +108,7 @@ Docmancer reports token savings per query:
 
 ### Where Context7 wins
 
-1. **No setup** — resolve library ID → query, done. Docmancer needs `docmancer add` + indexing.
+1. **No setup** — resolve library ID → query, done. Docmancer needs `doc-atlas add` + indexing.
 2. **Better deduplication** — no translation pages, no repeated sections in results.
 3. **Code example clarity** — Context7 extracts code snippets into clearly separated blocks.
 4. **Consistent hit rate** — 5/5 queries returned relevant content at rank 1.

@@ -34,15 +34,15 @@ This section is a practical map of what Docmancer can do today and which tool or
 
 | Need | Current capability | CLI / MCP entrypoint | Current boundary |
 |---|---|---|---|
-| Query local repo docs | Discover, ingest, stale-check, bootstrap, and query README/docs/wiki/ADR/roadmap files plus module/package docs in monorepos. | `inspect_project_docs`, `ingest_project_docs`, `bootstrap_project_docs`, `get_project_docs`, `get_project_context`; CLI `docmancer ingest`, `docmancer query`. | Project docs must be indexed before they can be trusted; bootstrap stops before repo writes. |
+| Query local repo docs | Discover, ingest, stale-check, bootstrap, and query README/docs/wiki/ADR/roadmap files plus module/package docs in monorepos. | `inspect_project_docs`, `ingest_project_docs`, `bootstrap_project_docs`, `get_project_docs`, `get_project_context`; CLI `doc-atlas ingest`, `doc-atlas query`. | Project docs must be indexed before they can be trusted; bootstrap stops before repo writes. |
 | Query a specific module | Use module-aware project-doc filters for packages, apps, services, crates, libraries, and similar module roots. | `get_project_docs(module_path=..., scope="module")`, `get_project_context(module_path=..., scope="module")`. | Module matching is exact; ambiguous module names return structured clarification instead of a guessed answer. |
-| Query public docs locally | Fetch, normalize, index, and query public docs sites. | CLI `docmancer add`, `docmancer query`; MCP `get_library_docs`, `prefetch_library_docs`. | First query requires indexing unless the source is already registered/indexed. |
+| Query public docs locally | Fetch, normalize, index, and query public docs sites. | CLI `doc-atlas add`, `doc-atlas query`; MCP `get_library_docs`, `prefetch_library_docs`. | First query requires indexing unless the source is already registered/indexed. |
 | Use exact dependency versions | Read supported project metadata and prefetch/query docs for resolved versions. | `inspect_project_docs`, `prefetch_project_dependency_docs`, `prefetch_project_docs`, `get_library_docs(project_path=...)`. | Strongest current support is Dart/Flutter and Rust metadata; dependency-docs prefetch may use the network and is separate from project-owned docs ingest. |
-| Avoid repeated WebFetch | Register sources once, then query local indexes. | `resolve_library_id`, `get_library_docs`, `list_library_docs`; CLI `docmancer list`. | If no registered or confidently resolved docs source exists, user may still need to provide a docs URL. |
-| Keep docs private/local | Index local files and private docs without sending content to hosted docs services. | CLI `docmancer ingest`; MCP `ingest_project_docs`. | Cloud embedding extras are optional; default retrieval stack can stay local. |
-| Get compact context for agents | Return sections with headings, source attribution, extracted snippets, metadata, and token estimates. | CLI `docmancer query`, `docmancer context`; MCP query tools and `get_project_context`. | Snippets are extracted from source docs, not synthesized. |
+| Avoid repeated WebFetch | Register sources once, then query local indexes. | `resolve_library_id`, `get_library_docs`, `list_library_docs`; CLI `doc-atlas list`. | If no registered or confidently resolved docs source exists, user may still need to provide a docs URL. |
+| Keep docs private/local | Index local files and private docs without sending content to hosted docs services. | CLI `doc-atlas ingest`; MCP `ingest_project_docs`. | Cloud embedding extras are optional; default retrieval stack can stay local. |
+| Get compact context for agents | Return sections with headings, source attribution, extracted snippets, metadata, and token estimates. | CLI `doc-atlas query`, `doc-atlas context`; MCP query tools and `get_project_context`. | Snippets are extracted from source docs, not synthesized. |
 | Run long docs indexing safely | Start async prefetch jobs and poll progress. | `prefetch_library_docs(async=true)`, `prefetch_docs_targets(async=true)`, `get_docs_job_status`. | Large public sites still need sane max pages, allowed domains, and source hygiene. |
-| Diagnose docs runtime | Check config, storage, SQLite, Qdrant, indexes, agents, and MCP state. | CLI `docmancer doctor`, `docmancer qdrant status`; MCP `mcp doctor`. | Doctor output should continue moving toward more explicit severity/fix commands. |
+| Diagnose docs runtime | Check config, storage, SQLite, Qdrant, indexes, agents, and MCP state. | CLI `doc-atlas doctor`, `doc-atlas qdrant status`; MCP `mcp doctor`. | Doctor output should continue moving toward more explicit severity/fix commands. |
 
 Important current boundary: `get_project_context(project_path, question)` is available as a compact MVP for combining indexed project-owned docs with one resolved dependency-doc source and a Trust Contract. `bootstrap_project_docs(project_path, question?)` is the safe onboarding shortcut before `get_project_context`; it can inspect and ingest/refresh existing reviewable docs, including module docs, but it stops before repository writes and dependency-docs network fetches.
 
@@ -53,9 +53,9 @@ Important current boundary: `get_project_context(project_path, question)` is ava
 Docmancer can index documentation from local files and directories:
 
 ```bash
-docmancer ingest ./docs
-docmancer ingest ./README.md
-docmancer ingest ./runbooks --include "*.md"
+doc-atlas ingest ./docs
+doc-atlas ingest ./README.md
+doc-atlas ingest ./runbooks --include "*.md"
 ```
 
 Supported local formats:
@@ -84,9 +84,9 @@ Useful ingest controls:
 Docmancer can fetch and index documentation from public URLs:
 
 ```bash
-docmancer add https://docs.pytest.org
-docmancer add https://fastapi.tiangolo.com/
-docmancer add https://github.com/org/repo
+doc-atlas add https://docs.pytest.org
+doc-atlas add https://fastapi.tiangolo.com/
+doc-atlas add https://github.com/org/repo
 ```
 
 Supported URL provider types:
@@ -168,7 +168,7 @@ Docmancer supports multiple retrieval modes:
 Example:
 
 ```bash
-docmancer query "How do I parametrize a pytest fixture?" --mode hybrid --explain
+doc-atlas query "How do I parametrize a pytest fixture?" --mode hybrid --explain
 ```
 
 `--explain` shows which signal placed a result, for example `lexical#1`, `dense#3`, `sparse#2`.
@@ -203,11 +203,11 @@ Docmancer can manage its own local Qdrant process for vector retrieval.
 Commands:
 
 ```bash
-docmancer qdrant up
-docmancer qdrant status
-docmancer qdrant logs
-docmancer qdrant down
-docmancer qdrant upgrade
+doc-atlas qdrant up
+doc-atlas qdrant status
+doc-atlas qdrant logs
+doc-atlas qdrant down
+doc-atlas qdrant upgrade
 ```
 
 Capabilities:
@@ -235,7 +235,7 @@ If a configured cloud provider lacks an API key, Docmancer can fall back to FTS5
 
 ### 10. Compact context packs
 
-`docmancer query` and MCP docs tools return compact context packs:
+`doc-atlas query` and MCP docs tools return compact context packs:
 
 - top matching sections;
 - heading paths;
@@ -247,10 +247,10 @@ If a configured cloud provider lacks an API key, Docmancer can fall back to FTS5
 Example:
 
 ```bash
-docmancer query "How do I authenticate?" --budget 2400
-docmancer query "How do I authenticate?" --expand
-docmancer query "How do I authenticate?" --expand page
-docmancer query "How do I authenticate?" --format json
+doc-atlas query "How do I authenticate?" --budget 2400
+doc-atlas query "How do I authenticate?" --expand
+doc-atlas query "How do I authenticate?" --expand page
+doc-atlas query "How do I authenticate?" --format json
 ```
 
 Docmancer reports token efficiency on queries:
@@ -411,7 +411,7 @@ This avoids generic answers when the repo already documents its architecture or 
 Docmancer exposes its docs runtime through MCP:
 
 ```bash
-docmancer mcp docs-serve
+doc-atlas mcp docs-serve
 ```
 
 Agents can then resolve, fetch, refresh, prefetch, inspect, and query docs without leaving their tool loop.
@@ -530,9 +530,9 @@ This steers agents away from repeated WebFetch when a registered local source ex
 Docmancer can install agent-facing skill/config files:
 
 ```bash
-docmancer setup
-docmancer setup --profile agent --agent claude-code --yes
-docmancer install <agent>
+doc-atlas setup
+doc-atlas setup --profile agent --agent claude-code --yes
+doc-atlas install <agent>
 ```
 
 Supported install targets include Claude Code, Cursor, Codex, Cline, Claude Desktop, Gemini, GitHub Copilot, and OpenCode.
@@ -544,9 +544,9 @@ The goal is that agents know when to call Docmancer before relying on model memo
 Docmancer includes health checks:
 
 ```bash
-docmancer doctor
-docmancer mcp doctor
-docmancer qdrant status
+doc-atlas doctor
+doc-atlas mcp doctor
+doc-atlas qdrant status
 ```
 
 Diagnostics cover areas such as:
@@ -568,16 +568,16 @@ Supported setup path:
 
 ```bash
 python -m pip install docmancer
-docmancer setup
-docmancer doctor
-docmancer mcp docs-serve
+doc-atlas setup
+doc-atlas doctor
+doc-atlas mcp docs-serve
 ```
 
 For agent integrations, verify installation with the target agent's config plus:
 
 ```bash
-docmancer list
-docmancer doctor
+doc-atlas list
+doc-atlas doctor
 ```
 
 Backup/restore is file-based because Docmancer keeps state local and inspectable. To move or restore state, copy the active `DOCMANCER_HOME` directory, plus any project-local `docmancer.yaml` files. The default home contains:
@@ -598,9 +598,9 @@ Restore checklist:
 1. install the same or newer compatible Docmancer version;
 2. copy the backed-up `DOCMANCER_HOME` to the target machine;
 3. copy project-local `docmancer.yaml` files with their repos;
-4. run `docmancer doctor`;
-5. run `docmancer list` and one representative `docmancer query` or `docmancer context` command;
-6. if Qdrant paths or vector state changed, run `docmancer qdrant status` and refresh vectors if doctor reports drift.
+4. run `doc-atlas doctor`;
+5. run `doc-atlas list` and one representative `doc-atlas query` or `doc-atlas context` command;
+6. if Qdrant paths or vector state changed, run `doc-atlas qdrant status` and refresh vectors if doctor reports drift.
 
 Private-doc security guidance:
 
@@ -618,7 +618,7 @@ Release integrity posture:
 - pin versions for reproducible agent environments;
 - verify downloaded pack artifacts by SHA-256 where pack install commands expose hashes;
 - treat arbitrary docs URLs as untrusted until they pass Docmancer URL validation and source review;
-- rerun `docmancer doctor` after upgrades.
+- rerun `doc-atlas doctor` after upgrades.
 
 ### 23. Advanced retrieval configuration
 
@@ -638,12 +638,12 @@ This is useful for large docs portals and mixed corpora where different query pa
 Docmancer supports lifecycle management:
 
 ```bash
-docmancer list
-docmancer inspect
-docmancer update
-docmancer update https://docs.example.com
-docmancer remove <source>
-docmancer remove --all
+doc-atlas list
+doc-atlas inspect
+doc-atlas update
+doc-atlas update https://docs.example.com
+doc-atlas remove <source>
+doc-atlas remove --all
 ```
 
 For MCP docs targets, the equivalent capabilities are available through `list_library_docs`, `inspect_library_docs`, `refresh_library_docs`, `remove_library_docs`, and `prune_library_docs`.
@@ -670,9 +670,9 @@ Use this when the repository already has `README.md`, `docs/`, `wiki/`, ADRs, ru
 CLI flow:
 
 ```bash
-docmancer ingest ./docs
-docmancer ingest ./README.md
-docmancer query "How should authentication work in this project?" --explain
+doc-atlas ingest ./docs
+doc-atlas ingest ./README.md
+doc-atlas query "How should authentication work in this project?" --explain
 ```
 
 MCP flow:
@@ -741,8 +741,8 @@ Use this when the agent needs public library docs but should avoid repeated raw 
 CLI flow:
 
 ```bash
-docmancer add https://fastapi.tiangolo.com/
-docmancer query "How do I raise HTTPException with status_code and detail?" --mode hybrid --explain
+doc-atlas add https://fastapi.tiangolo.com/
+doc-atlas query "How do I raise HTTPException with status_code and detail?" --mode hybrid --explain
 ```
 
 MCP flow:
@@ -1125,8 +1125,8 @@ They are separate from the docs retrieval flow: users can get value from Docmanc
 Install a pack:
 
 ```bash
-docmancer install-pack open-meteo@v1
-docmancer mcp serve
+doc-atlas install-pack open-meteo@v1
+doc-atlas mcp serve
 ```
 
 Each pack includes artifacts such as:
@@ -1184,9 +1184,9 @@ This makes API action tools safer for coding agents.
 ### Workflow A — local docs query
 
 ```bash
-docmancer setup --profile cli-docs --yes
-docmancer ingest ./docs
-docmancer query "How do we authenticate?" --explain
+doc-atlas setup --profile cli-docs --yes
+doc-atlas ingest ./docs
+doc-atlas query "How do we authenticate?" --explain
 ```
 
 Use when the project already has local docs and you want grounded answers from those files.
@@ -1194,8 +1194,8 @@ Use when the project already has local docs and you want grounded answers from t
 ### Workflow B — public docs site query
 
 ```bash
-docmancer add https://docs.pytest.org
-docmancer query "How do I parametrize a fixture?" --mode hybrid
+doc-atlas add https://docs.pytest.org
+doc-atlas query "How do I parametrize a fixture?" --mode hybrid
 ```
 
 Use when the agent needs public docs locally instead of repeatedly fetching web pages.
@@ -1203,8 +1203,8 @@ Use when the agent needs public docs locally instead of repeatedly fetching web 
 ### Workflow C — MCP docs for agents
 
 ```bash
-docmancer setup --profile mcp-docs --yes
-docmancer mcp docs-serve
+doc-atlas setup --profile mcp-docs --yes
+doc-atlas mcp docs-serve
 ```
 
 Then an agent can call `get_library_docs`, `inspect_project_docs`, or `get_project_docs` directly.
@@ -1231,8 +1231,8 @@ Use when the correct answer depends on local architecture and external API behav
 ### Workflow F — API action pack
 
 ```bash
-docmancer install-pack some-api@v1
-docmancer mcp serve
+doc-atlas install-pack some-api@v1
+doc-atlas mcp serve
 ```
 
 Use when the agent should call an API through a version-pinned, schema-validated MCP tool surface.
