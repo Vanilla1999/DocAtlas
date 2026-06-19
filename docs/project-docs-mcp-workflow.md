@@ -20,9 +20,10 @@ Use project-docs MCP tools when the user asks about:
 
 1. **discovers** current candidates from the filesystem;
 2. **prunes** orphaned indexed sources (files that no longer exist);
-3. **removes** stale indexed sections (files that changed on disk);
-4. **indexes** new and changed candidates;
-5. **reports** current_count, new_count, changed_count, orphaned_removed, indexed_sources.
+3. **deduplicates** duplicate indexed sources by path, keeping the most recently ingested row;
+4. **removes** stale indexed sections (files that changed on disk);
+5. **indexes** new and changed candidates;
+6. **reports** current_count, new_count, changed_count, orphaned_removed, dedup_removed, stale_removed, indexed_sources.
 
 No need to call `inspect` first: sync does a full reconcile. Call `inspect` only when you need read-only discovery without side effects.
 

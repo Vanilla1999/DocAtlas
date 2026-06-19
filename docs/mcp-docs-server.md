@@ -145,12 +145,20 @@ Compact `sync_project_docs` response:
 
 ```json
 {
-  "tool": "sync_project_docs",
   "status": "success",
-  "current_count": 3,
-  "new_count": 1,
-  "changed_count": 0,
-  "orphaned_removed": 1
+  "project_path": "/path/to/repo",
+  "candidate_count": 4,
+  "summary": {
+    "current": 3,
+    "new": 1,
+    "changed": 0,
+    "orphaned": 0,
+    "orphaned_removed": 1,
+    "dedup_removed": 0,
+    "stale_removed": 0,
+    "missing": 0,
+    "sections_indexed": 24
+  }
 }
 ```
 
@@ -158,17 +166,20 @@ Compact `inspect_project_docs` response:
 
 ```json
 {
-  "tool": "inspect_project_docs",
+  "project_path": "/path/to/repo",
+  "project_detected": true,
   "reason_code": "project_docs_ready",
   "next_action": {
-    "type": "sync_project_docs",
-    "tool": "sync_project_docs"
+    "type": "get_project_context",
+    "tool": "get_project_context"
   },
-  "candidate_count": 4,
-  "indexed_count": 4,
-  "stale_count": 0,
-  "ignored_count": 0,
-  "requires_confirmation": false
+  "source_summary": {
+    "candidates": 4,
+    "indexed": 4,
+    "stale": 0,
+    "ignored": 0
+  },
+  "recommended_next_actions": []
 }
 ```
 
@@ -176,10 +187,15 @@ Compact `ingest_project_docs` response:
 
 ```json
 {
-  "tool": "ingest_project_docs",
   "status": "success",
+  "project_path": "/path/to/repo",
   "candidate_count": 4,
-  "sections_indexed": 24
+  "sections_indexed": 24,
+  "source_summary": {
+    "indexed": 4,
+    "missing": 0,
+    "skipped": 0
+  }
 }
 ```
 
@@ -187,14 +203,14 @@ Compact `bootstrap_project_docs` response:
 
 ```json
 {
-  "tool": "bootstrap_project_docs",
+  "project_path": "/path/to/repo",
   "status": "ready",
   "reason_code": "project_docs_ready",
+  "actions_taken": ["inspect", "sync"],
   "next_action": {
     "type": "get_project_context",
     "tool": "get_project_context"
-  },
-  "requires_confirmation": false
+  }
 }
 ```
 
@@ -202,7 +218,8 @@ Compact `get_project_docs` response:
 
 ```json
 {
-  "tool": "get_project_docs",
+  "project_path": "/path/to/repo",
+  "query": "architecture",
   "status": "success",
   "answer_available": true,
   "source_summary": {
@@ -211,7 +228,9 @@ Compact `get_project_docs` response:
     "stale": 0,
     "ignored": 0
   },
-  "results": [ ... ]
+  "results": [ ... ],
+  "next_action": {},
+  "next_actions": []
 }
 ```
 
@@ -219,17 +238,20 @@ Compact `get_project_context` response:
 
 ```json
 {
-  "tool": "get_project_context",
+  "project_path": "/path/to/repo",
+  "question": "how does auth work",
   "status": "success",
   "answer_available": true,
-  "source_summary": {
-    "candidates": 4,
-    "indexed": 4,
-    "stale": 0,
-    "ignored": 0
+  "mode": "auto",
+  "context_pack": [ ... ],
+  "trust_contract": {
+    "selected": [ ... ],
+    "rejected": [ ... ],
+    "risky": [ ... ]
   },
-  "selected_sources": [ ... ],
-  "results": [ ... ]
+  "next_actions": [],
+  "metrics": { ... },
+  "warnings": []
 }
 ```
 

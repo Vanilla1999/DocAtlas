@@ -1,42 +1,93 @@
 <!-- docmancer:start -->
 # docmancer
 
-Docmancer compresses documentation context so coding agents spend tokens on code, not on rereading raw docs. It ingests local files, fetches public docs, indexes everything locally with SQLite FTS5, and returns compact context packs with source attribution.
+Docmancer compresses documentation context so coding agents spend tokens on code, not on rereading raw docs. It ingests local files, fetches public docs, indexes everything locally with SQLite FTS5, and returns compact context packs with source attribution, via MCP tools.
 
-Executable: `/home/viadmin/.local/bin/docmancer --config /home/viadmin/StudioProjects/hermes/docmancer/docmancer.yaml`
+MCP tools are available under the `docmancer-docs` server and the `docmancer-*` prefix in opencode.
 
-**All commands below use `docmancer` as shorthand for the full executable path above.**
+Use docmancer when the user asks about library docs, API references, vendor docs, version-specific behavior, offline docs, project architecture, conventions, runbooks, or wants to add docs before answering a technical question.
 
-Use docmancer when the user asks about library docs, API references, vendor docs, version-specific behavior, offline docs, or wants to add docs before answering a technical question.
+## Project‑owned docs workflow (preferred)
 
-## Workflow
+1. **`inspect_project_docs(project_path)`** — read‑only discovery; returns `reason_code`, `next_action`, `source_summary`.
+2. **`sync_project_docs(project_path, with_vectors=true)`** — reconcile index with filesystem: prune orphans, reindex changed, index new. Canonical lifecycle action.
+3. **`get_project_context(project_path, question)`** — compact context pack with Trust Contract and source attribution.
 
-1. Run `docmancer list` to see indexed docs.
-2. Run `docmancer query "question"` when relevant docs are present.
-3. If local docs are missing and the user approves the path, run `docmancer ingest <path>`.
-4. If URL docs are missing and the user approves the source, run `docmancer add <url>`.
-5. Use the returned sections as source-grounded context for the answer or code change.
+Or use the higher‑level shortcut:
 
-## Core Commands
-
-```bash
-docmancer setup
-docmancer ingest ./docs
-docmancer add https://docs.example.com
-docmancer update
-docmancer query "how to authenticate"
-docmancer query "how to authenticate" --limit 10
-docmancer query "how to authenticate" --expand
-docmancer query "how to authenticate" --expand page
-docmancer query "how to authenticate" --format json
-docmancer list
-docmancer inspect
-docmancer remove <source>
-docmancer doctor
-docmancer fetch <url> --output <dir>
+```
+bootstrap_project_docs(project_path, question?)
+get_project_context(project_path, question)
 ```
 
-`query` prints estimated raw docs tokens, context-pack tokens, percent saved, and agentic runway. Prefer the compact default. Use `--expand` for adjacent sections; use `--expand page` only when the surrounding page is necessary.
+## Library docs workflow
 
-When documentation context is relevant, do not rely only on model memory or latest-only hosted docs. Query docmancer first, then cite or summarize the relevant local sections in the response.
+1. **`resolve_library_id(library)`** / **`get_library_docs(library, topic)`** — find and query registered library docs.
+2. **`inspect_library_docs(canonical_id)`** — check what is indexed for one source.
+3. **`refresh_library_docs(library, version?)`** — re‑fetch and re‑index.
+
+## Dependency‑docs workflow (project‑specific)
+
+```
+prefetch_project_dependency_docs(project_path)
+```
+
+Ask the user first — this fetches from the network based on manifests/lockfiles.
+
+## Compact MCP responses
+
+All project‑docs tools return compact JSON by default. Pass `details: true` for the full response.
+
+**sync_project_docs**:
+```json
+{
+  "status": "success",
+  "summary": { "current": 3, "new": 1, "changed": 0, "orphaned": 0,
+    "orphaned_removed": 1, "dedup_removed": 0, "stale_removed": 0,
+    "sections_indexed": 24 }
+}
+```
+
+**inspect_project_docs**:
+```json
+{
+  "reason_code": "project_docs_ready",
+  "next_action": { "type": "get_project_context", "tool": "get_project_context" },
+  "source_summary": { "candidates": 4, "indexed": 4, "stale": 0, "ignored": 0 }
+}
+```
+
+**bootstrap_project_docs**:
+```json
+{
+  "status": "ready",
+  "reason_code": "project_docs_ready",
+  "next_action": { "type": "get_project_context", "tool": "get_project_context" },
+  "actions_taken": ["inspect", "sync"]
+}
+```
+
+**get_project_context**:
+```json
+{
+  "answer_available": true,
+  "mode": "auto",
+  "trust_contract": { "selected": [...], "rejected": [...], "risky": [...] },
+  "next_actions": []
+}
+```
+
+## CLI (fallback when MCP tools are unavailable)
+
+```bash
+docmancer list
+docmancer query "question"
+docmancer ingest ./docs
+docmancer add https://docs.example.com
+docmancer doctor
+```
+
+`docmancer query` prints token savings and agentic runway. Use `--expand` for adjacent sections.
+
+Always query docmancer before relying on model memory or latest‑only hosted docs when documentation context is relevant.
 <!-- docmancer:end -->
