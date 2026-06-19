@@ -26,3 +26,7 @@ docs/*
 !docmancer/docs/
 !docmancer/docs/*.py
 scripts/*.log
+
+.idea/
+doc-atlas/
+*.zip
