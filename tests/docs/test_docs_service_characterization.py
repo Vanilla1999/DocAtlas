@@ -159,7 +159,7 @@ def test_characterization_no_project_docs_returns_architecture_remediation(tmp_p
     assert result.recommended_next_actions[-1]["preferred_path"] == "ARCHITECTURE.md"
 
 
-def test_characterization_stale_project_docs_returns_ingest_next_action(tmp_path, monkeypatch):
+def test_characterization_stale_project_docs_returns_sync_next_action(tmp_path, monkeypatch):
     project = _flutter_project(tmp_path)
     readme = project / "README.md"
     readme.write_text("# Architecture\n\nOriginal overview.", encoding="utf-8")
@@ -170,9 +170,9 @@ def test_characterization_stale_project_docs_returns_ingest_next_action(tmp_path
     result = service.inspect_project_docs(str(project))
 
     assert result.reason_code == "project_docs_stale"
-    assert result.next_action == {"type": "ingest_project_docs", "tool": "ingest_project_docs"}
+    assert result.next_action == {"type": "sync_project_docs", "tool": "sync_project_docs"}
     assert result.requires_confirmation is False
-    assert result.recommended_next_actions[0]["tool"] == "ingest_project_docs"
+    assert result.recommended_next_actions[0]["tool"] == "sync_project_docs"
 
 
 def test_characterization_get_project_context_returns_context_pack_and_trust_contract(tmp_path, monkeypatch):

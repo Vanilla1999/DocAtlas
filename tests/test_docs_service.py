@@ -268,11 +268,10 @@ def test_inspect_project_docs_returns_candidates_dependency_sources_and_next_act
     assert "flutter" in result.project_type
     assert result.project_docs["found"][0]["path"] == "README.md"
     assert result.reason_code == "project_docs_found_not_indexed"
-    assert result.next_action == {"type": "ingest_project_docs", "tool": "ingest_project_docs"}
+    assert result.next_action == {"type": "sync_project_docs", "tool": "sync_project_docs"}
     assert result.requires_confirmation is False
     assert result.confirmation_reason is None
     assert result.arguments_patch["project_path"] == str(project.resolve())
-    assert result.arguments_patch["skip_known"] is False
     assert result.arguments_patch["with_vectors"] is True
     assert "not indexed" in (result.agent_message or "")
     assert result.user_message is None
@@ -294,10 +293,10 @@ def test_inspect_project_docs_returns_candidates_dependency_sources_and_next_act
     assert dependency_action["confirmation_reason"] == "network_fetch"
     assert dependency_action["arguments_patch"] == {"project_path": str(project.resolve())}
     action_tools = [action["tool"] for action in result.recommended_next_actions]
-    assert action_tools == ["ingest_project_docs", "prefetch_project_docs"]
+    assert action_tools == ["sync_project_docs", "prefetch_project_docs"]
     assert result.recommended_next_actions[0]["requires_confirmation"] is False
     assert result.recommended_next_actions[1]["requires_confirmation"] is True
-    assert "ingest_project_docs" in (result.agent_guidance or "")
+    assert "sync_project_docs" in (result.agent_guidance or "")
 
 
 def test_inspect_project_docs_reports_indexed_and_stale_sources(tmp_path, monkeypatch):
@@ -321,11 +320,11 @@ def test_inspect_project_docs_reports_indexed_and_stale_sources(tmp_path, monkey
 
     assert stale.project_docs["stale"][0]["path"] == "README.md"
     assert stale.reason_code == "project_docs_stale"
-    assert stale.next_action == {"type": "ingest_project_docs", "tool": "ingest_project_docs"}
+    assert stale.next_action == {"type": "sync_project_docs", "tool": "sync_project_docs"}
     assert stale.requires_confirmation is False
     assert stale.arguments_patch["project_path"] == str(project.resolve())
     assert "content_hash_changed" in stale.project_docs["stale"][0]["stale_reasons"]
-    assert stale.recommended_next_actions[0]["tool"] == "ingest_project_docs"
+    assert stale.recommended_next_actions[0]["tool"] == "sync_project_docs"
 
 
 def test_inspect_project_docs_does_not_mark_mtime_only_change_stale(tmp_path, monkeypatch):
@@ -514,6 +513,45 @@ def test_sync_project_docs_reindexes_changed_sources_and_removes_stale_index(tmp
     assert "NewChangedNeedle" in new_query.results[0].content
 
 
+def test_sync_project_docs_prunes_orphaned_sources_when_all_docs_removed(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    readme = project / "README.md"
+    readme.write_text("# App\n\nRemoveAllNeedle should be pruned.", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+    service.ingest_project_docs(str(project), with_vectors=False)
+    readme.unlink()
+
+    result = service.sync_project_docs(str(project), with_vectors=False)
+
+    assert result.status == "success"
+    assert result.candidate_count == 0
+    assert result.orphaned_count == 1
+    assert result.orphaned_removed == 1
+    assert result.current_count == 0
+    assert result.indexed_sources == []
+    assert {item["path"] for item in result.removed_sources} == {"README.md"}
+    with service._agent_instance().store._connect() as conn:
+        assert conn.execute("SELECT COUNT(*) FROM sources").fetchone()[0] == 0
+        assert conn.execute("SELECT COUNT(*) FROM sections").fetchone()[0] == 0
+
+
+def test_inspect_project_docs_reports_needs_sync_for_orphaned_sources(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    readme = project / "README.md"
+    readme.write_text("# App\n\nOrphaned inspect source.", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+    service.ingest_project_docs(str(project), with_vectors=False)
+    readme.unlink()
+
+    result = service.inspect_project_docs(str(project))
+
+    assert result.reason_code == "project_docs_stale"
+    assert result.next_action == {"type": "sync_project_docs", "tool": "sync_project_docs"}
+    assert result.arguments_patch == {"project_path": str(project.resolve()), "with_vectors": True}
+    assert result.ignored_sources[0]["path"] == "README.md"
+    assert result.recommended_next_actions[0]["tool"] == "sync_project_docs"
+
+
 def test_mcp_get_project_docs_returns_compact_response_unless_details_requested(tmp_path, monkeypatch):
     project = _flutter_project(tmp_path)
     (project / "README.md").write_text("# App\n\nCompactNeedle project docs.", encoding="utf-8")
@@ -540,6 +578,45 @@ def test_mcp_get_project_docs_returns_compact_response_unless_details_requested(
     assert "source_state_guidance" not in compact
     assert "candidate_sources" in detailed
     assert "source_state_guidance" in detailed
+
+
+def test_mcp_project_lifecycle_tools_return_compact_response_unless_details_requested(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    (project / "README.md").write_text("# App\n\nLifecycle compact docs.", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+
+    inspect_compact = handle_project_tool("inspect_project_docs", {"project_path": str(project)}, service)
+    inspect_detailed = handle_project_tool("inspect_project_docs", {"project_path": str(project), "details": True}, service)
+    sync_compact = handle_project_tool("sync_project_docs", {"project_path": str(project), "with_vectors": False}, service)
+    sync_detailed = handle_project_tool("sync_project_docs", {"project_path": str(project), "with_vectors": False, "details": True}, service)
+    ingest_compact = handle_project_tool("ingest_project_docs", {"project_path": str(project), "with_vectors": False}, service)
+    ingest_detailed = handle_project_tool("ingest_project_docs", {"project_path": str(project), "with_vectors": False, "details": True}, service)
+    bootstrap_compact = handle_project_tool("bootstrap_project_docs", {"project_path": str(project), "question": "Lifecycle"}, service)
+    bootstrap_detailed = handle_project_tool("bootstrap_project_docs", {"project_path": str(project), "question": "Lifecycle", "details": True}, service)
+
+    assert inspect_compact is not None
+    assert inspect_detailed is not None
+    assert inspect_compact["source_summary"] == {"candidates": 1, "indexed": 0, "stale": 0, "ignored": 0}
+    assert "candidate_sources" not in inspect_compact
+    assert "candidate_sources" in inspect_detailed
+
+    assert sync_compact is not None
+    assert sync_detailed is not None
+    assert sync_compact["summary"]["current"] == 1
+    assert "indexed_sources" not in sync_compact
+    assert "indexed_sources" in sync_detailed
+
+    assert ingest_compact is not None
+    assert ingest_detailed is not None
+    assert ingest_compact["source_summary"]["indexed"] == 1
+    assert "indexed_sources" not in ingest_compact
+    assert "indexed_sources" in ingest_detailed
+
+    assert bootstrap_compact is not None
+    assert bootstrap_detailed is not None
+    assert bootstrap_compact["status"] == "ready"
+    assert "inspect_result" not in bootstrap_compact
+    assert "inspect_result" in bootstrap_detailed
 
 
 def test_ingest_project_docs_no_candidates_returns_no_project_docs(tmp_path, monkeypatch):
@@ -577,7 +654,7 @@ def test_inspect_project_docs_recommends_architecture_bootstrap_when_no_docs(tmp
     assert action["preferred_path"] == "ARCHITECTURE.md"
     assert "ARCHITECTURE.md" in action["suggested_paths"]
     assert action["after"][0]["tool"] == "inspect_project_docs"
-    assert action["after"][1]["tool"] == "ingest_project_docs"
+    assert action["after"][1]["tool"] == "sync_project_docs"
     assert action["after"][2]["tool"] == "get_project_docs"
     assert "reviewable ARCHITECTURE.md" in (result.agent_guidance or "")
 
@@ -658,11 +735,12 @@ def test_bootstrap_project_docs_ingests_existing_docs_and_returns_ready(tmp_path
     assert result.reason_code == "project_docs_ready"
     assert [action["tool"] for action in result.actions_taken] == [
         "inspect_project_docs",
-        "ingest_project_docs",
+        "sync_project_docs",
         "inspect_project_docs",
     ]
-    assert result.ingest_result is not None
-    assert result.ingest_result.status == "success"
+    assert result.ingest_result is None
+    assert result.sync_result is not None
+    assert result.sync_result.status == "success"
     assert result.next_action == {"type": "get_project_context", "tool": "get_project_context"}
     assert result.requires_confirmation is False
     assert result.arguments_patch == {"project_path": str(project.resolve()), "question": "How is the app organized?"}
@@ -906,7 +984,7 @@ def test_get_project_docs_reports_stale_module_docs(tmp_path, monkeypatch):
     assert result.reason_code == "project_docs_stale"
     assert result.stale_sources
     assert result.stale_sources[0]["candidate"]["module_path"] == "packages/backend"
-    assert result.next_actions[0]["tool"] == "ingest_project_docs"
+    assert result.next_actions[0]["tool"] == "sync_project_docs"
 
 
 def test_get_project_docs_project_scope_preserves_backward_compatibility(tmp_path, monkeypatch):
@@ -984,9 +1062,9 @@ def test_get_project_context_before_ingest_returns_actionable_remediation(tmp_pa
     assert result.answer_available is False
     assert result.project_docs is not None
     assert result.project_docs.reason_code == "project_docs_found_not_indexed"
-    assert result.next_actions[0]["tool"] == "ingest_project_docs"
-    assert result.next_actions[0]["arguments_patch"] == {"project_path": str(project.resolve())}
-    assert result.trust_contract["next_actions"][0]["tool"] == "ingest_project_docs"
+    assert result.next_actions[0]["tool"] == "sync_project_docs"
+    assert result.next_actions[0]["arguments_patch"] == {"project_path": str(project.resolve()), "with_vectors": True}
+    assert result.trust_contract["next_actions"][0]["tool"] == "sync_project_docs"
     assert "not indexed" in (result.message or "")
 
 
@@ -1003,7 +1081,8 @@ def test_bootstrap_project_docs_refreshes_stale_docs_before_context(tmp_path, mo
 
     assert bootstrap.status == "ready"
     assert bootstrap.reason_code == "project_docs_ready"
-    assert any(action["tool"] == "ingest_project_docs" for action in bootstrap.actions_taken)
+    assert any(action["tool"] == "sync_project_docs" for action in bootstrap.actions_taken)
+    assert bootstrap.sync_result is not None
     assert context.answer_available is True
     assert context.project_docs is not None
     assert context.project_docs.results
@@ -1156,7 +1235,7 @@ def test_context_cli_explain_outputs_human_readable_trust_contract(tmp_path):
     assert "wrong_version_risk" in result.output
 
 
-def test_get_project_docs_returns_ingest_next_action_when_candidates_not_indexed(tmp_path, monkeypatch):
+def test_get_project_docs_returns_sync_next_action_when_candidates_not_indexed(tmp_path, monkeypatch):
     project = _flutter_project(tmp_path)
     (project / "README.md").write_text("# Architecture\n\nProject docs exist but are not indexed.", encoding="utf-8")
     service = _service_with_real_agent(tmp_path, monkeypatch)
@@ -1167,13 +1246,13 @@ def test_get_project_docs_returns_ingest_next_action_when_candidates_not_indexed
     assert result.answer_available is False
     assert result.reason == "project_docs_not_indexed"
     assert result.reason_code == "project_docs_found_not_indexed"
-    assert result.next_action == {"type": "ingest_project_docs", "tool": "ingest_project_docs"}
+    assert result.next_action == {"type": "sync_project_docs", "tool": "sync_project_docs"}
     assert result.requires_confirmation is False
-    assert result.arguments_patch == {"project_path": str(project.resolve()), "skip_known": False, "with_vectors": True}
+    assert result.arguments_patch == {"project_path": str(project.resolve()), "with_vectors": True}
     assert result.results == []
     assert result.candidate_sources[0]["path"] == "README.md"
-    assert result.next_actions[0]["tool"] == "ingest_project_docs"
-    assert result.next_actions[0]["arguments_patch"] == {"project_path": str(project.resolve())}
+    assert result.next_actions[0]["tool"] == "sync_project_docs"
+    assert result.next_actions[0]["arguments_patch"] == {"project_path": str(project.resolve()), "with_vectors": True}
 
 
 def test_get_project_docs_distinguishes_indexed_no_results_from_not_indexed(tmp_path, monkeypatch):
@@ -1208,11 +1287,11 @@ def test_get_project_docs_reports_stale_project_docs(tmp_path, monkeypatch):
     assert result.status == "stale"
     assert result.reason == "project_docs_stale"
     assert result.reason_code == "project_docs_stale"
-    assert result.next_action == {"type": "ingest_project_docs", "tool": "ingest_project_docs"}
+    assert result.next_action == {"type": "sync_project_docs", "tool": "sync_project_docs"}
     assert result.requires_confirmation is False
-    assert result.arguments_patch == {"project_path": str(project.resolve()), "skip_known": False, "with_vectors": True}
+    assert result.arguments_patch == {"project_path": str(project.resolve()), "with_vectors": True}
     assert result.stale_sources[0]["path"] == "README.md"
-    assert result.next_actions[0]["tool"] == "ingest_project_docs"
+    assert result.next_actions[0]["tool"] == "sync_project_docs"
 
 
 def test_get_project_docs_returns_no_project_docs_next_action(tmp_path, monkeypatch):
@@ -1239,7 +1318,7 @@ def test_get_project_docs_returns_no_project_docs_next_action(tmp_path, monkeypa
     assert result.next_actions[0]["preferred_path"] == "ARCHITECTURE.md"
     assert result.next_actions[0]["requires_confirmation"] is True
     assert result.next_actions[0]["after"][0]["tool"] == "inspect_project_docs"
-    assert result.next_actions[0]["after"][1]["tool"] == "ingest_project_docs"
+    assert result.next_actions[0]["after"][1]["tool"] == "sync_project_docs"
     assert "ARCHITECTURE.md" in (result.message or "")
 
 

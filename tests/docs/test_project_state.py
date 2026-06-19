@@ -41,7 +41,7 @@ def test_create_project_docs_next_action_shape_includes_followups(tmp_path):
     assert action["action"] == "create_reviewable_project_doc"
     assert action["requires_confirmation"] is True
     assert action["preferred_path"] == "ARCHITECTURE.md"
-    assert [item["tool"] for item in action["after"]] == ["inspect_project_docs", "ingest_project_docs", "get_project_docs"]
+    assert [item["tool"] for item in action["after"]] == ["inspect_project_docs", "sync_project_docs", "get_project_docs"]
     assert action["after"][2]["arguments_patch"] == {"project_path": str(tmp_path), "query": "architecture"}
 
 

@@ -56,11 +56,11 @@ class ProjectDocsState:
         return {
             "stale_source": {
                 "meaning": "An indexed project-doc source differs from the current file on disk.",
-                "next_action": "Run ingest_project_docs, then retry inspect_project_docs or get_project_context.",
+                "next_action": "Run sync_project_docs, then retry inspect_project_docs or get_project_context.",
             },
             "indexed_source_not_discovered": {
                 "meaning": "The source exists in the index, but the current discovery pass did not select it as a project-doc candidate. This does not by itself mean the file is deleted or invalid.",
-                "next_action": "Link the file from docs/INDEX.md or root docs, move it under a discovered docs location, adjust discovery, or re-ingest after removing obsolete index entries.",
+                "next_action": "Link the file from docs/INDEX.md or root docs, move it under a discovered docs location, adjust discovery, or run sync_project_docs to remove obsolete index entries.",
             },
             "ignored_generated_or_tooling_doc": {
                 "meaning": "Generated, build, dependency, or tooling docs are not treated as reviewable project-owned docs by default.",

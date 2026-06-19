@@ -389,6 +389,7 @@ class ProjectDocsBootstrapResult:
     arguments_patch: dict[str, Any] = field(default_factory=dict)
     inspect_result: ProjectDocsInspectResult | None = None
     ingest_result: ProjectDocsIngestResult | None = None
+    sync_result: ProjectDocsSyncResult | None = None
     agent_message: str | None = None
     user_message: str | None = None
     warnings: list[str] = field(default_factory=list)

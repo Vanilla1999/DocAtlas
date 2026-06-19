@@ -159,19 +159,21 @@ TOOLS: list[dict[str, Any]] = [
             "type": "object",
             "properties": {
                 "project_path": {"type": "string"},
+                "details": {"type": ["boolean", "null"]},
             },
             "required": ["project_path"],
         },
     },
     {
         "name": "ingest_project_docs",
-        "description": "Index discovered project-owned docs files for a repository when inspect_project_docs returns next_action.type=ingest_project_docs. This only ingests reviewable local docs candidates such as README, docs/, wiki/, ARCHITECTURE, ADR, and roadmap; it does not ingest source code, dependency directories, build outputs, or dependency docs. Call inspect_project_docs first to show candidates and get user confirmation if required.",
+        "description": "Legacy low-level index operation for discovered project-owned docs files. Prefer sync_project_docs for normal reconcile flows. This only ingests reviewable local docs candidates such as README, docs/, wiki/, ARCHITECTURE, ADR, and roadmap; it does not prune orphaned entries and does not ingest source code, dependency directories, build outputs, or dependency docs. Call inspect_project_docs first to show candidates and get user confirmation if required.",
         "inputSchema": {
             "type": "object",
             "properties": {
                 "project_path": {"type": "string"},
                 "skip_known": {"type": ["boolean", "null"]},
                 "with_vectors": {"type": ["boolean", "null"]},
+                "details": {"type": ["boolean", "null"]},
             },
             "required": ["project_path"],
         },
@@ -184,6 +186,7 @@ TOOLS: list[dict[str, Any]] = [
             "properties": {
                 "project_path": {"type": "string"},
                 "with_vectors": {"type": ["boolean", "null"]},
+                "details": {"type": ["boolean", "null"]},
             },
             "required": ["project_path"],
         },
@@ -196,6 +199,7 @@ TOOLS: list[dict[str, Any]] = [
             "properties": {
                 "project_path": {"type": "string"},
                 "question": {"type": ["string", "null"]},
+                "details": {"type": ["boolean", "null"]},
             },
             "required": ["project_path"],
         },
@@ -221,7 +225,7 @@ TOOLS: list[dict[str, Any]] = [
     },
     {
         "name": "get_project_context",
-        "description": "Return one repo-grounded context pack for a coding question after inspect_project_docs and any required ingest_project_docs step. Combines indexed project-owned docs with one exact dependency docs source when requested/detectable, and always returns a compact Trust Contract with selected, rejected, and risky sources plus next_actions.",
+        "description": "Return one repo-grounded context pack for a coding question after inspect_project_docs and any required sync_project_docs step. Combines indexed project-owned docs with one exact dependency docs source when requested/detectable, and always returns a compact Trust Contract with selected, rejected, and risky sources plus next_actions.",
         "inputSchema": {
             "type": "object",
             "properties": {

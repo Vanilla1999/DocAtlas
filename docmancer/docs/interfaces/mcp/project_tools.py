@@ -89,15 +89,103 @@ def _compact_project_context(result: dict[str, Any]) -> dict[str, Any]:
     return compact
 
 
+def _compact_inspect_project_docs(result: dict[str, Any]) -> dict[str, Any]:
+    compact = {
+        "project_path": result.get("project_path"),
+        "project_detected": result.get("project_detected"),
+        "reason_code": result.get("reason_code"),
+        "next_action": result.get("next_action") or {},
+        "arguments_patch": result.get("arguments_patch") or {},
+        "source_summary": _project_sources_summary(result),
+        "recommended_next_actions": result.get("recommended_next_actions") or [],
+        "agent_message": result.get("agent_message"),
+        "user_message": result.get("user_message"),
+        "warnings": result.get("warnings") or [],
+    }
+    if result.get("requires_confirmation"):
+        compact["requires_confirmation"] = result.get("requires_confirmation")
+        compact["confirmation_reason"] = result.get("confirmation_reason")
+    return compact
+
+
+def _compact_ingest_project_docs(result: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "status": result.get("status"),
+        "project_path": (result.get("project") or {}).get("project_path"),
+        "candidate_count": result.get("candidate_count") or 0,
+        "sections_indexed": result.get("sections_indexed") or 0,
+        "source_summary": {
+            "indexed": len(result.get("indexed_sources") or []),
+            "missing": len(result.get("missing_sources") or []),
+            "skipped": len(result.get("skipped_sources") or []),
+        },
+        "message": result.get("message"),
+        "warnings": result.get("warnings") or [],
+    }
+
+
+def _compact_sync_project_docs(result: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "status": result.get("status"),
+        "project_path": (result.get("project") or {}).get("project_path"),
+        "candidate_count": result.get("candidate_count") or 0,
+        "summary": {
+            "current": result.get("current_count") or 0,
+            "new": result.get("new_count") or 0,
+            "changed": result.get("changed_count") or 0,
+            "orphaned": result.get("orphaned_count") or 0,
+            "orphaned_removed": result.get("orphaned_removed") or 0,
+            "stale_removed": result.get("stale_removed") or 0,
+            "missing": len(result.get("missing_sources") or []),
+            "sections_indexed": result.get("sections_indexed") or 0,
+        },
+        "message": result.get("message"),
+        "warnings": result.get("warnings") or [],
+    }
+
+
+def _compact_bootstrap_project_docs(result: dict[str, Any]) -> dict[str, Any]:
+    compact = {
+        "project_path": result.get("project_path"),
+        "question": result.get("question"),
+        "status": result.get("status"),
+        "tool": result.get("tool"),
+        "reason_code": result.get("reason_code"),
+        "actions_taken": result.get("actions_taken") or [],
+        "next_action": result.get("next_action") or {},
+        "arguments_patch": result.get("arguments_patch") or {},
+        "agent_message": result.get("agent_message"),
+        "user_message": result.get("user_message"),
+        "warnings": result.get("warnings") or [],
+    }
+    inspect_result = result.get("inspect_result") or {}
+    if inspect_result:
+        compact["inspect"] = _compact_inspect_project_docs(inspect_result)
+    sync_result = result.get("sync_result") or {}
+    if sync_result:
+        compact["sync"] = _compact_sync_project_docs(sync_result)
+    ingest_result = result.get("ingest_result") or {}
+    if ingest_result:
+        compact["ingest"] = _compact_ingest_project_docs(ingest_result)
+    if result.get("requires_confirmation"):
+        compact["requires_confirmation"] = result.get("requires_confirmation")
+        compact["confirmation_reason"] = result.get("confirmation_reason")
+    return compact
+
+
 def handle_project_tool(name: str, args: dict[str, Any], service: LibraryDocsService) -> dict[str, Any] | None:
     if name == "inspect_project_docs":
-        return asdict(service.inspect_project_docs(args["project_path"]))
+        result = asdict(service.inspect_project_docs(args["project_path"]))
+        return result if args.get("details") else _compact_inspect_project_docs(result)
     if name == "ingest_project_docs":
-        return asdict(service.ingest_project_docs(args["project_path"], skip_known=bool(args.get("skip_known") if args.get("skip_known") is not None else True), with_vectors=bool(args.get("with_vectors") if args.get("with_vectors") is not None else True)))
+        result = asdict(service.ingest_project_docs(args["project_path"], skip_known=bool(args.get("skip_known") if args.get("skip_known") is not None else True), with_vectors=bool(args.get("with_vectors") if args.get("with_vectors") is not None else True)))
+        return result if args.get("details") else _compact_ingest_project_docs(result)
     if name == "sync_project_docs":
-        return asdict(service.sync_project_docs(args["project_path"], with_vectors=bool(args.get("with_vectors") if args.get("with_vectors") is not None else True)))
+        result = asdict(service.sync_project_docs(args["project_path"], with_vectors=bool(args.get("with_vectors") if args.get("with_vectors") is not None else True)))
+        return result if args.get("details") else _compact_sync_project_docs(result)
     if name == "bootstrap_project_docs":
-        return asdict(service.bootstrap_project_docs(args["project_path"], question=args.get("question")))
+        result = asdict(service.bootstrap_project_docs(args["project_path"], question=args.get("question")))
+        return result if args.get("details") else _compact_bootstrap_project_docs(result)
     if name == "get_project_docs":
         result = asdict(service.get_project_docs(args["project_path"], args["query"], tokens=args.get("tokens"), limit=args.get("limit"), expand=args.get("expand"), module=args.get("module"), module_path=args.get("module_path"), scope=args.get("scope")))
         return result if args.get("details") else _compact_project_docs(result)

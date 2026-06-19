@@ -144,23 +144,28 @@ class ProjectDocsService:
         candidate_sources = [asdict(item) for item in metadata.docs_candidates]
         indexed_sources_all = self._indexed_project_doc_sources(str(root))
         indexed_sources, stale_sources, ignored_sources = self._partition_project_doc_state(candidate_sources, indexed_sources_all)
+        candidate_paths = {item.get("path") for item in candidate_sources if item.get("path")}
+        indexed_paths = {item.get("path") for item in [*indexed_sources, *stale_sources] if item.get("path")}
+        missing_candidate_count = len(candidate_paths - indexed_paths)
         has_high_level_overview = self._has_high_level_project_overview(candidate_sources)
         manifests_found = [name for name in ("pubspec.yaml", "Cargo.toml") if (root / name).exists()]
         lockfiles_found = [name for name in ("pubspec.lock", "Cargo.lock") if (root / name).exists()]
         dependency_docs_state = self._project_dependency_docs_state(metadata)
         exact_versions_available = dependency_docs_state["dependency_docs_available"]
         recommended_next_actions: list[dict[str, Any]] = []
-        if stale_sources:
+        if stale_sources or ignored_sources:
             recommended_next_actions.append({
-                "tool": "ingest_project_docs",
+                "tool": "sync_project_docs",
                 "requires_confirmation": False,
-                "reason": "Some indexed project docs are stale; re-index reviewable docs files.",
+                "reason": "Project docs index has stale or orphaned entries; reconcile it with the current repository docs snapshot.",
+                "arguments_patch": {"project_path": str(root), "with_vectors": True},
             })
-        elif candidate_sources and len(indexed_sources) < len(candidate_sources):
+        elif candidate_sources and missing_candidate_count:
             recommended_next_actions.append({
-                "tool": "ingest_project_docs",
+                "tool": "sync_project_docs",
                 "requires_confirmation": False,
-                "reason": "Project docs found but not indexed.",
+                "reason": "Project docs found but not indexed; reconcile the index with current docs.",
+                "arguments_patch": {"project_path": str(root), "with_vectors": True},
             })
         if exact_versions_available:
             recommended_next_actions.append({
@@ -175,13 +180,13 @@ class ProjectDocsService:
                 root,
                 reason="Project docs exist, but no high-level architecture or overview document was discovered. Ask the user before creating a reviewable ARCHITECTURE.md file.",
             ))
-        if stale_sources:
+        if stale_sources or ignored_sources:
             reason_code = "project_docs_stale"
         elif not candidate_sources:
             reason_code = "no_project_docs"
         elif not has_high_level_overview:
             reason_code = "architecture_doc_creation_recommended"
-        elif len(indexed_sources) < len(candidate_sources):
+        elif missing_candidate_count:
             reason_code = "project_docs_found_not_indexed"
         else:
             reason_code = "project_docs_ready"
@@ -223,7 +228,7 @@ class ProjectDocsService:
             arguments_patch=arguments_patch,
             agent_message=agent_message,
             user_message=user_message,
-            agent_guidance="Call get_project_docs for repo-specific questions after project docs are indexed. If docs are missing, ask before creating a reviewable ARCHITECTURE.md, then inspect and ingest it. If docs are stale, call ingest_project_docs first. Ask before network dependency docs fetches.",
+            agent_guidance="Call get_project_docs for repo-specific questions after project docs are synced. If docs are missing, ask before creating a reviewable ARCHITECTURE.md, then inspect and sync it. If docs are stale or orphaned, call sync_project_docs first. Ask before network dependency docs fetches.",
             source_state_guidance=self._source_state_guidance(),
             warnings=metadata.warnings,
         )
@@ -356,15 +361,6 @@ class ProjectDocsService:
         metadata = self.read_project_metadata(str(root))
         warnings = list(metadata.warnings)
         candidate_sources = [asdict(item) for item in metadata.docs_candidates]
-        if not candidate_sources:
-            return ProjectDocsSyncResult(
-                status="no_project_docs",
-                project=metadata,
-                candidate_count=0,
-                warnings=warnings,
-                message="No project-owned docs candidates were discovered.",
-            )
-
         before_indexed_all = self._indexed_project_doc_sources(str(root))
         before_current, before_stale, before_ignored = self._partition_project_doc_state(candidate_sources, before_indexed_all)
         candidate_paths = {item.get("path") for item in candidate_sources if item.get("path")}
@@ -380,6 +376,37 @@ class ProjectDocsService:
                 continue
             if agent.store.delete_source(str(source_name)):
                 removed_sources.append(source)
+
+        if not candidate_sources:
+            after_indexed_all = self._indexed_project_doc_sources(str(root))
+            _indexed_sources, stale_sources, ignored_sources = self._partition_project_doc_state(candidate_sources, after_indexed_all)
+            orphaned_removed = len(removed_sources)
+            status = "success" if orphaned_removed else "no_project_docs"
+            message = (
+                f"Synced project docs: current=0, new=0, changed=0, "
+                f"orphaned_removed={orphaned_removed}, missing=0."
+            )
+            if not orphaned_removed:
+                message += " No project-owned docs candidates were discovered."
+            return ProjectDocsSyncResult(
+                status=status,
+                project=metadata,
+                candidate_count=0,
+                current_count=0,
+                new_count=0,
+                changed_count=0,
+                orphaned_count=len(before_ignored),
+                orphaned_removed=orphaned_removed,
+                stale_removed=0,
+                sections_indexed=0,
+                indexed_sources=[],
+                stale_sources=stale_sources,
+                missing_sources=[],
+                removed_sources=removed_sources,
+                skipped_sources=[],
+                warnings=warnings,
+                message=message,
+            )
 
         ingest_result = self.ingest_project_docs(str(root), skip_known=True, with_vectors=with_vectors)
         after_indexed_all = self._indexed_project_doc_sources(str(root))
@@ -426,18 +453,19 @@ class ProjectDocsService:
         actions_taken.append({"tool": "inspect_project_docs", "arguments_patch": {"project_path": str(root)}})
         inspect_result = initial
         ingest_result: ProjectDocsIngestResult | None = None
+        sync_result: ProjectDocsSyncResult | None = None
         warnings = list(initial.warnings)
 
         if initial.reason_code in {"project_docs_found_not_indexed", "project_docs_stale"}:
-            ingest_result = self.ingest_project_docs(str(root), skip_known=False, with_vectors=True)
+            sync_result = self.sync_project_docs(str(root), with_vectors=True)
             actions_taken.append({
-                "tool": "ingest_project_docs",
-                "arguments_patch": {"project_path": str(root), "skip_known": False, "with_vectors": True},
-                "status": ingest_result.status,
+                "tool": "sync_project_docs",
+                "arguments_patch": {"project_path": str(root), "with_vectors": True},
+                "status": sync_result.status,
             })
-            warnings.extend(ingest_result.warnings)
+            warnings.extend(sync_result.warnings)
             inspect_result = self.inspect_project_docs(str(root))
-            actions_taken.append({"tool": "inspect_project_docs", "arguments_patch": {"project_path": str(root)}, "reason": "post_ingest_verification"})
+            actions_taken.append({"tool": "inspect_project_docs", "arguments_patch": {"project_path": str(root)}, "reason": "post_sync_verification"})
 
         dependency_action = inspect_result.dependency_sources.get("dependency_next_action") if inspect_result.dependency_sources else None
         metadata = self.read_project_metadata(str(root))
@@ -455,6 +483,7 @@ class ProjectDocsService:
                 arguments_patch=dependency_action.get("arguments_patch") or {"project_path": str(root)},
                 inspect_result=inspect_result,
                 ingest_result=ingest_result,
+                sync_result=sync_result,
                 agent_message="Project docs are ready, but this question mentions a dependency whose exact docs are not prefetched. Ask before fetching dependency docs from the network.",
                 user_message=dependency_action.get("user_message"),
                 warnings=warnings,
@@ -473,6 +502,7 @@ class ProjectDocsService:
                 arguments_patch=inspect_result.arguments_patch,
                 inspect_result=inspect_result,
                 ingest_result=ingest_result,
+                sync_result=sync_result,
                 agent_message=inspect_result.agent_message,
                 user_message=inspect_result.user_message,
                 warnings=warnings,
@@ -495,6 +525,7 @@ class ProjectDocsService:
                 arguments_patch=arguments_patch,
                 inspect_result=inspect_result,
                 ingest_result=ingest_result,
+                sync_result=sync_result,
                 agent_message=agent_message,
                 warnings=warnings,
             )
@@ -511,6 +542,7 @@ class ProjectDocsService:
             arguments_patch=inspect_result.arguments_patch,
             inspect_result=inspect_result,
             ingest_result=ingest_result,
+            sync_result=sync_result,
             agent_message=inspect_result.agent_message or "Project docs are not ready after safe bootstrap actions.",
             user_message=inspect_result.user_message,
             warnings=warnings,
@@ -641,7 +673,7 @@ class ProjectDocsService:
                     **self._create_project_docs_next_action(root, query),
                     "reason": "No project-owned docs candidates were discovered for this repository. Create a reviewable architecture doc before indexing.",
                 }],
-                message=user_message or "No project-owned docs were found. Ask before creating a reviewable ARCHITECTURE.md, then run inspect_project_docs and ingest_project_docs.",
+                message=user_message or "No project-owned docs were found. Ask before creating a reviewable ARCHITECTURE.md, then run inspect_project_docs and sync_project_docs.",
             )
 
         if not indexed_sources_all:
@@ -664,12 +696,12 @@ class ProjectDocsService:
                 warnings=metadata.warnings,
                 candidate_sources=candidate_sources,
                 next_actions=[{
-                    "tool": "ingest_project_docs",
+                    "tool": "sync_project_docs",
                     "requires_confirmation": False,
-                    "arguments_patch": {"project_path": str(root)},
-                    "reason": "Project docs candidates were discovered but have not been indexed.",
+                    "arguments_patch": {"project_path": str(root), "with_vectors": True},
+                    "reason": "Project docs candidates were discovered but have not been indexed; reconcile the index.",
                 }],
-                message="Project docs candidates exist but are not indexed. Run ingest_project_docs, then retry get_project_docs.",
+                message="Project docs candidates exist but are not indexed. Run sync_project_docs, then retry get_project_docs.",
             )
 
         chunks = self.query_project_docs(str(root), query, tokens=tokens, limit=limit, expand=expand, scope=query_scope, module_path=resolved_module_path)
@@ -742,10 +774,10 @@ class ProjectDocsService:
                 query=query,
             )
             next_actions.append({
-                "tool": "ingest_project_docs",
+                "tool": "sync_project_docs",
                 "requires_confirmation": False,
-                "arguments_patch": {"project_path": str(root)},
-                "reason": "Some indexed project docs are stale; re-index before relying on repo-specific answers.",
+                "arguments_patch": {"project_path": str(root), "with_vectors": True},
+                "reason": "Some indexed project docs are stale; reconcile before relying on repo-specific answers.",
             })
         if results:
             return ProjectDocsResult(
@@ -799,10 +831,10 @@ class ProjectDocsService:
             ignored_sources=ignored_sources,
             source_state_guidance=self._source_state_guidance(),
             next_actions=[{
-                "tool": "ingest_project_docs" if stale_sources else "inspect_project_docs",
+                "tool": "sync_project_docs" if stale_sources else "inspect_project_docs",
                 "requires_confirmation": False,
-                "arguments_patch": {"project_path": str(root)},
-                "reason": "Project docs are stale; re-index and retry." if stale_sources else "Project docs are indexed, but no indexed project docs matched this query. Inspect candidates or refine the query.",
+                "arguments_patch": {"project_path": str(root), **({"with_vectors": True} if stale_sources else {})},
+                "reason": "Project docs are stale; sync and retry." if stale_sources else "Project docs are indexed, but no indexed project docs matched this query. Inspect candidates or refine the query.",
             }],
             message="Indexed project docs exist, but no results matched this query." + (" Some indexed docs are stale." if stale_sources else ""),
         )

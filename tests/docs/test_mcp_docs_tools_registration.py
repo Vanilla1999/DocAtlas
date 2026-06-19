@@ -69,18 +69,21 @@ def test_mcp_exposes_inspect_project_docs_with_discovery_first_guidance():
     assert "next_action" in tool["description"]
     assert "Follow next_action" in tool["description"]
     assert tool["inputSchema"]["required"] == ["project_path"]
+    assert "details" in tool["inputSchema"]["properties"]
 
 
 def test_mcp_exposes_ingest_project_docs():
     tool = next(tool for tool in TOOLS if tool["name"] == "ingest_project_docs")
 
-    assert "Index discovered project-owned docs files" in tool["description"]
+    assert "Legacy low-level index operation" in tool["description"]
+    assert "Prefer sync_project_docs" in tool["description"]
     assert "does not ingest source code" in tool["description"]
     assert "does not ingest" in tool["description"]
     assert "dependency docs" in tool["description"]
     assert tool["inputSchema"]["required"] == ["project_path"]
     assert "skip_known" in tool["inputSchema"]["properties"]
     assert "with_vectors" in tool["inputSchema"]["properties"]
+    assert "details" in tool["inputSchema"]["properties"]
 
 
 def test_mcp_exposes_sync_project_docs():
@@ -90,6 +93,7 @@ def test_mcp_exposes_sync_project_docs():
     assert "Reconcile project-owned docs index" in tool["description"]
     assert "Removes stale and orphaned" in tool["description"]
     assert "with_vectors" in tool["inputSchema"]["properties"]
+    assert "details" in tool["inputSchema"]["properties"]
 
 
 def test_mcp_exposes_bootstrap_project_docs_with_safe_stops():
@@ -99,6 +103,7 @@ def test_mcp_exposes_bootstrap_project_docs_with_safe_stops():
     assert "never writes repository files" in tool["description"]
     assert "never fetches dependency docs from the network" in tool["description"]
     assert "confirmation_required" in tool["description"]
+    assert "details" in tool["inputSchema"]["properties"]
 
 
 def test_mcp_exposes_get_project_docs_with_project_scoped_guidance():
@@ -119,6 +124,7 @@ def test_mcp_exposes_get_project_context_with_trust_contract():
     assert "Trust Contract" in tool["description"]
     assert "selected, rejected, and risky sources" in tool["description"]
     assert "after inspect_project_docs" in tool["description"]
+    assert "sync_project_docs" in tool["description"]
     assert tool["inputSchema"]["required"] == ["project_path", "question"]
     assert "mode" in tool["inputSchema"]["properties"]
     assert "libraries" in tool["inputSchema"]["properties"]
