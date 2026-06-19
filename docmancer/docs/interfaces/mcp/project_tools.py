@@ -9,6 +9,7 @@ from docmancer.docs.service import LibraryDocsService
 PROJECT_TOOL_NAMES = {
     "inspect_project_docs",
     "ingest_project_docs",
+    "sync_project_docs",
     "bootstrap_project_docs",
     "get_project_docs",
     "get_project_context",
@@ -21,17 +22,88 @@ def project_tools(tools: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return [tool for tool in tools if tool["name"] in PROJECT_TOOL_NAMES]
 
 
+def _project_sources_summary(result: dict[str, Any]) -> dict[str, int]:
+    return {
+        "candidates": len(result.get("candidate_sources") or []),
+        "indexed": len(result.get("indexed_sources") or []),
+        "stale": len(result.get("stale_sources") or []),
+        "ignored": len(result.get("ignored_sources") or []),
+    }
+
+
+def _compact_project_docs(result: dict[str, Any]) -> dict[str, Any]:
+    compact = {
+        "project_path": result.get("project_path"),
+        "query": result.get("query"),
+        "status": result.get("status"),
+        "tool": result.get("tool"),
+        "reason_code": result.get("reason_code"),
+        "answer_available": result.get("answer_available"),
+        "message": result.get("message"),
+        "results": result.get("results") or [],
+        "next_action": result.get("next_action") or {},
+        "next_actions": result.get("next_actions") or [],
+        "arguments_patch": result.get("arguments_patch") or {},
+        "source_summary": _project_sources_summary(result),
+        "warnings": result.get("warnings") or [],
+    }
+    if result.get("requires_confirmation"):
+        compact["requires_confirmation"] = result.get("requires_confirmation")
+        compact["confirmation_reason"] = result.get("confirmation_reason")
+    return compact
+
+
+def _compact_project_context(result: dict[str, Any]) -> dict[str, Any]:
+    compact = {
+        "project_path": result.get("project_path"),
+        "question": result.get("question"),
+        "status": result.get("status"),
+        "tool": result.get("tool"),
+        "schema_version": result.get("schema_version"),
+        "answer_available": result.get("answer_available"),
+        "mode": result.get("mode"),
+        "reason": result.get("reason"),
+        "message": result.get("message"),
+        "context_pack": result.get("context_pack") or [],
+        "trust_contract": result.get("trust_contract") or {},
+        "next_actions": result.get("next_actions") or [],
+        "metrics": result.get("metrics") or {},
+        "warnings": result.get("warnings") or [],
+    }
+    project_docs = result.get("project_docs") or {}
+    if project_docs:
+        compact["project_docs"] = _compact_project_docs(project_docs)
+    dependency_docs = result.get("dependency_docs") or {}
+    if dependency_docs:
+        compact["dependency_docs"] = {
+            "status": dependency_docs.get("status"),
+            "reason_code": dependency_docs.get("reason_code"),
+            "answer_available": dependency_docs.get("answer_available"),
+            "results_count": len(dependency_docs.get("results") or []),
+            "source_summary": {
+                "selected": len(dependency_docs.get("selected_sources") or []),
+                "rejected": len(dependency_docs.get("rejected_sources") or []),
+                "risky": len(dependency_docs.get("risky_sources") or []),
+            },
+        }
+    return compact
+
+
 def handle_project_tool(name: str, args: dict[str, Any], service: LibraryDocsService) -> dict[str, Any] | None:
     if name == "inspect_project_docs":
         return asdict(service.inspect_project_docs(args["project_path"]))
     if name == "ingest_project_docs":
         return asdict(service.ingest_project_docs(args["project_path"], skip_known=bool(args.get("skip_known") if args.get("skip_known") is not None else True), with_vectors=bool(args.get("with_vectors") if args.get("with_vectors") is not None else True)))
+    if name == "sync_project_docs":
+        return asdict(service.sync_project_docs(args["project_path"], with_vectors=bool(args.get("with_vectors") if args.get("with_vectors") is not None else True)))
     if name == "bootstrap_project_docs":
         return asdict(service.bootstrap_project_docs(args["project_path"], question=args.get("question")))
     if name == "get_project_docs":
-        return asdict(service.get_project_docs(args["project_path"], args["query"], tokens=args.get("tokens"), limit=args.get("limit"), expand=args.get("expand"), module=args.get("module"), module_path=args.get("module_path"), scope=args.get("scope")))
+        result = asdict(service.get_project_docs(args["project_path"], args["query"], tokens=args.get("tokens"), limit=args.get("limit"), expand=args.get("expand"), module=args.get("module"), module_path=args.get("module_path"), scope=args.get("scope")))
+        return result if args.get("details") else _compact_project_docs(result)
     if name == "get_project_context":
-        return asdict(service.get_project_context(args["project_path"], args["question"], tokens=args.get("tokens"), limit=args.get("limit"), expand=args.get("expand"), library=args.get("library"), libraries=args.get("libraries"), ecosystem=args.get("ecosystem"), version=args.get("version"), module=args.get("module"), module_path=args.get("module_path"), scope=args.get("scope"), mode=args.get("mode") or "auto"))
+        result = asdict(service.get_project_context(args["project_path"], args["question"], tokens=args.get("tokens"), limit=args.get("limit"), expand=args.get("expand"), library=args.get("library"), libraries=args.get("libraries"), ecosystem=args.get("ecosystem"), version=args.get("version"), module=args.get("module"), module_path=args.get("module_path"), scope=args.get("scope"), mode=args.get("mode") or "auto"))
+        return result if args.get("details") else _compact_project_context(result)
     if name in {"prefetch_project_docs", "prefetch_project_dependency_docs"}:
         method = service.prefetch_project_dependency_docs if name == "prefetch_project_dependency_docs" else service.prefetch_project_docs
         return asdict(method(args["project_path"], include_flutter=bool(args.get("include_flutter") if args.get("include_flutter") is not None else True), include_dart=bool(args.get("include_dart") or False), include_rust=bool(args.get("include_rust") if args.get("include_rust") is not None else True), include_packages=args.get("include_packages") or [], force_refresh=bool(args.get("force_refresh") or False), continue_on_error=bool(args.get("continue_on_error") if args.get("continue_on_error") is not None else True), async_=bool(args.get("async") or False)))

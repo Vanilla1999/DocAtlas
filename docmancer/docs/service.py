@@ -139,6 +139,9 @@ class LibraryDocsService:
     def ingest_project_docs(self, *args: Any, **kwargs: Any):
         return self.project_docs.ingest_project_docs(*args, **kwargs)
 
+    def sync_project_docs(self, *args: Any, **kwargs: Any):
+        return self.project_docs.sync_project_docs(*args, **kwargs)
+
     def bootstrap_project_docs(self, *args: Any, **kwargs: Any):
         return self.project_docs.bootstrap_project_docs(*args, **kwargs)
 

@@ -1,0 +1,3102 @@
+from __future__ import annotations
+
+from datetime import datetime, timedelta, timezone
+import json
+from pathlib import Path
+from threading import Event, Thread
+import time
+from unittest.mock import MagicMock, patch
+
+from click.testing import CliRunner
+
+from docmancer.cli.__main__ import cli
+from docmancer.core.config import DocmancerConfig
+from docmancer.core.models import RetrievedChunk
+from docmancer.agent import DocmancerAgent
+from docmancer.docs.models import DocsChunk, DocsResult, DocsTarget, ProjectContextResult, SOURCE_CLASS_PROJECT_FILE
+from docmancer.docs.registry import LibraryRegistry
+from docmancer.docs.service import DocsJobTracker, LibraryDocsService
+
+
+class FakeAgent:
+    def __init__(self):
+        self.add_calls: list[str] = []
+        self.add_kwargs: list[dict] = []
+        self.query_calls: list[tuple[str, int | None]] = []
+
+    def add(self, docs_url: str, recreate: bool = False, **kwargs) -> int:
+        self.add_calls.append(docs_url)
+        self.add_kwargs.append(kwargs)
+        return 1
+
+    def query(self, text: str, limit=None, budget=None, expand=None):
+        self.query_calls.append((text, budget))
+        return [
+            RetrievedChunk(
+                source="https://docs.example.com/guide",
+                chunk_index=0,
+                text="Use parametrize for generated cases.",
+                score=1.0,
+                metadata={"title": "Parametrize"},
+            )
+        ]
+
+
+class FailingAgent(FakeAgent):
+    def add(self, docs_url: str, recreate: bool = False, **kwargs) -> int:
+        self.add_calls.append(docs_url)
+        self.add_kwargs.append(kwargs)
+        if "bad-version" in docs_url:
+            raise RuntimeError("404 docs")
+        return 1
+
+
+class BlockingAgent(FakeAgent):
+    def __init__(self):
+        super().__init__()
+        self.entered = Event()
+        self.release = Event()
+
+    def add(self, docs_url: str, recreate: bool = False, **kwargs) -> int:
+        self.add_calls.append(docs_url)
+        self.add_kwargs.append(kwargs)
+        if len(self.add_calls) >= 2:
+            self.entered.set()
+        self.release.wait(timeout=2)
+        return 1
+
+
+class SlowAgent(FakeAgent):
+    def __init__(self):
+        super().__init__()
+        self.entered = Event()
+        self.release = Event()
+
+    def add(self, docs_url: str, recreate: bool = False, **kwargs) -> int:
+        self.add_calls.append(docs_url)
+        self.add_kwargs.append(kwargs)
+        self.entered.set()
+        self.release.wait(timeout=2)
+        return 1
+
+
+class PageFailingAgent(FakeAgent):
+    def add(self, docs_url: str, recreate: bool = False, **kwargs) -> int:
+        self.add_calls.append(docs_url)
+        self.add_kwargs.append(kwargs)
+        if "bad" in docs_url:
+            raise RuntimeError("bad page")
+        return 1
+
+
+class AlwaysFailingAgent(FakeAgent):
+    def add(self, docs_url: str, recreate: bool = False, **kwargs) -> int:
+        self.add_calls.append(docs_url)
+        self.add_kwargs.append(kwargs)
+        raise RuntimeError("indexer exploded")
+
+
+class ProgressAgent(FakeAgent):
+    def add(self, docs_url: str, recreate: bool = False, **kwargs) -> int:
+        self.add_calls.append(docs_url)
+        self.add_kwargs.append(kwargs)
+        cb = kwargs.get("progress_callback")
+        if cb:
+            cb({"phase": "fetching", "message": "Fetching page", "url": docs_url, "fetched_pages": 1, "total_pages": 1})
+            cb({"phase": "indexing", "message": "Indexed page", "url": docs_url, "indexed_pages": 1, "total_pages": 1})
+        return 1
+
+
+class MixedVersionFakeAgent(FakeAgent):
+    def query(self, text: str, limit=None, budget=None, expand=None):
+        self.query_calls.append((text, budget))
+        return [
+            RetrievedChunk(
+                source="https://pub.dev/documentation/go_router/14.8.1/",
+                chunk_index=0,
+                text="ShellRoute behavior from 14.8.1.",
+                score=1.0,
+                metadata={"title": "14 docs", "library_id": "go_router@14.8.1"},
+            ),
+            RetrievedChunk(
+                source="https://pub.dev/documentation/go_router/latest/",
+                chunk_index=0,
+                text="ShellRoute behavior from latest.",
+                score=0.9,
+                metadata={"title": "latest docs", "library_id": "go_router@latest"},
+            ),
+        ]
+
+
+class MixedRiverpodFakeAgent(FakeAgent):
+    def query(self, text: str, limit=None, budget=None, expand=None):
+        self.query_calls.append((text, budget))
+        return [
+            RetrievedChunk(
+                source="https://pub.dev/documentation/riverpod/2.6.1/",
+                chunk_index=0,
+                text="Riverpod 2 APIs.",
+                score=1.0,
+                metadata={"title": "v2", "library_id": "riverpod@2.6.1"},
+            ),
+            RetrievedChunk(
+                source="https://pub.dev/documentation/riverpod/3.0.0/",
+                chunk_index=0,
+                text="Riverpod 3 APIs.",
+                score=0.9,
+                metadata={"title": "v3", "library_id": "riverpod@3.0.0"},
+            ),
+        ]
+
+
+def _service(tmp_path, monkeypatch, agent: FakeAgent | None = None) -> LibraryDocsService:
+    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
+    config = DocmancerConfig()
+    config.index.db_path = str(tmp_path / "docmancer.db")
+    config.index.extracted_dir = str(tmp_path / "extracted")
+    return LibraryDocsService(
+        config=config,
+        registry=LibraryRegistry(config.index.db_path),
+        agent=agent or FakeAgent(),
+        job_tracker=DocsJobTracker(),
+    )
+
+
+def _service_with_real_agent(tmp_path, monkeypatch) -> LibraryDocsService:
+    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
+    config = DocmancerConfig()
+    config.index.db_path = str(tmp_path / "docmancer.db")
+    config.index.extracted_dir = str(tmp_path / "extracted")
+    return LibraryDocsService(
+        config=config,
+        registry=LibraryRegistry(config.index.db_path),
+        agent=DocmancerAgent(config=config),
+        job_tracker=DocsJobTracker(),
+    )
+
+
+def _old_iso(days: int = 31) -> str:
+    return (datetime.now(timezone.utc) - timedelta(days=days)).isoformat(timespec="seconds")
+
+
+def _flutter_project(tmp_path, *, fvmrc: str = "stable"):
+    project = tmp_path / "app"
+    project.mkdir()
+    (project / ".fvmrc").write_text(fvmrc, encoding="utf-8")
+    (project / "pubspec.yaml").write_text(
+        """
+name: app
+dependencies:
+  flutter:
+    sdk: flutter
+  go_router: ^14.0.0
+  riverpod: ^2.0.0
+""",
+        encoding="utf-8",
+    )
+    (project / "pubspec.lock").write_text(
+        """
+packages:
+  go_router:
+    dependency: "direct main"
+    description:
+      name: go_router
+      url: "https://pub.dev"
+    source: hosted
+    version: "14.8.1"
+  riverpod:
+    dependency: "direct main"
+    description:
+      name: riverpod
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.6.1"
+sdks:
+  dart: ">=3.5.0 <4.0.0"
+""",
+        encoding="utf-8",
+    )
+    return project
+
+
+def _rust_project(tmp_path):
+    project = tmp_path / "rust_app"
+    project.mkdir()
+    (project / "Cargo.toml").write_text(
+        """
+[package]
+name = "rust_app"
+version = "0.1.0"
+
+[dependencies]
+serde = "1.0"
+tokio = { version = "1", features = ["rt"] }
+local_crate = { path = "../local_crate" }
+""",
+        encoding="utf-8",
+    )
+    (project / "Cargo.lock").write_text(
+        """
+# This file is automatically @generated by Cargo.
+
+[[package]]
+name = "serde"
+version = "1.0.228"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+
+[[package]]
+name = "tokio"
+version = "1.48.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+""",
+        encoding="utf-8",
+    )
+    return project
+
+
+def test_inspect_project_docs_returns_candidates_dependency_sources_and_next_actions(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    (project / "README.md").write_text("# App", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+
+    result = service.inspect_project_docs(str(project))
+
+    assert result.project_detected is True
+    assert result.project_path == str(project.resolve())
+    assert "flutter" in result.project_type
+    assert result.project_docs["found"][0]["path"] == "README.md"
+    assert result.reason_code == "project_docs_found_not_indexed"
+    assert result.next_action == {"type": "ingest_project_docs", "tool": "ingest_project_docs"}
+    assert result.requires_confirmation is False
+    assert result.confirmation_reason is None
+    assert result.arguments_patch["project_path"] == str(project.resolve())
+    assert result.arguments_patch["skip_known"] is False
+    assert result.arguments_patch["with_vectors"] is True
+    assert "not indexed" in (result.agent_message or "")
+    assert result.user_message is None
+    assert result.candidate_sources == result.project_docs["found"]
+    assert result.project_docs["indexed"] == []
+    assert result.project_docs["stale"] == []
+    assert result.dependency_sources["manifests_found"] == ["pubspec.yaml"]
+    assert result.dependency_sources["lockfiles_found"] == ["pubspec.lock"]
+    assert result.dependency_sources["exact_versions_available"] is True
+    assert result.dependency_sources["network_fetch_required"] is True
+    assert result.dependency_sources["dependency_docs_available"] is True
+    assert result.dependency_sources["dependency_docs_prefetched"] is False
+    assert result.dependency_sources["dependency_docs_missing_count"] >= 2
+    dependency_action = result.dependency_sources["dependency_next_action"]
+    assert dependency_action["type"] == "ask_user_to_prefetch_dependency_docs"
+    assert dependency_action["tool_after_confirmation"] == "prefetch_project_docs"
+    assert dependency_action["alias_tool_after_confirmation"] == "prefetch_project_dependency_docs"
+    assert dependency_action["requires_confirmation"] is True
+    assert dependency_action["confirmation_reason"] == "network_fetch"
+    assert dependency_action["arguments_patch"] == {"project_path": str(project.resolve())}
+    action_tools = [action["tool"] for action in result.recommended_next_actions]
+    assert action_tools == ["ingest_project_docs", "prefetch_project_docs"]
+    assert result.recommended_next_actions[0]["requires_confirmation"] is False
+    assert result.recommended_next_actions[1]["requires_confirmation"] is True
+    assert "ingest_project_docs" in (result.agent_guidance or "")
+
+
+def test_inspect_project_docs_reports_indexed_and_stale_sources(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    readme = project / "README.md"
+    readme.write_text("# App\n\nOriginal project docs.", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+    service.ingest_project_docs(str(project), with_vectors=False)
+
+    indexed = service.inspect_project_docs(str(project))
+
+    assert indexed.reason_code == "project_docs_ready"
+    assert indexed.next_action == {"type": "get_project_context", "tool": "get_project_context"}
+    assert indexed.requires_confirmation is False
+    assert indexed.project_docs["indexed"][0]["path"] == "README.md"
+    assert indexed.project_docs["stale"] == []
+    assert indexed.indexed_sources[0]["source_class"] == SOURCE_CLASS_PROJECT_FILE
+
+    readme.write_text("# App\n\nUpdated project docs.", encoding="utf-8")
+    stale = service.inspect_project_docs(str(project))
+
+    assert stale.project_docs["stale"][0]["path"] == "README.md"
+    assert stale.reason_code == "project_docs_stale"
+    assert stale.next_action == {"type": "ingest_project_docs", "tool": "ingest_project_docs"}
+    assert stale.requires_confirmation is False
+    assert stale.arguments_patch["project_path"] == str(project.resolve())
+    assert "content_hash_changed" in stale.project_docs["stale"][0]["stale_reasons"]
+    assert stale.recommended_next_actions[0]["tool"] == "ingest_project_docs"
+
+
+def test_ingest_project_docs_indexes_only_discovered_candidates_with_metadata(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    (project / "README.md").write_text("# App\n\nIntro", encoding="utf-8")
+    (project / "docs").mkdir()
+    (project / "docs" / "testing.md").write_text("# Testing\n\nRun tests.", encoding="utf-8")
+    (project / "lib").mkdir()
+    (project / "lib" / "main.md").write_text("# Source docs should be ignored", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+
+    result = service.ingest_project_docs(str(project), with_vectors=False)
+
+    assert result.status == "success"
+    assert result.candidate_count == 2
+    assert result.sections_indexed == 2
+    assert {item["path"] for item in result.indexed_sources} == {"README.md", "docs/testing.md"}
+    assert result.skipped_sources == []
+    assert "Indexed 2 project docs" in (result.message or "")
+
+    with service._agent_instance().store._connect() as conn:
+        rows = conn.execute("SELECT source, metadata_json FROM sources ORDER BY source").fetchall()
+    sources = {Path(row["source"]).relative_to(project).as_posix(): row for row in rows}
+    assert set(sources) == {"README.md", "docs/testing.md"}
+    metadata = json.loads(sources["README.md"]["metadata_json"])
+    assert metadata["source_class"] == "project_file"
+    assert metadata["project_docs"] is True
+    assert metadata["project_path"] == str(project.resolve())
+    assert metadata["project_doc_path"] == "README.md"
+    assert metadata["project_doc_reason"] == "root_readme"
+
+
+def test_ingest_project_docs_is_idempotent_with_skip_known(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    (project / "README.md").write_text("# App\n", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+
+    first = service.ingest_project_docs(str(project), with_vectors=False)
+    second = service.ingest_project_docs(str(project), with_vectors=False)
+
+    assert first.status == "success"
+    assert first.sections_indexed == 1
+    assert second.status == "failed"
+    assert second.sections_indexed == 0
+    assert len(second.skipped_sources) == 1
+    assert second.skipped_sources[0]["exception_type"] == "SkippedKnownFile"
+    with service._agent_instance().store._connect() as conn:
+        assert conn.execute("SELECT COUNT(*) FROM sources").fetchone()[0] == 1
+        assert conn.execute("SELECT COUNT(*) FROM sections").fetchone()[0] == 1
+
+
+def test_ingest_project_docs_no_candidates_returns_no_project_docs(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    service = _service(tmp_path, monkeypatch)
+
+    result = service.ingest_project_docs(str(project), with_vectors=False)
+
+    assert result.status == "no_project_docs"
+    assert result.candidate_count == 0
+    assert result.sections_indexed == 0
+    assert "No project-owned docs candidates" in (result.message or "")
+
+
+def test_inspect_project_docs_recommends_architecture_bootstrap_when_no_docs(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+
+    result = service.inspect_project_docs(str(project))
+
+    assert result.reason_code == "no_project_docs"
+    assert result.next_action == {
+        "type": "ask_user_to_create_project_doc",
+        "suggested_file": "ARCHITECTURE.md",
+        "handled_by": "coding_agent",
+    }
+    assert result.requires_confirmation is True
+    assert result.confirmation_reason == "repo_write"
+    assert result.arguments_patch == {"project_path": str(project.resolve())}
+    assert "No reviewable project docs" in (result.agent_message or "")
+    assert "ARCHITECTURE.md" in (result.user_message or "")
+    action = result.recommended_next_actions[-1]
+    assert action["action"] == "create_reviewable_project_doc"
+    assert action["requires_confirmation"] is True
+    assert action["preferred_path"] == "ARCHITECTURE.md"
+    assert "ARCHITECTURE.md" in action["suggested_paths"]
+    assert action["after"][0]["tool"] == "inspect_project_docs"
+    assert action["after"][1]["tool"] == "ingest_project_docs"
+    assert action["after"][2]["tool"] == "get_project_docs"
+    assert "reviewable ARCHITECTURE.md" in (result.agent_guidance or "")
+
+
+def test_inspect_project_docs_recommends_architecture_when_docs_lack_overview(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    (project / "runbooks").mkdir()
+    (project / "runbooks" / "deploy.md").write_text("# Deploy\n\nDeployment steps only.", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+    service.ingest_project_docs(str(project), with_vectors=False)
+
+    result = service.inspect_project_docs(str(project))
+
+    assert result.reason_code == "architecture_doc_creation_recommended"
+    assert result.project_docs["high_level_overview_found"] is False
+    assert result.next_action == {
+        "type": "ask_user_to_create_project_doc",
+        "suggested_file": "ARCHITECTURE.md",
+        "handled_by": "coding_agent",
+    }
+    assert result.requires_confirmation is True
+    assert result.confirmation_reason == "repo_write"
+    assert result.arguments_patch == {"project_path": str(project.resolve())}
+    assert "high-level project architecture document" in (result.user_message or "")
+    action = result.recommended_next_actions[-1]
+    assert action["action"] == "create_reviewable_project_doc"
+    assert action["preferred_path"] == "ARCHITECTURE.md"
+    assert "no high-level architecture or overview" in action["reason"]
+
+
+def test_inspect_project_docs_treats_readme_as_high_level_overview(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    (project / "README.md").write_text("# App\n\nProject overview.", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+    service.ingest_project_docs(str(project), with_vectors=False)
+
+    result = service.inspect_project_docs(str(project))
+
+    assert result.reason_code == "project_docs_ready"
+    assert result.project_docs["high_level_overview_found"] is True
+
+
+def test_inspect_project_docs_reports_prefetched_dependency_docs(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    (project / "README.md").write_text("# App\n\nProject overview.", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+    now = service._now()
+    for package in ("go_router", "riverpod"):
+        version = "14.8.1" if package == "go_router" else "2.6.1"
+        service.registry.upsert(
+            library=package,
+            ecosystem="pub",
+            version=version,
+            source_type="api",
+            docs_url=f"https://pub.dev/documentation/{package}/{version}/",
+            now=now,
+            status="available",
+            last_refreshed_at=now,
+        )
+
+    result = service.inspect_project_docs(str(project))
+
+    assert result.dependency_sources["dependency_docs_available"] is True
+    assert result.dependency_sources["dependency_docs_prefetched"] is True
+    assert result.dependency_sources["dependency_docs_prefetched_count"] == 2
+    assert result.dependency_sources["dependency_docs_missing_count"] == 0
+    assert result.dependency_sources["dependency_next_action"] == {}
+
+
+def test_bootstrap_project_docs_ingests_existing_docs_and_returns_ready(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    (project / "README.md").write_text("# App\n\nBootstrap ready overview.", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+
+    result = service.bootstrap_project_docs(str(project), question="How is the app organized?")
+
+    assert result.status == "ready"
+    assert result.reason_code == "project_docs_ready"
+    assert [action["tool"] for action in result.actions_taken] == [
+        "inspect_project_docs",
+        "ingest_project_docs",
+        "inspect_project_docs",
+    ]
+    assert result.ingest_result is not None
+    assert result.ingest_result.status == "success"
+    assert result.next_action == {"type": "get_project_context", "tool": "get_project_context"}
+    assert result.requires_confirmation is False
+    assert result.arguments_patch == {"project_path": str(project.resolve()), "question": "How is the app organized?"}
+
+
+def test_bootstrap_project_docs_stops_before_repo_write(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+
+    result = service.bootstrap_project_docs(str(project), question="Explain the architecture")
+
+    assert result.status == "confirmation_required"
+    assert result.reason_code == "no_project_docs"
+    assert result.next_action["type"] == "ask_user_to_create_project_doc"
+    assert result.requires_confirmation is True
+    assert result.confirmation_reason == "repo_write"
+    assert [action["tool"] for action in result.actions_taken] == ["inspect_project_docs"]
+
+
+def test_bootstrap_project_docs_stops_before_dependency_network_fetch(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    (project / "README.md").write_text("# App\n\nBootstrap ready overview.", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+    service.ingest_project_docs(str(project), with_vectors=False)
+
+    result = service.bootstrap_project_docs(str(project), question="How should we use go_router?")
+
+    assert result.status == "confirmation_required"
+    assert result.reason_code == "dependency_docs_prefetch_confirmation_required"
+    assert result.next_action["type"] == "ask_user_to_prefetch_dependency_docs"
+    assert result.next_action["tool_after_confirmation"] == "prefetch_project_docs"
+    assert result.requires_confirmation is True
+    assert result.confirmation_reason == "network_fetch"
+
+
+def test_query_project_docs_filters_by_project_path_and_source_class(tmp_path, monkeypatch):
+    (tmp_path / "a").mkdir()
+    (tmp_path / "b").mkdir()
+    project_a = _flutter_project(tmp_path / "a")
+    project_b = _flutter_project(tmp_path / "b")
+    (project_a / "README.md").write_text("# Runbook\n\nSharedTopic alpha migration uses blue toggles.", encoding="utf-8")
+    (project_b / "README.md").write_text("# Runbook\n\nSharedTopic beta migration uses red toggles.", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+    service.ingest_project_docs(str(project_a), with_vectors=False)
+    service.ingest_project_docs(str(project_b), with_vectors=False)
+
+    chunks = service.query_project_docs(str(project_a), "SharedTopic migration toggles", tokens=1200, limit=5)
+
+    assert chunks
+    assert all(chunk.metadata["project_path"] == str(project_a.resolve()) for chunk in chunks)
+    assert all(chunk.metadata["source_class"] == SOURCE_CLASS_PROJECT_FILE for chunk in chunks)
+    assert all(chunk.metadata["project_docs"] is True for chunk in chunks)
+    assert any("alpha migration" in chunk.text for chunk in chunks)
+    assert not any("beta migration" in chunk.text for chunk in chunks)
+
+
+def test_project_query_does_not_return_non_project_docs_with_same_terms(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    (project / "README.md").write_text("# Architecture\n\nNeedleTerm project answer lives here.", encoding="utf-8")
+    unrelated = tmp_path / "unrelated.md"
+    unrelated.write_text("# Architecture\n\nNeedleTerm public docs answer should not leak.", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+    service._agent_instance().ingest(unrelated, with_vectors=False)
+    service.ingest_project_docs(str(project), with_vectors=False)
+
+    chunks = service.query_project_docs(str(project), "NeedleTerm Architecture", tokens=1200, limit=5)
+
+    assert chunks
+    assert all(chunk.metadata.get("project_path") == str(project.resolve()) for chunk in chunks)
+    assert any("project answer" in chunk.text for chunk in chunks)
+    assert not any("public docs answer" in chunk.text for chunk in chunks)
+
+
+def test_get_project_docs_returns_scoped_docs_result(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    (project / "README.md").write_text("# Architecture\n\nProjectAnswer uses the local ADR flow.", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+    service.ingest_project_docs(str(project), with_vectors=False)
+
+    result = service.get_project_docs(str(project), "ProjectAnswer ADR", tokens=1200, limit=3)
+
+    assert result.status == "success"
+    assert result.tool == "get_project_docs"
+    assert result.project_path == str(project.resolve())
+    assert result.results
+    assert result.results[0].source is not None
+    assert result.results[0].source_class == SOURCE_CLASS_PROJECT_FILE
+    assert result.results[0].path == "README.md"
+    assert result.results[0].heading_path == "Architecture"
+    assert result.results[0].content_hash is not None
+    assert result.results[0].mtime_ns is not None
+    assert "ProjectAnswer" in result.results[0].content
+    assert result.indexed_sources[0]["path"] == "README.md"
+    assert result.next_actions == []
+
+
+def test_inspect_project_docs_lists_discovered_modules(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    (project / "README.md").write_text("# App", encoding="utf-8")
+    module_docs = project / "packages" / "backend" / "docs"
+    module_docs.mkdir(parents=True)
+    (project / "packages" / "backend" / "README.md").write_text("# Backend", encoding="utf-8")
+    (module_docs / "architecture.md").write_text("# Backend architecture", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+
+    result = service.inspect_project_docs(str(project))
+
+    modules = result.project_docs["modules"]
+    assert modules == [{
+        "module_id": "packages/backend",
+        "module_name": "backend",
+        "module_path": "packages/backend",
+        "module_type": "package",
+        "doc_count": 2,
+        "docs": ["packages/backend/README.md", "packages/backend/docs/architecture.md"],
+    }]
+
+
+def test_get_project_docs_can_filter_by_module_path(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    (project / "README.md").write_text("# Architecture\n\nRootProjectAnswer only.", encoding="utf-8")
+    backend = project / "packages" / "backend"
+    frontend = project / "packages" / "frontend"
+    backend.mkdir(parents=True)
+    frontend.mkdir(parents=True)
+    (backend / "README.md").write_text("# Backend\n\nSharedNeedle BackendOnlyAnswer.", encoding="utf-8")
+    (frontend / "README.md").write_text("# Frontend\n\nSharedNeedle FrontendOnlyAnswer.", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+    service.ingest_project_docs(str(project), with_vectors=False)
+
+    result = service.get_project_docs(str(project), "SharedNeedle", module_path="packages/backend", tokens=1200, limit=3)
+
+    assert result.status == "success"
+    assert result.results
+    assert all(item.module_path == "packages/backend" for item in result.results)
+    assert all(item.doc_scope == "module" for item in result.results)
+    assert any("BackendOnlyAnswer" in item.content for item in result.results)
+    assert not any("FrontendOnlyAnswer" in item.content for item in result.results)
+
+
+def test_ingested_module_metadata_roundtrips_to_inspect_and_results(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    (project / "README.md").write_text("# Architecture\n\nRootProjectAnswer only.", encoding="utf-8")
+    module = project / "services" / "auth"
+    module.mkdir(parents=True)
+    (module / "README.md").write_text("# Auth service\n\nAuthRoundtripNeedle module docs.", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+
+    ingest = service.ingest_project_docs(str(project), with_vectors=False)
+    inspect = service.inspect_project_docs(str(project))
+    result = service.get_project_docs(str(project), "AuthRoundtripNeedle", module="auth", tokens=1200, limit=3)
+
+    assert ingest.status == "success"
+    assert inspect.project_docs["indexed_modules"] == [{
+        "module_id": "services/auth",
+        "module_name": "auth",
+        "module_path": "services/auth",
+        "module_type": "service",
+        "doc_count": 1,
+        "docs": ["services/auth/README.md"],
+    }]
+    assert result.status == "success"
+    assert result.results
+    assert result.results[0].module_id == "services/auth"
+    assert result.results[0].module_name == "auth"
+    assert result.results[0].module_path == "services/auth"
+    assert result.results[0].module_type == "service"
+    assert result.indexed_sources[0]["doc_scope"] == "module"
+    assert result.indexed_sources[0]["module_path"] == "services/auth"
+
+
+def test_get_project_docs_can_filter_by_module_name_exact_match(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    (project / "README.md").write_text("# Architecture\n\nRootProjectAnswer only.", encoding="utf-8")
+    backend = project / "packages" / "backend"
+    frontend = project / "packages" / "frontend"
+    backend.mkdir(parents=True)
+    frontend.mkdir(parents=True)
+    (backend / "README.md").write_text("# Backend\n\nSharedNeedle BackendOnlyAnswer.", encoding="utf-8")
+    (frontend / "README.md").write_text("# Frontend\n\nSharedNeedle FrontendOnlyAnswer.", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+    service.ingest_project_docs(str(project), with_vectors=False)
+
+    result = service.get_project_docs(str(project), "SharedNeedle", module="backend", tokens=1200, limit=3)
+
+    assert result.status == "success"
+    assert result.results
+    assert all(item.module_path == "packages/backend" for item in result.results)
+    assert any("BackendOnlyAnswer" in item.content for item in result.results)
+    assert not any("FrontendOnlyAnswer" in item.content for item in result.results)
+
+
+def test_get_project_docs_returns_structured_module_ambiguity(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    for parent in ("packages", "services"):
+        module = project / parent / "auth"
+        module.mkdir(parents=True)
+        (module / "README.md").write_text(f"# {parent} auth", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+
+    result = service.get_project_docs(str(project), "auth", module="auth", tokens=1200, limit=3)
+
+    assert result.status == "module_ambiguous"
+    assert result.reason_code == "module_ambiguous"
+    assert result.answer_available is False
+    assert result.next_actions[0]["arguments_patch"] == {"project_path": str(project.resolve())}
+
+
+def test_get_project_docs_returns_structured_module_not_found(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    (project / "README.md").write_text("# App", encoding="utf-8")
+    module = project / "packages" / "backend"
+    module.mkdir(parents=True)
+    (module / "README.md").write_text("# Backend", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+
+    result = service.get_project_docs(str(project), "auth", module_path="services/auth", tokens=1200, limit=3)
+
+    assert result.status == "module_not_found"
+    assert result.reason_code == "module_not_found"
+    assert result.answer_available is False
+    assert result.next_action == {"type": "inspect_project_docs", "tool": "inspect_project_docs"}
+    assert result.arguments_patch == {"project_path": str(project.resolve())}
+
+
+def test_get_project_docs_reports_stale_module_docs(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    (project / "README.md").write_text("# Architecture\n\nRootProjectAnswer only.", encoding="utf-8")
+    module = project / "packages" / "backend"
+    module.mkdir(parents=True)
+    doc = module / "README.md"
+    doc.write_text("# Backend\n\nStaleNeedle first version.", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+    service.ingest_project_docs(str(project), with_vectors=False)
+    time.sleep(0.01)
+    doc.write_text("# Backend\n\nStaleNeedle changed version.", encoding="utf-8")
+
+    result = service.get_project_docs(str(project), "StaleNeedle", module_path="packages/backend", tokens=1200, limit=3)
+
+    assert result.status == "stale"
+    assert result.reason_code == "project_docs_stale"
+    assert result.stale_sources
+    assert result.stale_sources[0]["candidate"]["module_path"] == "packages/backend"
+    assert result.next_actions[0]["tool"] == "ingest_project_docs"
+
+
+def test_get_project_docs_project_scope_preserves_backward_compatibility(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    (project / "README.md").write_text("# Architecture\n\nSharedNeedle RootProjectAnswer.", encoding="utf-8")
+    module = project / "packages" / "backend"
+    module.mkdir(parents=True)
+    (module / "README.md").write_text("# Backend\n\nSharedNeedle BackendOnlyAnswer.", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+    service.ingest_project_docs(str(project), with_vectors=False)
+
+    result = service.get_project_docs(str(project), "SharedNeedle", scope="project", tokens=1200, limit=5)
+
+    assert result.status == "success"
+    assert result.results
+    assert all(item.doc_scope == "project" for item in result.results)
+    assert any("RootProjectAnswer" in item.content for item in result.results)
+    assert not any("BackendOnlyAnswer" in item.content for item in result.results)
+
+
+def test_get_project_context_returns_trust_contract_for_project_docs(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    (project / "README.md").write_text("# Architecture\n\nProjectContextAnswer uses local ADRs.", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+    service.ingest_project_docs(str(project), with_vectors=False)
+
+    result = service.get_project_context(str(project), "ProjectContextAnswer ADR", tokens=1200, limit=3)
+
+    assert result.status == "success"
+    assert result.tool == "get_project_context"
+    assert result.project_docs is not None
+    assert result.project_docs.results
+    assert result.context_pack[0]["source_class"] == "project_doc"
+    assert result.context_pack[0]["token_estimate"] > 0
+    assert result.metrics["project_result_count"] == 1
+    selected = result.trust_contract["selected_sources"]
+    assert selected[0]["source_class"] == "project_file"
+    assert selected[0]["trust_level"] == "trusted"
+    assert result.trust_contract["trusted_sources"] == selected
+    assert result.trust_contract["policy"]["direct_webfetch"] == "forbidden"
+
+
+def test_get_project_context_preserves_module_metadata_in_pack_and_trust_contract(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    (project / "README.md").write_text("# Architecture\n\nRootProjectAnswer only.", encoding="utf-8")
+    module = project / "services" / "auth"
+    module.mkdir(parents=True)
+    (module / "README.md").write_text("# Auth\n\nContextModuleNeedle AuthContextAnswer.", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+    service.ingest_project_docs(str(project), with_vectors=False)
+
+    result = service.get_project_context(str(project), "ContextModuleNeedle", module_path="services/auth", scope="module", mode="project-only", tokens=1200, limit=3)
+
+    assert result.status == "success"
+    assert result.project_docs is not None
+    assert result.project_docs.results[0].module_path == "services/auth"
+    assert result.context_pack[0]["doc_scope"] == "module"
+    assert result.context_pack[0]["module_id"] == "services/auth"
+    assert result.context_pack[0]["module_name"] == "auth"
+    assert result.context_pack[0]["module_path"] == "services/auth"
+    assert result.context_pack[0]["module_type"] == "service"
+    selected = result.trust_contract["selected_sources"]
+    assert selected[0]["doc_scope"] == "module"
+    assert selected[0]["module_path"] == "services/auth"
+
+
+def test_get_project_context_before_ingest_returns_actionable_remediation(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    (project / "README.md").write_text("# Architecture\n\nProject docs exist but are not indexed.", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+
+    result = service.get_project_context(str(project), "Architecture", tokens=1200, limit=3)
+
+    assert result.status == "not_indexed"
+    assert result.answer_available is False
+    assert result.project_docs is not None
+    assert result.project_docs.reason_code == "project_docs_found_not_indexed"
+    assert result.next_actions[0]["tool"] == "ingest_project_docs"
+    assert result.next_actions[0]["arguments_patch"] == {"project_path": str(project.resolve())}
+    assert result.trust_contract["next_actions"][0]["tool"] == "ingest_project_docs"
+    assert "not indexed" in (result.message or "")
+
+
+def test_bootstrap_project_docs_refreshes_stale_docs_before_context(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    readme = project / "README.md"
+    readme.write_text("# Architecture\n\nOriginal stale acceptance text.", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+    service.ingest_project_docs(str(project), with_vectors=False)
+    readme.write_text("# Architecture\n\nFreshAcceptanceNeedle text.", encoding="utf-8")
+
+    bootstrap = service.bootstrap_project_docs(str(project), question="FreshAcceptanceNeedle")
+    context = service.get_project_context(str(project), "FreshAcceptanceNeedle", tokens=1200, limit=3)
+
+    assert bootstrap.status == "ready"
+    assert bootstrap.reason_code == "project_docs_ready"
+    assert any(action["tool"] == "ingest_project_docs" for action in bootstrap.actions_taken)
+    assert context.answer_available is True
+    assert context.project_docs is not None
+    assert context.project_docs.results
+    assert "FreshAcceptanceNeedle" in context.project_docs.results[0].content
+
+
+def test_get_project_context_can_return_project_and_dependency_context(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    (project / "README.md").write_text("# Routing\n\nUse AppRouter wrappers with GoRouter.", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+    service.ingest_project_docs(str(project), with_vectors=False)
+    monkeypatch.setattr(
+        service,
+        "get_docs",
+        lambda *args, **kwargs: DocsResult(
+            library_id="pub:go_router@14.8.1:api",
+            library="go_router",
+            version="14.8.1",
+            topic=kwargs.get("topic"),
+            refreshed=False,
+            stale_before_refresh=False,
+            warning=None,
+            last_refreshed_at=None,
+            results=[DocsChunk(title="GoRouter", content="Use GoRouter ShellRoute APIs.", source="https://pub.dev/documentation/go_router/14.8.1/", url="https://pub.dev/documentation/go_router/14.8.1/")],
+            requested_version="project-version",
+            resolved_version="14.8.1",
+            version_source="lockfile_exact",
+            docs_exactness="exact_version_url",
+            docs_binding_source="pub_dartdoc_template",
+            confidence="very_high",
+        ),
+    )
+
+    result = service.get_project_context(str(project), "How should AppRouter use go_router?", tokens=1200, limit=3)
+
+    assert result.answer_available is True
+    assert result.project_docs is not None
+    assert result.dependency_docs is not None
+    assert {item["source_class"] for item in result.context_pack} == {"project_doc", "dependency_doc"}
+    assert result.metrics["project_result_count"] >= 1
+    assert result.metrics["dependency_result_count"] >= 1
+    selected_classes = {item["source_class"] for item in result.trust_contract["selected_sources"]}
+    assert selected_classes == {"project_file", "dependency_docs"}
+
+
+def test_get_project_context_includes_snippet_object_when_metadata_has_code(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    (project / "README.md").write_text("# Routing\n\nUse AppRouter wrappers.", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+    service.ingest_project_docs(str(project), with_vectors=False)
+    monkeypatch.setattr(
+        service,
+        "get_docs",
+        lambda *args, **kwargs: DocsResult(
+            library_id="pub:go_router@14.8.1:api",
+            library="go_router",
+            version="14.8.1",
+            topic=kwargs.get("topic"),
+            refreshed=False,
+            stale_before_refresh=False,
+            warning=None,
+            last_refreshed_at=None,
+            results=[
+                DocsChunk(
+                    title="GoRouter example",
+                    content="Example prose plus code.",
+                    source="https://pub.dev/documentation/go_router/14.8.1/",
+                    url="https://pub.dev/documentation/go_router/14.8.1/",
+                    metadata={"code_snippets": [{"language": "dart", "code": "final router = GoRouter(routes: []);"}]},
+                )
+            ],
+            requested_version="project-version",
+            resolved_version="14.8.1",
+            version_source="lockfile_exact",
+            docs_exactness="exact_version_url",
+            docs_binding_source="pub_dartdoc_template",
+            confidence="very_high",
+        ),
+    )
+
+    result = service.get_project_context(str(project), "GoRouter example", library="go_router")
+
+    dependency_item = next(item for item in result.context_pack if item["source_class"] == "dependency_doc")
+    assert dependency_item["snippet"] == {
+        "language": "dart",
+        "code": "final router = GoRouter(routes: []);",
+        "why_relevant": "code example extracted from matching GoRouter example section",
+    }
+    assert dependency_item["surrounding_context"] == "Example prose plus code."
+
+
+def test_get_project_context_deps_only_skips_project_docs(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    service = _service(tmp_path, monkeypatch)
+
+    result = service.get_project_context(str(project), "go_router APIs", library="go_router", mode="deps-only")
+
+    assert result.mode == "deps-only"
+    assert result.project_docs is None
+    assert any(item["reason_code"] == "project_docs_skipped" for item in result.trust_contract["risky_sources"])
+
+
+def test_context_cli_outputs_json_and_explain(tmp_path):
+    project = tmp_path / "project"
+    project.mkdir()
+    fake_config = DocmancerConfig()
+    fake_result = ProjectContextResult(
+        project_path=str(project),
+        question="How?",
+        trust_contract={"selected_sources": [], "rejected_sources": [], "risky_sources": [], "warnings": [], "next_actions": []},
+    )
+
+    with patch("docmancer.cli.commands._load_config", return_value=fake_config), \
+         patch("docmancer.docs.service.LibraryDocsService") as service_cls:
+        service_cls.return_value.get_project_context.return_value = fake_result
+        result = CliRunner().invoke(cli, ["context", str(project), "How?", "--format", "json", "--mode", "project-only"])
+
+    assert result.exit_code == 0, result.output
+    payload = json.loads(result.output)
+    assert payload["trust_contract"]["selected_sources"] == []
+    service_cls.return_value.get_project_context.assert_called_once()
+    assert service_cls.return_value.get_project_context.call_args.kwargs["mode"] == "project-only"
+
+
+def test_context_cli_explain_outputs_human_readable_trust_contract(tmp_path):
+    project = tmp_path / "project"
+    project.mkdir()
+    fake_config = DocmancerConfig()
+    fake_result = ProjectContextResult(
+        project_path=str(project),
+        question="How?",
+        trust_contract={
+            "selected_sources": [{"source_class": "project_file", "path": "docs/architecture.md", "why_selected": "matched local rule", "freshness": "current"}],
+            "rejected_sources": [{"source_class": "dependency_doc", "library": "go_router latest", "reason": "wrong_version_risk"}],
+            "risky_sources": [],
+            "warnings": [],
+            "next_actions": [],
+        },
+    )
+
+    with patch("docmancer.cli.commands._load_config", return_value=fake_config), \
+         patch("docmancer.docs.service.LibraryDocsService") as service_cls:
+        service_cls.return_value.get_project_context.return_value = fake_result
+        result = CliRunner().invoke(cli, ["context", str(project), "How?", "--explain"])
+
+    assert result.exit_code == 0, result.output
+    assert "Trusted context for: How?" in result.output
+    assert "[project_file] docs/architecture.md" in result.output
+    assert "Rejected / risky:" in result.output
+    assert "wrong_version_risk" in result.output
+
+
+def test_get_project_docs_returns_ingest_next_action_when_candidates_not_indexed(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    (project / "README.md").write_text("# Architecture\n\nProject docs exist but are not indexed.", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+
+    result = service.get_project_docs(str(project), "Architecture", tokens=1200, limit=3)
+
+    assert result.status == "not_indexed"
+    assert result.answer_available is False
+    assert result.reason == "project_docs_not_indexed"
+    assert result.reason_code == "project_docs_found_not_indexed"
+    assert result.next_action == {"type": "ingest_project_docs", "tool": "ingest_project_docs"}
+    assert result.requires_confirmation is False
+    assert result.arguments_patch == {"project_path": str(project.resolve()), "skip_known": False, "with_vectors": True}
+    assert result.results == []
+    assert result.candidate_sources[0]["path"] == "README.md"
+    assert result.next_actions[0]["tool"] == "ingest_project_docs"
+    assert result.next_actions[0]["arguments_patch"] == {"project_path": str(project.resolve())}
+
+
+def test_get_project_docs_distinguishes_indexed_no_results_from_not_indexed(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    (project / "README.md").write_text("# Architecture\n\nKnown project docs topic.", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+    service.ingest_project_docs(str(project), with_vectors=False)
+
+    result = service.get_project_docs(str(project), "UnrelatedNeedleThatDoesNotExist", tokens=1200, limit=3)
+
+    assert result.status == "no_results"
+    assert result.answer_available is False
+    assert result.reason == "no_project_docs_results"
+    assert result.reason_code == "no_project_docs_results"
+    assert result.next_action == {"type": "inspect_project_docs", "tool": "inspect_project_docs"}
+    assert result.requires_confirmation is False
+    assert result.arguments_patch == {"project_path": str(project.resolve())}
+    assert result.indexed_sources[0]["path"] == "README.md"
+    assert result.next_actions[0]["tool"] == "inspect_project_docs"
+
+
+def test_get_project_docs_reports_stale_project_docs(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    readme = project / "README.md"
+    readme.write_text("# Architecture\n\nOriginal ProjectStaleAnswer.", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+    service.ingest_project_docs(str(project), with_vectors=False)
+
+    readme.write_text("# Architecture\n\nUpdated ProjectStaleAnswer.", encoding="utf-8")
+    result = service.get_project_docs(str(project), "ProjectStaleAnswer", tokens=1200, limit=3)
+
+    assert result.status == "stale"
+    assert result.reason == "project_docs_stale"
+    assert result.reason_code == "project_docs_stale"
+    assert result.next_action == {"type": "ingest_project_docs", "tool": "ingest_project_docs"}
+    assert result.requires_confirmation is False
+    assert result.arguments_patch == {"project_path": str(project.resolve()), "skip_known": False, "with_vectors": True}
+    assert result.stale_sources[0]["path"] == "README.md"
+    assert result.next_actions[0]["tool"] == "ingest_project_docs"
+
+
+def test_get_project_docs_returns_no_project_docs_next_action(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+
+    result = service.get_project_docs(str(project), "Architecture", tokens=1200, limit=3)
+
+    assert result.status == "no_project_docs"
+    assert result.answer_available is False
+    assert result.reason == "no_project_docs"
+    assert result.reason_code == "no_project_docs"
+    assert result.next_action == {
+        "type": "ask_user_to_create_project_doc",
+        "suggested_file": "ARCHITECTURE.md",
+        "handled_by": "coding_agent",
+    }
+    assert result.requires_confirmation is True
+    assert result.confirmation_reason == "repo_write"
+    assert result.arguments_patch == {"project_path": str(project.resolve())}
+    assert result.results == []
+    assert result.candidate_sources == []
+    assert result.next_actions[0]["action"] == "create_reviewable_project_doc"
+    assert result.next_actions[0]["preferred_path"] == "ARCHITECTURE.md"
+    assert result.next_actions[0]["requires_confirmation"] is True
+    assert result.next_actions[0]["after"][0]["tool"] == "inspect_project_docs"
+    assert result.next_actions[0]["after"][1]["tool"] == "ingest_project_docs"
+    assert "ARCHITECTURE.md" in (result.message or "")
+
+
+def test_architecture_bootstrap_file_is_discovered_indexed_and_queryable(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+
+    empty = service.inspect_project_docs(str(project))
+    assert empty.candidate_sources == []
+    assert empty.recommended_next_actions[-1]["preferred_path"] == "ARCHITECTURE.md"
+
+    (project / "ARCHITECTURE.md").write_text(
+        "# Architecture\n\nBootstrapArchitectureAnswer uses repository-local reviewable docs.",
+        encoding="utf-8",
+    )
+    discovered = service.inspect_project_docs(str(project))
+    assert discovered.candidate_sources[0]["path"] == "ARCHITECTURE.md"
+    assert discovered.candidate_sources[0]["reason"] == "architecture"
+
+    ingest = service.ingest_project_docs(str(project), with_vectors=False)
+    assert ingest.status == "success"
+    assert ingest.indexed_sources[0]["path"] == "ARCHITECTURE.md"
+
+    answer = service.get_project_docs(str(project), "BootstrapArchitectureAnswer", tokens=1200, limit=3)
+    assert answer.status == "success"
+    assert answer.results[0].path == "ARCHITECTURE.md"
+    assert "BootstrapArchitectureAnswer" in answer.results[0].content
+
+
+def test_resolve_unknown_without_url_needs_docs_url(tmp_path, monkeypatch):
+    service = _service(tmp_path, monkeypatch)
+
+    result = service.resolve_library("missing-lib")
+
+    assert result.status == "needs_docs_url"
+    assert result.library_id is None
+    assert result.local is False
+
+
+def test_unknown_with_url_creates_metadata(tmp_path, monkeypatch):
+    service = _service(tmp_path, monkeypatch)
+
+    result = service.resolve_library("pytest", docs_url="https://docs.pytest.org/")
+
+    assert result.library_id == "pytest"
+    assert result.docs_url == "https://docs.pytest.org/"
+    assert result.status == "available"
+
+
+def test_versioned_library_uses_canonical_id(tmp_path, monkeypatch):
+    service = _service(tmp_path, monkeypatch)
+
+    result = service.resolve_library(
+        "go_router",
+        ecosystem="pub",
+        version="14.8.1",
+        docs_url="https://pub.dev/documentation/go_router/14.8.1/",
+    )
+
+    assert result.library_id == "pub:go_router@14.8.1:api"
+    assert result.source_id == "pub:go_router:api"
+    assert result.canonical_id == "pub:go_router@14.8.1:api"
+    assert result.version == "14.8.1"
+    assert result.requested_version == "14.8.1"
+    assert result.resolved_version == "14.8.1"
+    assert result.version_source == "explicit"
+    assert result.version_confidence == "high"
+    assert result.version_inferred is False
+    assert result.docs_url_resolved == "https://pub.dev/documentation/go_router/14.8.1/"
+    assert result.docs_snapshot_exact is True
+
+
+def test_registry_backfills_identity_for_existing_rows(tmp_path, monkeypatch):
+    service = _service(tmp_path, monkeypatch)
+    now = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    service.registry.upsert(
+        library="go_router",
+        ecosystem="pub",
+        version="latest",
+        source_type="api",
+        docs_url="https://pub.dev/documentation/go_router/latest/",
+        now=now,
+        status="available",
+    )
+
+    record = service.registry.get("pub:go_router@latest:api")
+
+    assert record is not None
+    assert record.source_id == "pub:go_router:api"
+    assert record.canonical_id == "pub:go_router@latest:api"
+    assert record.requested_version == "latest"
+    assert record.resolved_version == "latest"
+    assert record.docs_url_resolved == "https://pub.dev/documentation/go_router/latest/"
+    assert record.docs_snapshot_exact is False
+
+
+def test_hyphen_alias_resolves_to_underscore_package_record(tmp_path, monkeypatch):
+    service = _service(tmp_path, monkeypatch)
+    service.resolve_library(
+        "go_router",
+        ecosystem="pub",
+        version="14.8.1",
+        docs_url="https://pub.dev/documentation/go_router/14.8.1/",
+    )
+
+    result = service.resolve_library("go-router", ecosystem="pub", version="14.8.1")
+
+    assert result.library_id == "pub:go_router@14.8.1:api"
+    assert result.library == "go_router"
+
+
+def test_docs_url_template_registers_version_url(tmp_path, monkeypatch):
+    service = _service(tmp_path, monkeypatch)
+
+    result = service.resolve_library(
+        "go_router",
+        ecosystem="pub",
+        version="16.2.0",
+        docs_url_template="https://pub.dev/documentation/{library}/{version}/",
+    )
+
+    assert result.library_id == "pub:go_router@16.2.0:api"
+    assert result.docs_url == "https://pub.dev/documentation/go_router/16.2.0/"
+
+
+def test_refresh_multiple_versions_from_template(tmp_path, monkeypatch):
+    agent = FakeAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+
+    result = service.refresh_docs(
+        "go_router",
+        ecosystem="pub",
+        versions=["14.8.1", "15.0.0", "latest"],
+        docs_url_template="https://pub.dev/documentation/{library}/{version}/",
+    )
+
+    assert result.status == "updated"
+    assert agent.add_calls == [
+        "https://pub.dev/documentation/go_router/14.8.1/",
+        "https://pub.dev/documentation/go_router/15.0.0/",
+        "https://pub.dev/documentation/go_router/latest/",
+    ]
+    assert service.registry.get("go_router", "pub", "15.0.0").library_id == "pub:go_router@15.0.0:api"
+
+
+def test_prefetch_docs_delegates_to_batch_refresh(tmp_path, monkeypatch):
+    agent = FakeAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+
+    result = service.prefetch_docs(
+        "go_router",
+        ecosystem="pub",
+        versions=["14.8.1", "latest"],
+        docs_url_template="https://pub.dev/documentation/{library}/{version}/",
+    )
+
+    assert result.status == "updated"
+    assert agent.add_calls == [
+        "https://pub.dev/documentation/go_router/14.8.1/",
+        "https://pub.dev/documentation/go_router/latest/",
+    ]
+
+
+def test_prefetch_docs_defaults_missing_versions_to_latest_with_warning(tmp_path, monkeypatch):
+    agent = FakeAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+
+    result = service.prefetch_docs(
+        "go_router",
+        ecosystem="pub",
+        docs_url_template="https://pub.dev/documentation/{library}/{version}/",
+    )
+
+    assert result.status == "updated"
+    assert "defaulted to latest" in result.message
+    assert agent.add_calls == ["https://pub.dev/documentation/go_router/latest/"]
+
+
+def test_missing_version_falls_back_to_latest_with_warning(tmp_path, monkeypatch):
+    agent = FakeAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+    now = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    service.registry.upsert(
+        library="go_router",
+        ecosystem="pub",
+        version="latest",
+        docs_url="https://pub.dev/documentation/go_router/latest/",
+        now=now,
+        status="available",
+        last_refreshed_at=now,
+    )
+
+    result = service.get_docs("go_router", ecosystem="pub", topic="ShellRoute")
+
+    assert result.library_id == "pub:go_router@latest:api"
+    assert result.version == "latest"
+    assert result.warning == "No version was provided; using latest/default docs."
+
+
+def test_get_docs_ingests_missing_library_with_url(tmp_path, monkeypatch):
+    agent = FakeAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+
+    result = service.get_docs("pytest", topic="parametrize", docs_url="https://docs.pytest.org/")
+
+    assert agent.add_calls == ["https://docs.pytest.org/"]
+    assert result.refreshed is True
+    assert result.results[0].title == "Parametrize"
+
+
+def test_get_docs_unknown_without_url_needs_docs_url(tmp_path, monkeypatch):
+    agent = FakeAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+
+    result = service.get_docs("missing-lib", topic="usage")
+
+    assert result.library_id == ""
+    assert result.results == []
+    assert result.warning == "needs_docs_url"
+    assert result.warnings == ["needs_docs_url"]
+    assert result.status == "needs_input"
+    assert result.decision == "retry_same_tool"
+    assert result.policy["direct_webfetch"] == "discovery_only"
+    assert result.next_actions
+    assert agent.add_calls == []
+
+
+def test_get_docs_uses_registered_docs_url_without_argument(tmp_path, monkeypatch):
+    agent = FakeAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+    service.resolve_library("pytest", docs_url="https://docs.pytest.org/")
+
+    result = service.get_docs("pytest", topic="parametrize")
+
+    assert agent.add_calls == ["https://docs.pytest.org/"]
+    assert result.library_id == "pytest"
+    assert result.warning is None
+    assert "needs_docs_url" not in result.warnings
+
+
+def test_registered_web_docs_without_docs_url_returns_success(tmp_path, monkeypatch):
+    agent = FakeAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+    service.resolve_library("flutter-adaptive-responsive", docs_url="https://pub.dev/documentation/flutter_adaptive_responsive/latest/")
+
+    result = service.get_docs("flutter-adaptive-responsive", topic="breakpoints")
+
+    assert result.status == "success"
+    assert result.tool == "get_library_docs"
+    assert result.schema_version == "2.0-mvp"
+    assert result.decision == "answer_returned"
+    assert result.result is None
+    assert result.library_id == "flutter-adaptive-responsive"
+    assert result.identity["docs_url"] == "https://pub.dev/documentation/flutter_adaptive_responsive/latest/"
+    assert result.identity["docs_url_source"] == "registry"
+    assert result.policy["direct_webfetch"] == "forbidden"
+    assert result.policy["reason_code"] == "registered_source_exists"
+
+
+def test_registered_web_docs_does_not_emit_needs_docs_url(tmp_path, monkeypatch):
+    agent = FakeAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+    service.resolve_library("pytest", docs_url="https://docs.pytest.org/")
+
+    result = service.get_docs("pytest", topic="fixtures")
+
+    warning_codes = [item["code"] for item in result.diagnostics["warnings"]]
+
+    assert "needs_docs_url" not in result.warnings
+    assert "needs_docs_url" not in warning_codes
+
+
+def test_registered_web_docs_uses_registry_docs_url(tmp_path, monkeypatch):
+    agent = FakeAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+    service.resolve_library("pytest", docs_url="https://docs.pytest.org/")
+
+    result = service.get_docs("pytest", topic="fixtures")
+
+    assert agent.add_calls == ["https://docs.pytest.org/"]
+    assert result.request["effective"]["docs_url"] == "https://docs.pytest.org/"
+    assert result.identity["docs_url_source"] == "registry"
+
+
+def test_registered_web_docs_reports_resolver_diagnostics(tmp_path, monkeypatch):
+    agent = FakeAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+    service.resolve_library("pytest", docs_url="https://docs.pytest.org/")
+
+    result = service.get_docs("pytest", topic="fixtures")
+
+    assert result.diagnostics["resolver"] == {
+        "status": "available",
+        "selected_by": "registry",
+        "stored_locator": "https://docs.pytest.org/",
+        "candidate_count": 0,
+    }
+
+
+def test_registered_web_docs_conflicting_input_url_blocks_without_mutation(tmp_path, monkeypatch):
+    agent = FakeAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+    service.resolve_library("pytest", docs_url="https://docs.pytest.org/")
+
+    result = service.get_docs("pytest", topic="fixtures", docs_url="https://example.com/pytest/")
+
+    assert result.status == "needs_input"
+    assert result.decision == "retry_same_tool"
+    assert result.warning == "docs_url_conflict"
+    assert {"code": "docs_url_conflict", "blocking": True} in result.diagnostics["warnings"]
+    assert result.policy["direct_webfetch"] == "forbidden"
+    assert result.identity["docs_url"] == "https://docs.pytest.org/"
+    assert agent.add_calls == []
+    assert service.registry.get("pytest").docs_url == "https://docs.pytest.org/"
+
+
+def test_registered_docs_without_locator_can_accept_input_url(tmp_path, monkeypatch):
+    agent = FakeAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+    service.registry.upsert(
+        library="pytest",
+        ecosystem=None,
+        docs_url=None,
+        now=datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        status="available",
+    )
+
+    result = service.get_docs("pytest", topic="fixtures", docs_url="https://docs.pytest.org/")
+
+    assert result.status == "success"
+    assert agent.add_calls == ["https://docs.pytest.org/"]
+    assert service.registry.get("pytest").docs_url == "https://docs.pytest.org/"
+
+
+def test_success_response_includes_effective_identity(tmp_path, monkeypatch):
+    agent = FakeAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+    service.resolve_library("pytest", version="8.3.4", docs_url="https://docs.pytest.org/")
+
+    result = service.get_docs("pytest", version="8.3.4", topic="fixtures")
+
+    assert result.request["input"]["library"] == "pytest"
+    assert result.request["effective"]["version"] == "8.3.4"
+    assert result.identity["canonical_id"] == "pytest@8.3.4"
+    assert result.identity["library"] == "pytest"
+    assert result.identity["version"] == "8.3.4"
+
+
+def test_success_with_registry_docs_url_has_non_blocking_warning(tmp_path, monkeypatch):
+    agent = FakeAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+    service.resolve_library("pytest", docs_url="https://docs.pytest.org/")
+
+    result = service.get_docs("pytest", topic="fixtures")
+
+    assert {"code": "used_registry_docs_url", "blocking": False} in result.diagnostics["warnings"]
+
+
+def test_ambiguous_versions_return_candidates(tmp_path, monkeypatch):
+    agent = FakeAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+    service.resolve_library("go_router", ecosystem="pub", version="14.8.1", docs_url="https://pub.dev/documentation/go_router/14.8.1/")
+    service.resolve_library("go_router", ecosystem="pub", version="16.2.0", docs_url="https://pub.dev/documentation/go_router/16.2.0/")
+
+    result = service.get_docs("go-router", ecosystem="pub", topic="ShellRoute")
+
+    assert result.status == "ambiguous"
+    assert result.decision == "choose_candidate"
+    assert len(result.candidates) == 2
+    assert {candidate["canonical_id"] for candidate in result.candidates} == {
+        "pub:go_router@14.8.1:api",
+        "pub:go_router@16.2.0:api",
+    }
+    assert result.policy["direct_webfetch"] == "forbidden"
+    assert result.diagnostics["resolver"]["candidate_count"] == 2
+    assert agent.add_calls == []
+
+
+def test_ambiguous_versions_include_retry_patches(tmp_path, monkeypatch):
+    agent = FakeAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+    service.resolve_library("go_router", ecosystem="pub", version="14.8.1", docs_url="https://pub.dev/documentation/go_router/14.8.1/")
+    service.resolve_library("go_router", ecosystem="pub", version="16.2.0", docs_url="https://pub.dev/documentation/go_router/16.2.0/")
+
+    result = service.get_docs("go-router", ecosystem="pub", topic="ShellRoute")
+
+    assert all(candidate["arguments_patch"] for candidate in result.candidates)
+    assert result.candidates[0]["arguments_patch"]["library"].startswith("pub:go_router@")
+
+
+def test_exact_version_with_unversioned_url_is_not_exact(tmp_path, monkeypatch):
+    service = _service(tmp_path, monkeypatch)
+
+    result = service.resolve_library("pytest", version="8.3.4", docs_url="https://docs.pytest.org/")
+
+    assert result.library_id == "pytest@8.3.4"
+    assert result.docs_snapshot_exact is False
+
+
+def test_get_docs_uses_registry_snapshot_metadata(tmp_path, monkeypatch):
+    agent = FakeAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+    service.resolve_library("pytest", version="8.3.4", docs_url="https://docs.pytest.org/")
+
+    result = service.get_docs("pytest", version="8.3.4", topic="parametrize")
+
+    assert result.library_id == "pytest@8.3.4"
+    assert result.requested_version == "8.3.4"
+    assert result.resolved_version == "8.3.4"
+    assert result.version_source == "explicit"
+    assert result.docs_snapshot_exact is False
+
+
+def test_get_docs_uses_project_package_version_when_omitted(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    agent = FakeAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+
+    result = service.get_docs("go_router", ecosystem="pub", topic="ShellRoute", project_path=str(project))
+
+    assert result.library_id == "pub:go_router@14.8.1:api"
+    assert result.version == "14.8.1"
+    assert result.docs_snapshot_exact is True
+    assert result.requested_version == "14.8.1"
+    assert result.version_source == "lockfile_exact"
+    assert result.docs_exactness == "exact_snapshot"
+    assert result.docs_binding_source == "pub_dartdoc"
+    assert result.confidence == "high"
+    assert agent.add_calls == ["https://pub.dev/documentation/go_router/14.8.1/"]
+    record = service.registry.get("pub:go_router@14.8.1:api")
+    assert record is not None
+    assert record.requested_version == "14.8.1"
+    assert record.resolved_version == "14.8.1"
+    assert record.version_source == "lockfile_exact"
+    assert record.version_inferred is True
+
+
+def test_get_docs_uses_rust_project_lockfile_and_docs_rs(tmp_path, monkeypatch):
+    project = _rust_project(tmp_path)
+    agent = FakeAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+
+    result = service.get_docs("serde", ecosystem="rust", topic="Serialize", project_path=str(project))
+
+    assert result.library_id == "rust:serde@1.0.228:api"
+    assert result.version == "1.0.228"
+    assert result.requested_version == "1.0"
+    assert result.resolved_version == "1.0.228"
+    assert result.version_source == "lockfile_exact"
+    assert result.docs_snapshot_exact is True
+    assert result.docs_exactness == "exact_snapshot"
+    assert result.docs_binding_source == "docs_rs"
+    assert result.confidence == "high"
+    assert agent.add_calls == ["https://docs.rs/serde/1.0.228/"]
+
+
+def test_get_docs_explicit_version_overrides_project_version(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    agent = FakeAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+
+    result = service.get_docs(
+        "go_router",
+        ecosystem="pub",
+        version="16.2.0",
+        docs_url_template="https://pub.dev/documentation/{library}/{version}/",
+        topic="ShellRoute",
+        project_path=str(project),
+    )
+
+    assert result.library_id == "pub:go_router@16.2.0:api"
+    assert result.version == "16.2.0"
+    assert agent.add_calls == ["https://pub.dev/documentation/go_router/16.2.0/"]
+
+
+def test_flutter_fvmrc_version_uses_stable_channel_id_not_exact_version(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path, fvmrc='{"flutter": "3.24.5", "channel": "stable"}')
+    agent = FakeAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+
+    result = service.get_docs("flutter-api", topic="Navigator", project_path=str(project))
+
+    assert result.library_id == "flutter:flutter-api@stable:api"
+    assert result.version == "stable"
+    assert result.requested_version == "3.24.5"
+    assert result.docs_snapshot_exact is False
+    assert "not an exact archived snapshot" in result.warning
+    assert agent.add_calls == ["https://api.flutter.dev/"]
+
+
+def test_flutter_main_channel_uses_main_id_and_non_exact_snapshot(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path, fvmrc="main")
+    agent = FakeAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+
+    result = service.get_docs("flutter-api", topic="Navigator", project_path=str(project))
+
+    assert result.library_id == "flutter:flutter-api@main:api"
+    assert result.version == "main"
+    assert result.docs_snapshot_exact is False
+    assert agent.add_calls == ["https://main-api.flutter.dev/"]
+
+
+def test_query_isolation_returns_only_requested_go_router_version(tmp_path, monkeypatch):
+    agent = MixedVersionFakeAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+    now = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    service.registry.upsert(
+        library="go_router",
+        ecosystem="pub",
+        version="14.8.1",
+        docs_url="https://pub.dev/documentation/go_router/14.8.1/",
+        now=now,
+        status="available",
+        last_refreshed_at=now,
+    )
+    service.registry.upsert(
+        library="go_router",
+        ecosystem="pub",
+        version="latest",
+        docs_url="https://pub.dev/documentation/go_router/latest/",
+        now=now,
+        status="available",
+        last_refreshed_at=now,
+    )
+
+    result = service.get_docs("go_router", ecosystem="pub", version="14.8.1", topic="ShellRoute")
+
+    assert [chunk.content for chunk in result.results] == ["ShellRoute behavior from 14.8.1."]
+
+
+def test_query_isolation_returns_only_latest_go_router_version(tmp_path, monkeypatch):
+    agent = MixedVersionFakeAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+    now = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    service.registry.upsert(
+        library="go_router",
+        ecosystem="pub",
+        version="14.8.1",
+        docs_url="https://pub.dev/documentation/go_router/14.8.1/",
+        now=now,
+        status="available",
+        last_refreshed_at=now,
+    )
+    service.registry.upsert(
+        library="go_router",
+        ecosystem="pub",
+        version="latest",
+        docs_url="https://pub.dev/documentation/go_router/latest/",
+        now=now,
+        status="available",
+        last_refreshed_at=now,
+    )
+
+    result = service.get_docs("go_router", ecosystem="pub", version="latest", topic="ShellRoute")
+
+    assert [chunk.content for chunk in result.results] == ["ShellRoute behavior from latest."]
+
+
+def test_query_isolation_between_two_riverpod_versions(tmp_path, monkeypatch):
+    agent = MixedRiverpodFakeAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+    now = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    service.registry.upsert(
+        library="riverpod",
+        ecosystem="pub",
+        version="2.6.1",
+        docs_url="https://pub.dev/documentation/riverpod/2.6.1/",
+        now=now,
+        status="available",
+        last_refreshed_at=now,
+    )
+    service.registry.upsert(
+        library="riverpod",
+        ecosystem="pub",
+        version="3.0.0",
+        docs_url="https://pub.dev/documentation/riverpod/3.0.0/",
+        now=now,
+        status="available",
+        last_refreshed_at=now,
+    )
+
+    result = service.get_docs("riverpod", ecosystem="pub", version="2.6.1", topic="Provider")
+
+    assert [chunk.content for chunk in result.results] == ["Riverpod 2 APIs."]
+
+
+def test_prefetch_project_docs_prefetches_only_selected_packages(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    agent = FakeAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+    monkeypatch.setattr(service, "_discover_pub_dartdoc_target", lambda target, warnings, job_id=None, canonical_id=None: target)
+
+    result = service.prefetch_project_docs(
+        str(project),
+        include_flutter=False,
+        include_packages=["go_router"],
+    )
+
+    assert len(result.results) == 1
+    assert result.results[0].library_id == "pub:go_router@14.8.1:api"
+    assert agent.add_calls == ["https://pub.dev/documentation/go_router/14.8.1/"]
+    assert agent.add_kwargs[0]["doc_format"] == "dartdoc"
+    assert result.detected_ecosystems == ["flutter", "pub"]
+    assert result.resolution_summary["dependencies_seen"] >= 2
+    assert result.resolution_summary["exact_versions"] >= 2
+
+
+def test_prefetch_project_docs_prefetches_rust_docs_rs(tmp_path, monkeypatch):
+    project = _rust_project(tmp_path)
+    agent = FakeAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+
+    result = service.prefetch_project_docs(
+        str(project),
+        include_flutter=False,
+        include_packages=["serde"],
+    )
+
+    assert len(result.results) == 1
+    assert result.results[0].library_id == "rust:serde@1.0.228:api"
+    assert result.results[0].docs_url == "https://docs.rs/serde/1.0.228/"
+    assert agent.add_calls == ["https://docs.rs/serde/1.0.228/"]
+    assert result.detected_ecosystems == ["rust"]
+    assert result.resolution_summary["exact_versions"] == 2
+
+
+def test_prefetch_project_docs_missing_package_returns_warning(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    agent = FakeAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+
+    result = service.prefetch_project_docs(
+        str(project),
+        include_flutter=False,
+        include_packages=["missing_pkg"],
+    )
+
+    assert result.results == []
+    assert "missing_pkg: Package was not found in project lockfiles." in result.warnings
+    assert agent.add_calls == []
+
+
+def test_prefetch_project_docs_async_returns_job_id(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    agent = SlowAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+    monkeypatch.setattr(service, "_discover_pub_dartdoc_target", lambda target, warnings, job_id=None, canonical_id=None: target)
+
+    result = service.prefetch_project_docs(str(project), include_flutter=False, include_packages=["go_router"], async_=True)
+
+    assert result.job_id
+    assert result.status == "running"
+    assert agent.entered.wait(timeout=1)
+    status = service.get_docs_job_status(result.job_id)
+    assert status is not None
+    assert status.kind == "prefetch_project_docs"
+    agent.release.set()
+
+
+def test_fresh_library_does_not_refresh(tmp_path, monkeypatch):
+    agent = FakeAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+    now = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    service.registry.upsert(
+        library="pytest",
+        ecosystem=None,
+        docs_url="https://docs.pytest.org/",
+        now=now,
+        status="available",
+        last_refreshed_at=now,
+    )
+
+    result = service.get_docs("pytest", topic="fixtures")
+
+    assert agent.add_calls == []
+    assert result.refreshed is False
+
+
+def test_stale_library_refreshes_automatically(tmp_path, monkeypatch):
+    agent = FakeAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+    service.registry.upsert(
+        library="pytest",
+        ecosystem=None,
+        docs_url="https://docs.pytest.org/",
+        now=_old_iso(),
+        status="available",
+        last_refreshed_at=_old_iso(),
+    )
+
+    result = service.get_docs("pytest", topic="fixtures")
+
+    assert agent.add_calls == ["https://docs.pytest.org/"]
+    assert result.stale_before_refresh is True
+
+
+def test_force_refresh_refreshes_fresh_library(tmp_path, monkeypatch):
+    agent = FakeAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+    now = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    service.registry.upsert(
+        library="pytest",
+        ecosystem=None,
+        docs_url="https://docs.pytest.org/",
+        now=now,
+        status="available",
+        last_refreshed_at=now,
+    )
+
+    result = service.get_docs("pytest", topic="fixtures", force_refresh=True)
+
+    assert agent.add_calls == ["https://docs.pytest.org/"]
+    assert result.refreshed is True
+
+
+def test_refresh_force_false_skips_fresh_library(tmp_path, monkeypatch):
+    agent = FakeAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+    now = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    service.registry.upsert(
+        library="pytest",
+        ecosystem=None,
+        docs_url="https://docs.pytest.org/",
+        now=now,
+        status="available",
+        last_refreshed_at=now,
+    )
+
+    result = service.refresh_docs("pytest", force=False)
+
+    assert result.status == "skipped"
+    assert agent.add_calls == []
+
+
+def test_force_refresh_is_per_version(tmp_path, monkeypatch):
+    agent = FakeAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+    now = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    service.registry.upsert(
+        library="go_router",
+        ecosystem="pub",
+        version="14.8.1",
+        docs_url="https://pub.dev/documentation/go_router/14.8.1/",
+        now=now,
+        status="available",
+        last_refreshed_at=now,
+    )
+    service.registry.upsert(
+        library="go_router",
+        ecosystem="pub",
+        version="16.2.0",
+        docs_url="https://pub.dev/documentation/go_router/16.2.0/",
+        now=now,
+        status="available",
+        last_refreshed_at=now,
+    )
+
+    result = service.refresh_docs("go_router", ecosystem="pub", version="14.8.1", force=True)
+
+    assert result.status == "updated"
+    assert result.version == "14.8.1"
+    assert agent.add_calls == ["https://pub.dev/documentation/go_router/14.8.1/"]
+
+
+def test_list_marks_stale_libraries(tmp_path, monkeypatch):
+    service = _service(tmp_path, monkeypatch)
+    service.registry.upsert(
+        library="old",
+        ecosystem=None,
+        docs_url="https://old.example.com",
+        now=_old_iso(),
+        status="available",
+        last_refreshed_at=_old_iso(),
+    )
+    now = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    service.registry.upsert(
+        library="fresh",
+        ecosystem=None,
+        docs_url="https://fresh.example.com",
+        now=now,
+        status="available",
+        last_refreshed_at=now,
+    )
+
+    stale = service.list_libraries(stale_only=True)
+
+    assert [item.library_id for item in stale] == ["old"]
+    assert stale[0].stale is True
+
+
+def test_concurrent_get_docs_does_not_duplicate_refresh(tmp_path, monkeypatch):
+    agent = FakeAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+    service.registry.upsert(
+        library="pytest",
+        ecosystem=None,
+        docs_url="https://docs.pytest.org/",
+        now=_old_iso(),
+        status="available",
+        last_refreshed_at=_old_iso(),
+    )
+
+    threads = [
+        Thread(target=lambda: service.get_docs("pytest", topic="fixtures"))
+        for _ in range(2)
+    ]
+    for thread in threads:
+        thread.start()
+    for thread in threads:
+        thread.join()
+
+    assert agent.add_calls == ["https://docs.pytest.org/"]
+
+
+def test_prefetch_docs_batch_partial_failure_continue_true(tmp_path, monkeypatch):
+    agent = FailingAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+
+    result = service.prefetch_docs(
+        "go_router",
+        ecosystem="pub",
+        versions=["14.8.1", "bad-version", "16.2.0"],
+        docs_url_template="https://pub.dev/documentation/{library}/{version}/",
+        continue_on_error=True,
+    )
+
+    assert result.status == "failed"
+    assert "updated=2" in result.message
+    assert "failed=1" in result.message
+    assert agent.add_calls == [
+        "https://pub.dev/documentation/go_router/14.8.1/",
+        "https://pub.dev/documentation/go_router/bad-version/",
+        "https://pub.dev/documentation/go_router/16.2.0/",
+    ]
+
+
+def test_prefetch_docs_batch_aborts_when_continue_false(tmp_path, monkeypatch):
+    agent = FailingAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+
+    result = service.prefetch_docs(
+        "go_router",
+        ecosystem="pub",
+        versions=["14.8.1", "bad-version", "16.2.0"],
+        docs_url_template="https://pub.dev/documentation/{library}/{version}/",
+        continue_on_error=False,
+    )
+
+    assert result.status == "aborted"
+    assert "updated=1" in result.message
+    assert "failed=1" in result.message
+    assert agent.add_calls == [
+        "https://pub.dev/documentation/go_router/14.8.1/",
+        "https://pub.dev/documentation/go_router/bad-version/",
+    ]
+
+
+def test_prefetch_docs_needs_docs_url_aborts_when_continue_false(tmp_path, monkeypatch):
+    agent = FakeAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+
+    result = service.prefetch_docs(
+        "go_router",
+        ecosystem="pub",
+        versions=["14.8.1", "16.2.0"],
+        continue_on_error=False,
+    )
+
+    assert result.status == "aborted"
+    assert "needs_docs_url=1" in result.message
+    assert agent.add_calls == []
+
+
+def test_source_type_is_part_of_canonical_target_identity(tmp_path, monkeypatch):
+    service = _service(tmp_path, monkeypatch)
+
+    api = service.resolve_library(
+        "riverpod",
+        ecosystem="pub",
+        version="latest",
+        source_type="api",
+        docs_url="https://pub.dev/documentation/riverpod/latest/",
+    )
+    guides = service.resolve_library(
+        "riverpod-guides",
+        ecosystem="web",
+        version="latest",
+        source_type="guides",
+        docs_url="https://riverpod.dev/docs/",
+    )
+
+    assert api.library_id == "pub:riverpod@latest:api"
+    assert guides.library_id == "web:riverpod-guides@latest:guides"
+    assert api.library_id != guides.library_id
+
+
+def test_same_library_version_can_have_api_and_guides_targets(tmp_path, monkeypatch):
+    service = _service(tmp_path, monkeypatch)
+
+    api = service.resolve_library(
+        "riverpod",
+        ecosystem="web",
+        version="latest",
+        source_type="api",
+        docs_url="https://pub.dev/documentation/riverpod/latest/",
+    )
+    guides = service.resolve_library(
+        "riverpod",
+        ecosystem="web",
+        version="latest",
+        source_type="guides",
+        docs_url="https://riverpod.dev/docs/",
+    )
+
+    assert api.library_id == "web:riverpod@latest:api"
+    assert guides.library_id == "web:riverpod@latest:guides"
+    assert service.registry.get("riverpod", "web", "latest", "api").docs_url == "https://pub.dev/documentation/riverpod/latest/"
+    assert service.registry.get("riverpod", "web", "latest", "guides").docs_url == "https://riverpod.dev/docs/"
+
+
+def test_concurrent_refresh_different_versions_run_independently(tmp_path, monkeypatch):
+    agent = BlockingAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+
+    def refresh(version: str) -> None:
+        service.refresh_docs(
+            "go_router",
+            ecosystem="pub",
+            version=version,
+            docs_url_template="https://pub.dev/documentation/{library}/{version}/",
+        )
+
+    threads = [Thread(target=refresh, args=(version,)) for version in ("14.8.1", "16.2.0")]
+    for thread in threads:
+        thread.start()
+
+    assert agent.entered.wait(timeout=1)
+    agent.release.set()
+    for thread in threads:
+        thread.join()
+
+    assert sorted(agent.add_calls) == [
+        "https://pub.dev/documentation/go_router/14.8.1/",
+        "https://pub.dev/documentation/go_router/16.2.0/",
+    ]
+
+
+def test_existing_stale_lock_file_does_not_block_refresh(tmp_path, monkeypatch):
+    agent = FakeAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+    info = service.resolve_library("pytest", docs_url="https://docs.pytest.org/")
+    lock = service._lock_for(info.library_id)
+    Path(lock.lock_file).touch()
+
+    result = service.refresh_docs("pytest")
+
+    assert result.status == "updated"
+    assert agent.add_calls == ["https://docs.pytest.org/"]
+
+
+def test_prefetch_docs_targets_mixed_targets(tmp_path, monkeypatch):
+    agent = FakeAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+    monkeypatch.setattr(service, "_discover_pub_dartdoc_target", lambda target, warnings, job_id=None, canonical_id=None: target)
+
+    result = service.prefetch_docs_targets(
+        [
+            {
+                "library": "flutter-api",
+                "ecosystem": "flutter",
+                "version": "stable",
+                "source_type": "api",
+                "docs_url": "https://api.flutter.dev/",
+                "allowed_domains": ["api.flutter.dev"],
+            },
+            {
+                "library": "riverpod-guides",
+                "ecosystem": "web",
+                "version": "latest",
+                "source_type": "guides",
+                "seed_urls": [
+                    "https://riverpod.dev/docs/introduction/getting_started",
+                    "https://riverpod.dev/docs/whats_new",
+                ],
+                "allowed_domains": ["riverpod.dev"],
+                "path_prefixes": ["/docs/"],
+                "warnings": ["Rolling guide docs, not an exact package snapshot."],
+            },
+            {
+                "library": "go_router",
+                "ecosystem": "pub",
+                "version": "latest",
+                "source_type": "api",
+                "docs_url_template": "https://pub.dev/documentation/{library}/{version}/",
+                "allowed_domains": ["pub.dev"],
+            },
+        ],
+        continue_on_error=False,
+    )
+
+    assert result.status == "ok"
+    assert [item.canonical_id for item in result.results] == [
+        "flutter:flutter-api@stable:api",
+        "web:riverpod-guides@latest:guides",
+        "pub:go_router@latest:api",
+    ]
+    assert result.results[1].pages_indexed == 2
+    assert result.results[1].warnings == ["Rolling guide docs, not an exact package snapshot."]
+    assert agent.add_calls == [
+        "https://api.flutter.dev/",
+        "https://riverpod.dev/docs/introduction/getting_started",
+        "https://riverpod.dev/docs/whats_new",
+        "https://pub.dev/documentation/go_router/latest/",
+    ]
+    assert result.pages_indexed == 4
+    assert result.pages_failed == 0
+    assert result.chunks_indexed == 4
+    assert result.targets_completed == 3
+    assert result.targets_failed == 0
+    assert result.duration_ms >= 0
+
+
+def test_prefetch_docs_targets_async_returns_job_id_immediately(tmp_path, monkeypatch):
+    agent = SlowAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+
+    result = service.prefetch_docs_targets(
+        [
+            {
+                "library": "go_router",
+                "ecosystem": "pub",
+                "version": "latest",
+                "docs_url_template": "https://pub.dev/documentation/{library}/{version}/",
+                "allowed_domains": ["pub.dev"],
+            }
+        ],
+        async_=True,
+    )
+
+    assert result.job_id
+    assert result.status == "running"
+    assert result.message == "Started docs prefetch job."
+    assert agent.entered.wait(timeout=1)
+    status = service.get_docs_job_status(result.job_id)
+    assert status is not None
+    assert status.status == "running"
+    agent.release.set()
+
+
+def test_prefetch_docs_targets_passes_doc_format_to_agent(tmp_path, monkeypatch):
+    agent = FakeAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+
+    result = service.prefetch_docs_targets(
+        [
+            {
+                "library": "go_router-api",
+                "ecosystem": "pub",
+                "version": "17.2.3",
+                "source_type": "api",
+                "doc_format": "dartdoc",
+                "seed_urls": [
+                    "https://pub.dev/documentation/go_router/17.2.3/go_router/ShellRoute-class.html"
+                ],
+                "allowed_domains": ["pub.dev"],
+                "path_prefixes": ["/documentation/go_router/17.2.3/"],
+            }
+        ],
+    )
+
+    assert result.status == "ok"
+    assert agent.add_kwargs[0]["doc_format"] == "dartdoc"
+    assert agent.add_kwargs[0]["browser"] is False
+
+
+def test_docs_job_status_changes_to_succeeded_and_tracks_counts(tmp_path, monkeypatch):
+    agent = FakeAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+
+    result = service.prefetch_docs_targets(
+        [
+            {
+                "library": "riverpod-guides",
+                "ecosystem": "web",
+                "version": "latest",
+                "source_type": "guides",
+                "seed_urls": [
+                    "https://riverpod.dev/docs/intro",
+                    "https://riverpod.dev/docs/advanced",
+                ],
+                "allowed_domains": ["riverpod.dev"],
+                "path_prefixes": ["/docs/"],
+            }
+        ],
+        async_=True,
+    )
+
+    for _ in range(50):
+        status = service.get_docs_job_status(result.job_id)
+        if status and status.status == "succeeded":
+            break
+        time.sleep(0.02)
+
+    status = service.get_docs_job_status(result.job_id)
+    assert status is not None
+    assert status.status == "succeeded"
+    assert status.phase == "done"
+    assert status.total_targets == 1
+    assert status.completed_targets == 1
+    assert status.failed_targets == 0
+    assert status.current_target == "web:riverpod-guides@latest:guides"
+    assert status.total_pages == 2
+    assert status.completed_pages == 2
+    assert status.failed_pages == 0
+    assert status.completed_chunks == 2
+    assert status.target_results == [
+        {
+            "canonical_id": "web:riverpod-guides@latest:guides",
+            "status": "ready",
+            "pages_indexed": 2,
+            "message": None,
+        }
+    ]
+
+
+def test_progress_callback_updates_current_url_and_events(tmp_path, monkeypatch):
+    agent = ProgressAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+
+    result = service.prefetch_docs_targets(
+        [
+            {
+                "library": "riverpod-guides",
+                "ecosystem": "web",
+                "version": "latest",
+                "source_type": "guides",
+                "seed_urls": ["https://riverpod.dev/docs/intro"],
+                "allowed_domains": ["riverpod.dev"],
+                "path_prefixes": ["/docs/"],
+            }
+        ],
+        async_=True,
+    )
+
+    for _ in range(50):
+        status = service.get_docs_job_status(result.job_id)
+        if status and status.status == "succeeded":
+            break
+        time.sleep(0.02)
+    status = service.get_docs_job_status(result.job_id)
+    assert status is not None
+    assert status.current_url == "https://riverpod.dev/docs/intro"
+    assert status.fetched_pages == 1
+    assert status.indexed_pages == 1
+    assert any(event.get("phase") == "fetching" for event in status.events)
+
+
+def test_job_events_are_capped_to_last_50(tmp_path, monkeypatch):
+    service = _service(tmp_path, monkeypatch)
+    job = service.jobs.create("prefetch_docs_targets")
+    for index in range(60):
+        service.jobs.append_event(job.job_id, {"phase": "fetching", "message": f"event {index}"})
+    status = service.get_docs_job_status(job.job_id)
+    assert status is not None
+    assert len(status.events) == 50
+    assert status.events[0]["message"] == "event 10"
+
+
+def test_docs_job_failed_page_increments_errors_and_failed_pages(tmp_path, monkeypatch):
+    agent = PageFailingAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+
+    result = service.prefetch_docs_targets(
+        [
+            {
+                "library": "bad-guides",
+                "ecosystem": "web",
+                "source_type": "guides",
+                "seed_urls": ["https://example.com/docs/bad"],
+                "allowed_domains": ["example.com"],
+                "path_prefixes": ["/docs/"],
+            }
+        ],
+        async_=True,
+    )
+
+    for _ in range(50):
+        status = service.get_docs_job_status(result.job_id)
+        if status and status.status == "failed":
+            break
+        time.sleep(0.02)
+
+    status = service.get_docs_job_status(result.job_id)
+    assert status is not None
+    assert status.status == "failed"
+    assert status.failed_targets == 1
+    assert status.failed_pages == 1
+    assert status.finished_at is not None
+    assert any("bad page" in error for error in status.errors)
+
+
+def test_background_indexer_exception_marks_job_failed(tmp_path, monkeypatch):
+    agent = AlwaysFailingAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+
+    result = service.prefetch_docs_targets(
+        [
+            {
+                "library": "explode",
+                "docs_url": "https://example.com/docs/",
+                "allowed_domains": ["example.com"],
+            }
+        ],
+        async_=True,
+    )
+
+    for _ in range(50):
+        status = service.get_docs_job_status(result.job_id)
+        if status and status.status == "failed":
+            break
+        time.sleep(0.02)
+
+    status = service.get_docs_job_status(result.job_id)
+    assert status is not None
+    assert status.status == "failed"
+    assert status.finished_at is not None
+    assert status.phase == "done"
+    assert any("indexer exploded" in error for error in status.errors)
+
+
+def test_cancel_docs_job_cancels_between_targets(tmp_path, monkeypatch):
+    agent = SlowAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+
+    result = service.prefetch_docs_targets(
+        [
+            {
+                "library": "one",
+                "docs_url": "https://example.com/one/",
+                "allowed_domains": ["example.com"],
+            },
+            {
+                "library": "two",
+                "docs_url": "https://example.com/two/",
+                "allowed_domains": ["example.com"],
+            },
+        ],
+        async_=True,
+    )
+
+    assert agent.entered.wait(timeout=1)
+    cancel = service.cancel_docs_job(result.job_id)
+    assert cancel.status == "cancelling"
+    agent.release.set()
+    for _ in range(50):
+        status = service.get_docs_job_status(result.job_id)
+        if status and status.status == "cancelled":
+            break
+        time.sleep(0.02)
+
+    status = service.get_docs_job_status(result.job_id)
+    assert status is not None
+    assert status.status == "cancelled"
+    assert status.finished_at is not None
+    assert any("Cancellation requested" in warning for warning in status.warnings)
+    assert agent.add_calls == ["https://example.com/one/"]
+
+
+def test_cancel_docs_job_before_first_target_starts(tmp_path, monkeypatch):
+    agent = FakeAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+    job = service.jobs.create("prefetch_docs_targets")
+
+    cancel = service.cancel_docs_job(job.job_id)
+    assert cancel.status == "cancelling"
+    result = service._prefetch_docs_targets_sync(
+        [
+            {
+                "library": "one",
+                "docs_url": "https://example.com/one/",
+                "allowed_domains": ["example.com"],
+            }
+        ],
+        job_id=job.job_id,
+    )
+
+    status = service.get_docs_job_status(job.job_id)
+    assert result.status == "aborted"
+    assert status is not None
+    assert status.status == "cancelled"
+    assert status.completed_targets == 0
+    assert status.finished_at is not None
+    assert agent.add_calls == []
+
+
+def test_list_docs_jobs_filters_by_status(tmp_path, monkeypatch):
+    service = _service(tmp_path, monkeypatch)
+    running = service.jobs.create("prefetch_docs_targets")
+    failed = service.jobs.create("prefetch_docs_targets")
+    service.jobs.update(running.job_id, status="running")
+    service.jobs.update(failed.job_id, status="failed")
+
+    jobs = service.list_docs_jobs(status="running", limit=10)
+
+    assert running.job_id in {job.job_id for job in jobs}
+    assert failed.job_id not in {job.job_id for job in jobs}
+
+
+def test_list_docs_jobs_limit_returns_newest_first(tmp_path, monkeypatch):
+    service = _service(tmp_path, monkeypatch)
+    first = service.jobs.create("prefetch_docs_targets")
+    time.sleep(0.01)
+    second = service.jobs.create("prefetch_docs_targets")
+    time.sleep(0.01)
+    third = service.jobs.create("prefetch_docs_targets")
+
+    jobs = service.list_docs_jobs(limit=2)
+
+    assert [job.job_id for job in jobs] == [third.job_id, second.job_id]
+    assert first.job_id not in {job.job_id for job in jobs}
+
+
+def test_invalid_job_id_returns_not_found(tmp_path, monkeypatch):
+    service = _service(tmp_path, monkeypatch)
+
+    assert service.get_docs_job_status("missing") is None
+    cancel = service.cancel_docs_job("missing")
+    assert cancel.status == "not_found"
+
+
+def test_prefetch_docs_targets_docs_url_template_target(tmp_path, monkeypatch):
+    agent = FakeAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+    monkeypatch.setattr(service, "_discover_pub_dartdoc_target", lambda target, warnings, job_id=None, canonical_id=None: target)
+
+    result = service.prefetch_docs_targets(
+        [
+            {
+                "library": "go_router",
+                "ecosystem": "pub",
+                "version": "14.8.1",
+                "docs_url_template": "https://pub.dev/documentation/{library}/{version}/",
+                "allowed_domains": ["pub.dev"],
+            }
+        ]
+    )
+
+    assert result.status == "ok"
+    assert result.results[0].canonical_id == "pub:go_router@14.8.1:api"
+    assert agent.add_calls == ["https://pub.dev/documentation/go_router/14.8.1/"]
+
+
+def test_prefetch_docs_targets_duplicate_canonical_id(tmp_path, monkeypatch):
+    agent = FakeAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+    monkeypatch.setattr(service, "_discover_pub_dartdoc_target", lambda target, warnings, job_id=None, canonical_id=None: target)
+
+    result = service.prefetch_docs_targets(
+        [
+            {
+                "library": "go_router",
+                "ecosystem": "pub",
+                "version": "latest",
+                "docs_url": "https://pub.dev/documentation/go_router/latest/",
+                "allowed_domains": ["pub.dev"],
+            },
+            {
+                "library": "go_router",
+                "ecosystem": "pub",
+                "version": "latest",
+                "docs_url": "https://pub.dev/documentation/go_router/latest/",
+                "allowed_domains": ["pub.dev"],
+            },
+        ]
+    )
+
+    assert result.status == "partial"
+    assert result.results[1].status == "failed"
+    assert result.results[1].message == "duplicate canonical target id"
+    assert agent.add_calls == ["https://pub.dev/documentation/go_router/latest/"]
+
+
+def test_prefetch_docs_targets_invalid_without_url_seed_or_template(tmp_path, monkeypatch):
+    service = _service(tmp_path, monkeypatch)
+
+    result = service.prefetch_docs_targets([{"library": "missing", "ecosystem": "web"}])
+
+    assert result.status == "failed"
+    assert result.results[0].message == "target must provide docs_url, docs_url_template, or seed_urls"
+
+
+def test_prefetch_docs_targets_requires_allowed_domains_for_remote(tmp_path, monkeypatch):
+    service = _service(tmp_path, monkeypatch)
+
+    result = service.prefetch_docs_targets([{"library": "flutter-api", "docs_url": "https://api.flutter.dev/"}])
+
+    assert result.status == "failed"
+    assert result.results[0].message == "allowed_domains is required for remote docs targets"
+
+
+def test_prefetch_docs_targets_rejects_domain_not_allowed(tmp_path, monkeypatch):
+    service = _service(tmp_path, monkeypatch)
+
+    result = service.prefetch_docs_targets(
+        [
+            {
+                "library": "flutter-api",
+                "docs_url": "https://api.flutter.dev/",
+                "allowed_domains": ["docs.flutter.dev"],
+            }
+        ]
+    )
+
+    assert result.status == "failed"
+    assert "not in allowed_domains" in result.results[0].message
+
+
+def test_prefetch_docs_targets_rejects_path_outside_prefix(tmp_path, monkeypatch):
+    service = _service(tmp_path, monkeypatch)
+
+    result = service.prefetch_docs_targets(
+        [
+            {
+                "library": "riverpod-guides",
+                "ecosystem": "web",
+                "source_type": "guides",
+                "seed_urls": ["https://riverpod.dev/blog/release"],
+                "allowed_domains": ["riverpod.dev"],
+                "path_prefixes": ["/docs/"],
+            }
+        ]
+    )
+
+    assert result.status == "failed"
+    assert "outside path_prefixes" in result.results[0].message
+
+
+def test_prefetch_docs_targets_continue_false_aborts(tmp_path, monkeypatch):
+    agent = FakeAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+
+    result = service.prefetch_docs_targets(
+        [
+            {
+                "library": "bad",
+                "docs_url": "https://bad.example.com/",
+                "allowed_domains": ["other.example.com"],
+            },
+            {
+                "library": "go_router",
+                "ecosystem": "pub",
+                "version": "latest",
+                "docs_url_template": "https://pub.dev/documentation/{library}/{version}/",
+                "allowed_domains": ["pub.dev"],
+            },
+        ],
+        continue_on_error=False,
+    )
+
+    assert result.status == "aborted"
+    assert len(result.results) == 1
+    assert agent.add_calls == []
+
+
+def _write_manifest(path: Path, body: str) -> Path:
+    path.write_text(body, encoding="utf-8")
+    return path
+
+
+def test_validate_docs_manifest_valid_manifest(tmp_path, monkeypatch):
+    service = _service(tmp_path, monkeypatch)
+    manifest = _write_manifest(
+        tmp_path / "docmancer.docs.yaml",
+        """
+version: 1
+targets:
+  - id: flutter-api-stable
+    library: flutter-api
+    ecosystem: flutter
+    version: stable
+    source_type: api
+    docs_url: https://api.flutter.dev/
+    allowed_domains:
+      - api.flutter.dev
+""",
+    )
+
+    result = service.validate_docs_manifest(str(manifest))
+
+    assert result.valid is True
+    assert len(result.targets) == 1
+    assert result.targets[0].library == "flutter-api"
+
+
+def test_validate_docs_manifest_invalid_yaml(tmp_path, monkeypatch):
+    service = _service(tmp_path, monkeypatch)
+    manifest = _write_manifest(tmp_path / "docmancer.docs.yaml", "version: [")
+
+    result = service.validate_docs_manifest(str(manifest))
+
+    assert result.valid is False
+    assert "invalid YAML" in result.errors[0]
+
+
+def test_validate_docs_manifest_requires_allowed_domains(tmp_path, monkeypatch):
+    service = _service(tmp_path, monkeypatch)
+    manifest = _write_manifest(
+        tmp_path / "docmancer.docs.yaml",
+        """
+version: 1
+targets:
+  - id: flutter-api-stable
+    library: flutter-api
+    docs_url: https://api.flutter.dev/
+""",
+    )
+
+    result = service.validate_docs_manifest(str(manifest))
+
+    assert result.valid is False
+    assert "allowed_domains is required" in result.errors[0]
+
+
+def test_validate_docs_manifest_warns_for_pub_package_landing_page(tmp_path, monkeypatch):
+    service = _service(tmp_path, monkeypatch)
+    manifest = _write_manifest(
+        tmp_path / "docmancer.docs.yaml",
+        """
+version: 1
+targets:
+  - id: go-router-package
+    library: go_router
+    ecosystem: pub
+    version: 14.8.1
+    docs_url: https://pub.dev/packages/go_router
+    allowed_domains:
+      - pub.dev
+""",
+    )
+
+    result = service.validate_docs_manifest(str(manifest))
+
+    assert result.valid is True
+    assert result.warnings == [
+        "go_router: Prefer exact pub.dev API docs such as https://pub.dev/documentation/go_router/14.8.1/ over package landing pages."
+    ]
+
+
+def test_prefetch_docs_manifest_resolves_project_version_from_pubspec_lock(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    agent = FakeAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+    monkeypatch.setattr(service, "_discover_pub_dartdoc_target", lambda target, warnings, job_id=None, canonical_id=None: target)
+    manifest = _write_manifest(
+        project / "docmancer.docs.yaml",
+        """
+version: 1
+targets:
+  - id: go-router-project
+    library: go_router
+    ecosystem: pub
+    version: project-version
+    source_type: api
+    project_version:
+      from: pubspec.lock
+      package: go_router
+      fallback: latest
+    docs_url_template: https://pub.dev/documentation/{library}/{version}/
+    allowed_domains:
+      - pub.dev
+""",
+    )
+
+    result = service.prefetch_docs_manifest(str(manifest), project_path=str(project))
+
+    assert result.status == "ok"
+    assert result.results[0].canonical_id == "pub:go_router@14.8.1:api"
+    assert agent.add_calls == ["https://pub.dev/documentation/go_router/14.8.1/"]
+
+
+def test_prefetch_docs_manifest_project_version_falls_back_latest(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    agent = FakeAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+    manifest = _write_manifest(
+        project / "docmancer.docs.yaml",
+        """
+version: 1
+targets:
+  - id: missing-project
+    library: missing_pkg
+    ecosystem: pub
+    version: project-version
+    source_type: api
+    project_version:
+      from: pubspec.lock
+      package: missing_pkg
+      fallback: latest
+    docs_url_template: https://pub.dev/documentation/{library}/{version}/
+    allowed_domains:
+      - pub.dev
+""",
+    )
+
+    result = service.prefetch_docs_manifest(str(manifest), project_path=str(project))
+
+    assert result.status == "ok"
+    assert result.results[0].canonical_id == "pub:missing_pkg@latest:api"
+    assert "missing_pkg: Package was not found" in result.warnings[0]
+
+
+def test_prefetch_docs_manifest_target_selection_by_id(tmp_path, monkeypatch):
+    agent = FakeAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+    monkeypatch.setattr(service, "_discover_pub_dartdoc_target", lambda target, warnings, job_id=None, canonical_id=None: target)
+    manifest = _write_manifest(
+        tmp_path / "docmancer.docs.yaml",
+        """
+version: 1
+targets:
+  - id: flutter-api-stable
+    library: flutter-api
+    ecosystem: flutter
+    version: stable
+    docs_url: https://api.flutter.dev/
+    allowed_domains: [api.flutter.dev]
+  - id: go-router-latest
+    library: go_router
+    ecosystem: pub
+    version: latest
+    docs_url_template: https://pub.dev/documentation/{library}/{version}/
+    allowed_domains: [pub.dev]
+""",
+    )
+
+    result = service.prefetch_docs_manifest(str(manifest), targets=["go-router-latest"])
+
+    assert result.status == "ok"
+    assert [item.canonical_id for item in result.results] == ["pub:go_router@latest:api"]
+    assert agent.add_calls == ["https://pub.dev/documentation/go_router/latest/"]
+
+
+def test_validate_docs_manifest_duplicate_target_ids(tmp_path, monkeypatch):
+    service = _service(tmp_path, monkeypatch)
+    manifest = _write_manifest(
+        tmp_path / "docmancer.docs.yaml",
+        """
+version: 1
+targets:
+  - id: duplicate
+    library: one
+    docs_url: https://one.example.com/
+    allowed_domains: [one.example.com]
+  - id: duplicate
+    library: two
+    docs_url: https://two.example.com/
+    allowed_domains: [two.example.com]
+""",
+    )
+
+    result = service.validate_docs_manifest(str(manifest))
+
+    assert result.valid is False
+    assert "duplicate target id: duplicate" in result.errors
+
+
+def test_validate_docs_manifest_invalid_source_type(tmp_path, monkeypatch):
+    service = _service(tmp_path, monkeypatch)
+    manifest = _write_manifest(
+        tmp_path / "docmancer.docs.yaml",
+        """
+version: 1
+targets:
+  - id: bad-source
+    library: flutter-api
+    source_type: blog
+    docs_url: https://api.flutter.dev/
+    allowed_domains: [api.flutter.dev]
+""",
+    )
+
+    result = service.validate_docs_manifest(str(manifest))
+
+    assert result.valid is False
+    assert "invalid source_type" in result.errors[0]
+
+
+def test_validate_docs_manifest_rejects_path_prefix_escape(tmp_path, monkeypatch):
+    service = _service(tmp_path, monkeypatch)
+    manifest = _write_manifest(
+        tmp_path / "docmancer.docs.yaml",
+        """
+version: 1
+targets:
+  - id: riverpod-guides
+    library: riverpod-guides
+    ecosystem: web
+    version: latest
+    source_type: guides
+    seed_urls:
+      - https://riverpod.dev/blog/release
+    allowed_domains:
+      - riverpod.dev
+    path_prefixes:
+      - /docs/
+""",
+    )
+
+    result = service.validate_docs_manifest(str(manifest))
+
+    assert result.valid is False
+    assert "outside path_prefixes" in result.errors[0]
+
+
+def test_inspect_library_docs_ready_target(tmp_path, monkeypatch):
+    service = _service(tmp_path, monkeypatch)
+    now = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    service.registry.upsert(
+        library="go_router",
+        ecosystem="pub",
+        version="14.8.1",
+        source_type="api",
+        docs_url="https://pub.dev/documentation/go_router/14.8.1/",
+        now=now,
+        status="available",
+        last_refreshed_at=now,
+    )
+
+    result = service.inspect_library_docs("pub:go_router@14.8.1:api")
+
+    assert result.canonical_id == "pub:go_router@14.8.1:api"
+    assert result.source_id == "pub:go_router:api"
+    assert result.status == "available"
+    assert result.library == "go_router"
+    assert result.docs_url_resolved == "https://pub.dev/documentation/go_router/14.8.1/"
+    assert result.docs_snapshot_exact is True
+    assert result.requested_version == "14.8.1"
+    assert result.resolved_version == "14.8.1"
+    assert result.version_source == "explicit"
+    assert result.version_confidence == "high"
+    assert result.version_inferred is False
+    assert result.stale is False
+
+
+def test_remove_library_docs_exact_canonical_id_only(tmp_path, monkeypatch):
+    service = _service(tmp_path, monkeypatch)
+    now = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    service.registry.upsert(
+        library="go_router",
+        ecosystem="pub",
+        version="14.8.1",
+        source_type="api",
+        docs_url="https://pub.dev/documentation/go_router/14.8.1/",
+        now=now,
+        status="available",
+    )
+    service.registry.upsert(
+        library="go_router",
+        ecosystem="pub",
+        version="latest",
+        source_type="api",
+        docs_url="https://pub.dev/documentation/go_router/latest/",
+        now=now,
+        status="available",
+    )
+
+    result = service.remove_library_docs("pub:go_router@14.8.1:api")
+
+    assert result.removed is True
+    assert service.registry.get("pub:go_router@14.8.1:api") is None
+    assert service.registry.get("pub:go_router@latest:api") is not None
+
+
+def test_remove_api_does_not_remove_guides(tmp_path, monkeypatch):
+    service = _service(tmp_path, monkeypatch)
+    now = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    service.registry.upsert(
+        library="riverpod",
+        ecosystem="web",
+        version="latest",
+        source_type="api",
+        docs_url="https://pub.dev/documentation/riverpod/latest/",
+        now=now,
+        status="available",
+    )
+    service.registry.upsert(
+        library="riverpod",
+        ecosystem="web",
+        version="latest",
+        source_type="guides",
+        docs_url="https://riverpod.dev/docs/",
+        now=now,
+        status="available",
+    )
+
+    service.remove_library_docs("web:riverpod@latest:api")
+
+    assert service.registry.get("web:riverpod@latest:api") is None
+    assert service.registry.get("web:riverpod@latest:guides") is not None
+
+
+def test_prune_library_docs_dry_run_removes_nothing(tmp_path, monkeypatch):
+    service = _service(tmp_path, monkeypatch)
+    service.registry.upsert(
+        library="go_router",
+        ecosystem="pub",
+        version="14.8.1",
+        source_type="api",
+        docs_url="https://pub.dev/documentation/go_router/14.8.1/",
+        now=_old_iso(120),
+        status="available",
+        last_refreshed_at=_old_iso(120),
+    )
+
+    result = service.prune_library_docs(library="go_router", older_than_days=90, dry_run=True)
+
+    assert result.would_remove == ["pub:go_router@14.8.1:api"]
+    assert service.registry.get("pub:go_router@14.8.1:api") is not None
+
+
+def test_prune_library_docs_keep_versions_respected(tmp_path, monkeypatch):
+    service = _service(tmp_path, monkeypatch)
+    for version in ["14.8.1", "17.2.3"]:
+        service.registry.upsert(
+            library="go_router",
+            ecosystem="pub",
+            version=version,
+            source_type="api",
+            docs_url=f"https://pub.dev/documentation/go_router/{version}/",
+            now=_old_iso(120),
+            status="available",
+            last_refreshed_at=_old_iso(120),
+        )
+
+    result = service.prune_library_docs(
+        library="go_router",
+        keep_versions=["17.2.3"],
+        older_than_days=90,
+        dry_run=True,
+    )
+
+    assert result.would_remove == ["pub:go_router@14.8.1:api"]
+
+
+def test_prune_library_docs_removes_failed_stale_records(tmp_path, monkeypatch):
+    service = _service(tmp_path, monkeypatch)
+    service.registry.upsert(
+        library="go_router",
+        ecosystem="pub",
+        version="15.0.0",
+        source_type="api",
+        docs_url="https://pub.dev/documentation/go_router/15.0.0/",
+        now=_old_iso(120),
+        status="failed",
+        last_error="404",
+    )
+
+    result = service.prune_library_docs(library="go_router", older_than_days=90, dry_run=False)
+
+    assert result.removed == ["pub:go_router@15.0.0:api"]
+    assert service.registry.get("pub:go_router@15.0.0:api") is None
+
+
+def test_prefetch_docs_targets_rejects_localhost_url(tmp_path, monkeypatch):
+    service = _service(tmp_path, monkeypatch)
+
+    result = service.prefetch_docs_targets(
+        [{"library": "local", "docs_url": "http://localhost:8000", "allowed_domains": ["localhost"]}]
+    )
+
+    assert result.status == "failed"
+    assert result.results[0].message == "localhost URLs are not allowed"
+
+
+def test_prefetch_docs_targets_rejects_private_ip_url(tmp_path, monkeypatch):
+    service = _service(tmp_path, monkeypatch)
+
+    result = service.prefetch_docs_targets(
+        [{"library": "router", "docs_url": "http://192.168.1.1", "allowed_domains": ["192.168.1.1"]}]
+    )
+
+    assert result.status == "failed"
+    assert result.results[0].message == "private network URLs are not allowed"
+
+
+def test_prefetch_docs_targets_rejects_file_url(tmp_path, monkeypatch):
+    service = _service(tmp_path, monkeypatch)
+
+    result = service.prefetch_docs_targets(
+        [{"library": "passwd", "docs_url": "file:///etc/passwd", "allowed_domains": ["etc"]}]
+    )
+
+    assert result.status == "failed"
+    assert result.results[0].message == "unsupported URL scheme: file"
+
+
+def test_prefetch_docs_targets_passes_max_pages_and_browser_false_by_default(tmp_path, monkeypatch):
+    agent = FakeAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+
+    service.prefetch_docs_targets(
+        [
+            {
+                "library": "flutter-api",
+                "docs_url": "https://api.flutter.dev/",
+                "allowed_domains": ["api.flutter.dev"],
+                "max_pages": 12,
+            }
+        ]
+    )
+
+    assert agent.add_kwargs == [{"max_pages": 12, "browser": False}]
+
+
+def test_refresh_record_reuses_all_persisted_seed_urls(tmp_path, monkeypatch):
+    agent = FakeAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+
+    service.prefetch_docs_targets(
+        [
+            {
+                "library": "riverpod-guides",
+                "ecosystem": "web",
+                "version": "latest",
+                "source_type": "guides",
+                "seed_urls": [
+                    "https://riverpod.dev/docs/one",
+                    "https://riverpod.dev/docs/two",
+                ],
+                "allowed_domains": ["riverpod.dev"],
+                "path_prefixes": ["/docs/"],
+            }
+        ]
+    )
+    agent.add_calls.clear()
+    agent.add_kwargs.clear()
+    service.registry.upsert(
+        library="riverpod-guides",
+        ecosystem="web",
+        version="latest",
+        source_type="guides",
+        docs_url="https://riverpod.dev/docs/one",
+        now=_old_iso(),
+        status="available",
+        last_refreshed_at=_old_iso(),
+    )
+
+    result = service.refresh_docs("riverpod-guides", ecosystem="web", version="latest", source_type="guides", force=False)
+
+    assert result.status == "updated"
+    assert agent.add_calls == [
+        "https://riverpod.dev/docs/one",
+        "https://riverpod.dev/docs/two",
+    ]
+    assert agent.add_kwargs == [
+        {"max_pages": 1, "browser": False},
+        {"max_pages": 1, "browser": False},
+    ]
+
+
+def test_remove_library_docs_deletes_physical_index_files(tmp_path, monkeypatch):
+    service = _service(tmp_path, monkeypatch)
+    record = service.registry.upsert(
+        library="go_router",
+        ecosystem="pub",
+        version="14.8.1",
+        source_type="api",
+        docs_url="https://pub.dev/documentation/go_router/14.8.1/",
+        now=datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        status="available",
+    )
+    config = service._index_config_for(record)
+    db_path = Path(config.index.db_path)
+    extracted = Path(config.index.extracted_dir)
+    db_path.parent.mkdir(parents=True, exist_ok=True)
+    db_path.write_text("old index", encoding="utf-8")
+    extracted.mkdir(parents=True, exist_ok=True)
+    (extracted / "chunk.md").write_text("old chunk", encoding="utf-8")
+
+    result = service.remove_library_docs(record.library_id)
+
+    assert result.removed is True
+    assert result.chunks_removed > 0
+    assert not db_path.exists()
+    assert not extracted.exists()
+
+
+def test_legacy_record_migrates_to_new_canonical_id(tmp_path, monkeypatch):
+    service = _service(tmp_path, monkeypatch)
+    now = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    service.registry.upsert(
+        library="go_router",
+        ecosystem=None,
+        version="14.8.1",
+        source_type="api",
+        docs_url="https://pub.dev/documentation/go_router/14.8.1/",
+        now=now,
+        status="available",
+    )
+    assert service.registry.get("go_router@14.8.1") is not None
+
+    result = service.resolve_library("go_router", ecosystem="pub", version="14.8.1")
+
+    assert result.library_id == "pub:go_router@14.8.1:api"
+    assert service.registry.get("pub:go_router@14.8.1:api") is not None
+    legacy = service.registry.get("go_router@14.8.1")
+    assert legacy is not None
+    assert legacy.library_id == "pub:go_router@14.8.1:api"
+    assert legacy.source_id == "pub:go_router:api"
+    assert "go_router@14.8.1" in legacy.legacy_ids
+
+
+def test_prefetch_project_docs_continue_false_aborts_on_missing_package(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    agent = FakeAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+
+    result = service.prefetch_project_docs(
+        str(project),
+        include_flutter=False,
+        include_packages=["missing_pkg", "go_router"],
+        continue_on_error=False,
+    )
+
+    assert result.results == []
+    assert agent.add_calls == []

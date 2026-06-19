@@ -3,7 +3,7 @@
 
 Docmancer compresses documentation context so coding agents spend tokens on code, not on rereading raw docs. It ingests local files, fetches public docs, indexes everything locally with SQLite FTS5, and returns compact context packs with source attribution.
 
-Executable: `/Users/gaurangtorvekar/Documents/coding/personal/kytona_stuff/devrel/docmancer_stuff/docmancer/.venv/bin/docmancer --config /private/var/folders/fj/87wdckpn2j7fhjysk511vt3m0000gn/T/docmancer-live-cli.8UadQL/project/docmancer.yaml`
+Executable: `/home/viadmin/.local/bin/docmancer --config /home/viadmin/StudioProjects/hermes/docmancer/docmancer.yaml`
 
 **All commands below use `docmancer` as shorthand for the full executable path above.**
 

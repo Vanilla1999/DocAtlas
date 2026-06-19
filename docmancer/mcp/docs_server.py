@@ -177,6 +177,18 @@ TOOLS: list[dict[str, Any]] = [
         },
     },
     {
+        "name": "sync_project_docs",
+        "description": "Reconcile project-owned docs index with the current repository discovery snapshot. Removes stale and orphaned indexed project-doc sources, indexes new or changed reviewable docs, and verifies the final index state before reporting counts.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "project_path": {"type": "string"},
+                "with_vectors": {"type": ["boolean", "null"]},
+            },
+            "required": ["project_path"],
+        },
+    },
+    {
         "name": "bootstrap_project_docs",
         "description": "Safely prepare project-owned docs for a repository question. This tool may inspect project docs and ingest/refresh existing reviewable README/docs/wiki/ARCHITECTURE/ADR files, but it never writes repository files and never fetches dependency docs from the network. If repo writes or dependency-doc network fetches are needed, it stops with confirmation_required, next_action, and arguments_patch.",
         "inputSchema": {
@@ -202,6 +214,7 @@ TOOLS: list[dict[str, Any]] = [
                 "module": {"type": ["string", "null"]},
                 "module_path": {"type": ["string", "null"]},
                 "scope": {"type": ["string", "null"], "enum": ["project", "module", "all", None]},
+                "details": {"type": ["boolean", "null"]},
             },
             "required": ["project_path", "query"],
         },
@@ -225,6 +238,7 @@ TOOLS: list[dict[str, Any]] = [
                 "module_path": {"type": ["string", "null"]},
                 "scope": {"type": ["string", "null"], "enum": ["project", "module", "all", None]},
                 "mode": {"type": ["string", "null"], "enum": ["auto", "project-only", "deps-only", "public-docs", None]},
+                "details": {"type": ["boolean", "null"]},
             },
             "required": ["project_path", "question"],
         },

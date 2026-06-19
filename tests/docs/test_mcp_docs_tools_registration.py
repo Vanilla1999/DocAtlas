@@ -83,6 +83,15 @@ def test_mcp_exposes_ingest_project_docs():
     assert "with_vectors" in tool["inputSchema"]["properties"]
 
 
+def test_mcp_exposes_sync_project_docs():
+    tool = next(tool for tool in TOOLS if tool["name"] == "sync_project_docs")
+
+    assert tool["inputSchema"]["required"] == ["project_path"]
+    assert "Reconcile project-owned docs index" in tool["description"]
+    assert "Removes stale and orphaned" in tool["description"]
+    assert "with_vectors" in tool["inputSchema"]["properties"]
+
+
 def test_mcp_exposes_bootstrap_project_docs_with_safe_stops():
     tool = next(tool for tool in TOOLS if tool["name"] == "bootstrap_project_docs")
 
@@ -101,6 +110,7 @@ def test_mcp_exposes_get_project_docs_with_project_scoped_guidance():
     assert "next_action" in tool["description"]
     assert "next_actions" in tool["description"]
     assert tool["inputSchema"]["required"] == ["project_path", "query"]
+    assert "details" in tool["inputSchema"]["properties"]
 
 
 def test_mcp_exposes_get_project_context_with_trust_contract():
@@ -112,6 +122,7 @@ def test_mcp_exposes_get_project_context_with_trust_contract():
     assert tool["inputSchema"]["required"] == ["project_path", "question"]
     assert "mode" in tool["inputSchema"]["properties"]
     assert "libraries" in tool["inputSchema"]["properties"]
+    assert "details" in tool["inputSchema"]["properties"]
 
 
 def test_agent_templates_include_project_docs_discovery_guidance():

@@ -573,7 +573,7 @@ wheels = [
 ]
 
 [[package]]
-name = "docmancer"
+name = "doc-atlas"
 source = { editable = "." }
 dependencies = [
     { name = "beautifulsoup4" },

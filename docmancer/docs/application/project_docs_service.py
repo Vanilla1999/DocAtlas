@@ -19,7 +19,7 @@ from docmancer.docs.domain.project_state import create_project_docs_next_action,
 from docmancer.docs.domain.source_identity import docs_exactness, docs_identity, docs_request
 from docmancer.docs.domain.target_security import host_allowed, is_remote_url, path_allowed, url_security_error
 from docmancer.docs.domain.trust_contract import build_project_context_trust_contract
-from docmancer.docs.models import DocsChunk, DocsInspectResult, DocsJobStartResult, DocsManifestValidationResult, DocsPruneResult, DocsRemoveResult, DocsResult, DocsSourceResolution, DocsTarget, DocsTargetResult, DocsTargetsPrefetchResult, LibraryInfo, ProjectDocsBootstrapResult, ProjectDocsChunk, ProjectDocsIngestResult, ProjectDocsInspectResult, ProjectDocsResult, ProjectMetadata, ProjectPrefetchResult, RefreshResult
+from docmancer.docs.models import DocsChunk, DocsInspectResult, DocsJobStartResult, DocsManifestValidationResult, DocsPruneResult, DocsRemoveResult, DocsResult, DocsSourceResolution, DocsTarget, DocsTargetResult, DocsTargetsPrefetchResult, LibraryInfo, ProjectDocsBootstrapResult, ProjectDocsChunk, ProjectDocsIngestResult, ProjectDocsInspectResult, ProjectDocsResult, ProjectDocsSyncResult, ProjectMetadata, ProjectPrefetchResult, RefreshResult
 from docmancer.docs.registry import LibraryRecord
 from docmancer.docs.resolver import canonical_library_id, normalize_library_name, normalize_version
 from docmancer.docs.dartdoc import discover_pub_dartdoc_seed_urls, is_pub_dartdoc_target, normalize_pub_dartdoc_target, pub_dartdoc_root_url
@@ -253,6 +253,18 @@ class ProjectDocsService:
         candidate_by_abs = {(root / item.path).resolve(): item for item in candidates}
         include = tuple(item.path for item in candidates)
 
+        def _verified_state() -> tuple[list[dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]]]:
+            candidate_sources = [asdict(item) for item in candidates]
+            indexed_sources_all = self._indexed_project_doc_sources(str(root))
+            current, stale, ignored = self._partition_project_doc_state(candidate_sources, indexed_sources_all)
+            verified_by_path = {
+                item.get("path"): item
+                for item in [*current, *stale]
+                if item.get("path")
+            }
+            missing = [item for item in candidate_sources if item.get("path") not in verified_by_path]
+            return current, stale, ignored, missing
+
         def _metadata_for_file(path: Path) -> dict[str, Any]:
             candidate = candidate_by_abs.get(path.resolve())
             result: dict[str, Any] = {
@@ -286,26 +298,125 @@ class ProjectDocsService:
                 metadata_for_file=_metadata_for_file,
             )
         except ValueError as exc:
+            indexed_sources, stale_sources, _ignored_sources, missing_sources = _verified_state()
+            if indexed_sources and not missing_sources and not stale_sources:
+                return ProjectDocsIngestResult(
+                    status="success",
+                    project=metadata,
+                    candidate_count=len(candidates),
+                    indexed_sources=indexed_sources,
+                    missing_sources=[],
+                    skipped_sources=getattr(agent, "last_ingest_skips", []),
+                    sections_indexed=0,
+                    warnings=warnings,
+                    message=f"Verified {len(indexed_sources)} indexed project docs candidate(s); no re-indexing was needed.",
+                )
             return ProjectDocsIngestResult(
                 status="failed",
                 project=metadata,
                 candidate_count=len(candidates),
-                indexed_sources=[],
+                indexed_sources=indexed_sources,
+                missing_sources=missing_sources,
                 skipped_sources=getattr(agent, "last_ingest_skips", []),
                 sections_indexed=0,
                 warnings=[*warnings, str(exc)],
                 message=str(exc),
             )
 
+        indexed_sources, stale_sources, _ignored_sources, missing_sources = _verified_state()
+        status = "success"
+        if missing_sources or stale_sources:
+            status = "partial"
+        message = f"Indexed {len(indexed_sources)} project docs candidate(s). Verified {len(indexed_sources)} indexed project docs candidate(s)."
+        if missing_sources:
+            message += f" Missing {len(missing_sources)} project docs candidate(s) from the index."
+        if stale_sources:
+            message += f" {len(stale_sources)} project docs candidate(s) remain stale after ingest."
         return ProjectDocsIngestResult(
-            status="success",
+            status=status,
             project=metadata,
             candidate_count=len(candidates),
-            indexed_sources=[asdict(item) for item in candidates],
+            indexed_sources=indexed_sources,
+            missing_sources=missing_sources,
             skipped_sources=getattr(agent, "last_ingest_skips", []),
             sections_indexed=sections_indexed,
             warnings=warnings,
-            message=f"Indexed {len(candidates)} project docs candidate(s).",
+            message=message,
+        )
+
+    def sync_project_docs(
+        self,
+        project_path: str,
+        *,
+        with_vectors: bool = True,
+    ) -> ProjectDocsSyncResult:
+        if hasattr(self.facade, "_project_sync_project_docs_impl"):
+            return self.facade._project_sync_project_docs_impl(project_path, with_vectors=with_vectors)
+        root = Path(project_path).expanduser().resolve()
+        metadata = self.read_project_metadata(str(root))
+        warnings = list(metadata.warnings)
+        candidate_sources = [asdict(item) for item in metadata.docs_candidates]
+        if not candidate_sources:
+            return ProjectDocsSyncResult(
+                status="no_project_docs",
+                project=metadata,
+                candidate_count=0,
+                warnings=warnings,
+                message="No project-owned docs candidates were discovered.",
+            )
+
+        before_indexed_all = self._indexed_project_doc_sources(str(root))
+        before_current, before_stale, before_ignored = self._partition_project_doc_state(candidate_sources, before_indexed_all)
+        candidate_paths = {item.get("path") for item in candidate_sources if item.get("path")}
+        current_paths = {item.get("path") for item in before_current if item.get("path")}
+        stale_paths = {item.get("path") for item in before_stale if item.get("path")}
+        new_count = len(candidate_paths - current_paths - stale_paths)
+        changed_count = len(stale_paths)
+        removed_sources: list[dict[str, Any]] = []
+        agent = self._agent_instance()
+        for source in [*before_stale, *before_ignored]:
+            source_name = source.get("source")
+            if not source_name:
+                continue
+            if agent.store.delete_source(str(source_name)):
+                removed_sources.append(source)
+
+        ingest_result = self.ingest_project_docs(str(root), skip_known=True, with_vectors=with_vectors)
+        after_indexed_all = self._indexed_project_doc_sources(str(root))
+        indexed_sources, stale_sources, _ignored_sources = self._partition_project_doc_state(candidate_sources, after_indexed_all)
+        indexed_paths = {item.get("path") for item in [*indexed_sources, *stale_sources] if item.get("path")}
+        missing_sources = [item for item in candidate_sources if item.get("path") not in indexed_paths]
+        status = "success"
+        if missing_sources or stale_sources:
+            status = "partial"
+        if ingest_result.status in {"failed", "no_project_docs"} and not indexed_sources:
+            status = ingest_result.status
+        stale_removed = sum(1 for item in removed_sources if item.get("path") in stale_paths)
+        orphaned_removed = len(removed_sources) - stale_removed
+        message = (
+            f"Synced project docs: current={len(indexed_sources)}, new={new_count}, "
+            f"changed={changed_count}, orphaned_removed={orphaned_removed}, missing={len(missing_sources)}."
+        )
+        if stale_sources:
+            message += f" {len(stale_sources)} project docs remain stale after sync."
+        return ProjectDocsSyncResult(
+            status=status,
+            project=metadata,
+            candidate_count=len(candidate_sources),
+            current_count=len(indexed_sources),
+            new_count=new_count,
+            changed_count=changed_count,
+            orphaned_count=len(before_ignored),
+            orphaned_removed=orphaned_removed,
+            stale_removed=stale_removed,
+            sections_indexed=ingest_result.sections_indexed,
+            indexed_sources=indexed_sources,
+            stale_sources=stale_sources,
+            missing_sources=missing_sources,
+            removed_sources=removed_sources,
+            skipped_sources=ingest_result.skipped_sources,
+            warnings=[*warnings, *ingest_result.warnings],
+            message=message,
         )
 
     def bootstrap_project_docs(self, project_path: str, question: str | None = None) -> ProjectDocsBootstrapResult:
@@ -562,6 +673,22 @@ class ProjectDocsService:
             )
 
         chunks = self.query_project_docs(str(root), query, tokens=tokens, limit=limit, expand=expand, scope=query_scope, module_path=resolved_module_path)
+        current_by_path = {
+            item.get("path"): item
+            for item in indexed_sources
+            if item.get("path")
+        }
+        safe_chunks = []
+        for chunk in chunks:
+            metadata_for_chunk = chunk.metadata or {}
+            chunk_path = metadata_for_chunk.get("project_doc_path") or metadata_for_chunk.get("source_path")
+            current_source = current_by_path.get(chunk_path)
+            if not current_source:
+                continue
+            if metadata_for_chunk.get("project_doc_content_hash") != current_source.get("content_hash"):
+                continue
+            safe_chunks.append(chunk)
+        chunks = safe_chunks
         seen_sources: set[str] = set()
         result_indexed_sources = []
         for chunk in chunks:

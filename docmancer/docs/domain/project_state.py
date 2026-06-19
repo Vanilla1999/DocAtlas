@@ -25,15 +25,18 @@ def partition_project_doc_state(
             })
             continue
         stale_reasons: list[str] = []
+        metadata_drift_reasons: list[str] = []
         if candidate.get("content_hash") != indexed.get("content_hash"):
             stale_reasons.append("content_hash_changed")
         if candidate.get("mtime_ns") != indexed.get("mtime_ns"):
-            stale_reasons.append("mtime_changed")
+            metadata_drift_reasons.append("mtime_changed")
         merged = {**indexed, "candidate": candidate, "stale": bool(stale_reasons)}
+        if metadata_drift_reasons:
+            merged["metadata_drift_reasons"] = metadata_drift_reasons
+            merged["current_mtime_ns"] = candidate.get("mtime_ns")
         if stale_reasons:
             merged["stale_reasons"] = stale_reasons
             merged["current_content_hash"] = candidate.get("content_hash")
-            merged["current_mtime_ns"] = candidate.get("mtime_ns")
             stale.append(merged)
         else:
             current.append(merged)

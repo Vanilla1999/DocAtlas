@@ -347,8 +347,30 @@ class ProjectDocsIngestResult:
     project: ProjectMetadata
     candidate_count: int = 0
     indexed_sources: list[dict[str, Any]] = field(default_factory=list)
+    missing_sources: list[dict[str, Any]] = field(default_factory=list)
     skipped_sources: list[dict[str, Any]] = field(default_factory=list)
     sections_indexed: int = 0
+    warnings: list[str] = field(default_factory=list)
+    message: str | None = None
+
+
+@dataclass(frozen=True)
+class ProjectDocsSyncResult:
+    status: str
+    project: ProjectMetadata
+    candidate_count: int = 0
+    current_count: int = 0
+    new_count: int = 0
+    changed_count: int = 0
+    orphaned_count: int = 0
+    orphaned_removed: int = 0
+    stale_removed: int = 0
+    sections_indexed: int = 0
+    indexed_sources: list[dict[str, Any]] = field(default_factory=list)
+    stale_sources: list[dict[str, Any]] = field(default_factory=list)
+    missing_sources: list[dict[str, Any]] = field(default_factory=list)
+    removed_sources: list[dict[str, Any]] = field(default_factory=list)
+    skipped_sources: list[dict[str, Any]] = field(default_factory=list)
     warnings: list[str] = field(default_factory=list)
     message: str | None = None
 

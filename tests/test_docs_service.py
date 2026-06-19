@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from datetime import datetime, timedelta, timezone
 import json
+import os
 from pathlib import Path
 from threading import Event, Thread
 import time
@@ -14,6 +15,7 @@ from docmancer.core.config import DocmancerConfig
 from docmancer.core.models import RetrievedChunk
 from docmancer.agent import DocmancerAgent
 from docmancer.docs.models import DocsChunk, DocsResult, DocsTarget, ProjectContextResult, SOURCE_CLASS_PROJECT_FILE
+from docmancer.docs.interfaces.mcp.project_tools import handle_project_tool
 from docmancer.docs.registry import LibraryRegistry
 from docmancer.docs.service import DocsJobTracker, LibraryDocsService
 
@@ -326,6 +328,23 @@ def test_inspect_project_docs_reports_indexed_and_stale_sources(tmp_path, monkey
     assert stale.recommended_next_actions[0]["tool"] == "ingest_project_docs"
 
 
+def test_inspect_project_docs_does_not_mark_mtime_only_change_stale(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    readme = project / "README.md"
+    readme.write_text("# App\n\nStable project docs.", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+    service.ingest_project_docs(str(project), with_vectors=False)
+
+    original = readme.stat().st_mtime_ns
+    os.utime(readme, ns=(original + 10_000_000, original + 10_000_000))
+
+    result = service.inspect_project_docs(str(project))
+
+    assert result.reason_code == "project_docs_ready"
+    assert result.project_docs["stale"] == []
+    assert result.project_docs["indexed"][0]["metadata_drift_reasons"] == ["mtime_changed"]
+
+
 def test_ingest_project_docs_indexes_only_discovered_candidates_with_metadata(tmp_path, monkeypatch):
     project = _flutter_project(tmp_path)
     (project / "README.md").write_text("# App\n\nIntro", encoding="utf-8")
@@ -356,6 +375,21 @@ def test_ingest_project_docs_indexes_only_discovered_candidates_with_metadata(tm
     assert metadata["project_doc_reason"] == "root_readme"
 
 
+def test_ingest_project_docs_reports_missing_candidates_after_verification(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    (project / "README.md").write_text("# App\n\nIntro", encoding="utf-8")
+    (project / "docs").mkdir()
+    (project / "docs" / "bad.md").write_bytes(b"# Bad\n\xff")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+
+    result = service.ingest_project_docs(str(project), with_vectors=False)
+
+    assert result.status == "partial"
+    assert {item["path"] for item in result.indexed_sources} == {"README.md"}
+    assert result.missing_sources[0]["path"] == "docs/bad.md"
+    assert "Missing 1 project docs" in (result.message or "")
+
+
 def test_ingest_project_docs_is_idempotent_with_skip_known(tmp_path, monkeypatch):
     project = _flutter_project(tmp_path)
     (project / "README.md").write_text("# App\n", encoding="utf-8")
@@ -366,13 +400,146 @@ def test_ingest_project_docs_is_idempotent_with_skip_known(tmp_path, monkeypatch
 
     assert first.status == "success"
     assert first.sections_indexed == 1
-    assert second.status == "failed"
+    assert second.status == "success"
     assert second.sections_indexed == 0
+    assert {item["path"] for item in second.indexed_sources} == {"README.md"}
     assert len(second.skipped_sources) == 1
     assert second.skipped_sources[0]["exception_type"] == "SkippedKnownFile"
     with service._agent_instance().store._connect() as conn:
         assert conn.execute("SELECT COUNT(*) FROM sources").fetchone()[0] == 1
         assert conn.execute("SELECT COUNT(*) FROM sections").fetchone()[0] == 1
+
+
+def test_get_project_docs_never_returns_deleted_orphaned_file_content(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    (project / "README.md").write_text("# App\n\nCurrent docs.", encoding="utf-8")
+    (project / "docs").mkdir()
+    deleted = project / "docs" / "old.md"
+    deleted.write_text("# Old\n\nOldNeedle should not be returned.", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+    service.ingest_project_docs(str(project), with_vectors=False)
+    deleted.unlink()
+
+    result = service.get_project_docs(str(project), "OldNeedle", tokens=1200, limit=5)
+
+    assert result.answer_available is False
+    assert result.results == []
+    assert result.ignored_sources[0]["path"] == "docs/old.md"
+    assert "OldNeedle" not in json.dumps([item.content for item in result.results])
+
+
+def test_get_project_docs_never_returns_hash_mismatched_stale_content(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    readme = project / "README.md"
+    readme.write_text("# App\n\nOriginalNeedle should not be returned after edits.", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+    service.ingest_project_docs(str(project), with_vectors=False)
+    readme.write_text("# App\n\nCurrent docs without the old needle.", encoding="utf-8")
+
+    result = service.get_project_docs(str(project), "OriginalNeedle", tokens=1200, limit=5)
+
+    assert result.answer_available is False
+    assert result.results == []
+    assert result.stale_sources[0]["path"] == "README.md"
+    assert result.stale_sources[0]["stale_reasons"] == ["content_hash_changed"]
+
+
+def test_get_project_context_never_returns_deleted_orphaned_file_content(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    (project / "README.md").write_text("# App\n\nCurrent docs.", encoding="utf-8")
+    (project / "docs").mkdir()
+    deleted = project / "docs" / "old.md"
+    deleted.write_text("# Old\n\nOldContextNeedle should not be returned.", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+    service.ingest_project_docs(str(project), with_vectors=False)
+    deleted.unlink()
+
+    result = service.get_project_context(str(project), "OldContextNeedle", tokens=1200, limit=5)
+
+    assert result.answer_available is False
+    assert result.context_pack == []
+    assert "OldContextNeedle" not in json.dumps(result.trust_contract)
+
+
+def test_sync_project_docs_prunes_orphaned_sources_and_indexes_new_docs(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    (project / "README.md").write_text("# App\n\nCurrent docs.", encoding="utf-8")
+    (project / "docs").mkdir()
+    old = project / "docs" / "old.md"
+    old.write_text("# Old\n\nOldSyncNeedle should be pruned.", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+    service.ingest_project_docs(str(project), with_vectors=False)
+    old.unlink()
+    (project / "docs" / "new.md").write_text("# New\n\nNewSyncNeedle should be indexed.", encoding="utf-8")
+
+    result = service.sync_project_docs(str(project), with_vectors=False)
+
+    assert result.status == "success"
+    assert result.new_count == 1
+    assert result.orphaned_count == 1
+    assert result.orphaned_removed == 1
+    assert {item["path"] for item in result.indexed_sources} == {"README.md", "docs/new.md"}
+    assert result.missing_sources == []
+    assert {item["path"] for item in result.removed_sources} == {"docs/old.md"}
+
+    old_query = service.get_project_docs(str(project), "OldSyncNeedle", tokens=1200, limit=5)
+    new_query = service.get_project_docs(str(project), "NewSyncNeedle", tokens=1200, limit=5)
+
+    assert old_query.results == []
+    assert new_query.answer_available is True
+    assert "NewSyncNeedle" in new_query.results[0].content
+
+
+def test_sync_project_docs_reindexes_changed_sources_and_removes_stale_index(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    readme = project / "README.md"
+    readme.write_text("# App\n\nOldChangedNeedle should disappear.", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+    service.ingest_project_docs(str(project), with_vectors=False)
+    readme.write_text("# App\n\nNewChangedNeedle should appear.", encoding="utf-8")
+
+    result = service.sync_project_docs(str(project), with_vectors=False)
+
+    assert result.status == "success"
+    assert result.changed_count == 1
+    assert result.stale_removed == 1
+    assert result.orphaned_removed == 0
+    assert result.stale_sources == []
+
+    old_query = service.get_project_docs(str(project), "OldChangedNeedle", tokens=1200, limit=5)
+    new_query = service.get_project_docs(str(project), "NewChangedNeedle", tokens=1200, limit=5)
+
+    assert old_query.results == []
+    assert new_query.answer_available is True
+    assert "NewChangedNeedle" in new_query.results[0].content
+
+
+def test_mcp_get_project_docs_returns_compact_response_unless_details_requested(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    (project / "README.md").write_text("# App\n\nCompactNeedle project docs.", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+    service.ingest_project_docs(str(project), with_vectors=False)
+
+    compact = handle_project_tool(
+        "get_project_docs",
+        {"project_path": str(project), "query": "CompactNeedle", "tokens": 1200, "limit": 5},
+        service,
+    )
+    detailed = handle_project_tool(
+        "get_project_docs",
+        {"project_path": str(project), "query": "CompactNeedle", "tokens": 1200, "limit": 5, "details": True},
+        service,
+    )
+
+    assert compact is not None
+    assert detailed is not None
+    assert compact["answer_available"] is True
+    assert compact["source_summary"] == {"candidates": 1, "indexed": 1, "stale": 0, "ignored": 0}
+    assert "CompactNeedle project docs." in compact["results"][0]["content"]
+    assert "candidate_sources" not in compact
+    assert "source_state_guidance" not in compact
+    assert "candidate_sources" in detailed
+    assert "source_state_guidance" in detailed
 
 
 def test_ingest_project_docs_no_candidates_returns_no_project_docs(tmp_path, monkeypatch):
