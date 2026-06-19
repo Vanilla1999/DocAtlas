@@ -1,7 +1,7 @@
 <!-- docmancer:start -->
-# docmancer
+# DocAtlas / docmancer
 
-Docmancer compresses documentation context so coding agents spend tokens on code, not on rereading raw docs. It ingests local files, fetches public docs, indexes everything locally with SQLite FTS5, and returns compact context packs with source attribution, via MCP tools.
+DocAtlas compresses documentation context so coding agents spend tokens on code, not on rereading raw docs. It ingests local files, fetches public docs, indexes everything locally with SQLite FTS5, and returns compact context packs with source attribution, via MCP tools. The Python package is still named `docmancer` for compatibility.
 
 MCP tools are available under the `docmancer-docs` server and the `docmancer-*` prefix in opencode.
 
@@ -12,6 +12,8 @@ Use docmancer when the user asks about library docs, API references, vendor docs
 1. **`inspect_project_docs(project_path)`** — read‑only discovery; returns `reason_code`, `next_action`, `source_summary`.
 2. **`sync_project_docs(project_path, with_vectors=true)`** — reconcile index with filesystem: prune orphans, reindex changed, index new. Canonical lifecycle action.
 3. **`get_project_context(project_path, question)`** — compact context pack with Trust Contract and source attribution.
+
+Read `answer_outline.recommended_reading_order` when present. Prefer `trust_contract.selected_sources` or compatibility alias `trust_contract.selected` for citations. Context items expose both flat fields (`path`, `title`, `heading_path`, `freshness`) and nested fields (`source.path`, `source.title`, `section.heading_path`). Treat `CHANGELOG.md` as release-history evidence unless the user asks about changes/releases.
 
 Or use the higher‑level shortcut:
 
@@ -80,14 +82,14 @@ All project‑docs tools return compact JSON by default. Pass `details: true` fo
 ## CLI (fallback when MCP tools are unavailable)
 
 ```bash
-docmancer list
-docmancer query "question"
-docmancer ingest ./docs
-docmancer add https://docs.example.com
-docmancer doctor
+doc-atlas list
+doc-atlas query "question"
+doc-atlas ingest ./docs
+doc-atlas add https://docs.example.com
+doc-atlas doctor
 ```
 
-`docmancer query` prints token savings and agentic runway. Use `--expand` for adjacent sections.
+`doc-atlas query` prints token savings and agentic runway. Use `--expand` for adjacent sections.
 
 Always query docmancer before relying on model memory or latest‑only hosted docs when documentation context is relevant.
 <!-- docmancer:end -->

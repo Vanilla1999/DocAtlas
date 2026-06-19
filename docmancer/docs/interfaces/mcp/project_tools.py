@@ -65,9 +65,11 @@ def _compact_project_context(result: dict[str, Any]) -> dict[str, Any]:
         "reason": result.get("reason"),
         "message": result.get("message"),
         "context_pack": result.get("context_pack") or [],
+        "answer_outline": result.get("answer_outline") or {},
         "trust_contract": result.get("trust_contract") or {},
         "next_actions": result.get("next_actions") or [],
         "metrics": result.get("metrics") or {},
+        "diagnostics": result.get("diagnostics") or {},
         "warnings": result.get("warnings") or [],
     }
     project_docs = result.get("project_docs") or {}

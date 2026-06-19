@@ -20,6 +20,11 @@ def test_trust_contract_selects_project_sources_and_forbids_webfetch():
 
     assert contract["schema_version"] == "trust-contract-1.0-mvp"
     assert contract["selected_sources"] == contract["trusted_sources"]
+    assert contract["selected"] == contract["selected_sources"]
+    assert contract["trusted"] == contract["trusted_sources"]
+    assert contract["rejected"] == contract["rejected_sources"]
+    assert contract["risky"] == contract["risky_sources"]
+    assert contract["rejected_or_risky"] == contract["rejected_or_risky_sources"]
     assert contract["selected_sources"][0]["source_class"] == "project_file"
     assert contract["policy"] == {"direct_webfetch": "forbidden", "reason_code": "trusted_context_available"}
 

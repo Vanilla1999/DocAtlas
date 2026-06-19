@@ -1,16 +1,16 @@
-# Docmancer MCP docs server
+# DocAtlas MCP docs server
 
-Docmancer exposes its documentation runtime through a Context7-style MCP server:
+DocAtlas exposes its documentation runtime through a Context7-style MCP server:
 
 ```bash
-docmancer mcp docs-serve
+doc-atlas mcp docs-serve
 ```
 
 Use this server when a coding agent needs local, source-grounded documentation context instead of relying on model memory, latest-only hosted docs, or repeated `WebFetch` calls.
 
 ## What the MCP server covers
 
-Docmancer's MCP docs server has three main lanes:
+DocAtlas's MCP docs server has three main lanes:
 
 1. **Library docs** — resolve, fetch, refresh, prefetch, inspect, and query public or registered documentation sources.
 2. **Project-owned docs** — discover, reconcile, stale-check, prune orphaned indexed entries, and query reviewable repository docs such as `README.md`, `docs/`, `wiki/`, `ARCHITECTURE.md`, ADRs, runbooks, roadmap files, and module/package docs in monorepos.
@@ -39,7 +39,7 @@ backwards compatibility.
 {
   "mcpServers": {
     "docmancer-docs": {
-      "command": "docmancer",
+      "command": "doc-atlas",
       "args": ["mcp", "docs-serve"]
     }
   }
@@ -244,7 +244,14 @@ Compact `get_project_context` response:
   "answer_available": true,
   "mode": "auto",
   "context_pack": [ ... ],
+  "answer_outline": {
+    "query_intent": "architecture",
+    "recommended_reading_order": [ ... ],
+    "coverage": { ... },
+    "warnings": []
+  },
   "trust_contract": {
+    "selected_sources": [ ... ],
     "selected": [ ... ],
     "rejected": [ ... ],
     "risky": [ ... ]
@@ -301,6 +308,11 @@ Current project-docs `reason_code` values:
 
 ## Safety rules for agents
 
+- Read `answer_outline.recommended_reading_order` when present; it is non-LLM guidance derived from selected sources.
+- Read `trust_contract.selected_sources` or the compatibility alias `trust_contract.selected` before citing sources.
+- For each context item, use either flat fields (`path`, `title`, `heading_path`, `freshness`) or nested fields (`source.path`, `source.title`, `section.heading_path`).
+- Treat `CHANGELOG.md` as release-history evidence unless the user asks about changes, releases, migrations, or version history.
+- Distinguish the Docs MCP server (`doc-atlas mcp docs-serve`) from the Packs MCP runtime (`doc-atlas mcp serve`).
 - Call `inspect_project_docs` first for repo-specific questions (read-only), unless using `bootstrap_project_docs` or going straight to `sync_project_docs`.
 - `sync_project_docs` is the recommended lifecycle action; it reconciles and prunes in one call.
 - Do not WebFetch project architecture/conventions before trying project-owned docs.

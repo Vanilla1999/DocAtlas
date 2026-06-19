@@ -115,6 +115,11 @@ def build_project_context_trust_contract(
         "rejected_sources": rejected_sources,
         "risky_sources": risky_sources,
         "rejected_or_risky_sources": [*rejected_sources, *risky_sources],
+        "selected": selected_sources,
+        "trusted": selected_sources,
+        "rejected": rejected_sources,
+        "risky": risky_sources,
+        "rejected_or_risky": [*rejected_sources, *risky_sources],
         "warnings": warnings,
         "next_actions": next_actions,
         "policy": {

@@ -1,4 +1,6 @@
-# Contributing to docmancer
+# Contributing to DocAtlas
+
+DocAtlas still uses the internal Python package name `docmancer` in parts of the codebase for compatibility. New user-facing docs should use `DocAtlas` and the `doc-atlas` CLI command.
 
 Thank you for contributing! This guide covers project layout and common extension points.
 

@@ -1,6 +1,6 @@
 <div align="center">
 
-# Docmancer
+# DocAtlas
 
 **Local, offline-first context packs for coding agents — from your own repository docs.**
 
@@ -13,17 +13,30 @@
 
 ---
 
-Docmancer compresses documentation context so coding agents spend tokens on code, not rereading raw docs. It ingests local repository files, fetches public docs, indexes everything offline with SQLite FTS5, and returns compact context packs with source attribution.
+DocAtlas compresses documentation context so coding agents spend tokens on code, not rereading raw docs. It ingests local repository files, fetches public docs, indexes everything offline with SQLite FTS5, and returns compact context packs with source attribution.
 
-The executable is `docmancer` (configured via `docmancer.yaml` in the project root).
+## Naming and compatibility
+
+The product name is **DocAtlas**.
+
+The PyPI package and CLI command are:
+
+```bash
+pipx install doc-atlas
+doc-atlas --help
+```
+
+Some internal Python modules, storage paths, and older documentation may still use the legacy name `docmancer`, for example `docmancer/` or `~/.docmancer/`. Treat those as compatibility/internal names unless this README explicitly says otherwise.
+
+Use `doc-atlas ...` for user-facing commands in new documentation. Configuration files may still be named `docmancer.yaml` for compatibility.
 
 ## Quickstart
 
 ```bash
-docmancer list                        # see indexed docs
-docmancer ingest ./docs               # index local files
-docmancer add https://docs.example.com
-docmancer query "how to authenticate"
+doc-atlas list                        # see indexed docs
+doc-atlas ingest ./docs               # index local files
+doc-atlas add https://docs.example.com
+doc-atlas query "how to authenticate"
 ```
 
 `query` prints estimated raw docs tokens, context-pack tokens, percent saved, and agentic runway:
@@ -37,28 +50,28 @@ Prefer the compact default. Use `--expand` for adjacent sections and `--expand p
 ## Core commands
 
 ```bash
-docmancer setup
-docmancer ingest ./docs
-docmancer add https://docs.example.com
-docmancer update
-docmancer query "how to authenticate"
-docmancer query "how to authenticate" --limit 10
-docmancer query "how to authenticate" --expand
-docmancer query "how to authenticate" --expand page
-docmancer query "how to authenticate" --format json
-docmancer list
-docmancer inspect
-docmancer remove <source>
-docmancer doctor
-docmancer fetch <url> --output <dir>
+doc-atlas setup
+doc-atlas ingest ./docs
+doc-atlas add https://docs.example.com
+doc-atlas update
+doc-atlas query "how to authenticate"
+doc-atlas query "how to authenticate" --limit 10
+doc-atlas query "how to authenticate" --expand
+doc-atlas query "how to authenticate" --expand page
+doc-atlas query "how to authenticate" --format json
+doc-atlas list
+doc-atlas inspect
+doc-atlas remove <source>
+doc-atlas doctor
+doc-atlas fetch <url> --output <dir>
 ```
 
 ## Project-docs MCP server
 
-Docmancer exposes its documentation runtime through a Context7-style MCP server:
+DocAtlas exposes its documentation runtime through a Context7-style MCP server:
 
 ```bash
-docmancer mcp docs-serve
+doc-atlas mcp docs-serve
 ```
 
 Project-docs tools let agents work with the reviewable documentation files that belong to a repository:
@@ -122,7 +135,7 @@ Pass `"details": true` for the full structured response.
 
 ## Project-aware Flutter/Dart docs
 
-Docmancer can inspect a local Flutter/Dart project. It reads `.fvmrc` for Flutter channel/version hints and `pubspec.lock` for pub package versions. This enables exact-version documentation for the dependencies your project actually uses.
+DocAtlas can inspect a local Flutter/Dart project. It reads `.fvmrc` for Flutter channel/version hints and `pubspec.lock` for pub package versions. This enables exact-version documentation for the dependencies your project actually uses.
 
 ## License
 

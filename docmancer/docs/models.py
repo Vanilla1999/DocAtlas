@@ -437,4 +437,6 @@ class ProjectContextResult:
     warnings: list[str] = field(default_factory=list)
     next_actions: list[dict[str, Any]] = field(default_factory=list)
     metrics: dict[str, Any] = field(default_factory=dict)
+    diagnostics: dict[str, Any] = field(default_factory=dict)
+    answer_outline: dict[str, Any] = field(default_factory=dict)
     message: str | None = None
