@@ -166,7 +166,10 @@ TOOLS: list[dict[str, Any]] = [
     },
     {
         "name": "ingest_project_docs",
-        "description": "Legacy low-level index operation for discovered project-owned docs files. Prefer sync_project_docs for normal reconcile flows. This only ingests reviewable local docs candidates such as README, docs/, wiki/, ARCHITECTURE, ADR, and roadmap; it does not prune orphaned entries and does not ingest source code, dependency directories, build outputs, or dependency docs. Call inspect_project_docs first to show candidates and get user confirmation if required.",
+        "description": """Legacy low-level index operation for discovered project-owned docs files. Prefer sync_project_docs for normal reconcile flows.
+This only ingests reviewable local docs candidates such as README, docs/, wiki/, ARCHITECTURE, ADR, and roadmap.
+It does not prune orphaned entries and does not ingest source code, dependency directories, build outputs, or dependency docs.
+Call inspect_project_docs first only when using this legacy tool intentionally.""",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -180,7 +183,8 @@ TOOLS: list[dict[str, Any]] = [
     },
     {
         "name": "sync_project_docs",
-        "description": "Reconcile project-owned docs index with the current repository discovery snapshot. Removes stale and orphaned indexed project-doc sources, indexes new or changed reviewable docs, and verifies the final index state before reporting counts.",
+        "description": """Canonical lifecycle action for project-owned docs.
+Reconcile the project-docs index with the current repository discovery snapshot: remove orphaned/stale indexed docs, index new or changed reviewable docs, and verify the final index state before reporting counts.""",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -193,7 +197,10 @@ TOOLS: list[dict[str, Any]] = [
     },
     {
         "name": "bootstrap_project_docs",
-        "description": "Safely prepare project-owned docs for a repository question. This tool may inspect project docs and ingest/refresh existing reviewable README/docs/wiki/ARCHITECTURE/ADR files, but it never writes repository files and never fetches dependency docs from the network. If repo writes or dependency-doc network fetches are needed, it stops with confirmation_required, next_action, and arguments_patch.",
+        "description": """Safely prepare project-owned docs for a repository question.
+This tool may inspect project docs, run sync_project_docs to reconcile the project-docs index with current reviewable README/docs/wiki/ARCHITECTURE/ADR files, and inspect again.
+It never writes repository files and never fetches dependency docs from the network.
+If repo writes or dependency-doc network fetches are needed, it stops with confirmation_required, next_action, and arguments_patch.""",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -225,7 +232,9 @@ TOOLS: list[dict[str, Any]] = [
     },
     {
         "name": "get_project_context",
-        "description": "Return one repo-grounded context pack for a coding question after inspect_project_docs and any required sync_project_docs step. Combines indexed project-owned docs with one exact dependency docs source when requested/detectable, and always returns a compact Trust Contract with selected, rejected, and risky sources plus next_actions.",
+        "description": """Return one repo-grounded context pack for a coding question after inspect_project_docs, bootstrap_project_docs, or any required sync_project_docs step.
+Combines indexed project-owned docs with exact dependency-doc evidence when requested or detectable, and always returns a compact Trust Contract with selected, rejected, and risky sources plus next_actions.
+Does not use deleted, orphaned, or stale project-doc content by default.""",
         "inputSchema": {
             "type": "object",
             "properties": {

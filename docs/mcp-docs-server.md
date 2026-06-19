@@ -13,10 +13,10 @@ Use this server when a coding agent needs local, source-grounded documentation c
 Docmancer's MCP docs server has three main lanes:
 
 1. **Library docs** — resolve, fetch, refresh, prefetch, inspect, and query public or registered documentation sources.
-2. **Project-owned docs** — discover, reconcile, index, and query reviewable repository docs such as `README.md`, `docs/`, `wiki/`, `ARCHITECTURE.md`, ADRs, runbooks, roadmap files, and module/package docs in monorepos.
+2. **Project-owned docs** — discover, reconcile, stale-check, prune orphaned indexed entries, and query reviewable repository docs such as `README.md`, `docs/`, `wiki/`, `ARCHITECTURE.md`, ADRs, runbooks, roadmap files, and module/package docs in monorepos.
 3. **Dependency docs from project metadata** — read supported manifests/lockfiles and prefetch exact dependency documentation for the versions the project actually uses.
 
-Project-owned docs and dependency docs are intentionally separate. `sync_project_docs` / `ingest_project_docs` index files that already live in the repository. `prefetch_project_docs` / `prefetch_project_dependency_docs` fetch dependency documentation from the network based on manifests or lockfiles.
+Project-owned docs and dependency docs are intentionally separate. `sync_project_docs` reconciles the local index for files that already live in the repository. `ingest_project_docs` remains available as a legacy low-level ingest operation, but new agent instructions should prefer `sync_project_docs`. `prefetch_project_docs` / `prefetch_project_dependency_docs` fetch dependency documentation from the network based on manifests or lockfiles.
 
 Implementation note for maintainers: the public MCP tool names and schemas remain centralized in `docmancer/mcp/docs_server.py`, while tool handling is split by lane under `docmancer/docs/interfaces/mcp/`:
 
@@ -63,12 +63,12 @@ backwards compatibility.
 
 | Tool | Purpose |
 |---|---|
-| `sync_project_docs` | **Canonical lifecycle action.** Discovers, reconciles, prunes orphaned/stale indexed sources, and indexes new/changed project docs in one call. Returns `current_count`, `new_count`, `changed_count`, `orphaned_removed`, `indexed_sources`. Prefer over `ingest_project_docs`. |
-| `inspect_project_docs` | Read-only discovery of local project docs and exact dependency metadata. Call this first for a no-side-effects view. |
-| `ingest_project_docs` | Legacy low-level index operation. Does not reconcile or prune — use `sync_project_docs`. |
-| `bootstrap_project_docs` | Safe high-level onboarding: inspect, sync if needed, inspect again. Stops before repo writes or dependency-docs network fetches. |
-| `get_project_docs` | Query indexed project docs for repo-specific architecture, conventions, runbooks, ADRs, README, roadmap, wiki, or module/package questions. Supports optional `module`, `module_path`, and `scope`; missing, stale, not-indexed, unmatched, or ambiguous docs return structured next actions. |
-| `get_project_context` | Return a compact repo-grounded context pack after sync. Combines project docs with one exact dependency-doc source when requested/detectable; includes a Trust Contract plus `next_actions`. Supports `mode`: `auto`, `project-only`, `deps-only`, or `public-docs`; also supports optional `module`, `module_path`, and `scope` for module-scoped context. |
+| `sync_project_docs` | Canonical lifecycle action. Reconciles the project-docs index with the current repository discovery snapshot: prunes orphaned/stale indexed docs, indexes new or changed reviewable docs, and verifies final state. |
+| `inspect_project_docs` | Read-only discovery of local project docs and exact dependency metadata. Reports reason_code, next_action, stale/ignored/orphaned sources, and compact state. |
+| `ingest_project_docs` | Legacy low-level index operation. Prefer `sync_project_docs` for normal agent flows because ingest does not reconcile orphaned entries. |
+| `bootstrap_project_docs` | Safe high-level onboarding for a repository question: inspect, sync if needed, inspect again. Stops before repo writes or dependency-docs network fetches. |
+| `get_project_docs` | Query indexed current project-owned docs for repo-specific architecture, conventions, runbooks, ADRs, README, roadmap, wiki, or module/package questions. |
+| `get_project_context` | Return a compact repo-grounded context pack after bootstrap/inspect and any required `sync_project_docs` step. Includes a Trust Contract and structured next_actions. |
 
 ## Dependency-docs project tools
 

@@ -31,42 +31,27 @@ No need to call `inspect` first: sync does a full reconcile. Call `inspect` only
 For most agents, the simplest safe flow is:
 
 ```text
-sync_project_docs(project_path, with_vectors=true)
-get_project_context(project_path, question)
-```
-
-For module-specific questions where the exact module path is known:
-
-```text
-sync_project_docs(project_path, with_vectors=true)
-get_project_context(
-  project_path,
-  question,
-  module_path="services/auth",
-  scope="module"
-)
-```
-
-The higher-level bootstrap alternative:
-
-```text
 bootstrap_project_docs(project_path, question?)
 get_project_context(project_path, question)
 ```
 
-`bootstrap_project_docs` is intentionally conservative. It may:
+For explicit lifecycle control, use:
 
-1. inspect project docs;
-2. sync existing reviewable docs if they are found but not indexed or stale;
-3. inspect again and return the current state.
+```text
+inspect_project_docs(project_path)
+sync_project_docs(project_path, with_vectors=true)
+get_project_context(project_path, question)
+```
 
-It will not:
+`sync_project_docs` is the canonical project-docs lifecycle action. It reconciles the local project-docs index with the current filesystem discovery snapshot:
 
-- create or edit repository files;
-- create `ARCHITECTURE.md` automatically;
-- fetch dependency documentation from the network.
+- discovers current reviewable project-doc candidates;
+- removes orphaned indexed docs whose files were deleted or are no longer discovered;
+- removes stale indexed sections for changed files;
+- indexes new and changed reviewable docs;
+- verifies the final indexed state before reporting results.
 
-When those actions are needed, it stops with `status = "confirmation_required"`, a `next_action`, and an `arguments_patch`.
+`ingest_project_docs` is a legacy low-level operation. New agent instructions should prefer `sync_project_docs` because project docs are owned by the repository filesystem, and the index is only a cache of that current state.
 
 ## Explicit low-level flow
 
@@ -82,10 +67,10 @@ Then follow the returned `reason_code`:
 |---|---|---|
 | `project_docs_ready` | Project docs are discovered and current. | Call `get_project_context` or `get_project_docs`. |
 | `project_docs_found_not_indexed` | Reviewable docs exist but are not indexed. | Call `sync_project_docs`. |
-| `project_docs_stale` | Indexed docs changed on disk or orphaned. | Call `sync_project_docs` to reconcile. |
+| `project_docs_stale` | Indexed docs changed on disk, were deleted, or are no longer part of current discovery. | Call `sync_project_docs`. |
 | `no_project_docs` | No reviewable docs were discovered. | Ask before creating a reviewable `ARCHITECTURE.md`. |
 | `architecture_doc_creation_recommended` | Some docs exist, but no high-level overview/architecture doc was found. | Ask before creating `ARCHITECTURE.md`. |
-| `no_project_docs_results` | Indexed docs did not answer the query. | Inspect docs and refine/remediate instead of guessing. |
+| `no_project_docs_results` | Indexed docs did not answer the query. | Inspect docs and reconcile with `sync_project_docs` before guessing. |
 
 After `sync_project_docs`, proceed to:
 
@@ -171,8 +156,9 @@ If approved, the coding agent should:
 
 1. inspect the codebase;
 2. write `ARCHITECTURE.md` as a normal repository file;
-3. call `sync_project_docs(project_path, with_vectors=true)`;
-4. answer future repo-specific questions from `get_project_context` or `get_project_docs`.
+3. call `inspect_project_docs`;
+4. call `sync_project_docs`;
+5. answer future repo-specific questions from `get_project_context` or `get_project_docs`.
 
 Do not store generated architecture only in hidden memory. Official project knowledge should remain a file humans can review and edit.
 
@@ -260,21 +246,29 @@ This file is the canonical map of maintained project-owned documentation.
 
 When an expected nested document is missing from results, first check whether it is linked from root docs or `docs/INDEX.md`, lives under a discovered docs location, or needs a discovery/manifest update. If `inspect_project_docs` reports `indexed_source_not_discovered`, do not assume the indexed file is deleted or invalid: it means the current discovery pass did not select it as a project-doc candidate. Link it from `docs/INDEX.md` or root docs, move it under a discovered docs location, adjust discovery, or run `sync_project_docs` to remove obsolete index entries.
 
-## Post-ingestion verification loop
+## Verification loop
 
-After adding, moving, refreshing, or reorganizing project docs, verify that discovery, indexing, and retrieval agree before relying on answers.
+After adding, moving, deleting, refreshing, or reorganizing project docs, verify that discovery, indexing, and retrieval agree before relying on answers.
 
 Checklist:
 
-1. Run `sync_project_docs(project_path, with_vectors=true)`.
-   - Confirm `current_count`, `new_count`, `changed_count`, `orphaned_removed` look right.
-2. Run `inspect_project_docs(project_path)`.
+1. Run `inspect_project_docs(project_path)`.
    - Confirm the expected files appear in `project_docs.found`.
-   - Check `project_docs.ignored` and `source_state_guidance` before assuming a file is bad or missing.
-3. Ask two or three project-specific smoke-test questions with `get_project_context` or `get_project_docs`.
+   - Check `project_docs.ignored`, `project_docs.stale`, and `source_state_guidance`.
+
+2. If docs are new, changed, stale, orphaned, or missing from the index, run:
+
+   ```text
+   sync_project_docs(project_path, with_vectors=true)
+   ```
+
+3. Run `inspect_project_docs(project_path)` again.
+   - Confirm `reason_code` is `project_docs_ready` or follow the returned `next_action`.
+
+4. Ask two or three project-specific smoke-test questions with `get_project_context` or `get_project_docs`.
    - Use terms that should only appear in the expected docs.
    - Confirm the expected files are cited in `selected_sources`, `indexed_sources`, or result chunks.
-4. If expected files are not cited, fix the source map instead of guessing:
+5. If expected files are not cited, fix the source map instead of guessing:
    - add or correct links in `docs/INDEX.md` or root docs;
    - move maintained docs under `docs/`, `wiki/`, ADR, roadmap, or runbook-style locations;
    - update discovery configuration or `docmancer.docs.yaml` manifest entries if the docs are external dependency/public docs;
@@ -305,7 +299,8 @@ Example: docs exist but are not indexed.
     "tool": "sync_project_docs"
   },
   "arguments_patch": {
-    "project_path": "/path/to/repo"
+    "project_path": "/path/to/repo",
+    "with_vectors": true
   }
 }
 ```

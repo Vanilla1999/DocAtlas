@@ -90,8 +90,8 @@ def test_mcp_exposes_sync_project_docs():
     tool = next(tool for tool in TOOLS if tool["name"] == "sync_project_docs")
 
     assert tool["inputSchema"]["required"] == ["project_path"]
-    assert "Reconcile project-owned docs index" in tool["description"]
-    assert "Removes stale and orphaned" in tool["description"]
+    assert "Canonical lifecycle action" in tool["description"]
+    assert "remove orphaned/stale indexed docs" in tool["description"]
     assert "with_vectors" in tool["inputSchema"]["properties"]
     assert "details" in tool["inputSchema"]["properties"]
 
@@ -158,7 +158,7 @@ def test_project_docs_workflow_documents_index_template_and_verification_loop():
     assert "canonical map of maintained project-owned documentation" in text
     assert "Generated or tooling docs to ignore" in text
     assert "indexed_source_not_discovered" in text
-    assert "## Post-ingestion verification loop" in text
+    assert "## Verification loop" in text
     assert "inspect_project_docs(project_path)" in text
     assert "sync_project_docs(project_path, with_vectors=true)" in text
     assert "Confirm the expected files are cited" in text
