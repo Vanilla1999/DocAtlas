@@ -3346,3 +3346,40 @@ def test_prefetch_project_docs_continue_false_aborts_on_missing_package(tmp_path
 
     assert result.results == []
     assert agent.add_calls == []
+
+
+def test_sync_project_docs_dedup_duplicate_indexed_sources(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    (project / "README.md").write_text("# App\n\nDedupDuplicateNeedle", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+    service.ingest_project_docs(str(project), with_vectors=False)
+    agent = service._agent_instance()
+    row = None
+    with agent.store._connect() as conn:
+        row = conn.execute(
+            "SELECT source, metadata_json, ingested_at FROM sources WHERE json_extract(metadata_json, '$.project_docs') = 1"
+        ).fetchone()
+    assert row is not None
+    dup_source = f"{row['source']}_dup"
+    dup_meta = json.loads(row["metadata_json"])
+    dup_meta["project_doc_path"] = dup_meta.get("project_doc_path")
+    with agent.store._connect() as conn:
+        conn.execute(
+            "INSERT INTO sources (source, docset_root, content, metadata_json, ingested_at) VALUES (?, '', '', ?, ?)",
+            (dup_source, json.dumps(dup_meta), row["ingested_at"]),
+        )
+
+    result = service.sync_project_docs(str(project), with_vectors=False)
+
+    assert result.dedup_removed == 1
+    assert result.status == "success"
+    assert result.current_count == 1
+    with agent.store._connect() as conn:
+        remaining = conn.execute(
+            "SELECT COUNT(*) FROM sources WHERE json_extract(metadata_json, '$.project_docs') = 1"
+        ).fetchone()[0]
+        assert remaining == 1
+
+    query_result = service.get_project_docs(str(project), "DedupDuplicateNeedle", tokens=1200, limit=5)
+    assert query_result.answer_available is True
+    assert "DedupDuplicateNeedle" in query_result.results[0].content

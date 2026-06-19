@@ -1,6 +1,6 @@
 # Project docs MCP workflow
 
-Project docs are the reviewable documentation files that belong to a repository: `README.md`, `docs/`, `wiki/`, `ARCHITECTURE.md`, ADRs, runbooks, roadmap files, module/package docs, and similar files. Docmancer can discover, index, stale-check, and query those files through MCP so coding agents answer from the repo's own docs before falling back to generic public documentation.
+Project docs are the reviewable documentation files that belong to a repository: `README.md`, `docs/`, `wiki/`, `ARCHITECTURE.md`, ADRs, runbooks, roadmap files, module/package docs, and similar files. Docmancer can discover, index, reconcile, and query those files through MCP so coding agents answer from the repo's own docs before falling back to generic public documentation.
 
 ## Use this workflow when
 
@@ -14,19 +14,31 @@ Use project-docs MCP tools when the user asks about:
 - project-owned docs as context for a code change;
 - a Context7-like docs workflow but grounded in the local repository.
 
+## Canonical lifecycle: sync
+
+`sync_project_docs` is the recommended lifecycle action. It replaces the old two-step `inspect → ingest` loop:
+
+1. **discovers** current candidates from the filesystem;
+2. **prunes** orphaned indexed sources (files that no longer exist);
+3. **removes** stale indexed sections (files that changed on disk);
+4. **indexes** new and changed candidates;
+5. **reports** current_count, new_count, changed_count, orphaned_removed, indexed_sources.
+
+No need to call `inspect` first: sync does a full reconcile. Call `inspect` only when you need read-only discovery without side effects.
+
 ## Preferred happy path
 
 For most agents, the simplest safe flow is:
 
 ```text
-bootstrap_project_docs(project_path, question?)
+sync_project_docs(project_path, with_vectors=true)
 get_project_context(project_path, question)
 ```
 
-For module-specific questions where the exact module path is known, keep the same onboarding step and scope the context query:
+For module-specific questions where the exact module path is known:
 
 ```text
-bootstrap_project_docs(project_path, question?)
+sync_project_docs(project_path, with_vectors=true)
 get_project_context(
   project_path,
   question,
@@ -35,12 +47,18 @@ get_project_context(
 )
 ```
 
+The higher-level bootstrap alternative:
+
+```text
+bootstrap_project_docs(project_path, question?)
+get_project_context(project_path, question)
+```
+
 `bootstrap_project_docs` is intentionally conservative. It may:
 
 1. inspect project docs;
-2. ingest existing reviewable docs if they are found but not indexed;
-3. refresh existing indexed docs if they are stale;
-4. inspect again and return the current state.
+2. sync existing reviewable docs if they are found but not indexed or stale;
+3. inspect again and return the current state.
 
 It will not:
 
@@ -52,7 +70,7 @@ When those actions are needed, it stops with `status = "confirmation_required"`,
 
 ## Explicit low-level flow
 
-Agents that need precise control can use the lower-level tools directly:
+Agents that need precise control can use the lower-level tools:
 
 ```text
 inspect_project_docs(project_path)
@@ -63,13 +81,13 @@ Then follow the returned `reason_code`:
 | `reason_code` | What it means | Agent action |
 |---|---|---|
 | `project_docs_ready` | Project docs are discovered and current. | Call `get_project_context` or `get_project_docs`. |
-| `project_docs_found_not_indexed` | Reviewable docs exist but are not indexed. | Call `ingest_project_docs`. |
-| `project_docs_stale` | Indexed docs changed on disk. | Call `ingest_project_docs` to refresh. |
+| `project_docs_found_not_indexed` | Reviewable docs exist but are not indexed. | Call `sync_project_docs`. |
+| `project_docs_stale` | Indexed docs changed on disk or orphaned. | Call `sync_project_docs` to reconcile. |
 | `no_project_docs` | No reviewable docs were discovered. | Ask before creating a reviewable `ARCHITECTURE.md`. |
 | `architecture_doc_creation_recommended` | Some docs exist, but no high-level overview/architecture doc was found. | Ask before creating `ARCHITECTURE.md`. |
 | `no_project_docs_results` | Indexed docs did not answer the query. | Inspect docs and refine/remediate instead of guessing. |
 
-After `ingest_project_docs`, call `inspect_project_docs` again or proceed to:
+After `sync_project_docs`, proceed to:
 
 ```text
 get_project_context(project_path, question)
@@ -77,7 +95,7 @@ get_project_context(project_path, question)
 
 `get_project_context` returns a compact Trust Contract with selected, rejected, and risky sources, plus `next_actions` for missing, stale, non-exact, or unmatched docs. Use `mode` when the agent should constrain sources explicitly: `auto`, `project-only`, `deps-only`, or `public-docs`.
 
-or, for project docs only:
+Or, for project docs only:
 
 ```text
 get_project_docs(project_path, query)
@@ -125,16 +143,7 @@ Prefer `module_path` over `module` when known:
 | `scope="project"` | Restrict retrieval to repo-level docs. |
 | `scope="all"` | Search both repo-level and module docs. |
 
-If the request is vague and multiple modules could match, the agent must ask the user instead of choosing silently:
-
-```text
-I found multiple possible modules:
-1. services/auth
-2. packages/auth-client
-3. apps/web
-
-Which one should I use, or should I search all project docs?
-```
+If the request is vague and multiple modules could match, the agent must ask the user instead of choosing silently.
 
 If the requested module has no maintained docs, do not invent architecture. The agent may search project-level docs if appropriate, or ask before creating reviewable module documentation such as `services/auth/README.md` or `services/auth/ARCHITECTURE.md`.
 
@@ -162,9 +171,8 @@ If approved, the coding agent should:
 
 1. inspect the codebase;
 2. write `ARCHITECTURE.md` as a normal repository file;
-3. call `inspect_project_docs` again;
-4. call `ingest_project_docs`;
-5. answer future repo-specific questions from `get_project_context` or `get_project_docs`.
+3. call `sync_project_docs(project_path, with_vectors=true)`;
+4. answer future repo-specific questions from `get_project_context` or `get_project_docs`.
 
 Do not store generated architecture only in hidden memory. Official project knowledge should remain a file humans can review and edit.
 
@@ -175,10 +183,10 @@ Do not store generated architecture only in hidden memory. Official project know
 Use:
 
 ```text
-ingest_project_docs(project_path)
+sync_project_docs(project_path)
 ```
 
-for repository files such as README/docs/wiki/ADR.
+for repository files such as README/docs/wiki/ADR (discovers, reconciles, and indexes).
 
 Use:
 
@@ -247,10 +255,10 @@ This file is the canonical map of maintained project-owned documentation.
 
 - Add new official docs here when they are created or moved.
 - Remove or mark stale docs when decisions change.
-- After reorganizing docs, run the Docmancer verification loop: inspect, ingest/refresh if needed, then ask smoke-test questions and confirm expected files are cited.
+- After reorganizing docs, run the Docmancer verification loop: sync, then inspect, then ask smoke-test questions and confirm expected files are cited.
 ```
 
-When an expected nested document is missing from results, first check whether it is linked from root docs or `docs/INDEX.md`, lives under a discovered docs location, or needs a discovery/manifest update. If `inspect_project_docs` reports `indexed_source_not_discovered`, do not assume the indexed file is deleted or invalid: it means the current discovery pass did not select it as a project-doc candidate. Link it from `docs/INDEX.md` or root docs, move it under a discovered docs location, adjust discovery, or refresh/remove obsolete index entries.
+When an expected nested document is missing from results, first check whether it is linked from root docs or `docs/INDEX.md`, lives under a discovered docs location, or needs a discovery/manifest update. If `inspect_project_docs` reports `indexed_source_not_discovered`, do not assume the indexed file is deleted or invalid: it means the current discovery pass did not select it as a project-doc candidate. Link it from `docs/INDEX.md` or root docs, move it under a discovered docs location, adjust discovery, or run `sync_project_docs` to remove obsolete index entries.
 
 ## Post-ingestion verification loop
 
@@ -258,20 +266,19 @@ After adding, moving, refreshing, or reorganizing project docs, verify that disc
 
 Checklist:
 
-1. Run `inspect_project_docs(project_path)`.
+1. Run `sync_project_docs(project_path, with_vectors=true)`.
+   - Confirm `current_count`, `new_count`, `changed_count`, `orphaned_removed` look right.
+2. Run `inspect_project_docs(project_path)`.
    - Confirm the expected files appear in `project_docs.found`.
-   - Check `project_docs.ignored`, `project_docs.stale`, and `source_state_guidance` before assuming a file is bad or missing.
-2. If docs are new or stale, run `ingest_project_docs(project_path, skip_known=false, with_vectors=true)`.
-3. Run `inspect_project_docs(project_path)` again.
-   - Confirm `reason_code` is `project_docs_ready` or follow the returned `next_action`.
-4. Ask two or three project-specific smoke-test questions with `get_project_context` or `get_project_docs`.
+   - Check `project_docs.ignored` and `source_state_guidance` before assuming a file is bad or missing.
+3. Ask two or three project-specific smoke-test questions with `get_project_context` or `get_project_docs`.
    - Use terms that should only appear in the expected docs.
    - Confirm the expected files are cited in `selected_sources`, `indexed_sources`, or result chunks.
-5. If expected files are not cited, fix the source map instead of guessing:
+4. If expected files are not cited, fix the source map instead of guessing:
    - add or correct links in `docs/INDEX.md` or root docs;
    - move maintained docs under `docs/`, `wiki/`, ADR, roadmap, or runbook-style locations;
    - update discovery configuration or `docmancer.docs.yaml` manifest entries if the docs are external dependency/public docs;
-   - re-run ingestion/refresh and repeat the smoke test.
+   - re-run sync and repeat the smoke test.
 
 Suggested smoke-test questions:
 
@@ -294,8 +301,8 @@ Example: docs exist but are not indexed.
   "reason_code": "project_docs_found_not_indexed",
   "requires_confirmation": false,
   "next_action": {
-    "type": "ingest_project_docs",
-    "tool": "ingest_project_docs"
+    "type": "sync_project_docs",
+    "tool": "sync_project_docs"
   },
   "arguments_patch": {
     "project_path": "/path/to/repo"
@@ -303,7 +310,26 @@ Example: docs exist but are not indexed.
 }
 ```
 
-The agent should call `ingest_project_docs` with the provided arguments.
+The agent should call `sync_project_docs` with the provided arguments.
+
+Example: stale or orphaned docs.
+
+```json
+{
+  "reason_code": "project_docs_stale",
+  "requires_confirmation": false,
+  "next_action": {
+    "type": "sync_project_docs",
+    "tool": "sync_project_docs"
+  },
+  "arguments_patch": {
+    "project_path": "/path/to/repo",
+    "with_vectors": true
+  }
+}
+```
+
+The agent should call `sync_project_docs` to reconcile.
 
 Example: module name is ambiguous.
 

@@ -364,6 +364,7 @@ class ProjectDocsSyncResult:
     changed_count: int = 0
     orphaned_count: int = 0
     orphaned_removed: int = 0
+    dedup_removed: int = 0
     stale_removed: int = 0
     sections_indexed: int = 0
     indexed_sources: list[dict[str, Any]] = field(default_factory=list)

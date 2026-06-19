@@ -160,7 +160,7 @@ def test_project_docs_workflow_documents_index_template_and_verification_loop():
     assert "indexed_source_not_discovered" in text
     assert "## Post-ingestion verification loop" in text
     assert "inspect_project_docs(project_path)" in text
-    assert "ingest_project_docs(project_path, skip_known=false, with_vectors=true)" in text
+    assert "sync_project_docs(project_path, with_vectors=true)" in text
     assert "Confirm the expected files are cited" in text
     assert "get_project_context(project_path" in text
 
@@ -173,7 +173,7 @@ def test_mcp_docs_server_documents_index_and_smoke_test_loop():
     assert "docs/INDEX.md" in text
     assert "canonical map of official project-owned docs" in text
     assert "inspect_project_docs(project_path)" in text
-    assert "ingest_project_docs(project_path, skip_known=false, with_vectors=true)" in text
+    assert "sync_project_docs(project_path, with_vectors=true)" in text
     assert "confirm expected files appear" in text
     assert "indexed_source_not_discovered" in text
     assert "Treat maintained `docs/INDEX.md` as the canonical map" in text

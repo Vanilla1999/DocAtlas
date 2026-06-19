@@ -135,6 +135,7 @@ def _compact_sync_project_docs(result: dict[str, Any]) -> dict[str, Any]:
             "changed": result.get("changed_count") or 0,
             "orphaned": result.get("orphaned_count") or 0,
             "orphaned_removed": result.get("orphaned_removed") or 0,
+            "dedup_removed": result.get("dedup_removed") or 0,
             "stale_removed": result.get("stale_removed") or 0,
             "missing": len(result.get("missing_sources") or []),
             "sections_indexed": result.get("sections_indexed") or 0,

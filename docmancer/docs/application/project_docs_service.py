@@ -362,6 +362,22 @@ class ProjectDocsService:
         warnings = list(metadata.warnings)
         candidate_sources = [asdict(item) for item in metadata.docs_candidates]
         before_indexed_all = self._indexed_project_doc_sources(str(root))
+        agent = self._agent_instance()
+        dedup_removed = 0
+        path_groups: dict[str, list[dict[str, Any]]] = {}
+        for s in before_indexed_all:
+            p = s.get("path")
+            if p:
+                path_groups.setdefault(p, []).append(s)
+        for p, items in path_groups.items():
+            if len(items) > 1:
+                items.sort(key=lambda x: x.get("ingested_at") or "", reverse=True)
+                for dup in items[1:]:
+                    src = dup.get("source")
+                    if src and agent.store.delete_source(str(src)):
+                        dedup_removed += 1
+        if dedup_removed:
+            before_indexed_all = self._indexed_project_doc_sources(str(root))
         before_current, before_stale, before_ignored = self._partition_project_doc_state(candidate_sources, before_indexed_all)
         candidate_paths = {item.get("path") for item in candidate_sources if item.get("path")}
         current_paths = {item.get("path") for item in before_current if item.get("path")}
@@ -369,7 +385,6 @@ class ProjectDocsService:
         new_count = len(candidate_paths - current_paths - stale_paths)
         changed_count = len(stale_paths)
         removed_sources: list[dict[str, Any]] = []
-        agent = self._agent_instance()
         for source in [*before_stale, *before_ignored]:
             source_name = source.get("source")
             if not source_name:
@@ -397,6 +412,7 @@ class ProjectDocsService:
                 changed_count=0,
                 orphaned_count=len(before_ignored),
                 orphaned_removed=orphaned_removed,
+                dedup_removed=dedup_removed,
                 stale_removed=0,
                 sections_indexed=0,
                 indexed_sources=[],
@@ -435,6 +451,7 @@ class ProjectDocsService:
             changed_count=changed_count,
             orphaned_count=len(before_ignored),
             orphaned_removed=orphaned_removed,
+            dedup_removed=dedup_removed,
             stale_removed=stale_removed,
             sections_indexed=ingest_result.sections_indexed,
             indexed_sources=indexed_sources,
