@@ -15,7 +15,7 @@
 
 Docmancer compresses documentation context so coding agents spend tokens on code, not rereading raw docs. It ingests local repository files, fetches public docs, indexes everything offline with SQLite FTS5, and returns compact context packs with source attribution.
 
-The executable is at `/home/viadmin/.local/bin/docmancer --config /home/viadmin/StudioProjects/hermes/docmancer/docmancer.yaml`.
+The executable is `docmancer` (configured via `docmancer.yaml` in the project root).
 
 ## Quickstart
 
