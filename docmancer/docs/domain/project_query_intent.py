@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 
 
@@ -15,8 +16,31 @@ class ProjectQueryIntent:
     wants_troubleshooting: bool = False
 
 
+PACKS_MCP_PHRASES = [
+    "mcp pack",
+    "mcp packs",
+    "action pack",
+    "action packs",
+    "install pack",
+    "install packs",
+    "install-pack",
+    "install-packs",
+    "api action",
+    "api actions",
+]
+
+
+def _contains_phrase(text: str, phrases: list[str]) -> bool:
+    return any(phrase in text for phrase in phrases)
+
+
+def _contains_word(text: str, words: list[str]) -> bool:
+    return any(re.search(rf"\b{re.escape(word)}\b", text) for word in words)
+
+
 def classify_project_query_intent(question: str) -> ProjectQueryIntent:
-    q = (question or "").lower().replace("-", " ").replace("_", " ")
+    q_raw = (question or "").lower().replace("_", " ")
+    q = q_raw.replace("-", " ")
 
     def has_any(terms: list[str]) -> bool:
         return any(term in q for term in terms)
@@ -28,7 +52,8 @@ def classify_project_query_intent(question: str) -> ProjectQueryIntent:
     explicit_release = has_any(["changelog", "release", "version history", "what changed", "recently changed"])
     wants_troubleshooting = has_any(["error", "bug", "fail", "failed", "why doesn't", "why does not", "not working", "stale", "missing", "diagnose", "doctor", "fix", "troubleshoot"])
     wants_docs_mcp = has_any(["docs mcp", "documentation mcp", "mcp docs", "docs serve", "docs serve", "get project context", "get project docs", "get library docs", "resolve library id", "context7"])
-    wants_packs_mcp = has_any(["pack", "packs", "action pack", "api action", "install pack", "call api"])
+    wants_packs_mcp = _contains_phrase(q, PACKS_MCP_PHRASES) or _contains_phrase(q_raw, PACKS_MCP_PHRASES)
+    wants_packs_mcp = wants_packs_mcp or ("mcp" in q and _contains_word(q, ["packs"]))
     mentions_mcp = "mcp" in q
 
     if explicit_release or (wants_release and not wants_how_to and not wants_architecture):

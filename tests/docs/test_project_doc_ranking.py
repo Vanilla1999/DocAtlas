@@ -1,9 +1,10 @@
 from __future__ import annotations
 
+from collections import Counter
 from dataclasses import dataclass, field
 from typing import Any
 
-from docmancer.docs.domain.project_doc_ranking import rerank_project_doc_chunks
+from docmancer.docs.domain.project_doc_ranking import rerank_project_doc_chunks, source_weight_for_intent, source_weight_reason
 from docmancer.docs.domain.project_query_intent import classify_project_query_intent
 
 
@@ -16,8 +17,8 @@ class FakeChunk:
     metadata: dict[str, Any] = field(default_factory=dict)
 
 
-def fake_chunk(path: str, heading_path: str, score: float) -> FakeChunk:
-    return FakeChunk(path=path, heading_path=heading_path, score=score)
+def fake_chunk(path: str, heading_path: str, score: float, content: str = "content", metadata: dict[str, Any] | None = None) -> FakeChunk:
+    return FakeChunk(path=path, heading_path=heading_path, score=score, content=content, metadata=metadata)
 
 
 def test_changelog_demoted_for_how_ingestion_question():
@@ -110,3 +111,125 @@ def test_ambiguous_mcp_query_includes_docs_and_packs_when_available():
     paths = [chunk.path for chunk in ranked]
     assert "README.md" in paths
     assert "wiki/MCP-Packs.md" in paths
+
+
+def test_ingestion_internals_uses_specific_weight_before_architecture_fallback():
+    intent = classify_project_query_intent("How are documents indexed and retrieved?")
+
+    architecture_indexing_weight = source_weight_for_intent(
+        "wiki/Architecture.md",
+        "Architecture > Indexing",
+        intent,
+    )
+
+    generic_architecture_weight = source_weight_for_intent(
+        "wiki/Architecture.md",
+        "Architecture > General overview",
+        intent,
+    )
+
+    assert architecture_indexing_weight >= generic_architecture_weight
+
+
+def test_ingestion_internals_reason_mentions_indexing_or_retrieval():
+    intent = classify_project_query_intent("How are documents indexed and retrieved?")
+
+    reason = source_weight_reason(
+        "wiki/Architecture.md",
+        "Architecture > Indexing",
+        intent,
+    ).lower()
+
+    assert "index" in reason or "retriev" in reason or "ingestion" in reason
+
+
+def test_broad_query_backfill_preserves_source_diversity_when_enough_sources_exist():
+    intent = classify_project_query_intent("What is the architecture and project structure?")
+
+    chunks = [
+        fake_chunk(path="wiki/Architecture.md", heading_path="A", score=0.99),
+        fake_chunk(path="wiki/Architecture.md", heading_path="B", score=0.98),
+        fake_chunk(path="wiki/Architecture.md", heading_path="C", score=0.97),
+        fake_chunk(path="wiki/Architecture.md", heading_path="D", score=0.96),
+        fake_chunk(path="README.md", heading_path="Overview", score=0.70),
+        fake_chunk(path="CONTRIBUTING.md", heading_path="Project structure", score=0.60),
+        fake_chunk(path="docs/mcp-docs-server.md", heading_path="Docs MCP", score=0.50),
+    ]
+
+    ranked = rerank_project_doc_chunks(
+        chunks,
+        question="What is the architecture and project structure?",
+        intent=intent,
+        limit=6,
+    )
+
+    counts = Counter(c.path for c in ranked)
+    assert counts["wiki/Architecture.md"] <= 2
+
+
+def test_docs_mcp_query_requires_specific_docs_mcp_source_when_available():
+    intent = classify_project_query_intent("How does the docs MCP server work?")
+
+    chunks = [
+        fake_chunk(path="README.md", heading_path="Documentation MCP server", content="doc-atlas mcp docs-serve", score=0.95),
+        fake_chunk(path="wiki/MCP-Packs.md", heading_path="MCP Packs", content="doc-atlas mcp serve", score=0.90),
+        fake_chunk(path="docs/mcp-docs-server.md", heading_path="Docs MCP server", content="get_project_context", score=0.50),
+    ]
+
+    ranked = rerank_project_doc_chunks(
+        chunks,
+        question="How does the docs MCP server work?",
+        intent=intent,
+        limit=3,
+    )
+
+    paths = [c.path for c in ranked]
+    assert "docs/mcp-docs-server.md" in paths
+    assert paths[0] != "wiki/MCP-Packs.md"
+
+
+def test_ambiguous_mcp_query_includes_specific_docs_and_packs_sources():
+    intent = classify_project_query_intent("How does the MCP server work?")
+
+    chunks = [
+        fake_chunk(path="README.md", heading_path="Documentation MCP server", content="doc-atlas mcp docs-serve", score=0.95),
+        fake_chunk(path="docs/mcp-docs-server.md", heading_path="Docs MCP server", content="get_project_context", score=0.60),
+        fake_chunk(path="wiki/MCP-Packs.md", heading_path="MCP Packs", content="doc-atlas mcp serve", score=0.60),
+        fake_chunk(path="CHANGELOG.md", heading_path="Added", content="MCP changes", score=0.99),
+    ]
+
+    ranked = rerank_project_doc_chunks(
+        chunks,
+        question="How does the MCP server work?",
+        intent=intent,
+        limit=4,
+    )
+
+    paths = [c.path for c in ranked]
+    assert "README.md" in paths
+    assert "docs/mcp-docs-server.md" in paths
+    assert "wiki/MCP-Packs.md" in paths
+    assert "CHANGELOG.md" not in paths[:3]
+
+
+def test_ranking_metadata_attached_when_metadata_is_none():
+    intent = classify_project_query_intent("What is the architecture?")
+
+    chunk = fake_chunk(
+        path="README.md",
+        heading_path="Overview",
+        content="overview",
+        score=0.9,
+        metadata=None,
+    )
+
+    ranked = rerank_project_doc_chunks(
+        [chunk],
+        question="What is the architecture?",
+        intent=intent,
+        limit=1,
+    )
+
+    metadata = getattr(ranked[0], "metadata", None)
+    assert isinstance(metadata, dict)
+    assert "project_ranking" in metadata

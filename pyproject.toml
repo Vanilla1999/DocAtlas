@@ -71,3 +71,6 @@ packages = ["docmancer"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
+markers = [
+    "integration: live/integration quality checks runnable with pytest tests/docs/test_project_context_live_quality.py -m integration",
+]
