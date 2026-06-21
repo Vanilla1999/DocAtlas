@@ -12,6 +12,7 @@ from typing import Any, Iterable
 
 from docmancer.core.chunking import chunk_paragraphs
 from docmancer.core.models import Document, RetrievedChunk
+from docmancer.docs.domain.quality import looks_like_code_or_command
 
 
 HEADING_RE = re.compile(r"^(#{1,6})\s+(.+?)\s*$", re.MULTILINE)
@@ -159,6 +160,8 @@ def _code_snippets(text: str, *, limit: int = 3, max_chars: int = 1200) -> list[
 
 
 def _code_like_snippets(text: str, *, max_chars: int = 1200) -> list[dict[str, str]]:
+    if not looks_like_code_or_command(text):
+        return []
     lines = [line.strip() for line in text.splitlines()]
     code_lines: list[str] = []
     for line in lines:

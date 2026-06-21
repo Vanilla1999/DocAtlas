@@ -107,6 +107,7 @@ class DocsResult:
     next_actions: list[str] = field(default_factory=list)
     result: Any = None
     candidates: list[dict[str, Any]] = field(default_factory=list)
+    discovery_candidates: list[dict[str, Any]] = field(default_factory=list)
 
 
 @dataclass(frozen=True)

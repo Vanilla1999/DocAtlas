@@ -42,3 +42,30 @@ items:
     expected_sources:
       - source: README.md
       - source: docs/project-docs-demo.md
+  - id: riverpod_dartdoc_extraction
+    query: How to use Riverpod with Flutter for state management?
+    taxonomy_class: docs_quality_regression
+    expected_behavior: Dartdoc extraction succeeds or returns actionable candidates, not opaque extraction failure.
+  - id: unknown_python_mcp_discovery
+    query: How to create an MCP server with tools and resources in Python?
+    taxonomy_class: docs_quality_regression
+    expected_behavior: Unknown library response includes discovery_candidates and retry next_action.
+  - id: code_symbol_mcp_server
+    query: What are the main Python classes and functions that implement the MCP server?
+    taxonomy_class: docs_quality_regression
+    expected_behavior: Returns concrete files/classes or insufficient_code_symbol_evidence, not generic wiki answer.
+  - id: fastapi_internal_noise
+    query: How to create a FastAPI application with routing and dependency injection?
+    taxonomy_class: docs_quality_regression
+    forbidden_concepts:
+      - "TODO: remove when discarding"
+      - "incorrect type specification"
+  - id: empty_sections_filtered
+    query: How to use httpx AsyncClient?
+    taxonomy_class: docs_quality_regression
+    forbidden_low_value_sections:
+      - Developer Interface
+  - id: compact_output_size
+    query: What is the architecture of this project?
+    taxonomy_class: docs_quality_regression
+    expected_behavior: compact mode omits raw duplicated project_docs.results

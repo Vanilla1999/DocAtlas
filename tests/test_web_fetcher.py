@@ -352,5 +352,5 @@ class TestWebFetcherDartdoc:
 
         with patch("docmancer.connectors.fetchers.web.httpx.Client", return_value=mock_client):
             fetcher = WebFetcher(max_pages=10, browser=False, doc_format="dartdoc", delay=0.0)
-            with pytest.raises(ValueError, match="Dartdoc root/index page had no extractable article content"):
+            with pytest.raises(ValueError, match="Dartdoc extraction found no usable documentation content"):
                 fetcher.fetch("https://pub.dev/documentation/empty/latest")

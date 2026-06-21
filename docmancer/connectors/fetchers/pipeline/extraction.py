@@ -39,11 +39,17 @@ _NOISE_SELECTORS = [
 ]
 
 _DARTDOC_MAIN_SELECTORS = [
-    "#dartdoc-main-content",
     "main",
-    ".main-content",
-    ".content",
     "article",
+    "#content",
+    ".content",
+    "#dartdoc-main-content",
+    ".dartdoc-main-content",
+    "section.desc",
+    "div.desc",
+    "div.documentation",
+    "div.markdown",
+    ".main-content",
     "[role='main']",
 ]
 
@@ -184,13 +190,36 @@ def _extract_dartdoc_index(soup: BeautifulSoup) -> str:
         text = link.get_text(" ", strip=True)
         if not text:
             continue
-        if any(token in href for token in DARTDOC_ENTITY_SUFFIXES):
+        if _is_dartdoc_candidate_href(href):
             links.append(f"- [{text}]({href})")
     if not links:
         return ""
     title_tag = soup.find("h1") or soup.find("title")
     title = title_tag.get_text(" ", strip=True) if title_tag else "Dartdoc index"
     return _normalize_whitespace("\n".join([f"# {title}", "", *links[:200]]))
+
+
+def _is_dartdoc_candidate_href(href: str) -> bool:
+    lowered = href.lower()
+    return (
+        any(token in lowered for token in DARTDOC_ENTITY_SUFFIXES)
+        or "/classes/" in lowered
+        or "/topics/" in lowered
+        or "/libraries/" in lowered
+        or lowered.endswith("-library.html")
+    )
+
+
+def is_dartdoc_html(html: str, url: str | None = None) -> bool:
+    lowered = (html or "").lower()
+    url_path = (url or "").lower()
+    return (
+        "/documentation/" in url_path
+        or "dartdoc" in lowered
+        or "static-assets" in lowered
+        or "package:" in lowered
+        or "__content" in lowered
+    )
 
 
 def extract_dartdoc_content(html: str, url: str | None = None) -> str:
@@ -229,6 +258,22 @@ def extract_dartdoc_content(html: str, url: str | None = None) -> str:
     return _extract_dartdoc_index(soup)
 
 
+def discover_dartdoc_candidate_links(html: str, base_url: str) -> list[str]:
+    soup = BeautifulSoup(html or "", "html.parser")
+    seen: set[str] = set()
+    links: list[str] = []
+    for link in soup.find_all("a", href=True):
+        href = str(link.get("href") or "")
+        if not _is_dartdoc_candidate_href(href):
+            continue
+        resolved = urljoin(base_url, href)
+        if resolved in seen:
+            continue
+        seen.add(resolved)
+        links.append(resolved)
+    return links
+
+
 def _normalize_whitespace(text: str) -> str:
     """Collapse excessive blank lines and strip trailing whitespace."""
     text = re.sub(r"\n{3,}", "\n\n", text)
@@ -253,7 +298,7 @@ def extract_content(html: str, url: str | None = None, doc_format: str | None = 
     if not html or not html.strip():
         return ""
 
-    if doc_format == "dartdoc":
+    if doc_format == "dartdoc" or is_dartdoc_html(html, url=url):
         result = extract_dartdoc_content(html, url=url)
         if result:
             return result

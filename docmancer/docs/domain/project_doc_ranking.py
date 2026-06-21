@@ -5,6 +5,8 @@ from collections import Counter
 from dataclasses import replace
 from typing import Any
 
+from docmancer.docs.domain.quality import has_code_symbol_evidence, internal_noise_score
+
 
 CHANGELOG_FILENAMES = {"changelog", "changelog.md", "changes", "changes.md", "history", "history.md"}
 
@@ -75,6 +77,12 @@ def source_weight_for_intent(path: str | None, heading_path: str | None, intent:
 
     if is_changelog_path(p):
         return 1.8 if getattr(intent, "wants_release_history", False) else 0.05
+
+    if getattr(intent, "wants_code_symbols", False):
+        if p.endswith(".py") or ".py" in h:
+            return 2.0
+        if p.startswith("wiki/"):
+            return 0.15
 
     if name == "ingestion_internals":
         if "architecture" in p and any(term in h for term in ["ingest", "index", "retriev"]):
@@ -167,6 +175,12 @@ def source_weight_reason(path: str | None, heading_path: str | None, intent: Any
         if getattr(intent, "wants_release_history", False):
             return "boosted because the query asks about recent changes or release history"
         return "demoted because CHANGELOG.md is not primary evidence for this non-release query"
+
+    if getattr(intent, "wants_code_symbols", False):
+        if p.endswith(".py") or ".py" in h:
+            return "boosted because the query asks for concrete code symbols or files"
+        if p.startswith("wiki/"):
+            return "demoted because generic wiki context is insufficient for code-symbol queries"
 
     if name == "ingestion_internals":
         if any(term in h for term in ["ingest", "index", "retriev"]):
@@ -288,6 +302,12 @@ def chunk_base_score(chunk: Any, original_rank: int) -> float:
     return 1.0 / (original_rank + 1)
 
 
+def _query_allows_internal_noise(question: str, intent: Any) -> bool:
+    q = (question or "").lower()
+    asks_internals = any(term in q for term in ["source", "internals", "internal", "implementation", "bug", "todo", "fixme"])
+    return asks_internals and not getattr(intent, "wants_how_to", False)
+
+
 def find_replaceable_index(selected: list[Any]) -> int | None:
     for index in range(len(selected) - 1, -1, -1):
         if is_changelog_path(getattr(selected[index], "path", None)):
@@ -345,6 +365,14 @@ def rerank_project_doc_chunks(chunks: list[Any], *, question: str, intent: Any, 
         path = getattr(chunk, "path", None)
         base = chunk_base_score(chunk, index)
         score = base * source_weight_for_intent(path, getattr(chunk, "heading_path", None), intent) * source_requirement_boost(path, question, intent)
+        if getattr(intent, "wants_code_symbols", False):
+            if has_code_symbol_evidence(getattr(chunk, "content", ""), getattr(chunk, "title", None), getattr(chunk, "heading_path", None), path):
+                score *= 2.5
+            else:
+                score *= 0.2
+        noise = internal_noise_score(getattr(chunk, "content", ""))
+        if noise >= 0.5 and getattr(intent, "wants_how_to", False) and not _query_allows_internal_noise(question, intent):
+            score *= 0.2
         scored.append((score, index, chunk))
         score_by_id[id(chunk)] = (base, score, index)
     scored.sort(key=lambda row: (-row[0], row[1]))

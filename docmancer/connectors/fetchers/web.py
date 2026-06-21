@@ -27,9 +27,11 @@ from docmancer.connectors.fetchers.pipeline.discovery import (
     discover_urls,
 )
 from docmancer.connectors.fetchers.pipeline.extraction import (
+    discover_dartdoc_candidate_links,
     extract_content,
     extract_metadata,
     extract_section_path,
+    is_dartdoc_html,
 )
 from docmancer.connectors.fetchers.pipeline.filtering import (
     ContentDeduplicator,
@@ -162,6 +164,11 @@ class WebFetcher:
                 max_pages=self._max_pages,
                 force_strategy=self._strategy,
             )
+
+            if not discovered and is_dartdoc_html(root_html, url=base_url):
+                candidates = discover_dartdoc_candidate_links(root_html, base_url)
+                if candidates:
+                    discovered = [DiscoveredUrl(url=item, strategy=DiscoveryStrategy.NAV_CRAWL) for item in candidates[: self._max_pages]]
 
             if not discovered:
                 # Check if the page might be JavaScript-rendered
@@ -384,11 +391,13 @@ class WebFetcher:
         if not documents:
             last_url = unique_discovered[-1].url if unique_discovered else base_url
             if self._is_dartdoc_url(base_url):
+                candidate_hint = ""
+                if unique_discovered:
+                    candidate_hint = f" Candidate doc links tried: {', '.join(item.url for item in unique_discovered[:5])}."
                 raise ValueError(
                     f"Extraction failed for {len(unique_discovered)} page(s). Last URL: {last_url}. "
-                    "Dartdoc root/index page had no extractable article content; use concrete "
-                    "class/library seed URLs or enable dartdoc index discovery. Browser fallback "
-                    "remains optional with browser=true."
+                    "Dartdoc extraction found no usable documentation content."
+                    f"{candidate_hint} Try concrete class/library seed URLs or browser=true."
                 )
             raise ValueError(
                 f"Extraction failed for {len(unique_discovered)} page(s). Last URL: {last_url}. "
@@ -460,7 +469,7 @@ class WebFetcher:
             raw_html = resp.text
 
         if looks_like_html(raw_html):
-            doc_format = "dartdoc" if self._is_dartdoc_url(url) else None
+            doc_format = "dartdoc" if self._is_dartdoc_url(url) or is_dartdoc_html(raw_html, url=final_url) else None
             content = extract_content(raw_html, url=url, doc_format=doc_format)
             meta = extract_metadata(raw_html, url=final_url)
             section_path = extract_section_path(raw_html)

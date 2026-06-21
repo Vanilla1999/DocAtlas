@@ -27,7 +27,8 @@ from docmancer.connectors.fetchers.pipeline.detection import Platform
 from docmancer.connectors.fetchers.pipeline.filtering import is_docs_url, normalize_url
 from docmancer.connectors.fetchers.pipeline.robots import RobotsChecker
 from docmancer.connectors.fetchers.pipeline.sitemap import parse_sitemap
-from docmancer.core.html_utils import looks_like_html, extract_main_content
+from docmancer.core.html_utils import looks_like_html
+from docmancer.connectors.fetchers.pipeline.extraction import discover_dartdoc_candidate_links, is_dartdoc_html
 
 logger = logging.getLogger(__name__)
 
@@ -118,8 +119,26 @@ def discover_urls(
         logger.info("Discovery candidates by strategy: %s", strategy_counts)
         return ranked[:max_pages]
 
+    dartdoc = _try_dartdoc_index(base_url, client, max_pages)
+    if dartdoc:
+        logger.info("Discovery: dartdoc-index found %d URL(s)", len(dartdoc))
+        return dartdoc[:max_pages]
+
     logger.warning("No discovery strategy found URLs for %s", base_url)
     return []
+
+
+def _try_dartdoc_index(base_url: str, client: httpx.Client, max_pages: int = 500) -> list[DiscoveredUrl] | None:
+    try:
+        resp = client.get(base_url)
+    except httpx.RequestError:
+        return None
+    if resp.status_code != 200 or not is_dartdoc_html(resp.text, url=base_url):
+        return None
+    links = discover_dartdoc_candidate_links(resp.text, base_url)
+    if not links:
+        return None
+    return [DiscoveredUrl(url=url, strategy=DiscoveryStrategy.NAV_CRAWL) for url in links[:max_pages]]
 
 
 def _dedupe_and_rank(results: list[DiscoveredUrl]) -> list[DiscoveredUrl]:

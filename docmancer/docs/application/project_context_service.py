@@ -3,10 +3,12 @@ from __future__ import annotations
 from dataclasses import replace
 from pathlib import Path
 from typing import Any
+import re
 
 from docmancer.docs.application.project_answer_outline import build_project_answer_outline
 from docmancer.docs.domain.project_doc_ranking import is_changelog_path, normalize_doc_path, rerank_project_doc_chunks
 from docmancer.docs.domain.project_query_intent import classify_project_query_intent
+from docmancer.docs.domain.quality import has_code_symbol_evidence, internal_noise_score, is_trivial_section, looks_like_code_or_command
 from docmancer.docs.domain.trust_contract import build_project_context_trust_contract
 from docmancer.docs.models import DocsChunk, DocsResult, ProjectContextResult, ProjectDocsResult, ProjectMetadata
 
@@ -93,10 +95,30 @@ class ProjectContextService:
                 },
             ]
         answer_available = bool(project_docs and project_docs.answer_available) or bool(dependency_docs and dependency_docs.results)
+        if getattr(intent, "wants_code_symbols", False) and not any(
+            has_code_symbol_evidence(
+                str(item.get("content") or ""),
+                str(item.get("title") or ""),
+                str(item.get("heading_path") or ""),
+                str(item.get("path") or ""),
+            )
+            for item in context_pack
+        ):
+            warning = {
+                "code": "insufficient_code_symbol_evidence",
+                "message": "Selected project docs do not contain concrete files, classes, or functions for this code-symbol query.",
+            }
+            answer_available = False
+            answer_outline.setdefault("warnings", []).append(warning)
+            metrics.setdefault("quality", {}).setdefault("warnings", []).append(warning)
+            next_actions.extend([
+                {"tool": "code_search", "reason": "Use code search / ripgrep for MCP server classes and functions"},
+                {"tool": "project_docs", "reason": "Add module docs or ADR linking MCP server implementation files"},
+            ])
         status = "success" if answer_available else (project_docs.status if project_docs else dependency_docs.status if dependency_docs else "no_results")
         if (project_docs and project_docs.status == "stale") or (dependency_docs and dependency_docs.stale_before_refresh):
             status = "stale"
-        reason = "trusted_context_available" if answer_available else "no_trusted_context"
+        reason = "trusted_context_available" if answer_available else ("insufficient_code_symbol_evidence" if getattr(intent, "wants_code_symbols", False) else "no_trusted_context")
         return ProjectContextResult(
             project_path=str(root),
             question=question,
@@ -130,6 +152,8 @@ def project_context_pack(*, project_docs: ProjectDocsResult | None, dependency_d
     pack: list[dict[str, Any]] = []
     if project_docs:
         for item in project_docs.results:
+            if _drop_low_value_context_section(item.content, item.title, item.heading_path):
+                continue
             token_estimate = max(1, len(item.content) // 4) if item.content else 0
             freshness = "stale" if item.stale else "current"
             pack.append({
@@ -170,6 +194,8 @@ def project_context_pack(*, project_docs: ProjectDocsResult | None, dependency_d
                 pack[-1]["surrounding_context"] = item.content
     if dependency_docs:
         for item in dependency_docs.results:
+            if _drop_low_value_context_section(item.content, item.title, getattr(item, "heading_path", None)):
+                continue
             token_estimate = max(1, len(item.content) // 4) if item.content else 0
             freshness = "stale" if dependency_docs.stale_before_refresh else "current"
             pack.append({
@@ -210,6 +236,19 @@ def project_context_pack(*, project_docs: ProjectDocsResult | None, dependency_d
     return pack
 
 
+def _drop_low_value_context_section(content: str, title: str | None = None, heading_path: str | None = None) -> bool:
+    if not is_trivial_section(content, title, heading_path):
+        return False
+    text = (content or "").strip()
+    lowered = text.lower()
+    title_lower = (title or "").strip().lower()
+    return (
+        not text
+        or lowered == title_lower
+        or bool(re.fullmatch(r"\d+(?:\.\d+){1,3}(?:\s+-\s+\d{4}-\d{2}-\d{2})?", text))
+    )
+
+
 def context_pack_snippet(item: DocsChunk) -> dict[str, Any] | None:
     metadata = item.metadata or {}
     snippets = metadata.get("code_snippets") or []
@@ -218,6 +257,8 @@ def context_pack_snippet(item: DocsChunk) -> dict[str, Any] | None:
         return None
     code = str(snippet.get("code") or "").strip()
     if not code:
+        return None
+    if not looks_like_code_or_command(code):
         return None
     language = str(snippet.get("language") or "").strip() or None
     title = item.title or metadata.get("title") or "section"
@@ -269,6 +310,11 @@ def project_context_metrics(
         if path:
             path_counts[path] = path_counts.get(path, 0) + 1
     changelog_count = sum(1 for path in paths if is_changelog_path(path))
+    project_result_count = len(project_docs.results) if project_docs else 0
+    dependency_result_count = len(dependency_docs.results) if dependency_docs else 0
+    raw_result_count = project_result_count + dependency_result_count
+    raw_results = [*(project_docs.results if project_docs else []), *(dependency_docs.results if dependency_docs else [])]
+    context_tokens = sum(int(item.get("token_estimate") or 0) for item in context_pack)
     max_items_from_single_source = max(path_counts.values(), default=0)
     quality_warnings = []
     if intent and not getattr(intent, "wants_release_history", False) and changelog_count:
@@ -284,9 +330,9 @@ def project_context_metrics(
     return {
         "context_pack_items": len(context_pack),
         "selected_source_count": len(context_pack),
-        "project_result_count": len(project_docs.results) if project_docs else 0,
-        "dependency_result_count": len(dependency_docs.results) if dependency_docs else 0,
-        "token_estimate": sum(int(item.get("token_estimate") or 0) for item in context_pack),
+        "project_result_count": project_result_count,
+        "dependency_result_count": dependency_result_count,
+        "token_estimate": context_tokens,
         "source_classes": sorted({str(item) for item in source_classes if item}),
         "quality": {
             "query_intent": getattr(intent, "name", None),
@@ -299,6 +345,15 @@ def project_context_metrics(
             "has_contributing": any(path.endswith("contributing.md") for path in paths),
             "has_docs_mcp_source": any("mcp-docs" in path or "docs-server" in path for path in paths),
             "has_packs_mcp_source": any("mcp-packs" in path for path in paths),
+            "relevance_coverage": len(context_pack) / max(1, raw_result_count),
+            "trivial_sections_filtered": max(0, raw_result_count - len(context_pack)),
+            "noise_sections_demoted": sum(1 for item in raw_results if internal_noise_score(getattr(item, "content", "")) >= 0.5),
             "warnings": quality_warnings,
+        },
+        "token_savings": {
+            "raw_docs_tokens": sum(int(((item.metadata or {}).get("raw_tokens") or 0)) for item in (project_docs.results if project_docs else [])),
+            "context_pack_tokens": context_tokens,
+            "savings_percent": next((item.metadata.get("savings_percent") for item in (project_docs.results if project_docs else []) if item.metadata and item.metadata.get("savings_percent") is not None), None),
+            "meaning": "compression_vs_raw_docs_not_relevance_score",
         },
     }

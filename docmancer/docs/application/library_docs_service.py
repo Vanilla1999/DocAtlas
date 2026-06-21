@@ -11,8 +11,10 @@ import httpx
 import yaml
 
 from docmancer.core.config import DocmancerConfig
+from docmancer.docs.discovery_candidates import discovery_candidates_for
 from docmancer.docs.domain.policies import docs_policy, is_stale
 from docmancer.docs.domain.project_state import create_project_docs_next_action, has_high_level_project_overview, partition_project_doc_state, project_docs_structured_next_action
+from docmancer.docs.domain.quality import is_trivial_section
 from docmancer.docs.domain.source_identity import docs_exactness, docs_identity, docs_request
 from docmancer.docs.domain.target_security import host_allowed, is_remote_url, path_allowed, url_security_error
 from docmancer.docs.domain.trust_contract import build_project_context_trust_contract
@@ -99,6 +101,7 @@ class LibraryDocsApplicationService:
                     candidates=[self._candidate_payload(candidate) for candidate in candidates],
                 )
         if record is None:
+            discovery_candidates = discovery_candidates_for(library, ecosystem)
             return LibraryInfo(
                 library_id=None,
                 library=library,
@@ -110,6 +113,7 @@ class LibraryDocsApplicationService:
                 local=False,
                 stale=True,
                 message="Pass docs_url or docs_url_template with version to register and ingest this library.",
+                candidates=discovery_candidates,
             )
         if docs_url is None and docs_url_template and normalized_version:
             docs_url = self._render_docs_url(docs_url_template, library, normalized_version)
@@ -462,6 +466,8 @@ class LibraryDocsApplicationService:
         if info.library_id is None:
             warning = self._join_warnings("needs_docs_url", extra=project_warnings)
             warnings = [warning] if warning else []
+            candidates = info.candidates
+            next_actions = ["Retry get_library_docs with docs_url from discovery_candidates[0]."] if candidates else ["Retry get_library_docs with docs_url, or call prefetch_library_docs/prefetch_docs_targets to register this source."]
             return DocsResult(
                 library_id="",
                 library=library,
@@ -485,8 +491,10 @@ class LibraryDocsApplicationService:
                 request=self._docs_request(input_args),
                 identity=self._docs_identity(info),
                 policy=self._docs_policy("needs_input", has_registered_source=resolution.has_registered_source),
-                diagnostics={**resolution.diagnostics, "warnings": [{"code": "needs_docs_url", "blocking": True}]},
-                next_actions=["Retry get_library_docs with docs_url, or call prefetch_library_docs/prefetch_docs_targets to register this source."],
+                diagnostics={**resolution.diagnostics, "warnings": [{"code": "needs_docs_url", "blocking": True}], "discovery_candidates": candidates},
+                next_actions=next_actions,
+                candidates=candidates,
+                discovery_candidates=candidates,
             )
 
         requested_version = requested_version if requested_version is not None else info.requested_version
@@ -612,6 +620,7 @@ class LibraryDocsApplicationService:
 
                 allowed_ids.add(legacy_library_id(info.library, info.version))
             chunks = [chunk for chunk in chunks if (chunk.metadata or {}).get("library_id") in allowed_ids]
+        chunks = [chunk for chunk in chunks if not _drop_low_value_library_section(chunk.text, (chunk.metadata or {}).get("title"))]
         return DocsResult(
             library_id=info.library_id,
             library=latest.library,
@@ -688,3 +697,10 @@ def to_jsonable(value: Any) -> Any:
     if hasattr(value, "__dataclass_fields__"):
         return asdict(value)
     return value
+
+
+def _drop_low_value_library_section(content: str, title: str | None = None) -> bool:
+    if not is_trivial_section(content, title):
+        return False
+    text = (content or "").strip()
+    return not text or text.lower() == (title or "").strip().lower()

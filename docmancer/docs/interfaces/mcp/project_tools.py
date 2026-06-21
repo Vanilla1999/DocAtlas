@@ -31,7 +31,7 @@ def _project_sources_summary(result: dict[str, Any]) -> dict[str, int]:
     }
 
 
-def _compact_project_docs(result: dict[str, Any]) -> dict[str, Any]:
+def _compact_project_docs(result: dict[str, Any], *, omit_results: bool = False) -> dict[str, Any]:
     compact = {
         "project_path": result.get("project_path"),
         "query": result.get("query"),
@@ -40,13 +40,17 @@ def _compact_project_docs(result: dict[str, Any]) -> dict[str, Any]:
         "reason_code": result.get("reason_code"),
         "answer_available": result.get("answer_available"),
         "message": result.get("message"),
-        "results": result.get("results") or [],
+        "results": [] if omit_results else (result.get("results") or []),
         "next_action": result.get("next_action") or {},
         "next_actions": result.get("next_actions") or [],
         "arguments_patch": result.get("arguments_patch") or {},
         "source_summary": _project_sources_summary(result),
         "warnings": result.get("warnings") or [],
     }
+    if omit_results:
+        compact["omitted"] = True
+        compact["result_count"] = len(result.get("results") or [])
+        compact["see"] = "context_pack"
     if result.get("requires_confirmation"):
         compact["requires_confirmation"] = result.get("requires_confirmation")
         compact["confirmation_reason"] = result.get("confirmation_reason")
@@ -74,7 +78,7 @@ def _compact_project_context(result: dict[str, Any]) -> dict[str, Any]:
     }
     project_docs = result.get("project_docs") or {}
     if project_docs:
-        compact["project_docs"] = _compact_project_docs(project_docs)
+        compact["project_docs"] = _compact_project_docs(project_docs, omit_results=True)
     dependency_docs = result.get("dependency_docs") or {}
     if dependency_docs:
         compact["dependency_docs"] = {
@@ -194,7 +198,8 @@ def handle_project_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
         return result if args.get("details") else _compact_project_docs(result)
     if name == "get_project_context":
         result = asdict(service.get_project_context(args["project_path"], args["question"], tokens=args.get("tokens"), limit=args.get("limit"), expand=args.get("expand"), library=args.get("library"), libraries=args.get("libraries"), ecosystem=args.get("ecosystem"), version=args.get("version"), module=args.get("module"), module_path=args.get("module_path"), scope=args.get("scope"), mode=args.get("mode") or "auto"))
-        return result if args.get("details") else _compact_project_context(result)
+        output_mode = args.get("output_mode") or ("full" if args.get("details") else "compact")
+        return result if output_mode == "full" else _compact_project_context(result)
     if name in {"prefetch_project_docs", "prefetch_project_dependency_docs"}:
         method = service.prefetch_project_dependency_docs if name == "prefetch_project_dependency_docs" else service.prefetch_project_docs
         return asdict(method(args["project_path"], include_flutter=bool(args.get("include_flutter") if args.get("include_flutter") is not None else True), include_dart=bool(args.get("include_dart") or False), include_rust=bool(args.get("include_rust") if args.get("include_rust") is not None else True), include_packages=args.get("include_packages") or [], force_refresh=bool(args.get("force_refresh") or False), continue_on_error=bool(args.get("continue_on_error") if args.get("continue_on_error") is not None else True), async_=bool(args.get("async") or False)))

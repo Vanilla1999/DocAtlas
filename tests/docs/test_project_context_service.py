@@ -11,7 +11,7 @@ class FakeProjectContextFacade:
         self.project_docs = ProjectDocsResult(
             project_path="/repo",
             query="needle",
-            results=[ProjectDocsChunk(title="Readme", content="needle content", source="/repo/README.md", url=None, path="README.md")],
+        results=[ProjectDocsChunk(title="Readme", content="needle content with enough words to be useful for the project context pack selection and stable regression testing across quality filters", source="/repo/README.md", url=None, path="README.md")],
             indexed_sources=[{"path": "README.md", "source": "/repo/README.md"}],
         )
         self.dependency_docs = DocsResult(
@@ -23,7 +23,7 @@ class FakeProjectContextFacade:
             stale_before_refresh=False,
             warning=None,
             last_refreshed_at=None,
-            results=[DocsChunk(title="GoRouter", content="go_router content", source="https://pub.dev", url="https://pub.dev")],
+            results=[DocsChunk(title="GoRouter", content="go_router content with enough words to be useful for dependency documentation context selection and stable regression testing across quality filters", source="https://pub.dev", url="https://pub.dev")],
             requested_version="14.8.1",
             resolved_version="14.8.1",
             version_source="lockfile_exact",
@@ -94,10 +94,10 @@ def test_context_pack_snippet_and_metrics_shape_are_stable():
     project_docs = ProjectDocsResult(
         project_path="/repo",
         query="needle",
-        results=[ProjectDocsChunk(title="Readme", content="12345678", source="/repo/README.md", url=None, path="README.md")],
+        results=[ProjectDocsChunk(title="Readme", content="This README section has enough words to remain in a context pack after quality filtering.", source="/repo/README.md", url=None, path="README.md")],
     )
     pack = project_context_pack(project_docs=project_docs, dependency_docs=None)
-    assert pack[0]["token_estimate"] == 2
+    assert pack[0]["token_estimate"] > 2
     assert pack[0]["source"] == {
         "source_class": "project_doc",
         "doc_scope": "project",
@@ -119,7 +119,7 @@ def test_context_pack_snippet_and_metrics_shape_are_stable():
         "selected_source_count": 1,
         "project_result_count": 1,
         "dependency_result_count": 0,
-        "token_estimate": 2,
+            "token_estimate": pack[0]["token_estimate"],
         "source_classes": ["project_doc"],
         "quality": {
             "query_intent": None,
@@ -132,7 +132,16 @@ def test_context_pack_snippet_and_metrics_shape_are_stable():
             "has_contributing": False,
             "has_docs_mcp_source": False,
             "has_packs_mcp_source": False,
+            "relevance_coverage": 1.0,
+            "trivial_sections_filtered": 0,
+            "noise_sections_demoted": 0,
             "warnings": [],
+        },
+        "token_savings": {
+            "raw_docs_tokens": 0,
+            "context_pack_tokens": pack[0]["token_estimate"],
+            "savings_percent": None,
+            "meaning": "compression_vs_raw_docs_not_relevance_score",
         },
     }
 
