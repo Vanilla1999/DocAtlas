@@ -18,6 +18,14 @@ targets:
     docs_url: https://click.palletsprojects.com/en/stable/
     allowed_domains:
       - click.palletsprojects.com
+    seed_urls:
+      - https://click.palletsprojects.com/en/stable/
+      - https://click.palletsprojects.com/en/stable/quickstart/
+      - https://click.palletsprojects.com/en/stable/parameters/
+      - https://click.palletsprojects.com/en/stable/options/
+      - https://click.palletsprojects.com/en/stable/arguments/
+      - https://click.palletsprojects.com/en/stable/commands/
+      - https://click.palletsprojects.com/en/stable/api/
   - id: httpx
     library: httpx
     ecosystem: python
