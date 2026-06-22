@@ -313,7 +313,7 @@ class LibraryDocsApplicationService:
             request=self._docs_request(input_args, info),
             identity=self._docs_identity(info, docs_url_source=docs_url_source),
             policy=self._docs_policy("error", has_registered_source=True),
-            diagnostics={**diagnostics, "reason_code": "missing_chunks", "warnings": diagnostic_warnings},
+            diagnostics={**diagnostics, "reason_code": "empty_index", "warnings": diagnostic_warnings},
             next_actions=["Call refresh_library_docs to ingest this library's docs."],
         )
 
@@ -756,24 +756,34 @@ class LibraryDocsApplicationService:
                 diagnostic_warnings.append({"code": code, "blocking": False, "dropped": count})
         chunks = [chunk for chunk in chunks if not _drop_low_value_library_section(chunk.text, (chunk.metadata or {}).get("title"))]
         if not chunks:
-            return self._empty_library_index_result(
-                info=info,
-                latest=latest,
+            reason_code = "guard_dropped_all" if dropped > 0 else "missing_chunks"
+            reason_diagnostics = {**resolution.diagnostics, "reason_code": reason_code, "warnings": diagnostic_warnings}
+            return DocsResult(
+                library_id=info.library_id,
+                library=latest.library,
+                version=latest.version,
                 topic=topic,
                 refreshed=refreshed,
-                stale_before=stale_before,
+                stale_before_refresh=stale_before,
                 warning=warning,
+                last_refreshed_at=latest.last_refreshed_at,
+                source_type=info.source_type,
+                results=[],
                 warnings=warnings,
                 requested_version=requested_version,
+                resolved_version=latest.resolved_version or latest.version,
                 version_source=version_source,
                 docs_snapshot_exact=docs_snapshot_exact,
                 docs_exactness=docs_exactness,
                 docs_binding_source=docs_binding_source,
                 confidence=confidence,
-                input_args=input_args,
-                docs_url_source=docs_url_source,
-                diagnostics=resolution.diagnostics,
-                diagnostic_warnings=diagnostic_warnings,
+                status="empty_library_index",
+                decision="stop",
+                request=self._docs_request(input_args, info),
+                identity=self._docs_identity(info, docs_url_source=docs_url_source),
+                policy=self._docs_policy("error", has_registered_source=True),
+                diagnostics=reason_diagnostics,
+                next_actions=["Call refresh_library_docs to ingest this library's docs."],
             )
         chunks, quality_diagnostics = _postprocess_library_chunks(chunks, query)
         latest_stale = self._is_stale(latest.last_refreshed_at)

@@ -270,7 +270,8 @@ class TestDiscovery:
         client = MagicMock(spec=httpx.Client)
         client.get.side_effect = mock_get
 
-        discovered = discover_urls("https://example.com/docs", client, Platform.GENERIC, max_pages=10)
+        result = discover_urls("https://example.com/docs", client, Platform.GENERIC, max_pages=10)
+        discovered = result.urls
 
         urls = {item.url for item in discovered}
         assert "https://example.com/docs/from-llms" in urls
@@ -290,7 +291,8 @@ class TestDiscovery:
         client = MagicMock(spec=httpx.Client)
         client.get.side_effect = mock_get
 
-        discovered = discover_urls("https://example.com/docs", client, Platform.GENERIC, max_pages=10)
+        result = discover_urls("https://example.com/docs", client, Platform.GENERIC, max_pages=10)
+        discovered = result.urls
 
         assert [item.strategy for item in discovered] == [DiscoveryStrategy.NAV_CRAWL, DiscoveryStrategy.NAV_CRAWL]
         assert [item.url for item in discovered] == ["https://example.com/docs/a", "https://example.com/docs/b"]

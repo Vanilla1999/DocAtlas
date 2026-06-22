@@ -44,6 +44,7 @@ class DocmancerAgent:
         self._store: SQLiteStore | None = None
         self.last_ingest_report_path: Path | None = None
         self.last_ingest_skips: list[dict[str, str]] = []
+        self.last_discovery_diagnostics: dict[str, Any] = {}
         if not _lazy_init:
             self._init_components()
 
@@ -345,6 +346,7 @@ class DocmancerAgent:
         browser: bool = False,
         url: str | None = None,
         doc_format: str | None = None,
+        seed_urls: list[str] | None = None,
         progress_callback: Callable[[dict[str, Any]], None] | None = None,
     ):
         if fetcher is not None:
@@ -362,6 +364,7 @@ class DocmancerAgent:
             browser=browser,
             workers=self.config.web_fetch.workers,
             doc_format=doc_format,
+            seed_urls=seed_urls,
             progress_callback=progress_callback,
         )
 
@@ -398,6 +401,7 @@ class DocmancerAgent:
         strategy: str | None = None,
         browser: bool = False,
         doc_format: str | None = None,
+        seed_urls: list[str] | None = None,
         metadata: dict[str, Any] | None = None,
         progress_callback: Callable[[dict[str, Any]], None] | None = None,
     ) -> int:
@@ -409,9 +413,11 @@ class DocmancerAgent:
             browser=browser,
             url=url,
             doc_format=doc_format,
+            seed_urls=seed_urls,
             progress_callback=progress_callback,
         )
         documents = f.fetch(url)
+        self.last_discovery_diagnostics = dict(getattr(f, "last_discovery_diagnostics", {}) or {})
         if metadata:
             for document in documents:
                 document.metadata.update(metadata)
@@ -446,6 +452,7 @@ class DocmancerAgent:
         strategy: str | None = None,
         browser: bool = False,
         doc_format: str | None = None,
+        seed_urls: list[str] | None = None,
         progress_callback: Callable[[dict[str, Any]], None] | None = None,
     ) -> list[Document]:
         f = self._get_fetcher(
@@ -456,6 +463,7 @@ class DocmancerAgent:
             browser=browser,
             url=url,
             doc_format=doc_format,
+            seed_urls=seed_urls,
             progress_callback=progress_callback,
         )
         return f.fetch(url)

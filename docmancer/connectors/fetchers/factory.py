@@ -27,6 +27,7 @@ def build_fetcher(
     delay: float = 0.5,
     workers: int = 8,
     doc_format: str | None = None,
+    seed_urls: list[str] | None = None,
     progress_callback=None,
 ):
     """Build the fetcher shared by the CLI and registry pipeline."""
@@ -67,5 +68,6 @@ def build_fetcher(
         delay=delay,
         workers=workers,
         doc_format=doc_format,
+        seed_urls=seed_urls,
         progress_callback=progress_callback,
     )
