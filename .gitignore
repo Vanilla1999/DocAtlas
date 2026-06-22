@@ -30,3 +30,8 @@ scripts/*.log
 .idea/
 doc-atlas/
 *.zip
+
+# Live benchmark generated artifacts
+eval/results/live/*
+!eval/results/live/README.md
+!eval/results/live/sample_report.md
