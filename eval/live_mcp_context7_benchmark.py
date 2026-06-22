@@ -1399,10 +1399,10 @@ def main() -> None:
             p.provider_id = "docatlas_preindexed"
             providers.append(p)
 
-    # Storage isolation for both mode: each docatlas provider gets its own db
+    # Storage isolation: each docatlas provider gets its own db
     runtime_base = Path(tempfile.gettempdir()) / "live-benchmark"
     for p in providers:
-        if isinstance(p, DocAtlasDirectProvider) and mode == "both":
+        if isinstance(p, DocAtlasDirectProvider):
             iso_dir = runtime_base / mode / p.provider_id
             iso_dir.mkdir(parents=True, exist_ok=True)
             p._custom_db_path = str(iso_dir / "docmancer.db")
