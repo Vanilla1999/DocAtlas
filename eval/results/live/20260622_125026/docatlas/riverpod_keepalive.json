@@ -1,0 +1,26 @@
+{
+  "provider": "docatlas",
+  "provider_mode": "live_mcp",
+  "case_id": "riverpod_keepalive",
+  "query": "Riverpod keepAlive modifier and ref.keepAlive to prevent disposal",
+  "suite": "public-docs",
+  "status": "empty_index",
+  "latency_ms": 10384.877,
+  "setup_calls": 2,
+  "sources": [],
+  "snippets": [],
+  "warnings": [
+    "failed: Extraction failed for 8 page(s). Last URL: https://pub.dev/documentation/riverpod/topics/Providers-topic.html. Dartdoc extraction found no usable documentation content. Candidate doc links tried: https://pub.dev/documentation/riverpod/experimental_mutation, https://pub.dev/documentation/riverpod/experimental_persist, https://pub.dev/documentation/riverpod/legacy, https://pub.dev/documentation/riverpod/misc, https://pub.dev/documentation/riverpod/riverpod. Try concrete class/library seed URLs or browser=true.",
+    "failed: Extraction failed for 8 page(s). Last URL: https://pub.dev/documentation/riverpod/topics/Providers-topic.html. Dartdoc extraction found no usable documentation content. Candidate doc links tried: https://pub.dev/documentation/riverpod/experimental_mutation, https://pub.dev/documentation/riverpod/experimental_persist, https://pub.dev/documentation/riverpod/legacy, https://pub.dev/documentation/riverpod/misc, https://pub.dev/documentation/riverpod/riverpod. Try concrete class/library seed URLs or browser=true.",
+    "failed: Extraction failed for 8 page(s). Last URL: https://pub.dev/documentation/riverpod/topics/Providers-topic.html. Dartdoc extraction found no usable documentation content. Candidate doc links tried: https://pub.dev/documentation/riverpod/experimental_mutation, https://pub.dev/documentation/riverpod/experimental_persist, https://pub.dev/documentation/riverpod/legacy, https://pub.dev/documentation/riverpod/misc, https://pub.dev/documentation/riverpod/riverpod. Try concrete class/library seed URLs or browser=true."
+  ],
+  "reason_codes": [
+    "empty_library_index"
+  ],
+  "exact_version_used": null,
+  "contamination_hits": [],
+  "forbidden_source_hits": [],
+  "expected_source_hits": [],
+  "answer_text_length": 0,
+  "timestamp": "20260622_125026"
+}

@@ -1,0 +1,84 @@
+{
+  "provider": "context7",
+  "provider_mode": "live_mcp",
+  "case_id": "exact_pydantic_version",
+  "query": "Pydantic BaseModel field validators with exact version",
+  "suite": "exact-version",
+  "status": "success",
+  "latency_ms": 1536.433,
+  "setup_calls": 2,
+  "sources": [
+    {
+      "url": "https://github.com/pydantic/pydantic/blob/main/docs/concepts/validators.md",
+      "title": null,
+      "rank": 1,
+      "doc_scope": null,
+      "domain": "github.com"
+    },
+    {
+      "url": "https://github.com/pydantic/pydantic/blob/main/docs/migration.md",
+      "title": null,
+      "rank": 2,
+      "doc_scope": null,
+      "domain": "github.com"
+    },
+    {
+      "url": "https://github.com/pydantic/pydantic/blob/main/docs/concepts/fields.md",
+      "title": null,
+      "rank": 3,
+      "doc_scope": null,
+      "domain": "github.com"
+    },
+    {
+      "url": "https://github.com/pydantic/pydantic/blob/main/pydantic/tests/test_model_validator.py",
+      "title": null,
+      "rank": 4,
+      "doc_scope": null,
+      "domain": "github.com"
+    },
+    {
+      "url": "https://github.com/pydantic/pydantic/blob/main/pydantic/_internal/_generate_schema.py",
+      "title": null,
+      "rank": 5,
+      "doc_scope": null,
+      "domain": "github.com"
+    }
+  ],
+  "snippets": [
+    {
+      "text": "from typing import Any\n\nfrom pydantic import BaseModel, ValidationError, field_validator\n\n\nclass Model(BaseModel):\n    numbers: list[int]\n\n    @field_validator('numbers', mode='before')\n    @classmeth",
+      "source": "https://github.com/pydantic/pydantic/blob/main/docs/concepts/validators.md",
+      "rank": 1
+    },
+    {
+      "text": "from pydantic import BaseModel, ValidationInfo, field_validator\n\n\nclass Model(BaseModel):\n    x: int\n\n    @field_validator('x')\n    def val_x(cls, v: int, info: ValidationInfo) -> int:\n        assert ",
+      "source": "https://github.com/pydantic/pydantic/blob/main/docs/migration.md",
+      "rank": 2
+    },
+    {
+      "text": "import warnings\n\nfrom typing_extensions import Self\n\nfrom pydantic import BaseModel, Field, model_validator\n\n\nclass Model(BaseModel):\n    deprecated_field: int = Field(deprecated='This is deprecated')",
+      "source": "https://github.com/pydantic/pydantic/blob/main/docs/concepts/fields.md",
+      "rank": 3
+    },
+    {
+      "text": "        @model_validator(mode='before')\n        @classmethod\n        def val_model(cls, values: Any, info: ValidationInfo) -> dict[str, Any] | Model:\n            assert not info.context\n            if",
+      "source": "https://github.com/pydantic/pydantic/blob/main/pydantic/tests/test_model_validator.py",
+      "rank": 4
+    },
+    {
+      "text": "validators_from_decorators = [\n    _mode_to_validator[decorator.info.mode]._from_decorator(decorator)\n    for decorator in filter_field_decorator_info_by_field(decorators.field_validators.values(), na",
+      "source": "https://github.com/pydantic/pydantic/blob/main/pydantic/_internal/_generate_schema.py",
+      "rank": 5
+    }
+  ],
+  "warnings": [],
+  "reason_codes": [],
+  "exact_version_used": "2.11.1",
+  "contamination_hits": [],
+  "forbidden_source_hits": [],
+  "expected_source_hits": [
+    "github.com"
+  ],
+  "answer_text_length": 4165,
+  "timestamp": "20260622_124859"
+}

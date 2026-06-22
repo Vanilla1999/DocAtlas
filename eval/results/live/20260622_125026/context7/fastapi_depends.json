@@ -1,0 +1,61 @@
+{
+  "provider": "context7",
+  "provider_mode": "live_mcp",
+  "case_id": "fastapi_depends",
+  "query": "FastAPI Depends in path operations with dependency function and query parameters",
+  "suite": "public-docs",
+  "status": "success",
+  "latency_ms": 2076.822,
+  "setup_calls": 2,
+  "sources": [
+    {
+      "url": "https://github.com/fastapi/fastapi/blob/master/docs/en/docs/tutorial/dependencies/index.md",
+      "title": null,
+      "rank": 1,
+      "doc_scope": null,
+      "domain": "github.com"
+    },
+    {
+      "url": "https://github.com/fastapi/fastapi/blob/master/docs/en/docs/tutorial/query-params.md",
+      "title": null,
+      "rank": 2,
+      "doc_scope": null,
+      "domain": "github.com"
+    },
+    {
+      "url": "https://github.com/fastapi/fastapi/blob/master/docs/en/docs/reference/parameters.md",
+      "title": null,
+      "rank": 3,
+      "doc_scope": null,
+      "domain": "github.com"
+    }
+  ],
+  "snippets": [
+    {
+      "text": "app = FastAPI()\n\nasync def common_parameters(q: str | None = None, skip: int = 0, limit: int = 100):\n    return {\"q\": q, \"skip\": skip, \"limit\": limit}\n\n@app.get(\"/items/\")\nasync def read_items(commons",
+      "source": "https://github.com/fastapi/fastapi/blob/master/docs/en/docs/tutorial/dependencies/index.md",
+      "rank": 1
+    },
+    {
+      "text": "from typing import Annotated\nfrom fastapi import FastAPI, Depends\n",
+      "source": "https://github.com/fastapi/fastapi/blob/master/docs/en/docs/tutorial/query-params.md",
+      "rank": 2
+    },
+    {
+      "text": "from typing import Union\n\nfrom fastapi import FastAPI\n\napp = FastAPI()\n\n\n@app.get(\"/users/{user_id}/items/{item_id}\")\nasync def read_user_item(user_id: int, item_id: str, q: Union[str, None] = None, s",
+      "source": "https://github.com/fastapi/fastapi/blob/master/docs/en/docs/reference/parameters.md",
+      "rank": 3
+    }
+  ],
+  "warnings": [],
+  "reason_codes": [],
+  "exact_version_used": null,
+  "contamination_hits": [],
+  "forbidden_source_hits": [],
+  "expected_source_hits": [
+    "fastapi",
+    "github.com"
+  ],
+  "answer_text_length": 3035,
+  "timestamp": "20260622_125026"
+}

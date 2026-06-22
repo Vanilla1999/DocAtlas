@@ -1,0 +1,70 @@
+{
+  "provider": "context7",
+  "provider_mode": "live_mcp",
+  "case_id": "exact_fastapi_version",
+  "query": "FastAPI Depends with exact version 0.115.13",
+  "suite": "exact-version",
+  "status": "success",
+  "latency_ms": 1477.196,
+  "setup_calls": 2,
+  "sources": [
+    {
+      "url": "https://github.com/fastapi/fastapi/blob/0.115.13/docs/en/docs/deployment/versions.md",
+      "title": null,
+      "rank": 1,
+      "doc_scope": null,
+      "domain": "github.com"
+    },
+    {
+      "url": "https://github.com/fastapi/fastapi/blob/0.115.13/docs/en/docs/deployment/docker.md",
+      "title": null,
+      "rank": 2,
+      "doc_scope": null,
+      "domain": "github.com"
+    },
+    {
+      "url": "https://github.com/fastapi/fastapi/blob/0.115.13/docs/en/docs/index.md",
+      "title": null,
+      "rank": 3,
+      "doc_scope": null,
+      "domain": "github.com"
+    }
+  ],
+  "snippets": [
+    {
+      "text": "fastapi[standard]==0.112.0\n",
+      "source": "https://github.com/fastapi/fastapi/blob/0.115.13/docs/en/docs/deployment/versions.md",
+      "rank": 1
+    },
+    {
+      "text": "fastapi[standard]>=0.113.0,<0.114.0\npydantic>=2.7.0,<3.0.0\n",
+      "source": "https://github.com/fastapi/fastapi/blob/0.115.13/docs/en/docs/deployment/docker.md",
+      "rank": 2
+    },
+    {
+      "text": "pip install \"fastapi[standard]\"\n",
+      "source": "https://github.com/fastapi/fastapi/blob/0.115.13/docs/en/docs/index.md",
+      "rank": 3
+    },
+    {
+      "text": "fastapi[standard]>=0.112.0,<0.113.0\n",
+      "source": "https://github.com/fastapi/fastapi/blob/0.115.13/docs/en/docs/deployment/versions.md",
+      "rank": 4
+    },
+    {
+      "text": "pydantic>=2.7.0,<3.0.0\n",
+      "source": "https://github.com/fastapi/fastapi/blob/0.115.13/docs/en/docs/deployment/docker.md",
+      "rank": 5
+    }
+  ],
+  "warnings": [],
+  "reason_codes": [],
+  "exact_version_used": "0.115.13",
+  "contamination_hits": [],
+  "forbidden_source_hits": [],
+  "expected_source_hits": [
+    "github.com"
+  ],
+  "answer_text_length": 2301,
+  "timestamp": "20260622_124859"
+}

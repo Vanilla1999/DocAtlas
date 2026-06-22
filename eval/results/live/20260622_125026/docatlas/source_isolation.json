@@ -1,0 +1,105 @@
+{
+  "provider": "docatlas",
+  "provider_mode": "live_mcp",
+  "case_id": "source_isolation",
+  "query": "How does DocAtlas isolate library docs from project docs?",
+  "suite": "project-docs",
+  "status": "success",
+  "latency_ms": 50.507,
+  "setup_calls": 1,
+  "sources": [
+    {
+      "url": "{'source_class': 'project_doc', 'doc_scope': 'project', 'module_id': None, 'module_name': None, 'module_path': None, 'module_type': None, 'path': 'README.md', 'url': None, 'title': 'Introduction'}",
+      "title": "Introduction - Introduction",
+      "rank": 1,
+      "doc_scope": "project",
+      "domain": ""
+    },
+    {
+      "url": "{'source_class': 'project_doc', 'doc_scope': 'project', 'module_id': None, 'module_name': None, 'module_path': None, 'module_type': None, 'path': 'README.md', 'url': None, 'title': 'DocAtlas'}",
+      "title": "DocAtlas - DocAtlas",
+      "rank": 2,
+      "doc_scope": "project",
+      "domain": ""
+    },
+    {
+      "url": "{'source_class': 'project_doc', 'doc_scope': 'project', 'module_id': None, 'module_name': None, 'module_path': None, 'module_type': None, 'path': 'README.md', 'url': None, 'title': 'Naming and compatibility'}",
+      "title": "Naming and compatibility - DocAtlas > Naming and compatibility",
+      "rank": 3,
+      "doc_scope": "project",
+      "domain": ""
+    },
+    {
+      "url": "{'source_class': 'project_doc', 'doc_scope': 'project', 'module_id': None, 'module_name': None, 'module_path': None, 'module_type': None, 'path': 'CONTRIBUTING.md', 'url': None, 'title': 'Contributing to DocAtlas'}",
+      "title": "Contributing to DocAtlas - Contributing to DocAtlas",
+      "rank": 4,
+      "doc_scope": "project",
+      "domain": ""
+    },
+    {
+      "url": "{'source_class': 'project_doc', 'doc_scope': 'project', 'module_id': None, 'module_name': None, 'module_path': None, 'module_type': None, 'path': 'CONTRIBUTING.md', 'url': None, 'title': 'Project structure'}",
+      "title": "Project structure - Contributing to DocAtlas > Project structure",
+      "rank": 5,
+      "doc_scope": "project",
+      "domain": ""
+    },
+    {
+      "url": "{'source_class': 'project_doc', 'doc_scope': 'project', 'module_id': None, 'module_name': None, 'module_path': None, 'module_type': None, 'path': 'CHANGELOG.md', 'url': None, 'title': '[0.6.0] - 2026-06-12'}",
+      "title": "[0.6.0] - 2026-06-12 - Changelog > [0.6.0] - 2026-06-12",
+      "rank": 6,
+      "doc_scope": "project",
+      "domain": ""
+    },
+    {
+      "url": "{'source_class': 'project_doc', 'doc_scope': 'project', 'module_id': None, 'module_name': None, 'module_path': None, 'module_type': None, 'path': 'CHANGELOG.md', 'url': None, 'title': 'Added'}",
+      "title": "Added - Changelog > [0.6.0] - 2026-06-12 > Added",
+      "rank": 7,
+      "doc_scope": "project",
+      "domain": ""
+    },
+    {
+      "url": "{'source_class': 'project_doc', 'doc_scope': 'project', 'module_id': None, 'module_name': None, 'module_path': None, 'module_type': None, 'path': 'CHANGELOG.md', 'url': None, 'title': 'Changed'}",
+      "title": "Changed - Changelog > [0.6.0] - 2026-06-12 > Changed",
+      "rank": 8,
+      "doc_scope": "project",
+      "domain": ""
+    }
+  ],
+  "snippets": [
+    {
+      "text": "<div align=\"center\">",
+      "source": "{'source_class': 'project_doc', 'doc_scope': 'project', 'module_id': None, 'module_name': None, 'module_path': None, 'module_type': None, 'path': 'README.md', 'url': None, 'title': 'Introduction'}",
+      "rank": 1
+    },
+    {
+      "text": "# DocAtlas\n\n**Local, offline-first context packs for coding agents — from your own repository docs.**\n\n[![License: MIT](https://img.shields.io/github/license/Vanilla1999/DocAtlas?style=for-the-badge)]",
+      "source": "{'source_class': 'project_doc', 'doc_scope': 'project', 'module_id': None, 'module_name': None, 'module_path': None, 'module_type': None, 'path': 'README.md', 'url': None, 'title': 'DocAtlas'}",
+      "rank": 2
+    },
+    {
+      "text": "## Naming and compatibility\n\nThe product name is **DocAtlas**.\n\nThe PyPI package and CLI command are:\n\n```bash\npipx install doc-atlas\ndoc-atlas --help\n```\n\nSome internal Python modules, storage paths,",
+      "source": "{'source_class': 'project_doc', 'doc_scope': 'project', 'module_id': None, 'module_name': None, 'module_path': None, 'module_type': None, 'path': 'README.md', 'url': None, 'title': 'Naming and compatibility'}",
+      "rank": 3
+    },
+    {
+      "text": "# Contributing to DocAtlas\n\nDocAtlas still uses the internal Python package name `docmancer` in parts of the codebase for compatibility. New user-facing docs should use `DocAtlas` and the `doc-atlas` ",
+      "source": "{'source_class': 'project_doc', 'doc_scope': 'project', 'module_id': None, 'module_name': None, 'module_path': None, 'module_type': None, 'path': 'CONTRIBUTING.md', 'url': None, 'title': 'Contributing to DocAtlas'}",
+      "rank": 4
+    },
+    {
+      "text": "## Project structure\n\n```text\ndocmancer/\n  agent.py              # DocmancerAgent; parser registry (_PARSERS); component wiring\n  core/\n    config.py           # DocmancerConfig (pydantic-settings)\n  ",
+      "source": "{'source_class': 'project_doc', 'doc_scope': 'project', 'module_id': None, 'module_name': None, 'module_path': None, 'module_type': None, 'path': 'CONTRIBUTING.md', 'url': None, 'title': 'Project structure'}",
+      "rank": 5
+    }
+  ],
+  "warnings": [],
+  "reason_codes": [],
+  "exact_version_used": null,
+  "contamination_hits": [],
+  "forbidden_source_hits": [],
+  "expected_source_hits": [
+    "CHANGELOG.md"
+  ],
+  "answer_text_length": 1078,
+  "timestamp": "20260622_125026"
+}

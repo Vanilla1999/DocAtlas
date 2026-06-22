@@ -1,0 +1,24 @@
+{
+  "provider": "context7",
+  "provider_mode": "live_mcp",
+  "case_id": "trust_contract",
+  "query": "How does the DocAtlas Trust Contract work?",
+  "suite": "project-docs",
+  "status": "not_applicable",
+  "latency_ms": 0.0,
+  "setup_calls": 0,
+  "sources": [],
+  "snippets": [],
+  "warnings": [
+    "Case not applicable: Context7 does not have local repo context"
+  ],
+  "reason_codes": [
+    "not_applicable_local_repo_context"
+  ],
+  "exact_version_used": null,
+  "contamination_hits": [],
+  "forbidden_source_hits": [],
+  "expected_source_hits": [],
+  "answer_text_length": 0,
+  "timestamp": "20260622_124855"
+}

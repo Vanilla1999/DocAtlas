@@ -1,0 +1,68 @@
+{
+  "provider": "context7",
+  "provider_mode": "live_mcp",
+  "case_id": "bloc_listener",
+  "query": "Flutter BlocListener with listener and listenWhen for side effects",
+  "suite": "public-docs",
+  "status": "success",
+  "latency_ms": 1498.907,
+  "setup_calls": 2,
+  "sources": [
+    {
+      "url": "https://github.com/felangel/bloc/blob/master/packages/flutter_bloc/README.md",
+      "title": null,
+      "rank": 1,
+      "doc_scope": null,
+      "domain": "github.com"
+    },
+    {
+      "url": "https://context7.com/felangel/bloc/llms.txt",
+      "title": null,
+      "rank": 2,
+      "doc_scope": null,
+      "domain": "context7.com"
+    },
+    {
+      "url": "https://github.com/felangel/bloc/blob/master/docs/src/content/docs/flutter-bloc-concepts.mdx",
+      "title": null,
+      "rank": 3,
+      "doc_scope": null,
+      "domain": "github.com"
+    }
+  ],
+  "snippets": [
+    {
+      "text": "BlocListener<BlocA, BlocAState>(\n  listener: (context, state) {\n    // do stuff here based on BlocA's state\n  },\n  child: Container(),\n)\n",
+      "source": "https://github.com/felangel/bloc/blob/master/packages/flutter_bloc/README.md",
+      "rank": 1
+    },
+    {
+      "text": "BlocListener<BlocA, BlocAState>(\n  listenWhen: (previousState, state) {\n    // return true/false to determine whether or not\n    // to call listener with state\n  },\n  listener: (context, state) {\n    ",
+      "source": "https://context7.com/felangel/bloc/llms.txt",
+      "rank": 2
+    },
+    {
+      "text": "BlocListener<AuthCubit, AuthState>(\n  listenWhen: (previous, current) => previous.status != current.status,\n  listener: (context, state) {\n    if (state.status == AuthStatus.authenticated) {\n      Nav",
+      "source": "https://github.com/felangel/bloc/blob/master/docs/src/content/docs/flutter-bloc-concepts.mdx",
+      "rank": 3
+    },
+    {
+      "text": "BlocListener<BlocA, BlocAState>(\n  listener: (context, state) {\n    // do stuff\n  },\n  child: Container(),\n)\n",
+      "source": "https://github.com/felangel/bloc/blob/master/packages/flutter_bloc/README.md",
+      "rank": 4
+    },
+    {
+      "text": "BlocListener<BlocA, BlocAState>(\n  bloc: blocA,\n  listener: (context, state) {},\n  child: Container(),\n)\n",
+      "source": "https://context7.com/felangel/bloc/llms.txt",
+      "rank": 5
+    }
+  ],
+  "warnings": [],
+  "reason_codes": [],
+  "exact_version_used": null,
+  "contamination_hits": [],
+  "forbidden_source_hits": [],
+  "expected_source_hits": [],
+  "answer_text_length": 5823,
+  "timestamp": "20260622_124329"
+}

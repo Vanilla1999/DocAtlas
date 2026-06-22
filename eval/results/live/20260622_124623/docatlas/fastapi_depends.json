@@ -1,0 +1,23 @@
+{
+  "provider": "docatlas",
+  "provider_mode": "live_mcp",
+  "case_id": "fastapi_depends",
+  "query": "FastAPI Depends in path operations with dependency function and query parameters",
+  "suite": "public-docs",
+  "status": "empty_index",
+  "latency_ms": 4.864,
+  "setup_calls": 2,
+  "sources": [],
+  "snippets": [],
+  "warnings": [],
+  "reason_codes": [
+    "empty_index",
+    "empty_library_index"
+  ],
+  "exact_version_used": null,
+  "contamination_hits": [],
+  "forbidden_source_hits": [],
+  "expected_source_hits": [],
+  "answer_text_length": 0,
+  "timestamp": "20260622_124623"
+}

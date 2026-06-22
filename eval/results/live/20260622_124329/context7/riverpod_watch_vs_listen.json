@@ -1,0 +1,68 @@
+{
+  "provider": "context7",
+  "provider_mode": "live_mcp",
+  "case_id": "riverpod_watch_vs_listen",
+  "query": "Riverpod ref.watch vs ref.listen differences and AsyncValue handling",
+  "suite": "public-docs",
+  "status": "success",
+  "latency_ms": 1415.809,
+  "setup_calls": 2,
+  "sources": [
+    {
+      "url": "https://github.com/rrousselgit/riverpod/blob/master/website/docs/from_provider/provider_vs_riverpod.mdx",
+      "title": null,
+      "rank": 1,
+      "doc_scope": null,
+      "domain": "github.com"
+    },
+    {
+      "url": "https://github.com/rrousselgit/riverpod/blob/master/README.md",
+      "title": null,
+      "rank": 2,
+      "doc_scope": null,
+      "domain": "github.com"
+    },
+    {
+      "url": "https://github.com/rrousselgit/riverpod/blob/master/website/docs/tutorials/first_app.mdx",
+      "title": null,
+      "rank": 3,
+      "doc_scope": null,
+      "domain": "github.com"
+    }
+  ],
+  "snippets": [
+    {
+      "text": "final userNotifierProvider = ChangeNotifierProvider<UserNotifier>((ref) {\n  final userNotifier = UserNotifier();\n  ref.listen<UserIdNotifier>(\n    userIdNotifierProvider,\n    (previous, next) {\n      ",
+      "source": "https://github.com/rrousselgit/riverpod/blob/master/website/docs/from_provider/provider_vs_riverpod.mdx",
+      "rank": 1
+    },
+    {
+      "text": "final labelProvider = Provider<String>((ref) {\n  UserIdNotifier userIdNotifier = ref.watch(userIdNotifierProvider);\n  return 'The user ID of the user is ${userIdNotifier.userId}';\n});\n",
+      "source": "https://github.com/rrousselgit/riverpod/blob/master/README.md",
+      "rank": 2
+    },
+    {
+      "text": "class Home extends ConsumerWidget {\n  @override\n  Widget build(BuildContext context, WidgetRef ref) {\n    final boredSuggestion = ref.watch(boredSuggestionProvider);\n    // Perform a switch-case on th",
+      "source": "https://github.com/rrousselgit/riverpod/blob/master/website/docs/tutorials/first_app.mdx",
+      "rank": 3
+    },
+    {
+      "text": "return Stack(\n  alignment: Alignment.center,\n  children: [\n    switch (randomJoke) {\n      // When the request completes successfully, we display the joke.\n      AsyncValue(:final value?) => Selectabl",
+      "source": "https://github.com/rrousselgit/riverpod/blob/master/website/docs/from_provider/provider_vs_riverpod.mdx",
+      "rank": 4
+    },
+    {
+      "text": "switch (asyncValue) {\n  // If \"value\" is non-null, it means that we have some data.\n  case AsyncValue(:final value?):\n    return Text(value);\n  // If \"error\" is non-null, it means that the operation f",
+      "source": "https://github.com/rrousselgit/riverpod/blob/master/README.md",
+      "rank": 5
+    }
+  ],
+  "warnings": [],
+  "reason_codes": [],
+  "exact_version_used": null,
+  "contamination_hits": [],
+  "forbidden_source_hits": [],
+  "expected_source_hits": [],
+  "answer_text_length": 4610,
+  "timestamp": "20260622_124329"
+}

@@ -1,0 +1,23 @@
+{
+  "provider": "docatlas",
+  "provider_mode": "live_mcp",
+  "case_id": "fastapi_testclient",
+  "query": "FastAPI test app with fastapi.testclient.TestClient client and pytest assertions",
+  "suite": "public-docs",
+  "status": "empty_index",
+  "latency_ms": 1.714,
+  "setup_calls": 2,
+  "sources": [],
+  "snippets": [],
+  "warnings": [],
+  "reason_codes": [
+    "already_indexed",
+    "empty_library_index"
+  ],
+  "exact_version_used": null,
+  "contamination_hits": [],
+  "forbidden_source_hits": [],
+  "expected_source_hits": [],
+  "answer_text_length": 0,
+  "timestamp": "20260622_125026"
+}

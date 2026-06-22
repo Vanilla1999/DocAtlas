@@ -1,0 +1,84 @@
+{
+  "provider": "context7",
+  "provider_mode": "live_mcp",
+  "case_id": "click_command_group",
+  "query": "Click command group with subcommands and options",
+  "suite": "public-docs",
+  "status": "success",
+  "latency_ms": 1722.083,
+  "setup_calls": 2,
+  "sources": [
+    {
+      "url": "https://github.com/pallets/click/blob/main/docs/commands-and-groups.md",
+      "title": null,
+      "rank": 1,
+      "doc_scope": null,
+      "domain": "github.com"
+    },
+    {
+      "url": "https://github.com/pallets/click/blob/main/docs/testing.md",
+      "title": null,
+      "rank": 2,
+      "doc_scope": null,
+      "domain": "github.com"
+    },
+    {
+      "url": "https://github.com/pallets/click/blob/main/docs/quickstart.md",
+      "title": null,
+      "rank": 3,
+      "doc_scope": null,
+      "domain": "github.com"
+    },
+    {
+      "url": "https://github.com/pallets/click/blob/main/docs/documentation.md",
+      "title": null,
+      "rank": 4,
+      "doc_scope": null,
+      "domain": "github.com"
+    },
+    {
+      "url": "https://github.com/pallets/click/blob/main/docs/commands.md",
+      "title": null,
+      "rank": 5,
+      "doc_scope": null,
+      "domain": "github.com"
+    }
+  ],
+  "snippets": [
+    {
+      "text": "import click\n\n@click.group()\ndef greeting():\n    pass\n\n@greeting.command()\n@click.option('--count', default=1)\ndef hello(count):\n    for x in range(count):\n        click.echo(\"Hello!\")\n\n@greeting.comm",
+      "source": "https://github.com/pallets/click/blob/main/docs/commands-and-groups.md",
+      "rank": 1
+    },
+    {
+      "text": "import click\n\n@click.group()\n@click.option('--debug/--no-debug', default=False)\ndef cli(debug):\n   click.echo(f\"Debug mode is {'on' if debug else 'off'}\")\n\n@cli.command()\ndef sync():\n   click.echo('Sy",
+      "source": "https://github.com/pallets/click/blob/main/docs/testing.md",
+      "rank": 2
+    },
+    {
+      "text": "@click.group()\ndef cli():\n    pass\n\n@cli.command()\ndef initdb():\n    click.echo('Initialized the database')\n\n@cli.command()\ndef dropdb():\n    click.echo('Dropped the database')\n",
+      "source": "https://github.com/pallets/click/blob/main/docs/quickstart.md",
+      "rank": 3
+    },
+    {
+      "text": "import click\n\n@click.group(\n    help=\"Example Click app with subcommands, options, and positional arguments.\",\n    epilog=(\"Examples:\\n\\n\\b\\n  python hello.py greet Alice --count 2\\n\"),\n)\ndef cli() ->",
+      "source": "https://github.com/pallets/click/blob/main/docs/documentation.md",
+      "rank": 4
+    },
+    {
+      "text": "import click\n\n@click.group()\n@click.option('--debug/--no-debug', default=False)\ndef cli(debug):\n    click.echo(f\"Debug mode is {'on' if debug else 'off'}\")\n\n@cli.command()\ndef sync():\n    click.echo('",
+      "source": "https://github.com/pallets/click/blob/main/docs/commands.md",
+      "rank": 5
+    }
+  ],
+  "warnings": [],
+  "reason_codes": [],
+  "exact_version_used": null,
+  "contamination_hits": [],
+  "forbidden_source_hits": [],
+  "expected_source_hits": [
+    "github.com"
+  ],
+  "answer_text_length": 3039,
+  "timestamp": "20260622_124623"
+}

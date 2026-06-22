@@ -1,0 +1,24 @@
+{
+  "provider": "context7",
+  "provider_mode": "live_mcp",
+  "case_id": "click_context_passing",
+  "query": "Click context passing with pass_context and ensure_object",
+  "suite": "public-docs",
+  "status": "not_supported",
+  "latency_ms": 1488.812,
+  "setup_calls": 2,
+  "sources": [],
+  "snippets": [],
+  "warnings": [
+    "Context7 could not find library: /pallets/click"
+  ],
+  "reason_codes": [
+    "library_not_found"
+  ],
+  "exact_version_used": null,
+  "contamination_hits": [],
+  "forbidden_source_hits": [],
+  "expected_source_hits": [],
+  "answer_text_length": 0,
+  "timestamp": "20260622_124623"
+}

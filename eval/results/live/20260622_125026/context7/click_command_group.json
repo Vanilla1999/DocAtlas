@@ -1,0 +1,28 @@
+{
+  "provider": "context7",
+  "provider_mode": "live_mcp",
+  "case_id": "click_command_group",
+  "query": "Click command group with subcommands and options",
+  "suite": "public-docs",
+  "status": "success",
+  "latency_ms": 311.498,
+  "setup_calls": 2,
+  "sources": [
+    {
+      "url": "https://context7.com/dashboard",
+      "title": null,
+      "rank": 1,
+      "doc_scope": null,
+      "domain": "context7.com"
+    }
+  ],
+  "snippets": [],
+  "warnings": [],
+  "reason_codes": [],
+  "exact_version_used": null,
+  "contamination_hits": [],
+  "forbidden_source_hits": [],
+  "expected_source_hits": [],
+  "answer_text_length": 98,
+  "timestamp": "20260622_125026"
+}

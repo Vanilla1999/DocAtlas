@@ -1,0 +1,72 @@
+{
+  "provider": "context7",
+  "provider_mode": "live_mcp",
+  "case_id": "exact_click_version",
+  "query": "Click command group with exact version 8.1.x",
+  "suite": "exact-version",
+  "status": "success",
+  "latency_ms": 1466.53,
+  "setup_calls": 2,
+  "sources": [
+    {
+      "url": "https://github.com/pallets/click/blob/main/docs/commands.md",
+      "title": null,
+      "rank": 1,
+      "doc_scope": null,
+      "domain": "github.com"
+    },
+    {
+      "url": "https://github.com/pallets/click/blob/main/docs/commands-and-groups.md",
+      "title": null,
+      "rank": 2,
+      "doc_scope": null,
+      "domain": "github.com"
+    },
+    {
+      "url": "https://github.com/pallets/click/blob/main/docs/testing.md",
+      "title": null,
+      "rank": 3,
+      "doc_scope": null,
+      "domain": "github.com"
+    },
+    {
+      "url": "https://github.com/pallets/click/blob/main/CHANGES.md",
+      "title": null,
+      "rank": 4,
+      "doc_scope": null,
+      "domain": "github.com"
+    }
+  ],
+  "snippets": [
+    {
+      "text": "import click\n\n@click.group()\n@click.option('--debug/--no-debug', default=False)\ndef cli(debug):\n    click.echo(f\"Debug mode is {'on' if debug else 'off'}\")\n\n@cli.command()\ndef sync():\n    click.echo('",
+      "source": "https://github.com/pallets/click/blob/main/docs/commands.md",
+      "rank": 1
+    },
+    {
+      "text": "import click\n\n@click.group()\ndef greeting():\n    pass\n\n@greeting.command()\n@click.option('--count', default=1)\ndef hello(count):\n    for x in range(count):\n        click.echo(\"Hello!\")\n\n@greeting.comm",
+      "source": "https://github.com/pallets/click/blob/main/docs/commands-and-groups.md",
+      "rank": 2
+    },
+    {
+      "text": "import click\n\n@click.group()\n@click.option('--debug/--no-debug', default=False)\ndef cli(debug):\n   click.echo(f\"Debug mode is {'on' if debug else 'off'}\")\n\n@cli.command()\ndef sync():\n   click.echo('Sy",
+      "source": "https://github.com/pallets/click/blob/main/docs/testing.md",
+      "rank": 3
+    },
+    {
+      "text": "import click\n\n@click.group()\ndef cli():\n   pass\n\n@cli.command()\ndef sync():\n   click.echo('Syncing')\n",
+      "source": "https://github.com/pallets/click/blob/main/CHANGES.md",
+      "rank": 4
+    }
+  ],
+  "warnings": [],
+  "reason_codes": [],
+  "exact_version_used": "8.1.8",
+  "contamination_hits": [],
+  "forbidden_source_hits": [],
+  "expected_source_hits": [
+    "github.com"
+  ],
+  "answer_text_length": 2306,
+  "timestamp": "20260622_124859"
+}

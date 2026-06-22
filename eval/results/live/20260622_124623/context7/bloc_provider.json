@@ -1,0 +1,70 @@
+{
+  "provider": "context7",
+  "provider_mode": "live_mcp",
+  "case_id": "bloc_provider",
+  "query": "Flutter BlocProvider to provide a bloc to the widget tree",
+  "suite": "public-docs",
+  "status": "success",
+  "latency_ms": 1709.323,
+  "setup_calls": 2,
+  "sources": [
+    {
+      "url": "https://github.com/felangel/bloc/blob/master/packages/flutter_bloc/README.md",
+      "title": null,
+      "rank": 1,
+      "doc_scope": null,
+      "domain": "github.com"
+    },
+    {
+      "url": "https://github.com/felangel/bloc/blob/master/docs/src/content/docs/flutter-bloc-concepts.mdx",
+      "title": null,
+      "rank": 2,
+      "doc_scope": null,
+      "domain": "github.com"
+    },
+    {
+      "url": "https://context7.com/felangel/bloc/llms.txt",
+      "title": null,
+      "rank": 3,
+      "doc_scope": null,
+      "domain": "context7.com"
+    }
+  ],
+  "snippets": [
+    {
+      "text": "BlocProvider(\n  create: (BuildContext context) => BlocA(),\n  child: ChildA(),\n);\n",
+      "source": "https://github.com/felangel/bloc/blob/master/packages/flutter_bloc/README.md",
+      "rank": 1
+    },
+    {
+      "text": "BlocProvider(\n  lazy: false,\n  create: (BuildContext context) => BlocA(),\n  child: ChildA(),\n);\n",
+      "source": "https://github.com/felangel/bloc/blob/master/docs/src/content/docs/flutter-bloc-concepts.mdx",
+      "rank": 2
+    },
+    {
+      "text": "BlocProvider.value(\n  value: BlocProvider.of<BlocA>(context),\n  child: ScreenA(),\n);\n",
+      "source": "https://context7.com/felangel/bloc/llms.txt",
+      "rank": 3
+    },
+    {
+      "text": "BlocProvider(\n  create: (BuildContext context) => BlocA(),\n  child: ChildA(),\n)\n",
+      "source": "https://github.com/felangel/bloc/blob/master/packages/flutter_bloc/README.md",
+      "rank": 4
+    },
+    {
+      "text": "BlocProvider(\n  lazy: false,\n  create: (BuildContext context) => BlocA(),\n  child: ChildA(),\n)\n",
+      "source": "https://github.com/felangel/bloc/blob/master/docs/src/content/docs/flutter-bloc-concepts.mdx",
+      "rank": 5
+    }
+  ],
+  "warnings": [],
+  "reason_codes": [],
+  "exact_version_used": null,
+  "contamination_hits": [],
+  "forbidden_source_hits": [],
+  "expected_source_hits": [
+    "github.com"
+  ],
+  "answer_text_length": 5789,
+  "timestamp": "20260622_124623"
+}

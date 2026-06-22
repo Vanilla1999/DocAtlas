@@ -1,0 +1,44 @@
+{
+  "provider": "context7",
+  "provider_mode": "live_mcp",
+  "case_id": "click_callbacks",
+  "query": "Click parameter callbacks and validation patterns",
+  "suite": "public-docs",
+  "status": "success",
+  "latency_ms": 1203.044,
+  "setup_calls": 2,
+  "sources": [
+    {
+      "url": "https://github.com/pallets/click/blob/main/docs/advanced.md",
+      "title": null,
+      "rank": 1,
+      "doc_scope": null,
+      "domain": "github.com"
+    }
+  ],
+  "snippets": [
+    {
+      "text": "def validate_rolls(ctx, param, value):\n    if isinstance(value, tuple):\n        return value\n\n    try:\n        rolls, _, dice = value.partition(\"d\")\n        return int(dice), int(rolls)\n    except Val",
+      "source": "https://github.com/pallets/click/blob/main/docs/advanced.md",
+      "rank": 1
+    },
+    {
+      "text": "import urllib.request\n\ndef open_url(ctx, param, value):\n    if value is not None:\n        ctx.params['fp'] = urllib.request.urlopen(value)\n        return value\n\n@click.command()\n@click.option('--url',",
+      "source": "https://github.com/pallets/click/blob/main/docs/advanced.md",
+      "rank": 2
+    },
+    {
+      "text": "import urllib.request\n\nclass URL:\n    def __init__(self, url, fp):\n        self.url = url\n        self.fp = fp\n\ndef open_url(ctx, param, value):\n    if value is not None:\n        return URL(value, url",
+      "source": "https://github.com/pallets/click/blob/main/docs/advanced.md",
+      "rank": 3
+    }
+  ],
+  "warnings": [],
+  "reason_codes": [],
+  "exact_version_used": null,
+  "contamination_hits": [],
+  "forbidden_source_hits": [],
+  "expected_source_hits": [],
+  "answer_text_length": 3058,
+  "timestamp": "20260622_124329"
+}

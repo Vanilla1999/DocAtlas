@@ -1,0 +1,105 @@
+{
+  "provider": "docatlas",
+  "provider_mode": "live_mcp",
+  "case_id": "risky_rejected_docs",
+  "query": "Which docs sources are considered risky or rejected in DocAtlas?",
+  "suite": "project-docs",
+  "status": "success",
+  "latency_ms": 52.384,
+  "setup_calls": 1,
+  "sources": [
+    {
+      "url": "{'source_class': 'project_doc', 'doc_scope': 'project', 'module_id': None, 'module_name': None, 'module_path': None, 'module_type': None, 'path': 'docs/capabilities.md', 'url': None, 'title': 'Example 9 - Public-doc quality regression checks'}",
+      "title": "Example 9 - Public-doc quality regression checks - Docmancer capabilities > End-to-end examples of current behavior > Example 9 - Public-doc quality regression checks",
+      "rank": 1,
+      "doc_scope": "project",
+      "domain": ""
+    },
+    {
+      "url": "{'source_class': 'project_doc', 'doc_scope': 'project', 'module_id': None, 'module_name': None, 'module_path': None, 'module_type': None, 'path': 'docs/capabilities.md', 'url': None, 'title': 'Example 10 - Current high-level orchestration boundary'}",
+      "title": "Example 10 - Current high-level orchestration boundary - Docmancer capabilities > End-to-end examples of current behavior > Example 10 - Current high-level orchestration boundary",
+      "rank": 2,
+      "doc_scope": "project",
+      "domain": ""
+    },
+    {
+      "url": "{'source_class': 'project_doc', 'doc_scope': 'project', 'module_id': None, 'module_name': None, 'module_path': None, 'module_type': None, 'path': 'docs/capabilities.md', 'url': None, 'title': 'Docmancer Packs capabilities'}",
+      "title": "Docmancer Packs capabilities - Docmancer capabilities > Docmancer Packs capabilities",
+      "rank": 3,
+      "doc_scope": "project",
+      "domain": ""
+    },
+    {
+      "url": "{'source_class': 'project_doc', 'doc_scope': 'project', 'module_id': None, 'module_name': None, 'module_path': None, 'module_type': None, 'path': 'docs/project-docs-mcp-workflow.md', 'url': None, 'title': 'Preferred happy path'}",
+      "title": "Preferred happy path - Project docs MCP workflow > Preferred happy path",
+      "rank": 4,
+      "doc_scope": "project",
+      "domain": ""
+    },
+    {
+      "url": "{'source_class': 'project_doc', 'doc_scope': 'project', 'module_id': None, 'module_name': None, 'module_path': None, 'module_type': None, 'path': 'docs/project-docs-mcp-workflow.md', 'url': None, 'title': 'Explicit low-level flow'}",
+      "title": "Explicit low-level flow - Project docs MCP workflow > Explicit low-level flow",
+      "rank": 5,
+      "doc_scope": "project",
+      "domain": ""
+    },
+    {
+      "url": "{'source_class': 'project_doc', 'doc_scope': 'project', 'module_id': None, 'module_name': None, 'module_path': None, 'module_type': None, 'path': 'docs/project-docs-mcp-workflow.md', 'url': None, 'title': 'Module docs workflow'}",
+      "title": "Module docs workflow - Project docs MCP workflow > Module docs workflow",
+      "rank": 6,
+      "doc_scope": "project",
+      "domain": ""
+    },
+    {
+      "url": "{'source_class': 'project_doc', 'doc_scope': 'project', 'module_id': None, 'module_name': None, 'module_path': None, 'module_type': None, 'path': 'wiki/Architecture.md', 'url': None, 'title': 'Dartdoc discovery'}",
+      "title": "Dartdoc discovery - Architecture > Docs MCP runtime > Dartdoc discovery",
+      "rank": 7,
+      "doc_scope": "project",
+      "domain": ""
+    },
+    {
+      "url": "{'source_class': 'project_doc', 'doc_scope': 'project', 'module_id': None, 'module_name': None, 'module_path': None, 'module_type': None, 'path': 'wiki/Architecture.md', 'url': None, 'title': 'URL security and docs policy'}",
+      "title": "URL security and docs policy - Architecture > Docs MCP runtime > URL security and docs policy",
+      "rank": 8,
+      "doc_scope": "project",
+      "domain": ""
+    }
+  ],
+  "snippets": [
+    {
+      "text": "### Example 9 - Public-doc quality regression checks\n\nCurrent saved benchmark artifacts let the project check whether public-doc retrieval regresses.\n\n```bash\nuv run pytest tests/test_context7_snapsho",
+      "source": "{'source_class': 'project_doc', 'doc_scope': 'project', 'module_id': None, 'module_name': None, 'module_path': None, 'module_type': None, 'path': 'docs/capabilities.md', 'url': None, 'title': 'Example 9 - Public-doc quality regression checks'}",
+      "rank": 1
+    },
+    {
+      "text": "### Example 10 - Current high-level orchestration boundary\n\n`get_project_context` is the shipped high-level context-pack tool, but it deliberately does not silently perform every setup action. Agents ",
+      "source": "{'source_class': 'project_doc', 'doc_scope': 'project', 'module_id': None, 'module_name': None, 'module_path': None, 'module_type': None, 'path': 'docs/capabilities.md', 'url': None, 'title': 'Example 10 - Current high-level orchestration boundary'}",
+      "rank": 2
+    },
+    {
+      "text": "## Docmancer Packs capabilities\n\nDocmancer Packs are the advanced product layer for API action tools.\n\nThey are separate from the docs retrieval flow: users can get value from Docmancer Docs without i",
+      "source": "{'source_class': 'project_doc', 'doc_scope': 'project', 'module_id': None, 'module_name': None, 'module_path': None, 'module_type': None, 'path': 'docs/capabilities.md', 'url': None, 'title': 'Docmancer Packs capabilities'}",
+      "rank": 3
+    },
+    {
+      "text": "## Preferred happy path\n\nFor most agents, the simplest safe flow is:\n\n```text\nbootstrap_project_docs(project_path, question?)\nget_project_context(project_path, question)\n```\n\nFor explicit lifecycle co",
+      "source": "{'source_class': 'project_doc', 'doc_scope': 'project', 'module_id': None, 'module_name': None, 'module_path': None, 'module_type': None, 'path': 'docs/project-docs-mcp-workflow.md', 'url': None, 'title': 'Preferred happy path'}",
+      "rank": 4
+    },
+    {
+      "text": "## Explicit low-level flow\n\nAgents that need precise control can use the lower-level tools:\n\n```text\ninspect_project_docs(project_path)\n```\n\nThen follow the returned `reason_code`:\n\n| `reason_code` | ",
+      "source": "{'source_class': 'project_doc', 'doc_scope': 'project', 'module_id': None, 'module_name': None, 'module_path': None, 'module_type': None, 'path': 'docs/project-docs-mcp-workflow.md', 'url': None, 'title': 'Explicit low-level flow'}",
+      "rank": 5
+    }
+  ],
+  "warnings": [],
+  "reason_codes": [],
+  "exact_version_used": null,
+  "contamination_hits": [],
+  "forbidden_source_hits": [],
+  "expected_source_hits": [
+    "docs/project-docs-mcp-workflow.md"
+  ],
+  "answer_text_length": 1117,
+  "timestamp": "20260622_124855"
+}

@@ -1,0 +1,67 @@
+{
+  "provider": "context7",
+  "provider_mode": "live_mcp",
+  "case_id": "fastapi_http_exception",
+  "query": "FastAPI raise HTTPException with status_code and detail for a 404 error",
+  "suite": "public-docs",
+  "status": "success",
+  "latency_ms": 1987.353,
+  "setup_calls": 2,
+  "sources": [
+    {
+      "url": "https://github.com/fastapi/fastapi/blob/master/docs/en/docs/tutorial/dependencies/dependencies-in-path-operation-decorators.md",
+      "title": null,
+      "rank": 1,
+      "doc_scope": null,
+      "domain": "github.com"
+    },
+    {
+      "url": "https://github.com/fastapi/fastapi/blob/master/docs/en/docs/reference/exceptions.md",
+      "title": null,
+      "rank": 2,
+      "doc_scope": null,
+      "domain": "github.com"
+    },
+    {
+      "url": "https://github.com/fastapi/fastapi/blob/master/fastapi/exception_handlers.py",
+      "title": null,
+      "rank": 3,
+      "doc_scope": null,
+      "domain": "github.com"
+    },
+    {
+      "url": "https://github.com/fastapi/fastapi/blob/master/docs/en/docs/tutorial/handling-errors.md",
+      "title": null,
+      "rank": 4,
+      "doc_scope": null,
+      "domain": "github.com"
+    }
+  ],
+  "snippets": [
+    {
+      "text": "        raise HTTPException(status_code=400, detail=\"X-Key header required\")\n        raise HTTPException(status_code=400, detail=\"X-Token header required\")\n",
+      "source": "https://github.com/fastapi/fastapi/blob/master/docs/en/docs/tutorial/dependencies/dependencies-in-path-operation-decorators.md",
+      "rank": 1
+    },
+    {
+      "text": "from fastapi import HTTPException, WebSocketException\n",
+      "source": "https://github.com/fastapi/fastapi/blob/master/docs/en/docs/reference/exceptions.md",
+      "rank": 2
+    },
+    {
+      "text": "async def http_exception_handler(request: Request, exc: HTTPException) -> Response:\n    headers = getattr(exc, \"headers\", None)\n    if not is_body_allowed_for_status_code(exc.status_code):\n        ret",
+      "source": "https://github.com/fastapi/fastapi/blob/master/fastapi/exception_handlers.py",
+      "rank": 3
+    }
+  ],
+  "warnings": [],
+  "reason_codes": [],
+  "exact_version_used": null,
+  "contamination_hits": [],
+  "forbidden_source_hits": [],
+  "expected_source_hits": [
+    "github.com"
+  ],
+  "answer_text_length": 2465,
+  "timestamp": "20260622_124623"
+}

@@ -1,0 +1,74 @@
+{
+  "provider": "context7",
+  "provider_mode": "live_mcp",
+  "case_id": "riverpod_asyncnotifier_migration",
+  "query": "Riverpod AsyncNotifier migration from StateNotifier pattern",
+  "suite": "public-docs",
+  "status": "success",
+  "latency_ms": 1325.063,
+  "setup_calls": 2,
+  "sources": [
+    {
+      "url": "https://github.com/rrousselgit/riverpod/blob/master/website/docs/migration/from_state_notifier.mdx",
+      "title": null,
+      "rank": 1,
+      "doc_scope": null,
+      "domain": "github.com"
+    },
+    {
+      "url": "https://github.com/rrousselgit/riverpod/blob/master/website/docs/migration/from_change_notifier.mdx",
+      "title": null,
+      "rank": 2,
+      "doc_scope": null,
+      "domain": "github.com"
+    },
+    {
+      "url": "https://pub.dev/packages/flutter_riverpod/changelog#200",
+      "title": "Riverpod 2.0",
+      "rank": 3,
+      "doc_scope": null,
+      "domain": "pub.dev"
+    },
+    {
+      "url": "https://pub.dev/documentation/riverpod/latest/riverpod/AsyncNotifier/future.html",
+      "title": "`future`",
+      "rank": 4,
+      "doc_scope": null,
+      "domain": "pub.dev"
+    },
+    {
+      "url": "https://pub.dev/documentation/riverpod/latest/riverpod/AsyncNotifier/update.html",
+      "title": "`update`",
+      "rank": 5,
+      "doc_scope": null,
+      "domain": "pub.dev"
+    }
+  ],
+  "snippets": [
+    {
+      "text": "import 'package:flutter_riverpod/flutter_riverpod.dart';\n\nfinal todoListProvider = StateNotifierProvider<TodoListNotifier, AsyncValue<List<String>>>((ref) {\n  return TodoListNotifier(ref);\n});\n\nclass ",
+      "source": "https://github.com/rrousselgit/riverpod/blob/master/website/docs/migration/from_state_notifier.mdx",
+      "rank": 1
+    },
+    {
+      "text": "import 'package:flutter_riverpod/flutter_riverpod.dart';\n\nfinal todoListProvider = AsyncNotifierProvider<TodoListNotifier, List<String>>(TodoListNotifier.new);\n\nclass TodoListNotifier extends AsyncNot",
+      "source": "https://github.com/rrousselgit/riverpod/blob/master/website/docs/migration/from_change_notifier.mdx",
+      "rank": 2
+    },
+    {
+      "text": "@override\nFuture<List<Todo>> build() async {\n  try {\n    final todos = await fetchTodosFromApi();\n    return todos;\n  } catch (e) {\n    rethrow;\n  }\n}\n",
+      "source": "https://pub.dev/packages/flutter_riverpod/changelog#200",
+      "rank": 3
+    }
+  ],
+  "warnings": [],
+  "reason_codes": [],
+  "exact_version_used": null,
+  "contamination_hits": [],
+  "forbidden_source_hits": [],
+  "expected_source_hits": [
+    "pub.dev"
+  ],
+  "answer_text_length": 4234,
+  "timestamp": "20260622_124329"
+}

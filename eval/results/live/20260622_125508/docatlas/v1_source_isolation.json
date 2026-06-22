@@ -1,0 +1,98 @@
+{
+  "provider": "docatlas",
+  "provider_mode": "live_mcp",
+  "case_id": "v1_source_isolation",
+  "query": "What changed in v1.0.0 for source isolation?",
+  "suite": "project-docs",
+  "status": "success",
+  "latency_ms": 40.886,
+  "setup_calls": 1,
+  "sources": [
+    {
+      "url": "docs/mcp-docs-server.md",
+      "title": "Recommended project-docs happy path - DocAtlas MCP docs server > Recommended project-docs happy path",
+      "rank": 1,
+      "doc_scope": "project",
+      "domain": ""
+    },
+    {
+      "url": "docs/mcp-docs-server.md",
+      "title": "Compact MCP responses - DocAtlas MCP docs server > Compact MCP responses",
+      "rank": 2,
+      "doc_scope": "project",
+      "domain": ""
+    },
+    {
+      "url": "CHANGELOG.md",
+      "title": "Added - Changelog > [0.4.6] - 2026-04-27 > Added",
+      "rank": 3,
+      "doc_scope": "project",
+      "domain": ""
+    },
+    {
+      "url": "CHANGELOG.md",
+      "title": "Changed - Changelog > [0.4.6] - 2026-04-27 > Changed",
+      "rank": 4,
+      "doc_scope": "project",
+      "domain": ""
+    },
+    {
+      "url": "docs/mcp-docs-server.md",
+      "title": "Maintained docs index and verification - DocAtlas MCP docs server > Maintained docs index and verification",
+      "rank": 5,
+      "doc_scope": "project",
+      "domain": ""
+    },
+    {
+      "url": "CHANGELOG.md",
+      "title": "Fixed - Changelog > [0.4.6] - 2026-04-27 > Fixed",
+      "rank": 6,
+      "doc_scope": "project",
+      "domain": ""
+    },
+    {
+      "url": "CHANGELOG.md",
+      "title": "[1.0.0] - 2026-06-22 - Changelog > [1.0.0] - 2026-06-22",
+      "rank": 7,
+      "doc_scope": "project",
+      "domain": ""
+    }
+  ],
+  "snippets": [
+    {
+      "text": "## Recommended project-docs happy path\n\nFor repo-specific questions, agents should prefer this flow:\n\n```text\nsync_project_docs(project_path, with_vectors=true)\n-> get_project_context(project_path, qu",
+      "source": "docs/mcp-docs-server.md",
+      "rank": 1
+    },
+    {
+      "text": "## Compact MCP responses\n\nAll project-docs lifecycle tools return compact responses by default. Pass `details: true` for the full structured response.\n\nCompact `sync_project_docs` response:\n\n```json\n{",
+      "source": "docs/mcp-docs-server.md",
+      "rank": 2
+    },
+    {
+      "text": "### Added\n\n- **RLM bench backend controls:** new flags on **`docmancer bench run`** to keep RLM runs bounded and debuggable. **`--rlm-max-iterations`** caps the root LM's iteration count per question ",
+      "source": "CHANGELOG.md",
+      "rank": 3
+    },
+    {
+      "text": "### Changed\n\n- **Dependencies:** add **`mcp>=1.0.0`** so installs include the MCP SDK used by **`docmancer mcp serve`** and the packaged agent guidance.",
+      "source": "CHANGELOG.md",
+      "rank": 4
+    },
+    {
+      "text": "## Maintained docs index and verification\n\nFor multi-doc repositories, recommend a maintained `docs/INDEX.md` as the canonical map of official project-owned docs. It should link root docs, architectur",
+      "source": "docs/mcp-docs-server.md",
+      "rank": 5
+    }
+  ],
+  "warnings": [],
+  "reason_codes": [],
+  "exact_version_used": null,
+  "contamination_hits": [],
+  "forbidden_source_hits": [],
+  "expected_source_hits": [
+    "CHANGELOG.md"
+  ],
+  "answer_text_length": 785,
+  "timestamp": "20260622_125508"
+}

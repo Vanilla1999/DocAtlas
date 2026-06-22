@@ -1,0 +1,65 @@
+{
+  "provider": "context7",
+  "provider_mode": "live_mcp",
+  "case_id": "riverpod_family",
+  "query": "Riverpod family modifier with parameterized providers",
+  "suite": "public-docs",
+  "status": "success",
+  "latency_ms": 1646.626,
+  "setup_calls": 2,
+  "sources": [
+    {
+      "url": "https://github.com/rrousselgit/riverpod/blob/master/website/docs/whats_new.mdx",
+      "title": null,
+      "rank": 1,
+      "doc_scope": null,
+      "domain": "github.com"
+    },
+    {
+      "url": "https://github.com/rrousselgit/riverpod/blob/master/website/docs/concepts2/providers.mdx",
+      "title": null,
+      "rank": 2,
+      "doc_scope": null,
+      "domain": "github.com"
+    },
+    {
+      "url": "https://github.com/rrousselgit/riverpod/blob/master/website/docs/from_provider/motivation/motivation.mdx",
+      "title": null,
+      "rank": 3,
+      "doc_scope": null,
+      "domain": "github.com"
+    },
+    {
+      "url": "https://github.com/rrousselgit/riverpod/blob/master/packages/riverpod_generator/README.md",
+      "title": null,
+      "rank": 4,
+      "doc_scope": null,
+      "domain": "github.com"
+    }
+  ],
+  "snippets": [
+    {
+      "text": "final provider = NotifierProvider.family<CounterNotifier, int, Argument>(\n  MyNotifier.new,\n);\n\nclass CounterNotifier extends FamilyNotifier<int, Argument> {\n  @override\n  int build(Argument arg) => 0",
+      "source": "https://github.com/rrousselgit/riverpod/blob/master/website/docs/whats_new.mdx",
+      "rank": 1
+    },
+    {
+      "text": "final provider = NotifierProvider.family<CounterNotifier, int, Argument>(\n  CounterNotifier.new,\n);\n\nclass CounterNotifier extends Notifier<int> {\n  CounterNotifier(this.arg);\n  final Argument arg;\n  ",
+      "source": "https://github.com/rrousselgit/riverpod/blob/master/website/docs/concepts2/providers.mdx",
+      "rank": 2
+    },
+    {
+      "text": "final name = SomeNotifierProvider.someModifier<MyNotifier, Result>(MyNotifier.new);\n \nclass MyNotifier extends SomeNotifier<Result> {\n  @override\n  Result build() {\n    <your logic here>\n  }\n\n  <your ",
+      "source": "https://github.com/rrousselgit/riverpod/blob/master/website/docs/from_provider/motivation/motivation.mdx",
+      "rank": 3
+    }
+  ],
+  "warnings": [],
+  "reason_codes": [],
+  "exact_version_used": null,
+  "contamination_hits": [],
+  "forbidden_source_hits": [],
+  "expected_source_hits": [],
+  "answer_text_length": 3389,
+  "timestamp": "20260622_124329"
+}

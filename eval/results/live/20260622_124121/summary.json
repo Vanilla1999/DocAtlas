@@ -1,0 +1,65 @@
+{
+  "timestamp": "20260622_124121",
+  "duration_s": 68.933,
+  "total_queries": 17,
+  "providers": {
+    "docatlas": "live_mcp"
+  },
+  "suites": [
+    "public-docs"
+  ],
+  "docatlas": {
+    "total_queries": 17,
+    "applicable_queries": 17,
+    "success_count": 0,
+    "error_count": 0,
+    "empty_count": 17,
+    "not_applicable_count": 0,
+    "contamination_rate": 0.0,
+    "correct_source_rate": 1.0,
+    "forbidden_source_rate": 0.0,
+    "hit@1": 0.0,
+    "hit@5": 0.0,
+    "mrr": 0.0,
+    "unique_sources@5": 0.0,
+    "redundancy_rate": 0.0,
+    "snippet_usefulness": 0.0,
+    "avg_latency_ms": 4049.122,
+    "avg_cold_latency_ms": 4049.122,
+    "avg_warm_latency_ms": 0.0,
+    "setup_calls_avg": 2.0,
+    "exact_version_correctness": 0.0,
+    "hallucinated_api_rate": 0.0
+  },
+  "context7": {},
+  "suite_metrics": [
+    {
+      "suite": "public-docs",
+      "total": 17,
+      "docatlas": {
+        "total_queries": 17,
+        "applicable_queries": 17,
+        "success_count": 0,
+        "error_count": 0,
+        "empty_count": 17,
+        "not_applicable_count": 0,
+        "contamination_rate": 0.0,
+        "correct_source_rate": 1.0,
+        "forbidden_source_rate": 0.0,
+        "hit@1": 0.0,
+        "hit@5": 0.0,
+        "mrr": 0.0,
+        "unique_sources@5": 0.0,
+        "redundancy_rate": 0.0,
+        "snippet_usefulness": 0.0,
+        "avg_latency_ms": 4049.122,
+        "avg_cold_latency_ms": 4049.122,
+        "avg_warm_latency_ms": 0.0,
+        "setup_calls_avg": 2.0,
+        "exact_version_correctness": 0.0,
+        "hallucinated_api_rate": 0.0
+      }
+    }
+  ],
+  "report_file": "/home/viadmin/StudioProjects/hermes/docmancer/eval/results/live/20260622_124121/report.md"
+}

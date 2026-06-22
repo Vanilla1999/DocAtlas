@@ -1,0 +1,91 @@
+{
+  "provider": "docatlas",
+  "provider_mode": "live_mcp",
+  "case_id": "sync_vs_ingest",
+  "query": "How does sync_project_docs differ from ingest_project_docs?",
+  "suite": "project-docs",
+  "status": "success",
+  "latency_ms": 42.153,
+  "setup_calls": 1,
+  "sources": [
+    {
+      "url": "{'source_class': 'project_doc', 'doc_scope': 'project', 'module_id': None, 'module_name': None, 'module_path': None, 'module_type': None, 'path': 'README.md', 'url': None, 'title': 'Compact MCP responses'}",
+      "title": "Compact MCP responses - DocAtlas > Project-docs MCP server > Compact MCP responses",
+      "rank": 1,
+      "doc_scope": "project",
+      "domain": ""
+    },
+    {
+      "url": "{'source_class': 'project_doc', 'doc_scope': 'project', 'module_id': None, 'module_name': None, 'module_path': None, 'module_type': None, 'path': 'README.md', 'url': None, 'title': 'When to use each tool'}",
+      "title": "When to use each tool - DocAtlas > Project-docs MCP server > When to use each tool",
+      "rank": 2,
+      "doc_scope": "project",
+      "domain": ""
+    },
+    {
+      "url": "{'source_class': 'project_doc', 'doc_scope': 'project', 'module_id': None, 'module_name': None, 'module_path': None, 'module_type': None, 'path': 'README.md', 'url': None, 'title': 'Project-aware Flutter/Dart docs'}",
+      "title": "Project-aware Flutter/Dart docs - DocAtlas > Project-aware Flutter/Dart docs",
+      "rank": 3,
+      "doc_scope": "project",
+      "domain": ""
+    },
+    {
+      "url": "{'source_class': 'project_doc', 'doc_scope': 'project', 'module_id': None, 'module_name': None, 'module_path': None, 'module_type': None, 'path': 'README.md', 'url': None, 'title': 'Core commands'}",
+      "title": "Core commands - DocAtlas > Core commands",
+      "rank": 4,
+      "doc_scope": "project",
+      "domain": ""
+    },
+    {
+      "url": "{'source_class': 'project_doc', 'doc_scope': 'project', 'module_id': None, 'module_name': None, 'module_path': None, 'module_type': None, 'path': 'docs/project-docs-mcp-workflow.md', 'url': None, 'title': 'Canonical lifecycle: sync'}",
+      "title": "Canonical lifecycle: sync - Project docs MCP workflow > Canonical lifecycle: sync",
+      "rank": 5,
+      "doc_scope": "project",
+      "domain": ""
+    },
+    {
+      "url": "{'source_class': 'project_doc', 'doc_scope': 'project', 'module_id': None, 'module_name': None, 'module_path': None, 'module_type': None, 'path': 'docs/project-docs-mcp-workflow.md', 'url': None, 'title': 'Preferred happy path'}",
+      "title": "Preferred happy path - Project docs MCP workflow > Preferred happy path",
+      "rank": 6,
+      "doc_scope": "project",
+      "domain": ""
+    }
+  ],
+  "snippets": [
+    {
+      "text": "### Compact MCP responses\n\nAll project-docs lifecycle tools return compact responses by default:\n\n```json\n{\n  \"tool\": \"sync_project_docs\",\n  \"status\": \"success\",\n  \"current_count\": 3,\n  \"new_count\": 1",
+      "source": "{'source_class': 'project_doc', 'doc_scope': 'project', 'module_id': None, 'module_name': None, 'module_path': None, 'module_type': None, 'path': 'README.md', 'url': None, 'title': 'Compact MCP responses'}",
+      "rank": 1
+    },
+    {
+      "text": "### When to use each tool\n\n| Situation | Tool |\n|---|---|\n| First time in a repo | `sync_project_docs` or `bootstrap_project_docs` |\n| Check what docs exist | `inspect_project_docs` (read-only) |\n| Re",
+      "source": "{'source_class': 'project_doc', 'doc_scope': 'project', 'module_id': None, 'module_name': None, 'module_path': None, 'module_type': None, 'path': 'README.md', 'url': None, 'title': 'When to use each tool'}",
+      "rank": 2
+    },
+    {
+      "text": "## Project-aware Flutter/Dart docs\n\nDocAtlas can inspect a local Flutter/Dart project. It reads `.fvmrc` for Flutter channel/version hints and `pubspec.lock` for pub package versions. This enables exa",
+      "source": "{'source_class': 'project_doc', 'doc_scope': 'project', 'module_id': None, 'module_name': None, 'module_path': None, 'module_type': None, 'path': 'README.md', 'url': None, 'title': 'Project-aware Flutter/Dart docs'}",
+      "rank": 3
+    },
+    {
+      "text": "## Core commands\n\n```bash\ndoc-atlas setup\ndoc-atlas ingest ./docs\ndoc-atlas add https://docs.example.com\ndoc-atlas update\ndoc-atlas query \"how to authenticate\"\ndoc-atlas query \"how to authenticate\" --",
+      "source": "{'source_class': 'project_doc', 'doc_scope': 'project', 'module_id': None, 'module_name': None, 'module_path': None, 'module_type': None, 'path': 'README.md', 'url': None, 'title': 'Core commands'}",
+      "rank": 4
+    },
+    {
+      "text": "## Canonical lifecycle: sync\n\n`sync_project_docs` is the recommended lifecycle action. It replaces the old two-step `inspect → ingest` loop:\n\n1. **discovers** current candidates from the filesystem;\n2",
+      "source": "{'source_class': 'project_doc', 'doc_scope': 'project', 'module_id': None, 'module_name': None, 'module_path': None, 'module_type': None, 'path': 'docs/project-docs-mcp-workflow.md', 'url': None, 'title': 'Canonical lifecycle: sync'}",
+      "rank": 5
+    }
+  ],
+  "warnings": [],
+  "reason_codes": [],
+  "exact_version_used": null,
+  "contamination_hits": [],
+  "forbidden_source_hits": [],
+  "expected_source_hits": [
+    "docs/project-docs-mcp-workflow.md"
+  ],
+  "answer_text_length": 799,
+  "timestamp": "20260622_125026"
+}
