@@ -4,6 +4,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Protocol
 import shutil
+import sqlite3
 
 from docmancer.docs.models import DocsInspectResult, DocsPruneResult, DocsRemoveResult, LibraryInfo
 from docmancer.docs.registry import LibraryRecord
@@ -47,14 +48,54 @@ class LibraryRegistryOps:
             shutil.rmtree(extracted)
         return removed
 
+    def count_index_entries(self, record: LibraryRecord) -> tuple[int, int]:
+        config = self.deps._index_config_for(record)
+        db_path = Path(config.index.db_path)
+        if not db_path.exists():
+            return 0, 0
+        try:
+            with sqlite3.connect(db_path) as conn:
+                pages = int(conn.execute("SELECT COUNT(*) FROM sources").fetchone()[0])
+                chunks = int(conn.execute("SELECT COUNT(*) FROM sections").fetchone()[0])
+                return pages, chunks
+        except sqlite3.Error:
+            return 0, 0
+
+    def status_for(self, record: LibraryRecord, size_bytes: int | None = None) -> str:
+        if record.status == "failed":
+            return "failed"
+        pages, chunks = self.count_index_entries(record)
+        if pages == 0 and chunks == 0 and Path(self.deps._index_config_for(record).index.db_path).exists():
+            return "empty_index"
+        size = self.index_size_for(record) if size_bytes is None else size_bytes
+        if size == 0:
+            return "empty_index"
+        if self.deps._is_stale(record.last_refreshed_at):
+            return "stale"
+        return "indexed"
+
+    def reason_code_for(self, record: LibraryRecord, status: str) -> str:
+        if status == "empty_index":
+            return "empty_index"
+        if status == "stale":
+            return "stale"
+        if status == "failed":
+            return "failed"
+        if status == "indexed":
+            return "healthy"
+        return "not_indexed"
+
     def inspect_library_docs(self, canonical_id: str) -> DocsInspectResult:
         record = self.deps.registry.get(canonical_id)
         if record is None:
-            return DocsInspectResult(canonical_id=canonical_id, status="missing", message="library docs target not found")
+            return DocsInspectResult(canonical_id=canonical_id, status="missing", reason_code="missing", message="library docs target not found")
+        size_bytes = self.index_size_for(record)
+        status = self.status_for(record, size_bytes)
+        pages, chunks = self.count_index_entries(record)
         return DocsInspectResult(
             canonical_id=record.library_id,
             source_id=record.source_id,
-            status=record.status or "available",
+            status=status,
             library=record.name,
             ecosystem=record.ecosystem,
             version=record.version,
@@ -69,7 +110,10 @@ class LibraryRegistryOps:
             version_inferred=record.version_inferred,
             last_refreshed_at=record.last_refreshed_at,
             stale=self.deps._is_stale(record.last_refreshed_at),
-            size_bytes=self.index_size_for(record),
+            pages=pages,
+            chunks=chunks,
+            reason_code=self.reason_code_for(record, status),
+            size_bytes=size_bytes,
             warnings=[record.last_error] if record.last_error else [],
         )
 
@@ -79,7 +123,7 @@ class LibraryRegistryOps:
             return DocsRemoveResult(canonical_id=canonical_id, removed=False, message="library docs target not found")
         removed_bytes = self.delete_index_for(record)
         removed = self.deps.registry.delete(record.library_id)
-        self.deps.agent_gateway.drop_library_agent(record.library_id)
+        self.deps.agent_gateway.drop_library_agent(record)
         return DocsRemoveResult(canonical_id=record.library_id, removed=removed, chunks_removed=removed_bytes)
 
     @staticmethod
@@ -129,6 +173,9 @@ class LibraryRegistryOps:
             stale = self.deps._is_stale(record.last_refreshed_at)
             if stale_only and not stale:
                 continue
+            size_bytes = self.index_size_for(record)
+            status = self.status_for(record, size_bytes)
+            pages, chunks = self.count_index_entries(record)
             items.append(
                 LibraryInfo(
                     library_id=record.library_id,
@@ -138,10 +185,13 @@ class LibraryRegistryOps:
                     source_type=record.source_type,
                     docs_url=record.docs_url,
                     docs_url_template=record.docs_url_template,
-                    status=record.status,
+                    status=status,
                     local=record.last_refreshed_at is not None,
                     stale=stale,
                     last_refreshed_at=record.last_refreshed_at,
+                    pages=pages,
+                    chunks=chunks,
+                    reason_code=self.reason_code_for(record, status),
                     message=record.last_error,
                 )
             )

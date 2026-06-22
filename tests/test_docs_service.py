@@ -12,7 +12,8 @@ from click.testing import CliRunner
 
 from docmancer.cli.__main__ import cli
 from docmancer.core.config import DocmancerConfig
-from docmancer.core.models import RetrievedChunk
+from docmancer.core.models import Document, RetrievedChunk
+from docmancer.core.sqlite_store import SQLiteStore
 from docmancer.agent import DocmancerAgent
 from docmancer.docs.models import DocsChunk, DocsResult, DocsTarget, ProjectContextResult, SOURCE_CLASS_PROJECT_FILE
 from docmancer.docs.interfaces.mcp.project_tools import handle_project_tool
@@ -25,32 +26,40 @@ class FakeAgent:
         self.add_calls: list[str] = []
         self.add_kwargs: list[dict] = []
         self.query_calls: list[tuple[str, int | None]] = []
+        self.config = None
 
     def add(self, docs_url: str, recreate: bool = False, **kwargs) -> int:
         self.add_calls.append(docs_url)
         self.add_kwargs.append(kwargs)
+        if self.config is not None:
+            store = SQLiteStore(self.config.index.db_path, self.config.index.extracted_dir)
+            metadata = dict(kwargs.get("metadata") or {})
+            metadata.setdefault("title", "Guide")
+            store.add_documents([Document(source=docs_url.rstrip("/") + "/guide", content="# Guide\nUse parametrize for generated cases.", metadata=metadata)], recreate=recreate)
         return 1
 
     def query(self, text: str, limit=None, budget=None, expand=None):
         self.query_calls.append((text, budget))
+        metadata = dict((self.add_kwargs[-1].get("metadata") if self.add_kwargs else None) or {})
+        metadata.setdefault("title", "Parametrize")
         return [
             RetrievedChunk(
-                source="https://docs.example.com/guide",
+                source=(self.add_calls[-1].rstrip("/") + "/guide") if self.add_calls else "https://docs.example.com/guide",
                 chunk_index=0,
                 text="Use parametrize for generated cases.",
                 score=1.0,
-                metadata={"title": "Parametrize"},
+                metadata=metadata,
             )
         ]
 
 
 class FailingAgent(FakeAgent):
     def add(self, docs_url: str, recreate: bool = False, **kwargs) -> int:
-        self.add_calls.append(docs_url)
-        self.add_kwargs.append(kwargs)
         if "bad-version" in docs_url:
+            self.add_calls.append(docs_url)
+            self.add_kwargs.append(kwargs)
             raise RuntimeError("404 docs")
-        return 1
+        return super().add(docs_url, recreate=recreate, **kwargs)
 
 
 class BlockingAgent(FakeAgent):
@@ -89,6 +98,13 @@ class PageFailingAgent(FakeAgent):
         if "bad" in docs_url:
             raise RuntimeError("bad page")
         return 1
+
+
+class ZeroPageAgent(FakeAgent):
+    def add(self, docs_url: str, recreate: bool = False, **kwargs) -> int:
+        self.add_calls.append(docs_url)
+        self.add_kwargs.append(kwargs)
+        return 0
 
 
 class AlwaysFailingAgent(FakeAgent):
@@ -151,15 +167,38 @@ class MixedRiverpodFakeAgent(FakeAgent):
         ]
 
 
+class StaticChunksAgent(FakeAgent):
+    def __init__(self, chunks):
+        super().__init__()
+        self.chunks = chunks
+
+    def query(self, text: str, limit=None, budget=None, expand=None):
+        self.query_calls.append((text, budget))
+        return self.chunks
+
+
+class FailingRefreshStaticChunksAgent(StaticChunksAgent):
+    def add(self, docs_url: str, recreate: bool = False, **kwargs) -> int:
+        self.add_calls.append(docs_url)
+        self.add_kwargs.append(kwargs)
+        raise RuntimeError("refresh failed")
+
+
 def _service(tmp_path, monkeypatch, agent: FakeAgent | None = None) -> LibraryDocsService:
     monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
+    agent = agent or FakeAgent()
     config = DocmancerConfig()
     config.index.db_path = str(tmp_path / "docmancer.db")
     config.index.extracted_dir = str(tmp_path / "extracted")
+    def agent_factory(**kwargs):
+        agent.config = kwargs.get("config")
+        return agent
+
     return LibraryDocsService(
         config=config,
         registry=LibraryRegistry(config.index.db_path),
-        agent=agent or FakeAgent(),
+        agent=agent,
+        agent_factory=agent_factory,
         job_tracker=DocsJobTracker(),
     )
 
@@ -177,8 +216,32 @@ def _service_with_real_agent(tmp_path, monkeypatch) -> LibraryDocsService:
     )
 
 
+def _mark_library_indexed(service: LibraryDocsService, record) -> None:
+    config = service._index_config_for(record)
+    marker = Path(config.index.extracted_dir) / "chunk.md"
+    marker.parent.mkdir(parents=True, exist_ok=True)
+    marker.write_text("indexed chunk", encoding="utf-8")
+
+
+def _write_library_index(service: LibraryDocsService, record, content: str = "# Guide\nUse this documentation.") -> None:
+    config = service._index_config_for(record)
+    store = SQLiteStore(config.index.db_path, config.index.extracted_dir)
+    store.add_documents([Document(source=record.docs_url_resolved or record.docs_url or record.library_id, content=content, metadata={"library_id": record.library_id})])
+
+
 def _old_iso(days: int = 31) -> str:
     return (datetime.now(timezone.utc) - timedelta(days=days)).isoformat(timespec="seconds")
+
+
+def _library_chunk(record, text: str, source_suffix: str = "guide", score: float = 1.0) -> RetrievedChunk:
+    root = (record.docs_url_resolved or record.docs_url or "https://docs.example.com/").rstrip("/")
+    return RetrievedChunk(
+        source=f"{root}/{source_suffix}",
+        chunk_index=0,
+        text=text,
+        score=score,
+        metadata={"title": source_suffix, "library_id": record.library_id, "canonical_id": record.canonical_id},
+    )
 
 
 def _flutter_project(tmp_path, *, fvmrc: str = "stable"):
@@ -1394,7 +1457,7 @@ def test_versioned_library_uses_canonical_id(tmp_path, monkeypatch):
 def test_registry_backfills_identity_for_existing_rows(tmp_path, monkeypatch):
     service = _service(tmp_path, monkeypatch)
     now = datetime.now(timezone.utc).isoformat(timespec="seconds")
-    service.registry.upsert(
+    record = service.registry.upsert(
         library="go_router",
         ecosystem="pub",
         version="latest",
@@ -1501,7 +1564,7 @@ def test_missing_version_falls_back_to_latest_with_warning(tmp_path, monkeypatch
     agent = FakeAgent()
     service = _service(tmp_path, monkeypatch, agent)
     now = datetime.now(timezone.utc).isoformat(timespec="seconds")
-    service.registry.upsert(
+    record = service.registry.upsert(
         library="go_router",
         ecosystem="pub",
         version="latest",
@@ -1510,6 +1573,7 @@ def test_missing_version_falls_back_to_latest_with_warning(tmp_path, monkeypatch
         status="available",
         last_refreshed_at=now,
     )
+    _mark_library_indexed(service, record)
 
     result = service.get_docs("go_router", ecosystem="pub", topic="ShellRoute")
 
@@ -1616,6 +1680,112 @@ def test_registered_web_docs_reports_resolver_diagnostics(tmp_path, monkeypatch)
         "stored_locator": "https://docs.pytest.org/",
         "candidate_count": 0,
     }
+
+
+def test_code_example_blocks_detected_and_ranked_first(tmp_path, monkeypatch):
+    service = _service(tmp_path, monkeypatch)
+    now = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    record = service.registry.upsert(
+        library="fastapi",
+        ecosystem="python",
+        docs_url="https://fastapi.tiangolo.com/",
+        now=now,
+        status="available",
+        last_refreshed_at=now,
+    )
+    _write_library_index(service, record)
+    chunks = [
+        _library_chunk(record, "Dependency injection overview.", "concepts", 0.9),
+        _library_chunk(record, "Use Depends.\n```python\ndef get_db():\n    return Depends(callable)\n```", "depends", 0.8),
+    ]
+    service.agent_gateway.drop_library_agent(record)
+    service.agent_gateway._agents[record.canonical_id] = StaticChunksAgent(chunks)
+
+    result = service.get_docs("fastapi", ecosystem="python", topic="Depends callable injection")
+
+    assert result.results[0].source.endswith("/depends")
+    assert result.results[0].metadata["code_snippets"] == 1
+    assert result.diagnostics["code_snippets"] == 1
+
+
+def test_noise_cleaned_from_output_and_anchor_links_stripped(tmp_path, monkeypatch):
+    service = _service(tmp_path, monkeypatch)
+    now = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    record = service.registry.upsert(
+        library="click",
+        ecosystem="python",
+        docs_url="https://click.palletsprojects.com/",
+        now=now,
+        status="available",
+        last_refreshed_at=now,
+    )
+    _write_library_index(service, record)
+    chunks = [_library_chunk(record, "Options [¶]\nCopy code\nUse @click.option() ", "options")]
+    service.agent_gateway.drop_library_agent(record)
+    service.agent_gateway._agents[record.canonical_id] = StaticChunksAgent(chunks)
+
+    result = service.get_docs("click", ecosystem="python", topic="option")
+
+    assert "[¶]" not in result.results[0].content
+    assert "Copy code" not in result.results[0].content
+    assert "@click.option()" in result.results[0].content
+
+
+def test_max_chunks_per_source_enforced_and_unique_sources_reported(tmp_path, monkeypatch):
+    service = _service(tmp_path, monkeypatch)
+    now = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    record = service.registry.upsert(
+        library="riverpod",
+        ecosystem="pub",
+        version="3.0.0",
+        docs_url="https://pub.dev/documentation/riverpod/3.0.0/",
+        now=now,
+        status="available",
+        last_refreshed_at=now,
+    )
+    _write_library_index(service, record)
+    root = record.docs_url.rstrip("/")
+    chunks = [
+        RetrievedChunk(source=f"{root}/provider", chunk_index=i, text=f"ref.watch example {i}", score=1.0 - i * 0.01, metadata={"title": f"provider {i}", "library_id": record.library_id, "canonical_id": record.canonical_id})
+        for i in range(4)
+    ] + [
+        _library_chunk(record, "ref.listen example", "listener", 0.7),
+        _library_chunk(record, "AsyncValue example", "async-value", 0.6),
+    ]
+    service.agent_gateway.drop_library_agent(record)
+    service.agent_gateway._agents[record.canonical_id] = StaticChunksAgent(chunks)
+
+    result = service.get_docs("riverpod", ecosystem="pub", version="3.0.0", topic="ref watch listen")
+
+    assert sum(1 for item in result.results if item.source == f"{root}/provider") == 2
+    assert result.diagnostics["chunks_dropped_for_diversity"] == 2
+    assert result.diagnostics["unique_sources@5"] == 3
+
+
+def test_stale_docs_include_freshness_warning_and_chunk_metadata(tmp_path, monkeypatch):
+    now = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    old = _old_iso(45)
+    service = _service(tmp_path, monkeypatch)
+    record = service.registry.upsert(
+        library="pytest",
+        ecosystem="python",
+        docs_url="https://docs.pytest.org/",
+        now=now,
+        status="available",
+        last_refreshed_at=old,
+    )
+    _write_library_index(service, record)
+    chunks = [_library_chunk(record, "Use fixtures.", "fixtures")]
+    service.agent_gateway.drop_library_agent(record)
+    service.agent_gateway._agents[record.canonical_id] = FailingRefreshStaticChunksAgent(chunks)
+
+    result = service.get_docs("pytest", ecosystem="python", topic="fixtures")
+
+    assert result.status == "success"
+    assert any("stale after" in warning for warning in result.warnings)
+    assert result.diagnostics["freshness"]["stale"] is True
+    assert result.diagnostics["freshness"]["age_days"] >= 45
+    assert result.results[0].metadata["stale"] is True
 
 
 def test_registered_web_docs_conflicting_input_url_blocks_without_mutation(tmp_path, monkeypatch):
@@ -1826,7 +1996,7 @@ def test_query_isolation_returns_only_requested_go_router_version(tmp_path, monk
     agent = MixedVersionFakeAgent()
     service = _service(tmp_path, monkeypatch, agent)
     now = datetime.now(timezone.utc).isoformat(timespec="seconds")
-    service.registry.upsert(
+    record = service.registry.upsert(
         library="go_router",
         ecosystem="pub",
         version="14.8.1",
@@ -1835,7 +2005,8 @@ def test_query_isolation_returns_only_requested_go_router_version(tmp_path, monk
         status="available",
         last_refreshed_at=now,
     )
-    service.registry.upsert(
+    _mark_library_indexed(service, record)
+    record = service.registry.upsert(
         library="go_router",
         ecosystem="pub",
         version="latest",
@@ -1844,6 +2015,7 @@ def test_query_isolation_returns_only_requested_go_router_version(tmp_path, monk
         status="available",
         last_refreshed_at=now,
     )
+    _mark_library_indexed(service, record)
 
     result = service.get_docs("go_router", ecosystem="pub", version="14.8.1", topic="ShellRoute")
 
@@ -1854,7 +2026,7 @@ def test_query_isolation_returns_only_latest_go_router_version(tmp_path, monkeyp
     agent = MixedVersionFakeAgent()
     service = _service(tmp_path, monkeypatch, agent)
     now = datetime.now(timezone.utc).isoformat(timespec="seconds")
-    service.registry.upsert(
+    record = service.registry.upsert(
         library="go_router",
         ecosystem="pub",
         version="14.8.1",
@@ -1863,7 +2035,8 @@ def test_query_isolation_returns_only_latest_go_router_version(tmp_path, monkeyp
         status="available",
         last_refreshed_at=now,
     )
-    service.registry.upsert(
+    _mark_library_indexed(service, record)
+    record = service.registry.upsert(
         library="go_router",
         ecosystem="pub",
         version="latest",
@@ -1872,6 +2045,7 @@ def test_query_isolation_returns_only_latest_go_router_version(tmp_path, monkeyp
         status="available",
         last_refreshed_at=now,
     )
+    _mark_library_indexed(service, record)
 
     result = service.get_docs("go_router", ecosystem="pub", version="latest", topic="ShellRoute")
 
@@ -1882,7 +2056,7 @@ def test_query_isolation_between_two_riverpod_versions(tmp_path, monkeypatch):
     agent = MixedRiverpodFakeAgent()
     service = _service(tmp_path, monkeypatch, agent)
     now = datetime.now(timezone.utc).isoformat(timespec="seconds")
-    service.registry.upsert(
+    record = service.registry.upsert(
         library="riverpod",
         ecosystem="pub",
         version="2.6.1",
@@ -1891,6 +2065,7 @@ def test_query_isolation_between_two_riverpod_versions(tmp_path, monkeypatch):
         status="available",
         last_refreshed_at=now,
     )
+    _mark_library_indexed(service, record)
     service.registry.upsert(
         library="riverpod",
         ecosystem="pub",
@@ -1904,6 +2079,176 @@ def test_query_isolation_between_two_riverpod_versions(tmp_path, monkeypatch):
     result = service.get_docs("riverpod", ecosystem="pub", version="2.6.1", topic="Provider")
 
     assert [chunk.content for chunk in result.results] == ["Riverpod 2 APIs."]
+
+
+def test_library_id_filter_is_unconditional(tmp_path, monkeypatch):
+    service = _service(
+        tmp_path,
+        monkeypatch,
+        StaticChunksAgent(
+            [
+                RetrievedChunk(
+                    source="https://docs.pytest.org/guide",
+                    chunk_index=0,
+                    text="Unlabeled project/global chunk.",
+                    score=1.0,
+                    metadata={"title": "Guide"},
+                )
+            ]
+        ),
+    )
+    now = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    record = service.registry.upsert(
+        library="pytest",
+        ecosystem=None,
+        docs_url="https://docs.pytest.org/",
+        now=now,
+        status="available",
+        last_refreshed_at=now,
+    )
+    _mark_library_indexed(service, record)
+
+    result = service.get_docs("pytest", topic="fixtures")
+
+    assert result.status == "empty_library_index"
+    assert result.results == []
+
+
+def test_post_retrieval_guard_drops_wrong_ecosystem(tmp_path, monkeypatch):
+    service = _service(
+        tmp_path,
+        monkeypatch,
+        StaticChunksAgent(
+            [
+                RetrievedChunk(
+                    source="https://docs.python.org/click/guide",
+                    chunk_index=0,
+                    text="FastAPI chunk in Click query.",
+                    score=1.0,
+                    metadata={
+                        "title": "Wrong ecosystem",
+                        "library_id": "python:click@8.1.7:api",
+                        "canonical_id": "python:click@8.1.7:api",
+                        "ecosystem": "fastapi",
+                        "version": "8.1.7",
+                    },
+                )
+            ]
+        ),
+    )
+    now = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    record = service.registry.upsert(
+        library="click",
+        ecosystem="python",
+        version="8.1.7",
+        docs_url="https://docs.python.org/click/",
+        now=now,
+        status="available",
+        last_refreshed_at=now,
+    )
+    _mark_library_indexed(service, record)
+
+    result = service.get_docs("click", ecosystem="python", version="8.1.7", topic="commands")
+
+    assert result.status == "empty_library_index"
+    assert result.results == []
+
+
+def test_post_retrieval_guard_drops_project_docs(tmp_path, monkeypatch):
+    service = _service(
+        tmp_path,
+        monkeypatch,
+        StaticChunksAgent(
+            [
+                RetrievedChunk(
+                    source="/repo/ARCHITECTURE.md",
+                    chunk_index=0,
+                    text="Project architecture chunk.",
+                    score=1.0,
+                    metadata={
+                        "title": "Architecture",
+                        "library_id": "pytest",
+                        "canonical_id": "pytest",
+                        "project_path": "/repo",
+                    },
+                )
+            ]
+        ),
+    )
+    now = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    record = service.registry.upsert(
+        library="pytest",
+        ecosystem=None,
+        docs_url="https://docs.pytest.org/",
+        now=now,
+        status="available",
+        last_refreshed_at=now,
+    )
+    _mark_library_indexed(service, record)
+
+    result = service.get_docs("pytest", topic="fixtures")
+
+    assert result.status == "empty_library_index"
+    assert result.results == []
+
+
+def test_post_retrieval_guard_empty_result_returns_controlled_error(tmp_path, monkeypatch):
+    service = _service(tmp_path, monkeypatch, StaticChunksAgent([]))
+    now = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    service.registry.upsert(
+        library="pytest",
+        ecosystem=None,
+        docs_url="https://docs.pytest.org/",
+        now=now,
+        status="available",
+        last_refreshed_at=now,
+    )
+
+    result = service.get_docs("pytest", topic="fixtures")
+
+    assert result.status == "empty_library_index"
+    assert result.decision == "stop"
+    assert result.next_actions == ["Call refresh_library_docs to ingest this library's docs."]
+
+
+def test_diagnostic_on_filtered_chunks(tmp_path, monkeypatch):
+    service = _service(
+        tmp_path,
+        monkeypatch,
+        StaticChunksAgent(
+            [
+                RetrievedChunk(
+                    source="https://docs.pytest.org/good",
+                    chunk_index=0,
+                    text="Correct pytest chunk.",
+                    score=1.0,
+                    metadata={"title": "Good", "library_id": "pytest", "canonical_id": "pytest"},
+                ),
+                RetrievedChunk(
+                    source="https://docs.pytest.org/bad",
+                    chunk_index=1,
+                    text="Unlabeled contaminant.",
+                    score=0.9,
+                    metadata={"title": "Bad"},
+                ),
+            ]
+        ),
+    )
+    now = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    record = service.registry.upsert(
+        library="pytest",
+        ecosystem=None,
+        docs_url="https://docs.pytest.org/",
+        now=now,
+        status="available",
+        last_refreshed_at=now,
+    )
+    _mark_library_indexed(service, record)
+
+    result = service.get_docs("pytest", topic="fixtures")
+
+    assert [chunk.content for chunk in result.results] == ["Correct pytest chunk."]
+    assert {"code": "cross_source_contamination_filtered", "blocking": False, "dropped": 1} in result.diagnostics["warnings"]
 
 
 def test_prefetch_project_docs_prefetches_only_selected_packages(tmp_path, monkeypatch):
@@ -1983,7 +2328,7 @@ def test_fresh_library_does_not_refresh(tmp_path, monkeypatch):
     agent = FakeAgent()
     service = _service(tmp_path, monkeypatch, agent)
     now = datetime.now(timezone.utc).isoformat(timespec="seconds")
-    service.registry.upsert(
+    record = service.registry.upsert(
         library="pytest",
         ecosystem=None,
         docs_url="https://docs.pytest.org/",
@@ -1991,6 +2336,7 @@ def test_fresh_library_does_not_refresh(tmp_path, monkeypatch):
         status="available",
         last_refreshed_at=now,
     )
+    _mark_library_indexed(service, record)
 
     result = service.get_docs("pytest", topic="fixtures")
 
@@ -2039,6 +2385,26 @@ def test_refresh_force_false_skips_fresh_library(tmp_path, monkeypatch):
     agent = FakeAgent()
     service = _service(tmp_path, monkeypatch, agent)
     now = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    record = service.registry.upsert(
+        library="pytest",
+        ecosystem=None,
+        docs_url="https://docs.pytest.org/",
+        now=now,
+        status="available",
+        last_refreshed_at=now,
+    )
+    _write_library_index(service, record)
+
+    result = service.refresh_docs("pytest", force=False)
+
+    assert result.status == "skipped"
+    assert agent.add_calls == []
+
+
+def test_refresh_force_false_reingests_fresh_but_empty_library(tmp_path, monkeypatch):
+    agent = FakeAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+    now = datetime.now(timezone.utc).isoformat(timespec="seconds")
     service.registry.upsert(
         library="pytest",
         ecosystem=None,
@@ -2050,8 +2416,54 @@ def test_refresh_force_false_skips_fresh_library(tmp_path, monkeypatch):
 
     result = service.refresh_docs("pytest", force=False)
 
-    assert result.status == "skipped"
-    assert agent.add_calls == []
+    assert result.status == "updated"
+    assert agent.add_calls == ["https://docs.pytest.org/"]
+
+
+def test_refresh_zero_pages_returns_empty_index_not_updated(tmp_path, monkeypatch):
+    agent = ZeroPageAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+    now = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    service.registry.upsert(
+        library="pytest",
+        ecosystem=None,
+        docs_url="https://docs.pytest.org/",
+        now=now,
+        status="available",
+        last_refreshed_at=_old_iso(),
+    )
+
+    result = service.refresh_docs("pytest", force=False)
+
+    assert result.status == "empty_index"
+    assert result.pages_indexed == 0
+    assert result.targets_failed == 1
+    assert "no_extractable_content" in (result.message or "")
+    assert service.inspect_library_docs("pytest").status == "empty_index"
+
+
+def test_dartdoc_zero_chunk_refresh_fails_safely_without_unrelated_docs(tmp_path, monkeypatch):
+    agent = ZeroPageAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+    now = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    service.registry.upsert(
+        library="flutter_bloc",
+        ecosystem="pub",
+        version="9.1.1",
+        source_type="api",
+        docs_url="https://pub.dev/documentation/flutter_bloc/9.1.1/",
+        now=now,
+        status="available",
+        last_refreshed_at=_old_iso(),
+        target_spec={"doc_format": "dartdoc", "max_pages": 500},
+    )
+
+    refresh = service.refresh_docs("flutter_bloc", ecosystem="pub", version="9.1.1", source_type="api", force=False)
+    result = service.get_docs("flutter_bloc", ecosystem="pub", version="9.1.1", source_type="api", topic="BlocBuilder")
+
+    assert refresh.status == "empty_index"
+    assert result.status == "empty_library_index"
+    assert result.results == []
 
 
 def test_force_refresh_is_per_version(tmp_path, monkeypatch):
@@ -3052,7 +3464,7 @@ def test_inspect_library_docs_ready_target(tmp_path, monkeypatch):
 
     assert result.canonical_id == "pub:go_router@14.8.1:api"
     assert result.source_id == "pub:go_router:api"
-    assert result.status == "available"
+    assert result.status == "empty_index"
     assert result.library == "go_router"
     assert result.docs_url_resolved == "https://pub.dev/documentation/go_router/14.8.1/"
     assert result.docs_snapshot_exact is True
@@ -3062,6 +3474,79 @@ def test_inspect_library_docs_ready_target(tmp_path, monkeypatch):
     assert result.version_confidence == "high"
     assert result.version_inferred is False
     assert result.stale is False
+    assert result.reason_code == "empty_index"
+    assert result.pages == 0
+    assert result.chunks == 0
+
+
+def test_inspect_on_empty_index_reports_empty_index_state(tmp_path, monkeypatch):
+    service = _service(tmp_path, monkeypatch)
+    now = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    record = service.registry.upsert(
+        library="click",
+        ecosystem="python",
+        version="8.1.7",
+        source_type="api",
+        docs_url="https://click.palletsprojects.com/en/8.1.x/",
+        now=now,
+        status="available",
+        last_refreshed_at=now,
+    )
+    config = service._index_config_for(record)
+    SQLiteStore(config.index.db_path, config.index.extracted_dir)
+
+    result = service.inspect_library_docs("python:click@8.1.7:api")
+
+    assert result.status == "empty_index"
+    assert result.reason_code == "empty_index"
+    assert result.pages == 0
+    assert result.chunks == 0
+
+
+def test_list_libraries_shows_pages_and_chunks(tmp_path, monkeypatch):
+    service = _service(tmp_path, monkeypatch)
+    now = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    record = service.registry.upsert(
+        library="click",
+        ecosystem="python",
+        version="8.1.7",
+        source_type="api",
+        docs_url="https://click.palletsprojects.com/en/8.1.x/",
+        now=now,
+        status="available",
+        last_refreshed_at=now,
+    )
+    _write_library_index(service, record)
+
+    result = service.list_libraries()
+
+    assert result[0].status == "indexed"
+    assert result[0].reason_code == "healthy"
+    assert result[0].pages == 1
+    assert result[0].chunks == 1
+
+
+def test_stale_index_triggers_warning_not_empty_state(tmp_path, monkeypatch):
+    service = _service(tmp_path, monkeypatch)
+    record = service.registry.upsert(
+        library="click",
+        ecosystem="python",
+        version="8.1.7",
+        source_type="api",
+        docs_url="https://click.palletsprojects.com/en/8.1.x/",
+        now=datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        status="available",
+        last_refreshed_at=_old_iso(),
+    )
+    _write_library_index(service, record)
+
+    result = service.inspect_library_docs("python:click@8.1.7:api")
+
+    assert result.status == "stale"
+    assert result.reason_code == "stale"
+    assert result.stale is True
+    assert result.pages == 1
+    assert result.chunks == 1
 
 
 def test_remove_library_docs_exact_canonical_id_only(tmp_path, monkeypatch):
@@ -3274,10 +3759,57 @@ def test_refresh_record_reuses_all_persisted_seed_urls(tmp_path, monkeypatch):
         "https://riverpod.dev/docs/one",
         "https://riverpod.dev/docs/two",
     ]
-    assert agent.add_kwargs == [
-        {"max_pages": 1, "browser": False},
-        {"max_pages": 1, "browser": False},
+    assert [kwargs["max_pages"] for kwargs in agent.add_kwargs] == [1, 1]
+    assert [kwargs["browser"] for kwargs in agent.add_kwargs] == [False, False]
+    assert [kwargs["metadata"]["library_id"] for kwargs in agent.add_kwargs] == [
+        "web:riverpod-guides@latest:guides",
+        "web:riverpod-guides@latest:guides",
     ]
+
+
+def test_refresh_record_keeps_dartdoc_seed_urls_at_target_page_cap(tmp_path, monkeypatch):
+    agent = FakeAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+
+    service.prefetch_docs_targets(
+        [
+            {
+                "library": "flutter-bloc-api",
+                "ecosystem": "pub",
+                "version": "8.1.6",
+                "source_type": "api",
+                "seed_urls": [
+                    "https://pub.dev/documentation/flutter_bloc/latest/flutter_bloc/BlocProvider-class.html",
+                    "https://pub.dev/documentation/flutter_bloc/latest/flutter_bloc/BlocBuilder-class.html",
+                ],
+                "doc_format": "dartdoc",
+                "max_pages": 500,
+                "allowed_domains": ["pub.dev"],
+                "path_prefixes": ["/documentation/flutter_bloc/"],
+            }
+        ]
+    )
+    agent.add_calls.clear()
+    agent.add_kwargs.clear()
+    service.registry.upsert(
+        library="flutter-bloc-api",
+        ecosystem="pub",
+        version="8.1.6",
+        source_type="api",
+        docs_url="https://pub.dev/documentation/flutter_bloc/latest/flutter_bloc/BlocProvider-class.html",
+        now=_old_iso(),
+        status="available",
+        last_refreshed_at=_old_iso(),
+    )
+
+    result = service.refresh_docs("flutter-bloc-api", ecosystem="pub", version="8.1.6", source_type="api", force=False)
+
+    assert result.status == "updated"
+    assert agent.add_calls == [
+        "https://pub.dev/documentation/flutter_bloc/latest/flutter_bloc/BlocProvider-class.html",
+        "https://pub.dev/documentation/flutter_bloc/latest/flutter_bloc/BlocBuilder-class.html",
+    ]
+    assert [kwargs["max_pages"] for kwargs in agent.add_kwargs] == [500, 500]
 
 
 def test_remove_library_docs_deletes_physical_index_files(tmp_path, monkeypatch):

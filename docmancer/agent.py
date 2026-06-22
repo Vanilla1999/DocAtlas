@@ -398,6 +398,7 @@ class DocmancerAgent:
         strategy: str | None = None,
         browser: bool = False,
         doc_format: str | None = None,
+        metadata: dict[str, Any] | None = None,
         progress_callback: Callable[[dict[str, Any]], None] | None = None,
     ) -> int:
         f = self._get_fetcher(
@@ -411,6 +412,9 @@ class DocmancerAgent:
             progress_callback=progress_callback,
         )
         documents = f.fetch(url)
+        if metadata:
+            for document in documents:
+                document.metadata.update(metadata)
         logger.info("Fetched %d document(s); starting index", len(documents))
         if progress_callback:
             progress_callback(

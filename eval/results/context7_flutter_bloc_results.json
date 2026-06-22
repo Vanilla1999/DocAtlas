@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "system": "context7",
+  "source": "/felangel/bloc",
+  "dataset": "eval/flutter_bloc_golden.yaml",
+  "corpus_snapshot": "flutter-bloc-pub-eval-v1",
+  "capture_method": "manual_normalized_from_tool_output",
+  "review_status": "manual_assessment_required_for_recapture",
+  "metrics": {"queries": 4, "hit_at": {"1": 1.0, "3": 1.0, "5": 1.0}, "mrr": 1.0, "quality": {"snippet_present_at_5_rate": 1.0, "locale_contamination_rate": 0.0}},
+  "items": [
+    {"id": "flutter_bloc_blocprovider", "first_hit_rank": 1, "hit_at_5": true, "expected_source_hit": "BlocProvider", "snippet_present_at_5": true, "manual_assessment": "rank 1 relevant in captured Context7 output"},
+    {"id": "flutter_bloc_blocbuilder", "first_hit_rank": 1, "hit_at_5": true, "expected_source_hit": "BlocBuilder", "snippet_present_at_5": true, "manual_assessment": "rank 1 relevant in captured Context7 output"},
+    {"id": "flutter_bloc_bloclistener", "first_hit_rank": 1, "hit_at_5": true, "expected_source_hit": "BlocListener", "snippet_present_at_5": true, "manual_assessment": "rank 1 relevant in captured Context7 output"},
+    {"id": "flutter_bloc_multiblocprovider", "first_hit_rank": 1, "hit_at_5": true, "expected_source_hit": "MultiBlocProvider", "snippet_present_at_5": true, "manual_assessment": "rank 1 relevant in captured Context7 output"}
+  ]
+}

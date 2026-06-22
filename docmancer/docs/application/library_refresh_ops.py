@@ -30,7 +30,9 @@ class LibraryRefreshOps:
                 duration_ms=int((time.monotonic() - started) * 1000),
                 targets_failed=1,
             )
-        if not force and not self._is_stale(record.last_refreshed_at):
+        pages, chunks = self.registry_ops.count_index_entries(record)
+        index_empty = pages == 0 and chunks == 0
+        if not force and not self._is_stale(record.last_refreshed_at) and not index_empty:
             return RefreshResult(
                 library_id=record.library_id,
                 status="skipped",
@@ -46,13 +48,23 @@ class LibraryRefreshOps:
         try:
             target = self._target_from_record(record)
             urls = self._record_urls(record)
-            per_url_max_pages = 1 if target.seed_urls and not target.docs_url and not target.docs_url_template else target.max_pages
+            per_url_max_pages = target.max_pages if target.doc_format == "dartdoc" else (1 if target.seed_urls and not target.docs_url and not target.docs_url_template else target.max_pages)
             for url in urls:
                 pages = self._agent_instance(record).add(
                     url,
                     recreate=False,
                     max_pages=per_url_max_pages,
                     browser=target.browser,
+                    metadata={
+                        "library_id": record.library_id,
+                        "canonical_id": record.canonical_id,
+                        "ecosystem": record.ecosystem,
+                        "version": record.version,
+                        "source_type": record.source_type,
+                        "docs_url": record.docs_url,
+                        "docs_url_resolved": record.docs_url_resolved or record.docs_url,
+                        "docset_root": record.docs_url_resolved or record.docs_url,
+                    },
                 )
                 if isinstance(pages, int):
                     pages_indexed += pages
@@ -79,6 +91,37 @@ class LibraryRefreshOps:
                 message=str(exc),
                 duration_ms=int((time.monotonic() - started) * 1000),
                 pages_failed=1,
+                targets_failed=1,
+            )
+
+        pages_after, chunks_after = self.registry_ops.count_index_entries(record)
+        if pages_indexed == 0 or pages_after == 0 or chunks_after == 0:
+            refreshed_at = self._now()
+            reason = "ingest_produced_no_chunks" if pages_indexed > 0 else "no_extractable_content"
+            self.registry.upsert(
+                library=record.name,
+                ecosystem=record.ecosystem,
+                version=record.version,
+                docs_url=record.docs_url,
+                docs_url_template=record.docs_url_template,
+                source_type=record.source_type,
+                now=refreshed_at,
+                status="empty_index",
+                last_refreshed_at=record.last_refreshed_at,
+                last_error=reason,
+                target_spec=record.target_spec,
+            )
+            return RefreshResult(
+                library_id=record.library_id,
+                status="empty_index",
+                docs_url=record.docs_url,
+                last_refreshed_at=record.last_refreshed_at,
+                version=record.version,
+                source_type=record.source_type,
+                message=f"{reason}: refresh indexed no usable chunks. Check docs_url, source_type, doc_format, browser, or Dartdoc seed discovery.",
+                duration_ms=int((time.monotonic() - started) * 1000),
+                pages_indexed=pages_indexed,
+                chunks_indexed=chunks_after,
                 targets_failed=1,
             )
 

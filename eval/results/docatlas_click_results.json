@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "dataset": "eval/click_golden.yaml",
+  "corpus_snapshot": "click-public-eval-v1",
+  "mode": "hybrid",
+  "metrics": {
+    "queries": 2,
+    "hit_at": {"1": 1.0, "3": 1.0, "5": 1.0, "10": 1.0},
+    "mrr": 1.0,
+    "latency_ms": {"p50": 440.0, "p95": 700.0},
+    "quality": {"unique_sources_at_5_avg": 4.0, "redundancy_rate_at_5_avg": 0.2, "snippet_present_at_5_rate": 1.0, "locale_contamination_rate": 0.0}
+  },
+  "items": [
+    {
+      "id": "click_group_options_callback",
+      "query": "Click group options callback pattern using click.group and click.option",
+      "taxonomy_class": "code_example",
+      "first_hit_rank": 1,
+      "hit_at_5": true,
+      "latency_ms": 700.0,
+      "setup_calls": 2,
+      "exact_version_match": true,
+      "hallucinated_api_hits": [],
+      "forbidden_source_hits": [],
+      "forbidden_version_hits": [],
+      "source_diversity": {"unique_sources_at_5": 4, "redundancy_rate_at_5": 0.2},
+      "snippet_presence": {"snippet_sections_at_5": 4, "snippet_present_at_5": true},
+      "results": [
+        {"rank": 1, "source": "https://click.palletsprojects.com/en/stable/commands/", "title": "Commands and Groups", "has_code_snippet": true, "relevant": true},
+        {"rank": 2, "source": "https://click.palletsprojects.com/en/stable/options/", "title": "Options", "has_code_snippet": true, "relevant": true},
+        {"rank": 3, "source": "https://click.palletsprojects.com/en/stable/documentation/", "title": "Documentation", "has_code_snippet": true, "relevant": true},
+        {"rank": 4, "source": "https://click.palletsprojects.com/en/stable/parameters/", "title": "Parameters", "has_code_snippet": false, "relevant": true},
+        {"rank": 5, "source": "https://click.palletsprojects.com/en/stable/commands/#callback-invocation", "title": "Callback Invocation", "has_code_snippet": true, "relevant": true}
+      ]
+    },
+    {
+      "id": "click_context_pass_context",
+      "query": "Click Context pass_context ensure_object pattern for nested commands",
+      "taxonomy_class": "exact_api_signature",
+      "first_hit_rank": 1,
+      "hit_at_5": true,
+      "latency_ms": 180.0,
+      "setup_calls": 2,
+      "exact_version_match": true,
+      "hallucinated_api_hits": [],
+      "forbidden_source_hits": [],
+      "forbidden_version_hits": [],
+      "source_diversity": {"unique_sources_at_5": 4, "redundancy_rate_at_5": 0.2},
+      "snippet_presence": {"snippet_sections_at_5": 5, "snippet_present_at_5": true},
+      "results": [
+        {"rank": 1, "source": "https://click.palletsprojects.com/en/stable/complex/", "title": "Complex Applications", "has_code_snippet": true, "relevant": true},
+        {"rank": 2, "source": "https://click.palletsprojects.com/en/stable/api/#click.Context", "title": "Context", "has_code_snippet": true, "relevant": true},
+        {"rank": 3, "source": "https://click.palletsprojects.com/en/stable/commands/", "title": "Commands and Groups", "has_code_snippet": true, "relevant": true},
+        {"rank": 4, "source": "https://click.palletsprojects.com/en/stable/advanced/", "title": "Advanced Patterns", "has_code_snippet": true, "relevant": true},
+        {"rank": 5, "source": "https://click.palletsprojects.com/en/stable/complex/#contexts", "title": "Contexts", "has_code_snippet": true, "relevant": true}
+      ]
+    }
+  ]
+}

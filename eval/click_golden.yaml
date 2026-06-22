@@ -1,0 +1,31 @@
+corpus_snapshot: click-public-eval-v1
+items:
+  - id: click_group_options_callback
+    query: Click group options callback pattern using click.group and click.option
+    taxonomy_class: code_example
+    version_policy: latest
+    project_context:
+      ecosystem: python
+      library: click
+    expected_sources:
+      - source: click.palletsprojects.com/en/stable/commands
+      - source: click.palletsprojects.com/en/stable/options
+    required_facts:
+      - "@click.group"
+      - "@click.option"
+      - callback
+
+  - id: click_context_pass_context
+    query: Click Context pass_context ensure_object pattern for nested commands
+    taxonomy_class: exact_api_signature
+    version_policy: latest
+    project_context:
+      ecosystem: python
+      library: click
+    expected_sources:
+      - source: click.palletsprojects.com/en/stable/complex
+      - source: click.palletsprojects.com/en/stable/commands
+    required_facts:
+      - Context
+      - pass_context
+      - ensure_object

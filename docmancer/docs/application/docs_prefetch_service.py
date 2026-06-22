@@ -263,7 +263,7 @@ class DocsPrefetchService:
                     continue
                 try:
                     pages_indexed = 0
-                    per_url_max_pages = 1 if target.seed_urls and not target.docs_url and not target.docs_url_template else target.max_pages
+                    per_url_max_pages = target.max_pages if target.doc_format == "dartdoc" else (1 if target.seed_urls and not target.docs_url and not target.docs_url_template else target.max_pages)
                     if job_id:
                         self.jobs.update(
                             job_id,

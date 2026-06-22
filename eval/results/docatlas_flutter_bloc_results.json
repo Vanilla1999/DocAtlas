@@ -1,0 +1,103 @@
+{
+  "schema_version": 1,
+  "dataset": "eval/flutter_bloc_golden.yaml",
+  "corpus_snapshot": "flutter-bloc-pub-eval-v1",
+  "mode": "hybrid",
+  "metrics": {
+    "queries": 4,
+    "hit_at": {"1": 1.0, "3": 1.0, "5": 1.0, "10": 1.0},
+    "mrr": 1.0,
+    "latency_ms": {"p50": 330.0, "p95": 880.0},
+    "quality": {"unique_sources_at_5_avg": 4.0, "redundancy_rate_at_5_avg": 0.2, "snippet_present_at_5_rate": 1.0, "locale_contamination_rate": 0.0}
+  },
+  "items": [
+    {
+      "id": "flutter_bloc_blocprovider",
+      "query": "flutter_bloc BlocProvider create child usage",
+      "taxonomy_class": "code_example",
+      "first_hit_rank": 1,
+      "hit_at_5": true,
+      "latency_ms": 880.0,
+      "setup_calls": 2,
+      "exact_version_match": true,
+      "hallucinated_api_hits": [],
+      "forbidden_source_hits": [],
+      "forbidden_version_hits": [],
+      "source_diversity": {"unique_sources_at_5": 4, "redundancy_rate_at_5": 0.2},
+      "snippet_presence": {"snippet_sections_at_5": 5, "snippet_present_at_5": true},
+      "results": [
+        {"rank": 1, "source": "https://pub.dev/documentation/flutter_bloc/latest/flutter_bloc/BlocProvider-class.html", "title": "BlocProvider", "has_code_snippet": true, "relevant": true},
+        {"rank": 2, "source": "https://pub.dev/packages/flutter_bloc", "title": "flutter_bloc package", "has_code_snippet": true, "relevant": true},
+        {"rank": 3, "source": "https://pub.dev/documentation/flutter_bloc/latest/flutter_bloc/MultiBlocProvider-class.html", "title": "MultiBlocProvider", "has_code_snippet": true, "relevant": true},
+        {"rank": 4, "source": "https://pub.dev/documentation/flutter_bloc/latest/flutter_bloc/RepositoryProvider-class.html", "title": "RepositoryProvider", "has_code_snippet": true, "relevant": true},
+        {"rank": 5, "source": "https://pub.dev/documentation/flutter_bloc/latest/flutter_bloc/BlocBuilder-class.html", "title": "BlocBuilder", "has_code_snippet": true, "relevant": true}
+      ]
+    },
+    {
+      "id": "flutter_bloc_blocbuilder",
+      "query": "flutter_bloc BlocBuilder builder and buildWhen usage",
+      "taxonomy_class": "code_example",
+      "first_hit_rank": 1,
+      "hit_at_5": true,
+      "latency_ms": 320.0,
+      "setup_calls": 1,
+      "exact_version_match": true,
+      "hallucinated_api_hits": [],
+      "forbidden_source_hits": [],
+      "forbidden_version_hits": [],
+      "source_diversity": {"unique_sources_at_5": 4, "redundancy_rate_at_5": 0.2},
+      "snippet_presence": {"snippet_sections_at_5": 5, "snippet_present_at_5": true},
+      "results": [
+        {"rank": 1, "source": "https://pub.dev/documentation/flutter_bloc/latest/flutter_bloc/BlocBuilder-class.html", "title": "BlocBuilder", "has_code_snippet": true, "relevant": true},
+        {"rank": 2, "source": "https://pub.dev/packages/flutter_bloc", "title": "flutter_bloc package", "has_code_snippet": true, "relevant": true},
+        {"rank": 3, "source": "https://pub.dev/documentation/flutter_bloc/latest/flutter_bloc/BlocConsumer-class.html", "title": "BlocConsumer", "has_code_snippet": true, "relevant": true},
+        {"rank": 4, "source": "https://pub.dev/documentation/flutter_bloc/latest/flutter_bloc/BlocSelector-class.html", "title": "BlocSelector", "has_code_snippet": true, "relevant": true},
+        {"rank": 5, "source": "https://pub.dev/documentation/flutter_bloc/latest/flutter_bloc/BlocProvider-class.html", "title": "BlocProvider", "has_code_snippet": true, "relevant": true}
+      ]
+    },
+    {
+      "id": "flutter_bloc_bloclistener",
+      "query": "flutter_bloc BlocListener listener and listenWhen usage",
+      "taxonomy_class": "code_example",
+      "first_hit_rank": 1,
+      "hit_at_5": true,
+      "latency_ms": 340.0,
+      "setup_calls": 1,
+      "exact_version_match": true,
+      "hallucinated_api_hits": [],
+      "forbidden_source_hits": [],
+      "forbidden_version_hits": [],
+      "source_diversity": {"unique_sources_at_5": 4, "redundancy_rate_at_5": 0.2},
+      "snippet_presence": {"snippet_sections_at_5": 5, "snippet_present_at_5": true},
+      "results": [
+        {"rank": 1, "source": "https://pub.dev/documentation/flutter_bloc/latest/flutter_bloc/BlocListener-class.html", "title": "BlocListener", "has_code_snippet": true, "relevant": true},
+        {"rank": 2, "source": "https://pub.dev/packages/flutter_bloc", "title": "flutter_bloc package", "has_code_snippet": true, "relevant": true},
+        {"rank": 3, "source": "https://pub.dev/documentation/flutter_bloc/latest/flutter_bloc/BlocConsumer-class.html", "title": "BlocConsumer", "has_code_snippet": true, "relevant": true},
+        {"rank": 4, "source": "https://pub.dev/documentation/flutter_bloc/latest/flutter_bloc/BlocBuilder-class.html", "title": "BlocBuilder", "has_code_snippet": true, "relevant": true},
+        {"rank": 5, "source": "https://pub.dev/documentation/flutter_bloc/latest/flutter_bloc/BlocProvider-class.html", "title": "BlocProvider", "has_code_snippet": true, "relevant": true}
+      ]
+    },
+    {
+      "id": "flutter_bloc_multiblocprovider",
+      "query": "flutter_bloc MultiBlocProvider nesting providers usage",
+      "taxonomy_class": "code_example",
+      "first_hit_rank": 1,
+      "hit_at_5": true,
+      "latency_ms": 310.0,
+      "setup_calls": 1,
+      "exact_version_match": true,
+      "hallucinated_api_hits": [],
+      "forbidden_source_hits": [],
+      "forbidden_version_hits": [],
+      "source_diversity": {"unique_sources_at_5": 4, "redundancy_rate_at_5": 0.2},
+      "snippet_presence": {"snippet_sections_at_5": 5, "snippet_present_at_5": true},
+      "results": [
+        {"rank": 1, "source": "https://pub.dev/documentation/flutter_bloc/latest/flutter_bloc/MultiBlocProvider-class.html", "title": "MultiBlocProvider", "has_code_snippet": true, "relevant": true},
+        {"rank": 2, "source": "https://pub.dev/packages/flutter_bloc", "title": "flutter_bloc package", "has_code_snippet": true, "relevant": true},
+        {"rank": 3, "source": "https://pub.dev/documentation/flutter_bloc/latest/flutter_bloc/BlocProvider-class.html", "title": "BlocProvider", "has_code_snippet": true, "relevant": true},
+        {"rank": 4, "source": "https://pub.dev/documentation/flutter_bloc/latest/flutter_bloc/RepositoryProvider-class.html", "title": "RepositoryProvider", "has_code_snippet": true, "relevant": true},
+        {"rank": 5, "source": "https://pub.dev/documentation/flutter_bloc/latest/flutter_bloc/MultiRepositoryProvider-class.html", "title": "MultiRepositoryProvider", "has_code_snippet": true, "relevant": true}
+      ]
+    }
+  ]
+}
