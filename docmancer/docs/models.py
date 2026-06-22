@@ -128,6 +128,7 @@ class RefreshResult:
     chunks_indexed: int = 0
     targets_completed: int = 0
     targets_failed: int = 0
+    preindex: dict[str, Any] | None = None
 
 
 @dataclass(frozen=True)

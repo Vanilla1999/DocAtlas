@@ -127,7 +127,7 @@ def test_empty_library_index_returns_controlled_error(tmp_path, monkeypatch):
 
     assert result.status == "empty_library_index"
     assert result.decision == "stop"
-    assert result.diagnostics["reason_code"] == "missing_chunks"
+    assert result.diagnostics["reason_code"] == "empty_index"
     assert result.next_actions == ["Call refresh_library_docs to ingest this library's docs."]
     assert result.results == []
     assert agent.query_calls == []
@@ -207,7 +207,7 @@ def test_all_chunks_filtered_returns_controlled_error(tmp_path, monkeypatch):
 
     assert result.status == "empty_library_index"
     assert result.decision == "stop"
-    assert result.diagnostics["reason_code"] == "missing_chunks"
+    assert result.diagnostics["reason_code"] == "guard_dropped_all"
 
 
 def test_local_path_with_matching_library_id_is_filtered_out(tmp_path, monkeypatch):

@@ -10,6 +10,11 @@ Strategy order:
 4. /sitemap.xml    -- standard sitemap location
 5. Platform-specific sitemap paths
 6. Nav crawl       -- BFS of <nav> link hrefs
+
+Fallback:
+If sitemap strategies return fewer than MIN_DOC_PAGES usable URLs, a
+nav-crawl fallback with higher depth runs automatically. seed_urls from
+configuration are merged into the candidate URL set.
 """
 
 from __future__ import annotations
@@ -17,7 +22,9 @@ from __future__ import annotations
 import logging
 import re
 from collections import deque
+from dataclasses import dataclass, field
 from enum import Enum
+from typing import Any
 from urllib.parse import urlparse, urljoin
 
 import httpx
@@ -35,6 +42,11 @@ logger = logging.getLogger(__name__)
 # Minimum content length for llms-full.txt to be considered valid.
 _LLMS_FULL_MIN_CHARS = 1000
 
+# Minimum number of docs pages expected from sitemap strategies before
+# triggering the nav-crawl fallback. ReadTheDocs often exposes only the
+# homepage in their sitemap; this threshold ensures a fallback attempt.
+MIN_DOC_PAGES = 5
+
 
 class DiscoveryStrategy(str, Enum):
     """Available URL discovery strategies."""
@@ -44,6 +56,8 @@ class DiscoveryStrategy(str, Enum):
     SITEMAP_XML = "sitemap.xml"
     PLATFORM_SITEMAP = "platform-sitemap"
     NAV_CRAWL = "nav-crawl"
+    NAV_FALLBACK = "nav-fallback"
+    SEED_URLS = "seed_urls"
 
 
 class DiscoveredUrl:
@@ -56,6 +70,13 @@ class DiscoveredUrl:
         self.content = content  # Only set for llms-full.txt (contains the full doc)
 
 
+@dataclass
+class DiscoveryResult:
+    """Container for discovery results and strategy diagnostics."""
+    urls: list[DiscoveredUrl] = field(default_factory=list)
+    diagnostics: dict[str, Any] = field(default_factory=dict)
+
+
 def discover_urls(
     base_url: str,
     client: httpx.Client,
@@ -63,10 +84,15 @@ def discover_urls(
     robots: RobotsChecker | None = None,
     max_pages: int = 500,
     force_strategy: str | None = None,
-) -> list[DiscoveredUrl]:
+    seed_urls: list[str] | None = None,
+) -> DiscoveryResult:
     """Run discovery strategies in order and return found URLs.
 
-    Short-circuits on the first strategy that returns results.
+    Short-circuits on llms-full.txt. Otherwise merges results from
+    llms.txt, sitemap strategies, seed_urls, and nav-crawl.
+
+    When sitemap strategies return fewer than MIN_DOC_PAGES usable URLs,
+    a nav-fallback with higher depth runs automatically.
 
     Args:
         base_url: Root URL of the documentation site.
@@ -75,9 +101,10 @@ def discover_urls(
         robots: Optional RobotsChecker instance.
         max_pages: Maximum number of URLs to return.
         force_strategy: If set, only run this specific strategy.
+        seed_urls: Explicit page URLs to include (from config/docs.yaml).
 
     Returns:
-        List of DiscoveredUrl objects.
+        DiscoveryResult with urls and diagnostics.
     """
     strategies = [
         (DiscoveryStrategy.LLMS_FULL_TXT, lambda u, c, p, r, m: _try_llms_full_txt(u, c, p, r)),
@@ -93,39 +120,129 @@ def discover_urls(
             if strategy_enum.value != force_strategy:
                 continue
             try:
-                return (strategy_fn(base_url, client, platform, robots, max_pages) or [])[:max_pages]
+                result = strategy_fn(base_url, client, platform, robots, max_pages) or []
+                return DiscoveryResult(urls=result[:max_pages])
             except Exception as exc:
                 logger.debug("Discovery strategy %s failed: %s", strategy_enum.value, exc)
-                return []
+                return DiscoveryResult()
 
     llms_full = _try_llms_full_txt(base_url, client, platform, robots)
     if llms_full:
         logger.info("Discovery: %s found %d URL(s)", DiscoveryStrategy.LLMS_FULL_TXT.value, len(llms_full))
-        return llms_full
+        return DiscoveryResult(urls=llms_full)
 
     all_results: list[DiscoveredUrl] = []
     strategy_counts: dict[str, int] = {}
+    nav_crawl_ran = False
+    sitemap_total = 0
     for strategy_enum, strategy_fn in strategies[1:]:
         try:
             results = strategy_fn(base_url, client, platform, robots, max_pages)
             if results:
                 strategy_counts[strategy_enum.value] = len(results)
                 all_results.extend(results)
+                if strategy_enum in (DiscoveryStrategy.ROBOTS_SITEMAP, DiscoveryStrategy.SITEMAP_XML, DiscoveryStrategy.PLATFORM_SITEMAP):
+                    sitemap_total += len(results)
+                if strategy_enum == DiscoveryStrategy.NAV_CRAWL:
+                    nav_crawl_ran = True
         except Exception as exc:
             logger.debug("Discovery strategy %s failed: %s", strategy_enum.value, exc)
+
+    # ---------------------------------------------------------------
+    # Nav-fallback: when sitemap coverage is too low, run a deeper
+    # nav crawl to try to discover more pages (common for ReadTheDocs).
+    # ---------------------------------------------------------------
+    fallback_reason = None
+    fallback_results: list[DiscoveredUrl] = []
+    if all_results and sitemap_total < MIN_DOC_PAGES and not nav_crawl_ran:
+        fallback_results = _try_nav_fallback(base_url, client, platform, robots, max_pages) or []
+        if fallback_results:
+            fallback_reason = "low_sitemap_coverage"
+            strategy_counts[DiscoveryStrategy.NAV_FALLBACK.value] = len(fallback_results)
+            all_results.extend(fallback_results)
+    elif sitemap_total < MIN_DOC_PAGES and nav_crawl_ran:
+        # Nav-crawl ran but sitemap was sparse; this is primarily a
+        # ReadTheDocs docset — log it for diagnostics.
+        fallback_reason = "low_sitemap_coverage_nav_crawl_used"
+
+    # ---------------------------------------------------------------
+    # Seed URLs: merge explicit page URLs as an additional source.
+    # ---------------------------------------------------------------
+    seed_pages = 0
+    if seed_urls:
+        seed_discovered = []
+        for seed in seed_urls:
+            seed_discovered.append(DiscoveredUrl(url=seed, strategy=DiscoveryStrategy.SEED_URLS))
+        if seed_discovered:
+            strategy_counts[DiscoveryStrategy.SEED_URLS.value] = len(seed_discovered)
+            seed_pages = len(seed_discovered)
+            all_results.extend(seed_discovered)
 
     if all_results:
         ranked = _dedupe_and_rank(all_results)
         logger.info("Discovery candidates by strategy: %s", strategy_counts)
-        return ranked[:max_pages]
+        discovery_strategy = _compute_discovery_strategy_label(
+            strategy_counts, fallback_reason, bool(seed_urls),
+        )
+        return DiscoveryResult(
+            urls=ranked[:max_pages],
+            diagnostics={
+                "strategies": dict(strategy_counts),
+                "discovery_strategy": discovery_strategy,
+                "fallback_reason": fallback_reason,
+                "sitemap_pages": sitemap_total,
+                "seed_pages": seed_pages,
+                "fallback_pages": len(fallback_results),
+            },
+        )
 
     dartdoc = _try_dartdoc_index(base_url, client, max_pages)
     if dartdoc:
         logger.info("Discovery: dartdoc-index found %d URL(s)", len(dartdoc))
-        return dartdoc[:max_pages]
+        return DiscoveryResult(
+            urls=dartdoc[:max_pages],
+            diagnostics={
+                "strategies": {"dartdoc-index": len(dartdoc)},
+                "discovery_strategy": "dartdoc-index",
+                "fallback_reason": None,
+                "sitemap_pages": 0,
+                "seed_pages": 0,
+                "fallback_pages": 0,
+            },
+        )
 
     logger.warning("No discovery strategy found URLs for %s", base_url)
-    return []
+    return DiscoveryResult(
+        diagnostics={
+            "strategies": {},
+            "discovery_strategy": "none",
+            "fallback_reason": "no_discovery",
+            "sitemap_pages": 0,
+            "seed_pages": 0,
+            "fallback_pages": 0,
+        },
+    )
+
+
+def _compute_discovery_strategy_label(
+    strategy_counts: dict[str, int],
+    fallback_reason: str | None,
+    has_seed_urls: bool,
+) -> str:
+    parts = []
+    for s in ("llms.txt", "robots-sitemap", "sitemap.xml", "platform-sitemap"):
+        if strategy_counts.get(s, 0) > 0:
+            parts.append("sitemap")
+            break
+    if fallback_reason and strategy_counts.get("nav-fallback", 0) > 0:
+        parts.append("nav_fallback")
+    elif strategy_counts.get("nav-crawl", 0) > 0:
+        parts.append("nav_crawl")
+    if has_seed_urls:
+        parts.append("seed_urls")
+    if not parts:
+        return "none"
+    return "+".join(parts)
 
 
 def _try_dartdoc_index(base_url: str, client: httpx.Client, max_pages: int = 500) -> list[DiscoveredUrl] | None:
@@ -158,6 +275,8 @@ def _strategy_rank(strategy: DiscoveryStrategy) -> int:
         DiscoveryStrategy.SITEMAP_XML: 2,
         DiscoveryStrategy.PLATFORM_SITEMAP: 3,
         DiscoveryStrategy.NAV_CRAWL: 4,
+        DiscoveryStrategy.NAV_FALLBACK: 5,
+        DiscoveryStrategy.SEED_URLS: 6,
     }.get(strategy, 10)
 
 
@@ -385,7 +504,52 @@ def _try_nav_crawl(
     return [DiscoveredUrl(url=u, strategy=DiscoveryStrategy.NAV_CRAWL) for u in found]
 
 
-def _extract_nav_links(html: str, page_url: str, base_url: str) -> list[str]:
+def _try_nav_fallback(
+    base_url: str,
+    client: httpx.Client,
+    platform: Platform | None = None,
+    robots: RobotsChecker | None = None,
+    max_pages: int = 500,
+) -> list[DiscoveredUrl] | None:
+    """Aggressive nav crawl fallback for low-sitemap docs sites.
+
+    Uses higher depth (3), more selectors, and always falls back to
+    all page links if nav/container selectors find too few.
+    """
+    seen = {normalize_url(base_url)}
+    found: list[str] = []
+    queue = deque([(base_url, 0)])
+    max_depth = 3
+
+    while queue and len(found) < max_pages:
+        page_url, depth = queue.popleft()
+        if robots and not robots.can_fetch(page_url):
+            continue
+        try:
+            resp = client.get(page_url)
+            if resp.status_code != 200:
+                continue
+        except httpx.RequestError:
+            continue
+
+        links = _extract_nav_links(resp.text, page_url, base_url, fallback_mode=True)
+        for link_url in links:
+            if link_url in seen:
+                continue
+            seen.add(link_url)
+            found.append(link_url)
+            if len(found) >= max_pages:
+                break
+            if depth < max_depth:
+                queue.append((link_url, depth + 1))
+
+    if not found:
+        return None
+
+    return [DiscoveredUrl(url=u, strategy=DiscoveryStrategy.NAV_FALLBACK) for u in found]
+
+
+def _extract_nav_links(html: str, page_url: str, base_url: str, fallback_mode: bool = False) -> list[str]:
     soup = BeautifulSoup(html, "html.parser")
     nav_selectors = ["nav a", ".sidebar a", "[role='navigation'] a", ".toc a", ".menu a"]
 
@@ -395,14 +559,14 @@ def _extract_nav_links(html: str, page_url: str, base_url: str) -> list[str]:
         for link in soup.select(selector):
             _append_link(link.get("href"), page_url, base_url, seen, nav_links)
 
-    if len(nav_links) < 5:
-        for container_tag in ["main", "article"]:
-            container = soup.find(container_tag)
-            if container:
-                for link in container.find_all("a", href=True):
-                    _append_link(link.get("href"), page_url, base_url, seen, nav_links)
+    threshold = 10 if fallback_mode else 5
 
-    if len(nav_links) < 5:
+    if len(nav_links) < threshold:
+        for selector in ["main a", "article a", ".section a", ".content a", ".bd-main a", ".document a"]:
+            for link in soup.select(selector):
+                _append_link(link.get("href"), page_url, base_url, seen, nav_links)
+
+    if len(nav_links) < threshold:
         for link in soup.find_all("a", href=True):
             _append_link(link.get("href"), page_url, base_url, seen, nav_links)
 

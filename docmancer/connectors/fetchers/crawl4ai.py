@@ -106,13 +106,14 @@ class Crawl4AIFetcher:
             robots = RobotsChecker(client) if self._respect_robots else None
 
             # Step 3: URL discovery (reuse docmancer's pipeline)
-            discovered = discover_urls(
+            discovery_result = discover_urls(
                 base_url,
                 client,
                 platform=platform,
                 robots=robots,
                 max_pages=self._max_pages,
             )
+            discovered = discovery_result.urls
 
             if not discovered:
                 raise ValueError(

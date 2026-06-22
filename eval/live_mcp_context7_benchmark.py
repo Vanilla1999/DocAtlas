@@ -61,6 +61,12 @@ class PreindexDiagnostics:
     latency_ms: float = 0.0
     reason_code: str | None = None
     warnings: list[str] = field(default_factory=list)
+    discovery_strategy: str | None = None
+    sitemap_pages: int = 0
+    seed_pages: int = 0
+    fallback_pages: int = 0
+    index_path: str | None = None
+    query_index_path: str | None = None
 
 
 @dataclass
@@ -430,6 +436,21 @@ class DocAtlasDirectProvider(BenchmarkProvider):
                 diag.status = "refreshed"
                 diag.pages = refresh_result.pages if hasattr(refresh_result, "pages") else 0
                 diag.chunks = len(refresh_result.results) if hasattr(refresh_result, "results") else 0
+                preindex = getattr(refresh_result, "preindex", None) or {}
+                diag.discovery_strategy = preindex.get("discovery_strategy")
+                diag.sitemap_pages = int(preindex.get("sitemap_pages") or 0)
+                diag.seed_pages = int(preindex.get("seed_pages") or 0)
+                diag.fallback_pages = int(preindex.get("fallback_pages") or 0)
+                diag.index_path = preindex.get("index_path")
+                diag.query_index_path = preindex.get("query_index_path")
+                diag.reason_code = preindex.get("reason_code")
+                for warning in preindex.get("warnings") or []:
+                    if isinstance(warning, dict):
+                        code = warning.get("code")
+                        if code:
+                            diag.warnings.append(str(code))
+                    elif warning:
+                        diag.warnings.append(str(warning))
 
             if diag.pages == 0 and diag.chunks == 0:
                 diag.status = "empty_index"

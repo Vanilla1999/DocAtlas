@@ -1,10 +1,45 @@
 from __future__ import annotations
 
+from pathlib import Path
 from typing import Any
 import time
 
 from docmancer.docs.models import RefreshResult
 from docmancer.docs.registry import LibraryRecord
+
+
+def _merged_discovery_diagnostics(items: list[dict[str, Any]]) -> dict[str, Any]:
+    if not items:
+        return {
+            "discovery_strategy": "unknown",
+            "sitemap_pages": 0,
+            "seed_pages": 0,
+            "fallback_pages": 0,
+            "warnings": [],
+        }
+    strategies = []
+    warnings: list[dict[str, Any]] = []
+    sitemap_pages = seed_pages = fallback_pages = 0
+    fallback_reasons = []
+    for item in items:
+        strategy = item.get("discovery_strategy")
+        if strategy and strategy not in strategies:
+            strategies.append(str(strategy))
+        sitemap_pages += int(item.get("sitemap_pages") or 0)
+        seed_pages += int(item.get("seed_pages") or 0)
+        fallback_pages += int(item.get("fallback_pages") or 0)
+        fallback_reason = item.get("fallback_reason")
+        if fallback_reason and fallback_reason not in fallback_reasons:
+            fallback_reasons.append(str(fallback_reason))
+    for reason in fallback_reasons:
+        warnings.append({"code": reason, "blocking": False})
+    return {
+        "discovery_strategy": "+".join(strategies) if strategies else "unknown",
+        "sitemap_pages": sitemap_pages,
+        "seed_pages": seed_pages,
+        "fallback_pages": fallback_pages,
+        "warnings": warnings,
+    }
 
 
 class LibraryRefreshOps:
@@ -45,16 +80,22 @@ class LibraryRefreshOps:
             )
 
         pages_indexed = 0
+        discovery_diagnostics: list[dict[str, Any]] = []
         try:
             target = self._target_from_record(record)
             urls = self._record_urls(record)
+            seed_urls_for_discovery = list(target.seed_urls)
+            if seed_urls_for_discovery and (target.docs_url or target.docs_url_template):
+                urls = urls[:1]
             per_url_max_pages = target.max_pages if target.doc_format == "dartdoc" else (1 if target.seed_urls and not target.docs_url and not target.docs_url_template else target.max_pages)
             for url in urls:
-                pages = self._agent_instance(record).add(
+                agent = self._agent_instance(record)
+                pages = agent.add(
                     url,
                     recreate=False,
                     max_pages=per_url_max_pages,
                     browser=target.browser,
+                    seed_urls=seed_urls_for_discovery if (target.docs_url or target.docs_url_template) else None,
                     metadata={
                         "library_id": record.library_id,
                         "canonical_id": record.canonical_id,
@@ -68,6 +109,8 @@ class LibraryRefreshOps:
                 )
                 if isinstance(pages, int):
                     pages_indexed += pages
+                if getattr(agent, "last_discovery_diagnostics", None):
+                    discovery_diagnostics.append(dict(agent.last_discovery_diagnostics))
         except Exception as exc:
             self.registry.upsert(
                 library=record.name,
@@ -111,6 +154,8 @@ class LibraryRefreshOps:
                 last_error=reason,
                 target_spec=record.target_spec,
             )
+            index_config = self._index_config_for(record) if hasattr(self, "_index_config_for") else None
+            db_path = str(Path(index_config.index.db_path).resolve()) if index_config and index_config.index else None
             return RefreshResult(
                 library_id=record.library_id,
                 status="empty_index",
@@ -123,6 +168,20 @@ class LibraryRefreshOps:
                 pages_indexed=pages_indexed,
                 chunks_indexed=chunks_after,
                 targets_failed=1,
+                preindex={
+                    "library": record.name,
+                    "canonical_id": record.canonical_id,
+                    "docs_url": record.docs_url,
+                    "docs_url_resolved": record.docs_url_resolved or record.docs_url,
+                    "source_type": record.source_type or "api",
+                    **_merged_discovery_diagnostics(discovery_diagnostics),
+                    "pages_indexed": pages_after,
+                    "chunks_indexed": chunks_after,
+                    "index_path": db_path,
+                    "query_index_path": db_path,
+                    "reason_code": reason,
+                    "elapsed_ms": int((time.monotonic() - started) * 1000),
+                },
             )
 
         refreshed_at = self._now()
@@ -139,6 +198,27 @@ class LibraryRefreshOps:
             last_error="",
             target_spec=record.target_spec,
         )
+
+        # Build preindex diagnostics
+        index_config = self._index_config_for(record)
+        db_path = Path(index_config.index.db_path).resolve() if index_config and index_config.index else None
+        reason_code = "healthy" if chunks_after > 0 else "empty_index"
+        preindex = {
+            "library": record.name,
+            "canonical_id": record.canonical_id,
+            "docs_url": record.docs_url,
+            "docs_url_resolved": record.docs_url_resolved or record.docs_url,
+            "docset_root": record.docs_url_resolved or record.docs_url,
+            "source_type": record.source_type or "api",
+            **_merged_discovery_diagnostics(discovery_diagnostics),
+            "pages_indexed": pages_after,
+            "chunks_indexed": chunks_after,
+            "index_path": str(db_path) if db_path else None,
+            "query_index_path": str(db_path) if db_path else None,
+            "reason_code": reason_code,
+            "elapsed_ms": int((time.monotonic() - started) * 1000),
+        }
+
         return RefreshResult(
             library_id=record.library_id,
             status="updated",
@@ -148,8 +228,9 @@ class LibraryRefreshOps:
             source_type=record.source_type,
             duration_ms=int((time.monotonic() - started) * 1000),
             pages_indexed=pages_indexed,
-            chunks_indexed=pages_indexed,
+            chunks_indexed=chunks_after,
             targets_completed=1,
+            preindex=preindex,
         )
 
     def refresh_docs(
@@ -269,5 +350,6 @@ class LibraryRefreshOps:
                 chunks_indexed=result.chunks_indexed,
                 targets_completed=result.targets_completed,
                 targets_failed=result.targets_failed,
+                preindex=result.preindex,
             )
         return result

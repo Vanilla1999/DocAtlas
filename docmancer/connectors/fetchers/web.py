@@ -23,6 +23,7 @@ import httpx
 from docmancer.connectors.fetchers.pipeline.detection import Platform, detect_platform
 from docmancer.connectors.fetchers.pipeline.discovery import (
     DiscoveredUrl,
+    DiscoveryResult,
     DiscoveryStrategy,
     discover_urls,
 )
@@ -89,6 +90,7 @@ class WebFetcher:
         delay: float = 0.5,
         workers: int = 8,
         doc_format: str | None = None,
+        seed_urls: list[str] | None = None,
         progress_callback=None,
     ):
         self._timeout = timeout
@@ -99,7 +101,9 @@ class WebFetcher:
         self._delay = delay
         self._workers = max(1, workers)
         self._doc_format = doc_format
+        self._seed_urls = list(seed_urls or [])
         self._progress_callback = progress_callback
+        self.last_discovery_diagnostics: dict | None = None
 
     def _emit_progress(self, event: dict) -> None:
         if not self._progress_callback:
@@ -156,14 +160,17 @@ class WebFetcher:
 
             # Step 3: Discover page URLs
             self._emit_progress({"phase": "discovering", "message": f"Discovering URLs from {base_url}", "url": base_url})
-            discovered = discover_urls(
+            discovery_result = discover_urls(
                 base_url=base_url,
                 client=client,
                 platform=platform,
                 robots=robots,
                 max_pages=self._max_pages,
                 force_strategy=self._strategy,
+                seed_urls=self._seed_urls,
             )
+            discovered = discovery_result.urls
+            self.last_discovery_diagnostics = discovery_result.diagnostics
 
             if not discovered and is_dartdoc_html(root_html, url=base_url):
                 candidates = discover_dartdoc_candidate_links(root_html, base_url)
@@ -196,6 +203,7 @@ class WebFetcher:
             # Step 4: Handle llms-full.txt (content already available)
             if (
                 len(discovered) == 1
+                and discovered
                 and discovered[0].strategy == DiscoveryStrategy.LLMS_FULL_TXT
                 and discovered[0].content
             ):
