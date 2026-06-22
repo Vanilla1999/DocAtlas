@@ -32,9 +32,10 @@ class FakeAgent:
         self.add_calls.append(docs_url)
         self.add_kwargs.append(kwargs)
         if self.config is not None:
-            marker = Path(self.config.index.extracted_dir) / "chunk.md"
-            marker.parent.mkdir(parents=True, exist_ok=True)
-            marker.write_text("indexed chunk", encoding="utf-8")
+            store = SQLiteStore(self.config.index.db_path, self.config.index.extracted_dir)
+            metadata = dict(kwargs.get("metadata") or {})
+            metadata.setdefault("title", "Guide")
+            store.add_documents([Document(source=docs_url.rstrip("/") + "/guide", content="# Guide\nUse parametrize for generated cases.", metadata=metadata)], recreate=recreate)
         return 1
 
     def query(self, text: str, limit=None, budget=None, expand=None):
@@ -54,11 +55,11 @@ class FakeAgent:
 
 class FailingAgent(FakeAgent):
     def add(self, docs_url: str, recreate: bool = False, **kwargs) -> int:
-        self.add_calls.append(docs_url)
-        self.add_kwargs.append(kwargs)
         if "bad-version" in docs_url:
+            self.add_calls.append(docs_url)
+            self.add_kwargs.append(kwargs)
             raise RuntimeError("404 docs")
-        return 1
+        return super().add(docs_url, recreate=recreate, **kwargs)
 
 
 class BlockingAgent(FakeAgent):
@@ -97,6 +98,13 @@ class PageFailingAgent(FakeAgent):
         if "bad" in docs_url:
             raise RuntimeError("bad page")
         return 1
+
+
+class ZeroPageAgent(FakeAgent):
+    def add(self, docs_url: str, recreate: bool = False, **kwargs) -> int:
+        self.add_calls.append(docs_url)
+        self.add_kwargs.append(kwargs)
+        return 0
 
 
 class AlwaysFailingAgent(FakeAgent):
@@ -2377,6 +2385,26 @@ def test_refresh_force_false_skips_fresh_library(tmp_path, monkeypatch):
     agent = FakeAgent()
     service = _service(tmp_path, monkeypatch, agent)
     now = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    record = service.registry.upsert(
+        library="pytest",
+        ecosystem=None,
+        docs_url="https://docs.pytest.org/",
+        now=now,
+        status="available",
+        last_refreshed_at=now,
+    )
+    _write_library_index(service, record)
+
+    result = service.refresh_docs("pytest", force=False)
+
+    assert result.status == "skipped"
+    assert agent.add_calls == []
+
+
+def test_refresh_force_false_reingests_fresh_but_empty_library(tmp_path, monkeypatch):
+    agent = FakeAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+    now = datetime.now(timezone.utc).isoformat(timespec="seconds")
     service.registry.upsert(
         library="pytest",
         ecosystem=None,
@@ -2388,8 +2416,54 @@ def test_refresh_force_false_skips_fresh_library(tmp_path, monkeypatch):
 
     result = service.refresh_docs("pytest", force=False)
 
-    assert result.status == "skipped"
-    assert agent.add_calls == []
+    assert result.status == "updated"
+    assert agent.add_calls == ["https://docs.pytest.org/"]
+
+
+def test_refresh_zero_pages_returns_empty_index_not_updated(tmp_path, monkeypatch):
+    agent = ZeroPageAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+    now = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    service.registry.upsert(
+        library="pytest",
+        ecosystem=None,
+        docs_url="https://docs.pytest.org/",
+        now=now,
+        status="available",
+        last_refreshed_at=_old_iso(),
+    )
+
+    result = service.refresh_docs("pytest", force=False)
+
+    assert result.status == "empty_index"
+    assert result.pages_indexed == 0
+    assert result.targets_failed == 1
+    assert "no_extractable_content" in (result.message or "")
+    assert service.inspect_library_docs("pytest").status == "empty_index"
+
+
+def test_dartdoc_zero_chunk_refresh_fails_safely_without_unrelated_docs(tmp_path, monkeypatch):
+    agent = ZeroPageAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+    now = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    service.registry.upsert(
+        library="flutter_bloc",
+        ecosystem="pub",
+        version="9.1.1",
+        source_type="api",
+        docs_url="https://pub.dev/documentation/flutter_bloc/9.1.1/",
+        now=now,
+        status="available",
+        last_refreshed_at=_old_iso(),
+        target_spec={"doc_format": "dartdoc", "max_pages": 500},
+    )
+
+    refresh = service.refresh_docs("flutter_bloc", ecosystem="pub", version="9.1.1", source_type="api", force=False)
+    result = service.get_docs("flutter_bloc", ecosystem="pub", version="9.1.1", source_type="api", topic="BlocBuilder")
+
+    assert refresh.status == "empty_index"
+    assert result.status == "empty_library_index"
+    assert result.results == []
 
 
 def test_force_refresh_is_per_version(tmp_path, monkeypatch):

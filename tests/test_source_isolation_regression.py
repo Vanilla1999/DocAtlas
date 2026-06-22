@@ -208,3 +208,23 @@ def test_all_chunks_filtered_returns_controlled_error(tmp_path, monkeypatch):
     assert result.status == "empty_library_index"
     assert result.decision == "stop"
     assert result.diagnostics["reason_code"] == "missing_chunks"
+
+
+def test_local_path_with_matching_library_id_is_filtered_out(tmp_path, monkeypatch):
+    agent = RecordingAgent(
+        [
+            _chunk(
+                "unrelated local README",
+                "/home/viadmin/StudioProjects/smart_glasses/README.md",
+                {"library_id": "python:click@8.1.7:api"},
+            )
+        ]
+    )
+    service = _service(tmp_path, monkeypatch, agent)
+    _register(service, library="click", ecosystem="python", version="8.1.7", docs_url="https://click.palletsprojects.com/en/8.1.x/")
+
+    result = service.get_docs("click", ecosystem="python", version="8.1.7", source_type="api", topic="commands")
+
+    assert result.status == "empty_library_index"
+    assert result.results == []
+    assert {"code": "wrong_docset_root", "blocking": False, "dropped": 1} in result.diagnostics["warnings"]

@@ -228,32 +228,45 @@ class LibraryDocsApplicationService:
 
     @staticmethod
     def _url_within_root(value: str | None, roots: set[str]) -> bool:
-        if not value or not value.startswith(("http://", "https://")):
-            return True
-        return any(value == root or value.startswith(root.rstrip("/") + "/") for root in roots if root)
+        if not roots:
+            return bool(value)
+        if not value:
+            return False
+        normalized = str(value).rstrip("/")
+        return any(normalized == root.rstrip("/") or normalized.startswith(root.rstrip("/") + "/") for root in roots if root)
 
-    def _library_chunk_allowed(self, chunk: Any, info: LibraryInfo, allowed_ids: set[str], expected_roots: set[str]) -> bool:
+    def _library_chunk_rejection_reason(self, chunk: Any, info: LibraryInfo, allowed_ids: set[str], expected_roots: set[str]) -> str | None:
         metadata = chunk.metadata or {}
         library_id = metadata.get("library_id")
         if library_id not in allowed_ids:
-            return False
+            return "missing_library_metadata" if not library_id else "wrong_library_id"
         canonical_id = metadata.get("canonical_id")
         if canonical_id and canonical_id != info.canonical_id:
-            return False
+            return "wrong_canonical_id"
         ecosystem = metadata.get("ecosystem")
         if ecosystem and info.ecosystem and ecosystem != info.ecosystem:
-            return False
+            return "wrong_ecosystem"
         version = metadata.get("version") or metadata.get("resolved_version")
         if version and info.version and version != info.version:
-            return False
+            return "wrong_version"
+        source_type = metadata.get("source_type")
+        if source_type and info.source_type and source_type != info.source_type:
+            return "wrong_source_type"
         if metadata.get("project_path"):
-            return False
+            return "project_doc_leak"
         docset_root = metadata.get("docset_root")
         if docset_root and expected_roots and not self._url_within_root(str(docset_root), expected_roots):
-            return False
+            return "wrong_docset_root"
         source = getattr(chunk, "source", None)
         url = metadata.get("url") or metadata.get("source_url")
-        return self._url_within_root(source, expected_roots) and self._url_within_root(url, expected_roots)
+        if not self._url_within_root(source, expected_roots):
+            return "wrong_docset_root"
+        if url and not self._url_within_root(url, expected_roots):
+            return "wrong_docset_root"
+        return None
+
+    def _library_chunk_allowed(self, chunk: Any, info: LibraryInfo, allowed_ids: set[str], expected_roots: set[str]) -> bool:
+        return self._library_chunk_rejection_reason(chunk, info, allowed_ids, expected_roots) is None
 
     def _empty_library_index_result(
         self,
@@ -727,10 +740,20 @@ class LibraryDocsApplicationService:
             allowed_ids.add(legacy_library_id(info.library, info.version))
         expected_roots = {root for root in {info.docs_url_resolved, info.docs_url} if root}
         chunks_before_guard = list(chunks)
-        chunks = [chunk for chunk in chunks if self._library_chunk_allowed(chunk, info, allowed_ids, expected_roots)]
+        filtered_chunks = []
+        rejection_counts: dict[str, int] = {}
+        for chunk in chunks_before_guard:
+            reason = self._library_chunk_rejection_reason(chunk, info, allowed_ids, expected_roots)
+            if reason is None:
+                filtered_chunks.append(chunk)
+            else:
+                rejection_counts[reason] = rejection_counts.get(reason, 0) + 1
+        chunks = filtered_chunks
         dropped = len(chunks_before_guard) - len(chunks)
         if dropped:
             diagnostic_warnings.append({"code": "cross_source_contamination_filtered", "blocking": False, "dropped": dropped})
+            for code, count in sorted(rejection_counts.items()):
+                diagnostic_warnings.append({"code": code, "blocking": False, "dropped": count})
         chunks = [chunk for chunk in chunks if not _drop_low_value_library_section(chunk.text, (chunk.metadata or {}).get("title"))]
         if not chunks:
             return self._empty_library_index_result(
