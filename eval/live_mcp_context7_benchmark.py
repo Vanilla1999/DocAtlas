@@ -6,6 +6,8 @@ import dataclasses
 import json
 import os
 import re
+import shutil
+import tempfile
 import time
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
@@ -83,6 +85,7 @@ class BenchmarkCase:
 @dataclass
 class NormalizedBenchmarkResult:
     provider: str
+    provider_id: str
     provider_mode: str
     mode: str
     case_id: str
@@ -344,6 +347,7 @@ def _filter_cases(suites: list[str] | None, quick: bool) -> list[BenchmarkCase]:
 
 class BenchmarkProvider:
     name: str
+    provider_id: str
     provider_mode: str
     benchmark_mode: str
 
@@ -359,17 +363,23 @@ class BenchmarkProvider:
 class DocAtlasDirectProvider(BenchmarkProvider):
     def __init__(self, project_path: str | None = None):
         self.name = "docatlas"
+        self.provider_id = "docatlas_zero_setup"
         self.provider_mode = "live_direct_api"
         self.benchmark_mode = "zero-setup"
         self._project_path = project_path or str(ROOT)
         self._service = None
         self._lib_cache: dict[str, dict[str, Any]] = {}
+        self._custom_db_path: str | None = None
 
     def _get_service(self):
         if self._service is None:
             from docmancer.docs.service import LibraryDocsService
             from docmancer.core.config import DocmancerConfig
-            config = DocmancerConfig()
+            if self._custom_db_path:
+                config = DocmancerConfig()
+                config.index.db_path = self._custom_db_path
+            else:
+                config = DocmancerConfig()
             self._service = LibraryDocsService(config=config)
         return self._service
 
@@ -505,10 +515,16 @@ class DocAtlasDirectProvider(BenchmarkProvider):
                     if hasattr(result, "results") and result.results is not None and len(result.results) == 0:
                         status = "empty_index"
                         reason_codes.append("empty_library_index")
+                        if preindex_diag and preindex_diag.attempted and preindex_diag.pages > 0:
+                            preindex_diag.status = "retrieval_no_hits"
+                            preindex_diag.reason_code = "preindex_succeeded_but_query_empty"
                         if hasattr(result, "warning") and result.warning:
                             warnings.append(result.warning)
                     else:
                         status = "no_results"
+                        if preindex_diag and preindex_diag.attempted and preindex_diag.status == "already_indexed":
+                            preindex_diag.status = "retrieval_no_hits"
+                            preindex_diag.reason_code = "preindex_succeeded_but_no_matching_sections"
                 if hasattr(result, "warnings") and result.warnings:
                     warnings.extend(result.warnings)
                 if hasattr(result, "warning") and result.warning:
@@ -531,7 +547,8 @@ class DocAtlasDirectProvider(BenchmarkProvider):
             sources, snippets, answer_text, warnings, reason_codes,
             exact_version_used, cont=None, forb=None, expt=None, preindex=None):
         return NormalizedBenchmarkResult(
-            provider=self.name, provider_mode=self.provider_mode, mode=self.benchmark_mode,
+            provider=self.name, provider_id=self.provider_id,
+            provider_mode=self.provider_mode, mode=self.benchmark_mode,
             case_id=case.id, query=case.query, suite=case.suite,
             status=status, latency_ms=latency_ms, setup_calls=setup_calls,
             sources=sources, snippets=snippets, answer_text=answer_text,
@@ -552,6 +569,7 @@ class DocAtlasDirectProvider(BenchmarkProvider):
 class Context7MCPProvider(BenchmarkProvider):
     def __init__(self):
         self.name = "context7"
+        self.provider_id = "context7_zero_setup"
         self.provider_mode = "live_mcp_stdio"
         self.benchmark_mode = "zero-setup"
         self._session: ClientSession | None = None
@@ -622,7 +640,8 @@ class Context7MCPProvider(BenchmarkProvider):
     async def query(self, case: BenchmarkCase) -> NormalizedBenchmarkResult:
         if "context7" in case.not_applicable_for:
             return NormalizedBenchmarkResult(
-                provider=self.name, provider_mode=self.provider_mode, mode=self.benchmark_mode,
+                provider=self.name, provider_id=self.provider_id,
+                provider_mode=self.provider_mode, mode=self.benchmark_mode,
                 case_id=case.id, query=case.query, suite=case.suite,
                 status="not_applicable", latency_ms=0, setup_calls=0,
                 sources=[], snippets=[], answer_text=None,
@@ -646,7 +665,8 @@ class Context7MCPProvider(BenchmarkProvider):
             setup_calls += 1
             if lib_id is None:
                 return NormalizedBenchmarkResult(
-                    provider=self.name, provider_mode=self.provider_mode, mode=self.benchmark_mode,
+                    provider=self.name, provider_id=self.provider_id,
+                    provider_mode=self.provider_mode, mode=self.benchmark_mode,
                     case_id=case.id, query=case.query, suite=case.suite,
                     status="not_supported", latency_ms=round((time.perf_counter() - start) * 1000, 3),
                     setup_calls=setup_calls, sources=[], snippets=[], answer_text=None,
@@ -688,7 +708,8 @@ class Context7MCPProvider(BenchmarkProvider):
         expt = _detect_expected_sources(sources, case)
 
         return NormalizedBenchmarkResult(
-            provider=self.name, provider_mode=self.provider_mode, mode=self.benchmark_mode,
+            provider=self.name, provider_id=self.provider_id,
+            provider_mode=self.provider_mode, mode=self.benchmark_mode,
             case_id=case.id, query=case.query, suite=case.suite,
             status=status, latency_ms=latency_ms, setup_calls=setup_calls,
             sources=sources, snippets=snippets, answer_text=answer_text,
@@ -837,10 +858,11 @@ def compute_metrics(results: list[NormalizedBenchmarkResult]) -> dict[str, Any]:
     lat_cold_n = sum(1 for r in applicable if r.setup_calls > 1)
     lat_warm_n = sum(1 for r in applicable if r.setup_calls <= 1)
 
-    ev_used = sum(1 for r in successful if r.exact_version_used)
-    ev_correct = sum(1 for r in successful if r.exact_version_used and r.expected_source_hits)
+    ev_success = sum(1 for r in successful if r.suite == "exact-version")
     ev_empty = sum(1 for r in applicable if r.is_empty() and r.suite == "exact-version")
+    ev_not_supported = sum(1 for r in applicable if r.status == "not_supported" and r.suite == "exact-version")
     ev_total = sum(1 for r in applicable if r.suite == "exact-version")
+    ev_correct = sum(1 for r in successful if r.exact_version_used and r.expected_source_hits and r.suite == "exact-version")
 
     return {
         "total_queries": total,
@@ -865,8 +887,11 @@ def compute_metrics(results: list[NormalizedBenchmarkResult]) -> dict[str, Any]:
         "avg_latency_ms": round(sum(lat_all) / max(len(lat_all), 1), 3),
         "avg_cold_latency_ms": round(lat_cold / max(lat_cold_n, 1), 3) if lat_cold_n else 0,
         "avg_warm_latency_ms": round(sum(r.latency_ms for r in applicable if r.setup_calls <= 1) / max(lat_warm_n, 1), 3) if lat_warm_n else 0,
-        "exact_version_coverage_rate": round(ev_used / max(ev_total, 1), 4),
-        "exact_version_correctness_on_success": round(ev_correct / max(ev_used, 1), 4) if ev_used > 0 else None,
+        "exact_version_success_count": ev_success,
+        "exact_version_empty_count": ev_empty,
+        "exact_version_not_supported_count": ev_not_supported,
+        "exact_version_coverage_rate": round(ev_success / max(ev_total, 1), 4),
+        "exact_version_correctness_on_success": round(ev_correct / max(ev_success, 1), 4) if ev_success > 0 else None,
         "exact_version_empty_rate": round(ev_empty / max(ev_total, 1), 4),
     }
 
@@ -875,13 +900,14 @@ def compute_suite_metrics(results: list[NormalizedBenchmarkResult], suite: str) 
     sr = [r for r in results if r.suite == suite]
     by_prov: dict[str, list[NormalizedBenchmarkResult]] = {}
     for r in sr:
-        by_prov.setdefault(r.provider, []).append(r)
+        by_prov.setdefault(r.provider_id, []).append(r)
     m: dict[str, Any] = {"suite": suite, "total": len(sr)}
-    for prov, rlist in by_prov.items():
+    for pid, rlist in by_prov.items():
         pm = compute_metrics(rlist)
+        pm["provider"] = rlist[0].provider if rlist else "unknown"
         pm["provider_mode"] = rlist[0].provider_mode if rlist else "unknown"
         pm["benchmark_mode"] = rlist[0].mode if rlist else "unknown"
-        m[prov] = pm
+        m[pid] = pm
     return m
 
 
@@ -935,8 +961,8 @@ def generate_markdown_report(
         lines.append("")
         for sm in suite_metrics:
             if sm["suite"] == "public-docs":
-                da = sm.get("docatlas", {})
-                c7 = sm.get("context7", {})
+                da = sm.get("docatlas_zero_setup", sm.get("docatlas", {}))
+                c7 = sm.get("context7_zero_setup", sm.get("context7", {}))
                 lines.append("| Metric | DocAtlas | Context7 |")
                 lines.append("|--------|----------|----------|")
                 lines.append(_metric_line("Coverage rate", da.get("coverage_rate"), c7.get("coverage_rate")))
@@ -961,8 +987,10 @@ def generate_markdown_report(
         lines.append("## Preindexed Public Docs")
         lines.append("")
         for sm in suite_metrics:
-            if sm["suite"] == "public-docs" and "docatlas" in sm:
-                da = sm.get("docatlas", {})
+            if sm["suite"] == "public-docs":
+                da = sm.get("docatlas_preindexed", sm.get("docatlas", {}))
+                if not da or not da.get("total_queries", 0):
+                    continue
                 lines.append("**DocAtlas (preindexed):**")
                 lines.append("")
                 lines.append(f"- Coverage rate: {_mv(da.get('coverage_rate'))}")
@@ -982,8 +1010,8 @@ def generate_markdown_report(
         lines.append("")
         for sm in suite_metrics:
             if sm["suite"] == "project-docs":
-                da = sm.get("docatlas", {})
-                c7 = sm.get("context7", {})
+                da = sm.get("docatlas_zero_setup", sm.get("docatlas", {}))
+                c7 = sm.get("context7_zero_setup", sm.get("context7", {}))
                 lines.append("| Metric | DocAtlas | Context7 |")
                 lines.append("|--------|----------|----------|")
                 lines.append(_metric_line("Success count", da.get("success_count"), c7.get("success_count")))
@@ -1003,8 +1031,8 @@ def generate_markdown_report(
         lines.append("")
         for sm in suite_metrics:
             if sm["suite"] == "exact-version":
-                da = sm.get("docatlas", {})
-                c7 = sm.get("context7", {})
+                da = sm.get("docatlas_preindexed", sm.get("docatlas", {}))
+                c7 = sm.get("context7_zero_setup", sm.get("context7", {}))
                 lines.append("| Metric | DocAtlas | Context7 |")
                 lines.append("|--------|----------|----------|")
                 lines.append(_metric_line("Coverage rate", da.get("coverage_rate"), c7.get("coverage_rate")))
@@ -1043,13 +1071,15 @@ def generate_markdown_report(
     wins = []
     for sm in suite_metrics:
         if sm["suite"] == "project-docs":
-            da = sm.get("docatlas", {})
+            da = sm.get("docatlas_zero_setup", sm.get("docatlas", {}))
             if da.get("coverage_rate", 0) > 0.8:
                 wins.append(f"- **Project docs awareness:** DocAtlas covers {_mv(da.get('coverage_rate'))} of project queries (Context7 is N/A by design)")
         if sm["suite"] == "public-docs":
-            da = sm.get("docatlas", {})
-            if da.get("contamination_rate_on_success", 0) == 0 or da.get("correct_source_rate_on_success", 1) >= 0.95:
-                wins.append(f"- **Source correctness:** correct_source_rate_on_success = {_mv(da.get('correct_source_rate_on_success'))} on public-docs")
+            da_zs = sm.get("docatlas_zero_setup", {})
+            da_pi = sm.get("docatlas_preindexed", {})
+            for label, da in [("zero-setup", da_zs), ("preindexed", da_pi)]:
+                if da and da.get("contamination_rate_on_success", 0) == 0 or (da and da.get("correct_source_rate_on_success", 1) >= 0.95):
+                    wins.append(f"- **Source correctness ({label}):** correct_source_rate_on_success = {_mv(da.get('correct_source_rate_on_success'))} on public-docs")
     if not wins:
         wins.append("- More data needed for conclusive wins.")
     for w in wins:
@@ -1061,11 +1091,11 @@ def generate_markdown_report(
     wins = []
     for sm in suite_metrics:
         if sm["suite"] == "public-docs":
-            c7 = sm.get("context7", {})
+            c7 = sm.get("context7_zero_setup", sm.get("context7", {}))
             if c7.get("coverage_rate", 0) > 0.8:
                 wins.append(f"- **Zero-setup public docs:** Context7 coverage = {_mv(c7.get('coverage_rate'))} with no pre-indexing")
         if sm["suite"] == "exact-version":
-            c7 = sm.get("context7", {})
+            c7 = sm.get("context7_zero_setup", sm.get("context7", {}))
             if c7.get("coverage_rate", 0) > 0.8:
                 wins.append(f"- **Zero-setup exact-version:** Context7 returns results without setup")
     if not wins:
@@ -1083,21 +1113,17 @@ def generate_markdown_report(
 
     lines.append("## Per-Case Detail")
     lines.append("")
-    lines.append("| Case | Suite | DA status | DA src | DA lat | C7 status | C7 src | C7 lat |")
-    lines.append("|------|-------|-----------|--------|--------|-----------|--------|--------|")
+    lines.append("| Case | Suite | Provider ID | Status | Sources | Latency |")
+    lines.append("|------|-------|-------------|--------|--------|---------|")
     by_id: dict[str, dict[str, NormalizedBenchmarkResult]] = {}
     for r in all_results:
-        by_id.setdefault(r.case_id, {})[r.provider] = r
+        by_id.setdefault(r.case_id, {})[r.provider_id] = r
     for cid, provs in sorted(by_id.items()):
-        da = provs.get("docatlas")
-        c7 = provs.get("context7")
-        da_st = da.status if da else "—"
-        da_src = str(len(da.sources)) if da else "—"
-        da_lt = f"{da.latency_ms:.0f}ms" if da else "—"
-        c7_st = c7.status if c7 else "—"
-        c7_src = str(len(c7.sources)) if c7 else "—"
-        c7_lt = f"{c7.latency_ms:.0f}ms" if c7 else "—"
-        lines.append(f"| {cid} | {(da or c7).suite} | {da_st} | {da_src} | {da_lt} | {c7_st} | {c7_src} | {c7_lt} |")
+        first = next(iter(provs.values())) if provs else None
+        suite = first.suite if first else "?"
+        for pid in sorted(provs.keys()):
+            r = provs[pid]
+            lines.append(f"| {cid} | {suite} | {pid} | {r.status} | {len(r.sources)} | {r.latency_ms:.0f}ms |")
     lines.append("")
 
     lines.append("## Preindex Diagnostics")
@@ -1182,7 +1208,6 @@ async def run_benchmark(
     print(f"Output: {out_path}\n")
 
     for p in providers:
-        p.benchmark_mode = benchmark_mode
         try:
             await p.setup()
         except Exception as exc:
@@ -1198,12 +1223,13 @@ async def run_benchmark(
             print(f"  {label}: {icon} {result.status} ({result.latency_ms:.0f}ms, {len(result.sources)} src)")
 
             if save_raw:
-                raw_dir = out_path / p.name
+                raw_dir = out_path / p.provider_id
                 raw_dir.mkdir(parents=True, exist_ok=True)
                 raw_data = {
                     "case_id": case.id, "suite": case.suite,
-                    "mode": benchmark_mode,
-                    "provider": p.name, "provider_mode": p.provider_mode,
+                    "mode": p.benchmark_mode,
+                    "provider": p.name, "provider_id": p.provider_id,
+                    "provider_mode": p.provider_mode,
                     "query": case.query,
                     "status": result.status, "latency_ms": result.latency_ms,
                     "setup_calls": result.setup_calls,
@@ -1257,7 +1283,14 @@ async def run_benchmark(
         "timestamp": timestamp, "duration_s": round(duration, 3),
         "benchmark_mode": benchmark_mode,
         "total_queries": len(all_results),
-        "providers": {p.name: p.provider_mode for p in providers},
+        "providers": {
+            p.provider_id: {
+                "provider": p.name,
+                "provider_mode": p.provider_mode,
+                "benchmark_mode": p.benchmark_mode,
+            }
+            for p in providers
+        },
         "suites": sorted(set(r.suite for r in all_results)),
         "docatlas": da_sm, "context7": c7_sm,
         "suite_metrics": suites_meta,
@@ -1330,17 +1363,29 @@ def main() -> None:
         if not args.skip_docatlas:
             p = DocAtlasDirectProvider()
             p.benchmark_mode = "zero-setup"
+            p.provider_id = "docatlas_zero_setup"
             providers.append(p)
         if not args.skip_context7:
             p = Context7MCPProvider()
             p.benchmark_mode = "zero-setup"
+            p.provider_id = "context7_zero_setup"
             providers.append(p)
 
     if mode in ("preindexed", "both"):
         if not args.skip_docatlas:
             p = DocAtlasDirectProvider()
             p.benchmark_mode = "preindexed"
+            p.provider_id = "docatlas_preindexed"
             providers.append(p)
+
+    # Storage isolation for both mode: each docatlas provider gets its own db
+    runtime_base = Path(tempfile.gettempdir()) / "live-benchmark"
+    for p in providers:
+        if isinstance(p, DocAtlasDirectProvider) and mode == "both":
+            iso_dir = runtime_base / mode / p.provider_id
+            iso_dir.mkdir(parents=True, exist_ok=True)
+            p._custom_db_path = str(iso_dir / "docmancer.db")
+            print(f"[isolation] {p.provider_id} -> {p._custom_db_path}")
 
     if not providers:
         print("No providers selected.")
