@@ -1,8 +1,11 @@
 from __future__ import annotations
 
 from dataclasses import asdict, replace
+from datetime import datetime, timezone
+from pathlib import Path
 from typing import Any
 import json
+import re
 import threading
 import time
 from urllib.parse import urlparse
@@ -20,13 +23,15 @@ from docmancer.docs.domain.target_security import host_allowed, is_remote_url, p
 from docmancer.docs.domain.trust_contract import build_project_context_trust_contract
 from docmancer.docs.models import DocsChunk, DocsInspectResult, DocsJobStartResult, DocsManifestValidationResult, DocsPruneResult, DocsRemoveResult, DocsResult, DocsSourceResolution, DocsTarget, DocsTargetResult, DocsTargetsPrefetchResult, LibraryInfo, ProjectDocsBootstrapResult, ProjectDocsChunk, ProjectDocsIngestResult, ProjectDocsInspectResult, ProjectDocsResult, ProjectMetadata, ProjectPrefetchResult, RefreshResult
 from docmancer.docs.registry import LibraryRecord
-from docmancer.docs.resolver import canonical_library_id, normalize_version
+from docmancer.docs.resolver import canonical_library_id, legacy_library_id, normalize_version
 from docmancer.docs.dartdoc import discover_pub_dartdoc_seed_urls, is_pub_dartdoc_target, normalize_pub_dartdoc_target, pub_dartdoc_root_url
 from docmancer.docs.application.library_registry_ops import LibraryRegistryOps
 from docmancer.docs.application.library_refresh_ops import LibraryRefreshOps
 
 STALE_AFTER_DAYS = 30
 DEFAULT_DOC_TOKENS = 4000
+MAX_CHUNKS_PER_SOURCE = 2
+MMR_LAMBDA = 0.7
 PUB_DOCS_URL_TEMPLATE = "https://pub.dev/documentation/{library}/{version}/"
 NO_PROJECT_VERSION_WARNING = "No version was found in project metadata; using latest/default docs."
 PACKAGE_NOT_FOUND_WARNING = "Package was not found in pubspec.lock."
@@ -220,6 +225,84 @@ class LibraryDocsApplicationService:
 
     def _docs_request(input_args: dict[str, Any], info: LibraryInfo | None = None) -> dict[str, Any]:
         return docs_request(input_args, info)
+
+    @staticmethod
+    def _url_within_root(value: str | None, roots: set[str]) -> bool:
+        if not value or not value.startswith(("http://", "https://")):
+            return True
+        return any(value == root or value.startswith(root.rstrip("/") + "/") for root in roots if root)
+
+    def _library_chunk_allowed(self, chunk: Any, info: LibraryInfo, allowed_ids: set[str], expected_roots: set[str]) -> bool:
+        metadata = chunk.metadata or {}
+        library_id = metadata.get("library_id")
+        if library_id not in allowed_ids:
+            return False
+        canonical_id = metadata.get("canonical_id")
+        if canonical_id and canonical_id != info.canonical_id:
+            return False
+        ecosystem = metadata.get("ecosystem")
+        if ecosystem and info.ecosystem and ecosystem != info.ecosystem:
+            return False
+        version = metadata.get("version") or metadata.get("resolved_version")
+        if version and info.version and version != info.version:
+            return False
+        if metadata.get("project_path"):
+            return False
+        docset_root = metadata.get("docset_root")
+        if docset_root and expected_roots and not self._url_within_root(str(docset_root), expected_roots):
+            return False
+        source = getattr(chunk, "source", None)
+        url = metadata.get("url") or metadata.get("source_url")
+        return self._url_within_root(source, expected_roots) and self._url_within_root(url, expected_roots)
+
+    def _empty_library_index_result(
+        self,
+        *,
+        info: LibraryInfo,
+        latest: LibraryInfo,
+        topic: str | None,
+        refreshed: bool,
+        stale_before: bool,
+        warning: str | None,
+        warnings: list[str],
+        requested_version: str | None,
+        version_source: str | None,
+        docs_snapshot_exact: bool | None,
+        docs_exactness: str | None,
+        docs_binding_source: str | None,
+        confidence: str | None,
+        input_args: dict[str, Any],
+        docs_url_source: str | None,
+        diagnostics: dict[str, Any],
+        diagnostic_warnings: list[dict[str, Any]],
+    ) -> DocsResult:
+        return DocsResult(
+            library_id=info.library_id,
+            library=latest.library,
+            version=latest.version,
+            topic=topic,
+            refreshed=refreshed,
+            stale_before_refresh=stale_before,
+            warning=warning,
+            last_refreshed_at=latest.last_refreshed_at,
+            source_type=info.source_type,
+            results=[],
+            warnings=warnings,
+            requested_version=requested_version,
+            resolved_version=latest.resolved_version or latest.version,
+            version_source=version_source,
+            docs_snapshot_exact=docs_snapshot_exact,
+            docs_exactness=docs_exactness,
+            docs_binding_source=docs_binding_source,
+            confidence=confidence,
+            status="empty_library_index",
+            decision="stop",
+            request=self._docs_request(input_args, info),
+            identity=self._docs_identity(info, docs_url_source=docs_url_source),
+            policy=self._docs_policy("error", has_registered_source=True),
+            diagnostics={**diagnostics, "reason_code": "missing_chunks", "warnings": diagnostic_warnings},
+            next_actions=["Call refresh_library_docs to ingest this library's docs."],
+        )
 
     def _record_from_info(self, info: LibraryInfo) -> LibraryRecord | None:
         if info.library_id is None:
@@ -581,6 +664,10 @@ class LibraryDocsApplicationService:
                         diagnostics={**resolution.diagnostics, "warnings": diagnostic_warnings},
                         next_actions=["Retry get_library_docs with force_refresh=false if local docs are usable, or refresh/register the source again."],
                     )
+                if stale_before:
+                    stale_warning = _stale_docs_warning(info.last_refreshed_at, self.stale_after_days)
+                    warnings = [*warnings, stale_warning]
+                    diagnostic_warnings.append({"code": "stale_docs_used", "blocking": False})
 
         latest = self.resolve_library(info.library_id, source_type=info.source_type)
         record = self.registry.get(info.library_id, source_type=info.source_type)
@@ -611,16 +698,63 @@ class LibraryDocsApplicationService:
                 policy=self._docs_policy("success", has_registered_source=True),
                 diagnostics={**resolution.diagnostics, "warnings": diagnostic_warnings},
             )
+        pages, chunks = self.registry_ops.count_index_entries(record)
+        index_db_exists = Path(self._index_config_for(record).index.db_path).exists()
+        if self._index_size_for(record) == 0 or (pages == 0 and chunks == 0 and index_db_exists):
+            return self._empty_library_index_result(
+                info=info,
+                latest=latest,
+                topic=topic,
+                refreshed=refreshed,
+                stale_before=stale_before,
+                warning=warning,
+                warnings=warnings,
+                requested_version=requested_version,
+                version_source=version_source,
+                docs_snapshot_exact=docs_snapshot_exact,
+                docs_exactness=docs_exactness,
+                docs_binding_source=docs_binding_source,
+                confidence=confidence,
+                input_args=input_args,
+                docs_url_source=docs_url_source,
+                diagnostics=resolution.diagnostics,
+                diagnostic_warnings=diagnostic_warnings,
+            )
         query = f"{info.library} {topic}".strip() if topic else info.library
         chunks = self._agent_instance(record).query(query, budget=tokens or DEFAULT_DOC_TOKENS)
-        if any((chunk.metadata or {}).get("library_id") for chunk in chunks):
-            allowed_ids = {info.library_id}
-            if info.version:
-                from docmancer.docs.resolver import legacy_library_id
-
-                allowed_ids.add(legacy_library_id(info.library, info.version))
-            chunks = [chunk for chunk in chunks if (chunk.metadata or {}).get("library_id") in allowed_ids]
+        allowed_ids = {info.library_id}
+        if info.version:
+            allowed_ids.add(legacy_library_id(info.library, info.version))
+        expected_roots = {root for root in {info.docs_url_resolved, info.docs_url} if root}
+        chunks_before_guard = list(chunks)
+        chunks = [chunk for chunk in chunks if self._library_chunk_allowed(chunk, info, allowed_ids, expected_roots)]
+        dropped = len(chunks_before_guard) - len(chunks)
+        if dropped:
+            diagnostic_warnings.append({"code": "cross_source_contamination_filtered", "blocking": False, "dropped": dropped})
         chunks = [chunk for chunk in chunks if not _drop_low_value_library_section(chunk.text, (chunk.metadata or {}).get("title"))]
+        if not chunks:
+            return self._empty_library_index_result(
+                info=info,
+                latest=latest,
+                topic=topic,
+                refreshed=refreshed,
+                stale_before=stale_before,
+                warning=warning,
+                warnings=warnings,
+                requested_version=requested_version,
+                version_source=version_source,
+                docs_snapshot_exact=docs_snapshot_exact,
+                docs_exactness=docs_exactness,
+                docs_binding_source=docs_binding_source,
+                confidence=confidence,
+                input_args=input_args,
+                docs_url_source=docs_url_source,
+                diagnostics=resolution.diagnostics,
+                diagnostic_warnings=diagnostic_warnings,
+            )
+        chunks, quality_diagnostics = _postprocess_library_chunks(chunks, query)
+        latest_stale = self._is_stale(latest.last_refreshed_at)
+        freshness = _freshness_diagnostics(latest.last_refreshed_at, self.stale_after_days, latest_stale)
         return DocsResult(
             library_id=info.library_id,
             library=latest.library,
@@ -637,7 +771,7 @@ class LibraryDocsApplicationService:
                     content=chunk.text,
                     source=chunk.source,
                     url=chunk.source if chunk.source.startswith(("http://", "https://")) else None,
-                    metadata=chunk.metadata or {},
+                    metadata={**(chunk.metadata or {}), "stale": latest_stale},
                 )
                 for chunk in chunks
             ],
@@ -654,7 +788,7 @@ class LibraryDocsApplicationService:
             request=self._docs_request(input_args, info),
             identity=self._docs_identity(info, docs_url_source=docs_url_source),
             policy=self._docs_policy("success", has_registered_source=True),
-            diagnostics={**resolution.diagnostics, "warnings": diagnostic_warnings},
+            diagnostics={**resolution.diagnostics, **quality_diagnostics, "freshness": freshness, "warnings": diagnostic_warnings},
         )
 
     def _index_size_for(self, record: LibraryRecord) -> int:
@@ -704,3 +838,157 @@ def _drop_low_value_library_section(content: str, title: str | None = None) -> b
         return False
     text = (content or "").strip()
     return not text or text.lower() == (title or "").strip().lower()
+
+
+_CODE_BLOCK_RE = re.compile(r"```([A-Za-z0-9_+.#-]*)\s*\n(.*?)```", re.DOTALL)
+_ANCHOR_RE = re.compile(r"\s*\[¶\]")
+_EMOJI_RE = re.compile("[\U0001F300-\U0001FAFF\U00002700-\U000027BF]")
+_TERM_RE = re.compile(r"[A-Za-z0-9_]+")
+_NOISE_LINES = {
+    "copy",
+    "copy code",
+    "download",
+    "download file",
+    "select language",
+    "translation",
+    "translations",
+}
+
+
+def _query_terms(query: str | None) -> set[str]:
+    return {term.lower() for term in _TERM_RE.findall(query or "") if len(term) > 1}
+
+
+def _clean_library_section(content: str) -> str:
+    text = _ANCHOR_RE.sub("", content or "")
+    text = _EMOJI_RE.sub("", text)
+    cleaned_lines = []
+    for line in text.splitlines():
+        normalized = line.strip().lower().strip(":")
+        if normalized in _NOISE_LINES:
+            continue
+        if normalized.startswith(("translated by ", "translation missing")):
+            continue
+        cleaned_lines.append(line.rstrip())
+    return "\n".join(cleaned_lines).strip()
+
+
+def _code_snippets(content: str) -> list[dict[str, str]]:
+    snippets = []
+    for match in _CODE_BLOCK_RE.finditer(content or ""):
+        snippets.append({"language": match.group(1).strip(), "code": match.group(2).strip()})
+    return snippets
+
+
+def _code_relevance(snippets: list[dict[str, str]], terms: set[str]) -> int:
+    if not snippets or not terms:
+        return 0
+    score = 0
+    for snippet in snippets:
+        snippet_terms = _query_terms(snippet["code"])
+        score += len(terms & snippet_terms)
+    return score
+
+
+def _text_similarity(left: str, right: str) -> float:
+    left_terms = _query_terms(left)
+    right_terms = _query_terms(right)
+    if not left_terms or not right_terms:
+        return 0.0
+    return len(left_terms & right_terms) / len(left_terms | right_terms)
+
+
+def _chunk_relevance(content: str, snippets: list[dict[str, str]], terms: set[str]) -> float:
+    if not terms:
+        return 0.0
+    text_terms = _query_terms(content)
+    lexical = len(terms & text_terms) / len(terms)
+    code = min(1.0, _code_relevance(snippets, terms) / len(terms))
+    return lexical + code
+
+
+def _copy_chunk(chunk: Any, *, text: str, metadata: dict[str, Any]) -> Any:
+    if hasattr(chunk, "model_copy"):
+        return chunk.model_copy(update={"text": text, "metadata": metadata})
+    if hasattr(chunk, "copy"):
+        return chunk.copy(update={"text": text, "metadata": metadata})
+    chunk.text = text
+    chunk.metadata = metadata
+    return chunk
+
+
+def _postprocess_library_chunks(chunks: list[Any], query: str) -> tuple[list[Any], dict[str, Any]]:
+    terms = _query_terms(query)
+    candidates: list[dict[str, Any]] = []
+    snippet_count = 0
+    for index, chunk in enumerate(chunks):
+        cleaned = _clean_library_section(chunk.text)
+        snippets = _code_snippets(cleaned)
+        snippet_count += len(snippets)
+        metadata = dict(chunk.metadata or {})
+        metadata["code_snippets"] = len(snippets)
+        if snippets:
+            metadata["top_code_language"] = snippets[0]["language"] or None
+        candidates.append(
+            {
+                "index": index,
+                "relevance": _chunk_relevance(cleaned, snippets, terms),
+                "chunk": _copy_chunk(chunk, text=cleaned, metadata=metadata),
+            }
+        )
+
+    selected = []
+    source_counts: dict[str, int] = {}
+    dropped_for_diversity = 0
+    while candidates:
+        scored = []
+        for candidate in candidates:
+            diversity = max(_text_similarity(candidate["chunk"].text, chunk.text) for chunk in selected) if selected else 0.0
+            mmr_score = MMR_LAMBDA * candidate["relevance"] - (1 - MMR_LAMBDA) * diversity
+            scored.append((mmr_score, candidate["relevance"], -candidate["index"], candidate))
+        _mmr_score, _relevance, _negative_index, best = max(scored, key=lambda item: item[:3])
+        candidates.remove(best)
+        chunk = best["chunk"]
+        source = chunk.source or ""
+        count = source_counts.get(source, 0)
+        if count >= MAX_CHUNKS_PER_SOURCE:
+            dropped_for_diversity += 1
+            continue
+        source_counts[source] = count + 1
+        selected.append(chunk)
+
+    return selected, {
+        "code_snippets": snippet_count,
+        "mmr_lambda": MMR_LAMBDA,
+        "max_chunks_per_source": MAX_CHUNKS_PER_SOURCE,
+        "chunks_dropped_for_diversity": dropped_for_diversity,
+        "unique_sources@5": len({chunk.source for chunk in selected[:5]}),
+    }
+
+
+def _age_days(last_refreshed_at: str | None) -> int | None:
+    if not last_refreshed_at:
+        return None
+    try:
+        refreshed = datetime.fromisoformat(last_refreshed_at)
+    except ValueError:
+        return None
+    if refreshed.tzinfo is None:
+        refreshed = refreshed.replace(tzinfo=timezone.utc)
+    return max(0, (datetime.now(timezone.utc) - refreshed).days)
+
+
+def _freshness_diagnostics(last_refreshed_at: str | None, stale_after_days: int, stale: bool) -> dict[str, Any]:
+    return {
+        "last_refreshed_at": last_refreshed_at,
+        "stale": stale,
+        "stale_after_days": stale_after_days,
+        "age_days": _age_days(last_refreshed_at),
+    }
+
+
+def _stale_docs_warning(last_refreshed_at: str | None, stale_after_days: int) -> str:
+    age = _age_days(last_refreshed_at)
+    if age is None:
+        return f"Documentation freshness is unknown (stale after {stale_after_days} days). Call refresh_library_docs to update."
+    return f"Documentation is {age} days old (stale after {stale_after_days} days). Call refresh_library_docs to update."

@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from typing import Any, Callable
 
-from docmancer.agent import DocmancerAgent
 from docmancer.core.config import DocmancerConfig
 from docmancer.docs.registry import LibraryRecord
 from docmancer.docs.resolver import normalize_library_name
@@ -15,8 +14,12 @@ class AgentIndexGateway:
         config: DocmancerConfig,
         *,
         default_agent: Any | None = None,
-        agent_factory: Callable[..., Any] = DocmancerAgent,
+        agent_factory: Callable[..., Any] | None = None,
     ):
+        if agent_factory is None:
+            from docmancer.agent import DocmancerAgent
+
+            agent_factory = DocmancerAgent
         self.config = config
         self._default_agent = default_agent
         self._agents: dict[str, Any] = {}
@@ -32,14 +35,20 @@ class AgentIndexGateway:
         return config
 
     def agent_instance(self, record: LibraryRecord | None = None) -> Any:
+        if record is not None:
+            key = record.canonical_id or record.library_id
+            if key not in self._agents:
+                self._agents[key] = self._agent_factory(config=self.index_config_for(record))
+            return self._agents[key]
+
         if self._default_agent is None:
-            if record is None:
-                self._default_agent = self._agent_factory(config=self.config)
-            else:
-                if record.library_id not in self._agents:
-                    self._agents[record.library_id] = self._agent_factory(config=self.index_config_for(record))
-                return self._agents[record.library_id]
+            self._default_agent = self._agent_factory(config=self.config)
         return self._default_agent
 
-    def drop_library_agent(self, library_id: str) -> None:
-        self._agents.pop(library_id, None)
+    def drop_library_agent(self, record_or_library_id: LibraryRecord | str) -> None:
+        if isinstance(record_or_library_id, LibraryRecord):
+            self._agents.pop(record_or_library_id.canonical_id or record_or_library_id.library_id, None)
+            self._agents.pop(record_or_library_id.library_id, None)
+            return
+
+        self._agents.pop(record_or_library_id, None)

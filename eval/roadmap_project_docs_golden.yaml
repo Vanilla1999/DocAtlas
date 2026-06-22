@@ -1,0 +1,34 @@
+corpus_snapshot: docatlas-project-docs-roadmap08-v1
+items:
+  - id: docatlas_ingest_docs
+    query: How does DocAtlas ingest docs?
+    taxonomy_class: project_docs_architecture
+    expected_sources:
+      - source: README.md
+      - source: docs/project-docs-demo.md
+    required_facts:
+      - ingest
+      - add_url
+      - index
+
+  - id: docatlas_trust_contract
+    query: How does DocAtlas handle Trust Contract?
+    taxonomy_class: project_docs_api
+    expected_sources:
+      - source: AGENTS.md
+      - source: docs/project-docs-demo.md
+    required_facts:
+      - trust_contract
+      - selected
+      - rejected
+
+  - id: docatlas_resolve_library_versions
+    query: How does DocAtlas resolve library versions?
+    taxonomy_class: project_docs_api
+    expected_sources:
+      - source: AGENTS.md
+      - source: README.md
+    required_facts:
+      - resolve_library
+      - version
+      - lockfile

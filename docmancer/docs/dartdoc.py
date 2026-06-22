@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 from dataclasses import replace
+from collections.abc import Callable
+import json
 from urllib.parse import urljoin, urlparse
 
 from bs4 import BeautifulSoup
@@ -50,6 +52,7 @@ def is_pub_dartdoc_target(target: DocsTarget) -> bool:
 
 def normalize_pub_dartdoc_target(target: DocsTarget) -> DocsTarget:
     version = normalize_version(target.version) or "latest"
+    max_pages = 500 if target.max_pages == 200 else target.max_pages
     allowed_domains = list(target.allowed_domains)
     if not allowed_domains:
         allowed_domains = ["pub.dev"]
@@ -66,6 +69,7 @@ def normalize_pub_dartdoc_target(target: DocsTarget) -> DocsTarget:
         docs_url=docs_url,
         allowed_domains=allowed_domains,
         path_prefixes=path_prefixes,
+        max_pages=max_pages,
         doc_format=target.doc_format or "dartdoc",
     )
 
@@ -88,31 +92,72 @@ def discover_pub_dartdoc_seed_urls(
     root_html: str,
     root_url: str,
     max_seed_urls: int = 50,
+    fetch_url: Callable[[str], str | None] | None = None,
 ) -> list[str]:
     prefix = pub_dartdoc_path_prefix(package, version)
     entity_urls: list[str] = []
     library_urls: list[str] = []
     seen: set[str] = set()
-    soup = BeautifulSoup(root_html or "", "html.parser")
 
-    for link in soup.find_all("a", href=True):
-        href = str(link.get("href") or "").strip()
+    def add_url(value: str, *, prefer_library: bool = False, base_url: str = root_url) -> None:
+        href = str(value or "").strip()
         if not href or href.startswith(("#", "javascript:", "mailto:")):
-            continue
-        absolute = urljoin(root_url, href)
+            return
+        absolute = urljoin(base_url, href)
         parsed = urlparse(absolute)
         if parsed.netloc.lower() != "pub.dev":
-            continue
+            return
         path = parsed.path
         if not path.startswith(prefix):
-            continue
+            return
         normalized = parsed._replace(fragment="", query="").geturl()
         if normalized in seen:
-            continue
+            return
         seen.add(normalized)
         if _is_entity_page(path):
             entity_urls.append(normalized)
-        elif _is_library_page(path, prefix):
+        elif prefer_library or _is_library_page(path, prefix):
             library_urls.append(normalized)
+
+    def add_html_links(html: str, *, prefer_library: bool = False, base_url: str = root_url) -> None:
+        soup = BeautifulSoup(html or "", "html.parser")
+        for link in soup.find_all("a", href=True):
+            add_url(str(link.get("href") or ""), prefer_library=prefer_library, base_url=base_url)
+
+    def add_json_links(payload: object) -> None:
+        if isinstance(payload, dict):
+            for key, value in payload.items():
+                if key in {"href", "url", "link", "path"} and isinstance(value, str):
+                    add_url(value, prefer_library=value.endswith("/"))
+                else:
+                    add_json_links(value)
+        elif isinstance(payload, list):
+            for item in payload:
+                add_json_links(item)
+
+    def fetch_and_parse(url: str) -> str | None:
+        if fetch_url is None:
+            return None
+        try:
+            return fetch_url(url)
+        except Exception:
+            return None
+
+    add_html_links(root_html)
+
+    if fetch_url is not None:
+        for json_url in (urljoin(root_url, "categories.json"), urljoin(root_url, "sidebar.json"), *[url for url in list(library_urls) if url.endswith(".json")]):
+            body = fetch_and_parse(json_url)
+            if not body:
+                continue
+            try:
+                add_json_links(json.loads(body))
+            except json.JSONDecodeError:
+                add_html_links(body)
+
+        for library_url in list(library_urls):
+            html = fetch_and_parse(library_url)
+            if html:
+                add_html_links(html, base_url=library_url)
 
     return [*entity_urls, *library_urls][:max(1, max_seed_urls)]

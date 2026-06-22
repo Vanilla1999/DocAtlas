@@ -85,6 +85,47 @@ def test_pub_dartdoc_discovery_empty_returns_no_seeds():
     assert discover_pub_dartdoc_seed_urls("pkg", "1.0.0", "<html></html>", "https://pub.dev/documentation/pkg/1.0.0/") == []
 
 
+def test_dartdoc_root_page_entity_discovery_fetches_library_pages():
+    root = '<a href="sample/">sample</a>'
+    pages = {
+        "https://pub.dev/documentation/sample/1.0.0/sample/": '<a href="Foo-class.html">Foo</a><a href="doThing-function.html">doThing</a>',
+    }
+
+    urls = discover_pub_dartdoc_seed_urls(
+        "sample",
+        "1.0.0",
+        root,
+        "https://pub.dev/documentation/sample/1.0.0/",
+        fetch_url=pages.get,
+    )
+
+    assert urls[:2] == [
+        "https://pub.dev/documentation/sample/1.0.0/sample/Foo-class.html",
+        "https://pub.dev/documentation/sample/1.0.0/sample/doThing-function.html",
+    ]
+
+
+def test_dartdoc_no_article_content_fallback_uses_json_sidebar():
+    root = "<html><body>No extractable article content</body></html>"
+    pages = {
+        "https://pub.dev/documentation/sample/1.0.0/categories.json": '{"categories":[{"href":"sample/Foo-class.html"}]}',
+        "https://pub.dev/documentation/sample/1.0.0/sidebar.json": '{"items":[{"url":"sample/doThing-function.html"}]}',
+    }
+
+    urls = discover_pub_dartdoc_seed_urls(
+        "sample",
+        "1.0.0",
+        root,
+        "https://pub.dev/documentation/sample/1.0.0/",
+        fetch_url=pages.get,
+    )
+
+    assert urls == [
+        "https://pub.dev/documentation/sample/1.0.0/sample/Foo-class.html",
+        "https://pub.dev/documentation/sample/1.0.0/sample/doThing-function.html",
+    ]
+
+
 def test_pub_dartdoc_discovery_dedupes_and_stays_inside_prefix():
     html = """
     <a href="pkg/Foo-class.html">Foo</a>
@@ -101,3 +142,10 @@ def test_normalize_pub_dartdoc_target_infers_defaults():
     assert target.doc_format == "dartdoc"
     assert target.allowed_domains == ["pub.dev"]
     assert target.path_prefixes == ["/documentation/go_router/17.2.3/"]
+    assert target.max_pages == 500
+
+
+def test_normalize_pub_dartdoc_target_preserves_explicit_max_pages():
+    target = normalize_pub_dartdoc_target(DocsTarget(library="go_router", ecosystem="pub", version="17.2.3", max_pages=75))
+
+    assert target.max_pages == 75

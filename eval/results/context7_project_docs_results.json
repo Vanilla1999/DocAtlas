@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "system": "context7",
+  "source": "/docatlas/project-docs",
+  "dataset": "eval/roadmap_project_docs_golden.yaml",
+  "corpus_snapshot": "docatlas-project-docs-roadmap08-v1",
+  "capture_method": "manual_normalized_from_tool_output",
+  "review_status": "manual_assessment_required_for_recapture",
+  "metrics": {"queries": 3, "hit_at": {"1": 1.0, "3": 1.0, "5": 1.0}, "mrr": 1.0, "quality": {"snippet_present_at_5_rate": 1.0, "locale_contamination_rate": 0.0}},
+  "items": [
+    {"id": "docatlas_ingest_docs", "first_hit_rank": 1, "hit_at_5": true, "expected_source_hit": "README.md", "snippet_present_at_5": true, "manual_assessment": "project docs equivalent baseline"},
+    {"id": "docatlas_trust_contract", "first_hit_rank": 1, "hit_at_5": true, "expected_source_hit": "AGENTS.md", "snippet_present_at_5": true, "manual_assessment": "project docs equivalent baseline"},
+    {"id": "docatlas_resolve_library_versions", "first_hit_rank": 1, "hit_at_5": true, "expected_source_hit": "AGENTS.md", "snippet_present_at_5": true, "manual_assessment": "project docs equivalent baseline"}
+  ]
+}

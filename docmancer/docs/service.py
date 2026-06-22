@@ -26,10 +26,10 @@ DEFAULT_DOC_TOKENS = 4000
 
 
 class LibraryDocsService:
-    def __init__(self, *, config: DocmancerConfig | None = None, registry: LibraryRegistry | None = None, agent: Any | None = None, project_reader: ProjectMetadataReader | None = None, job_tracker: DocsJobTracker | None = None, stale_after_days: int = STALE_AFTER_DAYS):
+    def __init__(self, *, config: DocmancerConfig | None = None, registry: LibraryRegistry | None = None, agent: Any | None = None, agent_factory: Any | None = None, project_reader: ProjectMetadataReader | None = None, job_tracker: DocsJobTracker | None = None, stale_after_days: int = STALE_AFTER_DAYS):
         self.config = config or DocmancerConfig()
         self.registry = registry or LibraryRegistry(self.config.index.db_path)
-        self.agent_gateway = AgentIndexGateway(self.config, default_agent=agent)
+        self.agent_gateway = AgentIndexGateway(self.config, default_agent=agent, agent_factory=agent_factory)
         self.lock_gateway = FilesystemLockGateway()
         self.project_reader = project_reader or ProjectMetadataReader()
         self.stale_after_days = stale_after_days

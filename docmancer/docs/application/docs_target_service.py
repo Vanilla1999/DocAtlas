@@ -150,9 +150,16 @@ class DocsTargetService:
         try:
             with httpx.Client(timeout=30.0, follow_redirects=True, headers={"User-Agent": "docmancer/1.0"}) as client:
                 resp = client.get(root_url)
-            if resp.status_code != 200:
-                raise ValueError(f"status {resp.status_code}")
-            seeds = discover_pub_dartdoc_seed_urls(target.library, version, resp.text, root_url, max_seed_urls=target.max_pages or 50)
+                if resp.status_code != 200:
+                    raise ValueError(f"status {resp.status_code}")
+
+                def fetch_url(url: str) -> str | None:
+                    fetched = client.get(url)
+                    if fetched.status_code != 200:
+                        return None
+                    return fetched.text
+
+                seeds = discover_pub_dartdoc_seed_urls(target.library, version, resp.text, root_url, max_seed_urls=target.max_pages or 500, fetch_url=fetch_url)
         except Exception as exc:
             warning = f"{target.library}: could not discover pub.dev Dartdoc seed URLs ({exc}); falling back to root URL."
             warnings.append(warning)

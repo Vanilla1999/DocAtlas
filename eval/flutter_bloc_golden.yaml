@@ -1,0 +1,60 @@
+corpus_snapshot: flutter-bloc-pub-eval-v1
+items:
+  - id: flutter_bloc_blocprovider
+    query: flutter_bloc BlocProvider create child usage
+    taxonomy_class: code_example
+    version_policy: exact
+    project_context:
+      ecosystem: pub
+      library: flutter_bloc
+      version: 8.1.6
+    expected_sources:
+      - source: pub.dev/documentation/flutter_bloc/latest/flutter_bloc/BlocProvider-class.html
+    required_facts:
+      - BlocProvider
+      - create
+      - child
+
+  - id: flutter_bloc_blocbuilder
+    query: flutter_bloc BlocBuilder builder and buildWhen usage
+    taxonomy_class: code_example
+    version_policy: exact
+    project_context:
+      ecosystem: pub
+      library: flutter_bloc
+      version: 8.1.6
+    expected_sources:
+      - source: pub.dev/documentation/flutter_bloc/latest/flutter_bloc/BlocBuilder-class.html
+    required_facts:
+      - BlocBuilder
+      - builder
+      - buildWhen
+
+  - id: flutter_bloc_bloclistener
+    query: flutter_bloc BlocListener listener and listenWhen usage
+    taxonomy_class: code_example
+    version_policy: exact
+    project_context:
+      ecosystem: pub
+      library: flutter_bloc
+      version: 8.1.6
+    expected_sources:
+      - source: pub.dev/documentation/flutter_bloc/latest/flutter_bloc/BlocListener-class.html
+    required_facts:
+      - BlocListener
+      - listener
+      - listenWhen
+
+  - id: flutter_bloc_multiblocprovider
+    query: flutter_bloc MultiBlocProvider nesting providers usage
+    taxonomy_class: code_example
+    version_policy: exact
+    project_context:
+      ecosystem: pub
+      library: flutter_bloc
+      version: 8.1.6
+    expected_sources:
+      - source: pub.dev/documentation/flutter_bloc/latest/flutter_bloc/MultiBlocProvider-class.html
+    required_facts:
+      - MultiBlocProvider
+      - providers

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import asdict
 from datetime import datetime, timezone
+from pathlib import Path
 
 from docmancer.agent import DocmancerAgent
 from docmancer.core.config import DocmancerConfig
@@ -16,34 +17,47 @@ class FakeAgent:
         self.add_calls: list[str] = []
         self.add_kwargs: list[dict] = []
         self.query_calls: list[tuple[str, int | None]] = []
+        self.config = None
 
     def add(self, docs_url: str, recreate: bool = False, **kwargs) -> int:
         self.add_calls.append(docs_url)
         self.add_kwargs.append(kwargs)
+        if self.config is not None:
+            marker = Path(self.config.index.extracted_dir) / "chunk.md"
+            marker.parent.mkdir(parents=True, exist_ok=True)
+            marker.write_text("indexed chunk", encoding="utf-8")
         return 1
 
     def query(self, text: str, limit=None, budget=None, expand=None):
         self.query_calls.append((text, budget))
+        metadata = dict((self.add_kwargs[-1].get("metadata") if self.add_kwargs else None) or {})
+        metadata.setdefault("title", "Guide")
         return [
             RetrievedChunk(
-                source="https://docs.example.com/guide",
+                source=(self.add_calls[-1].rstrip("/") + "/guide") if self.add_calls else "https://docs.example.com/guide",
                 chunk_index=0,
                 text="Use the registered docs source.",
                 score=1.0,
-                metadata={"title": "Guide"},
+                metadata=metadata,
             )
         ]
 
 
 def _service(tmp_path, monkeypatch, agent: FakeAgent | None = None) -> LibraryDocsService:
     monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
+    agent = agent or FakeAgent()
     config = DocmancerConfig()
     config.index.db_path = str(tmp_path / "docmancer.db")
     config.index.extracted_dir = str(tmp_path / "extracted")
+    def agent_factory(**kwargs):
+        agent.config = kwargs.get("config")
+        return agent
+
     return LibraryDocsService(
         config=config,
         registry=LibraryRegistry(config.index.db_path),
-        agent=agent or FakeAgent(),
+        agent=agent,
+        agent_factory=agent_factory,
         job_tracker=DocsJobTracker(),
     )
 

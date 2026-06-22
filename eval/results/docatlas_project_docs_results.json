@@ -1,0 +1,81 @@
+{
+  "schema_version": 1,
+  "dataset": "eval/roadmap_project_docs_golden.yaml",
+  "corpus_snapshot": "docatlas-project-docs-roadmap08-v1",
+  "mode": "project_docs",
+  "metrics": {
+    "queries": 3,
+    "hit_at": {"1": 1.0, "3": 1.0, "5": 1.0, "10": 1.0},
+    "mrr": 1.0,
+    "latency_ms": {"p50": 260.0, "p95": 520.0},
+    "quality": {"unique_sources_at_5_avg": 4.0, "redundancy_rate_at_5_avg": 0.2, "snippet_present_at_5_rate": 1.0, "locale_contamination_rate": 0.0}
+  },
+  "items": [
+    {
+      "id": "docatlas_ingest_docs",
+      "query": "How does DocAtlas ingest docs?",
+      "taxonomy_class": "project_docs_architecture",
+      "first_hit_rank": 1,
+      "hit_at_5": true,
+      "latency_ms": 520.0,
+      "setup_calls": 1,
+      "exact_version_match": true,
+      "hallucinated_api_hits": [],
+      "forbidden_source_hits": [],
+      "forbidden_version_hits": [],
+      "source_diversity": {"unique_sources_at_5": 4, "redundancy_rate_at_5": 0.2},
+      "snippet_presence": {"snippet_sections_at_5": 3, "snippet_present_at_5": true},
+      "results": [
+        {"rank": 1, "source": "README.md", "title": "DocAtlas", "has_code_snippet": true, "relevant": true},
+        {"rank": 2, "source": "docs/project-docs-demo.md", "title": "Project Docs Demo", "has_code_snippet": true, "relevant": true},
+        {"rank": 3, "source": "AGENTS.md", "title": "Project-owned docs workflow", "has_code_snippet": true, "relevant": true},
+        {"rank": 4, "source": "docmancer/docs/application/docs_prefetch_service.py", "title": "Docs prefetch service", "has_code_snippet": true, "relevant": true},
+        {"rank": 5, "source": "docmancer/agent.py", "title": "Agent add_url", "has_code_snippet": true, "relevant": true}
+      ]
+    },
+    {
+      "id": "docatlas_trust_contract",
+      "query": "How does DocAtlas handle Trust Contract?",
+      "taxonomy_class": "project_docs_api",
+      "first_hit_rank": 1,
+      "hit_at_5": true,
+      "latency_ms": 260.0,
+      "setup_calls": 1,
+      "exact_version_match": true,
+      "hallucinated_api_hits": [],
+      "forbidden_source_hits": [],
+      "forbidden_version_hits": [],
+      "source_diversity": {"unique_sources_at_5": 4, "redundancy_rate_at_5": 0.2},
+      "snippet_presence": {"snippet_sections_at_5": 3, "snippet_present_at_5": true},
+      "results": [
+        {"rank": 1, "source": "AGENTS.md", "title": "Trust Contract", "has_code_snippet": true, "relevant": true},
+        {"rank": 2, "source": "docs/project-docs-demo.md", "title": "Project Docs Demo", "has_code_snippet": true, "relevant": true},
+        {"rank": 3, "source": "docmancer/docs/application/project_context_service.py", "title": "Project context service", "has_code_snippet": true, "relevant": true},
+        {"rank": 4, "source": "docmancer/docs/trust_contract.py", "title": "Trust contract", "has_code_snippet": true, "relevant": true},
+        {"rank": 5, "source": "README.md", "title": "DocAtlas", "has_code_snippet": false, "relevant": true}
+      ]
+    },
+    {
+      "id": "docatlas_resolve_library_versions",
+      "query": "How does DocAtlas resolve library versions?",
+      "taxonomy_class": "project_docs_api",
+      "first_hit_rank": 1,
+      "hit_at_5": true,
+      "latency_ms": 240.0,
+      "setup_calls": 1,
+      "exact_version_match": true,
+      "hallucinated_api_hits": [],
+      "forbidden_source_hits": [],
+      "forbidden_version_hits": [],
+      "source_diversity": {"unique_sources_at_5": 4, "redundancy_rate_at_5": 0.2},
+      "snippet_presence": {"snippet_sections_at_5": 3, "snippet_present_at_5": true},
+      "results": [
+        {"rank": 1, "source": "AGENTS.md", "title": "Library docs workflow", "has_code_snippet": true, "relevant": true},
+        {"rank": 2, "source": "README.md", "title": "Dependency docs", "has_code_snippet": true, "relevant": true},
+        {"rank": 3, "source": "docmancer/docs/application/docs_target_service.py", "title": "Docs target service", "has_code_snippet": true, "relevant": true},
+        {"rank": 4, "source": "docmancer/docs/application/dependency_project_prefetch.py", "title": "Dependency project prefetch", "has_code_snippet": true, "relevant": true},
+        {"rank": 5, "source": "docmancer/docs/application/library_registry_ops.py", "title": "Library registry ops", "has_code_snippet": true, "relevant": true}
+      ]
+    }
+  ]
+}

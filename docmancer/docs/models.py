@@ -38,6 +38,9 @@ class LibraryInfo:
     local: bool = False
     stale: bool = False
     last_refreshed_at: str | None = None
+    pages: int = 0
+    chunks: int = 0
+    reason_code: str | None = None
     message: str | None = None
     candidates: list[dict[str, Any]] = field(default_factory=list)
 
@@ -246,6 +249,7 @@ class DocsInspectResult:
     stale: bool = False
     pages: int = 0
     chunks: int = 0
+    reason_code: str = ""
     size_bytes: int = 0
     warnings: list[str] = field(default_factory=list)
     message: str | None = None
