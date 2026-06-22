@@ -4,6 +4,56 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.0] - 2026-06-22
+
+Stable release. The project- and library-aware documentation stack is now production-ready.
+
+### Added
+
+- **Library docs source isolation:** ingested libraries no longer bleed into project-owned doc queries; each library gets its own isolated index scope so `get_project_context` never returns dependency docs as project evidence.
+- **Hardening gate for dependency doc ingestion:** prefetch and refresh pipelines validate source integrity before indexing; orphaned or partially-fetched dependency docs are rejected instead of indexed as project content.
+
+### Fixed
+
+- **Library docs MCP tools:** `get_library_docs` and `inspect_library_docs` now correctly scope to the requested library's index, preventing cross-library result contamination.
+- **Removed local artifacts and absolute paths** from public README and repository — no more absolute developer paths or stale build artifacts in distributed sources.
+
+### Changed
+
+- **Production/Stable classifier:** PyPI metadata updated from `3 - Alpha` to `5 - Production/Stable`.
+
+## [0.6.1] - 2026-06-13
+
+### Fixed
+
+- **CI/CD publish workflow:** adjusted tag matching and artifact upload paths for reliable PyPI publishing.
+
+### Changed
+
+- Version bump only; no functional changes.
+
+## [0.6.0] - 2026-06-12
+
+### Added
+
+- **Project-aware docs stack:** new `docmancer/docs/` package with domain models, trust contracts, library docs service, project docs service, and dependency docs orchestration.
+- **MCP tools for project docs:** `inspect_project_docs`, `sync_project_docs`, `get_project_context`, `bootstrap_project_docs` — read, reconcile, retrieve, and bootstrap project-owned documentation via MCP.
+- **MCP tools for library docs:** `resolve_library_id`, `get_library_docs`, `inspect_library_docs`, `refresh_library_docs`, `list_library_docs` — find, query, inspect, and refresh registered library documentation.
+- **Dependency docs prefetch:** `prefetch_project_dependency_docs` / `prefetch_project_docs` — read Flutter/Dart/Rust manifests and prefetch exact dependency docs.
+- **Docs manifest system:** `docmancer.docs.yaml` manifest support with `validate_docs_manifest`, `prefetch_docs_manifest` MCP tools.
+- **DocAtlas branding:** project renamed to DocAtlas; `docmancer` retained as Python package name for compatibility.
+- **Async docs job system:** `get_docs_job_status`, `list_docs_jobs`, `cancel_docs_job` — persistent progress tracking for indexing and prefetch jobs.
+- **Dartdoc-aware extraction** for Flutter and pub.dev docs.
+- **Public docs quality metrics and reranking** in the retrieval pipeline.
+- **Versioned MCP server** for project-aware docs.
+- **Evaluation harness** under `docmancer/eval/`.
+
+### Changed
+
+- **MCP server** extended from single-purpose to multi-tool docs server (`docmancer/mcp/docs_server.py`).
+- **Retrieval dispatch** extended for scoped project/library queries.
+- **Configuration** updated for docs manifest, MCP tool registration, and project paths.
+
 ## [0.5.2] - 2026-05-16
 ### Added
 
@@ -643,6 +693,12 @@ This release adds an optional **knowledge vault** workflow on top of the existin
 
 - Initial release on the restarted version line: fetch GitBook/Mintlify docs, local FastEmbed + Qdrant ingest, `docmancer query` / `list` / `remove` / `inspect` / `doctor`, and agent skill install targets (Claude Code, Cursor, Codex, OpenCode, Claude Desktop, Gemini, etc.).
 
+[1.0.0]: https://github.com/Vanilla1999/DocAtlas/compare/v0.6.1...v1.0.0
+[0.6.1]: https://github.com/Vanilla1999/DocAtlas/compare/v0.6.0...v0.6.1
+[0.6.0]: https://github.com/Vanilla1999/DocAtlas/compare/v0.5.2...v0.6.0
+[0.5.2]: https://github.com/Vanilla1999/DocAtlas/compare/v0.5.1...v0.5.2
+[0.5.1]: https://github.com/Vanilla1999/DocAtlas/compare/v0.5.0...v0.5.1
+[0.5.0]: https://github.com/Vanilla1999/DocAtlas/compare/v0.4.9...v0.5.0
 [0.4.6]: https://github.com/docmancer/docmancer/compare/v0.4.5...v0.4.6
 [0.4.5]: https://github.com/docmancer/docmancer/compare/v0.4.4...v0.4.5
 [0.4.4]: https://github.com/docmancer/docmancer/compare/v0.4.3...v0.4.4
