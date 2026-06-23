@@ -40,8 +40,8 @@ Tested against project-owned README, runbooks, and ADRs. DocAtlas returned Trust
 
 | Library | Requested | DocAtlas | Context7 |
 |---|---|---|---|
-| pydantic | 2.5.0 | 2.5.0 API correct | 2.4.0 API (stale) |
-| riverpod | 2.4.9 | 2.4.9 API correct | 2.4.0 API (stale) |
+| pydantic | 2.5.0 | Explicit unsupported (no patch-level docs) | 2.4.0 API (stale) |
+| fastapi | 0.115.0 | Explicit unsupported (latest only) | Generic/stale |
 
 ## Claims We Can Make
 

@@ -158,11 +158,73 @@ class TestExactVersionServiceIntegration:
                 assert "pypi" not in exact_version["fallback_docs_url"].lower()
 
 
+    def test_registered_latest_does_not_satisfy_exact_version_request(self, tmp_path):
+        """When latest is registered, exact-version request must not silently use latest."""
+        from docmancer.core.config import DocmancerConfig
+        from docmancer.docs.service import LibraryDocsService
+        from datetime import datetime, timezone
+        
+        config = DocmancerConfig()
+        config.index.db_path = str(tmp_path / "test.db")
+        service = LibraryDocsService(config=config)
+        now = datetime.now(timezone.utc).isoformat()
+        
+        # Register latest FastAPI with docs_url
+        service.registry.upsert(
+            library="fastapi",
+            ecosystem="python",
+            version=None,  # latest
+            docs_url="https://fastapi.tiangolo.com/",
+            source_type="web",
+            now=now,
+        )
+        
+        # Request exact version (different from latest)
+        result = service.get_docs(
+            library="fastapi",
+            ecosystem="python",
+            version="0.115.0",  # Specific version
+            topic="How to use Depends?"
+        )
+        
+        # Must NOT silently return latest docs
+        # Should either:
+        # 1. Return exact_version_not_supported (preferred)
+        # 2. Return empty_index with exact_version diagnostics
+        # 3. Return needs_input
+        # But MUST NOT return success with latest chunks
+        
+        if result.status == "success":
+            # If status is success, exact_version diagnostics must show no match
+            exact_version = result.diagnostics.get("exact_version")
+            if exact_version:
+                assert exact_version["expected"] == "0.115.0"
+                assert exact_version.get("match") is not True  # Not exact match
+                # If latest was used, fallback must be True
+                if exact_version.get("used") is None or exact_version.get("used") != "0.115.0":
+                    assert exact_version.get("fallback") is True
+        else:
+            # Preferred: explicit unsupported or needs_input
+            assert result.status in ("exact_version_not_supported", "needs_input", "empty_index")
+            
+            # If exact_version diagnostics present, verify correctness
+            exact_version = result.diagnostics.get("exact_version")
+            if exact_version:
+                assert exact_version["expected"] == "0.115.0"
+                assert exact_version.get("used") is None or exact_version.get("used") != "0.115.0"
+                assert exact_version.get("match") is not True
+                assert exact_version.get("fallback") is False
+
+
 class TestExactVersionSupportedPath:
     """Test the supported exact-version path (when docs are available)."""
 
-    def test_exact_version_supported_path_uses_versioned_docs_url(self, tmp_path):
-        """When resolver returns supported, should use versioned docs URL."""
+    def test_explicit_docs_url_exact_version_flow_does_not_return_unsupported(self, tmp_path):
+        """When explicit docs_url is provided with version, should not return unsupported.
+        
+        Note: This test uses explicit docs_url, so the resolver is not actually called.
+        TODO: Add true resolver-supported path test that calls resolver without docs_url.
+        """
         from docmancer.core.config import DocmancerConfig
         from docmancer.docs.service import LibraryDocsService
         
@@ -170,33 +232,17 @@ class TestExactVersionSupportedPath:
         config.index.db_path = str(tmp_path / "test.db")
         service = LibraryDocsService(config=config)
         
-        # Mock a supported resolution
-        with patch("docmancer.docs.exact_version.resolve_python_versioned_docs") as mock_resolve:
-            mock_resolve.return_value = VersionedDocsResolution(
-                status="exact_version_supported",
-                docs_url="https://docs.example.com/1.2.3/",
-                version_used="1.2.3",
-                reason_code=None,
-                exact_version_match=True,
-            )
-            
-            result = service.get_docs(
-                library="mocklib",
-                ecosystem="python",
-                version="1.2.3",
-                docs_url="https://docs.example.com/1.2.3/"  # Provide URL to complete the flow
-            )
-            
-            # Should attempt to use versioned URL
-            # Note: may still fail with needs_input or empty_index if not actually indexed,
-            # but should not be exact_version_not_supported
-            assert result.status != "exact_version_not_supported"
-            
-            # If successful, should have exact match diagnostics
-            if result.status == "success" and result.diagnostics.get("exact_version"):
-                exact_version = result.diagnostics["exact_version"]
-                assert exact_version["match"] is True
-                assert exact_version["fallback"] is False
+        # When explicit docs_url is provided, exact-version resolver is not called
+        result = service.get_docs(
+            library="mocklib",
+            ecosystem="python",
+            version="1.2.3",
+            docs_url="https://docs.example.com/1.2.3/"
+        )
+        
+        # Should not return exact_version_not_supported when explicit URL provided
+        # (may return needs_input or empty_index if not indexed)
+        assert result.status != "exact_version_not_supported"
 
 
 class TestCanonicalIDSeparation:
