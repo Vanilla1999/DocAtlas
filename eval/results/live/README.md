@@ -44,11 +44,28 @@ uv run python eval/live_mcp_context7_benchmark.py --mode both --save-raw
 
 ## Storage Isolation
 
-In `--mode both`, each provider instance uses its own SQLite database path to prevent cross-contamination:
+For every benchmark mode, each DocAtlas provider instance gets isolated runtime storage, including:
+- `DOCMANCER_HOME` — isolated home directory for per-library indexes
+- SQLite `db_path` — isolated database file
+- `docs-indexes/` — per-library documentation indexes
+- `extracted/` — extracted documentation files
+- `registry/` — library registry cache and state
+
+Runtime directories are generated per run with timestamp prefixes and are not reused between benchmark invocations:
+```
+/tmp/live-benchmark/<timestamp>/<mode>/<provider_id>/
+  home/
+    docs-indexes/
+    extracted/
+    registry/
+  docmancer.db
+```
+
+Examples:
 - `docatlas_zero_setup` — isolated temp storage (empty, no preindexed data)
 - `docatlas_preindexed` — isolated temp storage (preindexed data populated independently)
 
-This ensures that zero-setup results are not artificially inflated by preindexed data.
+This ensures that zero-setup results are not artificially inflated by preindexed data, and that each provider uses completely separate storage including per-library indexes.
 
 ## Notes
 
