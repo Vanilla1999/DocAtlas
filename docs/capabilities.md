@@ -322,6 +322,28 @@ Every docs response can include:
 - `docs_binding_source`;
 - confidence metadata.
 
+#### Exact-version behavior
+
+DocAtlas now exposes explicit exact-version status and prevents silent latest-doc fallback:
+
+**Exact-version status codes:**
+
+- `exact_version_indexed` — exact version docs successfully indexed and queried
+- `exact_version_not_supported` — library does not provide per-version docs
+- `exact_version_fallback_latest` — exact version unavailable, latest docs used (explicitly marked)
+- `exact_version_empty_index` — exact version indexed but contains no content
+- `exact_version_resolution_failed` — could not resolve exact-version docs URL
+
+**Python library support (minimal):**
+
+For Python packages where reliable versioned docs URL patterns can be determined:
+
+- **FastAPI**: Does not provide per-version docs; returns `exact_version_not_supported` with fallback to latest
+- **Click**: Provides major.x docs, not patch-level; returns `exact_version_not_supported` with major-version fallback
+- **Pydantic**: Provides major-version docs (v1/v2), not patch-level; returns `exact_version_not_supported` with major-version fallback
+
+When exact-version docs are unavailable, DocAtlas returns structured status with specific reason codes rather than silently using latest docs.
+
 ### 13. Pub Dartdoc and docs.rs support
 
 For ecosystem docs, Docmancer supports versioned documentation URL templates such as:

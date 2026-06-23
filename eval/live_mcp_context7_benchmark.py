@@ -112,6 +112,12 @@ class NormalizedBenchmarkResult:
     manual_review_required: bool
     preindex: PreindexDiagnostics | None = None
     raw_response: dict[str, Any] | None = None
+    # Exact-version fields
+    exact_version_expected: str | None = None
+    exact_version_match: bool | None = None
+    exact_version_status: str | None = None
+    exact_version_fallback: bool = False
+    exact_version_reason_code: str | None = None
 
     def is_not_applicable(self) -> bool:
         return self.status in ("not_applicable",)
@@ -588,6 +594,41 @@ class DocAtlasDirectProvider(BenchmarkProvider):
     def _build_result(self, case, status, latency_ms, setup_calls,
             sources, snippets, answer_text, warnings, reason_codes,
             exact_version_used, cont=None, forb=None, expt=None, preindex=None):
+        # Compute exact-version fields
+        exact_version_expected = case.version if case.suite == "exact-version" else None
+        exact_version_match = None
+        exact_version_status = None
+        exact_version_fallback = False
+        exact_version_reason_code = None
+        
+        if exact_version_expected:
+            if status == "not_supported":
+                exact_version_status = "exact_version_not_supported"
+                exact_version_match = None
+                exact_version_reason_code = reason_codes[0] if reason_codes else "exact_version_docs_url_unavailable"
+            elif status == "empty_index":
+                exact_version_status = "exact_version_empty_index"
+                exact_version_match = None
+                exact_version_reason_code = reason_codes[0] if reason_codes else "empty_index"
+            elif status == "success":
+                if exact_version_used and exact_version_used == exact_version_expected:
+                    exact_version_status = "exact_version_indexed"
+                    exact_version_match = True
+                    exact_version_reason_code = None
+                elif exact_version_used == "latest" or exact_version_used is None:
+                    exact_version_status = "exact_version_fallback_latest"
+                    exact_version_match = False
+                    exact_version_fallback = True
+                    exact_version_reason_code = "versioned_docs_unavailable"
+                else:
+                    exact_version_status = "exact_version_resolution_failed"
+                    exact_version_match = False
+                    exact_version_reason_code = "version_mismatch"
+            else:
+                exact_version_status = "exact_version_resolution_failed"
+                exact_version_match = None
+                exact_version_reason_code = status
+        
         return NormalizedBenchmarkResult(
             provider=self.name, provider_id=self.provider_id,
             provider_mode=self.provider_mode, mode=self.benchmark_mode,
@@ -599,7 +640,12 @@ class DocAtlasDirectProvider(BenchmarkProvider):
             contamination_hits=cont or [], forbidden_source_hits=forb or [],
             expected_source_hits=expt or [],
             manual_review_required=status == "error",
-            preindex=preindex)
+            preindex=preindex,
+            exact_version_expected=exact_version_expected,
+            exact_version_match=exact_version_match,
+            exact_version_status=exact_version_status,
+            exact_version_fallback=exact_version_fallback,
+            exact_version_reason_code=exact_version_reason_code)
 
     def _na_result(self, case):
         return self._build_result(case, "not_applicable", 0, 0, [], [], None,
@@ -900,11 +946,17 @@ def compute_metrics(results: list[NormalizedBenchmarkResult]) -> dict[str, Any]:
     lat_cold_n = sum(1 for r in applicable if r.setup_calls > 1)
     lat_warm_n = sum(1 for r in applicable if r.setup_calls <= 1)
 
-    ev_success = sum(1 for r in successful if r.suite == "exact-version")
-    ev_empty = sum(1 for r in applicable if r.is_empty() and r.suite == "exact-version")
-    ev_not_supported = sum(1 for r in applicable if r.status == "not_supported" and r.suite == "exact-version")
-    ev_total = sum(1 for r in applicable if r.suite == "exact-version")
-    ev_correct = sum(1 for r in successful if r.exact_version_used and r.expected_source_hits and r.suite == "exact-version")
+    ev_cases = [r for r in applicable if r.suite == "exact-version"]
+    ev_total = len(ev_cases)
+    ev_success = sum(1 for r in ev_cases if r.is_success())
+    ev_empty = sum(1 for r in ev_cases if r.is_empty())
+    ev_not_supported = sum(1 for r in ev_cases if r.status == "not_supported")
+    ev_match = sum(1 for r in ev_cases if r.exact_version_match is True)
+    ev_fallback = sum(1 for r in ev_cases if r.exact_version_fallback is True)
+    ev_indexed = sum(1 for r in ev_cases if r.exact_version_status == "exact_version_indexed")
+    
+    # Exact-version correctness: only count true exact matches
+    ev_correct = sum(1 for r in ev_cases if r.is_success() and r.exact_version_match is True and r.expected_source_hits)
 
     return {
         "total_queries": total,
@@ -929,12 +981,18 @@ def compute_metrics(results: list[NormalizedBenchmarkResult]) -> dict[str, Any]:
         "avg_latency_ms": round(sum(lat_all) / max(len(lat_all), 1), 3),
         "avg_cold_latency_ms": round(lat_cold / max(lat_cold_n, 1), 3) if lat_cold_n else 0,
         "avg_warm_latency_ms": round(sum(r.latency_ms for r in applicable if r.setup_calls <= 1) / max(lat_warm_n, 1), 3) if lat_warm_n else 0,
+        "exact_version_total_count": ev_total,
         "exact_version_success_count": ev_success,
         "exact_version_empty_count": ev_empty,
         "exact_version_not_supported_count": ev_not_supported,
-        "exact_version_coverage_rate": round(ev_success / max(ev_total, 1), 4),
+        "exact_version_match_count": ev_match,
+        "exact_version_fallback_count": ev_fallback,
+        "exact_version_indexed_count": ev_indexed,
+        "exact_version_coverage_rate": round(ev_success / max(ev_total, 1), 4) if ev_total > 0 else 0.0,
+        "exact_version_match_rate": round(ev_match / max(ev_total, 1), 4) if ev_total > 0 else 0.0,
+        "exact_version_not_supported_rate": round(ev_not_supported / max(ev_total, 1), 4) if ev_total > 0 else 0.0,
+        "exact_version_fallback_rate": round(ev_fallback / max(ev_total, 1), 4) if ev_total > 0 else 0.0,
         "exact_version_correctness_on_success": round(ev_correct / max(ev_success, 1), 4) if ev_success > 0 else None,
-        "exact_version_empty_rate": round(ev_empty / max(ev_total, 1), 4),
     }
 
 
