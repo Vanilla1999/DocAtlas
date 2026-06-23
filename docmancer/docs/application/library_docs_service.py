@@ -469,6 +469,7 @@ class LibraryDocsApplicationService:
         version_source = "explicit" if version is not None else None
         docs_snapshot_exact: bool | None = None
         docs_binding_source: str | None = None
+        exact_version_resolution = None  # Will be set if exact-version logic triggers
         if version is None and project_path:
             project_version, project_docs_url, project_template, project_warnings, requested_version, docs_snapshot_exact, project_version_source, docs_binding_source = self._project_version_for(
                 library=library,
@@ -560,6 +561,56 @@ class LibraryDocsApplicationService:
                 next_actions=["Retry get_library_docs without docs_url to use the registered source, or explicitly refresh/re-register the docs target."],
             )
         if info.library_id is None:
+            # Check exact-version resolver for Python libraries without registered source
+            exact_version_resolution = None
+            if ecosystem == "python" and version is not None and version not in ("latest", "*", "") and not docs_url:
+                from docmancer.docs.exact_version import resolve_python_versioned_docs
+                normalized_lib = library.lower().replace("-", "_").replace(" ", "_")
+                exact_version_resolution = resolve_python_versioned_docs(normalized_lib, version)
+                
+                if exact_version_resolution and exact_version_resolution.status == "exact_version_not_supported":
+                    # Return structured unsupported response without silent fallback
+                    return DocsResult(
+                        library_id="",
+                        library=library,
+                        version=version,
+                        topic=topic,
+                        refreshed=False,
+                        stale_before_refresh=False,
+                        warning=f"Exact version {version} not supported: {exact_version_resolution.reason_code}",
+                        last_refreshed_at=None,
+                        source_type=source_type,
+                        results=[],
+                        warnings=[f"exact_version_not_supported: {exact_version_resolution.reason_code}"],
+                        requested_version=version,
+                        resolved_version=None,
+                        version_source=version_source,
+                        docs_snapshot_exact=False,
+                        docs_exactness="exact_version_not_supported",
+                        docs_binding_source=None,
+                        confidence="high",
+                        status="exact_version_not_supported",
+                        decision="stop",
+                        request=self._docs_request(input_args),
+                        identity=self._docs_identity(None),
+                        policy=self._docs_policy("exact_version_not_supported", has_registered_source=False),
+                        diagnostics={
+                            "exact_version": {
+                                "expected": version,
+                                "used": None,
+                                "match": None,
+                                "status": exact_version_resolution.status,
+                                "fallback": False,
+                                "reason_code": exact_version_resolution.reason_code,
+                                "fallback_available": exact_version_resolution.fallback_docs_url is not None,
+                                "fallback_docs_url": exact_version_resolution.fallback_docs_url,
+                            }
+                        },
+                        next_actions=[
+                            "Retry without version to use latest docs, or use fallback_docs_url if available."
+                        ],
+                    )
+            
             warning = self._join_warnings("needs_docs_url", extra=project_warnings)
             warnings = [warning] if warning else []
             candidates = info.candidates
@@ -788,6 +839,20 @@ class LibraryDocsApplicationService:
         chunks, quality_diagnostics = _postprocess_library_chunks(chunks, query)
         latest_stale = self._is_stale(latest.last_refreshed_at)
         freshness = _freshness_diagnostics(latest.last_refreshed_at, self.stale_after_days, latest_stale)
+        
+        # Build exact-version diagnostics if applicable
+        final_diagnostics = {**resolution.diagnostics, **quality_diagnostics, "freshness": freshness, "warnings": diagnostic_warnings}
+        if exact_version_resolution and requested_version:
+            exact_version_match = (latest.resolved_version or latest.version) == requested_version
+            final_diagnostics["exact_version"] = {
+                "expected": requested_version,
+                "used": latest.resolved_version or latest.version,
+                "match": exact_version_match,
+                "status": "exact_version_indexed" if exact_version_match else "exact_version_fallback_latest",
+                "fallback": not exact_version_match,
+                "reason_code": None if exact_version_match else "version_mismatch",
+            }
+        
         return DocsResult(
             library_id=info.library_id,
             library=latest.library,
@@ -821,7 +886,7 @@ class LibraryDocsApplicationService:
             request=self._docs_request(input_args, info),
             identity=self._docs_identity(info, docs_url_source=docs_url_source),
             policy=self._docs_policy("success", has_registered_source=True),
-            diagnostics={**resolution.diagnostics, **quality_diagnostics, "freshness": freshness, "warnings": diagnostic_warnings},
+            diagnostics=final_diagnostics,
         )
 
     def _index_size_for(self, record: LibraryRecord) -> int:

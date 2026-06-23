@@ -549,6 +549,19 @@ class DocAtlasDirectProvider(BenchmarkProvider):
                         service.get_docs, case.library, topic=case.query, tokens=2000,
                         ecosystem=case.ecosystem, version=case.version)
                     setup_calls += 1
+                    
+                    # Extract exact-version diagnostics from API response
+                    result_diagnostics = getattr(result, "diagnostics", {})
+                    exact_version_info = result_diagnostics.get("exact_version") if isinstance(result_diagnostics, dict) else None
+                    
+                    # Handle exact-version status from service
+                    if hasattr(result, "status") and result.status == "exact_version_not_supported":
+                        status = "not_supported"
+                        if exact_version_info:
+                            reason_codes.append(exact_version_info.get("reason_code", "exact_version_not_supported"))
+                        else:
+                            reason_codes.append("exact_version_not_supported")
+                    
                     if hasattr(result, "results") and result.results:
                         for i, chunk in enumerate(result.results):
                             src = chunk.source or ""
@@ -559,6 +572,10 @@ class DocAtlasDirectProvider(BenchmarkProvider):
                             if content:
                                 snippets.append(Snippet(text=content[:500], source=url, rank=i + 1))
                         exact_version_used = getattr(result, "resolved_version", None) or exact_version_used
+                        
+                        # Override exact_version_used from diagnostics if available
+                        if exact_version_info:
+                            exact_version_used = exact_version_info.get("used", exact_version_used)
                     else:
                         if hasattr(result, "results") and result.results is not None and len(result.results) == 0:
                             status = "empty_index"
