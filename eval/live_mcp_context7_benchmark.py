@@ -375,194 +375,215 @@ class DocAtlasDirectProvider(BenchmarkProvider):
         self._project_path = project_path or str(ROOT)
         self._service = None
         self._lib_cache: dict[str, dict[str, Any]] = {}
-        self._custom_db_path: str | None = None
+        self.runtime_dir: Path | None = None
+        self.docmancer_home: Path | None = None
+        self.db_path: Path | None = None
+
+    def _isolated_env(self):
+        """Context manager for isolated DOCMANCER_HOME environment."""
+        from contextlib import contextmanager
+        @contextmanager
+        def _ctx():
+            old_home = os.environ.get("DOCMANCER_HOME")
+            if self.docmancer_home:
+                os.environ["DOCMANCER_HOME"] = str(self.docmancer_home)
+            try:
+                yield
+            finally:
+                if old_home is None:
+                    os.environ.pop("DOCMANCER_HOME", None)
+                else:
+                    os.environ["DOCMANCER_HOME"] = old_home
+        return _ctx()
 
     def _get_service(self):
         if self._service is None:
             from docmancer.docs.service import LibraryDocsService
             from docmancer.core.config import DocmancerConfig
-            if self._custom_db_path:
+            with self._isolated_env():
                 config = DocmancerConfig()
-                config.index.db_path = self._custom_db_path
-            else:
-                config = DocmancerConfig()
-            self._service = LibraryDocsService(config=config)
+                if self.db_path:
+                    config.index.db_path = str(self.db_path)
+                self._service = LibraryDocsService(config=config)
         return self._service
 
     async def setup(self) -> None:
-        _ = self._get_service()
+        with self._isolated_env():
+            _ = self._get_service()
 
     async def _preindex_library(self, case: BenchmarkCase) -> PreindexDiagnostics:
-        service = self._get_service()
-        diag = PreindexDiagnostics(attempted=True, status="pending", version=case.version)
-        t0 = time.perf_counter()
-        try:
-            lib = case.library or case.id
-            eco = case.ecosystem
-            ver = case.version
-            key = f"{eco}:{lib}:{ver}"
-            cached = self._lib_cache.get(key)
-            if cached:
-                diag.status = cached.get("status", "cached")
-                diag.library_id = cached.get("library_id")
-                diag.chunks = cached.get("chunks", 0)
-                diag.pages = cached.get("pages", 0)
-                diag.latency_ms = round((time.perf_counter() - t0) * 1000, 3)
-                return diag
+        with self._isolated_env():
+            service = self._get_service()
+            diag = PreindexDiagnostics(attempted=True, status="pending", version=case.version)
+            t0 = time.perf_counter()
+            try:
+                lib = case.library or case.id
+                eco = case.ecosystem
+                ver = case.version
+                key = f"{eco}:{lib}:{ver}"
+                cached = self._lib_cache.get(key)
+                if cached:
+                    diag.status = cached.get("status", "cached")
+                    diag.library_id = cached.get("library_id")
+                    diag.chunks = cached.get("chunks", 0)
+                    diag.pages = cached.get("pages", 0)
+                    diag.latency_ms = round((time.perf_counter() - t0) * 1000, 3)
+                    return diag
 
-            info = service.resolve_library(lib, ecosystem=eco, version=ver)
-            if info.library_id is None:
-                diag.status = "not_supported"
-                diag.reason_code = "unresolved"
-                diag.warnings.append(info.message or "Could not resolve")
-                diag.latency_ms = round((time.perf_counter() - t0) * 1000, 3)
-                self._lib_cache[key] = {"status": "not_supported"}
-                return diag
+                info = service.resolve_library(lib, ecosystem=eco, version=ver)
+                if info.library_id is None:
+                    diag.status = "not_supported"
+                    diag.reason_code = "unresolved"
+                    diag.warnings.append(info.message or "Could not resolve")
+                    diag.latency_ms = round((time.perf_counter() - t0) * 1000, 3)
+                    self._lib_cache[key] = {"status": "not_supported"}
+                    return diag
 
-            diag.library_id = info.library_id
-            diag.canonical_id = info.canonical_id
-            diag.version = info.resolved_version or info.version or ver
+                diag.library_id = info.library_id
+                diag.canonical_id = info.canonical_id
+                diag.version = info.resolved_version or info.version or ver
 
-            inspect_result = service.inspect_library_docs(info.library_id)
-            pages = inspect_result.pages if hasattr(inspect_result, "pages") else 0
-            chunks = inspect_result.chunks if hasattr(inspect_result, "chunks") else 0
+                inspect_result = service.inspect_library_docs(info.library_id)
+                pages = inspect_result.pages if hasattr(inspect_result, "pages") else 0
+                chunks = inspect_result.chunks if hasattr(inspect_result, "chunks") else 0
 
-            if pages > 0 and chunks > 0:
-                diag.status = "already_indexed"
-                diag.pages = pages
-                diag.chunks = chunks
-            else:
-                refresh_result = service.refresh_docs(lib, ecosystem=eco, version=ver, force=False)
-                diag.status = "refreshed"
-                diag.pages = refresh_result.pages if hasattr(refresh_result, "pages") else 0
-                diag.chunks = len(refresh_result.results) if hasattr(refresh_result, "results") else 0
-                preindex = getattr(refresh_result, "preindex", None) or {}
-                diag.discovery_strategy = preindex.get("discovery_strategy")
-                diag.sitemap_pages = int(preindex.get("sitemap_pages") or 0)
-                diag.seed_pages = int(preindex.get("seed_pages") or 0)
-                diag.fallback_pages = int(preindex.get("fallback_pages") or 0)
-                diag.index_path = preindex.get("index_path")
-                diag.query_index_path = preindex.get("query_index_path")
-                diag.reason_code = preindex.get("reason_code")
-                for warning in preindex.get("warnings") or []:
-                    if isinstance(warning, dict):
-                        code = warning.get("code")
-                        if code:
-                            diag.warnings.append(str(code))
-                    elif warning:
-                        diag.warnings.append(str(warning))
+                if pages > 0 and chunks > 0:
+                    diag.status = "already_indexed"
+                    diag.pages = pages
+                    diag.chunks = chunks
+                else:
+                    refresh_result = service.refresh_docs(lib, ecosystem=eco, version=ver, force=False)
+                    diag.status = "refreshed"
+                    diag.pages = refresh_result.pages if hasattr(refresh_result, "pages") else 0
+                    diag.chunks = len(refresh_result.results) if hasattr(refresh_result, "results") else 0
+                    preindex = getattr(refresh_result, "preindex", None) or {}
+                    diag.discovery_strategy = preindex.get("discovery_strategy")
+                    diag.sitemap_pages = int(preindex.get("sitemap_pages") or 0)
+                    diag.seed_pages = int(preindex.get("seed_pages") or 0)
+                    diag.fallback_pages = int(preindex.get("fallback_pages") or 0)
+                    diag.index_path = preindex.get("index_path")
+                    diag.query_index_path = preindex.get("query_index_path")
+                    diag.reason_code = preindex.get("reason_code")
+                    for warning in preindex.get("warnings") or []:
+                        if isinstance(warning, dict):
+                            code = warning.get("code")
+                            if code:
+                                diag.warnings.append(str(code))
+                        elif warning:
+                            diag.warnings.append(str(warning))
 
-            if diag.pages == 0 and diag.chunks == 0:
-                diag.status = "empty_index"
-                diag.reason_code = "refresh_produced_no_content"
+                if diag.pages == 0 and diag.chunks == 0:
+                    diag.status = "empty_index"
+                    diag.reason_code = "refresh_produced_no_content"
 
-            self._lib_cache[key] = {
-                "status": diag.status, "library_id": diag.library_id,
-                "pages": diag.pages, "chunks": diag.chunks,
-            }
-        except Exception as exc:
-            diag.status = "preindex_failed"
-            diag.reason_code = type(exc).__name__
-            diag.warnings.append(str(exc))
-        diag.latency_ms = round((time.perf_counter() - t0) * 1000, 3)
-        return diag
+                self._lib_cache[key] = {
+                    "status": diag.status, "library_id": diag.library_id,
+                    "pages": diag.pages, "chunks": diag.chunks,
+                }
+            except Exception as exc:
+                diag.status = "preindex_failed"
+                diag.reason_code = type(exc).__name__
+                diag.warnings.append(str(exc))
+            diag.latency_ms = round((time.perf_counter() - t0) * 1000, 3)
+            return diag
 
     async def query(self, case: BenchmarkCase) -> NormalizedBenchmarkResult:
         if "docatlas" in case.not_applicable_for:
             return self._na_result(case)
 
-        service = self._get_service()
-        start = time.perf_counter()
-        sources: list[SourceRef] = []
-        snippets: list[Snippet] = []
-        warnings: list[str] = []
-        reason_codes: list[str] = []
-        answer_text: str | None = None
-        exact_version_used: str | None = case.version
-        setup_calls = 0
-        status = "success"
-        preindex_diag: PreindexDiagnostics | None = None
+        with self._isolated_env():
+            service = self._get_service()
+            start = time.perf_counter()
+            sources: list[SourceRef] = []
+            snippets: list[Snippet] = []
+            warnings: list[str] = []
+            reason_codes: list[str] = []
+            answer_text: str | None = None
+            exact_version_used: str | None = case.version
+            setup_calls = 0
+            status = "success"
+            preindex_diag: PreindexDiagnostics | None = None
 
-        try:
-            if self.benchmark_mode == "preindexed" and case.suite in ("public-docs", "exact-version") and case.library:
-                preindex_diag = await self._preindex_library(case)
-                setup_calls += 2
-                reason_codes.append(preindex_diag.status)
-                if preindex_diag.status in ("preindex_failed", "not_supported", "empty_index"):
-                    status = preindex_diag.status if preindex_diag.status != "empty_index" else "empty_index"
-                    latency_ms = round((time.perf_counter() - start) * 1000, 3)
-                    return self._build_result(case, status, latency_ms, setup_calls,
-                        sources, snippets, answer_text, warnings, reason_codes,
-                        exact_version_used, preindex=preindex_diag)
+            try:
+                if self.benchmark_mode == "preindexed" and case.suite in ("public-docs", "exact-version") and case.library:
+                    preindex_diag = await self._preindex_library(case)
+                    setup_calls += 2
+                    reason_codes.append(preindex_diag.status)
+                    if preindex_diag.status in ("preindex_failed", "not_supported", "empty_index"):
+                        status = preindex_diag.status if preindex_diag.status != "empty_index" else "empty_index"
+                        latency_ms = round((time.perf_counter() - start) * 1000, 3)
+                        return self._build_result(case, status, latency_ms, setup_calls,
+                            sources, snippets, answer_text, warnings, reason_codes,
+                            exact_version_used, preindex=preindex_diag)
 
-            if case.suite == "project-docs":
-                result = await asyncio.to_thread(
-                    service.get_project_context, self._project_path, case.query, tokens=4000)
-                setup_calls += 1
-                context_pack = result.context_pack if hasattr(result, "context_pack") else []
-                answer_text = str(result.answer_outline) if hasattr(result, "answer_outline") and result.answer_outline else None
-                for i, item in enumerate(context_pack):
-                    raw_source = item.get("source") or {}
-                    path_val = item.get("path") or ""
-                    url_val = item.get("url") or ""
-                    if isinstance(raw_source, dict):
-                        source_str = path_val or url_val or ""
-                    else:
-                        source_str = str(raw_source) if raw_source else (path_val or url_val or "")
-                    title = item.get("title") or ""
-                    heading = item.get("heading_path") or ""
-                    content = item.get("content") or ""
-                    scope = item.get("doc_scope")
-                    url = source_str or "unknown"
-                    sources.append(SourceRef(url=url, title=f"{title} - {heading}" if heading else title, rank=i + 1, doc_scope=scope))
-                    if content:
-                        snippets.append(Snippet(text=content[:500], source=url, rank=i + 1))
-            else:
-                result = await asyncio.to_thread(
-                    service.get_docs, case.library, topic=case.query, tokens=2000,
-                    ecosystem=case.ecosystem, version=case.version)
-                setup_calls += 1
-                if hasattr(result, "results") and result.results:
-                    for i, chunk in enumerate(result.results):
-                        src = chunk.source or ""
-                        content = chunk.content or ""
-                        title = chunk.title or ""
-                        url = chunk.url or src
-                        sources.append(SourceRef(url=url, title=title, rank=i + 1, doc_scope="public_docs"))
+                if case.suite == "project-docs":
+                    result = await asyncio.to_thread(
+                        service.get_project_context, self._project_path, case.query, tokens=4000)
+                    setup_calls += 1
+                    context_pack = result.context_pack if hasattr(result, "context_pack") else []
+                    answer_text = str(result.answer_outline) if hasattr(result, "answer_outline") and result.answer_outline else None
+                    for i, item in enumerate(context_pack):
+                        raw_source = item.get("source") or {}
+                        path_val = item.get("path") or ""
+                        url_val = item.get("url") or ""
+                        if isinstance(raw_source, dict):
+                            source_str = path_val or url_val or ""
+                        else:
+                            source_str = str(raw_source) if raw_source else (path_val or url_val or "")
+                        title = item.get("title") or ""
+                        heading = item.get("heading_path") or ""
+                        content = item.get("content") or ""
+                        scope = item.get("doc_scope")
+                        url = source_str or "unknown"
+                        sources.append(SourceRef(url=url, title=f"{title} - {heading}" if heading else title, rank=i + 1, doc_scope=scope))
                         if content:
                             snippets.append(Snippet(text=content[:500], source=url, rank=i + 1))
-                    exact_version_used = getattr(result, "resolved_version", None) or exact_version_used
                 else:
-                    if hasattr(result, "results") and result.results is not None and len(result.results) == 0:
-                        status = "empty_index"
-                        reason_codes.append("empty_library_index")
-                        if preindex_diag and preindex_diag.attempted and preindex_diag.pages > 0:
-                            preindex_diag.status = "retrieval_no_hits"
-                            preindex_diag.reason_code = "preindex_succeeded_but_query_empty"
-                        if hasattr(result, "warning") and result.warning:
-                            warnings.append(result.warning)
+                    result = await asyncio.to_thread(
+                        service.get_docs, case.library, topic=case.query, tokens=2000,
+                        ecosystem=case.ecosystem, version=case.version)
+                    setup_calls += 1
+                    if hasattr(result, "results") and result.results:
+                        for i, chunk in enumerate(result.results):
+                            src = chunk.source or ""
+                            content = chunk.content or ""
+                            title = chunk.title or ""
+                            url = chunk.url or src
+                            sources.append(SourceRef(url=url, title=title, rank=i + 1, doc_scope="public_docs"))
+                            if content:
+                                snippets.append(Snippet(text=content[:500], source=url, rank=i + 1))
+                        exact_version_used = getattr(result, "resolved_version", None) or exact_version_used
                     else:
-                        status = "no_results"
-                        if preindex_diag and preindex_diag.attempted and preindex_diag.status == "already_indexed":
-                            preindex_diag.status = "retrieval_no_hits"
-                            preindex_diag.reason_code = "preindex_succeeded_but_no_matching_sections"
-                if hasattr(result, "warnings") and result.warnings:
-                    warnings.extend(result.warnings)
-                if hasattr(result, "warning") and result.warning:
-                    warnings.append(result.warning)
-        except Exception as exc:
-            status = "error"
-            warnings.append(str(exc))
-            reason_codes.append(type(exc).__name__)
+                        if hasattr(result, "results") and result.results is not None and len(result.results) == 0:
+                            status = "empty_index"
+                            reason_codes.append("empty_library_index")
+                            if preindex_diag and preindex_diag.attempted and preindex_diag.pages > 0:
+                                preindex_diag.status = "retrieval_no_hits"
+                                preindex_diag.reason_code = "preindex_succeeded_but_query_empty"
+                            if hasattr(result, "warning") and result.warning:
+                                warnings.append(result.warning)
+                        else:
+                            status = "no_results"
+                            if preindex_diag and preindex_diag.attempted and preindex_diag.status == "already_indexed":
+                                preindex_diag.status = "retrieval_no_hits"
+                                preindex_diag.reason_code = "preindex_succeeded_but_no_matching_sections"
+                    if hasattr(result, "warnings") and result.warnings:
+                        warnings.extend(result.warnings)
+                    if hasattr(result, "warning") and result.warning:
+                        warnings.append(result.warning)
+            except Exception as exc:
+                status = "error"
+                warnings.append(str(exc))
+                reason_codes.append(type(exc).__name__)
 
-        latency_ms = round((time.perf_counter() - start) * 1000, 3)
-        cont = _detect_contamination(sources, case)
-        forb = _detect_forbidden_sources(sources, case)
-        expt = _detect_expected_sources(sources, case)
+            latency_ms = round((time.perf_counter() - start) * 1000, 3)
+            cont = _detect_contamination(sources, case)
+            forb = _detect_forbidden_sources(sources, case)
+            expt = _detect_expected_sources(sources, case)
 
-        return self._build_result(case, status, latency_ms, setup_calls,
-            sources, snippets, answer_text, warnings, reason_codes,
-            exact_version_used, cont, forb, expt, preindex=preindex_diag)
+            return self._build_result(case, status, latency_ms, setup_calls,
+                sources, snippets, answer_text, warnings, reason_codes,
+                exact_version_used, cont, forb, expt, preindex=preindex_diag)
 
     def _build_result(self, case, status, latency_ms, setup_calls,
             sources, snippets, answer_text, warnings, reason_codes,
@@ -1268,6 +1289,12 @@ async def run_benchmark(
                     "preindex": dataclasses.asdict(result.preindex) if result.preindex else None,
                     "timestamp": timestamp,
                 }
+                if isinstance(p, DocAtlasDirectProvider):
+                    raw_data["runtime"] = {
+                        "docmancer_home": str(p.docmancer_home) if p.docmancer_home else None,
+                        "db_path": str(p.db_path) if p.db_path else None,
+                        "runtime_dir": str(p.runtime_dir) if p.runtime_dir else None,
+                    }
                 raw_file = raw_dir / f"{case.id}.json"
                 raw_file.write_text(json.dumps(raw_data, indent=2, ensure_ascii=False), encoding="utf-8")
 
@@ -1399,14 +1426,20 @@ def main() -> None:
             p.provider_id = "docatlas_preindexed"
             providers.append(p)
 
-    # Storage isolation for both mode: each docatlas provider gets its own db
-    runtime_base = Path(tempfile.gettempdir()) / "live-benchmark"
+    # Storage isolation: each docatlas provider gets its own run-scoped runtime dir
+    run_timestamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+    runtime_base = Path(tempfile.gettempdir()) / "live-benchmark" / run_timestamp
     for p in providers:
-        if isinstance(p, DocAtlasDirectProvider) and mode == "both":
-            iso_dir = runtime_base / mode / p.provider_id
-            iso_dir.mkdir(parents=True, exist_ok=True)
-            p._custom_db_path = str(iso_dir / "docmancer.db")
-            print(f"[isolation] {p.provider_id} -> {p._custom_db_path}")
+        if isinstance(p, DocAtlasDirectProvider):
+            p.runtime_dir = runtime_base / mode / p.provider_id
+            p.runtime_dir.mkdir(parents=True, exist_ok=True)
+            p.docmancer_home = p.runtime_dir / "home"
+            p.docmancer_home.mkdir(parents=True, exist_ok=True)
+            p.db_path = p.runtime_dir / "docmancer.db"
+            print(f"[isolation] {p.provider_id}")
+            print(f"  runtime_dir: {p.runtime_dir}")
+            print(f"  docmancer_home: {p.docmancer_home}")
+            print(f"  db_path: {p.db_path}")
 
     if not providers:
         print("No providers selected.")

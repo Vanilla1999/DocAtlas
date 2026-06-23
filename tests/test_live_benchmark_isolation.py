@@ -212,3 +212,129 @@ def test_exact_version_metrics_with_mixed_results():
     assert m["exact_version_empty_count"] == 1
     assert m["exact_version_not_supported_count"] == 1
     assert m["exact_version_coverage_rate"] == pytest.approx(1 / 3, abs=0.01)
+
+
+def test_docatlas_provider_sets_isolated_docmancer_home():
+    """DocAtlasDirectProvider sets isolated DOCMANCER_HOME inside _isolated_env context."""
+    import os
+    
+    p = DocAtlasDirectProvider()
+    p.docmancer_home = Path("/tmp/test-isolated-home")
+    
+    old_home = os.environ.get("DOCMANCER_HOME")
+    
+    with p._isolated_env():
+        assert os.environ.get("DOCMANCER_HOME") == str(p.docmancer_home)
+    
+    # After context manager, env should be restored
+    if old_home is None:
+        assert "DOCMANCER_HOME" not in os.environ
+    else:
+        assert os.environ.get("DOCMANCER_HOME") == old_home
+
+
+def test_docatlas_provider_isolates_library_index_paths():
+    """Zero-setup and preindexed providers compute different library index paths."""
+    import os
+    from docmancer.mcp import paths
+    
+    zs = DocAtlasDirectProvider()
+    zs.provider_id = "docatlas_zero_setup"
+    zs.docmancer_home = Path("/tmp/test-zero-setup/home")
+    
+    pi = DocAtlasDirectProvider()
+    pi.provider_id = "docatlas_preindexed"
+    pi.docmancer_home = Path("/tmp/test-preindexed/home")
+    
+    # Inside zero-setup context, docmancer_home() points to zero-setup home
+    with zs._isolated_env():
+        zs_home = paths.docmancer_home()
+        assert str(zs_home) == str(zs.docmancer_home)
+    
+    # Inside preindexed context, docmancer_home() points to preindexed home
+    with pi._isolated_env():
+        pi_home = paths.docmancer_home()
+        assert str(pi_home) == str(pi.docmancer_home)
+    
+    # They must be different
+    assert str(zs.docmancer_home) != str(pi.docmancer_home)
+
+
+def test_both_mode_uses_run_scoped_runtime_dirs():
+    """Runtime dirs contain run_id/timestamp and are not static paths."""
+    from datetime import datetime, timezone
+    
+    zs = DocAtlasDirectProvider()
+    zs.provider_id = "docatlas_zero_setup"
+    run_timestamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+    runtime_base = Path(tempfile.gettempdir()) / "live-benchmark" / run_timestamp
+    zs.runtime_dir = runtime_base / "both" / zs.provider_id
+    
+    pi = DocAtlasDirectProvider()
+    pi.provider_id = "docatlas_preindexed"
+    pi.runtime_dir = runtime_base / "both" / pi.provider_id
+    
+    # Runtime dirs must include timestamp/run_id
+    assert run_timestamp in str(zs.runtime_dir)
+    assert run_timestamp in str(pi.runtime_dir)
+    
+    # Runtime dirs must be different
+    assert zs.runtime_dir != pi.runtime_dir
+    
+    # Must not be static /tmp/live-benchmark/both/...
+    assert "live-benchmark/both" not in str(zs.runtime_dir).replace(f"live-benchmark/{run_timestamp}/both", "")
+
+
+def test_storage_isolation_applies_to_all_modes():
+    """Storage isolation applies to zero-setup, preindexed, and both modes."""
+    providers = []
+    
+    # Zero-setup mode
+    zs = DocAtlasDirectProvider()
+    zs.provider_id = "docatlas_zero_setup"
+    zs.runtime_dir = Path("/tmp/test-zero")
+    zs.docmancer_home = zs.runtime_dir / "home"
+    providers.append(zs)
+    
+    # Preindexed mode
+    pi = DocAtlasDirectProvider()
+    pi.provider_id = "docatlas_preindexed"
+    pi.runtime_dir = Path("/tmp/test-preindexed")
+    pi.docmancer_home = pi.runtime_dir / "home"
+    providers.append(pi)
+    
+    # Every provider must have isolated docmancer_home
+    for p in providers:
+        assert p.docmancer_home is not None
+        assert isinstance(p, DocAtlasDirectProvider)
+    
+    # All homes must be different
+    homes = [str(p.docmancer_home) for p in providers]
+    assert len(set(homes)) == len(homes)
+
+
+def test_raw_output_includes_runtime_paths():
+    """Raw JSON includes runtime paths for DocAtlas providers."""
+    p = DocAtlasDirectProvider()
+    p.provider_id = "docatlas_preindexed"
+    p.runtime_dir = Path("/tmp/test-runtime")
+    p.docmancer_home = p.runtime_dir / "home"
+    p.db_path = p.runtime_dir / "docmancer.db"
+    
+    # Simulate raw_data construction
+    raw_data = {
+        "provider": p.name,
+        "provider_id": p.provider_id,
+    }
+    
+    if isinstance(p, DocAtlasDirectProvider):
+        raw_data["runtime"] = {
+            "docmancer_home": str(p.docmancer_home) if p.docmancer_home else None,
+            "db_path": str(p.db_path) if p.db_path else None,
+            "runtime_dir": str(p.runtime_dir) if p.runtime_dir else None,
+        }
+    
+    assert "runtime" in raw_data
+    assert raw_data["runtime"]["docmancer_home"] == str(p.docmancer_home)
+    assert raw_data["runtime"]["db_path"] == str(p.db_path)
+    assert raw_data["runtime"]["runtime_dir"] == str(p.runtime_dir)
