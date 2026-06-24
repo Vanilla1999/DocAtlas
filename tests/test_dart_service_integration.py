@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from types import MethodType
+
 import pytest
 
 
@@ -20,8 +22,14 @@ def test_riverpod_auto_uses_official_docs(tmp_path):
     )
     
     assert info.library_id is not None
+    assert info.ecosystem == "dart"
     assert info.docs_url is not None
     assert "riverpod.dev" in info.docs_url
+    record = service.registry.get(info.library_id, source_type=info.source_type)
+    assert record is not None
+    assert record.target_spec is not None
+    assert record.target_spec["seed_urls"]
+    assert any("concepts2/providers" in url for url in record.target_spec["seed_urls"])
     assert info.status in ("available", "needs_refresh")
 
 
@@ -119,7 +127,7 @@ def test_python_package_not_affected(tmp_path):
 
 
 def test_go_router_still_needs_docs_url(tmp_path):
-    """go_router has only pub.dev URLs, should still return needs_docs_url."""
+    """go_router has no package-owned guide site, so auto-registration stays disabled."""
     from docmancer.core.config import DocmancerConfig
     from docmancer.docs.service import LibraryDocsService
     
@@ -151,11 +159,61 @@ def test_riverpod_auto_registers_and_get_docs_returns_result(tmp_path):
         topic="Riverpod providers",
     )
     
-    # Should at least return something reasonable
     assert result is not None
-    # Status could be needs_input, needs_refresh, success, etc.
-    # The key is it should not crash and should not be needs_docs_url
-    if result.status == "needs_docs_url":
-        # If it does need docs_url, at least candidates should have official docs
-        candidates = result.diagnostics.get("candidates", []) if hasattr(result, "diagnostics") else []
-        assert len(candidates) == 0 or any("riverpod.dev" in str(c.get("docs_url", "")) for c in candidates) is not False
+    assert result.status != "needs_docs_url"
+
+
+def test_dart_aliases_share_one_registry_identity(tmp_path):
+    """flutter/pub/dart aliases should not create duplicate registry records."""
+    from docmancer.core.config import DocmancerConfig
+    from docmancer.docs.service import LibraryDocsService
+
+    config = DocmancerConfig()
+    config.index.db_path = str(tmp_path / "test.db")
+    service = LibraryDocsService(config=config)
+
+    flutter = service.resolve_library("riverpod", ecosystem="flutter")
+    pub = service.resolve_library("riverpod", ecosystem="pub")
+    dart = service.resolve_library("riverpod", ecosystem="dart")
+
+    assert flutter.library_id == pub.library_id == dart.library_id
+    assert flutter.ecosystem == pub.ecosystem == dart.ecosystem == "dart"
+
+
+def test_refresh_receives_auto_registered_seed_urls(tmp_path, monkeypatch):
+    """Auto-registration target_spec must feed root + seed_urls into refresh."""
+    from docmancer.core.config import DocmancerConfig
+    from docmancer.docs.service import LibraryDocsService
+
+    config = DocmancerConfig()
+    config.index.db_path = str(tmp_path / "test.db")
+    service = LibraryDocsService(config=config)
+    info = service.resolve_library("riverpod", ecosystem="flutter")
+    record = service.registry.get(info.library_id, source_type=info.source_type)
+    assert record is not None
+
+    calls = []
+
+    class FakeAgent:
+        last_discovery_diagnostics = {"discovery_strategy": "seed", "seed_pages": 2}
+
+        def add(self, url, **kwargs):
+            calls.append((url, kwargs))
+            return 0
+
+    def fake_agent_instance(self, record=None):
+        return FakeAgent()
+
+    monkeypatch.setattr(service, "_agent_instance", MethodType(fake_agent_instance, service))
+
+    result = service.refresh_docs(info.library_id, source_type=info.source_type, force=True)
+
+    assert result.status == "empty_index"
+    assert calls
+    url, kwargs = calls[0]
+    assert url == "https://riverpod.dev/"
+    seed_urls = kwargs.get("seed_urls")
+    assert seed_urls
+    assert any("concepts2/providers" in seed for seed in seed_urls)
+    assert result.preindex is not None
+    assert result.preindex["dartdoc"]["reason_code"] == "dartdoc_root_only"

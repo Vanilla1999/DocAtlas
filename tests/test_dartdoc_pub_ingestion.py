@@ -29,7 +29,7 @@ class TestDartOfficialDocsResolver:
         
         assert resolution.official_docs_available is True
         assert resolution.package == "riverpod"
-        assert resolution.docs_strategy == "official_docs"
+        assert resolution.docs_strategy == "mixed"
         assert resolution.confidence == "high"
         assert "riverpod.dev" in resolution.official_docs_urls[0]
         assert "pub.dev/documentation/riverpod" in resolution.pubdev_docs_url
@@ -40,7 +40,7 @@ class TestDartOfficialDocsResolver:
         
         assert resolution.official_docs_available is True
         assert resolution.package == "flutter_bloc"
-        assert resolution.docs_strategy == "official_docs"
+        assert resolution.docs_strategy == "mixed"
         assert "bloclibrary.dev" in resolution.official_docs_urls[0]
         assert "pub.dev/documentation/flutter_bloc" in resolution.pubdev_docs_url
 
@@ -169,6 +169,15 @@ class TestDartdocPubDevIngestion:
         cross = discovery_candidates_for("mcp", "dart")
         assert len(cross) == 0, "Python package should not appear in dart queries"
 
+        assert discovery_candidates_for("riverpod", "python") == []
+        assert discovery_candidates_for("fastapi", "dart") == []
+
+    def test_versioned_resolution_does_not_include_latest_pubdev(self):
+        """Exact-version seed URLs should not mix in pub.dev /latest/."""
+        resolution = resolve_dart_official_docs("riverpod", version="2.4.0")
+        assert "https://pub.dev/documentation/riverpod/2.4.0/" in resolution.official_docs_urls
+        assert "https://pub.dev/documentation/riverpod/latest/" not in resolution.official_docs_urls
+
 
 class TestOfficialDocsFallback:
     """Test that official docs are preferred over pub.dev API."""
@@ -238,7 +247,7 @@ class TestDartdocDiagnostics:
         
         assert diagnostic["attempted"] is True
         assert diagnostic["official_available"] is True
-        assert diagnostic["docs_strategy"] == "official_docs"
+        assert diagnostic["docs_strategy"] == "mixed"
         assert diagnostic["package"] == "flutter_bloc"
         assert "bloclibrary.dev" in diagnostic["root_url"]
         
@@ -258,7 +267,7 @@ class TestDartdocDiagnostics:
         stored = result.diagnostics.get("dartdoc", {})
         assert stored["attempted"] is True
         assert stored["official_available"] is True
-        assert stored["docs_strategy"] == "official_docs"
+        assert stored["docs_strategy"] == "mixed"
 
 
 class TestEndToEndDartIngestion:

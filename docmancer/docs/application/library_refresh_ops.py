@@ -6,6 +6,7 @@ import time
 
 from docmancer.docs.models import RefreshResult
 from docmancer.docs.registry import LibraryRecord
+from docmancer.docs.dart_official_docs import build_dart_diagnostics, canonical_dart_ecosystem
 
 
 def _merged_discovery_diagnostics(items: list[dict[str, Any]]) -> dict[str, Any]:
@@ -39,6 +40,31 @@ def _merged_discovery_diagnostics(items: list[dict[str, Any]]) -> dict[str, Any]
         "seed_pages": seed_pages,
         "fallback_pages": fallback_pages,
         "warnings": warnings,
+    }
+
+
+def _dart_refresh_diagnostics(
+    record: LibraryRecord,
+    *,
+    pages_discovered: int | None,
+    pages_extracted: int | None,
+    chunks_created: int | None,
+    reason_code: str | None = None,
+) -> dict[str, Any]:
+    if canonical_dart_ecosystem(record.ecosystem) != "dart":
+        return {}
+    used_official_docs = bool(record.docs_url and "pub.dev" not in record.docs_url)
+    return {
+        "dartdoc": build_dart_diagnostics(
+            package=record.name,
+            version=record.version,
+            root_url=record.docs_url,
+            pages_discovered=pages_discovered,
+            pages_extracted=pages_extracted,
+            chunks_created=chunks_created,
+            used_official_docs=used_official_docs,
+            reason_code=reason_code,
+        )
     }
 
 
@@ -135,6 +161,19 @@ class LibraryRefreshOps:
                 duration_ms=int((time.monotonic() - started) * 1000),
                 pages_failed=1,
                 targets_failed=1,
+                preindex={
+                    "library": record.name,
+                    "canonical_id": record.canonical_id,
+                    "docs_url": record.docs_url,
+                    "reason_code": "refresh_failed",
+                    **_dart_refresh_diagnostics(
+                        record,
+                        pages_discovered=pages_indexed,
+                        pages_extracted=0,
+                        chunks_created=0,
+                        reason_code="refresh_failed",
+                    ),
+                },
             )
 
         pages_after, chunks_after = self.registry_ops.count_index_entries(record)
@@ -180,6 +219,12 @@ class LibraryRefreshOps:
                     "index_path": db_path,
                     "query_index_path": db_path,
                     "reason_code": reason,
+                    **_dart_refresh_diagnostics(
+                        record,
+                        pages_discovered=pages_indexed,
+                        pages_extracted=pages_after,
+                        chunks_created=chunks_after,
+                    ),
                     "elapsed_ms": int((time.monotonic() - started) * 1000),
                 },
             )
@@ -216,6 +261,12 @@ class LibraryRefreshOps:
             "index_path": str(db_path) if db_path else None,
             "query_index_path": str(db_path) if db_path else None,
             "reason_code": reason_code,
+            **_dart_refresh_diagnostics(
+                record,
+                pages_discovered=pages_indexed,
+                pages_extracted=pages_after,
+                chunks_created=chunks_after,
+            ),
             "elapsed_ms": int((time.monotonic() - started) * 1000),
         }
 

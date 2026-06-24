@@ -3,6 +3,15 @@ from __future__ import annotations
 from docmancer.docs.resolver import normalize_lookup_key
 
 
+def _canonical_ecosystem(ecosystem: str | None) -> str | None:
+    if ecosystem is None:
+        return None
+    normalized = normalize_lookup_key(ecosystem)
+    if normalized in {"pub", "flutter", "dart"}:
+        return "dart"
+    return normalized
+
+
 _KNOWN_DISCOVERY_CANDIDATES = {
     ("python", "mcp"): [
         {
@@ -110,17 +119,10 @@ _KNOWN_DISCOVERY_CANDIDATES = {
 
 def discovery_candidates_for(library: str, ecosystem: str | None) -> list[dict]:
     normalized_library = normalize_lookup_key(library)
-    normalized_ecosystem = normalize_lookup_key(ecosystem or "") if ecosystem else None
+    normalized_ecosystem = _canonical_ecosystem(ecosystem)
     keys: list[tuple[str, str]] = []
     if normalized_ecosystem:
         keys.append((normalized_ecosystem, normalized_library))
-        # Normalize pub/flutter/dart ecosystem aliases
-        if normalized_ecosystem == "pub":
-            keys.append(("dart", normalized_library))
-        elif normalized_ecosystem == "flutter":
-            keys.append(("dart", normalized_library))
-        elif normalized_ecosystem == "dart":
-            keys.append(("flutter", normalized_library))
     else:
         keys.extend(key for key in _KNOWN_DISCOVERY_CANDIDATES if key[1] == normalized_library)
     candidates: list[dict] = []

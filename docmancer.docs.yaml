@@ -73,10 +73,9 @@ targets:
     seed_urls:
       - https://riverpod.dev/
       - https://riverpod.dev/docs/introduction/getting_started
-      - https://riverpod.dev/docs/concepts/providers
-      - https://riverpod.dev/docs/concepts/reading
-      - https://riverpod.dev/docs/concepts/modifiers/auto_dispose
-      - https://riverpod.dev/docs/concepts/modifiers/family
+      - https://riverpod.dev/docs/concepts2/providers
+      - https://riverpod.dev/docs/concepts2/auto_dispose
+      - https://riverpod.dev/docs/concepts2/family
       - https://pub.dev/documentation/riverpod/latest/
   - id: flutter_riverpod
     library: flutter_riverpod
@@ -88,7 +87,8 @@ targets:
     seed_urls:
       - https://riverpod.dev/
       - https://riverpod.dev/docs/introduction/getting_started
-      - https://riverpod.dev/docs/concepts/providers
+      - https://riverpod.dev/docs/concepts2/providers
+      - https://riverpod.dev/docs/concepts2/auto_dispose
       - https://pub.dev/documentation/flutter_riverpod/latest/
   - id: flutter_bloc
     library: flutter_bloc
