@@ -25,6 +25,7 @@ from docmancer.docs.models import DocsChunk, DocsInspectResult, DocsJobStartResu
 from docmancer.docs.registry import LibraryRecord
 from docmancer.docs.resolver import canonical_library_id, legacy_library_id, normalize_version
 from docmancer.docs.dartdoc import discover_pub_dartdoc_seed_urls, is_pub_dartdoc_target, normalize_pub_dartdoc_target, pub_dartdoc_root_url
+from docmancer.docs.dart_official_docs import has_official_docs, get_seed_urls_for_package, resolve_dart_official_docs
 from docmancer.docs.application.library_registry_ops import LibraryRegistryOps
 from docmancer.docs.application.library_refresh_ops import LibraryRefreshOps
 
@@ -107,6 +108,57 @@ class LibraryDocsApplicationService:
                 )
         if record is None:
             discovery_candidates = discovery_candidates_for(library, ecosystem)
+            
+            # Check if Dart/Flutter package has real official docs (non-pub.dev)
+            normalized_ecosystem = (ecosystem or "").lower().strip()
+            is_dart_flutter = normalized_ecosystem in ("dart", "flutter", "pub")
+            
+            has_real_official_docs = False
+            dart_docs_url = None
+            
+            if is_dart_flutter and has_official_docs(library):
+                dart_resolution = resolve_dart_official_docs(library, version=normalized_version)
+                if dart_resolution.official_docs_available and dart_resolution.official_docs_urls:
+                    primary = dart_resolution.official_docs_urls[0]
+                    if "pub.dev" not in primary:
+                        has_real_official_docs = True
+                        dart_docs_url = primary
+            
+            if has_real_official_docs and dart_docs_url:
+                record = self.registry.upsert(
+                    library=library,
+                    ecosystem=ecosystem or "flutter",
+                    version=normalized_version or "latest",
+                    docs_url=dart_docs_url,
+                    source_type=source_type or "web",
+                    now=self._now(),
+                    status="available",
+                )
+                stale = self._is_stale(record.last_refreshed_at)
+                return LibraryInfo(
+                    library_id=record.library_id,
+                    source_id=record.source_id,
+                    canonical_id=record.canonical_id,
+                    library=record.name,
+                    ecosystem=record.ecosystem,
+                    version=record.version,
+                    source_type=record.source_type,
+                    docs_url=record.docs_url,
+                    docs_url_template=record.docs_url_template,
+                    docs_url_resolved=record.docs_url_resolved,
+                    docs_snapshot_exact=record.docs_snapshot_exact,
+                    requested_version=record.requested_version,
+                    resolved_version=record.resolved_version,
+                    version_source=record.version_source,
+                    version_confidence=record.version_confidence,
+                    version_inferred=record.version_inferred,
+                    status="needs_refresh" if stale else "available",
+                    local=record.last_refreshed_at is not None,
+                    stale=stale,
+                    last_refreshed_at=record.last_refreshed_at,
+                    message=None,
+                )
+            
             return LibraryInfo(
                 library_id=None,
                 library=library,
@@ -852,6 +904,20 @@ class LibraryDocsApplicationService:
                 "fallback": not exact_version_match,
                 "reason_code": None if exact_version_match else "version_mismatch",
             }
+        
+        # Dartdoc diagnostics for Dart/Flutter packages
+        if ecosystem and ecosystem.lower().strip() in ("flutter", "dart", "pub"):
+            from docmancer.docs.dart_official_docs import has_official_docs, resolve_dart_official_docs
+            if has_official_docs(library):
+                dart_res = resolve_dart_official_docs(library)
+                final_diagnostics["dartdoc"] = {
+                    "attempted": True,
+                    "package": library,
+                    "version": latest.version or "latest",
+                    "root_url": info.docs_url if info else None,
+                    "official_available": dart_res.official_docs_available,
+                    "docs_strategy": dart_res.docs_strategy,
+                }
         
         return DocsResult(
             library_id=info.library_id,
