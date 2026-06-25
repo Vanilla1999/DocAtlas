@@ -3,6 +3,15 @@ from __future__ import annotations
 from docmancer.docs.resolver import normalize_lookup_key
 
 
+def _canonical_ecosystem(ecosystem: str | None) -> str | None:
+    if ecosystem is None:
+        return None
+    normalized = normalize_lookup_key(ecosystem)
+    if normalized in {"pub", "flutter", "dart"}:
+        return "dart"
+    return normalized
+
+
 _KNOWN_DISCOVERY_CANDIDATES = {
     ("python", "mcp"): [
         {
@@ -18,20 +27,82 @@ _KNOWN_DISCOVERY_CANDIDATES = {
         {
             "library": "riverpod",
             "ecosystem": "dart",
-            "name": "Riverpod Dart API docs",
+            "name": "Riverpod official guide",
+            "docs_url": "https://riverpod.dev/",
+            "confidence": "high",
+            "why": "Official Riverpod guide documentation (preferred over pub.dev API)",
+        },
+        {
+            "library": "riverpod",
+            "ecosystem": "dart",
+            "name": "Riverpod pub.dev API reference",
             "docs_url": "https://pub.dev/documentation/riverpod/latest/",
             "confidence": "medium",
-            "why": "candidate matched dart ecosystem and riverpod query",
+            "why": "pub.dev API reference (fallback)",
         }
     ],
     ("dart", "flutter_riverpod"): [
         {
             "library": "flutter_riverpod",
             "ecosystem": "dart",
-            "name": "Flutter Riverpod API docs",
+            "name": "Flutter Riverpod official guide",
+            "docs_url": "https://riverpod.dev/",
+            "confidence": "high",
+            "why": "Official Riverpod guide documentation (preferred over pub.dev API)",
+        },
+        {
+            "library": "flutter_riverpod",
+            "ecosystem": "dart",
+            "name": "Flutter Riverpod pub.dev API reference",
             "docs_url": "https://pub.dev/documentation/flutter_riverpod/latest/",
             "confidence": "medium",
-            "why": "candidate matched dart ecosystem and flutter_riverpod query",
+            "why": "pub.dev API reference (fallback)",
+        }
+    ],
+    ("dart", "flutter_bloc"): [
+        {
+            "library": "flutter_bloc",
+            "ecosystem": "dart",
+            "name": "Flutter BLoC official guide",
+            "docs_url": "https://bloclibrary.dev/",
+            "confidence": "high",
+            "why": "Official BLoC library guide documentation (preferred over pub.dev API)",
+        },
+        {
+            "library": "flutter_bloc",
+            "ecosystem": "dart",
+            "name": "Flutter BLoC pub.dev API reference",
+            "docs_url": "https://pub.dev/documentation/flutter_bloc/latest/",
+            "confidence": "medium",
+            "why": "pub.dev API reference (fallback)",
+        }
+    ],
+    ("dart", "bloc"): [
+        {
+            "library": "bloc",
+            "ecosystem": "dart",
+            "name": "BLoC official guide",
+            "docs_url": "https://bloclibrary.dev/",
+            "confidence": "high",
+            "why": "Official BLoC library guide documentation (preferred over pub.dev API)",
+        },
+        {
+            "library": "bloc",
+            "ecosystem": "dart",
+            "name": "BLoC pub.dev API reference",
+            "docs_url": "https://pub.dev/documentation/bloc/latest/",
+            "confidence": "medium",
+            "why": "pub.dev API reference (fallback)",
+        }
+    ],
+    ("dart", "go_router"): [
+        {
+            "library": "go_router",
+            "ecosystem": "dart",
+            "name": "go_router pub.dev API reference",
+            "docs_url": "https://pub.dev/documentation/go_router/latest/",
+            "confidence": "high",
+            "why": "pub.dev API reference with package documentation",
         }
     ],
     ("python", "fastapi"): [
@@ -48,12 +119,10 @@ _KNOWN_DISCOVERY_CANDIDATES = {
 
 def discovery_candidates_for(library: str, ecosystem: str | None) -> list[dict]:
     normalized_library = normalize_lookup_key(library)
-    normalized_ecosystem = normalize_lookup_key(ecosystem or "") if ecosystem else None
+    normalized_ecosystem = _canonical_ecosystem(ecosystem)
     keys: list[tuple[str, str]] = []
     if normalized_ecosystem:
         keys.append((normalized_ecosystem, normalized_library))
-        if normalized_ecosystem == "pub":
-            keys.append(("dart", normalized_library))
     else:
         keys.extend(key for key in _KNOWN_DISCOVERY_CANDIDATES if key[1] == normalized_library)
     candidates: list[dict] = []

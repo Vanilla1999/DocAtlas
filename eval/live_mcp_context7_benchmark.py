@@ -391,8 +391,10 @@ class DocAtlasDirectProvider(BenchmarkProvider):
         @contextmanager
         def _ctx():
             old_home = os.environ.get("DOCMANCER_HOME")
+            old_auto_vectors = os.environ.get("DOCMANCER_AUTO_VECTORS")
             if self.docmancer_home:
                 os.environ["DOCMANCER_HOME"] = str(self.docmancer_home)
+                os.environ["DOCMANCER_AUTO_VECTORS"] = "0"
             try:
                 yield
             finally:
@@ -400,6 +402,10 @@ class DocAtlasDirectProvider(BenchmarkProvider):
                     os.environ.pop("DOCMANCER_HOME", None)
                 else:
                     os.environ["DOCMANCER_HOME"] = old_home
+                if old_auto_vectors is None:
+                    os.environ.pop("DOCMANCER_AUTO_VECTORS", None)
+                else:
+                    os.environ["DOCMANCER_AUTO_VECTORS"] = old_auto_vectors
         return _ctx()
 
     def _get_service(self):
@@ -460,8 +466,9 @@ class DocAtlasDirectProvider(BenchmarkProvider):
                 else:
                     refresh_result = service.refresh_docs(lib, ecosystem=eco, version=ver, force=False)
                     diag.status = "refreshed"
-                    diag.pages = refresh_result.pages if hasattr(refresh_result, "pages") else 0
-                    diag.chunks = len(refresh_result.results) if hasattr(refresh_result, "results") else 0
+                    post_inspect = service.inspect_library_docs(info.library_id)
+                    diag.pages = int(getattr(post_inspect, "pages", 0) or getattr(refresh_result, "pages_indexed", 0) or 0)
+                    diag.chunks = int(getattr(post_inspect, "chunks", 0) or getattr(refresh_result, "chunks_indexed", 0) or 0)
                     preindex = getattr(refresh_result, "preindex", None) or {}
                     diag.discovery_strategy = preindex.get("discovery_strategy")
                     diag.sitemap_pages = int(preindex.get("sitemap_pages") or 0)

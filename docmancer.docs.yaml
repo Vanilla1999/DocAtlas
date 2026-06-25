@@ -62,3 +62,66 @@ targets:
     docs_url: https://docs.pytest.org/en/stable/
     allowed_domains:
       - docs.pytest.org
+  # Dart/Flutter packages
+  - id: riverpod
+    library: riverpod
+    ecosystem: flutter
+    docs_url: https://riverpod.dev/
+    allowed_domains:
+      - riverpod.dev
+      - pub.dev
+    seed_urls:
+      - https://riverpod.dev/
+      - https://riverpod.dev/docs/introduction/getting_started
+      - https://riverpod.dev/docs/concepts2/providers
+      - https://riverpod.dev/docs/concepts2/auto_dispose
+      - https://riverpod.dev/docs/concepts2/family
+      - https://pub.dev/documentation/riverpod/latest/
+  - id: flutter_riverpod
+    library: flutter_riverpod
+    ecosystem: flutter
+    docs_url: https://riverpod.dev/
+    allowed_domains:
+      - riverpod.dev
+      - pub.dev
+    seed_urls:
+      - https://riverpod.dev/
+      - https://riverpod.dev/docs/introduction/getting_started
+      - https://riverpod.dev/docs/concepts2/providers
+      - https://riverpod.dev/docs/concepts2/auto_dispose
+      - https://pub.dev/documentation/flutter_riverpod/latest/
+  - id: flutter_bloc
+    library: flutter_bloc
+    ecosystem: flutter
+    docs_url: https://bloclibrary.dev/
+    allowed_domains:
+      - bloclibrary.dev
+      - pub.dev
+    seed_urls:
+      - https://bloclibrary.dev/
+      - https://bloclibrary.dev/getting-started/
+      - https://bloclibrary.dev/flutter-bloc-concepts/
+      - https://bloclibrary.dev/architecture/
+      - https://pub.dev/documentation/flutter_bloc/latest/
+  - id: bloc
+    library: bloc
+    ecosystem: flutter
+    docs_url: https://bloclibrary.dev/
+    allowed_domains:
+      - bloclibrary.dev
+      - pub.dev
+    seed_urls:
+      - https://bloclibrary.dev/
+      - https://bloclibrary.dev/bloc-concepts/
+      - https://pub.dev/documentation/bloc/latest/
+  - id: go_router
+    library: go_router
+    ecosystem: flutter
+    docs_url: https://pub.dev/documentation/go_router/latest/
+    allowed_domains:
+      - pub.dev
+      - docs.flutter.dev
+    seed_urls:
+      - https://pub.dev/documentation/go_router/latest/
+      - https://pub.dev/packages/go_router
+      - https://docs.flutter.dev/ui/navigation

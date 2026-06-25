@@ -23,8 +23,16 @@ from docmancer.docs.domain.target_security import host_allowed, is_remote_url, p
 from docmancer.docs.domain.trust_contract import build_project_context_trust_contract
 from docmancer.docs.models import DocsChunk, DocsInspectResult, DocsJobStartResult, DocsManifestValidationResult, DocsPruneResult, DocsRemoveResult, DocsResult, DocsSourceResolution, DocsTarget, DocsTargetResult, DocsTargetsPrefetchResult, LibraryInfo, ProjectDocsBootstrapResult, ProjectDocsChunk, ProjectDocsIngestResult, ProjectDocsInspectResult, ProjectDocsResult, ProjectMetadata, ProjectPrefetchResult, RefreshResult
 from docmancer.docs.registry import LibraryRecord
-from docmancer.docs.resolver import canonical_library_id, legacy_library_id, normalize_version
+from docmancer.docs.resolver import canonical_library_id, docs_snapshot_is_exact, legacy_library_id, normalize_version
 from docmancer.docs.dartdoc import discover_pub_dartdoc_seed_urls, is_pub_dartdoc_target, normalize_pub_dartdoc_target, pub_dartdoc_root_url
+from docmancer.docs.dart_official_docs import (
+    allowed_domains_for_urls,
+    build_dart_diagnostics,
+    canonical_dart_ecosystem,
+    get_seed_urls_for_package,
+    has_official_docs,
+    resolve_dart_official_docs,
+)
 from docmancer.docs.application.library_registry_ops import LibraryRegistryOps
 from docmancer.docs.application.library_refresh_ops import LibraryRefreshOps
 
@@ -61,6 +69,10 @@ class LibraryDocsApplicationService:
         if hasattr(self.facade, "_library_resolve_library_impl"):
             return self.facade._library_resolve_library_impl(library, ecosystem, version, docs_url, docs_url_template, source_type)
         normalized_version = normalize_version(version)
+        original_ecosystem = ecosystem
+        canonical_ecosystem = canonical_dart_ecosystem(ecosystem)
+        if canonical_ecosystem in {"dart"}:
+            ecosystem = canonical_ecosystem
         if docs_url is None and docs_url_template and normalized_version:
             docs_url = self._render_docs_url(docs_url_template, library, normalized_version)
 
@@ -107,6 +119,149 @@ class LibraryDocsApplicationService:
                 )
         if record is None:
             discovery_candidates = discovery_candidates_for(library, ecosystem)
+            
+            # Check if Dart/Flutter package has real official docs (non-pub.dev)
+            normalized_ecosystem = (canonical_dart_ecosystem(original_ecosystem) or "").lower().strip()
+            is_dart_flutter = normalized_ecosystem == "dart"
+            if is_dart_flutter and (source_type or "").lower() == "api":
+                dart_resolution = resolve_dart_official_docs(library, version=normalized_version)
+                pubdev_url = dart_resolution.pubdev_docs_url
+                is_exact_snapshot = docs_snapshot_is_exact(normalized_version, pubdev_url)
+                target_spec = {
+                    "id": f"dart:{library}:api",
+                    "library": library,
+                    "ecosystem": "dart",
+                    "version": normalized_version or "latest",
+                    "docs_url": pubdev_url,
+                    "source_type": "api",
+                    "doc_format": "dartdoc",
+                    "allowed_domains": allowed_domains_for_urls([pubdev_url]),
+                    "seed_urls": [],
+                    "max_pages": 100,
+                    "dart_docs": {
+                        "requested_ecosystem": original_ecosystem,
+                        "docs_strategy": "pubdev_only",
+                        "version_binding": "pubdev_api_snapshot" if is_exact_snapshot else "latest_pubdev_api",
+                    },
+                }
+                record = self.registry.upsert(
+                    library=library,
+                    ecosystem="dart",
+                    version=normalized_version or "latest",
+                    docs_url=pubdev_url,
+                    source_type="api",
+                    now=self._now(),
+                    status="available",
+                    target_spec=target_spec,
+                    requested_version=normalized_version,
+                    resolved_version=normalized_version or "latest",
+                    version_source="pubdev_api" if is_exact_snapshot else None,
+                    version_confidence="high" if is_exact_snapshot else None,
+                    version_inferred=not is_exact_snapshot,
+                    docs_snapshot_exact=is_exact_snapshot,
+                )
+                stale = self._is_stale(record.last_refreshed_at)
+                return LibraryInfo(
+                    library_id=record.library_id,
+                    source_id=record.source_id,
+                    canonical_id=record.canonical_id,
+                    library=record.name,
+                    ecosystem=record.ecosystem,
+                    version=record.version,
+                    source_type=record.source_type,
+                    docs_url=record.docs_url,
+                    docs_url_template=record.docs_url_template,
+                    docs_url_resolved=record.docs_url_resolved,
+                    docs_snapshot_exact=record.docs_snapshot_exact,
+                    requested_version=record.requested_version,
+                    resolved_version=record.resolved_version,
+                    version_source=record.version_source,
+                    version_confidence=record.version_confidence,
+                    version_inferred=record.version_inferred,
+                    status="needs_refresh" if stale else "available",
+                    local=record.last_refreshed_at is not None,
+                    stale=stale,
+                    last_refreshed_at=record.last_refreshed_at,
+                    message=None,
+                )
+
+            has_real_official_docs = False
+            dart_docs_url = None
+            
+            if is_dart_flutter and has_official_docs(library):
+                dart_resolution = resolve_dart_official_docs(library, version=normalized_version)
+                if dart_resolution.official_docs_available and dart_resolution.official_docs_urls:
+                    primary = next((url for url in dart_resolution.official_docs_urls if "pub.dev" not in url), None)
+                    primary_host = urlparse(primary).hostname if primary else None
+                    package_owned_host = primary_host in {"riverpod.dev", "bloclibrary.dev"}
+                    if primary and package_owned_host:
+                        has_real_official_docs = True
+                        dart_docs_url = primary
+            
+            if has_real_official_docs and dart_docs_url:
+                seed_urls = [
+                    url for url in get_seed_urls_for_package(library, normalized_version, max_urls=100)
+                    if url != dart_docs_url
+                ]
+                urls_for_domains = [dart_docs_url, *seed_urls]
+                target_spec = {
+                    "id": f"dart:{library}",
+                    "library": library,
+                    "ecosystem": "dart",
+                    "version": normalized_version or "latest",
+                    "docs_url": dart_docs_url,
+                    "source_type": source_type or "web",
+                    "doc_format": "html",
+                    "allowed_domains": allowed_domains_for_urls(urls_for_domains),
+                    "seed_urls": seed_urls,
+                    "max_pages": 100,
+                    "dart_docs": {
+                        "requested_ecosystem": original_ecosystem,
+                        "docs_strategy": dart_resolution.docs_strategy,
+                        "version_binding": "unversioned_official_guide" if normalized_version else "latest_or_unversioned",
+                    },
+                }
+                record = self.registry.upsert(
+                    library=library,
+                    ecosystem="dart",
+                    version=normalized_version or "latest",
+                    docs_url=dart_docs_url,
+                    source_type=source_type or "web",
+                    now=self._now(),
+                    status="available",
+                    target_spec=target_spec,
+                    requested_version=normalized_version,
+                    resolved_version=None if normalized_version else "latest",
+                    version_source="official_docs" if normalized_version else None,
+                    version_confidence="low" if normalized_version else None,
+                    version_inferred=normalized_version is None,
+                    docs_snapshot_exact=False,
+                )
+                stale = self._is_stale(record.last_refreshed_at)
+                return LibraryInfo(
+                    library_id=record.library_id,
+                    source_id=record.source_id,
+                    canonical_id=record.canonical_id,
+                    library=record.name,
+                    ecosystem=record.ecosystem,
+                    version=record.version,
+                    source_type=record.source_type,
+                    docs_url=record.docs_url,
+                    docs_url_template=record.docs_url_template,
+                    docs_url_resolved=record.docs_url_resolved,
+                    docs_snapshot_exact=record.docs_snapshot_exact,
+                    requested_version=record.requested_version,
+                    resolved_version=record.resolved_version,
+                    version_source=record.version_source,
+                    version_confidence=record.version_confidence,
+                    version_inferred=record.version_inferred,
+                    status="needs_refresh" if stale else "available",
+                    local=record.last_refreshed_at is not None,
+                    stale=stale,
+                    last_refreshed_at=record.last_refreshed_at,
+                    message=None,
+                )
+            
             return LibraryInfo(
                 library_id=None,
                 library=library,
@@ -268,6 +423,14 @@ class LibraryDocsApplicationService:
     def _library_chunk_allowed(self, chunk: Any, info: LibraryInfo, allowed_ids: set[str], expected_roots: set[str]) -> bool:
         return self._library_chunk_rejection_reason(chunk, info, allowed_ids, expected_roots) is None
 
+    def _expected_docset_roots(self, info: LibraryInfo, record: LibraryRecord | None) -> set[str]:
+        roots = {root for root in {info.docs_url_resolved, info.docs_url} if root}
+        spec = record.target_spec if record else None
+        if isinstance(spec, dict):
+            roots.update(str(url) for url in spec.get("seed_urls") or [] if url)
+            roots.update(str(url) for url in spec.get("resolved_urls") or [] if url)
+        return roots
+
     def _empty_library_index_result(
         self,
         *,
@@ -289,6 +452,13 @@ class LibraryDocsApplicationService:
         diagnostics: dict[str, Any],
         diagnostic_warnings: list[dict[str, Any]],
     ) -> DocsResult:
+        diagnostics_with_dart = self._with_dart_diagnostics(
+            diagnostics,
+            info=info,
+            pages_discovered=0,
+            pages_extracted=0,
+            chunks_created=0,
+        )
         return DocsResult(
             library_id=info.library_id,
             library=latest.library,
@@ -313,9 +483,36 @@ class LibraryDocsApplicationService:
             request=self._docs_request(input_args, info),
             identity=self._docs_identity(info, docs_url_source=docs_url_source),
             policy=self._docs_policy("error", has_registered_source=True),
-            diagnostics={**diagnostics, "reason_code": "empty_index", "warnings": diagnostic_warnings},
+            diagnostics={**diagnostics_with_dart, "reason_code": "empty_index", "warnings": diagnostic_warnings},
             next_actions=["Call refresh_library_docs to ingest this library's docs."],
         )
+
+    def _with_dart_diagnostics(
+        self,
+        diagnostics: dict[str, Any],
+        *,
+        info: LibraryInfo,
+        reason_code: str | None = None,
+        pages_discovered: int | None = None,
+        pages_extracted: int | None = None,
+        chunks_created: int | None = None,
+    ) -> dict[str, Any]:
+        if canonical_dart_ecosystem(info.ecosystem) != "dart":
+            return diagnostics
+        used_official_docs = bool(info.docs_url and "pub.dev" not in info.docs_url)
+        return {
+            **diagnostics,
+            "dartdoc": build_dart_diagnostics(
+                package=info.library,
+                version=info.version,
+                root_url=info.docs_url,
+                pages_discovered=pages_discovered,
+                pages_extracted=pages_extracted,
+                chunks_created=chunks_created,
+                used_official_docs=used_official_docs,
+                reason_code=reason_code,
+            ),
+        }
 
     def _record_from_info(self, info: LibraryInfo) -> LibraryRecord | None:
         if info.library_id is None:
@@ -725,7 +922,7 @@ class LibraryDocsApplicationService:
                         request=self._docs_request(input_args, info),
                         identity=self._docs_identity(info, docs_url_source=docs_url_source),
                         policy=self._docs_policy("error", has_registered_source=True),
-                        diagnostics={**resolution.diagnostics, "warnings": diagnostic_warnings},
+                        diagnostics={**resolution.diagnostics, **((result.preindex or {}) if result.preindex else {}), "warnings": diagnostic_warnings},
                         next_actions=["Retry get_library_docs with force_refresh=false if local docs are usable, or refresh/register the source again."],
                     )
                 if stale_before:
@@ -789,7 +986,7 @@ class LibraryDocsApplicationService:
         allowed_ids = {info.library_id}
         if info.version:
             allowed_ids.add(legacy_library_id(info.library, info.version))
-        expected_roots = {root for root in {info.docs_url_resolved, info.docs_url} if root}
+        expected_roots = self._expected_docset_roots(info, record)
         chunks_before_guard = list(chunks)
         filtered_chunks = []
         rejection_counts: dict[str, int] = {}
@@ -809,6 +1006,13 @@ class LibraryDocsApplicationService:
         if not chunks:
             reason_code = "guard_dropped_all" if dropped > 0 else "missing_chunks"
             reason_diagnostics = {**resolution.diagnostics, "reason_code": reason_code, "warnings": diagnostic_warnings}
+            reason_diagnostics = self._with_dart_diagnostics(
+                reason_diagnostics,
+                info=latest,
+                pages_discovered=pages,
+                pages_extracted=pages,
+                chunks_created=0,
+            )
             return DocsResult(
                 library_id=info.library_id,
                 library=latest.library,
@@ -852,6 +1056,14 @@ class LibraryDocsApplicationService:
                 "fallback": not exact_version_match,
                 "reason_code": None if exact_version_match else "version_mismatch",
             }
+        
+        final_diagnostics = self._with_dart_diagnostics(
+            final_diagnostics,
+            info=latest,
+            pages_discovered=pages,
+            pages_extracted=pages,
+            chunks_created=len(chunks),
+        )
         
         return DocsResult(
             library_id=info.library_id,

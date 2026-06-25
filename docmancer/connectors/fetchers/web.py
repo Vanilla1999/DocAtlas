@@ -57,6 +57,17 @@ _DIRECT_TEXT_SUFFIXES = {".md", ".txt"}
 _DIRECT_DARTDOC_SUFFIXES = DARTDOC_ENTITY_SUFFIXES
 
 
+def _source_docset_root(final_url: str, base_url: str) -> str:
+    base_host = urlparse(base_url).hostname
+    final = urlparse(final_url)
+    if base_host == final.hostname:
+        return normalize_url(base_url)
+    parts = [part for part in final.path.split("/") if part]
+    if final.hostname == "pub.dev" and len(parts) >= 3 and parts[0] == "documentation":
+        return normalize_url(f"{final.scheme}://{final.netloc}/{'/'.join(parts[:3])}")
+    return infer_docset_root(final_url) or final_url
+
+
 @dataclass(slots=True)
 class _FetchedPage:
     document: Document
@@ -426,10 +437,11 @@ class WebFetcher:
     ) -> _FetchedPage | None:
         url = normalize_url(disc.url)
         self._emit_progress({"phase": "fetching", "message": f"Fetching {url}", "url": url})
+        is_seed_url = disc.strategy == DiscoveryStrategy.SEED_URLS
         if robots and not robots.can_fetch(url):
             logger.debug("Skipped %s (blocked by robots.txt)", url)
             return None
-        if not is_docs_url(url, base_url):
+        if not is_seed_url and not is_docs_url(url, base_url):
             logger.debug("Skipped %s (out of docs scope)", url)
             return None
 
@@ -499,14 +511,15 @@ class WebFetcher:
 
         content_hash = ContentDeduplicator.content_hash(content)
         canonical = normalize_url(resolve_url(str(meta.get("canonical_url")), final_url)) if meta.get("canonical_url") else url
-        source_url = canonical if is_docs_url(canonical, base_url) else url
+        source_url = canonical if (is_seed_url or is_docs_url(canonical, base_url)) else url
+        docset_root = _source_docset_root(final_url, base_url)
         doc = Document(
             source=source_url,
             content=content,
             metadata={
                 "format": fmt,
                 "fetch_method": disc.strategy.value,
-                "docset_root": normalize_url(base_url),
+                "docset_root": docset_root,
                 "platform": platform.value,
                 "canonical_url": canonical,
                 "content_hash": content_hash,

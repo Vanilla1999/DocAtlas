@@ -6,6 +6,7 @@ import time
 
 from docmancer.docs.models import RefreshResult
 from docmancer.docs.registry import LibraryRecord
+from docmancer.docs.dart_official_docs import build_dart_diagnostics, canonical_dart_ecosystem
 
 
 def _merged_discovery_diagnostics(items: list[dict[str, Any]]) -> dict[str, Any]:
@@ -40,6 +41,50 @@ def _merged_discovery_diagnostics(items: list[dict[str, Any]]) -> dict[str, Any]
         "fallback_pages": fallback_pages,
         "warnings": warnings,
     }
+
+
+def _dart_refresh_diagnostics(
+    record: LibraryRecord,
+    *,
+    pages_discovered: int | None,
+    pages_extracted: int | None,
+    chunks_created: int | None,
+    reason_code: str | None = None,
+) -> dict[str, Any]:
+    if canonical_dart_ecosystem(record.ecosystem) != "dart":
+        return {}
+    used_official_docs = bool(record.docs_url and "pub.dev" not in record.docs_url)
+    return {
+        "dartdoc": build_dart_diagnostics(
+            package=record.name,
+            version=record.version,
+            root_url=record.docs_url,
+            pages_discovered=pages_discovered,
+            pages_extracted=pages_extracted,
+            chunks_created=chunks_created,
+            used_official_docs=used_official_docs,
+            reason_code=reason_code,
+        )
+    }
+
+
+def _metadata_for_record(record: LibraryRecord) -> dict[str, Any]:
+    metadata = {
+        "library_id": record.library_id,
+        "canonical_id": record.canonical_id,
+        "ecosystem": record.ecosystem,
+        "source_type": record.source_type,
+        "docs_url": record.docs_url,
+        "docs_url_resolved": record.docs_url_resolved or record.docs_url,
+        "registry_docset_root": record.docs_url_resolved or record.docs_url,
+        "requested_version": record.requested_version,
+        "resolved_version": record.resolved_version,
+        "version_binding": (record.target_spec or {}).get("dart_docs", {}).get("version_binding"),
+        "docs_snapshot_exact": record.docs_snapshot_exact,
+    }
+    if record.docs_snapshot_exact is not False and record.version:
+        metadata["version"] = record.version
+    return {key: value for key, value in metadata.items() if value is not None}
 
 
 class LibraryRefreshOps:
@@ -79,7 +124,7 @@ class LibraryRefreshOps:
                 targets_completed=1,
             )
 
-        pages_indexed = 0
+        sections_indexed = 0
         discovery_diagnostics: list[dict[str, Any]] = []
         try:
             target = self._target_from_record(record)
@@ -90,25 +135,16 @@ class LibraryRefreshOps:
             per_url_max_pages = target.max_pages if target.doc_format == "dartdoc" else (1 if target.seed_urls and not target.docs_url and not target.docs_url_template else target.max_pages)
             for url in urls:
                 agent = self._agent_instance(record)
-                pages = agent.add(
+                indexed_sections = agent.add(
                     url,
                     recreate=False,
                     max_pages=per_url_max_pages,
                     browser=target.browser,
                     seed_urls=seed_urls_for_discovery if (target.docs_url or target.docs_url_template) else None,
-                    metadata={
-                        "library_id": record.library_id,
-                        "canonical_id": record.canonical_id,
-                        "ecosystem": record.ecosystem,
-                        "version": record.version,
-                        "source_type": record.source_type,
-                        "docs_url": record.docs_url,
-                        "docs_url_resolved": record.docs_url_resolved or record.docs_url,
-                        "docset_root": record.docs_url_resolved or record.docs_url,
-                    },
+                    metadata=_metadata_for_record(record),
                 )
-                if isinstance(pages, int):
-                    pages_indexed += pages
+                if isinstance(indexed_sections, int):
+                    sections_indexed += indexed_sections
                 if getattr(agent, "last_discovery_diagnostics", None):
                     discovery_diagnostics.append(dict(agent.last_discovery_diagnostics))
         except Exception as exc:
@@ -135,12 +171,25 @@ class LibraryRefreshOps:
                 duration_ms=int((time.monotonic() - started) * 1000),
                 pages_failed=1,
                 targets_failed=1,
+                preindex={
+                    "library": record.name,
+                    "canonical_id": record.canonical_id,
+                    "docs_url": record.docs_url,
+                    "reason_code": "refresh_failed",
+                    **_dart_refresh_diagnostics(
+                        record,
+                        pages_discovered=sections_indexed,
+                        pages_extracted=0,
+                        chunks_created=0,
+                        reason_code="refresh_failed",
+                    ),
+                },
             )
 
         pages_after, chunks_after = self.registry_ops.count_index_entries(record)
-        if pages_indexed == 0 or pages_after == 0 or chunks_after == 0:
+        if sections_indexed == 0 or pages_after == 0 or chunks_after == 0:
             refreshed_at = self._now()
-            reason = "ingest_produced_no_chunks" if pages_indexed > 0 else "no_extractable_content"
+            reason = "ingest_produced_no_chunks" if sections_indexed > 0 else "no_extractable_content"
             self.registry.upsert(
                 library=record.name,
                 ecosystem=record.ecosystem,
@@ -165,7 +214,7 @@ class LibraryRefreshOps:
                 source_type=record.source_type,
                 message=f"{reason}: refresh indexed no usable chunks. Check docs_url, source_type, doc_format, browser, or Dartdoc seed discovery.",
                 duration_ms=int((time.monotonic() - started) * 1000),
-                pages_indexed=pages_indexed,
+                pages_indexed=pages_after,
                 chunks_indexed=chunks_after,
                 targets_failed=1,
                 preindex={
@@ -180,6 +229,12 @@ class LibraryRefreshOps:
                     "index_path": db_path,
                     "query_index_path": db_path,
                     "reason_code": reason,
+                    **_dart_refresh_diagnostics(
+                        record,
+                        pages_discovered=pages_after,
+                        pages_extracted=pages_after,
+                        chunks_created=chunks_after,
+                    ),
                     "elapsed_ms": int((time.monotonic() - started) * 1000),
                 },
             )
@@ -216,6 +271,12 @@ class LibraryRefreshOps:
             "index_path": str(db_path) if db_path else None,
             "query_index_path": str(db_path) if db_path else None,
             "reason_code": reason_code,
+            **_dart_refresh_diagnostics(
+                record,
+                pages_discovered=pages_after,
+                pages_extracted=pages_after,
+                chunks_created=chunks_after,
+            ),
             "elapsed_ms": int((time.monotonic() - started) * 1000),
         }
 
@@ -227,7 +288,7 @@ class LibraryRefreshOps:
             version=record.version,
             source_type=record.source_type,
             duration_ms=int((time.monotonic() - started) * 1000),
-            pages_indexed=pages_indexed,
+            pages_indexed=pages_after,
             chunks_indexed=chunks_after,
             targets_completed=1,
             preindex=preindex,

@@ -1441,9 +1441,9 @@ def test_versioned_library_uses_canonical_id(tmp_path, monkeypatch):
         docs_url="https://pub.dev/documentation/go_router/14.8.1/",
     )
 
-    assert result.library_id == "pub:go_router@14.8.1:api"
-    assert result.source_id == "pub:go_router:api"
-    assert result.canonical_id == "pub:go_router@14.8.1:api"
+    assert result.library_id == "dart:go_router@14.8.1:api"
+    assert result.source_id == "dart:go_router:api"
+    assert result.canonical_id == "dart:go_router@14.8.1:api"
     assert result.version == "14.8.1"
     assert result.requested_version == "14.8.1"
     assert result.resolved_version == "14.8.1"
@@ -1489,7 +1489,7 @@ def test_hyphen_alias_resolves_to_underscore_package_record(tmp_path, monkeypatc
 
     result = service.resolve_library("go-router", ecosystem="pub", version="14.8.1")
 
-    assert result.library_id == "pub:go_router@14.8.1:api"
+    assert result.library_id == "dart:go_router@14.8.1:api"
     assert result.library == "go_router"
 
 
@@ -1503,7 +1503,7 @@ def test_docs_url_template_registers_version_url(tmp_path, monkeypatch):
         docs_url_template="https://pub.dev/documentation/{library}/{version}/",
     )
 
-    assert result.library_id == "pub:go_router@16.2.0:api"
+    assert result.library_id == "dart:go_router@16.2.0:api"
     assert result.docs_url == "https://pub.dev/documentation/go_router/16.2.0/"
 
 
@@ -1524,7 +1524,7 @@ def test_refresh_multiple_versions_from_template(tmp_path, monkeypatch):
         "https://pub.dev/documentation/go_router/15.0.0/",
         "https://pub.dev/documentation/go_router/latest/",
     ]
-    assert service.registry.get("go_router", "pub", "15.0.0").library_id == "pub:go_router@15.0.0:api"
+    assert service.registry.get("go_router", "pub", "15.0.0").library_id == "dart:go_router@15.0.0:api"
 
 
 def test_prefetch_docs_delegates_to_batch_refresh(tmp_path, monkeypatch):
@@ -1859,8 +1859,8 @@ def test_ambiguous_versions_return_candidates(tmp_path, monkeypatch):
     assert result.decision == "choose_candidate"
     assert len(result.candidates) == 2
     assert {candidate["canonical_id"] for candidate in result.candidates} == {
-        "pub:go_router@14.8.1:api",
-        "pub:go_router@16.2.0:api",
+        "dart:go_router@14.8.1:api",
+        "dart:go_router@16.2.0:api",
     }
     assert result.policy["direct_webfetch"] == "forbidden"
     assert result.diagnostics["resolver"]["candidate_count"] == 2
@@ -1876,7 +1876,7 @@ def test_ambiguous_versions_include_retry_patches(tmp_path, monkeypatch):
     result = service.get_docs("go-router", ecosystem="pub", topic="ShellRoute")
 
     assert all(candidate["arguments_patch"] for candidate in result.candidates)
-    assert result.candidates[0]["arguments_patch"]["library"].startswith("pub:go_router@")
+    assert result.candidates[0]["arguments_patch"]["library"].startswith("dart:go_router@")
 
 
 def test_exact_version_with_unversioned_url_is_not_exact(tmp_path, monkeypatch):
@@ -1909,7 +1909,7 @@ def test_get_docs_uses_project_package_version_when_omitted(tmp_path, monkeypatc
 
     result = service.get_docs("go_router", ecosystem="pub", topic="ShellRoute", project_path=str(project))
 
-    assert result.library_id == "pub:go_router@14.8.1:api"
+    assert result.library_id == "dart:go_router@14.8.1:api"
     assert result.version == "14.8.1"
     assert result.docs_snapshot_exact is True
     assert result.requested_version == "14.8.1"
@@ -1918,7 +1918,7 @@ def test_get_docs_uses_project_package_version_when_omitted(tmp_path, monkeypatc
     assert result.docs_binding_source == "pub_dartdoc"
     assert result.confidence == "high"
     assert agent.add_calls == ["https://pub.dev/documentation/go_router/14.8.1/"]
-    record = service.registry.get("pub:go_router@14.8.1:api")
+    record = service.registry.get("dart:go_router@14.8.1:api")
     assert record is not None
     assert record.requested_version == "14.8.1"
     assert record.resolved_version == "14.8.1"
@@ -1959,7 +1959,7 @@ def test_get_docs_explicit_version_overrides_project_version(tmp_path, monkeypat
         project_path=str(project),
     )
 
-    assert result.library_id == "pub:go_router@16.2.0:api"
+    assert result.library_id == "dart:go_router@16.2.0:api"
     assert result.version == "16.2.0"
     assert agent.add_calls == ["https://pub.dev/documentation/go_router/16.2.0/"]
 
@@ -1971,7 +1971,7 @@ def test_flutter_fvmrc_version_uses_stable_channel_id_not_exact_version(tmp_path
 
     result = service.get_docs("flutter-api", topic="Navigator", project_path=str(project))
 
-    assert result.library_id == "flutter:flutter-api@stable:api"
+    assert result.library_id == "dart:flutter-api@stable:api"
     assert result.version == "stable"
     assert result.requested_version == "3.24.5"
     assert result.docs_snapshot_exact is False
@@ -1986,7 +1986,7 @@ def test_flutter_main_channel_uses_main_id_and_non_exact_snapshot(tmp_path, monk
 
     result = service.get_docs("flutter-api", topic="Navigator", project_path=str(project))
 
-    assert result.library_id == "flutter:flutter-api@main:api"
+    assert result.library_id == "dart:flutter-api@main:api"
     assert result.version == "main"
     assert result.docs_snapshot_exact is False
     assert agent.add_calls == ["https://main-api.flutter.dev/"]
@@ -2623,7 +2623,7 @@ def test_source_type_is_part_of_canonical_target_identity(tmp_path, monkeypatch)
         docs_url="https://riverpod.dev/docs/",
     )
 
-    assert api.library_id == "pub:riverpod@latest:api"
+    assert api.library_id == "dart:riverpod@latest:api"
     assert guides.library_id == "web:riverpod-guides@latest:guides"
     assert api.library_id != guides.library_id
 
@@ -3855,12 +3855,12 @@ def test_legacy_record_migrates_to_new_canonical_id(tmp_path, monkeypatch):
 
     result = service.resolve_library("go_router", ecosystem="pub", version="14.8.1")
 
-    assert result.library_id == "pub:go_router@14.8.1:api"
-    assert service.registry.get("pub:go_router@14.8.1:api") is not None
+    assert result.library_id == "dart:go_router@14.8.1:api"
+    assert service.registry.get("dart:go_router@14.8.1:api") is not None
     legacy = service.registry.get("go_router@14.8.1")
     assert legacy is not None
-    assert legacy.library_id == "pub:go_router@14.8.1:api"
-    assert legacy.source_id == "pub:go_router:api"
+    assert legacy.library_id == "dart:go_router@14.8.1:api"
+    assert legacy.source_id == "dart:go_router:api"
     assert "go_router@14.8.1" in legacy.legacy_ids
 
 

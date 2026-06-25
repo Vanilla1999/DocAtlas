@@ -355,6 +355,22 @@ https://docs.rs/{library}/{version}/
 
 For Pub/Dartdoc targets, Docmancer can discover precise seed URLs from package documentation index pages, including class, library, and entity pages. This reduces crawling noise and makes exact-version API docs more practical.
 
+#### Official docs fallback for Dart/Flutter packages
+
+For high-value Dart/Flutter packages, Docmancer provides automatic official docs discovery:
+
+- **riverpod / flutter_riverpod** → `riverpod.dev` (concept guides, provider docs, modifiers)
+- **flutter_bloc / bloc** → `bloclibrary.dev` (concept guides, architecture, tutorials)
+- Packages without known official docs fall back to pub.dev API reference
+
+Behavior:
+
+- When `resolve_library()` or `get_docs()` is called for a known Dart/Flutter package without explicit `docs_url`, Docmancer auto-registers the official docs source with high confidence.
+- Official guide docs are preferred over pub.dev API reference because they provide conceptual explanations, usage examples, and best practices needed by coding agents.
+- Packages with only pub.dev URLs (e.g., `go_router`) are not auto-registered and return `needs_docs_url` as before.
+- Ecosystem aliasing is supported: `flutter`, `dart`, and `pub` are all treated equivalently.
+- Dartdoc diagnostics (`dartdoc` key) are included in `DocsResult.diagnostics` when a Dart/Flutter package is queried.
+
 ### 14. Project-owned docs discovery
 
 Docmancer can discover and index docs that belong to a repository, not just external library docs.
