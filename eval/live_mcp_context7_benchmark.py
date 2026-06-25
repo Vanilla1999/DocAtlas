@@ -9,6 +9,7 @@ import re
 import shutil
 import tempfile
 import time
+import traceback
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
@@ -86,6 +87,7 @@ class BenchmarkCase:
     expected_facts: list[str] = field(default_factory=list)
     context7_library_id: str | None = None
     not_applicable_for: list[str] = field(default_factory=list)
+    mode: str | None = None
 
 
 @dataclass
@@ -335,14 +337,37 @@ EXACT_VERSION_CASES: list[BenchmarkCase] = [
         context7_library_id="/websites/pub_dev_packages_go_router"),
 ]
 
+UNIFIED_CONTEXT_CASES: list[BenchmarkCase] = [
+    BenchmarkCase(id="unified_project_only",
+        query="How does DocAtlas isolate project docs from library docs?",
+        suite="unified-context", mode="auto",
+        not_applicable_for=["context7"], expected_doc_scope="project",
+        expected_sources=["docs/", "CHANGELOG.md"]),
+    BenchmarkCase(id="unified_library_only",
+        query="How do I use FastAPI Depends?",
+        suite="unified-context", library="fastapi", ecosystem="python", mode="auto",
+        expected_domains=["fastapi.tiangolo.com", "github.com"], expected_source_patterns=["fastapi"],
+        context7_library_id="/fastapi/fastapi"),
+    BenchmarkCase(id="unified_mixed",
+        query="How does this project use FastAPI dependency injection?",
+        suite="unified-context", library="fastapi", ecosystem="python", mode="auto",
+        not_applicable_for=["context7"], expected_doc_scope="project",
+        expected_source_patterns=["fastapi", "docatlas"]),
+    BenchmarkCase(id="unified_dependency",
+        query="How do I use Riverpod autoDispose for the version in this project?",
+        suite="unified-context", library="riverpod", ecosystem="flutter", mode="dependency",
+        not_applicable_for=["context7"], expected_source_patterns=["riverpod"]),
+]
+
 QUICK_CASES: list[str] = [
     "fastapi_depends", "click_command_group", "riverpod_autodispose",
     "bloc_provider", "project_lifecycle", "exact_fastapi_version",
+    "unified_project_only", "unified_library_only", "unified_mixed", "unified_dependency",
 ]
 
 
 def _all_cases() -> list[BenchmarkCase]:
-    return PUBLIC_DOCS_CASES + PROJECT_DOCS_CASES + EXACT_VERSION_CASES
+    return PUBLIC_DOCS_CASES + PROJECT_DOCS_CASES + EXACT_VERSION_CASES + UNIFIED_CONTEXT_CASES
 
 
 def _filter_cases(suites: list[str] | None, quick: bool) -> list[BenchmarkCase]:
@@ -529,7 +554,39 @@ class DocAtlasDirectProvider(BenchmarkProvider):
                             sources, snippets, answer_text, warnings, reason_codes,
                             exact_version_used, preindex=preindex_diag)
 
-                if case.suite == "project-docs":
+                if case.suite == "unified-context":
+                    result = await asyncio.to_thread(
+                        service.get_docs_context,
+                        case.query,
+                        project_path=self._project_path if case.id != "unified_library_only" else None,
+                        library=case.library,
+                        ecosystem=case.ecosystem,
+                        version=case.version,
+                        mode=case.mode or "auto",
+                        tokens=4000,
+                        allow_network=False,
+                        prepare_project_docs=True,
+                    )
+                    setup_calls += 1
+                    context_pack = result.context_pack if hasattr(result, "context_pack") else []
+                    answer_text = str(getattr(result, "routing", {}))
+                    reason_codes.append(getattr(result, "mode_selected", "unknown"))
+                    if getattr(result, "requires_confirmation", False):
+                        reason_codes.append(getattr(result, "reason_code", "confirmation_required") or "confirmation_required")
+                    for i, item in enumerate(context_pack):
+                        source_str = str(item.get("source") or item.get("url") or item.get("path") or "unknown")
+                        title = item.get("title") or ""
+                        content = item.get("content") or ""
+                        scope = item.get("doc_scope")
+                        sources.append(SourceRef(url=source_str, title=title, rank=i + 1, doc_scope=scope))
+                        if content:
+                            snippets.append(Snippet(text=content[:500], source=source_str, rank=i + 1))
+                    if not context_pack:
+                        status = "needs_refresh" if getattr(result, "requires_confirmation", False) else "no_results"
+                    contamination = getattr(result, "contamination", {}) or {}
+                    if contamination.get("detected"):
+                        reason_codes.extend(contamination.get("reason_codes") or [])
+                elif case.suite == "project-docs":
                     result = await asyncio.to_thread(
                         service.get_project_context, self._project_path, case.query, tokens=4000)
                     setup_calls += 1
@@ -604,6 +661,7 @@ class DocAtlasDirectProvider(BenchmarkProvider):
             except Exception as exc:
                 status = "error"
                 warnings.append(str(exc))
+                warnings.append(traceback.format_exc())
                 reason_codes.append(type(exc).__name__)
 
             latency_ms = round((time.perf_counter() - start) * 1000, 3)
@@ -1031,6 +1089,15 @@ def compute_suite_metrics(results: list[NormalizedBenchmarkResult], suite: str) 
         pm["provider"] = rlist[0].provider if rlist else "unknown"
         pm["provider_mode"] = rlist[0].provider_mode if rlist else "unknown"
         pm["benchmark_mode"] = rlist[0].mode if rlist else "unknown"
+        if suite == "unified-context":
+            applicable = [r for r in rlist if not r.is_not_applicable()]
+            routing_ok = [r for r in applicable if r.reason_codes and r.reason_codes[0] in {"project", "library", "mixed", "dependency"}]
+            project_primary = [r for r in applicable if r.case_id in {"unified_project_only", "unified_mixed"}]
+            pm["routing_accuracy"] = round(len(routing_ok) / len(applicable), 4) if applicable else None
+            pm["source_scope_correctness"] = pm.get("correct_source_rate_on_success")
+            pm["project_primary_rate"] = round(sum(1 for r in project_primary if r.sources and r.sources[0].doc_scope == "project") / len(project_primary), 4) if project_primary else None
+            confirmation_codes = {"confirmation_required", "library_docs_network_fetch_required", "dependency_docs_prefetch_required"}
+            pm["confirmation_contract_correctness"] = round(sum(1 for r in applicable if not (r.status == "needs_refresh" and not confirmation_codes.intersection(r.reason_codes))) / len(applicable), 4) if applicable else None
         m[pid] = pm
     return m
 
@@ -1148,6 +1215,28 @@ def generate_markdown_report(
                 lines.append("**Interpretation:**")
                 lines.append("- Context7 is not applicable for project-docs (no local repo context). This is by design.")
                 lines.append(f"- DocAtlas: {da.get('success_count', 0)}/{da.get('applicable_queries', 0)} project queries answered.")
+                lines.append("")
+
+    if benchmark_mode in ("zero-setup", "preindexed", "both"):
+        lines.append("## Unified Context")
+        lines.append("")
+        for sm in suite_metrics:
+            if sm["suite"] == "unified-context":
+                da = sm.get("docatlas_preindexed", sm.get("docatlas_zero_setup", sm.get("docatlas", {})))
+                c7 = sm.get("context7_zero_setup", sm.get("context7", {}))
+                lines.append("| Metric | DocAtlas | Context7 |")
+                lines.append("|--------|----------|----------|")
+                lines.append(_metric_line("Routing accuracy", da.get("routing_accuracy"), c7.get("routing_accuracy")))
+                lines.append(_metric_line("Coverage rate", da.get("coverage_rate"), c7.get("coverage_rate")))
+                lines.append(_metric_line("Source scope correctness", da.get("source_scope_correctness"), c7.get("source_scope_correctness")))
+                lines.append(_metric_line("Contamination rate", da.get("contamination_rate_all"), c7.get("contamination_rate_all")))
+                lines.append(_metric_line("Project primary rate", da.get("project_primary_rate"), c7.get("project_primary_rate")))
+                lines.append(_metric_line("Exact version correctness on success", da.get("exact_version_correctness_on_success"), c7.get("exact_version_correctness_on_success")))
+                lines.append(_metric_line("Confirmation contract correctness", da.get("confirmation_contract_correctness"), c7.get("confirmation_contract_correctness")))
+                lines.append(_metric_line("Setup calls avg", da.get("setup_calls_avg"), c7.get("setup_calls_avg")))
+                lines.append(_metric_line("Avg latency (ms)", da.get("avg_latency_ms"), c7.get("avg_latency_ms")))
+                lines.append("")
+                lines.append("- Context7 is N/A for local project-only and mixed project cases.")
                 lines.append("")
 
     if benchmark_mode in ("preindexed", "both"):
@@ -1469,7 +1558,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Live MCP benchmark: DocAtlas vs Context7")
     parser.add_argument("--mode", choices=["zero-setup", "preindexed", "both"], default="zero-setup",
                         help="benchmark mode (default: zero-setup)")
-    parser.add_argument("--suite", choices=["public-docs", "project-docs", "exact-version", "all"],
+    parser.add_argument("--suite", choices=["public-docs", "project-docs", "exact-version", "unified-context", "all"],
                         default="all", help="suite filter (default: all)")
     parser.add_argument("--save-raw", action="store_true", help="save raw outputs per query")
     parser.add_argument("--output-dir", help="custom output directory")

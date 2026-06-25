@@ -6,12 +6,43 @@ import json
 from typing import Any
 
 from docmancer.docs.service import LibraryDocsService
+from docmancer.docs.interfaces.mcp.context_tools import context_tools, handle_context_tool
 from docmancer.docs.interfaces.mcp.docs_tools import handle_library_tool, library_tools
 from docmancer.docs.interfaces.mcp.prefetch_tools import handle_prefetch_tool, prefetch_tools
 from docmancer.docs.interfaces.mcp.project_tools import handle_project_tool, project_tools
 
 
 TOOLS: list[dict[str, Any]] = [
+    {
+        "name": "get_docs_context",
+        "description": "Return one source-grounded documentation context pack by routing the question to project-owned docs, public library docs, exact dependency docs, or a mixed project-plus-library flow.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "question": {"type": "string"},
+                "project_path": {"type": ["string", "null"]},
+                "library": {"type": ["string", "null"]},
+                "libraries": {"type": ["array", "null"], "items": {"type": "string"}},
+                "ecosystem": {"type": ["string", "null"]},
+                "version": {"type": ["string", "null"]},
+                "source_type": {"type": ["string", "null"]},
+                "docs_url": {"type": ["string", "null"]},
+                "module": {"type": ["string", "null"]},
+                "module_path": {"type": ["string", "null"]},
+                "scope": {"type": ["string", "null"], "enum": ["project", "module", "all", None]},
+                "mode": {"type": ["string", "null"], "enum": ["auto", "project", "library", "dependency", "mixed", None]},
+                "tokens": {"type": ["integer", "null"]},
+                "limit": {"type": ["integer", "null"]},
+                "expand": {"type": ["string", "null"]},
+                "prepare_project_docs": {"type": ["boolean", "null"]},
+                "allow_network": {"type": ["boolean", "null"]},
+                "allow_latest_fallback": {"type": ["boolean", "null"]},
+                "force_refresh": {"type": ["boolean", "null"]},
+                "details": {"type": ["boolean", "null"]},
+            },
+            "required": ["question"],
+        },
+    },
     {
         "name": "resolve_library_id",
         "description": "Resolve a documentation library from the local registry or explicit docs_url. Registered sources should be retried through Docmancer with returned candidates/arguments_patch; never WebFetch registered docs before that retry.",
@@ -366,6 +397,7 @@ Does not use deleted, orphaned, or stale project-doc content by default.""",
     },
 ]
 
+CONTEXT_TOOLS = context_tools(TOOLS)
 LIBRARY_TOOLS = library_tools(TOOLS)
 PROJECT_TOOLS = project_tools(TOOLS)
 PREFETCH_TOOLS = prefetch_tools(TOOLS)
@@ -393,7 +425,7 @@ async def _run_async(service: LibraryDocsService) -> None:
     async def _call_tool(name: str, arguments: dict[str, Any]) -> list[mcp_types.TextContent]:
         try:
             args = arguments or {}
-            for handler in (handle_library_tool, handle_prefetch_tool, handle_project_tool):
+            for handler in (handle_context_tool, handle_library_tool, handle_prefetch_tool, handle_project_tool):
                 payload = handler(name, args, service)
                 if payload is not None:
                     return _json_text(mcp_types, payload)

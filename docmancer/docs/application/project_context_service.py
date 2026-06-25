@@ -251,7 +251,11 @@ def _drop_low_value_context_section(content: str, title: str | None = None, head
 
 def context_pack_snippet(item: DocsChunk) -> dict[str, Any] | None:
     metadata = item.metadata or {}
+    if not isinstance(metadata, dict):
+        return None
     snippets = metadata.get("code_snippets") or []
+    if not isinstance(snippets, list):
+        return None
     snippet = snippets[0] if snippets and isinstance(snippets[0], dict) else None
     if not snippet:
         return None

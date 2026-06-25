@@ -78,6 +78,7 @@ Project-docs tools let agents work with the reviewable documentation files that 
 
 | Tool | Purpose |
 |---|---|
+| `get_docs_context` | High-level Context7-style entry point for project, library, dependency, and mixed documentation context. Routes deterministically to the existing lane-specific tools. |
 | `sync_project_docs` | **Canonical lifecycle action.** Discovers, reconciles, prunes orphaned/stale, and indexes project docs in one call. Prefer over `ingest_project_docs`. |
 | `inspect_project_docs` | Read-only discovery: reports discovered candidates, indexed docs, stale/ignored/orphaned sources, reason_code, and next_action. |
 | `ingest_project_docs` | Legacy low-level index operation. Does not reconcile — use `sync_project_docs`. |
@@ -86,6 +87,16 @@ Project-docs tools let agents work with the reviewable documentation files that 
 | `get_project_context` | Compact repo-grounded context pack combining project docs with optional dependency-doc evidence and a Trust Contract. |
 
 ### Recommended workflow
+
+For most MCP clients and coding agents, start with the unified high-level tool:
+
+```text
+get_docs_context(question, project_path?, library?, mode="auto")
+```
+
+DocAtlas now provides one high-level MCP entry point for project, library, dependency, and mixed documentation context. It does not replace the lane-specific tools, and it does not fetch missing docs automatically unless the caller explicitly allows network work.
+
+Advanced users can still call lane-specific tools directly.
 
 ```text
 sync_project_docs(project_path, with_vectors=true)     # discover + reconcile + index
