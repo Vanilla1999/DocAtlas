@@ -9,6 +9,7 @@ from docmancer.docs.application.project_answer_outline import build_project_answ
 from docmancer.docs.domain.project_doc_ranking import is_changelog_path, normalize_doc_path, rerank_project_doc_chunks
 from docmancer.docs.domain.project_query_intent import classify_project_query_intent
 from docmancer.docs.domain.quality import has_code_symbol_evidence, internal_noise_score, is_trivial_section, looks_like_code_or_command
+from docmancer.docs.domain.snippets import best_context_pack_snippet, build_snippet_presentation, validate_response_style
 from docmancer.docs.domain.trust_contract import build_project_context_trust_contract
 from docmancer.docs.models import DocsChunk, DocsResult, ProjectContextResult, ProjectDocsResult, ProjectMetadata
 
@@ -35,7 +36,9 @@ class ProjectContextService:
         module_path: str | None = None,
         scope: str | None = None,
         mode: str = "auto",
+        response_style: str | None = None,
     ) -> ProjectContextResult:
+        response_style = validate_response_style(response_style)
         mode = mode.lower()
         if mode not in {"auto", "project-only", "deps-only", "public-docs"}:
             raise ValueError("mode must be one of: auto, project-only, deps-only, public-docs")
@@ -78,6 +81,14 @@ class ProjectContextService:
         context_pack = project_context_pack(project_docs=project_docs, dependency_docs=dependency_docs)
         answer_outline = build_project_answer_outline(question=question, intent=intent, context_pack=context_pack)
         metrics = project_context_metrics(context_pack=context_pack, project_docs=project_docs, dependency_docs=dependency_docs, intent=intent)
+        lane_priority = ["project"] if mode == "project-only" else (["dependency"] if mode in {"deps-only", "public-docs"} else ["project", "dependency"])
+        snippet_presentation = build_snippet_presentation(
+            context_pack,
+            question=question,
+            response_style=response_style,
+            lane_priority=lane_priority,
+        )
+        metrics["snippet_metrics"] = snippet_presentation.metrics
         diagnostics: dict[str, Any] = {"query_intent": intent.name}
         if intent.name == "mcp_disambiguation":
             diagnostics["mcp_surfaces"] = [
@@ -130,8 +141,12 @@ class ProjectContextService:
             project_docs=project_docs,
             dependency_docs=dependency_docs,
             trust_contract=trust_contract,
-            warnings=warnings,
+            warnings=[*warnings, *[warning["code"] for warning in snippet_presentation.warnings]],
             next_actions=next_actions,
+            response_style=snippet_presentation.response_style,
+            primary_snippet=snippet_presentation.primary_snippet,
+            supporting_snippets=snippet_presentation.supporting_snippets,
+            snippet_metrics=snippet_presentation.metrics,
             metrics=metrics,
             diagnostics=diagnostics,
             answer_outline=answer_outline,
@@ -250,27 +265,7 @@ def _drop_low_value_context_section(content: str, title: str | None = None, head
 
 
 def context_pack_snippet(item: DocsChunk) -> dict[str, Any] | None:
-    metadata = item.metadata or {}
-    if not isinstance(metadata, dict):
-        return None
-    snippets = metadata.get("code_snippets") or []
-    if not isinstance(snippets, list):
-        return None
-    snippet = snippets[0] if snippets and isinstance(snippets[0], dict) else None
-    if not snippet:
-        return None
-    code = str(snippet.get("code") or "").strip()
-    if not code:
-        return None
-    if not looks_like_code_or_command(code):
-        return None
-    language = str(snippet.get("language") or "").strip() or None
-    title = item.title or metadata.get("title") or "section"
-    return {
-        "language": language,
-        "code": code,
-        "why_relevant": f"code example extracted from matching {title} section",
-    }
+    return best_context_pack_snippet(item)
 
 
 def project_why_selected(item: Any) -> str:

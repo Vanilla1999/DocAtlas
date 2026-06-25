@@ -93,6 +93,8 @@ class BenchmarkCase:
     library: str | None = None
     ecosystem: str | None = None
     version: str | None = None
+    source_type: str | None = None
+    docs_url: str | None = None
     expected_sources: list[str] = field(default_factory=list)
     forbidden_sources: list[str] = field(default_factory=list)
     expected_domains: list[str] = field(default_factory=list)
@@ -100,6 +102,8 @@ class BenchmarkCase:
     expected_source_patterns: list[str] = field(default_factory=list)
     expected_doc_scope: str | None = None
     expected_facts: list[str] = field(default_factory=list)
+    expected_symbols: list[str] = field(default_factory=list)
+    expected_languages: list[str] = field(default_factory=list)
     context7_library_id: str | None = None
     not_applicable_for: list[str] = field(default_factory=list)
     mode: str | None = None
@@ -140,6 +144,7 @@ class NormalizedBenchmarkResult:
     dependency_preparation: dict[str, Any] | None = None
     project_preparation: dict[str, Any] | None = None
     routing_observed: dict[str, Any] | None = None
+    snippet_eval: dict[str, Any] | None = None
 
     def is_not_applicable(self) -> bool:
         return self.status in ("not_applicable",)
@@ -388,24 +393,66 @@ UNIFIED_CONTEXT_CASES: list[BenchmarkCase] = [
         not_applicable_for=["context7"], expected_source_patterns=["anyhow"]),
 ]
 
+SNIPPET_FIRST_CASES: list[BenchmarkCase] = [
+    BenchmarkCase(id="fastapi_depends_snippet",
+        query="How do I use FastAPI Depends?",
+        suite="snippet-first", library="fastapi", ecosystem="python",
+        expected_domains=["fastapi.tiangolo.com"], forbidden_domains=["click.palletsprojects.com", "riverpod.dev", "bloclibrary.dev"],
+        expected_source_patterns=["fastapi"], expected_symbols=["Depends"], expected_languages=["python"],
+        context7_library_id="/fastapi/fastapi"),
+    BenchmarkCase(id="click_command_group_snippet",
+        query="Show a Click command group example.",
+        suite="snippet-first", library="click", ecosystem="python", docs_url="https://click.palletsprojects.com/",
+        expected_domains=["click.palletsprojects.com"], forbidden_domains=["fastapi.tiangolo.com", "riverpod.dev", "bloclibrary.dev"],
+        expected_source_patterns=["click"], expected_symbols=["@click.group", "click.group"], expected_languages=["python"],
+        context7_library_id="/pallets/click"),
+    BenchmarkCase(id="riverpod_autodispose_snippet",
+        query="Riverpod ref.watch provider example.",
+        suite="snippet-first", library="riverpod", ecosystem="dart", source_type="web",
+        expected_domains=["riverpod.dev", "pub.dev"], forbidden_domains=["fastapi.tiangolo.com", "click.palletsprojects.com", "bloclibrary.dev"],
+        expected_source_patterns=["riverpod"], expected_symbols=["ref.watch"], expected_languages=["dart"],
+        context7_library_id="/rrousselgit/riverpod"),
+    BenchmarkCase(id="flutter_bloc_provider_snippet",
+        query="flutter_bloc BlocProvider example.",
+        suite="snippet-first", library="flutter_bloc", ecosystem="dart", source_type="web",
+        expected_domains=["bloclibrary.dev", "pub.dev"], forbidden_domains=["fastapi.tiangolo.com", "click.palletsprojects.com", "riverpod.dev"],
+        expected_source_patterns=["bloc"], expected_symbols=["BlocProvider"], expected_languages=["dart"],
+        context7_library_id="/felangel/bloc"),
+    BenchmarkCase(id="anyhow_context_snippet",
+        query="How do I wrap an error with anyhow Context for the dependency version in this project?",
+        suite="snippet-first", ecosystem="rust", mode="auto",
+        not_applicable_for=["context7"], expected_domains=["docs.rs"], expected_source_patterns=["anyhow"],
+        expected_symbols=["Context", "with_context"], expected_languages=["rust"]),
+    BenchmarkCase(id="project_command_snippet",
+        query="Show the project test command.",
+        suite="snippet-first", mode="project",
+        not_applicable_for=["context7"], expected_doc_scope="project", expected_symbols=["uv run pytest"], expected_languages=["bash"]),
+    BenchmarkCase(id="mixed_fastapi_project_snippet",
+        query="How do I use FastAPI Depends while following this project?",
+        suite="snippet-first", library="fastapi", ecosystem="python", mode="auto",
+        not_applicable_for=["context7"], expected_domains=["fastapi.tiangolo.com"], expected_source_patterns=["fastapi"],
+        expected_symbols=["Depends"], expected_languages=["python"]),
+]
+
 QUICK_CASES: list[str] = [
     "fastapi_depends", "click_command_group", "riverpod_autodispose",
     "bloc_provider", "project_lifecycle", "exact_fastapi_version",
     "unified_project_auto", "unified_dependency_auto", "unified_library_only", "unified_mixed_partial_confirmation", "unified_latest_fallback", "unified_dependency",
+    "fastapi_depends_snippet", "click_command_group_snippet", "riverpod_autodispose_snippet", "flutter_bloc_provider_snippet", "anyhow_context_snippet", "project_command_snippet", "mixed_fastapi_project_snippet",
 ]
 
 
 def _all_cases() -> list[BenchmarkCase]:
-    return PUBLIC_DOCS_CASES + PROJECT_DOCS_CASES + EXACT_VERSION_CASES + UNIFIED_CONTEXT_CASES
+    return PUBLIC_DOCS_CASES + PROJECT_DOCS_CASES + EXACT_VERSION_CASES + UNIFIED_CONTEXT_CASES + SNIPPET_FIRST_CASES
 
 
 def _filter_cases(suites: list[str] | None, quick: bool) -> list[BenchmarkCase]:
     all_c = _all_cases()
+    if suites:
+        all_c = [c for c in all_c if c.suite in suites]
     if quick:
         quick_set = set(QUICK_CASES)
         return [c for c in all_c if c.id in quick_set]
-    if suites:
-        return [c for c in all_c if c.suite in suites]
     return all_c
 
 
@@ -439,6 +486,7 @@ class DocAtlasDirectProvider(BenchmarkProvider):
         self.docmancer_home: Path | None = None
         self.db_path: Path | None = None
         self._dependency_fixture_path: Path | None = None
+        self._project_command_fixture_path: Path | None = None
 
     def _isolated_env(self):
         """Context manager for isolated DOCMANCER_HOME environment."""
@@ -477,6 +525,29 @@ class DocAtlasDirectProvider(BenchmarkProvider):
     async def setup(self) -> None:
         with self._isolated_env():
             _ = self._get_service()
+
+
+    def _project_command_fixture(self) -> str:
+        if self._project_command_fixture_path is None:
+            root = (self.runtime_dir or Path(tempfile.gettempdir())) / "fixtures" / "snippet_project_command"
+            if root.exists():
+                shutil.rmtree(root)
+            root.mkdir(parents=True, exist_ok=True)
+            (root / "README.md").write_text(
+                """# Snippet project command fixture
+
+Use this command to run the project tests:
+
+```bash
+uv run pytest
+```
+""",
+                encoding="utf-8",
+            )
+            service = self._get_service()
+            service.sync_project_docs(str(root), with_vectors=False)
+            self._project_command_fixture_path = root
+        return str(self._project_command_fixture_path)
 
     def _dependency_fixture_project(self) -> str:
         if self._dependency_fixture_path is None:
@@ -736,10 +807,10 @@ from Cargo metadata and automatically retrieves dependency documentation.
                 lib = case.library or case.id
                 eco = case.ecosystem
                 ver = case.version
-                docs_url = {
+                docs_url = case.docs_url or {
                     "fastapi": "https://fastapi.tiangolo.com/",
+                    "click": "https://click.palletsprojects.com/",
                     "httpx": "https://www.python-httpx.org/",
-                    "riverpod": f"https://pub.dev/documentation/riverpod/{ver}/" if ver else "https://pub.dev/documentation/riverpod/latest/",
                     "anyhow": f"https://docs.rs/anyhow/{ver}/" if ver else "https://docs.rs/anyhow/latest/",
                 }.get(lib)
                 key = f"{eco}:{lib}:{ver}"
@@ -752,7 +823,7 @@ from Cargo metadata and automatically retrieves dependency documentation.
                     diag.latency_ms = round((time.perf_counter() - t0) * 1000, 3)
                     return diag
 
-                info = service.resolve_library(lib, ecosystem=eco, version=ver, docs_url=docs_url)
+                info = service.resolve_library(lib, ecosystem=eco, version=ver, docs_url=docs_url, source_type=case.source_type)
                 if info.library_id is None:
                     diag.status = "not_supported"
                     diag.reason_code = "unresolved"
@@ -774,7 +845,7 @@ from Cargo metadata and automatically retrieves dependency documentation.
                     diag.pages = pages
                     diag.chunks = chunks
                 else:
-                    refresh_result = service.refresh_docs(lib, ecosystem=eco, version=ver, docs_url=docs_url, force=False)
+                    refresh_result = service.refresh_docs(lib, ecosystem=eco, version=ver, docs_url=docs_url or case.docs_url, source_type=case.source_type, force=False)
                     diag.status = "refreshed"
                     post_inspect = service.inspect_library_docs(info.library_id)
                     diag.pages = int(getattr(post_inspect, "pages", 0) or getattr(refresh_result, "pages_indexed", 0) or 0)
@@ -831,9 +902,10 @@ from Cargo metadata and automatically retrieves dependency documentation.
             dependency_preparation: dict[str, Any] | None = None
             project_preparation: dict[str, Any] | None = None
             routing_observed: dict[str, Any] | None = None
+            snippet_eval: dict[str, Any] | None = None
 
             try:
-                uses_dependency_fixture = case.id in {"unified_dependency_auto", "unified_dependency"}
+                uses_dependency_fixture = case.id in {"unified_dependency_auto", "unified_dependency", "anyhow_context_snippet"}
                 case_project_path = None
                 if uses_dependency_fixture:
                     case_project_path = self._dependency_fixture_project()
@@ -866,7 +938,7 @@ from Cargo metadata and automatically retrieves dependency documentation.
                                 project_preparation=project_preparation)
 
                 should_preindex = self.benchmark_mode == "preindexed" and bool(case.library) and not uses_dependency_fixture and (
-                    case.suite in ("public-docs", "exact-version")
+                    case.suite in ("public-docs", "exact-version", "snippet-first")
                     or case.id in {"unified_library_only", "unified_latest_fallback", "unified_dependency"}
                 )
                 if should_preindex:
@@ -884,7 +956,82 @@ from Cargo metadata and automatically retrieves dependency documentation.
                             sources, snippets, answer_text, warnings, reason_codes,
                             exact_version_used, preindex=preindex_diag)
 
-                if case.suite == "unified-context":
+                if case.suite == "snippet-first":
+                    if case.id == "project_command_snippet":
+                        fixture = self._project_command_fixture()
+                        result = await asyncio.to_thread(
+                            service.get_project_context,
+                            fixture,
+                            case.query,
+                            tokens=4000,
+                            mode="project-only",
+                            response_style="snippet-first",
+                        )
+                        setup_calls += 1
+                    elif case.id == "mixed_fastapi_project_snippet":
+                        fixture = self._project_command_fixture()
+                        result = await asyncio.to_thread(
+                            service.get_docs_context,
+                            case.query,
+                            project_path=fixture,
+                            library=case.library,
+                            ecosystem=case.ecosystem,
+                            mode="auto",
+                            tokens=4000,
+                            allow_network=False,
+                            prepare_project_docs=False,
+                            response_style="snippet-first",
+                        )
+                        setup_calls += 1
+                    elif case.id == "anyhow_context_snippet":
+                        case_project_path = case_project_path or self._dependency_fixture_project()
+                        result = await asyncio.to_thread(
+                            service.get_docs_context,
+                            case.query,
+                            project_path=case_project_path,
+                            library=None,
+                            ecosystem=None,
+                            version=None,
+                            mode="auto",
+                            tokens=4000,
+                            allow_network=False,
+                            prepare_project_docs=False,
+                            response_style="snippet-first",
+                        )
+                        setup_calls += 1
+                    else:
+                        result = await asyncio.to_thread(
+                            service.get_docs,
+                            case.library,
+                            topic=case.query,
+                            tokens=4000,
+                            ecosystem=case.ecosystem,
+                            version=case.version,
+                            docs_url=case.docs_url,
+                            source_type=case.source_type,
+                            response_style="snippet-first",
+                        )
+                        setup_calls += 1
+                    raw = dataclasses.asdict(result) if dataclasses.is_dataclass(result) else dict(getattr(result, "__dict__", {}) or {})
+                    primary = raw.get("primary_snippet") or {}
+                    response_style_observed = raw.get("response_style")
+                    if primary:
+                        src = str(primary.get("source") or primary.get("source_url") or "unknown")
+                        sources.append(SourceRef(url=src, title=primary.get("title"), rank=1, doc_scope=primary.get("doc_scope")))
+                        snippets.append(Snippet(text=str(primary.get("code") or "")[:500], source=src, rank=1))
+                    context_pack = raw.get("context_pack") or []
+                    for i, item in enumerate(context_pack[:5], start=2):
+                        source_str = str(item.get("source") or item.get("url") or item.get("path") or "unknown")
+                        if isinstance(item.get("source"), dict):
+                            source_str = str((item.get("source") or {}).get("url") or (item.get("source") or {}).get("path") or source_str)
+                        sources.append(SourceRef(url=source_str, title=item.get("title"), rank=i, doc_scope=item.get("doc_scope")))
+                    snippet_eval = _evaluate_primary_snippet(primary, case, response_style_observed=response_style_observed)
+                    answer_text = json.dumps(snippet_eval, sort_keys=True)
+                    status = "success" if snippet_eval.get("success") else snippet_eval.get("reason_code", "snippet_failed")
+                    reason_codes.extend(snippet_eval.get("reason_codes") or [])
+                    exact_version_used = primary.get("version") or exact_version_used
+                    warnings.extend(str(w.get("code") or w) if isinstance(w, dict) else str(w) for w in raw.get("warnings") or [])
+                elif case.suite == "unified-context":
                     if uses_dependency_fixture:
                         case_project_path = case_project_path or self._dependency_fixture_project()
                     else:
@@ -987,7 +1134,7 @@ from Cargo metadata and automatically retrieves dependency documentation.
                 else:
                     result = await asyncio.to_thread(
                         service.get_docs, case.library, topic=case.query, tokens=2000,
-                        ecosystem=case.ecosystem, version=case.version)
+                        ecosystem=case.ecosystem, version=case.version, docs_url=case.docs_url, source_type=case.source_type)
                     setup_calls += 1
                     
                     # Extract exact-version diagnostics from API response
@@ -1052,7 +1199,8 @@ from Cargo metadata and automatically retrieves dependency documentation.
                 dependency_fixture=dependency_fixture_diag,
                 dependency_preparation=dependency_preparation,
                 project_preparation=project_preparation,
-                routing_observed=routing_observed)
+                routing_observed=routing_observed,
+            snippet_eval=snippet_eval)
 
     def _dependency_auto_failure_reason(self, *, result: Any, mode_selected: str, sources: list[SourceRef], exact_version_used: str | None) -> str | None:
         if getattr(result, "requires_confirmation", False):
@@ -1076,7 +1224,7 @@ from Cargo metadata and automatically retrieves dependency documentation.
             exact_version_used, cont=None, forb=None, expt=None, preindex=None,
             deduplication_dropped_count=0, dependency_fixture=None,
             dependency_preparation=None, project_preparation=None,
-            routing_observed=None):
+            routing_observed=None, snippet_eval=None):
         # Compute exact-version fields
         exact_version_expected = case.version if case.suite in {"exact-version", "unified-context"} else None
         exact_version_match = None
@@ -1133,7 +1281,8 @@ from Cargo metadata and automatically retrieves dependency documentation.
             dependency_fixture=dependency_fixture,
             dependency_preparation=dependency_preparation,
             project_preparation=project_preparation,
-            routing_observed=routing_observed)
+            routing_observed=routing_observed,
+            snippet_eval=snippet_eval)
 
     def _na_result(self, case):
         return self._build_result(case, "not_applicable", 0, 0, [], [], None,
@@ -1297,6 +1446,69 @@ class Context7MCPProvider(BenchmarkProvider):
             raw_response={"text_length": len(text) if text else 0})
 
 
+def _evaluate_primary_snippet(primary: dict[str, Any], case: BenchmarkCase, *, response_style_observed: str | None) -> dict[str, Any]:
+    code = str(primary.get("code") or "") if isinstance(primary, dict) else ""
+    language = str(primary.get("language") or "").lower() if isinstance(primary, dict) else ""
+    source = str(primary.get("source") or primary.get("source_url") or "") if isinstance(primary, dict) else ""
+    source_lower = source.lower()
+    symbol_match = True if not case.expected_symbols else any(symbol.lower() in code.lower() for symbol in case.expected_symbols)
+    language_match = True if not case.expected_languages else language in {item.lower() for item in case.expected_languages}
+    source_correct = True
+    if case.expected_domains:
+        try:
+            domain = urlparse(source).netloc.lower()
+        except Exception:
+            domain = ""
+        source_correct = any(domain == expected.lower() or domain.endswith("." + expected.lower()) for expected in case.expected_domains)
+    elif case.expected_source_patterns:
+        source_correct = any(pattern.lower() in source_lower for pattern in case.expected_source_patterns)
+    scope_correct = True
+    if case.expected_doc_scope:
+        scope_correct = primary.get("doc_scope") == case.expected_doc_scope
+    exact_ok = True
+    if case.id == "anyhow_context_snippet":
+        exact_ok = primary.get("version") == "1.0.86" or primary.get("requested_version") == "1.0.86"
+    present = bool(code.strip())
+    snippet_first = response_style_observed == "snippet-first"
+    truncated = bool(primary.get("truncated"))
+    noisy = _snippet_noise(code)
+    reason_codes = []
+    for ok, code_name in (
+        (present, "snippet_missing"),
+        (snippet_first, "snippet_first_not_applied"),
+        (symbol_match, "snippet_symbol_missing"),
+        (language_match, "snippet_language_mismatch"),
+        (source_correct, "snippet_source_mismatch"),
+        (scope_correct, "snippet_scope_mismatch"),
+        (exact_ok, "snippet_exact_version_mismatch"),
+    ):
+        if not ok:
+            reason_codes.append(code_name)
+    if noisy:
+        reason_codes.append("snippet_noise")
+    return {
+        "success": present and snippet_first and symbol_match and language_match and source_correct and scope_correct and exact_ok and not noisy,
+        "reason_code": reason_codes[0] if reason_codes else None,
+        "reason_codes": reason_codes or ["snippet_success"],
+        "snippet_present_at_1": present,
+        "primary_snippet_symbol_match": symbol_match,
+        "primary_snippet_language_match": language_match,
+        "primary_snippet_source_correct": source_correct,
+        "primary_snippet_exact_version_match": exact_ok,
+        "snippet_first_applied": snippet_first,
+        "snippet_noise": noisy,
+        "snippet_truncated": truncated,
+        "primary_language": language or None,
+        "primary_source": source or None,
+    }
+
+
+def _snippet_noise(code: str) -> bool:
+    stripped = (code or "").strip().lower()
+    if not stripped:
+        return True
+    return stripped in {"copy", "download", "open in new tab"}
+
 # ── Shared source detection ──────────────────────────────────
 
 def _detect_contamination(sources: list[SourceRef], case: BenchmarkCase) -> list[str]:
@@ -1446,6 +1658,8 @@ def compute_metrics(results: list[NormalizedBenchmarkResult]) -> dict[str, Any]:
     
     # Exact-version correctness: only count true exact matches
     ev_correct = sum(1 for r in ev_cases if r.is_success() and r.exact_version_match is True and r.expected_source_hits)
+    snippet_cases = [r for r in applicable if r.suite == "snippet-first"]
+    snippet_evals = [r.snippet_eval or {} for r in snippet_cases]
 
     return {
         "total_queries": total,
@@ -1484,6 +1698,13 @@ def compute_metrics(results: list[NormalizedBenchmarkResult]) -> dict[str, Any]:
         "exact_version_correctness_on_success": round(ev_correct / max(ev_success, 1), 4) if ev_success > 0 else None,
         "deduplication_drop_rate": round(dedup_drops / max(n_app, 1), 4),
         "deduplication_dropped_count": dedup_drops,
+        "snippet_present_at_1": round(sum(1 for e in snippet_evals if e.get("snippet_present_at_1")) / max(len(snippet_evals), 1), 4) if snippet_cases else None,
+        "primary_snippet_source_correct": round(sum(1 for e in snippet_evals if e.get("primary_snippet_source_correct")) / max(len(snippet_evals), 1), 4) if snippet_cases else None,
+        "primary_snippet_language_match": round(sum(1 for e in snippet_evals if e.get("primary_snippet_language_match")) / max(len(snippet_evals), 1), 4) if snippet_cases else None,
+        "primary_snippet_symbol_match": round(sum(1 for e in snippet_evals if e.get("primary_snippet_symbol_match")) / max(len(snippet_evals), 1), 4) if snippet_cases else None,
+        "snippet_noise_rate": round(sum(1 for e in snippet_evals if e.get("snippet_noise")) / max(len(snippet_evals), 1), 4) if snippet_cases else None,
+        "snippet_truncation_rate": round(sum(1 for e in snippet_evals if e.get("snippet_truncated")) / max(len(snippet_evals), 1), 4) if snippet_cases else None,
+        "snippet_first_application_rate": round(sum(1 for e in snippet_evals if e.get("snippet_first_applied")) / max(len(snippet_evals), 1), 4) if snippet_cases else None,
     }
 
 
@@ -1869,6 +2090,9 @@ async def run_benchmark(
                     "forbidden_source_hits": result.forbidden_source_hits,
                     "expected_source_hits": result.expected_source_hits,
                     "expected_domains": case.expected_domains,
+                    "expected_symbols": case.expected_symbols,
+                    "expected_languages": case.expected_languages,
+                    "snippet_eval": result.snippet_eval,
                     "forbidden_domains": case.forbidden_domains,
                     "expected_doc_scope": case.expected_doc_scope,
                     "manual_review_required": result.manual_review_required,
@@ -1977,7 +2201,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Live MCP benchmark: DocAtlas vs Context7")
     parser.add_argument("--mode", choices=["zero-setup", "preindexed", "both"], default="zero-setup",
                         help="benchmark mode (default: zero-setup)")
-    parser.add_argument("--suite", choices=["public-docs", "project-docs", "exact-version", "unified-context", "all"],
+    parser.add_argument("--suite", choices=["public-docs", "project-docs", "exact-version", "unified-context", "snippet-first", "all"],
                         default="all", help="suite filter (default: all)")
     parser.add_argument("--save-raw", action="store_true", help="save raw outputs per query")
     parser.add_argument("--output-dir", help="custom output directory")

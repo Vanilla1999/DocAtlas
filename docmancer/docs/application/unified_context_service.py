@@ -4,11 +4,20 @@ from dataclasses import asdict, is_dataclass, replace
 from typing import Any
 
 from docmancer.docs.application.project_context_service import context_pack_snippet
+from docmancer.docs.domain.snippets import build_snippet_presentation, validate_response_style
 from docmancer.docs.exact_version import resolve_python_versioned_docs
 from docmancer.docs.models import DocsResult, ProjectContextResult, UnifiedDocsContextResult
+from docmancer.docs.resolver import docs_snapshot_is_exact
 
 
 _LATEST_ALIASES = {"latest", "stable", "main", "*"}
+
+
+def _exact_version_match(result: DocsResult) -> bool | None:
+    if not result.requested_version:
+        return None
+    url = result.identity.get("docs_url_resolved") or result.identity.get("docs_url") if isinstance(result.identity, dict) else None
+    return docs_snapshot_is_exact(result.requested_version, url) and (result.resolved_version or result.version) == result.requested_version
 
 
 class UnifiedDocsContextService:
@@ -40,7 +49,9 @@ class UnifiedDocsContextService:
         allow_latest_fallback: bool | None = None,
         force_refresh: bool | None = None,
         details: bool | None = None,
+        response_style: str | None = None,
     ) -> UnifiedDocsContextResult:
+        response_style = validate_response_style(response_style)
         mode_requested = (mode or "auto").lower()
         prepare_project_docs = True if prepare_project_docs is None else bool(prepare_project_docs)
         allow_network = bool(allow_network) if allow_network is not None else False
@@ -99,7 +110,7 @@ class UnifiedDocsContextService:
         if mode_selected == "project":
             delegated_mode = "auto" if project_auto else "project-only"
             routing["delegated_mode"] = delegated_mode
-            project_result = self.service.get_project_context(project_path, question, tokens=tokens, limit=limit, expand=expand, module=module, module_path=module_path, scope=scope, mode=delegated_mode)
+            project_result = self.service.get_project_context(project_path, question, tokens=tokens, limit=limit, expand=expand, module=module, module_path=module_path, scope=scope, mode=delegated_mode, response_style=response_style)
         elif mode_selected == "dependency":
             if not allow_network and self._dependency_prefetch_needed(project_path):
                 lanes["dependency"] = {"status": "confirmation_required", "source_count": 0}
@@ -114,9 +125,9 @@ class UnifiedDocsContextService:
                     lanes=lanes,
                     lane_details=lane_details if details else {},
                 )
-            project_result = self.service.get_project_context(project_path, question, tokens=tokens, limit=limit, expand=expand, library=library, libraries=libraries, ecosystem=ecosystem, version=version, module=module, module_path=module_path, scope=scope, mode="deps-only")
+            project_result = self.service.get_project_context(project_path, question, tokens=tokens, limit=limit, expand=expand, library=library, libraries=libraries, ecosystem=ecosystem, version=version, module=module, module_path=module_path, scope=scope, mode="deps-only", response_style=response_style)
         elif mode_selected == "mixed":
-            project_result = self.service.get_project_context(project_path, question, tokens=tokens, limit=limit, expand=expand, library=library, libraries=libraries, ecosystem=ecosystem, version=version, module=module, module_path=module_path, scope=scope, mode="auto")
+            project_result = self.service.get_project_context(project_path, question, tokens=tokens, limit=limit, expand=expand, library=library, libraries=libraries, ecosystem=ecosystem, version=version, module=module, module_path=module_path, scope=scope, mode="auto", response_style=response_style)
             routing["dependency_detected"] = bool(getattr(project_result, "dependency_docs", None))
             explicit_library_results = []
             for lib in libs:
@@ -124,7 +135,7 @@ class UnifiedDocsContextService:
                 if safe is not None:
                     explicit_library_results.append(safe)
                     continue
-                explicit_library_results.append(self._get_library_docs_with_latest_fallback(lib, question=question, tokens=tokens, ecosystem=ecosystem, version=version, docs_url=docs_url, source_type=source_type, force_refresh=force_refresh, project_path=project_path, allow_network=allow_network, allow_latest_fallback=allow_latest_fallback))
+                explicit_library_results.append(self._get_library_docs_with_latest_fallback(lib, question=question, tokens=tokens, ecosystem=ecosystem, version=version, docs_url=docs_url, source_type=source_type, force_refresh=force_refresh, project_path=project_path, allow_network=allow_network, allow_latest_fallback=allow_latest_fallback, response_style=response_style))
             library_results = [item for item in explicit_library_results if isinstance(item, DocsResult)]
             lane_details["library"] = [self._to_dict(item) for item in explicit_library_results]
             confirmations = [item for item in explicit_library_results if isinstance(item, UnifiedDocsContextResult)]
@@ -146,7 +157,7 @@ class UnifiedDocsContextService:
                 safe = self._ensure_library_safe(lib, ecosystem, version, source_type, docs_url, force_refresh, allow_network)
                 if safe is not None:
                     return safe
-                result = self._get_library_docs_with_latest_fallback(lib, question=question, tokens=tokens, ecosystem=ecosystem, version=version, docs_url=docs_url, source_type=source_type, force_refresh=force_refresh, project_path=project_path, allow_network=allow_network, allow_latest_fallback=allow_latest_fallback)
+                result = self._get_library_docs_with_latest_fallback(lib, question=question, tokens=tokens, ecosystem=ecosystem, version=version, docs_url=docs_url, source_type=source_type, force_refresh=force_refresh, project_path=project_path, allow_network=allow_network, allow_latest_fallback=allow_latest_fallback, response_style=response_style)
                 if isinstance(result, UnifiedDocsContextResult):
                     return result
                 library_results.append(result)
@@ -193,6 +204,13 @@ class UnifiedDocsContextService:
         self._refresh_lane_counts(lanes, context_pack)
         trust_contract = self._trust_contract(context_pack, project_result, library_results)
         source_summary = self._source_summary(context_pack, trust_contract)
+        lane_priority = self._lane_priority_for(mode_selected)
+        snippet_presentation = build_snippet_presentation(
+            context_pack,
+            question=question,
+            response_style=response_style,
+            lane_priority=lane_priority,
+        )
         answer_available = bool(context_pack)
         pending_actions = self._collect_pending_actions(pending_lane_results)
         requested_lanes = [name for name, lane in lanes.items() if lane.get("status") != "not_requested"]
@@ -221,8 +239,17 @@ class UnifiedDocsContextService:
             next_action=pending_actions.get("next_action"),
             next_actions=combined_next_actions,
             arguments_patch=pending_actions.get("arguments_patch"),
-            warnings=warnings,
-            metrics={"context_pack_items": len(context_pack)},
+            warnings=[*warnings, *snippet_presentation.warnings],
+            response_style=snippet_presentation.response_style,
+            primary_snippet=snippet_presentation.primary_snippet,
+            supporting_snippets=snippet_presentation.supporting_snippets,
+            snippet_metrics=snippet_presentation.metrics,
+            presentation={
+                "project_constraints_count": source_summary.get("project", 0),
+                "primary_snippet_lane": (snippet_presentation.primary_snippet or {}).get("origin_lane") if snippet_presentation.primary_snippet else None,
+                "project_evidence_primary": source_summary.get("project", 0) > 0,
+            },
+            metrics={"context_pack_items": len(context_pack), "snippet_metrics": snippet_presentation.metrics},
             contamination=contamination,
             deduplication=deduplication,
             lane_details=lane_details if details else {},
@@ -324,8 +351,9 @@ class UnifiedDocsContextService:
         project_path: str | None,
         allow_network: bool,
         allow_latest_fallback: bool,
+        response_style: str | None = None,
     ) -> DocsResult | UnifiedDocsContextResult:
-        exact = self.service.get_docs(library, topic=question, tokens=tokens, ecosystem=ecosystem, version=version, docs_url=docs_url, source_type=source_type, force_refresh=force_refresh, project_path=project_path)
+        exact = self.service.get_docs(library, topic=question, tokens=tokens, ecosystem=ecosystem, version=version, docs_url=docs_url, source_type=source_type, force_refresh=force_refresh, project_path=project_path, response_style=response_style)
         exact_diag = (exact.diagnostics or {}).get("exact_version") if isinstance(exact.diagnostics, dict) else None
         if not (exact.status == "exact_version_not_supported" and allow_latest_fallback and isinstance(exact_diag, dict) and exact_diag.get("fallback_available")):
             return exact
@@ -346,7 +374,7 @@ class UnifiedDocsContextService:
                     lanes={**self._empty_lanes(), "library": {"status": "confirmation_required", "source_count": 0, "canonical_ids": [getattr(info, "library_id", None)] if getattr(info, "library_id", None) else [], "requires_confirmation": True, "next_action": {"type": "get_docs_context", "tool": "get_docs_context", "arguments_patch": {"allow_network": True, "allow_latest_fallback": True}}}},
                 )
 
-        latest = self.service.get_docs(library, topic=question, tokens=tokens, ecosystem=ecosystem, version=None, docs_url=fallback_docs_url or docs_url, source_type=source_type, force_refresh=force_refresh, project_path=project_path)
+        latest = self.service.get_docs(library, topic=question, tokens=tokens, ecosystem=ecosystem, version=None, docs_url=fallback_docs_url or docs_url, source_type=source_type, force_refresh=force_refresh, project_path=project_path, response_style=response_style)
         if latest.results:
             diag = dict(latest.diagnostics or {})
             diag["exact_version"] = {
@@ -406,6 +434,7 @@ class UnifiedDocsContextService:
         items = []
         for chunk in result.results or []:
             token_estimate = max(1, len(chunk.content or "") // 4)
+            chunk_metadata = chunk.metadata or {}
             item = {
                 "doc_scope": "library",
                 "origin_lane": "library",
@@ -417,7 +446,11 @@ class UnifiedDocsContextService:
                 "canonical_id": result.library_id,
                 "library_id": result.library_id,
                 "library": result.library,
-                "version": result.resolved_version or result.version,
+                "version": chunk_metadata.get("version") or result.resolved_version or result.version,
+                "requested_version": chunk_metadata.get("requested_version") or result.requested_version,
+                "docs_exactness": chunk_metadata.get("docs_exactness") or result.docs_exactness,
+                "docs_binding_source": chunk_metadata.get("docs_binding_source") or result.docs_binding_source,
+                "exact_version_match": chunk_metadata.get("exact_version_match") if "exact_version_match" in chunk_metadata else _exact_version_match(result),
                 "freshness": "stale" if result.stale_before_refresh else "current",
                 "why_selected": "library docs resolved through Docmancer registry",
                 "token_estimate": token_estimate,
@@ -494,6 +527,19 @@ class UnifiedDocsContextService:
                 if "fallback" in warning or "stale" in warning:
                     risky.append({"source": result.library_id, "doc_scope": "library", "origin_lane": "library", "why_selected": str(warning), "freshness": "unknown", "version_binding": result.docs_exactness, "risk_flags": [str(warning)]})
         return {"selected": selected, "rejected": rejected, "risky": risky}
+
+
+    @staticmethod
+    def _lane_priority_for(mode_selected: str) -> list[str]:
+        if mode_selected == "library":
+            return ["library"]
+        if mode_selected == "dependency":
+            return ["dependency"]
+        if mode_selected == "project":
+            return ["project"]
+        if mode_selected == "mixed":
+            return ["project", "dependency", "library"]
+        return ["project", "dependency", "library"]
 
     @staticmethod
     def _source_summary(items: list[dict[str, Any]], trust: dict[str, Any]) -> dict[str, int]:

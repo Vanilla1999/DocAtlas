@@ -18,6 +18,16 @@ get_docs_context(question, project_path?, library?, mode="auto")
 
 `get_docs_context` returns one source-grounded context pack by routing deterministically to project-owned docs, public library docs, exact dependency docs, or a mixed project-plus-library flow. It is additive: advanced users and existing agents can still call the lane-specific tools directly.
 
+`get_docs_context`, `get_library_docs`, and `get_project_context` also accept `response_style`: `auto`, `snippet-first`, or `evidence-first`. `auto` switches to snippet-first for coding/API/command/config questions when a usable snippet exists in the already selected trusted sources. `snippet-first` never removes `context_pack` or the Trust Contract, and it never creates fake code when no snippet exists.
+
+```json
+{
+  "question": "How do I use FastAPI Depends?",
+  "library": "fastapi",
+  "response_style": "snippet-first"
+}
+```
+
 1. **Library docs** — resolve, fetch, refresh, prefetch, inspect, and query public or registered documentation sources.
 2. **Project-owned docs** — discover, reconcile, stale-check, prune orphaned indexed entries, and query reviewable repository docs such as `README.md`, `docs/`, `wiki/`, `ARCHITECTURE.md`, ADRs, runbooks, roadmap files, and module/package docs in monorepos.
 3. **Dependency docs from project metadata** — read supported manifests/lockfiles and prefetch exact dependency documentation for the versions the project actually uses.

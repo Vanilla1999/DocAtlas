@@ -107,6 +107,10 @@ class DocsResult:
     identity: dict[str, Any] = field(default_factory=dict)
     policy: dict[str, Any] = field(default_factory=dict)
     diagnostics: dict[str, Any] = field(default_factory=dict)
+    response_style: str = "evidence-first"
+    primary_snippet: dict[str, Any] | None = None
+    supporting_snippets: list[dict[str, Any]] = field(default_factory=list)
+    snippet_metrics: dict[str, Any] = field(default_factory=dict)
     next_actions: list[str] = field(default_factory=list)
     result: Any = None
     candidates: list[dict[str, Any]] = field(default_factory=list)
@@ -442,6 +446,10 @@ class ProjectContextResult:
     trust_contract: dict[str, Any] = field(default_factory=dict)
     warnings: list[str] = field(default_factory=list)
     next_actions: list[dict[str, Any]] = field(default_factory=list)
+    response_style: str = "evidence-first"
+    primary_snippet: dict[str, Any] | None = None
+    supporting_snippets: list[dict[str, Any]] = field(default_factory=list)
+    snippet_metrics: dict[str, Any] = field(default_factory=dict)
     metrics: dict[str, Any] = field(default_factory=dict)
     diagnostics: dict[str, Any] = field(default_factory=dict)
     answer_outline: dict[str, Any] = field(default_factory=dict)
@@ -469,6 +477,11 @@ class UnifiedDocsContextResult:
     next_actions: list[Any] = field(default_factory=list)
     arguments_patch: dict[str, Any] | None = None
     warnings: list[Any] = field(default_factory=list)
+    response_style: str = "evidence-first"
+    primary_snippet: dict[str, Any] | None = None
+    supporting_snippets: list[dict[str, Any]] = field(default_factory=list)
+    snippet_metrics: dict[str, Any] = field(default_factory=dict)
+    presentation: dict[str, Any] = field(default_factory=dict)
     metrics: dict[str, Any] = field(default_factory=dict)
     contamination: dict[str, Any] = field(default_factory=dict)
     deduplication: dict[str, Any] = field(default_factory=dict)

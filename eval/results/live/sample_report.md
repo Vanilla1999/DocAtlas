@@ -54,6 +54,18 @@ Tested against project-owned README, runbooks, and ADRs. DocAtlas returned Trust
 
 Unified-context metrics include `routing_accuracy`, `coverage_rate`, `source_scope_correctness`, `contamination_rate`, `project_primary_rate`, `exact_version_correctness_on_success`, `confirmation_contract_correctness`, `setup_calls`, and `latency`.
 
+## Snippet-First
+
+| Case | Expected primary snippet | Deterministic checks |
+|---|---|---|
+| FastAPI Depends | `Depends` Python example | symbol, language, source domain |
+| Click group | `@click.group` / `click.group` Python example | symbol, language, source domain |
+| Riverpod autoDispose | Dart `autoDispose` / `keepAlive` / `ref.watch` example | symbol, language, source domain |
+| flutter_bloc BlocProvider | Dart `BlocProvider` example | symbol, language, source domain |
+| anyhow Context | Rust `Context` / `with_context` docs.rs example | symbol, language, exact dependency version |
+
+Snippet-first metrics include `snippet_present_at_1`, `primary_snippet_symbol_match`, `primary_snippet_language_match`, `primary_snippet_source_correct`, `snippet_noise_rate`, `snippet_truncation_rate`, `snippet_first_application_rate`, and `contamination_rate`.
+
 ## Claims We Can Make
 
 - DocAtlas provides verifiable source attribution on every answer.

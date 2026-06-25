@@ -96,6 +96,16 @@ get_docs_context(question, project_path?, library?, mode="auto")
 
 DocAtlas now provides one high-level MCP entry point for project, library, dependency, and mixed documentation context. It does not replace the lane-specific tools, and it does not fetch missing docs automatically unless the caller explicitly allows network work.
 
+For coding/API/command questions, tools accept `response_style` with `auto`, `snippet-first`, or `evidence-first`. In `auto`, DocAtlas returns a trusted `primary_snippet` first when the selected sources contain a usable code/config/command example, while preserving `context_pack`, source attribution, exact-version diagnostics, and the Trust Contract. Snippets are extracted from indexed documentation; DocAtlas does not synthesize code.
+
+```json
+{
+  "question": "How do I use FastAPI Depends?",
+  "library": "fastapi",
+  "response_style": "snippet-first"
+}
+```
+
 Advanced users can still call lane-specific tools directly.
 
 ```text
