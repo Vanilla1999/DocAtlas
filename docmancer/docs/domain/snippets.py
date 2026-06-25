@@ -239,7 +239,7 @@ def _score_candidate(candidate: SnippetCandidate, *, question: str, intent: Snip
     candidate.relevance_score = min(1.0, 0.55 * overlap + 0.25 * symbol_score + 0.10 * language_score + 0.10 * title_score)
     candidate.source_score = _source_score(candidate, lane_priority)
     candidate.completeness_score = 1.0 if candidate.complete and not candidate.truncated else 0.35
-    version_score = _version_score(candidate)
+    version_score = _version_relevance_score(candidate)
     usability_score = _usability_score(candidate)
     noise_penalty = internal_noise_score(candidate.code) * 0.2 + (0.25 if len(candidate.code.strip()) < 8 else 0.0)
     candidate.final_score = max(0.0, 0.35 * candidate.relevance_score + 0.20 * symbol_score + 0.15 * candidate.source_score + 0.10 * version_score + 0.10 * candidate.completeness_score + 0.10 * usability_score - noise_penalty)
@@ -359,7 +359,7 @@ def _source_score(candidate: SnippetCandidate, lane_priority: list[str] | None) 
     return min(1.0, score)
 
 
-def _version_score(candidate: SnippetCandidate) -> float:
+def _version_relevance_score(candidate: SnippetCandidate) -> float:
     if candidate.exact_version_match is True:
         return 1.0
     if candidate.requested_version and candidate.version and candidate.version == candidate.requested_version:
