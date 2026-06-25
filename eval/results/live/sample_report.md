@@ -43,12 +43,24 @@ Tested against project-owned README, runbooks, and ADRs. DocAtlas returned Trust
 | pydantic | 2.5.0 | Explicit unsupported (no patch-level docs) | 2.4.0 API (stale) |
 | fastapi | 0.115.0 | Explicit unsupported (latest only) | Generic/stale |
 
+## Unified Context
+
+| Case | Expected route | DocAtlas | Context7 |
+|---|---|---|---|
+| project-only | project | Project docs primary, Trust Contract included | N/A |
+| library-only | library | Library docs only | Public docs |
+| mixed | mixed | Project docs first, library docs supplementary | N/A |
+| dependency | dependency | Exact dependency docs or confirmation-required contract | N/A |
+
+Unified-context metrics include `routing_accuracy`, `coverage_rate`, `source_scope_correctness`, `contamination_rate`, `project_primary_rate`, `exact_version_correctness_on_success`, `confirmation_contract_correctness`, `setup_calls`, and `latency`.
+
 ## Claims We Can Make
 
 - DocAtlas provides verifiable source attribution on every answer.
 - SQLite FTS5 + local vector index enables offline, low-latency queries.
 - Project-owned docs ingestion gives context-specific answers that generic web search cannot.
 - Trust Contract mechanism transparently surfaces selected, rejected, and risky sources.
+- DocAtlas now provides one high-level MCP entry point for project, library, dependency, and mixed documentation context.
 
 ## Claims We Cannot Make Yet
 

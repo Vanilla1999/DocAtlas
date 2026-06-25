@@ -34,10 +34,10 @@ This section is a practical map of what Docmancer can do today and which tool or
 
 | Need | Current capability | CLI / MCP entrypoint | Current boundary |
 |---|---|---|---|
-| Query local repo docs | Discover, ingest, stale-check, bootstrap, and query README/docs/wiki/ADR/roadmap files plus module/package docs in monorepos. | `inspect_project_docs`, `ingest_project_docs`, `bootstrap_project_docs`, `get_project_docs`, `get_project_context`; CLI `doc-atlas ingest`, `doc-atlas query`. | Project docs must be indexed before they can be trusted; bootstrap stops before repo writes. |
+| Query local repo docs | Discover, ingest, stale-check, bootstrap, and query README/docs/wiki/ADR/roadmap files plus module/package docs in monorepos. | `get_docs_context`; advanced: `inspect_project_docs`, `ingest_project_docs`, `bootstrap_project_docs`, `get_project_docs`, `get_project_context`; CLI `doc-atlas ingest`, `doc-atlas query`. | Project docs must be indexed before they can be trusted; bootstrap stops before repo writes. |
 | Query a specific module | Use module-aware project-doc filters for packages, apps, services, crates, libraries, and similar module roots. | `get_project_docs(module_path=..., scope="module")`, `get_project_context(module_path=..., scope="module")`. | Module matching is exact; ambiguous module names return structured clarification instead of a guessed answer. |
-| Query public docs locally | Fetch, normalize, index, and query public docs sites. | CLI `doc-atlas add`, `doc-atlas query`; MCP `get_library_docs`, `prefetch_library_docs`. | First query requires indexing unless the source is already registered/indexed. |
-| Use exact dependency versions | Read supported project metadata and prefetch/query docs for resolved versions. | `inspect_project_docs`, `prefetch_project_dependency_docs`, `prefetch_project_docs`, `get_library_docs(project_path=...)`. | Strongest current support is Dart/Flutter and Rust metadata; dependency-docs prefetch may use the network and is separate from project-owned docs ingest. |
+| Query public docs locally | Fetch, normalize, index, and query public docs sites. | CLI `doc-atlas add`, `doc-atlas query`; MCP `get_docs_context`, `get_library_docs`, `prefetch_library_docs`. | First query requires indexing unless the source is already registered/indexed. |
+| Use exact dependency versions | Read supported project metadata and prefetch/query docs for resolved versions. | `get_docs_context(mode="dependency")`, `inspect_project_docs`, `prefetch_project_dependency_docs`, `prefetch_project_docs`, `get_library_docs(project_path=...)`. | Strongest current support is Dart/Flutter and Rust metadata; dependency-docs prefetch may use the network and is separate from project-owned docs ingest. |
 | Avoid repeated WebFetch | Register sources once, then query local indexes. | `resolve_library_id`, `get_library_docs`, `list_library_docs`; CLI `doc-atlas list`. | If no registered or confidently resolved docs source exists, user may still need to provide a docs URL. |
 | Keep docs private/local | Index local files and private docs without sending content to hosted docs services. | CLI `doc-atlas ingest`; MCP `ingest_project_docs`. | Cloud embedding extras are optional; default retrieval stack can stay local. |
 | Get compact context for agents | Return sections with headings, source attribution, extracted snippets, metadata, and token estimates. | CLI `doc-atlas query`, `doc-atlas context`; MCP query tools and `get_project_context`. | Snippets are extracted from source docs, not synthesized. |
@@ -45,6 +45,14 @@ This section is a practical map of what Docmancer can do today and which tool or
 | Diagnose docs runtime | Check config, storage, SQLite, Qdrant, indexes, agents, and MCP state. | CLI `doc-atlas doctor`, `doc-atlas qdrant status`; MCP `mcp doctor`. | Doctor output should continue moving toward more explicit severity/fix commands. |
 
 Important current boundary: `get_project_context(project_path, question)` is available as a compact MVP for combining indexed project-owned docs with one resolved dependency-doc source and a Trust Contract. `bootstrap_project_docs(project_path, question?)` is the safe onboarding shortcut before `get_project_context`; it can inspect and ingest/refresh existing reviewable docs, including module docs, but it stops before repository writes and dependency-docs network fetches.
+
+Recommended MCP entry point:
+
+```text
+get_docs_context(question, project_path?, library?, mode="auto")
+```
+
+DocAtlas now provides one high-level MCP entry point for project, library, dependency, and mixed documentation context. Advanced users can still call lane-specific tools directly. Missing library/dependency docs still require explicit network permission; exact-version requests do not silently fall back to latest docs.
 
 ## Core capabilities
 

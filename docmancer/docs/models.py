@@ -446,3 +446,30 @@ class ProjectContextResult:
     diagnostics: dict[str, Any] = field(default_factory=dict)
     answer_outline: dict[str, Any] = field(default_factory=dict)
     message: str | None = None
+
+
+@dataclass(frozen=True)
+class UnifiedDocsContextResult:
+    tool: str = "get_docs_context"
+    status: str = "success"
+    question: str = ""
+    mode_requested: str = "auto"
+    mode_selected: str = "auto"
+    routing: dict[str, Any] = field(default_factory=dict)
+    answer_available: bool = True
+    context_pack: list[dict[str, Any]] = field(default_factory=list)
+    lanes: dict[str, Any] = field(default_factory=dict)
+    source_summary: dict[str, int] = field(default_factory=dict)
+    trust_contract: dict[str, Any] = field(default_factory=dict)
+    exact_version: dict[str, Any] | None = None
+    reason_code: str | None = None
+    requires_confirmation: bool = False
+    confirmation_reason: str | None = None
+    next_action: dict[str, Any] | None = None
+    next_actions: list[Any] = field(default_factory=list)
+    arguments_patch: dict[str, Any] | None = None
+    warnings: list[Any] = field(default_factory=list)
+    metrics: dict[str, Any] = field(default_factory=dict)
+    contamination: dict[str, Any] = field(default_factory=dict)
+    deduplication: dict[str, Any] = field(default_factory=dict)
+    lane_details: dict[str, Any] = field(default_factory=dict)

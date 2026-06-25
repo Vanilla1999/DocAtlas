@@ -2,17 +2,19 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from docmancer.docs.interfaces.mcp.context_tools import CONTEXT_TOOL_NAMES
 from docmancer.docs.interfaces.mcp.docs_tools import LIBRARY_TOOL_NAMES
 from docmancer.docs.interfaces.mcp.prefetch_tools import PREFETCH_TOOL_NAMES
 from docmancer.docs.interfaces.mcp.project_tools import PROJECT_TOOL_NAMES
-from docmancer.mcp.docs_server import LIBRARY_TOOLS, PREFETCH_TOOLS, PROJECT_TOOLS, TOOLS
+from docmancer.mcp.docs_server import CONTEXT_TOOLS, LIBRARY_TOOLS, PREFETCH_TOOLS, PROJECT_TOOLS, TOOLS
 
 
 def test_mcp_grouped_tool_registration_preserves_tool_names():
-    grouped_names = {tool["name"] for tool in [*LIBRARY_TOOLS, *PREFETCH_TOOLS, *PROJECT_TOOLS]}
+    grouped_names = {tool["name"] for tool in [*CONTEXT_TOOLS, *LIBRARY_TOOLS, *PREFETCH_TOOLS, *PROJECT_TOOLS]}
     all_names = {tool["name"] for tool in TOOLS}
 
     assert grouped_names == all_names
+    assert {tool["name"] for tool in CONTEXT_TOOLS} == CONTEXT_TOOL_NAMES
     assert {tool["name"] for tool in LIBRARY_TOOLS} == LIBRARY_TOOL_NAMES
     assert {tool["name"] for tool in PREFETCH_TOOLS} == PREFETCH_TOOL_NAMES
     assert {tool["name"] for tool in PROJECT_TOOLS} == PROJECT_TOOL_NAMES
@@ -21,7 +23,7 @@ def test_mcp_grouped_tool_registration_preserves_tool_names():
 def test_mcp_grouped_tool_registration_keeps_original_order_within_groups():
     positions = {tool["name"]: index for index, tool in enumerate(TOOLS)}
 
-    for group in (LIBRARY_TOOLS, PREFETCH_TOOLS, PROJECT_TOOLS):
+    for group in (CONTEXT_TOOLS, LIBRARY_TOOLS, PREFETCH_TOOLS, PROJECT_TOOLS):
         assert [positions[tool["name"]] for tool in group] == sorted(positions[tool["name"]] for tool in group)
 
 

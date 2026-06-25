@@ -10,7 +10,13 @@ Use this server when a coding agent needs local, source-grounded documentation c
 
 ## What the MCP server covers
 
-DocAtlas's MCP docs server has three main lanes:
+DocAtlas's MCP docs server has one high-level router plus three main lanes:
+
+```text
+get_docs_context(question, project_path?, library?, mode="auto")
+```
+
+`get_docs_context` returns one source-grounded context pack by routing deterministically to project-owned docs, public library docs, exact dependency docs, or a mixed project-plus-library flow. It is additive: advanced users and existing agents can still call the lane-specific tools directly.
 
 1. **Library docs** — resolve, fetch, refresh, prefetch, inspect, and query public or registered documentation sources.
 2. **Project-owned docs** — discover, reconcile, stale-check, prune orphaned indexed entries, and query reviewable repository docs such as `README.md`, `docs/`, `wiki/`, `ARCHITECTURE.md`, ADRs, runbooks, roadmap files, and module/package docs in monorepos.
@@ -21,6 +27,7 @@ Project-owned docs and dependency docs are intentionally separate. `sync_project
 Implementation note for maintainers: the public MCP tool names and schemas remain centralized in `docmancer/mcp/docs_server.py`, while tool handling is split by lane under `docmancer/docs/interfaces/mcp/`:
 
 - `docs_tools.py` handles library-docs tools;
+- `context_tools.py` handles the unified context router;
 - `project_tools.py` handles project-owned docs and project dependency-docs tools;
 - `prefetch_tools.py` handles manifest, target prefetch, and job tools.
 
@@ -45,6 +52,36 @@ backwards compatibility.
   }
 }
 ```
+
+## Library docs tools
+
+## Unified context tool
+
+| Tool | Purpose |
+|---|---|
+| `get_docs_context` | Return one source-grounded documentation context pack by routing the question to project-owned docs, public library docs, exact dependency docs, or mixed project-plus-library context. |
+
+Default behavior:
+
+| Input | Mode selected |
+|---|---|
+| `project_path` only | `project` |
+| `library` or `libraries` only | `library` |
+| `project_path` plus `library`/`libraries` | `mixed` |
+| `mode="dependency"` | `dependency` |
+| no `project_path`, `library`, or `libraries` | `invalid_request` |
+
+Safety defaults:
+
+| Option | Default | Meaning |
+|---|---:|---|
+| `prepare_project_docs` | `true` | Run safe local project bootstrap before project/mixed/dependency context. |
+| `allow_network` | `false` | Missing/stale library or dependency docs return `confirmation_required` instead of fetching. |
+| `allow_latest_fallback` | `false` | Exact-version requests never silently use latest docs. |
+| `force_refresh` | `false` | Existing indexed docs are queried when usable. |
+| `details` | `false` | Compact lane summaries by default; `true` includes normalized lane details. |
+
+The unified tool delegates to existing facade methods such as `bootstrap_project_docs`, `get_project_context`, `get_library_docs`, and dependency prefetch/context services. It does not implement a second retrieval engine.
 
 ## Library docs tools
 
