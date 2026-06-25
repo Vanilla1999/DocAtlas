@@ -68,6 +68,25 @@ def _dart_refresh_diagnostics(
     }
 
 
+def _metadata_for_record(record: LibraryRecord) -> dict[str, Any]:
+    metadata = {
+        "library_id": record.library_id,
+        "canonical_id": record.canonical_id,
+        "ecosystem": record.ecosystem,
+        "source_type": record.source_type,
+        "docs_url": record.docs_url,
+        "docs_url_resolved": record.docs_url_resolved or record.docs_url,
+        "registry_docset_root": record.docs_url_resolved or record.docs_url,
+        "requested_version": record.requested_version,
+        "resolved_version": record.resolved_version,
+        "version_binding": (record.target_spec or {}).get("dart_docs", {}).get("version_binding"),
+        "docs_snapshot_exact": record.docs_snapshot_exact,
+    }
+    if record.docs_snapshot_exact is not False and record.version:
+        metadata["version"] = record.version
+    return {key: value for key, value in metadata.items() if value is not None}
+
+
 class LibraryRefreshOps:
     """Refresh and prefetch operations for registered library docs."""
 
@@ -122,16 +141,7 @@ class LibraryRefreshOps:
                     max_pages=per_url_max_pages,
                     browser=target.browser,
                     seed_urls=seed_urls_for_discovery if (target.docs_url or target.docs_url_template) else None,
-                    metadata={
-                        "library_id": record.library_id,
-                        "canonical_id": record.canonical_id,
-                        "ecosystem": record.ecosystem,
-                        "version": record.version,
-                        "source_type": record.source_type,
-                        "docs_url": record.docs_url,
-                        "docs_url_resolved": record.docs_url_resolved or record.docs_url,
-                        "docset_root": record.docs_url_resolved or record.docs_url,
-                    },
+                    metadata=_metadata_for_record(record),
                 )
                 if isinstance(pages, int):
                     pages_indexed += pages

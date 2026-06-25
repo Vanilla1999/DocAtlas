@@ -6,6 +6,53 @@ from types import MethodType
 
 import pytest
 
+from docmancer.core.config import DocmancerConfig
+from docmancer.core.models import Document
+from docmancer.docs.registry import LibraryRegistry
+from docmancer.docs.service import DocsJobTracker, LibraryDocsService
+from docmancer.agent import DocmancerAgent
+
+
+class MultiRootFakeFetcher:
+    last_discovery_diagnostics = {"discovery_strategy": "seed", "seed_pages": 2}
+
+    def __init__(self, documents):
+        self.documents = documents
+
+    def fetch(self, url):
+        return self.documents
+
+
+def _service_with_fake_fetcher(tmp_path, monkeypatch, documents):
+    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
+    config = DocmancerConfig()
+    config.index.db_path = str(tmp_path / "test.db")
+
+    def agent_factory(**kwargs):
+        agent = DocmancerAgent(config=kwargs["config"])
+        original_add = agent.add
+
+        def add(url, recreate=False, **add_kwargs):
+            add_kwargs["fetcher"] = MultiRootFakeFetcher(documents)
+            return original_add(url, recreate=recreate, **add_kwargs)
+
+        agent.add = add
+        return agent
+
+    return LibraryDocsService(
+        config=config,
+        registry=LibraryRegistry(config.index.db_path),
+        agent_factory=agent_factory,
+        job_tracker=DocsJobTracker(),
+    )
+
+
+def _dart_doc(source, content, *, docset_root, title="Guide", extra_metadata=None):
+    metadata = {"docset_root": docset_root, "title": title}
+    if extra_metadata:
+        metadata.update(extra_metadata)
+    return Document(source=source, content=content, metadata=metadata)
+
 
 def test_riverpod_auto_uses_official_docs(tmp_path):
     """resolve_library for riverpod should auto-register with riverpod.dev."""
@@ -217,3 +264,97 @@ def test_refresh_receives_auto_registered_seed_urls(tmp_path, monkeypatch):
     assert any("concepts2/providers" in seed for seed in seed_urls)
     assert result.preindex is not None
     assert result.preindex["dartdoc"]["reason_code"] == "dartdoc_root_only"
+
+
+def test_riverpod_refresh_ingests_and_queries_official_and_pubdev_roots(tmp_path, monkeypatch):
+    service = _service_with_fake_fetcher(
+        tmp_path,
+        monkeypatch,
+        [
+            _dart_doc(
+                "https://riverpod.dev/docs/concepts2/refs",
+                "# autoDispose ref.watch\nUse autoDispose providers with ref.watch for reactive dependencies.",
+                docset_root="https://riverpod.dev",
+                title="Refs",
+            ),
+            _dart_doc(
+                "https://pub.dev/documentation/riverpod/latest/riverpod/AutoDisposeProvider-class.html",
+                "# AutoDisposeProvider API\nThe AutoDisposeProvider API supports ref.watch and disposal behavior.",
+                docset_root="https://pub.dev/documentation/riverpod/latest",
+                title="AutoDisposeProvider",
+            ),
+            _dart_doc(
+                "https://docs.python.org/3/library/asyncio.html",
+                "# asyncio\nForeign Python project chunk mentioning riverpod autoDispose ref.watch must be rejected.",
+                docset_root="https://docs.python.org/3",
+                title="asyncio",
+            ),
+        ],
+    )
+
+    info = service.resolve_library("riverpod", ecosystem="flutter")
+    refreshed = service.refresh_docs(info.library_id, source_type=info.source_type, force=True)
+    assert refreshed.status == "updated"
+    assert refreshed.pages_indexed > 0
+    assert refreshed.chunks_indexed > 0
+
+    official = service.get_docs("riverpod", ecosystem="flutter", topic="reactive dependencies")
+    assert official.status == "success"
+    official_sources = {chunk.source for chunk in official.results}
+    assert any(source and source.startswith("https://riverpod.dev/") for source in official_sources)
+
+    api = service.get_docs("riverpod", ecosystem="flutter", topic="AutoDisposeProvider API")
+    assert api.status == "success"
+    api_sources = {chunk.source for chunk in api.results}
+    assert any(source and source.startswith("https://pub.dev/documentation/riverpod/latest/") for source in api_sources)
+
+    foreign = service.get_docs("riverpod", ecosystem="flutter", topic="asyncio")
+    assert not any(chunk.source and chunk.source.startswith("https://docs.python.org/") for chunk in foreign.results)
+    assert any(warning["code"] == "wrong_docset_root" for warning in foreign.diagnostics["warnings"])
+
+
+def test_flutter_bloc_refresh_ingests_and_queries_official_and_pubdev_roots(tmp_path, monkeypatch):
+    service = _service_with_fake_fetcher(
+        tmp_path,
+        monkeypatch,
+        [
+            _dart_doc(
+                "https://bloclibrary.dev/flutter-bloc-concepts/",
+                "# BlocProvider\nBlocProvider creates and provides a Bloc instance to child widgets.",
+                docset_root="https://bloclibrary.dev",
+                title="Flutter Bloc Concepts",
+            ),
+            _dart_doc(
+                "https://pub.dev/documentation/flutter_bloc/latest/flutter_bloc/BlocProvider-class.html",
+                "# BlocProvider API\nBlocProvider is a Flutter widget for dependency injection of blocs.",
+                docset_root="https://pub.dev/documentation/flutter_bloc/latest",
+                title="BlocProvider API",
+            ),
+            _dart_doc(
+                "https://fastapi.tiangolo.com/tutorial/",
+                "# FastAPI\nForeign project chunk mentioning flutter_bloc BlocProvider must be rejected.",
+                docset_root="https://fastapi.tiangolo.com",
+                title="FastAPI",
+            ),
+        ],
+    )
+
+    info = service.resolve_library("flutter_bloc", ecosystem="flutter")
+    refreshed = service.refresh_docs(info.library_id, source_type=info.source_type, force=True)
+    assert refreshed.status == "updated"
+    assert refreshed.pages_indexed > 0
+    assert refreshed.chunks_indexed > 0
+
+    official = service.get_docs("flutter_bloc", ecosystem="flutter", topic="child widgets")
+    assert official.status == "success"
+    official_sources = {chunk.source for chunk in official.results}
+    assert any(source and source.startswith("https://bloclibrary.dev/") for source in official_sources)
+
+    api = service.get_docs("flutter_bloc", ecosystem="flutter", topic="dependency injection")
+    assert api.status == "success"
+    api_sources = {chunk.source for chunk in api.results}
+    assert any(source and source.startswith("https://pub.dev/documentation/flutter_bloc/latest/") for source in api_sources)
+
+    foreign = service.get_docs("flutter_bloc", ecosystem="flutter", topic="FastAPI")
+    assert not any(chunk.source and chunk.source.startswith("https://fastapi.tiangolo.com/") for chunk in foreign.results)
+    assert any(warning["code"] == "wrong_docset_root" for warning in foreign.diagnostics["warnings"])

@@ -420,7 +420,8 @@ class DocmancerAgent:
         self.last_discovery_diagnostics = dict(getattr(f, "last_discovery_diagnostics", {}) or {})
         if metadata:
             for document in documents:
-                document.metadata.update(metadata)
+                for key, value in metadata.items():
+                    document.metadata.setdefault(key, value)
         logger.info("Fetched %d document(s); starting index", len(documents))
         if progress_callback:
             progress_callback(

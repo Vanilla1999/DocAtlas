@@ -362,6 +362,14 @@ class LibraryDocsApplicationService:
     def _library_chunk_allowed(self, chunk: Any, info: LibraryInfo, allowed_ids: set[str], expected_roots: set[str]) -> bool:
         return self._library_chunk_rejection_reason(chunk, info, allowed_ids, expected_roots) is None
 
+    def _expected_docset_roots(self, info: LibraryInfo, record: LibraryRecord | None) -> set[str]:
+        roots = {root for root in {info.docs_url_resolved, info.docs_url} if root}
+        spec = record.target_spec if record else None
+        if isinstance(spec, dict):
+            roots.update(str(url) for url in spec.get("seed_urls") or [] if url)
+            roots.update(str(url) for url in spec.get("resolved_urls") or [] if url)
+        return roots
+
     def _empty_library_index_result(
         self,
         *,
@@ -917,7 +925,7 @@ class LibraryDocsApplicationService:
         allowed_ids = {info.library_id}
         if info.version:
             allowed_ids.add(legacy_library_id(info.library, info.version))
-        expected_roots = {root for root in {info.docs_url_resolved, info.docs_url} if root}
+        expected_roots = self._expected_docset_roots(info, record)
         chunks_before_guard = list(chunks)
         filtered_chunks = []
         rejection_counts: dict[str, int] = {}
