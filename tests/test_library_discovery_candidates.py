@@ -20,11 +20,12 @@ def test_unknown_python_mcp_returns_discovery_candidates_not_dead_end(tmp_path):
     assert result.discovery_candidates[0]["docs_url"]
 
 
-def test_unknown_riverpod_returns_dart_candidates(tmp_path):
+def test_known_auto_supported_riverpod_does_not_need_discovery_candidates(tmp_path):
     result = _service(tmp_path).get_docs("riverpod", ecosystem="dart", topic="state")
 
-    assert result.discovery_candidates
-    assert "pub.dev/documentation/riverpod" in result.discovery_candidates[0]["docs_url"]
+    assert result.status == "success"
+    assert result.discovery_candidates == []
+    assert result.library_id == "dart:riverpod@latest:web"
 
 
 def test_discovery_candidates_include_next_action(tmp_path):

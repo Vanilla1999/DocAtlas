@@ -29,6 +29,17 @@ _PARSERS = {
     ".htm": "docmancer.connectors.parsers.html:HTMLLoader",
 }
 
+SOURCE_DERIVED_METADATA_KEYS = {
+    "docset_root",
+    "canonical_url",
+    "source_url",
+    "title",
+    "description",
+    "section_path",
+    "lang",
+    "format",
+}
+
 
 def _import_class(dotted_path: str) -> type:
     module_path, class_name = dotted_path.rsplit(":", 1)
@@ -86,7 +97,7 @@ class DocmancerAgent:
             try:
                 self._sync_vectors_if_enabled()
             except Exception as exc:
-                raise RuntimeError(f"vector indexing failed after FTS5 ingest: {exc}") from exc
+                logger.warning("vector indexing failed after FTS5 ingest; continuing with FTS5-only index: %s", exc)
         return result.sections
 
     def ingest_records(
@@ -119,7 +130,7 @@ class DocmancerAgent:
             try:
                 self._sync_vectors_if_enabled()
             except Exception as exc:
-                raise RuntimeError(f"vector indexing failed after FTS5 ingest: {exc}") from exc
+                logger.warning("vector indexing failed after FTS5 ingest; continuing with FTS5-only index: %s", exc)
         return result.sections
 
     def _vector_collection_name(self) -> str:
@@ -420,8 +431,11 @@ class DocmancerAgent:
         self.last_discovery_diagnostics = dict(getattr(f, "last_discovery_diagnostics", {}) or {})
         if metadata:
             for document in documents:
-                for key, value in metadata.items():
-                    document.metadata.setdefault(key, value)
+                source_metadata = dict(document.metadata or {})
+                document.metadata.update(metadata)
+                for key in SOURCE_DERIVED_METADATA_KEYS:
+                    if key in source_metadata:
+                        document.metadata[key] = source_metadata[key]
         logger.info("Fetched %d document(s); starting index", len(documents))
         if progress_callback:
             progress_callback(

@@ -123,7 +123,67 @@ class LibraryDocsApplicationService:
             # Check if Dart/Flutter package has real official docs (non-pub.dev)
             normalized_ecosystem = (canonical_dart_ecosystem(original_ecosystem) or "").lower().strip()
             is_dart_flutter = normalized_ecosystem == "dart"
-            
+            if is_dart_flutter and (source_type or "").lower() == "api":
+                dart_resolution = resolve_dart_official_docs(library, version=normalized_version)
+                pubdev_url = dart_resolution.pubdev_docs_url
+                target_spec = {
+                    "id": f"dart:{library}:api",
+                    "library": library,
+                    "ecosystem": "dart",
+                    "version": normalized_version or "latest",
+                    "docs_url": pubdev_url,
+                    "source_type": "api",
+                    "doc_format": "dartdoc",
+                    "allowed_domains": allowed_domains_for_urls([pubdev_url]),
+                    "seed_urls": [],
+                    "max_pages": 100,
+                    "dart_docs": {
+                        "requested_ecosystem": original_ecosystem,
+                        "docs_strategy": "pubdev_only",
+                        "version_binding": "pubdev_api_snapshot" if normalized_version else "latest_pubdev_api",
+                    },
+                }
+                record = self.registry.upsert(
+                    library=library,
+                    ecosystem="dart",
+                    version=normalized_version or "latest",
+                    docs_url=pubdev_url,
+                    source_type="api",
+                    now=self._now(),
+                    status="available",
+                    target_spec=target_spec,
+                    requested_version=normalized_version,
+                    resolved_version=normalized_version or "latest",
+                    version_source="pubdev_api" if normalized_version else None,
+                    version_confidence="high" if normalized_version else None,
+                    version_inferred=normalized_version is None,
+                    docs_snapshot_exact=bool(normalized_version),
+                )
+                stale = self._is_stale(record.last_refreshed_at)
+                return LibraryInfo(
+                    library_id=record.library_id,
+                    source_id=record.source_id,
+                    canonical_id=record.canonical_id,
+                    library=record.name,
+                    ecosystem=record.ecosystem,
+                    version=record.version,
+                    source_type=record.source_type,
+                    docs_url=record.docs_url,
+                    docs_url_template=record.docs_url_template,
+                    docs_url_resolved=record.docs_url_resolved,
+                    docs_snapshot_exact=record.docs_snapshot_exact,
+                    requested_version=record.requested_version,
+                    resolved_version=record.resolved_version,
+                    version_source=record.version_source,
+                    version_confidence=record.version_confidence,
+                    version_inferred=record.version_inferred,
+                    status="needs_refresh" if stale else "available",
+                    local=record.last_refreshed_at is not None,
+                    stale=stale,
+                    last_refreshed_at=record.last_refreshed_at,
+                    message=None,
+                )
+
             has_real_official_docs = False
             dart_docs_url = None
             

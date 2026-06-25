@@ -266,6 +266,60 @@ def test_refresh_receives_auto_registered_seed_urls(tmp_path, monkeypatch):
     assert result.preindex["dartdoc"]["reason_code"] == "dartdoc_root_only"
 
 
+def test_refresh_metadata_overwrites_fetcher_identity_but_preserves_docset_root(tmp_path, monkeypatch):
+    service = _service_with_fake_fetcher(
+        tmp_path,
+        monkeypatch,
+        [
+            _dart_doc(
+                "https://pub.dev/documentation/riverpod/latest/riverpod/Provider-class.html",
+                "# Provider API\nProvider API content for riverpod.",
+                docset_root="https://pub.dev/documentation/riverpod/latest",
+                title="Provider API",
+                extra_metadata={
+                    "library_id": "wrong-library",
+                    "canonical_id": "wrong:canonical",
+                    "ecosystem": "python",
+                    "source_type": "guides",
+                },
+            )
+        ],
+    )
+
+    info = service.resolve_library("riverpod", ecosystem="flutter")
+    refreshed = service.refresh_docs(info.library_id, source_type=info.source_type, force=True)
+    assert refreshed.status == "updated"
+
+    result = service.get_docs("riverpod", ecosystem="flutter", topic="Provider API")
+    assert result.status == "success"
+    assert len(result.results) == 1
+    metadata = result.results[0].metadata
+    assert metadata["library_id"] == info.library_id
+    assert metadata["canonical_id"] == info.canonical_id
+    assert metadata["ecosystem"] == "dart"
+    assert metadata["source_type"] == "web"
+    assert "version" not in metadata
+    assert metadata["docset_root"] == "https://pub.dev/documentation/riverpod/latest"
+
+
+def test_dart_explicit_api_source_type_registers_pubdev_api_docset(tmp_path):
+    from docmancer.core.config import DocmancerConfig
+    from docmancer.docs.service import LibraryDocsService
+
+    config = DocmancerConfig()
+    config.index.db_path = str(tmp_path / "test.db")
+    service = LibraryDocsService(config=config)
+
+    info = service.resolve_library("flutter_bloc", ecosystem="flutter", source_type="api")
+
+    assert info.library_id == "dart:flutter_bloc@latest:api"
+    assert info.source_type == "api"
+    assert info.docs_url == "https://pub.dev/documentation/flutter_bloc/latest/"
+    record = service.registry.get(info.library_id, source_type="api")
+    assert record is not None
+    assert record.target_spec["doc_format"] == "dartdoc"
+
+
 def test_riverpod_refresh_ingests_and_queries_official_and_pubdev_roots(tmp_path, monkeypatch):
     service = _service_with_fake_fetcher(
         tmp_path,

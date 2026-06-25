@@ -297,6 +297,37 @@ class TestDiscovery:
         assert [item.strategy for item in discovered] == [DiscoveryStrategy.NAV_CRAWL, DiscoveryStrategy.NAV_CRAWL]
         assert [item.url for item in discovered] == ["https://example.com/docs/a", "https://example.com/docs/b"]
 
+    def test_cross_domain_seed_url_gets_own_docset_root(self):
+        pubdev_html = """<!DOCTYPE html><html><head><title>Provider API</title></head><body>
+        <main><h1>Provider API</h1><p>Riverpod Provider API reference with enough documentation words to extract.</p></main>
+        </body></html>"""
+
+        def mock_get(url, **kwargs):
+            if url.endswith("llms-full.txt") or url.endswith("llms.txt") or "sitemap" in url:
+                return _mock_response("", status=404, content_type="text/plain")
+            if url.endswith("robots.txt"):
+                return _mock_response("User-agent: *\nAllow: /", content_type="text/plain")
+            if url == "https://riverpod.dev/":
+                return _mock_response('<main><h1>Riverpod</h1><p>Official guide page with meaningful content.</p></main>')
+            if url == "https://pub.dev/documentation/riverpod/latest/riverpod/Provider-class.html":
+                return _mock_response(pubdev_html)
+            return _mock_response("", status=404)
+
+        mock_client = _make_mock_client(mock_get)
+
+        with patch("docmancer.connectors.fetchers.web.httpx.Client", return_value=mock_client):
+            fetcher = WebFetcher(
+                max_pages=10,
+                browser=False,
+                delay=0.0,
+                seed_urls=["https://pub.dev/documentation/riverpod/latest/riverpod/Provider-class.html"],
+            )
+            docs = fetcher.fetch("https://riverpod.dev/")
+
+        pubdev = next(doc for doc in docs if doc.source.startswith("https://pub.dev/"))
+        assert pubdev.metadata["fetch_method"] == DiscoveryStrategy.SEED_URLS.value
+        assert pubdev.metadata["docset_root"] == "https://pub.dev/documentation/riverpod/latest"
+
 
 class TestWebFetcherDartdoc:
     def test_direct_dartdoc_class_page_without_browser(self):

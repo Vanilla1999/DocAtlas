@@ -58,3 +58,30 @@ def test_auto_vectors_zero_skips_vector_path(tmp_path, monkeypatch, caplog):
     assert sections >= 1
     # No vector log lines, no embeddings provider load attempt.
     assert not any("embedded=" in rec.message for rec in caplog.records)
+
+
+def test_vector_sync_failure_after_fts_ingest_falls_back_to_fts5(tmp_path, monkeypatch, caplog):
+    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
+    monkeypatch.setenv("DOCMANCER_AUTO_VECTORS", "1")
+
+    config = DocmancerConfig()
+    config.index.db_path = str(tmp_path / "docs.db")
+
+
+    from docmancer.agent import DocmancerAgent
+
+    agent = DocmancerAgent(config=config)
+
+    def fail_vectors():
+        raise RuntimeError("qdrant collection missing")
+
+    monkeypatch.setattr(agent, "_sync_vectors_if_enabled", fail_vectors)
+    doc = Document(source="doc.md", content="# BlocProvider\n\nBlocProvider provides a bloc.", metadata={"format": "markdown"})
+
+    with caplog.at_level(logging.WARNING, logger="docmancer.agent"):
+        sections = agent.ingest_documents([doc], with_vectors=True)
+
+    assert sections >= 1
+    hits = agent.query("BlocProvider", limit=2, budget=1500)
+    assert hits and "BlocProvider" in hits[0].text
+    assert any("continuing with FTS5-only index" in rec.message for rec in caplog.records)
