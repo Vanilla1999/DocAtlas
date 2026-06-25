@@ -1,0 +1,6 @@
+{
+  "reason": "fixture repository generator not executed",
+  "status": "pending_fixture_materialization",
+  "task_id": "fastapi_depends_001",
+  "validated_at": "2026-06-25T17:43:26.757688+00:00"
+}
