@@ -68,10 +68,14 @@ def _compact_project_context(result: dict[str, Any]) -> dict[str, Any]:
         "mode": result.get("mode"),
         "reason": result.get("reason"),
         "message": result.get("message"),
+        "response_style": result.get("response_style"),
+        "primary_snippet": result.get("primary_snippet"),
+        "supporting_snippets": result.get("supporting_snippets") or [],
         "context_pack": result.get("context_pack") or [],
         "answer_outline": result.get("answer_outline") or {},
         "trust_contract": result.get("trust_contract") or {},
         "next_actions": result.get("next_actions") or [],
+        "snippet_metrics": result.get("snippet_metrics") or {},
         "metrics": result.get("metrics") or {},
         "diagnostics": result.get("diagnostics") or {},
         "warnings": result.get("warnings") or [],
@@ -197,7 +201,7 @@ def handle_project_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
         result = asdict(service.get_project_docs(args["project_path"], args["query"], tokens=args.get("tokens"), limit=args.get("limit"), expand=args.get("expand"), module=args.get("module"), module_path=args.get("module_path"), scope=args.get("scope")))
         return result if args.get("details") else _compact_project_docs(result)
     if name == "get_project_context":
-        result = asdict(service.get_project_context(args["project_path"], args["question"], tokens=args.get("tokens"), limit=args.get("limit"), expand=args.get("expand"), library=args.get("library"), libraries=args.get("libraries"), ecosystem=args.get("ecosystem"), version=args.get("version"), module=args.get("module"), module_path=args.get("module_path"), scope=args.get("scope"), mode=args.get("mode") or "auto"))
+        result = asdict(service.get_project_context(args["project_path"], args["question"], tokens=args.get("tokens"), limit=args.get("limit"), expand=args.get("expand"), library=args.get("library"), libraries=args.get("libraries"), ecosystem=args.get("ecosystem"), version=args.get("version"), module=args.get("module"), module_path=args.get("module_path"), scope=args.get("scope"), mode=args.get("mode") or "auto", response_style=args.get("response_style")))
         output_mode = args.get("output_mode") or ("full" if args.get("details") else "compact")
         return result if output_mode == "full" else _compact_project_context(result)
     if name in {"prefetch_project_docs", "prefetch_project_dependency_docs"}:

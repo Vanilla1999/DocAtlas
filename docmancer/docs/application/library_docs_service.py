@@ -19,6 +19,7 @@ from docmancer.docs.domain.policies import docs_policy, is_stale
 from docmancer.docs.domain.project_state import create_project_docs_next_action, has_high_level_project_overview, partition_project_doc_state, project_docs_structured_next_action
 from docmancer.docs.domain.quality import is_trivial_section
 from docmancer.docs.domain.source_identity import docs_exactness, docs_identity, docs_request
+from docmancer.docs.domain.snippets import build_snippet_presentation, validate_response_style
 from docmancer.docs.domain.target_security import host_allowed, is_remote_url, path_allowed, url_security_error
 from docmancer.docs.domain.trust_contract import build_project_context_trust_contract
 from docmancer.docs.models import DocsChunk, DocsInspectResult, DocsJobStartResult, DocsManifestValidationResult, DocsPruneResult, DocsRemoveResult, DocsResult, DocsSourceResolution, DocsTarget, DocsTargetResult, DocsTargetsPrefetchResult, LibraryInfo, ProjectDocsBootstrapResult, ProjectDocsChunk, ProjectDocsIngestResult, ProjectDocsInspectResult, ProjectDocsResult, ProjectMetadata, ProjectPrefetchResult, RefreshResult
@@ -633,7 +634,9 @@ class LibraryDocsApplicationService:
         source_type: str | None = None,
         force_refresh: bool = False,
         project_path: str | None = None,
+        response_style: str | None = None,
     ) -> DocsResult:
+        response_style = validate_response_style(response_style)
         if hasattr(self.facade, "_library_get_docs_impl"):
             return self.facade._library_get_docs_impl(
                 library,
@@ -646,6 +649,7 @@ class LibraryDocsApplicationService:
                 source_type=source_type,
                 force_refresh=force_refresh,
                 project_path=project_path,
+                response_style=response_style,
             )
         input_args = {
             "library": library,
@@ -1065,6 +1069,44 @@ class LibraryDocsApplicationService:
             chunks_created=len(chunks),
         )
         
+        result_chunks = [
+            DocsChunk(
+                title=(chunk.metadata or {}).get("title"),
+                content=chunk.text,
+                source=chunk.source,
+                url=chunk.source if chunk.source.startswith(("http://", "https://")) else None,
+                metadata={**(chunk.metadata or {}), "stale": latest_stale},
+            )
+            for chunk in chunks
+        ]
+        snippet_chunks = [
+            {
+                "title": chunk.title,
+                "content": chunk.content,
+                "source": chunk.source,
+                "url": chunk.url,
+                "metadata": {
+                    **(chunk.metadata or {}),
+                    "source_class": "library_doc",
+                    "doc_scope": "library",
+                    "origin_lane": "library",
+                    "canonical_id": info.library_id,
+                    "library_id": info.library_id,
+                    "version": latest.resolved_version or latest.version,
+                    "requested_version": requested_version,
+                    "docs_exactness": docs_exactness,
+                    "docs_binding_source": docs_binding_source,
+                    "exact_version_match": (latest.resolved_version or latest.version) == requested_version if requested_version else None,
+                },
+            }
+            for chunk in result_chunks
+        ]
+        snippet_presentation = build_snippet_presentation(
+            snippet_chunks,
+            question=topic or library,
+            response_style=response_style,
+            lane_priority=["library"],
+        )
         return DocsResult(
             library_id=info.library_id,
             library=latest.library,
@@ -1075,17 +1117,8 @@ class LibraryDocsApplicationService:
             warning=warning,
             last_refreshed_at=latest.last_refreshed_at,
             source_type=info.source_type,
-            results=[
-                DocsChunk(
-                    title=(chunk.metadata or {}).get("title"),
-                    content=chunk.text,
-                    source=chunk.source,
-                    url=chunk.source if chunk.source.startswith(("http://", "https://")) else None,
-                    metadata={**(chunk.metadata or {}), "stale": latest_stale},
-                )
-                for chunk in chunks
-            ],
-            warnings=warnings,
+            results=result_chunks,
+            warnings=[*warnings, *[warning["code"] for warning in snippet_presentation.warnings]],
             requested_version=requested_version,
             resolved_version=latest.resolved_version or latest.version,
             version_source=version_source,
@@ -1099,6 +1132,10 @@ class LibraryDocsApplicationService:
             identity=self._docs_identity(info, docs_url_source=docs_url_source),
             policy=self._docs_policy("success", has_registered_source=True),
             diagnostics=final_diagnostics,
+            response_style=snippet_presentation.response_style,
+            primary_snippet=snippet_presentation.primary_snippet,
+            supporting_snippets=snippet_presentation.supporting_snippets,
+            snippet_metrics=snippet_presentation.metrics,
         )
 
     def _index_size_for(self, record: LibraryRecord) -> int:

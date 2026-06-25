@@ -26,7 +26,7 @@ def handle_library_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
     if name == "resolve_library_id":
         return asdict(service.resolve_library(args["library"], args.get("ecosystem"), args.get("version"), args.get("docs_url"), args.get("docs_url_template"), args.get("source_type")))
     if name == "get_library_docs":
-        return asdict(service.get_docs(args["library"], topic=args.get("topic"), tokens=args.get("tokens"), ecosystem=args.get("ecosystem"), version=args.get("version"), docs_url=args.get("docs_url"), docs_url_template=args.get("docs_url_template"), source_type=args.get("source_type"), force_refresh=bool(args.get("force_refresh") or False), project_path=args.get("project_path")))
+        return asdict(service.get_docs(args["library"], topic=args.get("topic"), tokens=args.get("tokens"), ecosystem=args.get("ecosystem"), version=args.get("version"), docs_url=args.get("docs_url"), docs_url_template=args.get("docs_url_template"), source_type=args.get("source_type"), force_refresh=bool(args.get("force_refresh") or False), project_path=args.get("project_path"), response_style=args.get("response_style")))
     if name == "refresh_library_docs":
         return asdict(service.refresh_docs(args["library"], ecosystem=args.get("ecosystem"), version=args.get("version"), docs_url=args.get("docs_url"), versions=args.get("versions"), docs_url_template=args.get("docs_url_template"), source_type=args.get("source_type"), force=bool(args.get("force") if args.get("force") is not None else True)))
     if name == "prefetch_library_docs":

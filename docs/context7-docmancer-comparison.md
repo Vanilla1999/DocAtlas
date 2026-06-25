@@ -17,6 +17,8 @@ Recommended positioning from this run:
 - Use **Context7** for quick one-off public API questions.
 - Use **Docmancer MCP** when the agent needs local docs, offline docs, exact dependency versions, source metadata, token-aware context packs, or project-owned README/docs/ADR context.
 
+DocAtlas now exposes trusted code examples as first-class snippet-first context while preserving project context, source attribution, and exact-version diagnostics. This closes a presentation gap with Context7 for coding queries, but it does not mean every documentation page contains executable code or that DocAtlas wins every public-doc lookup.
+
 ## Test scope
 
 This report uses the available Riverpod comparison artifacts:

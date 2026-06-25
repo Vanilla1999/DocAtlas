@@ -37,13 +37,14 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
         allow_latest_fallback=args.get("allow_latest_fallback"),
         force_refresh=args.get("force_refresh"),
         details=args.get("details"),
+        response_style=args.get("response_style"),
     )
     if is_dataclass(result):
         return asdict(result)
     if isinstance(result, dict):
         return result
     payload = dict(getattr(result, "__dict__", {}))
-    for key in ("tool", "status", "reason_code", "message"):
+    for key in ("tool", "status", "reason_code", "message", "response_style", "primary_snippet", "supporting_snippets", "snippet_metrics"):
         if hasattr(result, key):
             payload[key] = getattr(result, key)
     return payload

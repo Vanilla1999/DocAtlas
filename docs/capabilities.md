@@ -40,7 +40,7 @@ This section is a practical map of what Docmancer can do today and which tool or
 | Use exact dependency versions | Read supported project metadata and prefetch/query docs for resolved versions. | `get_docs_context(mode="dependency")`, `inspect_project_docs`, `prefetch_project_dependency_docs`, `prefetch_project_docs`, `get_library_docs(project_path=...)`. | Strongest current support is Dart/Flutter and Rust metadata; dependency-docs prefetch may use the network and is separate from project-owned docs ingest. |
 | Avoid repeated WebFetch | Register sources once, then query local indexes. | `resolve_library_id`, `get_library_docs`, `list_library_docs`; CLI `doc-atlas list`. | If no registered or confidently resolved docs source exists, user may still need to provide a docs URL. |
 | Keep docs private/local | Index local files and private docs without sending content to hosted docs services. | CLI `doc-atlas ingest`; MCP `ingest_project_docs`. | Cloud embedding extras are optional; default retrieval stack can stay local. |
-| Get compact context for agents | Return sections with headings, source attribution, extracted snippets, metadata, and token estimates. | CLI `doc-atlas query`, `doc-atlas context`; MCP query tools and `get_project_context`. | Snippets are extracted from source docs, not synthesized. |
+| Get compact context for agents | Return sections with headings, source attribution, extracted snippets, metadata, token estimates, and optional snippet-first presentation for coding queries. | CLI `doc-atlas query`, `doc-atlas context`; MCP `get_docs_context`, `get_library_docs`, and `get_project_context` with `response_style`. | Snippets are extracted from trusted source docs, not synthesized; `context_pack` and Trust Contract remain available. |
 | Run long docs indexing safely | Start async prefetch jobs and poll progress. | `prefetch_library_docs(async=true)`, `prefetch_docs_targets(async=true)`, `get_docs_job_status`. | Large public sites still need sane max pages, allowed domains, and source hygiene. |
 | Diagnose docs runtime | Check config, storage, SQLite, Qdrant, indexes, agents, and MCP state. | CLI `doc-atlas doctor`, `doc-atlas qdrant status`; MCP `mcp doctor`. | Doctor output should continue moving toward more explicit severity/fix commands. |
 
@@ -53,6 +53,17 @@ get_docs_context(question, project_path?, library?, mode="auto")
 ```
 
 DocAtlas now provides one high-level MCP entry point for project, library, dependency, and mixed documentation context. Advanced users can still call lane-specific tools directly. Missing library/dependency docs still require explicit network permission; exact-version requests do not silently fall back to latest docs.
+
+Snippet-first presentation is additive. For example:
+
+```json
+{
+  "question": "How do I use FastAPI Depends?",
+  "response_style": "snippet-first"
+}
+```
+
+`auto` selects snippet-first for coding, API, command, and config questions when selected trusted chunks contain usable snippets. `auto` remains evidence-first for conceptual architecture or release-history questions.
 
 ## Core capabilities
 
