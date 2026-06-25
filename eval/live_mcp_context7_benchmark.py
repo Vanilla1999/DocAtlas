@@ -71,6 +71,21 @@ class PreindexDiagnostics:
 
 
 @dataclass
+class DependencyFixtureDiagnostics:
+    project_path: str | None = None
+    manifest: str | None = None
+    lockfile: str | None = None
+    dependency: str = "anyhow"
+    ecosystem: str | None = None
+    requested_version: str = "1.0.86"
+    locked_version: str | None = None
+    exact: bool = False
+    valid: bool = False
+    reason_code: str | None = None
+    warnings: list[str] = field(default_factory=list)
+
+
+@dataclass
 class BenchmarkCase:
     id: str
     query: str
@@ -121,6 +136,10 @@ class NormalizedBenchmarkResult:
     exact_version_fallback: bool = False
     exact_version_reason_code: str | None = None
     deduplication_dropped_count: int = 0
+    dependency_fixture: DependencyFixtureDiagnostics | None = None
+    dependency_preparation: dict[str, Any] | None = None
+    project_preparation: dict[str, Any] | None = None
+    routing_observed: dict[str, Any] | None = None
 
     def is_not_applicable(self) -> bool:
         return self.status in ("not_applicable",)
@@ -461,12 +480,14 @@ class DocAtlasDirectProvider(BenchmarkProvider):
 
     def _dependency_fixture_project(self) -> str:
         if self._dependency_fixture_path is None:
-            root = (self.runtime_dir or Path(tempfile.gettempdir())) / "fixture_flutter_project"
+            root = (self.runtime_dir or Path(tempfile.gettempdir())) / "fixtures" / "unified_dependency_auto"
+            if root.exists():
+                shutil.rmtree(root)
             root.mkdir(parents=True, exist_ok=True)
             (root / "Cargo.toml").write_text(
                 """
 [package]
-name = "fixture"
+name = "docatlas-unified-dependency-fixture"
 version = "0.1.0"
 edition = "2021"
 
@@ -481,16 +502,205 @@ anyhow = "1.0.86"
 version = 3
 
 [[package]]
+name = "docatlas-unified-dependency-fixture"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+]
+
+[[package]]
 name = "anyhow"
 version = "1.0.86"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = ""
+""".strip()
+                + "\n",
+                encoding="utf-8",
+            )
+            (root / "README.md").write_text(
+                """
+# Unified dependency benchmark fixture
+
+This project uses `anyhow` for contextual Rust error handling.
+
+The benchmark verifies that DocAtlas discovers the locked dependency version
+from Cargo metadata and automatically retrieves dependency documentation.
 """.strip()
                 + "\n",
                 encoding="utf-8",
             )
             self._dependency_fixture_path = root
         return str(self._dependency_fixture_path)
+
+    def _validate_dependency_fixture(self, project_path: str) -> DependencyFixtureDiagnostics:
+        diag = DependencyFixtureDiagnostics(
+            project_path=project_path,
+            manifest=str(Path(project_path) / "Cargo.toml"),
+            lockfile=str(Path(project_path) / "Cargo.lock"),
+        )
+        try:
+            metadata = self._get_service().read_project_metadata(project_path)
+        except Exception as exc:
+            diag.reason_code = "dependency_fixture_metadata_missing"
+            diag.warnings.append(str(exc))
+            return diag
+
+        diag.warnings.extend(metadata.warnings)
+        observation = next(
+            (item for item in metadata.dependencies if item.ecosystem == "rust" and item.package_name == "anyhow"),
+            None,
+        )
+        diag.ecosystem = observation.ecosystem if observation else (metadata.detected_ecosystems[0] if metadata.detected_ecosystems else None)
+        diag.locked_version = metadata.packages.get("rust:anyhow") or (observation.resolved_version if observation else None)
+        diag.exact = bool(observation and observation.version_source == "lockfile_exact" and observation.resolved_version == "1.0.86")
+
+        missing: list[str] = []
+        if not Path(diag.manifest or "").exists():
+            missing.append("manifest")
+        if not Path(diag.lockfile or "").exists():
+            missing.append("lockfile")
+        if "rust" not in metadata.detected_ecosystems:
+            missing.append("rust_ecosystem")
+        if observation is None:
+            missing.append("anyhow_dependency")
+        if diag.locked_version != "1.0.86":
+            missing.append("locked_version")
+        if not diag.exact:
+            missing.append("lockfile_exact")
+
+        diag.valid = not missing
+        diag.reason_code = None if diag.valid else "dependency_fixture_metadata_missing"
+        if missing:
+            diag.warnings.append("missing:" + ",".join(missing))
+        return diag
+
+    def _prepare_dependency_auto_fixture(self, project_path: str) -> tuple[PreindexDiagnostics, dict[str, Any], dict[str, Any]]:
+        service = self._get_service()
+        project_diag: dict[str, Any] = {"status": "pending", "docs_indexed": False}
+        dependency_diag = PreindexDiagnostics(attempted=True, status="pending", version="1.0.86")
+        dependency_preparation: dict[str, Any] = {
+            "method": "prefetch_project_dependency_docs",
+            "status": "pending",
+            "library_id": None,
+            "canonical_id": None,
+            "docs_url": "https://docs.rs/anyhow/1.0.86/",
+            "pages": 0,
+            "chunks": 0,
+        }
+        t0 = time.perf_counter()
+        try:
+            sync_result = service.sync_project_docs(project_path, with_vectors=False)
+            summary = {
+                "current": int(getattr(sync_result, "current_count", 0) or 0),
+                "new": int(getattr(sync_result, "new_count", 0) or 0),
+                "changed": int(getattr(sync_result, "changed_count", 0) or 0),
+                "sections_indexed": int(getattr(sync_result, "sections_indexed", 0) or 0),
+            }
+            project_diag = {
+                "status": getattr(sync_result, "status", "success"),
+                "docs_indexed": int(summary.get("current") or summary.get("new") or summary.get("changed") or 0) > 0,
+                "summary": summary,
+            }
+        except Exception as exc:
+            project_diag = {"status": "project_docs_sync_failed", "docs_indexed": False, "reason_code": type(exc).__name__, "warning": str(exc)}
+
+        try:
+            result = service.prefetch_project_docs(
+                project_path,
+                include_flutter=False,
+                include_dart=False,
+                include_rust=True,
+                include_packages=["anyhow"],
+                force_refresh=False,
+                continue_on_error=False,
+                async_=False,
+            )
+            item = result.results[0] if result.results else None
+            dependency_diag.library_id = getattr(item, "library_id", None) if item else None
+            dependency_diag.canonical_id = dependency_diag.library_id
+            dependency_diag.version = getattr(item, "version", None) if item else "1.0.86"
+            dependency_diag.reason_code = None
+            dependency_diag.warnings.extend(result.warnings)
+            if item:
+                dependency_diag.status = getattr(item, "status", "unknown")
+                dependency_diag.pages = int(getattr(item, "pages_indexed", 0) or 0)
+                dependency_diag.chunks = int(getattr(item, "chunks_indexed", 0) or 0)
+                dependency_preparation.update({
+                    "status": dependency_diag.status,
+                    "library_id": dependency_diag.library_id,
+                    "canonical_id": dependency_diag.canonical_id,
+                    "docs_url": getattr(item, "docs_url", None),
+                    "pages": dependency_diag.pages,
+                    "chunks": dependency_diag.chunks,
+                })
+            else:
+                dependency_diag.status = "preindex_failed"
+                dependency_diag.reason_code = "dependency_prefetch_returned_no_results"
+                dependency_preparation["status"] = dependency_diag.status
+                dependency_preparation["reason_code"] = dependency_diag.reason_code
+
+            if dependency_diag.pages == 0 and dependency_diag.chunks == 0:
+                dependency_diag.status = "empty_index"
+                dependency_diag.reason_code = dependency_diag.reason_code or "refresh_produced_no_content"
+                dependency_preparation["status"] = dependency_diag.status
+                dependency_preparation["reason_code"] = dependency_diag.reason_code
+
+                from docmancer.docs.models import DocsTarget
+
+                seeded = service._prefetch_docs_targets_sync(
+                    [DocsTarget(
+                        library="anyhow",
+                        ecosystem="rust",
+                        version="1.0.86",
+                        source_type="api",
+                        docs_url="https://docs.rs/anyhow/1.0.86/",
+                        seed_urls=[
+                            "https://docs.rs/anyhow/1.0.86/anyhow/index.html",
+                            "https://docs.rs/anyhow/1.0.86/anyhow/trait.Context.html",
+                            "https://docs.rs/anyhow/1.0.86/anyhow/macro.anyhow.html",
+                        ],
+                        allowed_domains=["docs.rs"],
+                        path_prefixes=["/anyhow/1.0.86/"],
+                        max_pages=3,
+                    )],
+                    force_refresh=True,
+                    continue_on_error=False,
+                )
+                seeded_item = seeded.results[0] if seeded.results else None
+                inspect = service.inspect_library_docs("rust:anyhow@1.0.86:api")
+                dependency_diag.status = getattr(seeded_item, "status", "unknown") if seeded_item else seeded.status
+                dependency_diag.library_id = getattr(seeded_item, "canonical_id", None) if seeded_item else dependency_diag.library_id
+                dependency_diag.canonical_id = dependency_diag.library_id
+                dependency_diag.pages = int(getattr(inspect, "pages", 0) or getattr(seeded_item, "pages_indexed", 0) or seeded.pages_indexed or 0)
+                dependency_diag.chunks = int(getattr(inspect, "chunks", 0) or seeded.chunks_indexed or dependency_diag.pages or 0)
+                dependency_diag.reason_code = None if dependency_diag.pages and dependency_diag.chunks else "seeded_prefetch_produced_no_content"
+                dependency_preparation.update({
+                    "method": "prefetch_project_dependency_docs+prefetch_docs_targets",
+                    "status": dependency_diag.status,
+                    "library_id": dependency_diag.library_id,
+                    "canonical_id": dependency_diag.canonical_id,
+                    "docs_url": "https://docs.rs/anyhow/1.0.86/",
+                    "pages": dependency_diag.pages,
+                    "chunks": dependency_diag.chunks,
+                    "seed_urls": [
+                        "https://docs.rs/anyhow/1.0.86/anyhow/index.html",
+                        "https://docs.rs/anyhow/1.0.86/anyhow/trait.Context.html",
+                        "https://docs.rs/anyhow/1.0.86/anyhow/macro.anyhow.html",
+                    ],
+                })
+                if dependency_diag.reason_code:
+                    dependency_preparation["reason_code"] = dependency_diag.reason_code
+                else:
+                    dependency_preparation.pop("reason_code", None)
+        except Exception as exc:
+            dependency_diag.status = "preindex_failed"
+            dependency_diag.reason_code = type(exc).__name__
+            dependency_diag.warnings.append(str(exc))
+            dependency_preparation["status"] = dependency_diag.status
+            dependency_preparation["reason_code"] = dependency_diag.reason_code
+            dependency_preparation["warning"] = str(exc)
+
+        dependency_diag.latency_ms = round((time.perf_counter() - t0) * 1000, 3)
+        return dependency_diag, dependency_preparation, project_diag
 
     async def _preindex_library(self, case: BenchmarkCase) -> PreindexDiagnostics:
         with self._isolated_env():
@@ -592,15 +802,51 @@ checksum = ""
             setup_calls = 0
             status = "success"
             preindex_diag: PreindexDiagnostics | None = None
+            dependency_fixture_diag: DependencyFixtureDiagnostics | None = None
+            dependency_preparation: dict[str, Any] | None = None
+            project_preparation: dict[str, Any] | None = None
+            routing_observed: dict[str, Any] | None = None
 
             try:
                 preindex_for_unified_auto = case.id == "unified_dependency_auto"
-                should_preindex = self.benchmark_mode == "preindexed" and ((case.suite in ("public-docs", "exact-version") or case.id == "unified_latest_fallback") and case.library or preindex_for_unified_auto)
+                case_project_path = None
+                if preindex_for_unified_auto:
+                    case_project_path = self._dependency_fixture_project()
+                    dependency_fixture_diag = self._validate_dependency_fixture(case_project_path)
+                    if not dependency_fixture_diag.valid:
+                        status = "fixture_invalid"
+                        reason_codes.append("dependency_fixture_invalid")
+                        if dependency_fixture_diag.reason_code:
+                            reason_codes.append(dependency_fixture_diag.reason_code)
+                        warnings.extend(dependency_fixture_diag.warnings)
+                        latency_ms = round((time.perf_counter() - start) * 1000, 3)
+                        return self._build_result(case, status, latency_ms, setup_calls,
+                            sources, snippets, answer_text, warnings, reason_codes,
+                            exact_version_used, preindex=preindex_diag,
+                            dependency_fixture=dependency_fixture_diag)
+                    exact_version_used = dependency_fixture_diag.locked_version
+                    if self.benchmark_mode == "preindexed":
+                        preindex_diag, dependency_preparation, project_preparation = self._prepare_dependency_auto_fixture(case_project_path)
+                        setup_calls += 2
+                        reason_codes.append(preindex_diag.status)
+                        if preindex_diag.status in ("preindex_failed", "not_supported", "empty_index"):
+                            status = preindex_diag.status if preindex_diag.status != "empty_index" else "empty_index"
+                            reason_codes.append("dependency_preindex_failed" if status != "empty_index" else "dependency_preindex_empty")
+                            latency_ms = round((time.perf_counter() - start) * 1000, 3)
+                            return self._build_result(case, status, latency_ms, setup_calls,
+                                sources, snippets, answer_text, warnings, reason_codes,
+                                exact_version_used, preindex=preindex_diag,
+                                dependency_fixture=dependency_fixture_diag,
+                                dependency_preparation=dependency_preparation,
+                                project_preparation=project_preparation)
+
+                should_preindex = self.benchmark_mode == "preindexed" and bool(case.library) and (
+                    case.suite in ("public-docs", "exact-version")
+                    or case.id in {"unified_library_only", "unified_latest_fallback", "unified_dependency"}
+                )
                 if should_preindex:
                     if case.id == "unified_latest_fallback":
                         preindex_case = dataclasses.replace(case, version=None)
-                    elif preindex_for_unified_auto:
-                        preindex_case = dataclasses.replace(case, library="anyhow", ecosystem="rust", version="1.0.86")
                     else:
                         preindex_case = case
                     preindex_diag = await self._preindex_library(preindex_case)
@@ -615,7 +861,7 @@ checksum = ""
 
                 if case.suite == "unified-context":
                     if case.id == "unified_dependency_auto":
-                        case_project_path = self._dependency_fixture_project()
+                        case_project_path = case_project_path or self._dependency_fixture_project()
                     else:
                         case_project_path = None if case.id in {"unified_library_only", "unified_latest_fallback"} else self._project_path
                     allow_latest_fallback = case.id == "unified_latest_fallback"
@@ -624,7 +870,7 @@ checksum = ""
                         case.query,
                         project_path=case_project_path,
                         library=case.library,
-                        ecosystem=case.ecosystem,
+                        ecosystem=None if case.id == "unified_dependency_auto" else case.ecosystem,
                         version=case.version,
                         mode=case.mode or "auto",
                         tokens=4000,
@@ -635,7 +881,8 @@ checksum = ""
                     setup_calls += 1
                     context_pack = result.context_pack if hasattr(result, "context_pack") else []
                     answer_text = str(getattr(result, "routing", {}))
-                    reason_codes.append(getattr(result, "mode_selected", "unknown"))
+                    mode_selected = getattr(result, "mode_selected", "unknown")
+                    reason_codes.append(mode_selected)
                     exact_version_info = getattr(result, "exact_version", None)
                     if isinstance(exact_version_info, dict):
                         exact_version_used = exact_version_info.get("used", exact_version_used)
@@ -661,6 +908,25 @@ checksum = ""
                     deduplication_dropped_count = int(deduplication.get("dropped_count") or 0)
                     if deduplication_dropped_count:
                         reason_codes.extend(deduplication.get("reason_codes") or [])
+                    if case.id == "unified_dependency_auto":
+                        evidence_scopes = sorted({str(item.get("doc_scope")) for item in context_pack if item.get("doc_scope")})
+                        dependency_sources = [s.url for s in sources if s.doc_scope == "dependency"]
+                        routing_observed = {
+                            "mode_requested": case.mode or "auto",
+                            "mode_selected": mode_selected,
+                            "dependency_detected": any(s.doc_scope == "dependency" for s in sources),
+                            "evidence_scopes": evidence_scopes,
+                            "dependency_sources": dependency_sources,
+                        }
+                        strict_failure = self._dependency_auto_failure_reason(
+                            result=result,
+                            mode_selected=mode_selected,
+                            sources=sources,
+                            exact_version_used=exact_version_used,
+                        )
+                        if strict_failure:
+                            status = strict_failure
+                            reason_codes.append(strict_failure)
                 elif case.suite == "project-docs":
                     result = await asyncio.to_thread(
                         service.get_project_context, self._project_path, case.query, tokens=4000)
@@ -747,12 +1013,35 @@ checksum = ""
             return self._build_result(case, status, latency_ms, setup_calls,
                 sources, snippets, answer_text, warnings, reason_codes,
                 exact_version_used, cont, forb, expt, preindex=preindex_diag,
-                deduplication_dropped_count=deduplication_dropped_count)
+                deduplication_dropped_count=deduplication_dropped_count,
+                dependency_fixture=dependency_fixture_diag,
+                dependency_preparation=dependency_preparation,
+                project_preparation=project_preparation,
+                routing_observed=routing_observed)
+
+    def _dependency_auto_failure_reason(self, *, result: Any, mode_selected: str, sources: list[SourceRef], exact_version_used: str | None) -> str | None:
+        if getattr(result, "requires_confirmation", False):
+            return "unexpected_confirmation"
+        if mode_selected not in {"dependency", "mixed"}:
+            return "dependency_not_detected"
+        dependency_sources = [s for s in sources if s.doc_scope == "dependency"]
+        if not dependency_sources:
+            return "dependency_scope_missing"
+        if not any("anyhow" in s.url.lower() or "docs.rs" in s.url.lower() for s in dependency_sources):
+            return "dependency_source_missing"
+        if exact_version_used != "1.0.86":
+            return "dependency_version_mismatch"
+        contamination = getattr(result, "contamination", {}) or {}
+        if contamination.get("detected"):
+            return "dependency_contamination_detected"
+        return None
 
     def _build_result(self, case, status, latency_ms, setup_calls,
             sources, snippets, answer_text, warnings, reason_codes,
             exact_version_used, cont=None, forb=None, expt=None, preindex=None,
-            deduplication_dropped_count=0):
+            deduplication_dropped_count=0, dependency_fixture=None,
+            dependency_preparation=None, project_preparation=None,
+            routing_observed=None):
         # Compute exact-version fields
         exact_version_expected = case.version if case.suite in {"exact-version", "unified-context"} else None
         exact_version_match = None
@@ -805,7 +1094,11 @@ checksum = ""
             exact_version_status=exact_version_status,
             exact_version_fallback=exact_version_fallback,
             exact_version_reason_code=exact_version_reason_code,
-            deduplication_dropped_count=deduplication_dropped_count)
+            deduplication_dropped_count=deduplication_dropped_count,
+            dependency_fixture=dependency_fixture,
+            dependency_preparation=dependency_preparation,
+            project_preparation=project_preparation,
+            routing_observed=routing_observed)
 
     def _na_result(self, case):
         return self._build_result(case, "not_applicable", 0, 0, [], [], None,
@@ -1545,6 +1838,10 @@ async def run_benchmark(
                     "expected_doc_scope": case.expected_doc_scope,
                     "manual_review_required": result.manual_review_required,
                     "preindex": dataclasses.asdict(result.preindex) if result.preindex else None,
+                    "dependency_fixture": dataclasses.asdict(result.dependency_fixture) if result.dependency_fixture else None,
+                    "dependency_preparation": result.dependency_preparation,
+                    "project_preparation": result.project_preparation,
+                    "routing_observed": result.routing_observed,
                     "timestamp": timestamp,
                 }
                 if isinstance(p, DocAtlasDirectProvider):
