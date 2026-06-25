@@ -3,6 +3,8 @@ from __future__ import annotations
 
 import logging
 
+import pytest
+
 from docmancer.core.config import DocmancerConfig
 from docmancer.core.models import Document
 
@@ -60,14 +62,12 @@ def test_auto_vectors_zero_skips_vector_path(tmp_path, monkeypatch, caplog):
     assert not any("embedded=" in rec.message for rec in caplog.records)
 
 
-def test_vector_sync_failure_after_fts_ingest_falls_back_to_fts5(tmp_path, monkeypatch, caplog):
+def test_vector_sync_failure_after_fts_ingest_raises(tmp_path, monkeypatch):
     monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
     monkeypatch.setenv("DOCMANCER_AUTO_VECTORS", "1")
 
     config = DocmancerConfig()
     config.index.db_path = str(tmp_path / "docs.db")
-
-
     from docmancer.agent import DocmancerAgent
 
     agent = DocmancerAgent(config=config)
@@ -78,10 +78,25 @@ def test_vector_sync_failure_after_fts_ingest_falls_back_to_fts5(tmp_path, monke
     monkeypatch.setattr(agent, "_sync_vectors_if_enabled", fail_vectors)
     doc = Document(source="doc.md", content="# BlocProvider\n\nBlocProvider provides a bloc.", metadata={"format": "markdown"})
 
-    with caplog.at_level(logging.WARNING, logger="docmancer.agent"):
-        sections = agent.ingest_documents([doc], with_vectors=True)
+    with pytest.raises(RuntimeError, match="vector indexing failed after FTS5 ingest: qdrant collection missing"):
+        agent.ingest_documents([doc], with_vectors=True)
 
-    assert sections >= 1
-    hits = agent.query("BlocProvider", limit=2, budget=1500)
-    assert hits and "BlocProvider" in hits[0].text
-    assert any("continuing with FTS5-only index" in rec.message for rec in caplog.records)
+
+def test_vector_sync_failure_after_record_ingest_raises(tmp_path, monkeypatch):
+    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
+    monkeypatch.setenv("DOCMANCER_AUTO_VECTORS", "1")
+
+    config = DocmancerConfig()
+    config.index.db_path = str(tmp_path / "docs.db")
+    from docmancer.agent import DocmancerAgent
+
+    agent = DocmancerAgent(config=config)
+
+    def fail_vectors():
+        raise RuntimeError("qdrant collection missing")
+
+    monkeypatch.setattr(agent, "_sync_vectors_if_enabled", fail_vectors)
+    records = [Document(source="record.md", content="# Record\n\nRecord content.", metadata={"format": "markdown"})]
+
+    with pytest.raises(RuntimeError, match="vector indexing failed after FTS5 ingest: qdrant collection missing"):
+        agent.ingest_records(records, with_vectors=True)

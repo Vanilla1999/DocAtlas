@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from types import MethodType
-
 import pytest
 
 from docmancer.core.config import DocmancerConfig
@@ -11,6 +10,7 @@ from docmancer.core.models import Document
 from docmancer.docs.registry import LibraryRegistry
 from docmancer.docs.service import DocsJobTracker, LibraryDocsService
 from docmancer.agent import DocmancerAgent
+from docmancer.docs.dart_official_docs import DartDocsResolution
 
 
 class MultiRootFakeFetcher:
@@ -263,7 +263,7 @@ def test_refresh_receives_auto_registered_seed_urls(tmp_path, monkeypatch):
     assert seed_urls
     assert any("concepts2/providers" in seed for seed in seed_urls)
     assert result.preindex is not None
-    assert result.preindex["dartdoc"]["reason_code"] == "dartdoc_root_only"
+    assert result.preindex["dartdoc"]["package"] == "riverpod"
 
 
 def test_refresh_metadata_overwrites_fetcher_identity_but_preserves_docset_root(tmp_path, monkeypatch):
@@ -318,6 +318,87 @@ def test_dart_explicit_api_source_type_registers_pubdev_api_docset(tmp_path):
     record = service.registry.get(info.library_id, source_type="api")
     assert record is not None
     assert record.target_spec["doc_format"] == "dartdoc"
+
+
+@pytest.mark.parametrize("version", [None, "", "latest", "stable", "main"])
+def test_dart_api_latest_is_not_exact_snapshot(tmp_path, version):
+    config = DocmancerConfig()
+    config.index.db_path = str(tmp_path / "test.db")
+    service = LibraryDocsService(config=config)
+
+    info = service.resolve_library("riverpod", ecosystem="dart", version=version, source_type="api")
+
+    assert info.docs_snapshot_exact is False
+    assert info.version_confidence is None
+    assert info.version_inferred is True
+    record = service.registry.get(info.library_id, source_type="api")
+    assert record is not None
+    assert record.target_spec["dart_docs"]["version_binding"] == "latest_pubdev_api"
+
+
+def test_dart_api_stable_is_not_exact_snapshot(tmp_path):
+    config = DocmancerConfig()
+    config.index.db_path = str(tmp_path / "test.db")
+    service = LibraryDocsService(config=config)
+
+    info = service.resolve_library("riverpod", ecosystem="dart", version="stable", source_type="api")
+
+    assert info.docs_snapshot_exact is False
+    assert info.docs_url == "https://pub.dev/documentation/riverpod/stable/"
+
+
+def test_dart_api_main_is_not_exact_snapshot(tmp_path):
+    config = DocmancerConfig()
+    config.index.db_path = str(tmp_path / "test.db")
+    service = LibraryDocsService(config=config)
+
+    info = service.resolve_library("riverpod", ecosystem="dart", version="main", source_type="api")
+
+    assert info.docs_snapshot_exact is False
+    assert info.docs_url == "https://pub.dev/documentation/riverpod/main/"
+
+
+def test_dart_api_concrete_version_is_exact_snapshot(tmp_path):
+    config = DocmancerConfig()
+    config.index.db_path = str(tmp_path / "test.db")
+    service = LibraryDocsService(config=config)
+
+    info = service.resolve_library("flutter_bloc", ecosystem="flutter", version="9.1.1", source_type="api")
+
+    assert info.docs_url == "https://pub.dev/documentation/flutter_bloc/9.1.1/"
+    assert info.docs_snapshot_exact is True
+    assert info.version_confidence == "high"
+    assert info.version_inferred is False
+    record = service.registry.get(info.library_id, source_type="api")
+    assert record is not None
+    assert record.target_spec["dart_docs"]["version_binding"] == "pubdev_api_snapshot"
+
+
+def test_dart_api_version_string_does_not_override_latest_url_semantics(tmp_path, monkeypatch):
+    def fake_resolution(package, version=None, include_pubdev=True):
+        return DartDocsResolution(
+            package=package,
+            official_docs_available=False,
+            official_docs_urls=["https://pub.dev/documentation/flutter_bloc/latest/"],
+            pubdev_docs_url="https://pub.dev/documentation/flutter_bloc/latest/",
+            docs_strategy="pubdev_only",
+            confidence="medium",
+        )
+
+    monkeypatch.setattr("docmancer.docs.application.library_docs_service.resolve_dart_official_docs", fake_resolution)
+    config = DocmancerConfig()
+    config.index.db_path = str(tmp_path / "test.db")
+    service = LibraryDocsService(config=config)
+
+    info = service.resolve_library("flutter_bloc", ecosystem="flutter", version="9.1.1", source_type="api")
+
+    assert info.docs_url == "https://pub.dev/documentation/flutter_bloc/latest/"
+    assert info.docs_snapshot_exact is False
+    assert info.version_confidence is None
+    assert info.version_inferred is True
+    record = service.registry.get(info.library_id, source_type="api")
+    assert record is not None
+    assert record.target_spec["dart_docs"]["version_binding"] == "latest_pubdev_api"
 
 
 def test_riverpod_refresh_ingests_and_queries_official_and_pubdev_roots(tmp_path, monkeypatch):

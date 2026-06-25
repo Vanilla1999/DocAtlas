@@ -391,8 +391,10 @@ class DocAtlasDirectProvider(BenchmarkProvider):
         @contextmanager
         def _ctx():
             old_home = os.environ.get("DOCMANCER_HOME")
+            old_auto_vectors = os.environ.get("DOCMANCER_AUTO_VECTORS")
             if self.docmancer_home:
                 os.environ["DOCMANCER_HOME"] = str(self.docmancer_home)
+                os.environ["DOCMANCER_AUTO_VECTORS"] = "0"
             try:
                 yield
             finally:
@@ -400,6 +402,10 @@ class DocAtlasDirectProvider(BenchmarkProvider):
                     os.environ.pop("DOCMANCER_HOME", None)
                 else:
                     os.environ["DOCMANCER_HOME"] = old_home
+                if old_auto_vectors is None:
+                    os.environ.pop("DOCMANCER_AUTO_VECTORS", None)
+                else:
+                    os.environ["DOCMANCER_AUTO_VECTORS"] = old_auto_vectors
         return _ctx()
 
     def _get_service(self):

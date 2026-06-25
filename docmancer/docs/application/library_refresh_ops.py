@@ -124,7 +124,7 @@ class LibraryRefreshOps:
                 targets_completed=1,
             )
 
-        pages_indexed = 0
+        sections_indexed = 0
         discovery_diagnostics: list[dict[str, Any]] = []
         try:
             target = self._target_from_record(record)
@@ -135,7 +135,7 @@ class LibraryRefreshOps:
             per_url_max_pages = target.max_pages if target.doc_format == "dartdoc" else (1 if target.seed_urls and not target.docs_url and not target.docs_url_template else target.max_pages)
             for url in urls:
                 agent = self._agent_instance(record)
-                pages = agent.add(
+                indexed_sections = agent.add(
                     url,
                     recreate=False,
                     max_pages=per_url_max_pages,
@@ -143,8 +143,8 @@ class LibraryRefreshOps:
                     seed_urls=seed_urls_for_discovery if (target.docs_url or target.docs_url_template) else None,
                     metadata=_metadata_for_record(record),
                 )
-                if isinstance(pages, int):
-                    pages_indexed += pages
+                if isinstance(indexed_sections, int):
+                    sections_indexed += indexed_sections
                 if getattr(agent, "last_discovery_diagnostics", None):
                     discovery_diagnostics.append(dict(agent.last_discovery_diagnostics))
         except Exception as exc:
@@ -178,7 +178,7 @@ class LibraryRefreshOps:
                     "reason_code": "refresh_failed",
                     **_dart_refresh_diagnostics(
                         record,
-                        pages_discovered=pages_indexed,
+                        pages_discovered=sections_indexed,
                         pages_extracted=0,
                         chunks_created=0,
                         reason_code="refresh_failed",
@@ -187,9 +187,9 @@ class LibraryRefreshOps:
             )
 
         pages_after, chunks_after = self.registry_ops.count_index_entries(record)
-        if pages_indexed == 0 or pages_after == 0 or chunks_after == 0:
+        if sections_indexed == 0 or pages_after == 0 or chunks_after == 0:
             refreshed_at = self._now()
-            reason = "ingest_produced_no_chunks" if pages_indexed > 0 else "no_extractable_content"
+            reason = "ingest_produced_no_chunks" if sections_indexed > 0 else "no_extractable_content"
             self.registry.upsert(
                 library=record.name,
                 ecosystem=record.ecosystem,
@@ -214,7 +214,7 @@ class LibraryRefreshOps:
                 source_type=record.source_type,
                 message=f"{reason}: refresh indexed no usable chunks. Check docs_url, source_type, doc_format, browser, or Dartdoc seed discovery.",
                 duration_ms=int((time.monotonic() - started) * 1000),
-                pages_indexed=pages_indexed,
+                pages_indexed=pages_after,
                 chunks_indexed=chunks_after,
                 targets_failed=1,
                 preindex={
@@ -231,7 +231,7 @@ class LibraryRefreshOps:
                     "reason_code": reason,
                     **_dart_refresh_diagnostics(
                         record,
-                        pages_discovered=pages_indexed,
+                        pages_discovered=pages_after,
                         pages_extracted=pages_after,
                         chunks_created=chunks_after,
                     ),
@@ -273,7 +273,7 @@ class LibraryRefreshOps:
             "reason_code": reason_code,
             **_dart_refresh_diagnostics(
                 record,
-                pages_discovered=pages_indexed,
+                pages_discovered=pages_after,
                 pages_extracted=pages_after,
                 chunks_created=chunks_after,
             ),
@@ -288,7 +288,7 @@ class LibraryRefreshOps:
             version=record.version,
             source_type=record.source_type,
             duration_ms=int((time.monotonic() - started) * 1000),
-            pages_indexed=pages_indexed,
+            pages_indexed=pages_after,
             chunks_indexed=chunks_after,
             targets_completed=1,
             preindex=preindex,

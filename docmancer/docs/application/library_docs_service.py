@@ -23,7 +23,7 @@ from docmancer.docs.domain.target_security import host_allowed, is_remote_url, p
 from docmancer.docs.domain.trust_contract import build_project_context_trust_contract
 from docmancer.docs.models import DocsChunk, DocsInspectResult, DocsJobStartResult, DocsManifestValidationResult, DocsPruneResult, DocsRemoveResult, DocsResult, DocsSourceResolution, DocsTarget, DocsTargetResult, DocsTargetsPrefetchResult, LibraryInfo, ProjectDocsBootstrapResult, ProjectDocsChunk, ProjectDocsIngestResult, ProjectDocsInspectResult, ProjectDocsResult, ProjectMetadata, ProjectPrefetchResult, RefreshResult
 from docmancer.docs.registry import LibraryRecord
-from docmancer.docs.resolver import canonical_library_id, legacy_library_id, normalize_version
+from docmancer.docs.resolver import canonical_library_id, docs_snapshot_is_exact, legacy_library_id, normalize_version
 from docmancer.docs.dartdoc import discover_pub_dartdoc_seed_urls, is_pub_dartdoc_target, normalize_pub_dartdoc_target, pub_dartdoc_root_url
 from docmancer.docs.dart_official_docs import (
     allowed_domains_for_urls,
@@ -126,6 +126,7 @@ class LibraryDocsApplicationService:
             if is_dart_flutter and (source_type or "").lower() == "api":
                 dart_resolution = resolve_dart_official_docs(library, version=normalized_version)
                 pubdev_url = dart_resolution.pubdev_docs_url
+                is_exact_snapshot = docs_snapshot_is_exact(normalized_version, pubdev_url)
                 target_spec = {
                     "id": f"dart:{library}:api",
                     "library": library,
@@ -140,7 +141,7 @@ class LibraryDocsApplicationService:
                     "dart_docs": {
                         "requested_ecosystem": original_ecosystem,
                         "docs_strategy": "pubdev_only",
-                        "version_binding": "pubdev_api_snapshot" if normalized_version else "latest_pubdev_api",
+                        "version_binding": "pubdev_api_snapshot" if is_exact_snapshot else "latest_pubdev_api",
                     },
                 }
                 record = self.registry.upsert(
@@ -154,10 +155,10 @@ class LibraryDocsApplicationService:
                     target_spec=target_spec,
                     requested_version=normalized_version,
                     resolved_version=normalized_version or "latest",
-                    version_source="pubdev_api" if normalized_version else None,
-                    version_confidence="high" if normalized_version else None,
-                    version_inferred=normalized_version is None,
-                    docs_snapshot_exact=bool(normalized_version),
+                    version_source="pubdev_api" if is_exact_snapshot else None,
+                    version_confidence="high" if is_exact_snapshot else None,
+                    version_inferred=not is_exact_snapshot,
+                    docs_snapshot_exact=is_exact_snapshot,
                 )
                 stale = self._is_stale(record.last_refreshed_at)
                 return LibraryInfo(

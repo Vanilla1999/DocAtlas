@@ -113,6 +113,7 @@ class LibraryRegistry:
         source_id = row["source_id"] or source_identity_id(row["name"], row["ecosystem"], source_type)
         canonical_id = row["canonical_id"] or row["library_id"]
         resolved_url = row["docs_url_resolved"] or docs_url_resolved(row["docs_url"], row["docs_url_template"], row["name"], version)
+        snapshot_exact = bool(row["docs_snapshot_exact"]) or docs_snapshot_is_exact(version, resolved_url)
         return LibraryRecord(
             library_id=row["library_id"],
             source_id=source_id,
@@ -132,12 +133,11 @@ class LibraryRegistry:
             last_error=row["last_error"],
             requested_version=row["requested_version"] or version,
             resolved_version=row["resolved_version"] or version,
-            version_source=row["version_source"] or ("explicit" if version else None),
-            version_confidence=row["version_confidence"] or ("high" if version else None),
+            version_source=row["version_source"] or ("explicit" if snapshot_exact else None),
+            version_confidence=row["version_confidence"] or ("high" if snapshot_exact else None),
             version_inferred=bool(row["version_inferred"]),
             docs_url_resolved=resolved_url,
-            docs_snapshot_exact=bool(row["docs_snapshot_exact"])
-            or docs_snapshot_is_exact(version, resolved_url),
+            docs_snapshot_exact=snapshot_exact,
             legacy_ids=json.loads(row["legacy_ids_json"] or "[]"),
             target_spec=json.loads(row["target_spec_json"] or "null"),
         )
@@ -330,10 +330,10 @@ class LibraryRegistry:
         resolved_url = docs_url_resolved(final_docs_url, final_template, name, normalized_version)
         final_requested_version = requested_version if requested_version is not None else (existing.requested_version if existing else normalized_version)
         final_resolved_version = resolved_version if resolved_version is not None else (existing.resolved_version if existing else normalized_version)
-        final_version_source = version_source if version_source is not None else (existing.version_source if existing else ("explicit" if normalized_version else None))
-        final_version_confidence = version_confidence if version_confidence is not None else (existing.version_confidence if existing else ("high" if normalized_version else None))
         final_version_inferred = version_inferred if version_inferred is not None else (existing.version_inferred if existing else normalized_version is None)
         snapshot_exact = docs_snapshot_exact if docs_snapshot_exact is not None else docs_snapshot_is_exact(normalized_version, resolved_url)
+        final_version_source = version_source if version_source is not None else (existing.version_source if existing else ("explicit" if snapshot_exact else None))
+        final_version_confidence = version_confidence if version_confidence is not None else (existing.version_confidence if existing else ("high" if snapshot_exact else None))
         added_at = existing.added_at if existing else now
 
         with self._connect() as conn:
