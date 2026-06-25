@@ -1050,11 +1050,12 @@ class LibraryDocsApplicationService:
         
         # Build exact-version diagnostics if applicable
         final_diagnostics = {**resolution.diagnostics, **quality_diagnostics, "freshness": freshness, "warnings": diagnostic_warnings}
+        resolved_version = latest.resolved_version or latest.version
+        exact_version_match = docs_snapshot_is_exact(requested_version, latest.docs_url_resolved or latest.docs_url) and resolved_version == requested_version if requested_version else None
         if exact_version_resolution and requested_version:
-            exact_version_match = (latest.resolved_version or latest.version) == requested_version
             final_diagnostics["exact_version"] = {
                 "expected": requested_version,
-                "used": latest.resolved_version or latest.version,
+                "used": resolved_version,
                 "match": exact_version_match,
                 "status": "exact_version_indexed" if exact_version_match else "exact_version_fallback_latest",
                 "fallback": not exact_version_match,
@@ -1092,11 +1093,11 @@ class LibraryDocsApplicationService:
                     "origin_lane": "library",
                     "canonical_id": info.library_id,
                     "library_id": info.library_id,
-                    "version": latest.resolved_version or latest.version,
+                    "version": resolved_version,
                     "requested_version": requested_version,
                     "docs_exactness": docs_exactness,
                     "docs_binding_source": docs_binding_source,
-                    "exact_version_match": (latest.resolved_version or latest.version) == requested_version if requested_version else None,
+                    "exact_version_match": exact_version_match,
                 },
             }
             for chunk in result_chunks
@@ -1120,7 +1121,7 @@ class LibraryDocsApplicationService:
             results=result_chunks,
             warnings=[*warnings, *[warning["code"] for warning in snippet_presentation.warnings]],
             requested_version=requested_version,
-            resolved_version=latest.resolved_version or latest.version,
+            resolved_version=resolved_version,
             version_source=version_source,
             docs_snapshot_exact=docs_snapshot_exact,
             docs_exactness=docs_exactness,

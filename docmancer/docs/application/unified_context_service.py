@@ -7,9 +7,17 @@ from docmancer.docs.application.project_context_service import context_pack_snip
 from docmancer.docs.domain.snippets import build_snippet_presentation, validate_response_style
 from docmancer.docs.exact_version import resolve_python_versioned_docs
 from docmancer.docs.models import DocsResult, ProjectContextResult, UnifiedDocsContextResult
+from docmancer.docs.resolver import docs_snapshot_is_exact
 
 
 _LATEST_ALIASES = {"latest", "stable", "main", "*"}
+
+
+def _exact_version_match(result: DocsResult) -> bool | None:
+    if not result.requested_version:
+        return None
+    url = result.identity.get("docs_url_resolved") or result.identity.get("docs_url") if isinstance(result.identity, dict) else None
+    return docs_snapshot_is_exact(result.requested_version, url) and (result.resolved_version or result.version) == result.requested_version
 
 
 class UnifiedDocsContextService:
@@ -442,7 +450,7 @@ class UnifiedDocsContextService:
                 "requested_version": chunk_metadata.get("requested_version") or result.requested_version,
                 "docs_exactness": chunk_metadata.get("docs_exactness") or result.docs_exactness,
                 "docs_binding_source": chunk_metadata.get("docs_binding_source") or result.docs_binding_source,
-                "exact_version_match": chunk_metadata.get("exact_version_match") if "exact_version_match" in chunk_metadata else ((result.resolved_version or result.version) == result.requested_version if result.requested_version else None),
+                "exact_version_match": chunk_metadata.get("exact_version_match") if "exact_version_match" in chunk_metadata else _exact_version_match(result),
                 "freshness": "stale" if result.stale_before_refresh else "current",
                 "why_selected": "library docs resolved through Docmancer registry",
                 "token_estimate": token_estimate,

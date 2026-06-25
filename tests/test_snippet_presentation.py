@@ -5,6 +5,7 @@ from docmancer.docs.domain.snippets import (
     clean_snippet_title,
     clean_surrounding_context,
     extract_snippet_candidates,
+    infer_snippet_query_intent,
     normalize_code_for_dedupe,
 )
 from docmancer.docs.models import DocsChunk
@@ -74,12 +75,55 @@ def test_anyhow_context_selects_context_snippet():
     assert "with_context" in primary["code"]
 
 
+def test_project_context_question_remains_evidence_first():
+    item = chunk("Project context", "```bash\nuv run pytest\n```")
+    presentation = build_snippet_presentation([item], question="What is the project context?", response_style="auto")
+    assert presentation.response_style == "evidence-first"
+    assert presentation.primary_snippet is None
+
+
+def test_context_pack_question_remains_evidence_first():
+    item = chunk("Context pack", "```json\n{\"context_pack\": []}\n```")
+    presentation = build_snippet_presentation([item], question="How does the context pack work?", response_style="auto")
+    assert presentation.response_style == "evidence-first"
+    assert presentation.primary_snippet is None
+
+
+def test_anyhow_context_question_is_snippet_first():
+    intent = infer_snippet_query_intent("How do I add error context with anyhow?")
+    assert intent.wants_code is True
+
+
 def test_exact_version_snippet_outranks_latest_fallback():
     latest = chunk("Context latest", "```rust\nuse anyhow::Result;\n```", {"version": "latest", "requested_version": "1.0.86", "exact_version_match": False})
     exact = chunk("Context exact", "```rust\nuse anyhow::{Context, Result};\nread().context(\"failed\")?;\n```", {"version": "1.0.86", "requested_version": "1.0.86", "exact_version_match": True})
     primary = build_snippet_presentation([latest, exact], question="anyhow Context", response_style="snippet-first").primary_snippet
     assert primary["version"] == "1.0.86"
     assert primary["exact_version_match"] is True
+
+
+def test_latest_snippet_is_not_exact_match():
+    item = chunk("Latest", "```rust\nfn main() {\n    let value = anyhow::Result::<()>::Ok(());\n}\n```", {"version": "latest", "requested_version": "latest"})
+    primary = build_snippet_presentation([item], question="anyhow example", response_style="snippet-first").primary_snippet
+    assert primary["exact_version_match"] is False
+
+
+def test_stable_snippet_is_not_exact_match():
+    item = chunk("Stable", "```rust\nfn main() {\n    let value = anyhow::Result::<()>::Ok(());\n}\n```", {"version": "stable", "requested_version": "stable"})
+    primary = build_snippet_presentation([item], question="anyhow example", response_style="snippet-first").primary_snippet
+    assert primary["exact_version_match"] is False
+
+
+def test_concrete_versioned_snippet_is_exact_match():
+    item = chunk("Concrete", "```rust\nfn main() {\n    let value = anyhow::Result::<()>::Ok(());\n}\n```", {"version": "1.0.86", "requested_version": "1.0.86"})
+    primary = build_snippet_presentation([item], question="anyhow example", response_style="snippet-first").primary_snippet
+    assert primary["exact_version_match"] is True
+
+
+def test_latest_snippet_gets_not_exact_version_risk_flag():
+    item = chunk("Latest", "```rust\nfn main() {\n    let value = anyhow::Result::<()>::Ok(());\n}\n```", {"version": "latest", "requested_version": "latest"})
+    primary = build_snippet_presentation([item], question="anyhow example", response_style="snippet-first").primary_snippet
+    assert "not_exact_version" in primary["risk_flags"]
 
 
 def test_identical_snippets_are_deduplicated():
@@ -102,3 +146,38 @@ def test_cleaning_does_not_change_code_symbols():
     assert "Copy" not in clean_surrounding_context("Intro\nCopy\nBody")
     code = "# comment\n@decorator\nprint('✅')"
     assert normalize_code_for_dedupe(code) == code
+
+
+def test_cleaning_does_not_remove_copy_substrings():
+    assert clean_snippet_title("CopyWith usage") == "CopyWith usage"
+    assert "Copyright" in clean_surrounding_context("Intro\nCopyright 2024\nBody")
+
+
+def test_truncated_json_does_not_append_python_comment():
+    code = "{\n" + "\n".join(f'  \"key{i}\": \"value\",' for i in range(500)) + "\n}"
+    item = chunk("JSON", "prose", {"code_snippets": [{"language": "json", "code": code}]})
+    primary = build_snippet_presentation([item], question="json config example", response_style="snippet-first").primary_snippet
+    assert "# ... snippet truncated ..." not in primary["code"]
+
+
+def test_truncated_dart_does_not_append_python_comment():
+    code = "void main() {\n" + "\n".join("  print('hello');" for _ in range(500)) + "\n}"
+    item = chunk("Dart", "prose", {"code_snippets": [{"language": "dart", "code": code}]})
+    primary = build_snippet_presentation([item], question="dart example", response_style="snippet-first").primary_snippet
+    assert "# ... snippet truncated ..." not in primary["code"]
+
+
+def test_truncated_rust_does_not_append_python_comment():
+    code = "fn main() {\n" + "\n".join('  println!("hello");' for _ in range(500)) + "\n}"
+    item = chunk("Rust", "prose", {"code_snippets": [{"language": "rust", "code": code}]})
+    primary = build_snippet_presentation([item], question="rust example", response_style="snippet-first").primary_snippet
+    assert "# ... snippet truncated ..." not in primary["code"]
+
+
+def test_truncation_is_exposed_in_metadata_and_warning():
+    code = "fn main() {\n" + "\n".join('  println!("hello");' for _ in range(500)) + "\n}"
+    item = chunk("Rust", "prose", {"code_snippets": [{"language": "rust", "code": code}]})
+    presentation = build_snippet_presentation([item], question="rust example", response_style="snippet-first")
+    assert presentation.primary_snippet["truncated"] is True
+    assert presentation.primary_snippet["complete"] is False
+    assert presentation.warnings == [{"code": "snippet_truncated", "message": "One or more snippets were truncated for presentation."}]

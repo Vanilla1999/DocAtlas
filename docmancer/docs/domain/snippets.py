@@ -14,7 +14,8 @@ MAX_SNIPPETS_PER_SOURCE = 1
 
 _FENCED_CODE_RE = re.compile(r"```([A-Za-z0-9_+.#-]*)\s*\n(.*?)```", re.DOTALL)
 _TERM_RE = re.compile(r"[A-Za-z_][A-Za-z0-9_]*|[A-Za-z0-9][A-Za-z0-9_.:-]*")
-_NOISE_TEXT = ("[¶]", "Copy", "Copy code", "Download", "Open in new tab", "Edit this page", "Other versions and variants")
+_NOISE_TEXT = ("[¶]", "Copy code", "Copy", "Download", "Open in new tab", "Edit this page", "Other versions and variants")
+_FLOATING_VERSION_ALIASES = {"latest", "stable", "main", "master", "beta", "next"}
 _LANGUAGE_ALIASES = {"py": "python", "python3": "python", "sh": "bash", "shell": "bash", "console": "bash", "rs": "rust"}
 
 
@@ -77,11 +78,12 @@ def infer_snippet_query_intent(question: str) -> SnippetQueryIntent:
     lowered = text.lower()
     wants_command = bool(re.search(r"\b(command|cli|terminal|curl|shell|bash|run)\b", lowered))
     wants_config = bool(re.search(r"\b(config|configure|yaml|toml|json|ini|setting)\b", lowered))
-    wants_code = bool(re.search(r"\b(how do i use|example|snippet|code|api|function|class|decorator|provider|depends|context|with_context|autodispose|blocprovider|click\.group|command group)\b", lowered)) or wants_command or wants_config
+    coding_context = bool(re.search(r"\b(anyhow|with_context|error context|context trait)\b", lowered))
+    wants_code = bool(re.search(r"\b(how do i use|example|snippet|code|api|function|class|decorator|provider|depends|with_context|autodispose|blocprovider|click\.group|command group)\b", lowered)) or coding_context or wants_command or wants_config
     language_hints = {
         "python": ("python", "fastapi", "click", "depends"),
         "dart": ("dart", "flutter", "riverpod", "bloc", "blocprovider", "autodispose"),
-        "rust": ("rust", "anyhow", "with_context", "context"),
+        "rust": ("rust", "anyhow", "with_context", "context trait"),
         "yaml": ("yaml", "yml"),
         "toml": ("toml", "cargo.toml"),
         "json": ("json",),
@@ -106,11 +108,12 @@ def extract_snippet_candidates(chunk: Any, *, origin_lane: str, question: str) -
     candidates: list[SnippetCandidate] = []
     for index, snippet in enumerate(snippets):
         code = str(snippet.get("code") or "")
-        if not code.strip() or not looks_like_code_or_command(code):
+        language = _normalize_language(snippet.get("language")) or _infer_language(code, metadata)
+        if not code.strip() or (not looks_like_code_or_command(code) and language not in {"json", "yaml", "toml"}):
             continue
         candidate = SnippetCandidate(
             code=code.strip("\n"),
-            language=_normalize_language(snippet.get("language")) or _infer_language(code, metadata),
+            language=language,
             title=clean_snippet_title(snippet.get("title") or _title(chunk, metadata)),
             heading_path=_heading_path(chunk, metadata),
             source=_source(chunk, metadata),
@@ -194,8 +197,7 @@ def clean_snippet_title(value: Any) -> str | None:
     text = str(value or "").strip()
     if not text:
         return None
-    for noise in _NOISE_TEXT:
-        text = text.replace(noise, "")
+    text = _remove_ui_noise(text)
     text = re.sub(r"\s+", " ", text).strip(" -|")
     return text or None
 
@@ -204,14 +206,12 @@ def clean_surrounding_context(value: str | None) -> str | None:
     text = str(value or "")
     if not text.strip():
         return None
-    for noise in _NOISE_TEXT:
-        text = text.replace(noise, "")
     lines = []
     for line in text.splitlines():
         normalized = line.strip().lower().strip(":")
         if normalized in {"copy", "copy code", "download", "open in new tab", "edit this page"}:
             continue
-        lines.append(line.rstrip())
+        lines.append(_remove_ui_noise(line).rstrip())
     return "\n".join(lines).strip() or None
 
 
@@ -320,7 +320,7 @@ def _truncate_code(code: str, max_chars: int) -> tuple[str, bool]:
     cutoff = code.rfind("\n", 0, max_chars)
     if cutoff < max(80, max_chars // 2):
         cutoff = max_chars
-    return code[:cutoff].rstrip() + "\n# ... snippet truncated ...", True
+    return code[:cutoff].rstrip(), True
 
 
 def _query_terms(value: str | None) -> set[str]:
@@ -489,12 +489,20 @@ def _exact_version_match(metadata: dict[str, Any]) -> bool | None:
     requested = metadata.get("requested_version")
     version = metadata.get("version") or metadata.get("resolved_version")
     if requested and version:
+        if str(requested).strip().lower() in _FLOATING_VERSION_ALIASES:
+            return False
         return str(requested) == str(version)
     if metadata.get("docs_exactness") in {"exact_version_url", "exact_snapshot"}:
         return True
     if metadata.get("fallback") or (str(version or "").lower() == "latest" and requested):
         return False
     return None
+
+
+def _remove_ui_noise(value: str) -> str:
+    text = value.replace("[¶]", "")
+    text = re.sub(r"(?i)(?:^|\s)(copy code|copy|download|open in new tab|edit this page)(?=\s*$)", "", text)
+    return text
 
 
 def _string(value: Any) -> str | None:
