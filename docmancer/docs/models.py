@@ -471,4 +471,5 @@ class UnifiedDocsContextResult:
     warnings: list[Any] = field(default_factory=list)
     metrics: dict[str, Any] = field(default_factory=dict)
     contamination: dict[str, Any] = field(default_factory=dict)
+    deduplication: dict[str, Any] = field(default_factory=dict)
     lane_details: dict[str, Any] = field(default_factory=dict)

@@ -120,6 +120,7 @@ class NormalizedBenchmarkResult:
     exact_version_status: str | None = None
     exact_version_fallback: bool = False
     exact_version_reason_code: str | None = None
+    deduplication_dropped_count: int = 0
 
     def is_not_applicable(self) -> bool:
         return self.status in ("not_applicable",)
@@ -338,21 +339,30 @@ EXACT_VERSION_CASES: list[BenchmarkCase] = [
 ]
 
 UNIFIED_CONTEXT_CASES: list[BenchmarkCase] = [
-    BenchmarkCase(id="unified_project_only",
+    BenchmarkCase(id="unified_project_auto",
         query="How does DocAtlas isolate project docs from library docs?",
         suite="unified-context", mode="auto",
         not_applicable_for=["context7"], expected_doc_scope="project",
         expected_sources=["docs/", "CHANGELOG.md"]),
+    BenchmarkCase(id="unified_dependency_auto",
+        query="How do I use anyhow Context for the dependency version in this project?",
+        suite="unified-context", ecosystem="rust", mode="auto",
+        not_applicable_for=["context7"], expected_source_patterns=["anyhow"]),
     BenchmarkCase(id="unified_library_only",
         query="How do I use FastAPI Depends?",
         suite="unified-context", library="fastapi", ecosystem="python", mode="auto",
         expected_domains=["fastapi.tiangolo.com", "github.com"], expected_source_patterns=["fastapi"],
         context7_library_id="/fastapi/fastapi"),
-    BenchmarkCase(id="unified_mixed",
+    BenchmarkCase(id="unified_mixed_partial_confirmation",
         query="How does this project use FastAPI dependency injection?",
-        suite="unified-context", library="fastapi", ecosystem="python", mode="auto",
+        suite="unified-context", library="definitely_unindexed_unified_pr5_lib", ecosystem="python", mode="auto",
         not_applicable_for=["context7"], expected_doc_scope="project",
-        expected_source_patterns=["fastapi", "docatlas"]),
+        expected_source_patterns=["docatlas"]),
+    BenchmarkCase(id="unified_latest_fallback",
+        query="FastAPI Depends with unsupported exact version and latest fallback",
+        suite="unified-context", library="fastapi", ecosystem="python", version="0.115.0", mode="auto",
+        expected_domains=["fastapi.tiangolo.com", "github.com"], expected_source_patterns=["fastapi"],
+        context7_library_id="/fastapi/fastapi"),
     BenchmarkCase(id="unified_dependency",
         query="How do I use Riverpod autoDispose for the version in this project?",
         suite="unified-context", library="riverpod", ecosystem="flutter", mode="dependency",
@@ -362,7 +372,7 @@ UNIFIED_CONTEXT_CASES: list[BenchmarkCase] = [
 QUICK_CASES: list[str] = [
     "fastapi_depends", "click_command_group", "riverpod_autodispose",
     "bloc_provider", "project_lifecycle", "exact_fastapi_version",
-    "unified_project_only", "unified_library_only", "unified_mixed", "unified_dependency",
+    "unified_project_auto", "unified_dependency_auto", "unified_library_only", "unified_mixed_partial_confirmation", "unified_latest_fallback", "unified_dependency",
 ]
 
 
@@ -409,6 +419,7 @@ class DocAtlasDirectProvider(BenchmarkProvider):
         self.runtime_dir: Path | None = None
         self.docmancer_home: Path | None = None
         self.db_path: Path | None = None
+        self._dependency_fixture_path: Path | None = None
 
     def _isolated_env(self):
         """Context manager for isolated DOCMANCER_HOME environment."""
@@ -448,6 +459,39 @@ class DocAtlasDirectProvider(BenchmarkProvider):
         with self._isolated_env():
             _ = self._get_service()
 
+    def _dependency_fixture_project(self) -> str:
+        if self._dependency_fixture_path is None:
+            root = (self.runtime_dir or Path(tempfile.gettempdir())) / "fixture_flutter_project"
+            root.mkdir(parents=True, exist_ok=True)
+            (root / "Cargo.toml").write_text(
+                """
+[package]
+name = "fixture"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+anyhow = "1.0.86"
+""".strip()
+                + "\n",
+                encoding="utf-8",
+            )
+            (root / "Cargo.lock").write_text(
+                """
+version = 3
+
+[[package]]
+name = "anyhow"
+version = "1.0.86"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = ""
+""".strip()
+                + "\n",
+                encoding="utf-8",
+            )
+            self._dependency_fixture_path = root
+        return str(self._dependency_fixture_path)
+
     async def _preindex_library(self, case: BenchmarkCase) -> PreindexDiagnostics:
         with self._isolated_env():
             service = self._get_service()
@@ -457,6 +501,12 @@ class DocAtlasDirectProvider(BenchmarkProvider):
                 lib = case.library or case.id
                 eco = case.ecosystem
                 ver = case.version
+                docs_url = {
+                    "fastapi": "https://fastapi.tiangolo.com/",
+                    "httpx": "https://www.python-httpx.org/",
+                    "riverpod": f"https://pub.dev/documentation/riverpod/{ver}/" if ver else "https://pub.dev/documentation/riverpod/latest/",
+                    "anyhow": f"https://docs.rs/anyhow/{ver}/" if ver else "https://docs.rs/anyhow/latest/",
+                }.get(lib)
                 key = f"{eco}:{lib}:{ver}"
                 cached = self._lib_cache.get(key)
                 if cached:
@@ -467,7 +517,7 @@ class DocAtlasDirectProvider(BenchmarkProvider):
                     diag.latency_ms = round((time.perf_counter() - t0) * 1000, 3)
                     return diag
 
-                info = service.resolve_library(lib, ecosystem=eco, version=ver)
+                info = service.resolve_library(lib, ecosystem=eco, version=ver, docs_url=docs_url)
                 if info.library_id is None:
                     diag.status = "not_supported"
                     diag.reason_code = "unresolved"
@@ -489,7 +539,7 @@ class DocAtlasDirectProvider(BenchmarkProvider):
                     diag.pages = pages
                     diag.chunks = chunks
                 else:
-                    refresh_result = service.refresh_docs(lib, ecosystem=eco, version=ver, force=False)
+                    refresh_result = service.refresh_docs(lib, ecosystem=eco, version=ver, docs_url=docs_url, force=False)
                     diag.status = "refreshed"
                     post_inspect = service.inspect_library_docs(info.library_id)
                     diag.pages = int(getattr(post_inspect, "pages", 0) or getattr(refresh_result, "pages_indexed", 0) or 0)
@@ -538,13 +588,22 @@ class DocAtlasDirectProvider(BenchmarkProvider):
             reason_codes: list[str] = []
             answer_text: str | None = None
             exact_version_used: str | None = case.version
+            deduplication_dropped_count = 0
             setup_calls = 0
             status = "success"
             preindex_diag: PreindexDiagnostics | None = None
 
             try:
-                if self.benchmark_mode == "preindexed" and case.suite in ("public-docs", "exact-version") and case.library:
-                    preindex_diag = await self._preindex_library(case)
+                preindex_for_unified_auto = case.id == "unified_dependency_auto"
+                should_preindex = self.benchmark_mode == "preindexed" and ((case.suite in ("public-docs", "exact-version") or case.id == "unified_latest_fallback") and case.library or preindex_for_unified_auto)
+                if should_preindex:
+                    if case.id == "unified_latest_fallback":
+                        preindex_case = dataclasses.replace(case, version=None)
+                    elif preindex_for_unified_auto:
+                        preindex_case = dataclasses.replace(case, library="anyhow", ecosystem="rust", version="1.0.86")
+                    else:
+                        preindex_case = case
+                    preindex_diag = await self._preindex_library(preindex_case)
                     setup_calls += 2
                     reason_codes.append(preindex_diag.status)
                     if preindex_diag.status in ("preindex_failed", "not_supported", "empty_index"):
@@ -555,22 +614,32 @@ class DocAtlasDirectProvider(BenchmarkProvider):
                             exact_version_used, preindex=preindex_diag)
 
                 if case.suite == "unified-context":
+                    if case.id == "unified_dependency_auto":
+                        case_project_path = self._dependency_fixture_project()
+                    else:
+                        case_project_path = None if case.id in {"unified_library_only", "unified_latest_fallback"} else self._project_path
+                    allow_latest_fallback = case.id == "unified_latest_fallback"
                     result = await asyncio.to_thread(
                         service.get_docs_context,
                         case.query,
-                        project_path=self._project_path if case.id != "unified_library_only" else None,
+                        project_path=case_project_path,
                         library=case.library,
                         ecosystem=case.ecosystem,
                         version=case.version,
                         mode=case.mode or "auto",
                         tokens=4000,
                         allow_network=False,
-                        prepare_project_docs=True,
+                        allow_latest_fallback=allow_latest_fallback,
+                        prepare_project_docs=case.id != "unified_dependency_auto",
                     )
                     setup_calls += 1
                     context_pack = result.context_pack if hasattr(result, "context_pack") else []
                     answer_text = str(getattr(result, "routing", {}))
                     reason_codes.append(getattr(result, "mode_selected", "unknown"))
+                    exact_version_info = getattr(result, "exact_version", None)
+                    if isinstance(exact_version_info, dict):
+                        exact_version_used = exact_version_info.get("used", exact_version_used)
+                        reason_codes.append(exact_version_info.get("status") or "exact_version")
                     if getattr(result, "requires_confirmation", False):
                         reason_codes.append(getattr(result, "reason_code", "confirmation_required") or "confirmation_required")
                     for i, item in enumerate(context_pack):
@@ -583,9 +652,15 @@ class DocAtlasDirectProvider(BenchmarkProvider):
                             snippets.append(Snippet(text=content[:500], source=source_str, rank=i + 1))
                     if not context_pack:
                         status = "needs_refresh" if getattr(result, "requires_confirmation", False) else "no_results"
+                    else:
+                        status = getattr(result, "status", "success")
                     contamination = getattr(result, "contamination", {}) or {}
                     if contamination.get("detected"):
                         reason_codes.extend(contamination.get("reason_codes") or [])
+                    deduplication = getattr(result, "deduplication", {}) or {}
+                    deduplication_dropped_count = int(deduplication.get("dropped_count") or 0)
+                    if deduplication_dropped_count:
+                        reason_codes.extend(deduplication.get("reason_codes") or [])
                 elif case.suite == "project-docs":
                     result = await asyncio.to_thread(
                         service.get_project_context, self._project_path, case.query, tokens=4000)
@@ -671,13 +746,15 @@ class DocAtlasDirectProvider(BenchmarkProvider):
 
             return self._build_result(case, status, latency_ms, setup_calls,
                 sources, snippets, answer_text, warnings, reason_codes,
-                exact_version_used, cont, forb, expt, preindex=preindex_diag)
+                exact_version_used, cont, forb, expt, preindex=preindex_diag,
+                deduplication_dropped_count=deduplication_dropped_count)
 
     def _build_result(self, case, status, latency_ms, setup_calls,
             sources, snippets, answer_text, warnings, reason_codes,
-            exact_version_used, cont=None, forb=None, expt=None, preindex=None):
+            exact_version_used, cont=None, forb=None, expt=None, preindex=None,
+            deduplication_dropped_count=0):
         # Compute exact-version fields
-        exact_version_expected = case.version if case.suite == "exact-version" else None
+        exact_version_expected = case.version if case.suite in {"exact-version", "unified-context"} else None
         exact_version_match = None
         exact_version_status = None
         exact_version_fallback = False
@@ -727,7 +804,8 @@ class DocAtlasDirectProvider(BenchmarkProvider):
             exact_version_match=exact_version_match,
             exact_version_status=exact_version_status,
             exact_version_fallback=exact_version_fallback,
-            exact_version_reason_code=exact_version_reason_code)
+            exact_version_reason_code=exact_version_reason_code,
+            deduplication_dropped_count=deduplication_dropped_count)
 
     def _na_result(self, case):
         return self._build_result(case, "not_applicable", 0, 0, [], [], None,
@@ -1036,6 +1114,7 @@ def compute_metrics(results: list[NormalizedBenchmarkResult]) -> dict[str, Any]:
     ev_match = sum(1 for r in ev_cases if r.exact_version_match is True)
     ev_fallback = sum(1 for r in ev_cases if r.exact_version_fallback is True)
     ev_indexed = sum(1 for r in ev_cases if r.exact_version_status == "exact_version_indexed")
+    dedup_drops = sum(r.deduplication_dropped_count for r in applicable)
     
     # Exact-version correctness: only count true exact matches
     ev_correct = sum(1 for r in ev_cases if r.is_success() and r.exact_version_match is True and r.expected_source_hits)
@@ -1075,6 +1154,8 @@ def compute_metrics(results: list[NormalizedBenchmarkResult]) -> dict[str, Any]:
         "exact_version_not_supported_rate": round(ev_not_supported / max(ev_total, 1), 4) if ev_total > 0 else 0.0,
         "exact_version_fallback_rate": round(ev_fallback / max(ev_total, 1), 4) if ev_total > 0 else 0.0,
         "exact_version_correctness_on_success": round(ev_correct / max(ev_success, 1), 4) if ev_success > 0 else None,
+        "deduplication_drop_rate": round(dedup_drops / max(n_app, 1), 4),
+        "deduplication_dropped_count": dedup_drops,
     }
 
 
@@ -1091,13 +1172,15 @@ def compute_suite_metrics(results: list[NormalizedBenchmarkResult], suite: str) 
         pm["benchmark_mode"] = rlist[0].mode if rlist else "unknown"
         if suite == "unified-context":
             applicable = [r for r in rlist if not r.is_not_applicable()]
-            routing_ok = [r for r in applicable if r.reason_codes and r.reason_codes[0] in {"project", "library", "mixed", "dependency"}]
-            project_primary = [r for r in applicable if r.case_id in {"unified_project_only", "unified_mixed"}]
+            routing_ok = [r for r in applicable if {"project", "library", "mixed", "dependency"}.intersection(r.reason_codes)]
+            project_primary = [r for r in applicable if r.case_id in {"unified_project_auto", "unified_mixed_partial_confirmation"}]
             pm["routing_accuracy"] = round(len(routing_ok) / len(applicable), 4) if applicable else None
             pm["source_scope_correctness"] = pm.get("correct_source_rate_on_success")
             pm["project_primary_rate"] = round(sum(1 for r in project_primary if r.sources and r.sources[0].doc_scope == "project") / len(project_primary), 4) if project_primary else None
-            confirmation_codes = {"confirmation_required", "library_docs_network_fetch_required", "dependency_docs_prefetch_required"}
+            confirmation_codes = {"confirmation_required", "library_docs_network_fetch_required", "dependency_docs_prefetch_required", "dependency_docs_prefetch_confirmation_required", "latest_fallback_network_fetch_required"}
             pm["confirmation_contract_correctness"] = round(sum(1 for r in applicable if not (r.status == "needs_refresh" and not confirmation_codes.intersection(r.reason_codes))) / len(applicable), 4) if applicable else None
+            fallback_cases = [r for r in applicable if r.case_id == "unified_latest_fallback"]
+            pm["fallback_execution_rate"] = round(sum(1 for r in fallback_cases if r.exact_version_fallback and r.sources) / len(fallback_cases), 4) if fallback_cases else None
         m[pid] = pm
     return m
 
@@ -1230,6 +1313,8 @@ def generate_markdown_report(
                 lines.append(_metric_line("Coverage rate", da.get("coverage_rate"), c7.get("coverage_rate")))
                 lines.append(_metric_line("Source scope correctness", da.get("source_scope_correctness"), c7.get("source_scope_correctness")))
                 lines.append(_metric_line("Contamination rate", da.get("contamination_rate_all"), c7.get("contamination_rate_all")))
+                lines.append(_metric_line("Deduplication drop rate", da.get("deduplication_drop_rate"), c7.get("deduplication_drop_rate")))
+                lines.append(_metric_line("Fallback execution rate", da.get("fallback_execution_rate"), c7.get("fallback_execution_rate")))
                 lines.append(_metric_line("Project primary rate", da.get("project_primary_rate"), c7.get("project_primary_rate")))
                 lines.append(_metric_line("Exact version correctness on success", da.get("exact_version_correctness_on_success"), c7.get("exact_version_correctness_on_success")))
                 lines.append(_metric_line("Confirmation contract correctness", da.get("confirmation_contract_correctness"), c7.get("confirmation_contract_correctness")))
@@ -1450,6 +1535,8 @@ async def run_benchmark(
                     "snippets": [{"text": s.text[:200], "source": s.source, "rank": s.rank} for s in result.snippets[:5]],
                     "warnings": result.warnings, "reason_codes": result.reason_codes,
                     "exact_version_used": result.exact_version_used,
+                    "exact_version_fallback": result.exact_version_fallback,
+                    "deduplication_dropped_count": result.deduplication_dropped_count,
                     "contamination_hits": result.contamination_hits,
                     "forbidden_source_hits": result.forbidden_source_hits,
                     "expected_source_hits": result.expected_source_hits,

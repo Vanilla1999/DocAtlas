@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import asdict, is_dataclass
+from dataclasses import asdict, is_dataclass, replace
 from typing import Any
 
 from docmancer.docs.application.project_context_service import context_pack_snippet
@@ -69,6 +69,7 @@ class UnifiedDocsContextService:
         context_pack: list[dict[str, Any]] = []
         warnings: list[Any] = []
         next_actions: list[Any] = []
+        pending_lane_results: list[Any] = []
         exact_version: dict[str, Any] | None = None
 
         bootstrap = None
@@ -93,8 +94,12 @@ class UnifiedDocsContextService:
         project_result = None
         library_results: list[DocsResult] = []
 
+        project_auto = mode_requested == "auto" and bool(project_path) and not libs
+
         if mode_selected == "project":
-            project_result = self.service.get_project_context(project_path, question, tokens=tokens, limit=limit, expand=expand, module=module, module_path=module_path, scope=scope, mode="project-only")
+            delegated_mode = "auto" if project_auto else "project-only"
+            routing["delegated_mode"] = delegated_mode
+            project_result = self.service.get_project_context(project_path, question, tokens=tokens, limit=limit, expand=expand, module=module, module_path=module_path, scope=scope, mode=delegated_mode)
         elif mode_selected == "dependency":
             if not allow_network and self._dependency_prefetch_needed(project_path):
                 lanes["dependency"] = {"status": "confirmation_required", "source_count": 0}
@@ -119,12 +124,21 @@ class UnifiedDocsContextService:
                 if safe is not None:
                     explicit_library_results.append(safe)
                     continue
-                explicit_library_results.append(self.service.get_docs(lib, topic=question, tokens=tokens, ecosystem=ecosystem, version=version, docs_url=docs_url, source_type=source_type, force_refresh=force_refresh, project_path=project_path))
+                explicit_library_results.append(self._get_library_docs_with_latest_fallback(lib, question=question, tokens=tokens, ecosystem=ecosystem, version=version, docs_url=docs_url, source_type=source_type, force_refresh=force_refresh, project_path=project_path, allow_network=allow_network, allow_latest_fallback=allow_latest_fallback))
             library_results = [item for item in explicit_library_results if isinstance(item, DocsResult)]
             lane_details["library"] = [self._to_dict(item) for item in explicit_library_results]
-            confirmation = next((item for item in explicit_library_results if isinstance(item, UnifiedDocsContextResult)), None)
+            confirmations = [item for item in explicit_library_results if isinstance(item, UnifiedDocsContextResult)]
+            pending_lane_results.extend(confirmations)
+            confirmation = confirmations[0] if confirmations else None
             if confirmation and project_result and project_result.answer_available:
-                lanes["library"] = {"status": "confirmation_required", "source_count": 0, "canonical_ids": []}
+                confirmation_lanes = confirmation.lanes or {}
+                lanes["library"] = {
+                    **(confirmation_lanes.get("library") or {}),
+                    "status": "confirmation_required",
+                    "source_count": 0,
+                    "requires_confirmation": True,
+                    "next_action": confirmation.next_action,
+                }
             elif confirmation:
                 return confirmation
         elif mode_selected == "library":
@@ -132,20 +146,36 @@ class UnifiedDocsContextService:
                 safe = self._ensure_library_safe(lib, ecosystem, version, source_type, docs_url, force_refresh, allow_network)
                 if safe is not None:
                     return safe
-                result = self.service.get_docs(lib, topic=question, tokens=tokens, ecosystem=ecosystem, version=version, docs_url=docs_url, source_type=source_type, force_refresh=force_refresh, project_path=project_path)
+                result = self._get_library_docs_with_latest_fallback(lib, question=question, tokens=tokens, ecosystem=ecosystem, version=version, docs_url=docs_url, source_type=source_type, force_refresh=force_refresh, project_path=project_path, allow_network=allow_network, allow_latest_fallback=allow_latest_fallback)
+                if isinstance(result, UnifiedDocsContextResult):
+                    return result
                 library_results.append(result)
             lane_details["library"] = [self._to_dict(item) for item in library_results]
 
         if project_result:
             lane_details["project"] = self._to_dict(project_result)
             project_items = self._normalize_project_context(project_result)
+            if project_auto:
+                mode_selected = self._infer_project_auto_mode(project_result, project_items)
+                routing.update({
+                    "reason_code": "project_context_auto",
+                    "delegated_mode": "auto",
+                    "evidence_scopes": sorted({item.get("doc_scope") for item in project_items if item.get("doc_scope")}),
+                    "dependency_detected": any(item.get("doc_scope") == "dependency" for item in project_items),
+                })
             context_pack.extend(project_items)
             lanes["project"] = {"status": project_result.status, "source_count": len([i for i in project_items if i.get("doc_scope") == "project"])}
             dep_count = len([i for i in project_items if i.get("doc_scope") == "dependency"])
             if dep_count:
                 lanes["dependency"] = {"status": getattr(project_result.dependency_docs, "status", "success"), "source_count": dep_count}
+            if project_auto:
+                if mode_selected == "dependency" and lanes["project"]["source_count"] == 0:
+                    lanes["project"] = {"status": "not_requested", "source_count": 0}
+                elif mode_selected == "project" and dep_count == 0:
+                    lanes["dependency"] = {"status": "not_requested", "source_count": 0}
             warnings.extend(project_result.warnings or [])
             next_actions.extend(project_result.next_actions or [])
+            pending_lane_results.append(project_result)
 
         for result in library_results:
             library_items = self._library_context_pack(result)
@@ -159,12 +189,19 @@ class UnifiedDocsContextService:
             next_actions.extend(result.next_actions or [])
             exact_version = exact_version or self._exact_version(result, allow_latest_fallback)
 
-        context_pack, contamination = self._dedupe_and_guard(context_pack, libs)
+        context_pack, contamination, deduplication = self._dedupe_and_guard(context_pack, libs, project_path)
+        self._refresh_lane_counts(lanes, context_pack)
         trust_contract = self._trust_contract(context_pack, project_result, library_results)
         source_summary = self._source_summary(context_pack, trust_contract)
         answer_available = bool(context_pack)
-        status = self._overall_status(lanes, answer_available)
+        pending_actions = self._collect_pending_actions(pending_lane_results)
+        requested_lanes = [name for name, lane in lanes.items() if lane.get("status") != "not_requested"]
+        successful_lanes = [name for name, lane in lanes.items() if self._lane_succeeded(lane)]
+        pending_confirmation_lanes = [name for name, lane in lanes.items() if lane.get("requires_confirmation") or lane.get("status") == "confirmation_required"]
+        failed_lanes = [name for name, lane in lanes.items() if lane.get("status") not in {"not_requested", "success", "partial_success", "confirmation_required"} and not self._lane_succeeded(lane)]
+        status = self._aggregate_status(requested_lanes, successful_lanes, pending_confirmation_lanes, failed_lanes)
         reason = None if answer_available else "no_docs_context_available"
+        combined_next_actions = [*next_actions, *pending_actions.get("next_actions", [])]
 
         payload = UnifiedDocsContextResult(
             status=status,
@@ -179,13 +216,15 @@ class UnifiedDocsContextService:
             trust_contract=trust_contract,
             exact_version=exact_version,
             reason_code=reason,
-            requires_confirmation=status == "confirmation_required",
-            confirmation_reason="network_fetch" if status == "confirmation_required" else None,
-            next_actions=next_actions,
-            arguments_patch={"allow_network": True} if status == "confirmation_required" else None,
+            requires_confirmation=bool(pending_actions.get("requires_confirmation")),
+            confirmation_reason=pending_actions.get("confirmation_reason"),
+            next_action=pending_actions.get("next_action"),
+            next_actions=combined_next_actions,
+            arguments_patch=pending_actions.get("arguments_patch"),
             warnings=warnings,
             metrics={"context_pack_items": len(context_pack)},
             contamination=contamination,
+            deduplication=deduplication,
             lane_details=lane_details if details else {},
         )
         return payload
@@ -222,6 +261,7 @@ class UnifiedDocsContextService:
             source_summary={"project": 0, "library": 0, "dependency": 0, "rejected": 0, "risky": 0},
             trust_contract={"selected": [], "rejected": [], "risky": []},
             contamination={"detected": False, "dropped_count": 0, "reason_codes": []},
+            deduplication={"dropped_count": 0, "reason_codes": []},
         )
 
     def _select_mode(self, mode: str, project_path: str | None, libs: list[str]) -> tuple[str, str]:
@@ -269,6 +309,66 @@ class UnifiedDocsContextService:
                 warnings=list(getattr(info, "candidates", []) or []),
             )
         return None
+
+    def _get_library_docs_with_latest_fallback(
+        self,
+        library: str,
+        *,
+        question: str,
+        tokens: int | None,
+        ecosystem: str | None,
+        version: str | None,
+        docs_url: str | None,
+        source_type: str | None,
+        force_refresh: bool,
+        project_path: str | None,
+        allow_network: bool,
+        allow_latest_fallback: bool,
+    ) -> DocsResult | UnifiedDocsContextResult:
+        exact = self.service.get_docs(library, topic=question, tokens=tokens, ecosystem=ecosystem, version=version, docs_url=docs_url, source_type=source_type, force_refresh=force_refresh, project_path=project_path)
+        exact_diag = (exact.diagnostics or {}).get("exact_version") if isinstance(exact.diagnostics, dict) else None
+        if not (exact.status == "exact_version_not_supported" and allow_latest_fallback and isinstance(exact_diag, dict) and exact_diag.get("fallback_available")):
+            return exact
+
+        fallback_docs_url = exact_diag.get("fallback_docs_url") or None
+        if not allow_network:
+            info = self.service.resolve_library(library, ecosystem, None, fallback_docs_url or docs_url, None, source_type)
+            if not getattr(info, "local", False) or getattr(info, "stale", False) or getattr(info, "status", "") in {"needs_docs_url", "needs_refresh"}:
+                return self._confirmation_result(
+                    question=question,
+                    mode_requested="library",
+                    mode_selected="library",
+                    routing={"reason_code": "latest_fallback_network_fetch_required", "project_path_used": bool(project_path), "libraries_requested": [library], "dependency_detected": False},
+                    reason_code="latest_fallback_network_fetch_required",
+                    confirmation_reason="network_fetch",
+                    next_action={"type": "get_docs_context", "tool": "get_docs_context", "arguments_patch": {"allow_network": True, "allow_latest_fallback": True}},
+                    arguments_patch={"allow_network": True, "allow_latest_fallback": True},
+                    lanes={**self._empty_lanes(), "library": {"status": "confirmation_required", "source_count": 0, "canonical_ids": [getattr(info, "library_id", None)] if getattr(info, "library_id", None) else [], "requires_confirmation": True, "next_action": {"type": "get_docs_context", "tool": "get_docs_context", "arguments_patch": {"allow_network": True, "allow_latest_fallback": True}}}},
+                )
+
+        latest = self.service.get_docs(library, topic=question, tokens=tokens, ecosystem=ecosystem, version=None, docs_url=fallback_docs_url or docs_url, source_type=source_type, force_refresh=force_refresh, project_path=project_path)
+        if latest.results:
+            diag = dict(latest.diagnostics or {})
+            diag["exact_version"] = {
+                "expected": exact.requested_version or version,
+                "used": "latest",
+                "match": False,
+                "fallback": True,
+                "status": "exact_version_fallback_latest",
+                "reason_code": "versioned_docs_unavailable",
+            }
+            return replace(latest, requested_version=exact.requested_version or version, diagnostics=diag)
+
+        diag = dict(latest.diagnostics or {})
+        diag["exact_version"] = {
+            "expected": exact.requested_version or version,
+            "used": None,
+            "match": None,
+            "fallback": False,
+            "status": latest.status,
+            "reason_code": latest.diagnostics.get("reason_code") if isinstance(latest.diagnostics, dict) else latest.status,
+        }
+        return replace(latest, requested_version=exact.requested_version or version, diagnostics=diag)
 
     def _dependency_prefetch_needed(self, project_path: str | None) -> bool:
         if not project_path:
@@ -330,35 +430,43 @@ class UnifiedDocsContextService:
             items.append(item)
         return items
 
-    def _dedupe_and_guard(self, items: list[dict[str, Any]], libs: list[str]) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    def _dedupe_and_guard(self, items: list[dict[str, Any]], libs: list[str], project_path: str | None) -> tuple[list[dict[str, Any]], dict[str, Any], dict[str, Any]]:
         seen = set()
         out = []
-        dropped = 0
-        reasons: list[str] = []
+        contamination_dropped = 0
+        contamination_reasons: list[str] = []
+        dedup_dropped = 0
+        dedup_reasons: list[str] = []
         requested = {lib.lower().replace("-", "_") for lib in libs}
         for item in items:
             scope = item.get("doc_scope")
             if scope not in {"project", "dependency", "library"}:
-                dropped += 1
-                reasons.append("invalid_doc_scope")
+                contamination_dropped += 1
+                contamination_reasons.append("wrong_doc_scope")
                 continue
+            if scope == "project" and project_path:
+                path = str(item.get("path") or item.get("source") or "")
+                if path.startswith("/") and not path.startswith(str(project_path).rstrip("/") + "/") and path != str(project_path):
+                    contamination_dropped += 1
+                    contamination_reasons.append("foreign_project")
+                    continue
             if scope == "library" and requested:
                 lib_text = " ".join(str(item.get(key) or "") for key in ("library", "library_id", "canonical_id")).lower().replace("-", "_")
                 if not any(lib in lib_text for lib in requested):
-                    dropped += 1
-                    reasons.append("wrong_library_id")
+                    contamination_dropped += 1
+                    contamination_reasons.append("wrong_library_id")
                     continue
             source_identity = item.get("canonical_id") or item.get("source") or item.get("url") or item.get("path")
             if isinstance(source_identity, dict):
                 source_identity = source_identity.get("url") or source_identity.get("path") or source_identity.get("source") or str(sorted(source_identity.items()))
             stable = (str(source_identity), item.get("heading_path") or (item.get("section") or {}).get("heading_path") or item.get("title"))
             if stable in seen:
-                dropped += 1
-                reasons.append("duplicate_source")
+                dedup_dropped += 1
+                dedup_reasons.append("duplicate_source")
                 continue
             seen.add(stable)
             out.append(item)
-        return out, {"detected": bool(dropped), "dropped_count": dropped, "reason_codes": sorted(set(reasons))}
+        return out, {"detected": bool(contamination_dropped), "dropped_count": contamination_dropped, "reason_codes": sorted(set(contamination_reasons))}, {"dropped_count": dedup_dropped, "reason_codes": sorted(set(dedup_reasons))}
 
     def _trust_contract(self, items: list[dict[str, Any]], project_result: ProjectContextResult | None, library_results: list[DocsResult]) -> dict[str, Any]:
         selected = []
@@ -403,8 +511,6 @@ class UnifiedDocsContextService:
             return None
         diagnostic = (result.diagnostics or {}).get("exact_version") if isinstance(result.diagnostics, dict) else None
         if diagnostic:
-            if allow_latest_fallback and diagnostic.get("fallback_available") and diagnostic.get("used") is None:
-                return {"expected": expected, "used": "latest", "match": False, "fallback": True, "status": "exact_version_fallback_latest"}
             return diagnostic
         used = result.resolved_version or result.version
         return {"expected": expected, "used": used, "match": used == expected, "fallback": used == "latest" and used != expected, "status": "exact_version_indexed" if used == expected else "exact_version_fallback_latest"}
@@ -420,13 +526,75 @@ class UnifiedDocsContextService:
         return incoming
 
     @staticmethod
-    def _overall_status(lanes: dict[str, Any], answer_available: bool) -> str:
-        statuses = {lane.get("status") for lane in lanes.values() if lane.get("status") != "not_requested"}
-        if not answer_available:
-            return "confirmation_required" if "confirmation_required" in statuses else "not_found"
-        if any(status in {"confirmation_required", "needs_input", "exact_version_not_supported", "empty_library_index", "error"} for status in statuses):
+    def _lane_succeeded(lane: dict[str, Any]) -> bool:
+        return (lane.get("source_count") or 0) > 0
+
+    @staticmethod
+    def _refresh_lane_counts(lanes: dict[str, Any], items: list[dict[str, Any]]) -> None:
+        for name, scope in (("project", "project"), ("library", "library"), ("dependency", "dependency")):
+            lane = lanes.get(name)
+            if not lane or lane.get("status") == "not_requested":
+                continue
+            count = sum(1 for item in items if item.get("doc_scope") == scope)
+            lane["source_count"] = count
+            if count == 0 and lane.get("status") == "success":
+                lane["status"] = "not_found"
+
+    @staticmethod
+    def _aggregate_status(requested_lanes: list[str], successful_lanes: list[str], pending_confirmation_lanes: list[str], failed_lanes: list[str]) -> str:
+        if requested_lanes and len(successful_lanes) == len(requested_lanes) and not pending_confirmation_lanes and not failed_lanes:
+            return "success"
+        if successful_lanes and (pending_confirmation_lanes or failed_lanes):
             return "partial_success"
-        return "success"
+        if not successful_lanes and pending_confirmation_lanes:
+            return "confirmation_required"
+        if not successful_lanes and failed_lanes and all(lane in failed_lanes for lane in requested_lanes):
+            return "not_found"
+        if failed_lanes:
+            return "failed"
+        return "not_found"
+
+    @staticmethod
+    def _infer_project_auto_mode(result: ProjectContextResult, items: list[dict[str, Any]]) -> str:
+        diagnostics = result.diagnostics or {}
+        selected = diagnostics.get("mode_selected") or diagnostics.get("selected_mode") if isinstance(diagnostics, dict) else None
+        if selected in {"project", "dependency", "mixed"}:
+            return selected
+        scopes = {item.get("doc_scope") for item in items if item.get("doc_scope") in {"project", "dependency"}}
+        if scopes == {"dependency"}:
+            return "dependency"
+        if scopes == {"project", "dependency"}:
+            return "mixed"
+        return "project"
+
+    @staticmethod
+    def _collect_pending_actions(lane_results: list[Any]) -> dict[str, Any]:
+        pending: dict[str, Any] = {"requires_confirmation": False, "next_actions": []}
+        merged_patch: dict[str, Any] = {}
+        patch_conflict = False
+        for result in lane_results:
+            if not getattr(result, "requires_confirmation", False):
+                continue
+            pending["requires_confirmation"] = True
+            if not pending.get("confirmation_reason"):
+                pending["confirmation_reason"] = getattr(result, "confirmation_reason", None)
+            next_action = getattr(result, "next_action", None) or None
+            patch = getattr(result, "arguments_patch", None) or None
+            if next_action:
+                pending["next_actions"].append(next_action)
+                pending.setdefault("next_action", next_action)
+            if patch:
+                action = next_action or {"type": "get_docs_context", "tool": "get_docs_context", "arguments_patch": patch}
+                if action not in pending["next_actions"]:
+                    pending["next_actions"].append(action)
+                for key, value in patch.items():
+                    if key in merged_patch and merged_patch[key] != value:
+                        patch_conflict = True
+                    else:
+                        merged_patch[key] = value
+        if merged_patch and not patch_conflict:
+            pending["arguments_patch"] = merged_patch
+        return pending
 
     @staticmethod
     def _to_dict(value: Any) -> dict[str, Any]:
@@ -464,5 +632,6 @@ class UnifiedDocsContextService:
             arguments_patch=arguments_patch,
             warnings=warnings or [],
             contamination={"detected": False, "dropped_count": 0, "reason_codes": []},
+            deduplication={"dropped_count": 0, "reason_codes": []},
             lane_details=lane_details or {},
         )
