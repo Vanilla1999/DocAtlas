@@ -1,6 +1,19 @@
 {
-  "reason": "fixture repository generator not executed",
-  "status": "pending_fixture_materialization",
+  "base": {
+    "compile_success": true,
+    "expected_tests_failed": true,
+    "setup_success": true,
+    "unexpected_failures": []
+  },
+  "fixture_hash": "26fca42853566ac83029742eacd668f19fc612beb2207747f1d7284f7f0653af",
+  "gold": {
+    "compile_success": true,
+    "hidden_tests_passed": true,
+    "patch_applied": true,
+    "public_tests_passed": true
+  },
+  "oracle_isolated": true,
+  "status": "validated",
   "task_id": "mixed_fastapi_project_001",
-  "validated_at": "2026-06-25T17:43:26.757887+00:00"
+  "validated_at": "2026-06-26T08:28:09.979583+00:00"
 }

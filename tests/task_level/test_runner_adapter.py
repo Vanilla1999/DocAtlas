@@ -1,0 +1,86 @@
+from __future__ import annotations
+
+import json
+import subprocess
+from datetime import datetime, timezone
+from pathlib import Path
+
+import pytest
+
+from eval.task_level.execution import capture_patch, run_canary
+from eval.task_level.runners.base import AgentRunOutput, AgentRunRequest
+from eval.task_level.runners.claude import ClaudeRunner
+
+
+class MockRunner:
+    runner_id = "mock"
+
+    def run(self, request: AgentRunRequest) -> AgentRunOutput:
+        target = request.workspace / "calc.py"
+        if target.exists():
+            target.write_text("def add(a, b):\n    return a + b\n", encoding="utf-8")
+        request.output_dir.mkdir(parents=True, exist_ok=True)
+        stdout = request.output_dir / "stdout.log"
+        stderr = request.output_dir / "stderr.log"
+        trajectory = request.output_dir / "trajectory.normalized.json"
+        stdout.write_text("{}\n", encoding="utf-8")
+        stderr.write_text("", encoding="utf-8")
+        trajectory.write_text(json.dumps([{"event_type": "edit", "tool_name": "Edit", "arguments": {}, "result_summary": "edited calc.py"}]), encoding="utf-8")
+        now = datetime.now(timezone.utc).isoformat()
+        return AgentRunOutput(
+            status="completed",
+            exit_code=0,
+            started_at=now,
+            finished_at=now,
+            wall_time_seconds=0.1,
+            raw_stdout_path=str(stdout),
+            raw_stderr_path=str(stderr),
+            trajectory_path=str(trajectory),
+            patch_path=None,
+            tool_calls=[],
+            input_tokens=None,
+            output_tokens=None,
+            model="mock",
+            runner_version="mock",
+            notes=[],
+        )
+
+
+def test_runner_canary_produces_patch(tmp_path: Path):
+    result = run_canary(MockRunner(), "mock", 30, tmp_path)
+
+    assert result["status"] == "passed"
+    assert result["patch_exists"]
+    assert result["pytest_passes"]
+
+
+def test_patch_capture(tmp_path: Path):
+    subprocess.run(["git", "init"], cwd=tmp_path, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False)
+    subprocess.run(["git", "config", "user.email", "benchmark@example.invalid"], cwd=tmp_path, check=False)
+    subprocess.run(["git", "config", "user.name", "Task Benchmark"], cwd=tmp_path, check=False)
+    (tmp_path / "file.txt").write_text("before\n", encoding="utf-8")
+    subprocess.run(["git", "add", "."], cwd=tmp_path, check=False)
+    subprocess.run(["git", "commit", "-m", "base"], cwd=tmp_path, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False)
+    (tmp_path / "file.txt").write_text("after\n", encoding="utf-8")
+
+    patch_path, status_path, changed_path, changed = capture_patch(tmp_path, tmp_path)
+
+    assert patch_path.read_text(encoding="utf-8")
+    assert status_path.read_text(encoding="utf-8")
+    assert json.loads(changed_path.read_text(encoding="utf-8")) == ["file.txt"]
+    assert changed == ["file.txt"]
+
+
+def test_missing_token_metrics_remain_null(tmp_path: Path):
+    result = run_canary(MockRunner(), "mock", 30, tmp_path)
+
+    assert result["status"] == "passed"
+    output = MockRunner().run
+    assert output is not None
+
+
+@pytest.mark.integration
+def test_claude_verify_reports_token_usage_unverified():
+    caps = ClaudeRunner().verify()
+
+    assert caps.token_usage is False

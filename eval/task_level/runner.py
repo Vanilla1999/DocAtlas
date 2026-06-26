@@ -15,7 +15,11 @@ from typing import Any
 
 from eval.task_level.conditions import CONDITIONS, DEFAULT_CONDITIONS
 from eval.task_level.evaluators.tests import run_command
+from eval.task_level.execution import execute_pilot, run_canary, runner_verification_payload
+from eval.task_level.fixtures.builder import FIXTURE_TASKS, materialize_fixture, validate_fixture
 from eval.task_level.report import write_report
+from eval.task_level.runners.claude import ClaudeRunner
+from eval.task_level.runners.opencode import OpenCodeRunner
 from eval.task_level.schemas import RESULTS_ROOT, TASKS_PATH, VALIDATION_ROOT, RunMetrics, RunResult, TaskSpec
 
 
@@ -101,12 +105,36 @@ def _write_validation(task: TaskSpec, status: str, details: dict[str, Any]) -> P
 
 
 def validate_task(task: TaskSpec) -> dict[str, Any]:
+    if task.task_id in FIXTURE_TASKS:
+        with tempfile.TemporaryDirectory(prefix=f"docatlas-fixture-validate-{task.task_id}-") as temp_dir:
+            workspace = Path(temp_dir) / "workspace"
+            materialize_fixture(task, workspace)
+            return validate_fixture(task, workspace)
     if task.repo.startswith("fixture://"):
         # Curated fixture tasks are intentionally materialized by a future fixture builder.
         # They are excluded from causal results until base-fail/gold-pass validation exists.
         path = _write_validation(task, "pending_fixture_materialization", {"reason": "fixture repository generator not executed"})
         return {"task_id": task.task_id, "status": "pending_fixture_materialization", "path": str(path)}
     return _write_validation(task, "external_repo_not_checked_out", {"repo": task.repo}).read_text(encoding="utf-8")
+
+
+def select_runner(runner_id: str):
+    if runner_id == "claude":
+        return ClaudeRunner()
+    if runner_id == "opencode":
+        return OpenCodeRunner()
+    raise SystemExit(f"Unknown runner: {runner_id}")
+
+
+def filter_tasks(tasks: list[TaskSpec], selected: list[str] | None) -> list[TaskSpec]:
+    if not selected:
+        return tasks
+    wanted = set(selected)
+    filtered = [task for task in tasks if task.task_id in wanted]
+    missing = wanted - {task.task_id for task in filtered}
+    if missing:
+        raise SystemExit(f"Unknown tasks: {', '.join(sorted(missing))}")
+    return filtered
 
 
 def run_smoke(tasks: list[TaskSpec], conditions: list[str], repeats: int, run_dir: Path) -> list[dict[str, Any]]:
@@ -149,17 +177,25 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Task-level patch benchmark harness")
     parser.add_argument("--manifest", type=Path, default=TASKS_PATH)
     parser.add_argument("--validate", action="store_true")
+    parser.add_argument("--materialize", action="store_true")
+    parser.add_argument("--verify-runner", action="store_true")
+    parser.add_argument("--execute", action="store_true")
+    parser.add_argument("--runner", default="claude")
+    parser.add_argument("--tasks", nargs="*")
     parser.add_argument("--smoke", action="store_true")
     parser.add_argument("--conditions", nargs="*", default=list(DEFAULT_CONDITIONS))
     parser.add_argument("--repeats", type=int, default=1)
     parser.add_argument("--run-id", default=datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S"))
+    parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument("--timeout-seconds", type=int, default=900)
+    parser.add_argument("--model", default="sonnet")
     args = parser.parse_args(argv)
 
     unknown = [condition for condition in args.conditions if condition not in CONDITIONS]
     if unknown:
         raise SystemExit(f"Unknown conditions: {', '.join(unknown)}")
 
-    tasks = load_tasks(args.manifest)
+    tasks = filter_tasks(load_tasks(args.manifest), args.tasks)
     run_dir = RESULTS_ROOT / args.run_id
     run_dir.mkdir(parents=True, exist_ok=True)
     metadata = {
@@ -168,7 +204,25 @@ def main(argv: list[str] | None = None) -> int:
         "executive_result": "Independent causal benchmark not completed in this harness invocation.",
         "decision": "ITERATE: harness and task manifest are ready; execute with verified independent runner before product claims.",
     }
+
+    runner = select_runner(args.runner)
+    capabilities = runner.verify()
+    metadata["runner_verification"] = runner_verification_payload(capabilities)
     (run_dir / "metadata.json").write_text(json.dumps(metadata, indent=2, sort_keys=True), encoding="utf-8")
+
+    if args.materialize:
+        materialized: list[dict[str, Any]] = []
+        materialize_root = run_dir / "materialized"
+        for task in tasks:
+            if task.task_id in FIXTURE_TASKS:
+                materialized.append(materialize_fixture(task, materialize_root / task.task_id))
+        (run_dir / "materialized_summary.json").write_text(json.dumps(materialized, indent=2, sort_keys=True), encoding="utf-8")
+
+    if args.verify_runner:
+        canary = run_canary(runner, args.model, args.timeout_seconds, run_dir / "runner_canary") if not args.dry_run else {"status": "dry_run"}
+        VALIDATION_ROOT.mkdir(parents=True, exist_ok=True)
+        (VALIDATION_ROOT / "runner_canary.json").write_text(json.dumps(canary, indent=2, sort_keys=True), encoding="utf-8")
+        (run_dir / "runner_canary.json").write_text(json.dumps(canary, indent=2, sort_keys=True), encoding="utf-8")
 
     validation_results: list[Any] = []
     if args.validate:
@@ -179,6 +233,12 @@ def main(argv: list[str] | None = None) -> int:
     if args.smoke:
         results = run_smoke(tasks, args.conditions[:2], args.repeats, run_dir)
         (run_dir / "runs.jsonl").write_text("\n".join(json.dumps(x, sort_keys=True) for x in results), encoding="utf-8")
+
+    if args.execute:
+        if args.dry_run:
+            results = [{"status": "dry_run", "task_id": task.task_id, "condition_id": condition, "repeat": repeat, "resolved": False, "metrics": {}} for task in tasks for repeat in range(args.repeats) for condition in args.conditions]
+        else:
+            results = execute_pilot(tasks, args.conditions, args.repeats, args.run_id, runner, args.model, args.timeout_seconds, BASE_PROMPT)
 
     write_report(run_dir, metadata, results)
     print(run_dir)

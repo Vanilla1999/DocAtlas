@@ -42,3 +42,6 @@ eval/results/live/*
 eval/task_level/results/*
 !eval/task_level/results/README.md
 !eval/task_level/results/sample_report.md
+eval/task_level/runtime/
+eval/task_level/workspaces/
+eval/task_level/.cache/

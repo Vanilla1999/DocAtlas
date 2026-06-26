@@ -1,0 +1,15 @@
+{
+  "changed_files": [],
+  "failure_summary": "runner did not produce a patch",
+  "patch_exists": false,
+  "policy_clean": true,
+  "pytest_passes": false,
+  "runner_exit_code": 1,
+  "runner_exit_interpretable": true,
+  "runner_status": "runner_failed",
+  "status": "failed",
+  "task_id": "runner_canary",
+  "trajectory_exists": true,
+  "validated_at": "2026-06-26T08:31:11.190485+00:00",
+  "workspace": "/tmp/docatlas-runner-canary-1uezcxgq"
+}
