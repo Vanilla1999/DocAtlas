@@ -70,3 +70,15 @@ DocAtlas utilization pilot result (`docatlas_utilization_pilot_004`):
 Interpretation: optional tool availability is insufficient for this runner. The next condition adds a product-like `docatlas_tool_recommended` workflow instruction: use DocAtlas/docmancer documentation context before code changes when a task may depend on library APIs, exact versions, or project docs, then use or ignore the result based on relevance. This is distinct from the stricter diagnostic `docatlas_tool_required_once` condition.
 
 Current decision: ITERATE_TOOL_DISCOVERABILITY. Do not claim DocAtlas improves coding agents from this pilot; the supported claim is that this runner may require explicit workflow guidance to adopt DocAtlas.
+
+Recommended-workflow follow-up (`docatlas_recommended_pilot_001` and `docatlas_recommended_pilot_002`):
+
+- Matrix: `fastapi_depends_001` and `mixed_fastapi_project_001` x `repo_only` and `docatlas_tool_recommended` x 2 observed repeats.
+- `docatlas_tool_recommended` fixed adoption: every recommended run called DocAtlas (`2-6` agent DocAtlas calls per run) and context was judged used.
+- Patch success did not improve: `docatlas_tool_recommended` resolved `0/4`; `repo_only` resolved `1/4`.
+- `fastapi_depends_001` failure class under recommended: agents used `Annotated`, `Depends`, and `BackgroundTasks`, but missed hidden contract details such as the exact shared dependency name (`require_token`) and/or route parameter name (`token`) required for introspection.
+- `mixed_fastapi_project_001` failure class under recommended: agents found and used `require_admin`, but missed the exact project convention implementation: the route dependency needed `Annotated[str, Depends(require_admin)]`, and the app needed an `HTTPException` handler so the documented error envelope applied to dependency-raised 403 errors.
+- This means the benchmark has moved past pure tool discoverability: DocAtlas can be discovered and used when recommended, but the returned/used context is not yet sufficiently action-directing for these hidden-contract tasks.
+- `mixed_fastapi_project_001` remains unresolved by all tested conditions, which may indicate the task is too brittle, the public tests are not steering enough, or DocAtlas context formatting does not emphasize the critical convention.
+
+Final decision for this phase: ITERATE_DOCATLAS_CONTEXT_QUALITY. Secondary risk: ITERATE_TASKS for `mixed_fastapi_project_001` before any larger 8-task pilot. No product claim is supported.
