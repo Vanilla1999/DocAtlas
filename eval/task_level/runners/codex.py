@@ -160,11 +160,11 @@ def _codex_config(request: AgentRunRequest) -> str:
         'trust_level = "trusted"',
         "",
     ]
-    if request.condition_id == "docatlas_snippet_first":
+    if request.condition_id in {"docatlas_snippet_first", "docatlas_tool_optional", "docatlas_tool_recommended", "docatlas_context_injected", "docatlas_tool_required_once", "docatlas_tool_visibility_canary"}:
         lines.extend([
             "[mcp_servers.docmancer-docs]",
-            'command = "doc-atlas"',
-            'args = ["mcp", "docs-serve"]',
+            'command = "uv"',
+            f'args = ["run", "--project", "{Path(__file__).resolve().parents[3]}", "doc-atlas", "mcp", "docs-serve"]',
             "",
         ])
     return "\n".join(lines)

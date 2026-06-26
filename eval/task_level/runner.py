@@ -15,7 +15,7 @@ from typing import Any
 
 from eval.task_level.conditions import CONDITIONS, DEFAULT_CONDITIONS
 from eval.task_level.evaluators.tests import run_command
-from eval.task_level.execution import execute_pilot, run_canary, runner_verification_payload
+from eval.task_level.execution import execute_pilot, run_canary, run_docatlas_tool_visibility_canary, runner_verification_payload
 from eval.task_level.fixtures.builder import FIXTURE_TASKS, materialize_fixture, validate_fixture
 from eval.task_level.report import write_report
 from eval.task_level.runners.claude import ClaudeRunner
@@ -182,6 +182,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--validate", action="store_true")
     parser.add_argument("--materialize", action="store_true")
     parser.add_argument("--verify-runner", action="store_true")
+    parser.add_argument("--verify-docatlas-tool", action="store_true")
     parser.add_argument("--execute", action="store_true")
     parser.add_argument("--runner", default="claude")
     parser.add_argument("--tasks", nargs="*")
@@ -226,6 +227,16 @@ def main(argv: list[str] | None = None) -> int:
         VALIDATION_ROOT.mkdir(parents=True, exist_ok=True)
         (VALIDATION_ROOT / "runner_canary.json").write_text(json.dumps(canary, indent=2, sort_keys=True), encoding="utf-8")
         (run_dir / "runner_canary.json").write_text(json.dumps(canary, indent=2, sort_keys=True), encoding="utf-8")
+
+    if args.verify_docatlas_tool:
+        canary = run_docatlas_tool_visibility_canary(runner, args.model, args.timeout_seconds, run_dir / "docatlas_tool_visibility_canary") if not args.dry_run else {"status": "dry_run"}
+        VALIDATION_ROOT.mkdir(parents=True, exist_ok=True)
+        (VALIDATION_ROOT / "docatlas_tool_visibility_canary.json").write_text(json.dumps(canary, indent=2, sort_keys=True), encoding="utf-8")
+        (run_dir / "docatlas_tool_visibility_canary.json").write_text(json.dumps(canary, indent=2, sort_keys=True), encoding="utf-8")
+        metadata["docatlas_tool_visibility_canary"] = canary
+        if not canary.get("docatlas_tool_visibility_verified"):
+            metadata["decision"] = "ITERATE_TOOL_DISCOVERABILITY"
+            (run_dir / "metadata.json").write_text(json.dumps(metadata, indent=2, sort_keys=True), encoding="utf-8")
 
     validation_results: list[Any] = []
     if args.validate:

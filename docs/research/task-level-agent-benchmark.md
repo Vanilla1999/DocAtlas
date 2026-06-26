@@ -45,3 +45,28 @@ Pilot fixture update:
 - A 2-task x 2-condition x 1-repeat pilot was executed with Codex. `mixed_fastapi_project_001` resolved under `repo_only`; no run called DocAtlas, so there is no DocAtlas utilization evidence yet.
 
 Decision for this setup phase: ITERATE_DOCATLAS. The runner can execute patches and the fixtures are valid, but the DocAtlas condition did not actually retrieve/use DocAtlas context in the pilot.
+
+DocAtlas utilization iteration:
+
+- `docatlas_snippet_first` remains accepted as a deprecated alias for `docatlas_tool_optional`.
+- The next pilot matrix is `repo_only`, `docatlas_tool_optional`, `docatlas_context_injected`, and `docatlas_tool_required_once` over the same two validated fixtures.
+- `docatlas_context_injected` records harness-side DocAtlas calls separately from agent-side adoption and injects a compact verified context pack rather than raw JSON.
+- `docatlas_tool_required_once` is a diagnostic condition only: the agent must call the documentation-context tool once before the first edit, then use or ignore the result based on relevance.
+- Policy audit now distinguishes agent DocAtlas calls, Context7 calls, web calls, network shell calls, foreign MCP calls, and whether the first DocAtlas call preceded the first edit.
+- A `--verify-docatlas-tool` canary checks MCP discoverability before running a utilization pilot. If it cannot observe `get_docs_context`, the decision is `ITERATE_TOOL_DISCOVERABILITY`.
+- The Codex MCP config now launches DocAtlas through `uv run --project <repo> doc-atlas mcp docs-serve`; a bare `doc-atlas` executable was not available in this environment.
+
+The utilization pilot must not support a product claim unless DocAtlas context is actually retrieved, available to the agent or injected by the harness, and independently judged as used in a successful patch.
+
+DocAtlas utilization pilot result (`docatlas_utilization_pilot_004`):
+
+- The tool visibility canary verified that Codex can see and call `get_docs_context` through the generated DocAtlas MCP config.
+- `docatlas_tool_optional` adoption was `0/2`: the agent did not call DocAtlas when the tool was merely available.
+- `docatlas_tool_required_once` compliance was `2/2`: the agent called DocAtlas before editing in both diagnostic runs.
+- Patch success was `1/2` for `docatlas_tool_required_once`, `0/2` for `repo_only`, `0/2` for `docatlas_tool_optional`, and `0/2` for `docatlas_context_injected` in this two-task pilot.
+- The only resolved run was `fastapi_depends_001 x docatlas_tool_required_once`; it passed public and hidden tests with policy clean and DocAtlas context judged used.
+- `mixed_fastapi_project_001` remained unresolved in every condition, so it may require task/evaluator or context-quality iteration before scaling.
+
+Interpretation: optional tool availability is insufficient for this runner. The next condition adds a product-like `docatlas_tool_recommended` workflow instruction: use DocAtlas/docmancer documentation context before code changes when a task may depend on library APIs, exact versions, or project docs, then use or ignore the result based on relevance. This is distinct from the stricter diagnostic `docatlas_tool_required_once` condition.
+
+Current decision: ITERATE_TOOL_DISCOVERABILITY. Do not claim DocAtlas improves coding agents from this pilot; the supported claim is that this runner may require explicit workflow guidance to adopt DocAtlas.

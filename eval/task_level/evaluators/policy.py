@@ -21,6 +21,10 @@ class PolicyAudit:
     web_calls: int
     network_shell_calls: int
     foreign_mcp_calls: int
+    first_docatlas_call_before_first_edit: bool | None
+    first_docatlas_sequence: int | None
+    first_edit_sequence: int | None
+    docatlas_tool_name_seen: str | None
     violations: list[str]
 
     def to_json(self) -> dict[str, Any]:
@@ -44,7 +48,13 @@ def audit_trajectory(condition_id: str, trajectory_path: Path | None, output_pat
     context7_calls = _count_tool_patterns(events, CONTEXT7_PATTERNS)
     web_calls = _count_web_tool_calls(events)
     network_shell_calls = _count_network_shell(events, text)
-    foreign_mcp_calls = 0
+    foreign_mcp_calls = _count_foreign_mcp_calls(events)
+    first_docatlas_sequence = _first_tool_sequence(events, DOCATLAS_PATTERNS)
+    first_edit_sequence = _first_edit_sequence(events)
+    before_edit = None
+    if first_docatlas_sequence is not None or first_edit_sequence is not None:
+        before_edit = first_docatlas_sequence is not None and (first_edit_sequence is None or first_docatlas_sequence < first_edit_sequence)
+    tool_name_seen = _first_tool_name(events, DOCATLAS_PATTERNS)
     violations: list[str] = []
 
     if condition_id == "repo_only":
@@ -54,13 +64,15 @@ def audit_trajectory(condition_id: str, trajectory_path: Path | None, output_pat
             violations.append("repo_only used Context7 tools")
         if web_calls or network_shell_calls:
             violations.append("repo_only used web or network shell tools")
-    elif condition_id == "docatlas_snippet_first":
+    elif condition_id in {"docatlas_snippet_first", "docatlas_tool_optional", "docatlas_tool_recommended", "docatlas_context_injected", "docatlas_tool_required_once"}:
         if context7_calls:
             violations.append("docatlas condition used Context7 tools")
         if web_calls or network_shell_calls:
             violations.append("docatlas condition used web or network shell tools")
         if foreign_mcp_calls:
             violations.append("docatlas condition used foreign MCP tools")
+        if condition_id == "docatlas_tool_required_once" and not before_edit:
+            violations.append("required_docatlas_call_missing")
 
     audit = PolicyAudit(
         condition_id=condition_id,
@@ -70,6 +82,10 @@ def audit_trajectory(condition_id: str, trajectory_path: Path | None, output_pat
         web_calls=web_calls,
         network_shell_calls=network_shell_calls,
         foreign_mcp_calls=foreign_mcp_calls,
+        first_docatlas_call_before_first_edit=before_edit,
+        first_docatlas_sequence=first_docatlas_sequence,
+        first_edit_sequence=first_edit_sequence,
+        docatlas_tool_name_seen=tool_name_seen,
         violations=violations,
     )
     if output_path is not None:
@@ -89,9 +105,57 @@ def _count_tool_patterns(events: list[dict[str, Any]], patterns: tuple[str, ...]
         args = event.get("arguments", {}) if isinstance(event.get("arguments"), dict) else {}
         server = str(args.get("server", "")).lower()
         tool = str(args.get("tool", "")).lower()
-        command = str(args.get("command", "")).lower()
-        haystack = " ".join((tool_name, server, tool, command))
+        haystack = " ".join((tool_name, server, tool))
         if any(pattern.lower() in haystack for pattern in patterns):
+            count += 1
+    return count
+
+
+def _event_tool_haystack(event: dict[str, Any]) -> str:
+    tool_name = str(event.get("tool_name", "")).lower()
+    args = event.get("arguments", {}) if isinstance(event.get("arguments"), dict) else {}
+    server = str(args.get("server", "")).lower()
+    tool = str(args.get("tool", "")).lower()
+    return " ".join((tool_name, server, tool))
+
+
+def _matches_patterns(event: dict[str, Any], patterns: tuple[str, ...]) -> bool:
+    haystack = _event_tool_haystack(event)
+    return any(pattern.lower() in haystack for pattern in patterns)
+
+
+def _first_tool_sequence(events: list[dict[str, Any]], patterns: tuple[str, ...]) -> int | None:
+    for event in events:
+        if _matches_patterns(event, patterns):
+            sequence = event.get("sequence")
+            return sequence if isinstance(sequence, int) else None
+    return None
+
+
+def _first_tool_name(events: list[dict[str, Any]], patterns: tuple[str, ...]) -> str | None:
+    for event in events:
+        if _matches_patterns(event, patterns):
+            args = event.get("arguments", {}) if isinstance(event.get("arguments"), dict) else {}
+            return str(args.get("tool") or event.get("tool_name") or "get_docs_context")
+    return None
+
+
+def _first_edit_sequence(events: list[dict[str, Any]]) -> int | None:
+    for event in events:
+        tool_name = str(event.get("tool_name", "")).lower()
+        args = json.dumps(event.get("arguments", {}), sort_keys=True).lower()
+        if "edit" in tool_name or "file_change" in args or "changes" in args:
+            sequence = event.get("sequence")
+            return sequence if isinstance(sequence, int) else None
+    return None
+
+
+def _count_foreign_mcp_calls(events: list[dict[str, Any]]) -> int:
+    count = 0
+    for event in events:
+        args = event.get("arguments", {}) if isinstance(event.get("arguments"), dict) else {}
+        server = str(args.get("server", "")).lower()
+        if server and server not in {"docmancer-docs", ""}:
             count += 1
     return count
 

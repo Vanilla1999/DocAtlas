@@ -15,10 +15,40 @@ def test_repo_only_has_no_mcp_config(tmp_path: Path):
 
 
 def test_docatlas_condition_has_only_docatlas_mcp(tmp_path: Path):
+    _, mcp_path = build_tool_policy("docatlas_tool_optional", tmp_path)
+    config = json.loads(mcp_path.read_text(encoding="utf-8"))
+
+    assert list(config["mcpServers"].keys()) == ["docmancer-docs"]
+    assert config["mcpServers"]["docmancer-docs"]["command"] == "uv"
+
+
+def test_deprecated_docatlas_snippet_first_alias_still_has_mcp(tmp_path: Path):
     _, mcp_path = build_tool_policy("docatlas_snippet_first", tmp_path)
     config = json.loads(mcp_path.read_text(encoding="utf-8"))
 
     assert list(config["mcpServers"].keys()) == ["docmancer-docs"]
+
+
+def test_docatlas_recommended_has_mcp_without_required_policy(tmp_path: Path):
+    policy_path, mcp_path = build_tool_policy("docatlas_tool_recommended", tmp_path)
+    config = json.loads(mcp_path.read_text(encoding="utf-8"))
+    policy = json.loads(policy_path.read_text(encoding="utf-8"))
+
+    assert list(config["mcpServers"].keys()) == ["docmancer-docs"]
+    assert policy["recommend_docatlas_before_edit"] is True
+    assert policy["require_docatlas_call_before_edit"] is False
+
+
+def test_docatlas_recommended_does_not_require_call(tmp_path: Path):
+    trajectory = tmp_path / "trajectory.normalized.json"
+    trajectory.write_text(json.dumps([
+        {"sequence": 1, "tool_name": "Edit", "arguments": {"changes": ["src/app.py"]}},
+    ]), encoding="utf-8")
+
+    audit = audit_trajectory("docatlas_tool_recommended", trajectory)
+
+    assert audit.clean
+    assert audit.docatlas_calls == 0
 
 
 def test_policy_violation_invalidates_run(tmp_path: Path):
@@ -29,6 +59,33 @@ def test_policy_violation_invalidates_run(tmp_path: Path):
 
     assert not audit.clean
     assert audit.network_shell_calls > 0
+
+
+def test_required_docatlas_call_must_precede_edit(tmp_path: Path):
+    trajectory = tmp_path / "trajectory.normalized.json"
+    trajectory.write_text(json.dumps([
+        {"sequence": 1, "tool_name": "Edit", "arguments": {"changes": ["src/app.py"]}},
+        {"sequence": 2, "tool_name": "get_docs_context", "arguments": {"server": "docmancer-docs", "tool": "get_docs_context"}},
+    ]), encoding="utf-8")
+
+    audit = audit_trajectory("docatlas_tool_required_once", trajectory)
+
+    assert not audit.clean
+    assert "required_docatlas_call_missing" in audit.violations
+
+
+def test_required_docatlas_call_before_edit_is_clean(tmp_path: Path):
+    trajectory = tmp_path / "trajectory.normalized.json"
+    trajectory.write_text(json.dumps([
+        {"sequence": 1, "tool_name": "get_docs_context", "arguments": {"server": "docmancer-docs", "tool": "get_docs_context"}},
+        {"sequence": 2, "tool_name": "Edit", "arguments": {"changes": ["src/app.py"]}},
+    ]), encoding="utf-8")
+
+    audit = audit_trajectory("docatlas_tool_required_once", trajectory)
+
+    assert audit.clean
+    assert audit.docatlas_calls == 1
+    assert audit.first_docatlas_call_before_first_edit is True
 
 
 def test_each_run_uses_fresh_home(tmp_path: Path):

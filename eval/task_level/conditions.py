@@ -25,16 +25,55 @@ CONDITIONS: dict[str, Condition] = {
     ),
     "docatlas_snippet_first": Condition(
         condition_id="docatlas_snippet_first",
-        label="D - DocAtlas preindexed snippet-first",
+        label="D - DocAtlas tool optional snippet-first (deprecated alias)",
         tool_policy=ToolPolicy(
             allow_docatlas=True,
             docatlas_response_style="snippet-first",
             preindex=True,
         ),
     ),
+    "docatlas_tool_optional": Condition(
+        condition_id="docatlas_tool_optional",
+        label="D - DocAtlas tool optional snippet-first",
+        tool_policy=ToolPolicy(
+            allow_docatlas=True,
+            docatlas_response_style="snippet-first",
+            preindex=True,
+        ),
+    ),
+    "docatlas_tool_recommended": Condition(
+        condition_id="docatlas_tool_recommended",
+        label="E - DocAtlas tool recommended before edit",
+        tool_policy=ToolPolicy(
+            allow_docatlas=True,
+            docatlas_response_style="snippet-first",
+            preindex=True,
+            recommend_docatlas_before_edit=True,
+        ),
+    ),
+    "docatlas_context_injected": Condition(
+        condition_id="docatlas_context_injected",
+        label="F - DocAtlas verified context injected",
+        tool_policy=ToolPolicy(
+            allow_docatlas=True,
+            docatlas_response_style="snippet-first",
+            preindex=True,
+            inject_docatlas_context=True,
+        ),
+    ),
+    "docatlas_tool_required_once": Condition(
+        condition_id="docatlas_tool_required_once",
+        label="G - DocAtlas tool required once before edit",
+        tool_policy=ToolPolicy(
+            allow_docatlas=True,
+            docatlas_response_style="snippet-first",
+            preindex=True,
+            require_docatlas_call_before_edit=True,
+        ),
+    ),
     "docatlas_zero_setup": Condition(
         condition_id="docatlas_zero_setup",
-        label="E - DocAtlas zero-setup exploratory",
+        label="H - DocAtlas zero-setup exploratory",
         tool_policy=ToolPolicy(
             allow_docatlas=True,
             docatlas_response_style="snippet-first",
@@ -48,5 +87,8 @@ DEFAULT_CONDITIONS = (
     "repo_only",
     "context7",
     "docatlas_evidence_first",
-    "docatlas_snippet_first",
+    "docatlas_tool_recommended",
 )
+
+
+DOCATLAS_OPTIONAL_ALIASES = {"docatlas_snippet_first", "docatlas_tool_optional"}

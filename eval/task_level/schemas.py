@@ -10,6 +10,10 @@ ConditionId = Literal[
     "context7",
     "docatlas_evidence_first",
     "docatlas_snippet_first",
+    "docatlas_tool_optional",
+    "docatlas_tool_recommended",
+    "docatlas_context_injected",
+    "docatlas_tool_required_once",
     "docatlas_zero_setup",
 ]
 
@@ -84,6 +88,9 @@ class ToolPolicy:
     allow_web: bool = False
     docatlas_response_style: Literal["evidence-first", "snippet-first"] | None = None
     preindex: bool = False
+    inject_docatlas_context: bool = False
+    recommend_docatlas_before_edit: bool = False
+    require_docatlas_call_before_edit: bool = False
 
 
 @dataclass(frozen=True)

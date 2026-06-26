@@ -39,15 +39,16 @@ def write_report(run_dir: Path, metadata: dict[str, Any], results: list[dict[str
         "```",
         "",
         "## Task table",
-        "| task | condition | repeat | status | resolved | tests | tokens | time_s |",
-        "|---|---|---:|---|---:|---:|---:|---:|",
+        "| task | condition | repeat | status | resolved | public | hidden | harness_docatlas | agent_docatlas | context_injected | context_used | policy_clean |",
+        "|---|---|---:|---|---:|---:|---:|---:|---:|---:|---:|---:|",
     ]
     for result in results:
-        metrics = result.get("metrics", {})
+        docatlas = result.get("docatlas", {}) if isinstance(result.get("docatlas"), dict) else {}
         lines.append(
             f"| {result['task_id']} | {result['condition_id']} | {result['repeat']} | "
-            f"{result['status']} | {result.get('resolved', False)} | {result.get('tests_passed', False)} | "
-            f"{metrics.get('total_tokens', '')} | {metrics.get('wall_time_seconds', '')} |"
+            f"{result['status']} | {result.get('resolved', False)} | {result.get('public_tests_passed', result.get('tests_passed', False))} | "
+            f"{result.get('hidden_tests_passed', False)} | {docatlas.get('harness_calls', 0)} | {docatlas.get('agent_calls', 0)} | "
+            f"{docatlas.get('context_injected', False)} | {docatlas.get('context_used', False)} | {result.get('policy_clean', False)} |"
         )
 
     lines.extend(["", "## Condition results"])
@@ -64,7 +65,17 @@ def write_report(run_dir: Path, metadata: dict[str, Any], results: list[dict[str
         "Pilot report computes paired deltas when each compared condition has matched task/repeat results. Wide intervals must be treated as directional evidence only.",
         "",
         "## Context utilization",
-        "Retrieved/viewed/used/patch-relevant context is recorded per trajectory when an independent runner provides trajectory events.",
+        "DocAtlas adoption and utilization are recorded separately for harness-side context injection and agent-side MCP tool calls.",
+    ])
+    for condition, condition_results in sorted(by_condition.items()):
+        agent_calls = [int(r.get("docatlas", {}).get("agent_calls", 0)) for r in condition_results if isinstance(r.get("docatlas"), dict)]
+        used = [bool(r.get("docatlas", {}).get("context_used")) for r in condition_results if isinstance(r.get("docatlas"), dict)]
+        if agent_calls:
+            lines.append(
+                f"- `{condition}`: agent_docatlas_calls={sum(agent_calls)}, context_used={sum(used)}/{len(used)}"
+            )
+
+    lines.extend([
         "",
         "## Failures",
         metadata.get("failure_summary", "No independent agent failures were measured in this run."),

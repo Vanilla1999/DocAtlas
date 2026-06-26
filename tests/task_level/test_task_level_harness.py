@@ -26,6 +26,8 @@ def test_conditions_encode_tool_isolation():
     assert CONDITIONS["docatlas_evidence_first"].tool_policy.allow_docatlas
     assert CONDITIONS["docatlas_evidence_first"].tool_policy.docatlas_response_style == "evidence-first"
     assert CONDITIONS["docatlas_snippet_first"].tool_policy.docatlas_response_style == "snippet-first"
+    assert CONDITIONS["docatlas_tool_recommended"].tool_policy.recommend_docatlas_before_edit
+    assert not CONDITIONS["docatlas_tool_recommended"].tool_policy.require_docatlas_call_before_edit
 
 
 def test_smoke_results_are_explicitly_not_causal(tmp_path: Path):

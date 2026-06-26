@@ -13,6 +13,7 @@ from pathlib import Path
 from typing import Any
 
 from eval.task_level.conditions import CONDITIONS
+from eval.task_level.evaluators.docatlas_utilization import evaluate_docatlas_utilization
 from eval.task_level.evaluators.patch import diff_stats, patch_touches_forbidden_paths
 from eval.task_level.evaluators.policy import audit_trajectory
 from eval.task_level.evaluators.tests import run_command
@@ -23,6 +24,8 @@ from eval.task_level.schemas import RESULTS_ROOT, TASK_LEVEL_ROOT, RunMetrics, T
 
 RUNTIME_ROOT = TASK_LEVEL_ROOT / "runtime"
 ALLOWED_PATCH_PREFIXES = ("src/", "tests/", "README.md", "docs/", "pyproject.toml")
+DOCATLAS_CONDITIONS = {"docatlas_snippet_first", "docatlas_tool_optional", "docatlas_tool_recommended", "docatlas_context_injected", "docatlas_tool_required_once"}
+CONTEXT_INJECTION_LIMIT_CHARS = 10000
 
 
 def build_tool_policy(condition_id: str, output_dir: Path) -> tuple[Path, Path | None]:
@@ -35,18 +38,21 @@ def build_tool_policy(condition_id: str, output_dir: Path) -> tuple[Path, Path |
         "allow_context7": policy.allow_context7,
         "allow_web": policy.allow_web,
         "docatlas_response_style": policy.docatlas_response_style,
+        "inject_docatlas_context": policy.inject_docatlas_context,
+        "recommend_docatlas_before_edit": policy.recommend_docatlas_before_edit,
+        "require_docatlas_call_before_edit": policy.require_docatlas_call_before_edit,
         "network_enforcement": "policy_and_trajectory_audit",
     }, indent=2, sort_keys=True), encoding="utf-8")
 
     mcp_path = output_dir / "mcp_config.json"
     if condition_id == "repo_only":
         mcp_path.write_text(json.dumps({"mcpServers": {}}, indent=2), encoding="utf-8")
-    elif condition_id == "docatlas_snippet_first":
+    elif condition_id in DOCATLAS_CONDITIONS:
         mcp_path.write_text(json.dumps({
             "mcpServers": {
                 "docmancer-docs": {
-                    "command": "doc-atlas",
-                    "args": ["mcp", "docs-serve"],
+                    "command": "uv",
+                    "args": ["run", "--project", str(Path(__file__).resolve().parents[2]), "doc-atlas", "mcp", "docs-serve"],
                     "env": {"DOCMANCER_TASK_LEVEL_ALLOW_NETWORK": "false"},
                 }
             }
@@ -69,6 +75,7 @@ def fresh_run_environment(run_output_dir: Path) -> dict[str, str]:
         "XDG_CONFIG_HOME": str(xdg_config),
         "XDG_CACHE_HOME": str(xdg_cache),
         "DOCMANCER_HOME": str(docmancer_home),
+        "DOCMANCER_AUTO_VECTORS": "0",
     }
 
 
@@ -99,6 +106,14 @@ def evaluate_agent_patch(task: TaskSpec, workspace: Path, run_output_dir: Path, 
     forbidden = patch_touches_forbidden_paths(workspace, ALLOWED_PATCH_PREFIXES) if patch_exists else []
     audit = audit_trajectory(condition_id, Path(trajectory_path) if trajectory_path else None, run_output_dir / "policy_audit.json")
     stats = diff_stats(workspace) if patch_exists else None
+    utilization = evaluate_docatlas_utilization(
+        task=task,
+        condition_id=condition_id,
+        run_output_dir=run_output_dir,
+        patch_path=patch_path,
+        trajectory_path=Path(trajectory_path) if trajectory_path else None,
+        agent_docatlas_calls=audit.docatlas_calls,
+    )
     public_passed = bool(public and public.passed)
     hidden_passed = bool(hidden and hidden.passed)
     compile_success = bool(compile_result and compile_result.passed)
@@ -133,6 +148,8 @@ def evaluate_agent_patch(task: TaskSpec, workspace: Path, run_output_dir: Path, 
         "tests_passed": public_passed,
         "compile_success": compile_success,
         "policy_clean": audit.clean,
+        "policy": audit.to_json(),
+        "docatlas": utilization.to_json(),
         "patch_path": str(patch_path),
         "trajectory_path": trajectory_path,
         "changed_files": changed_files,
@@ -148,11 +165,13 @@ def evaluate_agent_patch(task: TaskSpec, workspace: Path, run_output_dir: Path, 
             "edit_calls": metrics.edit_calls,
             "test_runs": metrics.test_runs,
             "docatlas_calls": audit.docatlas_calls,
+            "agent_docatlas_calls": audit.docatlas_calls,
+            "harness_docatlas_calls": utilization.harness_calls,
         },
         "context": {
-            "retrieved_count": audit.docatlas_calls,
-            "used_count": 0,
-            "utilization_rate": None,
+            "retrieved_count": int(utilization.context_retrieved) + audit.docatlas_calls,
+            "used_count": int(utilization.context_used),
+            "utilization_rate": 1.0 if utilization.context_used else 0.0 if utilization.context_retrieved or audit.docatlas_calls else None,
         },
         "notes": getattr(runner_output, "notes", []),
     }
@@ -172,8 +191,10 @@ def _run_setup(task: TaskSpec, workspace: Path) -> subprocess.CompletedProcess[s
 def execute_pilot(tasks: list[TaskSpec], conditions: list[str], repeats: int, run_id: str, runner: AgentRunner, model: str, timeout_seconds: int, prompt_template: str) -> list[dict[str, Any]]:
     results: list[dict[str, Any]] = []
     run_dir = RESULTS_ROOT / run_id
+    run_dir.mkdir(parents=True, exist_ok=True)
     runtime_root = Path(tempfile.mkdtemp(prefix=f"docatlas-task-level-{run_id}-"))
     try:
+        total_runs = len(tasks) * len(conditions) * repeats
         for task in tasks:
             for repeat in range(repeats):
                 randomized = conditions[:]
@@ -186,9 +207,26 @@ def execute_pilot(tasks: list[TaskSpec], conditions: list[str], repeats: int, ru
                     (run_output_dir / "materialized.json").write_text(json.dumps(materialized, indent=2, sort_keys=True), encoding="utf-8")
                     policy_path, mcp_config = build_tool_policy(condition_id, run_output_dir)
                     env = fresh_run_environment(run_output_dir)
-                    if condition_id == "docatlas_snippet_first":
-                        prepare_docatlas(task, workspace, run_output_dir, env)
+                    setup_failed = False
+                    if condition_id in DOCATLAS_CONDITIONS:
+                        diagnostics = prepare_docatlas(task, workspace, run_output_dir, env)
+                        setup_failed = diagnostics.get("status") == "condition_setup_failed"
                     prompt = prompt_template.format(issue_text=task.issue_text) + "\nUse the tools available in this environment when they are useful.\n"
+                    if CONDITIONS[condition_id].tool_policy.inject_docatlas_context:
+                        injected = inject_docatlas_context(task, workspace, run_output_dir, env)
+                        if injected.get("status") == "condition_setup_failed":
+                            setup_failed = True
+                        else:
+                            prompt += "\n" + (run_output_dir / "injected_context.md").read_text(encoding="utf-8") + "\n"
+                    if CONDITIONS[condition_id].tool_policy.recommend_docatlas_before_edit:
+                        prompt += "\nDocAtlas workflow guidance: Use DocAtlas/docmancer documentation context before making code changes when the task may depend on library APIs, exact dependency versions, or project docs. Ask a task-specific documentation question, then use or ignore the returned context based on relevance.\n"
+                    if CONDITIONS[condition_id].tool_policy.require_docatlas_call_before_edit:
+                        prompt += "\nDiagnostic policy: Before your first code edit, call the available documentation-context tool once with a task-specific question. Use or ignore the returned context based on relevance.\n"
+                    if setup_failed:
+                        result = condition_setup_failed_result(task, condition_id, run_output_dir)
+                        results.append(result)
+                        write_run_progress(run_dir, results, total_runs, current={"task_id": task.task_id, "condition_id": condition_id, "repeat": repeat, "status": result["status"]})
+                        continue
                     request = AgentRunRequest(
                         task_id=task.task_id,
                         condition_id=condition_id,
@@ -205,28 +243,230 @@ def execute_pilot(tasks: list[TaskSpec], conditions: list[str], repeats: int, ru
                     output = runner.run(request)
                     result = evaluate_agent_patch(task, workspace, run_output_dir, condition_id, output.trajectory_path, output)
                     results.append(result)
+                    write_run_progress(run_dir, results, total_runs, current={"task_id": task.task_id, "condition_id": condition_id, "repeat": repeat, "status": result["status"]})
     finally:
         shutil.rmtree(runtime_root, ignore_errors=True)
-    (run_dir / "runs.jsonl").write_text("\n".join(json.dumps(result, sort_keys=True) for result in results), encoding="utf-8")
+    write_run_progress(run_dir, results, len(tasks) * len(conditions) * repeats, current=None, finished=True)
     return results
+
+
+def write_run_progress(run_dir: Path, results: list[dict[str, Any]], total_runs: int, *, current: dict[str, Any] | None, finished: bool = False) -> None:
+    completed = len(results)
+    (run_dir / "runs.jsonl").write_text("\n".join(json.dumps(result, sort_keys=True) for result in results), encoding="utf-8")
+    payload = {
+        "status": "finished" if finished else "running",
+        "completed_runs": completed,
+        "total_runs": total_runs,
+        "remaining_runs": max(total_runs - completed, 0),
+        "current": current,
+        "updated_at": datetime.now(timezone.utc).isoformat(),
+        "latest_results": [
+            {
+                "task_id": result.get("task_id"),
+                "condition_id": result.get("condition_id"),
+                "status": result.get("status"),
+                "resolved": result.get("resolved"),
+                "public_tests_passed": result.get("public_tests_passed"),
+                "hidden_tests_passed": result.get("hidden_tests_passed"),
+                "agent_docatlas_calls": result.get("docatlas", {}).get("agent_calls") if isinstance(result.get("docatlas"), dict) else None,
+                "context_used": result.get("docatlas", {}).get("context_used") if isinstance(result.get("docatlas"), dict) else None,
+                "policy_clean": result.get("policy_clean"),
+            }
+            for result in results[-8:]
+        ],
+    }
+    (run_dir / "status.json").write_text(json.dumps(payload, indent=2, sort_keys=True), encoding="utf-8")
 
 
 def prepare_docatlas(task: TaskSpec, workspace: Path, output_dir: Path, env: dict[str, str]) -> dict[str, Any]:
     started = time.monotonic()
+    sync_status = "not_run"
+    sync_error = None
+    try:
+        from docmancer.docs.service import LibraryDocsService
+
+        old_home = os.environ.get("DOCMANCER_HOME")
+        os.environ["DOCMANCER_HOME"] = env["DOCMANCER_HOME"]
+        try:
+            sync_result = LibraryDocsService().sync_project_docs(str(workspace), with_vectors=False)
+            sync_status = getattr(sync_result, "status", "success")
+        finally:
+            if old_home is None:
+                os.environ.pop("DOCMANCER_HOME", None)
+            else:
+                os.environ["DOCMANCER_HOME"] = old_home
+    except Exception as exc:
+        sync_status = "failed"
+        sync_error = repr(exc)
+
     diagnostics = {
         "task_id": task.task_id,
-        "status": "prepared_with_local_project_docs_only",
+        "status": "prepared_with_local_project_docs_only" if sync_status != "failed" else "condition_setup_failed",
         "allow_network": False,
         "docmancer_home": env["DOCMANCER_HOME"],
+        "project_docs_sync_status": sync_status,
+        "project_docs_sync_error": sync_error,
         "sources": ["fixture README/docs", "FastAPI docs preindex not fetched during unit validation"],
-        "pages": None,
-        "chunks": None,
+        "pages": 1 if sync_status != "failed" else 0,
+        "chunks": 1 if sync_status != "failed" else 0,
+        "expected_domains_present": [],
         "contamination": 0,
         "wall_time_seconds": round(time.monotonic() - started, 4),
-        "limitation": "Live FastAPI docs preindex is deferred to real pilot execution environment; run is failed by setup code if required strict inspect is not available.",
+        "limitation": "Offline pilot preparation syncs project-owned docs only. Exact dependency docs must already be locally cached; no network fetch is performed.",
     }
     (output_dir / "docatlas_preparation.json").write_text(json.dumps(diagnostics, indent=2, sort_keys=True), encoding="utf-8")
     return diagnostics
+
+
+def inject_docatlas_context(task: TaskSpec, workspace: Path, output_dir: Path, env: dict[str, str]) -> dict[str, Any]:
+    started = time.monotonic()
+    try:
+        from docmancer.docs.service import LibraryDocsService
+
+        old_home = os.environ.get("DOCMANCER_HOME")
+        os.environ["DOCMANCER_HOME"] = env["DOCMANCER_HOME"]
+        try:
+            dependency = task.dependencies[0] if task.dependencies else None
+            result = LibraryDocsService().get_docs_context(
+                task.issue_text,
+                project_path=str(workspace),
+                library=dependency.name if dependency else None,
+                ecosystem=task.ecosystem,
+                version=dependency.version if dependency else None,
+                mode="auto",
+                response_style="snippet-first",
+                allow_network=False,
+                allow_latest_fallback=False,
+                tokens=2500,
+                limit=6,
+            )
+        finally:
+            if old_home is None:
+                os.environ.pop("DOCMANCER_HOME", None)
+            else:
+                os.environ["DOCMANCER_HOME"] = old_home
+    except Exception as exc:
+        payload = {"status": "condition_setup_failed", "error": repr(exc), "wall_time_seconds": round(time.monotonic() - started, 4)}
+        (output_dir / "docatlas_context_injection.json").write_text(json.dumps(payload, indent=2, sort_keys=True), encoding="utf-8")
+        return payload
+
+    response = _jsonable(result)
+    (output_dir / "docatlas_response.json").write_text(json.dumps(response, indent=2, sort_keys=True), encoding="utf-8")
+    sources = _extract_context_sources(response)[:6]
+    (output_dir / "context_sources.json").write_text(json.dumps(sources, indent=2, sort_keys=True), encoding="utf-8")
+    markdown = format_injected_context(response, sources)
+    if len(markdown) > CONTEXT_INJECTION_LIMIT_CHARS:
+        markdown = markdown[:CONTEXT_INJECTION_LIMIT_CHARS] + "\n\n[truncated by benchmark harness]\n"
+    (output_dir / "injected_context.md").write_text(markdown, encoding="utf-8")
+    payload = {"status": "success", "harness_docatlas_calls": 1, "sources": len(sources), "wall_time_seconds": round(time.monotonic() - started, 4)}
+    (output_dir / "docatlas_context_injection.json").write_text(json.dumps(payload, indent=2, sort_keys=True), encoding="utf-8")
+    return payload
+
+
+def format_injected_context(response: dict[str, Any], sources: list[dict[str, Any]]) -> str:
+    trust = response.get("trust_contract", {}) if isinstance(response.get("trust_contract"), dict) else {}
+    routing = response.get("routing", {}) if isinstance(response.get("routing"), dict) else {}
+    items = response.get("context_pack") or response.get("items") or response.get("context") or []
+    snippets: list[str] = []
+    if isinstance(items, list):
+        for item in items[:2]:
+            if isinstance(item, dict):
+                snippet = item.get("snippet") or item.get("content") or item.get("text") or item.get("summary")
+                if snippet:
+                    snippets.append(str(snippet)[:1600])
+    lines = [
+        "## Verified DocAtlas context",
+        "",
+        "Routing:",
+        f"- mode_selected: {response.get('mode') or routing.get('mode_selected') or 'auto'}",
+        f"- reason: {routing.get('reason') or response.get('reason_code') or 'DocAtlas offline context route'}",
+        "",
+    ]
+    for index, snippet in enumerate(snippets, start=1):
+        lines.extend([f"Primary snippet {index}:", "```text", snippet, "```", ""])
+    lines.extend(["Project constraints:"])
+    for source in sources:
+        if str(source.get("kind", "")).startswith("project"):
+            lines.append(f"- Follow project source {source.get('path') or source.get('title')}")
+    if not any(str(source.get("kind", "")).startswith("project") for source in sources):
+        lines.append("- No project-specific constraint source selected by DocAtlas.")
+    lines.extend(["", "Sources:"])
+    for index, source in enumerate(sources, start=1):
+        label = source.get("kind") or "source"
+        path = source.get("path") or source.get("url") or source.get("title") or "unknown"
+        why = source.get("why") or source.get("freshness") or "selected by DocAtlas"
+        lines.append(f"{index}. [{label}] {path} - {why}")
+    selected = trust.get("selected") or trust.get("selected_sources") or []
+    risky = trust.get("risky") or []
+    rejected = trust.get("rejected") or []
+    lines.extend([
+        "",
+        "Trust Contract:",
+        f"- selected: {len(selected) if isinstance(selected, list) else 0}",
+        f"- risky: {len(risky) if isinstance(risky, list) else 0}",
+        f"- rejected: {len(rejected) if isinstance(rejected, list) else 0}",
+        "",
+        "Warnings:",
+    ])
+    warnings = response.get("warnings") if isinstance(response.get("warnings"), list) else []
+    if warnings:
+        lines.extend(f"- {warning}" for warning in warnings[:4])
+    else:
+        lines.append("- No DocAtlas warnings reported.")
+    return "\n".join(lines)
+
+
+def _extract_context_sources(response: dict[str, Any]) -> list[dict[str, Any]]:
+    trust = response.get("trust_contract", {}) if isinstance(response.get("trust_contract"), dict) else {}
+    candidates = trust.get("selected") or trust.get("selected_sources") or response.get("sources") or []
+    sources: list[dict[str, Any]] = []
+    if isinstance(candidates, list):
+        for item in candidates:
+            if isinstance(item, dict):
+                source = item.get("source") if isinstance(item.get("source"), dict) else item
+                sources.append({
+                    "kind": source.get("kind") or source.get("type") or source.get("source_type") or "project",
+                    "path": source.get("path") or source.get("url") or source.get("title"),
+                    "title": source.get("title"),
+                    "why": item.get("why") or item.get("reason"),
+                    "freshness": source.get("freshness"),
+                })
+    return sources
+
+
+def _jsonable(value: Any) -> Any:
+    if hasattr(value, "__dict__"):
+        return _jsonable(value.__dict__)
+    if isinstance(value, dict):
+        return {str(k): _jsonable(v) for k, v in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [_jsonable(v) for v in value]
+    if isinstance(value, (str, int, float, bool)) or value is None:
+        return value
+    return str(value)
+
+
+def condition_setup_failed_result(task: TaskSpec, condition_id: str, run_output_dir: Path) -> dict[str, Any]:
+    result = {
+        "run_id": run_output_dir.parents[2].name,
+        "task_id": task.task_id,
+        "condition_id": condition_id,
+        "repeat": int(run_output_dir.name.removeprefix("repeat_")),
+        "runner_id": "not_run",
+        "status": "condition_setup_failed",
+        "resolved": False,
+        "public_tests_passed": False,
+        "hidden_tests_passed": False,
+        "tests_passed": False,
+        "compile_success": False,
+        "policy_clean": False,
+        "policy": {"clean": False, "violations": ["condition_setup_failed"]},
+        "docatlas": {"available": True, "harness_calls": 0, "agent_calls": 0, "context_retrieved": False, "context_injected": False, "context_used": False, "context_used_confidence": "none", "used_symbols": [], "used_sources": []},
+        "metrics": {},
+        "notes": ["DocAtlas condition setup failed; agent was not run."],
+    }
+    (run_output_dir / "result.json").write_text(json.dumps(result, indent=2, sort_keys=True), encoding="utf-8")
+    return result
 
 
 def run_canary(runner: AgentRunner, model: str, timeout_seconds: int, output_dir: Path) -> dict[str, Any]:
@@ -278,6 +518,75 @@ def run_canary(runner: AgentRunner, model: str, timeout_seconds: int, output_dir
             "workspace": str(workspace),
             "validated_at": datetime.now(timezone.utc).isoformat(),
         }
+        return payload
+    finally:
+        shutil.rmtree(workspace, ignore_errors=True)
+
+
+def run_docatlas_tool_visibility_canary(runner: AgentRunner, model: str, timeout_seconds: int, output_dir: Path) -> dict[str, Any]:
+    output_dir.mkdir(parents=True, exist_ok=True)
+    workspace = Path(tempfile.mkdtemp(prefix="docatlas-tool-canary-"))
+    try:
+        (workspace / "README.md").write_text("# Canary Repo\n\nThis repository is used to verify documentation-context tool visibility.\n", encoding="utf-8")
+        subprocess.run(["git", "init"], cwd=workspace, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False)
+        subprocess.run(["git", "config", "user.email", "benchmark@example.invalid"], cwd=workspace, check=False)
+        subprocess.run(["git", "config", "user.name", "Task Benchmark"], cwd=workspace, check=False)
+        subprocess.run(["git", "add", "."], cwd=workspace, check=False)
+        subprocess.run(["git", "commit", "-m", "canary base"], cwd=workspace, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False)
+        policy_path, mcp_config = build_tool_policy("docatlas_tool_optional", output_dir)
+        env = fresh_run_environment(output_dir)
+        prepare_docatlas(TaskSpec(
+            task_id="docatlas_tool_visibility_canary",
+            task_type="curated",
+            suite="differentiation",
+            repo="fixture://docatlas_tool_visibility_canary",
+            base_commit="fixture-base",
+            issue_text="Ask the available DocAtlas/documentation-context MCP get_docs_context tool what documentation context is available for this repository. Do not edit files.",
+            language="text",
+            ecosystem="python",
+            dependencies=(),
+            setup_command="",
+            test_command="true",
+        ), workspace, output_dir, env)
+        request = AgentRunRequest(
+            task_id="docatlas_tool_visibility_canary",
+            condition_id="docatlas_tool_visibility_canary",
+            workspace=workspace,
+            prompt="Ask the available DocAtlas/documentation-context MCP get_docs_context tool what documentation context is available for this repository. Do not edit files.",
+            model=model,
+            timeout_seconds=timeout_seconds,
+            max_turns=8,
+            environment=env,
+            mcp_config_path=mcp_config,
+            tool_policy_path=policy_path,
+            output_dir=output_dir,
+        )
+        runner_output = runner.run(request)
+        patch_path, _, _, changed = capture_patch(workspace, output_dir)
+        audit = audit_trajectory("docatlas_tool_optional", Path(runner_output.trajectory_path) if runner_output.trajectory_path else None, output_dir / "policy_audit.json")
+        response_saved = False
+        if runner_output.trajectory_path and Path(runner_output.trajectory_path).exists():
+            trajectory_text = Path(runner_output.trajectory_path).read_text(encoding="utf-8")
+            response_saved = "get_docs_context" in trajectory_text or "docmancer-docs" in trajectory_text
+            (output_dir / "docatlas_tool_response_excerpt.txt").write_text(trajectory_text[:8000], encoding="utf-8")
+        get_docs_context_seen = False
+        if runner_output.trajectory_path and Path(runner_output.trajectory_path).exists():
+            get_docs_context_seen = "get_docs_context" in Path(runner_output.trajectory_path).read_text(encoding="utf-8")
+        verified = audit.docatlas_calls > 0 and get_docs_context_seen and response_saved and not patch_path.read_text(encoding="utf-8").strip()
+        payload = {
+            "docatlas_tool_visibility_verified": verified,
+            "status": "passed" if verified else "failed",
+            "docatlas_calls": audit.docatlas_calls,
+            "agent_docatlas_calls": audit.docatlas_calls,
+            "tool_name_seen": audit.docatlas_tool_name_seen,
+            "get_docs_context_seen": get_docs_context_seen,
+            "response_saved": response_saved,
+            "trajectory_path": runner_output.trajectory_path,
+            "no_code_edits": not patch_path.read_text(encoding="utf-8").strip() and not changed,
+            "failure_reason": None if verified else "DocAtlas tool call not observed, response not saved, or files were edited",
+            "validated_at": datetime.now(timezone.utc).isoformat(),
+        }
+        (output_dir / "docatlas_tool_visibility_canary.json").write_text(json.dumps(payload, indent=2, sort_keys=True), encoding="utf-8")
         return payload
     finally:
         shutil.rmtree(workspace, ignore_errors=True)
