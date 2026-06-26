@@ -43,19 +43,19 @@ class ActionabilityEvaluation:
 def requirements_for_task(task_id: str) -> list[ContractRequirement]:
     if task_id == "fastapi_depends_001":
         return [
-            ContractRequirement(task_id, "reject_missing_x_token", "Reject missing X-Token with HTTP 401.", "project_doc", True, ["X-Token", "HTTPException"], ["README.md", "src/app/main.py"]),
-            ContractRequirement(task_id, "shared_dependency", "Use a shared FastAPI dependency for token auth.", "project_doc", True, ["Depends"], ["src/app/main.py"]),
+            ContractRequirement(task_id, "reject_missing_x_token", "Reject missing X-Token with HTTP 401.", "project_doc", True, ["X-Token", "HTTPException"], ["README.md", "docs/auth.md", "src/app/main.py"]),
+            ContractRequirement(task_id, "shared_dependency", "Use a shared FastAPI dependency for token auth.", "project_doc", True, ["Depends"], ["docs/auth.md", "src/app/main.py"]),
             ContractRequirement(task_id, "background_audit", "Queue audit with BackgroundTasks only after success.", "project_doc", True, ["BackgroundTasks"], ["src/app/main.py"]),
-            ContractRequirement(task_id, "dependency_name_require_token", "Dependency function is named require_token.", "hidden_test", False, ["require_token"], ["src/app/main.py"]),
-            ContractRequirement(task_id, "route_param_token", "Route dependency parameter is named token.", "hidden_test", False, ["token"], ["src/app/main.py"]),
+            ContractRequirement(task_id, "dependency_name_require_token", "Dependency function is named require_token.", "project_doc", True, ["require_token"], ["docs/auth.md", "src/app/main.py"]),
+            ContractRequirement(task_id, "route_param_token", "Route dependency parameter is named token.", "project_doc", True, ["token"], ["docs/auth.md", "src/app/main.py"]),
         ]
     if task_id == "mixed_fastapi_project_001":
         return [
             ContractRequirement(task_id, "use_require_admin", "Use shared require_admin dependency.", "project_doc", True, ["require_admin"], ["docs/security.md", "src/app/security.py"]),
             ContractRequirement(task_id, "route_in_main", "Place internal admin route in src/app/main.py.", "project_doc", True, [], ["src/app/main.py"]),
             ContractRequirement(task_id, "error_envelope", "Use documented forbidden error envelope.", "project_doc", True, ["error_envelope"], ["docs/api-errors.md", "src/app/errors.py"]),
-            ContractRequirement(task_id, "dependency_raised_403", "Handle dependency-raised HTTPException 403 with the envelope path.", "code_symbol", True, ["HTTPException", "error_envelope"], ["src/app/security.py", "src/app/main.py"]),
-            ContractRequirement(task_id, "annotated_admin_param", "Use admin: Annotated[str, Depends(require_admin)].", "hidden_test", False, ["Annotated", "Depends", "require_admin", "admin"], ["src/app/main.py"]),
+            ContractRequirement(task_id, "dependency_raised_403", "Handle dependency-raised HTTPException 403 with the envelope path.", "project_doc", True, ["HTTPException", "error_envelope"], ["docs/api-errors.md", "src/app/security.py", "src/app/main.py"]),
+            ContractRequirement(task_id, "annotated_admin_param", "Use admin: Annotated[str, Depends(require_admin)].", "project_doc", True, ["Annotated", "Depends", "require_admin", "admin"], ["docs/security.md", "src/app/main.py"]),
         ]
     return []
 

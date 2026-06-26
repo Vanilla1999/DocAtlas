@@ -102,3 +102,19 @@ Actionability checklist pilot (`docatlas_actionability_pilot_001`):
 - The checklist correctly excluded hidden-only exact requirements (`require_token`, route parameter `token`, `admin: Annotated[...]`), so the remaining failures are mostly not fixable by oracle-free presentation alone.
 
 Decision after actionability pilot: ITERATE_TASKS. Secondary follow-up: make the checklist/directive workflow more explicit only after task contracts are made discoverable from public docs/tests. No task-level improvement claim is supported.
+
+Task fairness calibration (`task_fairness_review`):
+
+- `fastapi_depends_001` now exposes the `require_token` dependency name and `token` route parameter convention in `docs/auth.md`.
+- `mixed_fastapi_project_001` now exposes the `admin: Annotated[str, Depends(require_admin)]` route parameter convention in `docs/security.md` and dependency-raised `HTTPException` envelope handling in `docs/api-errors.md`.
+- Fixture validation after calibration passed for both tasks: base expected tests fail, gold public tests pass, gold hidden tests pass, and oracle isolation remains true.
+
+Recalibrated actionability pilot (`docatlas_actionability_pilot_recalibrated_001`):
+
+- One completed 2-task x 4-condition x 1-repeat matrix was observed before a later metric-only rerun attempt was stopped; raw run directories are not committed.
+- `fastapi_depends_001` resolved in all four conditions after the exact-form conventions became visible.
+- `mixed_fastapi_project_001` resolved under `repo_only` and `docatlas_action_checklist_injected`; `docatlas_tool_recommended` and `docatlas_context_injected` did not resolve it in this single repeat.
+- Checklist-injected runs used the checklist and surfaced the newly visible exact-form conventions.
+- Because `repo_only` solved both tasks in this small recalibrated matrix, the result does not justify a DocAtlas improvement claim or an 8-task pilot.
+
+Decision after recalibration: ITERATE_TASKS. The immediate issue shifted from unfair hidden contracts to weak differentiation: these two calibrated fixtures are now too solvable by repo-only in a single repeat to support causal DocAtlas claims.

@@ -114,6 +114,24 @@ def test_checklist_does_not_invent_parameter_name(tmp_path: Path):
     assert not any("admin:" in item.text for item in items)
 
 
+def test_checklist_surfaces_admin_parameter_when_visible_in_docs(tmp_path: Path):
+    workspace = _workspace(tmp_path)
+    (workspace / "docs/security.md").write_text(
+        "Admin routes must declare the shared admin dependency as a route parameter named `admin`.\n"
+        "```python\nadmin: Annotated[str, Depends(require_admin)]\n```",
+        encoding="utf-8",
+    )
+
+    items = build_action_checklist(
+        task_id="mixed_fastapi_project_001",
+        issue_text="Use dependency injection.",
+        docatlas_response={"context_pack": [{"content": "Depends require_admin"}]},
+        workspace=workspace,
+    )
+
+    assert any("admin: Annotated[str, Depends(require_admin)]" in item.text for item in items)
+
+
 def test_checklist_usage_detects_patch_symbol(tmp_path: Path):
     run_dir = tmp_path / "run"
     run_dir.mkdir()
@@ -140,7 +158,7 @@ def test_checklist_usage_detects_patch_symbol(tmp_path: Path):
     )
 
     assert result.action_checklist_used is True
-    assert "annotated_admin_param" in result.hidden_only_requirements_excluded
+    assert result.hidden_only_requirements_excluded == []
 
 
 def test_actionability_report_marks_missing_contracts(tmp_path: Path):
@@ -160,4 +178,4 @@ def test_actionability_report_marks_missing_contracts(tmp_path: Path):
     )
 
     assert result.critical_contract_recall == 0.0
-    assert "dependency_name_require_token" in result.hidden_only_requirements_excluded
+    assert result.hidden_only_requirements_excluded == []

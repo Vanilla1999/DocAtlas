@@ -83,6 +83,37 @@ def build_action_checklist(
             files=["docs/api-errors.md", "src/app/main.py"],
         ))
 
+    auth_doc = visible_files.get("docs/auth.md", "")
+    if "require_token" in auth_doc and "X-Token" in auth_doc:
+        add(ChecklistItem(
+            text="Use the documented shared dependency named `require_token` to validate the `X-Token` header.",
+            source="docs/auth.md",
+            evidence_type="project_doc",
+            confidence="high",
+            symbols=["require_token", "X-Token"],
+            files=["docs/auth.md", "src/app/main.py"],
+        ))
+
+    if "route as `token`" in auth_doc or "as `token`" in auth_doc:
+        add(ChecklistItem(
+            text="Expose the validated token to protected routes with a route parameter named `token`.",
+            source="docs/auth.md",
+            evidence_type="project_doc",
+            confidence="high",
+            symbols=["token", "Depends"],
+            files=["docs/auth.md", "src/app/main.py"],
+        ))
+
+    if "admin: Annotated[str, Depends(require_admin)]" in security_doc:
+        add(ChecklistItem(
+            text="Declare the admin dependency as `admin: Annotated[str, Depends(require_admin)]`.",
+            source="docs/security.md",
+            evidence_type="project_doc",
+            confidence="high",
+            symbols=["admin", "Annotated", "Depends", "require_admin"],
+            files=["docs/security.md", "src/app/main.py"],
+        ))
+
     if any(_mentions(token, context_text) for token in ("Depends", "Annotated")):
         add(ChecklistItem(
             text="Use FastAPI dependency injection for shared auth behavior instead of inline request parsing.",

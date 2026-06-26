@@ -5,7 +5,7 @@
     "setup_success": true,
     "unexpected_failures": []
   },
-  "fixture_hash": "26fca42853566ac83029742eacd668f19fc612beb2207747f1d7284f7f0653af",
+  "fixture_hash": "403ed624283c0e052f5cf22e4afb7120074fc4e8a59ec0f7b4b441727d3547b5",
   "gold": {
     "compile_success": true,
     "hidden_tests_passed": true,
@@ -15,5 +15,5 @@
   "oracle_isolated": true,
   "status": "validated",
   "task_id": "mixed_fastapi_project_001",
-  "validated_at": "2026-06-26T08:28:09.979583+00:00"
+  "validated_at": "2026-06-26T15:19:36.850668+00:00"
 }

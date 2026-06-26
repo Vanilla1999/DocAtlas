@@ -7,3 +7,7 @@ Error responses use this envelope:
 ```
 
 Use the shared helper from `app.errors` for documented errors.
+
+Dependency-raised `HTTPException` errors must still pass through the project error-envelope handler.
+
+Do not return raw FastAPI error bodies for admin authorization failures.

@@ -65,7 +65,7 @@ def _evaluate_mixed(text: str) -> ContractEvaluation:
     form_checks = {
         "route_parameter_admin": re.search(r"def\s+admin_status\s*\([^)]*\badmin\s*:", text, re.S) is not None,
         "annotated_depends_require_admin": "Annotated" in text and "Depends(require_admin)" in text,
-        "http_exception_handler": "exception_handler(HTTPException" in text or "@app.exception_handler(HTTPException" in text,
+        "dependency_exception_envelope_handler": "exception_handler(" in text and "error_envelope" in text,
     }
     project_checks = {
         "uses_require_admin": "require_admin" in text and "Depends(require_admin)" in text,

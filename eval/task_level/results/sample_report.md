@@ -76,3 +76,49 @@ ITERATE_TASKS
 ```
 
 Reason: the checklist excluded hidden-only exact requirements by design, and those exact requirements remain the main failure mode. Public docs/tests should make required contracts discoverable or hidden tests should avoid brittle exact-form introspection before scaling.
+
+## Task fairness calibration
+
+Artifacts:
+
+```text
+eval/task_level/results/task_fairness_review/
+```
+
+Calibration changes:
+
+- `fastapi_depends_001`: added visible `docs/auth.md` convention for `require_token`, `X-Token`, route parameter `token`, and no duplicated token validation.
+- `mixed_fastapi_project_001`: expanded visible `docs/security.md` for route parameter `admin` and `admin: Annotated[str, Depends(require_admin)]`; expanded `docs/api-errors.md` for dependency-raised `HTTPException` envelope handling.
+
+Validation:
+
+```text
+fastapi base expected tests fail: true
+fastapi gold public+hidden pass: true
+mixed base expected tests fail: true
+mixed gold public+hidden pass: true
+oracle isolation: true
+```
+
+Recalibrated pilot summary:
+
+| task | condition | resolved | public | hidden | behavior | form | project | checklist_used |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| fastapi_depends_001 | repo_only | true | true | true | 1.0 | 1.0 | 1.0 | false |
+| fastapi_depends_001 | docatlas_tool_recommended | true | true | true | 1.0 | 1.0 | 1.0 | false |
+| fastapi_depends_001 | docatlas_context_injected | true | true | true | 1.0 | 1.0 | 1.0 | false |
+| fastapi_depends_001 | docatlas_action_checklist_injected | true | true | true | 1.0 | 1.0 | 1.0 | true |
+| mixed_fastapi_project_001 | repo_only | true | true | true | 1.0 | 1.0* | 1.0 | false |
+| mixed_fastapi_project_001 | docatlas_tool_recommended | false | false | false | 1.0 | 1.0* | 1.0 | false |
+| mixed_fastapi_project_001 | docatlas_context_injected | false | false | false | 1.0 | 1.0* | 1.0 | false |
+| mixed_fastapi_project_001 | docatlas_action_checklist_injected | true | true | true | 1.0 | 1.0* | 1.0 | true |
+
+`*` The completed run used an earlier exact-decorator contract metric that reported mixed form as `0.6667` despite hidden tests passing. The evaluator was calibrated afterward to score the documented dependency exception envelope behavior instead of requiring a magic `HTTPException` decorator string; the heavy agent matrix was not rerun after that metric-only correction.
+
+Decision:
+
+```text
+ITERATE_TASKS
+```
+
+Reason: the calibrated contracts are now visible, but `repo_only` solved both tasks in this single-repeat matrix, so the fixtures no longer differentiate DocAtlas/checklist value enough to justify scaling.
