@@ -91,3 +91,14 @@ Diagnosis summary:
 - `mixed_fastapi_project_001`: context selected relevant project docs and agents used `require_admin`, module placement, and envelope facts, but context did not provide an action checklist for the FastAPI-specific implementation shape (`Annotated[str, Depends(require_admin)]`, route parameter `admin`, `HTTPException` handler for dependency-raised 403). This supports context presentation iteration, with secondary task/doc brittleness risk.
 
 Next recommended experiment: ITERATE_CONTEXT_PRESENTATION via an action-checklist section that prioritizes project constraints and visible-code implementation hazards before library snippets. Do not claim improvement until a new causal run passes the benchmark decision rule.
+
+Actionability checklist pilot (`docatlas_actionability_pilot_001`):
+
+- Matrix executed: `fastapi_depends_001` and `mixed_fastapi_project_001` x `repo_only`, `docatlas_tool_recommended`, `docatlas_context_injected`, `docatlas_action_checklist_injected` x 1 repeat = 8 runs.
+- `docatlas_action_checklist_injected` injected 4 checklist items for `fastapi_depends_001` and 5 for `mixed_fastapi_project_001`; checklist usage was detected in both checklist runs.
+- Resolved did not improve: all four conditions resolved `0/2` in this pilot.
+- Contract scores did not improve over baselines: `fastapi_depends_001` remained behavior=1.0, form=0.6667, project=1.0 across all conditions; `mixed_fastapi_project_001` checklist remained behavior=1.0, project=1.0 but form=0.0, worse than the repo-only/recommended form score of 0.3333.
+- Token/time overhead was not the blocker: checklist injection used fewer input tokens than full context or recommended tool use in this run, but did not improve correctness.
+- The checklist correctly excluded hidden-only exact requirements (`require_token`, route parameter `token`, `admin: Annotated[...]`), so the remaining failures are mostly not fixable by oracle-free presentation alone.
+
+Decision after actionability pilot: ITERATE_TASKS. Secondary follow-up: make the checklist/directive workflow more explicit only after task contracts are made discoverable from public docs/tests. No task-level improvement claim is supported.

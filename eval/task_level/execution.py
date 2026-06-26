@@ -13,6 +13,9 @@ from pathlib import Path
 from typing import Any
 
 from eval.task_level.conditions import CONDITIONS
+from eval.task_level.context.action_checklist import build_action_checklist, save_action_checklist
+from eval.task_level.evaluators.actionability import evaluate_actionability
+from eval.task_level.evaluators.contract import evaluate_contract
 from eval.task_level.evaluators.docatlas_utilization import evaluate_docatlas_utilization
 from eval.task_level.evaluators.patch import diff_stats, patch_touches_forbidden_paths
 from eval.task_level.evaluators.policy import audit_trajectory
@@ -24,7 +27,15 @@ from eval.task_level.schemas import RESULTS_ROOT, TASK_LEVEL_ROOT, RunMetrics, T
 
 RUNTIME_ROOT = TASK_LEVEL_ROOT / "runtime"
 ALLOWED_PATCH_PREFIXES = ("src/", "tests/", "README.md", "docs/", "pyproject.toml")
-DOCATLAS_CONDITIONS = {"docatlas_snippet_first", "docatlas_tool_optional", "docatlas_tool_recommended", "docatlas_context_injected", "docatlas_tool_required_once"}
+DOCATLAS_CONDITIONS = {
+    "docatlas_snippet_first",
+    "docatlas_tool_optional",
+    "docatlas_tool_recommended",
+    "docatlas_context_injected",
+    "docatlas_action_checklist_injected",
+    "docatlas_action_checklist_only",
+    "docatlas_tool_required_once",
+}
 CONTEXT_INJECTION_LIMIT_CHARS = 10000
 
 
@@ -39,6 +50,7 @@ def build_tool_policy(condition_id: str, output_dir: Path) -> tuple[Path, Path |
         "allow_web": policy.allow_web,
         "docatlas_response_style": policy.docatlas_response_style,
         "inject_docatlas_context": policy.inject_docatlas_context,
+        "inject_action_checklist": policy.inject_action_checklist,
         "recommend_docatlas_before_edit": policy.recommend_docatlas_before_edit,
         "require_docatlas_call_before_edit": policy.require_docatlas_call_before_edit,
         "network_enforcement": "policy_and_trajectory_audit",
@@ -114,6 +126,15 @@ def evaluate_agent_patch(task: TaskSpec, workspace: Path, run_output_dir: Path, 
         trajectory_path=Path(trajectory_path) if trajectory_path else None,
         agent_docatlas_calls=audit.docatlas_calls,
     )
+    contract = evaluate_contract(task, workspace, patch_path)
+    actionability = evaluate_actionability(
+        task=task,
+        condition_id=condition_id,
+        run_output_dir=run_output_dir,
+        patch_path=patch_path,
+        trajectory_path=Path(trajectory_path) if trajectory_path else None,
+        contract=contract,
+    )
     public_passed = bool(public and public.passed)
     hidden_passed = bool(hidden and hidden.passed)
     compile_success = bool(compile_result and compile_result.passed)
@@ -150,6 +171,8 @@ def evaluate_agent_patch(task: TaskSpec, workspace: Path, run_output_dir: Path, 
         "policy_clean": audit.clean,
         "policy": audit.to_json(),
         "docatlas": utilization.to_json(),
+        "contract": contract.to_json(),
+        "actionability": actionability.to_json(),
         "patch_path": str(patch_path),
         "trajectory_path": trajectory_path,
         "changed_files": changed_files,
@@ -212,12 +235,19 @@ def execute_pilot(tasks: list[TaskSpec], conditions: list[str], repeats: int, ru
                         diagnostics = prepare_docatlas(task, workspace, run_output_dir, env)
                         setup_failed = diagnostics.get("status") == "condition_setup_failed"
                     prompt = prompt_template.format(issue_text=task.issue_text) + "\nUse the tools available in this environment when they are useful.\n"
-                    if CONDITIONS[condition_id].tool_policy.inject_docatlas_context:
+                    if CONDITIONS[condition_id].tool_policy.inject_docatlas_context or CONDITIONS[condition_id].tool_policy.inject_action_checklist:
                         injected = inject_docatlas_context(task, workspace, run_output_dir, env)
                         if injected.get("status") == "condition_setup_failed":
                             setup_failed = True
                         else:
-                            prompt += "\n" + (run_output_dir / "injected_context.md").read_text(encoding="utf-8") + "\n"
+                            if CONDITIONS[condition_id].tool_policy.inject_action_checklist:
+                                checklist = inject_action_checklist(task, workspace, run_output_dir)
+                                if checklist.get("status") == "condition_setup_failed":
+                                    setup_failed = True
+                            if CONDITIONS[condition_id].tool_policy.inject_docatlas_context:
+                                prompt += "\n" + (run_output_dir / "injected_context.md").read_text(encoding="utf-8") + "\n"
+                            if CONDITIONS[condition_id].tool_policy.inject_action_checklist and (run_output_dir / "action_checklist.md").exists():
+                                prompt += "\n" + (run_output_dir / "action_checklist.md").read_text(encoding="utf-8") + "\n"
                     if CONDITIONS[condition_id].tool_policy.recommend_docatlas_before_edit:
                         prompt += "\nDocAtlas workflow guidance: Use DocAtlas/docmancer documentation context before making code changes when the task may depend on library APIs, exact dependency versions, or project docs. Ask a task-specific documentation question, then use or ignore the returned context based on relevance.\n"
                     if CONDITIONS[condition_id].tool_policy.require_docatlas_call_before_edit:
@@ -271,6 +301,8 @@ def write_run_progress(run_dir: Path, results: list[dict[str, Any]], total_runs:
                 "agent_docatlas_calls": result.get("docatlas", {}).get("agent_calls") if isinstance(result.get("docatlas"), dict) else None,
                 "context_used": result.get("docatlas", {}).get("context_used") if isinstance(result.get("docatlas"), dict) else None,
                 "policy_clean": result.get("policy_clean"),
+                "checklist_items": len(result.get("actionability", {}).get("checklist_items", [])) if isinstance(result.get("actionability"), dict) else 0,
+                "checklist_used": result.get("actionability", {}).get("action_checklist_used") if isinstance(result.get("actionability"), dict) else None,
             }
             for result in results[-8:]
         ],
@@ -360,6 +392,27 @@ def inject_docatlas_context(task: TaskSpec, workspace: Path, output_dir: Path, e
     (output_dir / "injected_context.md").write_text(markdown, encoding="utf-8")
     payload = {"status": "success", "harness_docatlas_calls": 1, "sources": len(sources), "wall_time_seconds": round(time.monotonic() - started, 4)}
     (output_dir / "docatlas_context_injection.json").write_text(json.dumps(payload, indent=2, sort_keys=True), encoding="utf-8")
+    return payload
+
+
+def inject_action_checklist(task: TaskSpec, workspace: Path, output_dir: Path) -> dict[str, Any]:
+    started = time.monotonic()
+    response_path = output_dir / "docatlas_response.json"
+    try:
+        response = json.loads(response_path.read_text(encoding="utf-8")) if response_path.exists() else {}
+        items = build_action_checklist(
+            task_id=task.task_id,
+            issue_text=task.issue_text,
+            docatlas_response=response,
+            workspace=workspace,
+        )
+        save_action_checklist(items, output_dir)
+    except Exception as exc:
+        payload = {"status": "condition_setup_failed", "error": repr(exc), "wall_time_seconds": round(time.monotonic() - started, 4)}
+        (output_dir / "action_checklist_injection.json").write_text(json.dumps(payload, indent=2, sort_keys=True), encoding="utf-8")
+        return payload
+    payload = {"status": "success", "checklist_items": len(items), "wall_time_seconds": round(time.monotonic() - started, 4)}
+    (output_dir / "action_checklist_injection.json").write_text(json.dumps(payload, indent=2, sort_keys=True), encoding="utf-8")
     return payload
 
 
@@ -462,6 +515,8 @@ def condition_setup_failed_result(task: TaskSpec, condition_id: str, run_output_
         "policy_clean": False,
         "policy": {"clean": False, "violations": ["condition_setup_failed"]},
         "docatlas": {"available": True, "harness_calls": 0, "agent_calls": 0, "context_retrieved": False, "context_injected": False, "context_used": False, "context_used_confidence": "none", "used_symbols": [], "used_sources": []},
+        "contract": {},
+        "actionability": {"checklist_items": [], "action_checklist_used": False},
         "metrics": {},
         "notes": ["DocAtlas condition setup failed; agent was not run."],
     }

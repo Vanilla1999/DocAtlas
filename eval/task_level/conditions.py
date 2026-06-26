@@ -71,9 +71,30 @@ CONDITIONS: dict[str, Condition] = {
             require_docatlas_call_before_edit=True,
         ),
     ),
+    "docatlas_action_checklist_injected": Condition(
+        condition_id="docatlas_action_checklist_injected",
+        label="G - DocAtlas context plus action checklist injected",
+        tool_policy=ToolPolicy(
+            allow_docatlas=True,
+            docatlas_response_style="snippet-first",
+            preindex=True,
+            inject_docatlas_context=True,
+            inject_action_checklist=True,
+        ),
+    ),
+    "docatlas_action_checklist_only": Condition(
+        condition_id="docatlas_action_checklist_only",
+        label="H - DocAtlas action checklist only",
+        tool_policy=ToolPolicy(
+            allow_docatlas=True,
+            docatlas_response_style="snippet-first",
+            preindex=True,
+            inject_action_checklist=True,
+        ),
+    ),
     "docatlas_zero_setup": Condition(
         condition_id="docatlas_zero_setup",
-        label="H - DocAtlas zero-setup exploratory",
+        label="I - DocAtlas zero-setup exploratory",
         tool_policy=ToolPolicy(
             allow_docatlas=True,
             docatlas_response_style="snippet-first",

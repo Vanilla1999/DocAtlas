@@ -39,16 +39,22 @@ def write_report(run_dir: Path, metadata: dict[str, Any], results: list[dict[str
         "```",
         "",
         "## Task table",
-        "| task | condition | repeat | status | resolved | public | hidden | harness_docatlas | agent_docatlas | context_injected | context_used | policy_clean |",
-        "|---|---|---:|---|---:|---:|---:|---:|---:|---:|---:|---:|",
+        "| task | condition | repeat | status | resolved | public | hidden | behavior | form | project | harness_docatlas | agent_docatlas | context_injected | context_used | checklist_items | checklist_used | policy_clean |",
+        "|---|---|---:|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
     ]
     for result in results:
         docatlas = result.get("docatlas", {}) if isinstance(result.get("docatlas"), dict) else {}
+        contract = result.get("contract", {}) if isinstance(result.get("contract"), dict) else {}
+        actionability = result.get("actionability", {}) if isinstance(result.get("actionability"), dict) else {}
         lines.append(
             f"| {result['task_id']} | {result['condition_id']} | {result['repeat']} | "
             f"{result['status']} | {result.get('resolved', False)} | {result.get('public_tests_passed', result.get('tests_passed', False))} | "
-            f"{result.get('hidden_tests_passed', False)} | {docatlas.get('harness_calls', 0)} | {docatlas.get('agent_calls', 0)} | "
-            f"{docatlas.get('context_injected', False)} | {docatlas.get('context_used', False)} | {result.get('policy_clean', False)} |"
+            f"{result.get('hidden_tests_passed', False)} | {contract.get('behavioral_contract_score', 'n/a')} | "
+            f"{contract.get('form_contract_score', 'n/a')} | {contract.get('project_convention_score', 'n/a')} | "
+            f"{docatlas.get('harness_calls', 0)} | {docatlas.get('agent_calls', 0)} | "
+            f"{docatlas.get('context_injected', False)} | {docatlas.get('context_used', False)} | "
+            f"{len(actionability.get('checklist_items', []))} | {actionability.get('action_checklist_used', False)} | "
+            f"{result.get('policy_clean', False)} |"
         )
 
     lines.extend(["", "## Condition results"])

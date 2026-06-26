@@ -10,6 +10,7 @@ coverage/
 .DS_Store
 .worktrees/
 .docmancer/
+.docmancer-home-test/
 .docs-kit/
 downloaded-docs/
 /release-patch-pypi.sh
