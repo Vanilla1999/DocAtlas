@@ -8,7 +8,7 @@ from typing import Any
 
 
 NETWORK_PATTERNS = (r"\bcurl\b", r"\bwget\b", r"https?://", r"WebFetch", r"WebSearch", r"browser")
-DOCATLAS_PATTERNS = ("docmancer", "docatlas", "get_docs_context", "docmancer-docs")
+DOCATLAS_PATTERNS = ("docmancer", "doc-atlas", "get_docs_context", "docmancer-docs")
 CONTEXT7_PATTERNS = ("context7", "resolve-library-id", "query-docs")
 
 
@@ -40,9 +40,9 @@ def audit_trajectory(condition_id: str, trajectory_path: Path | None, output_pat
         except json.JSONDecodeError:
             events = []
 
-    docatlas_calls = _count_patterns(text, DOCATLAS_PATTERNS)
-    context7_calls = _count_patterns(text, CONTEXT7_PATTERNS)
-    web_calls = sum(1 for pattern in NETWORK_PATTERNS if re.search(pattern, text, flags=re.IGNORECASE))
+    docatlas_calls = _count_tool_patterns(events, DOCATLAS_PATTERNS)
+    context7_calls = _count_tool_patterns(events, CONTEXT7_PATTERNS)
+    web_calls = _count_web_tool_calls(events)
     network_shell_calls = _count_network_shell(events, text)
     foreign_mcp_calls = 0
     violations: list[str] = []
@@ -82,6 +82,20 @@ def _count_patterns(text: str, patterns: tuple[str, ...]) -> int:
     return sum(lowered.count(pattern.lower()) for pattern in patterns)
 
 
+def _count_tool_patterns(events: list[dict[str, Any]], patterns: tuple[str, ...]) -> int:
+    count = 0
+    for event in events:
+        tool_name = str(event.get("tool_name", "")).lower()
+        args = event.get("arguments", {}) if isinstance(event.get("arguments"), dict) else {}
+        server = str(args.get("server", "")).lower()
+        tool = str(args.get("tool", "")).lower()
+        command = str(args.get("command", "")).lower()
+        haystack = " ".join((tool_name, server, tool, command))
+        if any(pattern.lower() in haystack for pattern in patterns):
+            count += 1
+    return count
+
+
 def _count_network_shell(events: list[dict[str, Any]], text: str) -> int:
     count = 0
     for event in events:
@@ -91,4 +105,16 @@ def _count_network_shell(events: list[dict[str, Any]], text: str) -> int:
             count += 1
     if re.search(r"\b(curl|wget)\b", text, flags=re.IGNORECASE):
         count += 1
+    return count
+
+
+def _count_web_tool_calls(events: list[dict[str, Any]]) -> int:
+    count = 0
+    for event in events:
+        tool_name = str(event.get("tool_name", "")).lower()
+        args = json.dumps(event.get("arguments", {}), sort_keys=True).lower()
+        if any(marker in tool_name for marker in ("web", "browser")):
+            count += 1
+        elif any(marker in args for marker in ("webfetch", "websearch", "browser")):
+            count += 1
     return count

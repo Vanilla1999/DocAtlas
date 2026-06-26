@@ -38,7 +38,10 @@ Pilot fixture update:
 - `fastapi_depends_001` is materialized with pinned `fastapi==0.111.0`, public tests, evaluator-only hidden tests, and a gold patch.
 - `mixed_fastapi_project_001` is materialized with pinned `fastapi==0.103.2`, project security/API-error docs, public tests, evaluator-only hidden tests, and a gold patch.
 - Both fixtures validate as base-fail/gold-pass in the local harness.
-- Claude Code is preferred over OpenCode for the first pilot because its help exposes stream-json output, model selection, strict MCP config, and tool allow/deny flags.
-- The live runner canary did not pass in this environment because Claude Code reported `Not logged in`; no causal four-run pilot was executed.
+- Claude Code was rejected for live execution because it reported `Not logged in` during canary.
+- Codex CLI was selected for live execution because `codex exec` exposes JSONL events, `--ephemeral`, `--cd`, model selection, and configured auth.
+- Codex canary produced a real patch, passed pytest, saved trajectory, and denied the network probe through benchmark `curl`/`wget` wrappers.
+- Codex `workspace-write` sandbox failed on this host with a `bwrap` loopback error, so the pilot uses `danger-full-access` plus policy/trajectory audit and blocked network command wrappers. This is a runner limitation, not a DocAtlas result.
+- A 2-task x 2-condition x 1-repeat pilot was executed with Codex. `mixed_fastapi_project_001` resolved under `repo_only`; no run called DocAtlas, so there is no DocAtlas utilization evidence yet.
 
-Decision for this setup phase: ITERATE_RUNNER. The materialized fixtures and adapters are ready, but no DocAtlas task-level patch success claim should be made until an authenticated runner canary produces a patch, passes tests, and passes policy audit.
+Decision for this setup phase: ITERATE_DOCATLAS. The runner can execute patches and the fixtures are valid, but the DocAtlas condition did not actually retrieve/use DocAtlas context in the pilot.

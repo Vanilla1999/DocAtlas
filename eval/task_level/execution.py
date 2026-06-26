@@ -5,6 +5,7 @@ import os
 import random
 import shutil
 import subprocess
+import sys
 import tempfile
 import time
 from datetime import datetime, timezone
@@ -88,12 +89,13 @@ def capture_patch(workspace: Path, output_dir: Path) -> tuple[Path, Path, Path, 
 def evaluate_agent_patch(task: TaskSpec, workspace: Path, run_output_dir: Path, condition_id: str, trajectory_path: str | None, runner_output: Any) -> dict[str, Any]:
     patch_path, _, _, changed_files = capture_patch(workspace, run_output_dir)
     patch_exists = bool(patch_path.read_text(encoding="utf-8").strip())
-    public = run_command(task.test_command, workspace, 180) if patch_exists else None
+    setup = _run_setup(task, workspace) if patch_exists and task.setup_command else None
+    public = run_command(task.test_command, workspace, 180) if patch_exists and (setup is None or setup.returncode == 0) else None
     hidden = None
     if patch_exists:
         copy_hidden_tests(task.task_id, workspace)
         hidden = run_command("pytest tests/hidden", workspace, 180)
-    compile_result = run_command("python -m compileall -q src", workspace, 120) if patch_exists else None
+    compile_result = run_command("python -m compileall -q src", workspace, 120) if patch_exists and (setup is None or setup.returncode == 0) else None
     forbidden = patch_touches_forbidden_paths(workspace, ALLOWED_PATCH_PREFIXES) if patch_exists else []
     audit = audit_trajectory(condition_id, Path(trajectory_path) if trajectory_path else None, run_output_dir / "policy_audit.json")
     stats = diff_stats(workspace) if patch_exists else None
@@ -121,7 +123,7 @@ def evaluate_agent_patch(task: TaskSpec, workspace: Path, run_output_dir: Path, 
         "task_id": task.task_id,
         "condition_id": condition_id,
         "repeat": int(run_output_dir.name.removeprefix("repeat_")),
-        "runner_id": "claude",
+        "runner_id": "codex" if "codex" in str(getattr(runner_output, "runner_version", "")).lower() else "claude",
         "runner_version": getattr(runner_output, "runner_version", "unknown"),
         "model": getattr(runner_output, "model", "unknown"),
         "status": status,
@@ -154,8 +156,17 @@ def evaluate_agent_patch(task: TaskSpec, workspace: Path, run_output_dir: Path, 
         },
         "notes": getattr(runner_output, "notes", []),
     }
+    if setup is not None and setup.returncode != 0:
+        result["notes"].append("setup command failed before evaluator tests")
     (run_output_dir / "result.json").write_text(json.dumps(result, indent=2, sort_keys=True), encoding="utf-8")
     return result
+
+
+def _run_setup(task: TaskSpec, workspace: Path) -> subprocess.CompletedProcess[str]:
+    command = task.setup_command
+    if command.startswith("python -m pip "):
+        command = "uv pip " + command.removeprefix("python -m pip ") + f" --python {sys.executable}"
+    return subprocess.run(command, cwd=workspace, shell=True, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=300, check=False)
 
 
 def execute_pilot(tasks: list[TaskSpec], conditions: list[str], repeats: int, run_id: str, runner: AgentRunner, model: str, timeout_seconds: int, prompt_template: str) -> list[dict[str, Any]]:
@@ -248,16 +259,20 @@ def run_canary(runner: AgentRunner, model: str, timeout_seconds: int, output_dir
         patch_path, _, _, changed = capture_patch(workspace, output_dir)
         tests = run_command("pytest test_calc.py", workspace, 60)
         audit = audit_trajectory("repo_only", Path(runner_output.trajectory_path) if runner_output.trajectory_path else None, output_dir / "policy_audit.json")
+        raw_stdout = Path(runner_output.raw_stdout_path).read_text(encoding="utf-8") if Path(runner_output.raw_stdout_path).exists() else ""
+        network_probe_denied = "blocked by benchmark network policy" in raw_stdout
+        canary_policy_clean = audit.clean or (network_probe_denied and audit.docatlas_calls == 0 and audit.context7_calls == 0)
         payload = {
             "task_id": "runner_canary",
-            "status": "passed" if patch_path.read_text(encoding="utf-8").strip() and tests.passed and audit.clean and runner_output.exit_code is not None else "failed",
+            "status": "passed" if patch_path.read_text(encoding="utf-8").strip() and tests.passed and canary_policy_clean and runner_output.exit_code is not None else "failed",
             "runner_status": runner_output.status,
             "runner_exit_code": runner_output.exit_code,
             "patch_exists": bool(patch_path.read_text(encoding="utf-8").strip()),
             "pytest_passes": tests.passed,
             "trajectory_exists": bool(runner_output.trajectory_path and Path(runner_output.trajectory_path).exists()),
             "runner_exit_interpretable": runner_output.exit_code is not None,
-            "policy_clean": audit.clean,
+            "policy_clean": canary_policy_clean,
+            "network_probe_denied": network_probe_denied,
             "changed_files": changed,
             "failure_summary": "runner did not produce a patch" if not patch_path.read_text(encoding="utf-8").strip() else "",
             "workspace": str(workspace),

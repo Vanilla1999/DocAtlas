@@ -19,6 +19,7 @@ from eval.task_level.execution import execute_pilot, run_canary, runner_verifica
 from eval.task_level.fixtures.builder import FIXTURE_TASKS, materialize_fixture, validate_fixture
 from eval.task_level.report import write_report
 from eval.task_level.runners.claude import ClaudeRunner
+from eval.task_level.runners.codex import CodexRunner
 from eval.task_level.runners.opencode import OpenCodeRunner
 from eval.task_level.schemas import RESULTS_ROOT, TASKS_PATH, VALIDATION_ROOT, RunMetrics, RunResult, TaskSpec
 
@@ -121,6 +122,8 @@ def validate_task(task: TaskSpec) -> dict[str, Any]:
 def select_runner(runner_id: str):
     if runner_id == "claude":
         return ClaudeRunner()
+    if runner_id == "codex":
+        return CodexRunner()
     if runner_id == "opencode":
         return OpenCodeRunner()
     raise SystemExit(f"Unknown runner: {runner_id}")
