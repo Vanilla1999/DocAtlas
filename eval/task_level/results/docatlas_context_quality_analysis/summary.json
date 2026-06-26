@@ -1,0 +1,79 @@
+{
+  "analysis_id": "docatlas_context_quality_analysis",
+  "source_runs": [
+    "docatlas_recommended_pilot_001",
+    "docatlas_recommended_pilot_002"
+  ],
+  "conditions_analyzed": [
+    "docatlas_tool_recommended"
+  ],
+  "tasks": {
+    "fastapi_depends_001": {
+      "runs_analyzed": 2,
+      "public_passed": 2,
+      "hidden_passed": 0,
+      "docatlas_calls": [2, 4],
+      "contract_recall": 0.5,
+      "contract_precision": 1.0,
+      "agent_context_utilization": "medium",
+      "actionability_gap": "high",
+      "primary_failure_class": "context_missing_critical_contract",
+      "secondary_failure_classes": [
+        "agent_used_context_incompletely",
+        "task_hidden_contract_too_brittle",
+        "public_tests_too_weak"
+      ],
+      "critical_missing_facts": [
+        "Dependency function name require_token",
+        "Route dependency parameter name token"
+      ],
+      "recommended_path": "ITERATE_TASKS"
+    },
+    "mixed_fastapi_project_001": {
+      "runs_analyzed": 2,
+      "public_passed": 0,
+      "hidden_passed": 0,
+      "docatlas_calls": [6, 6],
+      "contract_recall": 0.625,
+      "contract_precision": 1.0,
+      "agent_context_utilization": "medium-high",
+      "actionability_gap": "high",
+      "primary_failure_class": "context_present_but_not_salient",
+      "secondary_failure_classes": [
+        "snippet_missing_required_constraint",
+        "project_constraint_missing",
+        "library_api_present_but_project_contract_missing",
+        "public_tests_too_weak_for_signature_shape",
+        "task_hidden_contract_too_brittle"
+      ],
+      "critical_missing_facts": [
+        "Route dependency form Annotated[str, Depends(require_admin)]",
+        "Route parameter name admin",
+        "HTTPException handler required for dependency-raised 403"
+      ],
+      "recommended_path": "ITERATE_CONTEXT_PRESENTATION"
+    }
+  },
+  "aggregate": {
+    "runs_analyzed": 4,
+    "recommended_resolved": 0,
+    "adoption_fixed": true,
+    "context_used": true,
+    "primary_diagnosis": "DocAtlas context was relevant but not sufficiently action-directing for hidden-contract success.",
+    "selected_next_path": "ITERATE_CONTEXT_PRESENTATION",
+    "secondary_risk": "ITERATE_TASKS",
+    "proposed_next_pr": "feat: add action checklist to DocAtlas context packs"
+  },
+  "claims": {
+    "can_claim": [
+      "Explicit DocAtlas workflow guidance causes this Codex runner to call DocAtlas/docmancer.",
+      "Current context is relevant but not sufficiently action-directing for these hidden-contract tasks.",
+      "Some failures are task/doc discoverability issues rather than retrieval failures."
+    ],
+    "cannot_claim": [
+      "DocAtlas improves coding agents.",
+      "DocAtlas beats repo_only.",
+      "Actionability improvements improve task-level success before a new causal run."
+    ]
+  }
+}

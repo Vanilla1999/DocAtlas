@@ -82,3 +82,12 @@ Recommended-workflow follow-up (`docatlas_recommended_pilot_001` and `docatlas_r
 - `mixed_fastapi_project_001` remains unresolved by all tested conditions, which may indicate the task is too brittle, the public tests are not steering enough, or DocAtlas context formatting does not emphasize the critical convention.
 
 Final decision for this phase: ITERATE_DOCATLAS_CONTEXT_QUALITY. Secondary risk: ITERATE_TASKS for `mixed_fastapi_project_001` before any larger 8-task pilot. No product claim is supported.
+
+Context-quality failure analysis artifact: `eval/task_level/results/docatlas_context_quality_analysis/report.md`.
+
+Diagnosis summary:
+
+- `fastapi_depends_001`: context surfaced behavior but missed hidden exact-name contract (`require_token`, route parameter `token`). This is primarily a task/doc discoverability issue; context presentation cannot infer names absent from public docs without leaking evaluator-only details.
+- `mixed_fastapi_project_001`: context selected relevant project docs and agents used `require_admin`, module placement, and envelope facts, but context did not provide an action checklist for the FastAPI-specific implementation shape (`Annotated[str, Depends(require_admin)]`, route parameter `admin`, `HTTPException` handler for dependency-raised 403). This supports context presentation iteration, with secondary task/doc brittleness risk.
+
+Next recommended experiment: ITERATE_CONTEXT_PRESENTATION via an action-checklist section that prioritizes project constraints and visible-code implementation hazards before library snippets. Do not claim improvement until a new causal run passes the benchmark decision rule.
