@@ -5,7 +5,7 @@
     "setup_success": true,
     "unexpected_failures": []
   },
-  "fixture_hash": "75f92d25148c32f8bb565d67a701d005898607ac0d4c8ebff9e1d8e5e738a50c",
+  "fixture_hash": "c464e40ae5ba2dff32a2dda85486e8eb290f97bb47be01ec755d3c4e45dff67f",
   "gold": {
     "compile_success": true,
     "hidden_tests_passed": true,
@@ -14,6 +14,6 @@
   },
   "oracle_isolated": true,
   "status": "validated",
-  "task_id": "real_project_nbo_001",
-  "validated_at": "2026-06-27T12:26:46.133354+00:00"
+  "task_id": "real_project_nbo_permission_002",
+  "validated_at": "2026-06-27T12:52:07.861969+00:00"
 }

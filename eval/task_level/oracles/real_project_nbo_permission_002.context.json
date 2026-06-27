@@ -1,0 +1,11 @@
+{
+  "task_id": "real_project_nbo_permission_002",
+  "source_project": "/home/viadmin/StudioProjects/nbo",
+  "selected_sources": [
+    "README.md",
+    "lib/modules/permission/ARCHITECTURE.md",
+    "docs/permission-location.md",
+    "pubspec.lock"
+  ],
+  "notes": "Sanitized NBO-derived fixture. Hidden requirements are discoverable from visible project docs, source, public tests, and lockfile."
+}

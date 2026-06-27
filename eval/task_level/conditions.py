@@ -9,6 +9,16 @@ CONDITIONS: dict[str, Condition] = {
         label="A - repo-only",
         tool_policy=ToolPolicy(),
     ),
+    "repo_only_strict_offline": Condition(
+        condition_id="repo_only_strict_offline",
+        label="A1 - repo-only strict offline",
+        tool_policy=ToolPolicy(),
+    ),
+    "repo_only_web_audited": Condition(
+        condition_id="repo_only_web_audited",
+        label="A2 - repo-only web/network audited",
+        tool_policy=ToolPolicy(allow_web=True),
+    ),
     "context7": Condition(
         condition_id="context7",
         label="B - Context7",

@@ -1,0 +1,12 @@
+{
+  "task_id": "real_project_nbo_generated_source_001",
+  "source_project": "/home/viadmin/StudioProjects/nbo",
+  "selected_sources": [
+    "README.md",
+    "lib/modules/permission/ARCHITECTURE.md",
+    "docs/generated-source.md",
+    "lib/modules/permission/data/models/permission_info.dart",
+    "pubspec.lock"
+  ],
+  "notes": "Sanitized NBO-derived fixture. Hidden requirements are discoverable from visible generated-file policy, source model, public tests, and lockfile."
+}

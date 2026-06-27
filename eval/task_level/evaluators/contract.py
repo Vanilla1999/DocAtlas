@@ -37,7 +37,11 @@ def evaluate_contract(task: TaskSpec, workspace: Path, patch_path: Path) -> Cont
     if task.task_id == "mixed_fastapi_project_001":
         return _evaluate_mixed(combined)
     if task.task_id == "real_project_nbo_001":
-        return _evaluate_nbo_permissions(combined, patch_text)
+        return _evaluate_nbo_permissions(combined, patch_text, files.get("lib/modules/permission/domain/services/permission_service.dart", ""))
+    if task.task_id == "real_project_nbo_permission_002":
+        return _evaluate_nbo_location_deferred(combined, patch_text, files.get("lib/modules/permission/domain/services/permission_service.dart", ""))
+    if task.task_id == "real_project_nbo_generated_source_001":
+        return _evaluate_nbo_generated_source(combined, patch_text, files.get("lib/modules/permission/data/models/permission_info.dart", ""))
     return ContractEvaluation(0.0, 0.0, 0.0, missing_requirements=["contract_not_defined"])
 
 
@@ -92,9 +96,9 @@ def _scores(behavioral: dict[str, bool], form: dict[str, bool], project: dict[st
     )
 
 
-def _evaluate_nbo_permissions(text: str, patch_text: str) -> ContractEvaluation:
+def _evaluate_nbo_permissions(text: str, patch_text: str, service_text: str) -> ContractEvaluation:
     service_patch = _patch_file_body(patch_text, "lib/modules/permission/domain/services/permission_service.dart")
-    code_text = service_patch or text
+    code_text = service_patch or service_text or text
     behavioral_checks = {
         "adds_notification_permission": "Permission.notification" in text,
         "android_13_block_adds_notification": _android_13_adds_notification(code_text),
@@ -122,6 +126,72 @@ def _evaluate_nbo_permissions(text: str, patch_text: str) -> ContractEvaluation:
         form_contract_score=_ratio(form_checks),
         project_convention_score=_ratio(project_checks),
         version_contract_score=_ratio(version_checks),
+        satisfied_requirements=satisfied,
+        missing_requirements=missing,
+    )
+
+
+def _evaluate_nbo_location_deferred(text: str, patch_text: str, service_text: str) -> ContractEvaluation:
+    service_patch = _patch_file_body(patch_text, "lib/modules/permission/domain/services/permission_service.dart")
+    code_text = service_patch or service_text or text
+    behavioral_checks = {
+        "does_not_request_location_always_in_preflight": "Permission.locationAlways.request()" not in text,
+        "reports_location_always_again": "permissionsToRequestAgain.add(permissionLocationAlways)" in text or "permissionsToRequestAgain.add(locationAlwaysInfo)" in text,
+        "checks_foreground_location_status": "Permission.location.status" in text,
+    }
+    form_checks = {
+        "keeps_location_always_out_of_first_batch": "p.permission != Permission.locationAlways" in text,
+        "uses_existing_permission_location_always_info": "permissionLocationAlways" in text,
+        "does_not_add_media_permissions": "Permission.photos" not in code_text and "Permission.videos" not in code_text and "Permission.audio" not in code_text,
+    }
+    project_checks = {
+        "change_lives_in_permission_service": "Permission.locationAlways.request()" in service_patch or "permissionsToRequestAgain.add(permissionLocationAlways)" in service_patch,
+        "generated_files_untouched": ".g.dart" not in patch_text and ".freezed.dart" not in patch_text,
+        "notifier_flow_untouched": "permission_notifier.dart" not in patch_text,
+    }
+    version_checks = {
+        "pinned_permission_handler_11_4_0_visible": 'permission_handler' in text and 'version: "11.4.0"' in text,
+        "uses_permission_handler_11_location_api": "Permission.locationAlways" in text and "Permission.location.status" in text,
+        "avoids_latest_media_permission_trap": "Permission.photos" not in code_text and "Permission.videos" not in code_text and "Permission.audio" not in code_text,
+    }
+    return _scores_with_version(behavioral_checks, form_checks, project_checks, version_checks)
+
+
+def _evaluate_nbo_generated_source(text: str, patch_text: str, model_text: str) -> ContractEvaluation:
+    model_patch = _patch_file_body(patch_text, "lib/modules/permission/data/models/permission_info.dart")
+    code_text = model_text or text
+    getter_body = code_text.split("bool get isCritical", 1)[-1] if "bool get isCritical" in code_text else ""
+    behavioral_checks = {
+        "adds_is_critical_getter": "bool get isCritical" in code_text,
+        "critical_permissions_included": all(token in getter_body for token in ("Permission.camera", "Permission.phone", "Permission.location", "Permission.locationAlways")),
+        "noncritical_media_permissions_excluded": all(token not in getter_body for token in ("Permission.photos", "Permission.videos", "Permission.audio")),
+    }
+    form_checks = {
+        "model_extension_or_member": "extension PermissionInfoCritical" in code_text or "bool get isCritical" in model_patch,
+        "uses_permission_info_source_model": "class PermissionInfo" in code_text and "permission_info.dart" in patch_text,
+        "generated_stub_not_used_for_helper": "isCritical" not in _patch_file_body(patch_text, "lib/modules/permission/data/models/permission_info.freezed.dart"),
+    }
+    project_checks = {
+        "change_lives_in_source_model": "bool get isCritical" in model_patch,
+        "generated_files_untouched": ".g.dart" not in patch_text and ".freezed.dart" not in patch_text,
+        "service_layer_untouched": "permission_service.dart" not in patch_text,
+    }
+    version_checks = {
+        "pinned_permission_handler_11_4_0_visible": 'permission_handler' in text and 'version: "11.4.0"' in text,
+        "uses_permission_handler_permission_enum": "Permission.locationAlways" in code_text,
+        "avoids_latest_media_permission_trap": all(token not in getter_body for token in ("Permission.photos", "Permission.videos", "Permission.audio")),
+    }
+    return _scores_with_version(behavioral_checks, form_checks, project_checks, version_checks)
+
+
+def _scores_with_version(behavioral: dict[str, bool], form: dict[str, bool], project: dict[str, bool], version: dict[str, bool]) -> ContractEvaluation:
+    satisfied = [key for group in (behavioral, form, project, version) for key, value in group.items() if value]
+    missing = [key for group in (behavioral, form, project, version) for key, value in group.items() if not value]
+    return ContractEvaluation(
+        behavioral_contract_score=_ratio(behavioral),
+        form_contract_score=_ratio(form),
+        project_convention_score=_ratio(project),
+        version_contract_score=_ratio(version),
         satisfied_requirements=satisfied,
         missing_requirements=missing,
     )

@@ -118,3 +118,22 @@ Recalibrated actionability pilot (`docatlas_actionability_pilot_recalibrated_001
 - Because `repo_only` solved both tasks in this small recalibrated matrix, the result does not justify a DocAtlas improvement claim or an 8-task pilot.
 
 Decision after recalibration: ITERATE_TASKS. The immediate issue shifted from unfair hidden contracts to weak differentiation: these two calibrated fixtures are now too solvable by repo-only in a single repeat to support causal DocAtlas claims.
+
+Real-project suite expansion plan (`research/task-level-agent-benchmark`):
+
+- Baselines are split into `repo_only_strict_offline` and `repo_only_web_audited`. Strict offline treats DocAtlas, Context7, web tools, and network shell probes as policy violations. Web-audited still forbids DocAtlas/Context7 but records web/network attempts separately for diagnostic leakage analysis.
+- The real-project suite now targets three NBO-derived sanitized fixtures: `real_project_nbo_001`, `real_project_nbo_permission_002`, and `real_project_nbo_generated_source_001`.
+- Each fixture uses minimal project docs/source/lockfile context and excludes git history, secrets, build output, dependency directories, and private remotes.
+- Current allowed claim remains limited: DocAtlas can be reported as a positive signal only per real-project-derived fixture under policy-clean conditions. Do not claim broad agent improvement or robust vector retrieval from these fixtures alone.
+- DocAtlas context-injected runs now record `docatlas_retrieval_status`, `vector_indexing_timed_out`, `fallback_used`, and `fallback_source` so fallback success is distinguishable from retrieval-path success.
+
+Real-project suite pilot (`real_project_suite_pilot_002`):
+
+- Matrix: `real_project_nbo_001`, `real_project_nbo_permission_002`, and `real_project_nbo_generated_source_001` x `repo_only_strict_offline`, `repo_only_web_audited`, `docatlas_tool_recommended`, and `docatlas_action_checklist_injected` x 1 repeat = 12 runs.
+- Artifact integrity was clean: `completed_runs=12`, `runs_jsonl_records=12`, `ok=true`.
+- All four conditions resolved `3/3` with public and hidden tests passing, including `repo_only_strict_offline`.
+- `docatlas_tool_recommended` adopted DocAtlas in all three tasks (`12` total agent DocAtlas calls) and was policy-clean after the policy audit false-positive for the domain word `browser` was fixed.
+- `docatlas_action_checklist_injected` used checklist/context in all three tasks, but context injection still fell back to visible fixture project docs after vector indexing timeouts.
+- Because strict offline solved every task, this pilot does not support a DocAtlas improvement claim. It indicates the new fixtures are fair and valid, but still too easy as differentiators.
+
+Decision after `real_project_suite_pilot_002`: ITERATE_REAL_PROJECT_TASKS. Next fixtures should raise difficulty by requiring more distributed local context, less issue-text specificity, or stronger private/version traps while keeping every hidden requirement visible from project docs/source/public tests/lockfiles.

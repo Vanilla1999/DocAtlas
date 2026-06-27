@@ -1,0 +1,17 @@
+diff --git a/lib/modules/permission/data/models/permission_info.dart b/lib/modules/permission/data/models/permission_info.dart
+--- a/lib/modules/permission/data/models/permission_info.dart
++++ b/lib/modules/permission/data/models/permission_info.dart
+@@ -10,3 +10,12 @@ class PermissionInfo with _$PermissionInfo {
+     required Permission permission,
+   }) = _PermissionInfo;
+ }
++
++extension PermissionInfoCritical on PermissionInfo {
++  bool get isCritical => switch (permission) {
++        Permission.camera ||
++        Permission.phone ||
++        Permission.location ||
++        Permission.locationAlways => true,
++        _ => false,
++      };
++}

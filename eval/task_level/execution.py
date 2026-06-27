@@ -109,7 +109,7 @@ def build_tool_policy(condition_id: str, output_dir: Path) -> tuple[Path, Path |
     }, indent=2, sort_keys=True), encoding="utf-8")
 
     mcp_path = output_dir / "mcp_config.json"
-    if condition_id == "repo_only":
+    if condition_id in {"repo_only", "repo_only_strict_offline", "repo_only_web_audited"}:
         mcp_path.write_text(json.dumps({"mcpServers": {}}, indent=2), encoding="utf-8")
     elif condition_id in DOCATLAS_CONDITIONS:
         mcp_path.write_text(json.dumps({
@@ -241,6 +241,7 @@ def evaluate_agent_patch(task: TaskSpec, workspace: Path, run_output_dir: Path, 
             "test_runs": metrics.test_runs,
             "docatlas_calls": audit.docatlas_calls,
             "agent_docatlas_calls": audit.docatlas_calls,
+            "network_attempts": audit.network_attempts,
             "harness_docatlas_calls": utilization.harness_calls,
         },
         "context": {
@@ -458,6 +459,10 @@ def inject_docatlas_context(task: TaskSpec, workspace: Path, output_dir: Path, e
     (output_dir / "injected_context.md").write_text(markdown, encoding="utf-8")
     payload = {
         "status": "success" if fallback_reason is None else "fallback_local_project_context",
+        "docatlas_retrieval_status": "success" if fallback_reason is None else "fallback_local_project_context",
+        "vector_indexing_timed_out": bool(fallback_reason and "exceeded 45 seconds" in fallback_reason),
+        "fallback_used": fallback_reason is not None,
+        "fallback_source": "visible_fixture_project_docs" if fallback_reason is not None else None,
         "harness_docatlas_calls": 1 if fallback_reason is None else 0,
         "sources": len(sources),
         "fallback_reason": fallback_reason,

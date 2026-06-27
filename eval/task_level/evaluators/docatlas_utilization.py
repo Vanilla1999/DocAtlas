@@ -21,6 +21,12 @@ class DocAtlasUtilization:
     used_sources: list[str] = field(default_factory=list)
     used_project_constraints: list[str] = field(default_factory=list)
     used_version_info: list[str] = field(default_factory=list)
+    docatlas_retrieval_status: str | None = None
+    vector_indexing_timed_out: bool = False
+    fallback_used: bool = False
+    fallback_source: str | None = None
+    docatlas_tool_success: bool = False
+    docatlas_fallback_success: bool = False
 
     def to_json(self) -> dict[str, Any]:
         return {
@@ -35,6 +41,12 @@ class DocAtlasUtilization:
             "used_sources": self.used_sources,
             "used_project_constraints": self.used_project_constraints,
             "used_version_info": self.used_version_info,
+            "docatlas_retrieval_status": self.docatlas_retrieval_status,
+            "vector_indexing_timed_out": self.vector_indexing_timed_out,
+            "fallback_used": self.fallback_used,
+            "fallback_source": self.fallback_source,
+            "docatlas_tool_success": self.docatlas_tool_success,
+            "docatlas_fallback_success": self.docatlas_fallback_success,
         }
 
 
@@ -51,9 +63,15 @@ def evaluate_docatlas_utilization(
     response_path = run_output_dir / "docatlas_response.json"
     injected_path = run_output_dir / "injected_context.md"
     sources_path = run_output_dir / "context_sources.json"
+    injection_path = run_output_dir / "docatlas_context_injection.json"
     context_retrieved = response_path.exists()
     context_injected = injected_path.exists()
     harness_calls = 1 if context_retrieved else 0
+    injection = _load_json(injection_path)
+    retrieval_status = injection.get("docatlas_retrieval_status") or injection.get("status")
+    fallback_used = bool(injection.get("fallback_used"))
+    vector_timed_out = bool(injection.get("vector_indexing_timed_out"))
+    fallback_source = str(injection.get("fallback_source")) if injection.get("fallback_source") else None
     if not available and harness_calls == 0 and agent_docatlas_calls == 0:
         return DocAtlasUtilization(available=False)
 
@@ -67,7 +85,17 @@ def evaluate_docatlas_utilization(
     if agent_docatlas_calls and trajectory_path and trajectory_path.exists():
         context_text += "\n" + trajectory_path.read_text(encoding="utf-8")[:20000]
     if not context_text.strip():
-        return DocAtlasUtilization(available=available, agent_calls=agent_docatlas_calls, harness_calls=harness_calls)
+        return DocAtlasUtilization(
+            available=available,
+            agent_calls=agent_docatlas_calls,
+            harness_calls=harness_calls,
+            docatlas_retrieval_status=retrieval_status,
+            vector_indexing_timed_out=vector_timed_out,
+            fallback_used=fallback_used,
+            fallback_source=fallback_source,
+            docatlas_tool_success=agent_docatlas_calls > 0,
+            docatlas_fallback_success=fallback_used,
+        )
 
     candidate_symbols = _candidate_symbols(task, context_text)
     used_symbols = sorted(symbol for symbol in candidate_symbols if symbol and symbol in patch_text)
@@ -95,12 +123,18 @@ def evaluate_docatlas_utilization(
         used_sources=used_sources,
         used_project_constraints=used_project_constraints,
         used_version_info=used_version_info,
+        docatlas_retrieval_status=retrieval_status,
+        vector_indexing_timed_out=vector_timed_out,
+        fallback_used=fallback_used,
+        fallback_source=fallback_source,
+        docatlas_tool_success=agent_docatlas_calls > 0 or (context_retrieved and not fallback_used),
+        docatlas_fallback_success=fallback_used and confidence != "none",
     )
 
 
 def _candidate_symbols(task: TaskSpec, context_text: str) -> set[str]:
     symbols = {item.split(":")[-1] for item in task.expected_symbols if item.split(":")[-1] in context_text}
-    for token in ("Annotated", "Depends", "BackgroundTasks", "HTTPException", "Header", "require_admin", "error_envelope"):
+    for token in ("Annotated", "Depends", "BackgroundTasks", "HTTPException", "Header", "require_admin", "error_envelope", "Permission.notification", "Permission.locationAlways", "PermissionInfo", "isCritical"):
         if token in context_text:
             symbols.add(token)
     return symbols
@@ -140,3 +174,13 @@ def _used_version_info(task: TaskSpec, patch_text: str, context_text: str, traje
         if dep.version in context_text and dep.version in combined:
             used.append(f"{dep.name}=={dep.version}")
     return used
+
+
+def _load_json(path: Path) -> dict[str, Any]:
+    if not path.exists():
+        return {}
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return {}
+    return data if isinstance(data, dict) else {}

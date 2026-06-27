@@ -166,7 +166,7 @@ def build_action_checklist(
             symbols=["Permission.notification", "PermissionService"],
             files=["docs/permission-notifications.md", "lib/modules/permission/domain/services/permission_service.dart"],
         ))
-    if task_id == "real_project_nbo_001" and "PermissionService" in nbo_service:
+    if task_id in {"real_project_nbo_001", "real_project_nbo_permission_002"} and "PermissionService" in nbo_service:
         add(ChecklistItem(
             text="Keep the permission flow in `lib/modules/permission/domain/services/permission_service.dart`; do not move it into presentation providers.",
             source="lib/modules/permission/ARCHITECTURE.md",
@@ -175,7 +175,7 @@ def build_action_checklist(
             symbols=["PermissionService", "permissionsToRequest"],
             files=["lib/modules/permission/domain/services/permission_service.dart", "lib/modules/permission/ARCHITECTURE.md"],
         ))
-    if task_id == "real_project_nbo_001" and "permission_handler" in nbo_lock and 'version: "11.4.0"' in nbo_lock:
+    if task_id in {"real_project_nbo_001", "real_project_nbo_permission_002", "real_project_nbo_generated_source_001"} and "permission_handler" in nbo_lock and 'version: "11.4.0"' in nbo_lock:
         add(ChecklistItem(
             text="Use the pinned `permission_handler` 11.4.0 API; avoid unrelated media permission APIs.",
             source="pubspec.lock",
@@ -183,6 +183,36 @@ def build_action_checklist(
             confidence="high",
             symbols=["permission_handler", "11.4.0", "Permission.notification"],
             files=["pubspec.lock", "lib/modules/permission/domain/services/permission_service.dart"],
+        ))
+
+    location_doc = visible_files.get("docs/permission-location.md", "")
+    if task_id == "real_project_nbo_permission_002" and "locationAlways" in location_doc:
+        add(ChecklistItem(
+            text="Keep `Permission.locationAlways` deferred: do not call `Permission.locationAlways.request()` during preflight; report it as still needed instead.",
+            source="docs/permission-location.md",
+            evidence_type="project_doc",
+            confidence="high",
+            symbols=["Permission.locationAlways", "permissionsToRequestAgain"],
+            files=["docs/permission-location.md", "lib/modules/permission/domain/services/permission_service.dart"],
+        ))
+
+    generated_doc = visible_files.get("docs/generated-source.md", "")
+    if task_id == "real_project_nbo_generated_source_001" and "isCritical" in generated_doc:
+        add(ChecklistItem(
+            text="Add `isCritical` in `permission_info.dart`, not generated Freezed/Riverpod files.",
+            source="docs/generated-source.md",
+            evidence_type="project_doc",
+            confidence="high",
+            symbols=["PermissionInfo", "isCritical"],
+            files=["docs/generated-source.md", "lib/modules/permission/data/models/permission_info.dart"],
+        ))
+        add(ChecklistItem(
+            text="Mark only camera, phone, location, and locationAlways as critical; do not include storage/media/notification permissions.",
+            source="docs/generated-source.md",
+            evidence_type="project_doc",
+            confidence="high",
+            symbols=["Permission.camera", "Permission.phone", "Permission.location", "Permission.locationAlways"],
+            files=["docs/generated-source.md", "lib/modules/permission/data/models/permission_info.dart"],
         ))
 
     add(ChecklistItem(

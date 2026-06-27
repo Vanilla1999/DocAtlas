@@ -13,15 +13,18 @@ from eval.task_level.schemas import TASKS_PATH
 def test_manifest_has_required_pilot_shape():
     tasks = load_tasks(TASKS_PATH)
 
-    assert len(tasks) == 9
+    assert len(tasks) == 11
     assert sum(1 for task in tasks if task.suite == "comparable") == 5
-    assert sum(1 for task in tasks if task.suite == "differentiation") == 4
+    assert sum(1 for task in tasks if task.suite == "differentiation") == 6
     assert {task.task_type for task in tasks} == {"curated", "real"}
 
 
 def test_conditions_encode_tool_isolation():
     assert not CONDITIONS["repo_only"].tool_policy.allow_docatlas
     assert not CONDITIONS["repo_only"].tool_policy.allow_context7
+    assert not CONDITIONS["repo_only_strict_offline"].tool_policy.allow_docatlas
+    assert not CONDITIONS["repo_only_strict_offline"].tool_policy.allow_web
+    assert CONDITIONS["repo_only_web_audited"].tool_policy.allow_web
     assert CONDITIONS["context7"].tool_policy.allow_context7
     assert not CONDITIONS["context7"].tool_policy.allow_docatlas
     assert CONDITIONS["docatlas_evidence_first"].tool_policy.allow_docatlas

@@ -64,6 +64,20 @@ def requirements_for_task(task_id: str) -> list[ContractRequirement]:
             ContractRequirement(task_id, "pinned_permission_handler_api", "Use the pinned permission_handler 11.4.0 API.", "library_doc", True, ["permission_handler", "11.4.0", "Permission.notification"], ["pubspec.lock"]),
             ContractRequirement(task_id, "generated_files_untouched", "Do not edit generated Riverpod/Freezed files for this hand-written service change.", "project_doc", True, [".g.dart", ".freezed.dart"], ["lib/modules/permission/ARCHITECTURE.md"]),
         ]
+    if task_id == "real_project_nbo_permission_002":
+        return [
+            ContractRequirement(task_id, "location_always_deferred", "Do not request Permission.locationAlways during browser/scan preflight.", "project_doc", True, ["Permission.locationAlways", "permissionsToRequestAgain"], ["docs/permission-location.md", "lib/modules/permission/domain/services/permission_service.dart"]),
+            ContractRequirement(task_id, "permission_service_layer", "Keep deferred location policy in PermissionService, not presentation providers.", "project_doc", True, ["PermissionService"], ["lib/modules/permission/ARCHITECTURE.md", "lib/modules/permission/domain/services/permission_service.dart"]),
+            ContractRequirement(task_id, "pinned_permission_handler_api", "Use the pinned permission_handler 11.4.0 Permission API.", "library_doc", True, ["permission_handler", "11.4.0", "Permission.locationAlways"], ["pubspec.lock"]),
+            ContractRequirement(task_id, "generated_files_untouched", "Do not edit generated Riverpod/Freezed files for this service-policy change.", "project_doc", True, [".g.dart", ".freezed.dart"], ["lib/modules/permission/ARCHITECTURE.md"]),
+        ]
+    if task_id == "real_project_nbo_generated_source_001":
+        return [
+            ContractRequirement(task_id, "source_model_helper", "Add isCritical to the PermissionInfo source model.", "project_doc", True, ["PermissionInfo", "isCritical"], ["docs/generated-source.md", "lib/modules/permission/data/models/permission_info.dart"]),
+            ContractRequirement(task_id, "critical_permission_set", "Classify only camera, phone, foreground location, and background location as critical.", "project_doc", True, ["Permission.camera", "Permission.phone", "Permission.location", "Permission.locationAlways"], ["docs/generated-source.md"]),
+            ContractRequirement(task_id, "generated_files_untouched", "Do not hand-edit generated Freezed/Riverpod files.", "project_doc", True, [".g.dart", ".freezed.dart"], ["docs/generated-source.md", "lib/modules/permission/ARCHITECTURE.md"]),
+            ContractRequirement(task_id, "pinned_permission_handler_api", "Use the pinned permission_handler 11.4.0 Permission enum.", "library_doc", True, ["permission_handler", "11.4.0", "Permission.locationAlways"], ["pubspec.lock"]),
+        ]
     return []
 
 

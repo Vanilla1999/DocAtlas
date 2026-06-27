@@ -20,6 +20,7 @@ class PolicyAudit:
     context7_calls: int
     web_calls: int
     network_shell_calls: int
+    network_attempts: int
     foreign_mcp_calls: int
     first_docatlas_call_before_first_edit: bool | None
     first_docatlas_sequence: int | None
@@ -57,14 +58,21 @@ def audit_trajectory(condition_id: str, trajectory_path: Path | None, output_pat
     tool_name_seen = _first_tool_name(events, DOCATLAS_PATTERNS)
     violations: list[str] = []
 
-    if condition_id == "repo_only":
+    network_attempts = web_calls + network_shell_calls
+
+    if condition_id in {"repo_only", "repo_only_strict_offline"}:
         if docatlas_calls:
-            violations.append("repo_only used DocAtlas tools")
+            violations.append(f"{condition_id} used DocAtlas tools")
         if context7_calls:
-            violations.append("repo_only used Context7 tools")
+            violations.append(f"{condition_id} used Context7 tools")
         if web_calls or network_shell_calls:
-            violations.append("repo_only used web or network shell tools")
-    elif condition_id in {"docatlas_snippet_first", "docatlas_tool_optional", "docatlas_tool_recommended", "docatlas_context_injected", "docatlas_tool_required_once"}:
+            violations.append(f"{condition_id} used web or network shell tools")
+    elif condition_id == "repo_only_web_audited":
+        if docatlas_calls:
+            violations.append("repo_only_web_audited used DocAtlas tools")
+        if context7_calls:
+            violations.append("repo_only_web_audited used Context7 tools")
+    elif condition_id in {"docatlas_snippet_first", "docatlas_tool_optional", "docatlas_tool_recommended", "docatlas_context_injected", "docatlas_tool_required_once", "docatlas_action_checklist_injected", "docatlas_action_checklist_only"}:
         if context7_calls:
             violations.append("docatlas condition used Context7 tools")
         if web_calls or network_shell_calls:
@@ -81,6 +89,7 @@ def audit_trajectory(condition_id: str, trajectory_path: Path | None, output_pat
         context7_calls=context7_calls,
         web_calls=web_calls,
         network_shell_calls=network_shell_calls,
+        network_attempts=network_attempts,
         foreign_mcp_calls=foreign_mcp_calls,
         first_docatlas_call_before_first_edit=before_edit,
         first_docatlas_sequence=first_docatlas_sequence,
@@ -177,8 +186,8 @@ def _count_web_tool_calls(events: list[dict[str, Any]]) -> int:
     for event in events:
         tool_name = str(event.get("tool_name", "")).lower()
         args = json.dumps(event.get("arguments", {}), sort_keys=True).lower()
-        if any(marker in tool_name for marker in ("web", "browser")):
+        if any(marker in tool_name for marker in ("webfetch", "websearch", "web_fetch", "web_search", "browser")):
             count += 1
-        elif any(marker in args for marker in ("webfetch", "websearch", "browser")):
+        elif any(marker in args for marker in ("webfetch", "websearch", "web_fetch", "web_search")):
             count += 1
     return count
