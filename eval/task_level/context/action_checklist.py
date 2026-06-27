@@ -154,6 +154,37 @@ def build_action_checklist(
             files=["src/app/security.py", "src/app/main.py"],
         ))
 
+    nbo_doc = visible_files.get("docs/permission-notifications.md", "")
+    nbo_service = visible_files.get("lib/modules/permission/domain/services/permission_service.dart", "")
+    nbo_lock = visible_files.get("pubspec.lock", "")
+    if task_id == "real_project_nbo_001" and ("Permission.notification" in context_text or "notification" in nbo_doc.lower()):
+        add(ChecklistItem(
+            text="Add Android 13+ notification permission through `PermissionService` using `Permission.notification`.",
+            source="docs/permission-notifications.md",
+            evidence_type="project_doc",
+            confidence="high",
+            symbols=["Permission.notification", "PermissionService"],
+            files=["docs/permission-notifications.md", "lib/modules/permission/domain/services/permission_service.dart"],
+        ))
+    if task_id == "real_project_nbo_001" and "PermissionService" in nbo_service:
+        add(ChecklistItem(
+            text="Keep the permission flow in `lib/modules/permission/domain/services/permission_service.dart`; do not move it into presentation providers.",
+            source="lib/modules/permission/ARCHITECTURE.md",
+            evidence_type="project_doc",
+            confidence="high",
+            symbols=["PermissionService", "permissionsToRequest"],
+            files=["lib/modules/permission/domain/services/permission_service.dart", "lib/modules/permission/ARCHITECTURE.md"],
+        ))
+    if task_id == "real_project_nbo_001" and "permission_handler" in nbo_lock and 'version: "11.4.0"' in nbo_lock:
+        add(ChecklistItem(
+            text="Use the pinned `permission_handler` 11.4.0 API; avoid unrelated media permission APIs.",
+            source="pubspec.lock",
+            evidence_type="library_doc",
+            confidence="high",
+            symbols=["permission_handler", "11.4.0", "Permission.notification"],
+            files=["pubspec.lock", "lib/modules/permission/domain/services/permission_service.dart"],
+        ))
+
     add(ChecklistItem(
         text="Run the relevant public tests after editing, including unauthorized/failure-path tests.",
         source="issue",
@@ -199,7 +230,7 @@ def _combined_visible_context(issue_text: str, docatlas_response: dict[str, Any]
 
 def _read_visible_files(workspace: Path) -> dict[str, str]:
     files: dict[str, str] = {}
-    for pattern in ("README.md", "docs/*.md", "src/**/*.py", "tests/*.py"):
+    for pattern in ("README.md", "docs/*.md", "src/**/*.py", "tests/*.py", "lib/**/*.dart", "pubspec.yaml", "pubspec.lock"):
         for path in workspace.glob(pattern):
             if path.is_file() and "hidden" not in path.parts:
                 try:

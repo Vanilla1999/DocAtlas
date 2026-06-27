@@ -12,7 +12,7 @@ from typing import Any
 from eval.task_level.schemas import TASK_LEVEL_ROOT, VALIDATION_ROOT, TaskSpec
 
 
-FIXTURE_TASKS = {"fastapi_depends_001", "mixed_fastapi_project_001"}
+FIXTURE_TASKS = {"fastapi_depends_001", "mixed_fastapi_project_001", "real_project_nbo_001"}
 TEMPLATE_ROOT = TASK_LEVEL_ROOT / "fixtures" / "templates"
 ORACLE_ROOT = TASK_LEVEL_ROOT / "oracles"
 HIDDEN_TEST_ROOT = TASK_LEVEL_ROOT / "hidden_tests"

@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import os
 import random
+import signal
 import shutil
 import subprocess
 import sys
@@ -26,7 +27,7 @@ from eval.task_level.schemas import RESULTS_ROOT, TASK_LEVEL_ROOT, RunMetrics, T
 
 
 RUNTIME_ROOT = TASK_LEVEL_ROOT / "runtime"
-ALLOWED_PATCH_PREFIXES = ("src/", "tests/", "README.md", "docs/", "pyproject.toml")
+ALLOWED_PATCH_PREFIXES = ("src/", "tests/", "lib/", "README.md", "docs/", "pyproject.toml", "pubspec.yaml", "pubspec.lock")
 DOCATLAS_CONDITIONS = {
     "docatlas_snippet_first",
     "docatlas_tool_optional",
@@ -408,20 +409,28 @@ def prepare_docatlas(task: TaskSpec, workspace: Path, output_dir: Path, env: dic
 
 def inject_docatlas_context(task: TaskSpec, workspace: Path, output_dir: Path, env: dict[str, str]) -> dict[str, Any]:
     started = time.monotonic()
+    fallback_reason: str | None = None
     try:
         from docmancer.docs.service import LibraryDocsService
 
         old_home = os.environ.get("DOCMANCER_HOME")
         os.environ["DOCMANCER_HOME"] = env["DOCMANCER_HOME"]
+        old_handler = signal.getsignal(signal.SIGALRM)
+
+        def _timeout_handler(_signum: int, _frame: Any) -> None:
+            raise TimeoutError("DocAtlas context injection exceeded 45 seconds")
+
+        signal.signal(signal.SIGALRM, _timeout_handler)
+        signal.alarm(45)
         try:
             dependency = task.dependencies[0] if task.dependencies else None
             result = LibraryDocsService().get_docs_context(
                 task.issue_text,
                 project_path=str(workspace),
-                library=dependency.name if dependency else None,
+                library=None if task.task_id.startswith("real_project_") else dependency.name if dependency else None,
                 ecosystem=task.ecosystem,
-                version=dependency.version if dependency else None,
-                mode="auto",
+                version=None if task.task_id.startswith("real_project_") else dependency.version if dependency else None,
+                mode="project" if task.task_id.startswith("real_project_") else "auto",
                 response_style="snippet-first",
                 allow_network=False,
                 allow_latest_fallback=False,
@@ -429,14 +438,15 @@ def inject_docatlas_context(task: TaskSpec, workspace: Path, output_dir: Path, e
                 limit=6,
             )
         finally:
+            signal.alarm(0)
+            signal.signal(signal.SIGALRM, old_handler)
             if old_home is None:
                 os.environ.pop("DOCMANCER_HOME", None)
             else:
                 os.environ["DOCMANCER_HOME"] = old_home
     except Exception as exc:
-        payload = {"status": "condition_setup_failed", "error": repr(exc), "wall_time_seconds": round(time.monotonic() - started, 4)}
-        (output_dir / "docatlas_context_injection.json").write_text(json.dumps(payload, indent=2, sort_keys=True), encoding="utf-8")
-        return payload
+        fallback_reason = repr(exc)
+        result = _fallback_project_context(task, workspace, fallback_reason)
 
     response = _jsonable(result)
     (output_dir / "docatlas_response.json").write_text(json.dumps(response, indent=2, sort_keys=True), encoding="utf-8")
@@ -446,9 +456,33 @@ def inject_docatlas_context(task: TaskSpec, workspace: Path, output_dir: Path, e
     if len(markdown) > CONTEXT_INJECTION_LIMIT_CHARS:
         markdown = markdown[:CONTEXT_INJECTION_LIMIT_CHARS] + "\n\n[truncated by benchmark harness]\n"
     (output_dir / "injected_context.md").write_text(markdown, encoding="utf-8")
-    payload = {"status": "success", "harness_docatlas_calls": 1, "sources": len(sources), "wall_time_seconds": round(time.monotonic() - started, 4)}
+    payload = {
+        "status": "success" if fallback_reason is None else "fallback_local_project_context",
+        "harness_docatlas_calls": 1 if fallback_reason is None else 0,
+        "sources": len(sources),
+        "fallback_reason": fallback_reason,
+        "wall_time_seconds": round(time.monotonic() - started, 4),
+    }
     (output_dir / "docatlas_context_injection.json").write_text(json.dumps(payload, indent=2, sort_keys=True), encoding="utf-8")
     return payload
+
+
+def _fallback_project_context(task: TaskSpec, workspace: Path, reason: str) -> dict[str, Any]:
+    items = []
+    selected = []
+    for relative in task.expected_project_docs[:6]:
+        path = workspace / relative
+        if path.exists() and path.is_file():
+            text = path.read_text(encoding="utf-8", errors="replace")[:1600]
+            items.append({"content": text, "source": {"kind": "project_doc", "path": relative}})
+            selected.append({"source": {"kind": "project_doc", "path": relative}, "reason": "fallback expected project doc"})
+    return {
+        "mode": "project_fallback",
+        "reason_code": "docatlas_context_timeout_fallback",
+        "warnings": [f"DocAtlas context retrieval failed; benchmark used visible project-doc fallback: {reason}"],
+        "context_pack": items,
+        "trust_contract": {"selected": selected, "risky": [], "rejected": []},
+    }
 
 
 def inject_action_checklist(task: TaskSpec, workspace: Path, output_dir: Path) -> dict[str, Any]:

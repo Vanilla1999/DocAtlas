@@ -13,6 +13,7 @@ class ContractEvaluation:
     behavioral_contract_score: float
     form_contract_score: float
     project_convention_score: float
+    version_contract_score: float | None = None
     satisfied_requirements: list[str] = field(default_factory=list)
     missing_requirements: list[str] = field(default_factory=list)
 
@@ -21,6 +22,7 @@ class ContractEvaluation:
             "behavioral_contract_score": self.behavioral_contract_score,
             "form_contract_score": self.form_contract_score,
             "project_convention_score": self.project_convention_score,
+            "version_contract_score": self.version_contract_score,
             "satisfied_requirements": self.satisfied_requirements,
             "missing_requirements": self.missing_requirements,
         }
@@ -34,6 +36,8 @@ def evaluate_contract(task: TaskSpec, workspace: Path, patch_path: Path) -> Cont
         return _evaluate_fastapi(combined)
     if task.task_id == "mixed_fastapi_project_001":
         return _evaluate_mixed(combined)
+    if task.task_id == "real_project_nbo_001":
+        return _evaluate_nbo_permissions(combined, patch_text)
     return ContractEvaluation(0.0, 0.0, 0.0, missing_requirements=["contract_not_defined"])
 
 
@@ -88,13 +92,48 @@ def _scores(behavioral: dict[str, bool], form: dict[str, bool], project: dict[st
     )
 
 
+def _evaluate_nbo_permissions(text: str, patch_text: str) -> ContractEvaluation:
+    service_patch = _patch_file_body(patch_text, "lib/modules/permission/domain/services/permission_service.dart")
+    code_text = service_patch or text
+    behavioral_checks = {
+        "adds_notification_permission": "Permission.notification" in text,
+        "android_13_block_adds_notification": _android_13_adds_notification(code_text),
+        "request_flow_uses_permissions_to_request": "permissionsToRequest" in text and "permsToRequestFirst" in text,
+    }
+    form_checks = {
+        "permission_info_model_reused": "PermissionInfo" in text and "Permission.notification" in text,
+        "notification_permission_named_field": "permissionNotification" in text,
+        "does_not_request_location_always_in_first_batch": "Permission.locationAlways" in text and "permissionInfo.permission == Permission.locationAlways" in text,
+    }
+    project_checks = {
+        "change_lives_in_permission_service": "Permission.notification" in service_patch,
+        "generated_files_untouched": ".g.dart" not in patch_text and ".freezed.dart" not in patch_text,
+        "notifier_flow_untouched": "permission_notifier.dart" not in patch_text and "requestPermission" not in patch_text,
+    }
+    version_checks = {
+        "pinned_permission_handler_11_4_0_visible": 'permission_handler' in text and 'version: "11.4.0"' in text,
+        "uses_permission_handler_11_notification_api": "Permission.notification" in text,
+        "avoids_unrequested_media_permission_api": "Permission.photos" not in code_text and "Permission.videos" not in code_text and "Permission.audio" not in code_text,
+    }
+    satisfied = [key for group in (behavioral_checks, form_checks, project_checks, version_checks) for key, value in group.items() if value]
+    missing = [key for group in (behavioral_checks, form_checks, project_checks, version_checks) for key, value in group.items() if not value]
+    return ContractEvaluation(
+        behavioral_contract_score=_ratio(behavioral_checks),
+        form_contract_score=_ratio(form_checks),
+        project_convention_score=_ratio(project_checks),
+        version_contract_score=_ratio(version_checks),
+        satisfied_requirements=satisfied,
+        missing_requirements=missing,
+    )
+
+
 def _ratio(checks: dict[str, bool]) -> float:
     return round(sum(checks.values()) / len(checks), 4) if checks else 0.0
 
 
 def _read_workspace_files(workspace: Path) -> dict[str, str]:
     files: dict[str, str] = {}
-    for pattern in ("src/**/*.py", "tests/*.py", "docs/*.md", "README.md"):
+    for pattern in ("src/**/*.py", "tests/*.py", "docs/*.md", "README.md", "lib/**/*.dart", "pubspec.yaml", "pubspec.lock"):
         for path in workspace.glob(pattern):
             if path.is_file():
                 try:
@@ -107,3 +146,15 @@ def _read_workspace_files(workspace: Path) -> dict[str, str]:
 def _route_body(text: str, function_name: str) -> str:
     match = re.search(rf"def\s+{function_name}\s*\([^)]*\).*?(?=\n\ndef\s|\n\n@app|\Z)", text, re.S)
     return match.group(0) if match else ""
+
+
+def _patch_file_body(patch_text: str, file_path: str) -> str:
+    match = re.search(rf"diff --git a/{re.escape(file_path)} b/{re.escape(file_path)}\n(.*?)(?=\ndiff --git |\Z)", patch_text, re.S)
+    return match.group(1) if match else ""
+
+
+def _android_13_adds_notification(text: str) -> bool:
+    return re.search(
+        r"sdkInt\s*>=\s*33[\s\S]*?Permission\.notification[\s\S]*?permissionsToRequest\.add\(\s*permissionNotification\s*\)",
+        text,
+    ) is not None

@@ -57,6 +57,13 @@ def requirements_for_task(task_id: str) -> list[ContractRequirement]:
             ContractRequirement(task_id, "dependency_raised_403", "Handle dependency-raised HTTPException 403 with the envelope path.", "project_doc", True, ["HTTPException", "error_envelope"], ["docs/api-errors.md", "src/app/security.py", "src/app/main.py"]),
             ContractRequirement(task_id, "annotated_admin_param", "Use admin: Annotated[str, Depends(require_admin)].", "project_doc", True, ["Annotated", "Depends", "require_admin", "admin"], ["docs/security.md", "src/app/main.py"]),
         ]
+    if task_id == "real_project_nbo_001":
+        return [
+            ContractRequirement(task_id, "notification_permission", "Add Android 13+ notification permission support.", "project_doc", True, ["Permission.notification"], ["docs/permission-notifications.md", "lib/modules/permission/domain/services/permission_service.dart"]),
+            ContractRequirement(task_id, "permission_service_layer", "Put permission checks in PermissionService, not presentation providers.", "project_doc", True, ["PermissionService", "permissionsToRequest"], ["lib/modules/permission/ARCHITECTURE.md", "lib/modules/permission/domain/services/permission_service.dart"]),
+            ContractRequirement(task_id, "pinned_permission_handler_api", "Use the pinned permission_handler 11.4.0 API.", "library_doc", True, ["permission_handler", "11.4.0", "Permission.notification"], ["pubspec.lock"]),
+            ContractRequirement(task_id, "generated_files_untouched", "Do not edit generated Riverpod/Freezed files for this hand-written service change.", "project_doc", True, [".g.dart", ".freezed.dart"], ["lib/modules/permission/ARCHITECTURE.md"]),
+        ]
     return []
 
 

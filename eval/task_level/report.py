@@ -39,23 +39,34 @@ def write_report(run_dir: Path, metadata: dict[str, Any], results: list[dict[str
         "```",
         "",
         "## Task table",
-        "| task | condition | repeat | status | resolved | public | hidden | behavior | form | project | harness_docatlas | agent_docatlas | context_injected | context_used | checklist_items | checklist_used | policy_clean |",
-        "|---|---|---:|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
+        "| task | condition | repeat | status | resolved | public | hidden | behavior | form | project | version | harness_docatlas | agent_docatlas | tokens | wall_time | context_injected | context_used | checklist_items | checklist_used | policy_clean |",
+        "|---|---|---:|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
     ]
     for result in results:
         docatlas = result.get("docatlas", {}) if isinstance(result.get("docatlas"), dict) else {}
         contract = result.get("contract", {}) if isinstance(result.get("contract"), dict) else {}
         actionability = result.get("actionability", {}) if isinstance(result.get("actionability"), dict) else {}
+        metrics = result.get("metrics", {}) if isinstance(result.get("metrics"), dict) else {}
         lines.append(
             f"| {result['task_id']} | {result['condition_id']} | {result['repeat']} | "
             f"{result['status']} | {result.get('resolved', False)} | {result.get('public_tests_passed', result.get('tests_passed', False))} | "
             f"{result.get('hidden_tests_passed', False)} | {contract.get('behavioral_contract_score', 'n/a')} | "
             f"{contract.get('form_contract_score', 'n/a')} | {contract.get('project_convention_score', 'n/a')} | "
+            f"{contract.get('version_contract_score', 'n/a')} | "
             f"{docatlas.get('harness_calls', 0)} | {docatlas.get('agent_calls', 0)} | "
+            f"{metrics.get('input_tokens', '')}/{metrics.get('output_tokens', '')} | {metrics.get('wall_time_seconds', '')} | "
             f"{docatlas.get('context_injected', False)} | {docatlas.get('context_used', False)} | "
             f"{len(actionability.get('checklist_items', []))} | {actionability.get('action_checklist_used', False)} | "
             f"{result.get('policy_clean', False)} |"
         )
+
+    status_path = run_dir / "status.json"
+    if status_path.exists():
+        try:
+            artifact_integrity = json.loads(status_path.read_text(encoding="utf-8")).get("artifact_integrity")
+        except json.JSONDecodeError:
+            artifact_integrity = {"ok": False, "reason": "status_json_decode_failed"}
+        lines.extend(["", "## Artifact integrity", "```json", json.dumps(artifact_integrity, indent=2, sort_keys=True), "```"])
 
     lines.extend(["", "## Condition results"])
     for condition, condition_results in sorted(by_condition.items()):
