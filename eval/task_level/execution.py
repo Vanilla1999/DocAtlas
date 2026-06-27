@@ -39,6 +39,57 @@ DOCATLAS_CONDITIONS = {
 CONTEXT_INJECTION_LIMIT_CHARS = 10000
 
 
+def serialize_run_results_jsonl(results: list[dict[str, Any]]) -> str:
+    """Serialize run results as JSONL with one physical line per record."""
+
+    if not results:
+        return ""
+    return "\n".join(json.dumps(result, sort_keys=True) for result in results) + "\n"
+
+
+def count_jsonl_records(path: Path) -> int:
+    """Count non-empty JSONL records on disk."""
+
+    if not path.exists():
+        return 0
+    return sum(1 for line in path.read_text(encoding="utf-8").splitlines() if line.strip())
+
+
+def _write_text_atomic(path: Path, text: str) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp_path = path.with_name(f".{path.name}.{os.getpid()}.tmp")
+    tmp_path.write_text(text, encoding="utf-8")
+    tmp_path.replace(path)
+
+
+def _write_json_atomic(path: Path, payload: dict[str, Any]) -> None:
+    _write_text_atomic(path, json.dumps(payload, indent=2, sort_keys=True) + "\n")
+
+
+def run_artifact_integrity(run_dir: Path, *, in_memory_results: int, total_runs: int, finished: bool) -> dict[str, Any]:
+    """Return a machine-checkable consistency summary for run artifacts."""
+
+    runs_jsonl_records = count_jsonl_records(run_dir / "runs.jsonl")
+    jsonl_matches_memory = runs_jsonl_records == in_memory_results
+    final_run_count_matches = (not finished) or (in_memory_results == total_runs)
+    ok = jsonl_matches_memory and final_run_count_matches
+
+    reasons: list[str] = []
+    if not jsonl_matches_memory:
+        reasons.append("runs_jsonl_record_count_mismatch")
+    if not final_run_count_matches:
+        reasons.append("finished_before_expected_run_count")
+
+    return {
+        "ok": ok,
+        "finished": finished,
+        "runs_jsonl_records": runs_jsonl_records,
+        "in_memory_results": in_memory_results,
+        "expected_total_runs": total_runs,
+        "reason": reasons or None,
+    }
+
+
 def build_tool_policy(condition_id: str, output_dir: Path) -> tuple[Path, Path | None]:
     output_dir.mkdir(parents=True, exist_ok=True)
     policy = CONDITIONS[condition_id].tool_policy
@@ -282,14 +333,19 @@ def execute_pilot(tasks: list[TaskSpec], conditions: list[str], repeats: int, ru
 
 def write_run_progress(run_dir: Path, results: list[dict[str, Any]], total_runs: int, *, current: dict[str, Any] | None, finished: bool = False) -> None:
     completed = len(results)
-    (run_dir / "runs.jsonl").write_text("\n".join(json.dumps(result, sort_keys=True) for result in results), encoding="utf-8")
+    _write_text_atomic(run_dir / "runs.jsonl", serialize_run_results_jsonl(results))
+    integrity = run_artifact_integrity(run_dir, in_memory_results=completed, total_runs=total_runs, finished=finished)
+    status = "finished" if finished else "running"
+    if finished and not integrity["ok"]:
+        status = "artifact_integrity_failed"
     payload = {
-        "status": "finished" if finished else "running",
+        "status": status,
         "completed_runs": completed,
         "total_runs": total_runs,
         "remaining_runs": max(total_runs - completed, 0),
         "current": current,
         "updated_at": datetime.now(timezone.utc).isoformat(),
+        "artifact_integrity": integrity,
         "latest_results": [
             {
                 "task_id": result.get("task_id"),
@@ -307,7 +363,7 @@ def write_run_progress(run_dir: Path, results: list[dict[str, Any]], total_runs:
             for result in results[-8:]
         ],
     }
-    (run_dir / "status.json").write_text(json.dumps(payload, indent=2, sort_keys=True), encoding="utf-8")
+    _write_json_atomic(run_dir / "status.json", payload)
 
 
 def prepare_docatlas(task: TaskSpec, workspace: Path, output_dir: Path, env: dict[str, str]) -> dict[str, Any]:

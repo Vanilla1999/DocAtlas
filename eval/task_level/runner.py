@@ -15,7 +15,7 @@ from typing import Any
 
 from eval.task_level.conditions import CONDITIONS, DEFAULT_CONDITIONS
 from eval.task_level.evaluators.tests import run_command
-from eval.task_level.execution import execute_pilot, run_canary, run_docatlas_tool_visibility_canary, runner_verification_payload
+from eval.task_level.execution import execute_pilot, run_canary, run_docatlas_tool_visibility_canary, runner_verification_payload, serialize_run_results_jsonl
 from eval.task_level.fixtures.builder import FIXTURE_TASKS, materialize_fixture, validate_fixture
 from eval.task_level.report import write_report
 from eval.task_level.runners.claude import ClaudeRunner
@@ -246,7 +246,7 @@ def main(argv: list[str] | None = None) -> int:
     results: list[dict[str, Any]] = []
     if args.smoke:
         results = run_smoke(tasks, args.conditions[:2], args.repeats, run_dir)
-        (run_dir / "runs.jsonl").write_text("\n".join(json.dumps(x, sort_keys=True) for x in results), encoding="utf-8")
+        (run_dir / "runs.jsonl").write_text(serialize_run_results_jsonl(results), encoding="utf-8")
 
     if args.execute:
         if args.dry_run:
