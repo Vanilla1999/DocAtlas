@@ -1,0 +1,96 @@
+[
+  {
+    "task_id": "real_project_nbo_distributed_permission_policy_001",
+    "source_project": "nbo",
+    "candidate_status": "designed",
+    "docatlas_relevance": [
+      "project_docs",
+      "pinned_dependency",
+      "architecture_constraint",
+      "private_local_context"
+    ],
+    "repo_only_screening": {
+      "repeats": 2,
+      "resolved": null,
+      "policy_clean": null,
+      "network_attempts": null
+    },
+    "fairness": {
+      "reviewed": false,
+      "clean": null,
+      "hidden_oracle_only": null
+    },
+    "decision_reason": "Preferred first hard candidate because it combines distributed local docs, correct layer constraints, pinned permission context, and tempting wrong locations.",
+    "next_action": "Implement fixture, oracle, public tests, hidden tests, fairness review, and validation artifact; then run strict offline screening."
+  },
+  {
+    "task_id": "real_project_nbo_generated_policy_source_001",
+    "source_project": "nbo",
+    "candidate_status": "designed",
+    "docatlas_relevance": [
+      "project_docs",
+      "generated_file_constraint",
+      "architecture_constraint",
+      "private_local_context"
+    ],
+    "repo_only_screening": {
+      "repeats": 2,
+      "resolved": null,
+      "policy_clean": null,
+      "network_attempts": null
+    },
+    "fairness": {
+      "reviewed": false,
+      "clean": null,
+      "hidden_oracle_only": null
+    },
+    "decision_reason": "Designed as a source-of-truth trap; not implemented until the first hard candidate is screened.",
+    "next_action": "Hold until Candidate A screening determines whether project-doc distribution is differentiating."
+  },
+  {
+    "task_id": "real_project_nbo_permission_handler_version_001",
+    "source_project": "nbo",
+    "candidate_status": "designed",
+    "docatlas_relevance": [
+      "pinned_dependency",
+      "project_docs",
+      "private_local_context"
+    ],
+    "repo_only_screening": {
+      "repeats": 2,
+      "resolved": null,
+      "policy_clean": null,
+      "network_attempts": null
+    },
+    "fairness": {
+      "reviewed": false,
+      "clean": null,
+      "hidden_oracle_only": null
+    },
+    "decision_reason": "Designed to isolate pinned dependency traps; needs careful visible evidence to avoid unfair latest-doc punishment.",
+    "next_action": "Implement after at least one project-doc-heavy candidate is evaluated."
+  },
+  {
+    "task_id": "real_project_nbo_cross_module_permission_contract_001",
+    "source_project": "nbo",
+    "candidate_status": "designed",
+    "docatlas_relevance": [
+      "project_docs",
+      "architecture_constraint",
+      "private_local_context"
+    ],
+    "repo_only_screening": {
+      "repeats": 2,
+      "resolved": null,
+      "policy_clean": null,
+      "network_attempts": null
+    },
+    "fairness": {
+      "reviewed": false,
+      "clean": null,
+      "hidden_oracle_only": null
+    },
+    "decision_reason": "Designed for multi-module architecture constraints; needs public tests that expose both flows enough to stay fair.",
+    "next_action": "Hold until Candidates A/C show which harder context dimension is most promising."
+  }
+]

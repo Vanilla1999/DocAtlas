@@ -62,6 +62,28 @@ def test_real_project_fixtures_exclude_secrets_and_git_history(tmp_path: Path):
         assert "coderepo.corp" not in (workspace / "pubspec.lock").read_text(encoding="utf-8")
 
 
+def test_nbo_fixtures_exclude_private_remotes(tmp_path: Path):
+    for task in _tasks():
+        workspace = tmp_path / task.task_id
+        materialize_fixture(task, workspace)
+        text = "\n".join(path.read_text(encoding="utf-8", errors="ignore") for path in workspace.rglob("*") if path.is_file())
+
+        assert "coderepo.corp" not in text
+        assert "git@" not in text
+        assert "https://github.com/" not in text
+
+
+def test_nbo_fixtures_exclude_env_files(tmp_path: Path):
+    for task in _tasks():
+        workspace = tmp_path / task.task_id
+        materialize_fixture(task, workspace)
+        names = {path.name for path in workspace.rglob("*")}
+
+        assert ".env" not in names
+        assert not any(name.startswith(".env.") for name in names)
+        assert "credentials" not in names
+
+
 def test_real_project_suite_expected_runs_are_persisted(tmp_path: Path):
     from eval.task_level.execution import count_jsonl_records, write_run_progress
 

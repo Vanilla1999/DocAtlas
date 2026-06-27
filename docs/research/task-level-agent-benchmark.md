@@ -137,3 +137,13 @@ Real-project suite pilot (`real_project_suite_pilot_002`):
 - Because strict offline solved every task, this pilot does not support a DocAtlas improvement claim. It indicates the new fixtures are fair and valid, but still too easy as differentiators.
 
 Decision after `real_project_suite_pilot_002`: ITERATE_REAL_PROJECT_TASKS. Next fixtures should raise difficulty by requiring more distributed local context, less issue-text specificity, or stronger private/version traps while keeping every hidden requirement visible from project docs/source/public tests/lockfiles.
+
+NBO source profile and hard-task design pass:
+
+- A sanitized source project profile is recorded at `eval/task_level/results/source_project_profiles/nbo.md`.
+- NBO is represented only as a Flutter/Dart mobile application with permission-module fixture scope. The benchmark does not disclose full application domain details, private business logic outside fixture scope, live repository history, credentials, private remotes, generated runtime/build outputs, or user/customer data.
+- The existing NBO fixtures are reclassified as smoke/regression fixtures: they are fair, sanitized, and useful for runner/policy/artifact regressions, but `repo_only_strict_offline` resolved all three in pilot 002, so they are not differentiating proof-of-value tasks.
+- The first hard-candidate design target is `real_project_nbo_distributed_permission_policy_001`, because it combines distributed project docs, correct-layer constraints, pinned `permission_handler` context, browser/scan preflight policy, and tempting wrong locations.
+- Candidate tasks must pass a screening gate before full pilot: `repo_only_strict_offline` over 2 repeats, with acceptance only when strict offline resolves `<= 1/2`, fairness is clean, base fails, gold passes, hidden requirements are discoverable, and artifact integrity is clean.
+- If strict offline resolves `2/2`, the candidate is rejected as too easy. If hidden requirements require oracle-only information or the public tests do not exercise the intended behavior, the candidate is rejected as unfair.
+- Current diagnosis remains `ITERATE_REAL_PROJECT_TASKS`; next implementation step is `READY_TO_IMPLEMENT_HARD_CANDIDATE`, not a DocAtlas improvement claim.

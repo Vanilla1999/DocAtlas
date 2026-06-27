@@ -54,6 +54,12 @@ class TaskSpec:
     max_turns: int = 40
     max_input_tokens: int = 120_000
     max_output_tokens: int = 30_000
+    source_project: str | None = None
+    role: str = "candidate"
+    differentiating: bool = True
+    selection_status: str = "not_screened"
+    selection_reason: str = ""
+    docatlas_relevance: tuple[str, ...] = ()
 
     @classmethod
     def from_json(cls, data: dict[str, Any]) -> "TaskSpec":
@@ -80,6 +86,12 @@ class TaskSpec:
             max_turns=int(data.get("max_turns", 40)),
             max_input_tokens=int(data.get("max_input_tokens", 120_000)),
             max_output_tokens=int(data.get("max_output_tokens", 30_000)),
+            source_project=data.get("source_project"),
+            role=str(data.get("role", "candidate")),
+            differentiating=bool(data.get("differentiating", True)),
+            selection_status=str(data.get("selection_status", "not_screened")),
+            selection_reason=str(data.get("selection_reason", "")),
+            docatlas_relevance=tuple(data.get("docatlas_relevance", [])),
         )
 
 
