@@ -15,10 +15,13 @@ from typing import Any
 
 from eval.task_level.conditions import CONDITIONS
 from eval.task_level.context.action_checklist import build_action_checklist, save_action_checklist
+from eval.task_level.context.patch_constraints import build_patch_constraint_packet, save_patch_constraint_packet
 from eval.task_level.evaluators.actionability import evaluate_actionability
+from eval.task_level.evaluators.constraint_validation import validate_patch_against_constraints
 from eval.task_level.evaluators.contract import evaluate_contract
 from eval.task_level.evaluators.docatlas_utilization import evaluate_docatlas_utilization
 from eval.task_level.evaluators.patch import diff_stats, patch_touches_forbidden_paths
+from eval.task_level.evaluators.patch_constraints import evaluate_patch_constraint_usage, load_patch_constraint_packet
 from eval.task_level.evaluators.policy import audit_trajectory
 from eval.task_level.evaluators.tests import run_command
 from eval.task_level.fixtures.builder import copy_hidden_tests, materialize_fixture
@@ -34,6 +37,7 @@ DOCATLAS_CONDITIONS = {
     "docatlas_tool_recommended",
     "docatlas_context_injected",
     "docatlas_action_checklist_injected",
+    "docatlas_patch_constraints_injected",
     "docatlas_action_checklist_only",
     "docatlas_tool_required_once",
 }
@@ -50,6 +54,10 @@ def _load_optional_json(path: Path) -> dict[str, Any]:
     except (OSError, json.JSONDecodeError):
         return {}
     return data if isinstance(data, dict) else {}
+
+
+def _optional_int(value: Any) -> int | None:
+    return value if isinstance(value, int) else None
 
 
 def serialize_run_results_jsonl(results: list[dict[str, Any]]) -> str:
@@ -115,6 +123,10 @@ def build_tool_policy(condition_id: str, output_dir: Path) -> tuple[Path, Path |
         "docatlas_response_style": policy.docatlas_response_style,
         "inject_docatlas_context": policy.inject_docatlas_context,
         "inject_action_checklist": policy.inject_action_checklist,
+        "inject_patch_constraints": policy.inject_patch_constraints,
+        "max_constraint_packet_tokens": policy.max_constraint_packet_tokens,
+        "max_constraints": policy.max_constraints,
+        "max_sources": policy.max_sources,
         "recommend_docatlas_before_edit": policy.recommend_docatlas_before_edit,
         "require_docatlas_call_before_edit": policy.require_docatlas_call_before_edit,
         "network_enforcement": "policy_and_trajectory_audit",
@@ -199,6 +211,18 @@ def evaluate_agent_patch(task: TaskSpec, workspace: Path, run_output_dir: Path, 
         trajectory_path=Path(trajectory_path) if trajectory_path else None,
         contract=contract,
     )
+    patch_packet = load_patch_constraint_packet(run_output_dir / "patch_constraints.json")
+    patch_constraint_usage = evaluate_patch_constraint_usage(
+        patch_packet,
+        patch_path,
+        Path(trajectory_path) if trajectory_path else None,
+    )
+    constraint_validation = validate_patch_against_constraints(
+        packet=patch_packet,
+        changed_files=changed_files,
+        diff_text=patch_path.read_text(encoding="utf-8", errors="replace") if patch_path.exists() else "",
+        checks_run=[task.test_command] if public else [],
+    ) if patch_packet else {"constraint_validation": {"total_constraints": 0, "satisfied": 0, "violated": 0, "unknown": 0, "violations": []}}
     public_passed = bool(public and public.passed)
     hidden_passed = bool(hidden and hidden.passed)
     compile_success = bool(compile_result and compile_result.passed)
@@ -208,6 +232,7 @@ def evaluate_agent_patch(task: TaskSpec, workspace: Path, run_output_dir: Path, 
         status = "policy_violation"
     injection = _load_optional_json(run_output_dir / "docatlas_context_injection.json")
     checklist_injection = _load_optional_json(run_output_dir / "action_checklist_injection.json")
+    constraints_injection = _load_optional_json(run_output_dir / "patch_constraints_injection.json")
     metrics = RunMetrics(
         wall_time_seconds=getattr(runner_output, "wall_time_seconds", None),
         input_tokens=getattr(runner_output, "input_tokens", None),
@@ -224,6 +249,7 @@ def evaluate_agent_patch(task: TaskSpec, workspace: Path, run_output_dir: Path, 
         retrieved_context_tokens=int(injection.get("retrieved_context_tokens")) if isinstance(injection.get("retrieved_context_tokens"), int) else None,
         raw_doc_context_tokens=int(injection.get("raw_doc_context_tokens")) if isinstance(injection.get("raw_doc_context_tokens"), int) else None,
         checklist_tokens=int(checklist_injection.get("checklist_tokens")) if isinstance(checklist_injection.get("checklist_tokens"), int) else None,
+        constraint_packet_tokens=_optional_int(constraints_injection.get("constraint_packet_tokens")),
     )
     result = {
         "run_id": run_output_dir.parents[2].name,
@@ -244,6 +270,12 @@ def evaluate_agent_patch(task: TaskSpec, workspace: Path, run_output_dir: Path, 
         "docatlas": utilization.to_json(),
         "contract": contract.to_json(),
         "actionability": actionability.to_json(),
+        "patch_constraints": patch_constraint_usage,
+        "constraint_validation": constraint_validation["constraint_validation"],
+        "constraint_packet_tokens": patch_constraint_usage.get("constraint_packet_tokens"),
+        "constraint_count": patch_constraint_usage.get("constraint_count", 0),
+        "constraint_used": patch_constraint_usage.get("constraint_used", False),
+        "constraint_violations_after_patch": constraint_validation["constraint_validation"]["violated"],
         "patch_path": str(patch_path),
         "trajectory_path": trajectory_path,
         "changed_files": changed_files,
@@ -316,7 +348,7 @@ def execute_pilot(tasks: list[TaskSpec], conditions: list[str], repeats: int, ru
                         diagnostics = prepare_docatlas(task, workspace, run_output_dir, env)
                         setup_failed = diagnostics.get("status") == "condition_setup_failed"
                     prompt = prompt_template.format(issue_text=task.issue_text) + "\nUse the tools available in this environment when they are useful.\n"
-                    if CONDITIONS[condition_id].tool_policy.inject_docatlas_context or CONDITIONS[condition_id].tool_policy.inject_action_checklist:
+                    if CONDITIONS[condition_id].tool_policy.inject_docatlas_context or CONDITIONS[condition_id].tool_policy.inject_action_checklist or CONDITIONS[condition_id].tool_policy.inject_patch_constraints:
                         injected = inject_docatlas_context(task, workspace, run_output_dir, env)
                         if injected.get("status") == "condition_setup_failed":
                             setup_failed = True
@@ -325,10 +357,16 @@ def execute_pilot(tasks: list[TaskSpec], conditions: list[str], repeats: int, ru
                                 checklist = inject_action_checklist(task, workspace, run_output_dir)
                                 if checklist.get("status") == "condition_setup_failed":
                                     setup_failed = True
+                            if CONDITIONS[condition_id].tool_policy.inject_patch_constraints:
+                                constraints = inject_patch_constraints(task, workspace, run_output_dir)
+                                if constraints.get("status") == "condition_setup_failed":
+                                    setup_failed = True
                             if CONDITIONS[condition_id].tool_policy.inject_docatlas_context:
                                 prompt += "\n" + (run_output_dir / "injected_context.md").read_text(encoding="utf-8") + "\n"
                             if CONDITIONS[condition_id].tool_policy.inject_action_checklist and (run_output_dir / "action_checklist.md").exists():
                                 prompt += "\n" + (run_output_dir / "action_checklist.md").read_text(encoding="utf-8") + "\n"
+                            if CONDITIONS[condition_id].tool_policy.inject_patch_constraints and (run_output_dir / "patch_constraints.md").exists():
+                                prompt += "\n" + (run_output_dir / "patch_constraints.md").read_text(encoding="utf-8") + "\n"
                     if CONDITIONS[condition_id].tool_policy.recommend_docatlas_before_edit:
                         prompt += "\nDocAtlas workflow guidance: Use DocAtlas/docmancer documentation context before making code changes when the task may depend on library APIs, exact dependency versions, or project docs. Ask a task-specific documentation question, then use or ignore the returned context based on relevance.\n"
                     if CONDITIONS[condition_id].tool_policy.require_docatlas_call_before_edit:
@@ -543,6 +581,35 @@ def inject_action_checklist(task: TaskSpec, workspace: Path, output_dir: Path) -
     markdown = (output_dir / "action_checklist.md").read_text(encoding="utf-8") if (output_dir / "action_checklist.md").exists() else ""
     payload = {"status": "success", "checklist_items": len(items), "checklist_tokens": _estimate_tokens(markdown), "wall_time_seconds": round(time.monotonic() - started, 4)}
     (output_dir / "action_checklist_injection.json").write_text(json.dumps(payload, indent=2, sort_keys=True), encoding="utf-8")
+    return payload
+
+
+def inject_patch_constraints(task: TaskSpec, workspace: Path, output_dir: Path) -> dict[str, Any]:
+    started = time.monotonic()
+    response_path = output_dir / "docatlas_response.json"
+    policy = CONDITIONS["docatlas_patch_constraints_injected"].tool_policy
+    try:
+        response = json.loads(response_path.read_text(encoding="utf-8")) if response_path.exists() else {}
+        packet = build_patch_constraint_packet(
+            task=task,
+            workspace=workspace,
+            docatlas_response=response,
+            max_constraints=policy.max_constraints,
+            max_sources=policy.max_sources,
+            max_tokens=policy.max_constraint_packet_tokens,
+        )
+        save_patch_constraint_packet(packet, output_dir)
+    except Exception as exc:
+        payload = {"status": "condition_setup_failed", "error": repr(exc), "wall_time_seconds": round(time.monotonic() - started, 4)}
+        (output_dir / "patch_constraints_injection.json").write_text(json.dumps(payload, indent=2, sort_keys=True), encoding="utf-8")
+        return payload
+    payload = {
+        "status": "success",
+        "constraint_count": len(packet.constraints),
+        "constraint_packet_tokens": packet.token_estimate,
+        "wall_time_seconds": round(time.monotonic() - started, 4),
+    }
+    (output_dir / "patch_constraints_injection.json").write_text(json.dumps(payload, indent=2, sort_keys=True), encoding="utf-8")
     return payload
 
 

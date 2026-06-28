@@ -91,7 +91,7 @@ def build_patch_constraint_packet(
         add(PatchConstraint(
             id="architecture-owner",
             type="architecture",
-            instruction="Keep permission/business policy in the documented service/domain layer; UI/provider layers should delegate rather than own behavior.",
+            instruction="Keep permission/business policy in the documented `PermissionService` service/domain layer; UI/provider layers should delegate rather than own behavior.",
             source=owner_file,
             severity="must",
             confidence="high",

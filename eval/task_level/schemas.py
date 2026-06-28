@@ -14,6 +14,7 @@ ConditionId = Literal[
     "docatlas_tool_recommended",
     "docatlas_context_injected",
     "docatlas_action_checklist_injected",
+    "docatlas_patch_constraints_injected",
     "docatlas_action_checklist_only",
     "docatlas_tool_required_once",
     "docatlas_zero_setup",
@@ -104,8 +105,12 @@ class ToolPolicy:
     preindex: bool = False
     inject_docatlas_context: bool = False
     inject_action_checklist: bool = False
+    inject_patch_constraints: bool = False
     recommend_docatlas_before_edit: bool = False
     require_docatlas_call_before_edit: bool = False
+    max_constraint_packet_tokens: int = 1200
+    max_constraints: int = 12
+    max_sources: int = 8
 
 
 @dataclass(frozen=True)

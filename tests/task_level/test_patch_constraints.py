@@ -4,6 +4,7 @@ from pathlib import Path
 
 from eval.task_level.context.patch_constraints import build_patch_constraint_packet
 from eval.task_level.evaluators.patch_constraints import evaluate_patch_constraint_usage
+from eval.task_level.execution import inject_patch_constraints
 from eval.task_level.schemas import DependencySpec, TaskSpec
 
 
@@ -83,3 +84,42 @@ def test_patch_constraints_usage_detects_symbol_or_file_match(tmp_path: Path):
     usage = evaluate_patch_constraint_usage(packet, patch_path)
 
     assert usage["constraint_used"] is True
+
+
+def test_patch_constraints_condition_injects_packet(tmp_path: Path):
+    output_dir = tmp_path / "run"
+    output_dir.mkdir()
+    (output_dir / "docatlas_response.json").write_text("{}", encoding="utf-8")
+
+    payload = inject_patch_constraints(_task(), _workspace(tmp_path), output_dir)
+
+    assert payload["status"] == "success"
+    assert (output_dir / "patch_constraints.md").read_text(encoding="utf-8").startswith("## DocAtlas patch constraints")
+
+
+def test_patch_constraints_condition_respects_token_budget(tmp_path: Path):
+    packet = build_patch_constraint_packet(task=_task(), workspace=_workspace(tmp_path), max_tokens=80, max_constraints=12)
+
+    assert packet.token_estimate is not None
+    assert len(packet.constraints) < 12
+
+
+def test_patch_constraints_condition_writes_artifacts(tmp_path: Path):
+    output_dir = tmp_path / "run"
+    output_dir.mkdir()
+    (output_dir / "docatlas_response.json").write_text("{}", encoding="utf-8")
+
+    inject_patch_constraints(_task(), _workspace(tmp_path), output_dir)
+
+    assert (output_dir / "patch_constraints.json").exists()
+    assert (output_dir / "patch_constraints.md").exists()
+
+
+def test_patch_constraints_condition_does_not_include_hidden_tests(tmp_path: Path):
+    output_dir = tmp_path / "run"
+    output_dir.mkdir()
+    (output_dir / "docatlas_response.json").write_text("{}", encoding="utf-8")
+
+    inject_patch_constraints(_task(), _workspace(tmp_path), output_dir)
+
+    assert "Hidden test says" not in (output_dir / "patch_constraints.md").read_text(encoding="utf-8")
