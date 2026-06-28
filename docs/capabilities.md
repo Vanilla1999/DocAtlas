@@ -63,6 +63,14 @@ get_patch_constraints(question, project_path?, changed_files?, max_constraints=1
 
 This read-only tool compiles deterministic constraints from visible project docs and dependency metadata. It is designed to provide actionable project constraints for coding agents; it does not validate patches and should not be described as proven to outperform repo-only prompting.
 
+### get_patch_constraints — expanded deterministic heuristics
+
+`get_patch_constraints` now recognizes more deterministic project-rule patterns while keeping cautious source attribution. It scans visible architecture docs, ADRs, contributing guides, root/module READMEs, and maintained docs for language such as `must`, `must not`, `should`, `owned by`, `belongs to`, `source of truth`, `canonical`, `single source`, `do not duplicate`, `do not bypass`, layer ownership, repository/adapter ownership, and provider delegation.
+
+The compiler can extract owner/source-of-truth instructions from statements like `PermissionService owns permission policy`, `policy belongs in PermissionService`, or `Provider delegates to PermissionService`. It also recognizes generated-artifact guardrails for `*.g.dart`, `*.freezed.dart`, protobuf generated outputs, `*.generated.*`, `generated/`, `dist/`, regeneration/source-model instructions, and `build_runner` references.
+
+Dependency constraints are derived only from visible manifest/lock metadata with deterministic versions, including Dart/Flutter, Python, JS/TS, Rust, and Go files where supported. Task keywords and `changed_files` improve ranking and suggested checks, but they do not create high-confidence invented owners or dependency versions without source evidence.
+
 Snippet-first presentation is additive. For example:
 
 ```json

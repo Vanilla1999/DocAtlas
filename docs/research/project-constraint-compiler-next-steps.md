@@ -15,6 +15,14 @@ feat: add get_patch_constraints MCP tool
 
 Implementation status: this narrow production PR has been implemented as a read-only MCP tool. It adds production `PatchConstraint` / `PatchConstraintPacket` models, a deterministic `PatchConstraintsService`, and the `get_patch_constraints` MCP surface. The tool is designed to provide actionable project constraints for coding agents; it is not evidence that DocAtlas improves coding-agent success.
 
+## get_patch_constraints — expanded deterministic heuristics
+
+The hardening pass expands deterministic extraction without changing `get_docs_context` behavior or adding patch validation. Supported visible project-rule sources include `ARCHITECTURE.md`, `docs/architecture.md`, ADR files, `CONTRIBUTING.md`, root/module READMEs, and maintained docs. The compiler looks for explicit language such as `must`, `must not`, `should`, `belongs to`, `owned by`, `source of truth`, `canonical`, `single source`, `do not duplicate`, `do not bypass`, `do not hardcode`, layer ownership, repository/adapter ownership, and provider delegation.
+
+Owner/source-of-truth extraction handles forms like `PermissionService owns permission policy`, `policy belongs in PermissionService`, `PermissionService is source of truth for policy`, and `Provider delegates to PermissionService`. Generated-file guardrails cover generated artifacts, regeneration/source-model instructions, `build_runner`, `*.g.dart`, `*.freezed.dart`, protobuf outputs, `*.generated.*`, `generated/`, and `dist/`.
+
+Dependency/version constraints remain evidence-bound: they are derived from visible manifests and lockfiles such as `pubspec.yaml`/`pubspec.lock`, `pyproject.toml`, `requirements.txt`, `poetry.lock`, `uv.lock`, `package.json`, lockfiles for npm/pnpm/yarn, `Cargo.toml`/`Cargo.lock`, and `go.mod`/`go.sum` when deterministic versions are available. `changed_files` and task keywords affect ranking and suggested checks only; they must not produce high-confidence invented owners, versions, or hidden-test-derived requirements.
+
 This should be a narrow, experimental production API, not a broad rewrite and not a claim that DocAtlas is better than repo-only prompting.
 
 ## Should patch constraints become production API?

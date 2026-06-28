@@ -1,14 +1,64 @@
 from __future__ import annotations
 
+import json
 import re
+import tomllib
 from pathlib import Path
 from typing import Any
 
-from docmancer.docs.models import PatchConstraint, PatchConstraintPacket
+from docmancer.docs.models import DependencyObservation, PatchConstraint, PatchConstraintPacket
 
 DEFAULT_MAX_CONSTRAINTS = 12
 DEFAULT_MAX_TOKENS = 1200
-LOCKFILES = {"pubspec.lock", "poetry.lock", "uv.lock", "package-lock.json", "pnpm-lock.yaml", "yarn.lock", "Cargo.lock"}
+LOCKFILES = {
+    "pubspec.lock",
+    "poetry.lock",
+    "uv.lock",
+    "package-lock.json",
+    "pnpm-lock.yaml",
+    "yarn.lock",
+    "Cargo.lock",
+    "go.sum",
+}
+MANIFESTS = {"pubspec.yaml", "pyproject.toml", "requirements.txt", "package.json", "Cargo.toml", "go.mod"}
+DEPENDENCY_FILES = LOCKFILES | MANIFESTS
+GENERATED_PATTERNS = (
+    "*.g.dart",
+    "*.freezed.dart",
+    "*.pb.go",
+    "*.pb.dart",
+    "*.generated.*",
+    "generated/",
+    "dist/",
+)
+ARCHITECTURE_DOC_RE = re.compile(
+    r"(^|/)(architecture\.md|architecture/|adr/|adrs/|contributing\.md|readme[^/]*\.(md|txt)|adr[^/]*\.md)$",
+    re.I,
+)
+KEYWORD_RE = re.compile(
+    r"\b(must(?:\s+not)?|should(?:\s+not)?|belongs to|owned by|owns|source[- ]of[- ]truth|canonical|single source|do not duplicate|do not bypass|do not hardcode|layer|service layer|domain layer|application layer|presentation layer|provider delegates|repository owns|adapter owns)\b",
+    re.I,
+)
+EXCLUDED_SOURCE_PARTS = {
+    "eval",
+    "fixtures",
+    "results",
+    "runtime",
+    "workspaces",
+    "hidden_tests",
+    "oracles",
+    ".cache",
+    ".pytest_cache",
+    ".uv",
+    "uv-cache",
+    "archive-v0",
+    "materialized",
+    "node_modules",
+    ".venv",
+    "venv",
+    ".git",
+    "__pycache__",
+}
 
 
 class PatchConstraintsService:
@@ -16,6 +66,8 @@ class PatchConstraintsService:
 
     def __init__(self, facade: Any):
         self.facade = facade
+        self._question = ""
+        self._changed_files: list[str] = []
 
     def get_patch_constraints(
         self,
@@ -30,19 +82,23 @@ class PatchConstraintsService:
         max_constraints = max(1, int(max_constraints or DEFAULT_MAX_CONSTRAINTS))
         max_tokens = max(80, int(max_tokens or DEFAULT_MAX_TOKENS))
         changed_files = changed_files or []
+        self._question = question or ""
+        self._changed_files = changed_files
         root = Path(project_path).expanduser().resolve() if project_path else None
         sources = self._visible_sources(root) if root else []
         constraints: list[PatchConstraint] = []
-        constraints.extend(self._generated_file_constraints(sources))
-        constraints.extend(self._source_of_truth_constraints(sources, changed_files))
+        constraints.extend(self._architecture_constraints(sources))
+        constraints.extend(self._generated_file_constraints(sources, changed_files))
         constraints.extend(self._dependency_constraints(root))
-        constraints.extend(self._fallback_constraints(question, changed_files))
+        constraints.extend(self._fallback_constraints(question, changed_files, root))
         constraints = self._dedupe(constraints)
         constraints = self._sort_constraints(constraints)
         selected, truncated = self._apply_budget(constraints, max_constraints=max_constraints, max_tokens=max_tokens)
         warnings: list[str] = []
         if truncated:
-            warnings.append("Constraint packet was truncated to fit max_constraints/max_tokens; must/high-confidence constraints were kept first.")
+            warnings.append("constraints truncated by budget: must/high-confidence direct-source constraints were kept before lower-confidence guidance.")
+        if any(c.confidence == "low" for c in selected):
+            warnings.append("Low-confidence inferred constraints are based only on filenames/task context; verify against project docs before treating them as hard requirements.")
         if not root:
             warnings.append("project_path was not provided; constraints are limited to task-level generic guidance.")
         if root and not sources:
@@ -71,10 +127,21 @@ class PatchConstraintsService:
             candidates.extend(root / item.path for item in metadata.docs_candidates)
         except Exception:
             candidates = []
-        if not candidates:
-            patterns = ["README*", "docs/**/*.md", "docs/**/*.txt", "**/ARCHITECTURE.md", "**/ADR*.md"]
-            for pattern in patterns:
-                candidates.extend(root.glob(pattern))
+        patterns = [
+            "README*",
+            "CONTRIBUTING*",
+            "ARCHITECTURE.md",
+            "docs/architecture.md",
+            "docs/**/*.md",
+            "docs/**/*.txt",
+            "ADR*",
+            "adr/**/*.md",
+            "ADR/**/*.md",
+            "**/README.md",
+            "**/ARCHITECTURE.md",
+        ]
+        for pattern in patterns:
+            candidates.extend(root.glob(pattern))
         out: list[dict[str, str]] = []
         seen: set[Path] = set()
         for path in candidates:
@@ -84,10 +151,14 @@ class PatchConstraintsService:
                 continue
             if resolved in seen or not resolved.is_file() or not self._under_root(resolved, root):
                 continue
+            rel = resolved.relative_to(root).as_posix()
+            if self._excluded_source(rel):
+                continue
+            if not (ARCHITECTURE_DOC_RE.search(rel) or "/docs/" in f"/{rel}" or rel.lower().startswith("docs/")):
+                continue
             if resolved.stat().st_size > 80_000:
                 continue
             text = resolved.read_text(encoding="utf-8", errors="replace")
-            rel = resolved.relative_to(root).as_posix()
             out.append({"path": rel, "text": text})
             seen.add(resolved)
         return out
@@ -100,97 +171,141 @@ class PatchConstraintsService:
         except ValueError:
             return False
 
-    def _generated_file_constraints(self, sources: list[dict[str, str]]) -> list[PatchConstraint]:
+    @staticmethod
+    def _excluded_source(rel: str) -> bool:
+        parts = {part.lower() for part in Path(rel).parts}
+        return bool(parts & EXCLUDED_SOURCE_PARTS) or any("oracle" in part.lower() or "hidden" in part.lower() for part in Path(rel).parts)
+
+    def _architecture_constraints(self, sources: list[dict[str, str]]) -> list[PatchConstraint]:
         constraints: list[PatchConstraint] = []
         for source in sources:
-            text = source["text"]
-            if re.search(r"generated|\.g\.dart|\.freezed\.dart", text, re.I):
-                evidence = self._evidence(text, ["generated", ".g.dart", ".freezed.dart"])
-                constraints.append(PatchConstraint(
-                    id="generated-files-readonly",
-                    type="generated_file",
-                    instruction="Do not edit generated files such as `*.g.dart` or `*.freezed.dart` by hand.",
-                    source=source["path"],
-                    severity="must",
-                    confidence="high",
-                    evidence=evidence,
-                    files=["*.g.dart", "*.freezed.dart"],
-                ))
-                break
+            for line in self._interesting_lines(source["text"]):
+                lowered = line.lower()
+                owner = self._owner_from_line(line)
+                ctype = "architecture"
+                severity = "must" if re.search(r"\b(must|must not|do not|source[- ]of[- ]truth|owned by|owns|single source)\b", line, re.I) else "should"
+                if "source of truth" in lowered or "source-of-truth" in lowered or owner:
+                    ctype = "source_of_truth"
+                if "do not" in lowered or "must not" in lowered:
+                    ctype = "forbidden_edit" if "duplicate" in lowered or "bypass" in lowered or "hardcode" in lowered else ctype
+                if "duplicate" in lowered and "policy" in lowered:
+                    constraints.append(self._constraint(
+                        id="do-not-duplicate-policy",
+                        type="forbidden_edit",
+                        instruction="Do not duplicate policy outside the documented owner/source of truth.",
+                        source=source["path"],
+                        severity="must",
+                        confidence="high",
+                        evidence=line,
+                        symbols=[owner] if owner else [],
+                    ))
+                if "provider" in lowered and "delegat" in lowered:
+                    target = owner or self._delegate_target(line) or "the documented service/domain/application owner"
+                    constraints.append(self._constraint(
+                        id=f"provider-delegates-{self._slug(target)}",
+                        type="architecture",
+                        instruction=f"Provider/presentation code must delegate policy decisions to {target}; do not implement policy in provider/UI code.",
+                        source=source["path"],
+                        severity="must",
+                        confidence="high",
+                        evidence=line,
+                        symbols=[target],
+                        files=self._matching_changed_files(("provider", "presentation", "ui")),
+                    ))
+                if owner:
+                    constraints.append(self._constraint(
+                        id=f"source-of-truth-{self._slug(owner)}",
+                        type="source_of_truth",
+                        instruction=f"Keep behavior/policy changes in the documented source of truth: {owner}.",
+                        source=source["path"],
+                        severity="must",
+                        confidence="high",
+                        evidence=line,
+                        symbols=[owner],
+                        files=self._matching_changed_files(("service", "domain", "application", "provider", "presentation")),
+                    ))
+                elif KEYWORD_RE.search(line):
+                    constraints.append(self._constraint(
+                        id=f"{ctype}-{self._slug(line[:50])}",
+                        type=ctype if ctype != "forbidden_edit" or ("do not" in lowered or "must not" in lowered) else "project_convention",
+                        instruction=self._instruction_from_line(line),
+                        source=source["path"],
+                        severity=severity,
+                        confidence="high",
+                        evidence=line,
+                    ))
         return constraints
 
-    def _source_of_truth_constraints(self, sources: list[dict[str, str]], changed_files: list[str]) -> list[PatchConstraint]:
+    def _generated_file_constraints(self, sources: list[dict[str, str]], changed_files: list[str]) -> list[PatchConstraint]:
         constraints: list[PatchConstraint] = []
         for source in sources:
-            text = source["text"]
-            lowered = text.lower()
-            mentions_owner = "source-of-truth" in lowered or "source of truth" in lowered or "owned by" in lowered or "service" in lowered or "domain" in lowered or "application" in lowered
-            if mentions_owner:
-                symbol = self._first_symbol(text) or "documented service/domain/application layer"
-                constraints.append(PatchConstraint(
-                    id="source-of-truth-owner",
-                    type="source_of_truth",
-                    instruction=f"Keep behavior changes in the documented source-of-truth owner: {symbol}.",
-                    source=source["path"],
-                    severity="must",
-                    confidence="high",
-                    evidence=self._evidence(text, ["source-of-truth", "source of truth", "owned", "service", "domain", "application"]),
-                    symbols=[symbol] if symbol else [],
-                    files=[f for f in changed_files if any(part in f.lower() for part in ("service", "domain", "application"))],
-                ))
-                break
-        for source in sources:
-            text = source["text"]
-            lowered = text.lower()
-            if "provider" in lowered and ("delegate" in lowered or "do not duplicate" in lowered or "must not duplicate" in lowered):
-                constraints.append(PatchConstraint(
-                    id="provider-delegates-policy",
-                    type="architecture",
-                    instruction="Provider/UI layers should delegate policy to the service/domain/application owner; do not duplicate behavior policy there.",
-                    source=source["path"],
-                    severity="must",
-                    confidence="high",
-                    evidence=self._evidence(text, ["provider", "delegate", "duplicate policy"]),
-                    files=[f for f in changed_files if any(part in f.lower() for part in ("provider", "presentation", "ui"))],
-                ))
-                constraints.append(PatchConstraint(
-                    id="do-not-duplicate-policy",
-                    type="forbidden_edit",
-                    instruction="Do not add duplicate policy maps or parallel rule tables outside the documented owner.",
-                    source=source["path"],
-                    severity="must",
-                    confidence="high",
-                    evidence=self._evidence(text, ["do not duplicate", "must not duplicate", "policy"]),
-                ))
-                break
+            for line in self._interesting_lines(source["text"]):
+                if re.search(r"generated|\.g\.dart|\.freezed\.dart|\.pb\.go|\.pb\.dart|build_runner|regenerate|source model|source[- ]of[- ]truth|dist/", line, re.I):
+                    if not re.search(r"generated|\.g\.dart|\.freezed\.dart|\.pb\.go|\.pb\.dart|build_runner|regenerate|dist/", line, re.I):
+                        continue
+                    constraints.append(self._constraint(
+                        id="generated-files-readonly",
+                        type="generated_file",
+                        instruction="Do not edit generated artifacts by hand; update the source model/input and regenerate instead.",
+                        source=source["path"],
+                        severity="must",
+                        confidence="high",
+                        evidence=line,
+                        files=list(GENERATED_PATTERNS),
+                    ))
+                    if "source" in line.lower() or "regenerate" in line.lower() or "build_runner" in line.lower():
+                        constraints.append(self._constraint(
+                            id="generated-source-of-truth",
+                            type="source_of_truth",
+                            instruction="For generated artifacts, change the documented source model/input and run the documented generator.",
+                            source=source["path"],
+                            severity="must",
+                            confidence="high",
+                            evidence=line,
+                            files=list(GENERATED_PATTERNS),
+                        ))
+                    return constraints
+        generated_changed = [f for f in changed_files if self._is_generated_path(f)]
+        if generated_changed:
+            constraints.append(self._constraint(
+                id="generated-files-inferred",
+                type="generated_file",
+                instruction="Changed file path looks generated; verify whether it should be regenerated from a source file instead of edited directly.",
+                source="changed_files",
+                severity="should",
+                confidence="low",
+                evidence=", ".join(generated_changed[:4]),
+                files=generated_changed,
+            ))
         return constraints
 
     def _dependency_constraints(self, root: Path | None) -> list[PatchConstraint]:
         if not root:
             return []
         constraints: list[PatchConstraint] = []
-        try:
-            metadata = self.facade.read_project_metadata(str(root))
-        except Exception:
-            return []
-        for dep in metadata.dependencies[:6]:
-            if not dep.resolved_version:
+        observations = self._dependency_observations(root)
+        ranked = sorted(observations, key=lambda dep: self._dependency_relevance(dep), reverse=True)
+        for dep in ranked[:12]:
+            version = dep.resolved_version or (dep.specifier_raw if dep.specifier_kind == "exact" else None)
+            if not version:
                 continue
-            source = self._dependency_source(dep.version_source)
-            constraints.append(PatchConstraint(
+            source = self._dependency_source(dep.version_source, dep.ecosystem, root)
+            confidence = "high" if dep.resolved_version and ("lock" in dep.version_source or dep.version_source.endswith("exact")) else "medium"
+            constraints.append(self._constraint(
                 id=f"pinned-dependency-{self._slug(dep.package_name)}",
                 type="dependency_version",
-                instruction=f"Use pinned {dep.package_name} {dep.resolved_version}; do not assume APIs from another version.",
+                instruction=f"Use pinned/locked {dep.package_name} {version}; do not assume APIs from another version or latest-only docs.",
                 source=source,
                 severity="must",
-                confidence="high" if dep.version_source.endswith("exact") else "medium",
-                evidence=f"{dep.package_name} resolved_version={dep.resolved_version} from {dep.version_source}.",
-                symbols=[dep.package_name, dep.resolved_version],
+                confidence=confidence,
+                evidence=f"{dep.package_name} version {version} from {dep.version_source}.",
+                symbols=[dep.package_name, version],
                 files=[source],
             ))
-        if any((root / lockfile).exists() for lockfile in LOCKFILES):
-            lockfile = next(lock for lock in LOCKFILES if (root / lock).exists())
-            constraints.append(PatchConstraint(
+        lockfiles = [name for name in sorted(LOCKFILES) if (root / name).exists()]
+        if lockfiles:
+            lockfile = self._most_relevant_lockfile(lockfiles)
+            constraints.append(self._constraint(
                 id="do-not-change-lockfile",
                 type="forbidden_edit",
                 instruction="Do not change lockfiles unless the task explicitly requires dependency updates.",
@@ -198,69 +313,285 @@ class PatchConstraintsService:
                 severity="must",
                 confidence="high",
                 evidence=f"Lockfile `{lockfile}` is present and pins dependency resolution.",
-                files=[lockfile],
+                files=lockfiles,
             ))
         return constraints
 
-    def _fallback_constraints(self, question: str, changed_files: list[str]) -> list[PatchConstraint]:
-        checks = ["Run the relevant test command for the changed area before reporting completion."]
-        if changed_files:
-            checks.append(f"Review changed files for project-policy compliance: {', '.join(changed_files[:4])}.")
-        return [PatchConstraint(
-            id="run-relevant-tests",
-            type="verification",
-            instruction=check,
-            source="question",
-            severity="should",
-            confidence="medium",
-            evidence="Every coding patch should be verified with relevant checks.",
-        ) for check in checks]
+    def _dependency_observations(self, root: Path) -> list[DependencyObservation]:
+        observations: list[DependencyObservation] = []
+        try:
+            metadata = self.facade.read_project_metadata(str(root))
+            observations.extend(metadata.dependencies)
+        except Exception:
+            pass
+        observations.extend(self._read_python_dependencies(root))
+        observations.extend(self._read_node_dependencies(root))
+        observations.extend(self._read_go_dependencies(root))
+        return self._dedupe_dependencies(observations)
+
+    def _read_python_dependencies(self, root: Path) -> list[DependencyObservation]:
+        observations: list[DependencyObservation] = []
+        req = root / "requirements.txt"
+        if req.exists():
+            for raw in req.read_text(encoding="utf-8", errors="replace").splitlines():
+                line = raw.split("#", 1)[0].strip()
+                match = re.match(r"([A-Za-z0-9_.-]+)==([A-Za-z0-9_.!+\-]+)", line)
+                if match:
+                    observations.append(DependencyObservation("python", match.group(1), resolved_version=match.group(2), specifier_kind="exact", specifier_raw=match.group(2), version_source="requirements.txt_exact"))
+        pyproject = root / "pyproject.toml"
+        if pyproject.exists():
+            try:
+                data = tomllib.loads(pyproject.read_text(encoding="utf-8"))
+            except Exception:
+                data = {}
+            deps = data.get("project", {}).get("dependencies", []) if isinstance(data, dict) else []
+            if isinstance(deps, list):
+                for spec in deps:
+                    if isinstance(spec, str):
+                        match = re.match(r"([A-Za-z0-9_.-]+)==([A-Za-z0-9_.!+\-]+)", spec)
+                        if match:
+                            observations.append(DependencyObservation("python", match.group(1), resolved_version=match.group(2), specifier_kind="exact", specifier_raw=match.group(2), version_source="pyproject.toml_exact"))
+        return observations
+
+    def _read_node_dependencies(self, root: Path) -> list[DependencyObservation]:
+        observations: list[DependencyObservation] = []
+        lock = root / "package-lock.json"
+        if lock.exists():
+            try:
+                data = json.loads(lock.read_text(encoding="utf-8"))
+            except Exception:
+                data = {}
+            packages = data.get("packages") if isinstance(data, dict) else None
+            if isinstance(packages, dict):
+                for path, entry in packages.items():
+                    if not path.startswith("node_modules/") or not isinstance(entry, dict):
+                        continue
+                    version = entry.get("version")
+                    if isinstance(version, str):
+                        observations.append(DependencyObservation("npm", path.split("node_modules/", 1)[1], resolved_version=version, specifier_kind="exact", specifier_raw=version, version_source="package-lock.json_exact"))
+            deps = data.get("dependencies") if isinstance(data, dict) else None
+            if isinstance(deps, dict):
+                for name, entry in deps.items():
+                    if isinstance(entry, dict) and isinstance(entry.get("version"), str):
+                        observations.append(DependencyObservation("npm", name, resolved_version=entry["version"], specifier_kind="exact", specifier_raw=entry["version"], version_source="package-lock.json_exact"))
+        package = root / "package.json"
+        if package.exists():
+            try:
+                data = json.loads(package.read_text(encoding="utf-8"))
+            except Exception:
+                data = {}
+            for section in ("dependencies", "devDependencies"):
+                deps = data.get(section) if isinstance(data, dict) else None
+                if isinstance(deps, dict):
+                    for name, spec in deps.items():
+                        if isinstance(spec, str) and re.match(r"^\d+(?:\.\d+){0,2}$", spec):
+                            observations.append(DependencyObservation("npm", name, resolved_version=spec, specifier_kind="exact", specifier_raw=spec, version_source="package.json_exact"))
+        return observations
+
+    def _read_go_dependencies(self, root: Path) -> list[DependencyObservation]:
+        observations: list[DependencyObservation] = []
+        gomod = root / "go.mod"
+        if gomod.exists():
+            text = gomod.read_text(encoding="utf-8", errors="replace")
+            for match in re.finditer(r"^\s*([A-Za-z0-9_./-]+)\s+(v\d+\.\d+\.\d+(?:[-+][A-Za-z0-9_.-]+)?)", text, re.M):
+                if match.group(1) == "module":
+                    continue
+                observations.append(DependencyObservation("go", match.group(1), resolved_version=match.group(2), specifier_kind="exact", specifier_raw=match.group(2), version_source="go.mod_exact"))
+        return observations
 
     @staticmethod
-    def _dependency_source(version_source: str) -> str:
-        for lockfile in LOCKFILES:
-            if lockfile.replace(".", "_") in version_source.replace(".", "_") or lockfile in version_source:
-                return lockfile
-        if "pubspec" in version_source:
-            return "pubspec.lock"
-        if "package" in version_source:
-            return "package-lock.json"
+    def _dedupe_dependencies(observations: list[DependencyObservation]) -> list[DependencyObservation]:
+        best: dict[tuple[str, str], DependencyObservation] = {}
+        for dep in observations:
+            key = (dep.ecosystem, dep.package_name)
+            old = best.get(key)
+            if old is None or (dep.resolved_version and not old.resolved_version) or ("lock" in dep.version_source and "lock" not in old.version_source):
+                best[key] = dep
+        return list(best.values())
+
+    def _fallback_constraints(self, question: str, changed_files: list[str], root: Path | None) -> list[PatchConstraint]:
+        checks = ["Run the relevant test command for the changed area before reporting completion."]
+        if any(self._is_generated_path(f) for f in changed_files):
+            checks.append("Run the documented code generator/build step and verify generated artifacts are up to date.")
+        if any(Path(f).name in DEPENDENCY_FILES for f in changed_files):
+            checks.append("Run dependency/lockfile consistency checks after manifest or lockfile changes.")
+        if changed_files:
+            checks.append(f"Review changed files for project-policy compliance: {', '.join(changed_files[:4])}.")
+        source = "question" if not root else "changed_files" if changed_files else "question"
+        return [self._constraint(
+            id=f"run-check-{idx}",
+            type="verification",
+            instruction=check,
+            source=source,
+            severity="should",
+            confidence="medium",
+            evidence="Coding patches should be verified with relevant checks; changed_files/task context selected this check.",
+        ) for idx, check in enumerate(checks)]
+
+    def _constraint(self, **kwargs: Any) -> PatchConstraint:
+        evidence = str(kwargs.get("evidence") or "").strip()[:240]
+        source = str(kwargs.get("source") or "").strip()
+        confidence = kwargs.get("confidence") or "low"
+        if confidence == "high" and (not source or not evidence):
+            confidence = "medium" if source or evidence else "low"
+        return PatchConstraint(
+            id=kwargs["id"],
+            type=kwargs["type"],
+            instruction=str(kwargs["instruction"]).strip(),
+            source=source or "inferred",
+            severity=kwargs.get("severity", "should"),
+            confidence=confidence,
+            evidence=evidence or "Inferred from task context; no direct source evidence was available.",
+            symbols=list(kwargs.get("symbols") or []),
+            files=list(kwargs.get("files") or []),
+        )
+
+    @staticmethod
+    def _interesting_lines(text: str) -> list[str]:
+        lines = []
+        for raw in text.splitlines():
+            line = re.sub(r"^\s*[-*#>\d.()]+\s*", "", raw).strip()
+            if line:
+                lines.append(line[:300])
+        return lines
+
+    @staticmethod
+    def _owner_from_line(line: str) -> str | None:
+        patterns = [
+            r"\b([A-Z][A-Za-z0-9_]*(?:Service|Manager|Repository|Controller|Policy|Layer|Adapter))\s+owns\s+([^.;]+)",
+            r"\b([A-Z][A-Za-z0-9_]*(?:Service|Manager|Repository|Controller|Policy|Layer|Adapter))\s+is\s+(?:the\s+)?(?:canonical\s+|single\s+)?source[- ]of[- ]truth\b",
+            r"\b([A-Z][A-Za-z0-9_]*(?:Service|Manager|Repository|Controller|Policy|Layer|Adapter))\s+is\s+(?:the\s+)?source of truth\s+for\s+([^.;]+)",
+            r"\b([^.;]+?)\s+belongs\s+in\s+(?:the\s+)?([A-Z][A-Za-z0-9_]*(?:Service|Manager|Repository|Controller|Policy|Layer|Adapter))\b",
+            r"\bDo not implement\s+([^.;]+?)\s+in\s+([^.;]+?);?\s*(?:use|delegate to)\s+(?:the\s+)?([A-Z][A-Za-z0-9_]*(?:Service|Manager|Repository|Controller|Policy|Layer|Adapter))\b",
+            r"\bdelegates?\s+to\s+(?:the\s+)?([A-Z][A-Za-z0-9_]*(?:Service|Manager|Repository|Controller|Policy|Layer|Adapter))\b",
+            r"\bowned by\s+(?:the\s+)?([A-Z][A-Za-z0-9_]*(?:Service|Manager|Repository|Controller|Policy|Layer|Adapter))\b",
+        ]
+        for pattern in patterns:
+            match = re.search(pattern, line, re.I)
+            if match:
+                for group in reversed(match.groups()):
+                    if group and re.search(r"[A-Z][A-Za-z0-9_]*(Service|Manager|Repository|Controller|Policy|Layer|Adapter)$", group.strip()):
+                        return group.strip()
+        service_layer = re.search(r"\b(service layer|domain layer|application layer)\b", line, re.I)
+        if service_layer and re.search(r"source[- ]of[- ]truth|owns|belongs|policy", line, re.I):
+            return service_layer.group(1).lower()
+        return None
+
+    @staticmethod
+    def _delegate_target(line: str) -> str | None:
+        match = re.search(r"delegates?\s+to\s+(?:the\s+)?([A-Z][A-Za-z0-9_]*(?:Service|Manager|Repository|Controller|Policy|Layer|Adapter))", line, re.I)
+        return match.group(1) if match else None
+
+    @staticmethod
+    def _instruction_from_line(line: str) -> str:
+        cleaned = line.strip().rstrip(".")
+        if re.search(r"\b(must|should|do not)\b", cleaned, re.I):
+            return cleaned + "."
+        return f"Follow documented project convention: {cleaned}."
+
+    @staticmethod
+    def _is_generated_path(path: str) -> bool:
+        lower = path.lower()
+        return any(
+            lower.endswith(suffix) for suffix in (".g.dart", ".freezed.dart", ".pb.go", ".pb.dart")
+        ) or ".generated." in lower or "/generated/" in f"/{lower}" or lower.startswith("generated/") or lower.startswith("dist/") or "/dist/" in f"/{lower}"
+
+    def _matching_changed_files(self, needles: tuple[str, ...]) -> list[str]:
+        return [f for f in self._changed_files if any(needle in f.lower() for needle in needles)]
+
+    def _dependency_relevance(self, dep: DependencyObservation) -> int:
+        haystack = f"{self._question} {' '.join(self._changed_files)}".lower()
+        score = 0
+        if dep.package_name.lower() in haystack:
+            score += 10
+        if any(Path(f).name in DEPENDENCY_FILES for f in self._changed_files):
+            score += 4
+        if "dependency" in haystack or "version" in haystack or "upgrade" in haystack:
+            score += 3
+        if dep.resolved_version:
+            score += 1
+        return score
+
+    def _most_relevant_lockfile(self, lockfiles: list[str]) -> str:
+        changed_names = {Path(f).name for f in self._changed_files}
+        for lock in lockfiles:
+            if lock in changed_names:
+                return lock
+        order = ["pubspec.lock", "package-lock.json", "uv.lock", "poetry.lock", "Cargo.lock", "go.sum", "pnpm-lock.yaml", "yarn.lock"]
+        return next((lock for lock in order if lock in lockfiles), lockfiles[0])
+
+    @staticmethod
+    def _dependency_source(version_source: str, ecosystem: str = "", root: Path | None = None) -> str:
+        source_lower = (version_source or "").lower()
+        for name in DEPENDENCY_FILES:
+            if name.lower() in source_lower or name.lower().replace(".", "_") in source_lower.replace(".", "_"):
+                return name
+        if "pubspec" in source_lower or ecosystem == "pub":
+            return "pubspec.lock" if root and (root / "pubspec.lock").exists() else "pubspec.yaml"
+        if "package" in source_lower or ecosystem == "npm":
+            return "package-lock.json" if root and (root / "package-lock.json").exists() else "package.json"
+        if "requirements" in source_lower:
+            return "requirements.txt"
+        if "pyproject" in source_lower or ecosystem == "python":
+            return "pyproject.toml"
+        if ecosystem == "rust":
+            return "Cargo.lock" if root and (root / "Cargo.lock").exists() else "Cargo.toml"
+        if ecosystem == "go":
+            return "go.mod"
         return version_source or "manifest/lockfile"
 
     @staticmethod
-    def _first_symbol(text: str) -> str | None:
-        match = re.search(r"\b[A-Z][A-Za-z0-9_]*(?:Service|Manager|Repository|Controller|Policy)\b", text)
-        return match.group(0) if match else None
-
-    @staticmethod
-    def _evidence(text: str, needles: list[str]) -> str:
-        for line in text.splitlines():
-            if any(needle.lower() in line.lower() for needle in needles):
-                return line.strip()[:240]
-        compact = " ".join(text.split())
-        return compact[:240]
-
-    @staticmethod
     def _slug(value: str) -> str:
-        return re.sub(r"[^a-z0-9]+", "-", value.lower()).strip("-") or "dependency"
+        return re.sub(r"[^a-z0-9]+", "-", value.lower()).strip("-") or "constraint"
 
     @staticmethod
     def _dedupe(constraints: list[PatchConstraint]) -> list[PatchConstraint]:
         seen: set[str] = set()
         out: list[PatchConstraint] = []
         for constraint in constraints:
-            if constraint.id in seen:
+            key = constraint.id
+            if key in seen:
                 continue
-            seen.add(constraint.id)
+            seen.add(key)
             out.append(constraint)
         return out
 
-    @staticmethod
-    def _sort_constraints(constraints: list[PatchConstraint]) -> list[PatchConstraint]:
+    def _sort_constraints(self, constraints: list[PatchConstraint]) -> list[PatchConstraint]:
         severity_rank = {"must": 0, "should": 1, "info": 2}
         confidence_rank = {"high": 0, "medium": 1, "low": 2}
-        type_rank = {"generated_file": 0, "forbidden_edit": 1, "source_of_truth": 2, "dependency_version": 3, "architecture": 4, "verification": 5}
-        return sorted(constraints, key=lambda c: (severity_rank.get(c.severity, 3), confidence_rank.get(c.confidence, 3), type_rank.get(c.type, 9), c.id))
+        type_rank = {"source_of_truth": 0, "architecture": 1, "generated_file": 2, "forbidden_edit": 3, "dependency_version": 4, "project_convention": 5, "verification": 6}
+
+        def relevance(c: PatchConstraint) -> int:
+            score = 0
+            lower_q = self._question.lower()
+            changed = " ".join(self._changed_files).lower()
+            text = f"{c.instruction} {' '.join(c.symbols)} {' '.join(c.files)}".lower()
+            if any(f and (Path(f).name.lower() in changed or f.lower() in changed) for f in c.files):
+                score += 8
+            if c.type == "generated_file" and any(self._is_generated_path(f) for f in self._changed_files):
+                score += 8
+            if c.type in {"architecture", "source_of_truth"} and any(part in changed for part in ("provider", "presentation", "service", "domain", "application")):
+                score += 5
+            if c.type == "dependency_version" and any(word in lower_q for word in ("dependency", "version", "upgrade", "package")):
+                score += 5
+            for token in set(re.findall(r"[a-zA-Z_][a-zA-Z0-9_]{2,}", lower_q)):
+                if token in text:
+                    score += 1
+            if c.source.lower().startswith(("docs/", "architecture", "readme", "contributing", "adr")):
+                score += 1
+            return score
+
+        return sorted(
+            constraints,
+            key=lambda c: (
+                severity_rank.get(c.severity, 3),
+                confidence_rank.get(c.confidence, 3),
+                -relevance(c),
+                type_rank.get(c.type, 9),
+                len(c.instruction),
+                c.id,
+            ),
+        )
 
     def _apply_budget(self, constraints: list[PatchConstraint], *, max_constraints: int, max_tokens: int) -> tuple[list[PatchConstraint], bool]:
         selected: list[PatchConstraint] = []
@@ -300,6 +631,6 @@ class PatchConstraintsService:
             if source["path"] in used:
                 summary.append({"path": source["path"], "kind": "project_doc"})
         for source in sorted(used):
-            if source in LOCKFILES or "lock" in source or "manifest" in source:
-                summary.append({"path": source, "kind": "dependency_metadata"})
+            if source in DEPENDENCY_FILES or "lock" in source or "manifest" in source or source in {"changed_files", "question"}:
+                summary.append({"path": source, "kind": "dependency_metadata" if source in DEPENDENCY_FILES else "task_context"})
         return summary

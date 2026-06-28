@@ -133,6 +133,14 @@ The unified tool delegates to existing facade methods such as `bootstrap_project
 
 The tool uses deterministic local heuristics over visible project docs and dependency metadata. It can surface generated-file rules, source-of-truth rules, provider/delegation conventions, pinned dependency/version contracts, lockfile guardrails, and suggested checks. Every constraint includes source attribution, confidence, and short evidence. If the packet exceeds the budget, must/high-confidence constraints are kept first and a warning is returned.
 
+### get_patch_constraints — expanded deterministic heuristics
+
+Supported visible-source patterns include architecture docs (`ARCHITECTURE.md`, `docs/architecture.md`), ADRs, `CONTRIBUTING.md`, root/module READMEs, and maintained `docs/` files. The compiler looks for cautious deterministic phrases such as `must`, `must not`, `should`, `belongs to`, `owned by`, `source of truth`, `canonical`, `single source`, `do not duplicate`, `do not bypass`, `do not hardcode`, and documented layer ownership/delegation language.
+
+Owner extraction covers forms such as `PermissionService owns permission policy`, `policy belongs in PermissionService`, `PermissionService is source of truth for policy`, `Do not implement policy in providers; delegate to PermissionService`, and `Provider delegates to PermissionService`. Generated-artifact rules cover docs mentioning generated files, regeneration, source models, `build_runner`, `*.g.dart`, `*.freezed.dart`, protobuf outputs, `*.generated.*`, `generated/`, and `dist/`.
+
+Dependency/version constraints are compiled from visible supported manifests and lockfiles including `pubspec.yaml`/`pubspec.lock`, `pyproject.toml`, `requirements.txt`, `poetry.lock`, `uv.lock`, `package.json`, `package-lock.json`, `pnpm-lock.yaml`, `yarn.lock`, `Cargo.toml`/`Cargo.lock`, and `go.mod`/`go.sum` where deterministic versions are available. `changed_files` and task keywords only rank constraints and checks; they do not create high-confidence invented owners or versions without visible source evidence.
+
 Response shape:
 
 ```json
