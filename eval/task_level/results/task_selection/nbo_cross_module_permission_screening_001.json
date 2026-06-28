@@ -1,0 +1,26 @@
+{
+  "run_id": "nbo_cross_module_permission_screening_001",
+  "task_id": "real_project_nbo_cross_module_permission_contract_001",
+  "source_project": "nbo",
+  "repo_only_screening": {
+    "condition": "repo_only_strict_offline",
+    "repeats": 2,
+    "resolved": 2,
+    "policy_clean": true,
+    "network_attempts": 0
+  },
+  "artifact_integrity": {
+    "expected_total_runs": 2,
+    "completed_runs": 2,
+    "runs_jsonl_records": 2,
+    "ok": true
+  },
+  "fairness": {
+    "reviewed": true,
+    "clean": true,
+    "hidden_oracle_only": false
+  },
+  "selection_status": "rejected_too_easy",
+  "decision_reason": "repo_only_strict_offline resolved 2/2 during screening, so the candidate is not a differentiating proof-of-value task.",
+  "full_pilot": "not_run"
+}

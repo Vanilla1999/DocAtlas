@@ -13,9 +13,9 @@ from eval.task_level.schemas import TASKS_PATH
 def test_manifest_has_required_pilot_shape():
     tasks = load_tasks(TASKS_PATH)
 
-    assert len(tasks) == 12
+    assert len(tasks) == 13
     assert sum(1 for task in tasks if task.suite == "comparable") == 5
-    assert sum(1 for task in tasks if task.suite == "differentiation") == 7
+    assert sum(1 for task in tasks if task.suite == "differentiation") == 8
     assert {task.task_type for task in tasks} == {"curated", "real"}
 
 

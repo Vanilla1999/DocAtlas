@@ -19,6 +19,7 @@ FIXTURE_TASKS = {
     "real_project_nbo_permission_002",
     "real_project_nbo_generated_source_001",
     "real_project_nbo_distributed_permission_policy_001",
+    "real_project_nbo_cross_module_permission_contract_001",
 }
 TEMPLATE_ROOT = TASK_LEVEL_ROOT / "fixtures" / "templates"
 ORACLE_ROOT = TASK_LEVEL_ROOT / "oracles"

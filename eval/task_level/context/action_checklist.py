@@ -215,6 +215,36 @@ def build_action_checklist(
                 files=["docs/browser-scan-preflight.md", "lib/modules/permission/application/permission_service.dart"],
             ))
 
+    if task_id == "real_project_nbo_cross_module_permission_contract_001":
+        permission_arch = visible_files.get("docs/permission-architecture.md", "")
+        if "canonical permission result interpretation" in permission_arch:
+            add(ChecklistItem(
+                text="Keep canonical permission interpretation in `PermissionService`; flow gates should consume the shared contract.",
+                source="docs/permission-architecture.md",
+                evidence_type="project_doc",
+                confidence="high",
+                symbols=["PermissionService", "evaluatePreflight"],
+                files=["docs/permission-architecture.md", "lib/modules/permission/application/permission_service.dart"],
+            ))
+        if "same permission contract" in visible_files.get("docs/scan-flow.md", ""):
+            add(ChecklistItem(
+                text="Make browser and scan gates use the same shared permission contract rather than flow-specific interpretation.",
+                source="docs/scan-flow.md",
+                evidence_type="project_doc",
+                confidence="high",
+                symbols=["BrowserPermissionGate", "ScanPermissionGate", "evaluatePreflight"],
+                files=["docs/browser-flow.md", "docs/scan-flow.md"],
+            ))
+        if "must not be edited by hand" in visible_files.get("docs/generated-files.md", ""):
+            add(ChecklistItem(
+                text="Do not hand-edit generated `*.freezed.dart` or `*.g.dart` files.",
+                source="docs/generated-files.md",
+                evidence_type="project_doc",
+                confidence="high",
+                symbols=[".freezed.dart", ".g.dart"],
+                files=["docs/generated-files.md"],
+            ))
+
     location_doc = visible_files.get("docs/permission-location.md", "")
     if task_id == "real_project_nbo_permission_002" and "locationAlways" in location_doc:
         add(ChecklistItem(

@@ -1,0 +1,15 @@
+diff --git a/lib/modules/scan/application/scan_permission_gate.dart b/lib/modules/scan/application/scan_permission_gate.dart
+index 06a4a75..9bf7206 100644
+--- a/lib/modules/scan/application/scan_permission_gate.dart
++++ b/lib/modules/scan/application/scan_permission_gate.dart
+@@ -7,9 +7,6 @@ class ScanPermissionGate {
+   final PermissionService _permissionService;
+ 
+   bool canEnter(PermissionResult result) {
+-    if (!result.cameraGranted || !result.locationGranted) {
+-      return false;
+-    }
+-    return true;
++    return _permissionService.evaluatePreflight(result) == PermissionDecision.allow;
+   }
+ }

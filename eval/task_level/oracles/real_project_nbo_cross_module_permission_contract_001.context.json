@@ -1,0 +1,36 @@
+{
+  "task_id": "real_project_nbo_cross_module_permission_contract_001",
+  "source_project": "nbo",
+  "required_visible_sources": [
+    "README.md",
+    "docs/permission-architecture.md",
+    "docs/browser-flow.md",
+    "docs/scan-flow.md",
+    "docs/generated-files.md"
+  ],
+  "expected_docatlas_relevance": [
+    "project_docs",
+    "architecture_constraint",
+    "cross_module_context",
+    "private_local_context",
+    "generated_file_constraint"
+  ],
+  "hidden_requirements": [
+    {
+      "requirement": "permission module owns canonical permission interpretation",
+      "visible_source": "docs/permission-architecture.md"
+    },
+    {
+      "requirement": "browser and scan flows share the same contract",
+      "visible_source": "README.md"
+    },
+    {
+      "requirement": "flow gates must not duplicate permission policy",
+      "visible_source": "docs/permission-architecture.md"
+    },
+    {
+      "requirement": "generated files must not be edited",
+      "visible_source": "docs/generated-files.md"
+    }
+  ]
+}

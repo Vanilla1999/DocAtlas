@@ -44,6 +44,8 @@ def evaluate_contract(task: TaskSpec, workspace: Path, patch_path: Path) -> Cont
         return _evaluate_nbo_generated_source(combined, patch_text, files.get("lib/modules/permission/data/models/permission_info.dart", ""))
     if task.task_id == "real_project_nbo_distributed_permission_policy_001":
         return _evaluate_nbo_distributed_permission_policy(combined, patch_text, files.get("lib/modules/permission/application/permission_service.dart", ""))
+    if task.task_id == "real_project_nbo_cross_module_permission_contract_001":
+        return _evaluate_nbo_cross_module_permission_contract(combined, patch_text, files)
     return ContractEvaluation(0.0, 0.0, 0.0, missing_requirements=["contract_not_defined"])
 
 
@@ -213,6 +215,34 @@ def _evaluate_nbo_distributed_permission_policy(text: str, patch_text: str, serv
     return _scores_with_version(behavioral_checks, form_checks, project_checks, version_checks)
 
 
+def _evaluate_nbo_cross_module_permission_contract(text: str, patch_text: str, files: dict[str, str]) -> ContractEvaluation:
+    service_text = files.get("lib/modules/permission/application/permission_service.dart", "")
+    browser_text = files.get("lib/modules/browser/application/browser_permission_gate.dart", "")
+    scan_text = files.get("lib/modules/scan/application/scan_permission_gate.dart", "")
+    flow_text = browser_text + "\n" + scan_text
+    behavioral_checks = {
+        "browser_uses_shared_contract": "evaluatePreflight(result) == PermissionDecision.allow" in browser_text,
+        "scan_uses_shared_contract": "evaluatePreflight(result) == PermissionDecision.allow" in scan_text,
+        "shared_contract_blocks_partial": "result.hasAnyMissingPermission" in service_text and "PermissionDecision.block" in service_text,
+    }
+    form_checks = {
+        "permission_service_canonical_method": "PermissionDecision evaluatePreflight" in service_text,
+        "both_gates_have_service_dependency": "PermissionService _permissionService" in browser_text and "PermissionService _permissionService" in scan_text,
+        "no_duplicate_flow_interpretation": all(token not in flow_text for token in ("cameraGranted ||", "locationGranted ||", "notificationGranted ||", "hasAnyMissingPermission")),
+    }
+    project_checks = {
+        "scan_gate_fixed_to_delegate": "scan_permission_gate.dart" in patch_text and "evaluatePreflight(result)" in _patch_file_body(patch_text, "lib/modules/scan/application/scan_permission_gate.dart"),
+        "generated_files_untouched": ".g.dart" not in patch_text and ".freezed.dart" not in patch_text,
+        "dependency_files_untouched": "pubspec.yaml" not in patch_text and "pubspec.lock" not in patch_text,
+    }
+    version_checks = {
+        "pinned_permission_handler_11_4_0_visible": "permission_handler" in text and 'version: "11.4.0"' in text,
+        "no_dependency_version_change": "pubspec.yaml" not in patch_text and "pubspec.lock" not in patch_text,
+        "source_model_not_generated_model": "permission_result.freezed.dart" not in patch_text,
+    }
+    return _scores_with_version(behavioral_checks, form_checks, project_checks, version_checks)
+
+
 def _scores_with_version(behavioral: dict[str, bool], form: dict[str, bool], project: dict[str, bool], version: dict[str, bool]) -> ContractEvaluation:
     satisfied = [key for group in (behavioral, form, project, version) for key, value in group.items() if value]
     missing = [key for group in (behavioral, form, project, version) for key, value in group.items() if not value]
@@ -232,7 +262,7 @@ def _ratio(checks: dict[str, bool]) -> float:
 
 def _read_workspace_files(workspace: Path) -> dict[str, str]:
     files: dict[str, str] = {}
-    for pattern in ("src/**/*.py", "tests/*.py", "docs/*.md", "README.md", "lib/**/*.dart", "pubspec.yaml", "pubspec.lock"):
+    for pattern in ("src/**/*.py", "tests/*.py", "test/*.dart", "docs/*.md", "README.md", "lib/**/*.dart", "pubspec.yaml", "pubspec.lock"):
         for path in workspace.glob(pattern):
             if path.is_file():
                 try:

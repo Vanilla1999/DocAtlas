@@ -156,3 +156,11 @@ NBO distributed permission candidate implementation:
 - Screening rule remains unchanged: run `repo_only_strict_offline` for 2 repeats and reject the candidate as too easy if strict offline resolves `2/2`.
 - Validation passed for the implemented candidate, but screening rejected it as too easy: `repo_only_strict_offline` resolved `2/2`, policy-clean, with zero network attempts and clean artifact integrity.
 - Full 4-condition pilot was not run for this candidate. The diagnosis remains `ITERATE_TASK_DESIGN` for harder NBO-derived tasks.
+
+NBO cross-module permission candidate implementation:
+
+- `real_project_nbo_cross_module_permission_contract_001` was added as the next hard candidate after the distributed permission-policy candidate was rejected as too easy.
+- The task targets inconsistent permission gating between browser and scan flows. The issue text describes symptoms and does not directly instruct agents to edit service/gate/generated files.
+- The intended context spans README, permission architecture docs, browser docs, scan docs, generated-file policy, permission service, and two flow gates.
+- Validation passed for the cross-module candidate, but screening also rejected it as too easy: `repo_only_strict_offline` resolved `2/2`, policy-clean, with zero network attempts and clean artifact integrity.
+- Full 4-condition pilot was not run for this candidate. The diagnosis remains `ITERATE_TASK_DESIGN`.

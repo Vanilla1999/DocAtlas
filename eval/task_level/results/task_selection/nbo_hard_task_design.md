@@ -2,6 +2,8 @@
 
 Purpose: define harder NBO-derived candidate tasks before implementing them. These tasks should test whether DocAtlas helps with private/project/offline context, not whether agents can follow explicit issue text.
 
+The previous distributed permission-policy candidate was rejected because the public failing behavior pointed directly to the missing permission list update. The new candidate should make the tempting local fix pass some visible tests but fail hidden shared-contract tests.
+
 ## Design Principles
 
 - Issue text should describe user-visible symptoms, not the implementation path.

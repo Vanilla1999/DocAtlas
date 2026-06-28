@@ -86,6 +86,13 @@ def requirements_for_task(task_id: str) -> list[ContractRequirement]:
             ContractRequirement(task_id, "location_always_deferred", "Background location remains deferred from browser/scan preflight.", "project_doc", True, ["Permission.locationAlways"], ["docs/browser-scan-preflight.md", "lib/modules/permission/ARCHITECTURE.md"]),
             ContractRequirement(task_id, "pinned_permission_handler", "Use pinned permission_handler 11.4.0 API and avoid media permission substitutes.", "library_doc", True, ["permission_handler", "11.4.0", "Permission.notification"], ["pubspec.lock", "docs/permission-notifications.md"]),
         ]
+    if task_id == "real_project_nbo_cross_module_permission_contract_001":
+        return [
+            ContractRequirement(task_id, "permission_module_canonical", "Permission module owns canonical permission interpretation.", "project_doc", True, ["PermissionService", "evaluatePreflight"], ["docs/permission-architecture.md", "lib/modules/permission/application/permission_service.dart"]),
+            ContractRequirement(task_id, "browser_scan_shared_contract", "Browser and scan flows share the same permission contract.", "project_doc", True, ["BrowserPermissionGate", "ScanPermissionGate"], ["README.md", "docs/browser-flow.md", "docs/scan-flow.md"]),
+            ContractRequirement(task_id, "no_flow_duplicate_policy", "Flow gates must not duplicate permission policy.", "project_doc", True, ["evaluatePreflight"], ["docs/permission-architecture.md"]),
+            ContractRequirement(task_id, "generated_files_untouched", "Generated permission result files must not be edited.", "project_doc", True, [".freezed.dart", ".g.dart"], ["docs/generated-files.md"]),
+        ]
     return []
 
 
