@@ -116,6 +116,41 @@ The unified tool delegates to existing facade methods such as `bootstrap_project
 | `bootstrap_project_docs` | Safe high-level onboarding for a repository question: inspect, sync if needed, inspect again. Stops before repo writes or dependency-docs network fetches. |
 | `get_project_docs` | Query indexed current project-owned docs for repo-specific architecture, conventions, runbooks, ADRs, README, roadmap, wiki, or module/package questions. |
 | `get_project_context` | Return a compact repo-grounded context pack after bootstrap/inspect and any required `sync_project_docs` step. Includes a Trust Contract and structured next_actions. |
+| `get_patch_constraints` | Return compact, source-attributed constraints for a coding patch. Designed to provide actionable project constraints for coding agents; it does not validate patches or change `get_docs_context` behavior. |
+
+`get_patch_constraints` arguments:
+
+```json
+{
+  "question": "Update permission preflight behavior",
+  "project_path": "/path/to/repo",
+  "changed_files": ["lib/modules/permission/domain/services/permission_service.dart"],
+  "max_constraints": 12,
+  "max_tokens": 1200,
+  "include_sources": true
+}
+```
+
+The tool uses deterministic local heuristics over visible project docs and dependency metadata. It can surface generated-file rules, source-of-truth rules, provider/delegation conventions, pinned dependency/version contracts, lockfile guardrails, and suggested checks. Every constraint includes source attribution, confidence, and short evidence. If the packet exceeds the budget, must/high-confidence constraints are kept first and a warning is returned.
+
+Response shape:
+
+```json
+{
+  "task": "Update permission preflight behavior",
+  "constraints": [],
+  "forbidden_edits": [],
+  "dependency_contracts": [],
+  "source_of_truth_rules": [],
+  "suggested_checks": [],
+  "warnings": [],
+  "sources": [],
+  "token_estimate": 0,
+  "confidence": "high"
+}
+```
+
+Do not treat this as proof that DocAtlas improves coding-agent success. It is a compact constraint compiler surface for agent prompts, not a production patch validator.
 
 ## Dependency-docs project tools
 

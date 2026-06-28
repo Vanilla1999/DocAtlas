@@ -12,13 +12,14 @@ from docmancer.docs.application.dependency_docs_service import DependencyDocsSer
 from docmancer.docs.application.library_docs_service import LibraryDocsApplicationService
 from docmancer.docs.application.project_context_service import ProjectContextService, context_pack_snippet, project_context_metrics, project_context_pack
 from docmancer.docs.application.project_docs_service import ProjectDocsService
+from docmancer.docs.application.patch_constraints_service import PatchConstraintsService
 from docmancer.docs.application.unified_context_service import UnifiedDocsContextService
 from docmancer.docs.domain.policies import is_stale
 from docmancer.docs.domain.target_security import host_allowed, is_remote_url, path_allowed, url_security_error
 from docmancer.docs.domain.trust_contract import build_project_context_trust_contract
 from docmancer.docs.infrastructure.agent_index_gateway import AgentIndexGateway
 from docmancer.docs.infrastructure.filesystem_locks import FilesystemLockGateway
-from docmancer.docs.models import DocsChunk, DocsInspectResult, DocsJob, DocsJobCancelResult, DocsJobStartResult, DocsManifestValidationResult, DocsPruneResult, DocsRemoveResult, DocsResult, DocsSourceResolution, DocsTarget, DocsTargetResult, DocsTargetsPrefetchResult, LibraryInfo, ProjectContextResult, ProjectDocsBootstrapResult, ProjectDocsIngestResult, ProjectDocsInspectResult, ProjectDocsResult, ProjectDocsSyncResult, ProjectMetadata, ProjectPrefetchResult, RefreshResult, UnifiedDocsContextResult
+from docmancer.docs.models import DocsChunk, DocsInspectResult, DocsJob, DocsJobCancelResult, DocsJobStartResult, DocsManifestValidationResult, DocsPruneResult, DocsRemoveResult, DocsResult, DocsSourceResolution, DocsTarget, DocsTargetResult, DocsTargetsPrefetchResult, LibraryInfo, PatchConstraintPacket, ProjectContextResult, ProjectDocsBootstrapResult, ProjectDocsIngestResult, ProjectDocsInspectResult, ProjectDocsResult, ProjectDocsSyncResult, ProjectMetadata, ProjectPrefetchResult, RefreshResult, UnifiedDocsContextResult
 from docmancer.docs.project import ProjectMetadataReader
 from docmancer.docs.registry import LibraryRecord, LibraryRegistry
 
@@ -38,6 +39,7 @@ class LibraryDocsService:
         self.library_docs = LibraryDocsApplicationService(self)
         self.project_docs = ProjectDocsService(self)
         self.project_context = ProjectContextService(self)
+        self.patch_constraints = PatchConstraintsService(self)
         self.dependency_docs = DependencyDocsService(self)
         self.unified_context = UnifiedDocsContextService(self)
         self.docs_targets = DocsTargetService(self._render_docs_url, self.jobs)
@@ -176,6 +178,9 @@ class LibraryDocsService:
 
     def get_project_context(self, *args: Any, **kwargs: Any):
         return self.project_context.get_project_context(*args, **kwargs)
+
+    def get_patch_constraints(self, *args: Any, **kwargs: Any) -> PatchConstraintPacket:
+        return self.patch_constraints.get_patch_constraints(*args, **kwargs)
 
     def get_docs_context(self, *args: Any, **kwargs: Any):
         return self.unified_context.get_docs_context(*args, **kwargs)

@@ -13,6 +13,8 @@ Next production PR:
 feat: add get_patch_constraints MCP tool
 ```
 
+Implementation status: this narrow production PR has been implemented as a read-only MCP tool. It adds production `PatchConstraint` / `PatchConstraintPacket` models, a deterministic `PatchConstraintsService`, and the `get_patch_constraints` MCP surface. The tool is designed to provide actionable project constraints for coding agents; it is not evidence that DocAtlas improves coding-agent success.
+
 This should be a narrow, experimental production API, not a broad rewrite and not a claim that DocAtlas is better than repo-only prompting.
 
 ## Should patch constraints become production API?
@@ -31,6 +33,7 @@ Guardrail:
 - Do not claim patch constraints improve patch success yet.
 - Keep the first API read-only and compiler-only: return constraints, sources, warnings, and token estimate.
 - Do not auto-validate or block patches in the first production PR.
+- Do not change retrieval/ranking or `get_docs_context` behavior in this PR.
 
 ## Should action-checklist remain benchmark-only?
 
