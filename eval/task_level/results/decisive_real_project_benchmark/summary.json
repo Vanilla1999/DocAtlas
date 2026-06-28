@@ -1,16 +1,17 @@
 {
-  "generated_at": "2026-06-28T08:20:58Z",
+  "generated_at": "2026-06-28T08:55:43Z",
   "verdict": "INCONCLUSIVE",
   "direct_answer": "Inconclusive, because accepted task pool is still insufficient: latest screening has 1 accepted task, below the required 3.",
   "candidate_pool": {
     "mined": 12,
     "recommended": 7,
-    "implemented": 0,
+    "implemented": 1,
     "accepted": 1,
-    "rejected_too_easy_decisive_cycle": 4,
+    "rejected_too_easy_decisive_cycle": 5,
     "rejected_unfair_decisive_cycle": 0,
-    "needs_redesign_or_implementation": 7,
-    "screened_existing_fixtures": 5
+    "needs_redesign_or_implementation": 6,
+    "screened_existing_fixtures": 5,
+    "screened_new_candidates": 1
   },
   "pilot": {
     "run": false,
@@ -18,7 +19,7 @@
     "accepted_tasks": [
       "real_project_nbo_001"
     ],
-    "missing_requirement": "at least 3 accepted real-project tasks; latest existing-fixture screening has 1"
+    "missing_requirement": "at least 3 accepted real-project tasks; latest evidence has 1 accepted and one additional decisive candidate rejected too easy"
   },
   "condition_results": {},
   "metrics_available": false,
@@ -40,12 +41,45 @@
     "run_id": "decisive_existing_screening_001",
     "screened": 5,
     "accepted": 1,
-    "rejected_too_easy": 4,
+    "rejected_too_easy": 5,
     "rejected_unfair": 0,
     "artifact_integrity_ok": true,
     "policy_clean": true,
     "accepted_tasks": [
       "real_project_nbo_001"
-    ]
-  }
+    ],
+    "additional_screening_run_id": "decisive_nbo_generated_policy_source_001_screening_001",
+    "new_rejected_too_easy_tasks": [
+      "decisive_nbo_generated_policy_source_001"
+    ],
+    "rejected_too_easy_total": 5
+  },
+  "additional_screenings": [
+    {
+      "run_id": "decisive_nbo_generated_policy_source_001_screening_001",
+      "task_id": "decisive_nbo_generated_policy_source_001",
+      "source_project": "nbo",
+      "candidate_status": "rejected_too_easy",
+      "repo_only_screening": {
+        "repeats": 2,
+        "resolved": 2,
+        "policy_clean": true,
+        "network_attempts": 0
+      },
+      "fairness": {
+        "reviewed": true,
+        "clean": true,
+        "hidden_oracle_only": false
+      },
+      "artifact_integrity": {
+        "expected_total_runs": 2,
+        "finished": true,
+        "in_memory_results": 2,
+        "runs_jsonl_records": 2,
+        "ok": true
+      },
+      "decision_reason": "strict offline resolved all repeats",
+      "next_action": "redesign candidate before full pilot"
+    }
+  ]
 }

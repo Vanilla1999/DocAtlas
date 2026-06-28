@@ -1,0 +1,19 @@
+name: nbo_permission_snapshot
+description: Sanitized NBO permission module snapshot for task-level benchmark.
+publish_to: 'none'
+version: 2.40.13-tsdb+204000013
+
+environment:
+  sdk: '>=3.3.4 <4.0.0'
+
+dependencies:
+  flutter_riverpod: 2.6.1
+  riverpod_annotation: 2.6.1
+  permission_handler: 11.4.0
+  device_info_plus: 10.1.0
+  easy_localization: 3.0.7
+  freezed_annotation: 2.4.4
+
+dev_dependencies:
+  freezed: 2.5.7
+  riverpod_generator: 2.6.3

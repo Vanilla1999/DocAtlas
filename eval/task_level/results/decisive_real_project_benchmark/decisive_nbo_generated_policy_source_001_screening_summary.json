@@ -1,0 +1,26 @@
+{
+  "run_id": "decisive_nbo_generated_policy_source_001_screening_001",
+  "task_id": "decisive_nbo_generated_policy_source_001",
+  "source_project": "nbo",
+  "candidate_status": "rejected_too_easy",
+  "repo_only_screening": {
+    "repeats": 2,
+    "resolved": 2,
+    "policy_clean": true,
+    "network_attempts": 0
+  },
+  "fairness": {
+    "reviewed": true,
+    "clean": true,
+    "hidden_oracle_only": false
+  },
+  "artifact_integrity": {
+    "expected_total_runs": 2,
+    "finished": true,
+    "in_memory_results": 2,
+    "runs_jsonl_records": 2,
+    "ok": true
+  },
+  "decision_reason": "strict offline resolved all repeats",
+  "next_action": "redesign candidate before full pilot"
+}
