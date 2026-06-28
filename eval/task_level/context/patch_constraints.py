@@ -314,7 +314,10 @@ def _source_summary(visible_files: dict[str, str], docatlas_response: dict[str, 
         for item in selected:
             if isinstance(item, dict):
                 source = item.get("source") if isinstance(item.get("source"), dict) else item
-                sources.append({"path": source.get("path") or source.get("title"), "kind": source.get("kind") or "docatlas_selected"})
+                if isinstance(source, dict):
+                    path = source.get("path") or source.get("title") or "unknown"
+                    kind = source.get("kind") or "docatlas_selected"
+                    sources.append({"path": str(path), "kind": str(kind)})
     deduped: list[dict[str, Any]] = []
     seen: set[tuple[Any, Any]] = set()
     for source in sources:
