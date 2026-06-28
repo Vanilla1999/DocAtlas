@@ -258,3 +258,10 @@ Patch constraints smoke pilot:
 - `docatlas_patch_constraints_injected` produced a 1138-token packet, constraint usage was detected, and post-patch validation found zero violations, but it had higher token/wall-time cost and did not improve resolution.
 - This is a smoke/regression signal only, not production evidence.
 
+Final constraint-compiler recommendation:
+
+- The recommended next production PR is `feat: add get_patch_constraints MCP tool`.
+- Scope should be narrow and read-only: compile visible project docs/source/manifests/lockfiles into source-attributed constraints with token budget and warnings.
+- `validate_patch_against_constraints` should stay behind the compiler API until the constraint shape is stable.
+- The recommendation does not claim patch constraints improve task success; current evidence supports an experimental API direction, not a broad superiority claim.
+
