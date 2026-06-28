@@ -250,3 +250,11 @@ Cost/accuracy refresh with constraint metrics:
 - New constraint-packet metrics are mostly `null` in historical artifacts because those runs predate `docatlas_patch_constraints_injected`.
 - Retrieval/fallback/workflow accounting is now separated: vector retrieval success is not counted when `fallback_local_project_context` was used, and workflow success is reported separately from retrieval success.
 
+Patch constraints smoke pilot:
+
+- A targeted Codex smoke pilot was attempted with `repo_only_strict_offline`, `docatlas_action_checklist_injected`, and `docatlas_patch_constraints_injected`.
+- The two-task matrix exceeded the 600 second supervisor timeout, so only the comparable completed `real_project_nbo_001` rows are used in `docs/research/patch-constraints-smoke-pilot.md`.
+- No completed condition resolved the task; all were policy-clean and hidden-pass but failed the public/compile resolution gate.
+- `docatlas_patch_constraints_injected` produced a 1138-token packet, constraint usage was detected, and post-patch validation found zero violations, but it had higher token/wall-time cost and did not improve resolution.
+- This is a smoke/regression signal only, not production evidence.
+
