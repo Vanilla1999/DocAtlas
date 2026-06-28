@@ -52,10 +52,10 @@
     "fairness_score": 8,
     "privacy_risk_score": 1,
     "fixture_cost_score": 7,
-    "recommended": false,
-    "reason": "Scores well but cost exceeds threshold; useful redesign candidate if cheaper snapshot can be built.",
+    "recommended": true,
+    "reason": "Meets thresholds at the maximum allowed fixture cost; implement only if a sanitized lockfile/version snapshot can stay within scope.",
     "source_type": "dependency_trap",
-    "selection_recommendation": "do_not_implement_yet"
+    "selection_recommendation": "implement_next"
   },
   {
     "candidate_id": "decisive_nbo_cross_module_gate_large_001",
@@ -83,10 +83,10 @@
     "fairness_score": 9,
     "privacy_risk_score": 1,
     "fixture_cost_score": 7,
-    "recommended": false,
-    "reason": "Strong task shape but current implemented version was too easy and larger fixture cost exceeds threshold.",
+    "recommended": true,
+    "reason": "Meets thresholds at the maximum allowed fixture cost; current narrow implementation was too easy, so a redesigned larger fixture must preserve fairness without overspecifying the issue.",
     "source_type": "cross_module_contract",
-    "selection_recommendation": "do_not_implement_yet"
+    "selection_recommendation": "implement_next"
   },
   {
     "candidate_id": "decisive_nbo_browser_scan_policy_001",

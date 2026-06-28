@@ -1,0 +1,36 @@
+{
+  "generated_at": "2026-06-28T08:20:58Z",
+  "verdict": "INCONCLUSIVE",
+  "direct_answer": "Inconclusive, because accepted task pool is insufficient.",
+  "candidate_pool": {
+    "mined": 12,
+    "recommended": 7,
+    "implemented": 0,
+    "accepted": 0,
+    "rejected_too_easy_decisive_cycle": 0,
+    "rejected_unfair_decisive_cycle": 0,
+    "needs_redesign_or_implementation": 7
+  },
+  "pilot": {
+    "run": false,
+    "reason": "accepted task pool is insufficient",
+    "accepted_tasks": [],
+    "missing_requirement": "at least 3 accepted real-project tasks"
+  },
+  "condition_results": {},
+  "metrics_available": false,
+  "artifact_integrity": "not_applicable_no_decisive_pilot_runs",
+  "fairness_review": "not_applicable_no_decisive_fixtures_implemented",
+  "can_claim": [
+    "A sanitized decisive candidate pool exists for the next benchmark iteration.",
+    "Current evidence does not support a positive DocAtlas-over-repo-only claim.",
+    "The current benchmark verdict is INCONCLUSIVE."
+  ],
+  "cannot_claim": [
+    "DocAtlas improves coding agents on real patches.",
+    "DocAtlas beats repo_only_strict_offline.",
+    "DocAtlas beats Context7.",
+    "DocAtlas vector retrieval is robust for this benchmark.",
+    "A decisive real-project causal pilot has completed."
+  ]
+}

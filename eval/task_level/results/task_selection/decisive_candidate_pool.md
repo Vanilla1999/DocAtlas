@@ -29,8 +29,8 @@ Scoring thresholds for `recommended=true`: DocAtlas relevance >=7, repo-only dif
 - privacy risk: low after manifest/module sanitization
 - fixture size estimate: medium-large
 - scores: DocAtlas 8/10; repo_only difficulty 8/10; fairness 8/10; privacy risk 1/10; fixture cost 7/10
-- recommended: false
-- reason: Scores well but cost exceeds threshold; useful redesign candidate if cheaper snapshot can be built.
+- recommended: true
+- reason: Meets thresholds at the maximum allowed fixture cost; implement only if a sanitized lockfile/version snapshot can stay within scope.
 
 ## decisive_nbo_cross_module_gate_large_001
 
@@ -43,8 +43,8 @@ Scoring thresholds for `recommended=true`: DocAtlas relevance >=7, repo-only dif
 - privacy risk: low if permission domain is sanitized
 - fixture size estimate: large
 - scores: DocAtlas 9/10; repo_only difficulty 8/10; fairness 9/10; privacy risk 1/10; fixture cost 7/10
-- recommended: false
-- reason: Strong task shape but current implemented version was too easy and larger fixture cost exceeds threshold.
+- recommended: true
+- reason: Meets thresholds at the maximum allowed fixture cost; current narrow implementation was too easy, so a redesigned larger fixture must preserve fairness without overspecifying the issue.
 
 ## decisive_nbo_browser_scan_policy_001
 

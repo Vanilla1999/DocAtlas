@@ -174,3 +174,13 @@ Historical real-project task mining workflow:
 - Larger sanitized fixture mode is now preferred for the next attempt: include surrounding modules, separate docs/ADR constraints, lockfile/dependency notes, and at least two plausible edit locations, while still excluding full app snapshots and sensitive material.
 - Current mining output finds one threshold-passing candidate shape, `real_project_nbo_generated_policy_source_001`, but no fixture has been implemented or screened yet.
 - Current diagnosis is `READY_TO_IMPLEMENT_MINED_CANDIDATE`. This is not a DocAtlas improvement claim; implementation, validation, strict-offline screening, and possibly a full pilot remain required before any causal claim.
+
+Decisive candidate-pool checkpoint (`decisive_candidate_pool`):
+
+- A broader sanitized candidate pool was added at `eval/task_level/results/task_selection/decisive_candidate_pool.md` and `.json`.
+- The pool contains 12 candidates from local project shapes, including generated-file traps, dependency-version traps, cross-module contracts, historical fixes, ADR mismatch, private-local workflow, migration/version mismatch, and multi-doc architecture constraints.
+- Seven candidates currently meet the scoring thresholds for recommended follow-up, but none has yet been implemented as a decisive fixture, validated, or accepted by strict-offline screening in this cycle.
+- Because accepted task count is `0`, the full four-condition decisive pilot was not run.
+- Executive verdict for this checkpoint: `INCONCLUSIVE`.
+- Direct answer: no, current evidence does not support saying DocAtlas is better than asking the agent without it; the accepted task pool is insufficient.
+- Next required work: implement recommended candidates until either 3 tasks are accepted by strict-offline screening or 6 implemented candidates are rejected, then run the full pilot only if the accepted pool reaches 3 tasks.

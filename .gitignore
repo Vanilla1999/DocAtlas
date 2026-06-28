@@ -47,6 +47,8 @@ eval/task_level/results/*
 !eval/task_level/results/docatlas_context_quality_analysis/**
 !eval/task_level/results/task_fairness_review/
 !eval/task_level/results/task_fairness_review/**
+!eval/task_level/results/decisive_real_project_benchmark/
+!eval/task_level/results/decisive_real_project_benchmark/**
 eval/task_level/runtime/
 eval/task_level/workspaces/
 eval/task_level/.cache/
