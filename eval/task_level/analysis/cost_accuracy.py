@@ -16,6 +16,7 @@ DOCATLAS_CONDITIONS = {
     "docatlas_tool_recommended",
     "docatlas_context_injected",
     "docatlas_action_checklist_injected",
+    "docatlas_patch_constraints_injected",
     "docatlas_action_checklist_only",
     "docatlas_tool_required_once",
     "docatlas_evidence_first",
@@ -61,8 +62,16 @@ class NormalizedRun:
     context_used: bool = False
     checklist_used: bool = False
     fallback_used: bool = False
+    fallback_source: str | None = None
     docatlas_retrieval_status: str | None = None
     vector_indexing_timed_out: bool = False
+    docatlas_tool_success: bool = False
+    docatlas_fallback_success: bool = False
+    injected_context_tokens: int | None = None
+    checklist_tokens: int | None = None
+    retrieved_context_tokens: int | None = None
+    constraint_packet_tokens: int | None = None
+    raw_doc_context_tokens: int | None = None
     behavioral_contract_score: float | None = None
     project_convention_score: float | None = None
     version_contract_score: float | None = None
@@ -214,6 +223,12 @@ def _normalize_record(raw: dict[str, Any], *, run_id: str, run_family: str, task
     if harness_calls is None:
         harness_calls = _as_int(metrics.get("harness_docatlas_calls")) or 0
 
+    fallback_used = bool(docatlas.get("fallback_used", False))
+    retrieval_status = docatlas.get("docatlas_retrieval_status") or docatlas.get("retrieval_status")
+    fallback_source = docatlas.get("fallback_source")
+    inferred_tool_success = retrieval_status == "success" and not fallback_used
+    inferred_fallback_success = fallback_used and bool(fallback_source or retrieval_status == "fallback_local_project_context")
+
     return NormalizedRun(
         run_id=str(raw.get("run_id") or run_id),
         run_family=run_family,
@@ -236,9 +251,17 @@ def _normalize_record(raw: dict[str, Any], *, run_id: str, run_family: str, task
         harness_docatlas_calls=harness_calls,
         context_used=bool(docatlas.get("context_used", False)),
         checklist_used=bool(actionability.get("action_checklist_used", False)),
-        fallback_used=bool(docatlas.get("fallback_used", False)),
-        docatlas_retrieval_status=docatlas.get("docatlas_retrieval_status"),
+        fallback_used=fallback_used,
+        fallback_source=fallback_source,
+        docatlas_retrieval_status=retrieval_status,
         vector_indexing_timed_out=bool(docatlas.get("vector_indexing_timed_out", False)),
+        docatlas_tool_success=bool(docatlas.get("docatlas_tool_success", inferred_tool_success)),
+        docatlas_fallback_success=bool(docatlas.get("docatlas_fallback_success", inferred_fallback_success)),
+        injected_context_tokens=_as_int(metrics.get("injected_context_tokens") or docatlas.get("injected_context_tokens")),
+        checklist_tokens=_as_int(metrics.get("checklist_tokens") or actionability.get("checklist_tokens")),
+        retrieved_context_tokens=_as_int(metrics.get("retrieved_context_tokens") or docatlas.get("retrieved_context_tokens")),
+        constraint_packet_tokens=_as_int(metrics.get("constraint_packet_tokens") or docatlas.get("constraint_packet_tokens")),
+        raw_doc_context_tokens=_as_int(metrics.get("raw_doc_context_tokens") or docatlas.get("raw_doc_context_tokens")),
         behavioral_contract_score=_contract_score(contract, "behavioral_contract_score", ("behavior_score",)),
         project_convention_score=_contract_score(contract, "project_convention_score"),
         version_contract_score=_contract_score(contract, "version_contract_score"),
@@ -383,7 +406,15 @@ def compute_condition_metrics(records: list[NormalizedRun], *, task_role_filter:
             "median_input_tokens": _median(r.input_tokens for r in items),
             "median_output_tokens": _median(r.output_tokens for r in items),
             "median_total_tokens": _median(r.total_tokens for r in items),
+            "median_injected_context_tokens": _median(r.injected_context_tokens for r in items),
+            "median_checklist_tokens": _median(r.checklist_tokens for r in items),
+            "median_retrieved_context_tokens": _median(r.retrieved_context_tokens for r in items),
+            "median_constraint_packet_tokens": _median(r.constraint_packet_tokens for r in items),
+            "median_raw_doc_context_tokens": _median(r.raw_doc_context_tokens for r in items),
             "median_wall_time_seconds": _median(r.wall_time_seconds for r in items),
+            "vector_retrieval_success_rate": _rate(sum(r.docatlas_tool_success or (r.docatlas_retrieval_status == "success" and not r.fallback_used) for r in items), runs),
+            "fallback_success_rate": _rate(sum(r.docatlas_fallback_success for r in items), runs),
+            "workflow_success_rate": _rate(sum(r.resolved and r.policy_clean for r in items), runs),
             "tokens_per_resolved_task": (total_tokens_sum / resolved) if resolved else None,
             "tokens_per_policy_clean_resolved_task": (total_tokens_sum / policy_clean_resolved) if policy_clean_resolved else None,
             "tokens_per_hidden_pass": (total_tokens_sum / hidden_pass) if hidden_pass else None,
@@ -470,7 +501,11 @@ def compute_context_utilization(records: list[NormalizedRun]) -> dict[str, dict[
     for condition, items in sorted(by_condition.items()):
         context_used = [r for r in items if r.context_used]
         context_not_used = [r for r in items if not r.context_used]
-        retrieval_success = [r for r in items if r.docatlas_retrieval_status == "success"]
+        retrieval_success = [r for r in items if r.docatlas_tool_success or (r.docatlas_retrieval_status == "success" and not r.fallback_used)]
+        workflow_success = [
+            r for r in items
+            if (r.context_used or r.checklist_used) and (r.docatlas_tool_success or r.docatlas_fallback_success or r.agent_docatlas_calls > 0)
+        ]
         output[condition] = {
             "runs": len(items),
             "confidence": "low confidence" if len(items) < 10 else "normal",
@@ -478,8 +513,10 @@ def compute_context_utilization(records: list[NormalizedRun]) -> dict[str, dict[
             "context_used_rate": _rate(len(context_used), len(items)),
             "checklist_used_rate": _rate(sum(r.checklist_used for r in items), len(items)),
             "fallback_rate": _rate(sum(r.fallback_used for r in items), len(items)),
+            "fallback_success_rate": _rate(sum(r.docatlas_fallback_success for r in items), len(items)),
             "vector_timeout_rate": _rate(sum(r.vector_indexing_timed_out for r in items), len(items)),
             "retrieval_success_rate": _rate(len(retrieval_success), len(items)),
+            "workflow_success_rate": _rate(len(workflow_success), len(items)),
             "resolved_when_context_used": _rate(sum(r.resolved for r in context_used), len(context_used)),
             "resolved_when_context_not_used": _rate(sum(r.resolved for r in context_not_used), len(context_not_used)),
         }
@@ -575,6 +612,12 @@ def _metrics_table(metrics: dict[str, dict[str, Any]]) -> list[dict[str, Any]]:
             "median_total_tokens": item.get("median_total_tokens"),
             "median_wall_time": item.get("median_wall_time_seconds"),
             "tokens_per_policy_clean_resolved": item.get("tokens_per_policy_clean_resolved_task"),
+            "median_injected_context_tokens": item.get("median_injected_context_tokens"),
+            "median_checklist_tokens": item.get("median_checklist_tokens"),
+            "median_constraint_packet_tokens": item.get("median_constraint_packet_tokens"),
+            "vector_retrieval_success_rate": item.get("vector_retrieval_success_rate"),
+            "fallback_success_rate": item.get("fallback_success_rate"),
+            "workflow_success_rate": item.get("workflow_success_rate"),
         })
     return rows
 
@@ -621,7 +664,7 @@ def write_outputs(*, output_dir: Path, parsed: list[ParsedRunDirectory], records
         "condition_metric_groups": condition_metrics,
         "context_utilization": context_utilization,
         "policy_cases": policy_cases,
-        "injected_context_token_attribution": "injected context token attribution unavailable",
+        "unavailable_fields_note": "Older artifacts may not contain injected_context_tokens, checklist_tokens, retrieved_context_tokens, constraint_packet_tokens, raw_doc_context_tokens, or separated retrieval/fallback success fields; those metrics are reported as null when unavailable.",
     })
     (output_dir / "summary.json").write_text(json.dumps(summary, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     (output_dir / "condition_metrics.json").write_text(json.dumps(condition_metrics, indent=2, sort_keys=True) + "\n", encoding="utf-8")
@@ -691,7 +734,7 @@ def render_report(summary: dict[str, Any], condition_metrics: dict[str, Any], pa
         "",
         "## Token and wall-time analysis",
         "",
-        "DocAtlas generally increased token usage and wall time in paired comparisons. Any quality/policy-clean gains in historical paired pilots were costly rather than efficient. For context-injected conditions, injected context token attribution unavailable.",
+        "DocAtlas generally increased token usage and wall time in paired comparisons. Any quality/policy-clean gains in historical paired pilots were costly rather than efficient. Newer artifacts report injected context, checklist, raw docs, and constraint packet token fields when available; older artifacts show null for unavailable fields.",
         "",
         "## Context utilization",
         "",
@@ -748,7 +791,7 @@ def run_analysis(results_root: Path = RESULTS_ROOT, output_dir: Path | None = No
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Analyze DocAtlas task-level benchmark cost and accuracy artifacts.")
-    parser.add_argument("--results-root", type=Path, default=RESULTS_ROOT)
+    parser.add_argument("--results-root", "--results-dir", dest="results_root", type=Path, default=RESULTS_ROOT)
     parser.add_argument("--output-dir", type=Path, default=None)
     args = parser.parse_args()
     summary = run_analysis(args.results_root, args.output_dir)

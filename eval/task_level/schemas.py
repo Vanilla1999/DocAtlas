@@ -144,6 +144,11 @@ class RunMetrics:
     context_chunks_used_in_patch: int = 0
     context_precision: float | None = None
     context_recall: float | None = None
+    injected_context_tokens: int | None = None
+    checklist_tokens: int | None = None
+    retrieved_context_tokens: int | None = None
+    constraint_packet_tokens: int | None = None
+    raw_doc_context_tokens: int | None = None
 
 
 @dataclass

@@ -40,6 +40,18 @@ DOCATLAS_CONDITIONS = {
 CONTEXT_INJECTION_LIMIT_CHARS = 10000
 
 
+def _estimate_tokens(text: str) -> int:
+    return max(1, (len(text) + 3) // 4) if text else 0
+
+
+def _load_optional_json(path: Path) -> dict[str, Any]:
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return {}
+    return data if isinstance(data, dict) else {}
+
+
 def serialize_run_results_jsonl(results: list[dict[str, Any]]) -> str:
     """Serialize run results as JSONL with one physical line per record."""
 
@@ -194,6 +206,8 @@ def evaluate_agent_patch(task: TaskSpec, workspace: Path, run_output_dir: Path, 
     status = "completed" if resolved or patch_exists else "no_patch"
     if not audit.clean:
         status = "policy_violation"
+    injection = _load_optional_json(run_output_dir / "docatlas_context_injection.json")
+    checklist_injection = _load_optional_json(run_output_dir / "action_checklist_injection.json")
     metrics = RunMetrics(
         wall_time_seconds=getattr(runner_output, "wall_time_seconds", None),
         input_tokens=getattr(runner_output, "input_tokens", None),
@@ -205,6 +219,11 @@ def evaluate_agent_patch(task: TaskSpec, workspace: Path, run_output_dir: Path, 
         patch_files_changed=stats.files_changed if stats else 0,
         patch_lines_added=stats.lines_added if stats else 0,
         patch_lines_removed=stats.lines_removed if stats else 0,
+        context_chunks_returned=int(injection.get("sources", 0)) if isinstance(injection, dict) else 0,
+        injected_context_tokens=int(injection.get("injected_context_tokens")) if isinstance(injection.get("injected_context_tokens"), int) else None,
+        retrieved_context_tokens=int(injection.get("retrieved_context_tokens")) if isinstance(injection.get("retrieved_context_tokens"), int) else None,
+        raw_doc_context_tokens=int(injection.get("raw_doc_context_tokens")) if isinstance(injection.get("raw_doc_context_tokens"), int) else None,
+        checklist_tokens=int(checklist_injection.get("checklist_tokens")) if isinstance(checklist_injection.get("checklist_tokens"), int) else None,
     )
     result = {
         "run_id": run_output_dir.parents[2].name,
@@ -243,6 +262,15 @@ def evaluate_agent_patch(task: TaskSpec, workspace: Path, run_output_dir: Path, 
             "agent_docatlas_calls": audit.docatlas_calls,
             "network_attempts": audit.network_attempts,
             "harness_docatlas_calls": utilization.harness_calls,
+            "injected_context_tokens": metrics.injected_context_tokens,
+            "checklist_tokens": metrics.checklist_tokens,
+            "retrieved_context_tokens": metrics.retrieved_context_tokens,
+            "constraint_packet_tokens": metrics.constraint_packet_tokens,
+            "raw_doc_context_tokens": metrics.raw_doc_context_tokens,
+            "fallback_used": utilization.fallback_used,
+            "fallback_source": getattr(utilization, "fallback_source", None),
+            "docatlas_retrieval_status": utilization.docatlas_retrieval_status,
+            "vector_indexing_timed_out": utilization.vector_indexing_timed_out,
         },
         "context": {
             "retrieved_count": int(utilization.context_retrieved) + audit.docatlas_calls,
@@ -457,14 +485,20 @@ def inject_docatlas_context(task: TaskSpec, workspace: Path, output_dir: Path, e
     if len(markdown) > CONTEXT_INJECTION_LIMIT_CHARS:
         markdown = markdown[:CONTEXT_INJECTION_LIMIT_CHARS] + "\n\n[truncated by benchmark harness]\n"
     (output_dir / "injected_context.md").write_text(markdown, encoding="utf-8")
+    raw_json = json.dumps(response, sort_keys=True)
     payload = {
         "status": "success" if fallback_reason is None else "fallback_local_project_context",
         "docatlas_retrieval_status": "success" if fallback_reason is None else "fallback_local_project_context",
         "vector_indexing_timed_out": bool(fallback_reason and "exceeded 45 seconds" in fallback_reason),
         "fallback_used": fallback_reason is not None,
         "fallback_source": "visible_fixture_project_docs" if fallback_reason is not None else None,
+        "docatlas_tool_success": fallback_reason is None,
+        "docatlas_fallback_success": fallback_reason is not None,
         "harness_docatlas_calls": 1 if fallback_reason is None else 0,
         "sources": len(sources),
+        "injected_context_tokens": _estimate_tokens(markdown),
+        "retrieved_context_tokens": _estimate_tokens(raw_json),
+        "raw_doc_context_tokens": _estimate_tokens(raw_json),
         "fallback_reason": fallback_reason,
         "wall_time_seconds": round(time.monotonic() - started, 4),
     }
@@ -506,7 +540,8 @@ def inject_action_checklist(task: TaskSpec, workspace: Path, output_dir: Path) -
         payload = {"status": "condition_setup_failed", "error": repr(exc), "wall_time_seconds": round(time.monotonic() - started, 4)}
         (output_dir / "action_checklist_injection.json").write_text(json.dumps(payload, indent=2, sort_keys=True), encoding="utf-8")
         return payload
-    payload = {"status": "success", "checklist_items": len(items), "wall_time_seconds": round(time.monotonic() - started, 4)}
+    markdown = (output_dir / "action_checklist.md").read_text(encoding="utf-8") if (output_dir / "action_checklist.md").exists() else ""
+    payload = {"status": "success", "checklist_items": len(items), "checklist_tokens": _estimate_tokens(markdown), "wall_time_seconds": round(time.monotonic() - started, 4)}
     (output_dir / "action_checklist_injection.json").write_text(json.dumps(payload, indent=2, sort_keys=True), encoding="utf-8")
     return payload
 
