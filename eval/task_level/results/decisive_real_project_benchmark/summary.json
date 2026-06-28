@@ -1,17 +1,17 @@
 {
-  "generated_at": "2026-06-28T08:55:43Z",
+  "generated_at": "2026-06-28T09:08:54Z",
   "verdict": "INCONCLUSIVE",
   "direct_answer": "Inconclusive, because accepted task pool is still insufficient: latest screening has 1 accepted task, below the required 3.",
   "candidate_pool": {
     "mined": 12,
     "recommended": 7,
-    "implemented": 1,
+    "implemented": 2,
     "accepted": 1,
-    "rejected_too_easy_decisive_cycle": 5,
+    "rejected_too_easy_decisive_cycle": 6,
     "rejected_unfair_decisive_cycle": 0,
-    "needs_redesign_or_implementation": 6,
+    "needs_redesign_or_implementation": 5,
     "screened_existing_fixtures": 5,
-    "screened_new_candidates": 1
+    "screened_new_candidates": 2
   },
   "pilot": {
     "run": false,
@@ -19,12 +19,12 @@
     "accepted_tasks": [
       "real_project_nbo_001"
     ],
-    "missing_requirement": "at least 3 accepted real-project tasks; latest evidence has 1 accepted and one additional decisive candidate rejected too easy"
+    "missing_requirement": "at least 3 accepted real-project tasks; latest evidence has 1 accepted and two additional decisive candidates rejected too easy"
   },
   "condition_results": {},
   "metrics_available": false,
-  "artifact_integrity": "clean_for_decisive_existing_screening_001; not_applicable_for_full_pilot",
-  "fairness_review": "clean_for_decisive_existing_screening_001; not_applicable_for_unimplemented_decisive_candidate_pool",
+  "artifact_integrity": "clean_for_decisive_existing_screening_001_and_new_candidate_screenings; not_applicable_for_full_pilot",
+  "fairness_review": "clean_for_screened_tasks; not_applicable_for_unimplemented_decisive_candidate_pool",
   "can_claim": [
     "A sanitized decisive candidate pool exists for the next benchmark iteration.",
     "Current evidence does not support a positive DocAtlas-over-repo-only claim.",
@@ -41,23 +41,53 @@
     "run_id": "decisive_existing_screening_001",
     "screened": 5,
     "accepted": 1,
-    "rejected_too_easy": 5,
+    "rejected_too_easy": 6,
     "rejected_unfair": 0,
     "artifact_integrity_ok": true,
     "policy_clean": true,
     "accepted_tasks": [
       "real_project_nbo_001"
     ],
-    "additional_screening_run_id": "decisive_nbo_generated_policy_source_001_screening_001",
-    "new_rejected_too_easy_tasks": [
-      "decisive_nbo_generated_policy_source_001"
+    "additional_screening_run_ids": [
+      "decisive_nbo_generated_policy_source_001_screening_001",
+      "decisive_nbo_permission_handler_version_001_screening_001"
     ],
-    "rejected_too_easy_total": 5
+    "new_rejected_too_easy_tasks": [
+      "decisive_nbo_generated_policy_source_001",
+      "decisive_nbo_permission_handler_version_001"
+    ],
+    "rejected_too_easy_total": 6
   },
   "additional_screenings": [
     {
       "run_id": "decisive_nbo_generated_policy_source_001_screening_001",
       "task_id": "decisive_nbo_generated_policy_source_001",
+      "source_project": "nbo",
+      "candidate_status": "rejected_too_easy",
+      "repo_only_screening": {
+        "repeats": 2,
+        "resolved": 2,
+        "policy_clean": true,
+        "network_attempts": 0
+      },
+      "fairness": {
+        "reviewed": true,
+        "clean": true,
+        "hidden_oracle_only": false
+      },
+      "artifact_integrity": {
+        "expected_total_runs": 2,
+        "finished": true,
+        "in_memory_results": 2,
+        "runs_jsonl_records": 2,
+        "ok": true
+      },
+      "decision_reason": "strict offline resolved all repeats",
+      "next_action": "redesign candidate before full pilot"
+    },
+    {
+      "run_id": "decisive_nbo_permission_handler_version_001_screening_001",
+      "task_id": "decisive_nbo_permission_handler_version_001",
       "source_project": "nbo",
       "candidate_status": "rejected_too_easy",
       "repo_only_screening": {

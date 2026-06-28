@@ -182,6 +182,7 @@ Decisive candidate-pool checkpoint (`decisive_candidate_pool`):
 - Seven candidates currently meet the scoring thresholds for recommended follow-up.
 - A latest strict-offline screening run, `decisive_existing_screening_001`, screened five existing NBO fixtures over two repeats each. It accepted `real_project_nbo_001` at `1/2` strict-offline resolved and rejected the other four as too easy at `2/2` strict-offline resolved.
 - The first new decisive candidate, `decisive_nbo_generated_policy_source_001`, was implemented and validated, then screened in `decisive_nbo_generated_policy_source_001_screening_001`. It was rejected as too easy because `repo_only_strict_offline` resolved `2/2` policy-clean with clean artifact integrity.
+- The second new decisive candidate, `decisive_nbo_permission_handler_version_001`, was implemented and validated, then screened in `decisive_nbo_permission_handler_version_001_screening_001`. It was also rejected as too easy because `repo_only_strict_offline` resolved `2/2` policy-clean with clean artifact integrity.
 - Because accepted task count is `1`, below the required minimum of `3`, the full four-condition decisive pilot was not run.
 - Executive verdict for this checkpoint: `INCONCLUSIVE`.
 - Direct answer: no, current evidence does not support saying DocAtlas is better than asking the agent without it; the accepted task pool is still insufficient.
