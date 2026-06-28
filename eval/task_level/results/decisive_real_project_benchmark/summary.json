@@ -1,26 +1,29 @@
 {
   "generated_at": "2026-06-28T08:20:58Z",
   "verdict": "INCONCLUSIVE",
-  "direct_answer": "Inconclusive, because accepted task pool is insufficient.",
+  "direct_answer": "Inconclusive, because accepted task pool is still insufficient: latest screening has 1 accepted task, below the required 3.",
   "candidate_pool": {
     "mined": 12,
     "recommended": 7,
     "implemented": 0,
-    "accepted": 0,
-    "rejected_too_easy_decisive_cycle": 0,
+    "accepted": 1,
+    "rejected_too_easy_decisive_cycle": 4,
     "rejected_unfair_decisive_cycle": 0,
-    "needs_redesign_or_implementation": 7
+    "needs_redesign_or_implementation": 7,
+    "screened_existing_fixtures": 5
   },
   "pilot": {
     "run": false,
     "reason": "accepted task pool is insufficient",
-    "accepted_tasks": [],
-    "missing_requirement": "at least 3 accepted real-project tasks"
+    "accepted_tasks": [
+      "real_project_nbo_001"
+    ],
+    "missing_requirement": "at least 3 accepted real-project tasks; latest existing-fixture screening has 1"
   },
   "condition_results": {},
   "metrics_available": false,
-  "artifact_integrity": "not_applicable_no_decisive_pilot_runs",
-  "fairness_review": "not_applicable_no_decisive_fixtures_implemented",
+  "artifact_integrity": "clean_for_decisive_existing_screening_001; not_applicable_for_full_pilot",
+  "fairness_review": "clean_for_decisive_existing_screening_001; not_applicable_for_unimplemented_decisive_candidate_pool",
   "can_claim": [
     "A sanitized decisive candidate pool exists for the next benchmark iteration.",
     "Current evidence does not support a positive DocAtlas-over-repo-only claim.",
@@ -32,5 +35,17 @@
     "DocAtlas beats Context7.",
     "DocAtlas vector retrieval is robust for this benchmark.",
     "A decisive real-project causal pilot has completed."
-  ]
+  ],
+  "screening": {
+    "run_id": "decisive_existing_screening_001",
+    "screened": 5,
+    "accepted": 1,
+    "rejected_too_easy": 4,
+    "rejected_unfair": 0,
+    "artifact_integrity_ok": true,
+    "policy_clean": true,
+    "accepted_tasks": [
+      "real_project_nbo_001"
+    ]
+  }
 }

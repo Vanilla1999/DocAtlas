@@ -179,8 +179,9 @@ Decisive candidate-pool checkpoint (`decisive_candidate_pool`):
 
 - A broader sanitized candidate pool was added at `eval/task_level/results/task_selection/decisive_candidate_pool.md` and `.json`.
 - The pool contains 12 candidates from local project shapes, including generated-file traps, dependency-version traps, cross-module contracts, historical fixes, ADR mismatch, private-local workflow, migration/version mismatch, and multi-doc architecture constraints.
-- Seven candidates currently meet the scoring thresholds for recommended follow-up, but none has yet been implemented as a decisive fixture, validated, or accepted by strict-offline screening in this cycle.
-- Because accepted task count is `0`, the full four-condition decisive pilot was not run.
+- Seven candidates currently meet the scoring thresholds for recommended follow-up.
+- A latest strict-offline screening run, `decisive_existing_screening_001`, screened five existing NBO fixtures over two repeats each. It accepted `real_project_nbo_001` at `1/2` strict-offline resolved and rejected the other four as too easy at `2/2` strict-offline resolved.
+- Because accepted task count is `1`, below the required minimum of `3`, the full four-condition decisive pilot was not run.
 - Executive verdict for this checkpoint: `INCONCLUSIVE`.
-- Direct answer: no, current evidence does not support saying DocAtlas is better than asking the agent without it; the accepted task pool is insufficient.
+- Direct answer: no, current evidence does not support saying DocAtlas is better than asking the agent without it; the accepted task pool is still insufficient.
 - Next required work: implement recommended candidates until either 3 tasks are accepted by strict-offline screening or 6 implemented candidates are rejected, then run the full pilot only if the accepted pool reaches 3 tasks.

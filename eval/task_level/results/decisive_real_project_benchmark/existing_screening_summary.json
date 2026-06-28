@@ -1,0 +1,89 @@
+{
+  "run_id": "decisive_existing_screening_001",
+  "screened_tasks": [
+    {
+      "task_id": "real_project_nbo_001",
+      "source_project": "nbo",
+      "candidate_status": "accepted",
+      "repo_only_screening": {
+        "repeats": 2,
+        "resolved": 1,
+        "policy_clean": true,
+        "network_attempts": 0
+      },
+      "fairness_clean": true,
+      "artifact_integrity_ok": true,
+      "decision_reason": "strict offline did not resolve all repeats"
+    },
+    {
+      "task_id": "real_project_nbo_permission_002",
+      "source_project": "nbo",
+      "candidate_status": "rejected_too_easy",
+      "repo_only_screening": {
+        "repeats": 2,
+        "resolved": 2,
+        "policy_clean": true,
+        "network_attempts": 0
+      },
+      "fairness_clean": true,
+      "artifact_integrity_ok": true,
+      "decision_reason": "strict offline resolved all repeats"
+    },
+    {
+      "task_id": "real_project_nbo_generated_source_001",
+      "source_project": "nbo",
+      "candidate_status": "rejected_too_easy",
+      "repo_only_screening": {
+        "repeats": 2,
+        "resolved": 2,
+        "policy_clean": true,
+        "network_attempts": 0
+      },
+      "fairness_clean": true,
+      "artifact_integrity_ok": true,
+      "decision_reason": "strict offline resolved all repeats"
+    },
+    {
+      "task_id": "real_project_nbo_distributed_permission_policy_001",
+      "source_project": "nbo",
+      "candidate_status": "rejected_too_easy",
+      "repo_only_screening": {
+        "repeats": 2,
+        "resolved": 2,
+        "policy_clean": true,
+        "network_attempts": 0
+      },
+      "fairness_clean": true,
+      "artifact_integrity_ok": true,
+      "decision_reason": "strict offline resolved all repeats"
+    },
+    {
+      "task_id": "real_project_nbo_cross_module_permission_contract_001",
+      "source_project": "nbo",
+      "candidate_status": "rejected_too_easy",
+      "repo_only_screening": {
+        "repeats": 2,
+        "resolved": 2,
+        "policy_clean": true,
+        "network_attempts": 0
+      },
+      "fairness_clean": true,
+      "artifact_integrity_ok": true,
+      "decision_reason": "strict offline resolved all repeats"
+    }
+  ],
+  "artifact_integrity": {
+    "expected_total_runs": 10,
+    "finished": true,
+    "in_memory_results": 10,
+    "runs_jsonl_records": 10,
+    "ok": true
+  },
+  "counts": {
+    "screened": 5,
+    "accepted": 1,
+    "rejected_too_easy": 4,
+    "rejected_unfair": 0
+  },
+  "conclusion": "Latest existing-fixture screening finds one accepted task, which remains below the required three accepted tasks for a full decisive pilot. Verdict remains INCONCLUSIVE."
+}
