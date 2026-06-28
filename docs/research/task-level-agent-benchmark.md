@@ -202,3 +202,31 @@ Decisive full-pilot result (`decisive_full_pilot_001`):
 - Current final verdict: `NEGATIVE_SIGNAL`, low confidence.
 - Direct answer: no, current evidence does not support saying DocAtlas is better than asking the agent without it.
 - The negative signal is limited: repeats=1, one accepted task is self-referential, and one checklist run used fallback-local-project-context, so this is not a statistically strong universal negative claim or robust-vector-retrieval result.
+
+## Cost and accuracy analysis
+
+A cost/accuracy analyzer was added at `eval/task_level/analysis/cost_accuracy.py` and writes normalized outputs under `eval/task_level/results/cost_accuracy_analysis/`.
+
+Data inventory:
+
+- run directories collected: 56
+- comparable pilot records: 109
+- pilot run directories: 17
+- screening run directories: 8
+- accepted tasks: `decisive_docmancer_vector_timeout_fallback_001`, `decisive_nbo_cross_module_gate_large_001`, `real_project_nbo_001`
+- conditions observed: `context7`, `docatlas_action_checklist_injected`, `docatlas_context_injected`, `docatlas_snippet_first`, `docatlas_tool_optional`, `docatlas_tool_recommended`, `docatlas_tool_required_once`, `repo_only`, `repo_only_strict_offline`, `repo_only_web_audited`
+
+Verdict: `QUALITY_POSITIVE_COSTLY`.
+
+Interpretation:
+
+- DocAtlas-assisted workflows show a limited quality/policy-clean positive signal in paired historical pilot comparisons, but the signal is costly rather than efficient.
+- `docatlas_tool_recommended` and `docatlas_action_checklist_injected` generally increased median tokens and wall time versus `repo_only_strict_offline` in paired comparisons.
+- The decisive accepted-task pilot still had `0/3` resolved for every condition, so this cost/accuracy result does not overturn the decisive-pilot negative signal.
+- No evidence shows that repo-only solved primarily by violating the no-web policy; strict-offline runs were generally policy-clean.
+- No broad policy-clean DocAtlas win is established.
+- Context utilization is real in DocAtlas conditions, but samples are small and confidence remains low.
+- Injected context token attribution is unavailable as a separate field, so context-injected token accounting uses total runner input/output tokens only.
+
+Direct answer: current tests do say something useful: DocAtlas can be adopted/used and may improve quality in some historical paired workflows, but current artifacts do not show an efficient or statistically strong advantage over repo-only.
+

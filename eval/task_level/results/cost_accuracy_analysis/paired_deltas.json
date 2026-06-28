@@ -1,0 +1,248 @@
+{
+  "accepted_differentiating_tasks": {
+    "docatlas_action_checklist_injected - repo_only_strict_offline": {
+      "contract_score_delta": {
+        "behavioral": 0.0,
+        "generated_file": 0.0,
+        "project_convention": 0.0,
+        "version": 0.0
+      },
+      "forbidden_edit_delta_median": 0.0,
+      "hidden_pass_delta_mean": 0.0,
+      "input_token_delta_median": 76071.0,
+      "network_attempt_delta_median": 0.0,
+      "output_token_delta_median": 604.0,
+      "pairs": 5,
+      "policy_clean_delta_mean": 0.2,
+      "resolved_delta_mean": 0.2,
+      "token_delta_pct": 0.4592750329557588,
+      "total_token_delta_median": 76997.0,
+      "wall_time_delta_median": 4.619199999999999,
+      "wall_time_delta_pct": 0.05352323855452957
+    },
+    "docatlas_context_injected - repo_only_strict_offline": {
+      "contract_score_delta": {
+        "behavioral": null,
+        "generated_file": null,
+        "project_convention": null,
+        "version": null
+      },
+      "forbidden_edit_delta_median": null,
+      "hidden_pass_delta_mean": null,
+      "input_token_delta_median": null,
+      "network_attempt_delta_median": null,
+      "output_token_delta_median": null,
+      "pairs": 0,
+      "policy_clean_delta_mean": null,
+      "resolved_delta_mean": null,
+      "token_delta_pct": null,
+      "total_token_delta_median": null,
+      "wall_time_delta_median": null,
+      "wall_time_delta_pct": null
+    },
+    "docatlas_tool_recommended - repo_only_strict_offline": {
+      "contract_score_delta": {
+        "behavioral": 0.0,
+        "generated_file": 0.0,
+        "project_convention": 0.0,
+        "version": 0.0
+      },
+      "forbidden_edit_delta_median": 0.0,
+      "hidden_pass_delta_mean": 0.0,
+      "input_token_delta_median": 150408.0,
+      "network_attempt_delta_median": 0.0,
+      "output_token_delta_median": 369.0,
+      "pairs": 5,
+      "policy_clean_delta_mean": 0.0,
+      "resolved_delta_mean": 0.0,
+      "token_delta_pct": 0.8990748528174937,
+      "total_token_delta_median": 150729.0,
+      "wall_time_delta_median": 54.9246,
+      "wall_time_delta_pct": 0.6364180958417291
+    },
+    "repo_only_web_audited - repo_only_strict_offline": {
+      "contract_score_delta": {
+        "behavioral": 0.0,
+        "generated_file": 0.0,
+        "project_convention": 0.0,
+        "version": 0.0
+      },
+      "forbidden_edit_delta_median": 0.0,
+      "hidden_pass_delta_mean": 0.0,
+      "input_token_delta_median": 48453.0,
+      "network_attempt_delta_median": 0.0,
+      "output_token_delta_median": 946.0,
+      "pairs": 5,
+      "policy_clean_delta_mean": 0.2,
+      "resolved_delta_mean": 0.2,
+      "token_delta_pct": 0.2946572899331341,
+      "total_token_delta_median": 49399.0,
+      "wall_time_delta_median": 22.314799999999998,
+      "wall_time_delta_pct": 0.25856433228624365
+    }
+  },
+  "all_pilot_tasks": {
+    "docatlas_action_checklist_injected - repo_only_strict_offline": {
+      "contract_score_delta": {
+        "behavioral": 0.0,
+        "generated_file": 0.0,
+        "project_convention": 0.0,
+        "version": 0.0
+      },
+      "forbidden_edit_delta_median": 0.0,
+      "hidden_pass_delta_mean": 0.0,
+      "input_token_delta_median": 58560.0,
+      "network_attempt_delta_median": 0.0,
+      "output_token_delta_median": 424.0,
+      "pairs": 9,
+      "policy_clean_delta_mean": 0.1111111111111111,
+      "resolved_delta_mean": 0.1111111111111111,
+      "token_delta_pct": 0.3530306022899347,
+      "total_token_delta_median": 58984.0,
+      "wall_time_delta_median": 4.619199999999999,
+      "wall_time_delta_pct": 0.055224721048925375
+    },
+    "docatlas_context_injected - repo_only_strict_offline": {
+      "contract_score_delta": {
+        "behavioral": null,
+        "generated_file": null,
+        "project_convention": null,
+        "version": null
+      },
+      "forbidden_edit_delta_median": null,
+      "hidden_pass_delta_mean": null,
+      "input_token_delta_median": null,
+      "network_attempt_delta_median": null,
+      "output_token_delta_median": null,
+      "pairs": 0,
+      "policy_clean_delta_mean": null,
+      "resolved_delta_mean": null,
+      "token_delta_pct": null,
+      "total_token_delta_median": null,
+      "wall_time_delta_median": null,
+      "wall_time_delta_pct": null
+    },
+    "docatlas_tool_recommended - repo_only_strict_offline": {
+      "contract_score_delta": {
+        "behavioral": 0.0,
+        "generated_file": 0.0,
+        "project_convention": 0.0,
+        "version": 0.0
+      },
+      "forbidden_edit_delta_median": 0.0,
+      "hidden_pass_delta_mean": 0.0,
+      "input_token_delta_median": 150408.0,
+      "network_attempt_delta_median": 0.0,
+      "output_token_delta_median": 369.0,
+      "pairs": 9,
+      "policy_clean_delta_mean": -0.1111111111111111,
+      "resolved_delta_mean": -0.1111111111111111,
+      "token_delta_pct": 0.9021421004435027,
+      "total_token_delta_median": 150729.0,
+      "wall_time_delta_median": 54.9246,
+      "wall_time_delta_pct": 0.6566495743253825
+    },
+    "repo_only_web_audited - repo_only_strict_offline": {
+      "contract_score_delta": {
+        "behavioral": 0.0,
+        "generated_file": 0.0,
+        "project_convention": 0.0,
+        "version": 0.0
+      },
+      "forbidden_edit_delta_median": 0.0,
+      "hidden_pass_delta_mean": 0.0,
+      "input_token_delta_median": 45648.0,
+      "network_attempt_delta_median": 0.0,
+      "output_token_delta_median": 946.0,
+      "pairs": 9,
+      "policy_clean_delta_mean": 0.1111111111111111,
+      "resolved_delta_mean": 0.1111111111111111,
+      "token_delta_pct": 0.2810526756803668,
+      "total_token_delta_median": 46958.0,
+      "wall_time_delta_median": 19.460899999999995,
+      "wall_time_delta_pct": 0.23266426521064942
+    }
+  },
+  "real_project_tasks_only": {
+    "docatlas_action_checklist_injected - repo_only_strict_offline": {
+      "contract_score_delta": {
+        "behavioral": 0.0,
+        "generated_file": 0.0,
+        "project_convention": 0.0,
+        "version": 0.0
+      },
+      "forbidden_edit_delta_median": 0.0,
+      "hidden_pass_delta_mean": 0.0,
+      "input_token_delta_median": 58560.0,
+      "network_attempt_delta_median": 0.0,
+      "output_token_delta_median": 424.0,
+      "pairs": 9,
+      "policy_clean_delta_mean": 0.1111111111111111,
+      "resolved_delta_mean": 0.1111111111111111,
+      "token_delta_pct": 0.3530306022899347,
+      "total_token_delta_median": 58984.0,
+      "wall_time_delta_median": 4.619199999999999,
+      "wall_time_delta_pct": 0.055224721048925375
+    },
+    "docatlas_context_injected - repo_only_strict_offline": {
+      "contract_score_delta": {
+        "behavioral": null,
+        "generated_file": null,
+        "project_convention": null,
+        "version": null
+      },
+      "forbidden_edit_delta_median": null,
+      "hidden_pass_delta_mean": null,
+      "input_token_delta_median": null,
+      "network_attempt_delta_median": null,
+      "output_token_delta_median": null,
+      "pairs": 0,
+      "policy_clean_delta_mean": null,
+      "resolved_delta_mean": null,
+      "token_delta_pct": null,
+      "total_token_delta_median": null,
+      "wall_time_delta_median": null,
+      "wall_time_delta_pct": null
+    },
+    "docatlas_tool_recommended - repo_only_strict_offline": {
+      "contract_score_delta": {
+        "behavioral": 0.0,
+        "generated_file": 0.0,
+        "project_convention": 0.0,
+        "version": 0.0
+      },
+      "forbidden_edit_delta_median": 0.0,
+      "hidden_pass_delta_mean": 0.0,
+      "input_token_delta_median": 150408.0,
+      "network_attempt_delta_median": 0.0,
+      "output_token_delta_median": 369.0,
+      "pairs": 9,
+      "policy_clean_delta_mean": -0.1111111111111111,
+      "resolved_delta_mean": -0.1111111111111111,
+      "token_delta_pct": 0.9021421004435027,
+      "total_token_delta_median": 150729.0,
+      "wall_time_delta_median": 54.9246,
+      "wall_time_delta_pct": 0.6566495743253825
+    },
+    "repo_only_web_audited - repo_only_strict_offline": {
+      "contract_score_delta": {
+        "behavioral": 0.0,
+        "generated_file": 0.0,
+        "project_convention": 0.0,
+        "version": 0.0
+      },
+      "forbidden_edit_delta_median": 0.0,
+      "hidden_pass_delta_mean": 0.0,
+      "input_token_delta_median": 45648.0,
+      "network_attempt_delta_median": 0.0,
+      "output_token_delta_median": 946.0,
+      "pairs": 9,
+      "policy_clean_delta_mean": 0.1111111111111111,
+      "resolved_delta_mean": 0.1111111111111111,
+      "token_delta_pct": 0.2810526756803668,
+      "total_token_delta_median": 46958.0,
+      "wall_time_delta_median": 19.460899999999995,
+      "wall_time_delta_pct": 0.23266426521064942
+    }
+  }
+}
