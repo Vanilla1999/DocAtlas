@@ -14,6 +14,11 @@ NBO_SMOKE_TASKS = {
     "real_project_nbo_generated_source_001",
 }
 
+NBO_REJECTED_HARD_TASKS = {
+    "real_project_nbo_distributed_permission_policy_001",
+    "real_project_nbo_cross_module_permission_contract_001",
+}
+
 
 def test_existing_nbo_tasks_marked_smoke_not_differentiating():
     tasks = {task.task_id: task for task in load_tasks(TASKS_PATH)}
@@ -25,6 +30,20 @@ def test_existing_nbo_tasks_marked_smoke_not_differentiating():
         assert task.differentiating is False
         assert task.selection_status == "rejected_too_easy"
         assert task.selection_reason == "repo_only_strict_offline resolved in pilot; useful as regression/smoke, not proof-of-value"
+
+
+def test_rejected_too_easy_tasks_do_not_count_as_differentiating():
+    tasks = {task.task_id: task for task in load_tasks(TASKS_PATH)}
+
+    for task_id in NBO_REJECTED_HARD_TASKS:
+        task = tasks[task_id]
+        assert task.source_project == "nbo"
+        assert task.role == "smoke"
+        assert task.differentiating is False
+        assert task.selection_status == "rejected_too_easy"
+        assert task.selection_reason == (
+            "repo_only_strict_offline resolved 2/2 during screening; useful as regression/smoke, not proof-of-value"
+        )
 
 
 def test_task_selection_rejects_repo_only_2_of_2():

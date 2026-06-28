@@ -1,0 +1,114 @@
+[
+  {
+    "task_id": "real_project_nbo_generated_policy_source_001",
+    "source_project": "nbo",
+    "candidate_type": "generated_file_trap",
+    "docatlas_relevance_score": 7,
+    "repo_only_difficulty_score": 8,
+    "fairness_score": 8,
+    "privacy_risk_score": 1,
+    "fixture_cost_score": 5,
+    "recommended": true,
+    "reason": "Meets pre-implementation thresholds for a mined real-project candidate.",
+    "candidate_name": "Generated permission metadata source-of-truth mismatch",
+    "source_type": "generated_file_trap",
+    "why_it_might_beat_repo_only": "A generated model output appears to miss a policy flag, but the visible convention says edits must happen in the source model.",
+    "visible_context_needed": [
+      "docs/generated-files.md",
+      "permission source model",
+      "generated model output",
+      "architecture notes"
+    ],
+    "tempting_wrong_fix": [
+      "edit generated .freezed.dart output",
+      "duplicate metadata in provider",
+      "patch only the public test fixture"
+    ],
+    "privacy_risk": "Sanitized summary only; no private URLs, sensitive records, or raw history.",
+    "estimated_fixture_size": "medium",
+    "selection_recommendation": "implement_next"
+  },
+  {
+    "task_id": "real_project_nbo_permission_handler_version_001",
+    "source_project": "nbo",
+    "candidate_type": "dependency_trap",
+    "docatlas_relevance_score": 8,
+    "repo_only_difficulty_score": 8,
+    "fairness_score": 8,
+    "privacy_risk_score": 1,
+    "fixture_cost_score": 7,
+    "recommended": false,
+    "reason": "fixture cost above 6",
+    "candidate_name": "Pinned permission-handler API mismatch",
+    "source_type": "dependency_trap",
+    "why_it_might_beat_repo_only": "A permission status mapping bug should be fixed against the lockfile-pinned API rather than latest public API memory.",
+    "visible_context_needed": [
+      "pubspec.lock",
+      "dependency usage notes",
+      "permission mapping source",
+      "fake status tests"
+    ],
+    "tempting_wrong_fix": [
+      "invent latest-only enum members",
+      "change dependency versions",
+      "patch platform-specific branch only"
+    ],
+    "privacy_risk": "Sanitized summary only; no private URLs, sensitive records, or raw history.",
+    "estimated_fixture_size": "medium-large",
+    "selection_recommendation": "do_not_implement_yet"
+  },
+  {
+    "task_id": "real_project_historical_architecture_contract_001",
+    "source_project": "sanitized_real_project",
+    "candidate_type": "historical_fix",
+    "docatlas_relevance_score": 7,
+    "repo_only_difficulty_score": 7,
+    "fairness_score": 8,
+    "privacy_risk_score": 6,
+    "fixture_cost_score": 7,
+    "recommended": false,
+    "reason": "privacy risk above 3; fixture cost above 6",
+    "candidate_name": "Historical architecture-sensitive behavior fix",
+    "source_type": "historical_fix",
+    "why_it_might_beat_repo_only": "A real fix commit shape where behavior changed in one module while the contract lived in docs and tests elsewhere.",
+    "visible_context_needed": [
+      "ADR/convention document",
+      "caller module",
+      "shared service",
+      "public behavior tests"
+    ],
+    "tempting_wrong_fix": [
+      "local caller-only patch",
+      "test-specific branch",
+      "bypass shared service"
+    ],
+    "privacy_risk": "Sanitized summary only; no private URLs, sensitive records, or raw history.",
+    "estimated_fixture_size": "large",
+    "selection_recommendation": "do_not_implement_yet"
+  },
+  {
+    "task_id": "real_project_nbo_existing_public_test_patch_001",
+    "source_project": "nbo",
+    "candidate_type": "adr_mismatch",
+    "docatlas_relevance_score": 1,
+    "repo_only_difficulty_score": 0,
+    "fairness_score": 8,
+    "privacy_risk_score": 1,
+    "fixture_cost_score": 2,
+    "recommended": false,
+    "reason": "DocAtlas relevance below 7; repo-only difficulty below 7; public tests reveal the likely patch",
+    "candidate_name": "Obvious public-test patch anti-candidate",
+    "source_type": "adr_mismatch",
+    "why_it_might_beat_repo_only": "A documented mismatch where the public test names the exact method and expected replacement, making it a poor differentiator.",
+    "visible_context_needed": [
+      "public test",
+      "single nearby source file"
+    ],
+    "tempting_wrong_fix": [
+      "the same one-line fix public tests already reveal"
+    ],
+    "privacy_risk": "Sanitized summary only; no private URLs, sensitive records, or raw history.",
+    "estimated_fixture_size": "small",
+    "selection_recommendation": "do_not_implement_yet"
+  }
+]

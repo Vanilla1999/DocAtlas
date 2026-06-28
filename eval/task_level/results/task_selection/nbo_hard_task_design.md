@@ -4,6 +4,8 @@ Purpose: define harder NBO-derived candidate tasks before implementing them. The
 
 The previous distributed permission-policy candidate was rejected because the public failing behavior pointed directly to the missing permission list update. The new candidate should make the tempting local fix pass some visible tests but fail hidden shared-contract tests.
 
+Update: both implemented permission-family hard candidates were rejected by screening because `repo_only_strict_offline` resolved `2/2`. Keep them as smoke/regression fixtures, but do not continue hand-designing similar permission fixtures for proof-of-value. Use `eval/task_level/task_mining/` and `eval/task_level/results/task_selection/mined_candidates.*` before implementing another real-project task.
+
 ## Design Principles
 
 - Issue text should describe user-visible symptoms, not the implementation path.
@@ -12,6 +14,7 @@ The previous distributed permission-policy candidate was rejected because the pu
 - Candidates should include tempting wrong locations that are plausible from nearby code alone.
 - Candidates should include pinned-version traps where latest public docs may mislead the agent.
 - Candidates should be screened with `repo_only_strict_offline` before any full 4-condition pilot.
+- Larger sanitized fixtures are acceptable when narrow fixtures make the answer obvious: include surrounding modules, separate docs/ADR locations, lockfile/dependency notes, and multiple plausible edit locations without including full app snapshots, raw history, private remotes, or sensitive records.
 
 Bad issue text: `Add Permission.notification to PermissionService when sdkInt >= 33.`
 

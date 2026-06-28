@@ -102,7 +102,7 @@ def test_nbo_distributed_task_manifest_metadata():
 
     assert task.task_type == "real"
     assert task.source_project == "nbo"
-    assert task.role == "rejected"
+    assert task.role == "smoke"
     assert task.differentiating is False
     assert task.selection_status == "rejected_too_easy"
     assert set(task.docatlas_relevance) == {"project_docs", "pinned_dependency", "architecture_constraint", "private_local_context"}

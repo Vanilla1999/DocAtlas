@@ -164,3 +164,13 @@ NBO cross-module permission candidate implementation:
 - The intended context spans README, permission architecture docs, browser docs, scan docs, generated-file policy, permission service, and two flow gates.
 - Validation passed for the cross-module candidate, but screening also rejected it as too easy: `repo_only_strict_offline` resolved `2/2`, policy-clean, with zero network attempts and clean artifact integrity.
 - Full 4-condition pilot was not run for this candidate. The diagnosis remains `ITERATE_TASK_DESIGN`.
+
+Historical real-project task mining workflow:
+
+- The implemented NBO permission-family hard candidates are retained as smoke/regression fixtures, not differentiating proof-of-value tasks. They remain useful for fixture validation, screening-gate, policy-audit, DocAtlas workflow, and artifact-integrity regressions.
+- A pre-implementation mining workflow now lives under `eval/task_level/task_mining/`. It scores sanitized candidate task shapes before investing in full fixture templates, hidden tests, or oracle patches.
+- Supported source types are historical fixes, existing TODO/failing behavior or ADR mismatches, pinned-dependency traps, and generated-file/source-of-truth traps.
+- Committed mining reports are sanitized summaries only: `eval/task_level/results/task_selection/mined_candidates.md` and `eval/task_level/results/task_selection/mined_candidates.json` exclude raw history, private remotes, access material, user records, and full business domain details.
+- Larger sanitized fixture mode is now preferred for the next attempt: include surrounding modules, separate docs/ADR constraints, lockfile/dependency notes, and at least two plausible edit locations, while still excluding full app snapshots and sensitive material.
+- Current mining output finds one threshold-passing candidate shape, `real_project_nbo_generated_policy_source_001`, but no fixture has been implemented or screened yet.
+- Current diagnosis is `READY_TO_IMPLEMENT_MINED_CANDIDATE`. This is not a DocAtlas improvement claim; implementation, validation, strict-offline screening, and possibly a full pilot remain required before any causal claim.
