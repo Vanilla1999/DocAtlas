@@ -230,3 +230,15 @@ Interpretation:
 
 Direct answer: current tests do say something useful: DocAtlas can be adopted/used and may improve quality in some historical paired workflows, but current artifacts do not show an efficient or statistically strong advantage over repo-only.
 
+Project constraint compiler direction:
+
+- The next research direction is to treat DocAtlas as a project constraint compiler for coding agents, not only as a docs retrieval tool.
+- The proposed pipeline is: docs storage/index -> retrieval/source selection -> context pack -> project constraints/action checklist -> patch validation.
+- The product surface under evaluation shifts from `get_docs_context` returning snippets to `get_patch_constraints` returning source-attributed patch obligations and `validate_patch_against_constraints` checking patches against them.
+- This is not a Context7 clone: Context7 answers how to use an API; DocAtlas should answer which repository-specific constraints a patch must satisfy.
+- Guardrail remains unchanged: no broad superiority claim is supported until a stronger benchmark shows policy-clean quality improvements with separated retrieval/fallback accounting and acceptable token overhead.
+
+## Project constraint compiler direction
+
+A product RFC now lives at `docs/research/project-constraint-compiler-rfc.md`. The direction is to keep `get_docs_context` as the docs/snippets/context surface while prototyping `get_patch_constraints` and `validate_patch_against_constraints` for source-attributed project rules, action checks, and conservative post-patch validation. This is explicitly not a Context7 clone: Context7 answers API-usage questions, while DocAtlas should answer which repository constraints a patch must satisfy. The current verdict remains `QUALITY_POSITIVE_COSTLY`; no broad DocAtlas superiority claim is supported.
+
