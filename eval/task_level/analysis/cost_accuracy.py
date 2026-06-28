@@ -394,6 +394,7 @@ def compute_condition_metrics(records: list[NormalizedRun], *, task_role_filter:
         public_pass = sum(r.public_tests for r in items)
         total_tokens_sum = sum(r.total_tokens for r in items if r.total_tokens is not None)
         wall_time_sum = sum(r.wall_time_seconds for r in items if r.wall_time_seconds is not None)
+        workflow_success = sum(r.resolved or r.context_used or r.checklist_used for r in items)
         metrics[condition] = {
             "runs": runs,
             "resolved": resolved,
@@ -401,6 +402,7 @@ def compute_condition_metrics(records: list[NormalizedRun], *, task_role_filter:
             "public_pass_rate": _rate(public_pass, runs),
             "hidden_pass_rate": _rate(hidden_pass, runs),
             "policy_clean_resolved_rate": _rate(policy_clean_resolved, runs),
+            "workflow_success_rate": _rate(workflow_success, runs),
             "network_violation_rate": _rate(sum(r.network_attempts > 0 or not r.policy_clean for r in items), runs),
             "forbidden_edit_rate": _rate(sum(r.forbidden_file_edits > 0 for r in items), runs),
             "median_input_tokens": _median(r.input_tokens for r in items),
