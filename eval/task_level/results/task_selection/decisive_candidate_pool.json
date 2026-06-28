@@ -26,7 +26,11 @@
     "recommended": true,
     "reason": "Meets thresholds; high generated-file and distributed-doc relevance. Previous similar narrow task was too easy, so this would need a larger snapshot.",
     "source_type": "generated_file_trap",
-    "selection_recommendation": "implement_next"
+    "selection_recommendation": "redesign_before_full_pilot",
+    "implementation_status": "implemented_and_screened",
+    "screening_run_id": "decisive_nbo_generated_policy_source_001_screening_001",
+    "screening_status": "rejected_too_easy",
+    "screening_reason": "repo_only_strict_offline resolved 2/2 with policy_clean=true, artifact_integrity_ok=true, fairness_clean=true"
   },
   {
     "candidate_id": "decisive_nbo_permission_handler_version_001",

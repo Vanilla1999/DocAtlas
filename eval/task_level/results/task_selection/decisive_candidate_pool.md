@@ -15,6 +15,7 @@ Scoring thresholds for `recommended=true`: DocAtlas relevance >=7, repo-only dif
 - privacy risk: low; can sanitize to permission module only
 - fixture size estimate: medium
 - scores: DocAtlas 8/10; repo_only difficulty 8/10; fairness 9/10; privacy risk 1/10; fixture cost 5/10
+- selection status: implemented and screened in `decisive_nbo_generated_policy_source_001_screening_001`; rejected_too_easy because `repo_only_strict_offline` resolved 2/2 with policy clean, artifact integrity clean, and fairness clean
 - recommended: true
 - reason: Meets thresholds; high generated-file and distributed-doc relevance. Previous similar narrow task was too easy, so this would need a larger snapshot.
 
