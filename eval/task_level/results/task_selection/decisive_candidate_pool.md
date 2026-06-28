@@ -30,6 +30,7 @@ Scoring thresholds for `recommended=true`: DocAtlas relevance >=7, repo-only dif
 - privacy risk: low after manifest/module sanitization
 - fixture size estimate: medium-large
 - scores: DocAtlas 8/10; repo_only difficulty 8/10; fairness 8/10; privacy risk 1/10; fixture cost 7/10
+- selection status: implemented and screened in `decisive_nbo_permission_handler_version_001_screening_001`; rejected_too_easy because `repo_only_strict_offline` resolved 2/2 with policy clean, artifact integrity clean, and fairness clean
 - recommended: true
 - reason: Meets thresholds at the maximum allowed fixture cost; implement only if a sanitized lockfile/version snapshot can stay within scope.
 
