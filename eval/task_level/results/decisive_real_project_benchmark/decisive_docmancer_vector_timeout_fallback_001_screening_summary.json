@@ -1,0 +1,26 @@
+{
+  "artifact_integrity": {
+    "expected_total_runs": 2,
+    "finished": true,
+    "in_memory_results": 2,
+    "ok": true,
+    "reason": null,
+    "runs_jsonl_records": 2
+  },
+  "candidate_status": "accepted",
+  "decision_reason": "strict offline did not resolve all repeats",
+  "fairness": {
+    "clean": true,
+    "hidden_oracle_only": false,
+    "reviewed": true
+  },
+  "next_action": "eligible for full 4-condition pilot",
+  "repo_only_screening": {
+    "network_attempts": 0,
+    "policy_clean": true,
+    "repeats": 2,
+    "resolved": 0
+  },
+  "source_project": "docmancer",
+  "task_id": "decisive_docmancer_vector_timeout_fallback_001"
+}

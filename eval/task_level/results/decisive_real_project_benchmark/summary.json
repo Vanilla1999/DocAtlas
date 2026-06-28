@@ -1,115 +1,281 @@
 {
-  "generated_at": "2026-06-28T09:08:54Z",
-  "verdict": "INCONCLUSIVE",
-  "direct_answer": "Inconclusive, because accepted task pool is still insufficient: latest screening has 1 accepted task, below the required 3.",
+  "generated_at": "2026-06-28T10:14:47Z",
+  "verdict": "NEGATIVE_SIGNAL",
+  "confidence": "low",
+  "direct_answer": "No. In the decisive low-confidence pilot, DocAtlas conditions did not outperform repo_only baselines on resolved rate or contract scores.",
   "candidate_pool": {
     "mined": 12,
     "recommended": 7,
-    "implemented": 2,
-    "accepted": 1,
-    "rejected_too_easy_decisive_cycle": 6,
+    "implemented": 5,
+    "accepted": 3,
+    "rejected_too_easy_decisive_cycle": 7,
     "rejected_unfair_decisive_cycle": 0,
-    "needs_redesign_or_implementation": 5,
     "screened_existing_fixtures": 5,
-    "screened_new_candidates": 2
+    "screened_new_candidates": 5,
+    "accepted_tasks": [
+      "real_project_nbo_001",
+      "decisive_docmancer_vector_timeout_fallback_001",
+      "decisive_nbo_cross_module_gate_large_001"
+    ],
+    "accepted_caveats": [
+      "decisive_docmancer_vector_timeout_fallback_001 is self-referential Docmancer workflow/regression evidence, not external proof alone"
+    ]
   },
   "pilot": {
-    "run": false,
-    "reason": "accepted task pool is insufficient",
-    "accepted_tasks": [
+    "run": true,
+    "run_id": "decisive_full_pilot_001",
+    "repeats": 1,
+    "confidence": "low",
+    "expected_runs": 12,
+    "completed_runs": 12,
+    "conditions": [
+      "docatlas_action_checklist_injected",
+      "docatlas_tool_recommended",
+      "repo_only_strict_offline",
+      "repo_only_web_audited"
+    ],
+    "tasks": [
+      "decisive_docmancer_vector_timeout_fallback_001",
+      "decisive_nbo_cross_module_gate_large_001",
       "real_project_nbo_001"
     ],
-    "missing_requirement": "at least 3 accepted real-project tasks; latest evidence has 1 accepted and two additional decisive candidates rejected too easy"
-  },
-  "condition_results": {},
-  "metrics_available": false,
-  "artifact_integrity": "clean_for_decisive_existing_screening_001_and_new_candidate_screenings; not_applicable_for_full_pilot",
-  "fairness_review": "clean_for_screened_tasks; not_applicable_for_unimplemented_decisive_candidate_pool",
-  "can_claim": [
-    "A sanitized decisive candidate pool exists for the next benchmark iteration.",
-    "Current evidence does not support a positive DocAtlas-over-repo-only claim.",
-    "The current benchmark verdict is INCONCLUSIVE."
-  ],
-  "cannot_claim": [
-    "DocAtlas improves coding agents on real patches.",
-    "DocAtlas beats repo_only_strict_offline.",
-    "DocAtlas beats Context7.",
-    "DocAtlas vector retrieval is robust for this benchmark.",
-    "A decisive real-project causal pilot has completed."
-  ],
-  "screening": {
-    "run_id": "decisive_existing_screening_001",
-    "screened": 5,
-    "accepted": 1,
-    "rejected_too_easy": 6,
-    "rejected_unfair": 0,
-    "artifact_integrity_ok": true,
-    "policy_clean": true,
-    "accepted_tasks": [
-      "real_project_nbo_001"
-    ],
-    "additional_screening_run_ids": [
-      "decisive_nbo_generated_policy_source_001_screening_001",
-      "decisive_nbo_permission_handler_version_001_screening_001"
-    ],
-    "new_rejected_too_easy_tasks": [
-      "decisive_nbo_generated_policy_source_001",
-      "decisive_nbo_permission_handler_version_001"
-    ],
-    "rejected_too_easy_total": 6
-  },
-  "additional_screenings": [
-    {
-      "run_id": "decisive_nbo_generated_policy_source_001_screening_001",
-      "task_id": "decisive_nbo_generated_policy_source_001",
-      "source_project": "nbo",
-      "candidate_status": "rejected_too_easy",
-      "repo_only_screening": {
-        "repeats": 2,
-        "resolved": 2,
-        "policy_clean": true,
-        "network_attempts": 0
-      },
-      "fairness": {
-        "reviewed": true,
-        "clean": true,
-        "hidden_oracle_only": false
-      },
-      "artifact_integrity": {
-        "expected_total_runs": 2,
-        "finished": true,
-        "in_memory_results": 2,
-        "runs_jsonl_records": 2,
-        "ok": true
-      },
-      "decision_reason": "strict offline resolved all repeats",
-      "next_action": "redesign candidate before full pilot"
-    },
-    {
-      "run_id": "decisive_nbo_permission_handler_version_001_screening_001",
-      "task_id": "decisive_nbo_permission_handler_version_001",
-      "source_project": "nbo",
-      "candidate_status": "rejected_too_easy",
-      "repo_only_screening": {
-        "repeats": 2,
-        "resolved": 2,
-        "policy_clean": true,
-        "network_attempts": 0
-      },
-      "fairness": {
-        "reviewed": true,
-        "clean": true,
-        "hidden_oracle_only": false
-      },
-      "artifact_integrity": {
-        "expected_total_runs": 2,
-        "finished": true,
-        "in_memory_results": 2,
-        "runs_jsonl_records": 2,
-        "ok": true
-      },
-      "decision_reason": "strict offline resolved all repeats",
-      "next_action": "redesign candidate before full pilot"
+    "artifact_integrity": {
+      "expected_total_runs": 12,
+      "finished": true,
+      "in_memory_results": 12,
+      "ok": true,
+      "reason": null,
+      "runs_jsonl_records": 12
     }
-  ]
+  },
+  "condition_results": {
+    "docatlas_action_checklist_injected": {
+      "runs": 3,
+      "resolved": 0,
+      "policy_clean": 3,
+      "public_passed": 2,
+      "hidden_passed": 1,
+      "network_attempts": 0,
+      "agent_docatlas_calls": 0,
+      "context_used": 3,
+      "checklist_used": 2,
+      "median_wall_time_seconds": 87.9849,
+      "input_tokens_total": 554360,
+      "output_tokens_total": 10763,
+      "retrieval_statuses": [],
+      "fallback_used": 1
+    },
+    "docatlas_tool_recommended": {
+      "runs": 3,
+      "resolved": 0,
+      "policy_clean": 3,
+      "public_passed": 2,
+      "hidden_passed": 1,
+      "network_attempts": 0,
+      "agent_docatlas_calls": 12,
+      "context_used": 3,
+      "checklist_used": 0,
+      "median_wall_time_seconds": 125.6484,
+      "input_tokens_total": 1059320,
+      "output_tokens_total": 12609,
+      "retrieval_statuses": [],
+      "fallback_used": 0
+    },
+    "repo_only_strict_offline": {
+      "runs": 3,
+      "resolved": 0,
+      "policy_clean": 3,
+      "public_passed": 2,
+      "hidden_passed": 1,
+      "network_attempts": 0,
+      "agent_docatlas_calls": 0,
+      "context_used": 0,
+      "checklist_used": 0,
+      "median_wall_time_seconds": 86.3027,
+      "input_tokens_total": 501222,
+      "output_tokens_total": 9374,
+      "retrieval_statuses": [],
+      "fallback_used": 0
+    },
+    "repo_only_web_audited": {
+      "runs": 3,
+      "resolved": 0,
+      "policy_clean": 3,
+      "public_passed": 2,
+      "hidden_passed": 1,
+      "network_attempts": 0,
+      "agent_docatlas_calls": 0,
+      "context_used": 0,
+      "checklist_used": 0,
+      "median_wall_time_seconds": 85.6566,
+      "input_tokens_total": 556988,
+      "output_tokens_total": 10632,
+      "retrieval_statuses": [],
+      "fallback_used": 0
+    }
+  },
+  "per_task_results": {
+    "decisive_docmancer_vector_timeout_fallback_001": {
+      "docatlas_action_checklist_injected": {
+        "resolved": false,
+        "public": true,
+        "hidden": false,
+        "behavior_score": null,
+        "project_score": null,
+        "version_score": null,
+        "generated_file_score": null,
+        "policy_clean": true,
+        "context_used": true
+      },
+      "docatlas_tool_recommended": {
+        "resolved": false,
+        "public": true,
+        "hidden": false,
+        "behavior_score": null,
+        "project_score": null,
+        "version_score": null,
+        "generated_file_score": null,
+        "policy_clean": true,
+        "context_used": true
+      },
+      "repo_only_strict_offline": {
+        "resolved": false,
+        "public": true,
+        "hidden": false,
+        "behavior_score": null,
+        "project_score": null,
+        "version_score": null,
+        "generated_file_score": null,
+        "policy_clean": true,
+        "context_used": false
+      },
+      "repo_only_web_audited": {
+        "resolved": false,
+        "public": true,
+        "hidden": false,
+        "behavior_score": null,
+        "project_score": null,
+        "version_score": null,
+        "generated_file_score": null,
+        "policy_clean": true,
+        "context_used": false
+      }
+    },
+    "decisive_nbo_cross_module_gate_large_001": {
+      "docatlas_action_checklist_injected": {
+        "resolved": false,
+        "public": true,
+        "hidden": false,
+        "behavior_score": null,
+        "project_score": null,
+        "version_score": null,
+        "generated_file_score": null,
+        "policy_clean": true,
+        "context_used": true
+      },
+      "docatlas_tool_recommended": {
+        "resolved": false,
+        "public": true,
+        "hidden": false,
+        "behavior_score": null,
+        "project_score": null,
+        "version_score": null,
+        "generated_file_score": null,
+        "policy_clean": true,
+        "context_used": true
+      },
+      "repo_only_strict_offline": {
+        "resolved": false,
+        "public": true,
+        "hidden": false,
+        "behavior_score": null,
+        "project_score": null,
+        "version_score": null,
+        "generated_file_score": null,
+        "policy_clean": true,
+        "context_used": false
+      },
+      "repo_only_web_audited": {
+        "resolved": false,
+        "public": true,
+        "hidden": false,
+        "behavior_score": null,
+        "project_score": null,
+        "version_score": null,
+        "generated_file_score": null,
+        "policy_clean": true,
+        "context_used": false
+      }
+    },
+    "real_project_nbo_001": {
+      "docatlas_action_checklist_injected": {
+        "resolved": false,
+        "public": false,
+        "hidden": true,
+        "behavior_score": null,
+        "project_score": null,
+        "version_score": null,
+        "generated_file_score": null,
+        "policy_clean": true,
+        "context_used": true
+      },
+      "docatlas_tool_recommended": {
+        "resolved": false,
+        "public": false,
+        "hidden": true,
+        "behavior_score": null,
+        "project_score": null,
+        "version_score": null,
+        "generated_file_score": null,
+        "policy_clean": true,
+        "context_used": true
+      },
+      "repo_only_strict_offline": {
+        "resolved": false,
+        "public": false,
+        "hidden": true,
+        "behavior_score": null,
+        "project_score": null,
+        "version_score": null,
+        "generated_file_score": null,
+        "policy_clean": true,
+        "context_used": false
+      },
+      "repo_only_web_audited": {
+        "resolved": false,
+        "public": false,
+        "hidden": true,
+        "behavior_score": null,
+        "project_score": null,
+        "version_score": null,
+        "generated_file_score": null,
+        "policy_clean": true,
+        "context_used": false
+      }
+    }
+  },
+  "comparison": {
+    "policy_clean_resolved_delta_vs_repo_only_strict_offline": {
+      "docatlas_tool_recommended": 0,
+      "docatlas_action_checklist_injected": 0
+    },
+    "resolved_rate_result": "All four conditions resolved 0/3. No DocAtlas resolved-rate improvement.",
+    "contract_score_result": "No DocAtlas condition improved contract scores on >=2 accepted tasks; most scores were identical to repo-only or zero.",
+    "overhead_result": "DocAtlas tool/checklist conditions used context, but had no correctness gain and generally higher token/time cost than repo_only_strict_offline."
+  },
+  "claims": {
+    "can_claim": [
+      "A 3-task x 4-condition x 1-repeat decisive pilot completed with clean artifact integrity.",
+      "DocAtlas context was used/adopted in DocAtlas conditions.",
+      "In this low-confidence pilot, DocAtlas did not improve resolved rate over repo_only_strict_offline.",
+      "The current verdict is NEGATIVE_SIGNAL, low confidence."
+    ],
+    "cannot_claim": [
+      "DocAtlas improves coding agents on real patches.",
+      "DocAtlas beats repo_only_strict_offline.",
+      "DocAtlas beats Context7.",
+      "DocAtlas vector retrieval is robust; one NBO checklist run used fallback_local_project_context and the pilot is too small.",
+      "This is a statistically strong result; repeats=1 and one task is self-referential."
+    ]
+  }
 }

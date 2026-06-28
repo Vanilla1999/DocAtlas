@@ -1,0 +1,34 @@
+diff --git a/src/docmancer_benchmark/context_accounting.py b/src/docmancer_benchmark/context_accounting.py
+--- a/src/docmancer_benchmark/context_accounting.py
++++ b/src/docmancer_benchmark/context_accounting.py
+@@ -49,16 +49,22 @@ def summarize_context_injection(*, retrieval_error: str | None, context_used: bo
+             warnings=(),
+         )
+ 
+-    # BUG: fallback is currently counted as successful vector retrieval, and the
+-    # timeout flag is lost even when the error clearly came from the vector path.
++    normalized_error = retrieval_error.lower()
++    vector_indexing_timed_out = any(
++        marker in normalized_error
++        for marker in ("exceeded 45 seconds", "timed out", "timeout")
++    )
+     return ContextInjectionSummary(
+-        status="success",
+-        docatlas_retrieval_status="success",
+-        vector_indexing_timed_out=False,
++        status="fallback_local_project_context",
++        docatlas_retrieval_status="fallback_local_project_context",
++        vector_indexing_timed_out=vector_indexing_timed_out,
+         fallback_used=True,
+         fallback_source="visible_fixture_project_docs",
+-        harness_docatlas_calls=1,
+-        vector_retrieval_success=True,
++        harness_docatlas_calls=0,
++        vector_retrieval_success=False,
+         context_used=context_used,
+-        warnings=(f"fallback used after DocAtlas retrieval error: {retrieval_error}",),
++        warnings=(
++            "DocAtlas retrieval failed; using visible project-doc fallback. "
++            f"Original error: {retrieval_error}",
++        ),
+     )

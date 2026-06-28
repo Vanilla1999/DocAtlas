@@ -45,6 +45,7 @@ Scoring thresholds for `recommended=true`: DocAtlas relevance >=7, repo-only dif
 - privacy risk: low if permission domain is sanitized
 - fixture size estimate: large
 - scores: DocAtlas 9/10; repo_only difficulty 8/10; fairness 9/10; privacy risk 1/10; fixture cost 7/10
+- selection status: implemented and screened in `decisive_nbo_cross_module_gate_large_001_screening_001`; accepted because `repo_only_strict_offline` resolved 0/2 with policy clean, artifact integrity clean, and fairness clean
 - recommended: true
 - reason: Meets thresholds at the maximum allowed fixture cost; current narrow implementation was too easy, so a redesigned larger fixture must preserve fairness without overspecifying the issue.
 
@@ -59,6 +60,7 @@ Scoring thresholds for `recommended=true`: DocAtlas relevance >=7, repo-only dif
 - privacy risk: low
 - fixture size estimate: medium
 - scores: DocAtlas 9/10; repo_only difficulty 7/10; fairness 9/10; privacy risk 1/10; fixture cost 5/10
+- selection status: implemented and screened in `decisive_nbo_browser_scan_policy_001_screening_001`; rejected_too_easy because `repo_only_strict_offline` resolved 2/2 with policy clean, artifact integrity clean, and fairness clean
 - recommended: true
 - reason: Meets thresholds, but an earlier narrower implementation screened too easy; needs less explicit issue text/larger distractor surface.
 
@@ -73,6 +75,7 @@ Scoring thresholds for `recommended=true`: DocAtlas relevance >=7, repo-only dif
 - privacy risk: low public repo
 - fixture size estimate: medium
 - scores: DocAtlas 8/10; repo_only difficulty 7/10; fairness 8/10; privacy risk 1/10; fixture cost 5/10
+- selection status: implemented and screened in `decisive_docmancer_vector_timeout_fallback_001_screening_001`; accepted because `repo_only_strict_offline` resolved 0/2, with self-referential Docmancer caveat
 - recommended: true
 - reason: Meets thresholds, but it is self-referential to DocAtlas and should be used cautiously as regression, not external proof.
 

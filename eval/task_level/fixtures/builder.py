@@ -20,6 +20,9 @@ FIXTURE_TASKS = {
     "real_project_nbo_generated_source_001",
     "decisive_nbo_generated_policy_source_001",
     "decisive_nbo_permission_handler_version_001",
+    "decisive_docmancer_vector_timeout_fallback_001",
+    "decisive_nbo_browser_scan_policy_001",
+    "decisive_nbo_cross_module_gate_large_001",
     "real_project_nbo_distributed_permission_policy_001",
     "real_project_nbo_cross_module_permission_contract_001",
 }

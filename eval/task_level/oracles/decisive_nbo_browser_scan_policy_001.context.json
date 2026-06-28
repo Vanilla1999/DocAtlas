@@ -1,0 +1,49 @@
+{
+  "task_id": "decisive_nbo_browser_scan_policy_001",
+  "source_project": "nbo",
+  "required_visible_sources": [
+    "README.md",
+    "lib/modules/permission/ARCHITECTURE.md",
+    "docs/browser-scan-preflight.md",
+    "docs/permission-notifications.md",
+    "docs/permission-location.md",
+    "pubspec.lock"
+  ],
+  "expected_docatlas_relevance": [
+    "project_docs",
+    "pinned_dependency",
+    "architecture_constraint",
+    "cross_module_contract",
+    "private_local_context"
+  ],
+  "hidden_requirements": [
+    {
+      "requirement": "PermissionService owns browser/scan platform permission policy",
+      "visible_source": "lib/modules/permission/ARCHITECTURE.md"
+    },
+    {
+      "requirement": "browser and scan share the same service-owned preflight for a platform version",
+      "visible_source": "docs/browser-scan-preflight.md"
+    },
+    {
+      "requirement": "Android 13+ notification permission uses Permission.notification from the pinned dependency",
+      "visible_source": "docs/permission-notifications.md"
+    },
+    {
+      "requirement": "Android versions below 13 do not add notification to preflight",
+      "visible_source": "docs/permission-notifications.md"
+    },
+    {
+      "requirement": "Permission.locationAlways remains deferred from initial browser/scan preflight",
+      "visible_source": "docs/permission-location.md"
+    },
+    {
+      "requirement": "provider/generated/dependency files must not be changed for the policy fix",
+      "visible_source": "lib/modules/permission/ARCHITECTURE.md"
+    },
+    {
+      "requirement": "permission_handler remains pinned to 11.4.0",
+      "visible_source": "pubspec.lock"
+    }
+  ]
+}

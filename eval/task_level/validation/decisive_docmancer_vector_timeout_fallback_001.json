@@ -1,0 +1,19 @@
+{
+  "base": {
+    "compile_success": true,
+    "expected_tests_failed": true,
+    "setup_success": true,
+    "unexpected_failures": []
+  },
+  "fixture_hash": "7a846585152a8251951754a567e8613609c10b2d76f88e69513e80fc5eeda1a3",
+  "gold": {
+    "compile_success": true,
+    "hidden_tests_passed": true,
+    "patch_applied": true,
+    "public_tests_passed": true
+  },
+  "oracle_isolated": true,
+  "status": "validated",
+  "task_id": "decisive_docmancer_vector_timeout_fallback_001",
+  "validated_at": "2026-06-28T09:32:21.642797+00:00"
+}

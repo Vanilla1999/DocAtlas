@@ -1,0 +1,19 @@
+{
+  "base": {
+    "compile_success": true,
+    "expected_tests_failed": true,
+    "setup_success": true,
+    "unexpected_failures": []
+  },
+  "fixture_hash": "603712341cdeffb1332492ccbebeb04b022ddf665b1b305c9827765c69a629df",
+  "gold": {
+    "compile_success": true,
+    "hidden_tests_passed": true,
+    "patch_applied": true,
+    "public_tests_passed": true
+  },
+  "oracle_isolated": true,
+  "status": "validated",
+  "task_id": "decisive_nbo_cross_module_gate_large_001",
+  "validated_at": "2026-06-28T09:44:19.317489+00:00"
+}

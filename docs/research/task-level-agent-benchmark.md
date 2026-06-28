@@ -187,3 +187,18 @@ Decisive candidate-pool checkpoint (`decisive_candidate_pool`):
 - Executive verdict for this checkpoint: `INCONCLUSIVE`.
 - Direct answer: no, current evidence does not support saying DocAtlas is better than asking the agent without it; the accepted task pool is still insufficient.
 - Next required work: implement recommended candidates until either 3 tasks are accepted by strict-offline screening or 6 implemented candidates are rejected, then run the full pilot only if the accepted pool reaches 3 tasks.
+
+Decisive full-pilot result (`decisive_full_pilot_001`):
+
+- The accepted-task gate was reached with three accepted tasks: `real_project_nbo_001`, `decisive_docmancer_vector_timeout_fallback_001`, and `decisive_nbo_cross_module_gate_large_001`.
+- Caveat: `decisive_docmancer_vector_timeout_fallback_001` is self-referential to Docmancer and counts only as cautious workflow/regression evidence, not external proof by itself.
+- Matrix executed: 3 accepted tasks x `repo_only_strict_offline`, `repo_only_web_audited`, `docatlas_tool_recommended`, and `docatlas_action_checklist_injected` x 1 repeat = 12 runs.
+- Artifact integrity was clean: `expected_total_runs=12`, `runs_jsonl_records=12`, `ok=true`.
+- Policy audit was clean in all 12 runs; network attempts were 0.
+- Resolved rate was identical across conditions: all four conditions resolved `0/3`.
+- DocAtlas adoption was real in the DocAtlas conditions: `docatlas_tool_recommended` made 12 agent DocAtlas calls and used context in 3/3 tasks; `docatlas_action_checklist_injected` used context in 3/3 tasks and checklist in 2/3 tasks.
+- No DocAtlas condition improved contract scores on at least two accepted tasks.
+- `docatlas_tool_recommended` had higher median wall time and token volume than `repo_only_strict_offline` without correctness gain.
+- Current final verdict: `NEGATIVE_SIGNAL`, low confidence.
+- Direct answer: no, current evidence does not support saying DocAtlas is better than asking the agent without it.
+- The negative signal is limited: repeats=1, one accepted task is self-referential, and one checklist run used fallback-local-project-context, so this is not a statistically strong universal negative claim or robust-vector-retrieval result.

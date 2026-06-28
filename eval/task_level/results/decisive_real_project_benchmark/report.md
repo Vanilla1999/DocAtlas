@@ -1,133 +1,108 @@
 # Decisive Real-Project Task-Level Benchmark Report
 
-Generated: 2026-06-28T08:20:58Z; updated 2026-06-28T09:08:54Z after `decisive_existing_screening_001`, `decisive_nbo_generated_policy_source_001_screening_001`, and `decisive_nbo_permission_handler_version_001_screening_001`.
+Generated: 2026-06-28T09:50:10Z; final analysis after `decisive_full_pilot_001`.
 
 ## Executive verdict
 
-INCONCLUSIVE
+NEGATIVE_SIGNAL
+
+Confidence: low.
 
 ## Direct answer
 
 Can we say DocAtlas is better than asking the agent without it?
 
-Inconclusive, because accepted task pool is still insufficient. Latest strict-offline screening has 1 accepted task, below the required 3 accepted real-project tasks.
+No. In the decisive low-confidence pilot, DocAtlas conditions did not outperform repo-only baselines on resolved rate or contract scores.
 
 ## Candidate pool
 
 - total candidates mined: 12
 - recommended candidates: 7
-- existing fixtures screened in latest existing-fixture run: 5
-- newly implemented candidates screened: 2 (`decisive_nbo_generated_policy_source_001`, `decisive_nbo_permission_handler_version_001`)
-- accepted candidates after latest screening: 1
-- rejected_too_easy after latest screening: 6
-- rejected_unfair after latest screening: 0
-- needs_redesign / implementation: 5 recommended candidates remain; both newly implemented decisive candidates need redesign before any full pilot
+- implemented new decisive candidates: 5
+- accepted tasks: 3
+- rejected_too_easy tasks in decisive cycle: 7
+- rejected_unfair: 0
 
-The candidate pool is recorded in:
+Accepted tasks used in the full pilot:
 
-- `eval/task_level/results/task_selection/decisive_candidate_pool.md`
-- `eval/task_level/results/task_selection/decisive_candidate_pool.json`
+1. `real_project_nbo_001`
+2. `decisive_docmancer_vector_timeout_fallback_001`
+3. `decisive_nbo_cross_module_gate_large_001`
 
-The latest screening summaries are recorded in:
+Caveat: `decisive_docmancer_vector_timeout_fallback_001` is self-referential to Docmancer. It can count as cautious workflow/regression evidence, but not as external proof by itself.
 
-- `eval/task_level/results/decisive_real_project_benchmark/existing_screening_summary.json`
-- `eval/task_level/results/decisive_nbo_generated_policy_source_001_screening_001/screening_summary.json`
-- `eval/task_level/results/decisive_nbo_permission_handler_version_001_screening_001/screening_summary.json`
-- `eval/task_level/results/decisive_real_project_benchmark/decisive_nbo_permission_handler_version_001_screening_summary.json`
-
-## Accepted tasks
-
-### real_project_nbo_001
-
-- source_project: nbo
-- candidate_type: existing real-project fixture
-- why DocAtlas-relevant: project docs, pinned dependency, architecture constraint, generated-file constraint, local context
-- repo_only screening: `repo_only_strict_offline` resolved 1/2, policy-clean, zero network attempts
-- fairness: clean
-- privacy: sanitized NBO fixture scope
-
-This is only 1 accepted task. It is not enough to run or interpret the full decisive pilot.
-
-## Rejected too easy
+Rejected too easy:
 
 - `real_project_nbo_permission_002`: strict offline resolved 2/2
 - `real_project_nbo_generated_source_001`: strict offline resolved 2/2
 - `real_project_nbo_distributed_permission_policy_001`: strict offline resolved 2/2
 - `real_project_nbo_cross_module_permission_contract_001`: strict offline resolved 2/2
-- `decisive_nbo_generated_policy_source_001`: validated, then strict offline resolved 2/2 in `decisive_nbo_generated_policy_source_001_screening_001`; policy clean, artifact integrity clean, fairness clean
-- `decisive_nbo_permission_handler_version_001`: validated, then strict offline resolved 2/2 in `decisive_nbo_permission_handler_version_001_screening_001`; policy clean, artifact integrity clean, fairness clean
+- `decisive_nbo_generated_policy_source_001`: strict offline resolved 2/2
+- `decisive_nbo_permission_handler_version_001`: strict offline resolved 2/2
+- `decisive_nbo_browser_scan_policy_001`: strict offline resolved 2/2
 
-## Screening
+## Pilot result
 
-- run_id: `decisive_existing_screening_001`
-- expected runs: 10
-- completed runs: 10
-- artifact integrity: clean (`ok=true`, `runs_jsonl_records=10`)
-- condition: `repo_only_strict_offline`
-- policy_clean: true for screened summaries
-- network_attempts: 0
+- run_id: `decisive_full_pilot_001`
+- shape: 3 accepted tasks x 4 conditions x 1 repeat
+- expected runs: 12
+- completed runs: 12
+- confidence: low because repeats=1
+- artifact integrity: clean (`ok=true`, `runs_jsonl_records=12`)
+- policy clean: 12/12
+- network attempts: 0
 
-Additional new-candidate screening:
+Condition results:
 
-- run_id: `decisive_nbo_generated_policy_source_001_screening_001`
-- expected runs: 2
-- completed runs: 2
-- artifact integrity: clean (`ok=true`, `runs_jsonl_records=2`)
-- result: rejected_too_easy, `repo_only_strict_offline` resolved 2/2
+| condition | resolved | policy clean | context/docatlas use | median wall time |
+|---|---:|---:|---:|---:|
+| `repo_only_strict_offline` | 0/3 | 3/3 | 0/3 | 86.3027s |
+| `repo_only_web_audited` | 0/3 | 3/3 | 0/3 | 85.6566s |
+| `docatlas_tool_recommended` | 0/3 | 3/3 | 3/3 context used, 12 agent DocAtlas calls | 125.6484s |
+| `docatlas_action_checklist_injected` | 0/3 | 3/3 | 3/3 context used, checklist used 2/3 | 87.9849s |
 
-- run_id: `decisive_nbo_permission_handler_version_001_screening_001`
-- expected runs: 2
-- completed runs: 2
-- artifact integrity: clean (`ok=true`, `runs_jsonl_records=2`)
-- result: rejected_too_easy, `repo_only_strict_offline` resolved 2/2
+Per-task outcome summary:
 
-## Pilot
+- `real_project_nbo_001`: no condition resolved; all conditions had the same contract-score shape in the report.
+- `decisive_docmancer_vector_timeout_fallback_001`: no condition resolved; public passed and hidden failed in every condition.
+- `decisive_nbo_cross_module_gate_large_001`: no condition resolved; public passed and hidden failed in every condition.
 
-pilot not run because:
+## Evidence
 
-- accepted tasks: 1
-- missing requirement: at least 3 accepted real-project tasks are required before the full 4-condition pilot
+What supports the verdict:
 
-## Metrics
+- The accepted-task gate was finally reached: 3 accepted tasks.
+- The full low-confidence pilot completed all 12 expected runs.
+- Artifact integrity was clean.
+- Policy audit was clean in every run.
+- DocAtlas was actually used/adopted in the DocAtlas conditions:
+  - `docatlas_tool_recommended`: 12 agent DocAtlas calls, context used 3/3.
+  - `docatlas_action_checklist_injected`: context used 3/3.
+- Despite that, DocAtlas conditions resolved 0/3, identical to repo-only baselines.
+- DocAtlas conditions did not improve contract scores on at least 2 accepted tasks.
+- Tool-recommended DocAtlas had substantially higher median wall time and token volume than `repo_only_strict_offline` without correctness gain.
 
-No full decisive pilot runs were executed. Therefore the following causal deltas cannot be computed for the decisive pool:
+What weakens confidence:
 
-- policy-clean resolved delta
-- contract-score delta
-- network leakage delta
-- token/time overhead
-- fallback rate
-- DocAtlas call/use rate
-
-## Evidence supporting the verdict
-
-- Baseline task-level test suite passed before this cycle: `108 passed`.
-- A decisive candidate pool with 12 sanitized candidates was created.
-- Latest existing-fixture strict-offline screening completed 10/10 runs with clean artifact integrity.
-- The generated-policy-source candidate validated successfully but screened too easy at 2/2 strict-offline resolved.
-- The dependency-trap permission-handler-version candidate validated successfully but screened too easy at 2/2 strict-offline resolved.
-- Only 1 task is accepted by strict-offline screening; 6 screened tasks are rejected as too easy.
-
-## Evidence weakening any stronger claim
-
-- Accepted task count is 1, below the required minimum of 3.
-- No full 4-condition decisive pilot was run.
-- No decisive run-level DocAtlas condition metrics exist for retrieval/use, fallback dominance, or contract-score improvement.
-- Four screened existing fixtures and two new decisive candidates remain too easy for repo-only strict offline.
+- Repeats=1, so this is a low-confidence pilot, not a statistically strong benchmark.
+- One accepted task is self-referential to Docmancer and should not be treated as external product proof alone.
+- `docatlas_action_checklist_injected` had one fallback-local-project-context path, so this does not prove robust vector retrieval.
+- All conditions resolved 0/3, so the result is a negative signal for this pilot, not a broad universal claim about every possible task.
 
 ## Claims
 
 Can claim:
 
-- A sanitized decisive candidate pool has been prepared for the next benchmark iteration.
-- Latest strict-offline screening evidence found 1 accepted and 6 too-easy tasks.
-- The current evidence does not support a positive DocAtlas-over-repo-only claim.
-- The correct current benchmark verdict is `INCONCLUSIVE`.
+- A 3-task x 4-condition x 1-repeat decisive pilot completed.
+- The pilot had clean artifact integrity and clean policy audit.
+- DocAtlas context/tool use occurred in the DocAtlas conditions.
+- In this low-confidence pilot, DocAtlas did not improve resolved rate over repo-only.
+- Current benchmark verdict: `NEGATIVE_SIGNAL` with low confidence.
 
 Cannot claim:
 
 - DocAtlas improves coding agents on real patches.
 - DocAtlas beats `repo_only_strict_offline`.
 - DocAtlas beats Context7.
-- DocAtlas vector retrieval is robust for this benchmark.
-- The decisive real-project benchmark has completed a causal 4-condition pilot.
+- DocAtlas vector retrieval is robust.
+- This is a statistically strong negative result; the pilot has only one repeat and one self-referential accepted task.

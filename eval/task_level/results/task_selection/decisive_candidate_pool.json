@@ -94,7 +94,11 @@
     "recommended": true,
     "reason": "Meets thresholds at the maximum allowed fixture cost; current narrow implementation was too easy, so a redesigned larger fixture must preserve fairness without overspecifying the issue.",
     "source_type": "cross_module_contract",
-    "selection_recommendation": "implement_next"
+    "selection_recommendation": "eligible_for_full_pilot",
+    "implementation_status": "implemented_and_screened",
+    "screening_run_id": "decisive_nbo_cross_module_gate_large_001_screening_001",
+    "screening_status": "accepted",
+    "screening_reason": "repo_only_strict_offline resolved 0/2 with policy_clean=true, artifact_integrity_ok=true, fairness_clean=true"
   },
   {
     "candidate_id": "decisive_nbo_browser_scan_policy_001",
@@ -123,7 +127,11 @@
     "recommended": true,
     "reason": "Meets thresholds, but an earlier narrower implementation screened too easy; needs less explicit issue text/larger distractor surface.",
     "source_type": "multi_doc_architecture_constraint",
-    "selection_recommendation": "implement_next"
+    "selection_recommendation": "redesign_before_full_pilot",
+    "implementation_status": "implemented_and_screened",
+    "screening_run_id": "decisive_nbo_browser_scan_policy_001_screening_001",
+    "screening_status": "rejected_too_easy",
+    "screening_reason": "repo_only_strict_offline resolved 2/2 with policy_clean=true, artifact_integrity_ok=true, fairness_clean=true"
   },
   {
     "candidate_id": "decisive_docmancer_vector_timeout_fallback_001",
@@ -152,7 +160,11 @@
     "recommended": true,
     "reason": "Meets thresholds, but it is self-referential to DocAtlas and should be used cautiously as regression, not external proof.",
     "source_type": "private_local_workflow",
-    "selection_recommendation": "implement_next"
+    "selection_recommendation": "eligible_for_full_pilot",
+    "implementation_status": "implemented_and_screened",
+    "screening_run_id": "decisive_docmancer_vector_timeout_fallback_001_screening_001",
+    "screening_status": "accepted",
+    "screening_reason": "repo_only_strict_offline resolved 0/2 with policy_clean=true, artifact_integrity_ok=true, fairness_clean=true; self-referential Docmancer caveat"
   },
   {
     "candidate_id": "decisive_docmancer_policy_audit_network_001",
