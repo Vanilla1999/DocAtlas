@@ -156,6 +156,7 @@ def build_action_checklist(
 
     nbo_doc = visible_files.get("docs/permission-notifications.md", "")
     nbo_service = visible_files.get("lib/modules/permission/domain/services/permission_service.dart", "")
+    nbo_application_service = visible_files.get("lib/modules/permission/application/permission_service.dart", "")
     nbo_lock = visible_files.get("pubspec.lock", "")
     if task_id == "real_project_nbo_001" and ("Permission.notification" in context_text or "notification" in nbo_doc.lower()):
         add(ChecklistItem(
@@ -184,6 +185,35 @@ def build_action_checklist(
             symbols=["permission_handler", "11.4.0", "Permission.notification"],
             files=["pubspec.lock", "lib/modules/permission/domain/services/permission_service.dart"],
         ))
+
+    if task_id == "real_project_nbo_distributed_permission_policy_001":
+        if "PermissionService" in nbo_application_service:
+            add(ChecklistItem(
+                text="Keep browser/scan preflight policy in `PermissionService`; providers should delegate.",
+                source="lib/modules/permission/ARCHITECTURE.md",
+                evidence_type="project_doc",
+                confidence="high",
+                symbols=["PermissionService", "requiredForPreflight"],
+                files=["lib/modules/permission/application/permission_service.dart", "lib/modules/permission/ARCHITECTURE.md"],
+            ))
+        if "Permission.notification" in nbo_doc and "permission_handler" in nbo_lock:
+            add(ChecklistItem(
+                text="For Android 13+ browser/scan preflight, use pinned `Permission.notification`; do not substitute media permissions.",
+                source="docs/permission-notifications.md",
+                evidence_type="project_doc",
+                confidence="high",
+                symbols=["Permission.notification", "sdkInt >= 33"],
+                files=["docs/permission-notifications.md", "pubspec.lock", "lib/modules/permission/application/permission_service.dart"],
+            ))
+        if "Background location remains deferred" in visible_files.get("docs/browser-scan-preflight.md", ""):
+            add(ChecklistItem(
+                text="Keep `Permission.locationAlways` deferred from the shared browser/scan preflight batch.",
+                source="docs/browser-scan-preflight.md",
+                evidence_type="project_doc",
+                confidence="high",
+                symbols=["Permission.locationAlways"],
+                files=["docs/browser-scan-preflight.md", "lib/modules/permission/application/permission_service.dart"],
+            ))
 
     location_doc = visible_files.get("docs/permission-location.md", "")
     if task_id == "real_project_nbo_permission_002" and "locationAlways" in location_doc:

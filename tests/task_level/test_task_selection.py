@@ -38,6 +38,11 @@ def test_task_selection_accepts_repo_only_partial_or_zero():
     assert decide_candidate_status(repo_only_repeats=2, repo_only_resolved=0, fairness_clean=True, hidden_oracle_only=False) == "accepted"
 
 
+def test_screening_accepts_candidate_only_if_repo_only_not_2_of_2():
+    assert decide_candidate_status(repo_only_repeats=2, repo_only_resolved=2, fairness_clean=True, hidden_oracle_only=False) == "rejected_too_easy"
+    assert decide_candidate_status(repo_only_repeats=2, repo_only_resolved=1, fairness_clean=True, hidden_oracle_only=False) == "accepted"
+
+
 def test_task_selection_rejects_unfair_candidates():
     assert decide_candidate_status(repo_only_repeats=2, repo_only_resolved=0, fairness_clean=False, hidden_oracle_only=False) == "rejected_unfair"
     assert decide_candidate_status(repo_only_repeats=2, repo_only_resolved=0, fairness_clean=True, hidden_oracle_only=True) == "rejected_unfair"

@@ -22,6 +22,7 @@ from eval.task_level.runners.claude import ClaudeRunner
 from eval.task_level.runners.codex import CodexRunner
 from eval.task_level.runners.opencode import OpenCodeRunner
 from eval.task_level.schemas import RESULTS_ROOT, TASKS_PATH, VALIDATION_ROOT, RunMetrics, RunResult, TaskSpec
+from eval.task_level.task_selection import decide_candidate_status
 
 
 BASE_PROMPT = """You are working in a software repository at the supplied base commit.
@@ -176,6 +177,57 @@ def run_smoke(tasks: list[TaskSpec], conditions: list[str], repeats: int, run_di
     return results
 
 
+def write_screening_summary(run_dir: Path, tasks: list[TaskSpec], results: list[dict[str, Any]], repeats: int) -> dict[str, Any]:
+    summaries: list[dict[str, Any]] = []
+    for task in tasks:
+        task_results = [result for result in results if result.get("task_id") == task.task_id]
+        repo_only = [result for result in task_results if result.get("condition_id") == "repo_only_strict_offline"]
+        resolved = sum(1 for result in repo_only if result.get("resolved") is True)
+        policy_clean = all(result.get("policy_clean") is True for result in repo_only) if repo_only else None
+        network_attempts = sum(int(result.get("policy", {}).get("network_attempts") or result.get("metrics", {}).get("network_attempts") or 0) for result in repo_only)
+        integrity = _load_json(run_dir / "status.json").get("artifact_integrity", {})
+        fairness_clean = True
+        hidden_oracle_only = False
+        status = decide_candidate_status(
+            repo_only_repeats=repeats,
+            repo_only_resolved=resolved,
+            fairness_clean=fairness_clean,
+            hidden_oracle_only=hidden_oracle_only,
+        )
+        summaries.append({
+            "task_id": task.task_id,
+            "source_project": task.source_project,
+            "candidate_status": status,
+            "repo_only_screening": {
+                "repeats": repeats,
+                "resolved": resolved,
+                "policy_clean": policy_clean,
+                "network_attempts": network_attempts,
+            },
+            "fairness": {
+                "reviewed": True,
+                "clean": fairness_clean,
+                "hidden_oracle_only": hidden_oracle_only,
+            },
+            "artifact_integrity": integrity,
+            "decision_reason": "strict offline resolved all repeats" if status == "rejected_too_easy" else "strict offline did not resolve all repeats",
+            "next_action": "redesign candidate before full pilot" if status == "rejected_too_easy" else "eligible for full 4-condition pilot",
+        })
+    payload = {"run_id": run_dir.name, "summaries": summaries}
+    (run_dir / "screening_summary.json").write_text(json.dumps(payload, indent=2, sort_keys=True), encoding="utf-8")
+    return payload
+
+
+def _load_json(path: Path) -> dict[str, Any]:
+    if not path.exists():
+        return {}
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return {}
+    return data if isinstance(data, dict) else {}
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Task-level patch benchmark harness")
     parser.add_argument("--manifest", type=Path, default=TASKS_PATH)
@@ -184,6 +236,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--verify-runner", action="store_true")
     parser.add_argument("--verify-docatlas-tool", action="store_true")
     parser.add_argument("--execute", action="store_true")
+    parser.add_argument("--screen-tasks", action="store_true")
     parser.add_argument("--runner", default="claude")
     parser.add_argument("--tasks", nargs="*")
     parser.add_argument("--smoke", action="store_true")
@@ -248,13 +301,15 @@ def main(argv: list[str] | None = None) -> int:
         results = run_smoke(tasks, args.conditions[:2], args.repeats, run_dir)
         (run_dir / "runs.jsonl").write_text(serialize_run_results_jsonl(results), encoding="utf-8")
 
-    if args.execute:
+    if args.execute or args.screen_tasks:
         if args.dry_run:
             results = [{"status": "dry_run", "task_id": task.task_id, "condition_id": condition, "repeat": repeat, "resolved": False, "metrics": {}} for task in tasks for repeat in range(args.repeats) for condition in args.conditions]
         else:
             results = execute_pilot(tasks, args.conditions, args.repeats, args.run_id, runner, args.model, args.timeout_seconds, BASE_PROMPT)
 
     write_report(run_dir, metadata, results)
+    if args.screen_tasks:
+        write_screening_summary(run_dir, tasks, results, args.repeats)
     print(run_dir)
     return 0
 

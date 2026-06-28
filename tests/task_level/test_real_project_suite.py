@@ -13,6 +13,7 @@ REAL_TASK_IDS = (
     "real_project_nbo_001",
     "real_project_nbo_permission_002",
     "real_project_nbo_generated_source_001",
+    "real_project_nbo_distributed_permission_policy_001",
 )
 
 
@@ -105,6 +106,6 @@ def test_real_project_suite_expected_runs_are_persisted(tmp_path: Path):
         for condition in conditions
     ]
 
-    write_run_progress(tmp_path, results, total_runs=12, current=None, finished=True)
+    write_run_progress(tmp_path, results, total_runs=16, current=None, finished=True)
 
-    assert count_jsonl_records(tmp_path / "runs.jsonl") == 12
+    assert count_jsonl_records(tmp_path / "runs.jsonl") == 16

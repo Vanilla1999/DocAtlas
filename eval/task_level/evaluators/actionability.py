@@ -78,6 +78,14 @@ def requirements_for_task(task_id: str) -> list[ContractRequirement]:
             ContractRequirement(task_id, "generated_files_untouched", "Do not hand-edit generated Freezed/Riverpod files.", "project_doc", True, [".g.dart", ".freezed.dart"], ["docs/generated-source.md", "lib/modules/permission/ARCHITECTURE.md"]),
             ContractRequirement(task_id, "pinned_permission_handler_api", "Use the pinned permission_handler 11.4.0 Permission enum.", "library_doc", True, ["permission_handler", "11.4.0", "Permission.locationAlways"], ["pubspec.lock"]),
         ]
+    if task_id == "real_project_nbo_distributed_permission_policy_001":
+        return [
+            ContractRequirement(task_id, "service_owns_policy", "PermissionService owns browser/scan preflight policy.", "project_doc", True, ["PermissionService", "requiredForPreflight"], ["lib/modules/permission/ARCHITECTURE.md", "lib/modules/permission/application/permission_service.dart"]),
+            ContractRequirement(task_id, "provider_delegates", "Presentation provider delegates and does not encode platform policy.", "project_doc", True, ["PermissionProvider", "requiredForPreflight"], ["lib/modules/permission/ARCHITECTURE.md", "lib/modules/permission/presentation/permission_provider.dart"]),
+            ContractRequirement(task_id, "android_13_notification", "Android 13+ notification permission is required for notification-dependent scan/browser flows.", "project_doc", True, ["Permission.notification", "sdkInt >= 33"], ["docs/permission-notifications.md"]),
+            ContractRequirement(task_id, "location_always_deferred", "Background location remains deferred from browser/scan preflight.", "project_doc", True, ["Permission.locationAlways"], ["docs/browser-scan-preflight.md", "lib/modules/permission/ARCHITECTURE.md"]),
+            ContractRequirement(task_id, "pinned_permission_handler", "Use pinned permission_handler 11.4.0 API and avoid media permission substitutes.", "library_doc", True, ["permission_handler", "11.4.0", "Permission.notification"], ["pubspec.lock", "docs/permission-notifications.md"]),
+        ]
     return []
 
 

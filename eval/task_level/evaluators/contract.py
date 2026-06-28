@@ -42,6 +42,8 @@ def evaluate_contract(task: TaskSpec, workspace: Path, patch_path: Path) -> Cont
         return _evaluate_nbo_location_deferred(combined, patch_text, files.get("lib/modules/permission/domain/services/permission_service.dart", ""))
     if task.task_id == "real_project_nbo_generated_source_001":
         return _evaluate_nbo_generated_source(combined, patch_text, files.get("lib/modules/permission/data/models/permission_info.dart", ""))
+    if task.task_id == "real_project_nbo_distributed_permission_policy_001":
+        return _evaluate_nbo_distributed_permission_policy(combined, patch_text, files.get("lib/modules/permission/application/permission_service.dart", ""))
     return ContractEvaluation(0.0, 0.0, 0.0, missing_requirements=["contract_not_defined"])
 
 
@@ -184,6 +186,33 @@ def _evaluate_nbo_generated_source(text: str, patch_text: str, model_text: str) 
     return _scores_with_version(behavioral_checks, form_checks, project_checks, version_checks)
 
 
+def _evaluate_nbo_distributed_permission_policy(text: str, patch_text: str, service_text: str) -> ContractEvaluation:
+    service_patch = _patch_file_body(patch_text, "lib/modules/permission/application/permission_service.dart")
+    code_text = service_text or text
+    preflight = _method_body(code_text, "requiredForPreflight")
+    behavioral_checks = {
+        "android_13_notification_permission": "sdkInt >= 33" in preflight and "notificationPermission" in preflight and "Permission.notification" in code_text,
+        "android_below_13_not_default_notification": "Permission.notification" not in preflight.split("sdkInt >= 33", 1)[0],
+        "location_always_deferred": "Permission.locationAlways" not in preflight and "permission == Permission.locationAlways" in code_text,
+    }
+    form_checks = {
+        "service_method_used": "requiredForPreflight(PermissionFlow flow, int sdkInt)" in code_text,
+        "shared_policy_no_flow_branch": all(token not in preflight for token in ("flow == PermissionFlow.browser", "flow == PermissionFlow.scan", "switch (flow)")),
+        "uses_permission_info": "PermissionInfo" in preflight and "notificationPermission" in code_text,
+    }
+    project_checks = {
+        "change_lives_in_service": "Permission.notification" in service_patch,
+        "provider_untouched": "permission_provider.dart" not in patch_text,
+        "generated_files_untouched": ".g.dart" not in patch_text and ".freezed.dart" not in patch_text,
+    }
+    version_checks = {
+        "pinned_permission_handler_11_4_0_visible": "permission_handler" in text and 'version: "11.4.0"' in text,
+        "uses_notification_not_media": "Permission.notification" in code_text and all(token not in code_text for token in ("Permission.photos", "Permission.videos", "Permission.audio")),
+        "dependency_files_untouched": "pubspec.yaml" not in patch_text and "pubspec.lock" not in patch_text,
+    }
+    return _scores_with_version(behavioral_checks, form_checks, project_checks, version_checks)
+
+
 def _scores_with_version(behavioral: dict[str, bool], form: dict[str, bool], project: dict[str, bool], version: dict[str, bool]) -> ContractEvaluation:
     satisfied = [key for group in (behavioral, form, project, version) for key, value in group.items() if value]
     missing = [key for group in (behavioral, form, project, version) for key, value in group.items() if not value]
@@ -220,6 +249,11 @@ def _route_body(text: str, function_name: str) -> str:
 
 def _patch_file_body(patch_text: str, file_path: str) -> str:
     match = re.search(rf"diff --git a/{re.escape(file_path)} b/{re.escape(file_path)}\n(.*?)(?=\ndiff --git |\Z)", patch_text, re.S)
+    return match.group(1) if match else ""
+
+
+def _method_body(text: str, method_name: str) -> str:
+    match = re.search(rf"{method_name}\([^)]*\) \{{([\s\S]*?)\n  \}}", text)
     return match.group(1) if match else ""
 
 

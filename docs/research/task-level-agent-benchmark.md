@@ -147,3 +147,12 @@ NBO source profile and hard-task design pass:
 - Candidate tasks must pass a screening gate before full pilot: `repo_only_strict_offline` over 2 repeats, with acceptance only when strict offline resolves `<= 1/2`, fairness is clean, base fails, gold passes, hidden requirements are discoverable, and artifact integrity is clean.
 - If strict offline resolves `2/2`, the candidate is rejected as too easy. If hidden requirements require oracle-only information or the public tests do not exercise the intended behavior, the candidate is rejected as unfair.
 - Current diagnosis remains `ITERATE_REAL_PROJECT_TASKS`; next implementation step is `READY_TO_IMPLEMENT_HARD_CANDIDATE`, not a DocAtlas improvement claim.
+
+NBO distributed permission candidate implementation:
+
+- `real_project_nbo_distributed_permission_policy_001` was added as the first hard candidate fixture.
+- The issue text is symptom-style and does not directly reveal `Permission.notification`, `PermissionService`, generated-file restrictions, or pinned dependency details.
+- The intended solution requires combining visible README, module architecture, notification policy docs, browser/scan preflight docs, service/provider source, generated-file stubs, and the pinned `pubspec.lock` context.
+- Screening rule remains unchanged: run `repo_only_strict_offline` for 2 repeats and reject the candidate as too easy if strict offline resolves `2/2`.
+- Validation passed for the implemented candidate, but screening rejected it as too easy: `repo_only_strict_offline` resolved `2/2`, policy-clean, with zero network attempts and clean artifact integrity.
+- Full 4-condition pilot was not run for this candidate. The diagnosis remains `ITERATE_TASK_DESIGN` for harder NBO-derived tasks.
