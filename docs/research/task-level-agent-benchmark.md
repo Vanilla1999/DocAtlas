@@ -242,3 +242,11 @@ Project constraint compiler direction:
 
 A product RFC now lives at `docs/research/project-constraint-compiler-rfc.md`. The direction is to keep `get_docs_context` as the docs/snippets/context surface while prototyping `get_patch_constraints` and `validate_patch_against_constraints` for source-attributed project rules, action checks, and conservative post-patch validation. This is explicitly not a Context7 clone: Context7 answers API-usage questions, while DocAtlas should answer which repository constraints a patch must satisfy. The current verdict remains `QUALITY_POSITIVE_COSTLY`; no broad DocAtlas superiority claim is supported.
 
+Cost/accuracy refresh with constraint metrics:
+
+- The analyzer now accepts `--results-dir` and reports injected context, checklist, retrieved context, raw doc context, and constraint packet token metrics when artifacts contain those fields.
+- Existing artifacts were re-analyzed without new Codex runs. The refreshed inventory remains 56 run directories, 133 records, and 109 comparable pilot records.
+- The refreshed verdict remains `QUALITY_POSITIVE_COSTLY`.
+- New constraint-packet metrics are mostly `null` in historical artifacts because those runs predate `docatlas_patch_constraints_injected`.
+- Retrieval/fallback/workflow accounting is now separated: vector retrieval success is not counted when `fallback_local_project_context` was used, and workflow success is reported separately from retrieval success.
+

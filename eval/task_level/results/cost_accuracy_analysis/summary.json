@@ -11,10 +11,16 @@
           "version": 1.0
         },
         "docatlas_calls_per_resolved_task": 2.0,
+        "fallback_success_rate": 0.5,
         "forbidden_edit_rate": 0.0,
         "hidden_pass_rate": 0.6666666666666666,
+        "median_checklist_tokens": null,
+        "median_constraint_packet_tokens": null,
+        "median_injected_context_tokens": null,
         "median_input_tokens": 271743.0,
         "median_output_tokens": 4174.0,
+        "median_raw_doc_context_tokens": null,
+        "median_retrieved_context_tokens": null,
         "median_total_tokens": 275957.0,
         "median_wall_time_seconds": 100.58645,
         "network_violation_rate": 0.0,
@@ -26,7 +32,9 @@
         "tokens_per_hidden_pass": 362209.5,
         "tokens_per_policy_clean_resolved_task": 482946.0,
         "tokens_per_resolved_task": 482946.0,
-        "wall_time_per_resolved_task": 235.72446666666667
+        "vector_retrieval_success_rate": 0.3333333333333333,
+        "wall_time_per_resolved_task": 235.72446666666667,
+        "workflow_success_rate": 0.5
       },
       "docatlas_context_injected": {
         "contract_score_mean": {
@@ -36,10 +44,16 @@
           "version": 1.0
         },
         "docatlas_calls_per_resolved_task": 1.0,
+        "fallback_success_rate": 0.0,
         "forbidden_edit_rate": 0.0,
         "hidden_pass_rate": 1.0,
+        "median_checklist_tokens": null,
+        "median_constraint_packet_tokens": null,
+        "median_injected_context_tokens": null,
         "median_input_tokens": 271977,
         "median_output_tokens": 4245,
+        "median_raw_doc_context_tokens": null,
+        "median_retrieved_context_tokens": null,
         "median_total_tokens": 276222,
         "median_wall_time_seconds": 116.7486,
         "network_violation_rate": 0.0,
@@ -51,7 +65,9 @@
         "tokens_per_hidden_pass": 276222.0,
         "tokens_per_policy_clean_resolved_task": 276222.0,
         "tokens_per_resolved_task": 276222.0,
-        "wall_time_per_resolved_task": 116.7486
+        "vector_retrieval_success_rate": 0.0,
+        "wall_time_per_resolved_task": 116.7486,
+        "workflow_success_rate": 1.0
       },
       "docatlas_tool_recommended": {
         "contract_score_mean": {
@@ -61,10 +77,16 @@
           "version": 1.0
         },
         "docatlas_calls_per_resolved_task": 13.0,
+        "fallback_success_rate": 0.0,
         "forbidden_edit_rate": 0.0,
         "hidden_pass_rate": 0.6666666666666666,
+        "median_checklist_tokens": null,
+        "median_constraint_packet_tokens": null,
+        "median_injected_context_tokens": null,
         "median_input_tokens": 349660.5,
         "median_output_tokens": 3898.5,
+        "median_raw_doc_context_tokens": null,
+        "median_retrieved_context_tokens": null,
         "median_total_tokens": 353498.0,
         "median_wall_time_seconds": 145.18189999999998,
         "network_violation_rate": 0.16666666666666666,
@@ -76,7 +98,9 @@
         "tokens_per_hidden_pass": 561178.25,
         "tokens_per_policy_clean_resolved_task": 1122356.5,
         "tokens_per_resolved_task": 1122356.5,
-        "wall_time_per_resolved_task": 449.49385
+        "vector_retrieval_success_rate": 0.8333333333333334,
+        "wall_time_per_resolved_task": 449.49385,
+        "workflow_success_rate": 0.3333333333333333
       },
       "repo_only": {
         "contract_score_mean": {
@@ -86,10 +110,16 @@
           "version": 1.0
         },
         "docatlas_calls_per_resolved_task": null,
+        "fallback_success_rate": 0.0,
         "forbidden_edit_rate": 0.0,
         "hidden_pass_rate": 1.0,
+        "median_checklist_tokens": null,
+        "median_constraint_packet_tokens": null,
+        "median_injected_context_tokens": null,
         "median_input_tokens": 264464,
         "median_output_tokens": 3730,
+        "median_raw_doc_context_tokens": null,
+        "median_retrieved_context_tokens": null,
         "median_total_tokens": 268194,
         "median_wall_time_seconds": 96.3056,
         "network_violation_rate": 1.0,
@@ -101,7 +131,9 @@
         "tokens_per_hidden_pass": 268194.0,
         "tokens_per_policy_clean_resolved_task": null,
         "tokens_per_resolved_task": null,
-        "wall_time_per_resolved_task": null
+        "vector_retrieval_success_rate": 0.0,
+        "wall_time_per_resolved_task": null,
+        "workflow_success_rate": 0.0
       },
       "repo_only_strict_offline": {
         "contract_score_mean": {
@@ -111,10 +143,16 @@
           "version": 1.0
         },
         "docatlas_calls_per_resolved_task": 0.0,
+        "fallback_success_rate": 0.0,
         "forbidden_edit_rate": 0.0,
         "hidden_pass_rate": 0.6,
+        "median_checklist_tokens": null,
+        "median_constraint_packet_tokens": null,
+        "median_injected_context_tokens": null,
         "median_input_tokens": 164403,
         "median_output_tokens": 3246,
+        "median_raw_doc_context_tokens": null,
+        "median_retrieved_context_tokens": null,
         "median_total_tokens": 167649,
         "median_wall_time_seconds": 86.3027,
         "network_violation_rate": 0.2,
@@ -126,7 +164,9 @@
         "tokens_per_hidden_pass": 260831.0,
         "tokens_per_policy_clean_resolved_task": 782493.0,
         "tokens_per_resolved_task": 782493.0,
-        "wall_time_per_resolved_task": 407.325
+        "vector_retrieval_success_rate": 0.0,
+        "wall_time_per_resolved_task": 407.325,
+        "workflow_success_rate": 0.2
       },
       "repo_only_web_audited": {
         "contract_score_mean": {
@@ -136,10 +176,16 @@
           "version": 1.0
         },
         "docatlas_calls_per_resolved_task": 0.0,
+        "fallback_success_rate": 0.0,
         "forbidden_edit_rate": 0.0,
         "hidden_pass_rate": 0.6,
+        "median_checklist_tokens": null,
+        "median_constraint_packet_tokens": null,
+        "median_injected_context_tokens": null,
         "median_input_tokens": 215110,
         "median_output_tokens": 3437,
+        "median_raw_doc_context_tokens": null,
+        "median_retrieved_context_tokens": null,
         "median_total_tokens": 218547,
         "median_wall_time_seconds": 85.6566,
         "network_violation_rate": 0.0,
@@ -151,7 +197,9 @@
         "tokens_per_hidden_pass": 372374.6666666667,
         "tokens_per_policy_clean_resolved_task": 558562.0,
         "tokens_per_resolved_task": 558562.0,
-        "wall_time_per_resolved_task": 254.20409999999998
+        "vector_retrieval_success_rate": 0.0,
+        "wall_time_per_resolved_task": 254.20409999999998,
+        "workflow_success_rate": 0.4
       }
     },
     "all_pilot_tasks": {
@@ -163,10 +211,16 @@
           "version": null
         },
         "docatlas_calls_per_resolved_task": null,
+        "fallback_success_rate": 0.0,
         "forbidden_edit_rate": 0.0,
         "hidden_pass_rate": 0.0,
+        "median_checklist_tokens": null,
+        "median_constraint_packet_tokens": null,
+        "median_injected_context_tokens": null,
         "median_input_tokens": null,
         "median_output_tokens": null,
+        "median_raw_doc_context_tokens": null,
+        "median_retrieved_context_tokens": null,
         "median_total_tokens": null,
         "median_wall_time_seconds": 0.0,
         "network_violation_rate": 1.0,
@@ -178,7 +232,9 @@
         "tokens_per_hidden_pass": null,
         "tokens_per_policy_clean_resolved_task": null,
         "tokens_per_resolved_task": null,
-        "wall_time_per_resolved_task": null
+        "vector_retrieval_success_rate": 0.0,
+        "wall_time_per_resolved_task": null,
+        "workflow_success_rate": 0.0
       },
       "docatlas_action_checklist_injected": {
         "contract_score_mean": {
@@ -188,10 +244,16 @@
           "version": 0.83335
         },
         "docatlas_calls_per_resolved_task": 1.7777777777777777,
+        "fallback_success_rate": 0.4375,
         "forbidden_edit_rate": 0.0,
         "hidden_pass_rate": 0.625,
+        "median_checklist_tokens": null,
+        "median_constraint_packet_tokens": null,
+        "median_injected_context_tokens": null,
         "median_input_tokens": 170393.5,
         "median_output_tokens": 3620.0,
+        "median_raw_doc_context_tokens": null,
+        "median_retrieved_context_tokens": null,
         "median_total_tokens": 173358.5,
         "median_wall_time_seconds": 88.38135,
         "network_violation_rate": 0.0,
@@ -203,7 +265,9 @@
         "tokens_per_hidden_pass": 329886.8,
         "tokens_per_policy_clean_resolved_task": 366540.8888888889,
         "tokens_per_resolved_task": 366540.8888888889,
-        "wall_time_per_resolved_task": 177.72591111111112
+        "vector_retrieval_success_rate": 0.125,
+        "wall_time_per_resolved_task": 177.72591111111112,
+        "workflow_success_rate": 0.5625
       },
       "docatlas_context_injected": {
         "contract_score_mean": {
@@ -213,10 +277,16 @@
           "version": 1.0
         },
         "docatlas_calls_per_resolved_task": 2.75,
+        "fallback_success_rate": 0.0,
         "forbidden_edit_rate": 0.0,
         "hidden_pass_rate": 0.3076923076923077,
+        "median_checklist_tokens": null,
+        "median_constraint_packet_tokens": null,
+        "median_injected_context_tokens": null,
         "median_input_tokens": 276185,
         "median_output_tokens": 4956,
+        "median_raw_doc_context_tokens": null,
+        "median_retrieved_context_tokens": null,
         "median_total_tokens": 280552,
         "median_wall_time_seconds": 133.1119,
         "network_violation_rate": 0.15384615384615385,
@@ -228,7 +298,9 @@
         "tokens_per_hidden_pass": 834722.0,
         "tokens_per_policy_clean_resolved_task": 834722.0,
         "tokens_per_resolved_task": 834722.0,
-        "wall_time_per_resolved_task": 371.579475
+        "vector_retrieval_success_rate": 0.0,
+        "wall_time_per_resolved_task": 371.579475,
+        "workflow_success_rate": 0.3076923076923077
       },
       "docatlas_snippet_first": {
         "contract_score_mean": {
@@ -238,10 +310,16 @@
           "version": null
         },
         "docatlas_calls_per_resolved_task": null,
+        "fallback_success_rate": 0.0,
         "forbidden_edit_rate": 0.0,
         "hidden_pass_rate": 0.0,
+        "median_checklist_tokens": null,
+        "median_constraint_packet_tokens": null,
+        "median_injected_context_tokens": null,
         "median_input_tokens": 216009.0,
         "median_output_tokens": 4459.0,
+        "median_raw_doc_context_tokens": null,
+        "median_retrieved_context_tokens": null,
         "median_total_tokens": 220468.0,
         "median_wall_time_seconds": 124.10195,
         "network_violation_rate": 0.0,
@@ -253,7 +331,9 @@
         "tokens_per_hidden_pass": null,
         "tokens_per_policy_clean_resolved_task": null,
         "tokens_per_resolved_task": null,
-        "wall_time_per_resolved_task": null
+        "vector_retrieval_success_rate": 0.0,
+        "wall_time_per_resolved_task": null,
+        "workflow_success_rate": 0.0
       },
       "docatlas_tool_optional": {
         "contract_score_mean": {
@@ -263,10 +343,16 @@
           "version": null
         },
         "docatlas_calls_per_resolved_task": null,
+        "fallback_success_rate": 0.0,
         "forbidden_edit_rate": 0.0,
         "hidden_pass_rate": 0.0,
+        "median_checklist_tokens": null,
+        "median_constraint_packet_tokens": null,
+        "median_injected_context_tokens": null,
         "median_input_tokens": 316128.5,
         "median_output_tokens": 5235.5,
+        "median_raw_doc_context_tokens": null,
+        "median_retrieved_context_tokens": null,
         "median_total_tokens": 321774.5,
         "median_wall_time_seconds": 140.64465,
         "network_violation_rate": 0.3333333333333333,
@@ -278,7 +364,9 @@
         "tokens_per_hidden_pass": null,
         "tokens_per_policy_clean_resolved_task": null,
         "tokens_per_resolved_task": null,
-        "wall_time_per_resolved_task": null
+        "vector_retrieval_success_rate": 0.0,
+        "wall_time_per_resolved_task": null,
+        "workflow_success_rate": 0.0
       },
       "docatlas_tool_recommended": {
         "contract_score_mean": {
@@ -288,10 +376,16 @@
           "version": 0.83335
         },
         "docatlas_calls_per_resolved_task": 11.428571428571429,
+        "fallback_success_rate": 0.0,
         "forbidden_edit_rate": 0.0,
         "hidden_pass_rate": 0.5263157894736842,
+        "median_checklist_tokens": null,
+        "median_constraint_packet_tokens": null,
+        "median_injected_context_tokens": null,
         "median_input_tokens": 349267,
         "median_output_tokens": 4108,
+        "median_raw_doc_context_tokens": null,
+        "median_retrieved_context_tokens": null,
         "median_total_tokens": 354595,
         "median_wall_time_seconds": 151.6766,
         "network_violation_rate": 0.10526315789473684,
@@ -303,7 +397,9 @@
         "tokens_per_hidden_pass": 697282.2,
         "tokens_per_policy_clean_resolved_task": 996117.4285714285,
         "tokens_per_resolved_task": 996117.4285714285,
-        "wall_time_per_resolved_task": 461.68751428571426
+        "vector_retrieval_success_rate": 0.47368421052631576,
+        "wall_time_per_resolved_task": 461.68751428571426,
+        "workflow_success_rate": 0.3684210526315789
       },
       "docatlas_tool_required_once": {
         "contract_score_mean": {
@@ -313,10 +409,16 @@
           "version": null
         },
         "docatlas_calls_per_resolved_task": 8.0,
+        "fallback_success_rate": 0.0,
         "forbidden_edit_rate": 0.0,
         "hidden_pass_rate": 0.14285714285714285,
+        "median_checklist_tokens": null,
+        "median_constraint_packet_tokens": null,
+        "median_injected_context_tokens": null,
         "median_input_tokens": 346401.0,
         "median_output_tokens": 5570.0,
+        "median_raw_doc_context_tokens": null,
+        "median_retrieved_context_tokens": null,
         "median_total_tokens": 351985.0,
         "median_wall_time_seconds": 145.4866,
         "network_violation_rate": 0.42857142857142855,
@@ -328,7 +430,9 @@
         "tokens_per_hidden_pass": 1359116.0,
         "tokens_per_policy_clean_resolved_task": 1359116.0,
         "tokens_per_resolved_task": 1359116.0,
-        "wall_time_per_resolved_task": 843.7203
+        "vector_retrieval_success_rate": 0.0,
+        "wall_time_per_resolved_task": 843.7203,
+        "workflow_success_rate": 0.14285714285714285
       },
       "repo_only": {
         "contract_score_mean": {
@@ -338,10 +442,16 @@
           "version": 1.0
         },
         "docatlas_calls_per_resolved_task": 0.3333333333333333,
+        "fallback_success_rate": 0.0,
         "forbidden_edit_rate": 0.0,
         "hidden_pass_rate": 0.2916666666666667,
+        "median_checklist_tokens": null,
+        "median_constraint_packet_tokens": null,
+        "median_injected_context_tokens": null,
         "median_input_tokens": 197409.0,
         "median_output_tokens": 3388.5,
+        "median_raw_doc_context_tokens": null,
+        "median_retrieved_context_tokens": null,
         "median_total_tokens": 201610.5,
         "median_wall_time_seconds": 91.12465,
         "network_violation_rate": 0.16666666666666666,
@@ -353,7 +463,9 @@
         "tokens_per_hidden_pass": 637316.4285714285,
         "tokens_per_policy_clean_resolved_task": 743535.8333333334,
         "tokens_per_resolved_task": 743535.8333333334,
-        "wall_time_per_resolved_task": 381.9846
+        "vector_retrieval_success_rate": 0.0,
+        "wall_time_per_resolved_task": 381.9846,
+        "workflow_success_rate": 0.25
       },
       "repo_only_strict_offline": {
         "contract_score_mean": {
@@ -363,10 +475,16 @@
           "version": 0.8095428571428571
         },
         "docatlas_calls_per_resolved_task": 0.0,
+        "fallback_success_rate": 0.0,
         "forbidden_edit_rate": 0.0,
         "hidden_pass_rate": 0.7777777777777778,
+        "median_checklist_tokens": null,
+        "median_constraint_packet_tokens": null,
+        "median_injected_context_tokens": null,
         "median_input_tokens": 163672,
         "median_output_tokens": 3246,
+        "median_raw_doc_context_tokens": null,
+        "median_retrieved_context_tokens": null,
         "median_total_tokens": 167079,
         "median_wall_time_seconds": 83.6437,
         "network_violation_rate": 0.1111111111111111,
@@ -378,7 +496,9 @@
         "tokens_per_hidden_pass": 198967.57142857142,
         "tokens_per_policy_clean_resolved_task": 278554.6,
         "tokens_per_resolved_task": 278554.6,
-        "wall_time_per_resolved_task": 141.80868
+        "vector_retrieval_success_rate": 0.0,
+        "wall_time_per_resolved_task": 141.80868,
+        "workflow_success_rate": 0.5555555555555556
       },
       "repo_only_web_audited": {
         "contract_score_mean": {
@@ -388,10 +508,16 @@
           "version": 0.8095428571428571
         },
         "docatlas_calls_per_resolved_task": 0.0,
+        "fallback_success_rate": 0.0,
         "forbidden_edit_rate": 0.0,
         "hidden_pass_rate": 0.7777777777777778,
+        "median_checklist_tokens": null,
+        "median_constraint_packet_tokens": null,
+        "median_injected_context_tokens": null,
         "median_input_tokens": 179525,
         "median_output_tokens": 3021,
+        "median_raw_doc_context_tokens": null,
+        "median_retrieved_context_tokens": null,
         "median_total_tokens": 182418,
         "median_wall_time_seconds": 75.6638,
         "network_violation_rate": 0.1111111111111111,
@@ -403,7 +529,9 @@
         "tokens_per_hidden_pass": 254444.7142857143,
         "tokens_per_policy_clean_resolved_task": 296852.1666666667,
         "tokens_per_resolved_task": 296852.1666666667,
-        "wall_time_per_resolved_task": 132.40461666666667
+        "vector_retrieval_success_rate": 0.0,
+        "wall_time_per_resolved_task": 132.40461666666667,
+        "workflow_success_rate": 0.6666666666666666
       }
     },
     "real_project_tasks_only": {
@@ -415,10 +543,16 @@
           "version": 0.83335
         },
         "docatlas_calls_per_resolved_task": 1.4285714285714286,
+        "fallback_success_rate": 0.7,
         "forbidden_edit_rate": 0.0,
         "hidden_pass_rate": 0.8,
+        "median_checklist_tokens": null,
+        "median_constraint_packet_tokens": null,
+        "median_injected_context_tokens": null,
         "median_input_tokens": 203830.0,
         "median_output_tokens": 3921.5,
+        "median_raw_doc_context_tokens": null,
+        "median_retrieved_context_tokens": null,
         "median_total_tokens": 207252.5,
         "median_wall_time_seconds": 93.19495,
         "network_violation_rate": 0.0,
@@ -430,7 +564,9 @@
         "tokens_per_hidden_pass": 266643.5,
         "tokens_per_policy_clean_resolved_task": 304735.4285714286,
         "tokens_per_resolved_task": 304735.4285714286,
-        "wall_time_per_resolved_task": 143.13515714285714
+        "vector_retrieval_success_rate": 0.2,
+        "wall_time_per_resolved_task": 143.13515714285714,
+        "workflow_success_rate": 0.7
       },
       "docatlas_context_injected": {
         "contract_score_mean": {
@@ -440,10 +576,16 @@
           "version": 1.0
         },
         "docatlas_calls_per_resolved_task": 1.0,
+        "fallback_success_rate": 0.0,
         "forbidden_edit_rate": 0.0,
         "hidden_pass_rate": 1.0,
+        "median_checklist_tokens": null,
+        "median_constraint_packet_tokens": null,
+        "median_injected_context_tokens": null,
         "median_input_tokens": 271977,
         "median_output_tokens": 4245,
+        "median_raw_doc_context_tokens": null,
+        "median_retrieved_context_tokens": null,
         "median_total_tokens": 276222,
         "median_wall_time_seconds": 116.7486,
         "network_violation_rate": 0.0,
@@ -455,7 +597,9 @@
         "tokens_per_hidden_pass": 276222.0,
         "tokens_per_policy_clean_resolved_task": 276222.0,
         "tokens_per_resolved_task": 276222.0,
-        "wall_time_per_resolved_task": 116.7486
+        "vector_retrieval_success_rate": 0.0,
+        "wall_time_per_resolved_task": 116.7486,
+        "workflow_success_rate": 1.0
       },
       "docatlas_tool_recommended": {
         "contract_score_mean": {
@@ -465,10 +609,16 @@
           "version": 0.83335
         },
         "docatlas_calls_per_resolved_task": 8.0,
+        "fallback_success_rate": 0.0,
         "forbidden_edit_rate": 0.0,
         "hidden_pass_rate": 0.8,
+        "median_checklist_tokens": null,
+        "median_constraint_packet_tokens": null,
+        "median_injected_context_tokens": null,
         "median_input_tokens": 332039.0,
         "median_output_tokens": 3711.5,
+        "median_raw_doc_context_tokens": null,
+        "median_retrieved_context_tokens": null,
         "median_total_tokens": 335791.0,
         "median_wall_time_seconds": 120.79355,
         "network_violation_rate": 0.2,
@@ -480,7 +630,9 @@
         "tokens_per_hidden_pass": 414018.0,
         "tokens_per_policy_clean_resolved_task": 662428.8,
         "tokens_per_resolved_task": 662428.8,
-        "wall_time_per_resolved_task": 276.61122
+        "vector_retrieval_success_rate": 0.9,
+        "wall_time_per_resolved_task": 276.61122,
+        "workflow_success_rate": 0.5
       },
       "repo_only": {
         "contract_score_mean": {
@@ -490,10 +642,16 @@
           "version": 1.0
         },
         "docatlas_calls_per_resolved_task": null,
+        "fallback_success_rate": 0.0,
         "forbidden_edit_rate": 0.0,
         "hidden_pass_rate": 1.0,
+        "median_checklist_tokens": null,
+        "median_constraint_packet_tokens": null,
+        "median_injected_context_tokens": null,
         "median_input_tokens": 264464,
         "median_output_tokens": 3730,
+        "median_raw_doc_context_tokens": null,
+        "median_retrieved_context_tokens": null,
         "median_total_tokens": 268194,
         "median_wall_time_seconds": 96.3056,
         "network_violation_rate": 1.0,
@@ -505,7 +663,9 @@
         "tokens_per_hidden_pass": 268194.0,
         "tokens_per_policy_clean_resolved_task": null,
         "tokens_per_resolved_task": null,
-        "wall_time_per_resolved_task": null
+        "vector_retrieval_success_rate": 0.0,
+        "wall_time_per_resolved_task": null,
+        "workflow_success_rate": 0.0
       },
       "repo_only_strict_offline": {
         "contract_score_mean": {
@@ -515,10 +675,16 @@
           "version": 0.8095428571428571
         },
         "docatlas_calls_per_resolved_task": 0.0,
+        "fallback_success_rate": 0.0,
         "forbidden_edit_rate": 0.0,
         "hidden_pass_rate": 0.7777777777777778,
+        "median_checklist_tokens": null,
+        "median_constraint_packet_tokens": null,
+        "median_injected_context_tokens": null,
         "median_input_tokens": 163672,
         "median_output_tokens": 3246,
+        "median_raw_doc_context_tokens": null,
+        "median_retrieved_context_tokens": null,
         "median_total_tokens": 167079,
         "median_wall_time_seconds": 83.6437,
         "network_violation_rate": 0.1111111111111111,
@@ -530,7 +696,9 @@
         "tokens_per_hidden_pass": 198967.57142857142,
         "tokens_per_policy_clean_resolved_task": 278554.6,
         "tokens_per_resolved_task": 278554.6,
-        "wall_time_per_resolved_task": 141.80868
+        "vector_retrieval_success_rate": 0.0,
+        "wall_time_per_resolved_task": 141.80868,
+        "workflow_success_rate": 0.5555555555555556
       },
       "repo_only_web_audited": {
         "contract_score_mean": {
@@ -540,10 +708,16 @@
           "version": 0.8095428571428571
         },
         "docatlas_calls_per_resolved_task": 0.0,
+        "fallback_success_rate": 0.0,
         "forbidden_edit_rate": 0.0,
         "hidden_pass_rate": 0.7777777777777778,
+        "median_checklist_tokens": null,
+        "median_constraint_packet_tokens": null,
+        "median_injected_context_tokens": null,
         "median_input_tokens": 179525,
         "median_output_tokens": 3021,
+        "median_raw_doc_context_tokens": null,
+        "median_retrieved_context_tokens": null,
         "median_total_tokens": 182418,
         "median_wall_time_seconds": 75.6638,
         "network_violation_rate": 0.1111111111111111,
@@ -555,7 +729,9 @@
         "tokens_per_hidden_pass": 254444.7142857143,
         "tokens_per_policy_clean_resolved_task": 296852.1666666667,
         "tokens_per_resolved_task": 296852.1666666667,
-        "wall_time_per_resolved_task": 132.40461666666667
+        "vector_retrieval_success_rate": 0.0,
+        "wall_time_per_resolved_task": 132.40461666666667,
+        "workflow_success_rate": 0.6666666666666666
       }
     },
     "smoke_rejected_too_easy_tasks": {
@@ -567,10 +743,16 @@
           "version": 0.6667
         },
         "docatlas_calls_per_resolved_task": 1.0,
+        "fallback_success_rate": 1.0,
         "forbidden_edit_rate": 0.0,
         "hidden_pass_rate": 1.0,
+        "median_checklist_tokens": null,
+        "median_constraint_packet_tokens": null,
+        "median_injected_context_tokens": null,
         "median_input_tokens": 158178.5,
         "median_output_tokens": 2654.0,
+        "median_raw_doc_context_tokens": null,
+        "median_retrieved_context_tokens": null,
         "median_total_tokens": 160832.5,
         "median_wall_time_seconds": 67.98195000000001,
         "network_violation_rate": 0.0,
@@ -582,7 +764,9 @@
         "tokens_per_hidden_pass": 171077.5,
         "tokens_per_policy_clean_resolved_task": 171077.5,
         "tokens_per_resolved_task": 171077.5,
-        "wall_time_per_resolved_task": 73.693175
+        "vector_retrieval_success_rate": 0.0,
+        "wall_time_per_resolved_task": 73.693175,
+        "workflow_success_rate": 1.0
       },
       "docatlas_tool_recommended": {
         "contract_score_mean": {
@@ -592,10 +776,16 @@
           "version": 0.6667
         },
         "docatlas_calls_per_resolved_task": 4.666666666666667,
+        "fallback_success_rate": 0.0,
         "forbidden_edit_rate": 0.0,
         "hidden_pass_rate": 1.0,
+        "median_checklist_tokens": null,
+        "median_constraint_packet_tokens": null,
+        "median_injected_context_tokens": null,
         "median_input_tokens": 273921.0,
         "median_output_tokens": 3517.0,
+        "median_raw_doc_context_tokens": null,
+        "median_retrieved_context_tokens": null,
         "median_total_tokens": 277566.5,
         "median_wall_time_seconds": 114.41364999999999,
         "network_violation_rate": 0.25,
@@ -607,7 +797,9 @@
         "tokens_per_hidden_pass": 266857.75,
         "tokens_per_policy_clean_resolved_task": 355810.3333333333,
         "tokens_per_resolved_task": 355810.3333333333,
-        "wall_time_per_resolved_task": 161.35613333333333
+        "vector_retrieval_success_rate": 1.0,
+        "wall_time_per_resolved_task": 161.35613333333333,
+        "workflow_success_rate": 0.75
       },
       "repo_only_strict_offline": {
         "contract_score_mean": {
@@ -617,10 +809,16 @@
           "version": 0.6667
         },
         "docatlas_calls_per_resolved_task": 0.0,
+        "fallback_success_rate": 0.0,
         "forbidden_edit_rate": 0.0,
         "hidden_pass_rate": 1.0,
+        "median_checklist_tokens": null,
+        "median_constraint_packet_tokens": null,
+        "median_injected_context_tokens": null,
         "median_input_tokens": 148371.0,
         "median_output_tokens": 2761.5,
+        "median_raw_doc_context_tokens": null,
+        "median_retrieved_context_tokens": null,
         "median_total_tokens": 150937.5,
         "median_wall_time_seconds": 76.58135,
         "network_violation_rate": 0.0,
@@ -632,7 +830,9 @@
         "tokens_per_hidden_pass": 152570.0,
         "tokens_per_policy_clean_resolved_task": 152570.0,
         "tokens_per_resolved_task": 152570.0,
-        "wall_time_per_resolved_task": 75.4296
+        "vector_retrieval_success_rate": 0.0,
+        "wall_time_per_resolved_task": 75.4296,
+        "workflow_success_rate": 1.0
       },
       "repo_only_web_audited": {
         "contract_score_mean": {
@@ -642,10 +842,16 @@
           "version": 0.6667
         },
         "docatlas_calls_per_resolved_task": 0.0,
+        "fallback_success_rate": 0.0,
         "forbidden_edit_rate": 0.0,
         "hidden_pass_rate": 1.0,
+        "median_checklist_tokens": null,
+        "median_constraint_packet_tokens": null,
+        "median_injected_context_tokens": null,
         "median_input_tokens": 157587.5,
         "median_output_tokens": 2970.0,
+        "median_raw_doc_context_tokens": null,
+        "median_retrieved_context_tokens": null,
         "median_total_tokens": 160811.0,
         "median_wall_time_seconds": 72.68835,
         "network_violation_rate": 0.25,
@@ -657,7 +863,9 @@
         "tokens_per_hidden_pass": 165997.25,
         "tokens_per_policy_clean_resolved_task": 165997.25,
         "tokens_per_resolved_task": 165997.25,
-        "wall_time_per_resolved_task": 71.504875
+        "vector_retrieval_success_rate": 0.0,
+        "wall_time_per_resolved_task": 71.504875,
+        "workflow_success_rate": 1.0
       }
     }
   },
@@ -668,11 +876,13 @@
       "context_used_rate": 1.0,
       "docatlas_call_rate": 1.0,
       "fallback_rate": 0.4375,
+      "fallback_success_rate": 0.4375,
       "resolved_when_context_not_used": null,
       "resolved_when_context_used": 0.5625,
       "retrieval_success_rate": 0.125,
       "runs": 16,
-      "vector_timeout_rate": 0.4375
+      "vector_timeout_rate": 0.4375,
+      "workflow_success_rate": 0.5625
     },
     "docatlas_context_injected": {
       "checklist_used_rate": 0.0,
@@ -680,11 +890,13 @@
       "context_used_rate": 0.8461538461538461,
       "docatlas_call_rate": 0.8461538461538461,
       "fallback_rate": 0.0,
+      "fallback_success_rate": 0.0,
       "resolved_when_context_not_used": 0.0,
       "resolved_when_context_used": 0.36363636363636365,
       "retrieval_success_rate": 0.0,
       "runs": 13,
-      "vector_timeout_rate": 0.0
+      "vector_timeout_rate": 0.0,
+      "workflow_success_rate": 0.0
     },
     "docatlas_snippet_first": {
       "checklist_used_rate": 0.0,
@@ -692,11 +904,13 @@
       "context_used_rate": 0.0,
       "docatlas_call_rate": 0.0,
       "fallback_rate": 0.0,
+      "fallback_success_rate": 0.0,
       "resolved_when_context_not_used": 0.0,
       "resolved_when_context_used": null,
       "retrieval_success_rate": 0.0,
       "runs": 4,
-      "vector_timeout_rate": 0.0
+      "vector_timeout_rate": 0.0,
+      "workflow_success_rate": 0.0
     },
     "docatlas_tool_optional": {
       "checklist_used_rate": 0.0,
@@ -704,11 +918,13 @@
       "context_used_rate": 0.3333333333333333,
       "docatlas_call_rate": 0.0,
       "fallback_rate": 0.0,
+      "fallback_success_rate": 0.0,
       "resolved_when_context_not_used": 0.0,
       "resolved_when_context_used": 0.0,
       "retrieval_success_rate": 0.0,
       "runs": 6,
-      "vector_timeout_rate": 0.0
+      "vector_timeout_rate": 0.0,
+      "workflow_success_rate": 0.0
     },
     "docatlas_tool_recommended": {
       "checklist_used_rate": 0.0,
@@ -716,11 +932,13 @@
       "context_used_rate": 1.0,
       "docatlas_call_rate": 1.0,
       "fallback_rate": 0.0,
+      "fallback_success_rate": 0.0,
       "resolved_when_context_not_used": null,
       "resolved_when_context_used": 0.3684210526315789,
-      "retrieval_success_rate": 0.0,
+      "retrieval_success_rate": 0.47368421052631576,
       "runs": 19,
-      "vector_timeout_rate": 0.0
+      "vector_timeout_rate": 0.0,
+      "workflow_success_rate": 1.0
     },
     "docatlas_tool_required_once": {
       "checklist_used_rate": 0.0,
@@ -728,11 +946,13 @@
       "context_used_rate": 0.5714285714285714,
       "docatlas_call_rate": 0.5714285714285714,
       "fallback_rate": 0.0,
+      "fallback_success_rate": 0.0,
       "resolved_when_context_not_used": 0.0,
       "resolved_when_context_used": 0.25,
       "retrieval_success_rate": 0.0,
       "runs": 7,
-      "vector_timeout_rate": 0.0
+      "vector_timeout_rate": 0.0,
+      "workflow_success_rate": 0.5714285714285714
     }
   },
   "context_utilization_confidence": {
@@ -799,7 +1019,6 @@
     "docatlas_context_injected",
     "docatlas_tool_recommended"
   ],
-  "injected_context_token_attribution": "injected context token attribution unavailable",
   "policy_cases": [
     {
       "DocAtlas best": "missing",
@@ -867,5 +1086,6 @@
     }
   ],
   "reasons": [],
+  "unavailable_fields_note": "Older artifacts may not contain injected_context_tokens, checklist_tokens, retrieved_context_tokens, constraint_packet_tokens, raw_doc_context_tokens, or separated retrieval/fallback success fields; those metrics are reported as null when unavailable.",
   "verdict": "QUALITY_POSITIVE_COSTLY"
 }
