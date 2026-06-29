@@ -19,6 +19,11 @@ LOW_VALUE_SYMBOLS = {
     "StatelessWidget", "StatefulWidget",
 }
 DOGFOOD_MEMO_REASONS = {"dogfood_result_memo", "dogfood_task_artifact"}
+PATCH_REVIEW_SCHEMA_VERSIONS = {
+    "review_summary_manifest.json": 1,
+    "review_summary_quality.json": 1,
+    "review_summary_actions.json": 1,
+}
 TASK_TOKEN_STOPWORDS = {
     "add", "and", "before", "change", "check", "current", "diff", "file",
     "for", "from", "into", "keep", "make", "must", "path", "patch", "pr",
@@ -233,7 +238,7 @@ class PatchReviewService:
             },
         }
         return {
-            "schema_version": 1,
+            "schema_version": PATCH_REVIEW_SCHEMA_VERSIONS["review_summary_manifest.json"],
             "summary_mode": summary_mode,
             "product_role": "non_blocking_pr_review_assistant",
             "claims_avoided": [
@@ -363,7 +368,7 @@ class PatchReviewService:
             validation=validation,
         )
         return {
-            "schema_version": 1,
+            "schema_version": PATCH_REVIEW_SCHEMA_VERSIONS["review_summary_quality.json"],
             "attachable": quality["attachable"],
             "summary_mode": summary_mode,
             "actionable_items_limit": summary_max_items,
@@ -470,7 +475,7 @@ class PatchReviewService:
         violations = model["violations"]
         results_by_id = model["results_by_id"]
         return {
-            "schema_version": 1,
+            "schema_version": PATCH_REVIEW_SCHEMA_VERSIONS["review_summary_actions.json"],
             "summary_mode": summary_mode,
             "actionable_items_limit": summary_max_items,
             "actionable_items": [

@@ -7,7 +7,7 @@ from pathlib import Path
 from click.testing import CliRunner
 
 from docmancer.cli.__main__ import cli
-from docmancer.docs.application.patch_review_service import PatchReviewService
+from docmancer.docs.application.patch_review_service import PATCH_REVIEW_SCHEMA_VERSIONS, PatchReviewService
 from docmancer.docs.application.patch_constraints_service import PatchConstraintsService
 from docmancer.docs.service import LibraryDocsService
 
@@ -597,7 +597,7 @@ def test_patch_review_writes_machine_readable_summary_quality(tmp_path: Path):
     summary_quality = _section((out / "review_summary.md").read_text(encoding="utf-8"), "Review summary quality")
     assert "review_summary_quality.json" in payload["artifacts"]
     assert payload["review_summary_quality"] == quality
-    assert quality["schema_version"] == 1
+    assert quality["schema_version"] == PATCH_REVIEW_SCHEMA_VERSIONS["review_summary_quality.json"]
     assert quality["summary_mode"] == "compact"
     assert quality["actionable_items_limit"] == 2
     assert quality["attachable"] in {"yes", "maybe", "no"}
@@ -647,7 +647,7 @@ def test_patch_review_writes_machine_readable_action_items(tmp_path: Path):
     actionable_markdown = _section((out / "review_summary.md").read_text(encoding="utf-8"), "Actionable PR checklist")
     assert "review_summary_actions.json" in payload["artifacts"]
     assert payload["review_summary_actions"] == actions
-    assert actions["schema_version"] == 1
+    assert actions["schema_version"] == PATCH_REVIEW_SCHEMA_VERSIONS["review_summary_actions.json"]
     assert actions["actionable_items_limit"] == 2
     assert 0 < len(actions["actionable_items"]) <= 2
     assert any(item["instruction"] in actionable_markdown for item in actions["actionable_items"])
@@ -698,7 +698,7 @@ def test_patch_review_writes_machine_readable_manifest(tmp_path: Path):
     manifest_artifacts = {item["filename"]: item for item in manifest["artifacts"]}
     assert "review_summary_manifest.json" in payload["artifacts"]
     assert payload["review_summary_manifest"] == manifest
-    assert manifest["schema_version"] == 1
+    assert manifest["schema_version"] == PATCH_REVIEW_SCHEMA_VERSIONS["review_summary_manifest.json"]
     assert manifest["summary_mode"] == "compact"
     assert manifest["product_role"] == "non_blocking_pr_review_assistant"
     assert [item["filename"] for item in manifest["artifacts"]] == payload["artifacts"]
@@ -760,7 +760,7 @@ def test_patch_review_machine_readable_artifact_contracts(tmp_path: Path):
         "unknown_buckets",
         "claims_avoided",
     } <= set(quality)
-    assert quality["schema_version"] == 1
+    assert quality["schema_version"] == PATCH_REVIEW_SCHEMA_VERSIONS["review_summary_quality.json"]
     assert quality["attachable"] in {"yes", "maybe", "no"}
     for signal in quality["signals"]:
         assert {"code", "severity", "count", "message"} <= set(signal)
@@ -774,7 +774,7 @@ def test_patch_review_machine_readable_artifact_contracts(tmp_path: Path):
         "violations",
         "claims_avoided",
     } <= set(actions)
-    assert actions["schema_version"] == 1
+    assert actions["schema_version"] == PATCH_REVIEW_SCHEMA_VERSIONS["review_summary_actions.json"]
     for item in actions["actionable_items"]:
         assert {
             "rank",
@@ -791,10 +791,15 @@ def test_patch_review_machine_readable_artifact_contracts(tmp_path: Path):
         } <= set(item)
 
     assert {"schema_version", "summary_mode", "product_role", "claims_avoided", "artifacts"} <= set(manifest)
-    assert manifest["schema_version"] == 1
+    assert manifest["schema_version"] == PATCH_REVIEW_SCHEMA_VERSIONS["review_summary_manifest.json"]
     for item in manifest["artifacts"]:
         assert {"filename", "kind", "schema_version", "intended_consumers", "safe_usage"} <= set(item)
     assert [item["filename"] for item in manifest["artifacts"]] == payload["artifacts"]
+    assert PATCH_REVIEW_SCHEMA_VERSIONS == {
+        "review_summary_manifest.json": manifest["schema_version"],
+        "review_summary_quality.json": quality["schema_version"],
+        "review_summary_actions.json": actions["schema_version"],
+    }
 
 
 
