@@ -33,17 +33,63 @@ GENERATED_PATTERNS = (
     "dist/",
 )
 GENERATED_ARTIFACT_SOURCE_PATTERNS = (
-    "docs/research/docatlas-dogfood/**",
-    "docs/research/**/constraints.md",
-    "docs/research/**/constraints.json",
-    "docs/research/**/validation.json",
-    "docs/research/**/patch.diff",
-    "docs/research/**/changed_files.json",
-    "docs/research/**/review_notes.md",
     "eval/task_level/results/**",
     ".docatlas/**",
     ".docmancer/**",
 )
+PATCH_REVIEW_DIR_NAMES = {"patch-review", "patch_review"}
+PATCH_REVIEW_ARTIFACT_NAMES = {
+    "review_summary.md",
+    "constraints.md",
+    "constraints.json",
+    "validation.json",
+    "changed_files.json",
+    "patch.diff",
+    "patch.raw.diff",
+    "git_status.txt",
+    "git_status.raw.txt",
+    "changed_files.raw.json",
+    "patch_hygiene.json",
+    "untracked_files.json",
+    "ignored_runtime_artifacts.json",
+    "review_notes.md",
+    "checks.txt",
+}
+GENERIC_CALL_SYMBOLS = {
+    "read", "watch", "of", "push", "pop", "map", "where", "firstWhere",
+    "maybeWhen", "when", "setState",
+}
+ASSET_TASK_TERMS = {
+    "asset", "assets", "icon", "image", "logo", "svg", "png", "jpg",
+    "resource", "generated asset", "иконка", "изображение", "логотип",
+    "ресурс", "ассет", "картинка",
+}
+ASSET_REGISTRY_FILENAMES = {"assets.dart", "asset.dart", "assets.gen.dart", "assets.g.dart"}
+PHRASE_ALIASES = {
+    "закрыть меню": ("closeMenu", "close", "hide", "dismiss", "drawer", "menu"),
+    "закрывать меню": ("closeMenu", "close", "hide", "dismiss", "drawer", "menu"),
+    "закрытие меню": ("closeMenu", "close", "hide", "dismiss", "drawer", "menu"),
+    "закрыть шторку": ("closeMenu", "close", "hide", "dismiss", "drawer", "menu"),
+    "закрывать шторку": ("closeMenu", "close", "hide", "dismiss", "drawer", "menu"),
+    "закрытие шторки": ("closeMenu", "close", "hide", "dismiss", "drawer", "menu"),
+    "закрыть панель": ("closeMenu", "close", "hide", "dismiss", "drawer", "menu"),
+    "закрывать панель": ("closeMenu", "close", "hide", "dismiss", "drawer", "menu"),
+    "скрыть меню": ("closeMenu", "close", "hide", "dismiss", "drawer", "menu"),
+    "скрывать меню": ("closeMenu", "close", "hide", "dismiss", "drawer", "menu"),
+    "скрыть шторку": ("closeMenu", "close", "hide", "dismiss", "drawer", "menu"),
+    "скрывать шторку": ("closeMenu", "close", "hide", "dismiss", "drawer", "menu"),
+    "close menu": ("closeMenu", "close", "hide", "dismiss", "drawer", "menu"),
+    "closing menu": ("closeMenu", "close", "hide", "dismiss", "drawer", "menu"),
+    "close drawer": ("closeMenu", "close", "hide", "dismiss", "drawer", "menu"),
+    "closing drawer": ("closeMenu", "close", "hide", "dismiss", "drawer", "menu"),
+    "hide menu": ("closeMenu", "close", "hide", "dismiss", "drawer", "menu"),
+    "hide drawer": ("closeMenu", "close", "hide", "dismiss", "drawer", "menu"),
+    "dismiss menu": ("closeMenu", "close", "hide", "dismiss", "drawer", "menu"),
+    "dismiss drawer": ("closeMenu", "close", "hide", "dismiss", "drawer", "menu"),
+    "быстрая информация": ("openInfo", "info", "information"),
+    "scan doc": ("goToScanDocInit", "scanDoc", "scan", "document"),
+    "сканирование документов": ("goToScanDocInit", "scanDoc", "scan", "document"),
+}
 SYMBOL_SOURCE_SUFFIXES = (".py", ".dart", ".ts", ".tsx", ".js", ".jsx", ".go", ".rs", ".kt", ".java", ".md", ".txt")
 ARCHITECTURE_DOC_RE = re.compile(
     r"(^|/)(architecture\.md|architecture/|adr/|adrs/|contributing\.md|readme[^/]*\.(md|txt)|adr[^/]*\.md)$",
@@ -83,6 +129,7 @@ class PatchConstraintsService:
         self._question = ""
         self._changed_files: list[str] = []
         self._ignored_generated_artifact_sources: list[str] = []
+        self._excluded_source_reasons: list[dict[str, str]] = []
 
     def get_patch_constraints(
         self,
@@ -100,6 +147,7 @@ class PatchConstraintsService:
         self._question = question or ""
         self._changed_files = changed_files
         self._ignored_generated_artifact_sources = []
+        self._excluded_source_reasons = []
         root = Path(project_path).expanduser().resolve() if project_path else None
         sources = self._visible_sources(root) if root else []
         constraints: list[PatchConstraint] = []
@@ -136,6 +184,7 @@ class PatchConstraintsService:
             sources=self._source_summary(sources, selected) if include_sources else [],
             symbol_candidates=symbol_candidates,
             ignored_generated_artifact_sources=self._ignored_generated_artifact_sources[:20],
+            excluded_source_reasons=self._excluded_source_reasons[:50],
             excluded_source_count=len(self._ignored_generated_artifact_sources),
             token_estimate=token_estimate,
             confidence=confidence,
@@ -179,8 +228,14 @@ class PatchConstraintsService:
             rel = resolved.relative_to(root).as_posix()
             excluded_reason = self._excluded_source_reason(rel)
             if excluded_reason:
-                if excluded_reason == "generated_artifact":
+                if excluded_reason in {
+                    "patch_review_output",
+                    "dogfood_generated_artifact",
+                    "eval_result_artifact",
+                    "docatlas_internal_output",
+                }:
                     self._ignored_generated_artifact_sources.append(rel)
+                    self._excluded_source_reasons.append({"path": rel, "reason": excluded_reason})
                 continue
             if not (ARCHITECTURE_DOC_RE.search(rel) or "/docs/" in f"/{rel}" or rel.lower().startswith("docs/")):
                 continue
@@ -202,10 +257,26 @@ class PatchConstraintsService:
     @staticmethod
     def _excluded_source_reason(rel: str) -> str | None:
         normalized = rel.replace("\\", "/")
+        parts_list = [part.lower() for part in Path(normalized).parts]
+        parts = set(parts_list)
+        name = parts_list[-1] if parts_list else ""
+        if bool(parts & PATCH_REVIEW_DIR_NAMES):
+            return "patch_review_output"
+        if parts_list[:2] in ([".docatlas", "patch-review"], [".docmancer", "patch-review"]):
+            return "patch_review_output"
+        if name in PATCH_REVIEW_ARTIFACT_NAMES and (
+            "docs" in parts and "research" in parts and any(part.startswith("docatlas-dogfood") for part in parts_list)
+        ):
+            return "dogfood_generated_artifact"
+        if normalized.startswith("docs/research/docatlas-dogfood") and name in PATCH_REVIEW_ARTIFACT_NAMES:
+            return "dogfood_generated_artifact"
+        if normalized.startswith("eval/task_level/results/"):
+            return "eval_result_artifact"
+        if normalized.startswith((".docatlas/", ".docmancer/")):
+            return "docatlas_internal_output"
         if any(fnmatch.fnmatch(normalized, pattern) for pattern in GENERATED_ARTIFACT_SOURCE_PATTERNS):
-            return "generated_artifact"
-        parts = {part.lower() for part in Path(rel).parts}
-        if bool(parts & EXCLUDED_SOURCE_PARTS) or any("oracle" in part.lower() or "hidden" in part.lower() for part in Path(rel).parts):
+            return "dogfood_generated_artifact"
+        if bool(parts & EXCLUDED_SOURCE_PARTS) or any("oracle" in part or "hidden" in part for part in parts_list):
             return "runtime_or_hidden"
         return None
 
@@ -442,6 +513,7 @@ class PatchConstraintsService:
         terms = self._task_terms(question)
         if not terms:
             return []
+        asset_related_task = self._is_asset_related_task(question)
         source_files = self._symbol_source_files(root, changed_files)
         candidates: list[dict[str, Any]] = []
         seen: set[tuple[str, str, str]] = set()
@@ -451,6 +523,9 @@ class PatchConstraintsService:
                 rel = path.relative_to(root).as_posix()
                 if self._excluded_source(rel):
                     continue
+                generated_asset_source = self._is_generated_asset_path(rel)
+                if generated_asset_source and not asset_related_task:
+                    continue
                 try:
                     lines = path.read_text(encoding="utf-8", errors="replace").splitlines()
                 except OSError:
@@ -459,19 +534,25 @@ class PatchConstraintsService:
                     lowered = line.lower()
                     if not any(variant and variant.lower() in lowered for variant in variants):
                         continue
-                    symbol = self._symbol_from_line(line) or term
+                    symbol = self._symbol_from_line(line, variants) or term
+                    if symbol in GENERIC_CALL_SYMBOLS and not self._term_explicitly_mentions_symbol(term, symbol):
+                        continue
                     key = (term.lower(), rel, symbol)
                     if key in seen:
                         continue
                     seen.add(key)
+                    confidence = self._symbol_confidence(line, symbol, generated_asset_source)
+                    reason = "task term matched an existing source/docs symbol; prefer reusing source-attributed project behavior before inventing a new path."
+                    if generated_asset_source:
+                        reason = "generated_asset_demoted: task explicitly mentions assets/resources, so generated asset registry evidence is kept at low confidence."
                     candidates.append({
                         "term": term,
                         "matched_symbol": symbol,
                         "source": rel,
                         "line": line_number,
                         "evidence": line.strip()[:240],
-                        "confidence": "medium" if symbol != term else "low",
-                        "reason": "task term matched an existing source/docs symbol; prefer reusing source-attributed project behavior before inventing a new path.",
+                        "confidence": confidence,
+                        "reason": reason,
                     })
                     break
                 if any(candidate["term"].lower() == term.lower() for candidate in candidates):
@@ -490,6 +571,11 @@ class PatchConstraintsService:
         terms.extend(re.findall(r"\b[A-Za-zА-Яа-яЁё][A-Za-zА-Яа-яЁё0-9]*(?:\s+[A-Za-zА-Яа-яЁё][A-Za-zА-Яа-яЁё0-9]*){1,2}\b", question))
         for match in re.finditer(r"\b(open|close|show|hide|toggle|navigate|route|save|load)\s+([A-Za-zА-Яа-яЁё][A-Za-zА-Яа-яЁё0-9]*)\b", question, re.I):
             terms.append(f"{match.group(1)} {match.group(2)}")
+        lowered_question = question.lower()
+        for phrase, aliases in PHRASE_ALIASES.items():
+            if phrase in lowered_question:
+                terms.append(phrase)
+                terms.extend(aliases)
         out: list[str] = []
         seen: set[str] = set()
         stop = {"should", "existing", "button", "action", "menu", "project", "current", "текущая", "кнопка", "меню", "экран"}
@@ -501,7 +587,7 @@ class PatchConstraintsService:
             if key not in seen:
                 seen.add(key)
                 out.append(cleaned)
-        return out[:24]
+        return out[:32]
 
     @staticmethod
     def _term_variants(term: str) -> list[str]:
@@ -515,6 +601,8 @@ class PatchConstraintsService:
             for left, right in zip(words, words[1:]):
                 variants.add(f"{left} {right}")
                 variants.add(f"{left.lower()}{right[:1].upper() + right[1:]}")
+        if term in PHRASE_ALIASES:
+            variants.update(PHRASE_ALIASES[term])
         return [variant for variant in variants if len(variant) >= 3]
 
     def _symbol_source_files(self, root: Path, changed_files: list[str]) -> list[Path]:
@@ -545,7 +633,28 @@ class PatchConstraintsService:
         return out
 
     @staticmethod
-    def _symbol_from_line(line: str) -> str | None:
+    def extract_method_call_symbols(line: str) -> list[str]:
+        symbols: list[str] = []
+        for match in re.finditer(r"\.\s*([A-Za-z_][A-Za-z0-9_]*)\s*\(", line):
+            symbol = match.group(1)
+            if symbol not in symbols:
+                symbols.append(symbol)
+        return symbols
+
+    @classmethod
+    def _symbol_from_line(cls, line: str, variants: list[str] | None = None) -> str | None:
+        call_symbols = cls.extract_method_call_symbols(line)
+        variants_lower = {variant.lower() for variant in variants or []}
+        non_generic_calls = [symbol for symbol in call_symbols if symbol not in GENERIC_CALL_SYMBOLS]
+        for symbol in reversed(non_generic_calls):
+            if symbol.lower() in variants_lower:
+                return symbol
+        if non_generic_calls:
+            return non_generic_calls[-1]
+        if call_symbols:
+            explicit = [symbol for symbol in reversed(call_symbols) if symbol.lower() in variants_lower]
+            if explicit:
+                return explicit[0]
         patterns = [
             r"\b(?:class|enum|mixin|extension|typedef|const|final|var|void|Future<[^>]+>|Future|Widget)\s+([A-Za-z_][A-Za-z0-9_]*)",
             r"\b([A-Za-z_][A-Za-z0-9_]*)\s*\(",
@@ -558,6 +667,29 @@ class PatchConstraintsService:
                 if symbol not in {"if", "for", "while", "switch", "return"}:
                     return symbol
         return None
+
+    @staticmethod
+    def _symbol_confidence(line: str, symbol: str, generated_asset_source: bool) -> str:
+        if generated_asset_source:
+            return "low"
+        if re.search(rf"\b(?:class|enum|mixin|extension|typedef|const|final|var|void|Future<[^>]+>|Future|Widget)\s+{re.escape(symbol)}\b", line):
+            return "high"
+        return "medium"
+
+    @staticmethod
+    def _term_explicitly_mentions_symbol(term: str, symbol: str) -> bool:
+        return term.lower() == symbol.lower()
+
+    @staticmethod
+    def _is_asset_related_task(question: str) -> bool:
+        lowered = question.lower()
+        return any(term in lowered for term in ASSET_TASK_TERMS)
+
+    @classmethod
+    def _is_generated_asset_path(cls, rel: str) -> bool:
+        lower = rel.lower()
+        name = Path(lower).name
+        return cls._is_generated_path(rel) or name in ASSET_REGISTRY_FILENAMES or lower.startswith("lib/generated/") or "/lib/generated/" in f"/{lower}"
 
     def _symbol_candidate_constraints(self, candidates: list[dict[str, Any]]) -> list[PatchConstraint]:
         constraints: list[PatchConstraint] = []
