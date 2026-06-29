@@ -606,6 +606,9 @@ def test_patch_review_writes_machine_readable_summary_quality(tmp_path: Path):
         "test_or_human_review_replacement",
         "broad_docatlas_superiority",
     ]
+    signal_codes = {item["code"] for item in quality["signals"]}
+    assert "actionable_items_present" in signal_codes
+    assert "no_violations" in signal_codes
     assert f"- attachable: {quality['attachable']}" in summary_quality
     assert f"- actionable_items_count: {quality['actionable_items_count']}" in summary_quality
 
@@ -751,11 +754,15 @@ def test_patch_review_machine_readable_artifact_contracts(tmp_path: Path):
         "violated_count",
         "unknown_count",
         "reasons",
+        "signals",
         "unknown_buckets",
         "claims_avoided",
     } <= set(quality)
     assert quality["schema_version"] == 1
     assert quality["attachable"] in {"yes", "maybe", "no"}
+    for signal in quality["signals"]:
+        assert {"code", "severity", "count", "message"} <= set(signal)
+        assert signal["severity"] in {"info", "warning", "error"}
 
     assert {
         "schema_version",

@@ -354,6 +354,14 @@ class PatchReviewService:
         unknown_buckets = model["unknown_buckets"]
         residual_memos = model["residual_memos"]
         quality = model["quality"]
+        signals = PatchReviewService._review_summary_quality_signals(
+            actionable=actionable,
+            low_context=low_context,
+            low_symbols=low_symbols,
+            unknown_buckets=unknown_buckets,
+            residual_memos=residual_memos,
+            validation=validation,
+        )
         return {
             "schema_version": 1,
             "attachable": quality["attachable"],
@@ -367,6 +375,7 @@ class PatchReviewService:
             "violated_count": validation.get("violated", 0),
             "unknown_count": validation.get("unknown", 0),
             "reasons": quality["reasons"],
+            "signals": signals,
             "unknown_buckets": [
                 {
                     "name": name,
@@ -384,6 +393,59 @@ class PatchReviewService:
                 "broad_docatlas_superiority",
             ],
         }
+
+    @staticmethod
+    def _review_summary_quality_signals(
+        *,
+        actionable: list[dict[str, Any]],
+        low_context: list[dict[str, Any]],
+        low_symbols: list[dict[str, Any]],
+        unknown_buckets: dict[str, list[dict[str, Any]]],
+        residual_memos: list[dict[str, Any]],
+        validation: dict[str, Any],
+    ) -> list[dict[str, Any]]:
+        signals = [
+            {
+                "code": "actionable_items_present" if actionable else "no_actionable_items",
+                "severity": "info" if actionable else "warning",
+                "count": len(actionable),
+                "message": "Actionable checklist items are available." if actionable else "No actionable checklist items were selected.",
+            },
+            {
+                "code": "violations_present" if validation.get("violated", 0) else "no_violations",
+                "severity": "error" if validation.get("violated", 0) else "info",
+                "count": validation.get("violated", 0),
+                "message": "Validation found violated constraints." if validation.get("violated", 0) else "Validation found no violated constraints.",
+            },
+        ]
+        if unknown_buckets:
+            signals.append(
+                {
+                    "code": "unknown_buckets_present",
+                    "severity": "warning",
+                    "count": len(unknown_buckets),
+                    "message": "Manual-review buckets remain.",
+                }
+            )
+        if low_context or low_symbols:
+            signals.append(
+                {
+                    "code": "low_value_signals_present",
+                    "severity": "warning",
+                    "count": len(low_context) + len(low_symbols),
+                    "message": "Low-confidence or noisy signals were kept out of the top checklist.",
+                }
+            )
+        if residual_memos:
+            signals.append(
+                {
+                    "code": "residual_memo_sources_present",
+                    "severity": "warning",
+                    "count": len(residual_memos),
+                    "message": "Prior dogfood memo/task artifacts were excluded from top-level recommendations.",
+                }
+            )
+        return signals
 
     @staticmethod
     def _review_summary_actions_payload(
