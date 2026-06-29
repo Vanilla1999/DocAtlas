@@ -343,6 +343,7 @@ class PatchConstraintPacket:
     sources: list[dict[str, Any]] = field(default_factory=list)
     symbol_candidates: list[dict[str, Any]] = field(default_factory=list)
     ignored_generated_artifact_sources: list[str] = field(default_factory=list)
+    excluded_source_reasons: list[dict[str, str]] = field(default_factory=list)
     excluded_source_count: int = 0
     token_estimate: int = 0
     confidence: str = "low"
