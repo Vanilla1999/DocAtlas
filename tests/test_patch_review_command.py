@@ -705,6 +705,85 @@ def test_patch_review_writes_machine_readable_manifest(tmp_path: Path):
     assert "correctness_proof" in manifest["claims_avoided"]
 
 
+def test_patch_review_machine_readable_artifact_contracts(tmp_path: Path):
+    repo = _repo(tmp_path)
+    _git(repo, "init")
+    _git(repo, "config", "user.email", "test@example.com")
+    _git(repo, "config", "user.name", "Test User")
+    _git(repo, "add", ".")
+    _git(repo, "commit", "-m", "base")
+    _write(repo / "lib/presentation/menu_view.dart", "void buildMenu() {\n  menuNotifier.closeMenu();\n}\n")
+    out = tmp_path / "review-contracts"
+
+    result = CliRunner().invoke(
+        cli,
+        [
+            "patch-review",
+            "--project-path",
+            str(repo),
+            "--task",
+            "Review menu navigation",
+            "--summary-max-items",
+            "2",
+            "--output-dir",
+            str(out),
+            "--format",
+            "json",
+        ],
+    )
+
+    assert result.exit_code == 0, result.output
+    payload = json.loads(result.output)
+    quality = payload["review_summary_quality"]
+    actions = payload["review_summary_actions"]
+    manifest = payload["review_summary_manifest"]
+
+    assert {
+        "schema_version",
+        "attachable",
+        "summary_mode",
+        "actionable_items_limit",
+        "actionable_items_count",
+        "low_value_top_items_count",
+        "unknown_bucket_count",
+        "residual_memo_source_count",
+        "satisfied_count",
+        "violated_count",
+        "unknown_count",
+        "reasons",
+        "unknown_buckets",
+        "claims_avoided",
+    } <= set(quality)
+    assert quality["schema_version"] == 1
+    assert quality["attachable"] in {"yes", "maybe", "no"}
+
+    assert {
+        "schema_version",
+        "summary_mode",
+        "actionable_items_limit",
+        "actionable_items",
+        "violations",
+        "claims_avoided",
+    } <= set(actions)
+    assert actions["schema_version"] == 1
+    for item in actions["actionable_items"]:
+        assert {
+            "rank",
+            "constraint_id",
+            "instruction",
+            "source",
+            "type",
+            "confidence",
+            "markdown",
+        } <= set(item)
+
+    assert {"schema_version", "summary_mode", "product_role", "claims_avoided", "artifacts"} <= set(manifest)
+    assert manifest["schema_version"] == 1
+    for item in manifest["artifacts"]:
+        assert {"filename", "kind", "schema_version", "intended_consumers", "safe_usage"} <= set(item)
+    assert [item["filename"] for item in manifest["artifacts"]] == payload["artifacts"]
+
+
 
 def test_patch_review_summary_uses_generic_task_terms_without_project_hardcoding():
     summary = PatchReviewService._review_summary(
