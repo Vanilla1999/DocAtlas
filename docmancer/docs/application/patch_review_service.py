@@ -104,6 +104,7 @@ class PatchReviewService:
             "untracked_files": untracked_files,
             "ignored_runtime_artifacts": ignored_runtime_artifacts,
             "warnings": warnings,
+            "summary_max_items": summary_max_items,
             "constraints": constraints_dict,
             "validation": validation_dict,
             "artifacts": [
@@ -217,6 +218,7 @@ class PatchReviewService:
             "",
             "## Review summary quality",
             f"- attachable: {quality['attachable']}",
+            f"- actionable_items_limit: {summary_max_items}",
             f"- actionable_items_count: {len(actionable)}",
             f"- low_value_top_items_count: {len(low_context) + len(low_symbols)}",
             f"- unknown_bucket_count: {len(unknown_buckets)}",

@@ -316,6 +316,7 @@ def test_patch_review_summary_sections_stay_ordered_without_full_markdown_snapsh
     positions = [summary.index(section) for section in expected_order]
     assert positions == sorted(positions)
     assert "- attachable: maybe" in summary
+    assert "- actionable_items_limit: 5" in summary
     assert "- unknown_bucket_count: 1" in summary
     assert "- residual_memo_source_count: 1" in summary
     assert "symbol `tr`" in _section(summary, "Low-confidence / noisy signals")
@@ -413,8 +414,29 @@ def test_patch_review_summary_max_items_limits_actionable_checklist(tmp_path: Pa
 
     assert result.exit_code == 0, result.output
     actionable = _section((out / "review_summary.md").read_text(), "Actionable PR checklist")
+    quality = _section((out / "review_summary.md").read_text(), "Review summary quality")
     items = [line for line in actionable.splitlines() if line.startswith("- ") and line != "- none"]
     assert len(items) <= 2
+    assert "- actionable_items_limit: 2" in quality
+
+    json_result = CliRunner().invoke(
+        cli,
+        [
+            "patch-review",
+            "--project-path",
+            str(repo),
+            "--task",
+            "Review generated guardrails and menu action",
+            "--summary-max-items",
+            "2",
+            "--output-dir",
+            str(tmp_path / "review-json"),
+            "--format",
+            "json",
+        ],
+    )
+    assert json_result.exit_code == 0, json_result.output
+    assert json.loads(json_result.output)["summary_max_items"] == 2
 
 
 def test_patch_review_summary_max_items_is_validated_by_cli():
