@@ -707,6 +707,8 @@ def test_patch_review_writes_machine_readable_manifest(tmp_path: Path):
     assert manifest_artifacts["review_summary_actions.json"]["schema_version"] == payload["review_summary_actions"]["schema_version"]
     assert manifest_artifacts["review_summary_pr_comment.json"]["schema_version"] == payload["review_summary_pr_comment"]["schema_version"]
     assert manifest_artifacts["review_summary_pr_comment.json"]["kind"] == "bot_pr_comment_payload"
+    assert manifest_artifacts["review_summary_trace.json"]["schema_version"] == payload["review_summary_trace"]["schema_version"]
+    assert manifest_artifacts["review_summary_trace.json"]["kind"] == "bot_traceability_metadata"
     assert "without parsing markdown" in manifest_artifacts["review_summary_quality.json"]["safe_usage"]
     assert "without parsing markdown" in manifest_artifacts["review_summary_actions.json"]["safe_usage"]
     assert "correctness_proof" in manifest["claims_avoided"]
@@ -744,6 +746,7 @@ def test_patch_review_machine_readable_artifact_contracts(tmp_path: Path):
     quality = payload["review_summary_quality"]
     actions = payload["review_summary_actions"]
     pr_comment = payload["review_summary_pr_comment"]
+    trace = payload["review_summary_trace"]
     manifest = payload["review_summary_manifest"]
 
     assert {
@@ -803,6 +806,7 @@ def test_patch_review_machine_readable_artifact_contracts(tmp_path: Path):
         "review_summary_quality.json": quality["schema_version"],
         "review_summary_actions.json": actions["schema_version"],
         "review_summary_pr_comment.json": pr_comment["schema_version"],
+        "review_summary_trace.json": trace["schema_version"],
     }
     assert {
         "schema_version",
@@ -820,6 +824,29 @@ def test_patch_review_machine_readable_artifact_contracts(tmp_path: Path):
     assert "Non-blocking review context only" in pr_comment["body_markdown"]
     assert "review_summary_quality.json" in pr_comment["source_artifacts"]
     assert "review_summary_actions.json" in pr_comment["source_artifacts"]
+    assert {
+        "schema_version",
+        "summary_mode",
+        "source_artifacts",
+        "counts",
+        "action_traces",
+        "claims_avoided",
+    } <= set(trace)
+    assert trace["schema_version"] == PATCH_REVIEW_SCHEMA_VERSIONS["review_summary_trace.json"]
+    assert "constraints.json" in trace["source_artifacts"]
+    assert "validation.json" in trace["source_artifacts"]
+    assert trace["counts"]["action_traces"] == len(trace["action_traces"])
+    for item in trace["action_traces"]:
+        assert {
+            "rank",
+            "constraint_id",
+            "source",
+            "evidence",
+            "validation_status",
+            "validation_reason",
+            "raw_constraint_artifact",
+            "raw_validation_artifact",
+        } <= set(item)
 
 
 

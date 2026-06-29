@@ -24,6 +24,7 @@ PATCH_REVIEW_SCHEMA_VERSIONS = {
     "review_summary_quality.json": 1,
     "review_summary_actions.json": 1,
     "review_summary_pr_comment.json": 1,
+    "review_summary_trace.json": 1,
 }
 TASK_TOKEN_STOPWORDS = {
     "add", "and", "before", "change", "check", "current", "diff", "file",
@@ -114,6 +115,7 @@ class PatchReviewService:
             "review_summary_quality.json",
             "review_summary_actions.json",
             "review_summary_pr_comment.json",
+            "review_summary_trace.json",
             "constraints.json",
             "constraints.md",
             "changed_files.json",
@@ -138,7 +140,15 @@ class PatchReviewService:
             quality_payload,
             summary_mode=summary_mode,
         )
+        trace_payload = self._review_summary_trace_payload(
+            constraints_dict,
+            validation_dict,
+            actions_payload,
+            quality_payload,
+            summary_mode=summary_mode,
+        )
         self._write_json(out / "review_summary_pr_comment.json", pr_comment_payload)
+        self._write_json(out / "review_summary_trace.json", trace_payload)
         summary = self._review_summary(
             task,
             changed,
@@ -157,6 +167,7 @@ class PatchReviewService:
             quality_schema_version=quality_payload["schema_version"],
             actions_schema_version=actions_payload["schema_version"],
             pr_comment_schema_version=pr_comment_payload["schema_version"],
+            trace_schema_version=trace_payload["schema_version"],
         )
         self._write_json(out / "review_summary_manifest.json", manifest_payload)
         return {
@@ -171,6 +182,7 @@ class PatchReviewService:
             "review_summary_actions": actions_payload,
             "review_summary_quality": quality_payload,
             "review_summary_pr_comment": pr_comment_payload,
+            "review_summary_trace": trace_payload,
             "constraints": constraints_dict,
             "validation": validation_dict,
             "artifacts": artifact_names,
@@ -209,6 +221,7 @@ class PatchReviewService:
         quality_schema_version: int,
         actions_schema_version: int,
         pr_comment_schema_version: int,
+        trace_schema_version: int,
     ) -> dict[str, Any]:
         artifact_contract = {
             "review_summary.md": {
@@ -234,6 +247,12 @@ class PatchReviewService:
                 "schema_version": pr_comment_schema_version,
                 "intended_consumers": ["pr_bot", "automation"],
                 "safe_usage": "Render a ready non-blocking PR comment without parsing markdown; do not treat it as a merge gate by itself.",
+            },
+            "review_summary_trace.json": {
+                "kind": "bot_traceability_metadata",
+                "schema_version": trace_schema_version,
+                "intended_consumers": ["pr_bot", "automation", "debugger"],
+                "safe_usage": "Trace rendered recommendations back to raw constraints and validation results; use for audit/debug, not as a correctness proof.",
             },
             "constraints.json": {
                 "kind": "raw_constraints",
@@ -320,6 +339,53 @@ class PatchReviewService:
             ],
             "signals": signals,
             "actionable_items": actionable_items,
+            "claims_avoided": quality_payload.get("claims_avoided", []),
+        }
+
+    @staticmethod
+    def _review_summary_trace_payload(
+        constraints: dict[str, Any],
+        validation: dict[str, Any],
+        actions_payload: dict[str, Any],
+        quality_payload: dict[str, Any],
+        *,
+        summary_mode: str,
+    ) -> dict[str, Any]:
+        constraints_by_id = {str(item.get("id") or ""): item for item in constraints.get("constraints", [])}
+        validation_by_id = {str(item.get("constraint_id") or ""): item for item in validation.get("results", [])}
+        action_traces = []
+        for item in actions_payload.get("actionable_items", []):
+            constraint_id = str(item.get("constraint_id") or "")
+            raw_constraint = constraints_by_id.get(constraint_id, {})
+            raw_validation = validation_by_id.get(constraint_id, {})
+            action_traces.append(
+                {
+                    "rank": item.get("rank"),
+                    "constraint_id": constraint_id,
+                    "source": raw_constraint.get("source") or item.get("source"),
+                    "evidence": raw_constraint.get("evidence") or item.get("evidence"),
+                    "validation_status": raw_validation.get("status"),
+                    "validation_reason": raw_validation.get("reason"),
+                    "raw_constraint_artifact": "constraints.json",
+                    "raw_validation_artifact": "validation.json",
+                }
+            )
+        return {
+            "schema_version": PATCH_REVIEW_SCHEMA_VERSIONS["review_summary_trace.json"],
+            "summary_mode": summary_mode,
+            "source_artifacts": [
+                "constraints.json",
+                "validation.json",
+                "review_summary_quality.json",
+                "review_summary_actions.json",
+            ],
+            "counts": {
+                "constraints": len(constraints.get("constraints", [])),
+                "validation_results": len(validation.get("results", [])),
+                "action_traces": len(action_traces),
+                "quality_signals": len(quality_payload.get("signals", [])),
+            },
+            "action_traces": action_traces,
             "claims_avoided": quality_payload.get("claims_avoided", []),
         }
 
