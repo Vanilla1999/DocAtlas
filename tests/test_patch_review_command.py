@@ -560,3 +560,44 @@ def test_patch_review_summary_mode_is_exposed_in_json(tmp_path: Path):
     summary = (out / "review_summary.md").read_text()
     assert "- summary_mode: compact" in summary
     assert "## Manual review context" not in summary
+
+
+
+def test_patch_review_summary_uses_generic_task_terms_without_project_hardcoding():
+    summary = PatchReviewService._review_summary(
+        "Review checkout launch action",
+        ["lib/payments/checkout_button.dart"],
+        {
+            "constraints": [
+                {
+                    "id": "generic-task-local",
+                    "type": "source_of_truth",
+                    "instruction": "Use launchCheckoutFlow for the changed payment button action.",
+                    "source": "docs/payments.md",
+                    "confidence": "medium",
+                    "evidence": "Checkout buttons call launchCheckoutFlow before navigation.",
+                    "symbols": ["launchCheckoutFlow"],
+                    "files": [],
+                },
+                {
+                    "id": "broad-architecture",
+                    "type": "architecture",
+                    "instruction": "Rules that must not be violated live in broad architecture docs.",
+                    "source": "docs/architecture.md",
+                    "confidence": "high",
+                    "evidence": "Rules that must not be violated.",
+                    "symbols": [],
+                    "files": [],
+                },
+            ],
+            "symbol_candidates": [],
+            "excluded_source_reasons": [],
+        },
+        {"satisfied": 0, "violated": 0, "unknown": 0, "results": [], "warnings": []},
+    )
+
+    actionable = _section(summary, "Actionable PR checklist")
+    manual = _section(summary, "Manual review context")
+    assert "launchCheckoutFlow" in actionable
+    assert "broad architecture" not in actionable.lower()
+    assert "broad architecture" in manual.lower()

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import re
 import subprocess
 from dataclasses import asdict
 from datetime import datetime, timezone
@@ -18,6 +19,11 @@ LOW_VALUE_SYMBOLS = {
     "StatelessWidget", "StatefulWidget",
 }
 DOGFOOD_MEMO_REASONS = {"dogfood_result_memo", "dogfood_task_artifact"}
+TASK_TOKEN_STOPWORDS = {
+    "add", "and", "before", "change", "check", "current", "diff", "file",
+    "for", "from", "into", "keep", "make", "must", "path", "patch", "pr",
+    "review", "task", "test", "the", "this", "with", "without",
+}
 
 class PatchReviewService:
     """Generate read-only patch review artifacts for a local project."""
@@ -331,6 +337,7 @@ class PatchReviewService:
         ctype = str(item.get("type") or "")
         confidence = str(item.get("confidence") or "low")
         haystack = f"{instruction} {evidence} {' '.join(item.get('symbols') or [])}".lower()
+        haystack_compact = re.sub(r"[^a-z0-9]+", "", haystack)
         changed = " ".join(changed_files).lower()
         task_lower = task.lower()
         priority = 50
@@ -338,7 +345,7 @@ class PatchReviewService:
             priority = min(priority, 10)
         if any(path and path.lower() in source.lower() for path in changed_files):
             priority = min(priority, 15)
-        if any(token in haystack for token in PatchReviewService._task_symbol_tokens(task_lower)):
+        if any(token in haystack or token in haystack_compact for token in PatchReviewService._task_symbol_tokens(task_lower)):
             priority = min(priority, 20)
         if "policy" in task_lower and ("provider" in haystack or "policy" in haystack or "ui" in haystack):
             priority = min(priority, 22)
@@ -364,10 +371,22 @@ class PatchReviewService:
 
     @staticmethod
     def _task_symbol_tokens(task_lower: str) -> set[str]:
-        tokens = set()
+        tokens = {
+            token
+            for token in re.findall(r"[a-zа-я0-9_]{3,}", task_lower, flags=re.IGNORECASE)
+            if token not in TASK_TOKEN_STOPWORDS
+            and token not in {value.lower() for value in LOW_VALUE_SYMBOLS}
+        }
+        compact_task = re.sub(r"[^a-zа-я0-9]+", "", task_lower, flags=re.IGNORECASE)
         for token in ("openinfo", "closemenu", "gotoscandocinit", "generated", "lockfile", "provider", "policy"):
             if token.lower() in task_lower:
                 tokens.add(token.lower())
+        for phrase in re.findall(r"[a-z][a-z0-9_]*(?:\s+[a-z][a-z0-9_]*)+", task_lower):
+            compact_phrase = re.sub(r"[^a-z0-9]+", "", phrase)
+            if len(compact_phrase) >= 6:
+                tokens.add(compact_phrase)
+        if compact_task and len(compact_task) <= 48:
+            tokens.add(compact_task)
         if "быстрая информация" in task_lower or "quick-info" in task_lower or "quick info" in task_lower:
             tokens.add("openinfo")
         if "закры" in task_lower or "close menu" in task_lower or "штор" in task_lower:
