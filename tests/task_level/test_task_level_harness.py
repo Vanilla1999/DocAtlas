@@ -4,9 +4,10 @@ import json
 from pathlib import Path
 
 from eval.task_level.conditions import CONDITIONS, DEFAULT_CONDITIONS
-from eval.task_level.execution import count_jsonl_records, run_artifact_integrity, serialize_run_results_jsonl, write_run_progress
-from eval.task_level.report import bootstrap_delta_ci
+from eval.task_level.execution import count_jsonl_records, execute_pilot, run_artifact_integrity, serialize_run_results_jsonl, write_run_progress
+from eval.task_level.report import bootstrap_delta_ci, write_report
 from eval.task_level.runner import load_tasks, run_smoke
+from eval.task_level.runners.base import RunnerCapabilities
 from eval.task_level.schemas import TASKS_PATH
 
 
@@ -109,3 +110,75 @@ def test_finished_progress_marks_incomplete_artifacts_failed(tmp_path: Path):
     assert status["artifact_integrity"]["ok"] is False
     assert status["artifact_integrity"]["reason"] == ["finished_before_expected_run_count"]
     assert run_artifact_integrity(tmp_path, in_memory_results=7, total_runs=8, finished=True)["ok"] is False
+
+
+class FailingRunner:
+    runner_id = "failing"
+
+    def verify(self) -> RunnerCapabilities:
+        return RunnerCapabilities(
+            runner_id="failing",
+            version="test",
+            structured_trajectory=False,
+            patch_capture=False,
+            tool_isolation=False,
+            mcp_isolation=False,
+            shell_network_isolation=False,
+            token_usage=False,
+            independent_process=False,
+            verified=False,
+        )
+
+    def run(self, request):
+        raise NotImplementedError("runner unavailable in test")
+
+
+def test_execute_pilot_records_runner_blocked_rows(tmp_path: Path, monkeypatch):
+    monkeypatch.setattr("eval.task_level.execution.RESULTS_ROOT", tmp_path)
+    task = next(task for task in load_tasks(TASKS_PATH) if task.task_id == "decisive_docmancer_vector_timeout_fallback_001")
+
+    results = execute_pilot(
+        [task],
+        ["repo_only_strict_offline"],
+        repeats=1,
+        run_id="runner_blocked",
+        runner=FailingRunner(),
+        model="test",
+        timeout_seconds=1,
+        prompt_template="Issue:\n{issue_text}",
+    )
+
+    assert len(results) == 1
+    result = results[0]
+    assert result["status"] == "runner_unavailable"
+    assert result["resolved"] is False
+    assert result["constraint_violations_after_patch"] == 0
+    assert (tmp_path / "runner_blocked" / "runs.jsonl").exists()
+    run_dir = tmp_path / "runner_blocked" / task.task_id / "repo_only_strict_offline" / "repeat_0"
+    assert json.loads((run_dir / "changed_files.json").read_text(encoding="utf-8")) == []
+    assert (run_dir / "patch.diff").read_text(encoding="utf-8") == ""
+    assert json.loads((run_dir / "validation.json").read_text(encoding="utf-8"))["constraint_validation"]["violated"] == 0
+
+
+def test_report_summarizes_runner_unavailable_failures(tmp_path: Path):
+    report = write_report(
+        tmp_path,
+        metadata={"environment": {}, "executive_result": "test"},
+        results=[{
+            "task_id": "t",
+            "condition_id": "repo_only_strict_offline",
+            "repeat": 0,
+            "status": "runner_unavailable",
+            "resolved": False,
+            "public_tests_passed": False,
+            "hidden_tests_passed": False,
+            "policy_clean": False,
+            "metrics": {},
+            "docatlas": {},
+            "contract": {},
+            "actionability": {},
+        }],
+    )
+
+    text = report.read_text(encoding="utf-8")
+    assert "1 run(s) did not produce patches" in text

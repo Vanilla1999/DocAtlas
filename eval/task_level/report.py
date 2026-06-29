@@ -39,14 +39,16 @@ def write_report(run_dir: Path, metadata: dict[str, Any], results: list[dict[str
         "```",
         "",
         "## Task table",
-        "| task | condition | repeat | status | resolved | public | hidden | behavior | form | project | version | network_attempts | harness_docatlas | agent_docatlas | tokens | wall_time | context_injected | context_used | checklist_items | checklist_used | retrieval_status | fallback | policy_clean |",
-        "|---|---|---:|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|---:|---:|",
+        "| task | condition | repeat | status | resolved | public | hidden | behavior | form | project | version | network_attempts | harness_docatlas | agent_docatlas | tokens | wall_time | context_injected | context_used | checklist_items | checklist_used | retrieval_status | fallback | policy_clean | constraint_violations | unknowns | constraint_used | constraint_tokens |",
+        "|---|---|---:|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|---:|---:|---:|---:|---:|---:|",
     ]
     for result in results:
         docatlas = result.get("docatlas", {}) if isinstance(result.get("docatlas"), dict) else {}
         contract = result.get("contract", {}) if isinstance(result.get("contract"), dict) else {}
         actionability = result.get("actionability", {}) if isinstance(result.get("actionability"), dict) else {}
         metrics = result.get("metrics", {}) if isinstance(result.get("metrics"), dict) else {}
+        validation = result.get("constraint_validation", {}) if isinstance(result.get("constraint_validation"), dict) else {}
+        patch_constraints = result.get("patch_constraints", {}) if isinstance(result.get("patch_constraints"), dict) else {}
         lines.append(
             f"| {result['task_id']} | {result['condition_id']} | {result['repeat']} | "
             f"{result['status']} | {result.get('resolved', False)} | {result.get('public_tests_passed', result.get('tests_passed', False))} | "
@@ -58,7 +60,9 @@ def write_report(run_dir: Path, metadata: dict[str, Any], results: list[dict[str
             f"{docatlas.get('context_injected', False)} | {docatlas.get('context_used', False)} | "
             f"{len(actionability.get('checklist_items', []))} | {actionability.get('action_checklist_used', False)} | "
             f"{docatlas.get('docatlas_retrieval_status', '')} | {docatlas.get('fallback_used', False)} | "
-            f"{result.get('policy_clean', False)} |"
+            f"{result.get('policy_clean', False)} | {result.get('constraint_violations_after_patch', validation.get('violated', ''))} | "
+            f"{validation.get('unknown', result.get('unknown_count', ''))} | {result.get('constraint_used', patch_constraints.get('constraint_used', False))} | "
+            f"{result.get('constraint_packet_tokens', metrics.get('constraint_packet_tokens', ''))} |"
         )
 
     status_path = run_dir / "status.json"
@@ -93,10 +97,14 @@ def write_report(run_dir: Path, metadata: dict[str, Any], results: list[dict[str
                 f"- `{condition}`: agent_docatlas_calls={sum(agent_calls)}, context_used={sum(used)}/{len(used)}"
             )
 
+    blocked = sum(1 for result in results if result.get("status") in {"runner_unavailable", "runner_failed", "timeout"})
+    failure_summary = metadata.get("failure_summary")
+    if failure_summary is None and blocked:
+        failure_summary = f"{blocked} run(s) did not produce patches because the independent runner was unavailable, failed, or timed out."
     lines.extend([
         "",
         "## Failures",
-        metadata.get("failure_summary", "No independent agent failures were measured in this run."),
+        failure_summary or "No independent agent failures were measured in this run.",
         "",
         "## Cold/warm economics",
         metadata.get("cold_warm_economics", "DocAtlas preindex and warm query timing hooks are present; no full preindexed benchmark was executed."),

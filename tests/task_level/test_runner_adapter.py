@@ -10,6 +10,7 @@ import pytest
 from eval.task_level.execution import capture_patch, run_canary
 from eval.task_level.runners.base import AgentRunOutput, AgentRunRequest
 from eval.task_level.runners.claude import ClaudeRunner
+from eval.task_level.runners.opencode import _normalize_events, _write_opencode_config
 
 
 class MockRunner:
@@ -77,6 +78,40 @@ def test_missing_token_metrics_remain_null(tmp_path: Path):
     assert result["status"] == "passed"
     output = MockRunner().run
     assert output is not None
+
+
+def test_opencode_normalizes_json_events_for_policy_audit():
+    events = _normalize_events("\n".join([
+        json.dumps({"type": "tool_use", "part": {"tool": "edit", "state": {"input": {"filePath": "calc.py"}}}}),
+        json.dumps({"type": "tool_use", "part": {"tool": "bash", "state": {"input": {"command": "pytest -q"}}}}),
+        json.dumps({"type": "step_finish", "part": {"tokens": {"input": 10, "output": 3}}}),
+    ]))
+
+    tool_events = [event for event in events if event["event_type"] == "tool_call"]
+    assert [event["tool_name"] for event in tool_events] == ["edit", "bash"]
+    assert tool_events[0]["arguments"] == {"filePath": "calc.py"}
+    assert tool_events[1]["arguments"] == {"command": "pytest -q"}
+
+
+def test_opencode_config_uses_condition_mcp_only(tmp_path: Path):
+    source = tmp_path / "mcp_config.json"
+    source.write_text(json.dumps({
+        "mcpServers": {
+            "docmancer-docs": {
+                "command": "uv",
+                "args": ["run", "doc-atlas", "mcp", "docs-serve"],
+                "env": {"DOCMANCER_TASK_LEVEL_ALLOW_NETWORK": "false"},
+            }
+        }
+    }), encoding="utf-8")
+
+    config_home = tmp_path / "xdg_config"
+    written = _write_opencode_config(config_home, source)
+    payload = json.loads(written.read_text(encoding="utf-8"))
+
+    assert sorted(payload["mcp"]) == ["docmancer-docs"]
+    assert payload["mcp"]["docmancer-docs"]["type"] == "local"
+    assert payload["mcp"]["docmancer-docs"]["command"] == ["uv", "run", "doc-atlas", "mcp", "docs-serve"]
 
 
 @pytest.mark.integration

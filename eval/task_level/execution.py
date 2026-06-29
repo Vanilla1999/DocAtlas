@@ -9,6 +9,7 @@ import subprocess
 import sys
 import tempfile
 import time
+import traceback
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -38,6 +39,7 @@ DOCATLAS_CONDITIONS = {
     "docatlas_context_injected",
     "docatlas_action_checklist_injected",
     "docatlas_patch_constraints_injected",
+    "docatlas_patch_constraints_workflow",
     "docatlas_action_checklist_only",
     "docatlas_tool_required_once",
 }
@@ -223,6 +225,7 @@ def evaluate_agent_patch(task: TaskSpec, workspace: Path, run_output_dir: Path, 
         diff_text=patch_path.read_text(encoding="utf-8", errors="replace") if patch_path.exists() else "",
         checks_run=[task.test_command] if public else [],
     ) if patch_packet else {"constraint_validation": {"total_constraints": 0, "satisfied": 0, "violated": 0, "unknown": 0, "violations": []}}
+    (run_output_dir / "validation.json").write_text(json.dumps(constraint_validation, indent=2, sort_keys=True), encoding="utf-8")
     public_passed = bool(public and public.passed)
     hidden_passed = bool(hidden and hidden.passed)
     compile_success = bool(compile_result and compile_result.passed)
@@ -367,7 +370,9 @@ def execute_pilot(tasks: list[TaskSpec], conditions: list[str], repeats: int, ru
                                 prompt += "\n" + (run_output_dir / "action_checklist.md").read_text(encoding="utf-8") + "\n"
                             if CONDITIONS[condition_id].tool_policy.inject_patch_constraints and (run_output_dir / "patch_constraints.md").exists():
                                 prompt += "\n" + (run_output_dir / "patch_constraints.md").read_text(encoding="utf-8") + "\n"
-                    if CONDITIONS[condition_id].tool_policy.recommend_docatlas_before_edit:
+                    if condition_id == "docatlas_patch_constraints_workflow":
+                        prompt += "\nDocAtlas patch-constraints workflow guidance: before editing, use the available DocAtlas/docmancer docs tool to compile task-specific project constraints, including generated files, lockfiles, source-of-truth layers, architecture rules, dependency versions, and suggested checks. After editing, inspect your changed files and patch against those constraints; perform one repair pass if you find deterministic violations. Do not use hidden tests, gold patches, or oracle files.\n"
+                    elif CONDITIONS[condition_id].tool_policy.recommend_docatlas_before_edit:
                         prompt += "\nDocAtlas workflow guidance: Use DocAtlas/docmancer documentation context before making code changes when the task may depend on library APIs, exact dependency versions, or project docs. Ask a task-specific documentation question, then use or ignore the returned context based on relevance.\n"
                     if CONDITIONS[condition_id].tool_policy.require_docatlas_call_before_edit:
                         prompt += "\nDiagnostic policy: Before your first code edit, call the available documentation-context tool once with a task-specific question. Use or ignore the returned context based on relevance.\n"
@@ -389,8 +394,19 @@ def execute_pilot(tasks: list[TaskSpec], conditions: list[str], repeats: int, ru
                         tool_policy_path=policy_path,
                         output_dir=run_output_dir,
                     )
-                    output = runner.run(request)
-                    result = evaluate_agent_patch(task, workspace, run_output_dir, condition_id, output.trajectory_path, output)
+                    try:
+                        output = runner.run(request)
+                    except Exception as exc:
+                        result = runner_unavailable_result(
+                            task,
+                            condition_id,
+                            run_output_dir,
+                            exc,
+                            runner_id=getattr(runner, "runner_id", "unknown"),
+                            model=model,
+                        )
+                    else:
+                        result = evaluate_agent_patch(task, workspace, run_output_dir, condition_id, output.trajectory_path, output)
                     results.append(result)
                     write_run_progress(run_dir, results, total_runs, current={"task_id": task.task_id, "condition_id": condition_id, "repeat": repeat, "status": result["status"]})
     finally:
@@ -587,7 +603,7 @@ def inject_action_checklist(task: TaskSpec, workspace: Path, output_dir: Path) -
 def inject_patch_constraints(task: TaskSpec, workspace: Path, output_dir: Path) -> dict[str, Any]:
     started = time.monotonic()
     response_path = output_dir / "docatlas_response.json"
-    policy = CONDITIONS["docatlas_patch_constraints_injected"].tool_policy
+    policy = CONDITIONS["docatlas_patch_constraints_workflow"].tool_policy
     try:
         response = json.loads(response_path.read_text(encoding="utf-8")) if response_path.exists() else {}
         packet = build_patch_constraint_packet(
@@ -599,6 +615,9 @@ def inject_patch_constraints(task: TaskSpec, workspace: Path, output_dir: Path) 
             max_tokens=policy.max_constraint_packet_tokens,
         )
         save_patch_constraint_packet(packet, output_dir)
+        # Stable artifact names for the targeted patch-constraints workflow.
+        (output_dir / "constraints.json").write_text((output_dir / "patch_constraints.json").read_text(encoding="utf-8"), encoding="utf-8")
+        (output_dir / "constraints.md").write_text((output_dir / "patch_constraints.md").read_text(encoding="utf-8"), encoding="utf-8")
     except Exception as exc:
         payload = {"status": "condition_setup_failed", "error": repr(exc), "wall_time_seconds": round(time.monotonic() - started, 4)}
         (output_dir / "patch_constraints_injection.json").write_text(json.dumps(payload, indent=2, sort_keys=True), encoding="utf-8")
@@ -696,6 +715,55 @@ def _jsonable(value: Any) -> Any:
     return str(value)
 
 
+
+
+def runner_unavailable_result(task: TaskSpec, condition_id: str, run_output_dir: Path, exc: Exception, *, runner_id: str, model: str) -> dict[str, Any]:
+    (run_output_dir / "patch.diff").write_text("", encoding="utf-8")
+    (run_output_dir / "changed_files.json").write_text("[]\n", encoding="utf-8")
+    validation = {"constraint_validation": {"total_constraints": 0, "satisfied": 0, "violated": 0, "unknown": 0, "violations": []}}
+    (run_output_dir / "validation.json").write_text(json.dumps(validation, indent=2, sort_keys=True), encoding="utf-8")
+    error_payload = {
+        "type": exc.__class__.__name__,
+        "message": str(exc),
+        "traceback_tail": traceback.format_exc().splitlines()[-8:],
+    }
+    (run_output_dir / "runner_error.json").write_text(json.dumps(error_payload, indent=2, sort_keys=True), encoding="utf-8")
+    result = {
+        "run_id": run_output_dir.parents[2].name,
+        "task_id": task.task_id,
+        "condition_id": condition_id,
+        "repeat": int(run_output_dir.name.removeprefix("repeat_")),
+        "runner_id": runner_id,
+        "runner_version": "unavailable",
+        "model": model,
+        "status": "runner_unavailable",
+        "resolved": False,
+        "public_tests_passed": False,
+        "hidden_tests_passed": False,
+        "tests_passed": False,
+        "compile_success": False,
+        "policy_clean": True,
+        "policy": {"clean": True, "violations": [], "network_attempts": 0, "runner_unavailable": True},
+        "docatlas": {"available": condition_id in DOCATLAS_CONDITIONS, "harness_calls": 0, "agent_calls": 0, "context_retrieved": False, "context_injected": False, "context_used": False, "fallback_used": False},
+        "contract": {},
+        "actionability": {"checklist_items": [], "action_checklist_used": False},
+        "patch_constraints": {"constraint_count": 0, "constraint_used": False, "constraint_packet_tokens": None},
+        "constraint_validation": validation["constraint_validation"],
+        "constraint_packet_tokens": None,
+        "constraint_count": 0,
+        "constraint_used": False,
+        "constraint_violations_after_patch": 0,
+        "unknown_count": 0,
+        "patch_path": str(run_output_dir / "patch.diff"),
+        "trajectory_path": None,
+        "changed_files": [],
+        "forbidden_changes": [],
+        "metrics": {"wall_time_seconds": 0.0, "input_tokens": None, "output_tokens": None, "fallback_used": False},
+        "notes": [f"Runner unavailable before patch generation: {exc.__class__.__name__}: {exc}"],
+    }
+    (run_output_dir / "result.json").write_text(json.dumps(result, indent=2, sort_keys=True), encoding="utf-8")
+    return result
+
 def condition_setup_failed_result(task: TaskSpec, condition_id: str, run_output_dir: Path) -> dict[str, Any]:
     result = {
         "run_id": run_output_dir.parents[2].name,
@@ -738,7 +806,7 @@ def run_canary(runner: AgentRunner, model: str, timeout_seconds: int, output_dir
             task_id="runner_canary",
             condition_id="repo_only",
             workspace=workspace,
-            prompt="Fix add(a, b), which currently subtracts. Run the tests. Also confirm `curl -I https://fastapi.tiangolo.com/` is not allowed if attempted.",
+            prompt="Fix add(a, b), which currently subtracts. Run the tests. Do not use web, curl, wget, or external network.",
             model=model,
             timeout_seconds=timeout_seconds,
             max_turns=8,

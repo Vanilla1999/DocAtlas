@@ -17,6 +17,7 @@ DOCATLAS_CONDITIONS = {
     "docatlas_context_injected",
     "docatlas_action_checklist_injected",
     "docatlas_patch_constraints_injected",
+    "docatlas_patch_constraints_workflow",
     "docatlas_action_checklist_only",
     "docatlas_tool_required_once",
     "docatlas_evidence_first",
@@ -29,6 +30,8 @@ PAIRWISE_TARGETS = (
     "docatlas_action_checklist_injected",
     "docatlas_context_injected",
     "repo_only_web_audited",
+    "docatlas_patch_constraints_workflow",
+    "docatlas_patch_constraints_injected",
 )
 CONTRACT_FIELDS = (
     "behavioral_contract_score",
@@ -72,6 +75,9 @@ class NormalizedRun:
     retrieved_context_tokens: int | None = None
     constraint_packet_tokens: int | None = None
     raw_doc_context_tokens: int | None = None
+    constraint_violations_after_patch: int | None = None
+    unknown_count: int | None = None
+    constraint_used: bool = False
     behavioral_contract_score: float | None = None
     project_convention_score: float | None = None
     version_contract_score: float | None = None
@@ -203,6 +209,8 @@ def _normalize_record(raw: dict[str, Any], *, run_id: str, run_family: str, task
     docatlas = raw.get("docatlas") if isinstance(raw.get("docatlas"), dict) else {}
     actionability = raw.get("actionability") if isinstance(raw.get("actionability"), dict) else {}
     contract = raw.get("contract") if isinstance(raw.get("contract"), dict) else {}
+    validation = raw.get("constraint_validation") if isinstance(raw.get("constraint_validation"), dict) else {}
+    patch_constraints = raw.get("patch_constraints") if isinstance(raw.get("patch_constraints"), dict) else {}
     forbidden_changes = raw.get("forbidden_changes") if isinstance(raw.get("forbidden_changes"), list) else []
 
     input_tokens = _as_int(metrics.get("input_tokens"))
@@ -262,6 +270,9 @@ def _normalize_record(raw: dict[str, Any], *, run_id: str, run_family: str, task
         retrieved_context_tokens=_as_int(metrics.get("retrieved_context_tokens") or docatlas.get("retrieved_context_tokens")),
         constraint_packet_tokens=_as_int(metrics.get("constraint_packet_tokens") or docatlas.get("constraint_packet_tokens")),
         raw_doc_context_tokens=_as_int(metrics.get("raw_doc_context_tokens") or docatlas.get("raw_doc_context_tokens")),
+        constraint_violations_after_patch=_as_int(raw.get("constraint_violations_after_patch") if raw.get("constraint_violations_after_patch") is not None else validation.get("violated")),
+        unknown_count=_as_int(raw.get("unknown_count") if raw.get("unknown_count") is not None else validation.get("unknown")),
+        constraint_used=bool(raw.get("constraint_used", patch_constraints.get("constraint_used", False))),
         behavioral_contract_score=_contract_score(contract, "behavioral_contract_score", ("behavior_score",)),
         project_convention_score=_contract_score(contract, "project_convention_score"),
         version_contract_score=_contract_score(contract, "version_contract_score"),
@@ -413,6 +424,10 @@ def compute_condition_metrics(records: list[NormalizedRun], *, task_role_filter:
             "median_retrieved_context_tokens": _median(r.retrieved_context_tokens for r in items),
             "median_constraint_packet_tokens": _median(r.constraint_packet_tokens for r in items),
             "median_raw_doc_context_tokens": _median(r.raw_doc_context_tokens for r in items),
+            "constraint_violations_total": sum(r.constraint_violations_after_patch or 0 for r in items),
+            "constraint_violation_rate": _rate(sum((r.constraint_violations_after_patch or 0) > 0 for r in items), runs),
+            "median_unknown_count": _median(r.unknown_count for r in items),
+            "constraint_used_rate": _rate(sum(r.constraint_used for r in items), runs),
             "median_wall_time_seconds": _median(r.wall_time_seconds for r in items),
             "vector_retrieval_success_rate": _rate(sum(r.docatlas_tool_success or (r.docatlas_retrieval_status == "success" and not r.fallback_used) for r in items), runs),
             "fallback_success_rate": _rate(sum(r.docatlas_fallback_success for r in items), runs),
@@ -490,6 +505,8 @@ def compute_paired_deltas(records: list[NormalizedRun]) -> dict[str, dict[str, A
             "wall_time_delta_pct": _pct_delta(wall_delta, baseline_wall_med),
             "contract_score_delta": contract_deltas,
             "forbidden_edit_delta_median": _median_delta([(a.forbidden_file_edits, b.forbidden_file_edits) for a, b in pairs]),
+            "constraint_violation_delta_median": _median_delta([(a.constraint_violations_after_patch, b.constraint_violations_after_patch) for a, b in pairs]),
+            "unknown_count_delta_median": _median_delta([(a.unknown_count, b.unknown_count) for a, b in pairs]),
         }
     return result
 

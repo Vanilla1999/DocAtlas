@@ -7,6 +7,8 @@ from typing import Any, Literal
 
 ConditionId = Literal[
     "repo_only",
+    "repo_only_strict_offline",
+    "repo_only_web_audited",
     "context7",
     "docatlas_evidence_first",
     "docatlas_snippet_first",
@@ -15,6 +17,7 @@ ConditionId = Literal[
     "docatlas_context_injected",
     "docatlas_action_checklist_injected",
     "docatlas_patch_constraints_injected",
+    "docatlas_patch_constraints_workflow",
     "docatlas_action_checklist_only",
     "docatlas_tool_required_once",
     "docatlas_zero_setup",
