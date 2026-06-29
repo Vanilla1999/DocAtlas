@@ -1516,6 +1516,57 @@ def _format_context_explain(result) -> str:
 @click.command(
     cls=DocmancerCommand,
     context_settings=HELP_CONTEXT_SETTINGS,
+    epilog=format_examples(
+        'docmancer patch-review --project-path . --task "Review current patch"',
+        'docmancer patch-review --project-path . --task "Add menu action" --base-ref main --strict',
+    ),
+)
+@click.option("--project-path", required=True, type=click.Path(file_okay=False, path_type=Path), help="Local project repository path to review.")
+@click.option("--task", required=True, help="Task or PR intent to compile constraints for.")
+@click.option("--base-ref", default="HEAD", show_default=True, help="Git ref used for changed_files and patch.diff.")
+@click.option("--output-dir", default=None, type=click.Path(file_okay=False, path_type=Path), help="Artifact output directory. Defaults to .docatlas/patch-review/<timestamp> inside the project.")
+@click.option("--changed-file", "changed_files", multiple=True, help="Explicit changed file. Repeatable; defaults to git diff --name-only.")
+@click.option("--strict", is_flag=True, help="Mark unknown validation results as manual-review warnings.")
+@click.option("--max-constraints", default=12, show_default=True, type=int, help="Maximum constraints to keep in the packet.")
+@click.option("--max-tokens", default=1200, show_default=True, type=int, help="Approximate token budget for constraints.")
+@click.option("output_format", "--format", type=click.Choice(["text", "json"], case_sensitive=False), default="text", show_default=True)
+def patch_review_cmd(
+    project_path: Path,
+    task: str,
+    base_ref: str,
+    output_dir: Path | None,
+    changed_files: tuple[str, ...],
+    strict: bool,
+    max_constraints: int,
+    max_tokens: int,
+    output_format: str,
+):
+    """Generate read-only patch constraints, validation, diff, and review artifacts."""
+    from docmancer.docs.application.patch_review_service import PatchReviewService
+
+    result = PatchReviewService().run(
+        project_path=str(project_path),
+        task=task,
+        base_ref=base_ref,
+        output_dir=str(output_dir) if output_dir else None,
+        changed_files=list(changed_files) or None,
+        strict=strict,
+        max_constraints=max_constraints,
+        max_tokens=max_tokens,
+    )
+    if output_format.lower() == "json":
+        click.echo(json.dumps(result, ensure_ascii=False, indent=2, sort_keys=True))
+        return
+    validation = result["validation"]
+    click.echo(f"patch review artifacts: {result['output_dir']}")
+    click.echo(f"changed files: {len(result['changed_files'])}")
+    click.echo(f"constraints: {len(result['constraints'].get('constraints', []))}")
+    click.echo(f"validation: satisfied={validation.get('satisfied', 0)} violated={validation.get('violated', 0)} unknown={validation.get('unknown', 0)}")
+
+
+@click.command(
+    cls=DocmancerCommand,
+    context_settings=HELP_CONTEXT_SETTINGS,
     short_help="Return repo-grounded context with a Trust Contract.",
     epilog=format_examples(
         'docmancer context . "How should I test go_router changes?"',

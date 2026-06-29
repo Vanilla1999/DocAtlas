@@ -35,8 +35,6 @@ LOCKFILES = {
 PROVIDER_PATH_PARTS = ("provider", "presentation", "ui", "component", "view")
 SOURCE_OF_TRUTH_PATH_PARTS = ("service", "domain", "application", "repository", "adapter")
 POLICY_KEYWORDS = (
-    "if (",
-    "if(",
     "switch",
     "map",
     "permission",
@@ -47,6 +45,27 @@ POLICY_KEYWORDS = (
     "admin",
     "canproceed",
     "isallowed",
+)
+POLICY_DECISION_KEYWORDS = (
+    "permission",
+    "policy",
+    "status",
+    "authorization",
+    "role",
+    "admin",
+    "canproceed",
+    "isallowed",
+    "access",
+    "allowed",
+    "denied",
+)
+SAFE_UI_WIRING_PATTERNS = (
+    r"\bcloseMenu\s*\(",
+    r"\bcontext\.push\s*\(",
+    r"\bcontext\.go\s*\(",
+    r"\bNavigator\.",
+    r"\bref\.read\([^\n]+\.notifier\)\.[A-Za-z_][A-Za-z0-9_]*\s*\(",
+    r"\b[a-zA-Z_][A-Za-z0-9_]*(Notifier|Controller)\.[A-Za-z_][A-Za-z0-9_]*\s*\(",
 )
 
 
@@ -273,19 +292,48 @@ class PatchConstraintValidationService:
     def _diff_adds_policy_logic(patch_diff: str | None) -> bool:
         if not patch_diff:
             return False
-        for line in patch_diff.splitlines():
-            if not line.startswith("+") or line.startswith("+++"):
-                continue
+        added = [line[1:].strip() for line in patch_diff.splitlines() if line.startswith("+") and not line.startswith("+++")]
+        policy_context = "\n".join(added).lower()
+        for line in added:
             lowered = line.lower()
-            if any(keyword in lowered for keyword in POLICY_KEYWORDS):
+            if not lowered:
+                continue
+            if PatchConstraintValidationService._is_safe_ui_wiring_line(line):
+                continue
+            if PatchConstraintValidationService._line_adds_policy_decision(lowered, policy_context):
                 return True
         return False
+
+    @staticmethod
+    def _is_safe_ui_wiring_line(line: str) -> bool:
+        stripped = line.strip()
+        if re.match(r"^(onPressed|onTap|onChanged)\s*:\s*(\(.*\)\s*)?(async\s*)?\{?\s*$", stripped):
+            return True
+        if stripped in {"},", "}", "{", "});", ");"}:
+            return True
+        return any(re.search(pattern, stripped) for pattern in SAFE_UI_WIRING_PATTERNS)
+
+    @staticmethod
+    def _line_adds_policy_decision(lowered_line: str, lowered_patch: str) -> bool:
+        has_decision_keyword = any(keyword in lowered_line for keyword in POLICY_DECISION_KEYWORDS)
+        patch_has_decision_keyword = any(keyword in lowered_patch for keyword in POLICY_DECISION_KEYWORDS)
+        adds_branch = re.search(r"\b(if|switch)\s*\(", lowered_line) is not None
+        adds_policy_map = ("map" in lowered_line or "{" in lowered_line or "[" in lowered_line) and patch_has_decision_keyword
+        adds_assignment = re.search(r"\b(canproceed|isallowed|allowed|denied|status|role|permission|authorization)\b.*(=|=>|:)", lowered_line) is not None
+        compares_policy_state = re.search(r"\b(user\.|role|status|permission|authorization|access)\b.*(==|!=|>|<|&&|\|\|)", lowered_line) is not None
+        return bool((adds_branch and patch_has_decision_keyword) or adds_policy_map or adds_assignment or compares_policy_state or (has_decision_keyword and "policy" in lowered_line))
 
     @staticmethod
     def _policy_diff_evidence(patch_diff: str | None) -> str | None:
         if not patch_diff:
             return None
-        lines = [line.strip() for line in patch_diff.splitlines() if line.startswith("+") and not line.startswith("+++")]
+        lines = []
+        lowered_patch = patch_diff.lower()
+        for line in patch_diff.splitlines():
+            if line.startswith("+") and not line.startswith("+++"):
+                stripped = line[1:].strip()
+                if PatchConstraintValidationService._line_adds_policy_decision(stripped.lower(), lowered_patch):
+                    lines.append(line.strip())
         return "\n".join(lines[:3]) or None
 
     @staticmethod
