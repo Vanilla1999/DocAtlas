@@ -25,9 +25,13 @@ ARTIFACT_CONTRACT = [
 ]
 
 
-def select_targeted_pilot_tasks(tasks: list[TaskSpec], *, limit: int = 12) -> list[TaskSpec]:
+def select_targeted_pilot_tasks(tasks: list[TaskSpec], *, limit: int = 12, accepted_pool_path: Path | None = None) -> list[TaskSpec]:
     """Return accepted/differentiating tasks for the patch-constraints pilot."""
 
+    if accepted_pool_path is not None:
+        accepted_ids = _load_accepted_pool_ids(accepted_pool_path)
+        by_id = {task.task_id: task for task in tasks}
+        return [by_id[task_id] for task_id in accepted_ids if task_id in by_id][:limit]
     selected = [task for task in tasks if task.selection_status == "accepted" and task.differentiating]
     return selected[:limit]
 
@@ -62,13 +66,17 @@ def expected_constraint_types(task: TaskSpec) -> list[str]:
     return sorted(set(types or ["architecture"]))
 
 
-def build_targeted_pilot_plan(tasks: list[TaskSpec], *, repeats: int = 1) -> dict[str, Any]:
+def build_targeted_pilot_plan(tasks: list[TaskSpec], *, repeats: int = 1, task_selection_source: str = "legacy_manifest", screening_metadata: dict[str, Any] | None = None) -> dict[str, Any]:
+    screening_metadata = screening_metadata or {}
     return {
         "status": "Exploratory targeted pilot. Not broad superiority evidence.",
         "research_question": "Does DocAtlas patch-constraints workflow reduce high-confidence deterministic project-rule violations compared with repo_only_strict_offline?",
         "primary_success_metric": "fewer deterministic project-rule violations after patch",
         "conditions": list(TARGETED_PILOT_CONDITIONS),
         "repeats": repeats,
+        "task_selection_source": task_selection_source,
+        "accepted_pool_size": int(screening_metadata.get("accepted_pool_size", len(tasks))),
+        "rejected_counts": dict(screening_metadata.get("rejected_counts", {})),
         "minimum_meaningful_pilot": "8-12 accepted/differentiating tasks if available; this plan records the available accepted subset.",
         "condition_notes": {
             PATCH_CONSTRAINTS_WORKFLOW_CONDITION: "agent-side DocAtlas patch-constraints workflow guidance; no harness-side constraint injection",
@@ -197,3 +205,19 @@ def _plan_limitations(tasks: list[TaskSpec]) -> list[str]:
     if len(tasks) < 8:
         limitations.append(f"only {len(tasks)} accepted/differentiating tasks are currently available; below the 8-12 task target")
     return limitations
+
+
+def _load_accepted_pool_ids(path: Path) -> list[str]:
+    data = json.loads(path.read_text(encoding="utf-8"))
+    rows = data.get("results", data) if isinstance(data, dict) else data
+    if not isinstance(rows, list):
+        return []
+    ids: list[str] = []
+    for row in rows:
+        if not isinstance(row, dict):
+            continue
+        if row.get("status") == "accepted_differentiating" or row.get("selected_for_targeted_pilot") is True:
+            task_id = row.get("task_id")
+            if isinstance(task_id, str):
+                ids.append(task_id)
+    return ids

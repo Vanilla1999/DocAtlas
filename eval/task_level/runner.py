@@ -23,7 +23,7 @@ from eval.task_level.runners.claude import ClaudeRunner
 from eval.task_level.runners.codex import CodexRunner
 from eval.task_level.runners.opencode import OpenCodeRunner
 from eval.task_level.schemas import RESULTS_ROOT, TASKS_PATH, VALIDATION_ROOT, RunMetrics, RunResult, TaskSpec
-from eval.task_level.task_selection import decide_candidate_status
+from eval.task_level.task_selection import decide_candidate_status, decide_screening_result, write_screening_artifacts
 
 
 BASE_PROMPT = """You are working in a software repository at the supplied base commit.
@@ -180,6 +180,7 @@ def run_smoke(tasks: list[TaskSpec], conditions: list[str], repeats: int, run_di
 
 def write_screening_summary(run_dir: Path, tasks: list[TaskSpec], results: list[dict[str, Any]], repeats: int) -> dict[str, Any]:
     summaries: list[dict[str, Any]] = []
+    rich_results = []
     for task in tasks:
         task_results = [result for result in results if result.get("task_id") == task.task_id]
         repo_only = [result for result in task_results if result.get("condition_id") == "repo_only_strict_offline"]
@@ -189,6 +190,25 @@ def write_screening_summary(run_dir: Path, tasks: list[TaskSpec], results: list[
         integrity = _load_json(run_dir / "status.json").get("artifact_integrity", {})
         fairness_clean = True
         hidden_oracle_only = False
+        visible_source_coverage = bool(task.expected_project_docs or task.expected_symbols or task.dependencies)
+        effective_repeats = len(repo_only) or 0
+        rich = decide_screening_result(
+            task_id=task.task_id,
+            repo_only_repeats=effective_repeats,
+            repo_only_resolved=resolved,
+            repo_only_public_passed=sum(1 for result in repo_only if result.get("public_tests_passed") is True),
+            repo_only_hidden_passed=sum(1 for result in repo_only if result.get("hidden_tests_passed") is True),
+            policy_clean=bool(policy_clean) if policy_clean is not None else True,
+            visible_source_coverage=visible_source_coverage,
+            hidden_oracle_only=hidden_oracle_only,
+            fairness_clean=fairness_clean,
+            constraint_angle=_constraint_angle(task),
+            task_class=_screening_task_class(task),
+            stable_public_hidden_separation=True,
+            valid_fixture=bool(task.setup_command and task.test_command),
+            smoke_or_prototype=task.role in {"smoke", "prototype"},
+        )
+        rich_results.append(rich)
         status = decide_candidate_status(
             repo_only_repeats=repeats,
             repo_only_resolved=resolved,
@@ -213,10 +233,34 @@ def write_screening_summary(run_dir: Path, tasks: list[TaskSpec], results: list[
             "artifact_integrity": integrity,
             "decision_reason": "strict offline resolved all repeats" if status == "rejected_too_easy" else "strict offline did not resolve all repeats",
             "next_action": "redesign candidate before full pilot" if status == "rejected_too_easy" else "eligible for full 4-condition pilot",
+            "fair_screening": rich.to_json_dict(),
         })
     payload = {"run_id": run_dir.name, "summaries": summaries}
     (run_dir / "screening_summary.json").write_text(json.dumps(payload, indent=2, sort_keys=True), encoding="utf-8")
+    write_screening_artifacts(run_dir, rich_results)
     return payload
+
+
+def _constraint_angle(task: TaskSpec) -> str:
+    if task.expected_project_docs or task.expected_symbols or task.dependencies:
+        return ", ".join([*task.expected_project_docs, *task.expected_symbols, *[dependency.name for dependency in task.dependencies]])
+    return ""
+
+
+def _screening_task_class(task: TaskSpec) -> str:
+    relevance = set(task.docatlas_relevance)
+    text = task.issue_text.lower()
+    if "generated_file_constraint" in relevance or "generated" in text:
+        return "generated_file_trap"
+    if "pinned_dependency" in relevance or "lock" in text:
+        return "dependency_version_contract"
+    if "cross_module_contract" in relevance or "cross-module" in text:
+        return "cross_module_policy"
+    if "architecture_constraint" in relevance:
+        return "architecture_layer_boundary"
+    if task.source_project == "docmancer":
+        return "benchmark_accounting"
+    return "other"
 
 
 def _load_json(path: Path) -> dict[str, Any]:
@@ -239,6 +283,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--execute", action="store_true")
     parser.add_argument("--screen-tasks", action="store_true")
     parser.add_argument("--patch-constraints-targeted-pilot", action="store_true")
+    parser.add_argument("--accepted-pool", type=Path)
     parser.add_argument("--runner", default="claude")
     parser.add_argument("--tasks", nargs="*")
     parser.add_argument("--smoke", action="store_true")
@@ -256,7 +301,7 @@ def main(argv: list[str] | None = None) -> int:
 
     tasks = filter_tasks(load_tasks(args.manifest), args.tasks)
     if args.patch_constraints_targeted_pilot and not args.tasks:
-        tasks = select_targeted_pilot_tasks(tasks)
+        tasks = select_targeted_pilot_tasks(tasks, accepted_pool_path=args.accepted_pool)
         args.conditions = list(TARGETED_PILOT_CONDITIONS)
     run_dir = RESULTS_ROOT / args.run_id
     run_dir.mkdir(parents=True, exist_ok=True)
@@ -303,7 +348,16 @@ def main(argv: list[str] | None = None) -> int:
 
     results: list[dict[str, Any]] = []
     if args.patch_constraints_targeted_pilot:
-        plan = build_targeted_pilot_plan(tasks, repeats=args.repeats)
+        screening_metadata = _load_json(args.accepted_pool.parent / "screening_results.json") if args.accepted_pool else {}
+        plan = build_targeted_pilot_plan(
+            tasks,
+            repeats=args.repeats,
+            task_selection_source="screening_results" if args.accepted_pool else "legacy_manifest",
+            screening_metadata={
+                "accepted_pool_size": len(tasks),
+                "rejected_counts": screening_metadata.get("rejected_counts", {}),
+            },
+        )
         (run_dir / "targeted_pilot_plan.json").write_text(json.dumps(plan, indent=2, sort_keys=True), encoding="utf-8")
         metadata["targeted_patch_constraints_pilot"] = {
             "status": plan["status"],
