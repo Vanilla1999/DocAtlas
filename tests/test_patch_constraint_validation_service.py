@@ -64,6 +64,17 @@ def test_detects_lockfile_edit_violation():
     assert "lockfile" in result.results[0].reason.lower()
 
 
+def test_allows_lockfile_edit_for_explicit_dependency_upgrade_task():
+    constraint = _constraint("lock", "forbidden_edit", "Do not change lockfile unless explicitly upgrading dependencies.", files=["pubspec.lock"])
+    packet = PatchConstraintPacket(task="Upgrade permission_handler dependency", constraints=[constraint])
+
+    result = _service().validate_patch_against_constraints(packet, changed_files=["pubspec.lock"])
+
+    assert result.violated == 0
+    assert result.unknown == 1
+    assert "dependency-upgrade allowance" in result.results[0].reason.lower()
+
+
 def test_allows_source_of_truth_file_edit():
     constraint = _constraint("owner", "source_of_truth", "Permission policy belongs in PermissionService / service layer, not provider/UI.", symbols=["PermissionService"])
 

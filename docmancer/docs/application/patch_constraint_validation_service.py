@@ -72,7 +72,7 @@ class PatchConstraintValidationService:
         if not files and not patch_diff:
             warnings.append("Validation is limited: provide changed_files or patch_diff for deterministic checks.")
 
-        results = [self._validate_constraint(constraint, files, patch_diff) for constraint in normalized]
+        results = [self._validate_constraint(constraint, files, patch_diff, task) for constraint in normalized]
         satisfied = sum(1 for result in results if result.status == "satisfied")
         violated = sum(1 for result in results if result.status == "violated")
         unknown = sum(1 for result in results if result.status == "unknown")
@@ -92,7 +92,7 @@ class PatchConstraintValidationService:
             confidence=confidence,
         )
 
-    def _validate_constraint(self, constraint: PatchConstraint, changed_files: list[str], patch_diff: str | None) -> PatchConstraintValidationResult:
+    def _validate_constraint(self, constraint: PatchConstraint, changed_files: list[str], patch_diff: str | None, task: str | None = None) -> PatchConstraintValidationResult:
         text = self._constraint_text(constraint)
         generated_matches = self._changed_generated_files(changed_files)
         if self._is_generated_constraint(constraint, text):
@@ -105,6 +105,14 @@ class PatchConstraintValidationService:
         lockfile_matches = self._changed_lockfiles(changed_files)
         if self._is_lockfile_constraint(constraint, text):
             if lockfile_matches:
+                if self._lockfile_change_allowed(text, task):
+                    return self._result(
+                        constraint,
+                        "unknown",
+                        "lockfile changed under explicit dependency-upgrade allowance; review dependency intent manually",
+                        lockfile_matches,
+                        evidence=constraint.evidence,
+                    )
                 return self._result(constraint, "violated", "lockfile edit detected", lockfile_matches, evidence=constraint.evidence)
             if changed_files:
                 return self._result(constraint, "satisfied", "no lockfiles changed", [], evidence=constraint.evidence)
@@ -224,6 +232,26 @@ class PatchConstraintValidationService:
     @staticmethod
     def _is_lockfile_constraint(constraint: PatchConstraint, text: str) -> bool:
         return "lockfile" in text or any(lock.lower() in text for lock in LOCKFILES) or (constraint.type == "dependency_version" and "do not change" in text)
+
+    @staticmethod
+    def _lockfile_change_allowed(text: str, task: str | None) -> bool:
+        task_text = (task or "").lower()
+        allows_dependency_upgrade = (
+            "unless" in text
+            or "explicitly" in text
+            or "allow" in text
+            or "requires dependency" in text
+            or "dependency update" in text
+            or "dependency upgrade" in text
+        )
+        task_is_dependency_change = (
+            "upgrade" in task_text
+            or "update dependency" in task_text
+            or "dependency update" in task_text
+            or "dependency upgrade" in task_text
+            or "bump" in task_text
+        ) and ("depend" in task_text or "package" in task_text or "lockfile" in task_text)
+        return allows_dependency_upgrade and task_is_dependency_change
 
     @staticmethod
     def _is_provider_or_ui_path(path: str) -> bool:
