@@ -15,7 +15,7 @@ from pathlib import Path
 from typing import Any
 
 from eval.task_level.conditions import CONDITIONS
-from eval.task_level.artifact_hygiene import diff_stats_from_patch, write_patch_hygiene_artifacts
+from eval.task_level.artifact_hygiene import diff_stats_from_patch, is_runtime_artifact, write_patch_hygiene_artifacts
 from eval.task_level.context.action_checklist import build_action_checklist, save_action_checklist
 from eval.task_level.context.patch_constraints import build_patch_constraint_packet, save_patch_constraint_packet
 from eval.task_level.evaluators.actionability import evaluate_actionability
@@ -171,13 +171,15 @@ def fresh_run_environment(run_output_dir: Path) -> dict[str, str]:
 
 
 def capture_patch(workspace: Path, output_dir: Path) -> tuple[Path, Path, Path, list[str]]:
-    status = subprocess.run(["git", "status", "--porcelain"], cwd=workspace, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False)
+    status = subprocess.run(["git", "status", "--porcelain", "-uall"], cwd=workspace, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False)
     diff = subprocess.run(["git", "diff", "--binary", "--no-ext-diff"], cwd=workspace, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False)
     changed = subprocess.run(["git", "diff", "--name-only"], cwd=workspace, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False)
+    untracked = subprocess.run(["git", "ls-files", "--others", "--exclude-standard"], cwd=workspace, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False)
     patch_path = output_dir / "patch.diff"
     status_path = output_dir / "git_status.txt"
     changed_path = output_dir / "changed_files.json"
     files = [line for line in changed.stdout.splitlines() if line]
+    files.extend(line for line in untracked.stdout.splitlines() if line and not is_runtime_artifact(line))
     hygiene = write_patch_hygiene_artifacts(output_dir, raw_status=status.stdout, raw_changed_files=files, raw_patch_diff=diff.stdout)
     return patch_path, status_path, changed_path, hygiene.filtered_changed_files
 

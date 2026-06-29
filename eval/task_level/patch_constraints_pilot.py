@@ -31,6 +31,9 @@ def select_targeted_pilot_tasks(tasks: list[TaskSpec], *, limit: int = 12, accep
     if accepted_pool_path is not None:
         accepted_ids = _load_accepted_pool_ids(accepted_pool_path)
         by_id = {task.task_id: task for task in tasks}
+        missing = [task_id for task_id in accepted_ids if task_id not in by_id]
+        if missing:
+            raise ValueError(f"accepted pool references missing task ids: {', '.join(missing)}")
         return [by_id[task_id] for task_id in accepted_ids if task_id in by_id][:limit]
     selected = [task for task in tasks if task.selection_status == "accepted" and task.differentiating]
     return selected[:limit]

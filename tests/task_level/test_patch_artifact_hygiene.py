@@ -4,7 +4,13 @@ import json
 import subprocess
 from pathlib import Path
 
-from eval.task_level.artifact_hygiene import apply_patch_hygiene, is_runtime_artifact, is_preserved_generated_candidate
+from eval.task_level.artifact_hygiene import (
+    apply_patch_hygiene,
+    is_preserved_generated_candidate,
+    is_runtime_artifact,
+    normalize_diff_header_path,
+    normalize_repo_path,
+)
 from eval.task_level.execution import capture_patch
 
 
@@ -23,6 +29,13 @@ def test_runtime_artifacts_are_filtered_from_changed_files():
     assert hygiene.filtered_counts["ignored_runtime_artifacts"] == 1
 
 
+def test_repo_path_normalization_does_not_strip_top_level_a_or_b_dirs():
+    assert normalize_repo_path("a/service.py") == "a/service.py"
+    assert normalize_repo_path("b/generated/client.pb.go") == "b/generated/client.pb.go"
+    assert normalize_diff_header_path("a/service.py") == "service.py"
+    assert normalize_diff_header_path("b/generated/client.pb.go") == "generated/client.pb.go"
+
+
 def test_generated_and_lockfile_candidates_are_preserved():
     changed = [
         "lib/model/foo.g.dart",
@@ -39,6 +52,23 @@ def test_generated_and_lockfile_candidates_are_preserved():
     assert hygiene.preserved_generated_candidates == changed
     assert not hygiene.ignored_runtime_artifacts
     assert all(is_preserved_generated_candidate(path) for path in changed)
+
+
+def test_untracked_non_runtime_files_are_included_and_runtime_files_ignored():
+    hygiene = apply_patch_hygiene(
+        raw_status_lines=[
+            "?? src/new_feature.py",
+            "?? tests/__pycache__/test_new.cpython-312.pyc",
+            "?? generated/client.pb.go",
+            "?? package-lock.json",
+        ],
+        raw_changed_files=[],
+        raw_patch_diff="",
+    )
+
+    assert hygiene.filtered_changed_files == ["src/new_feature.py", "generated/client.pb.go", "package-lock.json"]
+    assert hygiene.ignored_runtime_artifacts == ["tests/__pycache__/test_new.cpython-312.pyc"]
+    assert hygiene.preserved_generated_candidates == ["generated/client.pb.go", "package-lock.json"]
 
 
 def test_runtime_artifact_detection_does_not_hide_real_generated_paths():
@@ -63,22 +93,28 @@ def test_capture_patch_writes_raw_and_normalized_hygiene_artifacts(tmp_path: Pat
 
     (tmp_path / "src" / "example.py").write_text("after\n", encoding="utf-8")
     (pycache / "test_example.cpython-311.pyc").write_text("after\n", encoding="utf-8")
+    (tmp_path / "a").mkdir()
+    (tmp_path / "a" / "service.py").write_text("new\n", encoding="utf-8")
+    (tmp_path / "package-lock.json").write_text("{}\n", encoding="utf-8")
+    (pycache / "untracked.cpython-311.pyc").write_text("new\n", encoding="utf-8")
 
     patch_path, status_path, changed_path, changed = capture_patch(tmp_path, tmp_path)
 
     assert patch_path.name == "patch.diff"
     assert status_path.name == "git_status.txt"
-    assert changed == ["src/example.py"]
-    assert json.loads(changed_path.read_text(encoding="utf-8")) == ["src/example.py"]
+    assert changed == ["src/example.py", "a/service.py", "package-lock.json"]
+    assert json.loads(changed_path.read_text(encoding="utf-8")) == ["src/example.py", "a/service.py", "package-lock.json"]
     assert json.loads((tmp_path / "changed_files.raw.json").read_text(encoding="utf-8")) == [
         "src/example.py",
         "tests/__pycache__/test_example.cpython-311.pyc",
+        "a/service.py",
+        "package-lock.json",
     ]
     ignored = json.loads((tmp_path / "ignored_runtime_artifacts.json").read_text(encoding="utf-8"))
-    assert ignored == ["tests/__pycache__/test_example.cpython-311.pyc"]
+    assert ignored == ["tests/__pycache__/test_example.cpython-311.pyc", "tests/__pycache__/untracked.cpython-311.pyc"]
     hygiene = json.loads((tmp_path / "patch_hygiene.json").read_text(encoding="utf-8"))
-    assert hygiene["raw_counts"]["changed_files"] == 2
-    assert hygiene["filtered_counts"]["changed_files"] == 1
-    assert hygiene["filtered_counts"]["ignored_runtime_artifacts"] == 1
+    assert hygiene["raw_counts"]["changed_files"] == 4
+    assert hygiene["filtered_counts"]["changed_files"] == 3
+    assert hygiene["filtered_counts"]["ignored_runtime_artifacts"] == 2
     assert (tmp_path / "patch.raw.diff").exists()
     assert "__pycache__" not in patch_path.read_text(encoding="utf-8", errors="replace")

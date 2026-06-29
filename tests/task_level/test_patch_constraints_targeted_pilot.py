@@ -3,6 +3,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import pytest
+
 from eval.task_level.conditions import CONDITIONS
 from eval.task_level.patch_constraints_pilot import (
     PATCH_CONSTRAINTS_INJECTED_CONDITION,
@@ -85,6 +87,16 @@ def test_select_targeted_pilot_tasks_can_use_frozen_accepted_pool(tmp_path: Path
     assert plan["task_selection_source"] == "screening_results"
     assert plan["accepted_pool_size"] == 1
     assert plan["rejected_counts"] == {"rejected_too_easy": 3}
+
+
+def test_select_targeted_pilot_tasks_fails_fast_on_missing_pool_task_id(tmp_path: Path):
+    accepted_pool = tmp_path / "accepted_pool.json"
+    accepted_pool.write_text(json.dumps([
+        {"task_id": "missing_task", "status": "accepted_differentiating"},
+    ]), encoding="utf-8")
+
+    with pytest.raises(ValueError, match="missing_task"):
+        select_targeted_pilot_tasks([_task("legacy_a")], accepted_pool_path=accepted_pool)
 
 
 def test_build_targeted_pilot_plan_records_constraints_workflow_protocol():

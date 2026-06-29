@@ -55,6 +55,8 @@ class ScreeningResult:
     fairness_clean: bool
     constraint_angle: str
     repo_only_repeats: int
+    repo_only_attempted: int
+    repo_only_runner_failures: int
     repo_only_resolved: int
     repo_only_public_passed: int
     repo_only_hidden_passed: int
@@ -108,6 +110,8 @@ def decide_screening_result(
     task_class: str,
     stable_public_hidden_separation: bool,
     valid_fixture: bool,
+    repo_only_attempted: int | None = None,
+    repo_only_runner_failures: int = 0,
     smoke_or_prototype: bool = False,
     expected_differentiator_stated: bool = True,
     allow_partial_as_legacy_accepted: bool = False,
@@ -117,6 +121,7 @@ def decide_screening_result(
     requires_manual_review = False
     normalized_angle = constraint_angle.strip()
     normalized_class = task_class if task_class in KNOWN_TASK_CLASSES else "other"
+    attempted = repo_only_repeats if repo_only_attempted is None else repo_only_attempted
 
     if not valid_fixture or not fairness_clean or not policy_clean or not stable_public_hidden_separation:
         status = "rejected_invalid"
@@ -136,6 +141,14 @@ def decide_screening_result(
     elif not expected_differentiator_stated:
         status = "needs_manual_review"
         reason = "expected differentiator was not stated before DocAtlas outcome"
+        requires_manual_review = True
+    elif repo_only_runner_failures > 0:
+        status = "needs_manual_review"
+        reason = "repo_only_strict_offline screening had runner errors/timeouts"
+        requires_manual_review = True
+    elif repo_only_repeats > 0 and attempted < repo_only_repeats:
+        status = "needs_manual_review"
+        reason = "repo_only_strict_offline screening repeats are incomplete"
         requires_manual_review = True
     elif repo_only_repeats <= 0:
         status = "candidate"
@@ -165,6 +178,8 @@ def decide_screening_result(
         fairness_clean=fairness_clean,
         constraint_angle=normalized_angle,
         repo_only_repeats=repo_only_repeats,
+        repo_only_attempted=attempted,
+        repo_only_runner_failures=repo_only_runner_failures,
         repo_only_resolved=repo_only_resolved,
         repo_only_public_passed=repo_only_public_passed,
         repo_only_hidden_passed=repo_only_hidden_passed,

@@ -191,10 +191,13 @@ def write_screening_summary(run_dir: Path, tasks: list[TaskSpec], results: list[
         fairness_clean = True
         hidden_oracle_only = False
         visible_source_coverage = bool(task.expected_project_docs or task.expected_symbols or task.dependencies)
-        effective_repeats = len(repo_only) or 0
+        attempted = len(repo_only)
+        runner_failures = sum(1 for result in repo_only if result.get("status") not in {"completed", "dry_run"})
         rich = decide_screening_result(
             task_id=task.task_id,
-            repo_only_repeats=effective_repeats,
+            repo_only_repeats=repeats,
+            repo_only_attempted=attempted,
+            repo_only_runner_failures=runner_failures,
             repo_only_resolved=resolved,
             repo_only_public_passed=sum(1 for result in repo_only if result.get("public_tests_passed") is True),
             repo_only_hidden_passed=sum(1 for result in repo_only if result.get("hidden_tests_passed") is True),
@@ -205,7 +208,7 @@ def write_screening_summary(run_dir: Path, tasks: list[TaskSpec], results: list[
             constraint_angle=_constraint_angle(task),
             task_class=_screening_task_class(task),
             stable_public_hidden_separation=True,
-            valid_fixture=bool(task.setup_command and task.test_command),
+            valid_fixture=bool(task.test_command),
             smoke_or_prototype=task.role in {"smoke", "prototype"},
         )
         rich_results.append(rich)

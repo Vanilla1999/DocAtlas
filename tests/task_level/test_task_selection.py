@@ -3,8 +3,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from eval.task_level.runner import load_tasks
-from eval.task_level.schemas import TASKS_PATH
+from eval.task_level.runner import load_tasks, write_screening_summary
+from eval.task_level.schemas import TASKS_PATH, TaskSpec
 from eval.task_level.task_selection import decide_candidate_status, decide_screening_result, write_screening_artifacts
 
 
@@ -148,3 +148,62 @@ def test_screening_artifacts_split_accepted_and_rejected_pools(tmp_path: Path):
     report = (tmp_path / "screening_report.md").read_text(encoding="utf-8")
     assert "rejected-too-easy tasks are not promoted" in report
     assert "must not use DocAtlas outcome" in report
+
+
+def test_rich_screening_guard_blocks_runner_failures_from_acceptance():
+    result = _screening(repo_only_repeats=2, repo_only_attempted=2, repo_only_runner_failures=1)
+
+    assert result.status == "needs_manual_review"
+    assert result.requires_manual_review
+    assert not result.selected_for_targeted_pilot
+    assert "runner" in result.reason
+
+
+def test_rich_screening_guard_blocks_incomplete_repo_only_repeats():
+    result = _screening(repo_only_repeats=2, repo_only_attempted=1)
+
+    assert result.status == "needs_manual_review"
+    assert result.requires_manual_review
+    assert not result.selected_for_targeted_pilot
+    assert "incomplete" in result.reason
+
+
+def test_screening_summary_treats_setup_command_as_optional_if_test_command_exists(tmp_path: Path):
+    task = TaskSpec(
+        task_id="no_setup_task",
+        task_type="real",
+        suite="differentiation",
+        repo="fixture://no_setup_task",
+        base_commit="fixture-base",
+        issue_text="Fix a visible architecture contract.",
+        language="python",
+        ecosystem="python",
+        dependencies=(),
+        setup_command="",
+        test_command="pytest tests/test_contract.py",
+        expected_symbols=("ContractService",),
+        expected_project_docs=("docs/contract.md",),
+        role="candidate",
+        differentiating=True,
+        selection_status="candidate",
+        docatlas_relevance=("architecture_constraint",),
+    )
+
+    payload = write_screening_summary(
+        tmp_path,
+        [task],
+        [{
+            "task_id": "no_setup_task",
+            "condition_id": "repo_only_strict_offline",
+            "status": "completed",
+            "resolved": False,
+            "public_tests_passed": True,
+            "hidden_tests_passed": False,
+            "policy_clean": True,
+        }],
+        repeats=1,
+    )
+
+    fair = payload["summaries"][0]["fair_screening"]
+    assert fair["status"] == "accepted_differentiating"
+    assert fair["selected_for_targeted_pilot"] is True
