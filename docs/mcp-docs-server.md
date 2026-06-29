@@ -116,6 +116,89 @@ The unified tool delegates to existing facade methods such as `bootstrap_project
 | `bootstrap_project_docs` | Safe high-level onboarding for a repository question: inspect, sync if needed, inspect again. Stops before repo writes or dependency-docs network fetches. |
 | `get_project_docs` | Query indexed current project-owned docs for repo-specific architecture, conventions, runbooks, ADRs, README, roadmap, wiki, or module/package questions. |
 | `get_project_context` | Return a compact repo-grounded context pack after bootstrap/inspect and any required `sync_project_docs` step. Includes a Trust Contract and structured next_actions. |
+| `get_patch_constraints` | Return compact, source-attributed constraints for a coding patch. Designed to provide actionable project constraints for coding agents; it does not validate patches or change `get_docs_context` behavior. |
+| `validate_patch_against_constraints` | Deterministically check changed files or a patch diff against a caller-supplied constraint packet. Best-effort guardrail only; it does not prove correctness or replace tests. |
+
+`get_patch_constraints` arguments:
+
+```json
+{
+  "question": "Update permission preflight behavior",
+  "project_path": "/path/to/repo",
+  "changed_files": ["lib/modules/permission/domain/services/permission_service.dart"],
+  "max_constraints": 12,
+  "max_tokens": 1200,
+  "include_sources": true
+}
+```
+
+The tool uses deterministic local heuristics over visible project docs and dependency metadata. It can surface generated-file rules, source-of-truth rules, provider/delegation conventions, pinned dependency/version contracts, lockfile guardrails, and suggested checks. Every constraint includes source attribution, confidence, and short evidence. If the packet exceeds the budget, must/high-confidence constraints are kept first and a warning is returned.
+
+
+### validate_patch_against_constraints — deterministic post-edit guardrail
+
+Use after editing code:
+
+1. Call `get_patch_constraints` before editing.
+2. Edit code.
+3. Call `validate_patch_against_constraints` with the returned constraints plus `changed_files` or `patch_diff`.
+4. Fix deterministic violations.
+5. Run the project tests.
+
+Arguments:
+
+```json
+{
+  "constraints": "object|array",
+  "project_path": "string|null",
+  "changed_files": "array[string]|null",
+  "patch_diff": "string|null",
+  "strict": "boolean"
+}
+```
+
+Return shape:
+
+```json
+{
+  "total_constraints": 0,
+  "satisfied": 0,
+  "violated": 0,
+  "unknown": 0,
+  "results": [],
+  "warnings": [],
+  "confidence": "high|medium|low"
+}
+```
+
+The validator is deterministic best-effort. It detects clear generated-file edits, lockfile edits, provider/UI policy edits, and source-of-truth layer matches. `unknown` means manual review is required. It does not call an LLM, does not fetch docs, does not prove correctness, and does not replace tests.
+
+### get_patch_constraints — expanded deterministic heuristics
+
+Supported visible-source patterns include architecture docs (`ARCHITECTURE.md`, `docs/architecture.md`), ADRs, `CONTRIBUTING.md`, root/module READMEs, and maintained `docs/` files. The compiler looks for cautious deterministic phrases such as `must`, `must not`, `should`, `belongs to`, `owned by`, `source of truth`, `canonical`, `single source`, `do not duplicate`, `do not bypass`, `do not hardcode`, and documented layer ownership/delegation language.
+
+Owner extraction covers forms such as `PermissionService owns permission policy`, `policy belongs in PermissionService`, `PermissionService is source of truth for policy`, `Do not implement policy in providers; delegate to PermissionService`, and `Provider delegates to PermissionService`. Generated-artifact rules cover docs mentioning generated files, regeneration, source models, `build_runner`, `*.g.dart`, `*.freezed.dart`, protobuf outputs, `*.generated.*`, `generated/`, and `dist/`.
+
+Dependency/version constraints are compiled from visible supported manifests and lockfiles including `pubspec.yaml`/`pubspec.lock`, `pyproject.toml`, `requirements.txt`, `poetry.lock`, `uv.lock`, `package.json`, `package-lock.json`, `pnpm-lock.yaml`, `yarn.lock`, `Cargo.toml`/`Cargo.lock`, and `go.mod`/`go.sum` where deterministic versions are available. `changed_files` and task keywords only rank constraints and checks; they do not create high-confidence invented owners or versions without visible source evidence.
+
+Response shape:
+
+```json
+{
+  "task": "Update permission preflight behavior",
+  "constraints": [],
+  "forbidden_edits": [],
+  "dependency_contracts": [],
+  "source_of_truth_rules": [],
+  "suggested_checks": [],
+  "warnings": [],
+  "sources": [],
+  "token_estimate": 0,
+  "confidence": "high"
+}
+```
+
+Do not treat this as proof that DocAtlas improves coding-agent success. It is a compact constraint compiler surface for agent prompts, not a production patch validator.
 
 ## Dependency-docs project tools
 

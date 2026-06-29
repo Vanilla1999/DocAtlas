@@ -1,0 +1,14 @@
+{
+  "critical_requirements": [
+    "Add Permission.notification for Android 13+ devices.",
+    "Keep the change in PermissionService per the module architecture guide.",
+    "Use pinned permission_handler 11.4.0 API and avoid unrelated media permissions.",
+    "Do not edit generated Riverpod/Freezed files."
+  ],
+  "visible_sources": [
+    "docs/permission-notifications.md",
+    "lib/modules/permission/ARCHITECTURE.md",
+    "lib/modules/permission/domain/services/permission_service.dart",
+    "pubspec.lock"
+  ]
+}

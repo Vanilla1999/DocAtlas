@@ -1,0 +1,98 @@
+[
+  {
+    "task_id": "real_project_nbo_distributed_permission_policy_001",
+    "source_project": "nbo",
+    "candidate_status": "rejected_too_easy",
+    "docatlas_relevance": [
+      "project_docs",
+      "pinned_dependency",
+      "architecture_constraint",
+      "private_local_context"
+    ],
+    "repo_only_screening": {
+      "repeats": 2,
+      "resolved": 2,
+      "policy_clean": true,
+      "network_attempts": 0
+    },
+    "fairness": {
+      "reviewed": true,
+      "clean": true,
+      "hidden_oracle_only": false
+    },
+    "decision_reason": "Implemented and validated, but strict offline screening resolved 2/2 policy-clean with zero network attempts.",
+    "next_action": "Reject as too easy; design a harder candidate before full DocAtlas pilot."
+  },
+  {
+    "task_id": "real_project_nbo_generated_policy_source_001",
+    "source_project": "nbo",
+    "candidate_status": "designed",
+    "docatlas_relevance": [
+      "project_docs",
+      "generated_file_constraint",
+      "architecture_constraint",
+      "private_local_context"
+    ],
+    "repo_only_screening": {
+      "repeats": 2,
+      "resolved": null,
+      "policy_clean": null,
+      "network_attempts": null
+    },
+    "fairness": {
+      "reviewed": false,
+      "clean": null,
+      "hidden_oracle_only": null
+    },
+    "decision_reason": "Designed as a source-of-truth trap; not implemented until the first hard candidate is screened.",
+    "next_action": "Hold until Candidate A screening determines whether project-doc distribution is differentiating."
+  },
+  {
+    "task_id": "real_project_nbo_permission_handler_version_001",
+    "source_project": "nbo",
+    "candidate_status": "designed",
+    "docatlas_relevance": [
+      "pinned_dependency",
+      "project_docs",
+      "private_local_context"
+    ],
+    "repo_only_screening": {
+      "repeats": 2,
+      "resolved": null,
+      "policy_clean": null,
+      "network_attempts": null
+    },
+    "fairness": {
+      "reviewed": false,
+      "clean": null,
+      "hidden_oracle_only": null
+    },
+    "decision_reason": "Designed to isolate pinned dependency traps; needs careful visible evidence to avoid unfair latest-doc punishment.",
+    "next_action": "Implement after at least one project-doc-heavy candidate is evaluated."
+  },
+  {
+    "task_id": "real_project_nbo_cross_module_permission_contract_001",
+    "source_project": "nbo",
+    "candidate_status": "rejected_too_easy",
+    "docatlas_relevance": [
+      "project_docs",
+      "architecture_constraint",
+      "cross_module_context",
+      "private_local_context",
+      "generated_file_constraint"
+    ],
+    "repo_only_screening": {
+      "repeats": 2,
+      "resolved": 2,
+      "policy_clean": true,
+      "network_attempts": 0
+    },
+    "fairness": {
+      "reviewed": true,
+      "clean": true,
+      "hidden_oracle_only": false
+    },
+    "decision_reason": "Implemented and validated, but strict offline screening resolved 2/2 policy-clean with zero network attempts.",
+    "next_action": "Reject as too easy; design a harder candidate before full DocAtlas pilot."
+  }
+]

@@ -1,0 +1,1 @@
+"""Sanitized fixture package marker."""

@@ -1,0 +1,13 @@
+{
+  "task_id": "decisive_nbo_permission_handler_version_001",
+  "source_project": "/home/viadmin/StudioProjects/nbo",
+  "selected_sources": [
+    "README.md",
+    "docs/dependencies.md",
+    "lib/modules/permission/ARCHITECTURE.md",
+    "lib/modules/permission/domain/services/permission_status_mapper.dart",
+    "lib/modules/permission/presentation/provider/permission_review_notifier.dart",
+    "pubspec.lock"
+  ],
+  "notes": "Sanitized NBO-derived dependency-version fixture. Hidden requirements are discoverable from visible dependency notes, permission architecture, status mapper source, public tests, and lockfile."
+}

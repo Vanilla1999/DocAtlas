@@ -1,0 +1,5 @@
+{
+  "expected_sources": ["docs/security.md", "docs/api-errors.md", "fastapi.tiangolo.com"],
+  "expected_symbols": ["Depends", "HTTPException", "require_admin", "error_envelope"],
+  "notes": "Evaluator-only reference for project-doc and FastAPI context utilization; not copied into agent workspace."
+}

@@ -1,0 +1,30 @@
+diff --git a/lib/modules/permission/application/permission_service.dart b/lib/modules/permission/application/permission_service.dart
+--- a/lib/modules/permission/application/permission_service.dart
++++ b/lib/modules/permission/application/permission_service.dart
+@@ -11,16 +11,25 @@
+     permission: Permission.location,
+   );
+ 
++  static const PermissionInfo notificationPermission = PermissionInfo(
++    name: 'Notifications',
++    permission: Permission.notification,
++  );
++
+   static const PermissionInfo backgroundLocationPermission = PermissionInfo(
+     name: 'Background location',
+     permission: Permission.locationAlways,
+   );
+ 
+   List<PermissionInfo> requiredForPreflight(PermissionFlow flow, int sdkInt) {
+-    return <PermissionInfo>[
++    final permissions = <PermissionInfo>[
+       cameraPermission,
+       foregroundLocationPermission,
+     ];
++    if (sdkInt >= 33) {
++      permissions.add(notificationPermission);
++    }
++    return permissions;
+   }
+ 
+   List<PermissionInfo> deferredAfterPreflight(PermissionFlow flow) {

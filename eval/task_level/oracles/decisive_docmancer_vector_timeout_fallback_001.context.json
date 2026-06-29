@@ -1,0 +1,12 @@
+{
+  "notes": "Self-referential sanitized Docmancer benchmark fixture. Hidden requirements are discoverable from visible benchmark notes, execution excerpt, source, and public tests. Fallback can count only as cautious workflow evidence, not external vector-retrieval proof.",
+  "selected_sources": [
+    "README.md",
+    "docs/research/task-level-agent-benchmark.md",
+    "eval/task_level/execution.py",
+    "src/docmancer_benchmark/context_accounting.py",
+    "tests/test_context_accounting.py"
+  ],
+  "source_project": "/home/viadmin/StudioProjects/hermes/docmancer",
+  "task_id": "decisive_docmancer_vector_timeout_fallback_001"
+}

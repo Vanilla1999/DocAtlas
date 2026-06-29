@@ -1,0 +1,19 @@
+{
+  "base": {
+    "compile_success": true,
+    "expected_tests_failed": true,
+    "setup_success": true,
+    "unexpected_failures": []
+  },
+  "fixture_hash": "0748e7438ca4555be68ae270329426f3382267059b72bf3d1b04ba6e16c21579",
+  "gold": {
+    "compile_success": true,
+    "hidden_tests_passed": true,
+    "patch_applied": true,
+    "public_tests_passed": true
+  },
+  "oracle_isolated": true,
+  "status": "validated",
+  "task_id": "real_project_nbo_cross_module_permission_contract_001",
+  "validated_at": "2026-06-28T07:36:52.779840+00:00"
+}

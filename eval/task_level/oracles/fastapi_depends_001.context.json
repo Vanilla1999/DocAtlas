@@ -1,0 +1,5 @@
+{
+  "expected_sources": ["README.md", "fastapi.tiangolo.com"],
+  "expected_symbols": ["Annotated", "Depends", "BackgroundTasks", "HTTPException", "Header"],
+  "notes": "Evaluator-only reference for context utilization; not copied into agent workspace."
+}

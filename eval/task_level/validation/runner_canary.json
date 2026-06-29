@@ -1,0 +1,18 @@
+{
+  "changed_files": [
+    "calc.py"
+  ],
+  "failure_summary": "",
+  "network_probe_denied": true,
+  "patch_exists": true,
+  "policy_clean": true,
+  "pytest_passes": true,
+  "runner_exit_code": 0,
+  "runner_exit_interpretable": true,
+  "runner_status": "completed",
+  "status": "passed",
+  "task_id": "runner_canary",
+  "trajectory_exists": true,
+  "validated_at": "2026-06-26T09:33:31.286445+00:00",
+  "workspace": "/tmp/docatlas-runner-canary-_wsiha0z"
+}

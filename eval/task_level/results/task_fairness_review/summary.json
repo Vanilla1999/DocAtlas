@@ -1,0 +1,38 @@
+{
+  "decision": "ITERATE_TASKS_CALIBRATED",
+  "tasks_reviewed": [
+    "fastapi_depends_001",
+    "mixed_fastapi_project_001"
+  ],
+  "calibration_rules": {
+    "discoverable_project_convention": "hidden tests may check strict form when README, docs, existing code, public tests, or issue text expose the contract",
+    "behavioral_correctness": "hidden tests may check edge cases derived from issue or public tests",
+    "oracle_only_exact_form": "removed, relaxed, or exposed"
+  },
+  "changes": {
+    "fastapi_depends_001": {
+      "new_visible_sources": [
+        "docs/auth.md"
+      ],
+      "exposed_requirements": [
+        "dependency function named require_token",
+        "route parameter named token",
+        "no duplicated token validation inside route handlers"
+      ],
+      "removed_or_relaxed_requirements": []
+    },
+    "mixed_fastapi_project_001": {
+      "new_visible_sources": [
+        "docs/security.md",
+        "docs/api-errors.md"
+      ],
+      "exposed_requirements": [
+        "route parameter named admin",
+        "admin: Annotated[str, Depends(require_admin)] dependency shape",
+        "dependency-raised HTTPException 403 uses the error envelope handler"
+      ],
+      "removed_or_relaxed_requirements": []
+    }
+  },
+  "oracle_only_requirements_remaining": []
+}

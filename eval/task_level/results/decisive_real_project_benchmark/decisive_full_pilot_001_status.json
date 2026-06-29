@@ -1,0 +1,122 @@
+{
+  "artifact_integrity": {
+    "expected_total_runs": 12,
+    "finished": true,
+    "in_memory_results": 12,
+    "ok": true,
+    "reason": null,
+    "runs_jsonl_records": 12
+  },
+  "completed_runs": 12,
+  "current": null,
+  "latest_results": [
+    {
+      "agent_docatlas_calls": 0,
+      "checklist_items": 0,
+      "checklist_used": false,
+      "condition_id": "repo_only_strict_offline",
+      "context_used": false,
+      "hidden_tests_passed": false,
+      "policy_clean": true,
+      "public_tests_passed": true,
+      "resolved": false,
+      "status": "completed",
+      "task_id": "decisive_docmancer_vector_timeout_fallback_001"
+    },
+    {
+      "agent_docatlas_calls": 0,
+      "checklist_items": 0,
+      "checklist_used": false,
+      "condition_id": "repo_only_web_audited",
+      "context_used": false,
+      "hidden_tests_passed": false,
+      "policy_clean": true,
+      "public_tests_passed": true,
+      "resolved": false,
+      "status": "completed",
+      "task_id": "decisive_docmancer_vector_timeout_fallback_001"
+    },
+    {
+      "agent_docatlas_calls": 0,
+      "checklist_items": 1,
+      "checklist_used": true,
+      "condition_id": "docatlas_action_checklist_injected",
+      "context_used": true,
+      "hidden_tests_passed": false,
+      "policy_clean": true,
+      "public_tests_passed": true,
+      "resolved": false,
+      "status": "completed",
+      "task_id": "decisive_docmancer_vector_timeout_fallback_001"
+    },
+    {
+      "agent_docatlas_calls": 2,
+      "checklist_items": 0,
+      "checklist_used": false,
+      "condition_id": "docatlas_tool_recommended",
+      "context_used": true,
+      "hidden_tests_passed": false,
+      "policy_clean": true,
+      "public_tests_passed": true,
+      "resolved": false,
+      "status": "completed",
+      "task_id": "decisive_docmancer_vector_timeout_fallback_001"
+    },
+    {
+      "agent_docatlas_calls": 6,
+      "checklist_items": 0,
+      "checklist_used": false,
+      "condition_id": "docatlas_tool_recommended",
+      "context_used": true,
+      "hidden_tests_passed": false,
+      "policy_clean": true,
+      "public_tests_passed": true,
+      "resolved": false,
+      "status": "completed",
+      "task_id": "decisive_nbo_cross_module_gate_large_001"
+    },
+    {
+      "agent_docatlas_calls": 0,
+      "checklist_items": 0,
+      "checklist_used": false,
+      "condition_id": "repo_only_strict_offline",
+      "context_used": false,
+      "hidden_tests_passed": false,
+      "policy_clean": true,
+      "public_tests_passed": true,
+      "resolved": false,
+      "status": "completed",
+      "task_id": "decisive_nbo_cross_module_gate_large_001"
+    },
+    {
+      "agent_docatlas_calls": 0,
+      "checklist_items": 1,
+      "checklist_used": false,
+      "condition_id": "docatlas_action_checklist_injected",
+      "context_used": true,
+      "hidden_tests_passed": false,
+      "policy_clean": true,
+      "public_tests_passed": true,
+      "resolved": false,
+      "status": "completed",
+      "task_id": "decisive_nbo_cross_module_gate_large_001"
+    },
+    {
+      "agent_docatlas_calls": 0,
+      "checklist_items": 0,
+      "checklist_used": false,
+      "condition_id": "repo_only_web_audited",
+      "context_used": false,
+      "hidden_tests_passed": false,
+      "policy_clean": true,
+      "public_tests_passed": true,
+      "resolved": false,
+      "status": "completed",
+      "task_id": "decisive_nbo_cross_module_gate_large_001"
+    }
+  ],
+  "remaining_runs": 0,
+  "status": "finished",
+  "total_runs": 12,
+  "updated_at": "2026-06-28T10:13:40.735619+00:00"
+}

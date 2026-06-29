@@ -1,0 +1,39 @@
+{
+  "task_id": "real_project_nbo_distributed_permission_policy_001",
+  "source_project": "nbo",
+  "required_visible_sources": [
+    "README.md",
+    "lib/modules/permission/ARCHITECTURE.md",
+    "docs/permission-notifications.md",
+    "docs/browser-scan-preflight.md",
+    "pubspec.lock"
+  ],
+  "expected_docatlas_relevance": [
+    "project_docs",
+    "pinned_dependency",
+    "architecture_constraint",
+    "private_local_context"
+  ],
+  "hidden_requirements": [
+    {
+      "requirement": "PermissionService owns policy",
+      "visible_source": "lib/modules/permission/ARCHITECTURE.md"
+    },
+    {
+      "requirement": "provider must delegate and not encode policy",
+      "visible_source": "lib/modules/permission/ARCHITECTURE.md"
+    },
+    {
+      "requirement": "Android 13 notification permission is required",
+      "visible_source": "docs/permission-notifications.md"
+    },
+    {
+      "requirement": "locationAlways remains deferred",
+      "visible_source": "docs/browser-scan-preflight.md"
+    },
+    {
+      "requirement": "permission_handler remains 11.4.0",
+      "visible_source": "pubspec.lock"
+    }
+  ]
+}

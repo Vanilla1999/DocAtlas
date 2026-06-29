@@ -1,0 +1,34 @@
+diff --git a/lib/modules/permission/application/permission_service.dart b/lib/modules/permission/application/permission_service.dart
+index e6ee4f0..465d328 100644
+--- a/lib/modules/permission/application/permission_service.dart
++++ b/lib/modules/permission/application/permission_service.dart
+@@ -11,19 +11,28 @@ class PermissionService {
+     permission: Permission.location,
+   );
+ 
++  static const PermissionInfo notificationPermission = PermissionInfo(
++    name: 'Notifications',
++    permission: Permission.notification,
++  );
++
+   static const PermissionInfo backgroundLocationPermission = PermissionInfo(
+     name: 'Background location',
+     permission: Permission.locationAlways,
+   );
+ 
+   List<PermissionInfo> requiredForPreflight(PermissionFlow flow, int sdkInt) {
+-    return <PermissionInfo>[
++    final permissions = <PermissionInfo>[
+       cameraPermission,
+       foregroundLocationPermission,
+     ];
++    if (sdkInt >= 33) {
++      permissions.add(notificationPermission);
++    }
++    return permissions;
+   }
+ 
+   bool isDeferredDuringPreflight(Permission permission) {
+     return permission == Permission.locationAlways;
+   }
+ }

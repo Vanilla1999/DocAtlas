@@ -1,0 +1,9 @@
+name: nbo_permission_review_fixture
+description: Sanitized benchmark fixture for permission_handler status mapping.
+publish_to: "none"
+
+environment:
+  sdk: ">=3.3.4 <4.0.0"
+
+dependencies:
+  permission_handler: 11.4.0

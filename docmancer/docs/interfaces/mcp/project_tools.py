@@ -13,6 +13,8 @@ PROJECT_TOOL_NAMES = {
     "bootstrap_project_docs",
     "get_project_docs",
     "get_project_context",
+    "get_patch_constraints",
+    "validate_patch_against_constraints",
     "prefetch_project_docs",
     "prefetch_project_dependency_docs",
 }
@@ -204,6 +206,23 @@ def handle_project_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
         result = asdict(service.get_project_context(args["project_path"], args["question"], tokens=args.get("tokens"), limit=args.get("limit"), expand=args.get("expand"), library=args.get("library"), libraries=args.get("libraries"), ecosystem=args.get("ecosystem"), version=args.get("version"), module=args.get("module"), module_path=args.get("module_path"), scope=args.get("scope"), mode=args.get("mode") or "auto", response_style=args.get("response_style")))
         output_mode = args.get("output_mode") or ("full" if args.get("details") else "compact")
         return result if output_mode == "full" else _compact_project_context(result)
+    if name == "get_patch_constraints":
+        return asdict(service.get_patch_constraints(
+            args["question"],
+            project_path=args.get("project_path"),
+            changed_files=args.get("changed_files"),
+            max_constraints=args.get("max_constraints") or 12,
+            max_tokens=args.get("max_tokens") or 1200,
+            include_sources=bool(args.get("include_sources") if args.get("include_sources") is not None else True),
+        ))
+    if name == "validate_patch_against_constraints":
+        return asdict(service.validate_patch_against_constraints(
+            args.get("constraints") or [],
+            project_path=args.get("project_path"),
+            changed_files=args.get("changed_files"),
+            patch_diff=args.get("patch_diff"),
+            strict=bool(args.get("strict") or False),
+        ))
     if name in {"prefetch_project_docs", "prefetch_project_dependency_docs"}:
         method = service.prefetch_project_dependency_docs if name == "prefetch_project_dependency_docs" else service.prefetch_project_docs
         return asdict(method(args["project_path"], include_flutter=bool(args.get("include_flutter") if args.get("include_flutter") is not None else True), include_dart=bool(args.get("include_dart") or False), include_rust=bool(args.get("include_rust") if args.get("include_rust") is not None else True), include_packages=args.get("include_packages") or [], force_refresh=bool(args.get("force_refresh") or False), continue_on_error=bool(args.get("continue_on_error") if args.get("continue_on_error") is not None else True), async_=bool(args.get("async") or False)))

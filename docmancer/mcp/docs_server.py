@@ -291,6 +291,37 @@ Does not use deleted, orphaned, or stale project-doc content by default.""",
         },
     },
     {
+        "name": "get_patch_constraints",
+        "description": "Return compact, source-attributed project constraints for a coding patch. Designed to provide actionable project constraints for coding agents; this does not validate patches or change get_docs_context behavior.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "question": {"type": "string"},
+                "project_path": {"type": ["string", "null"]},
+                "changed_files": {"type": ["array", "null"], "items": {"type": "string"}},
+                "max_constraints": {"type": "integer", "default": 12},
+                "max_tokens": {"type": "integer", "default": 1200},
+                "include_sources": {"type": "boolean", "default": True},
+            },
+            "required": ["question"],
+        },
+    },
+    {
+        "name": "validate_patch_against_constraints",
+        "description": "Use after editing code to check changed files or a patch diff against constraints returned by get_patch_constraints. This is a deterministic best-effort validator; it does not prove correctness and does not replace tests.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "constraints": {"type": ["object", "array"]},
+                "project_path": {"type": ["string", "null"]},
+                "changed_files": {"type": ["array", "null"], "items": {"type": "string"}},
+                "patch_diff": {"type": ["string", "null"]},
+                "strict": {"type": "boolean", "default": False},
+            },
+            "required": ["constraints"],
+        },
+    },
+    {
         "name": "get_docs_job_status",
         "description": "Return persistent progress for one docs indexing/prefetch job.",
         "inputSchema": {

@@ -1,0 +1,19 @@
+diff --git a/lib/modules/permission/domain/services/permission_service.dart b/lib/modules/permission/domain/services/permission_service.dart
+--- a/lib/modules/permission/domain/services/permission_service.dart
++++ b/lib/modules/permission/domain/services/permission_service.dart
+@@ -90,14 +90,8 @@ class PermissionService extends _$PermissionService {
+     if (locationAlwaysInfo != null && Platform.isAndroid) {
+       final PermissionStatus locationStatus = await Permission.location.status;
+       if (locationStatus.isGranted) {
+-        final PermissionStatus alwaysStatus = await Permission.locationAlways.request();
+-
+-        if (!alwaysStatus.isGranted) {
+-          permissionsToRequestAgain.add(locationAlwaysInfo);
+-        }
+-      } else {
+-        permissionsToRequestAgain.add(locationAlwaysInfo);
+       }
++      permissionsToRequestAgain.add(permissionLocationAlways);
+     }
+ 
+     return permissionsToRequestAgain;

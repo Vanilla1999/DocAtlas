@@ -1,0 +1,19 @@
+{
+  "base": {
+    "compile_success": true,
+    "expected_tests_failed": true,
+    "setup_success": true,
+    "unexpected_failures": []
+  },
+  "fixture_hash": "f350de7ff9cb875d4513da3325db41628d1052d41d3b4e323d1858a32ba266ba",
+  "gold": {
+    "compile_success": true,
+    "hidden_tests_passed": true,
+    "patch_applied": true,
+    "public_tests_passed": true
+  },
+  "oracle_isolated": true,
+  "status": "validated",
+  "task_id": "decisive_nbo_permission_handler_version_001",
+  "validated_at": "2026-06-28T09:06:47.998650+00:00"
+}

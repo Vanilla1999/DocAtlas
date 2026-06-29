@@ -1,0 +1,371 @@
+[
+  {
+    "candidate_id": "decisive_nbo_generated_policy_source_001",
+    "source_project": "nbo",
+    "candidate_type": "generated_file_trap",
+    "why_repo_only_may_struggle": "The symptom is visible near a generated output stub, but the durable fix must happen in the source model and regenerated-output policy lives in separate docs.",
+    "why_docatlas_should_help": "Project docs and source comments identify source-of-truth and generated-file boundaries before the agent edits the tempting generated file.",
+    "visible_context_required": [
+      "docs/generated-source.md",
+      "lib/modules/permission/ARCHITECTURE.md",
+      "permission_info.dart source model",
+      "generated output stub"
+    ],
+    "tempting_wrong_fixes": [
+      "edit *.freezed.dart",
+      "add a provider-only helper",
+      "hard-code a public-test-only branch"
+    ],
+    "privacy_risk": "low; can sanitize to permission module only",
+    "fixture_size_estimate": "medium",
+    "docatlas_relevance_score": 8,
+    "repo_only_difficulty_score": 8,
+    "fairness_score": 9,
+    "privacy_risk_score": 1,
+    "fixture_cost_score": 5,
+    "recommended": true,
+    "reason": "Meets thresholds; high generated-file and distributed-doc relevance. Previous similar narrow task was too easy, so this would need a larger snapshot.",
+    "source_type": "generated_file_trap",
+    "selection_recommendation": "redesign_before_full_pilot",
+    "implementation_status": "implemented_and_screened",
+    "screening_run_id": "decisive_nbo_generated_policy_source_001_screening_001",
+    "screening_status": "rejected_too_easy",
+    "screening_reason": "repo_only_strict_offline resolved 2/2 with policy_clean=true, artifact_integrity_ok=true, fairness_clean=true"
+  },
+  {
+    "candidate_id": "decisive_nbo_permission_handler_version_001",
+    "source_project": "nbo",
+    "candidate_type": "dependency_trap",
+    "why_repo_only_may_struggle": "A plausible patch may use latest permission_handler APIs or unrelated Android media permissions instead of the lockfile-pinned 11.4.0 API.",
+    "why_docatlas_should_help": "DocAtlas can surface pubspec.lock and local dependency notes without web access or model-memory guesses.",
+    "visible_context_required": [
+      "pubspec.lock",
+      "docs/dependencies.md",
+      "permission service mapping",
+      "fake permission status tests"
+    ],
+    "tempting_wrong_fixes": [
+      "upgrade dependency",
+      "use Permission.photos/videos/audio",
+      "patch only Android branch"
+    ],
+    "privacy_risk": "low after manifest/module sanitization",
+    "fixture_size_estimate": "medium-large",
+    "docatlas_relevance_score": 8,
+    "repo_only_difficulty_score": 8,
+    "fairness_score": 8,
+    "privacy_risk_score": 1,
+    "fixture_cost_score": 7,
+    "recommended": true,
+    "reason": "Meets thresholds at the maximum allowed fixture cost; implement only if a sanitized lockfile/version snapshot can stay within scope.",
+    "source_type": "dependency_trap",
+    "selection_recommendation": "redesign_before_full_pilot",
+    "implementation_status": "implemented_and_screened",
+    "screening_run_id": "decisive_nbo_permission_handler_version_001_screening_001",
+    "screening_status": "rejected_too_easy",
+    "screening_reason": "repo_only_strict_offline resolved 2/2 with policy_clean=true, artifact_integrity_ok=true, fairness_clean=true"
+  },
+  {
+    "candidate_id": "decisive_nbo_cross_module_gate_large_001",
+    "source_project": "nbo",
+    "candidate_type": "cross_module_contract",
+    "why_repo_only_may_struggle": "Two flows have similar local gates; a one-flow fix passes public symptom but violates shared permission contract documented elsewhere.",
+    "why_docatlas_should_help": "Retrieved architecture docs should point to PermissionService as the canonical gate and list both browser/scan flow contracts.",
+    "visible_context_required": [
+      "docs/permission-architecture.md",
+      "docs/browser-flow.md",
+      "docs/scan-flow.md",
+      "browser gate",
+      "scan gate",
+      "permission service"
+    ],
+    "tempting_wrong_fixes": [
+      "fix only failing flow",
+      "duplicate interpretation in each gate",
+      "relax hidden gate assertion"
+    ],
+    "privacy_risk": "low if permission domain is sanitized",
+    "fixture_size_estimate": "large",
+    "docatlas_relevance_score": 9,
+    "repo_only_difficulty_score": 8,
+    "fairness_score": 9,
+    "privacy_risk_score": 1,
+    "fixture_cost_score": 7,
+    "recommended": true,
+    "reason": "Meets thresholds at the maximum allowed fixture cost; current narrow implementation was too easy, so a redesigned larger fixture must preserve fairness without overspecifying the issue.",
+    "source_type": "cross_module_contract",
+    "selection_recommendation": "eligible_for_full_pilot",
+    "implementation_status": "implemented_and_screened",
+    "screening_run_id": "decisive_nbo_cross_module_gate_large_001_screening_001",
+    "screening_status": "accepted",
+    "screening_reason": "repo_only_strict_offline resolved 0/2 with policy_clean=true, artifact_integrity_ok=true, fairness_clean=true"
+  },
+  {
+    "candidate_id": "decisive_nbo_browser_scan_policy_001",
+    "source_project": "nbo",
+    "candidate_type": "multi_doc_architecture_constraint",
+    "why_repo_only_may_struggle": "Public failure can be fixed by adding notification to one flow, but hidden contracts require platform/version-specific preflight and deferred background location.",
+    "why_docatlas_should_help": "Project docs connect browser/scan policy, Android 13 notification behavior, and deferred background-location constraint.",
+    "visible_context_required": [
+      "docs/browser-scan-preflight.md",
+      "docs/permission-notifications.md",
+      "docs/permission-location.md",
+      "pubspec.lock"
+    ],
+    "tempting_wrong_fixes": [
+      "request notification on all Android versions",
+      "request locationAlways during preflight",
+      "edit provider instead of service"
+    ],
+    "privacy_risk": "low",
+    "fixture_size_estimate": "medium",
+    "docatlas_relevance_score": 9,
+    "repo_only_difficulty_score": 7,
+    "fairness_score": 9,
+    "privacy_risk_score": 1,
+    "fixture_cost_score": 5,
+    "recommended": true,
+    "reason": "Meets thresholds, but an earlier narrower implementation screened too easy; needs less explicit issue text/larger distractor surface.",
+    "source_type": "multi_doc_architecture_constraint",
+    "selection_recommendation": "redesign_before_full_pilot",
+    "implementation_status": "implemented_and_screened",
+    "screening_run_id": "decisive_nbo_browser_scan_policy_001_screening_001",
+    "screening_status": "rejected_too_easy",
+    "screening_reason": "repo_only_strict_offline resolved 2/2 with policy_clean=true, artifact_integrity_ok=true, fairness_clean=true"
+  },
+  {
+    "candidate_id": "decisive_docmancer_vector_timeout_fallback_001",
+    "source_project": "docmancer",
+    "candidate_type": "private_local_workflow",
+    "why_repo_only_may_struggle": "The failure spans vector indexing timeout, fallback metadata, and benchmark accounting; local code alone has multiple plausible counters to increment.",
+    "why_docatlas_should_help": "Docs explain retrieval status, fallback semantics, and what can count as workflow success versus vector robustness.",
+    "visible_context_required": [
+      "docs/research/task-level-agent-benchmark.md",
+      "eval/task_level/execution.py",
+      "artifact integrity tests",
+      "runner result schema"
+    ],
+    "tempting_wrong_fixes": [
+      "count fallback as vector retrieval success",
+      "drop timeout flag",
+      "mark all DocAtlas context as used"
+    ],
+    "privacy_risk": "low public repo",
+    "fixture_size_estimate": "medium",
+    "docatlas_relevance_score": 8,
+    "repo_only_difficulty_score": 7,
+    "fairness_score": 8,
+    "privacy_risk_score": 1,
+    "fixture_cost_score": 5,
+    "recommended": true,
+    "reason": "Meets thresholds, but it is self-referential to DocAtlas and should be used cautiously as regression, not external proof.",
+    "source_type": "private_local_workflow",
+    "selection_recommendation": "eligible_for_full_pilot",
+    "implementation_status": "implemented_and_screened",
+    "screening_run_id": "decisive_docmancer_vector_timeout_fallback_001_screening_001",
+    "screening_status": "accepted",
+    "screening_reason": "repo_only_strict_offline resolved 0/2 with policy_clean=true, artifact_integrity_ok=true, fairness_clean=true; self-referential Docmancer caveat"
+  },
+  {
+    "candidate_id": "decisive_docmancer_policy_audit_network_001",
+    "source_project": "docmancer",
+    "candidate_type": "historical_fix",
+    "why_repo_only_may_struggle": "Policy audit distinguishes browser-word mentions, actual network attempts, web-audited allowances, and strict-offline violations across logs.",
+    "why_docatlas_should_help": "Benchmark docs state isolation policy and audit semantics, preventing overbroad greps or undercounting network use.",
+    "visible_context_required": [
+      "docs/research/task-level-agent-benchmark.md",
+      "tests/task_level/test_policy_baselines.py",
+      "eval/task_level/policy audit code"
+    ],
+    "tempting_wrong_fixes": [
+      "treat the word browser as web use",
+      "allow network in strict offline",
+      "hide network attempts in notes"
+    ],
+    "privacy_risk": "low",
+    "fixture_size_estimate": "medium",
+    "docatlas_relevance_score": 7,
+    "repo_only_difficulty_score": 7,
+    "fairness_score": 8,
+    "privacy_risk_score": 1,
+    "fixture_cost_score": 4,
+    "recommended": true,
+    "reason": "Meets thresholds but source project is benchmark itself; useful for harness validation more than external agent-value proof.",
+    "source_type": "historical_fix",
+    "selection_recommendation": "implement_next"
+  },
+  {
+    "candidate_id": "decisive_docmancer_actionability_contract_001",
+    "source_project": "docmancer",
+    "candidate_type": "adr_mismatch",
+    "why_repo_only_may_struggle": "Checklist generation must include visible requirements but avoid hidden-only symbols; naive implementation leaks oracle requirements.",
+    "why_docatlas_should_help": "Local benchmark docs and fairness reviews specify discoverability constraints and visible-source mapping.",
+    "visible_context_required": [
+      "actionability tests",
+      "fairness review docs",
+      "task manifest schema",
+      "expected_project_docs"
+    ],
+    "tempting_wrong_fixes": [
+      "copy hidden requirements into checklist",
+      "invent parameter names",
+      "omit source references"
+    ],
+    "privacy_risk": "low",
+    "fixture_size_estimate": "small-medium",
+    "docatlas_relevance_score": 7,
+    "repo_only_difficulty_score": 7,
+    "fairness_score": 8,
+    "privacy_risk_score": 1,
+    "fixture_cost_score": 4,
+    "recommended": true,
+    "reason": "Meets thresholds; caveat: self-referential benchmark code may not generalize.",
+    "source_type": "adr_mismatch",
+    "selection_recommendation": "implement_next"
+  },
+  {
+    "candidate_id": "decisive_mobile_flutter_generated_l10n_001",
+    "source_project": "mobile-scout-flutter",
+    "candidate_type": "generated_file_trap",
+    "why_repo_only_may_struggle": "Flutter localization/generated files often tempt direct edits while source ARB/config is canonical.",
+    "why_docatlas_should_help": "Project docs/manifests can surface generation policy and build_runner/l10n configuration.",
+    "visible_context_required": [
+      "l10n.yaml or build config",
+      "README generation notes",
+      "ARB/source files",
+      "generated Dart output"
+    ],
+    "tempting_wrong_fixes": [
+      "edit generated localization Dart",
+      "change generated registry",
+      "ignore pinned Flutter tooling"
+    ],
+    "privacy_risk": "medium until sanitized; mobile domain may contain private labels",
+    "fixture_size_estimate": "medium",
+    "docatlas_relevance_score": 8,
+    "repo_only_difficulty_score": 7,
+    "fairness_score": 7,
+    "privacy_risk_score": 4,
+    "fixture_cost_score": 6,
+    "recommended": false,
+    "reason": "Fails privacy/fairness thresholds until source is reviewed and sanitized.",
+    "source_type": "generated_file_trap",
+    "selection_recommendation": "do_not_implement_yet"
+  },
+  {
+    "candidate_id": "decisive_krakend_config_contract_001",
+    "source_project": "krakend-service-helpdesk-proxy",
+    "candidate_type": "migration_or_version_mismatch",
+    "why_repo_only_may_struggle": "Gateway config syntax/version and endpoint policy can be split across templates, docs, and generated config output.",
+    "why_docatlas_should_help": "DocAtlas can retrieve local ADR/runbook snippets and versioned config constraints before editing JSON templates.",
+    "visible_context_required": [
+      "README/runbook",
+      "krakend config templates",
+      "version manifest",
+      "public smoke tests"
+    ],
+    "tempting_wrong_fixes": [
+      "edit generated config",
+      "use wrong KrakenD version field",
+      "change route shape outside documented proxy contract"
+    ],
+    "privacy_risk": "medium-high due service/domain configuration",
+    "fixture_size_estimate": "medium-large",
+    "docatlas_relevance_score": 8,
+    "repo_only_difficulty_score": 8,
+    "fairness_score": 6,
+    "privacy_risk_score": 5,
+    "fixture_cost_score": 7,
+    "recommended": false,
+    "reason": "Interesting but privacy and sanitization risk too high for immediate fixture.",
+    "source_type": "migration_or_version_mismatch",
+    "selection_recommendation": "do_not_implement_yet"
+  },
+  {
+    "candidate_id": "decisive_flutter_keycloak_version_001",
+    "source_project": "flutter-keycloak",
+    "candidate_type": "dependency_trap",
+    "why_repo_only_may_struggle": "Auth package APIs change across versions and web/native setup docs are easy to conflate.",
+    "why_docatlas_should_help": "Local dependency pins and setup docs could prevent latest-only API or platform-mismatch fixes.",
+    "visible_context_required": [
+      "pubspec.lock",
+      "auth README",
+      "platform setup files",
+      "public auth tests"
+    ],
+    "tempting_wrong_fixes": [
+      "upgrade auth dependency",
+      "mix web-only and native APIs",
+      "hard-code callback URL"
+    ],
+    "privacy_risk": "medium due auth domain",
+    "fixture_size_estimate": "medium",
+    "docatlas_relevance_score": 8,
+    "repo_only_difficulty_score": 7,
+    "fairness_score": 7,
+    "privacy_risk_score": 4,
+    "fixture_cost_score": 6,
+    "recommended": false,
+    "reason": "Auth/privacy boundary needs human sanitization before fixture.",
+    "source_type": "dependency_trap",
+    "selection_recommendation": "do_not_implement_yet"
+  },
+  {
+    "candidate_id": "decisive_android_keyboard_input_contract_001",
+    "source_project": "android-keyboard",
+    "candidate_type": "cross_module_contract",
+    "why_repo_only_may_struggle": "IME behavior can require agreement between manifest, service lifecycle, and key event handling docs.",
+    "why_docatlas_should_help": "Project docs/manifest constraints should guide the patch away from a local key-handler-only fix.",
+    "visible_context_required": [
+      "AndroidManifest.xml",
+      "IME service docs",
+      "input handling code",
+      "instrumentation/fake tests"
+    ],
+    "tempting_wrong_fixes": [
+      "patch only key event map",
+      "change manifest permission without service contract",
+      "ignore lifecycle callback"
+    ],
+    "privacy_risk": "low-medium",
+    "fixture_size_estimate": "large",
+    "docatlas_relevance_score": 7,
+    "repo_only_difficulty_score": 7,
+    "fairness_score": 7,
+    "privacy_risk_score": 3,
+    "fixture_cost_score": 8,
+    "recommended": false,
+    "reason": "Fixture cost and fairness uncertainty too high.",
+    "source_type": "cross_module_contract",
+    "selection_recommendation": "do_not_implement_yet"
+  },
+  {
+    "candidate_id": "decisive_viscanner_scan_pipeline_001",
+    "source_project": "viscanner",
+    "candidate_type": "multi_doc_architecture_constraint",
+    "why_repo_only_may_struggle": "Scanner pipeline bugs often have tempting UI-layer fixes while the contract belongs in acquisition/preprocessing modules.",
+    "why_docatlas_should_help": "Architecture docs can surface the pipeline boundary and generated/native output constraints.",
+    "visible_context_required": [
+      "pipeline README/ADR",
+      "scanner service",
+      "UI caller",
+      "test fixtures"
+    ],
+    "tempting_wrong_fixes": [
+      "fix only UI callback",
+      "edit generated/native artifact",
+      "bypass preprocessing contract"
+    ],
+    "privacy_risk": "medium; may include customer/device details",
+    "fixture_size_estimate": "large",
+    "docatlas_relevance_score": 8,
+    "repo_only_difficulty_score": 8,
+    "fairness_score": 6,
+    "privacy_risk_score": 5,
+    "fixture_cost_score": 8,
+    "recommended": false,
+    "reason": "High potential but not safe/cheap enough without deeper sanitization.",
+    "source_type": "multi_doc_architecture_constraint",
+    "selection_recommendation": "do_not_implement_yet"
+  }
+]

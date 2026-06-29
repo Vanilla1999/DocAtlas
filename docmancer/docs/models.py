@@ -319,6 +319,55 @@ class ProjectMetadata:
 
 
 @dataclass(frozen=True)
+class PatchConstraint:
+    id: str
+    type: str
+    instruction: str
+    source: str
+    severity: str
+    confidence: str
+    evidence: str
+    symbols: list[str] = field(default_factory=list)
+    files: list[str] = field(default_factory=list)
+
+
+@dataclass(frozen=True)
+class PatchConstraintPacket:
+    task: str
+    constraints: list[PatchConstraint] = field(default_factory=list)
+    forbidden_edits: list[PatchConstraint] = field(default_factory=list)
+    dependency_contracts: list[PatchConstraint] = field(default_factory=list)
+    source_of_truth_rules: list[PatchConstraint] = field(default_factory=list)
+    suggested_checks: list[str] = field(default_factory=list)
+    warnings: list[str] = field(default_factory=list)
+    sources: list[dict[str, Any]] = field(default_factory=list)
+    token_estimate: int = 0
+    confidence: str = "low"
+
+
+@dataclass(frozen=True)
+class PatchConstraintValidationResult:
+    constraint_id: str
+    status: str
+    reason: str
+    files: list[str] = field(default_factory=list)
+    evidence: str | None = None
+
+
+@dataclass(frozen=True)
+class PatchConstraintValidationPacket:
+    task: str | None = None
+    project_path: str | None = None
+    total_constraints: int = 0
+    satisfied: int = 0
+    violated: int = 0
+    unknown: int = 0
+    results: list[PatchConstraintValidationResult] = field(default_factory=list)
+    warnings: list[str] = field(default_factory=list)
+    confidence: str = "low"
+
+
+@dataclass(frozen=True)
 class ProjectPrefetchResult:
     project: ProjectMetadata
     results: list[RefreshResult] = field(default_factory=list)

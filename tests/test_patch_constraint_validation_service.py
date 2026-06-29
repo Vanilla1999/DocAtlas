@@ -1,0 +1,180 @@
+from __future__ import annotations
+
+from dataclasses import asdict
+from pathlib import Path
+
+from docmancer.docs.application.patch_constraint_validation_service import PatchConstraintValidationService
+from docmancer.docs.models import PatchConstraint, PatchConstraintPacket
+
+
+def _constraint(
+    constraint_id: str,
+    type_: str,
+    instruction: str,
+    *,
+    source: str = "docs/architecture.md",
+    severity: str = "must",
+    confidence: str = "high",
+    evidence: str | None = None,
+    files: list[str] | None = None,
+    symbols: list[str] | None = None,
+) -> PatchConstraint:
+    return PatchConstraint(
+        id=constraint_id,
+        type=type_,
+        instruction=instruction,
+        source=source,
+        severity=severity,
+        confidence=confidence,
+        evidence=evidence or instruction,
+        files=files or [],
+        symbols=symbols or [],
+    )
+
+
+def _service() -> PatchConstraintValidationService:
+    return PatchConstraintValidationService()
+
+
+def test_detects_generated_file_edit_violation():
+    constraint = _constraint("generated", "generated_file", "Generated files *.g.dart must not be edited by hand.", files=["*.g.dart"])
+
+    result = _service().validate_patch_against_constraints([constraint], changed_files=["lib/user/user.g.dart"])
+
+    assert result.violated == 1
+    assert result.results[0].status == "violated"
+    assert "generated" in result.results[0].reason.lower()
+
+
+def test_detects_freezed_file_edit_violation():
+    constraint = _constraint("generated", "generated_file", "Generated files *.freezed.dart must not be modified.", files=["*.freezed.dart"])
+
+    result = _service().validate_patch_against_constraints([constraint], changed_files=["lib/user/user.freezed.dart"])
+
+    assert result.violated == 1
+    assert result.results[0].files == ["lib/user/user.freezed.dart"]
+
+
+def test_detects_lockfile_edit_violation():
+    constraint = _constraint("lock", "forbidden_edit", "Do not change lockfile unless explicitly upgrading dependencies.", files=["pubspec.lock"])
+
+    result = _service().validate_patch_against_constraints([constraint], changed_files=["pubspec.lock"])
+
+    assert result.violated == 1
+    assert "lockfile" in result.results[0].reason.lower()
+
+
+def test_allows_lockfile_edit_for_explicit_dependency_upgrade_task():
+    constraint = _constraint("lock", "forbidden_edit", "Do not change lockfile unless explicitly upgrading dependencies.", files=["pubspec.lock"])
+    packet = PatchConstraintPacket(task="Upgrade permission_handler dependency", constraints=[constraint])
+
+    result = _service().validate_patch_against_constraints(packet, changed_files=["pubspec.lock"])
+
+    assert result.violated == 0
+    assert result.unknown == 1
+    assert "dependency-upgrade allowance" in result.results[0].reason.lower()
+
+
+def test_allows_source_of_truth_file_edit():
+    constraint = _constraint("owner", "source_of_truth", "Permission policy belongs in PermissionService / service layer, not provider/UI.", symbols=["PermissionService"])
+
+    result = _service().validate_patch_against_constraints([constraint], changed_files=["lib/permission/application/permission_service.dart"])
+
+    assert result.satisfied == 1
+    assert result.results[0].status == "satisfied"
+
+
+def test_detects_provider_policy_edit_when_forbidden():
+    constraint = _constraint("provider", "forbidden_edit", "Provider/UI must not duplicate permission policy; delegate to PermissionService.")
+    diff = """
++ if (status == PermissionStatus.denied) {
++   canProceed = role == 'admin';
++ }
+"""
+
+    result = _service().validate_patch_against_constraints([constraint], changed_files=["lib/permission/presentation/permission_provider.dart"], patch_diff=diff)
+
+    assert result.violated == 1
+    assert "provider/ui" in result.results[0].reason.lower()
+
+
+def test_marks_provider_change_unknown_without_diff():
+    constraint = _constraint("provider", "forbidden_edit", "Provider/UI must not duplicate permission policy; delegate to PermissionService.")
+
+    result = _service().validate_patch_against_constraints([constraint], changed_files=["lib/permission/presentation/permission_provider.dart"])
+
+    assert result.unknown == 1
+    assert result.results[0].status == "unknown"
+    assert "diff unavailable" in result.results[0].reason.lower()
+
+
+def test_marks_verification_constraint_unknown_without_test_evidence():
+    constraint = _constraint("checks", "verification", "Run permission tests after editing.")
+
+    result = _service().validate_patch_against_constraints([constraint], changed_files=["tests/test_permission.py"])
+
+    assert result.unknown == 1
+    assert "test evidence" in result.results[0].reason.lower()
+
+
+def test_summarizes_satisfied_violated_unknown_counts():
+    constraints = [
+        _constraint("generated", "generated_file", "Generated files *.g.dart must not be edited.", files=["*.g.dart"]),
+        _constraint("owner", "source_of_truth", "Permission policy belongs in PermissionService / service layer, not provider/UI."),
+        _constraint("checks", "verification", "Run tests."),
+    ]
+
+    result = _service().validate_patch_against_constraints(
+        constraints,
+        changed_files=["lib/user/user.g.dart", "lib/permission/service/permission_service.dart"],
+    )
+
+    assert result.total_constraints == 3
+    assert result.satisfied == 1
+    assert result.violated == 1
+    assert result.unknown == 1
+
+
+def test_strict_mode_adds_manual_review_warning_for_unknowns():
+    constraint = _constraint("checks", "verification", "Run tests.")
+
+    result = _service().validate_patch_against_constraints([constraint], strict=True)
+
+    assert result.unknown == 1
+    assert any("strict mode: unresolved unknown constraints require manual review" in warning for warning in result.warnings)
+
+
+def test_validation_accepts_constraints_packet_dict():
+    packet = PatchConstraintPacket(task="Update permissions", constraints=[_constraint("generated", "generated_file", "Generated files *.g.dart must not be edited.", files=["*.g.dart"])])
+
+    result = _service().validate_patch_against_constraints(asdict(packet), changed_files=["lib/user/user.g.dart"])
+
+    assert result.task == "Update permissions"
+    assert result.violated == 1
+
+
+def test_validation_accepts_constraints_list():
+    result = _service().validate_patch_against_constraints([
+        {"id": "lock", "type": "forbidden_edit", "instruction": "Do not change lockfile.", "source": "pubspec.lock", "severity": "must", "confidence": "high", "evidence": "Do not change lockfile.", "files": ["pubspec.lock"], "symbols": []}
+    ], changed_files=["pubspec.lock"])
+
+    assert result.violated == 1
+
+
+def test_validation_handles_empty_constraints():
+    result = _service().validate_patch_against_constraints([], changed_files=["lib/main.dart"])
+
+    assert result.total_constraints == 0
+    assert result.satisfied == 0
+    assert result.violated == 0
+    assert result.unknown == 0
+    assert result.confidence == "low"
+
+
+def test_validation_does_not_require_git_repo_when_changed_files_provided(tmp_path: Path):
+    missing_repo = tmp_path / "does-not-exist"
+    constraint = _constraint("lock", "forbidden_edit", "Do not change lockfile.", files=["pubspec.lock"])
+
+    result = _service().validate_patch_against_constraints([constraint], project_path=str(missing_repo), changed_files=["pubspec.lock"])
+
+    assert result.violated == 1

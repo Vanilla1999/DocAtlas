@@ -1,0 +1,34 @@
+diff --git a/src/app/main.py b/src/app/main.py
+--- a/src/app/main.py
++++ b/src/app/main.py
+@@ -1,17 +1,27 @@
+ from __future__ import annotations
+ 
+-from fastapi import FastAPI
++from typing import Annotated
++
++from fastapi import Depends, FastAPI, HTTPException
+ 
+ from .errors import error_envelope
++from .security import require_admin
+ 
+ app = FastAPI()
+ 
+ 
+-@app.exception_handler(403)
++@app.exception_handler(HTTPException)
+ async def forbidden_handler(request, exc):  # noqa: ANN001
+-    return error_envelope("forbidden", "admin access required", 403)
++    if exc.status_code == 403:
++        return error_envelope("forbidden", "admin access required", 403)
++    raise exc
+ 
+ 
+ @app.get("/health")
+ def health() -> dict[str, str]:
+     return {"status": "ok"}
++
++
++@app.get("/internal/admin/status")
++def admin_status(admin: Annotated[str, Depends(require_admin)]) -> dict[str, str]:
++    return {"admin": "ok"}

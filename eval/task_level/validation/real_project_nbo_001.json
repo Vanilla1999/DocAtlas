@@ -1,0 +1,19 @@
+{
+  "base": {
+    "compile_success": true,
+    "expected_tests_failed": true,
+    "setup_success": true,
+    "unexpected_failures": []
+  },
+  "fixture_hash": "75f92d25148c32f8bb565d67a701d005898607ac0d4c8ebff9e1d8e5e738a50c",
+  "gold": {
+    "compile_success": true,
+    "hidden_tests_passed": true,
+    "patch_applied": true,
+    "public_tests_passed": true
+  },
+  "oracle_isolated": true,
+  "status": "validated",
+  "task_id": "real_project_nbo_001",
+  "validated_at": "2026-06-27T12:26:46.133354+00:00"
+}

@@ -1,0 +1,7 @@
+name: decisive_nbo_cross_module_gate_large_fixture
+publish_to: none
+
+dependencies:
+  permission_handler: 11.4.0
+  flutter_riverpod: 2.6.1
+  freezed_annotation: 2.4.4

@@ -1,0 +1,19 @@
+{
+  "base": {
+    "compile_success": true,
+    "expected_tests_failed": true,
+    "setup_success": true,
+    "unexpected_failures": []
+  },
+  "fixture_hash": "d8294d2b73daeba6b7e28bd549a1492518996e80f6a39eb25dd0c2c846bce78a",
+  "gold": {
+    "compile_success": true,
+    "hidden_tests_passed": true,
+    "patch_applied": true,
+    "public_tests_passed": true
+  },
+  "oracle_isolated": true,
+  "status": "validated",
+  "task_id": "fastapi_depends_001",
+  "validated_at": "2026-06-26T15:19:34.594877+00:00"
+}

@@ -1,0 +1,26 @@
+diff --git a/lib/modules/permission/domain/services/permission_service.dart b/lib/modules/permission/domain/services/permission_service.dart
+index c557947..42b3fbb 100644
+--- a/lib/modules/permission/domain/services/permission_service.dart
++++ b/lib/modules/permission/domain/services/permission_service.dart
+@@ -49,6 +49,11 @@ class PermissionService extends _$PermissionService {
+     permission: Permission.bluetoothConnect,
+   );
+
++  PermissionInfo permissionNotification = PermissionInfo(
++    name: 'Notifications',
++    permission: Permission.notification,
++  );
++
+   PermissionInfo permissionLocationAlways = PermissionInfo(
+     name: LocaleKeys.permissionModule_location.tr(),
+     permission: Permission.locationAlways,
+@@ -105,6 +110,9 @@ class PermissionService extends _$PermissionService {
+     final AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+
+     if (androidInfo.version.sdkInt >= 33) {
++      if (!permissionsToRequest.any((p) => p.permission == permissionNotification.permission)) {
++        permissionsToRequest.add(permissionNotification);
++      }
+     } else if (!permissionsToRequest.any((p) => p.permission == permissionStorage.permission)) {
+       permissionsToRequest.add(permissionStorage);
+     }

@@ -10,6 +10,7 @@ coverage/
 .DS_Store
 .worktrees/
 .docmancer/
+.docmancer-home-test/
 .docs-kit/
 downloaded-docs/
 /release-patch-pypi.sh
@@ -23,6 +24,8 @@ docs/*
 !docs/mcp-docs-server.md
 !docs/project-docs-demo.md
 !docs/project-docs-mcp-workflow.md
+!docs/research/
+!docs/research/*.md
 !docmancer/docs/
 !docmancer/docs/*.py
 scripts/*.log
@@ -35,3 +38,19 @@ doc-atlas/
 eval/results/live/*
 !eval/results/live/README.md
 !eval/results/live/sample_report.md
+
+# Task-level agent benchmark generated artifacts
+eval/task_level/results/*
+!eval/task_level/results/README.md
+!eval/task_level/results/sample_report.md
+!eval/task_level/results/docatlas_context_quality_analysis/
+!eval/task_level/results/docatlas_context_quality_analysis/**
+!eval/task_level/results/task_fairness_review/
+!eval/task_level/results/task_fairness_review/**
+!eval/task_level/results/decisive_real_project_benchmark/
+!eval/task_level/results/decisive_real_project_benchmark/**
+!eval/task_level/results/cost_accuracy_analysis/
+!eval/task_level/results/cost_accuracy_analysis/**
+eval/task_level/runtime/
+eval/task_level/workspaces/
+eval/task_level/.cache/
