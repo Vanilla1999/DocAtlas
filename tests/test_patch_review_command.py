@@ -649,6 +649,8 @@ def test_patch_review_writes_machine_readable_action_items(tmp_path: Path):
     assert 0 < len(actions["actionable_items"]) <= 2
     assert any(item["instruction"] in actionable_markdown for item in actions["actionable_items"])
     assert all(item["constraint_id"] for item in actions["actionable_items"])
+    assert [item["rank"] for item in actions["actionable_items"]] == list(range(1, len(actions["actionable_items"]) + 1))
+    assert all(item["markdown"] in actionable_markdown for item in actions["actionable_items"])
     assert actions["claims_avoided"] == [
         "correctness_proof",
         "test_or_human_review_replacement",

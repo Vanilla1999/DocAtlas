@@ -330,8 +330,12 @@ class PatchReviewService:
             "summary_mode": summary_mode,
             "actionable_items_limit": summary_max_items,
             "actionable_items": [
-                PatchReviewService._actionable_item_payload(item, results_by_id.get(str(item.get("id") or "")))
-                for item in actionable
+                PatchReviewService._actionable_item_payload(
+                    item,
+                    results_by_id.get(str(item.get("id") or "")),
+                    rank=index,
+                )
+                for index, item in enumerate(actionable, start=1)
             ],
             "violations": [
                 {
@@ -349,13 +353,17 @@ class PatchReviewService:
         }
 
     @staticmethod
-    def _actionable_item_payload(item: dict[str, Any], result: dict[str, Any] | None) -> dict[str, Any]:
+    def _actionable_item_payload(item: dict[str, Any], result: dict[str, Any] | None, *, rank: int) -> dict[str, Any]:
+        source = item.get("source")
+        instruction = item.get("instruction")
         payload = {
+            "rank": rank,
             "constraint_id": item.get("id"),
-            "instruction": item.get("instruction"),
-            "source": item.get("source"),
+            "instruction": instruction,
+            "source": source,
             "type": item.get("type"),
             "confidence": item.get("confidence"),
+            "markdown": f"- {instruction} (source: `{source}`)",
         }
         if result:
             payload["validation_status"] = result.get("status")
