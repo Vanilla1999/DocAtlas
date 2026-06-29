@@ -41,7 +41,8 @@ This section is a practical map of what Docmancer can do today and which tool or
 | Avoid repeated WebFetch | Register sources once, then query local indexes. | `resolve_library_id`, `get_library_docs`, `list_library_docs`; CLI `doc-atlas list`. | If no registered or confidently resolved docs source exists, user may still need to provide a docs URL. |
 | Keep docs private/local | Index local files and private docs without sending content to hosted docs services. | CLI `doc-atlas ingest`; MCP `ingest_project_docs`. | Cloud embedding extras are optional; default retrieval stack can stay local. |
 | Get compact context for agents | Return sections with headings, source attribution, extracted snippets, metadata, token estimates, and optional snippet-first presentation for coding queries. | CLI `doc-atlas query`, `doc-atlas context`; MCP `get_docs_context`, `get_library_docs`, and `get_project_context` with `response_style`. | Snippets are extracted from trusted source docs, not synthesized; `context_pack` and Trust Contract remain available. |
-| Compile patch constraints for agents | Return compact, source-attributed project constraints for a coding patch: architecture conventions, forbidden/generated-file edits, source-of-truth rules, pinned dependency contracts, and suggested checks. | MCP `get_patch_constraints`. | Designed to provide actionable project constraints for coding agents; not proven to improve success rate and not a production patch validator. |
+| Compile patch constraints for agents | Return compact, source-attributed project constraints for a coding patch: architecture conventions, forbidden/generated-file edits, source-of-truth rules, pinned dependency contracts, and suggested checks. | MCP `get_patch_constraints`. | Designed to provide actionable project constraints for coding agents; not proven to improve success rate. |
+| Validate patch constraints after editing | Deterministically compare caller-supplied constraints with changed files or a patch diff. | MCP `validate_patch_against_constraints`. | Best-effort guardrail only; unknown results require manual review and tests still must run. |
 | Run long docs indexing safely | Start async prefetch jobs and poll progress. | `prefetch_library_docs(async=true)`, `prefetch_docs_targets(async=true)`, `get_docs_job_status`. | Large public sites still need sane max pages, allowed domains, and source hygiene. |
 | Diagnose docs runtime | Check config, storage, SQLite, Qdrant, indexes, agents, and MCP state. | CLI `doc-atlas doctor`, `doc-atlas qdrant status`; MCP `mcp doctor`. | Doctor output should continue moving toward more explicit severity/fix commands. |
 
@@ -62,6 +63,19 @@ get_patch_constraints(question, project_path?, changed_files?, max_constraints=1
 ```
 
 This read-only tool compiles deterministic constraints from visible project docs and dependency metadata. It is designed to provide actionable project constraints for coding agents; it does not validate patches and should not be described as proven to outperform repo-only prompting.
+
+
+### validate_patch_against_constraints — post-edit guardrail
+
+Recommended workflow:
+
+1. Call `get_patch_constraints` before editing.
+2. Edit code.
+3. Call `validate_patch_against_constraints` with the original constraints plus `changed_files` or `patch_diff`.
+4. Fix deterministic violations.
+5. Run tests.
+
+The validator detects deterministic issues such as generated-file edits, lockfile edits, provider/UI policy logic where a service/domain/application layer owns behavior, and source-of-truth layer edits. It is deterministic best-effort: it does not prove correctness, does not replace tests, does not call an LLM, and is not evidence that DocAtlas improves coding-agent success.
 
 ### get_patch_constraints — expanded deterministic heuristics
 

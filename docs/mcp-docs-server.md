@@ -117,6 +117,7 @@ The unified tool delegates to existing facade methods such as `bootstrap_project
 | `get_project_docs` | Query indexed current project-owned docs for repo-specific architecture, conventions, runbooks, ADRs, README, roadmap, wiki, or module/package questions. |
 | `get_project_context` | Return a compact repo-grounded context pack after bootstrap/inspect and any required `sync_project_docs` step. Includes a Trust Contract and structured next_actions. |
 | `get_patch_constraints` | Return compact, source-attributed constraints for a coding patch. Designed to provide actionable project constraints for coding agents; it does not validate patches or change `get_docs_context` behavior. |
+| `validate_patch_against_constraints` | Deterministically check changed files or a patch diff against a caller-supplied constraint packet. Best-effort guardrail only; it does not prove correctness or replace tests. |
 
 `get_patch_constraints` arguments:
 
@@ -132,6 +133,45 @@ The unified tool delegates to existing facade methods such as `bootstrap_project
 ```
 
 The tool uses deterministic local heuristics over visible project docs and dependency metadata. It can surface generated-file rules, source-of-truth rules, provider/delegation conventions, pinned dependency/version contracts, lockfile guardrails, and suggested checks. Every constraint includes source attribution, confidence, and short evidence. If the packet exceeds the budget, must/high-confidence constraints are kept first and a warning is returned.
+
+
+### validate_patch_against_constraints — deterministic post-edit guardrail
+
+Use after editing code:
+
+1. Call `get_patch_constraints` before editing.
+2. Edit code.
+3. Call `validate_patch_against_constraints` with the returned constraints plus `changed_files` or `patch_diff`.
+4. Fix deterministic violations.
+5. Run the project tests.
+
+Arguments:
+
+```json
+{
+  "constraints": "object|array",
+  "project_path": "string|null",
+  "changed_files": "array[string]|null",
+  "patch_diff": "string|null",
+  "strict": "boolean"
+}
+```
+
+Return shape:
+
+```json
+{
+  "total_constraints": 0,
+  "satisfied": 0,
+  "violated": 0,
+  "unknown": 0,
+  "results": [],
+  "warnings": [],
+  "confidence": "high|medium|low"
+}
+```
+
+The validator is deterministic best-effort. It detects clear generated-file edits, lockfile edits, provider/UI policy edits, and source-of-truth layer matches. `unknown` means manual review is required. It does not call an LLM, does not fetch docs, does not prove correctness, and does not replace tests.
 
 ### get_patch_constraints — expanded deterministic heuristics
 

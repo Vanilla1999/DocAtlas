@@ -135,6 +135,19 @@ Cannot claim:
 - Patch constraints are efficient versus repo-only on current artifacts.
 - Fallback-local-project-context is vector retrieval success.
 
+
+## validate_patch_against_constraints — deterministic post-edit guardrail
+
+Status: production MCP tool added after `get_patch_constraints` stabilization. The intended workflow is:
+
+1. Call `get_patch_constraints` before editing.
+2. Edit code.
+3. Call `validate_patch_against_constraints` with the returned constraints and caller-supplied `changed_files` or `patch_diff`.
+4. Fix deterministic violations.
+5. Run tests.
+
+The validator is deterministic best-effort. It can detect clear generated-file edits, lockfile edits, forbidden provider/UI policy logic, and source-of-truth layer edits. It does not call an LLM, does not fetch constraints automatically, does not prove patch correctness, does not replace tests, and does not show benchmark superiority. Unknown results mean manual review is required.
+
 ## Recommended PR scope
 
 `feat: add get_patch_constraints MCP tool` should:
@@ -147,4 +160,4 @@ Cannot claim:
 6. emit telemetry fields compatible with the benchmark analyzer;
 7. stay read-only.
 
-Do not add `validate_patch_against_constraints` first. Validation is useful, but the compiler surface must stabilize before production validation can be reliable.
+Validation is now available as a separate deterministic best-effort MCP guardrail after the compiler surface stabilized. Keep future claims cautious until targeted task-level evidence exists.

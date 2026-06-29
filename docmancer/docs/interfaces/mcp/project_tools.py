@@ -14,6 +14,7 @@ PROJECT_TOOL_NAMES = {
     "get_project_docs",
     "get_project_context",
     "get_patch_constraints",
+    "validate_patch_against_constraints",
     "prefetch_project_docs",
     "prefetch_project_dependency_docs",
 }
@@ -213,6 +214,14 @@ def handle_project_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
             max_constraints=args.get("max_constraints") or 12,
             max_tokens=args.get("max_tokens") or 1200,
             include_sources=bool(args.get("include_sources") if args.get("include_sources") is not None else True),
+        ))
+    if name == "validate_patch_against_constraints":
+        return asdict(service.validate_patch_against_constraints(
+            args.get("constraints") or [],
+            project_path=args.get("project_path"),
+            changed_files=args.get("changed_files"),
+            patch_diff=args.get("patch_diff"),
+            strict=bool(args.get("strict") or False),
         ))
     if name in {"prefetch_project_docs", "prefetch_project_dependency_docs"}:
         method = service.prefetch_project_dependency_docs if name == "prefetch_project_dependency_docs" else service.prefetch_project_docs

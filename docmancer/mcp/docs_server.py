@@ -307,6 +307,21 @@ Does not use deleted, orphaned, or stale project-doc content by default.""",
         },
     },
     {
+        "name": "validate_patch_against_constraints",
+        "description": "Use after editing code to check changed files or a patch diff against constraints returned by get_patch_constraints. This is a deterministic best-effort validator; it does not prove correctness and does not replace tests.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "constraints": {"type": ["object", "array"]},
+                "project_path": {"type": ["string", "null"]},
+                "changed_files": {"type": ["array", "null"], "items": {"type": "string"}},
+                "patch_diff": {"type": ["string", "null"]},
+                "strict": {"type": "boolean", "default": False},
+            },
+            "required": ["constraints"],
+        },
+    },
+    {
         "name": "get_docs_job_status",
         "description": "Return persistent progress for one docs indexing/prefetch job.",
         "inputSchema": {

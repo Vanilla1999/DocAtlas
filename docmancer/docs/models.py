@@ -346,6 +346,28 @@ class PatchConstraintPacket:
 
 
 @dataclass(frozen=True)
+class PatchConstraintValidationResult:
+    constraint_id: str
+    status: str
+    reason: str
+    files: list[str] = field(default_factory=list)
+    evidence: str | None = None
+
+
+@dataclass(frozen=True)
+class PatchConstraintValidationPacket:
+    task: str | None = None
+    project_path: str | None = None
+    total_constraints: int = 0
+    satisfied: int = 0
+    violated: int = 0
+    unknown: int = 0
+    results: list[PatchConstraintValidationResult] = field(default_factory=list)
+    warnings: list[str] = field(default_factory=list)
+    confidence: str = "low"
+
+
+@dataclass(frozen=True)
 class ProjectPrefetchResult:
     project: ProjectMetadata
     results: list[RefreshResult] = field(default_factory=list)
