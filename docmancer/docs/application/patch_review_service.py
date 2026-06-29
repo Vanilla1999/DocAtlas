@@ -36,6 +36,7 @@ class PatchReviewService:
         strict: bool = False,
         max_constraints: int = 12,
         max_tokens: int = 1200,
+        summary_max_items: int = 5,
     ) -> dict[str, Any]:
         root = Path(project_path).expanduser().resolve()
         if not root.exists():
@@ -86,7 +87,16 @@ class PatchReviewService:
         self._write_json(out / "patch_hygiene.json", hygiene.to_json_dict())
         (out / "patch.diff").write_text(patch_diff, encoding="utf-8")
         self._write_json(out / "validation.json", validation_dict)
-        summary = self._review_summary(task, changed, constraints_dict, validation_dict, warnings=warnings, untracked_files=untracked_files, ignored_runtime_artifacts=ignored_runtime_artifacts)
+        summary = self._review_summary(
+            task,
+            changed,
+            constraints_dict,
+            validation_dict,
+            warnings=warnings,
+            untracked_files=untracked_files,
+            ignored_runtime_artifacts=ignored_runtime_artifacts,
+            summary_max_items=summary_max_items,
+        )
         (out / "review_summary.md").write_text(summary, encoding="utf-8")
         return {
             "output_dir": str(out),
@@ -161,6 +171,7 @@ class PatchReviewService:
         warnings: list[str] | None = None,
         untracked_files: list[str] | None = None,
         ignored_runtime_artifacts: list[str] | None = None,
+        summary_max_items: int = 5,
     ) -> str:
         warnings = warnings or []
         untracked_files = untracked_files or []
@@ -177,7 +188,7 @@ class PatchReviewService:
             constraint_items,
             key=lambda item: PatchReviewService._summary_constraint_rank(item, changed_files, task),
         )
-        actionable = [item for item in ranked_constraints if PatchReviewService._summary_bucket(item, changed_files, task) == "actionable"][:5]
+        actionable = [item for item in ranked_constraints if PatchReviewService._summary_bucket(item, changed_files, task) == "actionable"][:summary_max_items]
         manual_context = [item for item in ranked_constraints if PatchReviewService._summary_bucket(item, changed_files, task) == "manual"][:6]
         low_context = [item for item in ranked_constraints if PatchReviewService._summary_bucket(item, changed_files, task) == "low"][:6]
         symbol_candidates = list(constraints.get("symbol_candidates") or [])

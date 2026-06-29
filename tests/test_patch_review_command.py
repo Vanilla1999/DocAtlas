@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import subprocess
 from pathlib import Path
 
 from click.testing import CliRunner
@@ -376,3 +377,59 @@ def test_patch_review_summary_quality_can_be_yes_or_no_without_raw_data_loss():
     assert "- attachable: no" in no_summary
     assert "- unknown/manual review: 1" in no_summary
     assert "broad-context: manual review required" in no_summary
+
+
+def test_patch_review_summary_max_items_limits_actionable_checklist(tmp_path: Path):
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    subprocess.run(["git", "init"], cwd=repo, check=True, stdout=subprocess.DEVNULL)
+    _write(
+        repo / "docs/architecture.md",
+        "\n".join(
+            f"Generated files must not be edited by hand. Guardrail {index}."
+            for index in range(6)
+        ),
+    )
+    _write(repo / "lib/menu.dart", "void openInfo() {}\n")
+    subprocess.run(["git", "add", "."], cwd=repo, check=True, stdout=subprocess.DEVNULL)
+    subprocess.run(["git", "commit", "-m", "initial"], cwd=repo, check=True, stdout=subprocess.DEVNULL)
+    _write(repo / "lib/menu.dart", "void openInfo() {}\nvoid closeMenu() {}\n")
+    out = tmp_path / "review"
+
+    result = CliRunner().invoke(
+        cli,
+        [
+            "patch-review",
+            "--project-path",
+            str(repo),
+            "--task",
+            "Review generated guardrails and menu action",
+            "--summary-max-items",
+            "2",
+            "--output-dir",
+            str(out),
+        ],
+    )
+
+    assert result.exit_code == 0, result.output
+    actionable = _section((out / "review_summary.md").read_text(), "Actionable PR checklist")
+    items = [line for line in actionable.splitlines() if line.startswith("- ") and line != "- none"]
+    assert len(items) <= 2
+
+
+def test_patch_review_summary_max_items_is_validated_by_cli():
+    result = CliRunner().invoke(
+        cli,
+        [
+            "patch-review",
+            "--project-path",
+            ".",
+            "--task",
+            "Review patch",
+            "--summary-max-items",
+            "0",
+        ],
+    )
+
+    assert result.exit_code != 0
+    assert "--summary-max-items" in result.output
