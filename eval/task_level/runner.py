@@ -311,11 +311,18 @@ def main(argv: list[str] | None = None) -> int:
             "conditions": plan["conditions"],
             "task_count": len(plan["tasks"]),
         }
-        metadata["executive_result"] = "Patch-constraints targeted pilot scaffold prepared; dry-run mode is non-causal."
-        metadata["decision"] = "RUN_TARGETED_PILOT_WITH_VERIFIED_RUNNER_BEFORE_OUTCOME_CLAIMS"
-        metadata["claims_can_make"] = "The harness can prepare a targeted patch-constraints pilot plan and artifact contract; dry-run output is not causal outcome evidence."
-        metadata["claims_cannot_make"] = "Cannot claim DocAtlas improves patch success, beats repo-only/Context7, proves correctness, or replaces tests from this dry-run/protocol checkpoint."
-        metadata["next_experiment"] = "Run the two-condition targeted pilot on the accepted/differentiating subset with a verified independent runner; expand accepted tasks before broad outcome claims."
+        if args.dry_run:
+            metadata["executive_result"] = "Patch-constraints targeted pilot scaffold prepared; dry-run mode is non-causal."
+            metadata["decision"] = "RUN_TARGETED_PILOT_WITH_VERIFIED_RUNNER_BEFORE_OUTCOME_CLAIMS"
+            metadata["claims_can_make"] = "The harness can prepare a targeted patch-constraints pilot plan and artifact contract; dry-run output is not causal outcome evidence."
+            metadata["claims_cannot_make"] = "Cannot claim DocAtlas improves patch success, beats repo-only/Context7, proves correctness, or replaces tests from this dry-run/protocol checkpoint."
+            metadata["next_experiment"] = "Run the targeted pilot on the accepted/differentiating subset with a verified independent runner; expand accepted tasks before broad outcome claims."
+        else:
+            metadata["executive_result"] = "Patch-constraints targeted pilot execution requested; interpret rows by runner status and artifact integrity."
+            metadata["decision"] = "INTERPRET_AFTER_RUNNER_STATUS_AND_ARTIFACT_REVIEW"
+            metadata["claims_can_make"] = "A targeted patch-constraints pilot execution was attempted with persisted per-run artifacts; outcome claims require completed patch rows."
+            metadata["claims_cannot_make"] = "Cannot claim DocAtlas improves patch success, beats repo-only/Context7, proves correctness, or replaces tests from a blocked or tiny pilot."
+            metadata["next_experiment"] = "If runner rows are blocked, verify/authenticate an independent runner before rerunning; otherwise expand accepted tasks before broader claims."
         (run_dir / "metadata.json").write_text(json.dumps(metadata, indent=2, sort_keys=True), encoding="utf-8")
         if args.dry_run:
             results = write_targeted_pilot_dry_run(run_dir, plan)
@@ -324,7 +331,8 @@ def main(argv: list[str] | None = None) -> int:
         results = run_smoke(tasks, args.conditions[:2], args.repeats, run_dir)
         (run_dir / "runs.jsonl").write_text(serialize_run_results_jsonl(results), encoding="utf-8")
 
-    if (args.execute or args.screen_tasks) and not (args.patch_constraints_targeted_pilot and args.dry_run):
+    should_execute_pilot = args.execute or args.screen_tasks or (args.patch_constraints_targeted_pilot and not args.dry_run)
+    if should_execute_pilot and not (args.patch_constraints_targeted_pilot and args.dry_run):
         if args.dry_run:
             results = [{"status": "dry_run", "task_id": task.task_id, "condition_id": condition, "repeat": repeat, "resolved": False, "metrics": {}} for task in tasks for repeat in range(args.repeats) for condition in args.conditions]
         else:

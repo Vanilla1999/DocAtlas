@@ -9,6 +9,7 @@ import subprocess
 import sys
 import tempfile
 import time
+import traceback
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -393,8 +394,19 @@ def execute_pilot(tasks: list[TaskSpec], conditions: list[str], repeats: int, ru
                         tool_policy_path=policy_path,
                         output_dir=run_output_dir,
                     )
-                    output = runner.run(request)
-                    result = evaluate_agent_patch(task, workspace, run_output_dir, condition_id, output.trajectory_path, output)
+                    try:
+                        output = runner.run(request)
+                    except Exception as exc:
+                        result = runner_unavailable_result(
+                            task,
+                            condition_id,
+                            run_output_dir,
+                            exc,
+                            runner_id=getattr(runner, "runner_id", "unknown"),
+                            model=model,
+                        )
+                    else:
+                        result = evaluate_agent_patch(task, workspace, run_output_dir, condition_id, output.trajectory_path, output)
                     results.append(result)
                     write_run_progress(run_dir, results, total_runs, current={"task_id": task.task_id, "condition_id": condition_id, "repeat": repeat, "status": result["status"]})
     finally:
@@ -702,6 +714,55 @@ def _jsonable(value: Any) -> Any:
         return value
     return str(value)
 
+
+
+
+def runner_unavailable_result(task: TaskSpec, condition_id: str, run_output_dir: Path, exc: Exception, *, runner_id: str, model: str) -> dict[str, Any]:
+    (run_output_dir / "patch.diff").write_text("", encoding="utf-8")
+    (run_output_dir / "changed_files.json").write_text("[]\n", encoding="utf-8")
+    validation = {"constraint_validation": {"total_constraints": 0, "satisfied": 0, "violated": 0, "unknown": 0, "violations": []}}
+    (run_output_dir / "validation.json").write_text(json.dumps(validation, indent=2, sort_keys=True), encoding="utf-8")
+    error_payload = {
+        "type": exc.__class__.__name__,
+        "message": str(exc),
+        "traceback_tail": traceback.format_exc().splitlines()[-8:],
+    }
+    (run_output_dir / "runner_error.json").write_text(json.dumps(error_payload, indent=2, sort_keys=True), encoding="utf-8")
+    result = {
+        "run_id": run_output_dir.parents[2].name,
+        "task_id": task.task_id,
+        "condition_id": condition_id,
+        "repeat": int(run_output_dir.name.removeprefix("repeat_")),
+        "runner_id": runner_id,
+        "runner_version": "unavailable",
+        "model": model,
+        "status": "runner_unavailable",
+        "resolved": False,
+        "public_tests_passed": False,
+        "hidden_tests_passed": False,
+        "tests_passed": False,
+        "compile_success": False,
+        "policy_clean": True,
+        "policy": {"clean": True, "violations": [], "network_attempts": 0, "runner_unavailable": True},
+        "docatlas": {"available": condition_id in DOCATLAS_CONDITIONS, "harness_calls": 0, "agent_calls": 0, "context_retrieved": False, "context_injected": False, "context_used": False, "fallback_used": False},
+        "contract": {},
+        "actionability": {"checklist_items": [], "action_checklist_used": False},
+        "patch_constraints": {"constraint_count": 0, "constraint_used": False, "constraint_packet_tokens": None},
+        "constraint_validation": validation["constraint_validation"],
+        "constraint_packet_tokens": None,
+        "constraint_count": 0,
+        "constraint_used": False,
+        "constraint_violations_after_patch": 0,
+        "unknown_count": 0,
+        "patch_path": str(run_output_dir / "patch.diff"),
+        "trajectory_path": None,
+        "changed_files": [],
+        "forbidden_changes": [],
+        "metrics": {"wall_time_seconds": 0.0, "input_tokens": None, "output_tokens": None, "fallback_used": False},
+        "notes": [f"Runner unavailable before patch generation: {exc.__class__.__name__}: {exc}"],
+    }
+    (run_output_dir / "result.json").write_text(json.dumps(result, indent=2, sort_keys=True), encoding="utf-8")
+    return result
 
 def condition_setup_failed_result(task: TaskSpec, condition_id: str, run_output_dir: Path) -> dict[str, Any]:
     result = {

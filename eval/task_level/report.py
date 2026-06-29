@@ -97,10 +97,14 @@ def write_report(run_dir: Path, metadata: dict[str, Any], results: list[dict[str
                 f"- `{condition}`: agent_docatlas_calls={sum(agent_calls)}, context_used={sum(used)}/{len(used)}"
             )
 
+    blocked = sum(1 for result in results if result.get("status") in {"runner_unavailable", "runner_failed", "timeout"})
+    failure_summary = metadata.get("failure_summary")
+    if failure_summary is None and blocked:
+        failure_summary = f"{blocked} run(s) did not produce patches because the independent runner was unavailable, failed, or timed out."
     lines.extend([
         "",
         "## Failures",
-        metadata.get("failure_summary", "No independent agent failures were measured in this run."),
+        failure_summary or "No independent agent failures were measured in this run.",
         "",
         "## Cold/warm economics",
         metadata.get("cold_warm_economics", "DocAtlas preindex and warm query timing hooks are present; no full preindexed benchmark was executed."),
