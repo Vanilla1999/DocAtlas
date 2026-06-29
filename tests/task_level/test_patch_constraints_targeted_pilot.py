@@ -3,6 +3,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import pytest
+
 from eval.task_level.conditions import CONDITIONS
 from eval.task_level.patch_constraints_pilot import (
     PATCH_CONSTRAINTS_INJECTED_CONDITION,
@@ -66,6 +68,37 @@ def test_select_targeted_pilot_tasks_uses_accepted_differentiating_subset():
     assert [task.task_id for task in selected] == ["accepted_a"]
 
 
+def test_select_targeted_pilot_tasks_can_use_frozen_accepted_pool(tmp_path: Path):
+    accepted_pool = tmp_path / "accepted_pool.json"
+    accepted_pool.write_text(json.dumps([
+        {"task_id": "screened_b", "status": "accepted_differentiating"},
+    ]), encoding="utf-8")
+    tasks = [_task("legacy_a"), _task("screened_b", status="candidate")]
+
+    selected = select_targeted_pilot_tasks(tasks, accepted_pool_path=accepted_pool)
+    plan = build_targeted_pilot_plan(
+        selected,
+        repeats=1,
+        task_selection_source="screening_results",
+        screening_metadata={"accepted_pool_size": 1, "rejected_counts": {"rejected_too_easy": 3}},
+    )
+
+    assert [task.task_id for task in selected] == ["screened_b"]
+    assert plan["task_selection_source"] == "screening_results"
+    assert plan["accepted_pool_size"] == 1
+    assert plan["rejected_counts"] == {"rejected_too_easy": 3}
+
+
+def test_select_targeted_pilot_tasks_fails_fast_on_missing_pool_task_id(tmp_path: Path):
+    accepted_pool = tmp_path / "accepted_pool.json"
+    accepted_pool.write_text(json.dumps([
+        {"task_id": "missing_task", "status": "accepted_differentiating"},
+    ]), encoding="utf-8")
+
+    with pytest.raises(ValueError, match="missing_task"):
+        select_targeted_pilot_tasks([_task("legacy_a")], accepted_pool_path=accepted_pool)
+
+
 def test_build_targeted_pilot_plan_records_constraints_workflow_protocol():
     plan = build_targeted_pilot_plan([_task("accepted_a")], repeats=2)
 
@@ -73,6 +106,7 @@ def test_build_targeted_pilot_plan_records_constraints_workflow_protocol():
     assert plan["repeats"] == 2
     assert plan["research_question"].startswith("Does DocAtlas patch-constraints workflow")
     assert plan["tasks"][0]["visible_source_coverage"] is True
+    assert plan["task_selection_source"] == "legacy_manifest"
     assert "one repair pass" in "\n".join(plan["protocol"])
     assert "Not broad superiority evidence" in plan["status"]
 

@@ -201,3 +201,5 @@ Merge only as an exploratory pilot execution and runner-hardening PR if reviewer
 ## Next PR recommendation
 
 `test/eval: add fair screening and generated-artifact hygiene for patch constraints pilot`
+
+Follow-up design note: `docs/research/patch-constraints-fair-screening-and-hygiene.md`.

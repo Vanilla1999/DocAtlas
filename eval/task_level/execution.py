@@ -15,13 +15,14 @@ from pathlib import Path
 from typing import Any
 
 from eval.task_level.conditions import CONDITIONS
+from eval.task_level.artifact_hygiene import diff_stats_from_patch, is_runtime_artifact, write_patch_hygiene_artifacts
 from eval.task_level.context.action_checklist import build_action_checklist, save_action_checklist
 from eval.task_level.context.patch_constraints import build_patch_constraint_packet, save_patch_constraint_packet
 from eval.task_level.evaluators.actionability import evaluate_actionability
 from eval.task_level.evaluators.constraint_validation import validate_patch_against_constraints
 from eval.task_level.evaluators.contract import evaluate_contract
 from eval.task_level.evaluators.docatlas_utilization import evaluate_docatlas_utilization
-from eval.task_level.evaluators.patch import diff_stats, patch_touches_forbidden_paths
+from eval.task_level.evaluators.patch import patch_touches_forbidden_paths
 from eval.task_level.evaluators.patch_constraints import evaluate_patch_constraint_usage, load_patch_constraint_packet
 from eval.task_level.evaluators.policy import audit_trajectory
 from eval.task_level.evaluators.tests import run_command
@@ -170,17 +171,17 @@ def fresh_run_environment(run_output_dir: Path) -> dict[str, str]:
 
 
 def capture_patch(workspace: Path, output_dir: Path) -> tuple[Path, Path, Path, list[str]]:
-    status = subprocess.run(["git", "status", "--porcelain"], cwd=workspace, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False)
+    status = subprocess.run(["git", "status", "--porcelain", "-uall"], cwd=workspace, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False)
     diff = subprocess.run(["git", "diff", "--binary", "--no-ext-diff"], cwd=workspace, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False)
     changed = subprocess.run(["git", "diff", "--name-only"], cwd=workspace, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False)
+    untracked = subprocess.run(["git", "ls-files", "--others", "--exclude-standard"], cwd=workspace, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False)
     patch_path = output_dir / "patch.diff"
     status_path = output_dir / "git_status.txt"
     changed_path = output_dir / "changed_files.json"
-    patch_path.write_text(diff.stdout, encoding="utf-8")
-    status_path.write_text(status.stdout, encoding="utf-8")
     files = [line for line in changed.stdout.splitlines() if line]
-    changed_path.write_text(json.dumps(files, indent=2), encoding="utf-8")
-    return patch_path, status_path, changed_path, files
+    files.extend(line for line in untracked.stdout.splitlines() if line and not is_runtime_artifact(line))
+    hygiene = write_patch_hygiene_artifacts(output_dir, raw_status=status.stdout, raw_changed_files=files, raw_patch_diff=diff.stdout)
+    return patch_path, status_path, changed_path, hygiene.filtered_changed_files
 
 
 def evaluate_agent_patch(task: TaskSpec, workspace: Path, run_output_dir: Path, condition_id: str, trajectory_path: str | None, runner_output: Any) -> dict[str, Any]:
@@ -195,7 +196,7 @@ def evaluate_agent_patch(task: TaskSpec, workspace: Path, run_output_dir: Path, 
     compile_result = run_command("python -m compileall -q src", workspace, 120) if patch_exists and (setup is None or setup.returncode == 0) else None
     forbidden = patch_touches_forbidden_paths(workspace, ALLOWED_PATCH_PREFIXES) if patch_exists else []
     audit = audit_trajectory(condition_id, Path(trajectory_path) if trajectory_path else None, run_output_dir / "policy_audit.json")
-    stats = diff_stats(workspace) if patch_exists else None
+    stats = diff_stats_from_patch(patch_path.read_text(encoding="utf-8", errors="replace")) if patch_exists else None
     utilization = evaluate_docatlas_utilization(
         task=task,
         condition_id=condition_id,
@@ -244,9 +245,9 @@ def evaluate_agent_patch(task: TaskSpec, workspace: Path, run_output_dir: Path, 
         edit_calls=sum(1 for call in getattr(runner_output, "tool_calls", []) if "edit" in json.dumps(call).lower()),
         test_runs=sum(1 for call in getattr(runner_output, "tool_calls", []) if "pytest" in json.dumps(call).lower()),
         docs_tool_calls=audit.docatlas_calls,
-        patch_files_changed=stats.files_changed if stats else 0,
-        patch_lines_added=stats.lines_added if stats else 0,
-        patch_lines_removed=stats.lines_removed if stats else 0,
+        patch_files_changed=stats[0] if stats else 0,
+        patch_lines_added=stats[1] if stats else 0,
+        patch_lines_removed=stats[2] if stats else 0,
         context_chunks_returned=int(injection.get("sources", 0)) if isinstance(injection, dict) else 0,
         injected_context_tokens=int(injection.get("injected_context_tokens")) if isinstance(injection.get("injected_context_tokens"), int) else None,
         retrieved_context_tokens=int(injection.get("retrieved_context_tokens")) if isinstance(injection.get("retrieved_context_tokens"), int) else None,
