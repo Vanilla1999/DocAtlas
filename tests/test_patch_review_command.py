@@ -705,6 +705,8 @@ def test_patch_review_writes_machine_readable_manifest(tmp_path: Path):
     assert manifest_artifacts["review_summary.md"]["intended_consumers"] == ["human_reviewer"]
     assert manifest_artifacts["review_summary_quality.json"]["schema_version"] == payload["review_summary_quality"]["schema_version"]
     assert manifest_artifacts["review_summary_actions.json"]["schema_version"] == payload["review_summary_actions"]["schema_version"]
+    assert manifest_artifacts["review_summary_pr_comment.json"]["schema_version"] == payload["review_summary_pr_comment"]["schema_version"]
+    assert manifest_artifacts["review_summary_pr_comment.json"]["kind"] == "bot_pr_comment_payload"
     assert "without parsing markdown" in manifest_artifacts["review_summary_quality.json"]["safe_usage"]
     assert "without parsing markdown" in manifest_artifacts["review_summary_actions.json"]["safe_usage"]
     assert "correctness_proof" in manifest["claims_avoided"]
@@ -741,6 +743,7 @@ def test_patch_review_machine_readable_artifact_contracts(tmp_path: Path):
     payload = json.loads(result.output)
     quality = payload["review_summary_quality"]
     actions = payload["review_summary_actions"]
+    pr_comment = payload["review_summary_pr_comment"]
     manifest = payload["review_summary_manifest"]
 
     assert {
@@ -799,7 +802,24 @@ def test_patch_review_machine_readable_artifact_contracts(tmp_path: Path):
         "review_summary_manifest.json": manifest["schema_version"],
         "review_summary_quality.json": quality["schema_version"],
         "review_summary_actions.json": actions["schema_version"],
+        "review_summary_pr_comment.json": pr_comment["schema_version"],
     }
+    assert {
+        "schema_version",
+        "summary_mode",
+        "title",
+        "attachable",
+        "body_markdown",
+        "source_artifacts",
+        "signals",
+        "actionable_items",
+        "claims_avoided",
+    } <= set(pr_comment)
+    assert pr_comment["schema_version"] == PATCH_REVIEW_SCHEMA_VERSIONS["review_summary_pr_comment.json"]
+    assert "DocAtlas patch review" in pr_comment["body_markdown"]
+    assert "Non-blocking review context only" in pr_comment["body_markdown"]
+    assert "review_summary_quality.json" in pr_comment["source_artifacts"]
+    assert "review_summary_actions.json" in pr_comment["source_artifacts"]
 
 
 

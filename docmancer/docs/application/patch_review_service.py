@@ -23,6 +23,7 @@ PATCH_REVIEW_SCHEMA_VERSIONS = {
     "review_summary_manifest.json": 1,
     "review_summary_quality.json": 1,
     "review_summary_actions.json": 1,
+    "review_summary_pr_comment.json": 1,
 }
 TASK_TOKEN_STOPWORDS = {
     "add", "and", "before", "change", "check", "current", "diff", "file",
@@ -112,6 +113,7 @@ class PatchReviewService:
             "review_summary.md",
             "review_summary_quality.json",
             "review_summary_actions.json",
+            "review_summary_pr_comment.json",
             "constraints.json",
             "constraints.md",
             "changed_files.json",
@@ -131,6 +133,12 @@ class PatchReviewService:
         self._write_json(out / "validation.json", validation_dict)
         self._write_json(out / "review_summary_actions.json", actions_payload)
         self._write_json(out / "review_summary_quality.json", quality_payload)
+        pr_comment_payload = self._review_summary_pr_comment_payload(
+            actions_payload,
+            quality_payload,
+            summary_mode=summary_mode,
+        )
+        self._write_json(out / "review_summary_pr_comment.json", pr_comment_payload)
         summary = self._review_summary(
             task,
             changed,
@@ -148,6 +156,7 @@ class PatchReviewService:
             summary_mode=summary_mode,
             quality_schema_version=quality_payload["schema_version"],
             actions_schema_version=actions_payload["schema_version"],
+            pr_comment_schema_version=pr_comment_payload["schema_version"],
         )
         self._write_json(out / "review_summary_manifest.json", manifest_payload)
         return {
@@ -161,6 +170,7 @@ class PatchReviewService:
             "review_summary_manifest": manifest_payload,
             "review_summary_actions": actions_payload,
             "review_summary_quality": quality_payload,
+            "review_summary_pr_comment": pr_comment_payload,
             "constraints": constraints_dict,
             "validation": validation_dict,
             "artifacts": artifact_names,
@@ -198,6 +208,7 @@ class PatchReviewService:
         summary_mode: str,
         quality_schema_version: int,
         actions_schema_version: int,
+        pr_comment_schema_version: int,
     ) -> dict[str, Any]:
         artifact_contract = {
             "review_summary.md": {
@@ -217,6 +228,12 @@ class PatchReviewService:
                 "schema_version": actions_schema_version,
                 "intended_consumers": ["pr_bot", "automation"],
                 "safe_usage": "Render ranked checklist suggestions without parsing markdown; keep comments non-blocking unless a separate policy says otherwise.",
+            },
+            "review_summary_pr_comment.json": {
+                "kind": "bot_pr_comment_payload",
+                "schema_version": pr_comment_schema_version,
+                "intended_consumers": ["pr_bot", "automation"],
+                "safe_usage": "Render a ready non-blocking PR comment without parsing markdown; do not treat it as a merge gate by itself.",
             },
             "constraints.json": {
                 "kind": "raw_constraints",
@@ -261,6 +278,49 @@ class PatchReviewService:
                 }
                 for name in artifact_names
             ],
+        }
+
+    @staticmethod
+    def _review_summary_pr_comment_payload(
+        actions_payload: dict[str, Any],
+        quality_payload: dict[str, Any],
+        *,
+        summary_mode: str,
+    ) -> dict[str, Any]:
+        actionable_items = actions_payload.get("actionable_items", [])
+        signals = quality_payload.get("signals", [])
+        body_lines = [
+            "### DocAtlas patch review",
+            "",
+            f"Attachability: `{quality_payload.get('attachable')}`",
+            f"Summary mode: `{summary_mode}`",
+        ]
+        if signals:
+            body_lines.extend(["", "Signals:"])
+            body_lines.extend(
+                f"- `{item.get('code')}` ({item.get('severity')}, count={item.get('count')})"
+                for item in signals
+            )
+        if actionable_items:
+            body_lines.extend(["", "Actionable checklist:"])
+            body_lines.extend(item.get("markdown", "") for item in actionable_items if item.get("markdown"))
+        body_lines.extend([
+            "",
+            "Non-blocking review context only; not a correctness proof or test replacement.",
+        ])
+        return {
+            "schema_version": PATCH_REVIEW_SCHEMA_VERSIONS["review_summary_pr_comment.json"],
+            "summary_mode": summary_mode,
+            "title": "DocAtlas patch review",
+            "attachable": quality_payload.get("attachable"),
+            "body_markdown": "\n".join(body_lines) + "\n",
+            "source_artifacts": [
+                "review_summary_quality.json",
+                "review_summary_actions.json",
+            ],
+            "signals": signals,
+            "actionable_items": actionable_items,
+            "claims_avoided": quality_payload.get("claims_avoided", []),
         }
 
     @staticmethod
