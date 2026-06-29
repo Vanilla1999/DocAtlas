@@ -56,7 +56,7 @@ def test_patch_review_command_writes_expected_artifacts(tmp_path: Path):
     )
 
     assert result.exit_code == 0, result.output
-    for name in ["constraints.json", "constraints.md", "changed_files.json", "untracked_files.json", "ignored_runtime_artifacts.json", "patch_hygiene.json", "patch.diff", "validation.json", "review_summary_actions.json", "review_summary_quality.json", "review_summary.md"]:
+    for name in ["constraints.json", "constraints.md", "changed_files.json", "untracked_files.json", "ignored_runtime_artifacts.json", "patch_hygiene.json", "patch.diff", "validation.json", "review_summary_actions.json", "review_summary_quality.json", "review_summary_manifest.json", "review_summary.md"]:
         assert (out / name).exists()
     validation = json.loads((out / "validation.json").read_text(encoding="utf-8"))
     assert "violated" in validation
@@ -656,6 +656,53 @@ def test_patch_review_writes_machine_readable_action_items(tmp_path: Path):
         "test_or_human_review_replacement",
         "broad_docatlas_superiority",
     ]
+
+
+def test_patch_review_writes_machine_readable_manifest(tmp_path: Path):
+    repo = _repo(tmp_path)
+    _git(repo, "init")
+    _git(repo, "config", "user.email", "test@example.com")
+    _git(repo, "config", "user.name", "Test User")
+    _git(repo, "add", ".")
+    _git(repo, "commit", "-m", "base")
+    _write(repo / "lib/presentation/menu_view.dart", "void buildMenu() {\n  menuNotifier.closeMenu();\n}\n")
+    out = tmp_path / "review-manifest"
+
+    result = CliRunner().invoke(
+        cli,
+        [
+            "patch-review",
+            "--project-path",
+            str(repo),
+            "--task",
+            "Review menu navigation",
+            "--summary-mode",
+            "compact",
+            "--summary-max-items",
+            "2",
+            "--output-dir",
+            str(out),
+            "--format",
+            "json",
+        ],
+    )
+
+    assert result.exit_code == 0, result.output
+    payload = json.loads(result.output)
+    manifest = json.loads((out / "review_summary_manifest.json").read_text(encoding="utf-8"))
+    manifest_artifacts = {item["filename"]: item for item in manifest["artifacts"]}
+    assert "review_summary_manifest.json" in payload["artifacts"]
+    assert payload["review_summary_manifest"] == manifest
+    assert manifest["schema_version"] == 1
+    assert manifest["summary_mode"] == "compact"
+    assert manifest["product_role"] == "non_blocking_pr_review_assistant"
+    assert [item["filename"] for item in manifest["artifacts"]] == payload["artifacts"]
+    assert manifest_artifacts["review_summary.md"]["intended_consumers"] == ["human_reviewer"]
+    assert manifest_artifacts["review_summary_quality.json"]["schema_version"] == payload["review_summary_quality"]["schema_version"]
+    assert manifest_artifacts["review_summary_actions.json"]["schema_version"] == payload["review_summary_actions"]["schema_version"]
+    assert "without parsing markdown" in manifest_artifacts["review_summary_quality.json"]["safe_usage"]
+    assert "without parsing markdown" in manifest_artifacts["review_summary_actions.json"]["safe_usage"]
+    assert "correctness_proof" in manifest["claims_avoided"]
 
 
 

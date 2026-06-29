@@ -102,6 +102,20 @@ class PatchReviewService:
             summary_max_items=summary_max_items,
             summary_mode=summary_mode,
         )
+        artifact_names = [
+            "review_summary_manifest.json",
+            "review_summary.md",
+            "review_summary_quality.json",
+            "review_summary_actions.json",
+            "constraints.json",
+            "constraints.md",
+            "changed_files.json",
+            "untracked_files.json",
+            "ignored_runtime_artifacts.json",
+            "patch_hygiene.json",
+            "patch.diff",
+            "validation.json",
+        ]
         self._write_json(out / "constraints.json", constraints_dict)
         (out / "constraints.md").write_text(self._constraints_markdown(constraints_dict), encoding="utf-8")
         self._write_json(out / "changed_files.json", changed)
@@ -124,6 +138,13 @@ class PatchReviewService:
             summary_mode=summary_mode,
         )
         (out / "review_summary.md").write_text(summary, encoding="utf-8")
+        manifest_payload = self._review_summary_manifest_payload(
+            artifact_names,
+            summary_mode=summary_mode,
+            quality_schema_version=quality_payload["schema_version"],
+            actions_schema_version=actions_payload["schema_version"],
+        )
+        self._write_json(out / "review_summary_manifest.json", manifest_payload)
         return {
             "output_dir": str(out),
             "changed_files": changed,
@@ -132,23 +153,12 @@ class PatchReviewService:
             "warnings": warnings,
             "summary_max_items": summary_max_items,
             "summary_mode": summary_mode,
+            "review_summary_manifest": manifest_payload,
             "review_summary_actions": actions_payload,
             "review_summary_quality": quality_payload,
             "constraints": constraints_dict,
             "validation": validation_dict,
-            "artifacts": [
-                "constraints.json",
-                "constraints.md",
-                "changed_files.json",
-                "untracked_files.json",
-                "ignored_runtime_artifacts.json",
-                "patch_hygiene.json",
-                "patch.diff",
-                "validation.json",
-                "review_summary_actions.json",
-                "review_summary_quality.json",
-                "review_summary.md",
-            ],
+            "artifacts": artifact_names,
         }
 
     @staticmethod
@@ -175,6 +185,78 @@ class PatchReviewService:
     @staticmethod
     def _write_json(path: Path, payload: Any) -> None:
         path.write_text(json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True), encoding="utf-8")
+
+    @staticmethod
+    def _review_summary_manifest_payload(
+        artifact_names: list[str],
+        *,
+        summary_mode: str,
+        quality_schema_version: int,
+        actions_schema_version: int,
+    ) -> dict[str, Any]:
+        artifact_contract = {
+            "review_summary.md": {
+                "kind": "human_review_summary",
+                "schema_version": None,
+                "intended_consumers": ["human_reviewer"],
+                "safe_usage": "Attach to PRs as non-blocking review context; do not treat as correctness proof.",
+            },
+            "review_summary_quality.json": {
+                "kind": "bot_quality_metadata",
+                "schema_version": quality_schema_version,
+                "intended_consumers": ["pr_bot", "automation"],
+                "safe_usage": "Use for attachability and summary-health decisions without parsing markdown; do not gate correctness by this alone.",
+            },
+            "review_summary_actions.json": {
+                "kind": "bot_action_metadata",
+                "schema_version": actions_schema_version,
+                "intended_consumers": ["pr_bot", "automation"],
+                "safe_usage": "Render ranked checklist suggestions without parsing markdown; keep comments non-blocking unless a separate policy says otherwise.",
+            },
+            "constraints.json": {
+                "kind": "raw_constraints",
+                "schema_version": None,
+                "intended_consumers": ["debugger", "automation"],
+                "safe_usage": "Inspect full extracted constraints and sources; this is raw evidence, not a verdict.",
+            },
+            "validation.json": {
+                "kind": "raw_validation",
+                "schema_version": None,
+                "intended_consumers": ["debugger", "automation"],
+                "safe_usage": "Inspect satisfied, violated, and unknown validation results; unknown means manual review, not pass.",
+            },
+            "patch.diff": {
+                "kind": "raw_patch_diff",
+                "schema_version": None,
+                "intended_consumers": ["debugger", "automation"],
+                "safe_usage": "Use as source patch evidence; may omit untracked file content.",
+            },
+        }
+        return {
+            "schema_version": 1,
+            "summary_mode": summary_mode,
+            "product_role": "non_blocking_pr_review_assistant",
+            "claims_avoided": [
+                "correctness_proof",
+                "test_or_human_review_replacement",
+                "broad_docatlas_superiority",
+            ],
+            "artifacts": [
+                {
+                    "filename": name,
+                    **artifact_contract.get(
+                        name,
+                        {
+                            "kind": "supporting_artifact",
+                            "schema_version": None,
+                            "intended_consumers": ["debugger"],
+                            "safe_usage": "Use as supporting review/debug context; do not treat as correctness proof.",
+                        },
+                    ),
+                }
+                for name in artifact_names
+            ],
+        }
 
     @staticmethod
     def _review_summary_model(
