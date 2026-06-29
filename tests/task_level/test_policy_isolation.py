@@ -102,3 +102,28 @@ def test_each_run_uses_fresh_docmancer_home(tmp_path: Path):
 
     assert env_a["DOCMANCER_HOME"] != env_b["DOCMANCER_HOME"]
     assert Path(env_a["DOCMANCER_HOME"]).exists()
+
+
+def test_patch_constraints_workflow_has_only_docatlas_mcp(tmp_path: Path):
+    policy_path, mcp_path = build_tool_policy("docatlas_patch_constraints_workflow", tmp_path)
+    config = json.loads(mcp_path.read_text(encoding="utf-8"))
+    policy = json.loads(policy_path.read_text(encoding="utf-8"))
+
+    assert list(config["mcpServers"].keys()) == ["docmancer-docs"]
+    assert policy["allow_docatlas"] is True
+    assert policy["inject_patch_constraints"] is False
+    assert policy["recommend_docatlas_before_edit"] is True
+
+
+def test_patch_constraints_workflow_rejects_context7_and_web(tmp_path: Path):
+    trajectory = tmp_path / "trajectory.normalized.json"
+    trajectory.write_text(json.dumps([
+        {"sequence": 1, "tool_name": "context7.query-docs", "arguments": {}},
+        {"sequence": 2, "tool_name": "WebFetch", "arguments": {"url": "https://example.com"}},
+    ]), encoding="utf-8")
+
+    audit = audit_trajectory("docatlas_patch_constraints_workflow", trajectory)
+
+    assert not audit.clean
+    assert "docatlas condition used Context7 tools" in audit.violations
+    assert "docatlas condition used web or network shell tools" in audit.violations

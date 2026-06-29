@@ -31,6 +31,7 @@ PAIRWISE_TARGETS = (
     "docatlas_context_injected",
     "repo_only_web_audited",
     "docatlas_patch_constraints_workflow",
+    "docatlas_patch_constraints_injected",
 )
 CONTRACT_FIELDS = (
     "behavioral_contract_score",

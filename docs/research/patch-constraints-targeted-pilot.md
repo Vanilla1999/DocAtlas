@@ -22,7 +22,7 @@ Base commit at branch creation:
 Dry-run planning artifact produced locally:
 
 ```text
-eval/task_level/results/patch_constraints_targeted_pilot_dry_run_002/
+eval/task_level/results/patch_constraints_targeted_pilot_dry_run_003/
 ```
 
 The dry-run is non-causal: it launches no coding agent and should not be interpreted as benchmark outcome evidence.
@@ -48,8 +48,11 @@ Secondary:
 
 - `repo_only_strict_offline`
 - `docatlas_patch_constraints_workflow`
+- `docatlas_patch_constraints_injected`
 
-The workflow condition is intentionally narrow. It models the product direction “project constraint compiler for coding agents” rather than broad docs retrieval superiority.
+The workflow condition is intentionally narrow. It models agent-side use of the DocAtlas patch-constraints workflow rather than broad docs retrieval superiority.
+
+The injected condition is included as a harness-side control to isolate compact constraint-packet quality from agent tool-use discipline. It is not the primary product workflow claim.
 
 ## Task selection
 
@@ -69,8 +72,8 @@ Limitation: only 2 accepted/differentiating tasks are currently available, below
 
 ## Protocol
 
-1. Compile constraints before editing.
-2. Inject compact constraint packet into the agent prompt.
+1. Compile constraints before editing, either by agent-side workflow use or by harness-side injected packet condition.
+2. Inject compact constraint packet only for the injected condition.
 3. Agent edits code.
 4. Collect `changed_files` and `patch_diff`.
 5. Validate patch against constraints.

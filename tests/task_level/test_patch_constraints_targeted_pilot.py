@@ -5,12 +5,14 @@ from pathlib import Path
 
 from eval.task_level.conditions import CONDITIONS
 from eval.task_level.patch_constraints_pilot import (
+    PATCH_CONSTRAINTS_INJECTED_CONDITION,
     PATCH_CONSTRAINTS_WORKFLOW_CONDITION,
     TARGETED_PILOT_CONDITIONS,
     build_targeted_pilot_plan,
     select_targeted_pilot_tasks,
     write_targeted_pilot_dry_run,
 )
+from eval.task_level.analysis.cost_accuracy import NormalizedRun, compute_paired_deltas
 from eval.task_level.runner import load_tasks
 from eval.task_level.schemas import DependencySpec, TaskSpec
 
@@ -40,8 +42,15 @@ def _task(task_id: str, *, status: str = "accepted", differentiating: bool = Tru
 def test_patch_constraints_workflow_condition_is_registered():
     assert PATCH_CONSTRAINTS_WORKFLOW_CONDITION in CONDITIONS
     policy = CONDITIONS[PATCH_CONSTRAINTS_WORKFLOW_CONDITION].tool_policy
-    assert policy.inject_patch_constraints is True
     assert policy.allow_docatlas is True
+    assert policy.inject_patch_constraints is False
+    assert policy.recommend_docatlas_before_edit is True
+
+
+def test_patch_constraints_injected_condition_keeps_harness_injection():
+    policy = CONDITIONS[PATCH_CONSTRAINTS_INJECTED_CONDITION].tool_policy
+    assert policy.allow_docatlas is True
+    assert policy.inject_patch_constraints is True
 
 
 def test_select_targeted_pilot_tasks_uses_accepted_differentiating_subset():
@@ -74,7 +83,7 @@ def test_write_targeted_pilot_dry_run_persists_artifact_contract(tmp_path: Path)
 
     rows = write_targeted_pilot_dry_run(run_dir, plan)
 
-    assert len(rows) == 2
+    assert len(rows) == 3
     assert (run_dir / "targeted_pilot_plan.json").exists()
     assert (run_dir / "targeted_pilot_protocol.md").exists()
     assert (run_dir / "runs.jsonl").exists()
@@ -90,6 +99,31 @@ def test_write_targeted_pilot_dry_run_persists_artifact_contract(tmp_path: Path)
         "patch.diff",
         "result.json",
     ]
+    assert {json.loads(line)["condition_id"] for line in (run_dir / "runs.jsonl").read_text(encoding="utf-8").splitlines()} == set(TARGETED_PILOT_CONDITIONS)
+
+
+def test_pairwise_targets_include_patch_constraints_conditions():
+    records = [
+        NormalizedRun(run_id="r", run_family="pilot", task_id="t", condition_id="repo_only_strict_offline", repeat=0, resolved=False, constraint_violations_after_patch=2),
+        NormalizedRun(run_id="r", run_family="pilot", task_id="t", condition_id="docatlas_patch_constraints_workflow", repeat=0, resolved=True, constraint_violations_after_patch=1),
+        NormalizedRun(run_id="r", run_family="pilot", task_id="t", condition_id="docatlas_patch_constraints_injected", repeat=0, resolved=True, constraint_violations_after_patch=0),
+    ]
+
+    deltas = compute_paired_deltas(records)
+
+    assert "docatlas_patch_constraints_workflow - repo_only_strict_offline" in deltas
+    assert "docatlas_patch_constraints_injected - repo_only_strict_offline" in deltas
+    assert deltas["docatlas_patch_constraints_injected - repo_only_strict_offline"]["constraint_violation_delta_median"] == -2.0
+
+
+def test_targeted_pilot_plan_avoids_broad_claims():
+    plan = build_targeted_pilot_plan([_task("accepted_a")], repeats=1)
+    text = json.dumps(plan).lower()
+
+    assert "not broad superiority evidence" in text
+    assert "beats repo-only" not in text
+    assert "beats context7" not in text
+    assert "proves correctness" not in text
 
 
 def test_main_manifest_has_targeted_pilot_subset():

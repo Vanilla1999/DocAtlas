@@ -9,7 +9,12 @@ from eval.task_level.schemas import TaskSpec
 
 BASELINE_CONDITION = "repo_only_strict_offline"
 PATCH_CONSTRAINTS_WORKFLOW_CONDITION = "docatlas_patch_constraints_workflow"
-TARGETED_PILOT_CONDITIONS = (BASELINE_CONDITION, PATCH_CONSTRAINTS_WORKFLOW_CONDITION)
+PATCH_CONSTRAINTS_INJECTED_CONDITION = "docatlas_patch_constraints_injected"
+TARGETED_PILOT_CONDITIONS = (
+    BASELINE_CONDITION,
+    PATCH_CONSTRAINTS_WORKFLOW_CONDITION,
+    PATCH_CONSTRAINTS_INJECTED_CONDITION,
+)
 ARTIFACT_CONTRACT = [
     "constraints.json",
     "constraints.md",
@@ -65,9 +70,13 @@ def build_targeted_pilot_plan(tasks: list[TaskSpec], *, repeats: int = 1) -> dic
         "conditions": list(TARGETED_PILOT_CONDITIONS),
         "repeats": repeats,
         "minimum_meaningful_pilot": "8-12 accepted/differentiating tasks if available; this plan records the available accepted subset.",
+        "condition_notes": {
+            PATCH_CONSTRAINTS_WORKFLOW_CONDITION: "agent-side DocAtlas patch-constraints workflow guidance; no harness-side constraint injection",
+            PATCH_CONSTRAINTS_INJECTED_CONDITION: "harness-side compact constraint packet injection to isolate packet quality",
+        },
         "protocol": [
-            "compile constraints before editing",
-            "inject compact constraint packet into the agent prompt",
+            "compile constraints before editing, either by agent-side workflow use or harness-side injected packet condition",
+            "inject compact constraint packet only for the injected condition",
             "agent edits code",
             "collect changed_files and patch_diff",
             "validate patch against constraints",
@@ -119,7 +128,7 @@ def write_targeted_pilot_dry_run(run_dir: Path, plan: dict[str, Any]) -> list[di
                     "unknown_count": None,
                     "manual_review_unknowns": None,
                     "manual_review_required": None,
-                    "constraint_used": False,
+                    "constraint_used": condition == PATCH_CONSTRAINTS_INJECTED_CONDITION,
                     "fallback_used": None,
                     "metrics": {
                         "constraint_packet_tokens": None,

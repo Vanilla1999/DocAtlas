@@ -369,7 +369,9 @@ def execute_pilot(tasks: list[TaskSpec], conditions: list[str], repeats: int, ru
                                 prompt += "\n" + (run_output_dir / "action_checklist.md").read_text(encoding="utf-8") + "\n"
                             if CONDITIONS[condition_id].tool_policy.inject_patch_constraints and (run_output_dir / "patch_constraints.md").exists():
                                 prompt += "\n" + (run_output_dir / "patch_constraints.md").read_text(encoding="utf-8") + "\n"
-                    if CONDITIONS[condition_id].tool_policy.recommend_docatlas_before_edit:
+                    if condition_id == "docatlas_patch_constraints_workflow":
+                        prompt += "\nDocAtlas patch-constraints workflow guidance: before editing, use the available DocAtlas/docmancer docs tool to compile task-specific project constraints, including generated files, lockfiles, source-of-truth layers, architecture rules, dependency versions, and suggested checks. After editing, inspect your changed files and patch against those constraints; perform one repair pass if you find deterministic violations. Do not use hidden tests, gold patches, or oracle files.\n"
+                    elif CONDITIONS[condition_id].tool_policy.recommend_docatlas_before_edit:
                         prompt += "\nDocAtlas workflow guidance: Use DocAtlas/docmancer documentation context before making code changes when the task may depend on library APIs, exact dependency versions, or project docs. Ask a task-specific documentation question, then use or ignore the returned context based on relevance.\n"
                     if CONDITIONS[condition_id].tool_policy.require_docatlas_call_before_edit:
                         prompt += "\nDiagnostic policy: Before your first code edit, call the available documentation-context tool once with a task-specific question. Use or ignore the returned context based on relevance.\n"
