@@ -709,6 +709,8 @@ def test_patch_review_writes_machine_readable_manifest(tmp_path: Path):
     assert manifest_artifacts["review_summary_pr_comment.json"]["kind"] == "bot_pr_comment_payload"
     assert manifest_artifacts["review_summary_trace.json"]["schema_version"] == payload["review_summary_trace"]["schema_version"]
     assert manifest_artifacts["review_summary_trace.json"]["kind"] == "bot_traceability_metadata"
+    assert manifest_artifacts["review_summary_bot_bundle.json"]["schema_version"] == payload["review_summary_bot_bundle"]["schema_version"]
+    assert manifest_artifacts["review_summary_bot_bundle.json"]["kind"] == "bot_bundle"
     assert "without parsing markdown" in manifest_artifacts["review_summary_quality.json"]["safe_usage"]
     assert "without parsing markdown" in manifest_artifacts["review_summary_actions.json"]["safe_usage"]
     assert "correctness_proof" in manifest["claims_avoided"]
@@ -747,6 +749,7 @@ def test_patch_review_machine_readable_artifact_contracts(tmp_path: Path):
     actions = payload["review_summary_actions"]
     pr_comment = payload["review_summary_pr_comment"]
     trace = payload["review_summary_trace"]
+    bot_bundle = payload["review_summary_bot_bundle"]
     manifest = payload["review_summary_manifest"]
 
     assert {
@@ -807,6 +810,7 @@ def test_patch_review_machine_readable_artifact_contracts(tmp_path: Path):
         "review_summary_actions.json": actions["schema_version"],
         "review_summary_pr_comment.json": pr_comment["schema_version"],
         "review_summary_trace.json": trace["schema_version"],
+        "review_summary_bot_bundle.json": bot_bundle["schema_version"],
     }
     assert {
         "schema_version",
@@ -847,6 +851,22 @@ def test_patch_review_machine_readable_artifact_contracts(tmp_path: Path):
             "raw_constraint_artifact",
             "raw_validation_artifact",
         } <= set(item)
+    assert {
+        "schema_version",
+        "summary_mode",
+        "source_artifacts",
+        "manifest",
+        "quality",
+        "actions",
+        "pr_comment",
+        "trace",
+        "claims_avoided",
+    } <= set(bot_bundle)
+    assert bot_bundle["schema_version"] == PATCH_REVIEW_SCHEMA_VERSIONS["review_summary_bot_bundle.json"]
+    assert bot_bundle["quality"] == quality
+    assert bot_bundle["actions"] == actions
+    assert bot_bundle["pr_comment"] == pr_comment
+    assert bot_bundle["trace"] == trace
 
 
 

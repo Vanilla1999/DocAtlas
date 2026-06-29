@@ -25,6 +25,7 @@ PATCH_REVIEW_SCHEMA_VERSIONS = {
     "review_summary_actions.json": 1,
     "review_summary_pr_comment.json": 1,
     "review_summary_trace.json": 1,
+    "review_summary_bot_bundle.json": 1,
 }
 TASK_TOKEN_STOPWORDS = {
     "add", "and", "before", "change", "check", "current", "diff", "file",
@@ -116,6 +117,7 @@ class PatchReviewService:
             "review_summary_actions.json",
             "review_summary_pr_comment.json",
             "review_summary_trace.json",
+            "review_summary_bot_bundle.json",
             "constraints.json",
             "constraints.md",
             "changed_files.json",
@@ -168,8 +170,18 @@ class PatchReviewService:
             actions_schema_version=actions_payload["schema_version"],
             pr_comment_schema_version=pr_comment_payload["schema_version"],
             trace_schema_version=trace_payload["schema_version"],
+            bot_bundle_schema_version=PATCH_REVIEW_SCHEMA_VERSIONS["review_summary_bot_bundle.json"],
+        )
+        bot_bundle_payload = self._review_summary_bot_bundle_payload(
+            manifest_payload,
+            quality_payload,
+            actions_payload,
+            pr_comment_payload,
+            trace_payload,
+            summary_mode=summary_mode,
         )
         self._write_json(out / "review_summary_manifest.json", manifest_payload)
+        self._write_json(out / "review_summary_bot_bundle.json", bot_bundle_payload)
         return {
             "output_dir": str(out),
             "changed_files": changed,
@@ -183,6 +195,7 @@ class PatchReviewService:
             "review_summary_quality": quality_payload,
             "review_summary_pr_comment": pr_comment_payload,
             "review_summary_trace": trace_payload,
+            "review_summary_bot_bundle": bot_bundle_payload,
             "constraints": constraints_dict,
             "validation": validation_dict,
             "artifacts": artifact_names,
@@ -222,6 +235,7 @@ class PatchReviewService:
         actions_schema_version: int,
         pr_comment_schema_version: int,
         trace_schema_version: int,
+        bot_bundle_schema_version: int,
     ) -> dict[str, Any]:
         artifact_contract = {
             "review_summary.md": {
@@ -253,6 +267,12 @@ class PatchReviewService:
                 "schema_version": trace_schema_version,
                 "intended_consumers": ["pr_bot", "automation", "debugger"],
                 "safe_usage": "Trace rendered recommendations back to raw constraints and validation results; use for audit/debug, not as a correctness proof.",
+            },
+            "review_summary_bot_bundle.json": {
+                "kind": "bot_bundle",
+                "schema_version": bot_bundle_schema_version,
+                "intended_consumers": ["pr_bot", "automation"],
+                "safe_usage": "Use as a single-file bot integration entrypoint containing manifest, quality, actions, PR comment, and trace metadata; non-blocking only.",
             },
             "constraints.json": {
                 "kind": "raw_constraints",
@@ -386,6 +406,34 @@ class PatchReviewService:
                 "quality_signals": len(quality_payload.get("signals", [])),
             },
             "action_traces": action_traces,
+            "claims_avoided": quality_payload.get("claims_avoided", []),
+        }
+
+    @staticmethod
+    def _review_summary_bot_bundle_payload(
+        manifest_payload: dict[str, Any],
+        quality_payload: dict[str, Any],
+        actions_payload: dict[str, Any],
+        pr_comment_payload: dict[str, Any],
+        trace_payload: dict[str, Any],
+        *,
+        summary_mode: str,
+    ) -> dict[str, Any]:
+        return {
+            "schema_version": PATCH_REVIEW_SCHEMA_VERSIONS["review_summary_bot_bundle.json"],
+            "summary_mode": summary_mode,
+            "source_artifacts": [
+                "review_summary_manifest.json",
+                "review_summary_quality.json",
+                "review_summary_actions.json",
+                "review_summary_pr_comment.json",
+                "review_summary_trace.json",
+            ],
+            "manifest": manifest_payload,
+            "quality": quality_payload,
+            "actions": actions_payload,
+            "pr_comment": pr_comment_payload,
+            "trace": trace_payload,
             "claims_avoided": quality_payload.get("claims_avoided", []),
         }
 
