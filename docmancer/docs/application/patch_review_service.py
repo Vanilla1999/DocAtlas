@@ -37,6 +37,7 @@ class PatchReviewService:
         max_constraints: int = 12,
         max_tokens: int = 1200,
         summary_max_items: int = 5,
+        summary_mode: str = "standard",
     ) -> dict[str, Any]:
         root = Path(project_path).expanduser().resolve()
         if not root.exists():
@@ -96,6 +97,7 @@ class PatchReviewService:
             untracked_files=untracked_files,
             ignored_runtime_artifacts=ignored_runtime_artifacts,
             summary_max_items=summary_max_items,
+            summary_mode=summary_mode,
         )
         (out / "review_summary.md").write_text(summary, encoding="utf-8")
         return {
@@ -105,6 +107,7 @@ class PatchReviewService:
             "ignored_runtime_artifacts": ignored_runtime_artifacts,
             "warnings": warnings,
             "summary_max_items": summary_max_items,
+            "summary_mode": summary_mode,
             "constraints": constraints_dict,
             "validation": validation_dict,
             "artifacts": [
@@ -173,7 +176,11 @@ class PatchReviewService:
         untracked_files: list[str] | None = None,
         ignored_runtime_artifacts: list[str] | None = None,
         summary_max_items: int = 5,
+        summary_mode: str = "standard",
     ) -> str:
+        summary_mode = summary_mode.lower()
+        if summary_mode not in {"compact", "standard", "verbose"}:
+            raise ValueError(f"unsupported summary_mode: {summary_mode}")
         warnings = warnings or []
         untracked_files = untracked_files or []
         ignored_runtime_artifacts = ignored_runtime_artifacts or []
@@ -190,8 +197,12 @@ class PatchReviewService:
             key=lambda item: PatchReviewService._summary_constraint_rank(item, changed_files, task),
         )
         actionable = [item for item in ranked_constraints if PatchReviewService._summary_bucket(item, changed_files, task) == "actionable"][:summary_max_items]
-        manual_context = [item for item in ranked_constraints if PatchReviewService._summary_bucket(item, changed_files, task) == "manual"][:6]
-        low_context = [item for item in ranked_constraints if PatchReviewService._summary_bucket(item, changed_files, task) == "low"][:6]
+        manual_limit = 12 if summary_mode == "verbose" else 6
+        low_limit = 12 if summary_mode == "verbose" else 6
+        symbol_limit = 16 if summary_mode == "verbose" else 8
+        excluded_limit = 24 if summary_mode == "verbose" else 12
+        manual_context = [item for item in ranked_constraints if PatchReviewService._summary_bucket(item, changed_files, task) == "manual"][:manual_limit]
+        low_context = [item for item in ranked_constraints if PatchReviewService._summary_bucket(item, changed_files, task) == "low"][:low_limit]
         symbol_candidates = list(constraints.get("symbol_candidates") or [])
         useful_symbols = [item for item in symbol_candidates if not PatchReviewService._is_low_value_symbol_candidate(item, task)]
         low_symbols = [item for item in symbol_candidates if PatchReviewService._is_low_value_symbol_candidate(item, task)]
@@ -218,6 +229,7 @@ class PatchReviewService:
             "",
             "## Review summary quality",
             f"- attachable: {quality['attachable']}",
+            f"- summary_mode: {summary_mode}",
             f"- actionable_items_limit: {summary_max_items}",
             f"- actionable_items_count: {len(actionable)}",
             f"- low_value_top_items_count: {len(low_context) + len(low_symbols)}",
@@ -232,6 +244,17 @@ class PatchReviewService:
             [f"- {item.get('instruction')} (source: `{item.get('source')}`)" for item in actionable]
             or ["- none"]
         )
+        if summary_mode == "compact":
+            lines.extend(["", "## Violations"])
+            lines.extend([f"- {item.get('constraint_id')}: {item.get('reason')}" for item in violations] or ["- none"])
+            lines.extend([
+                "",
+                "## Claims avoided",
+                "- This artifact does not prove correctness.",
+                "- This artifact does not replace tests or human review.",
+                "- This artifact does not claim broad DocAtlas superiority.",
+            ])
+            return "\n".join(lines) + "\n"
         lines.extend(["", "## Manual review context"])
         lines.extend(
             [f"- {item.get('instruction')} (source: `{item.get('source')}`)" for item in manual_context]
@@ -269,17 +292,17 @@ class PatchReviewService:
         if constraints.get("symbol_candidates"):
             lines.extend(["", "## Source-of-truth / symbol notes"])
             if useful_symbols:
-                for candidate in useful_symbols[:8]:
+                for candidate in useful_symbols[:symbol_limit]:
                     lines.append(f"- `{candidate.get('term')}` -> `{candidate.get('matched_symbol')}` (`{candidate.get('source')}`)")
             if low_symbols:
                 lines.append("- low-confidence/noisy symbols hidden from checklist:")
-                lines.extend(f"  - `{candidate.get('matched_symbol')}` (`{candidate.get('source')}`)" for candidate in low_symbols[:6])
+                lines.extend(f"  - `{candidate.get('matched_symbol')}` (`{candidate.get('source')}`)" for candidate in low_symbols[:low_limit])
         if excluded_sources:
             lines.extend(["", "## Excluded or ignored sources"])
-            for item in excluded_sources[:12]:
+            for item in excluded_sources[:excluded_limit]:
                 lines.append(f"- {item.get('reason')}: `{item.get('path')}`")
-            if len(excluded_sources) > 12:
-                lines.append(f"- ... {len(excluded_sources) - 12} more excluded source(s)")
+            if len(excluded_sources) > excluded_limit:
+                lines.append(f"- ... {len(excluded_sources) - excluded_limit} more excluded source(s)")
         if untracked_files:
             lines.extend(["", "## Untracked files"])
             lines.extend(f"- {path}" for path in untracked_files)

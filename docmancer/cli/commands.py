@@ -1530,6 +1530,7 @@ def _format_context_explain(result) -> str:
 @click.option("--max-constraints", default=12, show_default=True, type=int, help="Maximum constraints to keep in the packet.")
 @click.option("--max-tokens", default=1200, show_default=True, type=int, help="Approximate token budget for constraints.")
 @click.option("--summary-max-items", default=5, show_default=True, type=click.IntRange(1, 20), help="Maximum actionable checklist items in review_summary.md.")
+@click.option("--summary-mode", default="standard", show_default=True, type=click.Choice(["compact", "standard", "verbose"], case_sensitive=False), help="review_summary.md verbosity.")
 @click.option("output_format", "--format", type=click.Choice(["text", "json"], case_sensitive=False), default="text", show_default=True)
 def patch_review_cmd(
     project_path: Path,
@@ -1541,6 +1542,7 @@ def patch_review_cmd(
     max_constraints: int,
     max_tokens: int,
     summary_max_items: int,
+    summary_mode: str,
     output_format: str,
 ):
     """Generate read-only patch constraints, validation, diff, and review artifacts."""
@@ -1556,6 +1558,7 @@ def patch_review_cmd(
         max_constraints=max_constraints,
         max_tokens=max_tokens,
         summary_max_items=summary_max_items,
+        summary_mode=summary_mode,
     )
     if output_format.lower() == "json":
         click.echo(json.dumps(result, ensure_ascii=False, indent=2, sort_keys=True))

@@ -455,3 +455,108 @@ def test_patch_review_summary_max_items_is_validated_by_cli():
 
     assert result.exit_code != 0
     assert "--summary-max-items" in result.output
+
+
+
+def test_patch_review_summary_modes_control_markdown_verbosity():
+    packet = {
+        "constraints": [
+            {
+                "id": "guardrail",
+                "type": "generated_file",
+                "instruction": "Generated files must not be edited by hand.",
+                "source": "docs/architecture.md",
+                "confidence": "high",
+                "evidence": "Generated files must not be edited by hand.",
+                "symbols": [],
+                "files": [],
+            },
+            {
+                "id": "manual-context",
+                "type": "architecture",
+                "instruction": "Broad architecture context should be manually reviewed.",
+                "source": "docs/architecture.md",
+                "confidence": "medium",
+                "evidence": "Manual review required.",
+                "symbols": [],
+                "files": [],
+            },
+        ],
+        "symbol_candidates": [
+            {"term": "open", "matched_symbol": "openInfo", "source": "lib/menu.dart", "reason": "identifier match", "evidence": "openInfo();"}
+        ],
+        "excluded_source_reasons": [
+            {"path": "docs/research/docatlas-dogfood-v4/review-value-v4.md", "reason": "dogfood_result_memo"}
+        ],
+    }
+    validation = {
+        "satisfied": 1,
+        "violated": 0,
+        "unknown": 1,
+        "results": [{"constraint_id": "manual-context", "status": "unknown", "reason": "manual review required", "files": []}],
+        "warnings": [],
+    }
+
+    compact = PatchReviewService._review_summary(
+        "Review openInfo path",
+        ["lib/menu.dart"],
+        packet,
+        validation,
+        summary_mode="compact",
+    )
+    verbose = PatchReviewService._review_summary(
+        "Review openInfo path",
+        ["lib/menu.dart"],
+        packet,
+        validation,
+        summary_mode="verbose",
+    )
+
+    assert "- summary_mode: compact" in compact
+    assert "## Actionable PR checklist" in compact
+    assert "## Violations" in compact
+    assert "## Manual review context" not in compact
+    assert "## Unknown/manual review buckets" not in compact
+    assert "## Excluded or ignored sources" not in compact
+    assert "## Claims avoided" in compact
+
+    assert "- summary_mode: verbose" in verbose
+    assert "## Manual review context" in verbose
+    assert "## Unknown/manual review buckets" in verbose
+    assert "## Excluded or ignored sources" in verbose
+    assert "## Source-of-truth / symbol notes" in verbose
+
+
+def test_patch_review_summary_mode_is_exposed_in_json(tmp_path: Path):
+    repo = _repo(tmp_path)
+    _git(repo, "init")
+    _git(repo, "config", "user.email", "test@example.com")
+    _git(repo, "config", "user.name", "Test User")
+    _git(repo, "add", ".")
+    _git(repo, "commit", "-m", "base")
+    _write(repo / "lib/presentation/menu_view.dart", "void buildMenu() {\n  menuNotifier.closeMenu();\n}\n")
+    out = tmp_path / "review-compact"
+
+    result = CliRunner().invoke(
+        cli,
+        [
+            "patch-review",
+            "--project-path",
+            str(repo),
+            "--task",
+            "Review menu navigation",
+            "--summary-mode",
+            "compact",
+            "--output-dir",
+            str(out),
+            "--format",
+            "json",
+        ],
+    )
+
+    assert result.exit_code == 0, result.output
+    payload = json.loads(result.output)
+    assert payload["summary_mode"] == "compact"
+    summary = (out / "review_summary.md").read_text()
+    assert "- summary_mode: compact" in summary
+    assert "## Manual review context" not in summary
