@@ -58,6 +58,7 @@ POLICY_DECISION_KEYWORDS = (
     "access",
     "allowed",
     "denied",
+    "entitlement",
 )
 SAFE_UI_WIRING_PATTERNS = (
     r"\bcloseMenu\s*\(",
@@ -307,11 +308,30 @@ class PatchConstraintValidationService:
     @staticmethod
     def _is_safe_ui_wiring_line(line: str) -> bool:
         stripped = line.strip()
+        lowered = stripped.lower()
+        if PatchConstraintValidationService._line_has_decision_shape(lowered):
+            return False
         if re.match(r"^(onPressed|onTap|onChanged)\s*:\s*(\(.*\)\s*)?(async\s*)?\{?\s*$", stripped):
             return True
         if stripped in {"},", "}", "{", "});", ");"}:
             return True
         return any(re.search(pattern, stripped) for pattern in SAFE_UI_WIRING_PATTERNS)
+
+    @staticmethod
+    def _line_has_decision_shape(lowered_line: str) -> bool:
+        if re.search(r"\b(return|if|else\s+if|switch|case)\b", lowered_line):
+            return True
+        if "&&" in lowered_line or "||" in lowered_line:
+            return True
+        if re.search(r"(?<![=!<>])=(?!=|>)", lowered_line):
+            return True
+        if re.search(r"[?:]", lowered_line) and not re.match(r"^(onpressed|ontap|onchanged)\s*:", lowered_line):
+            return True
+        if re.search(r"(==|!=|>=|<=|>|<)", lowered_line):
+            return True
+        if any(keyword in lowered_line for keyword in POLICY_DECISION_KEYWORDS):
+            return True
+        return False
 
     @staticmethod
     def _line_adds_policy_decision(lowered_line: str, lowered_patch: str) -> bool:
@@ -321,7 +341,8 @@ class PatchConstraintValidationService:
         adds_policy_map = ("map" in lowered_line or "{" in lowered_line or "[" in lowered_line) and patch_has_decision_keyword
         adds_assignment = re.search(r"\b(canproceed|isallowed|allowed|denied|status|role|permission|authorization)\b.*(=|=>|:)", lowered_line) is not None
         compares_policy_state = re.search(r"\b(user\.|role|status|permission|authorization|access)\b.*(==|!=|>|<|&&|\|\|)", lowered_line) is not None
-        return bool((adds_branch and patch_has_decision_keyword) or adds_policy_map or adds_assignment or compares_policy_state or (has_decision_keyword and "policy" in lowered_line))
+        returns_policy_decision = lowered_line.startswith("return ") and has_decision_keyword
+        return bool((adds_branch and patch_has_decision_keyword) or adds_policy_map or adds_assignment or compares_policy_state or returns_policy_decision or (has_decision_keyword and "policy" in lowered_line))
 
     @staticmethod
     def _policy_diff_evidence(patch_diff: str | None) -> str | None:

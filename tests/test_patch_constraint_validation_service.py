@@ -206,6 +206,35 @@ def test_context_push_route_navigation_alone_is_not_policy_violation():
     assert result.violated == 0
 
 
+
+
+def test_ref_read_notifier_action_alone_is_not_policy_violation():
+    constraint = _constraint("provider", "forbidden_edit", "Presentation/UI must not duplicate policy; delegate to services.")
+    diff = "+ onPressed: () => ref.read(tabBrowserNotifierProvider.notifier).openInfo();\n"
+
+    result = _service().validate_patch_against_constraints([constraint], changed_files=["lib/ui/menu_view.dart"], patch_diff=diff)
+
+    assert result.violated == 0
+
+
+def test_assignment_from_is_allowed_controller_violates():
+    constraint = _constraint("provider", "forbidden_edit", "Provider/UI must not duplicate authorization policy; delegate to service.")
+    diff = "+ final canProceed = authController.isAllowed(user);\n"
+
+    result = _service().validate_patch_against_constraints([constraint], changed_files=["lib/presentation/user_view.dart"], patch_diff=diff)
+
+    assert result.violated == 1
+
+
+def test_return_permission_controller_can_proceed_violates():
+    constraint = _constraint("provider", "forbidden_edit", "Provider/UI must not duplicate permission policy; delegate to service.")
+    diff = "+ return permissionController.canProceed(state);\n"
+
+    result = _service().validate_patch_against_constraints([constraint], changed_files=["lib/ui/permission_view.dart"], patch_diff=diff)
+
+    assert result.violated == 1
+
+
 def test_ui_role_branch_remains_policy_violation():
     constraint = _constraint("provider", "forbidden_edit", "Provider/UI must not duplicate authorization policy; delegate to service.")
     diff = """

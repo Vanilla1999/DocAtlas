@@ -7,6 +7,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from eval.task_level.artifact_hygiene import apply_patch_hygiene, is_runtime_artifact, parse_status_paths
+
 from docmancer.docs.service import LibraryDocsService
 
 
@@ -31,8 +33,21 @@ class PatchReviewService:
         root = Path(project_path).expanduser().resolve()
         if not root.exists():
             raise FileNotFoundError(f"project_path does not exist: {root}")
-        changed = changed_files or self._git_changed_files(root, base_ref)
-        patch_diff = self._git_diff(root, base_ref)
+        raw_changed_files = self._git_changed_files(root, base_ref)
+        raw_status = self._git_status_porcelain(root)
+        raw_patch_diff = self._git_diff(root, base_ref)
+        hygiene = apply_patch_hygiene(
+            raw_status_lines=raw_status.splitlines(),
+            raw_changed_files=raw_changed_files,
+            raw_patch_diff=raw_patch_diff,
+        )
+        changed = changed_files or hygiene.filtered_changed_files
+        patch_diff = raw_patch_diff if changed_files else hygiene.filtered_patch_diff
+        untracked_files = self._meaningful_untracked_files(raw_status)
+        ignored_runtime_artifacts = hygiene.ignored_runtime_artifacts
+        warnings: list[str] = []
+        if untracked_files and not changed_files:
+            warnings.append("untracked files are included in changed_files; patch.diff may not include their content")
         out = Path(output_dir).expanduser() if output_dir else root / ".docatlas" / "patch-review" / self._run_id()
         if not out.is_absolute():
             out = root / out
@@ -59,19 +74,28 @@ class PatchReviewService:
         self._write_json(out / "constraints.json", constraints_dict)
         (out / "constraints.md").write_text(self._constraints_markdown(constraints_dict), encoding="utf-8")
         self._write_json(out / "changed_files.json", changed)
+        self._write_json(out / "untracked_files.json", untracked_files)
+        self._write_json(out / "ignored_runtime_artifacts.json", ignored_runtime_artifacts)
+        self._write_json(out / "patch_hygiene.json", hygiene.to_json_dict())
         (out / "patch.diff").write_text(patch_diff, encoding="utf-8")
         self._write_json(out / "validation.json", validation_dict)
-        summary = self._review_summary(task, changed, constraints_dict, validation_dict)
+        summary = self._review_summary(task, changed, constraints_dict, validation_dict, warnings=warnings, untracked_files=untracked_files, ignored_runtime_artifacts=ignored_runtime_artifacts)
         (out / "review_summary.md").write_text(summary, encoding="utf-8")
         return {
             "output_dir": str(out),
             "changed_files": changed,
+            "untracked_files": untracked_files,
+            "ignored_runtime_artifacts": ignored_runtime_artifacts,
+            "warnings": warnings,
             "constraints": constraints_dict,
             "validation": validation_dict,
             "artifacts": [
                 "constraints.json",
                 "constraints.md",
                 "changed_files.json",
+                "untracked_files.json",
+                "ignored_runtime_artifacts.json",
+                "patch_hygiene.json",
                 "patch.diff",
                 "validation.json",
                 "review_summary.md",
@@ -88,8 +112,16 @@ class PatchReviewService:
         return [line.strip() for line in output.splitlines() if line.strip()]
 
     @staticmethod
+    def _git_status_porcelain(root: Path) -> str:
+        return subprocess.check_output(["git", "status", "--porcelain", "-uall"], cwd=root, text=True)
+
+    @staticmethod
     def _git_diff(root: Path, base_ref: str) -> str:
         return subprocess.check_output(["git", "diff", base_ref, "--"], cwd=root, text=True)
+
+    @staticmethod
+    def _meaningful_untracked_files(raw_status: str) -> list[str]:
+        return [path for status, path in parse_status_paths(raw_status.splitlines()) if status == "??" and not is_runtime_artifact(path)]
 
     @staticmethod
     def _write_json(path: Path, payload: Any) -> None:
@@ -113,7 +145,19 @@ class PatchReviewService:
         return "\n".join(lines) + "\n"
 
     @staticmethod
-    def _review_summary(task: str, changed_files: list[str], constraints: dict[str, Any], validation: dict[str, Any]) -> str:
+    def _review_summary(
+        task: str,
+        changed_files: list[str],
+        constraints: dict[str, Any],
+        validation: dict[str, Any],
+        *,
+        warnings: list[str] | None = None,
+        untracked_files: list[str] | None = None,
+        ignored_runtime_artifacts: list[str] | None = None,
+    ) -> str:
+        warnings = warnings or []
+        untracked_files = untracked_files or []
+        ignored_runtime_artifacts = ignored_runtime_artifacts or []
         violations = [result for result in validation.get("results", []) if result.get("status") == "violated"]
         unknowns = [result for result in validation.get("results", []) if result.get("status") == "unknown"]
         generated_or_lock = [
@@ -148,12 +192,19 @@ class PatchReviewService:
         lines.extend([f"- {item.get('constraint_id')}: {item.get('reason')}" for item in unknowns[:8]] or ["- none"])
         lines.extend(["", "## Generated/lockfile checks"])
         lines.extend([f"- {item.get('constraint_id')}: {item.get('status')} — {item.get('reason')}" for item in generated_or_lock] or ["- none"])
+        if untracked_files:
+            lines.extend(["", "## Untracked files"])
+            lines.extend(f"- {path}" for path in untracked_files)
+        if ignored_runtime_artifacts:
+            lines.extend(["", "## Ignored runtime/cache artifacts"])
+            lines.extend(f"- {path}" for path in ignored_runtime_artifacts[:20])
         if constraints.get("symbol_candidates"):
             lines.extend(["", "## Source-of-truth / symbol notes"])
             for candidate in constraints["symbol_candidates"][:8]:
                 lines.append(f"- `{candidate.get('term')}` -> `{candidate.get('matched_symbol')}` (`{candidate.get('source')}`)")
-        if constraints.get("warnings") or validation.get("warnings"):
+        if constraints.get("warnings") or validation.get("warnings") or warnings:
             lines.extend(["", "## Warnings"])
+            lines.extend(f"- {warning}" for warning in warnings)
             lines.extend(f"- {warning}" for warning in constraints.get("warnings", []))
             lines.extend(f"- {warning}" for warning in validation.get("warnings", []))
         lines.extend([
