@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import fnmatch
 import re
 import tomllib
 from pathlib import Path
@@ -31,6 +32,19 @@ GENERATED_PATTERNS = (
     "generated/",
     "dist/",
 )
+GENERATED_ARTIFACT_SOURCE_PATTERNS = (
+    "docs/research/docatlas-dogfood/**",
+    "docs/research/**/constraints.md",
+    "docs/research/**/constraints.json",
+    "docs/research/**/validation.json",
+    "docs/research/**/patch.diff",
+    "docs/research/**/changed_files.json",
+    "docs/research/**/review_notes.md",
+    "eval/task_level/results/**",
+    ".docatlas/**",
+    ".docmancer/**",
+)
+SYMBOL_SOURCE_SUFFIXES = (".py", ".dart", ".ts", ".tsx", ".js", ".jsx", ".go", ".rs", ".kt", ".java", ".md", ".txt")
 ARCHITECTURE_DOC_RE = re.compile(
     r"(^|/)(architecture\.md|architecture/|adr/|adrs/|contributing\.md|readme[^/]*\.(md|txt)|adr[^/]*\.md)$",
     re.I,
@@ -68,6 +82,7 @@ class PatchConstraintsService:
         self.facade = facade
         self._question = ""
         self._changed_files: list[str] = []
+        self._ignored_generated_artifact_sources: list[str] = []
 
     def get_patch_constraints(
         self,
@@ -84,12 +99,15 @@ class PatchConstraintsService:
         changed_files = changed_files or []
         self._question = question or ""
         self._changed_files = changed_files
+        self._ignored_generated_artifact_sources = []
         root = Path(project_path).expanduser().resolve() if project_path else None
         sources = self._visible_sources(root) if root else []
         constraints: list[PatchConstraint] = []
         constraints.extend(self._architecture_constraints(sources))
         constraints.extend(self._generated_file_constraints(sources, changed_files))
         constraints.extend(self._dependency_constraints(root))
+        symbol_candidates = self._symbol_candidates(question, root, changed_files)
+        constraints.extend(self._symbol_candidate_constraints(symbol_candidates))
         constraints.extend(self._fallback_constraints(question, changed_files, root))
         constraints = self._dedupe(constraints)
         constraints = self._sort_constraints(constraints)
@@ -103,6 +121,8 @@ class PatchConstraintsService:
             warnings.append("project_path was not provided; constraints are limited to task-level generic guidance.")
         if root and not sources:
             warnings.append("No visible project docs were found; constraints are limited to dependency metadata and generic checks.")
+        if self._ignored_generated_artifact_sources:
+            warnings.append(f"ignored_generated_artifact_sources: excluded {len(self._ignored_generated_artifact_sources)} generated dogfood/eval artifact source(s) from patch-constraint extraction.")
         token_estimate = self._estimate_packet_tokens(selected, warnings)
         confidence = self._packet_confidence(selected)
         return PatchConstraintPacket(
@@ -114,6 +134,9 @@ class PatchConstraintsService:
             suggested_checks=[c.instruction for c in selected if c.type == "verification"],
             warnings=warnings,
             sources=self._source_summary(sources, selected) if include_sources else [],
+            symbol_candidates=symbol_candidates,
+            ignored_generated_artifact_sources=self._ignored_generated_artifact_sources[:20],
+            excluded_source_count=len(self._ignored_generated_artifact_sources),
             token_estimate=token_estimate,
             confidence=confidence,
         )
@@ -137,6 +160,8 @@ class PatchConstraintsService:
             "ADR*",
             "adr/**/*.md",
             "ADR/**/*.md",
+            ".docatlas/**/*.md",
+            ".docmancer/**/*.md",
             "**/README.md",
             "**/ARCHITECTURE.md",
         ]
@@ -152,7 +177,10 @@ class PatchConstraintsService:
             if resolved in seen or not resolved.is_file() or not self._under_root(resolved, root):
                 continue
             rel = resolved.relative_to(root).as_posix()
-            if self._excluded_source(rel):
+            excluded_reason = self._excluded_source_reason(rel)
+            if excluded_reason:
+                if excluded_reason == "generated_artifact":
+                    self._ignored_generated_artifact_sources.append(rel)
                 continue
             if not (ARCHITECTURE_DOC_RE.search(rel) or "/docs/" in f"/{rel}" or rel.lower().startswith("docs/")):
                 continue
@@ -172,9 +200,18 @@ class PatchConstraintsService:
             return False
 
     @staticmethod
-    def _excluded_source(rel: str) -> bool:
+    def _excluded_source_reason(rel: str) -> str | None:
+        normalized = rel.replace("\\", "/")
+        if any(fnmatch.fnmatch(normalized, pattern) for pattern in GENERATED_ARTIFACT_SOURCE_PATTERNS):
+            return "generated_artifact"
         parts = {part.lower() for part in Path(rel).parts}
-        return bool(parts & EXCLUDED_SOURCE_PARTS) or any("oracle" in part.lower() or "hidden" in part.lower() for part in Path(rel).parts)
+        if bool(parts & EXCLUDED_SOURCE_PARTS) or any("oracle" in part.lower() or "hidden" in part.lower() for part in Path(rel).parts):
+            return "runtime_or_hidden"
+        return None
+
+    @classmethod
+    def _excluded_source(cls, rel: str) -> bool:
+        return cls._excluded_source_reason(rel) is not None
 
     def _architecture_constraints(self, sources: list[dict[str, str]]) -> list[PatchConstraint]:
         constraints: list[PatchConstraint] = []
@@ -398,6 +435,146 @@ class PatchConstraintsService:
                     continue
                 observations.append(DependencyObservation("go", match.group(1), resolved_version=match.group(2), specifier_kind="exact", specifier_raw=match.group(2), version_source="go.mod_exact"))
         return observations
+
+    def _symbol_candidates(self, question: str, root: Path | None, changed_files: list[str]) -> list[dict[str, Any]]:
+        if not root or not root.exists():
+            return []
+        terms = self._task_terms(question)
+        if not terms:
+            return []
+        source_files = self._symbol_source_files(root, changed_files)
+        candidates: list[dict[str, Any]] = []
+        seen: set[tuple[str, str, str]] = set()
+        for term in terms:
+            variants = self._term_variants(term)
+            for path in source_files:
+                rel = path.relative_to(root).as_posix()
+                if self._excluded_source(rel):
+                    continue
+                try:
+                    lines = path.read_text(encoding="utf-8", errors="replace").splitlines()
+                except OSError:
+                    continue
+                for line_number, line in enumerate(lines, start=1):
+                    lowered = line.lower()
+                    if not any(variant and variant.lower() in lowered for variant in variants):
+                        continue
+                    symbol = self._symbol_from_line(line) or term
+                    key = (term.lower(), rel, symbol)
+                    if key in seen:
+                        continue
+                    seen.add(key)
+                    candidates.append({
+                        "term": term,
+                        "matched_symbol": symbol,
+                        "source": rel,
+                        "line": line_number,
+                        "evidence": line.strip()[:240],
+                        "confidence": "medium" if symbol != term else "low",
+                        "reason": "task term matched an existing source/docs symbol; prefer reusing source-attributed project behavior before inventing a new path.",
+                    })
+                    break
+                if any(candidate["term"].lower() == term.lower() for candidate in candidates):
+                    break
+        return candidates[:12]
+
+    @staticmethod
+    def _task_terms(question: str) -> list[str]:
+        terms: list[str] = []
+        for match in re.finditer(r"[\"'“”«»](.*?)[\"'“”«»]", question):
+            value = match.group(1).strip()
+            if 2 <= len(value) <= 60:
+                terms.append(value)
+        terms.extend(re.findall(r"\b[A-Z][A-Z0-9_]{2,}\b", question))
+        terms.extend(re.findall(r"\b[A-Za-z_][A-Za-z0-9_]*(?:[A-Z][A-Za-z0-9_]*)+\b", question))
+        terms.extend(re.findall(r"\b[A-Za-zА-Яа-яЁё][A-Za-zА-Яа-яЁё0-9]*(?:\s+[A-Za-zА-Яа-яЁё][A-Za-zА-Яа-яЁё0-9]*){1,2}\b", question))
+        for match in re.finditer(r"\b(open|close|show|hide|toggle|navigate|route|save|load)\s+([A-Za-zА-Яа-яЁё][A-Za-zА-Яа-яЁё0-9]*)\b", question, re.I):
+            terms.append(f"{match.group(1)} {match.group(2)}")
+        out: list[str] = []
+        seen: set[str] = set()
+        stop = {"should", "existing", "button", "action", "menu", "project", "current", "текущая", "кнопка", "меню", "экран"}
+        for term in terms:
+            cleaned = term.strip(" .,:;()[]{}\n\t")
+            if len(cleaned) < 3 or len(cleaned) > 60 or cleaned.lower() in stop:
+                continue
+            key = cleaned.lower()
+            if key not in seen:
+                seen.add(key)
+                out.append(cleaned)
+        return out[:24]
+
+    @staticmethod
+    def _term_variants(term: str) -> list[str]:
+        variants = {term, term.replace("_", " "), term.replace(" ", "_"), term.replace(" ", "")}
+        if term.isupper() and "_" in term:
+            variants.add(term.lower())
+        words = re.findall(r"[A-Za-zА-Яа-яЁё0-9]+", term)
+        if words:
+            variants.add("".join(word[:1].upper() + word[1:] for word in words))
+            variants.add("".join([words[0].lower(), *[word[:1].upper() + word[1:] for word in words[1:]]]))
+            for left, right in zip(words, words[1:]):
+                variants.add(f"{left} {right}")
+                variants.add(f"{left.lower()}{right[:1].upper() + right[1:]}")
+        return [variant for variant in variants if len(variant) >= 3]
+
+    def _symbol_source_files(self, root: Path, changed_files: list[str]) -> list[Path]:
+        files: list[Path] = []
+        for changed in changed_files:
+            path = (root / changed).resolve()
+            if path.is_file() and self._under_root(path, root):
+                files.append(path)
+            parent = path.parent if path.suffix else path
+            if parent.exists() and self._under_root(parent, root):
+                files.extend(p for p in parent.glob("**/*") if p.is_file() and p.suffix in SYMBOL_SOURCE_SUFFIXES and p.stat().st_size <= 80_000)
+        for base in (root / "lib", root / "src", root / "app", root / "docs"):
+            if base.exists():
+                files.extend(p for p in base.rglob("*") if p.is_file() and p.suffix in SYMBOL_SOURCE_SUFFIXES and p.stat().st_size <= 80_000)
+        out: list[Path] = []
+        seen: set[Path] = set()
+        for path in files:
+            try:
+                resolved = path.resolve()
+            except OSError:
+                continue
+            if resolved in seen or not self._under_root(resolved, root):
+                continue
+            seen.add(resolved)
+            out.append(resolved)
+            if len(out) >= 300:
+                break
+        return out
+
+    @staticmethod
+    def _symbol_from_line(line: str) -> str | None:
+        patterns = [
+            r"\b(?:class|enum|mixin|extension|typedef|const|final|var|void|Future<[^>]+>|Future|Widget)\s+([A-Za-z_][A-Za-z0-9_]*)",
+            r"\b([A-Za-z_][A-Za-z0-9_]*)\s*\(",
+            r"\b([A-Za-z_][A-Za-z0-9_]*)\s*[:=]",
+        ]
+        for pattern in patterns:
+            match = re.search(pattern, line)
+            if match:
+                symbol = match.group(1)
+                if symbol not in {"if", "for", "while", "switch", "return"}:
+                    return symbol
+        return None
+
+    def _symbol_candidate_constraints(self, candidates: list[dict[str, Any]]) -> list[PatchConstraint]:
+        constraints: list[PatchConstraint] = []
+        for candidate in candidates[:6]:
+            symbol = str(candidate.get("matched_symbol") or candidate.get("term") or "symbol")
+            constraints.append(self._constraint(
+                id=f"symbol-candidate-{self._slug(str(candidate.get('term') or symbol))}-{self._slug(symbol)}",
+                type="source_of_truth" if candidate.get("confidence") == "medium" else "project_convention",
+                instruction=f"Task term `{candidate.get('term')}` matches existing project symbol `{symbol}`; prefer reusing that source-attributed path before adding a new implementation.",
+                source=str(candidate.get("source") or "project_source"),
+                severity="should",
+                confidence=str(candidate.get("confidence") or "low"),
+                evidence=str(candidate.get("evidence") or ""),
+                symbols=[str(candidate.get("term") or ""), symbol],
+                files=[str(candidate.get("source") or "")],
+            ))
+        return constraints
 
     @staticmethod
     def _dedupe_dependencies(observations: list[DependencyObservation]) -> list[DependencyObservation]:

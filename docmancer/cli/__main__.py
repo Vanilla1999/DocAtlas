@@ -14,6 +14,7 @@ from docmancer.cli.commands import (
     inspect_cmd,
     install_cmd,
     list_cmd,
+    patch_review_cmd,
     query_cmd,
     remove_cmd,
     setup_cmd,
@@ -71,6 +72,7 @@ cli.add_command(add_cmd, "add")
 cli.add_command(update_cmd, "update")
 cli.add_command(query_cmd, "query")
 cli.add_command(context_cmd, "context")
+cli.add_command(patch_review_cmd, "patch-review")
 cli.add_command(eval_cmd, "eval")
 cli.add_command(inspect_cmd, "inspect")
 cli.add_command(list_cmd, "list")

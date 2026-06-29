@@ -219,6 +219,61 @@ def test_grouped_constraints_are_views_of_all_constraints(tmp_path: Path):
     assert all(c.id in all_ids for c in packet.source_of_truth_rules)
 
 
+def test_ignores_dogfood_generated_artifacts_but_keeps_normal_research_docs(tmp_path: Path):
+    root = _workspace(tmp_path)
+    _write(root / "docs/research/docatlas-dogfood/task/constraints.md", "Dogfood artifact: FakeService owns menu policy.\n")
+    _write(root / "docs/research/docatlas-dogfood/task/validation.json", '{"violated": 9, "evidence": "FakeService"}')
+    _write(root / "docs/research/normal-architecture-note.md", "NormalResearchService owns research note policy.\n")
+
+    packet = _packet(root, question="Update research note policy", max_constraints=20, max_tokens=4000)
+    payload = str(asdict(packet))
+
+    assert "FakeService" not in payload
+    assert "NormalResearchService" in payload
+    assert packet.excluded_source_count >= 2
+    assert any("ignored_generated_artifact_sources" in warning for warning in packet.warnings)
+    assert any(path.endswith("constraints.md") for path in packet.ignored_generated_artifact_sources)
+
+
+def test_symbol_grounding_finds_task_local_source_symbols(tmp_path: Path):
+    root = _workspace(tmp_path)
+    _write(
+        root / "lib/modules/menu/menu_line.dart",
+        """
+class MenuNotifier {
+  void closeMenu() {}
+}
+
+class TabBrowserNotifier {
+  void openInfo() {}
+}
+
+const quickInfoLabel = 'Быстрая информация';
+""",
+    )
+
+    packet = _packet(
+        root,
+        question='Add "Быстрая информация" button and close menu before action using FAST_INFO',
+        changed_files=["lib/modules/menu/menu_line.dart"],
+        max_constraints=20,
+        max_tokens=4000,
+    )
+
+    candidates = packet.symbol_candidates
+    assert any(candidate["matched_symbol"] in {"openInfo", "quickInfoLabel"} for candidate in candidates)
+    assert any(candidate["matched_symbol"] == "closeMenu" for candidate in candidates)
+    assert all("docatlas-dogfood" not in candidate["source"] for candidate in candidates)
+
+
+def test_symbol_grounding_does_not_invent_without_source_match(tmp_path: Path):
+    root = _workspace(tmp_path)
+
+    packet = _packet(root, question="Use TotallyMissingBusinessThing", max_constraints=20, max_tokens=4000)
+
+    assert not any(candidate["term"] == "TotallyMissingBusinessThing" for candidate in packet.symbol_candidates)
+
+
 # Backward-compatible smoke names from the first production PR.
 def test_generated_file_constraint_extraction(tmp_path: Path):
     test_extracts_generated_file_constraint_from_docs(tmp_path)
