@@ -122,6 +122,22 @@ def test_changed_files_raise_provider_layer_constraint(tmp_path: Path):
     assert any(c.type == "architecture" and c.files for c in packet.constraints[:4])
 
 
+def test_changed_files_raise_relevant_constraints(tmp_path: Path):
+    packet = _packet(
+        _workspace(tmp_path),
+        changed_files=["lib/modules/permission/presentation/providers/permission_provider.dart"],
+    )
+    provider_positions = [idx for idx, c in enumerate(packet.constraints) if "provider" in c.instruction.lower()]
+    assert provider_positions and provider_positions[0] < 4
+
+
+def test_changed_files_do_not_create_unsupported_high_confidence_constraint(tmp_path: Path):
+    root = tmp_path / "repo"
+    root.mkdir()
+    packet = _packet(root, changed_files=["lib/modules/permission/presentation/providers/permission_provider.dart"])
+    assert not any(c.confidence == "high" and "PermissionService" in c.instruction for c in packet.constraints)
+
+
 def test_question_keywords_raise_relevant_dependency_constraint(tmp_path: Path):
     root = _workspace(tmp_path)
     _write(root / "package-lock.json", '{"packages":{"node_modules/react":{"version":"18.2.0"}}}')
@@ -147,6 +163,13 @@ def test_budget_keeps_must_high_confidence_constraints(tmp_path: Path):
 def test_budget_emits_truncation_warning(tmp_path: Path):
     packet = _packet(_workspace(tmp_path), max_constraints=1, max_tokens=100)
     assert any("constraints truncated by budget" in warning for warning in packet.warnings)
+
+
+def test_budget_drops_low_priority_constraints_first(tmp_path: Path):
+    packet = _packet(_workspace(tmp_path), changed_files=["lib/foo/user.g.dart"], max_constraints=2, max_tokens=220)
+    assert packet.constraints
+    assert all(c.confidence == "high" for c in packet.constraints)
+    assert all(c.source != "changed_files" for c in packet.constraints)
 
 
 def test_high_confidence_constraints_have_source_and_evidence(tmp_path: Path):
@@ -186,6 +209,14 @@ def test_does_not_emit_hidden_or_benchmark_oracle_sources(tmp_path: Path):
     assert "secretservice" not in payload
     assert "hidden_tests" not in payload
     assert "oracle" not in payload
+
+
+def test_grouped_constraints_are_views_of_all_constraints(tmp_path: Path):
+    packet = _packet(_workspace(tmp_path))
+    all_ids = {c.id for c in packet.constraints}
+    assert all(c.id in all_ids for c in packet.forbidden_edits)
+    assert all(c.id in all_ids for c in packet.dependency_contracts)
+    assert all(c.id in all_ids for c in packet.source_of_truth_rules)
 
 
 # Backward-compatible smoke names from the first production PR.
