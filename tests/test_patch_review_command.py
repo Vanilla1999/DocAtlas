@@ -162,3 +162,81 @@ def test_patch_review_preserves_untracked_generated_and_lockfiles_for_validation
     assert "pubspec.lock" in changed
     assert validation["violated"] >= 1
     assert any("lib/generated/client.pb.go" in result.get("files", []) or "pubspec.lock" in result.get("files", []) for result in validation["results"])
+
+
+
+def _section(text: str, heading: str) -> str:
+    marker = f"## {heading}"
+    start = text.index(marker)
+    rest = text[start + len(marker):]
+    end = rest.find("\n## ")
+    return rest if end == -1 else rest[:end]
+
+
+def test_patch_review_summary_prioritizes_actionable_items_and_demotes_noise(tmp_path: Path):
+    repo = _repo(tmp_path)
+    _write(repo / "docs/research/normal-architecture-note.md", "NormalArchitectureService owns reviewable project architecture.\n")
+    _write(repo / "docs/research/docatlas-dogfood-v2/review-value-v2.md", "DocAtlas patch-review dogfood v2 says DogfoodMemoService owns everything.\n")
+    _write(repo / "docs/research/docatlas-dogfood-v2/foo/task.md", "DogfoodTaskService owns task artifacts.\n")
+    _write(repo / "lib/navigation_observer.dart", "void onHide() {}\n")
+    _git(repo, "init")
+    _git(repo, "config", "user.email", "test@example.com")
+    _git(repo, "config", "user.name", "Test User")
+    _git(repo, "add", ".")
+    _git(repo, "commit", "-m", "base")
+    _write(
+        repo / "lib/presentation/menu_view.dart",
+        """
+import 'package:app/localization.dart';
+// TODO: keep this surgical
+void buildMenu() {
+  final text = LocaleKeys.menu.tr();
+  menuNotifierController.closeMenu();
+  ref.read(tabBrowserNotifierProvider.notifier).openInfo();
+  barrierDismissible: false;
+  onHide();
+}
+""",
+    )
+    out = tmp_path / "review"
+
+    result = CliRunner().invoke(
+        cli,
+        [
+            "patch-review",
+            "--project-path",
+            str(repo),
+            "--task",
+            "Review-only: keep patch surgical, close menu before transition actions, reuse existing openInfo path, do not edit generated files or lockfiles, keep policy logic out of UI/provider.",
+            "--output-dir",
+            str(out),
+            "--strict",
+        ],
+    )
+
+    assert result.exit_code == 0, result.output
+    summary = (out / "review_summary.md").read_text(encoding="utf-8")
+    constraints = json.loads((out / "constraints.json").read_text(encoding="utf-8"))
+    actionable = _section(summary, "Actionable PR checklist")
+    low = _section(summary, "Low-confidence / noisy signals")
+    unknown = _section(summary, "Unknown/manual review buckets")
+    quality = _section(summary, "Review summary quality")
+
+    assert "Review summary quality" in summary
+    assert "Generated files" in actionable or "generated artifacts" in actionable
+    assert "policy" in actionable.lower() or "provider" in actionable.lower()
+    assert "DogfoodMemoService" not in summary
+    assert "docs/research/docatlas-dogfood-v2/review-value-v2.md" not in actionable
+    assert "DogfoodTaskService" not in summary
+    assert "TODO" not in actionable
+    assert "package" not in actionable
+    assert "symbol `tr`" not in actionable
+    assert "symbol `onHide`" not in actionable
+    assert "symbol `barrierDismissible`" not in actionable
+    assert "low-confidence/noisy symbols hidden from checklist" in summary
+    assert "tr" in low or "barrierDismissible" in low or "onHide" in low
+    assert "bucket" in quality
+    assert "Source-of-truth ownership unknowns" in unknown or "Provider/UI policy ownership unknowns" in unknown
+    reasons = {item["reason"] for item in constraints["excluded_source_reasons"]}
+    assert "dogfood_result_memo" in reasons
+    assert "dogfood_task_artifact" in reasons

@@ -72,7 +72,7 @@ def test_patch_review_artifacts_are_excluded_but_normal_research_doc_remains(tmp
     assert any("constraints.md" in item["path"] for item in packet.excluded_source_reasons)
 
 
-def test_dogfood_task_description_remains_allowed(tmp_path: Path):
+def test_dogfood_task_description_is_excluded_as_review_artifact(tmp_path: Path):
     root = _nbo_like_fixture(tmp_path)
     _write(
         root / "docs/research/docatlas-dogfood-v3/foo/task.md",
@@ -82,7 +82,8 @@ def test_dogfood_task_description_remains_allowed(tmp_path: Path):
     packet = _packet(root, "Use safe task descriptions")
     payload = str(asdict(packet))
 
-    assert "DogfoodTaskService" in payload
+    assert "DogfoodTaskService" not in payload
+    assert any(item["reason"] == "dogfood_task_artifact" for item in packet.excluded_source_reasons)
 
 
 def test_method_call_symbol_grounding_prefers_final_meaningful_method(tmp_path: Path):

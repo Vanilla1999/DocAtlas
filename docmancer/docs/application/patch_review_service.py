@@ -11,6 +11,13 @@ from eval.task_level.artifact_hygiene import apply_patch_hygiene, is_runtime_art
 
 from docmancer.docs.service import LibraryDocsService
 
+LOW_VALUE_SYMBOLS = {
+    "package", "import", "export", "part", "TODO", "FIXME", "tr", "l10n",
+    "localization", "onHide", "onShow", "onTap", "onPressed",
+    "barrierDismissible", "context", "build", "Widget", "State",
+    "StatelessWidget", "StatefulWidget",
+}
+DOGFOOD_MEMO_REASONS = {"dogfood_result_memo", "dogfood_task_artifact"}
 
 class PatchReviewService:
     """Generate read-only patch review artifacts for a local project."""
@@ -158,12 +165,35 @@ class PatchReviewService:
         warnings = warnings or []
         untracked_files = untracked_files or []
         ignored_runtime_artifacts = ignored_runtime_artifacts or []
-        violations = [result for result in validation.get("results", []) if result.get("status") == "violated"]
-        unknowns = [result for result in validation.get("results", []) if result.get("status") == "unknown"]
+        constraint_items = list(constraints.get("constraints", []))
+        results = list(validation.get("results", []))
+        violations = [result for result in results if result.get("status") == "violated"]
+        unknowns = [result for result in results if result.get("status") == "unknown"]
         generated_or_lock = [
-            result for result in validation.get("results", [])
+            result for result in results
             if "generated" in str(result.get("reason", "")).lower() or "lockfile" in str(result.get("reason", "")).lower()
         ]
+        ranked_constraints = sorted(
+            constraint_items,
+            key=lambda item: PatchReviewService._summary_constraint_rank(item, changed_files, task),
+        )
+        actionable = [item for item in ranked_constraints if PatchReviewService._summary_bucket(item, changed_files, task) == "actionable"][:5]
+        manual_context = [item for item in ranked_constraints if PatchReviewService._summary_bucket(item, changed_files, task) == "manual"][:6]
+        low_context = [item for item in ranked_constraints if PatchReviewService._summary_bucket(item, changed_files, task) == "low"][:6]
+        symbol_candidates = list(constraints.get("symbol_candidates") or [])
+        useful_symbols = [item for item in symbol_candidates if not PatchReviewService._is_low_value_symbol_candidate(item, task)]
+        low_symbols = [item for item in symbol_candidates if PatchReviewService._is_low_value_symbol_candidate(item, task)]
+        unknown_buckets = PatchReviewService._unknown_buckets(unknowns, constraint_items)
+        excluded_sources = list(constraints.get("excluded_source_reasons") or [])
+        residual_memos = [item for item in excluded_sources if item.get("reason") in DOGFOOD_MEMO_REASONS]
+        quality = PatchReviewService._summary_quality(
+            actionable=actionable,
+            low_context=low_context,
+            low_symbols=low_symbols,
+            unknown_buckets=unknown_buckets,
+            residual_memos=residual_memos,
+        )
+
         lines = [
             "# Patch review summary",
             "",
@@ -174,10 +204,35 @@ class PatchReviewService:
             "## Changed files",
             *[f"- {path}" for path in changed_files],
             "",
-            "## Top constraints",
+            "## Review summary quality",
+            f"- attachable: {quality['attachable']}",
+            f"- actionable_items_count: {len(actionable)}",
+            f"- low_value_top_items_count: {len(low_context) + len(low_symbols)}",
+            f"- unknown_bucket_count: {len(unknown_buckets)}",
+            f"- residual_memo_source_count: {len(residual_memos)}",
         ]
-        for constraint in constraints.get("constraints", [])[:6]:
-            lines.append(f"- {constraint.get('instruction')} (source: `{constraint.get('source')}`)")
+        if quality["reasons"]:
+            lines.append("- reasons:")
+            lines.extend(f"  - {reason}" for reason in quality["reasons"])
+        lines.extend(["", "## Actionable PR checklist"])
+        lines.extend(
+            [f"- {item.get('instruction')} (source: `{item.get('source')}`)" for item in actionable]
+            or ["- none"]
+        )
+        lines.extend(["", "## Manual review context"])
+        lines.extend(
+            [f"- {item.get('instruction')} (source: `{item.get('source')}`)" for item in manual_context]
+            or ["- none"]
+        )
+        lines.extend(["", "## Low-confidence / noisy signals"])
+        lines.extend([f"- {item.get('instruction')} (source: `{item.get('source')}`)" for item in low_context] or [])
+        lines.extend(
+            [
+                f"- symbol `{item.get('matched_symbol')}` from `{item.get('source')}`: {item.get('reason')}"
+                for item in low_symbols[:6]
+            ]
+            or ["- none"]
+        )
         lines.extend([
             "",
             "## Validation",
@@ -188,20 +243,36 @@ class PatchReviewService:
             "## Violations",
         ])
         lines.extend([f"- {item.get('constraint_id')}: {item.get('reason')}" for item in violations] or ["- none"])
-        lines.extend(["", "## Unknown/manual review"])
-        lines.extend([f"- {item.get('constraint_id')}: {item.get('reason')}" for item in unknowns[:8]] or ["- none"])
+        lines.extend(["", "## Unknown/manual review buckets"])
+        if unknown_buckets:
+            for name, items in unknown_buckets.items():
+                lines.append(f"- {name}: {len(items)}")
+                for item in items[:2]:
+                    lines.append(f"  - {item.get('constraint_id')}: {item.get('reason')}")
+        else:
+            lines.append("- none")
         lines.extend(["", "## Generated/lockfile checks"])
         lines.extend([f"- {item.get('constraint_id')}: {item.get('status')} — {item.get('reason')}" for item in generated_or_lock] or ["- none"])
+        if constraints.get("symbol_candidates"):
+            lines.extend(["", "## Source-of-truth / symbol notes"])
+            if useful_symbols:
+                for candidate in useful_symbols[:8]:
+                    lines.append(f"- `{candidate.get('term')}` -> `{candidate.get('matched_symbol')}` (`{candidate.get('source')}`)")
+            if low_symbols:
+                lines.append("- low-confidence/noisy symbols hidden from checklist:")
+                lines.extend(f"  - `{candidate.get('matched_symbol')}` (`{candidate.get('source')}`)" for candidate in low_symbols[:6])
+        if excluded_sources:
+            lines.extend(["", "## Excluded or ignored sources"])
+            for item in excluded_sources[:12]:
+                lines.append(f"- {item.get('reason')}: `{item.get('path')}`")
+            if len(excluded_sources) > 12:
+                lines.append(f"- ... {len(excluded_sources) - 12} more excluded source(s)")
         if untracked_files:
             lines.extend(["", "## Untracked files"])
             lines.extend(f"- {path}" for path in untracked_files)
         if ignored_runtime_artifacts:
             lines.extend(["", "## Ignored runtime/cache artifacts"])
             lines.extend(f"- {path}" for path in ignored_runtime_artifacts[:20])
-        if constraints.get("symbol_candidates"):
-            lines.extend(["", "## Source-of-truth / symbol notes"])
-            for candidate in constraints["symbol_candidates"][:8]:
-                lines.append(f"- `{candidate.get('term')}` -> `{candidate.get('matched_symbol')}` (`{candidate.get('source')}`)")
         if constraints.get("warnings") or validation.get("warnings") or warnings:
             lines.extend(["", "## Warnings"])
             lines.extend(f"- {warning}" for warning in warnings)
@@ -215,3 +286,127 @@ class PatchReviewService:
             "- This artifact does not claim broad DocAtlas superiority.",
         ])
         return "\n".join(lines) + "\n"
+
+    @staticmethod
+    def _summary_constraint_rank(item: dict[str, Any], changed_files: list[str], task: str) -> tuple[int, int, str]:
+        source = str(item.get("source") or "")
+        instruction = str(item.get("instruction") or "")
+        evidence = str(item.get("evidence") or "")
+        ctype = str(item.get("type") or "")
+        confidence = str(item.get("confidence") or "low")
+        haystack = f"{instruction} {evidence} {' '.join(item.get('symbols') or [])}".lower()
+        changed = " ".join(changed_files).lower()
+        task_lower = task.lower()
+        priority = 50
+        if ctype in {"generated_file", "forbidden_edit"} or "generated" in haystack or "lockfile" in haystack:
+            priority = min(priority, 10)
+        if any(path and path.lower() in source.lower() for path in changed_files):
+            priority = min(priority, 15)
+        if any(token in haystack for token in PatchReviewService._task_symbol_tokens(task_lower)):
+            priority = min(priority, 20)
+        if "policy" in task_lower and ("provider" in haystack or "policy" in haystack or "ui" in haystack):
+            priority = min(priority, 22)
+        if source.startswith("docs/research/docatlas-dogfood"):
+            priority = max(priority, 80)
+        if PatchReviewService._is_broad_context_source(source, instruction):
+            priority = max(priority, 60)
+        confidence_rank = {"high": 0, "medium": 1, "low": 2}.get(confidence, 3)
+        if source and source.lower() in changed:
+            priority -= 3
+        return (priority, confidence_rank, str(item.get("id") or ""))
+
+    @staticmethod
+    def _summary_bucket(item: dict[str, Any], changed_files: list[str], task: str) -> str:
+        rank = PatchReviewService._summary_constraint_rank(item, changed_files, task)[0]
+        source = str(item.get("source") or "")
+        confidence = str(item.get("confidence") or "low")
+        if source.startswith("docs/research/docatlas-dogfood") or rank >= 75 or confidence == "low":
+            return "low"
+        if rank <= 25:
+            return "actionable"
+        return "manual"
+
+    @staticmethod
+    def _task_symbol_tokens(task_lower: str) -> set[str]:
+        tokens = set()
+        for token in ("openinfo", "closemenu", "gotoscandocinit", "generated", "lockfile", "provider", "policy"):
+            if token.lower() in task_lower:
+                tokens.add(token.lower())
+        if "быстрая информация" in task_lower or "quick-info" in task_lower or "quick info" in task_lower:
+            tokens.add("openinfo")
+        if "закры" in task_lower or "close menu" in task_lower or "штор" in task_lower:
+            tokens.add("closemenu")
+        if "scan" in task_lower or "скан" in task_lower:
+            tokens.add("gotoscandocinit")
+        return tokens
+
+    @staticmethod
+    def _is_low_value_symbol_candidate(item: dict[str, Any], task: str) -> bool:
+        symbol = str(item.get("matched_symbol") or "")
+        term = str(item.get("term") or "")
+        task_lower = task.lower()
+        if symbol in LOW_VALUE_SYMBOLS or symbol.lower() in {value.lower() for value in LOW_VALUE_SYMBOLS}:
+            explicit = symbol.lower() in task_lower or term.lower() in task_lower
+            return not explicit
+        evidence = str(item.get("evidence") or "").strip()
+        if evidence.startswith(("import ", "export ", "part ")):
+            return True
+        return False
+
+    @staticmethod
+    def _is_broad_context_source(source: str, instruction: str) -> bool:
+        lowered = f"{source} {instruction}".lower()
+        return (
+            "external_oidc" in lowered
+            or "rules that must not be violated" in lowered
+            or "mainscreen owns global runtime" in lowered
+        )
+
+    @staticmethod
+    def _unknown_buckets(unknowns: list[dict[str, Any]], constraints: list[dict[str, Any]]) -> dict[str, list[dict[str, Any]]]:
+        by_id = {item.get("id"): item for item in constraints}
+        buckets: dict[str, list[dict[str, Any]]] = {}
+        for item in unknowns:
+            constraint = by_id.get(item.get("constraint_id"), {})
+            source = str(constraint.get("source") or "")
+            reason = str(item.get("reason") or "")
+            text = f"{item.get('constraint_id')} {reason} {source}".lower()
+            if source.startswith("docs/research/docatlas-dogfood"):
+                bucket = "Residual dogfood/research memo context"
+            elif "source-of-truth" in text or "source_of_truth" in text or "ownership" in text or "owns" in text:
+                bucket = "Source-of-truth ownership unknowns"
+            elif "provider" in text or "ui" in text or "policy" in text or "presentation" in text:
+                bucket = "Provider/UI policy ownership unknowns"
+            elif "generated" in text or "lockfile" in text or "protected" in text:
+                bucket = "Generated/lockfile/protected-file unknowns"
+            elif "module" in text or "boundary" in text or "route" in text or "scan_doc" in text or "architecture" in text:
+                bucket = "Module-boundary context unknowns"
+            else:
+                bucket = "Other low-confidence context"
+            buckets.setdefault(bucket, []).append(item)
+        return dict(sorted(buckets.items()))
+
+    @staticmethod
+    def _summary_quality(
+        *,
+        actionable: list[dict[str, Any]],
+        low_context: list[dict[str, Any]],
+        low_symbols: list[dict[str, Any]],
+        unknown_buckets: dict[str, list[dict[str, Any]]],
+        residual_memos: list[dict[str, Any]],
+    ) -> dict[str, Any]:
+        reasons: list[str] = []
+        if len(actionable) < 3:
+            reasons.append(f"only {len(actionable)} actionable checklist item(s)")
+        if low_context or low_symbols:
+            reasons.append(f"{len(low_context) + len(low_symbols)} low-confidence/noisy signal(s) kept outside checklist")
+        if unknown_buckets:
+            reasons.append(f"unknowns collapsed into {len(unknown_buckets)} bucket(s)")
+        if residual_memos:
+            reasons.append(f"{len(residual_memos)} residual dogfood memo source(s) excluded/demoted")
+        attachable = "yes"
+        if len(actionable) < 3 or len(unknown_buckets) > 5:
+            attachable = "no"
+        elif low_context or low_symbols or residual_memos or unknown_buckets:
+            attachable = "maybe"
+        return {"attachable": attachable, "reasons": reasons}

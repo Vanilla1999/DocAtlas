@@ -55,6 +55,7 @@ PATCH_REVIEW_ARTIFACT_NAMES = {
     "review_notes.md",
     "checks.txt",
 }
+DOGFOOD_TASK_ARTIFACT_NAMES = {"task.md", "review_notes.md"}
 GENERIC_CALL_SYMBOLS = {
     "read", "watch", "of", "push", "pop", "map", "where", "firstWhere",
     "maybeWhen", "when", "setState",
@@ -231,6 +232,8 @@ class PatchConstraintsService:
                 if excluded_reason in {
                     "patch_review_output",
                     "dogfood_generated_artifact",
+                    "dogfood_result_memo",
+                    "dogfood_task_artifact",
                     "eval_result_artifact",
                     "docatlas_internal_output",
                 }:
@@ -264,9 +267,16 @@ class PatchConstraintsService:
             return "patch_review_output"
         if parts_list[:2] in ([".docatlas", "patch-review"], [".docmancer", "patch-review"]):
             return "patch_review_output"
-        if name in PATCH_REVIEW_ARTIFACT_NAMES and (
-            "docs" in parts and "research" in parts and any(part.startswith("docatlas-dogfood") for part in parts_list)
-        ):
+        in_dogfood_research = (
+            "docs" in parts
+            and "research" in parts
+            and any(part.startswith("docatlas-dogfood") for part in parts_list)
+        )
+        if in_dogfood_research and (fnmatch.fnmatch(name, "review-value*.md") or name == "baseline.md"):
+            return "dogfood_result_memo"
+        if in_dogfood_research and name in DOGFOOD_TASK_ARTIFACT_NAMES:
+            return "dogfood_task_artifact"
+        if name in PATCH_REVIEW_ARTIFACT_NAMES and in_dogfood_research:
             return "dogfood_generated_artifact"
         if normalized.startswith("docs/research/docatlas-dogfood") and name in PATCH_REVIEW_ARTIFACT_NAMES:
             return "dogfood_generated_artifact"
