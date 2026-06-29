@@ -601,3 +601,52 @@ def test_patch_review_summary_uses_generic_task_terms_without_project_hardcoding
     assert "launchCheckoutFlow" in actionable
     assert "broad architecture" not in actionable.lower()
     assert "broad architecture" in manual.lower()
+
+
+
+def test_patch_review_summary_puts_violations_first_even_when_broad_context():
+    summary = PatchReviewService._review_summary(
+        "Review current patch",
+        ["lib/widget.dart"],
+        {
+            "constraints": [
+                {
+                    "id": "broad-violated",
+                    "type": "architecture",
+                    "instruction": "Broad architecture rule was violated and needs reviewer action.",
+                    "source": "docs/architecture.md",
+                    "confidence": "medium",
+                    "evidence": "Rules that must not be violated.",
+                    "symbols": [],
+                    "files": [],
+                },
+                {
+                    "id": "generated-guardrail",
+                    "type": "generated_file",
+                    "instruction": "Generated files must not be edited by hand.",
+                    "source": "docs/architecture.md",
+                    "confidence": "high",
+                    "evidence": "Generated files must not be edited by hand.",
+                    "symbols": [],
+                    "files": [],
+                },
+            ],
+            "symbol_candidates": [],
+            "excluded_source_reasons": [],
+        },
+        {
+            "satisfied": 0,
+            "violated": 1,
+            "unknown": 0,
+            "results": [
+                {"constraint_id": "broad-violated", "status": "violated", "reason": "policy code changed in UI", "files": ["lib/widget.dart"]}
+            ],
+            "warnings": [],
+        },
+        summary_max_items=2,
+    )
+
+    actionable_items = [line for line in _section(summary, "Actionable PR checklist").splitlines() if line.startswith("- ")]
+    assert actionable_items[0].startswith("- Broad architecture rule was violated")
+    assert "Generated files must not be edited" in actionable_items[1]
+    assert "broad-violated: policy code changed in UI" in _section(summary, "Violations")

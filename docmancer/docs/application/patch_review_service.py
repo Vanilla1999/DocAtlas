@@ -202,7 +202,14 @@ class PatchReviewService:
             constraint_items,
             key=lambda item: PatchReviewService._summary_constraint_rank(item, changed_files, task),
         )
-        actionable = [item for item in ranked_constraints if PatchReviewService._summary_bucket(item, changed_files, task) == "actionable"][:summary_max_items]
+        constraints_by_id = {str(item.get("id") or ""): item for item in constraint_items}
+        violation_constraints = [
+            constraints_by_id[str(item.get("constraint_id") or "")]
+            for item in violations
+            if str(item.get("constraint_id") or "") in constraints_by_id
+        ]
+        actionable_candidates = [item for item in ranked_constraints if PatchReviewService._summary_bucket(item, changed_files, task) == "actionable"]
+        actionable = PatchReviewService._dedupe_constraints([*violation_constraints, *actionable_candidates])[:summary_max_items]
         manual_limit = 12 if summary_mode == "verbose" else 6
         low_limit = 12 if summary_mode == "verbose" else 6
         symbol_limit = 16 if summary_mode == "verbose" else 8
@@ -368,6 +375,18 @@ class PatchReviewService:
         if rank <= 25:
             return "actionable"
         return "manual"
+
+    @staticmethod
+    def _dedupe_constraints(items: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        seen: set[str] = set()
+        deduped: list[dict[str, Any]] = []
+        for item in items:
+            key = str(item.get("id") or item.get("instruction") or "")
+            if key in seen:
+                continue
+            seen.add(key)
+            deduped.append(item)
+        return deduped
 
     @staticmethod
     def _task_symbol_tokens(task_lower: str) -> set[str]:
