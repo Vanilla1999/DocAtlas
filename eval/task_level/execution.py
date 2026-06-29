@@ -38,6 +38,7 @@ DOCATLAS_CONDITIONS = {
     "docatlas_context_injected",
     "docatlas_action_checklist_injected",
     "docatlas_patch_constraints_injected",
+    "docatlas_patch_constraints_workflow",
     "docatlas_action_checklist_only",
     "docatlas_tool_required_once",
 }
@@ -223,6 +224,7 @@ def evaluate_agent_patch(task: TaskSpec, workspace: Path, run_output_dir: Path, 
         diff_text=patch_path.read_text(encoding="utf-8", errors="replace") if patch_path.exists() else "",
         checks_run=[task.test_command] if public else [],
     ) if patch_packet else {"constraint_validation": {"total_constraints": 0, "satisfied": 0, "violated": 0, "unknown": 0, "violations": []}}
+    (run_output_dir / "validation.json").write_text(json.dumps(constraint_validation, indent=2, sort_keys=True), encoding="utf-8")
     public_passed = bool(public and public.passed)
     hidden_passed = bool(hidden and hidden.passed)
     compile_success = bool(compile_result and compile_result.passed)
@@ -587,7 +589,7 @@ def inject_action_checklist(task: TaskSpec, workspace: Path, output_dir: Path) -
 def inject_patch_constraints(task: TaskSpec, workspace: Path, output_dir: Path) -> dict[str, Any]:
     started = time.monotonic()
     response_path = output_dir / "docatlas_response.json"
-    policy = CONDITIONS["docatlas_patch_constraints_injected"].tool_policy
+    policy = CONDITIONS["docatlas_patch_constraints_workflow"].tool_policy
     try:
         response = json.loads(response_path.read_text(encoding="utf-8")) if response_path.exists() else {}
         packet = build_patch_constraint_packet(
@@ -599,6 +601,9 @@ def inject_patch_constraints(task: TaskSpec, workspace: Path, output_dir: Path) 
             max_tokens=policy.max_constraint_packet_tokens,
         )
         save_patch_constraint_packet(packet, output_dir)
+        # Stable artifact names for the targeted patch-constraints workflow.
+        (output_dir / "constraints.json").write_text((output_dir / "patch_constraints.json").read_text(encoding="utf-8"), encoding="utf-8")
+        (output_dir / "constraints.md").write_text((output_dir / "patch_constraints.md").read_text(encoding="utf-8"), encoding="utf-8")
     except Exception as exc:
         payload = {"status": "condition_setup_failed", "error": repr(exc), "wall_time_seconds": round(time.monotonic() - started, 4)}
         (output_dir / "patch_constraints_injection.json").write_text(json.dumps(payload, indent=2, sort_keys=True), encoding="utf-8")

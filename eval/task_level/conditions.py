@@ -105,6 +105,19 @@ CONDITIONS: dict[str, Condition] = {
             max_sources=8,
         ),
     ),
+    "docatlas_patch_constraints_workflow": Condition(
+        condition_id="docatlas_patch_constraints_workflow",
+        label="H2 - DocAtlas patch constraints workflow",
+        tool_policy=ToolPolicy(
+            allow_docatlas=True,
+            docatlas_response_style="snippet-first",
+            preindex=True,
+            inject_patch_constraints=True,
+            max_constraint_packet_tokens=1200,
+            max_constraints=12,
+            max_sources=8,
+        ),
+    ),
     "docatlas_action_checklist_only": Condition(
         condition_id="docatlas_action_checklist_only",
         label="H - DocAtlas action checklist only",

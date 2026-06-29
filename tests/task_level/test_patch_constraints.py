@@ -113,6 +113,8 @@ def test_patch_constraints_condition_writes_artifacts(tmp_path: Path):
 
     assert (output_dir / "patch_constraints.json").exists()
     assert (output_dir / "patch_constraints.md").exists()
+    assert (output_dir / "constraints.json").exists()
+    assert (output_dir / "constraints.md").exists()
 
 
 def test_patch_constraints_condition_does_not_include_hidden_tests(tmp_path: Path):

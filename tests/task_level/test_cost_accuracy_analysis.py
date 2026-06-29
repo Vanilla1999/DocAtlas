@@ -35,6 +35,9 @@ def _row(
     context_used: bool = False,
     checklist_used: bool = False,
     forbidden_changes: list[str] | None = None,
+    constraint_violations_after_patch=None,
+    unknown_count=None,
+    constraint_used=False,
 ) -> dict:
     return {
         "run_id": run_id,
@@ -70,6 +73,10 @@ def _row(
             "generated_file_contract_score": None,
         },
         "forbidden_changes": forbidden_changes or [],
+        "constraint_validation": {"violated": constraint_violations_after_patch, "unknown": unknown_count},
+        "constraint_violations_after_patch": constraint_violations_after_patch,
+        "unknown_count": unknown_count,
+        "constraint_used": constraint_used,
     }
 
 
@@ -253,3 +260,27 @@ def test_constraint_packet_tokens_in_condition_metrics():
     ])
 
     assert metrics["docatlas_patch_constraints_injected"]["median_constraint_packet_tokens"] == 456
+
+
+def test_patch_constraints_metrics_in_condition_metrics(tmp_path: Path):
+    run_dir = tmp_path / "patch_constraints_targeted_pilot_001"
+    run_dir.mkdir()
+    _write_jsonl(run_dir / "runs.jsonl", [
+        _row(
+            condition_id="docatlas_patch_constraints_workflow",
+            constraint_violations_after_patch=2,
+            unknown_count=1,
+            constraint_used=True,
+        )
+    ])
+
+    records = parse_run_directory(run_dir).records
+    metrics = compute_condition_metrics(records)
+
+    assert records[0].constraint_violations_after_patch == 2
+    assert records[0].unknown_count == 1
+    assert records[0].constraint_used is True
+    assert metrics["docatlas_patch_constraints_workflow"]["constraint_violations_total"] == 2
+    assert metrics["docatlas_patch_constraints_workflow"]["constraint_violation_rate"] == 1.0
+    assert metrics["docatlas_patch_constraints_workflow"]["median_unknown_count"] == 1
+    assert metrics["docatlas_patch_constraints_workflow"]["constraint_used_rate"] == 1.0

@@ -15,6 +15,7 @@ ConditionId = Literal[
     "docatlas_context_injected",
     "docatlas_action_checklist_injected",
     "docatlas_patch_constraints_injected",
+    "docatlas_patch_constraints_workflow",
     "docatlas_action_checklist_only",
     "docatlas_tool_required_once",
     "docatlas_zero_setup",
