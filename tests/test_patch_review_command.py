@@ -56,7 +56,7 @@ def test_patch_review_command_writes_expected_artifacts(tmp_path: Path):
     )
 
     assert result.exit_code == 0, result.output
-    for name in ["constraints.json", "constraints.md", "changed_files.json", "untracked_files.json", "ignored_runtime_artifacts.json", "patch_hygiene.json", "patch.diff", "validation.json", "review_summary_quality.json", "review_summary.md"]:
+    for name in ["constraints.json", "constraints.md", "changed_files.json", "untracked_files.json", "ignored_runtime_artifacts.json", "patch_hygiene.json", "patch.diff", "validation.json", "review_summary_actions.json", "review_summary_quality.json", "review_summary.md"]:
         assert (out / name).exists()
     validation = json.loads((out / "validation.json").read_text(encoding="utf-8"))
     assert "violated" in validation
@@ -608,6 +608,52 @@ def test_patch_review_writes_machine_readable_summary_quality(tmp_path: Path):
     ]
     assert f"- attachable: {quality['attachable']}" in summary_quality
     assert f"- actionable_items_count: {quality['actionable_items_count']}" in summary_quality
+
+
+def test_patch_review_writes_machine_readable_action_items(tmp_path: Path):
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    subprocess.run(["git", "init"], cwd=repo, check=True, stdout=subprocess.DEVNULL)
+    _write(repo / "docs/architecture.md", "Generated files must not be edited by hand. Checkout buttons call launchCheckoutFlow before navigation.\n")
+    _write(repo / "lib/payments/checkout_button.dart", "void renderCheckout() {}\n")
+    subprocess.run(["git", "add", "."], cwd=repo, check=True, stdout=subprocess.DEVNULL)
+    subprocess.run(["git", "commit", "-m", "initial"], cwd=repo, check=True, stdout=subprocess.DEVNULL)
+    _write(repo / "lib/payments/checkout_button.dart", "void renderCheckout() { launchCheckoutFlow(); }\n")
+    out = tmp_path / "review-actions"
+
+    result = CliRunner().invoke(
+        cli,
+        [
+            "patch-review",
+            "--project-path",
+            str(repo),
+            "--task",
+            "Review checkout launch action",
+            "--summary-max-items",
+            "2",
+            "--output-dir",
+            str(out),
+            "--format",
+            "json",
+        ],
+    )
+
+    assert result.exit_code == 0, result.output
+    payload = json.loads(result.output)
+    actions = json.loads((out / "review_summary_actions.json").read_text(encoding="utf-8"))
+    actionable_markdown = _section((out / "review_summary.md").read_text(encoding="utf-8"), "Actionable PR checklist")
+    assert "review_summary_actions.json" in payload["artifacts"]
+    assert payload["review_summary_actions"] == actions
+    assert actions["schema_version"] == 1
+    assert actions["actionable_items_limit"] == 2
+    assert 0 < len(actions["actionable_items"]) <= 2
+    assert any(item["instruction"] in actionable_markdown for item in actions["actionable_items"])
+    assert all(item["constraint_id"] for item in actions["actionable_items"])
+    assert actions["claims_avoided"] == [
+        "correctness_proof",
+        "test_or_human_review_replacement",
+        "broad_docatlas_superiority",
+    ]
 
 
 

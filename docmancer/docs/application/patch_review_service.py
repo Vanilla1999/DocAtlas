@@ -94,6 +94,14 @@ class PatchReviewService:
             summary_max_items=summary_max_items,
             summary_mode=summary_mode,
         )
+        actions_payload = self._review_summary_actions_payload(
+            task,
+            changed,
+            constraints_dict,
+            validation_dict,
+            summary_max_items=summary_max_items,
+            summary_mode=summary_mode,
+        )
         self._write_json(out / "constraints.json", constraints_dict)
         (out / "constraints.md").write_text(self._constraints_markdown(constraints_dict), encoding="utf-8")
         self._write_json(out / "changed_files.json", changed)
@@ -102,6 +110,7 @@ class PatchReviewService:
         self._write_json(out / "patch_hygiene.json", hygiene.to_json_dict())
         (out / "patch.diff").write_text(patch_diff, encoding="utf-8")
         self._write_json(out / "validation.json", validation_dict)
+        self._write_json(out / "review_summary_actions.json", actions_payload)
         self._write_json(out / "review_summary_quality.json", quality_payload)
         summary = self._review_summary(
             task,
@@ -123,6 +132,7 @@ class PatchReviewService:
             "warnings": warnings,
             "summary_max_items": summary_max_items,
             "summary_mode": summary_mode,
+            "review_summary_actions": actions_payload,
             "review_summary_quality": quality_payload,
             "constraints": constraints_dict,
             "validation": validation_dict,
@@ -135,6 +145,7 @@ class PatchReviewService:
                 "patch_hygiene.json",
                 "patch.diff",
                 "validation.json",
+                "review_summary_actions.json",
                 "review_summary_quality.json",
                 "review_summary.md",
             ],
@@ -240,6 +251,73 @@ class PatchReviewService:
                 "broad_docatlas_superiority",
             ],
         }
+
+    @staticmethod
+    def _review_summary_actions_payload(
+        task: str,
+        changed_files: list[str],
+        constraints: dict[str, Any],
+        validation: dict[str, Any],
+        *,
+        summary_max_items: int = 5,
+        summary_mode: str = "standard",
+    ) -> dict[str, Any]:
+        summary_mode = summary_mode.lower()
+        if summary_mode not in {"compact", "standard", "verbose"}:
+            raise ValueError(f"unsupported summary_mode: {summary_mode}")
+        constraint_items = list(constraints.get("constraints", []))
+        results = list(validation.get("results", []))
+        results_by_id = {str(item.get("constraint_id") or ""): item for item in results}
+        violations = [result for result in results if result.get("status") == "violated"]
+        ranked_constraints = sorted(
+            constraint_items,
+            key=lambda item: PatchReviewService._summary_constraint_rank(item, changed_files, task),
+        )
+        constraints_by_id = {str(item.get("id") or ""): item for item in constraint_items}
+        violation_constraints = [
+            constraints_by_id[str(item.get("constraint_id") or "")]
+            for item in violations
+            if str(item.get("constraint_id") or "") in constraints_by_id
+        ]
+        actionable_candidates = [item for item in ranked_constraints if PatchReviewService._summary_bucket(item, changed_files, task) == "actionable"]
+        actionable = PatchReviewService._dedupe_constraints([*violation_constraints, *actionable_candidates])[:summary_max_items]
+        return {
+            "schema_version": 1,
+            "summary_mode": summary_mode,
+            "actionable_items_limit": summary_max_items,
+            "actionable_items": [
+                PatchReviewService._actionable_item_payload(item, results_by_id.get(str(item.get("id") or "")))
+                for item in actionable
+            ],
+            "violations": [
+                {
+                    "constraint_id": item.get("constraint_id"),
+                    "reason": item.get("reason"),
+                    "files": item.get("files", []),
+                }
+                for item in violations
+            ],
+            "claims_avoided": [
+                "correctness_proof",
+                "test_or_human_review_replacement",
+                "broad_docatlas_superiority",
+            ],
+        }
+
+    @staticmethod
+    def _actionable_item_payload(item: dict[str, Any], result: dict[str, Any] | None) -> dict[str, Any]:
+        payload = {
+            "constraint_id": item.get("id"),
+            "instruction": item.get("instruction"),
+            "source": item.get("source"),
+            "type": item.get("type"),
+            "confidence": item.get("confidence"),
+        }
+        if result:
+            payload["validation_status"] = result.get("status")
+            payload["validation_reason"] = result.get("reason")
+            payload["files"] = result.get("files", [])
+        return payload
 
     @staticmethod
     def _constraints_markdown(packet: dict[str, Any]) -> str:
