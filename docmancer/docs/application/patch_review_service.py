@@ -500,6 +500,9 @@ class PatchReviewService:
     def _actionable_item_payload(item: dict[str, Any], result: dict[str, Any] | None, *, rank: int) -> dict[str, Any]:
         source = item.get("source")
         instruction = item.get("instruction")
+        evidence = item.get("evidence")
+        files = item.get("files") or []
+        symbols = item.get("symbols") or []
         payload = {
             "rank": rank,
             "constraint_id": item.get("id"),
@@ -507,7 +510,12 @@ class PatchReviewService:
             "source": source,
             "type": item.get("type"),
             "confidence": item.get("confidence"),
+            "evidence": evidence,
+            "source_files": files,
+            "symbols": symbols,
+            "files": files,
             "markdown": f"- {instruction} (source: `{source}`)",
+            "evidence_markdown": f"  - evidence: {evidence}" if evidence else None,
         }
         if result:
             payload["validation_status"] = result.get("status")

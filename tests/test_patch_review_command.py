@@ -654,6 +654,8 @@ def test_patch_review_writes_machine_readable_action_items(tmp_path: Path):
     assert all(item["constraint_id"] for item in actions["actionable_items"])
     assert [item["rank"] for item in actions["actionable_items"]] == list(range(1, len(actions["actionable_items"]) + 1))
     assert all(item["markdown"] in actionable_markdown for item in actions["actionable_items"])
+    assert any(item["evidence"] and item["evidence"] in item["evidence_markdown"] for item in actions["actionable_items"])
+    assert any("launchCheckoutFlow" in item["evidence"] for item in actions["actionable_items"] if item["evidence"])
     assert actions["claims_avoided"] == [
         "correctness_proof",
         "test_or_human_review_replacement",
@@ -781,7 +783,11 @@ def test_patch_review_machine_readable_artifact_contracts(tmp_path: Path):
             "source",
             "type",
             "confidence",
+            "evidence",
+            "source_files",
+            "symbols",
             "markdown",
+            "evidence_markdown",
         } <= set(item)
 
     assert {"schema_version", "summary_mode", "product_role", "claims_avoided", "artifacts"} <= set(manifest)
