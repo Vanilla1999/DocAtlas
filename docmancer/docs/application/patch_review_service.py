@@ -86,6 +86,14 @@ class PatchReviewService:
 
         constraints_dict = asdict(constraints)
         validation_dict = asdict(validation)
+        quality_payload = self._review_summary_quality_payload(
+            task,
+            changed,
+            constraints_dict,
+            validation_dict,
+            summary_max_items=summary_max_items,
+            summary_mode=summary_mode,
+        )
         self._write_json(out / "constraints.json", constraints_dict)
         (out / "constraints.md").write_text(self._constraints_markdown(constraints_dict), encoding="utf-8")
         self._write_json(out / "changed_files.json", changed)
@@ -94,6 +102,7 @@ class PatchReviewService:
         self._write_json(out / "patch_hygiene.json", hygiene.to_json_dict())
         (out / "patch.diff").write_text(patch_diff, encoding="utf-8")
         self._write_json(out / "validation.json", validation_dict)
+        self._write_json(out / "review_summary_quality.json", quality_payload)
         summary = self._review_summary(
             task,
             changed,
@@ -114,6 +123,7 @@ class PatchReviewService:
             "warnings": warnings,
             "summary_max_items": summary_max_items,
             "summary_mode": summary_mode,
+            "review_summary_quality": quality_payload,
             "constraints": constraints_dict,
             "validation": validation_dict,
             "artifacts": [
@@ -125,6 +135,7 @@ class PatchReviewService:
                 "patch_hygiene.json",
                 "patch.diff",
                 "validation.json",
+                "review_summary_quality.json",
                 "review_summary.md",
             ],
         }
@@ -153,6 +164,82 @@ class PatchReviewService:
     @staticmethod
     def _write_json(path: Path, payload: Any) -> None:
         path.write_text(json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True), encoding="utf-8")
+
+    @staticmethod
+    def _review_summary_quality_payload(
+        task: str,
+        changed_files: list[str],
+        constraints: dict[str, Any],
+        validation: dict[str, Any],
+        *,
+        summary_max_items: int = 5,
+        summary_mode: str = "standard",
+    ) -> dict[str, Any]:
+        summary_mode = summary_mode.lower()
+        if summary_mode not in {"compact", "standard", "verbose"}:
+            raise ValueError(f"unsupported summary_mode: {summary_mode}")
+        constraint_items = list(constraints.get("constraints", []))
+        results = list(validation.get("results", []))
+        violations = [result for result in results if result.get("status") == "violated"]
+        unknowns = [result for result in results if result.get("status") == "unknown"]
+        ranked_constraints = sorted(
+            constraint_items,
+            key=lambda item: PatchReviewService._summary_constraint_rank(item, changed_files, task),
+        )
+        constraints_by_id = {str(item.get("id") or ""): item for item in constraint_items}
+        violation_constraints = [
+            constraints_by_id[str(item.get("constraint_id") or "")]
+            for item in violations
+            if str(item.get("constraint_id") or "") in constraints_by_id
+        ]
+        actionable_candidates = [item for item in ranked_constraints if PatchReviewService._summary_bucket(item, changed_files, task) == "actionable"]
+        actionable = PatchReviewService._dedupe_constraints([*violation_constraints, *actionable_candidates])[:summary_max_items]
+        manual_limit = 12 if summary_mode == "verbose" else 6
+        low_limit = 12 if summary_mode == "verbose" else 6
+        manual_context = [item for item in ranked_constraints if PatchReviewService._summary_bucket(item, changed_files, task) == "manual"][:manual_limit]
+        low_context = [item for item in ranked_constraints if PatchReviewService._summary_bucket(item, changed_files, task) == "low"][:low_limit]
+        symbol_candidates = list(constraints.get("symbol_candidates") or [])
+        low_symbols = [item for item in symbol_candidates if PatchReviewService._is_low_value_symbol_candidate(item, task)]
+        unknown_buckets = PatchReviewService._unknown_buckets(unknowns, constraint_items)
+        excluded_sources = list(constraints.get("excluded_source_reasons") or [])
+        residual_memos = [item for item in excluded_sources if item.get("reason") in DOGFOOD_MEMO_REASONS]
+        quality = PatchReviewService._summary_quality(
+            actionable=actionable,
+            low_context=low_context,
+            low_symbols=low_symbols,
+            unknown_buckets=unknown_buckets,
+            residual_memos=residual_memos,
+        )
+        return {
+            "schema_version": 1,
+            "attachable": quality["attachable"],
+            "summary_mode": summary_mode,
+            "actionable_items_limit": summary_max_items,
+            "actionable_items_count": len(actionable),
+            "low_value_top_items_count": len(low_context) + len(low_symbols),
+            "unknown_bucket_count": len(unknown_buckets),
+            "residual_memo_source_count": len(residual_memos),
+            "satisfied_count": validation.get("satisfied", 0),
+            "violated_count": validation.get("violated", 0),
+            "unknown_count": validation.get("unknown", 0),
+            "reasons": quality["reasons"],
+            "unknown_buckets": [
+                {
+                    "name": name,
+                    "count": len(items),
+                    "examples": [
+                        {"constraint_id": item.get("constraint_id"), "reason": item.get("reason")}
+                        for item in items[:2]
+                    ],
+                }
+                for name, items in unknown_buckets.items()
+            ],
+            "claims_avoided": [
+                "correctness_proof",
+                "test_or_human_review_replacement",
+                "broad_docatlas_superiority",
+            ],
+        }
 
     @staticmethod
     def _constraints_markdown(packet: dict[str, Any]) -> str:

@@ -56,7 +56,7 @@ def test_patch_review_command_writes_expected_artifacts(tmp_path: Path):
     )
 
     assert result.exit_code == 0, result.output
-    for name in ["constraints.json", "constraints.md", "changed_files.json", "untracked_files.json", "ignored_runtime_artifacts.json", "patch_hygiene.json", "patch.diff", "validation.json", "review_summary.md"]:
+    for name in ["constraints.json", "constraints.md", "changed_files.json", "untracked_files.json", "ignored_runtime_artifacts.json", "patch_hygiene.json", "patch.diff", "validation.json", "review_summary_quality.json", "review_summary.md"]:
         assert (out / name).exists()
     validation = json.loads((out / "validation.json").read_text(encoding="utf-8"))
     assert "violated" in validation
@@ -560,6 +560,54 @@ def test_patch_review_summary_mode_is_exposed_in_json(tmp_path: Path):
     summary = (out / "review_summary.md").read_text()
     assert "- summary_mode: compact" in summary
     assert "## Manual review context" not in summary
+
+
+def test_patch_review_writes_machine_readable_summary_quality(tmp_path: Path):
+    repo = _repo(tmp_path)
+    _git(repo, "init")
+    _git(repo, "config", "user.email", "test@example.com")
+    _git(repo, "config", "user.name", "Test User")
+    _git(repo, "add", ".")
+    _git(repo, "commit", "-m", "base")
+    _write(repo / "lib/presentation/menu_view.dart", "void buildMenu() {\n  menuNotifier.closeMenu();\n}\n")
+    out = tmp_path / "review-quality"
+
+    result = CliRunner().invoke(
+        cli,
+        [
+            "patch-review",
+            "--project-path",
+            str(repo),
+            "--task",
+            "Review menu navigation",
+            "--summary-mode",
+            "compact",
+            "--summary-max-items",
+            "2",
+            "--output-dir",
+            str(out),
+            "--format",
+            "json",
+        ],
+    )
+
+    assert result.exit_code == 0, result.output
+    payload = json.loads(result.output)
+    quality = json.loads((out / "review_summary_quality.json").read_text(encoding="utf-8"))
+    summary_quality = _section((out / "review_summary.md").read_text(encoding="utf-8"), "Review summary quality")
+    assert "review_summary_quality.json" in payload["artifacts"]
+    assert payload["review_summary_quality"] == quality
+    assert quality["schema_version"] == 1
+    assert quality["summary_mode"] == "compact"
+    assert quality["actionable_items_limit"] == 2
+    assert quality["attachable"] in {"yes", "maybe", "no"}
+    assert quality["claims_avoided"] == [
+        "correctness_proof",
+        "test_or_human_review_replacement",
+        "broad_docatlas_superiority",
+    ]
+    assert f"- attachable: {quality['attachable']}" in summary_quality
+    assert f"- actionable_items_count: {quality['actionable_items_count']}" in summary_quality
 
 
 
