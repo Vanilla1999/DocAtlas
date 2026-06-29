@@ -177,7 +177,7 @@ class PatchReviewService:
         path.write_text(json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True), encoding="utf-8")
 
     @staticmethod
-    def _review_summary_quality_payload(
+    def _review_summary_model(
         task: str,
         changed_files: list[str],
         constraints: dict[str, Any],
@@ -193,6 +193,10 @@ class PatchReviewService:
         results = list(validation.get("results", []))
         violations = [result for result in results if result.get("status") == "violated"]
         unknowns = [result for result in results if result.get("status") == "unknown"]
+        generated_or_lock = [
+            result for result in results
+            if "generated" in str(result.get("reason", "")).lower() or "lockfile" in str(result.get("reason", "")).lower()
+        ]
         ranked_constraints = sorted(
             constraint_items,
             key=lambda item: PatchReviewService._summary_constraint_rank(item, changed_files, task),
@@ -207,9 +211,12 @@ class PatchReviewService:
         actionable = PatchReviewService._dedupe_constraints([*violation_constraints, *actionable_candidates])[:summary_max_items]
         manual_limit = 12 if summary_mode == "verbose" else 6
         low_limit = 12 if summary_mode == "verbose" else 6
+        symbol_limit = 16 if summary_mode == "verbose" else 8
+        excluded_limit = 24 if summary_mode == "verbose" else 12
         manual_context = [item for item in ranked_constraints if PatchReviewService._summary_bucket(item, changed_files, task) == "manual"][:manual_limit]
         low_context = [item for item in ranked_constraints if PatchReviewService._summary_bucket(item, changed_files, task) == "low"][:low_limit]
         symbol_candidates = list(constraints.get("symbol_candidates") or [])
+        useful_symbols = [item for item in symbol_candidates if not PatchReviewService._is_low_value_symbol_candidate(item, task)]
         low_symbols = [item for item in symbol_candidates if PatchReviewService._is_low_value_symbol_candidate(item, task)]
         unknown_buckets = PatchReviewService._unknown_buckets(unknowns, constraint_items)
         excluded_sources = list(constraints.get("excluded_source_reasons") or [])
@@ -221,6 +228,50 @@ class PatchReviewService:
             unknown_buckets=unknown_buckets,
             residual_memos=residual_memos,
         )
+        return {
+            "summary_mode": summary_mode,
+            "actionable": actionable,
+            "manual_context": manual_context,
+            "low_context": low_context,
+            "useful_symbols": useful_symbols,
+            "low_symbols": low_symbols,
+            "unknown_buckets": unknown_buckets,
+            "excluded_sources": excluded_sources,
+            "residual_memos": residual_memos,
+            "violations": violations,
+            "generated_or_lock": generated_or_lock,
+            "results_by_id": {str(item.get("constraint_id") or ""): item for item in results},
+            "quality": quality,
+            "symbol_limit": symbol_limit,
+            "low_limit": low_limit,
+            "excluded_limit": excluded_limit,
+        }
+
+    @staticmethod
+    def _review_summary_quality_payload(
+        task: str,
+        changed_files: list[str],
+        constraints: dict[str, Any],
+        validation: dict[str, Any],
+        *,
+        summary_max_items: int = 5,
+        summary_mode: str = "standard",
+    ) -> dict[str, Any]:
+        model = PatchReviewService._review_summary_model(
+            task,
+            changed_files,
+            constraints,
+            validation,
+            summary_max_items=summary_max_items,
+            summary_mode=summary_mode,
+        )
+        summary_mode = model["summary_mode"]
+        actionable = model["actionable"]
+        low_context = model["low_context"]
+        low_symbols = model["low_symbols"]
+        unknown_buckets = model["unknown_buckets"]
+        residual_memos = model["residual_memos"]
+        quality = model["quality"]
         return {
             "schema_version": 1,
             "attachable": quality["attachable"],
@@ -262,25 +313,18 @@ class PatchReviewService:
         summary_max_items: int = 5,
         summary_mode: str = "standard",
     ) -> dict[str, Any]:
-        summary_mode = summary_mode.lower()
-        if summary_mode not in {"compact", "standard", "verbose"}:
-            raise ValueError(f"unsupported summary_mode: {summary_mode}")
-        constraint_items = list(constraints.get("constraints", []))
-        results = list(validation.get("results", []))
-        results_by_id = {str(item.get("constraint_id") or ""): item for item in results}
-        violations = [result for result in results if result.get("status") == "violated"]
-        ranked_constraints = sorted(
-            constraint_items,
-            key=lambda item: PatchReviewService._summary_constraint_rank(item, changed_files, task),
+        model = PatchReviewService._review_summary_model(
+            task,
+            changed_files,
+            constraints,
+            validation,
+            summary_max_items=summary_max_items,
+            summary_mode=summary_mode,
         )
-        constraints_by_id = {str(item.get("id") or ""): item for item in constraint_items}
-        violation_constraints = [
-            constraints_by_id[str(item.get("constraint_id") or "")]
-            for item in violations
-            if str(item.get("constraint_id") or "") in constraints_by_id
-        ]
-        actionable_candidates = [item for item in ranked_constraints if PatchReviewService._summary_bucket(item, changed_files, task) == "actionable"]
-        actionable = PatchReviewService._dedupe_constraints([*violation_constraints, *actionable_candidates])[:summary_max_items]
+        summary_mode = model["summary_mode"]
+        actionable = model["actionable"]
+        violations = model["violations"]
+        results_by_id = model["results_by_id"]
         return {
             "schema_version": 1,
             "summary_mode": summary_mode,
@@ -349,51 +393,32 @@ class PatchReviewService:
         summary_max_items: int = 5,
         summary_mode: str = "standard",
     ) -> str:
-        summary_mode = summary_mode.lower()
-        if summary_mode not in {"compact", "standard", "verbose"}:
-            raise ValueError(f"unsupported summary_mode: {summary_mode}")
+        model = PatchReviewService._review_summary_model(
+            task,
+            changed_files,
+            constraints,
+            validation,
+            summary_max_items=summary_max_items,
+            summary_mode=summary_mode,
+        )
+        summary_mode = model["summary_mode"]
         warnings = warnings or []
         untracked_files = untracked_files or []
         ignored_runtime_artifacts = ignored_runtime_artifacts or []
-        constraint_items = list(constraints.get("constraints", []))
-        results = list(validation.get("results", []))
-        violations = [result for result in results if result.get("status") == "violated"]
-        unknowns = [result for result in results if result.get("status") == "unknown"]
-        generated_or_lock = [
-            result for result in results
-            if "generated" in str(result.get("reason", "")).lower() or "lockfile" in str(result.get("reason", "")).lower()
-        ]
-        ranked_constraints = sorted(
-            constraint_items,
-            key=lambda item: PatchReviewService._summary_constraint_rank(item, changed_files, task),
-        )
-        constraints_by_id = {str(item.get("id") or ""): item for item in constraint_items}
-        violation_constraints = [
-            constraints_by_id[str(item.get("constraint_id") or "")]
-            for item in violations
-            if str(item.get("constraint_id") or "") in constraints_by_id
-        ]
-        actionable_candidates = [item for item in ranked_constraints if PatchReviewService._summary_bucket(item, changed_files, task) == "actionable"]
-        actionable = PatchReviewService._dedupe_constraints([*violation_constraints, *actionable_candidates])[:summary_max_items]
-        manual_limit = 12 if summary_mode == "verbose" else 6
-        low_limit = 12 if summary_mode == "verbose" else 6
-        symbol_limit = 16 if summary_mode == "verbose" else 8
-        excluded_limit = 24 if summary_mode == "verbose" else 12
-        manual_context = [item for item in ranked_constraints if PatchReviewService._summary_bucket(item, changed_files, task) == "manual"][:manual_limit]
-        low_context = [item for item in ranked_constraints if PatchReviewService._summary_bucket(item, changed_files, task) == "low"][:low_limit]
-        symbol_candidates = list(constraints.get("symbol_candidates") or [])
-        useful_symbols = [item for item in symbol_candidates if not PatchReviewService._is_low_value_symbol_candidate(item, task)]
-        low_symbols = [item for item in symbol_candidates if PatchReviewService._is_low_value_symbol_candidate(item, task)]
-        unknown_buckets = PatchReviewService._unknown_buckets(unknowns, constraint_items)
-        excluded_sources = list(constraints.get("excluded_source_reasons") or [])
-        residual_memos = [item for item in excluded_sources if item.get("reason") in DOGFOOD_MEMO_REASONS]
-        quality = PatchReviewService._summary_quality(
-            actionable=actionable,
-            low_context=low_context,
-            low_symbols=low_symbols,
-            unknown_buckets=unknown_buckets,
-            residual_memos=residual_memos,
-        )
+        violations = model["violations"]
+        generated_or_lock = model["generated_or_lock"]
+        actionable = model["actionable"]
+        manual_context = model["manual_context"]
+        low_context = model["low_context"]
+        symbol_limit = model["symbol_limit"]
+        low_limit = model["low_limit"]
+        excluded_limit = model["excluded_limit"]
+        useful_symbols = model["useful_symbols"]
+        low_symbols = model["low_symbols"]
+        unknown_buckets = model["unknown_buckets"]
+        excluded_sources = model["excluded_sources"]
+        residual_memos = model["residual_memos"]
+        quality = model["quality"]
 
         lines = [
             "# Patch review summary",
