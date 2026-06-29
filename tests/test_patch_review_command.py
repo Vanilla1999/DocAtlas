@@ -6,6 +6,7 @@ from pathlib import Path
 from click.testing import CliRunner
 
 from docmancer.cli.__main__ import cli
+from docmancer.docs.application.patch_review_service import PatchReviewService
 from docmancer.docs.application.patch_constraints_service import PatchConstraintsService
 from docmancer.docs.service import LibraryDocsService
 
@@ -240,3 +241,138 @@ void buildMenu() {
     reasons = {item["reason"] for item in constraints["excluded_source_reasons"]}
     assert "dogfood_result_memo" in reasons
     assert "dogfood_task_artifact" in reasons
+
+
+def test_patch_review_summary_sections_stay_ordered_without_full_markdown_snapshot():
+    summary = PatchReviewService._review_summary(
+        "Review changed-file-local menu action and keep policy out of UI/provider",
+        ["lib/presentation/menu_view.dart"],
+        {
+            "constraints": [
+                {
+                    "id": "generated-guardrail",
+                    "type": "generated_file",
+                    "instruction": "Generated files must not be edited by hand.",
+                    "source": "docs/architecture.md",
+                    "confidence": "high",
+                    "evidence": "Generated files must not be edited by hand.",
+                    "symbols": [],
+                    "files": [],
+                },
+                {
+                    "id": "menu-local",
+                    "type": "source_of_truth",
+                    "instruction": "Reuse the changed-file-local closeMenu action before transitions.",
+                    "source": "lib/presentation/menu_view.dart",
+                    "confidence": "medium",
+                    "evidence": "menuNotifierController.closeMenu();",
+                    "symbols": ["closeMenu"],
+                    "files": ["lib/presentation/menu_view.dart"],
+                },
+                {
+                    "id": "provider-policy",
+                    "type": "architecture",
+                    "instruction": "Provider/UI code must keep policy decisions out of the menu view.",
+                    "source": "docs/architecture.md",
+                    "confidence": "high",
+                    "evidence": "Provider/UI code must delegate policy decisions.",
+                    "symbols": [],
+                    "files": [],
+                },
+            ],
+            "symbol_candidates": [
+                {"term": "tr", "matched_symbol": "tr", "source": "lib/presentation/menu_view.dart", "reason": "identifier match", "evidence": "LocaleKeys.menu.tr();"}
+            ],
+            "excluded_source_reasons": [
+                {"path": "docs/research/docatlas-dogfood-v4/review-value-v4.md", "reason": "dogfood_result_memo"}
+            ],
+        },
+        {
+            "satisfied": 1,
+            "violated": 0,
+            "unknown": 1,
+            "results": [
+                {"constraint_id": "menu-local", "status": "unknown", "reason": "provider/UI policy ownership needs review", "files": []}
+            ],
+            "warnings": [],
+        },
+    )
+    expected_order = [
+        "## Changed files",
+        "## Review summary quality",
+        "## Actionable PR checklist",
+        "## Manual review context",
+        "## Low-confidence / noisy signals",
+        "## Validation",
+        "## Violations",
+        "## Unknown/manual review buckets",
+        "## Generated/lockfile checks",
+        "## Source-of-truth / symbol notes",
+        "## Excluded or ignored sources",
+        "## Claims avoided",
+    ]
+
+    positions = [summary.index(section) for section in expected_order]
+    assert positions == sorted(positions)
+    assert "- attachable: maybe" in summary
+    assert "- unknown_bucket_count: 1" in summary
+    assert "- residual_memo_source_count: 1" in summary
+    assert "symbol `tr`" in _section(summary, "Low-confidence / noisy signals")
+    assert "symbol `tr`" not in _section(summary, "Actionable PR checklist")
+
+
+def test_patch_review_summary_quality_can_be_yes_or_no_without_raw_data_loss():
+    yes_summary = PatchReviewService._review_summary(
+        "Review generated-file guardrails",
+        ["lib/presentation/menu_view.dart"],
+        {
+            "constraints": [
+                {
+                    "id": f"guardrail-{index}",
+                    "type": "generated_file",
+                    "instruction": f"Generated/lockfile guardrail {index} must hold.",
+                    "source": "docs/architecture.md",
+                    "confidence": "high",
+                    "evidence": "Generated files must not be edited by hand.",
+                    "symbols": [],
+                    "files": [],
+                }
+                for index in range(3)
+            ],
+            "symbol_candidates": [],
+            "excluded_source_reasons": [],
+        },
+        {"satisfied": 3, "violated": 0, "unknown": 0, "results": [], "warnings": []},
+    )
+    no_summary = PatchReviewService._review_summary(
+        "Review broad context only",
+        ["lib/presentation/menu_view.dart"],
+        {
+            "constraints": [
+                {
+                    "id": "broad-context",
+                    "type": "architecture",
+                    "instruction": "Rules that must not be violated live in broad docs.",
+                    "source": "docs/architecture.md",
+                    "confidence": "medium",
+                    "evidence": "Rules that must not be violated.",
+                    "symbols": [],
+                    "files": [],
+                }
+            ],
+            "symbol_candidates": [],
+            "excluded_source_reasons": [],
+        },
+        {
+            "satisfied": 0,
+            "violated": 0,
+            "unknown": 1,
+            "results": [{"constraint_id": "broad-context", "status": "unknown", "reason": "manual review required", "files": []}],
+            "warnings": [],
+        },
+    )
+
+    assert "- attachable: yes" in yes_summary
+    assert "- attachable: no" in no_summary
+    assert "- unknown/manual review: 1" in no_summary
+    assert "broad-context: manual review required" in no_summary
