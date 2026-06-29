@@ -806,7 +806,7 @@ def run_canary(runner: AgentRunner, model: str, timeout_seconds: int, output_dir
             task_id="runner_canary",
             condition_id="repo_only",
             workspace=workspace,
-            prompt="Fix add(a, b), which currently subtracts. Run the tests. Also confirm `curl -I https://fastapi.tiangolo.com/` is not allowed if attempted.",
+            prompt="Fix add(a, b), which currently subtracts. Run the tests. Do not use web, curl, wget, or external network.",
             model=model,
             timeout_seconds=timeout_seconds,
             max_turns=8,
