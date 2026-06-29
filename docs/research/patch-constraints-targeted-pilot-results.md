@@ -2,10 +2,10 @@
 
 ## Status
 
-Exploratory targeted pilot execution attempt.
+Exploratory targeted pilot.
 Not broad superiority evidence.
 
-This result memo records a verified partial run: the harness executed the targeted pilot matrix and persisted per-run blocked artifacts, but no coding-agent patches were generated because the available independent runners were not usable for causal patch runs in this environment.
+This memo records the first non-dry-run targeted patch-constraints pilot with an OpenCode runner adapter that passed canary verification and DocAtlas tool visibility checks. The pilot produced real agent patches for the current accepted/differentiating two-task subset.
 
 ## Branch / commit / run IDs
 
@@ -21,19 +21,19 @@ Base:
 main @ 5a22bec Research/task level agent benchmark (#9)
 ```
 
-Prerequisite harness commits were cherry-picked because the local `main` did not yet contain the prior targeted-pilot branch:
-
-```text
-31136db test/eval: add patch constraints targeted pilot harness
-8284c23 docs/research: add patch constraints targeted pilot memo
-5739d8f test/eval: split patch constraints workflow and injection pilots
-```
-
 Run IDs:
 
 ```text
-patch_constraints_runner_canary_001
-patch_constraints_targeted_pilot_opencode_blocked_003
+opencode_canary_supported_002
+opencode_docatlas_tool_canary_001
+patch_constraints_targeted_pilot_opencode_real_001
+```
+
+Runner:
+
+```text
+OpenCode 1.17.11
+model=openrouter/anthropic/claude-sonnet-4
 ```
 
 ## Question
@@ -54,45 +54,34 @@ Interpretation:
 
 ## Task pool
 
-Accepted/differentiating tasks found in the current manifest:
+Accepted/differentiating tasks in the current manifest:
 
 | task_id | class | visible source coverage | status |
 | --- | --- | --- | --- |
-| `decisive_docmancer_vector_timeout_fallback_001` | architecture/layer boundary / benchmark accounting | yes | selected |
-| `decisive_nbo_cross_module_gate_large_001` | cross-module source-of-truth ownership | yes | selected |
+| `decisive_docmancer_vector_timeout_fallback_001` | benchmark-accounting / fallback semantics | yes | selected |
+| `decisive_nbo_cross_module_gate_large_001` | cross-module permission-gate contract | yes | selected |
 
-No additional tasks were promoted in this PR. Existing NBO smoke/rejected-too-easy tasks have useful regression coverage but are not accepted/differentiating evidence without fresh fair screening.
+No additional tasks were promoted. Existing NBO smoke/rejected-too-easy fixtures remain smoke/regression only because repo-only solved them during screening.
 
 ## Protocol
 
-Command attempted:
+Runner canary:
 
 ```bash
-uv run python -m eval.task_level.runner --patch-constraints-targeted-pilot --repeats 1 --run-id patch_constraints_targeted_pilot_opencode_blocked_003 --runner opencode --timeout-seconds 120
+uv run python -m eval.task_level.runner --verify-runner --runner opencode --model openrouter/anthropic/claude-sonnet-4 --timeout-seconds 180 --run-id opencode_canary_supported_002
 ```
 
-Runner verification probe:
+DocAtlas tool visibility canary:
 
 ```bash
-uv run python -m eval.task_level.runner --verify-runner --runner claude --model sonnet --timeout-seconds 120 --run-id patch_constraints_runner_canary_001
+uv run python -m eval.task_level.runner --verify-docatlas-tool --runner opencode --model openrouter/anthropic/claude-sonnet-4 --timeout-seconds 180 --run-id opencode_docatlas_tool_canary_001
 ```
 
-Observed runner state:
+Pilot command:
 
-- Claude Code CLI exists but canary failed before patch generation with `Not logged in · Please run /login`.
-- OpenCode CLI exists but the harness adapter intentionally raises `NotImplementedError` until strict tool/MCP isolation is verified.
-- The targeted pilot matrix therefore completed as blocked rows, not causal patch rows.
-
-## Results table
-
-| task_id | condition | repeat | status | resolved | public_tests_pass | hidden_tests_pass | policy_clean | constraint_violations_after_patch | unknown_count | constraint_used | constraint_packet_tokens |
-| --- | --- | ---: | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| `decisive_docmancer_vector_timeout_fallback_001` | `repo_only_strict_offline` | 0 | runner_unavailable | false | false | false | true | 0 | 0 | false | n/a |
-| `decisive_docmancer_vector_timeout_fallback_001` | `docatlas_patch_constraints_workflow` | 0 | runner_unavailable | false | false | false | true | 0 | 0 | false | n/a |
-| `decisive_docmancer_vector_timeout_fallback_001` | `docatlas_patch_constraints_injected` | 0 | runner_unavailable | false | false | false | true | 0 | 0 | false | n/a |
-| `decisive_nbo_cross_module_gate_large_001` | `repo_only_strict_offline` | 0 | runner_unavailable | false | false | false | true | 0 | 0 | false | n/a |
-| `decisive_nbo_cross_module_gate_large_001` | `docatlas_patch_constraints_workflow` | 0 | runner_unavailable | false | false | false | true | 0 | 0 | false | n/a |
-| `decisive_nbo_cross_module_gate_large_001` | `docatlas_patch_constraints_injected` | 0 | runner_unavailable | false | false | false | true | 0 | 0 | false | n/a |
+```bash
+uv run python -m eval.task_level.runner --patch-constraints-targeted-pilot --repeats 1 --run-id patch_constraints_targeted_pilot_opencode_real_001 --runner opencode --model openrouter/anthropic/claude-sonnet-4 --timeout-seconds 900
+```
 
 Artifact integrity:
 
@@ -102,6 +91,25 @@ runs_jsonl_records=6
 artifact_integrity.ok=true
 ```
 
+## Results table
+
+| condition | runs | resolved | public pass | hidden pass | policy clean | constraint violations total | median unknowns | constraint used rate | median constraint tokens | median wall time |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| `repo_only_strict_offline` | 2 | 0 | 2/2 | 0/2 | 2/2 | 0 | 0.0 | 0.0 | n/a | 145.9452s |
+| `docatlas_patch_constraints_workflow` | 2 | 0 | 2/2 | 0/2 | 2/2 | 0 | 0.0 | 0.0 | n/a | 177.33545s |
+| `docatlas_patch_constraints_injected` | 2 | 0 | 2/2 | 0/2 | 2/2 | 0 | 1.0 | 1.0 | 667.5 | 102.89335s |
+
+Per-task run status:
+
+| task_id | condition | status | resolved | public | hidden | constraint violations | unknowns | constraint_used |
+| --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| `decisive_docmancer_vector_timeout_fallback_001` | `repo_only_strict_offline` | completed | false | true | false | 0 | 0 | false |
+| `decisive_docmancer_vector_timeout_fallback_001` | `docatlas_patch_constraints_workflow` | completed | false | true | false | 0 | 0 | false |
+| `decisive_docmancer_vector_timeout_fallback_001` | `docatlas_patch_constraints_injected` | completed | false | true | false | 0 | 1 | true |
+| `decisive_nbo_cross_module_gate_large_001` | `repo_only_strict_offline` | completed | false | true | false | 0 | 0 | false |
+| `decisive_nbo_cross_module_gate_large_001` | `docatlas_patch_constraints_workflow` | completed | false | true | false | 0 | 0 | false |
+| `decisive_nbo_cross_module_gate_large_001` | `docatlas_patch_constraints_injected` | completed | false | true | false | 0 | 1 | true |
+
 ## Pairwise comparison
 
 Workflow vs repo_only:
@@ -109,7 +117,11 @@ Workflow vs repo_only:
 ```text
 pairs=2
 resolved_delta_mean=0.0
+hidden_pass_delta_mean=0.0
+policy_clean_delta_mean=0.0
 constraint_violation_delta_median=0.0
+unknown_count_delta_median=0.0
+wall_time_delta_median=+31.39025s
 ```
 
 Injected vs repo_only:
@@ -117,62 +129,75 @@ Injected vs repo_only:
 ```text
 pairs=2
 resolved_delta_mean=0.0
+hidden_pass_delta_mean=0.0
+policy_clean_delta_mean=0.0
 constraint_violation_delta_median=0.0
+unknown_count_delta_median=+1.0
+wall_time_delta_median=-43.05185s
 ```
 
-These deltas are not outcome evidence because every paired row is `runner_unavailable` and no patch was generated.
+These are two-task exploratory paired deltas. They do not justify broad product claims.
 
 ## Violation analysis
 
-No deterministic project-rule violations were observed because no patch was generated.
+No deterministic patch-constraint violations were recorded after patch in this run:
 
-This is a blocked-run result, not evidence that any condition avoids violations.
+```text
+repo_only_strict_offline: 0
+workflow: 0
+injected: 0
+```
+
+This does not show a reduction from DocAtlas because the strict repo-only baseline also had zero recorded deterministic violations. All conditions failed hidden tests on both tasks, so the generated patches were incomplete despite passing public tests.
 
 ## Cost analysis
 
-Token counts and wall-time metrics are not meaningful for the blocked pilot:
+Median wall time:
 
-- `input_tokens`: null
-- `output_tokens`: null
-- `constraint_packet_tokens`: null
-- `wall_time_seconds`: 0.0 in blocked rows
+- `repo_only_strict_offline`: 145.9452s
+- `docatlas_patch_constraints_workflow`: 177.33545s
+- `docatlas_patch_constraints_injected`: 102.89335s
+
+Token metrics are only partially comparable across OpenCode events. The parser captured low/null input token values in some rows, so cost conclusions should stay cautious.
 
 ## Unknown/manual-review analysis
 
-`unknown_count=0` in blocked rows because validation had no constraints or patch to inspect.
-
-This does not imply low manual-review burden; it means the validator did not run on a real patch.
+- `docatlas_patch_constraints_injected` produced compact packets and marked `constraint_used=true` on both tasks.
+- Injected validation had one unknown on each task.
+- Workflow rows did not produce harness-side `constraint_used=true`; agent-side DocAtlas calls were observed, but constraint usage remains a correlation signal only.
 
 ## What this supports
 
-- The targeted pilot command now runs to completion even when a runner is unavailable.
-- Blocked runner rows persist `runs.jsonl`, `result.json`, `patch.diff`, `changed_files.json`, and `validation.json` artifacts instead of crashing the harness.
-- Artifact integrity can distinguish completed blocked matrices from causal patch results.
-- The current environment is not ready for a causal patch pilot until an independent runner is authenticated and verified.
+- OpenCode canary passed and produced a patch under the harness.
+- DocAtlas tool visibility canary passed with `docmancer-docs_get_docs_context` observed and no foreign MCP/web calls.
+- The targeted pilot can execute non-dry-run rows and persist complete artifacts.
+- Policy isolation by per-run OpenCode config plus trajectory audit worked in this run: no Context7/web/foreign MCP calls were recorded.
+- The current two-task pilot found no deterministic project-rule violations in any condition, but also no resolved tasks.
 
 ## What this does not support
 
-- It does not show that DocAtlas reduces project-rule violations.
-- It does not show that DocAtlas improves resolved/public/hidden pass rates.
-- It does not show that DocAtlas beats repo-only or Context7.
+- It does not show DocAtlas reduces violations versus repo-only.
+- It does not show DocAtlas improves resolved/public/hidden pass rates.
+- It does not show DocAtlas beats repo-only or Context7.
 - It does not prove correctness.
 - It does not replace tests.
+- It does not show that `constraint_used` is causal.
 
 ## Limitations
 
-- No coding-agent patch was generated.
-- Claude Code was present but unauthenticated in the isolated canary run.
-- OpenCode adapter is deliberately non-causal until strict tool isolation is verified.
-- Only 2 accepted/differentiating tasks are available in the manifest.
-- No new accepted NBO tasks were added because existing rejected-too-easy NBO fixtures require fresh fair screening before promotion.
-- The pilot remains blocked on verified runner availability, not on constraint workflow logic.
+- Only two accepted/differentiating tasks are available.
+- One repeat per task/condition.
+- All rows pass public tests but fail hidden tests, so patches are incomplete.
+- The workflow condition used DocAtlas tools, but the current evaluator does not yet convert agent-side patch-constraints tool behavior into `constraint_used=true` unless the harness injected a packet.
+- OpenCode hard shell network isolation is not provided by CLI flags; enforcement is per-run config plus trajectory audit.
+- Generated `__pycache__` files appear in changed-file lists for some fixture runs and should be filtered or prevented in a follow-up hygiene PR.
 
 ## Decision
 
-Pause causal interpretation.
+Do not claim a positive DocAtlas outcome.
 
-Continue only after authenticating/verifying an independent runner or adding a supported runner adapter with strict tool/MCP isolation.
+Merge only as an exploratory pilot execution and runner-hardening PR if reviewers accept the small sample and caveats.
 
 ## Next PR recommendation
 
-`test/eval: verify independent runner for patch-constraints pilot`
+`test/eval: add fair screening and generated-artifact hygiene for patch constraints pilot`
