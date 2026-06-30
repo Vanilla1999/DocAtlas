@@ -1120,7 +1120,16 @@ class PatchReviewService:
         }
         for item in unknowns:
             constraint = by_id.get(item.get("constraint_id"), {})
-            text = " ".join(
+            manual_text = " ".join(
+                str(value or "")
+                for value in (
+                    item.get("reason"),
+                    constraint.get("instruction"),
+                    constraint.get("evidence"),
+                    constraint.get("source"),
+                )
+            ).lower()
+            evidence_text = " ".join(
                 str(value or "")
                 for value in (
                     item.get("constraint_id"),
@@ -1131,12 +1140,12 @@ class PatchReviewService:
                     constraint.get("type"),
                 )
             ).lower()
-            if "test" in text or "coverage" in text or "regression" in text:
-                code = "missing_test_evidence"
-            elif any(token in text for token in ("diff", "changed-file", "changed file", "patch", "direct evidence", "not found", "missing evidence")):
-                code = "missing_diff_evidence"
-            elif any(token in text for token in ("manual", "designer", "design", "open question", "ownership", "source-of-truth", "source_of_truth", "policy")):
+            if PatchReviewService._has_manual_unknown_signal(manual_text):
                 code = "manual_review_required"
+            elif "test" in evidence_text or "coverage" in evidence_text or "regression" in evidence_text:
+                code = "missing_test_evidence"
+            elif any(token in evidence_text for token in ("diff", "changed-file", "changed file", "patch", "direct evidence", "not found", "missing evidence")):
+                code = "missing_diff_evidence"
             else:
                 code = "low_risk_unknown"
             buckets[code].append(item)
@@ -1154,6 +1163,31 @@ class PatchReviewService:
             for code, items in buckets.items()
             if items
         ]
+
+    @staticmethod
+    def _has_manual_unknown_signal(text: str) -> bool:
+        manual_tokens = (
+            "manual",
+            "designer",
+            "open question",
+            "ownership",
+            "source-of-truth",
+            "source of truth",
+            "policy",
+            "дизайнер",
+            "дизайнера",
+            "дизайнером",
+            "открытый вопрос",
+            "открыт вопрос",
+            "владель",
+            "ответствен",
+            "согласовать",
+            "уточнить",
+            "политик",
+        )
+        if any(token in text for token in manual_tokens):
+            return True
+        return bool(re.search(r"\bdesign(?:er|\s+(?:input|question|approval|review|owner|dependency))?\b", text))
 
     @staticmethod
     def _summary_quality(

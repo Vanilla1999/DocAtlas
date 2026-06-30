@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 import subprocess
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import pytest
 from click.testing import CliRunner
@@ -11,6 +11,12 @@ from click.testing import CliRunner
 from docmancer.cli.__main__ import cli
 from docmancer.docs.application.patch_review_service import PATCH_REVIEW_SCHEMA_VERSIONS, PatchReviewService
 from docmancer.docs.application.patch_constraints_service import PatchConstraintsService
+from docmancer.docs.models import (
+    PatchConstraint,
+    PatchConstraintPacket,
+    PatchConstraintValidationPacket,
+    PatchConstraintValidationResult,
+)
 from docmancer.docs.service import LibraryDocsService
 
 
@@ -767,6 +773,69 @@ def test_patch_review_quality_classifies_unknowns_without_treating_them_as_pass(
     assert "manual_review_required" in {signal["code"] for signal in quality["signals"]}
     assert quality["unknown_count"] == 4
     assert quality["attachable"] != "yes"
+
+
+def test_patch_review_bot_bundle_routes_open_design_unknowns_to_manual_review(tmp_path: Path):
+    repo = _repo(tmp_path)
+    _git(repo, "init")
+    _git(repo, "config", "user.email", "test@example.com")
+    _git(repo, "config", "user.name", "Test User")
+    _git(repo, "add", ".")
+    _git(repo, "commit", "-m", "base")
+    _write(repo / "lib/presentation/menu_view.dart", "void buildMenu() {\n  showMenuButton();\n}\n")
+    out = tmp_path / "review-open-design-unknown"
+
+    class FakeDocsService:
+        def get_patch_constraints(self, *args: Any, **kwargs: Any) -> PatchConstraintPacket:
+            return PatchConstraintPacket(
+                task="Review TSDB menu redesign",
+                constraints=[
+                    PatchConstraint(
+                        id="open-designer-input",
+                        type="architecture",
+                        instruction="Получить инфо от дизайнера по новому виду кнопки вызова меню.",
+                        source="docs/menu.md",
+                        severity="warning",
+                        confidence="medium",
+                        evidence="Открытый вопрос по макету остается нерешенным.",
+                    )
+                ],
+                confidence="medium",
+            )
+
+        def validate_patch_against_constraints(self, *args: Any, **kwargs: Any) -> PatchConstraintValidationPacket:
+            return PatchConstraintValidationPacket(
+                task="Review TSDB menu redesign",
+                project_path=str(repo),
+                total_constraints=1,
+                unknown=1,
+                results=[
+                    PatchConstraintValidationResult(
+                        constraint_id="open-designer-input",
+                        status="unknown",
+                        reason="No decisive changed-file or diff evidence was found for this constraint.",
+                        files=[],
+                    )
+                ],
+                confidence="low",
+            )
+
+    PatchReviewService(cast(Any, FakeDocsService())).run(
+        project_path=str(repo),
+        task="Review TSDB menu redesign",
+        output_dir=str(out),
+    )
+
+    quality = json.loads((out / "review_summary_quality.json").read_text(encoding="utf-8"))
+    triage = {item["code"]: item for item in quality["unknown_triage"]}
+    assert set(triage) == {"manual_review_required"}
+    assert triage["manual_review_required"]["count"] == 1
+    assert triage["manual_review_required"]["requires_manual_review"] is True
+
+    consumer_decision = _fake_pr_bot_consume_manifest(out / "review_summary_manifest.json")
+    assert consumer_decision["requires_manual_review"] is True
+    assert "manual_review_required" in consumer_decision["reason_codes"]
+    assert consumer_decision["unknown_triage_codes"] == ["manual_review_required"]
 
 
 def test_patch_review_writes_machine_readable_action_items(tmp_path: Path):
