@@ -1167,7 +1167,13 @@ class PatchReviewService:
     @staticmethod
     def _has_manual_unknown_signal(text: str) -> bool:
         manual_tokens = (
-            "manual",
+            "manual review",
+            "manual reviewer",
+            "manual approval",
+            "manual decision",
+            "manual triage",
+            "human review",
+            "human reviewer",
             "designer",
             "open question",
             "ownership",
@@ -1187,7 +1193,7 @@ class PatchReviewService:
         )
         if any(token in text for token in manual_tokens):
             return True
-        return bool(re.search(r"\bdesign(?:er|\s+(?:input|question|approval|review|owner|dependency))?\b", text))
+        return bool(re.search(r"\bdesign\s+(?:input|question|approval|review|owner|dependency)\b", text))
 
     @staticmethod
     def _summary_quality(

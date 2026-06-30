@@ -775,6 +775,63 @@ def test_patch_review_quality_classifies_unknowns_without_treating_them_as_pass(
     assert quality["attachable"] != "yes"
 
 
+def test_patch_review_unknown_triage_keeps_generic_design_and_manual_text_granular():
+    constraints = {
+        "constraints": [
+            {
+                "id": "design-doc-gap",
+                "type": "source_of_truth",
+                "instruction": "Follow the design system spacing rule.",
+                "source": "docs/design.md",
+                "confidence": "medium",
+                "evidence": "Design tokens define menu spacing.",
+                "symbols": [],
+                "files": [],
+            },
+            {
+                "id": "manual-retry-test-gap",
+                "type": "behavior",
+                "instruction": "Keep the manual retry command covered by tests.",
+                "source": "docs/manual-retry.md",
+                "confidence": "medium",
+                "evidence": "Manual retry should remain available after service failures.",
+                "symbols": [],
+                "files": [],
+            },
+        ],
+        "symbol_candidates": [],
+        "excluded_source_reasons": [],
+    }
+    validation = {
+        "satisfied": 0,
+        "violated": 0,
+        "unknown": 2,
+        "results": [
+            {"constraint_id": "design-doc-gap", "status": "unknown", "reason": "no direct diff evidence found", "files": []},
+            {"constraint_id": "manual-retry-test-gap", "status": "unknown", "reason": "missing test evidence", "files": []},
+        ],
+        "warnings": [],
+    }
+
+    quality = PatchReviewService._review_summary_quality_payload(
+        "Review generic design documentation and manual retry coverage",
+        ["lib/menu.dart"],
+        constraints,
+        validation,
+    )
+
+    triage = {item["code"]: item for item in quality["unknown_triage"]}
+    assert set(triage) == {"missing_diff_evidence", "missing_test_evidence"}
+    assert triage["missing_diff_evidence"]["examples"] == [
+        {"constraint_id": "design-doc-gap", "reason": "no direct diff evidence found"}
+    ]
+    assert triage["missing_test_evidence"]["examples"] == [
+        {"constraint_id": "manual-retry-test-gap", "reason": "missing test evidence"}
+    ]
+    assert all(item["requires_manual_review"] for item in quality["unknown_triage"])
+    assert "manual_review_required" in {signal["code"] for signal in quality["signals"]}
+
+
 def test_patch_review_bot_bundle_routes_open_design_unknowns_to_manual_review(tmp_path: Path):
     repo = _repo(tmp_path)
     _git(repo, "init")
