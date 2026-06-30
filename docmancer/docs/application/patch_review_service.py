@@ -27,7 +27,7 @@ PATCH_REVIEW_SCHEMA_VERSIONS = {
     "review_summary_manifest.json": 1,
     "review_summary_quality.json": 2,
     "review_summary_actions.json": 1,
-    "review_summary_pr_comment.json": 1,
+    "review_summary_pr_comment.json": 2,
     "review_summary_trace.json": 1,
     "review_summary_bot_bundle.json": 3,
 }
@@ -374,12 +374,14 @@ class PatchReviewService:
             "",
             "Non-blocking review context only; not a correctness proof or test replacement.",
         ])
+        body_markdown = PatchReviewService._truncate_pr_comment("\n".join(body_lines) + "\n")
         return {
             "schema_version": PATCH_REVIEW_SCHEMA_VERSIONS["review_summary_pr_comment.json"],
             "summary_mode": summary_mode,
             "title": "DocAtlas patch review",
             "attachable": quality_payload.get("attachable"),
-            "body_markdown": PatchReviewService._truncate_pr_comment("\n".join(body_lines) + "\n"),
+            "body": body_markdown,
+            "body_markdown": body_markdown,
             "source_artifacts": [
                 "review_summary_quality.json",
                 "review_summary_actions.json",

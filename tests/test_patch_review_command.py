@@ -70,6 +70,8 @@ def _fake_pr_bot_contract_non_negative_int(value: Any, error: type[Exception], f
 def _fake_pr_bot_pr_comment_payload() -> dict[str, Any]:
     return {
         "schema_version": PATCH_REVIEW_SCHEMA_VERSIONS["review_summary_pr_comment.json"],
+        "body": "DocAtlas patch review\n",
+        "body_markdown": "DocAtlas patch review\n",
         "source_artifacts": ["review_summary_quality.json", "review_summary_actions.json"],
         "claims_avoided": ["correctness_proof", "test_or_human_review_replacement"],
     }
@@ -213,6 +215,15 @@ def _fake_pr_bot_consume_manifest(manifest_path: Path, manifest: dict[str, Any] 
         {"review_summary_quality.json", "review_summary_actions.json"} <= set(pr_comment_sources),
         _FakePrBotInvalidBotBundleContract,
         "bundle.pr_comment.source_artifacts",
+    )
+    body = pr_comment.get("body")
+    body_markdown = pr_comment.get("body_markdown")
+    _fake_pr_bot_contract_require(isinstance(body, str), _FakePrBotInvalidBotBundleContract, "bundle.pr_comment.body")
+    body_text = cast(str, body)
+    _fake_pr_bot_contract_require(
+        body_text == body_markdown,
+        _FakePrBotInvalidBotBundleContract,
+        "bundle.pr_comment.body_markdown_alias",
     )
     _fake_pr_bot_contract_require(
         "correctness_proof" in pr_comment_claims,
@@ -402,6 +413,12 @@ def _fake_pr_bot_consume_manifest(manifest_path: Path, manifest: dict[str, Any] 
             "manual_review_required" in reason_codes,
             _FakePrBotInvalidBotBundleContract,
             "bundle.advisory_decision.reason_codes.manual_review_required",
+        )
+    if decision["should_attach_comment"]:
+        _fake_pr_bot_contract_require(
+            bool(body_text.strip()),
+            _FakePrBotInvalidBotBundleContract,
+            "bundle.pr_comment.body.non_empty_when_attachable",
         )
     return {
         "attach_comment": decision["should_attach_comment"],
@@ -1672,6 +1689,7 @@ def test_patch_review_machine_readable_artifact_contracts(tmp_path: Path):
         "summary_mode",
         "title",
         "attachable",
+        "body",
         "body_markdown",
         "source_artifacts",
         "signals",
@@ -1680,6 +1698,8 @@ def test_patch_review_machine_readable_artifact_contracts(tmp_path: Path):
         "claims_avoided",
     } <= set(pr_comment)
     assert pr_comment["schema_version"] == PATCH_REVIEW_SCHEMA_VERSIONS["review_summary_pr_comment.json"]
+    assert pr_comment["schema_version"] == 2
+    assert pr_comment["body"] == pr_comment["body_markdown"]
     assert "DocAtlas patch review" in pr_comment["body_markdown"]
     assert "Non-blocking review context only" in pr_comment["body_markdown"]
     assert "review_summary_quality.json" in pr_comment["source_artifacts"]
@@ -1740,6 +1760,8 @@ def test_patch_review_machine_readable_artifact_contracts(tmp_path: Path):
     } <= set(bot_bundle["advisory_decision"])
     assert bot_bundle["advisory_decision"]["semantics"] == "advisory_non_blocking_only"
     assert "safe_to_merge" not in bot_bundle["advisory_decision"]
+    if bot_bundle["advisory_decision"]["should_attach_comment"]:
+        assert bot_bundle["pr_comment"]["body"].strip()
 
 
 def test_patch_review_advisory_decision_is_non_blocking_and_escalates_violations_and_unknowns():
@@ -2914,6 +2936,8 @@ def test_patch_review_pr_comment_lists_violations_separately_from_capped_actions
     comment = PatchReviewService._review_summary_pr_comment_payload(actions, quality, summary_mode="compact")
 
     assert comment["violations"] == actions["violations"]
+    assert comment["body"] == comment["body_markdown"]
+    assert comment["body"].strip()
     assert "Violations:" in comment["body_markdown"]
     assert "policy-violation" in comment["body_markdown"]
     assert "Provider policy moved into UI" in comment["body_markdown"]
