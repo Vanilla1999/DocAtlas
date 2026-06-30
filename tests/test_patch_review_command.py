@@ -68,6 +68,11 @@ def _fake_pr_bot_consume_manifest(manifest_path: Path, manifest: dict[str, Any] 
     assert "test_or_human_review_replacement" in bundle["claims_avoided"]
     assert "correctness_proof" in manifest["claims_avoided"]
     assert "test_or_human_review_replacement" in manifest["claims_avoided"]
+    unknown_triage_examples_by_code = {
+        item["code"]: item.get("examples", [])
+        for item in bundle["quality"].get("unknown_triage", [])
+        if item.get("examples")
+    }
     return {
         "attach_comment": decision["should_attach_comment"],
         "show_warning_badge": decision["show_warning_badge"],
@@ -75,6 +80,7 @@ def _fake_pr_bot_consume_manifest(manifest_path: Path, manifest: dict[str, Any] 
         "requires_manual_review": decision["requires_manual_review"],
         "reason_codes": decision["reason_codes"],
         "unknown_triage_codes": decision["unknown_triage_codes"],
+        "unknown_triage_examples_by_code": unknown_triage_examples_by_code,
         "violation_count": len(bundle["actions"]["violations"]),
         "unknown_count": bundle["quality"]["unknown_count"],
     }
@@ -1053,6 +1059,18 @@ def test_patch_review_bot_bundle_routes_open_design_unknowns_to_manual_review(tm
     assert consumer_decision["requires_manual_review"] is True
     assert "manual_review_required" in consumer_decision["reason_codes"]
     assert consumer_decision["unknown_triage_codes"] == ["manual_review_required"]
+    assert consumer_decision["unknown_triage_examples_by_code"] == {
+        "manual_review_required": [
+            {
+                "constraint_id": "open-designer-input",
+                "reason": "No decisive changed-file or diff evidence was found for this constraint.",
+                "source": "docs/menu.md",
+                "instruction": "Получить инфо от дизайнера по новому виду кнопки вызова меню.",
+                "evidence": "Открытый вопрос по макету остается нерешенным.",
+                "confidence": "medium",
+            }
+        ]
+    }
 
 
 def test_patch_review_writes_machine_readable_action_items(tmp_path: Path):
