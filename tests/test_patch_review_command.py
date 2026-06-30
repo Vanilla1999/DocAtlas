@@ -1126,6 +1126,45 @@ def test_patch_review_manifest_is_final_discovery_marker_when_bot_bundle_write_f
     assert (out / "review_summary_actions.json").exists()
 
 
+def test_patch_review_reused_output_dir_clears_stale_manifest_before_failed_run(tmp_path: Path, monkeypatch):
+    repo = _repo(tmp_path)
+    _git(repo, "init")
+    _git(repo, "config", "user.email", "test@example.com")
+    _git(repo, "config", "user.name", "Test User")
+    _git(repo, "add", ".")
+    _git(repo, "commit", "-m", "base")
+    _write(repo / "lib/generated/menu_state.g.dart", "// manual generated edit\n")
+    out = tmp_path / "review-reused-output-dir"
+
+    PatchReviewService().run(
+        project_path=str(repo),
+        task="Review generated artifact edit",
+        output_dir=str(out),
+    )
+    manifest_path = out / "review_summary_manifest.json"
+    assert manifest_path.exists()
+    assert _fake_pr_bot_consume_manifest(manifest_path)["show_warning_badge"] is True
+    original_write_json = PatchReviewService._write_json
+
+    def fail_on_bot_bundle(path: Path, payload: Any) -> None:
+        if path.name == "review_summary_bot_bundle.json":
+            raise RuntimeError("simulated bot bundle write failure")
+        original_write_json(path, payload)
+
+    monkeypatch.setattr(PatchReviewService, "_write_json", staticmethod(fail_on_bot_bundle))
+
+    with pytest.raises(RuntimeError, match="simulated bot bundle write failure"):
+        PatchReviewService().run(
+            project_path=str(repo),
+            task="Review generated artifact edit",
+            output_dir=str(out),
+        )
+
+    assert not manifest_path.exists()
+    assert not list(out.glob(".review_summary_manifest.json.*.tmp"))
+    assert (out / "review_summary_quality.json").exists()
+
+
 def test_patch_review_summary_uses_generic_task_terms_without_project_hardcoding():
     summary = PatchReviewService._review_summary(
         "Review checkout launch action",

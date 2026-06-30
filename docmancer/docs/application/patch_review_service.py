@@ -78,6 +78,7 @@ class PatchReviewService:
         if not out.is_absolute():
             out = root / out
         out.mkdir(parents=True, exist_ok=True)
+        self._clear_stale_manifest_marker(out)
 
         constraints = self.docs_service.get_patch_constraints(
             task,
@@ -224,6 +225,12 @@ class PatchReviewService:
     @staticmethod
     def _meaningful_untracked_files(raw_status: str) -> list[str]:
         return [path for status, path in parse_status_paths(raw_status.splitlines()) if status == "??" and not is_runtime_artifact(path)]
+
+    @staticmethod
+    def _clear_stale_manifest_marker(output_dir: Path) -> None:
+        (output_dir / "review_summary_manifest.json").unlink(missing_ok=True)
+        for temp_manifest in output_dir.glob(".review_summary_manifest.json.*.tmp"):
+            temp_manifest.unlink(missing_ok=True)
 
     @staticmethod
     def _write_json(path: Path, payload: Any) -> None:
