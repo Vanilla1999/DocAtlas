@@ -1172,7 +1172,7 @@ class PatchReviewService:
                 code = "manual_review_required"
             elif "test" in evidence_text or "coverage" in evidence_text or "regression" in evidence_text:
                 code = "missing_test_evidence"
-            elif any(token in evidence_text for token in ("diff", "changed-file", "changed file", "patch", "direct evidence", "not found", "missing evidence")):
+            elif PatchReviewService._has_missing_diff_unknown_signal(evidence_text):
                 code = "missing_diff_evidence"
             else:
                 code = "low_risk_unknown"
@@ -1234,6 +1234,27 @@ class PatchReviewService:
         if any(token in text for token in manual_tokens):
             return True
         return bool(re.search(r"\bdesign\s+(?:input|question|approval|review|owner|dependency)\b", text))
+
+    @staticmethod
+    def _has_missing_diff_unknown_signal(text: str) -> bool:
+        if any(
+            token in text
+            for token in (
+                "diff",
+                "changed-file",
+                "changed file",
+                "patch",
+                "direct evidence",
+                "not found",
+                "missing evidence",
+                "changed files unavailable",
+                "changed files or diff unavailable",
+                "not deterministically checkable from changed files",
+                "not deterministic for this patch",
+            )
+        ):
+            return True
+        return any(token in text for token in ("source question", "source changed_files", "source changed files"))
 
     @staticmethod
     def _summary_quality(

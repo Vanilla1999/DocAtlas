@@ -1210,6 +1210,16 @@ def test_patch_review_unknown_triage_keeps_generic_design_and_manual_text_granul
                 "symbols": [],
                 "files": [],
             },
+            {
+                "id": "task-derived-return-flow",
+                "type": "project_convention",
+                "instruction": "Confirm the closed request returns to the Active list after reopen.",
+                "source": "changed_files",
+                "confidence": "medium",
+                "evidence": "Task-derived requirement from changed files; patch review must find diff evidence before treating it as resolved.",
+                "symbols": [],
+                "files": ["lib/help_request_details.dart"],
+            },
         ],
         "symbol_candidates": [],
         "excluded_source_reasons": [],
@@ -1217,10 +1227,16 @@ def test_patch_review_unknown_triage_keeps_generic_design_and_manual_text_granul
     validation = {
         "satisfied": 0,
         "violated": 0,
-        "unknown": 2,
+        "unknown": 3,
         "results": [
             {"constraint_id": "design-doc-gap", "status": "unknown", "reason": "no direct diff evidence found", "files": []},
             {"constraint_id": "manual-retry-test-gap", "status": "unknown", "reason": "missing test evidence", "files": []},
+            {
+                "constraint_id": "task-derived-return-flow",
+                "status": "unknown",
+                "reason": "constraint not deterministically checkable from changed files",
+                "files": ["lib/help_request_details.dart"],
+            },
         ],
         "warnings": [],
     }
@@ -1234,12 +1250,21 @@ def test_patch_review_unknown_triage_keeps_generic_design_and_manual_text_granul
 
     triage = {item["code"]: item for item in quality["unknown_triage"]}
     assert set(triage) == {"missing_diff_evidence", "missing_test_evidence"}
+    assert triage["missing_diff_evidence"]["count"] == 2
     assert triage["missing_diff_evidence"]["examples"][0] == {
         "constraint_id": "design-doc-gap",
         "reason": "no direct diff evidence found",
         "source": "docs/design.md",
         "instruction": "Follow the design system spacing rule.",
         "evidence": "Design tokens define menu spacing.",
+        "confidence": "medium",
+    }
+    assert triage["missing_diff_evidence"]["examples"][1] == {
+        "constraint_id": "task-derived-return-flow",
+        "reason": "constraint not deterministically checkable from changed files",
+        "source": "changed_files",
+        "instruction": "Confirm the closed request returns to the Active list after reopen.",
+        "evidence": "Task-derived requirement from changed files; patch review must find diff evidence before treating it as resolved.",
         "confidence": "medium",
     }
     assert triage["missing_test_evidence"]["examples"][0] == {
