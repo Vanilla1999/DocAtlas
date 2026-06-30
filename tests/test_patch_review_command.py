@@ -59,6 +59,14 @@ def _fake_pr_bot_contract_list(value: Any, error: type[Exception], field: str) -
     return value
 
 
+def _fake_pr_bot_contract_non_negative_int(value: Any, error: type[Exception], field: str) -> int:
+    if value is None:
+        return 0
+    if isinstance(value, bool) or not isinstance(value, int) or value < 0:
+        raise error(f"{field} must be a non-negative integer")
+    return value
+
+
 def _fake_pr_bot_pr_comment_payload() -> dict[str, Any]:
     return {
         "schema_version": PATCH_REVIEW_SCHEMA_VERSIONS["review_summary_pr_comment.json"],
@@ -275,12 +283,17 @@ def _fake_pr_bot_consume_manifest(manifest_path: Path, manifest: dict[str, Any] 
         if isinstance(item, dict)
         if item.get("examples")
     }
-    unknown_triage_counts = {
-        item["code"]: item.get("count")
-        for item in unknown_triage
-        if isinstance(item, dict)
-        if item.get("code") and item.get("count", 0) > 0
-    }
+    unknown_triage_counts: dict[str, int] = {}
+    for index, item in enumerate(unknown_triage):
+        if not isinstance(item, dict):
+            continue
+        count = _fake_pr_bot_contract_non_negative_int(
+            item.get("count"),
+            _FakePrBotInvalidBotBundleContract,
+            f"bundle.quality.unknown_triage[{index}].count",
+        )
+        if item.get("code") and count > 0:
+            unknown_triage_counts[str(item["code"])] = count
     decision_unknown_triage_counts = decision.get("unknown_triage_counts")
     if decision_unknown_triage_counts is None:
         decision_unknown_triage_counts = unknown_triage_counts
@@ -299,8 +312,16 @@ def _fake_pr_bot_consume_manifest(manifest_path: Path, manifest: dict[str, Any] 
         )
         if isinstance(item, dict)
     }
-    violated_count = int(quality.get("violated_count") or 0)
-    unknown_count = int(quality.get("unknown_count") or 0)
+    violated_count = _fake_pr_bot_contract_non_negative_int(
+        quality.get("violated_count"),
+        _FakePrBotInvalidBotBundleContract,
+        "bundle.quality.violated_count",
+    )
+    unknown_count = _fake_pr_bot_contract_non_negative_int(
+        quality.get("unknown_count"),
+        _FakePrBotInvalidBotBundleContract,
+        "bundle.quality.unknown_count",
+    )
     reason_codes = list(
         _fake_pr_bot_contract_list(
             decision.get("reason_codes"),
@@ -2315,6 +2336,12 @@ def test_fake_pr_bot_consumer_treats_malformed_supported_manifest_contract_as_ma
         {"trace": []},
         {"actions": {}},
         {"actions": {"violations": {}}},
+        {"quality": {"unknown_count": "1", "unknown_triage": []}},
+        {"quality": {"unknown_count": -1, "unknown_triage": []}},
+        {"quality": {"unknown_count": 0, "unknown_triage": [], "violated_count": "1"}},
+        {"quality": {"unknown_count": 0, "unknown_triage": [], "violated_count": -1}},
+        {"quality": {"unknown_count": 0, "unknown_triage": [{"code": "missing_diff_evidence", "count": "1"}]}},
+        {"quality": {"unknown_count": 0, "unknown_triage": [{"code": "missing_test_evidence", "count": -1}]}},
     ],
 )
 def test_fake_pr_bot_consumer_treats_malformed_referenced_bundle_contract_as_manual_review(
