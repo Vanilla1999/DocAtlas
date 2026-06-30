@@ -19,6 +19,8 @@ LOW_VALUE_SYMBOLS = {
     "StatelessWidget", "StatefulWidget",
 }
 DOGFOOD_MEMO_REASONS = {"dogfood_result_memo", "dogfood_task_artifact"}
+MAX_PR_COMMENT_CHARS = 60_000
+MAX_PR_COMMENT_FIELD_CHARS = 2_000
 PATCH_REVIEW_SCHEMA_VERSIONS = {
     "review_summary_manifest.json": 1,
     "review_summary_quality.json": 1,
@@ -327,6 +329,7 @@ class PatchReviewService:
         summary_mode: str,
     ) -> dict[str, Any]:
         actionable_items = actions_payload.get("actionable_items", [])
+        violations = actions_payload.get("violations", [])
         signals = quality_payload.get("signals", [])
         body_lines = [
             "### DocAtlas patch review",
@@ -334,6 +337,13 @@ class PatchReviewService:
             f"Attachability: `{quality_payload.get('attachable')}`",
             f"Summary mode: `{summary_mode}`",
         ]
+        if violations:
+            body_lines.extend(["", "Violations:"])
+            body_lines.extend(
+                f"- `{PatchReviewService._markdown_text(item.get('constraint_id'))}`: "
+                f"{PatchReviewService._markdown_text(item.get('reason'))}"
+                for item in violations
+            )
         if signals:
             body_lines.extend(["", "Signals:"])
             body_lines.extend(
@@ -352,13 +362,14 @@ class PatchReviewService:
             "summary_mode": summary_mode,
             "title": "DocAtlas patch review",
             "attachable": quality_payload.get("attachable"),
-            "body_markdown": "\n".join(body_lines) + "\n",
+            "body_markdown": PatchReviewService._truncate_pr_comment("\n".join(body_lines) + "\n"),
             "source_artifacts": [
                 "review_summary_quality.json",
                 "review_summary_actions.json",
             ],
             "signals": signals,
             "actionable_items": actionable_items,
+            "violations": violations,
             "claims_avoided": quality_payload.get("claims_avoided", []),
         }
 
@@ -469,7 +480,8 @@ class PatchReviewService:
             if str(item.get("constraint_id") or "") in constraints_by_id
         ]
         actionable_candidates = [item for item in ranked_constraints if PatchReviewService._summary_bucket(item, changed_files, task) == "actionable"]
-        actionable = PatchReviewService._dedupe_constraints([*violation_constraints, *actionable_candidates])[:summary_max_items]
+        all_actionable = PatchReviewService._dedupe_constraints([*violation_constraints, *actionable_candidates])
+        actionable = all_actionable[:summary_max_items]
         manual_limit = 12 if summary_mode == "verbose" else 6
         low_limit = 12 if summary_mode == "verbose" else 6
         symbol_limit = 16 if summary_mode == "verbose" else 8
@@ -484,6 +496,7 @@ class PatchReviewService:
         residual_memos = [item for item in excluded_sources if item.get("reason") in DOGFOOD_MEMO_REASONS]
         quality = PatchReviewService._summary_quality(
             actionable=actionable,
+            actionable_total_count=len(all_actionable),
             low_context=low_context,
             low_symbols=low_symbols,
             unknown_buckets=unknown_buckets,
@@ -491,6 +504,7 @@ class PatchReviewService:
         )
         return {
             "summary_mode": summary_mode,
+            "all_actionable": all_actionable,
             "actionable": actionable,
             "manual_context": manual_context,
             "low_context": low_context,
@@ -528,6 +542,7 @@ class PatchReviewService:
         )
         summary_mode = model["summary_mode"]
         actionable = model["actionable"]
+        all_actionable = model["all_actionable"]
         low_context = model["low_context"]
         low_symbols = model["low_symbols"]
         unknown_buckets = model["unknown_buckets"]
@@ -547,6 +562,7 @@ class PatchReviewService:
             "summary_mode": summary_mode,
             "actionable_items_limit": summary_max_items,
             "actionable_items_count": len(actionable),
+            "actionable_items_total_count": len(all_actionable),
             "low_value_top_items_count": len(low_context) + len(low_symbols),
             "unknown_bucket_count": len(unknown_buckets),
             "residual_memo_source_count": len(residual_memos),
@@ -693,14 +709,31 @@ class PatchReviewService:
             "source_files": files,
             "symbols": symbols,
             "files": files,
-            "markdown": f"- {instruction} (source: `{source}`)",
-            "evidence_markdown": f"  - evidence: {evidence}" if evidence else None,
+            "markdown": (
+                f"- {PatchReviewService._markdown_text(instruction)} "
+                f"(source: `{PatchReviewService._markdown_text(source)}`)"
+            ),
+            "evidence_markdown": f"  - evidence: {PatchReviewService._markdown_text(evidence)}" if evidence else None,
         }
         if result:
             payload["validation_status"] = result.get("status")
             payload["validation_reason"] = result.get("reason")
             payload["files"] = result.get("files", [])
         return payload
+
+    @staticmethod
+    def _markdown_text(value: Any, *, limit: int = MAX_PR_COMMENT_FIELD_CHARS) -> str:
+        text = str(value or "")
+        text = text.replace("`", "\\`").replace("@", "@\u200b")
+        if len(text) <= limit:
+            return text
+        return text[: max(0, limit - 16)].rstrip() + " … [truncated]"
+
+    @staticmethod
+    def _truncate_pr_comment(body: str) -> str:
+        if len(body) <= MAX_PR_COMMENT_CHARS:
+            return body
+        return body[: MAX_PR_COMMENT_CHARS - 64].rstrip() + "\n\n_Comment truncated for provider limits._\n"
 
     @staticmethod
     def _constraints_markdown(packet: dict[str, Any]) -> str:
@@ -993,6 +1026,7 @@ class PatchReviewService:
     def _summary_quality(
         *,
         actionable: list[dict[str, Any]],
+        actionable_total_count: int,
         low_context: list[dict[str, Any]],
         low_symbols: list[dict[str, Any]],
         unknown_buckets: dict[str, list[dict[str, Any]]],
@@ -1008,7 +1042,7 @@ class PatchReviewService:
         if residual_memos:
             reasons.append(f"{len(residual_memos)} residual dogfood memo source(s) excluded/demoted")
         attachable = "yes"
-        if len(actionable) < 3 or len(unknown_buckets) > 5:
+        if actionable_total_count < 3 or len(unknown_buckets) > 5:
             attachable = "no"
         elif low_context or low_symbols or residual_memos or unknown_buckets:
             attachable = "maybe"

@@ -758,6 +758,7 @@ def test_patch_review_machine_readable_artifact_contracts(tmp_path: Path):
         "summary_mode",
         "actionable_items_limit",
         "actionable_items_count",
+        "actionable_items_total_count",
         "low_value_top_items_count",
         "unknown_bucket_count",
         "residual_memo_source_count",
@@ -821,6 +822,7 @@ def test_patch_review_machine_readable_artifact_contracts(tmp_path: Path):
         "source_artifacts",
         "signals",
         "actionable_items",
+        "violations",
         "claims_avoided",
     } <= set(pr_comment)
     assert pr_comment["schema_version"] == PATCH_REVIEW_SCHEMA_VERSIONS["review_summary_pr_comment.json"]
@@ -957,3 +959,85 @@ def test_patch_review_summary_puts_violations_first_even_when_broad_context():
     assert actionable_items[0].startswith("- Broad architecture rule was violated")
     assert "Generated files must not be edited" in actionable_items[1]
     assert "broad-violated: policy code changed in UI" in _section(summary, "Violations")
+
+
+def test_patch_review_quality_attachable_uses_total_actionable_not_display_cap():
+    constraints = {
+        "constraints": [
+            {
+                "id": f"actionable-{index}",
+                "type": "source_of_truth",
+                "instruction": f"Apply checkout rule {index}.",
+                "source": "docs/checkout.md",
+                "confidence": "high",
+                "evidence": f"checkout rule {index}",
+                "symbols": [f"checkoutRule{index}"],
+                "files": [],
+            }
+            for index in range(3)
+        ],
+        "symbol_candidates": [],
+        "excluded_source_reasons": [],
+    }
+    validation = {"satisfied": 0, "violated": 0, "unknown": 0, "results": [], "warnings": []}
+
+    quality = PatchReviewService._review_summary_quality_payload(
+        "Review checkout rules",
+        ["docs/checkout.md"],
+        constraints,
+        validation,
+        summary_max_items=1,
+    )
+
+    assert quality["actionable_items_count"] == 1
+    assert quality["actionable_items_total_count"] == 3
+    assert quality["attachable"] == "yes"
+
+
+def test_patch_review_pr_comment_lists_violations_separately_from_capped_actions():
+    actions = {
+        "actionable_items": [],
+        "violations": [
+            {"constraint_id": "policy-violation", "reason": "Provider policy moved into UI", "files": ["lib/widget.dart"]}
+        ],
+    }
+    quality = {
+        "attachable": "maybe",
+        "signals": [{"code": "violations_present", "severity": "error", "count": 1}],
+        "claims_avoided": ["correctness_proof"],
+    }
+
+    comment = PatchReviewService._review_summary_pr_comment_payload(actions, quality, summary_mode="compact")
+
+    assert comment["violations"] == actions["violations"]
+    assert "Violations:" in comment["body_markdown"]
+    assert "policy-violation" in comment["body_markdown"]
+    assert "Provider policy moved into UI" in comment["body_markdown"]
+
+
+def test_patch_review_render_ready_markdown_escapes_mentions_backticks_and_truncates():
+    item = PatchReviewService._actionable_item_payload(
+        {
+            "id": "unsafe-markdown",
+            "instruction": "Ping @team and use `danger`" + "x" * 2500,
+            "source": "docs/`unsafe`.md",
+            "type": "source_of_truth",
+            "confidence": "high",
+            "evidence": "Evidence mentions @team and `danger`",
+            "symbols": [],
+            "files": [],
+        },
+        None,
+        rank=1,
+    )
+
+    assert "@team" not in item["markdown"]
+    assert "@\u200bteam" in item["markdown"]
+    assert "\\`danger\\`" in item["markdown"]
+    assert "[truncated]" in item["markdown"]
+    assert "@team" not in item["evidence_markdown"]
+    assert "\\`danger\\`" in item["evidence_markdown"]
+
+    long_body = PatchReviewService._truncate_pr_comment("x" * 70_000)
+    assert len(long_body) <= 60_000
+    assert "Comment truncated for provider limits" in long_body
