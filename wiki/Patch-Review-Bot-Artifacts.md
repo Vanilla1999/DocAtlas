@@ -12,6 +12,8 @@ The manifest is the artifact discovery contract. Consumers should select entries
 
 If `review_summary_manifest.json` is absent, unreadable, malformed, or has an unsupported `schema_version`, automation must treat the output directory as having no completed patch-review run. Consumers should ignore sibling artifacts such as `review_summary_bot_bundle.json` and `review_summary.md`, then fall back to manual review rather than inferring pass/safe-to-merge from stale, partial, or incompatible files.
 
+After a supported manifest is loaded, consumers should still fail closed if a manifest-referenced bot JSON artifact is missing, unreadable, malformed, or fails the consumer's required contract checks. In that case, do not parse `review_summary.md` to recover automation decisions; fall back to manual review and treat the run as incomplete for bot purposes.
+
 Required manifest fields:
 
 - `schema_version`: manifest schema version.

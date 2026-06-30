@@ -135,9 +135,17 @@ def _fake_pr_bot_discover_output_dir(output_dir: Path) -> dict[str, Any]:
         return manual_fallback("invalid_manifest_completed_run_marker")
     if manifest.get("schema_version") != PATCH_REVIEW_SCHEMA_VERSIONS["review_summary_manifest.json"]:
         return manual_fallback("unsupported_manifest_schema_version")
+    try:
+        consumer_payload = _fake_pr_bot_consume_manifest(manifest_path, manifest)
+    except FileNotFoundError:
+        return manual_fallback("missing_bot_bundle_artifact")
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError):
+        return manual_fallback("invalid_bot_bundle_artifact")
+    except AssertionError:
+        return manual_fallback("invalid_bot_bundle_contract")
     return {
         "status": "completed_patch_review_run",
-        **_fake_pr_bot_consume_manifest(manifest_path, manifest),
+        **consumer_payload,
     }
 
 
@@ -1849,6 +1857,100 @@ def test_fake_pr_bot_consumer_treats_unsupported_manifest_schema_as_no_completed
     assert consumer_decision["highlight_violations"] is False
     assert consumer_decision["requires_manual_review"] is True
     assert consumer_decision["reason_codes"] == ["unsupported_manifest_schema_version"]
+    assert consumer_decision["semantics"] == "manual_fallback_not_pass"
+    assert "safe_to_merge" not in consumer_decision
+    assert "review_summary_bot_bundle.json" in consumer_decision["ignored_sibling_artifacts"]
+    assert "review_summary.md" in consumer_decision["ignored_sibling_artifacts"]
+
+
+def test_fake_pr_bot_consumer_treats_missing_manifest_referenced_bundle_as_manual_review(tmp_path: Path, monkeypatch):
+    out = tmp_path / "review-missing-bundle-fallback"
+    out.mkdir()
+    _write(
+        out / "review_summary_manifest.json",
+        json.dumps(
+            {
+                "schema_version": PATCH_REVIEW_SCHEMA_VERSIONS["review_summary_manifest.json"],
+                "summary_mode": "standard",
+                "product_role": "non_blocking_pr_review_assistant",
+                "claims_avoided": ["correctness_proof", "test_or_human_review_replacement"],
+                "artifacts": [
+                    {
+                        "filename": "review_summary_bot_bundle.json",
+                        "kind": "bot_bundle",
+                        "schema_version": PATCH_REVIEW_SCHEMA_VERSIONS["review_summary_bot_bundle.json"],
+                        "intended_consumers": ["pr_bot", "automation"],
+                        "safe_usage": "single-file bot integration entrypoint; advisory non-blocking only",
+                    }
+                ],
+            }
+        ),
+    )
+    _write(out / "review_summary.md", "stale human summary that must not be parsed for automation")
+    original_read_text = Path.read_text
+
+    def fail_if_markdown_is_read(path: Path, *args: Any, **kwargs: Any) -> str:
+        if path.name == "review_summary.md":
+            raise AssertionError("fake PR bot must not parse markdown when manifest-referenced bundle is missing")
+        return original_read_text(path, *args, **kwargs)
+
+    monkeypatch.setattr(Path, "read_text", fail_if_markdown_is_read)
+
+    consumer_decision = _fake_pr_bot_discover_output_dir(out)
+
+    assert consumer_decision["status"] == "no_completed_patch_review_run"
+    assert consumer_decision["attach_comment"] is False
+    assert consumer_decision["show_warning_badge"] is True
+    assert consumer_decision["highlight_violations"] is False
+    assert consumer_decision["requires_manual_review"] is True
+    assert consumer_decision["reason_codes"] == ["missing_bot_bundle_artifact"]
+    assert consumer_decision["semantics"] == "manual_fallback_not_pass"
+    assert "safe_to_merge" not in consumer_decision
+    assert "review_summary.md" in consumer_decision["ignored_sibling_artifacts"]
+
+
+def test_fake_pr_bot_consumer_treats_invalid_manifest_referenced_bundle_as_manual_review(tmp_path: Path, monkeypatch):
+    out = tmp_path / "review-invalid-bundle-fallback"
+    out.mkdir()
+    _write(
+        out / "review_summary_manifest.json",
+        json.dumps(
+            {
+                "schema_version": PATCH_REVIEW_SCHEMA_VERSIONS["review_summary_manifest.json"],
+                "summary_mode": "standard",
+                "product_role": "non_blocking_pr_review_assistant",
+                "claims_avoided": ["correctness_proof", "test_or_human_review_replacement"],
+                "artifacts": [
+                    {
+                        "filename": "review_summary_bot_bundle.json",
+                        "kind": "bot_bundle",
+                        "schema_version": PATCH_REVIEW_SCHEMA_VERSIONS["review_summary_bot_bundle.json"],
+                        "intended_consumers": ["pr_bot", "automation"],
+                        "safe_usage": "single-file bot integration entrypoint; advisory non-blocking only",
+                    }
+                ],
+            }
+        ),
+    )
+    _write(out / "review_summary_bot_bundle.json", "{not valid json")
+    _write(out / "review_summary.md", "stale human summary that must not be parsed for automation")
+    original_read_text = Path.read_text
+
+    def fail_if_markdown_is_read(path: Path, *args: Any, **kwargs: Any) -> str:
+        if path.name == "review_summary.md":
+            raise AssertionError("fake PR bot must not parse markdown when manifest-referenced bundle is invalid")
+        return original_read_text(path, *args, **kwargs)
+
+    monkeypatch.setattr(Path, "read_text", fail_if_markdown_is_read)
+
+    consumer_decision = _fake_pr_bot_discover_output_dir(out)
+
+    assert consumer_decision["status"] == "no_completed_patch_review_run"
+    assert consumer_decision["attach_comment"] is False
+    assert consumer_decision["show_warning_badge"] is True
+    assert consumer_decision["highlight_violations"] is False
+    assert consumer_decision["requires_manual_review"] is True
+    assert consumer_decision["reason_codes"] == ["invalid_bot_bundle_artifact"]
     assert consumer_decision["semantics"] == "manual_fallback_not_pass"
     assert "safe_to_merge" not in consumer_decision
     assert "review_summary_bot_bundle.json" in consumer_decision["ignored_sibling_artifacts"]
