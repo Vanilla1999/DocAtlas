@@ -78,7 +78,11 @@ def _fake_pr_bot_consume_manifest(manifest_path: Path, manifest: dict[str, Any] 
         for item in bundle["quality"].get("unknown_triage", [])
         if item.get("code") and item.get("count", 0) > 0
     }
-    assert decision["unknown_triage_counts"] == unknown_triage_counts
+    decision_unknown_triage_counts = decision.get("unknown_triage_counts")
+    if decision_unknown_triage_counts is None:
+        decision_unknown_triage_counts = unknown_triage_counts
+    else:
+        assert decision_unknown_triage_counts == unknown_triage_counts
     return {
         "attach_comment": decision["should_attach_comment"],
         "show_warning_badge": decision["show_warning_badge"],
@@ -86,7 +90,7 @@ def _fake_pr_bot_consume_manifest(manifest_path: Path, manifest: dict[str, Any] 
         "requires_manual_review": decision["requires_manual_review"],
         "reason_codes": decision["reason_codes"],
         "unknown_triage_codes": decision["unknown_triage_codes"],
-        "unknown_triage_counts": decision["unknown_triage_counts"],
+        "unknown_triage_counts": decision_unknown_triage_counts,
         "unknown_triage_examples_by_code": unknown_triage_examples_by_code,
         "violation_count": len(bundle["actions"]["violations"]),
         "unknown_count": bundle["quality"]["unknown_count"],
@@ -1464,6 +1468,76 @@ def test_patch_review_advisory_decision_exposes_unknown_triage_counts_for_bot_ba
     }
     assert decision["semantics"] == "advisory_non_blocking_only"
     assert "safe_to_merge" not in decision
+
+
+def test_fake_pr_bot_consumer_reconstructs_missing_triage_counts_for_v3_bundle(tmp_path: Path):
+    out = tmp_path / "review-v3-additive-field-fallback"
+    out.mkdir()
+    manifest = {
+        "schema_version": PATCH_REVIEW_SCHEMA_VERSIONS["review_summary_manifest.json"],
+        "summary_mode": "standard",
+        "product_role": "non_blocking_pr_review_assistant",
+        "claims_avoided": [
+            "correctness_proof",
+            "test_or_human_review_replacement",
+            "broad_docatlas_superiority",
+        ],
+        "artifacts": [
+            {
+                "filename": "review_summary_bot_bundle.json",
+                "kind": "bot_bundle",
+                "schema_version": PATCH_REVIEW_SCHEMA_VERSIONS["review_summary_bot_bundle.json"],
+                "intended_consumers": ["pr_bot", "automation"],
+                "safe_usage": "Use as a single-file bot integration entrypoint with advisory non-blocking decisions.",
+            }
+        ],
+    }
+    bundle = {
+        "schema_version": PATCH_REVIEW_SCHEMA_VERSIONS["review_summary_bot_bundle.json"],
+        "summary_mode": "standard",
+        "manifest": manifest,
+        "quality": {
+            "unknown_count": 2,
+            "unknown_triage": [
+                {"code": "missing_diff_evidence", "count": 1, "requires_manual_review": True, "examples": []},
+                {"code": "missing_test_evidence", "count": 1, "requires_manual_review": True, "examples": []},
+            ],
+        },
+        "actions": {"violations": []},
+        "advisory_decision": {
+            "should_attach_comment": True,
+            "show_warning_badge": True,
+            "highlight_violations": False,
+            "requires_manual_review": True,
+            "reason_codes": ["manual_review_required"],
+            "unknown_triage_codes": ["missing_diff_evidence", "missing_test_evidence"],
+            "semantics": "advisory_non_blocking_only",
+            "claims_avoided": [
+                "safe_to_merge",
+                "correctness_proof",
+                "test_or_human_review_replacement",
+            ],
+        },
+        "claims_avoided": [
+            "correctness_proof",
+            "test_or_human_review_replacement",
+            "broad_docatlas_superiority",
+        ],
+    }
+    _write(out / "review_summary_manifest.json", json.dumps(manifest))
+    _write(out / "review_summary_bot_bundle.json", json.dumps(bundle))
+
+    consumer_decision = _fake_pr_bot_discover_output_dir(out)
+
+    assert consumer_decision["status"] == "completed_patch_review_run"
+    assert consumer_decision["requires_manual_review"] is True
+    assert consumer_decision["reason_codes"] == ["manual_review_required"]
+    assert consumer_decision["unknown_triage_codes"] == ["missing_diff_evidence", "missing_test_evidence"]
+    assert consumer_decision["unknown_triage_counts"] == {
+        "missing_diff_evidence": 1,
+        "missing_test_evidence": 1,
+    }
+    assert "safe_to_merge" not in consumer_decision
 
 
 def test_fake_pr_bot_consumer_discovers_bundle_via_manifest_without_markdown_parsing(tmp_path: Path):
