@@ -544,7 +544,9 @@ class PatchConstraintsService:
                     lowered = line.lower()
                     if not any(variant and variant.lower() in lowered for variant in variants):
                         continue
-                    symbol = self._symbol_from_line(line, variants) or term
+                    symbol = self._symbol_from_line(line, variants)
+                    if not symbol:
+                        continue
                     if symbol in GENERIC_CALL_SYMBOLS and not self._term_explicitly_mentions_symbol(term, symbol):
                         continue
                     key = (term.lower(), rel, symbol)

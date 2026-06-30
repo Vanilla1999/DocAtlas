@@ -327,6 +327,44 @@ class HelpRequestsRepository {
     assert any(candidate["matched_symbol"] == "returnClosedRequestToActive" for candidate in packet.symbol_candidates)
 
 
+def test_symbol_grounding_skips_comment_only_phrase_matches(tmp_path: Path):
+    root = _workspace(tmp_path)
+    _write(
+        root / "lib/src/ui/help_request_details_screen/cubit/help_request_details_cubit.dart",
+        """
+class HelpRequestDetailsCubit {
+  /// Вернуть закрытую заявку HELP в работу.
+  Future<void> returnClosedRequestToActive(String requestNumber) async {}
+
+  /// Отправить комментарий.
+  Future<void> sendComment(String text) async {}
+}
+""",
+    )
+    _write(
+        root / "lib/src/utils/help_request_strings.dart",
+        """
+class HelpAppStrings {
+  static const helpRequestReturnToWorkBtn = 'Вернуть в работу';
+}
+""",
+    )
+
+    packet = _packet(
+        root,
+        question='Reopen HELP request: show button "Вернуть в работу" and allow Отправить after success.',
+        changed_files=["lib/src/ui/help_request_details_screen/cubit/help_request_details_cubit.dart"],
+        max_constraints=20,
+        max_tokens=4000,
+    )
+
+    assert not any(
+        candidate["matched_symbol"] in {"Вернуть в работу", "Отправить"}
+        for candidate in packet.symbol_candidates
+    )
+    assert any(candidate["matched_symbol"] == "helpRequestReturnToWorkBtn" for candidate in packet.symbol_candidates)
+
+
 # Backward-compatible smoke names from the first production PR.
 def test_generated_file_constraint_extraction(tmp_path: Path):
     test_extracts_generated_file_constraint_from_docs(tmp_path)
