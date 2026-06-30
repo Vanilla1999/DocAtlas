@@ -274,6 +274,34 @@ def test_symbol_grounding_does_not_invent_without_source_match(tmp_path: Path):
     assert not any(candidate["term"] == "TotallyMissingBusinessThing" for candidate in packet.symbol_candidates)
 
 
+def test_symbol_grounding_demotes_broad_project_acronyms(tmp_path: Path):
+    root = _workspace(tmp_path)
+    _write(
+        root / "lib/src/utils/help_request_strings.dart",
+        """
+class HelpAppStrings {}
+const helpRequestReturnToWorkButton = 'Вернуть в работу';
+""",
+    )
+
+    packet = _packet(
+        root,
+        question="Reopen HELP request and show the return-to-work button.",
+        changed_files=["lib/src/utils/help_request_strings.dart"],
+        max_constraints=20,
+        max_tokens=4000,
+    )
+
+    help_candidates = [candidate for candidate in packet.symbol_candidates if candidate["term"] == "HELP"]
+    assert help_candidates
+    assert all(candidate["confidence"] == "low" for candidate in help_candidates)
+    assert all(candidate["reason"].startswith("broad_acronym_demoted") for candidate in help_candidates)
+    assert any(candidate["matched_symbol"] == "helpRequestReturnToWorkButton" for candidate in packet.symbol_candidates)
+    help_constraints = [constraint for constraint in packet.constraints if constraint.id.startswith("symbol-candidate-help-")]
+    assert help_constraints
+    assert all(constraint.confidence == "low" for constraint in help_constraints)
+
+
 # Backward-compatible smoke names from the first production PR.
 def test_generated_file_constraint_extraction(tmp_path: Path):
     test_extracts_generated_file_constraint_from_docs(tmp_path)

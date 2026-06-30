@@ -555,6 +555,9 @@ class PatchConstraintsService:
                     reason = "task term matched an existing source/docs symbol; prefer reusing source-attributed project behavior before inventing a new path."
                     if generated_asset_source:
                         reason = "generated_asset_demoted: task explicitly mentions assets/resources, so generated asset registry evidence is kept at low confidence."
+                    elif self._is_broad_acronym_symbol_candidate(term, symbol):
+                        confidence = "low"
+                        reason = "broad_acronym_demoted: short project/product acronyms are too broad for the top PR-bot checklist unless tied to a more specific task symbol."
                     candidates.append({
                         "term": term,
                         "matched_symbol": symbol,
@@ -685,6 +688,13 @@ class PatchConstraintsService:
         if re.search(rf"\b(?:class|enum|mixin|extension|typedef|const|final|var|void|Future<[^>]+>|Future|Widget)\s+{re.escape(symbol)}\b", line):
             return "high"
         return "medium"
+
+    @staticmethod
+    def _is_broad_acronym_symbol_candidate(term: str, symbol: str) -> bool:
+        compact_term = re.sub(r"[^A-Z0-9]+", "", term)
+        if not (term == compact_term and 3 <= len(compact_term) <= 5):
+            return False
+        return symbol.lower() != compact_term.lower()
 
     @staticmethod
     def _term_explicitly_mentions_symbol(term: str, symbol: str) -> bool:
