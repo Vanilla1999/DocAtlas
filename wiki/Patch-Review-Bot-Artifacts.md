@@ -10,7 +10,7 @@ Start from `review_summary_manifest.json`, not from `review_summary.md`.
 
 The manifest is the artifact discovery contract. Consumers should select entries by `filename`, `kind`, and `schema_version`, then read the referenced JSON file from the same output directory. Human markdown remains a presentation artifact for reviewers.
 
-If `review_summary_manifest.json` is absent, automation must treat the output directory as having no completed patch-review run. Consumers should ignore sibling artifacts such as `review_summary_bot_bundle.json` and `review_summary.md`, then fall back to manual review rather than inferring pass/safe-to-merge from stale or partial files.
+If `review_summary_manifest.json` is absent, unreadable, malformed, or has an unsupported `schema_version`, automation must treat the output directory as having no completed patch-review run. Consumers should ignore sibling artifacts such as `review_summary_bot_bundle.json` and `review_summary.md`, then fall back to manual review rather than inferring pass/safe-to-merge from stale, partial, or incompatible files.
 
 Required manifest fields:
 
@@ -70,4 +70,4 @@ Forbidden bot-consumer assumptions:
 
 Schema versions are centralized in `PATCH_REVIEW_SCHEMA_VERSIONS` in `docmancer/docs/application/patch_review_service.py`. A required-field removal, type change, or meaning change should bump the affected artifact schema version and update contract tests. Additive fields may keep the current version when existing consumers can ignore them safely.
 
-Bot integrations should reject unknown major/required schema expectations conservatively and fall back to manual review rather than treating the result as pass.
+Bot integrations should reject unknown major/required schema expectations conservatively and fall back to manual review rather than reading sibling artifacts or treating the result as pass.

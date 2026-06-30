@@ -33,8 +33,10 @@ def _git(repo: Path, *args: str) -> None:
     subprocess.check_call(["git", *args], cwd=repo)
 
 
-def _fake_pr_bot_consume_manifest(manifest_path: Path) -> dict[str, Any]:
-    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+def _fake_pr_bot_consume_manifest(manifest_path: Path, manifest: dict[str, Any] | None = None) -> dict[str, Any]:
+    if manifest is None:
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    assert manifest is not None
     bundle_entries = [
         item
         for item in manifest["artifacts"]
@@ -73,7 +75,7 @@ def _fake_pr_bot_consume_manifest(manifest_path: Path) -> dict[str, Any]:
 
 def _fake_pr_bot_discover_output_dir(output_dir: Path) -> dict[str, Any]:
     manifest_path = output_dir / "review_summary_manifest.json"
-    if not manifest_path.exists():
+    def manual_fallback(reason_code: str) -> dict[str, Any]:
         sibling_artifacts = sorted(
             path.name
             for path in output_dir.iterdir()
@@ -85,13 +87,24 @@ def _fake_pr_bot_discover_output_dir(output_dir: Path) -> dict[str, Any]:
             "show_warning_badge": True,
             "highlight_violations": False,
             "requires_manual_review": True,
-            "reason_codes": ["missing_manifest_completed_run_marker"],
+            "reason_codes": [reason_code],
             "ignored_sibling_artifacts": sibling_artifacts,
             "semantics": "manual_fallback_not_pass",
         }
+
+    if not manifest_path.exists():
+        return manual_fallback("missing_manifest_completed_run_marker")
+    try:
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError):
+        return manual_fallback("invalid_manifest_completed_run_marker")
+    if not isinstance(manifest, dict):
+        return manual_fallback("invalid_manifest_completed_run_marker")
+    if manifest.get("schema_version") != PATCH_REVIEW_SCHEMA_VERSIONS["review_summary_manifest.json"]:
+        return manual_fallback("unsupported_manifest_schema_version")
     return {
         "status": "completed_patch_review_run",
-        **_fake_pr_bot_consume_manifest(manifest_path),
+        **_fake_pr_bot_consume_manifest(manifest_path, manifest),
     }
 
 
@@ -1242,6 +1255,80 @@ def test_fake_pr_bot_consumer_treats_missing_manifest_as_no_completed_run(tmp_pa
     assert consumer_decision["highlight_violations"] is False
     assert consumer_decision["requires_manual_review"] is True
     assert consumer_decision["reason_codes"] == ["missing_manifest_completed_run_marker"]
+    assert consumer_decision["semantics"] == "manual_fallback_not_pass"
+    assert "safe_to_merge" not in consumer_decision
+    assert "review_summary_bot_bundle.json" in consumer_decision["ignored_sibling_artifacts"]
+    assert "review_summary.md" in consumer_decision["ignored_sibling_artifacts"]
+
+
+def test_fake_pr_bot_consumer_treats_invalid_manifest_as_no_completed_run(tmp_path: Path, monkeypatch):
+    out = tmp_path / "review-invalid-manifest-fallback"
+    out.mkdir()
+    _write(out / "review_summary_manifest.json", "{not valid json")
+    _write(out / "review_summary_bot_bundle.json", json.dumps({"safe_to_merge": True}))
+    _write(out / "review_summary.md", "stale human summary")
+    original_read_text = Path.read_text
+
+    def fail_if_sibling_artifact_is_read(path: Path, *args: Any, **kwargs: Any) -> str:
+        if path.name in {"review_summary_bot_bundle.json", "review_summary.md"}:
+            raise AssertionError(f"fake PR bot must ignore sibling artifact with invalid manifest: {path.name}")
+        return original_read_text(path, *args, **kwargs)
+
+    monkeypatch.setattr(Path, "read_text", fail_if_sibling_artifact_is_read)
+
+    consumer_decision = _fake_pr_bot_discover_output_dir(out)
+    assert consumer_decision["status"] == "no_completed_patch_review_run"
+    assert consumer_decision["attach_comment"] is False
+    assert consumer_decision["show_warning_badge"] is True
+    assert consumer_decision["highlight_violations"] is False
+    assert consumer_decision["requires_manual_review"] is True
+    assert consumer_decision["reason_codes"] == ["invalid_manifest_completed_run_marker"]
+    assert consumer_decision["semantics"] == "manual_fallback_not_pass"
+    assert "safe_to_merge" not in consumer_decision
+    assert "review_summary_bot_bundle.json" in consumer_decision["ignored_sibling_artifacts"]
+    assert "review_summary.md" in consumer_decision["ignored_sibling_artifacts"]
+
+
+def test_fake_pr_bot_consumer_treats_unsupported_manifest_schema_as_no_completed_run(tmp_path: Path, monkeypatch):
+    out = tmp_path / "review-unsupported-manifest-fallback"
+    out.mkdir()
+    _write(
+        out / "review_summary_manifest.json",
+        json.dumps(
+            {
+                "schema_version": PATCH_REVIEW_SCHEMA_VERSIONS["review_summary_manifest.json"] + 1,
+                "product_role": "non_blocking_pr_review_assistant",
+                "claims_avoided": ["safe_to_merge"],
+                "artifacts": [
+                    {
+                        "filename": "review_summary_bot_bundle.json",
+                        "kind": "bot_bundle",
+                        "schema_version": PATCH_REVIEW_SCHEMA_VERSIONS["review_summary_bot_bundle.json"],
+                        "intended_consumers": ["pr_bot", "automation"],
+                        "safe_usage": "single-file bot integration entrypoint; advisory non-blocking only",
+                    }
+                ],
+            }
+        ),
+    )
+    _write(out / "review_summary_bot_bundle.json", json.dumps({"safe_to_merge": True}))
+    _write(out / "review_summary.md", "stale human summary")
+    original_read_text = Path.read_text
+
+    def fail_if_sibling_artifact_is_read(path: Path, *args: Any, **kwargs: Any) -> str:
+        if path.name in {"review_summary_bot_bundle.json", "review_summary.md"}:
+            raise AssertionError(f"fake PR bot must ignore sibling artifact with unsupported manifest: {path.name}")
+        return original_read_text(path, *args, **kwargs)
+
+    monkeypatch.setattr(Path, "read_text", fail_if_sibling_artifact_is_read)
+
+    consumer_decision = _fake_pr_bot_discover_output_dir(out)
+    assert consumer_decision["status"] == "no_completed_patch_review_run"
+    assert consumer_decision["attach_comment"] is False
+    assert consumer_decision["show_warning_badge"] is True
+    assert consumer_decision["highlight_violations"] is False
+    assert consumer_decision["requires_manual_review"] is True
+    assert consumer_decision["reason_codes"] == ["unsupported_manifest_schema_version"]
     assert consumer_decision["semantics"] == "manual_fallback_not_pass"
     assert "safe_to_merge" not in consumer_decision
     assert "review_summary_bot_bundle.json" in consumer_decision["ignored_sibling_artifacts"]
