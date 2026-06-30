@@ -952,16 +952,71 @@ def test_patch_review_machine_readable_artifact_contracts(tmp_path: Path):
         "actions",
         "pr_comment",
         "trace",
+        "advisory_decision",
         "claims_avoided",
     } <= set(bot_bundle)
     assert bot_bundle["schema_version"] == PATCH_REVIEW_SCHEMA_VERSIONS["review_summary_bot_bundle.json"]
-    assert bot_bundle["schema_version"] == 2
+    assert bot_bundle["schema_version"] == 3
     assert manifest_artifacts["review_summary_quality.json"]["schema_version"] == quality["schema_version"]
     assert manifest_artifacts["review_summary_bot_bundle.json"]["schema_version"] == bot_bundle["schema_version"]
     assert bot_bundle["quality"] == quality
     assert bot_bundle["actions"] == actions
     assert bot_bundle["pr_comment"] == pr_comment
     assert bot_bundle["trace"] == trace
+    assert bot_bundle["advisory_decision"]["semantics"] == "advisory_non_blocking_only"
+    assert "safe_to_merge" not in bot_bundle["advisory_decision"]
+
+
+def test_patch_review_advisory_decision_is_non_blocking_and_escalates_violations_and_unknowns():
+    base_quality = {
+        "signals": [],
+        "violated_count": 0,
+        "unknown_count": 0,
+        "actionable_items_total_count": 1,
+    }
+    base_actions = {"actionable_items": [{"constraint_id": "action"}], "violations": []}
+
+    clean_action = PatchReviewService._review_summary_advisory_decision_payload(base_quality, base_actions)
+    assert clean_action["should_attach_comment"] is True
+    assert clean_action["show_warning_badge"] is False
+    assert clean_action["highlight_violations"] is False
+    assert clean_action["requires_manual_review"] is False
+    assert clean_action["reason_codes"] == ["actionable_items_present"]
+
+    violation = PatchReviewService._review_summary_advisory_decision_payload(
+        {**base_quality, "violated_count": 1, "actionable_items_total_count": 0},
+        {"actionable_items": [], "violations": [{"constraint_id": "policy"}]},
+    )
+    assert violation["should_attach_comment"] is True
+    assert violation["show_warning_badge"] is True
+    assert violation["highlight_violations"] is True
+    assert violation["requires_manual_review"] is True
+    assert violation["reason_codes"] == ["violations_present"]
+
+    unknown = PatchReviewService._review_summary_advisory_decision_payload(
+        {**base_quality, "unknown_count": 1, "actionable_items_total_count": 0},
+        {"actionable_items": [], "violations": []},
+    )
+    assert unknown["should_attach_comment"] is True
+    assert unknown["show_warning_badge"] is True
+    assert unknown["highlight_violations"] is False
+    assert unknown["requires_manual_review"] is True
+    assert unknown["reason_codes"] == ["manual_review_required"]
+
+    violation_and_unknown = PatchReviewService._review_summary_advisory_decision_payload(
+        {**base_quality, "violated_count": 1, "unknown_count": 1, "actionable_items_total_count": 0},
+        {"actionable_items": [], "violations": [{"constraint_id": "policy"}]},
+    )
+    assert violation_and_unknown["highlight_violations"] is True
+    assert violation_and_unknown["requires_manual_review"] is True
+    assert violation_and_unknown["reason_codes"] == ["violations_present", "manual_review_required"]
+    assert violation_and_unknown["semantics"] == "advisory_non_blocking_only"
+    assert violation_and_unknown["claims_avoided"] == [
+        "safe_to_merge",
+        "correctness_proof",
+        "test_or_human_review_replacement",
+    ]
+    assert "safe_to_merge" not in violation_and_unknown
 
 
 

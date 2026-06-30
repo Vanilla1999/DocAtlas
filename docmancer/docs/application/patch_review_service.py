@@ -27,7 +27,7 @@ PATCH_REVIEW_SCHEMA_VERSIONS = {
     "review_summary_actions.json": 1,
     "review_summary_pr_comment.json": 1,
     "review_summary_trace.json": 1,
-    "review_summary_bot_bundle.json": 2,
+    "review_summary_bot_bundle.json": 3,
 }
 TASK_TOKEN_STOPWORDS = {
     "add", "and", "before", "change", "check", "current", "diff", "file",
@@ -274,7 +274,7 @@ class PatchReviewService:
                 "kind": "bot_bundle",
                 "schema_version": bot_bundle_schema_version,
                 "intended_consumers": ["pr_bot", "automation"],
-                "safe_usage": "Use as a single-file bot integration entrypoint containing manifest, quality, actions, PR comment, and trace metadata; non-blocking only.",
+                "safe_usage": "Use as a single-file bot integration entrypoint containing manifest, quality, actions, PR comment, trace metadata, and advisory non-blocking integration decisions.",
             },
             "constraints.json": {
                 "kind": "raw_constraints",
@@ -445,7 +445,46 @@ class PatchReviewService:
             "actions": actions_payload,
             "pr_comment": pr_comment_payload,
             "trace": trace_payload,
+            "advisory_decision": PatchReviewService._review_summary_advisory_decision_payload(
+                quality_payload,
+                actions_payload,
+            ),
             "claims_avoided": quality_payload.get("claims_avoided", []),
+        }
+
+    @staticmethod
+    def _review_summary_advisory_decision_payload(
+        quality_payload: dict[str, Any],
+        actions_payload: dict[str, Any],
+    ) -> dict[str, Any]:
+        signals = {str(item.get("code") or "") for item in quality_payload.get("signals", [])}
+        violations = list(actions_payload.get("violations") or [])
+        actionable_items = list(actions_payload.get("actionable_items") or [])
+        has_violations = bool(violations) or quality_payload.get("violated_count", 0) > 0 or "violations_present" in signals
+        has_manual_review = quality_payload.get("unknown_count", 0) > 0 or "manual_review_required" in signals
+        has_actionable_items = bool(actionable_items) or quality_payload.get("actionable_items_total_count", 0) > 0
+        reason_codes = []
+        if has_violations:
+            reason_codes.append("violations_present")
+        if has_manual_review:
+            reason_codes.append("manual_review_required")
+        if has_actionable_items:
+            reason_codes.append("actionable_items_present")
+        should_attach_comment = has_violations or has_manual_review or has_actionable_items
+        if not should_attach_comment:
+            reason_codes.append("no_attachable_review_signal")
+        return {
+            "should_attach_comment": should_attach_comment,
+            "show_warning_badge": has_violations or has_manual_review,
+            "highlight_violations": has_violations,
+            "requires_manual_review": has_violations or has_manual_review,
+            "reason_codes": reason_codes,
+            "semantics": "advisory_non_blocking_only",
+            "claims_avoided": [
+                "safe_to_merge",
+                "correctness_proof",
+                "test_or_human_review_replacement",
+            ],
         }
 
     @staticmethod
