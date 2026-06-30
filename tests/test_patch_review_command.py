@@ -832,6 +832,92 @@ def test_patch_review_unknown_triage_keeps_generic_design_and_manual_text_granul
     assert "manual_review_required" in {signal["code"] for signal in quality["signals"]}
 
 
+def test_patch_review_bot_bundle_keeps_generic_unknowns_granular_for_consumers(tmp_path: Path):
+    repo = _repo(tmp_path)
+    _git(repo, "init")
+    _git(repo, "config", "user.email", "test@example.com")
+    _git(repo, "config", "user.name", "Test User")
+    _git(repo, "add", ".")
+    _git(repo, "commit", "-m", "base")
+    _write(repo / "lib/presentation/menu_view.dart", "void buildMenu() {\n  renderDesignSystemSpacing();\n  runManualRetryCommand();\n}\n")
+    out = tmp_path / "review-generic-unknowns"
+
+    class FakeDocsService:
+        def get_patch_constraints(self, *args: Any, **kwargs: Any) -> PatchConstraintPacket:
+            return PatchConstraintPacket(
+                task="Review generic design docs and manual retry coverage",
+                constraints=[
+                    PatchConstraint(
+                        id="design-doc-gap",
+                        type="source_of_truth",
+                        instruction="Follow the design system spacing rule.",
+                        source="docs/design.md",
+                        severity="warning",
+                        confidence="medium",
+                        evidence="Design tokens define menu spacing.",
+                    ),
+                    PatchConstraint(
+                        id="manual-retry-test-gap",
+                        type="behavior",
+                        instruction="Keep the manual retry command covered by tests.",
+                        source="docs/manual-retry.md",
+                        severity="warning",
+                        confidence="medium",
+                        evidence="Manual retry should remain available after service failures.",
+                    ),
+                ],
+                confidence="medium",
+            )
+
+        def validate_patch_against_constraints(self, *args: Any, **kwargs: Any) -> PatchConstraintValidationPacket:
+            return PatchConstraintValidationPacket(
+                task="Review generic design docs and manual retry coverage",
+                project_path=str(repo),
+                total_constraints=2,
+                unknown=2,
+                results=[
+                    PatchConstraintValidationResult(
+                        constraint_id="design-doc-gap",
+                        status="unknown",
+                        reason="no direct diff evidence found",
+                        files=[],
+                    ),
+                    PatchConstraintValidationResult(
+                        constraint_id="manual-retry-test-gap",
+                        status="unknown",
+                        reason="missing test evidence",
+                        files=[],
+                    ),
+                ],
+                confidence="low",
+            )
+
+    PatchReviewService(cast(Any, FakeDocsService())).run(
+        project_path=str(repo),
+        task="Review generic design docs and manual retry coverage",
+        output_dir=str(out),
+    )
+
+    quality = json.loads((out / "review_summary_quality.json").read_text(encoding="utf-8"))
+    triage = {item["code"]: item for item in quality["unknown_triage"]}
+    assert set(triage) == {"missing_diff_evidence", "missing_test_evidence"}
+    assert triage["missing_diff_evidence"]["examples"] == [
+        {"constraint_id": "design-doc-gap", "reason": "no direct diff evidence found"}
+    ]
+    assert triage["missing_test_evidence"]["examples"] == [
+        {"constraint_id": "manual-retry-test-gap", "reason": "missing test evidence"}
+    ]
+    assert "manual_review_required" in {signal["code"] for signal in quality["signals"]}
+
+    consumer_decision = _fake_pr_bot_consume_manifest(out / "review_summary_manifest.json")
+    assert consumer_decision["requires_manual_review"] is True
+    assert "manual_review_required" in consumer_decision["reason_codes"]
+    assert consumer_decision["unknown_triage_codes"] == ["missing_diff_evidence", "missing_test_evidence"]
+    assert "manual_review_required" not in consumer_decision["unknown_triage_codes"]
+    assert consumer_decision["unknown_count"] == 2
+    assert consumer_decision["violation_count"] == 0
+
+
 def test_patch_review_bot_bundle_routes_open_design_unknowns_to_manual_review(tmp_path: Path):
     repo = _repo(tmp_path)
     _git(repo, "init")
