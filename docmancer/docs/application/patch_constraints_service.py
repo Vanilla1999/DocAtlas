@@ -594,13 +594,23 @@ class PatchConstraintsService:
         stop = {"should", "existing", "button", "action", "menu", "project", "current", "текущая", "кнопка", "меню", "экран"}
         for term in terms:
             cleaned = term.strip(" .,:;()[]{}\n\t")
-            if len(cleaned) < 3 or len(cleaned) > 60 or cleaned.lower() in stop:
+            if len(cleaned) < 3 or len(cleaned) > 60 or cleaned.lower() in stop or PatchConstraintsService._is_noisy_task_term(cleaned):
                 continue
             key = cleaned.lower()
             if key not in seen:
                 seen.add(key)
                 out.append(cleaned)
         return out[:32]
+
+    @staticmethod
+    def _is_noisy_task_term(term: str) -> bool:
+        words = re.findall(r"[A-Za-zА-Яа-яЁё0-9_]+", term)
+        if not words:
+            return True
+        connector_words = {"and", "or", "и", "или"}
+        if words[0].lower() in connector_words or words[-1].lower() in connector_words:
+            return True
+        return False
 
     @staticmethod
     def _term_variants(term: str) -> list[str]:

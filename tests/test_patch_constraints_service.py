@@ -302,6 +302,31 @@ const helpRequestReturnToWorkButton = 'Вернуть в работу';
     assert all(constraint.confidence == "low" for constraint in help_constraints)
 
 
+def test_symbol_grounding_skips_cross_language_connector_fragments(tmp_path: Path):
+    root = _workspace(tmp_path)
+    _write(
+        root / "lib/src/data/repositories/help_requests_repository.dart",
+        """
+class HelpRequestsRepository {
+  Future<void> returnClosedRequestToActive(String requestNumber) async {}
+  final label = 'Вернуть в работу and';
+}
+""",
+    )
+
+    packet = _packet(
+        root,
+        question="Reopen HELP request: show buttons Вернуть в работу and Создать новый запрос; return closed HELP sends status Активная.",
+        changed_files=["lib/src/data/repositories/help_requests_repository.dart"],
+        max_constraints=20,
+        max_tokens=4000,
+    )
+
+    terms = {candidate["term"] for candidate in packet.symbol_candidates}
+    assert "в работу and" not in terms
+    assert any(candidate["matched_symbol"] == "returnClosedRequestToActive" for candidate in packet.symbol_candidates)
+
+
 # Backward-compatible smoke names from the first production PR.
 def test_generated_file_constraint_extraction(tmp_path: Path):
     test_extracts_generated_file_constraint_from_docs(tmp_path)
