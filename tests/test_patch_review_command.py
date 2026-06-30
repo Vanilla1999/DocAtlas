@@ -298,11 +298,29 @@ def _fake_pr_bot_consume_manifest(manifest_path: Path, manifest: dict[str, Any] 
     if decision_unknown_triage_counts is None:
         decision_unknown_triage_counts = unknown_triage_counts
     else:
-        _fake_pr_bot_contract_require(
-            isinstance(decision_unknown_triage_counts, dict) and decision_unknown_triage_counts == unknown_triage_counts,
+        decision_unknown_triage_counts = _fake_pr_bot_contract_mapping(
+            decision_unknown_triage_counts,
             _FakePrBotInvalidBotBundleContract,
             "bundle.advisory_decision.unknown_triage_counts",
         )
+        normalized_decision_unknown_triage_counts: dict[str, int] = {}
+        for code, count_value in decision_unknown_triage_counts.items():
+            _fake_pr_bot_contract_require(
+                isinstance(code, str),
+                _FakePrBotInvalidBotBundleContract,
+                "bundle.advisory_decision.unknown_triage_counts.code",
+            )
+            normalized_decision_unknown_triage_counts[code] = _fake_pr_bot_contract_non_negative_int(
+                count_value,
+                _FakePrBotInvalidBotBundleContract,
+                f"bundle.advisory_decision.unknown_triage_counts.{code}",
+            )
+        _fake_pr_bot_contract_require(
+            normalized_decision_unknown_triage_counts == unknown_triage_counts,
+            _FakePrBotInvalidBotBundleContract,
+            "bundle.advisory_decision.unknown_triage_counts",
+        )
+        decision_unknown_triage_counts = normalized_decision_unknown_triage_counts
     quality_signals = {
         str(item.get("code") or "")
         for item in _fake_pr_bot_contract_list(
@@ -2342,6 +2360,78 @@ def test_fake_pr_bot_consumer_treats_malformed_supported_manifest_contract_as_ma
         {"quality": {"unknown_count": 0, "unknown_triage": [], "violated_count": -1}},
         {"quality": {"unknown_count": 0, "unknown_triage": [{"code": "missing_diff_evidence", "count": "1"}]}},
         {"quality": {"unknown_count": 0, "unknown_triage": [{"code": "missing_test_evidence", "count": -1}]}},
+        {
+            "quality": {"unknown_count": 1, "unknown_triage": [{"code": "missing_diff_evidence", "count": 1}]},
+            "advisory_decision": {
+                "should_attach_comment": True,
+                "show_warning_badge": True,
+                "highlight_violations": False,
+                "requires_manual_review": True,
+                "reason_codes": ["manual_review_required"],
+                "unknown_triage_codes": ["missing_diff_evidence"],
+                "unknown_triage_counts": {"missing_diff_evidence": True},
+                "semantics": "advisory_non_blocking_only",
+                "claims_avoided": [
+                    "safe_to_merge",
+                    "correctness_proof",
+                    "test_or_human_review_replacement",
+                ],
+            },
+        },
+        {
+            "quality": {"unknown_count": 1, "unknown_triage": [{"code": "missing_diff_evidence", "count": 1}]},
+            "advisory_decision": {
+                "should_attach_comment": True,
+                "show_warning_badge": True,
+                "highlight_violations": False,
+                "requires_manual_review": True,
+                "reason_codes": ["manual_review_required"],
+                "unknown_triage_codes": ["missing_diff_evidence"],
+                "unknown_triage_counts": {"missing_diff_evidence": 1.0},
+                "semantics": "advisory_non_blocking_only",
+                "claims_avoided": [
+                    "safe_to_merge",
+                    "correctness_proof",
+                    "test_or_human_review_replacement",
+                ],
+            },
+        },
+        {
+            "quality": {"unknown_count": 1, "unknown_triage": [{"code": "missing_diff_evidence", "count": 1}]},
+            "advisory_decision": {
+                "should_attach_comment": True,
+                "show_warning_badge": True,
+                "highlight_violations": False,
+                "requires_manual_review": True,
+                "reason_codes": ["manual_review_required"],
+                "unknown_triage_codes": ["missing_diff_evidence"],
+                "unknown_triage_counts": {"missing_diff_evidence": "1"},
+                "semantics": "advisory_non_blocking_only",
+                "claims_avoided": [
+                    "safe_to_merge",
+                    "correctness_proof",
+                    "test_or_human_review_replacement",
+                ],
+            },
+        },
+        {
+            "quality": {"unknown_count": 1, "unknown_triage": [{"code": "missing_diff_evidence", "count": 1}]},
+            "advisory_decision": {
+                "should_attach_comment": True,
+                "show_warning_badge": True,
+                "highlight_violations": False,
+                "requires_manual_review": True,
+                "reason_codes": ["manual_review_required"],
+                "unknown_triage_codes": ["missing_diff_evidence"],
+                "unknown_triage_counts": {"missing_diff_evidence": -1},
+                "semantics": "advisory_non_blocking_only",
+                "claims_avoided": [
+                    "safe_to_merge",
+                    "correctness_proof",
+                    "test_or_human_review_replacement",
+                ],
+            },
+        },
     ],
 )
 def test_fake_pr_bot_consumer_treats_malformed_referenced_bundle_contract_as_manual_review(
