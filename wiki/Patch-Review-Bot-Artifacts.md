@@ -56,6 +56,7 @@ Stable fields:
 - `requires_manual_review`: whether violations or unknowns require human attention.
 - `reason_codes`: deterministic reasons such as `violations_present`, `manual_review_required`, `actionable_items_present`, or `no_attachable_review_signal`.
 - `unknown_triage_codes`: granular unknown categories copied from `review_summary_quality.json.unknown_triage[]`, such as `missing_diff_evidence`, `missing_test_evidence`, `manual_review_required`, or `low_risk_unknown`; these help route human review and must not be treated as pass. Each `unknown_triage[].examples[]` entry includes the validation `constraint_id`/`reason` plus source constraint context (`source`, `instruction`, `evidence`, and `confidence` when present) so bots can route manual-review hints without parsing markdown.
+- `unknown_triage_counts`: granular unknown counts keyed by the same codes as `unknown_triage_codes`, copied from `review_summary_quality.json.unknown_triage[].count` so bots can show warning/manual-review badges without flattening all unknowns into one opaque count.
 - `semantics`: currently `advisory_non_blocking_only`.
 - `claims_avoided`: includes `safe_to_merge`, `correctness_proof`, and `test_or_human_review_replacement`.
 

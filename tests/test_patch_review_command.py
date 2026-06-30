@@ -73,6 +73,12 @@ def _fake_pr_bot_consume_manifest(manifest_path: Path, manifest: dict[str, Any] 
         for item in bundle["quality"].get("unknown_triage", [])
         if item.get("examples")
     }
+    unknown_triage_counts = {
+        item["code"]: item.get("count")
+        for item in bundle["quality"].get("unknown_triage", [])
+        if item.get("code") and item.get("count", 0) > 0
+    }
+    assert decision["unknown_triage_counts"] == unknown_triage_counts
     return {
         "attach_comment": decision["should_attach_comment"],
         "show_warning_badge": decision["show_warning_badge"],
@@ -80,6 +86,7 @@ def _fake_pr_bot_consume_manifest(manifest_path: Path, manifest: dict[str, Any] 
         "requires_manual_review": decision["requires_manual_review"],
         "reason_codes": decision["reason_codes"],
         "unknown_triage_codes": decision["unknown_triage_codes"],
+        "unknown_triage_counts": decision["unknown_triage_counts"],
         "unknown_triage_examples_by_code": unknown_triage_examples_by_code,
         "violation_count": len(bundle["actions"]["violations"]),
         "unknown_count": bundle["quality"]["unknown_count"],
@@ -993,6 +1000,10 @@ def test_patch_review_bot_bundle_keeps_generic_unknowns_granular_for_consumers(t
     assert consumer_decision["requires_manual_review"] is True
     assert "manual_review_required" in consumer_decision["reason_codes"]
     assert consumer_decision["unknown_triage_codes"] == ["missing_diff_evidence", "missing_test_evidence"]
+    assert consumer_decision["unknown_triage_counts"] == {
+        "missing_diff_evidence": 1,
+        "missing_test_evidence": 1,
+    }
     assert "manual_review_required" not in consumer_decision["unknown_triage_codes"]
     assert consumer_decision["unknown_count"] == 2
     assert consumer_decision["violation_count"] == 0
@@ -1059,6 +1070,7 @@ def test_patch_review_bot_bundle_routes_open_design_unknowns_to_manual_review(tm
     assert consumer_decision["requires_manual_review"] is True
     assert "manual_review_required" in consumer_decision["reason_codes"]
     assert consumer_decision["unknown_triage_codes"] == ["manual_review_required"]
+    assert consumer_decision["unknown_triage_counts"] == {"manual_review_required": 1}
     assert consumer_decision["unknown_triage_examples_by_code"] == {
         "manual_review_required": [
             {
@@ -1352,6 +1364,7 @@ def test_patch_review_machine_readable_artifact_contracts(tmp_path: Path):
         "requires_manual_review",
         "reason_codes",
         "unknown_triage_codes",
+        "unknown_triage_counts",
         "semantics",
         "claims_avoided",
     } <= set(bot_bundle["advisory_decision"])
@@ -1375,6 +1388,7 @@ def test_patch_review_advisory_decision_is_non_blocking_and_escalates_violations
     assert clean_action["requires_manual_review"] is False
     assert clean_action["reason_codes"] == ["actionable_items_present"]
     assert clean_action["unknown_triage_codes"] == []
+    assert clean_action["unknown_triage_counts"] == {}
 
     violation = PatchReviewService._review_summary_advisory_decision_payload(
         {**base_quality, "violated_count": 1, "actionable_items_total_count": 0},
@@ -1404,6 +1418,7 @@ def test_patch_review_advisory_decision_is_non_blocking_and_escalates_violations
     assert unknown["requires_manual_review"] is True
     assert unknown["reason_codes"] == ["manual_review_required"]
     assert unknown["unknown_triage_codes"] == ["missing_test_evidence", "low_risk_unknown"]
+    assert unknown["unknown_triage_counts"] == {"missing_test_evidence": 1, "low_risk_unknown": 1}
 
     violation_and_unknown = PatchReviewService._review_summary_advisory_decision_payload(
         {**base_quality, "violated_count": 1, "unknown_count": 1, "actionable_items_total_count": 0},
@@ -1413,6 +1428,7 @@ def test_patch_review_advisory_decision_is_non_blocking_and_escalates_violations
     assert violation_and_unknown["requires_manual_review"] is True
     assert violation_and_unknown["reason_codes"] == ["violations_present", "manual_review_required"]
     assert violation_and_unknown["unknown_triage_codes"] == []
+    assert violation_and_unknown["unknown_triage_counts"] == {}
     assert violation_and_unknown["semantics"] == "advisory_non_blocking_only"
     assert violation_and_unknown["claims_avoided"] == [
         "safe_to_merge",
@@ -1420,6 +1436,34 @@ def test_patch_review_advisory_decision_is_non_blocking_and_escalates_violations
         "test_or_human_review_replacement",
     ]
     assert "safe_to_merge" not in violation_and_unknown
+
+
+def test_patch_review_advisory_decision_exposes_unknown_triage_counts_for_bot_badges():
+    decision = PatchReviewService._review_summary_advisory_decision_payload(
+        {
+            "signals": [],
+            "violated_count": 0,
+            "unknown_count": 3,
+            "actionable_items_total_count": 0,
+            "unknown_triage": [
+                {"code": "manual_review_required", "count": 2, "requires_manual_review": True},
+                {"code": "missing_test_evidence", "count": 1, "requires_manual_review": True},
+            ],
+        },
+        {"actionable_items": [], "violations": []},
+    )
+
+    assert decision["should_attach_comment"] is True
+    assert decision["show_warning_badge"] is True
+    assert decision["requires_manual_review"] is True
+    assert decision["reason_codes"] == ["manual_review_required"]
+    assert decision["unknown_triage_codes"] == ["manual_review_required", "missing_test_evidence"]
+    assert decision["unknown_triage_counts"] == {
+        "manual_review_required": 2,
+        "missing_test_evidence": 1,
+    }
+    assert decision["semantics"] == "advisory_non_blocking_only"
+    assert "safe_to_merge" not in decision
 
 
 def test_fake_pr_bot_consumer_discovers_bundle_via_manifest_without_markdown_parsing(tmp_path: Path):
