@@ -2740,6 +2740,16 @@ def test_patch_review_actions_demote_generic_symbols_below_task_missing_evidence
                 "files": ["lib/src/ui/help_request_details_screen/states/help_request_details_success_state.dart"],
             },
             {
+                "id": "generic-package-symbol-pair",
+                "type": "source_of_truth",
+                "instruction": "Task term `HELP` matches existing project symbol `package`; prefer reusing that source-attributed path before adding a new implementation.",
+                "source": "lib/src/domain/services/help_requests_service.dart",
+                "confidence": "high",
+                "evidence": "import 'package:help_chat/src/data/models/help_add_new_comment_request_dto.dart';",
+                "symbols": ["HELP", "package"],
+                "files": ["lib/src/domain/services/help_requests_service.dart"],
+            },
+            {
                 "id": "return-active-service-call",
                 "type": "source_of_truth",
                 "instruction": "Button 'Вернуть в работу' must send the request status 'Активная' to the service.",
@@ -2783,6 +2793,12 @@ def test_patch_review_actions_demote_generic_symbols_below_task_missing_evidence
                 "files": ["lib/src/ui/help_request_details_screen/states/help_request_details_success_state.dart"],
             },
             {
+                "constraint_id": "generic-package-symbol-pair",
+                "status": "satisfied",
+                "reason": "source-of-truth layer file changed",
+                "files": ["lib/src/domain/services/help_requests_service.dart"],
+            },
+            {
                 "constraint_id": "return-active-service-call",
                 "status": "unknown",
                 "reason": "missing diff evidence for required service status transition",
@@ -2804,21 +2820,23 @@ def test_patch_review_actions_demote_generic_symbols_below_task_missing_evidence
         ["lib/src/ui/help_request_details_screen/states/help_request_details_success_state.dart"],
         constraints,
         validation,
-        summary_max_items=2,
+        summary_max_items=3,
     )
     summary = PatchReviewService._review_summary(
         task,
         ["lib/src/ui/help_request_details_screen/states/help_request_details_success_state.dart"],
         constraints,
         validation,
-        summary_max_items=2,
+        summary_max_items=3,
     )
 
     action_ids = [item["constraint_id"] for item in actions["actionable_items"]]
     assert action_ids == ["return-active-service-call", "success-attachment-panel"]
     assert "generic-title-symbol" not in action_ids
+    assert "generic-package-symbol-pair" not in action_ids
     assert actions["actionable_items"][0]["validation_status"] == "unknown"
     assert "title" not in _section(summary, "Actionable PR checklist")
+    assert "package" not in _section(summary, "Actionable PR checklist")
     assert "symbol `title`" in _section(summary, "Low-confidence / noisy signals")
 
 

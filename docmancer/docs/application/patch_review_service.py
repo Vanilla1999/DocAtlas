@@ -1007,7 +1007,7 @@ class PatchReviewService:
             priority = max(priority, 80)
         if PatchReviewService._is_broad_context_source(source, instruction):
             priority = max(priority, 60)
-        if PatchReviewService._has_only_low_value_symbols(item):
+        if PatchReviewService._has_only_low_value_symbols(item) or PatchReviewService._has_low_value_matched_symbol(item):
             priority = max(priority, 60)
         confidence_rank = {"high": 0, "medium": 1, "low": 2}.get(confidence, 3)
         if source and source.lower() in changed:
@@ -1082,6 +1082,21 @@ class PatchReviewService:
             return False
         low_value = {value.lower() for value in LOW_VALUE_SYMBOLS}
         return all(symbol in LOW_VALUE_SYMBOLS or symbol.lower() in low_value for symbol in symbols)
+
+    @staticmethod
+    def _has_low_value_matched_symbol(item: dict[str, Any]) -> bool:
+        symbols = [str(symbol or "") for symbol in item.get("symbols") or []]
+        if len(symbols) < 2:
+            return False
+        low_value = {value.lower() for value in LOW_VALUE_SYMBOLS}
+        matched_symbol = symbols[-1]
+        if matched_symbol not in LOW_VALUE_SYMBOLS and matched_symbol.lower() not in low_value:
+            return False
+        evidence = str(item.get("evidence") or "").strip()
+        if evidence.startswith(("import ", "export ", "part ")):
+            return True
+        instruction = str(item.get("instruction") or "")
+        return "matches existing project symbol" in instruction
 
     @staticmethod
     def _is_broad_context_source(source: str, instruction: str) -> bool:
