@@ -829,6 +829,7 @@ def test_patch_review_machine_readable_artifact_contracts(tmp_path: Path):
     trace = payload["review_summary_trace"]
     bot_bundle = payload["review_summary_bot_bundle"]
     manifest = payload["review_summary_manifest"]
+    manifest_artifacts = {item["filename"]: item for item in manifest["artifacts"]}
 
     assert {
         "schema_version",
@@ -850,6 +851,7 @@ def test_patch_review_machine_readable_artifact_contracts(tmp_path: Path):
         "claims_avoided",
     } <= set(quality)
     assert quality["schema_version"] == PATCH_REVIEW_SCHEMA_VERSIONS["review_summary_quality.json"]
+    assert quality["schema_version"] == 2
     assert quality["attachable"] in {"yes", "maybe", "no"}
     for signal in quality["signals"]:
         assert {"code", "severity", "count", "message"} <= set(signal)
@@ -953,6 +955,9 @@ def test_patch_review_machine_readable_artifact_contracts(tmp_path: Path):
         "claims_avoided",
     } <= set(bot_bundle)
     assert bot_bundle["schema_version"] == PATCH_REVIEW_SCHEMA_VERSIONS["review_summary_bot_bundle.json"]
+    assert bot_bundle["schema_version"] == 2
+    assert manifest_artifacts["review_summary_quality.json"]["schema_version"] == quality["schema_version"]
+    assert manifest_artifacts["review_summary_bot_bundle.json"]["schema_version"] == bot_bundle["schema_version"]
     assert bot_bundle["quality"] == quality
     assert bot_bundle["actions"] == actions
     assert bot_bundle["pr_comment"] == pr_comment

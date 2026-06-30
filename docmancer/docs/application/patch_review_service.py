@@ -23,11 +23,11 @@ MAX_PR_COMMENT_CHARS = 60_000
 MAX_PR_COMMENT_FIELD_CHARS = 2_000
 PATCH_REVIEW_SCHEMA_VERSIONS = {
     "review_summary_manifest.json": 1,
-    "review_summary_quality.json": 1,
+    "review_summary_quality.json": 2,
     "review_summary_actions.json": 1,
     "review_summary_pr_comment.json": 1,
     "review_summary_trace.json": 1,
-    "review_summary_bot_bundle.json": 1,
+    "review_summary_bot_bundle.json": 2,
 }
 TASK_TOKEN_STOPWORDS = {
     "add", "and", "before", "change", "check", "current", "diff", "file",
