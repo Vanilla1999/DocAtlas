@@ -71,6 +71,30 @@ def _fake_pr_bot_consume_manifest(manifest_path: Path) -> dict[str, Any]:
     }
 
 
+def _fake_pr_bot_discover_output_dir(output_dir: Path) -> dict[str, Any]:
+    manifest_path = output_dir / "review_summary_manifest.json"
+    if not manifest_path.exists():
+        sibling_artifacts = sorted(
+            path.name
+            for path in output_dir.iterdir()
+            if path.name.startswith("review_summary")
+        ) if output_dir.exists() else []
+        return {
+            "status": "no_completed_patch_review_run",
+            "attach_comment": False,
+            "show_warning_badge": True,
+            "highlight_violations": False,
+            "requires_manual_review": True,
+            "reason_codes": ["missing_manifest_completed_run_marker"],
+            "ignored_sibling_artifacts": sibling_artifacts,
+            "semantics": "manual_fallback_not_pass",
+        }
+    return {
+        "status": "completed_patch_review_run",
+        **_fake_pr_bot_consume_manifest(manifest_path),
+    }
+
+
 def test_patch_review_command_writes_expected_artifacts(tmp_path: Path):
     repo = _repo(tmp_path)
     _git(repo, "init")
@@ -1163,6 +1187,65 @@ def test_patch_review_reused_output_dir_clears_stale_manifest_before_failed_run(
     assert not manifest_path.exists()
     assert not list(out.glob(".review_summary_manifest.json.*.tmp"))
     assert (out / "review_summary_quality.json").exists()
+
+
+def test_fake_pr_bot_consumer_treats_missing_manifest_as_no_completed_run(tmp_path: Path, monkeypatch):
+    repo = _repo(tmp_path)
+    _git(repo, "init")
+    _git(repo, "config", "user.email", "test@example.com")
+    _git(repo, "config", "user.name", "Test User")
+    _git(repo, "add", ".")
+    _git(repo, "commit", "-m", "base")
+    _write(repo / "lib/generated/menu_state.g.dart", "// manual generated edit\n")
+    out = tmp_path / "review-missing-manifest-fallback"
+
+    PatchReviewService().run(
+        project_path=str(repo),
+        task="Review generated artifact edit",
+        output_dir=str(out),
+    )
+    completed_decision = _fake_pr_bot_discover_output_dir(out)
+    assert completed_decision["status"] == "completed_patch_review_run"
+    assert completed_decision["highlight_violations"] is True
+    original_write_json = PatchReviewService._write_json
+
+    def fail_on_bot_bundle(path: Path, payload: Any) -> None:
+        if path.name == "review_summary_bot_bundle.json":
+            raise RuntimeError("simulated bot bundle write failure")
+        original_write_json(path, payload)
+
+    monkeypatch.setattr(PatchReviewService, "_write_json", staticmethod(fail_on_bot_bundle))
+
+    with pytest.raises(RuntimeError, match="simulated bot bundle write failure"):
+        PatchReviewService().run(
+            project_path=str(repo),
+            task="Review generated artifact edit",
+            output_dir=str(out),
+        )
+
+    assert not (out / "review_summary_manifest.json").exists()
+    assert (out / "review_summary_bot_bundle.json").exists()
+    assert (out / "review_summary.md").exists()
+    original_read_text = Path.read_text
+
+    def fail_if_direct_artifact_is_read(path: Path, *args: Any, **kwargs: Any) -> str:
+        if path.name in {"review_summary_bot_bundle.json", "review_summary.md"}:
+            raise AssertionError(f"fake PR bot must ignore sibling artifact without manifest: {path.name}")
+        return original_read_text(path, *args, **kwargs)
+
+    monkeypatch.setattr(Path, "read_text", fail_if_direct_artifact_is_read)
+
+    consumer_decision = _fake_pr_bot_discover_output_dir(out)
+    assert consumer_decision["status"] == "no_completed_patch_review_run"
+    assert consumer_decision["attach_comment"] is False
+    assert consumer_decision["show_warning_badge"] is True
+    assert consumer_decision["highlight_violations"] is False
+    assert consumer_decision["requires_manual_review"] is True
+    assert consumer_decision["reason_codes"] == ["missing_manifest_completed_run_marker"]
+    assert consumer_decision["semantics"] == "manual_fallback_not_pass"
+    assert "safe_to_merge" not in consumer_decision
+    assert "review_summary_bot_bundle.json" in consumer_decision["ignored_sibling_artifacts"]
+    assert "review_summary.md" in consumer_decision["ignored_sibling_artifacts"]
 
 
 def test_patch_review_summary_uses_generic_task_terms_without_project_hardcoding():

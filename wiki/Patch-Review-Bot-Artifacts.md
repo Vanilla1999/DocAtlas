@@ -10,6 +10,8 @@ Start from `review_summary_manifest.json`, not from `review_summary.md`.
 
 The manifest is the artifact discovery contract. Consumers should select entries by `filename`, `kind`, and `schema_version`, then read the referenced JSON file from the same output directory. Human markdown remains a presentation artifact for reviewers.
 
+If `review_summary_manifest.json` is absent, automation must treat the output directory as having no completed patch-review run. Consumers should ignore sibling artifacts such as `review_summary_bot_bundle.json` and `review_summary.md`, then fall back to manual review rather than inferring pass/safe-to-merge from stale or partial files.
+
 Required manifest fields:
 
 - `schema_version`: manifest schema version.
