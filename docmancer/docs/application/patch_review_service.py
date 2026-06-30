@@ -1156,13 +1156,25 @@ class PatchReviewService:
                 "requires_manual_review": True,
                 "message": messages[code],
                 "examples": [
-                    {"constraint_id": item.get("constraint_id"), "reason": item.get("reason")}
+                    PatchReviewService._unknown_triage_example(item, by_id.get(item.get("constraint_id"), {}))
                     for item in items[:2]
                 ],
             }
             for code, items in buckets.items()
             if items
         ]
+
+    @staticmethod
+    def _unknown_triage_example(item: dict[str, Any], constraint: dict[str, Any]) -> dict[str, Any]:
+        example = {
+            "constraint_id": item.get("constraint_id"),
+            "reason": item.get("reason"),
+        }
+        for field in ("source", "instruction", "evidence", "confidence"):
+            value = constraint.get(field)
+            if value:
+                example[field] = value
+        return example
 
     @staticmethod
     def _has_manual_unknown_signal(text: str) -> bool:

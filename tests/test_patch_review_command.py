@@ -775,6 +775,60 @@ def test_patch_review_quality_classifies_unknowns_without_treating_them_as_pass(
     assert quality["attachable"] != "yes"
 
 
+def test_patch_review_unknown_triage_examples_carry_source_evidence_for_bot_routing():
+    constraints = {
+        "constraints": [
+            {
+                "id": "open-designer-input",
+                "type": "architecture",
+                "instruction": "Получить инфо от дизайнера по новому виду кнопки вызова меню.",
+                "source": "docs/menu.md",
+                "confidence": "medium",
+                "evidence": "Открытый вопрос по макету остается нерешенным.",
+                "symbols": [],
+                "files": [],
+            }
+        ],
+        "symbol_candidates": [],
+        "excluded_source_reasons": [],
+    }
+    validation = {
+        "satisfied": 0,
+        "violated": 0,
+        "unknown": 1,
+        "results": [
+            {
+                "constraint_id": "open-designer-input",
+                "status": "unknown",
+                "reason": "No decisive changed-file or diff evidence was found for this constraint.",
+                "files": [],
+            }
+        ],
+        "warnings": [],
+    }
+
+    quality = PatchReviewService._review_summary_quality_payload(
+        "Review TSDB menu redesign",
+        ["lib/presentation/menu_view.dart"],
+        constraints,
+        validation,
+    )
+
+    triage = {item["code"]: item for item in quality["unknown_triage"]}
+    assert set(triage) == {"manual_review_required"}
+    assert triage["manual_review_required"]["requires_manual_review"] is True
+    assert triage["manual_review_required"]["examples"][0] == {
+        "constraint_id": "open-designer-input",
+        "reason": "No decisive changed-file or diff evidence was found for this constraint.",
+        "source": "docs/menu.md",
+        "instruction": "Получить инфо от дизайнера по новому виду кнопки вызова меню.",
+        "evidence": "Открытый вопрос по макету остается нерешенным.",
+        "confidence": "medium",
+    }
+    assert quality["unknown_count"] == 1
+    assert quality["attachable"] != "yes"
+
+
 def test_patch_review_unknown_triage_keeps_generic_design_and_manual_text_granular():
     constraints = {
         "constraints": [
@@ -822,12 +876,22 @@ def test_patch_review_unknown_triage_keeps_generic_design_and_manual_text_granul
 
     triage = {item["code"]: item for item in quality["unknown_triage"]}
     assert set(triage) == {"missing_diff_evidence", "missing_test_evidence"}
-    assert triage["missing_diff_evidence"]["examples"] == [
-        {"constraint_id": "design-doc-gap", "reason": "no direct diff evidence found"}
-    ]
-    assert triage["missing_test_evidence"]["examples"] == [
-        {"constraint_id": "manual-retry-test-gap", "reason": "missing test evidence"}
-    ]
+    assert triage["missing_diff_evidence"]["examples"][0] == {
+        "constraint_id": "design-doc-gap",
+        "reason": "no direct diff evidence found",
+        "source": "docs/design.md",
+        "instruction": "Follow the design system spacing rule.",
+        "evidence": "Design tokens define menu spacing.",
+        "confidence": "medium",
+    }
+    assert triage["missing_test_evidence"]["examples"][0] == {
+        "constraint_id": "manual-retry-test-gap",
+        "reason": "missing test evidence",
+        "source": "docs/manual-retry.md",
+        "instruction": "Keep the manual retry command covered by tests.",
+        "evidence": "Manual retry should remain available after service failures.",
+        "confidence": "medium",
+    }
     assert all(item["requires_manual_review"] for item in quality["unknown_triage"])
     assert "manual_review_required" in {signal["code"] for signal in quality["signals"]}
 
@@ -901,12 +965,22 @@ def test_patch_review_bot_bundle_keeps_generic_unknowns_granular_for_consumers(t
     quality = json.loads((out / "review_summary_quality.json").read_text(encoding="utf-8"))
     triage = {item["code"]: item for item in quality["unknown_triage"]}
     assert set(triage) == {"missing_diff_evidence", "missing_test_evidence"}
-    assert triage["missing_diff_evidence"]["examples"] == [
-        {"constraint_id": "design-doc-gap", "reason": "no direct diff evidence found"}
-    ]
-    assert triage["missing_test_evidence"]["examples"] == [
-        {"constraint_id": "manual-retry-test-gap", "reason": "missing test evidence"}
-    ]
+    assert triage["missing_diff_evidence"]["examples"][0] == {
+        "constraint_id": "design-doc-gap",
+        "reason": "no direct diff evidence found",
+        "source": "docs/design.md",
+        "instruction": "Follow the design system spacing rule.",
+        "evidence": "Design tokens define menu spacing.",
+        "confidence": "medium",
+    }
+    assert triage["missing_test_evidence"]["examples"][0] == {
+        "constraint_id": "manual-retry-test-gap",
+        "reason": "missing test evidence",
+        "source": "docs/manual-retry.md",
+        "instruction": "Keep the manual retry command covered by tests.",
+        "evidence": "Manual retry should remain available after service failures.",
+        "confidence": "medium",
+    }
     assert "manual_review_required" in {signal["code"] for signal in quality["signals"]}
 
     consumer_decision = _fake_pr_bot_consume_manifest(out / "review_summary_manifest.json")
