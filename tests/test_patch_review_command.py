@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import subprocess
 from pathlib import Path
+from typing import Any
 
 from click.testing import CliRunner
 
@@ -29,6 +30,26 @@ def _git(repo: Path, *args: str) -> None:
     import subprocess
 
     subprocess.check_call(["git", *args], cwd=repo)
+
+
+def _fake_pr_bot_consume_bundle(bundle_path: Path) -> dict[str, Any]:
+    bundle = json.loads(bundle_path.read_text(encoding="utf-8"))
+    decision = bundle["advisory_decision"]
+    assert bundle["schema_version"] == 3
+    assert decision["semantics"] == "advisory_non_blocking_only"
+    assert "safe_to_merge" not in bundle
+    assert "safe_to_merge" not in decision
+    assert "correctness_proof" in bundle["claims_avoided"]
+    assert "test_or_human_review_replacement" in bundle["claims_avoided"]
+    return {
+        "attach_comment": decision["should_attach_comment"],
+        "show_warning_badge": decision["show_warning_badge"],
+        "highlight_violations": decision["highlight_violations"],
+        "requires_manual_review": decision["requires_manual_review"],
+        "reason_codes": decision["reason_codes"],
+        "violation_count": len(bundle["actions"]["violations"]),
+        "unknown_count": bundle["quality"]["unknown_count"],
+    }
 
 
 def test_patch_review_command_writes_expected_artifacts(tmp_path: Path):
@@ -1017,6 +1038,42 @@ def test_patch_review_advisory_decision_is_non_blocking_and_escalates_violations
         "test_or_human_review_replacement",
     ]
     assert "safe_to_merge" not in violation_and_unknown
+
+
+def test_fake_pr_bot_consumer_uses_generated_bundle_without_markdown_parsing(tmp_path: Path):
+    repo = _repo(tmp_path)
+    _git(repo, "init")
+    _git(repo, "config", "user.email", "test@example.com")
+    _git(repo, "config", "user.name", "Test User")
+    _git(repo, "add", ".")
+    _git(repo, "commit", "-m", "base")
+    _write(repo / "lib/generated/menu_state.g.dart", "// manual generated edit\n")
+    out = tmp_path / "review-fake-consumer"
+
+    result = CliRunner().invoke(
+        cli,
+        [
+            "patch-review",
+            "--project-path",
+            str(repo),
+            "--task",
+            "Review generated artifact edit",
+            "--output-dir",
+            str(out),
+            "--format",
+            "json",
+        ],
+    )
+
+    assert result.exit_code == 0, result.output
+    consumer_decision = _fake_pr_bot_consume_bundle(out / "review_summary_bot_bundle.json")
+    assert consumer_decision["attach_comment"] is True
+    assert consumer_decision["show_warning_badge"] is True
+    assert consumer_decision["highlight_violations"] is True
+    assert consumer_decision["requires_manual_review"] is True
+    assert "violations_present" in consumer_decision["reason_codes"]
+    assert consumer_decision["violation_count"] > 0
+    assert consumer_decision["violation_count"] + consumer_decision["unknown_count"] > 0
 
 
 
