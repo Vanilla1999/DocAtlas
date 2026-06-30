@@ -1,11 +1,13 @@
 from __future__ import annotations
 
 import json
+import subprocess
 from pathlib import Path
 
 from click.testing import CliRunner
 
 from docmancer.cli.__main__ import cli
+from docmancer.docs.application.patch_review_service import PATCH_REVIEW_SCHEMA_VERSIONS, PatchReviewService
 from docmancer.docs.application.patch_constraints_service import PatchConstraintsService
 from docmancer.docs.service import LibraryDocsService
 
@@ -54,7 +56,7 @@ def test_patch_review_command_writes_expected_artifacts(tmp_path: Path):
     )
 
     assert result.exit_code == 0, result.output
-    for name in ["constraints.json", "constraints.md", "changed_files.json", "untracked_files.json", "ignored_runtime_artifacts.json", "patch_hygiene.json", "patch.diff", "validation.json", "review_summary.md"]:
+    for name in ["constraints.json", "constraints.md", "changed_files.json", "untracked_files.json", "ignored_runtime_artifacts.json", "patch_hygiene.json", "patch.diff", "validation.json", "review_summary_actions.json", "review_summary_quality.json", "review_summary_manifest.json", "review_summary.md"]:
         assert (out / name).exists()
     validation = json.loads((out / "validation.json").read_text(encoding="utf-8"))
     assert "violated" in validation
@@ -240,3 +242,802 @@ void buildMenu() {
     reasons = {item["reason"] for item in constraints["excluded_source_reasons"]}
     assert "dogfood_result_memo" in reasons
     assert "dogfood_task_artifact" in reasons
+
+
+def test_patch_review_summary_sections_stay_ordered_without_full_markdown_snapshot():
+    summary = PatchReviewService._review_summary(
+        "Review changed-file-local menu action and keep policy out of UI/provider",
+        ["lib/presentation/menu_view.dart"],
+        {
+            "constraints": [
+                {
+                    "id": "generated-guardrail",
+                    "type": "generated_file",
+                    "instruction": "Generated files must not be edited by hand.",
+                    "source": "docs/architecture.md",
+                    "confidence": "high",
+                    "evidence": "Generated files must not be edited by hand.",
+                    "symbols": [],
+                    "files": [],
+                },
+                {
+                    "id": "menu-local",
+                    "type": "source_of_truth",
+                    "instruction": "Reuse the changed-file-local closeMenu action before transitions.",
+                    "source": "lib/presentation/menu_view.dart",
+                    "confidence": "medium",
+                    "evidence": "menuNotifierController.closeMenu();",
+                    "symbols": ["closeMenu"],
+                    "files": ["lib/presentation/menu_view.dart"],
+                },
+                {
+                    "id": "provider-policy",
+                    "type": "architecture",
+                    "instruction": "Provider/UI code must keep policy decisions out of the menu view.",
+                    "source": "docs/architecture.md",
+                    "confidence": "high",
+                    "evidence": "Provider/UI code must delegate policy decisions.",
+                    "symbols": [],
+                    "files": [],
+                },
+            ],
+            "symbol_candidates": [
+                {"term": "tr", "matched_symbol": "tr", "source": "lib/presentation/menu_view.dart", "reason": "identifier match", "evidence": "LocaleKeys.menu.tr();"}
+            ],
+            "excluded_source_reasons": [
+                {"path": "docs/research/docatlas-dogfood-v4/review-value-v4.md", "reason": "dogfood_result_memo"}
+            ],
+        },
+        {
+            "satisfied": 1,
+            "violated": 0,
+            "unknown": 1,
+            "results": [
+                {"constraint_id": "menu-local", "status": "unknown", "reason": "provider/UI policy ownership needs review", "files": []}
+            ],
+            "warnings": [],
+        },
+    )
+    expected_order = [
+        "## Changed files",
+        "## Review summary quality",
+        "## Actionable PR checklist",
+        "## Manual review context",
+        "## Low-confidence / noisy signals",
+        "## Validation",
+        "## Violations",
+        "## Unknown/manual review buckets",
+        "## Generated/lockfile checks",
+        "## Source-of-truth / symbol notes",
+        "## Excluded or ignored sources",
+        "## Claims avoided",
+    ]
+
+    positions = [summary.index(section) for section in expected_order]
+    assert positions == sorted(positions)
+    assert "- attachable: maybe" in summary
+    assert "- actionable_items_limit: 5" in summary
+    assert "- unknown_bucket_count: 1" in summary
+    assert "- residual_memo_source_count: 1" in summary
+    assert "symbol `tr`" in _section(summary, "Low-confidence / noisy signals")
+    assert "symbol `tr`" not in _section(summary, "Actionable PR checklist")
+
+
+def test_patch_review_summary_quality_can_be_yes_or_no_without_raw_data_loss():
+    yes_summary = PatchReviewService._review_summary(
+        "Review generated-file guardrails",
+        ["lib/presentation/menu_view.dart"],
+        {
+            "constraints": [
+                {
+                    "id": f"guardrail-{index}",
+                    "type": "generated_file",
+                    "instruction": f"Generated/lockfile guardrail {index} must hold.",
+                    "source": "docs/architecture.md",
+                    "confidence": "high",
+                    "evidence": "Generated files must not be edited by hand.",
+                    "symbols": [],
+                    "files": [],
+                }
+                for index in range(3)
+            ],
+            "symbol_candidates": [],
+            "excluded_source_reasons": [],
+        },
+        {"satisfied": 3, "violated": 0, "unknown": 0, "results": [], "warnings": []},
+    )
+    no_summary = PatchReviewService._review_summary(
+        "Review broad context only",
+        ["lib/presentation/menu_view.dart"],
+        {
+            "constraints": [
+                {
+                    "id": "broad-context",
+                    "type": "architecture",
+                    "instruction": "Rules that must not be violated live in broad docs.",
+                    "source": "docs/architecture.md",
+                    "confidence": "medium",
+                    "evidence": "Rules that must not be violated.",
+                    "symbols": [],
+                    "files": [],
+                }
+            ],
+            "symbol_candidates": [],
+            "excluded_source_reasons": [],
+        },
+        {
+            "satisfied": 0,
+            "violated": 0,
+            "unknown": 1,
+            "results": [{"constraint_id": "broad-context", "status": "unknown", "reason": "manual review required", "files": []}],
+            "warnings": [],
+        },
+    )
+
+    assert "- attachable: yes" in yes_summary
+    assert "- attachable: no" in no_summary
+    assert "- unknown/manual review: 1" in no_summary
+    assert "broad-context: manual review required" in no_summary
+
+
+def test_patch_review_summary_max_items_limits_actionable_checklist(tmp_path: Path):
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    subprocess.run(["git", "init"], cwd=repo, check=True, stdout=subprocess.DEVNULL)
+    _write(
+        repo / "docs/architecture.md",
+        "\n".join(
+            f"Generated files must not be edited by hand. Guardrail {index}."
+            for index in range(6)
+        ),
+    )
+    _write(repo / "lib/menu.dart", "void openInfo() {}\n")
+    subprocess.run(["git", "add", "."], cwd=repo, check=True, stdout=subprocess.DEVNULL)
+    subprocess.run(["git", "commit", "-m", "initial"], cwd=repo, check=True, stdout=subprocess.DEVNULL)
+    _write(repo / "lib/menu.dart", "void openInfo() {}\nvoid closeMenu() {}\n")
+    out = tmp_path / "review"
+
+    result = CliRunner().invoke(
+        cli,
+        [
+            "patch-review",
+            "--project-path",
+            str(repo),
+            "--task",
+            "Review generated guardrails and menu action",
+            "--summary-max-items",
+            "2",
+            "--output-dir",
+            str(out),
+        ],
+    )
+
+    assert result.exit_code == 0, result.output
+    actionable = _section((out / "review_summary.md").read_text(), "Actionable PR checklist")
+    quality = _section((out / "review_summary.md").read_text(), "Review summary quality")
+    items = [line for line in actionable.splitlines() if line.startswith("- ") and line != "- none"]
+    assert len(items) <= 2
+    assert "- actionable_items_limit: 2" in quality
+
+    json_result = CliRunner().invoke(
+        cli,
+        [
+            "patch-review",
+            "--project-path",
+            str(repo),
+            "--task",
+            "Review generated guardrails and menu action",
+            "--summary-max-items",
+            "2",
+            "--output-dir",
+            str(tmp_path / "review-json"),
+            "--format",
+            "json",
+        ],
+    )
+    assert json_result.exit_code == 0, json_result.output
+    assert json.loads(json_result.output)["summary_max_items"] == 2
+
+
+def test_patch_review_summary_max_items_is_validated_by_cli():
+    result = CliRunner().invoke(
+        cli,
+        [
+            "patch-review",
+            "--project-path",
+            ".",
+            "--task",
+            "Review patch",
+            "--summary-max-items",
+            "0",
+        ],
+    )
+
+    assert result.exit_code != 0
+    assert "--summary-max-items" in result.output
+
+
+
+def test_patch_review_summary_modes_control_markdown_verbosity():
+    packet = {
+        "constraints": [
+            {
+                "id": "guardrail",
+                "type": "generated_file",
+                "instruction": "Generated files must not be edited by hand.",
+                "source": "docs/architecture.md",
+                "confidence": "high",
+                "evidence": "Generated files must not be edited by hand.",
+                "symbols": [],
+                "files": [],
+            },
+            {
+                "id": "manual-context",
+                "type": "architecture",
+                "instruction": "Broad architecture context should be manually reviewed.",
+                "source": "docs/architecture.md",
+                "confidence": "medium",
+                "evidence": "Manual review required.",
+                "symbols": [],
+                "files": [],
+            },
+        ],
+        "symbol_candidates": [
+            {"term": "open", "matched_symbol": "openInfo", "source": "lib/menu.dart", "reason": "identifier match", "evidence": "openInfo();"}
+        ],
+        "excluded_source_reasons": [
+            {"path": "docs/research/docatlas-dogfood-v4/review-value-v4.md", "reason": "dogfood_result_memo"}
+        ],
+    }
+    validation = {
+        "satisfied": 1,
+        "violated": 0,
+        "unknown": 1,
+        "results": [{"constraint_id": "manual-context", "status": "unknown", "reason": "manual review required", "files": []}],
+        "warnings": [],
+    }
+
+    compact = PatchReviewService._review_summary(
+        "Review openInfo path",
+        ["lib/menu.dart"],
+        packet,
+        validation,
+        summary_mode="compact",
+    )
+    verbose = PatchReviewService._review_summary(
+        "Review openInfo path",
+        ["lib/menu.dart"],
+        packet,
+        validation,
+        summary_mode="verbose",
+    )
+
+    assert "- summary_mode: compact" in compact
+    assert "## Actionable PR checklist" in compact
+    assert "## Violations" in compact
+    assert "## Manual review context" not in compact
+    assert "## Unknown/manual review buckets" not in compact
+    assert "## Excluded or ignored sources" not in compact
+    assert "## Claims avoided" in compact
+
+    assert "- summary_mode: verbose" in verbose
+    assert "## Manual review context" in verbose
+    assert "## Unknown/manual review buckets" in verbose
+    assert "## Excluded or ignored sources" in verbose
+    assert "## Source-of-truth / symbol notes" in verbose
+
+
+def test_patch_review_summary_mode_is_exposed_in_json(tmp_path: Path):
+    repo = _repo(tmp_path)
+    _git(repo, "init")
+    _git(repo, "config", "user.email", "test@example.com")
+    _git(repo, "config", "user.name", "Test User")
+    _git(repo, "add", ".")
+    _git(repo, "commit", "-m", "base")
+    _write(repo / "lib/presentation/menu_view.dart", "void buildMenu() {\n  menuNotifier.closeMenu();\n}\n")
+    out = tmp_path / "review-compact"
+
+    result = CliRunner().invoke(
+        cli,
+        [
+            "patch-review",
+            "--project-path",
+            str(repo),
+            "--task",
+            "Review menu navigation",
+            "--summary-mode",
+            "compact",
+            "--output-dir",
+            str(out),
+            "--format",
+            "json",
+        ],
+    )
+
+    assert result.exit_code == 0, result.output
+    payload = json.loads(result.output)
+    assert payload["summary_mode"] == "compact"
+    summary = (out / "review_summary.md").read_text()
+    assert "- summary_mode: compact" in summary
+    assert "## Manual review context" not in summary
+
+
+def test_patch_review_writes_machine_readable_summary_quality(tmp_path: Path):
+    repo = _repo(tmp_path)
+    _git(repo, "init")
+    _git(repo, "config", "user.email", "test@example.com")
+    _git(repo, "config", "user.name", "Test User")
+    _git(repo, "add", ".")
+    _git(repo, "commit", "-m", "base")
+    _write(repo / "lib/presentation/menu_view.dart", "void buildMenu() {\n  menuNotifier.closeMenu();\n}\n")
+    out = tmp_path / "review-quality"
+
+    result = CliRunner().invoke(
+        cli,
+        [
+            "patch-review",
+            "--project-path",
+            str(repo),
+            "--task",
+            "Review menu navigation",
+            "--summary-mode",
+            "compact",
+            "--summary-max-items",
+            "2",
+            "--output-dir",
+            str(out),
+            "--format",
+            "json",
+        ],
+    )
+
+    assert result.exit_code == 0, result.output
+    payload = json.loads(result.output)
+    quality = json.loads((out / "review_summary_quality.json").read_text(encoding="utf-8"))
+    summary_quality = _section((out / "review_summary.md").read_text(encoding="utf-8"), "Review summary quality")
+    assert "review_summary_quality.json" in payload["artifacts"]
+    assert payload["review_summary_quality"] == quality
+    assert quality["schema_version"] == PATCH_REVIEW_SCHEMA_VERSIONS["review_summary_quality.json"]
+    assert quality["summary_mode"] == "compact"
+    assert quality["actionable_items_limit"] == 2
+    assert quality["attachable"] in {"yes", "maybe", "no"}
+    assert quality["claims_avoided"] == [
+        "correctness_proof",
+        "test_or_human_review_replacement",
+        "broad_docatlas_superiority",
+    ]
+    signal_codes = {item["code"] for item in quality["signals"]}
+    assert "actionable_items_present" in signal_codes
+    assert "no_violations" in signal_codes
+    assert f"- attachable: {quality['attachable']}" in summary_quality
+    assert f"- actionable_items_count: {quality['actionable_items_count']}" in summary_quality
+
+
+def test_patch_review_writes_machine_readable_action_items(tmp_path: Path):
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    subprocess.run(["git", "init"], cwd=repo, check=True, stdout=subprocess.DEVNULL)
+    _write(repo / "docs/architecture.md", "Generated files must not be edited by hand. Checkout buttons call launchCheckoutFlow before navigation.\n")
+    _write(repo / "lib/payments/checkout_button.dart", "void renderCheckout() {}\n")
+    subprocess.run(["git", "add", "."], cwd=repo, check=True, stdout=subprocess.DEVNULL)
+    subprocess.run(["git", "commit", "-m", "initial"], cwd=repo, check=True, stdout=subprocess.DEVNULL)
+    _write(repo / "lib/payments/checkout_button.dart", "void renderCheckout() { launchCheckoutFlow(); }\n")
+    out = tmp_path / "review-actions"
+
+    result = CliRunner().invoke(
+        cli,
+        [
+            "patch-review",
+            "--project-path",
+            str(repo),
+            "--task",
+            "Review checkout launch action",
+            "--summary-max-items",
+            "2",
+            "--output-dir",
+            str(out),
+            "--format",
+            "json",
+        ],
+    )
+
+    assert result.exit_code == 0, result.output
+    payload = json.loads(result.output)
+    actions = json.loads((out / "review_summary_actions.json").read_text(encoding="utf-8"))
+    actionable_markdown = _section((out / "review_summary.md").read_text(encoding="utf-8"), "Actionable PR checklist")
+    assert "review_summary_actions.json" in payload["artifacts"]
+    assert payload["review_summary_actions"] == actions
+    assert actions["schema_version"] == PATCH_REVIEW_SCHEMA_VERSIONS["review_summary_actions.json"]
+    assert actions["actionable_items_limit"] == 2
+    assert 0 < len(actions["actionable_items"]) <= 2
+    assert any(item["instruction"] in actionable_markdown for item in actions["actionable_items"])
+    assert all(item["constraint_id"] for item in actions["actionable_items"])
+    assert [item["rank"] for item in actions["actionable_items"]] == list(range(1, len(actions["actionable_items"]) + 1))
+    assert all(item["markdown"] in actionable_markdown for item in actions["actionable_items"])
+    assert any(item["evidence"] and item["evidence"] in item["evidence_markdown"] for item in actions["actionable_items"])
+    assert any("launchCheckoutFlow" in item["evidence"] for item in actions["actionable_items"] if item["evidence"])
+    assert actions["claims_avoided"] == [
+        "correctness_proof",
+        "test_or_human_review_replacement",
+        "broad_docatlas_superiority",
+    ]
+
+
+def test_patch_review_writes_machine_readable_manifest(tmp_path: Path):
+    repo = _repo(tmp_path)
+    _git(repo, "init")
+    _git(repo, "config", "user.email", "test@example.com")
+    _git(repo, "config", "user.name", "Test User")
+    _git(repo, "add", ".")
+    _git(repo, "commit", "-m", "base")
+    _write(repo / "lib/presentation/menu_view.dart", "void buildMenu() {\n  menuNotifier.closeMenu();\n}\n")
+    out = tmp_path / "review-manifest"
+
+    result = CliRunner().invoke(
+        cli,
+        [
+            "patch-review",
+            "--project-path",
+            str(repo),
+            "--task",
+            "Review menu navigation",
+            "--summary-mode",
+            "compact",
+            "--summary-max-items",
+            "2",
+            "--output-dir",
+            str(out),
+            "--format",
+            "json",
+        ],
+    )
+
+    assert result.exit_code == 0, result.output
+    payload = json.loads(result.output)
+    manifest = json.loads((out / "review_summary_manifest.json").read_text(encoding="utf-8"))
+    manifest_artifacts = {item["filename"]: item for item in manifest["artifacts"]}
+    assert "review_summary_manifest.json" in payload["artifacts"]
+    assert payload["review_summary_manifest"] == manifest
+    assert manifest["schema_version"] == PATCH_REVIEW_SCHEMA_VERSIONS["review_summary_manifest.json"]
+    assert manifest["summary_mode"] == "compact"
+    assert manifest["product_role"] == "non_blocking_pr_review_assistant"
+    assert [item["filename"] for item in manifest["artifacts"]] == payload["artifacts"]
+    assert manifest_artifacts["review_summary.md"]["intended_consumers"] == ["human_reviewer"]
+    assert manifest_artifacts["review_summary_quality.json"]["schema_version"] == payload["review_summary_quality"]["schema_version"]
+    assert manifest_artifacts["review_summary_actions.json"]["schema_version"] == payload["review_summary_actions"]["schema_version"]
+    assert manifest_artifacts["review_summary_pr_comment.json"]["schema_version"] == payload["review_summary_pr_comment"]["schema_version"]
+    assert manifest_artifacts["review_summary_pr_comment.json"]["kind"] == "bot_pr_comment_payload"
+    assert manifest_artifacts["review_summary_trace.json"]["schema_version"] == payload["review_summary_trace"]["schema_version"]
+    assert manifest_artifacts["review_summary_trace.json"]["kind"] == "bot_traceability_metadata"
+    assert manifest_artifacts["review_summary_bot_bundle.json"]["schema_version"] == payload["review_summary_bot_bundle"]["schema_version"]
+    assert manifest_artifacts["review_summary_bot_bundle.json"]["kind"] == "bot_bundle"
+    assert "without parsing markdown" in manifest_artifacts["review_summary_quality.json"]["safe_usage"]
+    assert "without parsing markdown" in manifest_artifacts["review_summary_actions.json"]["safe_usage"]
+    assert "correctness_proof" in manifest["claims_avoided"]
+
+
+def test_patch_review_machine_readable_artifact_contracts(tmp_path: Path):
+    repo = _repo(tmp_path)
+    _git(repo, "init")
+    _git(repo, "config", "user.email", "test@example.com")
+    _git(repo, "config", "user.name", "Test User")
+    _git(repo, "add", ".")
+    _git(repo, "commit", "-m", "base")
+    _write(repo / "lib/presentation/menu_view.dart", "void buildMenu() {\n  menuNotifier.closeMenu();\n}\n")
+    out = tmp_path / "review-contracts"
+
+    result = CliRunner().invoke(
+        cli,
+        [
+            "patch-review",
+            "--project-path",
+            str(repo),
+            "--task",
+            "Review menu navigation",
+            "--summary-max-items",
+            "2",
+            "--output-dir",
+            str(out),
+            "--format",
+            "json",
+        ],
+    )
+
+    assert result.exit_code == 0, result.output
+    payload = json.loads(result.output)
+    quality = payload["review_summary_quality"]
+    actions = payload["review_summary_actions"]
+    pr_comment = payload["review_summary_pr_comment"]
+    trace = payload["review_summary_trace"]
+    bot_bundle = payload["review_summary_bot_bundle"]
+    manifest = payload["review_summary_manifest"]
+
+    assert {
+        "schema_version",
+        "attachable",
+        "summary_mode",
+        "actionable_items_limit",
+        "actionable_items_count",
+        "actionable_items_total_count",
+        "low_value_top_items_count",
+        "unknown_bucket_count",
+        "residual_memo_source_count",
+        "satisfied_count",
+        "violated_count",
+        "unknown_count",
+        "reasons",
+        "signals",
+        "unknown_buckets",
+        "claims_avoided",
+    } <= set(quality)
+    assert quality["schema_version"] == PATCH_REVIEW_SCHEMA_VERSIONS["review_summary_quality.json"]
+    assert quality["attachable"] in {"yes", "maybe", "no"}
+    for signal in quality["signals"]:
+        assert {"code", "severity", "count", "message"} <= set(signal)
+        assert signal["severity"] in {"info", "warning", "error"}
+
+    assert {
+        "schema_version",
+        "summary_mode",
+        "actionable_items_limit",
+        "actionable_items",
+        "violations",
+        "claims_avoided",
+    } <= set(actions)
+    assert actions["schema_version"] == PATCH_REVIEW_SCHEMA_VERSIONS["review_summary_actions.json"]
+    for item in actions["actionable_items"]:
+        assert {
+            "rank",
+            "constraint_id",
+            "instruction",
+            "source",
+            "type",
+            "confidence",
+            "evidence",
+            "source_files",
+            "symbols",
+            "markdown",
+            "evidence_markdown",
+        } <= set(item)
+
+    assert {"schema_version", "summary_mode", "product_role", "claims_avoided", "artifacts"} <= set(manifest)
+    assert manifest["schema_version"] == PATCH_REVIEW_SCHEMA_VERSIONS["review_summary_manifest.json"]
+    for item in manifest["artifacts"]:
+        assert {"filename", "kind", "schema_version", "intended_consumers", "safe_usage"} <= set(item)
+    assert [item["filename"] for item in manifest["artifacts"]] == payload["artifacts"]
+    assert PATCH_REVIEW_SCHEMA_VERSIONS == {
+        "review_summary_manifest.json": manifest["schema_version"],
+        "review_summary_quality.json": quality["schema_version"],
+        "review_summary_actions.json": actions["schema_version"],
+        "review_summary_pr_comment.json": pr_comment["schema_version"],
+        "review_summary_trace.json": trace["schema_version"],
+        "review_summary_bot_bundle.json": bot_bundle["schema_version"],
+    }
+    assert {
+        "schema_version",
+        "summary_mode",
+        "title",
+        "attachable",
+        "body_markdown",
+        "source_artifacts",
+        "signals",
+        "actionable_items",
+        "violations",
+        "claims_avoided",
+    } <= set(pr_comment)
+    assert pr_comment["schema_version"] == PATCH_REVIEW_SCHEMA_VERSIONS["review_summary_pr_comment.json"]
+    assert "DocAtlas patch review" in pr_comment["body_markdown"]
+    assert "Non-blocking review context only" in pr_comment["body_markdown"]
+    assert "review_summary_quality.json" in pr_comment["source_artifacts"]
+    assert "review_summary_actions.json" in pr_comment["source_artifacts"]
+    assert {
+        "schema_version",
+        "summary_mode",
+        "source_artifacts",
+        "counts",
+        "action_traces",
+        "claims_avoided",
+    } <= set(trace)
+    assert trace["schema_version"] == PATCH_REVIEW_SCHEMA_VERSIONS["review_summary_trace.json"]
+    assert "constraints.json" in trace["source_artifacts"]
+    assert "validation.json" in trace["source_artifacts"]
+    assert trace["counts"]["action_traces"] == len(trace["action_traces"])
+    for item in trace["action_traces"]:
+        assert {
+            "rank",
+            "constraint_id",
+            "source",
+            "evidence",
+            "validation_status",
+            "validation_reason",
+            "raw_constraint_artifact",
+            "raw_validation_artifact",
+        } <= set(item)
+    assert {
+        "schema_version",
+        "summary_mode",
+        "source_artifacts",
+        "manifest",
+        "quality",
+        "actions",
+        "pr_comment",
+        "trace",
+        "claims_avoided",
+    } <= set(bot_bundle)
+    assert bot_bundle["schema_version"] == PATCH_REVIEW_SCHEMA_VERSIONS["review_summary_bot_bundle.json"]
+    assert bot_bundle["quality"] == quality
+    assert bot_bundle["actions"] == actions
+    assert bot_bundle["pr_comment"] == pr_comment
+    assert bot_bundle["trace"] == trace
+
+
+
+def test_patch_review_summary_uses_generic_task_terms_without_project_hardcoding():
+    summary = PatchReviewService._review_summary(
+        "Review checkout launch action",
+        ["lib/payments/checkout_button.dart"],
+        {
+            "constraints": [
+                {
+                    "id": "generic-task-local",
+                    "type": "source_of_truth",
+                    "instruction": "Use launchCheckoutFlow for the changed payment button action.",
+                    "source": "docs/payments.md",
+                    "confidence": "medium",
+                    "evidence": "Checkout buttons call launchCheckoutFlow before navigation.",
+                    "symbols": ["launchCheckoutFlow"],
+                    "files": [],
+                },
+                {
+                    "id": "broad-architecture",
+                    "type": "architecture",
+                    "instruction": "Rules that must not be violated live in broad architecture docs.",
+                    "source": "docs/architecture.md",
+                    "confidence": "high",
+                    "evidence": "Rules that must not be violated.",
+                    "symbols": [],
+                    "files": [],
+                },
+            ],
+            "symbol_candidates": [],
+            "excluded_source_reasons": [],
+        },
+        {"satisfied": 0, "violated": 0, "unknown": 0, "results": [], "warnings": []},
+    )
+
+    actionable = _section(summary, "Actionable PR checklist")
+    manual = _section(summary, "Manual review context")
+    assert "launchCheckoutFlow" in actionable
+    assert "broad architecture" not in actionable.lower()
+    assert "broad architecture" in manual.lower()
+
+
+
+def test_patch_review_summary_puts_violations_first_even_when_broad_context():
+    summary = PatchReviewService._review_summary(
+        "Review current patch",
+        ["lib/widget.dart"],
+        {
+            "constraints": [
+                {
+                    "id": "broad-violated",
+                    "type": "architecture",
+                    "instruction": "Broad architecture rule was violated and needs reviewer action.",
+                    "source": "docs/architecture.md",
+                    "confidence": "medium",
+                    "evidence": "Rules that must not be violated.",
+                    "symbols": [],
+                    "files": [],
+                },
+                {
+                    "id": "generated-guardrail",
+                    "type": "generated_file",
+                    "instruction": "Generated files must not be edited by hand.",
+                    "source": "docs/architecture.md",
+                    "confidence": "high",
+                    "evidence": "Generated files must not be edited by hand.",
+                    "symbols": [],
+                    "files": [],
+                },
+            ],
+            "symbol_candidates": [],
+            "excluded_source_reasons": [],
+        },
+        {
+            "satisfied": 0,
+            "violated": 1,
+            "unknown": 0,
+            "results": [
+                {"constraint_id": "broad-violated", "status": "violated", "reason": "policy code changed in UI", "files": ["lib/widget.dart"]}
+            ],
+            "warnings": [],
+        },
+        summary_max_items=2,
+    )
+
+    actionable_items = [line for line in _section(summary, "Actionable PR checklist").splitlines() if line.startswith("- ")]
+    assert actionable_items[0].startswith("- Broad architecture rule was violated")
+    assert "Generated files must not be edited" in actionable_items[1]
+    assert "broad-violated: policy code changed in UI" in _section(summary, "Violations")
+
+
+def test_patch_review_quality_attachable_uses_total_actionable_not_display_cap():
+    constraints = {
+        "constraints": [
+            {
+                "id": f"actionable-{index}",
+                "type": "source_of_truth",
+                "instruction": f"Apply checkout rule {index}.",
+                "source": "docs/checkout.md",
+                "confidence": "high",
+                "evidence": f"checkout rule {index}",
+                "symbols": [f"checkoutRule{index}"],
+                "files": [],
+            }
+            for index in range(3)
+        ],
+        "symbol_candidates": [],
+        "excluded_source_reasons": [],
+    }
+    validation = {"satisfied": 0, "violated": 0, "unknown": 0, "results": [], "warnings": []}
+
+    quality = PatchReviewService._review_summary_quality_payload(
+        "Review checkout rules",
+        ["docs/checkout.md"],
+        constraints,
+        validation,
+        summary_max_items=1,
+    )
+
+    assert quality["actionable_items_count"] == 1
+    assert quality["actionable_items_total_count"] == 3
+    assert quality["attachable"] == "yes"
+
+
+def test_patch_review_pr_comment_lists_violations_separately_from_capped_actions():
+    actions = {
+        "actionable_items": [],
+        "violations": [
+            {"constraint_id": "policy-violation", "reason": "Provider policy moved into UI", "files": ["lib/widget.dart"]}
+        ],
+    }
+    quality = {
+        "attachable": "maybe",
+        "signals": [{"code": "violations_present", "severity": "error", "count": 1}],
+        "claims_avoided": ["correctness_proof"],
+    }
+
+    comment = PatchReviewService._review_summary_pr_comment_payload(actions, quality, summary_mode="compact")
+
+    assert comment["violations"] == actions["violations"]
+    assert "Violations:" in comment["body_markdown"]
+    assert "policy-violation" in comment["body_markdown"]
+    assert "Provider policy moved into UI" in comment["body_markdown"]
+
+
+def test_patch_review_render_ready_markdown_escapes_mentions_backticks_and_truncates():
+    item = PatchReviewService._actionable_item_payload(
+        {
+            "id": "unsafe-markdown",
+            "instruction": "Ping @team and use `danger`" + "x" * 2500,
+            "source": "docs/`unsafe`.md",
+            "type": "source_of_truth",
+            "confidence": "high",
+            "evidence": "Evidence mentions @team and `danger`",
+            "symbols": [],
+            "files": [],
+        },
+        None,
+        rank=1,
+    )
+
+    assert "@team" not in item["markdown"]
+    assert "@\u200bteam" in item["markdown"]
+    assert "\\`danger\\`" in item["markdown"]
+    assert "[truncated]" in item["markdown"]
+    assert "@team" not in item["evidence_markdown"]
+    assert "\\`danger\\`" in item["evidence_markdown"]
+
+    long_body = PatchReviewService._truncate_pr_comment("x" * 70_000)
+    assert len(long_body) <= 60_000
+    assert "Comment truncated for provider limits" in long_body
