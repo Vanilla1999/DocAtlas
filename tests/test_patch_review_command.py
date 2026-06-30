@@ -5,6 +5,7 @@ import subprocess
 from pathlib import Path
 from typing import Any
 
+import pytest
 from click.testing import CliRunner
 
 from docmancer.cli.__main__ import cli
@@ -1093,6 +1094,36 @@ def test_fake_pr_bot_consumer_discovers_bundle_via_manifest_without_markdown_par
     assert consumer_decision["violation_count"] > 0
     assert consumer_decision["violation_count"] + consumer_decision["unknown_count"] > 0
 
+
+def test_patch_review_manifest_is_final_discovery_marker_when_bot_bundle_write_fails(tmp_path: Path, monkeypatch):
+    repo = _repo(tmp_path)
+    _git(repo, "init")
+    _git(repo, "config", "user.email", "test@example.com")
+    _git(repo, "config", "user.name", "Test User")
+    _git(repo, "add", ".")
+    _git(repo, "commit", "-m", "base")
+    _write(repo / "lib/generated/menu_state.g.dart", "// manual generated edit\n")
+    out = tmp_path / "review-partial-write"
+    original_write_json = PatchReviewService._write_json
+
+    def fail_on_bot_bundle(path: Path, payload: Any) -> None:
+        if path.name == "review_summary_bot_bundle.json":
+            raise RuntimeError("simulated bot bundle write failure")
+        original_write_json(path, payload)
+
+    monkeypatch.setattr(PatchReviewService, "_write_json", staticmethod(fail_on_bot_bundle))
+
+    with pytest.raises(RuntimeError, match="simulated bot bundle write failure"):
+        PatchReviewService().run(
+            project_path=str(repo),
+            task="Review generated artifact edit",
+            output_dir=str(out),
+        )
+
+    assert not (out / "review_summary_manifest.json").exists()
+    assert not (out / "review_summary_bot_bundle.json").exists()
+    assert (out / "review_summary_quality.json").exists()
+    assert (out / "review_summary_actions.json").exists()
 
 
 def test_patch_review_summary_uses_generic_task_terms_without_project_hardcoding():

@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import re
 import subprocess
+import tempfile
 from dataclasses import asdict
 from datetime import datetime, timezone
 from pathlib import Path
@@ -182,8 +183,8 @@ class PatchReviewService:
             trace_payload,
             summary_mode=summary_mode,
         )
-        self._write_json(out / "review_summary_manifest.json", manifest_payload)
         self._write_json(out / "review_summary_bot_bundle.json", bot_bundle_payload)
+        self._write_json(out / "review_summary_manifest.json", manifest_payload)
         return {
             "output_dir": str(out),
             "changed_files": changed,
@@ -226,7 +227,15 @@ class PatchReviewService:
 
     @staticmethod
     def _write_json(path: Path, payload: Any) -> None:
-        path.write_text(json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True), encoding="utf-8")
+        fd, tmp = tempfile.mkstemp(prefix=f".{path.name}.", suffix=".tmp", dir=str(path.parent))
+        tmp_path = Path(tmp)
+        try:
+            with open(fd, "w", encoding="utf-8") as handle:
+                json.dump(payload, handle, ensure_ascii=False, indent=2, sort_keys=True)
+            tmp_path.replace(path)
+        except Exception:
+            tmp_path.unlink(missing_ok=True)
+            raise
 
     @staticmethod
     def _review_summary_manifest_payload(
