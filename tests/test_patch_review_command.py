@@ -613,6 +613,84 @@ def test_patch_review_writes_machine_readable_summary_quality(tmp_path: Path):
     assert f"- actionable_items_count: {quality['actionable_items_count']}" in summary_quality
 
 
+def test_patch_review_quality_classifies_unknowns_without_treating_them_as_pass():
+    constraints = {
+        "constraints": [
+            {
+                "id": "diff-gap",
+                "type": "source_of_truth",
+                "instruction": "Close the menu before navigation.",
+                "source": "docs/menu.md",
+                "confidence": "high",
+                "evidence": "Menu closes before navigation.",
+                "symbols": ["closeMenu"],
+                "files": [],
+            },
+            {
+                "id": "test-gap",
+                "type": "behavior",
+                "instruction": "Add regression tests for closed request reopening.",
+                "source": "docs/help.md",
+                "confidence": "medium",
+                "evidence": "Request reopening needs regression coverage.",
+                "symbols": [],
+                "files": [],
+            },
+            {
+                "id": "manual-design",
+                "type": "architecture",
+                "instruction": "Designer must confirm the menu button style.",
+                "source": "docs/menu.md",
+                "confidence": "medium",
+                "evidence": "Open designer question remains.",
+                "symbols": [],
+                "files": [],
+            },
+            {
+                "id": "low-risk-note",
+                "type": "architecture",
+                "instruction": "Keep optional helper naming aligned with docs.",
+                "source": "docs/menu.md",
+                "confidence": "low",
+                "evidence": "Optional naming note.",
+                "symbols": [],
+                "files": [],
+            },
+        ],
+        "symbol_candidates": [],
+        "excluded_source_reasons": [],
+    }
+    validation = {
+        "satisfied": 0,
+        "violated": 0,
+        "unknown": 4,
+        "results": [
+            {"constraint_id": "diff-gap", "status": "unknown", "reason": "no direct diff evidence found", "files": []},
+            {"constraint_id": "test-gap", "status": "unknown", "reason": "missing test evidence", "files": []},
+            {"constraint_id": "manual-design", "status": "unknown", "reason": "manual review required for designer input", "files": []},
+            {"constraint_id": "low-risk-note", "status": "unknown", "reason": "low confidence context only", "files": []},
+        ],
+        "warnings": [],
+    }
+
+    quality = PatchReviewService._review_summary_quality_payload(
+        "Review menu redesign unknowns",
+        ["lib/menu.dart"],
+        constraints,
+        validation,
+    )
+
+    triage = {item["code"]: item for item in quality["unknown_triage"]}
+    assert triage["missing_diff_evidence"]["count"] == 1
+    assert triage["missing_test_evidence"]["count"] == 1
+    assert triage["manual_review_required"]["count"] == 1
+    assert triage["low_risk_unknown"]["count"] == 1
+    assert all(item["requires_manual_review"] for item in quality["unknown_triage"])
+    assert "manual_review_required" in {signal["code"] for signal in quality["signals"]}
+    assert quality["unknown_count"] == 4
+    assert quality["attachable"] != "yes"
+
+
 def test_patch_review_writes_machine_readable_action_items(tmp_path: Path):
     repo = tmp_path / "repo"
     repo.mkdir()
@@ -767,6 +845,7 @@ def test_patch_review_machine_readable_artifact_contracts(tmp_path: Path):
         "unknown_count",
         "reasons",
         "signals",
+        "unknown_triage",
         "unknown_buckets",
         "claims_avoided",
     } <= set(quality)
@@ -775,6 +854,15 @@ def test_patch_review_machine_readable_artifact_contracts(tmp_path: Path):
     for signal in quality["signals"]:
         assert {"code", "severity", "count", "message"} <= set(signal)
         assert signal["severity"] in {"info", "warning", "error"}
+    for unknown_triage in quality["unknown_triage"]:
+        assert {"code", "count", "requires_manual_review", "message", "examples"} <= set(unknown_triage)
+        assert unknown_triage["code"] in {
+            "missing_diff_evidence",
+            "missing_test_evidence",
+            "manual_review_required",
+            "low_risk_unknown",
+        }
+        assert unknown_triage["requires_manual_review"] is True
 
     assert {
         "schema_version",

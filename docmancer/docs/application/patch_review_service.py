@@ -492,6 +492,7 @@ class PatchReviewService:
         useful_symbols = [item for item in symbol_candidates if not PatchReviewService._is_low_value_symbol_candidate(item, task)]
         low_symbols = [item for item in symbol_candidates if PatchReviewService._is_low_value_symbol_candidate(item, task)]
         unknown_buckets = PatchReviewService._unknown_buckets(unknowns, constraint_items)
+        unknown_triage = PatchReviewService._unknown_triage(unknowns, constraint_items)
         excluded_sources = list(constraints.get("excluded_source_reasons") or [])
         residual_memos = [item for item in excluded_sources if item.get("reason") in DOGFOOD_MEMO_REASONS]
         quality = PatchReviewService._summary_quality(
@@ -511,6 +512,7 @@ class PatchReviewService:
             "useful_symbols": useful_symbols,
             "low_symbols": low_symbols,
             "unknown_buckets": unknown_buckets,
+            "unknown_triage": unknown_triage,
             "excluded_sources": excluded_sources,
             "residual_memos": residual_memos,
             "violations": violations,
@@ -546,6 +548,7 @@ class PatchReviewService:
         low_context = model["low_context"]
         low_symbols = model["low_symbols"]
         unknown_buckets = model["unknown_buckets"]
+        unknown_triage = model["unknown_triage"]
         residual_memos = model["residual_memos"]
         quality = model["quality"]
         signals = PatchReviewService._review_summary_quality_signals(
@@ -553,6 +556,7 @@ class PatchReviewService:
             low_context=low_context,
             low_symbols=low_symbols,
             unknown_buckets=unknown_buckets,
+            unknown_triage=unknown_triage,
             residual_memos=residual_memos,
             validation=validation,
         )
@@ -571,6 +575,7 @@ class PatchReviewService:
             "unknown_count": validation.get("unknown", 0),
             "reasons": quality["reasons"],
             "signals": signals,
+            "unknown_triage": unknown_triage,
             "unknown_buckets": [
                 {
                     "name": name,
@@ -596,6 +601,7 @@ class PatchReviewService:
         low_context: list[dict[str, Any]],
         low_symbols: list[dict[str, Any]],
         unknown_buckets: dict[str, list[dict[str, Any]]],
+        unknown_triage: list[dict[str, Any]],
         residual_memos: list[dict[str, Any]],
         validation: dict[str, Any],
     ) -> list[dict[str, Any]]:
@@ -620,6 +626,16 @@ class PatchReviewService:
                     "severity": "warning",
                     "count": len(unknown_buckets),
                     "message": "Manual-review buckets remain.",
+                }
+            )
+        manual_review_count = sum(item["count"] for item in unknown_triage if item.get("requires_manual_review"))
+        if manual_review_count:
+            signals.append(
+                {
+                    "code": "manual_review_required",
+                    "severity": "warning",
+                    "count": manual_review_count,
+                    "message": "Unknown validation results require manual review; do not treat them as pass.",
                 }
             )
         if low_context or low_symbols:
@@ -1021,6 +1037,58 @@ class PatchReviewService:
                 bucket = "Other low-confidence context"
             buckets.setdefault(bucket, []).append(item)
         return dict(sorted(buckets.items()))
+
+    @staticmethod
+    def _unknown_triage(unknowns: list[dict[str, Any]], constraints: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        by_id = {item.get("id"): item for item in constraints}
+        buckets: dict[str, list[dict[str, Any]]] = {
+            "missing_diff_evidence": [],
+            "missing_test_evidence": [],
+            "manual_review_required": [],
+            "low_risk_unknown": [],
+        }
+        messages = {
+            "missing_diff_evidence": "No decisive changed-file or diff evidence was found for this constraint.",
+            "missing_test_evidence": "The unknown result depends on missing or inconclusive test evidence.",
+            "manual_review_required": "A human reviewer must resolve an open product, ownership, or policy question.",
+            "low_risk_unknown": "Low-confidence context remains unresolved; keep it visible for manual review.",
+        }
+        for item in unknowns:
+            constraint = by_id.get(item.get("constraint_id"), {})
+            text = " ".join(
+                str(value or "")
+                for value in (
+                    item.get("constraint_id"),
+                    item.get("reason"),
+                    constraint.get("instruction"),
+                    constraint.get("evidence"),
+                    constraint.get("source"),
+                    constraint.get("type"),
+                )
+            ).lower()
+            if "test" in text or "coverage" in text or "regression" in text:
+                code = "missing_test_evidence"
+            elif any(token in text for token in ("diff", "changed-file", "changed file", "patch", "direct evidence", "not found", "missing evidence")):
+                code = "missing_diff_evidence"
+            elif any(token in text for token in ("manual", "designer", "design", "open question", "ownership", "source-of-truth", "source_of_truth", "policy")):
+                code = "manual_review_required"
+            else:
+                code = "low_risk_unknown"
+            buckets[code].append(item)
+        return [
+            {
+                "code": code,
+                "count": len(items),
+                "requires_manual_review": True,
+                "message": messages[code],
+                "examples": [
+                    {"constraint_id": item.get("constraint_id"), "reason": item.get("reason")}
+                    for item in items[:2]
+                ],
+            }
+            for code, items in buckets.items()
+            if items
+        ]
 
     @staticmethod
     def _summary_quality(
