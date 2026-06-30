@@ -32,15 +32,33 @@ def _git(repo: Path, *args: str) -> None:
     subprocess.check_call(["git", *args], cwd=repo)
 
 
-def _fake_pr_bot_consume_bundle(bundle_path: Path) -> dict[str, Any]:
-    bundle = json.loads(bundle_path.read_text(encoding="utf-8"))
+def _fake_pr_bot_consume_manifest(manifest_path: Path) -> dict[str, Any]:
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    bundle_entries = [
+        item
+        for item in manifest["artifacts"]
+        if item["kind"] == "bot_bundle" and item["filename"] == "review_summary_bot_bundle.json"
+    ]
+    assert len(bundle_entries) == 1
+    bundle_entry = bundle_entries[0]
+    assert bundle_entry["schema_version"] == PATCH_REVIEW_SCHEMA_VERSIONS["review_summary_bot_bundle.json"]
+    assert "pr_bot" in bundle_entry["intended_consumers"]
+    assert "single-file bot integration entrypoint" in bundle_entry["safe_usage"]
+    assert "advisory non-blocking" in bundle_entry["safe_usage"]
+
+    bundle = json.loads((manifest_path.parent / bundle_entry["filename"]).read_text(encoding="utf-8"))
     decision = bundle["advisory_decision"]
     assert bundle["schema_version"] == 3
+    assert bundle["manifest"] == manifest
     assert decision["semantics"] == "advisory_non_blocking_only"
+    assert manifest["product_role"] == "non_blocking_pr_review_assistant"
     assert "safe_to_merge" not in bundle
     assert "safe_to_merge" not in decision
+    assert "safe_to_merge" in decision["claims_avoided"]
     assert "correctness_proof" in bundle["claims_avoided"]
     assert "test_or_human_review_replacement" in bundle["claims_avoided"]
+    assert "correctness_proof" in manifest["claims_avoided"]
+    assert "test_or_human_review_replacement" in manifest["claims_avoided"]
     return {
         "attach_comment": decision["should_attach_comment"],
         "show_warning_badge": decision["show_warning_badge"],
@@ -1040,7 +1058,7 @@ def test_patch_review_advisory_decision_is_non_blocking_and_escalates_violations
     assert "safe_to_merge" not in violation_and_unknown
 
 
-def test_fake_pr_bot_consumer_uses_generated_bundle_without_markdown_parsing(tmp_path: Path):
+def test_fake_pr_bot_consumer_discovers_bundle_via_manifest_without_markdown_parsing(tmp_path: Path):
     repo = _repo(tmp_path)
     _git(repo, "init")
     _git(repo, "config", "user.email", "test@example.com")
@@ -1066,7 +1084,7 @@ def test_fake_pr_bot_consumer_uses_generated_bundle_without_markdown_parsing(tmp
     )
 
     assert result.exit_code == 0, result.output
-    consumer_decision = _fake_pr_bot_consume_bundle(out / "review_summary_bot_bundle.json")
+    consumer_decision = _fake_pr_bot_consume_manifest(out / "review_summary_manifest.json")
     assert consumer_decision["attach_comment"] is True
     assert consumer_decision["show_warning_badge"] is True
     assert consumer_decision["highlight_violations"] is True
