@@ -68,6 +68,7 @@ def _fake_pr_bot_consume_manifest(manifest_path: Path, manifest: dict[str, Any] 
         "highlight_violations": decision["highlight_violations"],
         "requires_manual_review": decision["requires_manual_review"],
         "reason_codes": decision["reason_codes"],
+        "unknown_triage_codes": decision["unknown_triage_codes"],
         "violation_count": len(bundle["actions"]["violations"]),
         "unknown_count": bundle["quality"]["unknown_count"],
     }
@@ -1040,6 +1041,16 @@ def test_patch_review_machine_readable_artifact_contracts(tmp_path: Path):
     assert bot_bundle["actions"] == actions
     assert bot_bundle["pr_comment"] == pr_comment
     assert bot_bundle["trace"] == trace
+    assert {
+        "should_attach_comment",
+        "show_warning_badge",
+        "highlight_violations",
+        "requires_manual_review",
+        "reason_codes",
+        "unknown_triage_codes",
+        "semantics",
+        "claims_avoided",
+    } <= set(bot_bundle["advisory_decision"])
     assert bot_bundle["advisory_decision"]["semantics"] == "advisory_non_blocking_only"
     assert "safe_to_merge" not in bot_bundle["advisory_decision"]
 
@@ -1059,6 +1070,7 @@ def test_patch_review_advisory_decision_is_non_blocking_and_escalates_violations
     assert clean_action["highlight_violations"] is False
     assert clean_action["requires_manual_review"] is False
     assert clean_action["reason_codes"] == ["actionable_items_present"]
+    assert clean_action["unknown_triage_codes"] == []
 
     violation = PatchReviewService._review_summary_advisory_decision_payload(
         {**base_quality, "violated_count": 1, "actionable_items_total_count": 0},
@@ -1071,7 +1083,15 @@ def test_patch_review_advisory_decision_is_non_blocking_and_escalates_violations
     assert violation["reason_codes"] == ["violations_present"]
 
     unknown = PatchReviewService._review_summary_advisory_decision_payload(
-        {**base_quality, "unknown_count": 1, "actionable_items_total_count": 0},
+        {
+            **base_quality,
+            "unknown_count": 2,
+            "actionable_items_total_count": 0,
+            "unknown_triage": [
+                {"code": "missing_test_evidence", "count": 1, "requires_manual_review": True},
+                {"code": "low_risk_unknown", "count": 1, "requires_manual_review": True},
+            ],
+        },
         {"actionable_items": [], "violations": []},
     )
     assert unknown["should_attach_comment"] is True
@@ -1079,6 +1099,7 @@ def test_patch_review_advisory_decision_is_non_blocking_and_escalates_violations
     assert unknown["highlight_violations"] is False
     assert unknown["requires_manual_review"] is True
     assert unknown["reason_codes"] == ["manual_review_required"]
+    assert unknown["unknown_triage_codes"] == ["missing_test_evidence", "low_risk_unknown"]
 
     violation_and_unknown = PatchReviewService._review_summary_advisory_decision_payload(
         {**base_quality, "violated_count": 1, "unknown_count": 1, "actionable_items_total_count": 0},
@@ -1087,6 +1108,7 @@ def test_patch_review_advisory_decision_is_non_blocking_and_escalates_violations
     assert violation_and_unknown["highlight_violations"] is True
     assert violation_and_unknown["requires_manual_review"] is True
     assert violation_and_unknown["reason_codes"] == ["violations_present", "manual_review_required"]
+    assert violation_and_unknown["unknown_triage_codes"] == []
     assert violation_and_unknown["semantics"] == "advisory_non_blocking_only"
     assert violation_and_unknown["claims_avoided"] == [
         "safe_to_merge",

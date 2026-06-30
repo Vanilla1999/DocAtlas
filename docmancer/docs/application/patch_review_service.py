@@ -474,10 +474,19 @@ class PatchReviewService:
         actions_payload: dict[str, Any],
     ) -> dict[str, Any]:
         signals = {str(item.get("code") or "") for item in quality_payload.get("signals", [])}
+        unknown_triage_codes = [
+            str(item.get("code"))
+            for item in quality_payload.get("unknown_triage", [])
+            if item.get("code") and item.get("count", 0) > 0
+        ]
         violations = list(actions_payload.get("violations") or [])
         actionable_items = list(actions_payload.get("actionable_items") or [])
         has_violations = bool(violations) or quality_payload.get("violated_count", 0) > 0 or "violations_present" in signals
-        has_manual_review = quality_payload.get("unknown_count", 0) > 0 or "manual_review_required" in signals
+        has_manual_review = (
+            quality_payload.get("unknown_count", 0) > 0
+            or "manual_review_required" in signals
+            or bool(unknown_triage_codes)
+        )
         has_actionable_items = bool(actionable_items) or quality_payload.get("actionable_items_total_count", 0) > 0
         reason_codes = []
         if has_violations:
@@ -495,6 +504,7 @@ class PatchReviewService:
             "highlight_violations": has_violations,
             "requires_manual_review": has_violations or has_manual_review,
             "reason_codes": reason_codes,
+            "unknown_triage_codes": unknown_triage_codes,
             "semantics": "advisory_non_blocking_only",
             "claims_avoided": [
                 "safe_to_merge",
