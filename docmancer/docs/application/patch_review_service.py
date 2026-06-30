@@ -17,7 +17,8 @@ LOW_VALUE_SYMBOLS = {
     "package", "import", "export", "part", "TODO", "FIXME", "tr", "l10n",
     "localization", "onHide", "onShow", "onTap", "onPressed",
     "barrierDismissible", "context", "build", "Widget", "State",
-    "StatelessWidget", "StatefulWidget",
+    "StatelessWidget", "StatefulWidget", "Text", "title", "VoidCallback",
+    "onRequest",
 }
 DOGFOOD_MEMO_REASONS = {"dogfood_result_memo", "dogfood_task_artifact"}
 MAX_PR_COMMENT_CHARS = 60_000
@@ -1006,6 +1007,8 @@ class PatchReviewService:
             priority = max(priority, 80)
         if PatchReviewService._is_broad_context_source(source, instruction):
             priority = max(priority, 60)
+        if PatchReviewService._has_only_low_value_symbols(item):
+            priority = max(priority, 60)
         confidence_rank = {"high": 0, "medium": 1, "low": 2}.get(confidence, 3)
         if source and source.lower() in changed:
             priority -= 3
@@ -1063,15 +1066,22 @@ class PatchReviewService:
     @staticmethod
     def _is_low_value_symbol_candidate(item: dict[str, Any], task: str) -> bool:
         symbol = str(item.get("matched_symbol") or "")
-        term = str(item.get("term") or "")
         task_lower = task.lower()
         if symbol in LOW_VALUE_SYMBOLS or symbol.lower() in {value.lower() for value in LOW_VALUE_SYMBOLS}:
-            explicit = symbol.lower() in task_lower or term.lower() in task_lower
+            explicit = symbol.lower() in task_lower
             return not explicit
         evidence = str(item.get("evidence") or "").strip()
         if evidence.startswith(("import ", "export ", "part ")):
             return True
         return False
+
+    @staticmethod
+    def _has_only_low_value_symbols(item: dict[str, Any]) -> bool:
+        symbols = [str(symbol or "") for symbol in item.get("symbols") or []]
+        if not symbols:
+            return False
+        low_value = {value.lower() for value in LOW_VALUE_SYMBOLS}
+        return all(symbol in LOW_VALUE_SYMBOLS or symbol.lower() in low_value for symbol in symbols)
 
     @staticmethod
     def _is_broad_context_source(source: str, instruction: str) -> bool:

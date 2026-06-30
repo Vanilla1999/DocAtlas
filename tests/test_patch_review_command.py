@@ -2726,6 +2726,102 @@ def test_patch_review_summary_puts_violations_first_even_when_broad_context():
     assert "broad-violated: policy code changed in UI" in _section(summary, "Violations")
 
 
+def test_patch_review_actions_demote_generic_symbols_below_task_missing_evidence():
+    constraints = {
+        "constraints": [
+            {
+                "id": "generic-title-symbol",
+                "type": "symbol",
+                "instruction": "Review the changed title handler for the task button.",
+                "source": "lib/src/ui/help_request_details_screen/states/help_request_details_success_state.dart",
+                "confidence": "high",
+                "evidence": "Вернуть в работу -> title",
+                "symbols": ["title"],
+                "files": ["lib/src/ui/help_request_details_screen/states/help_request_details_success_state.dart"],
+            },
+            {
+                "id": "return-active-service-call",
+                "type": "source_of_truth",
+                "instruction": "Button 'Вернуть в работу' must send the request status 'Активная' to the service.",
+                "source": "docs/help-chat-reopen-task.md",
+                "confidence": "high",
+                "evidence": "При нажатии приложение отправляет на сервис статус заявки 'Активная'.",
+                "symbols": ["returnToActive"],
+                "files": [],
+            },
+            {
+                "id": "success-attachment-panel",
+                "type": "source_of_truth",
+                "instruction": "On successful return, hide buttons and show the attachments/comment/send panel.",
+                "source": "docs/help-chat-reopen-task.md",
+                "confidence": "high",
+                "evidence": "Если успешно: кнопки скрываются; открывается панель с вложениями, вводом текста и кнопкой Отправить.",
+                "symbols": ["attachmentPanel"],
+                "files": [],
+            },
+        ],
+        "symbol_candidates": [
+            {
+                "term": "Вернуть в работу",
+                "matched_symbol": "title",
+                "source": "lib/src/ui/help_request_details_screen/states/help_request_details_success_state.dart",
+                "reason": "task text matched a generic UI title symbol",
+                "evidence": "title: 'Вернуть в работу'",
+            }
+        ],
+        "excluded_source_reasons": [],
+    }
+    validation = {
+        "satisfied": 0,
+        "violated": 0,
+        "unknown": 3,
+        "results": [
+            {
+                "constraint_id": "generic-title-symbol",
+                "status": "unknown",
+                "reason": "generic symbol match needs diff evidence",
+                "files": ["lib/src/ui/help_request_details_screen/states/help_request_details_success_state.dart"],
+            },
+            {
+                "constraint_id": "return-active-service-call",
+                "status": "unknown",
+                "reason": "missing diff evidence for required service status transition",
+                "files": [],
+            },
+            {
+                "constraint_id": "success-attachment-panel",
+                "status": "unknown",
+                "reason": "missing diff evidence for success UI transition",
+                "files": [],
+            },
+        ],
+        "warnings": [],
+    }
+    task = "Reopen HELP request: 'Вернуть в работу' must send status Активная, hide buttons, and show the attachment panel."
+
+    actions = PatchReviewService._review_summary_actions_payload(
+        task,
+        ["lib/src/ui/help_request_details_screen/states/help_request_details_success_state.dart"],
+        constraints,
+        validation,
+        summary_max_items=2,
+    )
+    summary = PatchReviewService._review_summary(
+        task,
+        ["lib/src/ui/help_request_details_screen/states/help_request_details_success_state.dart"],
+        constraints,
+        validation,
+        summary_max_items=2,
+    )
+
+    action_ids = [item["constraint_id"] for item in actions["actionable_items"]]
+    assert action_ids == ["return-active-service-call", "success-attachment-panel"]
+    assert "generic-title-symbol" not in action_ids
+    assert actions["actionable_items"][0]["validation_status"] == "unknown"
+    assert "title" not in _section(summary, "Actionable PR checklist")
+    assert "symbol `title`" in _section(summary, "Low-confidence / noisy signals")
+
+
 def test_patch_review_quality_attachable_uses_total_actionable_not_display_cap():
     constraints = {
         "constraints": [
