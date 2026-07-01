@@ -6,6 +6,7 @@ from typing import Any
 from docmancer.docs.domain.project_doc_ranking import normalize_doc_path
 
 SCHEMA_VERSION = "answer-completeness-1.0"
+_PROOF_SOURCE_CLASSES = {"project_doc", "dependency_doc", "source_evidence"}
 
 _QUOTED_TERM_RE = re.compile(r"[\"'`“”‘’«»„]+([^\"'`“”‘’«»„]{2,120})[\"'`“”‘’«»„]+")
 _CODE_TERM_RE = re.compile(
@@ -159,8 +160,9 @@ def evaluate_project_answer_completeness(
     """Return a backward-compatible completeness contract for get_project_context."""
 
     requirements = _extract_requirements(question)
-    context_text = _context_text(context_pack)
-    coverage_by_requirement = [_requirement_coverage(term, context_pack=context_pack, context_text=context_text) for term in requirements]
+    proof_context_pack = _proof_context_pack(context_pack)
+    context_text = _context_text(proof_context_pack)
+    coverage_by_requirement = [_requirement_coverage(term, context_pack=proof_context_pack, context_text=context_text) for term in requirements]
     matched_terms = [item["term"] for item in coverage_by_requirement if item["matched"]]
     missing_terms = [item["term"] for item in coverage_by_requirement if not item["matched"]]
     coverage_score = (len(matched_terms) / len(requirements)) if requirements else (1.0 if answer_available else 0.0)
@@ -399,6 +401,10 @@ def _is_story_specific_query(question: str, intent: Any, requirements: list[str]
 
 def _context_text(context_pack: list[dict[str, Any]]) -> str:
     return _normalize_text(_context_text_raw(context_pack))
+
+
+def _proof_context_pack(context_pack: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    return [item for item in context_pack if item.get("source_class") in _PROOF_SOURCE_CLASSES]
 
 
 def _context_text_raw(context_pack: list[dict[str, Any]]) -> str:

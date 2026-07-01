@@ -146,6 +146,54 @@ def test_story_specific_project_context_with_matched_terms_is_exact():
     assert not any(action.get("action") == "search_project_sources" for action in result.recommended_next_actions)
 
 
+def test_project_context_includes_repo_map_lane_for_matching_source_files(tmp_path):
+    lib = tmp_path / "lib"
+    lib.mkdir()
+    (lib / "help_request_details_screen.dart").write_text(
+        """
+import 'package:flutter/material.dart';
+
+class HelpRequestDetailsScreen extends StatelessWidget {
+  void reopenRequest() {
+    final label = 'Вернуть в работу';
+  }
+}
+""".strip()
+        + "\n",
+        encoding="utf-8",
+    )
+    facade = FakeProjectContextFacade()
+    facade.project_docs = ProjectDocsResult(
+        project_path=str(tmp_path),
+        query='Как реализовать кнопку "Вернуть в работу"?',
+        results=[
+            ProjectDocsChunk(
+                title="Architecture",
+                content="Help requests follow UI -> Cubit -> Service -> Repository -> API.",
+                source=str(tmp_path / "ARCHITECTURE.md"),
+                url=None,
+                path="ARCHITECTURE.md",
+                heading_path="Help requests architecture",
+            )
+        ],
+    )
+
+    result = ProjectContextService(facade).get_project_context(
+        str(tmp_path),
+        'Как реализовать кнопку "Вернуть в работу"?',
+        mode="project-only",
+    )
+
+    repo_map_items = [item for item in result.context_pack if item["source_class"] == "repo_map"]
+    assert [item["path"] for item in repo_map_items] == ["lib/help_request_details_screen.dart"]
+    assert repo_map_items[0]["language"] == "dart"
+    assert repo_map_items[0]["string_literals"] == ["Вернуть в работу"]
+    assert "repo_map" in result.metrics["source_classes"]
+    assert result.diagnostics["repo_map"]["selected_files"] == 1
+    assert result.answer_type == "partial_navigational"
+    assert result.answer_completeness["missing_terms"] == ["Вернуть в работу"]
+
+
 def test_story_specific_unquoted_error_toast_phrases_are_missing_terms():
     facade = FakeProjectContextFacade()
     facade.project_docs = ProjectDocsResult(

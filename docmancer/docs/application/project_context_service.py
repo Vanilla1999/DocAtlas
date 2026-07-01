@@ -11,6 +11,7 @@ from docmancer.docs.domain.project_doc_ranking import is_changelog_path, normali
 from docmancer.docs.domain.project_query_intent import classify_project_query_intent
 from docmancer.docs.domain.quality import has_code_symbol_evidence, internal_noise_score, is_trivial_section, looks_like_code_or_command
 from docmancer.docs.domain.snippets import best_context_pack_snippet, build_snippet_presentation, validate_response_style
+from docmancer.docs.domain.source_map import build_project_repo_map, source_map_diagnostics
 from docmancer.docs.domain.trust_contract import build_project_context_trust_contract
 from docmancer.docs.models import DocsChunk, DocsResult, ProjectContextResult, ProjectDocsResult, ProjectMetadata
 
@@ -84,6 +85,15 @@ class ProjectContextService:
         next_action = project_docs.next_action if requires_confirmation and project_docs else {}
         arguments_patch = project_docs.arguments_patch if requires_confirmation and project_docs else {}
         context_pack = project_context_pack(project_docs=project_docs, dependency_docs=dependency_docs)
+        repo_map_items: list[dict[str, Any]] = []
+        if mode in {"auto", "project-only"}:
+            repo_map_items = build_project_repo_map(
+                root,
+                question=question,
+                max_files=max(1, min(8, limit or 4)),
+                token_budget=_repo_map_token_budget(tokens),
+            )
+            context_pack.extend(repo_map_items)
         answer_outline = build_project_answer_outline(question=question, intent=intent, context_pack=context_pack)
         metrics = project_context_metrics(context_pack=context_pack, project_docs=project_docs, dependency_docs=dependency_docs, intent=intent)
         lane_priority = ["project"] if mode == "project-only" else (["dependency"] if mode in {"deps-only", "public-docs"} else ["project", "dependency"])
@@ -95,6 +105,8 @@ class ProjectContextService:
         )
         metrics["snippet_metrics"] = snippet_presentation.metrics
         diagnostics: dict[str, Any] = {"query_intent": intent.name}
+        if repo_map_items:
+            diagnostics["repo_map"] = source_map_diagnostics(repo_map_items)
         if project_docs is not None and hasattr(self.facade, "active_index_diagnostics"):
             diagnostics["active_index"] = self.facade.active_index_diagnostics(str(root))
         if intent.name == "mcp_disambiguation":
@@ -289,6 +301,12 @@ def project_context_pack(*, project_docs: ProjectDocsResult | None, dependency_d
                 pack[-1]["snippet"] = snippet
                 pack[-1]["surrounding_context"] = item.content
     return pack
+
+
+def _repo_map_token_budget(tokens: int | None) -> int:
+    if not tokens:
+        return 900
+    return max(120, min(900, tokens // 4))
 
 
 def _drop_low_value_context_section(content: str, title: str | None = None, heading_path: str | None = None) -> bool:
