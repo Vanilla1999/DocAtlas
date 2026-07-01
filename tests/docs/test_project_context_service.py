@@ -178,6 +178,83 @@ def test_story_specific_unquoted_error_toast_phrases_are_missing_terms():
     ]
 
 
+def test_unquoted_russian_story_query_uses_requirement_chunks_not_weak_words():
+    facade = FakeProjectContextFacade()
+    question = (
+        "Как реализовать Создать новый запрос на основании закрытой заявки, "
+        "отправить название заявки в чат как первое обязательное поле и показать Вернуть в работу?"
+    )
+    facade.project_docs = ProjectDocsResult(
+        project_path="/repo",
+        query=question,
+        results=[
+            ProjectDocsChunk(
+                title="Architecture",
+                content="""
+Help requests follow UI -> Cubit -> Service -> Repository -> API.
+The UI layer has help_requests_screen for active/closed lists,
+help_request_details_screen for comments and attachments, and
+new_help_request_screen for creating requests through a chat-like form.
+""".strip(),
+                source="/repo/ARCHITECTURE.md",
+                url=None,
+                path="ARCHITECTURE.md",
+                heading_path="Help requests architecture",
+            )
+        ],
+    )
+
+    result = ProjectContextService(facade).get_project_context("/repo", question, mode="project-only")
+
+    assert result.answer_type == "partial_navigational"
+    assert result.answer_completeness["source_search_required"] is True
+    missing_terms = result.answer_completeness["missing_terms"]
+    assert "Создать новый запрос" in missing_terms
+    assert "на основании закрытой заявки" in missing_terms
+    assert "отправить название заявки в чат" in missing_terms
+    assert "первое обязательное поле" in missing_terms
+    assert "Вернуть в работу" in missing_terms
+    assert "Создать" not in missing_terms
+    assert "закрытой" not in missing_terms
+    source_action = result.recommended_next_actions[-1]
+    assert source_action["query_terms"] == missing_terms[:8]
+    assert "Создать новый запрос" in source_action["query_terms"]
+    assert "отправить название заявки в чат" in source_action["query_terms"]
+
+
+def test_russian_story_requirement_chunks_drop_question_scaffolding_and_connectors():
+    facade = FakeProjectContextFacade()
+    question = (
+        "Как реализовать кнопку подключения Bluetooth-устройств и проверить сценарий подключения внешнего сканера? "
+        "Как изменить flow работы сервера, чтобы после запуска показать уведомление в верхней части экрана "
+        "и проверить примеры запросов?"
+    )
+    facade.project_docs = ProjectDocsResult(
+        project_path="/repo",
+        query=question,
+        results=[
+            ProjectDocsChunk(
+                title="Architecture",
+                content="Runtime flow follows UI -> Cubit -> Service -> Repository -> API for screens, scanner devices, and local server features.",
+                source="/repo/ARCHITECTURE.md",
+                url=None,
+                path="ARCHITECTURE.md",
+                heading_path="Runtime architecture",
+            )
+        ],
+    )
+
+    result = ProjectContextService(facade).get_project_context("/repo", question, mode="project-only")
+
+    assert result.answer_type == "partial_navigational"
+    missing_terms = result.answer_completeness["missing_terms"]
+    assert "Как реализовать кнопку" not in missing_terms
+    assert "показать уведомление в верхней части экрана и" not in missing_terms
+    assert "проверить сценарий подключения внешнего сканера" in missing_terms
+    assert "показать уведомление в верхней части экрана" in missing_terms
+    assert "проверить примеры запросов" in missing_terms
+
+
 def test_context_pack_snippet_and_metrics_shape_are_stable():
     chunk = DocsChunk(
         title="Example",

@@ -14,6 +14,7 @@ _CODE_TERM_RE = re.compile(
     r"|\b[A-Za-z][A-Za-z0-9_]*(?:Cubit|Service|Repository|Screen|Controller|Route|Router|Navigator|Module|Utils|Api|API)\b"
 )
 _WORD_RE = re.compile(r"[A-Za-zА-Яа-яЁё][A-Za-zА-Яа-яЁё0-9_\-]{3,}")
+_RUSSIAN_WORD_RE = re.compile(r"[А-Яа-яЁёA-Za-z0-9_\-]+")
 _FILE_HINT_RE = re.compile(r"\b(?:[\w.-]+/)*[\w.-]+\.(?:py|dart|js|jsx|ts|tsx|go|rs|java|kt|swift|md)\b")
 _LAYER_TERMS = ["UI", "Cubit", "Service", "Repository", "API", "Screen", "Route", "Navigator"]
 _STORY_MARKERS = [
@@ -45,7 +46,64 @@ _STORY_MARKERS = [
     "создат",
     "создать",
     "перевест",
+    "чат",
+    "пол",
+    "назван",
+    "обязатель",
 ]
+_RUSSIAN_REQUIREMENT_PATTERNS = [
+    re.compile(pattern, re.IGNORECASE)
+    for pattern in [
+        r"\bсоздать\s+нов(?:ый|ую|ое|ые|ого|ой|ым)?\s+[А-Яа-яЁё][А-Яа-яЁё0-9_\-]{2,}\b",
+        r"\bна\s+основании\s+закрыт(?:ой|ая|ую|ые|ого|ом|ым)?\s+заявк[А-Яа-яЁё0-9_\-]*\b",
+        r"\bотправить\s+название\s+заявк[А-Яа-яЁё0-9_\-]*\s+в\s+чат\b",
+        r"\bперв(?:ое|ый|ая|ые|ого|ой|ую|ым)?\s+обязательн(?:ое|ый|ая|ые|ого|ой|ую|ым)?\s+пол[ея]\b",
+        r"\bвернуть\s+в\s+работу\b",
+        r"\bзакрыт(?:ой|ая|ую|ые|ого|ом|ым)?\s+заявк[А-Яа-яЁё0-9_\-]*\b",
+        r"\bотправить\s+статус\s+[А-Яа-яЁё][А-Яа-яЁё0-9_\-]{2,}\b",
+        r"\b(?:переместить|перевести)\s+(?:е[её]|заявк[А-Яа-яЁё0-9_\-]*)\s+в\s+[А-Яа-яЁё][А-Яа-яЁё0-9_\-]{2,}\b",
+    ]
+]
+_RUSSIAN_REQUIREMENT_ACTIONS = [
+    "создать",
+    "отправить",
+    "вернуть",
+    "перевести",
+    "переместить",
+    "показать",
+    "добавить",
+    "открыть",
+    "закрыть",
+    "выбрать",
+    "сохранить",
+    "обновить",
+    "удалить",
+    "передать",
+    "заполнить",
+    "получить",
+    "загрузить",
+    "скачать",
+    "подключить",
+    "настроить",
+    "проверить",
+]
+_RUSSIAN_ACTION_RE = re.compile(r"\b(?:" + "|".join(map(re.escape, _RUSSIAN_REQUIREMENT_ACTIONS)) + r")\b", re.IGNORECASE)
+_RUSSIAN_ACTION_SPLIT_RE = re.compile(
+    r"[,;?!.\n]+|\s+(?:чтобы|если|когда|после\s+того\s+как|перед\s+тем\s+как)\s+|"
+    r"\s+(?:и|или)\s+(?=(?:" + "|".join(map(re.escape, _RUSSIAN_REQUIREMENT_ACTIONS)) + r")\b)",
+    re.IGNORECASE,
+)
+_WEAK_STORY_SINGLETONS = {
+    "создать",
+    "отправить",
+    "вернуть",
+    "закрытой",
+    "закрытая",
+    "закрытую",
+    "заявки",
+    "заявка",
+    "экран",
+}
 _STOPWORDS = {
     "about",
     "after",
@@ -71,6 +129,7 @@ _STOPWORDS = {
     "как",
     "где",
     "для",
+    "и",
     "или",
     "надо",
     "нужно",
@@ -161,6 +220,8 @@ def _extract_requirements(question: str) -> list[str]:
     if not terms:
         terms.extend(_extract_explicit_story_phrases(question))
     if not terms:
+        terms.extend(_extract_russian_story_requirement_chunks(question))
+    if not terms:
         for match in _WORD_RE.findall(question or ""):
             term = _clean_term(match)
             if not term:
@@ -190,7 +251,68 @@ def _extract_explicit_story_phrases(question: str) -> list[str]:
                 if not re.search(r"[A-ZА-ЯЁ]", phrase):
                     continue
                 phrases.append(phrase)
-    return _dedupe_terms(phrases)
+    return _dedupe_terms(_drop_weak_story_singletons(phrases))
+
+
+def _extract_russian_story_requirement_chunks(question: str) -> list[str]:
+    if not re.search(r"[А-Яа-яЁё]", question or ""):
+        return []
+    phrases: list[str] = []
+    for pattern in _RUSSIAN_REQUIREMENT_PATTERNS:
+        for match in pattern.finditer(question or ""):
+            _append_requirement_chunk(phrases, match.group(0))
+    if len(phrases) >= 3:
+        return _dedupe_terms(phrases)
+
+    for clause in _RUSSIAN_ACTION_SPLIT_RE.split(question or ""):
+        for match in _RUSSIAN_ACTION_RE.finditer(clause):
+            tail = clause[match.start() :]
+            words = _RUSSIAN_WORD_RE.findall(tail)
+            if len(words) < 2:
+                continue
+            phrase_words = words[:7]
+            while phrase_words and _normalize_text(phrase_words[-1]) in _STOPWORDS:
+                phrase_words.pop()
+            if 2 <= len(phrase_words) <= 7:
+                _append_requirement_chunk(phrases, " ".join(phrase_words))
+
+    for match in re.finditer(
+        r"\b(?:[А-Яа-яЁё][А-Яа-яЁё0-9_\-]*\s+){1,3}(?:заявк[А-Яа-яЁё0-9_\-]*|запрос[А-Яа-яЁё0-9_\-]*|пол[ея]|кнопк[А-Яа-яЁё0-9_\-]*|экран[А-Яа-яЁё0-9_\-]*|чат[А-Яа-яЁё0-9_\-]*|статус[А-Яа-яЁё0-9_\-]*|ошибк[А-Яа-яЁё0-9_\-]*)\b",
+        question or "",
+        re.IGNORECASE,
+    ):
+        _append_requirement_chunk(phrases, match.group(0))
+
+    return _dedupe_terms(_drop_weak_story_singletons(phrases))
+
+
+def _append_requirement_chunk(phrases: list[str], value: str) -> None:
+    phrase = _clean_term(value)
+    if not phrase:
+        return
+    words = _RUSSIAN_WORD_RE.findall(phrase)
+    if len(words) < 2 or len(words) > 8:
+        return
+    if _normalize_text(words[0]) in _STOPWORDS:
+        return
+    normalized = _normalize_text(phrase)
+    if normalized in _STOPWORDS:
+        return
+    if not any(marker in normalized for marker in _STORY_MARKERS + _RUSSIAN_REQUIREMENT_ACTIONS):
+        return
+    phrases.append(phrase)
+
+
+def _drop_weak_story_singletons(terms: list[str]) -> list[str]:
+    if not any(len(_RUSSIAN_WORD_RE.findall(term)) > 1 for term in terms):
+        return terms
+    filtered: list[str] = []
+    for term in terms:
+        words = _RUSSIAN_WORD_RE.findall(term)
+        if len(words) == 1 and _normalize_text(term) in _WEAK_STORY_SINGLETONS:
+            continue
+        filtered.append(term)
+    return filtered
 
 
 def _requirement_coverage(term: str, *, context_pack: list[dict[str, Any]], context_text: str) -> dict[str, Any]:
