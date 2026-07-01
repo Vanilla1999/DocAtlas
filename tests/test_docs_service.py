@@ -552,6 +552,39 @@ def test_sync_project_docs_prunes_orphaned_sources_and_indexes_new_docs(tmp_path
     assert "NewSyncNeedle" in new_query.results[0].content
 
 
+def test_sync_project_docs_ingests_only_exact_discovered_candidates(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    (project / "README.md").write_text("# App\n\nRoot project overview.", encoding="utf-8")
+    eval_readme = project / "eval" / "task_level" / "fixtures" / "README.md"
+    eval_readme.parent.mkdir(parents=True)
+    eval_readme.write_text("# Eval fixture\n\nShould not be indexed as project docs.", encoding="utf-8")
+    example_readme = project / "example" / "README.md"
+    example_readme.parent.mkdir()
+    example_readme.write_text("# Example\n\nShould not be indexed as project docs.", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+
+    result = service.sync_project_docs(str(project), with_vectors=False)
+    inspect = service.inspect_project_docs(str(project))
+
+    assert result.status == "success"
+    assert result.candidate_count == 1
+    assert result.current_count == 1
+    assert result.sections_indexed == 1
+    assert result.missing_sources == []
+    assert inspect.reason_code == "project_docs_ready"
+    assert inspect.ignored_sources == []
+    assert {item["path"] for item in inspect.indexed_sources} == {"README.md"}
+
+    with service._agent_instance().store._connect() as conn:
+        rows = conn.execute("SELECT source, metadata_json FROM sources ORDER BY source").fetchall()
+    sources = {
+        Path(row["source"]).relative_to(project).as_posix(): json.loads(row["metadata_json"] or "{}")
+        for row in rows
+    }
+    assert set(sources) == {"README.md"}
+    assert sources["README.md"]["project_doc_path"] == "README.md"
+
+
 def test_sync_project_docs_reindexes_changed_sources_and_removes_stale_index(tmp_path, monkeypatch):
     project = _flutter_project(tmp_path)
     readme = project / "README.md"

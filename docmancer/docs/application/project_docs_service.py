@@ -295,7 +295,7 @@ class ProjectDocsService:
         try:
             sections_indexed = agent.ingest(
                 root,
-                include=include,
+                include_exact=include,
                 recursive=True,
                 skip_known=skip_known,
                 with_vectors=with_vectors,

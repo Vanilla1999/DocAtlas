@@ -235,6 +235,7 @@ class DocmancerAgent:
         recreate: bool = False,
         *,
         include: tuple[str, ...] = (),
+        include_exact: tuple[str, ...] = (),
         exclude: tuple[str, ...] = (),
         formats: tuple[str, ...] = (),
         recursive: bool = True,
@@ -252,10 +253,29 @@ class DocmancerAgent:
             supported = set(_PARSERS.keys())
             selected_formats = {fmt if fmt.startswith(".") else f".{fmt}" for fmt in formats}
             allowed = supported & {fmt.lower() for fmt in selected_formats} if selected_formats else supported
-            iterator = path.rglob("*") if recursive else path.glob("*")
-            files = sorted(f for f in iterator if f.is_file() and f.suffix.lower() in allowed)
-            if include:
-                files = [f for f in files if self._matches_any(f.relative_to(path), include)]
+            if include_exact:
+                root = path.resolve()
+                selected_files: list[Path] = []
+                seen: set[Path] = set()
+                for relative in include_exact:
+                    exact_path = Path(relative)
+                    candidate = exact_path if exact_path.is_absolute() else path / exact_path
+                    try:
+                        resolved = candidate.resolve()
+                        resolved.relative_to(root)
+                    except (OSError, ValueError):
+                        continue
+                    if resolved in seen:
+                        continue
+                    seen.add(resolved)
+                    if candidate.is_file() and candidate.suffix.lower() in allowed:
+                        selected_files.append(candidate)
+                files = selected_files
+            else:
+                iterator = path.rglob("*") if recursive else path.glob("*")
+                files = sorted(f for f in iterator if f.is_file() and f.suffix.lower() in allowed)
+                if include:
+                    files = [f for f in files if self._matches_any(f.relative_to(path), include)]
             if exclude:
                 files = [f for f in files if not self._matches_any(f.relative_to(path), exclude)]
         if not files:
