@@ -326,6 +326,53 @@ new_help_request_screen for creating requests through a chat-like form.
     assert "отправить название заявки в чат" in source_action["query_terms"]
 
 
+def test_broad_story_query_with_code_identifier_still_requires_source_story_terms(tmp_path):
+    lib = tmp_path / "lib"
+    lib.mkdir()
+    (lib / "help_chat.dart").write_text(
+        """
+library help_chat;
+
+class HelpChatWidget {}
+""".strip()
+        + "\n",
+        encoding="utf-8",
+    )
+    question = (
+        "Для help_chat по бизнес-сценарию возврата/переоткрытия закрытой заявки в HELP какие файлы и слои нужно менять? "
+        "Use Case: Возврат/переоткрытие запроса в HELP. Пользователь на вкладке Закрытые открывает закрытую заявку. "
+        "Вернуть в работу отправляет статус Активная. При ошибках показывает toast: "
+        "Сервис временно недоступен / Повторите попытку позднее; Нет соединения / Проверьте интернет и попробуйте снова. "
+        "Создать новый запрос открывает экран создания новой заявки и показывает первое обязательное поле."
+    )
+    facade = FakeProjectContextFacade()
+    facade.project_docs = ProjectDocsResult(
+        project_path=str(tmp_path),
+        query=question,
+        results=[
+            ProjectDocsChunk(
+                title="Architecture",
+                content="help_chat follows UI -> Cubit -> Service -> Repository -> API for HELP requests.",
+                source=str(tmp_path / "ARCHITECTURE.md"),
+                url=None,
+                path="ARCHITECTURE.md",
+                heading_path="Help requests architecture",
+            )
+        ],
+    )
+
+    result = ProjectContextService(facade).get_project_context(str(tmp_path), question, mode="project-only")
+
+    assert result.answer_type == "partial_navigational"
+    assert result.answer_completeness["source_search_required"] is True
+    assert "help_chat" in result.answer_completeness["matched_terms"]
+    missing_terms = result.answer_completeness["missing_terms"]
+    assert "Создать новый запрос" in missing_terms
+    assert "Сервис временно недоступен" in missing_terms
+    assert "Нет соединения" in missing_terms
+    assert result.recommended_next_actions[-1]["action"] == "search_project_sources"
+
+
 def test_russian_story_requirement_chunks_drop_question_scaffolding_and_connectors():
     facade = FakeProjectContextFacade()
     question = (

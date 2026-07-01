@@ -226,7 +226,10 @@ def _extract_requirements(question: str) -> list[str]:
         term = _clean_term(match)
         if term:
             terms.append(term)
-    if not terms:
+    if terms and not quoted and _looks_like_story_requirement_question(question):
+        terms.extend(_extract_explicit_story_phrases(question))
+        terms.extend(_extract_russian_story_requirement_chunks(question))
+    elif not terms:
         terms.extend(_extract_explicit_story_phrases(question))
     if not terms:
         terms.extend(_extract_russian_story_requirement_chunks(question))
@@ -241,6 +244,11 @@ def _extract_requirements(question: str) -> list[str]:
             if any(marker in normalized for marker in _STORY_MARKERS):
                 terms.append(term)
     return _dedupe_terms(terms)
+
+
+def _looks_like_story_requirement_question(question: str) -> bool:
+    normalized = _normalize_text(question)
+    return any(marker in normalized for marker in _STORY_MARKERS) or bool(_RUSSIAN_ACTION_RE.search(question or ""))
 
 
 def _extract_explicit_story_phrases(question: str) -> list[str]:
