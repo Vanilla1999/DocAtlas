@@ -5,6 +5,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 import json
+import re
 import shutil
 import threading
 import time
@@ -20,6 +21,7 @@ from docmancer.docs.domain.source_identity import docs_exactness, docs_identity,
 from docmancer.docs.domain.target_security import host_allowed, is_remote_url, path_allowed, url_security_error
 from docmancer.docs.domain.trust_contract import build_project_context_trust_contract
 from docmancer.docs.models import DocsChunk, DocsInspectResult, DocsJobStartResult, DocsManifestValidationResult, DocsPruneResult, DocsRemoveResult, DocsResult, DocsSourceResolution, DocsTarget, DocsTargetResult, DocsTargetsPrefetchResult, LibraryInfo, ProjectDocsBootstrapResult, ProjectDocsChunk, ProjectDocsIngestResult, ProjectDocsInspectResult, ProjectDocsResult, ProjectDocsSyncResult, ProjectMetadata, ProjectPrefetchResult, RefreshResult
+from docmancer.docs.project import DOC_FILE_EXTENSIONS, ROOT_DOC_FILES
 from docmancer.docs.registry import LibraryRecord
 from docmancer.docs.resolver import canonical_library_id, normalize_library_name, normalize_version
 from docmancer.docs.dartdoc import discover_pub_dartdoc_seed_urls, is_pub_dartdoc_target, normalize_pub_dartdoc_target, pub_dartdoc_root_url
@@ -33,6 +35,10 @@ PACKAGE_NOT_FOUND_WARNING = "Package was not found in pubspec.lock."
 FLUTTER_CHANNEL_DOCS_WARNING = (
     "Flutter project version {version} was detected, but api.flutter.dev provides current stable API docs, "
     "not an exact archived snapshot."
+)
+PLACEHOLDER_PROJECT_DOC_RE = re.compile(
+    r"\b(todo|tbd|placeholder|coming soon|lorem ipsum|under construction|work in progress|wip)\b",
+    re.IGNORECASE,
 )
 
 class ProjectDocsService:
@@ -136,6 +142,175 @@ class ProjectDocsService:
     ) -> tuple[dict[str, Any], bool, str | None, dict[str, Any], str, str | None]:
         return project_docs_structured_next_action(reason_code=reason_code, root=root, query=query)
 
+    @staticmethod
+    def _project_docs_preflight_next_action(root: Path, preflight: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any], str, str]:
+        risk_codes = [str(item.get("code")) for item in preflight.get("risks", []) if item.get("code")]
+        sync_args = {"project_path": str(root), "with_vectors": True}
+        agent_message = (
+            "Project docs preflight found suspicious or risky docs/index state. Ask the user to update the docs "
+            "or explicitly confirm sync_project_docs before indexing/reconciling."
+        )
+        user_message = (
+            "Project documentation looks incomplete, placeholder-like, unsupported, or risky to reconcile. "
+            "Please update the docs, or confirm that I should index/reconcile the current files."
+        )
+        return (
+            {
+                "type": "ask_user_to_update_or_confirm_project_docs",
+                "handled_by": "coding_agent",
+                "requires_confirmation": True,
+                "confirmation_reason": "project_docs_preflight",
+                "risk_codes": risk_codes,
+                "tool_after_confirmation": "sync_project_docs",
+                "arguments_patch_after_confirmation": sync_args,
+            },
+            {"project_path": str(root)},
+            agent_message,
+            user_message,
+        )
+
+    @staticmethod
+    def _project_docs_preflight_recommended_action(root: Path, preflight: dict[str, Any]) -> dict[str, Any]:
+        risk_codes = [str(item.get("code")) for item in preflight.get("risks", []) if item.get("code")]
+        return {
+            "action": "ask_user_to_update_or_confirm_project_docs",
+            "requires_confirmation": True,
+            "confirmation_reason": "project_docs_preflight",
+            "risk_codes": risk_codes,
+            "reason": "Project docs preflight found suspicious or risky docs/index state; do not run blind indexing/reconciliation.",
+            "agent_guidance": "Ask the user to update the project docs, or explicitly confirm sync_project_docs for the current snapshot.",
+            "user_message": "Project docs may need updates before indexing. Update them, or confirm indexing/reconciliation of the current files?",
+            "after_user_updates": [
+                {"tool": "inspect_project_docs", "requires_confirmation": False, "arguments_patch": {"project_path": str(root)}},
+            ],
+            "after_confirmation": {
+                "tool": "sync_project_docs",
+                "requires_confirmation": False,
+                "arguments_patch": {"project_path": str(root), "with_vectors": True},
+            },
+        }
+
+    @staticmethod
+    def _looks_like_placeholder_project_doc(text: str) -> bool:
+        stripped = text.strip()
+        if not stripped:
+            return True
+        return bool(PLACEHOLDER_PROJECT_DOC_RE.search(stripped))
+
+    @staticmethod
+    def _read_text_prefix(path: Path, *, max_chars: int = 4096) -> str | None:
+        try:
+            with path.open("r", encoding="utf-8") as handle:
+                return handle.read(max_chars)
+        except OSError:
+            return None
+        except UnicodeDecodeError:
+            return None
+
+    @staticmethod
+    def _unsupported_root_doc_files(root: Path, candidate_sources: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        candidate_paths = {str(item.get("path")) for item in candidate_sources if item.get("path")}
+        risks: list[dict[str, Any]] = []
+        try:
+            children = sorted(root.iterdir(), key=lambda item: item.name.lower())
+        except OSError:
+            return risks
+        for child in children:
+            if not child.is_file():
+                continue
+            try:
+                relative = child.relative_to(root).as_posix()
+            except ValueError:
+                continue
+            if relative in candidate_paths:
+                continue
+            name = child.name.lower()
+            stem = child.stem.lower()
+            doc_like = stem in ROOT_DOC_FILES or stem.startswith("readme") or name in ROOT_DOC_FILES
+            if not doc_like:
+                continue
+            suffix = child.suffix.lower()
+            supported_extensionless = name in {"license", "copying"}
+            if suffix in DOC_FILE_EXTENSIONS or supported_extensionless:
+                continue
+            risks.append({
+                "code": "unsupported_project_doc_candidate",
+                "severity": "major",
+                "path": relative,
+                "message": "A root documentation-looking file was found in a format project-doc ingest will not index automatically.",
+                "recommended_action": "Convert or mirror it as Markdown/text, or confirm indexing only the currently supported docs.",
+            })
+        return risks
+
+    def _project_docs_preflight(
+        self,
+        root: Path,
+        *,
+        base_reason_code: str,
+        candidate_sources: list[dict[str, Any]],
+        stale_sources: list[dict[str, Any]],
+        ignored_sources: list[dict[str, Any]],
+        active_index: dict[str, Any],
+    ) -> dict[str, Any]:
+        risks: list[dict[str, Any]] = []
+        for candidate in candidate_sources:
+            candidate_path = str(candidate.get("path") or "")
+            if not candidate_path:
+                continue
+            path = Path(candidate_path)
+            reason = str(candidate.get("reason") or "")
+            if not (path.name.lower().startswith("readme") or reason == "architecture"):
+                continue
+            text = self._read_text_prefix(root / candidate_path)
+            if text is not None and self._looks_like_placeholder_project_doc(text):
+                risks.append({
+                    "code": "placeholder_project_doc",
+                    "severity": "major",
+                    "path": candidate_path,
+                    "message": "A high-level project doc appears to be placeholder/TODO content.",
+                    "recommended_action": "Ask the user to update the project doc, or explicitly confirm indexing the current placeholder content.",
+                })
+
+        risks.extend(self._unsupported_root_doc_files(root, candidate_sources))
+
+        if stale_sources:
+            risks.append({
+                "code": "stale_project_doc_sources",
+                "severity": "major",
+                "count": len(stale_sources),
+                "paths": [str(item.get("path")) for item in stale_sources[:5] if item.get("path")],
+                "message": "Indexed project docs differ from the current files on disk.",
+                "recommended_action": "Ask before reconciling stale indexed docs with the current repository snapshot.",
+            })
+        if ignored_sources:
+            risks.append({
+                "code": "orphaned_project_doc_sources",
+                "severity": "major",
+                "count": len(ignored_sources),
+                "paths": [str(item.get("path")) for item in ignored_sources[:5] if item.get("path")],
+                "message": "The index contains project docs not selected by current discovery.",
+                "recommended_action": "Ask before pruning or reconciling orphaned project-doc index entries.",
+            })
+        for warning in active_index.get("warnings") or []:
+            if warning.get("code") == "project_local_config_shadowed":
+                risks.append({
+                    "code": "project_local_config_shadowed",
+                    "severity": "major",
+                    "message": warning.get("message") or "Repo-local docmancer.yaml is shadowed by the active service config.",
+                    "recommended_action": "Ask the user to confirm which Docmancer DB/config should be used before indexing.",
+                    "active_db_path": warning.get("active_db_path"),
+                    "project_config_db_path": warning.get("project_config_db_path"),
+                })
+        return {
+            "status": "confirmation_required" if risks else "ok",
+            "requires_confirmation": bool(risks),
+            "confirmation_reason": "project_docs_preflight" if risks else None,
+            "safe_to_sync_without_confirmation": not risks,
+            "base_reason_code": base_reason_code,
+            "risk_count": len(risks),
+            "risks": risks,
+        }
+
     def inspect_project_docs(self, project_path: str) -> ProjectDocsInspectResult:
         if hasattr(self.facade, "_project_inspect_project_docs_impl"):
             return self.facade._project_inspect_project_docs_impl(project_path)
@@ -152,8 +327,29 @@ class ProjectDocsService:
         lockfiles_found = [name for name in ("pubspec.lock", "Cargo.lock") if (root / name).exists()]
         dependency_docs_state = self._project_dependency_docs_state(metadata)
         exact_versions_available = dependency_docs_state["dependency_docs_available"]
-        recommended_next_actions: list[dict[str, Any]] = []
         if stale_sources or ignored_sources:
+            base_reason_code = "project_docs_stale"
+        elif not candidate_sources:
+            base_reason_code = "no_project_docs"
+        elif not has_high_level_overview:
+            base_reason_code = "architecture_doc_creation_recommended"
+        elif missing_candidate_count:
+            base_reason_code = "project_docs_found_not_indexed"
+        else:
+            base_reason_code = "project_docs_ready"
+        active_index = self.active_index_diagnostics(str(root))
+        preflight = self._project_docs_preflight(
+            root,
+            base_reason_code=base_reason_code,
+            candidate_sources=candidate_sources,
+            stale_sources=stale_sources,
+            ignored_sources=ignored_sources,
+            active_index=active_index,
+        )
+        recommended_next_actions: list[dict[str, Any]] = []
+        if preflight["requires_confirmation"]:
+            recommended_next_actions.append(self._project_docs_preflight_recommended_action(root, preflight))
+        elif stale_sources or ignored_sources:
             recommended_next_actions.append({
                 "tool": "sync_project_docs",
                 "requires_confirmation": False,
@@ -180,20 +376,17 @@ class ProjectDocsService:
                 root,
                 reason="Project docs exist, but no high-level architecture or overview document was discovered. Ask the user before creating a reviewable ARCHITECTURE.md file.",
             ))
-        if stale_sources or ignored_sources:
-            reason_code = "project_docs_stale"
-        elif not candidate_sources:
-            reason_code = "no_project_docs"
-        elif not has_high_level_overview:
-            reason_code = "architecture_doc_creation_recommended"
-        elif missing_candidate_count:
-            reason_code = "project_docs_found_not_indexed"
+        if preflight["requires_confirmation"]:
+            reason_code = "project_docs_preflight_confirmation_required"
+            next_action, arguments_patch, agent_message, user_message = self._project_docs_preflight_next_action(root, preflight)
+            requires_confirmation = True
+            confirmation_reason = "project_docs_preflight"
         else:
-            reason_code = "project_docs_ready"
-        next_action, requires_confirmation, confirmation_reason, arguments_patch, agent_message, user_message = self._project_docs_structured_next_action(
-            reason_code=reason_code,
-            root=root,
-        )
+            reason_code = base_reason_code
+            next_action, requires_confirmation, confirmation_reason, arguments_patch, agent_message, user_message = self._project_docs_structured_next_action(
+                reason_code=reason_code,
+                root=root,
+            )
         project_docs = {
             "found": candidate_sources,
             "indexed": indexed_sources,
@@ -202,6 +395,7 @@ class ProjectDocsService:
             "high_level_overview_found": has_high_level_overview,
             "modules": self._module_summaries(candidate_sources),
             "indexed_modules": self._module_summaries(indexed_sources),
+            "preflight": preflight,
         }
         dependency_sources = {
             "manifests_found": manifests_found,
@@ -228,9 +422,9 @@ class ProjectDocsService:
             arguments_patch=arguments_patch,
             agent_message=agent_message,
             user_message=user_message,
-            agent_guidance="Call get_project_docs for repo-specific questions after project docs are synced. If docs are missing, ask before creating a reviewable ARCHITECTURE.md, then inspect and sync it. If docs are stale or orphaned, call sync_project_docs first. Ask before network dependency docs fetches.",
+            agent_guidance="Inspect diagnostics.preflight first. If it requires confirmation, ask the user to update docs or confirm before sync_project_docs. Otherwise call get_project_docs for repo-specific questions after project docs are synced. If docs are missing, ask before creating a reviewable ARCHITECTURE.md, then inspect and sync it. Ask before network dependency docs fetches.",
             source_state_guidance=self._source_state_guidance(),
-            diagnostics={"active_index": self.active_index_diagnostics(str(root))},
+            diagnostics={"active_index": active_index, "preflight": preflight},
             warnings=metadata.warnings,
         )
 
@@ -481,6 +675,26 @@ class ProjectDocsService:
         ingest_result: ProjectDocsIngestResult | None = None
         sync_result: ProjectDocsSyncResult | None = None
         warnings = list(initial.warnings)
+
+        if initial.requires_confirmation:
+            return ProjectDocsBootstrapResult(
+                project_path=str(root),
+                question=question,
+                status="confirmation_required",
+                reason_code=initial.reason_code,
+                actions_taken=actions_taken,
+                next_action=initial.next_action,
+                requires_confirmation=True,
+                confirmation_reason=initial.confirmation_reason,
+                arguments_patch=initial.arguments_patch,
+                inspect_result=initial,
+                ingest_result=ingest_result,
+                sync_result=sync_result,
+                agent_message=initial.agent_message,
+                user_message=initial.user_message,
+                diagnostics={"active_index": self.active_index_diagnostics(str(root))},
+                warnings=warnings,
+            )
 
         if initial.reason_code in {"project_docs_found_not_indexed", "project_docs_stale"}:
             sync_result = self.sync_project_docs(str(root), with_vectors=True)

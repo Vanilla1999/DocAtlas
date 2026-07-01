@@ -362,6 +362,47 @@ def test_inspect_project_docs_returns_candidates_dependency_sources_and_next_act
     assert "sync_project_docs" in (result.agent_guidance or "")
 
 
+def test_inspect_project_docs_requires_preflight_for_placeholder_readme_before_sync(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    (project / "README.md").write_text("# TODO\n\nPlaceholder docs coming soon.", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+
+    result = service.inspect_project_docs(str(project))
+
+    assert result.reason_code == "project_docs_preflight_confirmation_required"
+    assert result.requires_confirmation is True
+    assert result.confirmation_reason == "project_docs_preflight"
+    assert result.next_action["type"] == "ask_user_to_update_or_confirm_project_docs"
+    assert result.next_action["tool_after_confirmation"] == "sync_project_docs"
+    assert result.arguments_patch == {"project_path": str(project.resolve())}
+    assert result.recommended_next_actions[0]["action"] == "ask_user_to_update_or_confirm_project_docs"
+    assert result.recommended_next_actions[0]["requires_confirmation"] is True
+    assert result.recommended_next_actions[0]["after_confirmation"]["tool"] == "sync_project_docs"
+    preflight = result.diagnostics["preflight"]
+    assert preflight["base_reason_code"] == "project_docs_found_not_indexed"
+    assert preflight["requires_confirmation"] is True
+    assert {risk["code"] for risk in preflight["risks"]} == {"placeholder_project_doc"}
+
+
+def test_inspect_project_docs_requires_preflight_for_unsupported_root_doc_before_sync(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    (project / "README.md").write_text("# App\n\nProject overview.", encoding="utf-8")
+    (project / "ARCHITECTURE.docx").write_text("Binary-ish architecture placeholder", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+
+    result = service.inspect_project_docs(str(project))
+
+    assert result.reason_code == "project_docs_preflight_confirmation_required"
+    assert result.requires_confirmation is True
+    assert result.next_action["type"] == "ask_user_to_update_or_confirm_project_docs"
+    assert result.recommended_next_actions[0]["action"] == "ask_user_to_update_or_confirm_project_docs"
+    preflight = result.diagnostics["preflight"]
+    assert preflight["base_reason_code"] == "project_docs_found_not_indexed"
+    assert preflight["safe_to_sync_without_confirmation"] is False
+    assert {risk["code"] for risk in preflight["risks"]} == {"unsupported_project_doc_candidate"}
+    assert preflight["risks"][0]["path"] == "ARCHITECTURE.docx"
+
+
 def test_inspect_project_docs_reports_indexed_and_stale_sources(tmp_path, monkeypatch):
     project = _flutter_project(tmp_path)
     readme = project / "README.md"
@@ -382,12 +423,15 @@ def test_inspect_project_docs_reports_indexed_and_stale_sources(tmp_path, monkey
     stale = service.inspect_project_docs(str(project))
 
     assert stale.project_docs["stale"][0]["path"] == "README.md"
-    assert stale.reason_code == "project_docs_stale"
-    assert stale.next_action == {"type": "sync_project_docs", "tool": "sync_project_docs"}
-    assert stale.requires_confirmation is False
-    assert stale.arguments_patch["project_path"] == str(project.resolve())
+    assert stale.reason_code == "project_docs_preflight_confirmation_required"
+    assert stale.next_action["type"] == "ask_user_to_update_or_confirm_project_docs"
+    assert stale.requires_confirmation is True
+    assert stale.confirmation_reason == "project_docs_preflight"
+    assert stale.arguments_patch == {"project_path": str(project.resolve())}
     assert "content_hash_changed" in stale.project_docs["stale"][0]["stale_reasons"]
-    assert stale.recommended_next_actions[0]["tool"] == "sync_project_docs"
+    assert stale.recommended_next_actions[0]["action"] == "ask_user_to_update_or_confirm_project_docs"
+    assert stale.diagnostics["preflight"]["base_reason_code"] == "project_docs_stale"
+    assert {risk["code"] for risk in stale.diagnostics["preflight"]["risks"]} == {"stale_project_doc_sources"}
 
 
 def test_inspect_project_docs_does_not_mark_mtime_only_change_stale(tmp_path, monkeypatch):
@@ -697,11 +741,15 @@ def test_inspect_project_docs_reports_needs_sync_for_orphaned_sources(tmp_path, 
 
     result = service.inspect_project_docs(str(project))
 
-    assert result.reason_code == "project_docs_stale"
-    assert result.next_action == {"type": "sync_project_docs", "tool": "sync_project_docs"}
-    assert result.arguments_patch == {"project_path": str(project.resolve()), "with_vectors": True}
+    assert result.reason_code == "project_docs_preflight_confirmation_required"
+    assert result.next_action["type"] == "ask_user_to_update_or_confirm_project_docs"
+    assert result.requires_confirmation is True
+    assert result.confirmation_reason == "project_docs_preflight"
+    assert result.arguments_patch == {"project_path": str(project.resolve())}
     assert result.ignored_sources[0]["path"] == "README.md"
-    assert result.recommended_next_actions[0]["tool"] == "sync_project_docs"
+    assert result.recommended_next_actions[0]["action"] == "ask_user_to_update_or_confirm_project_docs"
+    assert result.diagnostics["preflight"]["base_reason_code"] == "project_docs_stale"
+    assert {risk["code"] for risk in result.diagnostics["preflight"]["risks"]} == {"orphaned_project_doc_sources"}
 
 
 def test_mcp_get_project_docs_returns_compact_response_unless_details_requested(tmp_path, monkeypatch):
@@ -967,6 +1015,20 @@ def test_bootstrap_project_docs_ingests_existing_docs_and_returns_ready(tmp_path
     assert result.next_action == {"type": "get_project_context", "tool": "get_project_context"}
     assert result.requires_confirmation is False
     assert result.arguments_patch == {"project_path": str(project.resolve()), "question": "How is the app organized?"}
+
+
+def test_bootstrap_project_docs_stops_before_placeholder_preflight_sync(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    (project / "README.md").write_text("# TODO\n\nPlaceholder docs coming soon.", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+
+    result = service.bootstrap_project_docs(str(project), question="How is the app organized?")
+
+    assert result.status == "confirmation_required"
+    assert result.reason_code == "project_docs_preflight_confirmation_required"
+    assert result.next_action["type"] == "ask_user_to_update_or_confirm_project_docs"
+    assert result.sync_result is None
+    assert [action["tool"] for action in result.actions_taken] == ["inspect_project_docs"]
 
 
 def test_bootstrap_project_docs_stops_before_repo_write(tmp_path, monkeypatch):
@@ -1291,7 +1353,7 @@ def test_get_project_context_before_ingest_returns_actionable_remediation(tmp_pa
     assert "not indexed" in (result.message or "")
 
 
-def test_bootstrap_project_docs_refreshes_stale_docs_before_context(tmp_path, monkeypatch):
+def test_bootstrap_project_docs_requires_confirmation_before_refreshing_stale_docs(tmp_path, monkeypatch):
     project = _flutter_project(tmp_path)
     readme = project / "README.md"
     readme.write_text("# Architecture\n\nOriginal stale acceptance text.", encoding="utf-8")
@@ -1300,12 +1362,17 @@ def test_bootstrap_project_docs_refreshes_stale_docs_before_context(tmp_path, mo
     readme.write_text("# Architecture\n\nFreshAcceptanceNeedle text.", encoding="utf-8")
 
     bootstrap = service.bootstrap_project_docs(str(project), question="FreshAcceptanceNeedle")
+
+    assert bootstrap.status == "confirmation_required"
+    assert bootstrap.reason_code == "project_docs_preflight_confirmation_required"
+    assert bootstrap.next_action["type"] == "ask_user_to_update_or_confirm_project_docs"
+    assert bootstrap.sync_result is None
+    assert [action["tool"] for action in bootstrap.actions_taken] == ["inspect_project_docs"]
+
+    sync = service.sync_project_docs(str(project), with_vectors=False)
     context = service.get_project_context(str(project), "FreshAcceptanceNeedle", tokens=1200, limit=3)
 
-    assert bootstrap.status == "ready"
-    assert bootstrap.reason_code == "project_docs_ready"
-    assert any(action["tool"] == "sync_project_docs" for action in bootstrap.actions_taken)
-    assert bootstrap.sync_result is not None
+    assert sync.status == "success"
     assert context.answer_available is True
     assert context.project_docs is not None
     assert context.project_docs.results
