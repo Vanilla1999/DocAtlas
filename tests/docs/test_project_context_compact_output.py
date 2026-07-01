@@ -4,6 +4,7 @@ from dataclasses import asdict
 
 from docmancer.docs.interfaces.mcp.project_tools import _compact_project_context
 from docmancer.docs.application.project_context_service import ProjectContextService
+from docmancer.docs.models import ProjectDocsChunk, ProjectDocsResult
 from tests.docs.test_project_context_service import FakeProjectContextFacade
 
 
@@ -30,3 +31,28 @@ def test_compact_output_keeps_context_pack_trust_contract_and_outline():
     assert compact["context_pack"]
     assert compact["trust_contract"]
     assert compact["answer_outline"]
+
+
+def test_compact_output_exposes_answer_completeness_contract():
+    facade = FakeProjectContextFacade()
+    facade.project_docs = ProjectDocsResult(
+        project_path="/repo",
+        query='Как реализовать кнопку "Вернуть в работу"?',
+        results=[
+            ProjectDocsChunk(
+                title="Architecture",
+                content="Help requests follow UI -> Cubit -> Service -> Repository -> API via help_request_details_screen.",
+                source="/repo/ARCHITECTURE.md",
+                url=None,
+                path="ARCHITECTURE.md",
+            )
+        ],
+    )
+    result = asdict(ProjectContextService(facade).get_project_context("/repo", 'Как реализовать кнопку "Вернуть в работу"?', mode="project-only"))
+
+    compact = _compact_project_context(result)
+
+    assert compact["answer_type"] == "partial_navigational"
+    assert compact["answer_completeness"]["status"] == "partial"
+    assert compact["answer_completeness"]["missing_terms"] == ["Вернуть в работу"]
+    assert compact["recommended_next_actions"][-1]["action"] == "search_project_sources"

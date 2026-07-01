@@ -235,6 +235,8 @@ class DocmancerAgent:
         recreate: bool = False,
         *,
         include: tuple[str, ...] = (),
+        include_exact: tuple[str, ...] = (),
+        extensionless_text_names: tuple[str, ...] = (),
         exclude: tuple[str, ...] = (),
         formats: tuple[str, ...] = (),
         recursive: bool = True,
@@ -244,6 +246,7 @@ class DocmancerAgent:
         metadata_for_file: Callable[[Path], dict[str, Any]] | None = None,
     ) -> int:
         path = Path(path)
+        extensionless_text_names_lower = {name.lower() for name in extensionless_text_names}
         if not path.exists():
             raise FileNotFoundError(f"Path not found: {path}")
         if path.is_file():
@@ -252,10 +255,41 @@ class DocmancerAgent:
             supported = set(_PARSERS.keys())
             selected_formats = {fmt if fmt.startswith(".") else f".{fmt}" for fmt in formats}
             allowed = supported & {fmt.lower() for fmt in selected_formats} if selected_formats else supported
-            iterator = path.rglob("*") if recursive else path.glob("*")
-            files = sorted(f for f in iterator if f.is_file() and f.suffix.lower() in allowed)
-            if include:
-                files = [f for f in files if self._matches_any(f.relative_to(path), include)]
+            extensionless_text_allowed = not selected_formats or ".txt" in allowed
+
+            def _allowed_file(candidate: Path) -> bool:
+                suffix = candidate.suffix.lower()
+                if suffix in allowed:
+                    return True
+                return (
+                    not suffix
+                    and extensionless_text_allowed
+                    and candidate.name.lower() in extensionless_text_names_lower
+                )
+
+            if include_exact:
+                root = path.resolve()
+                selected_files: list[Path] = []
+                seen: set[Path] = set()
+                for relative in include_exact:
+                    exact_path = Path(relative)
+                    candidate = exact_path if exact_path.is_absolute() else path / exact_path
+                    try:
+                        resolved = candidate.resolve()
+                        resolved.relative_to(root)
+                    except (OSError, ValueError):
+                        continue
+                    if resolved in seen:
+                        continue
+                    seen.add(resolved)
+                    if candidate.is_file() and _allowed_file(candidate):
+                        selected_files.append(candidate)
+                files = selected_files
+            else:
+                iterator = path.rglob("*") if recursive else path.glob("*")
+                files = sorted(f for f in iterator if f.is_file() and _allowed_file(f))
+                if include:
+                    files = [f for f in files if self._matches_any(f.relative_to(path), include)]
             if exclude:
                 files = [f for f in files if not self._matches_any(f.relative_to(path), exclude)]
         if not files:
@@ -264,9 +298,13 @@ class DocmancerAgent:
         skipped: list[dict[str, str]] = []
         for file_path in files:
             try:
-                loader = self._get_loader(file_path.suffix.lower())
+                extensionless_as_text = (
+                    not file_path.suffix
+                    and file_path.name.lower() in extensionless_text_names_lower
+                )
+                loader = self._get_loader(".txt" if extensionless_as_text else file_path.suffix.lower())
                 document = loader.load(file_path)
-                suffix = file_path.suffix.lower().lstrip(".")
+                suffix = "txt" if extensionless_as_text else file_path.suffix.lower().lstrip(".")
                 format_name = "markdown" if suffix in {"md", "markdown"} else suffix
                 document.metadata.setdefault("format", format_name)
                 document.metadata.setdefault("chunking_strategy", getattr(loader, "chunking_strategy", "heading"))
@@ -287,9 +325,12 @@ class DocmancerAgent:
                     document.metadata.update(metadata)
                 if metadata_for_file:
                     document.metadata.update(metadata_for_file(file_path))
-                if skip_known and self.store.has_source_content_hash(
-                    document.source,
-                    str(document.metadata.get("content_hash") or ""),
+                content_hash = str(document.metadata.get("content_hash") or "")
+                existing_metadata = self.store.source_metadata(document.source) if skip_known and content_hash else None
+                if (
+                    existing_metadata is not None
+                    and existing_metadata.get("content_hash") == content_hash
+                    and self._metadata_satisfies_skip_known(existing_metadata, document.metadata)
                 ):
                     skipped.append(
                         {
@@ -318,6 +359,10 @@ class DocmancerAgent:
     def _matches_any(relative_path: Path, patterns: tuple[str, ...]) -> bool:
         value = relative_path.as_posix()
         return any(fnmatch.fnmatch(value, pattern) or relative_path.match(pattern) for pattern in patterns)
+
+    @staticmethod
+    def _metadata_satisfies_skip_known(existing_metadata: dict[str, Any], expected_metadata: dict[str, Any]) -> bool:
+        return all(existing_metadata.get(key) == value for key, value in expected_metadata.items())
 
     def _write_last_ingest_report(self, root: Path, skipped: list[dict[str, str]]) -> None:
         home = Path(os.environ.get("DOCMANCER_HOME") or Path(self.config.index.db_path).expanduser().parent)

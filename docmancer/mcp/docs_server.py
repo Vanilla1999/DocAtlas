@@ -267,6 +267,7 @@ If repo writes or dependency-doc network fetches are needed, it stops with confi
         "name": "get_project_context",
         "description": """Return one repo-grounded context pack for a coding question after inspect_project_docs, bootstrap_project_docs, or any required sync_project_docs step.
 Combines indexed project-owned docs with exact dependency-doc evidence when requested or detectable, and always returns a compact Trust Contract with selected, rejected, and risky sources plus next_actions.
+For story-specific implementation questions, inspect answer_type and answer_completeness: partial_navigational means the docs are useful for architecture/source navigation but exact requested terms are missing, so follow recommended_next_actions/code_search before treating the context as a complete answer.
 Does not use deleted, orphaned, or stale project-doc content by default.""",
         "inputSchema": {
             "type": "object",

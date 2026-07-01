@@ -6,6 +6,7 @@ from typing import Any
 import re
 
 from docmancer.docs.application.project_answer_outline import build_project_answer_outline
+from docmancer.docs.domain.answer_completeness import evaluate_project_answer_completeness
 from docmancer.docs.domain.project_doc_ranking import is_changelog_path, normalize_doc_path, rerank_project_doc_chunks
 from docmancer.docs.domain.project_query_intent import classify_project_query_intent
 from docmancer.docs.domain.quality import has_code_symbol_evidence, internal_noise_score, is_trivial_section, looks_like_code_or_command
@@ -78,6 +79,10 @@ class ProjectContextService:
         next_actions = [*(project_docs.next_actions if project_docs else [])]
         if dependency_docs:
             next_actions.extend({"tool": dependency_docs.tool, "reason": action} for action in dependency_docs.next_actions)
+        requires_confirmation = bool(project_docs and project_docs.requires_confirmation)
+        confirmation_reason = project_docs.confirmation_reason if requires_confirmation and project_docs else None
+        next_action = project_docs.next_action if requires_confirmation and project_docs else {}
+        arguments_patch = project_docs.arguments_patch if requires_confirmation and project_docs else {}
         context_pack = project_context_pack(project_docs=project_docs, dependency_docs=dependency_docs)
         answer_outline = build_project_answer_outline(question=question, intent=intent, context_pack=context_pack)
         metrics = project_context_metrics(context_pack=context_pack, project_docs=project_docs, dependency_docs=dependency_docs, intent=intent)
@@ -90,6 +95,8 @@ class ProjectContextService:
         )
         metrics["snippet_metrics"] = snippet_presentation.metrics
         diagnostics: dict[str, Any] = {"query_intent": intent.name}
+        if project_docs is not None and hasattr(self.facade, "active_index_diagnostics"):
+            diagnostics["active_index"] = self.facade.active_index_diagnostics(str(root))
         if intent.name == "mcp_disambiguation":
             diagnostics["mcp_surfaces"] = [
                 {
@@ -126,15 +133,43 @@ class ProjectContextService:
                 {"tool": "code_search", "reason": "Use code search / ripgrep for MCP server classes and functions"},
                 {"tool": "project_docs", "reason": "Add module docs or ADR linking MCP server implementation files"},
             ])
+        completeness_result = evaluate_project_answer_completeness(
+            question=question,
+            context_pack=context_pack,
+            answer_available=answer_available,
+            intent=intent,
+        )
+        answer_type = completeness_result["answer_type"]
+        answer_completeness = completeness_result["answer_completeness"]
+        recommended_next_actions = completeness_result["recommended_next_actions"]
+        if recommended_next_actions:
+            next_actions.extend(recommended_next_actions)
+            warning = {
+                "code": answer_type,
+                "message": "Selected project docs are partial/navigational for this story-specific question; search project source for missing terms.",
+            }
+            answer_outline.setdefault("warnings", []).append(warning)
+            metrics.setdefault("quality", {}).setdefault("warnings", []).append(warning)
+        answer_outline["answer_completeness"] = answer_completeness
+        metrics["answer_completeness"] = answer_completeness
         status = "success" if answer_available else (project_docs.status if project_docs else dependency_docs.status if dependency_docs else "no_results")
         if (project_docs and project_docs.status == "stale") or (dependency_docs and dependency_docs.stale_before_refresh):
             status = "stale"
+        if requires_confirmation and not answer_available and status != "stale":
+            status = "confirmation_required"
         reason = "trusted_context_available" if answer_available else ("insufficient_code_symbol_evidence" if getattr(intent, "wants_code_symbols", False) else "no_trusted_context")
+        if answer_available and answer_type in {"partial", "partial_navigational"}:
+            reason = answer_type
+        message = "Returned project context with Trust Contract." if answer_available else (project_docs.message if project_docs else "No trusted context matched this question.")
+        if answer_available and answer_type == "partial_navigational":
+            message = "Returned partial/navigational project context; search project source for missing story-specific terms."
         return ProjectContextResult(
             project_path=str(root),
             question=question,
             status=status,
             answer_available=answer_available,
+            answer_type=answer_type,
+            answer_completeness=answer_completeness,
             mode=mode,
             reason=reason,
             context_pack=context_pack,
@@ -143,6 +178,11 @@ class ProjectContextService:
             trust_contract=trust_contract,
             warnings=[*warnings, *[warning["code"] for warning in snippet_presentation.warnings]],
             next_actions=next_actions,
+            recommended_next_actions=recommended_next_actions,
+            next_action=next_action,
+            requires_confirmation=requires_confirmation,
+            confirmation_reason=confirmation_reason,
+            arguments_patch=arguments_patch,
             response_style=snippet_presentation.response_style,
             primary_snippet=snippet_presentation.primary_snippet,
             supporting_snippets=snippet_presentation.supporting_snippets,
@@ -150,7 +190,7 @@ class ProjectContextService:
             metrics=metrics,
             diagnostics=diagnostics,
             answer_outline=answer_outline,
-            message="Returned project context with Trust Contract." if answer_available else (project_docs.message if project_docs else "No trusted context matched this question."),
+            message=message,
         )
 
     @staticmethod

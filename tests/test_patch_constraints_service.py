@@ -274,6 +274,97 @@ def test_symbol_grounding_does_not_invent_without_source_match(tmp_path: Path):
     assert not any(candidate["term"] == "TotallyMissingBusinessThing" for candidate in packet.symbol_candidates)
 
 
+def test_symbol_grounding_demotes_broad_project_acronyms(tmp_path: Path):
+    root = _workspace(tmp_path)
+    _write(
+        root / "lib/src/utils/help_request_strings.dart",
+        """
+class HelpAppStrings {}
+const helpRequestReturnToWorkButton = 'Вернуть в работу';
+""",
+    )
+
+    packet = _packet(
+        root,
+        question="Reopen HELP request and show the return-to-work button.",
+        changed_files=["lib/src/utils/help_request_strings.dart"],
+        max_constraints=20,
+        max_tokens=4000,
+    )
+
+    help_candidates = [candidate for candidate in packet.symbol_candidates if candidate["term"] == "HELP"]
+    assert help_candidates
+    assert all(candidate["confidence"] == "low" for candidate in help_candidates)
+    assert all(candidate["reason"].startswith("broad_acronym_demoted") for candidate in help_candidates)
+    assert any(candidate["matched_symbol"] == "helpRequestReturnToWorkButton" for candidate in packet.symbol_candidates)
+    help_constraints = [constraint for constraint in packet.constraints if constraint.id.startswith("symbol-candidate-help-")]
+    assert help_constraints
+    assert all(constraint.confidence == "low" for constraint in help_constraints)
+
+
+def test_symbol_grounding_skips_cross_language_connector_fragments(tmp_path: Path):
+    root = _workspace(tmp_path)
+    _write(
+        root / "lib/src/data/repositories/help_requests_repository.dart",
+        """
+class HelpRequestsRepository {
+  Future<void> returnClosedRequestToActive(String requestNumber) async {}
+  final label = 'Вернуть в работу and';
+}
+""",
+    )
+
+    packet = _packet(
+        root,
+        question="Reopen HELP request: show buttons Вернуть в работу and Создать новый запрос; return closed HELP sends status Активная.",
+        changed_files=["lib/src/data/repositories/help_requests_repository.dart"],
+        max_constraints=20,
+        max_tokens=4000,
+    )
+
+    terms = {candidate["term"] for candidate in packet.symbol_candidates}
+    assert "в работу and" not in terms
+    assert any(candidate["matched_symbol"] == "returnClosedRequestToActive" for candidate in packet.symbol_candidates)
+
+
+def test_symbol_grounding_skips_comment_only_phrase_matches(tmp_path: Path):
+    root = _workspace(tmp_path)
+    _write(
+        root / "lib/src/ui/help_request_details_screen/cubit/help_request_details_cubit.dart",
+        """
+class HelpRequestDetailsCubit {
+  /// Вернуть закрытую заявку HELP в работу.
+  Future<void> returnClosedRequestToActive(String requestNumber) async {}
+
+  /// Отправить комментарий.
+  Future<void> sendComment(String text) async {}
+}
+""",
+    )
+    _write(
+        root / "lib/src/utils/help_request_strings.dart",
+        """
+class HelpAppStrings {
+  static const helpRequestReturnToWorkBtn = 'Вернуть в работу';
+}
+""",
+    )
+
+    packet = _packet(
+        root,
+        question='Reopen HELP request: show button "Вернуть в работу" and allow Отправить after success.',
+        changed_files=["lib/src/ui/help_request_details_screen/cubit/help_request_details_cubit.dart"],
+        max_constraints=20,
+        max_tokens=4000,
+    )
+
+    assert not any(
+        candidate["matched_symbol"] in {"Вернуть в работу", "Отправить"}
+        for candidate in packet.symbol_candidates
+    )
+    assert any(candidate["matched_symbol"] == "helpRequestReturnToWorkBtn" for candidate in packet.symbol_candidates)
+
+
 # Backward-compatible smoke names from the first production PR.
 def test_generated_file_constraint_extraction(tmp_path: Path):
     test_extracts_generated_file_constraint_from_docs(tmp_path)

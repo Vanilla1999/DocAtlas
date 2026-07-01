@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import re
 import subprocess
+import tempfile
 from dataclasses import asdict
 from datetime import datetime, timezone
 from pathlib import Path
@@ -16,18 +17,19 @@ LOW_VALUE_SYMBOLS = {
     "package", "import", "export", "part", "TODO", "FIXME", "tr", "l10n",
     "localization", "onHide", "onShow", "onTap", "onPressed",
     "barrierDismissible", "context", "build", "Widget", "State",
-    "StatelessWidget", "StatefulWidget",
+    "StatelessWidget", "StatefulWidget", "Text", "title", "VoidCallback",
+    "onRequest",
 }
 DOGFOOD_MEMO_REASONS = {"dogfood_result_memo", "dogfood_task_artifact"}
 MAX_PR_COMMENT_CHARS = 60_000
 MAX_PR_COMMENT_FIELD_CHARS = 2_000
 PATCH_REVIEW_SCHEMA_VERSIONS = {
     "review_summary_manifest.json": 1,
-    "review_summary_quality.json": 1,
+    "review_summary_quality.json": 2,
     "review_summary_actions.json": 1,
-    "review_summary_pr_comment.json": 1,
+    "review_summary_pr_comment.json": 2,
     "review_summary_trace.json": 1,
-    "review_summary_bot_bundle.json": 1,
+    "review_summary_bot_bundle.json": 3,
 }
 TASK_TOKEN_STOPWORDS = {
     "add", "and", "before", "change", "check", "current", "diff", "file",
@@ -77,6 +79,7 @@ class PatchReviewService:
         if not out.is_absolute():
             out = root / out
         out.mkdir(parents=True, exist_ok=True)
+        self._clear_stale_manifest_marker(out)
 
         constraints = self.docs_service.get_patch_constraints(
             task,
@@ -182,8 +185,8 @@ class PatchReviewService:
             trace_payload,
             summary_mode=summary_mode,
         )
-        self._write_json(out / "review_summary_manifest.json", manifest_payload)
         self._write_json(out / "review_summary_bot_bundle.json", bot_bundle_payload)
+        self._write_json(out / "review_summary_manifest.json", manifest_payload)
         return {
             "output_dir": str(out),
             "changed_files": changed,
@@ -225,8 +228,22 @@ class PatchReviewService:
         return [path for status, path in parse_status_paths(raw_status.splitlines()) if status == "??" and not is_runtime_artifact(path)]
 
     @staticmethod
+    def _clear_stale_manifest_marker(output_dir: Path) -> None:
+        (output_dir / "review_summary_manifest.json").unlink(missing_ok=True)
+        for temp_manifest in output_dir.glob(".review_summary_manifest.json.*.tmp"):
+            temp_manifest.unlink(missing_ok=True)
+
+    @staticmethod
     def _write_json(path: Path, payload: Any) -> None:
-        path.write_text(json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True), encoding="utf-8")
+        fd, tmp = tempfile.mkstemp(prefix=f".{path.name}.", suffix=".tmp", dir=str(path.parent))
+        tmp_path = Path(tmp)
+        try:
+            with open(fd, "w", encoding="utf-8") as handle:
+                json.dump(payload, handle, ensure_ascii=False, indent=2, sort_keys=True)
+            tmp_path.replace(path)
+        except Exception:
+            tmp_path.unlink(missing_ok=True)
+            raise
 
     @staticmethod
     def _review_summary_manifest_payload(
@@ -274,7 +291,7 @@ class PatchReviewService:
                 "kind": "bot_bundle",
                 "schema_version": bot_bundle_schema_version,
                 "intended_consumers": ["pr_bot", "automation"],
-                "safe_usage": "Use as a single-file bot integration entrypoint containing manifest, quality, actions, PR comment, and trace metadata; non-blocking only.",
+                "safe_usage": "Use as a single-file bot integration entrypoint containing manifest, quality, actions, PR comment, trace metadata, and advisory non-blocking integration decisions.",
             },
             "constraints.json": {
                 "kind": "raw_constraints",
@@ -357,12 +374,14 @@ class PatchReviewService:
             "",
             "Non-blocking review context only; not a correctness proof or test replacement.",
         ])
+        body_markdown = PatchReviewService._truncate_pr_comment("\n".join(body_lines) + "\n")
         return {
             "schema_version": PATCH_REVIEW_SCHEMA_VERSIONS["review_summary_pr_comment.json"],
             "summary_mode": summary_mode,
             "title": "DocAtlas patch review",
             "attachable": quality_payload.get("attachable"),
-            "body_markdown": PatchReviewService._truncate_pr_comment("\n".join(body_lines) + "\n"),
+            "body": body_markdown,
+            "body_markdown": body_markdown,
             "source_artifacts": [
                 "review_summary_quality.json",
                 "review_summary_actions.json",
@@ -445,7 +464,59 @@ class PatchReviewService:
             "actions": actions_payload,
             "pr_comment": pr_comment_payload,
             "trace": trace_payload,
+            "advisory_decision": PatchReviewService._review_summary_advisory_decision_payload(
+                quality_payload,
+                actions_payload,
+            ),
             "claims_avoided": quality_payload.get("claims_avoided", []),
+        }
+
+    @staticmethod
+    def _review_summary_advisory_decision_payload(
+        quality_payload: dict[str, Any],
+        actions_payload: dict[str, Any],
+    ) -> dict[str, Any]:
+        signals = {str(item.get("code") or "") for item in quality_payload.get("signals", [])}
+        unknown_triage_counts: dict[str, int] = {}
+        for item in quality_payload.get("unknown_triage", []):
+            code = str(item.get("code") or "")
+            count = int(item.get("count") or 0)
+            if code and count > 0:
+                unknown_triage_counts[code] = count
+        unknown_triage_codes = list(unknown_triage_counts)
+        violations = list(actions_payload.get("violations") or [])
+        actionable_items = list(actions_payload.get("actionable_items") or [])
+        has_violations = bool(violations) or quality_payload.get("violated_count", 0) > 0 or "violations_present" in signals
+        has_manual_review = (
+            quality_payload.get("unknown_count", 0) > 0
+            or "manual_review_required" in signals
+            or bool(unknown_triage_codes)
+        )
+        has_actionable_items = bool(actionable_items) or quality_payload.get("actionable_items_total_count", 0) > 0
+        reason_codes = []
+        if has_violations:
+            reason_codes.append("violations_present")
+        if has_manual_review:
+            reason_codes.append("manual_review_required")
+        if has_actionable_items:
+            reason_codes.append("actionable_items_present")
+        should_attach_comment = has_violations or has_manual_review or has_actionable_items
+        if not should_attach_comment:
+            reason_codes.append("no_attachable_review_signal")
+        return {
+            "should_attach_comment": should_attach_comment,
+            "show_warning_badge": has_violations or has_manual_review,
+            "highlight_violations": has_violations,
+            "requires_manual_review": has_violations or has_manual_review,
+            "reason_codes": reason_codes,
+            "unknown_triage_codes": unknown_triage_codes,
+            "unknown_triage_counts": unknown_triage_counts,
+            "semantics": "advisory_non_blocking_only",
+            "claims_avoided": [
+                "safe_to_merge",
+                "correctness_proof",
+                "test_or_human_review_replacement",
+            ],
         }
 
     @staticmethod
@@ -492,6 +563,7 @@ class PatchReviewService:
         useful_symbols = [item for item in symbol_candidates if not PatchReviewService._is_low_value_symbol_candidate(item, task)]
         low_symbols = [item for item in symbol_candidates if PatchReviewService._is_low_value_symbol_candidate(item, task)]
         unknown_buckets = PatchReviewService._unknown_buckets(unknowns, constraint_items)
+        unknown_triage = PatchReviewService._unknown_triage(unknowns, constraint_items)
         excluded_sources = list(constraints.get("excluded_source_reasons") or [])
         residual_memos = [item for item in excluded_sources if item.get("reason") in DOGFOOD_MEMO_REASONS]
         quality = PatchReviewService._summary_quality(
@@ -511,6 +583,7 @@ class PatchReviewService:
             "useful_symbols": useful_symbols,
             "low_symbols": low_symbols,
             "unknown_buckets": unknown_buckets,
+            "unknown_triage": unknown_triage,
             "excluded_sources": excluded_sources,
             "residual_memos": residual_memos,
             "violations": violations,
@@ -546,6 +619,7 @@ class PatchReviewService:
         low_context = model["low_context"]
         low_symbols = model["low_symbols"]
         unknown_buckets = model["unknown_buckets"]
+        unknown_triage = model["unknown_triage"]
         residual_memos = model["residual_memos"]
         quality = model["quality"]
         signals = PatchReviewService._review_summary_quality_signals(
@@ -553,6 +627,7 @@ class PatchReviewService:
             low_context=low_context,
             low_symbols=low_symbols,
             unknown_buckets=unknown_buckets,
+            unknown_triage=unknown_triage,
             residual_memos=residual_memos,
             validation=validation,
         )
@@ -571,6 +646,7 @@ class PatchReviewService:
             "unknown_count": validation.get("unknown", 0),
             "reasons": quality["reasons"],
             "signals": signals,
+            "unknown_triage": unknown_triage,
             "unknown_buckets": [
                 {
                     "name": name,
@@ -596,6 +672,7 @@ class PatchReviewService:
         low_context: list[dict[str, Any]],
         low_symbols: list[dict[str, Any]],
         unknown_buckets: dict[str, list[dict[str, Any]]],
+        unknown_triage: list[dict[str, Any]],
         residual_memos: list[dict[str, Any]],
         validation: dict[str, Any],
     ) -> list[dict[str, Any]]:
@@ -620,6 +697,16 @@ class PatchReviewService:
                     "severity": "warning",
                     "count": len(unknown_buckets),
                     "message": "Manual-review buckets remain.",
+                }
+            )
+        manual_review_count = sum(item["count"] for item in unknown_triage if item.get("requires_manual_review"))
+        if manual_review_count:
+            signals.append(
+                {
+                    "code": "manual_review_required",
+                    "severity": "warning",
+                    "count": manual_review_count,
+                    "message": "Unknown validation results require manual review; do not treat them as pass.",
                 }
             )
         if low_context or low_symbols:
@@ -922,6 +1009,8 @@ class PatchReviewService:
             priority = max(priority, 80)
         if PatchReviewService._is_broad_context_source(source, instruction):
             priority = max(priority, 60)
+        if PatchReviewService._has_only_low_value_symbols(item) or PatchReviewService._has_low_value_matched_symbol(item):
+            priority = max(priority, 60)
         confidence_rank = {"high": 0, "medium": 1, "low": 2}.get(confidence, 3)
         if source and source.lower() in changed:
             priority -= 3
@@ -979,15 +1068,37 @@ class PatchReviewService:
     @staticmethod
     def _is_low_value_symbol_candidate(item: dict[str, Any], task: str) -> bool:
         symbol = str(item.get("matched_symbol") or "")
-        term = str(item.get("term") or "")
         task_lower = task.lower()
         if symbol in LOW_VALUE_SYMBOLS or symbol.lower() in {value.lower() for value in LOW_VALUE_SYMBOLS}:
-            explicit = symbol.lower() in task_lower or term.lower() in task_lower
+            explicit = symbol.lower() in task_lower
             return not explicit
         evidence = str(item.get("evidence") or "").strip()
         if evidence.startswith(("import ", "export ", "part ")):
             return True
         return False
+
+    @staticmethod
+    def _has_only_low_value_symbols(item: dict[str, Any]) -> bool:
+        symbols = [str(symbol or "") for symbol in item.get("symbols") or []]
+        if not symbols:
+            return False
+        low_value = {value.lower() for value in LOW_VALUE_SYMBOLS}
+        return all(symbol in LOW_VALUE_SYMBOLS or symbol.lower() in low_value for symbol in symbols)
+
+    @staticmethod
+    def _has_low_value_matched_symbol(item: dict[str, Any]) -> bool:
+        symbols = [str(symbol or "") for symbol in item.get("symbols") or []]
+        if len(symbols) < 2:
+            return False
+        low_value = {value.lower() for value in LOW_VALUE_SYMBOLS}
+        matched_symbol = symbols[-1]
+        if matched_symbol not in LOW_VALUE_SYMBOLS and matched_symbol.lower() not in low_value:
+            return False
+        evidence = str(item.get("evidence") or "").strip()
+        if evidence.startswith(("import ", "export ", "part ")):
+            return True
+        instruction = str(item.get("instruction") or "")
+        return "matches existing project symbol" in instruction
 
     @staticmethod
     def _is_broad_context_source(source: str, instruction: str) -> bool:
@@ -1021,6 +1132,131 @@ class PatchReviewService:
                 bucket = "Other low-confidence context"
             buckets.setdefault(bucket, []).append(item)
         return dict(sorted(buckets.items()))
+
+    @staticmethod
+    def _unknown_triage(unknowns: list[dict[str, Any]], constraints: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        by_id = {item.get("id"): item for item in constraints}
+        buckets: dict[str, list[dict[str, Any]]] = {
+            "missing_diff_evidence": [],
+            "missing_test_evidence": [],
+            "manual_review_required": [],
+            "low_risk_unknown": [],
+        }
+        messages = {
+            "missing_diff_evidence": "No decisive changed-file or diff evidence was found for this constraint.",
+            "missing_test_evidence": "The unknown result depends on missing or inconclusive test evidence.",
+            "manual_review_required": "A human reviewer must resolve an open product, ownership, or policy question.",
+            "low_risk_unknown": "Low-confidence context remains unresolved; keep it visible for manual review.",
+        }
+        for item in unknowns:
+            constraint = by_id.get(item.get("constraint_id"), {})
+            manual_text = " ".join(
+                str(value or "")
+                for value in (
+                    item.get("reason"),
+                    constraint.get("instruction"),
+                    constraint.get("evidence"),
+                    constraint.get("source"),
+                )
+            ).lower()
+            evidence_text = " ".join(
+                str(value or "")
+                for value in (
+                    item.get("constraint_id"),
+                    item.get("reason"),
+                    constraint.get("instruction"),
+                    constraint.get("evidence"),
+                    constraint.get("source"),
+                    constraint.get("type"),
+                )
+            ).lower()
+            if PatchReviewService._has_manual_unknown_signal(manual_text):
+                code = "manual_review_required"
+            elif "test" in evidence_text or "coverage" in evidence_text or "regression" in evidence_text:
+                code = "missing_test_evidence"
+            elif PatchReviewService._has_missing_diff_unknown_signal(evidence_text):
+                code = "missing_diff_evidence"
+            else:
+                code = "low_risk_unknown"
+            buckets[code].append(item)
+        return [
+            {
+                "code": code,
+                "count": len(items),
+                "requires_manual_review": True,
+                "message": messages[code],
+                "examples": [
+                    PatchReviewService._unknown_triage_example(item, by_id.get(item.get("constraint_id"), {}))
+                    for item in items[:2]
+                ],
+            }
+            for code, items in buckets.items()
+            if items
+        ]
+
+    @staticmethod
+    def _unknown_triage_example(item: dict[str, Any], constraint: dict[str, Any]) -> dict[str, Any]:
+        example = {
+            "constraint_id": item.get("constraint_id"),
+            "reason": item.get("reason"),
+        }
+        for field in ("source", "instruction", "evidence", "confidence"):
+            value = constraint.get(field)
+            if value:
+                example[field] = value
+        return example
+
+    @staticmethod
+    def _has_manual_unknown_signal(text: str) -> bool:
+        manual_tokens = (
+            "manual review",
+            "manual reviewer",
+            "manual approval",
+            "manual decision",
+            "manual triage",
+            "human review",
+            "human reviewer",
+            "designer",
+            "open question",
+            "ownership",
+            "source-of-truth",
+            "source of truth",
+            "policy",
+            "дизайнер",
+            "дизайнера",
+            "дизайнером",
+            "открытый вопрос",
+            "открыт вопрос",
+            "владель",
+            "ответствен",
+            "согласовать",
+            "уточнить",
+            "политик",
+        )
+        if any(token in text for token in manual_tokens):
+            return True
+        return bool(re.search(r"\bdesign\s+(?:input|question|approval|review|owner|dependency)\b", text))
+
+    @staticmethod
+    def _has_missing_diff_unknown_signal(text: str) -> bool:
+        if any(
+            token in text
+            for token in (
+                "diff",
+                "changed-file",
+                "changed file",
+                "patch",
+                "direct evidence",
+                "not found",
+                "missing evidence",
+                "changed files unavailable",
+                "changed files or diff unavailable",
+                "not deterministically checkable from changed files",
+                "not deterministic for this patch",
+            )
+        ):
+            return True
+        return any(token in text for token in ("source question", "source changed_files", "source changed files"))
 
     @staticmethod
     def _summary_quality(

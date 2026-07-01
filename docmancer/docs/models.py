@@ -401,6 +401,7 @@ class ProjectDocsInspectResult:
     user_message: str | None = None
     agent_guidance: str | None = None
     source_state_guidance: dict[str, Any] = field(default_factory=dict)
+    diagnostics: dict[str, Any] = field(default_factory=dict)
     warnings: list[str] = field(default_factory=list)
 
 
@@ -435,6 +436,7 @@ class ProjectDocsSyncResult:
     missing_sources: list[dict[str, Any]] = field(default_factory=list)
     removed_sources: list[dict[str, Any]] = field(default_factory=list)
     skipped_sources: list[dict[str, Any]] = field(default_factory=list)
+    diagnostics: dict[str, Any] = field(default_factory=dict)
     warnings: list[str] = field(default_factory=list)
     message: str | None = None
 
@@ -456,6 +458,7 @@ class ProjectDocsBootstrapResult:
     sync_result: ProjectDocsSyncResult | None = None
     agent_message: str | None = None
     user_message: str | None = None
+    diagnostics: dict[str, Any] = field(default_factory=dict)
     warnings: list[str] = field(default_factory=list)
 
 
@@ -477,6 +480,7 @@ class ProjectDocsResult:
     stale_sources: list[dict[str, Any]] = field(default_factory=list)
     ignored_sources: list[dict[str, Any]] = field(default_factory=list)
     source_state_guidance: dict[str, Any] = field(default_factory=dict)
+    diagnostics: dict[str, Any] = field(default_factory=dict)
     next_actions: list[dict[str, Any]] = field(default_factory=list)
     answer_available: bool = True
     reason: str | None = None
@@ -491,6 +495,8 @@ class ProjectContextResult:
     tool: str = "get_project_context"
     schema_version: str = "1.0-mvp"
     answer_available: bool = True
+    answer_type: str = "exact"
+    answer_completeness: dict[str, Any] = field(default_factory=dict)
     mode: str = "auto"
     reason: str | None = None
     context_pack: list[dict[str, Any]] = field(default_factory=list)
@@ -499,6 +505,11 @@ class ProjectContextResult:
     trust_contract: dict[str, Any] = field(default_factory=dict)
     warnings: list[str] = field(default_factory=list)
     next_actions: list[dict[str, Any]] = field(default_factory=list)
+    recommended_next_actions: list[dict[str, Any]] = field(default_factory=list)
+    next_action: dict[str, Any] = field(default_factory=dict)
+    requires_confirmation: bool = False
+    confirmation_reason: str | None = None
+    arguments_patch: dict[str, Any] = field(default_factory=dict)
     response_style: str = "evidence-first"
     primary_snippet: dict[str, Any] | None = None
     supporting_snippets: list[dict[str, Any]] = field(default_factory=list)

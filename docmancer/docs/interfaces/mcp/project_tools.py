@@ -47,6 +47,7 @@ def _compact_project_docs(result: dict[str, Any], *, omit_results: bool = False)
         "next_actions": result.get("next_actions") or [],
         "arguments_patch": result.get("arguments_patch") or {},
         "source_summary": _project_sources_summary(result),
+        "diagnostics": result.get("diagnostics") or {},
         "warnings": result.get("warnings") or [],
     }
     if omit_results:
@@ -67,6 +68,8 @@ def _compact_project_context(result: dict[str, Any]) -> dict[str, Any]:
         "tool": result.get("tool"),
         "schema_version": result.get("schema_version"),
         "answer_available": result.get("answer_available"),
+        "answer_type": result.get("answer_type"),
+        "answer_completeness": result.get("answer_completeness") or {},
         "mode": result.get("mode"),
         "reason": result.get("reason"),
         "message": result.get("message"),
@@ -77,11 +80,17 @@ def _compact_project_context(result: dict[str, Any]) -> dict[str, Any]:
         "answer_outline": result.get("answer_outline") or {},
         "trust_contract": result.get("trust_contract") or {},
         "next_actions": result.get("next_actions") or [],
+        "recommended_next_actions": result.get("recommended_next_actions") or [],
+        "next_action": result.get("next_action") or {},
+        "arguments_patch": result.get("arguments_patch") or {},
         "snippet_metrics": result.get("snippet_metrics") or {},
         "metrics": result.get("metrics") or {},
         "diagnostics": result.get("diagnostics") or {},
         "warnings": result.get("warnings") or [],
     }
+    if result.get("requires_confirmation"):
+        compact["requires_confirmation"] = result.get("requires_confirmation")
+        compact["confirmation_reason"] = result.get("confirmation_reason")
     project_docs = result.get("project_docs") or {}
     if project_docs:
         compact["project_docs"] = _compact_project_docs(project_docs, omit_results=True)
@@ -112,6 +121,7 @@ def _compact_inspect_project_docs(result: dict[str, Any]) -> dict[str, Any]:
         "recommended_next_actions": result.get("recommended_next_actions") or [],
         "agent_message": result.get("agent_message"),
         "user_message": result.get("user_message"),
+        "diagnostics": result.get("diagnostics") or {},
         "warnings": result.get("warnings") or [],
     }
     if result.get("requires_confirmation"):
@@ -153,6 +163,7 @@ def _compact_sync_project_docs(result: dict[str, Any]) -> dict[str, Any]:
             "sections_indexed": result.get("sections_indexed") or 0,
         },
         "message": result.get("message"),
+        "diagnostics": result.get("diagnostics") or {},
         "warnings": result.get("warnings") or [],
     }
 
@@ -169,6 +180,7 @@ def _compact_bootstrap_project_docs(result: dict[str, Any]) -> dict[str, Any]:
         "arguments_patch": result.get("arguments_patch") or {},
         "agent_message": result.get("agent_message"),
         "user_message": result.get("user_message"),
+        "diagnostics": result.get("diagnostics") or {},
         "warnings": result.get("warnings") or [],
     }
     inspect_result = result.get("inspect_result") or {}

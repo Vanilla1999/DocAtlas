@@ -1,7 +1,10 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
+import os
+from pathlib import Path
 from typing import Any
+import warnings
 
 from docmancer.core.config import DocmancerConfig
 from docmancer.docs.application.docs_job_service import DOCS_JOB_SERVICE, DocsJobService, DocsJobTracker
@@ -30,6 +33,7 @@ DEFAULT_DOC_TOKENS = 4000
 
 class LibraryDocsService:
     def __init__(self, *, config: DocmancerConfig | None = None, registry: LibraryRegistry | None = None, agent: Any | None = None, agent_factory: Any | None = None, project_reader: ProjectMetadataReader | None = None, job_tracker: DocsJobTracker | None = None, stale_after_days: int = STALE_AFTER_DAYS):
+        self.config_source = "provided" if config is not None else "default"
         self.config = config or DocmancerConfig()
         self.registry = registry or LibraryRegistry(self.config.index.db_path)
         self.agent_gateway = AgentIndexGateway(self.config, default_agent=agent, agent_factory=agent_factory)
@@ -59,6 +63,69 @@ class LibraryDocsService:
 
     def _agent_instance(self, record: LibraryRecord | None = None) -> Any:
         return self.agent_gateway.agent_instance(record)
+
+    def active_index_diagnostics(self, project_path: str | None = None) -> dict[str, Any]:
+        root = Path(project_path).expanduser().resolve() if project_path else None
+        db_path = Path(self.config.index.db_path).expanduser().resolve()
+        extracted_dir = (
+            str(Path(self.config.index.extracted_dir).expanduser().resolve())
+            if self.config.index.extracted_dir
+            else None
+        )
+        diagnostic_warnings: list[dict[str, Any]] = []
+        index_counts = {"sources": 0, "sections": 0}
+        try:
+            stats = self._agent_instance().store.collection_stats()
+            index_counts = {
+                "sources": int(stats.get("sources_count") or 0),
+                "sections": int(stats.get("sections_count") or stats.get("points_count") or 0),
+            }
+            extracted_dir = stats.get("extracted_dir") or extracted_dir
+        except Exception as exc:
+            diagnostic_warnings.append({
+                "code": "index_stats_unavailable",
+                "blocking": False,
+                "message": str(exc),
+            })
+
+        diagnostics: dict[str, Any] = {
+            "project_path": str(root) if root else None,
+            "db_path": str(db_path),
+            "db_exists": db_path.exists(),
+            "extracted_dir": extracted_dir,
+            "config_source": self.config_source,
+            "docmancer_home": os.environ.get("DOCMANCER_HOME"),
+            "index_counts": index_counts,
+            "warnings": diagnostic_warnings,
+        }
+
+        if root:
+            local_config_path = root / "docmancer.yaml"
+            local_config: dict[str, Any] = {"present": local_config_path.exists()}
+            if local_config_path.exists():
+                local_config["path"] = str(local_config_path.resolve())
+                try:
+                    with warnings.catch_warnings():
+                        warnings.simplefilter("ignore", DeprecationWarning)
+                        project_config = DocmancerConfig.from_yaml(local_config_path)
+                    project_db_path = Path(project_config.index.db_path).expanduser().resolve()
+                    local_config["db_path"] = str(project_db_path)
+                    if project_db_path != db_path:
+                        diagnostic_warnings.append({
+                            "code": "project_local_config_shadowed",
+                            "blocking": False,
+                            "message": "A repo-local docmancer.yaml exists, but this service is using a different active SQLite index path.",
+                            "active_db_path": str(db_path),
+                            "project_config_db_path": str(project_db_path),
+                        })
+                except Exception as exc:
+                    diagnostic_warnings.append({
+                        "code": "project_local_config_unreadable",
+                        "blocking": False,
+                        "message": str(exc),
+                    })
+            diagnostics["project_local_config"] = local_config
+        return diagnostics
 
     def _lock_for(self, library_id: str):
         return self.lock_gateway.lock_for(library_id)

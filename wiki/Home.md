@@ -7,6 +7,7 @@ This wiki is the deep-dive reference for Docmancer's local, version-aware docs r
 | Page | What's there |
 |------|--------------|
 | **[Commands](./Commands.md)** | Core docs runtime commands, docs MCP commands, advanced pack commands, and options |
+| **[Patch-review bot artifacts](./Patch-Review-Bot-Artifacts.md)** | Advisory PR-bot JSON artifact discovery, schema, and safe-usage contract |
 | **[Configuration](./Configuration.md)** | `docmancer.yaml` reference, env vars, **API keys**, and a tuned hybrid example |
 | **[Architecture](./Architecture.md)** | Indexing pipeline, hybrid retrieval, registry/source identity, version-aware resolution, project docs pipeline, docs MCP tools, job tracking, manifests, packs runtime, concurrency |
 | **[Supported Sources](./Supported-Sources.md)** | File formats, URL providers, and the MCP pack source standards |

@@ -3,12 +3,20 @@ from __future__ import annotations
 import json
 import subprocess
 from pathlib import Path
+from typing import Any, cast
 
+import pytest
 from click.testing import CliRunner
 
 from docmancer.cli.__main__ import cli
 from docmancer.docs.application.patch_review_service import PATCH_REVIEW_SCHEMA_VERSIONS, PatchReviewService
 from docmancer.docs.application.patch_constraints_service import PatchConstraintsService
+from docmancer.docs.models import (
+    PatchConstraint,
+    PatchConstraintPacket,
+    PatchConstraintValidationPacket,
+    PatchConstraintValidationResult,
+)
 from docmancer.docs.service import LibraryDocsService
 
 
@@ -29,6 +37,457 @@ def _git(repo: Path, *args: str) -> None:
     import subprocess
 
     subprocess.check_call(["git", *args], cwd=repo)
+
+
+class _FakePrBotInvalidManifestContract(Exception):
+    pass
+
+
+class _FakePrBotInvalidBotBundleContract(Exception):
+    pass
+
+
+def _fake_pr_bot_contract_mapping(value: Any, error: type[Exception], field: str) -> dict[str, Any]:
+    if not isinstance(value, dict):
+        raise error(f"{field} must be an object")
+    return value
+
+
+def _fake_pr_bot_contract_list(value: Any, error: type[Exception], field: str) -> list[Any]:
+    if not isinstance(value, list):
+        raise error(f"{field} must be a list")
+    return value
+
+
+def _fake_pr_bot_contract_non_negative_int(value: Any, error: type[Exception], field: str) -> int:
+    if value is None:
+        return 0
+    if isinstance(value, bool) or not isinstance(value, int) or value < 0:
+        raise error(f"{field} must be a non-negative integer")
+    return value
+
+
+def _fake_pr_bot_pr_comment_payload() -> dict[str, Any]:
+    return {
+        "schema_version": PATCH_REVIEW_SCHEMA_VERSIONS["review_summary_pr_comment.json"],
+        "body": "DocAtlas patch review\n",
+        "body_markdown": "DocAtlas patch review\n",
+        "source_artifacts": ["review_summary_quality.json", "review_summary_actions.json"],
+        "claims_avoided": ["correctness_proof", "test_or_human_review_replacement"],
+    }
+
+
+def _fake_pr_bot_trace_payload() -> dict[str, Any]:
+    return {
+        "schema_version": PATCH_REVIEW_SCHEMA_VERSIONS["review_summary_trace.json"],
+        "source_artifacts": [
+            "constraints.json",
+            "validation.json",
+            "review_summary_quality.json",
+            "review_summary_actions.json",
+        ],
+        "claims_avoided": ["correctness_proof", "test_or_human_review_replacement"],
+    }
+
+
+def _fake_pr_bot_contract_require(condition: bool, error: type[Exception], field: str) -> None:
+    if not condition:
+        raise error(f"{field} failed contract validation")
+
+
+def _fake_pr_bot_consume_manifest(manifest_path: Path, manifest: dict[str, Any] | None = None) -> dict[str, Any]:
+    if manifest is None:
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest = _fake_pr_bot_contract_mapping(manifest, _FakePrBotInvalidManifestContract, "manifest")
+    _fake_pr_bot_contract_require(
+        manifest.get("product_role") == "non_blocking_pr_review_assistant",
+        _FakePrBotInvalidManifestContract,
+        "manifest.product_role",
+    )
+    manifest_claims = _fake_pr_bot_contract_list(
+        manifest.get("claims_avoided"),
+        _FakePrBotInvalidManifestContract,
+        "manifest.claims_avoided",
+    )
+    _fake_pr_bot_contract_require(
+        "correctness_proof" in manifest_claims,
+        _FakePrBotInvalidManifestContract,
+        "manifest.claims_avoided.correctness_proof",
+    )
+    _fake_pr_bot_contract_require(
+        "test_or_human_review_replacement" in manifest_claims,
+        _FakePrBotInvalidManifestContract,
+        "manifest.claims_avoided.test_or_human_review_replacement",
+    )
+    artifacts = _fake_pr_bot_contract_list(
+        manifest.get("artifacts"),
+        _FakePrBotInvalidManifestContract,
+        "manifest.artifacts",
+    )
+    bundle_entries: list[dict[str, Any]] = []
+    for item in artifacts:
+        descriptor = _fake_pr_bot_contract_mapping(
+            item,
+            _FakePrBotInvalidManifestContract,
+            "manifest.artifacts[]",
+        )
+        if descriptor.get("kind") == "bot_bundle" and descriptor.get("filename") == "review_summary_bot_bundle.json":
+            bundle_entries.append(descriptor)
+    _fake_pr_bot_contract_require(len(bundle_entries) == 1, _FakePrBotInvalidManifestContract, "manifest.bot_bundle")
+    bundle_entry = bundle_entries[0]
+    _fake_pr_bot_contract_require(
+        bundle_entry.get("schema_version") == PATCH_REVIEW_SCHEMA_VERSIONS["review_summary_bot_bundle.json"],
+        _FakePrBotInvalidManifestContract,
+        "manifest.bot_bundle.schema_version",
+    )
+    intended_consumers = _fake_pr_bot_contract_list(
+        bundle_entry.get("intended_consumers"),
+        _FakePrBotInvalidManifestContract,
+        "manifest.bot_bundle.intended_consumers",
+    )
+    _fake_pr_bot_contract_require("pr_bot" in intended_consumers, _FakePrBotInvalidManifestContract, "manifest.bot_bundle.pr_bot")
+    safe_usage = bundle_entry.get("safe_usage")
+    _fake_pr_bot_contract_require(isinstance(safe_usage, str), _FakePrBotInvalidManifestContract, "manifest.bot_bundle.safe_usage")
+    safe_usage = cast(str, safe_usage)
+    _fake_pr_bot_contract_require(
+        "single-file bot integration entrypoint" in safe_usage,
+        _FakePrBotInvalidManifestContract,
+        "manifest.bot_bundle.safe_usage.entrypoint",
+    )
+    _fake_pr_bot_contract_require(
+        "advisory non-blocking" in safe_usage,
+        _FakePrBotInvalidManifestContract,
+        "manifest.bot_bundle.safe_usage.non_blocking",
+    )
+
+    bundle = json.loads((manifest_path.parent / bundle_entry["filename"]).read_text(encoding="utf-8"))
+    bundle = _fake_pr_bot_contract_mapping(bundle, _FakePrBotInvalidBotBundleContract, "bundle")
+    decision = _fake_pr_bot_contract_mapping(
+        bundle.get("advisory_decision"),
+        _FakePrBotInvalidBotBundleContract,
+        "bundle.advisory_decision",
+    )
+    quality = _fake_pr_bot_contract_mapping(bundle.get("quality"), _FakePrBotInvalidBotBundleContract, "bundle.quality")
+    actions = _fake_pr_bot_contract_mapping(bundle.get("actions"), _FakePrBotInvalidBotBundleContract, "bundle.actions")
+    pr_comment = _fake_pr_bot_contract_mapping(
+        bundle.get("pr_comment"),
+        _FakePrBotInvalidBotBundleContract,
+        "bundle.pr_comment",
+    )
+    trace = _fake_pr_bot_contract_mapping(bundle.get("trace"), _FakePrBotInvalidBotBundleContract, "bundle.trace")
+    bundle_claims = _fake_pr_bot_contract_list(
+        bundle.get("claims_avoided"),
+        _FakePrBotInvalidBotBundleContract,
+        "bundle.claims_avoided",
+    )
+    decision_claims = _fake_pr_bot_contract_list(
+        decision.get("claims_avoided"),
+        _FakePrBotInvalidBotBundleContract,
+        "bundle.advisory_decision.claims_avoided",
+    )
+    pr_comment_claims = _fake_pr_bot_contract_list(
+        pr_comment.get("claims_avoided"),
+        _FakePrBotInvalidBotBundleContract,
+        "bundle.pr_comment.claims_avoided",
+    )
+    trace_claims = _fake_pr_bot_contract_list(
+        trace.get("claims_avoided"),
+        _FakePrBotInvalidBotBundleContract,
+        "bundle.trace.claims_avoided",
+    )
+    _fake_pr_bot_contract_require(
+        bundle.get("schema_version") == PATCH_REVIEW_SCHEMA_VERSIONS["review_summary_bot_bundle.json"],
+        _FakePrBotInvalidBotBundleContract,
+        "bundle.schema_version",
+    )
+    _fake_pr_bot_contract_require(bundle.get("manifest") == manifest, _FakePrBotInvalidBotBundleContract, "bundle.manifest")
+    _fake_pr_bot_contract_require(
+        pr_comment.get("schema_version") == PATCH_REVIEW_SCHEMA_VERSIONS["review_summary_pr_comment.json"],
+        _FakePrBotInvalidBotBundleContract,
+        "bundle.pr_comment.schema_version",
+    )
+    pr_comment_sources = _fake_pr_bot_contract_list(
+        pr_comment.get("source_artifacts"),
+        _FakePrBotInvalidBotBundleContract,
+        "bundle.pr_comment.source_artifacts",
+    )
+    _fake_pr_bot_contract_require(
+        {"review_summary_quality.json", "review_summary_actions.json"} <= set(pr_comment_sources),
+        _FakePrBotInvalidBotBundleContract,
+        "bundle.pr_comment.source_artifacts",
+    )
+    body = pr_comment.get("body")
+    body_markdown = pr_comment.get("body_markdown")
+    _fake_pr_bot_contract_require(isinstance(body, str), _FakePrBotInvalidBotBundleContract, "bundle.pr_comment.body")
+    body_text = cast(str, body)
+    _fake_pr_bot_contract_require(
+        body_text == body_markdown,
+        _FakePrBotInvalidBotBundleContract,
+        "bundle.pr_comment.body_markdown_alias",
+    )
+    _fake_pr_bot_contract_require(
+        "correctness_proof" in pr_comment_claims,
+        _FakePrBotInvalidBotBundleContract,
+        "bundle.pr_comment.claims_avoided.correctness_proof",
+    )
+    _fake_pr_bot_contract_require(
+        "test_or_human_review_replacement" in pr_comment_claims,
+        _FakePrBotInvalidBotBundleContract,
+        "bundle.pr_comment.claims_avoided.test_or_human_review_replacement",
+    )
+    _fake_pr_bot_contract_require(
+        trace.get("schema_version") == PATCH_REVIEW_SCHEMA_VERSIONS["review_summary_trace.json"],
+        _FakePrBotInvalidBotBundleContract,
+        "bundle.trace.schema_version",
+    )
+    trace_sources = _fake_pr_bot_contract_list(
+        trace.get("source_artifacts"),
+        _FakePrBotInvalidBotBundleContract,
+        "bundle.trace.source_artifacts",
+    )
+    _fake_pr_bot_contract_require(
+        {"constraints.json", "validation.json", "review_summary_quality.json", "review_summary_actions.json"}
+        <= set(trace_sources),
+        _FakePrBotInvalidBotBundleContract,
+        "bundle.trace.source_artifacts",
+    )
+    _fake_pr_bot_contract_require(
+        "correctness_proof" in trace_claims,
+        _FakePrBotInvalidBotBundleContract,
+        "bundle.trace.claims_avoided.correctness_proof",
+    )
+    _fake_pr_bot_contract_require(
+        "test_or_human_review_replacement" in trace_claims,
+        _FakePrBotInvalidBotBundleContract,
+        "bundle.trace.claims_avoided.test_or_human_review_replacement",
+    )
+    _fake_pr_bot_contract_require(
+        decision.get("semantics") == "advisory_non_blocking_only",
+        _FakePrBotInvalidBotBundleContract,
+        "bundle.advisory_decision.semantics",
+    )
+    _fake_pr_bot_contract_require("safe_to_merge" not in bundle, _FakePrBotInvalidBotBundleContract, "bundle.safe_to_merge")
+    _fake_pr_bot_contract_require("safe_to_merge" not in decision, _FakePrBotInvalidBotBundleContract, "decision.safe_to_merge")
+    _fake_pr_bot_contract_require(
+        "safe_to_merge" in decision_claims,
+        _FakePrBotInvalidBotBundleContract,
+        "bundle.advisory_decision.claims_avoided.safe_to_merge",
+    )
+    _fake_pr_bot_contract_require(
+        "correctness_proof" in bundle_claims,
+        _FakePrBotInvalidBotBundleContract,
+        "bundle.claims_avoided.correctness_proof",
+    )
+    _fake_pr_bot_contract_require(
+        "test_or_human_review_replacement" in bundle_claims,
+        _FakePrBotInvalidBotBundleContract,
+        "bundle.claims_avoided.test_or_human_review_replacement",
+    )
+    unknown_triage = _fake_pr_bot_contract_list(
+        quality.get("unknown_triage", []),
+        _FakePrBotInvalidBotBundleContract,
+        "bundle.quality.unknown_triage",
+    )
+    unknown_triage_examples_by_code = {
+        item["code"]: item.get("examples", [])
+        for item in unknown_triage
+        if isinstance(item, dict)
+        if item.get("examples")
+    }
+    unknown_triage_counts: dict[str, int] = {}
+    for index, item in enumerate(unknown_triage):
+        if not isinstance(item, dict):
+            continue
+        count = _fake_pr_bot_contract_non_negative_int(
+            item.get("count"),
+            _FakePrBotInvalidBotBundleContract,
+            f"bundle.quality.unknown_triage[{index}].count",
+        )
+        if item.get("code") and count > 0:
+            unknown_triage_counts[str(item["code"])] = count
+    decision_unknown_triage_counts = decision.get("unknown_triage_counts")
+    if decision_unknown_triage_counts is None:
+        decision_unknown_triage_counts = unknown_triage_counts
+    else:
+        decision_unknown_triage_counts = _fake_pr_bot_contract_mapping(
+            decision_unknown_triage_counts,
+            _FakePrBotInvalidBotBundleContract,
+            "bundle.advisory_decision.unknown_triage_counts",
+        )
+        normalized_decision_unknown_triage_counts: dict[str, int] = {}
+        for code, count_value in decision_unknown_triage_counts.items():
+            _fake_pr_bot_contract_require(
+                isinstance(code, str),
+                _FakePrBotInvalidBotBundleContract,
+                "bundle.advisory_decision.unknown_triage_counts.code",
+            )
+            normalized_decision_unknown_triage_counts[code] = _fake_pr_bot_contract_non_negative_int(
+                count_value,
+                _FakePrBotInvalidBotBundleContract,
+                f"bundle.advisory_decision.unknown_triage_counts.{code}",
+            )
+        _fake_pr_bot_contract_require(
+            normalized_decision_unknown_triage_counts == unknown_triage_counts,
+            _FakePrBotInvalidBotBundleContract,
+            "bundle.advisory_decision.unknown_triage_counts",
+        )
+        decision_unknown_triage_counts = normalized_decision_unknown_triage_counts
+    quality_signals = {
+        str(item.get("code") or "")
+        for item in _fake_pr_bot_contract_list(
+            quality.get("signals", []),
+            _FakePrBotInvalidBotBundleContract,
+            "bundle.quality.signals",
+        )
+        if isinstance(item, dict)
+    }
+    violated_count = _fake_pr_bot_contract_non_negative_int(
+        quality.get("violated_count"),
+        _FakePrBotInvalidBotBundleContract,
+        "bundle.quality.violated_count",
+    )
+    unknown_count = _fake_pr_bot_contract_non_negative_int(
+        quality.get("unknown_count"),
+        _FakePrBotInvalidBotBundleContract,
+        "bundle.quality.unknown_count",
+    )
+    reason_codes = list(
+        _fake_pr_bot_contract_list(
+            decision.get("reason_codes"),
+            _FakePrBotInvalidBotBundleContract,
+            "bundle.advisory_decision.reason_codes",
+        )
+    )
+    unknown_triage_codes = _fake_pr_bot_contract_list(
+        decision.get("unknown_triage_codes"),
+        _FakePrBotInvalidBotBundleContract,
+        "bundle.advisory_decision.unknown_triage_codes",
+    )
+    for field in ["should_attach_comment", "show_warning_badge", "highlight_violations", "requires_manual_review"]:
+        _fake_pr_bot_contract_require(isinstance(decision.get(field), bool), _FakePrBotInvalidBotBundleContract, f"bundle.advisory_decision.{field}")
+    violations = _fake_pr_bot_contract_list(
+        actions.get("violations"),
+        _FakePrBotInvalidBotBundleContract,
+        "bundle.actions.violations",
+    )
+    has_quality_violation_signal = violated_count > 0 or "violations_present" in quality_signals
+    has_violation_payload = bool(violations)
+    if has_quality_violation_signal or has_violation_payload:
+        _fake_pr_bot_contract_require(
+            has_quality_violation_signal and has_violation_payload,
+            _FakePrBotInvalidBotBundleContract,
+            "bundle.quality.actions.violations_consistency",
+        )
+        _fake_pr_bot_contract_require(
+            decision["show_warning_badge"] is True,
+            _FakePrBotInvalidBotBundleContract,
+            "bundle.advisory_decision.show_warning_badge.violations",
+        )
+        _fake_pr_bot_contract_require(
+            decision["highlight_violations"] is True,
+            _FakePrBotInvalidBotBundleContract,
+            "bundle.advisory_decision.highlight_violations.violations",
+        )
+        _fake_pr_bot_contract_require(
+            decision["requires_manual_review"] is True,
+            _FakePrBotInvalidBotBundleContract,
+            "bundle.advisory_decision.requires_manual_review.violations",
+        )
+        _fake_pr_bot_contract_require(
+            "violations_present" in reason_codes,
+            _FakePrBotInvalidBotBundleContract,
+            "bundle.advisory_decision.reason_codes.violations_present",
+        )
+    if unknown_count > 0 or unknown_triage_counts or "manual_review_required" in quality_signals:
+        _fake_pr_bot_contract_require(
+            decision["show_warning_badge"] is True,
+            _FakePrBotInvalidBotBundleContract,
+            "bundle.advisory_decision.show_warning_badge.unknowns",
+        )
+        _fake_pr_bot_contract_require(
+            decision["requires_manual_review"] is True,
+            _FakePrBotInvalidBotBundleContract,
+            "bundle.advisory_decision.requires_manual_review.unknowns",
+        )
+        _fake_pr_bot_contract_require(
+            "manual_review_required" in reason_codes,
+            _FakePrBotInvalidBotBundleContract,
+            "bundle.advisory_decision.reason_codes.manual_review_required",
+        )
+    if decision["should_attach_comment"]:
+        _fake_pr_bot_contract_require(
+            bool(body_text.strip()),
+            _FakePrBotInvalidBotBundleContract,
+            "bundle.pr_comment.body.non_empty_when_attachable",
+        )
+    return {
+        "attach_comment": decision["should_attach_comment"],
+        "show_warning_badge": decision["show_warning_badge"],
+        "highlight_violations": decision["highlight_violations"],
+        "requires_manual_review": decision["requires_manual_review"],
+        "reason_codes": reason_codes,
+        "unknown_triage_codes": unknown_triage_codes,
+        "unknown_triage_counts": decision_unknown_triage_counts,
+        "unknown_triage_examples_by_code": unknown_triage_examples_by_code,
+        "violation_count": len(violations),
+        "unknown_count": unknown_count,
+    }
+
+
+def _fake_pr_bot_discover_output_dir(output_dir: Path) -> dict[str, Any]:
+    manifest_path = output_dir / "review_summary_manifest.json"
+    def manual_fallback(reason_code: str) -> dict[str, Any]:
+        sibling_artifacts = sorted(
+            path.name
+            for path in output_dir.iterdir()
+            if path.name.startswith("review_summary")
+        ) if output_dir.exists() else []
+        return {
+            "status": "no_completed_patch_review_run",
+            "attach_comment": False,
+            "show_warning_badge": True,
+            "highlight_violations": False,
+            "requires_manual_review": True,
+            "reason_codes": [reason_code],
+            "ignored_sibling_artifacts": sibling_artifacts,
+            "semantics": "manual_fallback_not_pass",
+        }
+
+    if not manifest_path.exists():
+        return manual_fallback("missing_manifest_completed_run_marker")
+    try:
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError):
+        return manual_fallback("invalid_manifest_completed_run_marker")
+    if not isinstance(manifest, dict):
+        return manual_fallback("invalid_manifest_completed_run_marker")
+    if manifest.get("schema_version") != PATCH_REVIEW_SCHEMA_VERSIONS["review_summary_manifest.json"]:
+        return manual_fallback("unsupported_manifest_schema_version")
+    try:
+        consumer_payload = _fake_pr_bot_consume_manifest(manifest_path, manifest)
+    except _FakePrBotInvalidManifestContract:
+        return manual_fallback("invalid_manifest_completed_run_marker")
+    except _FakePrBotInvalidBotBundleContract:
+        return manual_fallback("invalid_bot_bundle_contract")
+    except FileNotFoundError:
+        return manual_fallback("missing_bot_bundle_artifact")
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError):
+        return manual_fallback("invalid_bot_bundle_artifact")
+    return {
+        "status": "completed_patch_review_run",
+        **consumer_payload,
+    }
+
+
+def _assert_fake_pr_bot_manual_fallback(decision: dict[str, Any], reason_code: str) -> None:
+    assert decision["status"] == "no_completed_patch_review_run"
+    assert decision["attach_comment"] is False
+    assert decision["show_warning_badge"] is True
+    assert decision["highlight_violations"] is False
+    assert decision["requires_manual_review"] is True
+    assert decision["reason_codes"] == [reason_code]
+    assert decision["semantics"] == "manual_fallback_not_pass"
+    assert "safe_to_merge" not in decision
 
 
 def test_patch_review_command_writes_expected_artifacts(tmp_path: Path):
@@ -613,6 +1072,406 @@ def test_patch_review_writes_machine_readable_summary_quality(tmp_path: Path):
     assert f"- actionable_items_count: {quality['actionable_items_count']}" in summary_quality
 
 
+def test_patch_review_quality_classifies_unknowns_without_treating_them_as_pass():
+    constraints = {
+        "constraints": [
+            {
+                "id": "diff-gap",
+                "type": "source_of_truth",
+                "instruction": "Close the menu before navigation.",
+                "source": "docs/menu.md",
+                "confidence": "high",
+                "evidence": "Menu closes before navigation.",
+                "symbols": ["closeMenu"],
+                "files": [],
+            },
+            {
+                "id": "test-gap",
+                "type": "behavior",
+                "instruction": "Add regression tests for closed request reopening.",
+                "source": "docs/help.md",
+                "confidence": "medium",
+                "evidence": "Request reopening needs regression coverage.",
+                "symbols": [],
+                "files": [],
+            },
+            {
+                "id": "manual-design",
+                "type": "architecture",
+                "instruction": "Designer must confirm the menu button style.",
+                "source": "docs/menu.md",
+                "confidence": "medium",
+                "evidence": "Open designer question remains.",
+                "symbols": [],
+                "files": [],
+            },
+            {
+                "id": "low-risk-note",
+                "type": "architecture",
+                "instruction": "Keep optional helper naming aligned with docs.",
+                "source": "docs/menu.md",
+                "confidence": "low",
+                "evidence": "Optional naming note.",
+                "symbols": [],
+                "files": [],
+            },
+        ],
+        "symbol_candidates": [],
+        "excluded_source_reasons": [],
+    }
+    validation = {
+        "satisfied": 0,
+        "violated": 0,
+        "unknown": 4,
+        "results": [
+            {"constraint_id": "diff-gap", "status": "unknown", "reason": "no direct diff evidence found", "files": []},
+            {"constraint_id": "test-gap", "status": "unknown", "reason": "missing test evidence", "files": []},
+            {"constraint_id": "manual-design", "status": "unknown", "reason": "manual review required for designer input", "files": []},
+            {"constraint_id": "low-risk-note", "status": "unknown", "reason": "low confidence context only", "files": []},
+        ],
+        "warnings": [],
+    }
+
+    quality = PatchReviewService._review_summary_quality_payload(
+        "Review menu redesign unknowns",
+        ["lib/menu.dart"],
+        constraints,
+        validation,
+    )
+
+    triage = {item["code"]: item for item in quality["unknown_triage"]}
+    assert triage["missing_diff_evidence"]["count"] == 1
+    assert triage["missing_test_evidence"]["count"] == 1
+    assert triage["manual_review_required"]["count"] == 1
+    assert triage["low_risk_unknown"]["count"] == 1
+    assert all(item["requires_manual_review"] for item in quality["unknown_triage"])
+    assert "manual_review_required" in {signal["code"] for signal in quality["signals"]}
+    assert quality["unknown_count"] == 4
+    assert quality["attachable"] != "yes"
+
+
+def test_patch_review_unknown_triage_examples_carry_source_evidence_for_bot_routing():
+    constraints = {
+        "constraints": [
+            {
+                "id": "open-designer-input",
+                "type": "architecture",
+                "instruction": "Получить инфо от дизайнера по новому виду кнопки вызова меню.",
+                "source": "docs/menu.md",
+                "confidence": "medium",
+                "evidence": "Открытый вопрос по макету остается нерешенным.",
+                "symbols": [],
+                "files": [],
+            }
+        ],
+        "symbol_candidates": [],
+        "excluded_source_reasons": [],
+    }
+    validation = {
+        "satisfied": 0,
+        "violated": 0,
+        "unknown": 1,
+        "results": [
+            {
+                "constraint_id": "open-designer-input",
+                "status": "unknown",
+                "reason": "No decisive changed-file or diff evidence was found for this constraint.",
+                "files": [],
+            }
+        ],
+        "warnings": [],
+    }
+
+    quality = PatchReviewService._review_summary_quality_payload(
+        "Review TSDB menu redesign",
+        ["lib/presentation/menu_view.dart"],
+        constraints,
+        validation,
+    )
+
+    triage = {item["code"]: item for item in quality["unknown_triage"]}
+    assert set(triage) == {"manual_review_required"}
+    assert triage["manual_review_required"]["requires_manual_review"] is True
+    assert triage["manual_review_required"]["examples"][0] == {
+        "constraint_id": "open-designer-input",
+        "reason": "No decisive changed-file or diff evidence was found for this constraint.",
+        "source": "docs/menu.md",
+        "instruction": "Получить инфо от дизайнера по новому виду кнопки вызова меню.",
+        "evidence": "Открытый вопрос по макету остается нерешенным.",
+        "confidence": "medium",
+    }
+    assert quality["unknown_count"] == 1
+    assert quality["attachable"] != "yes"
+
+
+def test_patch_review_unknown_triage_keeps_generic_design_and_manual_text_granular():
+    constraints = {
+        "constraints": [
+            {
+                "id": "design-doc-gap",
+                "type": "source_of_truth",
+                "instruction": "Follow the design system spacing rule.",
+                "source": "docs/design.md",
+                "confidence": "medium",
+                "evidence": "Design tokens define menu spacing.",
+                "symbols": [],
+                "files": [],
+            },
+            {
+                "id": "manual-retry-test-gap",
+                "type": "behavior",
+                "instruction": "Keep the manual retry command covered by tests.",
+                "source": "docs/manual-retry.md",
+                "confidence": "medium",
+                "evidence": "Manual retry should remain available after service failures.",
+                "symbols": [],
+                "files": [],
+            },
+            {
+                "id": "task-derived-return-flow",
+                "type": "project_convention",
+                "instruction": "Confirm the closed request returns to the Active list after reopen.",
+                "source": "changed_files",
+                "confidence": "medium",
+                "evidence": "Task-derived requirement from changed files; patch review must find diff evidence before treating it as resolved.",
+                "symbols": [],
+                "files": ["lib/help_request_details.dart"],
+            },
+        ],
+        "symbol_candidates": [],
+        "excluded_source_reasons": [],
+    }
+    validation = {
+        "satisfied": 0,
+        "violated": 0,
+        "unknown": 3,
+        "results": [
+            {"constraint_id": "design-doc-gap", "status": "unknown", "reason": "no direct diff evidence found", "files": []},
+            {"constraint_id": "manual-retry-test-gap", "status": "unknown", "reason": "missing test evidence", "files": []},
+            {
+                "constraint_id": "task-derived-return-flow",
+                "status": "unknown",
+                "reason": "constraint not deterministically checkable from changed files",
+                "files": ["lib/help_request_details.dart"],
+            },
+        ],
+        "warnings": [],
+    }
+
+    quality = PatchReviewService._review_summary_quality_payload(
+        "Review generic design documentation and manual retry coverage",
+        ["lib/menu.dart"],
+        constraints,
+        validation,
+    )
+
+    triage = {item["code"]: item for item in quality["unknown_triage"]}
+    assert set(triage) == {"missing_diff_evidence", "missing_test_evidence"}
+    assert triage["missing_diff_evidence"]["count"] == 2
+    assert triage["missing_diff_evidence"]["examples"][0] == {
+        "constraint_id": "design-doc-gap",
+        "reason": "no direct diff evidence found",
+        "source": "docs/design.md",
+        "instruction": "Follow the design system spacing rule.",
+        "evidence": "Design tokens define menu spacing.",
+        "confidence": "medium",
+    }
+    assert triage["missing_diff_evidence"]["examples"][1] == {
+        "constraint_id": "task-derived-return-flow",
+        "reason": "constraint not deterministically checkable from changed files",
+        "source": "changed_files",
+        "instruction": "Confirm the closed request returns to the Active list after reopen.",
+        "evidence": "Task-derived requirement from changed files; patch review must find diff evidence before treating it as resolved.",
+        "confidence": "medium",
+    }
+    assert triage["missing_test_evidence"]["examples"][0] == {
+        "constraint_id": "manual-retry-test-gap",
+        "reason": "missing test evidence",
+        "source": "docs/manual-retry.md",
+        "instruction": "Keep the manual retry command covered by tests.",
+        "evidence": "Manual retry should remain available after service failures.",
+        "confidence": "medium",
+    }
+    assert all(item["requires_manual_review"] for item in quality["unknown_triage"])
+    assert "manual_review_required" in {signal["code"] for signal in quality["signals"]}
+
+
+def test_patch_review_bot_bundle_keeps_generic_unknowns_granular_for_consumers(tmp_path: Path):
+    repo = _repo(tmp_path)
+    _git(repo, "init")
+    _git(repo, "config", "user.email", "test@example.com")
+    _git(repo, "config", "user.name", "Test User")
+    _git(repo, "add", ".")
+    _git(repo, "commit", "-m", "base")
+    _write(repo / "lib/presentation/menu_view.dart", "void buildMenu() {\n  renderDesignSystemSpacing();\n  runManualRetryCommand();\n}\n")
+    out = tmp_path / "review-generic-unknowns"
+
+    class FakeDocsService:
+        def get_patch_constraints(self, *args: Any, **kwargs: Any) -> PatchConstraintPacket:
+            return PatchConstraintPacket(
+                task="Review generic design docs and manual retry coverage",
+                constraints=[
+                    PatchConstraint(
+                        id="design-doc-gap",
+                        type="source_of_truth",
+                        instruction="Follow the design system spacing rule.",
+                        source="docs/design.md",
+                        severity="warning",
+                        confidence="medium",
+                        evidence="Design tokens define menu spacing.",
+                    ),
+                    PatchConstraint(
+                        id="manual-retry-test-gap",
+                        type="behavior",
+                        instruction="Keep the manual retry command covered by tests.",
+                        source="docs/manual-retry.md",
+                        severity="warning",
+                        confidence="medium",
+                        evidence="Manual retry should remain available after service failures.",
+                    ),
+                ],
+                confidence="medium",
+            )
+
+        def validate_patch_against_constraints(self, *args: Any, **kwargs: Any) -> PatchConstraintValidationPacket:
+            return PatchConstraintValidationPacket(
+                task="Review generic design docs and manual retry coverage",
+                project_path=str(repo),
+                total_constraints=2,
+                unknown=2,
+                results=[
+                    PatchConstraintValidationResult(
+                        constraint_id="design-doc-gap",
+                        status="unknown",
+                        reason="no direct diff evidence found",
+                        files=[],
+                    ),
+                    PatchConstraintValidationResult(
+                        constraint_id="manual-retry-test-gap",
+                        status="unknown",
+                        reason="missing test evidence",
+                        files=[],
+                    ),
+                ],
+                confidence="low",
+            )
+
+    PatchReviewService(cast(Any, FakeDocsService())).run(
+        project_path=str(repo),
+        task="Review generic design docs and manual retry coverage",
+        output_dir=str(out),
+    )
+
+    quality = json.loads((out / "review_summary_quality.json").read_text(encoding="utf-8"))
+    triage = {item["code"]: item for item in quality["unknown_triage"]}
+    assert set(triage) == {"missing_diff_evidence", "missing_test_evidence"}
+    assert triage["missing_diff_evidence"]["examples"][0] == {
+        "constraint_id": "design-doc-gap",
+        "reason": "no direct diff evidence found",
+        "source": "docs/design.md",
+        "instruction": "Follow the design system spacing rule.",
+        "evidence": "Design tokens define menu spacing.",
+        "confidence": "medium",
+    }
+    assert triage["missing_test_evidence"]["examples"][0] == {
+        "constraint_id": "manual-retry-test-gap",
+        "reason": "missing test evidence",
+        "source": "docs/manual-retry.md",
+        "instruction": "Keep the manual retry command covered by tests.",
+        "evidence": "Manual retry should remain available after service failures.",
+        "confidence": "medium",
+    }
+    assert "manual_review_required" in {signal["code"] for signal in quality["signals"]}
+
+    consumer_decision = _fake_pr_bot_consume_manifest(out / "review_summary_manifest.json")
+    assert consumer_decision["requires_manual_review"] is True
+    assert "manual_review_required" in consumer_decision["reason_codes"]
+    assert consumer_decision["unknown_triage_codes"] == ["missing_diff_evidence", "missing_test_evidence"]
+    assert consumer_decision["unknown_triage_counts"] == {
+        "missing_diff_evidence": 1,
+        "missing_test_evidence": 1,
+    }
+    assert "manual_review_required" not in consumer_decision["unknown_triage_codes"]
+    assert consumer_decision["unknown_count"] == 2
+    assert consumer_decision["violation_count"] == 0
+
+
+def test_patch_review_bot_bundle_routes_open_design_unknowns_to_manual_review(tmp_path: Path):
+    repo = _repo(tmp_path)
+    _git(repo, "init")
+    _git(repo, "config", "user.email", "test@example.com")
+    _git(repo, "config", "user.name", "Test User")
+    _git(repo, "add", ".")
+    _git(repo, "commit", "-m", "base")
+    _write(repo / "lib/presentation/menu_view.dart", "void buildMenu() {\n  showMenuButton();\n}\n")
+    out = tmp_path / "review-open-design-unknown"
+
+    class FakeDocsService:
+        def get_patch_constraints(self, *args: Any, **kwargs: Any) -> PatchConstraintPacket:
+            return PatchConstraintPacket(
+                task="Review TSDB menu redesign",
+                constraints=[
+                    PatchConstraint(
+                        id="open-designer-input",
+                        type="architecture",
+                        instruction="Получить инфо от дизайнера по новому виду кнопки вызова меню.",
+                        source="docs/menu.md",
+                        severity="warning",
+                        confidence="medium",
+                        evidence="Открытый вопрос по макету остается нерешенным.",
+                    )
+                ],
+                confidence="medium",
+            )
+
+        def validate_patch_against_constraints(self, *args: Any, **kwargs: Any) -> PatchConstraintValidationPacket:
+            return PatchConstraintValidationPacket(
+                task="Review TSDB menu redesign",
+                project_path=str(repo),
+                total_constraints=1,
+                unknown=1,
+                results=[
+                    PatchConstraintValidationResult(
+                        constraint_id="open-designer-input",
+                        status="unknown",
+                        reason="No decisive changed-file or diff evidence was found for this constraint.",
+                        files=[],
+                    )
+                ],
+                confidence="low",
+            )
+
+    PatchReviewService(cast(Any, FakeDocsService())).run(
+        project_path=str(repo),
+        task="Review TSDB menu redesign",
+        output_dir=str(out),
+    )
+
+    quality = json.loads((out / "review_summary_quality.json").read_text(encoding="utf-8"))
+    triage = {item["code"]: item for item in quality["unknown_triage"]}
+    assert set(triage) == {"manual_review_required"}
+    assert triage["manual_review_required"]["count"] == 1
+    assert triage["manual_review_required"]["requires_manual_review"] is True
+
+    consumer_decision = _fake_pr_bot_consume_manifest(out / "review_summary_manifest.json")
+    assert consumer_decision["requires_manual_review"] is True
+    assert "manual_review_required" in consumer_decision["reason_codes"]
+    assert consumer_decision["unknown_triage_codes"] == ["manual_review_required"]
+    assert consumer_decision["unknown_triage_counts"] == {"manual_review_required": 1}
+    assert consumer_decision["unknown_triage_examples_by_code"] == {
+        "manual_review_required": [
+            {
+                "constraint_id": "open-designer-input",
+                "reason": "No decisive changed-file or diff evidence was found for this constraint.",
+                "source": "docs/menu.md",
+                "instruction": "Получить инфо от дизайнера по новому виду кнопки вызова меню.",
+                "evidence": "Открытый вопрос по макету остается нерешенным.",
+                "confidence": "medium",
+            }
+        ]
+    }
+
+
 def test_patch_review_writes_machine_readable_action_items(tmp_path: Path):
     repo = tmp_path / "repo"
     repo.mkdir()
@@ -751,6 +1610,7 @@ def test_patch_review_machine_readable_artifact_contracts(tmp_path: Path):
     trace = payload["review_summary_trace"]
     bot_bundle = payload["review_summary_bot_bundle"]
     manifest = payload["review_summary_manifest"]
+    manifest_artifacts = {item["filename"]: item for item in manifest["artifacts"]}
 
     assert {
         "schema_version",
@@ -767,14 +1627,25 @@ def test_patch_review_machine_readable_artifact_contracts(tmp_path: Path):
         "unknown_count",
         "reasons",
         "signals",
+        "unknown_triage",
         "unknown_buckets",
         "claims_avoided",
     } <= set(quality)
     assert quality["schema_version"] == PATCH_REVIEW_SCHEMA_VERSIONS["review_summary_quality.json"]
+    assert quality["schema_version"] == 2
     assert quality["attachable"] in {"yes", "maybe", "no"}
     for signal in quality["signals"]:
         assert {"code", "severity", "count", "message"} <= set(signal)
         assert signal["severity"] in {"info", "warning", "error"}
+    for unknown_triage in quality["unknown_triage"]:
+        assert {"code", "count", "requires_manual_review", "message", "examples"} <= set(unknown_triage)
+        assert unknown_triage["code"] in {
+            "missing_diff_evidence",
+            "missing_test_evidence",
+            "manual_review_required",
+            "low_risk_unknown",
+        }
+        assert unknown_triage["requires_manual_review"] is True
 
     assert {
         "schema_version",
@@ -818,6 +1689,7 @@ def test_patch_review_machine_readable_artifact_contracts(tmp_path: Path):
         "summary_mode",
         "title",
         "attachable",
+        "body",
         "body_markdown",
         "source_artifacts",
         "signals",
@@ -826,6 +1698,8 @@ def test_patch_review_machine_readable_artifact_contracts(tmp_path: Path):
         "claims_avoided",
     } <= set(pr_comment)
     assert pr_comment["schema_version"] == PATCH_REVIEW_SCHEMA_VERSIONS["review_summary_pr_comment.json"]
+    assert pr_comment["schema_version"] == 2
+    assert pr_comment["body"] == pr_comment["body_markdown"]
     assert "DocAtlas patch review" in pr_comment["body_markdown"]
     assert "Non-blocking review context only" in pr_comment["body_markdown"]
     assert "review_summary_quality.json" in pr_comment["source_artifacts"]
@@ -862,14 +1736,952 @@ def test_patch_review_machine_readable_artifact_contracts(tmp_path: Path):
         "actions",
         "pr_comment",
         "trace",
+        "advisory_decision",
         "claims_avoided",
     } <= set(bot_bundle)
     assert bot_bundle["schema_version"] == PATCH_REVIEW_SCHEMA_VERSIONS["review_summary_bot_bundle.json"]
+    assert bot_bundle["schema_version"] == 3
+    assert manifest_artifacts["review_summary_quality.json"]["schema_version"] == quality["schema_version"]
+    assert manifest_artifacts["review_summary_bot_bundle.json"]["schema_version"] == bot_bundle["schema_version"]
     assert bot_bundle["quality"] == quality
     assert bot_bundle["actions"] == actions
     assert bot_bundle["pr_comment"] == pr_comment
     assert bot_bundle["trace"] == trace
+    assert {
+        "should_attach_comment",
+        "show_warning_badge",
+        "highlight_violations",
+        "requires_manual_review",
+        "reason_codes",
+        "unknown_triage_codes",
+        "unknown_triage_counts",
+        "semantics",
+        "claims_avoided",
+    } <= set(bot_bundle["advisory_decision"])
+    assert bot_bundle["advisory_decision"]["semantics"] == "advisory_non_blocking_only"
+    assert "safe_to_merge" not in bot_bundle["advisory_decision"]
+    if bot_bundle["advisory_decision"]["should_attach_comment"]:
+        assert bot_bundle["pr_comment"]["body"].strip()
 
+
+def test_patch_review_advisory_decision_is_non_blocking_and_escalates_violations_and_unknowns():
+    base_quality = {
+        "signals": [],
+        "violated_count": 0,
+        "unknown_count": 0,
+        "actionable_items_total_count": 1,
+    }
+    base_actions = {"actionable_items": [{"constraint_id": "action"}], "violations": []}
+
+    clean_action = PatchReviewService._review_summary_advisory_decision_payload(base_quality, base_actions)
+    assert clean_action["should_attach_comment"] is True
+    assert clean_action["show_warning_badge"] is False
+    assert clean_action["highlight_violations"] is False
+    assert clean_action["requires_manual_review"] is False
+    assert clean_action["reason_codes"] == ["actionable_items_present"]
+    assert clean_action["unknown_triage_codes"] == []
+    assert clean_action["unknown_triage_counts"] == {}
+
+    violation = PatchReviewService._review_summary_advisory_decision_payload(
+        {**base_quality, "violated_count": 1, "actionable_items_total_count": 0},
+        {"actionable_items": [], "violations": [{"constraint_id": "policy"}]},
+    )
+    assert violation["should_attach_comment"] is True
+    assert violation["show_warning_badge"] is True
+    assert violation["highlight_violations"] is True
+    assert violation["requires_manual_review"] is True
+    assert violation["reason_codes"] == ["violations_present"]
+
+    unknown = PatchReviewService._review_summary_advisory_decision_payload(
+        {
+            **base_quality,
+            "unknown_count": 2,
+            "actionable_items_total_count": 0,
+            "unknown_triage": [
+                {"code": "missing_test_evidence", "count": 1, "requires_manual_review": True},
+                {"code": "low_risk_unknown", "count": 1, "requires_manual_review": True},
+            ],
+        },
+        {"actionable_items": [], "violations": []},
+    )
+    assert unknown["should_attach_comment"] is True
+    assert unknown["show_warning_badge"] is True
+    assert unknown["highlight_violations"] is False
+    assert unknown["requires_manual_review"] is True
+    assert unknown["reason_codes"] == ["manual_review_required"]
+    assert unknown["unknown_triage_codes"] == ["missing_test_evidence", "low_risk_unknown"]
+    assert unknown["unknown_triage_counts"] == {"missing_test_evidence": 1, "low_risk_unknown": 1}
+
+    violation_and_unknown = PatchReviewService._review_summary_advisory_decision_payload(
+        {**base_quality, "violated_count": 1, "unknown_count": 1, "actionable_items_total_count": 0},
+        {"actionable_items": [], "violations": [{"constraint_id": "policy"}]},
+    )
+    assert violation_and_unknown["highlight_violations"] is True
+    assert violation_and_unknown["requires_manual_review"] is True
+    assert violation_and_unknown["reason_codes"] == ["violations_present", "manual_review_required"]
+    assert violation_and_unknown["unknown_triage_codes"] == []
+    assert violation_and_unknown["unknown_triage_counts"] == {}
+    assert violation_and_unknown["semantics"] == "advisory_non_blocking_only"
+    assert violation_and_unknown["claims_avoided"] == [
+        "safe_to_merge",
+        "correctness_proof",
+        "test_or_human_review_replacement",
+    ]
+    assert "safe_to_merge" not in violation_and_unknown
+
+
+def test_patch_review_advisory_decision_exposes_unknown_triage_counts_for_bot_badges():
+    decision = PatchReviewService._review_summary_advisory_decision_payload(
+        {
+            "signals": [],
+            "violated_count": 0,
+            "unknown_count": 3,
+            "actionable_items_total_count": 0,
+            "unknown_triage": [
+                {"code": "manual_review_required", "count": 2, "requires_manual_review": True},
+                {"code": "missing_test_evidence", "count": 1, "requires_manual_review": True},
+            ],
+        },
+        {"actionable_items": [], "violations": []},
+    )
+
+    assert decision["should_attach_comment"] is True
+    assert decision["show_warning_badge"] is True
+    assert decision["requires_manual_review"] is True
+    assert decision["reason_codes"] == ["manual_review_required"]
+    assert decision["unknown_triage_codes"] == ["manual_review_required", "missing_test_evidence"]
+    assert decision["unknown_triage_counts"] == {
+        "manual_review_required": 2,
+        "missing_test_evidence": 1,
+    }
+    assert decision["semantics"] == "advisory_non_blocking_only"
+    assert "safe_to_merge" not in decision
+
+
+def test_fake_pr_bot_consumer_reconstructs_missing_triage_counts_for_v3_bundle(tmp_path: Path):
+    out = tmp_path / "review-v3-additive-field-fallback"
+    out.mkdir()
+    manifest = {
+        "schema_version": PATCH_REVIEW_SCHEMA_VERSIONS["review_summary_manifest.json"],
+        "summary_mode": "standard",
+        "product_role": "non_blocking_pr_review_assistant",
+        "claims_avoided": [
+            "correctness_proof",
+            "test_or_human_review_replacement",
+            "broad_docatlas_superiority",
+        ],
+        "artifacts": [
+            {
+                "filename": "review_summary_bot_bundle.json",
+                "kind": "bot_bundle",
+                "schema_version": PATCH_REVIEW_SCHEMA_VERSIONS["review_summary_bot_bundle.json"],
+                "intended_consumers": ["pr_bot", "automation"],
+                "safe_usage": "Use as a single-file bot integration entrypoint with advisory non-blocking decisions.",
+            }
+        ],
+    }
+    bundle = {
+        "schema_version": PATCH_REVIEW_SCHEMA_VERSIONS["review_summary_bot_bundle.json"],
+        "summary_mode": "standard",
+        "manifest": manifest,
+        "quality": {
+            "unknown_count": 2,
+            "unknown_triage": [
+                {"code": "missing_diff_evidence", "count": 1, "requires_manual_review": True, "examples": []},
+                {"code": "missing_test_evidence", "count": 1, "requires_manual_review": True, "examples": []},
+            ],
+        },
+        "actions": {"violations": []},
+        "pr_comment": _fake_pr_bot_pr_comment_payload(),
+        "trace": _fake_pr_bot_trace_payload(),
+        "advisory_decision": {
+            "should_attach_comment": True,
+            "show_warning_badge": True,
+            "highlight_violations": False,
+            "requires_manual_review": True,
+            "reason_codes": ["manual_review_required"],
+            "unknown_triage_codes": ["missing_diff_evidence", "missing_test_evidence"],
+            "semantics": "advisory_non_blocking_only",
+            "claims_avoided": [
+                "safe_to_merge",
+                "correctness_proof",
+                "test_or_human_review_replacement",
+            ],
+        },
+        "claims_avoided": [
+            "correctness_proof",
+            "test_or_human_review_replacement",
+            "broad_docatlas_superiority",
+        ],
+    }
+    _write(out / "review_summary_manifest.json", json.dumps(manifest))
+    _write(out / "review_summary_bot_bundle.json", json.dumps(bundle))
+
+    consumer_decision = _fake_pr_bot_discover_output_dir(out)
+
+    assert consumer_decision["status"] == "completed_patch_review_run"
+    assert consumer_decision["requires_manual_review"] is True
+    assert consumer_decision["reason_codes"] == ["manual_review_required"]
+    assert consumer_decision["unknown_triage_codes"] == ["missing_diff_evidence", "missing_test_evidence"]
+    assert consumer_decision["unknown_triage_counts"] == {
+        "missing_diff_evidence": 1,
+        "missing_test_evidence": 1,
+    }
+    assert "safe_to_merge" not in consumer_decision
+
+
+def test_fake_pr_bot_consumer_treats_hidden_unknown_manual_review_signal_as_invalid_bundle_contract(
+    tmp_path: Path,
+    monkeypatch,
+):
+    out = tmp_path / "review-v3-missing-triage-details"
+    out.mkdir()
+    manifest = {
+        "schema_version": PATCH_REVIEW_SCHEMA_VERSIONS["review_summary_manifest.json"],
+        "summary_mode": "standard",
+        "product_role": "non_blocking_pr_review_assistant",
+        "claims_avoided": [
+            "correctness_proof",
+            "test_or_human_review_replacement",
+            "broad_docatlas_superiority",
+        ],
+        "artifacts": [
+            {
+                "filename": "review_summary_bot_bundle.json",
+                "kind": "bot_bundle",
+                "schema_version": PATCH_REVIEW_SCHEMA_VERSIONS["review_summary_bot_bundle.json"],
+                "intended_consumers": ["pr_bot", "automation"],
+                "safe_usage": "Use as a single-file bot integration entrypoint with advisory non-blocking decisions.",
+            }
+        ],
+    }
+    bundle = {
+        "schema_version": PATCH_REVIEW_SCHEMA_VERSIONS["review_summary_bot_bundle.json"],
+        "summary_mode": "standard",
+        "manifest": manifest,
+        "quality": {
+            "unknown_count": 1,
+            "unknown_triage": [],
+        },
+        "actions": {"violations": []},
+        "pr_comment": _fake_pr_bot_pr_comment_payload(),
+        "trace": _fake_pr_bot_trace_payload(),
+        "advisory_decision": {
+            "should_attach_comment": False,
+            "show_warning_badge": False,
+            "highlight_violations": False,
+            "requires_manual_review": False,
+            "reason_codes": [],
+            "unknown_triage_codes": [],
+            "semantics": "advisory_non_blocking_only",
+            "claims_avoided": [
+                "safe_to_merge",
+                "correctness_proof",
+                "test_or_human_review_replacement",
+            ],
+        },
+        "claims_avoided": [
+            "correctness_proof",
+            "test_or_human_review_replacement",
+            "broad_docatlas_superiority",
+        ],
+    }
+    _write(out / "review_summary_manifest.json", json.dumps(manifest))
+    _write(out / "review_summary_bot_bundle.json", json.dumps(bundle))
+    _write(out / "review_summary.md", "stale human summary that must not be parsed for automation")
+    original_read_text = Path.read_text
+
+    def fail_if_markdown_is_read(path: Path, *args: Any, **kwargs: Any) -> str:
+        if path.name == "review_summary.md":
+            raise AssertionError("fake PR bot must not parse markdown when unknown signals are hidden")
+        return original_read_text(path, *args, **kwargs)
+
+    monkeypatch.setattr(Path, "read_text", fail_if_markdown_is_read)
+
+    consumer_decision = _fake_pr_bot_discover_output_dir(out)
+
+    _assert_fake_pr_bot_manual_fallback(consumer_decision, "invalid_bot_bundle_contract")
+    assert "review_summary_bot_bundle.json" in consumer_decision["ignored_sibling_artifacts"]
+    assert "review_summary.md" in consumer_decision["ignored_sibling_artifacts"]
+
+
+def test_fake_pr_bot_consumer_discovers_bundle_via_manifest_without_markdown_parsing(tmp_path: Path):
+    repo = _repo(tmp_path)
+    _git(repo, "init")
+    _git(repo, "config", "user.email", "test@example.com")
+    _git(repo, "config", "user.name", "Test User")
+    _git(repo, "add", ".")
+    _git(repo, "commit", "-m", "base")
+    _write(repo / "lib/generated/menu_state.g.dart", "// manual generated edit\n")
+    out = tmp_path / "review-fake-consumer"
+
+    result = CliRunner().invoke(
+        cli,
+        [
+            "patch-review",
+            "--project-path",
+            str(repo),
+            "--task",
+            "Review generated artifact edit",
+            "--output-dir",
+            str(out),
+            "--format",
+            "json",
+        ],
+    )
+
+    assert result.exit_code == 0, result.output
+    consumer_decision = _fake_pr_bot_consume_manifest(out / "review_summary_manifest.json")
+    assert consumer_decision["attach_comment"] is True
+    assert consumer_decision["show_warning_badge"] is True
+    assert consumer_decision["highlight_violations"] is True
+    assert consumer_decision["requires_manual_review"] is True
+    assert "violations_present" in consumer_decision["reason_codes"]
+    assert consumer_decision["violation_count"] > 0
+    assert consumer_decision["violation_count"] + consumer_decision["unknown_count"] > 0
+
+
+def test_patch_review_manifest_is_final_discovery_marker_when_bot_bundle_write_fails(tmp_path: Path, monkeypatch):
+    repo = _repo(tmp_path)
+    _git(repo, "init")
+    _git(repo, "config", "user.email", "test@example.com")
+    _git(repo, "config", "user.name", "Test User")
+    _git(repo, "add", ".")
+    _git(repo, "commit", "-m", "base")
+    _write(repo / "lib/generated/menu_state.g.dart", "// manual generated edit\n")
+    out = tmp_path / "review-partial-write"
+    original_write_json = PatchReviewService._write_json
+
+    def fail_on_bot_bundle(path: Path, payload: Any) -> None:
+        if path.name == "review_summary_bot_bundle.json":
+            raise RuntimeError("simulated bot bundle write failure")
+        original_write_json(path, payload)
+
+    monkeypatch.setattr(PatchReviewService, "_write_json", staticmethod(fail_on_bot_bundle))
+
+    with pytest.raises(RuntimeError, match="simulated bot bundle write failure"):
+        PatchReviewService().run(
+            project_path=str(repo),
+            task="Review generated artifact edit",
+            output_dir=str(out),
+        )
+
+    assert not (out / "review_summary_manifest.json").exists()
+    assert not (out / "review_summary_bot_bundle.json").exists()
+    assert (out / "review_summary_quality.json").exists()
+    assert (out / "review_summary_actions.json").exists()
+
+
+def test_patch_review_reused_output_dir_clears_stale_manifest_before_failed_run(tmp_path: Path, monkeypatch):
+    repo = _repo(tmp_path)
+    _git(repo, "init")
+    _git(repo, "config", "user.email", "test@example.com")
+    _git(repo, "config", "user.name", "Test User")
+    _git(repo, "add", ".")
+    _git(repo, "commit", "-m", "base")
+    _write(repo / "lib/generated/menu_state.g.dart", "// manual generated edit\n")
+    out = tmp_path / "review-reused-output-dir"
+
+    PatchReviewService().run(
+        project_path=str(repo),
+        task="Review generated artifact edit",
+        output_dir=str(out),
+    )
+    manifest_path = out / "review_summary_manifest.json"
+    assert manifest_path.exists()
+    assert _fake_pr_bot_consume_manifest(manifest_path)["show_warning_badge"] is True
+    original_write_json = PatchReviewService._write_json
+
+    def fail_on_bot_bundle(path: Path, payload: Any) -> None:
+        if path.name == "review_summary_bot_bundle.json":
+            raise RuntimeError("simulated bot bundle write failure")
+        original_write_json(path, payload)
+
+    monkeypatch.setattr(PatchReviewService, "_write_json", staticmethod(fail_on_bot_bundle))
+
+    with pytest.raises(RuntimeError, match="simulated bot bundle write failure"):
+        PatchReviewService().run(
+            project_path=str(repo),
+            task="Review generated artifact edit",
+            output_dir=str(out),
+        )
+
+    assert not manifest_path.exists()
+    assert not list(out.glob(".review_summary_manifest.json.*.tmp"))
+    assert (out / "review_summary_quality.json").exists()
+
+
+def test_fake_pr_bot_consumer_treats_missing_manifest_as_no_completed_run(tmp_path: Path, monkeypatch):
+    repo = _repo(tmp_path)
+    _git(repo, "init")
+    _git(repo, "config", "user.email", "test@example.com")
+    _git(repo, "config", "user.name", "Test User")
+    _git(repo, "add", ".")
+    _git(repo, "commit", "-m", "base")
+    _write(repo / "lib/generated/menu_state.g.dart", "// manual generated edit\n")
+    out = tmp_path / "review-missing-manifest-fallback"
+
+    PatchReviewService().run(
+        project_path=str(repo),
+        task="Review generated artifact edit",
+        output_dir=str(out),
+    )
+    completed_decision = _fake_pr_bot_discover_output_dir(out)
+    assert completed_decision["status"] == "completed_patch_review_run"
+    assert completed_decision["highlight_violations"] is True
+    original_write_json = PatchReviewService._write_json
+
+    def fail_on_bot_bundle(path: Path, payload: Any) -> None:
+        if path.name == "review_summary_bot_bundle.json":
+            raise RuntimeError("simulated bot bundle write failure")
+        original_write_json(path, payload)
+
+    monkeypatch.setattr(PatchReviewService, "_write_json", staticmethod(fail_on_bot_bundle))
+
+    with pytest.raises(RuntimeError, match="simulated bot bundle write failure"):
+        PatchReviewService().run(
+            project_path=str(repo),
+            task="Review generated artifact edit",
+            output_dir=str(out),
+        )
+
+    assert not (out / "review_summary_manifest.json").exists()
+    assert (out / "review_summary_bot_bundle.json").exists()
+    assert (out / "review_summary.md").exists()
+    original_read_text = Path.read_text
+
+    def fail_if_direct_artifact_is_read(path: Path, *args: Any, **kwargs: Any) -> str:
+        if path.name in {"review_summary_bot_bundle.json", "review_summary.md"}:
+            raise AssertionError(f"fake PR bot must ignore sibling artifact without manifest: {path.name}")
+        return original_read_text(path, *args, **kwargs)
+
+    monkeypatch.setattr(Path, "read_text", fail_if_direct_artifact_is_read)
+
+    consumer_decision = _fake_pr_bot_discover_output_dir(out)
+    assert consumer_decision["status"] == "no_completed_patch_review_run"
+    assert consumer_decision["attach_comment"] is False
+    assert consumer_decision["show_warning_badge"] is True
+    assert consumer_decision["highlight_violations"] is False
+    assert consumer_decision["requires_manual_review"] is True
+    assert consumer_decision["reason_codes"] == ["missing_manifest_completed_run_marker"]
+    assert consumer_decision["semantics"] == "manual_fallback_not_pass"
+    assert "safe_to_merge" not in consumer_decision
+    assert "review_summary_bot_bundle.json" in consumer_decision["ignored_sibling_artifacts"]
+    assert "review_summary.md" in consumer_decision["ignored_sibling_artifacts"]
+
+
+def test_fake_pr_bot_consumer_treats_invalid_manifest_as_no_completed_run(tmp_path: Path, monkeypatch):
+    out = tmp_path / "review-invalid-manifest-fallback"
+    out.mkdir()
+    _write(out / "review_summary_manifest.json", "{not valid json")
+    _write(out / "review_summary_bot_bundle.json", json.dumps({"safe_to_merge": True}))
+    _write(out / "review_summary.md", "stale human summary")
+    original_read_text = Path.read_text
+
+    def fail_if_sibling_artifact_is_read(path: Path, *args: Any, **kwargs: Any) -> str:
+        if path.name in {"review_summary_bot_bundle.json", "review_summary.md"}:
+            raise AssertionError(f"fake PR bot must ignore sibling artifact with invalid manifest: {path.name}")
+        return original_read_text(path, *args, **kwargs)
+
+    monkeypatch.setattr(Path, "read_text", fail_if_sibling_artifact_is_read)
+
+    consumer_decision = _fake_pr_bot_discover_output_dir(out)
+    assert consumer_decision["status"] == "no_completed_patch_review_run"
+    assert consumer_decision["attach_comment"] is False
+    assert consumer_decision["show_warning_badge"] is True
+    assert consumer_decision["highlight_violations"] is False
+    assert consumer_decision["requires_manual_review"] is True
+    assert consumer_decision["reason_codes"] == ["invalid_manifest_completed_run_marker"]
+    assert consumer_decision["semantics"] == "manual_fallback_not_pass"
+    assert "safe_to_merge" not in consumer_decision
+    assert "review_summary_bot_bundle.json" in consumer_decision["ignored_sibling_artifacts"]
+    assert "review_summary.md" in consumer_decision["ignored_sibling_artifacts"]
+
+
+def test_fake_pr_bot_consumer_treats_unsupported_manifest_schema_as_no_completed_run(tmp_path: Path, monkeypatch):
+    out = tmp_path / "review-unsupported-manifest-fallback"
+    out.mkdir()
+    _write(
+        out / "review_summary_manifest.json",
+        json.dumps(
+            {
+                "schema_version": PATCH_REVIEW_SCHEMA_VERSIONS["review_summary_manifest.json"] + 1,
+                "product_role": "non_blocking_pr_review_assistant",
+                "claims_avoided": ["safe_to_merge"],
+                "artifacts": [
+                    {
+                        "filename": "review_summary_bot_bundle.json",
+                        "kind": "bot_bundle",
+                        "schema_version": PATCH_REVIEW_SCHEMA_VERSIONS["review_summary_bot_bundle.json"],
+                        "intended_consumers": ["pr_bot", "automation"],
+                        "safe_usage": "single-file bot integration entrypoint; advisory non-blocking only",
+                    }
+                ],
+            }
+        ),
+    )
+    _write(out / "review_summary_bot_bundle.json", json.dumps({"safe_to_merge": True}))
+    _write(out / "review_summary.md", "stale human summary")
+    original_read_text = Path.read_text
+
+    def fail_if_sibling_artifact_is_read(path: Path, *args: Any, **kwargs: Any) -> str:
+        if path.name in {"review_summary_bot_bundle.json", "review_summary.md"}:
+            raise AssertionError(f"fake PR bot must ignore sibling artifact with unsupported manifest: {path.name}")
+        return original_read_text(path, *args, **kwargs)
+
+    monkeypatch.setattr(Path, "read_text", fail_if_sibling_artifact_is_read)
+
+    consumer_decision = _fake_pr_bot_discover_output_dir(out)
+    assert consumer_decision["status"] == "no_completed_patch_review_run"
+    assert consumer_decision["attach_comment"] is False
+    assert consumer_decision["show_warning_badge"] is True
+    assert consumer_decision["highlight_violations"] is False
+    assert consumer_decision["requires_manual_review"] is True
+    assert consumer_decision["reason_codes"] == ["unsupported_manifest_schema_version"]
+    assert consumer_decision["semantics"] == "manual_fallback_not_pass"
+    assert "safe_to_merge" not in consumer_decision
+    assert "review_summary_bot_bundle.json" in consumer_decision["ignored_sibling_artifacts"]
+    assert "review_summary.md" in consumer_decision["ignored_sibling_artifacts"]
+
+
+def test_fake_pr_bot_consumer_treats_missing_manifest_referenced_bundle_as_manual_review(tmp_path: Path, monkeypatch):
+    out = tmp_path / "review-missing-bundle-fallback"
+    out.mkdir()
+    _write(
+        out / "review_summary_manifest.json",
+        json.dumps(
+            {
+                "schema_version": PATCH_REVIEW_SCHEMA_VERSIONS["review_summary_manifest.json"],
+                "summary_mode": "standard",
+                "product_role": "non_blocking_pr_review_assistant",
+                "claims_avoided": ["correctness_proof", "test_or_human_review_replacement"],
+                "artifacts": [
+                    {
+                        "filename": "review_summary_bot_bundle.json",
+                        "kind": "bot_bundle",
+                        "schema_version": PATCH_REVIEW_SCHEMA_VERSIONS["review_summary_bot_bundle.json"],
+                        "intended_consumers": ["pr_bot", "automation"],
+                        "safe_usage": "single-file bot integration entrypoint; advisory non-blocking only",
+                    }
+                ],
+            }
+        ),
+    )
+    _write(out / "review_summary.md", "stale human summary that must not be parsed for automation")
+    original_read_text = Path.read_text
+
+    def fail_if_markdown_is_read(path: Path, *args: Any, **kwargs: Any) -> str:
+        if path.name == "review_summary.md":
+            raise AssertionError("fake PR bot must not parse markdown when manifest-referenced bundle is missing")
+        return original_read_text(path, *args, **kwargs)
+
+    monkeypatch.setattr(Path, "read_text", fail_if_markdown_is_read)
+
+    consumer_decision = _fake_pr_bot_discover_output_dir(out)
+
+    assert consumer_decision["status"] == "no_completed_patch_review_run"
+    assert consumer_decision["attach_comment"] is False
+    assert consumer_decision["show_warning_badge"] is True
+    assert consumer_decision["highlight_violations"] is False
+    assert consumer_decision["requires_manual_review"] is True
+    assert consumer_decision["reason_codes"] == ["missing_bot_bundle_artifact"]
+    assert consumer_decision["semantics"] == "manual_fallback_not_pass"
+    assert "safe_to_merge" not in consumer_decision
+    assert "review_summary.md" in consumer_decision["ignored_sibling_artifacts"]
+
+
+def test_fake_pr_bot_consumer_treats_invalid_manifest_referenced_bundle_as_manual_review(tmp_path: Path, monkeypatch):
+    out = tmp_path / "review-invalid-bundle-fallback"
+    out.mkdir()
+    _write(
+        out / "review_summary_manifest.json",
+        json.dumps(
+            {
+                "schema_version": PATCH_REVIEW_SCHEMA_VERSIONS["review_summary_manifest.json"],
+                "summary_mode": "standard",
+                "product_role": "non_blocking_pr_review_assistant",
+                "claims_avoided": ["correctness_proof", "test_or_human_review_replacement"],
+                "artifacts": [
+                    {
+                        "filename": "review_summary_bot_bundle.json",
+                        "kind": "bot_bundle",
+                        "schema_version": PATCH_REVIEW_SCHEMA_VERSIONS["review_summary_bot_bundle.json"],
+                        "intended_consumers": ["pr_bot", "automation"],
+                        "safe_usage": "single-file bot integration entrypoint; advisory non-blocking only",
+                    }
+                ],
+            }
+        ),
+    )
+    _write(out / "review_summary_bot_bundle.json", "{not valid json")
+    _write(out / "review_summary.md", "stale human summary that must not be parsed for automation")
+    original_read_text = Path.read_text
+
+    def fail_if_markdown_is_read(path: Path, *args: Any, **kwargs: Any) -> str:
+        if path.name == "review_summary.md":
+            raise AssertionError("fake PR bot must not parse markdown when manifest-referenced bundle is invalid")
+        return original_read_text(path, *args, **kwargs)
+
+    monkeypatch.setattr(Path, "read_text", fail_if_markdown_is_read)
+
+    consumer_decision = _fake_pr_bot_discover_output_dir(out)
+
+    assert consumer_decision["status"] == "no_completed_patch_review_run"
+    assert consumer_decision["attach_comment"] is False
+    assert consumer_decision["show_warning_badge"] is True
+    assert consumer_decision["highlight_violations"] is False
+    assert consumer_decision["requires_manual_review"] is True
+    assert consumer_decision["reason_codes"] == ["invalid_bot_bundle_artifact"]
+    assert consumer_decision["semantics"] == "manual_fallback_not_pass"
+    assert "safe_to_merge" not in consumer_decision
+    assert "review_summary_bot_bundle.json" in consumer_decision["ignored_sibling_artifacts"]
+    assert "review_summary.md" in consumer_decision["ignored_sibling_artifacts"]
+
+
+@pytest.mark.parametrize(
+    "manifest",
+    [
+        {
+            "schema_version": PATCH_REVIEW_SCHEMA_VERSIONS["review_summary_manifest.json"],
+            "summary_mode": "standard",
+            "product_role": "non_blocking_pr_review_assistant",
+            "claims_avoided": ["correctness_proof", "test_or_human_review_replacement"],
+        },
+        {
+            "schema_version": PATCH_REVIEW_SCHEMA_VERSIONS["review_summary_manifest.json"],
+            "summary_mode": "standard",
+            "product_role": "non_blocking_pr_review_assistant",
+            "claims_avoided": ["correctness_proof", "test_or_human_review_replacement"],
+            "artifacts": {"filename": "review_summary_bot_bundle.json"},
+        },
+        {
+            "schema_version": PATCH_REVIEW_SCHEMA_VERSIONS["review_summary_manifest.json"],
+            "summary_mode": "standard",
+            "product_role": "non_blocking_pr_review_assistant",
+            "claims_avoided": ["correctness_proof", "test_or_human_review_replacement"],
+            "artifacts": [{"kind": "bot_bundle"}],
+        },
+    ],
+)
+def test_fake_pr_bot_consumer_treats_malformed_supported_manifest_contract_as_manual_review(
+    tmp_path: Path,
+    monkeypatch,
+    manifest: dict[str, Any],
+):
+    out = tmp_path / "review-malformed-supported-manifest-fallback"
+    out.mkdir()
+    _write(out / "review_summary_manifest.json", json.dumps(manifest))
+    _write(out / "review_summary_bot_bundle.json", json.dumps({"safe_to_merge": True}))
+    _write(out / "review_summary.md", "stale human summary that must not be parsed for automation")
+    original_read_text = Path.read_text
+
+    def fail_if_sibling_artifact_is_read(path: Path, *args: Any, **kwargs: Any) -> str:
+        if path.name in {"review_summary_bot_bundle.json", "review_summary.md"}:
+            raise AssertionError(f"fake PR bot must ignore sibling artifact with malformed manifest contract: {path.name}")
+        return original_read_text(path, *args, **kwargs)
+
+    monkeypatch.setattr(Path, "read_text", fail_if_sibling_artifact_is_read)
+
+    consumer_decision = _fake_pr_bot_discover_output_dir(out)
+
+    _assert_fake_pr_bot_manual_fallback(consumer_decision, "invalid_manifest_completed_run_marker")
+    assert "review_summary_bot_bundle.json" in consumer_decision["ignored_sibling_artifacts"]
+    assert "review_summary.md" in consumer_decision["ignored_sibling_artifacts"]
+
+
+@pytest.mark.parametrize(
+    "bundle_override",
+    [
+        {"quality": None},
+        {"advisory_decision": None},
+        {"advisory_decision": {"semantics": "advisory_non_blocking_only"}},
+        {"pr_comment": None},
+        {"pr_comment": []},
+        {"trace": None},
+        {"trace": []},
+        {"actions": {}},
+        {"actions": {"violations": {}}},
+        {"quality": {"unknown_count": "1", "unknown_triage": []}},
+        {"quality": {"unknown_count": -1, "unknown_triage": []}},
+        {"quality": {"unknown_count": 0, "unknown_triage": [], "violated_count": "1"}},
+        {"quality": {"unknown_count": 0, "unknown_triage": [], "violated_count": -1}},
+        {"quality": {"unknown_count": 0, "unknown_triage": [{"code": "missing_diff_evidence", "count": "1"}]}},
+        {"quality": {"unknown_count": 0, "unknown_triage": [{"code": "missing_test_evidence", "count": -1}]}},
+        {
+            "quality": {"unknown_count": 1, "unknown_triage": [{"code": "missing_diff_evidence", "count": 1}]},
+            "advisory_decision": {
+                "should_attach_comment": True,
+                "show_warning_badge": True,
+                "highlight_violations": False,
+                "requires_manual_review": True,
+                "reason_codes": ["manual_review_required"],
+                "unknown_triage_codes": ["missing_diff_evidence"],
+                "unknown_triage_counts": {"missing_diff_evidence": True},
+                "semantics": "advisory_non_blocking_only",
+                "claims_avoided": [
+                    "safe_to_merge",
+                    "correctness_proof",
+                    "test_or_human_review_replacement",
+                ],
+            },
+        },
+        {
+            "quality": {"unknown_count": 1, "unknown_triage": [{"code": "missing_diff_evidence", "count": 1}]},
+            "advisory_decision": {
+                "should_attach_comment": True,
+                "show_warning_badge": True,
+                "highlight_violations": False,
+                "requires_manual_review": True,
+                "reason_codes": ["manual_review_required"],
+                "unknown_triage_codes": ["missing_diff_evidence"],
+                "unknown_triage_counts": {"missing_diff_evidence": 1.0},
+                "semantics": "advisory_non_blocking_only",
+                "claims_avoided": [
+                    "safe_to_merge",
+                    "correctness_proof",
+                    "test_or_human_review_replacement",
+                ],
+            },
+        },
+        {
+            "quality": {"unknown_count": 1, "unknown_triage": [{"code": "missing_diff_evidence", "count": 1}]},
+            "advisory_decision": {
+                "should_attach_comment": True,
+                "show_warning_badge": True,
+                "highlight_violations": False,
+                "requires_manual_review": True,
+                "reason_codes": ["manual_review_required"],
+                "unknown_triage_codes": ["missing_diff_evidence"],
+                "unknown_triage_counts": {"missing_diff_evidence": "1"},
+                "semantics": "advisory_non_blocking_only",
+                "claims_avoided": [
+                    "safe_to_merge",
+                    "correctness_proof",
+                    "test_or_human_review_replacement",
+                ],
+            },
+        },
+        {
+            "quality": {"unknown_count": 1, "unknown_triage": [{"code": "missing_diff_evidence", "count": 1}]},
+            "advisory_decision": {
+                "should_attach_comment": True,
+                "show_warning_badge": True,
+                "highlight_violations": False,
+                "requires_manual_review": True,
+                "reason_codes": ["manual_review_required"],
+                "unknown_triage_codes": ["missing_diff_evidence"],
+                "unknown_triage_counts": {"missing_diff_evidence": -1},
+                "semantics": "advisory_non_blocking_only",
+                "claims_avoided": [
+                    "safe_to_merge",
+                    "correctness_proof",
+                    "test_or_human_review_replacement",
+                ],
+            },
+        },
+    ],
+)
+def test_fake_pr_bot_consumer_treats_malformed_referenced_bundle_contract_as_manual_review(
+    tmp_path: Path,
+    monkeypatch,
+    bundle_override: dict[str, Any],
+):
+    out = tmp_path / "review-malformed-bundle-contract-fallback"
+    out.mkdir()
+    manifest = {
+        "schema_version": PATCH_REVIEW_SCHEMA_VERSIONS["review_summary_manifest.json"],
+        "summary_mode": "standard",
+        "product_role": "non_blocking_pr_review_assistant",
+        "claims_avoided": ["correctness_proof", "test_or_human_review_replacement"],
+        "artifacts": [
+            {
+                "filename": "review_summary_bot_bundle.json",
+                "kind": "bot_bundle",
+                "schema_version": PATCH_REVIEW_SCHEMA_VERSIONS["review_summary_bot_bundle.json"],
+                "intended_consumers": ["pr_bot", "automation"],
+                "safe_usage": "single-file bot integration entrypoint; advisory non-blocking only",
+            }
+        ],
+    }
+    bundle = {
+        "schema_version": PATCH_REVIEW_SCHEMA_VERSIONS["review_summary_bot_bundle.json"],
+        "summary_mode": "standard",
+        "manifest": manifest,
+        "quality": {"unknown_count": 0, "unknown_triage": []},
+        "actions": {"violations": []},
+        "pr_comment": _fake_pr_bot_pr_comment_payload(),
+        "trace": _fake_pr_bot_trace_payload(),
+        "advisory_decision": {
+            "should_attach_comment": False,
+            "show_warning_badge": False,
+            "highlight_violations": False,
+            "requires_manual_review": False,
+            "reason_codes": ["no_attachable_review_signal"],
+            "unknown_triage_codes": [],
+            "unknown_triage_counts": {},
+            "semantics": "advisory_non_blocking_only",
+            "claims_avoided": [
+                "safe_to_merge",
+                "correctness_proof",
+                "test_or_human_review_replacement",
+            ],
+        },
+        "claims_avoided": [
+            "correctness_proof",
+            "test_or_human_review_replacement",
+            "broad_docatlas_superiority",
+        ],
+    }
+    for key, value in bundle_override.items():
+        if value is None:
+            bundle.pop(key)
+        else:
+            bundle[key] = value
+    _write(out / "review_summary_manifest.json", json.dumps(manifest))
+    _write(out / "review_summary_bot_bundle.json", json.dumps(bundle))
+    _write(out / "review_summary.md", "stale human summary that must not be parsed for automation")
+    original_read_text = Path.read_text
+
+    def fail_if_markdown_is_read(path: Path, *args: Any, **kwargs: Any) -> str:
+        if path.name == "review_summary.md":
+            raise AssertionError("fake PR bot must not parse markdown when manifest-referenced bundle contract is malformed")
+        return original_read_text(path, *args, **kwargs)
+
+    monkeypatch.setattr(Path, "read_text", fail_if_markdown_is_read)
+
+    consumer_decision = _fake_pr_bot_discover_output_dir(out)
+
+    _assert_fake_pr_bot_manual_fallback(consumer_decision, "invalid_bot_bundle_contract")
+    assert "review_summary_bot_bundle.json" in consumer_decision["ignored_sibling_artifacts"]
+    assert "review_summary.md" in consumer_decision["ignored_sibling_artifacts"]
+
+
+@pytest.mark.parametrize(
+    "bundle_override",
+    [
+        {
+            "quality": {
+                "unknown_count": 0,
+                "unknown_triage": [],
+                "violated_count": 1,
+                "signals": [{"code": "violations_present", "severity": "error", "count": 1}],
+            },
+            "actions": {"violations": []},
+            "advisory_decision": {
+                "should_attach_comment": False,
+                "show_warning_badge": False,
+                "highlight_violations": False,
+                "requires_manual_review": False,
+                "reason_codes": ["no_attachable_review_signal"],
+                "unknown_triage_codes": [],
+                "unknown_triage_counts": {},
+                "semantics": "advisory_non_blocking_only",
+                "claims_avoided": [
+                    "safe_to_merge",
+                    "correctness_proof",
+                    "test_or_human_review_replacement",
+                ],
+            },
+        },
+        {
+            "quality": {
+                "unknown_count": 0,
+                "unknown_triage": [],
+                "violated_count": 1,
+                "signals": [{"code": "violations_present", "severity": "error", "count": 1}],
+            },
+            "actions": {
+                "violations": [
+                    {"constraint_id": "generated-file-policy", "reason": "Generated files must not be edited."}
+                ]
+            },
+            "advisory_decision": {
+                "should_attach_comment": True,
+                "show_warning_badge": False,
+                "highlight_violations": False,
+                "requires_manual_review": False,
+                "reason_codes": [],
+                "unknown_triage_codes": [],
+                "unknown_triage_counts": {},
+                "semantics": "advisory_non_blocking_only",
+                "claims_avoided": [
+                    "safe_to_merge",
+                    "correctness_proof",
+                    "test_or_human_review_replacement",
+                ],
+            },
+        },
+    ],
+)
+def test_fake_pr_bot_consumer_treats_inconsistent_violation_bundle_contract_as_manual_review(
+    tmp_path: Path,
+    monkeypatch,
+    bundle_override: dict[str, Any],
+):
+    out = tmp_path / "review-inconsistent-violation-contract-fallback"
+    out.mkdir()
+    manifest = {
+        "schema_version": PATCH_REVIEW_SCHEMA_VERSIONS["review_summary_manifest.json"],
+        "summary_mode": "standard",
+        "product_role": "non_blocking_pr_review_assistant",
+        "claims_avoided": ["correctness_proof", "test_or_human_review_replacement"],
+        "artifacts": [
+            {
+                "filename": "review_summary_bot_bundle.json",
+                "kind": "bot_bundle",
+                "schema_version": PATCH_REVIEW_SCHEMA_VERSIONS["review_summary_bot_bundle.json"],
+                "intended_consumers": ["pr_bot", "automation"],
+                "safe_usage": "single-file bot integration entrypoint; advisory non-blocking only",
+            }
+        ],
+    }
+    bundle = {
+        "schema_version": PATCH_REVIEW_SCHEMA_VERSIONS["review_summary_bot_bundle.json"],
+        "summary_mode": "standard",
+        "manifest": manifest,
+        "quality": {"unknown_count": 0, "unknown_triage": [], "violated_count": 0, "signals": []},
+        "actions": {"violations": []},
+        "pr_comment": _fake_pr_bot_pr_comment_payload(),
+        "trace": _fake_pr_bot_trace_payload(),
+        "advisory_decision": {
+            "should_attach_comment": False,
+            "show_warning_badge": False,
+            "highlight_violations": False,
+            "requires_manual_review": False,
+            "reason_codes": ["no_attachable_review_signal"],
+            "unknown_triage_codes": [],
+            "unknown_triage_counts": {},
+            "semantics": "advisory_non_blocking_only",
+            "claims_avoided": [
+                "safe_to_merge",
+                "correctness_proof",
+                "test_or_human_review_replacement",
+            ],
+        },
+        "claims_avoided": [
+            "correctness_proof",
+            "test_or_human_review_replacement",
+            "broad_docatlas_superiority",
+        ],
+    }
+    bundle.update(bundle_override)
+    _write(out / "review_summary_manifest.json", json.dumps(manifest))
+    _write(out / "review_summary_bot_bundle.json", json.dumps(bundle))
+    _write(out / "review_summary.md", "stale human summary that must not be parsed for automation")
+    original_read_text = Path.read_text
+
+    def fail_if_markdown_is_read(path: Path, *args: Any, **kwargs: Any) -> str:
+        if path.name == "review_summary.md":
+            raise AssertionError("fake PR bot must not parse markdown when violation signals are inconsistent")
+        return original_read_text(path, *args, **kwargs)
+
+    monkeypatch.setattr(Path, "read_text", fail_if_markdown_is_read)
+
+    consumer_decision = _fake_pr_bot_discover_output_dir(out)
+
+    _assert_fake_pr_bot_manual_fallback(consumer_decision, "invalid_bot_bundle_contract")
+    assert "review_summary_bot_bundle.json" in consumer_decision["ignored_sibling_artifacts"]
+    assert "review_summary.md" in consumer_decision["ignored_sibling_artifacts"]
 
 
 def test_patch_review_summary_uses_generic_task_terms_without_project_hardcoding():
@@ -961,6 +2773,120 @@ def test_patch_review_summary_puts_violations_first_even_when_broad_context():
     assert "broad-violated: policy code changed in UI" in _section(summary, "Violations")
 
 
+def test_patch_review_actions_demote_generic_symbols_below_task_missing_evidence():
+    constraints = {
+        "constraints": [
+            {
+                "id": "generic-title-symbol",
+                "type": "symbol",
+                "instruction": "Review the changed title handler for the task button.",
+                "source": "lib/src/ui/help_request_details_screen/states/help_request_details_success_state.dart",
+                "confidence": "high",
+                "evidence": "Вернуть в работу -> title",
+                "symbols": ["title"],
+                "files": ["lib/src/ui/help_request_details_screen/states/help_request_details_success_state.dart"],
+            },
+            {
+                "id": "generic-package-symbol-pair",
+                "type": "source_of_truth",
+                "instruction": "Task term `HELP` matches existing project symbol `package`; prefer reusing that source-attributed path before adding a new implementation.",
+                "source": "lib/src/domain/services/help_requests_service.dart",
+                "confidence": "high",
+                "evidence": "import 'package:help_chat/src/data/models/help_add_new_comment_request_dto.dart';",
+                "symbols": ["HELP", "package"],
+                "files": ["lib/src/domain/services/help_requests_service.dart"],
+            },
+            {
+                "id": "return-active-service-call",
+                "type": "source_of_truth",
+                "instruction": "Button 'Вернуть в работу' must send the request status 'Активная' to the service.",
+                "source": "docs/help-chat-reopen-task.md",
+                "confidence": "high",
+                "evidence": "При нажатии приложение отправляет на сервис статус заявки 'Активная'.",
+                "symbols": ["returnToActive"],
+                "files": [],
+            },
+            {
+                "id": "success-attachment-panel",
+                "type": "source_of_truth",
+                "instruction": "On successful return, hide buttons and show the attachments/comment/send panel.",
+                "source": "docs/help-chat-reopen-task.md",
+                "confidence": "high",
+                "evidence": "Если успешно: кнопки скрываются; открывается панель с вложениями, вводом текста и кнопкой Отправить.",
+                "symbols": ["attachmentPanel"],
+                "files": [],
+            },
+        ],
+        "symbol_candidates": [
+            {
+                "term": "Вернуть в работу",
+                "matched_symbol": "title",
+                "source": "lib/src/ui/help_request_details_screen/states/help_request_details_success_state.dart",
+                "reason": "task text matched a generic UI title symbol",
+                "evidence": "title: 'Вернуть в работу'",
+            }
+        ],
+        "excluded_source_reasons": [],
+    }
+    validation = {
+        "satisfied": 0,
+        "violated": 0,
+        "unknown": 3,
+        "results": [
+            {
+                "constraint_id": "generic-title-symbol",
+                "status": "unknown",
+                "reason": "generic symbol match needs diff evidence",
+                "files": ["lib/src/ui/help_request_details_screen/states/help_request_details_success_state.dart"],
+            },
+            {
+                "constraint_id": "generic-package-symbol-pair",
+                "status": "satisfied",
+                "reason": "source-of-truth layer file changed",
+                "files": ["lib/src/domain/services/help_requests_service.dart"],
+            },
+            {
+                "constraint_id": "return-active-service-call",
+                "status": "unknown",
+                "reason": "missing diff evidence for required service status transition",
+                "files": [],
+            },
+            {
+                "constraint_id": "success-attachment-panel",
+                "status": "unknown",
+                "reason": "missing diff evidence for success UI transition",
+                "files": [],
+            },
+        ],
+        "warnings": [],
+    }
+    task = "Reopen HELP request: 'Вернуть в работу' must send status Активная, hide buttons, and show the attachment panel."
+
+    actions = PatchReviewService._review_summary_actions_payload(
+        task,
+        ["lib/src/ui/help_request_details_screen/states/help_request_details_success_state.dart"],
+        constraints,
+        validation,
+        summary_max_items=3,
+    )
+    summary = PatchReviewService._review_summary(
+        task,
+        ["lib/src/ui/help_request_details_screen/states/help_request_details_success_state.dart"],
+        constraints,
+        validation,
+        summary_max_items=3,
+    )
+
+    action_ids = [item["constraint_id"] for item in actions["actionable_items"]]
+    assert action_ids == ["return-active-service-call", "success-attachment-panel"]
+    assert "generic-title-symbol" not in action_ids
+    assert "generic-package-symbol-pair" not in action_ids
+    assert actions["actionable_items"][0]["validation_status"] == "unknown"
+    assert "title" not in _section(summary, "Actionable PR checklist")
+    assert "package" not in _section(summary, "Actionable PR checklist")
+    assert "symbol `title`" in _section(summary, "Low-confidence / noisy signals")
+
+
 def test_patch_review_quality_attachable_uses_total_actionable_not_display_cap():
     constraints = {
         "constraints": [
@@ -1010,6 +2936,8 @@ def test_patch_review_pr_comment_lists_violations_separately_from_capped_actions
     comment = PatchReviewService._review_summary_pr_comment_payload(actions, quality, summary_mode="compact")
 
     assert comment["violations"] == actions["violations"]
+    assert comment["body"] == comment["body_markdown"]
+    assert comment["body"].strip()
     assert "Violations:" in comment["body_markdown"]
     assert "policy-violation" in comment["body_markdown"]
     assert "Provider policy moved into UI" in comment["body_markdown"]
