@@ -472,6 +472,31 @@ def test_ingest_project_docs_is_idempotent_with_skip_known(tmp_path, monkeypatch
         assert conn.execute("SELECT COUNT(*) FROM sections").fetchone()[0] == 1
 
 
+def test_sync_project_docs_backfills_known_file_missing_project_doc_metadata(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    (project / "README.md").write_text("# App\n\nBackfillKnownNeedle project docs.", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+    agent = service._agent_instance()
+    agent.ingest(project, include_exact=("README.md",), with_vectors=False)
+
+    before = service.inspect_project_docs(str(project))
+    result = service.sync_project_docs(str(project), with_vectors=False)
+    after = service.inspect_project_docs(str(project))
+
+    assert before.reason_code == "project_docs_found_not_indexed"
+    assert result.status == "success"
+    assert result.current_count == 1
+    assert result.missing_sources == []
+    assert {item["path"] for item in result.indexed_sources} == {"README.md"}
+    assert after.reason_code == "project_docs_ready"
+
+    with agent.store._connect() as conn:
+        row = conn.execute("SELECT metadata_json FROM sources WHERE source = ?", (str(project / "README.md"),)).fetchone()
+    metadata = json.loads(row["metadata_json"] or "{}")
+    assert metadata["project_docs"] is True
+    assert metadata["project_doc_path"] == "README.md"
+
+
 def test_get_project_docs_never_returns_deleted_orphaned_file_content(tmp_path, monkeypatch):
     project = _flutter_project(tmp_path)
     (project / "README.md").write_text("# App\n\nCurrent docs.", encoding="utf-8")

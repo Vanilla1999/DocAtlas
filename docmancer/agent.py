@@ -325,9 +325,12 @@ class DocmancerAgent:
                     document.metadata.update(metadata)
                 if metadata_for_file:
                     document.metadata.update(metadata_for_file(file_path))
-                if skip_known and self.store.has_source_content_hash(
-                    document.source,
-                    str(document.metadata.get("content_hash") or ""),
+                content_hash = str(document.metadata.get("content_hash") or "")
+                existing_metadata = self.store.source_metadata(document.source) if skip_known and content_hash else None
+                if (
+                    existing_metadata is not None
+                    and existing_metadata.get("content_hash") == content_hash
+                    and self._metadata_satisfies_skip_known(existing_metadata, document.metadata)
                 ):
                     skipped.append(
                         {
@@ -356,6 +359,10 @@ class DocmancerAgent:
     def _matches_any(relative_path: Path, patterns: tuple[str, ...]) -> bool:
         value = relative_path.as_posix()
         return any(fnmatch.fnmatch(value, pattern) or relative_path.match(pattern) for pattern in patterns)
+
+    @staticmethod
+    def _metadata_satisfies_skip_known(existing_metadata: dict[str, Any], expected_metadata: dict[str, Any]) -> bool:
+        return all(existing_metadata.get(key) == value for key, value in expected_metadata.items())
 
     def _write_last_ingest_report(self, root: Path, skipped: list[dict[str, str]]) -> None:
         home = Path(os.environ.get("DOCMANCER_HOME") or Path(self.config.index.db_path).expanduser().parent)

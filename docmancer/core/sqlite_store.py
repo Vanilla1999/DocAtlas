@@ -1059,16 +1059,21 @@ class SQLiteStore:
             row = conn.execute("SELECT content FROM sources WHERE source = ?", (source,)).fetchone()
             return str(row["content"]) if row else None
 
-    def has_source_content_hash(self, source: str, content_hash: str) -> bool:
-        if not content_hash:
-            return False
+    def source_metadata(self, source: str) -> dict[str, Any] | None:
         with self._connect() as conn:
             row = conn.execute("SELECT metadata_json FROM sources WHERE source = ?", (source,)).fetchone()
         if not row:
-            return False
+            return None
         try:
-            metadata = json.loads(row["metadata_json"] or "{}")
+            return json.loads(row["metadata_json"] or "{}")
         except json.JSONDecodeError:
+            return None
+
+    def has_source_content_hash(self, source: str, content_hash: str) -> bool:
+        if not content_hash:
+            return False
+        metadata = self.source_metadata(source)
+        if metadata is None:
             return False
         return metadata.get("content_hash") == content_hash
 
