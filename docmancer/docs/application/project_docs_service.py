@@ -257,6 +257,11 @@ class ProjectDocsService:
 
         candidate_by_abs = {(root / item.path).resolve(): item for item in candidates}
         include = tuple(item.path for item in candidates)
+        extensionless_text_names = tuple(
+            Path(item.path).name
+            for item in candidates
+            if not Path(item.path).suffix
+        )
 
         def _verified_state() -> tuple[list[dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]]]:
             candidate_sources = [asdict(item) for item in candidates]
@@ -296,6 +301,7 @@ class ProjectDocsService:
             sections_indexed = agent.ingest(
                 root,
                 include_exact=include,
+                extensionless_text_names=extensionless_text_names,
                 recursive=True,
                 skip_known=skip_known,
                 with_vectors=with_vectors,

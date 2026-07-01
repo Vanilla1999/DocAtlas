@@ -585,6 +585,37 @@ def test_sync_project_docs_ingests_only_exact_discovered_candidates(tmp_path, mo
     assert sources["README.md"]["project_doc_path"] == "README.md"
 
 
+def test_sync_project_docs_converges_on_extensionless_license_candidate(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    (project / "README.md").write_text("# App\n\nRoot project overview.", encoding="utf-8")
+    (project / "ARCHITECTURE.md").write_text("# Architecture\n\nSystem overview.", encoding="utf-8")
+    (project / "CHANGELOG.md").write_text("# Changelog\n\nInitial release.", encoding="utf-8")
+    (project / "LICENSE").write_text("MIT License\n", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+
+    first = service.sync_project_docs(str(project), with_vectors=False)
+    second = service.sync_project_docs(str(project), with_vectors=False)
+    inspect = service.inspect_project_docs(str(project))
+
+    assert first.status == "success"
+    assert first.candidate_count == 4
+    assert first.current_count == 4
+    assert first.missing_sources == []
+    assert second.status == "success"
+    assert second.current_count == 4
+    assert second.new_count == 0
+    assert second.changed_count == 0
+    assert second.missing_sources == []
+    assert second.orphaned_removed == 0
+    assert inspect.reason_code == "project_docs_ready"
+    assert {item["path"] for item in inspect.indexed_sources} == {
+        "ARCHITECTURE.md",
+        "CHANGELOG.md",
+        "LICENSE",
+        "README.md",
+    }
+
+
 def test_sync_project_docs_reindexes_changed_sources_and_removes_stale_index(tmp_path, monkeypatch):
     project = _flutter_project(tmp_path)
     readme = project / "README.md"
