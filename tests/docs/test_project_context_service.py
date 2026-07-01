@@ -117,7 +117,7 @@ new_help_request_screen, ToastUtils, and routes.
     assert "help_request_details_screen" in source_action["suggested_symbols"]
 
 
-def test_story_specific_project_context_with_matched_terms_is_exact():
+def test_story_specific_project_context_with_only_docs_matched_terms_requires_source_search():
     facade = FakeProjectContextFacade()
     facade.project_docs = ProjectDocsResult(
         project_path="/repo",
@@ -140,10 +140,11 @@ def test_story_specific_project_context_with_matched_terms_is_exact():
         mode="project-only",
     )
 
-    assert result.answer_type == "exact"
-    assert result.answer_completeness["status"] == "exact"
-    assert result.answer_completeness["missing_terms"] == []
-    assert not any(action.get("action") == "search_project_sources" for action in result.recommended_next_actions)
+    assert result.answer_type == "partial_navigational"
+    assert result.answer_completeness["status"] == "partial"
+    assert result.answer_completeness["source_search_required"] is True
+    assert result.answer_completeness["missing_terms"] == ["Вернуть в работу", "Активная"]
+    assert result.recommended_next_actions[-1]["action"] == "search_project_sources"
 
 
 def test_project_context_includes_repo_map_lane_for_matching_source_files(tmp_path):
@@ -188,10 +189,65 @@ class HelpRequestDetailsScreen extends StatelessWidget {
     assert [item["path"] for item in repo_map_items] == ["lib/help_request_details_screen.dart"]
     assert repo_map_items[0]["language"] == "dart"
     assert repo_map_items[0]["string_literals"] == ["Вернуть в работу"]
+    source_evidence_items = [item for item in result.context_pack if item["source_class"] == "source_evidence"]
+    assert len(source_evidence_items) == 1
+    assert source_evidence_items[0]["evidence_class"] == "source_snippet"
+    assert source_evidence_items[0]["path"] == "lib/help_request_details_screen.dart"
+    assert source_evidence_items[0]["line_start"] == 5
+    assert source_evidence_items[0]["snippet"] == "final label = 'Вернуть в работу';"
     assert "repo_map" in result.metrics["source_classes"]
+    assert "source_evidence" in result.metrics["source_classes"]
     assert result.diagnostics["repo_map"]["selected_files"] == 1
+    assert result.diagnostics["source_evidence"]["matched_terms"] == ["Вернуть в работу"]
+    assert result.answer_type == "exact"
+    assert result.answer_completeness["missing_terms"] == []
+
+
+def test_project_context_source_evidence_exposes_absent_terms_without_proof(tmp_path):
+    lib = tmp_path / "lib"
+    lib.mkdir()
+    (lib / "help_request_details_screen.dart").write_text(
+        """
+class HelpRequestDetailsScreen {
+  void reopenRequest() {
+    final label = 'Вернуть в работу';
+  }
+}
+""".strip()
+        + "\n",
+        encoding="utf-8",
+    )
+    facade = FakeProjectContextFacade()
+    facade.project_docs = ProjectDocsResult(
+        project_path=str(tmp_path),
+        query='Как реализовать кнопку "Вернуть в работу" и статус "Активная"?',
+        results=[
+            ProjectDocsChunk(
+                title="Architecture",
+                content="Help requests follow UI -> Cubit -> Service -> Repository -> API.",
+                source=str(tmp_path / "ARCHITECTURE.md"),
+                url=None,
+                path="ARCHITECTURE.md",
+                heading_path="Help requests architecture",
+            )
+        ],
+    )
+
+    result = ProjectContextService(facade).get_project_context(
+        str(tmp_path),
+        'Как реализовать кнопку "Вернуть в работу" и статус "Активная"?',
+        mode="project-only",
+    )
+
+    source_evidence_items = [item for item in result.context_pack if item["source_class"] == "source_evidence"]
+    assert [item["evidence_class"] for item in source_evidence_items] == ["source_snippet", "absent_in_source"]
+    assert source_evidence_items[0]["matched_terms"] == ["Вернуть в работу"]
+    assert source_evidence_items[1]["missing_terms"] == ["Активная"]
+    assert source_evidence_items[1]["path"] is None
+    assert "Активная" not in source_evidence_items[1]["content"]
     assert result.answer_type == "partial_navigational"
-    assert result.answer_completeness["missing_terms"] == ["Вернуть в работу"]
+    assert result.answer_completeness["missing_terms"] == ["Активная"]
+    assert result.recommended_next_actions[-1]["query_terms"] == ["Активная"]
 
 
 def test_story_specific_unquoted_error_toast_phrases_are_missing_terms():

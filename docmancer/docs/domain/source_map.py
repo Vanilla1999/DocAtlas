@@ -23,6 +23,8 @@ SOURCE_FILE_LANGUAGES = {
 MAX_SOURCE_FILE_BYTES = 256_000
 _DEFAULT_MAX_FILES = 8
 _DEFAULT_TOKEN_BUDGET = 900
+_DEFAULT_SOURCE_EVIDENCE_MAX_ITEMS = 12
+_DEFAULT_SOURCE_EVIDENCE_TOKEN_BUDGET = 700
 
 _IMPORT_RE = re.compile(r"^\s*import\s+(?:[^'\"]+\s+from\s+)?['\"]([^'\"]+)['\"]|^\s*export\s+(?:[^'\"]+\s+from\s+)?['\"]([^'\"]+)['\"]", re.MULTILINE)
 _GENERIC_SYMBOL_RE = re.compile(
@@ -35,6 +37,9 @@ _STRING_RE = re.compile(r"(['\"])((?:\\.|(?!\1).){2,120})\1")
 _WORD_RE = re.compile(r"[A-Za-zА-Яа-яЁё][A-Za-zА-Яа-яЁё0-9_\-]{2,}")
 _IDENTIFIER_RE = re.compile(r"\b[A-Za-z_][A-Za-z0-9_]{2,}\b")
 _STATUS_TOKEN_RE = re.compile(r"\b(?:active|inactive|closed|open|pending|success|error|failed|done|reopen|status|created|updated|deleted)\b", re.IGNORECASE)
+_SECRET_ASSIGNMENT_RE = re.compile(
+    r"(?i)\b(api[_-]?key|auth[_-]?token|password|passwd|secret|token)(\s*[:=]\s*)(['\"]?)[^'\"\s,;)]+"
+)
 _GENERATED_MARKERS = (
     ".g.dart",
     ".freezed.dart",
@@ -124,12 +129,202 @@ def build_project_repo_map(
     return selected
 
 
+def build_project_source_evidence(
+    project_root: str | Path,
+    *,
+    question: str = "",
+    requirements: list[str] | None = None,
+    max_items: int = _DEFAULT_SOURCE_EVIDENCE_MAX_ITEMS,
+    token_budget: int = _DEFAULT_SOURCE_EVIDENCE_TOKEN_BUDGET,
+) -> list[dict[str, Any]]:
+    """Return concrete source snippets and explicit absent facts for requirement terms.
+
+    Positive evidence always includes a source path and line number. Missing terms are
+    exposed as absent_in_source facts so callers can report uncertainty without treating
+    absence as proof.
+    """
+
+    root = Path(project_root).expanduser().resolve()
+    if max_items <= 0 or token_budget <= 0 or not root.exists() or not root.is_dir():
+        return []
+
+    terms = _source_evidence_terms(question=question, requirements=requirements)
+    if not terms:
+        return []
+
+    term_keys = {term: _normalize(term) for term in terms}
+    matches: list[dict[str, Any]] = []
+    match_counts: dict[str, int] = {}
+    for path in _iter_source_files(root):
+        try:
+            text = path.read_text(encoding="utf-8", errors="replace")
+        except OSError:
+            continue
+        relative = path.relative_to(root).as_posix()
+        language = SOURCE_FILE_LANGUAGES[path.suffix.lower()]
+        for line_number, line in enumerate(text.splitlines(), start=1):
+            normalized_line = _normalize(line)
+            if not normalized_line:
+                continue
+            for term in terms:
+                if match_counts.get(term, 0) >= 2:
+                    continue
+                normalized_term = term_keys.get(term) or ""
+                if not normalized_term or normalized_term not in normalized_line:
+                    continue
+                matches.append(_source_snippet_evidence_item(
+                    path=relative,
+                    language=language,
+                    line_number=line_number,
+                    line=line,
+                    term=term,
+                ))
+                match_counts[term] = match_counts.get(term, 0) + 1
+
+    selected: list[dict[str, Any]] = []
+    spent = 0
+    term_order = {term: index for index, term in enumerate(terms)}
+    for item in sorted(
+        matches,
+        key=lambda value: (
+            term_order.get((value.get("matched_terms") or [""])[0], 999),
+            value.get("path") or "",
+            int(value.get("line_start") or 0),
+        ),
+    ):
+        if len(selected) >= max_items:
+            break
+        estimate = int(item.get("token_estimate") or 1)
+        if selected and spent + estimate > token_budget:
+            continue
+        selected.append(item)
+        spent += estimate
+
+    for term in terms:
+        if match_counts.get(term):
+            continue
+        if len(selected) >= max_items:
+            break
+        item = _absent_source_evidence_item(term)
+        estimate = int(item.get("token_estimate") or 1)
+        if selected and spent + estimate > token_budget:
+            continue
+        selected.append(item)
+        spent += estimate
+
+    return selected
+
+
 def source_map_diagnostics(items: list[dict[str, Any]]) -> dict[str, Any]:
     return {
         "selected_files": len(items),
         "token_estimate": sum(int(item.get("token_estimate") or 0) for item in items),
         "paths": [item.get("path") for item in items],
     }
+
+
+def source_evidence_diagnostics(items: list[dict[str, Any]]) -> dict[str, Any]:
+    matched_terms: list[str] = []
+    absent_terms: list[str] = []
+    paths: list[str] = []
+    for item in items:
+        if item.get("evidence_class") == "source_snippet":
+            for term in item.get("matched_terms") or []:
+                _append_unique(matched_terms, str(term))
+            path = item.get("path")
+            if path:
+                _append_unique(paths, str(path))
+        elif item.get("evidence_class") == "absent_in_source":
+            for term in item.get("missing_terms") or []:
+                _append_unique(absent_terms, str(term))
+    return {
+        "selected_items": len(items),
+        "matched_terms": matched_terms,
+        "absent_terms": absent_terms,
+        "paths": paths,
+    }
+
+
+def _source_evidence_terms(*, question: str, requirements: list[str] | None) -> list[str]:
+    raw_terms = requirements if requirements is not None else _query_terms(question)
+    return _dedupe_normalized_terms(str(term) for term in raw_terms if str(term or "").strip())[:16]
+
+
+def _source_snippet_evidence_item(
+    *,
+    path: str,
+    language: str,
+    line_number: int,
+    line: str,
+    term: str,
+) -> dict[str, Any]:
+    snippet = _sanitize_source_line(line.strip())
+    content = f"{path}:{line_number}: {snippet}"
+    title = f"Source evidence: {path}:{line_number}"
+    return {
+        "source_class": "source_evidence",
+        "evidence_class": "source_snippet",
+        "matched": True,
+        "matched_terms": [term],
+        "missing_terms": [],
+        "path": path,
+        "title": title,
+        "language": language,
+        "freshness": "current",
+        "line_start": line_number,
+        "line_end": line_number,
+        "snippet": snippet,
+        "why_selected": "requirement term matched a concrete project source line",
+        "content": content,
+        "token_estimate": max(1, len(content) // 4),
+        "source": {
+            "source_class": "source_evidence",
+            "evidence_class": "source_snippet",
+            "path": path,
+            "line_start": line_number,
+            "line_end": line_number,
+            "title": title,
+        },
+        "section": {"title": title, "heading_path": "source_evidence", "freshness": "current"},
+    }
+
+
+def _absent_source_evidence_item(term: str) -> dict[str, Any]:
+    content = "absent_in_source: no concrete project source snippet matched this requirement term"
+    return {
+        "source_class": "source_evidence",
+        "evidence_class": "absent_in_source",
+        "matched": False,
+        "matched_terms": [],
+        "missing_terms": [term],
+        "path": None,
+        "title": "Source evidence absent",
+        "freshness": "current",
+        "line_start": None,
+        "line_end": None,
+        "why_selected": "requirement term was searched in project source; absence is a search result, not proof of nonexistence",
+        "content": content,
+        "token_estimate": max(1, len(content) // 4),
+        "source": {"source_class": "source_evidence", "evidence_class": "absent_in_source"},
+        "section": {"title": "Source evidence absent", "heading_path": "source_evidence", "freshness": "current"},
+    }
+
+
+def _sanitize_source_line(line: str) -> str:
+    return _SECRET_ASSIGNMENT_RE.sub(lambda match: f"{match.group(1)}{match.group(2)}{match.group(3)}[REDACTED]", line)
+
+
+def _dedupe_normalized_terms(terms: Any) -> list[str]:
+    deduped: list[str] = []
+    seen: set[str] = set()
+    for term in terms:
+        value = str(term or "").strip()
+        key = _normalize(value)
+        if not key or key in seen:
+            continue
+        seen.add(key)
+        deduped.append(value)
+    return deduped
 
 
 def _iter_source_files(root: Path) -> list[Path]:
