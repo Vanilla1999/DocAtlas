@@ -32,8 +32,12 @@ _NOISE_PATTERNS = [
     r"no cover",
 ]
 _CODE_SYMBOL_RE = re.compile(
-    r"(?:\b\w+\.py\b|\b(?:class|def|async\s+def)\s+[A-Za-z_]\w+|"
-    r"`[^`]*(?:\.py|class\s+|def\s+)[^`]*`)",
+    r"(?:"
+    r"\b[\w./-]+\.(?:py|dart|ts|tsx|js|jsx|go|rs|java|kt|swift|rb|php|cs|c|cc|cpp|h|hpp)\b|"
+    r"\b(?:class|def|async\s+def)\s+[A-Za-z_]\w+|"
+    r"\b[A-Z][A-Za-z0-9_]*(?:\.[A-Za-z_]\w+)?\([^\n)]*\)|"
+    r"`[^`]*(?:\.(?:py|dart|ts|tsx|js|jsx|go|rs|java|kt|swift|rb|php|cs|c|cc|cpp|h|hpp)\b|class\s+|def\s+|[A-Z][A-Za-z0-9_]*(?:\.[A-Za-z_]\w+)?)[^`]*`"
+    r")",
     re.IGNORECASE,
 )
 

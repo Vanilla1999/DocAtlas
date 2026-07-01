@@ -932,6 +932,45 @@ def test_get_project_context_diagnostics_preserve_query_intent_and_active_index(
     assert compact["diagnostics"]["active_index"]["db_path"] == str((tmp_path / "docmancer.db").resolve())
 
 
+def test_get_project_context_answers_dart_symbol_docs_with_snippet_evidence(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    (project / "README.md").write_text("# App\n\nProject overview.", encoding="utf-8")
+    (project / "ARCHITECTURE.md").write_text(
+        """
+# Architecture
+
+## Integration
+
+File: `lib/src/help_request_module.dart`.
+
+```text
+Host Flutter App
+  -> HelpRequestModule.init(config, mode)
+  -> HelpRequestNavigator / exported screens
+```
+
+Main class: `HelpRequestModule`.
+""".strip(),
+        encoding="utf-8",
+    )
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+    service.sync_project_docs(str(project), with_vectors=False)
+
+    result = service.get_project_context(
+        str(project),
+        "HelpRequestModule init",
+        tokens=1200,
+        limit=5,
+        response_style="snippet-first",
+    )
+
+    assert result.answer_available is True
+    assert result.reason == "trusted_context_available"
+    assert result.primary_snippet is not None
+    assert "HelpRequestModule.init" in result.primary_snippet["code"]
+    assert not any(action.get("tool") == "code_search" for action in result.next_actions)
+
+
 def test_ingest_project_docs_no_candidates_returns_no_project_docs(tmp_path, monkeypatch):
     project = _flutter_project(tmp_path)
     service = _service(tmp_path, monkeypatch)
