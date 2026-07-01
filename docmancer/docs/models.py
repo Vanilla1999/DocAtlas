@@ -401,6 +401,7 @@ class ProjectDocsInspectResult:
     user_message: str | None = None
     agent_guidance: str | None = None
     source_state_guidance: dict[str, Any] = field(default_factory=dict)
+    diagnostics: dict[str, Any] = field(default_factory=dict)
     warnings: list[str] = field(default_factory=list)
 
 
@@ -435,6 +436,7 @@ class ProjectDocsSyncResult:
     missing_sources: list[dict[str, Any]] = field(default_factory=list)
     removed_sources: list[dict[str, Any]] = field(default_factory=list)
     skipped_sources: list[dict[str, Any]] = field(default_factory=list)
+    diagnostics: dict[str, Any] = field(default_factory=dict)
     warnings: list[str] = field(default_factory=list)
     message: str | None = None
 
@@ -456,6 +458,7 @@ class ProjectDocsBootstrapResult:
     sync_result: ProjectDocsSyncResult | None = None
     agent_message: str | None = None
     user_message: str | None = None
+    diagnostics: dict[str, Any] = field(default_factory=dict)
     warnings: list[str] = field(default_factory=list)
 
 

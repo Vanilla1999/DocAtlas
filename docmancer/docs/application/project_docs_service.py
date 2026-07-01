@@ -230,6 +230,7 @@ class ProjectDocsService:
             user_message=user_message,
             agent_guidance="Call get_project_docs for repo-specific questions after project docs are synced. If docs are missing, ask before creating a reviewable ARCHITECTURE.md, then inspect and sync it. If docs are stale or orphaned, call sync_project_docs first. Ask before network dependency docs fetches.",
             source_state_guidance=self._source_state_guidance(),
+            diagnostics={"active_index": self.active_index_diagnostics(str(root))},
             warnings=metadata.warnings,
         )
 
@@ -426,6 +427,7 @@ class ProjectDocsService:
                 missing_sources=[],
                 removed_sources=removed_sources,
                 skipped_sources=[],
+                diagnostics={"active_index": self.active_index_diagnostics(str(root))},
                 warnings=warnings,
                 message=message,
             )
@@ -465,6 +467,7 @@ class ProjectDocsService:
             missing_sources=missing_sources,
             removed_sources=removed_sources,
             skipped_sources=ingest_result.skipped_sources,
+            diagnostics={"active_index": self.active_index_diagnostics(str(root))},
             warnings=[*warnings, *ingest_result.warnings],
             message=message,
         )
@@ -509,6 +512,7 @@ class ProjectDocsService:
                 sync_result=sync_result,
                 agent_message="Project docs are ready, but this question mentions a dependency whose exact docs are not prefetched. Ask before fetching dependency docs from the network.",
                 user_message=dependency_action.get("user_message"),
+                diagnostics={"active_index": self.active_index_diagnostics(str(root))},
                 warnings=warnings,
             )
 
@@ -528,6 +532,7 @@ class ProjectDocsService:
                 sync_result=sync_result,
                 agent_message=inspect_result.agent_message,
                 user_message=inspect_result.user_message,
+                diagnostics={"active_index": self.active_index_diagnostics(str(root))},
                 warnings=warnings,
             )
 
@@ -550,6 +555,7 @@ class ProjectDocsService:
                 ingest_result=ingest_result,
                 sync_result=sync_result,
                 agent_message=agent_message,
+                diagnostics={"active_index": self.active_index_diagnostics(str(root))},
                 warnings=warnings,
             )
 
@@ -568,6 +574,7 @@ class ProjectDocsService:
             sync_result=sync_result,
             agent_message=inspect_result.agent_message or "Project docs are not ready after safe bootstrap actions.",
             user_message=inspect_result.user_message,
+            diagnostics={"active_index": self.active_index_diagnostics(str(root))},
             warnings=warnings,
         )
 

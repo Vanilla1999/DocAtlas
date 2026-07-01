@@ -771,6 +771,77 @@ def test_mcp_project_lifecycle_tools_return_compact_response_unless_details_requ
     assert "inspect_result" in bootstrap_detailed
 
 
+def test_project_docs_lifecycle_diagnostics_expose_active_index_and_shadowed_project_config(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    (project / "README.md").write_text("# App\n\nDiagnostics compact docs.", encoding="utf-8")
+    (project / "docmancer.yaml").write_text(
+        """
+index:
+  db_path: .docmancer/project-local.db
+vector_store:
+  api_key_env: SUPER_SECRET_DOCMANCER_TOKEN
+""".strip(),
+        encoding="utf-8",
+    )
+    monkeypatch.setenv("SUPER_SECRET_DOCMANCER_TOKEN", "super-secret-token-value")
+    monkeypatch.setenv("HOME", str(tmp_path / "user-home"))
+    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "docmancer-home"))
+    service = LibraryDocsService(job_tracker=DocsJobTracker())
+
+    inspect = service.inspect_project_docs(str(project))
+    inspect_compact = handle_project_tool("inspect_project_docs", {"project_path": str(project)}, service)
+    sync = service.sync_project_docs(str(project), with_vectors=False)
+    sync_compact = handle_project_tool("sync_project_docs", {"project_path": str(project), "with_vectors": False}, service)
+
+    expected_active_db = str((tmp_path / "user-home" / ".docmancer" / "docmancer.db").resolve())
+    expected_project_db = str((project / ".docmancer" / "project-local.db").resolve())
+    assert inspect.diagnostics["active_index"]["db_path"] == expected_active_db
+    assert inspect.diagnostics["active_index"]["project_path"] == str(project.resolve())
+    assert inspect.diagnostics["active_index"]["config_source"] == "default"
+    assert inspect.diagnostics["active_index"]["project_local_config"] == {
+        "present": True,
+        "path": str((project / "docmancer.yaml").resolve()),
+        "db_path": expected_project_db,
+    }
+    assert any(
+        warning["code"] == "project_local_config_shadowed"
+        for warning in inspect.diagnostics["active_index"]["warnings"]
+    )
+    assert sync.diagnostics["active_index"]["index_counts"]["sources"] == 1
+    assert sync.diagnostics["active_index"]["index_counts"]["sections"] >= 1
+    assert inspect_compact["diagnostics"]["active_index"]["db_path"] == expected_active_db
+    assert sync_compact["diagnostics"]["active_index"]["db_path"] == expected_active_db
+    assert "super-secret-token-value" not in json.dumps(inspect_compact)
+    assert "SUPER_SECRET_DOCMANCER_TOKEN" not in json.dumps(inspect_compact)
+
+
+def test_get_project_context_diagnostics_preserve_query_intent_and_active_index(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    (project / "README.md").write_text("# App\n\nContextDiagnosticsNeedle project docs.", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+    service.sync_project_docs(str(project), with_vectors=False)
+
+    result = service.get_project_context(
+        str(project),
+        "Where is ContextDiagnosticsNeedle documented?",
+        tokens=1200,
+        limit=5,
+    )
+    compact = handle_project_tool(
+        "get_project_context",
+        {"project_path": str(project), "question": "Where is ContextDiagnosticsNeedle documented?", "tokens": 1200, "limit": 5},
+        service,
+    )
+
+    assert result.answer_available is True
+    assert result.diagnostics["query_intent"]
+    assert result.diagnostics["active_index"]["project_path"] == str(project.resolve())
+    assert result.diagnostics["active_index"]["db_path"] == str((tmp_path / "docmancer.db").resolve())
+    assert compact is not None
+    assert compact["diagnostics"]["query_intent"] == result.diagnostics["query_intent"]
+    assert compact["diagnostics"]["active_index"]["db_path"] == str((tmp_path / "docmancer.db").resolve())
+
+
 def test_ingest_project_docs_no_candidates_returns_no_project_docs(tmp_path, monkeypatch):
     project = _flutter_project(tmp_path)
     service = _service(tmp_path, monkeypatch)

@@ -112,6 +112,7 @@ def _compact_inspect_project_docs(result: dict[str, Any]) -> dict[str, Any]:
         "recommended_next_actions": result.get("recommended_next_actions") or [],
         "agent_message": result.get("agent_message"),
         "user_message": result.get("user_message"),
+        "diagnostics": result.get("diagnostics") or {},
         "warnings": result.get("warnings") or [],
     }
     if result.get("requires_confirmation"):
@@ -153,6 +154,7 @@ def _compact_sync_project_docs(result: dict[str, Any]) -> dict[str, Any]:
             "sections_indexed": result.get("sections_indexed") or 0,
         },
         "message": result.get("message"),
+        "diagnostics": result.get("diagnostics") or {},
         "warnings": result.get("warnings") or [],
     }
 
@@ -169,6 +171,7 @@ def _compact_bootstrap_project_docs(result: dict[str, Any]) -> dict[str, Any]:
         "arguments_patch": result.get("arguments_patch") or {},
         "agent_message": result.get("agent_message"),
         "user_message": result.get("user_message"),
+        "diagnostics": result.get("diagnostics") or {},
         "warnings": result.get("warnings") or [],
     }
     inspect_result = result.get("inspect_result") or {}

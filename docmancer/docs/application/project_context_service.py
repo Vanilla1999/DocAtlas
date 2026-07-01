@@ -90,6 +90,8 @@ class ProjectContextService:
         )
         metrics["snippet_metrics"] = snippet_presentation.metrics
         diagnostics: dict[str, Any] = {"query_intent": intent.name}
+        if project_docs is not None and hasattr(self.facade, "active_index_diagnostics"):
+            diagnostics["active_index"] = self.facade.active_index_diagnostics(str(root))
         if intent.name == "mcp_disambiguation":
             diagnostics["mcp_surfaces"] = [
                 {
