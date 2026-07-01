@@ -47,6 +47,7 @@ def _compact_project_docs(result: dict[str, Any], *, omit_results: bool = False)
         "next_actions": result.get("next_actions") or [],
         "arguments_patch": result.get("arguments_patch") or {},
         "source_summary": _project_sources_summary(result),
+        "diagnostics": result.get("diagnostics") or {},
         "warnings": result.get("warnings") or [],
     }
     if omit_results:
@@ -77,11 +78,16 @@ def _compact_project_context(result: dict[str, Any]) -> dict[str, Any]:
         "answer_outline": result.get("answer_outline") or {},
         "trust_contract": result.get("trust_contract") or {},
         "next_actions": result.get("next_actions") or [],
+        "next_action": result.get("next_action") or {},
+        "arguments_patch": result.get("arguments_patch") or {},
         "snippet_metrics": result.get("snippet_metrics") or {},
         "metrics": result.get("metrics") or {},
         "diagnostics": result.get("diagnostics") or {},
         "warnings": result.get("warnings") or [],
     }
+    if result.get("requires_confirmation"):
+        compact["requires_confirmation"] = result.get("requires_confirmation")
+        compact["confirmation_reason"] = result.get("confirmation_reason")
     project_docs = result.get("project_docs") or {}
     if project_docs:
         compact["project_docs"] = _compact_project_docs(project_docs, omit_results=True)

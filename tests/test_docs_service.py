@@ -589,7 +589,49 @@ def test_get_project_context_never_returns_deleted_orphaned_file_content(tmp_pat
 
     assert result.answer_available is False
     assert result.context_pack == []
+    assert result.requires_confirmation is True
+    assert result.confirmation_reason == "project_docs_preflight"
+    assert result.next_action["type"] == "ask_user_to_update_or_confirm_project_docs"
+    assert result.next_actions[0]["action"] == "ask_user_to_update_or_confirm_project_docs"
     assert "OldContextNeedle" not in json.dumps(result.trust_contract)
+
+
+def test_get_project_context_requires_preflight_for_placeholder_readme_before_sync(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    (project / "README.md").write_text("# TODO\n\nPlaceholder docs coming soon.", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+
+    result = service.get_project_context(str(project), "What is the architecture?", tokens=1200, limit=3)
+
+    assert result.status == "confirmation_required"
+    assert result.answer_available is False
+    assert result.requires_confirmation is True
+    assert result.confirmation_reason == "project_docs_preflight"
+    assert result.next_action["type"] == "ask_user_to_update_or_confirm_project_docs"
+    assert result.next_action["tool_after_confirmation"] == "sync_project_docs"
+    assert result.project_docs is not None
+    assert result.project_docs.requires_confirmation is True
+    assert result.project_docs.next_actions[0]["action"] == "ask_user_to_update_or_confirm_project_docs"
+    assert not any(
+        action.get("tool") == "sync_project_docs" and action.get("requires_confirmation") is False
+        for action in result.next_actions
+    )
+
+
+def test_get_project_context_requires_preflight_for_unsupported_root_doc(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    (project / "README.md").write_text("# App\n\nProject overview.", encoding="utf-8")
+    (project / "ARCHITECTURE.docx").write_text("Binary-ish architecture placeholder", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+
+    result = service.get_project_context(str(project), "What is the architecture?", tokens=1200, limit=3)
+
+    assert result.status == "confirmation_required"
+    assert result.requires_confirmation is True
+    assert result.confirmation_reason == "project_docs_preflight"
+    assert result.next_action["type"] == "ask_user_to_update_or_confirm_project_docs"
+    assert result.project_docs is not None
+    assert result.project_docs.next_actions[0]["risk_codes"] == ["unsupported_project_doc_candidate"]
 
 
 def test_sync_project_docs_prunes_orphaned_sources_and_indexes_new_docs(tmp_path, monkeypatch):
@@ -1266,10 +1308,12 @@ def test_get_project_docs_reports_stale_module_docs(tmp_path, monkeypatch):
     result = service.get_project_docs(str(project), "StaleNeedle", module_path="packages/backend", tokens=1200, limit=3)
 
     assert result.status == "stale"
-    assert result.reason_code == "project_docs_stale"
+    assert result.reason_code == "project_docs_preflight_confirmation_required"
+    assert result.requires_confirmation is True
+    assert result.confirmation_reason == "project_docs_preflight"
     assert result.stale_sources
     assert result.stale_sources[0]["candidate"]["module_path"] == "packages/backend"
-    assert result.next_actions[0]["tool"] == "sync_project_docs"
+    assert result.next_actions[0]["action"] == "ask_user_to_update_or_confirm_project_docs"
 
 
 def test_get_project_docs_project_scope_preserves_backward_compatibility(tmp_path, monkeypatch):
@@ -1576,12 +1620,33 @@ def test_get_project_docs_reports_stale_project_docs(tmp_path, monkeypatch):
 
     assert result.status == "stale"
     assert result.reason == "project_docs_stale"
-    assert result.reason_code == "project_docs_stale"
-    assert result.next_action == {"type": "sync_project_docs", "tool": "sync_project_docs"}
-    assert result.requires_confirmation is False
-    assert result.arguments_patch == {"project_path": str(project.resolve()), "with_vectors": True}
+    assert result.reason_code == "project_docs_preflight_confirmation_required"
+    assert result.next_action["type"] == "ask_user_to_update_or_confirm_project_docs"
+    assert result.next_action["tool_after_confirmation"] == "sync_project_docs"
+    assert result.requires_confirmation is True
+    assert result.confirmation_reason == "project_docs_preflight"
+    assert result.arguments_patch == {"project_path": str(project.resolve())}
     assert result.stale_sources[0]["path"] == "README.md"
-    assert result.next_actions[0]["tool"] == "sync_project_docs"
+    assert result.next_actions[0]["action"] == "ask_user_to_update_or_confirm_project_docs"
+    assert result.next_actions[0]["requires_confirmation"] is True
+
+
+def test_get_project_context_requires_preflight_for_stale_project_docs(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    readme = project / "README.md"
+    readme.write_text("# Architecture\n\nOriginal ProjectStaleContextAnswer.", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+    service.ingest_project_docs(str(project), with_vectors=False)
+
+    readme.write_text("# Architecture\n\nUpdated ProjectStaleContextAnswer.", encoding="utf-8")
+    result = service.get_project_context(str(project), "ProjectStaleContextAnswer", tokens=1200, limit=3)
+
+    assert result.status == "stale"
+    assert result.answer_available is False
+    assert result.requires_confirmation is True
+    assert result.confirmation_reason == "project_docs_preflight"
+    assert result.next_action["type"] == "ask_user_to_update_or_confirm_project_docs"
+    assert result.next_actions[0]["action"] == "ask_user_to_update_or_confirm_project_docs"
 
 
 def test_get_project_docs_returns_no_project_docs_next_action(tmp_path, monkeypatch):

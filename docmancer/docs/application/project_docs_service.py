@@ -895,7 +895,42 @@ class ProjectDocsService:
                     message=f"Module {resolved_module_path!r} exists, but no module docs were discovered for this scope.",
                 )
 
+        preflight_inspect: ProjectDocsInspectResult | None = None
+        if not indexed_sources_all or stale_sources or ignored_sources:
+            inspect_result = self.inspect_project_docs(str(root))
+            if inspect_result.requires_confirmation and inspect_result.confirmation_reason == "project_docs_preflight":
+                preflight_inspect = inspect_result
+
+        def _confirmation_required_result(*, status: str, reason: str) -> ProjectDocsResult:
+            assert preflight_inspect is not None
+            return ProjectDocsResult(
+                project_path=str(root),
+                query=query,
+                status=status,
+                reason_code=preflight_inspect.reason_code,
+                next_action=preflight_inspect.next_action,
+                requires_confirmation=True,
+                confirmation_reason=preflight_inspect.confirmation_reason,
+                arguments_patch=preflight_inspect.arguments_patch,
+                reason=reason,
+                answer_available=False,
+                warnings=metadata.warnings,
+                candidate_sources=candidate_sources,
+                indexed_sources=indexed_sources,
+                stale_sources=stale_sources,
+                ignored_sources=ignored_sources,
+                source_state_guidance=self._source_state_guidance(),
+                diagnostics=preflight_inspect.diagnostics,
+                next_actions=preflight_inspect.recommended_next_actions,
+                message=preflight_inspect.user_message or preflight_inspect.agent_message,
+            )
+
         if not candidate_sources:
+            if preflight_inspect:
+                return _confirmation_required_result(
+                    status="confirmation_required",
+                    reason="project_docs_preflight_confirmation_required",
+                )
             next_action, requires_confirmation, confirmation_reason, arguments_patch, _, user_message = self._project_docs_structured_next_action(
                 reason_code="no_project_docs",
                 root=root,
@@ -921,6 +956,11 @@ class ProjectDocsService:
             )
 
         if not indexed_sources_all:
+            if preflight_inspect:
+                return _confirmation_required_result(
+                    status="confirmation_required",
+                    reason="project_docs_preflight_confirmation_required",
+                )
             next_action, requires_confirmation, confirmation_reason, arguments_patch, _, _ = self._project_docs_structured_next_action(
                 reason_code="project_docs_found_not_indexed",
                 root=root,
@@ -1011,7 +1051,15 @@ class ProjectDocsService:
         requires_confirmation = False
         confirmation_reason = None
         arguments_patch: dict[str, Any] = {}
-        if stale_sources:
+        preflight_diagnostics: dict[str, Any] = {}
+        if preflight_inspect:
+            next_action = preflight_inspect.next_action
+            requires_confirmation = True
+            confirmation_reason = preflight_inspect.confirmation_reason
+            arguments_patch = preflight_inspect.arguments_patch
+            next_actions.extend(preflight_inspect.recommended_next_actions)
+            preflight_diagnostics = preflight_inspect.diagnostics
+        elif stale_sources:
             next_action, requires_confirmation, confirmation_reason, arguments_patch, _, _ = self._project_docs_structured_next_action(
                 reason_code="project_docs_stale",
                 root=root,
@@ -1024,16 +1072,19 @@ class ProjectDocsService:
                 "reason": "Some indexed project docs are stale; reconcile before relying on repo-specific answers.",
             })
         if results:
+            status = "stale" if stale_sources else ("confirmation_required" if preflight_inspect else "success")
+            reason_code = preflight_inspect.reason_code if preflight_inspect else ("project_docs_stale" if stale_sources else "project_docs_ready")
+            reason = "project_docs_stale" if stale_sources else ("project_docs_preflight_confirmation_required" if preflight_inspect else None)
             return ProjectDocsResult(
                 project_path=str(root),
                 query=query,
-                status="stale" if stale_sources else "success",
-                reason_code="project_docs_stale" if stale_sources else "project_docs_ready",
+                status=status,
+                reason_code=reason_code,
                 next_action=next_action,
                 requires_confirmation=requires_confirmation,
                 confirmation_reason=confirmation_reason,
                 arguments_patch=arguments_patch,
-                reason="project_docs_stale" if stale_sources else None,
+                reason=reason,
                 answer_available=True,
                 results=results,
                 warnings=metadata.warnings,
@@ -1042,8 +1093,14 @@ class ProjectDocsService:
                 stale_sources=stale_sources,
                 ignored_sources=ignored_sources,
                 source_state_guidance=self._source_state_guidance(),
+                diagnostics=preflight_diagnostics,
                 next_actions=next_actions,
-                message=f"Returned {len(results)} project docs result(s)." + (" Some indexed project docs are stale." if stale_sources else ""),
+                message=f"Returned {len(results)} project docs result(s)." + (" Project docs preflight requires confirmation before sync/reconcile." if preflight_inspect else (" Some indexed project docs are stale." if stale_sources else "")),
+            )
+        if preflight_inspect:
+            return _confirmation_required_result(
+                status="stale" if stale_sources else "confirmation_required",
+                reason="project_docs_stale" if stale_sources else "project_docs_preflight_confirmation_required",
             )
         reason_code = "project_docs_stale" if stale_sources else "no_project_docs_results"
         if stale_sources:

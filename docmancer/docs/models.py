@@ -480,6 +480,7 @@ class ProjectDocsResult:
     stale_sources: list[dict[str, Any]] = field(default_factory=list)
     ignored_sources: list[dict[str, Any]] = field(default_factory=list)
     source_state_guidance: dict[str, Any] = field(default_factory=dict)
+    diagnostics: dict[str, Any] = field(default_factory=dict)
     next_actions: list[dict[str, Any]] = field(default_factory=list)
     answer_available: bool = True
     reason: str | None = None
@@ -502,6 +503,10 @@ class ProjectContextResult:
     trust_contract: dict[str, Any] = field(default_factory=dict)
     warnings: list[str] = field(default_factory=list)
     next_actions: list[dict[str, Any]] = field(default_factory=list)
+    next_action: dict[str, Any] = field(default_factory=dict)
+    requires_confirmation: bool = False
+    confirmation_reason: str | None = None
+    arguments_patch: dict[str, Any] = field(default_factory=dict)
     response_style: str = "evidence-first"
     primary_snippet: dict[str, Any] | None = None
     supporting_snippets: list[dict[str, Any]] = field(default_factory=list)

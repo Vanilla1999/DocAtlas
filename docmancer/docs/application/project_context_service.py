@@ -78,6 +78,10 @@ class ProjectContextService:
         next_actions = [*(project_docs.next_actions if project_docs else [])]
         if dependency_docs:
             next_actions.extend({"tool": dependency_docs.tool, "reason": action} for action in dependency_docs.next_actions)
+        requires_confirmation = bool(project_docs and project_docs.requires_confirmation)
+        confirmation_reason = project_docs.confirmation_reason if requires_confirmation and project_docs else None
+        next_action = project_docs.next_action if requires_confirmation and project_docs else {}
+        arguments_patch = project_docs.arguments_patch if requires_confirmation and project_docs else {}
         context_pack = project_context_pack(project_docs=project_docs, dependency_docs=dependency_docs)
         answer_outline = build_project_answer_outline(question=question, intent=intent, context_pack=context_pack)
         metrics = project_context_metrics(context_pack=context_pack, project_docs=project_docs, dependency_docs=dependency_docs, intent=intent)
@@ -131,6 +135,8 @@ class ProjectContextService:
         status = "success" if answer_available else (project_docs.status if project_docs else dependency_docs.status if dependency_docs else "no_results")
         if (project_docs and project_docs.status == "stale") or (dependency_docs and dependency_docs.stale_before_refresh):
             status = "stale"
+        if requires_confirmation and not answer_available and status != "stale":
+            status = "confirmation_required"
         reason = "trusted_context_available" if answer_available else ("insufficient_code_symbol_evidence" if getattr(intent, "wants_code_symbols", False) else "no_trusted_context")
         return ProjectContextResult(
             project_path=str(root),
@@ -145,6 +151,10 @@ class ProjectContextService:
             trust_contract=trust_contract,
             warnings=[*warnings, *[warning["code"] for warning in snippet_presentation.warnings]],
             next_actions=next_actions,
+            next_action=next_action,
+            requires_confirmation=requires_confirmation,
+            confirmation_reason=confirmation_reason,
+            arguments_patch=arguments_patch,
             response_style=snippet_presentation.response_style,
             primary_snippet=snippet_presentation.primary_snippet,
             supporting_snippets=snippet_presentation.supporting_snippets,
