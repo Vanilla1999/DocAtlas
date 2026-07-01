@@ -495,6 +495,8 @@ class ProjectContextResult:
     tool: str = "get_project_context"
     schema_version: str = "1.0-mvp"
     answer_available: bool = True
+    answer_type: str = "exact"
+    answer_completeness: dict[str, Any] = field(default_factory=dict)
     mode: str = "auto"
     reason: str | None = None
     context_pack: list[dict[str, Any]] = field(default_factory=list)
@@ -503,6 +505,7 @@ class ProjectContextResult:
     trust_contract: dict[str, Any] = field(default_factory=dict)
     warnings: list[str] = field(default_factory=list)
     next_actions: list[dict[str, Any]] = field(default_factory=list)
+    recommended_next_actions: list[dict[str, Any]] = field(default_factory=list)
     next_action: dict[str, Any] = field(default_factory=dict)
     requires_confirmation: bool = False
     confirmation_reason: str | None = None

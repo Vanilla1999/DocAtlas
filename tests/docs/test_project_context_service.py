@@ -78,6 +78,106 @@ def test_project_context_service_deps_only_skips_project_docs_and_marks_risk():
     assert any(item["reason_code"] == "project_docs_skipped" for item in result.trust_contract["risky_sources"])
 
 
+def test_story_specific_project_context_missing_terms_is_partial_navigational():
+    facade = FakeProjectContextFacade()
+    facade.project_docs = ProjectDocsResult(
+        project_path="/repo",
+        query='Как реализовать кнопку "Вернуть в работу" для закрытой заявки и перевести её в "Активная"?',
+        results=[
+            ProjectDocsChunk(
+                title="Architecture",
+                content="""
+Help requests follow UI -> Cubit -> Service -> Repository -> API.
+Relevant places include help_requests_screen, help_request_details_screen,
+new_help_request_screen, ToastUtils, and routes.
+""".strip(),
+                source="/repo/ARCHITECTURE.md",
+                url=None,
+                path="ARCHITECTURE.md",
+                heading_path="Help requests architecture",
+            )
+        ],
+    )
+
+    result = ProjectContextService(facade).get_project_context(
+        "/repo",
+        'Как реализовать кнопку "Вернуть в работу" для закрытой заявки и перевести её в "Активная"?',
+        mode="project-only",
+    )
+
+    assert result.answer_available is True
+    assert result.answer_type == "partial_navigational"
+    assert result.answer_completeness["status"] == "partial"
+    assert result.answer_completeness["source_search_required"] is True
+    assert "Вернуть в работу" in result.answer_completeness["missing_terms"]
+    assert "Активная" in result.answer_completeness["missing_terms"]
+    source_action = result.recommended_next_actions[-1]
+    assert source_action["action"] == "search_project_sources"
+    assert source_action["tool"] == "code_search"
+    assert "help_request_details_screen" in source_action["suggested_symbols"]
+
+
+def test_story_specific_project_context_with_matched_terms_is_exact():
+    facade = FakeProjectContextFacade()
+    facade.project_docs = ProjectDocsResult(
+        project_path="/repo",
+        query='Как реализовать кнопку "Вернуть в работу" для закрытой заявки и перевести её в "Активная"?',
+        results=[
+            ProjectDocsChunk(
+                title="Help request reopen story",
+                content='Кнопка "Вернуть в работу" переводит закрытую заявку в статус "Активная" and shows ToastUtils feedback.',
+                source="/repo/ARCHITECTURE.md",
+                url=None,
+                path="ARCHITECTURE.md",
+                heading_path="Help requests > Reopen",
+            )
+        ],
+    )
+
+    result = ProjectContextService(facade).get_project_context(
+        "/repo",
+        'Как реализовать кнопку "Вернуть в работу" для закрытой заявки и перевести её в "Активная"?',
+        mode="project-only",
+    )
+
+    assert result.answer_type == "exact"
+    assert result.answer_completeness["status"] == "exact"
+    assert result.answer_completeness["missing_terms"] == []
+    assert not any(action.get("action") == "search_project_sources" for action in result.recommended_next_actions)
+
+
+def test_story_specific_unquoted_error_toast_phrases_are_missing_terms():
+    facade = FakeProjectContextFacade()
+    facade.project_docs = ProjectDocsResult(
+        project_path="/repo",
+        query="Где добавить toast ошибки?",
+        results=[
+            ProjectDocsChunk(
+                title="Core errors",
+                content="Use ToastUtils with AppError and StateStatus in the UI -> Cubit -> Service flow.",
+                source="/repo/ARCHITECTURE.md",
+                url=None,
+                path="ARCHITECTURE.md",
+                heading_path="Core error handling",
+            )
+        ],
+    )
+
+    result = ProjectContextService(facade).get_project_context(
+        "/repo",
+        "Где и как добавить toast ошибки для Вернуть в работу: Сервис временно недоступен / Повторите попытку позднее и Нет соединения / Проверьте интернет и попробуйте снова?",
+        mode="project-only",
+    )
+
+    assert result.answer_type == "partial_navigational"
+    assert result.answer_completeness["missing_terms"] == [
+        "Сервис временно недоступен",
+        "Повторите попытку позднее",
+        "Нет соединения",
+        "Проверьте интернет и попробуйте снова",
+    ]
+
+
 def test_context_pack_snippet_and_metrics_shape_are_stable():
     chunk = DocsChunk(
         title="Example",
