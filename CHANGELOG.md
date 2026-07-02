@@ -4,6 +4,32 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2026-07-02
+
+Project-context, exact-version, and patch-review release focused on making DocAtlas more useful as a project-aware context and constraint runtime for coding agents.
+
+### Added
+
+- **Unified docs context MCP entrypoint:** added `get_docs_context` to route project, library, dependency, and mixed documentation queries through one high-level tool.
+- **Snippet-first context packs:** added trusted `primary_snippet` extraction for coding, API, and command questions while preserving context packs, diagnostics, and Trust Contract metadata.
+- **Exact-version documentation support:** added minimal exact-version resolution for Python libraries and wired exact-version handling into library docs services.
+- **Patch constraints workflow:** added `get_patch_constraints` and `validate_patch_against_constraints` for bounded, source-attributed project constraints and deterministic post-patch checks.
+- **Patch-review bot artifacts:** added machine-readable quality/action/comment/trace/bundle artifacts plus a manifest-first artifact contract for non-blocking PR-bot consumers.
+- **Task-level and live benchmark tooling:** added live MCP/Context7 comparison tooling, task-level agent benchmark harnesses, cost/accuracy analysis, and recorded research reports.
+
+### Changed
+
+- **Project context ranking:** broad project-context queries now prefer maintained authoritative docs and demote research, dogfood, and generated patch-review artifacts unless the query explicitly asks for them.
+- **Trust Contract source ordering:** `selected_sources` now follows reranked context order while preserving compatibility aliases (`selected_sources`, `trusted_sources`, `selected`, `trusted`).
+- **Answer completeness:** project context now distinguishes exact/source-backed answers from partial navigational answers and surfaces source-search follow-up when required terms are absent.
+- **Patch-review summaries:** reduced reviewer-facing noise by grouping actionable/manual/noisy unknowns and keeping raw JSON evidence available for audit/debug.
+
+### Fixed
+
+- **Dartdoc/pub ingestion:** improved pub.dev/Dartdoc source discovery and ingestion coverage.
+- **Public docs coverage:** fixed pre-indexed public docs coverage gaps and ReadTheDocs sitemap seed URL handling.
+- **Source evidence hygiene:** prevented generated dogfood/eval/patch-review artifacts from being treated as authoritative project source evidence in broad context flows.
+
 ## [1.0.0] - 2026-06-22
 
 Stable release. The project- and library-aware documentation stack is now production-ready.
