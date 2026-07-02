@@ -220,6 +220,12 @@ class UnifiedDocsContextService:
         status = self._aggregate_status(requested_lanes, successful_lanes, pending_confirmation_lanes, failed_lanes)
         reason = None if answer_available else "no_docs_context_available"
         combined_next_actions = [*next_actions, *pending_actions.get("next_actions", [])]
+        patch_constraints_action = self._patch_constraints_next_action(question, project_path, mode_selected, mode_requested)
+        if patch_constraints_action:
+            routing["next_action_reason"] = patch_constraints_action["reason"]
+            if patch_constraints_action not in combined_next_actions:
+                combined_next_actions.insert(0, patch_constraints_action)
+        primary_next_action = pending_actions.get("next_action") or patch_constraints_action
 
         payload = UnifiedDocsContextResult(
             status=status,
@@ -236,7 +242,7 @@ class UnifiedDocsContextService:
             reason_code=reason,
             requires_confirmation=bool(pending_actions.get("requires_confirmation")),
             confirmation_reason=pending_actions.get("confirmation_reason"),
-            next_action=pending_actions.get("next_action"),
+            next_action=primary_next_action,
             next_actions=combined_next_actions,
             arguments_patch=pending_actions.get("arguments_patch"),
             warnings=[*warnings, *snippet_presentation.warnings],
@@ -301,6 +307,21 @@ class UnifiedDocsContextService:
         if project_path:
             return "project", "project_path_only"
         return "invalid_request", "docs_context_target_missing"
+
+    @staticmethod
+    def _patch_constraints_next_action(question: str, project_path: str | None, mode_selected: str, mode_requested: str) -> dict[str, Any] | None:
+        if not project_path or mode_requested == "library" or mode_selected == "library":
+            return None
+        normalized = f" {question.lower()} "
+        patch_terms = (" patch", " diff", " change", " edit", " modify", " fix", " implement", " refactor", " validate")
+        if not any(term in normalized for term in patch_terms):
+            return None
+        return {
+            "type": "get_patch_constraints",
+            "tool": "get_patch_constraints",
+            "reason": "patch_like_project_task",
+            "arguments_patch": {"project_path": project_path, "task": question},
+        }
 
     @staticmethod
     def _libraries(library: str | None, libraries: list[str] | None) -> list[str]:

@@ -506,6 +506,32 @@ def test_auto_project_question_selects_project():
     assert result.routing["reason_code"] == "project_context_auto"
 
 
+def test_patch_like_project_question_recommends_patch_constraints():
+    result = _service(FakeFacade()).get_docs_context(
+        "Implement a patch for the CLI and validate the diff",
+        project_path="/repo",
+        prepare_project_docs=False,
+    )
+    assert result.next_actions[0] == {
+        "type": "get_patch_constraints",
+        "tool": "get_patch_constraints",
+        "reason": "patch_like_project_task",
+        "arguments_patch": {"project_path": "/repo", "task": "Implement a patch for the CLI and validate the diff"},
+    }
+    assert result.routing["next_action_reason"] == "patch_like_project_task"
+
+
+def test_non_patch_project_question_does_not_recommend_patch_constraints():
+    result = _service(FakeFacade()).get_docs_context("How docs work?", project_path="/repo", prepare_project_docs=False)
+    assert not any(action.get("tool") == "get_patch_constraints" for action in result.next_actions)
+
+
+def test_library_question_does_not_recommend_patch_constraints():
+    result = _service(FakeFacade()).get_docs_context("How do I patch a FastAPI dependency?", library="fastapi")
+    assert result.mode_selected == "library"
+    assert not any(isinstance(action, dict) and action.get("tool") == "get_patch_constraints" for action in result.next_actions)
+
+
 def test_auto_dependency_question_selects_dependency():
     facade = FakeFacade()
     facade.project_context = replace(facade.project_context, context_pack=[{"doc_scope": "dependency", "source_class": "dependency_doc", "dependency": "riverpod", "title": "autoDispose", "content": "dep"}])
