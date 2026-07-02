@@ -33,6 +33,43 @@ def test_compact_output_keeps_context_pack_trust_contract_and_outline():
     assert compact["answer_outline"]
 
 
+def test_compact_output_preserves_trust_contract_context_sources(tmp_path):
+    lib = tmp_path / "lib"
+    lib.mkdir()
+    (lib / "help_request_details_screen.dart").write_text(
+        """
+class HelpRequestDetailsScreen {
+  final label = 'Вернуть в работу';
+}
+""".strip()
+        + "\n",
+        encoding="utf-8",
+    )
+    facade = FakeProjectContextFacade()
+    facade.project_docs = ProjectDocsResult(
+        project_path=str(tmp_path),
+        query='Как реализовать кнопку "Вернуть в работу"?',
+        results=[
+            ProjectDocsChunk(
+                title="Architecture",
+                content="Help requests follow UI -> Cubit -> Service -> Repository -> API with enough context for stable project-doc selection.",
+                source=str(tmp_path / "ARCHITECTURE.md"),
+                url=None,
+                path="ARCHITECTURE.md",
+            )
+        ],
+        indexed_sources=[{"path": "ARCHITECTURE.md", "source": str(tmp_path / "ARCHITECTURE.md")}],
+    )
+
+    result = asdict(ProjectContextService(facade).get_project_context(str(tmp_path), 'Как реализовать кнопку "Вернуть в работу"?', mode="project-only"))
+    compact = _compact_project_context(result)
+
+    source_evidence = compact["trust_contract"]["context_sources"]["source_evidence"]
+    assert source_evidence[0]["path"] == "lib/help_request_details_screen.dart"
+    assert source_evidence[0]["line_start"] == 2
+    assert source_evidence[0]["matched_terms"] == ["Вернуть в работу"]
+
+
 def test_compact_output_exposes_answer_completeness_contract():
     facade = FakeProjectContextFacade()
     facade.project_docs = ProjectDocsResult(

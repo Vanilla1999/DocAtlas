@@ -117,7 +117,7 @@ new_help_request_screen, ToastUtils, and routes.
     assert "help_request_details_screen" in source_action["suggested_symbols"]
 
 
-def test_story_specific_project_context_with_matched_terms_is_exact():
+def test_story_specific_project_context_with_only_docs_matched_terms_requires_source_search():
     facade = FakeProjectContextFacade()
     facade.project_docs = ProjectDocsResult(
         project_path="/repo",
@@ -140,10 +140,174 @@ def test_story_specific_project_context_with_matched_terms_is_exact():
         mode="project-only",
     )
 
+    assert result.answer_type == "partial_navigational"
+    assert result.answer_completeness["status"] == "partial"
+    assert result.answer_completeness["source_search_required"] is True
+    assert result.answer_completeness["missing_terms"] == ["Вернуть в работу", "Активная"]
+    assert result.recommended_next_actions[-1]["action"] == "search_project_sources"
+
+
+def test_project_context_includes_repo_map_lane_for_matching_source_files(tmp_path):
+    lib = tmp_path / "lib"
+    lib.mkdir()
+    (lib / "help_request_details_screen.dart").write_text(
+        """
+import 'package:flutter/material.dart';
+
+class HelpRequestDetailsScreen extends StatelessWidget {
+  void reopenRequest() {
+    final label = 'Вернуть в работу';
+  }
+}
+""".strip()
+        + "\n",
+        encoding="utf-8",
+    )
+    facade = FakeProjectContextFacade()
+    facade.project_docs = ProjectDocsResult(
+        project_path=str(tmp_path),
+        query='Как реализовать кнопку "Вернуть в работу"?',
+        results=[
+            ProjectDocsChunk(
+                title="Architecture",
+                content="Help requests follow UI -> Cubit -> Service -> Repository -> API.",
+                source=str(tmp_path / "ARCHITECTURE.md"),
+                url=None,
+                path="ARCHITECTURE.md",
+                heading_path="Help requests architecture",
+            )
+        ],
+    )
+
+    result = ProjectContextService(facade).get_project_context(
+        str(tmp_path),
+        'Как реализовать кнопку "Вернуть в работу"?',
+        mode="project-only",
+    )
+
+    repo_map_items = [item for item in result.context_pack if item["source_class"] == "repo_map"]
+    assert [item["path"] for item in repo_map_items] == ["lib/help_request_details_screen.dart"]
+    assert repo_map_items[0]["language"] == "dart"
+    assert repo_map_items[0]["string_literals"] == ["Вернуть в работу"]
+    source_evidence_items = [item for item in result.context_pack if item["source_class"] == "source_evidence"]
+    assert len(source_evidence_items) == 1
+    assert source_evidence_items[0]["evidence_class"] == "source_snippet"
+    assert source_evidence_items[0]["path"] == "lib/help_request_details_screen.dart"
+    assert source_evidence_items[0]["line_start"] == 5
+    assert source_evidence_items[0]["snippet"] == "final label = 'Вернуть в работу';"
+    assert "repo_map" in result.metrics["source_classes"]
+    assert "source_evidence" in result.metrics["source_classes"]
+    assert result.diagnostics["repo_map"]["selected_files"] == 1
+    assert result.diagnostics["source_evidence"]["matched_terms"] == ["Вернуть в работу"]
     assert result.answer_type == "exact"
-    assert result.answer_completeness["status"] == "exact"
     assert result.answer_completeness["missing_terms"] == []
-    assert not any(action.get("action") == "search_project_sources" for action in result.recommended_next_actions)
+
+
+def test_trust_contract_keeps_old_fields_and_exposes_source_evidence_context_sources(tmp_path):
+    lib = tmp_path / "lib"
+    lib.mkdir()
+    (lib / "help_request_details_screen.dart").write_text(
+        """
+class HelpRequestDetailsScreen {
+  final label = 'Вернуть в работу';
+}
+""".strip()
+        + "\n",
+        encoding="utf-8",
+    )
+    facade = FakeProjectContextFacade()
+    facade.project_docs = ProjectDocsResult(
+        project_path=str(tmp_path),
+        query='Как реализовать кнопку "Вернуть в работу"?',
+        results=[
+            ProjectDocsChunk(
+                title="Architecture",
+                content="Help requests follow UI -> Cubit -> Service -> Repository -> API with enough context for stable project-doc selection.",
+                source=str(tmp_path / "ARCHITECTURE.md"),
+                url=None,
+                path="ARCHITECTURE.md",
+                heading_path="Help requests architecture",
+            )
+        ],
+        indexed_sources=[{"path": "ARCHITECTURE.md", "source": str(tmp_path / "ARCHITECTURE.md")}],
+    )
+
+    result = ProjectContextService(facade).get_project_context(
+        str(tmp_path),
+        'Как реализовать кнопку "Вернуть в работу"?',
+        mode="project-only",
+    )
+
+    contract = result.trust_contract
+    assert contract["selected"] == contract["selected_sources"]
+    assert contract["trusted"] == contract["trusted_sources"]
+    assert {item["source_class"] for item in contract["selected_sources"]} == {"project_file"}
+
+    context_sources = contract["context_sources"]
+    assert context_sources["schema_version"] == "context-sources-1.0"
+    snippet = context_sources["source_evidence"][0]
+    assert snippet["source_class"] == "source_evidence"
+    assert snippet["evidence_class"] == "source_snippet"
+    assert snippet["role"] == "source_backed_evidence"
+    assert snippet["path"] == "lib/help_request_details_screen.dart"
+    assert snippet["line_start"] == 2
+    assert snippet["line_end"] == 2
+    assert snippet["matched_terms"] == ["Вернуть в работу"]
+    assert snippet["missing_terms"] == []
+    assert snippet["reason"] == "requirement term matched a concrete project source line"
+
+    repo_map = context_sources["repo_map"][0]
+    assert repo_map["source_class"] == "repo_map"
+    assert repo_map["role"] == "navigation_context"
+    assert repo_map["proof_role"] == "navigation_only"
+    assert repo_map["path"] == "lib/help_request_details_screen.dart"
+
+
+def test_project_context_source_evidence_exposes_absent_terms_without_proof(tmp_path):
+    lib = tmp_path / "lib"
+    lib.mkdir()
+    (lib / "help_request_details_screen.dart").write_text(
+        """
+class HelpRequestDetailsScreen {
+  void reopenRequest() {
+    final label = 'Вернуть в работу';
+  }
+}
+""".strip()
+        + "\n",
+        encoding="utf-8",
+    )
+    facade = FakeProjectContextFacade()
+    facade.project_docs = ProjectDocsResult(
+        project_path=str(tmp_path),
+        query='Как реализовать кнопку "Вернуть в работу" и статус "Активная"?',
+        results=[
+            ProjectDocsChunk(
+                title="Architecture",
+                content="Help requests follow UI -> Cubit -> Service -> Repository -> API.",
+                source=str(tmp_path / "ARCHITECTURE.md"),
+                url=None,
+                path="ARCHITECTURE.md",
+                heading_path="Help requests architecture",
+            )
+        ],
+    )
+
+    result = ProjectContextService(facade).get_project_context(
+        str(tmp_path),
+        'Как реализовать кнопку "Вернуть в работу" и статус "Активная"?',
+        mode="project-only",
+    )
+
+    source_evidence_items = [item for item in result.context_pack if item["source_class"] == "source_evidence"]
+    assert [item["evidence_class"] for item in source_evidence_items] == ["source_snippet", "absent_in_source"]
+    assert source_evidence_items[0]["matched_terms"] == ["Вернуть в работу"]
+    assert source_evidence_items[1]["missing_terms"] == ["Активная"]
+    assert source_evidence_items[1]["path"] is None
+    assert "Активная" not in source_evidence_items[1]["content"]
+    assert result.answer_type == "partial_navigational"
+    assert result.answer_completeness["missing_terms"] == ["Активная"]
+    assert result.recommended_next_actions[-1]["query_terms"] == ["Активная"]
 
 
 def test_story_specific_unquoted_error_toast_phrases_are_missing_terms():
@@ -222,6 +386,145 @@ new_help_request_screen for creating requests through a chat-like form.
     assert "отправить название заявки в чат" in source_action["query_terms"]
 
 
+def test_broad_story_query_with_code_identifier_still_requires_source_story_terms(tmp_path):
+    lib = tmp_path / "lib"
+    lib.mkdir()
+    (lib / "help_chat.dart").write_text(
+        """
+library help_chat;
+
+class HelpChatWidget {}
+""".strip()
+        + "\n",
+        encoding="utf-8",
+    )
+    question = (
+        "Для help_chat по бизнес-сценарию возврата/переоткрытия закрытой заявки в HELP какие файлы и слои нужно менять? "
+        "Use Case: Возврат/переоткрытие запроса в HELP. Пользователь на вкладке Закрытые открывает закрытую заявку. "
+        "Вернуть в работу отправляет статус Активная. При ошибках показывает toast: "
+        "Сервис временно недоступен / Повторите попытку позднее; Нет соединения / Проверьте интернет и попробуйте снова. "
+        "Создать новый запрос открывает экран создания новой заявки и показывает первое обязательное поле."
+    )
+    facade = FakeProjectContextFacade()
+    facade.project_docs = ProjectDocsResult(
+        project_path=str(tmp_path),
+        query=question,
+        results=[
+            ProjectDocsChunk(
+                title="Architecture",
+                content="help_chat follows UI -> Cubit -> Service -> Repository -> API for HELP requests.",
+                source=str(tmp_path / "ARCHITECTURE.md"),
+                url=None,
+                path="ARCHITECTURE.md",
+                heading_path="Help requests architecture",
+            )
+        ],
+    )
+
+    result = ProjectContextService(facade).get_project_context(str(tmp_path), question, mode="project-only")
+
+    assert result.answer_type == "partial_navigational"
+    assert result.answer_completeness["source_search_required"] is True
+    assert "help_chat" in result.answer_completeness["matched_terms"]
+    missing_terms = result.answer_completeness["missing_terms"]
+    assert "Создать новый запрос" in missing_terms
+    assert "Сервис временно недоступен" in missing_terms
+    assert "Нет соединения" in missing_terms
+    context_sources = result.trust_contract["context_sources"]
+    assert context_sources["repo_map"][0]["proof_role"] == "navigation_only"
+    assert any(
+        item["evidence_class"] == "source_snippet" and item["matched_terms"] == ["help_chat"]
+        for item in context_sources["source_evidence"]
+    )
+    assert any(
+        item["evidence_class"] == "absent_in_source" and "Сервис временно недоступен" in item["missing_terms"]
+        for item in context_sources["source_evidence"]
+    )
+    assert result.recommended_next_actions[-1]["action"] == "search_project_sources"
+
+
+def test_project_context_prefers_authoritative_workflow_docs_over_noisy_dogfood_artifacts():
+    question = "How should agents use the Docmancer MCP workflow, project architecture, and conventions?"
+    artifact_path = "docs/research/docatlas-dogfood-v4/nbo/patch-review/review_summary.md"
+    facade = FakeProjectContextFacade()
+    facade.project_docs = ProjectDocsResult(
+        project_path="/repo",
+        query=question,
+        results=[
+            ProjectDocsChunk(
+                title="Old dogfood patch-review output",
+                content=(
+                    "Docmancer MCP Workflow architecture conventions project context get_project_context. "
+                    "This generated dogfood artifact repeats architecture workflow terms from an old review run."
+                ),
+                source=f"/repo/{artifact_path}",
+                url=None,
+                path=artifact_path,
+                heading_path="Docmancer MCP Workflow",
+                metadata={"score": 0.99},
+            ),
+            ProjectDocsChunk(
+                title="Architecture",
+                content=(
+                    "Docmancer MCP Workflow is defined by authoritative architecture docs. "
+                    "Agents inspect, sync, then call get_project_context for project workflow and conventions."
+                ),
+                source="/repo/ARCHITECTURE.md",
+                url=None,
+                path="ARCHITECTURE.md",
+                heading_path="Docmancer MCP Workflow",
+                metadata={"score": 0.60},
+            ),
+            ProjectDocsChunk(
+                title="Docs index",
+                content=(
+                    "The project docs index maps architecture, workflow, runbooks, and conventions for Docmancer MCP."
+                ),
+                source="/repo/docs/INDEX.md",
+                url=None,
+                path="docs/INDEX.md",
+                heading_path="Docmancer MCP Workflow",
+                metadata={"score": 0.55},
+            ),
+        ],
+        indexed_sources=[
+            {"path": artifact_path, "source": f"/repo/{artifact_path}"},
+            {"path": "ARCHITECTURE.md", "source": "/repo/ARCHITECTURE.md"},
+            {"path": "docs/INDEX.md", "source": "/repo/docs/INDEX.md"},
+        ],
+    )
+
+    result = ProjectContextService(facade).get_project_context("/repo", question, mode="project-only", limit=3)
+
+    project_paths = [item["path"] for item in result.context_pack if item["source_class"] == "project_doc"]
+    assert project_paths[:2] == ["ARCHITECTURE.md", "docs/INDEX.md"]
+    assert artifact_path in project_paths
+
+    architecture_item = next(item for item in result.context_pack if item.get("path") == "ARCHITECTURE.md")
+    assert architecture_item["source_type"] == "architecture"
+    assert architecture_item["authority"] == "primary"
+    assert architecture_item["risk_flags"] == []
+
+    artifact_item = next(item for item in result.context_pack if item.get("path") == artifact_path)
+    assert artifact_item["source_type"] == "patch_review_artifact"
+    assert artifact_item["authority"] == "artifact"
+    assert "dogfood_artifact" in artifact_item["risk_flags"]
+    assert "patch_review_artifact" in artifact_item["risk_flags"]
+
+    contract_sources = result.trust_contract["selected_sources"]
+    contract_paths = [item["path"] for item in contract_sources]
+    assert contract_paths == ["ARCHITECTURE.md", "docs/INDEX.md", artifact_path]
+    assert result.trust_contract["selected"] == contract_sources
+    assert result.trust_contract["trusted_sources"] == contract_sources
+
+    reading_paths = [item["path"] for item in result.answer_outline["recommended_reading_order"]]
+    assert reading_paths[:3] == ["ARCHITECTURE.md", "docs/INDEX.md", artifact_path]
+
+    contract_artifact = next(item for item in contract_sources if item.get("path") == artifact_path)
+    assert contract_artifact["source_type"] == "patch_review_artifact"
+    assert "patch_review_artifact" in contract_artifact["risk_flags"]
+
+
 def test_russian_story_requirement_chunks_drop_question_scaffolding_and_connectors():
     facade = FakeProjectContextFacade()
     question = (
@@ -275,7 +578,24 @@ def test_context_pack_snippet_and_metrics_shape_are_stable():
     )
     pack = project_context_pack(project_docs=project_docs, dependency_docs=None)
     assert pack[0]["token_estimate"] > 2
-    assert pack[0]["source"] == {
+    assert pack[0]["source_type"] == "readme"
+    assert pack[0]["authority"] == "primary"
+    assert pack[0]["risk_flags"] == []
+    source = pack[0]["source"]
+    assert source["source_type"] == "readme"
+    assert source["authority"] == "primary"
+    assert source["risk_flags"] == []
+    assert {key: source[key] for key in (
+        "source_class",
+        "doc_scope",
+        "module_id",
+        "module_name",
+        "module_path",
+        "module_type",
+        "path",
+        "url",
+        "title",
+    )} == {
         "source_class": "project_doc",
         "doc_scope": "project",
         "module_id": None,

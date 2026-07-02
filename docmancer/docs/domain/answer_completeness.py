@@ -6,6 +6,9 @@ from typing import Any
 from docmancer.docs.domain.project_doc_ranking import normalize_doc_path
 
 SCHEMA_VERSION = "answer-completeness-1.0"
+_PROOF_SOURCE_CLASSES = {"project_doc", "dependency_doc", "source_evidence"}
+_SOURCE_BACKED_PROOF_SOURCE_CLASSES = {"source_evidence", "test_evidence"}
+_ABSENT_EVIDENCE_CLASSES = {"absent_in_source"}
 
 _QUOTED_TERM_RE = re.compile(r"[\"'`“”‘’«»„]+([^\"'`“”‘’«»„]{2,120})[\"'`“”‘’«»„]+")
 _CODE_TERM_RE = re.compile(
@@ -149,6 +152,10 @@ _STOPWORDS = {
 }
 
 
+def extract_project_answer_requirements(question: str) -> list[str]:
+    return _extract_requirements(question)
+
+
 def evaluate_project_answer_completeness(
     *,
     question: str,
@@ -158,13 +165,15 @@ def evaluate_project_answer_completeness(
 ) -> dict[str, Any]:
     """Return a backward-compatible completeness contract for get_project_context."""
 
-    requirements = _extract_requirements(question)
-    context_text = _context_text(context_pack)
-    coverage_by_requirement = [_requirement_coverage(term, context_pack=context_pack, context_text=context_text) for term in requirements]
+    requirements = extract_project_answer_requirements(question)
+    story_specific_query = _is_story_specific_query(question, intent, requirements)
+    proof_context_pack = _source_backed_context_pack(context_pack) if story_specific_query else _proof_context_pack(context_pack)
+    context_text = _context_text(proof_context_pack)
+    coverage_by_requirement = [_requirement_coverage(term, context_pack=proof_context_pack, context_text=context_text) for term in requirements]
     matched_terms = [item["term"] for item in coverage_by_requirement if item["matched"]]
     missing_terms = [item["term"] for item in coverage_by_requirement if not item["matched"]]
     coverage_score = (len(matched_terms) / len(requirements)) if requirements else (1.0 if answer_available else 0.0)
-    source_search_required = bool(answer_available and missing_terms and _is_story_specific_query(question, intent, requirements))
+    source_search_required = bool(answer_available and missing_terms and story_specific_query)
     navigational_context = _has_navigational_context(context_pack)
 
     if not answer_available:
@@ -184,7 +193,7 @@ def evaluate_project_answer_completeness(
     if not answer_available:
         reason_codes.append("no_trusted_context")
     if source_search_required:
-        reason_codes.append("story_terms_missing_from_selected_project_docs")
+        reason_codes.append("story_terms_missing_from_source_evidence")
     if navigational_context:
         reason_codes.append("navigational_context_present")
 
@@ -217,7 +226,10 @@ def _extract_requirements(question: str) -> list[str]:
         term = _clean_term(match)
         if term:
             terms.append(term)
-    if not terms:
+    if terms and not quoted and _looks_like_story_requirement_question(question):
+        terms.extend(_extract_explicit_story_phrases(question))
+        terms.extend(_extract_russian_story_requirement_chunks(question))
+    elif not terms:
         terms.extend(_extract_explicit_story_phrases(question))
     if not terms:
         terms.extend(_extract_russian_story_requirement_chunks(question))
@@ -232,6 +244,11 @@ def _extract_requirements(question: str) -> list[str]:
             if any(marker in normalized for marker in _STORY_MARKERS):
                 terms.append(term)
     return _dedupe_terms(terms)
+
+
+def _looks_like_story_requirement_question(question: str) -> bool:
+    normalized = _normalize_text(question)
+    return any(marker in normalized for marker in _STORY_MARKERS) or bool(_RUSSIAN_ACTION_RE.search(question or ""))
 
 
 def _extract_explicit_story_phrases(question: str) -> list[str]:
@@ -341,7 +358,7 @@ def _source_search_action(*, missing_terms: list[str], context_pack: list[dict[s
     return {
         "action": "search_project_sources",
         "tool": "code_search",
-        "reason": "Selected project docs are partial/navigational; exact story-specific terms are missing from selected snippets.",
+        "reason": "Selected docs are partial/navigational; exact story-specific terms are missing from source-backed snippets.",
         "query_terms": missing_terms[:8],
         "suggested_doc_paths": suggested_paths[:8],
         "suggested_symbols": _suggested_symbols(context_pack),
@@ -399,6 +416,26 @@ def _is_story_specific_query(question: str, intent: Any, requirements: list[str]
 
 def _context_text(context_pack: list[dict[str, Any]]) -> str:
     return _normalize_text(_context_text_raw(context_pack))
+
+
+def _proof_context_pack(context_pack: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    return [item for item in context_pack if item.get("source_class") in _PROOF_SOURCE_CLASSES and _is_positive_proof_item(item)]
+
+
+def _source_backed_context_pack(context_pack: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    return [
+        item
+        for item in context_pack
+        if item.get("source_class") in _SOURCE_BACKED_PROOF_SOURCE_CLASSES and _is_positive_proof_item(item)
+    ]
+
+
+def _is_positive_proof_item(item: dict[str, Any]) -> bool:
+    if item.get("source_class") == "source_evidence" and item.get("evidence_class") in _ABSENT_EVIDENCE_CLASSES:
+        return False
+    if item.get("source_class") == "source_evidence" and item.get("matched") is False:
+        return False
+    return True
 
 
 def _context_text_raw(context_pack: list[dict[str, Any]]) -> str:

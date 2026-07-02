@@ -6,11 +6,12 @@ from typing import Any
 import re
 
 from docmancer.docs.application.project_answer_outline import build_project_answer_outline
-from docmancer.docs.domain.answer_completeness import evaluate_project_answer_completeness
-from docmancer.docs.domain.project_doc_ranking import is_changelog_path, normalize_doc_path, rerank_project_doc_chunks
+from docmancer.docs.domain.answer_completeness import evaluate_project_answer_completeness, extract_project_answer_requirements
+from docmancer.docs.domain.project_doc_ranking import is_changelog_path, normalize_doc_path, project_source_taxonomy, rerank_project_doc_chunks
 from docmancer.docs.domain.project_query_intent import classify_project_query_intent
 from docmancer.docs.domain.quality import has_code_symbol_evidence, internal_noise_score, is_trivial_section, looks_like_code_or_command
 from docmancer.docs.domain.snippets import best_context_pack_snippet, build_snippet_presentation, validate_response_style
+from docmancer.docs.domain.source_map import build_project_repo_map, build_project_source_evidence, source_evidence_diagnostics, source_map_diagnostics
 from docmancer.docs.domain.trust_contract import build_project_context_trust_contract
 from docmancer.docs.models import DocsChunk, DocsResult, ProjectContextResult, ProjectDocsResult, ProjectMetadata
 
@@ -67,12 +68,6 @@ class ProjectContextService:
                 project_path=str(root),
             )
 
-        trust_contract = build_project_context_trust_contract(
-            project_docs=project_docs,
-            dependency_docs=dependency_docs,
-            requested_library=selected_dependency,
-            mode=mode,
-        )
         warnings = [*(project_docs.warnings if project_docs else [])]
         if dependency_docs:
             warnings.extend(dependency_docs.warnings)
@@ -84,6 +79,32 @@ class ProjectContextService:
         next_action = project_docs.next_action if requires_confirmation and project_docs else {}
         arguments_patch = project_docs.arguments_patch if requires_confirmation and project_docs else {}
         context_pack = project_context_pack(project_docs=project_docs, dependency_docs=dependency_docs)
+        requirements = extract_project_answer_requirements(question)
+        repo_map_items: list[dict[str, Any]] = []
+        source_evidence_items: list[dict[str, Any]] = []
+        if mode in {"auto", "project-only"}:
+            repo_map_items = build_project_repo_map(
+                root,
+                question=question,
+                max_files=max(1, min(8, limit or 4)),
+                token_budget=_repo_map_token_budget(tokens),
+            )
+            context_pack.extend(repo_map_items)
+            source_evidence_items = build_project_source_evidence(
+                root,
+                question=question,
+                requirements=requirements,
+                max_items=max(1, min(12, (limit or 4) * 2)),
+                token_budget=_source_evidence_token_budget(tokens),
+            )
+            context_pack.extend(source_evidence_items)
+        trust_contract = build_project_context_trust_contract(
+            project_docs=project_docs,
+            dependency_docs=dependency_docs,
+            requested_library=selected_dependency,
+            mode=mode,
+            context_pack=context_pack,
+        )
         answer_outline = build_project_answer_outline(question=question, intent=intent, context_pack=context_pack)
         metrics = project_context_metrics(context_pack=context_pack, project_docs=project_docs, dependency_docs=dependency_docs, intent=intent)
         lane_priority = ["project"] if mode == "project-only" else (["dependency"] if mode in {"deps-only", "public-docs"} else ["project", "dependency"])
@@ -95,6 +116,10 @@ class ProjectContextService:
         )
         metrics["snippet_metrics"] = snippet_presentation.metrics
         diagnostics: dict[str, Any] = {"query_intent": intent.name}
+        if repo_map_items:
+            diagnostics["repo_map"] = source_map_diagnostics(repo_map_items)
+        if source_evidence_items:
+            diagnostics["source_evidence"] = source_evidence_diagnostics(source_evidence_items)
         if project_docs is not None and hasattr(self.facade, "active_index_diagnostics"):
             diagnostics["active_index"] = self.facade.active_index_diagnostics(str(root))
         if intent.name == "mcp_disambiguation":
@@ -112,7 +137,8 @@ class ProjectContextService:
                     "preferred_for": ["API calls", "agent actions", "installed packs"],
                 },
             ]
-        answer_available = bool(project_docs and project_docs.answer_available) or bool(dependency_docs and dependency_docs.results)
+        source_evidence_answer_available = any(item.get("evidence_class") == "source_snippet" for item in source_evidence_items)
+        answer_available = bool(project_docs and project_docs.answer_available) or bool(dependency_docs and dependency_docs.results) or source_evidence_answer_available
         if getattr(intent, "wants_code_symbols", False) and not any(
             has_code_symbol_evidence(
                 str(item.get("content") or ""),
@@ -146,7 +172,7 @@ class ProjectContextService:
             next_actions.extend(recommended_next_actions)
             warning = {
                 "code": answer_type,
-                "message": "Selected project docs are partial/navigational for this story-specific question; search project source for missing terms.",
+                "message": "Selected context is partial/navigational for this story-specific question; search project source for missing source-backed terms.",
             }
             answer_outline.setdefault("warnings", []).append(warning)
             metrics.setdefault("quality", {}).setdefault("warnings", []).append(warning)
@@ -211,8 +237,13 @@ def project_context_pack(*, project_docs: ProjectDocsResult | None, dependency_d
                 continue
             token_estimate = max(1, len(item.content) // 4) if item.content else 0
             freshness = "stale" if item.stale else "current"
+            source_taxonomy = project_source_taxonomy(item.path, doc_scope=item.doc_scope, module_path=item.module_path)
             pack.append({
                 "source_class": "project_doc",
+                "source_type": source_taxonomy["source_type"],
+                "source_kind": source_taxonomy["source_kind"],
+                "authority": source_taxonomy["authority"],
+                "risk_flags": source_taxonomy["risk_flags"],
                 "doc_scope": item.doc_scope,
                 "module_id": item.module_id,
                 "module_name": item.module_name,
@@ -228,6 +259,10 @@ def project_context_pack(*, project_docs: ProjectDocsResult | None, dependency_d
                 "token_estimate": token_estimate,
                 "source": {
                     "source_class": "project_doc",
+                    "source_type": source_taxonomy["source_type"],
+                    "source_kind": source_taxonomy["source_kind"],
+                    "authority": source_taxonomy["authority"],
+                    "risk_flags": source_taxonomy["risk_flags"],
                     "doc_scope": item.doc_scope,
                     "module_id": item.module_id,
                     "module_name": item.module_name,
@@ -289,6 +324,18 @@ def project_context_pack(*, project_docs: ProjectDocsResult | None, dependency_d
                 pack[-1]["snippet"] = snippet
                 pack[-1]["surrounding_context"] = item.content
     return pack
+
+
+def _repo_map_token_budget(tokens: int | None) -> int:
+    if not tokens:
+        return 900
+    return max(120, min(900, tokens // 4))
+
+
+def _source_evidence_token_budget(tokens: int | None) -> int:
+    if not tokens:
+        return 700
+    return max(120, min(700, tokens // 5))
 
 
 def _drop_low_value_context_section(content: str, title: str | None = None, heading_path: str | None = None) -> bool:

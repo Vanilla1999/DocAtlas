@@ -934,6 +934,16 @@ def test_get_project_context_diagnostics_preserve_query_intent_and_active_index(
 
 def test_get_project_context_answers_dart_symbol_docs_with_snippet_evidence(tmp_path, monkeypatch):
     project = _flutter_project(tmp_path)
+    (project / "lib" / "src").mkdir(parents=True)
+    (project / "lib" / "src" / "help_request_module.dart").write_text(
+        """
+class HelpRequestModule {
+  void init(Object config, String mode) {}
+}
+""".strip()
+        + "\n",
+        encoding="utf-8",
+    )
     (project / "README.md").write_text("# App\n\nProject overview.", encoding="utf-8")
     (project / "ARCHITECTURE.md").write_text(
         """
@@ -968,6 +978,7 @@ Main class: `HelpRequestModule`.
     assert result.reason == "trusted_context_available"
     assert result.primary_snippet is not None
     assert "HelpRequestModule.init" in result.primary_snippet["code"]
+    assert any(item.get("source_class") == "source_evidence" and item.get("path") == "lib/src/help_request_module.dart" for item in result.context_pack)
     assert not any(action.get("tool") == "code_search" for action in result.next_actions)
 
 
@@ -1494,7 +1505,9 @@ def test_get_project_context_can_return_project_and_dependency_context(tmp_path,
     assert result.answer_available is True
     assert result.project_docs is not None
     assert result.dependency_docs is not None
-    assert {item["source_class"] for item in result.context_pack} == {"project_doc", "dependency_doc"}
+    context_source_classes = {item["source_class"] for item in result.context_pack}
+    assert {"project_doc", "dependency_doc"}.issubset(context_source_classes)
+    assert any(item.get("source_class") == "source_evidence" and item.get("evidence_class") == "absent_in_source" for item in result.context_pack)
     assert result.metrics["project_result_count"] >= 1
     assert result.metrics["dependency_result_count"] >= 1
     selected_classes = {item["source_class"] for item in result.trust_contract["selected_sources"]}

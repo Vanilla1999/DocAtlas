@@ -46,7 +46,7 @@ def classify_project_query_intent(question: str) -> ProjectQueryIntent:
     def has_any(terms: list[str]) -> bool:
         return any(term in q for term in terms)
 
-    wants_architecture = has_any(["architecture", "architectural", "project structure", "structured", "structure", "layout", "components", "design", "overview"])
+    wants_architecture = has_any(["architecture", "architectural", "project structure", "structured", "structure", "layout", "components", "design", "overview", "workflow", "convention", "conventions", "runbook", "runbooks", "adr"])
     wants_how_to = has_any(["how do i", "how to", "how does", "usage", "use", "setup", "configure", "config", "install", "quickstart", "getting started"])
     wants_ingestion = has_any(["ingest", "ingestion", "index", "indexing", "indexed", "retrieval", "retrieve", "chunk", "chunking", "embedding", "vector", "fts", "qdrant"])
     wants_release = has_any(["changelog", "release", "released", "changed", "added", "removed", "breaking", "migration", "version history", "what changed", "recently changed"])
