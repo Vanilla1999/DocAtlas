@@ -1474,6 +1474,69 @@ def test_patch_review_bot_bundle_routes_open_design_unknowns_to_manual_review(tm
     }
 
 
+def test_patch_review_surfaces_manual_review_validation_status(tmp_path: Path):
+    repo = _repo(tmp_path)
+    _git(repo, "init")
+    _git(repo, "config", "user.email", "test@example.com")
+    _git(repo, "config", "user.name", "Test User")
+    _git(repo, "add", ".")
+    _git(repo, "commit", "-m", "base")
+    _write(repo / "lib/presentation/menu_view.dart", "void buildMenu() {\n  showRedesignedMenu();\n}\n")
+    out = tmp_path / "review-manual-status"
+
+    class FakeDocsService:
+        def get_patch_constraints(self, *args: Any, **kwargs: Any) -> PatchConstraintPacket:
+            return PatchConstraintPacket(
+                task="Review menu behavior",
+                constraints=[
+                    PatchConstraint(
+                        id="menu-behavior",
+                        type="behavior",
+                        instruction="Keep menu behavior aligned with the designer-approved interaction.",
+                        source="docs/menu.md",
+                        severity="warning",
+                        confidence="medium",
+                        evidence="Designer approval is required for this interaction.",
+                    )
+                ],
+                confidence="medium",
+            )
+
+        def validate_patch_against_constraints(self, *args: Any, **kwargs: Any) -> PatchConstraintValidationPacket:
+            return PatchConstraintValidationPacket(
+                task="Review menu behavior",
+                project_path=str(repo),
+                total_constraints=1,
+                manual_review=1,
+                results=[
+                    PatchConstraintValidationResult(
+                        constraint_id="menu-behavior",
+                        status="manual_review",
+                        reason="semantic constraint is not mechanically decidable from changed files or diff",
+                        files=[],
+                        remediation="Review designer approval before treating this as satisfied.",
+                    )
+                ],
+                confidence="low",
+            )
+
+    PatchReviewService(cast(Any, FakeDocsService())).run(
+        project_path=str(repo),
+        task="Review menu behavior",
+        output_dir=str(out),
+    )
+
+    quality = json.loads((out / "review_summary_quality.json").read_text(encoding="utf-8"))
+    summary = (out / "review_summary.md").read_text(encoding="utf-8")
+    consumer_decision = _fake_pr_bot_consume_manifest(out / "review_summary_manifest.json")
+
+    assert quality["manual_review_count"] == 1
+    assert quality["unknown_count"] == 0
+    assert "manual_review: 1" in summary
+    assert consumer_decision["requires_manual_review"] is True
+    assert consumer_decision["unknown_triage_codes"] == ["manual_review_required"]
+
+
 def test_patch_review_writes_machine_readable_action_items(tmp_path: Path):
     repo = tmp_path / "repo"
     repo.mkdir()

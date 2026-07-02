@@ -368,6 +368,9 @@ class PatchConstraintValidationResult:
     reason: str
     files: list[str] = field(default_factory=list)
     evidence: str | None = None
+    constraint_type: str | None = None
+    source_refs: list[dict[str, Any]] = field(default_factory=list)
+    remediation: str | None = None
 
 
 @dataclass(frozen=True)
@@ -378,6 +381,7 @@ class PatchConstraintValidationPacket:
     satisfied: int = 0
     violated: int = 0
     unknown: int = 0
+    manual_review: int = 0
     results: list[PatchConstraintValidationResult] = field(default_factory=list)
     warnings: list[str] = field(default_factory=list)
     confidence: str = "low"

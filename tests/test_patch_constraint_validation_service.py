@@ -117,6 +117,47 @@ def test_marks_verification_constraint_unknown_without_test_evidence():
     assert "test evidence" in result.results[0].reason.lower()
 
 
+def test_marks_semantic_behavior_constraint_for_manual_review_with_source_refs():
+    constraint = _constraint(
+        "designer-input",
+        "behavior",
+        "Keep the redesigned menu behavior aligned with the designer-approved interaction.",
+    )
+    constraint = PatchConstraint(
+        **{**asdict(constraint), "source_refs": [{"path": "docs/menu.md", "line_start": 12, "line_end": 15}]}
+    )
+
+    result = _service().validate_patch_against_constraints(
+        [constraint],
+        changed_files=["lib/presentation/menu_view.dart"],
+        patch_diff="+ showRedesignedMenu();\n",
+    )
+
+    assert result.manual_review == 1
+    assert result.unknown == 0
+    assert result.results[0].status == "manual_review"
+    assert result.results[0].constraint_type == "behavior"
+    assert result.results[0].source_refs == [{"path": "docs/menu.md", "line_start": 12, "line_end": 15}]
+    assert "not mechanically decidable" in result.results[0].reason
+    assert result.results[0].remediation
+
+
+def test_deterministic_violation_cites_constraint_metadata_and_remediation():
+    constraint = _constraint(
+        "generated",
+        "generated_file",
+        "Generated files *.g.dart must not be edited by hand.",
+        files=["*.g.dart"],
+    )
+
+    result = _service().validate_patch_against_constraints([constraint], changed_files=["lib/user/user.g.dart"])
+
+    assert result.violated == 1
+    assert result.results[0].constraint_type == "generated_file"
+    assert result.results[0].evidence == "Generated files *.g.dart must not be edited by hand."
+    assert "Revert hand edits" in (result.results[0].remediation or "")
+
+
 def test_summarizes_satisfied_violated_unknown_counts():
     constraints = [
         _constraint("generated", "generated_file", "Generated files *.g.dart must not be edited.", files=["*.g.dart"]),
@@ -141,7 +182,7 @@ def test_strict_mode_adds_manual_review_warning_for_unknowns():
     result = _service().validate_patch_against_constraints([constraint], strict=True)
 
     assert result.unknown == 1
-    assert any("strict mode: unresolved unknown constraints require manual review" in warning for warning in result.warnings)
+    assert any("strict mode: unresolved unknown/manual_review constraints require manual review" in warning for warning in result.warnings)
 
 
 def test_validation_accepts_constraints_packet_dict():

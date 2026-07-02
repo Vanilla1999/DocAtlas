@@ -489,6 +489,7 @@ class PatchReviewService:
         has_violations = bool(violations) or quality_payload.get("violated_count", 0) > 0 or "violations_present" in signals
         has_manual_review = (
             quality_payload.get("unknown_count", 0) > 0
+            or quality_payload.get("manual_review_count", 0) > 0
             or "manual_review_required" in signals
             or bool(unknown_triage_codes)
         )
@@ -535,7 +536,7 @@ class PatchReviewService:
         constraint_items = list(constraints.get("constraints", []))
         results = list(validation.get("results", []))
         violations = [result for result in results if result.get("status") == "violated"]
-        unknowns = [result for result in results if result.get("status") == "unknown"]
+        unknowns = [result for result in results if result.get("status") in {"unknown", "manual_review"}]
         generated_or_lock = [
             result for result in results
             if "generated" in str(result.get("reason", "")).lower() or "lockfile" in str(result.get("reason", "")).lower()
@@ -644,6 +645,7 @@ class PatchReviewService:
             "satisfied_count": validation.get("satisfied", 0),
             "violated_count": validation.get("violated", 0),
             "unknown_count": validation.get("unknown", 0),
+            "manual_review_count": validation.get("manual_review", 0),
             "reasons": quality["reasons"],
             "signals": signals,
             "unknown_triage": unknown_triage,
@@ -936,7 +938,9 @@ class PatchReviewService:
             "## Validation",
             f"- satisfied: {validation.get('satisfied', 0)}",
             f"- violated: {validation.get('violated', 0)}",
-            f"- unknown/manual review: {validation.get('unknown', 0)}",
+            f"- unknown/manual review: {validation.get('unknown', 0) + validation.get('manual_review', 0)}",
+            f"- unknown: {validation.get('unknown', 0)}",
+            f"- manual_review: {validation.get('manual_review', 0)}",
             "",
             "## Violations",
         ])
