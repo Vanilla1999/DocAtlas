@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from docmancer.docs.domain.project_doc_ranking import project_source_taxonomy
+from docmancer.docs.domain.project_doc_ranking import normalize_doc_path, project_source_taxonomy
 from docmancer.docs.models import DocsResult, ProjectDocsResult
 
 
@@ -21,7 +21,7 @@ def build_project_context_trust_contract(
     next_actions: list[dict[str, Any]] = []
 
     if project_docs:
-        for source in project_docs.indexed_sources:
+        for source in _ordered_project_indexed_sources(project_docs, context_pack):
             source_taxonomy = project_source_taxonomy(
                 source.get("path"),
                 doc_scope=source.get("doc_scope") or "project",
@@ -139,6 +139,94 @@ def build_project_context_trust_contract(
             "reason_code": "trusted_context_available" if selected_sources else "no_trusted_context",
         },
     }
+
+
+def _ordered_project_indexed_sources(
+    project_docs: ProjectDocsResult,
+    context_pack: list[dict[str, Any]] | None,
+) -> list[dict[str, Any]]:
+    indexed_sources = list(project_docs.indexed_sources)
+    if len(indexed_sources) < 2:
+        return indexed_sources
+
+    source_order = _project_doc_source_order(project_docs=project_docs, context_pack=context_pack)
+    if not source_order:
+        return indexed_sources
+
+    ranked_sources: list[tuple[int, int, dict[str, Any]]] = []
+    for original_index, source in enumerate(indexed_sources):
+        matching_ranks = [source_order[key] for key in _source_mapping_order_keys(source) if key in source_order]
+        rank = min(matching_ranks) if matching_ranks else len(source_order) + original_index
+        ranked_sources.append((rank, original_index, source))
+    return [source for _, _, source in sorted(ranked_sources, key=lambda row: (row[0], row[1]))]
+
+
+def _project_doc_source_order(
+    *,
+    project_docs: ProjectDocsResult,
+    context_pack: list[dict[str, Any]] | None,
+) -> dict[str, int]:
+    order: dict[str, int] = {}
+    next_rank = 0
+
+    def remember(keys: list[str]) -> None:
+        nonlocal next_rank
+        if not keys:
+            return
+        existing_ranks = [order[key] for key in keys if key in order]
+        if existing_ranks:
+            rank = min(existing_ranks)
+        else:
+            rank = next_rank
+            next_rank += 1
+        for key in keys:
+            order.setdefault(key, rank)
+
+    for item in context_pack or []:
+        if item.get("source_class") == "project_doc":
+            remember(_context_item_order_keys(item))
+    for chunk in project_docs.results:
+        remember(_chunk_order_keys(chunk))
+    return order
+
+
+def _context_item_order_keys(item: dict[str, Any]) -> list[str]:
+    raw_source = item.get("source")
+    source: dict[str, Any] = raw_source if isinstance(raw_source, dict) else {}
+    return _normalized_order_keys([
+        item.get("path"),
+        source.get("path"),
+        item.get("source_url"),
+        source.get("source_url"),
+        item.get("url"),
+        source.get("url"),
+    ])
+
+
+def _chunk_order_keys(chunk: Any) -> list[str]:
+    return _normalized_order_keys([
+        getattr(chunk, "path", None),
+        getattr(chunk, "source", None),
+        getattr(chunk, "url", None),
+    ])
+
+
+def _source_mapping_order_keys(source: dict[str, Any]) -> list[str]:
+    return _normalized_order_keys([
+        source.get("path"),
+        source.get("source"),
+        source.get("source_url"),
+        source.get("url"),
+    ])
+
+
+def _normalized_order_keys(values: list[Any]) -> list[str]:
+    keys: list[str] = []
+    for value in values:
+        key = normalize_doc_path(str(value) if value is not None else None)
+        if key and key not in keys:
+            keys.append(key)
+    return keys
 
 
 def _build_context_sources(context_pack: list[dict[str, Any]] | None) -> dict[str, Any]:

@@ -512,6 +512,14 @@ def test_project_context_prefers_authoritative_workflow_docs_over_noisy_dogfood_
     assert "patch_review_artifact" in artifact_item["risk_flags"]
 
     contract_sources = result.trust_contract["selected_sources"]
+    contract_paths = [item["path"] for item in contract_sources]
+    assert contract_paths == ["ARCHITECTURE.md", "docs/INDEX.md", artifact_path]
+    assert result.trust_contract["selected"] == contract_sources
+    assert result.trust_contract["trusted_sources"] == contract_sources
+
+    reading_paths = [item["path"] for item in result.answer_outline["recommended_reading_order"]]
+    assert reading_paths[:3] == ["ARCHITECTURE.md", "docs/INDEX.md", artifact_path]
+
     contract_artifact = next(item for item in contract_sources if item.get("path") == artifact_path)
     assert contract_artifact["source_type"] == "patch_review_artifact"
     assert "patch_review_artifact" in contract_artifact["risk_flags"]
