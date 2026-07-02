@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from docmancer.docs.domain.project_doc_ranking import project_source_taxonomy
 from docmancer.docs.models import DocsResult, ProjectDocsResult
 
 
@@ -21,8 +22,17 @@ def build_project_context_trust_contract(
 
     if project_docs:
         for source in project_docs.indexed_sources:
+            source_taxonomy = project_source_taxonomy(
+                source.get("path"),
+                doc_scope=source.get("doc_scope") or "project",
+                module_path=source.get("module_path"),
+            )
             selected_sources.append({
                 "source_class": "project_file",
+                "source_type": source_taxonomy["source_type"],
+                "source_kind": source_taxonomy["source_kind"],
+                "authority": source_taxonomy["authority"],
+                "risk_flags": source_taxonomy["risk_flags"],
                 "path": source.get("path"),
                 "source": source.get("source"),
                 "doc_scope": source.get("doc_scope") or "project",

@@ -212,6 +212,26 @@ def test_ambiguous_mcp_query_includes_specific_docs_and_packs_sources():
     assert "CHANGELOG.md" not in paths[:3]
 
 
+def test_explicit_dogfood_query_can_promote_artifact_source():
+    question = "What did the docatlas dogfood patch-review artifact find about the workflow?"
+    intent = classify_project_query_intent(question)
+    artifact_path = "docs/research/docatlas-dogfood-v4/nbo/patch-review/review_summary.md"
+
+    ranked = rerank_project_doc_chunks(
+        [
+            fake_chunk(path="ARCHITECTURE.md", heading_path="Workflow", content="Authoritative workflow overview.", score=0.90),
+            fake_chunk(path=artifact_path, heading_path="Dogfood workflow finding", content="Dogfood patch-review artifact finding.", score=0.75),
+        ],
+        question=question,
+        intent=intent,
+        limit=2,
+    )
+
+    assert ranked[0].path == artifact_path
+    assert ranked[0].metadata["project_source"]["source_type"] == "patch_review_artifact"
+    assert "dogfood_artifact" in ranked[0].metadata["project_source"]["risk_flags"]
+
+
 def test_ranking_metadata_attached_when_metadata_is_none():
     intent = classify_project_query_intent("What is the architecture?")
 

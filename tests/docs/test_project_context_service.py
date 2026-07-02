@@ -443,6 +443,80 @@ class HelpChatWidget {}
     assert result.recommended_next_actions[-1]["action"] == "search_project_sources"
 
 
+def test_project_context_prefers_authoritative_workflow_docs_over_noisy_dogfood_artifacts():
+    question = "How should agents use the Docmancer MCP workflow, project architecture, and conventions?"
+    artifact_path = "docs/research/docatlas-dogfood-v4/nbo/patch-review/review_summary.md"
+    facade = FakeProjectContextFacade()
+    facade.project_docs = ProjectDocsResult(
+        project_path="/repo",
+        query=question,
+        results=[
+            ProjectDocsChunk(
+                title="Old dogfood patch-review output",
+                content=(
+                    "Docmancer MCP Workflow architecture conventions project context get_project_context. "
+                    "This generated dogfood artifact repeats architecture workflow terms from an old review run."
+                ),
+                source=f"/repo/{artifact_path}",
+                url=None,
+                path=artifact_path,
+                heading_path="Docmancer MCP Workflow",
+                metadata={"score": 0.99},
+            ),
+            ProjectDocsChunk(
+                title="Architecture",
+                content=(
+                    "Docmancer MCP Workflow is defined by authoritative architecture docs. "
+                    "Agents inspect, sync, then call get_project_context for project workflow and conventions."
+                ),
+                source="/repo/ARCHITECTURE.md",
+                url=None,
+                path="ARCHITECTURE.md",
+                heading_path="Docmancer MCP Workflow",
+                metadata={"score": 0.60},
+            ),
+            ProjectDocsChunk(
+                title="Docs index",
+                content=(
+                    "The project docs index maps architecture, workflow, runbooks, and conventions for Docmancer MCP."
+                ),
+                source="/repo/docs/INDEX.md",
+                url=None,
+                path="docs/INDEX.md",
+                heading_path="Docmancer MCP Workflow",
+                metadata={"score": 0.55},
+            ),
+        ],
+        indexed_sources=[
+            {"path": artifact_path, "source": f"/repo/{artifact_path}"},
+            {"path": "ARCHITECTURE.md", "source": "/repo/ARCHITECTURE.md"},
+            {"path": "docs/INDEX.md", "source": "/repo/docs/INDEX.md"},
+        ],
+    )
+
+    result = ProjectContextService(facade).get_project_context("/repo", question, mode="project-only", limit=3)
+
+    project_paths = [item["path"] for item in result.context_pack if item["source_class"] == "project_doc"]
+    assert project_paths[:2] == ["ARCHITECTURE.md", "docs/INDEX.md"]
+    assert artifact_path in project_paths
+
+    architecture_item = next(item for item in result.context_pack if item.get("path") == "ARCHITECTURE.md")
+    assert architecture_item["source_type"] == "architecture"
+    assert architecture_item["authority"] == "primary"
+    assert architecture_item["risk_flags"] == []
+
+    artifact_item = next(item for item in result.context_pack if item.get("path") == artifact_path)
+    assert artifact_item["source_type"] == "patch_review_artifact"
+    assert artifact_item["authority"] == "artifact"
+    assert "dogfood_artifact" in artifact_item["risk_flags"]
+    assert "patch_review_artifact" in artifact_item["risk_flags"]
+
+    contract_sources = result.trust_contract["selected_sources"]
+    contract_artifact = next(item for item in contract_sources if item.get("path") == artifact_path)
+    assert contract_artifact["source_type"] == "patch_review_artifact"
+    assert "patch_review_artifact" in contract_artifact["risk_flags"]
+
+
 def test_russian_story_requirement_chunks_drop_question_scaffolding_and_connectors():
     facade = FakeProjectContextFacade()
     question = (
@@ -496,7 +570,24 @@ def test_context_pack_snippet_and_metrics_shape_are_stable():
     )
     pack = project_context_pack(project_docs=project_docs, dependency_docs=None)
     assert pack[0]["token_estimate"] > 2
-    assert pack[0]["source"] == {
+    assert pack[0]["source_type"] == "readme"
+    assert pack[0]["authority"] == "primary"
+    assert pack[0]["risk_flags"] == []
+    source = pack[0]["source"]
+    assert source["source_type"] == "readme"
+    assert source["authority"] == "primary"
+    assert source["risk_flags"] == []
+    assert {key: source[key] for key in (
+        "source_class",
+        "doc_scope",
+        "module_id",
+        "module_name",
+        "module_path",
+        "module_type",
+        "path",
+        "url",
+        "title",
+    )} == {
         "source_class": "project_doc",
         "doc_scope": "project",
         "module_id": None,

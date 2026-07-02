@@ -7,7 +7,7 @@ import re
 
 from docmancer.docs.application.project_answer_outline import build_project_answer_outline
 from docmancer.docs.domain.answer_completeness import evaluate_project_answer_completeness, extract_project_answer_requirements
-from docmancer.docs.domain.project_doc_ranking import is_changelog_path, normalize_doc_path, rerank_project_doc_chunks
+from docmancer.docs.domain.project_doc_ranking import is_changelog_path, normalize_doc_path, project_source_taxonomy, rerank_project_doc_chunks
 from docmancer.docs.domain.project_query_intent import classify_project_query_intent
 from docmancer.docs.domain.quality import has_code_symbol_evidence, internal_noise_score, is_trivial_section, looks_like_code_or_command
 from docmancer.docs.domain.snippets import best_context_pack_snippet, build_snippet_presentation, validate_response_style
@@ -237,8 +237,13 @@ def project_context_pack(*, project_docs: ProjectDocsResult | None, dependency_d
                 continue
             token_estimate = max(1, len(item.content) // 4) if item.content else 0
             freshness = "stale" if item.stale else "current"
+            source_taxonomy = project_source_taxonomy(item.path, doc_scope=item.doc_scope, module_path=item.module_path)
             pack.append({
                 "source_class": "project_doc",
+                "source_type": source_taxonomy["source_type"],
+                "source_kind": source_taxonomy["source_kind"],
+                "authority": source_taxonomy["authority"],
+                "risk_flags": source_taxonomy["risk_flags"],
                 "doc_scope": item.doc_scope,
                 "module_id": item.module_id,
                 "module_name": item.module_name,
@@ -254,6 +259,10 @@ def project_context_pack(*, project_docs: ProjectDocsResult | None, dependency_d
                 "token_estimate": token_estimate,
                 "source": {
                     "source_class": "project_doc",
+                    "source_type": source_taxonomy["source_type"],
+                    "source_kind": source_taxonomy["source_kind"],
+                    "authority": source_taxonomy["authority"],
+                    "risk_flags": source_taxonomy["risk_flags"],
                     "doc_scope": item.doc_scope,
                     "module_id": item.module_id,
                     "module_name": item.module_name,

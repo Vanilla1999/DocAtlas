@@ -9,6 +9,8 @@ from docmancer.docs.domain.quality import has_code_symbol_evidence, internal_noi
 
 
 CHANGELOG_FILENAMES = {"changelog", "changelog.md", "changes", "changes.md", "history", "history.md"}
+PROJECT_MODULE_ROOTS = {"packages", "apps", "services", "modules", "libs", "crates", "plugins", "components"}
+GENERATED_REVIEW_FILENAMES = {"review_summary.md", "constraints.md", "review_summary_quality.json", "review_summary_actions.json", "review_summary_manifest.json"}
 
 
 def normalize_doc_path(path: str | None) -> str:
@@ -22,6 +24,52 @@ def basename(path: str | None) -> str:
 def is_changelog_path(path: str | None) -> bool:
     name = basename(path)
     return name in CHANGELOG_FILENAMES or name.startswith("changelog.")
+
+
+def project_source_taxonomy(path: str | None, *, doc_scope: str | None = None, module_path: str | None = None) -> dict[str, Any]:
+    """Classify project-doc source authority without excluding it from retrieval."""
+    p = normalize_doc_path(path)
+    parts = [part for part in p.split("/") if part]
+    name = parts[-1] if parts else ""
+    risk_flags: list[str] = []
+    if p.startswith("docs/research/") or "/research/" in p:
+        risk_flags.append("research_artifact")
+    if "docatlas-dogfood" in p or "dogfood" in p:
+        risk_flags.append("dogfood_artifact")
+    if "patch-review" in p or ".docatlas/patch-review" in p:
+        risk_flags.append("patch_review_artifact")
+    if name in GENERATED_REVIEW_FILENAMES:
+        risk_flags.append("generated_review_output")
+
+    if "patch_review_artifact" in risk_flags:
+        return {"source_type": "patch_review_artifact", "source_kind": "patch_review_artifact", "authority": "artifact", "risk_flags": risk_flags}
+    if "dogfood_artifact" in risk_flags:
+        return {"source_type": "dogfood_artifact", "source_kind": "dogfood_artifact", "authority": "artifact", "risk_flags": risk_flags}
+    if "research_artifact" in risk_flags:
+        return {"source_type": "research", "source_kind": "research", "authority": "research", "risk_flags": risk_flags}
+
+    module_doc = bool(doc_scope == "module" or module_path or (parts and parts[0] in PROJECT_MODULE_ROOTS))
+    if is_changelog_path(p):
+        return {"source_type": "changelog", "source_kind": "changelog", "authority": "historical", "risk_flags": []}
+    if name.startswith("architecture.") or name in {"architecture.md", "architecture.mdx", "arch.md", "arch.mdx"} or "architecture" in parts:
+        source_type = "package_architecture" if module_doc else "architecture"
+        authority = "secondary" if module_doc else "primary"
+        return {"source_type": source_type, "source_kind": source_type, "authority": authority, "risk_flags": []}
+    if p == "docs/index.md" or p == "doc/index.md" or (len(parts) == 2 and parts[0] in {"docs", "doc"} and name.startswith("index.")):
+        return {"source_type": "index", "source_kind": "index", "authority": "primary", "risk_flags": []}
+    if (parts and parts[0] in {"adr", "adrs"}) or "adr" in parts or "adrs" in parts:
+        return {"source_type": "adr", "source_kind": "adr", "authority": "primary", "risk_flags": []}
+    if (parts and parts[0] in {"runbook", "runbooks"}) or "runbook" in parts or "runbooks" in parts:
+        return {"source_type": "runbook", "source_kind": "runbook", "authority": "primary", "risk_flags": []}
+    if name.endswith("readme.md") or name.startswith("readme."):
+        source_type = "package_readme" if module_doc else "readme"
+        authority = "secondary" if module_doc else "primary"
+        return {"source_type": source_type, "source_kind": source_type, "authority": authority, "risk_flags": []}
+    if p.startswith("docs/") or "/docs/" in p:
+        return {"source_type": "docs", "source_kind": "docs", "authority": "supporting", "risk_flags": []}
+    if p.startswith("wiki/") or "/wiki/" in p:
+        return {"source_type": "wiki", "source_kind": "wiki", "authority": "supporting", "risk_flags": []}
+    return {"source_type": "project_doc", "source_kind": "project_doc", "authority": "supporting", "risk_flags": []}
 
 
 def is_readme_source(chunk: Any) -> bool:
@@ -74,6 +122,15 @@ def source_weight_for_intent(path: str | None, heading_path: str | None, intent:
     p = normalize_doc_path(path)
     h = (heading_path or "").lower()
     name = getattr(intent, "name", "general")
+    taxonomy = project_source_taxonomy(p)
+    source_type = taxonomy["source_type"]
+    authority = taxonomy["authority"]
+
+    if authority == "artifact":
+        artifact_sensitive = getattr(intent, "broad", False) or getattr(intent, "wants_architecture", False) or getattr(intent, "wants_how_to", False) or getattr(intent, "wants_docs_mcp", False)
+        return 0.25 if artifact_sensitive else 0.6
+    if source_type == "research" and (getattr(intent, "broad", False) or getattr(intent, "wants_architecture", False) or getattr(intent, "wants_how_to", False)):
+        return 0.45
 
     if is_changelog_path(p):
         return 1.8 if getattr(intent, "wants_release_history", False) else 0.05
@@ -87,6 +144,8 @@ def source_weight_for_intent(path: str | None, heading_path: str | None, intent:
     if name == "ingestion_internals":
         if "architecture" in p and any(term in h for term in ["ingest", "index", "retriev"]):
             return 1.65
+        if source_type == "index":
+            return 1.45
         if p.endswith("readme.md"):
             return 1.25
         if p.startswith("docs/") or "/docs/" in p:
@@ -94,6 +153,8 @@ def source_weight_for_intent(path: str | None, heading_path: str | None, intent:
         return 1.0
 
     if name in {"how_to", "ingestion_how_to"}:
+        if source_type == "index":
+            return 1.5
         if p.endswith("readme.md"):
             return 1.45
         if p.startswith("docs/") or "/docs/" in p:
@@ -104,6 +165,8 @@ def source_weight_for_intent(path: str | None, heading_path: str | None, intent:
             return 1.35
 
     if name == "docs_mcp":
+        if source_type == "index":
+            return 1.5
         if "mcp-docs" in p or "docs-server" in p or "docs_mcp" in p:
             return 1.7
         if p.endswith("readme.md"):
@@ -122,6 +185,10 @@ def source_weight_for_intent(path: str | None, heading_path: str | None, intent:
             return 0.65
 
     if name == "mcp_disambiguation":
+        if source_type == "architecture" and "mcp" in h:
+            return 1.55
+        if source_type == "index":
+            return 1.45
         if p.endswith("readme.md"):
             return 1.6
         if "mcp-docs" in p or "mcp-packs" in p:
@@ -137,6 +204,14 @@ def source_weight_for_intent(path: str | None, heading_path: str | None, intent:
         return 1.0
 
     if getattr(intent, "wants_architecture", False) or name == "architecture":
+        if source_type == "architecture":
+            return 2.0
+        if source_type == "index":
+            return 1.8
+        if source_type in {"adr", "runbook"}:
+            return 1.5
+        if source_type in {"package_architecture", "package_readme"}:
+            return 1.2
         if "architecture" in p or "architecture" in h:
             return 1.7
         if p.endswith("readme.md"):
@@ -152,6 +227,9 @@ def source_weight_for_intent(path: str | None, heading_path: str | None, intent:
 
 def source_requirement_boost(path: str | None, question: str, intent: Any) -> float:
     p = normalize_doc_path(path)
+    taxonomy = project_source_taxonomy(p)
+    if query_requests_artifact_sources(question) and taxonomy["source_type"] in {"research", "dogfood_artifact", "patch_review_artifact"}:
+        return 16.0
     if has_project_structure_terms(question):
         if p.endswith("contributing.md"):
             return 2.2
@@ -165,11 +243,35 @@ def source_requirement_boost(path: str | None, question: str, intent: Any) -> fl
     return 1.0
 
 
+def query_requests_artifact_sources(question: str) -> bool:
+    q = (question or "").lower().replace("_", "-")
+    return any(
+        term in q
+        for term in [
+            "dogfood",
+            "docatlas-dogfood",
+            "research",
+            "artifact",
+            "artifacts",
+            "patch-review",
+            "patch review",
+            "review summary",
+            "experiment",
+            "evaluation",
+        ]
+    )
+
+
 def source_weight_reason(path: str | None, heading_path: str | None, intent: Any) -> str:
     """Human-readable reason for source weighting in project-doc ranking."""
     p = normalize_doc_path(path)
     h = (heading_path or "").lower()
     name = getattr(intent, "name", "general")
+    taxonomy = project_source_taxonomy(p)
+    if taxonomy["authority"] == "artifact":
+        return "demoted as generated/research artifact context for ordinary project-doc questions"
+    if taxonomy["source_type"] == "research":
+        return "demoted as research context unless the query explicitly asks for research/history artifacts"
 
     if is_changelog_path(p):
         if getattr(intent, "wants_release_history", False):
@@ -205,6 +307,8 @@ def source_weight_reason(path: str | None, heading_path: str | None, intent: Any
             return "boosted because this is the MCP Packs/API-action runtime source"
 
     if name == "mcp_disambiguation":
+        if taxonomy["source_type"] in {"architecture", "index"}:
+            return "boosted as authoritative architecture/index evidence for MCP workflow disambiguation"
         if "mcp" in p or "mcp" in h or p.endswith("readme.md"):
             return "included to disambiguate Docs MCP server from MCP Packs runtime"
 
@@ -226,6 +330,9 @@ def source_weight_reason(path: str | None, heading_path: str | None, intent: Any
 
 def requirement_boost_reason(path: str | None, question: str, intent: Any) -> str | None:
     p = normalize_doc_path(path)
+    taxonomy = project_source_taxonomy(p)
+    if query_requests_artifact_sources(question) and taxonomy["source_type"] in {"research", "dogfood_artifact", "patch_review_artifact"}:
+        return "explicitly requested research/dogfood/history artifact context"
     if has_project_structure_terms(question):
         if p.endswith("contributing.md"):
             return "required for project-structure coverage"
@@ -250,6 +357,11 @@ def attach_project_ranking_metadata(chunk: Any, *, base_score: float, final_scor
         return chunk
     path = getattr(chunk, "path", None)
     heading_path = getattr(chunk, "heading_path", None)
+    taxonomy = project_source_taxonomy(
+        path,
+        doc_scope=getattr(chunk, "doc_scope", None),
+        module_path=getattr(chunk, "module_path", None),
+    )
     reasons = [source_weight_reason(path, heading_path, intent)]
     boost = requirement_boost_reason(path, question, intent)
     if boost:
@@ -273,6 +385,7 @@ def attach_project_ranking_metadata(chunk: Any, *, base_score: float, final_scor
         "reasons": reasons,
     }
     metadata["project_ranking"] = ranking
+    metadata["project_source"] = taxonomy
 
     if hasattr(chunk, "model_copy"):
         return chunk.model_copy(update={"metadata": metadata})
