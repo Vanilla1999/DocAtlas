@@ -4,7 +4,7 @@ import json
 from dataclasses import asdict
 from typing import Any
 
-from docmancer.docs.interfaces.mcp.project_tools import MCP_COMPACT_OUTPUT_MAX_BYTES, _compact_project_context, handle_project_tool
+from docmancer.docs.interfaces.mcp.project_tools import MCP_COMPACT_OUTPUT_MAX_BYTES, _compact_mcp_payload, _compact_project_context, handle_project_tool
 from docmancer.docs.application.project_context_service import ProjectContextService
 from docmancer.docs.models import ProjectDocsChunk, ProjectDocsResult
 from tests.docs.test_project_context_service import FakeProjectContextFacade
@@ -68,6 +68,24 @@ def test_mcp_project_context_compact_output_has_hard_size_cap():
     assert len(json.dumps(payload, ensure_ascii=False).encode("utf-8")) <= MCP_COMPACT_OUTPUT_MAX_BYTES
     assert payload["mcp_compaction"]["truncated"] is True
     assert any(isinstance(warning, dict) and warning["code"] == "mcp_compact_output_truncated" for warning in payload["warnings"])
+
+
+def test_mcp_compact_output_hard_cap_handles_many_small_mapping_fields():
+    payload = {
+        "project_path": "/repo",
+        "question": "find current web API camera implementation",
+        "status": "success",
+        "trust_contract": {f"source_{index}": {"path": f"docs/{index}.md", "score": index} for index in range(5_000)},
+        "diagnostics": {f"metric_{index}": index for index in range(2_000)},
+        "warnings": [],
+    }
+
+    compact = _compact_mcp_payload(payload)
+
+    assert len(json.dumps(compact, ensure_ascii=False).encode("utf-8")) <= MCP_COMPACT_OUTPUT_MAX_BYTES
+    assert compact["mcp_compaction"]["hard_cap_enforced"] is True
+    assert "trust_contract" in compact["mcp_compaction"]["omitted_sections"]
+    assert compact["trust_contract"]["omitted"] is True
 
 
 def test_compact_output_keeps_context_pack_trust_contract_and_outline():

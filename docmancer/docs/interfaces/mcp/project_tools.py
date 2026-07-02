@@ -12,6 +12,20 @@ MCP_COMPACT_OUTPUT_MAX_BYTES = 32_000
 _MCP_COMPACT_TEXT_KEYS = {"content", "snippet", "text", "primary_snippet"}
 _MCP_COMPACT_DEFAULT_TEXT_LIMIT = 1_200
 _MCP_COMPACT_LIST_LIMIT = 8
+_MCP_HARD_CAP_SECTION_ORDER = (
+    "context_pack",
+    "supporting_snippets",
+    "trust_contract",
+    "answer_outline",
+    "project_docs",
+    "dependency_docs",
+    "diagnostics",
+    "metrics",
+    "snippet_metrics",
+    "recommended_next_actions",
+    "next_actions",
+    "arguments_patch",
+)
 
 
 PROJECT_TOOL_NAMES = {
@@ -60,6 +74,78 @@ def _compact_value_for_mcp(value: Any, *, text_limit: int, list_limit: int, key:
     if isinstance(value, dict):
         return {k: _compact_value_for_mcp(v, text_limit=text_limit, list_limit=list_limit, key=str(k), stats=stats) for k, v in value.items()}
     return value
+
+
+def _summarize_omitted_value(value: Any) -> dict[str, Any]:
+    if isinstance(value, dict):
+        return {"omitted": True, "type": "object", "key_count": len(value), "keys": list(value.keys())[:12]}
+    if isinstance(value, list):
+        return {"omitted": True, "type": "array", "item_count": len(value)}
+    if isinstance(value, str):
+        return {"omitted": True, "type": "string", "char_count": len(value)}
+    return {"omitted": True, "type": type(value).__name__}
+
+
+def _enforce_mcp_hard_cap(payload: dict[str, Any], *, max_bytes: int) -> dict[str, Any]:
+    """Deterministically summarize remaining large sections until the MCP cap is absolute."""
+
+    if _json_bytes(payload) <= max_bytes:
+        return payload
+
+    compact = deepcopy(payload)
+    compaction = dict(compact.get("mcp_compaction") or {})
+    compaction.update({"max_bytes": max_bytes, "truncated": True, "hard_cap_enforced": True})
+    compact["mcp_compaction"] = compaction
+
+    omitted_sections: list[str] = []
+    for key in _MCP_HARD_CAP_SECTION_ORDER:
+        if _json_bytes(compact) <= max_bytes:
+            return compact
+        if key in compact and compact[key] not in ({}, [], None):
+            compact[key] = _summarize_omitted_value(compact[key])
+            omitted_sections.append(key)
+            compact["mcp_compaction"]["omitted_sections"] = omitted_sections
+
+    if _json_bytes(compact) <= max_bytes:
+        return compact
+
+    keep_keys = {
+        "project_path",
+        "question",
+        "query",
+        "status",
+        "tool",
+        "schema_version",
+        "answer_available",
+        "answer_type",
+        "answer_completeness",
+        "mode",
+        "reason",
+        "message",
+        "response_style",
+        "primary_snippet",
+        "next_action",
+        "output_mode",
+        "full_output_available",
+        "requires_confirmation",
+        "confirmation_reason",
+        "warnings",
+        "mcp_compaction",
+    }
+    omitted_fields = [key for key in compact if key not in keep_keys]
+    compact = {key: value for key, value in compact.items() if key in keep_keys}
+    compact["mcp_compaction"] = {
+        **dict(compact.get("mcp_compaction") or {}),
+        "omitted_fields": omitted_fields[:40],
+        "omitted_field_count": len(omitted_fields),
+    }
+    stats = {"truncated_strings": 0, "truncated_chars": 0, "omitted_list_items": 0}
+    compact = _compact_value_for_mcp(compact, text_limit=160, list_limit=3, stats=stats)
+    if _json_bytes(compact) <= max_bytes:
+        return compact
+
+    compact["warnings"] = _summarize_omitted_value(compact.get("warnings") or [])
+    return compact
 
 
 def _compact_mcp_payload(payload: dict[str, Any], *, max_bytes: int = MCP_COMPACT_OUTPUT_MAX_BYTES) -> dict[str, Any]:
@@ -113,7 +199,7 @@ def _compact_mcp_payload(payload: dict[str, Any], *, max_bytes: int = MCP_COMPAC
             "message": f"Large context fields were omitted to keep the compact MCP response under {max_bytes} bytes; use narrower tokens/limit or explicit full output when appropriate.",
         },
     ]
-    return compact
+    return _enforce_mcp_hard_cap(compact, max_bytes=max_bytes)
 
 
 def _project_sources_summary(result: dict[str, Any]) -> dict[str, int]:
