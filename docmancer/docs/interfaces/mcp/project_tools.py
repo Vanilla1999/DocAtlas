@@ -110,6 +110,27 @@ def _compact_project_context(result: dict[str, Any]) -> dict[str, Any]:
     return compact
 
 
+def _project_context_output_mode(args: dict[str, Any]) -> str:
+    output_mode = str(args.get("output_mode") or "compact").lower()
+    return "full" if output_mode == "full" else "compact"
+
+
+def _add_project_context_output_warning(payload: dict[str, Any], args: dict[str, Any]) -> dict[str, Any]:
+    if not args.get("details") or _project_context_output_mode(args) == "full":
+        return payload
+    warnings = list(payload.get("warnings") or [])
+    warning = {
+        "code": "project_context_full_output_requires_output_mode_full",
+        "message": "details=true no longer returns full get_project_context payloads at the MCP boundary; pass output_mode='full' only when a full dump is explicitly required.",
+    }
+    if warning not in warnings:
+        warnings.append(warning)
+    payload["warnings"] = warnings
+    payload["output_mode"] = "compact"
+    payload["full_output_available"] = True
+    return payload
+
+
 def _compact_inspect_project_docs(result: dict[str, Any]) -> dict[str, Any]:
     compact = {
         "project_path": result.get("project_path"),
@@ -216,8 +237,10 @@ def handle_project_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
         return result if args.get("details") else _compact_project_docs(result)
     if name == "get_project_context":
         result = asdict(service.get_project_context(args["project_path"], args["question"], tokens=args.get("tokens"), limit=args.get("limit"), expand=args.get("expand"), library=args.get("library"), libraries=args.get("libraries"), ecosystem=args.get("ecosystem"), version=args.get("version"), module=args.get("module"), module_path=args.get("module_path"), scope=args.get("scope"), mode=args.get("mode") or "auto", response_style=args.get("response_style")))
-        output_mode = args.get("output_mode") or ("full" if args.get("details") else "compact")
-        return result if output_mode == "full" else _compact_project_context(result)
+        if _project_context_output_mode(args) == "full":
+            result["output_mode"] = "full"
+            return result
+        return _add_project_context_output_warning(_compact_project_context(result), args)
     if name == "get_patch_constraints":
         return asdict(service.get_patch_constraints(
             args["question"],
