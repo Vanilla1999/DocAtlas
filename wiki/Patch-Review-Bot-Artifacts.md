@@ -36,9 +36,10 @@ Current bot-facing JSON artifacts:
 
 - `review_summary_quality.json` (`kind: bot_quality_metadata`) — attachability, summary-health counts, typed signals, unknown triage, and claim guardrails.
 - `review_summary_actions.json` (`kind: bot_action_metadata`) — ranked checklist items, violations, evidence links, and claim guardrails.
-- `review_summary_pr_comment.json` (`kind: bot_pr_comment_payload`) — render-ready non-blocking PR comment payload. Render-ready fields may be escaped or truncated; raw evidence remains in raw artifacts and trace metadata.
-- `review_summary_trace.json` (`kind: bot_traceability_metadata`) — links rendered recommendations back to `constraints.json` and `validation.json` for audit/debug.
-- `review_summary_bot_bundle.json` (`kind: bot_bundle`) — single-file bot integration entrypoint embedding manifest, quality, actions, PR comment, trace metadata, and advisory integration decisions.
+- `review_summary_pr_comment.json` (`kind: bot_pr_comment_payload`) — render-ready non-blocking PR comment payload, including compact deterministic coverage counts. Render-ready fields may be escaped or truncated; raw evidence remains in raw artifacts and trace metadata.
+- `review_summary_trace.json` (`kind: bot_traceability_metadata`) — links rendered recommendations back to `constraints.json`, `validation.json`, and `constraint_coverage.json` for audit/debug.
+- `constraint_coverage.json` (`kind: constraint_coverage_metadata`) — machine-readable covered-vs-unknown/manual category counts for PR bots that need warning badges without treating unknowns as pass.
+- `review_summary_bot_bundle.json` (`kind: bot_bundle`) — single-file bot integration entrypoint embedding manifest, quality, actions, coverage, PR comment, trace metadata, and advisory integration decisions.
 
 Raw audit/debug artifacts remain separate:
 
@@ -57,6 +58,7 @@ Stable fields:
 - `highlight_violations`: whether known violations should be emphasized.
 - `requires_manual_review`: whether violations or unknowns require human attention.
 - `reason_codes`: deterministic reasons such as `violations_present`, `manual_review_required`, `actionable_items_present`, or `no_attachable_review_signal`.
+- `coverage_counts`: deterministic coverage counters copied from `constraint_coverage.json` as `{covered, unknown_manual}` for bot badges and routing. A non-zero `unknown_manual` count is a manual-review signal, not a pass signal.
 - `unknown_triage_codes`: granular unknown categories copied from `review_summary_quality.json.unknown_triage[]`, such as `missing_diff_evidence`, `missing_test_evidence`, `manual_review_required`, or `low_risk_unknown`; these help route human review and must not be treated as pass. Each `unknown_triage[].examples[]` entry includes the validation `constraint_id`/`reason` plus source constraint context (`source`, `instruction`, `evidence`, and `confidence` when present) so bots can route manual-review hints without parsing markdown.
 - `unknown_triage_counts`: granular unknown counts keyed by the same codes as `unknown_triage_codes`, copied from `review_summary_quality.json.unknown_triage[].count` so bots can show warning/manual-review badges without flattening all unknowns into one opaque count. This field is additive in bot bundle schema v3; consumers reading an older v3 bundle where it is absent should reconstruct counts from `quality.unknown_triage[]` when available, otherwise fall back to manual review rather than treating unknowns as pass.
 - `semantics`: currently `advisory_non_blocking_only`.

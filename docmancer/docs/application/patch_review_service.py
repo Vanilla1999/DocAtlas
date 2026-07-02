@@ -149,6 +149,7 @@ class PatchReviewService:
         pr_comment_payload = self._review_summary_pr_comment_payload(
             actions_payload,
             quality_payload,
+            coverage_payload,
             summary_mode=summary_mode,
         )
         trace_payload = self._review_summary_trace_payload(
@@ -186,6 +187,7 @@ class PatchReviewService:
             manifest_payload,
             quality_payload,
             actions_payload,
+            coverage_payload,
             pr_comment_payload,
             trace_payload,
             summary_mode=summary_mode,
@@ -354,6 +356,7 @@ class PatchReviewService:
     def _review_summary_pr_comment_payload(
         actions_payload: dict[str, Any],
         quality_payload: dict[str, Any],
+        coverage_payload: dict[str, Any],
         *,
         summary_mode: str,
     ) -> dict[str, Any]:
@@ -365,6 +368,7 @@ class PatchReviewService:
             "",
             f"Attachability: `{quality_payload.get('attachable')}`",
             f"Summary mode: `{summary_mode}`",
+            f"Deterministic coverage: `{coverage_payload.get('covered_count', 0)}` covered / `{coverage_payload.get('unknown_manual_count', 0)}` unknown-manual",
         ]
         if violations:
             body_lines.extend(["", "Violations:"])
@@ -397,6 +401,7 @@ class PatchReviewService:
             "source_artifacts": [
                 "review_summary_quality.json",
                 "review_summary_actions.json",
+                "constraint_coverage.json",
             ],
             "signals": signals,
             "actionable_items": actionable_items,
@@ -561,6 +566,7 @@ class PatchReviewService:
         manifest_payload: dict[str, Any],
         quality_payload: dict[str, Any],
         actions_payload: dict[str, Any],
+        coverage_payload: dict[str, Any],
         pr_comment_payload: dict[str, Any],
         trace_payload: dict[str, Any],
         *,
@@ -580,11 +586,13 @@ class PatchReviewService:
             "manifest": manifest_payload,
             "quality": quality_payload,
             "actions": actions_payload,
+            "coverage": coverage_payload,
             "pr_comment": pr_comment_payload,
             "trace": trace_payload,
             "advisory_decision": PatchReviewService._review_summary_advisory_decision_payload(
                 quality_payload,
                 actions_payload,
+                coverage_payload,
             ),
             "claims_avoided": quality_payload.get("claims_avoided", []),
         }
@@ -593,6 +601,7 @@ class PatchReviewService:
     def _review_summary_advisory_decision_payload(
         quality_payload: dict[str, Any],
         actions_payload: dict[str, Any],
+        coverage_payload: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
         signals = {str(item.get("code") or "") for item in quality_payload.get("signals", [])}
         unknown_triage_counts: dict[str, int] = {}
@@ -605,11 +614,14 @@ class PatchReviewService:
         violations = list(actions_payload.get("violations") or [])
         actionable_items = list(actions_payload.get("actionable_items") or [])
         has_violations = bool(violations) or quality_payload.get("violated_count", 0) > 0 or "violations_present" in signals
+        coverage_unknown_manual = int((coverage_payload or {}).get("unknown_manual_count") or 0)
+        coverage_covered = int((coverage_payload or {}).get("covered_count") or 0)
         has_manual_review = (
             quality_payload.get("unknown_count", 0) > 0
             or quality_payload.get("manual_review_count", 0) > 0
             or "manual_review_required" in signals
             or bool(unknown_triage_codes)
+            or coverage_unknown_manual > 0
         )
         has_actionable_items = bool(actionable_items) or quality_payload.get("actionable_items_total_count", 0) > 0
         reason_codes = []
@@ -630,6 +642,10 @@ class PatchReviewService:
             "reason_codes": reason_codes,
             "unknown_triage_codes": unknown_triage_codes,
             "unknown_triage_counts": unknown_triage_counts,
+            "coverage_counts": {
+                "covered": coverage_covered,
+                "unknown_manual": coverage_unknown_manual,
+            },
             "semantics": "advisory_non_blocking_only",
             "claims_avoided": [
                 "safe_to_merge",

@@ -169,6 +169,9 @@ def _fake_pr_bot_consume_manifest(manifest_path: Path, manifest: dict[str, Any] 
     )
     quality = _fake_pr_bot_contract_mapping(bundle.get("quality"), _FakePrBotInvalidBotBundleContract, "bundle.quality")
     actions = _fake_pr_bot_contract_mapping(bundle.get("actions"), _FakePrBotInvalidBotBundleContract, "bundle.actions")
+    coverage = bundle.get("coverage")
+    if coverage is not None:
+        coverage = _fake_pr_bot_contract_mapping(coverage, _FakePrBotInvalidBotBundleContract, "bundle.coverage")
     pr_comment = _fake_pr_bot_contract_mapping(
         bundle.get("pr_comment"),
         _FakePrBotInvalidBotBundleContract,
@@ -216,6 +219,17 @@ def _fake_pr_bot_consume_manifest(manifest_path: Path, manifest: dict[str, Any] 
         _FakePrBotInvalidBotBundleContract,
         "bundle.pr_comment.source_artifacts",
     )
+    if coverage is not None:
+        _fake_pr_bot_contract_require(
+            "constraint_coverage.json" in pr_comment_sources,
+            _FakePrBotInvalidBotBundleContract,
+            "bundle.pr_comment.source_artifacts.constraint_coverage",
+        )
+        _fake_pr_bot_contract_require(
+            coverage.get("validation_status_counts") == trace.get("coverage_status_counts"),
+            _FakePrBotInvalidBotBundleContract,
+            "bundle.coverage.trace_status_counts",
+        )
     body = pr_comment.get("body")
     body_markdown = pr_comment.get("body_markdown")
     _fake_pr_bot_contract_require(isinstance(body, str), _FakePrBotInvalidBotBundleContract, "bundle.pr_comment.body")
@@ -428,6 +442,7 @@ def _fake_pr_bot_consume_manifest(manifest_path: Path, manifest: dict[str, Any] 
         "reason_codes": reason_codes,
         "unknown_triage_codes": unknown_triage_codes,
         "unknown_triage_counts": decision_unknown_triage_counts,
+        "coverage_counts": decision.get("coverage_counts", {}),
         "unknown_triage_examples_by_code": unknown_triage_examples_by_code,
         "violation_count": len(violations),
         "unknown_count": unknown_count,
@@ -1811,6 +1826,8 @@ def test_patch_review_machine_readable_artifact_contracts(tmp_path: Path):
     assert "Non-blocking review context only" in pr_comment["body_markdown"]
     assert "review_summary_quality.json" in pr_comment["source_artifacts"]
     assert "review_summary_actions.json" in pr_comment["source_artifacts"]
+    assert "constraint_coverage.json" in pr_comment["source_artifacts"]
+    assert "Deterministic coverage:" in pr_comment["body_markdown"]
     assert {
         "schema_version",
         "summary_mode",
@@ -1844,6 +1861,7 @@ def test_patch_review_machine_readable_artifact_contracts(tmp_path: Path):
         "manifest",
         "quality",
         "actions",
+        "coverage",
         "pr_comment",
         "trace",
         "advisory_decision",
@@ -1857,6 +1875,7 @@ def test_patch_review_machine_readable_artifact_contracts(tmp_path: Path):
     assert manifest_artifacts["constraint_coverage.json"]["kind"] == "constraint_coverage_metadata"
     assert bot_bundle["quality"] == quality
     assert bot_bundle["actions"] == actions
+    assert bot_bundle["coverage"] == coverage
     assert bot_bundle["pr_comment"] == pr_comment
     assert bot_bundle["trace"] == trace
     assert {
@@ -1867,10 +1886,15 @@ def test_patch_review_machine_readable_artifact_contracts(tmp_path: Path):
         "reason_codes",
         "unknown_triage_codes",
         "unknown_triage_counts",
+        "coverage_counts",
         "semantics",
         "claims_avoided",
     } <= set(bot_bundle["advisory_decision"])
     assert bot_bundle["advisory_decision"]["semantics"] == "advisory_non_blocking_only"
+    assert bot_bundle["advisory_decision"]["coverage_counts"] == {
+        "covered": coverage["covered_count"],
+        "unknown_manual": coverage["unknown_manual_count"],
+    }
     assert "safe_to_merge" not in bot_bundle["advisory_decision"]
     if bot_bundle["advisory_decision"]["should_attach_comment"]:
         assert bot_bundle["pr_comment"]["body"].strip()
@@ -1893,6 +1917,7 @@ def test_patch_review_advisory_decision_is_non_blocking_and_escalates_violations
     assert clean_action["reason_codes"] == ["actionable_items_present"]
     assert clean_action["unknown_triage_codes"] == []
     assert clean_action["unknown_triage_counts"] == {}
+    assert clean_action["coverage_counts"] == {"covered": 0, "unknown_manual": 0}
 
     violation = PatchReviewService._review_summary_advisory_decision_payload(
         {**base_quality, "violated_count": 1, "actionable_items_total_count": 0},
@@ -1923,6 +1948,16 @@ def test_patch_review_advisory_decision_is_non_blocking_and_escalates_violations
     assert unknown["reason_codes"] == ["manual_review_required"]
     assert unknown["unknown_triage_codes"] == ["missing_test_evidence", "low_risk_unknown"]
     assert unknown["unknown_triage_counts"] == {"missing_test_evidence": 1, "low_risk_unknown": 1}
+
+    coverage_unknown = PatchReviewService._review_summary_advisory_decision_payload(
+        {**base_quality, "actionable_items_total_count": 0},
+        {"actionable_items": [], "violations": []},
+        {"covered_count": 1, "unknown_manual_count": 2},
+    )
+    assert coverage_unknown["should_attach_comment"] is True
+    assert coverage_unknown["requires_manual_review"] is True
+    assert coverage_unknown["reason_codes"] == ["manual_review_required"]
+    assert coverage_unknown["coverage_counts"] == {"covered": 1, "unknown_manual": 2}
 
     violation_and_unknown = PatchReviewService._review_summary_advisory_decision_payload(
         {**base_quality, "violated_count": 1, "unknown_count": 1, "actionable_items_total_count": 0},
@@ -3045,7 +3080,12 @@ def test_patch_review_pr_comment_lists_violations_separately_from_capped_actions
         "claims_avoided": ["correctness_proof"],
     }
 
-    comment = PatchReviewService._review_summary_pr_comment_payload(actions, quality, summary_mode="compact")
+    comment = PatchReviewService._review_summary_pr_comment_payload(
+        actions,
+        quality,
+        {"covered_count": 0, "unknown_manual_count": 0},
+        summary_mode="compact",
+    )
 
     assert comment["violations"] == actions["violations"]
     assert comment["body"] == comment["body_markdown"]
