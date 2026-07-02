@@ -48,7 +48,50 @@ _PATCH_TASK_TERMS = {
     "validates",
     "validating",
 }
+_IMPERATIVE_PATCH_TASK_TERMS = {
+    "add",
+    "added",
+    "adding",
+    "adds",
+    "create",
+    "created",
+    "creates",
+    "creating",
+    "delete",
+    "deleted",
+    "deletes",
+    "deleting",
+    "migrate",
+    "migrated",
+    "migrates",
+    "migrating",
+    "remove",
+    "removed",
+    "removes",
+    "removing",
+    "rename",
+    "renamed",
+    "renames",
+    "renaming",
+    "update",
+    "updated",
+    "updates",
+    "updating",
+    "upgrade",
+    "upgraded",
+    "upgrades",
+    "upgrading",
+}
+_IMPERATIVE_PATCH_TASK_PREFIX_TERMS = {"please", "task", "todo", "todos"}
 _PATCH_TASK_TOKEN_RE = re.compile(r"[a-z0-9]+")
+
+
+def _looks_like_imperative_patch_task(tokens: list[str]) -> bool:
+    for token in tokens:
+        if token in _IMPERATIVE_PATCH_TASK_PREFIX_TERMS:
+            continue
+        return token in _IMPERATIVE_PATCH_TASK_TERMS
+    return False
 
 
 def _exact_version_match(result: DocsResult) -> bool | None:
@@ -351,7 +394,7 @@ class UnifiedDocsContextService:
         if not project_path or mode_requested == "library" or mode_selected == "library":
             return None
         tokens = _PATCH_TASK_TOKEN_RE.findall(question.lower())
-        if not any(token in _PATCH_TASK_TERMS for token in tokens):
+        if not any(token in _PATCH_TASK_TERMS for token in tokens) and not _looks_like_imperative_patch_task(tokens):
             return None
         return {
             "type": "get_patch_constraints",

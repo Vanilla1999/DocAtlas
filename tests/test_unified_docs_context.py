@@ -521,6 +521,25 @@ def test_patch_like_project_question_recommends_patch_constraints():
     assert result.routing["next_action_reason"] == "patch_like_project_task"
 
 
+def test_imperative_project_edit_tasks_recommend_patch_constraints():
+    questions = [
+        "Add CLI logging",
+        "Update README branding",
+        "Remove deprecated command",
+        "Rename the parser class",
+        "Create auth middleware",
+        "Delete stale migration",
+        "Migrate Flask routes to FastAPI",
+        "Upgrade the pydantic dependency",
+    ]
+
+    for question in questions:
+        result = _service(FakeFacade()).get_docs_context(question, project_path="/repo", prepare_project_docs=False)
+
+        assert result.next_actions[0]["tool"] == "get_patch_constraints"
+        assert result.next_actions[0]["arguments_patch"] == {"project_path": "/repo", "task": question}
+
+
 def test_non_patch_project_question_does_not_recommend_patch_constraints():
     result = _service(FakeFacade()).get_docs_context("How docs work?", project_path="/repo", prepare_project_docs=False)
     assert not any(action.get("tool") == "get_patch_constraints" for action in result.next_actions)
@@ -531,6 +550,9 @@ def test_project_docs_questions_with_patch_term_prefixes_do_not_recommend_patch_
         "How do pytest fixtures work?",
         "How is this different from Context7?",
         "How do dependency fixtures interact with project docs?",
+        "How does update_or_create work?",
+        "Explain the dependency upgrade guide",
+        "Describe delete cascade documentation",
     ]
 
     for question in questions:
