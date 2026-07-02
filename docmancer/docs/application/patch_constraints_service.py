@@ -9,6 +9,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
+from docmancer.docs.domain.source_map import build_project_repo_map, build_project_source_evidence
 from docmancer.docs.models import DependencyObservation, PatchConstraint, PatchConstraintPacket
 
 DEFAULT_MAX_CONSTRAINTS = 12
@@ -157,6 +158,8 @@ class PatchConstraintsService:
         constraints.extend(self._architecture_constraints(sources))
         constraints.extend(self._generated_file_constraints(sources, changed_files))
         constraints.extend(self._dependency_constraints(root))
+        repo_map, source_evidence = self._code_evidence(root, question, changed_files)
+        constraints.extend(self._source_evidence_constraints(source_evidence))
         symbol_candidates = self._symbol_candidates(question, root, changed_files)
         constraints.extend(self._symbol_candidate_constraints(symbol_candidates))
         constraints.extend(self._fallback_constraints(question, changed_files, root))
@@ -196,6 +199,8 @@ class PatchConstraintsService:
             suggested_checks=[c.instruction for c in selected if c.type == "verification"],
             warnings=warnings,
             sources=self._source_summary(sources, selected) if include_sources else [],
+            repo_map=repo_map,
+            source_evidence=source_evidence,
             symbol_candidates=symbol_candidates,
             ignored_generated_artifact_sources=self._ignored_generated_artifact_sources[:20],
             excluded_source_reasons=self._excluded_source_reasons[:50],
@@ -261,6 +266,55 @@ class PatchConstraintsService:
             out.append({"path": rel, "text": text})
             seen.add(resolved)
         return out
+
+    def _code_evidence(self, root: Path | None, question: str, changed_files: list[str]) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+        if not root or not root.exists():
+            return [], []
+        requirements = self._task_terms(question)
+        for changed in changed_files:
+            stem = Path(changed).stem.replace("_", " ").replace("-", " ")
+            if len(stem) >= 3:
+                requirements.append(stem)
+        try:
+            repo_map = build_project_repo_map(root, question=question, max_files=6, token_budget=650)
+            source_evidence = build_project_source_evidence(
+                root,
+                question=question,
+                requirements=requirements or None,
+                max_items=8,
+                token_budget=500,
+            )
+        except Exception:
+            return [], []
+        return repo_map, source_evidence
+
+    def _source_evidence_constraints(self, items: list[dict[str, Any]]) -> list[PatchConstraint]:
+        constraints: list[PatchConstraint] = []
+        for item in items:
+            if item.get("evidence_class") != "source_snippet":
+                continue
+            path = str(item.get("path") or "")
+            if not path:
+                continue
+            snippet = str(item.get("snippet") or "")
+            terms = [str(term) for term in item.get("matched_terms") or [] if str(term).strip()]
+            term = terms[0] if terms else Path(path).stem
+            line_start = item.get("line_start")
+            constraints.append(self._constraint(
+                id=f"source-evidence-{self._slug(path)}-{self._slug(term)}-{line_start or 0}",
+                type="project_convention",
+                instruction=f"Task term `{term}` has concrete source evidence in `{path}`; inspect or reuse that path before inventing a new implementation.",
+                source=path,
+                severity="should",
+                confidence="medium",
+                evidence=snippet,
+                symbols=terms,
+                files=[path],
+                source_kind="source_evidence",
+                line_start=line_start,
+                line_end=item.get("line_end") or line_start,
+            ))
+        return constraints
 
     @staticmethod
     def _under_root(path: Path, root: Path) -> bool:
@@ -798,24 +852,32 @@ class PatchConstraintsService:
             evidence=evidence or "Inferred from task context; no direct source evidence was available.",
             symbols=list(kwargs.get("symbols") or []),
             files=list(kwargs.get("files") or []),
-            source_refs=self._source_refs(source or "inferred"),
-            evidence_snippets=self._evidence_snippets(source or "inferred", evidence),
+            source_refs=self._source_refs(source or "inferred", kind=kwargs.get("source_kind"), line_start=kwargs.get("line_start"), line_end=kwargs.get("line_end")),
+            evidence_snippets=self._evidence_snippets(source or "inferred", evidence, line_start=kwargs.get("line_start"), line_end=kwargs.get("line_end")),
         )
 
     @staticmethod
-    def _source_refs(source: str) -> list[dict[str, Any]]:
+    def _source_refs(source: str, *, kind: str | None = None, line_start: Any = None, line_end: Any = None) -> list[dict[str, Any]]:
         if not source:
             return []
-        kind = "task_context" if source in {"changed_files", "question", "inferred"} else "source"
+        kind = kind or ("task_context" if source in {"changed_files", "question", "inferred"} else "source")
         if source in DEPENDENCY_FILES or "lock" in source or "manifest" in source:
             kind = "dependency_metadata"
-        return [{"path": source, "kind": kind}]
+        ref: dict[str, Any] = {"path": source, "kind": kind}
+        if line_start:
+            ref["line_start"] = line_start
+            ref["line_end"] = line_end or line_start
+        return [ref]
 
     @staticmethod
-    def _evidence_snippets(source: str, evidence: str) -> list[dict[str, Any]]:
+    def _evidence_snippets(source: str, evidence: str, *, line_start: Any = None, line_end: Any = None) -> list[dict[str, Any]]:
         if not evidence:
             return []
-        return [{"path": source, "text": evidence[:240]}]
+        snippet: dict[str, Any] = {"path": source, "text": evidence[:240]}
+        if line_start:
+            snippet["line_start"] = line_start
+            snippet["line_end"] = line_end or line_start
+        return [snippet]
 
     @staticmethod
     def _contract_id(root: Path | None, question: str, constraints: list[PatchConstraint]) -> str:

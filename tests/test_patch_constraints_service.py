@@ -296,6 +296,35 @@ const quickInfoLabel = 'Быстрая информация';
     assert all("docatlas-dogfood" not in candidate["source"] for candidate in candidates)
 
 
+def test_patch_contract_exposes_repo_map_and_source_evidence_layer(tmp_path: Path):
+    root = _workspace(tmp_path)
+    _write(
+        root / "lib/help_request_details_screen.dart",
+        """
+class HelpRequestDetailsScreen {}
+final label = 'Вернуть в работу';
+""",
+    )
+
+    packet = _packet(
+        root,
+        question='Reopen HELP request and show "Вернуть в работу" button.',
+        changed_files=["lib/help_request_details_screen.dart"],
+        max_constraints=20,
+        max_tokens=4000,
+    )
+
+    assert any(item["source_class"] == "repo_map" and item["path"] == "lib/help_request_details_screen.dart" for item in packet.repo_map)
+    evidence = [item for item in packet.source_evidence if item.get("evidence_class") == "source_snippet"]
+    assert any(item["path"] == "lib/help_request_details_screen.dart" and item["line_start"] == 3 for item in evidence)
+    grounded = [constraint for constraint in packet.constraints if constraint.id.startswith("source-evidence-")]
+    assert grounded
+    assert any(
+        constraint.source_refs[0]["kind"] == "source_evidence" and constraint.source_refs[0]["line_start"] == 3
+        for constraint in grounded
+    )
+
+
 def test_symbol_grounding_does_not_invent_without_source_match(tmp_path: Path):
     root = _workspace(tmp_path)
 
