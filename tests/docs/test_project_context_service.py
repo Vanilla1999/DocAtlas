@@ -51,7 +51,7 @@ class FakeProjectContextFacade:
 
 def test_project_context_service_returns_selected_project_and_dependency_sections():
     facade = FakeProjectContextFacade()
-    result = ProjectContextService(facade).get_project_context("/repo", "use go_router", tokens=1200, limit=3)
+    result = ProjectContextService(facade).get_project_context("/repo", "use go_router", tokens=1200, limit=3, allow_network=True)
 
     assert result.status == "success"
     assert result.tool == "get_project_context"
@@ -70,7 +70,7 @@ def test_project_context_service_returns_selected_project_and_dependency_section
 
 def test_project_context_service_deps_only_skips_project_docs_and_marks_risk():
     facade = FakeProjectContextFacade()
-    result = ProjectContextService(facade).get_project_context("/repo", "api", library="go_router", mode="deps-only")
+    result = ProjectContextService(facade).get_project_context("/repo", "api", library="go_router", mode="deps-only", allow_network=True)
 
     assert not any(call[0] == "project" for call in facade.calls)
     assert result.project_docs is None

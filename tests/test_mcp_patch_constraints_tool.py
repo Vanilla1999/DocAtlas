@@ -44,6 +44,7 @@ def test_mcp_schema_exposes_get_patch_constraints():
     assert properties["max_constraints"]["type"] == "integer"
     assert properties["max_tokens"]["type"] == "integer"
     assert properties["include_sources"]["type"] == "boolean"
+    assert properties["output_mode"]["enum"] == ["compact", "debug", "full", None]
 
 
 def test_mcp_return_shape(tmp_path: Path):
@@ -56,7 +57,7 @@ def test_mcp_return_shape(tmp_path: Path):
     assert isinstance(payload["dependency_contracts"], list)
     assert isinstance(payload["source_of_truth_rules"], list)
     assert isinstance(payload["suggested_checks"], list)
-    assert isinstance(payload["warnings"], list)
+    assert isinstance(payload.get("warnings", []), list)
     assert isinstance(payload["sources"], list)
     assert isinstance(payload["token_estimate"], int)
     assert payload["confidence"] in {"high", "medium", "low"}
@@ -81,3 +82,15 @@ def test_mcp_tool_respects_max_constraints_and_max_tokens(tmp_path: Path):
     assert len(payload["constraints"]) <= 2
     assert payload["token_estimate"] <= 180
     assert any("constraints truncated by budget" in warning for warning in payload["warnings"])
+
+
+def test_mcp_tool_applies_compact_cap_without_debug_noise(tmp_path: Path):
+    compact = handle_project_tool("get_patch_constraints", {
+        "question": "Update permission handling",
+        "project_path": str(_workspace(tmp_path)),
+        "max_constraints": 50,
+        "max_tokens": 120_000,
+        "include_sources": True,
+    }, LibraryDocsService())
+    assert len(json.dumps(compact, ensure_ascii=False).encode("utf-8")) <= 32_000
+    assert "mcp_compaction" not in compact

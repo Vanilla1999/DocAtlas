@@ -36,9 +36,9 @@ def test_mcp_project_context_details_stays_compact_without_full_output_opt_in():
     payload = handle_project_tool("get_project_context", {"project_path": "/repo", "question": "use go_router", "details": True}, service)
 
     assert payload is not None
-    assert payload["output_mode"] == "compact"
+    assert payload["output_mode"] == "debug"
     assert payload["project_docs"]["results"] == []
-    assert payload["warnings"][-1]["code"] == "project_context_full_output_requires_output_mode_full"
+    assert payload["diagnostics"] is not None
 
 
 def test_mcp_project_context_full_output_requires_explicit_output_mode():
@@ -55,14 +55,14 @@ def test_mcp_project_context_full_output_requires_explicit_output_mode():
     assert payload["project_docs"]["results"]
 
 
-def test_mcp_project_context_compact_output_has_hard_size_cap():
+def test_mcp_project_context_debug_output_has_hard_size_cap():
     large = "x" * 120_000
     result = ProjectContextService(FakeProjectContextFacade()).get_project_context("/repo", "find current web API camera implementation")
     result.context_pack.append({"doc_scope": "project", "source_class": "project_doc", "path": "docs/ScanDoc.md", "content": large})
     result.trust_contract["selected"] = [{"path": "docs/ScanDoc.md", "snippet": large}]
     service: Any = type("FakeService", (), {"get_project_context": lambda self, *args, **kwargs: result})()
 
-    payload = handle_project_tool("get_project_context", {"project_path": "/repo", "question": "find current web API camera implementation"}, service)
+    payload = handle_project_tool("get_project_context", {"project_path": "/repo", "question": "find current web API camera implementation", "output_mode": "debug"}, service)
 
     assert payload is not None
     assert len(json.dumps(payload, ensure_ascii=False).encode("utf-8")) <= MCP_COMPACT_OUTPUT_MAX_BYTES

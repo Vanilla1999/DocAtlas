@@ -39,6 +39,7 @@ class ProjectContextService:
         scope: str | None = None,
         mode: str = "auto",
         response_style: str | None = None,
+        allow_network: bool = False,
     ) -> ProjectContextResult:
         response_style = validate_response_style(response_style)
         mode = mode.lower()
@@ -56,17 +57,39 @@ class ProjectContextService:
                     results=rerank_project_doc_chunks(project_docs.results, question=question, intent=intent, limit=limit),
                 )
 
-        selected_dependency = library or (libraries[0] if libraries else None) or self.dependency_mentioned_in_question(metadata, question)
+        explicit_dependency = library or (libraries[0] if libraries else None)
+        inferred_dependency = self.dependency_mentioned_in_question(metadata, question)
+        selected_dependency = explicit_dependency or inferred_dependency
+        explicit_dependency_requested = bool(explicit_dependency or mode in {"deps-only", "public-docs"})
         dependency_docs: DocsResult | None = None
+        dependency_confirmation: dict[str, Any] | None = None
         if selected_dependency and mode in {"auto", "deps-only", "public-docs"}:
-            dependency_docs = self.facade.get_docs(
-                selected_dependency,
-                topic=question,
-                tokens=tokens,
-                ecosystem=ecosystem,
-                version=version,
-                project_path=str(root),
-            )
+            if not allow_network:
+                dependency_confirmation = {
+                    "type": "ask_user_to_fetch_dependency_docs",
+                    "tool": "get_project_context",
+                    "reason": "dependency_docs_network_fetch_required",
+                    "dependency": selected_dependency,
+                    "requires_confirmation": True,
+                    "confirmation_reason": "network_fetch",
+                    "arguments_patch": {
+                        "project_path": str(root),
+                        "question": question,
+                        "library": selected_dependency,
+                        "mode": "deps-only" if mode in {"deps-only", "public-docs"} else "auto",
+                        "allow_network": True,
+                    },
+                    "user_message": "Dependency/public documentation may require network fetch. Proceed?",
+                }
+            else:
+                dependency_docs = self.facade.get_docs(
+                    selected_dependency,
+                    topic=question,
+                    tokens=tokens,
+                    ecosystem=ecosystem,
+                    version=version,
+                    project_path=str(root),
+                )
 
         warnings = [*(project_docs.warnings if project_docs else [])]
         if dependency_docs:
@@ -74,10 +97,12 @@ class ProjectContextService:
         next_actions = [*(project_docs.next_actions if project_docs else [])]
         if dependency_docs:
             next_actions.extend({"tool": dependency_docs.tool, "reason": action} for action in dependency_docs.next_actions)
-        requires_confirmation = bool(project_docs and project_docs.requires_confirmation)
-        confirmation_reason = project_docs.confirmation_reason if requires_confirmation and project_docs else None
-        next_action = project_docs.next_action if requires_confirmation and project_docs else {}
-        arguments_patch = project_docs.arguments_patch if requires_confirmation and project_docs else {}
+        if dependency_confirmation:
+            next_actions.append(dependency_confirmation)
+        requires_confirmation = bool(project_docs and project_docs.requires_confirmation) or bool(dependency_confirmation and explicit_dependency_requested)
+        confirmation_reason = project_docs.confirmation_reason if project_docs and project_docs.requires_confirmation else ("network_fetch" if dependency_confirmation and explicit_dependency_requested else None)
+        next_action = project_docs.next_action if project_docs and project_docs.requires_confirmation else (dependency_confirmation or {})
+        arguments_patch = project_docs.arguments_patch if project_docs and project_docs.requires_confirmation else ({"allow_network": True} if dependency_confirmation else {})
         context_pack = project_context_pack(project_docs=project_docs, dependency_docs=dependency_docs)
         requirements = extract_project_answer_requirements(question)
         repo_map_items: list[dict[str, Any]] = []
@@ -181,14 +206,18 @@ class ProjectContextService:
         status = "success" if answer_available else (project_docs.status if project_docs else dependency_docs.status if dependency_docs else "no_results")
         if (project_docs and project_docs.status == "stale") or (dependency_docs and dependency_docs.stale_before_refresh):
             status = "stale"
-        if requires_confirmation and not answer_available and status != "stale":
+        if dependency_confirmation and not answer_available and status != "stale":
             status = "confirmation_required"
-        reason = "trusted_context_available" if answer_available else ("insufficient_code_symbol_evidence" if getattr(intent, "wants_code_symbols", False) else "no_trusted_context")
+        elif requires_confirmation and not answer_available and status != "stale":
+            status = "confirmation_required"
+        reason = "trusted_context_available" if answer_available else ("dependency_docs_network_fetch_required" if dependency_confirmation else ("insufficient_code_symbol_evidence" if getattr(intent, "wants_code_symbols", False) else "no_trusted_context"))
         if answer_available and answer_type in {"partial", "partial_navigational"}:
             reason = answer_type
         message = "Returned project context with Trust Contract." if answer_available else (project_docs.message if project_docs else "No trusted context matched this question.")
         if answer_available and answer_type == "partial_navigational":
             message = "Returned partial/navigational project context; search project source for missing story-specific terms."
+        if dependency_confirmation and not answer_available:
+            message = f"Dependency docs for {selected_dependency} require network access; retry with allow_network=true after user confirmation."
         return ProjectContextResult(
             project_path=str(root),
             question=question,
