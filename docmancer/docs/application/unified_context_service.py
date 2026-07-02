@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from dataclasses import asdict, is_dataclass, replace
 from typing import Any
 
@@ -11,6 +12,43 @@ from docmancer.docs.resolver import docs_snapshot_is_exact
 
 
 _LATEST_ALIASES = {"latest", "stable", "main", "*"}
+_PATCH_TASK_TERMS = {
+    "change",
+    "changed",
+    "changes",
+    "changing",
+    "diff",
+    "diffs",
+    "edit",
+    "edited",
+    "editing",
+    "edits",
+    "fix",
+    "fixed",
+    "fixes",
+    "fixing",
+    "implement",
+    "implemented",
+    "implementing",
+    "implements",
+    "modify",
+    "modified",
+    "modifies",
+    "modifying",
+    "patch",
+    "patched",
+    "patching",
+    "patches",
+    "refactor",
+    "refactored",
+    "refactoring",
+    "refactors",
+    "validate",
+    "validated",
+    "validates",
+    "validating",
+}
+_PATCH_TASK_TOKEN_RE = re.compile(r"[a-z0-9]+")
 
 
 def _exact_version_match(result: DocsResult) -> bool | None:
@@ -312,9 +350,8 @@ class UnifiedDocsContextService:
     def _patch_constraints_next_action(question: str, project_path: str | None, mode_selected: str, mode_requested: str) -> dict[str, Any] | None:
         if not project_path or mode_requested == "library" or mode_selected == "library":
             return None
-        normalized = f" {question.lower()} "
-        patch_terms = (" patch", " diff", " change", " edit", " modify", " fix", " implement", " refactor", " validate")
-        if not any(term in normalized for term in patch_terms):
+        tokens = _PATCH_TASK_TOKEN_RE.findall(question.lower())
+        if not any(token in _PATCH_TASK_TERMS for token in tokens):
             return None
         return {
             "type": "get_patch_constraints",

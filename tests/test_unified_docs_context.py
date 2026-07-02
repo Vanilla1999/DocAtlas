@@ -526,6 +526,18 @@ def test_non_patch_project_question_does_not_recommend_patch_constraints():
     assert not any(action.get("tool") == "get_patch_constraints" for action in result.next_actions)
 
 
+def test_project_docs_questions_with_patch_term_prefixes_do_not_recommend_patch_constraints():
+    questions = [
+        "How do pytest fixtures work?",
+        "How is this different from Context7?",
+        "How do dependency fixtures interact with project docs?",
+    ]
+
+    for question in questions:
+        result = _service(FakeFacade()).get_docs_context(question, project_path="/repo", prepare_project_docs=False)
+        assert not any(action.get("tool") == "get_patch_constraints" for action in result.next_actions)
+
+
 def test_library_question_does_not_recommend_patch_constraints():
     result = _service(FakeFacade()).get_docs_context("How do I patch a FastAPI dependency?", library="fastapi")
     assert result.mode_selected == "library"
