@@ -515,7 +515,7 @@ def test_patch_review_command_writes_expected_artifacts(tmp_path: Path):
     )
 
     assert result.exit_code == 0, result.output
-    for name in ["constraints.json", "constraints.md", "changed_files.json", "untracked_files.json", "ignored_runtime_artifacts.json", "patch_hygiene.json", "patch.diff", "validation.json", "review_summary_actions.json", "review_summary_quality.json", "review_summary_manifest.json", "review_summary.md"]:
+    for name in ["constraints.json", "constraints.md", "changed_files.json", "untracked_files.json", "ignored_runtime_artifacts.json", "patch_hygiene.json", "patch.diff", "validation.json", "constraint_coverage.json", "review_summary_actions.json", "review_summary_quality.json", "review_summary_manifest.json", "review_summary.md"]:
         assert (out / name).exists()
     validation = json.loads((out / "validation.json").read_text(encoding="utf-8"))
     assert "violated" in validation
@@ -1072,6 +1072,44 @@ def test_patch_review_writes_machine_readable_summary_quality(tmp_path: Path):
     assert "no_violations" in signal_codes
     assert f"- attachable: {quality['attachable']}" in summary_quality
     assert f"- actionable_items_count: {quality['actionable_items_count']}" in summary_quality
+
+
+def test_patch_review_writes_constraint_coverage_artifact(tmp_path: Path):
+    repo = _repo(tmp_path)
+    _git(repo, "init")
+    _git(repo, "config", "user.email", "test@example.com")
+    _git(repo, "config", "user.name", "Test User")
+    _git(repo, "add", ".")
+    _git(repo, "commit", "-m", "base")
+    _write(repo / "lib/generated/client.g.dart", "// generated\n")
+    _write(repo / "pubspec.lock", "packages: {}\n")
+    out = tmp_path / "review-coverage"
+
+    result = CliRunner().invoke(
+        cli,
+        ["patch-review", "--project-path", str(repo), "--task", "Review generated and dependency coverage", "--output-dir", str(out), "--format", "json"],
+    )
+
+    assert result.exit_code == 0, result.output
+    payload = json.loads(result.output)
+    coverage = json.loads((out / "constraint_coverage.json").read_text(encoding="utf-8"))
+    category_names = {item["name"] for item in coverage["categories"]}
+    assert "constraint_coverage.json" in payload["artifacts"]
+    assert payload["constraint_coverage"] == coverage
+    assert coverage["schema_version"] == PATCH_REVIEW_SCHEMA_VERSIONS["constraint_coverage.json"]
+    assert coverage["source_artifacts"] == ["constraints.json", "validation.json"]
+    assert coverage["total_constraints"] == payload["validation"]["total_constraints"]
+    assert coverage["validation_status_counts"] == {
+        "satisfied": payload["validation"]["satisfied"],
+        "violated": payload["validation"]["violated"],
+        "unknown": payload["validation"].get("unknown", 0),
+        "manual_review": payload["validation"].get("manual_review", 0),
+    }
+    assert coverage["unknown_manual_count"] == coverage["validation_status_counts"]["unknown"] + coverage["validation_status_counts"]["manual_review"]
+    assert "generated_files" in category_names
+    assert "dependency_versions" in category_names
+    assert "unknown_manual" in category_names
+    assert "unknown_manual_as_pass" in coverage["claims_avoided"]
 
 
 def test_patch_review_quality_classifies_unknowns_without_treating_them_as_pass():
@@ -1676,6 +1714,7 @@ def test_patch_review_machine_readable_artifact_contracts(tmp_path: Path):
     pr_comment = payload["review_summary_pr_comment"]
     trace = payload["review_summary_trace"]
     bot_bundle = payload["review_summary_bot_bundle"]
+    coverage = payload["constraint_coverage"]
     manifest = payload["review_summary_manifest"]
     manifest_artifacts = {item["filename"]: item for item in manifest["artifacts"]}
 
@@ -1750,6 +1789,7 @@ def test_patch_review_machine_readable_artifact_contracts(tmp_path: Path):
         "review_summary_pr_comment.json": pr_comment["schema_version"],
         "review_summary_trace.json": trace["schema_version"],
         "review_summary_bot_bundle.json": bot_bundle["schema_version"],
+        "constraint_coverage.json": coverage["schema_version"],
     }
     assert {
         "schema_version",
@@ -1777,11 +1817,14 @@ def test_patch_review_machine_readable_artifact_contracts(tmp_path: Path):
         "source_artifacts",
         "counts",
         "action_traces",
+        "coverage_status_counts",
         "claims_avoided",
     } <= set(trace)
     assert trace["schema_version"] == PATCH_REVIEW_SCHEMA_VERSIONS["review_summary_trace.json"]
     assert "constraints.json" in trace["source_artifacts"]
     assert "validation.json" in trace["source_artifacts"]
+    assert "constraint_coverage.json" in trace["source_artifacts"]
+    assert trace["coverage_status_counts"] == coverage["validation_status_counts"]
     assert trace["counts"]["action_traces"] == len(trace["action_traces"])
     for item in trace["action_traces"]:
         assert {
@@ -1810,6 +1853,8 @@ def test_patch_review_machine_readable_artifact_contracts(tmp_path: Path):
     assert bot_bundle["schema_version"] == 3
     assert manifest_artifacts["review_summary_quality.json"]["schema_version"] == quality["schema_version"]
     assert manifest_artifacts["review_summary_bot_bundle.json"]["schema_version"] == bot_bundle["schema_version"]
+    assert manifest_artifacts["constraint_coverage.json"]["schema_version"] == coverage["schema_version"]
+    assert manifest_artifacts["constraint_coverage.json"]["kind"] == "constraint_coverage_metadata"
     assert bot_bundle["quality"] == quality
     assert bot_bundle["actions"] == actions
     assert bot_bundle["pr_comment"] == pr_comment
