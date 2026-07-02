@@ -2,8 +2,10 @@ from __future__ import annotations
 
 import json
 import fnmatch
+import hashlib
 import re
 import tomllib
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -177,6 +179,17 @@ class PatchConstraintsService:
         return PatchConstraintPacket(
             task=question,
             constraints=selected,
+            contract_id=self._contract_id(root, question, selected),
+            project_path=str(root) if root else None,
+            generated_at=datetime.now(UTC).isoformat(),
+            index_state=self._index_state(root, sources),
+            token_budget={
+                "max_tokens": max_tokens,
+                "max_constraints": max_constraints,
+                "token_estimate": token_estimate,
+                "truncated": truncated,
+            },
+            next_actions=self._next_actions(selected, truncated),
             forbidden_edits=[c for c in selected if c.type in {"forbidden_edit", "generated_file"}],
             dependency_contracts=[c for c in selected if c.type == "dependency_version"],
             source_of_truth_rules=[c for c in selected if c.type == "source_of_truth"],
@@ -785,7 +798,65 @@ class PatchConstraintsService:
             evidence=evidence or "Inferred from task context; no direct source evidence was available.",
             symbols=list(kwargs.get("symbols") or []),
             files=list(kwargs.get("files") or []),
+            source_refs=self._source_refs(source or "inferred"),
+            evidence_snippets=self._evidence_snippets(source or "inferred", evidence),
         )
+
+    @staticmethod
+    def _source_refs(source: str) -> list[dict[str, Any]]:
+        if not source:
+            return []
+        kind = "task_context" if source in {"changed_files", "question", "inferred"} else "source"
+        if source in DEPENDENCY_FILES or "lock" in source or "manifest" in source:
+            kind = "dependency_metadata"
+        return [{"path": source, "kind": kind}]
+
+    @staticmethod
+    def _evidence_snippets(source: str, evidence: str) -> list[dict[str, Any]]:
+        if not evidence:
+            return []
+        return [{"path": source, "text": evidence[:240]}]
+
+    @staticmethod
+    def _contract_id(root: Path | None, question: str, constraints: list[PatchConstraint]) -> str:
+        payload = json.dumps(
+            {
+                "project_path": str(root) if root else None,
+                "task": question,
+                "constraints": [c.id for c in constraints],
+            },
+            sort_keys=True,
+            ensure_ascii=False,
+        )
+        return "patch-contract-" + hashlib.sha256(payload.encode("utf-8")).hexdigest()[:16]
+
+    @staticmethod
+    def _index_state(root: Path | None, sources: list[dict[str, str]]) -> dict[str, Any]:
+        return {
+            "project_path": str(root) if root else None,
+            "visible_source_count": len(sources),
+            "source_paths": [source["path"] for source in sources[:20]],
+            "source_paths_truncated": len(sources) > 20,
+        }
+
+    @staticmethod
+    def _next_actions(constraints: list[PatchConstraint], truncated: bool) -> list[dict[str, Any]]:
+        actions: list[dict[str, Any]] = [
+            {
+                "type": "edit_with_constraints",
+                "description": "Apply the patch while treating high-confidence must constraints as advisory guardrails.",
+            },
+            {
+                "type": "validate_patch_against_constraints",
+                "tool": "validate_patch_against_constraints",
+                "description": "After editing, validate changed files or a patch diff against this contract; unknown/manual results are not passes.",
+            },
+        ]
+        if any(c.type == "verification" for c in constraints):
+            actions.append({"type": "run_tests", "description": "Run the relevant project tests/checks and report real output."})
+        if truncated:
+            actions.append({"type": "rerun_with_larger_budget", "description": "Contract was budget-truncated; rerun with larger max_tokens/max_constraints if lower-priority guidance is needed."})
+        return actions
 
     @staticmethod
     def _interesting_lines(text: str) -> list[str]:

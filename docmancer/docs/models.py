@@ -329,12 +329,22 @@ class PatchConstraint:
     evidence: str
     symbols: list[str] = field(default_factory=list)
     files: list[str] = field(default_factory=list)
+    source_refs: list[dict[str, Any]] = field(default_factory=list)
+    evidence_snippets: list[dict[str, Any]] = field(default_factory=list)
 
 
 @dataclass(frozen=True)
 class PatchConstraintPacket:
     task: str
     constraints: list[PatchConstraint] = field(default_factory=list)
+    schema_version: str = "patch-contract-2.0"
+    contract_kind: str = "patch_contract"
+    contract_id: str | None = None
+    project_path: str | None = None
+    generated_at: str | None = None
+    index_state: dict[str, Any] = field(default_factory=dict)
+    token_budget: dict[str, Any] = field(default_factory=dict)
+    next_actions: list[dict[str, Any]] = field(default_factory=list)
     forbidden_edits: list[PatchConstraint] = field(default_factory=list)
     dependency_contracts: list[PatchConstraint] = field(default_factory=list)
     source_of_truth_rules: list[PatchConstraint] = field(default_factory=list)

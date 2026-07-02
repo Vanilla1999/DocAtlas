@@ -198,6 +198,8 @@ class PatchConstraintValidationService:
             evidence=str(raw.get("evidence") or ""),
             symbols=list(raw.get("symbols") or []),
             files=list(raw.get("files") or []),
+            source_refs=list(raw.get("source_refs") or []),
+            evidence_snippets=list(raw.get("evidence_snippets") or []),
         )
 
     def _normalize_changed_files(self, changed_files: list[str] | None, patch_diff: str | None) -> list[str]:
