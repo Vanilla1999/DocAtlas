@@ -1,9 +1,17 @@
 from __future__ import annotations
 
 from dataclasses import asdict
+import json
+from copy import deepcopy
 from typing import Any
 
 from docmancer.docs.service import LibraryDocsService
+
+
+MCP_COMPACT_OUTPUT_MAX_BYTES = 32_000
+_MCP_COMPACT_TEXT_KEYS = {"content", "snippet", "text", "primary_snippet"}
+_MCP_COMPACT_DEFAULT_TEXT_LIMIT = 1_200
+_MCP_COMPACT_LIST_LIMIT = 8
 
 
 PROJECT_TOOL_NAMES = {
@@ -22,6 +30,90 @@ PROJECT_TOOL_NAMES = {
 
 def project_tools(tools: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return [tool for tool in tools if tool["name"] in PROJECT_TOOL_NAMES]
+
+
+def _json_bytes(payload: dict[str, Any]) -> int:
+    return len(json.dumps(payload, ensure_ascii=False, default=str).encode("utf-8"))
+
+
+def _truncate_text(value: str, limit: int) -> tuple[str, bool]:
+    if len(value) <= limit:
+        return value, False
+    suffix = f" … [truncated {len(value) - limit} chars]"
+    return value[: max(0, limit - len(suffix))].rstrip() + suffix, True
+
+
+def _compact_value_for_mcp(value: Any, *, text_limit: int, list_limit: int, key: str | None = None, stats: dict[str, int]) -> Any:
+    if isinstance(value, str):
+        limit = text_limit if key in _MCP_COMPACT_TEXT_KEYS else max(text_limit * 2, text_limit)
+        compact, truncated = _truncate_text(value, limit)
+        if truncated:
+            stats["truncated_strings"] += 1
+            stats["truncated_chars"] += len(value) - len(compact)
+        return compact
+    if isinstance(value, list):
+        items = value[:list_limit]
+        omitted = max(0, len(value) - len(items))
+        if omitted:
+            stats["omitted_list_items"] += omitted
+        return [_compact_value_for_mcp(item, text_limit=text_limit, list_limit=list_limit, stats=stats) for item in items]
+    if isinstance(value, dict):
+        return {k: _compact_value_for_mcp(v, text_limit=text_limit, list_limit=list_limit, key=str(k), stats=stats) for k, v in value.items()}
+    return value
+
+
+def _compact_mcp_payload(payload: dict[str, Any], *, max_bytes: int = MCP_COMPACT_OUTPUT_MAX_BYTES) -> dict[str, Any]:
+    """Apply the MCP compact-response hard cap without changing explicit full output."""
+
+    if _json_bytes(payload) <= max_bytes:
+        return payload
+
+    last_compact = deepcopy(payload)
+    last_stats: dict[str, int] = {"truncated_strings": 0, "truncated_chars": 0, "omitted_list_items": 0}
+    for text_limit, list_limit in ((_MCP_COMPACT_DEFAULT_TEXT_LIMIT, _MCP_COMPACT_LIST_LIMIT), (800, 6), (480, 4), (240, 3), (120, 2)):
+        stats = {"truncated_strings": 0, "truncated_chars": 0, "omitted_list_items": 0}
+        compact = _compact_value_for_mcp(payload, text_limit=text_limit, list_limit=list_limit, stats=stats)
+        compact["mcp_compaction"] = {
+            "max_bytes": max_bytes,
+            "truncated": True,
+            "text_limit": text_limit,
+            "list_limit": list_limit,
+            "truncated_strings": stats["truncated_strings"],
+            "truncated_chars": stats["truncated_chars"],
+            "omitted_list_items": stats["omitted_list_items"],
+        }
+        warnings = list(compact.get("warnings") or [])
+        warning = {
+            "code": "mcp_compact_output_truncated",
+            "message": f"Compact MCP response was truncated to stay under {max_bytes} bytes; pass output_mode='full' only when a full get_project_context dump is explicitly required.",
+        }
+        if warning not in warnings:
+            warnings.append(warning)
+        compact["warnings"] = warnings
+        last_compact = compact
+        last_stats = stats
+        if _json_bytes(compact) <= max_bytes:
+            return compact
+
+    compact = deepcopy(last_compact)
+    compact["context_pack"] = []
+    compact["supporting_snippets"] = []
+    compact["mcp_compaction"] = {
+        "max_bytes": max_bytes,
+        "truncated": True,
+        "content_omitted": True,
+        "truncated_strings": last_stats["truncated_strings"],
+        "truncated_chars": last_stats["truncated_chars"],
+        "omitted_list_items": last_stats["omitted_list_items"],
+    }
+    compact["warnings"] = [
+        *(compact.get("warnings") or []),
+        {
+            "code": "mcp_compact_output_content_omitted",
+            "message": f"Large context fields were omitted to keep the compact MCP response under {max_bytes} bytes; use narrower tokens/limit or explicit full output when appropriate.",
+        },
+    ]
+    return compact
 
 
 def _project_sources_summary(result: dict[str, Any]) -> dict[str, int]:
@@ -240,7 +332,7 @@ def handle_project_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
         if _project_context_output_mode(args) == "full":
             result["output_mode"] = "full"
             return result
-        return _add_project_context_output_warning(_compact_project_context(result), args)
+        return _compact_mcp_payload(_add_project_context_output_warning(_compact_project_context(result), args))
     if name == "get_patch_constraints":
         return asdict(service.get_patch_constraints(
             args["question"],

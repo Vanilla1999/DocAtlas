@@ -1,6 +1,10 @@
 from __future__ import annotations
 
+import json
+
 from docmancer.docs.interfaces.mcp.context_tools import context_tools, handle_context_tool
+from docmancer.docs.interfaces.mcp.project_tools import MCP_COMPACT_OUTPUT_MAX_BYTES
+from docmancer.docs.models import UnifiedDocsContextResult
 from docmancer.mcp.docs_server import TOOLS
 
 
@@ -41,3 +45,21 @@ def test_existing_mcp_tools_unchanged():
 
 def test_context_tools_filter_only_unified_tool():
     assert [tool["name"] for tool in context_tools(TOOLS)] == ["get_docs_context"]
+
+
+def test_get_docs_context_mcp_compact_output_has_hard_size_cap():
+    large = "x" * 120_000
+
+    class Facade:
+        def get_docs_context(self, question, **kwargs):
+            return UnifiedDocsContextResult(
+                question=question,
+                context_pack=[{"doc_scope": "project", "path": "docs/ScanDoc.md", "content": large}],
+                trust_contract={"selected": [{"path": "docs/ScanDoc.md", "snippet": large}], "rejected": [], "risky": []},
+            )
+
+    result = handle_context_tool("get_docs_context", {"question": "find current web API camera implementation", "project_path": "/repo"}, Facade())
+
+    assert len(json.dumps(result, ensure_ascii=False).encode("utf-8")) <= MCP_COMPACT_OUTPUT_MAX_BYTES
+    assert result["mcp_compaction"]["truncated"] is True
+    assert any(isinstance(warning, dict) and warning["code"] == "mcp_compact_output_truncated" for warning in result["warnings"])

@@ -4,6 +4,7 @@ from dataclasses import asdict, is_dataclass
 from typing import Any
 
 from docmancer.docs.service import LibraryDocsService
+from docmancer.docs.interfaces.mcp.project_tools import _compact_mcp_payload
 
 
 CONTEXT_TOOL_NAMES = {"get_docs_context"}
@@ -40,11 +41,11 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
         response_style=args.get("response_style"),
     )
     if is_dataclass(result):
-        return asdict(result)
+        return _compact_mcp_payload(asdict(result))
     if isinstance(result, dict):
-        return result
+        return _compact_mcp_payload(result)
     payload = dict(getattr(result, "__dict__", {}))
     for key in ("tool", "status", "reason_code", "message", "response_style", "primary_snippet", "supporting_snippets", "snippet_metrics"):
         if hasattr(result, key):
             payload[key] = getattr(result, key)
-    return payload
+    return _compact_mcp_payload(payload)

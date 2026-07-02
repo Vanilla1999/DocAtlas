@@ -1,9 +1,10 @@
 from __future__ import annotations
 
+import json
 from dataclasses import asdict
 from typing import Any
 
-from docmancer.docs.interfaces.mcp.project_tools import _compact_project_context, handle_project_tool
+from docmancer.docs.interfaces.mcp.project_tools import MCP_COMPACT_OUTPUT_MAX_BYTES, _compact_project_context, handle_project_tool
 from docmancer.docs.application.project_context_service import ProjectContextService
 from docmancer.docs.models import ProjectDocsChunk, ProjectDocsResult
 from tests.docs.test_project_context_service import FakeProjectContextFacade
@@ -52,6 +53,21 @@ def test_mcp_project_context_full_output_requires_explicit_output_mode():
     assert payload is not None
     assert payload["output_mode"] == "full"
     assert payload["project_docs"]["results"]
+
+
+def test_mcp_project_context_compact_output_has_hard_size_cap():
+    large = "x" * 120_000
+    result = ProjectContextService(FakeProjectContextFacade()).get_project_context("/repo", "find current web API camera implementation")
+    result.context_pack.append({"doc_scope": "project", "source_class": "project_doc", "path": "docs/ScanDoc.md", "content": large})
+    result.trust_contract["selected"] = [{"path": "docs/ScanDoc.md", "snippet": large}]
+    service: Any = type("FakeService", (), {"get_project_context": lambda self, *args, **kwargs: result})()
+
+    payload = handle_project_tool("get_project_context", {"project_path": "/repo", "question": "find current web API camera implementation"}, service)
+
+    assert payload is not None
+    assert len(json.dumps(payload, ensure_ascii=False).encode("utf-8")) <= MCP_COMPACT_OUTPUT_MAX_BYTES
+    assert payload["mcp_compaction"]["truncated"] is True
+    assert any(isinstance(warning, dict) and warning["code"] == "mcp_compact_output_truncated" for warning in payload["warnings"])
 
 
 def test_compact_output_keeps_context_pack_trust_contract_and_outline():
