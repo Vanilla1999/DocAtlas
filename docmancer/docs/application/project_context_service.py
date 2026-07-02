@@ -68,12 +68,6 @@ class ProjectContextService:
                 project_path=str(root),
             )
 
-        trust_contract = build_project_context_trust_contract(
-            project_docs=project_docs,
-            dependency_docs=dependency_docs,
-            requested_library=selected_dependency,
-            mode=mode,
-        )
         warnings = [*(project_docs.warnings if project_docs else [])]
         if dependency_docs:
             warnings.extend(dependency_docs.warnings)
@@ -104,6 +98,13 @@ class ProjectContextService:
                 token_budget=_source_evidence_token_budget(tokens),
             )
             context_pack.extend(source_evidence_items)
+        trust_contract = build_project_context_trust_contract(
+            project_docs=project_docs,
+            dependency_docs=dependency_docs,
+            requested_library=selected_dependency,
+            mode=mode,
+            context_pack=context_pack,
+        )
         answer_outline = build_project_answer_outline(question=question, intent=intent, context_pack=context_pack)
         metrics = project_context_metrics(context_pack=context_pack, project_docs=project_docs, dependency_docs=dependency_docs, intent=intent)
         lane_priority = ["project"] if mode == "project-only" else (["dependency"] if mode in {"deps-only", "public-docs"} else ["project", "dependency"])

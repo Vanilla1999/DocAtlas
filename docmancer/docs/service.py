@@ -362,8 +362,15 @@ class LibraryDocsService:
         return project_context_metrics(context_pack=context_pack, project_docs=project_docs, dependency_docs=dependency_docs)
 
     @staticmethod
-    def _project_context_trust_contract(*, project_docs: ProjectDocsResult | None, dependency_docs: DocsResult | None, requested_library: str | None, mode: str) -> dict[str, Any]:
-        return build_project_context_trust_contract(project_docs=project_docs, dependency_docs=dependency_docs, requested_library=requested_library, mode=mode)
+    def _project_context_trust_contract(
+        *,
+        project_docs: ProjectDocsResult | None,
+        dependency_docs: DocsResult | None,
+        requested_library: str | None,
+        mode: str,
+        context_pack: list[dict[str, Any]] | None = None,
+    ) -> dict[str, Any]:
+        return build_project_context_trust_contract(project_docs=project_docs, dependency_docs=dependency_docs, requested_library=requested_library, mode=mode, context_pack=context_pack)
 
     @staticmethod
     def _target_result_summary(result: DocsTargetResult) -> dict[str, Any]:

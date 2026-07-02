@@ -11,6 +11,7 @@ def build_project_context_trust_contract(
     dependency_docs: DocsResult | None,
     requested_library: str | None,
     mode: str,
+    context_pack: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     selected_sources: list[dict[str, Any]] = []
     rejected_sources: list[dict[str, Any]] = []
@@ -120,6 +121,7 @@ def build_project_context_trust_contract(
         "rejected": rejected_sources,
         "risky": risky_sources,
         "rejected_or_risky": [*rejected_sources, *risky_sources],
+        "context_sources": _build_context_sources(context_pack),
         "warnings": warnings,
         "next_actions": next_actions,
         "policy": {
@@ -127,3 +129,82 @@ def build_project_context_trust_contract(
             "reason_code": "trusted_context_available" if selected_sources else "no_trusted_context",
         },
     }
+
+
+def _build_context_sources(context_pack: list[dict[str, Any]] | None) -> dict[str, Any]:
+    repo_map: list[dict[str, Any]] = []
+    source_evidence: list[dict[str, Any]] = []
+    for item in context_pack or []:
+        source_class = item.get("source_class")
+        if source_class == "source_evidence":
+            source_evidence.append(_source_evidence_contract_item(item))
+        elif source_class == "repo_map":
+            repo_map.append(_repo_map_contract_item(item))
+
+    return {
+        "schema_version": "context-sources-1.0",
+        "source_evidence": source_evidence,
+        "repo_map": repo_map,
+        "policy": {
+            "source_evidence": "source_snippet entries are path-line backed; absent_in_source entries are uncertainty signals",
+            "repo_map": "navigation_only_not_story_claim_proof",
+        },
+    }
+
+
+def _source_evidence_contract_item(item: dict[str, Any]) -> dict[str, Any]:
+    evidence_class = str(item.get("evidence_class") or "source_evidence")
+    result: dict[str, Any] = {
+        "source_class": "source_evidence",
+        "evidence_class": evidence_class,
+        "role": "source_backed_evidence" if evidence_class == "source_snippet" else "uncertainty_signal",
+        "proof_role": "path_line_evidence" if evidence_class == "source_snippet" else "not_proof_absence_signal",
+        "path": item.get("path"),
+        "line_start": item.get("line_start"),
+        "line_end": item.get("line_end"),
+        "matched_terms": _string_list(item.get("matched_terms")),
+        "missing_terms": _string_list(item.get("missing_terms")),
+    }
+    _copy_optional(result, item, "title")
+    _copy_optional(result, item, "snippet")
+    _copy_optional(result, item, "freshness")
+    _copy_reason(result, item)
+    return result
+
+
+def _repo_map_contract_item(item: dict[str, Any]) -> dict[str, Any]:
+    result: dict[str, Any] = {
+        "source_class": "repo_map",
+        "evidence_class": "navigation_map",
+        "role": "navigation_context",
+        "proof_role": "navigation_only",
+        "path": item.get("path"),
+        "line_start": item.get("line_start"),
+        "line_end": item.get("line_end"),
+        "matched_terms": _string_list(item.get("matched_terms")),
+        "missing_terms": [],
+    }
+    _copy_optional(result, item, "title")
+    _copy_optional(result, item, "language")
+    _copy_optional(result, item, "freshness")
+    _copy_reason(result, item)
+    return result
+
+
+def _copy_reason(result: dict[str, Any], item: dict[str, Any]) -> None:
+    reason = item.get("why_selected") or item.get("reason")
+    if not reason:
+        return
+    result["reason"] = str(reason)
+    result["why_selected"] = str(reason)
+
+
+def _copy_optional(result: dict[str, Any], item: dict[str, Any], key: str) -> None:
+    if item.get(key) is not None:
+        result[key] = item.get(key)
+
+
+def _string_list(value: Any) -> list[str]:
+    if not isinstance(value, list):
+        return []
+    return [str(item) for item in value if str(item or "").strip()]

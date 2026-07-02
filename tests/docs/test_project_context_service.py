@@ -203,6 +203,66 @@ class HelpRequestDetailsScreen extends StatelessWidget {
     assert result.answer_completeness["missing_terms"] == []
 
 
+def test_trust_contract_keeps_old_fields_and_exposes_source_evidence_context_sources(tmp_path):
+    lib = tmp_path / "lib"
+    lib.mkdir()
+    (lib / "help_request_details_screen.dart").write_text(
+        """
+class HelpRequestDetailsScreen {
+  final label = 'Вернуть в работу';
+}
+""".strip()
+        + "\n",
+        encoding="utf-8",
+    )
+    facade = FakeProjectContextFacade()
+    facade.project_docs = ProjectDocsResult(
+        project_path=str(tmp_path),
+        query='Как реализовать кнопку "Вернуть в работу"?',
+        results=[
+            ProjectDocsChunk(
+                title="Architecture",
+                content="Help requests follow UI -> Cubit -> Service -> Repository -> API with enough context for stable project-doc selection.",
+                source=str(tmp_path / "ARCHITECTURE.md"),
+                url=None,
+                path="ARCHITECTURE.md",
+                heading_path="Help requests architecture",
+            )
+        ],
+        indexed_sources=[{"path": "ARCHITECTURE.md", "source": str(tmp_path / "ARCHITECTURE.md")}],
+    )
+
+    result = ProjectContextService(facade).get_project_context(
+        str(tmp_path),
+        'Как реализовать кнопку "Вернуть в работу"?',
+        mode="project-only",
+    )
+
+    contract = result.trust_contract
+    assert contract["selected"] == contract["selected_sources"]
+    assert contract["trusted"] == contract["trusted_sources"]
+    assert {item["source_class"] for item in contract["selected_sources"]} == {"project_file"}
+
+    context_sources = contract["context_sources"]
+    assert context_sources["schema_version"] == "context-sources-1.0"
+    snippet = context_sources["source_evidence"][0]
+    assert snippet["source_class"] == "source_evidence"
+    assert snippet["evidence_class"] == "source_snippet"
+    assert snippet["role"] == "source_backed_evidence"
+    assert snippet["path"] == "lib/help_request_details_screen.dart"
+    assert snippet["line_start"] == 2
+    assert snippet["line_end"] == 2
+    assert snippet["matched_terms"] == ["Вернуть в работу"]
+    assert snippet["missing_terms"] == []
+    assert snippet["reason"] == "requirement term matched a concrete project source line"
+
+    repo_map = context_sources["repo_map"][0]
+    assert repo_map["source_class"] == "repo_map"
+    assert repo_map["role"] == "navigation_context"
+    assert repo_map["proof_role"] == "navigation_only"
+    assert repo_map["path"] == "lib/help_request_details_screen.dart"
+
+
 def test_project_context_source_evidence_exposes_absent_terms_without_proof(tmp_path):
     lib = tmp_path / "lib"
     lib.mkdir()
@@ -370,6 +430,16 @@ class HelpChatWidget {}
     assert "Создать новый запрос" in missing_terms
     assert "Сервис временно недоступен" in missing_terms
     assert "Нет соединения" in missing_terms
+    context_sources = result.trust_contract["context_sources"]
+    assert context_sources["repo_map"][0]["proof_role"] == "navigation_only"
+    assert any(
+        item["evidence_class"] == "source_snippet" and item["matched_terms"] == ["help_chat"]
+        for item in context_sources["source_evidence"]
+    )
+    assert any(
+        item["evidence_class"] == "absent_in_source" and "Сервис временно недоступен" in item["missing_terms"]
+        for item in context_sources["source_evidence"]
+    )
     assert result.recommended_next_actions[-1]["action"] == "search_project_sources"
 
 
