@@ -843,6 +843,8 @@ def test_patch_review_summary_max_items_limits_actionable_checklist(tmp_path: Pa
     repo = tmp_path / "repo"
     repo.mkdir()
     subprocess.run(["git", "init"], cwd=repo, check=True, stdout=subprocess.DEVNULL)
+    subprocess.run(["git", "config", "user.email", "test@example.com"], cwd=repo, check=True, stdout=subprocess.DEVNULL)
+    subprocess.run(["git", "config", "user.name", "Test User"], cwd=repo, check=True, stdout=subprocess.DEVNULL)
     _write(
         repo / "docs/architecture.md",
         "\n".join(
@@ -1476,6 +1478,8 @@ def test_patch_review_writes_machine_readable_action_items(tmp_path: Path):
     repo = tmp_path / "repo"
     repo.mkdir()
     subprocess.run(["git", "init"], cwd=repo, check=True, stdout=subprocess.DEVNULL)
+    subprocess.run(["git", "config", "user.email", "test@example.com"], cwd=repo, check=True, stdout=subprocess.DEVNULL)
+    subprocess.run(["git", "config", "user.name", "Test User"], cwd=repo, check=True, stdout=subprocess.DEVNULL)
     _write(repo / "docs/architecture.md", "Generated files must not be edited by hand. Checkout buttons call launchCheckoutFlow before navigation.\n")
     _write(repo / "lib/payments/checkout_button.dart", "void renderCheckout() {}\n")
     subprocess.run(["git", "add", "."], cwd=repo, check=True, stdout=subprocess.DEVNULL)
