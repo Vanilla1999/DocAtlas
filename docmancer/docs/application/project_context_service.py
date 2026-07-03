@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import replace
+from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Any
 import re
@@ -38,6 +38,18 @@ LOW_TRUST_QUERY_TERMS = (
     "eval",
     "evaluation",
 )
+LOW_SIGNAL_SINGLE_TOKEN_QUERIES = {"test", "tests", "doc", "docs", "readme", "todo", "fixme"}
+
+
+@dataclass(frozen=True)
+class ContextTrustDecision:
+    answer_available: bool
+    reason: str
+    confidence: str
+    passed_relevance_gate: bool
+    max_project_score: float | None
+    query_terms_matched: list[str]
+    query_terms_missing: list[str]
 
 
 class ProjectContextService:
@@ -256,6 +268,29 @@ class ProjectContextService:
             metrics.setdefault("quality", {}).setdefault("warnings", []).append(warning)
         answer_outline["answer_completeness"] = answer_completeness
         metrics["answer_completeness"] = answer_completeness
+        trust_decision = _make_context_trust_decision(
+            question=question,
+            context_pack=context_pack,
+            project_docs=project_docs,
+            dependency_docs=dependency_docs,
+            source_evidence_items=source_evidence_items,
+            relevance_gate=relevance_gate,
+            answer_available=answer_available,
+            answer_type=answer_type,
+            source_search_required=bool(answer_completeness.get("source_search_required")),
+            completeness_reason_codes=list(answer_completeness.get("reason_codes") or []),
+            intent=intent,
+        )
+        diagnostics["trust_decision"] = {
+            "answer_available": trust_decision.answer_available,
+            "reason": trust_decision.reason,
+            "confidence": trust_decision.confidence,
+            "passed_relevance_gate": trust_decision.passed_relevance_gate,
+            "max_project_score": trust_decision.max_project_score,
+            "query_terms_matched": trust_decision.query_terms_matched,
+            "query_terms_missing": trust_decision.query_terms_missing,
+        }
+        answer_available = trust_decision.answer_available
         status = "success" if answer_available else (project_docs.status if project_docs else dependency_docs.status if dependency_docs else "no_results")
         if (project_docs and project_docs.status == "stale") or (dependency_docs and dependency_docs.stale_before_refresh):
             status = "stale"
@@ -263,9 +298,11 @@ class ProjectContextService:
             status = "confirmation_required"
         elif requires_confirmation and not answer_available and status != "stale":
             status = "confirmation_required"
-        reason = "trusted_context_available" if answer_available else ("dependency_docs_network_fetch_required" if dependency_confirmation else ("insufficient_code_symbol_evidence" if getattr(intent, "wants_code_symbols", False) else "no_trusted_context"))
-        if answer_available and answer_type in {"partial", "partial_navigational"}:
-            reason = answer_type
+        reason = trust_decision.reason
+        if dependency_confirmation and not answer_available:
+            reason = "dependency_docs_network_fetch_required"
+        elif getattr(intent, "wants_code_symbols", False) and trust_decision.confidence != "trusted":
+            reason = "insufficient_code_symbol_evidence"
         message = "Returned project context with Trust Contract." if answer_available else (project_docs.message if project_docs else "No trusted context matched this question.")
         if answer_available and answer_type == "partial_navigational":
             message = "Returned partial/navigational project context; search project source for missing story-specific terms."
@@ -451,6 +488,67 @@ def _query_relevance_gate(
         "required_terms": terms[:8],
         "matched_terms": [],
     }
+
+
+def _make_context_trust_decision(
+    *,
+    question: str,
+    context_pack: list[dict[str, Any]],
+    project_docs: ProjectDocsResult | None,
+    dependency_docs: DocsResult | None,
+    source_evidence_items: list[dict[str, Any]],
+    relevance_gate: dict[str, Any],
+    answer_available: bool,
+    answer_type: str,
+    source_search_required: bool,
+    completeness_reason_codes: list[str],
+    intent: Any,
+) -> ContextTrustDecision:
+    max_project_score = _max_project_ranking_score(project_docs)
+    matched_terms = list(relevance_gate.get("matched_terms") or [])
+    missing_terms = list(relevance_gate.get("missing_terms") or relevance_gate.get("required_terms") or [])
+    passed = bool(relevance_gate.get("passed"))
+
+    if _is_low_signal_single_token_query(question):
+        return ContextTrustDecision(False, "no_reliable_context", "low", passed, max_project_score, matched_terms, missing_terms)
+
+    has_dependency_answer = bool(dependency_docs and dependency_docs.results)
+    has_source_evidence = any(item.get("evidence_class") == "source_snippet" for item in source_evidence_items)
+    has_strong_project_answer = bool(project_docs and project_docs.answer_available and _score_is_strong(max_project_score))
+    source_search_is_simple_relevance_gap = (
+        source_search_required
+        and not getattr(intent, "wants_code_symbols", False)
+        and "high_signal_query_terms_missing_from_context" in completeness_reason_codes
+    )
+    if answer_available and passed and (has_dependency_answer or has_source_evidence or (has_strong_project_answer and (not source_search_required or source_search_is_simple_relevance_gap))):
+        return ContextTrustDecision(True, "trusted_context_available", "trusted", passed, max_project_score, matched_terms, missing_terms)
+
+    if context_pack and (passed or getattr(intent, "broad", False) or answer_type in {"partial", "partial_navigational"}):
+        return ContextTrustDecision(False, "partial_navigational_context", "partial", passed, max_project_score, matched_terms, missing_terms)
+
+    return ContextTrustDecision(False, "no_reliable_context", "low", passed, max_project_score, matched_terms, missing_terms)
+
+
+def _max_project_ranking_score(project_docs: ProjectDocsResult | None) -> float | None:
+    scores: list[float] = []
+    for chunk in project_docs.results if project_docs else []:
+        metadata = getattr(chunk, "metadata", None) or {}
+        ranking = metadata.get("project_ranking") if isinstance(metadata, dict) else None
+        value = ranking.get("final_score") if isinstance(ranking, dict) else None
+        if isinstance(value, (int, float)):
+            scores.append(float(value))
+    if scores:
+        return max(scores)
+    return 1.0 if project_docs and project_docs.results else None
+
+
+def _score_is_strong(score: float | None) -> bool:
+    return score is not None and score >= 0.18
+
+
+def _is_low_signal_single_token_query(question: str) -> bool:
+    tokens = re.findall(r"[\wА-Яа-яЁё]+", (question or "").lower())
+    return len(tokens) == 1 and tokens[0] in LOW_SIGNAL_SINGLE_TOKEN_QUERIES
 
 
 def _context_has_query_evidence(context_pack: list[dict[str, Any]], terms: list[str] | None) -> bool:

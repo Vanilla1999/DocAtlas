@@ -103,6 +103,10 @@ class DocsResult:
     schema_version: str = "2.0-mvp"
     status: str = "success"
     decision: str = "answer_returned"
+    reason_code: str | None = None
+    message: str | None = None
+    requires_confirmation: bool = False
+    arguments_patch: dict[str, Any] | None = None
     request: dict[str, Any] = field(default_factory=dict)
     identity: dict[str, Any] = field(default_factory=dict)
     policy: dict[str, Any] = field(default_factory=dict)
@@ -551,6 +555,9 @@ class UnifiedDocsContextResult:
     trust_contract: dict[str, Any] = field(default_factory=dict)
     exact_version: dict[str, Any] | None = None
     reason_code: str | None = None
+    message: str | None = None
+    required_one_of: list[str] = field(default_factory=list)
+    examples: list[dict[str, Any]] = field(default_factory=list)
     requires_confirmation: bool = False
     confirmation_reason: str | None = None
     next_action: dict[str, Any] | None = None

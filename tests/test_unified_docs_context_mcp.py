@@ -65,6 +65,10 @@ def test_get_docs_context_default_answer_reports_compaction_without_debug_noise(
     assert result["output_mode"] == "answer"
     assert result["response_truncated"] is True
     assert result["mcp_compaction"]["truncated"] is True
+    assert result["output_contract"]["truncated"] is True
+    assert result["output_contract"]["complete"] is False
+    assert result["output_contract"]["safe_to_use_as_complete_context"] is False
+    assert result["output_contract"]["retry_with"] == {"output_mode": "debug"}
     assert "context_pack" not in result
     assert any(isinstance(warning, dict) and warning.get("code") == "mcp_response_truncated" for warning in result.get("warnings", []))
     assert not any(isinstance(warning, dict) and str(warning.get("code") or "").startswith("mcp_compact_output_") for warning in result.get("warnings", []))
@@ -85,3 +89,4 @@ def test_get_docs_context_debug_output_keeps_compaction_diagnostics():
 
     assert len(json.dumps(result, ensure_ascii=False).encode("utf-8")) <= MCP_COMPACT_OUTPUT_MAX_BYTES
     assert result["mcp_compaction"]["truncated"] is True
+    assert result["output_contract"]["truncated"] is True

@@ -4,7 +4,7 @@ from dataclasses import asdict, is_dataclass
 from typing import Any
 
 from docmancer.docs.service import LibraryDocsService
-from docmancer.docs.interfaces.mcp.project_tools import _bad_request, _bounded_int_arg, _clean_string, _compact_mcp_payload, _strip_mcp_debug_noise
+from docmancer.docs.interfaces.mcp.project_tools import _attach_output_contract, _bad_request, _bounded_int_arg, _clean_string, _compact_mcp_payload, _strip_mcp_debug_noise
 
 
 CONTEXT_TOOL_NAMES = {"get_docs_context"}
@@ -26,8 +26,9 @@ def _answer_payload(payload: dict[str, Any]) -> dict[str, Any]:
         "answer_available": payload.get("answer_available"),
         "mode_selected": payload.get("mode_selected"),
         "reason_code": payload.get("reason_code"),
+        "response_style": payload.get("response_style"),
         "primary_snippet": payload.get("primary_snippet"),
-        "selected_sources": (payload.get("trust_contract") or {}).get("selected") or (payload.get("trust_contract") or {}).get("selected_sources") or [],
+        "selected_sources": _trust_sources(payload.get("trust_contract"), "selected"),
         "next_action": payload.get("next_action"),
         "next_actions": payload.get("next_actions") or [],
         "arguments_patch": payload.get("arguments_patch"),
@@ -107,4 +108,15 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
     payload = raw if mode == "debug" else (_compact_payload(raw) if mode == "compact" else _answer_payload(raw))
     payload["output_mode"] = mode
     payload = _compact_mcp_payload(payload)
-    return payload if mode == "debug" else _strip_mcp_debug_noise(payload)
+    return _attach_output_contract(payload, output_mode=mode) if mode == "debug" else _strip_mcp_debug_noise(payload)
+
+
+def _trust_sources(contract: Any, lane: str) -> list[dict[str, Any]]:
+    if not isinstance(contract, dict):
+        return []
+    sources = contract.get("sources")
+    if isinstance(sources, dict) and isinstance(sources.get(lane), list):
+        return sources[lane]
+    legacy_key = f"{lane}_sources"
+    value = contract.get(lane) or contract.get(legacy_key)
+    return value if isinstance(value, list) else []

@@ -81,7 +81,35 @@ def normalize_url(url: str) -> str:
 
 
 _ROOT_HINT_SEGMENTS = {"docs", "doc", "documentation", "api", "reference", "sdk", "cli"}
-_LOCALE_PREFIXES = {"ar", "bn", "de", "es", "fr", "it", "ja", "ko", "ru", "tr", "zh-hans"}
+_LOCALE_PREFIXES = {
+    "ar",
+    "bn",
+    "de",
+    "es",
+    "fr",
+    "id",
+    "it",
+    "ja",
+    "ko",
+    "nl",
+    "pl",
+    "pt",
+    "pt-br",
+    "ru",
+    "tr",
+    "uk",
+    "vi",
+    "zh-hans",
+    "zh-hant",
+}
+
+
+def _is_locale_segment(segment: str) -> bool:
+    return segment.lower().replace("_", "-") in _LOCALE_PREFIXES
+
+
+def _starts_with_parts(parts: list[str], prefix: list[str]) -> bool:
+    return len(parts) >= len(prefix) and parts[: len(prefix)] == prefix
 
 
 def infer_docset_root(url: str) -> str | None:
@@ -190,7 +218,10 @@ def is_docs_url(url: str, base_url: str) -> bool:
     # locale by seeding that locale path directly, e.g. /ru/docs.
     url_parts = [part.lower() for part in parsed.path.split("/") if part]
     base_parts = [part.lower() for part in base_parsed.path.split("/") if part]
-    if url_parts and url_parts[0] in _LOCALE_PREFIXES and not (base_parts and base_parts[0] in _LOCALE_PREFIXES):
+    base_has_locale = any(_is_locale_segment(part) for part in base_parts)
+    scope_parts = [part.lower() for part in scope_path.split("/") if part]
+    relative_parts = url_parts[len(scope_parts) :] if scope_parts and _starts_with_parts(url_parts, scope_parts) else url_parts
+    if relative_parts and _is_locale_segment(relative_parts[0]) and not base_has_locale:
         return False
 
     # Must not match blocklist

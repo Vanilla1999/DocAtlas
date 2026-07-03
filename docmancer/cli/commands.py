@@ -1463,6 +1463,14 @@ def query_cmd(
 def _format_context_explain(result) -> str:
     contract = result.trust_contract or {}
 
+    def contract_sources(lane: str) -> list[dict]:
+        sources = contract.get("sources")
+        if isinstance(sources, dict) and isinstance(sources.get(lane), list):
+            return sources[lane]
+        legacy_key = f"{lane}_sources"
+        value = contract.get(lane) or contract.get(legacy_key)
+        return value if isinstance(value, list) else []
+
     def label(source: dict) -> str:
         return str(source.get("path") or source.get("library") or source.get("source") or source.get("url") or source.get("canonical_id") or "unknown")
 
@@ -1470,7 +1478,7 @@ def _format_context_explain(result) -> str:
         return str(source.get("why_selected") or source.get("reason") or source.get("reason_code") or source.get("message") or "not specified")
 
     lines = [f"Trusted context for: {result.question}", "", "Used:"]
-    selected = contract.get("selected_sources") or []
+    selected = contract_sources("selected")
     if selected:
         for source in selected:
             lines.append(f"  [{source.get('source_class', 'source')}] {label(source)}")
@@ -1484,7 +1492,7 @@ def _format_context_explain(result) -> str:
     else:
         lines.append("  none")
     lines.extend(["", "Rejected / risky:"])
-    rejected_or_risky = [*(contract.get("rejected_sources") or []), *(contract.get("risky_sources") or [])]
+    rejected_or_risky = [*contract_sources("rejected"), *contract_sources("risky")]
     if rejected_or_risky:
         for source in rejected_or_risky:
             lines.append(f"  [{source.get('source_class', 'source')}] {label(source)}")
@@ -1630,7 +1638,13 @@ def context_cmd(
         click.echo(json.dumps(payload, ensure_ascii=False, indent=2))
         return
     click.echo(f"Project context: {result.status}")
-    click.echo(f"Trust Contract: {len(result.trust_contract.get('selected_sources', []))} selected, {len(result.trust_contract.get('rejected_sources', []))} rejected, {len(result.trust_contract.get('risky_sources', []))} risky")
+    sources = result.trust_contract.get("sources") if isinstance(result.trust_contract, dict) else {}
+    if not isinstance(sources, dict):
+        sources = {}
+    selected_sources = sources.get("selected") or result.trust_contract.get("selected_sources", [])
+    rejected_sources = sources.get("rejected") or result.trust_contract.get("rejected_sources", [])
+    risky_sources = sources.get("risky") or result.trust_contract.get("risky_sources", [])
+    click.echo(f"Trust Contract: {len(selected_sources)} selected, {len(rejected_sources)} rejected, {len(risky_sources)} risky")
     if result.project_docs and result.project_docs.results:
         click.echo("--- project docs ---")
         for item in result.project_docs.results:

@@ -332,11 +332,13 @@ def _answer_project_context(result: dict[str, Any]) -> dict[str, Any]:
         "answer_type": result.get("answer_type"),
         "mode": result.get("mode"),
         "reason": result.get("reason"),
+        "response_style": result.get("response_style"),
         "primary_snippet": result.get("primary_snippet"),
-        "selected_sources": (result.get("trust_contract") or {}).get("selected") or (result.get("trust_contract") or {}).get("selected_sources") or [],
+        "selected_sources": _trust_sources(result.get("trust_contract"), "selected"),
         "next_actions": result.get("next_actions") or [],
         "next_action": result.get("next_action") or {},
         "arguments_patch": result.get("arguments_patch") or {},
+        "diagnostics": result.get("diagnostics") or {},
         "warnings": result.get("warnings") or [],
     }
     if result.get("requires_confirmation"):
@@ -354,7 +356,19 @@ def _project_context_output_mode(args: dict[str, Any]) -> str:
     return output_mode if output_mode in {"answer", "compact", "debug", "full"} else "answer"
 
 
+def _trust_sources(contract: Any, lane: str) -> list[dict[str, Any]]:
+    if not isinstance(contract, dict):
+        return []
+    sources = contract.get("sources")
+    if isinstance(sources, dict) and isinstance(sources.get(lane), list):
+        return sources[lane]
+    legacy_key = f"{lane}_sources"
+    value = contract.get(lane) or contract.get(legacy_key)
+    return value if isinstance(value, list) else []
+
+
 def _strip_mcp_debug_noise(payload: dict[str, Any]) -> dict[str, Any]:
+    output_mode = str(payload.get("output_mode") or "answer")
     compaction = payload.get("mcp_compaction")
     if isinstance(compaction, dict) and compaction.get("truncated"):
         payload["response_truncated"] = True
@@ -382,7 +396,7 @@ def _strip_mcp_debug_noise(payload: dict[str, Any]) -> dict[str, Any]:
                 "message": "MCP response was compacted/truncated; narrow query/limit/tokens or use output_mode='full' only when necessary.",
             })
         payload["warnings"] = warnings
-        return payload
+        return _attach_output_contract(payload, output_mode=output_mode)
 
     payload.pop("mcp_compaction", None)
     warnings = [
@@ -390,6 +404,25 @@ def _strip_mcp_debug_noise(payload: dict[str, Any]) -> dict[str, Any]:
         if not (isinstance(warning, dict) and str(warning.get("code") or "").startswith("mcp_compact_output_"))
     ]
     payload["warnings"] = warnings
+    return _attach_output_contract(payload, output_mode=output_mode)
+
+
+def _attach_output_contract(payload: dict[str, Any], *, output_mode: str) -> dict[str, Any]:
+    raw_compaction = payload.get("mcp_compaction")
+    compaction: dict[str, Any] = raw_compaction if isinstance(raw_compaction, dict) else {}
+    truncated = bool(payload.get("response_truncated") or compaction.get("truncated"))
+    payload["output_contract"] = {
+        "mode": output_mode,
+        "complete": not truncated,
+        "truncated": truncated,
+        "safe_to_use_as_complete_context": not truncated,
+        "retry_with": {"output_mode": "debug"} if truncated and output_mode != "debug" else None,
+        "omitted": {
+            "fields": compaction.get("omitted_fields", []),
+            "list_items": compaction.get("omitted_list_items", 0),
+            "content_blocks": compaction.get("omitted_content_blocks", 0),
+        },
+    }
     return payload
 
 
@@ -555,7 +588,7 @@ def handle_project_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
         if output_mode == "debug":
             payload = _debug_project_context(result)
             payload["output_mode"] = "debug"
-            return _compact_mcp_payload(payload)
+            return _attach_output_contract(_compact_mcp_payload(payload), output_mode="debug")
         payload = _answer_project_context(result) if output_mode == "answer" else _compact_project_context(result)
         payload["output_mode"] = output_mode
         payload = _compact_mcp_payload(_add_project_context_output_warning(payload, args))
@@ -582,7 +615,7 @@ def handle_project_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
         return payload if output_mode == "debug" else _strip_mcp_debug_noise(payload)
     if name == "validate_patch_against_constraints":
         constraints = args.get("constraints")
-        if not constraints:
+        if constraints is None:
             return _bad_request("empty_constraints", "constraints are required")
         return asdict(service.validate_patch_against_constraints(
             constraints,

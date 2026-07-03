@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import asyncio
 import json
-from typing import Any
+from typing import Any, cast
 
 from docmancer.docs.service import LibraryDocsService
 from docmancer.docs.interfaces.mcp.context_tools import context_tools, handle_context_tool
@@ -442,6 +442,103 @@ LIBRARY_TOOLS = library_tools(TOOLS)
 PROJECT_TOOLS = project_tools(TOOLS)
 PREFETCH_TOOLS = prefetch_tools(TOOLS)
 
+MCP_RESOURCES: list[dict[str, str]] = [
+    {
+        "uri": "docmancer://workflow/project-docs",
+        "name": "Project docs workflow",
+        "description": "Discovery-first workflow for project-owned docs.",
+        "mimeType": "text/markdown",
+        "text": """# Project docs workflow
+
+1. Call `inspect_project_docs(project_path)` before repo-specific architecture, conventions, runbook, or Context7-like questions.
+2. If the response asks for reconciliation, call `sync_project_docs(project_path, with_vectors=true)` before `get_project_context`.
+3. Call `get_project_context(project_path, question, output_mode=\"compact\")` and inspect `answer_available`, `answer_type`, `answer_completeness`, and `trust_contract.sources`.
+4. Treat `partial_navigational` as navigation/source-search guidance, not a complete answer.
+5. Use dependency/public network fetches only with explicit approval (`allow_network=true`).
+""",
+    },
+    {
+        "uri": "docmancer://schema/trust-contract",
+        "name": "Trust Contract schema",
+        "description": "Canonical Trust Contract fields returned by project context tools.",
+        "mimeType": "application/json",
+        "text": json.dumps({
+            "schema_version": "trust-contract-1.1",
+            "sources": {"selected": [], "rejected": [], "risky": []},
+            "context_sources": {"source_evidence": [], "repo_map": []},
+            "warnings": [],
+            "next_actions": [],
+            "policy": {"direct_webfetch": "forbidden|discovery_only", "reason_code": "trusted_context_available|no_trusted_context"},
+        }, ensure_ascii=False, indent=2),
+    },
+    {
+        "uri": "docmancer://workflow/library-docs",
+        "name": "Library docs workflow",
+        "description": "Registry-first workflow for exact library/dependency docs.",
+        "mimeType": "text/markdown",
+        "text": """# Library docs workflow
+
+1. Call `resolve_library_id(library, ecosystem, version, source_type)` before using external docs.
+2. If the response returns `candidates`, retry through Docmancer with the candidate `arguments_patch` or explicit `docs_url`.
+3. Call `get_library_docs(...)` after registration/resolution.
+4. If `reason_code=needs_docs_url`, do not WebFetch as a substitute; pass `docs_url` or prefetch/register an explicit docs target.
+5. Network ingestion is explicit: use `prefetch_library_docs`, `prefetch_docs_targets`, or a tool response with `allow_network=true` where supported.
+""",
+    },
+]
+
+MCP_RESOURCE_TEMPLATES: list[dict[str, str]] = [
+    {
+        "uriTemplate": "docmancer://workflow/project-docs/{project_path}",
+        "name": "Project-specific docs workflow",
+        "description": "Use with a local project_path to guide inspect/sync/get_project_context calls.",
+        "mimeType": "text/markdown",
+    },
+    {
+        "uriTemplate": "docmancer://library/{ecosystem}/{library}/{version}",
+        "name": "Registered library docs lookup",
+        "description": "Guide for resolving and querying exact dependency documentation through Docmancer.",
+        "mimeType": "text/markdown",
+    },
+]
+
+
+def read_docs_resource(uri: str) -> dict[str, str] | None:
+    for resource in MCP_RESOURCES:
+        if resource["uri"] == uri:
+            return resource
+    if uri.startswith("docmancer://workflow/project-docs/"):
+        project_path = uri.removeprefix("docmancer://workflow/project-docs/")
+        return {
+            "uri": uri,
+            "name": "Project-specific docs workflow",
+            "mimeType": "text/markdown",
+            "text": f"""# Project docs workflow for `{project_path}`
+
+1. `inspect_project_docs(project_path=\"{project_path}\")`
+2. If required, `sync_project_docs(project_path=\"{project_path}\", with_vectors=true)`
+3. `get_project_context(project_path=\"{project_path}\", question=..., output_mode=\"compact\")`
+4. Inspect `trust_contract.sources.selected`, `trust_contract.sources.rejected`, and `trust_contract.sources.risky` before using the answer.
+""",
+        }
+    if uri.startswith("docmancer://library/"):
+        parts = uri.removeprefix("docmancer://library/").split("/", 2)
+        if len(parts) == 3:
+            ecosystem, library, version = parts
+            return {
+                "uri": uri,
+                "name": "Registered library docs lookup",
+                "mimeType": "text/markdown",
+                "text": f"""# Library docs workflow for `{ecosystem}:{library}@{version}`
+
+1. `resolve_library_id(library=\"{library}\", ecosystem=\"{ecosystem}\", version=\"{version}\")`
+2. If `status=needs_docs_url`, retry through Docmancer with an explicit `docs_url` or prefetch/register a docs target.
+3. `get_library_docs(library=\"{library}\", ecosystem=\"{ecosystem}\", version=\"{version}\", topic=...)`
+4. Do not WebFetch registered docs before retrying with returned `candidates` or `arguments_patch`.
+""",
+            }
+    return None
+
 
 def _json_text(mcp_types: Any, payload: dict[str, Any]) -> list[Any]:
     return [mcp_types.TextContent(type="text", text=json.dumps(payload, ensure_ascii=False))]
@@ -460,6 +557,37 @@ async def _run_async(service: LibraryDocsService) -> None:
             mcp_types.Tool(name=tool["name"], description=tool["description"], inputSchema=tool["inputSchema"])
             for tool in TOOLS
         ]
+
+    @server.list_resources()
+    async def _list_resources() -> list[mcp_types.Resource]:
+        return [
+            mcp_types.Resource(
+                uri=cast(Any, resource["uri"]),
+                name=resource["name"],
+                description=resource["description"],
+                mimeType=resource["mimeType"],
+            )
+            for resource in MCP_RESOURCES
+        ]
+
+    @server.list_resource_templates()
+    async def _list_resource_templates() -> list[mcp_types.ResourceTemplate]:
+        return [
+            mcp_types.ResourceTemplate(
+                uriTemplate=template["uriTemplate"],
+                name=template["name"],
+                description=template["description"],
+                mimeType=template["mimeType"],
+            )
+            for template in MCP_RESOURCE_TEMPLATES
+        ]
+
+    @server.read_resource()
+    async def _read_resource(uri: Any) -> str:
+        resource = read_docs_resource(str(uri))
+        if resource is None:
+            raise ValueError(f"unknown resource: {uri}")
+        return resource["text"]
 
     @server.call_tool()
     async def _call_tool(name: str, arguments: dict[str, Any]) -> list[mcp_types.TextContent]:

@@ -350,7 +350,19 @@ class UnifiedDocsContextService:
         if mode not in {"auto", "project", "library", "dependency", "mixed"}:
             return self._invalid("docs_context_mode_invalid", {"mode": "auto"}, mode, question=question)
         if not project_path and not libs:
-            return self._invalid("docs_context_target_missing", {"project_path": "/path/to/repo"}, mode, question=question)
+            return self._invalid(
+                "docs_context_target_missing",
+                None,
+                mode,
+                question=question,
+                message="Pass at least one target: project_path, library, or libraries.",
+                required_one_of=["project_path", "library", "libraries"],
+                examples=[
+                    {"project_path": "/repo", "question": question, "mode": "project"},
+                    {"library": "flutter_riverpod", "question": question, "mode": "library"},
+                    {"project_path": "/repo", "library": "go_router", "question": question, "mode": "mixed"},
+                ],
+            )
         if mode == "project" and not project_path:
             return self._invalid("project_path_required", {"project_path": "/path/to/repo"}, mode, question=question)
         if mode == "project" and libs:
@@ -361,7 +373,17 @@ class UnifiedDocsContextService:
             return self._invalid("project_path_required", {"project_path": "/path/to/repo"}, mode, question=question)
         return None
 
-    def _invalid(self, reason_code: str, arguments_patch: dict[str, Any], mode: str, *, question: str = "") -> UnifiedDocsContextResult:
+    def _invalid(
+        self,
+        reason_code: str,
+        arguments_patch: dict[str, Any] | None,
+        mode: str,
+        *,
+        question: str = "",
+        message: str | None = None,
+        required_one_of: list[str] | None = None,
+        examples: list[dict[str, Any]] | None = None,
+    ) -> UnifiedDocsContextResult:
         return UnifiedDocsContextResult(
             status="invalid_request",
             question=question,
@@ -370,7 +392,10 @@ class UnifiedDocsContextService:
             routing={"reason_code": reason_code, "project_path_used": False, "libraries_requested": [], "dependency_detected": False},
             answer_available=False,
             reason_code=reason_code,
-            next_action={"type": "retry", "arguments_patch": arguments_patch},
+            message=message,
+            required_one_of=required_one_of or [],
+            examples=examples or [],
+            next_action={"type": "retry", "arguments_patch": arguments_patch} if arguments_patch else None,
             arguments_patch=arguments_patch,
             lanes=self._empty_lanes(),
             source_summary={"project": 0, "library": 0, "dependency": 0, "rejected": 0, "risky": 0},

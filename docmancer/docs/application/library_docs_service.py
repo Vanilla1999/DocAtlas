@@ -815,6 +815,13 @@ class LibraryDocsApplicationService:
             warning = self._join_warnings("needs_docs_url", extra=project_warnings)
             warnings = [warning] if warning else []
             candidates = info.candidates
+            arguments_patch = dict(candidates[0].get("arguments_patch") or {}) if candidates else {}
+            if candidates and candidates[0].get("docs_url"):
+                arguments_patch.setdefault("docs_url", candidates[0]["docs_url"])
+            if candidates and candidates[0].get("source_type"):
+                arguments_patch.setdefault("source_type", candidates[0]["source_type"])
+            if candidates and candidates[0].get("ecosystem"):
+                arguments_patch.setdefault("ecosystem", candidates[0]["ecosystem"])
             next_actions = ["Retry get_library_docs with docs_url from discovery_candidates[0]."] if candidates else ["Retry get_library_docs with docs_url, or call prefetch_library_docs/prefetch_docs_targets to register this source."]
             return DocsResult(
                 library_id="",
@@ -836,6 +843,9 @@ class LibraryDocsApplicationService:
                 confidence="high" if version_source in {"explicit", "lockfile_exact", "manifest_exact"} else None,
                 status="needs_input",
                 decision="retry_same_tool",
+                reason_code="needs_docs_url",
+                message="Documentation source is not registered locally. Retry with docs_url or prefetch/register an explicit docs target.",
+                arguments_patch=arguments_patch or None,
                 request=self._docs_request(input_args),
                 identity=self._docs_identity(info),
                 policy=self._docs_policy("needs_input", has_registered_source=resolution.has_registered_source),

@@ -63,12 +63,20 @@ MODULE_ROOT_DIRECTORIES = {
     "plugins": "plugin",
     "components": "component",
 }
+LIB_MODULE_ROOT_DIRECTORIES = {
+    "modules": "module",
+    "features": "feature",
+}
 
 
 class ProjectMetadataReader:
     def read(self, project_path: str | Path) -> ProjectMetadata:
         root = Path(project_path).expanduser().resolve()
         warnings: list[str] = []
+        if not root.exists():
+            return ProjectMetadata(project_path=str(root), warnings=[f"Project path not found: {root}"])
+        if not root.is_dir():
+            return ProjectMetadata(project_path=str(root), warnings=[f"Project path is not a directory: {root}"])
         flutter_version, flutter_channel = self._read_fvmrc(root / ".fvmrc", warnings)
         packages, pub_observations = self._read_pubspec_lock(root / "pubspec.lock", warnings)
         direct_dependencies, pub_manifest_observations = self._read_pubspec_yaml(root / "pubspec.yaml", warnings)
@@ -112,7 +120,22 @@ class ProjectMetadataReader:
                 self._discover_docs_in_dir(candidates, root, child, DOC_DIRECTORIES[child.name.lower()])
             elif child.is_dir() and child.name.lower() in MODULE_ROOT_DIRECTORIES:
                 self._discover_module_docs(candidates, root, child, MODULE_ROOT_DIRECTORIES[child.name.lower()])
+            elif child.is_dir() and child.name.lower() == "lib":
+                self._discover_lib_module_docs(candidates, root, child)
         return sorted(candidates.values(), key=lambda item: item.path)
+
+    def _discover_lib_module_docs(
+        self,
+        candidates: dict[str, ProjectDocsCandidate],
+        root: Path,
+        lib_directory: Path,
+    ) -> None:
+        for child in sorted(lib_directory.iterdir(), key=lambda item: item.name.lower()):
+            if child.name in EXCLUDED_DIR_NAMES or not child.is_dir():
+                continue
+            module_type = LIB_MODULE_ROOT_DIRECTORIES.get(child.name.lower())
+            if module_type:
+                self._discover_module_docs(candidates, root, child, module_type)
 
     def _discover_module_docs(
         self,

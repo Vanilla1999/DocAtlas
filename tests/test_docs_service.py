@@ -1399,10 +1399,10 @@ def test_get_project_context_returns_trust_contract_for_project_docs(tmp_path, m
     assert result.context_pack[0]["source_class"] == "project_doc"
     assert result.context_pack[0]["token_estimate"] > 0
     assert result.metrics["project_result_count"] == 1
-    selected = result.trust_contract["selected_sources"]
+    selected = result.trust_contract["sources"]["selected"]
     assert selected[0]["source_class"] == "project_file"
     assert selected[0]["trust_level"] == "trusted"
-    assert result.trust_contract["trusted_sources"] == selected
+    assert "trusted_sources" not in result.trust_contract
     assert result.trust_contract["policy"]["direct_webfetch"] == "forbidden"
 
 
@@ -1425,7 +1425,7 @@ def test_get_project_context_preserves_module_metadata_in_pack_and_trust_contrac
     assert result.context_pack[0]["module_name"] == "auth"
     assert result.context_pack[0]["module_path"] == "services/auth"
     assert result.context_pack[0]["module_type"] == "service"
-    selected = result.trust_contract["selected_sources"]
+    selected = result.trust_contract["sources"]["selected"]
     assert selected[0]["doc_scope"] == "module"
     assert selected[0]["module_path"] == "services/auth"
 
@@ -1500,7 +1500,7 @@ def test_get_project_context_can_return_project_and_dependency_context(tmp_path,
         ),
     )
 
-    result = service.get_project_context(str(project), "How should AppRouter use go_router?", tokens=1200, limit=3)
+    result = service.get_project_context(str(project), "How should AppRouter use go_router?", tokens=1200, limit=3, allow_network=True)
 
     assert result.answer_available is True
     assert result.project_docs is not None
@@ -1510,7 +1510,7 @@ def test_get_project_context_can_return_project_and_dependency_context(tmp_path,
     assert any(item.get("source_class") == "source_evidence" and item.get("evidence_class") == "absent_in_source" for item in result.context_pack)
     assert result.metrics["project_result_count"] >= 1
     assert result.metrics["dependency_result_count"] >= 1
-    selected_classes = {item["source_class"] for item in result.trust_contract["selected_sources"]}
+    selected_classes = {item["source_class"] for item in result.trust_contract["sources"]["selected"]}
     assert selected_classes == {"project_file", "dependency_docs"}
 
 
@@ -1549,7 +1549,7 @@ def test_get_project_context_includes_snippet_object_when_metadata_has_code(tmp_
         ),
     )
 
-    result = service.get_project_context(str(project), "GoRouter example", library="go_router")
+    result = service.get_project_context(str(project), "GoRouter example", library="go_router", allow_network=True)
 
     dependency_item = next(item for item in result.context_pack if item["source_class"] == "dependency_doc")
     assert dependency_item["snippet"] == {
@@ -1568,7 +1568,7 @@ def test_get_project_context_deps_only_skips_project_docs(tmp_path, monkeypatch)
 
     assert result.mode == "deps-only"
     assert result.project_docs is None
-    assert any(item["reason_code"] == "project_docs_skipped" for item in result.trust_contract["risky_sources"])
+    assert any(item["reason_code"] == "project_docs_skipped" for item in result.trust_contract["sources"]["risky"])
 
 
 def test_context_cli_outputs_json_and_explain(tmp_path):
@@ -1578,7 +1578,7 @@ def test_context_cli_outputs_json_and_explain(tmp_path):
     fake_result = ProjectContextResult(
         project_path=str(project),
         question="How?",
-        trust_contract={"selected_sources": [], "rejected_sources": [], "risky_sources": [], "warnings": [], "next_actions": []},
+        trust_contract={"sources": {"selected": [], "rejected": [], "risky": []}, "warnings": [], "next_actions": []},
     )
 
     with patch("docmancer.cli.commands._load_config", return_value=fake_config), \
@@ -1588,7 +1588,7 @@ def test_context_cli_outputs_json_and_explain(tmp_path):
 
     assert result.exit_code == 0, result.output
     payload = json.loads(result.output)
-    assert payload["trust_contract"]["selected_sources"] == []
+    assert payload["trust_contract"]["sources"]["selected"] == []
     service_cls.return_value.get_project_context.assert_called_once()
     assert service_cls.return_value.get_project_context.call_args.kwargs["mode"] == "project-only"
 
@@ -1949,8 +1949,28 @@ def test_get_docs_unknown_without_url_needs_docs_url(tmp_path, monkeypatch):
     assert result.warnings == ["needs_docs_url"]
     assert result.status == "needs_input"
     assert result.decision == "retry_same_tool"
+    assert result.reason_code == "needs_docs_url"
+    assert result.message
     assert result.policy["direct_webfetch"] == "discovery_only"
     assert result.next_actions
+    assert agent.add_calls == []
+
+
+def test_get_docs_needs_docs_url_returns_retry_contract_with_discovery_candidate(tmp_path, monkeypatch):
+    agent = FakeAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+
+    result = service.get_docs("mcp", ecosystem="python", topic="tools")
+
+    assert result.status == "needs_input"
+    assert result.reason_code == "needs_docs_url"
+    assert result.arguments_patch == {
+        "docs_url": "https://github.com/modelcontextprotocol/python-sdk",
+        "ecosystem": "python",
+    }
+    assert result.discovery_candidates == result.candidates
+    assert result.diagnostics["discovery_candidates"] == result.candidates
+    assert result.requires_confirmation is False
     assert agent.add_calls == []
 
 

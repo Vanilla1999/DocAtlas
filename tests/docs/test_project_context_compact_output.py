@@ -59,7 +59,7 @@ def test_mcp_project_context_debug_output_has_hard_size_cap():
     large = "x" * 120_000
     result = ProjectContextService(FakeProjectContextFacade()).get_project_context("/repo", "find current web API camera implementation")
     result.context_pack.append({"doc_scope": "project", "source_class": "project_doc", "path": "docs/ScanDoc.md", "content": large})
-    result.trust_contract["selected"] = [{"path": "docs/ScanDoc.md", "snippet": large}]
+    result.trust_contract["sources"] = {"selected": [{"path": "docs/ScanDoc.md", "snippet": large}], "rejected": [], "risky": []}
     service: Any = type("FakeService", (), {"get_project_context": lambda self, *args, **kwargs: result})()
 
     payload = handle_project_tool("get_project_context", {"project_path": "/repo", "question": "find current web API camera implementation", "output_mode": "debug"}, service)
@@ -67,6 +67,7 @@ def test_mcp_project_context_debug_output_has_hard_size_cap():
     assert payload is not None
     assert len(json.dumps(payload, ensure_ascii=False).encode("utf-8")) <= MCP_COMPACT_OUTPUT_MAX_BYTES
     assert payload["mcp_compaction"]["truncated"] is True
+    assert payload["output_contract"]["truncated"] is True
     assert any(isinstance(warning, dict) and warning["code"] == "mcp_compact_output_truncated" for warning in payload["warnings"])
 
 

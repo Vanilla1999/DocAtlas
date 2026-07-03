@@ -148,8 +148,14 @@ class TestIsDocsUrl:
         assert not is_docs_url("https://riverpod.dev/ru/docs/concepts2/refs", "https://riverpod.dev")
         assert not is_docs_url("https://riverpod.dev/zh-Hans/docs/concepts2/refs", "https://riverpod.dev")
 
+    def test_default_ingest_excludes_locale_mirrors_below_docs_root(self):
+        assert is_docs_url("https://example.com/docs/guide/setup", "https://example.com/docs")
+        assert not is_docs_url("https://example.com/docs/fr/guide/setup", "https://example.com/docs")
+        assert not is_docs_url("https://example.com/docs/pt-BR/guide/setup", "https://example.com/docs")
+
     def test_locale_seed_can_ingest_locale_paths(self):
         assert is_docs_url("https://riverpod.dev/ru/docs/concepts2/refs", "https://riverpod.dev/ru/docs")
+        assert is_docs_url("https://example.com/docs/fr/guide/setup", "https://example.com/docs/fr")
 
 
 # ---------------------------------------------------------------------------

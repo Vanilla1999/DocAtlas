@@ -156,7 +156,11 @@ def test_missing_all_targets_returns_invalid_request():
     result = _service().get_docs_context("What docs?")
     assert result.status == "invalid_request"
     assert result.reason_code == "docs_context_target_missing"
-    assert result.next_action == {"type": "retry", "arguments_patch": {"project_path": "/path/to/repo"}}
+    assert result.message == "Pass at least one target: project_path, library, or libraries."
+    assert result.required_one_of == ["project_path", "library", "libraries"]
+    assert result.arguments_patch is None
+    assert result.next_action is None
+    assert "/path/to/repo" not in str(result)
 
 
 def test_prepare_project_docs_uses_safe_bootstrap():

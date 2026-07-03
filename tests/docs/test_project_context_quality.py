@@ -120,10 +120,9 @@ def test_project_context_acceptance_schema_aliases_and_nested_source_section():
     )
 
     trust_contract = build_project_context_trust_contract(project_docs=project_docs, dependency_docs=None, requested_library=None, mode="auto")
-    assert trust_contract["selected"] == trust_contract["selected_sources"]
-    assert trust_contract["trusted"] == trust_contract["trusted_sources"]
-    assert trust_contract["rejected"] == trust_contract["rejected_sources"]
-    assert trust_contract["risky"] == trust_contract["risky_sources"]
+    assert trust_contract["sources"].keys() == {"selected", "rejected", "risky"}
+    assert "selected_sources" not in trust_contract
+    assert "selected" not in trust_contract
 
     pack = project_context_pack(project_docs=project_docs, dependency_docs=None)
     assert pack[0]["source"]["source_class"] == "project_doc"

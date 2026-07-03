@@ -666,9 +666,11 @@ def format_injected_context(response: dict[str, Any], sources: list[dict[str, An
         path = source.get("path") or source.get("url") or source.get("title") or "unknown"
         why = source.get("why") or source.get("freshness") or "selected by DocAtlas"
         lines.append(f"{index}. [{label}] {path} - {why}")
-    selected = trust.get("selected") or trust.get("selected_sources") or []
-    risky = trust.get("risky") or []
-    rejected = trust.get("rejected") or []
+    raw_sources = trust.get("sources")
+    trust_sources: dict[str, Any] = raw_sources if isinstance(raw_sources, dict) else {}
+    selected = trust_sources.get("selected") or trust.get("selected") or trust.get("selected_sources") or []
+    risky = trust_sources.get("risky") or trust.get("risky") or []
+    rejected = trust_sources.get("rejected") or trust.get("rejected") or []
     lines.extend([
         "",
         "Trust Contract:",
@@ -688,7 +690,9 @@ def format_injected_context(response: dict[str, Any], sources: list[dict[str, An
 
 def _extract_context_sources(response: dict[str, Any]) -> list[dict[str, Any]]:
     trust = response.get("trust_contract", {}) if isinstance(response.get("trust_contract"), dict) else {}
-    candidates = trust.get("selected") or trust.get("selected_sources") or response.get("sources") or []
+    raw_sources = trust.get("sources")
+    trust_sources: dict[str, Any] = raw_sources if isinstance(raw_sources, dict) else {}
+    candidates = trust_sources.get("selected") or trust.get("selected") or trust.get("selected_sources") or response.get("sources") or []
     sources: list[dict[str, Any]] = []
     if isinstance(candidates, list):
         for item in candidates:

@@ -310,7 +310,9 @@ def _source_summary(visible_files: dict[str, str], docatlas_response: dict[str, 
     sources = [{"path": path, "kind": "visible_file"} for path in sorted(visible_files)]
     if docatlas_response:
         trust = docatlas_response.get("trust_contract", {}) if isinstance(docatlas_response.get("trust_contract"), dict) else {}
-        selected = trust.get("selected") or trust.get("selected_sources") or []
+        raw_sources = trust.get("sources")
+        trust_sources: dict[str, Any] = raw_sources if isinstance(raw_sources, dict) else {}
+        selected = trust_sources.get("selected") or trust.get("selected") or trust.get("selected_sources") or []
         for item in selected:
             if isinstance(item, dict):
                 source = item.get("source") if isinstance(item.get("source"), dict) else item

@@ -176,6 +176,16 @@ def test_project_reader_excludes_dependency_and_build_dirs_from_docs(tmp_path):
     assert paths == {"README.md"}
 
 
+def test_missing_project_path_returns_single_warning(tmp_path):
+    missing = tmp_path / "missing"
+
+    metadata = ProjectMetadataReader().read(missing)
+
+    assert metadata.warnings == [f"Project path not found: {missing.resolve()}"]
+    assert metadata.docs_candidates == []
+    assert metadata.packages == {}
+
+
 def test_project_reader_discovers_module_owned_docs(tmp_path):
     project = _flutter_project(tmp_path)
     (project / "README.md").write_text("# App", encoding="utf-8")
@@ -206,6 +216,31 @@ def test_project_reader_discovers_module_owned_docs(tmp_path):
     assert by_path["apps/web/README.md"].module_type == "app"
     assert by_path["services/auth/docs/token-lifecycle.md"].module_type == "service"
     assert "packages/ignored/src/notes.md" not in by_path
+
+
+def test_project_reader_discovers_flutter_lib_modules_and_features_docs(tmp_path):
+    project = _flutter_project(tmp_path)
+    (project / "README.md").write_text("# App", encoding="utf-8")
+    orders_docs = project / "lib" / "modules" / "orders" / "docs"
+    orders_docs.mkdir(parents=True)
+    (project / "lib" / "modules" / "orders" / "README.md").write_text("# Orders", encoding="utf-8")
+    (orders_docs / "architecture.md").write_text("# Orders architecture", encoding="utf-8")
+    auth_docs = project / "lib" / "features" / "auth" / "docs"
+    auth_docs.mkdir(parents=True)
+    (auth_docs / "flow.md").write_text("# Auth flow", encoding="utf-8")
+    misc = project / "lib" / "utils"
+    misc.mkdir(parents=True)
+    (misc / "notes.md").write_text("# Not feature docs", encoding="utf-8")
+
+    metadata = ProjectMetadataReader().read(project)
+
+    by_path = {candidate.path: candidate for candidate in metadata.docs_candidates}
+    assert by_path["lib/modules/orders/README.md"].doc_scope == "module"
+    assert by_path["lib/modules/orders/README.md"].module_id == "lib/modules/orders"
+    assert by_path["lib/modules/orders/README.md"].module_type == "module"
+    assert by_path["lib/modules/orders/docs/architecture.md"].reason == "architecture"
+    assert by_path["lib/features/auth/docs/flow.md"].module_type == "feature"
+    assert "lib/utils/notes.md" not in by_path
 
 
 def test_project_docs_candidate_has_stable_serializable_shape_and_freshness(tmp_path):

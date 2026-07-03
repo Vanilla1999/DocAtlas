@@ -18,14 +18,11 @@ def test_trust_contract_selects_project_sources_and_forbids_webfetch():
         mode="auto",
     )
 
-    assert contract["schema_version"] == "trust-contract-1.0-mvp"
-    assert contract["selected_sources"] == contract["trusted_sources"]
-    assert contract["selected"] == contract["selected_sources"]
-    assert contract["trusted"] == contract["trusted_sources"]
-    assert contract["rejected"] == contract["rejected_sources"]
-    assert contract["risky"] == contract["risky_sources"]
-    assert contract["rejected_or_risky"] == contract["rejected_or_risky_sources"]
-    assert contract["selected_sources"][0]["source_class"] == "project_file"
+    assert contract["schema_version"] == "trust-contract-1.1"
+    assert contract["sources"].keys() == {"selected", "rejected", "risky"}
+    assert "selected_sources" not in contract
+    assert "selected" not in contract
+    assert contract["sources"]["selected"][0]["source_class"] == "project_file"
     assert contract["policy"] == {"direct_webfetch": "forbidden", "reason_code": "trusted_context_available"}
 
 
@@ -58,11 +55,11 @@ def test_trust_contract_reports_risky_dependency_warnings_and_rejections():
         mode="deps-only",
     )
 
-    assert contract["selected_sources"][0]["source_class"] == "dependency_docs"
-    assert contract["selected_sources"][0]["trust_level"] == "best_effort"
-    assert any(item["reason_code"] == "best_effort_docs" for item in contract["risky_sources"])
-    assert any(item["reason_code"] == "ambiguous" for item in contract["rejected_sources"])
-    assert any(item["reason_code"] == "project_docs_skipped" for item in contract["risky_sources"])
+    assert contract["sources"]["selected"][0]["source_class"] == "dependency_docs"
+    assert contract["sources"]["selected"][0]["trust_level"] == "best_effort"
+    assert any(item["reason_code"] == "best_effort_docs" for item in contract["sources"]["risky"])
+    assert any(item["reason_code"] == "ambiguous" for item in contract["sources"]["rejected"])
+    assert any(item["reason_code"] == "project_docs_skipped" for item in contract["sources"]["risky"])
 
 
 def test_trust_contract_requests_prefetch_when_dependency_not_resolved():
@@ -74,7 +71,7 @@ def test_trust_contract_requests_prefetch_when_dependency_not_resolved():
     )
 
     assert contract["policy"]["direct_webfetch"] == "discovery_only"
-    assert contract["rejected_sources"] == [{
+    assert contract["sources"]["rejected"] == [{
         "source_class": "dependency_docs",
         "library": "go_router",
         "reason_code": "not_resolved",
@@ -82,3 +79,24 @@ def test_trust_contract_requests_prefetch_when_dependency_not_resolved():
         "risk_level": "high",
     }]
     assert contract["next_actions"][0]["tool"] == "prefetch_project_docs"
+
+
+def test_trust_contract_can_include_legacy_aliases_when_requested():
+    project_docs = ProjectDocsResult(
+        project_path="/repo",
+        query="architecture",
+        indexed_sources=[{"path": "README.md", "source": "/repo/README.md"}],
+    )
+
+    contract = build_project_context_trust_contract(
+        project_docs=project_docs,
+        dependency_docs=None,
+        requested_library=None,
+        mode="auto",
+        include_legacy_aliases=True,
+    )
+
+    assert contract["selected_sources"] == contract["sources"]["selected"]
+    assert contract["trusted_sources"] == contract["sources"]["selected"]
+    assert contract["rejected_sources"] == contract["sources"]["rejected"]
+    assert contract["risky_sources"] == contract["sources"]["risky"]

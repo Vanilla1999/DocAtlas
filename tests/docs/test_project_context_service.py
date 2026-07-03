@@ -63,6 +63,7 @@ def test_project_context_service_returns_selected_project_and_dependency_section
     assert result.metrics["source_classes"] == ["dependency_doc", "project_doc"]
     assert result.metrics["quality"]["query_intent"] == "how_to"
     assert result.answer_outline["query_intent"] == "how_to"
+    assert result.reason == "trusted_context_available"
     assert result.trust_contract["policy"]["direct_webfetch"] == "forbidden"
     assert ("docs", "go_router", {"topic": "use go_router", "tokens": 1200, "ecosystem": None, "version": None, "project_path": "/repo"}) in facade.calls
     assert ("project", "/repo", "use go_router", {"tokens": 1200, "limit": 3, "expand": None, "module": None, "module_path": None, "scope": None}) in facade.calls
@@ -75,7 +76,7 @@ def test_project_context_service_deps_only_skips_project_docs_and_marks_risk():
     assert not any(call[0] == "project" for call in facade.calls)
     assert result.project_docs is None
     assert result.dependency_docs is facade.dependency_docs
-    assert any(item["reason_code"] == "project_docs_skipped" for item in result.trust_contract["risky_sources"])
+    assert any(item["reason_code"] == "project_docs_skipped" for item in result.trust_contract["sources"]["risky"])
 
 
 def test_story_specific_project_context_missing_terms_is_partial_navigational():
@@ -105,7 +106,8 @@ new_help_request_screen, ToastUtils, and routes.
         mode="project-only",
     )
 
-    assert result.answer_available is True
+    assert result.answer_available is False
+    assert result.reason == "partial_navigational_context"
     assert result.answer_type == "partial_navigational"
     assert result.answer_completeness["status"] == "partial"
     assert result.answer_completeness["source_search_required"] is True
@@ -115,6 +117,21 @@ new_help_request_screen, ToastUtils, and routes.
     assert source_action["action"] == "search_project_sources"
     assert source_action["tool"] == "code_search"
     assert "help_request_details_screen" in source_action["suggested_symbols"]
+
+
+def test_generic_test_query_is_not_trusted():
+    facade = FakeProjectContextFacade()
+    facade.project_docs = ProjectDocsResult(
+        project_path="/repo",
+        query="test",
+        results=[ProjectDocsChunk(title="README_TEST_TSD", content="test helper documentation", source="/repo/README_TEST_TSD.md", url=None, path="README_TEST_TSD.md")],
+    )
+
+    result = ProjectContextService(facade).get_project_context("/repo", "test", mode="project-only")
+
+    assert result.answer_available is False
+    assert result.reason != "trusted_context_available"
+    assert result.diagnostics["trust_decision"]["confidence"] == "low"
 
 
 def test_story_specific_project_context_with_only_docs_matched_terms_requires_source_search():
@@ -203,7 +220,7 @@ class HelpRequestDetailsScreen extends StatelessWidget {
     assert result.answer_completeness["missing_terms"] == []
 
 
-def test_trust_contract_keeps_old_fields_and_exposes_source_evidence_context_sources(tmp_path):
+def test_trust_contract_uses_canonical_sources_and_exposes_source_evidence_context_sources(tmp_path):
     lib = tmp_path / "lib"
     lib.mkdir()
     (lib / "help_request_details_screen.dart").write_text(
@@ -239,9 +256,9 @@ class HelpRequestDetailsScreen {
     )
 
     contract = result.trust_contract
-    assert contract["selected"] == contract["selected_sources"]
-    assert contract["trusted"] == contract["trusted_sources"]
-    assert {item["source_class"] for item in contract["selected_sources"]} == {"project_file"}
+    assert "selected_sources" not in contract
+    assert "selected" not in contract
+    assert {item["source_class"] for item in contract["sources"]["selected"]} == {"project_file"}
 
     context_sources = contract["context_sources"]
     assert context_sources["schema_version"] == "context-sources-1.0"
@@ -505,11 +522,11 @@ def test_project_context_prefers_authoritative_workflow_docs_over_noisy_dogfood_
     assert architecture_item["authority"] == "primary"
     assert architecture_item["risk_flags"] == []
 
-    contract_sources = result.trust_contract["selected_sources"]
+    contract_sources = result.trust_contract["sources"]["selected"]
     contract_paths = [item["path"] for item in contract_sources]
     assert contract_paths == ["ARCHITECTURE.md", "docs/INDEX.md"]
-    assert result.trust_contract["selected"] == contract_sources
-    assert result.trust_contract["trusted_sources"] == contract_sources
+    assert "selected" not in result.trust_contract
+    assert "trusted_sources" not in result.trust_contract
 
     reading_paths = [item["path"] for item in result.answer_outline["recommended_reading_order"]]
     assert reading_paths[:2] == ["ARCHITECTURE.md", "docs/INDEX.md"]

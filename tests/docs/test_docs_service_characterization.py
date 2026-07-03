@@ -204,9 +204,9 @@ def test_characterization_get_project_context_returns_context_pack_and_trust_con
     assert result.tool == "get_project_context"
     assert result.context_pack
     assert result.context_pack[0]["source_class"] == "project_doc"
-    assert result.trust_contract["schema_version"] == "trust-contract-1.0-mvp"
-    assert result.trust_contract["selected_sources"][0]["source_class"] == "project_file"
-    assert result.trust_contract["trusted_sources"] == result.trust_contract["selected_sources"]
+    assert result.trust_contract["schema_version"] == "trust-contract-1.1"
+    assert result.trust_contract["sources"]["selected"][0]["source_class"] == "project_file"
+    assert "trusted_sources" not in result.trust_contract
     assert result.trust_contract["policy"]["direct_webfetch"] == "forbidden"
 
 

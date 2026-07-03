@@ -6,7 +6,7 @@ from docmancer.docs.interfaces.mcp.context_tools import CONTEXT_TOOL_NAMES
 from docmancer.docs.interfaces.mcp.docs_tools import LIBRARY_TOOL_NAMES
 from docmancer.docs.interfaces.mcp.prefetch_tools import PREFETCH_TOOL_NAMES
 from docmancer.docs.interfaces.mcp.project_tools import PROJECT_TOOL_NAMES
-from docmancer.mcp.docs_server import CONTEXT_TOOLS, LIBRARY_TOOLS, PREFETCH_TOOLS, PROJECT_TOOLS, TOOLS
+from docmancer.mcp.docs_server import CONTEXT_TOOLS, LIBRARY_TOOLS, MCP_RESOURCES, MCP_RESOURCE_TEMPLATES, PREFETCH_TOOLS, PROJECT_TOOLS, TOOLS, read_docs_resource
 
 
 def test_mcp_grouped_tool_registration_preserves_tool_names():
@@ -200,3 +200,40 @@ def test_mcp_exposes_lifecycle_tools():
     assert "inspect_library_docs" in names
     assert "remove_library_docs" in names
     assert "prune_library_docs" in names
+
+
+def test_mcp_exposes_discoverable_resources_and_templates():
+    resource_uris = {resource["uri"] for resource in MCP_RESOURCES}
+    template_uris = {template["uriTemplate"] for template in MCP_RESOURCE_TEMPLATES}
+
+    assert "docmancer://workflow/project-docs" in resource_uris
+    assert "docmancer://schema/trust-contract" in resource_uris
+    assert "docmancer://workflow/library-docs" in resource_uris
+    assert "docmancer://workflow/project-docs/{project_path}" in template_uris
+    assert "docmancer://library/{ecosystem}/{library}/{version}" in template_uris
+
+
+def test_mcp_read_resource_returns_workflow_and_schema_guidance():
+    workflow = read_docs_resource("docmancer://workflow/project-docs")
+    library_workflow = read_docs_resource("docmancer://workflow/library-docs")
+    schema = read_docs_resource("docmancer://schema/trust-contract")
+    templated = read_docs_resource("docmancer://workflow/project-docs//repo")
+    library_templated = read_docs_resource("docmancer://library/python/mcp/latest")
+
+    assert workflow is not None
+    assert "inspect_project_docs" in workflow["text"]
+    assert "sync_project_docs" in workflow["text"]
+    assert "trust_contract.sources" in workflow["text"]
+    assert library_workflow is not None
+    assert "resolve_library_id" in library_workflow["text"]
+    assert "reason_code=needs_docs_url" in library_workflow["text"]
+    assert "do not WebFetch" in library_workflow["text"]
+    assert schema is not None
+    assert '"schema_version": "trust-contract-1.1"' in schema["text"]
+    assert '"selected"' in schema["text"]
+    assert templated is not None
+    assert 'project_path="/repo"' in templated["text"]
+    assert library_templated is not None
+    assert 'library="mcp"' in library_templated["text"]
+    assert 'ecosystem="python"' in library_templated["text"]
+    assert read_docs_resource("docmancer://missing") is None
