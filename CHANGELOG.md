@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.1] - 2026-07-03
+
+### Fixed
+
+- **DocAtlas MCP registration:** `doc-atlas mcp doctor` now validates the actual `docmancer` MCP server entry and rejects stale `docmancer mcp serve` commands.
+- **MCP config updates:** preserving existing custom `env` values when migrating the `docmancer` MCP server entry to `doc-atlas mcp serve`.
+
 ## [1.1.0] - 2026-07-02
 
 Project-context, exact-version, and patch-review release focused on making DocAtlas more useful as a project-aware context and constraint runtime for coding agents.
