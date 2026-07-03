@@ -114,7 +114,7 @@ def test_extracts_lockfile_guardrail(tmp_path: Path):
 
 def test_changed_files_raise_generated_file_constraint(tmp_path: Path):
     packet = _packet(_workspace(tmp_path), changed_files=["lib/foo/user.freezed.dart", "lib/foo/user.g.dart"])
-    assert packet.constraints[0].type == "generated_file"
+    assert any(c.type == "generated_file" and c.source == "changed_files" for c in packet.constraints)
 
 
 def test_changed_files_raise_provider_layer_constraint(tmp_path: Path):
@@ -168,8 +168,8 @@ def test_budget_emits_truncation_warning(tmp_path: Path):
 def test_budget_drops_low_priority_constraints_first(tmp_path: Path):
     packet = _packet(_workspace(tmp_path), changed_files=["lib/foo/user.g.dart"], max_constraints=2, max_tokens=220)
     assert packet.constraints
-    assert all(c.confidence == "high" for c in packet.constraints)
-    assert all(c.source != "changed_files" for c in packet.constraints)
+    assert any(c.type == "generated_file" and c.source == "changed_files" for c in packet.constraints)
+    assert all(c.confidence in {"high", "medium"} for c in packet.constraints)
 
 
 def test_high_confidence_constraints_have_source_and_evidence(tmp_path: Path):
@@ -218,12 +218,13 @@ def test_does_not_invent_service_owner_without_docs(tmp_path: Path):
     assert not any(c.confidence == "high" and "PermissionService" in c.instruction for c in packet.constraints)
 
 
-def test_low_confidence_inference_is_not_marked_high(tmp_path: Path):
+def test_path_heuristic_generated_inference_is_medium_not_high(tmp_path: Path):
     root = tmp_path / "repo"
     root.mkdir()
     packet = _packet(root, changed_files=["lib/foo/user.g.dart"])
     inferred = [c for c in packet.constraints if c.source == "changed_files" and c.type == "generated_file"]
-    assert inferred and all(c.confidence == "low" for c in inferred)
+    assert inferred and all(c.confidence == "medium" for c in inferred)
+    assert all(c.severity == "should" for c in inferred)
 
 
 def test_does_not_emit_hidden_or_benchmark_oracle_sources(tmp_path: Path):
@@ -239,6 +240,80 @@ def test_does_not_emit_hidden_or_benchmark_oracle_sources(tmp_path: Path):
     assert "secretservice" not in payload
     assert "hidden_tests" not in payload
     assert "oracle" not in payload
+
+
+def test_example_source_of_truth_statement_is_not_must_high_even_if_symbol_exists(tmp_path: Path):
+    root = tmp_path / "repo"
+    _write(
+        root / "docs/capabilities.md",
+        'The compiler can extract owner/source-of-truth instructions from statements like "PermissionService owns permission policy."\n',
+    )
+    _write(root / "lib/permission_service.py", "class PermissionService:\n    pass\n")
+
+    packet = _packet(root, question="Patch permission behavior", max_constraints=20, max_tokens=4000)
+
+    offenders = [
+        c for c in packet.constraints
+        if "PermissionService" in c.instruction and (c.severity == "must" or c.confidence == "high")
+    ]
+    assert not offenders
+
+
+def test_markdown_table_rows_do_not_become_constraints(tmp_path: Path):
+    root = tmp_path / "repo"
+    _write(
+        root / "docs/context7-docmancer-comparison.md",
+        """# Comparison\n\n| Capability | Result |\n| --- | --- |\n| Compile patch constraints for agents | Return compact, source-attributed constraints |\n""",
+    )
+
+    packet = _packet(root, question="Compile patch constraints for agents", max_constraints=20, max_tokens=4000)
+
+    payload = "\n".join(c.evidence + " " + c.instruction for c in packet.constraints)
+    assert "Compile patch constraints for agents" not in payload
+
+
+def test_research_and_comparison_docs_do_not_create_must_high_constraints(tmp_path: Path):
+    root = tmp_path / "repo"
+    _write(root / "docs/research/project-constraint-compiler-rfc.md", "ResearchService owns experimental compiler policy and must be the source of truth.\n")
+    _write(root / "docs/context7-docmancer-comparison.md", "ComparisonService owns comparison policy and must be the source of truth.\n")
+    _write(root / "research_service.py", "class ResearchService: pass\n")
+    _write(root / "comparison_service.py", "class ComparisonService: pass\n")
+
+    packet = _packet(root, question="Update compiler policy", max_constraints=20, max_tokens=4000)
+
+    research_constraints = [
+        c for c in packet.constraints
+        if "ResearchService" in c.instruction or "ComparisonService" in c.instruction
+    ]
+    assert research_constraints
+    assert all(not (c.severity == "must" and c.confidence == "high") for c in research_constraints)
+    assert all("authority=low" in c.evidence or "downgrade=low_authority_source" in c.evidence for c in research_constraints)
+
+
+def test_repo_artifact_paths_create_forbidden_edit_guardrail(tmp_path: Path):
+    root = tmp_path / "repo"
+    _write(root / "eval/task_level/results/run-1/constraints.json", "{}\n")
+    _write(root / ".docatlas/patch-review/constraints.json", "{}\n")
+
+    packet = _packet(root, question="Update app code", max_constraints=20, max_tokens=4000)
+
+    assert packet.forbidden_edits
+    guardrails = [c for c in packet.forbidden_edits if c.source == "repo_path_heuristics"]
+    assert guardrails
+    assert any("eval/task_level/results" in evidence for c in guardrails for evidence in [c.evidence])
+    assert all(c.confidence == "medium" and c.severity == "should" for c in guardrails)
+
+
+def test_final_token_budget_clamps_after_warnings(tmp_path: Path):
+    root = _workspace(tmp_path)
+    for idx in range(20):
+        _write(root / f"docs/architecture-extra-{idx}.md", f"ExtraService{idx} owns policy and must be the source of truth for generated behavior.\n")
+        _write(root / f"extra_service_{idx}.py", f"class ExtraService{idx}: pass\n")
+
+    packet = _packet(root, max_constraints=50, max_tokens=1200)
+
+    assert packet.token_estimate <= 1200
+    assert packet.token_budget["token_estimate"] <= 1200
 
 
 def test_grouped_constraints_are_views_of_all_constraints(tmp_path: Path):

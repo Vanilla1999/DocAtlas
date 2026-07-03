@@ -134,6 +134,7 @@ class PatchConstraintsService:
         self._changed_files: list[str] = []
         self._ignored_generated_artifact_sources: list[str] = []
         self._excluded_source_reasons: list[dict[str, str]] = []
+        self._project_root: Path | None = None
 
     def get_patch_constraints(
         self,
@@ -153,6 +154,7 @@ class PatchConstraintsService:
         self._ignored_generated_artifact_sources = []
         self._excluded_source_reasons = []
         root = Path(project_path).expanduser().resolve() if project_path else None
+        self._project_root = root
         sources = self._visible_sources(root) if root else []
         constraints: list[PatchConstraint] = []
         constraints.extend(self._architecture_constraints(sources))
@@ -177,6 +179,14 @@ class PatchConstraintsService:
             warnings.append("No visible project docs were found; constraints are limited to dependency metadata and generic checks.")
         if self._ignored_generated_artifact_sources:
             warnings.append(f"ignored_generated_artifact_sources: excluded {len(self._ignored_generated_artifact_sources)} generated dogfood/eval artifact source(s) from patch-constraint extraction.")
+        selected, final_truncated = self._final_token_clamp(
+            selected, warnings, max_constraints=max_constraints, max_tokens=max_tokens
+        )
+        if final_truncated:
+            warnings.append("constraints omitted by final token budget clamp after warnings were added.")
+            selected, _ = self._final_token_clamp(
+                selected, warnings, max_constraints=max_constraints, max_tokens=max_tokens
+            )
         token_estimate = self._estimate_packet_tokens(selected, warnings)
         confidence = self._packet_confidence(selected)
         return PatchConstraintPacket(
@@ -361,107 +371,430 @@ class PatchConstraintsService:
     def _excluded_source(cls, rel: str) -> bool:
         return cls._excluded_source_reason(rel) is not None
 
+
+    # Patch Contract Safety Gate helpers.
+    # These helpers deliberately keep the safety policy local to the constraint compiler:
+    # public/runtime surfaces may stay stable while extraction becomes more conservative.
+
+    @staticmethod
+    def _source_authority(path: str) -> str:
+        """Return an authority class for extracting agent-obeyable patch rules."""
+        normalized = (path or "").replace("\\", "/").lower().strip("/")
+        name = Path(normalized).name
+        if not normalized:
+            return "low"
+        if any(part in normalized for part in (
+            "/eval/", "eval/", "/results/", "results/", "/dogfood/", "dogfood/",
+            "/patch-review/", "/patch_review/", ".docatlas/", ".docmancer/",
+        )):
+            return "risky"
+        if normalized.startswith("docs/research/") or "/docs/research/" in f"/{normalized}":
+            return "low"
+        if any(token in name for token in (
+            "comparison", "benchmark", "pilot", "experiment", "research", "roadmap", "prompt", "brief",
+        )):
+            return "low"
+        if name in {"agents.md", "contributing.md", "architecture.md", "project_map.md"}:
+            return "high"
+        if name.startswith("adr") or normalized.startswith("adr/") or normalized.startswith("adrs/"):
+            return "high"
+        if normalized == "readme.md" or name == "readme.md":
+            return "high"
+        if normalized.startswith("docs/") and any(token in normalized for token in (
+            "architecture", "index", "development", "contributing", "runbook", "operations", "policy",
+        )):
+            return "medium"
+        if normalized.startswith("docs/") or name.endswith(".md") or name.endswith(".txt"):
+            return "medium"
+        return "low"
+
+    @staticmethod
+    def _is_markdown_table_row(raw: str) -> bool:
+        stripped = (raw or "").strip()
+        if not stripped.startswith("|"):
+            return False
+        if stripped.count("|") < 2:
+            return False
+        # Header separator or ordinary table row.
+        compact = stripped.replace("|", "").replace("-", "").replace(":", "").strip()
+        return not compact or stripped.count("|") >= 2
+
+    @staticmethod
+    def _example_marker_re() -> re.Pattern[str]:
+        return re.compile(
+            r"\b(statements?\s+like|for\s+example|e\.g\.|i\.e\.|example(?:s)?|sample|hypothetical|such\s+as|например)\b",
+            re.I,
+        )
+
+    @classmethod
+    def _is_example_line(cls, line: str) -> bool:
+        stripped = (line or "").strip()
+        if not stripped:
+            return False
+        if cls._example_marker_re().search(stripped):
+            return True
+        # Treat quoted symbol-only owners in explanatory prose as examples unless other evidence grounds them.
+        if re.search(r"[\"'“”«»][A-Z][A-Za-z0-9_]*(?:Service|Manager|Repository|Controller|Policy|Layer|Adapter)[\"'“”«»]", stripped):
+            if re.search(r"\b(can|could|may|would|like|example|extract|detect|recognize|распозна)\b", stripped, re.I):
+                return True
+        return False
+
+    @staticmethod
+    def _is_example_heading(heading: str) -> bool:
+        lowered = (heading or "").lower()
+        return any(token in lowered for token in (
+            "example", "examples", "sample", "tutorial", "hypothesis", "research", "benchmark",
+            "comparison", "experiment", "prompt", "roadmap", "appendix", "пример",
+        ))
+
+    @staticmethod
+    def _has_normative_language(line: str) -> bool:
+        return bool(re.search(
+            r"\b(must(?:\s+not)?|should(?:\s+not)?|do\s+not|don't|required|requires|forbidden|never|"
+            r"source[- ]of[- ]truth|single\s+source|canonical|owned\s+by|owns|belongs\s+in|"
+            r"delegate(?:s)?\s+to|do\s+not\s+duplicate|do\s+not\s+bypass|do\s+not\s+hardcode)\b",
+            line or "",
+            re.I,
+        ))
+
+    @staticmethod
+    def _line_metadata_suffix(*, authority: str, block: str, heading: str, downgrade_reason: str | None = None) -> str:
+        parts = [f"authority={authority}", f"block={block}"]
+        if heading:
+            parts.append(f"heading={heading[:60]}")
+        if downgrade_reason:
+            parts.append(f"downgrade={downgrade_reason}")
+        return " [" + "; ".join(parts) + "]"
+
+    def _iter_constraint_lines(self, text: str, source_path: str) -> list[dict[str, str]]:
+        """Return non-table, non-code constraint candidates with coarse markdown context."""
+        candidates: list[dict[str, str]] = []
+        in_code = False
+        heading = ""
+        authority = self._source_authority(source_path)
+        for raw in (text or "").splitlines():
+            stripped = raw.strip()
+            if stripped.startswith("```") or stripped.startswith("~~~"):
+                in_code = not in_code
+                continue
+            if in_code:
+                continue
+            if not stripped:
+                continue
+            if stripped.startswith("#"):
+                heading = re.sub(r"^#+\s*", "", stripped).strip()[:120]
+                continue
+            if self._is_markdown_table_row(stripped):
+                continue
+            if stripped.startswith(">"):
+                # Blockquotes are frequently copied examples or historical quotes, not project policy.
+                continue
+            block = "list" if re.match(r"^\s*[-*+\d.)]+\s+", raw) else "paragraph"
+            line = re.sub(r"^\s*[-*+\d.)]+\s*", "", raw).strip()
+            if not line:
+                continue
+            is_example = self._is_example_line(line) or self._is_example_heading(heading)
+            candidates.append({
+                "line": line[:300],
+                "heading": heading,
+                "authority": authority,
+                "block": block,
+                "is_example": "true" if is_example else "false",
+            })
+        return candidates
+
+    @staticmethod
+    def _path_looks_forbidden_artifact(path: str) -> bool:
+        normalized = (path or "").replace("\\", "/").lower()
+        if not normalized:
+            return False
+        artifact_parts = (
+            "/generated/", "generated/", "/dist/", "dist/", "/build/", "build/", "/coverage/", "coverage/",
+            "eval/task_level/results/", ".docatlas/", ".docmancer/", "/patch-review/", "/patch_review/",
+            "/dogfood/", "dogfood/", "/node_modules/", "node_modules/", "/vendor/", "vendor/",
+        )
+        artifact_suffixes = (
+            ".g.dart", ".freezed.dart", ".pb.go", ".pb.dart", ".generated", ".generated.py", "_generated.py",
+        )
+        return any(part in normalized for part in artifact_parts) or any(normalized.endswith(suffix) for suffix in artifact_suffixes)
+
+    def _repo_artifact_examples(self, root: Path | None, limit: int = 8) -> list[str]:
+        if not root or not root.exists():
+            return []
+        examples: list[str] = []
+        patterns = (
+            "eval/task_level/results/**", ".docatlas/**", ".docmancer/**", "**/patch-review/**", "**/patch_review/**",
+            "**/generated/**", "**/dist/**", "**/coverage/**", "**/*.g.dart", "**/*.freezed.dart", "**/*.pb.go",
+            "**/*.pb.dart", "**/*.generated.*", "**/*_generated.py",
+        )
+        seen: set[str] = set()
+        for pattern in patterns:
+            try:
+                paths = root.glob(pattern)
+            except Exception:
+                continue
+            for path in paths:
+                try:
+                    if not path.is_file():
+                        continue
+                    rel = path.relative_to(root).as_posix()
+                except Exception:
+                    continue
+                if rel in seen:
+                    continue
+                seen.add(rel)
+                examples.append(rel)
+                if len(examples) >= limit:
+                    return examples
+        return examples
+
+    def _owner_is_repo_grounded(self, owner: str | None) -> bool:
+        if not owner:
+            return False
+        root = getattr(self, "_project_root", None)
+        if not isinstance(root, Path) or not root.exists():
+            return False
+        needle = owner.lower()
+        # Fast path: path/file names.
+        try:
+            for path in root.rglob("*"):
+                if len(path.parts) > 20:
+                    continue
+                try:
+                    rel = path.relative_to(root).as_posix()
+                except Exception:
+                    continue
+                lowered = rel.lower()
+                if self._excluded_source(rel):
+                    continue
+                if needle in lowered:
+                    return True
+        except Exception:
+            pass
+        # Bounded content scan to avoid expensive repo-wide reads.
+        scanned = 0
+        for glob in ("**/*.py", "**/*.dart", "**/*.ts", "**/*.tsx", "**/*.js", "**/*.go", "**/*.rs", "**/*.md"):
+            try:
+                files = root.glob(glob)
+            except Exception:
+                continue
+            for path in files:
+                if scanned >= 250:
+                    return False
+                try:
+                    rel = path.relative_to(root).as_posix()
+                    if self._excluded_source(rel) or path.stat().st_size > 120_000:
+                        continue
+                    scanned += 1
+                    if owner in path.read_text(encoding="utf-8", errors="replace"):
+                        return True
+                except Exception:
+                    continue
+        return False
+
+    def _safe_constraint_profile(self, *, source_path: str, line: str, owner: str | None, candidate: dict[str, str]) -> tuple[str, str, str | None]:
+        """Return severity, confidence, downgrade_reason after applying the safety gate."""
+        authority = candidate.get("authority") or self._source_authority(source_path)
+        if candidate.get("is_example") == "true":
+            return "should", "low", "example_context"
+        if candidate.get("block") == "table":
+            return "should", "low", "table_row"
+        if authority in {"low", "risky"}:
+            return "should", "medium" if authority == "low" else "low", "low_authority_source"
+        if not self._has_normative_language(line):
+            return "should", "medium", "non_normative_language"
+        if owner and not self._owner_is_repo_grounded(owner):
+            return "should", "medium", "ungrounded_owner"
+        severity = "must" if re.search(r"\b(must|must not|do not|source[- ]of[- ]truth|owned by|owns|single source|never|required)\b", line, re.I) else "should"
+        confidence = "high" if severity == "must" and authority in {"high", "medium"} else "medium"
+        return severity, confidence, None
+
+    def _final_token_clamp(self, constraints: list[PatchConstraint], warnings: list[str], *, max_constraints: int, max_tokens: int) -> tuple[list[PatchConstraint], bool]:
+        """Apply the token budget after warnings have been assembled."""
+        selected = constraints[:max_constraints]
+        if self._estimate_packet_tokens(selected, warnings) <= max_tokens:
+            return selected, False
+        # Drop lowest-value constraints first: low confidence, verification, then long instructions.
+        type_rank = {"source_of_truth": 0, "generated_file": 1, "forbidden_edit": 1, "dependency_version": 2, "architecture": 3, "project_convention": 4, "verification": 8}
+        confidence_rank = {"high": 0, "medium": 1, "low": 2}
+        severity_rank = {"must": 0, "should": 1, "may": 2}
+        ordered = sorted(
+            selected,
+            key=lambda c: (
+                0 if c.type == "generated_file" and c.source == "changed_files" else 1,
+                type_rank.get(c.type, 9),
+                severity_rank.get(c.severity, 9),
+                confidence_rank.get(c.confidence, 9),
+                len(c.instruction) + len(c.evidence),
+            ),
+        )
+        while ordered and self._estimate_packet_tokens(ordered, warnings) > max_tokens:
+            ordered.pop()
+        return ordered, True
+
     def _architecture_constraints(self, sources: list[dict[str, str]]) -> list[PatchConstraint]:
         constraints: list[PatchConstraint] = []
+
         for source in sources:
-            for line in self._interesting_lines(source["text"]):
+            source_path = source["path"]
+            for candidate in self._iter_constraint_lines(source["text"], source_path):
+                line = candidate["line"]
                 lowered = line.lower()
+
+                # Never turn examples/tutorial text into agent-obeyable patch rules.
+                if candidate.get("is_example") == "true":
+                    continue
+                if not (KEYWORD_RE.search(line) or self._owner_from_line(line)):
+                    continue
+
                 owner = self._owner_from_line(line)
                 ctype = "architecture"
-                severity = "must" if re.search(r"\b(must|must not|do not|source[- ]of[- ]truth|owned by|owns|single source)\b", line, re.I) else "should"
                 if "source of truth" in lowered or "source-of-truth" in lowered or owner:
                     ctype = "source_of_truth"
                 if "do not" in lowered or "must not" in lowered:
                     ctype = "forbidden_edit" if "duplicate" in lowered or "bypass" in lowered or "hardcode" in lowered else ctype
+
+                severity, confidence, downgrade_reason = self._safe_constraint_profile(
+                    source_path=source_path,
+                    line=line,
+                    owner=owner,
+                    candidate=candidate,
+                )
+                evidence = line + self._line_metadata_suffix(
+                    authority=candidate.get("authority", "low"),
+                    block=candidate.get("block", "paragraph"),
+                    heading=candidate.get("heading", ""),
+                    downgrade_reason=downgrade_reason,
+                )
+
                 if "duplicate" in lowered and "policy" in lowered:
                     constraints.append(self._constraint(
                         id="do-not-duplicate-policy",
                         type="forbidden_edit",
                         instruction="Do not duplicate policy outside the documented owner/source of truth.",
-                        source=source["path"],
-                        severity="must",
-                        confidence="high",
-                        evidence=line,
+                        source=source_path,
+                        severity=severity,
+                        confidence=confidence,
+                        evidence=evidence,
                         symbols=[owner] if owner else [],
                     ))
+
                 if "provider" in lowered and "delegat" in lowered:
                     target = owner or self._delegate_target(line) or "the documented service/domain/application owner"
+                    target_grounded = owner is None or self._owner_is_repo_grounded(owner)
+                    target_confidence = confidence if target_grounded else "medium"
+                    target_severity = severity if target_grounded else "should"
                     constraints.append(self._constraint(
                         id=f"provider-delegates-{self._slug(target)}",
                         type="architecture",
                         instruction=f"Provider/presentation code must delegate policy decisions to {target}; do not implement policy in provider/UI code.",
-                        source=source["path"],
-                        severity="must",
-                        confidence="high",
-                        evidence=line,
+                        source=source_path,
+                        severity=target_severity,
+                        confidence=target_confidence,
+                        evidence=evidence if target_grounded else evidence + " [downgrade=ungrounded_delegate_target]",
                         symbols=[target],
                         files=self._matching_changed_files(("provider", "presentation", "ui")),
                     ))
+
                 if owner:
                     constraints.append(self._constraint(
                         id=f"source-of-truth-{self._slug(owner)}",
                         type="source_of_truth",
                         instruction=f"Keep behavior/policy changes in the documented source of truth: {owner}.",
-                        source=source["path"],
-                        severity="must",
-                        confidence="high",
-                        evidence=line,
+                        source=source_path,
+                        severity=severity,
+                        confidence=confidence,
+                        evidence=evidence,
                         symbols=[owner],
                         files=self._matching_changed_files(("service", "domain", "application", "provider", "presentation")),
                     ))
-                elif KEYWORD_RE.search(line):
+                    continue
+
+                if KEYWORD_RE.search(line):
                     constraints.append(self._constraint(
                         id=f"{ctype}-{self._slug(line[:50])}",
                         type=ctype if ctype != "forbidden_edit" or ("do not" in lowered or "must not" in lowered) else "project_convention",
                         instruction=self._instruction_from_line(line),
-                        source=source["path"],
+                        source=source_path,
                         severity=severity,
-                        confidence="high",
-                        evidence=line,
+                        confidence=confidence,
+                        evidence=evidence,
                     ))
+
         return constraints
 
     def _generated_file_constraints(self, sources: list[dict[str, str]], changed_files: list[str]) -> list[PatchConstraint]:
         constraints: list[PatchConstraint] = []
+
         for source in sources:
-            for line in self._interesting_lines(source["text"]):
-                if re.search(r"generated|\.g\.dart|\.freezed\.dart|\.pb\.go|\.pb\.dart|build_runner|regenerate|source model|source[- ]of[- ]truth|dist/", line, re.I):
-                    if not re.search(r"generated|\.g\.dart|\.freezed\.dart|\.pb\.go|\.pb\.dart|build_runner|regenerate|dist/", line, re.I):
-                        continue
+            source_path = source["path"]
+            for candidate in self._iter_constraint_lines(source["text"], source_path):
+                line = candidate["line"]
+                generated_normative = bool(
+                    re.search(r"generated|\.g\.dart|\.freezed\.dart|\.pb\.go|\.pb\.dart|build_runner|regenerate|dist/", line, re.I)
+                    and self._has_normative_language(line)
+                )
+                if candidate.get("is_example") == "true" and not generated_normative:
+                    continue
+                if not re.search(r"generated|\.g\.dart|\.freezed\.dart|\.pb\.go|\.pb\.dart|build_runner|regenerate|dist/", line, re.I):
+                    continue
+                severity = "must" if candidate.get("authority") in {"high", "medium"} and self._has_normative_language(line) else "should"
+                confidence = "high" if severity == "must" else "medium"
+                evidence = line + self._line_metadata_suffix(
+                    authority=candidate.get("authority", "low"),
+                    block=candidate.get("block", "paragraph"),
+                    heading=candidate.get("heading", ""),
+                    downgrade_reason=None if confidence == "high" else "non_normative_or_low_authority",
+                )
+                constraints.append(self._constraint(
+                    id="generated-files-readonly",
+                    type="generated_file",
+                    instruction="Do not edit generated artifacts by hand; update the source model/input and regenerate instead.",
+                    source=source_path,
+                    severity=severity,
+                    confidence=confidence,
+                    evidence=evidence,
+                    files=list(GENERATED_PATTERNS),
+                ))
+                if "source" in line.lower() or "regenerate" in line.lower() or "build_runner" in line.lower():
                     constraints.append(self._constraint(
-                        id="generated-files-readonly",
-                        type="generated_file",
-                        instruction="Do not edit generated artifacts by hand; update the source model/input and regenerate instead.",
-                        source=source["path"],
-                        severity="must",
-                        confidence="high",
-                        evidence=line,
+                        id="generated-source-of-truth",
+                        type="source_of_truth",
+                        instruction="For generated artifacts, change the documented source model/input and run the documented generator.",
+                        source=source_path,
+                        severity=severity,
+                        confidence=confidence,
+                        evidence=evidence,
                         files=list(GENERATED_PATTERNS),
                     ))
-                    if "source" in line.lower() or "regenerate" in line.lower() or "build_runner" in line.lower():
-                        constraints.append(self._constraint(
-                            id="generated-source-of-truth",
-                            type="source_of_truth",
-                            instruction="For generated artifacts, change the documented source model/input and run the documented generator.",
-                            source=source["path"],
-                            severity="must",
-                            confidence="high",
-                            evidence=line,
-                            files=list(GENERATED_PATTERNS),
-                        ))
-                    return constraints
-        generated_changed = [f for f in changed_files if self._is_generated_path(f)]
+
+        generated_changed = [f for f in changed_files if self._is_generated_path(f) or self._path_looks_forbidden_artifact(f)]
         if generated_changed:
             constraints.append(self._constraint(
                 id="generated-files-inferred",
                 type="generated_file",
-                instruction="Changed file path looks generated; verify whether it should be regenerated from a source file instead of edited directly.",
+                instruction="Changed file path looks generated or artifact-like; verify whether it should be regenerated from a source file instead of edited directly.",
                 source="changed_files",
                 severity="should",
-                confidence="low",
-                evidence=", ".join(generated_changed[:4]),
+                confidence="medium",
+                evidence=", ".join(generated_changed[:4]) + " [authority=changed_files; block=path_heuristic]",
                 files=generated_changed,
             ))
+
+        root = getattr(self, "_project_root", None)
+        artifact_examples = self._repo_artifact_examples(root)
+        if artifact_examples and not any(c.id == "generated-files-inferred" for c in constraints):
+            constraints.append(self._constraint(
+                id="artifact-paths-not-touch",
+                type="generated_file",
+                instruction="Do not edit generated, eval, dogfood, patch-review, build, coverage, vendor, or runtime artifact paths unless the task explicitly targets artifact maintenance.",
+                source="repo_path_heuristics",
+                severity="should",
+                confidence="medium",
+                evidence=", ".join(artifact_examples[:4]) + " [authority=path_heuristic; block=repo_scan]",
+                files=artifact_examples[:8],
+            ))
+
         return constraints
 
     def _dependency_constraints(self, root: Path | None) -> list[PatchConstraint]:
@@ -921,12 +1254,31 @@ class PatchConstraintsService:
         return actions
 
     @staticmethod
+    @staticmethod
     def _interesting_lines(text: str) -> list[str]:
         lines = []
+        in_code = False
+        heading = ""
         for raw in text.splitlines():
-            line = re.sub(r"^\s*[-*#>\d.()]+\s*", "", raw).strip()
-            if line:
-                lines.append(line[:300])
+            stripped = raw.strip()
+            if stripped.startswith("```") or stripped.startswith("~~~"):
+                in_code = not in_code
+                continue
+            if in_code or not stripped:
+                continue
+            if stripped.startswith("#"):
+                heading = re.sub(r"^#+\s*", "", stripped).strip()
+                continue
+            if PatchConstraintsService._is_markdown_table_row(stripped):
+                continue
+            if stripped.startswith(">"):
+                continue
+            line = re.sub(r"^\s*[-*+\d.)]+\s*", "", raw).strip()
+            if not line:
+                continue
+            if PatchConstraintsService._is_example_line(line) or PatchConstraintsService._is_example_heading(heading):
+                continue
+            lines.append(line[:300])
         return lines
 
     @staticmethod
@@ -1058,6 +1410,7 @@ class PatchConstraintsService:
         return sorted(
             constraints,
             key=lambda c: (
+                0 if c.type == "generated_file" and c.source == "changed_files" else 1,
                 severity_rank.get(c.severity, 3),
                 confidence_rank.get(c.confidence, 3),
                 -relevance(c),

@@ -12,6 +12,21 @@ tags:
 install: pipx install docmancer --python python3.13
 ---
 
+# Project Patch Contract Runtime for coding agents
+
+For patch-like tasks, use DocAtlas as a Patch Contract runtime, not only as docs search.
+
+Required agent ritual:
+
+1. Call `get_docs_context(question, project_path)` when task scope is unclear.
+2. If the response has `next_action.name == "get_patch_constraints"`, call `get_patch_constraints` before editing.
+3. Treat `forbidden_edits`, `source_of_truth_rules`, `dependency_contracts`, `suggested_checks`, and `unknowns/manual_review` as the pre-patch contract.
+4. Edit code.
+5. Call `validate_patch_against_constraints` with `changed_files` and/or `patch_diff`.
+6. Report `violated` and `manual_review` constraints clearly.
+7. Never claim the patch is safe-to-merge from DocAtlas validation alone; this output is advisory and does not replace tests or human review.
+
+
 # DocAtlas / docmancer
 
 Docmancer compresses documentation context so coding agents spend tokens on code, not on rereading raw docs. It ingests local files, fetches public docs, indexes everything locally with SQLite FTS5, and returns compact context packs with source attribution. The core retrieval path needs no API keys, vector database, hosted query API, or background daemon.
