@@ -292,6 +292,8 @@ class ProjectContextService:
         }
         answer_available = trust_decision.answer_available
         status = "success" if answer_available else (project_docs.status if project_docs else dependency_docs.status if dependency_docs else "no_results")
+        if not answer_available and trust_decision.reason == "no_reliable_context" and _is_low_signal_single_token_query(question):
+            status = "no_results"
         if (project_docs and project_docs.status == "stale") or (dependency_docs and dependency_docs.stale_before_refresh):
             status = "stale"
         if dependency_confirmation and not answer_available and status != "stale":

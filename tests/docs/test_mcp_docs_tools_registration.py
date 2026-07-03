@@ -4,7 +4,7 @@ from pathlib import Path
 
 from docmancer.docs.interfaces.mcp.context_tools import CONTEXT_TOOL_NAMES
 from docmancer.docs.interfaces.mcp.docs_tools import LIBRARY_TOOL_NAMES
-from docmancer.docs.interfaces.mcp.prefetch_tools import PREFETCH_TOOL_NAMES
+from docmancer.docs.interfaces.mcp.prefetch_tools import PREFETCH_TOOL_NAMES, _bounded_targets
 from docmancer.docs.interfaces.mcp.project_tools import PROJECT_TOOL_NAMES
 from docmancer.mcp.docs_server import CONTEXT_TOOLS, LIBRARY_TOOLS, MCP_RESOURCES, MCP_RESOURCE_TEMPLATES, PREFETCH_TOOLS, PROJECT_TOOLS, TOOLS, read_docs_resource
 
@@ -237,3 +237,9 @@ def test_mcp_read_resource_returns_workflow_and_schema_guidance():
     assert 'library="mcp"' in library_templated["text"]
     assert 'ecosystem="python"' in library_templated["text"]
     assert read_docs_resource("docmancer://missing") is None
+
+
+def test_mcp_prefetch_targets_infers_allowed_domains_from_explicit_urls():
+    targets = _bounded_targets([{"library": "go_router", "docs_url": "https://pub.dev/packages/go_router"}])
+
+    assert targets[0]["allowed_domains"] == ["pub.dev"]

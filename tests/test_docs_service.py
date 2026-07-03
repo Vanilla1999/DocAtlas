@@ -1406,6 +1406,19 @@ def test_get_project_context_returns_trust_contract_for_project_docs(tmp_path, m
     assert result.trust_contract["policy"]["direct_webfetch"] == "forbidden"
 
 
+def test_get_project_context_low_signal_single_token_query_returns_no_results(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    (project / "README.md").write_text("# Architecture\n\nProjectContextAnswer uses local ADRs.", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+    service.ingest_project_docs(str(project), with_vectors=False)
+
+    result = service.get_project_context(str(project), "test", tokens=1200, limit=3)
+
+    assert result.status == "no_results"
+    assert result.answer_available is False
+    assert result.reason == "no_reliable_context"
+
+
 def test_get_project_context_preserves_module_metadata_in_pack_and_trust_contract(tmp_path, monkeypatch):
     project = _flutter_project(tmp_path)
     (project / "README.md").write_text("# Architecture\n\nRootProjectAnswer only.", encoding="utf-8")

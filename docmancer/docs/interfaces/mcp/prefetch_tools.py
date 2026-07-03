@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import asdict
 from typing import Any
+from urllib.parse import urlparse
 
 from docmancer.docs.service import LibraryDocsService
 from docmancer.docs.interfaces.mcp.project_tools import _bounded_int_arg
@@ -25,10 +26,26 @@ def _bounded_targets(targets: Any) -> Any:
         if not isinstance(target, dict):
             continue
         item = dict(target)
+        if not item.get("allowed_domains"):
+            inferred = _infer_allowed_domains(item)
+            if inferred:
+                item["allowed_domains"] = inferred
         if item.get("max_pages") is not None:
             item["max_pages"] = max(1, min(500, int(item["max_pages"])))
         bounded.append(item)
     return bounded
+
+
+def _infer_allowed_domains(target: dict[str, Any]) -> list[str]:
+    domains: list[str] = []
+    urls: list[str] = [*(target.get("seed_urls") or [])]
+    if target.get("docs_url"):
+        urls.insert(0, target["docs_url"])
+    for url in urls:
+        parsed = urlparse(str(url))
+        if parsed.scheme in {"http", "https"} and parsed.hostname and parsed.hostname not in domains:
+            domains.append(parsed.hostname)
+    return domains
 
 
 def prefetch_tools(tools: list[dict[str, Any]]) -> list[dict[str, Any]]:
