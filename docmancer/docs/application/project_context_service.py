@@ -6,7 +6,11 @@ from typing import Any
 import re
 
 from docmancer.docs.application.project_answer_outline import build_project_answer_outline
-from docmancer.docs.domain.answer_completeness import evaluate_project_answer_completeness, extract_project_answer_requirements
+from docmancer.docs.domain.answer_completeness import (
+    evaluate_project_answer_completeness,
+    extract_project_answer_requirements,
+    extract_query_relevance_terms,
+)
 from docmancer.docs.domain.project_doc_ranking import is_changelog_path, normalize_doc_path, project_source_taxonomy, rerank_project_doc_chunks
 from docmancer.docs.domain.project_query_intent import classify_project_query_intent
 from docmancer.docs.domain.quality import has_code_symbol_evidence, internal_noise_score, is_trivial_section, looks_like_code_or_command
@@ -14,6 +18,26 @@ from docmancer.docs.domain.snippets import best_context_pack_snippet, build_snip
 from docmancer.docs.domain.source_map import build_project_repo_map, build_project_source_evidence, source_evidence_diagnostics, source_map_diagnostics
 from docmancer.docs.domain.trust_contract import build_project_context_trust_contract
 from docmancer.docs.models import DocsChunk, DocsResult, ProjectContextResult, ProjectDocsResult, ProjectMetadata
+
+LOW_TRUST_PROJECT_RISK_FLAGS = frozenset({
+    "research_artifact",
+    "dogfood_artifact",
+    "patch_review_artifact",
+    "generated_review_output",
+})
+LOW_TRUST_QUERY_TERMS = (
+    "dogfood",
+    "research",
+    "experiment",
+    "benchmark",
+    "baseline",
+    "patch review",
+    "patch-review",
+    "review artifact",
+    "generated review",
+    "eval",
+    "evaluation",
+)
 
 
 class ProjectContextService:
@@ -103,7 +127,7 @@ class ProjectContextService:
         confirmation_reason = project_docs.confirmation_reason if project_docs and project_docs.requires_confirmation else ("network_fetch" if dependency_confirmation and explicit_dependency_requested else None)
         next_action = project_docs.next_action if project_docs and project_docs.requires_confirmation else (dependency_confirmation or {})
         arguments_patch = project_docs.arguments_patch if project_docs and project_docs.requires_confirmation else ({"allow_network": True} if dependency_confirmation else {})
-        context_pack = project_context_pack(project_docs=project_docs, dependency_docs=dependency_docs)
+        context_pack = project_context_pack(question=question, project_docs=project_docs, dependency_docs=dependency_docs)
         requirements = extract_project_answer_requirements(question)
         repo_map_items: list[dict[str, Any]] = []
         source_evidence_items: list[dict[str, Any]] = []
@@ -162,8 +186,37 @@ class ProjectContextService:
                     "preferred_for": ["API calls", "agent actions", "installed packs"],
                 },
             ]
-        source_evidence_answer_available = any(item.get("evidence_class") == "source_snippet" for item in source_evidence_items)
+        relevance_terms = [] if requirements else extract_query_relevance_terms(question, intent=intent)
+        source_evidence_answer_available = any(
+            item.get("evidence_class") == "source_snippet"
+            and _context_has_query_evidence([item], relevance_terms)
+            for item in source_evidence_items
+        )
         answer_available = bool(project_docs and project_docs.answer_available) or bool(dependency_docs and dependency_docs.results) or source_evidence_answer_available
+        relevance_gate = _query_relevance_gate(
+            question=question,
+            intent=intent,
+            context_pack=context_pack,
+            relevance_terms=relevance_terms,
+        )
+        diagnostics["relevance_gate"] = relevance_gate
+        if answer_available and not relevance_gate["passed"]:
+            warning = {
+                "code": "no_query_relevance_evidence",
+                "message": (
+                    "Selected context does not contain high-signal terms from the question; "
+                    "do not treat the result as an exact trusted answer."
+                ),
+                "missing_terms": relevance_gate.get("required_terms", []),
+            }
+            answer_available = False
+            answer_outline.setdefault("warnings", []).append(warning)
+            metrics.setdefault("quality", {}).setdefault("warnings", []).append(warning)
+            next_actions.append({
+                "tool": "code_search",
+                "reason": "No selected trusted source contains high-signal query terms; search project docs/source before answering.",
+                "query_terms": relevance_gate.get("required_terms", [])[:8],
+            })
         if getattr(intent, "wants_code_symbols", False) and not any(
             has_code_symbol_evidence(
                 str(item.get("content") or ""),
@@ -258,7 +311,7 @@ class ProjectContextService:
         return None
 
 
-def project_context_pack(*, project_docs: ProjectDocsResult | None, dependency_docs: DocsResult | None) -> list[dict[str, Any]]:
+def project_context_pack(*, question: str = "", project_docs: ProjectDocsResult | None, dependency_docs: DocsResult | None) -> list[dict[str, Any]]:
     pack: list[dict[str, Any]] = []
     if project_docs:
         for item in project_docs.results:
@@ -267,6 +320,8 @@ def project_context_pack(*, project_docs: ProjectDocsResult | None, dependency_d
             token_estimate = max(1, len(item.content) // 4) if item.content else 0
             freshness = "stale" if item.stale else "current"
             source_taxonomy = project_source_taxonomy(item.path, doc_scope=item.doc_scope, module_path=item.module_path)
+            if _should_skip_low_trust_project_source(question, source_taxonomy):
+                continue
             pack.append({
                 "source_class": "project_doc",
                 "source_type": source_taxonomy["source_type"],
@@ -353,6 +408,87 @@ def project_context_pack(*, project_docs: ProjectDocsResult | None, dependency_d
                 pack[-1]["snippet"] = snippet
                 pack[-1]["surrounding_context"] = item.content
     return pack
+
+
+def _should_skip_low_trust_project_source(question: str, source_taxonomy: dict[str, Any]) -> bool:
+    risk_flags = set(source_taxonomy.get("risk_flags") or [])
+    if not risk_flags.intersection(LOW_TRUST_PROJECT_RISK_FLAGS):
+        return False
+    return not _question_explicitly_targets_low_trust_artifacts(question)
+
+
+def _question_explicitly_targets_low_trust_artifacts(question: str) -> bool:
+    normalized = (question or "").lower()
+    return any(term in normalized for term in LOW_TRUST_QUERY_TERMS)
+
+
+def _query_relevance_gate(
+    *,
+    question: str,
+    intent: Any,
+    context_pack: list[dict[str, Any]],
+    relevance_terms: list[str] | None = None,
+) -> dict[str, Any]:
+    terms = relevance_terms if relevance_terms is not None else extract_query_relevance_terms(question, intent=intent)
+    if not terms:
+        return {
+            "passed": True,
+            "reason": "no_high_signal_terms_required",
+            "required_terms": [],
+            "matched_terms": [],
+        }
+    matched_terms = _matched_query_terms(context_pack, terms)
+    if matched_terms:
+        return {
+            "passed": True,
+            "reason": "query_term_evidence_present",
+            "required_terms": terms[:8],
+            "matched_terms": matched_terms[:8],
+        }
+    return {
+        "passed": False,
+        "reason": "no_selected_source_contains_high_signal_query_terms",
+        "required_terms": terms[:8],
+        "matched_terms": [],
+    }
+
+
+def _context_has_query_evidence(context_pack: list[dict[str, Any]], terms: list[str] | None) -> bool:
+    if not terms:
+        return True
+    return bool(_matched_query_terms(context_pack, terms))
+
+
+def _matched_query_terms(context_pack: list[dict[str, Any]], terms: list[str]) -> list[str]:
+    matched: list[str] = []
+    normalized_items = [_normalize_gate_text(_context_item_text_for_gate(item)) for item in context_pack]
+    for term in terms:
+        normalized_term = _normalize_gate_text(term)
+        if normalized_term and any(normalized_term in text for text in normalized_items):
+            if term not in matched:
+                matched.append(term)
+    return matched
+
+
+def _context_item_text_for_gate(item: dict[str, Any]) -> str:
+    source = item.get("source") if isinstance(item.get("source"), dict) else {}
+    section = item.get("section") if isinstance(item.get("section"), dict) else {}
+    parts = [
+        item.get("path"),
+        item.get("title"),
+        item.get("heading_path"),
+        item.get("content"),
+        item.get("snippet"),
+        source.get("path"),
+        source.get("title"),
+        section.get("title"),
+    ]
+    return "\n".join(str(part) for part in parts if part)
+
+
+def _normalize_gate_text(value: str | None) -> str:
+    text = (value or "").replace("\\", "/").lower().replace("-", "_")
+    return re.sub(r"\s+", " ", text)
 
 
 def _repo_map_token_budget(tokens: int | None) -> int:

@@ -497,32 +497,22 @@ def test_project_context_prefers_authoritative_workflow_docs_over_noisy_dogfood_
     result = ProjectContextService(facade).get_project_context("/repo", question, mode="project-only", limit=3)
 
     project_paths = [item["path"] for item in result.context_pack if item["source_class"] == "project_doc"]
-    assert project_paths[:2] == ["ARCHITECTURE.md", "docs/INDEX.md"]
-    assert artifact_path in project_paths
+    assert project_paths == ["ARCHITECTURE.md", "docs/INDEX.md"]
+    assert artifact_path not in project_paths
 
     architecture_item = next(item for item in result.context_pack if item.get("path") == "ARCHITECTURE.md")
     assert architecture_item["source_type"] == "architecture"
     assert architecture_item["authority"] == "primary"
     assert architecture_item["risk_flags"] == []
 
-    artifact_item = next(item for item in result.context_pack if item.get("path") == artifact_path)
-    assert artifact_item["source_type"] == "patch_review_artifact"
-    assert artifact_item["authority"] == "artifact"
-    assert "dogfood_artifact" in artifact_item["risk_flags"]
-    assert "patch_review_artifact" in artifact_item["risk_flags"]
-
     contract_sources = result.trust_contract["selected_sources"]
     contract_paths = [item["path"] for item in contract_sources]
-    assert contract_paths == ["ARCHITECTURE.md", "docs/INDEX.md", artifact_path]
+    assert contract_paths == ["ARCHITECTURE.md", "docs/INDEX.md"]
     assert result.trust_contract["selected"] == contract_sources
     assert result.trust_contract["trusted_sources"] == contract_sources
 
     reading_paths = [item["path"] for item in result.answer_outline["recommended_reading_order"]]
-    assert reading_paths[:3] == ["ARCHITECTURE.md", "docs/INDEX.md", artifact_path]
-
-    contract_artifact = next(item for item in contract_sources if item.get("path") == artifact_path)
-    assert contract_artifact["source_type"] == "patch_review_artifact"
-    assert "patch_review_artifact" in contract_artifact["risk_flags"]
+    assert reading_paths[:2] == ["ARCHITECTURE.md", "docs/INDEX.md"]
 
 
 def test_russian_story_requirement_chunks_drop_question_scaffolding_and_connectors():

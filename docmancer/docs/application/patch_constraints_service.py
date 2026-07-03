@@ -103,6 +103,18 @@ KEYWORD_RE = re.compile(
     r"\b(must(?:\s+not)?|should(?:\s+not)?|belongs to|owned by|owns|source[- ]of[- ]truth|canonical|single source|do not duplicate|do not bypass|do not hardcode|layer|service layer|domain layer|application layer|presentation layer|provider delegates|repository owns|adapter owns)\b",
     re.I,
 )
+NON_ACTIONABLE_CONSTRAINT_HEADING_RE = re.compile(
+    r"^(rules?|constraints?|requirements?|notes?|guidelines?)\s+"
+    r"(that\s+)?(must|should|may|must\s+not|should\s+not)?\s*"
+    r"(not\s+)?(be\s+)?(violated|followed|checked)?\s*:?\s*$",
+    re.I,
+)
+TREE_GLYPH_RE = re.compile(r"[│├└┬┴┼─]{2,}|^[│├└┬┴┼─]")
+OWNER_SUFFIX_RE = re.compile(
+    r"(Service|Repository|Controller|Notifier|Bloc|Cubit|Provider|Adapter|Manager|"
+    r"UseCase|Store|Module|Screen|Route|Router|Policy|Gateway|Client|Api|API|"
+    r"Dao|DAO|DataSource|HttpServer|Server)$"
+)
 EXCLUDED_SOURCE_PARTS = {
     "eval",
     "fixtures",
@@ -135,6 +147,7 @@ class PatchConstraintsService:
         self._ignored_generated_artifact_sources: list[str] = []
         self._excluded_source_reasons: list[dict[str, str]] = []
         self._project_root: Path | None = None
+        self._dropped_non_actionable_constraints: list[str] = []
 
     def get_patch_constraints(
         self,
@@ -153,6 +166,7 @@ class PatchConstraintsService:
         self._changed_files = changed_files
         self._ignored_generated_artifact_sources = []
         self._excluded_source_reasons = []
+        self._dropped_non_actionable_constraints = []
         root = Path(project_path).expanduser().resolve() if project_path else None
         self._project_root = root
         sources = self._visible_sources(root) if root else []
@@ -166,6 +180,7 @@ class PatchConstraintsService:
         constraints.extend(self._symbol_candidate_constraints(symbol_candidates))
         constraints.extend(self._fallback_constraints(question, changed_files, root))
         constraints = self._dedupe(constraints)
+        constraints = self._drop_non_actionable_constraints(constraints)
         constraints = self._sort_constraints(constraints)
         selected, truncated = self._apply_budget(constraints, max_constraints=max_constraints, max_tokens=max_tokens)
         warnings: list[str] = []
@@ -179,6 +194,11 @@ class PatchConstraintsService:
             warnings.append("No visible project docs were found; constraints are limited to dependency metadata and generic checks.")
         if self._ignored_generated_artifact_sources:
             warnings.append(f"ignored_generated_artifact_sources: excluded {len(self._ignored_generated_artifact_sources)} generated dogfood/eval artifact source(s) from patch-constraint extraction.")
+        if self._dropped_non_actionable_constraints:
+            warnings.append(
+                "dropped_non_actionable_constraints: excluded "
+                f"{len(self._dropped_non_actionable_constraints)} heading/tree/ungrounded-owner candidate(s)."
+            )
         selected, final_truncated = self._final_token_clamp(
             selected, warnings, max_constraints=max_constraints, max_tokens=max_tokens
         )
@@ -644,6 +664,8 @@ class PatchConstraintsService:
                 # Never turn examples/tutorial text into agent-obeyable patch rules.
                 if candidate.get("is_example") == "true":
                     continue
+                if self._line_is_non_actionable_constraint(line):
+                    continue
                 if not (KEYWORD_RE.search(line) or self._owner_from_line(line)):
                     continue
 
@@ -722,6 +744,56 @@ class PatchConstraintsService:
                     ))
 
         return constraints
+
+    def _drop_non_actionable_constraints(self, constraints: list[PatchConstraint]) -> list[PatchConstraint]:
+        kept: list[PatchConstraint] = []
+        for constraint in constraints:
+            if self._constraint_is_actionable(constraint):
+                kept.append(constraint)
+                continue
+            self._dropped_non_actionable_constraints.append(f"{constraint.id}:{constraint.source}")
+        return kept
+
+    def _constraint_is_actionable(self, constraint: PatchConstraint) -> bool:
+        instruction = (constraint.instruction or "").strip()
+        evidence_line = (constraint.evidence or "").split("[", 1)[0].strip()
+        if self._line_is_non_actionable_constraint(instruction):
+            return False
+        if evidence_line and self._line_is_non_actionable_constraint(evidence_line):
+            return False
+        if constraint.type == "source_of_truth" and constraint.symbols:
+            return any(self._owner_looks_like_code_owner(str(symbol)) for symbol in constraint.symbols)
+        return True
+
+    def _line_is_non_actionable_constraint(self, line: str) -> bool:
+        stripped = (line or "").strip()
+        if not stripped:
+            return True
+        if TREE_GLYPH_RE.search(stripped):
+            return True
+        if NON_ACTIONABLE_CONSTRAINT_HEADING_RE.match(stripped):
+            return True
+        if stripped.endswith(":") and len(stripped.split()) <= 8:
+            return True
+        owner = self._owner_from_line(stripped)
+        if owner and not self._owner_looks_like_code_owner(owner):
+            return True
+        return False
+
+    @staticmethod
+    def _owner_looks_like_code_owner(owner: str | None) -> bool:
+        value = (owner or "").strip().strip("`'\"“”«»")
+        if not value or len(value) > 80:
+            return False
+        if re.search(r"\s|[:;?]|[│├└┬┴┼─]", value):
+            return False
+        if value.startswith("_") and not OWNER_SUFFIX_RE.search(value):
+            return False
+        if "/" in value or "." in value:
+            return True
+        if OWNER_SUFFIX_RE.search(value):
+            return True
+        return bool(re.match(r"^[A-Z][A-Za-z0-9_]+$", value))
 
     def _generated_file_constraints(self, sources: list[dict[str, str]], changed_files: list[str]) -> list[PatchConstraint]:
         constraints: list[PatchConstraint] = []

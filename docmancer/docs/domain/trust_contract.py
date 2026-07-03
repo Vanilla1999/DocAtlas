@@ -156,7 +156,9 @@ def _ordered_project_indexed_sources(
     ranked_sources: list[tuple[int, int, dict[str, Any]]] = []
     for original_index, source in enumerate(indexed_sources):
         matching_ranks = [source_order[key] for key in _source_mapping_order_keys(source) if key in source_order]
-        rank = min(matching_ranks) if matching_ranks else len(source_order) + original_index
+        if not matching_ranks:
+            continue
+        rank = min(matching_ranks)
         ranked_sources.append((rank, original_index, source))
     return [source for _, _, source in sorted(ranked_sources, key=lambda row: (row[0], row[1]))]
 
@@ -182,9 +184,13 @@ def _project_doc_source_order(
         for key in keys:
             order.setdefault(key, rank)
 
+    saw_context_project_docs = False
     for item in context_pack or []:
         if item.get("source_class") == "project_doc":
+            saw_context_project_docs = True
             remember(_context_item_order_keys(item))
+    if saw_context_project_docs:
+        return order
     for chunk in project_docs.results:
         remember(_chunk_order_keys(chunk))
     return order

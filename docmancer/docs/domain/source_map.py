@@ -114,6 +114,8 @@ def build_project_repo_map(
             continue
         item["matched_terms"] = _matched_terms(item, query_terms)
         item["selection_score"] = _selection_score(item, query_terms)
+        if item["selection_score"] <= 0:
+            continue
         candidates.append(item)
 
     selected: list[dict[str, Any]] = []
@@ -568,13 +570,19 @@ def _selection_score(item: dict[str, Any], query_terms: list[str]) -> float:
     return score
 
 
+_QUERY_STOPWORDS = {
+    "and", "are", "for", "from", "how", "the", "this", "that", "where", "with",
+    "как", "где", "для", "или", "что", "это", "этой",
+}
+
+
 def _query_terms(question: str) -> list[str]:
     terms: list[str] = []
     for quoted in re.findall(r"[\"'`“”‘’«»„]+([^\"'`“”‘’«»„]{2,120})[\"'`“”‘’«»„]+", question or ""):
         _append_unique(terms, quoted.strip())
     for word in _WORD_RE.findall(question or ""):
         normalized = _normalize(word)
-        if len(normalized) < 3:
+        if len(normalized) < 3 or normalized in _QUERY_STOPWORDS:
             continue
         _append_unique(terms, word)
     return terms[:24]

@@ -524,3 +524,21 @@ def test_budget_limits_keep_must_high_confidence_first(tmp_path: Path):
 
 def test_no_benchmark_oracle_hidden_test_leakage(tmp_path: Path):
     test_does_not_emit_hidden_or_benchmark_oracle_sources(tmp_path)
+
+def test_drops_non_actionable_headings_tree_and_owner_noise(tmp_path: Path):
+    root = _workspace(
+        tmp_path,
+        docs="""
+# Architecture
+Rules that must not be violated:
+│ owns Shelf HttpServer
+PermissionService owns permission policy and is the source of truth for permission decisions.
+""",
+    )
+
+    packet = _packet(root)
+    text = "\n".join([c.instruction for c in packet.constraints] + [c.evidence for c in packet.constraints])
+
+    assert "Rules that must not be violated" not in text
+    assert "Shelf HttpServer" not in text
+    assert any("PermissionService" in c.instruction for c in packet.constraints)

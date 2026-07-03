@@ -150,10 +150,27 @@ _STOPWORDS = {
     "реализовать",
     "сделать",
 }
+_GENERIC_RELEVANCE_WORDS = {
+    "agent", "answer", "answers", "architecture", "change", "changes",
+    "codebase", "context", "constraint", "constraints", "doc", "docs",
+    "documentation", "exact", "feature", "features", "file", "files",
+    "implementation", "module", "overview", "product", "project", "protocol",
+    "repo", "repository", "source", "sources", "structure", "structured",
+    "term", "terms",
+}
 
 
 def extract_project_answer_requirements(question: str) -> list[str]:
     return _extract_requirements(question)
+
+
+def extract_query_relevance_terms(question: str, intent: Any | None = None) -> list[str]:
+    explicit = extract_project_answer_requirements(question)
+    if explicit:
+        return explicit
+    if _skip_high_signal_relevance_gate(question, intent):
+        return []
+    return _extract_high_signal_query_terms(question)
 
 
 def evaluate_project_answer_completeness(
@@ -165,8 +182,10 @@ def evaluate_project_answer_completeness(
 ) -> dict[str, Any]:
     """Return a backward-compatible completeness contract for get_project_context."""
 
-    requirements = extract_project_answer_requirements(question)
-    story_specific_query = _is_story_specific_query(question, intent, requirements)
+    explicit_requirements = extract_project_answer_requirements(question)
+    requirements = explicit_requirements or extract_query_relevance_terms(question, intent=intent)
+    fallback_relevance_query = bool(requirements and not explicit_requirements)
+    story_specific_query = _is_story_specific_query(question, intent, requirements) or fallback_relevance_query
     proof_context_pack = _source_backed_context_pack(context_pack) if story_specific_query else _proof_context_pack(context_pack)
     context_text = _context_text(proof_context_pack)
     coverage_by_requirement = [_requirement_coverage(term, context_pack=proof_context_pack, context_text=context_text) for term in requirements]
@@ -194,6 +213,8 @@ def evaluate_project_answer_completeness(
         reason_codes.append("no_trusted_context")
     if source_search_required:
         reason_codes.append("story_terms_missing_from_source_evidence")
+    if fallback_relevance_query and missing_terms:
+        reason_codes.append("high_signal_query_terms_missing_from_context")
     if navigational_context:
         reason_codes.append("navigational_context_present")
 
@@ -217,6 +238,47 @@ def evaluate_project_answer_completeness(
         "answer_completeness": completeness,
         "recommended_next_actions": recommended_next_actions,
     }
+
+
+def _skip_high_signal_relevance_gate(question: str, intent: Any | None) -> bool:
+    q = _normalize_text(question)
+    if not q:
+        return True
+    if getattr(intent, "broad", False):
+        return True
+    if getattr(intent, "wants_architecture", False):
+        return True
+    if getattr(intent, "wants_how_to", False):
+        return True
+    if getattr(intent, "wants_release_history", False):
+        return True
+    return any(
+        phrase in q
+        for phrase in (
+            "project structure",
+            "architecture overview",
+            "repo overview",
+            "codebase overview",
+            "how is this project structured",
+        )
+    )
+
+
+def _extract_high_signal_query_terms(question: str) -> list[str]:
+    terms: list[str] = []
+    for match in _WORD_RE.findall(question or ""):
+        term = _clean_term(match)
+        if not term:
+            continue
+        normalized = _normalize_text(term)
+        if not normalized or normalized in _STOPWORDS or normalized in _GENERIC_RELEVANCE_WORDS:
+            continue
+        has_digit = any(ch.isdigit() for ch in term)
+        has_symbolish_shape = "_" in term or "-" in term or "." in term
+        has_camel_shape = bool(re.search(r"[a-zа-яё][A-ZА-ЯЁ]", term))
+        if len(normalized) >= 5 or has_digit or has_symbolish_shape or has_camel_shape:
+            terms.append(term)
+    return _dedupe_terms(terms[:8])
 
 
 def _extract_requirements(question: str) -> list[str]:
