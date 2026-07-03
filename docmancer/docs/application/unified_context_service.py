@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from dataclasses import asdict, is_dataclass, replace
 from typing import Any
 
@@ -11,6 +12,86 @@ from docmancer.docs.resolver import docs_snapshot_is_exact
 
 
 _LATEST_ALIASES = {"latest", "stable", "main", "*"}
+_PATCH_TASK_TERMS = {
+    "change",
+    "changed",
+    "changes",
+    "changing",
+    "diff",
+    "diffs",
+    "edit",
+    "edited",
+    "editing",
+    "edits",
+    "fix",
+    "fixed",
+    "fixes",
+    "fixing",
+    "implement",
+    "implemented",
+    "implementing",
+    "implements",
+    "modify",
+    "modified",
+    "modifies",
+    "modifying",
+    "patch",
+    "patched",
+    "patching",
+    "patches",
+    "refactor",
+    "refactored",
+    "refactoring",
+    "refactors",
+    "validate",
+    "validated",
+    "validates",
+    "validating",
+}
+_IMPERATIVE_PATCH_TASK_TERMS = {
+    "add",
+    "added",
+    "adding",
+    "adds",
+    "create",
+    "created",
+    "creates",
+    "creating",
+    "delete",
+    "deleted",
+    "deletes",
+    "deleting",
+    "migrate",
+    "migrated",
+    "migrates",
+    "migrating",
+    "remove",
+    "removed",
+    "removes",
+    "removing",
+    "rename",
+    "renamed",
+    "renames",
+    "renaming",
+    "update",
+    "updated",
+    "updates",
+    "updating",
+    "upgrade",
+    "upgraded",
+    "upgrades",
+    "upgrading",
+}
+_IMPERATIVE_PATCH_TASK_PREFIX_TERMS = {"please", "task", "todo", "todos"}
+_PATCH_TASK_TOKEN_RE = re.compile(r"[a-z0-9]+")
+
+
+def _looks_like_imperative_patch_task(tokens: list[str]) -> bool:
+    for token in tokens:
+        if token in _IMPERATIVE_PATCH_TASK_PREFIX_TERMS:
+            continue
+        return token in _IMPERATIVE_PATCH_TASK_TERMS
+    return False
 
 
 def _exact_version_match(result: DocsResult) -> bool | None:
@@ -87,13 +168,14 @@ class UnifiedDocsContextService:
         if prepare_project_docs and project_path and mode_selected in {"project", "mixed", "dependency"}:
             bootstrap = self.service.bootstrap_project_docs(project_path, question=question)
             lane_details["project_bootstrap"] = self._to_dict(bootstrap)
-            if getattr(bootstrap, "requires_confirmation", False):
+            bootstrap_reason = getattr(bootstrap, "reason_code", None) or "project_docs_confirmation_required"
+            if getattr(bootstrap, "requires_confirmation", False) and "dependency_docs" not in bootstrap_reason:
                 return self._confirmation_result(
                     question=question,
                     mode_requested=mode_requested,
                     mode_selected=mode_selected,
                     routing=routing,
-                    reason_code=getattr(bootstrap, "reason_code", None) or "project_docs_confirmation_required",
+                    reason_code=bootstrap_reason,
                     confirmation_reason=getattr(bootstrap, "confirmation_reason", None),
                     next_action=getattr(bootstrap, "next_action", None) or None,
                     arguments_patch=getattr(bootstrap, "arguments_patch", None) or None,
@@ -108,9 +190,9 @@ class UnifiedDocsContextService:
         project_auto = mode_requested == "auto" and bool(project_path) and not libs
 
         if mode_selected == "project":
-            delegated_mode = "auto" if project_auto else "project-only"
+            delegated_mode = "auto" if project_auto and allow_network else "project-only"
             routing["delegated_mode"] = delegated_mode
-            project_result = self.service.get_project_context(project_path, question, tokens=tokens, limit=limit, expand=expand, module=module, module_path=module_path, scope=scope, mode=delegated_mode, response_style=response_style)
+            project_result = self.service.get_project_context(project_path, question, tokens=tokens, limit=limit, expand=expand, module=module, module_path=module_path, scope=scope, mode=delegated_mode, response_style=response_style, allow_network=allow_network)
         elif mode_selected == "dependency":
             if not allow_network and self._dependency_prefetch_needed(project_path):
                 lanes["dependency"] = {"status": "confirmation_required", "source_count": 0}
@@ -125,9 +207,9 @@ class UnifiedDocsContextService:
                     lanes=lanes,
                     lane_details=lane_details if details else {},
                 )
-            project_result = self.service.get_project_context(project_path, question, tokens=tokens, limit=limit, expand=expand, library=library, libraries=libraries, ecosystem=ecosystem, version=version, module=module, module_path=module_path, scope=scope, mode="deps-only", response_style=response_style)
+            project_result = self.service.get_project_context(project_path, question, tokens=tokens, limit=limit, expand=expand, library=library, libraries=libraries, ecosystem=ecosystem, version=version, module=module, module_path=module_path, scope=scope, mode="deps-only", response_style=response_style, allow_network=allow_network)
         elif mode_selected == "mixed":
-            project_result = self.service.get_project_context(project_path, question, tokens=tokens, limit=limit, expand=expand, library=library, libraries=libraries, ecosystem=ecosystem, version=version, module=module, module_path=module_path, scope=scope, mode="auto", response_style=response_style)
+            project_result = self.service.get_project_context(project_path, question, tokens=tokens, limit=limit, expand=expand, library=library, libraries=libraries, ecosystem=ecosystem, version=version, module=module, module_path=module_path, scope=scope, mode="auto", response_style=response_style, allow_network=allow_network)
             routing["dependency_detected"] = bool(getattr(project_result, "dependency_docs", None))
             explicit_library_results = []
             for lib in libs:
@@ -170,7 +252,7 @@ class UnifiedDocsContextService:
                 mode_selected = self._infer_project_auto_mode(project_result, project_items)
                 routing.update({
                     "reason_code": "project_context_auto",
-                    "delegated_mode": "auto",
+                    "delegated_mode": routing.get("delegated_mode") or "auto",
                     "evidence_scopes": sorted({item.get("doc_scope") for item in project_items if item.get("doc_scope")}),
                     "dependency_detected": any(item.get("doc_scope") == "dependency" for item in project_items),
                 })
@@ -220,6 +302,12 @@ class UnifiedDocsContextService:
         status = self._aggregate_status(requested_lanes, successful_lanes, pending_confirmation_lanes, failed_lanes)
         reason = None if answer_available else "no_docs_context_available"
         combined_next_actions = [*next_actions, *pending_actions.get("next_actions", [])]
+        patch_constraints_action = self._patch_constraints_next_action(question, project_path, mode_selected, mode_requested)
+        if patch_constraints_action:
+            routing["next_action_reason"] = patch_constraints_action["reason"]
+            if patch_constraints_action not in combined_next_actions:
+                combined_next_actions.insert(0, patch_constraints_action)
+        primary_next_action = pending_actions.get("next_action") or patch_constraints_action
 
         payload = UnifiedDocsContextResult(
             status=status,
@@ -236,7 +324,7 @@ class UnifiedDocsContextService:
             reason_code=reason,
             requires_confirmation=bool(pending_actions.get("requires_confirmation")),
             confirmation_reason=pending_actions.get("confirmation_reason"),
-            next_action=pending_actions.get("next_action"),
+            next_action=primary_next_action,
             next_actions=combined_next_actions,
             arguments_patch=pending_actions.get("arguments_patch"),
             warnings=[*warnings, *snippet_presentation.warnings],
@@ -301,6 +389,20 @@ class UnifiedDocsContextService:
         if project_path:
             return "project", "project_path_only"
         return "invalid_request", "docs_context_target_missing"
+
+    @staticmethod
+    def _patch_constraints_next_action(question: str, project_path: str | None, mode_selected: str, mode_requested: str) -> dict[str, Any] | None:
+        if not project_path or mode_requested == "library" or mode_selected == "library":
+            return None
+        tokens = _PATCH_TASK_TOKEN_RE.findall(question.lower())
+        if not any(token in _PATCH_TASK_TERMS for token in tokens) and not _looks_like_imperative_patch_task(tokens):
+            return None
+        return {
+            "type": "get_patch_constraints",
+            "tool": "get_patch_constraints",
+            "reason": "patch_like_project_task",
+            "arguments_patch": {"project_path": project_path, "task": question},
+        }
 
     @staticmethod
     def _libraries(library: str | None, libraries: list[str] | None) -> list[str]:

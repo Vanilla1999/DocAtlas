@@ -6,13 +6,15 @@
 
 ## 1. Короткое позиционирование
 
-**Docmancer** — локальный инструмент для превращения документации в компактный, source-grounded контекст для coding agents.
+**Docmancer / DocAtlas** — локальный **Project Patch Contract Runtime** для coding agents: repo-owned docs, lockfiles/dependency docs и code-evidence graph превращаются в source-attributed Patch Contract перед изменением кода, а после патча — в deterministic advisory validation и PR artifacts.
 
 Более точное текущее позиционирование:
 
-> **Docmancer is a local, version-aware docs runtime for coding agents.**
+> **DocAtlas is a local Project Patch Contract Runtime for coding agents.**
 
-Основной продуктовый слой — **Docmancer Docs**: локальный runtime для документации проекта, приватных docs, публичных docs-сайтов и version-aware library docs. **Docmancer Packs** — advanced слой для version-pinned API action tools; он важен, но не должен быть hero narrative.
+Основной продуктовый слой — **Docmancer Docs / Patch Contract Runtime**: агент сначала вызывает `get_docs_context`, для patch-like задачи переходит к `get_patch_constraints`, редактирует код, затем вызывает `validate_patch_against_constraints` и получает advisory/non-blocking PR artifacts. Это не safe-to-merge proof: semantic uncertainty остаётся `unknown`/manual review. **Docmancer Packs** — advanced слой для version-pinned API action tools; он важен, но не должен быть hero narrative.
+
+Legacy docs-RAG / context-pack сценарий остаётся совместимым, но теперь он supporting layer, а не главный product thesis.
 
 Он умеет:
 
@@ -24,9 +26,9 @@
 - устанавливать agent skills для популярных coding-agent окружений;
 - отдельно предоставлять MCP runtime для version-pinned API tool packs.
 
-Ключевая идея: **агент тратит контекст на работу с кодом, а не на перечитывание полной документации**.
+Ключевая идея: **агент тратит контекст на выполнение патча и проверку проектных ограничений, а не на перечитывание полной документации**.
 
-Ключевое отличие от Context7, которое стоит развивать: Context7 хорошо даёт публичные docs библиотек; Docmancer должен давать агенту docs, которые реально относятся к проекту: local/private project docs + exact/project-aware dependency docs + source/version metadata.
+Ключевое отличие от Context7, которое стоит развивать: Context7 хорошо даёт публичные docs библиотек; Docmancer должен давать агенту Patch Contract, который реально относится к проекту: local/private project docs + exact/project-aware dependency docs + source/version metadata + task-local code evidence.
 
 ## 2. Основные пользовательские сценарии
 

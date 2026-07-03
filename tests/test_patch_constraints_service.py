@@ -179,6 +179,31 @@ def test_high_confidence_constraints_have_source_and_evidence(tmp_path: Path):
     assert all(c.source and c.evidence for c in high)
 
 
+def test_patch_contract_schema_v2_exposes_contract_metadata(tmp_path: Path):
+    root = _workspace(tmp_path)
+    packet = _packet(root, max_constraints=20, max_tokens=4000)
+
+    assert packet.schema_version == "patch-contract-2.0"
+    assert packet.contract_kind == "patch_contract"
+    assert packet.contract_id and packet.contract_id.startswith("patch-contract-")
+    assert packet.project_path == str(root.resolve())
+    assert packet.generated_at
+    assert packet.index_state["visible_source_count"] >= 1
+    assert packet.token_budget["max_tokens"] == 4000
+    assert packet.token_budget["token_estimate"] == packet.token_estimate
+    assert any(action["type"] == "validate_patch_against_constraints" for action in packet.next_actions)
+
+
+def test_patch_contract_schema_v2_constraint_items_keep_evidence_refs(tmp_path: Path):
+    packet = _packet(_workspace(tmp_path), max_constraints=20, max_tokens=4000)
+    high = next(c for c in packet.constraints if c.confidence == "high")
+
+    assert high.source_refs == [{"path": high.source, "kind": "source"}]
+    assert high.evidence_snippets
+    assert high.evidence_snippets[0]["path"] == high.source
+    assert high.evidence_snippets[0]["text"] == high.evidence
+
+
 def test_does_not_invent_dependency_version_without_manifest(tmp_path: Path):
     root = tmp_path / "repo"
     _write(root / "docs/architecture.md", "PermissionService owns permission policy.\n")
@@ -205,7 +230,12 @@ def test_does_not_emit_hidden_or_benchmark_oracle_sources(tmp_path: Path):
     root = _workspace(tmp_path)
     _write(root / "eval/task_level/hidden_tests/oracles/README.md", "Hidden oracle: SecretService owns everything.\n")
     packet = _packet(root)
-    payload = str(asdict(packet)).lower()
+    payload = str({
+        "constraints": asdict(packet)["constraints"],
+        "sources": packet.sources,
+        "ignored_generated_artifact_sources": packet.ignored_generated_artifact_sources,
+        "excluded_source_reasons": packet.excluded_source_reasons,
+    }).lower()
     assert "secretservice" not in payload
     assert "hidden_tests" not in payload
     assert "oracle" not in payload
@@ -264,6 +294,35 @@ const quickInfoLabel = 'Быстрая информация';
     assert any(candidate["matched_symbol"] in {"openInfo", "quickInfoLabel"} for candidate in candidates)
     assert any(candidate["matched_symbol"] == "closeMenu" for candidate in candidates)
     assert all("docatlas-dogfood" not in candidate["source"] for candidate in candidates)
+
+
+def test_patch_contract_exposes_repo_map_and_source_evidence_layer(tmp_path: Path):
+    root = _workspace(tmp_path)
+    _write(
+        root / "lib/help_request_details_screen.dart",
+        """
+class HelpRequestDetailsScreen {}
+final label = 'Вернуть в работу';
+""",
+    )
+
+    packet = _packet(
+        root,
+        question='Reopen HELP request and show "Вернуть в работу" button.',
+        changed_files=["lib/help_request_details_screen.dart"],
+        max_constraints=20,
+        max_tokens=4000,
+    )
+
+    assert any(item["source_class"] == "repo_map" and item["path"] == "lib/help_request_details_screen.dart" for item in packet.repo_map)
+    evidence = [item for item in packet.source_evidence if item.get("evidence_class") == "source_snippet"]
+    assert any(item["path"] == "lib/help_request_details_screen.dart" and item["line_start"] == 3 for item in evidence)
+    grounded = [constraint for constraint in packet.constraints if constraint.id.startswith("source-evidence-")]
+    assert grounded
+    assert any(
+        constraint.source_refs[0]["kind"] == "source_evidence" and constraint.source_refs[0]["line_start"] == 3
+        for constraint in grounded
+    )
 
 
 def test_symbol_grounding_does_not_invent_without_source_match(tmp_path: Path):

@@ -329,18 +329,30 @@ class PatchConstraint:
     evidence: str
     symbols: list[str] = field(default_factory=list)
     files: list[str] = field(default_factory=list)
+    source_refs: list[dict[str, Any]] = field(default_factory=list)
+    evidence_snippets: list[dict[str, Any]] = field(default_factory=list)
 
 
 @dataclass(frozen=True)
 class PatchConstraintPacket:
     task: str
     constraints: list[PatchConstraint] = field(default_factory=list)
+    schema_version: str = "patch-contract-2.0"
+    contract_kind: str = "patch_contract"
+    contract_id: str | None = None
+    project_path: str | None = None
+    generated_at: str | None = None
+    index_state: dict[str, Any] = field(default_factory=dict)
+    token_budget: dict[str, Any] = field(default_factory=dict)
+    next_actions: list[dict[str, Any]] = field(default_factory=list)
     forbidden_edits: list[PatchConstraint] = field(default_factory=list)
     dependency_contracts: list[PatchConstraint] = field(default_factory=list)
     source_of_truth_rules: list[PatchConstraint] = field(default_factory=list)
     suggested_checks: list[str] = field(default_factory=list)
     warnings: list[str] = field(default_factory=list)
     sources: list[dict[str, Any]] = field(default_factory=list)
+    repo_map: list[dict[str, Any]] = field(default_factory=list)
+    source_evidence: list[dict[str, Any]] = field(default_factory=list)
     symbol_candidates: list[dict[str, Any]] = field(default_factory=list)
     ignored_generated_artifact_sources: list[str] = field(default_factory=list)
     excluded_source_reasons: list[dict[str, str]] = field(default_factory=list)
@@ -356,6 +368,9 @@ class PatchConstraintValidationResult:
     reason: str
     files: list[str] = field(default_factory=list)
     evidence: str | None = None
+    constraint_type: str | None = None
+    source_refs: list[dict[str, Any]] = field(default_factory=list)
+    remediation: str | None = None
 
 
 @dataclass(frozen=True)
@@ -366,6 +381,7 @@ class PatchConstraintValidationPacket:
     satisfied: int = 0
     violated: int = 0
     unknown: int = 0
+    manual_review: int = 0
     results: list[PatchConstraintValidationResult] = field(default_factory=list)
     warnings: list[str] = field(default_factory=list)
     confidence: str = "low"

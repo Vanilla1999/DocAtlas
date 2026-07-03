@@ -30,6 +30,7 @@ PATCH_REVIEW_SCHEMA_VERSIONS = {
     "review_summary_pr_comment.json": 2,
     "review_summary_trace.json": 1,
     "review_summary_bot_bundle.json": 3,
+    "constraint_coverage.json": 1,
 }
 TASK_TOKEN_STOPWORDS = {
     "add", "and", "before", "change", "check", "current", "diff", "file",
@@ -115,6 +116,7 @@ class PatchReviewService:
             summary_max_items=summary_max_items,
             summary_mode=summary_mode,
         )
+        coverage_payload = self._constraint_coverage_payload(constraints_dict, validation_dict)
         artifact_names = [
             "review_summary_manifest.json",
             "review_summary.md",
@@ -123,6 +125,7 @@ class PatchReviewService:
             "review_summary_pr_comment.json",
             "review_summary_trace.json",
             "review_summary_bot_bundle.json",
+            "constraint_coverage.json",
             "constraints.json",
             "constraints.md",
             "changed_files.json",
@@ -140,11 +143,13 @@ class PatchReviewService:
         self._write_json(out / "patch_hygiene.json", hygiene.to_json_dict())
         (out / "patch.diff").write_text(patch_diff, encoding="utf-8")
         self._write_json(out / "validation.json", validation_dict)
+        self._write_json(out / "constraint_coverage.json", coverage_payload)
         self._write_json(out / "review_summary_actions.json", actions_payload)
         self._write_json(out / "review_summary_quality.json", quality_payload)
         pr_comment_payload = self._review_summary_pr_comment_payload(
             actions_payload,
             quality_payload,
+            coverage_payload,
             summary_mode=summary_mode,
         )
         trace_payload = self._review_summary_trace_payload(
@@ -152,6 +157,7 @@ class PatchReviewService:
             validation_dict,
             actions_payload,
             quality_payload,
+            coverage_payload,
             summary_mode=summary_mode,
         )
         self._write_json(out / "review_summary_pr_comment.json", pr_comment_payload)
@@ -181,6 +187,7 @@ class PatchReviewService:
             manifest_payload,
             quality_payload,
             actions_payload,
+            coverage_payload,
             pr_comment_payload,
             trace_payload,
             summary_mode=summary_mode,
@@ -201,6 +208,7 @@ class PatchReviewService:
             "review_summary_pr_comment": pr_comment_payload,
             "review_summary_trace": trace_payload,
             "review_summary_bot_bundle": bot_bundle_payload,
+            "constraint_coverage": coverage_payload,
             "constraints": constraints_dict,
             "validation": validation_dict,
             "artifacts": artifact_names,
@@ -287,6 +295,12 @@ class PatchReviewService:
                 "intended_consumers": ["pr_bot", "automation", "debugger"],
                 "safe_usage": "Trace rendered recommendations back to raw constraints and validation results; use for audit/debug, not as a correctness proof.",
             },
+            "constraint_coverage.json": {
+                "kind": "constraint_coverage_metadata",
+                "schema_version": PATCH_REVIEW_SCHEMA_VERSIONS["constraint_coverage.json"],
+                "intended_consumers": ["pr_bot", "automation", "debugger"],
+                "safe_usage": "Inspect deterministic coverage versus unknown/manual categories; unknown/manual coverage remains review context, not pass.",
+            },
             "review_summary_bot_bundle.json": {
                 "kind": "bot_bundle",
                 "schema_version": bot_bundle_schema_version,
@@ -342,6 +356,7 @@ class PatchReviewService:
     def _review_summary_pr_comment_payload(
         actions_payload: dict[str, Any],
         quality_payload: dict[str, Any],
+        coverage_payload: dict[str, Any],
         *,
         summary_mode: str,
     ) -> dict[str, Any]:
@@ -353,6 +368,7 @@ class PatchReviewService:
             "",
             f"Attachability: `{quality_payload.get('attachable')}`",
             f"Summary mode: `{summary_mode}`",
+            f"Deterministic coverage: `{coverage_payload.get('covered_count', 0)}` covered / `{coverage_payload.get('unknown_manual_count', 0)}` unknown-manual",
         ]
         if violations:
             body_lines.extend(["", "Violations:"])
@@ -385,6 +401,7 @@ class PatchReviewService:
             "source_artifacts": [
                 "review_summary_quality.json",
                 "review_summary_actions.json",
+                "constraint_coverage.json",
             ],
             "signals": signals,
             "actionable_items": actionable_items,
@@ -398,6 +415,7 @@ class PatchReviewService:
         validation: dict[str, Any],
         actions_payload: dict[str, Any],
         quality_payload: dict[str, Any],
+        coverage_payload: dict[str, Any],
         *,
         summary_mode: str,
     ) -> dict[str, Any]:
@@ -426,6 +444,7 @@ class PatchReviewService:
             "source_artifacts": [
                 "constraints.json",
                 "validation.json",
+                "constraint_coverage.json",
                 "review_summary_quality.json",
                 "review_summary_actions.json",
             ],
@@ -434,16 +453,120 @@ class PatchReviewService:
                 "validation_results": len(validation.get("results", [])),
                 "action_traces": len(action_traces),
                 "quality_signals": len(quality_payload.get("signals", [])),
+                "coverage_categories": len(coverage_payload.get("categories", [])),
             },
             "action_traces": action_traces,
+            "coverage_status_counts": coverage_payload.get("validation_status_counts", {}),
             "claims_avoided": quality_payload.get("claims_avoided", []),
         }
+
+    @staticmethod
+    def _constraint_coverage_payload(constraints: dict[str, Any], validation: dict[str, Any]) -> dict[str, Any]:
+        constraint_items = list(constraints.get("constraints") or [])
+        results = list(validation.get("results") or [])
+        results_by_id = {str(item.get("constraint_id") or ""): item for item in results}
+        categories: dict[str, dict[str, Any]] = {
+            "generated_files": PatchReviewService._empty_coverage_category("generated_files", "Generated/protected artifact edits"),
+            "source_of_truth_owner_layer": PatchReviewService._empty_coverage_category("source_of_truth_owner_layer", "Source-of-truth, owner, or layer rules"),
+            "required_checks_tests": PatchReviewService._empty_coverage_category("required_checks_tests", "Required checks and test evidence"),
+            "dependency_versions": PatchReviewService._empty_coverage_category("dependency_versions", "Dependency versions and lockfiles"),
+            "docs_update_requirements": PatchReviewService._empty_coverage_category("docs_update_requirements", "Documentation update requirements"),
+            "unknown_manual": PatchReviewService._empty_coverage_category("unknown_manual", "Constraints requiring unknown/manual review handling"),
+        }
+        uncategorized = PatchReviewService._empty_coverage_category("uncategorized", "Other constraints")
+        for constraint in constraint_items:
+            result = results_by_id.get(str(constraint.get("id") or ""))
+            names = PatchReviewService._coverage_categories_for_constraint(constraint, result) or ["uncategorized"]
+            for name in names:
+                category = categories.get(name) or uncategorized
+                PatchReviewService._add_constraint_to_coverage_category(category, constraint, result)
+        status_counts = {
+            "satisfied": int(validation.get("satisfied") or 0),
+            "violated": int(validation.get("violated") or 0),
+            "unknown": int(validation.get("unknown") or 0),
+            "manual_review": int(validation.get("manual_review") or 0),
+        }
+        return {
+            "schema_version": PATCH_REVIEW_SCHEMA_VERSIONS["constraint_coverage.json"],
+            "source_artifacts": ["constraints.json", "validation.json"],
+            "total_constraints": int(validation.get("total_constraints") or len(constraint_items)),
+            "validation_status_counts": status_counts,
+            "covered_count": status_counts["satisfied"] + status_counts["violated"],
+            "unknown_manual_count": status_counts["unknown"] + status_counts["manual_review"],
+            "categories": [category for category in [*categories.values(), uncategorized] if category["total_constraints"] > 0],
+            "claims_avoided": [
+                "correctness_proof",
+                "test_or_human_review_replacement",
+                "unknown_manual_as_pass",
+            ],
+        }
+
+    @staticmethod
+    def _empty_coverage_category(name: str, description: str) -> dict[str, Any]:
+        return {
+            "name": name,
+            "description": description,
+            "total_constraints": 0,
+            "status_counts": {"satisfied": 0, "violated": 0, "unknown": 0, "manual_review": 0, "unvalidated": 0},
+            "constraint_ids": [],
+            "examples": [],
+        }
+
+    @staticmethod
+    def _coverage_categories_for_constraint(constraint: dict[str, Any], result: dict[str, Any] | None) -> list[str]:
+        ctype = str(constraint.get("type") or "").lower()
+        text = " ".join(
+            str(value or "")
+            for value in (
+                ctype,
+                constraint.get("instruction"),
+                constraint.get("source"),
+                constraint.get("evidence"),
+                " ".join(constraint.get("files") or []),
+            )
+        ).lower()
+        names: list[str] = []
+        if ctype in {"generated_file", "forbidden_edit"} or "generated" in text or "protected" in text:
+            names.append("generated_files")
+        if ctype == "source_of_truth" or any(token in text for token in ("source-of-truth", "source of truth", "owner", "owns", "layer", "delegate")):
+            names.append("source_of_truth_owner_layer")
+        if ctype == "verification" or any(token in text for token in ("test", "check", "regression", "coverage")):
+            names.append("required_checks_tests")
+        if ctype == "dependency_version" or "lockfile" in text or "dependency" in text or "version" in text:
+            names.append("dependency_versions")
+        if "doc" in text or "readme" in text or "changelog" in text:
+            names.append("docs_update_requirements")
+        if result and result.get("status") in {"unknown", "manual_review"}:
+            names.append("unknown_manual")
+        return list(dict.fromkeys(names))
+
+    @staticmethod
+    def _add_constraint_to_coverage_category(category: dict[str, Any], constraint: dict[str, Any], result: dict[str, Any] | None) -> None:
+        constraint_id = str(constraint.get("id") or "")
+        status = str((result or {}).get("status") or "unvalidated")
+        if status not in category["status_counts"]:
+            status = "unvalidated"
+        category["total_constraints"] += 1
+        category["status_counts"][status] += 1
+        if constraint_id:
+            category["constraint_ids"].append(constraint_id)
+        if len(category["examples"]) < 3:
+            category["examples"].append(
+                {
+                    "constraint_id": constraint_id,
+                    "status": status,
+                    "type": constraint.get("type"),
+                    "source": constraint.get("source"),
+                    "reason": (result or {}).get("reason"),
+                }
+            )
 
     @staticmethod
     def _review_summary_bot_bundle_payload(
         manifest_payload: dict[str, Any],
         quality_payload: dict[str, Any],
         actions_payload: dict[str, Any],
+        coverage_payload: dict[str, Any],
         pr_comment_payload: dict[str, Any],
         trace_payload: dict[str, Any],
         *,
@@ -458,15 +581,18 @@ class PatchReviewService:
                 "review_summary_actions.json",
                 "review_summary_pr_comment.json",
                 "review_summary_trace.json",
+                "constraint_coverage.json",
             ],
             "manifest": manifest_payload,
             "quality": quality_payload,
             "actions": actions_payload,
+            "coverage": coverage_payload,
             "pr_comment": pr_comment_payload,
             "trace": trace_payload,
             "advisory_decision": PatchReviewService._review_summary_advisory_decision_payload(
                 quality_payload,
                 actions_payload,
+                coverage_payload,
             ),
             "claims_avoided": quality_payload.get("claims_avoided", []),
         }
@@ -475,6 +601,7 @@ class PatchReviewService:
     def _review_summary_advisory_decision_payload(
         quality_payload: dict[str, Any],
         actions_payload: dict[str, Any],
+        coverage_payload: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
         signals = {str(item.get("code") or "") for item in quality_payload.get("signals", [])}
         unknown_triage_counts: dict[str, int] = {}
@@ -487,10 +614,14 @@ class PatchReviewService:
         violations = list(actions_payload.get("violations") or [])
         actionable_items = list(actions_payload.get("actionable_items") or [])
         has_violations = bool(violations) or quality_payload.get("violated_count", 0) > 0 or "violations_present" in signals
+        coverage_unknown_manual = int((coverage_payload or {}).get("unknown_manual_count") or 0)
+        coverage_covered = int((coverage_payload or {}).get("covered_count") or 0)
         has_manual_review = (
             quality_payload.get("unknown_count", 0) > 0
+            or quality_payload.get("manual_review_count", 0) > 0
             or "manual_review_required" in signals
             or bool(unknown_triage_codes)
+            or coverage_unknown_manual > 0
         )
         has_actionable_items = bool(actionable_items) or quality_payload.get("actionable_items_total_count", 0) > 0
         reason_codes = []
@@ -511,6 +642,10 @@ class PatchReviewService:
             "reason_codes": reason_codes,
             "unknown_triage_codes": unknown_triage_codes,
             "unknown_triage_counts": unknown_triage_counts,
+            "coverage_counts": {
+                "covered": coverage_covered,
+                "unknown_manual": coverage_unknown_manual,
+            },
             "semantics": "advisory_non_blocking_only",
             "claims_avoided": [
                 "safe_to_merge",
@@ -535,7 +670,7 @@ class PatchReviewService:
         constraint_items = list(constraints.get("constraints", []))
         results = list(validation.get("results", []))
         violations = [result for result in results if result.get("status") == "violated"]
-        unknowns = [result for result in results if result.get("status") == "unknown"]
+        unknowns = [result for result in results if result.get("status") in {"unknown", "manual_review"}]
         generated_or_lock = [
             result for result in results
             if "generated" in str(result.get("reason", "")).lower() or "lockfile" in str(result.get("reason", "")).lower()
@@ -644,6 +779,7 @@ class PatchReviewService:
             "satisfied_count": validation.get("satisfied", 0),
             "violated_count": validation.get("violated", 0),
             "unknown_count": validation.get("unknown", 0),
+            "manual_review_count": validation.get("manual_review", 0),
             "reasons": quality["reasons"],
             "signals": signals,
             "unknown_triage": unknown_triage,
@@ -936,7 +1072,9 @@ class PatchReviewService:
             "## Validation",
             f"- satisfied: {validation.get('satisfied', 0)}",
             f"- violated: {validation.get('violated', 0)}",
-            f"- unknown/manual review: {validation.get('unknown', 0)}",
+            f"- unknown/manual review: {validation.get('unknown', 0) + validation.get('manual_review', 0)}",
+            f"- unknown: {validation.get('unknown', 0)}",
+            f"- manual_review: {validation.get('manual_review', 0)}",
             "",
             "## Violations",
         ])

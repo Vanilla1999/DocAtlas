@@ -130,6 +130,7 @@ def test_mcp_exposes_get_project_context_with_trust_contract():
     assert tool["inputSchema"]["required"] == ["project_path", "question"]
     assert "mode" in tool["inputSchema"]["properties"]
     assert "libraries" in tool["inputSchema"]["properties"]
+    assert tool["inputSchema"]["properties"]["output_mode"]["enum"] == ["compact", "full", None]
     assert "details" in tool["inputSchema"]["properties"]
 
 

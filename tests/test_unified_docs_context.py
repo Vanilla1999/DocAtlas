@@ -44,10 +44,19 @@ class FakeFacade:
         self.get_docs_results: list[DocsResult] = []
         self.wrote_repo_files = False
         self.prefetched_dependency_docs = False
+        self.bootstrap_requires_confirmation = False
+        self.bootstrap_reason_code = "project_docs_ready"
 
     def bootstrap_project_docs(self, project_path, question=None):
         self.calls.append(("bootstrap_project_docs", {"project_path": project_path, "question": question}))
-        return type("Bootstrap", (), {"requires_confirmation": False, "warnings": [], "reason_code": "project_docs_ready"})()
+        return type("Bootstrap", (), {
+            "requires_confirmation": self.bootstrap_requires_confirmation,
+            "warnings": [],
+            "reason_code": self.bootstrap_reason_code,
+            "confirmation_reason": "network_fetch" if self.bootstrap_requires_confirmation else None,
+            "next_action": {"tool": "prefetch_project_dependency_docs"} if self.bootstrap_requires_confirmation else {},
+            "arguments_patch": {"allow_network": True} if self.bootstrap_requires_confirmation else {},
+        })()
 
     def get_project_context(self, project_path, question, **kwargs):
         self.calls.append(("get_project_context", {"project_path": project_path, "question": question, **kwargs}))
@@ -97,6 +106,12 @@ def test_auto_with_project_path_routes_to_project_context():
     result = _service(facade).get_docs_context("How docs work?", project_path="/repo", prepare_project_docs=False)
     assert result.mode_selected == "project"
     assert _call_names(facade) == ["get_project_context"]
+    assert facade.calls[0][1]["mode"] == "project-only"
+
+
+def test_auto_with_project_path_allows_network_only_when_explicit():
+    facade = FakeFacade()
+    _service(facade).get_docs_context("How does riverpod fit?", project_path="/repo", prepare_project_docs=False, allow_network=True)
     assert facade.calls[0][1]["mode"] == "auto"
 
 
@@ -154,6 +169,15 @@ def test_prepare_project_docs_does_not_fetch_dependency_docs():
     facade = FakeFacade()
     _service(facade).get_docs_context("Project?", project_path="/repo")
     assert facade.prefetched_dependency_docs is False
+
+
+def test_project_mode_ignores_dependency_prefetch_confirmation_from_bootstrap():
+    facade = FakeFacade()
+    facade.bootstrap_requires_confirmation = True
+    facade.bootstrap_reason_code = "dependency_docs_prefetch_required"
+    result = _service(facade).get_docs_context("Project architecture?", project_path="/repo", mode="project")
+    assert result.status == "success"
+    assert "get_project_context" in _call_names(facade)
 
 
 def test_prepare_project_docs_does_not_write_repo_files(tmp_path: Path):
@@ -497,7 +521,7 @@ def test_auto_project_path_delegates_to_project_context_auto():
     facade = FakeFacade()
     _service(facade).get_docs_context("How docs work?", project_path="/repo", prepare_project_docs=False)
     assert facade.calls[0][0] == "get_project_context"
-    assert facade.calls[0][1]["mode"] == "auto"
+    assert facade.calls[0][1]["mode"] == "project-only"
 
 
 def test_auto_project_question_selects_project():
@@ -506,10 +530,70 @@ def test_auto_project_question_selects_project():
     assert result.routing["reason_code"] == "project_context_auto"
 
 
+def test_patch_like_project_question_recommends_patch_constraints():
+    result = _service(FakeFacade()).get_docs_context(
+        "Implement a patch for the CLI and validate the diff",
+        project_path="/repo",
+        prepare_project_docs=False,
+    )
+    assert result.next_actions[0] == {
+        "type": "get_patch_constraints",
+        "tool": "get_patch_constraints",
+        "reason": "patch_like_project_task",
+        "arguments_patch": {"project_path": "/repo", "task": "Implement a patch for the CLI and validate the diff"},
+    }
+    assert result.routing["next_action_reason"] == "patch_like_project_task"
+
+
+def test_imperative_project_edit_tasks_recommend_patch_constraints():
+    questions = [
+        "Add CLI logging",
+        "Update README branding",
+        "Remove deprecated command",
+        "Rename the parser class",
+        "Create auth middleware",
+        "Delete stale migration",
+        "Migrate Flask routes to FastAPI",
+        "Upgrade the pydantic dependency",
+    ]
+
+    for question in questions:
+        result = _service(FakeFacade()).get_docs_context(question, project_path="/repo", prepare_project_docs=False)
+
+        assert result.next_actions[0]["tool"] == "get_patch_constraints"
+        assert result.next_actions[0]["arguments_patch"] == {"project_path": "/repo", "task": question}
+
+
+def test_non_patch_project_question_does_not_recommend_patch_constraints():
+    result = _service(FakeFacade()).get_docs_context("How docs work?", project_path="/repo", prepare_project_docs=False)
+    assert not any(action.get("tool") == "get_patch_constraints" for action in result.next_actions)
+
+
+def test_project_docs_questions_with_patch_term_prefixes_do_not_recommend_patch_constraints():
+    questions = [
+        "How do pytest fixtures work?",
+        "How is this different from Context7?",
+        "How do dependency fixtures interact with project docs?",
+        "How does update_or_create work?",
+        "Explain the dependency upgrade guide",
+        "Describe delete cascade documentation",
+    ]
+
+    for question in questions:
+        result = _service(FakeFacade()).get_docs_context(question, project_path="/repo", prepare_project_docs=False)
+        assert not any(action.get("tool") == "get_patch_constraints" for action in result.next_actions)
+
+
+def test_library_question_does_not_recommend_patch_constraints():
+    result = _service(FakeFacade()).get_docs_context("How do I patch a FastAPI dependency?", library="fastapi")
+    assert result.mode_selected == "library"
+    assert not any(isinstance(action, dict) and action.get("tool") == "get_patch_constraints" for action in result.next_actions)
+
+
 def test_auto_dependency_question_selects_dependency():
     facade = FakeFacade()
     facade.project_context = replace(facade.project_context, context_pack=[{"doc_scope": "dependency", "source_class": "dependency_doc", "dependency": "riverpod", "title": "autoDispose", "content": "dep"}])
-    result = _service(facade).get_docs_context("Riverpod autoDispose?", project_path="/repo", prepare_project_docs=False)
+    result = _service(facade).get_docs_context("Riverpod autoDispose?", project_path="/repo", prepare_project_docs=False, allow_network=True)
     assert result.mode_selected == "dependency"
     assert result.routing["dependency_detected"] is True
 
@@ -517,7 +601,7 @@ def test_auto_dependency_question_selects_dependency():
 def test_auto_project_and_dependency_evidence_selects_mixed():
     facade = FakeFacade()
     facade.project_context = replace(facade.project_context, context_pack=[*facade.project_context.context_pack, {"doc_scope": "dependency", "source_class": "dependency_doc", "dependency": "riverpod", "title": "autoDispose", "content": "dep"}])
-    result = _service(facade).get_docs_context("How project uses Riverpod?", project_path="/repo", prepare_project_docs=False)
+    result = _service(facade).get_docs_context("How project uses Riverpod?", project_path="/repo", prepare_project_docs=False, allow_network=True)
     assert result.mode_selected == "mixed"
     assert result.routing["evidence_scopes"] == ["dependency", "project"]
 
@@ -526,7 +610,7 @@ def test_auto_does_not_use_new_keyword_classifier():
     facade = FakeFacade()
     result = _service(facade).get_docs_context("Riverpod autoDispose keyword should not force dependency", project_path="/repo", prepare_project_docs=False)
     assert result.mode_selected == "project"
-    assert facade.calls[0][1]["mode"] == "auto"
+    assert facade.calls[0][1]["mode"] == "project-only"
 
 
 def test_explicit_project_mode_stays_project_only():

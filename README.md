@@ -2,7 +2,7 @@
 
 # DocAtlas
 
-**Local, offline-first context packs for coding agents — from your own repository docs.**
+**Project Patch Contract Runtime for coding agents — local, source-attributed constraints from your repository docs and dependency evidence.**
 
 [![License: MIT](https://img.shields.io/github/license/Vanilla1999/DocAtlas?style=for-the-badge)](https://github.com/Vanilla1999/DocAtlas/blob/main/LICENSE)
 [![Python 3.11 | 3.12 | 3.13](https://img.shields.io/badge/python-3.11%20|%203.12%20|%203.13-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://pypi.org/project/doc-atlas/)
@@ -13,7 +13,15 @@
 
 ---
 
-DocAtlas compresses documentation context so coding agents spend tokens on code, not rereading raw docs. It ingests local repository files, fetches public docs, indexes everything offline with SQLite FTS5, and returns compact context packs with source attribution.
+DocAtlas turns reviewable project docs, lockfiles/dependency docs, and local code evidence into source-attributed Patch Contracts for coding agents. The runtime keeps agents on the project-owned path before they edit, then provides deterministic advisory validation and PR artifacts after a patch.
+
+The first path for repository work is:
+
+```text
+get_docs_context → get_patch_constraints → edit → validate_patch_against_constraints → advisory PR artifacts
+```
+
+Patch Contract output is advisory and non-blocking: it highlights source-backed constraints, deterministic violations, and unknown/manual-review areas, but it does not prove a patch is safe to merge.
 
 ## Naming and compatibility
 
@@ -68,17 +76,19 @@ doc-atlas fetch <url> --output <dir>
 
 ## Project-docs MCP server
 
-DocAtlas exposes its documentation runtime through a Context7-style MCP server:
+DocAtlas exposes its local project-constraint and documentation runtime through an MCP docs server:
 
 ```bash
 doc-atlas mcp docs-serve
 ```
 
-Project-docs tools let agents work with the reviewable documentation files that belong to a repository:
+Project-docs tools let agents start from reviewable repository files, then move into a source-attributed Patch Contract before editing:
 
 | Tool | Purpose |
 |---|---|
-| `get_docs_context` | High-level Context7-style entry point for project, library, dependency, and mixed documentation context. Routes deterministically to the existing lane-specific tools. |
+| `get_docs_context` | Recommended first call. Returns project, library, dependency, or mixed documentation context and routes patch-like tasks toward `get_patch_constraints`. |
+| `get_patch_constraints` | Builds a compact, source-attributed Patch Contract for the requested coding change. |
+| `validate_patch_against_constraints` | Performs deterministic advisory checks after a patch and keeps semantic uncertainty as unknown/manual review. |
 | `sync_project_docs` | **Canonical lifecycle action.** Discovers, reconciles, prunes orphaned/stale, and indexes project docs in one call. Prefer over `ingest_project_docs`. |
 | `inspect_project_docs` | Read-only discovery: reports discovered candidates, indexed docs, stale/ignored/orphaned sources, reason_code, and next_action. |
 | `ingest_project_docs` | Legacy low-level index operation. Does not reconcile — use `sync_project_docs`. |
@@ -94,7 +104,7 @@ For most MCP clients and coding agents, start with the unified high-level tool:
 get_docs_context(question, project_path?, library?, mode="auto")
 ```
 
-DocAtlas now provides one high-level MCP entry point for project, library, dependency, and mixed documentation context. It does not replace the lane-specific tools, and it does not fetch missing docs automatically unless the caller explicitly allows network work.
+DocAtlas provides one high-level MCP entry point for project, library, dependency, and mixed documentation context. For patch-like tasks, follow its next action to `get_patch_constraints`, make the code change, then call `validate_patch_against_constraints` and attach the non-blocking review artifacts. It does not replace the lane-specific tools, and it does not fetch missing docs automatically unless the caller explicitly allows network work.
 
 For coding/API/command questions, tools accept `response_style` with `auto`, `snippet-first`, or `evidence-first`. In `auto`, DocAtlas returns a trusted `primary_snippet` first when the selected sources contain a usable code/config/command example, while preserving `context_pack`, source attribution, exact-version diagnostics, and the Trust Contract. Snippets are extracted from indexed documentation; DocAtlas does not synthesize code.
 
@@ -112,6 +122,8 @@ Advanced users can still call lane-specific tools directly.
 sync_project_docs(project_path, with_vectors=true)     # discover + reconcile + index
 get_project_context(project_path, question)             # compact grounded context
 ```
+
+MCP Packs are an advanced layer for version-pinned API action tools. They are useful when an agent needs executable API operations, but the default repository workflow is the Patch Contract Runtime above.
 
 For safe high-level onboarding:
 

@@ -96,10 +96,12 @@ class PatchConstraintValidationService:
         satisfied = sum(1 for result in results if result.status == "satisfied")
         violated = sum(1 for result in results if result.status == "violated")
         unknown = sum(1 for result in results if result.status == "unknown")
-        if strict and unknown:
-            warnings.append("strict mode: unresolved unknown constraints require manual review")
+        manual_review = sum(1 for result in results if result.status == "manual_review")
+        unresolved = unknown + manual_review
+        if strict and unresolved:
+            warnings.append("strict mode: unresolved unknown/manual_review constraints require manual review")
 
-        confidence = self._packet_confidence(total=len(normalized), satisfied=satisfied, violated=violated, unknown=unknown)
+        confidence = self._packet_confidence(total=len(normalized), satisfied=satisfied, violated=violated, unknown=unknown, manual_review=manual_review)
         return PatchConstraintValidationPacket(
             task=task,
             project_path=project_path,
@@ -107,6 +109,7 @@ class PatchConstraintValidationService:
             satisfied=satisfied,
             violated=violated,
             unknown=unknown,
+            manual_review=manual_review,
             results=results,
             warnings=warnings,
             confidence=confidence,
@@ -162,6 +165,16 @@ class PatchConstraintValidationService:
         if constraint.type == "verification":
             return self._result(constraint, "unknown", "verification constraint requires explicit test evidence", [], evidence=constraint.evidence)
 
+        if self._requires_manual_review(constraint, text):
+            return self._result(
+                constraint,
+                "manual_review",
+                "semantic constraint is not mechanically decidable from changed files or diff",
+                [],
+                evidence=constraint.evidence,
+                remediation="Review the patch against the cited source before treating this constraint as satisfied.",
+            )
+
         if changed_files:
             return self._result(constraint, "unknown", "constraint not deterministically checkable from changed files", [], evidence=constraint.evidence)
         return self._result(constraint, "unknown", "changed files or diff unavailable", [], evidence=constraint.evidence)
@@ -198,6 +211,8 @@ class PatchConstraintValidationService:
             evidence=str(raw.get("evidence") or ""),
             symbols=list(raw.get("symbols") or []),
             files=list(raw.get("files") or []),
+            source_refs=list(raw.get("source_refs") or []),
+            evidence_snippets=list(raw.get("evidence_snippets") or []),
         )
 
     def _normalize_changed_files(self, changed_files: list[str] | None, patch_diff: str | None) -> list[str]:
@@ -252,6 +267,12 @@ class PatchConstraintValidationService:
     @staticmethod
     def _is_lockfile_constraint(constraint: PatchConstraint, text: str) -> bool:
         return "lockfile" in text or any(lock.lower() in text for lock in LOCKFILES) or (constraint.type == "dependency_version" and "do not change" in text)
+
+    @staticmethod
+    def _requires_manual_review(constraint: PatchConstraint, text: str) -> bool:
+        if constraint.type in {"architecture", "behavior", "semantic", "manual_review"}:
+            return True
+        return any(phrase in text for phrase in ("manual review", "review manually", "designer", "stakeholder", "product decision", "semantic correctness"))
 
     @staticmethod
     def _lockfile_change_allowed(text: str, task: str | None) -> bool:
@@ -358,20 +379,35 @@ class PatchConstraintValidationService:
         return "\n".join(lines[:3]) or None
 
     @staticmethod
-    def _result(constraint: PatchConstraint, status: str, reason: str, files: list[str], *, evidence: str | None) -> PatchConstraintValidationResult:
+    def _result(constraint: PatchConstraint, status: str, reason: str, files: list[str], *, evidence: str | None, remediation: str | None = None) -> PatchConstraintValidationResult:
         return PatchConstraintValidationResult(
             constraint_id=constraint.id,
             status=status,
             reason=reason,
             files=files,
             evidence=evidence,
+            constraint_type=constraint.type,
+            source_refs=constraint.source_refs,
+            remediation=remediation or PatchConstraintValidationService._remediation_for_status(status, constraint),
         )
 
     @staticmethod
-    def _packet_confidence(*, total: int, satisfied: int, violated: int, unknown: int) -> str:
+    def _remediation_for_status(status: str, constraint: PatchConstraint) -> str | None:
+        if status == "violated":
+            if constraint.type == "generated_file":
+                return "Revert hand edits to generated files and regenerate them from source-of-truth inputs if needed."
+            if constraint.type == "source_of_truth":
+                return "Move policy/ownership logic into the cited source-of-truth layer or document why manual review accepts the exception."
+            return "Change the patch to comply with the cited constraint or document an explicit exception for review."
+        if status in {"unknown", "manual_review"}:
+            return "Provide decisive diff/test/source evidence before treating this constraint as satisfied."
+        return None
+
+    @staticmethod
+    def _packet_confidence(*, total: int, satisfied: int, violated: int, unknown: int, manual_review: int = 0) -> str:
         if total == 0:
             return "low"
-        if unknown == 0:
+        if unknown == 0 and manual_review == 0:
             return "high"
         if satisfied or violated:
             return "medium"
