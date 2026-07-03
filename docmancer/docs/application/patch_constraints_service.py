@@ -543,7 +543,7 @@ class PatchConstraintsService:
             return []
         examples: list[str] = []
         patterns = (
-            "eval/task_level/results/**", ".docatlas/**", ".docmancer/**", "**/patch-review/**", "**/patch_review/**",
+            "eval/task_level/results/**/*", ".docatlas/**/*", ".docmancer/**/*", "**/patch-review/**/*", "**/patch_review/**/*",
             "**/generated/**", "**/dist/**", "**/coverage/**", "**/*.g.dart", "**/*.freezed.dart", "**/*.pb.go",
             "**/*.pb.dart", "**/*.generated.*", "**/*_generated.py",
         )
