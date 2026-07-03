@@ -174,7 +174,7 @@ def test_setup_yes_offline_project_local_prints_readiness_summary():
         assert Path("docmancer.yaml").exists()
         assert "Ready now" in result.output
         assert "Next best command" in result.output
-        assert "docmancer ingest ./docs" in result.output
+        assert "doc-atlas ingest ./docs" in result.output
 
 
 def test_setup_mcp_docs_prints_docs_server_command():
@@ -189,4 +189,4 @@ def test_setup_mcp_docs_prints_docs_server_command():
             result = runner.invoke(cli, ["setup", "--profile", "mcp-docs", "--yes"])
 
         assert result.exit_code == 0, result.output
-        assert "docmancer mcp docs-serve" in result.output
+        assert "doc-atlas mcp docs-serve" in result.output

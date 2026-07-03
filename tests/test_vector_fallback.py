@@ -12,7 +12,7 @@ from docmancer.core.models import Document
 def test_missing_openai_key_falls_back_to_fts5(tmp_path, monkeypatch, caplog):
     """Configuring openai embeddings without OPENAI_API_KEY must not abort ingest.
 
-    Bare ``docmancer ingest`` should still index FTS5; the vector path is
+    Bare ``doc-atlas ingest`` should still index FTS5; the vector path is
     skipped with a clear log line so the user knows what happened.
     """
     monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))

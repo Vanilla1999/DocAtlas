@@ -1,4 +1,4 @@
-"""docmancer mcp doctor: health check the local MCP setup."""
+"""doc-atlas mcp doctor: health check the local MCP setup."""
 from __future__ import annotations
 
 import hashlib
@@ -22,11 +22,11 @@ RAW_TOOL_COUNT_THRESHOLD = 100
 def run() -> list[CheckResult]:
     results: list[CheckResult] = []
 
-    docmancer_path = shutil.which("docmancer")
+    cli_path = shutil.which("doc-atlas") or shutil.which("docmancer")
     results.append(CheckResult(
-        "docmancer on PATH",
-        bool(docmancer_path),
-        docmancer_path or "docmancer not found on PATH",
+        "doc-atlas on PATH",
+        bool(cli_path),
+        cli_path or "doc-atlas not found on PATH",
     ))
 
     try:

@@ -32,7 +32,7 @@ from docmancer.cli.qdrant_commands import qdrant_group
 def _show_version(ctx: click.Context, param: click.Parameter, value: bool) -> None:
     if not value or ctx.resilient_parsing:
         return
-    click.echo(f"docmancer {__version__}")
+    click.echo(f"doc-atlas {__version__}")
     ctx.exit()
 
 
@@ -40,13 +40,13 @@ def _show_version(ctx: click.Context, param: click.Parameter, value: bool) -> No
     cls=DocmancerGroup,
     context_settings=HELP_CONTEXT_SETTINGS,
     epilog=format_examples(
-        "docmancer setup",
-        "docmancer ingest ./docs",
-        "docmancer add https://docs.example.com",
-        "docmancer update",
-        'docmancer query "How do I authenticate?"',
-        "docmancer install claude-code",
-        "docmancer install github-copilot --project",
+        "doc-atlas setup",
+        "doc-atlas ingest ./docs",
+        "doc-atlas add https://docs.example.com",
+        "doc-atlas update",
+        'doc-atlas query "How do I authenticate?"',
+        "doc-atlas install claude-code",
+        "doc-atlas install github-copilot --project",
     ),
 )
 @click.option(

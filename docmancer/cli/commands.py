@@ -249,16 +249,16 @@ def _operational_source_card(row: dict) -> dict:
     elif vector_rows:
         vectors = "drift"
     status = "ready"
-    next_action = f"docmancer query \"question about {row.get('source', 'docs')}\""
+    next_action = f"doc-atlas query \"question about {row.get('source', 'docs')}\""
     if failures:
         status = "failed"
-        next_action = f"docmancer update {row.get('source', '')}".strip()
+        next_action = f"doc-atlas update {row.get('source', '')}".strip()
     elif stale or vectors == "drift" or empty or sparse:
         status = "degraded"
-        next_action = f"docmancer update {row.get('source', '')}".strip()
+        next_action = f"doc-atlas update {row.get('source', '')}".strip()
     elif sections == 0:
         status = "failed"
-        next_action = f"docmancer remove {row.get('source', '')}".strip()
+        next_action = f"doc-atlas remove {row.get('source', '')}".strip()
     return {
         "source": row.get("source") or "unknown",
         "type": row.get("type") or "unknown",
@@ -310,7 +310,7 @@ def _collect_doctor_report(config, config_path: str | None, *, profile: str = "c
         add_check("config", "ok", f"Config exists at {effective_config}")
     else:
         add_check("config", "failed", f"Config missing at {effective_config}")
-        issues.append(_doctor_issue("CONFIG_MISSING", "config", "BLOCKER", "Docmancer has no config to load paths and retrieval defaults.", "docmancer setup --yes", "docmancer.yaml exists and doctor can read it.", auto_fix=True))
+        issues.append(_doctor_issue("CONFIG_MISSING", "config", "BLOCKER", "Docmancer has no config to load paths and retrieval defaults.", "doc-atlas setup --yes", "docmancer.yaml exists and doctor can read it.", auto_fix=True))
 
     db_path = Path(config.index.db_path)
     add_check("storage", "ok" if db_path.parent.exists() else "failed", f"Index path: {db_path}")
@@ -322,7 +322,7 @@ def _collect_doctor_report(config, config_path: str | None, *, profile: str = "c
         add_check("sqlite", "ok", "SQLite FTS5 is available")
     except Exception as exc:  # noqa: BLE001
         add_check("sqlite", "failed", str(exc))
-        issues.append(_doctor_issue("SQLITE_FTS5_MISSING", "sqlite", "BLOCKER", "Lexical search cannot work without SQLite FTS5.", "Use a Python build with SQLite FTS5, then rerun docmancer setup --yes", "doctor shows SQLite FTS5 available."))
+        issues.append(_doctor_issue("SQLITE_FTS5_MISSING", "sqlite", "BLOCKER", "Lexical search cannot work without SQLite FTS5.", "Use a Python build with SQLite FTS5, then rerun doc-atlas setup --yes", "doctor shows SQLite FTS5 available."))
 
     stats = {"sources_count": 0, "sections_count": 0, "extracted_dir": str(getattr(config.index, "extracted_dir", ""))}
     try:
@@ -332,10 +332,10 @@ def _collect_doctor_report(config, config_path: str | None, *, profile: str = "c
         sections = int(stats.get("sections_count", 0) or 0)
         add_check("sources", "ok" if sources else "empty", f"{sources} source(s), {sections} section(s)")
         if sources == 0:
-            issues.append(_doctor_issue("NO_SOURCES", "sources", "BLOCKER" if profile == "cli-docs" else "DEGRADED", "Queries have no documentation context to return.", "docmancer ingest ./docs", "docmancer list shows at least one ready source."))
+            issues.append(_doctor_issue("NO_SOURCES", "sources", "BLOCKER" if profile == "cli-docs" else "DEGRADED", "Queries have no documentation context to return.", "doc-atlas ingest ./docs", "doc-atlas list shows at least one ready source."))
     except Exception as exc:  # noqa: BLE001
         add_check("storage", "failed", str(exc))
-        issues.append(_doctor_issue("INDEX_OPEN_FAILED", "storage", "BLOCKER", "The local index cannot be opened.", "docmancer setup --yes", "doctor can read collection stats."))
+        issues.append(_doctor_issue("INDEX_OPEN_FAILED", "storage", "BLOCKER", "The local index cannot be opened.", "doc-atlas setup --yes", "doctor can read collection stats."))
 
     for label, available, hint in _loader_availability():
         add_check("extraction", "ok" if available else "missing", f"{label}: {'available' if available else hint}")
@@ -353,14 +353,14 @@ def _collect_doctor_report(config, config_path: str | None, *, profile: str = "c
             qdrant_status = QdrantManager().status()
             add_check("qdrant", "ok" if qdrant_status.get("alive") else "missing", "qdrant running" if qdrant_status.get("alive") else "qdrant not running")
             if not qdrant_status.get("alive"):
-                issues.append(_doctor_issue("QDRANT_NOT_RUNNING", "qdrant", "DEGRADED", "Hybrid/vector retrieval falls back or fails depending on --allow-degraded.", "docmancer qdrant up", "doctor shows qdrant running.", auto_fix=True))
+                issues.append(_doctor_issue("QDRANT_NOT_RUNNING", "qdrant", "DEGRADED", "Hybrid/vector retrieval falls back or fails depending on --allow-degraded.", "doc-atlas qdrant up", "doctor shows qdrant running.", auto_fix=True))
         except Exception as exc:  # noqa: BLE001
             add_check("qdrant", "failed", str(exc))
 
     installed_agents = _agent_installed_targets()
     add_check("agent", "ok" if installed_agents else "missing", f"installed: {', '.join(installed_agents) if installed_agents else 'none'}")
     if profile == "agent" and not installed_agents:
-        issues.append(_doctor_issue("AGENT_NOT_INSTALLED", "agent", "BLOCKER", "The selected agent path cannot see Docmancer instructions.", "docmancer install codex", "doctor shows at least one installed agent integration.", restart_required=True, auto_fix=True))
+        issues.append(_doctor_issue("AGENT_NOT_INSTALLED", "agent", "BLOCKER", "The selected agent path cannot see Docmancer instructions.", "doc-atlas install codex", "doctor shows at least one installed agent integration.", restart_required=True, auto_fix=True))
 
     severity_rank = {name: i for i, name in enumerate(DOCTOR_SEVERITIES)}
     worst = min((severity_rank.get(issue["severity"], 99) for issue in issues), default=severity_rank["INFO"])
@@ -377,7 +377,7 @@ def _collect_doctor_report(config, config_path: str | None, *, profile: str = "c
 
 
 def _emit_doctor_report(report: dict) -> None:
-    _emit_brand_header("docmancer doctor", "What prevents docs context in the selected path?")
+    _emit_brand_header("doc-atlas doctor", "What prevents docs context in the selected path?")
     click.echo(_style("  Selected path", fg="white", bold=True))
     _emit_status_line(f"profile: {report['profile']}")
     _emit_status_line(f"retrieval: {report['retrieval_mode']}")
@@ -625,7 +625,7 @@ def _emit_install_summary(
     next_step: str,
     extra_lines: list[str] | None = None,
 ) -> None:
-    _emit_brand_header("docmancer install", heading)
+    _emit_brand_header("doc-atlas install", heading)
     for label, path in installed_paths:
         _emit_status_line(f"{label}: {display_path(path)}")
     if created_user_config:
@@ -716,7 +716,7 @@ def _install_or_append_agents_md(dest: Path, content_body: str) -> None:
 
 
 def _register_mcp_for_agent(agent_name: str) -> None:
-    """Register `docmancer mcp serve` into a known agent's MCP config (best-effort)."""
+    """Register `doc-atlas mcp serve` into a known agent's MCP config (best-effort)."""
     try:
         from docmancer.cli.mcp_commands import register_docmancer_mcp_in_agent
     except Exception:
@@ -749,8 +749,8 @@ def _install_vscode_copilot_settings(dest: Path) -> None:
     context_settings={**HELP_CONTEXT_SETTINGS, "allow_extra_args": True},
     short_help="Create a project-local config file.",
     epilog=format_examples(
-        "docmancer init",
-        "docmancer init --dir ./sandbox",
+        "doc-atlas init",
+        "doc-atlas init --dir ./sandbox",
     ),
 )
 @click.option("--dir", "directory", default=None, help="Target directory for the config file.")
@@ -780,9 +780,9 @@ def init_cmd(directory: str | None):
     context_settings=HELP_CONTEXT_SETTINGS,
     short_help="Add URL docs to the local SQLite index.",
     epilog=format_examples(
-        "docmancer add https://docs.example.com",
-        "docmancer add https://github.com/owner/repo",
-        "docmancer add https://docs.example.com --max-pages 200",
+        "doc-atlas add https://docs.example.com",
+        "doc-atlas add https://github.com/owner/repo",
+        "doc-atlas add https://docs.example.com --max-pages 200",
     ),
 )
 @click.argument("path")
@@ -831,14 +831,14 @@ def add_cmd(
             )
         else:
             warnings.warn(
-                "docmancer add for local files is deprecated. Use docmancer ingest <path>. "
+                "doc-atlas add for local files is deprecated. Use doc-atlas ingest <path>. "
                 "The compatibility path will be removed after the 0.4.x line.",
                 DeprecationWarning,
                 stacklevel=2,
             )
             click.echo(
-                "Warning: local paths now belong to `docmancer ingest`. "
-                "`docmancer add ./path` still works during the 0.4.x compatibility window.",
+                "Warning: local paths now belong to `doc-atlas ingest`. "
+                "`doc-atlas add ./path` still works during the 0.4.x compatibility window.",
                 err=True,
             )
             total = agent.add(path, recreate=recreate)
@@ -856,9 +856,9 @@ def add_cmd(
     context_settings=HELP_CONTEXT_SETTINGS,
     short_help="Refresh all or specific indexed docs sources.",
     epilog=format_examples(
-        "docmancer update",
-        "docmancer update https://docs.example.com",
-        "docmancer update ./docs",
+        "doc-atlas update",
+        "doc-atlas update https://docs.example.com",
+        "doc-atlas update ./docs",
     ),
 )
 @click.argument("source", required=False, default=None)
@@ -886,7 +886,7 @@ def update_cmd(
 
     sources = agent.list_sources_with_dates()
     if not sources:
-        click.echo("No indexed sources to update. Run 'docmancer add <url-or-path>' first.")
+        click.echo("No indexed sources to update. Run 'doc-atlas add <url-or-path>' first.")
         return
 
     if source:
@@ -908,7 +908,7 @@ def update_cmd(
                     matching = [{"source": row["source"]} for row in rows]
             if not matching:
                 click.echo(f"Source not found in index: {source}")
-                click.echo("Run 'docmancer list' to see indexed sources.")
+                click.echo("Run 'doc-atlas list' to see indexed sources.")
                 sys.exit(1)
         targets = matching
     else:
@@ -947,10 +947,10 @@ def update_cmd(
     context_settings=HELP_CONTEXT_SETTINGS,
     short_help="Index local files into the SQLite index.",
     epilog=format_examples(
-        "docmancer ingest ./docs",
-        "docmancer ingest ./README.md",
-        "docmancer ingest ./docs --format md --format pdf",
-        "docmancer ingest ./docs --include 'guides/**' --exclude '**/draft*'",
+        "doc-atlas ingest ./docs",
+        "doc-atlas ingest ./README.md",
+        "doc-atlas ingest ./docs --format md --format pdf",
+        "doc-atlas ingest ./docs --include 'guides/**' --exclude '**/draft*'",
     ),
 )
 @click.argument("path")
@@ -981,7 +981,7 @@ def ingest_cmd(
 ):
     """Index local files or directories."""
     if path.startswith(("http://", "https://")):
-        raise click.ClickException("Use `docmancer add` for URLs.")
+        raise click.ClickException("Use `doc-atlas add` for URLs.")
 
     config_path = _effective_config(config_path)
     _configure_ingest_logging()
@@ -1048,8 +1048,8 @@ def _drop_vector_collection(config, agent) -> None:
     context_settings=HELP_CONTEXT_SETTINGS,
     short_help="Download docs to Markdown files.",
     epilog=format_examples(
-        "docmancer fetch https://docs.example.com",
-        "docmancer fetch https://docs.example.com --output ./downloaded-docs",
+        "doc-atlas fetch https://docs.example.com",
+        "doc-atlas fetch https://docs.example.com --output ./downloaded-docs",
     ),
 )
 @click.argument("url")
@@ -1092,9 +1092,9 @@ def fetch_cmd(url: str, output_dir: str):
     context_settings=HELP_CONTEXT_SETTINGS,
     short_help="Stream-ingest a USPTO trademark XML / ZIP bulk file.",
     epilog=format_examples(
-        "docmancer ingest-uspto apc18840407-20240102-xx.xml",
-        "docmancer ingest-uspto bulk-trademarks-2024.zip --include-dead",
-        "docmancer ingest-uspto daily.xml.gz --no-vectors --batch-size 5000",
+        "doc-atlas ingest-uspto apc18840407-20240102-xx.xml",
+        "doc-atlas ingest-uspto bulk-trademarks-2024.zip --include-dead",
+        "doc-atlas ingest-uspto daily.xml.gz --no-vectors --batch-size 5000",
     ),
 )
 @click.argument("path", type=click.Path(exists=True, dir_okay=False, readable=True))
@@ -1175,10 +1175,10 @@ def ingest_uspto_cmd(
     context_settings=HELP_CONTEXT_SETTINGS,
     short_help="Show collection stats.",
     epilog=format_examples(
-        "docmancer inspect",
-        "docmancer inspect pytest --vectors",
-        "docmancer inspect pytest --json",
-        "docmancer inspect --config ./docmancer.yaml",
+        "doc-atlas inspect",
+        "doc-atlas inspect pytest --vectors",
+        "doc-atlas inspect pytest --json",
+        "doc-atlas inspect --config ./docmancer.yaml",
     ),
 )
 @click.argument("source", required=False)
@@ -1249,12 +1249,12 @@ def inspect_cmd(source: str | None, show_failed: bool, show_vectors: bool, show_
     context_settings=HELP_CONTEXT_SETTINGS,
     short_help="Diagnose docs-context readiness.",
     epilog=format_examples(
-        "docmancer doctor",
-        "docmancer doctor --profile agent",
-        "docmancer doctor --json",
-        "docmancer doctor --list-checks",
-        "docmancer doctor --check sources",
-        "docmancer doctor --config ./docmancer.yaml",
+        "doc-atlas doctor",
+        "doc-atlas doctor --profile agent",
+        "doc-atlas doctor --json",
+        "doc-atlas doctor --list-checks",
+        "doc-atlas doctor --check sources",
+        "doc-atlas doctor --config ./docmancer.yaml",
     ),
 )
 @click.option("--config", "config_path", default=None, help="Path to docmancer.yaml.")
@@ -1287,11 +1287,11 @@ def doctor_cmd(config_path: str | None, profile: str, json_output: bool, list_ch
     context_settings={**HELP_CONTEXT_SETTINGS, "allow_extra_args": True},
     short_help="Search indexed docs.",
     epilog=format_examples(
-        'docmancer query "How do I authenticate?"',
-        'docmancer query "getting started" --limit 3',
-        'docmancer query "season 5 end date" --expand',
-        'docmancer query "season 5 end date" --expand page',
-        'docmancer query "auth" --format json',
+        'doc-atlas query "How do I authenticate?"',
+        'doc-atlas query "getting started" --limit 3',
+        'doc-atlas query "season 5 end date" --expand',
+        'doc-atlas query "season 5 end date" --expand page',
+        'doc-atlas query "auth" --format json',
     ),
 )
 @click.argument("text")
@@ -1525,8 +1525,8 @@ def _format_context_explain(result) -> str:
     cls=DocmancerCommand,
     context_settings=HELP_CONTEXT_SETTINGS,
     epilog=format_examples(
-        'docmancer patch-review --project-path . --task "Review current patch"',
-        'docmancer patch-review --project-path . --task "Add menu action" --base-ref main --strict',
+        'doc-atlas patch-review --project-path . --task "Review current patch"',
+        'doc-atlas patch-review --project-path . --task "Add menu action" --base-ref main --strict',
     ),
 )
 @click.option("--project-path", required=True, type=click.Path(file_okay=False, path_type=Path), help="Local project repository path to review.")
@@ -1583,9 +1583,9 @@ def patch_review_cmd(
     context_settings=HELP_CONTEXT_SETTINGS,
     short_help="Return repo-grounded context with a Trust Contract.",
     epilog=format_examples(
-        'docmancer context . "How should I test go_router changes?"',
-        'docmancer context . "How should I test go_router changes?" --library go_router --format json',
-        'docmancer context . "Architecture rules" --explain',
+        'doc-atlas context . "How should I test go_router changes?"',
+        'doc-atlas context . "How should I test go_router changes?" --library go_router --format json',
+        'doc-atlas context . "Architecture rules" --explain',
     ),
 )
 @click.argument("project_path", type=click.Path(exists=True, file_okay=False, path_type=str))
@@ -1668,9 +1668,9 @@ def context_cmd(
     context_settings=HELP_CONTEXT_SETTINGS,
     short_help="Run retrieval quality evals.",
     epilog=format_examples(
-        "docmancer eval golden.yaml",
-        "docmancer eval golden.json --format json",
-        "docmancer eval golden.yaml --source-health",
+        "doc-atlas eval golden.yaml",
+        "doc-atlas eval golden.json --format json",
+        "doc-atlas eval golden.yaml --source-health",
     ),
 )
 @click.argument("dataset", type=click.Path(exists=True, dir_okay=False, path_type=str))
@@ -1727,10 +1727,10 @@ def eval_cmd(
     context_settings=HELP_CONTEXT_SETTINGS,
     short_help="Remove an indexed source.",
     epilog=format_examples(
-        "docmancer remove --all",
-        "docmancer remove https://docs.example.com",
-        "docmancer remove https://docs.example.com/page",
-        "docmancer remove ./docs/getting-started.md",
+        "doc-atlas remove --all",
+        "doc-atlas remove https://docs.example.com",
+        "doc-atlas remove https://docs.example.com/page",
+        "doc-atlas remove ./docs/getting-started.md",
     ),
 )
 @click.argument("source", required=False)
@@ -1799,11 +1799,11 @@ def _format_size(n: int) -> str:
     context_settings=HELP_CONTEXT_SETTINGS,
     short_help="Remove all docmancer state from this machine.",
     epilog=format_examples(
-        "docmancer clear",
-        "docmancer clear --yes",
-        "docmancer clear --dry-run",
-        "docmancer clear --keep-config",
-        "docmancer clear --keep-models",
+        "doc-atlas clear",
+        "doc-atlas clear --yes",
+        "doc-atlas clear --dry-run",
+        "doc-atlas clear --keep-config",
+        "doc-atlas clear --keep-models",
     ),
 )
 @click.option("--yes", "-y", "assume_yes", is_flag=True, help="Skip the confirmation prompt.")
@@ -1909,12 +1909,12 @@ def clear_cmd(assume_yes: bool, dry_run: bool, keep_config: bool, keep_models: b
     context_settings=HELP_CONTEXT_SETTINGS,
     short_help="List indexed documentation sources.",
     epilog=format_examples(
-        "docmancer list",
-        "docmancer list --all",
-        "docmancer list --stale",
-        "docmancer list --vectors=drift",
-        "docmancer list --format json",
-        "docmancer list --config ./docmancer.yaml",
+        "doc-atlas list",
+        "doc-atlas list --all",
+        "doc-atlas list --stale",
+        "doc-atlas list --vectors=drift",
+        "doc-atlas list --format json",
+        "doc-atlas list --config ./docmancer.yaml",
     ),
 )
 @click.option("--all", "show_all", is_flag=True, default=False, help="Show every stored page/file source.")
@@ -1958,15 +1958,15 @@ def list_cmd(show_all: bool, stale: bool, failed: bool, vectors: str | None, out
     context_settings=HELP_CONTEXT_SETTINGS,
     short_help="Install docmancer skills into an AI agent.",
     epilog=format_examples(
-        "docmancer install claude-code",
-        "docmancer install codex",
-        "docmancer install claude-code --project",
-        "docmancer install cursor",
-        "docmancer install claude-desktop",
-        "docmancer install gemini",
-        "docmancer install github-copilot --project",
-        "docmancer install opencode",
-        "docmancer install cline",
+        "doc-atlas install claude-code",
+        "doc-atlas install codex",
+        "doc-atlas install claude-code --project",
+        "doc-atlas install cursor",
+        "doc-atlas install claude-desktop",
+        "doc-atlas install gemini",
+        "doc-atlas install github-copilot --project",
+        "doc-atlas install opencode",
+        "doc-atlas install cline",
     ),
 )
 @click.argument("agent", type=click.Choice(INSTALL_TARGETS, case_sensitive=False))
@@ -1977,7 +1977,7 @@ def install_cmd(agent: str, project: bool, config_path: str | None):
     """Install docmancer skill files into an AI agent.
 
     Teaches the agent to call docmancer CLI commands directly. Also registers
-    the local `docmancer mcp serve` entry into the agent's MCP config so any
+    the local `doc-atlas mcp serve` entry into the agent's MCP config so any
     installed API packs are immediately available.
 
     AGENT must be one of: claude-code, claude-desktop, cline, cursor, codex,
@@ -2044,7 +2044,7 @@ def install_cmd(agent: str, project: bool, config_path: str | None):
             ],
             created_user_config,
             effective_config_path,
-            'Run `docmancer query "your question"` to verify retrieval from the CLI.',
+            'Run `doc-atlas query "your question"` to verify retrieval from the CLI.',
             extra_lines=["Codex will automatically use docmancer commands."],
         )
         return
@@ -2125,7 +2125,7 @@ def install_cmd(agent: str, project: bool, config_path: str | None):
                 effective_config_path,
                 "Start a new Copilot CLI session for the instructions to take effect.",
                 extra_lines=[
-                    "For Copilot in VS Code, Xcode, JetBrains, or GitHub.com, run `docmancer install github-copilot --project` inside each repository.",
+                    "For Copilot in VS Code, Xcode, JetBrains, or GitHub.com, run `doc-atlas install github-copilot --project` inside each repository.",
                 ],
             )
         return
@@ -2150,7 +2150,7 @@ def install_cmd(agent: str, project: bool, config_path: str | None):
             installed_paths,
             created_user_config,
             effective_config_path,
-            'Run `docmancer query "your question"` or restart Gemini if it does not pick up the skill immediately.',
+            'Run `doc-atlas query "your question"` or restart Gemini if it does not pick up the skill immediately.',
             extra_lines=["Gemini CLI will automatically use docmancer commands."],
         )
         return
@@ -2172,7 +2172,7 @@ def install_cmd(agent: str, project: bool, config_path: str | None):
             installed_paths,
             created_user_config,
             effective_config_path,
-            'Run `docmancer query "your question"` to verify retrieval from the CLI.',
+            'Run `doc-atlas query "your question"` to verify retrieval from the CLI.',
             extra_lines=["OpenCode will automatically use docmancer commands."],
         )
         return
@@ -2242,15 +2242,15 @@ def _emit_setup_readiness_summary(config, *, selected_agents: list[str], profile
     click.echo(f"  CLI query ............. {'yes' if sources else 'after ingest'}")
     click.echo(f"  Local hybrid .......... {'ready' if mode == 'hybrid' else 'off'}")
     click.echo(f"  Coding agent .......... {'installed' if installed_agents else 'not installed'}")
-    click.echo(f"  MCP docs server ....... {'run docmancer mcp docs-serve' if profile == 'mcp-docs' else 'not configured'}")
+    click.echo(f"  MCP docs server ....... {'run doc-atlas mcp docs-serve' if profile == 'mcp-docs' else 'not configured'}")
     click.echo()
     click.echo(_style("Next best command", fg="white", bold=True))
     if sources:
-        click.echo('  docmancer query "How do I authenticate?"')
+        click.echo('  doc-atlas query "How do I authenticate?"')
     elif profile == "mcp-docs":
-        click.echo("  docmancer mcp docs-serve")
+        click.echo("  doc-atlas mcp docs-serve")
     else:
-        click.echo("  docmancer ingest ./docs")
+        click.echo("  doc-atlas ingest ./docs")
 
 
 @click.command(
@@ -2258,14 +2258,14 @@ def _emit_setup_readiness_summary(config, *, selected_agents: list[str], profile
     context_settings=HELP_CONTEXT_SETTINGS,
     short_help="Set up docmancer for local agent docs retrieval.",
     epilog=format_examples(
-        "docmancer setup",
-        "docmancer setup --yes",
-        "docmancer setup --profile agent --agent claude-code --yes",
-        "docmancer setup --offline --vectors off --yes",
-        "docmancer setup --project-local --yes",
-        "docmancer setup --all",
-        "docmancer setup --agent codex --agent claude-desktop",
-        "docmancer setup --agent github-copilot",
+        "doc-atlas setup",
+        "doc-atlas setup --yes",
+        "doc-atlas setup --profile agent --agent claude-code --yes",
+        "doc-atlas setup --offline --vectors off --yes",
+        "doc-atlas setup --project-local --yes",
+        "doc-atlas setup --all",
+        "doc-atlas setup --agent codex --agent claude-desktop",
+        "doc-atlas setup --agent github-copilot",
     ),
 )
 @click.option("--all", "install_all", is_flag=True, default=False, help="Install every supported agent integration non-interactively.")
@@ -2296,7 +2296,7 @@ def setup_cmd(
     """
     config_path = _effective_config(config_path)
     config_file = _ensure_project_config() if project_local and config_path is None else _ensure_config_and_db(config_path)
-    _emit_brand_header("docmancer setup", "Choose an outcome, then get first docs context fast.")
+    _emit_brand_header("doc-atlas setup", "Choose an outcome, then get first docs context fast.")
     _emit_status_line(f"Config: {display_path(config_file)}")
     config = _get_config_class().from_yaml(config_file)
     config = _apply_setup_retrieval_profile(config, retrieval_profile, offline=offline, vectors=vectors)
@@ -2328,4 +2328,4 @@ def setup_cmd(
 
     _emit_setup_readiness_summary(config, selected_agents=list(dict.fromkeys(selected)), profile=profile.lower())
 
-    _emit_next_step("Run `docmancer add <url-or-path>`, then `docmancer query \"your question\"`.")
+    _emit_next_step("Run `doc-atlas add <url-or-path>`, then `doc-atlas query \"your question\"`.")

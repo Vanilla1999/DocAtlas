@@ -218,7 +218,7 @@ class QdrantManager:
     """Manages a single docmancer-owned local Qdrant process.
 
     Most callers should use :func:`ensure_running`; this class exposes the
-    individual lifecycle steps for tests and the ``docmancer qdrant`` CLI.
+    individual lifecycle steps for tests and the ``doc-atlas qdrant`` CLI.
     """
 
     home: Path = field(default_factory=_docmancer_home)

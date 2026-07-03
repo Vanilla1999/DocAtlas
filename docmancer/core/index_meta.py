@@ -65,9 +65,9 @@ class IndexMismatchError(RuntimeError):
         return (
             f"Index {collection!r} was built with a different embedder ({change}). "
             f"Rebuild it before running queries:\n"
-            f"  docmancer ingest <path> --recreate\n"
+            f"  doc-atlas ingest <path> --recreate\n"
             f"or, to start fresh, drop docmancer state and re-ingest:\n"
-            f"  docmancer clear --keep-config --keep-models && docmancer ingest <path>"
+            f"  doc-atlas clear --keep-config --keep-models && doc-atlas ingest <path>"
         )
 
 

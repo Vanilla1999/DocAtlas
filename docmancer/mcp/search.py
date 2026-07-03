@@ -1,7 +1,7 @@
 """Tool Search corpus + ranking (spec 2.7 / D10).
 
 v1 uses a lightweight token-overlap scorer. Keep this dependency-light so
-`docmancer mcp serve` works in a minimal install.
+`doc-atlas mcp serve` works in a minimal install.
 """
 from __future__ import annotations
 

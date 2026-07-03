@@ -11,7 +11,7 @@ def test_register_writes_entry(tmp_path):
     changed, _ = agent_config.register_server(target)
     assert changed is True
     payload = json.loads(cfg.read_text())
-    assert payload["mcpServers"]["docmancer"]["command"] == "docmancer"
+    assert payload["mcpServers"]["docmancer"]["command"] == "doc-atlas"
     assert payload["mcpServers"]["docmancer"]["args"] == ["mcp", "serve"]
 
 

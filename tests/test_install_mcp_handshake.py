@@ -29,7 +29,7 @@ def test_install_claude_code_registers_mcp_entry():
         cfg = fake_home / ".claude" / "settings.json"
         assert cfg.exists()
         payload = json.loads(cfg.read_text())
-        assert payload["mcpServers"]["docmancer"]["command"] == "docmancer"
+        assert payload["mcpServers"]["docmancer"]["command"] == "doc-atlas"
         assert payload["mcpServers"]["docmancer"]["args"] == ["mcp", "serve"]
 
 

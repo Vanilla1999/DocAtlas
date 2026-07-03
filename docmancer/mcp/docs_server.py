@@ -1,4 +1,4 @@
-"""`docmancer mcp docs-serve`: stdio MCP server for library documentation."""
+"""`doc-atlas mcp docs-serve`: stdio MCP server for library documentation."""
 from __future__ import annotations
 
 import asyncio
