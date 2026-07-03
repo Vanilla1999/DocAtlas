@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import hashlib
+import json
 import shutil
 from dataclasses import dataclass
 
@@ -73,12 +74,12 @@ def run() -> list[CheckResult]:
             results.append(CheckResult(f"agent {agent.name}", True, "no config file (skipped)"))
             continue
         try:
-            payload = agent.config_path.read_text()
-            ok = '"docmancer"' in payload and '"mcp"' in payload and '"serve"' in payload
+            payload = json.loads(agent.config_path.read_text())
+            ok = agent_config.has_current_server_entry(payload, agent)
             results.append(CheckResult(
                 f"agent {agent.name}",
                 ok,
-                "registered" if ok else "config exists but docmancer entry not found",
+                "registered" if ok else "config exists but current docmancer MCP entry not found",
             ))
         except Exception as exc:
             results.append(CheckResult(f"agent {agent.name}", False, str(exc)))

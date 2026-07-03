@@ -33,6 +33,30 @@ def test_register_preserves_other_servers(tmp_path):
     assert "docmancer" in payload["mcpServers"]
 
 
+def test_register_preserves_existing_env(tmp_path):
+    cfg = tmp_path / "settings.json"
+    cfg.write_text(json.dumps({
+        "mcpServers": {
+            "docmancer": {
+                "command": "docmancer",
+                "args": ["mcp", "serve"],
+                "env": {"DOCMANCER_HOME": "/custom/home"},
+            }
+        }
+    }))
+    target = agent_config.AgentTarget("test", cfg, "json_mcpServers")
+
+    changed, _ = agent_config.register_server(target)
+
+    assert changed is True
+    payload = json.loads(cfg.read_text())
+    assert payload["mcpServers"]["docmancer"] == {
+        "command": "doc-atlas",
+        "args": ["mcp", "serve"],
+        "env": {"DOCMANCER_HOME": "/custom/home"},
+    }
+
+
 def test_unregister_removes(tmp_path):
     cfg = tmp_path / "settings.json"
     target = agent_config.AgentTarget("test", cfg, "json_mcpServers")
