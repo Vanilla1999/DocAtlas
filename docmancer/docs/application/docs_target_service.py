@@ -138,10 +138,6 @@ class DocsTargetService:
         if not is_pub_dartdoc_target(target):
             return target
         target = normalize_pub_dartdoc_target(target)
-        if job_id:
-            # Async jobs should reach indexing promptly. Keep live Dartdoc seed
-            # discovery on the synchronous path where callers wait for the full result.
-            return target
         version = normalize_version(target.version) or "latest"
         root_url = pub_dartdoc_root_url(target.library, version)
         if job_id and self.jobs:

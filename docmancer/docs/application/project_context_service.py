@@ -566,6 +566,7 @@ def project_context_metrics(
     raw_result_count = project_result_count + dependency_result_count
     raw_results = [*(project_docs.results if project_docs else []), *(dependency_docs.results if dependency_docs else [])]
     context_tokens = sum(int(item.get("token_estimate") or 0) for item in context_pack)
+    raw_docs_tokens = sum(int(((item.metadata or {}).get("raw_tokens") or 0)) for item in (project_docs.results if project_docs else []))
     max_items_from_single_source = max(path_counts.values(), default=0)
     quality_warnings = []
     if intent and not getattr(intent, "wants_release_history", False) and changelog_count:
@@ -601,10 +602,27 @@ def project_context_metrics(
             "noise_sections_demoted": sum(1 for item in raw_results if internal_noise_score(getattr(item, "content", "")) >= 0.5),
             "warnings": quality_warnings,
         },
-        "token_savings": {
-            "raw_docs_tokens": sum(int(((item.metadata or {}).get("raw_tokens") or 0)) for item in (project_docs.results if project_docs else [])),
-            "context_pack_tokens": context_tokens,
-            "savings_percent": next((item.metadata.get("savings_percent") for item in (project_docs.results if project_docs else []) if item.metadata and item.metadata.get("savings_percent") is not None), None),
+        "token_savings": _token_savings_metrics(raw_docs_tokens, context_tokens),
+    }
+
+
+def _token_savings_metrics(raw_docs_tokens: int, context_pack_tokens: int) -> dict[str, Any]:
+    raw = max(0, int(raw_docs_tokens or 0))
+    pack = max(0, int(context_pack_tokens or 0))
+    if raw == 0:
+        return {
+            "raw_docs_tokens": raw,
+            "context_pack_tokens": pack,
+            "savings_percent": None,
+            "used_percent": None,
+            "agentic_runway_multiplier": None,
             "meaning": "compression_vs_raw_docs_not_relevance_score",
-        },
+        }
+    return {
+        "raw_docs_tokens": raw,
+        "context_pack_tokens": pack,
+        "savings_percent": round(max(0, raw - pack) / raw * 100, 1),
+        "used_percent": round(pack / raw * 100, 1),
+        "agentic_runway_multiplier": round(raw / pack, 2) if pack else None,
+        "meaning": "compression_vs_raw_docs_not_relevance_score",
     }

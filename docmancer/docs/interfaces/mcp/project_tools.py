@@ -41,6 +41,37 @@ PROJECT_TOOL_NAMES = {
     "prefetch_project_dependency_docs",
 }
 
+_MCP_MAX_TOKENS = 20_000
+_MCP_MAX_PROJECT_LIMIT = 20
+_MCP_MAX_PATCH_CONSTRAINTS = 40
+_MCP_MAX_PATCH_TOKENS = 8_000
+
+
+def _bad_request(reason_code: str, message: str) -> dict[str, Any]:
+    return {"status": "failed", "reason_code": reason_code, "message": message}
+
+
+def _clean_string(value: Any) -> str | None:
+    if value is None:
+        return None
+    text = str(value).strip()
+    return text or None
+
+
+def _bounded_int_arg(
+    args: dict[str, Any],
+    key: str,
+    *,
+    default: int | None = None,
+    min_value: int = 1,
+    max_value: int,
+) -> int | None:
+    value = args.get(key)
+    if value is None:
+        return default
+    number = int(value)
+    return max(min_value, min(max_value, number))
+
 
 def project_tools(tools: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return [tool for tool in tools if tool["name"] in PROJECT_TOOL_NAMES]
@@ -324,6 +355,35 @@ def _project_context_output_mode(args: dict[str, Any]) -> str:
 
 
 def _strip_mcp_debug_noise(payload: dict[str, Any]) -> dict[str, Any]:
+    compaction = payload.get("mcp_compaction")
+    if isinstance(compaction, dict) and compaction.get("truncated"):
+        payload["response_truncated"] = True
+        payload["mcp_compaction"] = {
+            key: compaction.get(key)
+            for key in (
+                "max_bytes",
+                "truncated",
+                "hard_cap_enforced",
+                "content_omitted",
+                "truncated_strings",
+                "truncated_chars",
+                "omitted_list_items",
+                "omitted_sections",
+            )
+            if key in compaction
+        }
+        warnings = [
+            warning for warning in (payload.get("warnings") or [])
+            if not (isinstance(warning, dict) and str(warning.get("code") or "").startswith("mcp_compact_output_"))
+        ]
+        if not any(isinstance(warning, dict) and warning.get("code") == "mcp_response_truncated" for warning in warnings):
+            warnings.append({
+                "code": "mcp_response_truncated",
+                "message": "MCP response was compacted/truncated; narrow query/limit/tokens or use output_mode='full' only when necessary.",
+            })
+        payload["warnings"] = warnings
+        return payload
+
     payload.pop("mcp_compaction", None)
     warnings = [
         warning for warning in (payload.get("warnings") or [])
@@ -478,10 +538,16 @@ def handle_project_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
         result = asdict(service.bootstrap_project_docs(args["project_path"], question=args.get("question")))
         return result if args.get("details") else _compact_bootstrap_project_docs(result)
     if name == "get_project_docs":
-        result = asdict(service.get_project_docs(args["project_path"], args["query"], tokens=args.get("tokens"), limit=args.get("limit"), expand=args.get("expand"), module=args.get("module"), module_path=args.get("module_path"), scope=args.get("scope")))
+        query = _clean_string(args.get("query"))
+        if not query:
+            return _bad_request("empty_query", "query must not be empty")
+        result = asdict(service.get_project_docs(args["project_path"], query, tokens=_bounded_int_arg(args, "tokens", max_value=_MCP_MAX_TOKENS), limit=_bounded_int_arg(args, "limit", default=None, max_value=_MCP_MAX_PROJECT_LIMIT), expand=args.get("expand"), module=args.get("module"), module_path=args.get("module_path"), scope=args.get("scope")))
         return result if args.get("details") else _compact_project_docs(result)
     if name == "get_project_context":
-        result = asdict(service.get_project_context(args["project_path"], args["question"], tokens=args.get("tokens"), limit=args.get("limit"), expand=args.get("expand"), library=args.get("library"), libraries=args.get("libraries"), ecosystem=args.get("ecosystem"), version=args.get("version"), module=args.get("module"), module_path=args.get("module_path"), scope=args.get("scope"), mode=args.get("mode") or "auto", response_style=args.get("response_style"), allow_network=bool(args.get("allow_network") or False)))
+        question = _clean_string(args.get("question"))
+        if not question:
+            return _bad_request("empty_question", "question must not be empty")
+        result = asdict(service.get_project_context(args["project_path"], question, tokens=_bounded_int_arg(args, "tokens", max_value=_MCP_MAX_TOKENS), limit=_bounded_int_arg(args, "limit", default=None, max_value=_MCP_MAX_PROJECT_LIMIT), expand=args.get("expand"), library=args.get("library"), libraries=args.get("libraries"), ecosystem=args.get("ecosystem"), version=args.get("version"), module=args.get("module"), module_path=args.get("module_path"), scope=args.get("scope"), mode=args.get("mode") or "auto", response_style=args.get("response_style"), allow_network=bool(args.get("allow_network") or False)))
         output_mode = _project_context_output_mode(args)
         if output_mode == "full":
             result["output_mode"] = "full"
@@ -495,12 +561,15 @@ def handle_project_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
         payload = _compact_mcp_payload(_add_project_context_output_warning(payload, args))
         return _strip_mcp_debug_noise(payload)
     if name == "get_patch_constraints":
+        question = _clean_string(args.get("question"))
+        if not question:
+            return _bad_request("empty_question", "question must not be empty")
         result = asdict(service.get_patch_constraints(
-            args["question"],
+            question,
             project_path=args.get("project_path"),
             changed_files=args.get("changed_files"),
-            max_constraints=args.get("max_constraints") or 12,
-            max_tokens=args.get("max_tokens") or 1200,
+            max_constraints=_bounded_int_arg(args, "max_constraints", default=12, max_value=_MCP_MAX_PATCH_CONSTRAINTS),
+            max_tokens=_bounded_int_arg(args, "max_tokens", default=1200, max_value=_MCP_MAX_PATCH_TOKENS),
             include_sources=bool(args.get("include_sources") if args.get("include_sources") is not None else True),
         ))
         output_mode = _patch_constraints_output_mode(args)
@@ -512,8 +581,11 @@ def handle_project_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
         payload = _compact_mcp_payload(payload)
         return payload if output_mode == "debug" else _strip_mcp_debug_noise(payload)
     if name == "validate_patch_against_constraints":
+        constraints = args.get("constraints")
+        if not constraints:
+            return _bad_request("empty_constraints", "constraints are required")
         return asdict(service.validate_patch_against_constraints(
-            args.get("constraints") or [],
+            constraints,
             project_path=args.get("project_path"),
             changed_files=args.get("changed_files"),
             patch_diff=args.get("patch_diff"),

@@ -628,6 +628,8 @@ def test_context_pack_snippet_and_metrics_shape_are_stable():
             "raw_docs_tokens": 0,
             "context_pack_tokens": pack[0]["token_estimate"],
             "savings_percent": None,
+            "used_percent": None,
+            "agentic_runway_multiplier": None,
             "meaning": "compression_vs_raw_docs_not_relevance_score",
         },
     }

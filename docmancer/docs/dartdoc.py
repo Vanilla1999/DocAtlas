@@ -146,7 +146,13 @@ def discover_pub_dartdoc_seed_urls(
     add_html_links(root_html)
 
     if fetch_url is not None:
-        for json_url in (urljoin(root_url, "categories.json"), urljoin(root_url, "sidebar.json"), *[url for url in list(library_urls) if url.endswith(".json")]):
+        json_candidates = [
+            urljoin(root_url, "index.json"),
+            urljoin(root_url, "categories.json"),
+            urljoin(root_url, "sidebar.json"),
+            *[url for url in list(library_urls) if url.endswith(".json")],
+        ]
+        for json_url in json_candidates:
             body = fetch_and_parse(json_url)
             if not body:
                 continue
@@ -154,6 +160,11 @@ def discover_pub_dartdoc_seed_urls(
                 add_json_links(json.loads(body))
             except json.JSONDecodeError:
                 add_html_links(body)
+
+        for library_url in list(library_urls):
+            html = fetch_and_parse(library_url)
+            if html:
+                add_html_links(html, base_url=library_url)
 
         for library_url in list(library_urls):
             html = fetch_and_parse(library_url)

@@ -4,7 +4,7 @@ from dataclasses import asdict, is_dataclass
 from typing import Any
 
 from docmancer.docs.service import LibraryDocsService
-from docmancer.docs.interfaces.mcp.project_tools import _compact_mcp_payload, _strip_mcp_debug_noise
+from docmancer.docs.interfaces.mcp.project_tools import _bad_request, _bounded_int_arg, _clean_string, _compact_mcp_payload, _strip_mcp_debug_noise
 
 
 CONTEXT_TOOL_NAMES = {"get_docs_context"}
@@ -65,8 +65,11 @@ def _compact_payload(payload: dict[str, Any]) -> dict[str, Any]:
 def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsService) -> dict[str, Any] | None:
     if name != "get_docs_context":
         return None
+    question = _clean_string(args.get("question"))
+    if not question:
+        return _bad_request("empty_question", "question must not be empty")
     result = service.get_docs_context(
-        args["question"],
+        question,
         project_path=args.get("project_path"),
         library=args.get("library"),
         libraries=args.get("libraries"),
@@ -78,8 +81,8 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
         module_path=args.get("module_path"),
         scope=args.get("scope"),
         mode=args.get("mode"),
-        tokens=args.get("tokens"),
-        limit=args.get("limit"),
+        tokens=_bounded_int_arg(args, "tokens", max_value=20_000),
+        limit=_bounded_int_arg(args, "limit", default=None, max_value=20),
         expand=args.get("expand"),
         prepare_project_docs=args.get("prepare_project_docs"),
         allow_network=args.get("allow_network"),

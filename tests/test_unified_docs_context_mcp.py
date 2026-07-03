@@ -48,7 +48,7 @@ def test_context_tools_filter_only_unified_tool():
     assert [tool["name"] for tool in context_tools(TOOLS)] == ["get_docs_context"]
 
 
-def test_get_docs_context_default_answer_omits_debug_compaction_noise():
+def test_get_docs_context_default_answer_reports_compaction_without_debug_noise():
     large = "x" * 120_000
 
     class Facade:
@@ -63,8 +63,10 @@ def test_get_docs_context_default_answer_omits_debug_compaction_noise():
 
     assert len(json.dumps(result, ensure_ascii=False).encode("utf-8")) <= MCP_COMPACT_OUTPUT_MAX_BYTES
     assert result["output_mode"] == "answer"
-    assert "mcp_compaction" not in result
+    assert result["response_truncated"] is True
+    assert result["mcp_compaction"]["truncated"] is True
     assert "context_pack" not in result
+    assert any(isinstance(warning, dict) and warning.get("code") == "mcp_response_truncated" for warning in result.get("warnings", []))
     assert not any(isinstance(warning, dict) and str(warning.get("code") or "").startswith("mcp_compact_output_") for warning in result.get("warnings", []))
 
 

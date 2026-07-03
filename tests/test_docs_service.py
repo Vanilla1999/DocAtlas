@@ -3105,11 +3105,11 @@ def test_prefetch_docs_targets_async_returns_job_id_immediately(tmp_path, monkey
     result = service.prefetch_docs_targets(
         [
             {
-                "library": "go_router",
-                "ecosystem": "pub",
+                "library": "example-docs",
+                "ecosystem": "web",
                 "version": "latest",
-                "docs_url_template": "https://pub.dev/documentation/{library}/{version}/",
-                "allowed_domains": ["pub.dev"],
+                "docs_url": "https://example.com/docs/",
+                "allowed_domains": ["example.com"],
             }
         ],
         async_=True,
