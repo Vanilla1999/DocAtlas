@@ -184,7 +184,7 @@ def sync_vector_store(
             raise RuntimeError(
                 f"vector index {collection!r} is incomplete: expected {expected_total} "
                 f"indexed points but the vector store reports {count_after}. Rebuild with "
-                f"`docmancer ingest <path> --recreate`."
+                f"`doc-atlas ingest <path> --recreate`."
             )
         return SyncResult(
             embedded=0,
@@ -258,7 +258,7 @@ def sync_vector_store(
             f"vector upsert into {collection!r} did not land: expected {expected_total} "
             f"indexed points but the vector store reports {count_after}. The most common cause is "
             f"a dimension or model mismatch against an existing collection. Rebuild with "
-            f"`docmancer ingest <path> --recreate` or `docmancer clear --keep-config "
+            f"`doc-atlas ingest <path> --recreate` or `doc-atlas clear --keep-config "
             f"--keep-models` to wipe the index."
         )
 

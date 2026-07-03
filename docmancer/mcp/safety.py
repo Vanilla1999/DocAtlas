@@ -35,7 +35,7 @@ def check(
             (
                 f"Tool for {operation.get('id')} is marked destructive. "
                 f"Destructive calls are disabled for package {package}. "
-                f"To enable: docmancer install-pack {spec} --allow-destructive, "
+                f"To enable: doc-atlas install-pack {spec} --allow-destructive, "
                 f"then restart your agent."
             ),
         )

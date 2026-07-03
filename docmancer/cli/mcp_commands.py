@@ -1,4 +1,4 @@
-"""CLI surface for `docmancer mcp ...` and `docmancer install-pack <pkg>@<ver>`."""
+"""CLI surface for `doc-atlas mcp ...` and `doc-atlas install-pack <pkg>@<ver>`."""
 from __future__ import annotations
 
 import json
@@ -55,7 +55,7 @@ def mcp_list_cmd() -> None:
     """List installed packs and their per-package state."""
     manifest = Manifest.load()
     if not manifest.packages:
-        click.echo("No packs installed. Try `docmancer install-pack <pkg>@<version>`.")
+        click.echo("No packs installed. Try `doc-atlas install-pack <pkg>@<version>`.")
         return
     for p in manifest.packages:
         try:
@@ -91,7 +91,7 @@ def mcp_disable_cmd(package: str, version: str | None) -> None:
     click.echo(f"Disabled {n} package(s).")
 
 
-@mcp_group.command("remove", help="Remove an installed pack: `docmancer mcp remove <package>[@<version>]`.")
+@mcp_group.command("remove", help="Remove an installed pack: `doc-atlas mcp remove <package>[@<version>]`.")
 @click.argument("spec")
 def mcp_remove_cmd(spec: str) -> None:
     package, version = _parse_pack_spec(spec, require_version=False)
@@ -100,7 +100,7 @@ def mcp_remove_cmd(spec: str) -> None:
     click.echo(f"Removed {n} package entry/entries for {target}.")
 
 
-@click.command("install-pack", help="Install an API pack: `docmancer install-pack <package>@<version>`.")
+@click.command("install-pack", help="Install an API pack: `doc-atlas install-pack <package>@<version>`.")
 @click.argument("spec")
 @click.option("--expanded", is_flag=True, default=False, help="Activate the full tool surface (not the curated subset).")
 @click.option("--allow-destructive", is_flag=True, default=False, help="Permit destructive calls for this pack.")
@@ -142,10 +142,10 @@ def install_pack_cmd(spec: str, expanded: bool, allow_destructive: bool, allow_e
             click.echo(f"Wire-pinned header: {k}: {v}")
     click.echo(f"Destructive endpoints: {result.destructive_count} ({'allowed' if allow_destructive else 'gated'})")
     if not allow_destructive and result.destructive_count:
-        click.echo(f"To enable: docmancer install-pack {spec} --allow-destructive")
+        click.echo(f"To enable: doc-atlas install-pack {spec} --allow-destructive")
 
 
-@click.command("uninstall", help="Remove an installed pack: `docmancer uninstall <package>[@<version>]`.")
+@click.command("uninstall", help="Remove an installed pack: `doc-atlas uninstall <package>[@<version>]`.")
 @click.argument("spec")
 def uninstall_pack_cmd(spec: str) -> None:
     package, version = _parse_pack_spec(spec, require_version=False)
@@ -206,7 +206,7 @@ def _compile_from_url_or_die(package: str, version: str, url: str) -> None:
 
 
 def register_docmancer_mcp_in_agent(agent_name: str) -> str | None:
-    """Helper for the existing `docmancer install <agent>` to also register MCP. Returns message or None."""
+    """Helper for the existing `doc-atlas install <agent>` to also register MCP. Returns message or None."""
     target = agent_config.find_agent(agent_name)
     if target is None:
         return None

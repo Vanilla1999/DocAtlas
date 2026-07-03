@@ -1,4 +1,4 @@
-"""Idempotent writers that register `docmancer mcp serve` into agent MCP configs."""
+"""Idempotent writers that register `doc-atlas mcp serve` into agent MCP configs."""
 from __future__ import annotations
 
 import json
@@ -9,7 +9,7 @@ from typing import Any
 
 
 SERVER_KEY = "docmancer"
-COMMAND = "docmancer"
+COMMAND = "doc-atlas"
 ARGS = ["mcp", "serve"]
 
 
@@ -49,7 +49,7 @@ def register_server(target: AgentTarget) -> tuple[bool, str]:
     else:
         servers = config.setdefault("mcp_servers", {})
 
-    desired: dict[str, Any] = {"command": COMMAND, "args": list(ARGS), "env": {}}
+    desired: dict[str, Any] = {"command": COMMAND, "args": list(ARGS)}
     existing = servers.get(SERVER_KEY)
     if existing == desired or _matches_command(existing, desired):
         return False, f"already registered in {target.config_path}"
@@ -88,6 +88,15 @@ def _matches_command(existing: Any, desired: dict[str, Any]) -> bool:
     return existing.get("command") == desired["command"] and list(
         existing.get("args", [])
     ) == desired["args"]
+
+
+def has_current_server_entry(config: dict[str, Any], target: AgentTarget) -> bool:
+    key = "mcpServers" if target.style == "json_mcpServers" else "mcp_servers"
+    servers = config.get(key)
+    if not isinstance(servers, dict):
+        return False
+    desired = {"command": COMMAND, "args": list(ARGS)}
+    return _matches_command(servers.get(SERVER_KEY), desired)
 
 
 def _backup_and_write(path: Path, payload: dict[str, Any]) -> None:

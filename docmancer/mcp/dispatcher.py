@@ -167,7 +167,7 @@ class Dispatcher:
                 "error": "execution_not_allowed",
                 "message": (
                     f"Operation {operation.get('id')} uses executor '{executor_kind}' which "
-                    f"requires opt-in. To enable: docmancer install-pack {pkg.package}@{pkg.version} "
+                    f"requires opt-in. To enable: doc-atlas install-pack {pkg.package}@{pkg.version} "
                     f"--allow-execute, then restart your agent."
                 ),
             }

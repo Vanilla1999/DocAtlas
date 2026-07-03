@@ -4,7 +4,7 @@ import json
 
 import pytest
 
-from docmancer.mcp import doctor, paths
+from docmancer.mcp import agent_config, doctor, paths
 from docmancer.mcp.installer import install_package
 
 
@@ -49,3 +49,27 @@ def test_doctor_detects_corrupted_artifact(healthy_pack):
     by_name = {r.name: r for r in results}
     assert by_name["package demo@1: contract.json hash"].ok is False
     assert "expected" in by_name["package demo@1: contract.json hash"].detail
+
+
+def test_doctor_rejects_stale_docmancer_mcp_command(healthy_pack, tmp_path, monkeypatch):
+    cfg = tmp_path / "settings.json"
+    cfg.write_text(json.dumps({"mcpServers": {"docmancer": {"command": "docmancer", "args": ["mcp", "serve"]}}}))
+    target = agent_config.AgentTarget("test", cfg, "json_mcpServers")
+    monkeypatch.setattr(agent_config, "known_agents", lambda: [target])
+
+    results = doctor.run()
+    by_name = {r.name: r for r in results}
+
+    assert by_name["agent test"].ok is False
+
+
+def test_doctor_accepts_current_doc_atlas_mcp_command(healthy_pack, tmp_path, monkeypatch):
+    cfg = tmp_path / "settings.json"
+    cfg.write_text(json.dumps({"mcpServers": {"docmancer": {"command": "doc-atlas", "args": ["mcp", "serve"]}}}))
+    target = agent_config.AgentTarget("test", cfg, "json_mcpServers")
+    monkeypatch.setattr(agent_config, "known_agents", lambda: [target])
+
+    results = doctor.run()
+    by_name = {r.name: r for r in results}
+
+    assert by_name["agent test"].ok is True

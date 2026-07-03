@@ -53,15 +53,15 @@ class FakeDocmancerConfig:
 
 
 PUBLIC_COMMAND_HELP_CASES = [
-    ("setup", ["docmancer setup --all"]),
-    ("add", ["docmancer add https://docs.example.com"]),
-    ("ingest", ["docmancer ingest ./docs", "--format"]),
-    ("query", ["docmancer query", "--expand", "--format json"]),
-    ("list", ["docmancer list"]),
-    ("install", ["docmancer install claude-code", "--project"]),
-    ("inspect", ["docmancer inspect --config ./docmancer.yaml"]),
-    ("doctor", ["docmancer doctor --config ./docmancer.yaml"]),
-    ("remove", ["docmancer remove"]),
+    ("setup", ["doc-atlas setup --all"]),
+    ("add", ["doc-atlas add https://docs.example.com"]),
+    ("ingest", ["doc-atlas ingest ./docs", "--format"]),
+    ("query", ["doc-atlas query", "--expand", "--format json"]),
+    ("list", ["doc-atlas list"]),
+    ("install", ["doc-atlas install claude-code", "--project"]),
+    ("inspect", ["doc-atlas inspect --config ./docmancer.yaml"]),
+    ("doctor", ["doc-atlas doctor --config ./docmancer.yaml"]),
+    ("remove", ["doc-atlas remove"]),
 ]
 
 
@@ -77,7 +77,7 @@ def test_cli_help():
 def test_version_flag_outputs_compact_version():
     result = CliRunner().invoke(cli, ["--version"])
     assert result.exit_code == 0
-    assert result.output.strip() == f"docmancer {__version__}"
+    assert result.output.strip() == f"doc-atlas {__version__}"
 
 
 def test_public_commands_have_examples_in_help():
@@ -92,7 +92,7 @@ def test_public_commands_have_examples_in_help():
 def test_ingest_url_points_to_add():
     result = CliRunner().invoke(cli, ["ingest", "https://docs.example.com"])
     assert result.exit_code != 0
-    assert "Use `docmancer add` for URLs." in result.output
+    assert "Use `doc-atlas add` for URLs." in result.output
 
 
 def test_cli_init_creates_project_sqlite_config(tmp_path):
@@ -173,7 +173,7 @@ def test_add_shows_total_and_calls_agent(tmp_path):
     assert f"Index: {display_path(db_path)} (2.0 KB)" in result.output
     assert f"Extracted docs: {display_path(extracted_dir)} (1.0 KB)" in result.output
     mock_agent.add.assert_called_once_with(str(tmp_path), recreate=False)
-    assert "local paths now belong to `docmancer ingest`" in result.output
+    assert "local paths now belong to `doc-atlas ingest`" in result.output
 
 
 def test_ingest_shows_total_and_calls_agent(tmp_path):
@@ -395,7 +395,7 @@ def test_doctor_json_and_list_checks():
     payload = json.loads(result.output)
     assert payload["profile"] == "cli-docs"
     assert all(check["group"] == "sources" for check in payload["checks"])
-    assert payload["issues"][0]["fix_command"] == "docmancer ingest ./docs"
+    assert payload["issues"][0]["fix_command"] == "doc-atlas ingest ./docs"
 
     checks = CliRunner().invoke(cli, ["doctor", "--list-checks"])
     assert checks.exit_code == 0

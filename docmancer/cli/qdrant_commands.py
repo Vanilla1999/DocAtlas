@@ -1,4 +1,4 @@
-"""``docmancer qdrant`` CLI group for managed local Qdrant control."""
+"""``doc-atlas qdrant`` CLI group for managed local Qdrant control."""
 from __future__ import annotations
 
 import json
@@ -98,7 +98,7 @@ def qdrant_upgrade_cmd(binary_path: str | None, force: bool) -> None:
     st = mgr.status()
     if st["alive"] and st["owned"] and not force:
         click.secho(
-            "qdrant is running; stop it first with `docmancer qdrant down` or pass --force.",
+            "qdrant is running; stop it first with `doc-atlas qdrant down` or pass --force.",
             fg="red",
             err=True,
         )

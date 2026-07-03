@@ -140,7 +140,7 @@ Docmancer-only записи могут быть полезны для време
 Текущее MCP-состояние project-owned docs уже стало first-class workflow, а не только ручным `ingest ./docs`:
 
 - `inspect_project_docs(project_path)` — read-only discovery project docs candidates, indexed/stale/ignored sources и dependency metadata;
-- `ingest_project_docs(project_path)` — индексирует только reviewable project docs candidates (`README`, `docs/`, `wiki/`, `ARCHITECTURE`, ADR, roadmap), не source code, dependency directories или build outputs;
+- `sync_project_docs(project_path)` — канонический reconcile-инструмент: приводит project-docs индекс в соответствие с текущими reviewable candidates (`README`, `docs/`, `wiki/`, `ARCHITECTURE`, ADR, roadmap), не трогая source code, dependency directories или build outputs (`ingest_project_docs` остался как legacy low-level операция);
 - `bootstrap_project_docs(project_path, question?)` — safe high-level onboarding flow: inspect -> ingest/refresh existing reviewable docs -> inspect again, но останавливается перед repo writes и dependency network fetch;
 - `get_project_docs(project_path, query)` — query по indexed project-owned docs с project-scoped filters, source attribution, heading paths и stale metadata;
 - `get_project_context(project_path, question, ...)` — high-level context pack, который может объединять project docs и dependency docs и возвращает Trust Contract;
@@ -150,9 +150,9 @@ Docmancer-only записи могут быть полезны для време
 Agent-discoverable onboarding теперь закреплён не только в prose/tool descriptions, но и в response schemas:
 
 1. `inspect_project_docs` и project-docs query fallbacks возвращают stable `reason_code`, structured `next_action`, `requires_confirmation`, `confirmation_reason`, `arguments_patch`, а также agent/user messages;
-2. если docs candidates найдены, но не indexed — `reason_code = project_docs_found_not_indexed`, `next_action.tool = ingest_project_docs`;
-3. если indexed docs stale — `reason_code = project_docs_stale`, `next_action.tool = ingest_project_docs`;
-4. если project docs отсутствуют — `reason_code = no_project_docs`, remediation path: спросить разрешение на создание reviewable `ARCHITECTURE.md`, затем coding agent изучает repo и создаёт файл, после чего Docmancer снова делает `inspect_project_docs -> ingest_project_docs -> get_project_docs/get_project_context`;
+2. если docs candidates найдены, но не indexed — `reason_code = project_docs_found_not_indexed`, `next_action.tool = sync_project_docs`;
+3. если indexed docs stale — `reason_code = project_docs_stale`, `next_action.tool = sync_project_docs`;
+4. если project docs отсутствуют — `reason_code = no_project_docs`, remediation path: спросить разрешение на создание reviewable `ARCHITECTURE.md`, затем coding agent изучает repo и создаёт файл, после чего Docmancer снова делает `inspect_project_docs -> sync_project_docs -> get_project_docs/get_project_context`;
 5. если docs есть, но нет high-level overview/architecture doc — `reason_code = architecture_doc_creation_recommended`, тот же безопасный repo-file remediation path;
 6. если project docs готовы — `reason_code = project_docs_ready`, `next_action.tool = get_project_context`;
 7. если lockfiles/manifests дают exact dependency versions — `dependency_sources.dependency_next_action` предлагает `prefetch_project_docs` / `prefetch_project_dependency_docs`, но это network fetch и требует confirmation.
@@ -168,7 +168,7 @@ Agent-discoverable onboarding теперь закреплён не только 
 
 Важная граница текущего продукта: Docmancer **не пишет архитектуру сам** и не должен сохранять official architecture в hidden memory. Он направляет агента через `next_actions`; создание `ARCHITECTURE.md` выполняет coding agent как обычный reviewable file change после согласия пользователя.
 
-Ключевой UX-риск уже снижен: tool descriptions и response shapes теперь явно ведут модель к `inspect_project_docs -> ingest_project_docs/bootstrap_project_docs -> get_project_docs/get_project_context`, а при `no_project_docs` / `architecture_doc_creation_recommended` — к запросу разрешения на создание `ARCHITECTURE.md`. Оставшийся риск — проверить это в реальных agent loops разных клиентов и закрепить в setup-installed skills/README.
+Ключевой UX-риск уже снижен: tool descriptions и response shapes теперь явно ведут модель к `inspect_project_docs -> sync_project_docs/bootstrap_project_docs -> get_project_docs/get_project_context`, а при `no_project_docs` / `architecture_doc_creation_recommended` — к запросу разрешения на создание `ARCHITECTURE.md`. Оставшийся риск — проверить это в реальных agent loops разных клиентов и закрепить в setup-installed skills/README.
 
 ### 2.4. Agent integration
 
@@ -209,7 +209,9 @@ doc-atlas mcp docs-serve
 - `get_docs_job_status`;
 - `list_docs_jobs`;
 - `cancel_docs_job`.
-- project docs tools: `inspect_project_docs`, `ingest_project_docs`, `bootstrap_project_docs`, `get_project_docs`, `get_project_context`;
+- unified high-level entrypoint: `get_docs_context` — маршрутизирует project / library / dependency / mixed запросы через один инструмент (добавлен в 1.1.0);
+- project docs tools: `inspect_project_docs`, `sync_project_docs` (канонический reconcile), `bootstrap_project_docs`, `get_project_docs`, `get_project_context`, а также legacy `ingest_project_docs`;
+- patch contract tools: `get_patch_constraints` (bounded source-attributed constraints перед патчем) и `validate_patch_against_constraints` (deterministic post-patch checks) — добавлены в 1.1.0;
 - dependency-docs project helpers: `prefetch_project_docs` и более явный alias `prefetch_project_dependency_docs`.
 
 Docs server использует тот же локальный ingest/index/query path, что и CLI, плюс registry библиотек в SQLite.
@@ -580,7 +582,26 @@ web_fetch:
 
 ## 9. Текущее состояние по версии / changelog highlights
 
-Актуальные заметки из changelog:
+Текущая версия — **1.1.0**. Актуальные заметки из changelog (свежие сверху):
+
+### 1.1.0
+
+Project-context / exact-version / patch-review релиз, усиливающий DocAtlas как project-aware context и constraint runtime для coding agents:
+
+- **Unified docs context MCP entrypoint:** `get_docs_context` маршрутизирует project / library / dependency / mixed запросы через один high-level инструмент;
+- **Snippet-first context packs:** trusted `primary_snippet` для coding/API/command вопросов при сохранении context packs, diagnostics и Trust Contract;
+- **Exact-version documentation:** minimal exact-version resolution для Python-библиотек, проброшенный в library docs services (изначально exact-version полоса была Flutter/Dart через `.fvmrc`/`pubspec.lock`; теперь есть и Python-путь);
+- **Patch constraints workflow:** `get_patch_constraints` и `validate_patch_against_constraints` для bounded source-attributed constraints перед патчем и deterministic post-patch checks;
+- **Patch-review bot artifacts:** machine-readable quality/action/comment/trace/bundle артефакты с manifest-first контрактом для non-blocking PR-bot consumers;
+- **Task-level / live benchmark tooling:** live MCP/Context7 сравнение, task-level agent benchmark harness, cost/accuracy анализ и recorded research reports.
+
+Важно для планирования: `get_patch_constraints` / `validate_patch_against_constraints` и patch-review artifacts **уже отгружены** (не будущая работа). Следующий leverage — не «построить Patch Contract flow», а стабилизировать схему, снизить UX-сложность и доказать ценность бенчмарком.
+
+### 1.0.0
+
+- **Library docs source isolation:** ingested libraries больше не протекают в project-owned doc queries; каждая библиотека получает изолированный index scope;
+- **Hardening gate для dependency doc ingestion:** prefetch/refresh проверяют source integrity до индексации; orphaned/partial dependency docs отклоняются;
+- PyPI classifier обновлён с `3 - Alpha` до `5 - Production/Stable`.
 
 ### 0.5.2
 
@@ -745,7 +766,7 @@ Generic docs crawling всегда сложен:
 
 Главный недавний прогресс: workflow теперь имеет stable reason codes, structured next actions, explicit confirmation gates и safe bootstrap. API разделяет:
 
-- `inspect_project_docs` / `ingest_project_docs` / `get_project_docs` — project-owned docs;
+- `inspect_project_docs` / `sync_project_docs` (канонический reconcile; `ingest_project_docs` — legacy) / `get_project_docs` — project-owned docs;
 - `bootstrap_project_docs` — safe onboarding orchestration для project-owned docs;
 - `prefetch_project_docs` / `prefetch_project_dependency_docs` — dependency docs по lockfile/project metadata;
 - `get_library_docs` — library docs.
@@ -1010,15 +1031,17 @@ The strategic comparison target is Context7:
 Docmancer current capabilities:
 - CLI setup, ingest, add, query, list, inspect, doctor, fetch, update, clear.
 - Local project docs ingestion: README, docs, wiki, architecture, ADR, roadmap, private docs.
-- Project-owned docs MCP onboarding: inspect_project_docs, ingest_project_docs, bootstrap_project_docs, get_project_docs, get_project_context.
+- Unified high-level docs entrypoint: get_docs_context routes project/library/dependency/mixed queries through one tool.
+- Project-owned docs MCP onboarding: inspect_project_docs, sync_project_docs (canonical reconcile; ingest_project_docs kept as legacy), bootstrap_project_docs, get_project_docs, get_project_context.
+- Patch contract workflow: get_patch_constraints (bounded source-attributed constraints before a patch) and validate_patch_against_constraints (deterministic post-patch checks); patch-review bot artifacts are manifest-first and non-blocking (no safe-to-merge claim).
 - Structured project-docs reason codes and next actions: no_project_docs, project_docs_found_not_indexed, project_docs_stale, project_docs_ready, architecture_doc_creation_recommended, no_project_docs_results.
 - Safe project-docs bootstrap: automatically inspect/ingest/reinspect existing reviewable docs, but stop before repo writes or dependency-docs network fetch.
 - Public docs fetching: GitBook, Mintlify, generic web docs, GitHub, llms.txt/llms-full.txt, sitemap, nav crawl, optional browser fallback.
 - Hybrid retrieval: SQLite FTS5 + dense vectors + sparse vectors + RRF, with explain/explain-json.
 - Local Qdrant lifecycle with sqlite-vec fallback.
-- MCP docs server: resolve_library_id, get_library_docs, refresh_library_docs, prefetch_library_docs, prefetch_project_docs, prefetch_project_dependency_docs, prefetch_docs_targets, prefetch_docs_manifest, list/inspect library docs, docs jobs.
+- MCP docs server: get_docs_context, resolve_library_id, get_library_docs, refresh_library_docs, prefetch_library_docs, prefetch_project_docs, prefetch_project_dependency_docs, prefetch_docs_targets, prefetch_docs_manifest, list/inspect library docs, docs jobs, get_patch_constraints, validate_patch_against_constraints.
 - Registry/versioning: canonical ids, requested/resolved version, docs_snapshot_exact, stored docs_url reuse.
-- Flutter/Dart project-aware docs path: .fvmrc and pubspec.lock.
+- Project-aware exact-version docs path: Flutter/Dart via .fvmrc and pubspec.lock, plus minimal exact-version resolution for Python libraries.
 - Eval/doctor foundations.
 - Advanced Docmancer Packs layer for version-pinned API action tools, but Packs are not the hero product.
 
@@ -1032,8 +1055,9 @@ Previously planned roadmap items included:
 4. Project-aware version resolution.
 5. Retrieval eval and observability.
 6. First-run DX / doctor.
+7. Patch contract workflow (get_patch_constraints, validate_patch_against_constraints, patch-review artifacts) — shipped in 1.1.0.
 
-Many of these are now partially or mostly implemented. Do not repeat this roadmap as if starting from zero.
+Many of these are now partially or mostly implemented, and the patch contract workflow is already shipped. Do not repeat this roadmap as if starting from zero; treat patch constraints as a surface to harden, simplify, and benchmark, not to build.
 
 Task:
 Perform a sharp strategic gap analysis of current Docmancer vs Context7 and recommend what to do next.

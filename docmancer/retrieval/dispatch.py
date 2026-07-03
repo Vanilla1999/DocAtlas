@@ -43,7 +43,7 @@ class HybridRetrievalError(RuntimeError):
         super().__init__(
             f"hybrid retrieval failed in {len(failures)} source(s): {parts}. "
             f"Pass --allow-degraded to fall back to the remaining signals, or "
-            f"run `docmancer doctor` to diagnose."
+            f"run `doc-atlas doctor` to diagnose."
         )
 
 

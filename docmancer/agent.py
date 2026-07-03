@@ -143,7 +143,7 @@ class DocmancerAgent:
     def _sync_vectors_if_enabled(self) -> None:
         """Embed any new chunks and upsert into the configured vector store.
 
-        Vector retrieval is on by default. Bare ``docmancer ingest`` will
+        Vector retrieval is on by default. Bare ``doc-atlas ingest`` will
         download the pinned Qdrant binary on first run, start it in the
         background with telemetry disabled, embed every section with the
         configured provider (default FastEmbed: local, no API key), and

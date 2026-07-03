@@ -1,7 +1,8 @@
-"""docmancer mcp doctor: health check the local MCP setup."""
+"""doc-atlas mcp doctor: health check the local MCP setup."""
 from __future__ import annotations
 
 import hashlib
+import json
 import shutil
 from dataclasses import dataclass
 
@@ -22,11 +23,11 @@ RAW_TOOL_COUNT_THRESHOLD = 100
 def run() -> list[CheckResult]:
     results: list[CheckResult] = []
 
-    docmancer_path = shutil.which("docmancer")
+    cli_path = shutil.which("doc-atlas") or shutil.which("docmancer")
     results.append(CheckResult(
-        "docmancer on PATH",
-        bool(docmancer_path),
-        docmancer_path or "docmancer not found on PATH",
+        "doc-atlas on PATH",
+        bool(cli_path),
+        cli_path or "doc-atlas not found on PATH",
     ))
 
     try:
@@ -73,12 +74,12 @@ def run() -> list[CheckResult]:
             results.append(CheckResult(f"agent {agent.name}", True, "no config file (skipped)"))
             continue
         try:
-            payload = agent.config_path.read_text()
-            ok = '"docmancer"' in payload and '"mcp"' in payload and '"serve"' in payload
+            payload = json.loads(agent.config_path.read_text())
+            ok = agent_config.has_current_server_entry(payload, agent)
             results.append(CheckResult(
                 f"agent {agent.name}",
                 ok,
-                "registered" if ok else "config exists but docmancer entry not found",
+                "registered" if ok else "config exists but current docmancer MCP entry not found",
             ))
         except Exception as exc:
             results.append(CheckResult(f"agent {agent.name}", False, str(exc)))
