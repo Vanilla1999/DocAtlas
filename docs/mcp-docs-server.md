@@ -52,6 +52,14 @@ backwards compatibility.
 
 ## MCP client configuration
 
+The fastest path is the one-line installer, which registers this docs server into Claude Code, OpenCode, and/or Codex for you:
+
+```bash
+curl -LsSf https://raw.githubusercontent.com/Vanilla1999/DocAtlas/main/install.sh | sh
+```
+
+See [`scripts/install.sh`](../scripts/install.sh). To configure a client manually, add:
+
 ```json
 {
   "mcpServers": {

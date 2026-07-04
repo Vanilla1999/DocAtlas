@@ -23,6 +23,26 @@ get_docs_context → get_patch_constraints → edit → validate_patch_against_c
 
 Patch Contract output is advisory and non-blocking: it highlights source-backed constraints, deterministic violations, and unknown/manual-review areas, but it does not prove a patch is safe to merge.
 
+## One-line install
+
+Install `uv`, the `doc-atlas` CLI, and register the docs MCP server into your agent — in a single command:
+
+```bash
+curl -LsSf https://raw.githubusercontent.com/Vanilla1999/DocAtlas/main/install.sh | sh
+```
+
+The installer sets up `uv` (if missing), runs `uv tool install doc-atlas`, then lets you pick which agent(s) to register the DocAtlas docs MCP server (`doc-atlas mcp docs-serve`) into — **Claude Code**, **OpenCode**, and/or **Codex** — and finishes with a version/health check. It is idempotent, so re-running it is safe.
+
+Non-interactive (CI or scripted) usage — pass the agent(s) via env var or positional args:
+
+```bash
+DOCATLAS_AGENT=claude-code curl -LsSf https://raw.githubusercontent.com/Vanilla1999/DocAtlas/main/install.sh | sh
+# or several / all at once:
+curl -LsSf https://raw.githubusercontent.com/Vanilla1999/DocAtlas/main/install.sh | sh -s -- claude-code opencode
+```
+
+Accepted values: `claude-code`, `opencode`, `codex`, `all`, `none`. macOS and Linux only. Prefer the manual steps below on Windows.
+
 ## Naming and compatibility
 
 The product name is **DocAtlas**.
