@@ -149,6 +149,14 @@ def test_question_keywords_raise_relevant_dependency_constraint(tmp_path: Path):
 def test_suggested_checks_include_generated_and_lockfile_checks(tmp_path: Path):
     packet = _packet(_workspace(tmp_path), changed_files=["lib/foo/user.g.dart", "pubspec.lock"])
     checks = "\n".join(packet.suggested_checks).lower()
+    import json, dataclasses
+    print(f"\nDEBUG: suggested_checks={packet.suggested_checks!r}")
+    print(f"DEBUG: checks={checks!r}")
+    print(f"DEBUG: constraints count={len(packet.constraints)}")
+    for c in packet.constraints:
+        print(f"  [{c.type}] {c.id}: {c.instruction[:60]!r}")
+    print(f"DEBUG: _dropped_non_actionable_constraints types: {packet.warnings}")
+    print(f"DEBUG: token_budget: {packet.token_budget}")
     assert "generator" in checks or "generated" in checks
     assert "lockfile" in checks
 

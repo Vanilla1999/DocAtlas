@@ -195,6 +195,19 @@ def evaluate_project_answer_completeness(
     source_search_required = bool(answer_available and missing_terms and story_specific_query)
     navigational_context = _has_navigational_context(context_pack)
 
+    has_strong_evidence = any(
+        item.get("source_class") in ("dependency_doc", "source_evidence")
+        or (item.get("authority") in ("primary", "primary_source"))
+        for item in proof_context_pack
+    )
+    has_exact_dependency = any(
+        item.get("source_class") == "dependency_doc"
+        and item.get("docs_exactness") == "exact"
+        for item in context_pack
+    )
+    all_terms_covered = not missing_terms
+    reason_codes: list[str] = []
+
     if not answer_available:
         answer_type = "unavailable"
         status = "unavailable"
@@ -204,18 +217,25 @@ def evaluate_project_answer_completeness(
     elif source_search_required:
         answer_type = "partial"
         status = "partial"
-    else:
+    elif all_terms_covered and (has_strong_evidence or has_exact_dependency):
         answer_type = "exact"
         status = "exact"
-
-    reason_codes: list[str] = []
-    if not answer_available:
-        reason_codes.append("no_trusted_context")
-    if source_search_required:
+    elif all_terms_covered:
+        answer_type = "partial_navigational"
+        status = "partial"
+        reason_codes.append("missing_strong_evidence_for_exact")
+    else:
+        answer_type = "partial"
+        status = "partial"
         reason_codes.append("story_terms_missing_from_source_evidence")
-    if fallback_relevance_query and missing_terms:
+
+    if not answer_available and "no_trusted_context" not in reason_codes:
+        reason_codes.append("no_trusted_context")
+    if source_search_required and "story_terms_missing_from_source_evidence" not in reason_codes:
+        reason_codes.append("story_terms_missing_from_source_evidence")
+    if fallback_relevance_query and missing_terms and "high_signal_query_terms_missing_from_context" not in reason_codes:
         reason_codes.append("high_signal_query_terms_missing_from_context")
-    if navigational_context:
+    if navigational_context and "navigational_context_present" not in reason_codes:
         reason_codes.append("navigational_context_present")
 
     recommended_next_actions = []

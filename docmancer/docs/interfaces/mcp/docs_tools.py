@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import asdict
 from typing import Any
 
+from docmancer.docs.interfaces.mcp.error_contract import build_bad_request_payload
 from docmancer.docs.service import LibraryDocsService
 
 
@@ -22,7 +23,7 @@ _MCP_MAX_LIST_LIMIT = 200
 
 
 def _bad_request(reason_code: str, message: str) -> dict[str, Any]:
-    return {"status": "failed", "reason_code": reason_code, "message": message}
+    return build_bad_request_payload(reason_code, message)
 
 
 def _clean_string(value: Any) -> str | None:
@@ -56,26 +57,27 @@ def library_tools(tools: list[dict[str, Any]]) -> list[dict[str, Any]]:
 
 
 def handle_library_tool(name: str, args: dict[str, Any], service: LibraryDocsService) -> dict[str, Any] | None:
+    app = getattr(service, "library_docs", service)
     if name == "resolve_library_id":
         library = _library_arg(args)
         if not library:
             return _bad_request("empty_library", "library must not be empty")
-        return asdict(service.resolve_library(library, args.get("ecosystem"), args.get("version"), args.get("docs_url"), args.get("docs_url_template"), args.get("source_type")))
+        return asdict(app.resolve_library(library, args.get("ecosystem"), args.get("version"), args.get("docs_url"), args.get("docs_url_template"), args.get("source_type")))
     if name == "get_library_docs":
         library = _library_arg(args)
         if not library:
             return _bad_request("empty_library", "library must not be empty")
-        return asdict(service.get_docs(library, topic=_clean_string(args.get("topic")), tokens=_bounded_int_arg(args, "tokens", max_value=_MCP_MAX_TOKENS), ecosystem=args.get("ecosystem"), version=args.get("version"), docs_url=args.get("docs_url"), docs_url_template=args.get("docs_url_template"), source_type=args.get("source_type"), force_refresh=bool(args.get("force_refresh") or False), project_path=args.get("project_path"), response_style=args.get("response_style")))
+        return asdict(app.get_docs(library, topic=_clean_string(args.get("topic")), tokens=_bounded_int_arg(args, "tokens", max_value=_MCP_MAX_TOKENS), ecosystem=args.get("ecosystem"), version=args.get("version"), docs_url=args.get("docs_url"), docs_url_template=args.get("docs_url_template"), source_type=args.get("source_type"), force_refresh=bool(args.get("force_refresh") or False), project_path=args.get("project_path"), response_style=args.get("response_style")))
     if name == "refresh_library_docs":
-        return asdict(service.refresh_docs(args["library"], ecosystem=args.get("ecosystem"), version=args.get("version"), docs_url=args.get("docs_url"), versions=args.get("versions"), docs_url_template=args.get("docs_url_template"), source_type=args.get("source_type"), force=bool(args.get("force") if args.get("force") is not None else True)))
+        return asdict(app.refresh_docs(args["library"], ecosystem=args.get("ecosystem"), version=args.get("version"), docs_url=args.get("docs_url"), versions=args.get("versions"), docs_url_template=args.get("docs_url_template"), source_type=args.get("source_type"), force=bool(args.get("force") if args.get("force") is not None else True)))
     if name == "prefetch_library_docs":
-        return asdict(service.prefetch_docs(args["library"], ecosystem=args.get("ecosystem"), versions=args.get("versions"), docs_url=args.get("docs_url"), docs_url_template=args.get("docs_url_template"), source_type=args.get("source_type"), force_refresh=bool(args.get("force_refresh") or False), continue_on_error=bool(args.get("continue_on_error") if args.get("continue_on_error") is not None else True), async_=bool(args.get("async") or False)))
+        return asdict(app.prefetch_docs(args["library"], ecosystem=args.get("ecosystem"), versions=args.get("versions"), docs_url=args.get("docs_url"), docs_url_template=args.get("docs_url_template"), source_type=args.get("source_type"), force_refresh=bool(args.get("force_refresh") or False), continue_on_error=bool(args.get("continue_on_error") if args.get("continue_on_error") is not None else True), async_=bool(args.get("async") or False)))
     if name == "inspect_library_docs":
-        return asdict(service.inspect_library_docs(args["canonical_id"]))
+        return asdict(app.inspect_library_docs(args["canonical_id"]))
     if name == "remove_library_docs":
-        return asdict(service.remove_library_docs(args["canonical_id"]))
+        return asdict(app.remove_library_docs(args["canonical_id"]))
     if name == "prune_library_docs":
-        return asdict(service.prune_library_docs(library=args.get("library"), keep_versions=args.get("keep_versions") or [], older_than_days=int(args.get("older_than_days") or 90), dry_run=bool(args.get("dry_run") if args.get("dry_run") is not None else True)))
+        return asdict(app.prune_library_docs(library=args.get("library"), keep_versions=args.get("keep_versions") or [], older_than_days=int(args.get("older_than_days") or 90), dry_run=bool(args.get("dry_run") if args.get("dry_run") is not None else True)))
     if name == "list_library_docs":
-        return {"libraries": [asdict(item) for item in service.list_libraries(stale_only=bool(args.get("stale_only") or False), limit=_bounded_int_arg(args, "limit", default=None, max_value=_MCP_MAX_LIST_LIMIT))]}
+        return {"libraries": [asdict(item) for item in app.list_libraries(stale_only=bool(args.get("stale_only") or False), limit=_bounded_int_arg(args, "limit", default=None, max_value=_MCP_MAX_LIST_LIMIT))]}
     return None

@@ -174,7 +174,7 @@ def _infer_scope_path(base_path: str) -> str:
     return "/" + "/".join(scope_parts)
 
 
-def is_docs_url(url: str, base_url: str) -> bool:
+def is_docs_url(url: str, base_url: str, locale_skip_counter: list[int] | None = None) -> bool:
     """Check if a URL is within the documentation scope.
 
     A URL is in scope if:
@@ -189,6 +189,9 @@ def is_docs_url(url: str, base_url: str) -> bool:
     Args:
         url: The candidate URL to check.
         base_url: The documentation root URL.
+        locale_skip_counter: Optional mutable counter (list[1]) incremented
+            when a URL is rejected because it uses a locale prefix not
+            present in the seed URL.
 
     Returns:
         True if the URL is in scope.
@@ -222,6 +225,8 @@ def is_docs_url(url: str, base_url: str) -> bool:
     scope_parts = [part.lower() for part in scope_path.split("/") if part]
     relative_parts = url_parts[len(scope_parts) :] if scope_parts and _starts_with_parts(url_parts, scope_parts) else url_parts
     if relative_parts and _is_locale_segment(relative_parts[0]) and not base_has_locale:
+        if locale_skip_counter is not None:
+            locale_skip_counter[0] += 1
         return False
 
     # Must not match blocklist

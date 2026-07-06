@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 from pathlib import Path
 from typing import Any
 import time
@@ -7,6 +8,8 @@ import time
 from docmancer.docs.models import RefreshResult
 from docmancer.docs.registry import LibraryRecord
 from docmancer.docs.dart_official_docs import build_dart_diagnostics, canonical_dart_ecosystem
+
+logger = logging.getLogger(__name__)
 
 
 def _merged_discovery_diagnostics(items: list[dict[str, Any]]) -> dict[str, Any]:
@@ -148,6 +151,7 @@ class LibraryRefreshOps:
                 if getattr(agent, "last_discovery_diagnostics", None):
                     discovery_diagnostics.append(dict(agent.last_discovery_diagnostics))
         except Exception as exc:
+            logger.exception("Refresh failed for record %s: %s", record.library_id, exc)
             self.registry.upsert(
                 library=record.name,
                 ecosystem=record.ecosystem,

@@ -5,6 +5,7 @@ import asyncio
 import json
 from typing import Any, cast
 
+from docmancer.docs.interfaces.mcp.error_contract import build_mcp_error_payload, debug_errors_enabled
 from docmancer.docs.service import LibraryDocsService
 from docmancer.docs.interfaces.mcp.context_tools import context_tools, handle_context_tool
 from docmancer.docs.interfaces.mcp.docs_tools import handle_library_tool, library_tools
@@ -39,6 +40,10 @@ TOOLS: list[dict[str, Any]] = [
                 "allow_network": {"type": ["boolean", "null"]},
                 "allow_latest_fallback": {"type": ["boolean", "null"]},
                 "force_refresh": {"type": ["boolean", "null"]},
+                "prefetch_auto": {"type": ["boolean", "null"], "description": "When true, automatically prefetch dependency/library docs from the network without requiring user confirmation."},
+                "page": {"type": ["integer", "null"], "minimum": 1, "default": 1},
+                "page_size": {"type": ["integer", "null"], "minimum": 1, "maximum": 20},
+                "include_sections": {"type": ["array", "null"], "items": {"type": "string", "enum": ["context_pack", "supporting_snippets", "trust_contract", "diagnostics", "metrics"]}},
                 "output_mode": {"type": ["string", "null"], "enum": ["answer", "compact", "debug", "full", None], "default": "answer", "description": "answer is the default minimal agent-friendly response; compact includes structured context; debug includes diagnostics; full returns raw output."},
                 "details": {"type": ["boolean", "null"]},
             },
@@ -289,6 +294,9 @@ Does not use deleted, orphaned, or stale project-doc content by default.""",
                 "mode": {"type": ["string", "null"], "enum": ["auto", "project-only", "deps-only", "public-docs", None]},
                 "response_style": {"type": ["string", "null"], "enum": ["auto", "snippet-first", "evidence-first", None], "default": "auto", "description": "Choose snippet-first presentation for coding tasks or preserve evidence-first context."},
                 "allow_network": {"type": ["boolean", "null"], "default": False, "description": "Permit dependency/public docs network fetches. Defaults to false and returns confirmation instead."},
+                "page": {"type": ["integer", "null"], "minimum": 1, "default": 1},
+                "page_size": {"type": ["integer", "null"], "minimum": 1, "maximum": 20},
+                "include_sections": {"type": ["array", "null"], "items": {"type": "string", "enum": ["context_pack", "supporting_snippets", "trust_contract", "diagnostics", "metrics"]}},
                 "output_mode": {"type": ["string", "null"], "enum": ["answer", "compact", "debug", "full", None], "default": "answer", "description": "answer is the default minimal agent-friendly response; compact includes structured context; debug includes diagnostics; full returns raw output."},
                 "details": {"type": ["boolean", "null"], "description": "Compatibility flag; for get_project_context it does not request full output unless output_mode='full'."},
             },
@@ -401,7 +409,7 @@ Does not use deleted, orphaned, or stale project-doc content by default.""",
     },
     {
         "name": "prefetch_project_docs",
-        "description": "Read a Flutter/Dart/Rust project and prefetch exact dependency documentation from project manifests/lockfiles. This is for dependency docs, not project-owned README/docs/wiki files; call inspect_project_docs first to discover local project docs. May fetch from the network, so ask for confirmation before running unless the user already approved dependency docs prefetch.",
+        "description": "[DEPRECATED] Use prefetch_project_dependency_docs instead. Read a Flutter/Dart/Rust project and prefetch exact dependency documentation from project manifests/lockfiles. May fetch from the network, so ask for confirmation before running.",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -419,7 +427,7 @@ Does not use deleted, orphaned, or stale project-doc content by default.""",
     },
     {
         "name": "prefetch_project_dependency_docs",
-        "description": "Alias for prefetch_project_docs with clearer naming. Read a Flutter/Dart/Rust project and prefetch exact dependency documentation from project manifests/lockfiles. This is for dependency docs, not project-owned README/docs/wiki files. May fetch from the network, so ask for confirmation before running unless the user already approved dependency docs prefetch.",
+        "description": "Read a Flutter/Dart/Rust project and prefetch exact dependency documentation from project manifests/lockfiles. This is for dependency docs, not project-owned README/docs/wiki files; call inspect_project_docs first to discover local project docs. May fetch from the network, so ask for confirmation before running unless the user already approved dependency docs prefetch.",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -598,8 +606,26 @@ async def _run_async(service: LibraryDocsService) -> None:
                 if payload is not None:
                     return _json_text(mcp_types, payload)
         except Exception as exc:
-            return _json_text(mcp_types, {"status": "failed", "message": str(exc)})
-        return _json_text(mcp_types, {"status": "failed", "message": f"unknown tool: {name}"})
+            return _json_text(
+                mcp_types,
+                build_mcp_error_payload(
+                    reason_code="unhandled_exception",
+                    message=str(exc),
+                    exception=exc,
+                    tool=name,
+                    phase="execution",
+                    debug=debug_errors_enabled(arguments or {}),
+                ),
+            )
+        return _json_text(
+            mcp_types,
+            build_mcp_error_payload(
+                reason_code="unknown_tool",
+                message=f"unknown tool: {name}",
+                tool=name,
+                phase="validation",
+            ),
+        )
 
     async with stdio_server() as (read_stream, write_stream):
         await server.run(read_stream, write_stream, server.create_initialization_options())

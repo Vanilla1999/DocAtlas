@@ -114,4 +114,4 @@ def test_known_riverpod_fake_refresh_and_query_uses_isolated_home(tmp_path, monk
 def test_discovery_candidates_include_next_action(tmp_path):
     result = _service(tmp_path).get_docs("mcp", ecosystem="python", topic="server")
 
-    assert result.next_actions == ["Retry get_library_docs with docs_url from discovery_candidates[0]."]
+    assert result.next_actions == [{"type": "get_library_docs", "tool": "get_library_docs", "arguments_patch": {"docs_url": "https://github.com/modelcontextprotocol/python-sdk", "ecosystem": "python"}}]

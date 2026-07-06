@@ -106,3 +106,123 @@ def test_context_pack_excludes_low_trust_artifacts_unless_requested():
     )
 
     assert artifact_path in [item["path"] for item in artifact_pack]
+
+
+def test_weighted_relevance_gate_single_low_weight_does_not_pass():
+    question = "nonexistent zzzxq foobar"
+    from docmancer.docs.application.project_context_service import _query_relevance_gate
+
+    gate = _query_relevance_gate(
+        question=question,
+        intent=_intent(),
+        context_pack=[
+            {"source_class": "project_doc", "path": "docs/oidc.md", "title": "OIDC", "content": "protocol overview"},
+        ],
+        relevance_terms=["nonexistent", "zzzxq", "foobar"],
+    )
+    assert not gate["passed"]
+    assert gate["reason"] == "insufficient_weighted_relevance"
+    assert "matched_details" in gate
+    assert "weighted_score" in gate
+
+
+def test_weighted_relevance_gate_strong_content_match_passes():
+    question = "authentication protocol oidc token"
+    from docmancer.docs.application.project_context_service import _query_relevance_gate
+
+    gate = _query_relevance_gate(
+        question=question,
+        intent=_intent(),
+        context_pack=[
+            {
+                "source_class": "project_doc",
+                "path": "docs/oidc.md",
+                "title": "OIDC protocol",
+                "content": "authentication protocol oidc token overview with detailed explanation of flows",
+            },
+        ],
+        relevance_terms=["authentication", "protocol", "oidc"],
+    )
+    assert gate["passed"]
+    assert gate["reason"] == "weighted_relevance_sufficient"
+
+
+def test_weighted_relevance_gate_symbol_match_passes():
+    question = "PermissionService grant authority"
+    from docmancer.docs.application.project_context_service import _query_relevance_gate
+
+    gate = _query_relevance_gate(
+        question=question,
+        intent=_intent(),
+        context_pack=[
+            {
+                "source_class": "source_evidence",
+                "evidence_class": "source_snippet",
+                "path": "lib/permission_service.dart",
+                "title": "PermissionService",
+                "content": "class PermissionService implements GrantAuthority",
+            },
+        ],
+        relevance_terms=["PermissionService", "grant authority"],
+    )
+    assert gate["passed"]
+    assert gate["reason"] == "weighted_relevance_sufficient"
+
+
+def test_weighted_relevance_gate_dependency_match_passes():
+    question = "go_router navigate screen"
+    from docmancer.docs.application.project_context_service import _query_relevance_gate
+
+    gate = _query_relevance_gate(
+        question=question,
+        intent=_intent(),
+        context_pack=[
+            {
+                "source_class": "dependency_doc",
+                "path": "pub/go_router",
+                "title": "GoRouter navigate",
+                "content": "go_router provides navigate method for screen routing with detailed navigation patterns",
+            },
+        ],
+        relevance_terms=["go_router", "navigate"],
+    )
+    assert gate["passed"]
+    assert gate["reason"] == "weighted_relevance_sufficient"
+
+
+def test_answer_type_not_exact_without_strong_evidence():
+    result = evaluate_project_answer_completeness(
+        question="How to use the widget tree?",
+        context_pack=[
+            {
+                "source_class": "project_doc",
+                "source_type": "readme",
+                "path": "README.md",
+                "title": "Project Overview",
+                "authority": "supporting",
+                "content": "the widget tree is defined by the Flutter framework.",
+            }
+        ],
+        answer_available=True,
+        intent=_intent(),
+    )
+    assert result["answer_type"] != "exact"
+    assert "missing_strong_evidence_for_exact" in result["answer_completeness"]["reason_codes"] or "high_signal_query_terms_missing_from_context" in result["answer_completeness"]["reason_codes"]
+
+
+def test_answer_type_exact_only_with_strong_evidence():
+    result = evaluate_project_answer_completeness(
+        question="PermissionService grant access",
+        context_pack=[
+            {
+                "source_class": "source_evidence",
+                "evidence_class": "source_snippet",
+                "path": "lib/permission_service.dart",
+                "title": "PermissionService",
+                "content": "class PermissionService implements GrantAccessAuthority",
+            }
+        ],
+        answer_available=True,
+        intent=_intent(),
+    )
+    assert result["answer_type"] == "exact"

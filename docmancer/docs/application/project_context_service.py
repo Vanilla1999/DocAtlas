@@ -132,7 +132,7 @@ class ProjectContextService:
             warnings.extend(dependency_docs.warnings)
         next_actions = [*(project_docs.next_actions if project_docs else [])]
         if dependency_docs:
-            next_actions.extend({"tool": dependency_docs.tool, "reason": action} for action in dependency_docs.next_actions)
+            next_actions.extend(_library_next_action(dependency_docs, action) for action in dependency_docs.next_actions)
         if dependency_confirmation:
             next_actions.append(dependency_confirmation)
         requires_confirmation = bool(project_docs and project_docs.requires_confirmation) or bool(dependency_confirmation and explicit_dependency_requested)
@@ -449,6 +449,12 @@ def project_context_pack(*, question: str = "", project_docs: ProjectDocsResult 
     return pack
 
 
+def _library_next_action(dependency_docs: DocsResult, action: Any) -> dict[str, Any]:
+    if isinstance(action, dict):
+        return action
+    return {"tool": dependency_docs.tool, "reason": action}
+
+
 def _should_skip_low_trust_project_source(question: str, source_taxonomy: dict[str, Any]) -> bool:
     risk_flags = set(source_taxonomy.get("risk_flags") or [])
     if not risk_flags.intersection(LOW_TRUST_PROJECT_RISK_FLAGS):
@@ -459,6 +465,13 @@ def _should_skip_low_trust_project_source(question: str, source_taxonomy: dict[s
 def _question_explicitly_targets_low_trust_artifacts(question: str) -> bool:
     normalized = (question or "").lower()
     return any(term in normalized for term in LOW_TRUST_QUERY_TERMS)
+
+
+_GATE_WEIGHT_PATH = 1.0
+_GATE_WEIGHT_TITLE_HEADING = 2.0
+_GATE_WEIGHT_CONTENT = 3.0
+_GATE_WEIGHT_SYMBOL = 4.0
+_GATE_WEIGHT_DEPENDENCY = 4.0
 
 
 def _query_relevance_gate(
@@ -475,20 +488,65 @@ def _query_relevance_gate(
             "reason": "no_high_signal_terms_required",
             "required_terms": [],
             "matched_terms": [],
+            "weighted_score": None,
+            "matched_term_count": 0,
+            "required_term_count": 0,
         }
-    matched_terms = _matched_query_terms(context_pack, terms)
-    if matched_terms:
-        return {
-            "passed": True,
-            "reason": "query_term_evidence_present",
-            "required_terms": terms[:8],
-            "matched_terms": matched_terms[:8],
-        }
+    matched_details: list[dict[str, Any]] = []
+    for term in terms:
+        normalized_term = _normalize_gate_text(term)
+        if not normalized_term:
+            continue
+        best_weight = 0.0
+        hit_fields: list[str] = []
+        for item in context_pack:
+            item_text = _normalize_gate_text(_context_item_text_for_gate(item))
+            if normalized_term not in item_text:
+                continue
+            path = (item.get("source") or {}).get("path") if isinstance(item.get("source"), dict) else item.get("path")
+            if path and normalized_term in _normalize_gate_text(path):
+                best_weight = max(best_weight, _GATE_WEIGHT_PATH)
+                hit_fields.append("path")
+            heading = item.get("heading_path") or (item.get("section") or {}).get("heading_path")
+            if heading and normalized_term in _normalize_gate_text(heading):
+                best_weight = max(best_weight, _GATE_WEIGHT_TITLE_HEADING)
+                hit_fields.append("heading")
+            title = item.get("title") or (item.get("section") or {}).get("title")
+            if title and normalized_term in _normalize_gate_text(title):
+                best_weight = max(best_weight, _GATE_WEIGHT_TITLE_HEADING)
+                hit_fields.append("title")
+            snippet = item.get("snippet") or item.get("content")
+            if snippet and normalized_term in _normalize_gate_text(snippet):
+                weight = _GATE_WEIGHT_DEPENDENCY if item.get("source_class") == "dependency_doc" else _GATE_WEIGHT_CONTENT
+                best_weight = max(best_weight, weight)
+                hit_fields.append("content")
+            evidence_class = item.get("evidence_class")
+            if evidence_class:
+                best_weight = max(best_weight, _GATE_WEIGHT_SYMBOL)
+                hit_fields.append("evidence")
+        if best_weight > 0:
+            matched_details.append({"term": term, "weight": best_weight, "fields": sorted(set(hit_fields))})
+    total_weight = sum(d["weight"] for d in matched_details)
+    matched_count = len(matched_details)
+    required_count = len(terms)
+    coverage_ratio = matched_count / required_count if required_count > 0 else 0.0
+    has_strong_match = any(d["weight"] >= _GATE_WEIGHT_SYMBOL for d in matched_details)
+    high_signal_count = sum(1 for d in matched_details if d["weight"] >= _GATE_WEIGHT_CONTENT)
+    passes = (
+        matched_count >= 2 and high_signal_count >= 1
+    ) or coverage_ratio >= 0.5 or has_strong_match
+    matched_terms_list = [d["term"] for d in matched_details]
+    missing_terms_list = [t for t in terms[:8] if t not in matched_terms_list]
     return {
-        "passed": False,
-        "reason": "no_selected_source_contains_high_signal_query_terms",
+        "passed": passes,
+        "reason": "weighted_relevance_sufficient" if passes else "insufficient_weighted_relevance",
         "required_terms": terms[:8],
-        "matched_terms": [],
+        "matched_terms": matched_terms_list,
+        "missing_terms": missing_terms_list,
+        "matched_details": matched_details,
+        "weighted_score": round(total_weight, 1),
+        "matched_term_count": matched_count,
+        "required_term_count": required_count,
     }
 
 
@@ -544,8 +602,11 @@ def _max_project_ranking_score(project_docs: ProjectDocsResult | None) -> float 
     return 1.0 if project_docs and project_docs.results else None
 
 
+STRONG_PROJECT_SCORE_THRESHOLD = 0.35
+
+
 def _score_is_strong(score: float | None) -> bool:
-    return score is not None and score >= 0.18
+    return score is not None and score >= STRONG_PROJECT_SCORE_THRESHOLD
 
 
 def _is_low_signal_single_token_query(question: str) -> bool:

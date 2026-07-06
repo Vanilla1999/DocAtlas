@@ -39,6 +39,10 @@ from docmancer.connectors.fetchers.pipeline.extraction import discover_dartdoc_c
 
 logger = logging.getLogger(__name__)
 
+# Module-level counter for locale-skipped URLs during discovery.
+# Reset in discover_urls(); read to surface locale_skipped_count in diagnostics.
+_LOCALE_SKIP_COUNTER: list[int] = [0]
+
 # Minimum content length for llms-full.txt to be considered valid.
 _LLMS_FULL_MIN_CHARS = 1000
 
@@ -126,6 +130,8 @@ def discover_urls(
                 logger.debug("Discovery strategy %s failed: %s", strategy_enum.value, exc)
                 return DiscoveryResult()
 
+    _LOCALE_SKIP_COUNTER[0] = 0
+
     llms_full = _try_llms_full_txt(base_url, client, platform, robots)
     if llms_full:
         logger.info("Discovery: %s found %d URL(s)", DiscoveryStrategy.LLMS_FULL_TXT.value, len(llms_full))
@@ -193,6 +199,7 @@ def discover_urls(
                 "sitemap_pages": sitemap_total,
                 "seed_pages": seed_pages,
                 "fallback_pages": len(fallback_results),
+                "locale_skipped_count": _LOCALE_SKIP_COUNTER[0],
             },
         )
 
@@ -208,6 +215,7 @@ def discover_urls(
                 "sitemap_pages": 0,
                 "seed_pages": 0,
                 "fallback_pages": 0,
+                "locale_skipped_count": _LOCALE_SKIP_COUNTER[0],
             },
         )
 
@@ -220,6 +228,7 @@ def discover_urls(
             "sitemap_pages": 0,
             "seed_pages": 0,
             "fallback_pages": 0,
+            "locale_skipped_count": _LOCALE_SKIP_COUNTER[0],
         },
     )
 
@@ -394,7 +403,7 @@ def _try_robots_sitemap(
             break
         entries = parse_sitemap(sitemap_url, client, max_entries=remaining, scope_base_url=base_url)
         for entry in entries:
-            if entry["url"] and is_docs_url(entry["url"], base_url):
+            if entry["url"] and is_docs_url(entry["url"], base_url, locale_skip_counter=_LOCALE_SKIP_COUNTER):
                 all_urls.append(
                     DiscoveredUrl(url=entry["url"], strategy=DiscoveryStrategy.ROBOTS_SITEMAP)
                 )
@@ -418,7 +427,7 @@ def _try_sitemap_xml(
         if entries:
             results = []
             for entry in entries:
-                if entry["url"] and is_docs_url(entry["url"], base_url):
+                if entry["url"] and is_docs_url(entry["url"], base_url, locale_skip_counter=_LOCALE_SKIP_COUNTER):
                     results.append(
                         DiscoveredUrl(url=entry["url"], strategy=DiscoveryStrategy.SITEMAP_XML)
                     )
@@ -452,7 +461,7 @@ def _try_platform_sitemap(
             results = [
                 DiscoveredUrl(url=e["url"], strategy=DiscoveryStrategy.PLATFORM_SITEMAP)
                 for e in entries[:max_pages]
-                if e["url"] and is_docs_url(e["url"], base_url)
+                if e["url"] and is_docs_url(e["url"], base_url, locale_skip_counter=_LOCALE_SKIP_COUNTER)
             ]
             if results:
                 return results
@@ -583,6 +592,6 @@ def _append_link(
     if not href:
         return
     full_url = normalize_url(_resolve(href, page_url))
-    if full_url not in seen and is_docs_url(full_url, base_url):
+    if full_url not in seen and is_docs_url(full_url, base_url, locale_skip_counter=_LOCALE_SKIP_COUNTER):
         seen.add(full_url)
         output.append(full_url)

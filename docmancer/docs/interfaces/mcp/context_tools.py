@@ -4,6 +4,7 @@ from dataclasses import asdict, is_dataclass
 from typing import Any
 
 from docmancer.docs.service import LibraryDocsService
+from docmancer.docs.interfaces.mcp.output_contract import normalize_output_mode
 from docmancer.docs.interfaces.mcp.project_tools import _attach_output_contract, _bad_request, _bounded_int_arg, _clean_string, _compact_mcp_payload, _strip_mcp_debug_noise
 
 
@@ -15,8 +16,7 @@ def context_tools(tools: list[dict[str, Any]]) -> list[dict[str, Any]]:
 
 
 def _output_mode(args: dict[str, Any]) -> str:
-    mode = str(args.get("output_mode") or "answer").lower()
-    return mode if mode in {"answer", "compact", "debug", "full"} else "answer"
+    return normalize_output_mode(args)
 
 
 def _answer_payload(payload: dict[str, Any]) -> dict[str, Any]:
@@ -37,6 +37,12 @@ def _answer_payload(payload: dict[str, Any]) -> dict[str, Any]:
     if payload.get("requires_confirmation"):
         answer["requires_confirmation"] = payload.get("requires_confirmation")
         answer["confirmation_reason"] = payload.get("confirmation_reason")
+    ingestion = payload.get("ingestion_diagnostics") or {}
+    retrieval = payload.get("retrieval_diagnostics") or {}
+    if ingestion:
+        answer["ingestion_diagnostics"] = ingestion
+    if retrieval:
+        answer["retrieval_diagnostics"] = retrieval
     return {key: value for key, value in answer.items() if value not in (None, {}, [])}
 
 
@@ -60,6 +66,8 @@ def _compact_payload(payload: dict[str, Any]) -> dict[str, Any]:
         "warnings": payload.get("warnings") or [],
         "requires_confirmation": payload.get("requires_confirmation"),
         "confirmation_reason": payload.get("confirmation_reason"),
+        "ingestion_diagnostics": payload.get("ingestion_diagnostics") or {},
+        "retrieval_diagnostics": payload.get("retrieval_diagnostics") or {},
     }
 
 
@@ -68,8 +76,9 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
         return None
     question = _clean_string(args.get("question"))
     if not question:
-        return _bad_request("empty_question", "question must not be empty")
-    result = service.get_docs_context(
+        return _bad_request("empty_question", "question must not be empty. Examples: 'Flutter Riverpod providers', 'Firebase Auth signIn', 'How to use go_router redirect', 'FastAPI dependency injection', 'patch_constraints for adding a service'")
+    app = getattr(service, "unified_context", service)
+    result = app.get_docs_context(
         question,
         project_path=args.get("project_path"),
         library=args.get("library"),
@@ -89,6 +98,7 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
         allow_network=args.get("allow_network"),
         allow_latest_fallback=args.get("allow_latest_fallback"),
         force_refresh=args.get("force_refresh"),
+        prefetch_auto=args.get("prefetch_auto"),
         details=args.get("details"),
         response_style=args.get("response_style"),
     )
@@ -107,7 +117,7 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
         return raw
     payload = raw if mode == "debug" else (_compact_payload(raw) if mode == "compact" else _answer_payload(raw))
     payload["output_mode"] = mode
-    payload = _compact_mcp_payload(payload)
+    payload = _compact_mcp_payload(payload, page=_bounded_int_arg(args, "page", default=1, max_value=10_000), page_size=_bounded_int_arg(args, "page_size", default=None, max_value=20), include_sections=args.get("include_sections"))
     return _attach_output_contract(payload, output_mode=mode) if mode == "debug" else _strip_mcp_debug_noise(payload)
 
 

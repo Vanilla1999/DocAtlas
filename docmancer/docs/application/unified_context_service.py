@@ -129,6 +129,7 @@ class UnifiedDocsContextService:
         allow_network: bool | None = None,
         allow_latest_fallback: bool | None = None,
         force_refresh: bool | None = None,
+        prefetch_auto: bool | None = None,
         details: bool | None = None,
         response_style: str | None = None,
     ) -> UnifiedDocsContextResult:
@@ -137,6 +138,8 @@ class UnifiedDocsContextService:
         prepare_project_docs = True if prepare_project_docs is None else bool(prepare_project_docs)
         allow_network = bool(allow_network) if allow_network is not None else False
         allow_latest_fallback = bool(allow_latest_fallback) if allow_latest_fallback is not None else False
+        prefetch_auto_val = bool(prefetch_auto) if prefetch_auto is not None else False
+        effective_allow_network = allow_network or prefetch_auto_val
         force_refresh = bool(force_refresh) if force_refresh is not None else False
         details = bool(details) if details is not None else False
         libs = self._libraries(library, libraries)
@@ -190,11 +193,11 @@ class UnifiedDocsContextService:
         project_auto = mode_requested == "auto" and bool(project_path) and not libs
 
         if mode_selected == "project":
-            delegated_mode = "auto" if project_auto and allow_network else "project-only"
+            delegated_mode = "auto" if project_auto and effective_allow_network else "project-only"
             routing["delegated_mode"] = delegated_mode
-            project_result = self.service.get_project_context(project_path, question, tokens=tokens, limit=limit, expand=expand, module=module, module_path=module_path, scope=scope, mode=delegated_mode, response_style=response_style, allow_network=allow_network)
+            project_result = self.service.get_project_context(project_path, question, tokens=tokens, limit=limit, expand=expand, module=module, module_path=module_path, scope=scope, mode=delegated_mode, response_style=response_style, allow_network=effective_allow_network)
         elif mode_selected == "dependency":
-            if not allow_network and self._dependency_prefetch_needed(project_path):
+            if not effective_allow_network and self._dependency_prefetch_needed(project_path):
                 lanes["dependency"] = {"status": "confirmation_required", "source_count": 0}
                 return self._confirmation_result(
                     question=question,
@@ -207,17 +210,17 @@ class UnifiedDocsContextService:
                     lanes=lanes,
                     lane_details=lane_details if details else {},
                 )
-            project_result = self.service.get_project_context(project_path, question, tokens=tokens, limit=limit, expand=expand, library=library, libraries=libraries, ecosystem=ecosystem, version=version, module=module, module_path=module_path, scope=scope, mode="deps-only", response_style=response_style, allow_network=allow_network)
+            project_result = self.service.get_project_context(project_path, question, tokens=tokens, limit=limit, expand=expand, library=library, libraries=libraries, ecosystem=ecosystem, version=version, module=module, module_path=module_path, scope=scope, mode="deps-only", response_style=response_style, allow_network=effective_allow_network)
         elif mode_selected == "mixed":
-            project_result = self.service.get_project_context(project_path, question, tokens=tokens, limit=limit, expand=expand, library=library, libraries=libraries, ecosystem=ecosystem, version=version, module=module, module_path=module_path, scope=scope, mode="auto", response_style=response_style, allow_network=allow_network)
+            project_result = self.service.get_project_context(project_path, question, tokens=tokens, limit=limit, expand=expand, library=library, libraries=libraries, ecosystem=ecosystem, version=version, module=module, module_path=module_path, scope=scope, mode="auto", response_style=response_style, allow_network=effective_allow_network)
             routing["dependency_detected"] = bool(getattr(project_result, "dependency_docs", None))
             explicit_library_results = []
             for lib in libs:
-                safe = self._ensure_library_safe(lib, ecosystem, version, source_type, docs_url, force_refresh, allow_network)
+                safe = self._ensure_library_safe(lib, ecosystem, version, source_type, docs_url, force_refresh, effective_allow_network)
                 if safe is not None:
                     explicit_library_results.append(safe)
                     continue
-                explicit_library_results.append(self._get_library_docs_with_latest_fallback(lib, question=question, tokens=tokens, ecosystem=ecosystem, version=version, docs_url=docs_url, source_type=source_type, force_refresh=force_refresh, project_path=project_path, allow_network=allow_network, allow_latest_fallback=allow_latest_fallback, response_style=response_style))
+                explicit_library_results.append(self._get_library_docs_with_latest_fallback(lib, question=question, tokens=tokens, ecosystem=ecosystem, version=version, docs_url=docs_url, source_type=source_type, force_refresh=force_refresh, project_path=project_path, allow_network=effective_allow_network, allow_latest_fallback=allow_latest_fallback, response_style=response_style))
             library_results = [item for item in explicit_library_results if isinstance(item, DocsResult)]
             lane_details["library"] = [self._to_dict(item) for item in explicit_library_results]
             confirmations = [item for item in explicit_library_results if isinstance(item, UnifiedDocsContextResult)]
@@ -236,10 +239,10 @@ class UnifiedDocsContextService:
                 return confirmation
         elif mode_selected == "library":
             for lib in libs:
-                safe = self._ensure_library_safe(lib, ecosystem, version, source_type, docs_url, force_refresh, allow_network)
+                safe = self._ensure_library_safe(lib, ecosystem, version, source_type, docs_url, force_refresh, effective_allow_network)
                 if safe is not None:
                     return safe
-                result = self._get_library_docs_with_latest_fallback(lib, question=question, tokens=tokens, ecosystem=ecosystem, version=version, docs_url=docs_url, source_type=source_type, force_refresh=force_refresh, project_path=project_path, allow_network=allow_network, allow_latest_fallback=allow_latest_fallback, response_style=response_style)
+                result = self._get_library_docs_with_latest_fallback(lib, question=question, tokens=tokens, ecosystem=ecosystem, version=version, docs_url=docs_url, source_type=source_type, force_refresh=force_refresh, project_path=project_path, allow_network=effective_allow_network, allow_latest_fallback=allow_latest_fallback, response_style=response_style)
                 if isinstance(result, UnifiedDocsContextResult):
                     return result
                 library_results.append(result)
@@ -309,6 +312,28 @@ class UnifiedDocsContextService:
                 combined_next_actions.insert(0, patch_constraints_action)
         primary_next_action = pending_actions.get("next_action") or patch_constraints_action
 
+        ingestion_diagnostics = {}
+        retrieval_diagnostics = {}
+        if project_result:
+            project_diagnostics = getattr(project_result, "diagnostics", None) or getattr(project_result, "ingestion_diagnostics", None) or {}
+        else:
+            project_diagnostics = {}
+        for lane_name, lane_payload in [("project", project_diagnostics), ("library", library_results)]:
+            if lane_name == "library":
+                for lib_result in library_results:
+                    lib_diag = getattr(lib_result, "diagnostics", None) or {}
+                    if lib_diag:
+                        ingestion_diagnostics.setdefault(lane_name, []).append(lib_diag)
+                    retrieval_lane_diag = getattr(lib_result, "retrieval_diagnostics", None) or {}
+                    if retrieval_lane_diag:
+                        retrieval_diagnostics.setdefault(lane_name, []).append(retrieval_lane_diag)
+            else:
+                if lane_payload:
+                    ingestion_diagnostics.setdefault(lane_name, lane_payload)
+                    retrieval_lane_diag = getattr(project_result, "retrieval_diagnostics", None) or {}
+                    if retrieval_lane_diag:
+                        retrieval_diagnostics.setdefault(lane_name, retrieval_lane_diag)
+
         payload = UnifiedDocsContextResult(
             status=status,
             question=question,
@@ -341,6 +366,8 @@ class UnifiedDocsContextService:
             contamination=contamination,
             deduplication=deduplication,
             lane_details=lane_details if details else {},
+            ingestion_diagnostics=ingestion_diagnostics,
+            retrieval_diagnostics=retrieval_diagnostics,
         )
         return payload
 

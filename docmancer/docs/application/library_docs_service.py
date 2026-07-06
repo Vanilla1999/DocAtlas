@@ -58,6 +58,33 @@ class LibraryDocsApplicationService:
     def __getattr__(self, name: str) -> Any:
         return getattr(self.facade, name)
 
+    def _target_from_record(self, *args: Any, **kwargs: Any) -> Any:
+        return self.facade._target_from_record(*args, **kwargs)
+
+    def _record_urls(self, *args: Any, **kwargs: Any) -> list[str]:
+        return self.facade._record_urls(*args, **kwargs)
+
+    def _agent_instance(self, *args: Any, **kwargs: Any) -> Any:
+        return self.facade._agent_instance(*args, **kwargs)
+
+    def _is_stale(self, *args: Any, **kwargs: Any) -> bool:
+        return self.facade._is_stale(*args, **kwargs)
+
+    def _now(self, *args: Any, **kwargs: Any) -> Any:
+        return self.facade._now(*args, **kwargs)
+
+    def _index_config_for(self, *args: Any, **kwargs: Any) -> Any:
+        return self.facade._index_config_for(*args, **kwargs)
+
+    def _record_from_info(self, *args: Any, **kwargs: Any) -> Any:
+        return self.facade._record_from_info(*args, **kwargs)
+
+    def _lock_for(self, *args: Any, **kwargs: Any) -> Any:
+        return self.facade._lock_for(*args, **kwargs)
+
+    def _render_docs_url(self, *args: Any, **kwargs: Any) -> str:
+        return self.facade._render_docs_url(*args, **kwargs)
+
     def resolve_library(
         self,
         library: str,
@@ -822,7 +849,20 @@ class LibraryDocsApplicationService:
                 arguments_patch.setdefault("source_type", candidates[0]["source_type"])
             if candidates and candidates[0].get("ecosystem"):
                 arguments_patch.setdefault("ecosystem", candidates[0]["ecosystem"])
-            next_actions = ["Retry get_library_docs with docs_url from discovery_candidates[0]."] if candidates else ["Retry get_library_docs with docs_url, or call prefetch_library_docs/prefetch_docs_targets to register this source."]
+            next_actions_list: list[dict[str, Any]] = []
+            if candidates:
+                patch = dict(arguments_patch)
+                next_actions_list.append({
+                    "type": "get_library_docs",
+                    "tool": "get_library_docs",
+                    "arguments_patch": patch,
+                })
+            else:
+                next_actions_list.append({
+                    "type": "register_docs_source",
+                    "tool": "prefetch_docs_targets",
+                    "arguments_patch": {"targets": [{"library": library, "ecosystem": ecosystem or "dart", "version": version or "latest"}]},
+                })
             return DocsResult(
                 library_id="",
                 library=library,
@@ -850,7 +890,7 @@ class LibraryDocsApplicationService:
                 identity=self._docs_identity(info),
                 policy=self._docs_policy("needs_input", has_registered_source=resolution.has_registered_source),
                 diagnostics={**resolution.diagnostics, "warnings": [{"code": "needs_docs_url", "blocking": True}], "discovery_candidates": candidates},
-                next_actions=next_actions,
+                next_actions=next_actions_list,
                 candidates=candidates,
                 discovery_candidates=candidates,
             )

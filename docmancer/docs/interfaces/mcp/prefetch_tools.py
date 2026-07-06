@@ -53,12 +53,14 @@ def prefetch_tools(tools: list[dict[str, Any]]) -> list[dict[str, Any]]:
 
 
 def handle_prefetch_tool(name: str, args: dict[str, Any], service: LibraryDocsService) -> dict[str, Any] | None:
+    docs_manifest_app = getattr(service, "docs_manifest", service)
+    docs_prefetch_app = getattr(service, "docs_prefetch", service)
     if name == "validate_docs_manifest":
-        return asdict(service.validate_docs_manifest(args["manifest_path"], project_path=args.get("project_path"), targets=args.get("targets")))
+        return asdict(docs_manifest_app.validate_docs_manifest(args["manifest_path"], project_path=args.get("project_path"), targets=args.get("targets")))
     if name == "prefetch_docs_manifest":
-        return asdict(service.prefetch_docs_manifest(args["manifest_path"], project_path=args.get("project_path"), targets=args.get("targets"), force_refresh=bool(args.get("force_refresh") or False), continue_on_error=bool(args.get("continue_on_error") if args.get("continue_on_error") is not None else True), async_=bool(args.get("async") or False)))
+        return asdict(docs_manifest_app.prefetch_docs_manifest(args["manifest_path"], project_path=args.get("project_path"), targets=args.get("targets"), force_refresh=bool(args.get("force_refresh") or False), continue_on_error=bool(args.get("continue_on_error") if args.get("continue_on_error") is not None else True), async_=bool(args.get("async") or False)))
     if name == "prefetch_docs_targets":
-        return asdict(service.prefetch_docs_targets(_bounded_targets(args.get("targets")), force_refresh=bool(args.get("force_refresh") or False), continue_on_error=bool(args.get("continue_on_error") if args.get("continue_on_error") is not None else True), async_=bool(args.get("async") or False)))
+        return asdict(docs_prefetch_app.prefetch_docs_targets(_bounded_targets(args.get("targets")), force_refresh=bool(args.get("force_refresh") or False), continue_on_error=bool(args.get("continue_on_error") if args.get("continue_on_error") is not None else True), async_=bool(args.get("async") or False)))
     if name == "get_docs_job_status":
         job = service.get_docs_job_status(args["job_id"])
         return {"job_id": args["job_id"], "status": "not_found"} if job is None else asdict(job)

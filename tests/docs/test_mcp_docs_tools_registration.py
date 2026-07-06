@@ -44,8 +44,8 @@ def test_mcp_exposes_prefetch_project_docs():
     assert "prefetch_project_docs" in {tool["name"] for tool in TOOLS}
     tool = next(tool for tool in TOOLS if tool["name"] == "prefetch_project_docs")
     assert "async" in tool["inputSchema"]["properties"]
-    assert "dependency docs" in tool["description"]
-    assert "not project-owned README/docs/wiki files" in tool["description"]
+    assert "DEPRECATED" in tool["description"]
+    assert "prefetch_project_dependency_docs" in tool["description"]
     assert "May fetch from the network" in tool["description"]
 
 
@@ -53,7 +53,7 @@ def test_mcp_exposes_prefetch_project_dependency_docs_alias():
     tool = next(tool for tool in TOOLS if tool["name"] == "prefetch_project_dependency_docs")
 
     assert tool["inputSchema"]["required"] == ["project_path"]
-    assert "Alias for prefetch_project_docs" in tool["description"]
+    assert "DEPRECATED" not in tool["description"]
     assert "dependency documentation from project manifests/lockfiles" in tool["description"]
     assert "May fetch from the network" in tool["description"]
 

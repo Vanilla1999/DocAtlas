@@ -215,6 +215,35 @@ def test_missing_dependency_docs_requires_confirmation():
     assert result.reason_code == "dependency_docs_prefetch_required"
 
 
+def test_prefetch_auto_treats_explicit_flag_as_network_approval():
+    facade = FakeFacade()
+    facade.dependency_missing = True
+
+    result = _service(facade).get_docs_context(
+        "Riverpod autoDispose?",
+        project_path="/repo",
+        mode="dependency",
+        prepare_project_docs=False,
+        prefetch_auto=True,
+    )
+
+    assert result.status == "success"
+    assert facade.calls[0][0] == "get_project_context"
+    assert facade.calls[0][1]["allow_network"] is True
+
+
+def test_project_context_next_actions_preserve_structured_library_actions():
+    facade = FakeFacade()
+    facade.project_context = replace(
+        facade.project_context,
+        next_actions=[{"type": "get_library_docs", "tool": "get_library_docs", "arguments_patch": {"docs_url": "https://example.test/docs"}}],
+    )
+
+    result = _service(facade).get_docs_context("MCP server?", project_path="/repo", mode="dependency", prepare_project_docs=False, allow_network=True)
+
+    assert result.next_actions == [{"type": "get_library_docs", "tool": "get_library_docs", "arguments_patch": {"docs_url": "https://example.test/docs"}}]
+
+
 def test_unified_tool_preserves_exact_version_unsupported():
     facade = FakeFacade()
     facade.library_local = False
