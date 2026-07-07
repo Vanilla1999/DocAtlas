@@ -17,7 +17,7 @@ from docmancer.docs.domain.quality import has_code_symbol_evidence, internal_noi
 from docmancer.docs.domain.snippets import best_context_pack_snippet, build_snippet_presentation, validate_response_style
 from docmancer.docs.domain.source_map import build_project_repo_map, build_project_source_evidence, source_evidence_diagnostics, source_map_diagnostics
 from docmancer.docs.domain.trust_contract import build_project_context_trust_contract
-from docmancer.docs.models import DocsChunk, DocsResult, ProjectContextResult, ProjectDocsResult, ProjectMetadata
+from docmancer.docs.models import DocsChunk, DocsResult, ProjectContextResult, ProjectDocsChunk, ProjectDocsResult, ProjectMetadata
 
 LOW_TRUST_PROJECT_RISK_FLAGS = frozenset({
     "research_artifact",
@@ -39,6 +39,11 @@ LOW_TRUST_QUERY_TERMS = (
     "evaluation",
 )
 LOW_SIGNAL_SINGLE_TOKEN_QUERIES = {"test", "tests", "doc", "docs", "readme", "todo", "fixme"}
+PLACEHOLDER_CONTEXT_DOC_RE = re.compile(
+    r"\b(todo|tbd|placeholder|coming soon|lorem ipsum|under construction|work in progress|wip)\b|"
+    r"TODO:\s*Put a short description|const\s+like\s*=\s*['\"]sample['\"]",
+    re.IGNORECASE,
+)
 
 
 @dataclass(frozen=True)
@@ -87,7 +92,10 @@ class ProjectContextService:
         project_docs = None
         if mode in {"auto", "project-only"}:
             project_docs = self.facade.get_project_docs(str(root), question, tokens=tokens, limit=limit, expand=expand, module=module, module_path=module_path, scope=scope)
+            if project_docs and project_docs.requires_confirmation and project_docs.confirmation_reason == "project_docs_preflight":
+                return _project_docs_preflight_confirmation_result(root=root, question=question, mode=mode, project_docs=project_docs)
             if project_docs and project_docs.results:
+                project_docs = _inject_broad_architecture_docs(project_docs, root=root, intent=intent)
                 project_docs = replace(
                     project_docs,
                     results=rerank_project_doc_chunks(project_docs.results, question=question, intent=intent, limit=limit),
@@ -354,6 +362,8 @@ def project_context_pack(*, question: str = "", project_docs: ProjectDocsResult 
     pack: list[dict[str, Any]] = []
     if project_docs:
         for item in project_docs.results:
+            if _drop_placeholder_context_doc(item):
+                continue
             if _drop_low_value_context_section(item.content, item.title, item.heading_path):
                 continue
             token_estimate = max(1, len(item.content) // 4) if item.content else 0
@@ -453,6 +463,87 @@ def _library_next_action(dependency_docs: DocsResult, action: Any) -> dict[str, 
     if isinstance(action, dict):
         return action
     return {"tool": dependency_docs.tool, "reason": action}
+
+
+def _project_docs_preflight_confirmation_result(*, root: Path, question: str, mode: str, project_docs: ProjectDocsResult) -> ProjectContextResult:
+    answer_completeness = {
+        "schema_version": "answer-completeness-1.0",
+        "status": "unavailable",
+        "answer_type": "unavailable",
+        "coverage_score": 0.0,
+        "matched_terms": [],
+        "missing_terms": [],
+        "coverage_by_requirement": [],
+        "source_search_required": False,
+        "reason_codes": ["project_docs_preflight_confirmation_required"],
+    }
+    return ProjectContextResult(
+        project_path=str(root),
+        question=question,
+        status=project_docs.status if project_docs.status in {"stale", "confirmation_required"} else "confirmation_required",
+        answer_available=False,
+        answer_type="unavailable",
+        answer_completeness=answer_completeness,
+        mode=mode,
+        reason="project_docs_preflight_confirmation_required",
+        context_pack=[],
+        project_docs=project_docs,
+        dependency_docs=None,
+        trust_contract={
+            "sources": {"selected": [], "rejected": [], "risky": []},
+            "policy": {"direct_webfetch": "forbidden", "reason_code": "project_docs_preflight_confirmation_required"},
+        },
+        warnings=project_docs.warnings,
+        next_actions=project_docs.next_actions,
+        recommended_next_actions=project_docs.next_actions,
+        next_action=project_docs.next_action,
+        requires_confirmation=True,
+        confirmation_reason=project_docs.confirmation_reason,
+        arguments_patch=project_docs.arguments_patch,
+        metrics={"answer_completeness": answer_completeness},
+        diagnostics={"preflight": project_docs.diagnostics.get("preflight") if isinstance(project_docs.diagnostics, dict) else project_docs.diagnostics},
+        answer_outline={"answer_completeness": answer_completeness},
+        message=project_docs.message or "Project docs preflight requires confirmation before returning trusted project context.",
+    )
+
+
+def _inject_broad_architecture_docs(project_docs: ProjectDocsResult, *, root: Path, intent: Any) -> ProjectDocsResult:
+    if not getattr(intent, "wants_architecture", False):
+        return project_docs
+    existing = {normalize_doc_path(chunk.path) for chunk in project_docs.results}
+    injected: list[ProjectDocsChunk] = []
+    for rel in ("ARCHITECTURE.md", "docs/INDEX.md", "README.md"):
+        if normalize_doc_path(rel) in existing:
+            continue
+        path = root / rel
+        if not path.is_file() or path.stat().st_size > 80_000:
+            continue
+        text = path.read_text(encoding="utf-8", errors="replace").strip()
+        if not text or _looks_like_placeholder_context_doc(rel, text):
+            continue
+        injected.append(ProjectDocsChunk(
+            title=path.stem if path.stem else rel,
+            content=text[:12_000],
+            source=str(path),
+            url=None,
+            metadata={"score": 1.0, "injected_for": "broad_architecture_query"},
+            path=rel,
+        ))
+    if not injected:
+        return project_docs
+    return replace(project_docs, results=[*project_docs.results, *injected])
+
+
+def _drop_placeholder_context_doc(item: ProjectDocsChunk) -> bool:
+    return _looks_like_placeholder_context_doc(getattr(item, "path", None), getattr(item, "content", None))
+
+
+def _looks_like_placeholder_context_doc(path: str | None, content: str | None) -> bool:
+    normalized_path = normalize_doc_path(path)
+    name = normalized_path.rsplit("/", 1)[-1]
+    if not (name.startswith("readme") or name.startswith("architecture") or name in {"license", "copying"}):
+        return False
+    return bool(PLACEHOLDER_CONTEXT_DOC_RE.search((content or "")[:4096]))
 
 
 def _should_skip_low_trust_project_source(question: str, source_taxonomy: dict[str, Any]) -> bool:
@@ -566,7 +657,7 @@ def _make_context_trust_decision(
 ) -> ContextTrustDecision:
     max_project_score = _max_project_ranking_score(project_docs)
     matched_terms = list(relevance_gate.get("matched_terms") or [])
-    missing_terms = list(relevance_gate.get("missing_terms") or relevance_gate.get("required_terms") or [])
+    missing_terms = list(relevance_gate["missing_terms"] if "missing_terms" in relevance_gate else relevance_gate.get("required_terms") or [])
     passed = bool(relevance_gate.get("passed"))
 
     if _is_low_signal_single_token_query(question):
@@ -580,7 +671,7 @@ def _make_context_trust_decision(
         and not getattr(intent, "wants_code_symbols", False)
         and "high_signal_query_terms_missing_from_context" in completeness_reason_codes
     )
-    if answer_available and passed and (has_dependency_answer or has_source_evidence or (has_strong_project_answer and (not source_search_required or source_search_is_simple_relevance_gap))):
+    if answer_available and not missing_terms and passed and (has_dependency_answer or has_source_evidence or (has_strong_project_answer and (not source_search_required or source_search_is_simple_relevance_gap))):
         return ContextTrustDecision(True, "trusted_context_available", "trusted", passed, max_project_score, matched_terms, missing_terms)
 
     if context_pack and (passed or getattr(intent, "broad", False) or answer_type in {"partial", "partial_navigational"}):
@@ -647,8 +738,19 @@ def _context_item_text_for_gate(item: dict[str, Any]) -> str:
     return "\n".join(str(part) for part in parts if part)
 
 
-def _normalize_gate_text(value: str | None) -> str:
-    text = (value or "").replace("\\", "/").lower().replace("-", "_")
+def _normalize_gate_text(value: Any) -> str:
+    if isinstance(value, dict):
+        parts = [
+            value.get("code"),
+            value.get("text"),
+            value.get("content"),
+            value.get("title"),
+            value.get("why_relevant"),
+        ]
+        value = "\n".join(str(part) for part in parts if part)
+    elif isinstance(value, list):
+        value = "\n".join(str(part) for part in value if part)
+    text = str(value or "").replace("\\", "/").lower().replace("-", "_")
     return re.sub(r"\s+", " ", text)
 
 

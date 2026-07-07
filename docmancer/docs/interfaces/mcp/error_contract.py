@@ -20,6 +20,7 @@ _RETRYABLE_BY_REASON: dict[str, bool | None] = {
 _HINTS_BY_REASON: dict[str, list[str]] = {
     "bad_request": ["Fix the MCP tool arguments and retry."],
     "validation_error": ["Fix the MCP tool arguments and retry."],
+    "empty_question": ["Provide a non-empty question, for example: 'Flutter Riverpod providers' or 'FastAPI dependency injection'."],
     "unknown_tool": ["Use list_tools to discover available MCP tools."],
     "config_shadowing": ["Start MCP from the repo config, set DOCMANCER_HOME, or use an explicit override if available."],
     "project_local_config_shadowed": ["Start MCP from the repo config, set DOCMANCER_HOME, or use an explicit override if available."],

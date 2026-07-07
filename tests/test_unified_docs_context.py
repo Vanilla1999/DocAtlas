@@ -18,6 +18,7 @@ class FakeFacade:
         self.calls: list[tuple[str, dict[str, Any]]] = []
         self.library_local = True
         self.library_stale = False
+        self.library_status = "available"
         self.latest_library_local = True
         self.dependency_missing = False
         self.project_context = ProjectContextResult(
@@ -71,7 +72,7 @@ class FakeFacade:
             ecosystem=ecosystem,
             version=version or "latest",
             source_type=source_type or "web",
-            status="available",
+            status=self.library_status,
             local=local,
             stale=self.library_stale,
             last_refreshed_at="now" if local else None,
@@ -197,6 +198,22 @@ def test_missing_library_index_requires_confirmation_when_network_disallowed():
     assert result.status == "confirmation_required"
     assert result.reason_code == "library_docs_network_fetch_required"
     assert result.requires_confirmation is True
+
+
+def test_missing_library_source_asks_user_for_docs_source():
+    facade = FakeFacade()
+    facade.library_status = "needs_docs_url"
+    facade.library_local = False
+    result = _service(facade).get_docs_context("Depends?", library="unknown_lib")
+
+    assert result.status == "confirmation_required"
+    assert result.reason_code == "library_docs_source_required"
+    assert result.confirmation_reason == "library_docs_source"
+    assert result.next_action["type"] == "ask_user_for_library_docs_source"
+    option_ids = [option["id"] for option in result.next_action["options"]]
+    assert "manual_docs_url" in option_ids
+    assert "best_effort_web_discovery" in option_ids
+    assert result.next_action["quality_warning"]
 
 
 def test_allow_network_delegates_to_library_refresh():
@@ -406,6 +423,57 @@ def test_project_mode_with_library_is_invalid_combination():
 def test_result_type_is_typed_model():
     result = _service(FakeFacade()).get_docs_context("Depends?", library="fastapi")
     assert isinstance(result, UnifiedDocsContextResult)
+
+
+def test_snippet_first_library_success_falls_back_to_code_query_when_primary_missing():
+    facade = FakeFacade()
+    no_snippet = DocsResult(
+        library_id="dart:riverpod@latest:web",
+        library="riverpod",
+        version="latest",
+        topic="Riverpod snippet-first",
+        refreshed=False,
+        stale_before_refresh=False,
+        warning=None,
+        last_refreshed_at="now",
+        source_type="web",
+        results=[DocsChunk(title="Concept", content="Riverpod conceptual documentation without code.", source="https://riverpod.dev/docs/concepts", url="https://riverpod.dev/docs/concepts", metadata={})],
+        resolved_version="latest",
+    )
+    with_snippet = DocsResult(
+        library_id="dart:riverpod@latest:web",
+        library="riverpod",
+        version="latest",
+        topic="Riverpod snippet-first",
+        refreshed=False,
+        stale_before_refresh=False,
+        warning=None,
+        last_refreshed_at="now",
+        source_type="web",
+        results=[DocsChunk(title="Provider example", content="```dart\nfinal countProvider = Provider<int>((ref) => 0);\n```", source="https://riverpod.dev/docs/concepts2/providers", url="https://riverpod.dev/docs/concepts2/providers", metadata={})],
+        resolved_version="latest",
+    )
+    facade.get_docs_results = [no_snippet, with_snippet]
+
+    result = _service(facade).get_docs_context(
+        "Riverpod snippet-first",
+        library="riverpod",
+        ecosystem="dart",
+        response_style="snippet-first",
+    )
+
+    assert result.status == "success"
+    assert result.response_style == "snippet-first"
+    assert result.primary_snippet is not None
+    assert result.primary_snippet["language"] == "dart"
+    assert result.snippet_metrics["primary_selected"] is True
+    assert "snippet_not_available" not in result.warnings
+    assert result.routing["snippet_first_fallback"]["reason"] == "snippet_first_requested_without_selected_snippet"
+    get_docs_calls = [payload for name, payload in facade.calls if name == "get_docs"]
+    assert [call["topic"] for call in get_docs_calls] == [
+        "Riverpod snippet-first",
+        "Riverpod snippet-first example code snippet",
+    ]
 
 
 def _exact_unsupported(version: str = "0.115.0") -> DocsResult:

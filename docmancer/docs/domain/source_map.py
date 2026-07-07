@@ -46,6 +46,7 @@ _GENERATED_MARKERS = (
     ".pb.go",
     ".generated.",
     ".gen.",
+    "generatedpluginregistrant.",
 )
 _KEYWORDS = {
     "abstract",

@@ -1673,6 +1673,21 @@ def test_get_project_docs_distinguishes_indexed_no_results_from_not_indexed(tmp_
     assert result.next_actions[0]["tool"] == "inspect_project_docs"
 
 
+def test_get_project_docs_drops_placeholder_license_search_results(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    (project / "README.md").write_text("# Architecture\n\nKnown project docs topic.", encoding="utf-8")
+    (project / "LICENSE").write_text("TODO: Put a short description of the license here.", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+    service.ingest_project_docs(str(project), with_vectors=False)
+
+    result = service.get_project_docs(str(project), "TODO license", tokens=1200, limit=3)
+
+    assert result.status == "no_results"
+    assert result.answer_available is False
+    assert result.results == []
+    assert not any("TODO: Put a short description" in chunk.content for chunk in result.results)
+
+
 def test_get_project_docs_reports_stale_project_docs(tmp_path, monkeypatch):
     project = _flutter_project(tmp_path)
     readme = project / "README.md"
@@ -1950,7 +1965,7 @@ def test_get_docs_ingests_missing_library_with_url(tmp_path, monkeypatch):
     assert result.results[0].title == "Parametrize"
 
 
-def test_get_docs_unknown_without_url_needs_docs_url(tmp_path, monkeypatch):
+def test_get_docs_unknown_without_url_asks_for_library_docs_source(tmp_path, monkeypatch):
     agent = FakeAgent()
     service = _service(tmp_path, monkeypatch, agent)
 
@@ -1958,32 +1973,38 @@ def test_get_docs_unknown_without_url_needs_docs_url(tmp_path, monkeypatch):
 
     assert result.library_id == ""
     assert result.results == []
-    assert result.warning == "needs_docs_url"
-    assert result.warnings == ["needs_docs_url"]
+    assert result.warning == "library_docs_source_required"
+    assert result.warnings == ["library_docs_source_required"]
     assert result.status == "needs_input"
     assert result.decision == "retry_same_tool"
-    assert result.reason_code == "needs_docs_url"
+    assert result.reason_code == "library_docs_source_required"
+    assert result.requires_confirmation is True
     assert result.message
+    assert result.next_actions[0]["type"] == "ask_user_for_library_docs_source"
+    assert any(option["id"] == "manual_docs_url" for option in result.diagnostics["source_options"])
+    assert any(option["id"] == "best_effort_web_discovery" and option["quality_guarantee"] is False for option in result.diagnostics["source_options"])
     assert result.policy["direct_webfetch"] == "discovery_only"
     assert result.next_actions
     assert agent.add_calls == []
 
 
-def test_get_docs_needs_docs_url_returns_retry_contract_with_discovery_candidate(tmp_path, monkeypatch):
+def test_get_docs_source_required_returns_retry_contract_with_discovery_candidate(tmp_path, monkeypatch):
     agent = FakeAgent()
     service = _service(tmp_path, monkeypatch, agent)
 
     result = service.get_docs("mcp", ecosystem="python", topic="tools")
 
     assert result.status == "needs_input"
-    assert result.reason_code == "needs_docs_url"
+    assert result.reason_code == "library_docs_source_required"
     assert result.arguments_patch == {
         "docs_url": "https://github.com/modelcontextprotocol/python-sdk",
         "ecosystem": "python",
     }
     assert result.discovery_candidates == result.candidates
     assert result.diagnostics["discovery_candidates"] == result.candidates
-    assert result.requires_confirmation is False
+    assert result.requires_confirmation is True
+    assert result.next_actions[0]["type"] == "ask_user_for_library_docs_source"
+    assert result.next_actions[1]["requires_confirmation"] is True
     assert agent.add_calls == []
 
 

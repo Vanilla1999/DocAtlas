@@ -94,6 +94,27 @@ def test_build_project_source_evidence_absent_has_unknown_confidence(tmp_path):
         assert absent[0].get("confidence") == "unknown"
 
 
+def test_source_evidence_skips_generated_plugin_registrant(tmp_path):
+    android = tmp_path / "android/app/src/main/java/io/flutter/plugins"
+    android.mkdir(parents=True)
+    (android / "GeneratedPluginRegistrant.java").write_text(
+        "public final class GeneratedPluginRegistrant { public static void registerWith() {} }",
+        encoding="utf-8",
+    )
+    lib = tmp_path / "lib"
+    lib.mkdir()
+    (lib / "public_api.dart").write_text(
+        "class PublicApi { void registerWithHost() {} }",
+        encoding="utf-8",
+    )
+
+    items = build_project_source_evidence(tmp_path, question="GeneratedPluginRegistrant public API", max_items=8, token_budget=1000)
+    paths = {item.get("path") for item in items if item.get("evidence_class") == "source_snippet"}
+
+    assert "android/app/src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.java" not in paths
+    assert "lib/public_api.dart" in paths
+
+
 def test_project_repo_map_extracts_static_source_facts_and_honors_budget(tmp_path):
     lib = tmp_path / "lib"
     lib.mkdir()

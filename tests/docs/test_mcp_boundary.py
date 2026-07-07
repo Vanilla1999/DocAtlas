@@ -173,6 +173,24 @@ def test_get_docs_context_clamps_tokens_and_limit_at_mcp_boundary() -> None:
     assert kwargs["limit"] == 20
 
 
+def test_get_docs_context_rejects_whitespace_question_with_hint() -> None:
+    service = FakeService()
+
+    result = handle_context_tool(
+        "get_docs_context",
+        {"question": "   ", "library": "riverpod"},
+        cast(LibraryDocsService, service),
+    )
+
+    assert result is not None
+    assert result["status"] == "failed"
+    assert result["reason_code"] == "empty_question"
+    assert result["error"]["hints"] == [
+        "Provide a non-empty question, for example: 'Flutter Riverpod providers' or 'FastAPI dependency injection'."
+    ]
+    assert service.unified_context.calls == []
+
+
 def test_mcp_schemas_expose_hard_bounds_and_library_name_alias() -> None:
     tools = {tool["name"]: tool["inputSchema"] for tool in TOOLS}
 

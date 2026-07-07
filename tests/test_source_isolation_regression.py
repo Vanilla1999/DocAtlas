@@ -228,3 +228,48 @@ def test_local_path_with_matching_library_id_is_filtered_out(tmp_path, monkeypat
     assert result.status == "empty_library_index"
     assert result.results == []
     assert {"code": "wrong_docset_root", "blocking": False, "dropped": 1} in result.diagnostics["warnings"]
+
+
+
+def test_failed_registered_library_source_does_not_auto_refresh_on_query(tmp_path, monkeypatch):
+    agent = RecordingAgent([])
+    service = _service(tmp_path, monkeypatch, agent)
+    now = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    service.registry.upsert(
+        library="flutter-api",
+        ecosystem="flutter",
+        version="stable",
+        docs_url="https://api.flutter.dev",
+        source_type="api",
+        now=now,
+        status="failed",
+        last_refreshed_at=now,
+        last_error="Dartdoc extraction found no usable documentation content",
+    )
+
+    result = service.get_docs("flutter-api", ecosystem="flutter", version="stable", source_type="api", topic="StatefulWidget build")
+
+    assert result.status == "error"
+    assert result.reason_code == "registered_source_failed"
+    assert result.results == []
+    assert agent.add_calls == []
+    assert result.diagnostics["reason_code"] == "registered_source_failed"
+
+
+def test_low_relevance_library_results_are_not_returned_as_answer(tmp_path, monkeypatch):
+    agent = RecordingAgent([
+        _chunk(
+            "Riverpod migration updateShouldNotify changed behavior for generated providers.",
+            "https://pub.dev/documentation/flutter_riverpod/latest/migration",
+            {"library_id": "pub:flutter_riverpod@latest:api", "canonical_id": "pub:flutter_riverpod@latest:api", "ecosystem": "pub", "version": "latest"},
+        )
+    ])
+    service = _service(tmp_path, monkeypatch, agent)
+    _register(service, library="flutter_riverpod", ecosystem="pub", version="latest", docs_url="https://pub.dev/documentation/flutter_riverpod/latest/")
+
+    result = service.get_docs("flutter_riverpod", ecosystem="pub", version="latest", source_type="api", topic="NotifierProvider ref watch AsyncValue")
+
+    assert result.status == "no_results"
+    assert result.reason_code == "low_relevance_query_results"
+    assert result.results == []
+    assert any(warning["code"] == "low_relevance_query_results" for warning in result.diagnostics["warnings"] if isinstance(warning, dict))

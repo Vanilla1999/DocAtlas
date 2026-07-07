@@ -19,6 +19,7 @@ configuration are merged into the candidate URL set.
 
 from __future__ import annotations
 
+import json
 import logging
 import re
 from collections import deque
@@ -262,9 +263,57 @@ def _try_dartdoc_index(base_url: str, client: httpx.Client, max_pages: int = 500
     if resp.status_code != 200 or not is_dartdoc_html(resp.text, url=base_url):
         return None
     links = discover_dartdoc_candidate_links(resp.text, base_url)
+    links.extend(_discover_dartdoc_index_json(base_url, client, max_pages=max_pages))
     if not links:
         return None
     return [DiscoveredUrl(url=url, strategy=DiscoveryStrategy.NAV_CRAWL) for url in links[:max_pages]]
+
+
+def _discover_dartdoc_index_json(base_url: str, client: httpx.Client, max_pages: int = 500) -> list[str]:
+    """Discover Dartdoc entity pages from static index.json navigation data."""
+    index_url = f"{base_url.rstrip('/')}/index.json"
+    try:
+        resp = client.get(index_url)
+    except httpx.RequestError:
+        return []
+    if resp.status_code != 200 or not resp.text.strip():
+        return []
+    try:
+        payload = json.loads(resp.text)
+    except json.JSONDecodeError:
+        return []
+
+    seen: set[str] = set()
+    links: list[str] = []
+
+    def add(value: str) -> None:
+        href = value.strip()
+        if not href or href.startswith(("#", "javascript:", "mailto:")):
+            return
+        lowered = href.lower()
+        if not any(token in lowered for token in ("-class.html", "-library.html", "-mixin.html", "-enum.html", "-extension.html", "-typedef.html", "-function.html")):
+            return
+        url = normalize_url(urljoin(base_url, href))
+        if url in seen:
+            return
+        seen.add(url)
+        links.append(url)
+
+    def visit(value: Any) -> None:
+        if len(links) >= max_pages:
+            return
+        if isinstance(value, dict):
+            for key, item in value.items():
+                if key in {"href", "url", "link", "path"} and isinstance(item, str):
+                    add(item)
+                else:
+                    visit(item)
+        elif isinstance(value, list):
+            for item in value:
+                visit(item)
+
+    visit(payload)
+    return links
 
 
 def _dedupe_and_rank(results: list[DiscoveredUrl]) -> list[DiscoveredUrl]:

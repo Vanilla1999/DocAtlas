@@ -387,3 +387,30 @@ class TestWebFetcherDartdoc:
             fetcher = WebFetcher(max_pages=10, browser=False, doc_format="dartdoc", delay=0.0)
             with pytest.raises(ValueError, match="Dartdoc extraction found no usable documentation content"):
                 fetcher.fetch("https://pub.dev/documentation/empty/latest")
+
+    def test_dartdoc_index_json_discovers_api_pages_when_html_shell_has_no_links(self):
+        root = '<html><head><script src="static-assets/main.dart.js"></script></head><body><main>Flutter API</main></body></html>'
+        index_json = '{"items":[{"href":"/flutter/widgets/StatefulWidget-class.html"}]}'
+
+        def mock_get(url, **kwargs):
+            if url.endswith("llms-full.txt") or url.endswith("llms.txt") or "sitemap" in url:
+                return _mock_response("", status=404, content_type="text/plain")
+            if url.endswith("robots.txt"):
+                return _mock_response("User-agent: *\nAllow: /", content_type="text/plain")
+            if url == "https://api.flutter.dev":
+                return _mock_response(root)
+            if url == "https://api.flutter.dev/index.json":
+                return _mock_response(index_json, content_type="application/json")
+            if url == "https://api.flutter.dev/flutter/widgets/StatefulWidget-class.html":
+                return _mock_response(DARTDOC_SIZED_BOX_HTML.replace("SizedBox", "StatefulWidget"))
+            return _mock_response("", status=404)
+
+        mock_client = _make_mock_client(mock_get)
+
+        with patch("docmancer.connectors.fetchers.web.httpx.Client", return_value=mock_client):
+            fetcher = WebFetcher(max_pages=10, browser=False, doc_format="dartdoc", delay=0.0)
+            docs = fetcher.fetch("https://api.flutter.dev")
+
+        assert len(docs) == 1
+        assert docs[0].source == "https://api.flutter.dev/flutter/widgets/StatefulWidget-class.html"
+        assert "StatefulWidget class" in docs[0].content

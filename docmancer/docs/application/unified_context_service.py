@@ -94,6 +94,24 @@ def _looks_like_imperative_patch_task(tokens: list[str]) -> bool:
     return False
 
 
+def _snippet_first_fallback_question(question: str, library: str) -> str:
+    text = (question or "").strip()
+    base = text if text else library
+    lowered = base.lower()
+    if "example" in lowered or "code" in lowered:
+        return base
+    return f"{base} example code snippet"
+
+
+def _without_snippet_not_available(warnings: list[Any]) -> list[Any]:
+    return [
+        warning
+        for warning in warnings
+        if warning != "snippet_not_available"
+        and not (isinstance(warning, dict) and warning.get("code") == "snippet_not_available")
+    ]
+
+
 def _exact_version_match(result: DocsResult) -> bool | None:
     if not result.requested_version:
         return None
@@ -286,16 +304,35 @@ class UnifiedDocsContextService:
             exact_version = exact_version or self._exact_version(result, allow_latest_fallback)
 
         context_pack, contamination, deduplication = self._dedupe_and_guard(context_pack, libs, project_path)
+        lane_priority = self._lane_priority_for(mode_selected)
+        context_pack, snippet_fallback = self._augment_snippet_first_context(
+            context_pack,
+            question=question,
+            response_style=response_style,
+            lane_priority=lane_priority,
+            library_results=library_results,
+            libs=libs,
+            tokens=tokens,
+            ecosystem=ecosystem,
+            version=version,
+            docs_url=docs_url,
+            source_type=source_type,
+            project_path=project_path,
+        )
+        if snippet_fallback:
+            context_pack, contamination, deduplication = self._dedupe_and_guard(context_pack, libs, project_path)
+            routing["snippet_first_fallback"] = snippet_fallback
         self._refresh_lane_counts(lanes, context_pack)
         trust_contract = self._trust_contract(context_pack, project_result, library_results)
         source_summary = self._source_summary(context_pack, trust_contract)
-        lane_priority = self._lane_priority_for(mode_selected)
         snippet_presentation = build_snippet_presentation(
             context_pack,
             question=question,
             response_style=response_style,
             lane_priority=lane_priority,
         )
+        if snippet_fallback and snippet_presentation.primary_snippet:
+            warnings = _without_snippet_not_available(warnings)
         answer_available = bool(context_pack)
         pending_actions = self._collect_pending_actions(pending_lane_results)
         requested_lanes = [name for name, lane in lanes.items() if lane.get("status") != "not_requested"]
@@ -476,7 +513,31 @@ class UnifiedDocsContextService:
         info = self.service.resolve_library(library, ecosystem, version, docs_url, None, source_type)
         if getattr(info, "status", None) == "exact_version_not_supported":
             return None
-        if force_refresh or not getattr(info, "local", False) or getattr(info, "stale", False) or getattr(info, "status", "") in {"needs_docs_url", "needs_refresh"}:
+        status = getattr(info, "status", "")
+        if status == "needs_docs_url":
+            candidates = list(getattr(info, "candidates", []) or [])
+            source_options = self._library_source_options(library, ecosystem, version, source_type, candidates)
+            next_action = {
+                "type": "ask_user_for_library_docs_source",
+                "tool": None,
+                "requires_confirmation": True,
+                "question": f"Which documentation source should be used for {library}?",
+                "options": source_options,
+                "quality_warning": "If the user does not know, best-effort web discovery can be used, but quality is not guaranteed.",
+            }
+            return self._confirmation_result(
+                question=f"Which documentation source should be used for {library}?",
+                mode_requested="library",
+                mode_selected="library",
+                routing={"reason_code": "library_docs_source_required", "project_path_used": False, "libraries_requested": [library], "dependency_detected": False},
+                reason_code="library_docs_source_required",
+                confirmation_reason="library_docs_source",
+                next_action=next_action,
+                arguments_patch={"library": library, "ecosystem": ecosystem, "version": version, "source_type": source_type},
+                lanes={**self._empty_lanes(), "library": {"status": "confirmation_required", "source_count": 0, "canonical_ids": [], "requires_confirmation": True, "next_action": next_action}},
+                warnings=[{"code": "library_docs_source_required", "blocking": True, "source_options": source_options}],
+            )
+        if force_refresh or not getattr(info, "local", False) or getattr(info, "stale", False) or status in {"needs_refresh"}:
             return self._confirmation_result(
                 question="",
                 mode_requested="library",
@@ -490,6 +551,46 @@ class UnifiedDocsContextService:
                 warnings=list(getattr(info, "candidates", []) or []),
             )
         return None
+
+    @staticmethod
+    def _library_source_options(library: str, ecosystem: str | None, version: str | None, source_type: str | None, candidates: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        options = []
+        for candidate in candidates:
+            arguments_patch = {"library": library}
+            for key in ("ecosystem", "version", "source_type", "docs_url"):
+                value = candidate.get(key)
+                if value is not None:
+                    arguments_patch[key] = value
+            if version and "version" not in arguments_patch:
+                arguments_patch["version"] = version
+            if source_type and "source_type" not in arguments_patch:
+                arguments_patch["source_type"] = source_type
+            options.append({
+                "id": candidate.get("id") or candidate.get("name") or candidate.get("docs_url"),
+                "kind": "candidate_docs_source",
+                "label": candidate.get("name") or candidate.get("docs_url"),
+                "docs_url": candidate.get("docs_url"),
+                "confidence": candidate.get("confidence"),
+                "why": candidate.get("why"),
+                "arguments_patch": arguments_patch,
+            })
+        options.append({
+            "id": "manual_docs_url",
+            "kind": "manual_docs_url",
+            "label": "User-provided documentation URL",
+            "requires_user_input": True,
+            "arguments_patch": {"library": library, "ecosystem": ecosystem, "version": version, "source_type": source_type, "docs_url": "<docs_url>"},
+        })
+        options.append({
+            "id": "best_effort_web_discovery",
+            "kind": "best_effort_web_discovery",
+            "label": "Best-effort web/LLM-assisted discovery",
+            "requires_confirmation": True,
+            "quality_guarantee": False,
+            "warning": "Quality is not guaranteed; prefer an explicit docs_url when possible.",
+            "arguments_patch": {"library": library, "ecosystem": ecosystem, "version": version, "source_type": source_type, "allow_network": True},
+        })
+        return options
 
     def _get_library_docs_with_latest_fallback(
         self,
@@ -551,6 +652,61 @@ class UnifiedDocsContextService:
             "reason_code": latest.diagnostics.get("reason_code") if isinstance(latest.diagnostics, dict) else latest.status,
         }
         return replace(latest, requested_version=exact.requested_version or version, diagnostics=diag)
+
+    def _augment_snippet_first_context(
+        self,
+        context_pack: list[dict[str, Any]],
+        *,
+        question: str,
+        response_style: str,
+        lane_priority: list[str],
+        library_results: list[DocsResult],
+        libs: list[str],
+        tokens: int | None,
+        ecosystem: str | None,
+        version: str | None,
+        docs_url: str | None,
+        source_type: str | None,
+        project_path: str | None,
+    ) -> tuple[list[dict[str, Any]], dict[str, Any] | None]:
+        if response_style != "snippet-first" or not library_results:
+            return context_pack, None
+        current = build_snippet_presentation(
+            context_pack,
+            question=question,
+            response_style=response_style,
+            lane_priority=lane_priority,
+        )
+        if current.primary_snippet:
+            return context_pack, None
+
+        added = 0
+        for lib in libs:
+            fallback = self.service.get_docs(
+                lib,
+                topic=_snippet_first_fallback_question(question, lib),
+                tokens=tokens,
+                ecosystem=ecosystem,
+                version=version,
+                docs_url=docs_url,
+                source_type=source_type,
+                force_refresh=False,
+                project_path=project_path,
+                response_style=response_style,
+            )
+            if not isinstance(fallback, DocsResult) or not fallback.results:
+                continue
+            fallback_items = self._library_context_pack(fallback)
+            snippet_items = [item for item in fallback_items if item.get("snippet")]
+            if not snippet_items:
+                continue
+            context_pack = [*context_pack, *snippet_items]
+            added += len(snippet_items)
+            break
+
+        if not added:
+            return context_pack, None
+        return context_pack, {"reason": "snippet_first_requested_without_selected_snippet", "added_context_items": added}
 
     def _dependency_prefetch_needed(self, project_path: str | None) -> bool:
         if not project_path:

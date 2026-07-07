@@ -381,7 +381,7 @@ def _attach_output_contract(payload: dict[str, Any], *, output_mode: str) -> dic
         "complete": not truncated,
         "truncated": truncated,
         "safe_to_use_as_complete_context": not truncated,
-        "retry_with": {"output_mode": "debug"} if truncated and output_mode != "debug" else None,
+        "retry_with": {"output_mode": "debug", "page_size": 5, "narrow_query": True} if truncated and output_mode != "debug" else None,
         "omitted": {
             "fields": compaction.get("omitted_fields", []),
             "list_items": compaction.get("omitted_list_items", 0),

@@ -550,3 +550,24 @@ PermissionService owns permission policy and is the source of truth for permissi
     assert "Rules that must not be violated" not in text
     assert "Shelf HttpServer" not in text
     assert any("PermissionService" in c.instruction for c in packet.constraints)
+
+
+def test_scan_doc_constraints_skip_unrelated_oidc_and_dart_tool_sources(tmp_path: Path):
+    root = _workspace(tmp_path)
+    _write(root / "docs/SCANDOC_WEB_CAMERA_API_PLAN.md", "ScanDocRunner owns ScanDoc initialization before Hive and must not be bypassed.\n")
+    _write(root / "docs/EXTERNAL_OIDC_BROWSER_SELECTION_FIX_PLAN.md", "OidcBrowserSelector owns external auth WebView/browser policy and must be the source of truth.\n")
+    _write(root / "packages/path_provider_nbo/.dart_tool/extension_discovery/README.md", "Hence, it should never be necessary to edit extension discovery metadata.\n")
+    _write(root / "lib/scandoc_runner.dart", "class ScanDocRunner {}\n")
+    _write(root / "lib/oidc_browser_selector.dart", "class OidcBrowserSelector {}\n")
+
+    packet = _packet(
+        root,
+        question="Change ScanDoc WebView file chooser without bypassing ScanDocRunner initialization before Hive.",
+        max_constraints=20,
+        max_tokens=4000,
+    )
+    payload = str(asdict(packet))
+
+    assert "ScanDocRunner" in payload
+    assert "OidcBrowserSelector" not in payload
+    assert ".dart_tool" not in payload

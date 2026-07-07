@@ -192,7 +192,7 @@ class LibraryRegistryOps:
                     pages=pages,
                     chunks=chunks,
                     reason_code=self.reason_code_for(record, status),
-                    message=record.last_error,
+                    message=record.last_error or ("Index is present; run get_library_docs for topic-level health/relevance." if status == "indexed" else None),
                 )
             )
         return items

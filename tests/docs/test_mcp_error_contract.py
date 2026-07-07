@@ -64,4 +64,6 @@ def test_bad_request_error_contract_has_fix_arguments_hint() -> None:
     assert payload["message"] == "question must not be empty"
     assert payload["error"]["reason_code"] == "empty_question"
     assert payload["error"]["retryable"] is False
-    assert "Fix the MCP tool arguments and retry." in payload["error"]["hints"]
+    assert payload["error"]["hints"] == [
+        "Provide a non-empty question, for example: 'Flutter Riverpod providers' or 'FastAPI dependency injection'."
+    ]
