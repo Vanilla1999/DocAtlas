@@ -138,6 +138,22 @@ def discover_urls(
         logger.info("Discovery: %s found %d URL(s)", DiscoveryStrategy.LLMS_FULL_TXT.value, len(llms_full))
         return DiscoveryResult(urls=llms_full)
 
+    dartdoc = _try_dartdoc_index(base_url, client, max_pages)
+    if dartdoc:
+        logger.info("Discovery: dartdoc-index found %d URL(s)", len(dartdoc))
+        return DiscoveryResult(
+            urls=dartdoc[:max_pages],
+            diagnostics={
+                "strategies": {"dartdoc-index": len(dartdoc)},
+                "discovery_strategy": "dartdoc-index",
+                "fallback_reason": None,
+                "sitemap_pages": 0,
+                "seed_pages": 0,
+                "fallback_pages": 0,
+                "locale_skipped_count": _LOCALE_SKIP_COUNTER[0],
+            },
+        )
+
     all_results: list[DiscoveredUrl] = []
     strategy_counts: dict[str, int] = {}
     nav_crawl_ran = False
@@ -262,11 +278,23 @@ def _try_dartdoc_index(base_url: str, client: httpx.Client, max_pages: int = 500
         return None
     if resp.status_code != 200 or not is_dartdoc_html(resp.text, url=base_url):
         return None
-    links = discover_dartdoc_candidate_links(resp.text, base_url)
-    links.extend(_discover_dartdoc_index_json(base_url, client, max_pages=max_pages))
+    dartdoc_base_url = _html_base_url(resp.text, base_url) or base_url
+    links = discover_dartdoc_candidate_links(resp.text, dartdoc_base_url)
+    links.extend(_discover_dartdoc_index_json(dartdoc_base_url, client, max_pages=max_pages))
     if not links:
         return None
     return [DiscoveredUrl(url=url, strategy=DiscoveryStrategy.NAV_CRAWL) for url in links[:max_pages]]
+
+
+def _html_base_url(html: str, page_url: str) -> str | None:
+    soup = BeautifulSoup(html or "", "html.parser")
+    base = soup.find("base", href=True)
+    if base is None:
+        return None
+    href = str(base.get("href") or "").strip()
+    if not href:
+        return None
+    return urljoin(page_url, href)
 
 
 def _discover_dartdoc_index_json(base_url: str, client: httpx.Client, max_pages: int = 500) -> list[str]:

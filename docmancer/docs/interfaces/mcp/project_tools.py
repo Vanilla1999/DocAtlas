@@ -436,6 +436,10 @@ def _compact_symbol_candidates(items: list[dict[str, Any]], *, limit: int = 5) -
 
 def _compact_patch_constraints(result: dict[str, Any]) -> dict[str, Any]:
     return {
+        "tool": result.get("tool"),
+        "status": result.get("status"),
+        "reason_code": result.get("reason_code"),
+        "answer_available": result.get("answer_available"),
         "task": result.get("task"),
         "constraints": result.get("constraints") or [],
         "schema_version": result.get("schema_version"),
@@ -615,6 +619,10 @@ def handle_project_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
             max_tokens=_bounded_int_arg(args, "max_tokens", default=8000, max_value=_MCP_MAX_PATCH_TOKENS),
             include_sources=bool(args.get("include_sources") if args.get("include_sources") is not None else True),
         ))
+        result.setdefault("tool", "get_patch_constraints")
+        result.setdefault("status", "success")
+        result.setdefault("reason_code", None)
+        result.setdefault("answer_available", bool(result.get("constraints")))
         output_mode = _patch_constraints_output_mode(args)
         if output_mode == "full":
             result["output_mode"] = "full"

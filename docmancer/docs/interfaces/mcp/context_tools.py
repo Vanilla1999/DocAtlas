@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from copy import deepcopy
 from dataclasses import asdict, is_dataclass
 from typing import Any
 
@@ -71,6 +72,64 @@ def _compact_payload(payload: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def _align_trust_contract_with_snippets(payload: dict[str, Any]) -> dict[str, Any]:
+    """Keep selected source risk metadata consistent with snippet metadata."""
+
+    contract = payload.get("trust_contract")
+    if not isinstance(contract, dict):
+        return payload
+    selected = contract.get("selected")
+    if not isinstance(selected, list) or not selected:
+        return payload
+
+    snippet_risks: dict[str, dict[str, Any]] = {}
+    snippets = [payload.get("primary_snippet"), *(payload.get("supporting_snippets") or [])]
+    for snippet in snippets:
+        if not isinstance(snippet, dict):
+            continue
+        keys = {str(value) for value in (snippet.get("source"), snippet.get("source_url")) if value}
+        if not keys:
+            continue
+        stricter = {
+            "risk_flags": list(snippet.get("risk_flags") or []),
+            "version_binding": snippet.get("version_binding"),
+            "exact_version_match": snippet.get("exact_version_match"),
+        }
+        if not stricter["risk_flags"] and stricter["version_binding"] is None and stricter["exact_version_match"] is None:
+            continue
+        for key in keys:
+            snippet_risks[key] = stricter
+    if not snippet_risks:
+        return payload
+
+    updated = deepcopy(payload)
+    updated_selected = []
+    for source in selected:
+        if not isinstance(source, dict):
+            updated_selected.append(source)
+            continue
+        keys = [
+            str(value)
+            for value in (source.get("source"), source.get("source_url"), source.get("url"), source.get("path"))
+            if value
+        ]
+        stricter = next((snippet_risks[key] for key in keys if key in snippet_risks), None)
+        if not stricter:
+            updated_selected.append(source)
+            continue
+        merged = dict(source)
+        risk_flags = list(dict.fromkeys([*(merged.get("risk_flags") or []), *stricter.get("risk_flags", [])]))
+        if risk_flags:
+            merged["risk_flags"] = risk_flags
+        if stricter.get("version_binding"):
+            merged["version_binding"] = stricter["version_binding"]
+        if stricter.get("exact_version_match") is not None:
+            merged["exact_version_match"] = stricter["exact_version_match"]
+        updated_selected.append(merged)
+    updated["trust_contract"] = {**dict(updated.get("trust_contract") or {}), "selected": updated_selected}
+    return updated
+
+
 def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsService) -> dict[str, Any] | None:
     if name != "get_docs_context":
         return None
@@ -111,6 +170,7 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
         for key in ("tool", "status", "reason_code", "message", "response_style", "primary_snippet", "supporting_snippets", "snippet_metrics"):
             if hasattr(result, key):
                 raw[key] = getattr(result, key)
+    raw = _align_trust_contract_with_snippets(raw)
     mode = _output_mode(args)
     if mode == "full":
         raw["output_mode"] = "full"

@@ -51,6 +51,10 @@ def test_mcp_return_shape(tmp_path: Path):
     payload = _payload(tmp_path)
 
     assert payload is not None
+    assert payload["tool"] == "get_patch_constraints"
+    assert payload["status"] == "success"
+    assert payload["reason_code"] is None
+    assert payload["answer_available"] is True
     assert payload["task"] == "Update permission handling"
     assert isinstance(payload["constraints"], list)
     assert isinstance(payload["forbidden_edits"], list)

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from typing import Any, cast
 
 from docmancer.docs.interfaces.mcp.context_tools import context_tools, handle_context_tool
 from docmancer.docs.interfaces.mcp.project_tools import MCP_COMPACT_OUTPUT_MAX_BYTES
@@ -91,3 +92,40 @@ def test_get_docs_context_debug_output_keeps_compaction_diagnostics():
     assert len(json.dumps(result, ensure_ascii=False).encode("utf-8")) <= MCP_COMPACT_OUTPUT_MAX_BYTES
     assert result["mcp_compaction"]["truncated"] is True
     assert result["output_contract"]["truncated"] is True
+
+
+def test_get_docs_context_aligns_selected_source_risk_with_primary_snippet():
+    class Facade:
+        def get_docs_context(self, question, **kwargs):
+            return {
+                "tool": "get_docs_context",
+                "status": "success",
+                "answer_available": True,
+                "primary_snippet": {
+                    "source": "https://riverpod.dev/docs/3.0_migration",
+                    "source_url": "https://riverpod.dev/docs/3.0_migration",
+                    "risk_flags": ["not_exact_version"],
+                    "version_binding": "latest_fallback",
+                    "exact_version_match": False,
+                },
+                "trust_contract": {
+                    "selected": [{
+                        "source": "https://riverpod.dev/docs/3.0_migration",
+                        "risk_flags": [],
+                        "version_binding": "exact_version_url",
+                    }],
+                    "rejected": [],
+                    "risky": [],
+                },
+            }
+
+    result = cast(dict[str, Any], handle_context_tool(
+        "get_docs_context",
+        {"question": "Riverpod ref.watch AsyncValue", "library": "flutter_riverpod"},
+        Facade(),
+    ))
+
+    selected = result["selected_sources"][0]
+    assert selected["risk_flags"] == ["not_exact_version"]
+    assert selected["version_binding"] == "latest_fallback"
+    assert selected["exact_version_match"] is False
