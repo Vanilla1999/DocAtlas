@@ -366,6 +366,26 @@ Does not use deleted, orphaned, or stale project-doc content by default.""",
         },
     },
     {
+        "name": "get_patch_plan_context",
+        "description": "Return a Patch Planning Context payload for coding agents: an implementation map from concrete intent to exact source/dependency evidence, missing symbols, minimal patch path, risks, and verification. This first-class tool sits between get_docs_context and get_patch_constraints.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "question": {"type": "string"},
+                "project_path": {"type": ["string", "null"]},
+                "changed_files": {"type": ["array", "null"], "items": {"type": "string"}},
+                "symbol_queries": {"type": ["array", "null"], "items": {"type": "string"}},
+                "design_context": {"type": ["object", "null"]},
+                "include_dependency_source": {"type": ["boolean", "null"], "default": True},
+                "max_files": {"type": ["integer", "null"], "minimum": 1, "maximum": 50, "default": 12},
+                "max_snippets": {"type": ["integer", "null"], "minimum": 1, "maximum": 40, "default": 16},
+                "max_tokens": {"type": ["integer", "null"], "minimum": 200, "maximum": 12000, "default": 2400},
+                "output_mode": {"type": ["string", "null"], "enum": ["compact", "debug", "full", None], "default": "compact"},
+            },
+            "required": ["question"],
+        },
+    },
+    {
         "name": "get_patch_constraints",
         "description": "Return compact, source-attributed project constraints for a coding patch. Designed to provide actionable project constraints for coding agents; this does not validate patches or change get_docs_context behavior.",
         "inputSchema": {

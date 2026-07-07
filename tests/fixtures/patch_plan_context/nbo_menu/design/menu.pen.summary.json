@@ -1,0 +1,17 @@
+{
+  "artifact": "menu.pen",
+  "summary": "Bottom sheet menu replacing the legacy inline menu while preserving existing browser actions.",
+  "components": [
+    "bottom_sheet",
+    "menu_action_button",
+    "icon"
+  ],
+  "dimensions": {
+    "sheet_height": 320
+  },
+  "visual_rules": [
+    "Preserve existing action order where possible.",
+    "Use compact icon buttons from pole_base_kit/ui_base.",
+    "Do not duplicate tabs controls."
+  ]
+}

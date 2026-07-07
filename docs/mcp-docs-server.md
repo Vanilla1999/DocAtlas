@@ -124,8 +124,79 @@ The unified tool delegates to existing facade methods such as `bootstrap_project
 | `bootstrap_project_docs` | Safe high-level onboarding for a repository question: inspect, sync if needed, inspect again. Stops before repo writes or dependency-docs network fetches. |
 | `get_project_docs` | Query indexed current project-owned docs for repo-specific architecture, conventions, runbooks, ADRs, README, roadmap, wiki, or module/package questions. |
 | `get_project_context` | Return a compact repo-grounded context pack after bootstrap/inspect and any required `sync_project_docs` step. Includes a Trust Contract and structured next_actions. |
-| `get_patch_constraints` | Return compact, source-attributed constraints for a coding patch. Designed to provide actionable project constraints for coding agents; it does not validate patches or change `get_docs_context` behavior. |
-| `validate_patch_against_constraints` | Deterministically check changed files or a patch diff against a caller-supplied constraint packet. Best-effort guardrail only; it does not prove correctness or replace tests. |
+| `get_patch_plan_context` | Build a compact implementation map from source/dependency/design evidence: current behavior, relevant files, existing APIs, missing symbols, minimal patch path, risks, verification, warnings, and next actions. It is not a replacement for `get_docs_context` or `get_patch_constraints`. |
+| `get_patch_constraints` | Return compact, source-attributed constraints before patching. Designed to provide actionable project constraints for coding agents; it does not validate patches or change `get_docs_context` behavior. |
+| `validate_patch_against_constraints` | Deterministically check changed files or a patch diff against a caller-supplied constraint packet after editing. Best-effort advisory guardrail only; it does not prove correctness or replace tests. |
+
+Recommended patch workflow:
+
+```text
+get_docs_context
+→ get_patch_plan_context
+→ get_patch_constraints
+→ edit
+→ validate_patch_against_constraints
+```
+
+Tool roles:
+
+- `get_docs_context`: retrieve project/library docs and broad context.
+- `get_patch_plan_context`: build an implementation map from source, dependency, and design evidence.
+- `get_patch_constraints`: return source-attributed constraints before patching.
+- `validate_patch_against_constraints`: advisory validation after patching.
+
+`get_patch_plan_context` fills the gap between broad docs context and pre-edit constraints. It helps an agent identify exact files, existing APIs, missing symbols, and a minimal implementation path, but it does not generate code and does not validate a patch.
+
+Example `get_patch_plan_context` arguments:
+
+```json
+{
+  "question": "Plan changing Flutter menu_line from inline menu to bottom sheet using menu.pen design and pole_base_kit APIs. Preserve screenshot/camera/tabs/ScanDoc/rating/info/logout/admin, remove legacy BT QR buttons, preserve needFlashLight/needBT/isEmulator semantics.",
+  "project_path": "/path/to/project",
+  "symbol_queries": [
+    "menu_line",
+    "menu_icon",
+    "system_line",
+    "menu_notifier",
+    "tab_icon",
+    "showBottomDialog",
+    "PBBottomSheet",
+    "PBButton",
+    "PBIcon",
+    "PBIcons"
+  ],
+  "design_context": {
+    "artifact": "menu.pen",
+    "summary": "Caller-normalized design summary for the bottom-sheet menu"
+  },
+  "include_dependency_source": true,
+  "max_files": 12,
+  "max_snippets": 16,
+  "max_tokens": 2400,
+  "output_mode": "compact"
+}
+```
+
+Expected result summary:
+
+- top-level contract includes `reason_code`, `token_estimate`, and `output_mode`;
+- `current_behavior` entries include `behavior`, `file`, `start_line`, `end_line`, `symbol`, `evidence`, and `confidence`;
+- `risks_and_constraints` entries include `risk`, `severity`, `source`, and `mitigation`;
+- caller-provided `design_context` is passed through into the plan context;
+- exact relevant files for `menu_line`, `menu_icon`, `system_line`, `menu_notifier`, and tabs behavior when requested;
+- `showBottomDialog: not_found` in `missing_symbols` when the project does not define it;
+- `PBBottomSheet.open` found in resolved dependency source when available through `.dart_tool/package_config.json`;
+- unrelated broad docs can appear in `rejected_sources` when they match generic words but not exact patch terms;
+- `minimal_patch_path` describing replacement of the inline menu with a bottom sheet without generating a patch;
+- `verification` includes `flutter analyze` for Flutter/UI-like tasks.
+
+Non-goals:
+
+- does not generate a patch;
+- does not guarantee safe merge;
+- does not index the whole `.pub-cache`;
+- does not replace code reading by the agent;
+- does not replace constraints validation.
 
 `get_patch_constraints` arguments:
 

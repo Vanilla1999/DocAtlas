@@ -6,6 +6,7 @@ from typing import Any
 
 from docmancer.docs.interfaces.mcp.error_contract import build_bad_request_payload
 from docmancer.docs.interfaces.mcp.output_contract import compact_mcp_payload, json_bytes, normalize_output_mode
+from docmancer.docs.patch_plan_context import build_patch_plan_context
 from docmancer.docs.service import LibraryDocsService
 
 
@@ -36,6 +37,7 @@ PROJECT_TOOL_NAMES = {
     "bootstrap_project_docs",
     "get_project_docs",
     "get_project_context",
+    "get_patch_plan_context",
     "get_patch_constraints",
     "validate_patch_against_constraints",
     "prefetch_project_docs",
@@ -569,6 +571,7 @@ def _compact_bootstrap_project_docs(result: dict[str, Any]) -> dict[str, Any]:
 def handle_project_tool(name: str, args: dict[str, Any], service: LibraryDocsService) -> dict[str, Any] | None:
     project_docs_app = getattr(service, "project_docs", service)
     project_context_app = getattr(service, "project_context", service)
+    patch_plan_context_app = getattr(service, "patch_plan_context", service)
     patch_constraints_app = getattr(service, "patch_constraints", service)
     patch_validation_app = getattr(service, "patch_constraint_validation", service)
     dependency_docs_app = getattr(service, "dependency_docs", service)
@@ -607,6 +610,23 @@ def handle_project_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
         payload["output_mode"] = output_mode
         payload = _compact_mcp_payload(_add_project_context_output_warning(payload, args), page=_bounded_int_arg(args, "page", default=1, max_value=10_000), page_size=_bounded_int_arg(args, "page_size", default=None, max_value=20), include_sections=args.get("include_sections"))
         return _strip_mcp_debug_noise(payload)
+    if name == "get_patch_plan_context":
+        question = _clean_string(args.get("question"))
+        if not question:
+            return _bad_request("empty_question", "question must not be empty")
+        builder = getattr(patch_plan_context_app, "get_patch_plan_context", build_patch_plan_context)
+        return builder(
+            question,
+            project_path=args.get("project_path"),
+            changed_files=args.get("changed_files"),
+            symbol_queries=args.get("symbol_queries"),
+            design_context=args.get("design_context"),
+            include_dependency_source=bool(args.get("include_dependency_source") if args.get("include_dependency_source") is not None else True),
+            max_files=_bounded_int_arg(args, "max_files", default=12, max_value=50),
+            max_snippets=_bounded_int_arg(args, "max_snippets", default=16, max_value=40),
+            max_tokens=_bounded_int_arg(args, "max_tokens", default=2400, min_value=200, max_value=12000),
+            output_mode=args.get("output_mode") or "compact",
+        )
     if name == "get_patch_constraints":
         question = _clean_string(args.get("question"))
         if not question:

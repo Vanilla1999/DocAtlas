@@ -19,7 +19,7 @@ DocAtlas turns reviewable project docs, lockfiles/dependency docs, and local cod
 The first path for repository work is:
 
 ```text
-get_docs_context → get_patch_constraints → edit → validate_patch_against_constraints → advisory PR artifacts
+get_docs_context → get_patch_plan_context → get_patch_constraints → edit → validate_patch_against_constraints → advisory PR artifacts
 ```
 
 Patch Contract output is advisory and non-blocking: it highlights source-backed constraints, deterministic violations, and unknown/manual-review areas, but it does not prove a patch is safe to merge.
@@ -112,9 +112,10 @@ Project-docs tools let agents start from reviewable repository files, then move 
 
 | Tool | Purpose |
 |---|---|
-| `get_docs_context` | Recommended first call. Returns project, library, dependency, or mixed documentation context and routes patch-like tasks toward `get_patch_constraints`. |
-| `get_patch_constraints` | Builds a compact, source-attributed Patch Contract for the requested coding change. |
-| `validate_patch_against_constraints` | Performs deterministic advisory checks after a patch and keeps semantic uncertainty as unknown/manual review. |
+| `get_docs_context` | Recommended first call. Retrieves project/library docs and broad source-grounded context. It is not replaced by `get_patch_plan_context`. |
+| `get_patch_plan_context` | Builds a compact implementation map from source, dependency, and design evidence: relevant files, existing APIs, missing symbols, minimal patch path, risks, and verification. It does not replace `get_docs_context` or `get_patch_constraints`. |
+| `get_patch_constraints` | Returns source-attributed constraints before patching. Use it after planning and before editing; it is not replaced by `get_patch_plan_context`. |
+| `validate_patch_against_constraints` | Performs deterministic advisory validation after a patch and keeps semantic uncertainty as unknown/manual review. |
 | `sync_project_docs` | **Canonical lifecycle action.** Discovers, reconciles, prunes orphaned/stale, and indexes project docs in one call. Prefer over `ingest_project_docs`. |
 | `inspect_project_docs` | Read-only discovery: reports discovered candidates, indexed docs, stale/ignored/orphaned sources, reason_code, and next_action. |
 | `ingest_project_docs` | Legacy low-level index operation. Does not reconcile — use `sync_project_docs`. |
@@ -130,7 +131,21 @@ For most MCP clients and coding agents, start with the unified high-level tool:
 get_docs_context(question, project_path?, library?, mode="auto")
 ```
 
-DocAtlas provides one high-level MCP entry point for project, library, dependency, and mixed documentation context. For patch-like tasks, follow its next action to `get_patch_constraints`, make the code change, then call `validate_patch_against_constraints` and attach the non-blocking review artifacts. It does not replace the lane-specific tools, and it does not fetch missing docs automatically unless the caller explicitly allows network work.
+DocAtlas provides one high-level MCP entry point for project, library, dependency, and mixed documentation context. For patch-like tasks, use the planning and constraint tools as separate steps:
+
+```text
+get_docs_context
+→ get_patch_plan_context
+→ get_patch_constraints
+→ edit
+→ validate_patch_against_constraints
+```
+
+`get_patch_plan_context` is a source/dependency/design evidence map for implementation planning. It is not a docs retriever, not a patch generator, and not a constraints validator. Use `get_patch_constraints` separately before editing, then call `validate_patch_against_constraints` after the patch. The workflow is advisory and non-blocking; it does not prove merge safety.
+
+Expected result summary for a Flutter menu planning task: exact relevant files for menu/system/tabs code, `showBottomDialog: not_found`, `PBBottomSheet.open` found in dependency source, a minimal patch path for replacing the inline menu with a bottom sheet, and `verification` including `flutter analyze`. See [`docs/mcp-docs-server.md`](./docs/mcp-docs-server.md) for the example call.
+
+Non-goals: `get_patch_plan_context` does not generate a patch, does not guarantee safe merge, does not index the whole `.pub-cache`, does not replace code reading by the agent, and does not replace constraints validation.
 
 For coding/API/command questions, tools accept `response_style` with `auto`, `snippet-first`, or `evidence-first`. In `auto`, DocAtlas returns a trusted `primary_snippet` first when the selected sources contain a usable code/config/command example, while preserving `context_pack`, source attribution, exact-version diagnostics, and the Trust Contract. Snippets are extracted from indexed documentation; DocAtlas does not synthesize code.
 

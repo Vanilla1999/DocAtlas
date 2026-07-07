@@ -1,0 +1,14 @@
+packages:
+  ui_base:
+    dependency: transitive
+    description:
+      name: ui_base
+    source: hosted
+    version: "1.2.3"
+  pole_base_kit:
+    dependency: "direct main"
+    description:
+      path: fake_pub_cache/ui_base
+      relative: true
+    source: path
+    version: "1.2.3"

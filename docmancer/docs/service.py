@@ -18,6 +18,7 @@ from docmancer.docs.application.project_docs_service import ProjectDocsService
 from docmancer.docs.application.patch_constraint_validation_service import PatchConstraintValidationService
 from docmancer.docs.application.patch_constraints_service import PatchConstraintsService
 from docmancer.docs.application.unified_context_service import UnifiedDocsContextService
+from docmancer.docs.patch_plan_context import PatchPlanContextService
 from docmancer.docs.domain.policies import is_stale
 from docmancer.docs.domain.target_security import host_allowed, is_remote_url, path_allowed, url_security_error
 from docmancer.docs.domain.trust_contract import build_project_context_trust_contract
@@ -44,6 +45,7 @@ class LibraryDocsService:
         self.library_docs = LibraryDocsApplicationService(self)
         self.project_docs = ProjectDocsService(self)
         self.project_context = ProjectContextService(self)
+        self.patch_plan_context = PatchPlanContextService(self)
         self.patch_constraints = PatchConstraintsService(self)
         self.patch_constraint_validation = PatchConstraintValidationService()
         self.dependency_docs = DependencyDocsService(self)
@@ -247,6 +249,9 @@ class LibraryDocsService:
 
     def get_project_context(self, *args: Any, **kwargs: Any):
         return self.project_context.get_project_context(*args, **kwargs)
+
+    def get_patch_plan_context(self, *args: Any, **kwargs: Any):
+        return self.patch_plan_context.get_patch_plan_context(*args, **kwargs)
 
     def get_patch_constraints(self, *args: Any, **kwargs: Any) -> PatchConstraintPacket:
         return self.patch_constraints.get_patch_constraints(*args, **kwargs)

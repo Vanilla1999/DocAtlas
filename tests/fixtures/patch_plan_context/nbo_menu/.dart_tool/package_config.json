@@ -1,0 +1,15 @@
+{
+  "configVersion": 2,
+  "packages": [
+    {
+      "name": "ui_base",
+      "rootUri": "../fake_pub_cache/ui_base",
+      "packageUri": "lib/"
+    },
+    {
+      "name": "pole_base_kit",
+      "rootUri": "../fake_pub_cache/ui_base",
+      "packageUri": "lib/"
+    }
+  ]
+}
