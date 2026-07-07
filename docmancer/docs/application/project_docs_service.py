@@ -37,7 +37,8 @@ FLUTTER_CHANNEL_DOCS_WARNING = (
     "not an exact archived snapshot."
 )
 PLACEHOLDER_PROJECT_DOC_RE = re.compile(
-    r"\b(todo|tbd|placeholder|coming soon|lorem ipsum|under construction|work in progress|wip)\b",
+    r"\b(todo|tbd|placeholder|coming soon|lorem ipsum|under construction|work in progress|wip)\b|"
+    r"TODO:\s*Put a short description|const\s+like\s*=\s*['\"]sample['\"]",
     re.IGNORECASE,
 )
 
@@ -196,6 +197,13 @@ class ProjectDocsService:
         if not stripped:
             return True
         return bool(PLACEHOLDER_PROJECT_DOC_RE.search(stripped))
+
+    @classmethod
+    def _looks_like_placeholder_search_result(cls, path: str | None, text: str) -> bool:
+        name = Path(str(path or "")).name.lower()
+        if not (name.startswith("readme") or name.startswith("architecture") or name in {"license", "copying"}):
+            return False
+        return cls._looks_like_placeholder_project_doc(text[:4096])
 
     @staticmethod
     def _read_text_prefix(path: Path, *, max_chars: int = 4096) -> str | None:
@@ -995,6 +1003,7 @@ class ProjectDocsService:
             if item.get("path")
         }
         safe_chunks = []
+        dropped_placeholder_chunks = 0
         for chunk in chunks:
             metadata_for_chunk = chunk.metadata or {}
             chunk_path = metadata_for_chunk.get("project_doc_path") or metadata_for_chunk.get("source_path")
@@ -1002,6 +1011,9 @@ class ProjectDocsService:
             if not current_source:
                 continue
             if metadata_for_chunk.get("project_doc_content_hash") != current_source.get("content_hash"):
+                continue
+            if self._looks_like_placeholder_search_result(chunk_path, chunk.text):
+                dropped_placeholder_chunks += 1
                 continue
             safe_chunks.append(chunk)
         chunks = safe_chunks
@@ -1052,6 +1064,8 @@ class ProjectDocsService:
         confirmation_reason = None
         arguments_patch: dict[str, Any] = {}
         preflight_diagnostics: dict[str, Any] = {}
+        if dropped_placeholder_chunks:
+            preflight_diagnostics["dropped_placeholder_project_docs"] = dropped_placeholder_chunks
         if preflight_inspect:
             next_action = preflight_inspect.next_action
             requires_confirmation = True

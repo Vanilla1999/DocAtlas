@@ -3,8 +3,10 @@ from __future__ import annotations
 
 import asyncio
 import json
+import os
 from typing import Any, cast
 
+from docmancer.docs.interfaces.mcp.error_contract import build_mcp_error_payload, debug_errors_enabled
 from docmancer.docs.service import LibraryDocsService
 from docmancer.docs.interfaces.mcp.context_tools import context_tools, handle_context_tool
 from docmancer.docs.interfaces.mcp.docs_tools import handle_library_tool, library_tools
@@ -39,10 +41,75 @@ TOOLS: list[dict[str, Any]] = [
                 "allow_network": {"type": ["boolean", "null"]},
                 "allow_latest_fallback": {"type": ["boolean", "null"]},
                 "force_refresh": {"type": ["boolean", "null"]},
+                "prefetch_auto": {"type": ["boolean", "null"], "description": "When true, automatically prefetch dependency/library docs from the network without requiring user confirmation."},
+                "page": {"type": ["integer", "null"], "minimum": 1, "default": 1},
+                "page_size": {"type": ["integer", "null"], "minimum": 1, "maximum": 20},
+                "include_sections": {"type": ["array", "null"], "items": {"type": "string", "enum": ["context_pack", "supporting_snippets", "trust_contract", "diagnostics", "metrics"]}},
                 "output_mode": {"type": ["string", "null"], "enum": ["answer", "compact", "debug", "full", None], "default": "answer", "description": "answer is the default minimal agent-friendly response; compact includes structured context; debug includes diagnostics; full returns raw output."},
                 "details": {"type": ["boolean", "null"]},
             },
             "required": ["question"],
+        },
+    },
+    {
+        "name": "prepare_docs",
+        "description": "Unified confirmation-first lifecycle/admin tool for docs preparation: sync project docs, prefetch dependency/library/manifest/target docs, refresh, prune, or remove registered docs sources. Prefer this over separate ingest/sync/prefetch/refresh/prune/remove tools.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "action": {"type": "string", "enum": ["sync_project_docs", "prefetch_project_dependency_docs", "prefetch_library_docs", "prefetch_docs_targets", "validate_docs_manifest", "prefetch_docs_manifest", "refresh_library_docs", "prune_library_docs", "remove_library_docs"]},
+                "project_path": {"type": ["string", "null"]},
+                "library": {"type": ["string", "null"]},
+                "canonical_id": {"type": ["string", "null"]},
+                "manifest_path": {"type": ["string", "null"]},
+                "targets": {"type": ["array", "null"]},
+                "ecosystem": {"type": ["string", "null"]},
+                "version": {"type": ["string", "null"]},
+                "versions": {"type": ["array", "null"], "items": {"type": "string"}},
+                "source_type": {"type": ["string", "null"]},
+                "docs_url": {"type": ["string", "null"]},
+                "docs_url_template": {"type": ["string", "null"]},
+                "include_flutter": {"type": ["boolean", "null"]},
+                "include_dart": {"type": ["boolean", "null"]},
+                "include_rust": {"type": ["boolean", "null"]},
+                "include_packages": {"type": ["array", "null"], "items": {"type": "string"}},
+                "with_vectors": {"type": ["boolean", "null"]},
+                "force_refresh": {"type": ["boolean", "null"]},
+                "force": {"type": ["boolean", "null"]},
+                "continue_on_error": {"type": ["boolean", "null"]},
+                "async": {"type": ["boolean", "null"]},
+                "keep_versions": {"type": ["array", "null"], "items": {"type": "string"}},
+                "older_than_days": {"type": ["integer", "null"]},
+                "dry_run": {"type": ["boolean", "null"], "default": True},
+            },
+            "required": ["action"],
+        },
+    },
+    {
+        "name": "docs_job",
+        "description": "Unified async docs job manager. Use action='list', 'status', or 'cancel' for jobs started by prepare_docs(..., async=true).",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "action": {"type": "string", "enum": ["list", "status", "cancel"]},
+                "job_id": {"type": ["string", "null"]},
+                "status": {"type": ["string", "null"]},
+                "limit": {"type": ["integer", "null"], "minimum": 1, "maximum": 200},
+            },
+            "required": ["action"],
+        },
+    },
+    {
+        "name": "list_docs_sources",
+        "description": "Admin/debug source-health view for locally registered docs sources. Normal answer flows should use get_docs_context; use this for failed/stale library-doc diagnostics.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "kind": {"type": ["string", "null"], "enum": ["library", "all", None], "default": "library"},
+                "canonical_id": {"type": ["string", "null"]},
+                "stale_only": {"type": ["boolean", "null"]},
+                "limit": {"type": ["integer", "null"], "minimum": 1, "maximum": 200},
+            },
         },
     },
     {
@@ -289,6 +356,9 @@ Does not use deleted, orphaned, or stale project-doc content by default.""",
                 "mode": {"type": ["string", "null"], "enum": ["auto", "project-only", "deps-only", "public-docs", None]},
                 "response_style": {"type": ["string", "null"], "enum": ["auto", "snippet-first", "evidence-first", None], "default": "auto", "description": "Choose snippet-first presentation for coding tasks or preserve evidence-first context."},
                 "allow_network": {"type": ["boolean", "null"], "default": False, "description": "Permit dependency/public docs network fetches. Defaults to false and returns confirmation instead."},
+                "page": {"type": ["integer", "null"], "minimum": 1, "default": 1},
+                "page_size": {"type": ["integer", "null"], "minimum": 1, "maximum": 20},
+                "include_sections": {"type": ["array", "null"], "items": {"type": "string", "enum": ["context_pack", "supporting_snippets", "trust_contract", "diagnostics", "metrics"]}},
                 "output_mode": {"type": ["string", "null"], "enum": ["answer", "compact", "debug", "full", None], "default": "answer", "description": "answer is the default minimal agent-friendly response; compact includes structured context; debug includes diagnostics; full returns raw output."},
                 "details": {"type": ["boolean", "null"], "description": "Compatibility flag; for get_project_context it does not request full output unless output_mode='full'."},
             },
@@ -401,7 +471,7 @@ Does not use deleted, orphaned, or stale project-doc content by default.""",
     },
     {
         "name": "prefetch_project_docs",
-        "description": "Read a Flutter/Dart/Rust project and prefetch exact dependency documentation from project manifests/lockfiles. This is for dependency docs, not project-owned README/docs/wiki files; call inspect_project_docs first to discover local project docs. May fetch from the network, so ask for confirmation before running unless the user already approved dependency docs prefetch.",
+        "description": "[DEPRECATED] Use prefetch_project_dependency_docs instead. Read a Flutter/Dart/Rust project and prefetch exact dependency documentation from project manifests/lockfiles. May fetch from the network, so ask for confirmation before running.",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -419,7 +489,7 @@ Does not use deleted, orphaned, or stale project-doc content by default.""",
     },
     {
         "name": "prefetch_project_dependency_docs",
-        "description": "Alias for prefetch_project_docs with clearer naming. Read a Flutter/Dart/Rust project and prefetch exact dependency documentation from project manifests/lockfiles. This is for dependency docs, not project-owned README/docs/wiki files. May fetch from the network, so ask for confirmation before running unless the user already approved dependency docs prefetch.",
+        "description": "Read a Flutter/Dart/Rust project and prefetch exact dependency documentation from project manifests/lockfiles. This is for dependency docs, not project-owned README/docs/wiki files; call inspect_project_docs first to discover local project docs. May fetch from the network, so ask for confirmation before running unless the user already approved dependency docs prefetch.",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -436,6 +506,50 @@ Does not use deleted, orphaned, or stale project-doc content by default.""",
         },
     },
 ]
+
+LEGACY_TOOL_NAMES = {
+    "resolve_library_id",
+    "get_library_docs",
+    "refresh_library_docs",
+    "prefetch_library_docs",
+    "validate_docs_manifest",
+    "prefetch_docs_manifest",
+    "prefetch_docs_targets",
+    "ingest_project_docs",
+    "sync_project_docs",
+    "bootstrap_project_docs",
+    "get_project_docs",
+    "get_project_context",
+    "get_docs_job_status",
+    "list_docs_jobs",
+    "cancel_docs_job",
+    "prefetch_project_docs",
+    "prefetch_project_dependency_docs",
+}
+ADMIN_TOOL_NAMES = {
+    "inspect_library_docs",
+    "remove_library_docs",
+    "prune_library_docs",
+    "list_library_docs",
+}
+
+
+def _enabled_tools(all_tools: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    show_legacy = os.environ.get("DOCMANCER_MCP_LEGACY_TOOLS") == "1"
+    show_admin = os.environ.get("DOCMANCER_MCP_ADMIN_TOOLS") == "1"
+    enabled: list[dict[str, Any]] = []
+    for tool in all_tools:
+        name = str(tool.get("name") or "")
+        if name in LEGACY_TOOL_NAMES and not show_legacy:
+            continue
+        if name in ADMIN_TOOL_NAMES and not show_admin:
+            continue
+        enabled.append(tool)
+    return enabled
+
+
+ALL_TOOLS = TOOLS
+TOOLS = _enabled_tools(ALL_TOOLS)
 
 CONTEXT_TOOLS = context_tools(TOOLS)
 LIBRARY_TOOLS = library_tools(TOOLS)
@@ -598,8 +712,26 @@ async def _run_async(service: LibraryDocsService) -> None:
                 if payload is not None:
                     return _json_text(mcp_types, payload)
         except Exception as exc:
-            return _json_text(mcp_types, {"status": "failed", "message": str(exc)})
-        return _json_text(mcp_types, {"status": "failed", "message": f"unknown tool: {name}"})
+            return _json_text(
+                mcp_types,
+                build_mcp_error_payload(
+                    reason_code="unhandled_exception",
+                    message=str(exc),
+                    exception=exc,
+                    tool=name,
+                    phase="execution",
+                    debug=debug_errors_enabled(arguments or {}),
+                ),
+            )
+        return _json_text(
+            mcp_types,
+            build_mcp_error_payload(
+                reason_code="unknown_tool",
+                message=f"unknown tool: {name}",
+                tool=name,
+                phase="validation",
+            ),
+        )
 
     async with stdio_server() as (read_stream, write_stream):
         await server.run(read_stream, write_stream, server.create_initialization_options())

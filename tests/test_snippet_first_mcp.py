@@ -7,11 +7,15 @@ from docmancer.docs.models import DocsResult, ProjectContextResult
 from docmancer.docs.interfaces.mcp.context_tools import handle_context_tool
 from docmancer.docs.interfaces.mcp.docs_tools import handle_library_tool
 from docmancer.docs.interfaces.mcp.project_tools import handle_project_tool
-from docmancer.mcp.docs_server import TOOLS
+from docmancer.mcp.docs_server import ALL_TOOLS, TOOLS
 
 
 def tool_schema(name):
     return next(tool for tool in TOOLS if tool["name"] == name)["inputSchema"]
+
+
+def legacy_tool_schema(name):
+    return next(tool for tool in ALL_TOOLS if tool["name"] == name)["inputSchema"]
 
 
 def test_response_style_registered_in_get_docs_context_schema():
@@ -19,11 +23,11 @@ def test_response_style_registered_in_get_docs_context_schema():
 
 
 def test_response_style_registered_in_get_library_docs_schema():
-    assert "response_style" in tool_schema("get_library_docs")["properties"]
+    assert "response_style" in legacy_tool_schema("get_library_docs")["properties"]
 
 
 def test_response_style_registered_in_get_project_context_schema():
-    assert "response_style" in tool_schema("get_project_context")["properties"]
+    assert "response_style" in legacy_tool_schema("get_project_context")["properties"]
 
 
 def test_invalid_response_style_rejected():

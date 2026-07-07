@@ -5,6 +5,7 @@ from dataclasses import asdict, is_dataclass, replace
 from typing import Any
 
 from docmancer.docs.application.project_context_service import context_pack_snippet
+from docmancer.docs.domain.library_source_options import library_docs_source_options, source_required_diagnostics
 from docmancer.docs.domain.snippets import build_snippet_presentation, validate_response_style
 from docmancer.docs.exact_version import resolve_python_versioned_docs
 from docmancer.docs.models import DocsResult, ProjectContextResult, UnifiedDocsContextResult
@@ -94,6 +95,24 @@ def _looks_like_imperative_patch_task(tokens: list[str]) -> bool:
     return False
 
 
+def _snippet_first_fallback_question(question: str, library: str) -> str:
+    text = (question or "").strip()
+    base = text if text else library
+    lowered = base.lower()
+    if "example" in lowered or "code" in lowered:
+        return base
+    return f"{base} example code snippet"
+
+
+def _without_snippet_not_available(warnings: list[Any]) -> list[Any]:
+    return [
+        warning
+        for warning in warnings
+        if warning != "snippet_not_available"
+        and not (isinstance(warning, dict) and warning.get("code") == "snippet_not_available")
+    ]
+
+
 def _exact_version_match(result: DocsResult) -> bool | None:
     if not result.requested_version:
         return None
@@ -129,6 +148,7 @@ class UnifiedDocsContextService:
         allow_network: bool | None = None,
         allow_latest_fallback: bool | None = None,
         force_refresh: bool | None = None,
+        prefetch_auto: bool | None = None,
         details: bool | None = None,
         response_style: str | None = None,
     ) -> UnifiedDocsContextResult:
@@ -137,6 +157,8 @@ class UnifiedDocsContextService:
         prepare_project_docs = True if prepare_project_docs is None else bool(prepare_project_docs)
         allow_network = bool(allow_network) if allow_network is not None else False
         allow_latest_fallback = bool(allow_latest_fallback) if allow_latest_fallback is not None else False
+        prefetch_auto_val = bool(prefetch_auto) if prefetch_auto is not None else False
+        effective_allow_network = allow_network or prefetch_auto_val
         force_refresh = bool(force_refresh) if force_refresh is not None else False
         details = bool(details) if details is not None else False
         libs = self._libraries(library, libraries)
@@ -190,11 +212,11 @@ class UnifiedDocsContextService:
         project_auto = mode_requested == "auto" and bool(project_path) and not libs
 
         if mode_selected == "project":
-            delegated_mode = "auto" if project_auto and allow_network else "project-only"
+            delegated_mode = "auto" if project_auto and effective_allow_network else "project-only"
             routing["delegated_mode"] = delegated_mode
-            project_result = self.service.get_project_context(project_path, question, tokens=tokens, limit=limit, expand=expand, module=module, module_path=module_path, scope=scope, mode=delegated_mode, response_style=response_style, allow_network=allow_network)
+            project_result = self.service.get_project_context(project_path, question, tokens=tokens, limit=limit, expand=expand, module=module, module_path=module_path, scope=scope, mode=delegated_mode, response_style=response_style, allow_network=effective_allow_network)
         elif mode_selected == "dependency":
-            if not allow_network and self._dependency_prefetch_needed(project_path):
+            if not effective_allow_network and self._dependency_prefetch_needed(project_path):
                 lanes["dependency"] = {"status": "confirmation_required", "source_count": 0}
                 return self._confirmation_result(
                     question=question,
@@ -207,17 +229,17 @@ class UnifiedDocsContextService:
                     lanes=lanes,
                     lane_details=lane_details if details else {},
                 )
-            project_result = self.service.get_project_context(project_path, question, tokens=tokens, limit=limit, expand=expand, library=library, libraries=libraries, ecosystem=ecosystem, version=version, module=module, module_path=module_path, scope=scope, mode="deps-only", response_style=response_style, allow_network=allow_network)
+            project_result = self.service.get_project_context(project_path, question, tokens=tokens, limit=limit, expand=expand, library=library, libraries=libraries, ecosystem=ecosystem, version=version, module=module, module_path=module_path, scope=scope, mode="deps-only", response_style=response_style, allow_network=effective_allow_network)
         elif mode_selected == "mixed":
-            project_result = self.service.get_project_context(project_path, question, tokens=tokens, limit=limit, expand=expand, library=library, libraries=libraries, ecosystem=ecosystem, version=version, module=module, module_path=module_path, scope=scope, mode="auto", response_style=response_style, allow_network=allow_network)
+            project_result = self.service.get_project_context(project_path, question, tokens=tokens, limit=limit, expand=expand, library=library, libraries=libraries, ecosystem=ecosystem, version=version, module=module, module_path=module_path, scope=scope, mode="auto", response_style=response_style, allow_network=effective_allow_network)
             routing["dependency_detected"] = bool(getattr(project_result, "dependency_docs", None))
             explicit_library_results = []
             for lib in libs:
-                safe = self._ensure_library_safe(lib, ecosystem, version, source_type, docs_url, force_refresh, allow_network)
+                safe = self._ensure_library_safe(lib, ecosystem, version, source_type, docs_url, force_refresh, effective_allow_network)
                 if safe is not None:
                     explicit_library_results.append(safe)
                     continue
-                explicit_library_results.append(self._get_library_docs_with_latest_fallback(lib, question=question, tokens=tokens, ecosystem=ecosystem, version=version, docs_url=docs_url, source_type=source_type, force_refresh=force_refresh, project_path=project_path, allow_network=allow_network, allow_latest_fallback=allow_latest_fallback, response_style=response_style))
+                explicit_library_results.append(self._get_library_docs_with_latest_fallback(lib, question=question, tokens=tokens, ecosystem=ecosystem, version=version, docs_url=docs_url, source_type=source_type, force_refresh=force_refresh, project_path=project_path, allow_network=effective_allow_network, allow_latest_fallback=allow_latest_fallback, response_style=response_style))
             library_results = [item for item in explicit_library_results if isinstance(item, DocsResult)]
             lane_details["library"] = [self._to_dict(item) for item in explicit_library_results]
             confirmations = [item for item in explicit_library_results if isinstance(item, UnifiedDocsContextResult)]
@@ -236,10 +258,10 @@ class UnifiedDocsContextService:
                 return confirmation
         elif mode_selected == "library":
             for lib in libs:
-                safe = self._ensure_library_safe(lib, ecosystem, version, source_type, docs_url, force_refresh, allow_network)
+                safe = self._ensure_library_safe(lib, ecosystem, version, source_type, docs_url, force_refresh, effective_allow_network)
                 if safe is not None:
                     return safe
-                result = self._get_library_docs_with_latest_fallback(lib, question=question, tokens=tokens, ecosystem=ecosystem, version=version, docs_url=docs_url, source_type=source_type, force_refresh=force_refresh, project_path=project_path, allow_network=allow_network, allow_latest_fallback=allow_latest_fallback, response_style=response_style)
+                result = self._get_library_docs_with_latest_fallback(lib, question=question, tokens=tokens, ecosystem=ecosystem, version=version, docs_url=docs_url, source_type=source_type, force_refresh=force_refresh, project_path=project_path, allow_network=effective_allow_network, allow_latest_fallback=allow_latest_fallback, response_style=response_style)
                 if isinstance(result, UnifiedDocsContextResult):
                     return result
                 library_results.append(result)
@@ -283,16 +305,35 @@ class UnifiedDocsContextService:
             exact_version = exact_version or self._exact_version(result, allow_latest_fallback)
 
         context_pack, contamination, deduplication = self._dedupe_and_guard(context_pack, libs, project_path)
+        lane_priority = self._lane_priority_for(mode_selected)
+        context_pack, snippet_fallback = self._augment_snippet_first_context(
+            context_pack,
+            question=question,
+            response_style=response_style,
+            lane_priority=lane_priority,
+            library_results=library_results,
+            libs=libs,
+            tokens=tokens,
+            ecosystem=ecosystem,
+            version=version,
+            docs_url=docs_url,
+            source_type=source_type,
+            project_path=project_path,
+        )
+        if snippet_fallback:
+            context_pack, contamination, deduplication = self._dedupe_and_guard(context_pack, libs, project_path)
+            routing["snippet_first_fallback"] = snippet_fallback
         self._refresh_lane_counts(lanes, context_pack)
         trust_contract = self._trust_contract(context_pack, project_result, library_results)
         source_summary = self._source_summary(context_pack, trust_contract)
-        lane_priority = self._lane_priority_for(mode_selected)
         snippet_presentation = build_snippet_presentation(
             context_pack,
             question=question,
             response_style=response_style,
             lane_priority=lane_priority,
         )
+        if snippet_fallback and snippet_presentation.primary_snippet:
+            warnings = _without_snippet_not_available(warnings)
         answer_available = bool(context_pack)
         pending_actions = self._collect_pending_actions(pending_lane_results)
         requested_lanes = [name for name, lane in lanes.items() if lane.get("status") != "not_requested"]
@@ -308,6 +349,28 @@ class UnifiedDocsContextService:
             if patch_constraints_action not in combined_next_actions:
                 combined_next_actions.insert(0, patch_constraints_action)
         primary_next_action = pending_actions.get("next_action") or patch_constraints_action
+
+        ingestion_diagnostics = {}
+        retrieval_diagnostics = {}
+        if project_result:
+            project_diagnostics = getattr(project_result, "diagnostics", None) or getattr(project_result, "ingestion_diagnostics", None) or {}
+        else:
+            project_diagnostics = {}
+        for lane_name, lane_payload in [("project", project_diagnostics), ("library", library_results)]:
+            if lane_name == "library":
+                for lib_result in library_results:
+                    lib_diag = getattr(lib_result, "diagnostics", None) or {}
+                    if lib_diag:
+                        ingestion_diagnostics.setdefault(lane_name, []).append(lib_diag)
+                    retrieval_lane_diag = getattr(lib_result, "retrieval_diagnostics", None) or {}
+                    if retrieval_lane_diag:
+                        retrieval_diagnostics.setdefault(lane_name, []).append(retrieval_lane_diag)
+            else:
+                if lane_payload:
+                    ingestion_diagnostics.setdefault(lane_name, lane_payload)
+                    retrieval_lane_diag = getattr(project_result, "retrieval_diagnostics", None) or {}
+                    if retrieval_lane_diag:
+                        retrieval_diagnostics.setdefault(lane_name, retrieval_lane_diag)
 
         payload = UnifiedDocsContextResult(
             status=status,
@@ -341,6 +404,8 @@ class UnifiedDocsContextService:
             contamination=contamination,
             deduplication=deduplication,
             lane_details=lane_details if details else {},
+            ingestion_diagnostics=ingestion_diagnostics,
+            retrieval_diagnostics=retrieval_diagnostics,
         )
         return payload
 
@@ -449,7 +514,80 @@ class UnifiedDocsContextService:
         info = self.service.resolve_library(library, ecosystem, version, docs_url, None, source_type)
         if getattr(info, "status", None) == "exact_version_not_supported":
             return None
-        if force_refresh or not getattr(info, "local", False) or getattr(info, "stale", False) or getattr(info, "status", "") in {"needs_docs_url", "needs_refresh"}:
+        status = getattr(info, "status", "")
+        if status == "needs_docs_url":
+            candidates = list(getattr(info, "candidates", []) or [])
+            source_options = library_docs_source_options(library, ecosystem, version, source_type, candidates)
+            next_action = {
+                "type": "ask_user_for_library_docs_source",
+                "tool": None,
+                "requires_confirmation": True,
+                "question": f"Which documentation source should be used for {library}?",
+                "options": source_options,
+                "quality_warning": "If the user does not know, best-effort web discovery can be used, but quality is not guaranteed.",
+            }
+            return self._confirmation_result(
+                question=f"Which documentation source should be used for {library}?",
+                mode_requested="library",
+                mode_selected="library",
+                routing={"reason_code": "library_docs_source_required", "legacy_reason_code": "needs_docs_url", "project_path_used": False, "libraries_requested": [library], "dependency_detected": False},
+                reason_code="library_docs_source_required",
+                confirmation_reason="library_docs_source",
+                next_action=next_action,
+                arguments_patch={"library": library, "ecosystem": ecosystem, "version": version, "source_type": source_type},
+                lanes={**self._empty_lanes(), "library": {"status": "confirmation_required", "source_count": 0, "canonical_ids": [], "requires_confirmation": True, "next_action": next_action}},
+                warnings=[source_required_diagnostics({"code": "library_docs_source_required", "blocking": True, "source_options": source_options})],
+            )
+        if status == "failed":
+            message = getattr(info, "message", None) or "Registered library documentation source is in failed state."
+            next_action = {
+                "type": "repair_library_docs_source",
+                "tool": "prepare_docs",
+                "arguments_patch": {
+                    "action": "refresh_library_docs",
+                    "library": library,
+                    "ecosystem": ecosystem,
+                    "version": version,
+                    "source_type": source_type,
+                    "force": True,
+                    "allow_network": True,
+                },
+            }
+            return self._confirmation_result(
+                question="",
+                mode_requested="library",
+                mode_selected="library",
+                routing={
+                    "reason_code": "library_docs_failed",
+                    "project_path_used": False,
+                    "libraries_requested": [library],
+                    "dependency_detected": False,
+                    "failed_status": status,
+                    "failed_message": message,
+                },
+                reason_code="library_docs_failed",
+                confirmation_reason="library_docs_repair",
+                next_action=next_action,
+                arguments_patch=next_action["arguments_patch"],
+                lanes={
+                    **self._empty_lanes(),
+                    "library": {
+                        "status": "failed",
+                        "source_count": 0,
+                        "canonical_ids": [getattr(info, "library_id", None)] if getattr(info, "library_id", None) else [],
+                        "requires_confirmation": True,
+                        "next_action": next_action,
+                    },
+                },
+                warnings=[{
+                    "code": "library_docs_failed",
+                    "blocking": True,
+                    "library": library,
+                    "canonical_id": getattr(info, "canonical_id", None) or getattr(info, "library_id", None),
+                    "message": message,
+                }],
+            )
+        if force_refresh or not getattr(info, "local", False) or getattr(info, "stale", False) or status in {"needs_refresh"}:
             return self._confirmation_result(
                 question="",
                 mode_requested="library",
@@ -524,6 +662,61 @@ class UnifiedDocsContextService:
             "reason_code": latest.diagnostics.get("reason_code") if isinstance(latest.diagnostics, dict) else latest.status,
         }
         return replace(latest, requested_version=exact.requested_version or version, diagnostics=diag)
+
+    def _augment_snippet_first_context(
+        self,
+        context_pack: list[dict[str, Any]],
+        *,
+        question: str,
+        response_style: str,
+        lane_priority: list[str],
+        library_results: list[DocsResult],
+        libs: list[str],
+        tokens: int | None,
+        ecosystem: str | None,
+        version: str | None,
+        docs_url: str | None,
+        source_type: str | None,
+        project_path: str | None,
+    ) -> tuple[list[dict[str, Any]], dict[str, Any] | None]:
+        if response_style != "snippet-first" or not library_results:
+            return context_pack, None
+        current = build_snippet_presentation(
+            context_pack,
+            question=question,
+            response_style=response_style,
+            lane_priority=lane_priority,
+        )
+        if current.primary_snippet:
+            return context_pack, None
+
+        added = 0
+        for lib in libs:
+            fallback = self.service.get_docs(
+                lib,
+                topic=_snippet_first_fallback_question(question, lib),
+                tokens=tokens,
+                ecosystem=ecosystem,
+                version=version,
+                docs_url=docs_url,
+                source_type=source_type,
+                force_refresh=False,
+                project_path=project_path,
+                response_style=response_style,
+            )
+            if not isinstance(fallback, DocsResult) or not fallback.results:
+                continue
+            fallback_items = self._library_context_pack(fallback)
+            snippet_items = [item for item in fallback_items if item.get("snippet")]
+            if not snippet_items:
+                continue
+            context_pack = [*context_pack, *snippet_items]
+            added += len(snippet_items)
+            break
+
+        if not added:
+            return context_pack, None
+        return context_pack, {"reason": "snippet_first_requested_without_selected_snippet", "added_context_items": added}
 
     def _dependency_prefetch_needed(self, project_path: str | None) -> bool:
         if not project_path:

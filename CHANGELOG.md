@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- **MCP boundary contracts:** added structured MCP error payloads with legacy top-level compatibility fields and debug-gated tracebacks.
+- **MCP output compaction contract:** added shared output-mode normalization, bounded compact payload summaries, and pagination guidance for oversized context responses.
+- **Architecture decision record:** documented that the MCP boundary owns transport-safe error/output contracts while application services own business logic.
+
+### Fixed
+
+- **MCP compact evidence retention:** oversized compact responses now keep useful context summaries and truncation metadata instead of dropping all context evidence.
+- **MCP handler compatibility:** direct sub-service handler calls retain facade fallback for existing scripts, tests, and clients.
+
 ## [1.1.1] - 2026-07-03
 
 ### Fixed

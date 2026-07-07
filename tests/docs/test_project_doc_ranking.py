@@ -253,3 +253,40 @@ def test_ranking_metadata_attached_when_metadata_is_none():
     metadata = getattr(ranked[0], "metadata", None)
     assert isinstance(metadata, dict)
     assert "project_ranking" in metadata
+
+
+def test_is_specific_docs_mcp_source_matches_docs_server_py():
+    from docmancer.docs.domain.project_doc_ranking import is_specific_docs_mcp_source
+
+    class FakeMcpSource:
+        def __init__(self, path: str):
+            self.path = path
+            self.heading_path = ""
+            self.content = ""
+
+    assert is_specific_docs_mcp_source(FakeMcpSource("docmancer/mcp/docs_server.py"))
+    assert is_specific_docs_mcp_source(FakeMcpSource("docmancer/docs/interfaces/mcp/context_tools.py"))
+    assert is_specific_docs_mcp_source(FakeMcpSource("docs/mcp-docs-server.md"))
+    assert not is_specific_docs_mcp_source(FakeMcpSource("CHANGELOG.md"))
+
+
+def test_docs_mcp_weight_boost_docs_server_py():
+    intent = classify_project_query_intent("How does the MCP docs server work?")
+    assert intent.name == "docs_mcp"
+
+    w = source_weight_for_intent("docmancer/mcp/docs_server.py", None, intent)
+    assert w >= 1.7
+
+    w = source_weight_for_intent("docmancer/docs/interfaces/mcp/context_tools.py", None, intent)
+    assert w >= 1.7
+
+
+def test_mcp_disambiguation_boost_interfaces_mcp():
+    intent = classify_project_query_intent("What is the MCP server?")
+    assert intent.name == "mcp_disambiguation"
+
+    w = source_weight_for_intent("docmancer/mcp/docs_server.py", None, intent)
+    assert w >= 1.3
+
+    w = source_weight_for_intent("docmancer/docs/interfaces/mcp/context_tools.py", None, intent)
+    assert w >= 1.3

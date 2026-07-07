@@ -32,6 +32,7 @@ GENERATED_PATTERNS = (
     "*.pb.go",
     "*.pb.dart",
     "*.generated.*",
+    "GeneratedPluginRegistrant.*",
     "generated/",
     "dist/",
 )
@@ -124,12 +125,14 @@ EXCLUDED_SOURCE_PARTS = {
     "hidden_tests",
     "oracles",
     ".cache",
+    ".dart_tool",
     ".pytest_cache",
     ".uv",
     "uv-cache",
     "archive-v0",
     "materialized",
     "node_modules",
+    "build",
     ".venv",
     "venv",
     ".git",
@@ -531,10 +534,11 @@ class PatchConstraintsService:
         artifact_parts = (
             "/generated/", "generated/", "/dist/", "dist/", "/build/", "build/", "/coverage/", "coverage/",
             "eval/task_level/results/", ".docatlas/", ".docmancer/", "/patch-review/", "/patch_review/",
-            "/dogfood/", "dogfood/", "/node_modules/", "node_modules/", "/vendor/", "vendor/",
+            "/dogfood/", "dogfood/", "/node_modules/", "node_modules/", "/vendor/", "vendor/", ".dart_tool/", "/.dart_tool/",
         )
         artifact_suffixes = (
             ".g.dart", ".freezed.dart", ".pb.go", ".pb.dart", ".generated", ".generated.py", "_generated.py",
+            "generatedpluginregistrant.java", "generatedpluginregistrant.kt",
         )
         return any(part in normalized for part in artifact_parts) or any(normalized.endswith(suffix) for suffix in artifact_suffixes)
 
@@ -657,6 +661,8 @@ class PatchConstraintsService:
 
         for source in sources:
             source_path = source["path"]
+            if not self._source_relevant_to_task(source_path, source["text"]):
+                continue
             for candidate in self._iter_constraint_lines(source["text"], source_path):
                 line = candidate["line"]
                 lowered = line.lower()
@@ -744,6 +750,53 @@ class PatchConstraintsService:
                     ))
 
         return constraints
+
+    def _source_relevant_to_task(self, source_path: str, text: str) -> bool:
+        """Keep global docs, but do not import unrelated feature plans into a task contract."""
+        normalized_path = source_path.replace("\\", "/").lower()
+        name = Path(normalized_path).name
+        if self._source_authority(source_path) == "high":
+            return True
+        if name in {"architecture.md", "contributing.md", "readme.md", "agents.md", "project_map.md"}:
+            return True
+        if any(part in normalized_path for part in ("/adr/", "/adrs/", "docs/index.md", "docs/architecture")):
+            return True
+        question_text = (self._question or "").lower().replace("-", "_")
+        haystack = f"{normalized_path}\n{text[:3000]}".lower().replace("-", "_")
+        if "scandoc" in question_text and "scandoc" not in haystack and "scan_doc" not in haystack:
+            return False
+        terms = self._source_relevance_terms(self._question)
+        if not terms:
+            return True
+        for term in terms:
+            normalized_term = term.lower().replace("-", "_")
+            if normalized_term and normalized_term in haystack:
+                return True
+        return False
+
+    @staticmethod
+    def _source_relevance_terms(question: str) -> list[str]:
+        stop = {
+            "update", "change", "patch", "fix", "without", "before", "after", "using", "use",
+            "policy", "behavior", "feature", "task", "code", "file", "files", "project",
+        }
+        terms: list[str] = []
+        for term in PatchConstraintsService._task_terms(question):
+            terms.append(term)
+            for word in re.findall(r"[A-Za-zА-Яа-яЁё0-9_]+", term):
+                if len(word) >= 4 and word.lower() not in stop:
+                    terms.append(word)
+        for word in re.findall(r"[A-Za-zА-Яа-яЁё0-9_]+", question or ""):
+            if len(word) >= 4 and word.lower() not in stop:
+                terms.append(word)
+        out: list[str] = []
+        seen: set[str] = set()
+        for term in terms:
+            key = term.lower()
+            if key not in seen:
+                seen.add(key)
+                out.append(term)
+        return out
 
     def _drop_non_actionable_constraints(self, constraints: list[PatchConstraint]) -> list[PatchConstraint]:
         kept: list[PatchConstraint] = []
@@ -1322,7 +1375,12 @@ class PatchConstraintsService:
         if any(c.type == "verification" for c in constraints):
             actions.append({"type": "run_tests", "description": "Run the relevant project tests/checks and report real output."})
         if truncated:
-            actions.append({"type": "rerun_with_larger_budget", "description": "Contract was budget-truncated; rerun with larger max_tokens/max_constraints if lower-priority guidance is needed."})
+            actions.append({
+                "type": "rerun_with_larger_budget",
+                "tool": "get_patch_constraints",
+                "description": "Contract was budget-truncated; rerun with the maximum MCP budget and pass changed_files when known to make the contract more task-specific.",
+                "arguments_patch": {"max_tokens": 8000, "max_constraints": 40, "changed_files": ["path/to/changed_file"]},
+            })
         return actions
 
     @staticmethod

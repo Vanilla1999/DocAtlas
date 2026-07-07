@@ -16,6 +16,10 @@ GENERATED_REVIEW_FILENAMES = {"review_summary.md", "constraints.md", "review_sum
 def normalize_doc_path(path: str | None) -> str:
     return (path or "").replace("\\", "/").lower().strip()
 
+def normalize_doc_path_for_match(path: str | None) -> str:
+    """Like normalize_doc_path but treats _ and - as equivalent for matching."""
+    return normalize_doc_path(path).replace("-", "_")
+
 
 def basename(path: str | None) -> str:
     return normalize_doc_path(path).rsplit("/", 1)[-1]
@@ -84,6 +88,8 @@ def is_specific_docs_mcp_source(chunk: Any) -> bool:
     return (
         "mcp-docs" in p
         or "docs-server" in p
+        or "/mcp/docs_server" in p
+        or "/interfaces/mcp/" in p
         or "docs mcp" in h
         or "documentation mcp server" in h
         or "docs mcp runtime" in h
@@ -167,7 +173,7 @@ def source_weight_for_intent(path: str | None, heading_path: str | None, intent:
     if name == "docs_mcp":
         if source_type == "index":
             return 1.5
-        if "mcp-docs" in p or "docs-server" in p or "docs_mcp" in p:
+        if "mcp-docs" in p or "docs-server" in p or "docs_mcp" in p or "/mcp/docs_server" in p or "/interfaces/mcp/" in p:
             return 1.7
         if p.endswith("readme.md"):
             return 1.5
@@ -194,6 +200,8 @@ def source_weight_for_intent(path: str | None, heading_path: str | None, intent:
         if "mcp-docs" in p or "mcp-packs" in p:
             return 1.35
         if "architecture" in p and "mcp" in h:
+            return 1.3
+        if "/mcp/docs_server" in p or "/interfaces/mcp/" in p:
             return 1.3
 
     if name == "troubleshooting":

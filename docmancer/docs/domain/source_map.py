@@ -46,6 +46,7 @@ _GENERATED_MARKERS = (
     ".pb.go",
     ".generated.",
     ".gen.",
+    "generatedpluginregistrant.",
 )
 _KEYWORDS = {
     "abstract",
@@ -172,14 +173,21 @@ def build_project_source_evidence(
                 if match_counts.get(term, 0) >= 2:
                     continue
                 normalized_term = term_keys.get(term) or ""
-                if not normalized_term or normalized_term not in normalized_line:
+                if not normalized_term:
                     continue
+                match_type, confidence_score = _find_symbol_match(term, line)
+                if match_type is None:
+                    continue
+                confidence_label = _confidence_for_line(line, match_type)
                 matches.append(_source_snippet_evidence_item(
                     path=relative,
                     language=language,
                     line_number=line_number,
                     line=line,
                     term=term,
+                    match_type=match_type,
+                    confidence=confidence_label,
+                    confidence_score=confidence_score,
                 ))
                 match_counts[term] = match_counts.get(term, 0) + 1
 
@@ -259,6 +267,9 @@ def _source_snippet_evidence_item(
     line_number: int,
     line: str,
     term: str,
+    match_type: str = "exact_substring",
+    confidence: str = "high",
+    confidence_score: float = 1.0,
 ) -> dict[str, Any]:
     snippet = _sanitize_source_line(line.strip())
     content = f"{path}:{line_number}: {snippet}"
@@ -266,6 +277,9 @@ def _source_snippet_evidence_item(
     return {
         "source_class": "source_evidence",
         "evidence_class": "source_snippet",
+        "match_type": match_type,
+        "confidence": confidence,
+        "confidence_score": round(confidence_score, 2),
         "matched": True,
         "matched_terms": [term],
         "missing_terms": [],
@@ -282,6 +296,8 @@ def _source_snippet_evidence_item(
         "source": {
             "source_class": "source_evidence",
             "evidence_class": "source_snippet",
+            "match_type": match_type,
+            "confidence": confidence,
             "path": path,
             "line_start": line_number,
             "line_end": line_number,
@@ -296,6 +312,8 @@ def _absent_source_evidence_item(term: str) -> dict[str, Any]:
     return {
         "source_class": "source_evidence",
         "evidence_class": "absent_in_source",
+        "match_type": None,
+        "confidence": "unknown",
         "matched": False,
         "matched_terms": [],
         "missing_terms": [term],
@@ -307,7 +325,7 @@ def _absent_source_evidence_item(term: str) -> dict[str, Any]:
         "why_selected": "requirement term was searched in project source; absence is a search result, not proof of nonexistence",
         "content": content,
         "token_estimate": max(1, len(content) // 4),
-        "source": {"source_class": "source_evidence", "evidence_class": "absent_in_source"},
+        "source": {"source_class": "source_evidence", "evidence_class": "absent_in_source", "confidence": "unknown"},
         "section": {"title": "Source evidence absent", "heading_path": "source_evidence", "freshness": "current"},
     }
 
@@ -548,18 +566,21 @@ def _matched_terms(item: dict[str, Any], query_terms: list[str]) -> list[str]:
 def _selection_score(item: dict[str, Any], query_terms: list[str]) -> float:
     score = 0.0
     normalized_path = _normalize(str(item.get("path") or ""))
-    symbols = _normalize(" ".join(str(symbol.get("name") or "") for symbol in item.get("symbols") or []))
+    raw_symbols = " ".join(str(symbol.get("name") or "") for symbol in item.get("symbols") or [])
+    symbols = _normalize(raw_symbols)
+    split_symbols = _split_identifier(raw_symbols)
     strings = _normalize(" ".join(str(value) for value in item.get("string_literals") or []))
     imports = _normalize(" ".join(str(value) for value in item.get("imports") or []))
     if not query_terms:
         return 0.0
     for term in query_terms:
         normalized = _normalize(term)
+        split_term = _split_identifier(term)
         if not normalized:
             continue
         if normalized in normalized_path:
             score += 5.0
-        if normalized in symbols:
+        if normalized in symbols or (split_term != normalized and split_term in split_symbols):
             score += 4.0
         if normalized in strings:
             score += 4.0
@@ -641,6 +662,102 @@ def _looks_like_useful_literal(value: str) -> bool:
 def _is_generated_path(path: str) -> bool:
     lowered = path.lower()
     return any(marker in lowered for marker in _GENERATED_MARKERS) or "/generated/" in lowered or lowered.startswith("generated/")
+
+
+_CAMEL_SPLIT_RE = re.compile(r"(?<=[a-zа-яё])(?=[A-ZА-ЯЁ])|(?<=[A-ZА-ЯЁ]{2})(?=[A-ZА-ЯЁ][a-zа-яё])")
+_SYMBOL_CLEAN_RE = re.compile(r"^[_\s]+|[_\s]+$")
+
+
+def _split_identifier(name: str) -> str:
+    """Split camelCase/PascalCase/snake_case into space-separated words."""
+    cleaned = _SYMBOL_CLEAN_RE.sub("", name.replace("-", " "))
+    cleaned = _CAMEL_SPLIT_RE.sub(" ", cleaned)
+    return _normalize(cleaned)
+
+
+def _fuzzy_match(normalized_term: str, normalized_text: str) -> bool:
+    """Check if term approximately matches text using token similarity."""
+    if normalized_term in normalized_text:
+        return True
+    term_tokens = normalized_term.split()
+    text_tokens = normalized_text.split()
+    if len(term_tokens) <= 1:
+        return False
+    for size in range(len(term_tokens), 1, -1):
+        for start in range(len(term_tokens) - size + 1):
+            phrase = " ".join(term_tokens[start:start + size])
+            if phrase in normalized_text:
+                return True
+    joined_term = normalized_term.replace(" ", "")
+    if joined_term in normalized_text.replace(" ", ""):
+        return True
+    return False
+
+
+def _token_overlap_ratio(term_tokens: set[str], text_tokens: set[str]) -> float:
+    if not term_tokens:
+        return 0.0
+    intersection = term_tokens & text_tokens
+    return len(intersection) / len(term_tokens)
+
+
+def _find_symbol_match(term: str, line: str) -> tuple[str | None, float]:
+    """Try to match a natural-language query term against a source line.
+    Returns (match_type, confidence) where match_type is one of:
+    exact_substring, symbol, fuzzy, proximity, string_literal, import, none.
+    """
+    normalized_term = _normalize(term)
+    normalized_line = _normalize(line)
+    if not normalized_term or not normalized_line:
+        return None, 0.0
+    if normalized_term in normalized_line:
+        return "exact_substring", 1.0
+
+    split_term = _split_identifier(term)
+    split_line = _split_identifier(line)
+    term_tokens = set(split_term.split())
+    line_tokens = set(split_line.split())
+
+    overlap_ratio = _token_overlap_ratio(term_tokens, line_tokens)
+
+    if overlap_ratio >= 0.75:
+        return "symbol", 0.95
+
+    if _fuzzy_match(normalized_term, normalized_line):
+        return "fuzzy", 0.7
+
+    if len(term_tokens) > 1:
+        overlap = term_tokens & line_tokens
+        if len(overlap) >= 2 or (len(overlap) >= 1 and overlap_ratio >= 0.5):
+            return "proximity", 0.6
+
+    return None, 0.0
+
+
+def _is_comment_line(line: str) -> bool:
+    stripped = line.strip()
+    return stripped.startswith(("#", "//", "/*", "*", "///", "//!"))
+
+
+def _is_string_literal_line(line: str) -> bool:
+    stripped = line.strip()
+    return stripped.startswith(("'", '"', "f'", 'f"', "r'", 'r"')) and stripped.endswith(("'", '"'))
+
+
+def _confidence_for_line(line: str, match_type: str | None) -> str:
+    if match_type in ("import",):
+        return "high"
+    if match_type in ("symbol", "exact_substring"):
+        if _is_comment_line(line):
+            return "medium"
+        return "high"
+    if match_type == "fuzzy":
+        return "medium" if not _is_comment_line(line) else "low"
+    if match_type == "proximity":
+        return "medium"
+    if match_type == "string_literal":
+        return "medium"
+    return "low"
 
 
 def _normalize(value: str) -> str:

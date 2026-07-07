@@ -151,12 +151,13 @@ _STOPWORDS = {
     "сделать",
 }
 _GENERIC_RELEVANCE_WORDS = {
-    "agent", "answer", "answers", "architecture", "change", "changes",
-    "codebase", "context", "constraint", "constraints", "doc", "docs",
-    "documentation", "exact", "feature", "features", "file", "files",
-    "implementation", "module", "overview", "product", "project", "protocol",
+    "agent", "answer", "answers", "architecture", "change", "changes", "class", "classes",
+    "codebase", "context", "constraint", "constraints", "doc", "docs", "documented",
+    "documentation", "exact", "feature", "features", "file", "files", "function", "functions",
+    "implementation", "implement", "implements", "module", "overview", "product", "project", "protocol",
     "repo", "repository", "source", "sources", "structure", "structured",
-    "term", "terms",
+    "system", "technical", "term", "terms", "test", "tests", "usage", "workflow",
+    "архитектура", "архитектуры", "архитектуре", "архитектур", "структура", "структуры", "структуре",
 }
 
 
@@ -168,9 +169,12 @@ def extract_query_relevance_terms(question: str, intent: Any | None = None) -> l
     explicit = extract_project_answer_requirements(question)
     if explicit:
         return explicit
+    high_signal = _extract_high_signal_query_terms(question)
+    if high_signal:
+        return high_signal
     if _skip_high_signal_relevance_gate(question, intent):
         return []
-    return _extract_high_signal_query_terms(question)
+    return high_signal
 
 
 def evaluate_project_answer_completeness(
@@ -185,15 +189,33 @@ def evaluate_project_answer_completeness(
     explicit_requirements = extract_project_answer_requirements(question)
     requirements = explicit_requirements or extract_query_relevance_terms(question, intent=intent)
     fallback_relevance_query = bool(requirements and not explicit_requirements)
-    story_specific_query = _is_story_specific_query(question, intent, requirements) or fallback_relevance_query
-    proof_context_pack = _source_backed_context_pack(context_pack) if story_specific_query else _proof_context_pack(context_pack)
+    story_specific_query = bool(explicit_requirements) and _is_story_specific_query(question, intent, requirements)
+    if story_specific_query:
+        proof_context_pack = _source_backed_context_pack(context_pack)
+    elif fallback_relevance_query:
+        proof_context_pack = context_pack
+    else:
+        proof_context_pack = _proof_context_pack(context_pack)
     context_text = _context_text(proof_context_pack)
     coverage_by_requirement = [_requirement_coverage(term, context_pack=proof_context_pack, context_text=context_text) for term in requirements]
     matched_terms = [item["term"] for item in coverage_by_requirement if item["matched"]]
     missing_terms = [item["term"] for item in coverage_by_requirement if not item["matched"]]
     coverage_score = (len(matched_terms) / len(requirements)) if requirements else (1.0 if answer_available else 0.0)
-    source_search_required = bool(answer_available and missing_terms and story_specific_query)
+    source_search_required = bool(answer_available and missing_terms and (story_specific_query or fallback_relevance_query))
     navigational_context = _has_navigational_context(context_pack)
+
+    has_strong_evidence = any(
+        item.get("source_class") in ("dependency_doc", "source_evidence")
+        or (item.get("authority") in ("primary", "primary_source"))
+        for item in proof_context_pack
+    )
+    has_exact_dependency = any(
+        item.get("source_class") == "dependency_doc"
+        and item.get("docs_exactness") == "exact"
+        for item in context_pack
+    )
+    all_terms_covered = not missing_terms
+    reason_codes: list[str] = []
 
     if not answer_available:
         answer_type = "unavailable"
@@ -204,18 +226,25 @@ def evaluate_project_answer_completeness(
     elif source_search_required:
         answer_type = "partial"
         status = "partial"
-    else:
+    elif all_terms_covered and (has_strong_evidence or has_exact_dependency):
         answer_type = "exact"
         status = "exact"
-
-    reason_codes: list[str] = []
-    if not answer_available:
-        reason_codes.append("no_trusted_context")
-    if source_search_required:
+    elif all_terms_covered:
+        answer_type = "partial_navigational"
+        status = "partial"
+        reason_codes.append("missing_strong_evidence_for_exact")
+    else:
+        answer_type = "partial"
+        status = "partial"
         reason_codes.append("story_terms_missing_from_source_evidence")
-    if fallback_relevance_query and missing_terms:
+
+    if not answer_available and "no_trusted_context" not in reason_codes:
+        reason_codes.append("no_trusted_context")
+    if source_search_required and "story_terms_missing_from_source_evidence" not in reason_codes:
+        reason_codes.append("story_terms_missing_from_source_evidence")
+    if fallback_relevance_query and missing_terms and "high_signal_query_terms_missing_from_context" not in reason_codes:
         reason_codes.append("high_signal_query_terms_missing_from_context")
-    if navigational_context:
+    if navigational_context and "navigational_context_present" not in reason_codes:
         reason_codes.append("navigational_context_present")
 
     recommended_next_actions = []

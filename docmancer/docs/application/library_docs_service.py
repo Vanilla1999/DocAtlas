@@ -18,6 +18,7 @@ from docmancer.docs.discovery_candidates import discovery_candidates_for
 from docmancer.docs.domain.policies import docs_policy, is_stale
 from docmancer.docs.domain.project_state import create_project_docs_next_action, has_high_level_project_overview, partition_project_doc_state, project_docs_structured_next_action
 from docmancer.docs.domain.quality import is_trivial_section
+from docmancer.docs.domain.library_source_options import library_docs_source_next_actions, library_docs_source_options, source_required_diagnostics
 from docmancer.docs.domain.source_identity import docs_exactness, docs_identity, docs_request
 from docmancer.docs.domain.snippets import build_snippet_presentation, validate_response_style
 from docmancer.docs.domain.target_security import host_allowed, is_remote_url, path_allowed, url_security_error
@@ -57,6 +58,33 @@ class LibraryDocsApplicationService:
 
     def __getattr__(self, name: str) -> Any:
         return getattr(self.facade, name)
+
+    def _target_from_record(self, *args: Any, **kwargs: Any) -> Any:
+        return self.facade._target_from_record(*args, **kwargs)
+
+    def _record_urls(self, *args: Any, **kwargs: Any) -> list[str]:
+        return self.facade._record_urls(*args, **kwargs)
+
+    def _agent_instance(self, *args: Any, **kwargs: Any) -> Any:
+        return self.facade._agent_instance(*args, **kwargs)
+
+    def _is_stale(self, *args: Any, **kwargs: Any) -> bool:
+        return self.facade._is_stale(*args, **kwargs)
+
+    def _now(self, *args: Any, **kwargs: Any) -> Any:
+        return self.facade._now(*args, **kwargs)
+
+    def _index_config_for(self, *args: Any, **kwargs: Any) -> Any:
+        return self.facade._index_config_for(*args, **kwargs)
+
+    def _record_from_info(self, *args: Any, **kwargs: Any) -> Any:
+        return self.facade._record_from_info(*args, **kwargs)
+
+    def _lock_for(self, *args: Any, **kwargs: Any) -> Any:
+        return self.facade._lock_for(*args, **kwargs)
+
+    def _render_docs_url(self, *args: Any, **kwargs: Any) -> str:
+        return self.facade._render_docs_url(*args, **kwargs)
 
     def resolve_library(
         self,
@@ -812,9 +840,10 @@ class LibraryDocsApplicationService:
                         ],
                     )
             
-            warning = self._join_warnings("needs_docs_url", extra=project_warnings)
+            warning = self._join_warnings("library_docs_source_required", extra=project_warnings)
             warnings = [warning] if warning else []
             candidates = info.candidates
+            source_options = library_docs_source_options(library, ecosystem, version, source_type, candidates)
             arguments_patch = dict(candidates[0].get("arguments_patch") or {}) if candidates else {}
             if candidates and candidates[0].get("docs_url"):
                 arguments_patch.setdefault("docs_url", candidates[0]["docs_url"])
@@ -822,7 +851,7 @@ class LibraryDocsApplicationService:
                 arguments_patch.setdefault("source_type", candidates[0]["source_type"])
             if candidates and candidates[0].get("ecosystem"):
                 arguments_patch.setdefault("ecosystem", candidates[0]["ecosystem"])
-            next_actions = ["Retry get_library_docs with docs_url from discovery_candidates[0]."] if candidates else ["Retry get_library_docs with docs_url, or call prefetch_library_docs/prefetch_docs_targets to register this source."]
+            next_actions_list = library_docs_source_next_actions(library, ecosystem, version, source_type, candidates, source_options)
             return DocsResult(
                 library_id="",
                 library=library,
@@ -843,14 +872,22 @@ class LibraryDocsApplicationService:
                 confidence="high" if version_source in {"explicit", "lockfile_exact", "manifest_exact"} else None,
                 status="needs_input",
                 decision="retry_same_tool",
-                reason_code="needs_docs_url",
-                message="Documentation source is not registered locally. Retry with docs_url or prefetch/register an explicit docs target.",
+                reason_code="library_docs_source_required",
+                message="Documentation source is not registered locally. Ask the user which library documentation to use; if they do not know, use best-effort web discovery with quality not guaranteed.",
+                requires_confirmation=True,
                 arguments_patch=arguments_patch or None,
                 request=self._docs_request(input_args),
                 identity=self._docs_identity(info),
                 policy=self._docs_policy("needs_input", has_registered_source=resolution.has_registered_source),
-                diagnostics={**resolution.diagnostics, "warnings": [{"code": "needs_docs_url", "blocking": True}], "discovery_candidates": candidates},
-                next_actions=next_actions,
+                diagnostics=source_required_diagnostics({
+                    **resolution.diagnostics,
+                    "warnings": [{"code": "library_docs_source_required", "blocking": True}],
+                    "question": f"Which documentation source should be used for {library}?",
+                    "source_options": source_options,
+                    "discovery_candidates": candidates,
+                    "quality_warning": "Best-effort web discovery may choose an incomplete or unofficial documentation source; prefer an explicit docs_url.",
+                }),
+                next_actions=next_actions_list,
                 candidates=candidates,
                 discovery_candidates=candidates,
             )
@@ -898,6 +935,48 @@ class LibraryDocsApplicationService:
             diagnostic_warnings.append({"code": "used_registry_docs_url", "blocking": False})
         if warning:
             diagnostic_warnings.append({"code": warning, "blocking": False})
+        if info.status == "failed" and not force_refresh:
+            failed_warning = info.message or "registered documentation source is marked failed"
+            diagnostic_warnings.append({"code": "registered_source_failed", "blocking": True, "message": failed_warning})
+            return DocsResult(
+                library_id=info.library_id,
+                library=info.library,
+                version=info.version,
+                topic=topic,
+                refreshed=False,
+                stale_before_refresh=stale_before,
+                warning=failed_warning,
+                last_refreshed_at=info.last_refreshed_at,
+                source_type=info.source_type,
+                results=[],
+                warnings=[failed_warning],
+                requested_version=requested_version,
+                resolved_version=info.resolved_version or info.version,
+                version_source=version_source,
+                docs_snapshot_exact=docs_snapshot_exact,
+                docs_exactness=docs_exactness,
+                docs_binding_source=docs_binding_source,
+                confidence=confidence,
+                status="error",
+                decision="stop",
+                reason_code="registered_source_failed",
+                message="Registered documentation source is failed; refusing automatic refresh during get_library_docs to avoid long MCP timeouts.",
+                request=self._docs_request(input_args, info),
+                identity=self._docs_identity(info, docs_url_source=docs_url_source),
+                policy=self._docs_policy("error", has_registered_source=True),
+                diagnostics=self._with_dart_diagnostics(
+                    {**resolution.diagnostics, "reason_code": "registered_source_failed", "warnings": diagnostic_warnings},
+                    info=info,
+                    reason_code="registered_source_failed",
+                    pages_discovered=info.pages,
+                    pages_extracted=0,
+                    chunks_created=0,
+                ),
+                next_actions=[
+                    {"tool": "refresh_library_docs", "requires_confirmation": True, "arguments_patch": {"library": info.library, "ecosystem": info.ecosystem, "version": info.version, "force": True}, "reason": "Refresh the failed docs target explicitly after confirming network/indexing cost."}
+                ],
+            )
+
         if force_refresh or stale_before:
             result = self.refresh_docs(
                 info.library_id,
@@ -1018,7 +1097,7 @@ class LibraryDocsApplicationService:
                 diagnostic_warnings.append({"code": code, "blocking": False, "dropped": count})
         chunks = [chunk for chunk in chunks if not _drop_low_value_library_section(chunk.text, (chunk.metadata or {}).get("title"))]
         if not chunks:
-            reason_code = "guard_dropped_all" if dropped > 0 else "missing_chunks"
+            reason_code = "guard_dropped_all" if dropped > 0 else "no_library_docs_results"
             reason_diagnostics = {**resolution.diagnostics, "reason_code": reason_code, "warnings": diagnostic_warnings}
             reason_diagnostics = self._with_dart_diagnostics(
                 reason_diagnostics,
@@ -1027,6 +1106,8 @@ class LibraryDocsApplicationService:
                 pages_extracted=pages,
                 chunks_created=0,
             )
+            status = "empty_library_index" if dropped > 0 else "no_results"
+            next_actions = ["Call refresh_library_docs to ingest this library's docs."] if dropped > 0 else ["Narrow or rephrase the topic, or inspect_library_docs to verify indexed coverage before refreshing."]
             return DocsResult(
                 library_id=info.library_id,
                 library=latest.library,
@@ -1046,15 +1127,53 @@ class LibraryDocsApplicationService:
                 docs_exactness=docs_exactness,
                 docs_binding_source=docs_binding_source,
                 confidence=confidence,
-                status="empty_library_index",
+                status=status,
                 decision="stop",
+                reason_code=reason_code,
                 request=self._docs_request(input_args, info),
                 identity=self._docs_identity(info, docs_url_source=docs_url_source),
                 policy=self._docs_policy("error", has_registered_source=True),
                 diagnostics=reason_diagnostics,
-                next_actions=["Call refresh_library_docs to ingest this library's docs."],
+                next_actions=next_actions,
             )
         chunks, quality_diagnostics = _postprocess_library_chunks(chunks, query)
+        if topic and chunks and canonical_dart_ecosystem(latest.ecosystem) == "dart" and quality_diagnostics.get("top_relevance", 0.0) < 0.25:
+            diagnostic_warnings.append({"code": "low_relevance_query_results", "blocking": True})
+            reason_diagnostics = self._with_dart_diagnostics(
+                {**resolution.diagnostics, **quality_diagnostics, "reason_code": "low_relevance_query_results", "warnings": diagnostic_warnings},
+                info=latest,
+                pages_discovered=pages,
+                pages_extracted=pages,
+                chunks_created=0,
+            )
+            return DocsResult(
+                library_id=info.library_id,
+                library=latest.library,
+                version=latest.version,
+                topic=topic,
+                refreshed=refreshed,
+                stale_before_refresh=stale_before,
+                warning=warning,
+                last_refreshed_at=latest.last_refreshed_at,
+                source_type=info.source_type,
+                results=[],
+                warnings=[*warnings, "low_relevance_query_results"],
+                requested_version=requested_version,
+                resolved_version=latest.resolved_version or latest.version,
+                version_source=version_source,
+                docs_snapshot_exact=docs_snapshot_exact,
+                docs_exactness=docs_exactness,
+                docs_binding_source=docs_binding_source,
+                confidence=confidence,
+                status="no_results",
+                decision="stop",
+                reason_code="low_relevance_query_results",
+                request=self._docs_request(input_args, info),
+                identity=self._docs_identity(info, docs_url_source=docs_url_source),
+                policy=self._docs_policy("error", has_registered_source=True),
+                diagnostics=reason_diagnostics,
+                next_actions=["Narrow the topic to concrete API symbols or refresh with a more focused docs source."],
+            )
         latest_stale = self._is_stale(latest.last_refreshed_at)
         freshness = _freshness_diagnostics(latest.last_refreshed_at, self.stale_after_days, latest_stale)
         
@@ -1315,14 +1434,17 @@ def _postprocess_library_chunks(chunks: list[Any], query: str) -> tuple[list[Any
         source_counts[source] = count + 1
         selected.append(chunk)
 
+    top_relevance = max((candidate["relevance"] for candidate in candidates), default=None)
+    if top_relevance is None:
+        top_relevance = max((_chunk_relevance(chunk.text, _code_snippets(chunk.text), terms) for chunk in selected), default=0.0)
     return selected, {
         "code_snippets": snippet_count,
+        "top_relevance": top_relevance,
         "mmr_lambda": MMR_LAMBDA,
         "max_chunks_per_source": MAX_CHUNKS_PER_SOURCE,
         "chunks_dropped_for_diversity": dropped_for_diversity,
         "unique_sources@5": len({chunk.source for chunk in selected[:5]}),
     }
-
 
 def _age_days(last_refreshed_at: str | None) -> int | None:
     if not last_refreshed_at:

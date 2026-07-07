@@ -127,6 +127,101 @@ DART_PACKAGE_OFFICIAL_DOCS: dict[str, DartDocsSources] = {
         pubdev_api="https://pub.dev/documentation/json_serializable/{version}/",
         package_page="https://pub.dev/packages/json_serializable",
     ),
+    "firebase_auth": DartDocsSources(
+        official_guides=(),
+        pubdev_api="https://pub.dev/documentation/firebase_auth/{version}/",
+        package_page="https://pub.dev/packages/firebase_auth",
+    ),
+    "firebase_core": DartDocsSources(
+        official_guides=(),
+        pubdev_api="https://pub.dev/documentation/firebase_core/{version}/",
+        package_page="https://pub.dev/packages/firebase_core",
+    ),
+    "firebase_firestore": DartDocsSources(
+        official_guides=(),
+        pubdev_api="https://pub.dev/documentation/cloud_firestore/{version}/",
+        package_page="https://pub.dev/packages/cloud_firestore",
+    ),
+    "cloud_firestore": DartDocsSources(
+        official_guides=(),
+        pubdev_api="https://pub.dev/documentation/cloud_firestore/{version}/",
+        package_page="https://pub.dev/packages/cloud_firestore",
+    ),
+    "shared_preferences": DartDocsSources(
+        official_guides=(),
+        pubdev_api="https://pub.dev/documentation/shared_preferences/{version}/",
+        package_page="https://pub.dev/packages/shared_preferences",
+    ),
+    "sqflite": DartDocsSources(
+        official_guides=(),
+        pubdev_api="https://pub.dev/documentation/sqflite/{version}/",
+        package_page="https://pub.dev/packages/sqflite",
+    ),
+    "flutter_secure_storage": DartDocsSources(
+        official_guides=(),
+        pubdev_api="https://pub.dev/documentation/flutter_secure_storage/{version}/",
+        package_page="https://pub.dev/packages/flutter_secure_storage",
+    ),
+    "get_it": DartDocsSources(
+        official_guides=(),
+        pubdev_api="https://pub.dev/documentation/get_it/{version}/",
+        package_page="https://pub.dev/packages/get_it",
+    ),
+    "equatable": DartDocsSources(
+        official_guides=(),
+        pubdev_api="https://pub.dev/documentation/equatable/{version}/",
+        package_page="https://pub.dev/packages/equatable",
+    ),
+    "dartz": DartDocsSources(
+        official_guides=(),
+        pubdev_api="https://pub.dev/documentation/dartz/{version}/",
+        package_page="https://pub.dev/packages/dartz",
+    ),
+    "retrofit": DartDocsSources(
+        official_guides=(),
+        pubdev_api="https://pub.dev/documentation/retrofit/{version}/",
+        package_page="https://pub.dev/packages/retrofit",
+    ),
+    "json_annotation": DartDocsSources(
+        official_guides=(),
+        pubdev_api="https://pub.dev/documentation/json_annotation/{version}/",
+        package_page="https://pub.dev/packages/json_annotation",
+    ),
+    "logger": DartDocsSources(
+        official_guides=(),
+        pubdev_api="https://pub.dev/documentation/logger/{version}/",
+        package_page="https://pub.dev/packages/logger",
+    ),
+    "flutter_local_notifications": DartDocsSources(
+        official_guides=(),
+        pubdev_api="https://pub.dev/documentation/flutter_local_notifications/{version}/",
+        package_page="https://pub.dev/packages/flutter_local_notifications",
+    ),
+    "url_launcher": DartDocsSources(
+        official_guides=(),
+        pubdev_api="https://pub.dev/documentation/url_launcher/{version}/",
+        package_page="https://pub.dev/packages/url_launcher",
+    ),
+    "path_provider": DartDocsSources(
+        official_guides=(),
+        pubdev_api="https://pub.dev/documentation/path_provider/{version}/",
+        package_page="https://pub.dev/packages/path_provider",
+    ),
+    "http": DartDocsSources(
+        official_guides=(),
+        pubdev_api="https://pub.dev/documentation/http/{version}/",
+        package_page="https://pub.dev/packages/http",
+    ),
+    "intl": DartDocsSources(
+        official_guides=(),
+        pubdev_api="https://pub.dev/documentation/intl/{version}/",
+        package_page="https://pub.dev/packages/intl",
+    ),
+    "cached_network_image": DartDocsSources(
+        official_guides=(),
+        pubdev_api="https://pub.dev/documentation/cached_network_image/{version}/",
+        package_page="https://pub.dev/packages/cached_network_image",
+    ),
 }
 
 
@@ -287,14 +382,24 @@ def build_dart_diagnostics(
     chunks_created: int | None = None,
     used_official_docs: bool | None = None,
     reason_code: str | None = None,
+    nav_shell_count: int | None = None,
 ) -> dict[str, object]:
-    """Build Dart diagnostics for both success and empty-index paths."""
+    """Build Dart diagnostics for both success and empty-index paths.
+
+    The ``nav_shell_count`` is the number of dartdoc-pipeline pages whose
+    extracted content consisted only of navigation/index links (no real
+    documentation body). When every discovered page is nav-shell-only, the
+    reason code is set to ``dartdoc_nav_shell_only``, indicating the root
+    page is an API index rather than guide-style docs.
+    """
     resolution = resolve_dart_official_docs(package, version=version)
     if reason_code is None:
         if pages_discovered == 0:
             reason_code = "dartdoc_root_only"
         elif pages_extracted == 0:
             reason_code = "dartdoc_no_extractable_content"
+        elif nav_shell_count is not None and nav_shell_count > 0 and nav_shell_count == (pages_discovered or 0):
+            reason_code = "dartdoc_nav_shell_only"
         elif chunks_created == 0:
             reason_code = "dartdoc_ingest_produced_no_chunks"
         else:
@@ -310,5 +415,6 @@ def build_dart_diagnostics(
         "pages_discovered": pages_discovered,
         "pages_extracted": pages_extracted,
         "chunks_created": chunks_created,
+        "nav_shell_count": nav_shell_count,
         "reason_code": reason_code,
     }

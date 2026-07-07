@@ -115,7 +115,7 @@ class DocsResult:
     primary_snippet: dict[str, Any] | None = None
     supporting_snippets: list[dict[str, Any]] = field(default_factory=list)
     snippet_metrics: dict[str, Any] = field(default_factory=dict)
-    next_actions: list[str] = field(default_factory=list)
+    next_actions: list[Any] = field(default_factory=list)
     result: Any = None
     candidates: list[dict[str, Any]] = field(default_factory=list)
     discovery_candidates: list[dict[str, Any]] = field(default_factory=list)
@@ -573,3 +573,5 @@ class UnifiedDocsContextResult:
     contamination: dict[str, Any] = field(default_factory=dict)
     deduplication: dict[str, Any] = field(default_factory=dict)
     lane_details: dict[str, Any] = field(default_factory=dict)
+    ingestion_diagnostics: dict[str, Any] = field(default_factory=dict)
+    retrieval_diagnostics: dict[str, Any] = field(default_factory=dict)

@@ -1,9 +1,11 @@
 from __future__ import annotations
 
+from copy import deepcopy
 from dataclasses import asdict, is_dataclass
 from typing import Any
 
 from docmancer.docs.service import LibraryDocsService
+from docmancer.docs.interfaces.mcp.output_contract import normalize_output_mode
 from docmancer.docs.interfaces.mcp.project_tools import _attach_output_contract, _bad_request, _bounded_int_arg, _clean_string, _compact_mcp_payload, _strip_mcp_debug_noise
 
 
@@ -15,8 +17,7 @@ def context_tools(tools: list[dict[str, Any]]) -> list[dict[str, Any]]:
 
 
 def _output_mode(args: dict[str, Any]) -> str:
-    mode = str(args.get("output_mode") or "answer").lower()
-    return mode if mode in {"answer", "compact", "debug", "full"} else "answer"
+    return normalize_output_mode(args)
 
 
 def _answer_payload(payload: dict[str, Any]) -> dict[str, Any]:
@@ -37,6 +38,12 @@ def _answer_payload(payload: dict[str, Any]) -> dict[str, Any]:
     if payload.get("requires_confirmation"):
         answer["requires_confirmation"] = payload.get("requires_confirmation")
         answer["confirmation_reason"] = payload.get("confirmation_reason")
+    ingestion = payload.get("ingestion_diagnostics") or {}
+    retrieval = payload.get("retrieval_diagnostics") or {}
+    if ingestion:
+        answer["ingestion_diagnostics"] = ingestion
+    if retrieval:
+        answer["retrieval_diagnostics"] = retrieval
     return {key: value for key, value in answer.items() if value not in (None, {}, [])}
 
 
@@ -60,7 +67,67 @@ def _compact_payload(payload: dict[str, Any]) -> dict[str, Any]:
         "warnings": payload.get("warnings") or [],
         "requires_confirmation": payload.get("requires_confirmation"),
         "confirmation_reason": payload.get("confirmation_reason"),
+        "ingestion_diagnostics": payload.get("ingestion_diagnostics") or {},
+        "retrieval_diagnostics": payload.get("retrieval_diagnostics") or {},
     }
+
+
+def _align_trust_contract_with_snippets(payload: dict[str, Any]) -> dict[str, Any]:
+    """Keep selected source risk metadata consistent with snippet metadata."""
+
+    contract = payload.get("trust_contract")
+    if not isinstance(contract, dict):
+        return payload
+    selected = contract.get("selected")
+    if not isinstance(selected, list) or not selected:
+        return payload
+
+    snippet_risks: dict[str, dict[str, Any]] = {}
+    snippets = [payload.get("primary_snippet"), *(payload.get("supporting_snippets") or [])]
+    for snippet in snippets:
+        if not isinstance(snippet, dict):
+            continue
+        keys = {str(value) for value in (snippet.get("source"), snippet.get("source_url")) if value}
+        if not keys:
+            continue
+        stricter = {
+            "risk_flags": list(snippet.get("risk_flags") or []),
+            "version_binding": snippet.get("version_binding"),
+            "exact_version_match": snippet.get("exact_version_match"),
+        }
+        if not stricter["risk_flags"] and stricter["version_binding"] is None and stricter["exact_version_match"] is None:
+            continue
+        for key in keys:
+            snippet_risks[key] = stricter
+    if not snippet_risks:
+        return payload
+
+    updated = deepcopy(payload)
+    updated_selected = []
+    for source in selected:
+        if not isinstance(source, dict):
+            updated_selected.append(source)
+            continue
+        keys = [
+            str(value)
+            for value in (source.get("source"), source.get("source_url"), source.get("url"), source.get("path"))
+            if value
+        ]
+        stricter = next((snippet_risks[key] for key in keys if key in snippet_risks), None)
+        if not stricter:
+            updated_selected.append(source)
+            continue
+        merged = dict(source)
+        risk_flags = list(dict.fromkeys([*(merged.get("risk_flags") or []), *stricter.get("risk_flags", [])]))
+        if risk_flags:
+            merged["risk_flags"] = risk_flags
+        if stricter.get("version_binding"):
+            merged["version_binding"] = stricter["version_binding"]
+        if stricter.get("exact_version_match") is not None:
+            merged["exact_version_match"] = stricter["exact_version_match"]
+        updated_selected.append(merged)
+    updated["trust_contract"] = {**dict(updated.get("trust_contract") or {}), "selected": updated_selected}
+    return updated
 
 
 def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsService) -> dict[str, Any] | None:
@@ -68,8 +135,9 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
         return None
     question = _clean_string(args.get("question"))
     if not question:
-        return _bad_request("empty_question", "question must not be empty")
-    result = service.get_docs_context(
+        return _bad_request("empty_question", "question must not be empty. Examples: 'Flutter Riverpod providers', 'Firebase Auth signIn', 'How to use go_router redirect', 'FastAPI dependency injection', 'patch_constraints for adding a service'")
+    app = getattr(service, "unified_context", service)
+    result = app.get_docs_context(
         question,
         project_path=args.get("project_path"),
         library=args.get("library"),
@@ -89,6 +157,7 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
         allow_network=args.get("allow_network"),
         allow_latest_fallback=args.get("allow_latest_fallback"),
         force_refresh=args.get("force_refresh"),
+        prefetch_auto=args.get("prefetch_auto"),
         details=args.get("details"),
         response_style=args.get("response_style"),
     )
@@ -101,13 +170,14 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
         for key in ("tool", "status", "reason_code", "message", "response_style", "primary_snippet", "supporting_snippets", "snippet_metrics"):
             if hasattr(result, key):
                 raw[key] = getattr(result, key)
+    raw = _align_trust_contract_with_snippets(raw)
     mode = _output_mode(args)
     if mode == "full":
         raw["output_mode"] = "full"
         return raw
     payload = raw if mode == "debug" else (_compact_payload(raw) if mode == "compact" else _answer_payload(raw))
     payload["output_mode"] = mode
-    payload = _compact_mcp_payload(payload)
+    payload = _compact_mcp_payload(payload, page=_bounded_int_arg(args, "page", default=1, max_value=10_000), page_size=_bounded_int_arg(args, "page_size", default=None, max_value=20), include_sections=args.get("include_sections"))
     return _attach_output_contract(payload, output_mode=mode) if mode == "debug" else _strip_mcp_debug_noise(payload)
 
 

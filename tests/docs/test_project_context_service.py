@@ -134,6 +134,165 @@ def test_generic_test_query_is_not_trusted():
     assert result.diagnostics["trust_decision"]["confidence"] == "low"
 
 
+def test_project_context_stops_on_project_docs_preflight_confirmation():
+    facade = FakeProjectContextFacade()
+    facade.project_docs = ProjectDocsResult(
+        project_path="/repo",
+        query="unread badge архитектура help_chat",
+        status="confirmation_required",
+        reason_code="project_docs_preflight_confirmation_required",
+        next_action={"type": "ask_user_to_update_or_confirm_project_docs"},
+        requires_confirmation=True,
+        confirmation_reason="project_docs_preflight",
+        arguments_patch={"project_path": "/repo"},
+        results=[
+            ProjectDocsChunk(
+                title="Architecture",
+                content="unread badge architecture content that should not be trusted until preflight is resolved",
+                source="/repo/ARCHITECTURE.md",
+                url=None,
+                path="ARCHITECTURE.md",
+            )
+        ],
+        diagnostics={"preflight": {"requires_confirmation": True, "risks": [{"code": "placeholder_project_doc"}]}},
+        next_actions=[{"tool": "sync_project_docs", "requires_confirmation": True}],
+        message="Project docs preflight requires confirmation.",
+    )
+
+    result = ProjectContextService(facade).get_project_context("/repo", "unread badge архитектура help_chat", mode="project-only")
+
+    assert result.status == "confirmation_required"
+    assert result.answer_available is False
+    assert result.answer_type == "unavailable"
+    assert result.reason == "project_docs_preflight_confirmation_required"
+    assert result.requires_confirmation is True
+    assert result.next_action["type"] == "ask_user_to_update_or_confirm_project_docs"
+    assert result.context_pack == []
+    assert result.trust_contract["policy"]["reason_code"] == "project_docs_preflight_confirmation_required"
+
+
+def test_project_context_drops_placeholder_readme_from_context_pack():
+    project_docs = ProjectDocsResult(
+        project_path="/repo",
+        query="overview",
+        results=[
+            ProjectDocsChunk(
+                title="Readme",
+                content="TODO: Put a short description of the package here.\n\n```dart\nconst like = 'sample';\n```",
+                source="/repo/README.md",
+                url=None,
+                path="README.md",
+            ),
+            ProjectDocsChunk(
+                title="Architecture",
+                content="The real architecture document describes request, unread badge, and chat module responsibilities.",
+                source="/repo/ARCHITECTURE.md",
+                url=None,
+                path="ARCHITECTURE.md",
+            ),
+        ],
+    )
+
+    pack = project_context_pack(question="unread badge architecture", project_docs=project_docs, dependency_docs=None)
+
+    assert [item["path"] for item in pack] == ["ARCHITECTURE.md"]
+    assert "sample" not in pack[0]["content"]
+
+
+def test_project_context_relevance_gate_accepts_structured_code_snippets():
+    facade = FakeProjectContextFacade()
+    facade.project_docs = ProjectDocsResult(
+        project_path="/repo",
+        query="How does ScanDoc camera take photos?",
+        results=[
+            ProjectDocsChunk(
+                title="ScanDoc camera",
+                content="""
+Use the ScanDoc camera service from the WebView camera flow.
+
+```dart
+final photo = await ScanDocCameraService.takePhoto();
+```
+""".strip(),
+                source="/repo/docs/SCANDOC_WEB_CAMERA_API_PLAN.md",
+                url=None,
+                path="docs/SCANDOC_WEB_CAMERA_API_PLAN.md",
+                heading_path="ScanDoc camera API",
+            )
+        ],
+    )
+
+    result = ProjectContextService(facade).get_project_context(
+        "/repo",
+        "How does ScanDocCameraService.takePhoto work?",
+        mode="project-only",
+    )
+
+    assert result.status == "success"
+    assert isinstance(result.context_pack[0]["snippet"], dict)
+    assert result.context_pack[0]["snippet"]["code"] == "final photo = await ScanDocCameraService.takePhoto();"
+
+
+def test_russian_architecture_query_prefers_architecture_docs_over_feature_plans():
+    facade = FakeProjectContextFacade()
+    facade.project_docs = ProjectDocsResult(
+        project_path="/repo",
+        query="архитектура",
+        results=[
+            ProjectDocsChunk(
+                title="OIDC browser fix",
+                content="OIDC browser selection plan mentions architecture once but is scoped to external auth.",
+                source="/repo/docs/EXTERNAL_OIDC_BROWSER_SELECTION_FIX_PLAN.md",
+                url=None,
+                path="docs/EXTERNAL_OIDC_BROWSER_SELECTION_FIX_PLAN.md",
+            ),
+            ProjectDocsChunk(
+                title="Architecture",
+                content="Project architecture overview: UI -> application -> domain -> infrastructure.",
+                source="/repo/ARCHITECTURE.md",
+                url=None,
+                path="ARCHITECTURE.md",
+            ),
+        ],
+    )
+
+    result = ProjectContextService(facade).get_project_context("/repo", "архитектура", mode="project-only")
+
+    assert result.diagnostics["query_intent"] == "architecture"
+    assert result.context_pack[0]["path"] == "ARCHITECTURE.md"
+    assert result.diagnostics["trust_decision"]["reason"] == "trusted_context_available"
+    assert result.diagnostics["trust_decision"]["query_terms_missing"] == []
+
+
+def test_architecture_query_injects_root_architecture_when_retrieval_misses_it(tmp_path):
+    (tmp_path / "ARCHITECTURE.md").write_text(
+        "Project architecture overview: UI -> application -> domain -> infrastructure.\n",
+        encoding="utf-8",
+    )
+    facade = FakeProjectContextFacade()
+    facade.project_docs = ProjectDocsResult(
+        project_path=str(tmp_path),
+        query="архитектура",
+        results=[
+            ProjectDocsChunk(
+                title="OIDC browser fix",
+                content="OIDC browser selection plan mentions architecture once but is scoped to external auth.",
+                source=str(tmp_path / "docs/EXTERNAL_OIDC_BROWSER_SELECTION_FIX_PLAN.md"),
+                url=None,
+                path="docs/EXTERNAL_OIDC_BROWSER_SELECTION_FIX_PLAN.md",
+            ),
+        ],
+    )
+
+    result = ProjectContextService(facade).get_project_context(str(tmp_path), "архитектура", mode="project-only")
+
+    assert result.context_pack[0]["path"] == "ARCHITECTURE.md"
+    assert result.project_docs is not None
+    injected = next(chunk for chunk in result.project_docs.results if chunk.path == "ARCHITECTURE.md")
+    assert injected.source_class == "project_file"
+    assert injected.metadata["injection_policy"] == "root_reviewable_project_doc_after_preflight"
+
+
 def test_story_specific_project_context_with_only_docs_matched_terms_requires_source_search():
     facade = FakeProjectContextFacade()
     facade.project_docs = ProjectDocsResult(

@@ -19,6 +19,7 @@ configuration are merged into the candidate URL set.
 
 from __future__ import annotations
 
+import json
 import logging
 import re
 from collections import deque
@@ -38,6 +39,10 @@ from docmancer.core.html_utils import looks_like_html
 from docmancer.connectors.fetchers.pipeline.extraction import discover_dartdoc_candidate_links, is_dartdoc_html
 
 logger = logging.getLogger(__name__)
+
+# Module-level counter for locale-skipped URLs during discovery.
+# Reset in discover_urls(); read to surface locale_skipped_count in diagnostics.
+_LOCALE_SKIP_COUNTER: list[int] = [0]
 
 # Minimum content length for llms-full.txt to be considered valid.
 _LLMS_FULL_MIN_CHARS = 1000
@@ -126,10 +131,28 @@ def discover_urls(
                 logger.debug("Discovery strategy %s failed: %s", strategy_enum.value, exc)
                 return DiscoveryResult()
 
+    _LOCALE_SKIP_COUNTER[0] = 0
+
     llms_full = _try_llms_full_txt(base_url, client, platform, robots)
     if llms_full:
         logger.info("Discovery: %s found %d URL(s)", DiscoveryStrategy.LLMS_FULL_TXT.value, len(llms_full))
         return DiscoveryResult(urls=llms_full)
+
+    dartdoc = _try_dartdoc_index(base_url, client, max_pages)
+    if dartdoc:
+        logger.info("Discovery: dartdoc-index found %d URL(s)", len(dartdoc))
+        return DiscoveryResult(
+            urls=dartdoc[:max_pages],
+            diagnostics={
+                "strategies": {"dartdoc-index": len(dartdoc)},
+                "discovery_strategy": "dartdoc-index",
+                "fallback_reason": None,
+                "sitemap_pages": 0,
+                "seed_pages": 0,
+                "fallback_pages": 0,
+                "locale_skipped_count": _LOCALE_SKIP_COUNTER[0],
+            },
+        )
 
     all_results: list[DiscoveredUrl] = []
     strategy_counts: dict[str, int] = {}
@@ -193,6 +216,7 @@ def discover_urls(
                 "sitemap_pages": sitemap_total,
                 "seed_pages": seed_pages,
                 "fallback_pages": len(fallback_results),
+                "locale_skipped_count": _LOCALE_SKIP_COUNTER[0],
             },
         )
 
@@ -208,6 +232,7 @@ def discover_urls(
                 "sitemap_pages": 0,
                 "seed_pages": 0,
                 "fallback_pages": 0,
+                "locale_skipped_count": _LOCALE_SKIP_COUNTER[0],
             },
         )
 
@@ -220,6 +245,7 @@ def discover_urls(
             "sitemap_pages": 0,
             "seed_pages": 0,
             "fallback_pages": 0,
+            "locale_skipped_count": _LOCALE_SKIP_COUNTER[0],
         },
     )
 
@@ -252,10 +278,70 @@ def _try_dartdoc_index(base_url: str, client: httpx.Client, max_pages: int = 500
         return None
     if resp.status_code != 200 or not is_dartdoc_html(resp.text, url=base_url):
         return None
-    links = discover_dartdoc_candidate_links(resp.text, base_url)
+    dartdoc_base_url = _html_base_url(resp.text, base_url) or base_url
+    links = discover_dartdoc_candidate_links(resp.text, dartdoc_base_url)
+    links.extend(_discover_dartdoc_index_json(dartdoc_base_url, client, max_pages=max_pages))
     if not links:
         return None
     return [DiscoveredUrl(url=url, strategy=DiscoveryStrategy.NAV_CRAWL) for url in links[:max_pages]]
+
+
+def _html_base_url(html: str, page_url: str) -> str | None:
+    soup = BeautifulSoup(html or "", "html.parser")
+    base = soup.find("base", href=True)
+    if base is None:
+        return None
+    href = str(base.get("href") or "").strip()
+    if not href:
+        return None
+    return urljoin(page_url, href)
+
+
+def _discover_dartdoc_index_json(base_url: str, client: httpx.Client, max_pages: int = 500) -> list[str]:
+    """Discover Dartdoc entity pages from static index.json navigation data."""
+    index_url = f"{base_url.rstrip('/')}/index.json"
+    try:
+        resp = client.get(index_url)
+    except httpx.RequestError:
+        return []
+    if resp.status_code != 200 or not resp.text.strip():
+        return []
+    try:
+        payload = json.loads(resp.text)
+    except json.JSONDecodeError:
+        return []
+
+    seen: set[str] = set()
+    links: list[str] = []
+
+    def add(value: str) -> None:
+        href = value.strip()
+        if not href or href.startswith(("#", "javascript:", "mailto:")):
+            return
+        lowered = href.lower()
+        if not any(token in lowered for token in ("-class.html", "-library.html", "-mixin.html", "-enum.html", "-extension.html", "-typedef.html", "-function.html")):
+            return
+        url = normalize_url(urljoin(base_url, href))
+        if url in seen:
+            return
+        seen.add(url)
+        links.append(url)
+
+    def visit(value: Any) -> None:
+        if len(links) >= max_pages:
+            return
+        if isinstance(value, dict):
+            for key, item in value.items():
+                if key in {"href", "url", "link", "path"} and isinstance(item, str):
+                    add(item)
+                else:
+                    visit(item)
+        elif isinstance(value, list):
+            for item in value:
+                visit(item)
+
+    visit(payload)
+    return links
 
 
 def _dedupe_and_rank(results: list[DiscoveredUrl]) -> list[DiscoveredUrl]:
@@ -394,7 +480,7 @@ def _try_robots_sitemap(
             break
         entries = parse_sitemap(sitemap_url, client, max_entries=remaining, scope_base_url=base_url)
         for entry in entries:
-            if entry["url"] and is_docs_url(entry["url"], base_url):
+            if entry["url"] and is_docs_url(entry["url"], base_url, locale_skip_counter=_LOCALE_SKIP_COUNTER):
                 all_urls.append(
                     DiscoveredUrl(url=entry["url"], strategy=DiscoveryStrategy.ROBOTS_SITEMAP)
                 )
@@ -418,7 +504,7 @@ def _try_sitemap_xml(
         if entries:
             results = []
             for entry in entries:
-                if entry["url"] and is_docs_url(entry["url"], base_url):
+                if entry["url"] and is_docs_url(entry["url"], base_url, locale_skip_counter=_LOCALE_SKIP_COUNTER):
                     results.append(
                         DiscoveredUrl(url=entry["url"], strategy=DiscoveryStrategy.SITEMAP_XML)
                     )
@@ -452,7 +538,7 @@ def _try_platform_sitemap(
             results = [
                 DiscoveredUrl(url=e["url"], strategy=DiscoveryStrategy.PLATFORM_SITEMAP)
                 for e in entries[:max_pages]
-                if e["url"] and is_docs_url(e["url"], base_url)
+                if e["url"] and is_docs_url(e["url"], base_url, locale_skip_counter=_LOCALE_SKIP_COUNTER)
             ]
             if results:
                 return results
@@ -583,6 +669,6 @@ def _append_link(
     if not href:
         return
     full_url = normalize_url(_resolve(href, page_url))
-    if full_url not in seen and is_docs_url(full_url, base_url):
+    if full_url not in seen and is_docs_url(full_url, base_url, locale_skip_counter=_LOCALE_SKIP_COUNTER):
         seen.add(full_url)
         output.append(full_url)
