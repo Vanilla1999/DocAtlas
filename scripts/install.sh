@@ -197,11 +197,9 @@ register_codex() {
 }
 
 register_opencode() {
-  # Honor OpenCode's config overrides; fall back to the XDG default.
+  # Honor OpenCode's config-file override; fall back to the XDG default.
   if [ -n "${OPENCODE_CONFIG:-}" ]; then
     cfg="$OPENCODE_CONFIG"
-  elif [ -n "${OPENCODE_CONFIG_DIR:-}" ]; then
-    cfg="$OPENCODE_CONFIG_DIR/opencode.json"
   elif [ -n "${XDG_CONFIG_HOME:-}" ]; then
     cfg="$XDG_CONFIG_HOME/opencode/opencode.json"
   else

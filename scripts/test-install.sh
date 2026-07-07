@@ -173,6 +173,30 @@ env -i HOME="$H" PATH="$BIN:/usr/bin:/bin" OPENCODE_CONFIG="$CUSTOM" \
 [ -f "$H/.config/opencode/opencode.json" ] && fail "opencode: wrote default path despite OPENCODE_CONFIG"
 pass "agent 'opencode': OPENCODE_CONFIG custom path honored"
 
+# OPENCODE_CONFIG_DIR is not an OpenCode config-file override; do not write
+# $OPENCODE_CONFIG_DIR/opencode.json unless OPENCODE_CONFIG points there.
+H="$(mktemp -d)"; OCD="$H/opencode-dir"
+env -i HOME="$H" PATH="$BIN:/usr/bin:/bin" OPENCODE_CONFIG_DIR="$OCD" \
+    sh "$INSTALL_SH" opencode >/dev/null 2>&1 || fail "opencode OPENCODE_CONFIG_DIR run failed"
+[ ! -f "$OCD/opencode.json" ] || fail "opencode: OPENCODE_CONFIG_DIR should not be treated as config file location"
+[ -f "$H/.config/opencode/opencode.json" ] || fail "opencode: default config not written when only OPENCODE_CONFIG_DIR is set"
+pass "agent 'opencode': OPENCODE_CONFIG_DIR is ignored for config-file path"
+
+# README pipe forms should work when the script is read from stdin.
+H="$(mktemp -d)"; : >"$CALL_LOG"
+cat "$INSTALL_SH" | env -i HOME="$H" PATH="$BIN:/usr/bin:/bin" DOCATLAS_AGENT=opencode sh \
+    >/dev/null 2>&1 || fail "pipe form with DOCATLAS_AGENT=opencode failed"
+[ -f "$H/.config/opencode/opencode.json" ] || fail "pipe env form: opencode config not written"
+pass "README pipe form: cat scripts/install.sh | DOCATLAS_AGENT=opencode sh"
+
+H="$(mktemp -d)"; : >"$CALL_LOG"
+cat "$INSTALL_SH" | env -i HOME="$H" PATH="$BIN:/usr/bin:/bin" sh -s -- claude-code opencode \
+    >/dev/null 2>&1 || fail "pipe form with positional agents failed"
+grep -q "claude mcp add --scope user docatlas-docs" "$CALL_LOG" \
+  || fail "pipe positional form: expected claude registration"
+[ -f "$H/.config/opencode/opencode.json" ] || fail "pipe positional form: opencode config not written"
+pass "README pipe form: cat scripts/install.sh | sh -s -- claude-code opencode"
+
 # opencode with an existing JSONC config (comments + trailing comma) -> merged,
 # existing keys preserved, comments dropped on rewrite
 H="$(mktemp -d)"; JC="$H/oc.jsonc"

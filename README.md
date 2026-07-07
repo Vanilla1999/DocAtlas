@@ -31,7 +31,7 @@ Install `uv`, the `doc-atlas` CLI, and register the docs MCP server into your ag
 curl -LsSf https://raw.githubusercontent.com/Vanilla1999/DocAtlas/main/scripts/install.sh | sh
 ```
 
-The installer sets up `uv` (if missing), runs `uv tool install doc-atlas`, then lets you pick which agent(s) to register the DocAtlas docs MCP server (`doc-atlas mcp docs-serve`) into — **Claude Code**, **OpenCode**, and/or **Codex** — and finishes with a version/health check. It is idempotent, so re-running it is safe.
+The installer sets up `uv` (if missing), runs `uv tool install --upgrade doc-atlas`, then lets you pick which agent(s) to register the DocAtlas docs MCP server (`doc-atlas mcp docs-serve`) into — **Claude Code**, **OpenCode**, and/or **Codex** — and finishes with a version/health check. It is idempotent, so re-running it is safe.
 
 Non-interactive (CI or scripted) usage — pass the agent(s) via env var or positional args:
 
@@ -46,7 +46,7 @@ curl -LsSf https://raw.githubusercontent.com/Vanilla1999/DocAtlas/main/scripts/i
 
 Accepted values: `claude-code`, `opencode`, `codex`, `all`, `none`. An unknown value passed via args or `DOCATLAS_AGENT` is a hard error. macOS and Linux only. Prefer the manual steps below on Windows.
 
-For OpenCode, the installer honors `OPENCODE_CONFIG` (full path) and `OPENCODE_CONFIG_DIR`, falling back to `$XDG_CONFIG_HOME/opencode/opencode.json`. Existing JSONC configs (comments / trailing commas) are parsed; a `.bak` backup is kept on rewrite.
+For OpenCode, the installer honors `OPENCODE_CONFIG` (full path), falling back to `$XDG_CONFIG_HOME/opencode/opencode.json`. Existing JSONC configs (comments / trailing commas) are parsed; a `.bak` backup is kept on rewrite.
 
 ## Naming and compatibility
 
