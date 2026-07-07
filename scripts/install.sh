@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 # DocAtlas one-line installer.
 #
-#   curl -LsSf https://raw.githubusercontent.com/Vanilla1999/DocAtlas/main/install.sh | sh
+#   curl -LsSf https://raw.githubusercontent.com/Vanilla1999/DocAtlas/main/scripts/install.sh | sh
 #
 # Installs uv (if missing), installs the `doc-atlas` CLI, and registers the
 # DocAtlas docs MCP server (`doc-atlas mcp docs-serve`) into the AI agent(s) you
@@ -138,25 +138,38 @@ pick_python() {
 register_claude_code() {
   if ! have claude; then
     warn "claude CLI not found; skipping Claude Code registration."
-    step "Add manually later:  claude mcp add -s user $SERVER_NAME -- doc-atlas mcp docs-serve"
+    step "Add manually later:  claude mcp add --scope user $SERVER_NAME -- doc-atlas mcp docs-serve"
     return 0
   fi
-  if claude mcp list 2>/dev/null | grep -q "$SERVER_NAME"; then
+  if claude mcp get "$SERVER_NAME" >/dev/null 2>&1; then
     ok "claude-code: '$SERVER_NAME' already registered"
     return 0
   fi
-  if claude mcp add -s user "$SERVER_NAME" -- doc-atlas mcp docs-serve; then
+  if claude mcp add --scope user "$SERVER_NAME" -- doc-atlas mcp docs-serve; then
     ok "claude-code: registered '$SERVER_NAME'"
   else
-    warn "claude-code: 'claude mcp add' failed; add manually: claude mcp add -s user $SERVER_NAME -- doc-atlas mcp docs-serve"
+    warn "claude-code: 'claude mcp add' failed; add manually: claude mcp add --scope user $SERVER_NAME -- doc-atlas mcp docs-serve"
   fi
 }
 
 register_codex() {
   cfg="$HOME/.codex/config.toml"
+  # Prefer the official Codex CLI, which manages the config for us.
+  if have codex; then
+    if codex mcp get "$SERVER_NAME" >/dev/null 2>&1; then
+      ok "codex: '$SERVER_NAME' already registered"
+      return 0
+    fi
+    if codex mcp add "$SERVER_NAME" -- doc-atlas mcp docs-serve; then
+      ok "codex: registered '$SERVER_NAME'"
+      return 0
+    fi
+    warn "codex: 'codex mcp add' failed; falling back to direct config edit."
+  fi
   mkdir -p "$(dirname "$cfg")"
   [ -f "$cfg" ] || : >"$cfg"
-  if grep -q "^\[mcp_servers\.$SERVER_NAME\]" "$cfg" 2>/dev/null; then
+  # Match both bare and quoted TOML section headers, ignoring inner whitespace.
+  if grep -Eq "^\[mcp_servers\.(\"$SERVER_NAME\"|$SERVER_NAME)\][[:space:]]*$" "$cfg" 2>/dev/null; then
     ok "codex: '$SERVER_NAME' already present in $cfg"
     return 0
   fi

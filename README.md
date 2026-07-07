@@ -28,7 +28,7 @@ Patch Contract output is advisory and non-blocking: it highlights source-backed 
 Install `uv`, the `doc-atlas` CLI, and register the docs MCP server into your agent — in a single command:
 
 ```bash
-curl -LsSf https://raw.githubusercontent.com/Vanilla1999/DocAtlas/main/install.sh | sh
+curl -LsSf https://raw.githubusercontent.com/Vanilla1999/DocAtlas/main/scripts/install.sh | sh
 ```
 
 The installer sets up `uv` (if missing), runs `uv tool install doc-atlas`, then lets you pick which agent(s) to register the DocAtlas docs MCP server (`doc-atlas mcp docs-serve`) into — **Claude Code**, **OpenCode**, and/or **Codex** — and finishes with a version/health check. It is idempotent, so re-running it is safe.
@@ -36,9 +36,12 @@ The installer sets up `uv` (if missing), runs `uv tool install doc-atlas`, then 
 Non-interactive (CI or scripted) usage — pass the agent(s) via env var or positional args:
 
 ```bash
-DOCATLAS_AGENT=claude-code curl -LsSf https://raw.githubusercontent.com/Vanilla1999/DocAtlas/main/install.sh | sh
-# or several / all at once:
-curl -LsSf https://raw.githubusercontent.com/Vanilla1999/DocAtlas/main/install.sh | sh -s -- claude-code opencode
+# env var must be set on the `sh` process (right of the pipe), not on curl:
+curl -LsSf https://raw.githubusercontent.com/Vanilla1999/DocAtlas/main/scripts/install.sh | DOCATLAS_AGENT=claude-code sh
+# or pass the agent(s) as positional args:
+curl -LsSf https://raw.githubusercontent.com/Vanilla1999/DocAtlas/main/scripts/install.sh | sh -s -- claude-code opencode
+# several clients via env var:
+curl -LsSf https://raw.githubusercontent.com/Vanilla1999/DocAtlas/main/scripts/install.sh | DOCATLAS_AGENT="claude-code codex opencode" sh
 ```
 
 Accepted values: `claude-code`, `opencode`, `codex`, `all`, `none`. macOS and Linux only. Prefer the manual steps below on Windows.
