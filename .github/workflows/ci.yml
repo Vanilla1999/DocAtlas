@@ -10,6 +10,15 @@ env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
 
 jobs:
+  installer-smoke:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Installer smoke tests
+        run: sh scripts/test-install.sh
+
   test:
     runs-on: ubuntu-latest
     strategy:
