@@ -88,7 +88,13 @@ ok "doc-atlas $(doc-atlas --version 2>/dev/null || echo installed)"
 KNOWN_AGENTS="claude-code opencode codex"
 
 # Normalize a raw selection (numbers, names, csv) into a clean agent list.
+# Result is placed in the global NORMALIZED (not stdout) so that, in strict
+# mode, `die` on an unknown token exits the whole installer rather than a
+# command-substitution subshell.
+#   $1 = raw selection   $2 = mode: "strict" (fail on unknown) | "soft" (warn+skip)
+NORMALIZED=""
 normalize_selection() {
+  mode="${2:-soft}"
   raw="$(printf '%s' "$1" | tr 'A-Z,' 'a-z ')"
   out=""
   for tok in $raw; do
@@ -98,28 +104,34 @@ normalize_selection() {
       3|codex)                         a="codex" ;;
       4|all)                           a="$KNOWN_AGENTS" ;;
       5|skip|none|no)                  a="" ;;
-      *) warn "Unknown agent '$tok' (ignored). Valid: claude-code, opencode, codex, all, none"; continue ;;
+      *)
+        if [ "$mode" = strict ]; then
+          die "Unknown agent '$tok'. Valid: claude-code, opencode, codex, all, none"
+        fi
+        warn "Unknown agent '$tok' (ignored). Valid: claude-code, opencode, codex, all, none"
+        continue
+        ;;
     esac
     for one in $a; do
       case " $out " in *" $one "*) : ;; *) out="$out $one" ;; esac
     done
   done
-  printf '%s' "${out# }"
+  NORMALIZED="${out# }"
 }
 
 SELECTION=""
 SELECTION_SOURCE=""
 if [ "$#" -gt 0 ]; then
-  SELECTION="$(normalize_selection "$*")"; SELECTION_SOURCE="arguments"
+  normalize_selection "$*" strict; SELECTION="$NORMALIZED"; SELECTION_SOURCE="arguments"
 elif [ -n "${DOCATLAS_AGENT:-}" ]; then
-  SELECTION="$(normalize_selection "$DOCATLAS_AGENT")"; SELECTION_SOURCE="\$DOCATLAS_AGENT"
+  normalize_selection "$DOCATLAS_AGENT" strict; SELECTION="$NORMALIZED"; SELECTION_SOURCE="\$DOCATLAS_AGENT"
 elif [ -r /dev/tty ]; then
   printf '\n%sRegister the DocAtlas docs MCP server into which agent(s)?%s\n' "$C_BOLD" "$C_RESET"
   printf '  1) claude-code\n  2) opencode\n  3) codex\n  4) all\n  5) skip\n'
   printf 'Enter number(s) or name(s), space-separated [5]: '
   reply=""; IFS= read -r reply </dev/tty || reply=""
   [ -z "$reply" ] && reply="skip"
-  SELECTION="$(normalize_selection "$reply")"; SELECTION_SOURCE="prompt"
+  normalize_selection "$reply" soft; SELECTION="$NORMALIZED"; SELECTION_SOURCE="prompt"
 else
   warn "Non-interactive run and no agent selected; skipping MCP registration."
   step "Re-run with:  DOCATLAS_AGENT=claude-code  (or: opencode / codex / all)"
