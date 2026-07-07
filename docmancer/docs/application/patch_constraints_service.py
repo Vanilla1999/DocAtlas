@@ -178,6 +178,7 @@ class PatchConstraintsService:
         constraints.extend(self._generated_file_constraints(sources, changed_files))
         constraints.extend(self._dependency_constraints(root))
         repo_map, source_evidence = self._code_evidence(root, question, changed_files)
+        constraints.extend(self._repo_map_constraints(repo_map))
         constraints.extend(self._source_evidence_constraints(source_evidence))
         symbol_candidates = self._symbol_candidates(question, root, changed_files)
         constraints.extend(self._symbol_candidate_constraints(symbol_candidates))
@@ -321,6 +322,30 @@ class PatchConstraintsService:
             return [], []
         return repo_map, source_evidence
 
+    def _repo_map_constraints(self, items: list[dict[str, Any]]) -> list[PatchConstraint]:
+        constraints: list[PatchConstraint] = []
+        for item in items:
+            path = str(item.get("path") or "")
+            if not path or self._example_source_noise(path):
+                continue
+            terms = [str(term) for term in item.get("matched_terms") or [] if str(term).strip()]
+            term = terms[0] if terms else Path(path).stem
+            constraints.append(self._constraint(
+                id=f"repo-map-{self._slug(path)}-{self._slug(term)}",
+                type="project_convention",
+                instruction=f"Task term `{term}` maps to `{path}`; inspect or update that project source before using example or unrelated paths.",
+                source=path,
+                severity="should",
+                confidence="medium",
+                evidence=str(item.get("content") or item.get("title") or path)[:500],
+                symbols=terms,
+                files=[path],
+                source_kind="repo_map",
+                line_start=item.get("line_start"),
+                line_end=item.get("line_end") or item.get("line_start"),
+            ))
+        return constraints
+
     def _source_evidence_constraints(self, items: list[dict[str, Any]]) -> list[PatchConstraint]:
         constraints: list[PatchConstraint] = []
         for item in items:
@@ -328,6 +353,8 @@ class PatchConstraintsService:
                 continue
             path = str(item.get("path") or "")
             if not path:
+                continue
+            if self._example_source_noise(path):
                 continue
             snippet = str(item.get("snippet") or "")
             terms = [str(term) for term in item.get("matched_terms") or [] if str(term).strip()]
@@ -348,6 +375,13 @@ class PatchConstraintsService:
                 line_end=item.get("line_end") or line_start,
             ))
         return constraints
+
+    def _example_source_noise(self, path: str) -> bool:
+        normalized = path.replace("\\", "/").lower().strip("/")
+        if not (normalized == "example" or normalized.startswith("example/")):
+            return False
+        text = f"{self._question} {' '.join(self._changed_files)}".lower().replace("\\", "/")
+        return not any(token in text for token in ("example", "sample", "demo", "пример"))
 
     @staticmethod
     def _under_root(path: Path, root: Path) -> bool:
@@ -1289,7 +1323,14 @@ class PatchConstraintsService:
         if any(Path(f).name in DEPENDENCY_FILES for f in changed_files):
             checks.append("Run dependency/lockfile consistency checks after manifest or lockfile changes.")
         if changed_files:
-            checks.append(f"Review changed files for project-policy compliance: {', '.join(changed_files[:4])}.")
+            changed_label = "changed files"
+            if any(self._is_generated_path(f) for f in changed_files) and any(Path(f).name in DEPENDENCY_FILES for f in changed_files):
+                changed_label = "changed generated/lockfile files"
+            elif any(self._is_generated_path(f) for f in changed_files):
+                changed_label = "changed generated files"
+            elif any(Path(f).name in DEPENDENCY_FILES for f in changed_files):
+                changed_label = "changed lockfile/dependency files"
+            checks.append(f"Review {changed_label} for project-policy compliance: {', '.join(changed_files[:4])}.")
         source = "question" if not root else "changed_files" if changed_files else "question"
         return [self._constraint(
             id=f"run-check-{idx}",
@@ -1464,10 +1505,13 @@ class PatchConstraintsService:
 
     def _dependency_relevance(self, dep: DependencyObservation) -> int:
         haystack = f"{self._question} {' '.join(self._changed_files)}".lower()
+        haystack_tokens = set(re.findall(r"[a-z0-9_]+", haystack))
         score = 0
         package = dep.package_name.lower()
         package_words = package.replace("_", " ").replace("-", " ")
-        if package in haystack or package_words in haystack:
+        if (len(package) >= 3 and re.search(rf"(?<![a-z0-9_]){re.escape(package)}(?![a-z0-9_])", haystack)) or package in haystack_tokens:
+            score += 10
+        elif package_words != package and package_words in haystack:
             score += 10
         elif any(part and len(part) >= 5 and part in haystack for part in re.split(r"[_\-]+", package)):
             score += 6

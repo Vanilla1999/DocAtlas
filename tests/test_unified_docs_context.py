@@ -739,9 +739,15 @@ def test_placeholder_preflight_returns_partial_project_context_without_blind_syn
     result = _service(facade).get_docs_context("architecture", project_path="/repo", mode="project")
 
     assert result.answer_available is True
-    assert result.status == "partial_success"
-    assert result.requires_confirmation is True
-    assert result.confirmation_reason == "project_docs_preflight"
+    assert result.status == "success"
+    assert result.requires_confirmation is False
+    assert result.confirmation_reason is None
+    assert not any(
+        action.get("type") == "ask_user_to_update_or_confirm_project_docs"
+        for action in result.next_actions
+        if isinstance(action, dict)
+    )
+    assert result.lanes["project"].get("requires_confirmation") is None
     assert result.context_pack
     assert ("bootstrap_project_docs", {"project_path": "/repo", "question": "architecture"}) in facade.calls
     assert any(call[0] == "get_project_context" for call in facade.calls)

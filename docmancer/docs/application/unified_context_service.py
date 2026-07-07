@@ -288,8 +288,6 @@ class UnifiedDocsContextService:
                 })
             context_pack.extend(project_items)
             lanes["project"] = {"status": project_result.status, "source_count": len([i for i in project_items if i.get("doc_scope") == "project"])}
-            if project_preflight_pending is not None:
-                lanes["project"].update({"requires_confirmation": True, "confirmation_reason": getattr(project_preflight_pending, "confirmation_reason", None)})
             dep_count = len([i for i in project_items if i.get("doc_scope") == "dependency"])
             if dep_count:
                 lanes["dependency"] = {"status": getattr(project_result.dependency_docs, "status", "success"), "source_count": dep_count}
@@ -301,8 +299,6 @@ class UnifiedDocsContextService:
             warnings.extend(project_result.warnings or [])
             next_actions.extend(project_result.next_actions or [])
             pending_lane_results.append(project_result)
-            if project_preflight_pending is not None:
-                pending_lane_results.append(project_preflight_pending)
 
         for result in library_results:
             library_items = self._library_context_pack(result)

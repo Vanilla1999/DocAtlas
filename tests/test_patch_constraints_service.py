@@ -161,6 +161,43 @@ def test_task_specific_source_evidence_is_not_crowded_out_by_unmentioned_depende
     assert not any(c.type == "dependency_version" for c in packet.constraints[:5])
 
 
+def test_navigation_patch_constraints_prefer_lib_sources_over_example_noise(tmp_path: Path):
+    root = tmp_path / "repo"
+    _write(
+        root / "ARCHITECTURE.md",
+        """
+# Architecture
+
+## Navigation
+
+Folder: `lib/src/navigation/`.
+
+- `help_request_routes.dart` - route constants;
+- `help_request_navigator.dart` - local `Navigator` for the help request flow.
+
+Routes are registered in `HelpRequestNavigator._onGenerateRoute`.
+""",
+    )
+    _write(root / "README.md", "TODO: Put a short description here.\n")
+    _write(root / "example/README.md", "Example app.\n")
+    _write(root / "pubspec.lock", 'packages:\n  io:\n    dependency: transitive\n    source: hosted\n    version: "1.0.5"\n')
+    _write(root / "example/lib/mobile_auth_view.dart", "void onNavigationAction() { final url = navigationAction.request.url; }\n")
+    _write(root / "lib/src/navigation/help_request_routes.dart", "class HelpRequestRoutes { static const newHelpRequestPath = 'new-help-request'; }\n")
+    _write(root / "lib/src/navigation/help_request_navigator.dart", "class HelpRequestNavigator { void onGenerateRoute() {} }\n")
+
+    packet = _packet(
+        root,
+        question="Добавить новый экран в help_chat navigation flow",
+        max_constraints=20,
+        max_tokens=4000,
+    )
+
+    assert any("help_request_routes.dart" in c.source for c in packet.constraints)
+    assert any("help_request_navigator.dart" in c.source for c in packet.constraints)
+    assert not any(c.source.startswith("example/") for c in packet.constraints)
+    assert not any(c.type == "dependency_version" for c in packet.constraints)
+
+
 def test_suggested_checks_include_generated_and_lockfile_checks(tmp_path: Path):
     packet = _packet(_workspace(tmp_path), changed_files=["lib/foo/user.g.dart", "pubspec.lock"])
     checks = "\n".join(packet.suggested_checks).lower()
