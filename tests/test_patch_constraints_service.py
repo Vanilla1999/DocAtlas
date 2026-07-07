@@ -146,6 +146,21 @@ def test_question_keywords_raise_relevant_dependency_constraint(tmp_path: Path):
     assert dep_positions and dep_positions[0] < 8
 
 
+def test_task_specific_source_evidence_is_not_crowded_out_by_unmentioned_dependencies(tmp_path: Path):
+    root = _workspace(tmp_path)
+    _write(root / "lib/src/domain/services/help_requests_service.dart", "class HelpRequestsService { void sendAttachments() {} }\n")
+
+    packet = _packet(
+        root,
+        question="Add sendAttachments support for selecting and sending attachments in chat",
+        max_constraints=5,
+        max_tokens=900,
+    )
+
+    assert any(c.source == "lib/src/domain/services/help_requests_service.dart" for c in packet.constraints[:5])
+    assert not any(c.type == "dependency_version" for c in packet.constraints[:5])
+
+
 def test_suggested_checks_include_generated_and_lockfile_checks(tmp_path: Path):
     packet = _packet(_workspace(tmp_path), changed_files=["lib/foo/user.g.dart", "pubspec.lock"])
     checks = "\n".join(packet.suggested_checks).lower()

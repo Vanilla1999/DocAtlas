@@ -129,3 +129,38 @@ def test_get_docs_context_aligns_selected_source_risk_with_primary_snippet():
     assert selected["risk_flags"] == ["not_exact_version"]
     assert selected["version_binding"] == "latest_fallback"
     assert selected["exact_version_match"] is False
+
+
+def test_get_docs_context_answer_flattens_nested_selected_source_path():
+    class Facade:
+        def get_docs_context(self, question, **kwargs):
+            return {
+                "tool": "get_docs_context",
+                "status": "success",
+                "answer_available": True,
+                "trust_contract": {
+                    "selected": [{
+                        "source": {
+                            "path": "ARCHITECTURE.md",
+                            "title": "ARCHITECTURE",
+                            "source_class": "project_doc",
+                        },
+                        "risk_flags": [],
+                    }],
+                    "rejected": [],
+                    "risky": [],
+                },
+            }
+
+    result = cast(dict[str, Any], handle_context_tool(
+        "get_docs_context",
+        {"question": "architecture", "project_path": "/repo", "mode": "project"},
+        cast(Any, Facade()),
+    ))
+
+    assert result["selected_sources"] == [{
+        "path": "ARCHITECTURE.md",
+        "title": "ARCHITECTURE",
+        "source_class": "project_doc",
+        "risk_flags": [],
+    }]

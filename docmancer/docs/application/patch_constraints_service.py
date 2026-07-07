@@ -928,7 +928,10 @@ class PatchConstraintsService:
         constraints: list[PatchConstraint] = []
         observations = self._dependency_observations(root)
         ranked = sorted(observations, key=lambda dep: self._dependency_relevance(dep), reverse=True)
+        dependency_intent = self._has_dependency_intent()
         for dep in ranked[:12]:
+            if not dependency_intent and self._dependency_relevance(dep) <= 1:
+                continue
             version = dep.resolved_version or (dep.specifier_raw if dep.specifier_kind == "exact" else None)
             if not version:
                 continue
@@ -959,6 +962,10 @@ class PatchConstraintsService:
                 files=lockfiles,
             ))
         return constraints
+
+    def _has_dependency_intent(self) -> bool:
+        text = f"{self._question} {' '.join(self._changed_files)}".lower()
+        return any(word in text for word in ("dependency", "dependencies", "version", "upgrade", "package", "pubspec", "lockfile", "requirements", "зависим"))
 
     def _dependency_observations(self, root: Path) -> list[DependencyObservation]:
         observations: list[DependencyObservation] = []
@@ -1458,8 +1465,12 @@ class PatchConstraintsService:
     def _dependency_relevance(self, dep: DependencyObservation) -> int:
         haystack = f"{self._question} {' '.join(self._changed_files)}".lower()
         score = 0
-        if dep.package_name.lower() in haystack:
+        package = dep.package_name.lower()
+        package_words = package.replace("_", " ").replace("-", " ")
+        if package in haystack or package_words in haystack:
             score += 10
+        elif any(part and len(part) >= 5 and part in haystack for part in re.split(r"[_\-]+", package)):
+            score += 6
         if any(Path(f).name in DEPENDENCY_FILES for f in self._changed_files):
             score += 4
         if "dependency" in haystack or "version" in haystack or "upgrade" in haystack:
@@ -1541,6 +1552,7 @@ class PatchConstraintsService:
             constraints,
             key=lambda c: (
                 0 if c.type == "generated_file" and c.source == "changed_files" else 1,
+                0 if any(ref.get("kind") == "source_evidence" for ref in c.source_refs) else 1,
                 severity_rank.get(c.severity, 3),
                 confidence_rank.get(c.confidence, 3),
                 -relevance(c),

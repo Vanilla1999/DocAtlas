@@ -186,7 +186,24 @@ def _trust_sources(contract: Any, lane: str) -> list[dict[str, Any]]:
         return []
     sources = contract.get("sources")
     if isinstance(sources, dict) and isinstance(sources.get(lane), list):
-        return sources[lane]
+        return [_flatten_trust_source(item) for item in sources[lane] if isinstance(item, dict)]
     legacy_key = f"{lane}_sources"
     value = contract.get(lane) or contract.get(legacy_key)
-    return value if isinstance(value, list) else []
+    if not isinstance(value, list):
+        return []
+    return [_flatten_trust_source(item) for item in value if isinstance(item, dict)]
+
+
+def _flatten_trust_source(item: dict[str, Any]) -> dict[str, Any]:
+    source = item.get("source")
+    if not isinstance(source, dict):
+        return item
+    flattened = dict(item)
+    flattened.pop("source", None)
+    for key in (
+        "path", "url", "title", "source_class", "source_type", "source_kind", "authority",
+        "doc_scope", "module_id", "module_name", "module_path", "module_type",
+    ):
+        if source.get(key) not in (None, [], {}) and flattened.get(key) in (None, [], {}):
+            flattened[key] = source[key]
+    return flattened

@@ -97,6 +97,21 @@ class _MockDataclass:
     trust_contract: dict
 
 
+@dataclass
+class _LargePatchPacket:
+    task: str
+    constraints: list[dict[str, Any]]
+    schema_version: str = "patch-contract-2.0"
+    next_actions: list[dict[str, Any]] = field(default_factory=list)
+    warnings: list[Any] = field(default_factory=list)
+    source_evidence: list[dict[str, Any]] = field(default_factory=list)
+    repo_map: dict[str, Any] = field(default_factory=dict)
+    forbidden_edits: list[dict[str, Any]] = field(default_factory=list)
+    dependency_contracts: list[dict[str, Any]] = field(default_factory=list)
+    source_of_truth_rules: list[dict[str, Any]] = field(default_factory=list)
+    suggested_checks: list[str] = field(default_factory=list)
+
+
 class FakeService:
     def __init__(self) -> None:
         self.library_docs = SubService()
@@ -235,3 +250,47 @@ def test_prefetch_project_dependency_docs_canonical_no_warning() -> None:
     assert result["status"] == "success"
     warnings = result.get("warnings") or []
     assert not any(w.get("code") == "deprecated_tool_alias" for w in warnings)
+
+
+def test_patch_constraints_debug_compaction_preserves_contract_fields() -> None:
+    class PatchSubService:
+        def get_patch_constraints(self, *args: Any, **kwargs: Any) -> Any:
+            large_text = "x" * 2_000
+            constraints = [
+                {
+                    "id": f"constraint-{idx}",
+                    "type": "architecture",
+                    "severity": "must",
+                    "confidence": "high",
+                    "instruction": f"Keep source-owned rule {idx}: {large_text}",
+                    "source": "ARCHITECTURE.md",
+                }
+                for idx in range(30)
+            ]
+            return _LargePatchPacket(
+                task="fix ScanDoc camera permissions",
+                constraints=constraints,
+                forbidden_edits=[constraints[0]],
+                source_evidence=[{"path": "lib/modules/tsd_browser/browser.dart", "snippet": large_text}],
+                repo_map={"symbols": [{"name": f"Symbol{idx}", "path": "lib/foo.dart"} for idx in range(40)]},
+                next_actions=[{"type": "validate_patch_against_constraints", "tool": "validate_patch_against_constraints"}],
+            )
+
+    class Service(FakeService):
+        def __init__(self) -> None:
+            super().__init__()
+            self.patch_constraints = PatchSubService()
+
+    result = handle_project_tool(
+        "get_patch_constraints",
+        {"project_path": "/repo", "question": "fix ScanDoc camera permissions", "output_mode": "debug"},
+        cast(LibraryDocsService, Service()),
+    )
+
+    assert result is not None
+    assert result["mcp_compaction"]["truncated"] is True
+    assert result["answer_available"] is True
+    assert result["constraints"]
+    assert result["forbidden_edits"]
+    assert result["source_evidence"]
+    assert "constraints" not in result["mcp_compaction"].get("omitted_fields", [])

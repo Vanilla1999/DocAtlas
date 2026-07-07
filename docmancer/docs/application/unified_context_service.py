@@ -187,24 +187,32 @@ class UnifiedDocsContextService:
         exact_version: dict[str, Any] | None = None
 
         bootstrap = None
+        project_preflight_pending = None
         if prepare_project_docs and project_path and mode_selected in {"project", "mixed", "dependency"}:
             bootstrap = self.service.bootstrap_project_docs(project_path, question=question)
             lane_details["project_bootstrap"] = self._to_dict(bootstrap)
             bootstrap_reason = getattr(bootstrap, "reason_code", None) or "project_docs_confirmation_required"
             if getattr(bootstrap, "requires_confirmation", False) and "dependency_docs" not in bootstrap_reason:
-                return self._confirmation_result(
-                    question=question,
-                    mode_requested=mode_requested,
-                    mode_selected=mode_selected,
-                    routing=routing,
-                    reason_code=bootstrap_reason,
-                    confirmation_reason=getattr(bootstrap, "confirmation_reason", None),
-                    next_action=getattr(bootstrap, "next_action", None) or None,
-                    arguments_patch=getattr(bootstrap, "arguments_patch", None) or None,
-                    lanes=lanes,
-                    lane_details=lane_details if details else {},
-                    warnings=list(getattr(bootstrap, "warnings", []) or []),
-                )
+                if self._can_return_partial_project_context(bootstrap):
+                    project_preflight_pending = bootstrap
+                    warnings.append({
+                        "code": "project_docs_preflight_partial_context",
+                        "message": "Project docs preflight requires confirmation; returning indexed project context as partial guidance without syncing/reconciling docs.",
+                    })
+                else:
+                    return self._confirmation_result(
+                        question=question,
+                        mode_requested=mode_requested,
+                        mode_selected=mode_selected,
+                        routing=routing,
+                        reason_code=bootstrap_reason,
+                        confirmation_reason=getattr(bootstrap, "confirmation_reason", None),
+                        next_action=getattr(bootstrap, "next_action", None) or None,
+                        arguments_patch=getattr(bootstrap, "arguments_patch", None) or None,
+                        lanes=lanes,
+                        lane_details=lane_details if details else {},
+                        warnings=list(getattr(bootstrap, "warnings", []) or []),
+                    )
 
         project_result = None
         library_results: list[DocsResult] = []
@@ -280,6 +288,8 @@ class UnifiedDocsContextService:
                 })
             context_pack.extend(project_items)
             lanes["project"] = {"status": project_result.status, "source_count": len([i for i in project_items if i.get("doc_scope") == "project"])}
+            if project_preflight_pending is not None:
+                lanes["project"].update({"requires_confirmation": True, "confirmation_reason": getattr(project_preflight_pending, "confirmation_reason", None)})
             dep_count = len([i for i in project_items if i.get("doc_scope") == "dependency"])
             if dep_count:
                 lanes["dependency"] = {"status": getattr(project_result.dependency_docs, "status", "success"), "source_count": dep_count}
@@ -291,6 +301,8 @@ class UnifiedDocsContextService:
             warnings.extend(project_result.warnings or [])
             next_actions.extend(project_result.next_actions or [])
             pending_lane_results.append(project_result)
+            if project_preflight_pending is not None:
+                pending_lane_results.append(project_preflight_pending)
 
         for result in library_results:
             library_items = self._library_context_pack(result)
@@ -932,6 +944,16 @@ class UnifiedDocsContextService:
         if scopes == {"project", "dependency"}:
             return "mixed"
         return "project"
+
+    @staticmethod
+    def _can_return_partial_project_context(bootstrap: Any) -> bool:
+        """Return already indexed context when preflight only flags placeholder docs."""
+        reason_code = str(getattr(bootstrap, "reason_code", "") or "")
+        if reason_code != "project_docs_preflight_confirmation_required":
+            return False
+        next_action = getattr(bootstrap, "next_action", None) or {}
+        risk_codes = set(next_action.get("risk_codes") or []) if isinstance(next_action, dict) else set()
+        return bool(risk_codes) and risk_codes <= {"placeholder_project_doc"}
 
     @staticmethod
     def _collect_pending_actions(lane_results: list[Any]) -> dict[str, Any]:

@@ -627,7 +627,7 @@ def handle_project_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
         if output_mode == "full":
             result["output_mode"] = "full"
             return result
-        payload = result if output_mode == "debug" else _compact_patch_constraints(result)
+        payload = _compact_patch_constraints(result)
         payload["output_mode"] = output_mode
         payload = _compact_mcp_payload(payload)
         return payload if output_mode == "debug" else _strip_mcp_debug_noise(payload)
