@@ -24,6 +24,31 @@ get_docs_context → get_patch_constraints → edit → validate_patch_against_c
 
 Patch Contract output is advisory and non-blocking: it highlights source-backed constraints, deterministic violations, and unknown/manual-review areas, but it does not prove a patch is safe to merge.
 
+## One-line install
+
+Install `uv`, the `doc-atlas` CLI, and register the docs MCP server into your agent — in a single command:
+
+```bash
+curl -LsSf https://raw.githubusercontent.com/Vanilla1999/DocAtlas/main/scripts/install.sh | sh
+```
+
+The installer sets up `uv` (if missing), runs `uv tool install --upgrade doc-atlas`, then lets you pick which agent(s) to register the DocAtlas docs MCP server (`doc-atlas mcp docs-serve`) into — **Claude Code**, **OpenCode**, and/or **Codex** — and finishes with a version/health check. It is idempotent, so re-running it is safe.
+
+Non-interactive (CI or scripted) usage — pass the agent(s) via env var or positional args:
+
+```bash
+# env var must be set on the `sh` process (right of the pipe), not on curl:
+curl -LsSf https://raw.githubusercontent.com/Vanilla1999/DocAtlas/main/scripts/install.sh | DOCATLAS_AGENT=claude-code sh
+# or pass the agent(s) as positional args:
+curl -LsSf https://raw.githubusercontent.com/Vanilla1999/DocAtlas/main/scripts/install.sh | sh -s -- claude-code opencode
+# several clients via env var:
+curl -LsSf https://raw.githubusercontent.com/Vanilla1999/DocAtlas/main/scripts/install.sh | DOCATLAS_AGENT="claude-code codex opencode" sh
+```
+
+Accepted values: `claude-code`, `opencode`, `codex`, `all`, `none`. An unknown value passed via args or `DOCATLAS_AGENT` is a hard error. macOS and Linux only. Prefer the manual steps below on Windows.
+
+For OpenCode, the installer honors `OPENCODE_CONFIG` (full path), falling back to `$XDG_CONFIG_HOME/opencode/opencode.json`. Existing JSONC configs (comments / trailing commas) are parsed; a `.bak` backup is kept on rewrite.
+
 ## Naming and compatibility
 
 The product name is **DocAtlas**.
