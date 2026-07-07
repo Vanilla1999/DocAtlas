@@ -152,6 +152,7 @@ def test_characterization_unknown_library_without_url_returns_needs_input_shape(
     assert result.results == []
     assert result.policy["direct_webfetch"] == "discovery_only"
     assert result.reason_code == "library_docs_source_required"
+    assert result.diagnostics["legacy_reason_code"] == "needs_docs_url"
     assert result.requires_confirmation is True
     assert result.next_actions[0]["type"] == "ask_user_for_library_docs_source"
     assert result.next_actions

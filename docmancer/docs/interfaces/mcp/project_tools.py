@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from dataclasses import asdict
-import json
 from copy import deepcopy
 from typing import Any
 
@@ -396,6 +395,45 @@ def _patch_constraints_output_mode(args: dict[str, Any]) -> str:
     return output_mode if output_mode in {"compact", "debug", "full"} else "compact"
 
 
+def _compact_patch_evidence(items: list[dict[str, Any]], *, limit: int = 5) -> list[dict[str, Any]]:
+    compact: list[dict[str, Any]] = []
+    for item in items[:limit]:
+        if not isinstance(item, dict):
+            continue
+        snippet = item.get("snippet")
+        if isinstance(snippet, str) and len(snippet) > 300:
+            snippet = snippet[:297].rstrip() + "..."
+        compact.append({
+            key: value
+            for key, value in {
+                "path": item.get("path"),
+                "line_start": item.get("line_start"),
+                "line_end": item.get("line_end"),
+                "matched_terms": item.get("matched_terms") or item.get("terms"),
+                "snippet": snippet,
+            }.items()
+            if value not in (None, [], "")
+        })
+    return compact
+
+
+def _compact_symbol_candidates(items: list[dict[str, Any]], *, limit: int = 5) -> list[dict[str, Any]]:
+    return [
+        {
+            key: value
+            for key, value in {
+                "symbol": item.get("symbol") or item.get("name"),
+                "path": item.get("path"),
+                "score": item.get("score"),
+                "reason": item.get("reason"),
+            }.items()
+            if value not in (None, [], "")
+        }
+        for item in items[:limit]
+        if isinstance(item, dict)
+    ]
+
+
 def _compact_patch_constraints(result: dict[str, Any]) -> dict[str, Any]:
     return {
         "task": result.get("task"),
@@ -413,6 +451,8 @@ def _compact_patch_constraints(result: dict[str, Any]) -> dict[str, Any]:
         "suggested_checks": result.get("suggested_checks") or [],
         "warnings": result.get("warnings") or [],
         "sources": result.get("sources") or [],
+        "source_evidence": _compact_patch_evidence(result.get("source_evidence") or []),
+        "symbol_candidates": _compact_symbol_candidates(result.get("symbol_candidates") or []),
         "token_estimate": result.get("token_estimate"),
         "confidence": result.get("confidence"),
     }
@@ -571,8 +611,8 @@ def handle_project_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
             question,
             project_path=args.get("project_path"),
             changed_files=args.get("changed_files"),
-            max_constraints=_bounded_int_arg(args, "max_constraints", default=12, max_value=_MCP_MAX_PATCH_CONSTRAINTS),
-            max_tokens=_bounded_int_arg(args, "max_tokens", default=1200, max_value=_MCP_MAX_PATCH_TOKENS),
+            max_constraints=_bounded_int_arg(args, "max_constraints", default=40, max_value=_MCP_MAX_PATCH_CONSTRAINTS),
+            max_tokens=_bounded_int_arg(args, "max_tokens", default=8000, max_value=_MCP_MAX_PATCH_TOKENS),
             include_sources=bool(args.get("include_sources") if args.get("include_sources") is not None else True),
         ))
         output_mode = _patch_constraints_output_mode(args)

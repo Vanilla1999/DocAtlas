@@ -5,6 +5,7 @@ from dataclasses import asdict, is_dataclass, replace
 from typing import Any
 
 from docmancer.docs.application.project_context_service import context_pack_snippet
+from docmancer.docs.domain.library_source_options import library_docs_source_options, source_required_diagnostics
 from docmancer.docs.domain.snippets import build_snippet_presentation, validate_response_style
 from docmancer.docs.exact_version import resolve_python_versioned_docs
 from docmancer.docs.models import DocsResult, ProjectContextResult, UnifiedDocsContextResult
@@ -516,7 +517,7 @@ class UnifiedDocsContextService:
         status = getattr(info, "status", "")
         if status == "needs_docs_url":
             candidates = list(getattr(info, "candidates", []) or [])
-            source_options = self._library_source_options(library, ecosystem, version, source_type, candidates)
+            source_options = library_docs_source_options(library, ecosystem, version, source_type, candidates)
             next_action = {
                 "type": "ask_user_for_library_docs_source",
                 "tool": None,
@@ -529,13 +530,62 @@ class UnifiedDocsContextService:
                 question=f"Which documentation source should be used for {library}?",
                 mode_requested="library",
                 mode_selected="library",
-                routing={"reason_code": "library_docs_source_required", "project_path_used": False, "libraries_requested": [library], "dependency_detected": False},
+                routing={"reason_code": "library_docs_source_required", "legacy_reason_code": "needs_docs_url", "project_path_used": False, "libraries_requested": [library], "dependency_detected": False},
                 reason_code="library_docs_source_required",
                 confirmation_reason="library_docs_source",
                 next_action=next_action,
                 arguments_patch={"library": library, "ecosystem": ecosystem, "version": version, "source_type": source_type},
                 lanes={**self._empty_lanes(), "library": {"status": "confirmation_required", "source_count": 0, "canonical_ids": [], "requires_confirmation": True, "next_action": next_action}},
-                warnings=[{"code": "library_docs_source_required", "blocking": True, "source_options": source_options}],
+                warnings=[source_required_diagnostics({"code": "library_docs_source_required", "blocking": True, "source_options": source_options})],
+            )
+        if status == "failed":
+            message = getattr(info, "message", None) or "Registered library documentation source is in failed state."
+            next_action = {
+                "type": "repair_library_docs_source",
+                "tool": "prepare_docs",
+                "arguments_patch": {
+                    "action": "refresh_library_docs",
+                    "library": library,
+                    "ecosystem": ecosystem,
+                    "version": version,
+                    "source_type": source_type,
+                    "force": True,
+                    "allow_network": True,
+                },
+            }
+            return self._confirmation_result(
+                question="",
+                mode_requested="library",
+                mode_selected="library",
+                routing={
+                    "reason_code": "library_docs_failed",
+                    "project_path_used": False,
+                    "libraries_requested": [library],
+                    "dependency_detected": False,
+                    "failed_status": status,
+                    "failed_message": message,
+                },
+                reason_code="library_docs_failed",
+                confirmation_reason="library_docs_repair",
+                next_action=next_action,
+                arguments_patch=next_action["arguments_patch"],
+                lanes={
+                    **self._empty_lanes(),
+                    "library": {
+                        "status": "failed",
+                        "source_count": 0,
+                        "canonical_ids": [getattr(info, "library_id", None)] if getattr(info, "library_id", None) else [],
+                        "requires_confirmation": True,
+                        "next_action": next_action,
+                    },
+                },
+                warnings=[{
+                    "code": "library_docs_failed",
+                    "blocking": True,
+                    "library": library,
+                    "canonical_id": getattr(info, "canonical_id", None) or getattr(info, "library_id", None),
+                    "message": message,
+                }],
             )
         if force_refresh or not getattr(info, "local", False) or getattr(info, "stale", False) or status in {"needs_refresh"}:
             return self._confirmation_result(
@@ -551,46 +601,6 @@ class UnifiedDocsContextService:
                 warnings=list(getattr(info, "candidates", []) or []),
             )
         return None
-
-    @staticmethod
-    def _library_source_options(library: str, ecosystem: str | None, version: str | None, source_type: str | None, candidates: list[dict[str, Any]]) -> list[dict[str, Any]]:
-        options = []
-        for candidate in candidates:
-            arguments_patch = {"library": library}
-            for key in ("ecosystem", "version", "source_type", "docs_url"):
-                value = candidate.get(key)
-                if value is not None:
-                    arguments_patch[key] = value
-            if version and "version" not in arguments_patch:
-                arguments_patch["version"] = version
-            if source_type and "source_type" not in arguments_patch:
-                arguments_patch["source_type"] = source_type
-            options.append({
-                "id": candidate.get("id") or candidate.get("name") or candidate.get("docs_url"),
-                "kind": "candidate_docs_source",
-                "label": candidate.get("name") or candidate.get("docs_url"),
-                "docs_url": candidate.get("docs_url"),
-                "confidence": candidate.get("confidence"),
-                "why": candidate.get("why"),
-                "arguments_patch": arguments_patch,
-            })
-        options.append({
-            "id": "manual_docs_url",
-            "kind": "manual_docs_url",
-            "label": "User-provided documentation URL",
-            "requires_user_input": True,
-            "arguments_patch": {"library": library, "ecosystem": ecosystem, "version": version, "source_type": source_type, "docs_url": "<docs_url>"},
-        })
-        options.append({
-            "id": "best_effort_web_discovery",
-            "kind": "best_effort_web_discovery",
-            "label": "Best-effort web/LLM-assisted discovery",
-            "requires_confirmation": True,
-            "quality_guarantee": False,
-            "warning": "Quality is not guaranteed; prefer an explicit docs_url when possible.",
-            "arguments_patch": {"library": library, "ecosystem": ecosystem, "version": version, "source_type": source_type, "allow_network": True},
-        })
-        return options
 
     def _get_library_docs_with_latest_fallback(
         self,

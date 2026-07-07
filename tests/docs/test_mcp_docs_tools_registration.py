@@ -6,7 +6,7 @@ from docmancer.docs.interfaces.mcp.context_tools import CONTEXT_TOOL_NAMES
 from docmancer.docs.interfaces.mcp.docs_tools import LIBRARY_TOOL_NAMES
 from docmancer.docs.interfaces.mcp.prefetch_tools import PREFETCH_TOOL_NAMES, _bounded_targets
 from docmancer.docs.interfaces.mcp.project_tools import PROJECT_TOOL_NAMES
-from docmancer.mcp.docs_server import CONTEXT_TOOLS, LIBRARY_TOOLS, MCP_RESOURCES, MCP_RESOURCE_TEMPLATES, PREFETCH_TOOLS, PROJECT_TOOLS, TOOLS, read_docs_resource
+from docmancer.mcp.docs_server import ALL_TOOLS, CONTEXT_TOOLS, LIBRARY_TOOLS, MCP_RESOURCES, MCP_RESOURCE_TEMPLATES, PREFETCH_TOOLS, PROJECT_TOOLS, TOOLS, read_docs_resource
 
 
 def test_mcp_grouped_tool_registration_preserves_tool_names():
@@ -15,9 +15,9 @@ def test_mcp_grouped_tool_registration_preserves_tool_names():
 
     assert grouped_names == all_names
     assert {tool["name"] for tool in CONTEXT_TOOLS} == CONTEXT_TOOL_NAMES
-    assert {tool["name"] for tool in LIBRARY_TOOLS} == LIBRARY_TOOL_NAMES
-    assert {tool["name"] for tool in PREFETCH_TOOLS} == PREFETCH_TOOL_NAMES
-    assert {tool["name"] for tool in PROJECT_TOOLS} == PROJECT_TOOL_NAMES
+    assert {tool["name"] for tool in LIBRARY_TOOLS}.issubset(LIBRARY_TOOL_NAMES)
+    assert {tool["name"] for tool in PREFETCH_TOOLS}.issubset(PREFETCH_TOOL_NAMES)
+    assert {tool["name"] for tool in PROJECT_TOOLS}.issubset(PROJECT_TOOL_NAMES)
 
 
 def test_mcp_grouped_tool_registration_keeps_original_order_within_groups():
@@ -27,12 +27,14 @@ def test_mcp_grouped_tool_registration_keeps_original_order_within_groups():
         assert [positions[tool["name"]] for tool in group] == sorted(positions[tool["name"]] for tool in group)
 
 
-def test_mcp_exposes_prefetch_library_docs():
-    assert "prefetch_library_docs" in {tool["name"] for tool in TOOLS}
+def test_mcp_public_surface_exposes_prepare_docs_instead_of_prefetch_library_docs():
+    names = {tool["name"] for tool in TOOLS}
+    assert "prepare_docs" in names
+    assert "prefetch_library_docs" not in names
 
 
 def test_mcp_get_library_docs_guides_retry_before_webfetch():
-    tool = next(tool for tool in TOOLS if tool["name"] == "get_library_docs")
+    tool = next(tool for tool in ALL_TOOLS if tool["name"] == "get_library_docs")
 
     assert "Registered sources do not require docs_url" in tool["description"]
     assert "call inspect_project_docs first" in tool["description"]
@@ -40,9 +42,9 @@ def test_mcp_get_library_docs_guides_retry_before_webfetch():
     assert "never WebFetch registered docs before that retry" in tool["description"]
 
 
-def test_mcp_exposes_prefetch_project_docs():
-    assert "prefetch_project_docs" in {tool["name"] for tool in TOOLS}
-    tool = next(tool for tool in TOOLS if tool["name"] == "prefetch_project_docs")
+def test_mcp_legacy_prefetch_project_docs_hidden_from_public_surface():
+    assert "prefetch_project_docs" not in {tool["name"] for tool in TOOLS}
+    tool = next(tool for tool in ALL_TOOLS if tool["name"] == "prefetch_project_docs")
     assert "async" in tool["inputSchema"]["properties"]
     assert "DEPRECATED" in tool["description"]
     assert "prefetch_project_dependency_docs" in tool["description"]
@@ -50,7 +52,8 @@ def test_mcp_exposes_prefetch_project_docs():
 
 
 def test_mcp_exposes_prefetch_project_dependency_docs_alias():
-    tool = next(tool for tool in TOOLS if tool["name"] == "prefetch_project_dependency_docs")
+    assert "prefetch_project_dependency_docs" not in {tool["name"] for tool in TOOLS}
+    tool = next(tool for tool in ALL_TOOLS if tool["name"] == "prefetch_project_dependency_docs")
 
     assert tool["inputSchema"]["required"] == ["project_path"]
     assert "DEPRECATED" not in tool["description"]
@@ -58,8 +61,9 @@ def test_mcp_exposes_prefetch_project_dependency_docs_alias():
     assert "May fetch from the network" in tool["description"]
 
 
-def test_mcp_exposes_prefetch_docs_targets():
-    assert "prefetch_docs_targets" in {tool["name"] for tool in TOOLS}
+def test_mcp_exposes_prefetch_docs_targets_through_prepare_docs():
+    assert "prepare_docs" in {tool["name"] for tool in TOOLS}
+    assert "prefetch_docs_targets" not in {tool["name"] for tool in TOOLS}
 
 
 def test_mcp_exposes_inspect_project_docs_with_discovery_first_guidance():
@@ -75,7 +79,8 @@ def test_mcp_exposes_inspect_project_docs_with_discovery_first_guidance():
 
 
 def test_mcp_exposes_ingest_project_docs():
-    tool = next(tool for tool in TOOLS if tool["name"] == "ingest_project_docs")
+    assert "ingest_project_docs" not in {tool["name"] for tool in TOOLS}
+    tool = next(tool for tool in ALL_TOOLS if tool["name"] == "ingest_project_docs")
 
     assert "Legacy low-level index operation" in tool["description"]
     assert "Prefer sync_project_docs" in tool["description"]
@@ -89,7 +94,8 @@ def test_mcp_exposes_ingest_project_docs():
 
 
 def test_mcp_exposes_sync_project_docs():
-    tool = next(tool for tool in TOOLS if tool["name"] == "sync_project_docs")
+    assert "sync_project_docs" not in {tool["name"] for tool in TOOLS}
+    tool = next(tool for tool in ALL_TOOLS if tool["name"] == "sync_project_docs")
 
     assert tool["inputSchema"]["required"] == ["project_path"]
     assert "Canonical lifecycle action" in tool["description"]
@@ -99,7 +105,8 @@ def test_mcp_exposes_sync_project_docs():
 
 
 def test_mcp_exposes_bootstrap_project_docs_with_safe_stops():
-    tool = next(tool for tool in TOOLS if tool["name"] == "bootstrap_project_docs")
+    assert "bootstrap_project_docs" not in {tool["name"] for tool in TOOLS}
+    tool = next(tool for tool in ALL_TOOLS if tool["name"] == "bootstrap_project_docs")
 
     assert tool["inputSchema"]["required"] == ["project_path"]
     assert "never writes repository files" in tool["description"]
@@ -109,7 +116,8 @@ def test_mcp_exposes_bootstrap_project_docs_with_safe_stops():
 
 
 def test_mcp_exposes_get_project_docs_with_project_scoped_guidance():
-    tool = next(tool for tool in TOOLS if tool["name"] == "get_project_docs")
+    assert "get_project_docs" not in {tool["name"] for tool in TOOLS}
+    tool = next(tool for tool in ALL_TOOLS if tool["name"] == "get_project_docs")
 
     assert "project-scoped filters" in tool["description"]
     assert "before WebFetch" in tool["description"]
@@ -121,7 +129,8 @@ def test_mcp_exposes_get_project_docs_with_project_scoped_guidance():
 
 
 def test_mcp_exposes_get_project_context_with_trust_contract():
-    tool = next(tool for tool in TOOLS if tool["name"] == "get_project_context")
+    assert "get_project_context" not in {tool["name"] for tool in TOOLS}
+    tool = next(tool for tool in ALL_TOOLS if tool["name"] == "get_project_context")
 
     assert "Trust Contract" in tool["description"]
     assert "selected, rejected, and risky sources" in tool["description"]
@@ -184,22 +193,25 @@ def test_mcp_docs_server_documents_index_and_smoke_test_loop():
 
 def test_mcp_exposes_docs_job_tools():
     names = {tool["name"] for tool in TOOLS}
-    assert "get_docs_job_status" in names
-    assert "list_docs_jobs" in names
-    assert "cancel_docs_job" in names
+    assert "docs_job" in names
+    assert "get_docs_job_status" not in names
+    assert "list_docs_jobs" not in names
+    assert "cancel_docs_job" not in names
 
 
 def test_mcp_exposes_manifest_tools():
     names = {tool["name"] for tool in TOOLS}
-    assert "validate_docs_manifest" in names
-    assert "prefetch_docs_manifest" in names
+    assert "prepare_docs" in names
+    assert "validate_docs_manifest" not in names
+    assert "prefetch_docs_manifest" not in names
 
 
 def test_mcp_exposes_lifecycle_tools():
     names = {tool["name"] for tool in TOOLS}
-    assert "inspect_library_docs" in names
-    assert "remove_library_docs" in names
-    assert "prune_library_docs" in names
+    assert "list_docs_sources" in names
+    assert "inspect_library_docs" not in names
+    assert "remove_library_docs" not in names
+    assert "prune_library_docs" not in names
 
 
 def test_mcp_exposes_discoverable_resources_and_templates():

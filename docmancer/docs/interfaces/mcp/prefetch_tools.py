@@ -9,6 +9,8 @@ from docmancer.docs.interfaces.mcp.project_tools import _bounded_int_arg
 
 
 PREFETCH_TOOL_NAMES = {
+    "prepare_docs",
+    "docs_job",
     "validate_docs_manifest",
     "prefetch_docs_manifest",
     "prefetch_docs_targets",
@@ -55,6 +57,47 @@ def prefetch_tools(tools: list[dict[str, Any]]) -> list[dict[str, Any]]:
 def handle_prefetch_tool(name: str, args: dict[str, Any], service: LibraryDocsService) -> dict[str, Any] | None:
     docs_manifest_app = getattr(service, "docs_manifest", service)
     docs_prefetch_app = getattr(service, "docs_prefetch", service)
+    library_docs_app = getattr(service, "library_docs", service)
+    project_docs_app = getattr(service, "project_docs", service)
+    dependency_docs_app = getattr(service, "dependency_docs", service)
+    if name == "prepare_docs":
+        action = str(args.get("action") or "").strip()
+        if not action:
+            return {"status": "error", "reason_code": "empty_action", "message": "action must not be empty"}
+        if action == "validate_docs_manifest":
+            payload = asdict(docs_manifest_app.validate_docs_manifest(args["manifest_path"], project_path=args.get("project_path"), targets=args.get("targets")))
+        elif action == "prefetch_docs_manifest":
+            payload = asdict(docs_manifest_app.prefetch_docs_manifest(args["manifest_path"], project_path=args.get("project_path"), targets=args.get("targets"), force_refresh=bool(args.get("force_refresh") or False), continue_on_error=bool(args.get("continue_on_error") if args.get("continue_on_error") is not None else True), async_=bool(args.get("async") or False)))
+        elif action == "prefetch_docs_targets":
+            payload = asdict(docs_prefetch_app.prefetch_docs_targets(_bounded_targets(args.get("targets")), force_refresh=bool(args.get("force_refresh") or False), continue_on_error=bool(args.get("continue_on_error") if args.get("continue_on_error") is not None else True), async_=bool(args.get("async") or False)))
+        elif action == "sync_project_docs":
+            payload = asdict(project_docs_app.sync_project_docs(args["project_path"], with_vectors=bool(args.get("with_vectors") if args.get("with_vectors") is not None else True)))
+        elif action == "prefetch_project_dependency_docs":
+            payload = asdict(dependency_docs_app.prefetch_project_dependency_docs(args["project_path"], include_flutter=bool(args.get("include_flutter") if args.get("include_flutter") is not None else True), include_dart=bool(args.get("include_dart") or False), include_rust=bool(args.get("include_rust") if args.get("include_rust") is not None else True), include_packages=args.get("include_packages") or [], force_refresh=bool(args.get("force_refresh") or False), continue_on_error=bool(args.get("continue_on_error") if args.get("continue_on_error") is not None else True), async_=bool(args.get("async") or False)))
+        elif action == "prefetch_library_docs":
+            payload = asdict(library_docs_app.prefetch_docs(args["library"], ecosystem=args.get("ecosystem"), versions=args.get("versions"), docs_url=args.get("docs_url"), docs_url_template=args.get("docs_url_template"), source_type=args.get("source_type"), force_refresh=bool(args.get("force_refresh") or False), continue_on_error=bool(args.get("continue_on_error") if args.get("continue_on_error") is not None else True), async_=bool(args.get("async") or False)))
+        elif action == "refresh_library_docs":
+            payload = asdict(library_docs_app.refresh_docs(args["library"], ecosystem=args.get("ecosystem"), version=args.get("version"), docs_url=args.get("docs_url"), versions=args.get("versions"), docs_url_template=args.get("docs_url_template"), source_type=args.get("source_type"), force=bool(args.get("force") if args.get("force") is not None else True)))
+        elif action == "remove_library_docs":
+            payload = asdict(library_docs_app.remove_library_docs(args["canonical_id"]))
+        elif action == "prune_library_docs":
+            payload = asdict(library_docs_app.prune_library_docs(library=args.get("library"), keep_versions=args.get("keep_versions") or [], older_than_days=int(args.get("older_than_days") or 90), dry_run=bool(args.get("dry_run") if args.get("dry_run") is not None else True)))
+        else:
+            return {"status": "error", "reason_code": "unknown_prepare_action", "message": f"unknown prepare_docs action: {action}", "supported_actions": ["sync_project_docs", "prefetch_project_dependency_docs", "prefetch_library_docs", "prefetch_docs_targets", "validate_docs_manifest", "prefetch_docs_manifest", "refresh_library_docs", "prune_library_docs", "remove_library_docs"]}
+        if isinstance(payload, dict):
+            payload.setdefault("action", action)
+            payload.setdefault("tool", "prepare_docs")
+        return payload
+    if name == "docs_job":
+        action = str(args.get("action") or "").strip()
+        if action == "status":
+            job = service.get_docs_job_status(args["job_id"])
+            return {"tool": "docs_job", "action": action, "job_id": args["job_id"], "status": "not_found"} if job is None else {"tool": "docs_job", "action": action, **asdict(job)}
+        if action == "list":
+            return {"tool": "docs_job", "action": action, "jobs": [{"job_id": job.job_id, "kind": job.kind, "status": job.status, "phase": job.phase, "message": job.message, "started_at": job.started_at, "updated_at": job.updated_at} for job in service.list_docs_jobs(status=args.get("status"), limit=_bounded_int_arg(args, "limit", default=None, max_value=200))]}
+        if action == "cancel":
+            return {"tool": "docs_job", "action": action, **asdict(service.cancel_docs_job(args["job_id"]))}
+        return {"status": "error", "reason_code": "unknown_docs_job_action", "message": f"unknown docs_job action: {action}", "supported_actions": ["list", "status", "cancel"]}
     if name == "validate_docs_manifest":
         return asdict(docs_manifest_app.validate_docs_manifest(args["manifest_path"], project_path=args.get("project_path"), targets=args.get("targets")))
     if name == "prefetch_docs_manifest":

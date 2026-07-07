@@ -18,6 +18,7 @@ from docmancer.docs.discovery_candidates import discovery_candidates_for
 from docmancer.docs.domain.policies import docs_policy, is_stale
 from docmancer.docs.domain.project_state import create_project_docs_next_action, has_high_level_project_overview, partition_project_doc_state, project_docs_structured_next_action
 from docmancer.docs.domain.quality import is_trivial_section
+from docmancer.docs.domain.library_source_options import library_docs_source_next_actions, library_docs_source_options, source_required_diagnostics
 from docmancer.docs.domain.source_identity import docs_exactness, docs_identity, docs_request
 from docmancer.docs.domain.snippets import build_snippet_presentation, validate_response_style
 from docmancer.docs.domain.target_security import host_allowed, is_remote_url, path_allowed, url_security_error
@@ -842,7 +843,7 @@ class LibraryDocsApplicationService:
             warning = self._join_warnings("library_docs_source_required", extra=project_warnings)
             warnings = [warning] if warning else []
             candidates = info.candidates
-            source_options = _library_docs_source_options(library, ecosystem, version, source_type, candidates)
+            source_options = library_docs_source_options(library, ecosystem, version, source_type, candidates)
             arguments_patch = dict(candidates[0].get("arguments_patch") or {}) if candidates else {}
             if candidates and candidates[0].get("docs_url"):
                 arguments_patch.setdefault("docs_url", candidates[0]["docs_url"])
@@ -850,7 +851,7 @@ class LibraryDocsApplicationService:
                 arguments_patch.setdefault("source_type", candidates[0]["source_type"])
             if candidates and candidates[0].get("ecosystem"):
                 arguments_patch.setdefault("ecosystem", candidates[0]["ecosystem"])
-            next_actions_list = _library_docs_source_next_actions(library, ecosystem, version, source_type, candidates, source_options)
+            next_actions_list = library_docs_source_next_actions(library, ecosystem, version, source_type, candidates, source_options)
             return DocsResult(
                 library_id="",
                 library=library,
@@ -878,14 +879,14 @@ class LibraryDocsApplicationService:
                 request=self._docs_request(input_args),
                 identity=self._docs_identity(info),
                 policy=self._docs_policy("needs_input", has_registered_source=resolution.has_registered_source),
-                diagnostics={
+                diagnostics=source_required_diagnostics({
                     **resolution.diagnostics,
                     "warnings": [{"code": "library_docs_source_required", "blocking": True}],
                     "question": f"Which documentation source should be used for {library}?",
                     "source_options": source_options,
                     "discovery_candidates": candidates,
                     "quality_warning": "Best-effort web discovery may choose an incomplete or unofficial documentation source; prefer an explicit docs_url.",
-                },
+                }),
                 next_actions=next_actions_list,
                 candidates=candidates,
                 discovery_candidates=candidates,
@@ -1444,77 +1445,6 @@ def _postprocess_library_chunks(chunks: list[Any], query: str) -> tuple[list[Any
         "chunks_dropped_for_diversity": dropped_for_diversity,
         "unique_sources@5": len({chunk.source for chunk in selected[:5]}),
     }
-
-
-
-def _library_docs_source_options(library: str, ecosystem: str | None, version: str | None, source_type: str | None, candidates: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    options: list[dict[str, Any]] = []
-    for candidate in candidates:
-        arguments_patch: dict[str, Any] = {"library": library}
-        for key in ("ecosystem", "version", "source_type", "docs_url"):
-            value = candidate.get(key)
-            if value is not None:
-                arguments_patch[key] = value
-        if version and "version" not in arguments_patch:
-            arguments_patch["version"] = version
-        if source_type and "source_type" not in arguments_patch:
-            arguments_patch["source_type"] = source_type
-        options.append({
-            "id": candidate.get("id") or candidate.get("name") or candidate.get("docs_url"),
-            "kind": "candidate_docs_source",
-            "label": candidate.get("name") or candidate.get("docs_url"),
-            "docs_url": candidate.get("docs_url"),
-            "confidence": candidate.get("confidence"),
-            "why": candidate.get("why"),
-            "arguments_patch": arguments_patch,
-        })
-
-    options.append({
-        "id": "manual_docs_url",
-        "kind": "manual_docs_url",
-        "label": "User-provided documentation URL",
-        "requires_user_input": True,
-        "arguments_patch": {"library": library, "ecosystem": ecosystem, "version": version, "source_type": source_type, "docs_url": "<docs_url>"},
-    })
-    options.append({
-        "id": "best_effort_web_discovery",
-        "kind": "best_effort_web_discovery",
-        "label": "Best-effort web/LLM-assisted discovery",
-        "requires_confirmation": True,
-        "quality_guarantee": False,
-        "warning": "Quality is not guaranteed; source may be incomplete, unofficial, stale, or less relevant than an explicit docs_url.",
-        "arguments_patch": {"library": library, "ecosystem": ecosystem, "version": version, "source_type": source_type, "allow_network": True},
-    })
-    return options
-
-
-def _library_docs_source_next_actions(library: str, ecosystem: str | None, version: str | None, source_type: str | None, candidates: list[dict[str, Any]], source_options: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    actions: list[dict[str, Any]] = [{
-        "type": "ask_user_for_library_docs_source",
-        "tool": None,
-        "requires_confirmation": True,
-        "question": f"Which documentation source should be used for {library}?",
-        "options": source_options,
-        "quality_warning": "If the user does not know, best-effort web discovery can be used, but quality is not guaranteed.",
-    }]
-    if candidates:
-        patch = dict(source_options[0].get("arguments_patch") or {})
-        patch.pop("library", None)
-        actions.append({
-            "type": "get_library_docs",
-            "tool": "get_library_docs",
-            "requires_confirmation": True,
-            "reason": "Use the first discovered candidate only after user confirmation.",
-            "arguments_patch": patch,
-        })
-    actions.append({
-        "type": "best_effort_web_discovery",
-        "tool": "get_docs_context",
-        "requires_confirmation": True,
-        "reason": "Use only when the user does not know the documentation source; quality is not guaranteed.",
-        "arguments_patch": {"library": library, "ecosystem": ecosystem, "version": version, "source_type": source_type, "allow_network": True},
-    })
-    return actions
 
 def _age_days(last_refreshed_at: str | None) -> int | None:
     if not last_refreshed_at:

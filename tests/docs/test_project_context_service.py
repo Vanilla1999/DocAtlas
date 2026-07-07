@@ -287,6 +287,10 @@ def test_architecture_query_injects_root_architecture_when_retrieval_misses_it(t
     result = ProjectContextService(facade).get_project_context(str(tmp_path), "архитектура", mode="project-only")
 
     assert result.context_pack[0]["path"] == "ARCHITECTURE.md"
+    assert result.project_docs is not None
+    injected = next(chunk for chunk in result.project_docs.results if chunk.path == "ARCHITECTURE.md")
+    assert injected.source_class == "project_file"
+    assert injected.metadata["injection_policy"] == "root_reviewable_project_doc_after_preflight"
 
 
 def test_story_specific_project_context_with_only_docs_matched_terms_requires_source_search():

@@ -1978,6 +1978,8 @@ def test_get_docs_unknown_without_url_asks_for_library_docs_source(tmp_path, mon
     assert result.status == "needs_input"
     assert result.decision == "retry_same_tool"
     assert result.reason_code == "library_docs_source_required"
+    assert result.diagnostics["legacy_reason_code"] == "needs_docs_url"
+    assert "needs_docs_url" in result.diagnostics["reason_aliases"]
     assert result.requires_confirmation is True
     assert result.message
     assert result.next_actions[0]["type"] == "ask_user_for_library_docs_source"
@@ -1996,6 +1998,7 @@ def test_get_docs_source_required_returns_retry_contract_with_discovery_candidat
 
     assert result.status == "needs_input"
     assert result.reason_code == "library_docs_source_required"
+    assert result.diagnostics["legacy_reason_code"] == "needs_docs_url"
     assert result.arguments_patch == {
         "docs_url": "https://github.com/modelcontextprotocol/python-sdk",
         "ecosystem": "python",

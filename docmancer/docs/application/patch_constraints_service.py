@@ -1375,7 +1375,12 @@ class PatchConstraintsService:
         if any(c.type == "verification" for c in constraints):
             actions.append({"type": "run_tests", "description": "Run the relevant project tests/checks and report real output."})
         if truncated:
-            actions.append({"type": "rerun_with_larger_budget", "description": "Contract was budget-truncated; rerun with larger max_tokens/max_constraints if lower-priority guidance is needed."})
+            actions.append({
+                "type": "rerun_with_larger_budget",
+                "tool": "get_patch_constraints",
+                "description": "Contract was budget-truncated; rerun with the maximum MCP budget and pass changed_files when known to make the contract more task-specific.",
+                "arguments_patch": {"max_tokens": 8000, "max_constraints": 40, "changed_files": ["path/to/changed_file"]},
+            })
         return actions
 
     @staticmethod

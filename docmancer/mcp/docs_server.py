@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import os
 from typing import Any, cast
 
 from docmancer.docs.interfaces.mcp.error_contract import build_mcp_error_payload, debug_errors_enabled
@@ -48,6 +49,67 @@ TOOLS: list[dict[str, Any]] = [
                 "details": {"type": ["boolean", "null"]},
             },
             "required": ["question"],
+        },
+    },
+    {
+        "name": "prepare_docs",
+        "description": "Unified confirmation-first lifecycle/admin tool for docs preparation: sync project docs, prefetch dependency/library/manifest/target docs, refresh, prune, or remove registered docs sources. Prefer this over separate ingest/sync/prefetch/refresh/prune/remove tools.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "action": {"type": "string", "enum": ["sync_project_docs", "prefetch_project_dependency_docs", "prefetch_library_docs", "prefetch_docs_targets", "validate_docs_manifest", "prefetch_docs_manifest", "refresh_library_docs", "prune_library_docs", "remove_library_docs"]},
+                "project_path": {"type": ["string", "null"]},
+                "library": {"type": ["string", "null"]},
+                "canonical_id": {"type": ["string", "null"]},
+                "manifest_path": {"type": ["string", "null"]},
+                "targets": {"type": ["array", "null"]},
+                "ecosystem": {"type": ["string", "null"]},
+                "version": {"type": ["string", "null"]},
+                "versions": {"type": ["array", "null"], "items": {"type": "string"}},
+                "source_type": {"type": ["string", "null"]},
+                "docs_url": {"type": ["string", "null"]},
+                "docs_url_template": {"type": ["string", "null"]},
+                "include_flutter": {"type": ["boolean", "null"]},
+                "include_dart": {"type": ["boolean", "null"]},
+                "include_rust": {"type": ["boolean", "null"]},
+                "include_packages": {"type": ["array", "null"], "items": {"type": "string"}},
+                "with_vectors": {"type": ["boolean", "null"]},
+                "force_refresh": {"type": ["boolean", "null"]},
+                "force": {"type": ["boolean", "null"]},
+                "continue_on_error": {"type": ["boolean", "null"]},
+                "async": {"type": ["boolean", "null"]},
+                "keep_versions": {"type": ["array", "null"], "items": {"type": "string"}},
+                "older_than_days": {"type": ["integer", "null"]},
+                "dry_run": {"type": ["boolean", "null"], "default": True},
+            },
+            "required": ["action"],
+        },
+    },
+    {
+        "name": "docs_job",
+        "description": "Unified async docs job manager. Use action='list', 'status', or 'cancel' for jobs started by prepare_docs(..., async=true).",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "action": {"type": "string", "enum": ["list", "status", "cancel"]},
+                "job_id": {"type": ["string", "null"]},
+                "status": {"type": ["string", "null"]},
+                "limit": {"type": ["integer", "null"], "minimum": 1, "maximum": 200},
+            },
+            "required": ["action"],
+        },
+    },
+    {
+        "name": "list_docs_sources",
+        "description": "Admin/debug source-health view for locally registered docs sources. Normal answer flows should use get_docs_context; use this for failed/stale library-doc diagnostics.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "kind": {"type": ["string", "null"], "enum": ["library", "all", None], "default": "library"},
+                "canonical_id": {"type": ["string", "null"]},
+                "stale_only": {"type": ["boolean", "null"]},
+                "limit": {"type": ["integer", "null"], "minimum": 1, "maximum": 200},
+            },
         },
     },
     {
@@ -444,6 +506,50 @@ Does not use deleted, orphaned, or stale project-doc content by default.""",
         },
     },
 ]
+
+LEGACY_TOOL_NAMES = {
+    "resolve_library_id",
+    "get_library_docs",
+    "refresh_library_docs",
+    "prefetch_library_docs",
+    "validate_docs_manifest",
+    "prefetch_docs_manifest",
+    "prefetch_docs_targets",
+    "ingest_project_docs",
+    "sync_project_docs",
+    "bootstrap_project_docs",
+    "get_project_docs",
+    "get_project_context",
+    "get_docs_job_status",
+    "list_docs_jobs",
+    "cancel_docs_job",
+    "prefetch_project_docs",
+    "prefetch_project_dependency_docs",
+}
+ADMIN_TOOL_NAMES = {
+    "inspect_library_docs",
+    "remove_library_docs",
+    "prune_library_docs",
+    "list_library_docs",
+}
+
+
+def _enabled_tools(all_tools: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    show_legacy = os.environ.get("DOCMANCER_MCP_LEGACY_TOOLS") == "1"
+    show_admin = os.environ.get("DOCMANCER_MCP_ADMIN_TOOLS") == "1"
+    enabled: list[dict[str, Any]] = []
+    for tool in all_tools:
+        name = str(tool.get("name") or "")
+        if name in LEGACY_TOOL_NAMES and not show_legacy:
+            continue
+        if name in ADMIN_TOOL_NAMES and not show_admin:
+            continue
+        enabled.append(tool)
+    return enabled
+
+
+ALL_TOOLS = TOOLS
+TOOLS = _enabled_tools(ALL_TOOLS)
 
 CONTEXT_TOOLS = context_tools(TOOLS)
 LIBRARY_TOOLS = library_tools(TOOLS)

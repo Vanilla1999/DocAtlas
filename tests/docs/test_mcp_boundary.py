@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass, field
+from dataclasses import dataclass, field
 from typing import Any, cast
 
 from docmancer.docs.interfaces.mcp.context_tools import handle_context_tool
@@ -8,7 +8,7 @@ from docmancer.docs.interfaces.mcp.docs_tools import handle_library_tool
 from docmancer.docs.interfaces.mcp.project_tools import handle_project_tool
 from docmancer.docs.models import LibraryInfo
 from docmancer.docs.service import LibraryDocsService
-from docmancer.mcp.docs_server import TOOLS
+from docmancer.mcp.docs_server import ALL_TOOLS
 
 
 @dataclass
@@ -192,7 +192,7 @@ def test_get_docs_context_rejects_whitespace_question_with_hint() -> None:
 
 
 def test_mcp_schemas_expose_hard_bounds_and_library_name_alias() -> None:
-    tools = {tool["name"]: tool["inputSchema"] for tool in TOOLS}
+    tools = {tool["name"]: tool["inputSchema"] for tool in ALL_TOOLS}
 
     resolve_schema = tools["resolve_library_id"]
     assert "libraryName" in resolve_schema["properties"]

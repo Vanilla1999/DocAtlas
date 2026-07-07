@@ -19,6 +19,7 @@ class FakeFacade:
         self.library_local = True
         self.library_stale = False
         self.library_status = "available"
+        self.library_message = None
         self.latest_library_local = True
         self.dependency_missing = False
         self.project_context = ProjectContextResult(
@@ -76,6 +77,7 @@ class FakeFacade:
             local=local,
             stale=self.library_stale,
             last_refreshed_at="now" if local else None,
+            message=self.library_message,
         )
 
     def get_docs(self, library, **kwargs):
@@ -208,12 +210,37 @@ def test_missing_library_source_asks_user_for_docs_source():
 
     assert result.status == "confirmation_required"
     assert result.reason_code == "library_docs_source_required"
+    assert result.routing["legacy_reason_code"] == "needs_docs_url"
+    assert result.warnings[0]["legacy_reason_code"] == "needs_docs_url"
     assert result.confirmation_reason == "library_docs_source"
     assert result.next_action["type"] == "ask_user_for_library_docs_source"
     option_ids = [option["id"] for option in result.next_action["options"]]
     assert "manual_docs_url" in option_ids
     assert "best_effort_web_discovery" in option_ids
     assert result.next_action["quality_warning"]
+
+
+def test_failed_library_source_is_not_reported_as_network_fetch_required():
+    facade = FakeFacade()
+    facade.library_status = "failed"
+    facade.library_local = False
+    facade.library_stale = True
+    facade.library_message = "Extraction failed for 160 page(s)."
+
+    result = _service(facade).get_docs_context(
+        "Flutter attachment APIs",
+        library="flutter-api",
+        ecosystem="flutter",
+        version="stable",
+    )
+
+    assert result.status == "confirmation_required"
+    assert result.reason_code == "library_docs_failed"
+    assert result.confirmation_reason == "library_docs_repair"
+    assert result.routing["failed_message"] == "Extraction failed for 160 page(s)."
+    assert result.next_action["tool"] == "prepare_docs"
+    assert result.next_action["arguments_patch"]["action"] == "refresh_library_docs"
+    assert result.warnings[0]["code"] == "library_docs_failed"
 
 
 def test_allow_network_delegates_to_library_refresh():

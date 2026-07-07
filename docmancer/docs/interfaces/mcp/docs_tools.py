@@ -8,6 +8,7 @@ from docmancer.docs.service import LibraryDocsService
 
 
 LIBRARY_TOOL_NAMES = {
+    "list_docs_sources",
     "resolve_library_id",
     "get_library_docs",
     "refresh_library_docs",
@@ -80,4 +81,21 @@ def handle_library_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
         return asdict(app.prune_library_docs(library=args.get("library"), keep_versions=args.get("keep_versions") or [], older_than_days=int(args.get("older_than_days") or 90), dry_run=bool(args.get("dry_run") if args.get("dry_run") is not None else True)))
     if name == "list_library_docs":
         return {"libraries": [asdict(item) for item in app.list_libraries(stale_only=bool(args.get("stale_only") or False), limit=_bounded_int_arg(args, "limit", default=None, max_value=_MCP_MAX_LIST_LIMIT))]}
+    if name == "list_docs_sources":
+        kind = str(args.get("kind") or "library").strip()
+        if kind not in {"library", "all"}:
+            return {"status": "error", "reason_code": "unsupported_source_kind", "message": "list_docs_sources currently supports kind='library' or kind='all'"}
+        payload: dict[str, Any] = {"tool": "list_docs_sources", "kind": kind}
+        canonical_id = _clean_string(args.get("canonical_id"))
+        if canonical_id:
+            payload["library_source"] = asdict(app.inspect_library_docs(canonical_id))
+        else:
+            payload["libraries"] = [
+                asdict(item)
+                for item in app.list_libraries(
+                    stale_only=bool(args.get("stale_only") or False),
+                    limit=_bounded_int_arg(args, "limit", default=None, max_value=_MCP_MAX_LIST_LIMIT),
+                )
+            ]
+        return payload
     return None

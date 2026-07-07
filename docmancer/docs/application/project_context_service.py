@@ -17,7 +17,7 @@ from docmancer.docs.domain.quality import has_code_symbol_evidence, internal_noi
 from docmancer.docs.domain.snippets import best_context_pack_snippet, build_snippet_presentation, validate_response_style
 from docmancer.docs.domain.source_map import build_project_repo_map, build_project_source_evidence, source_evidence_diagnostics, source_map_diagnostics
 from docmancer.docs.domain.trust_contract import build_project_context_trust_contract
-from docmancer.docs.models import DocsChunk, DocsResult, ProjectContextResult, ProjectDocsChunk, ProjectDocsResult, ProjectMetadata
+from docmancer.docs.models import SOURCE_CLASS_PROJECT_FILE, DocsChunk, DocsResult, ProjectContextResult, ProjectDocsChunk, ProjectDocsResult, ProjectMetadata
 
 LOW_TRUST_PROJECT_RISK_FLAGS = frozenset({
     "research_artifact",
@@ -526,8 +526,10 @@ def _inject_broad_architecture_docs(project_docs: ProjectDocsResult, *, root: Pa
             content=text[:12_000],
             source=str(path),
             url=None,
-            metadata={"score": 1.0, "injected_for": "broad_architecture_query"},
+            metadata={"score": 1.0, "injected_for": "broad_architecture_query", "injection_policy": "root_reviewable_project_doc_after_preflight"},
+            source_class=SOURCE_CLASS_PROJECT_FILE,
             path=rel,
+            doc_scope="project",
         ))
     if not injected:
         return project_docs

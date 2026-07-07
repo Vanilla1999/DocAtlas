@@ -77,9 +77,12 @@ class ProjectMetadataReader:
             return ProjectMetadata(project_path=str(root), warnings=[f"Project path not found: {root}"])
         if not root.is_dir():
             return ProjectMetadata(project_path=str(root), warnings=[f"Project path is not a directory: {root}"])
-        flutter_version, flutter_channel = self._read_fvmrc(root / ".fvmrc", warnings)
-        packages, pub_observations = self._read_pubspec_lock(root / "pubspec.lock", warnings)
-        direct_dependencies, pub_manifest_observations = self._read_pubspec_yaml(root / "pubspec.yaml", warnings)
+        fvmrc_path = root / ".fvmrc"
+        pubspec_lock_path = root / "pubspec.lock"
+        pubspec_yaml_path = root / "pubspec.yaml"
+        flutter_version, flutter_channel = self._read_fvmrc(fvmrc_path, warnings) if fvmrc_path.exists() else (None, None)
+        packages, pub_observations = self._read_pubspec_lock(pubspec_lock_path, warnings) if pubspec_lock_path.exists() else ({}, [])
+        direct_dependencies, pub_manifest_observations = self._read_pubspec_yaml(pubspec_yaml_path, warnings) if pubspec_yaml_path.exists() else ([], [])
         cargo_packages, rust_observations = self._read_cargo(root, warnings)
         docs_candidates = self.discover_docs(root, warnings)
         all_packages = {**packages, **cargo_packages}
