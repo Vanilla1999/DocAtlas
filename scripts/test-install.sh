@@ -165,6 +165,38 @@ assert srv == {"type": "local", "command": ["doc-atlas", "mcp", "docs-serve"], "
 PY
 pass "agent 'opencode' (via env): JSON config merged"
 
+# opencode with a custom OPENCODE_CONFIG path -> writes there, not the default
+H="$(mktemp -d)"; CUSTOM="$H/custom/oc.json"
+env -i HOME="$H" PATH="$BIN:/usr/bin:/bin" OPENCODE_CONFIG="$CUSTOM" \
+    sh "$INSTALL_SH" opencode >/dev/null 2>&1 || fail "opencode OPENCODE_CONFIG run failed"
+[ -f "$CUSTOM" ] || fail "opencode: OPENCODE_CONFIG path not honored"
+[ -f "$H/.config/opencode/opencode.json" ] && fail "opencode: wrote default path despite OPENCODE_CONFIG"
+pass "agent 'opencode': OPENCODE_CONFIG custom path honored"
+
+# opencode with an existing JSONC config (comments + trailing comma) -> merged,
+# existing keys preserved, comments dropped on rewrite
+H="$(mktemp -d)"; JC="$H/oc.jsonc"
+cat >"$JC" <<'JSONC'
+{
+  // user theme
+  "theme": "dark",
+  "mcp": {
+    "other": { "type": "local", "command": ["x"], "enabled": true },
+  },
+}
+JSONC
+env -i HOME="$H" PATH="$BIN:/usr/bin:/bin" OPENCODE_CONFIG="$JC" \
+    sh "$INSTALL_SH" opencode >/dev/null 2>&1 || fail "opencode JSONC run failed"
+python3 - "$JC" <<'PY' || fail "opencode: JSONC merge/preservation mismatch"
+import json, sys
+d = json.load(open(sys.argv[1]))
+assert d["theme"] == "dark", d
+assert d["mcp"]["other"] == {"type": "local", "command": ["x"], "enabled": True}, d
+assert d["mcp"]["docatlas-docs"] == {"type": "local", "command": ["doc-atlas", "mcp", "docs-serve"], "enabled": True}, d
+PY
+[ -f "$JC.bak" ] || fail "opencode: JSONC rewrite did not keep a .bak"
+pass "agent 'opencode': JSONC parsed, existing keys preserved, .bak kept"
+
 # unknown explicit agent (positional) -> hard failure
 if run_install codx 2>/dev/null; then
   fail "unknown positional agent 'codx' should fail, but exited 0"

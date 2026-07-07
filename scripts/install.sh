@@ -197,25 +197,78 @@ register_codex() {
 }
 
 register_opencode() {
-  cfg="$HOME/.config/opencode/opencode.json"
+  # Honor OpenCode's config overrides; fall back to the XDG default.
+  if [ -n "${OPENCODE_CONFIG:-}" ]; then
+    cfg="$OPENCODE_CONFIG"
+  elif [ -n "${OPENCODE_CONFIG_DIR:-}" ]; then
+    cfg="$OPENCODE_CONFIG_DIR/opencode.json"
+  elif [ -n "${XDG_CONFIG_HOME:-}" ]; then
+    cfg="$XDG_CONFIG_HOME/opencode/opencode.json"
+  else
+    cfg="$HOME/.config/opencode/opencode.json"
+  fi
   mkdir -p "$(dirname "$cfg")"
   PY="$(pick_python)"
   if OPENCODE_CFG="$cfg" SERVER_NAME="$SERVER_NAME" $PY - <<'PY'
-import json, os, shutil, sys
+import json, os, re, shutil, sys
 
 path = os.environ["OPENCODE_CFG"]
 name = os.environ["SERVER_NAME"]
+
+
+def strip_jsonc(src):
+    """Drop // and /* */ comments and trailing commas, ignoring string bodies.
+
+    OpenCode accepts JSONC; stdlib json does not. This is a best-effort
+    tolerant parse so an existing commented config is not clobbered.
+    """
+    out = []
+    i, n = 0, len(src)
+    in_str = False
+    while i < n:
+        c = src[i]
+        if in_str:
+            out.append(c)
+            if c == "\\" and i + 1 < n:
+                out.append(src[i + 1]); i += 2; continue
+            if c == '"':
+                in_str = False
+            i += 1; continue
+        if c == '"':
+            in_str = True; out.append(c); i += 1; continue
+        if c == "/" and i + 1 < n and src[i + 1] == "/":
+            i += 2
+            while i < n and src[i] not in "\r\n":
+                i += 1
+            continue
+        if c == "/" and i + 1 < n and src[i + 1] == "*":
+            i += 2
+            while i + 1 < n and not (src[i] == "*" and src[i + 1] == "/"):
+                i += 1
+            i += 2; continue
+        out.append(c); i += 1
+    # Remove trailing commas before } or ].
+    return re.sub(r",(\s*[}\]])", r"\1", "".join(out))
+
 
 data = {}
 if os.path.exists(path):
     with open(path, encoding="utf-8") as fh:
         text = fh.read().strip()
+    was_jsonc = False
     if text:
         try:
             data = json.loads(text)
-        except json.JSONDecodeError as exc:
-            print(f"opencode config is not valid JSON: {exc}", file=sys.stderr)
-            sys.exit(2)
+        except json.JSONDecodeError:
+            try:
+                data = json.loads(strip_jsonc(text))
+                was_jsonc = True
+            except json.JSONDecodeError as exc:
+                print(f"opencode config is not valid JSON/JSONC: {exc}", file=sys.stderr)
+                sys.exit(2)
+    if was_jsonc:
+        print("note: opencode config uses JSONC; comments will be dropped on "
+              "rewrite (a .bak backup is kept)", file=sys.stderr)
     if not isinstance(data, dict):
         print("opencode config must be a JSON object", file=sys.stderr)
         sys.exit(2)

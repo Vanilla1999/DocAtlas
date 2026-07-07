@@ -44,7 +44,9 @@ curl -LsSf https://raw.githubusercontent.com/Vanilla1999/DocAtlas/main/scripts/i
 curl -LsSf https://raw.githubusercontent.com/Vanilla1999/DocAtlas/main/scripts/install.sh | DOCATLAS_AGENT="claude-code codex opencode" sh
 ```
 
-Accepted values: `claude-code`, `opencode`, `codex`, `all`, `none`. macOS and Linux only. Prefer the manual steps below on Windows.
+Accepted values: `claude-code`, `opencode`, `codex`, `all`, `none`. An unknown value passed via args or `DOCATLAS_AGENT` is a hard error. macOS and Linux only. Prefer the manual steps below on Windows.
+
+For OpenCode, the installer honors `OPENCODE_CONFIG` (full path) and `OPENCODE_CONFIG_DIR`, falling back to `$XDG_CONFIG_HOME/opencode/opencode.json`. Existing JSONC configs (comments / trailing commas) are parsed; a `.bak` backup is kept on rewrite.
 
 ## Naming and compatibility
 
