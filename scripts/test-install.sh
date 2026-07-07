@@ -29,7 +29,7 @@ for cp in list(range(0x200E, 0x2010)) + list(range(0x202A, 0x2030)) + \
 bad = []
 for pat in ("*.sh", "*.md", "*.toml", "*.py"):
     for f in root.rglob(pat):
-        if ".git" in f.parts:
+        if any(part in {".git", ".venv", "venv", "build", "dist", "node_modules"} for part in f.parts):
             continue
         try:
             text = f.read_text(encoding="utf-8")
