@@ -15,7 +15,6 @@ from __future__ import annotations
 
 import json
 import os
-import shlex
 import shutil
 import subprocess
 import sys
@@ -27,15 +26,58 @@ from docmancer.mcp.executors.base import Executor, ExecutorResult
 DEFAULT_TIMEOUT_SECONDS = 30
 
 
-def detect_python(start: Path | None = None) -> str:
-    """Walk up from cwd looking for `.venv` then `venv`. Fall back to system python."""
+def detect_python(start: Path | None = None, *, use_project_venv: bool = False) -> str:
+    """Resolve the Python runtime.
+
+    Project venv discovery is opt-in because executing pack code inside the
+    caller project's environment expands the trust boundary to that project.
+    """
     here = (start or Path.cwd()).resolve()
-    for parent in [here, *here.parents]:
-        for candidate in (".venv", "venv"):
-            python = parent / candidate / "bin" / "python"
-            if python.exists():
-                return str(python)
+    if use_project_venv:
+        for parent in [here, *here.parents]:
+            for candidate in (".venv", "venv"):
+                python = parent / candidate / "bin" / "python"
+                if python.exists():
+                    return str(python)
     return shutil.which("python") or shutil.which("python3") or sys.executable
+
+
+def validate_python_import(meta: dict[str, Any], grant: dict[str, Any]) -> str | None:
+    module = meta.get("module")
+    callable_name = meta.get("callable")
+    if not module or not callable_name:
+        return "missing_python_import_target"
+    if not module_matches(str(module), tuple(grant.get("allowed_modules") or ())):
+        return "module_not_allowed"
+    if "__" in str(callable_name):
+        return "dunder_callable_blocked"
+    return None
+
+
+def module_matches(module: str, allowed_modules: tuple[str, ...]) -> bool:
+    for allowed in allowed_modules:
+        allowed = str(allowed).strip()
+        if not allowed:
+            continue
+        if module == allowed or module.startswith(allowed + "."):
+            return True
+    return False
+
+
+def safe_path() -> str:
+    return os.pathsep.join(part for part in ("/usr/local/bin", "/usr/bin", "/bin") if Path(part).exists())
+
+
+def minimal_env(grant: dict[str, Any]) -> dict[str, str]:
+    env = {
+        "PATH": safe_path(),
+        "PYTHONNOUSERSITE": "1",
+        "PYTHONUNBUFFERED": "1",
+    }
+    for name in grant.get("allowed_env") or ():
+        if name in os.environ:
+            env[str(name)] = os.environ[str(name)]
+    return env
 
 
 _RUNNER = """
@@ -85,21 +127,18 @@ class PythonImportExecutor(Executor):
         auth_cookies: dict[str, str] | None = None,
     ) -> ExecutorResult:
         meta = operation.get("python_import") or {}
-        if not meta.get("module") or not meta.get("callable"):
-            return ExecutorResult(
-                False, "config_error", None,
-                error="operation missing python_import.module or .callable",
-            )
-        python = self._python or detect_python()
+        grant = operation.get("_docmancer_operation_grant") or {}
+        validation_error = validate_python_import(meta, grant)
+        if validation_error:
+            return ExecutorResult(False, validation_error, None, error=validation_error)
+        python = self._python or detect_python(use_project_venv=bool(grant.get("use_project_venv")))
         payload = json.dumps({
             "module": meta["module"],
             "callable": meta["callable"],
             "via_kwargs": meta.get("via_kwargs", True),
             "args": {k: v for k, v in args.items() if not k.startswith("_docmancer")},
         })
-        env = os.environ.copy()
-        env.update(required_headers or {})
-        # auth_headers are HTTP-shaped; the runner can pull them from os.environ if it needs.
+        env = minimal_env(grant)
         try:
             proc = subprocess.run(
                 [python, "-c", _RUNNER],
@@ -124,7 +163,3 @@ class PythonImportExecutor(Executor):
                 error=result.get("message") or "python execution failed",
             )
         return ExecutorResult(True, 0, result.get("result"))
-
-
-def _quote_command(cmd: list[str]) -> str:
-    return " ".join(shlex.quote(c) for c in cmd)

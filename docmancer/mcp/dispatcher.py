@@ -189,19 +189,30 @@ class Dispatcher:
             log_call(tool=name, args=args, status="execution_not_allowed",
                      latency_ms=int((time.time() - start) * 1000))
             return DispatchResult(False, body, "execution_not_allowed")
+        allowed_executors = operation_grant.get("allowed_executors") or []
+        if executor_kind in {"python_import", "shell"} and executor_kind not in allowed_executors:
+            body = {
+                "error": "executor_not_granted",
+                "message": f"Operation {operation.get('id')} is not granted for executor '{executor_kind}'.",
+            }
+            log_call(tool=name, args=args, status="executor_not_granted",
+                     latency_ms=int((time.time() - start) * 1000))
+            return DispatchResult(False, body, "executor_not_granted")
         executor = get_executor(executor_kind)
         operation_for_executor = dict(operation)
         if executor_kind == "http":
             operation_for_executor["_docmancer_http_grant"] = operation_grant
+        elif executor_kind == "python_import":
+            operation_for_executor["_docmancer_operation_grant"] = operation_grant
         result = executor.call(
             operation=operation_for_executor,
             args=validation_args,
-            auth_headers=auth_material.headers,
-            required_headers=auth.get("required_headers", {}) or {},
+            auth_headers={} if executor_kind == "python_import" else auth_material.headers,
+            required_headers={} if executor_kind == "python_import" else auth.get("required_headers", {}) or {},
             idempotency_key=idempotency_key,
             idempotency_header=idempotency_header,
-            auth_params=auth_material.params,
-            auth_cookies=auth_material.cookies,
+            auth_params={} if executor_kind == "python_import" else auth_material.params,
+            auth_cookies={} if executor_kind == "python_import" else auth_material.cookies,
         )
 
         body: Any = result.body
