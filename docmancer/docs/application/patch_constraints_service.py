@@ -477,7 +477,7 @@ class PatchConstraintsService:
     @staticmethod
     def _code_graph_constraint_instruction(path: str, edge_kinds: list[str], *, unresolved_only: bool) -> str:
         if unresolved_only:
-            return f"`{path}` contains unresolved task-relevant references/imports. Treat this as a search hint, not proof of dependency; inspect before patching."
+            return f"`{path}` contains unresolved task-relevant references/imports. Treat this as a search hint, not proof of dependency; inspect linked files or search results before patching."
         if "references" in edge_kinds:
             return f"Task-relevant symbol references appear in `{path}`; inspect this file together with linked definitions before patching."
         if "imports" in edge_kinds or "exports" in edge_kinds:
