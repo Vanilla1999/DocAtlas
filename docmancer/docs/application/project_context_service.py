@@ -16,6 +16,7 @@ from docmancer.docs.domain.project_query_intent import classify_project_query_in
 from docmancer.docs.domain.quality import has_code_symbol_evidence, internal_noise_score, is_trivial_section, looks_like_code_or_command
 from docmancer.docs.domain.snippets import best_context_pack_snippet, build_snippet_presentation, validate_response_style
 from docmancer.docs.domain.source_map import build_project_repo_map, build_project_source_evidence, source_evidence_diagnostics, source_map_diagnostics
+from docmancer.docs.domain.code_graph import build_code_graph_context_items, build_project_code_graph, code_graph_context_diagnostics, code_graph_diagnostics
 from docmancer.docs.domain.trust_contract import build_project_context_trust_contract
 from docmancer.docs.models import SOURCE_CLASS_PROJECT_FILE, DocsChunk, DocsResult, ProjectContextResult, ProjectDocsChunk, ProjectDocsResult, ProjectMetadata
 
@@ -151,6 +152,9 @@ class ProjectContextService:
         requirements = extract_project_answer_requirements(question)
         repo_map_items: list[dict[str, Any]] = []
         source_evidence_items: list[dict[str, Any]] = []
+        code_graph = None
+        code_graph_items: list[dict[str, Any]] = []
+        code_graph_error: str | None = None
         if mode in {"auto", "project-only"}:
             repo_map_items = build_project_repo_map(
                 root,
@@ -167,6 +171,23 @@ class ProjectContextService:
                 token_budget=_source_evidence_token_budget(tokens),
             )
             context_pack.extend(source_evidence_items)
+            try:
+                code_graph = build_project_code_graph(
+                    root,
+                    question=question,
+                    requirements=requirements,
+                    max_files=max(8, min(24, (limit or 4) * 3)),
+                    token_budget=_code_graph_build_token_budget(tokens),
+                )
+                code_graph_items = build_code_graph_context_items(
+                    code_graph,
+                    question=question,
+                    max_items=max(1, min(8, limit or 4)),
+                    token_budget=_code_graph_context_token_budget(tokens),
+                )
+                context_pack.extend(code_graph_items)
+            except Exception as exc:
+                code_graph_error = f"{type(exc).__name__}: {exc}"
         trust_contract = build_project_context_trust_contract(
             project_docs=project_docs,
             dependency_docs=dependency_docs,
@@ -189,6 +210,12 @@ class ProjectContextService:
             diagnostics["repo_map"] = source_map_diagnostics(repo_map_items)
         if source_evidence_items:
             diagnostics["source_evidence"] = source_evidence_diagnostics(source_evidence_items)
+        if code_graph_items:
+            diagnostics["code_graph"] = code_graph_context_diagnostics(code_graph_items)
+        if code_graph is not None and (code_graph_items or code_graph.diagnostics.get("status") == "ok"):
+            diagnostics.setdefault("code_graph", {"selected_items": 0})["graph"] = _compact_code_graph_diagnostics(code_graph_diagnostics(code_graph))
+        if code_graph_error:
+            diagnostics["code_graph"] = {"error": code_graph_error, "selected_items": 0}
         if project_docs is not None and hasattr(self.facade, "active_index_diagnostics"):
             diagnostics["active_index"] = self.facade.active_index_diagnostics(str(root))
         if intent.name == "mcp_disambiguation":
@@ -766,6 +793,34 @@ def _source_evidence_token_budget(tokens: int | None) -> int:
     if not tokens:
         return 700
     return max(120, min(700, tokens // 5))
+
+
+def _code_graph_build_token_budget(tokens: int | None) -> int:
+    if not tokens:
+        return 3000
+    return max(1200, min(5000, int(tokens * 0.35)))
+
+
+def _code_graph_context_token_budget(tokens: int | None) -> int:
+    if not tokens:
+        return 900
+    return max(400, min(1400, int(tokens * 0.12)))
+
+
+def _compact_code_graph_diagnostics(diagnostics: dict[str, Any]) -> dict[str, Any]:
+    keys = (
+        "node_count",
+        "edge_count",
+        "selected_files",
+        "selected_paths",
+        "edge_kinds",
+        "confidence_summary",
+        "unresolved_import_count",
+        "unresolved_reference_count",
+        "graph_scope",
+        "limitations",
+    )
+    return {key: diagnostics[key] for key in keys if key in diagnostics}
 
 
 def _drop_low_value_context_section(content: str, title: str | None = None, heading_path: str | None = None) -> bool:

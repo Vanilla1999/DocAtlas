@@ -161,6 +161,100 @@ def test_task_specific_source_evidence_is_not_crowded_out_by_unmentioned_depende
     assert not any(c.type == "dependency_version" for c in packet.constraints[:5])
 
 
+def test_patch_constraints_include_code_graph_link_hints(tmp_path: Path):
+    root = tmp_path / "repo"
+    _write(root / "docs/architecture.md", "Help requests use UI -> Cubit -> Service flow.\n")
+    _write(
+        root / "lib/screens/help_request_screen.dart",
+        """
+import '../cubit/help_requests_cubit.dart';
+
+class HelpRequestScreen {
+  final label = "Вернуть в работу";
+
+  void build() {
+    HelpRequestsCubit();
+  }
+}
+""".strip()
+        + "\n",
+    )
+    _write(
+        root / "lib/cubit/help_requests_cubit.dart",
+        """
+import '../services/help_requests_service.dart';
+
+class HelpRequestsCubit {
+  final service = HelpRequestsService();
+}
+""".strip()
+        + "\n",
+    )
+    _write(root / "lib/services/help_requests_service.dart", "class HelpRequestsService { void reopenRequest() {} }\n")
+
+    packet = _packet(
+        root,
+        question="Измени поведение кнопки Вернуть в работу через HelpRequestsCubit",
+        max_constraints=20,
+        max_tokens=4000,
+    )
+
+    graph_constraints = [c for c in packet.constraints if any(ref.get("kind") == "code_graph" for ref in c.source_refs)]
+    assert graph_constraints
+    payload = "\n".join(c.instruction for c in graph_constraints).lower()
+    assert "inspect" in payload
+    assert "linked" in payload
+    files = {file for c in graph_constraints for file in c.files}
+    assert "lib/screens/help_request_screen.dart" in files or "lib/cubit/help_requests_cubit.dart" in files
+    assert any("Code graph slice:" in c.evidence for c in graph_constraints)
+    assert not any("void build()" in c.evidence for c in graph_constraints)
+    assert not any("calls" in c.instruction.lower() for c in graph_constraints)
+    diagnostics_refs = [ref.get("diagnostics") for c in graph_constraints for ref in c.source_refs if ref.get("kind") == "code_graph"]
+    assert diagnostics_refs
+    assert any(ref.get("edge_kinds") for ref in diagnostics_refs if isinstance(ref, dict))
+    assert all(len(ref.get("score_reasons", [])) <= 8 for ref in diagnostics_refs if isinstance(ref, dict))
+
+
+def test_patch_constraints_code_graph_unresolved_external_is_low_confidence_hint(tmp_path: Path):
+    root = tmp_path / "repo"
+    _write(root / "docs/architecture.md", "External package integration is reviewed case by case.\n")
+    _write(
+        root / "lib/external_screen.dart",
+        """
+import 'package:external/foo.dart';
+
+class ExternalScreen {}
+""".strip()
+        + "\n",
+    )
+
+    packet = _packet(root, question="external package integration", max_constraints=20, max_tokens=4000)
+
+    graph_constraints = [c for c in packet.constraints if any(ref.get("kind") == "code_graph" for ref in c.source_refs)]
+    if graph_constraints:
+        text = "\n".join(c.instruction.lower() for c in graph_constraints)
+        assert all(c.confidence == "low" or "unresolved" in c.instruction.lower() or "search hint" in c.instruction.lower() for c in graph_constraints)
+        assert "definitely depends on" not in text
+        assert "calls" not in text
+
+
+def test_patch_constraints_code_graph_failure_is_non_fatal(tmp_path: Path, monkeypatch):
+    root = _workspace(tmp_path)
+
+    def fail_build(*args, **kwargs):
+        raise RuntimeError("boom")
+
+    monkeypatch.setattr(
+        "docmancer.docs.application.patch_constraints_service.build_project_code_graph",
+        fail_build,
+    )
+
+    packet = _packet(root, question="Update PermissionService behavior", max_constraints=20, max_tokens=4000)
+
+    assert packet.constraints
+    assert any(c.source.endswith("architecture.md") for c in packet.constraints)
+
+
 def test_navigation_patch_constraints_prefer_lib_sources_over_example_noise(tmp_path: Path):
     root = tmp_path / "repo"
     _write(
