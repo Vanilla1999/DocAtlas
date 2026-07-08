@@ -5,7 +5,62 @@ from docmancer.docs.domain.source_map import (
     _split_identifier,
     build_project_repo_map,
     build_project_source_evidence,
+    collect_project_source_facts,
+    source_facts_diagnostics,
 )
+
+
+def _source_facts_fixture(tmp_path):
+    lib = tmp_path / "lib"
+    cubit = lib / "cubit"
+    generated = lib / "generated"
+    app = tmp_path / "app"
+    cubit.mkdir(parents=True)
+    generated.mkdir(parents=True)
+    app.mkdir()
+    (lib / "screen.dart").write_text(
+        """
+import '../cubit/help_requests_cubit.dart';
+
+class HelpRequestScreen {
+  final title = "Вернуть в работу";
+  void build() {
+    HelpRequestsCubit();
+  }
+}
+""".strip()
+        + "\n",
+        encoding="utf-8",
+    )
+    (cubit / "help_requests_cubit.dart").write_text(
+        """
+class HelpRequestsCubit {
+  void reopen() {}
+}
+""".strip()
+        + "\n",
+        encoding="utf-8",
+    )
+    (app / "service.py").write_text(
+        """
+from app.permissions import PermissionService
+
+class TicketService:
+    def reopen_request(self):
+        return "active"
+""".strip()
+        + "\n",
+        encoding="utf-8",
+    )
+    (generated / "GeneratedPluginRegistrant.dart").write_text(
+        "class GeneratedPluginRegistrant {}\n",
+        encoding="utf-8",
+    )
+    (generated / "screen.g.dart").write_text(
+        "class GeneratedScreen {}\n",
+        encoding="utf-8",
+    )
+    return tmp_path
 
 
 def test_split_identifier_splits_camel_case():
@@ -160,3 +215,79 @@ class HelpService:
     assert item["string_literals"] == ["Вернуть в работу", "active"]
     assert item["source"] == {"source_class": "repo_map", "path": "lib/help_request_details_screen.dart", "title": "Source map: lib/help_request_details_screen.dart"}
     assert "Вернуть в работу" in item["content"]
+
+
+def test_collect_project_source_facts_returns_python_and_dart_facts(tmp_path):
+    root = _source_facts_fixture(tmp_path)
+
+    items = collect_project_source_facts(root, question="Вернуть в работу TicketService HelpRequestScreen")
+
+    paths = [item["path"] for item in items]
+    assert "lib/screen.dart" in paths
+    assert "app/service.py" in paths
+    screen = next(item for item in items if item["path"] == "lib/screen.dart")
+    service = next(item for item in items if item["path"] == "app/service.py")
+    assert screen["source_class"] == "repo_map"
+    assert screen["language"] == "dart"
+    assert screen["imports"] == ["../cubit/help_requests_cubit.dart"]
+    assert {symbol["name"] for symbol in screen["symbols"]} >= {"HelpRequestScreen", "build"}
+    assert "HelpRequestsCubit" in screen["references"]
+    assert "Вернуть в работу" in screen["string_literals"]
+    assert service["language"] == "python"
+    assert service["imports"] == ["app.permissions.PermissionService"]
+    assert {symbol["name"] for symbol in service["symbols"]} >= {"TicketService", "reopen_request"}
+
+
+def test_collect_project_source_facts_keeps_repo_map_shape_compatible(tmp_path):
+    root = _source_facts_fixture(tmp_path)
+
+    repo_map = build_project_repo_map(root, question="Вернуть в работу HelpRequestScreen", max_files=2, token_budget=4000)
+    facts = collect_project_source_facts(root, question="Вернуть в работу HelpRequestScreen", max_files=2, token_budget=4000)
+
+    assert facts == repo_map
+
+
+def test_collect_project_source_facts_skips_generated_files(tmp_path):
+    root = _source_facts_fixture(tmp_path)
+
+    items = collect_project_source_facts(root, question="GeneratedPluginRegistrant GeneratedScreen HelpRequestScreen")
+
+    paths = {item["path"] for item in items}
+    assert "lib/screen.dart" in paths
+    assert "lib/generated/GeneratedPluginRegistrant.dart" not in paths
+    assert "lib/generated/screen.g.dart" not in paths
+
+
+def test_collect_project_source_facts_selection_score_favors_exact_question_term(tmp_path):
+    root = _source_facts_fixture(tmp_path)
+
+    items = collect_project_source_facts(root, question="HelpRequestScreen HelpRequestsCubit", max_files=3, token_budget=4000)
+
+    assert items[0]["path"] == "lib/screen.dart"
+    cubit = next(item for item in items if item["path"] == "lib/cubit/help_requests_cubit.dart")
+    assert items[0]["selection_score"] > cubit["selection_score"]
+
+
+def test_source_facts_diagnostics_contains_counts(tmp_path):
+    root = _source_facts_fixture(tmp_path)
+    items = collect_project_source_facts(root, question="Вернуть в работу TicketService HelpRequestScreen")
+
+    diagnostics = source_facts_diagnostics(items)
+
+    assert diagnostics["selected_files"] == len(items)
+    assert diagnostics["token_estimate"] == sum(item["token_estimate"] for item in items)
+    assert diagnostics["paths"] == [item["path"] for item in items]
+    assert set(diagnostics["languages"]) == {"dart", "python"}
+    assert diagnostics["symbol_count"] >= 4
+    assert diagnostics["import_count"] >= 2
+    assert diagnostics["reference_count"] >= 2
+
+
+def test_collect_project_source_facts_honors_token_budget(tmp_path):
+    root = _source_facts_fixture(tmp_path)
+
+    all_items = collect_project_source_facts(root, question="Вернуть в работу TicketService HelpRequestScreen HelpRequestsCubit", token_budget=4000)
+    limited = collect_project_source_facts(root, question="Вернуть в работу TicketService HelpRequestScreen HelpRequestsCubit", token_budget=1)
+
+    assert len(all_items) > 1
+    assert len(limited) == 1

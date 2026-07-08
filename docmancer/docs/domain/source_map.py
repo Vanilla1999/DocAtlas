@@ -103,10 +103,36 @@ def build_project_repo_map(
     this map to decide where concrete snippets are needed.
     """
 
+    return collect_project_source_facts(
+        project_root,
+        question=question,
+        max_files=max_files,
+        token_budget=token_budget,
+    )
+
+
+def collect_project_source_facts(
+    project_root: str | Path,
+    *,
+    question: str = "",
+    max_files: int = 24,
+    token_budget: int = 4000,
+) -> list[dict[str, Any]]:
+    """Collect deterministic source facts for repo_map and future graph layers.
+
+    The returned items intentionally use the same factual shape as
+    build_project_repo_map(). This gives downstream callers a stable seam without
+    duplicating source traversal or extraction logic.
+    """
+
     root = Path(project_root).expanduser().resolve()
     if max_files <= 0 or token_budget <= 0 or not root.exists() or not root.is_dir():
         return []
 
+    return _select_project_source_facts(root, question=question, max_files=max_files, token_budget=token_budget)
+
+
+def _select_project_source_facts(root: Path, *, question: str, max_files: int, token_budget: int) -> list[dict[str, Any]]:
     query_terms = _query_terms(question)
     candidates: list[dict[str, Any]] = []
     for path in _iter_source_files(root):
@@ -230,6 +256,23 @@ def source_map_diagnostics(items: list[dict[str, Any]]) -> dict[str, Any]:
         "selected_files": len(items),
         "token_estimate": sum(int(item.get("token_estimate") or 0) for item in items),
         "paths": [item.get("path") for item in items],
+    }
+
+
+def source_facts_diagnostics(items: list[dict[str, Any]]) -> dict[str, Any]:
+    languages: list[str] = []
+    for item in items:
+        language = item.get("language")
+        if language:
+            _append_unique(languages, str(language))
+    return {
+        "selected_files": len(items),
+        "token_estimate": sum(int(item.get("token_estimate") or 0) for item in items),
+        "paths": [item.get("path") for item in items],
+        "languages": languages,
+        "symbol_count": sum(len(item.get("symbols") or []) for item in items),
+        "import_count": sum(len(item.get("imports") or []) for item in items),
+        "reference_count": sum(len(item.get("references") or []) for item in items),
     }
 
 
