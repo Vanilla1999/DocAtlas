@@ -379,6 +379,102 @@ class HelpRequestDetailsScreen extends StatelessWidget {
     assert result.answer_completeness["missing_terms"] == []
 
 
+def test_project_context_includes_code_graph_lane_for_project_source_queries(tmp_path):
+    lib = tmp_path / "lib"
+    screens = lib / "screens"
+    cubit = lib / "cubit"
+    screens.mkdir(parents=True)
+    cubit.mkdir(parents=True)
+    (screens / "help_request_screen.dart").write_text(
+        """
+import '../cubit/help_requests_cubit.dart';
+
+class HelpRequestScreen {
+  void build() {
+    HelpRequestsCubit();
+  }
+}
+""".strip()
+        + "\n",
+        encoding="utf-8",
+    )
+    (cubit / "help_requests_cubit.dart").write_text("class HelpRequestsCubit {}\n", encoding="utf-8")
+    facade = FakeProjectContextFacade()
+    facade.project_docs = ProjectDocsResult(
+        project_path=str(tmp_path),
+        query="Где используется HelpRequestsCubit?",
+        results=[
+            ProjectDocsChunk(
+                title="Architecture",
+                content="Help request screen uses cubit classes in the UI flow.",
+                source=str(tmp_path / "README.md"),
+                url=None,
+                path="README.md",
+            )
+        ],
+    )
+
+    result = ProjectContextService(facade).get_project_context(
+        str(tmp_path),
+        "Где используется HelpRequestsCubit?",
+        mode="project-only",
+    )
+
+    source_classes = {item["source_class"] for item in result.context_pack}
+    assert result.status == "success"
+    assert {"repo_map", "source_evidence", "code_graph"}.issubset(source_classes)
+    graph_items = [item for item in result.context_pack if item["source_class"] == "code_graph"]
+    assert graph_items[0]["path"] == "lib/screens/help_request_screen.dart"
+    assert "HelpRequestsCubit" in graph_items[0]["content"]
+    assert "repo_map" in result.diagnostics
+    assert "source_evidence" in result.diagnostics
+    assert result.diagnostics["code_graph"]["selected_items"] >= 1
+    assert result.diagnostics["code_graph"]["graph"]["node_count"] >= 1
+    assert "references" in result.diagnostics["code_graph"]["edge_kinds"] or "imports" in result.diagnostics["code_graph"]["edge_kinds"]
+
+
+def test_project_context_deps_only_does_not_build_code_graph(tmp_path):
+    lib = tmp_path / "lib"
+    lib.mkdir()
+    (lib / "screen.dart").write_text("class HelpRequestScreen {}\n", encoding="utf-8")
+    facade = FakeProjectContextFacade()
+
+    result = ProjectContextService(facade).get_project_context(
+        str(tmp_path),
+        "HelpRequestScreen",
+        library="go_router",
+        mode="deps-only",
+        allow_network=True,
+    )
+
+    assert not any(item["source_class"] == "code_graph" for item in result.context_pack)
+    assert "code_graph" not in result.diagnostics
+
+
+def test_project_context_code_graph_failure_is_non_fatal(tmp_path, monkeypatch):
+    lib = tmp_path / "lib"
+    lib.mkdir()
+    (lib / "screen.dart").write_text("class HelpRequestScreen {}\n", encoding="utf-8")
+    facade = FakeProjectContextFacade()
+
+    def fail_build(*args, **kwargs):
+        raise RuntimeError("boom")
+
+    monkeypatch.setattr(
+        "docmancer.docs.application.project_context_service.build_project_code_graph",
+        fail_build,
+    )
+
+    result = ProjectContextService(facade).get_project_context(
+        str(tmp_path),
+        "HelpRequestScreen",
+        mode="project-only",
+    )
+
+    assert result.status == "success"
+    assert result.diagnostics["code_graph"] == {"error": "RuntimeError: boom", "selected_items": 0}
+
+
 def test_trust_contract_uses_canonical_sources_and_exposes_source_evidence_context_sources(tmp_path):
     lib = tmp_path / "lib"
     lib.mkdir()

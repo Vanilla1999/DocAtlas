@@ -3,8 +3,10 @@ from __future__ import annotations
 import json
 import re
 from pathlib import Path
-from typing import Any, Iterator
+from typing import Any, Iterator, Sequence
 from urllib.parse import unquote, urlparse
+
+from docmancer.docs.domain.code_graph import build_project_code_graph, code_graph_diagnostics
 
 
 PATCH_PLAN_CONTEXT_SCHEMA_VERSION = "patch-plan-context-1"
@@ -45,6 +47,24 @@ def build_patch_plan_context(
         max_files=max_files or 12,
         max_snippets=max_snippets or 16,
     )
+    graph_diagnostics: dict[str, Any] = {"graph_used": False, "fallback_reason": None}
+    if project_path:
+        root = Path(project_path).expanduser().resolve()
+        graph_requirements = [*list(symbol_queries or []), *list(changed_files or [])]
+        graph_hints, graph_diagnostics = _graph_relevant_file_hints(
+            root,
+            question=question,
+            requirements=graph_requirements,
+            changed_files=changed_files,
+            max_files=6,
+            max_depth=1,
+        )
+        relevant_files = _merge_graph_hints_into_relevant_files(
+            relevant_files,
+            graph_hints,
+            max_files=max_files or 12,
+            max_snippets=max_snippets or 16,
+        )
     dependency_apis, dependency_warnings = discover_dart_dependency_apis(
         question,
         project_path=project_path,
@@ -96,6 +116,8 @@ def build_patch_plan_context(
         "token_estimate": 0,
         "output_mode": mode,
     }
+    if mode != "compact":
+        payload["diagnostics"] = {"code_graph": graph_diagnostics}
     payload["token_estimate"] = _estimate_tokens(payload)
     if mode == "compact":
         payload = _enforce_patch_plan_budget(payload, max_tokens=max_tokens or 2400)
@@ -350,6 +372,194 @@ def discover_relevant_source_files(
         if len(public) >= max(1, max_files):
             break
     return _cap_relevant_file_refs(public, max_snippets=max_snippets)
+
+
+def _graph_relevant_file_hints(
+    root: Path,
+    *,
+    question: str,
+    requirements: Sequence[str] | None = None,
+    changed_files: Sequence[str] | None = None,
+    max_files: int = 6,
+    max_depth: int = 1,
+) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    diagnostics: dict[str, Any] = {
+        "graph_used": False,
+        "fallback_reason": None,
+        "seed_files": [],
+        "selected_graph_files": [],
+        "edge_kinds": [],
+        "max_depth": max_depth,
+        "max_files": max_files,
+        "limitations": ["not_call_graph", "depth_limited"],
+    }
+    if not root.exists() or not root.is_dir():
+        diagnostics["fallback_reason"] = "invalid_root"
+        return [], diagnostics
+    try:
+        graph = build_project_code_graph(
+            root,
+            question=question,
+            requirements=requirements,
+            max_files=24,
+            token_budget=3500,
+        )
+    except Exception as exc:
+        diagnostics["fallback_reason"] = f"{type(exc).__name__}: {exc}"
+        return [], diagnostics
+
+    file_nodes = {node.path: node for node in graph.nodes if node.kind == "file"}
+    if not file_nodes:
+        diagnostics["fallback_reason"] = "empty_graph"
+        return [], diagnostics
+    diagnostics["graph"] = code_graph_diagnostics(graph)
+
+    terms = _graph_query_terms(question, requirements or [])
+    changed = {str(path).replace("\\", "/").strip("/") for path in changed_files or [] if str(path).strip()}
+    hints: dict[str, dict[str, Any]] = {}
+
+    def add_hint(path: str, boost: float, reason: str, edge_kinds: Sequence[str] = (), confidence: str = "heuristic", linked_paths: Sequence[str] = ()) -> None:
+        if not path or path not in file_nodes:
+            return
+        item = hints.setdefault(path, {
+            "path": path,
+            "score_boost": 0.0,
+            "reason": "",
+            "edge_kinds": [],
+            "confidence": confidence,
+            "linked_paths": [],
+        })
+        item["score_boost"] = float(item["score_boost"]) + boost
+        if reason and reason not in item["reason"]:
+            item["reason"] = f"{item['reason']}; {reason}" if item["reason"] else reason
+        for kind in edge_kinds:
+            if kind not in item["edge_kinds"]:
+                item["edge_kinds"].append(kind)
+        for linked in linked_paths:
+            if linked and linked not in item["linked_paths"]:
+                item["linked_paths"].append(linked)
+        if _confidence_rank(confidence) > _confidence_rank(str(item.get("confidence") or "heuristic")):
+            item["confidence"] = confidence
+
+    symbols_by_path: dict[str, list[Any]] = {}
+    for node in graph.nodes:
+        if node.kind == "symbol":
+            symbols_by_path.setdefault(node.path, []).append(node)
+
+    for path, node in file_nodes.items():
+        if path in changed:
+            add_hint(path, 4, "code_graph: changed_file seed; confidence=exact", confidence="exact")
+        if _graph_text_matches(path, terms):
+            add_hint(path, 5, "code_graph: exact path match; confidence=heuristic", confidence="heuristic")
+        strings = [str(value) for key in ("string_literals", "status_like_tokens") for value in node.metadata.get(key) or []]
+        if any(_graph_text_matches(value, terms) for value in strings):
+            add_hint(path, 5, "code_graph: exact string/status match; confidence=heuristic", confidence="heuristic")
+        if any(_graph_text_matches(symbol.name, terms) for symbol in symbols_by_path.get(path, [])):
+            confidence = "parser" if node.language == "python" else "regex"
+            add_hint(path, 5, f"code_graph: exact symbol match; confidence={confidence}", confidence=confidence)
+
+    for edge in graph.edges:
+        if edge.kind in {"references", "unresolved_reference"} and edge.symbol and _graph_text_matches(edge.symbol, terms):
+            if edge.kind == "references" and edge.from_path:
+                add_hint(edge.from_path, 3, f"code_graph: reference edge matched `{edge.symbol}`; confidence={edge.confidence}", [edge.kind], edge.confidence, [edge.to_path] if edge.to_path else [])
+            elif edge.from_path:
+                add_hint(edge.from_path, 0.5, f"code_graph: unresolved reference search hint `{edge.symbol}`; confidence=unresolved", [edge.kind], "unresolved")
+        if edge.kind in {"imports", "exports"} and edge.from_path and edge.to_path:
+            if _graph_text_matches(edge.to_path, terms) or _graph_text_matches(edge.symbol or "", terms):
+                add_hint(edge.from_path, 2, f"code_graph: import/export neighbor matched task terms; confidence={edge.confidence}", [edge.kind], edge.confidence, [edge.to_path])
+        if edge.kind in {"unresolved_import", "unresolved_export"} and edge.from_path and _graph_text_matches(edge.evidence or edge.symbol or "", terms):
+            add_hint(edge.from_path, 0.5, "code_graph: unresolved import/export search hint; confidence=unresolved", [edge.kind], "unresolved")
+
+    seed_files = sorted(
+        path for path, item in hints.items()
+        if float(item.get("score_boost") or 0) >= 3
+        and "import/export neighbor" not in str(item.get("reason") or "")
+    )
+    diagnostics["seed_files"] = seed_files
+    if max_depth > 0:
+        for seed in list(seed_files):
+            for edge in graph.edges:
+                if edge.kind not in {"imports", "exports", "references"}:
+                    continue
+                if edge.from_path == seed and edge.to_path in file_nodes:
+                    add_hint(edge.to_path, 2, f"code_graph: linked by local import/reference to task-relevant file; confidence={edge.confidence}", [edge.kind], edge.confidence, [seed])
+                elif edge.to_path == seed and edge.from_path in file_nodes:
+                    add_hint(edge.from_path, 2, f"code_graph: linked by local import/reference to task-relevant file; confidence={edge.confidence}", [edge.kind], edge.confidence, [seed])
+
+    selected = sorted(hints.values(), key=lambda item: (-float(item["score_boost"]), item["path"]))[: max(1, max_files)]
+    diagnostics["graph_used"] = True
+    diagnostics["selected_graph_files"] = [item["path"] for item in selected]
+    diagnostics["edge_kinds"] = sorted({kind for item in selected for kind in item.get("edge_kinds", [])})
+    return selected, diagnostics
+
+
+def _merge_graph_hints_into_relevant_files(
+    relevant_files: list[dict[str, Any]],
+    graph_hints: list[dict[str, Any]],
+    *,
+    max_files: int,
+    max_snippets: int,
+) -> list[dict[str, Any]]:
+    merged = [dict(item) for item in relevant_files]
+    by_file = {item["file"]: item for item in merged}
+    for hint in graph_hints[:6]:
+        path = str(hint.get("path") or "")
+        if not path:
+            continue
+        reason = str(hint.get("reason") or "code_graph: linked by local import/reference to task-relevant file; confidence=heuristic")
+        if path in by_file:
+            item = by_file[path]
+            if "code_graph" not in str(item.get("why") or ""):
+                item["why"] = f"{item.get('why') or 'Relevant source file found.'}; {reason}"
+            item["graph_hint"] = hint
+            continue
+        item = {
+            "file": path,
+            "why": reason,
+            "action": "read",
+            "symbols": [],
+            "refs": [],
+            "graph_hint": hint,
+        }
+        merged.append(item)
+        by_file[path] = item
+    return _cap_relevant_file_refs(merged[: max(1, max_files)], max_snippets=max_snippets)
+
+
+def _graph_query_terms(question: str, requirements: Sequence[str]) -> set[str]:
+    terms: set[str] = set()
+    generic = {"app", "lib", "src", "dart", "file", "files", "service", "services", "screen", "screens"}
+    for raw in [question, *requirements]:
+        for word in _WORD_RE.findall(str(raw)):
+            if word.casefold() in generic:
+                continue
+            for variant in _term_variants(word):
+                normalized = _graph_normalize(variant)
+                if len(normalized) >= 3 and normalized not in generic:
+                    terms.add(normalized)
+        for quoted in re.finditer(r"[\"'“”«»](.*?)[\"'“”«»]", str(raw)):
+            value = quoted.group(1).strip()
+            if value:
+                terms.add(_graph_normalize(value))
+    return {term for term in terms if term}
+
+
+def _graph_text_matches(value: str, terms: set[str]) -> bool:
+    if not terms:
+        return False
+    normalized = _graph_normalize(value)
+    compact = normalized.replace(" ", "")
+    return any(term in normalized or term in compact for term in terms)
+
+
+def _graph_normalize(value: str) -> str:
+    text = _to_snake_case(str(value).replace("/", "_").replace("-", "_").replace(".", "_"))
+    text = re.sub(r"[^0-9A-Za-zА-Яа-яЁё]+", " ", text, flags=re.UNICODE)
+    return re.sub(r"\s+", " ", text).strip().casefold()
+
+
+def _confidence_rank(confidence: str) -> int:
+    return {"unresolved": 0, "heuristic": 1, "regex": 2, "parser": 3, "exact": 4}.get(confidence, 1)
 
 
 def discover_dart_dependency_apis(

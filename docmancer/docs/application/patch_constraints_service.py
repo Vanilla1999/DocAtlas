@@ -9,6 +9,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
+from docmancer.docs.domain.code_graph import build_code_graph_context_items, build_project_code_graph
 from docmancer.docs.domain.source_map import build_project_repo_map, build_project_source_evidence
 from docmancer.docs.models import DependencyObservation, PatchConstraint, PatchConstraintPacket
 
@@ -177,9 +178,16 @@ class PatchConstraintsService:
         constraints.extend(self._architecture_constraints(sources))
         constraints.extend(self._generated_file_constraints(sources, changed_files))
         constraints.extend(self._dependency_constraints(root))
-        repo_map, source_evidence = self._code_evidence(root, question, changed_files)
+        requirements = self._task_terms(question)
+        for changed in changed_files:
+            stem = Path(changed).stem.replace("_", " ").replace("-", " ")
+            if len(stem) >= 3:
+                requirements.append(stem)
+        repo_map, source_evidence = self._code_evidence(root, question, requirements, changed_files)
+        _code_graph, code_graph_items = self._code_graph_evidence(root, question, requirements, changed_files)
         constraints.extend(self._repo_map_constraints(repo_map))
         constraints.extend(self._source_evidence_constraints(source_evidence))
+        constraints.extend(self._code_graph_constraints(code_graph_items))
         symbol_candidates = self._symbol_candidates(question, root, changed_files)
         constraints.extend(self._symbol_candidate_constraints(symbol_candidates))
         constraints.extend(self._fallback_constraints(question, changed_files, root))
@@ -301,14 +309,9 @@ class PatchConstraintsService:
             seen.add(resolved)
         return out
 
-    def _code_evidence(self, root: Path | None, question: str, changed_files: list[str]) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    def _code_evidence(self, root: Path | None, question: str, requirements: list[str], changed_files: list[str]) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
         if not root or not root.exists():
             return [], []
-        requirements = self._task_terms(question)
-        for changed in changed_files:
-            stem = Path(changed).stem.replace("_", " ").replace("-", " ")
-            if len(stem) >= 3:
-                requirements.append(stem)
         try:
             repo_map = build_project_repo_map(root, question=question, max_files=6, token_budget=650)
             source_evidence = build_project_source_evidence(
@@ -323,6 +326,35 @@ class PatchConstraintsService:
         if changed_files:
             source_evidence = self._prefer_changed_file_evidence(source_evidence, changed_files)
         return repo_map, source_evidence
+
+    def _code_graph_evidence(
+        self,
+        root: Path | None,
+        question: str,
+        requirements: list[str],
+        changed_files: list[str],
+    ) -> tuple[Any | None, list[dict[str, Any]]]:
+        if not root or not root.exists():
+            return None, []
+        try:
+            graph = build_project_code_graph(
+                root,
+                question=question,
+                requirements=requirements,
+                max_files=24,
+                token_budget=3500,
+            )
+            graph_items = build_code_graph_context_items(
+                graph,
+                question=question,
+                max_items=6,
+                token_budget=800,
+            )
+        except Exception:
+            return None, []
+        if changed_files:
+            graph_items = self._prefer_changed_file_evidence(graph_items, changed_files)
+        return graph, graph_items
 
     @staticmethod
     def _prefer_changed_file_evidence(items: list[dict[str, Any]], changed_files: list[str]) -> list[dict[str, Any]]:
@@ -387,6 +419,70 @@ class PatchConstraintsService:
                 line_end=item.get("line_end") or line_start,
             ))
         return constraints
+
+    def _code_graph_constraints(self, items: list[dict[str, Any]]) -> list[PatchConstraint]:
+        constraints: list[PatchConstraint] = []
+        for item in items:
+            path = str(item.get("path") or "")
+            if not path or self._example_source_noise(path):
+                continue
+            metadata = item.get("metadata") or {}
+            edge_kinds = [str(kind) for kind in metadata.get("edge_kinds") or []]
+            confidence_summary = metadata.get("confidence_summary") or {}
+            linked_paths = [str(value) for value in metadata.get("linked_paths") or [] if str(value).strip()]
+            symbols = [str(value) for value in metadata.get("symbols") or [] if str(value).strip()]
+            files = list(dict.fromkeys([path, *linked_paths]))
+            unresolved_only = bool(edge_kinds) and all(str(kind).startswith("unresolved_") for kind in edge_kinds)
+            confidence = self._code_graph_constraint_confidence(confidence_summary, unresolved_only=unresolved_only)
+            instruction = self._code_graph_constraint_instruction(path, edge_kinds, unresolved_only=unresolved_only)
+            constraints.append(self._constraint(
+                id=f"code-graph-{self._slug(path)}",
+                type="project_convention",
+                instruction=instruction,
+                source=path,
+                severity="should",
+                confidence=confidence,
+                evidence=str(item.get("content") or "")[:500],
+                symbols=symbols,
+                files=files,
+                source_kind="code_graph",
+                source_ref_metadata={"diagnostics": self._code_graph_constraint_diagnostics(item)},
+                line_start=item.get("line_start"),
+                line_end=item.get("line_end") or item.get("line_start"),
+            ))
+        return constraints
+
+    @staticmethod
+    def _code_graph_constraint_diagnostics(item: dict[str, Any]) -> dict[str, Any]:
+        metadata = item.get("metadata") or {}
+        confidence_summary = metadata.get("confidence_summary") or {}
+        edge_kinds = [str(kind) for kind in metadata.get("edge_kinds") or []][:20]
+        return {
+            "path": item.get("path"),
+            "edge_kinds": edge_kinds,
+            "confidence_summary": dict(sorted(confidence_summary.items())) if isinstance(confidence_summary, dict) else {},
+            "score_reasons": [str(reason) for reason in metadata.get("score_reasons") or []][:8],
+            "unresolved_count": sum(1 for kind in edge_kinds if kind.startswith("unresolved_")),
+            "token_estimate": int(item.get("token_estimate") or 0),
+        }
+
+    @staticmethod
+    def _code_graph_constraint_confidence(confidence_summary: dict[str, Any], *, unresolved_only: bool) -> str:
+        if unresolved_only:
+            return "low"
+        strong = int(confidence_summary.get("exact") or 0) + int(confidence_summary.get("parser") or 0)
+        weak = int(confidence_summary.get("heuristic") or 0) + int(confidence_summary.get("unresolved") or 0) + int(confidence_summary.get("regex") or 0)
+        return "medium" if strong > weak else "low"
+
+    @staticmethod
+    def _code_graph_constraint_instruction(path: str, edge_kinds: list[str], *, unresolved_only: bool) -> str:
+        if unresolved_only:
+            return f"`{path}` contains unresolved task-relevant references/imports. Treat this as a search hint, not proof of dependency; inspect before patching."
+        if "references" in edge_kinds:
+            return f"Task-relevant symbol references appear in `{path}`; inspect this file together with linked definitions before patching."
+        if "imports" in edge_kinds or "exports" in edge_kinds:
+            return f"`{path}` has local import links to task-relevant files; inspect linked files on both sides of the import before changing behavior."
+        return f"Code graph links `{path}` to task-relevant symbols/imports/references. Inspect this file and its linked local files before inventing a new implementation."
 
     def _example_source_noise(self, path: str) -> bool:
         normalized = path.replace("\\", "/").lower().strip("/")
@@ -1370,12 +1466,12 @@ class PatchConstraintsService:
             evidence=evidence or "Inferred from task context; no direct source evidence was available.",
             symbols=list(kwargs.get("symbols") or []),
             files=list(kwargs.get("files") or []),
-            source_refs=self._source_refs(source or "inferred", kind=kwargs.get("source_kind"), line_start=kwargs.get("line_start"), line_end=kwargs.get("line_end")),
+            source_refs=self._source_refs(source or "inferred", kind=kwargs.get("source_kind"), line_start=kwargs.get("line_start"), line_end=kwargs.get("line_end"), extra=kwargs.get("source_ref_metadata")),
             evidence_snippets=self._evidence_snippets(source or "inferred", evidence, line_start=kwargs.get("line_start"), line_end=kwargs.get("line_end")),
         )
 
     @staticmethod
-    def _source_refs(source: str, *, kind: str | None = None, line_start: Any = None, line_end: Any = None) -> list[dict[str, Any]]:
+    def _source_refs(source: str, *, kind: str | None = None, line_start: Any = None, line_end: Any = None, extra: dict[str, Any] | None = None) -> list[dict[str, Any]]:
         if not source:
             return []
         kind = kind or ("task_context" if source in {"changed_files", "question", "inferred"} else "source")
@@ -1385,6 +1481,8 @@ class PatchConstraintsService:
         if line_start:
             ref["line_start"] = line_start
             ref["line_end"] = line_end or line_start
+        if extra:
+            ref.update(extra)
         return [ref]
 
     @staticmethod
