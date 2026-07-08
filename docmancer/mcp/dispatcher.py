@@ -17,6 +17,7 @@ from docmancer.mcp import credentials, idempotency, safety
 from docmancer.mcp.executors import get_executor
 from docmancer.mcp.logging import log_call
 from docmancer.mcp.manifest import InstalledPackage, Manifest
+from docmancer.mcp.network_policy import SecurityError, grant_from_mapping, target_url, validate_http_target
 from docmancer.mcp.search import ToolEntry, build_corpus, search
 from docmancer.mcp.slug import split_tool_name
 
@@ -135,6 +136,21 @@ class Dispatcher:
                      latency_ms=int((time.time() - start) * 1000))
             return DispatchResult(False, body, "invalid_args")
 
+        executor_kind = operation.get("executor", "http")
+        operation_grant = pkg.grant_for(str(operation.get("id") or ""))
+        if executor_kind == "http":
+            http_meta = operation.get("http", {}) or {}
+            try:
+                validate_http_target(
+                    target_url(http_meta.get("base_url", ""), http_meta.get("path", "")),
+                    grant_from_mapping(operation_grant),
+                )
+            except SecurityError as exc:
+                body = {"error": exc.code, "message": f"HTTP target blocked: {exc.code}"}
+                log_call(tool=name, args=args, status=exc.code,
+                         latency_ms=int((time.time() - start) * 1000))
+                return DispatchResult(False, body, exc.code)
+
         auth_material = credentials.build_auth(pkg.package, auth, args)
         missing = auth_material.missing
         gate = safety.check(
@@ -161,7 +177,6 @@ class Dispatcher:
         if not op_safety.get("idempotent", True) and idempotency_header:
             idempotency_key, _ = idempotency.get_or_create_key(name, args)
 
-        executor_kind = operation.get("executor", "http")
         if executor_kind in {"python_import", "shell"} and not getattr(pkg, "allow_execute", False):
             body = {
                 "error": "execution_not_allowed",
@@ -175,8 +190,11 @@ class Dispatcher:
                      latency_ms=int((time.time() - start) * 1000))
             return DispatchResult(False, body, "execution_not_allowed")
         executor = get_executor(executor_kind)
+        operation_for_executor = dict(operation)
+        if executor_kind == "http":
+            operation_for_executor["_docmancer_http_grant"] = operation_grant
         result = executor.call(
-            operation=operation,
+            operation=operation_for_executor,
             args=validation_args,
             auth_headers=auth_material.headers,
             required_headers=auth.get("required_headers", {}) or {},

@@ -17,14 +17,14 @@ def isolated(tmp_path, monkeypatch):
     paths.ensure_dirs()
 
 
-def _seed_python_pack(registry_root, allow_execute=False):
+def _seed_python_pack(registry_root, *, via_kwargs=False):
     contract = {
         "operations": [
             {
                 "id": "json_loads",
                 "summary": "Parse a JSON string",
                 "executor": "python_import",
-                "python_import": {"module": "json", "callable": "loads", "via_kwargs": False},
+                "python_import": {"module": "json", "callable": "loads", "via_kwargs": via_kwargs},
                 "params": [{"name": "s", "in": "body", "type": "string", "required": True}],
                 "inputSchema": {
                     "type": "object",
@@ -60,19 +60,9 @@ def test_executor_blocked_without_allow_execute(tmp_path, monkeypatch):
 
 def test_executor_runs_when_opted_in(tmp_path, monkeypatch):
     registry = tmp_path / "reg"
-    _seed_python_pack(registry)
+    _seed_python_pack(registry, via_kwargs=True)
     monkeypatch.setenv("DOCMANCER_REGISTRY_DIR", str(registry))
     install_package("demo", "1", allow_execute=True)
-    d = Dispatcher(Manifest.load())
-    # via_kwargs=False means the args dict is the *first positional*; we want to pass a string.
-    # The test pack declares via_kwargs=False, so 'args' itself is the positional arg —
-    # but our dispatcher stuffs args dict in. For a clean test, swap to via_kwargs=True.
-    # Re-write contract with via_kwargs=True for this assertion path:
-    contract_path = paths.package_dir("demo", "1") / "contract.json"
-    contract = json.loads(contract_path.read_text())
-    contract["operations"][0]["python_import"]["via_kwargs"] = True
-    contract_path.write_text(json.dumps(contract))
-
     d = Dispatcher(Manifest.load())
     out = d.call_tool("demo__1__json_loads", {"s": '{"x": 1}'})
     assert out.ok is True, out.body

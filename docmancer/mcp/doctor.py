@@ -7,7 +7,7 @@ import shutil
 from dataclasses import dataclass
 
 from docmancer.mcp import agent_config, credentials, paths
-from docmancer.mcp.manifest import Manifest
+from docmancer.mcp.manifest import IntegrityError, Manifest
 
 
 @dataclass
@@ -47,6 +47,7 @@ def run() -> list[CheckResult]:
                 results.append(CheckResult(f"{prefix}: {artifact}", False, "missing on disk"))
                 continue
             actual = hashlib.sha256(path.read_bytes()).hexdigest()
+            expected_sha = expected_sha.removeprefix("sha256:")
             results.append(CheckResult(
                 f"{prefix}: {artifact} hash",
                 actual == expected_sha,
@@ -58,6 +59,9 @@ def run() -> list[CheckResult]:
             contract = pkg.contract()
         except FileNotFoundError:
             results.append(CheckResult(f"{prefix}: contract.json", False, "missing"))
+            continue
+        except IntegrityError as exc:
+            results.append(CheckResult(f"{prefix}: artifact integrity", False, str(exc)))
             continue
         for scheme in (contract.get("auth", {}) or {}).get("schemes", []):
             res = credentials.resolve(pkg.package, scheme)

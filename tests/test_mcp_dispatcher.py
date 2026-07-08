@@ -4,7 +4,7 @@ from pathlib import Path
 import httpx
 import pytest
 
-from docmancer.mcp import paths
+from docmancer.mcp import credentials, paths
 from docmancer.mcp.dispatcher import CALL_TOOL, SEARCH_TOOL, Dispatcher
 from docmancer.mcp.executors import http as http_executor
 from docmancer.mcp.manifest import InstalledPackage, Manifest
@@ -91,7 +91,20 @@ def acme_pack(tmp_path, monkeypatch):
     pkg_dir.mkdir(parents=True, exist_ok=True)
     (pkg_dir / "contract.json").write_text(json.dumps(ACME_CONTRACT))
     (pkg_dir / "tools.curated.json").write_text(json.dumps(CURATED_TOOLS))
-    return InstalledPackage(package="acme", version="v1")
+    return InstalledPackage(
+        package="acme",
+        version="v1",
+        operation_grants={
+            "widgets_list": {
+                "allowed_executors": ["http"],
+                "allowed_hosts": ["api.acme.test"],
+            },
+            "widgets_create": {
+                "allowed_executors": ["http"],
+                "allowed_hosts": ["api.acme.test"],
+            },
+        },
+    )
 
 
 @pytest.fixture
@@ -237,3 +250,99 @@ def test_call_tool_post_injects_idempotency_and_form_encoding(manifest_with_acme
     assert "idempotency-key" in captured["headers"]
     assert "_docmancer" in out.body
     assert out.body["_docmancer"]["idempotency_key"] == captured["headers"]["idempotency-key"]
+
+
+def test_http_private_metadata_target_blocked_before_credentials(tmp_path, monkeypatch):
+    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path))
+    contract = json.loads(json.dumps(ACME_CONTRACT))
+    contract["operations"][0]["http"]["base_url"] = "http://169.254.169.254"
+    pkg_dir = paths.package_dir("acme", "v1")
+    pkg_dir.mkdir(parents=True, exist_ok=True)
+    (pkg_dir / "contract.json").write_text(json.dumps(contract))
+    (pkg_dir / "tools.curated.json").write_text(json.dumps(CURATED_TOOLS))
+    pkg = InstalledPackage(
+        package="acme",
+        version="v1",
+        operation_grants={
+            "widgets_list": {
+                "allowed_executors": ["http"],
+                "allowed_hosts": ["169.254.169.254"],
+                "allow_http": True,
+            },
+        },
+    )
+
+    def fail_if_called(_package, _auth, _args):
+        raise AssertionError("credentials must not be resolved for blocked targets")
+
+    monkeypatch.setattr(credentials, "build_auth", fail_if_called)
+    out = Dispatcher(Manifest(packages=[pkg])).call_tool("acme__v1__widgets_list", {"limit": 3})
+    assert out.ok is False
+    assert out.error_code == "private_network_blocked"
+
+
+def test_http_host_not_granted_blocks_before_credentials(tmp_path, monkeypatch):
+    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path))
+    contract = json.loads(json.dumps(ACME_CONTRACT))
+    contract["operations"][0]["http"]["base_url"] = "https://attacker.example"
+    pkg_dir = paths.package_dir("acme", "v1")
+    pkg_dir.mkdir(parents=True, exist_ok=True)
+    (pkg_dir / "contract.json").write_text(json.dumps(contract))
+    (pkg_dir / "tools.curated.json").write_text(json.dumps(CURATED_TOOLS))
+    pkg = InstalledPackage(
+        package="acme",
+        version="v1",
+        operation_grants={
+            "widgets_list": {
+                "allowed_executors": ["http"],
+                "allowed_hosts": ["api.github.com"],
+            },
+        },
+    )
+
+    def fail_if_called(_package, _auth, _args):
+        raise AssertionError("credentials must not be resolved for non-granted hosts")
+
+    monkeypatch.setattr(credentials, "build_auth", fail_if_called)
+    out = Dispatcher(Manifest(packages=[pkg])).call_tool("acme__v1__widgets_list", {"limit": 3})
+    assert out.ok is False
+    assert out.error_code == "host_not_allowed"
+
+
+def test_http_redirect_to_ungranted_host_is_blocked(manifest_with_acme, monkeypatch):
+    monkeypatch.setenv("ACME_API_KEY", "ak_test")
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(302, headers={"Location": "https://evil.example/steal"})
+
+    client = httpx.Client(transport=httpx.MockTransport(handler))
+    from docmancer.mcp import executors
+    original = executors.get_executor
+    monkeypatch.setattr(
+        "docmancer.mcp.dispatcher.get_executor",
+        lambda kind: http_executor.HttpExecutor(client=client) if kind == "http" else original(kind),
+    )
+    out = Dispatcher(manifest_with_acme).call_tool("acme__v1__widgets_list", {"limit": 3})
+    assert out.ok is False
+    assert out.error_code == "executor_error"
+    assert out.body["error"] == "redirect_not_allowed"
+
+
+def test_http_response_larger_than_grant_limit_is_blocked(manifest_with_acme, monkeypatch):
+    monkeypatch.setenv("ACME_API_KEY", "ak_test")
+    manifest_with_acme.packages[0].operation_grants["widgets_list"]["max_response_bytes"] = 3
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(200, content=b"too large")
+
+    client = httpx.Client(transport=httpx.MockTransport(handler))
+    from docmancer.mcp import executors
+    original = executors.get_executor
+    monkeypatch.setattr(
+        "docmancer.mcp.dispatcher.get_executor",
+        lambda kind: http_executor.HttpExecutor(client=client) if kind == "http" else original(kind),
+    )
+    out = Dispatcher(manifest_with_acme).call_tool("acme__v1__widgets_list", {"limit": 3})
+    assert out.ok is False
+    assert out.error_code == "executor_error"
+    assert out.body["error"] == "response_too_large"

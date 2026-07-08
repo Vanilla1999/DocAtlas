@@ -1,12 +1,19 @@
 """HTTP executor with explicit per-operation encoding (D19)."""
 from __future__ import annotations
 
+import json
 from typing import Any
-from urllib.parse import quote
+from urllib.parse import quote, urlparse
 
 import httpx
 
 from docmancer.mcp.executors.base import Executor, ExecutorResult
+from docmancer.mcp.network_policy import (
+    SecurityError,
+    grant_from_mapping,
+    validate_http_target,
+    validate_redirect,
+)
 
 DEFAULT_TIMEOUT = 30.0
 
@@ -38,6 +45,18 @@ class HttpExecutor(Executor):
         path_args, query_args, header_args, body_args = _partition_args(params, args)
 
         url = base_url.rstrip("/") + _render_path(path_template, path_args)
+        grant_mapping = operation.get("_docmancer_http_grant")
+        if grant_mapping is None:
+            parsed_for_compat = urlparse(url)
+            grant_mapping = {
+                "allowed_hosts": [parsed_for_compat.hostname] if parsed_for_compat.hostname else [],
+                "allow_http": parsed_for_compat.scheme == "http",
+            }
+        grant = grant_from_mapping(grant_mapping)
+        try:
+            validate_http_target(url, grant)
+        except SecurityError as exc:
+            return ExecutorResult(False, exc.code, None, error=exc.code)
 
         headers: dict[str, str] = {}
         headers.update(required_headers or {})
@@ -67,7 +86,10 @@ class HttpExecutor(Executor):
             request_kwargs["params"] = {**merged_query, **body_args} or None
         # path_only: nothing extra
 
-        client = self._client or httpx.Client(timeout=self._timeout)
+        client = self._client or httpx.Client(
+            timeout=httpx.Timeout(connect=5, read=20, write=10, pool=5),
+            follow_redirects=False,
+        )
         owns_client = self._client is None
         try:
             response = client.request(method, url, **request_kwargs)
@@ -77,11 +99,22 @@ class HttpExecutor(Executor):
             if owns_client:
                 client.close()
 
+        if 300 <= response.status_code < 400 and response.headers.get("Location"):
+            try:
+                validate_redirect(response.headers["Location"], url, grant)
+            except SecurityError:
+                return ExecutorResult(False, "redirect_not_allowed", None, error="redirect_not_allowed")
+            return ExecutorResult(False, "redirect_not_followed", None, error="redirect_not_followed")
+
         body: Any
         try:
-            body = response.json()
-        except (ValueError, httpx.DecodingError):
-            body = response.text
+            content = read_limited_response(response, grant.max_response_bytes)
+        except SecurityError as exc:
+            return ExecutorResult(False, exc.code, None, error=exc.code)
+        try:
+            body = json.loads(content.decode(response.encoding or "utf-8"))
+        except (ValueError, UnicodeDecodeError):
+            body = content.decode(response.encoding or "utf-8", errors="replace")
 
         ok = 200 <= response.status_code < 300
         return ExecutorResult(
@@ -91,6 +124,17 @@ class HttpExecutor(Executor):
             error=None if ok else _extract_error(body),
             extras={"headers": dict(response.headers)},
         )
+
+
+def read_limited_response(response: httpx.Response, limit: int) -> bytes:
+    chunks: list[bytes] = []
+    total = 0
+    for chunk in response.iter_bytes():
+        total += len(chunk)
+        if total > limit:
+            raise SecurityError("response_too_large")
+        chunks.append(chunk)
+    return b"".join(chunks)
 
 
 def _partition_args(
