@@ -320,7 +320,19 @@ class PatchConstraintsService:
             )
         except Exception:
             return [], []
+        if changed_files:
+            source_evidence = self._prefer_changed_file_evidence(source_evidence, changed_files)
         return repo_map, source_evidence
+
+    @staticmethod
+    def _prefer_changed_file_evidence(items: list[dict[str, Any]], changed_files: list[str]) -> list[dict[str, Any]]:
+        changed = {file.replace("\\", "/").strip("/") for file in changed_files if file.strip()}
+        if not changed:
+            return items
+        in_scope = [item for item in items if str(item.get("path") or "").replace("\\", "/").strip("/") in changed]
+        if in_scope:
+            return in_scope
+        return items
 
     def _repo_map_constraints(self, items: list[dict[str, Any]]) -> list[PatchConstraint]:
         constraints: list[PatchConstraint] = []

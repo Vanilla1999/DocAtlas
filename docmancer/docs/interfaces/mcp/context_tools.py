@@ -21,14 +21,19 @@ def _output_mode(args: dict[str, Any]) -> str:
 
 
 def _answer_payload(payload: dict[str, Any]) -> dict[str, Any]:
+    primary_snippet = payload.get("primary_snippet")
+    supporting_snippets = payload.get("supporting_snippets") or []
+    has_direct_answer = bool(primary_snippet or supporting_snippets)
+    answer_available = bool(payload.get("answer_available")) and has_direct_answer
     answer = {
         "tool": payload.get("tool"),
         "status": payload.get("status"),
-        "answer_available": payload.get("answer_available"),
+        "answer_available": answer_available,
+        "answer_type": "direct" if answer_available else "navigation_only",
         "mode_selected": payload.get("mode_selected"),
         "reason_code": payload.get("reason_code"),
         "response_style": payload.get("response_style"),
-        "primary_snippet": payload.get("primary_snippet"),
+        "primary_snippet": primary_snippet,
         "selected_sources": _trust_sources(payload.get("trust_contract"), "selected"),
         "next_action": payload.get("next_action"),
         "next_actions": payload.get("next_actions") or [],
@@ -38,12 +43,6 @@ def _answer_payload(payload: dict[str, Any]) -> dict[str, Any]:
     if payload.get("requires_confirmation"):
         answer["requires_confirmation"] = payload.get("requires_confirmation")
         answer["confirmation_reason"] = payload.get("confirmation_reason")
-    ingestion = payload.get("ingestion_diagnostics") or {}
-    retrieval = payload.get("retrieval_diagnostics") or {}
-    if ingestion:
-        answer["ingestion_diagnostics"] = ingestion
-    if retrieval:
-        answer["retrieval_diagnostics"] = retrieval
     return {key: value for key, value in answer.items() if value not in (None, {}, [])}
 
 

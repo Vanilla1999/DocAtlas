@@ -44,7 +44,7 @@ def test_readme_documents_naming_compatibility():
 def test_readme_leads_with_patch_contract_runtime_happy_path():
     text = (ROOT / "README.md").read_text(encoding="utf-8")
     assert "Project Patch Contract Runtime" in text
-    assert "get_docs_context → get_patch_constraints → edit → validate_patch_against_constraints → advisory PR artifacts" in text
+    assert "get_docs_context → get_patch_plan_context → get_patch_constraints → edit → validate_patch_against_constraints → advisory PR artifacts" in text
     assert "advisory and non-blocking" in text
     assert "does not prove a patch is safe to merge" in text
 

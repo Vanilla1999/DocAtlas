@@ -164,3 +164,31 @@ def test_get_docs_context_answer_flattens_nested_selected_source_path():
         "source_class": "project_doc",
         "risk_flags": [],
     }]
+
+
+def test_get_docs_context_answer_mode_marks_navigation_only_payload_not_answer_available():
+    class Facade:
+        def get_docs_context(self, question, **kwargs):
+            return {
+                "tool": "get_docs_context",
+                "status": "success",
+                "answer_available": True,
+                "trust_contract": {
+                    "selected": [{"path": "ARCHITECTURE.md", "title": "Architecture"}],
+                    "rejected": [],
+                    "risky": [],
+                },
+                "next_actions": [{"action": "search_project_sources", "tool": "code_search"}],
+                "ingestion_diagnostics": {"project": {"repo_map": {"selected_files": 1}}},
+            }
+
+    result = cast(dict[str, Any], handle_context_tool(
+        "get_docs_context",
+        {"question": "How does DI work?", "project_path": "/repo", "mode": "project"},
+        cast(Any, Facade()),
+    ))
+
+    assert result["answer_available"] is False
+    assert result["answer_type"] == "navigation_only"
+    assert "ingestion_diagnostics" not in result
+    assert result["next_actions"] == [{"action": "search_project_sources", "tool": "code_search"}]

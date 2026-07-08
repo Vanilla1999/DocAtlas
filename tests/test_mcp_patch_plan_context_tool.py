@@ -223,6 +223,42 @@ def test_get_patch_plan_context_handler_accepts_minimal_question():
     assert payload["output_mode"] == "compact"
 
 
+def test_get_patch_plan_context_avoids_hardcoded_ui_risks_for_mcp_tasks(tmp_path: Path):
+    root = tmp_path / "docmancer"
+    _write(
+        root / "docmancer/docs/application/library_registry_ops.py",
+        """
+class LibraryRegistryOps:
+    def prune_library_docs(self):
+        return None
+""".strip(),
+    )
+    _write(
+        root / "docmancer/docs/interfaces/mcp/context_tools.py",
+        """
+def _answer_payload(payload):
+    return payload
+""".strip(),
+    )
+
+    payload = handle_project_tool(
+        "get_patch_plan_context",
+        {
+            "question": "Fix Docmancer MCP answer_available and prune_library_docs response shape",
+            "project_path": str(root),
+            "symbol_queries": ["prune_library_docs", "_answer_payload"],
+        },
+        LibraryDocsService(),
+    )
+
+    assert payload is not None
+    risk_text = "\n".join(item["risk"] for item in payload["risks_and_constraints"])
+    plan_text = json.dumps(payload["minimal_patch_path"], ensure_ascii=False)
+    assert "needFlashLight" not in risk_text
+    assert "Bluetooth" not in risk_text
+    assert "bottom sheet" not in plan_text
+
+
 def test_get_patch_plan_context_response_is_json_serializable():
     payload = handle_project_tool(
         "get_patch_plan_context",
@@ -339,6 +375,33 @@ def test_get_patch_plan_context_wires_changed_files_design_context_and_rejected_
     assert isinstance(payload["token_estimate"], int)
 
 
+def test_get_patch_plan_context_prioritizes_changed_files(tmp_path: Path):
+    root = _source_fixture(tmp_path)
+
+    payload = handle_project_tool(
+        "get_patch_plan_context",
+        {
+            "question": "Plan BrowserTSD menu bottom sheet with MenuLine and MenuIcon",
+            "project_path": str(root),
+            "changed_files": [
+                "lib/modules/tsd_browser/presentation/menu/menu_icon.dart",
+                "lib/modules/tsd_browser/presentation/menu/menu_line.dart",
+            ],
+            "symbol_queries": ["BrowserTSD", "MenuLine", "MenuIcon"],
+            "max_files": 4,
+        },
+        LibraryDocsService(),
+    )
+
+    assert payload is not None
+    files = [item["file"] for item in payload["relevant_files"]]
+    assert files[:2] == [
+        "lib/modules/tsd_browser/presentation/menu/menu_icon.dart",
+        "lib/modules/tsd_browser/presentation/menu/menu_line.dart",
+    ]
+    assert payload["minimal_patch_path"][0]["files"][:2] == files[:2]
+
+
 def test_get_patch_plan_context_builds_compact_implementation_map_for_flutter_fixture(tmp_path: Path):
     root = _dependency_fixture(tmp_path)
 
@@ -433,6 +496,29 @@ def test_get_patch_plan_context_finds_requested_dart_dependency_apis(tmp_path: P
     assert symbols["PBBottomSheet.open"]["usage_example_file"] is None
     assert symbols["PBBottomSheet.open"]["usage_example_lines"] is None
     json.dumps(payload)
+
+
+def test_get_patch_plan_context_does_not_report_project_root_as_dependency(tmp_path: Path):
+    root = _dependency_fixture(tmp_path)
+    config_path = root / ".dart_tool/package_config.json"
+    config = json.loads(config_path.read_text(encoding="utf-8"))
+    config["packages"].append({"name": "nbo_menu", "rootUri": "..", "packageUri": "lib/"})
+    config_path.write_text(json.dumps(config), encoding="utf-8")
+
+    payload = handle_project_tool(
+        "get_patch_plan_context",
+        {
+            "question": "Use MenuLine and PBBottomSheet.open for menu_line",
+            "project_path": str(root),
+            "symbol_queries": ["MenuLine", "PBBottomSheet.open"],
+            "include_dependency_source": True,
+        },
+        LibraryDocsService(),
+    )
+
+    assert payload is not None
+    assert "PBBottomSheet.open" in {item["symbol"] for item in payload["existing_apis"]}
+    assert all(item["symbol"] != "MenuLine" for item in payload["existing_apis"])
 
 
 def test_get_patch_plan_context_does_not_scan_entire_pub_cache_for_dependency_symbols(tmp_path: Path):

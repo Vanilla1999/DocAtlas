@@ -367,7 +367,7 @@ Does not use deleted, orphaned, or stale project-doc content by default.""",
     },
     {
         "name": "get_patch_plan_context",
-        "description": "Return a Patch Planning Context payload for coding agents: an implementation map from concrete intent to exact source/dependency evidence, missing symbols, minimal patch path, risks, and verification. This first-class tool sits between get_docs_context and get_patch_constraints.",
+        "description": "Use for coding changes after docs lookup: return a Patch Planning Context implementation map from concrete intent to exact source/dependency evidence, changed_files, missing symbols, minimal patch path, risks, and verification. Order for agents: inspect_project_docs -> prepare_docs(sync_project_docs if requested) -> get_docs_context for docs -> get_patch_plan_context for source/API map -> get_patch_constraints before editing -> validate_patch_against_constraints after editing -> run tests. This tool does not generate or validate a patch.",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -387,7 +387,7 @@ Does not use deleted, orphaned, or stale project-doc content by default.""",
     },
     {
         "name": "get_patch_constraints",
-        "description": "Return compact, source-attributed project constraints for a coding patch. Designed to provide actionable project constraints for coding agents; this does not validate patches or change get_docs_context behavior.",
+        "description": "Use immediately before editing code: return compact source-attributed project constraints for a coding patch. Pass changed_files when known. This is not a docs lookup, patch planner, patch validator, or test substitute.",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -404,7 +404,7 @@ Does not use deleted, orphaned, or stale project-doc content by default.""",
     },
     {
         "name": "validate_patch_against_constraints",
-        "description": "Use after editing code to check changed files or a patch diff against constraints returned by get_patch_constraints. This is a deterministic best-effort validator; it does not prove correctness and does not replace tests.",
+        "description": "Use after editing code: check changed_files or patch_diff against constraints returned by get_patch_constraints. Treat unknown/manual_review as requiring human/code review. This is deterministic best-effort only; it does not prove correctness and does not replace tests.",
         "inputSchema": {
             "type": "object",
             "properties": {

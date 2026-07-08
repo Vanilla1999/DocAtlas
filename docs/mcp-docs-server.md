@@ -128,6 +128,25 @@ The unified tool delegates to existing facade methods such as `bootstrap_project
 | `get_patch_constraints` | Return compact, source-attributed constraints before patching. Designed to provide actionable project constraints for coding agents; it does not validate patches or change `get_docs_context` behavior. |
 | `validate_patch_against_constraints` | Deterministically check changed files or a patch diff against a caller-supplied constraint packet after editing. Best-effort advisory guardrail only; it does not prove correctness or replace tests. |
 
+Recommended agent workflow:
+
+```text
+Question about this repo?       inspect_project_docs -> prepare_docs(sync_project_docs) only if inspect says stale/not indexed -> get_docs_context
+Coding change / bug fix?        get_docs_context -> get_patch_plan_context -> get_patch_constraints -> edit -> validate_patch_against_constraints -> tests
+Dependency/API question?        inspect_project_docs -> get_docs_context(mode="dependency"|"mixed", allow_network=false first) -> prepare_docs(prefetch_*) only after approval
+After a patch is written?       validate_patch_against_constraints plus real project tests; unknown/manual_review is not a pass
+Debugging Docmancer itself?     use output_mode="debug" or "full"; normal coding agents should use "answer"/"compact"
+```
+
+Tool roles, in one line each:
+
+- `inspect_project_docs`: read-only preflight; tells whether local project docs are indexed/stale and what action to take next.
+- `prepare_docs(action="sync_project_docs")`: mutate/sync the local project-doc index only when inspect recommends it or the user approved it.
+- `get_docs_context`: answer from project/dependency/library docs; use this before guessing architecture or APIs.
+- `get_patch_plan_context`: source/API implementation map for coding; pass `changed_files` and `symbol_queries` when known.
+- `get_patch_constraints`: pre-edit guardrails; pass `changed_files`; not a planner and not a validator.
+- `validate_patch_against_constraints`: post-edit deterministic check; advisory only, then run real tests.
+
 Recommended patch workflow:
 
 ```text

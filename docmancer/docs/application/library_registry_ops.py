@@ -147,6 +147,9 @@ class LibraryRegistryOps:
                 continue
             if record.version in keep:
                 continue
+            if record.status == "failed":
+                candidates.append(record.library_id)
+                continue
             value = self.record_age_cutoff_value(record)
             if not value:
                 continue
@@ -180,6 +183,8 @@ class LibraryRegistryOps:
                 LibraryInfo(
                     library_id=record.library_id,
                     library=record.name,
+                    source_id=record.source_id,
+                    canonical_id=record.canonical_id or record.library_id,
                     ecosystem=record.ecosystem,
                     version=record.version,
                     source_type=record.source_type,

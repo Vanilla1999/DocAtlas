@@ -121,7 +121,7 @@ def build_implementation_map(
 ) -> dict[str, Any]:
     current_behavior = _current_behavior_from_files(relevant_files)
     minimal_patch_path = _minimal_patch_path(question, project_path, relevant_files, design_context=design_context)
-    risks_and_constraints = _risks_and_constraints(missing_symbols, existing_apis, design_context)
+    risks_and_constraints = _risks_and_constraints(question, missing_symbols, existing_apis, design_context)
     verification = _verification_steps(question, relevant_files, existing_apis)
     warnings = _implementation_warnings(project_path, relevant_files, existing_apis, missing_symbols)
     next_actions = _next_actions(relevant_files, existing_apis, missing_symbols)
@@ -226,15 +226,18 @@ def _goal_for_question(question: str) -> str:
     return "Make the requested source change using only files and APIs found in this context."
 
 
-def _risks_and_constraints(missing_symbols: list[dict[str, Any]], existing_apis: list[dict[str, Any]], design_context: dict[str, Any] | None = None) -> list[dict[str, str]]:
+def _risks_and_constraints(question: str, missing_symbols: list[dict[str, Any]], existing_apis: list[dict[str, Any]], design_context: dict[str, Any] | None = None) -> list[dict[str, str]]:
     risks = [
         _risk("generated files must not be edited", "high", "code", "Edit only source files listed in relevant_files; keep generated outputs read-only."),
         _risk("unrelated modules should not be touched", "medium", "code", "Limit changes to the minimal_patch_path files unless new evidence is found."),
-        _risk("capability semantics must be preserved", "high", "code", "Keep existing capability branches and actions while changing presentation."),
-        _risk("preserve needFlashLight, needBT, and isEmulator semantics", "high", "code", "Move UI wiring without changing these flag meanings or call sites."),
-        _risk("legacy Bluetooth QR helpers _showRT40QRDialog and _showMS300QRDialog should be removal candidates only when backed by file evidence", "medium", "code", "Delete only after confirming the helper definitions/usages in the listed files."),
         _risk("missing APIs must not be invented", "high", "code", "Use existing_apis or framework APIs with fresh source evidence."),
     ]
+    if _mentions_any(question, {"menu", "capability", "bluetooth", "flashlight", "emulator", "needbt", "needflashlight"}):
+        risks.extend([
+            _risk("capability semantics must be preserved", "high", "code", "Keep existing capability branches and actions while changing presentation."),
+            _risk("preserve needFlashLight, needBT, and isEmulator semantics", "high", "code", "Move UI wiring without changing these flag meanings or call sites."),
+            _risk("legacy Bluetooth QR helpers _showRT40QRDialog and _showMS300QRDialog should be removal candidates only when backed by file evidence", "medium", "code", "Delete only after confirming the helper definitions/usages in the listed files."),
+        ])
     if existing_apis:
         risks.append(_risk("dependency APIs must be evidence-backed", "medium", "dependency", "Use only dependency APIs with file and line evidence in existing_apis."))
     if missing_symbols:
@@ -329,12 +332,14 @@ def discover_relevant_source_files(
         if candidate is not None:
             candidates.append(candidate)
 
-    for changed_file in changed_files or []:
+    for changed_index, changed_file in enumerate(changed_files or []):
         candidate = _changed_file_candidate(root, changed_file)
         if candidate is not None:
+            candidate["_changed_file_index"] = changed_index
             candidates.append(candidate)
 
-    candidates.sort(key=lambda item: (-item["_score"], item["_first_term_index"], item["file"]))
+    candidates = _merge_duplicate_source_candidates(candidates)
+    candidates.sort(key=lambda item: (-item["_score"], item.get("_changed_file_index", 10_000), item["_first_term_index"], item["file"]))
     public: list[dict[str, Any]] = []
     seen_files: set[str] = set()
     for item in candidates:
@@ -387,7 +392,7 @@ def discover_dart_dependency_apis(
                 seen.add(key)
                 existing.append(found)
     existing.sort(key=lambda item: (item["symbol"], item["file"]))
-    return existing, warnings
+    return _dedupe_dependency_apis(existing), warnings
 
 
 def discover_rejected_sources(question: str, *, project_path: str | None, symbol_queries: list[str] | None = None) -> list[dict[str, Any]]:
@@ -420,6 +425,18 @@ def discover_rejected_sources(question: str, *, project_path: str | None, symbol
         if len(rejected) >= 5:
             break
     return rejected
+
+
+def _dedupe_dependency_apis(items: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    deduped: list[dict[str, Any]] = []
+    seen_symbols: set[str] = set()
+    for item in items:
+        symbol = str(item.get("symbol") or "")
+        if symbol in seen_symbols:
+            continue
+        seen_symbols.add(symbol)
+        deduped.append(item)
+    return deduped
 
 
 def discover_missing_symbols(
@@ -482,6 +499,8 @@ def _resolved_dart_package_roots(project_root: Path) -> tuple[list[Path], list[s
             warnings.append(f"Dart package root for {name} was listed but not found: {root_uri}")
             continue
         resolved = package_root.resolve()
+        if resolved == project_root.resolve():
+            continue
         if resolved not in seen:
             seen.add(resolved)
             roots.append(resolved)
@@ -821,9 +840,30 @@ def _changed_file_candidate(root: Path, changed_file: str) -> dict[str, Any] | N
         "action": "edit",
         "symbols": list(definitions.keys())[:5],
         "refs": refs,
-        "_score": 15,
-        "_first_term_index": 10_000,
+        "_score": 1_000,
+        "_first_term_index": -1,
     }
+
+
+def _merge_duplicate_source_candidates(candidates: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    merged: dict[str, dict[str, Any]] = {}
+    for item in candidates:
+        current = merged.get(item["file"])
+        if current is None:
+            merged[item["file"]] = dict(item)
+            continue
+        if item["_score"] > current["_score"] or item["action"] == "edit":
+            replacement = dict(item)
+            if current.get("refs") and not replacement.get("refs"):
+                replacement["refs"] = current["refs"]
+            replacement["symbols"] = _dedupe([*(replacement.get("symbols") or []), *(current.get("symbols") or [])])[:8]
+            if item["action"] == "edit" and current.get("why"):
+                replacement["why"] = f"{item['why']} Also matched query evidence: {current['why']}"
+            merged[item["file"]] = replacement
+        else:
+            current["symbols"] = _dedupe([*(current.get("symbols") or []), *(item.get("symbols") or [])])[:8]
+            current["refs"] = [*(current.get("refs") or []), *(item.get("refs") or [])][:3]
+    return list(merged.values())
 
 
 def _cap_relevant_file_refs(items: list[dict[str, Any]], *, max_snippets: int) -> list[dict[str, Any]]:

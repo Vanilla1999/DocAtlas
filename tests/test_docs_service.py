@@ -3927,6 +3927,26 @@ def test_list_libraries_shows_pages_and_chunks(tmp_path, monkeypatch):
     assert result[0].chunks == 1
 
 
+def test_list_libraries_exposes_removable_canonical_id(tmp_path, monkeypatch):
+    service = _service(tmp_path, monkeypatch)
+    now = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    service.registry.upsert(
+        library="go_router",
+        ecosystem="pub",
+        version="14.8.1",
+        source_type="api",
+        docs_url="https://pub.dev/documentation/go_router/14.8.1/",
+        now=now,
+        status="available",
+    )
+
+    result = service.list_libraries()
+
+    assert result[0].library_id == "pub:go_router@14.8.1:api"
+    assert result[0].canonical_id == "pub:go_router@14.8.1:api"
+    assert result[0].source_id == "pub:go_router:api"
+
+
 def test_stale_index_triggers_warning_not_empty_state(tmp_path, monkeypatch):
     service = _service(tmp_path, monkeypatch)
     record = service.registry.upsert(
@@ -4067,6 +4087,25 @@ def test_prune_library_docs_removes_failed_stale_records(tmp_path, monkeypatch):
 
     assert result.removed == ["pub:go_router@15.0.0:api"]
     assert service.registry.get("pub:go_router@15.0.0:api") is None
+
+
+def test_prune_library_docs_dry_run_includes_failed_records_even_when_not_old(tmp_path, monkeypatch):
+    service = _service(tmp_path, monkeypatch)
+    service.registry.upsert(
+        library="go_router",
+        ecosystem="pub",
+        version="15.0.0",
+        source_type="api",
+        docs_url="https://pub.dev/documentation/go_router/15.0.0/",
+        now=datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        status="failed",
+        last_error="404",
+    )
+
+    result = service.prune_library_docs(library="go_router", older_than_days=90, dry_run=True)
+
+    assert result.would_remove == ["pub:go_router@15.0.0:api"]
+    assert service.registry.get("pub:go_router@15.0.0:api") is not None
 
 
 def test_prefetch_docs_targets_rejects_localhost_url(tmp_path, monkeypatch):
