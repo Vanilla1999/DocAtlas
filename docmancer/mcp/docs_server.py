@@ -2,9 +2,11 @@
 from __future__ import annotations
 
 import asyncio
+import copy
 import json
 import os
-from typing import Any, cast
+from dataclasses import dataclass
+from typing import Any, Callable, Mapping, cast
 
 from docmancer.docs.interfaces.mcp.error_contract import build_mcp_error_payload, debug_errors_enabled
 from docmancer.docs.service import LibraryDocsService
@@ -13,8 +15,40 @@ from docmancer.docs.interfaces.mcp.docs_tools import handle_library_tool, librar
 from docmancer.docs.interfaces.mcp.prefetch_tools import handle_prefetch_tool, prefetch_tools
 from docmancer.docs.interfaces.mcp.project_tools import handle_project_tool, project_tools
 
+ToolHandler = Callable[[str, dict[str, Any], LibraryDocsService], dict[str, Any] | None]
 
-TOOLS: list[dict[str, Any]] = [
+
+@dataclass(frozen=True)
+class DocsServerConfig:
+    expose_legacy: bool = False
+    expose_admin: bool = False
+
+    @classmethod
+    def from_env(cls, env: Mapping[str, str]) -> "DocsServerConfig":
+        return cls(
+            expose_legacy=env.get("DOCMANCER_MCP_LEGACY_TOOLS") == "1",
+            expose_admin=env.get("DOCMANCER_MCP_ADMIN_TOOLS") == "1",
+        )
+
+
+@dataclass(frozen=True)
+class ToolSpec:
+    name: str
+    description: str
+    input_schema: dict[str, Any]
+    handler: ToolHandler
+
+    def to_tool_dict(self) -> dict[str, Any]:
+        return {"name": self.name, "description": self.description, "inputSchema": copy.deepcopy(self.input_schema)}
+
+
+@dataclass(frozen=True)
+class DocsMcpSurface:
+    tools: tuple[ToolSpec, ...]
+    handlers: Mapping[str, ToolHandler]
+
+
+RAW_TOOLS: list[dict[str, Any]] = [
     {
         "name": "get_docs_context",
         "description": "Return one source-grounded documentation context pack by routing the question to project-owned docs, public library docs, exact dependency docs, or a mixed project-plus-library flow.",
@@ -554,22 +588,59 @@ ADMIN_TOOL_NAMES = {
 }
 
 
-def _enabled_tools(all_tools: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    show_legacy = os.environ.get("DOCMANCER_MCP_LEGACY_TOOLS") == "1"
-    show_admin = os.environ.get("DOCMANCER_MCP_ADMIN_TOOLS") == "1"
-    enabled: list[dict[str, Any]] = []
-    for tool in all_tools:
-        name = str(tool.get("name") or "")
-        if name in LEGACY_TOOL_NAMES and not show_legacy:
-            continue
-        if name in ADMIN_TOOL_NAMES and not show_admin:
-            continue
-        enabled.append(tool)
-    return enabled
+def _handler_for_tool(name: str) -> ToolHandler:
+    if name in {tool["name"] for tool in context_tools(RAW_TOOLS)}:
+        return handle_context_tool
+    if name in {tool["name"] for tool in library_tools(RAW_TOOLS)}:
+        return handle_library_tool
+    if name in {tool["name"] for tool in prefetch_tools(RAW_TOOLS)}:
+        return handle_prefetch_tool
+    if name in {tool["name"] for tool in project_tools(RAW_TOOLS)}:
+        return handle_project_tool
+    raise ValueError(f"No MCP docs handler registered for tool: {name}")
 
 
-ALL_TOOLS = TOOLS
-TOOLS = _enabled_tools(ALL_TOOLS)
+def _strip_null_enum_values(value: Any) -> Any:
+    if isinstance(value, dict):
+        cleaned = {key: _strip_null_enum_values(child) for key, child in value.items()}
+        if "enum" in cleaned and isinstance(cleaned["enum"], list):
+            cleaned["enum"] = [item for item in cleaned["enum"] if item is not None]
+        return cleaned
+    if isinstance(value, list):
+        return [_strip_null_enum_values(item) for item in value]
+    return value
+
+
+def _tool_spec(raw: dict[str, Any]) -> ToolSpec:
+    name = str(raw["name"])
+    return ToolSpec(
+        name=name,
+        description=str(raw["description"]),
+        input_schema=_strip_null_enum_values(copy.deepcopy(raw["inputSchema"])),
+        handler=_handler_for_tool(name),
+    )
+
+
+def build_docs_surface(config: DocsServerConfig) -> DocsMcpSurface:
+    specs: list[ToolSpec] = []
+    for raw in RAW_TOOLS:
+        name = str(raw.get("name") or "")
+        if name in LEGACY_TOOL_NAMES and not config.expose_legacy:
+            continue
+        if name in ADMIN_TOOL_NAMES and not config.expose_admin:
+            continue
+        specs.append(_tool_spec(raw))
+    return DocsMcpSurface(
+        tools=tuple(specs),
+        handlers={spec.name: spec.handler for spec in specs},
+    )
+
+
+ALL_SURFACE = build_docs_surface(DocsServerConfig(expose_legacy=True, expose_admin=True))
+DOCS_SURFACE = build_docs_surface(DocsServerConfig.from_env(os.environ))
+
+ALL_TOOLS = [spec.to_tool_dict() for spec in ALL_SURFACE.tools]
+TOOLS = [spec.to_tool_dict() for spec in DOCS_SURFACE.tools]
 
 CONTEXT_TOOLS = context_tools(TOOLS)
 LIBRARY_TOOLS = library_tools(TOOLS)
@@ -727,7 +798,8 @@ async def _run_async(service: LibraryDocsService) -> None:
     async def _call_tool(name: str, arguments: dict[str, Any]) -> list[mcp_types.TextContent]:
         try:
             args = arguments or {}
-            for handler in (handle_context_tool, handle_library_tool, handle_prefetch_tool, handle_project_tool):
+            handler = DOCS_SURFACE.handlers.get(name)
+            if handler is not None:
                 payload = handler(name, args, service)
                 if payload is not None:
                     return _json_text(mcp_types, payload)

@@ -6,7 +6,20 @@ from docmancer.docs.interfaces.mcp.context_tools import CONTEXT_TOOL_NAMES
 from docmancer.docs.interfaces.mcp.docs_tools import LIBRARY_TOOL_NAMES
 from docmancer.docs.interfaces.mcp.prefetch_tools import PREFETCH_TOOL_NAMES, _bounded_targets
 from docmancer.docs.interfaces.mcp.project_tools import PROJECT_TOOL_NAMES
-from docmancer.mcp.docs_server import ALL_TOOLS, CONTEXT_TOOLS, LIBRARY_TOOLS, MCP_RESOURCES, MCP_RESOURCE_TEMPLATES, PREFETCH_TOOLS, PROJECT_TOOLS, TOOLS, read_docs_resource
+from docmancer.mcp.docs_server import (
+    ADMIN_TOOL_NAMES,
+    ALL_TOOLS,
+    CONTEXT_TOOLS,
+    DocsServerConfig,
+    LIBRARY_TOOLS,
+    MCP_RESOURCES,
+    MCP_RESOURCE_TEMPLATES,
+    PREFETCH_TOOLS,
+    PROJECT_TOOLS,
+    TOOLS,
+    build_docs_surface,
+    read_docs_resource,
+)
 
 
 def test_mcp_grouped_tool_registration_preserves_tool_names():
@@ -31,6 +44,40 @@ def test_mcp_public_surface_exposes_prepare_docs_instead_of_prefetch_library_doc
     names = {tool["name"] for tool in TOOLS}
     assert "prepare_docs" in names
     assert "prefetch_library_docs" not in names
+
+
+def test_docs_surface_builder_uses_one_tool_and_handler_contract():
+    surface = build_docs_surface(DocsServerConfig(expose_legacy=False, expose_admin=False))
+    tool_names = {spec.name for spec in surface.tools}
+
+    assert tool_names == set(surface.handlers)
+    assert "get_docs_context" in surface.handlers
+    assert "prefetch_library_docs" not in tool_names
+
+
+def test_docs_surface_builder_exposes_legacy_and_admin_by_config():
+    surface = build_docs_surface(DocsServerConfig(expose_legacy=True, expose_admin=True))
+    names = {spec.name for spec in surface.tools}
+
+    assert "prefetch_library_docs" in names
+    assert ADMIN_TOOL_NAMES.issubset(names)
+    assert names == set(surface.handlers)
+
+
+def test_public_mcp_schemas_do_not_put_null_in_enum_values():
+    def walk(value):
+        if isinstance(value, dict):
+            enum = value.get("enum")
+            if enum is not None:
+                assert None not in enum
+            for child in value.values():
+                walk(child)
+        elif isinstance(value, list):
+            for child in value:
+                walk(child)
+
+    for tool in TOOLS:
+        walk(tool["inputSchema"])
 
 
 def test_mcp_get_library_docs_guides_retry_before_webfetch():
@@ -139,7 +186,7 @@ def test_mcp_exposes_get_project_context_with_trust_contract():
     assert tool["inputSchema"]["required"] == ["project_path", "question"]
     assert "mode" in tool["inputSchema"]["properties"]
     assert "libraries" in tool["inputSchema"]["properties"]
-    assert tool["inputSchema"]["properties"]["output_mode"]["enum"] == ["answer", "compact", "debug", "full", None]
+    assert tool["inputSchema"]["properties"]["output_mode"]["enum"] == ["answer", "compact", "debug", "full"]
     assert "details" in tool["inputSchema"]["properties"]
 
 

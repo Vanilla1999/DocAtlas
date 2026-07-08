@@ -19,8 +19,8 @@ def test_get_docs_context_schema():
     schema = tool["inputSchema"]
     assert schema["required"] == ["question"]
     assert "allow_network" in schema["properties"]
-    assert schema["properties"]["output_mode"]["enum"] == ["answer", "compact", "debug", "full", None]
-    assert schema["properties"]["mode"]["enum"] == ["auto", "project", "library", "dependency", "mixed", None]
+    assert schema["properties"]["output_mode"]["enum"] == ["answer", "compact", "debug", "full"]
+    assert schema["properties"]["mode"]["enum"] == ["auto", "project", "library", "dependency", "mixed"]
 
 
 def test_get_docs_context_handler_calls_facade():

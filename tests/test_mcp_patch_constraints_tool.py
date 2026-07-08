@@ -44,7 +44,7 @@ def test_mcp_schema_exposes_get_patch_constraints():
     assert properties["max_constraints"]["type"] == "integer"
     assert properties["max_tokens"]["type"] == "integer"
     assert properties["include_sources"]["type"] == "boolean"
-    assert properties["output_mode"]["enum"] == ["compact", "debug", "full", None]
+    assert properties["output_mode"]["enum"] == ["compact", "debug", "full"]
 
 
 def test_mcp_return_shape(tmp_path: Path):
