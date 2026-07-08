@@ -16,6 +16,7 @@ from docmancer.docs.domain.code_graph import (
     make_file_node_id,
     make_symbol_node_id,
     render_code_graph_path,
+    score_code_graph_file,
 )
 
 
@@ -651,3 +652,98 @@ def test_code_graph_context_diagnostics_includes_capped_score_reasons_by_path(tm
     assert diagnostics["score_reasons_by_path"]
     assert all(len(reasons) <= 8 for reasons in diagnostics["score_reasons_by_path"].values())
     assert diagnostics == code_graph_context_diagnostics(items)
+
+
+def test_code_graph_ranking_exact_string_beats_common_external_import_noise(tmp_path):
+    lib = tmp_path / "lib"
+    lib.mkdir()
+    (lib / "screen.dart").write_text(
+        """
+class HelpRequestScreen {
+  final label = "Вернуть в работу";
+}
+""".strip()
+        + "\n",
+        encoding="utf-8",
+    )
+    (lib / "flutter_noise.dart").write_text(
+        """
+import 'package:flutter/widgets.dart';
+import 'package:provider/provider.dart';
+
+class WidgetNoise {
+  final value = Widget;
+}
+""".strip()
+        + "\n",
+        encoding="utf-8",
+    )
+    graph = build_project_code_graph(tmp_path, question="Вернуть в работу Widget provider")
+
+    items = build_code_graph_context_items(graph, question="Вернуть в работу Widget provider", token_budget=1200, max_items=3)
+
+    assert items[0]["path"] == "lib/screen.dart"
+    assert items[0]["metadata"]["score_breakdown"]
+    assert any(reason["reason"] == "string_or_status_match" for reason in items[0]["metadata"]["score_breakdown"])
+
+
+def test_code_graph_ranking_specific_symbol_beats_generic_cubit_match(tmp_path):
+    graph = _dart_help_graph(tmp_path)
+    lib = tmp_path / "lib"
+    (lib / "generic_cubit.dart").write_text("class Cubit {}\n", encoding="utf-8")
+    graph = build_project_code_graph(tmp_path, question="HelpRequestsCubit Cubit", max_files=10, token_budget=4000)
+
+    items = build_code_graph_context_items(graph, question="HelpRequestsCubit Cubit", token_budget=1200, max_items=5)
+    paths = [item["path"] for item in items]
+
+    assert "lib/generic_cubit.dart" in paths
+    assert paths.index("lib/generic_cubit.dart") > min(paths.index("lib/cubit/help_requests_cubit.dart"), paths.index("lib/screens/help_request_screen.dart"))
+
+
+def test_code_graph_ranking_external_import_has_no_relevance_by_itself(tmp_path):
+    file_node = CodeGraphNode(id="file:lib/external.dart", kind="file", name="external.dart", path="lib/external.dart", language="dart")
+    edge = CodeGraphEdge(
+        id="edge:external",
+        kind="unresolved_import",
+        from_node_id=file_node.id,
+        from_path=file_node.path,
+        symbol="package:provider/provider.dart",
+        confidence="unresolved",
+        confidence_score=0.1,
+        metadata={"external": True},
+    )
+    graph = CodeGraph(nodes=[file_node], edges=[edge])
+
+    score, reasons = score_code_graph_file(graph, file_node, question="provider")
+
+    assert score <= 0
+    assert all("provider" not in reason or "unresolved" in reason or "external" in reason for reason in reasons)
+
+
+def test_code_graph_ranking_unresolved_reference_is_weak_search_hint_only():
+    file_node = CodeGraphNode(id="file:lib/screen.dart", kind="file", name="screen.dart", path="lib/screen.dart", language="dart")
+    edge = CodeGraphEdge(
+        id="edge:missing",
+        kind="unresolved_reference",
+        from_node_id=file_node.id,
+        from_path=file_node.path,
+        symbol="MissingApi",
+        confidence="unresolved",
+        confidence_score=0.1,
+    )
+    graph = CodeGraph(nodes=[file_node], edges=[edge])
+
+    score, reasons = score_code_graph_file(graph, file_node, question="MissingApi")
+
+    assert 0 < score <= 0.3
+    assert any("unresolved_reference" in reason for reason in reasons)
+
+
+def test_code_graph_ranking_connected_service_appears_after_selected_screen_or_cubit_when_budget_allows(tmp_path):
+    graph = _dart_help_graph(tmp_path)
+
+    items = build_code_graph_context_items(graph, question="Вернуть в работу HelpRequestsCubit HelpRequestsService", token_budget=1600, max_items=5)
+    paths = [item["path"] for item in items]
+
+    assert "lib/services/help_requests_service.dart" in paths
+    assert paths.index("lib/services/help_requests_service.dart") > min(paths.index("lib/screens/help_request_screen.dart"), paths.index("lib/cubit/help_requests_cubit.dart"))

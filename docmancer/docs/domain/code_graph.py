@@ -265,7 +265,7 @@ def build_code_graph_context_items(
     file_nodes = [node for node in graph.nodes if node.kind == "file"]
     if not file_nodes:
         return []
-    scored = [(node, *score_code_graph_file(graph, node, question=question)) for node in file_nodes]
+    scored = [(node, *_score_code_graph_file_detail(graph, node, question=question)) for node in file_nodes]
     scored.sort(key=lambda item: (-item[1], item[0].path))
     selected = [item for item in scored if item[1] > 0]
     if not selected:
@@ -273,10 +273,10 @@ def build_code_graph_context_items(
 
     items: list[dict[str, Any]] = []
     used_tokens = 0
-    for file_node, score, reasons in selected:
+    for file_node, score, reasons, breakdown in selected:
         if len(items) >= max_items:
             break
-        item = _code_graph_context_item(graph, file_node, question=question, score=score, score_reasons=reasons, token_budget=token_budget)
+        item = _code_graph_context_item(graph, file_node, question=question, score=score, score_reasons=reasons, score_breakdown=breakdown, token_budget=token_budget)
         estimate = int(item["token_estimate"])
         if items and used_tokens + estimate > token_budget:
             continue
@@ -291,48 +291,77 @@ def score_code_graph_file(
     *,
     question: str,
 ) -> tuple[float, list[str]]:
+    score, reasons, _breakdown = _score_code_graph_file_detail(graph, file_node, question=question)
+    return score, reasons
+
+
+def _score_code_graph_file_detail(
+    graph: CodeGraph,
+    file_node: CodeGraphNode,
+    *,
+    question: str,
+) -> tuple[float, list[str], list[dict[str, Any]]]:
     terms = _context_query_terms(question)
     use_intent = _has_reference_intent(question)
-    reasons: list[str] = []
-    score = 0.0
+    breakdown: list[dict[str, Any]] = []
+    seen_breakdown: set[tuple[str, str]] = set()
     edges = _edges_for_file(graph, file_node.id)
     symbols = _symbols_for_file(graph, file_node.path)
     strings = _file_strings(file_node)
 
-    if symbols:
-        score += 1
-        reasons.append("non_empty_symbols")
+    def add(reason: str, points: float, evidence: str, confidence: str) -> None:
+        if points <= 0:
+            return
+        key = (reason, str(evidence))
+        if key in seen_breakdown:
+            return
+        seen_breakdown.add(key)
+        breakdown.append({
+            "reason": reason,
+            "points": round(points, 3),
+            "evidence": str(evidence)[:80],
+            "confidence": confidence,
+        })
+
     for term in terms:
-        if any(_contains_term(symbol.name, term) for symbol in symbols):
-            score += 8
-            reasons.append(f"symbol_match:{term}")
-        if any(_contains_term(value, term) for value in strings):
-            score += 7
-            reasons.append(f"string_or_status_match:{term}")
+        for symbol in symbols:
+            if not _contains_term(symbol.name, term):
+                continue
+            confidence = str(symbol.metadata.get("extraction_confidence") or ("parser" if file_node.language == "python" else "regex"))
+            points = 0.5 if _is_low_signal_symbol(symbol.name) else 5.0
+            add("symbol_match", points, symbol.name, confidence)
+        for value in strings:
+            if _contains_term(value, term):
+                add("string_or_status_match", 8.0, value, "exact")
         if _contains_term(file_node.path, term):
-            score += 5
-            reasons.append(f"path_match:{term}")
-        if any(edge.kind == "references" and _contains_term(edge.symbol or "", term) for edge in edges):
-            score += 4
-            reasons.append(f"reference_match:{term}")
-            if use_intent:
-                score += 7
-                reasons.append(f"reference_intent_match:{term}")
-        if any(edge.kind in {"imports", "exports"} and (_contains_term(edge.to_path or "", term) or _contains_term(edge.symbol or "", term)) for edge in edges):
-            score += 3
-            reasons.append(f"import_or_export_match:{term}")
+            add("path_match", 5.0, file_node.path, "exact")
+        for matched in file_node.metadata.get("matched_terms") or []:
+            if _contains_term(str(matched), term):
+                add("source_evidence_term", 4.0, str(matched), "heuristic")
+        for edge in edges:
+            if edge.kind == "references" and edge.symbol and _contains_term(edge.symbol, term):
+                points = _edge_relevance_weight(edge)
+                if _is_low_signal_symbol(edge.symbol):
+                    points = min(points, 0.5)
+                add("reference_match", points, edge.symbol, edge.confidence)
+                if use_intent and points > 0.5:
+                    add("reference_intent_match", 7.0, edge.symbol, edge.confidence)
+            elif edge.kind == "unresolved_reference" and edge.symbol and _contains_term(edge.symbol, term):
+                add("unresolved_reference_search_hint", _edge_relevance_weight(edge), edge.symbol, "unresolved")
+            elif edge.kind in {"imports", "exports"} and (_contains_term(edge.to_path or "", term) or _contains_term(edge.symbol or "", term)):
+                add("import_or_export_match", _edge_relevance_weight(edge), edge.to_path or edge.symbol or edge.kind, edge.confidence)
+            elif edge.kind in {"unresolved_import", "unresolved_export"} and _contains_term(edge.symbol or edge.evidence or "", term):
+                add("unresolved_import_search_hint", _edge_relevance_weight(edge), edge.symbol or edge.evidence or edge.kind, "unresolved")
 
     local_edges = [edge for edge in edges if edge.kind in {"imports", "exports", "references"} and edge.to_path]
+    has_direct_evidence = any(item["reason"] in {"symbol_match", "string_or_status_match", "path_match", "source_evidence_term", "reference_match", "unresolved_reference_search_hint"} for item in breakdown)
     if local_edges and _is_connected_to_matched_file(graph, file_node, terms):
-        score += 2
-        reasons.append("connected_to_matched_file")
-    unresolved_external = [edge for edge in edges if edge.kind.startswith("unresolved_") and edge.metadata.get("external") is True]
-    local_evidence = symbols or strings or local_edges
-    if unresolved_external and not local_evidence:
-        score -= 3
-        reasons.append("external_unresolved_only")
-    return score, reasons
+        boost = 1.0 if has_direct_evidence else 0.6
+        add("connected_to_matched_file", boost, file_node.path, "heuristic")
 
+    score = round(sum(float(item["points"]) for item in breakdown), 3)
+    reasons = [f"{item['reason']}:{item['evidence']}:+{item['points']}[{item['confidence']}]" for item in breakdown]
+    return score, reasons, breakdown
 
 def code_graph_diagnostics(graph: CodeGraph) -> dict[str, Any]:
     edge_kinds = Counter(edge.kind for edge in graph.edges)
@@ -555,6 +584,40 @@ def confidence_score_for(confidence: str) -> float:
     return _CONFIDENCE_SCORES.get(confidence, _CONFIDENCE_SCORES["heuristic"])
 
 
+def _is_low_signal_symbol(name: str) -> bool:
+    normalized = re.sub(r"[^A-Za-z0-9]+", "", str(name or "")).casefold()
+    return normalized in {
+        "state",
+        "widget",
+        "buildcontext",
+        "string",
+        "future",
+        "list",
+        "map",
+        "error",
+        "result",
+        "service",
+        "repository",
+        "cubit",
+    }
+
+
+def _edge_relevance_weight(edge: CodeGraphEdge) -> float:
+    if edge.kind in {"unresolved_import", "unresolved_export"}:
+        return 0.0 if edge.metadata.get("external") is True else 0.2
+    if edge.kind == "unresolved_reference":
+        return 0.3
+    if edge.kind in {"imports", "exports"}:
+        if not edge.to_path or edge.metadata.get("external") is True:
+            return 0.0
+        return 2.0 if edge.confidence == "exact" else 1.3
+    if edge.kind == "references":
+        return 2.5 if edge.confidence in {"heuristic", "regex", "parser", "exact"} else 1.0
+    if edge.kind == "contains":
+        return 5.0 if edge.confidence in {"parser", "regex", "exact"} else 0.5
+    return 0.0
+
+
 def _code_graph_context_item(
     graph: CodeGraph,
     file_node: CodeGraphNode,
@@ -562,6 +625,7 @@ def _code_graph_context_item(
     question: str,
     score: float,
     score_reasons: list[str],
+    score_breakdown: list[dict[str, Any]],
     token_budget: int,
 ) -> dict[str, Any]:
     symbols = _symbols_for_file(graph, file_node.path)[:6]
@@ -612,6 +676,7 @@ def _code_graph_context_item(
             "confidence_summary": confidence_summary,
             "score": score,
             "score_reasons": score_reasons,
+            "score_breakdown": score_breakdown[:20],
         },
     }
 
