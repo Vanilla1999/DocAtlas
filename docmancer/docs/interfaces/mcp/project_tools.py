@@ -6,6 +6,7 @@ from typing import Any
 
 from docmancer.docs.interfaces.mcp.error_contract import build_bad_request_payload
 from docmancer.docs.interfaces.mcp.output_contract import compact_mcp_payload, json_bytes, normalize_output_mode
+from docmancer.docs.code_context import build_code_context
 from docmancer.docs.patch_plan_context import build_patch_plan_context
 from docmancer.docs.service import LibraryDocsService
 
@@ -37,6 +38,7 @@ PROJECT_TOOL_NAMES = {
     "bootstrap_project_docs",
     "get_project_docs",
     "get_project_context",
+    "get_code_context",
     "get_patch_plan_context",
     "get_patch_constraints",
     "validate_patch_against_constraints",
@@ -610,6 +612,24 @@ def handle_project_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
         payload["output_mode"] = output_mode
         payload = _compact_mcp_payload(_add_project_context_output_warning(payload, args), page=_bounded_int_arg(args, "page", default=1, max_value=10_000), page_size=_bounded_int_arg(args, "page_size", default=None, max_value=20), include_sections=args.get("include_sections"))
         return _strip_mcp_debug_noise(payload)
+    if name == "get_code_context":
+        question = _clean_string(args.get("question"))
+        if not question:
+            return _bad_request("empty_question", "question must not be empty")
+        project_path = _clean_string(args.get("project_path"))
+        if not project_path:
+            return _bad_request("empty_project_path", "project_path must not be empty")
+        return build_code_context(
+            question,
+            project_path=project_path,
+            changed_files=args.get("changed_files"),
+            entry_symbols=args.get("entry_symbols"),
+            max_hops=_bounded_int_arg(args, "max_hops", default=2, min_value=0, max_value=4),
+            max_files=_bounded_int_arg(args, "max_files", default=12, max_value=50),
+            max_snippets=_bounded_int_arg(args, "max_snippets", default=20, max_value=40),
+            max_lines_per_snippet=_bounded_int_arg(args, "max_lines_per_snippet", default=80, min_value=10, max_value=200),
+            output_mode=args.get("output_mode") or "answer",
+        )
     if name == "get_patch_plan_context":
         question = _clean_string(args.get("question"))
         if not question:

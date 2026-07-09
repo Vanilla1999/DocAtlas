@@ -418,6 +418,30 @@ Does not use deleted, orphaned, or stale project-doc content by default.""",
         },
     },
     {
+        "name": "get_code_context",
+        "description": """Find relevant local source files, extract real code snippets, follow name-based references for a few hops, and return an answer-ready source context pack.
+
+Agent workflow: call inspect_project_docs(project_path) first for repo/documentation state; then use get_code_context for implementation/source-navigation questions. If safe_to_answer=true, answer only from returned snippets and cite file paths and line ranges. If answer_type=navigation_only, read/search files_to_read and search_queries before answering.
+
+This is language-agnostic heuristic retrieval over local source. It is not an LSP, AST-perfect analyzer, call graph, patch validator, or test substitute.
+""",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "question": {"type": "string"},
+                "project_path": {"type": "string"},
+                "changed_files": {"type": ["array", "null"], "items": {"type": "string"}},
+                "entry_symbols": {"type": ["array", "null"], "items": {"type": "string"}},
+                "max_hops": {"type": ["integer", "null"], "minimum": 0, "maximum": 4, "default": 2},
+                "max_files": {"type": ["integer", "null"], "minimum": 1, "maximum": 50, "default": 12},
+                "max_snippets": {"type": ["integer", "null"], "minimum": 1, "maximum": 40, "default": 20},
+                "max_lines_per_snippet": {"type": ["integer", "null"], "minimum": 10, "maximum": 200, "default": 80},
+                "output_mode": {"type": ["string", "null"], "enum": ["answer", "compact", "debug", "full", None], "default": "answer"},
+            },
+            "required": ["question", "project_path"],
+        },
+    },
+    {
         "name": "get_patch_plan_context",
         "description": """Use for coding changes after docs lookup: return a Patch Planning Context implementation map from concrete intent to exact source/dependency evidence, changed_files, missing symbols, minimal patch path, risks, and verification.
 
@@ -760,13 +784,14 @@ It is not:
 - a static analyzer;
 - a test runner;
 - a code generator;
-- a full Context7 clone that always returns function bodies.
+- an AST-perfect/LSP code intelligence engine.
 
 Use Docmancer before generic code search when the user asks about:
 - project architecture;
 - repo conventions;
 - dependency/library documentation;
 - Context7-like docs help;
+- answer-ready local source snippets via `get_code_context`;
 - patch planning;
 - patch constraints.
 
@@ -781,10 +806,14 @@ Use Docmancer before generic code search when the user asks about:
 3. Then call:
    `get_docs_context(project_path=..., question=..., mode="project" | "mixed", response_style="snippet-first", output_mode="answer")`
 
-4. Interpret the result:
+4. For implementation/source-navigation questions that need code bodies, call:
+   `get_code_context(project_path=..., question=..., entry_symbols=[...], output_mode="answer")`
+
+5. Interpret the result:
    - `answer_type="direct"`: you may answer from the returned snippets/sources.
    - `answer_type="navigation_only"`: do not answer yet. Read/search the suggested files first, then answer.
    - `partial_navigational`: treat it as source-search guidance, not a complete answer.
+   - `safe_to_answer=true` from `get_code_context`: answer only from returned source snippets and cite paths/line ranges.
    - `requires_confirmation=true`: ask the user before network/dependency fetches.
 
 ## Context7-like library workflow
@@ -804,11 +833,12 @@ Do not use WebFetch as a substitute for registered Docmancer docs until Docmance
 Before editing code:
 
 1. `get_docs_context(...)`
-2. `get_patch_plan_context(project_path=..., question=..., changed_files=[...])`
-3. `get_patch_constraints(project_path=..., question=..., changed_files=[...])`
-4. Edit code.
-5. `validate_patch_against_constraints(project_path=..., changed_files=[...] or patch_diff=...)`
-6. Run tests/linters.
+2. `get_code_context(project_path=..., question=..., changed_files=[...])` when source bodies/references matter.
+3. `get_patch_plan_context(project_path=..., question=..., changed_files=[...])`
+4. `get_patch_constraints(project_path=..., question=..., changed_files=[...])`
+5. Edit code.
+6. `validate_patch_against_constraints(project_path=..., changed_files=[...] or patch_diff=...)`
+7. Run tests/linters.
 
 ## Audit workflow
 
