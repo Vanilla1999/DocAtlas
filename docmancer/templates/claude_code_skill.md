@@ -36,23 +36,23 @@ For MCP docs tools, registered sources are registry-owned. If `get_library_docs`
 
 When MCP docs tools are available, call `inspect_project_docs(project_path=".")` first inside a repo when the user asks to use Docmancer, asks about project architecture, asks how this repo works, or expects Context7-like help. This read-only step discovers reviewable project-owned docs (`README`, `docs/`, `wiki/`, `ARCHITECTURE`, ADR, roadmap) and dependency manifests/lockfiles.
 
-Use the returned `recommended_next_actions`:
+Use the returned `next_action` / `recommended_next_actions`:
 
-- `ingest_project_docs` indexes local project docs; ask briefly unless local indexing was already approved.
-- `get_project_docs` queries indexed project-owned docs and returns source class, file path, heading, and stale/next-action guidance. Use it before WebFetch for repo-specific architecture, implementation, roadmap, ADR, or README questions.
-- `create_reviewable_project_doc` is a manual agent/user action, not hidden memory: if no project docs exist, ask the user before studying the codebase and creating `ARCHITECTURE.md`; then run `inspect_project_docs`, `ingest_project_docs`, and `get_project_docs`.
-- `prefetch_project_docs` fetches exact dependency docs from manifests/lockfiles; ask before running because it may use the network.
+- `prepare_docs(action="sync_project_docs")` is the public lifecycle path for local project docs. Run it only when inspect reports not-indexed or stale docs, or when the user already approved local indexing.
+- `get_docs_context(mode="project")` is the public query path for repo-specific architecture, implementation, roadmap, ADR, README, wiki, or module-doc questions. Use it before WebFetch.
+- `create_reviewable_project_doc` is a manual agent/user action, not hidden memory: if no project docs exist, ask the user before studying the codebase and creating `ARCHITECTURE.md`; then run `inspect_project_docs`, `prepare_docs(action="sync_project_docs")`, and `get_docs_context(mode="project")`.
+- Dependency-doc prefetch may use the network. Use `prepare_docs(action="prefetch_project_dependency_docs")` only after explicit approval.
 - Do not write official architecture or ADR into hidden memory. Official project docs should remain files in the repo.
 
-For repo-specific implementation or architecture answers, use `get_project_docs` after `inspect_project_docs`/`ingest_project_docs` before WebFetch. If `get_project_docs` reports `not_indexed`, `stale`, or `no_project_docs`, follow its `next_actions` instead of guessing. For dependency API questions in a project, prefer exact dependency docs discovered from the project before latest-only hosted docs.
+For repo-specific implementation or architecture answers, use `get_docs_context(mode="project")` after `inspect_project_docs` and any required `prepare_docs(action="sync_project_docs")` step before WebFetch. If the response reports not-indexed, stale, or missing project docs, follow its `next_action` instead of guessing. For dependency API questions in a project, prefer exact dependency docs discovered from the project before latest-only hosted docs.
 
-Golden path for repo questions: `inspect_project_docs` -> `ingest_project_docs` when requested -> `get_project_context` -> review the Trust Contract -> inspect source code only for current implementation facts. Bad path: answer from generic package docs or WebFetch before checking project-owned docs.
+Golden path for repo questions: `inspect_project_docs` -> `prepare_docs(action="sync_project_docs")` if needed -> `get_docs_context(mode="project")` -> review the Trust Contract -> inspect source code only for current implementation facts. Bad path: answer from generic package docs or WebFetch before checking project-owned docs.
 
 Evidence types must stay separate: project docs prove repository architecture, decisions, runbooks, and conventions; dependency docs prove external package APIs; source code proves current implementation. Do not use dependency docs as proof of repo-specific architecture.
 
 If `source_state_guidance` mentions `indexed_source_not_discovered`, do not treat that as automatically deleted or invalid. It means an indexed source was not selected by the current project-doc discovery pass; link it from `docs/INDEX.md` or root docs, move it under a discovered docs location, adjust discovery, or refresh/remove obsolete index entries.
 
-When a repository has many docs, treat a maintained `docs/INDEX.md` as the canonical map of project-owned docs. After docs are added, refreshed, or reorganized, recommend a verification loop: `inspect_project_docs` -> `ingest_project_docs` if needed -> `inspect_project_docs` again -> ask smoke-test questions with `get_project_context`/`get_project_docs` and confirm expected files are cited.
+When a repository has many docs, treat a maintained `docs/INDEX.md` as the canonical map of project-owned docs. After docs are added, refreshed, or reorganized, recommend a verification loop: `inspect_project_docs` -> `prepare_docs(action="sync_project_docs")` if needed -> `inspect_project_docs` again -> ask smoke-test questions with `get_docs_context(mode="project")` and confirm expected files are cited.
 
 ## Core Commands
 
@@ -76,7 +76,7 @@ Use `ingest` for local files and `add` for URLs. `query` is the primary retrieva
 
 ## Advanced: API Tools via MCP
 
-Only use the MCP surface if the user is explicitly working with installed API packs. If the user has run `doc-atlas install-pack <pkg>@<version>`, the agent host can launch `doc-atlas mcp serve` and expose two meta-tools:
+Only use the MCP Packs surface if the user is explicitly working with installed API packs. It is an advanced API-action layer, not an alternative documentation workflow. If the user has run `doc-atlas install-pack <pkg>@<version>`, the agent host can launch `doc-atlas mcp serve` and expose two meta-tools:
 
 - `docmancer_search_tools(query, package?, limit?)`
 - `docmancer_call_tool(name, args)`

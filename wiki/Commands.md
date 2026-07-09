@@ -90,7 +90,7 @@ Register unknown docs with an explicit `docs_url` or `docs_url_template`; later 
 |---------|-------------|
 | `doc-atlas install-pack <pkg>@<version>` | Install a pack from the registry. Verifies SHA-256 of every artifact and registers it in `~/.docmancer/mcp/manifest.json`. Spec parses from the rightmost `@` so npm-scoped names like `@scope/pkg@1.2.3` work. |
 | `doc-atlas uninstall <pkg>[@<version>]` | Remove an installed pack (all versions if no version given). |
-| `doc-atlas mcp serve` | Run the stdio MCP server. Agents launch this; humans usually do not. |
+| `doc-atlas mcp serve` | Run the advanced stdio MCP Packs/API-pack gateway. The default documentation workflow uses `doc-atlas mcp docs-serve`. |
 | `doc-atlas mcp list` | Show installed packs with mode (curated/expanded), per-pack tool counts, and destructive gate state (`block` or `ALLOW`). |
 | `doc-atlas mcp doctor` | Verify pack SHA-256s, credential resolution per scheme, and agent-config registrations. Reports actionable warnings. |
 | `doc-atlas mcp enable <pkg> [--version <v>]` | Re-enable a previously disabled pack without reinstalling. |

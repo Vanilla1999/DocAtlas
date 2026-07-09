@@ -117,7 +117,7 @@ Returns a compact markdown context pack with source attribution and token saving
 
 ## Advanced: API Tools via MCP
 
-Only use the MCP surface if the user is explicitly working with installed API packs. If the user has run `doc-atlas install-pack <pkg>@<version>`, the agent host can launch `doc-atlas mcp serve` and expose two meta-tools:
+Only use the MCP Packs surface if the user is explicitly working with installed API packs. It is an advanced API-action layer, not an alternative documentation workflow. If the user has run `doc-atlas install-pack <pkg>@<version>`, the agent host can launch `doc-atlas mcp serve` and expose two meta-tools:
 
 - `docmancer_search_tools(query, package?, limit?)`
 - `docmancer_call_tool(name, args)`
@@ -134,7 +134,7 @@ For repository-specific architecture, conventions, runbooks, roadmap, README/wik
 4. Read `answer_outline.recommended_reading_order` before composing the answer.
 5. Use `trust_contract.selected` / `trust_contract.selected_sources` to cite trusted sources. Treat `CHANGELOG.md` as primary only for release-history/change questions.
 6. Prefer nested `context_pack[].source` and `context_pack[].section` metadata; the flat fields are kept for compatibility.
-7. If the user asks vaguely about "the MCP server", distinguish `doc-atlas mcp docs-serve` (documentation context) from `doc-atlas mcp serve` (installed MCP Packs/API action tools).
+7. If the user asks vaguely about "the MCP server", distinguish `doc-atlas mcp docs-serve` (canonical documentation context and Patch Contract workflows) from `doc-atlas mcp serve` (advanced installed MCP Packs/API action tools).
 
 ## Common Mistakes
 

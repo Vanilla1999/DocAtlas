@@ -30,7 +30,7 @@ def test_install_claude_code_registers_mcp_entry():
         assert cfg.exists()
         payload = json.loads(cfg.read_text())
         assert payload["mcpServers"]["docmancer"]["command"] == "doc-atlas"
-        assert payload["mcpServers"]["docmancer"]["args"] == ["mcp", "serve"]
+        assert payload["mcpServers"]["docmancer"]["args"] == ["mcp", "docs-serve"]
 
 
 def test_install_cursor_registers_mcp_entry():

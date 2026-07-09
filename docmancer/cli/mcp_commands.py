@@ -21,14 +21,14 @@ def mcp_group() -> None:
 
 @mcp_group.command("serve")
 def mcp_serve_cmd() -> None:
-    """Run the stdio MCP server. Agents launch this; humans usually do not."""
+    """Run the advanced stdio MCP Packs/API-pack gateway."""
     from docmancer.mcp.serve import serve
     serve()
 
 
 @mcp_group.command("docs-serve")
 def mcp_docs_serve_cmd() -> None:
-    """Run the stdio MCP documentation server."""
+    """Run the canonical stdio MCP documentation server."""
     from docmancer.mcp.docs_server import serve
     serve()
 

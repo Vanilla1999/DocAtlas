@@ -23,9 +23,9 @@ Preferred public MCP happy path:
 3. Call `get_docs_context(project_path=".", question="Context7 project-owned docs roadmap", mode="project")`.
 4. Answer using the returned Trust Contract, `next_actions`, and chunks that include `source_class`, `path`, `heading_path`, freshness metadata, and stale state.
 
-Legacy compatibility flow:
+Legacy compatibility note:
 
-Older docs surfaces may expose direct `ingest_project_docs`, `get_project_docs`, `get_project_context`, or `bootstrap_project_docs`. Prefer the public flow above when `prepare_docs` and `get_docs_context` are available.
+Older docs surfaces may expose direct `ingest_project_docs`, `get_project_docs`, `get_project_context`, or `bootstrap_project_docs`. Treat those as legacy/admin compatibility verbs. Prefer the public flow above when `prepare_docs` and `get_docs_context` are available.
 
 ## Success criteria
 
@@ -47,13 +47,13 @@ Expected agent flow:
 
 ## Dependency docs are separate
 
-If `inspect_project_docs` reports dependency metadata from `pubspec.lock`, `Cargo.lock`, or related manifests, dependency docs should be prefetched with:
+If `inspect_project_docs` reports dependency metadata from `pubspec.lock`, `Cargo.lock`, or related manifests, dependency docs should be prefetched through the public lifecycle wrapper:
 
 ```text
-prefetch_project_dependency_docs(project_path=".")
+prepare_docs(action="prefetch_project_dependency_docs", project_path=".")
 ```
 
-The existing compatible tool name is:
+Legacy compatibility surfaces may also expose:
 
 ```text
 prefetch_project_docs(project_path=".")

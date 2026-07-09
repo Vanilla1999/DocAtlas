@@ -238,13 +238,16 @@ def test_agent_templates_include_project_docs_discovery_guidance():
         assert "Project Docs Discovery with MCP" in text
         assert "inspect_project_docs(project_path=\".\")" in text
         assert "expects Context7-like help" in text
-        assert "prefetch_project_docs` fetches exact dependency docs" in text
+        assert "prepare_docs(action=\"sync_project_docs\")" in text
+        assert "get_docs_context(mode=\"project\")" in text
+        assert "prepare_docs(action=\"prefetch_project_dependency_docs\")" in text
         assert "Official project docs should remain files in the repo" in text
         assert "Do not skip `inspect_project_docs`" in text
         assert "docs/INDEX.md" in text
         assert "canonical map of project-owned docs" in text
         assert "verification loop" in text
         assert "confirm expected files are cited" in text
+        assert "not an alternative documentation workflow" in text
 
 
 def test_project_docs_workflow_documents_index_template_and_verification_loop():

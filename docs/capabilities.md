@@ -1322,10 +1322,11 @@ Use when dependency version matters.
 
 ### Workflow E — project-owned docs + external library docs
 
-1. `ingest_project_docs` indexes README/docs/ADR/wiki.
-2. `get_project_docs` retrieves project conventions.
-3. `get_library_docs` retrieves external library docs.
-4. Agent combines both in the answer or code change.
+1. `inspect_project_docs` discovers README/docs/ADR/wiki and dependency metadata.
+2. `prepare_docs(action="sync_project_docs")` indexes/reconciles project docs when needed.
+3. `get_docs_context(mode="project")` retrieves project conventions.
+4. `get_docs_context(mode="library"|"mixed")` or `get_library_docs` retrieves external library docs when explicitly needed.
+5. Agent combines both in the answer or code change.
 
 Use when the correct answer depends on local architecture and external API behavior.
 

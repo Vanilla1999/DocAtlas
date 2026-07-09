@@ -44,7 +44,7 @@ doc-atlas uninstall open-meteo@v1
 
 | Command | Description |
 |---------|-------------|
-| `doc-atlas mcp serve` | Run the stdio MCP server. Agents launch this. |
+| `doc-atlas mcp serve` | Run the advanced stdio MCP Packs/API-pack gateway. The default documentation workflow uses `doc-atlas mcp docs-serve`. |
 | `doc-atlas mcp doctor` | Verify pack artifacts, credential resolution, and agent config registrations. |
 | `doc-atlas mcp list` | Show installed packs, curated or expanded mode, tool counts, and destructive gate state. |
 | `doc-atlas mcp enable <pkg> [--version <v>]` | Re-enable a disabled pack without reinstalling it. |
