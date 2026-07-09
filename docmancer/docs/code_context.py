@@ -14,6 +14,8 @@ _LOW_SIGNAL_TERMS = {
     "and", "does", "how", "the", "this", "that", "where", "work", "used",
     "как", "где", "для", "или", "что", "это", "работает", "используется",
 }
+_GENERIC_SOURCE_TERMS = {"tab", "tabs", "key", "build", "file", "files", "download", "downloaded", "browser"}
+_IMPORT_EXTENSIONS = (".dart", ".ts", ".tsx", ".js", ".jsx", ".py")
 
 
 def build_code_context(
@@ -77,6 +79,7 @@ def build_code_context(
     source_chain = [_source_chain_item(fact, snippets) for fact in selected_facts if fact.get("path") in snippet_paths]
     references = _reference_items(selected_facts, query_terms=query_terms, selected_paths=snippet_paths)
     unresolved = _unresolved_symbols(selected_facts, query_terms=query_terms)
+    resolved_imports = _resolve_imports(root, selected_facts)
     payload = {
         "schema_version": CODE_CONTEXT_SCHEMA_VERSION,
         "tool": CODE_CONTEXT_TOOL,
@@ -94,8 +97,13 @@ def build_code_context(
         "source_snippets": snippets,
         "references": references,
         "unresolved": unresolved,
+        "resolved_imports": resolved_imports,
         "files_to_read": _files_to_read(selected_facts, snippets, limit=max_files_value),
         "search_queries": query_terms[:12],
+        "confidence": {
+            "overall": 0.82,
+            "reason": f"Found {len(snippets)} source snippet(s) across {len(snippet_paths)} connected file(s).",
+        },
         "required_next_step": None,
         "output_mode": mode,
     }
@@ -186,6 +194,7 @@ def _expand_references(
     selected: list[dict[str, Any]] = []
     selected_paths: set[str] = set()
     frontier = set(_normalized_terms(query_terms))
+    module_terms = _module_coherence_terms(query_terms)
     if not frontier:
         frontier = {""}
 
@@ -195,11 +204,13 @@ def _expand_references(
             path = str(item.get("path") or "")
             if not path or path in selected_paths:
                 continue
-            if _fact_matches_any(item, frontier):
+            connection_reason = _connection_reason(item, frontier, hop=hop, selected=selected, module_terms=module_terms)
+            if connection_reason:
                 item = dict(item)
+                item["connection_reason"] = connection_reason
                 item["why_selected"] = _why_selected(item, frontier, hop=hop)
                 matches.append(item)
-        matches.sort(key=lambda item: (-float(item.get("selection_score") or 0), str(item.get("path") or "")))
+        matches.sort(key=lambda item: (-_source_context_score(item, module_terms=module_terms), str(item.get("path") or "")))
         for item in matches:
             if len(selected) >= max_files:
                 return selected
@@ -219,6 +230,67 @@ def _expand_references(
             break
         frontier = {term for term in next_terms if term}
     return selected[:max_files]
+
+
+def _connection_reason(item: dict[str, Any], frontier: set[str], *, hop: int, selected: list[dict[str, Any]], module_terms: set[str]) -> str | None:
+    path = str(item.get("path") or "")
+    normalized_path = _normalize_identifier(path)
+    symbol_names = {_normalize_identifier(str(symbol.get("name") or "")) for symbol in item.get("symbols") or []}
+    references = {_normalize_identifier(str(value)) for value in item.get("references") or []}
+    imports = {_normalize_identifier(str(value)) for value in item.get("imports") or []}
+    exact_symbols = {term for term in frontier if term in symbol_names}
+    exact_refs = {term for term in frontier if term in references}
+    path_matches = {term for term in frontier if term and term in normalized_path}
+    generic_only = bool(path_matches) and not exact_symbols and not exact_refs and all(term in _GENERIC_SOURCE_TERMS for term in path_matches)
+    if exact_symbols:
+        return "defines entry/central symbol"
+    if exact_refs:
+        return "references central symbol from source chain"
+    if selected and _connected_to_selected(item, selected):
+        return "import/reference-connected to source chain"
+    if path_matches and not generic_only and (not module_terms or any(term in normalized_path for term in module_terms)):
+        return "path/module coherent query match"
+    if hop == 0 and _fact_matches_any(item, frontier) and not generic_only and not imports:
+        return "query symbol/path match"
+    return None
+
+
+def _connected_to_selected(item: dict[str, Any], selected: list[dict[str, Any]]) -> bool:
+    path = _normalize_identifier(str(item.get("path") or ""))
+    imports = {_normalize_identifier(str(value)) for value in item.get("imports") or []}
+    references = {_normalize_identifier(str(value)) for value in item.get("references") or []}
+    selected_symbols = {_normalize_identifier(str(symbol.get("name") or "")) for value in selected for symbol in value.get("symbols") or []}
+    selected_import_tails = {_normalize_identifier(Path(str(value.get("path") or "")).stem) for value in selected}
+    return bool((references & selected_symbols) or (imports & selected_import_tails) or any(stem and stem in path for stem in selected_import_tails))
+
+
+def _source_context_score(item: dict[str, Any], *, module_terms: set[str]) -> float:
+    score = float(item.get("selection_score") or 0)
+    path = str(item.get("path") or "")
+    normalized_path = _normalize_identifier(path)
+    if module_terms and any(term in normalized_path for term in module_terms):
+        score += 8.0
+    if _is_noise_path(path):
+        score -= 20.0
+    if item.get("connection_reason") in {"defines entry/central symbol", "references central symbol from source chain"}:
+        score += 10.0
+    return score
+
+
+def _module_coherence_terms(query_terms: list[str]) -> set[str]:
+    normalized = set(_normalized_terms(query_terms))
+    terms: set[str] = set()
+    for term in normalized:
+        if term in {"tsd browser", "tsd_browser", "browser"} or "tsd" in term:
+            terms.update({"tsd browser", "tsd_browser"})
+        elif term not in _GENERIC_SOURCE_TERMS and len(term) >= 4:
+            terms.add(term)
+    return terms
+
+
+def _is_noise_path(path: str) -> bool:
+    lowered = path.lower()
+    return any(part in lowered for part in (".g.dart", ".freezed.dart", "/generated/", "build/", "/build/", "/vendor/", "/cache/", ".cache/"))
 
 
 def _fact_matches_any(item: dict[str, Any], normalized_terms: set[str]) -> bool:
@@ -265,6 +337,7 @@ def _snippets_for_facts(
                 "end_line": end_line,
                 "language": str(fact.get("language") or path.suffix.lstrip(".")),
                 "symbol": symbol,
+                "symbols": [str(item.get("name")) for item in fact.get("symbols") or [] if item.get("name")][:8],
                 "code": _sanitize_code(code),
                 "why_selected": fact.get("why_selected") or "Selected by source context retrieval.",
             })
@@ -333,6 +406,7 @@ def _source_chain_item(fact: dict[str, Any], snippets: list[dict[str, Any]]) -> 
         "symbol": snippet.get("symbol") or _first_symbol(fact),
         "start_line": snippet.get("start_line") or fact.get("line_start"),
         "end_line": snippet.get("end_line") or fact.get("line_end"),
+        "connection_reason": fact.get("connection_reason") or "selected_source_context_match",
         "why_selected": snippet.get("why_selected") or fact.get("why_selected") or "Selected by source context retrieval.",
     }
 
@@ -363,6 +437,161 @@ def _unresolved_symbols(facts: list[dict[str, Any]], *, query_terms: list[str]) 
             continue
         unresolved.append({"symbol": term, "reason": "Referenced by query but not found as a definition in selected source files."})
     return unresolved[:12]
+
+
+def _resolve_imports(root: Path, facts: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    package_name = _dart_package_name(root)
+    symbol_index = _symbol_path_index(facts)
+    results: list[dict[str, Any]] = []
+    seen: set[tuple[str, str]] = set()
+    for fact in facts:
+        source_path = str(fact.get("path") or "")
+        if not source_path:
+            continue
+        for import_value in fact.get("imports") or []:
+            raw_import = str(import_value).strip()
+            if not raw_import:
+                continue
+            key = (source_path, raw_import)
+            if key in seen:
+                continue
+            seen.add(key)
+            results.append(_resolve_import(root, source_path=source_path, import_value=raw_import, package_name=package_name, symbol_index=symbol_index))
+    return results[:80]
+
+
+def _resolve_import(root: Path, *, source_path: str, import_value: str, package_name: str | None, symbol_index: dict[str, list[str]]) -> dict[str, Any]:
+    candidate_paths = _candidate_import_paths(root, source_path=source_path, import_value=import_value, package_name=package_name)
+    for method, candidate in candidate_paths:
+        if (root / candidate).is_file():
+            return {
+                "source_path": source_path,
+                "import": import_value,
+                "resolution_status": "resolved",
+                "resolution_method": method,
+                "resolved_path": candidate,
+                "candidate_paths": [path for _, path in candidate_paths[:8]],
+            }
+    fallback_candidates = _symbol_fallback_candidates(import_value, symbol_index)
+    if fallback_candidates:
+        return {
+            "source_path": source_path,
+            "import": import_value,
+            "resolution_status": "unresolved",
+            "resolution_method": "symbol_fallback",
+            "resolved_path": None,
+            "candidate_paths": fallback_candidates[:8],
+        }
+    return {
+        "source_path": source_path,
+        "import": import_value,
+        "resolution_status": "unresolved",
+        "resolution_method": "none",
+        "resolved_path": None,
+        "candidate_paths": [path for _, path in candidate_paths[:8]],
+    }
+
+
+def _candidate_import_paths(root: Path, *, source_path: str, import_value: str, package_name: str | None) -> list[tuple[str, str]]:
+    candidates: list[tuple[str, str]] = []
+    normalized_import = import_value.split("#", 1)[0].split("?", 1)[0].strip().strip("'\"")
+    if normalized_import.startswith("package:"):
+        package_part = normalized_import[len("package:"):]
+        package, _, package_path = package_part.partition("/")
+        if package_name and package == package_name and package_path:
+            _append_candidate_path(candidates, "dart_package_lib", f"lib/{package_path}")
+        return candidates
+    if normalized_import.startswith(("dart:", "http:", "https:", "node:", "package/")):
+        return candidates
+    source_dir = Path(source_path).parent
+    if normalized_import.startswith(("./", "../")):
+        base = source_dir / normalized_import
+        method = "relative"
+    elif normalized_import.startswith("/"):
+        base = Path(normalized_import.lstrip("/"))
+        method = "absolute_project"
+    else:
+        base = source_dir / normalized_import
+        method = "relative_extensionless"
+    for path in _expand_extensionless_paths(base):
+        _append_candidate_path(candidates, method, path.as_posix())
+    # Python-style local module import from project root.
+    if not normalized_import.startswith(("./", "../")) and re.fullmatch(r"[A-Za-z_][A-Za-z0-9_.]*", normalized_import):
+        module_path = Path(*normalized_import.split("."))
+        for path in _expand_extensionless_paths(module_path):
+            _append_candidate_path(candidates, "python_project_module", path.as_posix())
+    return candidates
+
+
+def _expand_extensionless_paths(base: Path) -> list[Path]:
+    if base.suffix:
+        return [base]
+    paths = [base.with_suffix(ext) for ext in _IMPORT_EXTENSIONS]
+    paths.extend(base / f"index{ext}" for ext in (".ts", ".tsx", ".js", ".jsx"))
+    paths.append(base / "__init__.py")
+    return paths
+
+
+def _append_candidate_path(candidates: list[tuple[str, str]], method: str, path: str) -> None:
+    normalized = _normalize_path(path)
+    if normalized:
+        normalized = Path(normalized).resolve().as_posix() if Path(normalized).is_absolute() else Path(normalized).as_posix()
+        parts: list[str] = []
+        for part in normalized.split("/"):
+            if part in {"", "."}:
+                continue
+            if part == ".." and parts:
+                parts.pop()
+            elif part != "..":
+                parts.append(part)
+        normalized = "/".join(parts)
+    if normalized and (method, normalized) not in candidates:
+        candidates.append((method, normalized))
+
+
+def _dart_package_name(root: Path) -> str | None:
+    pubspec = root / "pubspec.yaml"
+    if not pubspec.is_file():
+        return None
+    try:
+        for line in pubspec.read_text(encoding="utf-8", errors="replace").splitlines():
+            match = re.match(r"\s*name\s*:\s*['\"]?([^'\"#\s]+)", line)
+            if match:
+                return match.group(1)
+    except OSError:
+        return None
+    return None
+
+
+def _symbol_path_index(facts: list[dict[str, Any]]) -> dict[str, list[str]]:
+    index: dict[str, list[str]] = {}
+    for fact in facts:
+        path = str(fact.get("path") or "")
+        if not path:
+            continue
+        for symbol in fact.get("symbols") or []:
+            name = str(symbol.get("name") or "")
+            for key in {_normalize_identifier(name), _normalize_identifier(Path(path).stem), _normalize_identifier(_snake_to_pascal(Path(path).stem))}:
+                if key:
+                    index.setdefault(key, [])
+                    if path not in index[key]:
+                        index[key].append(path)
+    return index
+
+
+def _symbol_fallback_candidates(import_value: str, symbol_index: dict[str, list[str]]) -> list[str]:
+    raw_tail = import_value.rstrip("/").split("/")[-1].split(".")[-1]
+    keys = {_normalize_identifier(raw_tail), _normalize_identifier(_snake_to_pascal(raw_tail))}
+    candidates: list[str] = []
+    for key in keys:
+        for path in symbol_index.get(key, []):
+            if path not in candidates:
+                candidates.append(path)
+    return candidates
+
+
+def _snake_to_pascal(value: str) -> str:
+    return "".join(part[:1].upper() + part[1:] for part in re.split(r"[_\-\s]+", value) if part)
 
 
 def _files_to_read(facts: list[dict[str, Any]], snippets: list[dict[str, Any]], *, limit: int) -> list[dict[str, Any]]:

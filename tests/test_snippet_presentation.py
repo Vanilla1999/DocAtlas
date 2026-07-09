@@ -75,6 +75,32 @@ def test_anyhow_context_selects_context_snippet():
     assert "with_context" in primary["code"]
 
 
+def test_modules_question_prefers_module_snippet_over_startup_snippet():
+    startup = chunk(
+        "Startup Flow",
+        "```dart\nvoid bootstrap() {\n  runApp(const App());\n}\n```",
+        source="docs/architecture/startup.md",
+    )
+    modules = chunk(
+        "Module Documentation",
+        "```dart\n// lib/modules contains feature modules\nclass ModuleRegistry {\n  final modules = <String>[];\n}\n```",
+        source="docs/architecture/modules.md",
+    )
+
+    presentation = build_snippet_presentation(
+        [startup, modules],
+        question="What are the modules and how is the project organized?",
+        response_style="snippet-first",
+    )
+
+    assert presentation.primary_snippet["source"] == "docs/architecture/modules.md"
+    assert "ModuleRegistry" in presentation.primary_snippet["code"]
+    assert presentation.primary_snippets[0]["source"] == "docs/architecture/modules.md"
+    assert len(presentation.primary_snippets) >= 2
+    assert presentation.primary_snippet_confidence in {"high", "medium", "low"}
+    assert presentation.primary_snippet_alternatives
+
+
 def test_project_context_question_remains_evidence_first():
     item = chunk("Project context", "```bash\nuv run pytest\n```")
     presentation = build_snippet_presentation([item], question="What is the project context?", response_style="auto")

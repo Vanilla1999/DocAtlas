@@ -59,6 +59,10 @@ def _answer_payload(payload: dict[str, Any]) -> dict[str, Any]:
         "reason_code": payload.get("reason_code"),
         "response_style": payload.get("response_style"),
         "primary_snippet": primary_snippet,
+        "primary_snippets": payload.get("primary_snippets") or ([primary_snippet] if primary_snippet else []),
+        "primary_snippet_confidence": payload.get("primary_snippet_confidence"),
+        "primary_snippet_selection_reason": payload.get("primary_snippet_selection_reason"),
+        "primary_snippet_alternatives": payload.get("primary_snippet_alternatives") or [],
         "selected_sources": _trust_sources(payload.get("trust_contract"), "selected"),
         "next_action": payload.get("next_action"),
         "next_actions": payload.get("next_actions") or [],
@@ -83,6 +87,10 @@ def _compact_payload(payload: dict[str, Any]) -> dict[str, Any]:
         "source_summary": payload.get("source_summary") or {},
         "trust_contract": payload.get("trust_contract") or {},
         "primary_snippet": payload.get("primary_snippet"),
+        "primary_snippets": payload.get("primary_snippets") or [],
+        "primary_snippet_confidence": payload.get("primary_snippet_confidence"),
+        "primary_snippet_selection_reason": payload.get("primary_snippet_selection_reason"),
+        "primary_snippet_alternatives": payload.get("primary_snippet_alternatives") or [],
         "supporting_snippets": payload.get("supporting_snippets") or [],
         "context_pack": payload.get("context_pack") or [],
         "next_action": payload.get("next_action"),
@@ -191,7 +199,7 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
         raw = result
     else:
         raw = dict(getattr(result, "__dict__", {}))
-        for key in ("tool", "status", "reason_code", "message", "response_style", "primary_snippet", "supporting_snippets", "snippet_metrics"):
+        for key in ("tool", "status", "reason_code", "message", "response_style", "primary_snippet", "primary_snippets", "primary_snippet_confidence", "primary_snippet_selection_reason", "primary_snippet_alternatives", "supporting_snippets", "snippet_metrics"):
             if hasattr(result, key):
                 raw[key] = getattr(result, key)
     raw = _align_trust_contract_with_snippets(raw)

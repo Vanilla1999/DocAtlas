@@ -1265,6 +1265,10 @@ class LibraryDocsApplicationService:
             response_style=snippet_presentation.response_style,
             primary_snippet=snippet_presentation.primary_snippet,
             supporting_snippets=snippet_presentation.supporting_snippets,
+            primary_snippets=snippet_presentation.primary_snippets,
+            primary_snippet_confidence=snippet_presentation.primary_snippet_confidence,
+            primary_snippet_selection_reason=snippet_presentation.primary_snippet_selection_reason,
+            primary_snippet_alternatives=snippet_presentation.primary_snippet_alternatives,
             snippet_metrics=snippet_presentation.metrics,
         )
 

@@ -55,6 +55,10 @@ class SnippetPresentation:
     snippet_count: int
     warnings: list[dict[str, Any]]
     metrics: dict[str, Any]
+    primary_snippets: list[dict[str, Any]] = field(default_factory=list)
+    primary_snippet_confidence: str | None = None
+    primary_snippet_selection_reason: str | None = None
+    primary_snippet_alternatives: list[dict[str, Any]] = field(default_factory=list)
 
 
 @dataclass(frozen=True)
@@ -177,9 +181,22 @@ def build_snippet_presentation(chunks: list[Any], *, question: str, response_sty
         return SnippetPresentation("evidence-first", None, [], len(raw_candidates), [warning], _snippet_metrics(raw_candidates, [], duplicates_dropped, 0, False, requested_style))
     primary = _snippet_payload(selected[0], max_chars=MAX_PRIMARY_SNIPPET_CHARS)
     supporting = [_snippet_payload(candidate, max_chars=MAX_SUPPORTING_SNIPPET_CHARS) for candidate in selected[1:]]
+    primary_candidates = [_snippet_payload(candidate, max_chars=MAX_SUPPORTING_SNIPPET_CHARS) for candidate in selected[:3]]
+    confidence = _primary_snippet_confidence(selected)
     truncations = int(bool(primary.get("truncated"))) + sum(1 for item in supporting if item.get("truncated"))
     warnings = [{"code": "snippet_truncated", "message": "One or more snippets were truncated for presentation."}] if truncations else []
-    return SnippetPresentation("snippet-first", primary, supporting, len(raw_candidates), warnings, _snippet_metrics(raw_candidates, selected, duplicates_dropped, truncations, True, requested_style))
+    return SnippetPresentation(
+        "snippet-first",
+        primary,
+        supporting,
+        len(raw_candidates),
+        warnings,
+        _snippet_metrics(raw_candidates, selected, duplicates_dropped, truncations, True, requested_style, confidence=confidence),
+        primary_snippets=primary_candidates,
+        primary_snippet_confidence=confidence,
+        primary_snippet_selection_reason=_primary_snippet_selection_reason(selected[0], confidence=confidence),
+        primary_snippet_alternatives=primary_candidates[1:],
+    )
 
 
 def best_context_pack_snippet(item: Any, *, question: str = "") -> dict[str, Any] | None:
@@ -241,8 +258,9 @@ def _score_candidate(candidate: SnippetCandidate, *, question: str, intent: Snip
     candidate.completeness_score = 1.0 if candidate.complete and not candidate.truncated else 0.35
     version_score = _version_relevance_score(candidate)
     usability_score = _usability_score(candidate)
+    intent_score = _intent_relevance_score(candidate, question)
     noise_penalty = internal_noise_score(candidate.code) * 0.2 + (0.25 if len(candidate.code.strip()) < 8 else 0.0)
-    candidate.final_score = max(0.0, 0.35 * candidate.relevance_score + 0.20 * symbol_score + 0.15 * candidate.source_score + 0.10 * version_score + 0.10 * candidate.completeness_score + 0.10 * usability_score - noise_penalty)
+    candidate.final_score = max(0.0, 0.30 * candidate.relevance_score + 0.18 * symbol_score + 0.14 * candidate.source_score + 0.10 * version_score + 0.10 * candidate.completeness_score + 0.08 * usability_score + 0.10 * intent_score - noise_penalty)
     why = []
     if query_terms & code_terms:
         why.append("matches query symbols in code")
@@ -250,6 +268,8 @@ def _score_candidate(candidate: SnippetCandidate, *, question: str, intent: Snip
         why.append(f"matches expected {candidate.language} example")
     if candidate.exact_version_match is True:
         why.append("matches exact requested version")
+    if intent_score:
+        why.append("matches query intent")
     candidate.why_relevant = "; ".join(why) or "code example extracted from selected trusted source"
     return candidate
 
@@ -286,7 +306,7 @@ def _snippet_payload(candidate: SnippetCandidate, *, max_chars: int) -> dict[str
     }
 
 
-def _snippet_metrics(raw: list[SnippetCandidate], selected: list[SnippetCandidate], duplicates: int, truncations: int, applied: bool, requested_style: str) -> dict[str, Any]:
+def _snippet_metrics(raw: list[SnippetCandidate], selected: list[SnippetCandidate], duplicates: int, truncations: int, applied: bool, requested_style: str, *, confidence: str | None = None) -> dict[str, Any]:
     primary = selected[0] if selected else None
     return {
         "candidates_found": len(raw),
@@ -300,6 +320,8 @@ def _snippet_metrics(raw: list[SnippetCandidate], selected: list[SnippetCandidat
         "primary_lane": primary.origin_lane if primary else None,
         "primary_source_correct": True if primary else None,
         "primary_exact_version_match": primary.exact_version_match if primary else None,
+        "primary_snippet_confidence": confidence,
+        "primary_snippet_alternatives": max(0, min(3, len(selected)) - 1),
         "snippet_first_applied": applied,
         "requested_response_style": requested_style,
     }
@@ -348,6 +370,29 @@ def _language_score(language: str | None, expected_languages: list[str]) -> floa
     return 1.0 if language and _normalize_language(language) in expected_languages else 0.0
 
 
+def _intent_relevance_score(candidate: SnippetCandidate, question: str) -> float:
+    lowered = (question or "").casefold()
+    haystack = " ".join(
+        str(value or "")
+        for value in (candidate.title, candidate.heading_path, candidate.source, candidate.source_url, candidate.code)
+    ).casefold()
+    intents = [
+        ({"module", "modules", "structure", "organized"}, ("module", "modules", "lib/modules", "architecture", "structure")),
+        ({"startup", "init", "bootstrap"}, ("startup", "init", "bootstrap")),
+        ({"test", "testing"}, ("test", "tests", "testing", "pytest")),
+        ({"dependency", "package", "library"}, ("dependency", "dependencies", "package", "library", "pubspec", "requirements")),
+    ]
+    score = 0.0
+    for triggers, boosts in intents:
+        if not any(trigger in lowered for trigger in triggers):
+            continue
+        if any(boost in haystack for boost in boosts):
+            score = max(score, 1.0)
+        elif "architecture" in haystack and triggers & {"module", "modules", "structure", "organized"}:
+            score = max(score, 0.25)
+    return score
+
+
 def _source_score(candidate: SnippetCandidate, lane_priority: list[str] | None) -> float:
     score = 0.6
     if candidate.source_url and candidate.source_url.startswith(("http://", "https://")):
@@ -357,6 +402,24 @@ def _source_score(candidate: SnippetCandidate, lane_priority: list[str] | None) 
     if lane_priority and candidate.origin_lane in lane_priority:
         score += max(0.0, 0.15 - 0.04 * lane_priority.index(candidate.origin_lane))
     return min(1.0, score)
+
+
+def _primary_snippet_confidence(selected: list[SnippetCandidate]) -> str:
+    if not selected:
+        return "low"
+    primary = selected[0].final_score
+    if len(selected) == 1:
+        return "high" if primary >= 0.55 else "medium"
+    margin = primary - selected[1].final_score
+    if primary >= 0.65 and margin >= 0.15:
+        return "high"
+    if primary >= 0.35 and margin >= 0.03:
+        return "medium"
+    return "low"
+
+
+def _primary_snippet_selection_reason(candidate: SnippetCandidate, *, confidence: str) -> str:
+    return f"{confidence} confidence primary snippet selected by score {candidate.final_score:.3f}: {candidate.why_relevant or 'selected trusted source'}"
 
 
 def _version_relevance_score(candidate: SnippetCandidate) -> float:

@@ -114,6 +114,10 @@ class DocsResult:
     response_style: str = "evidence-first"
     primary_snippet: dict[str, Any] | None = None
     supporting_snippets: list[dict[str, Any]] = field(default_factory=list)
+    primary_snippets: list[dict[str, Any]] = field(default_factory=list)
+    primary_snippet_confidence: str | None = None
+    primary_snippet_selection_reason: str | None = None
+    primary_snippet_alternatives: list[dict[str, Any]] = field(default_factory=list)
     snippet_metrics: dict[str, Any] = field(default_factory=dict)
     next_actions: list[Any] = field(default_factory=list)
     result: Any = None
@@ -533,6 +537,10 @@ class ProjectContextResult:
     response_style: str = "evidence-first"
     primary_snippet: dict[str, Any] | None = None
     supporting_snippets: list[dict[str, Any]] = field(default_factory=list)
+    primary_snippets: list[dict[str, Any]] = field(default_factory=list)
+    primary_snippet_confidence: str | None = None
+    primary_snippet_selection_reason: str | None = None
+    primary_snippet_alternatives: list[dict[str, Any]] = field(default_factory=list)
     snippet_metrics: dict[str, Any] = field(default_factory=dict)
     metrics: dict[str, Any] = field(default_factory=dict)
     diagnostics: dict[str, Any] = field(default_factory=dict)
@@ -553,6 +561,7 @@ class UnifiedDocsContextResult:
     lanes: dict[str, Any] = field(default_factory=dict)
     source_summary: dict[str, int] = field(default_factory=dict)
     trust_contract: dict[str, Any] = field(default_factory=dict)
+    dependency_docs: dict[str, Any] = field(default_factory=dict)
     exact_version: dict[str, Any] | None = None
     reason_code: str | None = None
     message: str | None = None
@@ -567,6 +576,10 @@ class UnifiedDocsContextResult:
     response_style: str = "evidence-first"
     primary_snippet: dict[str, Any] | None = None
     supporting_snippets: list[dict[str, Any]] = field(default_factory=list)
+    primary_snippets: list[dict[str, Any]] = field(default_factory=list)
+    primary_snippet_confidence: str | None = None
+    primary_snippet_selection_reason: str | None = None
+    primary_snippet_alternatives: list[dict[str, Any]] = field(default_factory=list)
     snippet_metrics: dict[str, Any] = field(default_factory=dict)
     presentation: dict[str, Any] = field(default_factory=dict)
     metrics: dict[str, Any] = field(default_factory=dict)
