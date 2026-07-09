@@ -20,16 +20,41 @@ def _output_mode(args: dict[str, Any]) -> str:
     return normalize_output_mode(args)
 
 
+def _agent_instruction(answer_type: str) -> dict[str, Any]:
+    if answer_type == "direct":
+        return {
+            "agent_instruction": (
+                "You may answer from primary_snippet/supporting_snippets and selected_sources. "
+                "Cite or mention source paths when useful."
+            ),
+            "required_next_step": "answer_from_returned_context",
+            "safe_to_answer": True,
+            "not_a_code_auditor": True,
+        }
+
+    return {
+        "agent_instruction": (
+            "Do not treat this as a complete answer. Docmancer returned navigation/source guidance. "
+            "Read or search the suggested files/sources first, then produce your own answer."
+        ),
+        "required_next_step": "read_or_search_suggested_sources",
+        "safe_to_answer": False,
+        "not_a_code_auditor": True,
+    }
+
+
 def _answer_payload(payload: dict[str, Any]) -> dict[str, Any]:
     primary_snippet = payload.get("primary_snippet")
     supporting_snippets = payload.get("supporting_snippets") or []
     has_direct_answer = bool(primary_snippet or supporting_snippets)
     answer_available = bool(payload.get("answer_available")) and has_direct_answer
+    answer_type = "direct" if answer_available else "navigation_only"
     answer = {
         "tool": payload.get("tool"),
         "status": payload.get("status"),
         "answer_available": answer_available,
-        "answer_type": "direct" if answer_available else "navigation_only",
+        "answer_type": answer_type,
+        **_agent_instruction(answer_type),
         "mode_selected": payload.get("mode_selected"),
         "reason_code": payload.get("reason_code"),
         "response_style": payload.get("response_style"),

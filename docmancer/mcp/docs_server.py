@@ -51,7 +51,14 @@ class DocsMcpSurface:
 RAW_TOOLS: list[dict[str, Any]] = [
     {
         "name": "get_docs_context",
-        "description": "Return one source-grounded documentation context pack by routing the question to project-owned docs, public library docs, exact dependency docs, or a mixed project-plus-library flow.",
+        "description": """Canonical Docmancer docs/context tool. Use this as the Context7-like query entrypoint for project docs, dependency/library docs, and mixed project+library questions.
+
+Agent workflow:
+- For repo questions, call inspect_project_docs(project_path) first.
+- For coding/API questions, set response_style=\"snippet-first\".
+- If answer_type is navigation_only or partial_navigational, do not answer yet; read/search the suggested files first.
+- This tool provides source-grounded context, not a full code audit or test substitute.
+""",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -87,7 +94,13 @@ RAW_TOOLS: list[dict[str, Any]] = [
     },
     {
         "name": "prepare_docs",
-        "description": "Unified confirmation-first lifecycle/admin tool for docs preparation: sync project docs, prefetch dependency/library/manifest/target docs, refresh, prune, or remove registered docs sources. Prefer this over separate ingest/sync/prefetch/refresh/prune/remove tools.",
+        "description": """Unified confirmation-first lifecycle/admin tool for docs preparation: sync project docs, prefetch dependency/library/manifest/target docs, refresh, prune, or remove registered docs sources.
+
+Agent workflow:
+- Use prepare_docs(action=\"sync_project_docs\") only after inspect_project_docs asks for project-doc reconciliation.
+- Use prepare_docs(action=\"prefetch_library_docs\") for public/dependency docs only after network access is approved.
+- Prefer this over separate ingest/sync/prefetch/refresh/prune/remove tools.
+""",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -290,7 +303,12 @@ RAW_TOOLS: list[dict[str, Any]] = [
 
     {
         "name": "inspect_project_docs",
-        "description": "Call this first when working inside a repository and the user asks to use Docmancer, asks about project architecture, asks how this repo works, or expects Context7-like docs help. This read-only tool discovers local project docs and exact dependency metadata, then returns reason_code, next_action, arguments_patch, and any required user confirmation. Follow next_action before generic code search, public docs, or WebFetch.",
+        "description": """Call this first inside a repository when the user asks about project architecture, repo conventions, implementation workflow, dependency docs, or Context7-like help.
+
+This is read-only. It discovers local docs and exact dependency metadata, then returns reason_code, next_action, arguments_patch, and confirmation requirements.
+
+Agents must follow next_action before generic code search, public docs, or WebFetch.
+""",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -401,7 +419,12 @@ Does not use deleted, orphaned, or stale project-doc content by default.""",
     },
     {
         "name": "get_patch_plan_context",
-        "description": "Use for coding changes after docs lookup: return a Patch Planning Context implementation map from concrete intent to exact source/dependency evidence, changed_files, missing symbols, minimal patch path, risks, and verification. Order for agents: inspect_project_docs -> prepare_docs(sync_project_docs if requested) -> get_docs_context for docs -> get_patch_plan_context for source/API map -> get_patch_constraints before editing -> validate_patch_against_constraints after editing -> run tests. This tool does not generate or validate a patch.",
+        "description": """Use for coding changes after docs lookup: return a Patch Planning Context implementation map from concrete intent to exact source/dependency evidence, changed_files, missing symbols, minimal patch path, risks, and verification.
+
+Agent workflow: inspect_project_docs -> prepare_docs(sync_project_docs if requested) -> get_docs_context for docs -> get_patch_plan_context for source/API map -> get_patch_constraints before editing -> validate_patch_against_constraints after editing -> run tests.
+
+This tool does not generate code, validate patches, run tests, or perform a full audit.
+""",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -421,7 +444,11 @@ Does not use deleted, orphaned, or stale project-doc content by default.""",
     },
     {
         "name": "get_patch_constraints",
-        "description": "Use immediately before editing code: return compact source-attributed project constraints for a coding patch. Pass changed_files when known. This is not a docs lookup, patch planner, patch validator, or test substitute.",
+        "description": """Use immediately before editing code to get source-attributed constraints for a patch.
+
+This is not a code auditor, patch planner, patch validator, static analyzer, or test substitute.
+For audits, use Docmancer for context, then run/read/search/analyze code separately.
+""",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -438,7 +465,11 @@ Does not use deleted, orphaned, or stale project-doc content by default.""",
     },
     {
         "name": "validate_patch_against_constraints",
-        "description": "Use after editing code: check changed_files or patch_diff against constraints returned by get_patch_constraints. Treat unknown/manual_review as requiring human/code review. This is deterministic best-effort only; it does not prove correctness and does not replace tests.",
+        "description": """Use after editing code: check changed_files or patch_diff against constraints returned by get_patch_constraints.
+
+Treat unknown/manual_review as requiring human/code review. This deterministic best-effort check is not a code auditor, static analyzer, proof of correctness, or test substitute.
+Run the relevant tests/linters after this tool.
+""",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -714,6 +745,89 @@ def call_docs_tool_payload(
 
 MCP_RESOURCES: list[dict[str, str]] = [
     {
+        "uri": "docmancer://agent/quickstart",
+        "name": "Docmancer agent quickstart",
+        "description": "How agents should use Docmancer MCP without confusing it with a code auditor or raw Context7 clone.",
+        "mimeType": "text/markdown",
+        "text": """# Docmancer agent quickstart
+
+Docmancer is a local documentation/context router and project cartographer.
+
+Docmancer is not a code auditor.
+
+It is not:
+- a code auditor;
+- a static analyzer;
+- a test runner;
+- a code generator;
+- a full Context7 clone that always returns function bodies.
+
+Use Docmancer before generic code search when the user asks about:
+- project architecture;
+- repo conventions;
+- dependency/library documentation;
+- Context7-like docs help;
+- patch planning;
+- patch constraints.
+
+## Default project workflow
+
+1. Call:
+   `inspect_project_docs(project_path, details=true)`
+
+2. If the response asks for reconciliation, call:
+   `prepare_docs(action="sync_project_docs", project_path=..., with_vectors=true)`
+
+3. Then call:
+   `get_docs_context(project_path=..., question=..., mode="project" | "mixed", response_style="snippet-first", output_mode="answer")`
+
+4. Interpret the result:
+   - `answer_type="direct"`: you may answer from the returned snippets/sources.
+   - `answer_type="navigation_only"`: do not answer yet. Read/search the suggested files first, then answer.
+   - `partial_navigational`: treat it as source-search guidance, not a complete answer.
+   - `requires_confirmation=true`: ask the user before network/dependency fetches.
+
+## Context7-like library workflow
+
+For public/dependency docs, use the canonical public tool:
+
+`get_docs_context(question=..., library=..., ecosystem=..., version=..., mode="library" | "mixed", response_style="snippet-first")`
+
+If docs are missing/stale and the user approves network access, use:
+
+`prepare_docs(action="prefetch_library_docs", library=..., ecosystem=..., version=...)`
+
+Do not use WebFetch as a substitute for registered Docmancer docs until Docmancer has returned no trusted route.
+
+## Patch workflow
+
+Before editing code:
+
+1. `get_docs_context(...)`
+2. `get_patch_plan_context(project_path=..., question=..., changed_files=[...])`
+3. `get_patch_constraints(project_path=..., question=..., changed_files=[...])`
+4. Edit code.
+5. `validate_patch_against_constraints(project_path=..., changed_files=[...] or patch_diff=...)`
+6. Run tests/linters.
+
+## Audit workflow
+
+For audits, Docmancer only supplies documentation/context. It does not find all bugs.
+
+Use Docmancer for architecture/docs context, then use normal code tools:
+- read/search/grep;
+- analyzer/linter;
+- tests;
+- dependency inspection;
+- duplicate/large-file checks.
+
+Always separate:
+- facts from Docmancer docs;
+- facts from source code;
+- your own analysis.
+""",
+    },
+    {
         "uri": "docmancer://workflow/project-docs",
         "name": "Project docs workflow",
         "description": "Discovery-first workflow for project-owned docs.",
@@ -744,15 +858,30 @@ MCP_RESOURCES: list[dict[str, str]] = [
     {
         "uri": "docmancer://workflow/library-docs",
         "name": "Library docs workflow",
-        "description": "Registry-first workflow for exact library/dependency docs.",
+        "description": "Canonical public workflow for exact library/dependency docs.",
         "mimeType": "text/markdown",
         "text": """# Library docs workflow
 
-1. Call `resolve_library_id(library, ecosystem, version, source_type)` before using external docs.
-2. If the response returns `candidates`, retry through Docmancer with the candidate `arguments_patch` or explicit `docs_url`.
-3. Call `get_library_docs(...)` after registration/resolution.
-4. If `reason_code=needs_docs_url`, do not WebFetch as a substitute; pass `docs_url` or prefetch/register an explicit docs target.
-5. Network ingestion is explicit: use `prefetch_library_docs`, `prefetch_docs_targets`, or a tool response with `allow_network=true` where supported.
+Use the public unified tool first:
+
+1. Call:
+   `get_docs_context(question=..., library=..., ecosystem=..., version=..., mode="library", response_style="snippet-first")`
+
+2. If the response returns `requires_confirmation=true`, `reason_code=network_required`, or missing/stale docs, ask the user before network access.
+
+3. If approved, call:
+   `prepare_docs(action="prefetch_library_docs", library=..., ecosystem=..., version=..., force_refresh=false)`
+
+4. Retry:
+   `get_docs_context(question=..., library=..., ecosystem=..., version=..., mode="library", response_style="snippet-first")`
+
+5. If working inside a repository, prefer:
+   `inspect_project_docs(project_path)` first, then:
+   `get_docs_context(project_path=..., question=..., mode="mixed", response_style="snippet-first")`
+
+Do not use WebFetch as a substitute for registered docs before Docmancer has returned no trusted route.
+
+Legacy tools such as `resolve_library_id` and `get_library_docs` may exist only when legacy surface is explicitly enabled. Do not assume they are available.
 """,
     },
 ]
@@ -801,10 +930,26 @@ def read_docs_resource(uri: str) -> dict[str, str] | None:
                 "mimeType": "text/markdown",
                 "text": f"""# Library docs workflow for `{ecosystem}:{library}@{version}`
 
-1. `resolve_library_id(library=\"{library}\", ecosystem=\"{ecosystem}\", version=\"{version}\")`
-2. If `status=needs_docs_url`, retry through Docmancer with an explicit `docs_url` or prefetch/register a docs target.
-3. `get_library_docs(library=\"{library}\", ecosystem=\"{ecosystem}\", version=\"{version}\", topic=...)`
-4. Do not WebFetch registered docs before retrying with returned `candidates` or `arguments_patch`.
+1. `get_docs_context(
+       question=...,
+       library=\"{library}\",
+       ecosystem=\"{ecosystem}\",
+       version=\"{version}\",
+       mode=\"library\",
+       response_style=\"snippet-first\"
+   )`
+
+2. If docs are missing/stale and network is approved:
+   `prepare_docs(
+       action=\"prefetch_library_docs\",
+       library=\"{library}\",
+       ecosystem=\"{ecosystem}\",
+       version=\"{version}\"
+   )`
+
+3. Retry `get_docs_context(...)`.
+
+Do not assume legacy `resolve_library_id` / `get_library_docs` tools are available on the public surface.
 """,
             }
     return None

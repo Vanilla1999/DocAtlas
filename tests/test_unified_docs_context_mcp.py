@@ -23,6 +23,36 @@ def test_get_docs_context_schema():
     assert schema["properties"]["mode"]["enum"] == ["auto", "project", "library", "dependency", "mixed"]
 
 
+def test_docmancer_agent_quickstart_resource_exists():
+    from docmancer.mcp.docs_server import MCP_RESOURCES
+
+    resources = {resource["uri"]: resource for resource in MCP_RESOURCES}
+    assert "docmancer://agent/quickstart" in resources
+
+    text = resources["docmancer://agent/quickstart"]["text"]
+    assert "Docmancer is a local documentation/context router" in text
+    assert "not a code auditor" in text
+    assert "get_docs_context" in text
+    assert "response_style=\"snippet-first\"" in text
+    assert "navigation_only" in text
+
+
+def test_library_workflow_resource_uses_public_unified_tool_not_legacy_aliases():
+    from docmancer.mcp.docs_server import MCP_RESOURCES
+
+    resource = next(
+        resource for resource in MCP_RESOURCES
+        if resource["uri"] == "docmancer://workflow/library-docs"
+    )
+    text = resource["text"]
+
+    assert "get_docs_context" in text
+    assert "mode=\"library\"" in text
+    assert "response_style=\"snippet-first\"" in text
+    assert "resolve_library_id" not in text.split("Legacy tools")[0]
+    assert "get_library_docs" not in text.split("Legacy tools")[0]
+
+
 def test_get_docs_context_handler_calls_facade():
     class Facade:
         def __init__(self):
@@ -191,5 +221,67 @@ def test_get_docs_context_answer_mode_marks_navigation_only_payload_not_answer_a
 
     assert result["answer_available"] is False
     assert result["answer_type"] == "navigation_only"
+    assert result["safe_to_answer"] is False
+    assert result["required_next_step"] == "read_or_search_suggested_sources"
+    assert result["not_a_code_auditor"] is True
+    assert "Do not treat this as a complete answer" in result["agent_instruction"]
     assert "ingestion_diagnostics" not in result
     assert result["next_actions"] == [{"action": "search_project_sources", "tool": "code_search"}]
+
+
+def test_get_docs_context_navigation_only_has_agent_instruction():
+    class Facade:
+        def get_docs_context(self, question, **kwargs):
+            return {
+                "tool": "get_docs_context",
+                "status": "success",
+                "answer_available": True,
+                "trust_contract": {
+                    "selected": [{"path": "ARCHITECTURE.md", "title": "Architecture"}],
+                    "rejected": [],
+                    "risky": [],
+                },
+                "next_actions": [{"action": "search_project_sources", "tool": "code_search"}],
+                "ingestion_diagnostics": {"project": {"repo_map": {"selected_files": 1}}},
+            }
+
+    result = cast(dict[str, Any], handle_context_tool(
+        "get_docs_context",
+        {"question": "How does DI work?", "project_path": "/repo", "mode": "project"},
+        cast(Any, Facade()),
+    ))
+
+    assert result["answer_available"] is False
+    assert result["answer_type"] == "navigation_only"
+    assert result["safe_to_answer"] is False
+    assert result["required_next_step"] == "read_or_search_suggested_sources"
+    assert "Do not treat this as a complete answer" in result["agent_instruction"]
+
+
+def test_get_docs_context_direct_answer_has_agent_instruction():
+    class Facade:
+        def get_docs_context(self, question, **kwargs):
+            return {
+                "tool": "get_docs_context",
+                "status": "success",
+                "answer_available": True,
+                "primary_snippet": {
+                    "source": "docs/API.md",
+                    "content": "Use FooClient.create()",
+                },
+                "trust_contract": {
+                    "selected": [{"path": "docs/API.md"}],
+                    "rejected": [],
+                    "risky": [],
+                },
+            }
+
+    result = cast(dict[str, Any], handle_context_tool(
+        "get_docs_context",
+        {"question": "How to create FooClient?", "project_path": "/repo"},
+        cast(Any, Facade()),
+    ))
+
+    assert result["answer_type"] == "direct"
+    assert result["safe_to_answer"] is True
+    assert result["required_next_step"] == "answer_from_returned_context"

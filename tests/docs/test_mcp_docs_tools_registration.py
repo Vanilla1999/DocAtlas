@@ -160,7 +160,7 @@ def test_mcp_exposes_inspect_project_docs_with_discovery_first_guidance():
     assert "Context7-like" in tool["description"]
     assert "reason_code" in tool["description"]
     assert "next_action" in tool["description"]
-    assert "Follow next_action" in tool["description"]
+    assert "follow next_action" in tool["description"]
     assert tool["inputSchema"]["required"] == ["project_path"]
     assert "details" in tool["inputSchema"]["properties"]
 
@@ -352,9 +352,13 @@ def test_mcp_read_resource_returns_workflow_and_schema_guidance():
     assert "get_docs_context" in workflow["text"]
     assert "trust_contract.sources" in workflow["text"]
     assert library_workflow is not None
-    assert "resolve_library_id" in library_workflow["text"]
-    assert "reason_code=needs_docs_url" in library_workflow["text"]
-    assert "do not WebFetch" in library_workflow["text"]
+    assert "get_docs_context" in library_workflow["text"]
+    assert "mode=\"library\"" in library_workflow["text"]
+    assert "response_style=\"snippet-first\"" in library_workflow["text"]
+    assert "Legacy tools" in library_workflow["text"]
+    assert "resolve_library_id" not in library_workflow["text"].split("Legacy tools")[0]
+    assert "get_library_docs" not in library_workflow["text"].split("Legacy tools")[0]
+    assert "Do not use WebFetch" in library_workflow["text"]
     assert schema is not None
     assert '"schema_version": "trust-contract-1.1"' in schema["text"]
     assert '"selected"' in schema["text"]
@@ -364,6 +368,9 @@ def test_mcp_read_resource_returns_workflow_and_schema_guidance():
     assert library_templated is not None
     assert 'library="mcp"' in library_templated["text"]
     assert 'ecosystem="python"' in library_templated["text"]
+    assert "get_docs_context" in library_templated["text"]
+    assert "prepare_docs" in library_templated["text"]
+    assert "resolve_library_id" not in library_templated["text"].split("Do not assume legacy")[0]
     assert read_docs_resource("docmancer://missing") is None
 
 
