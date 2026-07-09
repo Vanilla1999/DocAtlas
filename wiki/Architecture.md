@@ -257,7 +257,7 @@ This creates an agent-discoverable onboarding path where the agent guides itself
 
 When an agent launches `doc-atlas mcp serve` (registered automatically by `doc-atlas setup` or `install <agent>`), the server exposes exactly **two** tools to the agent regardless of how many packs are installed:
 
-- `docmancer_search_tools(query, package?, limit)`: BM25-style search with lightweight synonym expansion across the curated (or full) tool surfaces of every enabled pack. Returns name, description, safety, and inlined `inputSchema` for every returned match.
+- `docmancer_search_tools(query, package?, limit)`: hybrid-ready search across enriched operation metadata (operation ids, summaries/descriptions, aliases, intents, tags, examples, and schema terms). The default remains dependency-light BM25-style lexical ranking with synonym expansion and snake/kebab/camel token normalization. Set `DOCMANCER_MCP_SEARCH=hybrid` plus `DOCMANCER_MCP_EMBEDDING_MODEL=<local FastEmbed model>` to add local semantic embeddings as a second signal; lexical and semantic ranks are fused with RRF, and unavailable semantic search falls back to lexical with an explicit warning. Returns name, description, safety, score/rank metadata, low-confidence search metadata, and inlined `inputSchema` for every returned match.
 - `docmancer_call_tool(name, args)`: dispatches the resolved tool through the matching executor.
 
 Every dispatch passes through the gate chain (in order):

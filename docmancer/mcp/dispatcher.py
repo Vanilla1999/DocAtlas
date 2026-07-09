@@ -18,7 +18,7 @@ from docmancer.mcp.executors import get_executor
 from docmancer.mcp.logging import log_call
 from docmancer.mcp.manifest import InstalledPackage, Manifest
 from docmancer.mcp.network_policy import SecurityError, grant_from_mapping, target_url, validate_http_target
-from docmancer.mcp.search import ToolEntry, build_corpus, search
+from docmancer.mcp.search import ToolEntry, build_corpus, search_with_metadata
 from docmancer.mcp.slug import split_tool_name
 
 
@@ -66,7 +66,8 @@ class Dispatcher:
                 "name": SEARCH_TOOL,
                 "description": (
                     "Search across installed API packages for tools matching a task. "
-                    "Returns top-K tool names with descriptions and inlined input "
+                    "Returns top-K tool names with descriptions, score/rank "
+                    "metadata, low-confidence search metadata, and inlined input "
                     "schemas. Pass an empty query with package to list that package's "
                     "tools. Always call this before docmancer_call_tool."
                 ),
@@ -89,19 +90,33 @@ class Dispatcher:
         package: str | None = None,
         limit: int = 5,
     ) -> dict[str, Any]:
-        matches = search(self._corpus, query, package=package, limit=limit)
+        hits, search_meta = search_with_metadata(self._corpus, query, package=package, limit=limit)
+        fallback_hint: str | None = None
+        if not hits and package and query:
+            hits, search_meta = search_with_metadata(self._corpus, "", package=package, limit=limit)
+            fallback_hint = "No lexical matches; showing package tools instead."
         out: list[dict[str, Any]] = []
-        for i, m in enumerate(matches):
+        for hit in hits:
+            m = hit.entry
             entry: dict[str, Any] = {
                 "name": m.name,
                 "package": m.package,
                 "version": m.version,
                 "description": m.description,
                 "safety": m.safety,
+                "score": hit.score,
+                "lexicalScore": hit.lexical_score,
+                "semanticScore": hit.semantic_score,
+                "rankReason": hit.rank_reason,
             }
             entry["inputSchema"] = m.input_schema
             out.append(entry)
-        return {"matches": out}
+        if fallback_hint:
+            search_meta = {**search_meta, "lowConfidence": True, "hint": fallback_hint}
+        return {
+            "matches": out,
+            "search": search_meta,
+        }
 
     def call_tool(self, name: str, args: dict[str, Any]) -> DispatchResult:
         start = time.time()

@@ -4,7 +4,7 @@ from pathlib import Path
 import httpx
 import pytest
 
-from docmancer.mcp import credentials, paths
+from docmancer.mcp import credentials, paths, search_semantic
 from docmancer.mcp.dispatcher import CALL_TOOL, SEARCH_TOOL, Dispatcher
 from docmancer.mcp.executors import http as http_executor
 from docmancer.mcp.manifest import InstalledPackage, Manifest
@@ -159,10 +159,222 @@ def test_search_tools_uses_synonyms_for_common_action_vocab(tmp_path, monkeypatc
     assert [match["name"] for match in res["matches"]] == ["helpdesk__v1__tickets_open"]
 
 
-def test_search_tools_returns_no_match_for_garbage(manifest_with_acme):
+def test_search_tools_indexes_aliases_without_token_overlap(tmp_path, monkeypatch):
+    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path))
+    contract = {
+        "operations": [
+            {
+                "id": "tracker_action",
+                "summary": "Manage tracker record",
+                "executor": "noop_doc",
+                "aliases": ["create issue", "open ticket"],
+                "inputSchema": {"type": "object", "properties": {}},
+                "safety": {"destructive": False, "requires_auth": False},
+            }
+        ]
+    }
+    tools = {"tools": [{"operation_id": "tracker_action", "description": "Manage tracker record"}]}
+    pkg_dir = paths.package_dir("helpdesk", "v1")
+    pkg_dir.mkdir(parents=True, exist_ok=True)
+    (pkg_dir / "contract.json").write_text(json.dumps(contract))
+    (pkg_dir / "tools.curated.json").write_text(json.dumps(tools))
+
+    res = Dispatcher(Manifest(packages=[InstalledPackage(package="helpdesk", version="v1")])).search_tools(
+        query="create issue", package="helpdesk"
+    )
+
+    assert [match["name"] for match in res["matches"]] == ["helpdesk__v1__tracker_action"]
+    assert res["matches"][0]["rankReason"] == ["lexical"]
+    assert res["search"]["mode"] == "lexical"
+
+
+def test_search_tools_uses_schema_terms(tmp_path, monkeypatch):
+    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path))
+    schema = {
+        "type": "object",
+        "properties": {
+            "assignee": {"type": "string", "description": "User assigned to the ticket"},
+        },
+    }
+    contract = {
+        "operations": [
+            {
+                "id": "tracker_query",
+                "summary": "Query tracker records",
+                "executor": "noop_doc",
+                "inputSchema": schema,
+                "safety": {"destructive": False, "requires_auth": False},
+            }
+        ]
+    }
+    tools = {"tools": [{"operation_id": "tracker_query", "description": "Query tracker records", "inputSchema": schema}]}
+    pkg_dir = paths.package_dir("helpdesk", "v1")
+    pkg_dir.mkdir(parents=True, exist_ok=True)
+    (pkg_dir / "contract.json").write_text(json.dumps(contract))
+    (pkg_dir / "tools.curated.json").write_text(json.dumps(tools))
+
+    res = Dispatcher(Manifest(packages=[InstalledPackage(package="helpdesk", version="v1")])).search_tools(
+        query="search by assignee", package="helpdesk"
+    )
+
+    assert [match["name"] for match in res["matches"]] == ["helpdesk__v1__tracker_query"]
+
+
+def test_search_tools_splits_snake_kebab_and_camel_case(tmp_path, monkeypatch):
+    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path))
+    contract = {
+        "operations": [
+            {
+                "id": "createIssue",
+                "summary": "Tracker operation",
+                "executor": "noop_doc",
+                "inputSchema": {"type": "object", "properties": {}},
+                "safety": {"destructive": False, "requires_auth": False},
+            }
+        ]
+    }
+    tools = {"tools": [{"operation_id": "createIssue", "description": "Tracker operation"}]}
+    pkg_dir = paths.package_dir("helpdesk", "v1")
+    pkg_dir.mkdir(parents=True, exist_ok=True)
+    (pkg_dir / "contract.json").write_text(json.dumps(contract))
+    (pkg_dir / "tools.curated.json").write_text(json.dumps(tools))
+
+    res = Dispatcher(Manifest(packages=[InstalledPackage(package="helpdesk", version="v1")])).search_tools(
+        query="create issue", package="helpdesk"
+    )
+
+    assert [match["name"] for match in res["matches"]] == ["helpdesk__v1__createIssue"]
+
+
+def test_search_tools_marks_low_confidence_when_top_scores_are_close(tmp_path, monkeypatch):
+    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path))
+    contract = {
+        "operations": [
+            {
+                "id": "issue_create",
+                "summary": "Create issue",
+                "executor": "noop_doc",
+                "inputSchema": {"type": "object", "properties": {}},
+                "safety": {"destructive": False, "requires_auth": False},
+            },
+            {
+                "id": "issue_open",
+                "summary": "Open issue",
+                "executor": "noop_doc",
+                "inputSchema": {"type": "object", "properties": {}},
+                "safety": {"destructive": False, "requires_auth": False},
+            },
+        ]
+    }
+    tools = {
+        "tools": [
+            {"operation_id": "issue_create", "description": "Create issue"},
+            {"operation_id": "issue_open", "description": "Open issue"},
+        ]
+    }
+    pkg_dir = paths.package_dir("helpdesk", "v1")
+    pkg_dir.mkdir(parents=True, exist_ok=True)
+    (pkg_dir / "contract.json").write_text(json.dumps(contract))
+    (pkg_dir / "tools.curated.json").write_text(json.dumps(tools))
+
+    res = Dispatcher(Manifest(packages=[InstalledPackage(package="helpdesk", version="v1")])).search_tools(
+        query="issue", package="helpdesk", limit=2
+    )
+
+    assert len(res["matches"]) == 2
+    assert res["search"]["lowConfidence"] is True
+    assert all("score" in match for match in res["matches"])
+
+
+def test_search_tools_hybrid_merges_semantic_hits_and_caches_embeddings(tmp_path, monkeypatch):
+    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path))
+    monkeypatch.setenv("DOCMANCER_MCP_SEARCH", "hybrid")
+    contract = {
+        "operations": [
+            {
+                "id": "alpha_lookup",
+                "summary": "Alpha lookup",
+                "executor": "noop_doc",
+                "tags": ["semantic target"],
+                "inputSchema": {"type": "object", "properties": {}},
+                "safety": {"destructive": False, "requires_auth": False},
+            },
+            {
+                "id": "beta_lookup",
+                "summary": "Beta lookup",
+                "executor": "noop_doc",
+                "tags": ["other vector"],
+                "inputSchema": {"type": "object", "properties": {}},
+                "safety": {"destructive": False, "requires_auth": False},
+            },
+        ]
+    }
+    tools = {
+        "tools": [
+            {"operation_id": "alpha_lookup", "description": "Alpha lookup"},
+            {"operation_id": "beta_lookup", "description": "Beta lookup"},
+        ]
+    }
+    pkg_dir = paths.package_dir("helpdesk", "v1")
+    pkg_dir.mkdir(parents=True, exist_ok=True)
+    (pkg_dir / "contract.json").write_text(json.dumps(contract))
+    (pkg_dir / "tools.curated.json").write_text(json.dumps(tools))
+
+    class FakeProvider:
+        provider_id = "fake-provider"
+
+        def __init__(self):
+            self.document_calls = 0
+
+        def embed_query(self, text):
+            return [1.0, 0.0]
+
+        def embed_documents(self, texts):
+            self.document_calls += 1
+            return [[1.0, 0.0] if "semantic target" in text else [0.0, 1.0] for text in texts]
+
+    provider = FakeProvider()
+    monkeypatch.setattr(search_semantic, "embedding_provider_from_env", lambda env=None: provider)
+    dispatcher = Dispatcher(Manifest(packages=[InstalledPackage(package="helpdesk", version="v1")]))
+
+    first = dispatcher.search_tools(query="meaning only", package="helpdesk", limit=2)
+    second = dispatcher.search_tools(query="meaning only", package="helpdesk", limit=2)
+
+    assert first["matches"][0]["name"] == "helpdesk__v1__alpha_lookup"
+    assert first["matches"][0]["rankReason"] == ["semantic"]
+    assert first["matches"][0]["semanticScore"] > 0
+    assert first["search"]["mode"] == "hybrid"
+    assert first["search"]["semantic"] is True
+    assert second["matches"][0]["name"] == "helpdesk__v1__alpha_lookup"
+    assert provider.document_calls == 1
+
+
+def test_search_tools_hybrid_falls_back_to_lexical_when_semantic_unavailable(manifest_with_acme, monkeypatch):
+    monkeypatch.setenv("DOCMANCER_MCP_SEARCH", "hybrid")
+    monkeypatch.setattr(
+        search_semantic,
+        "embedding_provider_from_env",
+        lambda env=None: (_ for _ in ()).throw(search_semantic.SemanticUnavailable("missing local embedding model")),
+    )
+
+    res = Dispatcher(manifest_with_acme).search_tools(query="widgets", package="acme", limit=2)
+
+    assert len(res["matches"]) == 2
+    assert res["search"]["mode"] == "lexical"
+    assert res["search"]["semantic"] is False
+    assert res["search"]["warning"] == "missing local embedding model"
+
+
+def test_search_tools_falls_back_to_package_listing_for_no_match(manifest_with_acme):
     d = Dispatcher(manifest_with_acme)
-    res = d.search_tools(query="zzzzqqqqxxxxnomatchforthis", package="acme")
-    assert res["matches"] == []
+    res = d.search_tools(query="zzzzqqqqxxxxnomatchforthis", package="acme", limit=10)
+
+    assert {match["name"] for match in res["matches"]} == {
+        "acme__v1__widgets_list",
+        "acme__v1__widgets_create",
+    }
+    assert res["search"]["lowConfidence"] is True
+    assert res["search"]["hint"] == "No lexical matches; showing package tools instead."
 
 
 def test_search_tools_can_list_package_tools_with_empty_query(manifest_with_acme):
