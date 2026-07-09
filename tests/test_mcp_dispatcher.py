@@ -122,13 +122,41 @@ def test_list_tools_returns_only_two_meta_tools(manifest_with_acme):
 
 def test_search_tools_returns_matches_with_inlined_schema(manifest_with_acme):
     d = Dispatcher(manifest_with_acme)
-    res = d.search_tools(query="list widgets", package="acme")
-    assert len(res["matches"]) >= 1
+    res = d.search_tools(query="widgets", package="acme", limit=2)
+    assert len(res["matches"]) == 2
     top = res["matches"][0]
-    assert top["name"] == "acme__v1__widgets_list"
-    assert "inputSchema" in top
+    assert {match["name"] for match in res["matches"]} == {
+        "acme__v1__widgets_list",
+        "acme__v1__widgets_create",
+    }
+    assert all("inputSchema" in match for match in res["matches"])
     # safety metadata included
     assert top["safety"]["destructive"] is False
+
+
+def test_search_tools_uses_synonyms_for_common_action_vocab(tmp_path, monkeypatch):
+    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path))
+    contract = {
+        "operations": [
+            {
+                "id": "tickets_open",
+                "summary": "Open a ticket",
+                "executor": "noop_doc",
+                "inputSchema": {"type": "object", "properties": {}},
+                "safety": {"destructive": False, "requires_auth": False},
+            }
+        ]
+    }
+    tools = {"tools": [{"operation_id": "tickets_open", "description": "Open a ticket", "inputSchema": contract["operations"][0]["inputSchema"]}]}
+    pkg_dir = paths.package_dir("helpdesk", "v1")
+    pkg_dir.mkdir(parents=True, exist_ok=True)
+    (pkg_dir / "contract.json").write_text(json.dumps(contract))
+    (pkg_dir / "tools.curated.json").write_text(json.dumps(tools))
+    pkg = InstalledPackage(package="helpdesk", version="v1")
+
+    res = Dispatcher(Manifest(packages=[pkg])).search_tools(query="create issue", package="helpdesk")
+
+    assert [match["name"] for match in res["matches"]] == ["helpdesk__v1__tickets_open"]
 
 
 def test_search_tools_returns_no_match_for_garbage(manifest_with_acme):
@@ -181,6 +209,20 @@ def test_call_tool_blocks_destructive_without_optin(manifest_with_acme, monkeypa
     assert "docmancer install acme " not in out.body["message"]
 
 
+def test_call_tool_blocks_destructive_without_operation_grant(manifest_with_acme, monkeypatch):
+    monkeypatch.setenv("ACME_API_KEY", "ak_test")
+    manifest_with_acme.packages[0].allow_destructive = True
+    manifest_with_acme.packages[0].operation_grants["widgets_create"].pop("allow_destructive", None)
+
+    out = Dispatcher(manifest_with_acme).call_tool(
+        "acme__v1__widgets_create",
+        {"amount": 2500, "currency": "usd"},
+    )
+
+    assert out.ok is False
+    assert out.error_code == "destructive_call_blocked"
+
+
 def test_call_tool_dispatches_get_with_headers(manifest_with_acme, monkeypatch):
     monkeypatch.setenv("ACME_API_KEY", "ak_test")
     captured = {}
@@ -219,6 +261,7 @@ def test_call_tool_post_injects_idempotency_and_form_encoding(manifest_with_acme
     monkeypatch.setenv("ACME_API_KEY", "ak_test")
     # Allow destructive
     manifest_with_acme.packages[0].allow_destructive = True
+    manifest_with_acme.packages[0].operation_grants["widgets_create"]["allow_destructive"] = True
 
     captured = {}
 
@@ -250,6 +293,35 @@ def test_call_tool_post_injects_idempotency_and_form_encoding(manifest_with_acme
     assert "idempotency-key" in captured["headers"]
     assert "_docmancer" in out.body
     assert out.body["_docmancer"]["idempotency_key"] == captured["headers"]["idempotency-key"]
+
+
+def test_call_tool_post_defaults_to_idempotency_when_safety_omits_flag(manifest_with_acme, monkeypatch):
+    monkeypatch.setenv("ACME_API_KEY", "ak_test")
+    manifest_with_acme.packages[0].allow_destructive = True
+    manifest_with_acme.packages[0].operation_grants["widgets_create"]["allow_destructive"] = True
+    contract = json.loads(json.dumps(ACME_CONTRACT))
+    contract["operations"][1]["safety"].pop("idempotent")
+    pkg_dir = paths.package_dir("acme", "v1")
+    (pkg_dir / "contract.json").write_text(json.dumps(contract))
+
+    captured = {}
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        captured["headers"] = dict(request.headers)
+        return httpx.Response(200, json={"id": "wgt_1"})
+
+    client = httpx.Client(transport=httpx.MockTransport(handler))
+    from docmancer.mcp import executors
+    original = executors.get_executor
+    monkeypatch.setattr(
+        "docmancer.mcp.dispatcher.get_executor",
+        lambda kind: http_executor.HttpExecutor(client=client) if kind == "http" else original(kind),
+    )
+
+    out = Dispatcher(manifest_with_acme).call_tool("acme__v1__widgets_create", {"amount": 1, "currency": "usd"})
+
+    assert out.ok is True, out.body
+    assert "idempotency-key" in captured["headers"]
 
 
 def test_http_private_metadata_target_blocked_before_credentials(tmp_path, monkeypatch):

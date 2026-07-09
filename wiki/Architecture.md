@@ -257,7 +257,7 @@ This creates an agent-discoverable onboarding path where the agent guides itself
 
 When an agent launches `doc-atlas mcp serve` (registered automatically by `doc-atlas setup` or `install <agent>`), the server exposes exactly **two** tools to the agent regardless of how many packs are installed:
 
-- `docmancer_search_tools(query, package?, limit)`: token-overlap search across the curated (or full) tool surfaces of every enabled pack. Returns name, description, safety, and inlined `inputSchema` for the top match (lazy schema fetch for the rest).
+- `docmancer_search_tools(query, package?, limit)`: BM25-style search with lightweight synonym expansion across the curated (or full) tool surfaces of every enabled pack. Returns name, description, safety, and inlined `inputSchema` for every returned match.
 - `docmancer_call_tool(name, args)`: dispatches the resolved tool through the matching executor.
 
 Every dispatch passes through the gate chain (in order):

@@ -281,7 +281,8 @@ def test_mcp_read_resource_returns_workflow_and_schema_guidance():
 
     assert workflow is not None
     assert "inspect_project_docs" in workflow["text"]
-    assert "sync_project_docs" in workflow["text"]
+    assert "prepare_docs(action=\"sync_project_docs\"" in workflow["text"]
+    assert "get_docs_context" in workflow["text"]
     assert "trust_contract.sources" in workflow["text"]
     assert library_workflow is not None
     assert "resolve_library_id" in library_workflow["text"]
@@ -292,6 +293,7 @@ def test_mcp_read_resource_returns_workflow_and_schema_guidance():
     assert '"selected"' in schema["text"]
     assert templated is not None
     assert 'project_path="/repo"' in templated["text"]
+    assert "get_docs_context" in templated["text"]
     assert library_templated is not None
     assert 'library="mcp"' in library_templated["text"]
     assert 'ecosystem="python"' in library_templated["text"]

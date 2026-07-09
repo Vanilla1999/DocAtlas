@@ -656,8 +656,8 @@ MCP_RESOURCES: list[dict[str, str]] = [
         "text": """# Project docs workflow
 
 1. Call `inspect_project_docs(project_path)` before repo-specific architecture, conventions, runbook, or Context7-like questions.
-2. If the response asks for reconciliation, call `sync_project_docs(project_path, with_vectors=true)` before `get_project_context`.
-3. Call `get_project_context(project_path, question, output_mode=\"compact\")` and inspect `answer_available`, `answer_type`, `answer_completeness`, and `trust_contract.sources`.
+2. If the response asks for reconciliation, call `prepare_docs(action="sync_project_docs", project_path=..., with_vectors=true)`.
+3. Call `get_docs_context(project_path=..., question=..., mode="project", output_mode="compact")` and inspect `answer_available`, `answer_type`, `answer_completeness`, and `trust_contract.sources`.
 4. Treat `partial_navigational` as navigation/source-search guidance, not a complete answer.
 5. Use dependency/public network fetches only with explicit approval (`allow_network=true`).
 """,
@@ -696,7 +696,7 @@ MCP_RESOURCE_TEMPLATES: list[dict[str, str]] = [
     {
         "uriTemplate": "docmancer://workflow/project-docs/{project_path}",
         "name": "Project-specific docs workflow",
-        "description": "Use with a local project_path to guide inspect/sync/get_project_context calls.",
+        "description": "Use with a local project_path to guide inspect/prepare_docs/get_docs_context calls.",
         "mimeType": "text/markdown",
     },
     {
@@ -721,8 +721,8 @@ def read_docs_resource(uri: str) -> dict[str, str] | None:
             "text": f"""# Project docs workflow for `{project_path}`
 
 1. `inspect_project_docs(project_path=\"{project_path}\")`
-2. If required, `sync_project_docs(project_path=\"{project_path}\", with_vectors=true)`
-3. `get_project_context(project_path=\"{project_path}\", question=..., output_mode=\"compact\")`
+2. If required, `prepare_docs(action=\"sync_project_docs\", project_path=\"{project_path}\", with_vectors=true)`
+3. `get_docs_context(project_path=\"{project_path}\", question=..., mode=\"project\", output_mode=\"compact\")`
 4. Inspect `trust_contract.sources.selected`, `trust_contract.sources.rejected`, and `trust_contract.sources.risky` before using the answer.
 """,
         }

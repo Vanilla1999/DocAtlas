@@ -59,19 +59,29 @@ def get_or_create_key(
     now = int(now if now is not None else time.time())
     conn = _connect(db_path)
     try:
-        row = conn.execute(
-            "SELECT key, expires_at FROM idempotency_keys WHERE fingerprint = ?",
-            (fp,),
-        ).fetchone()
-        if row and row[1] > now:
-            return row[0], True
+        conn.execute("PRAGMA busy_timeout = 5000")
+        conn.execute("BEGIN IMMEDIATE")
+        conn.execute("DELETE FROM idempotency_keys WHERE expires_at <= ?", (now,))
         new_key = str(uuid.uuid4())
-        conn.execute(
-            "INSERT OR REPLACE INTO idempotency_keys "
+        inserted = conn.execute(
+            "INSERT OR IGNORE INTO idempotency_keys "
             "(fingerprint, key, created_at, expires_at) VALUES (?, ?, ?, ?)",
             (fp, new_key, now, now + ttl_seconds),
-        )
+        ).rowcount
+        if inserted:
+            conn.commit()
+            return new_key, False
+        row = conn.execute(
+            "SELECT key FROM idempotency_keys WHERE fingerprint = ?",
+            (fp,),
+        ).fetchone()
         conn.commit()
+        if row:
+            return row[0], True
         return new_key, False
+    except Exception:
+        if conn.in_transaction:
+            conn.rollback()
+        raise
     finally:
         conn.close()

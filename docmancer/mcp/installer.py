@@ -67,7 +67,7 @@ def install_package(
     destructive_count = sum(
         1 for op in contract.get("operations", []) if (op.get("safety") or {}).get("destructive")
     )
-    operation_grants = _operation_grants(contract, allow_execute=allow_execute)
+    operation_grants = _operation_grants(contract, allow_execute=allow_execute, allow_destructive=allow_destructive)
 
     manifest = Manifest.load(manifest_path)
     pkg = InstalledPackage(
@@ -139,13 +139,13 @@ def _read_tool_count(path: Path) -> int:
     return 0
 
 
-def _operation_grants(contract: dict, *, allow_execute: bool) -> dict[str, dict]:
+def _operation_grants(contract: dict, *, allow_execute: bool, allow_destructive: bool) -> dict[str, dict]:
     grants: dict[str, dict] = {}
     for operation in contract.get("operations", []) or []:
         operation_id = operation.get("id")
         if not operation_id:
             continue
-        executor = operation.get("executor", "http")
+        executor = operation.get("executor", "noop_doc")
         grant: dict[str, object] = {"allowed_executors": [executor]}
         if executor == "http":
             base_url = (operation.get("http") or {}).get("base_url", "")
@@ -154,5 +154,7 @@ def _operation_grants(contract: dict, *, allow_execute: bool) -> dict[str, dict]
         elif executor == "python_import" and allow_execute:
             module = (operation.get("python_import") or {}).get("module")
             grant["allowed_modules"] = [module] if module else []
+        if (operation.get("safety") or {}).get("destructive") and allow_destructive:
+            grant["allow_destructive"] = True
         grants[str(operation_id)] = grant
     return grants

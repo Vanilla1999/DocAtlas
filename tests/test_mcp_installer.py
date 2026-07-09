@@ -75,3 +75,25 @@ def test_install_idempotent_reinstall(tmp_path, monkeypatch):
     pkgs = [p for p in m.packages if p.package == "x"]
     assert len(pkgs) == 1
     assert pkgs[0].allow_destructive is True
+
+
+def test_install_grants_destructive_per_operation_only_when_opted_in(tmp_path, monkeypatch):
+    registry_dir = tmp_path / "registry"
+    _seed_registry(
+        registry_dir,
+        "x",
+        "1",
+        {
+            "operations": [
+                {"id": "read", "executor": "http", "http": {"base_url": "https://api.example.com"}, "safety": {"destructive": False}},
+                {"id": "delete", "executor": "http", "http": {"base_url": "https://api.example.com"}, "safety": {"destructive": True}},
+            ]
+        },
+        {"tools": []},
+    )
+    monkeypatch.setenv("DOCMANCER_REGISTRY_DIR", str(registry_dir))
+
+    result = install_package("x", "1", allow_destructive=True)
+
+    assert result.package.operation_grants["read"].get("allow_destructive") is None
+    assert result.package.operation_grants["delete"]["allow_destructive"] is True

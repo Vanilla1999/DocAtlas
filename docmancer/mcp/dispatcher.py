@@ -33,6 +33,7 @@ class DispatchResult:
 
 SEARCH_TOOL = "docmancer_search_tools"
 CALL_TOOL = "docmancer_call_tool"
+DEFAULT_EXECUTOR = "noop_doc"
 
 SEARCH_TOOL_SCHEMA = {
     "type": "object",
@@ -65,8 +66,8 @@ class Dispatcher:
                 "name": SEARCH_TOOL,
                 "description": (
                     "Search across installed API packages for tools matching a task. "
-                    "Returns top-K tool names with descriptions and an inlined input "
-                    "schema for the top match. Always call this before docmancer_call_tool."
+                    "Returns top-K tool names with descriptions and inlined input "
+                    "schemas. Always call this before docmancer_call_tool."
                 ),
                 "inputSchema": SEARCH_TOOL_SCHEMA,
             },
@@ -97,8 +98,7 @@ class Dispatcher:
                 "description": m.description,
                 "safety": m.safety,
             }
-            if i == 0:
-                entry["inputSchema"] = m.input_schema
+            entry["inputSchema"] = m.input_schema
             out.append(entry)
         return {"matches": out}
 
@@ -136,7 +136,7 @@ class Dispatcher:
                      latency_ms=int((time.time() - start) * 1000))
             return DispatchResult(False, body, "invalid_args")
 
-        executor_kind = operation.get("executor", "http")
+        executor_kind = operation.get("executor", DEFAULT_EXECUTOR)
         operation_grant = pkg.grant_for(str(operation.get("id") or ""))
         if executor_kind == "http":
             http_meta = operation.get("http", {}) or {}
@@ -157,7 +157,7 @@ class Dispatcher:
             package=pkg.package,
             version=pkg.version,
             operation=operation,
-            allow_destructive=pkg.allow_destructive,
+            allow_destructive=pkg.allow_destructive and bool(operation_grant.get("allow_destructive")),
             has_credentials=not missing or not (operation.get("safety") or {}).get("requires_auth"),
         )
         if not gate.allowed:
@@ -171,10 +171,9 @@ class Dispatcher:
             return DispatchResult(False, body, gate.error_code)
 
         # Idempotency
-        op_safety = operation.get("safety") or {}
         idempotency_key: str | None = None
         idempotency_header = auth.get("idempotency_header")
-        if not op_safety.get("idempotent", True) and idempotency_header:
+        if _should_create_idempotency_key(operation, executor_kind) and idempotency_header:
             idempotency_key, _ = idempotency.get_or_create_key(name, args)
 
         if executor_kind in {"python_import", "shell"} and not getattr(pkg, "allow_execute", False):
@@ -285,3 +284,13 @@ def _schema_from_params(operation: dict[str, Any]) -> dict[str, Any]:
     if required:
         schema["required"] = required
     return schema
+
+
+def _should_create_idempotency_key(operation: dict[str, Any], executor_kind: str) -> bool:
+    if executor_kind != "http":
+        return False
+    method = ((operation.get("http") or {}).get("method") or "GET").upper()
+    if method in {"GET", "HEAD", "OPTIONS"}:
+        return False
+    safety_meta = operation.get("safety") or {}
+    return safety_meta.get("idempotent") is not True
