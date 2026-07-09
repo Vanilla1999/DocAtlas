@@ -53,7 +53,10 @@ def validate_http_target(url: str, grant: HttpGrant):
         raise SecurityError("missing_host")
     if not host_matches(host, grant.allowed_hosts):
         raise SecurityError("host_not_allowed")
-    for ip in resolve_host(host):
+    resolved = resolve_host(host)
+    if not resolved:
+        raise SecurityError("host_resolution_failed")
+    for ip in resolved:
         if is_private_or_metadata_ip(ip) and not grant.allow_private_network:
             raise SecurityError("private_network_blocked")
     return parsed

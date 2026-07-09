@@ -29,22 +29,15 @@ No need to call `inspect` first: sync does a full reconcile. Call `inspect` only
 
 ## Preferred happy path
 
-For most agents, the simplest safe flow is:
-
-```text
-bootstrap_project_docs(project_path, question?)
-get_project_context(project_path, question)
-```
-
-For explicit lifecycle control, use:
+For public MCP clients, use one explicit lifecycle flow:
 
 ```text
 inspect_project_docs(project_path)
-sync_project_docs(project_path, with_vectors=true)
-get_project_context(project_path, question)
+prepare_docs(action="sync_project_docs", project_path=..., with_vectors=true)
+get_docs_context(project_path=..., question=..., mode="project")
 ```
 
-`sync_project_docs` is the canonical project-docs lifecycle action. It reconciles the local project-docs index with the current filesystem discovery snapshot:
+`prepare_docs(action="sync_project_docs")` is the canonical public project-docs lifecycle action. It reconciles the local project-docs index with the current filesystem discovery snapshot:
 
 - discovers current reviewable project-doc candidates;
 - removes orphaned indexed docs whose files were deleted or are no longer discovered;
@@ -52,7 +45,7 @@ get_project_context(project_path, question)
 - indexes new and changed reviewable docs;
 - verifies the final indexed state before reporting results.
 
-`ingest_project_docs` is a legacy low-level operation. New agent instructions should prefer `sync_project_docs` because project docs are owned by the repository filesystem, and the index is only a cache of that current state.
+`ingest_project_docs` and direct `sync_project_docs` are legacy/compatibility-surface operations. New agent instructions should prefer `prepare_docs(action="sync_project_docs")` because project docs are owned by the repository filesystem, and the index is only a cache of that current state.
 
 ## Explicit low-level flow
 
@@ -66,33 +59,28 @@ Then follow the returned `reason_code`:
 
 | `reason_code` | What it means | Agent action |
 |---|---|---|
-| `project_docs_ready` | Project docs are discovered and current. | Call `get_project_context` or `get_project_docs`. |
-| `project_docs_found_not_indexed` | Reviewable docs exist but are not indexed. | Call `sync_project_docs`. |
-| `project_docs_stale` | Indexed docs changed on disk, were deleted, or are no longer part of current discovery. | Call `sync_project_docs`. |
+| `project_docs_ready` | Project docs are discovered and current. | Call `get_docs_context(mode="project")`. |
+| `project_docs_found_not_indexed` | Reviewable docs exist but are not indexed. | Call `prepare_docs(action="sync_project_docs")`. |
+| `project_docs_stale` | Indexed docs changed on disk, were deleted, or are no longer part of current discovery. | Call `prepare_docs(action="sync_project_docs")`. |
 | `no_project_docs` | No reviewable docs were discovered. | Ask before creating a reviewable `ARCHITECTURE.md`. |
 | `architecture_doc_creation_recommended` | Some docs exist, but no high-level overview/architecture doc was found. | Ask before creating `ARCHITECTURE.md`. |
-| `no_project_docs_results` | Indexed docs did not answer the query. | Inspect docs and reconcile with `sync_project_docs` before guessing. |
+| `no_project_docs_results` | Indexed docs did not answer the query. | Inspect docs and reconcile with `prepare_docs(action="sync_project_docs")` before guessing. |
 
-After `sync_project_docs`, proceed to:
-
-```text
-get_project_context(project_path, question)
-```
-
-`get_project_context` returns a compact Trust Contract with selected, rejected, and risky sources, plus `next_actions` for missing, stale, non-exact, or unmatched docs. Use `mode` when the agent should constrain sources explicitly: `auto`, `project-only`, `deps-only`, or `public-docs`.
-
-Or, for project docs only:
+After sync, proceed to:
 
 ```text
-get_project_docs(project_path, query)
+get_docs_context(project_path=..., question=..., mode="project")
 ```
+
+`get_docs_context(mode="project")` returns a compact Trust Contract with selected, rejected, and risky sources, plus `next_actions` for missing, stale, non-exact, or unmatched docs.
 
 For module-specific queries, use exact module filters:
 
 ```text
-get_project_docs(
-  project_path,
-  query,
+get_docs_context(
+  project_path=...,
+  question=...,
+  mode="project",
   module_path="packages/backend",
   scope="module"
 )
@@ -158,8 +146,8 @@ If approved, the coding agent should:
 1. inspect the codebase;
 2. write `ARCHITECTURE.md` as a normal repository file;
 3. call `inspect_project_docs`;
-4. call `sync_project_docs`;
-5. answer future repo-specific questions from `get_project_context` or `get_project_docs`.
+4. call `prepare_docs(action="sync_project_docs")`;
+5. answer future repo-specific questions from `get_docs_context(mode="project")`.
 
 Do not store generated architecture only in hidden memory. Official project knowledge should remain a file humans can review and edit.
 
@@ -170,7 +158,7 @@ Do not store generated architecture only in hidden memory. Official project know
 Use:
 
 ```text
-sync_project_docs(project_path)
+prepare_docs(action="sync_project_docs", project_path=...)
 ```
 
 for repository files such as README/docs/wiki/ADR (discovers, reconciles, and indexes).
@@ -260,13 +248,13 @@ Checklist:
 2. If docs are new, changed, stale, orphaned, or missing from the index, run:
 
    ```text
-   sync_project_docs(project_path, with_vectors=true)
+   prepare_docs(action="sync_project_docs", project_path=..., with_vectors=true)
    ```
 
 3. Run `inspect_project_docs(project_path)` again.
    - Confirm `reason_code` is `project_docs_ready` or follow the returned `next_action`.
 
-4. Ask two or three project-specific smoke-test questions with `get_project_context` or `get_project_docs`.
+4. Ask two or three project-specific smoke-test questions with `get_docs_context(mode="project")`.
    - Use terms that should only appear in the expected docs.
    - Confirm the expected files are cited in `selected_sources`, `indexed_sources`, or result chunks.
 5. If expected files are not cited, fix the source map instead of guessing:
@@ -278,11 +266,11 @@ Checklist:
 Suggested smoke-test questions:
 
 ```text
-get_project_context(project_path, "What is the architecture decision for <unique ADR term>?")
-get_project_context(project_path, "How do we deploy <unique service/module name>?")
-get_project_docs(project_path, "<unique heading or phrase from docs/INDEX.md target>")
-get_project_docs(project_path, "<unique module phrase>", module_path="<module>", scope="module")
-get_project_context(project_path, "<module-specific question>", module_path="<module>", scope="module")
+get_docs_context(project_path=..., question="What is the architecture decision for <unique ADR term>?", mode="project")
+get_docs_context(project_path=..., question="How do we deploy <unique service/module name>?", mode="project")
+get_docs_context(project_path=..., question="<unique heading or phrase from docs/INDEX.md target>", mode="project")
+get_docs_context(project_path=..., question="<unique module phrase>", mode="project", module_path="<module>", scope="module")
+get_docs_context(project_path=..., question="<module-specific question>", mode="project", module_path="<module>", scope="module")
 ```
 
 Agents should recommend this verification loop whenever docs were just added, refreshed, reorganized, or when a user expected a source that was not cited.
@@ -296,17 +284,18 @@ Example: docs exist but are not indexed.
   "reason_code": "project_docs_found_not_indexed",
   "requires_confirmation": false,
   "next_action": {
-    "type": "sync_project_docs",
-    "tool": "sync_project_docs"
+    "type": "prepare_docs",
+    "tool": "prepare_docs"
   },
   "arguments_patch": {
+    "action": "sync_project_docs",
     "project_path": "/path/to/repo",
     "with_vectors": true
   }
 }
 ```
 
-The agent should call `sync_project_docs` with the provided arguments.
+The agent should call `prepare_docs` with the provided arguments.
 
 Example: stale or orphaned docs.
 

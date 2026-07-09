@@ -29,7 +29,7 @@ ACME_CONTRACT = {
             "http": {
                 "method": "GET",
                 "path": "/v1/widgets",
-                "base_url": "https://api.acme.test",
+                "base_url": "https://example.com",
                 "encoding": "query_only",
             },
             "params": [
@@ -44,7 +44,7 @@ ACME_CONTRACT = {
             "http": {
                 "method": "POST",
                 "path": "/v1/widgets",
-                "base_url": "https://api.acme.test",
+                "base_url": "https://example.com",
                 "encoding": "form",
             },
             "params": [
@@ -97,11 +97,11 @@ def acme_pack(tmp_path, monkeypatch):
         operation_grants={
             "widgets_list": {
                 "allowed_executors": ["http"],
-                "allowed_hosts": ["api.acme.test"],
+                "allowed_hosts": ["example.com"],
             },
             "widgets_create": {
                 "allowed_executors": ["http"],
-                "allowed_hosts": ["api.acme.test"],
+                "allowed_hosts": ["example.com"],
             },
         },
     )
@@ -163,6 +163,17 @@ def test_search_tools_returns_no_match_for_garbage(manifest_with_acme):
     d = Dispatcher(manifest_with_acme)
     res = d.search_tools(query="zzzzqqqqxxxxnomatchforthis", package="acme")
     assert res["matches"] == []
+
+
+def test_search_tools_can_list_package_tools_with_empty_query(manifest_with_acme):
+    d = Dispatcher(manifest_with_acme)
+    res = d.search_tools(query="", package="acme", limit=10)
+
+    assert {match["name"] for match in res["matches"]} == {
+        "acme__v1__widgets_list",
+        "acme__v1__widgets_create",
+    }
+    assert all("inputSchema" in match for match in res["matches"])
 
 
 def test_call_tool_unknown_returns_fuzzy(manifest_with_acme):

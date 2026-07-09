@@ -24,6 +24,17 @@ from typing import Any
 from docmancer.mcp.executors.base import Executor, ExecutorResult
 
 DEFAULT_TIMEOUT_SECONDS = 30
+NETWORK_MODULE_ROOTS = {
+    "ftplib",
+    "http",
+    "httpx",
+    "imaplib",
+    "poplib",
+    "requests",
+    "smtplib",
+    "socket",
+    "urllib",
+}
 
 
 def detect_python(start: Path | None = None, *, use_project_venv: bool = False) -> str:
@@ -49,6 +60,9 @@ def validate_python_import(meta: dict[str, Any], grant: dict[str, Any]) -> str |
         return "missing_python_import_target"
     if not module_matches(str(module), tuple(grant.get("allowed_modules") or ())):
         return "module_not_allowed"
+    root = str(module).split(".", 1)[0]
+    if root in NETWORK_MODULE_ROOTS and not bool(grant.get("allow_network_imports")):
+        return "network_module_not_allowed"
     if "__" in str(callable_name):
         return "dunder_callable_blocked"
     return None

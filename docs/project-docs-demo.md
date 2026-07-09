@@ -16,19 +16,16 @@ Inside the Docmancer repository, ask the agent a repo-specific question such as:
 
 ## Expected agent flow
 
-Preferred happy path:
+Preferred public MCP happy path:
 
-1. Call `bootstrap_project_docs(project_path=".", question="Context7 project-owned docs roadmap")`. This may inspect, ingest existing reviewable docs, refresh stale docs, and inspect again.
-2. If `bootstrap_project_docs` returns `status = "confirmation_required"`, ask the user before taking the proposed action.
-3. Call `get_project_context(project_path=".", question="Context7 project-owned docs roadmap", mode="auto")`.
+1. Call `inspect_project_docs(project_path=".")`. This is read-only and discovers `README.md`, roadmap files, product brief, and other reviewable docs candidates.
+2. If `reason_code` is `project_docs_found_not_indexed` or `project_docs_stale`, call `prepare_docs(action="sync_project_docs", project_path=".")`.
+3. Call `get_docs_context(project_path=".", question="Context7 project-owned docs roadmap", mode="project")`.
 4. Answer using the returned Trust Contract, `next_actions`, and chunks that include `source_class`, `path`, `heading_path`, freshness metadata, and stale state.
 
-Explicit lower-level flow:
+Legacy compatibility flow:
 
-1. Call `inspect_project_docs(project_path=".")` first. This is read-only and discovers `README.md`, roadmap files, product brief, and other reviewable docs candidates.
-2. If `reason_code` is `project_docs_found_not_indexed` or `project_docs_stale`, follow `next_action` and call `ingest_project_docs(project_path=".")`.
-3. Retry with `get_project_docs(project_path=".", query="Context7 project-owned docs roadmap")` or `get_project_context(project_path=".", question="Context7 project-owned docs roadmap")`.
-4. Answer from Docmancer project-docs results instead of guessing.
+Older docs surfaces may expose direct `ingest_project_docs`, `get_project_docs`, `get_project_context`, or `bootstrap_project_docs`. Prefer the public flow above when `prepare_docs` and `get_docs_context` are available.
 
 ## Success criteria
 
@@ -38,15 +35,15 @@ Explicit lower-level flow:
 
 ## Bootstrapping a repo with no docs
 
-If `inspect_project_docs(project_path=".")`, `bootstrap_project_docs`, or `get_project_docs` reports `no_project_docs`, Docmancer should return `next_action.type = "ask_user_to_create_project_doc"` with `suggested_file: "ARCHITECTURE.md"`, `requires_confirmation: true`, and `confirmation_reason: "repo_write"`.
+If `inspect_project_docs(project_path=".")` or `get_docs_context(mode="project")` reports `no_project_docs`, Docmancer should return `next_action.type = "ask_user_to_create_project_doc"` with `suggested_file: "ARCHITECTURE.md"`, `requires_confirmation: true`, and `confirmation_reason: "repo_write"`.
 
 Expected agent flow:
 
 1. Ask the user before creating documentation: "No project docs were found. May I inspect the codebase and create `ARCHITECTURE.md` as a reviewable project doc?"
 2. If approved, inspect the codebase and create `ARCHITECTURE.md` in the repository root.
 3. Call `inspect_project_docs(project_path=".")` again; `ARCHITECTURE.md` should now be discovered as an `architecture` project doc.
-4. Call `ingest_project_docs(project_path=".")`.
-5. Answer future repo-specific architecture questions through `get_project_docs`, citing `ARCHITECTURE.md` instead of relying on hidden memory.
+4. Call `prepare_docs(action="sync_project_docs", project_path=".")`.
+5. Answer future repo-specific architecture questions through `get_docs_context(mode="project")`, citing `ARCHITECTURE.md` instead of relying on hidden memory.
 
 ## Dependency docs are separate
 

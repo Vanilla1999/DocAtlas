@@ -94,6 +94,24 @@ def test_python_import_blocks_module_not_in_operation_grant(tmp_path, monkeypatc
     assert out.body["error"] == "module_not_allowed"
 
 
+def test_python_import_blocks_network_modules_without_network_grant(tmp_path, monkeypatch):
+    registry = tmp_path / "reg"
+    _seed_python_pack(
+        registry,
+        module="http.client",
+        callable_name="HTTPConnection",
+        via_kwargs=True,
+        args_schema={"type": "object", "properties": {"host": {"type": "string"}}, "required": ["host"]},
+    )
+    monkeypatch.setenv("DOCMANCER_REGISTRY_DIR", str(registry))
+    install_package("demo", "1", allow_execute=True)
+
+    out = Dispatcher(Manifest.load()).call_tool("demo__1__json_loads", {"host": "example.com"})
+
+    assert out.ok is False
+    assert out.body["error"] == "network_module_not_allowed"
+
+
 def test_python_import_blocks_dunder_callable(tmp_path, monkeypatch):
     registry = tmp_path / "reg"
     _seed_python_pack(registry, callable_name="__dict__", args_schema={"type": "object", "properties": {}})

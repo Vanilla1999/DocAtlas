@@ -95,7 +95,7 @@ The resolution happens in `LibraryDocsService.get_docs()` when `project_path` is
 
 `doc-atlas mcp docs-serve` exposes the docs runtime to coding agents as MCP tools. It uses the same local ingest, index, update, and query path as the CLI, plus the persistent SQLite registry for known documentation sources.
 
-For repository-specific questions, agents should call `bootstrap_project_docs(project_path, question?)` first, then `get_project_context(project_path, question)`. `get_project_context` returns an `answer_outline` with a recommended reading order, a Trust Contract (`selected_sources` plus the shorter `selected` alias), and each context item has both flat metadata and nested `source` / `section` objects. Agents should cite trusted sources from the Trust Contract, prefer the nested metadata for machine reads, and treat `CHANGELOG.md` as primary evidence only for release-history or "what changed" questions.
+For repository-specific questions, agents should call `inspect_project_docs(project_path)` first, run `prepare_docs(action="sync_project_docs", project_path=..., with_vectors=true)` when reconciliation is needed, then call `get_docs_context(project_path=..., question=..., mode="project")`. `get_docs_context` returns an answer outline/context pack with a Trust Contract (`selected_sources` plus compatibility aliases where present). Agents should cite trusted sources from the Trust Contract, prefer nested metadata for machine reads, and treat `CHANGELOG.md` as primary evidence only for release-history or "what changed" questions.
 
 If the user asks broadly about "the MCP server", distinguish the two surfaces explicitly:
 

@@ -128,12 +128,13 @@ For API tasks, search first, inspect the returned schema and safety block, then 
 
 For repository-specific architecture, conventions, runbooks, roadmap, README/wiki, or module-doc questions, use the Docs MCP tools before generic WebFetch or model memory:
 
-1. Call `bootstrap_project_docs(project_path, question?)` first. It safely inspects and syncs reviewable project-owned docs; it stops before repo writes or dependency-doc network fetches.
-2. Call `get_project_context(project_path, question)` for the answer context pack.
-3. Read `answer_outline.recommended_reading_order` before composing the answer.
-4. Use `trust_contract.selected` / `trust_contract.selected_sources` to cite trusted sources. Treat `CHANGELOG.md` as primary only for release-history/change questions.
-5. Prefer nested `context_pack[].source` and `context_pack[].section` metadata; the flat fields are kept for compatibility.
-6. If the user asks vaguely about "the MCP server", distinguish `doc-atlas mcp docs-serve` (documentation context) from `doc-atlas mcp serve` (installed MCP Packs/API action tools).
+1. Call `inspect_project_docs(project_path)` first for read-only discovery.
+2. If reconciliation is needed, call `prepare_docs(action="sync_project_docs", project_path=..., with_vectors=true)`.
+3. Call `get_docs_context(project_path=..., question=..., mode="project")` for the answer context pack.
+4. Read `answer_outline.recommended_reading_order` before composing the answer.
+5. Use `trust_contract.selected` / `trust_contract.selected_sources` to cite trusted sources. Treat `CHANGELOG.md` as primary only for release-history/change questions.
+6. Prefer nested `context_pack[].source` and `context_pack[].section` metadata; the flat fields are kept for compatibility.
+7. If the user asks vaguely about "the MCP server", distinguish `doc-atlas mcp docs-serve` (documentation context) from `doc-atlas mcp serve` (installed MCP Packs/API action tools).
 
 ## Common Mistakes
 

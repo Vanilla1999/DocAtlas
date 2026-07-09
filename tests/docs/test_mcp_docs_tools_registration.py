@@ -10,6 +10,7 @@ from docmancer.mcp.docs_server import (
     ADMIN_TOOL_NAMES,
     ALL_TOOLS,
     CONTEXT_TOOLS,
+    DocsMcpSurface,
     DocsServerConfig,
     LIBRARY_TOOLS,
     MCP_RESOURCES,
@@ -17,7 +18,10 @@ from docmancer.mcp.docs_server import (
     PREFETCH_TOOLS,
     PROJECT_TOOLS,
     TOOLS,
+    ToolSpec,
     build_docs_surface,
+    call_docs_tool_payload,
+    current_tools,
     read_docs_resource,
 )
 
@@ -46,6 +50,13 @@ def test_mcp_public_surface_exposes_prepare_docs_instead_of_prefetch_library_doc
     assert "prefetch_library_docs" not in names
 
 
+def test_mcp_public_surface_hides_admin_debug_tools_by_default():
+    names = {tool["name"] for tool in TOOLS}
+
+    assert "list_docs_sources" not in names
+    assert "list_docs_sources" in {tool["name"] for tool in ALL_TOOLS}
+
+
 def test_docs_surface_builder_uses_one_tool_and_handler_contract():
     surface = build_docs_surface(DocsServerConfig(expose_legacy=False, expose_admin=False))
     tool_names = {spec.name for spec in surface.tools}
@@ -62,6 +73,35 @@ def test_docs_surface_builder_exposes_legacy_and_admin_by_config():
     assert "prefetch_library_docs" in names
     assert ADMIN_TOOL_NAMES.issubset(names)
     assert names == set(surface.handlers)
+
+
+def test_current_tools_reads_env_each_call(monkeypatch):
+    monkeypatch.delenv("DOCMANCER_MCP_LEGACY_TOOLS", raising=False)
+    public_names = {tool["name"] for tool in current_tools()}
+    assert "get_project_context" not in public_names
+
+    monkeypatch.setenv("DOCMANCER_MCP_LEGACY_TOOLS", "1")
+    legacy_names = {tool["name"] for tool in current_tools()}
+    assert "get_project_context" in legacy_names
+
+
+def test_call_docs_tool_payload_classifies_handler_value_error():
+    def broken_handler(name, args, service):
+        raise ValueError("bad user input")
+
+    spec = ToolSpec(
+        name="broken",
+        description="Broken test tool",
+        input_schema={"type": "object", "properties": {}},
+        handler=broken_handler,
+    )
+    surface = DocsMcpSurface(tools=(spec,), handlers={"broken": broken_handler})
+
+    payload = call_docs_tool_payload("broken", {}, object(), surface=surface)
+
+    assert payload["reason_code"] == "bad_request"
+    assert payload["error"]["retryable"] is False
+    assert payload["error"]["where"]["tool"] == "broken"
 
 
 def test_public_mcp_schemas_do_not_put_null_in_enum_values():
@@ -219,9 +259,9 @@ def test_project_docs_workflow_documents_index_template_and_verification_loop():
     assert "indexed_source_not_discovered" in text
     assert "## Verification loop" in text
     assert "inspect_project_docs(project_path)" in text
-    assert "sync_project_docs(project_path, with_vectors=true)" in text
+    assert "prepare_docs(action=\"sync_project_docs\"" in text
     assert "Confirm the expected files are cited" in text
-    assert "get_project_context(project_path" in text
+    assert "get_docs_context(project_path=" in text
 
 
 def test_mcp_docs_server_documents_index_and_smoke_test_loop():
@@ -232,7 +272,7 @@ def test_mcp_docs_server_documents_index_and_smoke_test_loop():
     assert "docs/INDEX.md" in text
     assert "canonical map of official project-owned docs" in text
     assert "inspect_project_docs(project_path)" in text
-    assert "sync_project_docs(project_path, with_vectors=true)" in text
+    assert "prepare_docs(action=\"sync_project_docs\"" in text
     assert "confirm expected files appear" in text
     assert "indexed_source_not_discovered" in text
     assert "Treat maintained `docs/INDEX.md` as the canonical map" in text
@@ -255,7 +295,9 @@ def test_mcp_exposes_manifest_tools():
 
 def test_mcp_exposes_lifecycle_tools():
     names = {tool["name"] for tool in TOOLS}
-    assert "list_docs_sources" in names
+    all_names = {tool["name"] for tool in ALL_TOOLS}
+    assert "list_docs_sources" not in names
+    assert "list_docs_sources" in all_names
     assert "inspect_library_docs" not in names
     assert "remove_library_docs" not in names
     assert "prune_library_docs" not in names
@@ -270,6 +312,28 @@ def test_mcp_exposes_discoverable_resources_and_templates():
     assert "docmancer://workflow/library-docs" in resource_uris
     assert "docmancer://workflow/project-docs/{project_path}" in template_uris
     assert "docmancer://library/{ecosystem}/{library}/{version}" in template_uris
+
+
+def test_maintained_agent_docs_prefer_public_docs_workflow():
+    repo = Path(__file__).resolve().parents[2]
+    docs = [
+        repo / "AGENTS.md",
+        repo / "README.md",
+        repo / "SKILL.md",
+        repo / "docs" / "AGENT_DOCS_WORKFLOW.md",
+        repo / "docs" / "PROJECT_MAP.md",
+        repo / "docs" / "mcp-docs-server.md",
+        repo / "docs" / "project-docs-demo.md",
+        repo / "docs" / "project-docs-mcp-workflow.md",
+        repo / "wiki" / "Architecture.md",
+    ]
+    joined = "\n".join(path.read_text() for path in docs)
+
+    assert "prepare_docs(action=\"sync_project_docs\"" in joined
+    assert "get_docs_context(" in joined
+    assert "bootstrap_project_docs(project_path" not in joined
+    assert "sync_project_docs(project_path" not in joined
+    assert "get_project_context(project_path" not in joined
 
 
 def test_mcp_read_resource_returns_workflow_and_schema_guidance():

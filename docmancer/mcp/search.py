@@ -83,9 +83,9 @@ def search(
     limit: int = 5,
 ) -> list[ToolEntry]:
     q = _tokens(query, expand=True)
-    if not q:
-        return []
     candidates = [t for t in corpus if package is None or t.package == package]
+    if not q:
+        return candidates[:limit] if package is not None else []
     documents = [_tokens(f"{t.operation_id} {t.description}") for t in candidates]
     if not documents:
         return []

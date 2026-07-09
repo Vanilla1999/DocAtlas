@@ -34,20 +34,20 @@ This section is a practical map of what Docmancer can do today and which tool or
 
 | Need | Current capability | CLI / MCP entrypoint | Current boundary |
 |---|---|---|---|
-| Query local repo docs | Discover, ingest, stale-check, bootstrap, and query README/docs/wiki/ADR/roadmap files plus module/package docs in monorepos. | `get_docs_context`; advanced: `inspect_project_docs`, `ingest_project_docs`, `bootstrap_project_docs`, `get_project_docs`, `get_project_context`; CLI `doc-atlas ingest`, `doc-atlas query`. | Project docs must be indexed before they can be trusted; bootstrap stops before repo writes. |
-| Query a specific module | Use module-aware project-doc filters for packages, apps, services, crates, libraries, and similar module roots. | `get_project_docs(module_path=..., scope="module")`, `get_project_context(module_path=..., scope="module")`. | Module matching is exact; ambiguous module names return structured clarification instead of a guessed answer. |
+| Query local repo docs | Discover, reconcile, stale-check, and query README/docs/wiki/ADR/roadmap files plus module/package docs in monorepos. | `get_docs_context(mode="project")`; lifecycle: `inspect_project_docs`, `prepare_docs(action="sync_project_docs")`; CLI `doc-atlas ingest`, `doc-atlas query`. | Project docs must be indexed before they can be trusted; repo writes still require confirmation. |
+| Query a specific module | Use module-aware project-doc filters for packages, apps, services, crates, libraries, and similar module roots. | `get_docs_context(mode="project", module_path=..., scope="module")`. | Module matching is exact; ambiguous module names return structured clarification instead of a guessed answer. |
 | Query public docs locally | Fetch, normalize, index, and query public docs sites. | CLI `doc-atlas add`, `doc-atlas query`; MCP `get_docs_context`, `get_library_docs`, `prefetch_library_docs`. | First query requires indexing unless the source is already registered/indexed. |
 | Use exact dependency versions | Read supported project metadata and prefetch/query docs for resolved versions. | `get_docs_context(mode="dependency")`, `inspect_project_docs`, `prefetch_project_dependency_docs`, `prefetch_project_docs`, `get_library_docs(project_path=...)`. | Strongest current support is Dart/Flutter and Rust metadata; dependency-docs prefetch may use the network and is separate from project-owned docs ingest. |
 | Avoid repeated WebFetch | Register sources once, then query local indexes. | `resolve_library_id`, `get_library_docs`, `list_library_docs`; CLI `doc-atlas list`. | If no registered or confidently resolved docs source exists, user may still need to provide a docs URL. |
 | Keep docs private/local | Index local files and private docs without sending content to hosted docs services. | CLI `doc-atlas ingest`; MCP `ingest_project_docs`. | Cloud embedding extras are optional; default retrieval stack can stay local. |
-| Get compact context for agents | Return sections with headings, source attribution, extracted snippets, metadata, token estimates, and optional snippet-first presentation for coding queries. | CLI `doc-atlas query`, `doc-atlas context`; MCP `get_docs_context`, `get_library_docs`, and `get_project_context` with `response_style`. | Snippets are extracted from trusted source docs, not synthesized; `context_pack` and Trust Contract remain available. |
+| Get compact context for agents | Return sections with headings, source attribution, extracted snippets, metadata, token estimates, and optional snippet-first presentation for coding queries. | CLI `doc-atlas query`, `doc-atlas context`; MCP `get_docs_context` with `response_style`. | Snippets are extracted from trusted source docs, not synthesized; `context_pack` and Trust Contract remain available. |
 | Plan implementation from source evidence | Return a compact implementation map for a patch-like task: relevant files, current behavior, existing dependency APIs, missing symbols, minimal patch path, risks, verification, warnings, and next actions. | MCP `get_patch_plan_context`. | Planning-only surface. It does not replace `get_docs_context`, does not generate a patch, does not index the whole `.pub-cache`, and does not replace `get_patch_constraints` or validation. |
 | Compile patch constraints for agents | Return compact, source-attributed project constraints for a coding patch: architecture conventions, forbidden/generated-file edits, source-of-truth rules, pinned dependency contracts, and suggested checks. | MCP `get_patch_constraints`. | Designed to provide actionable project constraints for coding agents; not proven to improve success rate. |
 | Validate patch constraints after editing | Deterministically compare caller-supplied constraints with changed files or a patch diff. | MCP `validate_patch_against_constraints`. | Best-effort guardrail only; unknown results require manual review and tests still must run. |
 | Run long docs indexing safely | Start async prefetch jobs and poll progress. | `prefetch_library_docs(async=true)`, `prefetch_docs_targets(async=true)`, `get_docs_job_status`. | Large public sites still need sane max pages, allowed domains, and source hygiene. |
 | Diagnose docs runtime | Check config, storage, SQLite, Qdrant, indexes, agents, and MCP state. | CLI `doc-atlas doctor`, `doc-atlas qdrant status`; MCP `mcp doctor`. | Doctor output should continue moving toward more explicit severity/fix commands. |
 
-Important current boundary: `get_project_context(project_path, question)` is available as a compact MVP for combining indexed project-owned docs with one resolved dependency-doc source and a Trust Contract. `bootstrap_project_docs(project_path, question?)` is the safe onboarding shortcut before `get_project_context`; it can inspect and ingest/refresh existing reviewable docs, including module docs, but it stops before repository writes and dependency-docs network fetches.
+Important current boundary: `get_docs_context(project_path=..., question=..., mode="project"|"mixed")` is the public high-level context tool for combining indexed project-owned docs with optional dependency-doc evidence and a Trust Contract. Project-doc reconciliation stays explicit through `inspect_project_docs` and `prepare_docs(action="sync_project_docs")`; repository writes and dependency network fetches still require confirmation.
 
 Recommended MCP entry point:
 
@@ -493,14 +493,14 @@ When docs are stale, MCP responses include stale indicators and recommended next
 
 The project docs tools are designed so an agent can guide itself:
 
-1. call `bootstrap_project_docs(project_path=..., question=...)` for the safe happy path, or call `inspect_project_docs(project_path=...)` for the explicit low-level flow;
+1. call `inspect_project_docs(project_path=...)` for read-only discovery;
 2. discover README/docs/wiki/roadmap/ADR candidates and dependency metadata;
 3. inspect `project_docs.modules` and `project_docs.indexed_modules` when the question is module-specific;
-4. if docs are not indexed, follow `reason_code = project_docs_found_not_indexed` and call `ingest_project_docs`;
-5. if docs are stale, follow `reason_code = project_docs_stale` and call `ingest_project_docs`;
+4. if docs are not indexed, follow `reason_code = project_docs_found_not_indexed` and call `prepare_docs(action="sync_project_docs")`;
+5. if docs are stale, follow `reason_code = project_docs_stale` and call `prepare_docs(action="sync_project_docs")`;
 6. if no docs exist, follow `reason_code = no_project_docs`, ask the user, and have the coding agent create a reviewable `ARCHITECTURE.md` only after confirmation;
 7. if docs exist but no high-level overview/architecture doc is found, follow `reason_code = architecture_doc_creation_recommended` and ask before creating `ARCHITECTURE.md`;
-8. then answer repo-specific questions with `get_project_context` or `get_project_docs`;
+8. then answer repo-specific questions with `get_docs_context(mode="project")`;
 9. for module-specific questions, prefer `module_path="packages/backend"` plus `scope="module"`; if a module name is ambiguous, ask the user to choose instead of guessing.
 
 Project-docs responses include `reason_code`, `next_action`, optional `next_actions` / `recommended_next_actions`, `requires_confirmation`, `confirmation_reason`, `arguments_patch`, and optional agent/user messages so agents can follow the flow without guessing. Module-specific failures use structured reason codes such as `module_not_found`, `module_ambiguous`, and `no_module_docs`.
@@ -1203,10 +1203,10 @@ The tests check Docmancer artifacts and normalized Context7 snapshots for matchi
 
 ### Example 10 - Current high-level orchestration boundary
 
-`get_project_context` is the shipped high-level context-pack tool, but it deliberately does not silently perform every setup action. Agents should still use `bootstrap_project_docs` or the explicit inspect/ingest flow first:
+`get_docs_context` is the shipped high-level context-pack tool, but it deliberately does not silently perform every setup action. Agents should still use `inspect_project_docs` and, when needed, `prepare_docs(action="sync_project_docs")` first:
 
 ```text
-get_project_context(project_path, question)
+get_docs_context(project_path=..., question=..., mode="project"|"mixed")
   -> query indexed project docs
   -> optionally query one requested/detected exact dependency-doc source
   -> return one compact Trust Contract with selected/rejected/risky sources

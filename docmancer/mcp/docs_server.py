@@ -585,6 +585,7 @@ ADMIN_TOOL_NAMES = {
     "remove_library_docs",
     "prune_library_docs",
     "list_library_docs",
+    "list_docs_sources",
 }
 
 
@@ -646,6 +647,70 @@ CONTEXT_TOOLS = context_tools(TOOLS)
 LIBRARY_TOOLS = library_tools(TOOLS)
 PROJECT_TOOLS = project_tools(TOOLS)
 PREFETCH_TOOLS = prefetch_tools(TOOLS)
+
+
+def current_docs_surface(env: Mapping[str, str] | None = None) -> DocsMcpSurface:
+    """Build the docs MCP surface from the current environment.
+
+    `TOOLS` remains as an import-time compatibility snapshot for tests and
+    older integrations, but the live server calls this so env flag changes are
+    not frozen by module import order.
+    """
+    return build_docs_surface(DocsServerConfig.from_env(os.environ if env is None else env))
+
+
+def current_tools(env: Mapping[str, str] | None = None) -> list[dict[str, Any]]:
+    return [spec.to_tool_dict() for spec in current_docs_surface(env).tools]
+
+
+def _exception_reason_code(exc: Exception) -> str:
+    if isinstance(exc, ValueError):
+        return "bad_request"
+    if isinstance(exc, TimeoutError):
+        return "network_required"
+    if isinstance(exc, PermissionError):
+        return "permission_denied"
+    return "handler_exception"
+
+
+def call_docs_tool_payload(
+    name: str,
+    arguments: dict[str, Any] | None,
+    service: LibraryDocsService,
+    *,
+    surface: DocsMcpSurface | None = None,
+) -> dict[str, Any]:
+    args = arguments or {}
+    active_surface = surface or current_docs_surface()
+    handler = active_surface.handlers.get(name)
+    if handler is None:
+        return build_mcp_error_payload(
+            reason_code="unknown_tool",
+            message=f"unknown tool: {name}",
+            tool=name,
+            phase="validation",
+        )
+    try:
+        payload = handler(name, args, service)
+    except Exception as exc:
+        reason_code = _exception_reason_code(exc)
+        return build_mcp_error_payload(
+            reason_code=reason_code,
+            message=str(exc),
+            exception=exc,
+            tool=name,
+            phase="execution",
+            debug=debug_errors_enabled(args),
+        )
+    if payload is None:
+        return build_mcp_error_payload(
+            reason_code="unknown_tool",
+            message=f"unknown tool: {name}",
+            tool=name,
+            phase="validation",
+        )
+    return payload
+
 
 MCP_RESOURCES: list[dict[str, str]] = [
     {
@@ -760,7 +825,7 @@ async def _run_async(service: LibraryDocsService) -> None:
     async def _list_tools() -> list[mcp_types.Tool]:
         return [
             mcp_types.Tool(name=tool["name"], description=tool["description"], inputSchema=tool["inputSchema"])
-            for tool in TOOLS
+            for tool in current_tools()
         ]
 
     @server.list_resources()
@@ -796,34 +861,7 @@ async def _run_async(service: LibraryDocsService) -> None:
 
     @server.call_tool()
     async def _call_tool(name: str, arguments: dict[str, Any]) -> list[mcp_types.TextContent]:
-        try:
-            args = arguments or {}
-            handler = DOCS_SURFACE.handlers.get(name)
-            if handler is not None:
-                payload = handler(name, args, service)
-                if payload is not None:
-                    return _json_text(mcp_types, payload)
-        except Exception as exc:
-            return _json_text(
-                mcp_types,
-                build_mcp_error_payload(
-                    reason_code="unhandled_exception",
-                    message=str(exc),
-                    exception=exc,
-                    tool=name,
-                    phase="execution",
-                    debug=debug_errors_enabled(arguments or {}),
-                ),
-            )
-        return _json_text(
-            mcp_types,
-            build_mcp_error_payload(
-                reason_code="unknown_tool",
-                message=f"unknown tool: {name}",
-                tool=name,
-                phase="validation",
-            ),
-        )
+        return _json_text(mcp_types, call_docs_tool_payload(name, arguments, service))
 
     async with stdio_server() as (read_stream, write_stream):
         await server.run(read_stream, write_stream, server.create_initialization_options())

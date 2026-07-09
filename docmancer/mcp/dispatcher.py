@@ -67,7 +67,8 @@ class Dispatcher:
                 "description": (
                     "Search across installed API packages for tools matching a task. "
                     "Returns top-K tool names with descriptions and inlined input "
-                    "schemas. Always call this before docmancer_call_tool."
+                    "schemas. Pass an empty query with package to list that package's "
+                    "tools. Always call this before docmancer_call_tool."
                 ),
                 "inputSchema": SEARCH_TOOL_SCHEMA,
             },
