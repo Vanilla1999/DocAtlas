@@ -535,7 +535,7 @@ Current project-docs `reason_code` values:
 - Read `trust_contract.selected_sources` or the compatibility alias `trust_contract.selected` before citing sources.
 - For each context item, use either flat fields (`path`, `title`, `heading_path`, `freshness`) or nested fields (`source.path`, `source.title`, `section.heading_path`).
 - Treat `CHANGELOG.md` as release-history evidence unless the user asks about changes, releases, migrations, or version history.
-- Distinguish the Docs MCP server (`doc-atlas mcp docs-serve`) from the Packs MCP runtime (`doc-atlas mcp serve`).
+- Distinguish the Docs MCP server (`doc-atlas mcp docs-serve`) from the Packs MCP runtime (`doc-atlas mcp packs-serve`; `serve` is a compatibility alias).
 - Call `inspect_project_docs` first for repo-specific questions (read-only).
 - `prepare_docs(action="sync_project_docs")` is the recommended public lifecycle action; it reconciles and prunes in one call.
 - Do not WebFetch project architecture/conventions before trying project-owned docs.

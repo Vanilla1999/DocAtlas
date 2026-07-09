@@ -1,4 +1,4 @@
-"""`doc-atlas mcp serve`: stdio MCP server bridging to the Dispatcher."""
+"""`doc-atlas mcp packs-serve`: stdio MCP server bridging to the Dispatcher."""
 from __future__ import annotations
 
 import asyncio

@@ -108,6 +108,7 @@ def is_specific_packs_mcp_source(chunk: Any) -> bool:
         or "mcp packs" in h
         or "action packs" in h
         or "install-pack" in h
+        or "packs-serve" in content[:500]
         or "mcp serve" in content[:500]
     )
 

@@ -19,11 +19,21 @@ def mcp_group() -> None:
     pass
 
 
-@mcp_group.command("serve")
-def mcp_serve_cmd() -> None:
-    """Run the advanced stdio MCP Packs/API-pack gateway."""
+def _run_packs_gateway() -> None:
     from docmancer.mcp.serve import serve
     serve()
+
+
+@mcp_group.command("packs-serve")
+def mcp_packs_serve_cmd() -> None:
+    """Run the advanced stdio MCP Packs/API-pack gateway."""
+    _run_packs_gateway()
+
+
+@mcp_group.command("serve")
+def mcp_serve_cmd() -> None:
+    """Compatibility alias for packs-serve."""
+    _run_packs_gateway()
 
 
 @mcp_group.command("docs-serve")

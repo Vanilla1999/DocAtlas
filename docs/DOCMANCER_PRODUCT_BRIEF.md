@@ -451,7 +451,7 @@ doc-atlas qdrant logs
 
 ```bash
 doc-atlas install-pack open-meteo@v1
-doc-atlas mcp serve
+doc-atlas mcp packs-serve
 ```
 
 Agent видит не сотни tools, а две meta-tools:
@@ -529,7 +529,8 @@ MCP pack commands:
 ```bash
 doc-atlas install-pack <pkg>@<version>
 doc-atlas uninstall <pkg>[@<version>]
-doc-atlas mcp serve
+doc-atlas mcp packs-serve
+doc-atlas mcp serve  # compatibility alias
 doc-atlas mcp list
 doc-atlas mcp doctor
 doc-atlas mcp enable <pkg>

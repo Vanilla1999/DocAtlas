@@ -1,6 +1,6 @@
 """Tool Search corpus + ranking (spec 2.7 / D10).
 
-Keep this dependency-light so `doc-atlas mcp serve` works in a minimal
+Keep this dependency-light so `doc-atlas mcp packs-serve` works in a minimal
 install. The default backend is lexical BM25 over enriched operation metadata;
 the API is hybrid-ready so semantic hits can be fused later without replacing
 lexical matching.

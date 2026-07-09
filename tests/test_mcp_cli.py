@@ -3,9 +3,11 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from typing import cast
 from unittest.mock import patch
 
 import pytest
+from click import Group
 from click.testing import CliRunner
 
 from docmancer.cli.__main__ import cli
@@ -22,8 +24,22 @@ def test_mcp_command_group_registered():
     runner = CliRunner()
     result = runner.invoke(cli, ["mcp", "--help"])
     assert result.exit_code == 0
-    for sub in ("serve", "docs-serve", "doctor", "list", "enable", "disable"):
+    for sub in ("packs-serve", "serve", "docs-serve", "doctor", "list", "enable", "disable"):
         assert sub in result.output
+
+
+def test_mcp_serve_is_compatibility_alias_for_packs_serve():
+    mcp_group = cast(Group, cli.commands["mcp"])
+    mcp_commands = mcp_group.commands
+    assert "packs-serve" in mcp_commands
+    assert "serve" in mcp_commands
+    serve_callback = mcp_commands["serve"].callback
+    packs_serve_callback = mcp_commands["packs-serve"].callback
+    assert serve_callback is not None
+    assert packs_serve_callback is not None
+    assert serve_callback.__name__ == "mcp_serve_cmd"
+    assert packs_serve_callback.__name__ == "mcp_packs_serve_cmd"
+    assert "Compatibility alias" in (mcp_commands["serve"].help or "")
 
 
 def test_install_pack_command_registered():

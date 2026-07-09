@@ -228,7 +228,7 @@ class ProjectContextService:
                 },
                 {
                     "name": "Packs MCP runtime",
-                    "command": "doc-atlas mcp serve",
+                    "command": "doc-atlas mcp packs-serve",
                     "purpose": "Expose version-pinned API action tools from installed packs.",
                     "preferred_for": ["API calls", "agent actions", "installed packs"],
                 },

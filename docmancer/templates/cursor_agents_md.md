@@ -39,7 +39,7 @@ Use docmancer when the user asks about library docs, API references, vendor docs
 
 ## Advanced: API Tools via MCP
 
-Only use the MCP Packs surface if the user is explicitly working with installed API packs. It is an advanced API-action layer, not an alternative documentation workflow. If the user has run `doc-atlas install-pack <pkg>@<version>`, Cursor can launch `doc-atlas mcp serve` and expose two meta-tools:
+Only use the MCP Packs surface if the user is explicitly working with installed API packs. It is an advanced API-action layer, not an alternative documentation workflow. If the user has run `doc-atlas install-pack <pkg>@<version>`, Cursor can launch `doc-atlas mcp packs-serve` and expose two meta-tools. `doc-atlas mcp serve` is a compatibility alias:
 
 - `docmancer_search_tools(query, package?, limit?)`
 - `docmancer_call_tool(name, args)`

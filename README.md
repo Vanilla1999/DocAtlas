@@ -163,7 +163,7 @@ prepare_docs(action="sync_project_docs", project_path=..., with_vectors=true)  #
 get_docs_context(project_path=..., question=..., mode="project")               # compact grounded context
 ```
 
-MCP Packs are an advanced layer for version-pinned API action tools exposed by `doc-atlas mcp serve`. They are useful when an agent needs executable external API operations. They are not an alternative DocAtlas documentation workflow; the default repository workflow is the Docs MCP/Patch Contract Runtime above.
+MCP Packs are an advanced layer for version-pinned API action tools exposed by `doc-atlas mcp packs-serve`. They are useful when an agent needs executable external API operations. They are not an alternative DocAtlas documentation workflow; the default repository workflow is the Docs MCP/Patch Contract Runtime above. `doc-atlas mcp serve` remains a compatibility alias for the Packs gateway.
 
 `prepare_docs(action="sync_project_docs")` replaces the old two-step `inspect → ingest` loop. It:
 1. discovers current candidates from the filesystem;

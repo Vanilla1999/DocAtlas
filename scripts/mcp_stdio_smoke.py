@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""End-to-end stdio smoke test: launches `docmancer mcp serve` as a subprocess
+"""End-to-end stdio smoke test: launches `docmancer mcp packs-serve` as a subprocess
 and drives it via the official MCP client SDK against the keyless Open-Meteo
 demo pack.
 
@@ -80,7 +80,7 @@ async def _smoke(home: Path) -> int:
     server_env = {**os.environ, "DOCMANCER_HOME": str(home)}
     params = StdioServerParameters(
         command=sys.executable,
-        args=["-m", "docmancer", "mcp", "serve"],
+        args=["-m", "docmancer", "mcp", "packs-serve"],
         env=server_env,
         cwd=str(ROOT),
     )

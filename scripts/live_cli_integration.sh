@@ -320,7 +320,7 @@ for agent in claude-desktop cline cursor codex codex-app codex-desktop gemini gi
 done
 
 print_banner "Open-Meteo walkthrough Step 0: prerequisites"
-print_info "Agent install (above) already registered docmancer mcp serve into Claude Code/Cursor/Claude Desktop MCP configs. Verifying entries exist."
+print_info "Agent install (above) already registered docmancer mcp docs-serve into Claude Code/Cursor/Claude Desktop MCP configs. Verifying entries exist."
 run "$VENV_PYTHON" - <<'PY'
 import json, os, pathlib, sys
 

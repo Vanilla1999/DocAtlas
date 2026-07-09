@@ -1227,7 +1227,7 @@ Install a pack:
 
 ```bash
 doc-atlas install-pack open-meteo@v1
-doc-atlas mcp serve
+doc-atlas mcp packs-serve
 ```
 
 Each pack includes artifacts such as:
@@ -1334,7 +1334,7 @@ Use when the correct answer depends on local architecture and external API behav
 
 ```bash
 doc-atlas install-pack some-api@v1
-doc-atlas mcp serve
+doc-atlas mcp packs-serve
 ```
 
 Use when the agent should call an API through a version-pinned, schema-validated MCP tool surface.

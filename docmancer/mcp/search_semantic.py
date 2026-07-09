@@ -1,7 +1,7 @@
 """Optional semantic backend for MCP Tool Search.
 
 This module is deliberately opt-in: lexical BM25 remains the default path for
-`doc-atlas mcp serve`. Hybrid mode loads a local embedding provider only when
+`doc-atlas mcp packs-serve`. Hybrid mode loads a local embedding provider only when
 explicitly requested by environment.
 """
 from __future__ import annotations
