@@ -93,6 +93,18 @@ class SlowAgent(FakeAgent):
         return 1
 
 
+class SlowIndexingAgent(FakeAgent):
+    def __init__(self):
+        super().__init__()
+        self.entered = Event()
+        self.release = Event()
+
+    def add(self, docs_url: str, recreate: bool = False, **kwargs) -> int:
+        self.entered.set()
+        self.release.wait(timeout=2)
+        return super().add(docs_url, recreate=recreate, **kwargs)
+
+
 class PageFailingAgent(FakeAgent):
     def add(self, docs_url: str, recreate: bool = False, **kwargs) -> int:
         self.add_calls.append(docs_url)
@@ -3371,6 +3383,35 @@ def test_library_prefetch_job_cancellation_reaches_terminal_cancelled_state(tmp_
     agent.release.set()
 
 
+def test_cancelled_library_prefetch_restores_index_state_after_inflight_fetch(tmp_path, monkeypatch):
+    agent = SlowIndexingAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+    result = service.prefetch_docs(
+        "example-docs",
+        ecosystem="web",
+        docs_url="https://example.com/docs/",
+        async_=True,
+    )
+
+    assert agent.entered.wait(timeout=1)
+    service.cancel_docs_job(result.job_id)
+    for _ in range(30):
+        status = service.get_docs_job_status(result.job_id)
+        if status and status.status == "cancelled":
+            break
+        time.sleep(0.02)
+    before = service.registry.get("example-docs", "web", "latest")
+    assert before is not None
+    assert before.status == "available"
+
+    agent.release.set()
+    time.sleep(0.2)
+    after = service.registry.get("example-docs", "web", "latest")
+    assert after is not None
+    assert after.status == "available"
+    assert service.library_docs.registry_ops.count_index_entries(after) == (0, 0)
+
+
 def test_library_prefetch_job_deadline_is_terminal_and_retryable(tmp_path, monkeypatch):
     agent = SlowAgent()
     service = _service(tmp_path, monkeypatch, agent)
@@ -3418,6 +3459,29 @@ def test_library_prefetch_job_exposes_structured_retryable_network_error(tmp_pat
     assert status is not None
     assert status.reason_code == "network_unreachable"
     assert status.retryable is True
+
+
+def test_partial_library_prefetch_job_never_reports_healthy_reason(tmp_path, monkeypatch):
+    service = _service(tmp_path, monkeypatch, FailingAgent())
+    result = service.prefetch_docs(
+        "go_router",
+        ecosystem="pub",
+        versions=["bad-version", "16.2.0"],
+        docs_url_template="https://pub.dev/documentation/{library}/{version}/",
+        async_=True,
+    )
+
+    for _ in range(30):
+        status = service.get_docs_job_status(result.job_id)
+        if status and status.status in {"partial", "failed", "succeeded"}:
+            break
+        time.sleep(0.02)
+
+    status = service.get_docs_job_status(result.job_id)
+    assert status is not None
+    assert status.status == "partial"
+    assert status.reason_code == "partial_failure"
+    assert status.retryable is False
 
 
 def test_prefetch_docs_targets_passes_doc_format_to_agent(tmp_path, monkeypatch):
