@@ -82,8 +82,7 @@ class DependencyProjectPrefetch:
             npm_version = metadata.packages.get(f"npm:{package}")
             if npm_version:
                 record = self.registry.get(package, ecosystem="npm", version=npm_version, source_type="api")
-                docs_url = record.docs_url_resolved if record else None
-                if not docs_url:
+                if not record:
                     warnings.append(
                         f"{package}: Exact npm version {npm_version} was found, "
                         "but no npm documentation source is registered."
@@ -91,14 +90,15 @@ class DependencyProjectPrefetch:
                     if not continue_on_error:
                         break
                     continue
-                targets.append(DocsTarget(
-                    library=package,
-                    ecosystem="npm",
-                    version=npm_version,
-                    docs_url=docs_url,
-                    docs_url_template=record.docs_url_template,
-                    source_type=record.source_type or "api",
-                ))
+                target = self._target_from_record(record)
+                if not target.allowed_domains:
+                    warnings.append(
+                        f"{package}: Registered npm documentation source has no allowed_domains security policy."
+                    )
+                    if not continue_on_error:
+                        break
+                    continue
+                targets.append(target)
                 continue
             version = metadata.packages.get(package)
             if not version:
