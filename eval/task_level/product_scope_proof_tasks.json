@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "purpose": "Fairness-screened designs for future real-project differentiation fixtures. These are not benchmark outcomes and must not be used to claim DocAtlas beats repo-only agents.",
+  "tasks": [
+    {
+      "task_id": "real_project_permission_migration_policy_001",
+      "source_project": "sanitized mobile permission project",
+      "required_context": ["docs/permission-architecture.md", "docs/browser-flow.md", "pubspec.lock", "official permission_handler 11.4.0 docs"],
+      "issue": "Keep Android 13 notification permission in the shared preflight policy while leaving background location deferred for browser and scan flows.",
+      "fairness": {"reviewed": true, "clean": true, "hidden_oracle_only": false},
+      "visible_requirement_sources": ["issue", "project_doc", "lockfile", "library_doc"],
+      "benchmark_metric": "repeated policy-clean public_and_hidden_test_pass_rate"
+    },
+    {
+      "task_id": "real_project_pydantic_error_contract_001",
+      "source_project": "sanitized Python service",
+      "required_context": ["docs/api-errors.md", "docs/security.md", "poetry.lock", "official Pydantic 2.8 docs"],
+      "issue": "Add a validation path that preserves the documented error envelope and uses only the Pydantic API pinned by the lockfile.",
+      "fairness": {"reviewed": true, "clean": true, "hidden_oracle_only": false},
+      "visible_requirement_sources": ["issue", "project_doc", "lockfile", "library_doc"],
+      "benchmark_metric": "repeated policy-clean public_and_hidden_test_pass_rate"
+    },
+    {
+      "task_id": "real_project_react_session_boundary_001",
+      "source_project": "sanitized TypeScript web application",
+      "required_context": ["docs/session-boundaries.md", "docs/testing.md", "package-lock.json", "official React 18.3 docs"],
+      "issue": "Move session cleanup to the documented boundary without using an API unavailable in the lockfile-pinned React version.",
+      "fairness": {"reviewed": true, "clean": true, "hidden_oracle_only": false},
+      "visible_requirement_sources": ["issue", "project_doc", "lockfile", "library_doc"],
+      "benchmark_metric": "repeated policy-clean public_and_hidden_test_pass_rate"
+    }
+  ]
+}
