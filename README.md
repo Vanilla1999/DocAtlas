@@ -196,6 +196,17 @@ Pass `"details": true` for the full structured response.
 | Low-level inspection and patch tools | advanced compatibility surface only |
 | Answer "how does this repo work?" | `get_docs_context(mode="project")` |
 
+### Change-aware documentation review
+
+`doc-atlas docs-impact` maps a code diff to the maintained repository docs that should be reviewed. It never edits documentation automatically:
+
+```bash
+doc-atlas docs-impact --base origin/main
+doc-atlas docs-impact --changed-file packages/auth/src/token_service.ts --format json
+```
+
+The bundled GitHub Actions workflow publishes this report in every pull request summary. It highlights module docs that need review and module changes with no maintained documentation, while leaving the final documentation edit to an explicit, reviewable change.
+
 ## Project-aware exact dependency docs
 
 DocAtlas can inspect a local Flutter/Dart project. It reads `.fvmrc` for Flutter channel/version hints and `pubspec.lock` for pub package versions. This enables exact-version documentation for the dependencies your project actually uses.
