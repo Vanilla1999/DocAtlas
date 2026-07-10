@@ -38,12 +38,30 @@ class ValidatedHttpTarget:
 
 
 def grant_from_mapping(raw: dict | None) -> HttpGrant:
-    raw = raw or {}
-    max_response_bytes = int(raw.get("max_response_bytes", 2_000_000))
+    if raw is None:
+        raw = {}
+    if not isinstance(raw, dict):
+        raise SecurityError("invalid_http_grant")
+
+    raw_hosts = raw.get("allowed_hosts") or ()
+    if isinstance(raw_hosts, str):
+        allowed_hosts = (raw_hosts,)
+    elif isinstance(raw_hosts, (list, tuple)):
+        allowed_hosts = tuple(str(host) for host in raw_hosts)
+    else:
+        raise SecurityError("invalid_allowed_hosts")
+
+    raw_max_response_bytes = raw.get("max_response_bytes", 2_000_000)
+    if isinstance(raw_max_response_bytes, bool):
+        raise SecurityError("invalid_max_response_bytes")
+    try:
+        max_response_bytes = int(raw_max_response_bytes)
+    except (TypeError, ValueError) as exc:
+        raise SecurityError("invalid_max_response_bytes") from exc
     if max_response_bytes <= 0:
         raise SecurityError("invalid_max_response_bytes")
     return HttpGrant(
-        allowed_hosts=tuple(raw.get("allowed_hosts") or ()),
+        allowed_hosts=allowed_hosts,
         allow_private_network=bool(raw.get("allow_private_network", False)),
         allow_http=bool(raw.get("allow_http", False)),
         max_response_bytes=max_response_bytes,
@@ -57,14 +75,20 @@ def target_url(base_url: str, path: str = "") -> str:
 
 
 def validate_http_target(url: str, grant: HttpGrant) -> ValidatedHttpTarget:
-    parsed = urlparse(url)
+    try:
+        parsed = urlparse(url)
+        host = parsed.hostname
+        port = parsed.port
+        username = parsed.username
+        password = parsed.password
+    except (TypeError, ValueError) as exc:
+        raise SecurityError("invalid_url") from exc
     if parsed.scheme not in {"https", "http"}:
         raise SecurityError("unsupported_scheme")
-    if parsed.username is not None or parsed.password is not None:
+    if username is not None or password is not None:
         raise SecurityError("userinfo_not_allowed")
     if parsed.scheme == "http" and not grant.allow_http:
         raise SecurityError("plain_http_blocked")
-    host = parsed.hostname
     if not host:
         raise SecurityError("missing_host")
     if not host_matches(host, grant.allowed_hosts):
@@ -79,7 +103,7 @@ def validate_http_target(url: str, grant: HttpGrant) -> ValidatedHttpTarget:
         url=url,
         scheme=parsed.scheme,
         host=host.rstrip(".").lower(),
-        port=parsed.port,
+        port=port,
         resolved_ips=tuple(sorted({str(ip) for ip in resolved})),
     )
 
