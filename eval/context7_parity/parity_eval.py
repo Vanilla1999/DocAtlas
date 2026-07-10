@@ -131,6 +131,11 @@ def score_trace(item: dict[str, Any], trace: dict[str, Any]) -> dict[str, Any]:
     contaminating = [str(result.get("source") or "") for result in results if not _source_allowed(result, item)]
     resolved_version = str(trace.get("resolved_version") or "")
     expected_tool = str(item["expected_first_tool"].get(provider) or "")
+    version_status = (
+        "unknown" if not resolved_version
+        else "match" if resolved_version == item["requested_version"]
+        else "mismatch"
+    )
     return {
         "id": item["id"],
         "provider": provider,
@@ -141,7 +146,9 @@ def score_trace(item: dict[str, Any], trace: dict[str, Any]) -> dict[str, Any]:
         "hit_at_1": first_rank == 1,
         "hit_at_3": first_rank is not None and first_rank <= 3,
         "mrr": round(1 / first_rank, 4) if first_rank else 0.0,
-        "version_mismatch": bool(resolved_version) and resolved_version != item["requested_version"],
+        "version_status": version_status,
+        "version_mismatch": version_status == "mismatch",
+        "version_verified": version_status == "match",
         "snippet_required": item["requires_code_snippet"],
         "snippet_present": bool(snippets),
         "snippet_syntax_valid": valid_snippet,
@@ -165,6 +172,7 @@ def summarize(items: list[dict[str, Any]]) -> dict[str, Any]:
     hits3 = sum(bool(item["hit_at_3"]) for item in items)
     tool_ok = sum(bool(item["first_tool_correct"]) for item in items)
     version_bad = sum(bool(item["version_mismatch"]) for item in items)
+    version_unknown = sum(item["version_status"] == "unknown" for item in items)
     contamination = sum(bool(item["source_contamination"]) for item in items)
     snippets_required = [item for item in items if item["snippet_required"]]
     snippets_ok = sum(bool(item["snippet_present"] and item["snippet_syntax_valid"]) for item in snippets_required)
@@ -177,13 +185,15 @@ def summarize(items: list[dict[str, Any]]) -> dict[str, Any]:
         "hit_at_3": _mean([float(item["hit_at_3"]) for item in items]),
         "mrr": _mean([float(item["mrr"]) for item in items]),
         "version_mismatch_rate": _mean([float(item["version_mismatch"]) for item in items]),
+        "version_unknown_rate": _mean([float(item["version_status"] == "unknown") for item in items]),
+        "exact_version_verified_rate": _mean([float(item["version_verified"]) for item in items]),
         "usable_snippet_rate": _mean([float(item["snippet_present"] and item["snippet_syntax_valid"]) for item in snippets_required]),
         "cold_latency_ms": _mean(cold),
         "warm_latency_ms": _mean(warm),
         "network_fetch_count": sum(item["network_fetch_count"] for item in items),
         "unnecessary_lifecycle_call_rate": _mean([float(item["unnecessary_lifecycle_call"]) for item in items]),
         "source_contamination_rate": _mean([float(bool(item["source_contamination"])) for item in items]),
-        "confidence_intervals_95": {"hit_at_1": _wilson(hits1, total), "hit_at_3": _wilson(hits3, total), "first_tool_accuracy": _wilson(tool_ok, total), "version_mismatch_rate": _wilson(version_bad, total), "source_contamination_rate": _wilson(contamination, total), "usable_snippet_rate": _wilson(snippets_ok, len(snippets_required))},
+        "confidence_intervals_95": {"hit_at_1": _wilson(hits1, total), "hit_at_3": _wilson(hits3, total), "first_tool_accuracy": _wilson(tool_ok, total), "version_mismatch_rate": _wilson(version_bad, total), "version_unknown_rate": _wilson(version_unknown, total), "source_contamination_rate": _wilson(contamination, total), "usable_snippet_rate": _wilson(snippets_ok, len(snippets_required))},
     }
 
 
