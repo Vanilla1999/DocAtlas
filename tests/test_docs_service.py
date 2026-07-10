@@ -3345,6 +3345,81 @@ def test_prepare_library_docs_queues_network_ingest_and_keeps_status_responsive(
     agent.release.set()
 
 
+def test_library_prefetch_job_cancellation_reaches_terminal_cancelled_state(tmp_path, monkeypatch):
+    agent = SlowAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+    result = service.prefetch_docs(
+        "example-docs",
+        ecosystem="web",
+        docs_url="https://example.com/docs/",
+        async_=True,
+    )
+
+    assert agent.entered.wait(timeout=1)
+    assert service.cancel_docs_job(result.job_id).status == "cancelling"
+    for _ in range(30):
+        status = service.get_docs_job_status(result.job_id)
+        if status and status.status == "cancelled":
+            break
+        time.sleep(0.02)
+
+    status = service.get_docs_job_status(result.job_id)
+    assert status is not None
+    assert status.status == "cancelled"
+    assert status.reason_code == "cancelled"
+    assert status.retryable is True
+    agent.release.set()
+
+
+def test_library_prefetch_job_deadline_is_terminal_and_retryable(tmp_path, monkeypatch):
+    agent = SlowAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+    monkeypatch.setattr(service.library_docs, "_library_job_timeout_seconds", lambda: 0.05)
+    result = service.prefetch_docs(
+        "example-docs",
+        ecosystem="web",
+        docs_url="https://example.com/docs/",
+        async_=True,
+    )
+
+    assert agent.entered.wait(timeout=1)
+    for _ in range(30):
+        status = service.get_docs_job_status(result.job_id)
+        if status and status.status == "failed":
+            break
+        time.sleep(0.02)
+
+    status = service.get_docs_job_status(result.job_id)
+    assert status is not None
+    assert status.status == "failed"
+    assert status.reason_code == "job_deadline_exceeded"
+    assert status.retryable is True
+    agent.release.set()
+
+
+def test_library_prefetch_job_exposes_structured_retryable_network_error(tmp_path, monkeypatch):
+    agent = FakeAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+    monkeypatch.setattr(agent, "add", lambda *args, **kwargs: (_ for _ in ()).throw(httpx.ConnectError("network unavailable")))
+    result = service.prefetch_docs(
+        "example-docs",
+        ecosystem="web",
+        docs_url="https://example.com/docs/",
+        async_=True,
+    )
+
+    for _ in range(30):
+        status = service.get_docs_job_status(result.job_id)
+        if status and status.status == "failed":
+            break
+        time.sleep(0.02)
+
+    status = service.get_docs_job_status(result.job_id)
+    assert status is not None
+    assert status.reason_code == "network_unreachable"
+    assert status.retryable is True
+
+
 def test_prefetch_docs_targets_passes_doc_format_to_agent(tmp_path, monkeypatch):
     agent = FakeAgent()
     service = _service(tmp_path, monkeypatch, agent)
