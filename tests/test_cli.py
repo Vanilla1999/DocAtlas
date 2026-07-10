@@ -62,6 +62,7 @@ PUBLIC_COMMAND_HELP_CASES = [
     ("inspect", ["doc-atlas inspect --config ./docmancer.yaml"]),
     ("doctor", ["doc-atlas doctor --config ./docmancer.yaml"]),
     ("docs-impact", ["doc-atlas docs-impact --base origin/main", "--changed-file"]),
+    ("agent-contract", ["doc-atlas agent-contract --project-path .", "--format json"]),
     ("remove", ["doc-atlas remove"]),
 ]
 
@@ -112,6 +113,33 @@ def test_docs_impact_cli_can_fail_for_missing_module_docs(tmp_path):
 
     assert result.exit_code == 2
     assert "Documentation gaps" in result.output
+
+
+def test_agent_contract_cli_describes_project_sources_and_tool_selection(tmp_path):
+    (tmp_path / "README.md").write_text("# Project\n", encoding="utf-8")
+    module = tmp_path / "packages" / "auth"
+    module.mkdir(parents=True)
+    (module / "README.md").write_text("# Auth\n", encoding="utf-8")
+    (tmp_path / "package.json").write_text('{"dependencies": {"react": "18.3.1"}}', encoding="utf-8")
+
+    result = CliRunner().invoke(cli, ["agent-contract", "--project-path", str(tmp_path), "--format", "json"])
+
+    assert result.exit_code == 0, result.output
+    contract = json.loads(result.output)
+    assert contract["schema_version"] == "agent-contract-1"
+    assert contract["tool_selection"]["default_tool"] == "get_docs_context"
+    assert {item["path"] for item in contract["project"]["documentation"]} == {"README.md", "packages/auth/README.md"}
+    assert any(item["name"] == "react" for item in contract["project"]["dependencies"])
+
+
+def test_agent_contract_cli_can_render_markdown(tmp_path):
+    (tmp_path / "README.md").write_text("# Project\n", encoding="utf-8")
+
+    result = CliRunner().invoke(cli, ["agent-contract", "--project-path", str(tmp_path), "--format", "markdown"])
+
+    assert result.exit_code == 0, result.output
+    assert "# DocAtlas agent contract" in result.output
+    assert "`README.md`" in result.output
 
 
 def test_version_flag_outputs_compact_version():
