@@ -6,6 +6,7 @@ from docmancer.docs.interfaces.mcp.context_tools import CONTEXT_TOOL_NAMES
 from docmancer.docs.interfaces.mcp.docs_tools import LIBRARY_TOOL_NAMES
 from docmancer.docs.interfaces.mcp.prefetch_tools import PREFETCH_TOOL_NAMES, _bounded_targets
 from docmancer.docs.interfaces.mcp.project_tools import PROJECT_TOOL_NAMES
+from docmancer.docs.models import DocsJobCancelResult
 from docmancer.mcp.docs_server import (
     ADVANCED_TOOL_NAMES,
     ADMIN_TOOL_NAMES,
@@ -315,6 +316,40 @@ def test_mcp_exposes_docs_job_tools():
     assert "get_docs_job_status" not in names
     assert "list_docs_jobs" not in names
     assert "cancel_docs_job" not in names
+
+
+def test_prepare_docs_keeps_async_job_cancellation_on_public_surface():
+    tool = next(tool for tool in TOOLS if tool["name"] == "prepare_docs")
+    assert "cancel_docs_job" in tool["inputSchema"]["properties"]["action"]["enum"]
+    assert "job_id" in tool["inputSchema"]["properties"]
+
+    class Service:
+        def cancel_docs_job(self, job_id):
+            return DocsJobCancelResult(
+                job_id=job_id,
+                status="cancel_requested",
+                message="Cancellation requested.",
+            )
+
+    missing = call_docs_tool_payload(
+        "prepare_docs",
+        {"action": "cancel_docs_job"},
+        Service(),
+    )
+    cancelled = call_docs_tool_payload(
+        "prepare_docs",
+        {"action": "cancel_docs_job", "job_id": "job-1"},
+        Service(),
+    )
+
+    assert missing["reason_code"] == "job_id_required"
+    assert cancelled == {
+        "job_id": "job-1",
+        "status": "cancel_requested",
+        "message": "Cancellation requested.",
+        "action": "cancel_docs_job",
+        "tool": "prepare_docs",
+    }
 
 
 def test_mcp_exposes_three_public_tools_with_mutually_exclusive_guidance():
