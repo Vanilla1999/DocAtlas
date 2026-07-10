@@ -106,17 +106,7 @@ def analyze_docs_impact(
         hints = _matching_section_hints(sections, changed, symbols)
         if not hints:
             continue
-        for hint in hints:
-            reason = hint["reason"]
-            evidence = hint["evidence"]
-            _add_impact(
-                impacts,
-                candidate.path,
-                reason="section_reference_changed_path" if reason == "references_changed_path" else "section_reference_changed_symbol",
-                changed_file=evidence[0],
-                module_path=candidate.module_path,
-            )
-        impacts[candidate.path]["sections"] = hints
+        _add_section_impacts(impacts, candidate.path, hints=hints, module_path=candidate.module_path)
 
     missing = [{
         "module_path": module_path,
@@ -187,6 +177,29 @@ def _add_impact(impacts: dict[str, dict[str, Any]], path: str, *, reason: str, c
     })
     item["reasons"] = list(dict.fromkeys([*item["reasons"], reason]))
     item["changed_files"] = list(dict.fromkeys([*item["changed_files"], changed_file]))
+
+
+def _add_section_impacts(
+    impacts: dict[str, dict[str, Any]],
+    path: str,
+    *,
+    hints: list[dict[str, Any]],
+    module_path: str | None,
+) -> None:
+    item = impacts.setdefault(path, {
+        "path": path,
+        "status": "review_required",
+        "reasons": [],
+        "changed_files": [],
+        "module_path": module_path,
+    })
+    for hint in hints:
+        is_path = hint["reason"] == "references_changed_path"
+        reason = "section_reference_changed_path" if is_path else "section_reference_changed_symbol"
+        item["reasons"] = list(dict.fromkeys([*item["reasons"], reason]))
+        if is_path:
+            item["changed_files"] = list(dict.fromkeys([*item["changed_files"], *hint["evidence"]]))
+    item["sections"] = hints
 
 
 def _module_path(path: str) -> str | None:
