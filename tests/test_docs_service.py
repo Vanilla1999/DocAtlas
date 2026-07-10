@@ -3357,6 +3357,28 @@ def test_prepare_library_docs_queues_network_ingest_and_keeps_status_responsive(
     agent.release.set()
 
 
+def test_successful_library_prefetch_atomically_publishes_staged_index(tmp_path, monkeypatch):
+    service = _service(tmp_path, monkeypatch, FakeAgent())
+    result = service.prefetch_docs(
+        "example-docs",
+        ecosystem="web",
+        docs_url="https://example.com/docs/",
+        async_=True,
+    )
+
+    for _ in range(30):
+        status = service.get_docs_job_status(result.job_id)
+        if status and status.status == "succeeded":
+            break
+        time.sleep(0.02)
+
+    record = service.registry.get("example-docs", "web", "latest")
+    assert record is not None
+    assert status is not None
+    assert status.status == "succeeded"
+    assert service.library_docs.registry_ops.count_index_entries(record) == (1, 1)
+
+
 def test_library_prefetch_job_cancellation_reaches_terminal_cancelled_state(tmp_path, monkeypatch):
     agent = SlowAgent()
     service = _service(tmp_path, monkeypatch, agent)
@@ -3410,6 +3432,39 @@ def test_cancelled_library_prefetch_restores_index_state_after_inflight_fetch(tm
     assert after is not None
     assert after.status == "available"
     assert service.library_docs.registry_ops.count_index_entries(after) == (0, 0)
+
+
+def test_cancel_between_staging_fetch_and_commit_never_publishes_index(tmp_path, monkeypatch):
+    agent = SlowIndexingAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+    result = service.prefetch_docs(
+        "example-docs",
+        ecosystem="web",
+        docs_url="https://example.com/docs/",
+        async_=True,
+    )
+    assert agent.entered.wait(timeout=1)
+    original_count = service.library_docs.refresh_ops._count_index_config
+    cancelled = False
+
+    def cancel_before_commit(config):
+        nonlocal cancelled
+        if not cancelled:
+            cancelled = True
+            service.cancel_docs_job(result.job_id)
+        return original_count(config)
+
+    monkeypatch.setattr(service.library_docs.refresh_ops, "_count_index_config", cancel_before_commit)
+    agent.release.set()
+    for _ in range(30):
+        status = service.get_docs_job_status(result.job_id)
+        if status and status.status == "cancelled":
+            break
+        time.sleep(0.02)
+
+    record = service.registry.get("example-docs", "web", "latest")
+    assert record is not None
+    assert service.library_docs.registry_ops.count_index_entries(record) == (0, 0)
 
 
 def test_library_prefetch_job_deadline_is_terminal_and_retryable(tmp_path, monkeypatch):
