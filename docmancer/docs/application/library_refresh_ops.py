@@ -180,6 +180,7 @@ class LibraryRefreshOps:
                     seed_urls=seed_urls_for_discovery if (target.docs_url or target.docs_url_template) else None,
                     metadata=_metadata_for_record(record),
                     cancellation_callback=should_cancel,
+                    with_vectors=False if staging else True,
                 )
                 if isinstance(indexed_sections, int):
                     sections_indexed += indexed_sections
@@ -316,6 +317,45 @@ class LibraryRefreshOps:
             target_spec=record.target_spec,
         )
 
+        if staging:
+            try:
+                production_agent = self._agent_instance(record)
+                sync_vectors = getattr(production_agent, "sync_vectors", None)
+                if callable(sync_vectors):
+                    sync_vectors()
+            except Exception as exc:
+                message = f"vector_indexing_failed: {exc}"
+                try:
+                    self.registry.upsert(
+                        library=record.name,
+                        ecosystem=record.ecosystem,
+                        version=record.version,
+                        docs_url=record.docs_url,
+                        docs_url_template=record.docs_url_template,
+                        source_type=record.source_type,
+                        now=self._now(),
+                        status="available",
+                        last_refreshed_at=refreshed_at,
+                        last_error=message,
+                        target_spec=record.target_spec,
+                    )
+                except Exception:
+                    logger.warning("Could not persist vector failure diagnostics for %s", record.library_id, exc_info=True)
+                return RefreshResult(
+                    library_id=record.library_id,
+                    status="partial",
+                    docs_url=record.docs_url,
+                    last_refreshed_at=refreshed_at,
+                    version=record.version,
+                    source_type=record.source_type,
+                    message=message,
+                    duration_ms=int((time.monotonic() - started) * 1000),
+                    pages_indexed=pages_after,
+                    chunks_indexed=chunks_after,
+                    targets_completed=1,
+                    reason_codes=["vector_indexing_failed"],
+                )
+
         # Build preindex diagnostics
         index_config = self._index_config_for(record)
         db_path = Path(index_config.index.db_path).resolve() if index_config and index_config.index else None
@@ -382,7 +422,7 @@ class LibraryRefreshOps:
                 message="Library docs prefetch cancelled.",
             )
         if versions:
-            updated = skipped = failed = needs_url = 0
+            updated = skipped = partial = failed = needs_url = 0
             pages_indexed = pages_failed = chunks_indexed = 0
             last: RefreshResult | None = None
             failure_codes: list[str] = []
@@ -417,6 +457,11 @@ class LibraryRefreshOps:
                     updated += 1
                 elif last.status == "skipped":
                     skipped += 1
+                elif last.status == "partial":
+                    partial += 1
+                    for reason_code in last.reason_codes:
+                        if reason_code not in failure_codes:
+                            failure_codes.append(reason_code)
                 elif last.status == "needs_docs_url":
                     needs_url += 1
                 else:
@@ -433,8 +478,8 @@ class LibraryRefreshOps:
                 if not continue_on_error and last.status in {"failed", "needs_docs_url"}:
                     break
             aborted = not continue_on_error and last is not None and last.status in {"failed", "needs_docs_url"}
-            status = "aborted" if aborted else ("failed" if failed else ("needs_docs_url" if needs_url else ("updated" if updated else "skipped")))
-            message = f"updated={updated} skipped={skipped} failed={failed} needs_docs_url={needs_url}"
+            status = "aborted" if aborted else ("failed" if failed else ("needs_docs_url" if needs_url else ("partial" if partial else ("updated" if updated else "skipped"))))
+            message = f"updated={updated} skipped={skipped} partial={partial} failed={failed} needs_docs_url={needs_url}"
             if failure_codes:
                 message = f"{message} reason_code={','.join(failure_codes)}"
             return RefreshResult(
@@ -447,7 +492,7 @@ class LibraryRefreshOps:
                 pages_indexed=pages_indexed,
                 pages_failed=pages_failed,
                 chunks_indexed=chunks_indexed,
-                targets_completed=updated + skipped,
+                targets_completed=updated + skipped + partial,
                 targets_failed=failed + needs_url,
                 preindex=last.preindex if last else None,
                 reason_codes=failure_codes,
