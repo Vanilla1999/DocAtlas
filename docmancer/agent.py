@@ -229,6 +229,10 @@ class DocmancerAgent:
             result.pruned,
         )
 
+    def sync_vectors(self) -> None:
+        """Synchronize the committed SQLite index into its production vector collection."""
+        self._sync_vectors_if_enabled()
+
     def ingest(
         self,
         path: str | Path,
@@ -463,6 +467,7 @@ class DocmancerAgent:
         metadata: dict[str, Any] | None = None,
         progress_callback: Callable[[dict[str, Any]], None] | None = None,
         cancellation_callback: Callable[[], bool] | None = None,
+        with_vectors: bool = True,
     ) -> int:
         f = self._get_fetcher(
             provider,
@@ -497,7 +502,7 @@ class DocmancerAgent:
                     "total_pages": len(documents),
                 }
             )
-        indexed = self.ingest_documents(documents, recreate=recreate)
+        indexed = self.ingest_documents(documents, recreate=recreate, with_vectors=with_vectors)
         if progress_callback:
             progress_callback(
                 {
