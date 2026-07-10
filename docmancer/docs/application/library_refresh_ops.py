@@ -5,11 +5,33 @@ from pathlib import Path
 from typing import Any
 import time
 
+import httpx
+
 from docmancer.docs.models import RefreshResult
 from docmancer.docs.registry import LibraryRecord
 from docmancer.docs.dart_official_docs import build_dart_diagnostics, canonical_dart_ecosystem
 
 logger = logging.getLogger(__name__)
+
+
+def _refresh_failure_code(exc: Exception) -> str:
+    """Return a stable, safe failure category for a library ingestion attempt."""
+    if isinstance(exc, httpx.ConnectTimeout):
+        return "connect_timeout"
+    if isinstance(exc, httpx.ReadTimeout):
+        return "read_timeout"
+    if isinstance(exc, httpx.TimeoutException):
+        return "network_timeout"
+    if isinstance(exc, httpx.ConnectError):
+        return "network_unreachable"
+    if isinstance(exc, httpx.TransportError):
+        return "network_transport_error"
+    if isinstance(exc, httpx.HTTPStatusError):
+        return "http_failure"
+    message = str(exc).lower()
+    if "extract" in message:
+        return "extraction_failed"
+    return "indexing_failed"
 
 
 def _merged_discovery_diagnostics(items: list[dict[str, Any]]) -> dict[str, Any]:
@@ -152,6 +174,8 @@ class LibraryRefreshOps:
                     discovery_diagnostics.append(dict(agent.last_discovery_diagnostics))
         except Exception as exc:
             logger.exception("Refresh failed for record %s: %s", record.library_id, exc)
+            reason_code = _refresh_failure_code(exc)
+            message = f"{reason_code}: {exc}"
             self.registry.upsert(
                 library=record.name,
                 ecosystem=record.ecosystem,
@@ -161,7 +185,7 @@ class LibraryRefreshOps:
                 source_type=record.source_type,
                 now=self._now(),
                 status="failed",
-                last_error=str(exc),
+                last_error=message,
                 target_spec=record.target_spec,
             )
             return RefreshResult(
@@ -171,7 +195,7 @@ class LibraryRefreshOps:
                 last_refreshed_at=record.last_refreshed_at,
                 version=record.version,
                 source_type=record.source_type,
-                message=str(exc),
+                message=message,
                 duration_ms=int((time.monotonic() - started) * 1000),
                 pages_failed=1,
                 targets_failed=1,
@@ -179,13 +203,13 @@ class LibraryRefreshOps:
                     "library": record.name,
                     "canonical_id": record.canonical_id,
                     "docs_url": record.docs_url,
-                    "reason_code": "refresh_failed",
+                    "reason_code": reason_code,
                     **_dart_refresh_diagnostics(
                         record,
                         pages_discovered=sections_indexed,
                         pages_extracted=0,
                         chunks_created=0,
-                        reason_code="refresh_failed",
+                        reason_code=reason_code,
                     ),
                 },
             )
@@ -315,6 +339,7 @@ class LibraryRefreshOps:
             updated = skipped = failed = needs_url = 0
             pages_indexed = pages_failed = chunks_indexed = 0
             last: RefreshResult | None = None
+            failure_codes: list[str] = []
             for item_version in versions:
                 last = self.refresh_docs(
                     library,
@@ -334,6 +359,9 @@ class LibraryRefreshOps:
                     needs_url += 1
                 else:
                     failed += 1
+                    reason_code = (last.preindex or {}).get("reason_code") if last.preindex else None
+                    if reason_code and reason_code not in failure_codes:
+                        failure_codes.append(str(reason_code))
                 pages_indexed += last.pages_indexed
                 pages_failed += last.pages_failed
                 chunks_indexed += last.chunks_indexed
@@ -341,18 +369,22 @@ class LibraryRefreshOps:
                     break
             aborted = not continue_on_error and last is not None and last.status in {"failed", "needs_docs_url"}
             status = "aborted" if aborted else ("failed" if failed else ("needs_docs_url" if needs_url else ("updated" if updated else "skipped")))
+            message = f"updated={updated} skipped={skipped} failed={failed} needs_docs_url={needs_url}"
+            if failure_codes:
+                message = f"{message} reason_code={','.join(failure_codes)}"
             return RefreshResult(
                 library_id=None,
                 status=status,
                 docs_url=docs_url_template or docs_url,
                 last_refreshed_at=last.last_refreshed_at if last else None,
-                message=f"updated={updated} skipped={skipped} failed={failed} needs_docs_url={needs_url}",
+                message=message,
                 duration_ms=int((time.monotonic() - started) * 1000),
                 pages_indexed=pages_indexed,
                 pages_failed=pages_failed,
                 chunks_indexed=chunks_indexed,
                 targets_completed=updated + skipped,
                 targets_failed=failed + needs_url,
+                preindex=last.preindex if last else None,
             )
 
         info = self.resolve_library(library, ecosystem, version, docs_url, docs_url_template, source_type)
