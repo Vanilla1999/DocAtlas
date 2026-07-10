@@ -1,4 +1,5 @@
 import json
+import tomllib
 
 import pytest
 
@@ -64,3 +65,29 @@ def test_unregister_removes(tmp_path):
     assert agent_config.unregister_server(target) is True
     payload = json.loads(cfg.read_text())
     assert "docmancer" not in payload["mcpServers"]
+
+
+def test_register_writes_codex_toml_entry(tmp_path):
+    cfg = tmp_path / "config.toml"
+    target = agent_config.AgentTarget("codex", cfg, "toml_mcp_servers")
+
+    changed, _ = agent_config.register_server(target)
+
+    assert changed is True
+    payload = tomllib.loads(cfg.read_text())
+    assert payload["mcp_servers"]["docmancer"] == {"command": "doc-atlas", "args": ["mcp", "docs-serve"]}
+
+
+def test_register_writes_opencode_and_vscode_project_entries(tmp_path):
+    opencode = agent_config.AgentTarget("opencode", tmp_path / "opencode.json", "json_opencode_mcp")
+    vscode = agent_config.AgentTarget("github-copilot", tmp_path / "mcp.json", "json_vscode_servers")
+
+    agent_config.register_server(opencode)
+    agent_config.register_server(vscode)
+
+    assert json.loads(opencode.config_path.read_text())["mcp"]["docmancer"] == {
+        "type": "local", "command": ["doc-atlas", "mcp", "docs-serve"], "enabled": True,
+    }
+    assert json.loads(vscode.config_path.read_text())["servers"]["docmancer"] == {
+        "type": "stdio", "command": "doc-atlas", "args": ["mcp", "docs-serve"],
+    }
