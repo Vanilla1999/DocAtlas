@@ -521,7 +521,10 @@ def test_inspect_project_docs_does_not_mark_mtime_only_change_stale(tmp_path, mo
 
 def test_ingest_project_docs_indexes_only_discovered_candidates_with_metadata(tmp_path, monkeypatch):
     project = _flutter_project(tmp_path)
-    (project / "README.md").write_text("# App\n\nIntro", encoding="utf-8")
+    (project / "README.md").write_text(
+        "# App\n\n## Authentication\nUse `issue_token` from `lib/auth/token.dart`.\n",
+        encoding="utf-8",
+    )
     (project / "docs").mkdir()
     (project / "docs" / "testing.md").write_text("# Testing\n\nRun tests.", encoding="utf-8")
     (project / "lib").mkdir()
@@ -532,7 +535,7 @@ def test_ingest_project_docs_indexes_only_discovered_candidates_with_metadata(tm
 
     assert result.status == "success"
     assert result.candidate_count == 2
-    assert result.sections_indexed == 2
+    assert result.sections_indexed == 3
     assert {item["path"] for item in result.indexed_sources} == {"README.md", "docs/testing.md"}
     assert result.skipped_sources == []
     assert "Indexed 2 project docs" in (result.message or "")
@@ -547,6 +550,20 @@ def test_ingest_project_docs_indexes_only_discovered_candidates_with_metadata(tm
     assert metadata["project_path"] == str(project.resolve())
     assert metadata["project_doc_path"] == "README.md"
     assert metadata["project_doc_reason"] == "root_readme"
+    assert metadata["project_doc_sections"] == [{
+        "source_document_path": "README.md",
+        "heading_path": ["App"],
+        "mentioned_paths": [],
+        "mentioned_symbols": [],
+        "content_hash": metadata["project_doc_sections"][0]["content_hash"],
+    }, {
+        "source_document_path": "README.md",
+        "heading_path": ["App", "Authentication"],
+        "mentioned_paths": ["lib/auth/token.dart"],
+        "mentioned_symbols": ["issue_token"],
+        "content_hash": metadata["project_doc_sections"][1]["content_hash"],
+    }]
+    assert metadata["project_doc_sections"][0]["content_hash"].startswith("sha256:")
 
 
 def test_ingest_project_docs_reports_missing_candidates_after_verification(tmp_path, monkeypatch):

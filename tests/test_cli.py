@@ -115,6 +115,26 @@ def test_docs_impact_cli_can_fail_for_missing_module_docs(tmp_path):
     assert "Documentation gaps" in result.output
 
 
+def test_docs_impact_cli_accepts_changed_symbols_for_section_hints(tmp_path):
+    (tmp_path / "README.md").write_text(
+        "# Project\n\n## Authentication\nUse `issue_token`.\n", encoding="utf-8"
+    )
+
+    result = CliRunner().invoke(
+        cli,
+        [
+            "docs-impact",
+            "--project-path", str(tmp_path),
+            "--changed-file", "src/auth.py",
+            "--changed-symbol", "issue_token",
+            "--format", "json",
+        ],
+    )
+
+    assert result.exit_code == 0, result.output
+    assert json.loads(result.output)["impacts"][0]["sections"][0]["evidence"] == ["issue_token"]
+
+
 def test_agent_contract_cli_describes_project_sources_and_tool_selection(tmp_path):
     (tmp_path / "README.md").write_text("# Project\n", encoding="utf-8")
     module = tmp_path / "packages" / "auth"

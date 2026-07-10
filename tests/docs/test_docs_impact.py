@@ -157,3 +157,97 @@ def test_markdown_report_is_ready_for_github_step_summary(tmp_path: Path) -> Non
     assert rendered.startswith("## DocAtlas documentation impact")
     assert "`packages/auth/README.md`" in rendered
     assert "Review the listed docs" in rendered
+
+
+def test_explicit_changed_path_returns_only_the_referenced_section(tmp_path: Path) -> None:
+    root = _project(tmp_path)
+    _write(
+        root / "ARCHITECTURE.md",
+        """# Architecture
+
+## Authentication
+The token service lives at `packages/auth/src/token_service.ts`.
+
+## Payments
+The payment gateway lives at `packages/payments/src/gateway.ts`.
+""",
+    )
+
+    report = analyze_docs_impact(root, ["packages/auth/src/token_service.ts"])
+
+    architecture = next(item for item in report["impacts"] if item["path"] == "ARCHITECTURE.md")
+    assert architecture["sections"] == [{
+        "heading_path": ["Architecture", "Authentication"],
+        "reason": "references_changed_path",
+        "evidence": ["packages/auth/src/token_service.ts"],
+    }]
+
+
+def test_explicit_changed_symbol_returns_only_matching_python_typescript_and_dart_sections(tmp_path: Path) -> None:
+    root = _project(tmp_path)
+    _write(
+        root / "ARCHITECTURE.md",
+        """# API contracts
+
+## Python
+Use `issue_token` for the Python service.
+
+## TypeScript
+Use `createSession` in the web client.
+
+## Dart
+Use `AuthNotifier` in Flutter.
+
+## Unrelated
+Use `PaymentNotifier` for payments.
+""",
+    )
+
+    report = analyze_docs_impact(
+        root,
+        ["src/contracts.py", "web/session.ts", "lib/auth_notifier.dart"],
+        changed_symbols=["issue_token", "createSession", "AuthNotifier"],
+    )
+
+    architecture = next(item for item in report["impacts"] if item["path"] == "ARCHITECTURE.md")
+    assert architecture["sections"] == [
+        {"heading_path": ["API contracts", "Python"], "reason": "references_changed_symbol", "evidence": ["issue_token"]},
+        {"heading_path": ["API contracts", "TypeScript"], "reason": "references_changed_symbol", "evidence": ["createSession"]},
+        {"heading_path": ["API contracts", "Dart"], "reason": "references_changed_symbol", "evidence": ["AuthNotifier"]},
+    ]
+
+
+def test_unmatched_sections_leave_file_level_recommendation_intact(tmp_path: Path) -> None:
+    root = _project(tmp_path)
+    _write(root / "packages" / "auth" / "README.md", "# Auth\n\n## API\nUse `issue_token`.\n")
+
+    report = analyze_docs_impact(root, ["packages/auth/src/token_service.ts"])
+
+    item = report["impacts"][0]
+    assert item["path"] == "packages/auth/README.md"
+    assert "sections" not in item
+
+
+def test_symbol_evidence_does_not_pollute_changed_files(tmp_path: Path) -> None:
+    root = _project(tmp_path)
+    _write(root / "README.md", "# Project\n\n## Auth\nUse `issue_token`.\n")
+
+    report = analyze_docs_impact(root, ["src/auth.py"], changed_symbols=["issue_token"])
+
+    item = next(impact for impact in report["impacts"] if impact["path"] == "README.md")
+    assert item["changed_files"] == ["src/auth.py"]
+    assert item["sections"][0]["evidence"] == ["issue_token"]
+
+
+def test_all_matching_paths_are_kept_as_changed_files(tmp_path: Path) -> None:
+    root = _project(tmp_path)
+    _write(
+        root / "docs" / "auth.md",
+        "# Auth\nReview `src/auth.py` together with `web/auth.ts`.\n",
+    )
+
+    report = analyze_docs_impact(root, ["src/auth.py", "web/auth.ts"])
+
+    item = next(impact for impact in report["impacts"] if impact["path"] == "docs/auth.md")
+    assert item["changed_files"] == ["src/auth.py", "web/auth.ts"]
+    assert item["sections"][0]["evidence"] == ["src/auth.py", "web/auth.ts"]

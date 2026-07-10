@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any
 
 from docmancer.docs.project import ProjectMetadataReader
+from docmancer.docs.section_metadata import extract_section_metadata
 
 
 _MODULE_ROOTS = {"packages", "apps", "services", "modules", "libs", "crates", "plugins", "components"}
@@ -33,12 +34,18 @@ def changed_files_from_git(project_path: str | Path, base: str, head: str = "HEA
     return _normalized_paths(completed.stdout.splitlines())
 
 
-def analyze_docs_impact(project_path: str | Path, changed_files: list[str]) -> dict[str, Any]:
+def analyze_docs_impact(
+    project_path: str | Path,
+    changed_files: list[str],
+    *,
+    changed_symbols: list[str] | None = None,
+) -> dict[str, Any]:
     """Map a code diff to maintained project docs without writing repository files."""
 
     root = Path(project_path).expanduser().resolve()
     metadata = ProjectMetadataReader().read(root)
     changed = _normalized_paths(changed_files)
+    symbols = _normalized_symbols(changed_symbols or [])
     candidates = [candidate for candidate in metadata.docs_candidates if candidate.path]
     candidates_by_path = {candidate.path: candidate for candidate in candidates}
     module_docs: dict[str, list[str]] = defaultdict(list)
@@ -91,6 +98,16 @@ def analyze_docs_impact(project_path: str | Path, changed_files: list[str]) -> d
         item["reasons"] = list(dict.fromkeys([*item["reasons"], "documentation_changed"]))
         item["changed_files"] = list(dict.fromkeys([*item["changed_files"], doc_path]))
 
+    # Explicit references are stronger evidence than the module/file heuristics
+    # above.  They may also identify a maintained project doc outside the
+    # affected module.  Unsupported formats simply produce no section hints.
+    for candidate in candidates:
+        sections = extract_section_metadata(root / candidate.path, source_document_path=candidate.path)
+        hints = _matching_section_hints(sections, changed, symbols)
+        if not hints:
+            continue
+        _add_section_impacts(impacts, candidate.path, hints=hints, module_path=candidate.module_path)
+
     missing = [{
         "module_path": module_path,
         "reason": "module_code_changed_without_module_docs",
@@ -136,6 +153,9 @@ def format_docs_impact_markdown(report: dict[str, Any]) -> str:
         for item in impacts:
             reasons = ", ".join(item.get("reasons") or [])
             lines.append(f"| `{item['path']}` | {item['status']} | {reasons} |")
+            for section in item.get("sections") or []:
+                heading = " > ".join(section["heading_path"]) or "(document)"
+                lines.append(f"| ↳ `{heading}` | section | {section['reason']}: {', '.join(section['evidence'])} |")
         lines.append("")
     missing = report.get("missing") or []
     if missing:
@@ -159,6 +179,29 @@ def _add_impact(impacts: dict[str, dict[str, Any]], path: str, *, reason: str, c
     item["changed_files"] = list(dict.fromkeys([*item["changed_files"], changed_file]))
 
 
+def _add_section_impacts(
+    impacts: dict[str, dict[str, Any]],
+    path: str,
+    *,
+    hints: list[dict[str, Any]],
+    module_path: str | None,
+) -> None:
+    item = impacts.setdefault(path, {
+        "path": path,
+        "status": "review_required",
+        "reasons": [],
+        "changed_files": [],
+        "module_path": module_path,
+    })
+    for hint in hints:
+        is_path = hint["reason"] == "references_changed_path"
+        reason = "section_reference_changed_path" if is_path else "section_reference_changed_symbol"
+        item["reasons"] = list(dict.fromkeys([*item["reasons"], reason]))
+        if is_path:
+            item["changed_files"] = list(dict.fromkeys([*item["changed_files"], *hint["evidence"]]))
+    item["sections"] = hints
+
+
 def _module_path(path: str) -> str | None:
     parts = Path(path).parts
     if len(parts) >= 2 and parts[0] in _MODULE_ROOTS:
@@ -180,6 +223,34 @@ def _is_test_path(path: str) -> bool:
 
 def _normalized_paths(paths: list[str]) -> list[str]:
     return sorted({str(path).replace("\\", "/").strip("/") for path in paths if str(path).strip()})
+
+
+def _normalized_symbols(symbols: list[str]) -> list[str]:
+    return sorted({str(symbol).strip() for symbol in symbols if str(symbol).strip()})
+
+
+def _matching_section_hints(
+    sections: list[dict[str, object]], changed_paths: list[str], changed_symbols: list[str]
+) -> list[dict[str, Any]]:
+    hints: list[dict[str, Any]] = []
+    for section in sections:
+        paths = set(str(item) for item in section.get("mentioned_paths", []))
+        symbols = set(str(item) for item in section.get("mentioned_symbols", []))
+        path_evidence = [path for path in changed_paths if path in paths]
+        symbol_evidence = [symbol for symbol in changed_symbols if symbol in symbols]
+        if path_evidence:
+            hints.append({
+                "heading_path": list(section.get("heading_path", [])),
+                "reason": "references_changed_path",
+                "evidence": path_evidence,
+            })
+        if symbol_evidence:
+            hints.append({
+                "heading_path": list(section.get("heading_path", [])),
+                "reason": "references_changed_symbol",
+                "evidence": symbol_evidence,
+            })
+    return hints
 
 
 def _recommendation(review_required: list[dict[str, Any]], missing: list[dict[str, Any]]) -> str:
