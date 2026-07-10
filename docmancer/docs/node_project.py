@@ -18,7 +18,7 @@ def read_node_project(
     """Read direct Node dependencies and bind them to the selected lockfile."""
 
     package_path = root / "package.json"
-    lock_names = ("package-lock.json", "pnpm-lock.yaml", "yarn.lock")
+    lock_names = ("package-lock.json", "pnpm-lock.yaml", "yarn.lock", "bun.lock")
     available_locks = [name for name in lock_names if (root / name).exists()]
     if not package_path.exists() and not available_locks:
         return {}, [], []
@@ -33,6 +33,8 @@ def read_node_project(
         lock_versions, lock_direct = _read_pnpm_lock(root / selected_lock, warnings)
     elif selected_lock == "yarn.lock":
         lock_versions = _read_yarn_lock(root / selected_lock, manifest, warnings)
+    elif selected_lock == "bun.lock":
+        lock_versions = _read_bun_lock(root / selected_lock, manifest, warnings)
 
     if package_path.exists() and not available_locks:
         warnings.append("JavaScript lockfile not found; exact npm dependency versions may be unavailable.")
@@ -100,12 +102,12 @@ def _read_package_json(path: Path, warnings: list[str]) -> tuple[dict[str, tuple
 
 
 def _select_lock(package_manager: str | None, available: list[str]) -> str | None:
-    preferred = {"npm": "package-lock.json", "pnpm": "pnpm-lock.yaml", "yarn": "yarn.lock"}
+    preferred = {"npm": "package-lock.json", "pnpm": "pnpm-lock.yaml", "yarn": "yarn.lock", "bun": "bun.lock"}
     manager = (package_manager or "").split("@", 1)[0].lower()
     selected = preferred.get(manager)
     if selected in available:
         return selected
-    return next((name for name in ("package-lock.json", "pnpm-lock.yaml", "yarn.lock") if name in available), None)
+    return next((name for name in ("package-lock.json", "pnpm-lock.yaml", "yarn.lock", "bun.lock") if name in available), None)
 
 
 def _read_package_lock(path: Path, warnings: list[str]) -> tuple[dict[str, str], dict[str, tuple[str, str]]]:
@@ -212,6 +214,62 @@ def _read_yarn_lock(path: Path, manifest: dict[str, tuple[str, str]], warnings: 
         if exact:
             versions[name] = exact
     return versions
+
+
+def _read_bun_lock(path: Path, manifest: dict[str, tuple[str, str]], warnings: list[str]) -> dict[str, str]:
+    """Read Bun's text/JSON lockfile when it exposes package name+version pairs.
+
+    Binary ``bun.lockb`` is intentionally not guessed: callers retain the
+    package range and receive no invented exact version.
+    """
+    try:
+        text = path.read_text(encoding="utf-8")
+    except OSError as exc:
+        warnings.append(f"Could not read bun.lock: {exc}")
+        return {}
+    versions: dict[str, str] = {}
+    try:
+        data = json.loads(text)
+    except json.JSONDecodeError:
+        data = None
+    if isinstance(data, dict):
+        packages = data.get("packages")
+        if isinstance(packages, dict):
+            for key, entry in packages.items():
+                if isinstance(entry, dict):
+                    name, version = entry.get("name"), entry.get("version")
+                    if isinstance(name, str) and isinstance(version, str) and name in manifest:
+                        versions[name] = version
+                elif isinstance(key, str) and key in manifest and isinstance(entry, list) and entry:
+                    version = _bun_package_ref_version(key, entry[0])
+                    if version:
+                        versions[key] = version
+    for name in manifest:
+        if name in versions:
+            continue
+        escaped = re.escape(name)
+        array_match = re.search(
+            rf'(?ms)["\']{escaped}["\']\s*:\s*\[\s*["\']([^"\']+)["\']',
+            text,
+        )
+        if array_match:
+            version = _bun_package_ref_version(name, array_match.group(1))
+            if version:
+                versions[name] = version
+                continue
+        match = re.search(rf'(?m)["\']?{escaped}["\']?[^\n]*?["\'](\d+(?:\.\d+){{1,3}}(?:[-+][A-Za-z0-9.-]+)?)["\']', text)
+        if match:
+            versions[name] = match.group(1)
+    return versions
+
+
+def _bun_package_ref_version(name: str, value: object) -> str | None:
+    if not isinstance(value, str):
+        return None
+    prefix = f"{name}@"
+    candidate = value[len(prefix):] if value.startswith(prefix) else value
+    candidate = candidate.removeprefix("npm:")
+    return candidate if re.fullmatch(r"\d+(?:\.\d+){1,3}(?:[-+][A-Za-z0-9_.-]+)?", candidate) else None
 
 
 def _parse_yarn_selector(selector: str) -> tuple[str, str] | None:

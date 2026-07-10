@@ -64,6 +64,40 @@ version = "8.3.4"
     assert "python" in metadata.detected_ecosystems
 
 
+def test_python_project_uses_poetry_lock_when_uv_lock_is_absent(tmp_path: Path) -> None:
+    root = tmp_path / "python_repo"
+    root.mkdir()
+    (root / "pyproject.toml").write_text(
+        "[project]\nname = 'demo'\ndependencies = ['fastapi>=0.110']\n", encoding="utf-8"
+    )
+    (root / "poetry.lock").write_text(
+        "[[package]]\nname = 'fastapi'\nversion = '0.115.6'\n", encoding="utf-8"
+    )
+
+    metadata = ProjectMetadataReader().read(root)
+    dependency = next(item for item in metadata.dependencies if item.package_name == "fastapi")
+
+    assert metadata.packages["python:fastapi"] == "0.115.6"
+    assert dependency.version_source == "poetry.lock_exact"
+
+
+def test_python_project_uses_pdm_lock_when_it_is_the_available_lock(tmp_path: Path) -> None:
+    root = tmp_path / "python_repo"
+    root.mkdir()
+    (root / "pyproject.toml").write_text(
+        "[project]\nname = 'demo'\ndependencies = ['httpx>=0.27']\n", encoding="utf-8"
+    )
+    (root / "pdm.lock").write_text(
+        "[[package]]\nname = 'httpx'\nversion = '0.28.1'\n", encoding="utf-8"
+    )
+
+    metadata = ProjectMetadataReader().read(root)
+    dependency = next(item for item in metadata.dependencies if item.package_name == "httpx")
+
+    assert metadata.packages["python:httpx"] == "0.28.1"
+    assert dependency.version_source == "pdm.lock_exact"
+
+
 def test_poetry_path_and_git_dependencies_are_never_registry_version_bindings(tmp_path: Path) -> None:
     root = tmp_path / "poetry_repo"
     root.mkdir()
@@ -191,6 +225,47 @@ react@^18.0.0:
 "@scope/pkg@~1.2.0":
   version "1.2.4"
 '''.strip(),
+        encoding="utf-8",
+    )
+
+    metadata = ProjectMetadataReader().read(root)
+
+    assert metadata.packages["npm:react"] == "18.3.1"
+    assert metadata.packages["npm:@scope/pkg"] == "1.2.4"
+
+
+def test_node_project_reads_bun_json_lock_for_direct_dependencies(tmp_path: Path) -> None:
+    root = tmp_path / "bun_repo"
+    root.mkdir()
+    (root / "package.json").write_text(
+        '{"packageManager":"bun@1.2.0","dependencies":{"react":"^18.0.0"}}', encoding="utf-8"
+    )
+    (root / "bun.lock").write_text(
+        '{"packages":{"react@18.3.1":{"name":"react","version":"18.3.1"}}}', encoding="utf-8"
+    )
+
+    metadata = ProjectMetadataReader().read(root)
+    dependency = next(item for item in metadata.dependencies if item.package_name == "react")
+
+    assert metadata.packages["npm:react"] == "18.3.1"
+    assert dependency.version_source == "bun.lock_exact"
+
+
+def test_node_project_reads_realistic_bun_text_lock_array(tmp_path: Path) -> None:
+    root = tmp_path / "bun_text_repo"
+    root.mkdir()
+    (root / "package.json").write_text(
+        '{"packageManager":"bun@1.2.0","dependencies":{"react":"^18.0.0","@scope/pkg":"~1.2.0"}}',
+        encoding="utf-8",
+    )
+    (root / "bun.lock").write_text(
+        '''{
+  "lockfileVersion": 1,
+  "packages": {
+    "react": ["react@18.3.1", "", {}, "sha512-example"],
+    "@scope/pkg": ["@scope/pkg@1.2.4", "", {}, "sha512-example"]
+  }
+}''',
         encoding="utf-8",
     )
 

@@ -1,0 +1,455 @@
+{
+  "schema_version": 1,
+  "sources": [
+    {
+      "library": "fastapi",
+      "ecosystem": "python",
+      "version_rule": "unversioned",
+      "docs_url": "https://fastapi.tiangolo.com/",
+      "allowed_domains": [
+        "fastapi.tiangolo.com"
+      ],
+      "preferred_seeds": [
+        "https://fastapi.tiangolo.com/llms.txt",
+        "https://fastapi.tiangolo.com/sitemap.xml"
+      ],
+      "extraction_format": "html",
+      "max_pages": 24
+    },
+    {
+      "library": "pydantic",
+      "ecosystem": "python",
+      "version_rule": "unversioned",
+      "docs_url": "https://docs.pydantic.dev/latest/",
+      "allowed_domains": [
+        "docs.pydantic.dev"
+      ],
+      "preferred_seeds": [
+        "https://docs.pydantic.dev/latest/llms.txt",
+        "https://docs.pydantic.dev/latest/sitemap.xml"
+      ],
+      "extraction_format": "html",
+      "max_pages": 24
+    },
+    {
+      "library": "django",
+      "ecosystem": "python",
+      "version_rule": "unversioned",
+      "docs_url": "https://docs.djangoproject.com/en/5.1/",
+      "allowed_domains": [
+        "docs.djangoproject.com"
+      ],
+      "preferred_seeds": [
+        "https://docs.djangoproject.com/en/5.1/llms.txt",
+        "https://docs.djangoproject.com/en/5.1/sitemap.xml"
+      ],
+      "extraction_format": "html",
+      "max_pages": 24
+    },
+    {
+      "library": "flask",
+      "ecosystem": "python",
+      "version_rule": "unversioned",
+      "docs_url": "https://flask.palletsprojects.com/en/3.1.x/",
+      "allowed_domains": [
+        "flask.palletsprojects.com"
+      ],
+      "preferred_seeds": [
+        "https://flask.palletsprojects.com/en/3.1.x/llms.txt",
+        "https://flask.palletsprojects.com/en/3.1.x/sitemap.xml"
+      ],
+      "extraction_format": "html",
+      "max_pages": 24
+    },
+    {
+      "library": "sqlalchemy",
+      "ecosystem": "python",
+      "version_rule": "unversioned",
+      "docs_url": "https://docs.sqlalchemy.org/en/20/",
+      "allowed_domains": [
+        "docs.sqlalchemy.org"
+      ],
+      "preferred_seeds": [
+        "https://docs.sqlalchemy.org/en/20/llms.txt",
+        "https://docs.sqlalchemy.org/en/20/sitemap.xml"
+      ],
+      "extraction_format": "html",
+      "max_pages": 24
+    },
+    {
+      "library": "pytest",
+      "ecosystem": "python",
+      "version_rule": "unversioned",
+      "docs_url": "https://docs.pytest.org/en/8.3.x/",
+      "allowed_domains": [
+        "docs.pytest.org"
+      ],
+      "preferred_seeds": [
+        "https://docs.pytest.org/en/8.3.x/llms.txt",
+        "https://docs.pytest.org/en/8.3.x/sitemap.xml"
+      ],
+      "extraction_format": "html",
+      "max_pages": 24
+    },
+    {
+      "library": "httpx",
+      "ecosystem": "python",
+      "version_rule": "unversioned",
+      "docs_url": "https://www.python-httpx.org/",
+      "allowed_domains": [
+        "www.python-httpx.org"
+      ],
+      "preferred_seeds": [
+        "https://www.python-httpx.org/llms.txt",
+        "https://www.python-httpx.org/sitemap.xml"
+      ],
+      "extraction_format": "html",
+      "max_pages": 24
+    },
+    {
+      "library": "click",
+      "ecosystem": "python",
+      "version_rule": "unversioned",
+      "docs_url": "https://click.palletsprojects.com/en/8.1.x/",
+      "allowed_domains": [
+        "click.palletsprojects.com"
+      ],
+      "preferred_seeds": [
+        "https://click.palletsprojects.com/en/8.1.x/llms.txt",
+        "https://click.palletsprojects.com/en/8.1.x/sitemap.xml"
+      ],
+      "extraction_format": "html",
+      "max_pages": 24
+    },
+    {
+      "library": "celery",
+      "ecosystem": "python",
+      "version_rule": "unversioned",
+      "docs_url": "https://docs.celeryq.dev/en/v5.4.0/",
+      "allowed_domains": [
+        "docs.celeryq.dev"
+      ],
+      "preferred_seeds": [
+        "https://docs.celeryq.dev/en/v5.4.0/llms.txt",
+        "https://docs.celeryq.dev/en/v5.4.0/sitemap.xml"
+      ],
+      "extraction_format": "html",
+      "max_pages": 24
+    },
+    {
+      "library": "rich",
+      "ecosystem": "python",
+      "version_rule": "unversioned",
+      "docs_url": "https://rich.readthedocs.io/en/stable/",
+      "allowed_domains": [
+        "rich.readthedocs.io"
+      ],
+      "preferred_seeds": [
+        "https://rich.readthedocs.io/en/stable/llms.txt",
+        "https://rich.readthedocs.io/en/stable/sitemap.xml"
+      ],
+      "extraction_format": "html",
+      "max_pages": 24
+    },
+    {
+      "library": "requests",
+      "ecosystem": "python",
+      "version_rule": "unversioned",
+      "docs_url": "https://requests.readthedocs.io/en/latest/",
+      "allowed_domains": [
+        "requests.readthedocs.io"
+      ],
+      "preferred_seeds": [
+        "https://requests.readthedocs.io/en/latest/llms.txt",
+        "https://requests.readthedocs.io/en/latest/sitemap.xml"
+      ],
+      "extraction_format": "html",
+      "max_pages": 24
+    },
+    {
+      "library": "typer",
+      "ecosystem": "python",
+      "version_rule": "unversioned",
+      "docs_url": "https://typer.tiangolo.com/",
+      "allowed_domains": [
+        "typer.tiangolo.com"
+      ],
+      "preferred_seeds": [
+        "https://typer.tiangolo.com/llms.txt",
+        "https://typer.tiangolo.com/sitemap.xml"
+      ],
+      "extraction_format": "html",
+      "max_pages": 24
+    },
+    {
+      "library": "react",
+      "ecosystem": "npm",
+      "version_rule": "unversioned",
+      "docs_url": "https://react.dev/",
+      "allowed_domains": [
+        "react.dev"
+      ],
+      "preferred_seeds": [
+        "https://react.dev/llms.txt",
+        "https://react.dev/sitemap.xml"
+      ],
+      "extraction_format": "html",
+      "max_pages": 24
+    },
+    {
+      "library": "next",
+      "ecosystem": "npm",
+      "version_rule": "unversioned",
+      "docs_url": "https://nextjs.org/docs/14",
+      "allowed_domains": [
+        "nextjs.org"
+      ],
+      "preferred_seeds": [
+        "https://nextjs.org/docs/14/llms.txt",
+        "https://nextjs.org/docs/14/sitemap.xml"
+      ],
+      "extraction_format": "html",
+      "max_pages": 24
+    },
+    {
+      "library": "typescript",
+      "ecosystem": "npm",
+      "version_rule": "unversioned",
+      "docs_url": "https://www.typescriptlang.org/docs/",
+      "allowed_domains": [
+        "www.typescriptlang.org"
+      ],
+      "preferred_seeds": [
+        "https://www.typescriptlang.org/docs/llms.txt",
+        "https://www.typescriptlang.org/docs/sitemap.xml"
+      ],
+      "extraction_format": "html",
+      "max_pages": 24
+    },
+    {
+      "library": "express",
+      "ecosystem": "npm",
+      "version_rule": "unversioned",
+      "docs_url": "https://expressjs.com/en/4x/api.html",
+      "allowed_domains": [
+        "expressjs.com"
+      ],
+      "preferred_seeds": [
+        "https://expressjs.com/en/4x/api.html/llms.txt",
+        "https://expressjs.com/en/4x/api.html/sitemap.xml"
+      ],
+      "extraction_format": "html",
+      "max_pages": 24
+    },
+    {
+      "library": "zod",
+      "ecosystem": "npm",
+      "version_rule": "unversioned",
+      "docs_url": "https://zod.dev/",
+      "allowed_domains": [
+        "zod.dev"
+      ],
+      "preferred_seeds": [
+        "https://zod.dev/llms.txt",
+        "https://zod.dev/sitemap.xml"
+      ],
+      "extraction_format": "html",
+      "max_pages": 24
+    },
+    {
+      "library": "vite",
+      "ecosystem": "npm",
+      "version_rule": "unversioned",
+      "docs_url": "https://vite.dev/guide/",
+      "allowed_domains": [
+        "vite.dev"
+      ],
+      "preferred_seeds": [
+        "https://vite.dev/guide/llms.txt",
+        "https://vite.dev/guide/sitemap.xml"
+      ],
+      "extraction_format": "html",
+      "max_pages": 24
+    },
+    {
+      "library": "nestjs",
+      "ecosystem": "npm",
+      "version_rule": "unversioned",
+      "docs_url": "https://docs.nestjs.com/",
+      "allowed_domains": [
+        "docs.nestjs.com"
+      ],
+      "preferred_seeds": [
+        "https://docs.nestjs.com/llms.txt",
+        "https://docs.nestjs.com/sitemap.xml"
+      ],
+      "extraction_format": "html",
+      "max_pages": 24
+    },
+    {
+      "library": "axios",
+      "ecosystem": "npm",
+      "version_rule": "unversioned",
+      "docs_url": "https://axios-http.com/docs/intro",
+      "allowed_domains": [
+        "axios-http.com"
+      ],
+      "preferred_seeds": [
+        "https://axios-http.com/docs/intro/llms.txt",
+        "https://axios-http.com/docs/intro/sitemap.xml"
+      ],
+      "extraction_format": "html",
+      "max_pages": 24
+    },
+    {
+      "library": "prisma",
+      "ecosystem": "npm",
+      "version_rule": "unversioned",
+      "docs_url": "https://www.prisma.io/docs/",
+      "allowed_domains": [
+        "www.prisma.io"
+      ],
+      "preferred_seeds": [
+        "https://www.prisma.io/docs/llms.txt",
+        "https://www.prisma.io/docs/sitemap.xml"
+      ],
+      "extraction_format": "html",
+      "max_pages": 24
+    },
+    {
+      "library": "jest",
+      "ecosystem": "npm",
+      "version_rule": "unversioned",
+      "docs_url": "https://jestjs.io/docs/29.7/getting-started",
+      "allowed_domains": [
+        "jestjs.io"
+      ],
+      "preferred_seeds": [
+        "https://jestjs.io/docs/29.7/getting-started/llms.txt",
+        "https://jestjs.io/docs/29.7/getting-started/sitemap.xml"
+      ],
+      "extraction_format": "html",
+      "max_pages": 24
+    },
+    {
+      "library": "tanstack-query",
+      "ecosystem": "npm",
+      "version_rule": "unversioned",
+      "docs_url": "https://tanstack.com/query/latest",
+      "allowed_domains": [
+        "tanstack.com"
+      ],
+      "preferred_seeds": [
+        "https://tanstack.com/query/latest/llms.txt",
+        "https://tanstack.com/query/latest/sitemap.xml"
+      ],
+      "extraction_format": "html",
+      "max_pages": 24
+    },
+    {
+      "library": "redux-toolkit",
+      "ecosystem": "npm",
+      "version_rule": "unversioned",
+      "docs_url": "https://redux-toolkit.js.org/",
+      "allowed_domains": [
+        "redux-toolkit.js.org"
+      ],
+      "preferred_seeds": [
+        "https://redux-toolkit.js.org/llms.txt",
+        "https://redux-toolkit.js.org/sitemap.xml"
+      ],
+      "extraction_format": "html",
+      "max_pages": 24
+    },
+    {
+      "library": "riverpod",
+      "ecosystem": "dart",
+      "version_rule": "unversioned",
+      "docs_url": "https://riverpod.dev/",
+      "allowed_domains": [
+        "riverpod.dev"
+      ],
+      "preferred_seeds": [
+        "https://riverpod.dev/llms.txt",
+        "https://riverpod.dev/sitemap.xml"
+      ],
+      "extraction_format": "html",
+      "max_pages": 24
+    },
+    {
+      "library": "flutter_bloc",
+      "ecosystem": "dart",
+      "version_rule": "exact",
+      "docs_url": "https://pub.dev/documentation/flutter_bloc/{version}/",
+      "allowed_domains": [
+        "bloclibrary.dev"
+      ],
+      "preferred_seeds": [
+        "https://bloclibrary.dev/llms.txt",
+        "https://bloclibrary.dev/sitemap.xml"
+      ],
+      "extraction_format": "html",
+      "max_pages": 24
+    },
+    {
+      "library": "go_router",
+      "ecosystem": "dart",
+      "version_rule": "exact",
+      "docs_url": "https://pub.dev/documentation/go_router/{version}/",
+      "allowed_domains": [
+        "pub.dev"
+      ],
+      "preferred_seeds": [
+        "https://pub.dev/documentation/go_router/14.8.1/llms.txt",
+        "https://pub.dev/documentation/go_router/14.8.1/sitemap.xml"
+      ],
+      "extraction_format": "dartdoc",
+      "max_pages": 24
+    },
+    {
+      "library": "dio",
+      "ecosystem": "dart",
+      "version_rule": "exact",
+      "docs_url": "https://pub.dev/documentation/dio/{version}/",
+      "allowed_domains": [
+        "pub.dev"
+      ],
+      "preferred_seeds": [
+        "https://pub.dev/packages/dio/llms.txt",
+        "https://pub.dev/packages/dio/sitemap.xml"
+      ],
+      "extraction_format": "html",
+      "max_pages": 24
+    },
+    {
+      "library": "freezed",
+      "ecosystem": "dart",
+      "version_rule": "unversioned",
+      "docs_url": "https://pub.dev/packages/freezed",
+      "allowed_domains": [
+        "pub.dev"
+      ],
+      "preferred_seeds": [
+        "https://pub.dev/packages/freezed/llms.txt",
+        "https://pub.dev/packages/freezed/sitemap.xml"
+      ],
+      "extraction_format": "html",
+      "max_pages": 24
+    },
+    {
+      "library": "flutter_test",
+      "ecosystem": "dart",
+      "version_rule": "unversioned",
+      "docs_url": "https://api.flutter.dev/flutter/flutter_test/flutter_test-library.html",
+      "allowed_domains": [
+        "api.flutter.dev"
+      ],
+      "preferred_seeds": [
+        "https://api.flutter.dev/flutter/flutter_test/flutter_test-library.html/llms.txt",
+        "https://api.flutter.dev/flutter/flutter_test/flutter_test-library.html/sitemap.xml"
+      ],
+      "extraction_format": "html",
+      "max_pages": 24
+    }
+  ]
+}

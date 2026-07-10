@@ -159,6 +159,7 @@ class DocsTarget:
     browser: bool = False
     doc_format: str | None = None
     warnings: list[str] = field(default_factory=list)
+    source_manifest: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass(frozen=True)
