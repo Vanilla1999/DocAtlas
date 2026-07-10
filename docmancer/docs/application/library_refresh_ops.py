@@ -4,6 +4,7 @@ import logging
 from pathlib import Path
 from typing import Any, Callable
 import shutil
+import sqlite3
 import tempfile
 import time
 
@@ -129,6 +130,7 @@ class LibraryRefreshOps:
         *,
         force: bool,
         should_cancel: Callable[[], bool] | None = None,
+        begin_commit: Callable[[], bool] | None = None,
     ) -> RefreshResult:
         started = time.monotonic()
         if not record.docs_url:
@@ -157,7 +159,7 @@ class LibraryRefreshOps:
                 targets_completed=1,
             )
 
-        index_snapshot = self._snapshot_index(record) if should_cancel else None
+        staging = self._create_staging_index(record) if should_cancel else None
 
         sections_indexed = 0
         discovery_diagnostics: list[dict[str, Any]] = []
@@ -168,8 +170,8 @@ class LibraryRefreshOps:
             if seed_urls_for_discovery and (target.docs_url or target.docs_url_template):
                 urls = urls[:1]
             per_url_max_pages = target.max_pages if target.doc_format == "dartdoc" else (1 if target.seed_urls and not target.docs_url and not target.docs_url_template else target.max_pages)
+            agent = self.agent_gateway.agent_for_config(staging[0]) if staging else self._agent_instance(record)
             for url in urls:
-                agent = self._agent_instance(record)
                 indexed_sections = agent.add(
                     url,
                     recreate=False,
@@ -184,9 +186,12 @@ class LibraryRefreshOps:
                     discovery_diagnostics.append(dict(agent.last_discovery_diagnostics))
         except Exception as exc:
             if should_cancel and should_cancel():
-                self._restore_index(record, index_snapshot)
+                self._discard_staging(staging)
                 return self._cancelled_result(record, started)
-            self._discard_index_snapshot(index_snapshot)
+            if begin_commit and not begin_commit():
+                self._discard_staging(staging)
+                return self._cancelled_result(record, started)
+            self._discard_staging(staging)
             logger.exception("Refresh failed for record %s: %s", record.library_id, exc)
             reason_code = _refresh_failure_code(exc)
             message = f"{reason_code}: {exc}"
@@ -229,11 +234,17 @@ class LibraryRefreshOps:
             )
 
         if should_cancel and should_cancel():
-            self._restore_index(record, index_snapshot)
+            self._discard_staging(staging)
             return self._cancelled_result(record, started)
-        self._discard_index_snapshot(index_snapshot)
 
-        pages_after, chunks_after = self.registry_ops.count_index_entries(record)
+        pages_after, chunks_after = (
+            self._count_index_config(staging[0]) if staging else self.registry_ops.count_index_entries(record)
+        )
+        if begin_commit and not begin_commit():
+            self._discard_staging(staging)
+            return self._cancelled_result(record, started)
+        if staging:
+            self._promote_staging(record, staging)
         if sections_indexed == 0 or pages_after == 0 or chunks_after == 0:
             refreshed_at = self._now()
             reason = "ingest_produced_no_chunks" if sections_indexed > 0 else "no_extractable_content"
@@ -353,6 +364,7 @@ class LibraryRefreshOps:
         force: bool = True,
         continue_on_error: bool = True,
         should_cancel: Callable[[], bool] | None = None,
+        begin_commit: Callable[[], bool] | None = None,
     ) -> RefreshResult:
         started = time.monotonic()
         if should_cancel and should_cancel():
@@ -395,6 +407,7 @@ class LibraryRefreshOps:
                     force=force,
                     continue_on_error=continue_on_error,
                     should_cancel=should_cancel,
+                    begin_commit=begin_commit,
                 )
                 if last.status == "updated":
                     updated += 1
@@ -450,9 +463,12 @@ class LibraryRefreshOps:
                 duration_ms=int((time.monotonic() - started) * 1000),
                 targets_failed=1,
             )
+        if should_cancel:
+            record = self.registry.get(record.library_id, None, source_type=record.source_type) or record
+            return self.refresh_record(record, force=force, should_cancel=should_cancel, begin_commit=begin_commit)
         with self._lock_for(record.library_id):
             record = self.registry.get(record.library_id, None, source_type=record.source_type) or record
-            return self.refresh_record(record, force=force, should_cancel=should_cancel)
+            return self.refresh_record(record, force=force)
 
     def prefetch_docs(
         self,
@@ -465,6 +481,7 @@ class LibraryRefreshOps:
         force_refresh: bool = False,
         continue_on_error: bool = True,
         should_cancel: Callable[[], bool] | None = None,
+        begin_commit: Callable[[], bool] | None = None,
     ) -> RefreshResult:
         selected_versions = versions or ["latest"]
         result = self.refresh_docs(
@@ -477,6 +494,7 @@ class LibraryRefreshOps:
             force=force_refresh,
             continue_on_error=continue_on_error,
             should_cancel=should_cancel,
+            begin_commit=begin_commit,
         )
         messages = []
         if not versions:
@@ -503,42 +521,82 @@ class LibraryRefreshOps:
             )
         return result
 
-    def _snapshot_index(self, record: LibraryRecord) -> Path:
-        config = self._index_config_for(record)
-        snapshot = Path(tempfile.mkdtemp(prefix="docatlas-index-snapshot-"))
-        db_path = Path(config.index.db_path)
-        for candidate in db_path.parent.glob(f"{db_path.name}*"):
-            if candidate.is_file():
-                shutil.copy2(candidate, snapshot / candidate.name)
-        extracted = Path(config.index.extracted_dir)
+    def _create_staging_index(self, record: LibraryRecord) -> tuple[Any, Path]:
+        production = self._index_config_for(record)
+        db_path = Path(production.index.db_path)
+        db_path.parent.mkdir(parents=True, exist_ok=True)
+        root = Path(tempfile.mkdtemp(prefix=".docatlas-staging-", dir=db_path.parent))
+        staging = production.model_copy(deep=True)
+        staging.index.db_path = str(root / "index.db")
+        staging.index.extracted_dir = str(root / "extracted")
+        if db_path.exists():
+            with sqlite3.connect(db_path) as source, sqlite3.connect(staging.index.db_path) as destination:
+                source.backup(destination)
+        extracted = Path(production.index.extracted_dir)
         if extracted.exists():
-            shutil.copytree(extracted, snapshot / "extracted")
-        return snapshot
-
-    def _restore_index(self, record: LibraryRecord, snapshot: Path | None) -> None:
-        if snapshot is None:
-            return
-        config = self._index_config_for(record)
-        db_path = Path(config.index.db_path)
-        for candidate in db_path.parent.glob(f"{db_path.name}*"):
-            if candidate.is_file():
-                candidate.unlink()
-        for candidate in snapshot.glob(f"{db_path.name}*"):
-            if candidate.is_file():
-                db_path.parent.mkdir(parents=True, exist_ok=True)
-                shutil.copy2(candidate, db_path.parent / candidate.name)
-        extracted = Path(config.index.extracted_dir)
-        if extracted.exists():
-            shutil.rmtree(extracted)
-        snapshot_extracted = snapshot / "extracted"
-        if snapshot_extracted.exists():
-            shutil.copytree(snapshot_extracted, extracted)
-        self._discard_index_snapshot(snapshot)
+            shutil.copytree(extracted, staging.index.extracted_dir)
+        return staging, root
 
     @staticmethod
-    def _discard_index_snapshot(snapshot: Path | None) -> None:
-        if snapshot and snapshot.exists():
-            shutil.rmtree(snapshot)
+    def _count_index_config(config: Any) -> tuple[int, int]:
+        db_path = Path(config.index.db_path)
+        if not db_path.exists():
+            return 0, 0
+        try:
+            with sqlite3.connect(db_path) as conn:
+                pages = int(conn.execute("SELECT COUNT(*) FROM sources").fetchone()[0])
+                chunks = int(conn.execute("SELECT COUNT(*) FROM sections").fetchone()[0])
+                return pages, chunks
+        except sqlite3.Error:
+            return 0, 0
+
+    def _promote_staging(self, record: LibraryRecord, staging: tuple[Any, Path]) -> None:
+        staging_config, staging_root = staging
+        production = self._index_config_for(record)
+        production_db = Path(production.index.db_path)
+        production_extracted = Path(production.index.extracted_dir)
+        staging_db = Path(staging_config.index.db_path)
+        staging_extracted = Path(staging_config.index.extracted_dir)
+        backup_root = Path(tempfile.mkdtemp(prefix=".docatlas-backup-", dir=production_db.parent))
+        backup_db = backup_root / production_db.name
+        backup_extracted = backup_root / "extracted"
+        candidate_db = backup_root / "candidate.db"
+
+        with self._lock_for(record.library_id):
+            try:
+                if staging_db.exists():
+                    with sqlite3.connect(staging_db) as source, sqlite3.connect(candidate_db) as destination:
+                        source.backup(destination)
+                if production_db.exists():
+                    production_db.replace(backup_db)
+                if production_extracted.exists():
+                    production_extracted.replace(backup_extracted)
+                production_db.parent.mkdir(parents=True, exist_ok=True)
+                if candidate_db.exists():
+                    candidate_db.replace(production_db)
+                if staging_extracted.exists():
+                    production_extracted.parent.mkdir(parents=True, exist_ok=True)
+                    staging_extracted.replace(production_extracted)
+            except Exception:
+                if production_db.exists():
+                    production_db.unlink()
+                if backup_db.exists():
+                    backup_db.replace(production_db)
+                if production_extracted.exists():
+                    shutil.rmtree(production_extracted)
+                if backup_extracted.exists():
+                    production_extracted.parent.mkdir(parents=True, exist_ok=True)
+                    backup_extracted.replace(production_extracted)
+                raise
+            finally:
+                shutil.rmtree(backup_root, ignore_errors=True)
+                shutil.rmtree(staging_root, ignore_errors=True)
+        self.agent_gateway.drop_library_agent(record)
+
+    @staticmethod
+    def _discard_staging(staging: tuple[Any, Path] | None) -> None:
+        if staging:
+            shutil.rmtree(staging[1], ignore_errors=True)
 
     @staticmethod
     def _cancelled_result(record: LibraryRecord, started: float) -> RefreshResult:
