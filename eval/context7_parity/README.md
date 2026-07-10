@@ -6,7 +6,7 @@ Every dataset item fixes the requested version, allowed official corpus, expecte
 
 ## Capture contract
 
-Capture one JSON object per line. Required fields are `provider` (`docatlas` or `context7`), `case_id`, `first_tool`, `results`, `latency_ms`, and `phase` (`cold` or `warm`). Each result may contain `source`, `title`, `section`, `content`, and `snippet`. Optional trace fields measure `resolved_version`, `network_fetch_count`, `lifecycle_call_count`, and `unnecessary_lifecycle_call`.
+Capture one JSON object per line. Required fields are `provider` (`docatlas` or `context7`), `case_id`, `first_tool`, `results`, `latency_ms`, and `phase` (`cold` or `warm`). Each result may contain `source`, `title`, `section`, `content`, and `snippet`. Optional trace fields measure `resolved_version`, `network_fetch_count`, `lifecycle_call_count`, and `unnecessary_lifecycle_call`. Omit `resolved_version` only when it is unavailable: the report marks that item as `unknown`, not as an exact-version match.
 
 ## Reproduce the DocAtlas scoring side
 
