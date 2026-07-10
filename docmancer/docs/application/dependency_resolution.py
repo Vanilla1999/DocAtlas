@@ -108,6 +108,27 @@ def project_version_for(
         warnings.append(NO_PROJECT_VERSION_WARNING)
         return None, None, None, warnings, observation.specifier_raw, False, observation.version_source, "no_docs"
 
+    if observation and observation.ecosystem == "npm":
+        if observation.source_kind != "registry":
+            warnings.append(
+                f"{library}: npm path/git dependencies cannot be bound to "
+                "registry documentation exactly."
+            )
+            return None, None, None, warnings, observation.specifier_raw, False, observation.version_source, "no_docs"
+        if observation.resolved_version:
+            return (
+                observation.resolved_version,
+                None,
+                None,
+                warnings,
+                observation.specifier_raw or observation.resolved_version,
+                None,
+                observation.version_source,
+                "npm_registry_version",
+            )
+        warnings.append(NO_PROJECT_VERSION_WARNING)
+        return None, None, None, warnings, observation.specifier_raw, False, observation.version_source, "no_docs"
+
     if ecosystem == "pub" or library in metadata.packages:
         version = metadata.packages.get(library)
         if version:
