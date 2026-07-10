@@ -1,5 +1,7 @@
 version: 1
 description: Public Docs MCP first-tool selection benchmark (English and Russian).
+benchmark_kind: deterministic_policy_conformance
+notes: This checks the documented routing policy. It is not a live LLM tool-choice evaluation.
 groups:
   - expected_tool: get_docs_context
     templates:
@@ -54,3 +56,29 @@ groups:
       - "this repository"
       - "FastAPI"
       - "the current project"
+
+cases:
+  - prompt: "How do I remove docs from a Python list?"
+    expected_tool: get_docs_context
+  - prompt: "Explain how to refresh docs in CI."
+    expected_tool: get_docs_context
+  - prompt: "Show how docs status works in an MCP client."
+    expected_tool: get_docs_context
+  - prompt: "Почему документация устарела после релиза?"
+    expected_tool: get_docs_context
+  - prompt: "Объясни как обновить документацию без запуска команды."
+    expected_tool: get_docs_context
+  - prompt: "Как удалить документы из коллекции в Python?"
+    expected_tool: get_docs_context
+  - prompt: "Please sync docs after this change."
+    expected_tool: prepare_docs
+  - prompt: "Sync docs locally but do not fetch from the network."
+    expected_tool: prepare_docs
+  - prompt: "Пожалуйста, переиндексируй документацию локально."
+    expected_tool: prepare_docs
+  - prompt: "Check whether the docs index is healthy."
+    expected_tool: docs_status
+  - prompt: "List running documentation jobs."
+    expected_tool: docs_status
+  - prompt: "Проверь статус задачи job-42."
+    expected_tool: docs_status
