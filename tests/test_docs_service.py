@@ -8,6 +8,7 @@ from threading import Event, Thread
 import time
 from unittest.mock import MagicMock, patch
 
+import httpx
 from click.testing import CliRunner
 
 from docmancer.cli.__main__ import cli
@@ -19,6 +20,7 @@ from docmancer.docs.models import DocsChunk, DocsResult, DocsTarget, ProjectCont
 from docmancer.docs.interfaces.mcp.project_tools import handle_project_tool
 from docmancer.docs.registry import LibraryRegistry
 from docmancer.docs.service import DocsJobTracker, LibraryDocsService
+from docmancer.mcp.docs_server import call_docs_tool_payload
 
 
 class FakeAgent:
@@ -1983,6 +1985,22 @@ def test_prefetch_docs_defaults_missing_versions_to_latest_with_warning(tmp_path
     assert agent.add_calls == ["https://pub.dev/documentation/go_router/latest/"]
 
 
+def test_library_prefetch_reports_retryable_network_failure_category(tmp_path, monkeypatch):
+    agent = FakeAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+    monkeypatch.setattr(agent, "add", lambda *args, **kwargs: (_ for _ in ()).throw(httpx.ConnectError("network unavailable")))
+
+    result = service.prefetch_docs(
+        "example-docs",
+        ecosystem="web",
+        docs_url="https://example.com/docs/",
+    )
+
+    assert result.status == "failed"
+    assert "reason_code=network_unreachable" in result.message
+    assert result.preindex["reason_code"] == "network_unreachable"
+
+
 def test_missing_version_falls_back_to_latest_with_warning(tmp_path, monkeypatch):
     agent = FakeAgent()
     service = _service(tmp_path, monkeypatch, agent)
@@ -3294,6 +3312,36 @@ def test_prefetch_docs_targets_async_returns_job_id_immediately(tmp_path, monkey
     status = service.get_docs_job_status(result.job_id)
     assert status is not None
     assert status.status == "running"
+    agent.release.set()
+
+
+def test_prepare_library_docs_queues_network_ingest_and_keeps_status_responsive(tmp_path, monkeypatch):
+    agent = SlowAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+
+    started = time.monotonic()
+    payload = call_docs_tool_payload(
+        "prepare_docs",
+        {
+            "action": "prefetch_library_docs",
+            "library": "example-docs",
+            "ecosystem": "web",
+            "docs_url": "https://example.com/docs/",
+        },
+        service,
+    )
+
+    assert time.monotonic() - started < 1
+    assert payload["status"] == "running"
+    assert payload["job_id"]
+    assert agent.entered.wait(timeout=1)
+
+    status_started = time.monotonic()
+    status = call_docs_tool_payload("docs_status", {"action": "job", "job_id": payload["job_id"]}, service)
+    assert time.monotonic() - status_started < 1
+    assert status["status"] == "running"
+    assert status["job_id"] == payload["job_id"]
+
     agent.release.set()
 
 
