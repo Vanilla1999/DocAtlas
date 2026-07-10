@@ -225,7 +225,7 @@ def test_characterization_dependency_docs_network_fetch_path_requires_confirmati
     assert result.status == "confirmation_required"
     assert result.reason_code == "dependency_docs_prefetch_confirmation_required"
     assert result.next_action["type"] == "ask_user_to_prefetch_dependency_docs"
-    assert result.next_action["tool_after_confirmation"] == "prefetch_project_docs"
+    assert result.next_action["tool_after_confirmation"] == "prepare_docs"
     assert result.requires_confirmation is True
     assert result.confirmation_reason == "network_fetch"
 

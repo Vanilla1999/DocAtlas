@@ -88,6 +88,7 @@ The `ProjectMetadataReader` inspects project metadata to choose the exact docume
 - **`pubspec.lock`** — extracts pinned package versions from `packages` map. Used as exact version sources for pub.dev Dartdoc and docs.rs bindings.
 - **`pubspec.yaml`** — reads direct dependencies and specifier kinds (exact, range, path, git).
 - **`Cargo.toml`** / **`Cargo.lock`** — extracts Rust dependency versions and sources (registry, path, git). Non-registry sources produce warnings about inexact docs binding.
+- **`package.json`** with **`package-lock.json`**, **`pnpm-lock.yaml`**, or **`yarn.lock`** — extracts direct npm dependencies and exact installed versions. `packageManager` chooses the authoritative lockfile when more than one exists; workspace/path/git sources remain explicitly non-registry.
 
 The resolution happens in `LibraryDocsService.get_docs()` when `project_path` is provided and `version` is not explicitly set. For Flutter SDK docs, the version is resolved from `.fvmrc`; for pub packages, from `pubspec.lock`; for Rust packages, from `Cargo.lock`.
 

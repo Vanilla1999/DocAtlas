@@ -153,7 +153,7 @@ Do not store generated architecture only in hidden memory. Official project know
 
 ## Dependency docs are separate
 
-`inspect_project_docs` also reports dependency metadata from supported manifests and lockfiles. That metadata is useful for exact-version docs, but it is not the same as project-owned docs.
+Advanced inspection reports dependency metadata from supported manifests and lockfiles. This includes direct npm dependencies from `package.json` resolved through the authoritative `package-lock.json`, `pnpm-lock.yaml`, or `yarn.lock`. That metadata is useful for exact-version docs, but it is not the same as project-owned docs.
 
 Use:
 

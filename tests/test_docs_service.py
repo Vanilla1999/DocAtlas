@@ -350,16 +350,47 @@ def test_inspect_project_docs_returns_candidates_dependency_sources_and_next_act
     assert result.dependency_sources["dependency_docs_missing_count"] >= 2
     dependency_action = result.dependency_sources["dependency_next_action"]
     assert dependency_action["type"] == "ask_user_to_prefetch_dependency_docs"
-    assert dependency_action["tool_after_confirmation"] == "prefetch_project_docs"
+    assert dependency_action["tool_after_confirmation"] == "prepare_docs"
     assert dependency_action["alias_tool_after_confirmation"] == "prefetch_project_dependency_docs"
     assert dependency_action["requires_confirmation"] is True
     assert dependency_action["confirmation_reason"] == "network_fetch"
-    assert dependency_action["arguments_patch"] == {"project_path": str(project.resolve())}
+    assert dependency_action["arguments_patch"] == {
+        "action": "prefetch_project_dependency_docs",
+        "project_path": str(project.resolve()),
+        "include_packages": ["go_router", "riverpod"],
+    }
     action_tools = [action["tool"] for action in result.recommended_next_actions]
     assert action_tools == ["sync_project_docs", "prefetch_project_docs"]
     assert result.recommended_next_actions[0]["requires_confirmation"] is False
     assert result.recommended_next_actions[1]["requires_confirmation"] is True
     assert "sync_project_docs" in (result.agent_guidance or "")
+
+
+def test_inspect_project_docs_reports_node_manifest_and_selected_lockfile(tmp_path, monkeypatch):
+    project = tmp_path / "node_app"
+    project.mkdir()
+    (project / "README.md").write_text("# Node app\n\nArchitecture overview.", encoding="utf-8")
+    (project / "package.json").write_text(
+        '{"packageManager":"pnpm@9.0.0","dependencies":{"react":"^18.0.0"}}',
+        encoding="utf-8",
+    )
+    (project / "pnpm-lock.yaml").write_text(
+        "lockfileVersion: '9.0'\nimporters:\n  .:\n    dependencies:\n      react:\n        specifier: ^18.0.0\n        version: 18.3.1\n",
+        encoding="utf-8",
+    )
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+
+    result = service.inspect_project_docs(str(project))
+
+    assert result.dependency_sources["manifests_found"] == ["package.json"]
+    assert result.dependency_sources["lockfiles_found"] == ["pnpm-lock.yaml"]
+    assert result.dependency_sources["exact_versions_available"] is True
+    assert result.project_type == ["npm"]
+    assert result.dependency_sources["dependency_next_action"]["arguments_patch"] == {
+        "action": "prefetch_project_dependency_docs",
+        "project_path": str(project.resolve()),
+        "include_packages": ["react"],
+    }
 
 
 def test_inspect_project_docs_requires_preflight_for_placeholder_readme_before_sync(tmp_path, monkeypatch):
@@ -1148,7 +1179,7 @@ def test_bootstrap_project_docs_stops_before_dependency_network_fetch(tmp_path, 
     assert result.status == "confirmation_required"
     assert result.reason_code == "dependency_docs_prefetch_confirmation_required"
     assert result.next_action["type"] == "ask_user_to_prefetch_dependency_docs"
-    assert result.next_action["tool_after_confirmation"] == "prefetch_project_docs"
+    assert result.next_action["tool_after_confirmation"] == "prepare_docs"
     assert result.requires_confirmation is True
     assert result.confirmation_reason == "network_fetch"
 
@@ -2690,6 +2721,70 @@ def test_prefetch_project_docs_prefetches_rust_docs_rs(tmp_path, monkeypatch):
     assert agent.add_calls == ["https://docs.rs/serde/1.0.228/"]
     assert result.detected_ecosystems == ["rust"]
     assert result.resolution_summary["exact_versions"] == 2
+
+
+def test_prefetch_project_docs_does_not_treat_unregistered_npm_package_as_pub(tmp_path, monkeypatch):
+    project = tmp_path / "node_prefetch"
+    project.mkdir()
+    (project / "package.json").write_text('{"dependencies":{"react":"^18.0.0"}}', encoding="utf-8")
+    (project / "package-lock.json").write_text(
+        '{"packages":{"":{"dependencies":{"react":"^18.0.0"}},"node_modules/react":{"version":"18.3.1"}}}',
+        encoding="utf-8",
+    )
+    agent = FakeAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+
+    result = service.prefetch_project_docs(
+        str(project),
+        include_flutter=False,
+        include_packages=["react"],
+    )
+
+    assert result.results == []
+    assert "react: Exact npm version 18.3.1 was found, but no npm documentation source is registered." in result.warnings
+    assert agent.add_calls == []
+
+
+def test_prefetch_project_docs_reuses_registered_exact_npm_target_policy(tmp_path, monkeypatch):
+    project = tmp_path / "registered_node_prefetch"
+    project.mkdir()
+    (project / "package.json").write_text('{"dependencies":{"react":"^18.0.0"}}', encoding="utf-8")
+    (project / "package-lock.json").write_text(
+        '{"packages":{"":{"dependencies":{"react":"^18.0.0"}},"node_modules/react":{"version":"18.3.1"}}}',
+        encoding="utf-8",
+    )
+    agent = FakeAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+    now = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    service.registry.upsert(
+        library="react",
+        ecosystem="npm",
+        version="18.3.1",
+        docs_url=None,
+        docs_url_template="https://docs.example.com/react/{version}/",
+        source_type="api",
+        now=now,
+        status="available",
+        target_spec={
+            "library": "react",
+            "ecosystem": "npm",
+            "version": "18.3.1",
+            "docs_url_template": "https://docs.example.com/react/{version}/",
+            "allowed_domains": ["docs.example.com"],
+            "path_prefixes": ["/react/18.3.1/"],
+        },
+    )
+
+    result = service.prefetch_project_docs(
+        str(project),
+        include_flutter=False,
+        include_packages=["react"],
+    )
+
+    assert len(result.results) == 1
+    assert result.results[0].status == "ready"
+    assert result.results[0].library_id == "npm:react@18.3.1:api"
+    assert agent.add_calls == ["https://docs.example.com/react/18.3.1/"]
 
 
 def test_prefetch_project_docs_missing_package_returns_warning(tmp_path, monkeypatch):
