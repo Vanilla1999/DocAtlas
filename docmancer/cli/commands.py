@@ -1770,6 +1770,7 @@ def eval_cmd(
 @click.option("--base", default=None, help="Base git ref used to discover changed files.")
 @click.option("--head", default="HEAD", show_default=True, help="Head git ref used with --base.")
 @click.option("--changed-file", "changed_files", multiple=True, help="Changed repository path; may be repeated instead of --base.")
+@click.option("--changed-symbol", "changed_symbols", multiple=True, help="Changed API symbol or config key; may be repeated for section-level hints.")
 @click.option("output_format", "--format", type=click.Choice(["markdown", "json"], case_sensitive=False), default="markdown", show_default=True)
 @click.option("--fail-on-missing", is_flag=True, default=False, help="Exit non-zero when a changed module has no maintained docs.")
 def docs_impact_cmd(
@@ -1777,6 +1778,7 @@ def docs_impact_cmd(
     base: str | None,
     head: str,
     changed_files: tuple[str, ...],
+    changed_symbols: tuple[str, ...],
     output_format: str,
     fail_on_missing: bool,
 ):
@@ -1789,7 +1791,7 @@ def docs_impact_cmd(
         raise click.UsageError("Pass --base to read git diff paths, or at least one --changed-file.")
     try:
         paths = changed_files_from_git(project_path, base, head) if base else list(changed_files)
-        report = analyze_docs_impact(project_path, paths)
+        report = analyze_docs_impact(project_path, paths, changed_symbols=list(changed_symbols))
     except ValueError as exc:
         raise click.ClickException(str(exc)) from exc
     if output_format.lower() == "json":
