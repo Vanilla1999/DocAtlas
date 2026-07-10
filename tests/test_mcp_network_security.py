@@ -9,6 +9,7 @@ from docmancer.mcp.executors.http import HttpExecutor
 from docmancer.mcp.network_policy import (
     HttpGrant,
     SecurityError,
+    ValidatedHttpTarget,
     grant_from_mapping,
     validate_http_target,
     validate_resolution_stability,
@@ -110,7 +111,7 @@ def test_dns_resolution_change_is_blocked_before_request(monkeypatch):
 
 
 def test_resolution_stability_ignores_dns_answer_order():
-    target = validate_http_target.__annotations__["return"](
+    target = ValidatedHttpTarget(
         url="https://example.com/v1",
         scheme="https",
         host="example.com",
