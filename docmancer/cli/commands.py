@@ -1767,6 +1767,29 @@ def docs_impact_cmd(
 
 
 @click.command(
+    "agent-contract",
+    cls=DocmancerCommand,
+    context_settings=HELP_CONTEXT_SETTINGS,
+    short_help="Describe the local docs workflow for coding agents.",
+    epilog=format_examples(
+        "doc-atlas agent-contract --project-path .",
+        "doc-atlas agent-contract --project-path ./my-project --format json",
+    ),
+)
+@click.option("--project-path", default=".", type=click.Path(exists=True, file_okay=False, path_type=str), show_default=True)
+@click.option("output_format", "--format", type=click.Choice(["markdown", "json"], case_sensitive=False), default="json", show_default=True)
+def agent_contract_cmd(project_path: str, output_format: str) -> None:
+    """Emit source-of-truth and tool-selection rules for a local project."""
+    from docmancer.docs.agent_contract import build_agent_contract, format_agent_contract_markdown
+
+    contract = build_agent_contract(project_path)
+    if output_format.lower() == "json":
+        click.echo(json.dumps(contract, ensure_ascii=False, indent=2))
+    else:
+        click.echo(format_agent_contract_markdown(contract))
+
+
+@click.command(
     cls=DocmancerCommand,
     context_settings=HELP_CONTEXT_SETTINGS,
     short_help="Remove an indexed source.",

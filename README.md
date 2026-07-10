@@ -207,6 +207,17 @@ doc-atlas docs-impact --changed-file packages/auth/src/token_service.ts --format
 
 The bundled GitHub Actions workflow publishes this report in every pull request summary. It highlights module docs that need review and module changes with no maintained documentation, while leaving the final documentation edit to an explicit, reviewable change.
 
+### Agent contract for a local project
+
+Before handing a repository to a coding agent, generate a compact, machine-readable contract. It tells the agent which local documents are authoritative, which dependency versions were detected, and how to select the minimal DocAtlas MCP tool surface:
+
+```bash
+doc-atlas agent-contract --project-path . --format json
+doc-atlas agent-contract --project-path . --format markdown
+```
+
+The contract is read-only. For an explicit health, freshness, index, or job-status request, agents use `docs_status`; otherwise they start with `get_docs_context`. Agents call `prepare_docs` only when that tool returns it as `next_action`, or when a user explicitly requests a refresh or sync.
+
 ## Project-aware exact dependency docs
 
 DocAtlas can inspect a local Flutter/Dart project. It reads `.fvmrc` for Flutter channel/version hints and `pubspec.lock` for pub package versions. This enables exact-version documentation for the dependencies your project actually uses.
