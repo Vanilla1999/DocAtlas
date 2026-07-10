@@ -103,14 +103,6 @@ This makes `get_docs_context` the single high-level entry point. For coding/API/
 4. indexes new and changed candidates;
 5. returns `current_count`, `new_count`, `changed_count`, `orphaned_removed`, and `indexed_sources`.
 
-## Advanced surfaces
-
-MCP Packs are an advanced layer of version-pinned API action tools, exposed by `doc-atlas mcp packs-serve`. They are separate from the Docs MCP and are not needed for the workflow above. `doc-atlas mcp serve` is retained only as a compatibility alias.
-
-Patch planning and patch constraints are advanced compatibility tools behind `DOCMANCER_MCP_ADVANCED_TOOLS=1`. They are advisory: they help an agent gather evidence and validate a proposed edit, but never prove that a change is safe to merge or replace tests and review. Detailed usage lives in [the Docs MCP reference](./docs/mcp-docs-server.md).
-
-Internal and compatibility CLI commands remain supported, but are intentionally kept out of the beginner path. See the [capability reference](./docs/capabilities.md) when you need a CLI fallback, diagnostics, benchmark tooling, Qdrant management, USPTO ingestion, or Pack administration. The explicit product boundaries and evidence rules are in [Product scope and evidence](./docs/product-scope.md).
-
 ### Compact MCP responses
 
 All project-docs lifecycle tools return compact responses by default:
@@ -160,6 +152,14 @@ doc-atlas agent-contract --project-path . --format markdown
 ```
 
 The contract is read-only. For an explicit health, freshness, index, or job-status request, agents use `docs_status`; otherwise they start with `get_docs_context`. Agents call `prepare_docs` only when that tool returns it as `next_action`, or when a user explicitly requests a refresh or sync.
+
+## Advanced surfaces
+
+MCP Packs are an advanced layer of version-pinned API action tools, exposed by `doc-atlas mcp packs-serve`. They are separate from the Docs MCP and are not needed for the workflow above. `doc-atlas mcp serve` is retained only as a compatibility alias.
+
+Patch planning and patch constraints are advanced compatibility tools behind `DOCMANCER_MCP_ADVANCED_TOOLS=1`. They are advisory: they help an agent gather evidence and validate a proposed edit, but never prove that a change is safe to merge or replace tests and review. Detailed usage lives in [the Docs MCP reference](./docs/mcp-docs-server.md).
+
+Internal and compatibility CLI commands remain supported, but are intentionally kept out of the beginner path. See the [capability reference](./docs/capabilities.md) when you need a CLI fallback, diagnostics, benchmark tooling, Qdrant management, USPTO ingestion, or Pack administration. The explicit product boundaries and evidence rules are in [Product scope and evidence](./docs/product-scope.md).
 
 ## Project-aware exact dependency docs
 
