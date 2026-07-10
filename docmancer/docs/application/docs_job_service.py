@@ -108,6 +108,12 @@ class DocsJobTracker:
             job = self._jobs.get(job_id)
             if job is None:
                 return DocsJobCancelResult(job_id=job_id, status="not_found", message="Job not found.")
+            if job.phase == "committing":
+                return DocsJobCancelResult(
+                    job_id=job_id,
+                    status=job.status,
+                    message="Job is committing and can no longer be cancelled safely.",
+                )
             self._cancel_requested.add(job_id)
             if job.status in {"succeeded", "partial", "failed", "cancelled"}:
                 status = "cancelled" if job.status == "cancelled" else "cancelling"
