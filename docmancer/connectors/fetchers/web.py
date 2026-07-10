@@ -103,6 +103,7 @@ class WebFetcher:
         doc_format: str | None = None,
         seed_urls: list[str] | None = None,
         progress_callback=None,
+        cancellation_callback=None,
     ):
         self._timeout = timeout
         self._max_pages = max_pages
@@ -114,6 +115,7 @@ class WebFetcher:
         self._doc_format = doc_format
         self._seed_urls = list(seed_urls or [])
         self._progress_callback = progress_callback
+        self._cancellation_callback = cancellation_callback
         self.last_discovery_diagnostics: dict | None = None
 
     def _emit_progress(self, event: dict) -> None:
@@ -143,6 +145,7 @@ class WebFetcher:
         Raises:
             ValueError: If no documentation pages could be discovered or fetched.
         """
+        self._raise_if_cancelled()
         base_url = url.rstrip("/")
 
         with httpx.Client(**self._client_kwargs()) as client:
@@ -159,6 +162,7 @@ class WebFetcher:
 
             # Step 1: Fetch homepage and detect platform
             platform, root_html, root_headers = self._fetch_and_detect(base_url, client)
+            self._raise_if_cancelled()
             logger.info("Detected platform: %s", platform.value)
 
             # Step 2: Set up robots.txt checker
@@ -181,6 +185,7 @@ class WebFetcher:
                 seed_urls=self._seed_urls,
             )
             discovered = discovery_result.urls
+            self._raise_if_cancelled()
             self.last_discovery_diagnostics = discovery_result.diagnostics
 
             if not discovered and is_dartdoc_html(root_html, url=base_url):
@@ -222,6 +227,10 @@ class WebFetcher:
 
             # Step 5: Fetch and extract each page
             return self._fetch_pages(discovered, base_url, client, platform, robots)
+
+    def _raise_if_cancelled(self) -> None:
+        if self._cancellation_callback and self._cancellation_callback():
+            raise RuntimeError("Documentation fetch cancelled.")
 
     @staticmethod
     def _is_direct_text_url(url: str) -> bool:
@@ -350,6 +359,7 @@ class WebFetcher:
         documents = []
         unique_discovered: list[DiscoveredUrl] = []
         for disc in discovered:
+            self._raise_if_cancelled()
             normalized = normalize_url(disc.url)
             if deduplicator.is_url_duplicate(normalized):
                 continue
@@ -372,6 +382,7 @@ class WebFetcher:
             ]
             deduplicator.reset()
             for future in as_completed(futures):
+                self._raise_if_cancelled()
                 completed_fetches = getattr(self, "_completed_fetches", 0) + 1
                 self._completed_fetches = completed_fetches
                 page = future.result()
