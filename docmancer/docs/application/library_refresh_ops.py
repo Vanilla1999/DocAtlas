@@ -179,6 +179,7 @@ class LibraryRefreshOps:
                     browser=target.browser,
                     seed_urls=seed_urls_for_discovery if (target.docs_url or target.docs_url_template) else None,
                     metadata=_metadata_for_record(record),
+                    cancellation_callback=should_cancel,
                 )
                 if isinstance(indexed_sections, int):
                     sections_indexed += indexed_sections
@@ -243,12 +244,15 @@ class LibraryRefreshOps:
         if begin_commit and not begin_commit():
             self._discard_staging(staging)
             return self._cancelled_result(record, started)
-        if staging:
-            self._promote_staging(record, staging)
+
+        def _commit_registry(**values: Any) -> Any:
+            update = lambda: self.registry.upsert(**values)
+            return self._publish_staging_and_update(record, staging, update)
+
         if sections_indexed == 0 or pages_after == 0 or chunks_after == 0:
             refreshed_at = self._now()
             reason = "ingest_produced_no_chunks" if sections_indexed > 0 else "no_extractable_content"
-            self.registry.upsert(
+            _commit_registry(
                 library=record.name,
                 ecosystem=record.ecosystem,
                 version=record.version,
@@ -298,7 +302,7 @@ class LibraryRefreshOps:
             )
 
         refreshed_at = self._now()
-        self.registry.upsert(
+        _commit_registry(
             library=record.name,
             ecosystem=record.ecosystem,
             version=record.version,
@@ -529,12 +533,16 @@ class LibraryRefreshOps:
         staging = production.model_copy(deep=True)
         staging.index.db_path = str(root / "index.db")
         staging.index.extracted_dir = str(root / "extracted")
-        if db_path.exists():
-            with sqlite3.connect(db_path) as source, sqlite3.connect(staging.index.db_path) as destination:
-                source.backup(destination)
-        extracted = Path(production.index.extracted_dir)
-        if extracted.exists():
-            shutil.copytree(extracted, staging.index.extracted_dir)
+        try:
+            if db_path.exists():
+                with sqlite3.connect(db_path) as source, sqlite3.connect(staging.index.db_path) as destination:
+                    source.backup(destination)
+            extracted = Path(production.index.extracted_dir)
+            if extracted.exists():
+                shutil.copytree(extracted, staging.index.extracted_dir)
+        except Exception:
+            shutil.rmtree(root, ignore_errors=True)
+            raise
         return staging, root
 
     @staticmethod
@@ -550,7 +558,14 @@ class LibraryRefreshOps:
         except sqlite3.Error:
             return 0, 0
 
-    def _promote_staging(self, record: LibraryRecord, staging: tuple[Any, Path]) -> None:
+    def _publish_staging_and_update(
+        self,
+        record: LibraryRecord,
+        staging: tuple[Any, Path] | None,
+        registry_update: Callable[[], Any],
+    ) -> Any:
+        if staging is None:
+            return registry_update()
         staging_config, staging_root = staging
         production = self._index_config_for(record)
         production_db = Path(production.index.db_path)
@@ -562,6 +577,9 @@ class LibraryRefreshOps:
         backup_extracted = backup_root / "extracted"
         candidate_db = backup_root / "candidate.db"
 
+        committed = False
+        rolled_back = False
+        result: Any = None
         with self._lock_for(record.library_id):
             try:
                 if staging_db.exists():
@@ -577,21 +595,31 @@ class LibraryRefreshOps:
                 if staging_extracted.exists():
                     production_extracted.parent.mkdir(parents=True, exist_ok=True)
                     staging_extracted.replace(production_extracted)
-            except Exception:
-                if production_db.exists():
-                    production_db.unlink()
-                if backup_db.exists():
-                    backup_db.replace(production_db)
-                if production_extracted.exists():
-                    shutil.rmtree(production_extracted)
-                if backup_extracted.exists():
-                    production_extracted.parent.mkdir(parents=True, exist_ok=True)
-                    backup_extracted.replace(production_extracted)
+                result = registry_update()
+                committed = True
+            except Exception as commit_error:
+                try:
+                    if production_db.exists():
+                        production_db.unlink()
+                    if backup_db.exists():
+                        backup_db.replace(production_db)
+                    if production_extracted.exists():
+                        shutil.rmtree(production_extracted)
+                    if backup_extracted.exists():
+                        production_extracted.parent.mkdir(parents=True, exist_ok=True)
+                        backup_extracted.replace(production_extracted)
+                    rolled_back = True
+                except Exception as rollback_error:
+                    raise RuntimeError(
+                        f"Library index commit failed and rollback backup was preserved at {backup_root}: {rollback_error}"
+                    ) from commit_error
                 raise
             finally:
-                shutil.rmtree(backup_root, ignore_errors=True)
                 shutil.rmtree(staging_root, ignore_errors=True)
+                if committed or rolled_back:
+                    shutil.rmtree(backup_root, ignore_errors=True)
         self.agent_gateway.drop_library_agent(record)
+        return result
 
     @staticmethod
     def _discard_staging(staging: tuple[Any, Path] | None) -> None:
