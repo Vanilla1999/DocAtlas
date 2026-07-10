@@ -107,13 +107,18 @@ class ProjectDocsState:
         available = bool(exact_dependencies)
         dependency_next_action: dict[str, Any] = {}
         if missing:
+            missing_packages = sorted({item["library"] for item in missing})
             dependency_next_action = {
                 "type": "ask_user_to_prefetch_dependency_docs",
-                "tool_after_confirmation": "prefetch_project_docs",
+                "tool_after_confirmation": "prepare_docs",
                 "alias_tool_after_confirmation": "prefetch_project_dependency_docs",
                 "requires_confirmation": True,
                 "confirmation_reason": "network_fetch",
-                "arguments_patch": {"project_path": metadata.project_path},
+                "arguments_patch": {
+                    "action": "prefetch_project_dependency_docs",
+                    "project_path": metadata.project_path,
+                    "include_packages": missing_packages,
+                },
                 "user_message": "I found dependency manifests/lockfiles. I can fetch exact documentation for the dependency versions used by this project. This may use the network. Proceed?",
             }
         return {
