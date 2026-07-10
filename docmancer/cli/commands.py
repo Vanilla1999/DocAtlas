@@ -703,7 +703,7 @@ def _install_or_append_agents_md(dest: Path, content_body: str) -> None:
         existing = dest.read_text(encoding="utf-8")
         start_idx = existing.find(_AGENTS_MD_START)
         end_idx = existing.find(_AGENTS_MD_END)
-        if start_idx != -1 and end_idx != -1:
+        if start_idx != -1 and end_idx != -1 and start_idx < end_idx:
             # Replace existing block
             new_content = (
                 existing[:start_idx]
@@ -711,12 +711,16 @@ def _install_or_append_agents_md(dest: Path, content_body: str) -> None:
                 + existing[end_idx + len(_AGENTS_MD_END):]
             )
             dest.write_text(new_content, encoding="utf-8")
-        else:
+        elif start_idx == -1 and end_idx == -1:
             # Append to file
-            separator = "\n\n" if existing.strip() else ""
+            separator = "\n\n" if existing and not existing.endswith("\n\n") else ""
             dest.write_text(
-                existing.rstrip() + separator + marker_block + "\n",
+                existing + separator + marker_block + "\n",
                 encoding="utf-8",
+            )
+        else:
+            raise click.ClickException(
+                f"Could not update {display_path(dest)} because its DocAtlas markers are incomplete or out of order."
             )
     else:
         dest.write_text(marker_block + "\n", encoding="utf-8")
@@ -745,13 +749,13 @@ def _install_project_bootstrap(agent: str) -> Path | None:
     return dest
 
 
-def _register_mcp_for_agent(agent_name: str) -> None:
+def _register_mcp_for_agent(agent_name: str, *, project: bool) -> None:
     """Register `doc-atlas mcp docs-serve` into a known agent's MCP config (best-effort)."""
     try:
         from docmancer.cli.mcp_commands import register_docmancer_mcp_in_agent
     except Exception:
         return
-    msg = register_docmancer_mcp_in_agent(agent_name)
+    msg = register_docmancer_mcp_in_agent(agent_name, project=project)
     if msg:
         _emit_status_line(msg, indent=0)
 
@@ -2082,7 +2086,7 @@ def install_cmd(agent: str, project: bool, config_path: str | None):
     """
     config_path = _effective_config(config_path)
     normalized = agent.lower()
-    _register_mcp_for_agent(normalized)
+    _register_mcp_for_agent(normalized, project=project)
     home = Path.home()
     user_config_exists_before = _get_user_config_path().exists()
     effective_config_path = _resolve_install_config_path(config_path, project)
@@ -2132,18 +2136,19 @@ def install_cmd(agent: str, project: bool, config_path: str | None):
         return
 
     if normalized in {"codex", "codex-app", "codex-desktop"}:
-        dest = _get_codex_skill_path()
-        shared_dest = _get_shared_agent_skill_path()
-        content = _build_skill_content("skill.md", effective_config_path)
-        _install_skill_file(content, dest)
-        _install_skill_file(content, shared_dest)
-        bootstrap_dest = _install_project_bootstrap(normalized) if project else None
-        installed = [
-            ("Installed docmancer skill at", dest),
-            ("Also installed shared compatibility skill at", shared_dest),
-        ]
-        if bootstrap_dest:
-            installed.append(("Updated project instructions at", bootstrap_dest))
+        if project:
+            bootstrap_dest = _install_project_bootstrap(normalized)
+            installed = [("Updated project instructions at", bootstrap_dest)]
+        else:
+            dest = _get_codex_skill_path()
+            shared_dest = _get_shared_agent_skill_path()
+            content = _build_skill_content("skill.md", effective_config_path)
+            _install_skill_file(content, dest)
+            _install_skill_file(content, shared_dest)
+            installed = [
+                ("Installed docmancer skill at", dest),
+                ("Also installed shared compatibility skill at", shared_dest),
+            ]
         _emit_install_summary(
             "Install skill for Codex.",
             installed,
@@ -2208,6 +2213,7 @@ def install_cmd(agent: str, project: bool, config_path: str | None):
             copilot_dest = Path(".github") / "copilot-instructions.md"
             agents_dest = Path("AGENTS.md")
             settings_dest = Path(".vscode") / "settings.json"
+            mcp_dest = Path(".vscode") / "mcp.json"
             bootstrap = _get_template_content("project_bootstrap.md")
             _install_or_append_agents_md(copilot_dest, bootstrap)
             _install_or_append_agents_md(agents_dest, bootstrap)
@@ -2218,6 +2224,7 @@ def install_cmd(agent: str, project: bool, config_path: str | None):
                     ("Updated Copilot repository instructions at", copilot_dest),
                     ("Updated Copilot coding-agent fallback at", agents_dest),
                     ("Enabled VS Code Copilot instruction files at", settings_dest),
+                    ("Registered Docs MCP server at", mcp_dest),
                 ],
                 created_user_config,
                 effective_config_path,
@@ -2269,19 +2276,18 @@ def install_cmd(agent: str, project: bool, config_path: str | None):
         return
 
     if normalized == "opencode":
-        dest = home / ".config" / "opencode" / "skills" / "docmancer" / "SKILL.md"
-        content = _build_skill_content("skill.md", effective_config_path)
-        _install_skill_file(content, dest)
-        bootstrap_dest = _install_project_bootstrap(normalized) if project else None
-
-        # Also write to shared ~/.agents/skills/ path if not already installed by codex
-        shared_dest = _get_shared_agent_skill_path()
-        installed_paths = [("Installed docmancer skill at", dest)]
-        if not shared_dest.exists():
-            _install_skill_file(content, shared_dest)
-            installed_paths.append(("Also installed at shared path", shared_dest))
-        if bootstrap_dest:
-            installed_paths.append(("Updated project instructions at", bootstrap_dest))
+        if project:
+            bootstrap_dest = _install_project_bootstrap(normalized)
+            installed_paths = [("Updated project instructions at", bootstrap_dest)]
+        else:
+            dest = home / ".config" / "opencode" / "skills" / "docmancer" / "SKILL.md"
+            content = _build_skill_content("skill.md", effective_config_path)
+            _install_skill_file(content, dest)
+            shared_dest = _get_shared_agent_skill_path()
+            installed_paths = [("Installed docmancer skill at", dest)]
+            if not shared_dest.exists():
+                _install_skill_file(content, shared_dest)
+                installed_paths.append(("Also installed at shared path", shared_dest))
 
         _emit_install_summary(
             "Install skill for OpenCode.",
