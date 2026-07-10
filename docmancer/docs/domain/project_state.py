@@ -68,7 +68,33 @@ def create_project_docs_next_action(root: Path, query: str | None = None, *, rea
         "preferred_path": "ARCHITECTURE.md",
         "suggested_paths": ["ARCHITECTURE.md", "README.md", "docs/architecture.md"],
         "reason": reason or "No official project docs files were discovered. Ask the user before creating a reviewable architecture doc in the repository.",
-        "agent_guidance": "If the user approves, inspect the codebase, create ARCHITECTURE.md as a normal reviewable file, then call inspect_project_docs and sync_project_docs before answering repo-specific architecture questions.",
+        "agent_guidance": "If the user approves, inspect the listed evidence, create ARCHITECTURE.md as a normal reviewable file, then sync it before answering repo-specific architecture questions.",
+        "documentation_gap": {
+            "suggested_path": "ARCHITECTURE.md",
+            "required_sections": [
+                {"name": "purpose", "evidence": ["manifests", "root entrypoints"]},
+                {"name": "entrypoints", "evidence": ["root entrypoints", "runtime configuration"]},
+                {"name": "modules", "evidence": ["module directories", "module imports"]},
+                {"name": "runtime flow", "evidence": ["entrypoints", "module imports", "runtime configuration"]},
+                {"name": "development commands", "evidence": ["manifests", "test and build configuration"]},
+            ],
+            "evidence_to_collect": [
+                "manifests",
+                "root entrypoints",
+                "module directories and imports",
+                "runtime configuration",
+                "test and build configuration",
+            ],
+            "rules": [
+                "do not invent unsupported facts",
+                "cite repository paths for factual claims",
+                "mark uncertain claims as unknown",
+            ],
+        },
+        "after_file_change": {
+            "tool": "prepare_docs",
+            "arguments_patch": {"action": "sync_project_docs", "project_path": str(root)},
+        },
         "after": [
             {"tool": "inspect_project_docs", "requires_confirmation": False, "arguments_patch": {"project_path": str(root)}},
             {"tool": "sync_project_docs", "requires_confirmation": False, "arguments_patch": {"project_path": str(root)}},
