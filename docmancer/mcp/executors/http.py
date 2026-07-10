@@ -46,15 +46,15 @@ class HttpExecutor(Executor):
         path_args, query_args, header_args, body_args = _partition_args(params, args)
 
         url = base_url.rstrip("/") + _render_path(path_template, path_args)
-        grant_mapping = operation.get("_docmancer_http_grant")
-        if grant_mapping is None:
-            parsed_for_compat = urlparse(url)
-            grant_mapping = {
-                "allowed_hosts": [parsed_for_compat.hostname] if parsed_for_compat.hostname else [],
-                "allow_http": parsed_for_compat.scheme == "http",
-            }
-        grant = grant_from_mapping(grant_mapping)
         try:
+            grant_mapping = operation.get("_docmancer_http_grant")
+            if grant_mapping is None:
+                parsed_for_compat = urlparse(url)
+                grant_mapping = {
+                    "allowed_hosts": [parsed_for_compat.hostname] if parsed_for_compat.hostname else [],
+                    "allow_http": parsed_for_compat.scheme == "http",
+                }
+            grant = grant_from_mapping(grant_mapping)
             validated_target = validate_http_target(url, grant)
             validate_resolution_stability(
                 operation.get("_docmancer_http_resolved_ips") or (),
@@ -133,11 +133,16 @@ class HttpExecutor(Executor):
             if owns_client:
                 client.close()
 
+        try:
+            decoded_content = content.decode(response_encoding)
+        except (LookupError, UnicodeDecodeError):
+            decoded_content = content.decode("utf-8", errors="replace")
+
         body: Any
         try:
-            body = json.loads(content.decode(response_encoding))
-        except (ValueError, UnicodeDecodeError):
-            body = content.decode(response_encoding, errors="replace")
+            body = json.loads(decoded_content)
+        except ValueError:
+            body = decoded_content
 
         ok = 200 <= response_status < 300
         return ExecutorResult(
