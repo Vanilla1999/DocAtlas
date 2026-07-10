@@ -235,20 +235,41 @@ def _read_bun_lock(path: Path, manifest: dict[str, tuple[str, str]], warnings: l
     if isinstance(data, dict):
         packages = data.get("packages")
         if isinstance(packages, dict):
-            for _key, entry in packages.items():
-                if not isinstance(entry, dict):
-                    continue
-                name, version = entry.get("name"), entry.get("version")
-                if isinstance(name, str) and isinstance(version, str) and name in manifest:
-                    versions[name] = version
+            for key, entry in packages.items():
+                if isinstance(entry, dict):
+                    name, version = entry.get("name"), entry.get("version")
+                    if isinstance(name, str) and isinstance(version, str) and name in manifest:
+                        versions[name] = version
+                elif isinstance(key, str) and key in manifest and isinstance(entry, list) and entry:
+                    version = _bun_package_ref_version(key, entry[0])
+                    if version:
+                        versions[key] = version
     for name in manifest:
         if name in versions:
             continue
         escaped = re.escape(name)
+        array_match = re.search(
+            rf'(?ms)["\']{escaped}["\']\s*:\s*\[\s*["\']([^"\']+)["\']',
+            text,
+        )
+        if array_match:
+            version = _bun_package_ref_version(name, array_match.group(1))
+            if version:
+                versions[name] = version
+                continue
         match = re.search(rf'(?m)["\']?{escaped}["\']?[^\n]*?["\'](\d+(?:\.\d+){{1,3}}(?:[-+][A-Za-z0-9.-]+)?)["\']', text)
         if match:
             versions[name] = match.group(1)
     return versions
+
+
+def _bun_package_ref_version(name: str, value: object) -> str | None:
+    if not isinstance(value, str):
+        return None
+    prefix = f"{name}@"
+    candidate = value[len(prefix):] if value.startswith(prefix) else value
+    candidate = candidate.removeprefix("npm:")
+    return candidate if re.fullmatch(r"\d+(?:\.\d+){1,3}(?:[-+][A-Za-z0-9_.-]+)?", candidate) else None
 
 
 def _parse_yarn_selector(selector: str) -> tuple[str, str] | None:
