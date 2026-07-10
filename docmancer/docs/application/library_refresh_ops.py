@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 import time
 
 import httpx
@@ -333,14 +333,39 @@ class LibraryRefreshOps:
         source_type: str | None = None,
         force: bool = True,
         continue_on_error: bool = True,
+        should_cancel: Callable[[], bool] | None = None,
     ) -> RefreshResult:
         started = time.monotonic()
+        if should_cancel and should_cancel():
+            return RefreshResult(
+                library_id=None,
+                status="cancelled",
+                docs_url=docs_url_template or docs_url,
+                last_refreshed_at=None,
+                version=version,
+                source_type=source_type or "api",
+                message="Library docs prefetch cancelled.",
+            )
         if versions:
             updated = skipped = failed = needs_url = 0
             pages_indexed = pages_failed = chunks_indexed = 0
             last: RefreshResult | None = None
             failure_codes: list[str] = []
             for item_version in versions:
+                if should_cancel and should_cancel():
+                    return RefreshResult(
+                        library_id=None,
+                        status="cancelled",
+                        docs_url=docs_url_template or docs_url,
+                        last_refreshed_at=last.last_refreshed_at if last else None,
+                        message="Library docs prefetch cancelled.",
+                        duration_ms=int((time.monotonic() - started) * 1000),
+                        pages_indexed=pages_indexed,
+                        pages_failed=pages_failed,
+                        chunks_indexed=chunks_indexed,
+                        targets_completed=updated + skipped,
+                        targets_failed=failed + needs_url,
+                    )
                 last = self.refresh_docs(
                     library,
                     ecosystem=ecosystem,
@@ -350,6 +375,7 @@ class LibraryRefreshOps:
                     source_type=source_type,
                     force=force,
                     continue_on_error=continue_on_error,
+                    should_cancel=should_cancel,
                 )
                 if last.status == "updated":
                     updated += 1
@@ -415,6 +441,7 @@ class LibraryRefreshOps:
         source_type: str | None = None,
         force_refresh: bool = False,
         continue_on_error: bool = True,
+        should_cancel: Callable[[], bool] | None = None,
     ) -> RefreshResult:
         selected_versions = versions or ["latest"]
         result = self.refresh_docs(
@@ -426,6 +453,7 @@ class LibraryRefreshOps:
             source_type=source_type,
             force=force_refresh,
             continue_on_error=continue_on_error,
+            should_cancel=should_cancel,
         )
         messages = []
         if not versions:
