@@ -3391,6 +3391,10 @@ def test_library_prefetch_job_cancellation_reaches_terminal_cancelled_state(tmp_
 
     assert agent.entered.wait(timeout=1)
     assert service.cancel_docs_job(result.job_id).status == "cancelling"
+    status = service.get_docs_job_status(result.job_id)
+    assert status is not None
+    assert status.status == "cancelling"
+    agent.release.set()
     for _ in range(30):
         status = service.get_docs_job_status(result.job_id)
         if status and status.status == "cancelled":
@@ -3402,7 +3406,6 @@ def test_library_prefetch_job_cancellation_reaches_terminal_cancelled_state(tmp_
     assert status.status == "cancelled"
     assert status.reason_code == "cancelled"
     assert status.retryable is True
-    agent.release.set()
 
 
 def test_cancelled_library_prefetch_restores_index_state_after_inflight_fetch(tmp_path, monkeypatch):
@@ -3481,6 +3484,17 @@ def test_library_prefetch_job_deadline_is_terminal_and_retryable(tmp_path, monke
     assert agent.entered.wait(timeout=1)
     for _ in range(30):
         status = service.get_docs_job_status(result.job_id)
+        if status and status.status == "cancelling":
+            break
+        time.sleep(0.02)
+
+    status = service.get_docs_job_status(result.job_id)
+    assert status is not None
+    assert status.status == "cancelling"
+    assert status.reason_code == "job_deadline_exceeded"
+    agent.release.set()
+    for _ in range(30):
+        status = service.get_docs_job_status(result.job_id)
         if status and status.status == "failed":
             break
         time.sleep(0.02)
@@ -3490,7 +3504,40 @@ def test_library_prefetch_job_deadline_is_terminal_and_retryable(tmp_path, monke
     assert status.status == "failed"
     assert status.reason_code == "job_deadline_exceeded"
     assert status.retryable is True
+    record = service.registry.get("example-docs", "web", "latest")
+    assert record is not None
+    index_parent = Path(service._index_config_for(record).index.db_path).parent
+    assert list(index_parent.glob(".docatlas-staging-*")) == []
+
+
+def test_registry_commit_failure_rolls_back_published_staging_index(tmp_path, monkeypatch):
+    agent = SlowIndexingAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+    result = service.prefetch_docs(
+        "example-docs",
+        ecosystem="web",
+        docs_url="https://example.com/docs/",
+        async_=True,
+    )
+    assert agent.entered.wait(timeout=1)
+
+    monkeypatch.setattr(
+        service.registry,
+        "upsert",
+        lambda *args, **kwargs: (_ for _ in ()).throw(RuntimeError("registry commit failed")),
+    )
     agent.release.set()
+    for _ in range(30):
+        status = service.get_docs_job_status(result.job_id)
+        if status and status.status == "failed":
+            break
+        time.sleep(0.02)
+
+    record = service.registry.get("example-docs", "web", "latest")
+    assert record is not None
+    assert status is not None
+    assert status.status == "failed"
+    assert service.library_docs.registry_ops.count_index_entries(record) == (0, 0)
 
 
 def test_library_prefetch_job_exposes_structured_retryable_network_error(tmp_path, monkeypatch):
