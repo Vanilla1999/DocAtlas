@@ -18,14 +18,14 @@ Inside the Docmancer repository, ask the agent a repo-specific question such as:
 
 Preferred public MCP happy path:
 
-1. Call `inspect_project_docs(project_path=".")`. This is read-only and discovers `README.md`, roadmap files, product brief, and other reviewable docs candidates.
-2. If `reason_code` is `project_docs_found_not_indexed` or `project_docs_stale`, call `prepare_docs(action="sync_project_docs", project_path=".")`.
-3. Call `get_docs_context(project_path=".", question="Context7 project-owned docs roadmap", mode="project")`.
+1. Call `get_docs_context(project_path=".", question="Context7 project-owned docs roadmap", mode="project")`.
+2. If it returns `prepare_docs` as `next_action`, call the exact returned action and retry `get_docs_context`.
+3. Use `docs_status` only when the user explicitly asks about health, freshness, index state, or a background job.
 4. Answer using the returned Trust Contract, `next_actions`, and chunks that include `source_class`, `path`, `heading_path`, freshness metadata, and stale state.
 
 Legacy compatibility note:
 
-Older docs surfaces may expose direct `ingest_project_docs`, `get_project_docs`, `get_project_context`, or `bootstrap_project_docs`. Treat those as legacy/admin compatibility verbs. Prefer the public flow above when `prepare_docs` and `get_docs_context` are available.
+Older docs surfaces may expose direct inspection or project-doc verbs. Treat those as advanced/legacy compatibility tools. The default surface has exactly three tools: `get_docs_context`, `prepare_docs`, and `docs_status`.
 
 ## Success criteria
 
