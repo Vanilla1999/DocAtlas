@@ -1,4 +1,4 @@
-"""Idempotent writers that register `doc-atlas mcp serve` into agent MCP configs."""
+"""Idempotent writers that register `doc-atlas mcp docs-serve` into agent MCP configs."""
 from __future__ import annotations
 
 import json
@@ -10,7 +10,7 @@ from typing import Any
 
 SERVER_KEY = "docmancer"
 COMMAND = "doc-atlas"
-ARGS = ["mcp", "serve"]
+ARGS = ["mcp", "docs-serve"]
 
 
 @dataclass

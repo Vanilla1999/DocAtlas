@@ -1,6 +1,6 @@
 """docmancer MCP server: turns installed API packs into MCP tools.
 
-Public API: `serve()` (entry point invoked by `doc-atlas mcp serve`) and the
+Public API: `serve()` (entry point invoked by `doc-atlas mcp packs-serve`) and the
 `Manifest` / `Dispatcher` types for testing.
 """
 from __future__ import annotations

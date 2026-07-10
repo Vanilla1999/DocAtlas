@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import hashlib
 import tempfile
 from dataclasses import dataclass, field, asdict
 from pathlib import Path
@@ -10,6 +11,10 @@ from typing import Any
 from docmancer.mcp import paths
 
 MANIFEST_VERSION = 1
+
+
+class IntegrityError(Exception):
+    pass
 
 
 @dataclass
@@ -21,18 +26,43 @@ class InstalledPackage:
     allow_destructive: bool = False
     allow_execute: bool = False  # opt-in for python_import / shell-style executors
     artifact_sha256: dict[str, str] = field(default_factory=dict)
+    operation_grants: dict[str, dict[str, Any]] = field(default_factory=dict)
 
     @property
     def directory(self) -> Path:
         return paths.package_dir(self.package, self.version)
 
     def contract(self) -> dict[str, Any]:
+        verify_artifacts(self)
         return _read_json(self.directory / "contract.json")
 
     def tools(self) -> list[dict[str, Any]]:
+        verify_artifacts(self)
         artifact = "tools.full.json" if self.expanded else "tools.curated.json"
         data = _read_json(self.directory / artifact)
         return data.get("tools", []) if isinstance(data, dict) else data
+
+    def grant_for(self, operation_id: str) -> dict[str, Any]:
+        return self.operation_grants.get(operation_id, {})
+
+
+def sha256_file(path: Path) -> str:
+    h = hashlib.sha256()
+    with path.open("rb") as f:
+        for chunk in iter(lambda: f.read(1024 * 1024), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def verify_artifacts(pkg: InstalledPackage) -> None:
+    for rel_path, expected in pkg.artifact_sha256.items():
+        path = pkg.directory / rel_path
+        if not path.exists():
+            raise IntegrityError(f"missing_artifact:{rel_path}")
+        expected = expected.removeprefix("sha256:")
+        actual = sha256_file(path)
+        if actual != expected:
+            raise IntegrityError(f"artifact_hash_mismatch:{rel_path}")
 
 
 @dataclass

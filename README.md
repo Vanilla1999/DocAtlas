@@ -116,22 +116,21 @@ Project-docs tools let agents start from reviewable repository files, then move 
 | `get_patch_plan_context` | Builds a compact implementation map from source, dependency, and design evidence: relevant files, existing APIs, missing symbols, minimal patch path, risks, and verification. It does not replace `get_docs_context` or `get_patch_constraints`. |
 | `get_patch_constraints` | Returns source-attributed constraints before patching. Use it after planning and before editing; it is not replaced by `get_patch_plan_context`. |
 | `validate_patch_against_constraints` | Performs deterministic advisory validation after a patch and keeps semantic uncertainty as unknown/manual review. |
-| `sync_project_docs` | **Canonical lifecycle action.** Discovers, reconciles, prunes orphaned/stale, and indexes project docs in one call. Prefer over `ingest_project_docs`. |
+| `prepare_docs(action="sync_project_docs")` | **Canonical public MCP lifecycle action.** Discovers, reconciles, prunes orphaned/stale, and indexes project docs in one call. Prefer over direct legacy `ingest_project_docs`. |
 | `inspect_project_docs` | Read-only discovery: reports discovered candidates, indexed docs, stale/ignored/orphaned sources, reason_code, and next_action. |
-| `ingest_project_docs` | Legacy low-level index operation. Does not reconcile — use `sync_project_docs`. |
-| `bootstrap_project_docs` | Safe high-level onboarding: inspect, sync if needed, inspect again. Stops before repo writes or network fetches. |
-| `get_project_docs` | Query indexed project docs for repo-specific architecture, conventions, README, ADRs, runbooks, or module docs. |
-| `get_project_context` | Compact repo-grounded context pack combining project docs with optional dependency-doc evidence and a Trust Contract. |
+| `get_docs_context(mode="project")` | Compact repo-grounded context pack for repo-specific architecture, conventions, README, ADRs, runbooks, or module docs. |
 
 ### Recommended workflow
 
-For most MCP clients and coding agents, start with the unified high-level tool:
+For most MCP clients and coding agents, start with the public Docs MCP discovery path:
 
 ```text
-get_docs_context(question, project_path?, library?, mode="auto")
+inspect_project_docs
+→ prepare_docs(action="sync_project_docs") if inspect reports stale/not indexed docs
+→ get_docs_context(mode="project")
 ```
 
-DocAtlas provides one high-level MCP entry point for project, library, dependency, and mixed documentation context. For patch-like tasks, use the planning and constraint tools as separate steps:
+DocAtlas provides one high-level MCP entry point for project, library, dependency, and mixed documentation context. Embedded agent guidance for repository docs should use the public `inspect_project_docs -> prepare_docs(action="sync_project_docs") -> get_docs_context(mode="project")` path, not legacy direct project-doc verbs. For patch-like tasks, use the planning and constraint tools as separate steps:
 
 ```text
 get_docs_context
@@ -157,23 +156,16 @@ For coding/API/command questions, tools accept `response_style` with `auto`, `sn
 }
 ```
 
-Advanced users can still call lane-specific tools directly.
+Advanced users can still route lifecycle explicitly through the public unified tool.
 
 ```text
-sync_project_docs(project_path, with_vectors=true)     # discover + reconcile + index
-get_project_context(project_path, question)             # compact grounded context
+prepare_docs(action="sync_project_docs", project_path=..., with_vectors=true)  # discover + reconcile + index
+get_docs_context(project_path=..., question=..., mode="project")               # compact grounded context
 ```
 
-MCP Packs are an advanced layer for version-pinned API action tools. They are useful when an agent needs executable API operations, but the default repository workflow is the Patch Contract Runtime above.
+MCP Packs are an advanced layer for version-pinned API action tools exposed by `doc-atlas mcp packs-serve`. They are useful when an agent needs executable external API operations. They are not an alternative DocAtlas documentation workflow; the default repository workflow is the Docs MCP/Patch Contract Runtime above. `doc-atlas mcp serve` remains a compatibility alias for the Packs gateway.
 
-For safe high-level onboarding:
-
-```text
-bootstrap_project_docs(project_path, question?)
-get_project_context(project_path, question)
-```
-
-`sync_project_docs` replaces the old two-step `inspect → ingest` loop. It:
+`prepare_docs(action="sync_project_docs")` replaces the old two-step `inspect → ingest` loop. It:
 1. discovers current candidates from the filesystem;
 2. prunes orphaned indexed sources (deleted files);
 3. removes stale indexed sections (changed files);
@@ -201,11 +193,11 @@ Pass `"details": true` for the full structured response.
 
 | Situation | Tool |
 |---|---|
-| First time in a repo | `sync_project_docs` or `bootstrap_project_docs` |
+| First time in a repo | `inspect_project_docs`, then `prepare_docs(action="sync_project_docs")` if needed |
 | Check what docs exist | `inspect_project_docs` (read-only) |
-| Reconcile after file changes | `sync_project_docs` |
-| Old low-level index (no reconcile) | `ingest_project_docs` |
-| Answer "how does this repo work?" | `get_project_context` or `get_project_docs` |
+| Reconcile after file changes | `prepare_docs(action="sync_project_docs")` |
+| Old low-level project-doc verbs | legacy/admin compatibility surface only; prefer public `prepare_docs` / `get_docs_context` |
+| Answer "how does this repo work?" | `get_docs_context(mode="project")` |
 
 ## Project-aware Flutter/Dart docs
 

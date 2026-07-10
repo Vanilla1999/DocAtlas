@@ -2,12 +2,12 @@
 
 MCP Packs are Docmancer's advanced product layer. If your goal is source-grounded answers from documentation, start with Docmancer Docs: `doc-atlas ingest`, `doc-atlas add`, `doc-atlas query`, or `doc-atlas mcp docs-serve`. Use Packs when an agent needs version-pinned API action tools.
 
-MCP packs are version-pinned tool bundles compiled from public API documentation sources such as OpenAPI, GraphQL introspection, TypeDoc, and Sphinx. Installed packs are exposed to agents through one local stdio server, `doc-atlas mcp serve`, using two meta-tools:
+MCP packs are version-pinned tool bundles compiled from public API documentation sources such as OpenAPI, GraphQL introspection, TypeDoc, and Sphinx. Installed packs are exposed to agents through one local stdio gateway, `doc-atlas mcp packs-serve`, using two meta-tools. `doc-atlas mcp serve` remains a compatibility alias:
 
 - `docmancer_search_tools(query, package?, limit?)` searches across enabled packs and returns the best matching tool with its input schema.
 - `docmancer_call_tool(name, args)` invokes a specific fully qualified tool name returned by search.
 
-Agents launch `doc-atlas mcp serve` automatically from their MCP config; humans use the management commands below to install, enable/disable, and inspect packs.
+Advanced users can explicitly launch or register `doc-atlas mcp packs-serve` for MCP Packs; humans use the management commands below to install, enable/disable, and inspect packs.
 
 ## Install a Pack
 
@@ -44,7 +44,8 @@ doc-atlas uninstall open-meteo@v1
 
 | Command | Description |
 |---------|-------------|
-| `doc-atlas mcp serve` | Run the stdio MCP server. Agents launch this. |
+| `doc-atlas mcp packs-serve` | Run the advanced stdio MCP Packs/API-pack gateway. |
+| `doc-atlas mcp serve` | Compatibility alias for `packs-serve`. The default documentation workflow uses `doc-atlas mcp docs-serve`. |
 | `doc-atlas mcp doctor` | Verify pack artifacts, credential resolution, and agent config registrations. |
 | `doc-atlas mcp list` | Show installed packs, curated or expanded mode, tool counts, and destructive gate state. |
 | `doc-atlas mcp enable <pkg> [--version <v>]` | Re-enable a disabled pack without reinstalling it. |

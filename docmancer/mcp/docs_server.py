@@ -2,9 +2,11 @@
 from __future__ import annotations
 
 import asyncio
+import copy
 import json
 import os
-from typing import Any, cast
+from dataclasses import dataclass
+from typing import Any, Callable, Mapping, cast
 
 from docmancer.docs.interfaces.mcp.error_contract import build_mcp_error_payload, debug_errors_enabled
 from docmancer.docs.service import LibraryDocsService
@@ -13,11 +15,50 @@ from docmancer.docs.interfaces.mcp.docs_tools import handle_library_tool, librar
 from docmancer.docs.interfaces.mcp.prefetch_tools import handle_prefetch_tool, prefetch_tools
 from docmancer.docs.interfaces.mcp.project_tools import handle_project_tool, project_tools
 
+ToolHandler = Callable[[str, dict[str, Any], LibraryDocsService], dict[str, Any] | None]
 
-TOOLS: list[dict[str, Any]] = [
+
+@dataclass(frozen=True)
+class DocsServerConfig:
+    expose_legacy: bool = False
+    expose_admin: bool = False
+
+    @classmethod
+    def from_env(cls, env: Mapping[str, str]) -> "DocsServerConfig":
+        return cls(
+            expose_legacy=env.get("DOCMANCER_MCP_LEGACY_TOOLS") == "1",
+            expose_admin=env.get("DOCMANCER_MCP_ADMIN_TOOLS") == "1",
+        )
+
+
+@dataclass(frozen=True)
+class ToolSpec:
+    name: str
+    description: str
+    input_schema: dict[str, Any]
+    handler: ToolHandler
+
+    def to_tool_dict(self) -> dict[str, Any]:
+        return {"name": self.name, "description": self.description, "inputSchema": copy.deepcopy(self.input_schema)}
+
+
+@dataclass(frozen=True)
+class DocsMcpSurface:
+    tools: tuple[ToolSpec, ...]
+    handlers: Mapping[str, ToolHandler]
+
+
+RAW_TOOLS: list[dict[str, Any]] = [
     {
         "name": "get_docs_context",
-        "description": "Return one source-grounded documentation context pack by routing the question to project-owned docs, public library docs, exact dependency docs, or a mixed project-plus-library flow.",
+        "description": """Canonical Docmancer docs/context tool. Use this as the Context7-like query entrypoint for project docs, dependency/library docs, and mixed project+library questions.
+
+Agent workflow:
+- For repo questions, call inspect_project_docs(project_path) first.
+- For coding/API questions, set response_style=\"snippet-first\".
+- If answer_type is navigation_only or partial_navigational, do not answer yet; read/search the suggested files first.
+- This tool provides source-grounded context, not a full code audit or test substitute.
+""",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -53,7 +94,13 @@ TOOLS: list[dict[str, Any]] = [
     },
     {
         "name": "prepare_docs",
-        "description": "Unified confirmation-first lifecycle/admin tool for docs preparation: sync project docs, prefetch dependency/library/manifest/target docs, refresh, prune, or remove registered docs sources. Prefer this over separate ingest/sync/prefetch/refresh/prune/remove tools.",
+        "description": """Unified confirmation-first lifecycle/admin tool for docs preparation: sync project docs, prefetch dependency/library/manifest/target docs, refresh, prune, or remove registered docs sources.
+
+Agent workflow:
+- Use prepare_docs(action=\"sync_project_docs\") only after inspect_project_docs asks for project-doc reconciliation.
+- Use prepare_docs(action=\"prefetch_library_docs\") for public/dependency docs only after network access is approved.
+- Prefer this over separate ingest/sync/prefetch/refresh/prune/remove tools.
+""",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -256,7 +303,12 @@ TOOLS: list[dict[str, Any]] = [
 
     {
         "name": "inspect_project_docs",
-        "description": "Call this first when working inside a repository and the user asks to use Docmancer, asks about project architecture, asks how this repo works, or expects Context7-like docs help. This read-only tool discovers local project docs and exact dependency metadata, then returns reason_code, next_action, arguments_patch, and any required user confirmation. Follow next_action before generic code search, public docs, or WebFetch.",
+        "description": """Call this first inside a repository when the user asks about project architecture, repo conventions, implementation workflow, dependency docs, or Context7-like help.
+
+This is read-only. It discovers local docs and exact dependency metadata, then returns reason_code, next_action, arguments_patch, and confirmation requirements.
+
+Agents must follow next_action before generic code search, public docs, or WebFetch.
+""",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -366,8 +418,37 @@ Does not use deleted, orphaned, or stale project-doc content by default.""",
         },
     },
     {
+        "name": "get_code_context",
+        "description": """Find relevant local source files, extract real code snippets, follow name-based references for a few hops, and return an answer-ready source context pack.
+
+Agent workflow: call inspect_project_docs(project_path) first for repo/documentation state; then use get_code_context for implementation/source-navigation questions. If safe_to_answer=true, answer only from returned snippets and cite file paths and line ranges. If answer_type=navigation_only, read/search files_to_read and search_queries before answering.
+
+This is language-agnostic heuristic retrieval over local source. It is not an LSP, AST-perfect analyzer, call graph, patch validator, or test substitute.
+""",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "question": {"type": "string"},
+                "project_path": {"type": "string"},
+                "changed_files": {"type": ["array", "null"], "items": {"type": "string"}},
+                "entry_symbols": {"type": ["array", "null"], "items": {"type": "string"}},
+                "max_hops": {"type": ["integer", "null"], "minimum": 0, "maximum": 4, "default": 2},
+                "max_files": {"type": ["integer", "null"], "minimum": 1, "maximum": 50, "default": 12},
+                "max_snippets": {"type": ["integer", "null"], "minimum": 1, "maximum": 40, "default": 20},
+                "max_lines_per_snippet": {"type": ["integer", "null"], "minimum": 10, "maximum": 200, "default": 80},
+                "output_mode": {"type": ["string", "null"], "enum": ["answer", "compact", "debug", "full", None], "default": "answer"},
+            },
+            "required": ["question", "project_path"],
+        },
+    },
+    {
         "name": "get_patch_plan_context",
-        "description": "Use for coding changes after docs lookup: return a Patch Planning Context implementation map from concrete intent to exact source/dependency evidence, changed_files, missing symbols, minimal patch path, risks, and verification. Order for agents: inspect_project_docs -> prepare_docs(sync_project_docs if requested) -> get_docs_context for docs -> get_patch_plan_context for source/API map -> get_patch_constraints before editing -> validate_patch_against_constraints after editing -> run tests. This tool does not generate or validate a patch.",
+        "description": """Use for coding changes after docs lookup: return a Patch Planning Context implementation map from concrete intent to exact source/dependency evidence, changed_files, missing symbols, minimal patch path, risks, and verification.
+
+Agent workflow: inspect_project_docs -> prepare_docs(sync_project_docs if requested) -> get_docs_context for docs -> get_patch_plan_context for source/API map -> get_patch_constraints before editing -> validate_patch_against_constraints after editing -> run tests.
+
+This tool does not generate code, validate patches, run tests, or perform a full audit.
+""",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -387,7 +468,11 @@ Does not use deleted, orphaned, or stale project-doc content by default.""",
     },
     {
         "name": "get_patch_constraints",
-        "description": "Use immediately before editing code: return compact source-attributed project constraints for a coding patch. Pass changed_files when known. This is not a docs lookup, patch planner, patch validator, or test substitute.",
+        "description": """Use immediately before editing code to get source-attributed constraints for a patch.
+
+This is not a code auditor, patch planner, patch validator, static analyzer, or test substitute.
+For audits, use Docmancer for context, then run/read/search/analyze code separately.
+""",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -404,7 +489,11 @@ Does not use deleted, orphaned, or stale project-doc content by default.""",
     },
     {
         "name": "validate_patch_against_constraints",
-        "description": "Use after editing code: check changed_files or patch_diff against constraints returned by get_patch_constraints. Treat unknown/manual_review as requiring human/code review. This is deterministic best-effort only; it does not prove correctness and does not replace tests.",
+        "description": """Use after editing code: check changed_files or patch_diff against constraints returned by get_patch_constraints.
+
+Treat unknown/manual_review as requiring human/code review. This deterministic best-effort check is not a code auditor, static analyzer, proof of correctness, or test substitute.
+Run the relevant tests/linters after this tool.
+""",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -551,32 +640,223 @@ ADMIN_TOOL_NAMES = {
     "remove_library_docs",
     "prune_library_docs",
     "list_library_docs",
+    "list_docs_sources",
 }
 
 
-def _enabled_tools(all_tools: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    show_legacy = os.environ.get("DOCMANCER_MCP_LEGACY_TOOLS") == "1"
-    show_admin = os.environ.get("DOCMANCER_MCP_ADMIN_TOOLS") == "1"
-    enabled: list[dict[str, Any]] = []
-    for tool in all_tools:
-        name = str(tool.get("name") or "")
-        if name in LEGACY_TOOL_NAMES and not show_legacy:
-            continue
-        if name in ADMIN_TOOL_NAMES and not show_admin:
-            continue
-        enabled.append(tool)
-    return enabled
+def _handler_for_tool(name: str) -> ToolHandler:
+    if name in {tool["name"] for tool in context_tools(RAW_TOOLS)}:
+        return handle_context_tool
+    if name in {tool["name"] for tool in library_tools(RAW_TOOLS)}:
+        return handle_library_tool
+    if name in {tool["name"] for tool in prefetch_tools(RAW_TOOLS)}:
+        return handle_prefetch_tool
+    if name in {tool["name"] for tool in project_tools(RAW_TOOLS)}:
+        return handle_project_tool
+    raise ValueError(f"No MCP docs handler registered for tool: {name}")
 
 
-ALL_TOOLS = TOOLS
-TOOLS = _enabled_tools(ALL_TOOLS)
+def _strip_null_enum_values(value: Any) -> Any:
+    if isinstance(value, dict):
+        cleaned = {key: _strip_null_enum_values(child) for key, child in value.items()}
+        if "enum" in cleaned and isinstance(cleaned["enum"], list):
+            cleaned["enum"] = [item for item in cleaned["enum"] if item is not None]
+        return cleaned
+    if isinstance(value, list):
+        return [_strip_null_enum_values(item) for item in value]
+    return value
+
+
+def _tool_spec(raw: dict[str, Any]) -> ToolSpec:
+    name = str(raw["name"])
+    return ToolSpec(
+        name=name,
+        description=str(raw["description"]),
+        input_schema=_strip_null_enum_values(copy.deepcopy(raw["inputSchema"])),
+        handler=_handler_for_tool(name),
+    )
+
+
+def build_docs_surface(config: DocsServerConfig) -> DocsMcpSurface:
+    specs: list[ToolSpec] = []
+    for raw in RAW_TOOLS:
+        name = str(raw.get("name") or "")
+        if name in LEGACY_TOOL_NAMES and not config.expose_legacy:
+            continue
+        if name in ADMIN_TOOL_NAMES and not config.expose_admin:
+            continue
+        specs.append(_tool_spec(raw))
+    return DocsMcpSurface(
+        tools=tuple(specs),
+        handlers={spec.name: spec.handler for spec in specs},
+    )
+
+
+ALL_SURFACE = build_docs_surface(DocsServerConfig(expose_legacy=True, expose_admin=True))
+DOCS_SURFACE = build_docs_surface(DocsServerConfig.from_env(os.environ))
+
+ALL_TOOLS = [spec.to_tool_dict() for spec in ALL_SURFACE.tools]
+TOOLS = [spec.to_tool_dict() for spec in DOCS_SURFACE.tools]
 
 CONTEXT_TOOLS = context_tools(TOOLS)
 LIBRARY_TOOLS = library_tools(TOOLS)
 PROJECT_TOOLS = project_tools(TOOLS)
 PREFETCH_TOOLS = prefetch_tools(TOOLS)
 
+
+def current_docs_surface(env: Mapping[str, str] | None = None) -> DocsMcpSurface:
+    """Build the docs MCP surface from the current environment.
+
+    `TOOLS` remains as an import-time compatibility snapshot for tests and
+    older integrations, but the live server calls this so env flag changes are
+    not frozen by module import order.
+    """
+    return build_docs_surface(DocsServerConfig.from_env(os.environ if env is None else env))
+
+
+def current_tools(env: Mapping[str, str] | None = None) -> list[dict[str, Any]]:
+    return [spec.to_tool_dict() for spec in current_docs_surface(env).tools]
+
+
+def _exception_reason_code(exc: Exception) -> str:
+    if isinstance(exc, ValueError):
+        return "bad_request"
+    if isinstance(exc, TimeoutError):
+        return "network_required"
+    if isinstance(exc, PermissionError):
+        return "permission_denied"
+    return "handler_exception"
+
+
+def call_docs_tool_payload(
+    name: str,
+    arguments: dict[str, Any] | None,
+    service: LibraryDocsService,
+    *,
+    surface: DocsMcpSurface | None = None,
+) -> dict[str, Any]:
+    args = arguments or {}
+    active_surface = surface or current_docs_surface()
+    handler = active_surface.handlers.get(name)
+    if handler is None:
+        return build_mcp_error_payload(
+            reason_code="unknown_tool",
+            message=f"unknown tool: {name}",
+            tool=name,
+            phase="validation",
+        )
+    try:
+        payload = handler(name, args, service)
+    except Exception as exc:
+        reason_code = _exception_reason_code(exc)
+        return build_mcp_error_payload(
+            reason_code=reason_code,
+            message=str(exc),
+            exception=exc,
+            tool=name,
+            phase="execution",
+            debug=debug_errors_enabled(args),
+        )
+    if payload is None:
+        return build_mcp_error_payload(
+            reason_code="unknown_tool",
+            message=f"unknown tool: {name}",
+            tool=name,
+            phase="validation",
+        )
+    return payload
+
+
 MCP_RESOURCES: list[dict[str, str]] = [
+    {
+        "uri": "docmancer://agent/quickstart",
+        "name": "Docmancer agent quickstart",
+        "description": "How agents should use Docmancer MCP without confusing it with a code auditor or raw Context7 clone.",
+        "mimeType": "text/markdown",
+        "text": """# Docmancer agent quickstart
+
+Docmancer is a local documentation/context router and project cartographer.
+
+Docmancer is not a code auditor.
+
+It is not:
+- a code auditor;
+- a static analyzer;
+- a test runner;
+- a code generator;
+- an AST-perfect/LSP code intelligence engine.
+
+Use Docmancer before generic code search when the user asks about:
+- project architecture;
+- repo conventions;
+- dependency/library documentation;
+- Context7-like docs help;
+- answer-ready local source snippets via `get_code_context`;
+- patch planning;
+- patch constraints.
+
+## Default project workflow
+
+1. Call:
+   `inspect_project_docs(project_path, details=true)`
+
+2. If the response asks for reconciliation, call:
+   `prepare_docs(action="sync_project_docs", project_path=..., with_vectors=true)`
+
+3. Then call:
+   `get_docs_context(project_path=..., question=..., mode="project" | "mixed", response_style="snippet-first", output_mode="answer")`
+
+4. For implementation/source-navigation questions that need code bodies, call:
+   `get_code_context(project_path=..., question=..., entry_symbols=[...], output_mode="answer")`
+
+5. Interpret the result:
+   - `answer_type="direct"`: you may answer from the returned snippets/sources.
+   - `answer_type="navigation_only"`: do not answer yet. Read/search the suggested files first, then answer.
+   - `partial_navigational`: treat it as source-search guidance, not a complete answer.
+   - `safe_to_answer=true` from `get_code_context`: answer only from returned source snippets and cite paths/line ranges.
+   - `requires_confirmation=true`: ask the user before network/dependency fetches.
+
+## Context7-like library workflow
+
+For public/dependency docs, use the canonical public tool:
+
+`get_docs_context(question=..., library=..., ecosystem=..., version=..., mode="library" | "mixed", response_style="snippet-first")`
+
+If docs are missing/stale and the user approves network access, use:
+
+`prepare_docs(action="prefetch_library_docs", library=..., ecosystem=..., version=...)`
+
+Do not use WebFetch as a substitute for registered Docmancer docs until Docmancer has returned no trusted route.
+
+## Patch workflow
+
+Before editing code:
+
+1. `get_docs_context(...)`
+2. `get_code_context(project_path=..., question=..., changed_files=[...])` when source bodies/references matter.
+3. `get_patch_plan_context(project_path=..., question=..., changed_files=[...])`
+4. `get_patch_constraints(project_path=..., question=..., changed_files=[...])`
+5. Edit code.
+6. `validate_patch_against_constraints(project_path=..., changed_files=[...] or patch_diff=...)`
+7. Run tests/linters.
+
+## Audit workflow
+
+For audits, Docmancer only supplies documentation/context. It does not find all bugs.
+
+Use Docmancer for architecture/docs context, then use normal code tools:
+- read/search/grep;
+- analyzer/linter;
+- tests;
+- dependency inspection;
+- duplicate/large-file checks.
+
+Always separate:
+- facts from Docmancer docs;
+- facts from source code;
+- your own analysis.
+""",
+    },
     {
         "uri": "docmancer://workflow/project-docs",
         "name": "Project docs workflow",
@@ -585,8 +865,8 @@ MCP_RESOURCES: list[dict[str, str]] = [
         "text": """# Project docs workflow
 
 1. Call `inspect_project_docs(project_path)` before repo-specific architecture, conventions, runbook, or Context7-like questions.
-2. If the response asks for reconciliation, call `sync_project_docs(project_path, with_vectors=true)` before `get_project_context`.
-3. Call `get_project_context(project_path, question, output_mode=\"compact\")` and inspect `answer_available`, `answer_type`, `answer_completeness`, and `trust_contract.sources`.
+2. If the response asks for reconciliation, call `prepare_docs(action="sync_project_docs", project_path=..., with_vectors=true)`.
+3. Call `get_docs_context(project_path=..., question=..., mode="project", output_mode="compact")` and inspect `answer_available`, `answer_type`, `answer_completeness`, and `trust_contract.sources`.
 4. Treat `partial_navigational` as navigation/source-search guidance, not a complete answer.
 5. Use dependency/public network fetches only with explicit approval (`allow_network=true`).
 """,
@@ -608,15 +888,30 @@ MCP_RESOURCES: list[dict[str, str]] = [
     {
         "uri": "docmancer://workflow/library-docs",
         "name": "Library docs workflow",
-        "description": "Registry-first workflow for exact library/dependency docs.",
+        "description": "Canonical public workflow for exact library/dependency docs.",
         "mimeType": "text/markdown",
         "text": """# Library docs workflow
 
-1. Call `resolve_library_id(library, ecosystem, version, source_type)` before using external docs.
-2. If the response returns `candidates`, retry through Docmancer with the candidate `arguments_patch` or explicit `docs_url`.
-3. Call `get_library_docs(...)` after registration/resolution.
-4. If `reason_code=needs_docs_url`, do not WebFetch as a substitute; pass `docs_url` or prefetch/register an explicit docs target.
-5. Network ingestion is explicit: use `prefetch_library_docs`, `prefetch_docs_targets`, or a tool response with `allow_network=true` where supported.
+Use the public unified tool first:
+
+1. Call:
+   `get_docs_context(question=..., library=..., ecosystem=..., version=..., mode="library", response_style="snippet-first")`
+
+2. If the response returns `requires_confirmation=true`, `reason_code=network_required`, or missing/stale docs, ask the user before network access.
+
+3. If approved, call:
+   `prepare_docs(action="prefetch_library_docs", library=..., ecosystem=..., version=..., force_refresh=false)`
+
+4. Retry:
+   `get_docs_context(question=..., library=..., ecosystem=..., version=..., mode="library", response_style="snippet-first")`
+
+5. If working inside a repository, prefer:
+   `inspect_project_docs(project_path)` first, then:
+   `get_docs_context(project_path=..., question=..., mode="mixed", response_style="snippet-first")`
+
+Do not use WebFetch as a substitute for registered docs before Docmancer has returned no trusted route.
+
+Legacy tools such as `resolve_library_id` and `get_library_docs` may exist only when legacy surface is explicitly enabled. Do not assume they are available.
 """,
     },
 ]
@@ -625,7 +920,7 @@ MCP_RESOURCE_TEMPLATES: list[dict[str, str]] = [
     {
         "uriTemplate": "docmancer://workflow/project-docs/{project_path}",
         "name": "Project-specific docs workflow",
-        "description": "Use with a local project_path to guide inspect/sync/get_project_context calls.",
+        "description": "Use with a local project_path to guide inspect/prepare_docs/get_docs_context calls.",
         "mimeType": "text/markdown",
     },
     {
@@ -650,8 +945,8 @@ def read_docs_resource(uri: str) -> dict[str, str] | None:
             "text": f"""# Project docs workflow for `{project_path}`
 
 1. `inspect_project_docs(project_path=\"{project_path}\")`
-2. If required, `sync_project_docs(project_path=\"{project_path}\", with_vectors=true)`
-3. `get_project_context(project_path=\"{project_path}\", question=..., output_mode=\"compact\")`
+2. If required, `prepare_docs(action=\"sync_project_docs\", project_path=\"{project_path}\", with_vectors=true)`
+3. `get_docs_context(project_path=\"{project_path}\", question=..., mode=\"project\", output_mode=\"compact\")`
 4. Inspect `trust_contract.sources.selected`, `trust_contract.sources.rejected`, and `trust_contract.sources.risky` before using the answer.
 """,
         }
@@ -665,10 +960,26 @@ def read_docs_resource(uri: str) -> dict[str, str] | None:
                 "mimeType": "text/markdown",
                 "text": f"""# Library docs workflow for `{ecosystem}:{library}@{version}`
 
-1. `resolve_library_id(library=\"{library}\", ecosystem=\"{ecosystem}\", version=\"{version}\")`
-2. If `status=needs_docs_url`, retry through Docmancer with an explicit `docs_url` or prefetch/register a docs target.
-3. `get_library_docs(library=\"{library}\", ecosystem=\"{ecosystem}\", version=\"{version}\", topic=...)`
-4. Do not WebFetch registered docs before retrying with returned `candidates` or `arguments_patch`.
+1. `get_docs_context(
+       question=...,
+       library=\"{library}\",
+       ecosystem=\"{ecosystem}\",
+       version=\"{version}\",
+       mode=\"library\",
+       response_style=\"snippet-first\"
+   )`
+
+2. If docs are missing/stale and network is approved:
+   `prepare_docs(
+       action=\"prefetch_library_docs\",
+       library=\"{library}\",
+       ecosystem=\"{ecosystem}\",
+       version=\"{version}\"
+   )`
+
+3. Retry `get_docs_context(...)`.
+
+Do not assume legacy `resolve_library_id` / `get_library_docs` tools are available on the public surface.
 """,
             }
     return None
@@ -689,7 +1000,7 @@ async def _run_async(service: LibraryDocsService) -> None:
     async def _list_tools() -> list[mcp_types.Tool]:
         return [
             mcp_types.Tool(name=tool["name"], description=tool["description"], inputSchema=tool["inputSchema"])
-            for tool in TOOLS
+            for tool in current_tools()
         ]
 
     @server.list_resources()
@@ -725,33 +1036,7 @@ async def _run_async(service: LibraryDocsService) -> None:
 
     @server.call_tool()
     async def _call_tool(name: str, arguments: dict[str, Any]) -> list[mcp_types.TextContent]:
-        try:
-            args = arguments or {}
-            for handler in (handle_context_tool, handle_library_tool, handle_prefetch_tool, handle_project_tool):
-                payload = handler(name, args, service)
-                if payload is not None:
-                    return _json_text(mcp_types, payload)
-        except Exception as exc:
-            return _json_text(
-                mcp_types,
-                build_mcp_error_payload(
-                    reason_code="unhandled_exception",
-                    message=str(exc),
-                    exception=exc,
-                    tool=name,
-                    phase="execution",
-                    debug=debug_errors_enabled(arguments or {}),
-                ),
-            )
-        return _json_text(
-            mcp_types,
-            build_mcp_error_payload(
-                reason_code="unknown_tool",
-                message=f"unknown tool: {name}",
-                tool=name,
-                phase="validation",
-            ),
-        )
+        return _json_text(mcp_types, call_docs_tool_payload(name, arguments, service))
 
     async with stdio_server() as (read_stream, write_stream):
         await server.run(read_stream, write_stream, server.create_initialization_options())

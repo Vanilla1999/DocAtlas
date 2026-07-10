@@ -6,7 +6,24 @@ from docmancer.docs.interfaces.mcp.context_tools import CONTEXT_TOOL_NAMES
 from docmancer.docs.interfaces.mcp.docs_tools import LIBRARY_TOOL_NAMES
 from docmancer.docs.interfaces.mcp.prefetch_tools import PREFETCH_TOOL_NAMES, _bounded_targets
 from docmancer.docs.interfaces.mcp.project_tools import PROJECT_TOOL_NAMES
-from docmancer.mcp.docs_server import ALL_TOOLS, CONTEXT_TOOLS, LIBRARY_TOOLS, MCP_RESOURCES, MCP_RESOURCE_TEMPLATES, PREFETCH_TOOLS, PROJECT_TOOLS, TOOLS, read_docs_resource
+from docmancer.mcp.docs_server import (
+    ADMIN_TOOL_NAMES,
+    ALL_TOOLS,
+    CONTEXT_TOOLS,
+    DocsMcpSurface,
+    DocsServerConfig,
+    LIBRARY_TOOLS,
+    MCP_RESOURCES,
+    MCP_RESOURCE_TEMPLATES,
+    PREFETCH_TOOLS,
+    PROJECT_TOOLS,
+    TOOLS,
+    ToolSpec,
+    build_docs_surface,
+    call_docs_tool_payload,
+    current_tools,
+    read_docs_resource,
+)
 
 
 def test_mcp_grouped_tool_registration_preserves_tool_names():
@@ -31,6 +48,76 @@ def test_mcp_public_surface_exposes_prepare_docs_instead_of_prefetch_library_doc
     names = {tool["name"] for tool in TOOLS}
     assert "prepare_docs" in names
     assert "prefetch_library_docs" not in names
+
+
+def test_mcp_public_surface_hides_admin_debug_tools_by_default():
+    names = {tool["name"] for tool in TOOLS}
+
+    assert "list_docs_sources" not in names
+    assert "list_docs_sources" in {tool["name"] for tool in ALL_TOOLS}
+
+
+def test_docs_surface_builder_uses_one_tool_and_handler_contract():
+    surface = build_docs_surface(DocsServerConfig(expose_legacy=False, expose_admin=False))
+    tool_names = {spec.name for spec in surface.tools}
+
+    assert tool_names == set(surface.handlers)
+    assert "get_docs_context" in surface.handlers
+    assert "prefetch_library_docs" not in tool_names
+
+
+def test_docs_surface_builder_exposes_legacy_and_admin_by_config():
+    surface = build_docs_surface(DocsServerConfig(expose_legacy=True, expose_admin=True))
+    names = {spec.name for spec in surface.tools}
+
+    assert "prefetch_library_docs" in names
+    assert ADMIN_TOOL_NAMES.issubset(names)
+    assert names == set(surface.handlers)
+
+
+def test_current_tools_reads_env_each_call(monkeypatch):
+    monkeypatch.delenv("DOCMANCER_MCP_LEGACY_TOOLS", raising=False)
+    public_names = {tool["name"] for tool in current_tools()}
+    assert "get_project_context" not in public_names
+
+    monkeypatch.setenv("DOCMANCER_MCP_LEGACY_TOOLS", "1")
+    legacy_names = {tool["name"] for tool in current_tools()}
+    assert "get_project_context" in legacy_names
+
+
+def test_call_docs_tool_payload_classifies_handler_value_error():
+    def broken_handler(name, args, service):
+        raise ValueError("bad user input")
+
+    spec = ToolSpec(
+        name="broken",
+        description="Broken test tool",
+        input_schema={"type": "object", "properties": {}},
+        handler=broken_handler,
+    )
+    surface = DocsMcpSurface(tools=(spec,), handlers={"broken": broken_handler})
+
+    payload = call_docs_tool_payload("broken", {}, object(), surface=surface)
+
+    assert payload["reason_code"] == "bad_request"
+    assert payload["error"]["retryable"] is False
+    assert payload["error"]["where"]["tool"] == "broken"
+
+
+def test_public_mcp_schemas_do_not_put_null_in_enum_values():
+    def walk(value):
+        if isinstance(value, dict):
+            enum = value.get("enum")
+            if enum is not None:
+                assert None not in enum
+            for child in value.values():
+                walk(child)
+        elif isinstance(value, list):
+            for child in value:
+                walk(child)
+
+    for tool in TOOLS:
+        walk(tool["inputSchema"])
 
 
 def test_mcp_get_library_docs_guides_retry_before_webfetch():
@@ -73,7 +160,7 @@ def test_mcp_exposes_inspect_project_docs_with_discovery_first_guidance():
     assert "Context7-like" in tool["description"]
     assert "reason_code" in tool["description"]
     assert "next_action" in tool["description"]
-    assert "Follow next_action" in tool["description"]
+    assert "follow next_action" in tool["description"]
     assert tool["inputSchema"]["required"] == ["project_path"]
     assert "details" in tool["inputSchema"]["properties"]
 
@@ -139,7 +226,7 @@ def test_mcp_exposes_get_project_context_with_trust_contract():
     assert tool["inputSchema"]["required"] == ["project_path", "question"]
     assert "mode" in tool["inputSchema"]["properties"]
     assert "libraries" in tool["inputSchema"]["properties"]
-    assert tool["inputSchema"]["properties"]["output_mode"]["enum"] == ["answer", "compact", "debug", "full", None]
+    assert tool["inputSchema"]["properties"]["output_mode"]["enum"] == ["answer", "compact", "debug", "full"]
     assert "details" in tool["inputSchema"]["properties"]
 
 
@@ -151,13 +238,16 @@ def test_agent_templates_include_project_docs_discovery_guidance():
         assert "Project Docs Discovery with MCP" in text
         assert "inspect_project_docs(project_path=\".\")" in text
         assert "expects Context7-like help" in text
-        assert "prefetch_project_docs` fetches exact dependency docs" in text
+        assert "prepare_docs(action=\"sync_project_docs\")" in text
+        assert "get_docs_context(mode=\"project\")" in text
+        assert "prepare_docs(action=\"prefetch_project_dependency_docs\")" in text
         assert "Official project docs should remain files in the repo" in text
         assert "Do not skip `inspect_project_docs`" in text
         assert "docs/INDEX.md" in text
         assert "canonical map of project-owned docs" in text
         assert "verification loop" in text
         assert "confirm expected files are cited" in text
+        assert "not an alternative documentation workflow" in text
 
 
 def test_project_docs_workflow_documents_index_template_and_verification_loop():
@@ -172,9 +262,9 @@ def test_project_docs_workflow_documents_index_template_and_verification_loop():
     assert "indexed_source_not_discovered" in text
     assert "## Verification loop" in text
     assert "inspect_project_docs(project_path)" in text
-    assert "sync_project_docs(project_path, with_vectors=true)" in text
+    assert "prepare_docs(action=\"sync_project_docs\"" in text
     assert "Confirm the expected files are cited" in text
-    assert "get_project_context(project_path" in text
+    assert "get_docs_context(project_path=" in text
 
 
 def test_mcp_docs_server_documents_index_and_smoke_test_loop():
@@ -185,7 +275,7 @@ def test_mcp_docs_server_documents_index_and_smoke_test_loop():
     assert "docs/INDEX.md" in text
     assert "canonical map of official project-owned docs" in text
     assert "inspect_project_docs(project_path)" in text
-    assert "sync_project_docs(project_path, with_vectors=true)" in text
+    assert "prepare_docs(action=\"sync_project_docs\"" in text
     assert "confirm expected files appear" in text
     assert "indexed_source_not_discovered" in text
     assert "Treat maintained `docs/INDEX.md` as the canonical map" in text
@@ -208,7 +298,9 @@ def test_mcp_exposes_manifest_tools():
 
 def test_mcp_exposes_lifecycle_tools():
     names = {tool["name"] for tool in TOOLS}
-    assert "list_docs_sources" in names
+    all_names = {tool["name"] for tool in ALL_TOOLS}
+    assert "list_docs_sources" not in names
+    assert "list_docs_sources" in all_names
     assert "inspect_library_docs" not in names
     assert "remove_library_docs" not in names
     assert "prune_library_docs" not in names
@@ -225,6 +317,28 @@ def test_mcp_exposes_discoverable_resources_and_templates():
     assert "docmancer://library/{ecosystem}/{library}/{version}" in template_uris
 
 
+def test_maintained_agent_docs_prefer_public_docs_workflow():
+    repo = Path(__file__).resolve().parents[2]
+    docs = [
+        repo / "AGENTS.md",
+        repo / "README.md",
+        repo / "SKILL.md",
+        repo / "docs" / "AGENT_DOCS_WORKFLOW.md",
+        repo / "docs" / "PROJECT_MAP.md",
+        repo / "docs" / "mcp-docs-server.md",
+        repo / "docs" / "project-docs-demo.md",
+        repo / "docs" / "project-docs-mcp-workflow.md",
+        repo / "wiki" / "Architecture.md",
+    ]
+    joined = "\n".join(path.read_text() for path in docs)
+
+    assert "prepare_docs(action=\"sync_project_docs\"" in joined
+    assert "get_docs_context(" in joined
+    assert "bootstrap_project_docs(project_path" not in joined
+    assert "sync_project_docs(project_path" not in joined
+    assert "get_project_context(project_path" not in joined
+
+
 def test_mcp_read_resource_returns_workflow_and_schema_guidance():
     workflow = read_docs_resource("docmancer://workflow/project-docs")
     library_workflow = read_docs_resource("docmancer://workflow/library-docs")
@@ -234,20 +348,29 @@ def test_mcp_read_resource_returns_workflow_and_schema_guidance():
 
     assert workflow is not None
     assert "inspect_project_docs" in workflow["text"]
-    assert "sync_project_docs" in workflow["text"]
+    assert "prepare_docs(action=\"sync_project_docs\"" in workflow["text"]
+    assert "get_docs_context" in workflow["text"]
     assert "trust_contract.sources" in workflow["text"]
     assert library_workflow is not None
-    assert "resolve_library_id" in library_workflow["text"]
-    assert "reason_code=needs_docs_url" in library_workflow["text"]
-    assert "do not WebFetch" in library_workflow["text"]
+    assert "get_docs_context" in library_workflow["text"]
+    assert "mode=\"library\"" in library_workflow["text"]
+    assert "response_style=\"snippet-first\"" in library_workflow["text"]
+    assert "Legacy tools" in library_workflow["text"]
+    assert "resolve_library_id" not in library_workflow["text"].split("Legacy tools")[0]
+    assert "get_library_docs" not in library_workflow["text"].split("Legacy tools")[0]
+    assert "Do not use WebFetch" in library_workflow["text"]
     assert schema is not None
     assert '"schema_version": "trust-contract-1.1"' in schema["text"]
     assert '"selected"' in schema["text"]
     assert templated is not None
     assert 'project_path="/repo"' in templated["text"]
+    assert "get_docs_context" in templated["text"]
     assert library_templated is not None
     assert 'library="mcp"' in library_templated["text"]
     assert 'ecosystem="python"' in library_templated["text"]
+    assert "get_docs_context" in library_templated["text"]
+    assert "prepare_docs" in library_templated["text"]
+    assert "resolve_library_id" not in library_templated["text"].split("Do not assume legacy")[0]
     assert read_docs_resource("docmancer://missing") is None
 
 

@@ -716,7 +716,7 @@ def _install_or_append_agents_md(dest: Path, content_body: str) -> None:
 
 
 def _register_mcp_for_agent(agent_name: str) -> None:
-    """Register `doc-atlas mcp serve` into a known agent's MCP config (best-effort)."""
+    """Register `doc-atlas mcp docs-serve` into a known agent's MCP config (best-effort)."""
     try:
         from docmancer.cli.mcp_commands import register_docmancer_mcp_in_agent
     except Exception:
@@ -1977,8 +1977,8 @@ def install_cmd(agent: str, project: bool, config_path: str | None):
     """Install docmancer skill files into an AI agent.
 
     Teaches the agent to call docmancer CLI commands directly. Also registers
-    the local `doc-atlas mcp serve` entry into the agent's MCP config so any
-    installed API packs are immediately available.
+    the local `doc-atlas mcp docs-serve` entry into the agent's MCP config for
+    documentation workflows.
 
     AGENT must be one of: claude-code, claude-desktop, cline, cursor, codex,
     codex-app, codex-desktop, gemini, github-copilot, opencode

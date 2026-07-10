@@ -38,7 +38,7 @@ The entry has the shape:
   "mcpServers": {
     "docmancer": {
       "command": "docmancer",
-      "args": ["mcp", "serve"],
+      "args": ["mcp", "docs-serve"],
       "env": {}
     }
   }
@@ -56,7 +56,7 @@ Installed skills cover the core workflow:
 - `doc-atlas update` to refresh existing sources
 - `doc-atlas query` to get compact context packs with token savings
 - `doc-atlas list`, `doc-atlas inspect`, `doc-atlas remove`, `doc-atlas doctor` for index management
-- Advanced only: `doc-atlas install-pack <pkg>@<version>` installs API MCP packs, and the registered `doc-atlas mcp serve` exposes them through the Tool Search pattern (`docmancer_search_tools`, `docmancer_call_tool`)
+- Advanced only: `doc-atlas install-pack <pkg>@<version>` installs API MCP packs. If you explicitly register/run `doc-atlas mcp packs-serve`, it exposes them through the Tool Search pattern (`docmancer_search_tools`, `docmancer_call_tool`). `doc-atlas mcp serve` remains a compatibility alias. The default installer registers `doc-atlas mcp docs-serve` for documentation workflows.
 - Advanced only: `doc-atlas mcp doctor` and `doc-atlas mcp list` verify pack state and credentials
 
 Agents learn to call `doc-atlas query` for grounded answers instead of relying on stale training data. If API packs are installed, agents can also call MCP packs through the resolved tool name (for example `open_meteo__v1__forecast`) for live API work without losing track of the pinned version.

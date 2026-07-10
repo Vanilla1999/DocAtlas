@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 
+- **MCP Packs gateway alias:** added `doc-atlas mcp packs-serve` as the explicit advanced API-pack gateway command while keeping `doc-atlas mcp serve` as a compatibility alias.
 - **MCP boundary contracts:** added structured MCP error payloads with legacy top-level compatibility fields and debug-gated tracebacks.
 - **MCP output compaction contract:** added shared output-mode normalization, bounded compact payload summaries, and pagination guidance for oversized context responses.
 - **Architecture decision record:** documented that the MCP boundary owns transport-safe error/output contracts while application services own business logic.

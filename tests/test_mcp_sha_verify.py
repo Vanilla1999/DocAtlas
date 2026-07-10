@@ -6,6 +6,7 @@ import pytest
 
 from docmancer.mcp import paths
 from docmancer.mcp.installer import LocalRegistry, install_package
+from docmancer.mcp.manifest import IntegrityError, Manifest
 
 
 @pytest.fixture(autouse=True)
@@ -63,3 +64,32 @@ def test_install_skips_verification_when_no_manifest(tmp_path, monkeypatch):
     monkeypatch.setenv("DOCMANCER_REGISTRY_DIR", str(registry))
     result = install_package("demo", "1")
     assert "contract.json" in result.package.artifact_sha256
+
+
+def test_runtime_refuses_tampered_contract_artifact(tmp_path, monkeypatch):
+    registry = tmp_path / "reg"
+    _seed(registry, "demo", "1")
+    monkeypatch.setenv("DOCMANCER_REGISTRY_DIR", str(registry))
+    install_package("demo", "1")
+
+    contract_path = paths.package_dir("demo", "1") / "contract.json"
+    contract_path.write_text(json.dumps({"operations": [{"id": "tampered"}]}))
+
+    pkg = Manifest.load().find("demo", "1")
+    assert pkg is not None
+    with pytest.raises(IntegrityError, match="artifact_hash_mismatch:contract.json"):
+        pkg.contract()
+
+
+def test_runtime_refuses_missing_tools_artifact(tmp_path, monkeypatch):
+    registry = tmp_path / "reg"
+    _seed(registry, "demo", "1")
+    monkeypatch.setenv("DOCMANCER_REGISTRY_DIR", str(registry))
+    install_package("demo", "1")
+
+    (paths.package_dir("demo", "1") / "tools.curated.json").unlink()
+
+    pkg = Manifest.load().find("demo", "1")
+    assert pkg is not None
+    with pytest.raises(IntegrityError, match="missing_artifact:tools.curated.json"):
+        pkg.tools()

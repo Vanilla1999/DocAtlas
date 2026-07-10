@@ -12,7 +12,7 @@ def test_register_writes_entry(tmp_path):
     assert changed is True
     payload = json.loads(cfg.read_text())
     assert payload["mcpServers"]["docmancer"]["command"] == "doc-atlas"
-    assert payload["mcpServers"]["docmancer"]["args"] == ["mcp", "serve"]
+    assert payload["mcpServers"]["docmancer"]["args"] == ["mcp", "docs-serve"]
 
 
 def test_register_is_idempotent(tmp_path):
@@ -52,7 +52,7 @@ def test_register_preserves_existing_env(tmp_path):
     payload = json.loads(cfg.read_text())
     assert payload["mcpServers"]["docmancer"] == {
         "command": "doc-atlas",
-        "args": ["mcp", "serve"],
+        "args": ["mcp", "docs-serve"],
         "env": {"DOCMANCER_HOME": "/custom/home"},
     }
 

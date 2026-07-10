@@ -234,6 +234,7 @@ class UnifiedDocsContextService:
                     reason_code="dependency_docs_prefetch_required",
                     confirmation_reason="network_fetch",
                     arguments_patch={"allow_network": True},
+                    dependency_docs=self._dependency_prefetch_guidance(project_path, question),
                     lanes=lanes,
                     lane_details=lane_details if details else {},
                 )
@@ -402,6 +403,10 @@ class UnifiedDocsContextService:
             response_style=snippet_presentation.response_style,
             primary_snippet=snippet_presentation.primary_snippet,
             supporting_snippets=snippet_presentation.supporting_snippets,
+            primary_snippets=snippet_presentation.primary_snippets,
+            primary_snippet_confidence=snippet_presentation.primary_snippet_confidence,
+            primary_snippet_selection_reason=snippet_presentation.primary_snippet_selection_reason,
+            primary_snippet_alternatives=snippet_presentation.primary_snippet_alternatives,
             snippet_metrics=snippet_presentation.metrics,
             presentation={
                 "project_constraints_count": source_summary.get("project", 0),
@@ -738,6 +743,54 @@ class UnifiedDocsContextService:
             return False
         return bool(state.get("missing") or state.get("stale"))
 
+    def _dependency_prefetch_guidance(self, project_path: str | None, question: str, *, limit: int = 20) -> dict[str, Any]:
+        if not project_path:
+            return {
+                "available": 0,
+                "missing": 0,
+                "network_fetch_required": True,
+                "recommended_prefetch": [],
+                "agent_instruction": "Ask the user before prefetching dependency docs.",
+            }
+        metadata = self.service.read_project_metadata(project_path)
+        deps = getattr(metadata, "dependencies", []) or []
+        state = self.service._project_dependency_docs_state(metadata)
+        unavailable = []
+        if isinstance(state, dict):
+            unavailable = [str(value) for value in [*(state.get("missing") or []), *(state.get("stale") or [])]]
+        available = max(0, len(deps) - len(set(unavailable)))
+        recommended = self._rank_dependencies_for_prefetch(deps, unavailable, question, limit=limit)
+        return {
+            "available": available,
+            "missing": len(set(unavailable)),
+            "network_fetch_required": bool(unavailable),
+            "recommended_prefetch": recommended,
+            "agent_instruction": "Ask the user before prefetching dependency docs. The user can approve prefetching all dependencies or only the recommended top-N.",
+            "next_action": {
+                "tool": "prepare_docs",
+                "arguments_patch": {"action": "prefetch_project_dependency_docs", "project_path": project_path, "include_packages": [item["library"] for item in recommended]},
+            } if recommended else None,
+        }
+
+    @staticmethod
+    def _rank_dependencies_for_prefetch(deps: list[Any], unavailable: list[str], question: str, *, limit: int) -> list[dict[str, Any]]:
+        unavailable_set = {str(value).lower() for value in unavailable}
+        query = question.lower().replace("-", "_")
+        rows: list[tuple[int, str, Any]] = []
+        for dep in deps:
+            name = str(getattr(dep, "package_name", "") or getattr(dep, "name", "") or dep)
+            if not name or name.lower() not in unavailable_set:
+                continue
+            normalized = name.lower().replace("-", "_")
+            score = 10 if normalized in query else 0
+            rows.append((-score, normalized, dep))
+        rows.sort(key=lambda row: (row[0], row[1]))
+        result: list[dict[str, Any]] = []
+        for _, _, dep in rows[:limit]:
+            name = str(getattr(dep, "package_name", "") or getattr(dep, "name", "") or dep)
+            result.append({"ecosystem": getattr(dep, "ecosystem", None) or "unknown", "library": name, "version": getattr(dep, "version", None)})
+        return result
+
     def _normalize_project_context(self, result: ProjectContextResult) -> list[dict[str, Any]]:
         items = []
         for item in result.context_pack or []:
@@ -998,7 +1051,7 @@ class UnifiedDocsContextService:
             "dependency": {"status": "not_requested", "source_count": 0},
         }
 
-    def _confirmation_result(self, *, question: str, mode_requested: str, mode_selected: str, routing: dict[str, Any], reason_code: str, confirmation_reason: str | None, lanes: dict[str, Any], next_action: dict[str, Any] | None = None, arguments_patch: dict[str, Any] | None = None, lane_details: dict[str, Any] | None = None, warnings: list[Any] | None = None) -> UnifiedDocsContextResult:
+    def _confirmation_result(self, *, question: str, mode_requested: str, mode_selected: str, routing: dict[str, Any], reason_code: str, confirmation_reason: str | None, lanes: dict[str, Any], next_action: dict[str, Any] | None = None, arguments_patch: dict[str, Any] | None = None, dependency_docs: dict[str, Any] | None = None, lane_details: dict[str, Any] | None = None, warnings: list[Any] | None = None) -> UnifiedDocsContextResult:
         return UnifiedDocsContextResult(
             status="confirmation_required",
             question=question,
@@ -1014,6 +1067,7 @@ class UnifiedDocsContextService:
             confirmation_reason=confirmation_reason,
             next_action=next_action,
             arguments_patch=arguments_patch,
+            dependency_docs=dependency_docs or {},
             warnings=warnings or [],
             contamination={"detected": False, "dropped_count": 0, "reason_codes": []},
             deduplication={"dropped_count": 0, "reason_codes": []},

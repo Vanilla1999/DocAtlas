@@ -117,7 +117,7 @@ Returns a compact markdown context pack with source attribution and token saving
 
 ## Advanced: API Tools via MCP
 
-Only use the MCP surface if the user is explicitly working with installed API packs. If the user has run `doc-atlas install-pack <pkg>@<version>`, the agent host can launch `doc-atlas mcp serve` and expose two meta-tools:
+Only use the MCP Packs surface if the user is explicitly working with installed API packs. It is an advanced API-action layer, not an alternative documentation workflow. If the user has run `doc-atlas install-pack <pkg>@<version>`, the agent host can launch `doc-atlas mcp packs-serve` and expose two meta-tools. `doc-atlas mcp serve` is a compatibility alias:
 
 - `docmancer_search_tools(query, package?, limit?)`
 - `docmancer_call_tool(name, args)`
@@ -128,12 +128,13 @@ For API tasks, search first, inspect the returned schema and safety block, then 
 
 For repository-specific architecture, conventions, runbooks, roadmap, README/wiki, or module-doc questions, use the Docs MCP tools before generic WebFetch or model memory:
 
-1. Call `bootstrap_project_docs(project_path, question?)` first. It safely inspects and syncs reviewable project-owned docs; it stops before repo writes or dependency-doc network fetches.
-2. Call `get_project_context(project_path, question)` for the answer context pack.
-3. Read `answer_outline.recommended_reading_order` before composing the answer.
-4. Use `trust_contract.selected` / `trust_contract.selected_sources` to cite trusted sources. Treat `CHANGELOG.md` as primary only for release-history/change questions.
-5. Prefer nested `context_pack[].source` and `context_pack[].section` metadata; the flat fields are kept for compatibility.
-6. If the user asks vaguely about "the MCP server", distinguish `doc-atlas mcp docs-serve` (documentation context) from `doc-atlas mcp serve` (installed MCP Packs/API action tools).
+1. Call `inspect_project_docs(project_path)` first for read-only discovery.
+2. If reconciliation is needed, call `prepare_docs(action="sync_project_docs", project_path=..., with_vectors=true)`.
+3. Call `get_docs_context(project_path=..., question=..., mode="project")` for the answer context pack.
+4. Read `answer_outline.recommended_reading_order` before composing the answer.
+5. Use `trust_contract.selected` / `trust_contract.selected_sources` to cite trusted sources. Treat `CHANGELOG.md` as primary only for release-history/change questions.
+6. Prefer nested `context_pack[].source` and `context_pack[].section` metadata; the flat fields are kept for compatibility.
+7. If the user asks vaguely about "the MCP server", distinguish `doc-atlas mcp docs-serve` (canonical documentation context and Patch Contract workflows) from `doc-atlas mcp packs-serve` (advanced installed MCP Packs/API action tools; `serve` is only a compatibility alias).
 
 ## Common Mistakes
 

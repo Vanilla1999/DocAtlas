@@ -15,6 +15,8 @@ _RETRYABLE_BY_REASON: dict[str, bool | None] = {
     "transport_size_limit": True,
     "full_output_too_large": True,
     "unhandled_exception": False,
+    "handler_exception": False,
+    "permission_denied": False,
 }
 
 _HINTS_BY_REASON: dict[str, list[str]] = {
@@ -29,6 +31,8 @@ _HINTS_BY_REASON: dict[str, list[str]] = {
     "transport_size_limit": ["Retry with compact output, lower limit/tokens, or pagination."],
     "full_output_too_large": ["Retry with output_mode='compact', lower limit/tokens, page/page_size, or include_sections."],
     "unhandled_exception": ["Check diagnostics/logs; retry only after the underlying issue is fixed."],
+    "handler_exception": ["Check diagnostics/logs; retry only after the underlying handler issue is fixed."],
+    "permission_denied": ["Check filesystem permissions or run with access to the requested resource."],
 }
 
 _VALIDATION_REASON_CODES = {

@@ -65,7 +65,7 @@ def test_doctor_rejects_stale_docmancer_mcp_command(healthy_pack, tmp_path, monk
 
 def test_doctor_accepts_current_doc_atlas_mcp_command(healthy_pack, tmp_path, monkeypatch):
     cfg = tmp_path / "settings.json"
-    cfg.write_text(json.dumps({"mcpServers": {"docmancer": {"command": "doc-atlas", "args": ["mcp", "serve"]}}}))
+    cfg.write_text(json.dumps({"mcpServers": {"docmancer": {"command": "doc-atlas", "args": ["mcp", "docs-serve"]}}}))
     target = agent_config.AgentTarget("test", cfg, "json_mcpServers")
     monkeypatch.setattr(agent_config, "known_agents", lambda: [target])
 

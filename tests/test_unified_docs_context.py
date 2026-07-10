@@ -259,6 +259,20 @@ def test_missing_dependency_docs_requires_confirmation():
     assert result.reason_code == "dependency_docs_prefetch_required"
 
 
+def test_missing_dependency_docs_returns_prefetch_guidance_without_network_fetch():
+    facade = FakeFacade()
+    facade.dependency_missing = True
+
+    result = _service(facade).get_docs_context("Riverpod autoDispose?", project_path="/repo", mode="dependency", prepare_project_docs=False)
+
+    assert result.status == "confirmation_required"
+    assert result.dependency_docs["network_fetch_required"] is True
+    assert result.dependency_docs["missing"] == 1
+    assert result.dependency_docs["recommended_prefetch"][0]["library"] == "riverpod"
+    assert result.dependency_docs["agent_instruction"] == "Ask the user before prefetching dependency docs. The user can approve prefetching all dependencies or only the recommended top-N."
+    assert facade.prefetched_dependency_docs is False
+
+
 def test_prefetch_auto_treats_explicit_flag_as_network_approval():
     facade = FakeFacade()
     facade.dependency_missing = True

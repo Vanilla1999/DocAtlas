@@ -73,7 +73,7 @@ The docs MCP server exposes documentation lookup tools.
 
 MCP Packs are the action runtime layer.
 
-Run `doc-atlas mcp serve` for packs.
+Run `doc-atlas mcp packs-serve` for packs.
 """,
         encoding="utf-8",
     )

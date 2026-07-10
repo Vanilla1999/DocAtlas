@@ -24,17 +24,12 @@ Use docmancer when the user asks about library docs, API references, vendor docs
 ## Project‑owned docs workflow (preferred)
 
 1. **`inspect_project_docs(project_path)`** — read‑only discovery; returns `reason_code`, `next_action`, `source_summary`.
-2. **`sync_project_docs(project_path, with_vectors=true)`** — reconcile index with filesystem: prune orphans, reindex changed, index new. Canonical lifecycle action.
-3. **`get_project_context(project_path, question)`** — compact context pack with Trust Contract and source attribution.
+2. **`prepare_docs(action="sync_project_docs", project_path=..., with_vectors=true)`** — reconcile index with filesystem: prune orphans, reindex changed, index new. Canonical lifecycle action on the public MCP surface.
+3. **`get_docs_context(project_path=..., question=..., mode="project")`** — compact context pack with Trust Contract and source attribution.
 
 Read `answer_outline.recommended_reading_order` when present. Prefer `trust_contract.selected_sources` or compatibility alias `trust_contract.selected` for citations. Context items expose both flat fields (`path`, `title`, `heading_path`, `freshness`) and nested fields (`source.path`, `source.title`, `section.heading_path`). Treat `CHANGELOG.md` as release-history evidence unless the user asks about changes/releases.
 
-Or use the higher‑level shortcut:
-
-```
-bootstrap_project_docs(project_path, question?)
-get_project_context(project_path, question)
-```
+Use legacy `sync_project_docs`, `bootstrap_project_docs`, `get_project_docs`, or `get_project_context` only when they are explicitly exposed by a compatibility surface. The public docs MCP surface routes lifecycle through `prepare_docs(...)` and context through `get_docs_context(...)`.
 
 ## Library docs workflow
 
@@ -68,22 +63,22 @@ All project‑docs tools return compact JSON by default. Pass `details: true` fo
 ```json
 {
   "reason_code": "project_docs_ready",
-  "next_action": { "type": "get_project_context", "tool": "get_project_context" },
+  "next_action": { "type": "get_docs_context", "tool": "get_docs_context" },
   "source_summary": { "candidates": 4, "indexed": 4, "stale": 0, "ignored": 0 }
 }
 ```
 
-**bootstrap_project_docs**:
+**prepare_docs(action="sync_project_docs")**:
 ```json
 {
   "status": "ready",
   "reason_code": "project_docs_ready",
-  "next_action": { "type": "get_project_context", "tool": "get_project_context" },
+  "next_action": { "type": "get_docs_context", "tool": "get_docs_context" },
   "actions_taken": ["inspect", "sync"]
 }
 ```
 
-**get_project_context**:
+**get_docs_context(mode="project")**:
 ```json
 {
   "answer_available": true,

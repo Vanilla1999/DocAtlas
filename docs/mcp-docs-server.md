@@ -32,7 +32,7 @@ get_docs_context(question, project_path?, library?, mode="auto")
 2. **Project-owned docs** — discover, reconcile, stale-check, prune orphaned indexed entries, and query reviewable repository docs such as `README.md`, `docs/`, `wiki/`, `ARCHITECTURE.md`, ADRs, runbooks, roadmap files, and module/package docs in monorepos.
 3. **Dependency docs from project metadata** — read supported manifests/lockfiles and prefetch exact dependency documentation for the versions the project actually uses.
 
-Project-owned docs and dependency docs are intentionally separate. `sync_project_docs` reconciles the local index for files that already live in the repository. `ingest_project_docs` remains available as a legacy low-level ingest operation, but new agent instructions should prefer `sync_project_docs`. `prefetch_project_docs` / `prefetch_project_dependency_docs` fetch dependency documentation from the network based on manifests or lockfiles.
+Project-owned docs and dependency docs are intentionally separate. `prepare_docs(action="sync_project_docs")` is the public lifecycle action for files that already live in the repository. Legacy direct verbs such as `sync_project_docs`, `ingest_project_docs`, `bootstrap_project_docs`, `get_project_docs`, and `get_project_context` remain compatibility/admin concepts, but new agent instructions should use the public `inspect_project_docs -> prepare_docs(action="sync_project_docs") -> get_docs_context(mode="project")` path. Dependency prefetch actions fetch documentation from the network based on manifests or lockfiles and require explicit approval.
 
 Implementation note for maintainers: the public MCP tool names and schemas remain centralized in `docmancer/mcp/docs_server.py`, while tool handling is split by lane under `docmancer/docs/interfaces/mcp/`:
 
@@ -114,24 +114,23 @@ The unified tool delegates to existing facade methods such as `bootstrap_project
 | `prune_library_docs` | Prune old documentation targets with dry-run support. |
 | `list_library_docs` | List locally registered documentation libraries. |
 
-## Project-owned docs tools
+## Project-owned docs public surface
 
 | Tool | Purpose |
 |---|---|
-| `sync_project_docs` | Canonical lifecycle action. Reconciles the project-docs index with the current repository discovery snapshot: prunes orphaned/stale indexed docs, indexes new or changed reviewable docs, and verifies final state. |
 | `inspect_project_docs` | Read-only discovery of local project docs and exact dependency metadata. Reports reason_code, next_action, stale/ignored/orphaned sources, and compact state. |
-| `ingest_project_docs` | Legacy low-level index operation. Prefer `sync_project_docs` for normal agent flows because ingest does not reconcile orphaned entries. |
-| `bootstrap_project_docs` | Safe high-level onboarding for a repository question: inspect, sync if needed, inspect again. Stops before repo writes or dependency-docs network fetches. |
-| `get_project_docs` | Query indexed current project-owned docs for repo-specific architecture, conventions, runbooks, ADRs, README, roadmap, wiki, or module/package questions. |
-| `get_project_context` | Return a compact repo-grounded context pack after bootstrap/inspect and any required `sync_project_docs` step. Includes a Trust Contract and structured next_actions. |
+| `prepare_docs(action="sync_project_docs")` | Public lifecycle action. Reconciles the project-docs index with the current repository discovery snapshot: prunes orphaned/stale indexed docs, indexes new or changed reviewable docs, and verifies final state. |
+| `get_docs_context(mode="project")` | Query indexed current project-owned docs for repo-specific architecture, conventions, runbooks, ADRs, README, roadmap, wiki, or module/package questions. Includes a Trust Contract and structured next_actions. |
 | `get_patch_plan_context` | Build a compact implementation map from source/dependency/design evidence: current behavior, relevant files, existing APIs, missing symbols, minimal patch path, risks, verification, warnings, and next actions. It is not a replacement for `get_docs_context` or `get_patch_constraints`. |
 | `get_patch_constraints` | Return compact, source-attributed constraints before patching. Designed to provide actionable project constraints for coding agents; it does not validate patches or change `get_docs_context` behavior. |
 | `validate_patch_against_constraints` | Deterministically check changed files or a patch diff against a caller-supplied constraint packet after editing. Best-effort advisory guardrail only; it does not prove correctness or replace tests. |
 
+Legacy/admin direct verbs (`sync_project_docs`, `ingest_project_docs`, `bootstrap_project_docs`, `get_project_docs`, `get_project_context`, direct prefetch/refresh/remove/list tools) are hidden from the default Docs MCP surface unless explicitly enabled for compatibility or diagnostics.
+
 Recommended agent workflow:
 
 ```text
-Question about this repo?       inspect_project_docs -> prepare_docs(sync_project_docs) only if inspect says stale/not indexed -> get_docs_context
+Question about this repo?       inspect_project_docs -> prepare_docs(action="sync_project_docs") only if inspect says stale/not indexed -> get_docs_context(mode="project")
 Coding change / bug fix?        get_docs_context -> get_patch_plan_context -> get_patch_constraints -> edit -> validate_patch_against_constraints -> tests
 Dependency/API question?        inspect_project_docs -> get_docs_context(mode="dependency"|"mixed", allow_network=false first) -> prepare_docs(prefetch_*) only after approval
 After a patch is written?       validate_patch_against_constraints plus real project tests; unknown/manual_review is not a pass
@@ -323,24 +322,20 @@ These tools may fetch documentation from the network. Ask for user confirmation 
 For repo-specific questions, agents should prefer this flow:
 
 ```text
-sync_project_docs(project_path, with_vectors=true)
--> get_project_context(project_path, question)
+inspect_project_docs(project_path)
+-> prepare_docs(action="sync_project_docs", project_path=..., with_vectors=true) if needed
+-> get_docs_context(project_path=..., question=..., mode="project")
 ```
 
-The higher-level bootstrap alternative:
+Legacy compatibility surfaces may still expose direct project-doc tools. Public MCP clients should prefer the unified flow above.
 
-```text
-bootstrap_project_docs(project_path, question?)
--> get_project_context(project_path, question)
-```
-
-The old explicit flow (still available but deprecated):
+The explicit decision flow is:
 
 ```text
 inspect_project_docs(project_path)
--> if reason_code is project_docs_found_not_indexed: sync_project_docs(project_path)
--> if reason_code is project_docs_stale: sync_project_docs(project_path)
--> if reason_code is project_docs_ready: get_project_context(project_path, question)
+-> if reason_code is project_docs_found_not_indexed: prepare_docs(action="sync_project_docs", project_path=...)
+-> if reason_code is project_docs_stale: prepare_docs(action="sync_project_docs", project_path=...)
+-> if reason_code is project_docs_ready: get_docs_context(project_path=..., question=..., mode="project")
 ```
 
 For module-specific questions in monorepos, inspect first so the agent can see discovered modules, then query with an exact `module_path` when possible:
@@ -348,10 +343,10 @@ For module-specific questions in monorepos, inspect first so the agent can see d
 ```text
 inspect_project_docs(project_path)
 -> project_docs.modules / project_docs.indexed_modules
--> get_project_context(project_path, question, module_path="services/auth", scope="module")
+-> get_docs_context(project_path=..., question=..., mode="project", module_path="services/auth", scope="module")
 ```
 
-`get_project_docs` and `get_project_context` accept:
+`get_docs_context(mode="project")` accepts:
 
 | Argument | Meaning |
 |---|---|
@@ -369,7 +364,7 @@ If dependency docs are available from manifests/lockfiles but missing locally, D
 
 All project-docs lifecycle tools return compact responses by default. Pass `details: true` for the full structured response.
 
-Compact `sync_project_docs` response:
+Compact `prepare_docs(action="sync_project_docs")` response:
 
 ```json
 {
@@ -497,9 +492,9 @@ For multi-doc repositories, recommend a maintained `docs/INDEX.md` as the canoni
 After docs are added, moved, refreshed, or reorganized, use this smoke-test loop before relying on answers:
 
 ```text
-sync_project_docs(project_path, with_vectors=true)
+prepare_docs(action="sync_project_docs", project_path=..., with_vectors=true)
 -> inspect_project_docs(project_path) to confirm
--> get_project_context/get_project_docs with 2-3 project-specific questions
+-> get_docs_context(mode="project") with 2-3 project-specific questions
 -> confirm expected files appear in selected_sources, indexed_sources, or result chunks
 ```
 
@@ -525,9 +520,9 @@ Current project-docs `reason_code` values:
 | `reason_code` | Meaning | Expected next step |
 |---|---|---|
 | `no_project_docs` | No reviewable project-owned docs were discovered. | Ask before creating `ARCHITECTURE.md`; then sync and inspect. |
-| `project_docs_found_not_indexed` | Docs candidates exist but are not indexed yet. | Call `sync_project_docs`. |
-| `project_docs_stale` | Indexed project docs changed on disk or are orphaned/ignored. | Call `sync_project_docs` to reconcile. |
-| `project_docs_ready` | Project docs are discovered and current. | Call `get_project_context` or `get_project_docs`. |
+| `project_docs_found_not_indexed` | Docs candidates exist but are not indexed yet. | Call `prepare_docs(action="sync_project_docs")`. |
+| `project_docs_stale` | Indexed project docs changed on disk or are orphaned/ignored. | Call `prepare_docs(action="sync_project_docs")` to reconcile. |
+| `project_docs_ready` | Project docs are discovered and current. | Call `get_docs_context(mode="project")`. |
 | `architecture_doc_creation_recommended` | Docs exist but no high-level overview/architecture doc was discovered. | Ask before creating `ARCHITECTURE.md`; then sync and inspect. |
 | `no_project_docs_results` | Project docs are indexed but the query returned no matching sections. | Inspect project docs and refine/remediate before guessing. |
 | `module_not_found` | A requested `module` or `module_path` was not found among discovered module docs. | Inspect available modules and retry with an exact `module_path`, or ask the user whether to search all project docs. |
@@ -540,9 +535,9 @@ Current project-docs `reason_code` values:
 - Read `trust_contract.selected_sources` or the compatibility alias `trust_contract.selected` before citing sources.
 - For each context item, use either flat fields (`path`, `title`, `heading_path`, `freshness`) or nested fields (`source.path`, `source.title`, `section.heading_path`).
 - Treat `CHANGELOG.md` as release-history evidence unless the user asks about changes, releases, migrations, or version history.
-- Distinguish the Docs MCP server (`doc-atlas mcp docs-serve`) from the Packs MCP runtime (`doc-atlas mcp serve`).
-- Call `inspect_project_docs` first for repo-specific questions (read-only), unless using `bootstrap_project_docs` or going straight to `sync_project_docs`.
-- `sync_project_docs` is the recommended lifecycle action; it reconciles and prunes in one call.
+- Distinguish the Docs MCP server (`doc-atlas mcp docs-serve`) from the Packs MCP runtime (`doc-atlas mcp packs-serve`; `serve` is a compatibility alias).
+- Call `inspect_project_docs` first for repo-specific questions (read-only).
+- `prepare_docs(action="sync_project_docs")` is the recommended public lifecycle action; it reconciles and prunes in one call.
 - Do not WebFetch project architecture/conventions before trying project-owned docs.
 - Do not treat `prefetch_project_docs` as project-owned docs ingest; it is dependency-docs prefetch.
 - Do not create or edit `ARCHITECTURE.md` without user confirmation.

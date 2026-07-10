@@ -172,7 +172,7 @@ def test_docs_mcp_query_requires_specific_docs_mcp_source_when_available():
 
     chunks = [
         fake_chunk(path="README.md", heading_path="Documentation MCP server", content="doc-atlas mcp docs-serve", score=0.95),
-        fake_chunk(path="wiki/MCP-Packs.md", heading_path="MCP Packs", content="doc-atlas mcp serve", score=0.90),
+        fake_chunk(path="wiki/MCP-Packs.md", heading_path="MCP Packs", content="doc-atlas mcp packs-serve", score=0.90),
         fake_chunk(path="docs/mcp-docs-server.md", heading_path="Docs MCP server", content="get_project_context", score=0.50),
     ]
 
@@ -194,7 +194,7 @@ def test_ambiguous_mcp_query_includes_specific_docs_and_packs_sources():
     chunks = [
         fake_chunk(path="README.md", heading_path="Documentation MCP server", content="doc-atlas mcp docs-serve", score=0.95),
         fake_chunk(path="docs/mcp-docs-server.md", heading_path="Docs MCP server", content="get_project_context", score=0.60),
-        fake_chunk(path="wiki/MCP-Packs.md", heading_path="MCP Packs", content="doc-atlas mcp serve", score=0.60),
+        fake_chunk(path="wiki/MCP-Packs.md", heading_path="MCP Packs", content="doc-atlas mcp packs-serve", score=0.60),
         fake_chunk(path="CHANGELOG.md", heading_path="Added", content="MCP changes", score=0.99),
     ]
 

@@ -1,4 +1,5 @@
 from docmancer.mcp import idempotency
+import sqlite3
 
 
 def _db(tmp_path):
@@ -47,3 +48,24 @@ def test_ttl_expiry(tmp_path):
     k2, reused = idempotency.get_or_create_key("t", {"a": 1}, db_path=db, ttl_seconds=10, now=2000)
     assert k1 != k2
     assert reused is False
+
+
+def test_expired_rows_are_pruned_on_write(tmp_path):
+    db = _db(tmp_path)
+    idempotency.get_or_create_key("old", {"a": 1}, db_path=db, ttl_seconds=10, now=1000)
+    idempotency.get_or_create_key("new", {"a": 2}, db_path=db, ttl_seconds=10, now=2000)
+
+    with sqlite3.connect(db) as conn:
+        rows = conn.execute("SELECT fingerprint FROM idempotency_keys").fetchall()
+
+    assert len(rows) == 1
+
+
+def test_insert_is_atomic_for_existing_fingerprint(tmp_path):
+    db = _db(tmp_path)
+    key1, reused1 = idempotency.get_or_create_key("t", {"a": 1}, db_path=db, now=1000)
+    key2, reused2 = idempotency.get_or_create_key("t", {"a": 1}, db_path=db, now=1000)
+
+    assert key1 == key2
+    assert reused1 is False
+    assert reused2 is True

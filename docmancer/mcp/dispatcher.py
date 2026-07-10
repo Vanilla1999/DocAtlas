@@ -17,7 +17,8 @@ from docmancer.mcp import credentials, idempotency, safety
 from docmancer.mcp.executors import get_executor
 from docmancer.mcp.logging import log_call
 from docmancer.mcp.manifest import InstalledPackage, Manifest
-from docmancer.mcp.search import ToolEntry, build_corpus, search
+from docmancer.mcp.network_policy import SecurityError, grant_from_mapping, target_url, validate_http_target
+from docmancer.mcp.search import ToolEntry, build_corpus, search_with_metadata
 from docmancer.mcp.slug import split_tool_name
 
 
@@ -32,6 +33,7 @@ class DispatchResult:
 
 SEARCH_TOOL = "docmancer_search_tools"
 CALL_TOOL = "docmancer_call_tool"
+DEFAULT_EXECUTOR = "noop_doc"
 
 SEARCH_TOOL_SCHEMA = {
     "type": "object",
@@ -64,8 +66,10 @@ class Dispatcher:
                 "name": SEARCH_TOOL,
                 "description": (
                     "Search across installed API packages for tools matching a task. "
-                    "Returns top-K tool names with descriptions and an inlined input "
-                    "schema for the top match. Always call this before docmancer_call_tool."
+                    "Returns top-K tool names with descriptions, score/rank "
+                    "metadata, low-confidence search metadata, and inlined input "
+                    "schemas. Pass an empty query with package to list that package's "
+                    "tools. Always call this before docmancer_call_tool."
                 ),
                 "inputSchema": SEARCH_TOOL_SCHEMA,
             },
@@ -86,20 +90,33 @@ class Dispatcher:
         package: str | None = None,
         limit: int = 5,
     ) -> dict[str, Any]:
-        matches = search(self._corpus, query, package=package, limit=limit)
+        hits, search_meta = search_with_metadata(self._corpus, query, package=package, limit=limit)
+        fallback_hint: str | None = None
+        if not hits and package and query:
+            hits, search_meta = search_with_metadata(self._corpus, "", package=package, limit=limit)
+            fallback_hint = "No lexical matches; showing package tools instead."
         out: list[dict[str, Any]] = []
-        for i, m in enumerate(matches):
+        for hit in hits:
+            m = hit.entry
             entry: dict[str, Any] = {
                 "name": m.name,
                 "package": m.package,
                 "version": m.version,
                 "description": m.description,
                 "safety": m.safety,
+                "score": hit.score,
+                "lexicalScore": hit.lexical_score,
+                "semanticScore": hit.semantic_score,
+                "rankReason": hit.rank_reason,
             }
-            if i == 0:
-                entry["inputSchema"] = m.input_schema
+            entry["inputSchema"] = m.input_schema
             out.append(entry)
-        return {"matches": out}
+        if fallback_hint:
+            search_meta = {**search_meta, "lowConfidence": True, "hint": fallback_hint}
+        return {
+            "matches": out,
+            "search": search_meta,
+        }
 
     def call_tool(self, name: str, args: dict[str, Any]) -> DispatchResult:
         start = time.time()
@@ -135,13 +152,29 @@ class Dispatcher:
                      latency_ms=int((time.time() - start) * 1000))
             return DispatchResult(False, body, "invalid_args")
 
+        executor_kind = operation.get("executor", DEFAULT_EXECUTOR)
+        operation_grant = pkg.grant_for(str(operation.get("id") or ""))
+        validated_http_target = None
+        if executor_kind == "http":
+            http_meta = operation.get("http", {}) or {}
+            try:
+                validated_http_target = validate_http_target(
+                    target_url(http_meta.get("base_url", ""), http_meta.get("path", "")),
+                    grant_from_mapping(operation_grant),
+                )
+            except SecurityError as exc:
+                body = {"error": exc.code, "message": f"HTTP target blocked: {exc.code}"}
+                log_call(tool=name, args=args, status=exc.code,
+                         latency_ms=int((time.time() - start) * 1000))
+                return DispatchResult(False, body, exc.code)
+
         auth_material = credentials.build_auth(pkg.package, auth, args)
         missing = auth_material.missing
         gate = safety.check(
             package=pkg.package,
             version=pkg.version,
             operation=operation,
-            allow_destructive=pkg.allow_destructive,
+            allow_destructive=pkg.allow_destructive and bool(operation_grant.get("allow_destructive")),
             has_credentials=not missing or not (operation.get("safety") or {}).get("requires_auth"),
         )
         if not gate.allowed:
@@ -155,13 +188,11 @@ class Dispatcher:
             return DispatchResult(False, body, gate.error_code)
 
         # Idempotency
-        op_safety = operation.get("safety") or {}
         idempotency_key: str | None = None
         idempotency_header = auth.get("idempotency_header")
-        if not op_safety.get("idempotent", True) and idempotency_header:
+        if _should_create_idempotency_key(operation, executor_kind) and idempotency_header:
             idempotency_key, _ = idempotency.get_or_create_key(name, args)
 
-        executor_kind = operation.get("executor", "http")
         if executor_kind in {"python_import", "shell"} and not getattr(pkg, "allow_execute", False):
             body = {
                 "error": "execution_not_allowed",
@@ -174,16 +205,32 @@ class Dispatcher:
             log_call(tool=name, args=args, status="execution_not_allowed",
                      latency_ms=int((time.time() - start) * 1000))
             return DispatchResult(False, body, "execution_not_allowed")
+        allowed_executors = operation_grant.get("allowed_executors") or []
+        if executor_kind in {"python_import", "shell"} and executor_kind not in allowed_executors:
+            body = {
+                "error": "executor_not_granted",
+                "message": f"Operation {operation.get('id')} is not granted for executor '{executor_kind}'.",
+            }
+            log_call(tool=name, args=args, status="executor_not_granted",
+                     latency_ms=int((time.time() - start) * 1000))
+            return DispatchResult(False, body, "executor_not_granted")
         executor = get_executor(executor_kind)
+        operation_for_executor = dict(operation)
+        if executor_kind == "http":
+            operation_for_executor["_docmancer_http_grant"] = operation_grant
+            if validated_http_target is not None:
+                operation_for_executor["_docmancer_http_resolved_ips"] = list(validated_http_target.resolved_ips)
+        elif executor_kind == "python_import":
+            operation_for_executor["_docmancer_operation_grant"] = operation_grant
         result = executor.call(
-            operation=operation,
+            operation=operation_for_executor,
             args=validation_args,
-            auth_headers=auth_material.headers,
-            required_headers=auth.get("required_headers", {}) or {},
+            auth_headers={} if executor_kind == "python_import" else auth_material.headers,
+            required_headers={} if executor_kind == "python_import" else auth.get("required_headers", {}) or {},
             idempotency_key=idempotency_key,
             idempotency_header=idempotency_header,
-            auth_params=auth_material.params,
-            auth_cookies=auth_material.cookies,
+            auth_params={} if executor_kind == "python_import" else auth_material.params,
+            auth_cookies={} if executor_kind == "python_import" else auth_material.cookies,
         )
 
         body: Any = result.body
@@ -256,3 +303,13 @@ def _schema_from_params(operation: dict[str, Any]) -> dict[str, Any]:
     if required:
         schema["required"] = required
     return schema
+
+
+def _should_create_idempotency_key(operation: dict[str, Any], executor_kind: str) -> bool:
+    if executor_kind != "http":
+        return False
+    method = ((operation.get("http") or {}).get("method") or "GET").upper()
+    if method in {"GET", "HEAD", "OPTIONS"}:
+        return False
+    safety_meta = operation.get("safety") or {}
+    return safety_meta.get("idempotent") is not True

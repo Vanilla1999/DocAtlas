@@ -195,7 +195,7 @@ def test_get_patch_plan_context_schema_contains_required_fields():
     assert properties["max_tokens"]["default"] == 2400
     assert properties["max_tokens"]["minimum"] == 200
     assert properties["max_tokens"]["maximum"] == 12000
-    assert properties["output_mode"]["enum"] == ["compact", "debug", "full", None]
+    assert properties["output_mode"]["enum"] == ["compact", "debug", "full"]
 
 
 def test_get_patch_plan_context_routes_through_project_tools():

@@ -2,8 +2,49 @@
 from __future__ import annotations
 
 import httpx
+import pytest
 
 from docmancer.mcp.executors.http import HttpExecutor
+from docmancer.mcp.network_policy import HttpGrant, SecurityError, validate_http_target
+
+
+def test_http_target_blocks_unresolvable_hostname(monkeypatch):
+    monkeypatch.setattr("docmancer.mcp.network_policy.resolve_host", lambda host: [])
+
+    with pytest.raises(SecurityError) as exc:
+        validate_http_target("https://example.com/v1", HttpGrant(allowed_hosts=("example.com",)))
+
+    assert exc.value.code == "host_resolution_failed"
+
+
+def test_http_executor_blocks_unresolved_host_before_credentials(monkeypatch):
+    monkeypatch.setattr("docmancer.mcp.network_policy.resolve_host", lambda host: [])
+    called = False
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        nonlocal called
+        called = True
+        return httpx.Response(200, json={"ok": True})
+
+    exec_ = HttpExecutor(client=httpx.Client(transport=httpx.MockTransport(handler)))
+    op = {
+        "http": {"method": "GET", "path": "/v1/items", "base_url": "https://example.com"},
+        "params": [],
+        "safety": {"destructive": False, "idempotent": True, "requires_auth": True},
+    }
+
+    result = exec_.call(
+        operation=op,
+        args={},
+        auth_headers={"Authorization": "Bearer secret"},
+        required_headers={},
+        idempotency_key=None,
+        idempotency_header=None,
+    )
+
+    assert result.ok is False
+    assert result.error == "host_resolution_failed"
+    assert called is False
 
 
 def test_multipart_executor():
@@ -23,7 +64,7 @@ def test_multipart_executor():
         "http": {
             "method": "POST",
             "path": "/v1/files",
-            "base_url": "https://api.example.com",
+            "base_url": "https://example.com",
             "encoding": "multipart",
         },
         "params": [
@@ -64,7 +105,7 @@ def test_pagination_response_returned_untouched():
         "http": {
             "method": "GET",
             "path": "/v1/widgets",
-            "base_url": "https://api.acme.test",
+            "base_url": "https://example.com",
             "encoding": "query_only",
         },
         "params": [{"name": "limit", "in": "query", "type": "integer"}],
@@ -95,7 +136,7 @@ def test_idempotency_header_skipped_when_source_lacks_one():
         "http": {
             "method": "POST",
             "path": "/v1/things",
-            "base_url": "https://api.example.com",
+            "base_url": "https://example.com",
             "encoding": "json",
         },
         "params": [{"name": "name", "in": "body", "type": "string"}],
@@ -128,7 +169,7 @@ def test_path_parameters_are_percent_encoded():
         "http": {
             "method": "GET",
             "path": "/repos/{owner}/{repo}/contents/{path}",
-            "base_url": "https://api.example.com",
+            "base_url": "https://example.com",
             "encoding": "path_only",
         },
         "params": [
@@ -164,7 +205,7 @@ def test_apikey_in_query_is_sent_as_query_param():
         "http": {
             "method": "GET",
             "path": "/v1/items",
-            "base_url": "https://api.example.com",
+            "base_url": "https://example.com",
             "encoding": "query_only",
         },
         "params": [],
@@ -195,7 +236,7 @@ def test_apikey_in_cookie_is_sent_as_cookie():
         "http": {
             "method": "GET",
             "path": "/v1/items",
-            "base_url": "https://api.example.com",
+            "base_url": "https://example.com",
             "encoding": "query_only",
         },
         "params": [],
