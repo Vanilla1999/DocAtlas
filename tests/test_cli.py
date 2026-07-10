@@ -128,6 +128,7 @@ def test_agent_contract_cli_describes_project_sources_and_tool_selection(tmp_pat
     contract = json.loads(result.output)
     assert contract["schema_version"] == "agent-contract-1"
     assert contract["tool_selection"]["default_tool"] == "get_docs_context"
+    assert "docs_status for an explicit health" in contract["tool_selection"]["decision_rule"]
     assert {item["path"] for item in contract["project"]["documentation"]} == {"README.md", "packages/auth/README.md"}
     assert any(item["name"] == "react" for item in contract["project"]["dependencies"])
 
