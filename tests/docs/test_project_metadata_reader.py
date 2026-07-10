@@ -20,6 +20,50 @@ def test_non_flutter_project_does_not_warn_about_missing_flutter_files(tmp_path:
     assert "flutter" not in metadata.detected_ecosystems
 
 
+def test_python_project_binds_direct_dependencies_to_uv_lock_versions(tmp_path: Path) -> None:
+    root = tmp_path / "python_repo"
+    root.mkdir()
+    (root / "pyproject.toml").write_text(
+        """
+[project]
+name = "demo"
+dependencies = ["fastapi>=0.110", "httpx==0.27.2"]
+
+[dependency-groups]
+dev = ["pytest>=8"]
+""".strip(),
+        encoding="utf-8",
+    )
+    (root / "uv.lock").write_text(
+        """
+version = 1
+
+[[package]]
+name = "fastapi"
+version = "0.115.6"
+
+[[package]]
+name = "httpx"
+version = "0.27.2"
+
+[[package]]
+name = "pytest"
+version = "8.3.4"
+""".strip(),
+        encoding="utf-8",
+    )
+
+    metadata = ProjectMetadataReader().read(root)
+    python = {item.package_name: item for item in metadata.dependencies if item.ecosystem == "python"}
+
+    assert metadata.packages["python:fastapi"] == "0.115.6"
+    assert metadata.packages["python:httpx"] == "0.27.2"
+    assert metadata.packages["python:pytest"] == "8.3.4"
+    assert python["fastapi"].version_source == "uv.lock_exact"
+    assert python["pytest"].dependency_group == "dev"
+    assert "python" in metadata.detected_ecosystems
+
+
 def test_flutter_project_reads_pubspec_without_requiring_fvmrc_or_lock(tmp_path: Path) -> None:
     root = tmp_path / "flutter_repo"
     root.mkdir()
