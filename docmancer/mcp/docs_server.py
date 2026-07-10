@@ -82,7 +82,7 @@ Agent workflow:
                 "tokens": {"type": ["integer", "null"], "minimum": 1, "maximum": 20000},
                 "limit": {"type": ["integer", "null"], "minimum": 1, "maximum": 20},
                 "expand": {"type": ["string", "null"]},
-                "prepare_project_docs": {"type": ["boolean", "null"]},
+                "prepare_project_docs": {"type": ["boolean", "null"], "default": False, "description": "Compatibility opt-in for automatic local bootstrap. The public default is read-only preflight; follow a returned prepare_docs action instead."},
                 "allow_network": {"type": ["boolean", "null"]},
                 "allow_latest_fallback": {"type": ["boolean", "null"]},
                 "force_refresh": {"type": ["boolean", "null"]},
@@ -108,11 +108,12 @@ Agent workflow:
         "inputSchema": {
             "type": "object",
             "properties": {
-                "action": {"type": "string", "enum": ["sync_project_docs", "prefetch_project_dependency_docs", "prefetch_library_docs", "prefetch_docs_targets", "validate_docs_manifest", "prefetch_docs_manifest", "refresh_library_docs", "prune_library_docs", "remove_library_docs"]},
+                "action": {"type": "string", "enum": ["sync_project_docs", "prefetch_project_dependency_docs", "prefetch_library_docs", "prefetch_docs_targets", "validate_docs_manifest", "prefetch_docs_manifest", "refresh_library_docs", "prune_library_docs", "remove_library_docs", "cancel_docs_job"]},
                 "project_path": {"type": ["string", "null"]},
                 "library": {"type": ["string", "null"]},
                 "canonical_id": {"type": ["string", "null"]},
                 "manifest_path": {"type": ["string", "null"]},
+                "job_id": {"type": ["string", "null"]},
                 "targets": {"type": ["array", "null"]},
                 "ecosystem": {"type": ["string", "null"]},
                 "version": {"type": ["string", "null"]},
