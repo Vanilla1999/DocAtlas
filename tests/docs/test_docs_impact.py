@@ -2,7 +2,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from docmancer.docs.impact import analyze_docs_impact, format_docs_impact_markdown
+from docmancer.docs import impact
+from docmancer.docs.impact import analyze_docs_impact, changed_files_from_git, format_docs_impact_markdown
 
 
 def _write(path: Path, text: str) -> None:
@@ -65,10 +66,82 @@ def test_docs_and_dependency_metadata_changes_are_explicit(tmp_path: Path) -> No
     assert by_path["README.md"]["reasons"] == ["dependency_metadata_changed"]
 
 
+def test_module_dependency_metadata_maps_to_module_docs(tmp_path: Path) -> None:
+    root = _project(tmp_path)
+
+    report = analyze_docs_impact(root, ["packages/auth/package.json"])
+
+    assert report["impacts"] == [{
+        "path": "packages/auth/README.md",
+        "status": "review_required",
+        "reasons": ["module_dependency_metadata_changed"],
+        "changed_files": ["packages/auth/package.json"],
+        "module_path": "packages/auth",
+    }]
+
+
+def test_dependency_metadata_uses_discovered_root_readme(tmp_path: Path) -> None:
+    root = _project(tmp_path)
+    (root / "README.md").unlink()
+    _write(root / "README.rst", "Project\n=======\n")
+
+    report = analyze_docs_impact(root, ["package-lock.json"])
+
+    assert report["impacts"][0]["path"] == "README.rst"
+    assert report["missing"] == []
+
+
+def test_dependency_metadata_without_root_readme_is_a_gap(tmp_path: Path) -> None:
+    root = _project(tmp_path)
+    (root / "README.md").unlink()
+
+    report = analyze_docs_impact(root, ["package-lock.json"])
+
+    assert report["impacts"] == []
+    assert report["missing"] == [{
+        "module_path": ".",
+        "reason": "dependency_metadata_changed_without_root_readme",
+        "suggested_path": "README.md",
+    }]
+
+
+def test_deleted_module_docs_are_reported_as_a_gap(tmp_path: Path) -> None:
+    root = _project(tmp_path)
+    (root / "packages" / "auth" / "README.md").unlink()
+
+    report = analyze_docs_impact(root, ["packages/auth/README.md"])
+
+    assert report["summary"]["missing_docs"] == 1
+    assert report["missing"][0]["module_path"] == "packages/auth"
+
+
+def test_git_diff_includes_deleted_paths(tmp_path: Path, monkeypatch) -> None:
+    calls: list[list[str]] = []
+
+    class Completed:
+        returncode = 0
+        stdout = "packages/auth/README.md\n"
+        stderr = ""
+
+    def fake_run(command, **_kwargs):
+        calls.append(command)
+        return Completed()
+
+    monkeypatch.setattr(impact.subprocess, "run", fake_run)
+
+    assert changed_files_from_git(tmp_path, "base") == ["packages/auth/README.md"]
+    assert "--diff-filter=ACDMR" in calls[0]
+
+
 def test_tests_only_change_does_not_request_docs_review(tmp_path: Path) -> None:
     root = _project(tmp_path)
 
-    report = analyze_docs_impact(root, ["tests/test_auth.py"])
+    report = analyze_docs_impact(root, [
+        "tests/test_auth.py",
+        "packages/auth/__tests__/token.ts",
+        "packages/auth/src/token.spec.tsx",
+        "packages/auth/token_test.go",
+    ])
 
     assert report["summary"]["code_files"] == 0
     assert report["impacts"] == []
@@ -84,4 +157,3 @@ def test_markdown_report_is_ready_for_github_step_summary(tmp_path: Path) -> Non
     assert rendered.startswith("## DocAtlas documentation impact")
     assert "`packages/auth/README.md`" in rendered
     assert "Review the listed docs" in rendered
-
