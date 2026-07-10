@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 import re
+import tomllib
 from pathlib import Path
 from typing import Any
 
@@ -85,10 +86,11 @@ class ProjectMetadataReader:
         direct_dependencies, pub_manifest_observations = self._read_pubspec_yaml(pubspec_yaml_path, warnings) if pubspec_yaml_path.exists() else ([], [])
         cargo_packages, rust_observations = self._read_cargo(root, warnings)
         npm_packages, npm_direct_dependencies, npm_observations = self._read_node(root, warnings)
+        python_packages, python_direct_dependencies, python_observations = self._read_python(root, warnings)
         docs_candidates = self.discover_docs(root, warnings)
-        all_packages = {**packages, **cargo_packages, **npm_packages}
-        direct_dependencies = sorted({*direct_dependencies, *npm_direct_dependencies})
-        dependencies = [*pub_observations, *pub_manifest_observations, *rust_observations, *npm_observations]
+        all_packages = {**packages, **cargo_packages, **npm_packages, **python_packages}
+        direct_dependencies = sorted({*direct_dependencies, *npm_direct_dependencies, *python_direct_dependencies})
+        dependencies = [*pub_observations, *pub_manifest_observations, *rust_observations, *npm_observations, *python_observations]
         detected_ecosystems = sorted({item.ecosystem for item in dependencies})
         if flutter_version or flutter_channel or "flutter" in direct_dependencies:
             detected_ecosystems = sorted({*detected_ecosystems, "flutter"})
@@ -493,6 +495,168 @@ class ProjectMetadataReader:
                 warnings=[] if source_kind == "registry" else [f"{name}: non-registry npm dependency source."],
             ))
         return packages, sorted(manifest), observations
+
+    def _read_python(
+        self,
+        root: Path,
+        warnings: list[str],
+    ) -> tuple[dict[str, str], list[str], list[DependencyObservation]]:
+        """Read direct Python dependencies and bind them to uv.lock when present."""
+
+        pyproject = root / "pyproject.toml"
+        requirements = root / "requirements.txt"
+        uv_lock = root / "uv.lock"
+        if not pyproject.exists() and not requirements.exists() and not uv_lock.exists():
+            return {}, [], []
+
+        manifest = self._read_pyproject_dependencies(pyproject, warnings)
+        if not manifest:
+            manifest = self._read_requirements_dependencies(requirements, warnings)
+        locked_versions = self._read_uv_lock_versions(uv_lock, warnings)
+        if manifest and not uv_lock.exists():
+            warnings.append("uv.lock not found; exact Python dependency versions may be unavailable.")
+
+        packages: dict[str, str] = {}
+        observations: list[DependencyObservation] = []
+        for name, (group, specifier) in sorted(manifest.items()):
+            source_kind = self._python_source_kind(specifier)
+            locked_version = locked_versions.get(name)
+            resolved = locked_version if source_kind == "registry" else None
+            if resolved:
+                packages[f"python:{name}"] = resolved
+                version_source = "uv.lock_exact"
+            else:
+                exact = self._python_exact_version(specifier)
+                resolved = exact if source_kind == "registry" else None
+                if resolved:
+                    packages[f"python:{name}"] = resolved
+                version_source = "pyproject.toml_exact" if resolved else "pyproject.toml_range"
+            observations.append(DependencyObservation(
+                ecosystem="python",
+                package_name=name,
+                dependency_group=group,
+                specifier_kind="exact" if resolved else ("direct_url" if source_kind != "registry" else "range"),
+                specifier_raw=specifier,
+                resolved_version=resolved,
+                version_source=version_source,
+                source_kind=source_kind,
+                warnings=[] if source_kind == "registry" else [f"{name}: non-registry Python dependency source."],
+            ))
+        return packages, sorted(manifest), observations
+
+    def _read_pyproject_dependencies(self, path: Path, warnings: list[str]) -> dict[str, tuple[str, str]]:
+        if not path.exists():
+            return {}
+        try:
+            data = tomllib.loads(path.read_text(encoding="utf-8"))
+        except (OSError, tomllib.TOMLDecodeError) as exc:
+            warnings.append(f"Could not parse pyproject.toml: {exc}")
+            return {}
+        if not isinstance(data, dict):
+            return {}
+        result: dict[str, tuple[str, str]] = {}
+        project = data.get("project") if isinstance(data.get("project"), dict) else {}
+        self._add_python_requirements(result, project.get("dependencies"), "dependencies")
+        optional = project.get("optional-dependencies")
+        if isinstance(optional, dict):
+            for group, values in optional.items():
+                self._add_python_requirements(result, values, f"optional:{group}")
+        self._add_python_requirements(result, data.get("dependency-groups"), "dev", grouped=True)
+
+        tool = data.get("tool") if isinstance(data.get("tool"), dict) else {}
+        poetry = tool.get("poetry") if isinstance(tool.get("poetry"), dict) else {}
+        self._add_poetry_dependencies(result, poetry.get("dependencies"), "dependencies")
+        poetry_groups = poetry.get("group")
+        if isinstance(poetry_groups, dict):
+            for group, values in poetry_groups.items():
+                if isinstance(values, dict):
+                    self._add_poetry_dependencies(result, values.get("dependencies"), str(group))
+        return result
+
+    def _read_requirements_dependencies(self, path: Path, warnings: list[str]) -> dict[str, tuple[str, str]]:
+        if not path.exists():
+            return {}
+        try:
+            lines = path.read_text(encoding="utf-8").splitlines()
+        except OSError as exc:
+            warnings.append(f"Could not read requirements.txt: {exc}")
+            return {}
+        result: dict[str, tuple[str, str]] = {}
+        self._add_python_requirements(result, lines, "dependencies")
+        return result
+
+    @staticmethod
+    def _read_uv_lock_versions(path: Path, warnings: list[str]) -> dict[str, str]:
+        if not path.exists():
+            return {}
+        try:
+            data = tomllib.loads(path.read_text(encoding="utf-8"))
+        except (OSError, tomllib.TOMLDecodeError) as exc:
+            warnings.append(f"Could not parse uv.lock: {exc}")
+            return {}
+        versions: dict[str, str] = {}
+        for entry in data.get("package", []) if isinstance(data, dict) else []:
+            if not isinstance(entry, dict):
+                continue
+            name, version = entry.get("name"), entry.get("version")
+            if isinstance(name, str) and isinstance(version, str) and name.strip() and version.strip():
+                versions.setdefault(ProjectMetadataReader._python_name(name), version.strip())
+        return versions
+
+    def _add_python_requirements(
+        self, result: dict[str, tuple[str, str]], values: Any, group: str, *, grouped: bool = False
+    ) -> None:
+        if grouped:
+            if not isinstance(values, dict):
+                return
+            for group_name, requirements in values.items():
+                self._add_python_requirements(result, requirements, str(group_name))
+            return
+        if not isinstance(values, list):
+            return
+        for raw in values:
+            if not isinstance(raw, str):
+                continue
+            requirement = raw.split("#", 1)[0].strip()
+            if not requirement or requirement.startswith(("-", "--")):
+                continue
+            name = self._python_requirement_name(requirement)
+            if name:
+                result[name] = (group, requirement)
+
+    def _add_poetry_dependencies(self, result: dict[str, tuple[str, str]], values: Any, group: str) -> None:
+        if not isinstance(values, dict):
+            return
+        for name, raw in values.items():
+            if not isinstance(name, str) or name.lower() == "python":
+                continue
+            specifier = self._specifier_raw(raw) or ""
+            result[self._python_name(name)] = (group, f"{name}{specifier}" if specifier else name)
+
+    @staticmethod
+    def _python_name(name: str) -> str:
+        return re.sub(r"[-_.]+", "-", name.strip().lower())
+
+    @classmethod
+    def _python_requirement_name(cls, requirement: str) -> str | None:
+        match = re.match(r"^([A-Za-z0-9_.-]+)(?:\[[^]]*\])?", requirement)
+        return cls._python_name(match.group(1)) if match else None
+
+    @staticmethod
+    def _python_exact_version(specifier: str) -> str | None:
+        match = re.search(r"==\s*([A-Za-z0-9][A-Za-z0-9._+!-]*)", specifier)
+        return match.group(1) if match else None
+
+    @staticmethod
+    def _python_source_kind(specifier: str) -> str:
+        lowered = specifier.lower()
+        if " @ git+" in lowered or "git+" in lowered:
+            return "git"
+        if " @ file:" in lowered or " @ ../" in lowered or " @ ./" in lowered:
+            return "path"
+        if " @ " in lowered:
+            return "url"
+        return "registry"
 
     @staticmethod
     def _read_package_json(
