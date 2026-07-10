@@ -1,3 +1,6 @@
+Warning: truncated output (original token count: 25281)
+Total output lines: 2375
+
 from __future__ import annotations
 
 import os
@@ -965,526 +968,7 @@ def update_cmd(
     help="Restrict ingest to one or more file formats.",
 )
 @click.option("--recursive/--no-recursive", default=True, show_default=True, help="Recurse through directories.")
-@click.option("--skip-known", is_flag=True, help="Skip files whose content hash is already indexed.")
-@click.option("--no-vectors", is_flag=True, help="Index FTS5 only; skip embedding/vector upsert.")
-@click.option("--config", "config_path", default=None, help="Path to docmancer.yaml.")
-def ingest_cmd(
-    path: str,
-    recreate: bool,
-    include_patterns: tuple[str, ...],
-    exclude_patterns: tuple[str, ...],
-    formats: tuple[str, ...],
-    recursive: bool,
-    skip_known: bool,
-    no_vectors: bool,
-    config_path: str | None,
-):
-    """Index local files or directories."""
-    if path.startswith(("http://", "https://")):
-        raise click.ClickException("Use `doc-atlas add` for URLs.")
-
-    config_path = _effective_config(config_path)
-    _configure_ingest_logging()
-    config = _load_config(config_path)
-    agent = _get_agent_class()(config=config)
-
-    if recreate and not no_vectors:
-        _drop_vector_collection(config, agent)
-
-    try:
-        total = agent.ingest(
-            path,
-            recreate=recreate,
-            include=include_patterns,
-            exclude=exclude_patterns,
-            formats=formats,
-            recursive=recursive,
-            skip_known=skip_known,
-            with_vectors=not no_vectors,
-        )
-        _emit_index_summary(total, agent)
-        if getattr(agent, "last_ingest_skips", None):
-            report_path = getattr(agent, "last_ingest_report_path", None)
-            click.echo(f"Skipped {len(agent.last_ingest_skips)} file(s). Report: {display_path(report_path)}")
-    except (FileNotFoundError, ValueError) as e:
-        click.echo(f"Error: {e}", err=True)
-        sys.exit(1)
-
-
-def _drop_vector_collection(config, agent) -> None:
-    """Best-effort: remove the Qdrant collection + persisted meta so the
-    next ingest rebuilds at the current embedder dimension.
-
-    Silent on missing-collection / Qdrant-down: callers use this defensively
-    before re-ingest, and a missing collection is success, not failure.
-    """
-    try:
-        from docmancer.core import index_meta
-        from docmancer.runtime.qdrant_manager import ensure_running
-        from docmancer.stores.base import get_vector_store
-    except ImportError:
-        return
-
-    collection = agent._vector_collection_name()
-    vs_config = config.vector_store
-    if vs_config.provider == "qdrant" and not vs_config.url:
-        resolution = ensure_running()
-        if not resolution.url:
-            index_meta.drop(collection)
-            return
-        vs_config = vs_config.model_copy(update={"url": resolution.url})
-
-    try:
-        store = get_vector_store(vs_config, embeddings_dim=config.embeddings.dimensions)
-        store.delete_collection(collection)
-    except Exception as exc:
-        logger = logging.getLogger(__name__)
-        logger.debug("could not drop vector collection %r: %s", collection, exc)
-    index_meta.drop(collection)
-
-
-@click.command(
-    cls=DocmancerCommand,
-    context_settings=HELP_CONTEXT_SETTINGS,
-    short_help="Download docs to Markdown files.",
-    epilog=format_examples(
-        "doc-atlas fetch https://docs.example.com",
-        "doc-atlas fetch https://docs.example.com --output ./downloaded-docs",
-    ),
-)
-@click.argument("url")
-@click.option(
-    "--output",
-    "output_dir",
-    default="docmancer-docs",
-    show_default=True,
-    help="Output directory for downloaded .md files.",
-)
-def fetch_cmd(url: str, output_dir: str):
-    """Download docs from a GitBook URL to local .md files."""
-    from urllib.parse import urlparse
-    from docmancer.connectors.fetchers.gitbook import GitBookFetcher
-
-    fetcher = GitBookFetcher()
-    click.echo(f"Fetching docs from {url}...")
-    try:
-        documents = fetcher.fetch(url)
-    except ValueError as e:
-        click.echo(f"Error: {e}", err=True)
-        sys.exit(1)
-
-    out_path = Path(output_dir)
-    out_path.mkdir(parents=True, exist_ok=True)
-
-    for doc in documents:
-        parsed = urlparse(doc.source)
-        slug = parsed.path.strip("/").replace("/", "_") or "index"
-        filename = f"{slug}.md"
-        file_path = out_path / filename
-        file_path.write_text(doc.content, encoding="utf-8")
-        click.echo(f"  Saved {display_path(file_path)}")
-
-    click.echo(f"Downloaded {len(documents)} document(s) to {output_dir}/")
-
-
-@click.command(
-    cls=DocmancerCommand,
-    context_settings=HELP_CONTEXT_SETTINGS,
-    short_help="Stream-ingest a USPTO trademark XML / ZIP bulk file.",
-    epilog=format_examples(
-        "doc-atlas ingest-uspto apc18840407-20240102-xx.xml",
-        "doc-atlas ingest-uspto bulk-trademarks-2024.zip --include-dead",
-        "doc-atlas ingest-uspto daily.xml.gz --no-vectors --batch-size 5000",
-    ),
-)
-@click.argument("path", type=click.Path(exists=True, dir_okay=False, readable=True))
-@click.option("--recreate", is_flag=True, help="Clear the index before ingesting.")
-@click.option("--include-dead", is_flag=True, help="Index dead/abandoned marks too (default: live only).")
-@click.option("--no-vectors", is_flag=True, help="Skip embedding/vector upsert; index FTS5 only.")
-@click.option("--batch-size", default=1000, type=int, show_default=True, help="Commit batch size for streaming ingest.")
-@click.option("--limit", default=None, type=int, help="Stop after N records (smoke testing).")
-@click.option("--config", "config_path", default=None, help="Path to docmancer.yaml.")
-def ingest_uspto_cmd(
-    path: str,
-    recreate: bool,
-    include_dead: bool,
-    no_vectors: bool,
-    batch_size: int,
-    limit: int | None,
-    config_path: str | None,
-):
-    """Stream USPTO trademark case-files into the local index.
-
-    Accepts an `.xml`, `.xml.gz`, or `.zip` archive containing the USPTO bulk
-    trademark XML. Each `<case-file>` becomes one Section in SQLite (no
-    heading splitting). Memory stays flat thanks to streaming iterparse and
-    batched SQLite commits.
-    """
-    from docmancer.connectors.fetchers.uspto_tm import (
-        ParseStats,
-        iter_uspto_documents,
-    )
-
-    config_path = _effective_config(config_path)
-    _configure_ingest_logging()
-    config = _load_config(config_path)
-    agent = _get_agent_class()(config=config)
-
-    stats = ParseStats()
-
-    def _records():
-        count = 0
-        for doc in iter_uspto_documents(path, live_only=not include_dead, stats=stats):
-            yield doc
-            count += 1
-            if limit is not None and count >= limit:
-                break
-
-    def _progress(sources: int, sections: int) -> None:
-        click.echo(
-            f"  ... {sources} record(s) ingested ({stats.parsed} parsed, "
-            f"{stats.skipped_dead} skipped dead, {stats.failed} failed)"
-        )
-
-    try:
-        total = agent.ingest_records(
-            _records(),
-            recreate=recreate,
-            batch_size=batch_size,
-            with_vectors=not no_vectors,
-            progress_callback=_progress,
-        )
-    except Exception as exc:
-        click.echo(f"USPTO ingest failed: {type(exc).__name__}: {exc}", err=True)
-        sys.exit(1)
-
-    click.echo()
-    click.echo(f"Parsed:        {stats.parsed}")
-    click.echo(f"Emitted:       {stats.emitted}")
-    click.echo(f"Skipped dead:  {stats.skipped_dead}")
-    click.echo(f"Failed:        {stats.failed}")
-    if stats.failures_by_reason:
-        click.echo("Failure reasons:")
-        for reason, count in sorted(stats.failures_by_reason.items()):
-            click.echo(f"  {reason}: {count}")
-    click.echo(f"Sections indexed: {total}")
-
-
-@click.command(
-    cls=DocmancerCommand,
-    context_settings=HELP_CONTEXT_SETTINGS,
-    short_help="Show collection stats.",
-    epilog=format_examples(
-        "doc-atlas inspect",
-        "doc-atlas inspect pytest --vectors",
-        "doc-atlas inspect pytest --json",
-        "doc-atlas inspect --config ./docmancer.yaml",
-    ),
-)
-@click.argument("source", required=False)
-@click.option("--failed", "show_failed", is_flag=True, default=False, help="Show failure-focused details for the source.")
-@click.option("--vectors", "show_vectors", is_flag=True, default=False, help="Show retrieval/vector state for the source.")
-@click.option("--extraction", "show_extraction", is_flag=True, default=False, help="Show extraction/content state for the source.")
-@click.option("--json", "json_output", is_flag=True, default=False, help="Emit source card as JSON.")
-@click.option("--config", "config_path", default=None, help="Path to docmancer.yaml.")
-def inspect_cmd(source: str | None, show_failed: bool, show_vectors: bool, show_extraction: bool, json_output: bool, config_path: str | None):
-    """Show collection stats or a source operational card."""
-    config_path = _effective_config(config_path)
-    config = _load_config(config_path)
-    agent = _create_agent_or_raise_lock_error(config)
-
-    if source:
-        cards = [_operational_source_card(row) for row in _source_rows(config, grouped=False)]
-        matches = [card for card in cards if source in card["source"]]
-        if not matches:
-            raise click.ClickException(f"No indexed source matches {source!r}.")
-        card = matches[0]
-        if json_output:
-            click.echo(json.dumps(card, ensure_ascii=False, indent=2))
-            return
-        click.echo(f"Source: {card['source']}")
-        click.echo(f"Type: {card['type']}")
-        click.echo(f"Status: {card['status']}")
-        click.echo(f"Freshness: {card['freshness']}")
-        click.echo(f"Content: {card['content']}")
-        click.echo(f"Vectors: {card['vectors']}")
-        click.echo(f"Failures: {card['failures']}")
-        details = card["details"]
-        if show_extraction or not (show_failed or show_vectors):
-            click.echo("Extraction:")
-            click.echo(f"  empty sections: {details['empty_sections']}")
-            click.echo(f"  sparse sections: {details['sparse_sections']}")
-        if show_vectors or not (show_failed or show_extraction):
-            click.echo("Retrieval/vector state:")
-            click.echo(f"  vectors: {card['vectors']}")
-        if show_failed:
-            click.echo("Failures:")
-            click.echo(f"  vector failures: {card['failures']}")
-        click.echo(f"Fix command: {card['next_action']}")
-        return
-
-    stats = agent.collection_stats()
-    if json_output:
-        click.echo(json.dumps(stats, ensure_ascii=False, indent=2))
-        return
-    click.echo(f"Index: {display_path(config.index.db_path)}")
-    click.echo(f"Exists: {stats.get('collection_exists', False)}")
-    click.echo(f"Sources: {stats.get('sources_count', 0)}")
-    sources_by_format = stats.get("sources_by_format") or {}
-    if sources_by_format:
-        click.echo("Sources by format:")
-        for format_name, count in sorted(sources_by_format.items()):
-            click.echo(f"  {format_name}: {count}")
-    click.echo(f"Sections: {stats.get('sections_count', 0)}")
-    sections_by_format = stats.get("sections_by_format") or {}
-    if sections_by_format:
-        click.echo("Sections by format:")
-        for format_name, count in sorted(sections_by_format.items()):
-            click.echo(f"  {format_name}: {count}")
-    click.echo(f"Extracted: {display_path(stats.get('extracted_dir', ''))}")
-
-
-@click.command(
-    cls=DocmancerCommand,
-    context_settings=HELP_CONTEXT_SETTINGS,
-    short_help="Diagnose docs-context readiness.",
-    epilog=format_examples(
-        "doc-atlas doctor",
-        "doc-atlas doctor --profile agent",
-        "doc-atlas doctor --json",
-        "doc-atlas doctor --list-checks",
-        "doc-atlas doctor --check sources",
-        "doc-atlas doctor --config ./docmancer.yaml",
-    ),
-)
-@click.option("--config", "config_path", default=None, help="Path to docmancer.yaml.")
-@click.option("--profile", type=click.Choice(SETUP_PROFILES, case_sensitive=False), default="cli-docs", show_default=True, help="Goal/path to diagnose.")
-@click.option("--json", "json_output", is_flag=True, default=False, help="Emit structured doctor report as JSON.")
-@click.option("--list-checks", is_flag=True, default=False, help="List available doctor check groups and exit.")
-@click.option("--check", "checks", multiple=True, type=click.Choice(DOCTOR_CHECK_GROUPS, case_sensitive=False), help="Only show one check group. Can be repeated.")
-def doctor_cmd(config_path: str | None, profile: str, json_output: bool, list_checks: bool, checks: tuple[str, ...]):
-    """Diagnose what blocks documentation context for a selected path."""
-    if list_checks:
-        for group in DOCTOR_CHECK_GROUPS:
-            click.echo(group)
-        return
-    config_path = _effective_config(config_path)
-    config = _load_config(config_path)
-    report = _collect_doctor_report(config, config_path, profile=profile.lower())
-    if checks:
-        selected = {check.lower() for check in checks}
-        report["checks"] = [check for check in report["checks"] if check["group"] in selected]
-        report["issues"] = [issue for issue in report["issues"] if issue["group"] in selected]
-    if json_output:
-        click.echo(json.dumps(report, ensure_ascii=False, indent=2))
-        return
-    _emit_doctor_report(report)
-
-
-
-@click.command(
-    cls=DocmancerCommand,
-    context_settings={**HELP_CONTEXT_SETTINGS, "allow_extra_args": True},
-    short_help="Search indexed docs.",
-    epilog=format_examples(
-        'doc-atlas query "How do I authenticate?"',
-        'doc-atlas query "getting started" --limit 3',
-        'doc-atlas query "season 5 end date" --expand',
-        'doc-atlas query "season 5 end date" --expand page',
-        'doc-atlas query "auth" --format json',
-    ),
-)
-@click.argument("text")
-@click.option("--config", "config_path", default=None, help="Path to docmancer.yaml.")
-@click.option("--limit", default=None, type=int, help="Maximum sections to return.")
-@click.option("--budget", default=None, type=int, help="Maximum estimated output tokens.")
-@click.option(
-    "--expand",
-    flag_value="adjacent",
-    default=None,
-    help="Include adjacent sections around matches. Add 'page' after the flag for the full page.",
-)
-@click.option("output_format", "--format", type=click.Choice(["markdown", "json"], case_sensitive=False), default="markdown", show_default=True)
-@click.option(
-    "--mode",
-    type=click.Choice(["lexical", "dense", "sparse", "hybrid"], case_sensitive=False),
-    default=None,
-    help="Retrieval mode. Default reads from retrieval.default_mode in config.",
-)
-@click.option("--explain", is_flag=True, help="Show per-source rank contributions for each result.")
-@click.option(
-    "--explain-json",
-    type=click.Path(dir_okay=False, writable=True, path_type=str),
-    default=None,
-    help="Write a structured retrieval/packing explain trace JSON artifact.",
-)
-@click.option(
-    "--allow-degraded",
-    is_flag=True,
-    default=False,
-    help="In non-lexical modes, fall back to remaining signals if a retriever fails instead of erroring.",
-)
-@click.pass_context
-def query_cmd(
-    ctx: click.Context,
-    text: str,
-    config_path: str | None,
-    limit: int | None,
-    budget: int | None,
-    expand: str | None,
-    output_format: str,
-    mode: str | None,
-    explain: bool,
-    explain_json: str | None,
-    allow_degraded: bool,
-):
-    """Return a compact docs context pack from the local SQLite index."""
-    import json as _json
-    from docmancer.retrieval.dispatch import HybridRetrievalError
-
-    if expand and ctx.args:
-        if ctx.args == ["page"]:
-            expand = "page"
-        elif ctx.args == ["adjacent"]:
-            expand = "adjacent"
-        else:
-            raise click.ClickException("Unexpected argument after --expand. Use '--expand' or '--expand page'.")
-    config_path = _effective_config(config_path)
-    config = _load_config(config_path)
-    agent = _get_agent_class()(config=config)
-    effective_mode = _effective_retrieval_mode(mode, config)
-    contributions: dict = {}
-    failures: dict[str, str] = {}
-    candidate_counts: dict[str, int] = {}
-    mode_used = effective_mode
-    from docmancer.eval.trace import build_explain_trace, elapsed_ms, started_timer, validate_explain_trace
-
-    trace_start = started_timer()
-    if effective_mode == "lexical":
-        chunks = agent.query(text, limit=limit, budget=budget, expand=expand)
-        contributions = {c.metadata.get("section_id"): {"lexical": idx + 1} for idx, c in enumerate(chunks) if (c.metadata or {}).get("section_id") is not None}
-        candidate_counts = {"lexical": len(chunks)}
-        mode_used = "lexical"
-    else:
-        try:
-            chunks, contributions, failures, mode_used, candidate_counts = _run_dispatch_query(
-                agent=agent,
-                config=config,
-                query=text,
-                mode=effective_mode,
-                limit=limit,
-                budget=budget,
-                expand=expand,
-                allow_degraded=allow_degraded,
-            )
-        except HybridRetrievalError as exc:
-            click.echo(f"Error: {exc}", err=True)
-            sys.exit(2)
-
-    if not chunks:
-        click.echo("No results found.")
-        sys.exit(1)
-
-    trace_latency_ms = elapsed_ms(trace_start)
-    if explain_json:
-        trace = build_explain_trace(
-            query=text,
-            selected_mode=mode_used,
-            chunks=chunks,
-            limit=limit,
-            budget=budget or config.query.default_budget,
-            expand=expand,
-            contributions=contributions,
-            candidate_counts=candidate_counts,
-            failures=failures,
-            latency_ms=trace_latency_ms,
-        )
-        validate_explain_trace(trace)
-        Path(explain_json).write_text(_json.dumps(trace, ensure_ascii=False, indent=2), encoding="utf-8")
-
-    meta = chunks[0].metadata or {}
-    savings = meta.get("savings_percent", 0)
-    runway = meta.get("runway_multiplier", 1)
-    docmancer_tokens = meta.get("docmancer_tokens", 0)
-    raw_tokens = meta.get("raw_tokens", 0)
-
-    if output_format == "json":
-        click.echo(
-            _json.dumps(
-                {
-                    "query": text,
-                    "budget": budget or config.query.default_budget,
-                    "docmancer_tokens": docmancer_tokens,
-                    "raw_tokens": raw_tokens,
-                    "savings_percent": savings,
-                    "runway_multiplier": runway,
-                    "degraded": bool(failures),
-                    "failures": failures,
-                    "mode_used": mode_used,
-                    "results": [chunk.model_dump() for chunk in chunks],
-                },
-                ensure_ascii=False,
-                indent=2,
-            )
-        )
-        return
-
-    click.echo(
-        f"Context pack: ~{docmancer_tokens} tokens vs ~{raw_tokens} raw docs tokens "
-        f"({savings}% less docs overhead, {runway}x agentic runway)"
-    )
-    if failures:
-        for source, failure in failures.items():
-            click.echo(f"Warning: {source} retriever degraded: {failure}", err=True)
-    click.echo("---")
-
-    for i, chunk in enumerate(chunks, start=1):
-        body = chunk.text
-        click.echo(f"[{i}] score={chunk.score:.2f}  source={chunk.source}")
-        meta = chunk.metadata or {}
-        if meta.get("title"):
-            click.echo(f"    section: {meta['title']}")
-        click.echo(f"    tokens: ~{meta.get('token_estimate', 0)}")
-        if explain:
-            sid = meta.get("section_id")
-            contrib = contributions.get(sid) if sid is not None else None
-            if contrib:
-                parts = ", ".join(f"{src}#{rank}" for src, rank in sorted(contrib.items()))
-                click.echo(f"    explain: {parts}")
-            elif effective_mode == "lexical":
-                click.echo("    explain: lexical#1")
-            elif failures:
-                failure_parts = "; ".join(f"{src}: {msg}" for src, msg in sorted(failures.items()))
-                click.echo(f"    explain: degraded retrieval ({failure_parts})")
-        click.echo(body)
-        click.echo("---")
-
-
-def _format_context_explain(result) -> str:
-    contract = result.trust_contract or {}
-
-    def contract_sources(lane: str) -> list[dict]:
-        sources = contract.get("sources")
-        if isinstance(sources, dict) and isinstance(sources.get(lane), list):
-            return sources[lane]
-        legacy_key = f"{lane}_sources"
-        value = contract.get(lane) or contract.get(legacy_key)
-        return value if isinstance(value, list) else []
-
-    def label(source: dict) -> str:
-        return str(source.get("path") or source.get("library") or source.get("source") or source.get("url") or source.get("canonical_id") or "unknown")
-
-    def reason(source: dict) -> str:
-        return str(source.get("why_selected") or source.get("reason") or source.get("reason_code") or source.get("message") or "not specified")
-
-    lines = [f"Trusted context for: {result.question}", "", "Used:"]
-    selected = contract_sources("selected")
-    if selected:
-        for source in selected:
-            lines.append(f"  [{source.get('source_class', 'source')}] {label(source)}")
-            lines.append(f"    why: {reason(source)}")
-            if source.get("freshness"):
-                lines.append(f"    freshness: {source['freshness']}")
+@click.option("--skip-known", is_flag=True, help="Skip files whose co…5281 tokens truncated…nes.append(f"    freshness: {source['freshness']}")
             if source.get("docs_exactness"):
                 lines.append(f"    docs_exactness: {source['docs_exactness']}")
             if source.get("version_source"):
@@ -1720,6 +1204,50 @@ def eval_cmd(
             f"Source health: sources={health['sources_count']} sections={health['sections_count']} "
             f"empty={health['empty_sections']} sparse={health['sparse_sections']} duplicates={health['duplicate_content_hashes']}"
         )
+
+
+@click.command(
+    "docs-impact",
+    cls=DocmancerCommand,
+    context_settings=HELP_CONTEXT_SETTINGS,
+    short_help="Report documentation affected by a code diff.",
+    epilog=format_examples(
+        "doc-atlas docs-impact --base origin/main",
+        "doc-atlas docs-impact --changed-file packages/api/src/auth.ts --format json",
+    ),
+)
+@click.option("--project-path", default=".", type=click.Path(exists=True, file_okay=False, path_type=str), show_default=True)
+@click.option("--base", default=None, help="Base git ref used to discover changed files.")
+@click.option("--head", default="HEAD", show_default=True, help="Head git ref used with --base.")
+@click.option("--changed-file", "changed_files", multiple=True, help="Changed repository path; may be repeated instead of --base.")
+@click.option("output_format", "--format", type=click.Choice(["markdown", "json"], case_sensitive=False), default="markdown", show_default=True)
+@click.option("--fail-on-missing", is_flag=True, default=False, help="Exit non-zero when a changed module has no maintained docs.")
+def docs_impact_cmd(
+    project_path: str,
+    base: str | None,
+    head: str,
+    changed_files: tuple[str, ...],
+    output_format: str,
+    fail_on_missing: bool,
+):
+    """Report which maintained docs should be reviewed after a code change."""
+    from docmancer.docs.impact import analyze_docs_impact, changed_files_from_git, format_docs_impact_markdown
+
+    if base and changed_files:
+        raise click.UsageError("Use either --base/--head or --changed-file, not both.")
+    if not base and not changed_files:
+        raise click.UsageError("Pass --base to read git diff paths, or at least one --changed-file.")
+    try:
+        paths = changed_files_from_git(project_path, base, head) if base else list(changed_files)
+        report = analyze_docs_impact(project_path, paths)
+    except ValueError as exc:
+        raise click.ClickException(str(exc)) from exc
+    if output_format.lower() == "json":
+        click.echo(json.dumps(report, ensure_ascii=False, indent=2))
+    else:
+        click.echo(format_docs_impact_markdown(report))
+    if fail_on_missing and report["summary"]["missing_docs"]:
+        raise click.exceptions.Exit(2)
 
 
 @click.command(
