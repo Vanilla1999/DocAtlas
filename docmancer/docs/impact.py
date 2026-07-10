@@ -22,7 +22,7 @@ def changed_files_from_git(project_path: str | Path, base: str, head: str = "HEA
 
     root = Path(project_path).expanduser().resolve()
     completed = subprocess.run(
-        ["git", "-C", str(root), "diff", "--name-only", "--diff-filter=ACMR", base, head],
+        ["git", "-C", str(root), "diff", "--name-only", "--diff-filter=ACDMR", base, head],
         check=False,
         capture_output=True,
         text=True,
@@ -45,24 +45,35 @@ def analyze_docs_impact(project_path: str | Path, changed_files: list[str]) -> d
     for candidate in candidates:
         if candidate.module_path:
             module_docs[candidate.module_path].append(candidate.path)
+    root_readmes = [
+        candidate.path
+        for candidate in candidates
+        if candidate.doc_scope == "project" and candidate.reason == "root_readme"
+    ]
 
     updated_docs = sorted(path for path in changed if path in candidates_by_path)
     code_changes = [path for path in changed if path not in candidates_by_path and not _is_test_path(path)]
     impacts: dict[str, dict[str, Any]] = {}
     missing_modules: set[str] = set()
+    missing_root_readme = False
 
     for path in code_changes:
-        if Path(path).name in _DEPENDENCY_FILES:
-            _add_impact(impacts, "README.md", reason="dependency_metadata_changed", changed_file=path, module_path=None)
-            continue
         module_path = _module_path(path)
         docs = module_docs.get(module_path or "", [])
         if docs:
+            reason = "module_dependency_metadata_changed" if Path(path).name in _DEPENDENCY_FILES else "module_code_changed"
             for doc_path in docs:
-                _add_impact(impacts, doc_path, reason="module_code_changed", changed_file=path, module_path=module_path)
+                _add_impact(impacts, doc_path, reason=reason, changed_file=path, module_path=module_path)
             continue
         if module_path:
             missing_modules.add(module_path)
+            continue
+        if Path(path).name in _DEPENDENCY_FILES:
+            if root_readmes:
+                for doc_path in root_readmes:
+                    _add_impact(impacts, doc_path, reason="dependency_metadata_changed", changed_file=path, module_path=None)
+            else:
+                missing_root_readme = True
             continue
         for candidate in candidates:
             if candidate.reason in {"architecture", "root_readme"} or candidate.path == "docs/INDEX.md":
@@ -85,6 +96,12 @@ def analyze_docs_impact(project_path: str | Path, changed_files: list[str]) -> d
         "reason": "module_code_changed_without_module_docs",
         "suggested_path": f"{module_path}/README.md",
     } for module_path in sorted(missing_modules)]
+    if missing_root_readme:
+        missing.append({
+            "module_path": ".",
+            "reason": "dependency_metadata_changed_without_root_readme",
+            "suggested_path": "README.md",
+        })
     impact_rows = sorted(impacts.values(), key=lambda item: item["path"])
     review_required = [item for item in impact_rows if item["status"] == "review_required"]
     return {
@@ -152,8 +169,13 @@ def _module_path(path: str) -> str | None:
 
 
 def _is_test_path(path: str) -> bool:
+    parts = {part.lower() for part in Path(path).parts}
     name = Path(path).name.lower()
-    return path.startswith(("tests/", "test/", "__tests__/")) or name.startswith("test_") or name.endswith(("_test.py", ".test.ts", ".spec.ts"))
+    test_suffixes = (
+        "_test.py", "_test.go", ".test.js", ".spec.js", ".test.jsx", ".spec.jsx",
+        ".test.ts", ".spec.ts", ".test.tsx", ".spec.tsx",
+    )
+    return bool(parts & {"tests", "test", "__tests__"}) or name.startswith("test_") or name.endswith(test_suffixes)
 
 
 def _normalized_paths(paths: list[str]) -> list[str]:
@@ -166,4 +188,3 @@ def _recommendation(review_required: list[dict[str, Any]], missing: list[dict[st
     if review_required:
         return "Review the listed docs for accuracy; no repository write is performed automatically."
     return "No maintained documentation changes are suggested by this diff."
-
