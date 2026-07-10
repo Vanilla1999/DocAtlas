@@ -468,12 +468,13 @@ class ProjectMetadataReader:
         packages: dict[str, str] = {}
         for name, (group, specifier) in manifest.items():
             source_kind = self._node_source_kind(specifier)
+            specifier_kind = self._node_specifier_kind(specifier)
             locked_version = lock_versions.get(name)
             resolved = locked_version
             if locked_version and source_kind == "registry":
                 packages[f"npm:{name}"] = resolved
-            elif self._specifier_kind(specifier) == "exact" and source_kind == "registry":
-                resolved = specifier.lstrip("=")
+            elif specifier_kind == "exact" and source_kind == "registry":
+                resolved = specifier.lstrip("=v")
                 packages[f"npm:{name}"] = resolved
             version_source = (
                 f"{selected_lock}_exact"
@@ -484,7 +485,7 @@ class ProjectMetadataReader:
                 ecosystem="npm",
                 package_name=name,
                 dependency_group=group,
-                specifier_kind=self._node_specifier_kind(specifier),
+                specifier_kind=specifier_kind,
                 specifier_raw=specifier,
                 resolved_version=resolved,
                 version_source=version_source,
@@ -677,7 +678,18 @@ class ProjectMetadataReader:
             return source_kind
         if specifier.startswith("npm:"):
             return "alias"
-        return ProjectMetadataReader._specifier_kind(specifier)
+        text = specifier.strip()
+        exact = r"=?v?\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?"
+        if re.fullmatch(exact, text):
+            return "exact"
+        if (
+            re.fullmatch(r"\d+(?:\.\d+)?", text)
+            or re.search(r"(?:^|\.)[xX*](?:\.|$)", text)
+            or text.startswith(("^", "~", ">", "<", "*", "||"))
+            or any(marker in text for marker in (" ", ",", "||"))
+        ):
+            return "range"
+        return "tag"
 
     def _read_cargo_lock(self, path: Path, warnings: list[str]) -> dict[str, str]:
         if not path.exists():
