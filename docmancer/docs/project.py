@@ -630,6 +630,18 @@ class ProjectMetadataReader:
         for name, raw in values.items():
             if not isinstance(name, str) or name.lower() == "python":
                 continue
+            if isinstance(raw, dict):
+                path = raw.get("path")
+                if isinstance(path, str) and path.strip():
+                    result[self._python_name(name)] = (group, f"{name} @ {path.strip()}")
+                    continue
+                git = raw.get("git")
+                if isinstance(git, str) and git.strip():
+                    reference = git.strip()
+                    if not reference.startswith("git+"):
+                        reference = f"git+{reference}"
+                    result[self._python_name(name)] = (group, f"{name} @ {reference}")
+                    continue
             specifier = self._specifier_raw(raw) or ""
             result[self._python_name(name)] = (group, f"{name}{specifier}" if specifier else name)
 
