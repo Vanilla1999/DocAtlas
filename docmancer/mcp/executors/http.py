@@ -13,6 +13,7 @@ from docmancer.mcp.network_policy import (
     grant_from_mapping,
     validate_http_target,
     validate_redirect,
+    validate_resolution_stability,
 )
 
 DEFAULT_TIMEOUT = 30.0
@@ -54,7 +55,11 @@ class HttpExecutor(Executor):
             }
         grant = grant_from_mapping(grant_mapping)
         try:
-            validate_http_target(url, grant)
+            validated_target = validate_http_target(url, grant)
+            validate_resolution_stability(
+                operation.get("_docmancer_http_resolved_ips") or (),
+                validated_target,
+            )
         except SecurityError as exc:
             return ExecutorResult(False, exc.code, None, error=exc.code)
 
@@ -92,41 +97,69 @@ class HttpExecutor(Executor):
         )
         owns_client = self._client is None
         try:
-            response = client.request(method, url, **request_kwargs)
+            with client.stream(
+                method,
+                url,
+                follow_redirects=False,
+                **request_kwargs,
+            ) as response:
+                response_status = response.status_code
+                response_headers = dict(response.headers)
+                response_encoding = response.encoding or "utf-8"
+
+                if 300 <= response_status < 400 and response.headers.get("Location"):
+                    try:
+                        validate_redirect(response.headers["Location"], url, grant)
+                    except SecurityError:
+                        return ExecutorResult(
+                            False,
+                            "redirect_not_allowed",
+                            None,
+                            error="redirect_not_allowed",
+                        )
+                    return ExecutorResult(
+                        False,
+                        "redirect_not_followed",
+                        None,
+                        error="redirect_not_followed",
+                    )
+
+                content = read_limited_response(response, grant.max_response_bytes)
+        except SecurityError as exc:
+            return ExecutorResult(False, exc.code, None, error=exc.code)
         except httpx.HTTPError as exc:
             return ExecutorResult(False, "network_error", None, error=str(exc))
         finally:
             if owns_client:
                 client.close()
 
-        if 300 <= response.status_code < 400 and response.headers.get("Location"):
-            try:
-                validate_redirect(response.headers["Location"], url, grant)
-            except SecurityError:
-                return ExecutorResult(False, "redirect_not_allowed", None, error="redirect_not_allowed")
-            return ExecutorResult(False, "redirect_not_followed", None, error="redirect_not_followed")
-
         body: Any
         try:
-            content = read_limited_response(response, grant.max_response_bytes)
-        except SecurityError as exc:
-            return ExecutorResult(False, exc.code, None, error=exc.code)
-        try:
-            body = json.loads(content.decode(response.encoding or "utf-8"))
+            body = json.loads(content.decode(response_encoding))
         except (ValueError, UnicodeDecodeError):
-            body = content.decode(response.encoding or "utf-8", errors="replace")
+            body = content.decode(response_encoding, errors="replace")
 
-        ok = 200 <= response.status_code < 300
+        ok = 200 <= response_status < 300
         return ExecutorResult(
             ok=ok,
-            status=response.status_code,
+            status=response_status,
             body=body,
             error=None if ok else _extract_error(body),
-            extras={"headers": dict(response.headers)},
+            extras={"headers": response_headers},
         )
 
 
 def read_limited_response(response: httpx.Response, limit: int) -> bytes:
+    if limit <= 0:
+        raise SecurityError("invalid_max_response_bytes")
+    declared_length = response.headers.get("Content-Length")
+    if declared_length:
+        try:
+            if int(declared_length) > limit:
+                raise SecurityError("response_too_large")
+        except ValueError:
+            pass
+
     chunks: list[bytes] = []
     total = 0
     for chunk in response.iter_bytes():
