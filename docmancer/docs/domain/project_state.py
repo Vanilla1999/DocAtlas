@@ -3,6 +3,8 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
+from docmancer.docs.domain.source_map import build_project_repo_map
+
 
 def partition_project_doc_state(
     candidates: list[dict[str, Any]],
@@ -58,17 +60,36 @@ def has_high_level_project_overview(candidates: list[dict[str, Any]]) -> bool:
     return False
 
 
+def _documentation_gap_evidence(root: Path, query: str | None) -> list[dict[str, Any]]:
+    manifests = [
+        name for name in ("pyproject.toml", "package.json", "Cargo.toml", "pubspec.yaml")
+        if (root / name).exists()
+    ]
+    source_paths = [
+        str(item.get("path"))
+        for item in build_project_repo_map(root, question=query or "architecture", max_files=6, token_budget=800)
+        if item.get("path")
+    ]
+    evidence = []
+    if manifests:
+        evidence.append({"category": "manifests", "paths": manifests})
+    if source_paths:
+        evidence.append({"category": "source map", "paths": list(dict.fromkeys(source_paths))})
+    return evidence
+
+
 def create_project_docs_next_action(root: Path, query: str | None = None, *, reason: str | None = None) -> dict[str, Any]:
-    get_project_docs_args = {"project_path": str(root)}
+    get_docs_context_args = {"project_path": str(root)}
     if query:
-        get_project_docs_args["query"] = query
+        get_docs_context_args["question"] = query
+    evidence_to_collect = _documentation_gap_evidence(root, query)
     return {
         "action": "create_reviewable_project_doc",
         "requires_confirmation": True,
         "preferred_path": "ARCHITECTURE.md",
         "suggested_paths": ["ARCHITECTURE.md", "README.md", "docs/architecture.md"],
         "reason": reason or "No official project docs files were discovered. Ask the user before creating a reviewable architecture doc in the repository.",
-        "agent_guidance": "If the user approves, inspect the listed evidence, create ARCHITECTURE.md as a normal reviewable file, then sync it before answering repo-specific architecture questions.",
+        "agent_guidance": "If the user approves, inspect the listed evidence, create ARCHITECTURE.md as a normal reviewable file, then use the returned public prepare_docs action before retrying get_docs_context.",
         "documentation_gap": {
             "suggested_path": "ARCHITECTURE.md",
             "required_sections": [
@@ -78,13 +99,8 @@ def create_project_docs_next_action(root: Path, query: str | None = None, *, rea
                 {"name": "runtime flow", "evidence": ["entrypoints", "module imports", "runtime configuration"]},
                 {"name": "development commands", "evidence": ["manifests", "test and build configuration"]},
             ],
-            "evidence_to_collect": [
-                "manifests",
-                "root entrypoints",
-                "module directories and imports",
-                "runtime configuration",
-                "test and build configuration",
-            ],
+            "evidence_to_collect": evidence_to_collect,
+            "evidence_complete": bool(evidence_to_collect),
             "rules": [
                 "do not invent unsupported facts",
                 "cite repository paths for factual claims",
@@ -96,9 +112,12 @@ def create_project_docs_next_action(root: Path, query: str | None = None, *, rea
             "arguments_patch": {"action": "sync_project_docs", "project_path": str(root)},
         },
         "after": [
-            {"tool": "inspect_project_docs", "requires_confirmation": False, "arguments_patch": {"project_path": str(root)}},
-            {"tool": "sync_project_docs", "requires_confirmation": False, "arguments_patch": {"project_path": str(root)}},
-            {"tool": "get_project_docs", "requires_confirmation": False, "arguments_patch": get_project_docs_args},
+            {
+                "tool": "prepare_docs",
+                "requires_confirmation": False,
+                "arguments_patch": {"action": "sync_project_docs", "project_path": str(root)},
+            },
+            {"tool": "get_docs_context", "requires_confirmation": False, "arguments_patch": get_docs_context_args},
         ],
     }
 
@@ -120,12 +139,28 @@ def project_docs_structured_next_action(
             message = "Project documentation index is out of sync. Call sync_project_docs before answering project-level questions."
         return ({"type": "sync_project_docs", "tool": "sync_project_docs"}, False, None, sync_args, message, None)
     if reason_code in {"no_project_docs", "architecture_doc_creation_recommended"}:
+        handoff = create_project_docs_next_action(root, query)
         agent_message = "No reviewable project docs were found. Ask the user whether to create ARCHITECTURE.md as a repository file, then inspect and sync it after creation."
         user_message = "Project documentation was not found. Create ARCHITECTURE.md as a reviewable file?"
         if reason_code == "architecture_doc_creation_recommended":
             agent_message = "Project docs exist, but no high-level architecture or overview document was found. Ask the user before creating ARCHITECTURE.md as a repository file, then inspect and sync it after creation."
             user_message = "I could not find a high-level project architecture document. Do you want me to inspect the repository and create ARCHITECTURE.md as a reviewable file?"
-        return ({"type": "ask_user_to_create_project_doc", "suggested_file": "ARCHITECTURE.md", "handled_by": "coding_agent"}, True, "repo_write", project_args, agent_message, user_message)
+        return (
+            {
+                "action": "create_reviewable_project_doc",
+                "type": "ask_user_to_create_project_doc",
+                "suggested_file": "ARCHITECTURE.md",
+                "handled_by": "coding_agent",
+                "documentation_gap": handoff["documentation_gap"],
+                "after_file_change": handoff["after_file_change"],
+                "after": handoff["after"],
+            },
+            True,
+            "repo_write",
+            project_args,
+            agent_message,
+            user_message,
+        )
     get_context_args = {"project_path": str(root)}
     if query:
         get_context_args["question"] = query
