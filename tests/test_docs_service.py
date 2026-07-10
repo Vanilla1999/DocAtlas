@@ -105,6 +105,29 @@ class SlowIndexingAgent(FakeAgent):
         return super().add(docs_url, recreate=recreate, **kwargs)
 
 
+class VectorTrackingAgent(FakeAgent):
+    def __init__(self, *, fail_sync: bool = False):
+        super().__init__()
+        self.fail_sync = fail_sync
+        self.sync_calls = 0
+        self.sync_db_paths: list[str] = []
+
+    def sync_vectors(self):
+        self.sync_calls += 1
+        self.sync_db_paths.append(self.config.index.db_path)
+        if self.fail_sync:
+            raise RuntimeError("vector backend unavailable")
+
+
+class SlowVectorTrackingAgent(SlowIndexingAgent):
+    def __init__(self):
+        super().__init__()
+        self.sync_calls = 0
+
+    def sync_vectors(self):
+        self.sync_calls += 1
+
+
 class PageFailingAgent(FakeAgent):
     def add(self, docs_url: str, recreate: bool = False, **kwargs) -> int:
         self.add_calls.append(docs_url)
@@ -3376,6 +3399,77 @@ def test_successful_library_prefetch_atomically_publishes_staged_index(tmp_path,
     assert record is not None
     assert status is not None
     assert status.status == "succeeded"
+    assert service.library_docs.registry_ops.count_index_entries(record) == (1, 1)
+
+
+def test_staged_prefetch_syncs_vectors_only_from_production_index(tmp_path, monkeypatch):
+    agent = VectorTrackingAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+    result = service.prefetch_docs(
+        "example-docs",
+        ecosystem="web",
+        docs_url="https://example.com/docs/",
+        async_=True,
+    )
+
+    for _ in range(30):
+        status = service.get_docs_job_status(result.job_id)
+        if status and status.status == "succeeded":
+            break
+        time.sleep(0.02)
+
+    assert status is not None
+    assert status.status == "succeeded"
+    assert agent.add_kwargs[0]["with_vectors"] is False
+    assert agent.sync_calls == 1
+    assert Path(agent.sync_db_paths[0]).name != "index.db"
+
+
+def test_cancelled_staged_prefetch_never_syncs_vectors(tmp_path, monkeypatch):
+    agent = SlowVectorTrackingAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+    result = service.prefetch_docs(
+        "example-docs",
+        ecosystem="web",
+        docs_url="https://example.com/docs/",
+        async_=True,
+    )
+
+    assert agent.entered.wait(timeout=1)
+    service.cancel_docs_job(result.job_id)
+    agent.release.set()
+    for _ in range(30):
+        status = service.get_docs_job_status(result.job_id)
+        if status and status.status == "cancelled":
+            break
+        time.sleep(0.02)
+
+    assert agent.sync_calls == 0
+
+
+def test_vector_sync_failure_keeps_fts_index_and_returns_partial(tmp_path, monkeypatch):
+    agent = VectorTrackingAgent(fail_sync=True)
+    service = _service(tmp_path, monkeypatch, agent)
+    result = service.prefetch_docs(
+        "example-docs",
+        ecosystem="web",
+        docs_url="https://example.com/docs/",
+        async_=True,
+    )
+
+    for _ in range(30):
+        status = service.get_docs_job_status(result.job_id)
+        if status and status.status == "partial":
+            break
+        time.sleep(0.02)
+
+    record = service.registry.get("example-docs", "web", "latest")
+    assert record is not None
+    assert status is not None
+    assert status.status == "partial"
+    assert status.reason_code == "partial_failure"
+    assert status.retryable is True
+    assert record.last_error.startswith("vector_indexing_failed:")
     assert service.library_docs.registry_ops.count_index_entries(record) == (1, 1)
 
 
