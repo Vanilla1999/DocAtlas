@@ -24,6 +24,11 @@ def load_cases(path: Path = DEFAULT_GOLDEN) -> list[dict[str, str]]:
                     "prompt": str(template).format(subject=subject),
                     "expected_tool": expected,
                 })
+    for case in data.get("cases") or []:
+        cases.append({
+            "prompt": str(case["prompt"]),
+            "expected_tool": str(case["expected_tool"]),
+        })
     return cases
 
 
@@ -43,6 +48,8 @@ def evaluate(cases: list[dict[str, str]]) -> dict[str, Any]:
         })
     total = len(rows)
     return {
+        "benchmark_kind": "deterministic_policy_conformance",
+        "live_llm_evaluation": False,
         "total": total,
         "correct": correct,
         "accuracy": correct / total if total else 0.0,
