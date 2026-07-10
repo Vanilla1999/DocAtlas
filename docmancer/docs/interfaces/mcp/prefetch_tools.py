@@ -93,6 +93,9 @@ def handle_prefetch_tool(name: str, args: dict[str, Any], service: LibraryDocsSe
                         "status": job.status,
                         "phase": job.phase,
                         "message": job.message,
+                        "reason_code": job.reason_code,
+                        "retryable": job.retryable,
+                        "deadline_at": job.deadline_at,
                         "started_at": job.started_at,
                         "updated_at": job.updated_at,
                     }
@@ -171,7 +174,7 @@ def handle_prefetch_tool(name: str, args: dict[str, Any], service: LibraryDocsSe
             job = service.get_docs_job_status(args["job_id"])
             return {"tool": "docs_job", "action": action, "job_id": args["job_id"], "status": "not_found"} if job is None else {"tool": "docs_job", "action": action, **asdict(job)}
         if action == "list":
-            return {"tool": "docs_job", "action": action, "jobs": [{"job_id": job.job_id, "kind": job.kind, "status": job.status, "phase": job.phase, "message": job.message, "started_at": job.started_at, "updated_at": job.updated_at} for job in service.list_docs_jobs(status=args.get("status"), limit=_bounded_int_arg(args, "limit", default=None, max_value=200))]}
+            return {"tool": "docs_job", "action": action, "jobs": [{"job_id": job.job_id, "kind": job.kind, "status": job.status, "phase": job.phase, "message": job.message, "reason_code": job.reason_code, "retryable": job.retryable, "deadline_at": job.deadline_at, "started_at": job.started_at, "updated_at": job.updated_at} for job in service.list_docs_jobs(status=args.get("status"), limit=_bounded_int_arg(args, "limit", default=None, max_value=200))]}
         if action == "cancel":
             return {"tool": "docs_job", "action": action, **asdict(service.cancel_docs_job(args["job_id"]))}
         return {"status": "error", "reason_code": "unknown_docs_job_action", "message": f"unknown docs_job action: {action}", "supported_actions": ["list", "status", "cancel"]}
@@ -185,7 +188,7 @@ def handle_prefetch_tool(name: str, args: dict[str, Any], service: LibraryDocsSe
         job = service.get_docs_job_status(args["job_id"])
         return {"job_id": args["job_id"], "status": "not_found"} if job is None else asdict(job)
     if name == "list_docs_jobs":
-        return {"jobs": [{"job_id": job.job_id, "kind": job.kind, "status": job.status, "phase": job.phase, "message": job.message, "started_at": job.started_at, "updated_at": job.updated_at} for job in service.list_docs_jobs(status=args.get("status"), limit=_bounded_int_arg(args, "limit", default=None, max_value=200))]}
+        return {"jobs": [{"job_id": job.job_id, "kind": job.kind, "status": job.status, "phase": job.phase, "message": job.message, "reason_code": job.reason_code, "retryable": job.retryable, "deadline_at": job.deadline_at, "started_at": job.started_at, "updated_at": job.updated_at} for job in service.list_docs_jobs(status=args.get("status"), limit=_bounded_int_arg(args, "limit", default=None, max_value=200))]}
     if name == "cancel_docs_job":
         return asdict(service.cancel_docs_job(args["job_id"]))
     return None
