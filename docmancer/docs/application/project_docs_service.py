@@ -22,6 +22,7 @@ from docmancer.docs.domain.target_security import host_allowed, is_remote_url, p
 from docmancer.docs.domain.trust_contract import build_project_context_trust_contract
 from docmancer.docs.models import DocsChunk, DocsInspectResult, DocsJobStartResult, DocsManifestValidationResult, DocsPruneResult, DocsRemoveResult, DocsResult, DocsSourceResolution, DocsTarget, DocsTargetResult, DocsTargetsPrefetchResult, LibraryInfo, ProjectDocsBootstrapResult, ProjectDocsChunk, ProjectDocsIngestResult, ProjectDocsInspectResult, ProjectDocsResult, ProjectDocsSyncResult, ProjectMetadata, ProjectPrefetchResult, RefreshResult
 from docmancer.docs.project import DOC_FILE_EXTENSIONS, ROOT_DOC_FILES
+from docmancer.docs.section_metadata import extract_section_metadata
 from docmancer.docs.registry import LibraryRecord
 from docmancer.docs.resolver import canonical_library_id, normalize_library_name, normalize_version
 from docmancer.docs.dartdoc import discover_pub_dartdoc_seed_urls, is_pub_dartdoc_target, normalize_pub_dartdoc_target, pub_dartdoc_root_url
@@ -500,6 +501,7 @@ class ProjectDocsService:
                     "module_name": candidate.module_name,
                     "module_path": candidate.module_path,
                     "module_type": candidate.module_type,
+                    "project_doc_sections": extract_section_metadata(path, source_document_path=candidate.path),
                 })
             return result
 
