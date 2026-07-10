@@ -684,11 +684,16 @@ class LibraryDocsApplicationService:
         deadline_seconds: float,
     ) -> None:
         completed = threading.Event()
+        deadline_expired = threading.Event()
         outcome: dict[str, Any] = {}
         deadline = time.monotonic() + deadline_seconds
 
         def _cancelled() -> bool:
-            return self.jobs.cancellation_requested(job_id) or time.monotonic() >= deadline
+            return (
+                self.jobs.cancellation_requested(job_id)
+                or deadline_expired.is_set()
+                or time.monotonic() >= deadline
+            )
 
         def _begin_commit() -> bool:
             if _cancelled():
@@ -721,29 +726,22 @@ class LibraryDocsApplicationService:
         threading.Thread(target=_work, daemon=True).start()
         while not completed.wait(timeout=max(0.01, min(0.1, max(deadline - time.monotonic(), 0.0)))):
             if self.jobs.cancellation_requested(job_id):
-                self.jobs.update(
-                    job_id,
-                    status="cancelled",
-                    phase="done",
-                    reason_code="cancelled",
-                    retryable=True,
-                    message="Library docs prefetch cancelled.",
-                )
-                return
+                continue
             if time.monotonic() >= deadline:
                 current = self.jobs.get(job_id)
                 if current and current.phase == "committing":
                     continue
-                self.jobs.append_error(job_id, "Library docs prefetch exceeded its configured deadline.")
-                self.jobs.update(
-                    job_id,
-                    status="failed",
-                    phase="done",
-                    reason_code="job_deadline_exceeded",
-                    retryable=True,
-                    message="Library docs prefetch exceeded its configured deadline.",
-                )
-                return
+                if not deadline_expired.is_set():
+                    deadline_expired.set()
+                    self.jobs.append_error(job_id, "Library docs prefetch exceeded its configured deadline.")
+                    self.jobs.update(
+                        job_id,
+                        status="cancelling",
+                        phase="cancelling",
+                        reason_code="job_deadline_exceeded",
+                        retryable=True,
+                        message="Deadline exceeded; waiting for staging cleanup.",
+                    )
 
         if self.jobs.cancellation_requested(job_id):
             self.jobs.update(
@@ -753,6 +751,16 @@ class LibraryDocsApplicationService:
                 reason_code="cancelled",
                 retryable=True,
                 message="Library docs prefetch cancelled.",
+            )
+            return
+        if deadline_expired.is_set():
+            self.jobs.update(
+                job_id,
+                status="failed",
+                phase="done",
+                reason_code="job_deadline_exceeded",
+                retryable=True,
+                message="Library docs prefetch exceeded its configured deadline.",
             )
             return
         if "exception" in outcome:
