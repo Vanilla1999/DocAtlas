@@ -154,10 +154,11 @@ class Dispatcher:
 
         executor_kind = operation.get("executor", DEFAULT_EXECUTOR)
         operation_grant = pkg.grant_for(str(operation.get("id") or ""))
+        validated_http_target = None
         if executor_kind == "http":
             http_meta = operation.get("http", {}) or {}
             try:
-                validate_http_target(
+                validated_http_target = validate_http_target(
                     target_url(http_meta.get("base_url", ""), http_meta.get("path", "")),
                     grant_from_mapping(operation_grant),
                 )
@@ -217,6 +218,8 @@ class Dispatcher:
         operation_for_executor = dict(operation)
         if executor_kind == "http":
             operation_for_executor["_docmancer_http_grant"] = operation_grant
+            if validated_http_target is not None:
+                operation_for_executor["_docmancer_http_resolved_ips"] = list(validated_http_target.resolved_ips)
         elif executor_kind == "python_import":
             operation_for_executor["_docmancer_operation_grant"] = operation_grant
         result = executor.call(
