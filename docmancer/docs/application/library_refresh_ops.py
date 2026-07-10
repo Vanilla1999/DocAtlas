@@ -3,6 +3,8 @@ from __future__ import annotations
 import logging
 from pathlib import Path
 from typing import Any, Callable
+import shutil
+import tempfile
 import time
 
 import httpx
@@ -121,7 +123,13 @@ class LibraryRefreshOps:
     def __getattr__(self, name: str) -> Any:
         return getattr(self.dependencies, name)
 
-    def refresh_record(self, record: LibraryRecord, *, force: bool) -> RefreshResult:
+    def refresh_record(
+        self,
+        record: LibraryRecord,
+        *,
+        force: bool,
+        should_cancel: Callable[[], bool] | None = None,
+    ) -> RefreshResult:
         started = time.monotonic()
         if not record.docs_url:
             return RefreshResult(
@@ -149,6 +157,8 @@ class LibraryRefreshOps:
                 targets_completed=1,
             )
 
+        index_snapshot = self._snapshot_index(record) if should_cancel else None
+
         sections_indexed = 0
         discovery_diagnostics: list[dict[str, Any]] = []
         try:
@@ -173,6 +183,10 @@ class LibraryRefreshOps:
                 if getattr(agent, "last_discovery_diagnostics", None):
                     discovery_diagnostics.append(dict(agent.last_discovery_diagnostics))
         except Exception as exc:
+            if should_cancel and should_cancel():
+                self._restore_index(record, index_snapshot)
+                return self._cancelled_result(record, started)
+            self._discard_index_snapshot(index_snapshot)
             logger.exception("Refresh failed for record %s: %s", record.library_id, exc)
             reason_code = _refresh_failure_code(exc)
             message = f"{reason_code}: {exc}"
@@ -213,6 +227,11 @@ class LibraryRefreshOps:
                     ),
                 },
             )
+
+        if should_cancel and should_cancel():
+            self._restore_index(record, index_snapshot)
+            return self._cancelled_result(record, started)
+        self._discard_index_snapshot(index_snapshot)
 
         pages_after, chunks_after = self.registry_ops.count_index_entries(record)
         if sections_indexed == 0 or pages_after == 0 or chunks_after == 0:
@@ -385,9 +404,12 @@ class LibraryRefreshOps:
                     needs_url += 1
                 else:
                     failed += 1
-                    reason_code = (last.preindex or {}).get("reason_code") if last.preindex else None
-                    if reason_code and reason_code not in failure_codes:
-                        failure_codes.append(str(reason_code))
+                    codes = list(last.reason_codes)
+                    if not codes and last.preindex and last.preindex.get("reason_code"):
+                        codes = [str(last.preindex["reason_code"])]
+                    for reason_code in codes:
+                        if reason_code not in failure_codes:
+                            failure_codes.append(reason_code)
                 pages_indexed += last.pages_indexed
                 pages_failed += last.pages_failed
                 chunks_indexed += last.chunks_indexed
@@ -411,6 +433,7 @@ class LibraryRefreshOps:
                 targets_completed=updated + skipped,
                 targets_failed=failed + needs_url,
                 preindex=last.preindex if last else None,
+                reason_codes=failure_codes,
             )
 
         info = self.resolve_library(library, ecosystem, version, docs_url, docs_url_template, source_type)
@@ -429,7 +452,7 @@ class LibraryRefreshOps:
             )
         with self._lock_for(record.library_id):
             record = self.registry.get(record.library_id, None, source_type=record.source_type) or record
-            return self.refresh_record(record, force=force)
+            return self.refresh_record(record, force=force, should_cancel=should_cancel)
 
     def prefetch_docs(
         self,
@@ -476,5 +499,56 @@ class LibraryRefreshOps:
                 targets_completed=result.targets_completed,
                 targets_failed=result.targets_failed,
                 preindex=result.preindex,
+                reason_codes=result.reason_codes,
             )
         return result
+
+    def _snapshot_index(self, record: LibraryRecord) -> Path:
+        config = self._index_config_for(record)
+        snapshot = Path(tempfile.mkdtemp(prefix="docatlas-index-snapshot-"))
+        db_path = Path(config.index.db_path)
+        for candidate in db_path.parent.glob(f"{db_path.name}*"):
+            if candidate.is_file():
+                shutil.copy2(candidate, snapshot / candidate.name)
+        extracted = Path(config.index.extracted_dir)
+        if extracted.exists():
+            shutil.copytree(extracted, snapshot / "extracted")
+        return snapshot
+
+    def _restore_index(self, record: LibraryRecord, snapshot: Path | None) -> None:
+        if snapshot is None:
+            return
+        config = self._index_config_for(record)
+        db_path = Path(config.index.db_path)
+        for candidate in db_path.parent.glob(f"{db_path.name}*"):
+            if candidate.is_file():
+                candidate.unlink()
+        for candidate in snapshot.glob(f"{db_path.name}*"):
+            if candidate.is_file():
+                db_path.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(candidate, db_path.parent / candidate.name)
+        extracted = Path(config.index.extracted_dir)
+        if extracted.exists():
+            shutil.rmtree(extracted)
+        snapshot_extracted = snapshot / "extracted"
+        if snapshot_extracted.exists():
+            shutil.copytree(snapshot_extracted, extracted)
+        self._discard_index_snapshot(snapshot)
+
+    @staticmethod
+    def _discard_index_snapshot(snapshot: Path | None) -> None:
+        if snapshot and snapshot.exists():
+            shutil.rmtree(snapshot)
+
+    @staticmethod
+    def _cancelled_result(record: LibraryRecord, started: float) -> RefreshResult:
+        return RefreshResult(
+            library_id=record.library_id,
+            status="cancelled",
+            docs_url=record.docs_url,
+            last_refreshed_at=record.last_refreshed_at,
+            version=record.version,
+            source_type=record.source_type,
+            message="Library docs prefetch cancelled.",
+            duration_ms=int((time.monotonic() - started) * 1000),
+        )
