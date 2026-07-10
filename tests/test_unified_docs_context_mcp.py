@@ -19,6 +19,7 @@ def test_get_docs_context_schema():
     schema = tool["inputSchema"]
     assert schema["required"] == ["question"]
     assert "allow_network" in schema["properties"]
+    assert schema["properties"]["prepare_project_docs"]["default"] is False
     assert schema["properties"]["output_mode"]["enum"] == ["answer", "compact", "debug", "full"]
     assert schema["properties"]["mode"]["enum"] == ["auto", "project", "library", "dependency", "mixed"]
 
@@ -62,6 +63,7 @@ def test_get_docs_context_handler_calls_facade():
             self.called = True
             assert question == "How?"
             assert kwargs["library"] == "fastapi"
+            assert kwargs["prepare_project_docs"] is False
             return type("Result", (), {"tool": "get_docs_context", "status": "success"})()
 
     facade = Facade()
@@ -70,11 +72,106 @@ def test_get_docs_context_handler_calls_facade():
     assert result["tool"] == "get_docs_context"
 
 
+def test_get_docs_context_maps_legacy_lifecycle_action_to_public_prepare_docs():
+    class Facade:
+        def get_docs_context(self, question, **kwargs):
+            return {
+                "tool": "get_docs_context",
+                "status": "not_found",
+                "answer_available": False,
+                "next_actions": [{
+                    "tool": "sync_project_docs",
+                    "arguments_patch": {"project_path": "/repo", "with_vectors": True},
+                }],
+            }
+
+    result = cast(dict[str, Any], handle_context_tool(
+        "get_docs_context",
+        {"question": "How does the project work?", "project_path": "/repo"},
+        cast(Any, Facade()),
+    ))
+
+    assert result["next_action"]["tool"] == "prepare_docs"
+    assert result["next_action"]["arguments_patch"] == {
+        "project_path": "/repo",
+        "with_vectors": True,
+        "action": "sync_project_docs",
+    }
+    assert result["next_actions"] == [result["next_action"]]
+
+
+def test_get_docs_context_never_returns_hidden_patch_tool_on_public_surface():
+    class Facade:
+        def get_docs_context(self, question, **kwargs):
+            return {
+                "tool": "get_docs_context",
+                "status": "success",
+                "answer_available": False,
+                "next_action": {"tool": "get_patch_constraints"},
+                "next_actions": [
+                    {"tool": "get_patch_constraints"},
+                    {"tool": "code_search", "action": "search_project_sources"},
+                ],
+            }
+
+    result = cast(dict[str, Any], handle_context_tool(
+        "get_docs_context",
+        {"question": "Implement CLI logging", "project_path": "/repo", "output_mode": "full"},
+        cast(Any, Facade()),
+    ))
+
+    assert result["next_action"] == {"tool": "code_search", "action": "search_project_sources"}
+    assert result["next_actions"] == [result["next_action"]]
+
+
+def test_get_docs_context_maps_legacy_query_status_and_cancel_actions():
+    class Facade:
+        def get_docs_context(self, question, **kwargs):
+            return {
+                "tool": "get_docs_context",
+                "status": "not_found",
+                "next_actions": [
+                    {"tool": "get_project_context", "arguments_patch": {"query": question, "project_path": "/repo"}},
+                    {"tool": "inspect_project_docs", "arguments_patch": {"project_path": "/repo"}},
+                    {"tool": "cancel_docs_job", "arguments_patch": {"job_id": "job-1"}},
+                    {"tool": "list_docs_sources"},
+                ],
+            }
+
+    result = cast(dict[str, Any], handle_context_tool(
+        "get_docs_context",
+        {"question": "architecture", "project_path": "/repo", "output_mode": "full"},
+        cast(Any, Facade()),
+    ))
+
+    assert [action["tool"] for action in result["next_actions"]] == [
+        "get_docs_context",
+        "docs_status",
+        "prepare_docs",
+    ]
+    assert result["next_actions"][0]["arguments_patch"]["question"] == "architecture"
+    assert result["next_actions"][1]["arguments_patch"]["action"] == "project"
+    assert result["next_actions"][2]["arguments_patch"]["action"] == "cancel_docs_job"
+
+
 def test_mcp_public_surface_exposes_canonical_tools_and_hides_legacy_aliases():
     names = {tool["name"] for tool in TOOLS}
-    assert {"get_docs_context", "inspect_project_docs", "prepare_docs", "docs_job", "get_patch_constraints", "validate_patch_against_constraints"}.issubset(names)
+    assert names == {"get_docs_context", "prepare_docs", "docs_status"}
     assert "list_docs_sources" not in names
-    assert {"get_project_context", "get_project_docs", "get_library_docs", "inspect_library_docs", "refresh_library_docs", "prefetch_project_dependency_docs"}.isdisjoint(names)
+    assert {
+        "get_project_context",
+        "get_project_docs",
+        "get_library_docs",
+        "inspect_library_docs",
+        "refresh_library_docs",
+        "prefetch_project_dependency_docs",
+        "inspect_project_docs",
+        "docs_job",
+        "get_code_context",
+        "get_patch_plan_context",
+        "get_patch_constraints",
+        "validate_patch_against_constraints",
+    }.isdisjoint(names)
 
 
 def test_context_tools_filter_only_unified_tool():

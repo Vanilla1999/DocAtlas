@@ -5,7 +5,7 @@ from pathlib import Path
 
 from docmancer.docs.interfaces.mcp.project_tools import handle_project_tool, project_tools
 from docmancer.docs.service import LibraryDocsService
-from docmancer.mcp.docs_server import TOOLS
+from docmancer.mcp.docs_server import ALL_TOOLS, TOOLS
 
 
 def _write(path: Path, text: str) -> None:
@@ -70,15 +70,16 @@ class TSDTabController {
     return root
 
 
-def test_get_code_context_exposed_in_public_mcp_tools():
-    names = {tool["name"] for tool in TOOLS}
+def test_get_code_context_exposed_only_in_advanced_mcp_tools():
+    names = {tool["name"] for tool in ALL_TOOLS}
 
     assert "get_code_context" in names
-    assert "get_code_context" in [tool["name"] for tool in project_tools(TOOLS)]
+    assert "get_code_context" not in {tool["name"] for tool in TOOLS}
+    assert "get_code_context" in [tool["name"] for tool in project_tools(ALL_TOOLS)]
 
 
 def test_get_code_context_schema_contains_agentic_source_fields():
-    tool = next(tool for tool in TOOLS if tool["name"] == "get_code_context")
+    tool = next(tool for tool in ALL_TOOLS if tool["name"] == "get_code_context")
     schema = tool["inputSchema"]
     properties = schema["properties"]
 

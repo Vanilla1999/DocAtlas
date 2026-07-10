@@ -22,12 +22,14 @@ ToolHandler = Callable[[str, dict[str, Any], LibraryDocsService], dict[str, Any]
 class DocsServerConfig:
     expose_legacy: bool = False
     expose_admin: bool = False
+    expose_advanced: bool = False
 
     @classmethod
     def from_env(cls, env: Mapping[str, str]) -> "DocsServerConfig":
         return cls(
             expose_legacy=env.get("DOCMANCER_MCP_LEGACY_TOOLS") == "1",
             expose_admin=env.get("DOCMANCER_MCP_ADMIN_TOOLS") == "1",
+            expose_advanced=env.get("DOCMANCER_MCP_ADVANCED_TOOLS") == "1",
         )
 
 
@@ -51,11 +53,13 @@ class DocsMcpSurface:
 RAW_TOOLS: list[dict[str, Any]] = [
     {
         "name": "get_docs_context",
-        "description": """Canonical Docmancer docs/context tool. Use this as the Context7-like query entrypoint for project docs, dependency/library docs, and mixed project+library questions.
+        "description": """Default first tool for every documentation, repository, dependency, API, architecture, convention, and source-grounding question.
 
 Agent workflow:
-- For repo questions, call inspect_project_docs(project_path) first.
+- Call get_docs_context first. It performs safe project preflight internally.
 - For coding/API questions, set response_style=\"snippet-first\".
+- Call prepare_docs only when this response explicitly returns it as next_action.
+- Use docs_status only for explicit health, freshness, source-state, or job-status requests.
 - If answer_type is navigation_only or partial_navigational, do not answer yet; read/search the suggested files first.
 - This tool provides source-grounded context, not a full code audit or test substitute.
 """,
@@ -78,7 +82,7 @@ Agent workflow:
                 "tokens": {"type": ["integer", "null"], "minimum": 1, "maximum": 20000},
                 "limit": {"type": ["integer", "null"], "minimum": 1, "maximum": 20},
                 "expand": {"type": ["string", "null"]},
-                "prepare_project_docs": {"type": ["boolean", "null"]},
+                "prepare_project_docs": {"type": ["boolean", "null"], "default": False, "description": "Compatibility opt-in for automatic local bootstrap. The public default is read-only preflight; follow a returned prepare_docs action instead."},
                 "allow_network": {"type": ["boolean", "null"]},
                 "allow_latest_fallback": {"type": ["boolean", "null"]},
                 "force_refresh": {"type": ["boolean", "null"]},
@@ -97,18 +101,19 @@ Agent workflow:
         "description": """Unified confirmation-first lifecycle/admin tool for docs preparation: sync project docs, prefetch dependency/library/manifest/target docs, refresh, prune, or remove registered docs sources.
 
 Agent workflow:
-- Use prepare_docs(action=\"sync_project_docs\") only after inspect_project_docs asks for project-doc reconciliation.
+- Use prepare_docs only after get_docs_context returns prepare_docs as next_action, or when the user explicitly asks to sync, refresh, prefetch, prune, or remove docs.
 - Use prepare_docs(action=\"prefetch_library_docs\") for public/dependency docs only after network access is approved.
 - Prefer this over separate ingest/sync/prefetch/refresh/prune/remove tools.
 """,
         "inputSchema": {
             "type": "object",
             "properties": {
-                "action": {"type": "string", "enum": ["sync_project_docs", "prefetch_project_dependency_docs", "prefetch_library_docs", "prefetch_docs_targets", "validate_docs_manifest", "prefetch_docs_manifest", "refresh_library_docs", "prune_library_docs", "remove_library_docs"]},
+                "action": {"type": "string", "enum": ["sync_project_docs", "prefetch_project_dependency_docs", "prefetch_library_docs", "prefetch_docs_targets", "validate_docs_manifest", "prefetch_docs_manifest", "refresh_library_docs", "prune_library_docs", "remove_library_docs", "cancel_docs_job"]},
                 "project_path": {"type": ["string", "null"]},
                 "library": {"type": ["string", "null"]},
                 "canonical_id": {"type": ["string", "null"]},
                 "manifest_path": {"type": ["string", "null"]},
+                "job_id": {"type": ["string", "null"]},
                 "targets": {"type": ["array", "null"]},
                 "ecosystem": {"type": ["string", "null"]},
                 "version": {"type": ["string", "null"]},
@@ -128,6 +133,25 @@ Agent workflow:
                 "keep_versions": {"type": ["array", "null"], "items": {"type": "string"}},
                 "older_than_days": {"type": ["integer", "null"]},
                 "dry_run": {"type": ["boolean", "null"], "default": True},
+            },
+            "required": ["action"],
+        },
+    },
+    {
+        "name": "docs_status",
+        "description": """Read-only diagnostics for project documentation freshness and asynchronous documentation jobs.
+
+Use this only when the user explicitly asks whether docs are indexed/stale/healthy, wants job progress, or needs diagnostics. For documentation content or coding questions, use get_docs_context instead.
+""",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "action": {"type": "string", "enum": ["project", "jobs", "job"]},
+                "project_path": {"type": ["string", "null"]},
+                "job_id": {"type": ["string", "null"]},
+                "status": {"type": ["string", "null"]},
+                "limit": {"type": ["integer", "null"], "minimum": 1, "maximum": 200},
+                "details": {"type": ["boolean", "null"]},
             },
             "required": ["action"],
         },
@@ -642,6 +666,16 @@ ADMIN_TOOL_NAMES = {
     "list_library_docs",
     "list_docs_sources",
 }
+ADVANCED_TOOL_NAMES = {
+    "inspect_project_docs",
+    "docs_job",
+    "get_code_context",
+    "get_patch_plan_context",
+    "get_patch_constraints",
+    "validate_patch_against_constraints",
+}
+PUBLIC_TOOL_NAMES = {"get_docs_context", "prepare_docs", "docs_status"}
+CLASSIFIED_TOOL_NAMES = PUBLIC_TOOL_NAMES | ADVANCED_TOOL_NAMES | ADMIN_TOOL_NAMES | LEGACY_TOOL_NAMES
 
 
 def _handler_for_tool(name: str) -> ToolHandler:
@@ -681,9 +715,13 @@ def build_docs_surface(config: DocsServerConfig) -> DocsMcpSurface:
     specs: list[ToolSpec] = []
     for raw in RAW_TOOLS:
         name = str(raw.get("name") or "")
+        if name not in CLASSIFIED_TOOL_NAMES:
+            raise ValueError(f"Unclassified MCP docs tool: {name}")
         if name in LEGACY_TOOL_NAMES and not config.expose_legacy:
             continue
         if name in ADMIN_TOOL_NAMES and not config.expose_admin:
+            continue
+        if name in ADVANCED_TOOL_NAMES and not config.expose_advanced:
             continue
         specs.append(_tool_spec(raw))
     return DocsMcpSurface(
@@ -692,7 +730,7 @@ def build_docs_surface(config: DocsServerConfig) -> DocsMcpSurface:
     )
 
 
-ALL_SURFACE = build_docs_surface(DocsServerConfig(expose_legacy=True, expose_admin=True))
+ALL_SURFACE = build_docs_surface(DocsServerConfig(expose_legacy=True, expose_admin=True, expose_advanced=True))
 DOCS_SURFACE = build_docs_surface(DocsServerConfig.from_env(os.environ))
 
 ALL_TOOLS = [spec.to_tool_dict() for spec in ALL_SURFACE.tools]
@@ -791,30 +829,32 @@ Use Docmancer before generic code search when the user asks about:
 - repo conventions;
 - dependency/library documentation;
 - Context7-like docs help;
-- answer-ready local source snippets via `get_code_context`;
-- patch planning;
-- patch constraints.
+- source-grounded repository context.
+
+The default public surface has exactly three tools:
+- `get_docs_context`: first tool for content and coding questions;
+- `prepare_docs`: lifecycle work only after a returned next_action or explicit user request;
+- `docs_status`: explicit freshness, health, source-state, or job-progress checks.
 
 ## Default project workflow
 
 1. Call:
-   `inspect_project_docs(project_path, details=true)`
+   `get_docs_context(project_path=..., question=..., mode="auto", response_style="snippet-first", output_mode="answer")`
 
-2. If the response asks for reconciliation, call:
+2. If and only if the response returns `prepare_docs` as its next action, follow it. For example:
    `prepare_docs(action="sync_project_docs", project_path=..., with_vectors=true)`
 
-3. Then call:
-   `get_docs_context(project_path=..., question=..., mode="project" | "mixed", response_style="snippet-first", output_mode="answer")`
+3. Retry `get_docs_context` after successful preparation.
 
-4. For implementation/source-navigation questions that need code bodies, call:
-   `get_code_context(project_path=..., question=..., entry_symbols=[...], output_mode="answer")`
-
-5. Interpret the result:
+4. Interpret the result:
    - `answer_type="direct"`: you may answer from the returned snippets/sources.
    - `answer_type="navigation_only"`: do not answer yet. Read/search the suggested files first, then answer.
    - `partial_navigational`: treat it as source-search guidance, not a complete answer.
-   - `safe_to_answer=true` from `get_code_context`: answer only from returned source snippets and cite paths/line ranges.
    - `requires_confirmation=true`: ask the user before network/dependency fetches.
+
+Use `docs_status(action="project", project_path=...)` only when the user asks
+whether documentation is indexed, stale, or healthy. Use `action="jobs"` or
+`action="job"` only for asynchronous job progress.
 
 ## Context7-like library workflow
 
@@ -830,15 +870,10 @@ Do not use WebFetch as a substitute for registered Docmancer docs until Docmance
 
 ## Patch workflow
 
-Before editing code:
-
-1. `get_docs_context(...)`
-2. `get_code_context(project_path=..., question=..., changed_files=[...])` when source bodies/references matter.
-3. `get_patch_plan_context(project_path=..., question=..., changed_files=[...])`
-4. `get_patch_constraints(project_path=..., question=..., changed_files=[...])`
-5. Edit code.
-6. `validate_patch_against_constraints(project_path=..., changed_files=[...] or patch_diff=...)`
-7. Run tests/linters.
+Before editing code, call `get_docs_context(...)`, then use normal source
+read/search tools and run tests/linters. Optional code/plan/constraint tools are
+available only when the advanced surface is explicitly enabled with
+`DOCMANCER_MCP_ADVANCED_TOOLS=1`.
 
 ## Audit workflow
 
@@ -860,15 +895,29 @@ Always separate:
     {
         "uri": "docmancer://workflow/project-docs",
         "name": "Project docs workflow",
-        "description": "Discovery-first workflow for project-owned docs.",
+        "description": "Single-entry workflow for project-owned docs.",
         "mimeType": "text/markdown",
         "text": """# Project docs workflow
 
-1. Call `inspect_project_docs(project_path)` before repo-specific architecture, conventions, runbook, or Context7-like questions.
-2. If the response asks for reconciliation, call `prepare_docs(action="sync_project_docs", project_path=..., with_vectors=true)`.
-3. Call `get_docs_context(project_path=..., question=..., mode="project", output_mode="compact")` and inspect `answer_available`, `answer_type`, `answer_completeness`, and `trust_contract.sources`.
+1. Call `get_docs_context(project_path=..., question=..., mode="auto", output_mode="compact")`.
+2. If the response explicitly returns `prepare_docs` as next_action, follow it and retry `get_docs_context`.
+3. Inspect `answer_available`, `answer_type`, `answer_completeness`, and `trust_contract.sources`.
 4. Treat `partial_navigational` as navigation/source-search guidance, not a complete answer.
 5. Use dependency/public network fetches only with explicit approval (`allow_network=true`).
+""",
+    },
+    {
+        "uri": "docmancer://agent/tool-selection",
+        "name": "Docmancer public tool selection",
+        "description": "Mutually exclusive first-call policy for the three public Docs MCP tools.",
+        "mimeType": "text/markdown",
+        "text": """# Public tool selection
+
+1. Natural documentation, API, dependency, architecture, convention, and coding questions → `get_docs_context`.
+2. Explicit sync/refresh/prefetch/prune/remove request, or a returned next_action → `prepare_docs`.
+3. Explicit index freshness, health, source-state, or async job-progress request → `docs_status`.
+
+Never call an advanced or legacy tool unless the corresponding environment flag exposes it.
 """,
     },
     {
@@ -905,8 +954,7 @@ Use the public unified tool first:
 4. Retry:
    `get_docs_context(question=..., library=..., ecosystem=..., version=..., mode="library", response_style="snippet-first")`
 
-5. If working inside a repository, prefer:
-   `inspect_project_docs(project_path)` first, then:
+5. If working inside a repository, call:
    `get_docs_context(project_path=..., question=..., mode="mixed", response_style="snippet-first")`
 
 Do not use WebFetch as a substitute for registered docs before Docmancer has returned no trusted route.
@@ -920,7 +968,7 @@ MCP_RESOURCE_TEMPLATES: list[dict[str, str]] = [
     {
         "uriTemplate": "docmancer://workflow/project-docs/{project_path}",
         "name": "Project-specific docs workflow",
-        "description": "Use with a local project_path to guide inspect/prepare_docs/get_docs_context calls.",
+        "description": "Use with a local project_path to guide get_docs_context and returned prepare_docs actions.",
         "mimeType": "text/markdown",
     },
     {
@@ -944,10 +992,9 @@ def read_docs_resource(uri: str) -> dict[str, str] | None:
             "mimeType": "text/markdown",
             "text": f"""# Project docs workflow for `{project_path}`
 
-1. `inspect_project_docs(project_path=\"{project_path}\")`
-2. If required, `prepare_docs(action=\"sync_project_docs\", project_path=\"{project_path}\", with_vectors=true)`
-3. `get_docs_context(project_path=\"{project_path}\", question=..., mode=\"project\", output_mode=\"compact\")`
-4. Inspect `trust_contract.sources.selected`, `trust_contract.sources.rejected`, and `trust_contract.sources.risky` before using the answer.
+1. `get_docs_context(project_path=\"{project_path}\", question=..., mode=\"auto\", output_mode=\"compact\")`
+2. If the response returns `prepare_docs` as next_action, follow it and retry `get_docs_context`.
+3. Inspect `trust_contract.sources.selected`, `trust_contract.sources.rejected`, and `trust_contract.sources.risky` before using the answer.
 """,
         }
     if uri.startswith("docmancer://library/"):

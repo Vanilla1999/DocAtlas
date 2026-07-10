@@ -5,11 +5,12 @@ from typing import Any
 from urllib.parse import urlparse
 
 from docmancer.docs.service import LibraryDocsService
-from docmancer.docs.interfaces.mcp.project_tools import _bounded_int_arg
+from docmancer.docs.interfaces.mcp.project_tools import _bounded_int_arg, handle_project_tool
 
 
 PREFETCH_TOOL_NAMES = {
     "prepare_docs",
+    "docs_status",
     "docs_job",
     "validate_docs_manifest",
     "prefetch_docs_manifest",
@@ -60,6 +61,69 @@ def handle_prefetch_tool(name: str, args: dict[str, Any], service: LibraryDocsSe
     library_docs_app = getattr(service, "library_docs", service)
     project_docs_app = getattr(service, "project_docs", service)
     dependency_docs_app = getattr(service, "dependency_docs", service)
+    if name == "docs_status":
+        action = str(args.get("action") or "").strip()
+        if action == "project":
+            project_path = str(args.get("project_path") or "").strip()
+            if not project_path:
+                return {
+                    "tool": "docs_status",
+                    "status": "error",
+                    "reason_code": "project_path_required",
+                    "message": "project_path is required for action='project'",
+                }
+            project = handle_project_tool(
+                "inspect_project_docs",
+                {"project_path": project_path, "details": bool(args.get("details") or False)},
+                service,
+            )
+            return {"tool": "docs_status", "action": action, "project": project}
+        if action == "jobs":
+            jobs = service.list_docs_jobs(
+                status=args.get("status"),
+                limit=_bounded_int_arg(args, "limit", default=None, max_value=200),
+            )
+            return {
+                "tool": "docs_status",
+                "action": action,
+                "jobs": [
+                    {
+                        "job_id": job.job_id,
+                        "kind": job.kind,
+                        "status": job.status,
+                        "phase": job.phase,
+                        "message": job.message,
+                        "started_at": job.started_at,
+                        "updated_at": job.updated_at,
+                    }
+                    for job in jobs
+                ],
+            }
+        if action == "job":
+            job_id = str(args.get("job_id") or "").strip()
+            if not job_id:
+                return {
+                    "tool": "docs_status",
+                    "status": "error",
+                    "reason_code": "job_id_required",
+                    "message": "job_id is required for action='job'",
+                }
+            job = service.get_docs_job_status(job_id)
+            if job is None:
+                return {
+                    "tool": "docs_status",
+                    "action": action,
+                    "job_id": job_id,
+                    "status": "not_found",
+                }
+            return {"tool": "docs_status", "action": action, **asdict(job)}
+        return {
+            "tool": "docs_status",
+            "status": "error",
+            "reason_code": "unknown_docs_status_action",
+            "message": f"unknown docs_status action: {action}",
+            "supported_actions": ["project", "jobs", "job"],
+        }
     if name == "prepare_docs":
         action = str(args.get("action") or "").strip()
         if not action:
@@ -82,8 +146,19 @@ def handle_prefetch_tool(name: str, args: dict[str, Any], service: LibraryDocsSe
             payload = asdict(library_docs_app.remove_library_docs(args["canonical_id"]))
         elif action == "prune_library_docs":
             payload = asdict(library_docs_app.prune_library_docs(library=args.get("library"), keep_versions=args.get("keep_versions") or [], older_than_days=int(args.get("older_than_days") or 90), dry_run=bool(args.get("dry_run") if args.get("dry_run") is not None else True)))
+        elif action == "cancel_docs_job":
+            job_id = str(args.get("job_id") or "").strip()
+            if not job_id:
+                return {
+                    "tool": "prepare_docs",
+                    "action": action,
+                    "status": "error",
+                    "reason_code": "job_id_required",
+                    "message": "job_id is required for action='cancel_docs_job'",
+                }
+            payload = asdict(service.cancel_docs_job(job_id))
         else:
-            return {"status": "error", "reason_code": "unknown_prepare_action", "message": f"unknown prepare_docs action: {action}", "supported_actions": ["sync_project_docs", "prefetch_project_dependency_docs", "prefetch_library_docs", "prefetch_docs_targets", "validate_docs_manifest", "prefetch_docs_manifest", "refresh_library_docs", "prune_library_docs", "remove_library_docs"]}
+            return {"status": "error", "reason_code": "unknown_prepare_action", "message": f"unknown prepare_docs action: {action}", "supported_actions": ["sync_project_docs", "prefetch_project_dependency_docs", "prefetch_library_docs", "prefetch_docs_targets", "validate_docs_manifest", "prefetch_docs_manifest", "refresh_library_docs", "prune_library_docs", "remove_library_docs", "cancel_docs_job"]}
         if isinstance(payload, dict):
             payload.setdefault("action", action)
             payload.setdefault("tool", "prepare_docs")

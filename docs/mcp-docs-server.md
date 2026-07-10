@@ -10,13 +10,13 @@ Use this server when a coding agent needs local, source-grounded documentation c
 
 ## What the MCP server covers
 
-DocAtlas's MCP docs server has one high-level router plus three main lanes:
+DocAtlas's default MCP docs server has exactly three public tools. The high-level router is always the first choice:
 
 ```text
 get_docs_context(question, project_path?, library?, mode="auto")
 ```
 
-`get_docs_context` returns one source-grounded context pack by routing deterministically to project-owned docs, public library docs, exact dependency docs, or a mixed project-plus-library flow. It is additive: advanced users and existing agents can still call the lane-specific tools directly.
+`get_docs_context` returns one source-grounded context pack by routing deterministically to project-owned docs, public library docs, exact dependency docs, or a mixed project-plus-library flow. `prepare_docs` performs lifecycle work only when context returns it as `next_action` or the user explicitly requests that action. `docs_status` handles explicit health, freshness, index, and job-status questions.
 
 `get_docs_context`, `get_library_docs`, and `get_project_context` also accept `response_style`: `auto`, `snippet-first`, or `evidence-first`. `auto` switches to snippet-first for coding/API/command/config questions when a usable snippet exists in the already selected trusted sources. `snippet-first` never removes `context_pack` or the Trust Contract, and it never creates fake code when no snippet exists.
 
@@ -32,7 +32,7 @@ get_docs_context(question, project_path?, library?, mode="auto")
 2. **Project-owned docs** — discover, reconcile, stale-check, prune orphaned indexed entries, and query reviewable repository docs such as `README.md`, `docs/`, `wiki/`, `ARCHITECTURE.md`, ADRs, runbooks, roadmap files, and module/package docs in monorepos.
 3. **Dependency docs from project metadata** — read supported manifests/lockfiles and prefetch exact dependency documentation for the versions the project actually uses.
 
-Project-owned docs and dependency docs are intentionally separate. `prepare_docs(action="sync_project_docs")` is the public lifecycle action for files that already live in the repository. Legacy direct verbs such as `sync_project_docs`, `ingest_project_docs`, `bootstrap_project_docs`, `get_project_docs`, and `get_project_context` remain compatibility/admin concepts, but new agent instructions should use the public `inspect_project_docs -> prepare_docs(action="sync_project_docs") -> get_docs_context(mode="project")` path. Dependency prefetch actions fetch documentation from the network based on manifests or lockfiles and require explicit approval.
+Project-owned docs and dependency docs are intentionally separate. New agent instructions should use `get_docs_context -> returned prepare_docs action when needed -> retry get_docs_context`. Dependency prefetch actions fetch documentation from the network based on manifests or lockfiles and require explicit approval. Low-level inspection and patch-contract tools require `DOCMANCER_MCP_ADVANCED_TOOLS=1`; legacy direct verbs require their separate compatibility flag.
 
 Implementation note for maintainers: the public MCP tool names and schemas remain centralized in `docmancer/mcp/docs_server.py`, while tool handling is split by lane under `docmancer/docs/interfaces/mcp/`:
 
@@ -71,13 +71,13 @@ See [`scripts/install.sh`](../scripts/install.sh). To configure a client manuall
 }
 ```
 
-## Library docs tools
-
-## Unified context tool
+## Default public tools
 
 | Tool | Purpose |
 |---|---|
 | `get_docs_context` | Return one source-grounded documentation context pack by routing the question to project-owned docs, public library docs, exact dependency docs, or mixed project-plus-library context. |
+| `prepare_docs` | Perform the exact sync, refresh, index, or prefetch action returned by context, or an explicitly requested lifecycle action. |
+| `docs_status` | Inspect explicit project freshness/index state or background-job status without using status as discovery. |
 
 Default behavior:
 
@@ -114,7 +114,9 @@ The unified tool delegates to existing facade methods such as `bootstrap_project
 | `prune_library_docs` | Prune old documentation targets with dry-run support. |
 | `list_library_docs` | List locally registered documentation libraries. |
 
-## Project-owned docs public surface
+## Advanced and compatibility tools
+
+The tools below are not exposed by default. Set `DOCMANCER_MCP_ADVANCED_TOOLS=1` for low-level inspection and patch-contract compatibility; legacy/admin tools have separate flags.
 
 | Tool | Purpose |
 |---|---|
@@ -127,17 +129,16 @@ The unified tool delegates to existing facade methods such as `bootstrap_project
 
 Legacy/admin direct verbs (`sync_project_docs`, `ingest_project_docs`, `bootstrap_project_docs`, `get_project_docs`, `get_project_context`, direct prefetch/refresh/remove/list tools) are hidden from the default Docs MCP surface unless explicitly enabled for compatibility or diagnostics.
 
-Recommended agent workflow:
+Default agent workflow:
 
 ```text
-Question about this repo?       inspect_project_docs -> prepare_docs(action="sync_project_docs") only if inspect says stale/not indexed -> get_docs_context(mode="project")
-Coding change / bug fix?        get_docs_context -> get_patch_plan_context -> get_patch_constraints -> edit -> validate_patch_against_constraints -> tests
-Dependency/API question?        inspect_project_docs -> get_docs_context(mode="dependency"|"mixed", allow_network=false first) -> prepare_docs(prefetch_*) only after approval
-After a patch is written?       validate_patch_against_constraints plus real project tests; unknown/manual_review is not a pass
-Debugging Docmancer itself?     use output_mode="debug" or "full"; normal coding agents should use "answer"/"compact"
+Question about this repo?       get_docs_context -> returned prepare_docs action when needed -> retry get_docs_context
+Dependency/API question?        get_docs_context(mode="dependency"|"mixed", allow_network=false first) -> prepare_docs(prefetch_*) only after approval
+Health, freshness, job status?  docs_status
+Explicit sync/refresh request?  prepare_docs
 ```
 
-Tool roles, in one line each:
+Advanced compatibility roles:
 
 - `inspect_project_docs`: read-only preflight; tells whether local project docs are indexed/stale and what action to take next.
 - `prepare_docs(action="sync_project_docs")`: mutate/sync the local project-doc index only when inspect recommends it or the user approved it.
@@ -322,28 +323,25 @@ These tools may fetch documentation from the network. Ask for user confirmation 
 For repo-specific questions, agents should prefer this flow:
 
 ```text
-inspect_project_docs(project_path)
--> prepare_docs(action="sync_project_docs", project_path=..., with_vectors=true) if needed
--> get_docs_context(project_path=..., question=..., mode="project")
+get_docs_context(project_path=..., question=..., mode="project")
+-> follow the returned prepare_docs action if needed
+-> retry get_docs_context with the original question
 ```
 
-Legacy compatibility surfaces may still expose direct project-doc tools. Public MCP clients should prefer the unified flow above.
+Advanced and legacy compatibility surfaces may expose direct project-doc tools. Public MCP clients should prefer the unified flow above.
 
-The explicit decision flow is:
+The public decision flow is:
 
 ```text
-inspect_project_docs(project_path)
--> if reason_code is project_docs_found_not_indexed: prepare_docs(action="sync_project_docs", project_path=...)
--> if reason_code is project_docs_stale: prepare_docs(action="sync_project_docs", project_path=...)
--> if reason_code is project_docs_ready: get_docs_context(project_path=..., question=..., mode="project")
+get_docs_context(project_path=..., question=..., mode="project")
+-> if next_action.tool is prepare_docs: call it with returned arguments
+-> retry get_docs_context
 ```
 
-For module-specific questions in monorepos, inspect first so the agent can see discovered modules, then query with an exact `module_path` when possible:
+For module-specific questions in monorepos, query with an exact `module_path` when possible:
 
 ```text
-inspect_project_docs(project_path)
--> project_docs.modules / project_docs.indexed_modules
--> get_docs_context(project_path=..., question=..., mode="project", module_path="services/auth", scope="module")
+get_docs_context(project_path=..., question=..., mode="project", module_path="services/auth", scope="module")
 ```
 
 `get_docs_context(mode="project")` accepts:
@@ -536,8 +534,9 @@ Current project-docs `reason_code` values:
 - For each context item, use either flat fields (`path`, `title`, `heading_path`, `freshness`) or nested fields (`source.path`, `source.title`, `section.heading_path`).
 - Treat `CHANGELOG.md` as release-history evidence unless the user asks about changes, releases, migrations, or version history.
 - Distinguish the Docs MCP server (`doc-atlas mcp docs-serve`) from the Packs MCP runtime (`doc-atlas mcp packs-serve`; `serve` is a compatibility alias).
-- Call `inspect_project_docs` first for repo-specific questions (read-only).
-- `prepare_docs(action="sync_project_docs")` is the recommended public lifecycle action; it reconciles and prunes in one call.
+- Call `get_docs_context` first for repo-specific questions; its preflight is read-only.
+- Follow a returned `prepare_docs` action, or call it for an explicit lifecycle request.
+- Use `docs_status` only for explicit health, freshness, index, or job-status requests.
 - Do not WebFetch project architecture/conventions before trying project-owned docs.
 - Do not treat `prefetch_project_docs` as project-owned docs ingest; it is dependency-docs prefetch.
 - Do not create or edit `ARCHITECTURE.md` without user confirmation.

@@ -5,7 +5,7 @@ from pathlib import Path
 
 from docmancer.docs.interfaces.mcp.project_tools import handle_project_tool, project_tools
 from docmancer.docs.service import LibraryDocsService
-from docmancer.mcp.docs_server import TOOLS
+from docmancer.mcp.docs_server import ALL_TOOLS, TOOLS
 
 
 REQUIRED_SECTIONS = {
@@ -168,14 +168,15 @@ class PBCacheOnly {}
     return root
 
 
-def test_get_patch_plan_context_exposed_in_public_mcp_tools():
-    names = {tool["name"] for tool in TOOLS}
+def test_get_patch_plan_context_exposed_only_in_advanced_mcp_tools():
+    names = {tool["name"] for tool in ALL_TOOLS}
 
     assert "get_patch_plan_context" in names
+    assert "get_patch_plan_context" not in {tool["name"] for tool in TOOLS}
 
 
 def test_get_patch_plan_context_schema_contains_required_fields():
-    tool = next(tool for tool in TOOLS if tool["name"] == "get_patch_plan_context")
+    tool = next(tool for tool in ALL_TOOLS if tool["name"] == "get_patch_plan_context")
     schema = tool["inputSchema"]
     properties = schema["properties"]
 
@@ -199,7 +200,7 @@ def test_get_patch_plan_context_schema_contains_required_fields():
 
 
 def test_get_patch_plan_context_routes_through_project_tools():
-    assert "get_patch_plan_context" in [tool["name"] for tool in project_tools(TOOLS)]
+    assert "get_patch_plan_context" in [tool["name"] for tool in project_tools(ALL_TOOLS)]
 
 
 def test_get_patch_plan_context_handler_accepts_minimal_question():

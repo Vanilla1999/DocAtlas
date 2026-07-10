@@ -6,17 +6,23 @@ from docmancer.docs.interfaces.mcp.context_tools import CONTEXT_TOOL_NAMES
 from docmancer.docs.interfaces.mcp.docs_tools import LIBRARY_TOOL_NAMES
 from docmancer.docs.interfaces.mcp.prefetch_tools import PREFETCH_TOOL_NAMES, _bounded_targets
 from docmancer.docs.interfaces.mcp.project_tools import PROJECT_TOOL_NAMES
+from docmancer.docs.models import DocsJobCancelResult
 from docmancer.mcp.docs_server import (
+    ADVANCED_TOOL_NAMES,
     ADMIN_TOOL_NAMES,
     ALL_TOOLS,
+    CLASSIFIED_TOOL_NAMES,
     CONTEXT_TOOLS,
     DocsMcpSurface,
     DocsServerConfig,
+    LEGACY_TOOL_NAMES,
     LIBRARY_TOOLS,
     MCP_RESOURCES,
     MCP_RESOURCE_TEMPLATES,
     PREFETCH_TOOLS,
     PROJECT_TOOLS,
+    PUBLIC_TOOL_NAMES,
+    RAW_TOOLS,
     TOOLS,
     ToolSpec,
     build_docs_surface,
@@ -50,6 +56,15 @@ def test_mcp_public_surface_exposes_prepare_docs_instead_of_prefetch_library_doc
     assert "prefetch_library_docs" not in names
 
 
+def test_every_raw_tool_has_exactly_one_visibility_class():
+    classes = [PUBLIC_TOOL_NAMES, ADVANCED_TOOL_NAMES, ADMIN_TOOL_NAMES, LEGACY_TOOL_NAMES]
+    raw_names = {tool["name"] for tool in RAW_TOOLS}
+
+    assert raw_names == CLASSIFIED_TOOL_NAMES
+    for name in raw_names:
+        assert sum(name in tool_class for tool_class in classes) == 1
+
+
 def test_mcp_public_surface_hides_admin_debug_tools_by_default():
     names = {tool["name"] for tool in TOOLS}
 
@@ -62,27 +77,37 @@ def test_docs_surface_builder_uses_one_tool_and_handler_contract():
     tool_names = {spec.name for spec in surface.tools}
 
     assert tool_names == set(surface.handlers)
-    assert "get_docs_context" in surface.handlers
+    assert tool_names == PUBLIC_TOOL_NAMES
     assert "prefetch_library_docs" not in tool_names
 
 
 def test_docs_surface_builder_exposes_legacy_and_admin_by_config():
-    surface = build_docs_surface(DocsServerConfig(expose_legacy=True, expose_admin=True))
+    surface = build_docs_surface(DocsServerConfig(
+        expose_legacy=True,
+        expose_admin=True,
+        expose_advanced=True,
+    ))
     names = {spec.name for spec in surface.tools}
 
     assert "prefetch_library_docs" in names
     assert ADMIN_TOOL_NAMES.issubset(names)
+    assert ADVANCED_TOOL_NAMES.issubset(names)
     assert names == set(surface.handlers)
 
 
 def test_current_tools_reads_env_each_call(monkeypatch):
     monkeypatch.delenv("DOCMANCER_MCP_LEGACY_TOOLS", raising=False)
+    monkeypatch.delenv("DOCMANCER_MCP_ADVANCED_TOOLS", raising=False)
     public_names = {tool["name"] for tool in current_tools()}
-    assert "get_project_context" not in public_names
+    assert public_names == PUBLIC_TOOL_NAMES
 
     monkeypatch.setenv("DOCMANCER_MCP_LEGACY_TOOLS", "1")
     legacy_names = {tool["name"] for tool in current_tools()}
     assert "get_project_context" in legacy_names
+
+    monkeypatch.setenv("DOCMANCER_MCP_ADVANCED_TOOLS", "1")
+    advanced_names = {tool["name"] for tool in current_tools()}
+    assert ADVANCED_TOOL_NAMES.issubset(advanced_names)
 
 
 def test_call_docs_tool_payload_classifies_handler_value_error():
@@ -154,7 +179,8 @@ def test_mcp_exposes_prefetch_docs_targets_through_prepare_docs():
 
 
 def test_mcp_exposes_inspect_project_docs_with_discovery_first_guidance():
-    tool = next(tool for tool in TOOLS if tool["name"] == "inspect_project_docs")
+    assert "inspect_project_docs" not in {tool["name"] for tool in TOOLS}
+    tool = next(tool for tool in ALL_TOOLS if tool["name"] == "inspect_project_docs")
 
     assert "Call this first" in tool["description"]
     assert "Context7-like" in tool["description"]
@@ -230,19 +256,21 @@ def test_mcp_exposes_get_project_context_with_trust_contract():
     assert "details" in tool["inputSchema"]["properties"]
 
 
-def test_agent_templates_include_project_docs_discovery_guidance():
+def test_agent_templates_include_three_tool_selection_guidance():
     template_dir = Path(__file__).resolve().parents[2] / "docmancer" / "templates"
 
     for name in ("skill.md", "claude_code_skill.md", "claude_desktop_skill.md"):
         text = (template_dir / name).read_text(encoding="utf-8")
         assert "Project Docs Discovery with MCP" in text
-        assert "inspect_project_docs(project_path=\".\")" in text
+        assert "get_docs_context(project_path=\".\"" in text
         assert "expects Context7-like help" in text
         assert "prepare_docs(action=\"sync_project_docs\")" in text
         assert "get_docs_context(mode=\"project\")" in text
+        assert "`docs_status` is only for explicit" in text
         assert "prepare_docs(action=\"prefetch_project_dependency_docs\")" in text
         assert "Official project docs should remain files in the repo" in text
-        assert "Do not skip `inspect_project_docs`" in text
+        assert "Do not skip `get_docs_context`" in text
+        assert "Do not call `prepare_docs` speculatively" in text
         assert "docs/INDEX.md" in text
         assert "canonical map of project-owned docs" in text
         assert "verification loop" in text
@@ -283,10 +311,89 @@ def test_mcp_docs_server_documents_index_and_smoke_test_loop():
 
 def test_mcp_exposes_docs_job_tools():
     names = {tool["name"] for tool in TOOLS}
-    assert "docs_job" in names
+    assert "docs_status" in names
+    assert "docs_job" not in names
     assert "get_docs_job_status" not in names
     assert "list_docs_jobs" not in names
     assert "cancel_docs_job" not in names
+
+
+def test_prepare_docs_keeps_async_job_cancellation_on_public_surface():
+    tool = next(tool for tool in TOOLS if tool["name"] == "prepare_docs")
+    assert "cancel_docs_job" in tool["inputSchema"]["properties"]["action"]["enum"]
+    assert "job_id" in tool["inputSchema"]["properties"]
+
+    class Service:
+        def cancel_docs_job(self, job_id):
+            return DocsJobCancelResult(
+                job_id=job_id,
+                status="cancel_requested",
+                message="Cancellation requested.",
+            )
+
+    missing = call_docs_tool_payload(
+        "prepare_docs",
+        {"action": "cancel_docs_job"},
+        Service(),
+    )
+    cancelled = call_docs_tool_payload(
+        "prepare_docs",
+        {"action": "cancel_docs_job", "job_id": "job-1"},
+        Service(),
+    )
+
+    assert missing["reason_code"] == "job_id_required"
+    assert cancelled == {
+        "job_id": "job-1",
+        "status": "cancel_requested",
+        "message": "Cancellation requested.",
+        "action": "cancel_docs_job",
+        "tool": "prepare_docs",
+    }
+
+
+def test_mcp_exposes_three_public_tools_with_mutually_exclusive_guidance():
+    tools = {tool["name"]: tool for tool in TOOLS}
+
+    assert set(tools) == PUBLIC_TOOL_NAMES
+    assert "Default first tool" in tools["get_docs_context"]["description"]
+    assert "only after get_docs_context" in tools["prepare_docs"]["description"]
+    assert "explicitly asks" in tools["docs_status"]["description"]
+    assert tools["docs_status"]["inputSchema"]["required"] == ["action"]
+    assert tools["docs_status"]["inputSchema"]["properties"]["action"]["enum"] == [
+        "project",
+        "jobs",
+        "job",
+    ]
+
+
+def test_docs_status_validates_required_action_arguments():
+    class Service:
+        def list_docs_jobs(self, **kwargs):
+            return []
+
+        def get_docs_job_status(self, job_id):
+            return None
+
+    project = call_docs_tool_payload(
+        "docs_status",
+        {"action": "project"},
+        Service(),
+    )
+    job = call_docs_tool_payload(
+        "docs_status",
+        {"action": "job"},
+        Service(),
+    )
+    jobs = call_docs_tool_payload(
+        "docs_status",
+        {"action": "jobs"},
+        Service(),
+    )
+
+    assert project["reason_code"] == "project_path_required"
+    assert job["reason_code"] == "job_id_required"
+    assert jobs == {"tool": "docs_status", "action": "jobs", "jobs": []}
 
 
 def test_mcp_exposes_manifest_tools():
@@ -334,6 +441,8 @@ def test_maintained_agent_docs_prefer_public_docs_workflow():
 
     assert "prepare_docs(action=\"sync_project_docs\"" in joined
     assert "get_docs_context(" in joined
+    assert "docs_status" in joined
+    assert "exactly three" in joined
     assert "bootstrap_project_docs(project_path" not in joined
     assert "sync_project_docs(project_path" not in joined
     assert "get_project_context(project_path" not in joined
@@ -343,13 +452,13 @@ def test_mcp_read_resource_returns_workflow_and_schema_guidance():
     workflow = read_docs_resource("docmancer://workflow/project-docs")
     library_workflow = read_docs_resource("docmancer://workflow/library-docs")
     schema = read_docs_resource("docmancer://schema/trust-contract")
+    selection = read_docs_resource("docmancer://agent/tool-selection")
     templated = read_docs_resource("docmancer://workflow/project-docs//repo")
     library_templated = read_docs_resource("docmancer://library/python/mcp/latest")
 
     assert workflow is not None
-    assert "inspect_project_docs" in workflow["text"]
-    assert "prepare_docs(action=\"sync_project_docs\"" in workflow["text"]
     assert "get_docs_context" in workflow["text"]
+    assert "next_action" in workflow["text"]
     assert "trust_contract.sources" in workflow["text"]
     assert library_workflow is not None
     assert "get_docs_context" in library_workflow["text"]
@@ -362,6 +471,11 @@ def test_mcp_read_resource_returns_workflow_and_schema_guidance():
     assert schema is not None
     assert '"schema_version": "trust-contract-1.1"' in schema["text"]
     assert '"selected"' in schema["text"]
+    assert selection is not None
+    assert "Natural documentation" in selection["text"]
+    assert "get_docs_context" in selection["text"]
+    assert "prepare_docs" in selection["text"]
+    assert "docs_status" in selection["text"]
     assert templated is not None
     assert 'project_path="/repo"' in templated["text"]
     assert "get_docs_context" in templated["text"]

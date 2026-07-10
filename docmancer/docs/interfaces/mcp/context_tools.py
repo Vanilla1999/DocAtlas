@@ -4,6 +4,7 @@ from copy import deepcopy
 from dataclasses import asdict, is_dataclass
 from typing import Any
 
+from docmancer.docs.domain.tool_selection import normalize_public_docs_actions
 from docmancer.docs.service import LibraryDocsService
 from docmancer.docs.interfaces.mcp.output_contract import normalize_output_mode
 from docmancer.docs.interfaces.mcp.project_tools import _attach_output_contract, _bad_request, _bounded_int_arg, _clean_string, _compact_mcp_payload, _strip_mcp_debug_noise
@@ -185,7 +186,11 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
         tokens=_bounded_int_arg(args, "tokens", max_value=20_000),
         limit=_bounded_int_arg(args, "limit", default=None, max_value=20),
         expand=args.get("expand"),
-        prepare_project_docs=args.get("prepare_project_docs"),
+        prepare_project_docs=(
+            bool(args.get("prepare_project_docs"))
+            if args.get("prepare_project_docs") is not None
+            else False
+        ),
         allow_network=args.get("allow_network"),
         allow_latest_fallback=args.get("allow_latest_fallback"),
         force_refresh=args.get("force_refresh"),
@@ -203,6 +208,7 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
             if hasattr(result, key):
                 raw[key] = getattr(result, key)
     raw = _align_trust_contract_with_snippets(raw)
+    raw = normalize_public_docs_actions(raw)
     mode = _output_mode(args)
     if mode == "full":
         raw["output_mode"] = "full"

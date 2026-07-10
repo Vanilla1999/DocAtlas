@@ -41,12 +41,12 @@ def test_readme_documents_naming_compatibility():
     assert "legacy name `docmancer`" in text
 
 
-def test_readme_leads_with_patch_contract_runtime_happy_path():
+def test_readme_leads_with_three_tool_docs_runtime_happy_path():
     text = (ROOT / "README.md").read_text(encoding="utf-8")
-    assert "Project Patch Contract Runtime" in text
-    assert "get_docs_context → get_patch_plan_context → get_patch_constraints → edit → validate_patch_against_constraints → advisory PR artifacts" in text
-    assert "advisory and non-blocking" in text
-    assert "does not prove a patch is safe to merge" in text
+    assert "Local-first documentation context" in text
+    assert "get_docs_context → follow a returned prepare_docs action when needed → retry get_docs_context" in text
+    assert "exactly three mutually exclusive tools" in text
+    assert "DOCMANCER_MCP_ADVANCED_TOOLS=1" in text
 
 
 def test_readme_keeps_mcp_packs_out_of_hero_path():

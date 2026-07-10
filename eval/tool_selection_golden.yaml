@@ -1,0 +1,84 @@
+version: 1
+description: Public Docs MCP first-tool selection benchmark (English and Russian).
+benchmark_kind: deterministic_policy_conformance
+notes: This checks the documented routing policy. It is not a live LLM tool-choice evaluation.
+groups:
+  - expected_tool: get_docs_context
+    templates:
+      - "How does {subject} work in this project?"
+      - "Show the correct API for {subject}."
+      - "Explain the architecture around {subject}."
+      - "Where is {subject} configured?"
+      - "Как в проекте работает {subject}?"
+      - "Покажи правильный API для {subject}."
+      - "Объясни архитектуру вокруг {subject}."
+      - "Где настроен {subject}?"
+      - "Give me a version-specific example for {subject}."
+      - "Найди пример кода для {subject} с версией из проекта."
+    subjects:
+      - "FastAPI dependencies"
+      - "Riverpod providers"
+      - "authentication"
+      - "database migrations"
+      - "the CLI"
+      - "error handling"
+
+  - expected_tool: prepare_docs
+    templates:
+      - "Sync the {subject}."
+      - "Reindex the {subject}."
+      - "Refresh the {subject}."
+      - "Prefetch the {subject}."
+      - "Remove the old {subject}."
+      - "Синхронизируй {subject}."
+      - "Переиндексируй {subject}."
+      - "Обнови {subject}."
+      - "Загрузи {subject}."
+      - "Удали старые {subject}."
+    subjects:
+      - "docs"
+      - "documentation index"
+      - "dependency documentation"
+
+  - expected_tool: docs_status
+    templates:
+      - "Show docs status for {subject}."
+      - "Is documentation stale for {subject}?"
+      - "What is indexed for {subject}?"
+      - "Show job progress for {subject}."
+      - "Is the docs index healthy for {subject}?"
+      - "Покажи статус документации для {subject}."
+      - "Документация устарела для {subject}?"
+      - "Что проиндексировано для {subject}?"
+      - "Покажи прогресс задачи для {subject}."
+      - "Здоров ли индекс для {subject}?"
+    subjects:
+      - "this repository"
+      - "FastAPI"
+      - "the current project"
+
+cases:
+  - prompt: "How do I remove docs from a Python list?"
+    expected_tool: get_docs_context
+  - prompt: "Explain how to refresh docs in CI."
+    expected_tool: get_docs_context
+  - prompt: "Show how docs status works in an MCP client."
+    expected_tool: get_docs_context
+  - prompt: "Почему документация устарела после релиза?"
+    expected_tool: get_docs_context
+  - prompt: "Объясни как обновить документацию без запуска команды."
+    expected_tool: get_docs_context
+  - prompt: "Как удалить документы из коллекции в Python?"
+    expected_tool: get_docs_context
+  - prompt: "Please sync docs after this change."
+    expected_tool: prepare_docs
+  - prompt: "Sync docs locally but do not fetch from the network."
+    expected_tool: prepare_docs
+  - prompt: "Пожалуйста, переиндексируй документацию локально."
+    expected_tool: prepare_docs
+  - prompt: "Check whether the docs index is healthy."
+    expected_tool: docs_status
+  - prompt: "List running documentation jobs."
+    expected_tool: docs_status
+  - prompt: "Проверь статус задачи job-42."
+    expected_tool: docs_status

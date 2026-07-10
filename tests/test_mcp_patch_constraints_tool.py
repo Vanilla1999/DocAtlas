@@ -5,7 +5,7 @@ from pathlib import Path
 
 from docmancer.docs.interfaces.mcp.project_tools import handle_project_tool
 from docmancer.docs.service import LibraryDocsService
-from docmancer.mcp.docs_server import TOOLS
+from docmancer.mcp.docs_server import ALL_TOOLS
 
 
 def _workspace(tmp_path: Path) -> Path:
@@ -34,7 +34,7 @@ def _payload(tmp_path: Path, **overrides):
 
 
 def test_mcp_schema_exposes_get_patch_constraints():
-    tool = next(tool for tool in TOOLS if tool["name"] == "get_patch_constraints")
+    tool = next(tool for tool in ALL_TOOLS if tool["name"] == "get_patch_constraints")
 
     assert tool["inputSchema"]["required"] == ["question"]
     properties = tool["inputSchema"]["properties"]

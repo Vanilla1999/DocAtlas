@@ -12,19 +12,17 @@ tags:
 install: pipx install docmancer --python python3.13
 ---
 
-# Project Patch Contract Runtime for coding agents
+# Documentation context runtime for coding agents
 
-For patch-like tasks, use DocAtlas as a Patch Contract runtime, not only as docs search.
+DocAtlas is the source-grounded documentation entry point for repository, library, dependency, and mixed questions.
 
-Required agent ritual:
+The default Docs MCP surface has exactly three tools:
 
-1. Call `get_docs_context(question, project_path)` when task scope is unclear.
-2. If the response has `next_action.name == "get_patch_constraints"`, call `get_patch_constraints` before editing.
-3. Treat `forbidden_edits`, `source_of_truth_rules`, `dependency_contracts`, `suggested_checks`, and `unknowns/manual_review` as the pre-patch contract.
-4. Edit code.
-5. Call `validate_patch_against_constraints` with `changed_files` and/or `patch_diff`.
-6. Report `violated` and `manual_review` constraints clearly.
-7. Never claim the patch is safe-to-merge from DocAtlas validation alone; this output is advisory and does not replace tests or human review.
+1. Start with `get_docs_context` for normal documentation questions.
+2. Call `prepare_docs` only when context returns it as `next_action`, or for an explicit sync, refresh, index, or prefetch request.
+3. Call `docs_status` only for explicit health, freshness, index, or job-status requests.
+
+Advanced patch and inspection tools are compatibility features enabled with `DOCMANCER_MCP_ADVANCED_TOOLS=1`; new agent workflows must not depend on them.
 
 
 # DocAtlas / docmancer
@@ -48,7 +46,7 @@ Docmancer compresses documentation context so coding agents spend tokens on code
 4. **Fetch URL docs if needed:** `doc-atlas add <url>`
 5. **Use the returned context** to ground your response with source-attributed sections.
 
-For MCP docs tools, registered sources are registry-owned. If `get_library_docs` returns candidates or `next_actions`, retry through Docmancer with the returned `arguments_patch`/guidance. Never WebFetch registered docs before that Docmancer retry.
+For MCP docs tools, registered sources are registry-owned. If `get_docs_context` returns candidates or `next_actions`, retry through DocAtlas with the returned arguments and guidance. Never WebFetch registered docs before that retry.
 
 ## Core Commands
 
@@ -128,13 +126,13 @@ For API tasks, search first, inspect the returned schema and safety block, then 
 
 For repository-specific architecture, conventions, runbooks, roadmap, README/wiki, or module-doc questions, use the Docs MCP tools before generic WebFetch or model memory:
 
-1. Call `inspect_project_docs(project_path)` first for read-only discovery.
-2. If reconciliation is needed, call `prepare_docs(action="sync_project_docs", project_path=..., with_vectors=true)`.
-3. Call `get_docs_context(project_path=..., question=..., mode="project")` for the answer context pack.
+1. Call `get_docs_context(project_path=..., question=..., mode="project")` first.
+2. If it returns `prepare_docs` as `next_action`, call that exact action and then retry `get_docs_context`.
+3. Use `docs_status` only when the user explicitly asks about health, freshness, index state, or a background job.
 4. Read `answer_outline.recommended_reading_order` before composing the answer.
 5. Use `trust_contract.selected` / `trust_contract.selected_sources` to cite trusted sources. Treat `CHANGELOG.md` as primary only for release-history/change questions.
 6. Prefer nested `context_pack[].source` and `context_pack[].section` metadata; the flat fields are kept for compatibility.
-7. If the user asks vaguely about "the MCP server", distinguish `doc-atlas mcp docs-serve` (canonical documentation context and Patch Contract workflows) from `doc-atlas mcp packs-serve` (advanced installed MCP Packs/API action tools; `serve` is only a compatibility alias).
+7. If the user asks vaguely about "the MCP server", distinguish `doc-atlas mcp docs-serve` (the three-tool documentation surface) from `doc-atlas mcp packs-serve` (advanced installed API-action packs).
 
 ## Common Mistakes
 
@@ -142,4 +140,6 @@ For repository-specific architecture, conventions, runbooks, roadmap, README/wik
 - Do not use `doc-atlas ingest` for URLs. Use `doc-atlas add <url>`.
 - Do not run `doc-atlas query` before checking indexed sources with `doc-atlas list`.
 - Do not assume docs are indexed. Always verify with `doc-atlas list` before querying.
-- Do not WebFetch registered docs when Docmancer returns candidates or retry guidance. Retry Docmancer first.
+- Do not WebFetch registered docs when DocAtlas returns candidates or retry guidance. Retry `get_docs_context` first.
+- Do not call `prepare_docs` speculatively; follow the context response or an explicit lifecycle request.
+- Do not use `docs_status` as a discovery step.

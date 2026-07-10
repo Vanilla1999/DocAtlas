@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from docmancer.docs.interfaces.mcp.project_tools import handle_project_tool
 from docmancer.docs.service import LibraryDocsService
-from docmancer.mcp.docs_server import TOOLS
+from docmancer.mcp.docs_server import ALL_TOOLS
 
 
 def _constraint_packet() -> dict:
@@ -25,7 +25,7 @@ def _constraint_packet() -> dict:
 
 
 def test_validate_patch_against_constraints_mcp_schema():
-    tool = next(tool for tool in TOOLS if tool["name"] == "validate_patch_against_constraints")
+    tool = next(tool for tool in ALL_TOOLS if tool["name"] == "validate_patch_against_constraints")
 
     properties = tool["inputSchema"]["properties"]
     assert properties["constraints"]["type"] == ["object", "array"]
