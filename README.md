@@ -216,7 +216,7 @@ doc-atlas agent-contract --project-path . --format json
 doc-atlas agent-contract --project-path . --format markdown
 ```
 
-The contract is read-only and intentionally begins every documentation task with `get_docs_context`. Agents call `prepare_docs` only when that tool returns it as `next_action`, or when a user explicitly requests a refresh or sync.
+The contract is read-only. For an explicit health, freshness, index, or job-status request, agents use `docs_status`; otherwise they start with `get_docs_context`. Agents call `prepare_docs` only when that tool returns it as `next_action`, or when a user explicitly requests a refresh or sync.
 
 ## Project-aware exact dependency docs
 
