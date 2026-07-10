@@ -29,6 +29,7 @@ class QueryConfig(BaseSettings):
 class WebFetchConfig(BaseSettings):
     workers: int = Field(default=8, ge=1)
     default_page_cap: int = Field(default=500, ge=1)
+    library_job_timeout_seconds: float = Field(default=120.0, gt=0)
     browser_fallback: bool = False
     model_config = SettingsConfigDict(env_prefix="DOCMANCER_WEB_FETCH_", extra="ignore")
 
