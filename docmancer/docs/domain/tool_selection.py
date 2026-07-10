@@ -19,18 +19,30 @@ _PREPARE_ACTION_BY_TOOL = {
     "refresh_library_docs": "refresh_library_docs",
     "prune_library_docs": "prune_library_docs",
     "remove_library_docs": "remove_library_docs",
+    "cancel_docs_job": "cancel_docs_job",
+}
+_CONTEXT_ACTION_TOOLS = {
+    "get_project_docs",
+    "get_project_context",
+    "get_library_docs",
+}
+_STATUS_ACTION_BY_TOOL = {
+    "inspect_project_docs": "project",
+    "get_docs_job_status": "job",
+    "list_docs_jobs": "jobs",
 }
 _HIDDEN_DOCS_ACTION_TOOLS = {
-    "inspect_project_docs",
     "docs_job",
     "get_code_context",
     "get_patch_plan_context",
     "get_patch_constraints",
     "validate_patch_against_constraints",
-    "get_project_docs",
-    "get_project_context",
-    "get_library_docs",
     "resolve_library_id",
+    "inspect_library_docs",
+    "list_library_docs",
+    "list_docs_sources",
+    "prune_library_docs",
+    "remove_library_docs",
 }
 
 _TOKEN_RE = re.compile(r"[a-zа-яё0-9_-]+", re.IGNORECASE)
@@ -133,6 +145,26 @@ def normalize_public_docs_action(action: Any) -> dict[str, Any] | None:
     normalized = dict(action)
     tool = str(normalized.get("tool") or "").strip()
     if not tool or tool in PUBLIC_DOCS_TOOLS:
+        return normalized
+    if tool in _CONTEXT_ACTION_TOOLS:
+        arguments = dict(normalized.get("arguments_patch") or {})
+        if "query" in arguments and "question" not in arguments:
+            arguments["question"] = arguments.pop("query")
+        normalized.update({
+            "type": "get_docs_context",
+            "tool": "get_docs_context",
+            "arguments_patch": arguments,
+        })
+        return normalized
+    status_action = _STATUS_ACTION_BY_TOOL.get(tool)
+    if status_action:
+        arguments = dict(normalized.get("arguments_patch") or {})
+        arguments["action"] = status_action
+        normalized.update({
+            "type": "docs_status",
+            "tool": "docs_status",
+            "arguments_patch": arguments,
+        })
         return normalized
     prepare_action = _PREPARE_ACTION_BY_TOOL.get(tool)
     if prepare_action:
