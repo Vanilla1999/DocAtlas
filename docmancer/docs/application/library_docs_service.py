@@ -793,7 +793,7 @@ class LibraryDocsApplicationService:
             return
         failed = int(result.targets_failed or 0)
         succeeded = int(result.targets_completed or 0)
-        status = "succeeded" if failed == 0 else ("partial" if succeeded else "failed")
+        status = "partial" if result.status == "partial" else ("succeeded" if failed == 0 else ("partial" if succeeded else "failed"))
         if result.status in {"failed", "needs_docs_url", "aborted"} and not succeeded:
             status = "failed"
         reason_code = self._result_reason_code(result, status)
@@ -847,6 +847,7 @@ class LibraryDocsApplicationService:
             "network_unreachable",
             "network_transport_error",
             "job_deadline_exceeded",
+            "vector_indexing_failed",
         }
 
     def _prefetch_docs_sync(
