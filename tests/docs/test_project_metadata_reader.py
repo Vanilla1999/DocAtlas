@@ -139,3 +139,36 @@ def test_node_exact_version_is_available_to_project_library_resolution(tmp_path:
     assert source == "package-lock.json_exact"
     assert binding == "npm_registry_version"
     assert warnings == []
+
+
+def test_node_manifest_ranges_are_never_reported_as_exact_without_lockfile(tmp_path: Path) -> None:
+    root = tmp_path / "range_only_repo"
+    root.mkdir()
+    (root / "package.json").write_text(
+        '{"dependencies":{"major":"18","minor":"18.2","tag":"latest","caret":"^18.0.0","wildcard":"18.x"}}',
+        encoding="utf-8",
+    )
+
+    metadata = ProjectMetadataReader().read(root)
+    npm = {item.package_name: item for item in metadata.dependencies if item.ecosystem == "npm"}
+
+    assert not any(key.startswith("npm:") for key in metadata.packages)
+    assert all(item.resolved_version is None for item in npm.values())
+    assert npm["major"].specifier_kind == "range"
+    assert npm["minor"].specifier_kind == "range"
+    assert npm["wildcard"].specifier_kind == "range"
+    assert npm["tag"].specifier_kind == "tag"
+
+
+def test_node_full_semver_manifest_is_exact_without_lockfile(tmp_path: Path) -> None:
+    root = tmp_path / "exact_manifest_repo"
+    root.mkdir()
+    (root / "package.json").write_text(
+        '{"dependencies":{"react":"18.3.1","prerelease":"v2.0.0-beta.1"}}',
+        encoding="utf-8",
+    )
+
+    metadata = ProjectMetadataReader().read(root)
+
+    assert metadata.packages["npm:react"] == "18.3.1"
+    assert metadata.packages["npm:prerelease"] == "2.0.0-beta.1"
