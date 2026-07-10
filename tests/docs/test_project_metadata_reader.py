@@ -251,6 +251,30 @@ def test_node_project_reads_bun_json_lock_for_direct_dependencies(tmp_path: Path
     assert dependency.version_source == "bun.lock_exact"
 
 
+def test_node_project_reads_realistic_bun_text_lock_array(tmp_path: Path) -> None:
+    root = tmp_path / "bun_text_repo"
+    root.mkdir()
+    (root / "package.json").write_text(
+        '{"packageManager":"bun@1.2.0","dependencies":{"react":"^18.0.0","@scope/pkg":"~1.2.0"}}',
+        encoding="utf-8",
+    )
+    (root / "bun.lock").write_text(
+        '''{
+  "lockfileVersion": 1,
+  "packages": {
+    "react": ["react@18.3.1", "", {}, "sha512-example"],
+    "@scope/pkg": ["@scope/pkg@1.2.4", "", {}, "sha512-example"]
+  }
+}''',
+        encoding="utf-8",
+    )
+
+    metadata = ProjectMetadataReader().read(root)
+
+    assert metadata.packages["npm:react"] == "18.3.1"
+    assert metadata.packages["npm:@scope/pkg"] == "1.2.4"
+
+
 def test_node_exact_version_is_available_to_project_library_resolution(tmp_path: Path) -> None:
     root = tmp_path / "resolution_repo"
     root.mkdir()
