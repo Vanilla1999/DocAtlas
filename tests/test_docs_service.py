@@ -8,6 +8,7 @@ from threading import Event, Thread
 import time
 from unittest.mock import MagicMock, patch
 
+import httpx
 from click.testing import CliRunner
 
 from docmancer.cli.__main__ import cli
@@ -19,6 +20,7 @@ from docmancer.docs.models import DocsChunk, DocsResult, DocsTarget, ProjectCont
 from docmancer.docs.interfaces.mcp.project_tools import handle_project_tool
 from docmancer.docs.registry import LibraryRegistry
 from docmancer.docs.service import DocsJobTracker, LibraryDocsService
+from docmancer.mcp.docs_server import call_docs_tool_payload
 
 
 class FakeAgent:
@@ -89,6 +91,41 @@ class SlowAgent(FakeAgent):
         self.entered.set()
         self.release.wait(timeout=2)
         return 1
+
+
+class SlowIndexingAgent(FakeAgent):
+    def __init__(self):
+        super().__init__()
+        self.entered = Event()
+        self.release = Event()
+
+    def add(self, docs_url: str, recreate: bool = False, **kwargs) -> int:
+        self.entered.set()
+        self.release.wait(timeout=2)
+        return super().add(docs_url, recreate=recreate, **kwargs)
+
+
+class VectorTrackingAgent(FakeAgent):
+    def __init__(self, *, fail_sync: bool = False):
+        super().__init__()
+        self.fail_sync = fail_sync
+        self.sync_calls = 0
+        self.sync_db_paths: list[str] = []
+
+    def sync_vectors(self):
+        self.sync_calls += 1
+        self.sync_db_paths.append(self.config.index.db_path)
+        if self.fail_sync:
+            raise RuntimeError("vector backend unavailable")
+
+
+class SlowVectorTrackingAgent(SlowIndexingAgent):
+    def __init__(self):
+        super().__init__()
+        self.sync_calls = 0
+
+    def sync_vectors(self):
+        self.sync_calls += 1
 
 
 class PageFailingAgent(FakeAgent):
@@ -1983,6 +2020,22 @@ def test_prefetch_docs_defaults_missing_versions_to_latest_with_warning(tmp_path
     assert agent.add_calls == ["https://pub.dev/documentation/go_router/latest/"]
 
 
+def test_library_prefetch_reports_retryable_network_failure_category(tmp_path, monkeypatch):
+    agent = FakeAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+    monkeypatch.setattr(agent, "add", lambda *args, **kwargs: (_ for _ in ()).throw(httpx.ConnectError("network unavailable")))
+
+    result = service.prefetch_docs(
+        "example-docs",
+        ecosystem="web",
+        docs_url="https://example.com/docs/",
+    )
+
+    assert result.status == "failed"
+    assert "reason_code=network_unreachable" in result.message
+    assert result.preindex["reason_code"] == "network_unreachable"
+
+
 def test_missing_version_falls_back_to_latest_with_warning(tmp_path, monkeypatch):
     agent = FakeAgent()
     service = _service(tmp_path, monkeypatch, agent)
@@ -3295,6 +3348,336 @@ def test_prefetch_docs_targets_async_returns_job_id_immediately(tmp_path, monkey
     assert status is not None
     assert status.status == "running"
     agent.release.set()
+
+
+def test_prepare_library_docs_queues_network_ingest_and_keeps_status_responsive(tmp_path, monkeypatch):
+    agent = SlowAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+
+    started = time.monotonic()
+    payload = call_docs_tool_payload(
+        "prepare_docs",
+        {
+            "action": "prefetch_library_docs",
+            "library": "example-docs",
+            "ecosystem": "web",
+            "docs_url": "https://example.com/docs/",
+        },
+        service,
+    )
+
+    assert time.monotonic() - started < 1
+    assert payload["status"] == "running"
+    assert payload["job_id"]
+    assert agent.entered.wait(timeout=1)
+
+    status_started = time.monotonic()
+    status = call_docs_tool_payload("docs_status", {"action": "job", "job_id": payload["job_id"]}, service)
+    assert time.monotonic() - status_started < 1
+    assert status["status"] == "running"
+    assert status["job_id"] == payload["job_id"]
+
+    agent.release.set()
+
+
+def test_successful_library_prefetch_atomically_publishes_staged_index(tmp_path, monkeypatch):
+    service = _service(tmp_path, monkeypatch, FakeAgent())
+    result = service.prefetch_docs(
+        "example-docs",
+        ecosystem="web",
+        docs_url="https://example.com/docs/",
+        async_=True,
+    )
+
+    for _ in range(30):
+        status = service.get_docs_job_status(result.job_id)
+        if status and status.status == "succeeded":
+            break
+        time.sleep(0.02)
+
+    record = service.registry.get("example-docs", "web", "latest")
+    assert record is not None
+    assert status is not None
+    assert status.status == "succeeded"
+    assert service.library_docs.registry_ops.count_index_entries(record) == (1, 1)
+
+
+def test_staged_prefetch_syncs_vectors_only_from_production_index(tmp_path, monkeypatch):
+    agent = VectorTrackingAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+    result = service.prefetch_docs(
+        "example-docs",
+        ecosystem="web",
+        docs_url="https://example.com/docs/",
+        async_=True,
+    )
+
+    for _ in range(30):
+        status = service.get_docs_job_status(result.job_id)
+        if status and status.status == "succeeded":
+            break
+        time.sleep(0.02)
+
+    assert status is not None
+    assert status.status == "succeeded"
+    assert agent.add_kwargs[0]["with_vectors"] is False
+    assert agent.sync_calls == 1
+    assert Path(agent.sync_db_paths[0]).name != "index.db"
+
+
+def test_cancelled_staged_prefetch_never_syncs_vectors(tmp_path, monkeypatch):
+    agent = SlowVectorTrackingAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+    result = service.prefetch_docs(
+        "example-docs",
+        ecosystem="web",
+        docs_url="https://example.com/docs/",
+        async_=True,
+    )
+
+    assert agent.entered.wait(timeout=1)
+    service.cancel_docs_job(result.job_id)
+    agent.release.set()
+    for _ in range(30):
+        status = service.get_docs_job_status(result.job_id)
+        if status and status.status == "cancelled":
+            break
+        time.sleep(0.02)
+
+    assert agent.sync_calls == 0
+
+
+def test_vector_sync_failure_keeps_fts_index_and_returns_partial(tmp_path, monkeypatch):
+    agent = VectorTrackingAgent(fail_sync=True)
+    service = _service(tmp_path, monkeypatch, agent)
+    result = service.prefetch_docs(
+        "example-docs",
+        ecosystem="web",
+        docs_url="https://example.com/docs/",
+        async_=True,
+    )
+
+    for _ in range(30):
+        status = service.get_docs_job_status(result.job_id)
+        if status and status.status == "partial":
+            break
+        time.sleep(0.02)
+
+    record = service.registry.get("example-docs", "web", "latest")
+    assert record is not None
+    assert status is not None
+    assert status.status == "partial"
+    assert status.reason_code == "partial_failure"
+    assert status.retryable is True
+    assert record.last_error.startswith("vector_indexing_failed:")
+    assert service.library_docs.registry_ops.count_index_entries(record) == (1, 1)
+
+
+def test_library_prefetch_job_cancellation_reaches_terminal_cancelled_state(tmp_path, monkeypatch):
+    agent = SlowAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+    result = service.prefetch_docs(
+        "example-docs",
+        ecosystem="web",
+        docs_url="https://example.com/docs/",
+        async_=True,
+    )
+
+    assert agent.entered.wait(timeout=1)
+    assert service.cancel_docs_job(result.job_id).status == "cancelling"
+    status = service.get_docs_job_status(result.job_id)
+    assert status is not None
+    assert status.status == "cancelling"
+    agent.release.set()
+    for _ in range(30):
+        status = service.get_docs_job_status(result.job_id)
+        if status and status.status == "cancelled":
+            break
+        time.sleep(0.02)
+
+    status = service.get_docs_job_status(result.job_id)
+    assert status is not None
+    assert status.status == "cancelled"
+    assert status.reason_code == "cancelled"
+    assert status.retryable is True
+
+
+def test_cancelled_library_prefetch_restores_index_state_after_inflight_fetch(tmp_path, monkeypatch):
+    agent = SlowIndexingAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+    result = service.prefetch_docs(
+        "example-docs",
+        ecosystem="web",
+        docs_url="https://example.com/docs/",
+        async_=True,
+    )
+
+    assert agent.entered.wait(timeout=1)
+    service.cancel_docs_job(result.job_id)
+    for _ in range(30):
+        status = service.get_docs_job_status(result.job_id)
+        if status and status.status == "cancelled":
+            break
+        time.sleep(0.02)
+    before = service.registry.get("example-docs", "web", "latest")
+    assert before is not None
+    assert before.status == "available"
+
+    agent.release.set()
+    time.sleep(0.2)
+    after = service.registry.get("example-docs", "web", "latest")
+    assert after is not None
+    assert after.status == "available"
+    assert service.library_docs.registry_ops.count_index_entries(after) == (0, 0)
+
+
+def test_cancel_between_staging_fetch_and_commit_never_publishes_index(tmp_path, monkeypatch):
+    agent = SlowIndexingAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+    result = service.prefetch_docs(
+        "example-docs",
+        ecosystem="web",
+        docs_url="https://example.com/docs/",
+        async_=True,
+    )
+    assert agent.entered.wait(timeout=1)
+    original_count = service.library_docs.refresh_ops._count_index_config
+    cancelled = False
+
+    def cancel_before_commit(config):
+        nonlocal cancelled
+        if not cancelled:
+            cancelled = True
+            service.cancel_docs_job(result.job_id)
+        return original_count(config)
+
+    monkeypatch.setattr(service.library_docs.refresh_ops, "_count_index_config", cancel_before_commit)
+    agent.release.set()
+    for _ in range(30):
+        status = service.get_docs_job_status(result.job_id)
+        if status and status.status == "cancelled":
+            break
+        time.sleep(0.02)
+
+    record = service.registry.get("example-docs", "web", "latest")
+    assert record is not None
+    assert service.library_docs.registry_ops.count_index_entries(record) == (0, 0)
+
+
+def test_library_prefetch_job_deadline_is_terminal_and_retryable(tmp_path, monkeypatch):
+    agent = SlowAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+    monkeypatch.setattr(service.library_docs, "_library_job_timeout_seconds", lambda: 0.05)
+    result = service.prefetch_docs(
+        "example-docs",
+        ecosystem="web",
+        docs_url="https://example.com/docs/",
+        async_=True,
+    )
+
+    assert agent.entered.wait(timeout=1)
+    for _ in range(30):
+        status = service.get_docs_job_status(result.job_id)
+        if status and status.status == "cancelling":
+            break
+        time.sleep(0.02)
+
+    status = service.get_docs_job_status(result.job_id)
+    assert status is not None
+    assert status.status == "cancelling"
+    assert status.reason_code == "job_deadline_exceeded"
+    agent.release.set()
+    for _ in range(30):
+        status = service.get_docs_job_status(result.job_id)
+        if status and status.status == "failed":
+            break
+        time.sleep(0.02)
+
+    status = service.get_docs_job_status(result.job_id)
+    assert status is not None
+    assert status.status == "failed"
+    assert status.reason_code == "job_deadline_exceeded"
+    assert status.retryable is True
+    record = service.registry.get("example-docs", "web", "latest")
+    assert record is not None
+    index_parent = Path(service._index_config_for(record).index.db_path).parent
+    assert list(index_parent.glob(".docatlas-staging-*")) == []
+
+
+def test_registry_commit_failure_rolls_back_published_staging_index(tmp_path, monkeypatch):
+    agent = SlowIndexingAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+    result = service.prefetch_docs(
+        "example-docs",
+        ecosystem="web",
+        docs_url="https://example.com/docs/",
+        async_=True,
+    )
+    assert agent.entered.wait(timeout=1)
+
+    monkeypatch.setattr(
+        service.registry,
+        "upsert",
+        lambda *args, **kwargs: (_ for _ in ()).throw(RuntimeError("registry commit failed")),
+    )
+    agent.release.set()
+    for _ in range(30):
+        status = service.get_docs_job_status(result.job_id)
+        if status and status.status == "failed":
+            break
+        time.sleep(0.02)
+
+    record = service.registry.get("example-docs", "web", "latest")
+    assert record is not None
+    assert status is not None
+    assert status.status == "failed"
+    assert service.library_docs.registry_ops.count_index_entries(record) == (0, 0)
+
+
+def test_library_prefetch_job_exposes_structured_retryable_network_error(tmp_path, monkeypatch):
+    agent = FakeAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+    monkeypatch.setattr(agent, "add", lambda *args, **kwargs: (_ for _ in ()).throw(httpx.ConnectError("network unavailable")))
+    result = service.prefetch_docs(
+        "example-docs",
+        ecosystem="web",
+        docs_url="https://example.com/docs/",
+        async_=True,
+    )
+
+    for _ in range(30):
+        status = service.get_docs_job_status(result.job_id)
+        if status and status.status == "failed":
+            break
+        time.sleep(0.02)
+
+    status = service.get_docs_job_status(result.job_id)
+    assert status is not None
+    assert status.reason_code == "network_unreachable"
+    assert status.retryable is True
+
+
+def test_partial_library_prefetch_job_never_reports_healthy_reason(tmp_path, monkeypatch):
+    service = _service(tmp_path, monkeypatch, FailingAgent())
+    result = service.prefetch_docs(
+        "go_router",
+        ecosystem="pub",
+        versions=["bad-version", "16.2.0"],
+        docs_url_template="https://pub.dev/documentation/{library}/{version}/",
+        async_=True,
+    )
+
+    for _ in range(30):
+        status = service.get_docs_job_status(result.job_id)
+        if status and status.status in {"partial", "failed", "succeeded"}:
+            break
+        time.sleep(0.02)
+
+    status = service.get_docs_job_status(result.job_id)
+    assert status is not None
+    assert status.status == "partial"
+    assert status.reason_code == "partial_failure"
+    assert status.retryable is False
 
 
 def test_prefetch_docs_targets_passes_doc_format_to_agent(tmp_path, monkeypatch):

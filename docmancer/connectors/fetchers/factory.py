@@ -29,6 +29,7 @@ def build_fetcher(
     doc_format: str | None = None,
     seed_urls: list[str] | None = None,
     progress_callback=None,
+    cancellation_callback=None,
 ):
     """Build the fetcher shared by the CLI and registry pipeline."""
     concrete = detect_fetcher_provider(url, provider)
@@ -70,4 +71,5 @@ def build_fetcher(
         doc_format=doc_format,
         seed_urls=seed_urls,
         progress_callback=progress_callback,
+        cancellation_callback=cancellation_callback,
     )

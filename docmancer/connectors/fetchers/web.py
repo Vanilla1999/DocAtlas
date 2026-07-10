@@ -13,7 +13,7 @@ from __future__ import annotations
 
 import logging
 import threading
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from concurrent.futures import FIRST_COMPLETED, ThreadPoolExecutor, wait
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from urllib.parse import urlparse
@@ -103,6 +103,7 @@ class WebFetcher:
         doc_format: str | None = None,
         seed_urls: list[str] | None = None,
         progress_callback=None,
+        cancellation_callback=None,
     ):
         self._timeout = timeout
         self._max_pages = max_pages
@@ -114,6 +115,7 @@ class WebFetcher:
         self._doc_format = doc_format
         self._seed_urls = list(seed_urls or [])
         self._progress_callback = progress_callback
+        self._cancellation_callback = cancellation_callback
         self.last_discovery_diagnostics: dict | None = None
 
     def _emit_progress(self, event: dict) -> None:
@@ -143,6 +145,7 @@ class WebFetcher:
         Raises:
             ValueError: If no documentation pages could be discovered or fetched.
         """
+        self._raise_if_cancelled()
         base_url = url.rstrip("/")
 
         with httpx.Client(**self._client_kwargs()) as client:
@@ -159,6 +162,7 @@ class WebFetcher:
 
             # Step 1: Fetch homepage and detect platform
             platform, root_html, root_headers = self._fetch_and_detect(base_url, client)
+            self._raise_if_cancelled()
             logger.info("Detected platform: %s", platform.value)
 
             # Step 2: Set up robots.txt checker
@@ -181,6 +185,7 @@ class WebFetcher:
                 seed_urls=self._seed_urls,
             )
             discovered = discovery_result.urls
+            self._raise_if_cancelled()
             self.last_discovery_diagnostics = discovery_result.diagnostics
 
             if not discovered and is_dartdoc_html(root_html, url=base_url):
@@ -222,6 +227,10 @@ class WebFetcher:
 
             # Step 5: Fetch and extract each page
             return self._fetch_pages(discovered, base_url, client, platform, robots)
+
+    def _raise_if_cancelled(self) -> None:
+        if self._cancellation_callback and self._cancellation_callback():
+            raise RuntimeError("Documentation fetch cancelled.")
 
     @staticmethod
     def _is_direct_text_url(url: str) -> bool:
@@ -350,14 +359,15 @@ class WebFetcher:
         documents = []
         unique_discovered: list[DiscoveredUrl] = []
         for disc in discovered:
+            self._raise_if_cancelled()
             normalized = normalize_url(disc.url)
             if deduplicator.is_url_duplicate(normalized):
                 continue
             unique_discovered.append(disc)
 
         max_workers = min(self._workers, max(1, len(unique_discovered)))
-        with ThreadPoolExecutor(max_workers=max_workers) as executor:
-            futures = [
+        executor = ThreadPoolExecutor(max_workers=max_workers)
+        pending = {
                 executor.submit(
                     self._fetch_page,
                     disc,
@@ -369,43 +379,56 @@ class WebFetcher:
                     redirect_lock,
                 )
                 for disc in unique_discovered
-            ]
+            }
+        cancelled = False
+        try:
             deduplicator.reset()
-            for future in as_completed(futures):
-                completed_fetches = getattr(self, "_completed_fetches", 0) + 1
-                self._completed_fetches = completed_fetches
-                page = future.result()
-                if page is None:
+            while pending:
+                self._raise_if_cancelled()
+                done, pending = wait(pending, timeout=0.1, return_when=FIRST_COMPLETED)
+                for future in done:
+                    completed_fetches = getattr(self, "_completed_fetches", 0) + 1
+                    self._completed_fetches = completed_fetches
+                    page = future.result()
+                    if page is None:
+                        self._emit_progress(
+                            {
+                                "phase": "fetching",
+                                "message": f"Fetched {completed_fetches}/{len(unique_discovered)} pages",
+                                "fetched_pages": completed_fetches,
+                                "failed_pages": 1,
+                                "total_pages": len(unique_discovered),
+                            }
+                        )
+                        continue
+                    if deduplicator.is_url_duplicate(page.final_url):
+                        logger.debug("Skipped %s (duplicate final URL)", page.document.source)
+                        continue
+                    if page.document.source != page.final_url and deduplicator.is_url_duplicate(page.document.source):
+                        logger.debug("Skipped %s (duplicate canonical URL)", page.document.source)
+                        continue
+                    if deduplicator.is_content_duplicate(page.document.content):
+                        logger.debug("Skipped %s (duplicate content)", page.document.source)
+                        continue
+                    documents.append(page.document)
+                    logger.info("Fetched %s (%d words)", page.document.source, len(page.document.content.split()))
                     self._emit_progress(
                         {
                             "phase": "fetching",
                             "message": f"Fetched {completed_fetches}/{len(unique_discovered)} pages",
+                            "url": page.document.source,
                             "fetched_pages": completed_fetches,
-                            "failed_pages": 1,
                             "total_pages": len(unique_discovered),
                         }
                     )
-                    continue
-                if deduplicator.is_url_duplicate(page.final_url):
-                    logger.debug("Skipped %s (duplicate final URL)", page.document.source)
-                    continue
-                if page.document.source != page.final_url and deduplicator.is_url_duplicate(page.document.source):
-                    logger.debug("Skipped %s (duplicate canonical URL)", page.document.source)
-                    continue
-                if deduplicator.is_content_duplicate(page.document.content):
-                    logger.debug("Skipped %s (duplicate content)", page.document.source)
-                    continue
-                documents.append(page.document)
-                logger.info("Fetched %s (%d words)", page.document.source, len(page.document.content.split()))
-                self._emit_progress(
-                    {
-                        "phase": "fetching",
-                        "message": f"Fetched {completed_fetches}/{len(unique_discovered)} pages",
-                        "url": page.document.source,
-                        "fetched_pages": completed_fetches,
-                        "total_pages": len(unique_discovered),
-                    }
-                )
+        except RuntimeError as exc:
+            cancelled = "cancelled" in str(exc).lower()
+            raise
+        finally:
+            if cancelled:
+                for future in pending:
+                    future.cancel()
+            executor.shutdown(wait=not cancelled, cancel_futures=cancelled)
 
         if not documents:
             last_url = unique_discovered[-1].url if unique_discovered else base_url

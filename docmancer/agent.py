@@ -229,6 +229,10 @@ class DocmancerAgent:
             result.pruned,
         )
 
+    def sync_vectors(self) -> None:
+        """Synchronize the committed SQLite index into its production vector collection."""
+        self._sync_vectors_if_enabled()
+
     def ingest(
         self,
         path: str | Path,
@@ -404,6 +408,7 @@ class DocmancerAgent:
         doc_format: str | None = None,
         seed_urls: list[str] | None = None,
         progress_callback: Callable[[dict[str, Any]], None] | None = None,
+        cancellation_callback: Callable[[], bool] | None = None,
     ):
         if fetcher is not None:
             return fetcher
@@ -422,6 +427,7 @@ class DocmancerAgent:
             doc_format=doc_format,
             seed_urls=seed_urls,
             progress_callback=progress_callback,
+            cancellation_callback=cancellation_callback,
         )
 
     def _auto_detect_provider(self, url: str) -> str:
@@ -460,6 +466,8 @@ class DocmancerAgent:
         seed_urls: list[str] | None = None,
         metadata: dict[str, Any] | None = None,
         progress_callback: Callable[[dict[str, Any]], None] | None = None,
+        cancellation_callback: Callable[[], bool] | None = None,
+        with_vectors: bool = True,
     ) -> int:
         f = self._get_fetcher(
             provider,
@@ -471,8 +479,11 @@ class DocmancerAgent:
             doc_format=doc_format,
             seed_urls=seed_urls,
             progress_callback=progress_callback,
+            cancellation_callback=cancellation_callback,
         )
         documents = f.fetch(url)
+        if cancellation_callback and cancellation_callback():
+            raise RuntimeError("Documentation ingestion cancelled before indexing.")
         self.last_discovery_diagnostics = dict(getattr(f, "last_discovery_diagnostics", {}) or {})
         if metadata:
             for document in documents:
@@ -491,7 +502,7 @@ class DocmancerAgent:
                     "total_pages": len(documents),
                 }
             )
-        indexed = self.ingest_documents(documents, recreate=recreate)
+        indexed = self.ingest_documents(documents, recreate=recreate, with_vectors=with_vectors)
         if progress_callback:
             progress_callback(
                 {

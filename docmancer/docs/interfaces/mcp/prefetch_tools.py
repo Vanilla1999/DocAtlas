@@ -93,6 +93,9 @@ def handle_prefetch_tool(name: str, args: dict[str, Any], service: LibraryDocsSe
                         "status": job.status,
                         "phase": job.phase,
                         "message": job.message,
+                        "reason_code": job.reason_code,
+                        "retryable": job.retryable,
+                        "deadline_at": job.deadline_at,
                         "started_at": job.started_at,
                         "updated_at": job.updated_at,
                     }
@@ -139,7 +142,9 @@ def handle_prefetch_tool(name: str, args: dict[str, Any], service: LibraryDocsSe
         elif action == "prefetch_project_dependency_docs":
             payload = asdict(dependency_docs_app.prefetch_project_dependency_docs(args["project_path"], include_flutter=bool(args.get("include_flutter") if args.get("include_flutter") is not None else True), include_dart=bool(args.get("include_dart") or False), include_rust=bool(args.get("include_rust") if args.get("include_rust") is not None else True), include_packages=args.get("include_packages") or [], force_refresh=bool(args.get("force_refresh") or False), continue_on_error=bool(args.get("continue_on_error") if args.get("continue_on_error") is not None else True), async_=bool(args.get("async") or False)))
         elif action == "prefetch_library_docs":
-            payload = asdict(library_docs_app.prefetch_docs(args["library"], ecosystem=args.get("ecosystem"), versions=args.get("versions"), docs_url=args.get("docs_url"), docs_url_template=args.get("docs_url_template"), source_type=args.get("source_type"), force_refresh=bool(args.get("force_refresh") or False), continue_on_error=bool(args.get("continue_on_error") if args.get("continue_on_error") is not None else True), async_=bool(args.get("async") or False)))
+            # Public MCP calls must not block the server while a remote source is crawled.
+            async_requested = args.get("async")
+            payload = asdict(library_docs_app.prefetch_docs(args["library"], ecosystem=args.get("ecosystem"), versions=args.get("versions"), docs_url=args.get("docs_url"), docs_url_template=args.get("docs_url_template"), source_type=args.get("source_type"), force_refresh=bool(args.get("force_refresh") or False), continue_on_error=bool(args.get("continue_on_error") if args.get("continue_on_error") is not None else True), async_=True if async_requested is None else bool(async_requested)))
         elif action == "refresh_library_docs":
             payload = asdict(library_docs_app.refresh_docs(args["library"], ecosystem=args.get("ecosystem"), version=args.get("version"), docs_url=args.get("docs_url"), versions=args.get("versions"), docs_url_template=args.get("docs_url_template"), source_type=args.get("source_type"), force=bool(args.get("force") if args.get("force") is not None else True)))
         elif action == "remove_library_docs":
@@ -169,7 +174,7 @@ def handle_prefetch_tool(name: str, args: dict[str, Any], service: LibraryDocsSe
             job = service.get_docs_job_status(args["job_id"])
             return {"tool": "docs_job", "action": action, "job_id": args["job_id"], "status": "not_found"} if job is None else {"tool": "docs_job", "action": action, **asdict(job)}
         if action == "list":
-            return {"tool": "docs_job", "action": action, "jobs": [{"job_id": job.job_id, "kind": job.kind, "status": job.status, "phase": job.phase, "message": job.message, "started_at": job.started_at, "updated_at": job.updated_at} for job in service.list_docs_jobs(status=args.get("status"), limit=_bounded_int_arg(args, "limit", default=None, max_value=200))]}
+            return {"tool": "docs_job", "action": action, "jobs": [{"job_id": job.job_id, "kind": job.kind, "status": job.status, "phase": job.phase, "message": job.message, "reason_code": job.reason_code, "retryable": job.retryable, "deadline_at": job.deadline_at, "started_at": job.started_at, "updated_at": job.updated_at} for job in service.list_docs_jobs(status=args.get("status"), limit=_bounded_int_arg(args, "limit", default=None, max_value=200))]}
         if action == "cancel":
             return {"tool": "docs_job", "action": action, **asdict(service.cancel_docs_job(args["job_id"]))}
         return {"status": "error", "reason_code": "unknown_docs_job_action", "message": f"unknown docs_job action: {action}", "supported_actions": ["list", "status", "cancel"]}
@@ -183,7 +188,7 @@ def handle_prefetch_tool(name: str, args: dict[str, Any], service: LibraryDocsSe
         job = service.get_docs_job_status(args["job_id"])
         return {"job_id": args["job_id"], "status": "not_found"} if job is None else asdict(job)
     if name == "list_docs_jobs":
-        return {"jobs": [{"job_id": job.job_id, "kind": job.kind, "status": job.status, "phase": job.phase, "message": job.message, "started_at": job.started_at, "updated_at": job.updated_at} for job in service.list_docs_jobs(status=args.get("status"), limit=_bounded_int_arg(args, "limit", default=None, max_value=200))]}
+        return {"jobs": [{"job_id": job.job_id, "kind": job.kind, "status": job.status, "phase": job.phase, "message": job.message, "reason_code": job.reason_code, "retryable": job.retryable, "deadline_at": job.deadline_at, "started_at": job.started_at, "updated_at": job.updated_at} for job in service.list_docs_jobs(status=args.get("status"), limit=_bounded_int_arg(args, "limit", default=None, max_value=200))]}
     if name == "cancel_docs_job":
         return asdict(service.cancel_docs_job(args["job_id"]))
     return None

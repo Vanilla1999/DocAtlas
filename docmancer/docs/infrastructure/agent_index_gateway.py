@@ -45,6 +45,10 @@ class AgentIndexGateway:
             self._default_agent = self._agent_factory(config=self.config)
         return self._default_agent
 
+    def agent_for_config(self, config: DocmancerConfig) -> Any:
+        """Create an uncached agent for an isolated staging index."""
+        return self._agent_factory(config=config)
+
     def drop_library_agent(self, record_or_library_id: LibraryRecord | str) -> None:
         if isinstance(record_or_library_id, LibraryRecord):
             self._agents.pop(record_or_library_id.canonical_id or record_or_library_id.library_id, None)

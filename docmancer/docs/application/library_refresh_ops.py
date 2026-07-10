@@ -2,14 +2,39 @@ from __future__ import annotations
 
 import logging
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
+import shutil
+import sqlite3
+import tempfile
 import time
+
+import httpx
 
 from docmancer.docs.models import RefreshResult
 from docmancer.docs.registry import LibraryRecord
 from docmancer.docs.dart_official_docs import build_dart_diagnostics, canonical_dart_ecosystem
 
 logger = logging.getLogger(__name__)
+
+
+def _refresh_failure_code(exc: Exception) -> str:
+    """Return a stable, safe failure category for a library ingestion attempt."""
+    if isinstance(exc, httpx.ConnectTimeout):
+        return "connect_timeout"
+    if isinstance(exc, httpx.ReadTimeout):
+        return "read_timeout"
+    if isinstance(exc, httpx.TimeoutException):
+        return "network_timeout"
+    if isinstance(exc, httpx.ConnectError):
+        return "network_unreachable"
+    if isinstance(exc, httpx.TransportError):
+        return "network_transport_error"
+    if isinstance(exc, httpx.HTTPStatusError):
+        return "http_failure"
+    message = str(exc).lower()
+    if "extract" in message:
+        return "extraction_failed"
+    return "indexing_failed"
 
 
 def _merged_discovery_diagnostics(items: list[dict[str, Any]]) -> dict[str, Any]:
@@ -99,7 +124,14 @@ class LibraryRefreshOps:
     def __getattr__(self, name: str) -> Any:
         return getattr(self.dependencies, name)
 
-    def refresh_record(self, record: LibraryRecord, *, force: bool) -> RefreshResult:
+    def refresh_record(
+        self,
+        record: LibraryRecord,
+        *,
+        force: bool,
+        should_cancel: Callable[[], bool] | None = None,
+        begin_commit: Callable[[], bool] | None = None,
+    ) -> RefreshResult:
         started = time.monotonic()
         if not record.docs_url:
             return RefreshResult(
@@ -127,6 +159,8 @@ class LibraryRefreshOps:
                 targets_completed=1,
             )
 
+        staging = self._create_staging_index(record) if should_cancel else None
+
         sections_indexed = 0
         discovery_diagnostics: list[dict[str, Any]] = []
         try:
@@ -136,8 +170,8 @@ class LibraryRefreshOps:
             if seed_urls_for_discovery and (target.docs_url or target.docs_url_template):
                 urls = urls[:1]
             per_url_max_pages = target.max_pages if target.doc_format == "dartdoc" else (1 if target.seed_urls and not target.docs_url and not target.docs_url_template else target.max_pages)
+            agent = self.agent_gateway.agent_for_config(staging[0]) if staging else self._agent_instance(record)
             for url in urls:
-                agent = self._agent_instance(record)
                 indexed_sections = agent.add(
                     url,
                     recreate=False,
@@ -145,13 +179,24 @@ class LibraryRefreshOps:
                     browser=target.browser,
                     seed_urls=seed_urls_for_discovery if (target.docs_url or target.docs_url_template) else None,
                     metadata=_metadata_for_record(record),
+                    cancellation_callback=should_cancel,
+                    with_vectors=False if staging else True,
                 )
                 if isinstance(indexed_sections, int):
                     sections_indexed += indexed_sections
                 if getattr(agent, "last_discovery_diagnostics", None):
                     discovery_diagnostics.append(dict(agent.last_discovery_diagnostics))
         except Exception as exc:
+            if should_cancel and should_cancel():
+                self._discard_staging(staging)
+                return self._cancelled_result(record, started)
+            if begin_commit and not begin_commit():
+                self._discard_staging(staging)
+                return self._cancelled_result(record, started)
+            self._discard_staging(staging)
             logger.exception("Refresh failed for record %s: %s", record.library_id, exc)
+            reason_code = _refresh_failure_code(exc)
+            message = f"{reason_code}: {exc}"
             self.registry.upsert(
                 library=record.name,
                 ecosystem=record.ecosystem,
@@ -161,7 +206,7 @@ class LibraryRefreshOps:
                 source_type=record.source_type,
                 now=self._now(),
                 status="failed",
-                last_error=str(exc),
+                last_error=message,
                 target_spec=record.target_spec,
             )
             return RefreshResult(
@@ -171,7 +216,7 @@ class LibraryRefreshOps:
                 last_refreshed_at=record.last_refreshed_at,
                 version=record.version,
                 source_type=record.source_type,
-                message=str(exc),
+                message=message,
                 duration_ms=int((time.monotonic() - started) * 1000),
                 pages_failed=1,
                 targets_failed=1,
@@ -179,22 +224,36 @@ class LibraryRefreshOps:
                     "library": record.name,
                     "canonical_id": record.canonical_id,
                     "docs_url": record.docs_url,
-                    "reason_code": "refresh_failed",
+                    "reason_code": reason_code,
                     **_dart_refresh_diagnostics(
                         record,
                         pages_discovered=sections_indexed,
                         pages_extracted=0,
                         chunks_created=0,
-                        reason_code="refresh_failed",
+                        reason_code=reason_code,
                     ),
                 },
             )
 
-        pages_after, chunks_after = self.registry_ops.count_index_entries(record)
+        if should_cancel and should_cancel():
+            self._discard_staging(staging)
+            return self._cancelled_result(record, started)
+
+        pages_after, chunks_after = (
+            self._count_index_config(staging[0]) if staging else self.registry_ops.count_index_entries(record)
+        )
+        if begin_commit and not begin_commit():
+            self._discard_staging(staging)
+            return self._cancelled_result(record, started)
+
+        def _commit_registry(**values: Any) -> Any:
+            update = lambda: self.registry.upsert(**values)
+            return self._publish_staging_and_update(record, staging, update)
+
         if sections_indexed == 0 or pages_after == 0 or chunks_after == 0:
             refreshed_at = self._now()
             reason = "ingest_produced_no_chunks" if sections_indexed > 0 else "no_extractable_content"
-            self.registry.upsert(
+            _commit_registry(
                 library=record.name,
                 ecosystem=record.ecosystem,
                 version=record.version,
@@ -244,7 +303,7 @@ class LibraryRefreshOps:
             )
 
         refreshed_at = self._now()
-        self.registry.upsert(
+        _commit_registry(
             library=record.name,
             ecosystem=record.ecosystem,
             version=record.version,
@@ -257,6 +316,45 @@ class LibraryRefreshOps:
             last_error="",
             target_spec=record.target_spec,
         )
+
+        if staging:
+            try:
+                production_agent = self._agent_instance(record)
+                sync_vectors = getattr(production_agent, "sync_vectors", None)
+                if callable(sync_vectors):
+                    sync_vectors()
+            except Exception as exc:
+                message = f"vector_indexing_failed: {exc}"
+                try:
+                    self.registry.upsert(
+                        library=record.name,
+                        ecosystem=record.ecosystem,
+                        version=record.version,
+                        docs_url=record.docs_url,
+                        docs_url_template=record.docs_url_template,
+                        source_type=record.source_type,
+                        now=self._now(),
+                        status="available",
+                        last_refreshed_at=refreshed_at,
+                        last_error=message,
+                        target_spec=record.target_spec,
+                    )
+                except Exception:
+                    logger.warning("Could not persist vector failure diagnostics for %s", record.library_id, exc_info=True)
+                return RefreshResult(
+                    library_id=record.library_id,
+                    status="partial",
+                    docs_url=record.docs_url,
+                    last_refreshed_at=refreshed_at,
+                    version=record.version,
+                    source_type=record.source_type,
+                    message=message,
+                    duration_ms=int((time.monotonic() - started) * 1000),
+                    pages_indexed=pages_after,
+                    chunks_indexed=chunks_after,
+                    targets_completed=1,
+                    reason_codes=["vector_indexing_failed"],
+                )
 
         # Build preindex diagnostics
         index_config = self._index_config_for(record)
@@ -309,13 +407,40 @@ class LibraryRefreshOps:
         source_type: str | None = None,
         force: bool = True,
         continue_on_error: bool = True,
+        should_cancel: Callable[[], bool] | None = None,
+        begin_commit: Callable[[], bool] | None = None,
     ) -> RefreshResult:
         started = time.monotonic()
+        if should_cancel and should_cancel():
+            return RefreshResult(
+                library_id=None,
+                status="cancelled",
+                docs_url=docs_url_template or docs_url,
+                last_refreshed_at=None,
+                version=version,
+                source_type=source_type or "api",
+                message="Library docs prefetch cancelled.",
+            )
         if versions:
-            updated = skipped = failed = needs_url = 0
+            updated = skipped = partial = failed = needs_url = 0
             pages_indexed = pages_failed = chunks_indexed = 0
             last: RefreshResult | None = None
+            failure_codes: list[str] = []
             for item_version in versions:
+                if should_cancel and should_cancel():
+                    return RefreshResult(
+                        library_id=None,
+                        status="cancelled",
+                        docs_url=docs_url_template or docs_url,
+                        last_refreshed_at=last.last_refreshed_at if last else None,
+                        message="Library docs prefetch cancelled.",
+                        duration_ms=int((time.monotonic() - started) * 1000),
+                        pages_indexed=pages_indexed,
+                        pages_failed=pages_failed,
+                        chunks_indexed=chunks_indexed,
+                        targets_completed=updated + skipped,
+                        targets_failed=failed + needs_url,
+                    )
                 last = self.refresh_docs(
                     library,
                     ecosystem=ecosystem,
@@ -325,34 +450,52 @@ class LibraryRefreshOps:
                     source_type=source_type,
                     force=force,
                     continue_on_error=continue_on_error,
+                    should_cancel=should_cancel,
+                    begin_commit=begin_commit,
                 )
                 if last.status == "updated":
                     updated += 1
                 elif last.status == "skipped":
                     skipped += 1
+                elif last.status == "partial":
+                    partial += 1
+                    for reason_code in last.reason_codes:
+                        if reason_code not in failure_codes:
+                            failure_codes.append(reason_code)
                 elif last.status == "needs_docs_url":
                     needs_url += 1
                 else:
                     failed += 1
+                    codes = list(last.reason_codes)
+                    if not codes and last.preindex and last.preindex.get("reason_code"):
+                        codes = [str(last.preindex["reason_code"])]
+                    for reason_code in codes:
+                        if reason_code not in failure_codes:
+                            failure_codes.append(reason_code)
                 pages_indexed += last.pages_indexed
                 pages_failed += last.pages_failed
                 chunks_indexed += last.chunks_indexed
                 if not continue_on_error and last.status in {"failed", "needs_docs_url"}:
                     break
             aborted = not continue_on_error and last is not None and last.status in {"failed", "needs_docs_url"}
-            status = "aborted" if aborted else ("failed" if failed else ("needs_docs_url" if needs_url else ("updated" if updated else "skipped")))
+            status = "aborted" if aborted else ("failed" if failed else ("needs_docs_url" if needs_url else ("partial" if partial else ("updated" if updated else "skipped"))))
+            message = f"updated={updated} skipped={skipped} partial={partial} failed={failed} needs_docs_url={needs_url}"
+            if failure_codes:
+                message = f"{message} reason_code={','.join(failure_codes)}"
             return RefreshResult(
                 library_id=None,
                 status=status,
                 docs_url=docs_url_template or docs_url,
                 last_refreshed_at=last.last_refreshed_at if last else None,
-                message=f"updated={updated} skipped={skipped} failed={failed} needs_docs_url={needs_url}",
+                message=message,
                 duration_ms=int((time.monotonic() - started) * 1000),
                 pages_indexed=pages_indexed,
                 pages_failed=pages_failed,
                 chunks_indexed=chunks_indexed,
-                targets_completed=updated + skipped,
+                targets_completed=updated + skipped + partial,
                 targets_failed=failed + needs_url,
+                preindex=last.preindex if last else None,
+                reason_codes=failure_codes,
             )
 
         info = self.resolve_library(library, ecosystem, version, docs_url, docs_url_template, source_type)
@@ -369,6 +512,9 @@ class LibraryRefreshOps:
                 duration_ms=int((time.monotonic() - started) * 1000),
                 targets_failed=1,
             )
+        if should_cancel:
+            record = self.registry.get(record.library_id, None, source_type=record.source_type) or record
+            return self.refresh_record(record, force=force, should_cancel=should_cancel, begin_commit=begin_commit)
         with self._lock_for(record.library_id):
             record = self.registry.get(record.library_id, None, source_type=record.source_type) or record
             return self.refresh_record(record, force=force)
@@ -383,6 +529,8 @@ class LibraryRefreshOps:
         source_type: str | None = None,
         force_refresh: bool = False,
         continue_on_error: bool = True,
+        should_cancel: Callable[[], bool] | None = None,
+        begin_commit: Callable[[], bool] | None = None,
     ) -> RefreshResult:
         selected_versions = versions or ["latest"]
         result = self.refresh_docs(
@@ -394,6 +542,8 @@ class LibraryRefreshOps:
             source_type=source_type,
             force=force_refresh,
             continue_on_error=continue_on_error,
+            should_cancel=should_cancel,
+            begin_commit=begin_commit,
         )
         messages = []
         if not versions:
@@ -416,5 +566,120 @@ class LibraryRefreshOps:
                 targets_completed=result.targets_completed,
                 targets_failed=result.targets_failed,
                 preindex=result.preindex,
+                reason_codes=result.reason_codes,
             )
         return result
+
+    def _create_staging_index(self, record: LibraryRecord) -> tuple[Any, Path]:
+        production = self._index_config_for(record)
+        db_path = Path(production.index.db_path)
+        db_path.parent.mkdir(parents=True, exist_ok=True)
+        root = Path(tempfile.mkdtemp(prefix=".docatlas-staging-", dir=db_path.parent))
+        staging = production.model_copy(deep=True)
+        staging.index.db_path = str(root / "index.db")
+        staging.index.extracted_dir = str(root / "extracted")
+        try:
+            if db_path.exists():
+                with sqlite3.connect(db_path) as source, sqlite3.connect(staging.index.db_path) as destination:
+                    source.backup(destination)
+            extracted = Path(production.index.extracted_dir)
+            if extracted.exists():
+                shutil.copytree(extracted, staging.index.extracted_dir)
+        except Exception:
+            shutil.rmtree(root, ignore_errors=True)
+            raise
+        return staging, root
+
+    @staticmethod
+    def _count_index_config(config: Any) -> tuple[int, int]:
+        db_path = Path(config.index.db_path)
+        if not db_path.exists():
+            return 0, 0
+        try:
+            with sqlite3.connect(db_path) as conn:
+                pages = int(conn.execute("SELECT COUNT(*) FROM sources").fetchone()[0])
+                chunks = int(conn.execute("SELECT COUNT(*) FROM sections").fetchone()[0])
+                return pages, chunks
+        except sqlite3.Error:
+            return 0, 0
+
+    def _publish_staging_and_update(
+        self,
+        record: LibraryRecord,
+        staging: tuple[Any, Path] | None,
+        registry_update: Callable[[], Any],
+    ) -> Any:
+        if staging is None:
+            return registry_update()
+        staging_config, staging_root = staging
+        production = self._index_config_for(record)
+        production_db = Path(production.index.db_path)
+        production_extracted = Path(production.index.extracted_dir)
+        staging_db = Path(staging_config.index.db_path)
+        staging_extracted = Path(staging_config.index.extracted_dir)
+        backup_root = Path(tempfile.mkdtemp(prefix=".docatlas-backup-", dir=production_db.parent))
+        backup_db = backup_root / production_db.name
+        backup_extracted = backup_root / "extracted"
+        candidate_db = backup_root / "candidate.db"
+
+        committed = False
+        rolled_back = False
+        result: Any = None
+        with self._lock_for(record.library_id):
+            try:
+                if staging_db.exists():
+                    with sqlite3.connect(staging_db) as source, sqlite3.connect(candidate_db) as destination:
+                        source.backup(destination)
+                if production_db.exists():
+                    production_db.replace(backup_db)
+                if production_extracted.exists():
+                    production_extracted.replace(backup_extracted)
+                production_db.parent.mkdir(parents=True, exist_ok=True)
+                if candidate_db.exists():
+                    candidate_db.replace(production_db)
+                if staging_extracted.exists():
+                    production_extracted.parent.mkdir(parents=True, exist_ok=True)
+                    staging_extracted.replace(production_extracted)
+                result = registry_update()
+                committed = True
+            except Exception as commit_error:
+                try:
+                    if production_db.exists():
+                        production_db.unlink()
+                    if backup_db.exists():
+                        backup_db.replace(production_db)
+                    if production_extracted.exists():
+                        shutil.rmtree(production_extracted)
+                    if backup_extracted.exists():
+                        production_extracted.parent.mkdir(parents=True, exist_ok=True)
+                        backup_extracted.replace(production_extracted)
+                    rolled_back = True
+                except Exception as rollback_error:
+                    raise RuntimeError(
+                        f"Library index commit failed and rollback backup was preserved at {backup_root}: {rollback_error}"
+                    ) from commit_error
+                raise
+            finally:
+                shutil.rmtree(staging_root, ignore_errors=True)
+                if committed or rolled_back:
+                    shutil.rmtree(backup_root, ignore_errors=True)
+        self.agent_gateway.drop_library_agent(record)
+        return result
+
+    @staticmethod
+    def _discard_staging(staging: tuple[Any, Path] | None) -> None:
+        if staging:
+            shutil.rmtree(staging[1], ignore_errors=True)
+
+    @staticmethod
+    def _cancelled_result(record: LibraryRecord, started: float) -> RefreshResult:
+        return RefreshResult(
+            library_id=record.library_id,
+            status="cancelled",
+            docs_url=record.docs_url,
+            last_refreshed_at=record.last_refreshed_at,
+            version=record.version,
+            source_type=record.source_type,
+            message="Library docs prefetch cancelled.",
+            duration_ms=int((time.monotonic() - started) * 1000),
+        )

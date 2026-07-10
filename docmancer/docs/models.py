@@ -141,6 +141,7 @@ class RefreshResult:
     targets_completed: int = 0
     targets_failed: int = 0
     preindex: dict[str, Any] | None = None
+    reason_codes: list[str] = field(default_factory=list)
 
 
 @dataclass(frozen=True)
@@ -208,6 +209,9 @@ class DocsJob:
     total_chunks: int = 0
     completed_chunks: int = 0
     message: str | None = None
+    reason_code: str | None = None
+    retryable: bool | None = None
+    deadline_at: str | None = None
     warnings: list[str] = field(default_factory=list)
     errors: list[str] = field(default_factory=list)
     target_results: list[dict[str, Any]] = field(default_factory=list)
