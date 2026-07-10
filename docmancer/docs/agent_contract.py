@@ -48,6 +48,7 @@ def build_agent_contract(project_path: str | Path) -> dict[str, Any]:
             "dependencies": dependencies,
         },
         "tool_selection": {
+            "decision_rule": "Use docs_status for an explicit health, freshness, index, or job-status request. Otherwise start with get_docs_context; call prepare_docs only from next_action or an explicit lifecycle request.",
             "default_tool": "get_docs_context",
             "tools": [
                 {
@@ -67,7 +68,7 @@ def build_agent_contract(project_path: str | Path) -> dict[str, Any]:
             ],
         },
         "evidence_rules": [
-            "Start with get_docs_context and follow its next_action before choosing another documentation tool.",
+            "For explicit health, freshness, index, or job-status requests, use docs_status; otherwise start with get_docs_context and follow its next_action.",
             "Use project documentation for repository conventions and decisions; use source code for current implementation.",
             "Use dependency documentation only for external APIs, with the resolved version when available.",
             "Cite the selected sources returned by DocAtlas; do not replace local evidence with model memory.",
@@ -96,7 +97,7 @@ def format_agent_contract_markdown(contract: dict[str, Any]) -> str:
         "",
         "## Required tool selection",
         "",
-        "Start every documentation question with `get_docs_context`. Call `prepare_docs` only when it is returned as `next_action` or when the user explicitly requests a sync/refresh/index. Use `docs_status` only for health or freshness questions.",
+        "For an explicit health, freshness, index, or job-status request, use `docs_status`. Otherwise start with `get_docs_context`. Call `prepare_docs` only when it is returned as `next_action` or when the user explicitly requests a sync/refresh/index.",
         "",
         "## Local documentation sources",
         "",
