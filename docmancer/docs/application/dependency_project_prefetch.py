@@ -79,6 +79,27 @@ class DependencyProjectPrefetch:
                     path_prefixes=[f"/{package}/{rust_version}/"],
                 ))
                 continue
+            npm_version = metadata.packages.get(f"npm:{package}")
+            if npm_version:
+                record = self.registry.get(package, ecosystem="npm", version=npm_version, source_type="api")
+                docs_url = record.docs_url_resolved if record else None
+                if not docs_url:
+                    warnings.append(
+                        f"{package}: Exact npm version {npm_version} was found, "
+                        "but no npm documentation source is registered."
+                    )
+                    if not continue_on_error:
+                        break
+                    continue
+                targets.append(DocsTarget(
+                    library=package,
+                    ecosystem="npm",
+                    version=npm_version,
+                    docs_url=docs_url,
+                    docs_url_template=record.docs_url_template,
+                    source_type=record.source_type or "api",
+                ))
+                continue
             version = metadata.packages.get(package)
             if not version:
                 warnings.append(f"{package}: Package was not found in project lockfiles.")
