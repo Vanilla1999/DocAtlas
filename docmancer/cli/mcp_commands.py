@@ -215,9 +215,9 @@ def _compile_from_url_or_die(package: str, version: str, url: str) -> None:
     click.echo(f"Compiled {package}@{version} from {url} into {pkg_dir}")
 
 
-def register_docmancer_mcp_in_agent(agent_name: str) -> str | None:
+def register_docmancer_mcp_in_agent(agent_name: str, *, project: bool = False) -> str | None:
     """Helper for the existing `doc-atlas install <agent>` to also register MCP. Returns message or None."""
-    target = agent_config.find_agent(agent_name)
+    target = agent_config.find_agent(agent_name, project=project)
     if target is None:
         return None
     try:
