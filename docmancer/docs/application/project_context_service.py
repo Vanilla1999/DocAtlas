@@ -58,6 +58,40 @@ class ContextTrustDecision:
     query_terms_missing: list[str]
 
 
+def _documentation_gap_actions(actions: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    return [action for action in actions if action.get("action") == "create_reviewable_project_doc"]
+
+
+def _source_ground_documentation_gap(
+    actions: list[dict[str, Any]],
+    *,
+    root: Path,
+    repo_map: list[dict[str, Any]],
+    source_evidence: list[dict[str, Any]],
+    code_graph: list[dict[str, Any]],
+) -> None:
+    """Attach bounded, discovered paths to a host-only documentation handoff."""
+    manifests = [
+        name for name in ("pyproject.toml", "package.json", "Cargo.toml", "pubspec.yaml")
+        if (root / name).exists()
+    ]
+    code_paths = list(dict.fromkeys(
+        str(item.get("path"))
+        for item in [*repo_map, *source_evidence, *code_graph]
+        if item.get("path")
+    ))[:8]
+    evidence = []
+    if manifests:
+        evidence.append({"category": "manifests", "paths": manifests})
+    if code_paths:
+        evidence.append({"category": "source map and code graph", "paths": code_paths})
+    for action in _documentation_gap_actions(actions):
+        gap = dict(action.get("documentation_gap") or {})
+        gap["evidence_to_collect"] = evidence
+        gap["evidence_complete"] = bool(evidence)
+        action["documentation_gap"] = gap
+
+
 class ProjectContextService:
     """Application boundary for composing repo-grounded context packs."""
 
@@ -148,6 +182,21 @@ class ProjectContextService:
         confirmation_reason = project_docs.confirmation_reason if project_docs and project_docs.requires_confirmation else ("network_fetch" if dependency_confirmation and explicit_dependency_requested else None)
         next_action = project_docs.next_action if project_docs and project_docs.requires_confirmation else (dependency_confirmation or {})
         arguments_patch = project_docs.arguments_patch if project_docs and project_docs.requires_confirmation else ({"allow_network": True} if dependency_confirmation else {})
+        if mode in {"auto", "project-only"} and project_docs and hasattr(self.facade, "inspect_project_docs"):
+            inspection = self.facade.inspect_project_docs(str(root))
+            if (
+                inspection.reason_code in {"no_project_docs", "architecture_doc_creation_recommended"}
+                and not _documentation_gap_actions(next_actions)
+            ):
+                gap_action = next(
+                    (
+                        action for action in inspection.recommended_next_actions
+                        if action.get("action") == "create_reviewable_project_doc"
+                    ),
+                    None,
+                )
+                if gap_action:
+                    next_actions.append(gap_action)
         context_pack = project_context_pack(question=question, project_docs=project_docs, dependency_docs=dependency_docs)
         requirements = extract_project_answer_requirements(question)
         repo_map_items: list[dict[str, Any]] = []
@@ -188,6 +237,19 @@ class ProjectContextService:
                 context_pack.extend(code_graph_items)
             except Exception as exc:
                 code_graph_error = f"{type(exc).__name__}: {exc}"
+        _source_ground_documentation_gap(
+            next_actions,
+            root=root,
+            repo_map=repo_map_items,
+            source_evidence=source_evidence_items,
+            code_graph=code_graph_items,
+        )
+        gap_actions = _documentation_gap_actions(next_actions)
+        if gap_actions:
+            requires_confirmation = True
+            confirmation_reason = "repo_write"
+            next_action = gap_actions[0]
+            arguments_patch = {"project_path": str(root)}
         trust_contract = build_project_context_trust_contract(
             project_docs=project_docs,
             dependency_docs=dependency_docs,

@@ -1032,11 +1032,10 @@ def test_inspect_project_docs_recommends_architecture_bootstrap_when_no_docs(tmp
     result = service.inspect_project_docs(str(project))
 
     assert result.reason_code == "no_project_docs"
-    assert result.next_action == {
-        "type": "ask_user_to_create_project_doc",
-        "suggested_file": "ARCHITECTURE.md",
-        "handled_by": "coding_agent",
-    }
+    assert result.next_action["action"] == "create_reviewable_project_doc"
+    assert result.next_action["type"] == "ask_user_to_create_project_doc"
+    assert result.next_action["suggested_file"] == "ARCHITECTURE.md"
+    assert result.next_action["handled_by"] == "coding_agent"
     assert result.requires_confirmation is True
     assert result.confirmation_reason == "repo_write"
     assert result.arguments_patch == {"project_path": str(project.resolve())}
@@ -1047,9 +1046,7 @@ def test_inspect_project_docs_recommends_architecture_bootstrap_when_no_docs(tmp
     assert action["requires_confirmation"] is True
     assert action["preferred_path"] == "ARCHITECTURE.md"
     assert "ARCHITECTURE.md" in action["suggested_paths"]
-    assert action["after"][0]["tool"] == "inspect_project_docs"
-    assert action["after"][1]["tool"] == "sync_project_docs"
-    assert action["after"][2]["tool"] == "get_project_docs"
+    assert [item["tool"] for item in action["after"]] == ["prepare_docs", "get_docs_context"]
     assert "reviewable ARCHITECTURE.md" in (result.agent_guidance or "")
 
 
@@ -1064,11 +1061,10 @@ def test_inspect_project_docs_recommends_architecture_when_docs_lack_overview(tm
 
     assert result.reason_code == "architecture_doc_creation_recommended"
     assert result.project_docs["high_level_overview_found"] is False
-    assert result.next_action == {
-        "type": "ask_user_to_create_project_doc",
-        "suggested_file": "ARCHITECTURE.md",
-        "handled_by": "coding_agent",
-    }
+    assert result.next_action["action"] == "create_reviewable_project_doc"
+    assert result.next_action["type"] == "ask_user_to_create_project_doc"
+    assert result.next_action["suggested_file"] == "ARCHITECTURE.md"
+    assert result.next_action["handled_by"] == "coding_agent"
     assert result.requires_confirmation is True
     assert result.confirmation_reason == "repo_write"
     assert result.arguments_patch == {"project_path": str(project.resolve())}
@@ -1077,6 +1073,32 @@ def test_inspect_project_docs_recommends_architecture_when_docs_lack_overview(tm
     assert action["action"] == "create_reviewable_project_doc"
     assert action["preferred_path"] == "ARCHITECTURE.md"
     assert "no high-level architecture or overview" in action["reason"]
+
+
+def test_project_context_returns_source_grounded_public_docs_handoff(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    (project / "runbooks").mkdir()
+    (project / "runbooks" / "deploy.md").write_text("# Deploy\n\nDeployment steps only.", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+    service.ingest_project_docs(str(project), with_vectors=False)
+
+    result = service.get_project_context(str(project), "Explain the architecture", mode="project-only")
+
+    action = next(item for item in result.next_actions if item.get("action") == "create_reviewable_project_doc")
+    assert result.next_action is action
+    assert result.requires_confirmation is True
+    assert action["documentation_gap"]["evidence_complete"] is True
+    assert any("pubspec.yaml" in item["paths"] for item in action["documentation_gap"]["evidence_to_collect"])
+    assert [item["tool"] for item in action["after"]] == ["prepare_docs", "get_docs_context"]
+
+    public = service.get_docs_context(
+        "Explain the architecture",
+        project_path=str(project),
+        mode="project",
+    )
+    assert public.next_action["action"] == "create_reviewable_project_doc"
+    assert public.next_action["documentation_gap"]["evidence_complete"] is True
+    assert [item["tool"] for item in public.next_action["after"]] == ["prepare_docs", "get_docs_context"]
 
 
 def test_inspect_project_docs_treats_readme_as_high_level_overview(tmp_path, monkeypatch):
@@ -1770,11 +1792,10 @@ def test_get_project_docs_returns_no_project_docs_next_action(tmp_path, monkeypa
     assert result.answer_available is False
     assert result.reason == "no_project_docs"
     assert result.reason_code == "no_project_docs"
-    assert result.next_action == {
-        "type": "ask_user_to_create_project_doc",
-        "suggested_file": "ARCHITECTURE.md",
-        "handled_by": "coding_agent",
-    }
+    assert result.next_action["action"] == "create_reviewable_project_doc"
+    assert result.next_action["type"] == "ask_user_to_create_project_doc"
+    assert result.next_action["suggested_file"] == "ARCHITECTURE.md"
+    assert result.next_action["handled_by"] == "coding_agent"
     assert result.requires_confirmation is True
     assert result.confirmation_reason == "repo_write"
     assert result.arguments_patch == {"project_path": str(project.resolve())}
@@ -1783,8 +1804,7 @@ def test_get_project_docs_returns_no_project_docs_next_action(tmp_path, monkeypa
     assert result.next_actions[0]["action"] == "create_reviewable_project_doc"
     assert result.next_actions[0]["preferred_path"] == "ARCHITECTURE.md"
     assert result.next_actions[0]["requires_confirmation"] is True
-    assert result.next_actions[0]["after"][0]["tool"] == "inspect_project_docs"
-    assert result.next_actions[0]["after"][1]["tool"] == "sync_project_docs"
+    assert [item["tool"] for item in result.next_actions[0]["after"]] == ["prepare_docs", "get_docs_context"]
     assert "ARCHITECTURE.md" in (result.message or "")
 
 

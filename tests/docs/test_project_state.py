@@ -41,8 +41,22 @@ def test_create_project_docs_next_action_shape_includes_followups(tmp_path):
     assert action["action"] == "create_reviewable_project_doc"
     assert action["requires_confirmation"] is True
     assert action["preferred_path"] == "ARCHITECTURE.md"
-    assert [item["tool"] for item in action["after"]] == ["inspect_project_docs", "sync_project_docs", "get_project_docs"]
-    assert action["after"][2]["arguments_patch"] == {"project_path": str(tmp_path), "query": "architecture"}
+    assert [item["tool"] for item in action["after"]] == ["prepare_docs", "get_docs_context"]
+    assert action["after"][0]["arguments_patch"] == {"action": "sync_project_docs", "project_path": str(tmp_path)}
+    assert action["after"][1]["arguments_patch"] == {"project_path": str(tmp_path), "question": "architecture"}
+
+
+def test_create_project_docs_next_action_contains_machine_readable_model_handoff(tmp_path):
+    action = create_project_docs_next_action(tmp_path, "Explain the architecture")
+
+    gap = action["documentation_gap"]
+    assert gap["suggested_path"] == "ARCHITECTURE.md"
+    assert all(section["evidence"] for section in gap["required_sections"])
+    assert "do not invent unsupported facts" in gap["rules"]
+    assert action["after_file_change"] == {
+        "tool": "prepare_docs",
+        "arguments_patch": {"action": "sync_project_docs", "project_path": str(tmp_path)},
+    }
 
 
 def test_project_docs_structured_next_action_values(tmp_path):

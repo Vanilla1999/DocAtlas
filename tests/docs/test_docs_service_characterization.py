@@ -166,11 +166,10 @@ def test_characterization_no_project_docs_returns_architecture_remediation(tmp_p
     result = service.inspect_project_docs(str(project))
 
     assert result.reason_code == "no_project_docs"
-    assert result.next_action == {
-        "type": "ask_user_to_create_project_doc",
-        "suggested_file": "ARCHITECTURE.md",
-        "handled_by": "coding_agent",
-    }
+    assert result.next_action["action"] == "create_reviewable_project_doc"
+    assert result.next_action["type"] == "ask_user_to_create_project_doc"
+    assert result.next_action["suggested_file"] == "ARCHITECTURE.md"
+    assert result.next_action["handled_by"] == "coding_agent"
     assert result.requires_confirmation is True
     assert result.confirmation_reason == "repo_write"
     assert result.arguments_patch == {"project_path": str(project.resolve())}
