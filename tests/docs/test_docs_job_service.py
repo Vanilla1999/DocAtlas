@@ -54,6 +54,18 @@ def test_docs_job_service_missing_job_result_shape():
     }
 
 
+def test_docs_job_cannot_be_cancelled_after_atomic_commit_phase_starts():
+    service = DocsJobService(DocsJobTracker())
+    job = service.create("prefetch_library_docs")
+    service.update(job.job_id, status="running", phase="committing")
+
+    result = service.cancel(job.job_id)
+
+    assert result.status == "running"
+    assert "committing" in result.message
+    assert service.cancellation_requested(job.job_id) is False
+
+
 def test_docs_job_service_event_history_is_capped():
     service = DocsJobService(DocsJobTracker())
     job = service.create("prefetch_docs_targets")
