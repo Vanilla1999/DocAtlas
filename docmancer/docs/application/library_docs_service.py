@@ -690,6 +690,12 @@ class LibraryDocsApplicationService:
         def _cancelled() -> bool:
             return self.jobs.cancellation_requested(job_id) or time.monotonic() >= deadline
 
+        def _begin_commit() -> bool:
+            if _cancelled():
+                return False
+            self.jobs.update(job_id, phase="committing", message="Publishing staged library index.")
+            return not _cancelled()
+
         def _work() -> None:
             try:
                 outcome["result"] = self._prefetch_docs_sync(
@@ -702,6 +708,7 @@ class LibraryDocsApplicationService:
                     force_refresh=force_refresh,
                     continue_on_error=continue_on_error,
                     should_cancel=_cancelled,
+                    begin_commit=_begin_commit,
                 )
             except Exception as exc:
                 outcome["exception"] = exc
@@ -712,7 +719,7 @@ class LibraryDocsApplicationService:
         # from the job controller so status becomes terminal at the configured
         # deadline rather than being stuck at `running` forever.
         threading.Thread(target=_work, daemon=True).start()
-        while not completed.wait(timeout=min(0.1, max(deadline - time.monotonic(), 0.0))):
+        while not completed.wait(timeout=max(0.01, min(0.1, max(deadline - time.monotonic(), 0.0)))):
             if self.jobs.cancellation_requested(job_id):
                 self.jobs.update(
                     job_id,
@@ -724,6 +731,9 @@ class LibraryDocsApplicationService:
                 )
                 return
             if time.monotonic() >= deadline:
+                current = self.jobs.get(job_id)
+                if current and current.phase == "committing":
+                    continue
                 self.jobs.append_error(job_id, "Library docs prefetch exceeded its configured deadline.")
                 self.jobs.update(
                     job_id,
@@ -842,6 +852,7 @@ class LibraryDocsApplicationService:
         force_refresh: bool = False,
         continue_on_error: bool = True,
         should_cancel: Callable[[], bool] | None = None,
+        begin_commit: Callable[[], bool] | None = None,
     ) -> RefreshResult:
         return self.refresh_ops.prefetch_docs(
             library,
@@ -853,6 +864,7 @@ class LibraryDocsApplicationService:
             force_refresh=force_refresh,
             continue_on_error=continue_on_error,
             should_cancel=should_cancel,
+            begin_commit=begin_commit,
         )
 
     def get_docs(
