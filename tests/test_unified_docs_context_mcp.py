@@ -124,6 +124,36 @@ def test_get_docs_context_never_returns_hidden_patch_tool_on_public_surface():
     assert result["next_actions"] == [result["next_action"]]
 
 
+def test_get_docs_context_maps_legacy_query_status_and_cancel_actions():
+    class Facade:
+        def get_docs_context(self, question, **kwargs):
+            return {
+                "tool": "get_docs_context",
+                "status": "not_found",
+                "next_actions": [
+                    {"tool": "get_project_context", "arguments_patch": {"query": question, "project_path": "/repo"}},
+                    {"tool": "inspect_project_docs", "arguments_patch": {"project_path": "/repo"}},
+                    {"tool": "cancel_docs_job", "arguments_patch": {"job_id": "job-1"}},
+                    {"tool": "list_docs_sources"},
+                ],
+            }
+
+    result = cast(dict[str, Any], handle_context_tool(
+        "get_docs_context",
+        {"question": "architecture", "project_path": "/repo", "output_mode": "full"},
+        cast(Any, Facade()),
+    ))
+
+    assert [action["tool"] for action in result["next_actions"]] == [
+        "get_docs_context",
+        "docs_status",
+        "prepare_docs",
+    ]
+    assert result["next_actions"][0]["arguments_patch"]["question"] == "architecture"
+    assert result["next_actions"][1]["arguments_patch"]["action"] == "project"
+    assert result["next_actions"][2]["arguments_patch"]["action"] == "cancel_docs_job"
+
+
 def test_mcp_public_surface_exposes_canonical_tools_and_hides_legacy_aliases():
     names = {tool["name"] for tool in TOOLS}
     assert names == {"get_docs_context", "prepare_docs", "docs_status"}
