@@ -19,15 +19,20 @@ def read_python_project(
     pyproject = root / "pyproject.toml"
     requirements = root / "requirements.txt"
     uv_lock = root / "uv.lock"
-    if not pyproject.exists() and not requirements.exists() and not uv_lock.exists():
+    poetry_lock = root / "poetry.lock"
+    pdm_lock = root / "pdm.lock"
+    locks = [("uv.lock", uv_lock), ("poetry.lock", poetry_lock), ("pdm.lock", pdm_lock)]
+    if not pyproject.exists() and not requirements.exists() and not any(path.exists() for _, path in locks):
         return {}, [], []
 
     manifest = _read_pyproject_dependencies(pyproject, warnings)
     if not manifest:
         manifest = _read_requirements_dependencies(requirements, warnings)
-    locked_versions = _read_uv_lock_versions(uv_lock, warnings)
-    if manifest and not uv_lock.exists():
-        warnings.append("uv.lock not found; exact Python dependency versions may be unavailable.")
+    selected_lock = next(((name, path) for name, path in locks if path.exists()), (None, None))
+    lock_name, lock_path = selected_lock
+    locked_versions = _read_toml_lock_versions(lock_path, warnings) if lock_path else {}
+    if manifest and not lock_path:
+        warnings.append("Python lockfile not found; exact Python dependency versions may be unavailable.")
 
     packages: dict[str, str] = {}
     observations: list[DependencyObservation] = []
@@ -37,7 +42,7 @@ def read_python_project(
         resolved = locked_version if source_kind == "registry" else None
         if resolved:
             packages[f"python:{name}"] = resolved
-            version_source = "uv.lock_exact"
+            version_source = f"{lock_name}_exact"
         else:
             exact = _exact_version(specifier)
             resolved = exact if source_kind == "registry" else None
@@ -101,7 +106,7 @@ def _read_requirements_dependencies(path: Path, warnings: list[str]) -> dict[str
     return result
 
 
-def _read_uv_lock_versions(path: Path, warnings: list[str]) -> dict[str, str]:
+def _read_toml_lock_versions(path: Path, warnings: list[str]) -> dict[str, str]:
     if not path.exists():
         return {}
     try:
