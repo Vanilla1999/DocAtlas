@@ -331,8 +331,12 @@ class ProjectDocsService:
         indexed_paths = {item.get("path") for item in [*indexed_sources, *stale_sources] if item.get("path")}
         missing_candidate_count = len(candidate_paths - indexed_paths)
         has_high_level_overview = self._has_high_level_project_overview(candidate_sources)
-        manifests_found = [name for name in ("pubspec.yaml", "Cargo.toml") if (root / name).exists()]
-        lockfiles_found = [name for name in ("pubspec.lock", "Cargo.lock") if (root / name).exists()]
+        manifests_found = [name for name in ("pubspec.yaml", "Cargo.toml", "package.json") if (root / name).exists()]
+        lockfiles_found = [
+            name
+            for name in ("pubspec.lock", "Cargo.lock", "package-lock.json", "pnpm-lock.yaml", "yarn.lock")
+            if (root / name).exists()
+        ]
         dependency_docs_state = self._project_dependency_docs_state(metadata)
         exact_versions_available = dependency_docs_state["dependency_docs_available"]
         if stale_sources or ignored_sources:
