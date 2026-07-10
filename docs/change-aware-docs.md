@@ -10,7 +10,7 @@ doc-atlas docs-impact --changed-file packages/auth/src/token_service.ts
 doc-atlas docs-impact --changed-file apps/web/src/routes.ts --fail-on-missing
 ```
 
-Use `--format json` for CI integrations. With `--base`, DocAtlas reads added, copied, modified, and renamed paths from `git diff`; `--changed-file` is useful when the caller already has a changed-file list.
+Use `--format json` for CI integrations. With `--base`, DocAtlas reads added, copied, modified, deleted, and renamed paths from `git diff`; `--changed-file` is useful when the caller already has a changed-file list.
 
 ## Result
 
@@ -24,7 +24,6 @@ The GitHub Actions `docs-impact` job writes a Markdown version to the pull-reque
 
 ## Current mapping
 
-Module paths under `packages/`, `apps/`, `services/`, `modules/`, `libs/`, `crates/`, `plugins/`, `components/`, `lib/modules/`, and `lib/features/` map to their discovered `README` and `docs/` files. General project code maps to root README/architecture docs; dependency manifests and lockfiles map to `README.md`.
+Module paths under `packages/`, `apps/`, `services/`, `modules/`, `libs/`, `crates/`, `plugins/`, `components/`, `lib/modules/`, and `lib/features/` map to their discovered `README` and `docs/` files. General project code maps to root README/architecture docs; dependency manifests and lockfiles map to a discovered root README, or are reported as a documentation gap when none exists.
 
 This is a review map, not proof that documentation is correct. An agent should use `get_docs_context` to read the selected docs and propose a normal, reviewable documentation diff when an update is needed.
-
