@@ -20,12 +20,14 @@ The user-facing CLI is `doc-atlas`; the Python package retains the
 
 ## Default documentation flow
 
-`inspect_project_docs`
-→ `prepare_docs(action="sync_project_docs", ...)` when required
-→ `get_docs_context(...)`
+`get_docs_context(...)`
+→ follow its returned `prepare_docs(...)` action when required
+→ retry `get_docs_context(...)`
 
 The index is derived state. Reviewable repository files remain the source of
 truth for architecture, onboarding, runbooks and decisions.
+`docs_status` is reserved for explicit health, freshness, index, and job
+status requests.
 
 ## Security boundary
 
