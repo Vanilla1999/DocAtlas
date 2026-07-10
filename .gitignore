@@ -42,6 +42,9 @@ eval/results/live/*
 !eval/results/live/README.md
 !eval/results/live/sample_report.md
 
+# Context7 parity raw provider captures are local/CI artifacts only.
+eval/context7_parity/raw/
+
 # Task-level agent benchmark generated artifacts
 eval/task_level/results/*
 !eval/task_level/results/README.md

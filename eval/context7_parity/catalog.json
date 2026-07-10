@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "question_templates": [
+    {"kind": "api_usage", "requires_code_snippet": true, "suffix": "Show a minimal usable code example."},
+    {"kind": "migration", "requires_code_snippet": false, "suffix": "Call out the version-specific migration concern."},
+    {"kind": "configuration", "requires_code_snippet": true, "suffix": "Show the relevant configuration syntax."},
+    {"kind": "code_example", "requires_code_snippet": true, "suffix": "Return a directly usable example."},
+    {"kind": "reference", "requires_code_snippet": false, "suffix": "Name the official API section that proves the answer."}
+  ],
+  "libraries": [
+    {"ecosystem": "python", "library": "fastapi", "version": "0.115.6", "docs_url": "https://fastapi.tiangolo.com/", "context7_library_id": "/fastapi/fastapi", "topic": "dependency injection with Depends", "section": "Dependencies", "symbol": "Depends"},
+    {"ecosystem": "python", "library": "pydantic", "version": "2.10.6", "docs_url": "https://docs.pydantic.dev/latest/", "context7_library_id": "/pydantic/pydantic", "topic": "field validation", "section": "Validators", "symbol": "field_validator"},
+    {"ecosystem": "python", "library": "django", "version": "5.1.5", "docs_url": "https://docs.djangoproject.com/en/5.1/", "context7_library_id": "/django/django", "topic": "model queries", "section": "Making queries", "symbol": "QuerySet"},
+    {"ecosystem": "python", "library": "flask", "version": "3.1.0", "docs_url": "https://flask.palletsprojects.com/en/3.1.x/", "context7_library_id": "/pallets/flask", "topic": "application factories", "section": "Application Factories", "symbol": "Flask"},
+    {"ecosystem": "python", "library": "sqlalchemy", "version": "2.0.37", "docs_url": "https://docs.sqlalchemy.org/en/20/", "context7_library_id": "/sqlalchemy/sqlalchemy", "topic": "ORM sessions", "section": "Session Basics", "symbol": "Session"},
+    {"ecosystem": "python", "library": "pytest", "version": "8.3.4", "docs_url": "https://docs.pytest.org/en/8.3.x/", "context7_library_id": "/pytest-dev/pytest", "topic": "fixtures", "section": "About fixtures", "symbol": "fixture"},
+    {"ecosystem": "python", "library": "httpx", "version": "0.28.1", "docs_url": "https://www.python-httpx.org/", "context7_library_id": "/encode/httpx", "topic": "async clients", "section": "Async Support", "symbol": "AsyncClient"},
+    {"ecosystem": "python", "library": "click", "version": "8.1.8", "docs_url": "https://click.palletsprojects.com/en/8.1.x/", "context7_library_id": "/pallets/click", "topic": "command groups and options", "section": "Commands and Groups", "symbol": "group"},
+    {"ecosystem": "python", "library": "celery", "version": "5.4.0", "docs_url": "https://docs.celeryq.dev/en/v5.4.0/", "context7_library_id": "/celery/celery", "topic": "task retry", "section": "Tasks", "symbol": "retry"},
+    {"ecosystem": "python", "library": "rich", "version": "13.9.4", "docs_url": "https://rich.readthedocs.io/en/stable/", "context7_library_id": "/textualize/rich", "topic": "console output", "section": "Console API", "symbol": "Console"},
+    {"ecosystem": "python", "library": "requests", "version": "2.32.3", "docs_url": "https://requests.readthedocs.io/en/latest/", "context7_library_id": "/psf/requests", "topic": "HTTP requests", "section": "Quickstart", "symbol": "get"},
+    {"ecosystem": "python", "library": "typer", "version": "0.15.1", "docs_url": "https://typer.tiangolo.com/", "context7_library_id": "/fastapi/typer", "topic": "CLI commands", "section": "Commands", "symbol": "Typer"},
+
+    {"ecosystem": "javascript", "library": "react", "version": "18.3.1", "docs_url": "https://react.dev/", "context7_library_id": "/facebook/react", "topic": "state with useState", "section": "useState", "symbol": "useState"},
+    {"ecosystem": "typescript", "library": "next", "version": "14.2.24", "docs_url": "https://nextjs.org/docs/14", "context7_library_id": "/vercel/next.js", "topic": "App Router routes", "section": "App Router", "symbol": "page"},
+    {"ecosystem": "typescript", "library": "typescript", "version": "5.7.3", "docs_url": "https://www.typescriptlang.org/docs/", "context7_library_id": "/microsoft/typescript", "topic": "generic functions", "section": "Generics", "symbol": "identity"},
+    {"ecosystem": "javascript", "library": "express", "version": "4.21.2", "docs_url": "https://expressjs.com/en/4x/api.html", "context7_library_id": "/expressjs/express", "topic": "middleware", "section": "Using middleware", "symbol": "use"},
+    {"ecosystem": "typescript", "library": "zod", "version": "3.24.1", "docs_url": "https://zod.dev/", "context7_library_id": "/colinhacks/zod", "topic": "schema parsing", "section": "Basic usage", "symbol": "parse"},
+    {"ecosystem": "javascript", "library": "vite", "version": "5.4.14", "docs_url": "https://vite.dev/guide/", "context7_library_id": "/vitejs/vite", "topic": "environment variables", "section": "Env Variables", "symbol": "import.meta.env"},
+    {"ecosystem": "typescript", "library": "nestjs", "version": "10.4.15", "docs_url": "https://docs.nestjs.com/", "context7_library_id": "/nestjs/docs.nestjs.com", "topic": "dependency injection", "section": "Providers", "symbol": "Injectable"},
+    {"ecosystem": "javascript", "library": "axios", "version": "1.7.9", "docs_url": "https://axios-http.com/docs/intro", "context7_library_id": "/axios/axios", "topic": "request interceptors", "section": "Interceptors", "symbol": "interceptors"},
+    {"ecosystem": "typescript", "library": "prisma", "version": "6.2.1", "docs_url": "https://www.prisma.io/docs/", "context7_library_id": "/prisma/docs", "topic": "database client queries", "section": "CRUD", "symbol": "findMany"},
+    {"ecosystem": "javascript", "library": "jest", "version": "29.7.0", "docs_url": "https://jestjs.io/docs/29.7/getting-started", "context7_library_id": "/jestjs/jest", "topic": "mock functions", "section": "Mock Functions", "symbol": "jest.fn"},
+    {"ecosystem": "typescript", "library": "tanstack-query", "version": "5.62.8", "docs_url": "https://tanstack.com/query/latest", "context7_library_id": "/tanstack/query", "topic": "data fetching queries", "section": "Queries", "symbol": "useQuery"},
+    {"ecosystem": "typescript", "library": "redux-toolkit", "version": "2.5.0", "docs_url": "https://redux-toolkit.js.org/", "context7_library_id": "/reduxjs/redux-toolkit", "topic": "slice reducers", "section": "createSlice", "symbol": "createSlice"},
+
+    {"ecosystem": "dart", "library": "riverpod", "version": "2.6.1", "docs_url": "https://riverpod.dev/", "context7_library_id": "/rrousselgit/riverpod", "topic": "providers and ref.watch", "section": "Providers", "symbol": "ref.watch"},
+    {"ecosystem": "flutter", "library": "flutter_bloc", "version": "8.1.6", "docs_url": "https://bloclibrary.dev/", "context7_library_id": "/felangel/bloc", "topic": "BlocProvider and BlocBuilder", "section": "Flutter Bloc Concepts", "symbol": "BlocProvider"},
+    {"ecosystem": "flutter", "library": "go_router", "version": "14.8.1", "docs_url": "https://pub.dev/documentation/go_router/14.8.1/", "context7_library_id": "/flutter/packages", "topic": "route configuration", "section": "Configuration", "symbol": "GoRoute"},
+    {"ecosystem": "dart", "library": "dio", "version": "5.7.0", "docs_url": "https://pub.dev/packages/dio", "context7_library_id": "/cfug/dio", "topic": "HTTP interceptors", "section": "Interceptors", "symbol": "InterceptorsWrapper"},
+    {"ecosystem": "flutter", "library": "freezed", "version": "2.5.8", "docs_url": "https://pub.dev/packages/freezed", "context7_library_id": "/rrousselgit/freezed", "topic": "immutable unions", "section": "Union types", "symbol": "freezed"},
+    {"ecosystem": "flutter", "library": "flutter_test", "version": "3.24.5", "docs_url": "https://api.flutter.dev/flutter/flutter_test/flutter_test-library.html", "context7_library_id": "/flutter/flutter", "topic": "widget tests", "section": "Widget testing", "symbol": "testWidgets"}
+  ]
+}
