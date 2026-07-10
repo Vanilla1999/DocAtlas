@@ -638,6 +638,95 @@ class LibraryDocsApplicationService:
         source_type: str | None = None,
         force_refresh: bool = False,
         continue_on_error: bool = True,
+        async_: bool = False,
+    ) -> RefreshResult | DocsJobStartResult:
+        if async_:
+            job = self.jobs.create("prefetch_library_docs")
+            self.jobs.update(
+                job.job_id,
+                status="running",
+                phase="resolving",
+                current_target=library,
+                message="Started library docs prefetch job.",
+            )
+            threading.Thread(
+                target=self._run_prefetch_docs_job,
+                args=(job.job_id, library, ecosystem, versions, docs_url, docs_url_template, source_type, force_refresh, continue_on_error),
+                daemon=True,
+            ).start()
+            return DocsJobStartResult(job_id=job.job_id, status="running", message="Started library docs prefetch job.")
+
+        return self._prefetch_docs_sync(
+            library,
+            ecosystem=ecosystem,
+            versions=versions,
+            docs_url=docs_url,
+            docs_url_template=docs_url_template,
+            source_type=source_type,
+            force_refresh=force_refresh,
+            continue_on_error=continue_on_error,
+        )
+
+    def _run_prefetch_docs_job(
+        self,
+        job_id: str,
+        library: str,
+        ecosystem: str | None,
+        versions: list[str] | None,
+        docs_url: str | None,
+        docs_url_template: str | None,
+        source_type: str | None,
+        force_refresh: bool,
+        continue_on_error: bool,
+    ) -> None:
+        try:
+            result = self._prefetch_docs_sync(
+                library,
+                ecosystem=ecosystem,
+                versions=versions,
+                docs_url=docs_url,
+                docs_url_template=docs_url_template,
+                source_type=source_type,
+                force_refresh=force_refresh,
+                continue_on_error=continue_on_error,
+            )
+            failed = int(result.targets_failed or 0)
+            completed = int(result.targets_completed or 0)
+            status = "succeeded" if failed == 0 else ("partial" if completed else "failed")
+            if result.status in {"failed", "needs_docs_url", "aborted"} and not completed:
+                status = "failed"
+            if status == "failed" and result.message:
+                self.jobs.append_error(job_id, result.message)
+            self.jobs.update(
+                job_id,
+                status=status,
+                phase="done",
+                current_target=library,
+                total_targets=max(completed + failed, 1),
+                completed_targets=completed,
+                failed_targets=failed,
+                total_pages=int(result.pages_indexed or 0) + int(result.pages_failed or 0),
+                completed_pages=int(result.pages_indexed or 0),
+                indexed_pages=int(result.pages_indexed or 0),
+                failed_pages=int(result.pages_failed or 0),
+                total_chunks=int(result.chunks_indexed or 0),
+                completed_chunks=int(result.chunks_indexed or 0),
+                message=result.message or f"Library docs prefetch {status}.",
+            )
+        except Exception as exc:
+            self.jobs.append_error(job_id, str(exc))
+            self.jobs.update(job_id, status="failed", phase="done", message=str(exc))
+
+    def _prefetch_docs_sync(
+        self,
+        library: str,
+        ecosystem: str | None = None,
+        versions: list[str] | None = None,
+        docs_url: str | None = None,
+        docs_url_template: str | None = None,
+        source_type: str | None = None,
+        force_refresh: bool = False,
+        continue_on_error: bool = True,
     ) -> RefreshResult:
         return self.refresh_ops.prefetch_docs(
             library,
