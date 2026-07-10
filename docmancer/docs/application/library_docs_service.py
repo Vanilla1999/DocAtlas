@@ -779,7 +779,7 @@ class LibraryDocsApplicationService:
         if result.status in {"failed", "needs_docs_url", "aborted"} and not succeeded:
             status = "failed"
         reason_code = self._result_reason_code(result, status)
-        retryable = self._retryable_reason_code(reason_code)
+        retryable = self._result_retryable(result, reason_code)
         if status in {"failed", "partial"} and result.message:
             self.jobs.append_error(job_id, result.message)
         self.jobs.update(
@@ -808,9 +808,17 @@ class LibraryDocsApplicationService:
     def _result_reason_code(result: RefreshResult, status: str) -> str:
         if status == "succeeded":
             return "healthy"
+        if status == "partial":
+            return "partial_failure"
         if result.status == "needs_docs_url":
             return "needs_docs_url"
-        return str((result.preindex or {}).get("reason_code") or "indexing_failed")
+        return str(result.reason_codes[0] if result.reason_codes else (result.preindex or {}).get("reason_code") or "indexing_failed")
+
+    @classmethod
+    def _result_retryable(cls, result: RefreshResult, reason_code: str) -> bool:
+        return cls._retryable_reason_code(reason_code) or any(
+            cls._retryable_reason_code(code) for code in result.reason_codes
+        )
 
     @staticmethod
     def _retryable_reason_code(reason_code: str) -> bool:
