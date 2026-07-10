@@ -146,8 +146,19 @@ def handle_prefetch_tool(name: str, args: dict[str, Any], service: LibraryDocsSe
             payload = asdict(library_docs_app.remove_library_docs(args["canonical_id"]))
         elif action == "prune_library_docs":
             payload = asdict(library_docs_app.prune_library_docs(library=args.get("library"), keep_versions=args.get("keep_versions") or [], older_than_days=int(args.get("older_than_days") or 90), dry_run=bool(args.get("dry_run") if args.get("dry_run") is not None else True)))
+        elif action == "cancel_docs_job":
+            job_id = str(args.get("job_id") or "").strip()
+            if not job_id:
+                return {
+                    "tool": "prepare_docs",
+                    "action": action,
+                    "status": "error",
+                    "reason_code": "job_id_required",
+                    "message": "job_id is required for action='cancel_docs_job'",
+                }
+            payload = asdict(service.cancel_docs_job(job_id))
         else:
-            return {"status": "error", "reason_code": "unknown_prepare_action", "message": f"unknown prepare_docs action: {action}", "supported_actions": ["sync_project_docs", "prefetch_project_dependency_docs", "prefetch_library_docs", "prefetch_docs_targets", "validate_docs_manifest", "prefetch_docs_manifest", "refresh_library_docs", "prune_library_docs", "remove_library_docs"]}
+            return {"status": "error", "reason_code": "unknown_prepare_action", "message": f"unknown prepare_docs action: {action}", "supported_actions": ["sync_project_docs", "prefetch_project_dependency_docs", "prefetch_library_docs", "prefetch_docs_targets", "validate_docs_manifest", "prefetch_docs_manifest", "refresh_library_docs", "prune_library_docs", "remove_library_docs", "cancel_docs_job"]}
         if isinstance(payload, dict):
             payload.setdefault("action", action)
             payload.setdefault("tool", "prepare_docs")
