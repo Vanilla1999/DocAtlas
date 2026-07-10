@@ -64,6 +64,48 @@ version = "8.3.4"
     assert "python" in metadata.detected_ecosystems
 
 
+def test_poetry_path_and_git_dependencies_are_never_registry_version_bindings(tmp_path: Path) -> None:
+    root = tmp_path / "poetry_repo"
+    root.mkdir()
+    (root / "pyproject.toml").write_text(
+        """
+[tool.poetry]
+name = "demo"
+version = "0.1.0"
+
+[tool.poetry.dependencies]
+python = ">=3.11"
+local-lib = { path = "../local-lib" }
+git-lib = { git = "https://github.com/example/git-lib.git" }
+""".strip(),
+        encoding="utf-8",
+    )
+    (root / "uv.lock").write_text(
+        """
+version = 1
+
+[[package]]
+name = "local-lib"
+version = "1.2.3"
+
+[[package]]
+name = "git-lib"
+version = "4.5.6"
+""".strip(),
+        encoding="utf-8",
+    )
+
+    metadata = ProjectMetadataReader().read(root)
+    python = {item.package_name: item for item in metadata.dependencies if item.ecosystem == "python"}
+
+    assert "python:local-lib" not in metadata.packages
+    assert "python:git-lib" not in metadata.packages
+    assert python["local-lib"].source_kind == "path"
+    assert python["local-lib"].resolved_version is None
+    assert python["git-lib"].source_kind == "git"
+    assert python["git-lib"].resolved_version is None
+
+
 def test_flutter_project_reads_pubspec_without_requiring_fvmrc_or_lock(tmp_path: Path) -> None:
     root = tmp_path / "flutter_repo"
     root.mkdir()
