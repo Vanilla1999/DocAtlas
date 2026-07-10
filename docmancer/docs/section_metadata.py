@@ -8,9 +8,10 @@ from pathlib import Path
 
 
 _HEADING = re.compile(r"^(#{1,6})\s+(.+?)\s*#*\s*$")
-_PATH = re.compile(r"(?<![\w.-])(?:[A-Za-z0-9_.-]+/)+[A-Za-z0-9_.-]+")
+_FENCE = re.compile(r"^[ \t]{0,3}(`{3,}|~{3,})")
+_PATH = re.compile(r"(?<![\w.-])(?:[A-Za-z0-9_.-]+[\\/])+[A-Za-z0-9_.-]*[A-Za-z0-9_]")
 _INLINE_CODE = re.compile(r"`([^`\n]+)`")
-_SYMBOL = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)*$")
+_SYMBOL = re.compile(r"^[A-Za-z_][A-Za-z0-9_-]*(?:\.[A-Za-z_][A-Za-z0-9_-]*)*$")
 _MAX_SECTIONS = 256
 _MAX_REFERENCES_PER_SECTION = 64
 
@@ -38,7 +39,22 @@ def extract_markdown_section_metadata(text: str, *, source_document_path: str) -
     sections: list[tuple[list[str], list[str]]] = []
     heading_stack: list[str] = []
     current_lines: list[str] | None = None
+    fence_marker: tuple[str, int] | None = None
     for line in text.splitlines():
+        fence = _FENCE.match(line)
+        if fence:
+            marker = fence.group(1)
+            if fence_marker is None:
+                fence_marker = (marker[0], len(marker))
+            elif marker[0] == fence_marker[0] and len(marker) >= fence_marker[1]:
+                fence_marker = None
+            if current_lines is not None:
+                current_lines.append(line)
+            continue
+        if fence_marker is not None:
+            if current_lines is not None:
+                current_lines.append(line)
+            continue
         match = _HEADING.match(line)
         if match:
             if current_lines is not None:
@@ -58,7 +74,7 @@ def extract_markdown_section_metadata(text: str, *, source_document_path: str) -
     metadata: list[dict[str, object]] = []
     for heading_path, lines in sections:
         content = "\n".join(lines)
-        mentioned_paths = _unique(_PATH.findall(content))[:_MAX_REFERENCES_PER_SECTION]
+        mentioned_paths = _explicit_paths(content)[:_MAX_REFERENCES_PER_SECTION]
         mentioned_symbols = _unique(
             token.strip()
             for token in _INLINE_CODE.findall(content)
@@ -76,3 +92,16 @@ def extract_markdown_section_metadata(text: str, *, source_document_path: str) -
 
 def _unique(values: object) -> list[str]:
     return list(dict.fromkeys(str(value).replace("\\", "/") for value in values if str(value)))
+
+
+def _explicit_paths(content: str) -> list[str]:
+    paths: list[str] = []
+    for match in _PATH.finditer(content):
+        # A URL host/path is external evidence, not a repository path.
+        if content[max(0, match.start() - 2):match.start()] == "//":
+            continue
+        value = match.group(0).replace("\\", "/")
+        if value.startswith("./"):
+            value = value[2:]
+        paths.append(value.lstrip("/"))
+    return _unique(paths)
