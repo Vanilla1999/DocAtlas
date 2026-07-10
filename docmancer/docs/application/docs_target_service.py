@@ -44,6 +44,7 @@ class DocsTargetService:
             browser=bool(value.get("browser") or False),
             doc_format=value.get("doc_format"),
             warnings=list(value.get("warnings") or []),
+            source_manifest=dict(value.get("source_manifest") or {}),
         )
 
     @staticmethod
@@ -63,6 +64,7 @@ class DocsTargetService:
             "browser": target.browser,
             "doc_format": target.doc_format,
             "warnings": list(target.warnings),
+            "source_manifest": dict(target.source_manifest),
         }
 
     def target_from_record(self, record: LibraryRecord) -> DocsTarget:
@@ -81,6 +83,7 @@ class DocsTargetService:
             browser=bool(spec.get("browser") or False),
             doc_format=spec.get("doc_format"),
             warnings=list(spec.get("warnings") or []),
+            source_manifest=dict(spec.get("source_manifest") or {}),
         )
 
     def record_urls(self, record: LibraryRecord) -> list[str]:
