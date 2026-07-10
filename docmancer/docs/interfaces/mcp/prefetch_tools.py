@@ -5,11 +5,12 @@ from typing import Any
 from urllib.parse import urlparse
 
 from docmancer.docs.service import LibraryDocsService
-from docmancer.docs.interfaces.mcp.project_tools import _bounded_int_arg
+from docmancer.docs.interfaces.mcp.project_tools import _bounded_int_arg, handle_project_tool
 
 
 PREFETCH_TOOL_NAMES = {
     "prepare_docs",
+    "docs_status",
     "docs_job",
     "validate_docs_manifest",
     "prefetch_docs_manifest",
@@ -60,6 +61,69 @@ def handle_prefetch_tool(name: str, args: dict[str, Any], service: LibraryDocsSe
     library_docs_app = getattr(service, "library_docs", service)
     project_docs_app = getattr(service, "project_docs", service)
     dependency_docs_app = getattr(service, "dependency_docs", service)
+    if name == "docs_status":
+        action = str(args.get("action") or "").strip()
+        if action == "project":
+            project_path = str(args.get("project_path") or "").strip()
+            if not project_path:
+                return {
+                    "tool": "docs_status",
+                    "status": "error",
+                    "reason_code": "project_path_required",
+                    "message": "project_path is required for action='project'",
+                }
+            project = handle_project_tool(
+                "inspect_project_docs",
+                {"project_path": project_path, "details": bool(args.get("details") or False)},
+                service,
+            )
+            return {"tool": "docs_status", "action": action, "project": project}
+        if action == "jobs":
+            jobs = service.list_docs_jobs(
+                status=args.get("status"),
+                limit=_bounded_int_arg(args, "limit", default=None, max_value=200),
+            )
+            return {
+                "tool": "docs_status",
+                "action": action,
+                "jobs": [
+                    {
+                        "job_id": job.job_id,
+                        "kind": job.kind,
+                        "status": job.status,
+                        "phase": job.phase,
+                        "message": job.message,
+                        "started_at": job.started_at,
+                        "updated_at": job.updated_at,
+                    }
+                    for job in jobs
+                ],
+            }
+        if action == "job":
+            job_id = str(args.get("job_id") or "").strip()
+            if not job_id:
+                return {
+                    "tool": "docs_status",
+                    "status": "error",
+                    "reason_code": "job_id_required",
+                    "message": "job_id is required for action='job'",
+                }
+            job = service.get_docs_job_status(job_id)
+            if job is None:
+                return {
+                    "tool": "docs_status",
+                    "action": action,
+                    "job_id": job_id,
+                    "status": "not_found",
+                }
+            return {"tool": "docs_status", "action": action, **asdict(job)}
+        return {
+            "tool": "docs_status",
+            "status": "error",
+            "reason_code": "unknown_docs_status_action",
+            "message": f"unknown docs_status action: {action}",
+            "supported_actions": ["project", "jobs", "job"],
+        }
     if name == "prepare_docs":
         action = str(args.get("action") or "").strip()
         if not action:
