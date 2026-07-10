@@ -103,3 +103,19 @@ def test_source_contamination_prevents_a_comparative_claim(tmp_path: Path) -> No
 
     assert report["providers"]["context7"]["source_contamination_rate"] > 0.0
     assert report["comparison"]["comparable"] is False
+
+
+def test_missing_resolved_version_is_unknown_not_a_verified_match() -> None:
+    module = _module()
+    item = _dataset(module)[0]
+    trace = _trace(item, "docatlas")
+    trace.pop("resolved_version")
+
+    scored = module.score_trace(item, trace)
+    summary = module.summarize([scored])
+
+    assert scored["version_status"] == "unknown"
+    assert scored["version_verified"] is False
+    assert summary["version_mismatch_rate"] == 0.0
+    assert summary["version_unknown_rate"] == 1.0
+    assert summary["exact_version_verified_rate"] == 0.0
