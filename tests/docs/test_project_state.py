@@ -45,6 +45,19 @@ def test_create_project_docs_next_action_shape_includes_followups(tmp_path):
     assert action["after"][2]["arguments_patch"] == {"project_path": str(tmp_path), "query": "architecture"}
 
 
+def test_create_project_docs_next_action_contains_machine_readable_model_handoff(tmp_path):
+    action = create_project_docs_next_action(tmp_path, "Explain the architecture")
+
+    gap = action["documentation_gap"]
+    assert gap["suggested_path"] == "ARCHITECTURE.md"
+    assert all(section["evidence"] for section in gap["required_sections"])
+    assert "do not invent unsupported facts" in gap["rules"]
+    assert action["after_file_change"] == {
+        "tool": "prepare_docs",
+        "arguments_patch": {"action": "sync_project_docs", "project_path": str(tmp_path)},
+    }
+
+
 def test_project_docs_structured_next_action_values(tmp_path):
     next_action, requires_confirmation, confirmation_reason, arguments_patch, agent_message, user_message = project_docs_structured_next_action(
         reason_code="architecture_doc_creation_recommended",
