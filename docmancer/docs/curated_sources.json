@@ -364,7 +364,7 @@
     {
       "library": "riverpod",
       "ecosystem": "dart",
-      "version_rule": "exact",
+      "version_rule": "unversioned",
       "docs_url": "https://riverpod.dev/",
       "allowed_domains": [
         "riverpod.dev"
@@ -380,7 +380,7 @@
       "library": "flutter_bloc",
       "ecosystem": "dart",
       "version_rule": "exact",
-      "docs_url": "https://bloclibrary.dev/",
+      "docs_url": "https://pub.dev/documentation/flutter_bloc/{version}/",
       "allowed_domains": [
         "bloclibrary.dev"
       ],
@@ -395,7 +395,7 @@
       "library": "go_router",
       "ecosystem": "dart",
       "version_rule": "exact",
-      "docs_url": "https://pub.dev/documentation/go_router/14.8.1/",
+      "docs_url": "https://pub.dev/documentation/go_router/{version}/",
       "allowed_domains": [
         "pub.dev"
       ],
@@ -410,7 +410,7 @@
       "library": "dio",
       "ecosystem": "dart",
       "version_rule": "exact",
-      "docs_url": "https://pub.dev/packages/dio",
+      "docs_url": "https://pub.dev/documentation/dio/{version}/",
       "allowed_domains": [
         "pub.dev"
       ],
@@ -424,7 +424,7 @@
     {
       "library": "freezed",
       "ecosystem": "dart",
-      "version_rule": "exact",
+      "version_rule": "unversioned",
       "docs_url": "https://pub.dev/packages/freezed",
       "allowed_domains": [
         "pub.dev"
@@ -439,7 +439,7 @@
     {
       "library": "flutter_test",
       "ecosystem": "dart",
-      "version_rule": "exact",
+      "version_rule": "unversioned",
       "docs_url": "https://api.flutter.dev/flutter/flutter_test/flutter_test-library.html",
       "allowed_domains": [
         "api.flutter.dev"
