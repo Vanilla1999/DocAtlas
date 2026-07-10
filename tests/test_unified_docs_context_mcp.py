@@ -72,9 +72,22 @@ def test_get_docs_context_handler_calls_facade():
 
 def test_mcp_public_surface_exposes_canonical_tools_and_hides_legacy_aliases():
     names = {tool["name"] for tool in TOOLS}
-    assert {"get_docs_context", "inspect_project_docs", "prepare_docs", "docs_job", "get_patch_constraints", "validate_patch_against_constraints"}.issubset(names)
+    assert names == {"get_docs_context", "prepare_docs", "docs_status"}
     assert "list_docs_sources" not in names
-    assert {"get_project_context", "get_project_docs", "get_library_docs", "inspect_library_docs", "refresh_library_docs", "prefetch_project_dependency_docs"}.isdisjoint(names)
+    assert {
+        "get_project_context",
+        "get_project_docs",
+        "get_library_docs",
+        "inspect_library_docs",
+        "refresh_library_docs",
+        "prefetch_project_dependency_docs",
+        "inspect_project_docs",
+        "docs_job",
+        "get_code_context",
+        "get_patch_plan_context",
+        "get_patch_constraints",
+        "validate_patch_against_constraints",
+    }.isdisjoint(names)
 
 
 def test_context_tools_filter_only_unified_tool():
