@@ -7,18 +7,18 @@ from docmancer.docs.domain.tool_selection import (
 )
 
 
-def test_tool_selection_golden_has_120_balanced_cases():
+def test_tool_selection_golden_has_balanced_core_and_adversarial_cases():
     cases = load_cases()
 
-    assert len(cases) == 120
+    assert len(cases) == 132
     counts = {
         tool: sum(case["expected_tool"] == tool for case in cases)
         for tool in PUBLIC_DOCS_TOOLS
     }
     assert counts == {
-        "get_docs_context": 60,
-        "prepare_docs": 30,
-        "docs_status": 30,
+        "get_docs_context": 66,
+        "prepare_docs": 33,
+        "docs_status": 33,
     }
 
 
@@ -42,3 +42,14 @@ def test_natural_docs_question_defaults_to_context():
     assert select_public_docs_tool(
         "Обновлялся ли API авторизации в последней версии?"
     ).tool == "get_docs_context"
+
+
+def test_adversarial_question_wording_does_not_trigger_mutation_or_status():
+    prompts = [
+        "How do I remove docs from a Python list?",
+        "Explain how to refresh docs in CI.",
+        "Show how docs status works in an MCP client.",
+        "Почему документация устарела после релиза?",
+    ]
+
+    assert {select_public_docs_tool(prompt).tool for prompt in prompts} == {"get_docs_context"}
