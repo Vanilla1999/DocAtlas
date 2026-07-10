@@ -29,15 +29,15 @@ No need to call `inspect` first: sync does a full reconcile. Call `inspect` only
 
 ## Preferred happy path
 
-For public MCP clients, use one explicit lifecycle flow:
+For public MCP clients, start with context and follow its decision:
 
 ```text
-inspect_project_docs(project_path)
-prepare_docs(action="sync_project_docs", project_path=..., with_vectors=true)
 get_docs_context(project_path=..., question=..., mode="project")
+-> returned prepare_docs action when required
+-> retry get_docs_context
 ```
 
-`prepare_docs(action="sync_project_docs")` is the canonical public project-docs lifecycle action. It reconciles the local project-docs index with the current filesystem discovery snapshot:
+The default surface has exactly three tools: `get_docs_context`, `prepare_docs`, and `docs_status`. `prepare_docs(action="sync_project_docs")` reconciles the local project-docs index with the current filesystem discovery snapshot when context returns it or the user explicitly requests synchronization:
 
 - discovers current reviewable project-doc candidates;
 - removes orphaned indexed docs whose files were deleted or are no longer discovered;
@@ -47,9 +47,9 @@ get_docs_context(project_path=..., question=..., mode="project")
 
 `ingest_project_docs` and direct `sync_project_docs` are legacy/compatibility-surface operations. New agent instructions should prefer `prepare_docs(action="sync_project_docs")` because project docs are owned by the repository filesystem, and the index is only a cache of that current state.
 
-## Explicit low-level flow
+## Advanced low-level flow
 
-Agents that need precise control can use the lower-level tools:
+Agents that enable `DOCMANCER_MCP_ADVANCED_TOOLS=1` can use lower-level inspection tools:
 
 ```text
 inspect_project_docs(project_path)
