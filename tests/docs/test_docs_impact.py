@@ -226,3 +226,28 @@ def test_unmatched_sections_leave_file_level_recommendation_intact(tmp_path: Pat
     item = report["impacts"][0]
     assert item["path"] == "packages/auth/README.md"
     assert "sections" not in item
+
+
+def test_symbol_evidence_does_not_pollute_changed_files(tmp_path: Path) -> None:
+    root = _project(tmp_path)
+    _write(root / "README.md", "# Project\n\n## Auth\nUse `issue_token`.\n")
+
+    report = analyze_docs_impact(root, ["src/auth.py"], changed_symbols=["issue_token"])
+
+    item = next(impact for impact in report["impacts"] if impact["path"] == "README.md")
+    assert item["changed_files"] == ["src/auth.py"]
+    assert item["sections"][0]["evidence"] == ["issue_token"]
+
+
+def test_all_matching_paths_are_kept_as_changed_files(tmp_path: Path) -> None:
+    root = _project(tmp_path)
+    _write(
+        root / "docs" / "auth.md",
+        "# Auth\nReview `src/auth.py` together with `web/auth.ts`.\n",
+    )
+
+    report = analyze_docs_impact(root, ["src/auth.py", "web/auth.ts"])
+
+    item = next(impact for impact in report["impacts"] if impact["path"] == "docs/auth.md")
+    assert item["changed_files"] == ["src/auth.py", "web/auth.ts"]
+    assert item["sections"][0]["evidence"] == ["src/auth.py", "web/auth.ts"]
