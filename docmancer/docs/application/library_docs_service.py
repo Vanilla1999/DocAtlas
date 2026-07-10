@@ -21,6 +21,7 @@ from docmancer.docs.domain.quality import is_trivial_section
 from docmancer.docs.domain.library_source_options import library_docs_source_next_actions, library_docs_source_options, source_required_diagnostics
 from docmancer.docs.domain.source_identity import docs_exactness, docs_identity, docs_request
 from docmancer.docs.domain.snippets import build_snippet_presentation, validate_response_style
+from docmancer.docs.curated_sources import curated_source_for, curated_target_spec
 from docmancer.docs.domain.target_security import host_allowed, is_remote_url, path_allowed, url_security_error
 from docmancer.docs.domain.trust_contract import build_project_context_trust_contract
 from docmancer.docs.models import DocsChunk, DocsInspectResult, DocsJobStartResult, DocsManifestValidationResult, DocsPruneResult, DocsRemoveResult, DocsResult, DocsSourceResolution, DocsTarget, DocsTargetResult, DocsTargetsPrefetchResult, LibraryInfo, ProjectDocsBootstrapResult, ProjectDocsChunk, ProjectDocsIngestResult, ProjectDocsInspectResult, ProjectDocsResult, ProjectMetadata, ProjectPrefetchResult, RefreshResult
@@ -291,19 +292,41 @@ class LibraryDocsApplicationService:
                     message=None,
                 )
             
-            return LibraryInfo(
-                library_id=None,
-                library=library,
-                ecosystem=ecosystem,
-                version=normalized_version,
-                docs_url=docs_url,
-                docs_url_template=docs_url_template,
-                status="needs_docs_url",
-                local=False,
-                stale=True,
-                message="Pass docs_url or docs_url_template with version to register and ingest this library.",
-                candidates=discovery_candidates,
-            )
+            curated = curated_source_for(library, ecosystem, normalized_version)
+            if curated:
+                target_spec = curated_target_spec(curated, version=normalized_version)
+                assert target_spec is not None
+                docs_url = target_spec["docs_url"]
+                record = self.registry.upsert(
+                    library=library,
+                    ecosystem=ecosystem,
+                    version=normalized_version or "latest",
+                    docs_url=docs_url,
+                    source_type=source_type or "api",
+                    now=self._now(),
+                    status="available",
+                    target_spec=target_spec,
+                    requested_version=normalized_version,
+                    resolved_version=normalized_version if curated.exact_snapshot else None,
+                    version_source="curated_source_manifest",
+                    version_confidence="high" if curated.exact_snapshot else "low",
+                    version_inferred=normalized_version is None,
+                    docs_snapshot_exact=curated.exact_snapshot,
+                )
+            else:
+                return LibraryInfo(
+                    library_id=None,
+                    library=library,
+                    ecosystem=ecosystem,
+                    version=normalized_version,
+                    docs_url=docs_url,
+                    docs_url_template=docs_url_template,
+                    status="needs_docs_url",
+                    local=False,
+                    stale=True,
+                    message="Pass docs_url or docs_url_template with version to register and ingest this library.",
+                    candidates=discovery_candidates,
+                )
         if docs_url is None and docs_url_template and normalized_version:
             docs_url = self._render_docs_url(docs_url_template, library, normalized_version)
         input_resolved_url = docs_url or (
