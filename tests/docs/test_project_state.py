@@ -41,8 +41,9 @@ def test_create_project_docs_next_action_shape_includes_followups(tmp_path):
     assert action["action"] == "create_reviewable_project_doc"
     assert action["requires_confirmation"] is True
     assert action["preferred_path"] == "ARCHITECTURE.md"
-    assert [item["tool"] for item in action["after"]] == ["inspect_project_docs", "sync_project_docs", "get_project_docs"]
-    assert action["after"][2]["arguments_patch"] == {"project_path": str(tmp_path), "query": "architecture"}
+    assert [item["tool"] for item in action["after"]] == ["prepare_docs", "get_docs_context"]
+    assert action["after"][0]["arguments_patch"] == {"action": "sync_project_docs", "project_path": str(tmp_path)}
+    assert action["after"][1]["arguments_patch"] == {"project_path": str(tmp_path), "question": "architecture"}
 
 
 def test_create_project_docs_next_action_contains_machine_readable_model_handoff(tmp_path):
