@@ -6,6 +6,32 @@ from typing import Any
 
 
 PUBLIC_DOCS_TOOLS = ("get_docs_context", "prepare_docs", "docs_status")
+_PREPARE_ACTION_BY_TOOL = {
+    "sync_project_docs": "sync_project_docs",
+    "ingest_project_docs": "sync_project_docs",
+    "bootstrap_project_docs": "sync_project_docs",
+    "prefetch_project_docs": "prefetch_project_dependency_docs",
+    "prefetch_project_dependency_docs": "prefetch_project_dependency_docs",
+    "prefetch_library_docs": "prefetch_library_docs",
+    "prefetch_docs_targets": "prefetch_docs_targets",
+    "prefetch_docs_manifest": "prefetch_docs_manifest",
+    "validate_docs_manifest": "validate_docs_manifest",
+    "refresh_library_docs": "refresh_library_docs",
+    "prune_library_docs": "prune_library_docs",
+    "remove_library_docs": "remove_library_docs",
+}
+_HIDDEN_DOCS_ACTION_TOOLS = {
+    "inspect_project_docs",
+    "docs_job",
+    "get_code_context",
+    "get_patch_plan_context",
+    "get_patch_constraints",
+    "validate_patch_against_constraints",
+    "get_project_docs",
+    "get_project_context",
+    "get_library_docs",
+    "resolve_library_id",
+}
 
 _TOKEN_RE = re.compile(r"[a-zа-яё0-9_-]+", re.IGNORECASE)
 _STATUS_PHRASES = (
@@ -20,6 +46,9 @@ _STATUS_PHRASES = (
     "are docs stale",
     "what is indexed",
     "which docs are indexed",
+    "docs index is healthy",
+    "documentation jobs",
+    "running docs jobs",
     "статус документации",
     "статус индекса",
     "статус задачи",
@@ -28,6 +57,18 @@ _STATUS_PHRASES = (
     "документация устарела",
     "что проиндексировано",
     "какие документы проиндексированы",
+    "задачи документации",
+)
+_QUESTION_PREFIXES = (
+    "how ",
+    "why ",
+    "explain ",
+    "show how ",
+    "what does ",
+    "как ",
+    "почему ",
+    "объясни как ",
+    "расскажи как ",
 )
 _PREPARE_TERMS = {
     "sync",
@@ -80,6 +121,53 @@ class ToolSelectionDecision:
         return asdict(self)
 
 
+def normalize_public_docs_action(action: Any) -> dict[str, Any] | None:
+    """Map DocAtlas-internal next actions onto the public three-tool surface.
+
+    Host actions such as code_search remain untouched. Hidden DocAtlas actions
+    are removed unless they have an equivalent prepare_docs lifecycle action.
+    """
+
+    if not isinstance(action, dict):
+        return None
+    normalized = dict(action)
+    tool = str(normalized.get("tool") or "").strip()
+    if not tool or tool in PUBLIC_DOCS_TOOLS:
+        return normalized
+    prepare_action = _PREPARE_ACTION_BY_TOOL.get(tool)
+    if prepare_action:
+        arguments = dict(normalized.get("arguments_patch") or {})
+        arguments["action"] = prepare_action
+        normalized.update({
+            "type": "prepare_docs",
+            "tool": "prepare_docs",
+            "arguments_patch": arguments,
+        })
+        return normalized
+    if tool in _HIDDEN_DOCS_ACTION_TOOLS:
+        return None
+    return normalized
+
+
+def normalize_public_docs_actions(payload: dict[str, Any]) -> dict[str, Any]:
+    """Ensure top-level DocAtlas next actions are callable on the public surface."""
+
+    normalized = dict(payload)
+    primary = normalize_public_docs_action(normalized.get("next_action"))
+    actions: list[dict[str, Any]] = []
+    for action in normalized.get("next_actions") or []:
+        candidate = normalize_public_docs_action(action)
+        if candidate is not None and candidate not in actions:
+            actions.append(candidate)
+    if primary is not None and primary not in actions:
+        actions.insert(0, primary)
+    if primary is None and actions:
+        primary = actions[0]
+    normalized["next_action"] = primary
+    normalized["next_actions"] = actions
+    return normalized
+
+
 def select_public_docs_tool(
     user_text: str,
     *,
@@ -100,6 +188,12 @@ def select_public_docs_tool(
         )
 
     normalized = " ".join(_TOKEN_RE.findall((user_text or "").lower()))
+    if normalized.startswith(_QUESTION_PREFIXES):
+        return ToolSelectionDecision(
+            tool="get_docs_context",
+            reason_code="natural_question_entrypoint",
+            confidence=0.99,
+        )
     if any(phrase in normalized for phrase in _STATUS_PHRASES):
         return ToolSelectionDecision(
             tool="docs_status",
