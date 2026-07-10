@@ -79,6 +79,15 @@ def _make_mock_client(get_side_effect):
     return client
 
 
+def test_web_fetcher_honors_cancellation_before_network_access():
+    fetcher = WebFetcher(cancellation_callback=lambda: True)
+
+    with patch("httpx.Client") as client, pytest.raises(RuntimeError, match="cancelled"):
+        fetcher.fetch("https://example.com/docs/")
+
+    client.assert_not_called()
+
+
 class TestWebFetcherLlmsFull:
     def test_llms_full_txt_success(self):
         """When llms-full.txt is available, return it directly."""
