@@ -1083,7 +1083,11 @@ async def _run_async(service: LibraryDocsService) -> None:
 
     @server.call_tool()
     async def _call_tool(name: str, arguments: dict[str, Any]) -> list[mcp_types.TextContent]:
-        return _json_text(mcp_types, call_docs_tool_payload(name, arguments, service))
+        # Tool handlers include synchronous indexing and HTTP clients.  Keep
+        # them off the MCP event loop so docs_status can report a running job
+        # while another request is still doing bounded compatibility work.
+        payload = await asyncio.to_thread(call_docs_tool_payload, name, arguments, service)
+        return _json_text(mcp_types, payload)
 
     async with stdio_server() as (read_stream, write_stream):
         await server.run(read_stream, write_stream, server.create_initialization_options())
