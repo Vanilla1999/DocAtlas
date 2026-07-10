@@ -85,6 +85,52 @@ def test_http_grant_rejects_non_positive_response_limit():
     assert exc.value.code == "invalid_max_response_bytes"
 
 
+@pytest.mark.parametrize("value", [None, True, "not-a-number"])
+def test_http_grant_rejects_invalid_response_limit(value):
+    with pytest.raises(SecurityError) as exc:
+        grant_from_mapping({
+            "allowed_hosts": ["example.com"],
+            "max_response_bytes": value,
+        })
+
+    assert exc.value.code == "invalid_max_response_bytes"
+
+
+def test_http_target_rejects_invalid_port():
+    with pytest.raises(SecurityError) as exc:
+        validate_http_target(
+            "https://example.com:not-a-port/v1",
+            HttpGrant(allowed_hosts=("example.com",)),
+        )
+
+    assert exc.value.code == "invalid_url"
+
+
+def test_executor_returns_structured_invalid_grant_error(monkeypatch):
+    monkeypatch.setattr(
+        "docmancer.mcp.network_policy.resolve_host",
+        lambda host: [ipaddress.ip_address("93.184.216.34")],
+    )
+    called = False
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        nonlocal called
+        called = True
+        return httpx.Response(200, json={"ok": True})
+
+    operation = _operation()
+    operation["_docmancer_http_grant"]["max_response_bytes"] = "invalid"
+    executor = HttpExecutor(
+        client=httpx.Client(transport=httpx.MockTransport(handler)),
+    )
+
+    result = _call(executor, operation)
+
+    assert result.ok is False
+    assert result.error == "invalid_max_response_bytes"
+    assert called is False
+
+
 def test_dns_resolution_change_is_blocked_before_request(monkeypatch):
     monkeypatch.setattr(
         "docmancer.mcp.network_policy.resolve_host",
@@ -169,3 +215,26 @@ def test_content_length_limit_blocks_before_stream_read(monkeypatch):
     assert result.ok is False
     assert result.error == "response_too_large"
     assert stream.yielded == 0
+
+
+def test_unknown_response_charset_falls_back_to_utf8(monkeypatch):
+    monkeypatch.setattr(
+        "docmancer.mcp.network_policy.resolve_host",
+        lambda host: [ipaddress.ip_address("93.184.216.34")],
+    )
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(
+            200,
+            headers={"Content-Type": "text/plain; charset=not-a-codec"},
+            content="hello".encode(),
+        )
+
+    executor = HttpExecutor(
+        client=httpx.Client(transport=httpx.MockTransport(handler)),
+    )
+
+    result = _call(executor, _operation())
+
+    assert result.ok is True
+    assert result.body == "hello"
