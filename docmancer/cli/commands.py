@@ -696,7 +696,7 @@ _AGENTS_MD_END = "<!-- docmancer:end -->"
 
 
 def _install_or_append_agents_md(dest: Path, content_body: str) -> None:
-    marker_block = f"{_AGENTS_MD_START}\n{content_body.strip()}\n{_AGENTS_MD_END}\n"
+    marker_block = f"{_AGENTS_MD_START}\n{content_body.strip()}\n{_AGENTS_MD_END}"
     dest.parent.mkdir(parents=True, exist_ok=True)
 
     if dest.exists():
@@ -705,14 +705,44 @@ def _install_or_append_agents_md(dest: Path, content_body: str) -> None:
         end_idx = existing.find(_AGENTS_MD_END)
         if start_idx != -1 and end_idx != -1:
             # Replace existing block
-            new_content = existing[:start_idx] + marker_block + existing[end_idx + len(_AGENTS_MD_END):]
-            dest.write_text(new_content.strip() + "\n", encoding="utf-8")
+            new_content = (
+                existing[:start_idx]
+                + marker_block
+                + existing[end_idx + len(_AGENTS_MD_END):]
+            )
+            dest.write_text(new_content, encoding="utf-8")
         else:
             # Append to file
             separator = "\n\n" if existing.strip() else ""
-            dest.write_text(existing.rstrip() + separator + marker_block, encoding="utf-8")
+            dest.write_text(
+                existing.rstrip() + separator + marker_block + "\n",
+                encoding="utf-8",
+            )
     else:
-        dest.write_text(marker_block, encoding="utf-8")
+        dest.write_text(marker_block + "\n", encoding="utf-8")
+
+
+def _project_bootstrap_dest(agent: str) -> Path | None:
+    """Return the project instruction file supported by an agent.
+
+    AGENTS.md is deliberately used for compatible coding agents: it keeps one
+    compact, reviewable contract in the repository instead of duplicating a
+    generated dependency or documentation inventory per agent.
+    """
+    normalized = agent.lower()
+    if normalized == "claude-code":
+        return Path("CLAUDE.md")
+    if normalized in {"codex", "codex-app", "codex-desktop", "cursor", "opencode"}:
+        return Path("AGENTS.md")
+    return None
+
+
+def _install_project_bootstrap(agent: str) -> Path | None:
+    dest = _project_bootstrap_dest(agent)
+    if dest is None:
+        return None
+    _install_or_append_agents_md(dest, _get_template_content("project_bootstrap.md"))
+    return dest
 
 
 def _register_mcp_for_agent(agent_name: str) -> None:
@@ -2038,7 +2068,7 @@ def list_cmd(show_all: bool, stale: bool, failed: bool, vectors: str | None, out
 )
 @click.argument("agent", type=click.Choice(INSTALL_TARGETS, case_sensitive=False))
 @click.option("--project", is_flag=True, default=False,
-              help="Install in project-level settings (claude-code, gemini, cline, or github-copilot).")
+              help="Install in project-level settings when the agent supports them.")
 @click.option("--config", "config_path", default=None, help="Path to docmancer.yaml.")
 def install_cmd(agent: str, project: bool, config_path: str | None):
     """Install docmancer skill files into an AI agent.
@@ -2087,9 +2117,13 @@ def install_cmd(agent: str, project: bool, config_path: str | None):
             dest = home / ".claude" / "skills" / "docmancer" / "SKILL.md"
         content = _build_skill_content("claude_code_skill.md", effective_config_path)
         _install_skill_file(content, dest)
+        bootstrap_dest = _install_project_bootstrap(normalized) if project else None
+        installed = [("Installed docmancer skill at", dest)]
+        if bootstrap_dest:
+            installed.append(("Updated project instructions at", bootstrap_dest))
         _emit_install_summary(
             "Install skill for Claude Code.",
-            [("Installed docmancer skill at", dest)],
+            installed,
             created_user_config,
             effective_config_path,
             "Claude Code can use docmancer immediately. No restart needed.",
@@ -2103,12 +2137,16 @@ def install_cmd(agent: str, project: bool, config_path: str | None):
         content = _build_skill_content("skill.md", effective_config_path)
         _install_skill_file(content, dest)
         _install_skill_file(content, shared_dest)
+        bootstrap_dest = _install_project_bootstrap(normalized) if project else None
+        installed = [
+            ("Installed docmancer skill at", dest),
+            ("Also installed shared compatibility skill at", shared_dest),
+        ]
+        if bootstrap_dest:
+            installed.append(("Updated project instructions at", bootstrap_dest))
         _emit_install_summary(
             "Install skill for Codex.",
-            [
-                ("Installed docmancer skill at", dest),
-                ("Also installed shared compatibility skill at", shared_dest),
-            ],
+            installed,
             created_user_config,
             effective_config_path,
             'Run `doc-atlas query "your question"` to verify retrieval from the CLI.',
@@ -2117,16 +2155,23 @@ def install_cmd(agent: str, project: bool, config_path: str | None):
         return
 
     if normalized == "cursor":
-        dest = home / ".cursor" / "skills" / "docmancer" / "SKILL.md"
+        dest = (
+            Path(".cursor") / "skills" / "docmancer" / "SKILL.md"
+            if project
+            else home / ".cursor" / "skills" / "docmancer" / "SKILL.md"
+        )
         content = _build_skill_content("skill.md", effective_config_path)
         _install_skill_file(content, dest)
 
         # Also write AGENTS.md fallback while Cursor's skill discovery matures
-        agents_md = home / ".cursor" / "AGENTS.md"
-        agents_body = _get_template_content("cursor_agents_md.md").replace(
-            "{{DOCS_KIT_CMD}}", _resolve_skill_command(effective_config_path)
-        )
-        _install_or_append_agents_md(agents_md, agents_body)
+        if project:
+            agents_md = _install_project_bootstrap(normalized)
+        else:
+            agents_md = home / ".cursor" / "AGENTS.md"
+            agents_body = _get_template_content("cursor_agents_md.md").replace(
+                "{{DOCS_KIT_CMD}}", _resolve_skill_command(effective_config_path)
+            )
+            _install_or_append_agents_md(agents_md, agents_body)
         _emit_install_summary(
             "Install skill for Cursor.",
             [
@@ -2159,13 +2204,13 @@ def install_cmd(agent: str, project: bool, config_path: str | None):
         return
 
     if normalized == "github-copilot":
-        content = _build_skill_content("copilot_instructions.md", effective_config_path)
         if project:
             copilot_dest = Path(".github") / "copilot-instructions.md"
             agents_dest = Path("AGENTS.md")
             settings_dest = Path(".vscode") / "settings.json"
-            _install_or_append_agents_md(copilot_dest, content)
-            _install_or_append_agents_md(agents_dest, content)
+            bootstrap = _get_template_content("project_bootstrap.md")
+            _install_or_append_agents_md(copilot_dest, bootstrap)
+            _install_or_append_agents_md(agents_dest, bootstrap)
             _install_vscode_copilot_settings(settings_dest)
             _emit_install_summary(
                 "Install instructions for GitHub Copilot.",
@@ -2183,6 +2228,7 @@ def install_cmd(agent: str, project: bool, config_path: str | None):
                 ],
             )
         else:
+            content = _build_skill_content("copilot_instructions.md", effective_config_path)
             dest = _get_copilot_user_instructions_path()
             _install_or_append_agents_md(dest, content)
             _emit_install_summary(
@@ -2226,6 +2272,7 @@ def install_cmd(agent: str, project: bool, config_path: str | None):
         dest = home / ".config" / "opencode" / "skills" / "docmancer" / "SKILL.md"
         content = _build_skill_content("skill.md", effective_config_path)
         _install_skill_file(content, dest)
+        bootstrap_dest = _install_project_bootstrap(normalized) if project else None
 
         # Also write to shared ~/.agents/skills/ path if not already installed by codex
         shared_dest = _get_shared_agent_skill_path()
@@ -2233,6 +2280,8 @@ def install_cmd(agent: str, project: bool, config_path: str | None):
         if not shared_dest.exists():
             _install_skill_file(content, shared_dest)
             installed_paths.append(("Also installed at shared path", shared_dest))
+        if bootstrap_dest:
+            installed_paths.append(("Updated project instructions at", bootstrap_dest))
 
         _emit_install_summary(
             "Install skill for OpenCode.",

@@ -2,6 +2,7 @@ import zipfile
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
+import pytest
 from click.testing import CliRunner
 
 from docmancer.cli.__main__ import cli
@@ -101,12 +102,61 @@ def test_install_github_copilot_project_creates_repo_instructions():
         assert agents_md.exists()
         assert vscode_settings.exists()
         copilot_content = copilot_md.read_text()
-        assert "doc-atlas query" in copilot_content
-        assert "doc-atlas ingest" in copilot_content
-        assert "docmancer bench" not in copilot_content
-        assert "--expand page" in copilot_content
+        assert "get_docs_context" in copilot_content
+        assert "prepare_docs" in copilot_content
+        assert "docs_status" in copilot_content
+        assert len(copilot_content.split()) < 250
         assert "docmancer:start" in agents_md.read_text()
         assert "github.copilot.chat.codeGeneration.useInstructionFiles" in vscode_settings.read_text()
+
+
+@pytest.mark.parametrize(
+    ("agent", "instruction_path"),
+    [
+        ("codex", "AGENTS.md"),
+        ("claude-code", "CLAUDE.md"),
+        ("cursor", "AGENTS.md"),
+        ("github-copilot", "AGENTS.md"),
+        ("opencode", "AGENTS.md"),
+    ],
+)
+def test_project_install_writes_compact_docs_mcp_bootstrap(agent: str, instruction_path: str):
+    runner = CliRunner()
+    with runner.isolated_filesystem() as tmp_dir:
+        fake_home = _home(tmp_dir)
+        with patch("docmancer.cli.commands.Path.home", return_value=fake_home), \
+             patch("docmancer.cli.commands._get_config_class", return_value=FakeDocmancerConfig):
+            result = runner.invoke(cli, ["install", agent, "--project"])
+        assert result.exit_code == 0, result.output
+        content = Path(instruction_path).read_text(encoding="utf-8")
+        assert "<!-- docmancer:start -->" in content
+        assert "get_docs_context" in content
+        assert "prepare_docs" in content
+        assert "docs_status" in content
+        assert len(content.split()) < 250
+
+
+def test_project_install_replaces_only_its_managed_bootstrap_block():
+    runner = CliRunner()
+    with runner.isolated_filesystem() as tmp_dir:
+        fake_home = _home(tmp_dir)
+        instruction_path = Path("AGENTS.md")
+        instruction_path.write_text(
+            "# Team instructions\n\n<!-- docmancer:start -->\nold bootstrap\n<!-- docmancer:end -->\n\nKeep this text.\n",
+            encoding="utf-8",
+        )
+        with patch("docmancer.cli.commands.Path.home", return_value=fake_home), \
+             patch("docmancer.cli.commands._get_config_class", return_value=FakeDocmancerConfig):
+            first = runner.invoke(cli, ["install", "codex", "--project"])
+            assert first.exit_code == 0, first.output
+            first_content = instruction_path.read_text(encoding="utf-8")
+            second = runner.invoke(cli, ["install", "codex", "--project"])
+        assert second.exit_code == 0, second.output
+        assert instruction_path.read_text(encoding="utf-8") == first_content
+        assert "# Team instructions" in first_content
+        assert "Keep this text." in first_content
+        assert "old bootstrap" not in first_content
+        assert first_content.count("<!-- docmancer:start -->") == 1
 
 
 def test_setup_detects_vscode_and_installs_github_copilot_project_files():
