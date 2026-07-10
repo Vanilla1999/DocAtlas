@@ -196,9 +196,11 @@ Pass `"details": true` for the full structured response.
 | Low-level inspection and patch tools | advanced compatibility surface only |
 | Answer "how does this repo work?" | `get_docs_context(mode="project")` |
 
-## Project-aware Flutter/Dart docs
+## Project-aware exact dependency docs
 
 DocAtlas can inspect a local Flutter/Dart project. It reads `.fvmrc` for Flutter channel/version hints and `pubspec.lock` for pub package versions. This enables exact-version documentation for the dependencies your project actually uses.
+
+It also reads direct JavaScript/TypeScript dependencies from `package.json` and resolves their exact installed versions from `package-lock.json`, `pnpm-lock.yaml`, or `yarn.lock`. When several lockfiles exist, the `packageManager` declaration selects the authoritative one; local, workspace, and Git dependencies are never presented as exact registry bindings.
 
 ## License
 
