@@ -37,7 +37,7 @@ class CuratedSource:
 
     @property
     def exact_snapshot(self) -> bool:
-        return self.version_rule == "exact"
+        return self.version_rule == "exact" and "{version}" in self.docs_url
 
 
 def _ecosystem_aliases(ecosystem: str | None) -> set[str]:
@@ -57,13 +57,18 @@ def curated_sources() -> tuple[CuratedSource, ...]:
     entries: list[CuratedSource] = []
     for raw in data.get("sources") or []:
         docs_url = str(raw["docs_url"])
+        version_rule = str(raw.get("version_rule") or "unversioned")
+        if version_rule == "exact" and "{version}" not in docs_url:
+            raise ValueError(
+                f"exact curated source must bind {{version}} in docs_url: {raw.get('library')}"
+            )
         allowed_domains = tuple(str(value) for value in raw.get("allowed_domains") or [])
         if not allowed_domains or not urlparse(docs_url.format(library="x", version="1")).hostname:
             raise ValueError(f"invalid curated source entry: {raw.get('library')}")
         entries.append(CuratedSource(
             library=str(raw["library"]).casefold(),
             ecosystem=str(raw["ecosystem"]).casefold(),
-            version_rule=str(raw.get("version_rule") or "unversioned"),
+            version_rule=version_rule,
             docs_url=docs_url,
             allowed_domains=allowed_domains,
             preferred_seeds=tuple(str(value) for value in raw.get("preferred_seeds") or []),
@@ -77,7 +82,14 @@ def curated_source_for(library: str, ecosystem: str | None, version: str | None)
     normalized_library = library.strip().casefold()
     aliases = _ecosystem_aliases(ecosystem)
     for source in curated_sources():
-        if source.library == normalized_library and source.ecosystem in aliases and source.render(version):
+        if source.library != normalized_library or source.ecosystem not in aliases:
+            continue
+        # An unversioned/current documentation site cannot satisfy an exact
+        # dependency request.  Keep the normal confirmation-first flow instead
+        # of silently labelling latest documentation as the requested version.
+        if version and not source.exact_snapshot:
+            continue
+        if source.render(version):
             return source
     return None
 
@@ -86,7 +98,10 @@ def curated_target_spec(source: CuratedSource, *, version: str | None) -> dict[s
     docs_url = source.render(version)
     if not docs_url:
         return None
-    seeds = [seed.format(library=source.library, version=version or "latest") for seed in source.preferred_seeds]
+    # Manifest seed hints are advisory and historically included mechanically
+    # appended, non-existent llms.txt/sitemap.xml paths.  The canonical docs URL
+    # is the safe bounded starting point until a seed has been verified.
+    seeds: list[str] = []
     return {
         "library": source.library,
         "ecosystem": source.ecosystem,
