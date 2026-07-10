@@ -15,6 +15,7 @@ import yaml
 
 from docmancer.core.config import DocmancerConfig
 from docmancer.docs.domain.policies import docs_policy, is_stale
+from docmancer.docs.curated_sources import canonical_source_identity
 from docmancer.docs.domain.project_state import create_project_docs_next_action, has_high_level_project_overview, partition_project_doc_state, project_docs_structured_next_action
 from docmancer.docs.domain.source_identity import docs_exactness, docs_identity, docs_request
 from docmancer.docs.domain.target_security import host_allowed, is_remote_url, path_allowed, url_security_error
@@ -279,6 +280,12 @@ class DocsPrefetchService:
                         add_kwargs: dict[str, Any] = {
                             "max_pages": per_url_max_pages,
                             "browser": target.browser,
+                            "metadata": {
+                                "canonical_source_identity": canonical_source_identity(url),
+                                "library_id": record.library_id,
+                                "canonical_id": record.canonical_id or record.library_id,
+                                "version": record.version,
+                            },
                         }
                         if target.doc_format:
                             add_kwargs["doc_format"] = target.doc_format
