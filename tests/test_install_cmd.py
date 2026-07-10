@@ -1,4 +1,6 @@
+import json
 import zipfile
+import tomllib
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
@@ -157,6 +159,49 @@ def test_project_install_replaces_only_its_managed_bootstrap_block():
         assert "Keep this text." in first_content
         assert "old bootstrap" not in first_content
         assert first_content.count("<!-- docmancer:start -->") == 1
+
+
+def test_project_install_preserves_user_text_when_appending_bootstrap():
+    runner = CliRunner()
+    with runner.isolated_filesystem() as tmp_dir:
+        fake_home = _home(tmp_dir)
+        instruction_path = Path("AGENTS.md")
+        original = "# Team instructions\n\n\n"
+        instruction_path.write_text(original, encoding="utf-8")
+        with patch("docmancer.cli.commands.Path.home", return_value=fake_home), \
+             patch("docmancer.cli.commands._get_config_class", return_value=FakeDocmancerConfig):
+            result = runner.invoke(cli, ["install", "codex", "--project"])
+        assert result.exit_code == 0, result.output
+        assert instruction_path.read_text(encoding="utf-8").startswith(original)
+
+
+@pytest.mark.parametrize(
+    ("agent", "config_path", "container_key"),
+    [
+        ("codex", ".codex/config.toml", "mcp_servers"),
+        ("opencode", "opencode.json", "mcp"),
+        ("github-copilot", ".vscode/mcp.json", "servers"),
+    ],
+)
+def test_project_install_registers_docs_mcp_without_global_skill(agent: str, config_path: str, container_key: str):
+    runner = CliRunner()
+    with runner.isolated_filesystem() as tmp_dir:
+        fake_home = _home(tmp_dir)
+        with patch("docmancer.cli.commands.Path.home", return_value=fake_home), \
+             patch("docmancer.mcp.agent_config.Path.home", return_value=fake_home), \
+             patch("docmancer.cli.commands._get_config_class", return_value=FakeDocmancerConfig):
+            result = runner.invoke(cli, ["install", agent, "--project"])
+        assert result.exit_code == 0, result.output
+        config = Path(config_path)
+        if config.suffix == ".toml":
+            payload = tomllib.loads(config.read_text(encoding="utf-8"))
+        else:
+            payload = json.loads(config.read_text(encoding="utf-8"))
+        assert "docmancer" in payload[container_key]
+        if agent == "codex":
+            assert not (fake_home / ".codex" / "skills" / "docmancer" / "SKILL.md").exists()
+        if agent == "opencode":
+            assert not (fake_home / ".config" / "opencode" / "skills" / "docmancer" / "SKILL.md").exists()
 
 
 def test_setup_detects_vscode_and_installs_github_copilot_project_files():
