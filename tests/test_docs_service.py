@@ -3180,7 +3180,7 @@ def test_prefetch_docs_needs_docs_url_aborts_when_continue_false(tmp_path, monke
     service = _service(tmp_path, monkeypatch, agent)
 
     result = service.prefetch_docs(
-        "go_router",
+        "missing-library",
         ecosystem="pub",
         versions=["14.8.1", "16.2.0"],
         continue_on_error=False,
@@ -4671,7 +4671,10 @@ def test_prefetch_docs_targets_passes_max_pages_and_browser_false_by_default(tmp
         ]
     )
 
-    assert agent.add_kwargs == [{"max_pages": 12, "browser": False}]
+    assert agent.add_kwargs[0]["max_pages"] == 12
+    assert agent.add_kwargs[0]["browser"] is False
+    assert agent.add_kwargs[0]["metadata"]["canonical_source_identity"].startswith("source:")
+    assert agent.add_kwargs[0]["metadata"]["version"] == "latest"
 
 
 def test_refresh_record_reuses_all_persisted_seed_urls(tmp_path, monkeypatch):
