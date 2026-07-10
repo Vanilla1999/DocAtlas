@@ -10,6 +10,26 @@ env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
 
 jobs:
+  docs-impact:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Install DocAtlas
+        run: pip install -e .
+
+      - name: Report documentation impact
+        run: doc-atlas docs-impact --project-path . --base "${{ github.event.pull_request.base.sha }}" --head "${{ github.event.pull_request.head.sha }}" --format markdown >> "$GITHUB_STEP_SUMMARY"
+
   installer-smoke:
     runs-on: ubuntu-latest
 

@@ -24,6 +24,7 @@ docs/*
 !docs/mcp-docs-server.md
 !docs/project-docs-demo.md
 !docs/project-docs-mcp-workflow.md
+!docs/change-aware-docs.md
 !docs/adr/
 !docs/adr/*.md
 !docs/research/

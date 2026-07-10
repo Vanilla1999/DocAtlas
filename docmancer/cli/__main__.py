@@ -5,6 +5,7 @@ from docmancer.cli.commands import (
     add_cmd,
     clear_cmd,
     context_cmd,
+    docs_impact_cmd,
     doctor_cmd,
     eval_cmd,
     fetch_cmd,
@@ -74,6 +75,7 @@ cli.add_command(query_cmd, "query")
 cli.add_command(context_cmd, "context")
 cli.add_command(patch_review_cmd, "patch-review")
 cli.add_command(eval_cmd, "eval")
+cli.add_command(docs_impact_cmd, "docs-impact")
 cli.add_command(inspect_cmd, "inspect")
 cli.add_command(list_cmd, "list")
 cli.add_command(remove_cmd, "remove")

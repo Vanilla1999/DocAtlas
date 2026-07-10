@@ -61,6 +61,7 @@ PUBLIC_COMMAND_HELP_CASES = [
     ("install", ["doc-atlas install claude-code", "--project"]),
     ("inspect", ["doc-atlas inspect --config ./docmancer.yaml"]),
     ("doctor", ["doc-atlas doctor --config ./docmancer.yaml"]),
+    ("docs-impact", ["doc-atlas docs-impact --base origin/main", "--changed-file"]),
     ("remove", ["doc-atlas remove"]),
 ]
 
@@ -72,6 +73,45 @@ def test_cli_help():
     assert "add" in result.output
     assert "setup" in result.output
     assert "mcp" not in result.output
+
+
+def test_docs_impact_cli_returns_machine_readable_report(tmp_path):
+    (tmp_path / "README.md").write_text("# Project\n", encoding="utf-8")
+    module = tmp_path / "packages" / "auth"
+    module.mkdir(parents=True)
+    (module / "README.md").write_text("# Auth\n", encoding="utf-8")
+
+    result = CliRunner().invoke(
+        cli,
+        [
+            "docs-impact",
+            "--project-path", str(tmp_path),
+            "--changed-file", "packages/auth/src/token_service.ts",
+            "--format", "json",
+        ],
+    )
+
+    assert result.exit_code == 0, result.output
+    report = json.loads(result.output)
+    assert report["summary"]["docs_to_review"] == 1
+    assert report["impacts"][0]["path"] == "packages/auth/README.md"
+
+
+def test_docs_impact_cli_can_fail_for_missing_module_docs(tmp_path):
+    (tmp_path / "README.md").write_text("# Project\n", encoding="utf-8")
+
+    result = CliRunner().invoke(
+        cli,
+        [
+            "docs-impact",
+            "--project-path", str(tmp_path),
+            "--changed-file", "apps/web/src/routes.ts",
+            "--fail-on-missing",
+        ],
+    )
+
+    assert result.exit_code == 2
+    assert "Documentation gaps" in result.output
 
 
 def test_version_flag_outputs_compact_version():

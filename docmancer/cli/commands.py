@@ -1723,6 +1723,50 @@ def eval_cmd(
 
 
 @click.command(
+    "docs-impact",
+    cls=DocmancerCommand,
+    context_settings=HELP_CONTEXT_SETTINGS,
+    short_help="Report documentation affected by a code diff.",
+    epilog=format_examples(
+        "doc-atlas docs-impact --base origin/main",
+        "doc-atlas docs-impact --changed-file packages/api/src/auth.ts --format json",
+    ),
+)
+@click.option("--project-path", default=".", type=click.Path(exists=True, file_okay=False, path_type=str), show_default=True)
+@click.option("--base", default=None, help="Base git ref used to discover changed files.")
+@click.option("--head", default="HEAD", show_default=True, help="Head git ref used with --base.")
+@click.option("--changed-file", "changed_files", multiple=True, help="Changed repository path; may be repeated instead of --base.")
+@click.option("output_format", "--format", type=click.Choice(["markdown", "json"], case_sensitive=False), default="markdown", show_default=True)
+@click.option("--fail-on-missing", is_flag=True, default=False, help="Exit non-zero when a changed module has no maintained docs.")
+def docs_impact_cmd(
+    project_path: str,
+    base: str | None,
+    head: str,
+    changed_files: tuple[str, ...],
+    output_format: str,
+    fail_on_missing: bool,
+):
+    """Report which maintained docs should be reviewed after a code change."""
+    from docmancer.docs.impact import analyze_docs_impact, changed_files_from_git, format_docs_impact_markdown
+
+    if base and changed_files:
+        raise click.UsageError("Use either --base/--head or --changed-file, not both.")
+    if not base and not changed_files:
+        raise click.UsageError("Pass --base to read git diff paths, or at least one --changed-file.")
+    try:
+        paths = changed_files_from_git(project_path, base, head) if base else list(changed_files)
+        report = analyze_docs_impact(project_path, paths)
+    except ValueError as exc:
+        raise click.ClickException(str(exc)) from exc
+    if output_format.lower() == "json":
+        click.echo(json.dumps(report, ensure_ascii=False, indent=2))
+    else:
+        click.echo(format_docs_impact_markdown(report))
+    if fail_on_missing and report["summary"]["missing_docs"]:
+        raise click.exceptions.Exit(2)
+
+
+@click.command(
     cls=DocmancerCommand,
     context_settings=HELP_CONTEXT_SETTINGS,
     short_help="Remove an indexed source.",
