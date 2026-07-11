@@ -1,5 +1,9 @@
 # Task 07 — narrow product scope and prove the core workflow
 
+## Audit status
+
+Complete for scope cleanup and claim hygiene. It did not prove product advantage: current decisive evidence is a negative signal and the new candidates were correctly rejected as too easy. Task 23 owns product proof.
+
 ## Problem
 
 The repository contains Docs MCP, API Packs, patch constraints, hybrid retrieval, Qdrant management, USPTO ingestion, and 22 top-level CLI commands. This makes the product harder to explain and increases maintenance cost. Existing task-level pilots do not prove a broad improvement over repo-only agents.

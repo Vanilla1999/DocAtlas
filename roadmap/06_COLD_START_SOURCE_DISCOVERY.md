@@ -1,5 +1,9 @@
 # Task 06 — reduce cold-start cost for public dependency docs
 
+## Audit status
+
+Partial. The manifest and additional parsers exist, but most sources are not exact-version capable, one curated target is invalid, and cache/SLO/workspace criteria are unproven. Tasks 10, 16, and 17 own the residual work.
+
 ## Problem
 
 Context7 can answer popular public-library questions with almost no setup. DocAtlas may need source resolution, crawling, extraction, and indexing before the first useful answer.

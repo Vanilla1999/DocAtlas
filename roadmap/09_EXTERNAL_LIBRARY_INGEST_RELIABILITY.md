@@ -1,5 +1,9 @@
 # Task 09 — make external-library ingest reliable and observable
 
+## Audit status
+
+Partial. The async mismatch, event-loop blocking path, staging publication, cancellation checks, and GitHub fetch route were improved. Singular version propagation, action validation, hard terminal deadlines, bounded capacity, durable status, real network taxonomy/recovery, reliable partial-page provenance, and the Kotlin live-smoke artifact remain. Tasks 11–14 and 30–31 split those residual acceptance criteria into smaller PRs.
+
 ## Priority
 
 Treat this as an immediate reliability regression and complete it before Context7 parity evaluation. A failed or blocked ingest makes retrieval quality impossible to measure fairly.
