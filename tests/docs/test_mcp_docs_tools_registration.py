@@ -6,7 +6,7 @@ from docmancer.docs.interfaces.mcp.context_tools import CONTEXT_TOOL_NAMES
 from docmancer.docs.interfaces.mcp.docs_tools import LIBRARY_TOOL_NAMES
 from docmancer.docs.interfaces.mcp.prefetch_tools import PREFETCH_TOOL_NAMES, _bounded_targets
 from docmancer.docs.interfaces.mcp.project_tools import PROJECT_TOOL_NAMES
-from docmancer.docs.models import DocsJobCancelResult
+from docmancer.docs.models import DocsJobCancelResult, DocsJobStartResult
 from docmancer.mcp.docs_server import (
     ADVANCED_TOOL_NAMES,
     ADMIN_TOOL_NAMES,
@@ -340,7 +340,7 @@ def test_prepare_docs_keeps_async_job_cancellation_on_public_surface():
         Service(),
     )
 
-    assert missing["reason_code"] == "job_id_required"
+    assert missing["reason_code"] == "validation_error"
     assert cancelled == {
         "job_id": "job-1",
         "status": "cancel_requested",
@@ -348,6 +348,125 @@ def test_prepare_docs_keeps_async_job_cancellation_on_public_surface():
         "action": "cancel_docs_job",
         "tool": "prepare_docs",
     }
+
+
+def test_prepare_docs_rejects_unknown_and_action_irrelevant_fields_before_service_call():
+    class Service:
+        called = False
+
+        def prefetch_docs(self, *args, **kwargs):
+            self.called = True
+            raise AssertionError("validation should have stopped this call")
+
+    service = Service()
+    unknown = call_docs_tool_payload(
+        "prepare_docs",
+        {"action": "prefetch_library_docs", "library": "kotlin", "unexpected": True},
+        service,
+    )
+    irrelevant = call_docs_tool_payload(
+        "prepare_docs",
+        {"action": "sync_project_docs", "project_path": "/repo", "library": "kotlin"},
+        service,
+    )
+    unsupported_dry_run = call_docs_tool_payload(
+        "prepare_docs",
+        {"action": "prefetch_library_docs", "library": "kotlin", "dry_run": True},
+        service,
+    )
+
+    assert unknown["reason_code"] == "validation_error"
+    assert irrelevant["reason_code"] == "validation_error"
+    assert unsupported_dry_run["reason_code"] == "validation_error"
+    assert service.called is False
+
+
+def test_prepare_docs_rejects_invalid_types_before_service_call():
+    class Service:
+        called = False
+
+        def prune_library_docs(self, **kwargs):
+            self.called = True
+            raise AssertionError("validation should have stopped this call")
+
+        def prefetch_docs_targets(self, *args, **kwargs):
+            self.called = True
+            raise AssertionError("validation should have stopped this call")
+
+    service = Service()
+    invalid_days = call_docs_tool_payload(
+        "prepare_docs",
+        {"action": "prune_library_docs", "older_than_days": {}},
+        service,
+    )
+    invalid_target = call_docs_tool_payload(
+        "prepare_docs",
+        {
+            "action": "prefetch_docs_targets",
+            "targets": [{"docs_url": "https://example.com", "max_pages": "bad"}],
+        },
+        service,
+    )
+    missing_target_library = call_docs_tool_payload(
+        "prepare_docs",
+        {"action": "prefetch_docs_targets", "targets": [{"docs_url": "https://example.com"}]},
+        service,
+    )
+
+    assert invalid_days["reason_code"] == "validation_error"
+    assert invalid_target["reason_code"] == "validation_error"
+    assert missing_target_library["reason_code"] == "validation_error"
+    assert service.called is False
+
+
+def test_prepare_docs_preserves_singular_version_for_library_prefetch():
+    class Service:
+        received = None
+
+        def prefetch_docs(self, library, **kwargs):
+            self.received = {"library": library, **kwargs}
+            return DocsJobStartResult(job_id="job-1", status="running", message="started")
+
+    service = Service()
+    payload = call_docs_tool_payload(
+        "prepare_docs",
+        {"action": "prefetch_library_docs", "library": "kotlin", "ecosystem": "kotlin", "version": "1.8.1"},
+        service,
+    )
+
+    assert payload["status"] == "running"
+    assert service.received["versions"] == ["1.8.1"]
+    assert service.received["async_"] is True
+
+
+def test_prepare_docs_rejects_synchronous_remote_prefetch():
+    payload = call_docs_tool_payload(
+        "prepare_docs",
+        {"action": "prefetch_library_docs", "library": "kotlin", "async": False},
+        object(),
+    )
+
+    assert payload["reason_code"] == "validation_error"
+
+
+def test_prepare_docs_refresh_returns_a_background_job():
+    class Service:
+        received = None
+
+        def prefetch_docs(self, library, **kwargs):
+            self.received = {"library": library, **kwargs}
+            return DocsJobStartResult(job_id="job-1", status="running", message="started")
+
+    service = Service()
+    payload = call_docs_tool_payload(
+        "prepare_docs",
+        {"action": "refresh_library_docs", "library": "kotlin", "version": "1.8.1"},
+        service,
+    )
+
+    assert payload["status"] == "running"
+    assert service.received["force_refresh"] is True
+    assert service.received["async_"] is True
 
 
 def test_mcp_exposes_three_public_tools_with_mutually_exclusive_guidance():

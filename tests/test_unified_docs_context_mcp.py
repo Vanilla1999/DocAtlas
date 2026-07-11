@@ -4,9 +4,11 @@ import json
 from typing import Any, cast
 
 from docmancer.docs.interfaces.mcp.context_tools import context_tools, handle_context_tool
+from docmancer.docs.application.unified_context_service import UnifiedDocsContextService
+from docmancer.docs.models import LibraryInfo
 from docmancer.docs.interfaces.mcp.project_tools import MCP_COMPACT_OUTPUT_MAX_BYTES
 from docmancer.docs.models import UnifiedDocsContextResult
-from docmancer.mcp.docs_server import TOOLS
+from docmancer.mcp.docs_server import TOOLS, call_docs_tool_payload
 
 
 def test_get_docs_context_registered_in_mcp_tool_list():
@@ -18,8 +20,7 @@ def test_get_docs_context_schema():
     tool = next(tool for tool in TOOLS if tool["name"] == "get_docs_context")
     schema = tool["inputSchema"]
     assert schema["required"] == ["question"]
-    assert "allow_network" in schema["properties"]
-    assert schema["properties"]["prepare_project_docs"]["default"] is False
+    assert {"allow_network", "force_refresh", "prefetch_auto", "prepare_project_docs"}.isdisjoint(schema["properties"])
     assert schema["properties"]["output_mode"]["enum"] == ["answer", "compact", "debug", "full"]
     assert schema["properties"]["mode"]["enum"] == ["auto", "project", "library", "dependency", "mixed"]
 
@@ -70,6 +71,104 @@ def test_get_docs_context_handler_calls_facade():
     result = handle_context_tool("get_docs_context", {"question": "How?", "library": "fastapi"}, facade)
     assert facade.called is True
     assert result["tool"] == "get_docs_context"
+
+
+def test_get_docs_context_rejects_legacy_mutation_flags_on_public_surface():
+    from docmancer.mcp.docs_server import call_docs_tool_payload
+
+    payload = call_docs_tool_payload(
+        "get_docs_context",
+        {"question": "How?", "allow_network": True},
+        object(),
+    )
+
+    assert payload["reason_code"] == "validation_error"
+    assert payload["error"]["where"]["phase"] == "validation"
+
+
+def test_get_docs_context_rewrites_network_retry_to_complete_prepare_action():
+    class Facade:
+        def get_docs_context(self, question, **kwargs):
+            assert kwargs["allow_network"] is False
+            assert kwargs["prepare_project_docs"] is False
+            return {
+                "tool": "get_docs_context",
+                "status": "confirmation_required",
+                "next_action": {
+                    "tool": "get_docs_context",
+                    "arguments_patch": {"allow_network": True},
+                },
+            }
+
+    result = cast(dict[str, Any], handle_context_tool(
+        "get_docs_context",
+        {"question": "coroutines", "library": "kotlin", "ecosystem": "kotlin", "version": "1.8.1"},
+        Facade(),
+    ))
+
+    assert result["next_action"] == {
+        "tool": "prepare_docs",
+        "type": "prepare_docs",
+        "arguments_patch": {
+            "action": "prefetch_library_docs",
+            "library": "kotlin",
+            "ecosystem": "kotlin",
+            "version": "1.8.1",
+        },
+    }
+
+
+def test_missing_kotlin_corpus_uses_prepare_docs_through_real_application_boundary():
+    class Facade:
+        def resolve_library(self, library, ecosystem, version, docs_url, docs_url_template, source_type):
+            return LibraryInfo(
+                library_id="kotlin:kotlin@1.8.1:web",
+                library=library,
+                ecosystem=ecosystem,
+                version=version,
+                source_type="web",
+                status="available",
+                local=False,
+            )
+
+    payload = call_docs_tool_payload(
+        "get_docs_context",
+        {"question": "coroutines", "library": "kotlin", "ecosystem": "kotlin", "version": "1.8.1"},
+        UnifiedDocsContextService(Facade()),
+    )
+
+    assert payload["next_action"]["tool"] == "prepare_docs"
+    assert payload["next_action"]["arguments_patch"] == {
+        "action": "prefetch_library_docs",
+        "library": "kotlin",
+        "ecosystem": "kotlin",
+        "version": "1.8.1",
+    }
+
+
+def test_get_docs_context_strips_legacy_network_field_from_prepare_next_action():
+    class Facade:
+        def get_docs_context(self, question, **kwargs):
+            return {
+                "tool": "get_docs_context",
+                "status": "confirmation_required",
+                "next_action": {
+                    "tool": "prepare_docs",
+                    "arguments_patch": {
+                        "action": "refresh_library_docs",
+                        "library": "kotlin",
+                        "allow_network": True,
+                    },
+                },
+            }
+
+    result = cast(dict[str, Any], handle_context_tool(
+        "get_docs_context", {"question": "coroutines", "library": "kotlin"}, Facade()
+    ))
+
+    assert result["next_action"]["arguments_patch"] == {
+        "action": "refresh_library_docs", "library": "kotlin"
+    }
 
 
 def test_get_docs_context_maps_legacy_lifecycle_action_to_public_prepare_docs():
