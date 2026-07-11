@@ -47,6 +47,23 @@ def test_curated_target_has_explicit_allowlist_and_never_invents_version_binding
     assert canonical_source_identity("https://fastapi.tiangolo.com/") == canonical_source_identity("https://FASTAPI.tiangolo.com")
 
 
+def test_curated_target_preserves_path_prefix_policy() -> None:
+    source = curated_source_for("fastapi", "python", None)
+    assert source is not None
+
+    target = curated_target_spec(replace(source, path_prefixes=("/docs/",)), version=None)
+    assert target is not None
+    runtime_target = DocsTargetService.target_from_dict(target)
+
+    assert runtime_target.path_prefixes == ["/docs/"]
+    service = DocsTargetService(
+        lambda template, library, version: template.format(library=library, version=version)
+    )
+    urls, error = service.target_urls(runtime_target)
+    assert urls == []
+    assert error == "URL path is outside path_prefixes: https://fastapi.tiangolo.com/"
+
+
 def test_exact_request_does_not_register_unversioned_curated_docs(tmp_path: Path) -> None:
     info = _service(tmp_path).resolve_library("fastapi", ecosystem="python", version="0.115.6", source_type="api")
 

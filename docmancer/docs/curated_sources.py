@@ -175,6 +175,7 @@ def curated_target_spec(source: CuratedSource, *, version: str | None) -> dict[s
         "docs_url": docs_url,
         "seed_urls": seeds,
         "allowed_domains": list(source.allowed_domains),
+        "path_prefixes": list(source.path_prefixes),
         "max_pages": source.max_pages,
         "doc_format": source.extraction_format,
         "source_manifest": {"schema_version": 1, "version_rule": source.version_rule, "official": True},
