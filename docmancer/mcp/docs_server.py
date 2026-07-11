@@ -8,6 +8,8 @@ import os
 from dataclasses import dataclass
 from typing import Any, Callable, Mapping, cast
 
+import jsonschema
+
 from docmancer.docs.interfaces.mcp.error_contract import build_mcp_error_payload, debug_errors_enabled
 from docmancer.docs.service import LibraryDocsService
 from docmancer.docs.interfaces.mcp.context_tools import context_tools, handle_context_tool
@@ -50,6 +52,29 @@ class DocsMcpSurface:
     handlers: Mapping[str, ToolHandler]
 
 
+DOCS_TARGET_INPUT_SCHEMA: dict[str, Any] = {
+    "type": "object",
+    "properties": {
+        "library": {"type": "string", "minLength": 1},
+        "ecosystem": {"type": ["string", "null"]},
+        "version": {"type": ["string", "null"]},
+        "source_type": {"type": ["string", "null"]},
+        "docs_url": {"type": ["string", "null"]},
+        "docs_url_template": {"type": ["string", "null"]},
+        "seed_urls": {"type": ["array", "null"], "items": {"type": "string"}},
+        "allowed_domains": {"type": ["array", "null"], "items": {"type": "string"}},
+        "path_prefixes": {"type": ["array", "null"], "items": {"type": "string"}},
+        "max_pages": {"type": ["integer", "null"], "minimum": 1, "maximum": 500},
+        "browser": {"type": ["boolean", "null"]},
+        "doc_format": {"type": ["string", "null"]},
+        "warnings": {"type": ["array", "null"], "items": {"type": "string"}},
+        "source_manifest": {"type": ["object", "null"]},
+    },
+    "required": ["library"],
+    "additionalProperties": False,
+}
+
+
 RAW_TOOLS: list[dict[str, Any]] = [
     {
         "name": "get_docs_context",
@@ -82,11 +107,7 @@ Agent workflow:
                 "tokens": {"type": ["integer", "null"], "minimum": 1, "maximum": 20000},
                 "limit": {"type": ["integer", "null"], "minimum": 1, "maximum": 20},
                 "expand": {"type": ["string", "null"]},
-                "prepare_project_docs": {"type": ["boolean", "null"], "default": False, "description": "Compatibility opt-in for automatic local bootstrap. The public default is read-only preflight; follow a returned prepare_docs action instead."},
-                "allow_network": {"type": ["boolean", "null"]},
                 "allow_latest_fallback": {"type": ["boolean", "null"]},
-                "force_refresh": {"type": ["boolean", "null"]},
-                "prefetch_auto": {"type": ["boolean", "null"], "description": "When true, automatically prefetch dependency/library docs from the network without requiring user confirmation."},
                 "page": {"type": ["integer", "null"], "minimum": 1, "default": 1},
                 "page_size": {"type": ["integer", "null"], "minimum": 1, "maximum": 20},
                 "include_sections": {"type": ["array", "null"], "items": {"type": "string", "enum": ["context_pack", "supporting_snippets", "trust_contract", "diagnostics", "metrics"]}},
@@ -114,10 +135,9 @@ Agent workflow:
                 "canonical_id": {"type": ["string", "null"]},
                 "manifest_path": {"type": ["string", "null"]},
                 "job_id": {"type": ["string", "null"]},
-                "targets": {"type": ["array", "null"]},
+                "targets": {"type": ["array", "null"], "items": DOCS_TARGET_INPUT_SCHEMA},
                 "ecosystem": {"type": ["string", "null"]},
                 "version": {"type": ["string", "null"]},
-                "versions": {"type": ["array", "null"], "items": {"type": "string"}},
                 "source_type": {"type": ["string", "null"]},
                 "docs_url": {"type": ["string", "null"]},
                 "docs_url_template": {"type": ["string", "null"]},
@@ -131,7 +151,7 @@ Agent workflow:
                 "continue_on_error": {"type": ["boolean", "null"]},
                 "async": {"type": ["boolean", "null"]},
                 "keep_versions": {"type": ["array", "null"], "items": {"type": "string"}},
-                "older_than_days": {"type": ["integer", "null"]},
+                "older_than_days": {"type": ["integer", "null"], "minimum": 0},
                 "dry_run": {"type": ["boolean", "null"], "default": True},
             },
             "required": ["action"],
@@ -297,25 +317,7 @@ Use this only when the user explicitly asks whether docs are indexed/stale/healt
             "properties": {
                 "targets": {
                     "type": "array",
-                    "items": {
-                        "type": "object",
-                        "properties": {
-                            "library": {"type": "string"},
-                            "ecosystem": {"type": ["string", "null"]},
-                            "version": {"type": ["string", "null"]},
-                            "source_type": {"type": ["string", "null"]},
-                            "docs_url": {"type": ["string", "null"]},
-                            "docs_url_template": {"type": ["string", "null"]},
-                            "seed_urls": {"type": ["array", "null"], "items": {"type": "string"}},
-                            "allowed_domains": {"type": ["array", "null"], "items": {"type": "string"}},
-                            "path_prefixes": {"type": ["array", "null"], "items": {"type": "string"}},
-                            "max_pages": {"type": ["integer", "null"], "minimum": 1, "maximum": 500},
-                            "browser": {"type": ["boolean", "null"]},
-                            "doc_format": {"type": ["string", "null"]},
-                            "warnings": {"type": ["array", "null"], "items": {"type": "string"}},
-                        },
-                        "required": ["library"],
-                    },
+                    "items": DOCS_TARGET_INPUT_SCHEMA,
                 },
                 "force_refresh": {"type": ["boolean", "null"]},
                 "continue_on_error": {"type": ["boolean", "null"]},
@@ -780,6 +782,26 @@ def call_docs_tool_payload(
         return build_mcp_error_payload(
             reason_code="unknown_tool",
             message=f"unknown tool: {name}",
+            tool=name,
+            phase="validation",
+        )
+    spec = next(spec for spec in active_surface.tools if spec.name == name)
+    try:
+        jsonschema.validate(args, spec.input_schema)
+    except jsonschema.ValidationError as exc:
+        field_path = ".".join(str(part) for part in exc.absolute_path) or "<root>"
+        return build_mcp_error_payload(
+            reason_code="validation_error",
+            message=f"invalid arguments for {name} at {field_path}",
+            tool=name,
+            phase="validation",
+        )
+    allowed_fields = set(spec.input_schema.get("properties", {}))
+    unknown_fields = sorted(set(args) - allowed_fields)
+    if unknown_fields:
+        return build_mcp_error_payload(
+            reason_code="validation_error",
+            message=f"unknown field(s) for {name}: {', '.join(unknown_fields)}",
             tool=name,
             phase="validation",
         )

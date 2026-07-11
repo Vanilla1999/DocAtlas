@@ -186,15 +186,14 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
         tokens=_bounded_int_arg(args, "tokens", max_value=20_000),
         limit=_bounded_int_arg(args, "limit", default=None, max_value=20),
         expand=args.get("expand"),
-        prepare_project_docs=(
-            bool(args.get("prepare_project_docs"))
-            if args.get("prepare_project_docs") is not None
-            else False
-        ),
-        allow_network=args.get("allow_network"),
         allow_latest_fallback=args.get("allow_latest_fallback"),
-        force_refresh=args.get("force_refresh"),
-        prefetch_auto=args.get("prefetch_auto"),
+        # The public three-tool surface is retrieval-only.  Legacy callers may
+        # still opt into these behaviors through their separate compatibility
+        # tools, but this handler never starts bootstrap or network work.
+        prepare_project_docs=False,
+        allow_network=False,
+        force_refresh=False,
+        prefetch_auto=False,
         details=args.get("details"),
         response_style=args.get("response_style"),
     )
@@ -209,6 +208,7 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
                 raw[key] = getattr(result, key)
     raw = _align_trust_contract_with_snippets(raw)
     raw = normalize_public_docs_actions(raw)
+    raw = _replace_network_retries_with_prepare_actions(raw, args)
     mode = _output_mode(args)
     if mode == "full":
         raw["output_mode"] = "full"
@@ -217,6 +217,62 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
     payload["output_mode"] = mode
     payload = _compact_mcp_payload(payload, page=_bounded_int_arg(args, "page", default=1, max_value=10_000), page_size=_bounded_int_arg(args, "page_size", default=None, max_value=20), include_sections=args.get("include_sections"))
     return _attach_output_contract(payload, output_mode=mode) if mode == "debug" else _strip_mcp_debug_noise(payload)
+
+
+def _replace_network_retries_with_prepare_actions(payload: dict[str, Any], request: dict[str, Any]) -> dict[str, Any]:
+    """Keep the public retrieval tool from suggesting another mutating retry."""
+
+    def rewrite(action: Any) -> Any:
+        if not isinstance(action, dict):
+            return action
+        arguments = dict(action.get("arguments_patch") or {})
+        if action.get("tool") == "prepare_docs":
+            # Network approval is a user decision, not a callable MCP field.
+            # The returned lifecycle action must pass its own public validator.
+            arguments.pop("allow_network", None)
+            return {**action, "arguments_patch": arguments}
+        if action.get("tool") != "get_docs_context" or not arguments.get("allow_network"):
+            return action
+        library = request.get("library")
+        if library:
+            patch = {
+                "action": "prefetch_library_docs",
+                "library": library,
+                **{
+                    key: request[key]
+                    for key in ("ecosystem", "version", "source_type", "docs_url")
+                    if request.get(key) is not None
+                },
+            }
+        elif request.get("project_path"):
+            patch = {
+                "action": "prefetch_project_dependency_docs",
+                "project_path": request["project_path"],
+            }
+        else:
+            return action
+        return {**action, "type": "prepare_docs", "tool": "prepare_docs", "arguments_patch": patch}
+
+    updated = dict(payload)
+    actions = []
+    for action in updated.get("next_actions") or []:
+        candidate = rewrite(action)
+        if candidate not in actions:
+            actions.append(candidate)
+    primary = rewrite(updated.get("next_action"))
+    if primary is not None and primary not in actions:
+        actions.insert(0, primary)
+    updated["next_actions"] = actions
+    updated["next_action"] = primary or (actions[0] if actions else None)
+    if isinstance(updated.get("lanes"), dict):
+        updated["lanes"] = {
+            name: {**lane, "next_action": rewrite(lane.get("next_action"))}
+            if isinstance(lane, dict) else lane
+            for name, lane in updated["lanes"].items()
+        }
+    if isinstance(updated.get("arguments_patch"), dict) and updated["arguments_patch"].get("allow_network"):
+        updated["arguments_patch"] = dict(updated["next_action"].get("arguments_patch") or {}) if updated.get("next_action") else {}
+    return updated
 
 
 def _trust_sources(contract: Any, lane: str) -> list[dict[str, Any]]:
