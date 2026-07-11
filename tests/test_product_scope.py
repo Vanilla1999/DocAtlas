@@ -38,17 +38,21 @@ def test_three_real_project_task_designs_are_fairness_screened_and_distributed()
     for task in tasks:
         assert task["fixture_status"] == "validated"
         assert task["fairness_status"] == "passed"
+        assert task["differentiation_candidate"] is True
+        assert task["differentiating"] is False
         assert task["selection_status"] == "rejected_too_easy"
         assert task["benchmark_metric"] == "repeated policy-clean public_and_hidden_test_pass_rate"
         assert len(task["required_context"]) == 4
         assert any(path.endswith("pubspec.lock") for path in task["required_context"])
-        assert any(path.endswith("docs") for path in task["required_context"])
         assert any(path.startswith("docs/") or path.endswith("ARCHITECTURE.md") for path in task["required_context"])
+        assert any("dependency_docs/permission_handler/11.4.0.json" in path for path in task["required_context"])
 
         spec = registered[task["task_id"]]
         assert spec["task_type"] == "real"
         assert spec["suite"] == "differentiation"
         assert spec["repo"] == f"fixture://{task['task_id']}"
+        assert spec["differentiating"] is False
+        assert spec["selection_status"] == "rejected_too_easy"
         assert any(dependency["name"] == "permission_handler" for dependency in spec["dependencies"])
         assert "pubspec.lock" in spec["expected_project_docs"]
         assert "pub.dev" in spec["expected_docs_domains"]
@@ -57,6 +61,13 @@ def test_three_real_project_task_designs_are_fairness_screened_and_distributed()
         assert (ROOT / artifacts["template"]).is_dir()
         assert (ROOT / artifacts["hidden_tests"]).is_dir()
         assert (ROOT / artifacts["gold_patch"]).is_file()
+
+        dependency_docs = json.loads((ROOT / artifacts["dependency_docs"]).read_text(encoding="utf-8"))
+        assert dependency_docs["library"] == "permission_handler"
+        assert dependency_docs["version"] == "11.4.0"
+        assert all(url.startswith("https://pub.dev/documentation/permission_handler/11.4.0/") for url in dependency_docs["sources"])
+        assert {"permanentlyDenied", "provisional"} <= set(dependency_docs["facts"]["PermissionStatus.values"])
+        assert {"notification", "locationAlways"} <= set(dependency_docs["facts"]["Permission.members"])
 
         validation = json.loads((ROOT / artifacts["validation"]).read_text(encoding="utf-8"))
         assert validation["task_id"] == task["task_id"]
