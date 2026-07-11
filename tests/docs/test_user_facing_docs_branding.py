@@ -72,10 +72,11 @@ def test_active_docs_are_not_silently_ignored_by_gitignore():
         "docs/RELEASE_CHECKLIST.md",
         "docs/capabilities.md",
         "docs/mcp-docs-server.md",
+        "docs/FUTURE_ACTIVE_DOC.md",
     ]
     for relative_path in active_docs:
         result = subprocess.run(
-            ["git", "check-ignore", "--quiet", relative_path],
+            ["git", "check-ignore", "--no-index", "--quiet", relative_path],
             cwd=ROOT,
             check=False,
         )
@@ -83,6 +84,12 @@ def test_active_docs_are_not_silently_ignored_by_gitignore():
 
 
 def test_active_docs_stay_within_the_documentation_size_budget():
-    active_docs = [ROOT / "README.md", *sorted((ROOT / "docs").glob("*.md"))]
+    active_docs = [
+        ROOT / "README.md",
+        ROOT / "docs" / "DOCMANCER_PRODUCT_BRIEF.md",
+        ROOT / "docs" / "mcp-docs-server.md",
+        ROOT / "docs" / "capabilities.md",
+        ROOT / "docs" / "RELEASE_CHECKLIST.md",
+    ]
     line_count = sum(len(path.read_text(encoding="utf-8").splitlines()) for path in active_docs)
-    assert line_count <= 2500, f"active docs use {line_count} lines; see docs/RELEASE_CHECKLIST.md"
+    assert line_count <= 1000, f"canonical release docs use {line_count} lines; see docs/RELEASE_CHECKLIST.md"

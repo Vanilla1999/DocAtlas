@@ -9,7 +9,7 @@ Use this checklist before promoting a release. A source checkout passing tests i
 - [ ] README, product brief, Docs MCP reference, wiki command/troubleshooting pages, and changelog agree that the public Docs MCP tools are `get_docs_context`, `prepare_docs`, and `docs_status`.
 - [ ] Advanced Packs and patch constraints are labelled advanced/advisory.
 - [ ] New active documentation is tracked by Git and does not duplicate the canonical Docs MCP workflow.
-- [ ] The active user/model documentation set is at most 2,500 lines, or this release records a reviewed exception and removal plan.
+- [ ] The canonical user-facing release set (`README.md`, product brief, Docs MCP reference, capability reference, release checklist) is at most 1,000 lines, or this release records a reviewed exception and removal plan.
 
 ## Built artifact
 

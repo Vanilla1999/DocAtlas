@@ -17,11 +17,11 @@ doc-atlas mcp --help
 
 ## Public tool contract
 
-The Docs MCP server exposes exactly three public tools.
+The Docs MCP server exposes exactly three public tools. The table describes the recommended contract; task 11 still removes compatibility flags that can currently blur the retrieval/lifecycle boundary.
 
 | Tool | Default use | Must not be used for |
 |---|---|---|
-| `get_docs_context` | First documentation question about a repository, dependency, library, or a mix. | Hidden indexing, crawling, or job polling. |
+| `get_docs_context` | First documentation question about a repository, dependency, library, or a mix. | Speculative compatibility flags for indexing, crawling, or job polling. |
 | `prepare_docs` | The exact lifecycle action returned by `get_docs_context`, or an explicit user-approved sync/refresh request. | Normal discovery or implementation-code search. |
 | `docs_status` | A returned job id, index health, freshness, or status request. | The first discovery call. |
 

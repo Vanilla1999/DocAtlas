@@ -20,7 +20,7 @@ The public Docs MCP server exposes exactly three tools:
 | `prepare_docs` | Explicit lifecycle work such as syncing accepted project docs or fetching an approved external source. |
 | `docs_status` | A returned job, freshness, health, or index-status question. |
 
-`get_docs_context` is the normal entry point. If preparation is required, it returns the exact `prepare_docs` action and arguments. The agent retries the original question when preparation finishes.
+`get_docs_context` is the normal entry point. The target contract is for it to return the exact `prepare_docs` action and arguments when preparation is required, then let the agent retry the original question. Task 11 hardens this boundary; until then, compatibility flags remain and agents must not use them for speculative lifecycle/network work.
 
 ## Product boundaries
 
@@ -28,7 +28,7 @@ The public Docs MCP server exposes exactly three tools:
 - DocAtlas does not silently author, commit, or push official project documentation.
 - When docs are missing or stale, it gives the host coding agent a bounded evidence-gathering and file-editing brief. The host agent makes a normal reviewable Git change; DocAtlas then indexes the accepted file.
 - Project code search answers implementation facts. DocAtlas supplies documentation context and provenance.
-- Network acquisition is explicit lifecycle work. It must not be hidden in a normal retrieval call.
+- Network acquisition is the target explicit lifecycle contract. Task 11 still has to remove hidden compatibility paths from normal retrieval.
 
 ## Current capabilities
 
@@ -41,7 +41,7 @@ For the detailed current contract, commands, response fields, and examples, use 
 
 ## Installation truth
 
-The package distributed on PyPI is currently `doc-atlas` version `1.1.1`. The `main` branch can contain workflow changes that are not yet published. Until the release artifact gate is complete, use the release documentation that matches the installed version, or install from a checked-out source deliberately for development. Do not assume a one-line installer for `main` has published every documented feature.
+The package distributed on PyPI is `doc-atlas`. The `main` branch can contain workflow changes that are not yet published. Check `doc-atlas --version`, use release documentation that matches that installed version, and do not assume a one-line installer for `main` has published every documented feature.
 
 ## Advanced and compatibility surfaces
 
@@ -62,4 +62,4 @@ Keep active user/model documentation small and non-duplicated:
 - this brief: product scope and claims;
 - `wiki/`: navigation and compatibility reference.
 
-No active user/model documentation set should exceed 2,500 lines without a recorded exception in the release checklist. Add links to the canonical guide instead of copying tool tables or workflows.
+The canonical user-facing release set — `README.md`, this brief, the Docs MCP reference, the capability reference, and the release checklist — must not exceed 1,000 lines without a recorded exception. Add links to the canonical guide instead of copying tool tables or workflows.

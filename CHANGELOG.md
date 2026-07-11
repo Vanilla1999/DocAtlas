@@ -8,7 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 
-- **Three-tool Docs MCP workflow:** documented and tested `get_docs_context`, `prepare_docs`, and `docs_status` as the only public Docs MCP tools; lifecycle work now follows an explicit returned action instead of a legacy direct-tool workflow.
+- **Three-tool Docs MCP workflow:** documented and tested `get_docs_context`, `prepare_docs`, and `docs_status` as the public Docs MCP inventory and recommended lifecycle workflow. Task 11 retains ownership of removing remaining retrieval compatibility flags.
 - **Project documentation sync and guidance:** added model-guided missing-doc handoff, accepted-file sync, compact agent contracts, and source-attributed project documentation context.
 - **Project dependency evidence:** added npm/Node and Python dependency/lockfile detection alongside existing project metadata support, with exactness diagnostics rather than silent latest-version claims.
 - **Documentation impact CI:** added `doc-atlas docs-impact` reporting for changed code paths and maintained documentation review.
