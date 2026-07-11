@@ -17,8 +17,8 @@ Every supported installer should leave the coding agent with one compact, consis
 The installed guidance must say, in client-appropriate syntax:
 
 1. Call `get_docs_context` first for project or dependency documentation questions.
-2. If it returns `next_action`, request any required network/write confirmation and call the exact `prepare_docs` action.
-3. Poll `docs_status` only for a returned job id.
+2. If it returns `next_action`, request any required network/write confirmation and call `prepare_docs` with the returned `action` and only its supported arguments from `arguments_patch`.
+3. Use `docs_status` only for explicit health, freshness, or index diagnostics, or for a returned job id.
 4. Repeat the original `get_docs_context` question after successful preparation.
 5. Prefer repository code/search for implementation facts and DocAtlas for documentation context; do not use legacy direct tools.
 
@@ -32,6 +32,19 @@ The installed guidance must say, in client-appropriate syntax:
 6. Add a tool-choice evaluation runner that presents the actual public tool schemas plus installed guidance to at least one named weaker/low-cost model adapter.
 7. Cover scenarios for local docs present/missing/stale, exact library present/missing, job polling, implementation-only code search, network confirmation, invalid prepare payload, and unrelated questions.
 8. Commit sanitized per-scenario results and model/tool-schema versions. Keep live evaluation opt-in; deterministic schema/fixture tests remain in CI.
+
+Run the opt-in gate with:
+
+```bash
+OPENAI_API_KEY=... python -m docmancer.docs.tool_choice_eval \
+  --model <low-cost-model> \
+  --output eval/results/task21_tool_choice_gate.json
+```
+
+The command reads the canonical installed guidance and the actual public MCP
+schemas, writes only sanitized decisions, and exits non-zero when a frozen
+threshold fails. The committed report must remain explicitly failed/not-run
+until a credentialed run replaces it; absence of a live result is never a pass.
 
 ## Decision metrics
 

@@ -28,7 +28,7 @@ DocAtlas must not silently author or commit official documentation. When documen
 | Task | Status | What is true now | Residual work |
 |---|---|---|---|
 | 01 Architecture refactor | Done for its Node slice | Python and Node parsing were extracted | Cargo/Pub and large services remain; see 25–27 |
-| 02 Agent bootstrap | Done for `install --project` | Compact bootstrap is generated | Hero installer does not install it; see 21 |
+| 02 Agent bootstrap | Done for supported installers | Compact canonical bootstrap and Docs MCP registration are installed, updated, and uninstalled with managed ownership | Task 21 credentialed low-cost-model gate remains separately owned and explicitly not-run |
 | 03 Model-guided docs | Partial | Missing-doc handoff exists | `evidence_complete` can be falsely true; see 19 |
 | 04 Section impact | Partial | Section metadata and CLI output exist | Stored metadata is not consumed; changed symbols are manual; see 20 |
 | 05 Context7 parity | Partial | 150-item dataset and scorer exist | No real capture runner; scoring protocol is gameable; see 18 |

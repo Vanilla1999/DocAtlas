@@ -49,16 +49,13 @@ def test_install_claude_code_creates_rebooted_skill_file():
         assert result.exit_code == 0, result.output
         skill_file = fake_home / ".claude" / "skills" / "docmancer" / "SKILL.md"
         content = skill_file.read_text()
+        assert content.startswith("---\n")
+        assert content.index("<!-- docmancer:start -->") > content.index("\n---\n")
         assert "allowed-tools" in content
-        assert "doc-atlas add" in content
-        assert "doc-atlas ingest" in content
-        assert "docmancer bench" not in content
-        assert content.index("doc-atlas query") < content.index("Advanced: API Tools via MCP")
-        # Pre-bench registry narrative concepts must stay gone.
-        assert "vault" not in content.lower()
-        assert "docmancer pull" not in content
-        assert "docmancer search" not in content
-        assert "from the registry" not in content.lower()
+        assert "get_docs_context" in content
+        assert "prepare_docs" in content
+        assert "docs_status" in content
+        assert "legacy direct documentation tools" in content
 
 
 def test_install_codex_creates_native_and_shared_skills():
@@ -84,9 +81,9 @@ def test_install_cursor_creates_agents_md_fallback():
         agents_md = fake_home / ".cursor" / "AGENTS.md"
         assert agents_md.exists()
         content = agents_md.read_text()
-        assert "doc-atlas ingest" in content
-        assert "doc-atlas add" in content
-        assert content.index("doc-atlas query") < content.index("Advanced: API Tools via MCP")
+        assert "get_docs_context" in content
+        assert "prepare_docs" in content
+        assert "docs_status" in content
 
 
 def test_install_github_copilot_project_creates_repo_instructions():
@@ -120,6 +117,8 @@ def test_install_github_copilot_project_creates_repo_instructions():
         ("cursor", "AGENTS.md"),
         ("github-copilot", "AGENTS.md"),
         ("opencode", "AGENTS.md"),
+        ("cline", "AGENTS.md"),
+        ("gemini", "AGENTS.md"),
     ],
 )
 def test_project_install_writes_compact_docs_mcp_bootstrap(agent: str, instruction_path: str):
@@ -173,6 +172,305 @@ def test_project_install_preserves_user_text_when_appending_bootstrap():
             result = runner.invoke(cli, ["install", "codex", "--project"])
         assert result.exit_code == 0, result.output
         assert instruction_path.read_text(encoding="utf-8").startswith(original)
+
+
+def test_project_uninstall_removes_only_managed_bootstrap_block():
+    runner = CliRunner()
+    with runner.isolated_filesystem() as tmp_dir:
+        fake_home = _home(tmp_dir)
+        instruction_path = Path("AGENTS.md")
+        instruction_path.write_text("# Team instructions\n", encoding="utf-8")
+        with patch("docmancer.cli.commands.Path.home", return_value=fake_home), \
+             patch("docmancer.cli.commands._get_config_class", return_value=FakeDocmancerConfig):
+            install = runner.invoke(cli, ["install", "codex", "--project"])
+            uninstall = runner.invoke(cli, ["install", "codex", "--project", "--uninstall"])
+        assert install.exit_code == 0, install.output
+        assert uninstall.exit_code == 0, uninstall.output
+        assert instruction_path.read_text(encoding="utf-8") == "# Team instructions\n"
+
+
+def test_project_uninstall_keeps_shared_bootstrap_for_another_agent():
+    runner = CliRunner()
+    with runner.isolated_filesystem() as tmp_dir:
+        fake_home = _home(tmp_dir)
+        with patch("docmancer.cli.commands.Path.home", return_value=fake_home), \
+             patch("docmancer.mcp.agent_config.Path.home", return_value=fake_home), \
+             patch("docmancer.cli.commands._get_config_class", return_value=FakeDocmancerConfig):
+            codex = runner.invoke(cli, ["install", "codex", "--project"])
+            gemini = runner.invoke(cli, ["install", "gemini", "--project"])
+            remove_gemini = runner.invoke(cli, ["install", "gemini", "--project", "--uninstall"])
+            retained = Path("AGENTS.md").read_text(encoding="utf-8")
+            remove_codex = runner.invoke(cli, ["install", "codex", "--project", "--uninstall"])
+        assert codex.exit_code == 0, codex.output
+        assert gemini.exit_code == 0, gemini.output
+        assert remove_gemini.exit_code == 0, remove_gemini.output
+        assert "get_docs_context" in retained
+        assert remove_codex.exit_code == 0, remove_codex.output
+        assert not Path("AGENTS.md").exists()
+
+
+@pytest.mark.parametrize("removed_agent", ["codex", "github-copilot"])
+def test_project_uninstall_keeps_shared_bootstrap_for_copilot_and_codex(removed_agent: str):
+    runner = CliRunner()
+    with runner.isolated_filesystem() as tmp_dir:
+        fake_home = _home(tmp_dir)
+        with patch("docmancer.cli.commands.Path.home", return_value=fake_home), \
+             patch("docmancer.mcp.agent_config.Path.home", return_value=fake_home), \
+             patch("docmancer.cli.commands._get_config_class", return_value=FakeDocmancerConfig):
+            codex = runner.invoke(cli, ["install", "codex", "--project"])
+            copilot = runner.invoke(cli, ["install", "github-copilot", "--project"])
+            uninstall = runner.invoke(cli, ["install", removed_agent, "--project", "--uninstall"])
+        assert codex.exit_code == 0, codex.output
+        assert copilot.exit_code == 0, copilot.output
+        assert uninstall.exit_code == 0, uninstall.output
+        assert "get_docs_context" in Path("AGENTS.md").read_text(encoding="utf-8")
+
+
+def test_project_uninstall_detects_legacy_shared_bootstrap_owners_from_mcp_configs():
+    runner = CliRunner()
+    with runner.isolated_filesystem() as tmp_dir:
+        fake_home = _home(tmp_dir)
+        with patch("docmancer.cli.commands.Path.home", return_value=fake_home), \
+             patch("docmancer.mcp.agent_config.Path.home", return_value=fake_home), \
+             patch("docmancer.cli.commands._get_config_class", return_value=FakeDocmancerConfig):
+            assert runner.invoke(cli, ["install", "codex", "--project"]).exit_code == 0
+            assert runner.invoke(cli, ["install", "opencode", "--project"]).exit_code == 0
+            Path(".docmancer/agent-installs.json").unlink()
+            uninstall = runner.invoke(cli, ["install", "codex", "--project", "--uninstall"])
+        assert uninstall.exit_code == 0, uninstall.output
+        assert "get_docs_context" in Path("AGENTS.md").read_text(encoding="utf-8")
+
+
+def test_failed_project_install_does_not_record_agent_state():
+    runner = CliRunner()
+    with runner.isolated_filesystem() as tmp_dir:
+        fake_home = _home(tmp_dir)
+        skill = Path(".gemini/skills/docmancer/SKILL.md")
+        skill.parent.mkdir(parents=True)
+        skill.write_text("---\nname: custom\n---\n<!-- docmancer:start -->\nbroken\n", encoding="utf-8")
+        with patch("docmancer.cli.commands.Path.home", return_value=fake_home), \
+             patch("docmancer.mcp.agent_config.Path.home", return_value=fake_home), \
+             patch("docmancer.cli.commands._get_config_class", return_value=FakeDocmancerConfig):
+            result = runner.invoke(cli, ["install", "gemini", "--project"])
+        assert result.exit_code != 0
+        assert not Path(".docmancer/agent-installs.json").exists()
+
+
+@pytest.mark.parametrize(
+    ("agent", "skill_path"),
+    [
+        ("claude-code", ".claude/skills/docmancer/SKILL.md"),
+        ("cursor", ".cursor/skills/docmancer/SKILL.md"),
+        ("cline", ".cline/skills/docmancer/SKILL.md"),
+        ("gemini", ".gemini/skills/docmancer/SKILL.md"),
+    ],
+)
+def test_project_uninstall_removes_managed_project_skill(agent: str, skill_path: str):
+    runner = CliRunner()
+    with runner.isolated_filesystem() as tmp_dir:
+        fake_home = _home(tmp_dir)
+        with patch("docmancer.cli.commands.Path.home", return_value=fake_home), \
+             patch("docmancer.mcp.agent_config.Path.home", return_value=fake_home), \
+             patch("docmancer.cli.commands._get_config_class", return_value=FakeDocmancerConfig):
+            install = runner.invoke(cli, ["install", agent, "--project"])
+            assert Path(skill_path).exists()
+            uninstall = runner.invoke(cli, ["install", agent, "--project", "--uninstall"])
+        assert install.exit_code == 0, install.output
+        assert uninstall.exit_code == 0, uninstall.output
+        assert not Path(skill_path).exists()
+
+
+def test_claude_project_uninstall_preserves_global_mcp_registration():
+    runner = CliRunner()
+    with runner.isolated_filesystem() as tmp_dir:
+        fake_home = _home(tmp_dir)
+        with patch("docmancer.cli.commands.Path.home", return_value=fake_home), \
+             patch("docmancer.mcp.agent_config.Path.home", return_value=fake_home), \
+             patch("docmancer.cli.commands._get_config_class", return_value=FakeDocmancerConfig):
+            global_install = runner.invoke(cli, ["install", "claude-code"])
+            project_install = runner.invoke(cli, ["install", "claude-code", "--project"])
+            uninstall = runner.invoke(cli, ["install", "claude-code", "--project", "--uninstall"])
+        assert global_install.exit_code == 0, global_install.output
+        assert project_install.exit_code == 0, project_install.output
+        assert uninstall.exit_code == 0, uninstall.output
+        global_config = json.loads((fake_home / ".claude/settings.json").read_text())
+        assert "docmancer" in global_config["mcpServers"]
+        project_config = json.loads(Path(".mcp.json").read_text())
+        assert "docmancer" not in project_config["mcpServers"]
+
+
+def test_global_uninstall_preserves_unmanaged_skill_text():
+    runner = CliRunner()
+    with runner.isolated_filesystem() as tmp_dir:
+        fake_home = _home(tmp_dir)
+        skill = fake_home / ".codex" / "skills" / "docmancer" / "SKILL.md"
+        skill.parent.mkdir(parents=True)
+        skill.write_text("# User notes\n", encoding="utf-8")
+        with patch("docmancer.cli.commands.Path.home", return_value=fake_home), \
+             patch("docmancer.cli.commands._get_config_class", return_value=FakeDocmancerConfig):
+            install = runner.invoke(cli, ["install", "codex"])
+            uninstall = runner.invoke(cli, ["install", "codex", "--uninstall"])
+        assert install.exit_code == 0, install.output
+        assert uninstall.exit_code == 0, uninstall.output
+        assert skill.read_text(encoding="utf-8") == "# User notes\n"
+
+
+def test_project_uninstall_removes_codex_mcp_registration():
+    runner = CliRunner()
+    with runner.isolated_filesystem() as tmp_dir:
+        fake_home = _home(tmp_dir)
+        with patch("docmancer.cli.commands.Path.home", return_value=fake_home), \
+             patch("docmancer.mcp.agent_config.Path.home", return_value=fake_home), \
+             patch("docmancer.cli.commands._get_config_class", return_value=FakeDocmancerConfig):
+            install = runner.invoke(cli, ["install", "codex", "--project"])
+            uninstall = runner.invoke(cli, ["install", "codex", "--project", "--uninstall"])
+        assert install.exit_code == 0, install.output
+        assert uninstall.exit_code == 0, uninstall.output
+        config = Path(".codex/config.toml").read_text(encoding="utf-8")
+        assert "[mcp_servers.docmancer]" not in config
+        assert "Removed DocAtlas MCP registration." in uninstall.output
+
+
+def test_gemini_uninstall_does_not_remove_codex_shared_skill():
+    runner = CliRunner()
+    with runner.isolated_filesystem() as tmp_dir:
+        fake_home = _home(tmp_dir)
+        with patch("docmancer.cli.commands.Path.home", return_value=fake_home), \
+             patch("docmancer.mcp.agent_config.Path.home", return_value=fake_home), \
+             patch("docmancer.cli.commands._get_config_class", return_value=FakeDocmancerConfig):
+            codex = runner.invoke(cli, ["install", "codex"])
+            gemini = runner.invoke(cli, ["install", "gemini"])
+            uninstall = runner.invoke(cli, ["install", "gemini", "--uninstall"])
+        assert codex.exit_code == 0, codex.output
+        assert gemini.exit_code == 0, gemini.output
+        assert uninstall.exit_code == 0, uninstall.output
+        assert (fake_home / ".agents/skills/docmancer/SKILL.md").exists()
+
+
+def test_reinstall_migrates_marker_before_front_matter():
+    runner = CliRunner()
+    with runner.isolated_filesystem() as tmp_dir:
+        fake_home = _home(tmp_dir)
+        skill = fake_home / ".claude/skills/docmancer/SKILL.md"
+        skill.parent.mkdir(parents=True)
+        skill.write_text("<!-- docmancer:start -->\n---\nname: old\n---\nold\n<!-- docmancer:end -->\n")
+        with patch("docmancer.cli.commands.Path.home", return_value=fake_home), \
+             patch("docmancer.cli.commands._get_config_class", return_value=FakeDocmancerConfig):
+            result = runner.invoke(cli, ["install", "claude-code"])
+        assert result.exit_code == 0, result.output
+        content = skill.read_text(encoding="utf-8")
+        assert content.startswith("---\n")
+        assert content.count("<!-- docmancer:start -->") == 1
+
+
+def test_global_uninstall_removes_fully_managed_skill_file():
+    runner = CliRunner()
+    with runner.isolated_filesystem() as tmp_dir:
+        fake_home = _home(tmp_dir)
+        skill = fake_home / ".claude/skills/docmancer/SKILL.md"
+        with patch("docmancer.cli.commands.Path.home", return_value=fake_home), \
+             patch("docmancer.mcp.agent_config.Path.home", return_value=fake_home), \
+             patch("docmancer.cli.commands._get_config_class", return_value=FakeDocmancerConfig):
+            install = runner.invoke(cli, ["install", "claude-code"])
+            uninstall = runner.invoke(cli, ["install", "claude-code", "--uninstall"])
+        assert install.exit_code == 0, install.output
+        assert uninstall.exit_code == 0, uninstall.output
+        assert not skill.exists()
+
+
+def test_global_uninstall_preserves_user_skill_front_matter():
+    runner = CliRunner()
+    with runner.isolated_filesystem() as tmp_dir:
+        fake_home = _home(tmp_dir)
+        skill = fake_home / ".claude/skills/docmancer/SKILL.md"
+        skill.parent.mkdir(parents=True)
+        user_front_matter = "---\nname: user-skill\n---\n"
+        skill.write_text(user_front_matter, encoding="utf-8")
+        with patch("docmancer.cli.commands.Path.home", return_value=fake_home), \
+             patch("docmancer.mcp.agent_config.Path.home", return_value=fake_home), \
+             patch("docmancer.cli.commands._get_config_class", return_value=FakeDocmancerConfig):
+            install = runner.invoke(cli, ["install", "claude-code"])
+            uninstall = runner.invoke(cli, ["install", "claude-code", "--uninstall"])
+        assert install.exit_code == 0, install.output
+        assert uninstall.exit_code == 0, uninstall.output
+        assert skill.read_text(encoding="utf-8") == user_front_matter
+
+
+def test_reinstall_updates_owned_skill_front_matter():
+    runner = CliRunner()
+    with runner.isolated_filesystem() as tmp_dir:
+        fake_home = _home(tmp_dir)
+        skill = fake_home / ".claude/skills/docmancer/SKILL.md"
+        with patch("docmancer.cli.commands.Path.home", return_value=fake_home), \
+             patch("docmancer.cli.commands._get_config_class", return_value=FakeDocmancerConfig):
+            first = runner.invoke(cli, ["install", "claude-code"])
+            content = skill.read_text(encoding="utf-8").replace(
+                "description: Source-grounded documentation workflow for coding agents.",
+                "description: stale metadata",
+            )
+            skill.write_text(content, encoding="utf-8")
+            second = runner.invoke(cli, ["install", "claude-code"])
+        assert first.exit_code == 0, first.output
+        assert second.exit_code == 0, second.output
+        assert "description: Source-grounded documentation workflow for coding agents." in skill.read_text(encoding="utf-8")
+
+
+def test_copilot_project_uninstall_removes_both_managed_instruction_blocks():
+    runner = CliRunner()
+    with runner.isolated_filesystem() as tmp_dir:
+        fake_home = _home(tmp_dir)
+        with patch("docmancer.cli.commands.Path.home", return_value=fake_home), \
+             patch("docmancer.cli.commands._get_config_class", return_value=FakeDocmancerConfig):
+            install = runner.invoke(cli, ["install", "github-copilot", "--project"])
+            uninstall = runner.invoke(cli, ["install", "github-copilot", "--project", "--uninstall"])
+        assert install.exit_code == 0, install.output
+        assert uninstall.exit_code == 0, uninstall.output
+        assert not Path("AGENTS.md").exists()
+        assert not (Path(".github") / "copilot-instructions.md").exists()
+
+
+def test_copilot_project_install_preserves_explicit_user_instruction_setting():
+    runner = CliRunner()
+    with runner.isolated_filesystem() as tmp_dir:
+        fake_home = _home(tmp_dir)
+        settings_path = Path(".vscode/settings.json")
+        settings_path.parent.mkdir(parents=True)
+        settings_path.write_text(json.dumps({
+            "github.copilot.chat.codeGeneration.useInstructionFiles": False,
+            "user.setting": "keep",
+        }))
+        with patch("docmancer.cli.commands.Path.home", return_value=fake_home), \
+             patch("docmancer.mcp.agent_config.Path.home", return_value=fake_home), \
+             patch("docmancer.cli.commands._get_config_class", return_value=FakeDocmancerConfig):
+            install = runner.invoke(cli, ["install", "github-copilot", "--project"])
+            uninstall = runner.invoke(cli, ["install", "github-copilot", "--project", "--uninstall"])
+        assert install.exit_code == 0, install.output
+        assert uninstall.exit_code == 0, uninstall.output
+        assert json.loads(settings_path.read_text(encoding="utf-8")) == {
+            "github.copilot.chat.codeGeneration.useInstructionFiles": False,
+            "user.setting": "keep",
+        }
+        assert "remains disabled" in install.output
+        assert "Enabled VS Code Copilot instruction files" not in install.output
+
+
+def test_legacy_skill_migration_preserves_user_suffix():
+    runner = CliRunner()
+    with runner.isolated_filesystem() as tmp_dir:
+        fake_home = _home(tmp_dir)
+        skill = fake_home / ".claude/skills/docmancer/SKILL.md"
+        skill.parent.mkdir(parents=True)
+        skill.write_text(
+            "<!-- docmancer:start -->\n---\nname: docmancer\n---\nold\n"
+            "<!-- docmancer:end -->\n\n# My local notes\nDo not delete this.\n",
+            encoding="utf-8",
+        )
+        with patch("docmancer.cli.commands.Path.home", return_value=fake_home), \
+             patch("docmancer.mcp.agent_config.Path.home", return_value=fake_home), \
+             patch("docmancer.cli.commands._get_config_class", return_value=FakeDocmancerConfig):
+            result = runner.invoke(cli, ["install", "claude-code"])
+        assert result.exit_code == 0, result.output
+        assert "# My local notes\nDo not delete this." in skill.read_text(encoding="utf-8")
 
 
 @pytest.mark.parametrize(
@@ -231,11 +529,11 @@ def test_install_claude_desktop_creates_zip():
         zip_path = fake_home / ".docmancer" / "exports" / "claude-desktop" / "docmancer.zip"
         assert zip_path.exists()
         with zipfile.ZipFile(zip_path) as zf:
-            assert "docmancer/Skill.md" in zf.namelist()
-            content = zf.read("docmancer/Skill.md").decode()
-            assert "doc-atlas ingest" in content
-            assert "doc-atlas add" in content
-            assert content.index("doc-atlas query") < content.index("Advanced: API Tools via MCP")
+                assert "docmancer/Skill.md" in zf.namelist()
+                content = zf.read("docmancer/Skill.md").decode()
+                assert "get_docs_context" in content
+                assert "prepare_docs" in content
+                assert "docs_status" in content
 
 
 def test_setup_all_creates_config_db_and_installs_skills():
