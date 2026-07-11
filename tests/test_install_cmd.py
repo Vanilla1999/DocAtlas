@@ -209,6 +209,23 @@ def test_project_uninstall_keeps_shared_bootstrap_for_another_agent():
         assert not Path("AGENTS.md").exists()
 
 
+@pytest.mark.parametrize("removed_agent", ["codex", "github-copilot"])
+def test_project_uninstall_keeps_shared_bootstrap_for_copilot_and_codex(removed_agent: str):
+    runner = CliRunner()
+    with runner.isolated_filesystem() as tmp_dir:
+        fake_home = _home(tmp_dir)
+        with patch("docmancer.cli.commands.Path.home", return_value=fake_home), \
+             patch("docmancer.mcp.agent_config.Path.home", return_value=fake_home), \
+             patch("docmancer.cli.commands._get_config_class", return_value=FakeDocmancerConfig):
+            codex = runner.invoke(cli, ["install", "codex", "--project"])
+            copilot = runner.invoke(cli, ["install", "github-copilot", "--project"])
+            uninstall = runner.invoke(cli, ["install", removed_agent, "--project", "--uninstall"])
+        assert codex.exit_code == 0, codex.output
+        assert copilot.exit_code == 0, copilot.output
+        assert uninstall.exit_code == 0, uninstall.output
+        assert "get_docs_context" in Path("AGENTS.md").read_text(encoding="utf-8")
+
+
 @pytest.mark.parametrize(
     ("agent", "skill_path"),
     [
@@ -380,6 +397,29 @@ def test_copilot_project_uninstall_removes_both_managed_instruction_blocks():
         assert uninstall.exit_code == 0, uninstall.output
         assert not Path("AGENTS.md").exists()
         assert not (Path(".github") / "copilot-instructions.md").exists()
+
+
+def test_copilot_project_install_preserves_explicit_user_instruction_setting():
+    runner = CliRunner()
+    with runner.isolated_filesystem() as tmp_dir:
+        fake_home = _home(tmp_dir)
+        settings_path = Path(".vscode/settings.json")
+        settings_path.parent.mkdir(parents=True)
+        settings_path.write_text(json.dumps({
+            "github.copilot.chat.codeGeneration.useInstructionFiles": False,
+            "user.setting": "keep",
+        }))
+        with patch("docmancer.cli.commands.Path.home", return_value=fake_home), \
+             patch("docmancer.mcp.agent_config.Path.home", return_value=fake_home), \
+             patch("docmancer.cli.commands._get_config_class", return_value=FakeDocmancerConfig):
+            install = runner.invoke(cli, ["install", "github-copilot", "--project"])
+            uninstall = runner.invoke(cli, ["install", "github-copilot", "--project", "--uninstall"])
+        assert install.exit_code == 0, install.output
+        assert uninstall.exit_code == 0, uninstall.output
+        assert json.loads(settings_path.read_text(encoding="utf-8")) == {
+            "github.copilot.chat.codeGeneration.useInstructionFiles": False,
+            "user.setting": "keep",
+        }
 
 
 @pytest.mark.parametrize(

@@ -28,6 +28,7 @@ class ToolChoiceScenario:
     expected_first_tool: str | None
     expected_next_action: dict[str, Any] | None = None
     expected_retry_question: str | None = None
+    messages: tuple[dict[str, str], ...] | None = None
 
 
 class LowCostModelAdapter(Protocol):
@@ -49,7 +50,7 @@ class OpenAICompatibleLowCostAdapter:
         return self.completion({"guidance": guidance, "tools": tool_schemas, "scenario": asdict(scenario)})
 
 
-_SCENARIO_ROWS = (
+_SCENARIO_ROWS: tuple[tuple[Any, ...], ...] = (
     ("project-present", "How does this repository authenticate requests?", "get_docs_context"),
     ("project-missing", "Explain this project's architecture; its docs are not indexed.", "get_docs_context"),
     ("project-stale", "What does the current ADR say about caching?", "get_docs_context"),
@@ -65,20 +66,31 @@ _SCENARIO_ROWS = (
     ("unrelated", "Write a haiku about rain.", None),
     ("mixed-question", "How does this project use Riverpod providers?", "get_docs_context"),
     ("missing-action", "The docs response says to prefetch Kotlin 1.8.1; follow it.", "prepare_docs", {"action": "prefetch_library_docs", "library": "kotlin", "version": "1.8.1"}),
-    ("retry-question", "Preparation finished. Retry the original documentation question exactly: Show Kotlin coroutine launch usage.", "get_docs_context", None, "Show Kotlin coroutine launch usage."),
+    (
+        "retry-question",
+        "Preparation succeeded. Continue the documentation workflow.",
+        "get_docs_context",
+        None,
+        "Show Kotlin coroutine launch usage.",
+        (
+            {"role": "user", "content": "Show Kotlin coroutine launch usage."},
+            {"role": "assistant", "content": "The required documentation preparation was started."},
+            {"role": "user", "content": "Preparation succeeded. Continue the documentation workflow."},
+        ),
+    ),
     ("project-code-boundary", "Which source file implements the current retry loop?", None),
     ("dependency-version", "What API does the locked Flutter dependency expose?", "get_docs_context"),
     ("refresh-request", "Refresh the indexed library documentation.", "prepare_docs"),
     ("job-list", "List running documentation jobs.", "docs_status"),
 )
-SCENARIOS = tuple(ToolChoiceScenario(*row) for row in _SCENARIO_ROWS)
+SCENARIOS = tuple(ToolChoiceScenario(*row) for row in _SCENARIO_ROWS)  # type: ignore[arg-type]
 
 
 def public_tool_schemas() -> list[dict[str, Any]]:
     """Load the real three-tool MCP surface used by the server."""
-    from docmancer.mcp.docs_server import PUBLIC_TOOL_NAMES, RAW_TOOLS
+    from docmancer.mcp.docs_server import PUBLIC_TOOL_NAMES, TOOLS
 
-    return [tool for tool in RAW_TOOLS if tool["name"] in PUBLIC_TOOL_NAMES]
+    return [tool for tool in TOOLS if tool["name"] in PUBLIC_TOOL_NAMES]
 
 
 def installed_guidance() -> str:
@@ -177,7 +189,9 @@ def _openai_completion(*, api_base: str, api_key: str, model: str) -> Callable[[
                 "temperature": 0,
                 "messages": [
                     {"role": "system", "content": payload["guidance"]},
-                    {"role": "user", "content": scenario["prompt"]},
+                    *(scenario.get("messages") or [
+                        {"role": "user", "content": scenario["prompt"]}
+                    ]),
                 ],
                 "tools": tools,
                 "tool_choice": "auto",
@@ -215,8 +229,19 @@ def main(argv: list[str] | None = None) -> int:
         model_version=args.model,
         completion=_openai_completion(api_base=args.api_base, api_key=api_key, model=args.model),
     )
-    report = evaluate_tool_choice(adapter, guidance=guidance, tool_schemas=schemas)
     args.output.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        report = evaluate_tool_choice(adapter, guidance=guidance, tool_schemas=schemas)
+    except Exception:
+        report = {
+            "adapter": {"name": adapter.name, "model_version": adapter.model_version},
+            "passed": False,
+            "reason": "live evaluation failed",
+            "status": "failed",
+            "tool_schema_version": _schema_version(schemas),
+        }
+        args.output.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+        return 1
     args.output.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     return 0 if report["passed"] else 1
 

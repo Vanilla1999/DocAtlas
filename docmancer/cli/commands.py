@@ -786,7 +786,7 @@ def _project_bootstrap_dest(agent: str) -> Path | None:
     normalized = agent.lower()
     if normalized == "claude-code":
         return Path("CLAUDE.md")
-    if normalized in {"codex", "codex-app", "codex-desktop", "cursor", "opencode", "cline", "gemini"}:
+    if normalized in {"codex", "codex-app", "codex-desktop", "cursor", "opencode", "cline", "gemini", "github-copilot"}:
         return Path("AGENTS.md")
     return None
 
@@ -932,7 +932,7 @@ def _install_vscode_copilot_settings(dest: Path) -> None:
             raise click.ClickException(f"Could not update {display_path(dest)} because it is not valid JSON: {exc}") from exc
         if not isinstance(settings, dict):
             raise click.ClickException(f"Could not update {display_path(dest)} because it must contain a JSON object.")
-    settings["github.copilot.chat.codeGeneration.useInstructionFiles"] = True
+    settings.setdefault("github.copilot.chat.codeGeneration.useInstructionFiles", True)
     dest.write_text(json.dumps(settings, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
 
@@ -2243,9 +2243,8 @@ def list_cmd(show_all: bool, stale: bool, failed: bool, vectors: str | None, out
 def install_cmd(agent: str, project: bool, uninstall: bool, config_path: str | None):
     """Install docmancer skill files into an AI agent.
 
-    Teaches the agent to call docmancer CLI commands directly. Also registers
-    the local `doc-atlas mcp docs-serve` entry into the agent's MCP config for
-    documentation workflows.
+    Installs the canonical three-tool Docs MCP workflow and registers the local
+    `doc-atlas mcp docs-serve` entry in the agent's MCP config.
 
     AGENT must be one of: claude-code, claude-desktop, cline, cursor, codex,
     codex-app, codex-desktop, gemini, github-copilot, opencode
@@ -2338,8 +2337,8 @@ def install_cmd(agent: str, project: bool, uninstall: bool, config_path: str | N
             installed,
             created_user_config,
             effective_config_path,
-            'Run `doc-atlas query "your question"` to verify retrieval from the CLI.',
-            extra_lines=["Codex will automatically use docmancer commands."],
+            "Start a new Codex session and ask a documentation question to verify get_docs_context routing.",
+            extra_lines=["Codex will automatically use the DocAtlas Docs MCP workflow."],
         )
         return
 
@@ -2456,8 +2455,8 @@ def install_cmd(agent: str, project: bool, uninstall: bool, config_path: str | N
             installed_paths,
             created_user_config,
             effective_config_path,
-            'Run `doc-atlas query "your question"` or restart Gemini if it does not pick up the skill immediately.',
-            extra_lines=["Gemini CLI will automatically use docmancer commands."],
+            "Start a new Gemini session and ask a documentation question to verify get_docs_context routing.",
+            extra_lines=["Gemini CLI will automatically use the DocAtlas Docs MCP workflow."],
         )
         return
 
@@ -2476,8 +2475,8 @@ def install_cmd(agent: str, project: bool, uninstall: bool, config_path: str | N
             installed_paths,
             created_user_config,
             effective_config_path,
-            'Run `doc-atlas query "your question"` to verify retrieval from the CLI.',
-            extra_lines=["OpenCode will automatically use docmancer commands."],
+            "Start a new OpenCode session and ask a documentation question to verify get_docs_context routing.",
+            extra_lines=["OpenCode will automatically use the DocAtlas Docs MCP workflow."],
         )
         return
 

@@ -18,7 +18,7 @@ The installed guidance must say, in client-appropriate syntax:
 
 1. Call `get_docs_context` first for project or dependency documentation questions.
 2. If it returns `next_action`, request any required network/write confirmation and call the exact `prepare_docs` action.
-3. Poll `docs_status` only for a returned job id.
+3. Use `docs_status` only for explicit health, freshness, or index diagnostics, or for a returned job id.
 4. Repeat the original `get_docs_context` question after successful preparation.
 5. Prefer repository code/search for implementation facts and DocAtlas for documentation context; do not use legacy direct tools.
 
