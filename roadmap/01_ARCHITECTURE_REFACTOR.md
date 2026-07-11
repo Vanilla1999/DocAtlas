@@ -2,7 +2,7 @@
 
 ## Status
 
-Started. The first slice extracted Python manifest and lockfile parsing from `docmancer/docs/project.py` into `docmancer/docs/python_project.py` without behavior changes.
+Complete for this task's bounded Node extraction. The first slice extracted Python parsing and this task extracted Node parsing without behavior changes. Cargo/Pub extraction and large-service decomposition remain separate work in tasks 25–27.
 
 ## Goal
 

@@ -1,5 +1,9 @@
 # Task 05 — build a credible Context7 parity evaluation
 
+## Audit status
+
+Partial scaffolding only. The dataset and scorer exist, but no runner captures the DocAtlas side and the current relevance/coverage protocol can produce misleading results. Task 18 supersedes the unfinished acceptance work.
+
 ## Problem
 
 Current saved snapshots have only two or three queries per library. Perfect Hit@1 on that sample is a regression signal, not proof of parity.

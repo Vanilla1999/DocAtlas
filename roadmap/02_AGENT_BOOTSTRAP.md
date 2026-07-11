@@ -1,5 +1,9 @@
 # Task 02 — make agent bootstrap automatic and compact
 
+## Audit status
+
+Complete for `doc-atlas install <agent> --project`. The hero installer still does not install this project bootstrap; task 21 owns that integration and live tool-selection proof.
+
 ## Problem
 
 `doc-atlas agent-contract` exists, but a coding agent does not necessarily run it when it first opens a repository. Tool availability alone is not sufficient: existing task-level experiments showed zero optional adoption in some runs.

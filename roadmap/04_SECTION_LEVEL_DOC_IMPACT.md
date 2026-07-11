@@ -1,5 +1,9 @@
 # Task 04 — improve docs impact from files to sections
 
+## Audit status
+
+Partial. Section metadata is written and the CLI reports section impact, but the stored index metadata is not consumed and CI does not derive changed symbols automatically. Task 20 owns the residual work.
+
 ## Problem
 
 `doc-atlas docs-impact` maps changed files to maintained documents. It cannot yet say which heading or documented claim may be stale.

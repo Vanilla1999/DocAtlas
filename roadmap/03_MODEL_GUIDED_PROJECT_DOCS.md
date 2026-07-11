@@ -1,5 +1,9 @@
 # Task 03 — guide the coding model when project docs are missing
 
+## Audit status
+
+Partial. The handoff exists, but `evidence_complete` can be true when required architectural evidence is still missing. Task 19 owns per-section completeness and missing-evidence reporting.
+
 ## Product decision
 
 DocAtlas does not author official project documentation. It detects documentation gaps and gives the host coding model a bounded instruction for creating or updating normal reviewable files. After the file is accepted, DocAtlas indexes it.
