@@ -100,29 +100,10 @@ For repository-specific questions, agents should call `get_docs_context(project_
 
 If the user asks broadly about "the MCP server", distinguish the two surfaces explicitly:
 
-- **Docs MCP server:** `doc-atlas mcp docs-serve` provides documentation/project/dependency context tools such as `get_library_docs` and `get_project_context`.
+- **Docs MCP server:** `doc-atlas mcp docs-serve` exposes exactly `get_docs_context`, `prepare_docs`, and `docs_status` for the default documentation workflow.
 - **MCP Packs runtime:** `doc-atlas mcp packs-serve` exposes installed API action packs through `docmancer_search_tools` and `docmancer_call_tool`; `serve` is a compatibility alias.
 
-The server exposes the following tools:
-
-### Library docs tools
-- **`resolve_library_id`** — Resolve a library from the registry or explicit `docs_url`. Returns source/version metadata. Never requires WebFetch for registered sources.
-- **`get_library_docs`** — Resolve, ingest or refresh if needed, then query local documentation. Returns compact context pack with full source identity, version provenance, docs policy (WebFetch rules), and diagnostics. Registered sources do not require `docs_url` on later calls.
-- **`refresh_library_docs`** — Refresh one library/version. Supports multi-version refresh.
-- **`prefetch_library_docs`** — Download and index one or more versions ahead of time.
-- **`inspect_library_docs`** — Inspect one exact documentation target by canonical ID. Returns size, staleness, version provenance.
-- **`remove_library_docs`** — Remove one exact target by canonical ID. Deletes index and registry entry.
-- **`prune_library_docs`** — Prune old documentation targets with dry-run support.
-- **`list_library_docs`** — List locally registered libraries, optionally filtered by stale-only.
-
-### Project docs tools
-- **`inspect_project_docs`** — Read-only discovery of project-owned docs candidates and exact dependency metadata. Returns recommended next actions (ingest project docs, prefetch dependency docs, or create architecture doc).
-- **`ingest_project_docs`** — Index discovered project-owned docs files (README, docs/, wiki/, ARCHITECTURE, ADR, roadmap). Does not ingest source code, dependency directories, or build outputs.
-- **`get_project_docs`** — Query indexed project-owned docs with project-scoped filters. Returns results with staleness indicators; if docs are missing, returns structured next actions instead of a generic failure.
-- **`prefetch_project_docs`** — Read project manifests/lockfiles and prefetch exact dependency documentation. Supports Flutter SDK docs, pub.dev Dartdoc, and docs.rs bindings.
-
-### Manifest tools
-- **`validate_docs_manifest`** — Validate a `docmancer.docs.yaml` manifest without fetching. Checks target structure, URL security, duplicate IDs, source types, and project-version resolution.
+Legacy direct library/project tools remain internal compatibility paths. They are not a public routing contract for agents; see [Docs MCP server](../docs/mcp-docs-server.md) for the current tool contract.
 - **`prefetch_docs_manifest`** — Validate and prefetch all targets declared in a `docmancer.docs.yaml`.
 
 ### Prefetch and job tools
@@ -285,18 +266,18 @@ Per-library locks (`filelock`-based under `~/.docmancer/locks/`) serialize refre
 Docs (library):
   GitBook / Mintlify / web / GitHub / local files
     -> SQLite FTS5 sections + Qdrant vectors (per-library index)
-    -> doc-atlas query / get_library_docs
+    -> get_docs_context
     -> context pack + token savings + version provenance
 
 Docs (project-aware):
   Repo files: README, docs/, wiki/, ADR, ARCHITECTURE, roadmap
     -> SHA-256 content hash, staleness check
-    -> ingest_project_docs / get_project_docs
+    -> prepare_docs(sync_project_docs) / get_docs_context
     -> project-scoped context pack + stale indicators + next actions
 
   Dependencies: pubspec.lock, Cargo.lock, .fvmrc
     -> exact version resolution
-    -> prefetch_project_docs / get_library_docs(project_path=...)
+    -> prepare_docs when get_docs_context returns next_action
     -> version-pinned docs from pub.dev Dartdoc / docs.rs / api.flutter.dev
 
 Manifest:

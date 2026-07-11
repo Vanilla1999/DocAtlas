@@ -38,6 +38,8 @@ curl -LsSf https://raw.githubusercontent.com/Vanilla1999/DocAtlas/main/scripts/i
 
 The installer sets up `uv` (if missing), runs `uv tool install --upgrade doc-atlas`, then lets you pick which agent(s) to register the DocAtlas docs MCP server (`doc-atlas mcp docs-serve`) into — **Claude Code**, **OpenCode**, and/or **Codex** — and finishes with a version/health check. It is idempotent, so re-running it is safe.
 
+> It installs the latest published PyPI package, not unreleased code from `main`. Check `doc-atlas --version` before relying on a workflow newly documented on `main`; use a deliberately checked-out source installation for development changes that have not been released.
+
 Non-interactive (CI or scripted) usage — pass the agent(s) via env var or positional args:
 
 ```bash
@@ -159,7 +161,7 @@ MCP Packs are an advanced layer of version-pinned API action tools, exposed by `
 
 Patch planning and patch constraints are advanced compatibility tools behind `DOCMANCER_MCP_ADVANCED_TOOLS=1`. They are advisory: they help an agent gather evidence and validate a proposed edit, but never prove that a change is safe to merge or replace tests and review. Detailed usage lives in [the Docs MCP reference](./docs/mcp-docs-server.md).
 
-Internal and compatibility CLI commands remain supported, but are intentionally kept out of the beginner path. See the [capability reference](./docs/capabilities.md) when you need a CLI fallback, diagnostics, benchmark tooling, Qdrant management, USPTO ingestion, or Pack administration. The explicit product boundaries and evidence rules are in [Product scope and evidence](./docs/product-scope.md).
+Internal and compatibility CLI commands remain supported, but are intentionally kept out of the beginner path. See the [capability reference](./docs/capabilities.md) when you need a CLI fallback, diagnostics, benchmark tooling, Qdrant management, USPTO ingestion, or Pack administration. The explicit product boundaries and evidence rules are in [the product brief](./docs/DOCMANCER_PRODUCT_BRIEF.md).
 
 ## Project-aware exact dependency docs
 

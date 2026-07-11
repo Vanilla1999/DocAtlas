@@ -1,13 +1,13 @@
 # Troubleshooting
 
-Common issues when installing or running docmancer. See also [Architecture](./Architecture.md), [Configuration](./Configuration.md), and [Install Targets](./Install-Targets.md).
+Common issues when installing or running DocAtlas. See also [Configuration](./Configuration.md), [Install Targets](./Install-Targets.md), and the [Docs MCP reference](../docs/mcp-docs-server.md).
 
-## `pip install` succeeds, but `docmancer` is `command not found`
+## `pipx install doc-atlas` succeeds, but `doc-atlas` is `command not found`
 
 This usually means the scripts directory is not on your `PATH`. The install output will show the path:
 
 ```text
-WARNING: The script docmancer is installed in '/Users/your-user/Library/Python/3.13/bin' which is not on PATH.
+WARNING: The script doc-atlas is installed in '/Users/your-user/.local/bin' which is not on PATH.
 ```
 
 Recommended fix:
@@ -15,7 +15,7 @@ Recommended fix:
 ```bash
 brew install pipx
 pipx ensurepath
-pipx install docmancer --python python3.13
+pipx install doc-atlas --python python3.13
 ```
 
 Or confirm the install by running the script directly:
@@ -24,19 +24,19 @@ Or confirm the install by running the script directly:
 ~/Library/Python/3.13/bin/doc-atlas doctor
 ```
 
-## `pipx install docmancer` says `No matching distribution found`
+## `pipx install doc-atlas` says `No matching distribution found`
 
-This means `pipx` picked an unsupported Python version. docmancer requires Python 3.11-3.13.
+This means `pipx` picked an unsupported Python version. DocAtlas requires Python 3.11-3.13.
 
 ```bash
-pipx install docmancer --python python3.13
+pipx install doc-atlas --python python3.13
 ```
 
 If Python 3.13 is not installed:
 
 ```bash
 brew install python@3.13
-pipx install docmancer --python python3.13
+pipx install doc-atlas --python python3.13
 ```
 
 ## `pipx install` fails: Apple Silicon / architecture mismatch
@@ -44,13 +44,13 @@ pipx install docmancer --python python3.13
 On macOS, `pipx` and Python can end up on different architectures (`arm64` vs `x86_64`). Use the native Homebrew Python explicitly:
 
 ```bash
-pipx install docmancer --python /opt/homebrew/bin/python3.13
+pipx install doc-atlas --python /opt/homebrew/bin/python3.13
 ```
 
 If needed:
 
 ```bash
-arch -arm64 pipx install docmancer --python /opt/homebrew/bin/python3.13
+arch -arm64 pipx install doc-atlas --python /opt/homebrew/bin/python3.13
 ```
 
 ## `doc-atlas doctor` crashes with `pydantic_core` or architecture error
@@ -71,7 +71,7 @@ docmancer requires SQLite with FTS5 support. Most Python distributions include i
 
 ```bash
 brew install python@3.13
-pipx install docmancer --python /opt/homebrew/bin/python3.13
+pipx install doc-atlas --python /opt/homebrew/bin/python3.13
 ```
 
 ## `doc-atlas add` hangs or returns empty content for a JS-heavy site
@@ -82,11 +82,11 @@ Some documentation sites rely on client-side JavaScript to render content. If `d
 doc-atlas add <url> --browser
 ```
 
-This requires the `browser` optional dependency: `pip install docmancer[browser]`.
+This requires the `browser` optional dependency: `pip install 'doc-atlas[browser]'`.
 
-## Agent does not know about docmancer commands
+## Agent does not use the Docs MCP workflow
 
-Re-run `doc-atlas setup` or `doc-atlas install <target>` to update the skill file. Older skill installations may not include newer commands. See [Install Targets](./Install-Targets.md) for where skills land.
+Confirm that the agent is registered with `doc-atlas mcp docs-serve`. The first tool for documentation questions is `get_docs_context`; follow a returned `prepare_docs` action and use `docs_status` only for returned jobs or explicit health/freshness requests. See [Docs MCP server](../docs/mcp-docs-server.md).
 
 ## MCP packs
 

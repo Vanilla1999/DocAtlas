@@ -63,24 +63,15 @@ Reference for the main Docmancer Docs runtime commands, vector lifecycle command
 
 ## Docs MCP server
 
-`doc-atlas mcp docs-serve` runs the local, version-aware documentation MCP server. Agents use it to resolve registered library docs, fetch or refresh stale docs, prefetch project dependencies, and query compact context packs without leaving their tool loop.
+`doc-atlas mcp docs-serve` runs the local Docs MCP server. Find the command with `doc-atlas --help` followed by `doc-atlas mcp --help`.
 
-Core docs MCP tools include:
+Its public workflow has exactly three tools:
 
-- `resolve_library_id`
-- `get_library_docs`
-- `refresh_library_docs`
-- `prefetch_library_docs`
-- `prefetch_project_docs`
-- `prefetch_docs_targets`
-- `prefetch_docs_manifest`
-- `list_library_docs`
-- `inspect_library_docs`
-- `get_docs_job_status`
-- `list_docs_jobs`
-- `cancel_docs_job`
+- `get_docs_context` — first documentation question;
+- `prepare_docs` — a returned or explicitly approved sync/prefetch action;
+- `docs_status` — a returned job, health, or freshness request.
 
-Register unknown docs with an explicit `docs_url` or `docs_url_template`; later queries can use the stored registry entry without repeating the URL. Versioned entries use canonical ids such as `pub:go_router@14.8.1:api` and expose source/version metadata in responses.
+The normal sequence is `get_docs_context → prepare_docs when returned → retry get_docs_context`. See [Docs MCP server](../docs/mcp-docs-server.md) for the canonical contract. Legacy direct docs APIs may exist for compatibility but are not the default agent workflow.
 
 ## MCP pack commands
 
