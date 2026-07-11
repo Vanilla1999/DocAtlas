@@ -25,6 +25,8 @@ FORBIDDEN_LEGACY_COMMANDS = [
     "docmancer doctor",
     "docmancer setup",
     "docmancer qdrant",
+    "pipx install docmancer",
+    "pip install docmancer",
 ]
 
 

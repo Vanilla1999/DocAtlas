@@ -9,7 +9,7 @@ tags:
   - local-first
   - knowledge-base
   - sqlite
-install: pipx install docmancer --python python3.13
+install: pipx install doc-atlas --python python3.13
 ---
 
 # Documentation context runtime for coding agents
