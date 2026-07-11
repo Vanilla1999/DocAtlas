@@ -28,5 +28,5 @@ Make local documentation context the default product and keep other systems clea
 
 - A new user can explain the core product after reading the first README screen.
 - Beginner docs show one Docs workflow and no Packs details above the advanced section.
-- At least three differentiating task fixtures pass fairness screening.
+- At least three materialized real-project differentiation candidates pass fixture validation and fairness screening. Difficulty screening decides whether a candidate may set `differentiating=true`; candidates rejected as too easy must stay non-differentiating and cannot support product claims.
 - Product claims map to a named benchmark metric.

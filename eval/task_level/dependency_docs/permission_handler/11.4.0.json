@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "library": "permission_handler",
+  "version": "11.4.0",
+  "captured_at": "2026-07-11",
+  "sources": [
+    "https://pub.dev/documentation/permission_handler/11.4.0/permission_handler/PermissionStatus.html",
+    "https://pub.dev/documentation/permission_handler/11.4.0/permission_handler/Permission-class.html"
+  ],
+  "facts": {
+    "PermissionStatus.values": [
+      "denied",
+      "granted",
+      "restricted",
+      "limited",
+      "permanentlyDenied",
+      "provisional"
+    ],
+    "Permission.members": [
+      "locationAlways",
+      "notification"
+    ]
+  }
+}

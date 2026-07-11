@@ -8,7 +8,7 @@
 [![License: MIT](https://img.shields.io/github/license/Vanilla1999/DocAtlas?style=for-the-badge)](https://github.com/Vanilla1999/DocAtlas/blob/main/LICENSE)
 [![Python 3.11 | 3.12 | 3.13](https://img.shields.io/badge/python-3.11%20|%203.12%20|%203.13-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://pypi.org/project/doc-atlas/)
 
-[Quickstart](#quickstart) | [Project docs](#project-docs-mcp-server) | [Commands](./docs/commands.md)
+[Install](#one-line-install) | [Docs MCP](#project-docs-mcp-server) | [Advanced surfaces](#advanced-surfaces) | [CLI reference](./docs/capabilities.md#end-to-end-examples-of-current-behavior)
 
 </div>
 
@@ -16,13 +16,17 @@
 
 DocAtlas turns reviewable project docs, lockfiles, and dependency documentation into compact, source-attributed context for coding agents. Its default MCP surface is deliberately small so agents select the correct operation reliably.
 
-The default path for repository work is:
+The primary journey is:
+
+```text
+install → get_docs_context → follow a returned prepare_docs action when needed → answer with sources
+```
+
+For a normal repository question, the agent starts with `get_docs_context`. If it returns a `prepare_docs` next action, the agent follows it, retries the question, and cites the selected project or dependency sources. This is the product's default workflow.
 
 ```text
 get_docs_context → follow a returned prepare_docs action when needed → retry get_docs_context
 ```
-
-Advanced patch-planning and constraint tools remain available behind `DOCMANCER_MCP_ADVANCED_TOOLS=1`. Their output is advisory and does not replace tests or human review.
 
 ## One-line install
 
@@ -64,42 +68,6 @@ Some internal Python modules, storage paths, and older documentation may still u
 
 Use `doc-atlas ...` for user-facing commands in new documentation. Configuration files may still be named `docmancer.yaml` for compatibility.
 
-## Quickstart
-
-```bash
-doc-atlas list                        # see indexed docs
-doc-atlas ingest ./docs               # index local files
-doc-atlas add https://docs.example.com
-doc-atlas query "how to authenticate"
-```
-
-`query` prints estimated raw docs tokens, context-pack tokens, percent saved, and agentic runway:
-
-```text
-Context pack: ~900 tokens vs ~4800 raw docs (81.2% less overhead, 5.33x agentic runway)
-```
-
-Prefer the compact default. Use `--expand` for adjacent sections and `--expand page` only when the whole page is necessary.
-
-## Core commands
-
-```bash
-doc-atlas setup
-doc-atlas ingest ./docs
-doc-atlas add https://docs.example.com
-doc-atlas update
-doc-atlas query "how to authenticate"
-doc-atlas query "how to authenticate" --limit 10
-doc-atlas query "how to authenticate" --expand
-doc-atlas query "how to authenticate" --expand page
-doc-atlas query "how to authenticate" --format json
-doc-atlas list
-doc-atlas inspect
-doc-atlas remove <source>
-doc-atlas doctor
-doc-atlas fetch <url> --output <dir>
-```
-
 ## Project-docs MCP server
 
 DocAtlas exposes its local project-constraint and documentation runtime through an MCP docs server:
@@ -126,40 +94,7 @@ get_docs_context(question=..., project_path=...)
 → retry get_docs_context(...)
 ```
 
-This makes `get_docs_context` the single high-level entry point. To expose low-level inspection and patch-contract compatibility tools, set `DOCMANCER_MCP_ADVANCED_TOOLS=1`:
-
-```text
-get_docs_context
-→ get_patch_plan_context
-→ get_patch_constraints
-→ edit
-→ validate_patch_against_constraints
-```
-
-`get_patch_plan_context` is a source/dependency/design evidence map for implementation planning. It is not a docs retriever, not a patch generator, and not a constraints validator. Use `get_patch_constraints` separately before editing, then call `validate_patch_against_constraints` after the patch. The workflow is advisory and non-blocking; it does not prove merge safety.
-
-Expected result summary for a Flutter menu planning task: exact relevant files for menu/system/tabs code, `showBottomDialog: not_found`, `PBBottomSheet.open` found in dependency source, a minimal patch path for replacing the inline menu with a bottom sheet, and `verification` including `flutter analyze`. See [`docs/mcp-docs-server.md`](./docs/mcp-docs-server.md) for the example call.
-
-Non-goals: `get_patch_plan_context` does not generate a patch, does not guarantee safe merge, does not index the whole `.pub-cache`, does not replace code reading by the agent, and does not replace constraints validation.
-
-For coding/API/command questions, tools accept `response_style` with `auto`, `snippet-first`, or `evidence-first`. In `auto`, DocAtlas returns a trusted `primary_snippet` first when the selected sources contain a usable code/config/command example, while preserving `context_pack`, source attribution, exact-version diagnostics, and the Trust Contract. Snippets are extracted from indexed documentation; DocAtlas does not synthesize code.
-
-```json
-{
-  "question": "How do I use FastAPI Depends?",
-  "library": "fastapi",
-  "response_style": "snippet-first"
-}
-```
-
-Explicit lifecycle requests can route directly through the public unified tool.
-
-```text
-prepare_docs(action="sync_project_docs", project_path=..., with_vectors=true)  # discover + reconcile + index
-get_docs_context(project_path=..., question=..., mode="project")               # compact grounded context
-```
-
-MCP Packs are an advanced layer for version-pinned API action tools exposed by `doc-atlas mcp packs-serve`. They are useful when an agent needs executable external API operations. They are not an alternative to the three-tool Docs MCP workflow. `doc-atlas mcp serve` remains a compatibility alias for the Packs gateway.
+This makes `get_docs_context` the single high-level entry point. For coding/API/command questions, it accepts `response_style=auto`, `snippet-first`, or `evidence-first`; snippets are extracted from indexed sources and retain attribution.
 
 `prepare_docs(action="sync_project_docs")` replaces the old two-step `inspect → ingest` loop. It:
 1. discovers current candidates from the filesystem;
@@ -217,6 +152,14 @@ doc-atlas agent-contract --project-path . --format markdown
 ```
 
 The contract is read-only. For an explicit health, freshness, index, or job-status request, agents use `docs_status`; otherwise they start with `get_docs_context`. Agents call `prepare_docs` only when that tool returns it as `next_action`, or when a user explicitly requests a refresh or sync.
+
+## Advanced surfaces
+
+MCP Packs are an advanced layer of version-pinned API action tools, exposed by `doc-atlas mcp packs-serve`. They are separate from the Docs MCP and are not needed for the workflow above. `doc-atlas mcp serve` is retained only as a compatibility alias.
+
+Patch planning and patch constraints are advanced compatibility tools behind `DOCMANCER_MCP_ADVANCED_TOOLS=1`. They are advisory: they help an agent gather evidence and validate a proposed edit, but never prove that a change is safe to merge or replace tests and review. Detailed usage lives in [the Docs MCP reference](./docs/mcp-docs-server.md).
+
+Internal and compatibility CLI commands remain supported, but are intentionally kept out of the beginner path. See the [capability reference](./docs/capabilities.md) when you need a CLI fallback, diagnostics, benchmark tooling, Qdrant management, USPTO ingestion, or Pack administration. The explicit product boundaries and evidence rules are in [Product scope and evidence](./docs/product-scope.md).
 
 ## Project-aware exact dependency docs
 
