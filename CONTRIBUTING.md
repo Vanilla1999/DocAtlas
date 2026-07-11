@@ -8,16 +8,14 @@ Thank you for contributing! This guide covers project layout and common extensio
 
 ```text
 docmancer/
-  agent.py              # DocmancerAgent; parser registry (_PARSERS); component wiring
+  agent.py              # DocmancerAgent compatibility facade and component wiring
   core/
     config.py           # DocmancerConfig (pydantic-settings)
     models.py           # Document, Chunk, RetrievedChunk
     chunking.py         # Text/markdown chunking
-  connectors/
-    fetchers/           # GitBook and other doc sources (base + gitbook)
-    embeddings/         # Embedding backends (FastEmbed)
-    parsers/            # Document loaders (text, markdown)
-    vector_stores/      # Qdrant store
+  connectors/           # Fetchers, document parsing, and optional retrieval backends
+  docs/                 # Project/library documentation application and domain services
+  mcp/                  # Docs MCP and advanced compatibility runtime
   cli/
     commands.py         # Click commands
     __main__.py         # CLI entry point
@@ -29,17 +27,9 @@ tests/                  # pytest tests (mirror docmancer/ where useful)
 1. Implement a loader subclassing `BaseLoader` in `docmancer/connectors/parsers/`.
 2. Register the file extension in `_PARSERS` in `docmancer/agent.py` (dotted import path to the class).
 
-## Adding a new embedding provider
+## Documentation MCP changes
 
-1. Implement the dense (and if needed sparse) API following `docmancer/connectors/embeddings/base.py`.
-2. Extend the `embedding.provider` branch in `DocmancerAgent._init_components()` in `docmancer/agent.py`.
-3. Extend `DocmancerConfig` / YAML schema in `docmancer/core/config.py` if new settings are required.
-4. Add optional dependencies in `pyproject.toml` if the provider needs extra packages.
-
-## Adding a new vector store
-
-1. Implement `BaseVectorStore` in `docmancer/connectors/vector_stores/`.
-2. Extend the `vector_store.provider` branch in `DocmancerAgent._init_components()` and add config fields as needed.
+Keep the public Docs MCP inventory to `get_docs_context`, `prepare_docs`, and `docs_status`. Repository files are the source of truth; DocAtlas may index accepted docs but must not silently author or commit them. Read [the canonical Docs MCP reference](./docs/mcp-docs-server.md) before changing this boundary.
 
 ## Adding a new doc source (fetcher)
 

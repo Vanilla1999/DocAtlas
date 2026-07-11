@@ -64,6 +64,8 @@ PUBLIC_COMMAND_HELP_CASES = [
     ("docs-impact", ["doc-atlas docs-impact --base origin/main", "--changed-file"]),
     ("agent-contract", ["doc-atlas agent-contract --project-path .", "--format json"]),
     ("remove", ["doc-atlas remove"]),
+    ("mcp", ["docs-serve", "packs-serve"]),
+    ("qdrant", ["status", "upgrade"]),
 ]
 
 
@@ -73,7 +75,7 @@ def test_cli_help():
     assert "Compress documentation context" in result.output
     assert "add" in result.output
     assert "setup" in result.output
-    assert "mcp" not in result.output
+    assert "mcp" in result.output
 
 
 def test_docs_impact_cli_returns_machine_readable_report(tmp_path):

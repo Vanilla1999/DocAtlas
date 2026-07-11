@@ -299,14 +299,12 @@ def test_mcp_docs_server_documents_index_and_smoke_test_loop():
     docs = Path(__file__).resolve().parents[2] / "docs" / "mcp-docs-server.md"
     text = docs.read_text(encoding="utf-8")
 
-    assert "## Maintained docs index and verification" in text
-    assert "docs/INDEX.md" in text
-    assert "canonical map of official project-owned docs" in text
-    assert "inspect_project_docs(project_path)" in text
+    assert "## Project documentation" in text
+    assert "get_docs_context" in text
     assert "prepare_docs(action=\"sync_project_docs\"" in text
-    assert "confirm expected files appear" in text
-    assert "indexed_source_not_discovered" in text
-    assert "Treat maintained `docs/INDEX.md` as the canonical map" in text
+    assert "## Response and source rules" in text
+    assert "docs_status" in text
+    assert "does not generate or commit official documentation" in text
 
 
 def test_mcp_exposes_docs_job_tools():

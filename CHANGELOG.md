@@ -8,6 +8,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 
+- **Three-tool Docs MCP workflow:** documented and tested `get_docs_context`, `prepare_docs`, and `docs_status` as the only public Docs MCP tools; lifecycle work now follows an explicit returned action instead of a legacy direct-tool workflow.
+- **Project documentation sync and guidance:** added model-guided missing-doc handoff, accepted-file sync, compact agent contracts, and source-attributed project documentation context.
+- **Project dependency evidence:** added npm/Node and Python dependency/lockfile detection alongside existing project metadata support, with exactness diagnostics rather than silent latest-version claims.
+- **Documentation impact CI:** added `doc-atlas docs-impact` reporting for changed code paths and maintained documentation review.
+- **External-ingest job foundations:** added background job status, staging publication, GitHub-source handling, and structured diagnostics for external documentation acquisition.
 - **MCP Packs gateway alias:** added `doc-atlas mcp packs-serve` as the explicit advanced API-pack gateway command while keeping `doc-atlas mcp serve` as a compatibility alias.
 - **MCP boundary contracts:** added structured MCP error payloads with legacy top-level compatibility fields and debug-gated tracebacks.
 - **MCP output compaction contract:** added shared output-mode normalization, bounded compact payload summaries, and pagination guidance for oversized context responses.
@@ -15,6 +20,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Fixed
 
+- **Public CLI discoverability:** `doc-atlas mcp` is visible from root help, matching the documented Docs MCP command.
 - **MCP compact evidence retention:** oversized compact responses now keep useful context summaries and truncation metadata instead of dropping all context evidence.
 - **MCP handler compatibility:** direct sub-service handler calls retain facade fallback for existing scripts, tests, and clients.
 
