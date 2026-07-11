@@ -1,10 +1,12 @@
 {
   "schema_version": 1,
-  "purpose": "Three materialized real-project differentiation candidates whose requirements span project docs, lockfiles, and dependency docs. All three have validated fixtures and fairness reviews; their repo-only screening rejected them as too easy, so they are designs/evidence infrastructure rather than proof that DocAtlas wins.",
+  "purpose": "Three materialized real-project differentiation candidates whose requirements span project docs, lockfiles, and an exact-version dependency-doc artifact. All three have validated fixtures and fairness reviews; their repo-only screening rejected them as too easy, so differentiating remains false and they cannot support a product-win claim.",
   "tasks": [
     {
       "task_id": "decisive_nbo_generated_policy_source_001",
-      "required_context": ["lib/modules/permission/ARCHITECTURE.md", "docs/generated-source.md", "pubspec.lock", "permission_handler 11.4.0 docs"],
+      "required_context": ["lib/modules/permission/ARCHITECTURE.md", "docs/generated-source.md", "pubspec.lock", "eval/task_level/dependency_docs/permission_handler/11.4.0.json"],
+      "differentiation_candidate": true,
+      "differentiating": false,
       "fixture_status": "validated",
       "fairness_status": "passed",
       "selection_status": "rejected_too_easy",
@@ -14,12 +16,15 @@
         "validation": "eval/task_level/validation/decisive_nbo_generated_policy_source_001.json",
         "fairness_review": "eval/task_level/results/task_fairness_review/decisive_nbo_generated_policy_source_001.md",
         "hidden_tests": "eval/task_level/hidden_tests/decisive_nbo_generated_policy_source_001",
-        "gold_patch": "eval/task_level/oracles/decisive_nbo_generated_policy_source_001.patch"
+        "gold_patch": "eval/task_level/oracles/decisive_nbo_generated_policy_source_001.patch",
+        "dependency_docs": "eval/task_level/dependency_docs/permission_handler/11.4.0.json"
       }
     },
     {
       "task_id": "decisive_nbo_permission_handler_version_001",
-      "required_context": ["lib/modules/permission/ARCHITECTURE.md", "docs/dependencies.md", "pubspec.lock", "permission_handler 11.4.0 docs"],
+      "required_context": ["lib/modules/permission/ARCHITECTURE.md", "docs/dependencies.md", "pubspec.lock", "eval/task_level/dependency_docs/permission_handler/11.4.0.json"],
+      "differentiation_candidate": true,
+      "differentiating": false,
       "fixture_status": "validated",
       "fairness_status": "passed",
       "selection_status": "rejected_too_easy",
@@ -29,12 +34,15 @@
         "validation": "eval/task_level/validation/decisive_nbo_permission_handler_version_001.json",
         "fairness_review": "eval/task_level/results/task_fairness_review/decisive_nbo_permission_handler_version_001.md",
         "hidden_tests": "eval/task_level/hidden_tests/decisive_nbo_permission_handler_version_001",
-        "gold_patch": "eval/task_level/oracles/decisive_nbo_permission_handler_version_001.patch"
+        "gold_patch": "eval/task_level/oracles/decisive_nbo_permission_handler_version_001.patch",
+        "dependency_docs": "eval/task_level/dependency_docs/permission_handler/11.4.0.json"
       }
     },
     {
       "task_id": "decisive_nbo_browser_scan_policy_001",
-      "required_context": ["lib/modules/permission/ARCHITECTURE.md", "docs/browser-scan-preflight.md", "pubspec.lock", "permission_handler 11.4.0 docs"],
+      "required_context": ["lib/modules/permission/ARCHITECTURE.md", "docs/browser-scan-preflight.md", "pubspec.lock", "eval/task_level/dependency_docs/permission_handler/11.4.0.json"],
+      "differentiation_candidate": true,
+      "differentiating": false,
       "fixture_status": "validated",
       "fairness_status": "passed",
       "selection_status": "rejected_too_easy",
@@ -44,7 +52,8 @@
         "validation": "eval/task_level/validation/decisive_nbo_browser_scan_policy_001.json",
         "fairness_review": "eval/task_level/results/task_fairness_review/decisive_nbo_browser_scan_policy_001.md",
         "hidden_tests": "eval/task_level/hidden_tests/decisive_nbo_browser_scan_policy_001",
-        "gold_patch": "eval/task_level/oracles/decisive_nbo_browser_scan_policy_001.patch"
+        "gold_patch": "eval/task_level/oracles/decisive_nbo_browser_scan_policy_001.patch",
+        "dependency_docs": "eval/task_level/dependency_docs/permission_handler/11.4.0.json"
       }
     }
   ]
