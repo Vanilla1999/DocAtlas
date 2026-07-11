@@ -33,6 +33,19 @@ The installed guidance must say, in client-appropriate syntax:
 7. Cover scenarios for local docs present/missing/stale, exact library present/missing, job polling, implementation-only code search, network confirmation, invalid prepare payload, and unrelated questions.
 8. Commit sanitized per-scenario results and model/tool-schema versions. Keep live evaluation opt-in; deterministic schema/fixture tests remain in CI.
 
+Run the opt-in gate with:
+
+```bash
+OPENAI_API_KEY=... python -m docmancer.docs.tool_choice_eval \
+  --model <low-cost-model> \
+  --output eval/results/task21_tool_choice_gate.json
+```
+
+The command reads the canonical installed guidance and the actual public MCP
+schemas, writes only sanitized decisions, and exits non-zero when a frozen
+threshold fails. The committed report must remain explicitly failed/not-run
+until a credentialed run replaces it; absence of a live result is never a pass.
+
 ## Decision metrics
 
 - first-tool accuracy;

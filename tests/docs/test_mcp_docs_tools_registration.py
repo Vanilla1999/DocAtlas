@@ -257,25 +257,19 @@ def test_mcp_exposes_get_project_context_with_trust_contract():
 
 
 def test_agent_templates_include_three_tool_selection_guidance():
-    template_dir = Path(__file__).resolve().parents[2] / "docmancer" / "templates"
+    from docmancer.cli.commands import _get_template_content
 
-    for name in ("skill.md", "claude_code_skill.md", "claude_desktop_skill.md"):
-        text = (template_dir / name).read_text(encoding="utf-8")
-        assert "Project Docs Discovery with MCP" in text
-        assert "get_docs_context(project_path=\".\"" in text
-        assert "expects Context7-like help" in text
-        assert "prepare_docs(action=\"sync_project_docs\")" in text
-        assert "get_docs_context(mode=\"project\")" in text
-        assert "`docs_status` is only for explicit" in text
-        assert "prepare_docs(action=\"prefetch_project_dependency_docs\")" in text
-        assert "Official project docs should remain files in the repo" in text
-        assert "Do not skip `get_docs_context`" in text
-        assert "Do not call `prepare_docs` speculatively" in text
-        assert "docs/INDEX.md" in text
-        assert "canonical map of project-owned docs" in text
-        assert "verification loop" in text
-        assert "confirm expected files are cited" in text
-        assert "not an alternative documentation workflow" in text
+    for name in (
+        "skill.md", "claude_code_skill.md", "claude_desktop_skill.md",
+        "cursor_agents_md.md", "copilot_instructions.md", "project_bootstrap.md",
+    ):
+        text = _get_template_content(name)
+        assert "get_docs_context" in text
+        assert "prepare_docs" in text
+        assert "docs_status" in text
+        assert "retry the original `get_docs_context` question unchanged" in text
+        assert "repository code search" in text
+        assert "legacy direct documentation tools" in text
 
 
 def test_project_docs_workflow_documents_index_template_and_verification_loop():

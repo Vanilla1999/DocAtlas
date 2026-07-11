@@ -24,7 +24,11 @@ class AgentTarget:
 def known_agents(*, project: bool = False) -> list[AgentTarget]:
     home = Path.home()
     targets = [
-        AgentTarget("claude-code", home / ".claude" / "settings.json", "json_mcpServers"),
+        AgentTarget(
+            "claude-code",
+            Path(".mcp.json") if project else home / ".claude" / "settings.json",
+            "json_mcpServers",
+        ),
         AgentTarget(
             "cursor",
             Path(".cursor") / "mcp.json" if project else home / ".cursor" / "mcp.json",
@@ -47,6 +51,8 @@ def known_agents(*, project: bool = False) -> list[AgentTarget]:
             Path("opencode.json") if project else home / ".config" / "opencode" / "opencode.json",
             "json_opencode_mcp",
         ),
+        AgentTarget("cline", Path(".cline") / "mcp.json" if project else home / ".cline" / "mcp.json", "json_mcpServers"),
+        AgentTarget("gemini", Path(".gemini") / "mcp.json" if project else home / ".gemini" / "mcp.json", "json_mcpServers"),
     ])
     if project:
         targets.append(AgentTarget("github-copilot", Path(".vscode") / "mcp.json", "json_vscode_servers"))
@@ -87,6 +93,10 @@ def register_server(target: AgentTarget) -> tuple[bool, str]:
     existing = servers.get(SERVER_KEY)
     if existing == desired or _matches_command(existing, desired):
         return False, f"already registered in {target.config_path}"
+    if existing is not None and not _is_legacy_docmancer_entry(existing, target.style):
+        raise ValueError(
+            f"Existing MCP server {SERVER_KEY!r} in {target.config_path} has a different command; refusing to overwrite it."
+        )
     servers[SERVER_KEY] = {**(existing or {}), **desired}
     _backup_and_write(target.config_path, config)
     return True, f"registered docmancer in {target.config_path}"
@@ -96,7 +106,26 @@ def unregister_server(target: AgentTarget) -> bool:
     if not target.config_path.exists():
         return False
     if target.style == "toml_mcp_servers":
-        return False
+        text = target.config_path.read_text(encoding="utf-8")
+        config = tomllib.loads(text) if text.strip() else {}
+        existing = config.get("mcp_servers", {}).get(SERVER_KEY)
+        if not _matches_command(existing, {"command": COMMAND, "args": list(ARGS)}):
+            return False
+        lines = text.splitlines(keepends=True)
+        header = f"[mcp_servers.{SERVER_KEY}]"
+        nested_header_prefix = f"[mcp_servers.{SERVER_KEY}."
+        start = next((i for i, line in enumerate(lines) if line.strip() == header), None)
+        if start is None:
+            return False
+        end = start + 1
+        while end < len(lines):
+            candidate = lines[end].lstrip()
+            if candidate.startswith("[") and not candidate.startswith(nested_header_prefix):
+                break
+            end += 1
+        shutil.copy2(target.config_path, target.config_path.with_suffix(target.config_path.suffix + ".bak"))
+        target.config_path.write_text("".join(lines[:start] + lines[end:]), encoding="utf-8")
+        return True
     config = _load_config(target.config_path)
     key = {
         "json_mcpServers": "mcpServers",
@@ -106,11 +135,27 @@ def unregister_server(target: AgentTarget) -> bool:
     }.get(target.style)
     if key is None:
         return False
-    if key in config and SERVER_KEY in config[key]:
+    desired = _desired_server_entry(target.style)
+    if key in config and _matches_command(config[key].get(SERVER_KEY), desired):
         del config[key][SERVER_KEY]
         _backup_and_write(target.config_path, config)
         return True
     return False
+
+
+def _desired_server_entry(style: str) -> dict[str, Any]:
+    if style == "json_opencode_mcp":
+        return {"type": "local", "command": [COMMAND, *ARGS], "enabled": True}
+    return {"command": COMMAND, "args": list(ARGS)}
+
+
+def _is_legacy_docmancer_entry(existing: Any, style: str) -> bool:
+    """Allow migration only from the previously shipped Docmancer command."""
+    if not isinstance(existing, dict):
+        return False
+    if style == "json_opencode_mcp":
+        return existing.get("command") == ["docmancer", "mcp", "serve"]
+    return existing.get("command") == "docmancer" and list(existing.get("args", [])) == ["mcp", "serve"]
 
 
 def _load_config(path: Path) -> dict[str, Any]:

@@ -50,3 +50,17 @@ def test_install_unknown_to_mcp_agent_does_not_break_install():
     with runner.isolated_filesystem() as tmp_dir:
         fake_home, result = _run_install(tmp_dir, "opencode")
         assert result.exit_code == 0, result.output
+
+
+def test_project_install_cline_and_gemini_register_docs_mcp():
+    runner = CliRunner()
+    with runner.isolated_filesystem() as tmp_dir:
+        fake_home = _home(tmp_dir)
+        for agent, path in (("cline", ".cline/mcp.json"), ("gemini", ".gemini/mcp.json")):
+            with patch("docmancer.cli.commands.Path.home", return_value=fake_home), \
+                 patch("docmancer.cli.commands._get_config_class", return_value=FakeDocmancerConfig), \
+                 patch("docmancer.mcp.agent_config.Path.home", return_value=fake_home):
+                result = runner.invoke(cli, ["install", agent, "--project"])
+            assert result.exit_code == 0, result.output
+            payload = json.loads(Path(path).read_text())
+            assert "docmancer" in payload["mcpServers"]
