@@ -1,9 +1,19 @@
 from __future__ import annotations
 
+from dataclasses import replace
 from pathlib import Path
 
+import pytest
+
 from docmancer.core.config import DocmancerConfig
-from docmancer.docs.curated_sources import canonical_source_identity, curated_source_for, curated_sources, curated_target_spec
+from docmancer.docs.curated_sources import (
+    canonical_source_identity,
+    curated_source_for,
+    curated_sources,
+    curated_target_spec,
+    validate_curated_sources,
+)
+from docmancer.docs.application.docs_target_service import DocsTargetService
 from docmancer.docs.service import LibraryDocsService
 
 
@@ -37,6 +47,23 @@ def test_curated_target_has_explicit_allowlist_and_never_invents_version_binding
     assert canonical_source_identity("https://fastapi.tiangolo.com/") == canonical_source_identity("https://FASTAPI.tiangolo.com")
 
 
+def test_curated_target_preserves_path_prefix_policy() -> None:
+    source = curated_source_for("fastapi", "python", None)
+    assert source is not None
+
+    target = curated_target_spec(replace(source, path_prefixes=("/docs/",)), version=None)
+    assert target is not None
+    runtime_target = DocsTargetService.target_from_dict(target)
+
+    assert runtime_target.path_prefixes == ["/docs/"]
+    service = DocsTargetService(
+        lambda template, library, version: template.format(library=library, version=version)
+    )
+    urls, error = service.target_urls(runtime_target)
+    assert urls == []
+    assert error == "URL path is outside path_prefixes: https://fastapi.tiangolo.com/"
+
+
 def test_exact_request_does_not_register_unversioned_curated_docs(tmp_path: Path) -> None:
     info = _service(tmp_path).resolve_library("fastapi", ecosystem="python", version="0.115.6", source_type="api")
 
@@ -50,3 +77,40 @@ def test_exact_curated_source_renders_the_requested_version() -> None:
     assert source.exact_snapshot is True
     assert source.render("16.2.0") == "https://pub.dev/documentation/go_router/16.2.0/"
     assert curated_target_spec(source, version="16.2.0")["seed_urls"] == []
+
+
+def test_full_curated_manifest_passes_offline_target_validation() -> None:
+    validate_curated_sources()
+
+
+def test_flutter_bloc_exact_target_is_allowed() -> None:
+    source = curated_source_for("flutter_bloc", "flutter", "8.1.6")
+    assert source is not None
+
+    target = curated_target_spec(source, version="8.1.6")
+    urls, error = DocsTargetService(lambda template, library, version: template.format(library=library, version=version)).target_urls(
+        DocsTargetService.target_from_dict(target)
+    )
+
+    assert error is None
+    assert urls == ["https://pub.dev/documentation/flutter_bloc/8.1.6/"]
+
+
+def test_curated_manifest_validator_reports_library_and_invalid_field() -> None:
+    source = curated_source_for("flutter_bloc", "dart", "8.1.6")
+    assert source is not None
+
+    invalid = replace(source, allowed_domains=("bloclibrary.dev",))
+
+    with pytest.raises(ValueError, match="invalid curated source flutter_bloc field docs_url: URL host is not in allowed_domains"):
+        validate_curated_sources([invalid])
+
+
+def test_curated_manifest_validator_rejects_seed_userinfo() -> None:
+    source = curated_source_for("flutter_bloc", "dart", "8.1.6")
+    assert source is not None
+
+    invalid = replace(source, preferred_seeds=("https://user:secret@pub.dev/seed",))
+
+    with pytest.raises(ValueError, match="invalid curated source flutter_bloc field preferred_seeds\\[0\\]: URL userinfo is not allowed"):
+        validate_curated_sources([invalid])

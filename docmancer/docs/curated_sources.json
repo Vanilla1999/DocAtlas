@@ -382,12 +382,9 @@
       "version_rule": "exact",
       "docs_url": "https://pub.dev/documentation/flutter_bloc/{version}/",
       "allowed_domains": [
-        "bloclibrary.dev"
+        "pub.dev"
       ],
-      "preferred_seeds": [
-        "https://bloclibrary.dev/llms.txt",
-        "https://bloclibrary.dev/sitemap.xml"
-      ],
+      "preferred_seeds": [],
       "extraction_format": "html",
       "max_pages": 24
     },
