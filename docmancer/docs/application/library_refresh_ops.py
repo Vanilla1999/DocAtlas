@@ -178,6 +178,8 @@ class LibraryRefreshOps:
                     max_pages=per_url_max_pages,
                     browser=target.browser,
                     seed_urls=seed_urls_for_discovery if (target.docs_url or target.docs_url_template) else None,
+                    allowed_domains=target.allowed_domains,
+                    path_prefixes=target.path_prefixes,
                     metadata=_metadata_for_record(record),
                     cancellation_callback=should_cancel,
                     with_vectors=False if staging else True,

@@ -31,6 +31,12 @@ class WebFetchConfig(BaseSettings):
     default_page_cap: int = Field(default=500, ge=1)
     library_job_timeout_seconds: float = Field(default=120.0, gt=0)
     browser_fallback: bool = False
+    max_redirects: int = Field(default=5, ge=0)
+    connect_timeout_seconds: float = Field(default=10.0, gt=0)
+    read_timeout_seconds: float = Field(default=30.0, gt=0)
+    max_total_seconds: float = Field(default=120.0, gt=0)
+    max_response_bytes: int = Field(default=8 * 1024 * 1024, ge=1)
+    max_decoded_text_bytes: int = Field(default=16 * 1024 * 1024, ge=1)
     model_config = SettingsConfigDict(env_prefix="DOCMANCER_WEB_FETCH_", extra="ignore")
 
 

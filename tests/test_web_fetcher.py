@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import ipaddress
 from unittest.mock import MagicMock, patch, PropertyMock
 
 import httpx
@@ -10,6 +11,7 @@ import pytest
 from docmancer.connectors.fetchers.web import WebFetcher
 from docmancer.connectors.fetchers.pipeline.detection import Platform
 from docmancer.connectors.fetchers.pipeline.discovery import DiscoveryStrategy, discover_urls
+from docmancer.docs.fetch_policy import DocsFetchPolicy, DocsFetchSecurityError
 
 
 def _mock_response(text: str, status: int = 200, content_type: str = "text/html") -> MagicMock:
@@ -70,6 +72,14 @@ DARTDOC_EMPTY_HTML = """<!DOCTYPE html><html><body><nav><a href="/a">A</a></nav>
 LLMS_FULL_CONTENT = "# Full Documentation\n\n" + ("This is comprehensive documentation content. " * 100)
 
 
+@pytest.fixture(autouse=True)
+def _public_docs_dns(monkeypatch):
+    monkeypatch.setattr(
+        "docmancer.docs.fetch_policy.resolve_host",
+        lambda _host: (ipaddress.ip_address("93.184.216.34"),),
+    )
+
+
 def _make_mock_client(get_side_effect):
     """Create a mock httpx.Client that works as a context manager."""
     client = MagicMock()
@@ -105,6 +115,23 @@ def test_web_fetcher_rejects_unsupported_scheme_before_network_access():
             fetcher.fetch("file:///etc/passwd")
 
     client.assert_not_called()
+
+
+def test_default_policy_scope_allows_only_target_and_declared_seed_hosts():
+    fetcher = WebFetcher(
+        seed_urls=["https://seed.example.org/docs/start"],
+        fetch_policy=DocsFetchPolicy(
+            resolver=lambda _host: (ipaddress.ip_address("93.184.216.34"),)
+        ),
+    )
+
+    scoped = fetcher._policy_for("https://example.com/docs")
+
+    scoped.validate_url("https://example.com/docs/guide")
+    scoped.validate_url("https://seed.example.org/docs/start")
+    with pytest.raises(DocsFetchSecurityError, match="host_not_allowed"):
+        scoped.validate_url("https://evil.test/docs")
+    assert fetcher._fetch_policy.allowed_hosts == ()
 
 
 class TestWebFetcherLlmsFull:

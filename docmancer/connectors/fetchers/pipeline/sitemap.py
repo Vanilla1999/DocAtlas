@@ -8,10 +8,13 @@ from __future__ import annotations
 
 import logging
 import gzip
+import io
 import xml.etree.ElementTree as ET
-from urllib.parse import urlparse
+from urllib.parse import urlparse, urlsplit
 
 import httpx
+
+from docmancer.docs.fetch_policy import DocsFetchSecurityError
 
 logger = logging.getLogger(__name__)
 
@@ -20,6 +23,7 @@ _SITEMAP_NS = {"sm": "http://www.sitemaps.org/schemas/sitemap/0.9"}
 
 # Skip sitemap responses larger than 10 MB to avoid memory exhaustion.
 _MAX_SITEMAP_RESPONSE_BYTES = 10 * 1024 * 1024
+_MAX_SITEMAP_DECODED_BYTES = 16 * 1024 * 1024
 
 
 def parse_sitemap(
@@ -108,6 +112,8 @@ def _parse_sitemap_xml(
             max_entries=max_entries,
             scope_base_url=scope_base_url,
         )
+    except DocsFetchSecurityError:
+        raise
     except Exception as exc:
         logger.warning("Failed to fetch sitemap %s: %s", sitemap_url, exc)
         return []
@@ -242,6 +248,8 @@ def _parse_sitemap_index(
                 )
                 entries.extend(child_entries)
             children_fetched += 1
+        except DocsFetchSecurityError:
+            raise
         except Exception as exc:
             logger.warning("Failed to fetch child sitemap %s: %s", sitemap_loc, exc)
             children_fetched += 1
@@ -295,11 +303,17 @@ def _sitemap_child_in_scope(sitemap_url: str, scope_base_url: str | None) -> boo
 
 def _response_text(resp: httpx.Response, url: str) -> str:
     """Return response text, explicitly handling gzipped sitemap URLs."""
-    if url.endswith(".gz"):
+    if urlsplit(url).path.endswith(".gz"):
         content = getattr(resp, "content", None)
         if isinstance(content, bytes):
             try:
-                return gzip.decompress(content).decode("utf-8")
+                with gzip.GzipFile(fileobj=io.BytesIO(content)) as compressed:
+                    decoded = compressed.read(_MAX_SITEMAP_DECODED_BYTES + 1)
+                if len(decoded) > _MAX_SITEMAP_DECODED_BYTES:
+                    parsed = urlsplit(url)
+                    redacted = parsed._replace(query="", fragment="").geturl()
+                    raise DocsFetchSecurityError("decoded_response_too_large", redacted)
+                return decoded.decode("utf-8")
             except (OSError, UnicodeDecodeError):
                 logger.debug("Failed to gzip-decompress %s, falling back to text", url)
     return resp.text

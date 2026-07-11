@@ -78,6 +78,22 @@ def test_cli_help():
     assert "mcp" in result.output
 
 
+def test_fetch_command_uses_secure_fetcher_factory(tmp_path):
+    document = MagicMock(source="https://docs.example.com/guide", content="# Guide")
+    fetcher = MagicMock()
+    fetcher.fetch.return_value = [document]
+
+    with patch("docmancer.connectors.fetchers.factory.build_fetcher", return_value=fetcher) as build:
+        result = CliRunner().invoke(
+            cli,
+            ["fetch", "https://docs.example.com", "--output", str(tmp_path)],
+        )
+
+    assert result.exit_code == 0
+    build.assert_called_once_with("https://docs.example.com", provider="gitbook")
+    fetcher.fetch.assert_called_once_with("https://docs.example.com")
+
+
 def test_docs_impact_cli_returns_machine_readable_report(tmp_path):
     (tmp_path / "README.md").write_text("# Project\n", encoding="utf-8")
     module = tmp_path / "packages" / "auth"

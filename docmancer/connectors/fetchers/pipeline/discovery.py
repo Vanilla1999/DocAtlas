@@ -37,6 +37,7 @@ from docmancer.connectors.fetchers.pipeline.robots import RobotsChecker
 from docmancer.connectors.fetchers.pipeline.sitemap import parse_sitemap
 from docmancer.core.html_utils import looks_like_html
 from docmancer.connectors.fetchers.pipeline.extraction import discover_dartdoc_candidate_links, is_dartdoc_html
+from docmancer.docs.fetch_policy import DocsFetchSecurityError
 
 logger = logging.getLogger(__name__)
 
@@ -127,6 +128,8 @@ def discover_urls(
             try:
                 result = strategy_fn(base_url, client, platform, robots, max_pages) or []
                 return DiscoveryResult(urls=result[:max_pages])
+            except DocsFetchSecurityError:
+                raise
             except Exception as exc:
                 logger.debug("Discovery strategy %s failed: %s", strategy_enum.value, exc)
                 return DiscoveryResult()
@@ -168,6 +171,8 @@ def discover_urls(
                     sitemap_total += len(results)
                 if strategy_enum == DiscoveryStrategy.NAV_CRAWL:
                     nav_crawl_ran = True
+        except DocsFetchSecurityError:
+            raise
         except Exception as exc:
             logger.debug("Discovery strategy %s failed: %s", strategy_enum.value, exc)
 

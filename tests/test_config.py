@@ -12,6 +12,12 @@ def test_default_config_uses_sqlite_index():
     assert config.index.db_path.endswith(".docmancer/docmancer.db")
     assert config.query.default_budget == 2400
     assert config.web_fetch.default_page_cap == 500
+    assert config.web_fetch.max_redirects == 5
+    assert config.web_fetch.connect_timeout_seconds == 10.0
+    assert config.web_fetch.read_timeout_seconds == 30.0
+    assert config.web_fetch.max_total_seconds == 120.0
+    assert config.web_fetch.max_response_bytes == 8 * 1024 * 1024
+    assert config.web_fetch.max_decoded_text_bytes == 16 * 1024 * 1024
 
 
 def test_config_from_dict():

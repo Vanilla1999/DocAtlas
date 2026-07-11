@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import Any, Callable
 from datetime import datetime, timezone
 
-import httpx
+
 
 from docmancer.core.config import DocmancerConfig
 from docmancer.core.models import Document, RetrievedChunk
@@ -407,6 +407,8 @@ class DocmancerAgent:
         url: str | None = None,
         doc_format: str | None = None,
         seed_urls: list[str] | None = None,
+        allowed_domains: list[str] | None = None,
+        path_prefixes: list[str] | None = None,
         progress_callback: Callable[[dict[str, Any]], None] | None = None,
         cancellation_callback: Callable[[], bool] | None = None,
     ):
@@ -420,37 +422,28 @@ class DocmancerAgent:
         return build_fetcher(
             url or "",
             provider=provider,
+            timeout=getattr(self.config.web_fetch, "read_timeout_seconds", 30.0),
             max_pages=max_pages,
             strategy=strategy,
             browser=browser,
             workers=self.config.web_fetch.workers,
             doc_format=doc_format,
             seed_urls=seed_urls,
+            allowed_domains=allowed_domains,
+            path_prefixes=path_prefixes,
+            max_redirects=getattr(self.config.web_fetch, "max_redirects", 5),
+            connect_timeout=self.config.web_fetch.connect_timeout_seconds,
+            max_total_seconds=self.config.web_fetch.max_total_seconds,
+            max_response_bytes=getattr(self.config.web_fetch, "max_response_bytes", 8 * 1024 * 1024),
+            max_decoded_text_bytes=getattr(
+                self.config.web_fetch, "max_decoded_text_bytes", 16 * 1024 * 1024
+            ),
             progress_callback=progress_callback,
             cancellation_callback=cancellation_callback,
         )
 
     def _auto_detect_provider(self, url: str) -> str:
-        if "github.com" in url:
-            logger.info("Detected GitHub URL")
-            return "github"
-
-        from docmancer.connectors.fetchers.pipeline.detection import Platform, detect_platform
-
-        try:
-            with httpx.Client(timeout=15, follow_redirects=True) as client:
-                resp = client.get(url)
-                platform = detect_platform(resp.text, url, dict(resp.headers))
-        except Exception:
-            return "web"
-
-        if platform == Platform.GITBOOK:
-            logger.info("Auto-detected platform: GitBook")
-            return "gitbook"
-        if platform == Platform.MINTLIFY:
-            logger.info("Auto-detected platform: Mintlify")
-            return "mintlify"
-        logger.info("Auto-detected platform: %s; using web fetcher", platform.value)
+        logger.info("Using secure web fetcher; platform detection happens inside its network boundary")
         return "web"
 
     def ingest_url(
@@ -464,6 +457,8 @@ class DocmancerAgent:
         browser: bool = False,
         doc_format: str | None = None,
         seed_urls: list[str] | None = None,
+        allowed_domains: list[str] | None = None,
+        path_prefixes: list[str] | None = None,
         metadata: dict[str, Any] | None = None,
         progress_callback: Callable[[dict[str, Any]], None] | None = None,
         cancellation_callback: Callable[[], bool] | None = None,
@@ -478,6 +473,8 @@ class DocmancerAgent:
             url=url,
             doc_format=doc_format,
             seed_urls=seed_urls,
+            allowed_domains=allowed_domains,
+            path_prefixes=path_prefixes,
             progress_callback=progress_callback,
             cancellation_callback=cancellation_callback,
         )
@@ -524,6 +521,8 @@ class DocmancerAgent:
         browser: bool = False,
         doc_format: str | None = None,
         seed_urls: list[str] | None = None,
+        allowed_domains: list[str] | None = None,
+        path_prefixes: list[str] | None = None,
         progress_callback: Callable[[dict[str, Any]], None] | None = None,
     ) -> list[Document]:
         f = self._get_fetcher(
@@ -535,6 +534,8 @@ class DocmancerAgent:
             url=url,
             doc_format=doc_format,
             seed_urls=seed_urls,
+            allowed_domains=allowed_domains,
+            path_prefixes=path_prefixes,
             progress_callback=progress_callback,
         )
         return f.fetch(url)

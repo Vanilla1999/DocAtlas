@@ -6,6 +6,7 @@ from unittest.mock import MagicMock
 
 import gzip
 import httpx
+import pytest
 
 from docmancer.connectors.fetchers.pipeline.sitemap import (
     _parse_urlset,
@@ -170,3 +171,18 @@ class TestParseSitemap:
         entries = parse_sitemap("https://example.com/sitemap.xml.gz", client)
         assert len(entries) == 2
         assert entries[0]["url"] == "https://example.com/docs/getting-started"
+
+    def test_rejects_oversized_decoded_gzip(self, monkeypatch):
+        from docmancer.connectors.fetchers.pipeline import sitemap
+        from docmancer.docs.fetch_policy import DocsFetchSecurityError
+
+        monkeypatch.setattr(sitemap, "_MAX_SITEMAP_DECODED_BYTES", 10)
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.content = gzip.compress(b"x" * 20)
+        mock_resp.text = ""
+        client = MagicMock(spec=httpx.Client)
+        client.get.return_value = mock_resp
+
+        with pytest.raises(DocsFetchSecurityError, match="decoded_response_too_large"):
+            parse_sitemap("https://example.com/sitemap.xml.gz?token=secret", client)

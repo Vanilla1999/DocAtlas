@@ -1282,9 +1282,9 @@ def _drop_vector_collection(config, agent) -> None:
 def fetch_cmd(url: str, output_dir: str):
     """Download docs from a GitBook URL to local .md files."""
     from urllib.parse import urlparse
-    from docmancer.connectors.fetchers.gitbook import GitBookFetcher
+    from docmancer.connectors.fetchers.factory import build_fetcher
 
-    fetcher = GitBookFetcher()
+    fetcher = build_fetcher(url, provider="gitbook")
     click.echo(f"Fetching docs from {url}...")
     try:
         documents = fetcher.fetch(url)
