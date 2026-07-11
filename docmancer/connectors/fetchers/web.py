@@ -47,6 +47,7 @@ from docmancer.connectors.fetchers.pipeline.robots import RobotsChecker
 from docmancer.core.html_utils import looks_like_html
 from docmancer.core.models import Document
 from docmancer.docs.dartdoc import DARTDOC_ENTITY_SUFFIXES
+from docmancer.docs.fetch_policy import DocsFetchPolicy
 
 logger = logging.getLogger(__name__)
 
@@ -104,6 +105,7 @@ class WebFetcher:
         seed_urls: list[str] | None = None,
         progress_callback=None,
         cancellation_callback=None,
+        fetch_policy: DocsFetchPolicy | None = None,
     ):
         self._timeout = timeout
         self._max_pages = max_pages
@@ -116,6 +118,7 @@ class WebFetcher:
         self._seed_urls = list(seed_urls or [])
         self._progress_callback = progress_callback
         self._cancellation_callback = cancellation_callback
+        self._fetch_policy = fetch_policy or DocsFetchPolicy()
         self.last_discovery_diagnostics: dict | None = None
 
     def _emit_progress(self, event: dict) -> None:
@@ -146,6 +149,7 @@ class WebFetcher:
             ValueError: If no documentation pages could be discovered or fetched.
         """
         self._raise_if_cancelled()
+        self._fetch_policy.validate_url(url)
         base_url = url.rstrip("/")
 
         with httpx.Client(**self._client_kwargs()) as client:

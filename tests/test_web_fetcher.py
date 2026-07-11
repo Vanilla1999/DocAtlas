@@ -84,6 +84,25 @@ def test_web_fetcher_honors_cancellation_before_network_access():
 
     with patch("httpx.Client") as client, pytest.raises(RuntimeError, match="cancelled"):
         fetcher.fetch("https://example.com/docs/")
+    client.assert_not_called()
+
+
+def test_web_fetcher_rejects_url_userinfo_before_network_access():
+    fetcher = WebFetcher()
+
+    with patch("docmancer.connectors.fetchers.web.httpx.Client") as client:
+        with pytest.raises(ValueError, match="userinfo_not_allowed"):
+            fetcher.fetch("https://user:secret@example.com/docs")
+
+    client.assert_not_called()
+
+
+def test_web_fetcher_rejects_unsupported_scheme_before_network_access():
+    fetcher = WebFetcher()
+
+    with patch("docmancer.connectors.fetchers.web.httpx.Client") as client:
+        with pytest.raises(ValueError, match="unsupported_scheme"):
+            fetcher.fetch("file:///etc/passwd")
 
     client.assert_not_called()
 
