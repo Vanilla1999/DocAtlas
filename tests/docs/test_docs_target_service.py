@@ -1,7 +1,10 @@
 from __future__ import annotations
 
+import pytest
+
 from docmancer.docs.application.docs_target_service import DocsTargetService
 from docmancer.docs.dartdoc import discover_pub_dartdoc_seed_urls, normalize_pub_dartdoc_target
+from docmancer.docs.fetch_policy import DocsFetchSecurityError
 from docmancer.docs.models import DocsTarget
 from docmancer.docs.registry import LibraryRecord
 
@@ -149,3 +152,24 @@ def test_normalize_pub_dartdoc_target_preserves_explicit_max_pages():
     target = normalize_pub_dartdoc_target(DocsTarget(library="go_router", ecosystem="pub", version="17.2.3", max_pages=75))
 
     assert target.max_pages == 75
+
+
+def test_pub_dartdoc_discovery_propagates_security_rejection(monkeypatch):
+    def reject(*_args, **_kwargs):
+        raise DocsFetchSecurityError(
+            "private_network_blocked",
+            "https://pub.dev/documentation/pkg/1.0.0/",
+        )
+
+    monkeypatch.setattr("docmancer.docs.application.docs_target_service.DocsHttpClient.get", reject)
+    target = DocsTarget(
+        library="pkg",
+        ecosystem="pub",
+        version="1.0.0",
+        source_type="api",
+        allowed_domains=["pub.dev"],
+        path_prefixes=["/documentation/pkg/1.0.0"],
+    )
+
+    with pytest.raises(DocsFetchSecurityError, match="private_network_blocked"):
+        DocsTargetService(render_docs_url).discover_pub_dartdoc_target(target, [])

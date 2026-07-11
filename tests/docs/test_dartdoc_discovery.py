@@ -33,6 +33,12 @@ def test_discover_pub_dartdoc_seed_urls_reads_index_json() -> None:
 
 
 def test_async_pub_dartdoc_target_still_discovers_seed_urls(monkeypatch) -> None:
+    import ipaddress
+
+    monkeypatch.setattr(
+        "docmancer.docs.fetch_policy.resolve_host",
+        lambda _host: (ipaddress.ip_address("93.184.216.34"),),
+    )
     from docmancer.docs.application.docs_target_service import DocsTargetService
     from docmancer.docs.models import DocsTarget
 
@@ -42,6 +48,9 @@ def test_async_pub_dartdoc_target_still_discovers_seed_urls(monkeypatch) -> None
         def __init__(self, status_code: int, text: str) -> None:
             self.status_code = status_code
             self.text = text
+            self.headers = {
+                "content-type": "application/json" if text.startswith("[") else "text/html"
+            }
 
     class Client:
         def __init__(self, *args, **kwargs) -> None:

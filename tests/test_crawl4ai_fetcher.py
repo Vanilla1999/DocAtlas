@@ -36,7 +36,7 @@ class TestFactoryRoutingCrawl4AI:
             return_value=True,
         ):
             from docmancer.connectors.fetchers.factory import build_fetcher
-            from docmancer.connectors.fetchers.crawl4ai import Crawl4AIFetcher
+            from docmancer.connectors.fetchers.web import WebFetcher
 
             fetcher = build_fetcher("https://docs.example.com", provider="crawl4ai")
-            assert isinstance(fetcher, Crawl4AIFetcher)
+            assert isinstance(fetcher, WebFetcher)

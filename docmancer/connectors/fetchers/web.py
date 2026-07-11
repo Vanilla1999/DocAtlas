@@ -14,9 +14,9 @@ from __future__ import annotations
 import logging
 import threading
 from concurrent.futures import FIRST_COMPLETED, ThreadPoolExecutor, wait
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import datetime, timezone
-from urllib.parse import urlparse
+from urllib.parse import urljoin, urlparse
 
 import httpx
 
@@ -47,6 +47,8 @@ from docmancer.connectors.fetchers.pipeline.robots import RobotsChecker
 from docmancer.core.html_utils import looks_like_html
 from docmancer.core.models import Document
 from docmancer.docs.dartdoc import DARTDOC_ENTITY_SUFFIXES
+from docmancer.docs.fetch_policy import DocsFetchPolicy, redact_url
+from docmancer.docs.fetch_transport import DocsHttpClient
 
 logger = logging.getLogger(__name__)
 
@@ -104,6 +106,14 @@ class WebFetcher:
         seed_urls: list[str] | None = None,
         progress_callback=None,
         cancellation_callback=None,
+        fetch_policy: DocsFetchPolicy | None = None,
+        allowed_domains: list[str] | None = None,
+        path_prefixes: list[str] | None = None,
+        max_response_bytes: int = 8 * 1024 * 1024,
+        max_decoded_text_bytes: int = 16 * 1024 * 1024,
+        max_redirects: int = 5,
+        connect_timeout: float = 10.0,
+        max_total_seconds: float = 120.0,
     ):
         self._timeout = timeout
         self._max_pages = max_pages
@@ -116,6 +126,15 @@ class WebFetcher:
         self._seed_urls = list(seed_urls or [])
         self._progress_callback = progress_callback
         self._cancellation_callback = cancellation_callback
+        self._fetch_policy = fetch_policy or DocsFetchPolicy(
+            allowed_hosts=tuple(allowed_domains or ()),
+            path_prefixes=tuple(path_prefixes or ()),
+        )
+        self._max_response_bytes = max_response_bytes
+        self._max_decoded_text_bytes = max_decoded_text_bytes
+        self._max_redirects = max_redirects
+        self._connect_timeout = connect_timeout
+        self._max_total_seconds = max_total_seconds
         self.last_discovery_diagnostics: dict | None = None
 
     def _emit_progress(self, event: dict) -> None:
@@ -128,10 +147,35 @@ class WebFetcher:
 
     def _client_kwargs(self) -> dict:
         return {
-            "timeout": self._timeout,
-            "follow_redirects": True,
+            "timeout": httpx.Timeout(
+                connect=self._connect_timeout,
+                read=self._timeout,
+                write=self._timeout,
+                pool=self._connect_timeout,
+            ),
+            "follow_redirects": False,
             "headers": {"User-Agent": _DEFAULT_USER_AGENT},
         }
+
+    def _new_client(self, policy: DocsFetchPolicy | None = None) -> DocsHttpClient:
+        return DocsHttpClient(
+            httpx.Client(**self._client_kwargs()),
+            policy or self._fetch_policy,
+            max_redirects=self._max_redirects,
+            max_response_bytes=self._max_response_bytes,
+            max_decoded_text_bytes=self._max_decoded_text_bytes,
+            max_total_seconds=self._max_total_seconds,
+        )
+
+    def _policy_for(self, url: str) -> DocsFetchPolicy:
+        if self._fetch_policy.allowed_hosts:
+            return self._fetch_policy
+        hosts = {
+            parsed.hostname.rstrip(".").lower()
+            for candidate in [url, *self._seed_urls]
+            if (parsed := urlparse(candidate)).hostname
+        }
+        return replace(self._fetch_policy, allowed_hosts=tuple(sorted(hosts)))
 
     def fetch(self, url: str) -> list[Document]:
         """Fetch documentation from a URL using the generic pipeline.
@@ -146,16 +190,19 @@ class WebFetcher:
             ValueError: If no documentation pages could be discovered or fetched.
         """
         self._raise_if_cancelled()
+        policy = self._policy_for(url)
+        policy.validate_url(url)
         base_url = url.rstrip("/")
+        public_base_url = redact_url(base_url)
 
-        with httpx.Client(**self._client_kwargs()) as client:
+        with self._new_client(policy) as client:
             if self._is_direct_text_url(base_url):
                 return [self._fetch_direct_text_page(base_url, client)]
             if self._is_direct_dartdoc_url(base_url):
                 page = self._fetch_dartdoc_direct_page(base_url, base_url, client, Platform.GENERIC)
                 if page is None:
                     raise ValueError(
-                        f"Dartdoc page {base_url!r} had no extractable article content. "
+                        f"Dartdoc page {public_base_url!r} had no extractable article content. "
                         "Try concrete class/library seed URLs or browser=true."
                     )
                 return [page.document]
@@ -167,14 +214,15 @@ class WebFetcher:
 
             # Step 2: Set up robots.txt checker
             robots = None
-            if self._respect_robots:
+            robots_url = urljoin(f"{base_url}/", "/robots.txt")
+            if self._respect_robots and policy.allows_scope(robots_url):
                 robots = RobotsChecker(client)
                 crawl_delay = robots.get_crawl_delay(base_url)
                 if crawl_delay:
                     self._delay = max(self._delay, crawl_delay)
 
             # Step 3: Discover page URLs
-            self._emit_progress({"phase": "discovering", "message": f"Discovering URLs from {base_url}", "url": base_url})
+            self._emit_progress({"phase": "discovering", "message": f"Discovering URLs from {public_base_url}", "url": public_base_url})
             discovery_result = discover_urls(
                 base_url=base_url,
                 client=client,
@@ -203,14 +251,14 @@ class WebFetcher:
                         "in the static HTML). Try: doc-atlas add <url> --browser"
                     )
                 raise ValueError(
-                    f"Could not discover any documentation pages at {base_url!r}. "
+                    f"Could not discover any documentation pages at {public_base_url!r}. "
                     f"No /llms-full.txt, /llms.txt, sitemap, or navigable links found.{hint}"
                 )
             self._emit_progress(
                 {
                     "phase": "discovering",
                     "message": f"Discovered {len(discovered)} URLs",
-                    "url": base_url,
+                    "url": public_base_url,
                     "discovered_pages": len(discovered),
                     "total_pages": len(discovered),
                 }
@@ -252,15 +300,15 @@ class WebFetcher:
         """Fetch an exact markdown/text docs URL without running site discovery."""
         try:
             resp = client.get(url)
-        except httpx.RequestError as exc:
-            raise ValueError(f"Could not fetch documentation page {url!r}: {exc}") from exc
+        except httpx.RequestError:
+            raise ValueError(f"Could not fetch documentation page {redact_url(url)!r}: transport_error") from None
 
         if resp.status_code != 200:
-            raise ValueError(f"Could not fetch documentation page {url!r}: status {resp.status_code}")
+            raise ValueError(f"Could not fetch documentation page {redact_url(url)!r}: status {resp.status_code}")
         if not resp.text.strip():
-            raise ValueError(f"Could not fetch documentation page {url!r}: empty response")
+            raise ValueError(f"Could not fetch documentation page {redact_url(url)!r}: empty response")
         if looks_like_html(resp.text):
-            raise ValueError(f"Could not fetch documentation page {url!r}: response appears to be HTML")
+            raise ValueError(f"Could not fetch documentation page {redact_url(url)!r}: response appears to be HTML")
 
         resp_url = getattr(resp, "url", None)
         if isinstance(resp_url, (str, httpx.URL)):
@@ -318,8 +366,8 @@ class WebFetcher:
             headers = dict(resp.headers)
             platform = detect_platform(html, base_url, headers)
             return platform, html, headers
-        except httpx.RequestError as exc:
-            logger.warning("Failed to fetch homepage %s: %s", base_url, exc)
+        except httpx.RequestError:
+            logger.warning("Failed to fetch homepage %s: transport_error", redact_url(base_url))
             return Platform.GENERIC, "", {}
 
     def _build_llms_full_documents(
@@ -402,21 +450,21 @@ class WebFetcher:
                         )
                         continue
                     if deduplicator.is_url_duplicate(page.final_url):
-                        logger.debug("Skipped %s (duplicate final URL)", page.document.source)
+                        logger.debug("Skipped %s (duplicate final URL)", redact_url(page.document.source))
                         continue
                     if page.document.source != page.final_url and deduplicator.is_url_duplicate(page.document.source):
-                        logger.debug("Skipped %s (duplicate canonical URL)", page.document.source)
+                        logger.debug("Skipped %s (duplicate canonical URL)", redact_url(page.document.source))
                         continue
                     if deduplicator.is_content_duplicate(page.document.content):
-                        logger.debug("Skipped %s (duplicate content)", page.document.source)
+                        logger.debug("Skipped %s (duplicate content)", redact_url(page.document.source))
                         continue
                     documents.append(page.document)
-                    logger.info("Fetched %s (%d words)", page.document.source, len(page.document.content.split()))
+                    logger.info("Fetched %s (%d words)", redact_url(page.document.source), len(page.document.content.split()))
                     self._emit_progress(
                         {
                             "phase": "fetching",
                             "message": f"Fetched {completed_fetches}/{len(unique_discovered)} pages",
-                            "url": page.document.source,
+                            "url": redact_url(page.document.source),
                             "fetched_pages": completed_fetches,
                             "total_pages": len(unique_discovered),
                         }
@@ -472,7 +520,7 @@ class WebFetcher:
             predicted_url = redirect_tracker.predict_final_url(url)
         fetch_url = predicted_url or url
 
-        with httpx.Client(**self._client_kwargs()) as client:
+        with self._new_client() as client:
             rate_limiter.wait(fetch_url)
             try:
                 resp = client.get(fetch_url)
@@ -558,17 +606,9 @@ class WebFetcher:
         return _FetchedPage(document=doc, final_url=final_url)
 
     def _try_browser_fallback(self, url: str) -> str | None:
-        """Attempt to render a page with Playwright and extract content."""
-        try:
-            from docmancer.connectors.fetchers.pipeline.browser import BrowserRenderer
-            renderer = BrowserRenderer()
-            html = renderer.render(url)
-            if html:
-                return extract_content(html, url=url)
-        except ImportError:
-            logger.debug(
-                "Playwright not installed. Install with: pip install docmancer[browser]"
-            )
-        except Exception as exc:
-            logger.debug("Browser fallback failed for %s: %s", url, exc)
+        """Fail closed until Playwright requests share the Docs network policy."""
+        logger.warning(
+            "Browser fallback skipped for %s: secure browser network interception is unavailable.",
+            redact_url(url),
+        )
         return None

@@ -11,6 +11,8 @@ from docmancer.docs.models import DocsTarget
 from docmancer.docs.registry import LibraryRecord
 from docmancer.docs.resolver import normalize_version
 from docmancer.docs.dartdoc import discover_pub_dartdoc_seed_urls, is_pub_dartdoc_target, normalize_pub_dartdoc_target, pub_dartdoc_root_url
+from docmancer.docs.fetch_policy import DocsFetchPolicy, DocsFetchSecurityError
+from docmancer.docs.fetch_transport import DocsHttpClient
 
 
 class DocsTargetJobs(Protocol):
@@ -147,7 +149,12 @@ class DocsTargetService:
             self.jobs.update(job_id, phase="discovering", current_target=canonical_id, current_url=root_url, message=f"Discovering Dartdoc seed URLs for {target.library}.")
             self.jobs.append_event(job_id, {"phase": "discovering", "message": f"Discovering Dartdoc seed URLs for {target.library}", "url": root_url})
         try:
-            with httpx.Client(timeout=30.0, follow_redirects=True, headers={"User-Agent": "docmancer/1.0"}) as client:
+            policy = DocsFetchPolicy(
+                allowed_hosts=tuple(target.allowed_domains),
+                path_prefixes=tuple(target.path_prefixes),
+            )
+            raw_client = httpx.Client(timeout=30.0, follow_redirects=False, headers={"User-Agent": "docmancer/1.0"})
+            with DocsHttpClient(raw_client, policy) as client:
                 resp = client.get(root_url)
                 if resp.status_code != 200:
                     raise ValueError(f"status {resp.status_code}")
@@ -159,6 +166,13 @@ class DocsTargetService:
                     return fetched.text
 
                 seeds = discover_pub_dartdoc_seed_urls(target.library, version, resp.text, root_url, max_seed_urls=target.max_pages or 500, fetch_url=fetch_url)
+        except DocsFetchSecurityError as exc:
+            if exc.category != "transport_error":
+                raise
+            warning = f"{target.library}: could not discover pub.dev Dartdoc seed URLs (transport_error); falling back to root URL."
+            warnings.append(warning)
+            target = replace(target, warnings=[*target.warnings, warning])
+            return target
         except Exception as exc:
             warning = f"{target.library}: could not discover pub.dev Dartdoc seed URLs ({exc}); falling back to root URL."
             warnings.append(warning)

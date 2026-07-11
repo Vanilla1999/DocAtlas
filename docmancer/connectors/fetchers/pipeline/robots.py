@@ -15,6 +15,8 @@ from urllib.robotparser import RobotFileParser
 
 import httpx
 
+from docmancer.docs.fetch_policy import DocsFetchSecurityError
+
 logger = logging.getLogger(__name__)
 
 # Default user agent string for docmancer.
@@ -58,6 +60,8 @@ class RobotsChecker:
             else:
                 # No robots.txt or error -> allow everything
                 parser.parse([])
+        except DocsFetchSecurityError:
+            raise
         except Exception as exc:
             logger.debug("Failed to fetch robots.txt from %s: %s", robots_url, exc)
             parser.parse([])

@@ -8,10 +8,8 @@ def detect_fetcher_provider(url: str, provider: str | None = None) -> str:
     if provider and provider != "auto":
         return provider.lower()
 
-    parsed = urlparse(url)
-    if parsed.netloc.lower() == "github.com":
+    if urlparse(url).netloc.lower() == "github.com":
         return "github"
-
     return "web"
 
 
@@ -28,35 +26,20 @@ def build_fetcher(
     workers: int = 8,
     doc_format: str | None = None,
     seed_urls: list[str] | None = None,
+    allowed_domains: list[str] | None = None,
+    path_prefixes: list[str] | None = None,
+    max_redirects: int = 5,
+    connect_timeout: float = 10.0,
+    max_total_seconds: float = 120.0,
+    max_response_bytes: int = 8 * 1024 * 1024,
+    max_decoded_text_bytes: int = 16 * 1024 * 1024,
     progress_callback=None,
     cancellation_callback=None,
 ):
     """Build the fetcher shared by the CLI and registry pipeline."""
     concrete = detect_fetcher_provider(url, provider)
-
-    if concrete == "gitbook":
-        from docmancer.connectors.fetchers.gitbook import GitBookFetcher
-
-        return GitBookFetcher()
-    if concrete == "mintlify":
-        from docmancer.connectors.fetchers.mintlify import MintlifyFetcher
-
-        return MintlifyFetcher()
-    if concrete == "github":
-        from docmancer.connectors.fetchers.github import GitHubFetcher
-
-        return GitHubFetcher(timeout=timeout)
-
-    if concrete == "crawl4ai":
-        from docmancer.connectors.fetchers.crawl4ai import Crawl4AIFetcher
-
-        return Crawl4AIFetcher(
-            timeout=timeout,
-            max_pages=max_pages,
-            respect_robots=respect_robots,
-            delay=delay,
-            workers=workers,
-        )
+    if concrete not in {"web", "gitbook", "mintlify", "github", "crawl4ai", "auto"}:
+        raise ValueError(f"Unsupported fetch provider: {concrete}")
 
     from docmancer.connectors.fetchers.web import WebFetcher
 
@@ -70,6 +53,13 @@ def build_fetcher(
         workers=workers,
         doc_format=doc_format,
         seed_urls=seed_urls,
+        allowed_domains=allowed_domains,
+        path_prefixes=path_prefixes,
+        max_redirects=max_redirects,
+        connect_timeout=connect_timeout,
+        max_total_seconds=max_total_seconds,
+        max_response_bytes=max_response_bytes,
+        max_decoded_text_bytes=max_decoded_text_bytes,
         progress_callback=progress_callback,
         cancellation_callback=cancellation_callback,
     )
