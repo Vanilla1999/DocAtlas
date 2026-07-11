@@ -93,7 +93,10 @@ def register_server(target: AgentTarget) -> tuple[bool, str]:
     existing = servers.get(SERVER_KEY)
     if existing == desired or _matches_command(existing, desired):
         return False, f"already registered in {target.config_path}"
-    if existing is not None and not _is_legacy_docmancer_entry(existing, target.style):
+    if existing is not None and not (
+        _is_legacy_docmancer_entry(existing, target.style)
+        or _has_same_command(existing, desired)
+    ):
         raise ValueError(
             f"Existing MCP server {SERVER_KEY!r} in {target.config_path} has a different command; refusing to overwrite it."
         )
@@ -109,7 +112,7 @@ def unregister_server(target: AgentTarget) -> bool:
         text = target.config_path.read_text(encoding="utf-8")
         config = tomllib.loads(text) if text.strip() else {}
         existing = config.get("mcp_servers", {}).get(SERVER_KEY)
-        if not _matches_command(existing, {"command": COMMAND, "args": list(ARGS)}):
+        if existing != {"command": COMMAND, "args": list(ARGS)}:
             return False
         lines = text.splitlines(keepends=True)
         header = f"[mcp_servers.{SERVER_KEY}]"
@@ -136,7 +139,7 @@ def unregister_server(target: AgentTarget) -> bool:
     if key is None:
         return False
     desired = _desired_server_entry(target.style)
-    if key in config and _matches_command(config[key].get(SERVER_KEY), desired):
+    if key in config and config[key].get(SERVER_KEY) == desired:
         del config[key][SERVER_KEY]
         _backup_and_write(target.config_path, config)
         return True
@@ -173,9 +176,17 @@ def _load_config(path: Path) -> dict[str, Any]:
 def _matches_command(existing: Any, desired: dict[str, Any]) -> bool:
     if not isinstance(existing, dict):
         return False
-    if desired.get("type") == "local":
-        return existing.get("command") == desired["command"]
-    return existing.get("command") == desired["command"] and list(existing.get("args", [])) == desired["args"]
+    return all(existing.get(key) == value for key, value in desired.items())
+
+
+def _has_same_command(existing: Any, desired: dict[str, Any]) -> bool:
+    if not isinstance(existing, dict):
+        return False
+    if existing.get("command") != desired.get("command"):
+        return False
+    if "args" in desired:
+        return list(existing.get("args", [])) == desired["args"]
+    return True
 
 
 def has_current_server_entry(config: dict[str, Any], target: AgentTarget) -> bool:
@@ -196,6 +207,18 @@ def has_current_server_entry(config: dict[str, Any], target: AgentTarget) -> boo
         else {"command": COMMAND, "args": list(ARGS)}
     )
     return _matches_command(servers.get(SERVER_KEY), desired)
+
+
+def target_has_current_server_entry(target: AgentTarget) -> bool:
+    """Return whether a target's on-disk config contains the active Docs MCP entry."""
+    if not target.config_path.exists():
+        return False
+    if target.style == "toml_mcp_servers":
+        text = target.config_path.read_text(encoding="utf-8")
+        config = tomllib.loads(text) if text.strip() else {}
+        existing = config.get("mcp_servers", {}).get(SERVER_KEY)
+        return _matches_command(existing, _desired_server_entry(target.style))
+    return has_current_server_entry(_load_config(target.config_path), target)
 
 
 def _register_toml_server(target: AgentTarget) -> tuple[bool, str]:

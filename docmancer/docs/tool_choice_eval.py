@@ -5,7 +5,7 @@ import argparse
 import hashlib
 import json
 import os
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, replace
 from pathlib import Path
 from typing import Any, Callable, Protocol
 
@@ -28,7 +28,7 @@ class ToolChoiceScenario:
     expected_first_tool: str | None
     expected_next_action: dict[str, Any] | None = None
     expected_retry_question: str | None = None
-    messages: tuple[dict[str, str], ...] | None = None
+    messages: tuple[dict[str, Any], ...] | None = None
 
 
 class LowCostModelAdapter(Protocol):
@@ -65,19 +65,19 @@ _SCENARIO_ROWS: tuple[tuple[Any, ...], ...] = (
     ("invalid-payload", "Prepare Kotlin docs with an invalid field.", "prepare_docs"),
     ("unrelated", "Write a haiku about rain.", None),
     ("mixed-question", "How does this project use Riverpod providers?", "get_docs_context"),
-    ("missing-action", "The docs response says to prefetch Kotlin 1.8.1; follow it.", "prepare_docs", {"action": "prefetch_library_docs", "library": "kotlin", "version": "1.8.1"}),
     (
-        "retry-question",
-        "Preparation succeeded. Continue the documentation workflow.",
-        "get_docs_context",
-        None,
+        "prepare-and-retry",
+        "Show Kotlin coroutine launch usage.",
+        "prepare_docs",
+        {"action": "prefetch_library_docs", "library": "kotlin", "version": "1.8.1"},
         "Show Kotlin coroutine launch usage.",
         (
             {"role": "user", "content": "Show Kotlin coroutine launch usage."},
-            {"role": "assistant", "content": "The required documentation preparation was started."},
-            {"role": "user", "content": "Preparation succeeded. Continue the documentation workflow."},
+            {"role": "assistant", "content": None, "tool_calls": [{"id": "context-1", "type": "function", "function": {"name": "get_docs_context", "arguments": "{\"library\":\"kotlin\",\"question\":\"Show Kotlin coroutine launch usage.\"}"}}]},
+            {"role": "tool", "tool_call_id": "context-1", "name": "get_docs_context", "content": json.dumps({"answer_available": False, "next_action": {"type": "prepare_docs", "tool": "prepare_docs", "arguments_patch": {"action": "prefetch_library_docs", "library": "kotlin", "version": "1.8.1"}}}, sort_keys=True)},
         ),
     ),
+    ("direct-guidance", "What documentation tool should answer an API question?", "get_docs_context"),
     ("project-code-boundary", "Which source file implements the current retry loop?", None),
     ("dependency-version", "What API does the locked Flutter dependency expose?", "get_docs_context"),
     ("refresh-request", "Refresh the indexed library documentation.", "prepare_docs"),
@@ -112,11 +112,39 @@ def evaluate_tool_choice(adapter: LowCostModelAdapter, *, guidance: str, tool_sc
     actual_names = {tool.get("name") for tool in tool_schemas}
     if actual_names != {"get_docs_context", "prepare_docs", "docs_status"}:
         raise ValueError("tool_schemas must contain the actual three public Docs MCP tools")
+    if tool_schemas != public_tool_schemas():
+        raise ValueError("tool_schemas must be the exact published schemas, not fabricated lookalikes")
     results: list[dict[str, Any]] = []
     for scenario in SCENARIOS:
         for repeat in range(1, REPEATS + 1):
             response = dict(adapter.choose_tool(guidance=guidance, tool_schemas=tool_schemas, scenario=scenario) or {})
             tool = response.get("tool")
+            arguments = response.get("arguments") or {}
+            retried = None
+            if scenario.expected_retry_question is not None:
+                prepare_call = {
+                    "role": "assistant", "content": None,
+                    "tool_calls": [{"id": "prepare-1", "type": "function", "function": {
+                        "name": str(tool), "arguments": json.dumps(arguments, sort_keys=True)
+                    }}],
+                }
+                prepare_result = {
+                    "role": "tool", "tool_call_id": "prepare-1", "name": "prepare_docs",
+                    "content": json.dumps({"status": "completed", "action": arguments.get("action")}, sort_keys=True),
+                }
+                retry_scenario = replace(
+                    scenario,
+                    expected_first_tool="get_docs_context",
+                    expected_next_action=None,
+                    messages=(*(scenario.messages or ()), prepare_call, prepare_result),
+                )
+                retry_response = dict(adapter.choose_tool(
+                    guidance=guidance, tool_schemas=tool_schemas, scenario=retry_scenario
+                ) or {})
+                retried = (
+                    retry_response.get("tool") == "get_docs_context"
+                    and (retry_response.get("arguments") or {}).get("question") == scenario.expected_retry_question
+                )
             results.append({
                 "scenario_id": scenario.scenario_id,
                 "repeat": repeat,
@@ -125,12 +153,8 @@ def evaluate_tool_choice(adapter: LowCostModelAdapter, *, guidance: str, tool_sc
                 "first_tool_correct": tool == scenario.expected_first_tool,
                 "legacy_tool_hallucinated": bool(tool and tool not in {"get_docs_context", "prepare_docs", "docs_status"}),
                 "unnecessary_prepare_or_status": scenario.expected_first_tool not in {"prepare_docs", "docs_status"} and tool in {"prepare_docs", "docs_status"},
-                "next_action_correct": response.get("arguments") == scenario.expected_next_action if scenario.expected_next_action else None,
-                "original_question_retried": (
-                    response.get("arguments", {}).get("question") == scenario.expected_retry_question
-                    if scenario.expected_retry_question is not None
-                    else None
-                ),
+                "next_action_correct": arguments == scenario.expected_next_action if scenario.expected_next_action else None,
+                "original_question_retried": retried,
             })
     total = len(results)
     first_tool_accuracy = sum(item["first_tool_correct"] for item in results) / total
@@ -213,6 +237,25 @@ def _openai_completion(*, api_base: str, api_key: str, model: str) -> Callable[[
     return complete
 
 
+def _failure_report(*, model_version: str, reason: str, tool_schemas: list[dict[str, Any]] | None = None) -> dict[str, Any]:
+    """Return the single fail-closed report shape for preflight and live failures."""
+    return {
+        "adapter": {"name": MODEL_ADAPTER_NAME, "model_version": model_version},
+        "tool_schema_version": _schema_version(tool_schemas) if tool_schemas else "unavailable",
+        "scenario_count": len(SCENARIOS),
+        "repeats": REPEATS,
+        "thresholds": THRESHOLDS,
+        "metrics": {name: 0.0 for name in THRESHOLDS},
+        "passed": False,
+        "status": "failed",
+        "reason": reason,
+        "results": [
+            {"scenario_id": scenario.scenario_id, "repeat": repeat, "status": "not_run"}
+            for scenario in SCENARIOS for repeat in range(1, REPEATS + 1)
+        ],
+    }
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Run the opt-in live agent tool-choice gate.")
     parser.add_argument("--model", required=True)
@@ -220,26 +263,28 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--guidance", type=Path, help="Evaluate an exact installed guidance file instead of the canonical render.")
     args = parser.parse_args(argv)
-    api_key = os.environ.get("OPENAI_API_KEY")
-    if not api_key:
-        parser.error("OPENAI_API_KEY is required for this opt-in live evaluation")
-    guidance = args.guidance.read_text(encoding="utf-8") if args.guidance else installed_guidance()
-    schemas = public_tool_schemas()
-    adapter = OpenAICompatibleLowCostAdapter(
-        model_version=args.model,
-        completion=_openai_completion(api_base=args.api_base, api_key=api_key, model=args.model),
-    )
     args.output.parent.mkdir(parents=True, exist_ok=True)
+    schemas: list[dict[str, Any]] | None = None
     try:
+        guidance = args.guidance.read_text(encoding="utf-8") if args.guidance else installed_guidance()
+        if not guidance.strip():
+            raise ValueError("installed guidance must not be empty")
+        schemas = public_tool_schemas()
+        actual_names = {tool.get("name") for tool in schemas}
+        if actual_names != {"get_docs_context", "prepare_docs", "docs_status"}:
+            raise ValueError("public tool schema preflight failed")
+        api_key = os.environ.get("OPENAI_API_KEY")
+        if not api_key:
+            raise ValueError("OPENAI_API_KEY is required")
+        adapter = OpenAICompatibleLowCostAdapter(
+            model_version=args.model,
+            completion=_openai_completion(api_base=args.api_base, api_key=api_key, model=args.model),
+        )
         report = evaluate_tool_choice(adapter, guidance=guidance, tool_schemas=schemas)
     except Exception:
-        report = {
-            "adapter": {"name": adapter.name, "model_version": adapter.model_version},
-            "passed": False,
-            "reason": "live evaluation failed",
-            "status": "failed",
-            "tool_schema_version": _schema_version(schemas),
-        }
+        report = _failure_report(
+            model_version=args.model, reason="live evaluation failed", tool_schemas=schemas
+        )
         args.output.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8")
         return 1
     args.output.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8")

@@ -105,7 +105,7 @@ def test_unregister_preserves_a_user_modified_codex_entry(tmp_path):
     assert "custom-docs" in cfg.read_text()
 
 
-def test_unregister_removes_codex_nested_server_tables(tmp_path):
+def test_unregister_preserves_codex_entry_with_user_nested_tables(tmp_path):
     cfg = tmp_path / "config.toml"
     target = agent_config.AgentTarget("codex", cfg, "toml_mcp_servers")
     agent_config.register_server(target)
@@ -114,10 +114,22 @@ def test_unregister_removes_codex_nested_server_tables(tmp_path):
         + '\n[mcp_servers.docmancer.env]\nTOKEN = "secret"\n\n[other]\nvalue = 1\n'
     )
 
-    assert agent_config.unregister_server(target) is True
+    assert agent_config.unregister_server(target) is False
     payload = tomllib.loads(cfg.read_text())
-    assert "docmancer" not in payload.get("mcp_servers", {})
+    assert payload["mcp_servers"]["docmancer"]["env"]["TOKEN"] == "secret"
     assert payload["other"]["value"] == 1
+
+
+def test_unregister_preserves_json_entry_with_user_fields(tmp_path):
+    cfg = tmp_path / "settings.json"
+    target = agent_config.AgentTarget("test", cfg, "json_mcpServers")
+    agent_config.register_server(target)
+    payload = json.loads(cfg.read_text())
+    payload["mcpServers"]["docmancer"]["env"] = {"TOKEN": "secret"}
+    cfg.write_text(json.dumps(payload))
+
+    assert agent_config.unregister_server(target) is False
+    assert json.loads(cfg.read_text())["mcpServers"]["docmancer"]["env"] == {"TOKEN": "secret"}
 
 
 def test_register_writes_codex_toml_entry(tmp_path):
@@ -144,3 +156,22 @@ def test_register_writes_opencode_and_vscode_project_entries(tmp_path):
     assert json.loads(vscode.config_path.read_text())["servers"]["docmancer"] == {
         "type": "stdio", "command": "doc-atlas", "args": ["mcp", "docs-serve"],
     }
+
+
+def test_register_reenables_disabled_opencode_entry(tmp_path):
+    cfg = tmp_path / "opencode.json"
+    cfg.write_text(json.dumps({
+        "mcp": {
+            "docmancer": {
+                "type": "local",
+                "command": ["doc-atlas", "mcp", "docs-serve"],
+                "enabled": False,
+            }
+        }
+    }))
+    target = agent_config.AgentTarget("opencode", cfg, "json_opencode_mcp")
+
+    changed, _ = agent_config.register_server(target)
+
+    assert changed is True
+    assert json.loads(cfg.read_text())["mcp"]["docmancer"]["enabled"] is True

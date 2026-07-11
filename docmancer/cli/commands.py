@@ -697,7 +697,8 @@ def _install_skill_file(content: str, dest: Path) -> None:
             managed = existing[len(_AGENTS_MD_START):end_idx].strip()
             old_front_matter, _ = _split_front_matter(managed)
             if old_front_matter:
-                dest.write_text(front_matter + _SKILL_FILE_OWNER + "\n" + marker_block, encoding="utf-8")
+                suffix = existing[end_idx + len(_AGENTS_MD_END):]
+                dest.write_text(front_matter + _SKILL_FILE_OWNER + "\n" + marker_block + suffix, encoding="utf-8")
                 return
 
     existing_front_matter, _ = _split_front_matter(existing)
@@ -743,6 +744,11 @@ _AGENTS_MD_START = "<!-- docmancer:start -->"
 _AGENTS_MD_END = "<!-- docmancer:end -->"
 _SKILL_FILE_OWNER = "<!-- docmancer:managed-skill-file -->"
 _PROJECT_INSTALL_STATE = Path(".docmancer") / "agent-installs.json"
+
+
+def _project_state_agent(agent: str) -> str:
+    normalized = agent.lower()
+    return "codex" if normalized in {"codex-app", "codex-desktop"} else normalized
 
 
 def _install_or_append_agents_md(dest: Path, content_body: str) -> None:
@@ -793,7 +799,22 @@ def _project_bootstrap_dest(agent: str) -> Path | None:
 
 def _project_install_agents() -> set[str]:
     if not _PROJECT_INSTALL_STATE.exists():
-        return set()
+        try:
+            from docmancer.mcp.agent_config import known_agents, target_has_current_server_entry
+
+            return {
+                target.name
+                for target in known_agents(project=True)
+                if _project_bootstrap_dest(target.name) is not None
+                and target_has_current_server_entry(target)
+            }
+        except (OSError, ValueError):
+            # A malformed legacy MCP config makes ownership unknowable. Prefer
+            # retaining shared guidance over deleting another agent's contract.
+            return {
+                "claude-code", "codex", "cursor", "opencode",
+                "cline", "gemini", "github-copilot",
+            }
     try:
         payload = json.loads(_PROJECT_INSTALL_STATE.read_text(encoding="utf-8"))
         agents = payload.get("agents", [])
@@ -815,13 +836,14 @@ def _write_project_install_agents(agents: set[str]) -> None:
 
 def _record_project_install(agent: str) -> None:
     agents = _project_install_agents()
-    agents.add(agent.lower())
+    agents.add(_project_state_agent(agent))
     _write_project_install_agents(agents)
 
 
 def _other_agent_uses_project_bootstrap(agent: str, dest: Path) -> bool:
+    current = _project_state_agent(agent)
     return any(
-        other != agent.lower() and _project_bootstrap_dest(other) == dest
+        other != current and _project_bootstrap_dest(other) == dest
         for other in _project_install_agents()
     )
 
@@ -922,7 +944,7 @@ def _unregister_mcp_for_agent(agent_name: str, *, project: bool) -> bool:
         ) from exc
 
 
-def _install_vscode_copilot_settings(dest: Path) -> None:
+def _install_vscode_copilot_settings(dest: Path) -> bool:
     dest.parent.mkdir(parents=True, exist_ok=True)
     settings: dict[str, object] = {}
     if dest.exists() and dest.read_text(encoding="utf-8").strip():
@@ -934,6 +956,7 @@ def _install_vscode_copilot_settings(dest: Path) -> None:
             raise click.ClickException(f"Could not update {display_path(dest)} because it must contain a JSON object.")
     settings.setdefault("github.copilot.chat.codeGeneration.useInstructionFiles", True)
     dest.write_text(json.dumps(settings, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    return settings["github.copilot.chat.codeGeneration.useInstructionFiles"] is True
 
 
 # ---------------------------------------------------------------------------
@@ -2259,15 +2282,13 @@ def install_cmd(agent: str, project: bool, uninstall: bool, config_path: str | N
             removed = _remove_managed_instruction_block(path) or removed
         if project:
             agents = _project_install_agents()
-            agents.discard(normalized)
+            agents.discard(_project_state_agent(normalized))
             _write_project_install_agents(agents)
         unregistered = _unregister_mcp_for_agent(normalized, project=project)
         click.echo("Removed DocAtlas-managed project guidance." if removed else "No DocAtlas-managed project guidance found.")
         click.echo("Removed DocAtlas MCP registration." if unregistered else "No DocAtlas MCP registration found.")
         return
     _register_mcp_for_agent(normalized, project=project)
-    if project and _project_bootstrap_dest(normalized) is not None:
-        _record_project_install(normalized)
     if not project:
         click.echo(f"Project guidance: run `doc-atlas install {agent} --project` inside the repository.")
     home = Path.home()
@@ -2305,6 +2326,8 @@ def install_cmd(agent: str, project: bool, uninstall: bool, config_path: str | N
         content = _build_skill_content("claude_code_skill.md", effective_config_path)
         _install_skill_file(content, dest)
         bootstrap_dest = _install_project_bootstrap(normalized) if project else None
+        if project:
+            _record_project_install(normalized)
         installed = [("Installed docmancer skill at", dest)]
         if bootstrap_dest:
             installed.append(("Updated project instructions at", bootstrap_dest))
@@ -2321,6 +2344,7 @@ def install_cmd(agent: str, project: bool, uninstall: bool, config_path: str | N
     if normalized in {"codex", "codex-app", "codex-desktop"}:
         if project:
             bootstrap_dest = _install_project_bootstrap(normalized)
+            _record_project_install(normalized)
             installed = [("Updated project instructions at", bootstrap_dest)]
         else:
             dest = _get_codex_skill_path()
@@ -2354,6 +2378,7 @@ def install_cmd(agent: str, project: bool, uninstall: bool, config_path: str | N
         # Also write AGENTS.md fallback while Cursor's skill discovery matures
         if project:
             agents_md = _install_project_bootstrap(normalized)
+            _record_project_install(normalized)
         else:
             agents_md = home / ".cursor" / "AGENTS.md"
             agents_body = _get_template_content("cursor_agents_md.md").replace(
@@ -2380,6 +2405,8 @@ def install_cmd(agent: str, project: bool, uninstall: bool, config_path: str | N
         content = _build_skill_content("skill.md", effective_config_path)
         _install_skill_file(content, dest)
         bootstrap_dest = _install_project_bootstrap(normalized) if project else None
+        if project:
+            _record_project_install(normalized)
         installed = [("Installed docmancer skill at", dest)]
         if bootstrap_dest:
             installed.append(("Updated project instructions at", bootstrap_dest))
@@ -2404,13 +2431,19 @@ def install_cmd(agent: str, project: bool, uninstall: bool, config_path: str | N
             bootstrap = _get_template_content("project_bootstrap.md")
             _install_or_append_agents_md(copilot_dest, bootstrap)
             _install_or_append_agents_md(agents_dest, bootstrap)
-            _install_vscode_copilot_settings(settings_dest)
+            instructions_enabled = _install_vscode_copilot_settings(settings_dest)
+            _record_project_install(normalized)
             _emit_install_summary(
                 "Install instructions for GitHub Copilot.",
                 [
                     ("Updated Copilot repository instructions at", copilot_dest),
                     ("Updated Copilot coding-agent fallback at", agents_dest),
-                    ("Enabled VS Code Copilot instruction files at", settings_dest),
+                    (
+                        "Enabled VS Code Copilot instruction files at"
+                        if instructions_enabled
+                        else "Preserved disabled VS Code Copilot instruction setting at",
+                        settings_dest,
+                    ),
                     ("Registered Docs MCP server at", mcp_dest),
                 ],
                 created_user_config,
@@ -2419,6 +2452,9 @@ def install_cmd(agent: str, project: bool, uninstall: bool, config_path: str | N
                 extra_lines=[
                     "Copilot Chat and code review use .github/copilot-instructions.md.",
                     "Copilot coding agent can also read AGENTS.md.",
+                    *([] if instructions_enabled else [
+                        "WARNING: Copilot instruction files remains disabled by explicit user configuration."
+                    ]),
                 ],
             )
         else:
@@ -2446,6 +2482,8 @@ def install_cmd(agent: str, project: bool, uninstall: bool, config_path: str | N
         _install_skill_file(content, dest)
         bootstrap_dest = _install_project_bootstrap(normalized) if project else None
 
+        if project:
+            _record_project_install(normalized)
         installed_paths = [("Installed docmancer skill at", dest)]
         if bootstrap_dest:
             installed_paths.append(("Updated project instructions at", bootstrap_dest))
@@ -2463,6 +2501,7 @@ def install_cmd(agent: str, project: bool, uninstall: bool, config_path: str | N
     if normalized == "opencode":
         if project:
             bootstrap_dest = _install_project_bootstrap(normalized)
+            _record_project_install(normalized)
             installed_paths = [("Updated project instructions at", bootstrap_dest)]
         else:
             dest = home / ".config" / "opencode" / "skills" / "docmancer" / "SKILL.md"

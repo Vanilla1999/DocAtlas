@@ -226,6 +226,36 @@ def test_project_uninstall_keeps_shared_bootstrap_for_copilot_and_codex(removed_
         assert "get_docs_context" in Path("AGENTS.md").read_text(encoding="utf-8")
 
 
+def test_project_uninstall_detects_legacy_shared_bootstrap_owners_from_mcp_configs():
+    runner = CliRunner()
+    with runner.isolated_filesystem() as tmp_dir:
+        fake_home = _home(tmp_dir)
+        with patch("docmancer.cli.commands.Path.home", return_value=fake_home), \
+             patch("docmancer.mcp.agent_config.Path.home", return_value=fake_home), \
+             patch("docmancer.cli.commands._get_config_class", return_value=FakeDocmancerConfig):
+            assert runner.invoke(cli, ["install", "codex", "--project"]).exit_code == 0
+            assert runner.invoke(cli, ["install", "opencode", "--project"]).exit_code == 0
+            Path(".docmancer/agent-installs.json").unlink()
+            uninstall = runner.invoke(cli, ["install", "codex", "--project", "--uninstall"])
+        assert uninstall.exit_code == 0, uninstall.output
+        assert "get_docs_context" in Path("AGENTS.md").read_text(encoding="utf-8")
+
+
+def test_failed_project_install_does_not_record_agent_state():
+    runner = CliRunner()
+    with runner.isolated_filesystem() as tmp_dir:
+        fake_home = _home(tmp_dir)
+        skill = Path(".gemini/skills/docmancer/SKILL.md")
+        skill.parent.mkdir(parents=True)
+        skill.write_text("---\nname: custom\n---\n<!-- docmancer:start -->\nbroken\n", encoding="utf-8")
+        with patch("docmancer.cli.commands.Path.home", return_value=fake_home), \
+             patch("docmancer.mcp.agent_config.Path.home", return_value=fake_home), \
+             patch("docmancer.cli.commands._get_config_class", return_value=FakeDocmancerConfig):
+            result = runner.invoke(cli, ["install", "gemini", "--project"])
+        assert result.exit_code != 0
+        assert not Path(".docmancer/agent-installs.json").exists()
+
+
 @pytest.mark.parametrize(
     ("agent", "skill_path"),
     [
@@ -420,6 +450,27 @@ def test_copilot_project_install_preserves_explicit_user_instruction_setting():
             "github.copilot.chat.codeGeneration.useInstructionFiles": False,
             "user.setting": "keep",
         }
+        assert "remains disabled" in install.output
+        assert "Enabled VS Code Copilot instruction files" not in install.output
+
+
+def test_legacy_skill_migration_preserves_user_suffix():
+    runner = CliRunner()
+    with runner.isolated_filesystem() as tmp_dir:
+        fake_home = _home(tmp_dir)
+        skill = fake_home / ".claude/skills/docmancer/SKILL.md"
+        skill.parent.mkdir(parents=True)
+        skill.write_text(
+            "<!-- docmancer:start -->\n---\nname: docmancer\n---\nold\n"
+            "<!-- docmancer:end -->\n\n# My local notes\nDo not delete this.\n",
+            encoding="utf-8",
+        )
+        with patch("docmancer.cli.commands.Path.home", return_value=fake_home), \
+             patch("docmancer.mcp.agent_config.Path.home", return_value=fake_home), \
+             patch("docmancer.cli.commands._get_config_class", return_value=FakeDocmancerConfig):
+            result = runner.invoke(cli, ["install", "claude-code"])
+        assert result.exit_code == 0, result.output
+        assert "# My local notes\nDo not delete this." in skill.read_text(encoding="utf-8")
 
 
 @pytest.mark.parametrize(

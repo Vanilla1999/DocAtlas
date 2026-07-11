@@ -257,13 +257,19 @@ def test_mcp_exposes_get_project_context_with_trust_contract():
 
 
 def test_agent_templates_include_three_tool_selection_guidance():
+    from importlib.resources import files
     from docmancer.cli.commands import _get_template_content
 
+    canonical = files("docmancer.templates").joinpath("agent_contract.md").read_text(encoding="utf-8").strip()
     for name in (
         "skill.md", "claude_code_skill.md", "claude_desktop_skill.md",
         "cursor_agents_md.md", "copilot_instructions.md", "project_bootstrap.md",
     ):
+        raw = files("docmancer.templates").joinpath(name).read_text(encoding="utf-8")
+        assert raw.count("{{CANONICAL_AGENT_CONTRACT}}") == 1
+        assert "get_docs_context" not in raw.replace("{{CANONICAL_AGENT_CONTRACT}}", "")
         text = _get_template_content(name)
+        assert text.count(canonical) == 1
         assert "get_docs_context" in text
         assert "prepare_docs" in text
         assert "docs_status" in text

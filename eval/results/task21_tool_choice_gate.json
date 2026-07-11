@@ -1,34 +1,322 @@
 {
   "adapter": {
-    "name": "openai-compatible-low-cost",
-    "model_version": "not-run"
+    "model_version": "not-run",
+    "name": "openai-compatible-low-cost"
+  },
+  "metrics": {
+    "first_tool_accuracy": 0.0,
+    "legacy_tool_hallucination_rate": 0.0,
+    "next_action_copy_accuracy": 0.0,
+    "original_question_retry_rate": 0.0,
+    "unnecessary_prepare_or_status_rate": 0.0
   },
   "passed": false,
-  "reason": "Live evaluation requires an explicitly supplied model and OPENAI_API_KEY; no credential was available for the repository run.",
+  "reason": "live evaluation failed",
   "repeats": 3,
   "results": [
-    {"scenario_id": "project-present", "status": "not_run"},
-    {"scenario_id": "project-missing", "status": "not_run"},
-    {"scenario_id": "project-stale", "status": "not_run"},
-    {"scenario_id": "library-present", "status": "not_run"},
-    {"scenario_id": "library-missing", "status": "not_run"},
-    {"scenario_id": "exact-library", "status": "not_run"},
-    {"scenario_id": "job-poll", "status": "not_run"},
-    {"scenario_id": "index-health", "status": "not_run"},
-    {"scenario_id": "implementation-only", "status": "not_run"},
-    {"scenario_id": "network-confirmation", "status": "not_run"},
-    {"scenario_id": "explicit-sync", "status": "not_run"},
-    {"scenario_id": "invalid-payload", "status": "not_run"},
-    {"scenario_id": "unrelated", "status": "not_run"},
-    {"scenario_id": "mixed-question", "status": "not_run"},
-    {"scenario_id": "missing-action", "status": "not_run"},
-    {"scenario_id": "retry-question", "status": "not_run"},
-    {"scenario_id": "project-code-boundary", "status": "not_run"},
-    {"scenario_id": "dependency-version", "status": "not_run"},
-    {"scenario_id": "refresh-request", "status": "not_run"},
-    {"scenario_id": "job-list", "status": "not_run"}
+    {
+      "repeat": 1,
+      "scenario_id": "project-present",
+      "status": "not_run"
+    },
+    {
+      "repeat": 2,
+      "scenario_id": "project-present",
+      "status": "not_run"
+    },
+    {
+      "repeat": 3,
+      "scenario_id": "project-present",
+      "status": "not_run"
+    },
+    {
+      "repeat": 1,
+      "scenario_id": "project-missing",
+      "status": "not_run"
+    },
+    {
+      "repeat": 2,
+      "scenario_id": "project-missing",
+      "status": "not_run"
+    },
+    {
+      "repeat": 3,
+      "scenario_id": "project-missing",
+      "status": "not_run"
+    },
+    {
+      "repeat": 1,
+      "scenario_id": "project-stale",
+      "status": "not_run"
+    },
+    {
+      "repeat": 2,
+      "scenario_id": "project-stale",
+      "status": "not_run"
+    },
+    {
+      "repeat": 3,
+      "scenario_id": "project-stale",
+      "status": "not_run"
+    },
+    {
+      "repeat": 1,
+      "scenario_id": "library-present",
+      "status": "not_run"
+    },
+    {
+      "repeat": 2,
+      "scenario_id": "library-present",
+      "status": "not_run"
+    },
+    {
+      "repeat": 3,
+      "scenario_id": "library-present",
+      "status": "not_run"
+    },
+    {
+      "repeat": 1,
+      "scenario_id": "library-missing",
+      "status": "not_run"
+    },
+    {
+      "repeat": 2,
+      "scenario_id": "library-missing",
+      "status": "not_run"
+    },
+    {
+      "repeat": 3,
+      "scenario_id": "library-missing",
+      "status": "not_run"
+    },
+    {
+      "repeat": 1,
+      "scenario_id": "exact-library",
+      "status": "not_run"
+    },
+    {
+      "repeat": 2,
+      "scenario_id": "exact-library",
+      "status": "not_run"
+    },
+    {
+      "repeat": 3,
+      "scenario_id": "exact-library",
+      "status": "not_run"
+    },
+    {
+      "repeat": 1,
+      "scenario_id": "job-poll",
+      "status": "not_run"
+    },
+    {
+      "repeat": 2,
+      "scenario_id": "job-poll",
+      "status": "not_run"
+    },
+    {
+      "repeat": 3,
+      "scenario_id": "job-poll",
+      "status": "not_run"
+    },
+    {
+      "repeat": 1,
+      "scenario_id": "index-health",
+      "status": "not_run"
+    },
+    {
+      "repeat": 2,
+      "scenario_id": "index-health",
+      "status": "not_run"
+    },
+    {
+      "repeat": 3,
+      "scenario_id": "index-health",
+      "status": "not_run"
+    },
+    {
+      "repeat": 1,
+      "scenario_id": "implementation-only",
+      "status": "not_run"
+    },
+    {
+      "repeat": 2,
+      "scenario_id": "implementation-only",
+      "status": "not_run"
+    },
+    {
+      "repeat": 3,
+      "scenario_id": "implementation-only",
+      "status": "not_run"
+    },
+    {
+      "repeat": 1,
+      "scenario_id": "network-confirmation",
+      "status": "not_run"
+    },
+    {
+      "repeat": 2,
+      "scenario_id": "network-confirmation",
+      "status": "not_run"
+    },
+    {
+      "repeat": 3,
+      "scenario_id": "network-confirmation",
+      "status": "not_run"
+    },
+    {
+      "repeat": 1,
+      "scenario_id": "explicit-sync",
+      "status": "not_run"
+    },
+    {
+      "repeat": 2,
+      "scenario_id": "explicit-sync",
+      "status": "not_run"
+    },
+    {
+      "repeat": 3,
+      "scenario_id": "explicit-sync",
+      "status": "not_run"
+    },
+    {
+      "repeat": 1,
+      "scenario_id": "invalid-payload",
+      "status": "not_run"
+    },
+    {
+      "repeat": 2,
+      "scenario_id": "invalid-payload",
+      "status": "not_run"
+    },
+    {
+      "repeat": 3,
+      "scenario_id": "invalid-payload",
+      "status": "not_run"
+    },
+    {
+      "repeat": 1,
+      "scenario_id": "unrelated",
+      "status": "not_run"
+    },
+    {
+      "repeat": 2,
+      "scenario_id": "unrelated",
+      "status": "not_run"
+    },
+    {
+      "repeat": 3,
+      "scenario_id": "unrelated",
+      "status": "not_run"
+    },
+    {
+      "repeat": 1,
+      "scenario_id": "mixed-question",
+      "status": "not_run"
+    },
+    {
+      "repeat": 2,
+      "scenario_id": "mixed-question",
+      "status": "not_run"
+    },
+    {
+      "repeat": 3,
+      "scenario_id": "mixed-question",
+      "status": "not_run"
+    },
+    {
+      "repeat": 1,
+      "scenario_id": "prepare-and-retry",
+      "status": "not_run"
+    },
+    {
+      "repeat": 2,
+      "scenario_id": "prepare-and-retry",
+      "status": "not_run"
+    },
+    {
+      "repeat": 3,
+      "scenario_id": "prepare-and-retry",
+      "status": "not_run"
+    },
+    {
+      "repeat": 1,
+      "scenario_id": "direct-guidance",
+      "status": "not_run"
+    },
+    {
+      "repeat": 2,
+      "scenario_id": "direct-guidance",
+      "status": "not_run"
+    },
+    {
+      "repeat": 3,
+      "scenario_id": "direct-guidance",
+      "status": "not_run"
+    },
+    {
+      "repeat": 1,
+      "scenario_id": "project-code-boundary",
+      "status": "not_run"
+    },
+    {
+      "repeat": 2,
+      "scenario_id": "project-code-boundary",
+      "status": "not_run"
+    },
+    {
+      "repeat": 3,
+      "scenario_id": "project-code-boundary",
+      "status": "not_run"
+    },
+    {
+      "repeat": 1,
+      "scenario_id": "dependency-version",
+      "status": "not_run"
+    },
+    {
+      "repeat": 2,
+      "scenario_id": "dependency-version",
+      "status": "not_run"
+    },
+    {
+      "repeat": 3,
+      "scenario_id": "dependency-version",
+      "status": "not_run"
+    },
+    {
+      "repeat": 1,
+      "scenario_id": "refresh-request",
+      "status": "not_run"
+    },
+    {
+      "repeat": 2,
+      "scenario_id": "refresh-request",
+      "status": "not_run"
+    },
+    {
+      "repeat": 3,
+      "scenario_id": "refresh-request",
+      "status": "not_run"
+    },
+    {
+      "repeat": 1,
+      "scenario_id": "job-list",
+      "status": "not_run"
+    },
+    {
+      "repeat": 2,
+      "scenario_id": "job-list",
+      "status": "not_run"
+    },
+    {
+      "repeat": 3,
+      "scenario_id": "job-list",
+      "status": "not_run"
+    }
   ],
   "scenario_count": 20,
+  "status": "failed",
   "thresholds": {
     "first_tool_accuracy": 0.95,
     "legacy_tool_hallucination_rate": 0.0,
