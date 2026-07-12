@@ -20,6 +20,7 @@ from docmancer.docs.models import DocsChunk, DocsResult, DocsTarget, ProjectCont
 from docmancer.docs.interfaces.mcp.project_tools import handle_project_tool
 from docmancer.docs.registry import LibraryRegistry
 from docmancer.docs.service import DocsJobTracker, LibraryDocsService
+from docmancer.docs.application.library_job_executor import LibraryJobExecutor
 from docmancer.mcp.docs_server import call_docs_tool_payload
 
 
@@ -3388,7 +3389,7 @@ def test_prepare_library_docs_queues_network_ingest_and_keeps_status_responsive(
     )
 
     assert time.monotonic() - started < 1
-    assert payload["status"] == "running"
+    assert payload["status"] in {"pending", "running"}
     assert payload["job_id"]
     assert agent.entered.wait(timeout=1)
 
@@ -3599,17 +3600,6 @@ def test_library_prefetch_job_deadline_is_terminal_and_retryable(tmp_path, monke
     assert agent.entered.wait(timeout=1)
     for _ in range(30):
         status = service.get_docs_job_status(result.job_id)
-        if status and status.status == "cancelling":
-            break
-        time.sleep(0.02)
-
-    status = service.get_docs_job_status(result.job_id)
-    assert status is not None
-    assert status.status == "cancelling"
-    assert status.reason_code == "job_deadline_exceeded"
-    agent.release.set()
-    for _ in range(30):
-        status = service.get_docs_job_status(result.job_id)
         if status and status.status == "failed":
             break
         time.sleep(0.02)
@@ -3619,10 +3609,51 @@ def test_library_prefetch_job_deadline_is_terminal_and_retryable(tmp_path, monke
     assert status.status == "failed"
     assert status.reason_code == "job_deadline_exceeded"
     assert status.retryable is True
+    agent.release.set()
     record = service.registry.get("example-docs", "web", "latest")
     assert record is not None
     index_parent = Path(service._index_config_for(record).index.db_path).parent
+    for _ in range(50):
+        if not list(index_parent.glob(".docatlas-staging-*")):
+            break
+        time.sleep(0.02)
     assert list(index_parent.glob(".docatlas-staging-*")) == []
+
+
+def test_library_prefetch_rejects_overload_before_staging(tmp_path, monkeypatch):
+    agent = SlowAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+    service.library_docs.job_executor = LibraryJobExecutor(max_workers=1, max_queued=0)
+
+    first = service.prefetch_docs(
+        "first-docs",
+        ecosystem="web",
+        docs_url="https://example.com/first/",
+        async_=True,
+    )
+    assert first.status in {"pending", "running"}
+    assert agent.entered.wait(timeout=1)
+
+    rejected = service.prefetch_docs(
+        "second-docs",
+        ecosystem="web",
+        docs_url="https://example.com/second/",
+        async_=True,
+    )
+    assert rejected.status == "busy"
+    status = service.get_docs_job_status(rejected.job_id)
+    assert status is not None
+    assert status.reason_code == "busy"
+    assert status.retryable is True
+    assert len(agent.add_calls) == 1
+    assert not list((tmp_path / "home" / "docs-indexes").glob(".docatlas-staging-*second*"))
+    status_latencies = []
+    for _ in range(100):
+        started = time.monotonic()
+        assert service.get_docs_job_status(first.job_id) is not None
+        status_latencies.append(time.monotonic() - started)
+    assert sorted(status_latencies)[98] < 1.0
+    agent.release.set()
 
 
 def test_registry_commit_failure_rolls_back_published_staging_index(tmp_path, monkeypatch):

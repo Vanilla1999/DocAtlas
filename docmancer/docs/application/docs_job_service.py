@@ -438,7 +438,7 @@ class DocsJobTracker:
             job = self._store.get(job_id) if self._store is not None else self._jobs.get(job_id)
             if job is None:
                 return DocsJobCancelResult(job_id=job_id, status="not_found", message="Job not found.")
-            if job.phase == "committing":
+            if job.phase == "committing" and job.kind != "prefetch_library_docs":
                 return DocsJobCancelResult(
                     job_id=job_id,
                     status=job.status,

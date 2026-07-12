@@ -731,21 +731,28 @@ class LibraryRefreshOps:
         result: Any = None
         with self._lock_for(record.library_id):
             try:
-                if commit_guard is not None and not commit_guard():
-                    raise RuntimeError("docs_job_generation_revoked")
+                def require_active_generation() -> None:
+                    if commit_guard is not None and not commit_guard():
+                        raise RuntimeError("docs_job_generation_revoked")
+
+                require_active_generation()
                 if staging_db.exists():
                     with sqlite3.connect(staging_db) as source, sqlite3.connect(candidate_db) as destination:
                         source.backup(destination)
+                require_active_generation()
                 if production_db.exists():
                     production_db.replace(backup_db)
                 if production_extracted.exists():
                     production_extracted.replace(backup_extracted)
                 production_db.parent.mkdir(parents=True, exist_ok=True)
+                require_active_generation()
                 if candidate_db.exists():
                     candidate_db.replace(production_db)
+                require_active_generation()
                 if staging_extracted.exists():
                     production_extracted.parent.mkdir(parents=True, exist_ok=True)
                     staging_extracted.replace(production_extracted)
+                require_active_generation()
                 result = registry_update()
                 committed = True
             except Exception as commit_error:
