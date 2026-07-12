@@ -179,61 +179,32 @@ for exact dependency documentation from manifests/lockfiles.
 
 Prefer `prefetch_project_dependency_docs` in new instructions because it makes the behavior explicit.
 
-## Maintained docs index
+## Maintained project-doc catalog
 
-For repositories with more than a few documentation files, keep a reviewable documentation map at:
+For repositories with nonstandard documentation names or more than a few files, keep a reviewable `docatlas.project-docs.yaml` catalog. When it exists, DocAtlas indexes only validated catalog entries. Without it, common README/docs/module locations remain a cold-start fallback.
 
-```text
-docs/INDEX.md
+```yaml
+schema_version: 1
+documents:
+  - path: ARCHITECTURE.md
+    role: project_architecture
+    scope: project
+    description: Whole-project architecture and component boundaries.
+    authority: source_of_truth
+    status: active
+    impact: track
+
+  - path: packages/auth/design.md
+    role: module_architecture
+    scope: module
+    module_path: packages/auth
+    description: Authentication module architecture and token lifecycle.
+    authority: source_of_truth
+    status: active
+    impact: track
 ```
 
-Docmancer can discover common root docs and documentation directories without this file, but a maintained index makes intent explicit for both humans and agents. Treat `docs/INDEX.md` as the canonical map of project-owned docs: it should link the files that are official, maintained, and safe to use as project evidence.
-
-Copy-paste template:
-
-```markdown
-# Documentation Index
-
-This file is the canonical map of maintained project-owned documentation.
-
-## Start here
-
-- [README](../README.md) — product/project overview and setup.
-- [Architecture](../ARCHITECTURE.md) — high-level architecture and major decisions.
-
-## Architecture and decisions
-
-- [Architecture overview](architecture.md) — current system shape and boundaries.
-- [ADR index](adr/README.md) — accepted architecture decision records.
-
-## Modules and packages
-
-- [Backend module](../packages/backend/README.md) — backend-specific conventions.
-- [Frontend module](../packages/frontend/README.md) — frontend-specific conventions.
-- [Auth service](../services/auth/README.md) — authentication service architecture and runbook.
-
-## Runbooks
-
-- [Deploy runbook](runbooks/deploy.md) — release and rollback steps.
-- [Incident runbook](runbooks/incidents.md) — operational response steps.
-
-## Investigation notes
-
-- [Investigations](investigations/README.md) — time-bound research notes. Mark each note with owner/date/status.
-
-## Generated or tooling docs to ignore
-
-- `build/`, `dist/`, `coverage/`, `.dart_tool/`, `node_modules/`, `.venv/` — generated, dependency, or tooling output.
-- Link a generated file here only if humans intentionally maintain it as project documentation.
-
-## Maintenance rules
-
-- Add new official docs here when they are created or moved.
-- Remove or mark stale docs when decisions change.
-- After reorganizing docs, run the Docmancer verification loop: sync, then inspect, then ask smoke-test questions and confirm expected files are cited.
-```
-
-When an expected nested document is missing from results, first check whether it is linked from root docs or `docs/INDEX.md`, lives under a discovered docs location, or needs a discovery/manifest update. If `inspect_project_docs` reports `indexed_source_not_discovered`, do not assume the indexed file is deleted or invalid: it means the current discovery pass did not select it as a project-doc candidate. Link it from `docs/INDEX.md` or root docs, move it under a discovered docs location, adjust discovery, or run `sync_project_docs` to remove obsolete index entries.
+The host coding model may edit this normal Git file after inspecting the repository. DocAtlas only validates and consumes it. Invalid paths, traversal, symlinks, duplicates, missing files, and unsupported formats fail closed with warnings. Use `status: completed` or `superseded` and `impact: search_only` for historical material.
 
 ## Verification loop
 

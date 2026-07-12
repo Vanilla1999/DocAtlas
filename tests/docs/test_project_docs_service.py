@@ -265,9 +265,13 @@ def test_project_docs_candidate_has_stable_serializable_shape_and_freshness(tmp_
         "doc_scope": "project",
         "module_id": None,
         "module_name": None,
-        "module_path": None,
-        "module_type": None,
-    }
+            "module_path": None,
+            "module_type": None,
+            "description": None,
+            "authority": None,
+            "lifecycle_status": "active",
+            "impact_policy": "track",
+        }
 
 
 def test_project_reader_emits_normalized_pub_dependency_observations(tmp_path):

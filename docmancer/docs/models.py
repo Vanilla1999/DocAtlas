@@ -67,6 +67,10 @@ class ProjectDocsChunk(DocsChunk):
     module_name: str | None = None
     module_path: str | None = None
     module_type: str | None = None
+    description: str | None = None
+    authority: str | None = None
+    lifecycle_status: str | None = None
+    impact_policy: str | None = None
 
 
 @dataclass(frozen=True)
@@ -329,6 +333,10 @@ class ProjectDocsCandidate:
     module_name: str | None = None
     module_path: str | None = None
     module_type: str | None = None
+    description: str | None = None
+    authority: str | None = None
+    lifecycle_status: str = "active"
+    impact_policy: str = "track"
 
 
 @dataclass(frozen=True)

@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any
 
 from docmancer.docs.project import ProjectMetadataReader
+from docmancer.docs.project_docs_catalog import CATALOG_FILENAME
 
 
 SCHEMA_VERSION = "agent-contract-1"
@@ -19,12 +20,17 @@ def build_agent_contract(project_path: str | Path) -> dict[str, Any]:
     """
 
     metadata = ProjectMetadataReader().read(project_path)
+    catalog_present = (Path(metadata.project_path) / CATALOG_FILENAME).is_file()
     docs = [
         {
             "path": candidate.path,
             "scope": candidate.doc_scope,
             "module_path": candidate.module_path,
             "role": candidate.reason,
+            "description": candidate.description,
+            "authority": candidate.authority,
+            "status": candidate.lifecycle_status,
+            "impact": candidate.impact_policy,
         }
         for candidate in metadata.docs_candidates
     ]
@@ -45,6 +51,10 @@ def build_agent_contract(project_path: str | Path) -> dict[str, Any]:
             "path": metadata.project_path,
             "ecosystems": metadata.detected_ecosystems,
             "documentation": docs,
+            "documentation_catalog": {
+                "path": CATALOG_FILENAME,
+                "mode": "explicit" if catalog_present else "cold_start_discovery",
+            },
             "dependencies": dependencies,
         },
         "tool_selection": {
@@ -104,12 +114,12 @@ def format_agent_contract_markdown(contract: dict[str, Any]) -> str:
     ]
     docs = project["documentation"]
     if docs:
-        lines.extend(["| Path | Scope | Role |", "|---|---|---|"])
+        lines.extend(["| Path | Scope | Role | Description |", "|---|---|---|---|"])
         for item in docs:
             scope = item["scope"]
             if item["module_path"]:
                 scope = f"{scope}: {item['module_path']}"
-            lines.append(f"| `{item['path']}` | {scope} | {item['role']} |")
+            lines.append(f"| `{item['path']}` | {scope} | {item['role']} | {item.get('description') or ''} |")
     else:
         lines.append("No maintained documentation files were discovered.")
     lines.extend(["", "## Evidence rules", ""])

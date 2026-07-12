@@ -463,7 +463,17 @@ def analyze_docs_impact(
     else:
         automatic_symbols = list((diff_evidence or {}).get("symbols") or [])
     symbols = _normalized_symbols([*automatic_symbols, *(changed_symbols or [])])
-    all_candidates = [candidate for candidate in metadata.docs_candidates if candidate.path]
+    ignored_document_paths = {
+        candidate.path for candidate in metadata.docs_candidates
+        if candidate.path
+        and (candidate.lifecycle_status != "active" or candidate.impact_policy != "track")
+    }
+    all_candidates = [
+        candidate for candidate in metadata.docs_candidates
+        if candidate.path
+        and candidate.lifecycle_status == "active"
+        and candidate.impact_policy == "track"
+    ]
     candidates_by_path = {candidate.path: candidate for candidate in all_candidates}
     changed_modules = {_module_path(path) for path in changed}
     candidates = sorted(all_candidates, key=lambda candidate: _impact_candidate_priority(candidate, changed_modules))
@@ -518,12 +528,16 @@ def analyze_docs_impact(
             documentation_changes.setdefault(path, {"path": path, "status": "updated"})
         elif not change_records and _looks_like_doc_path(path):
             documentation_changes.setdefault(path, {"path": path, "status": "changed_or_deleted"})
+    documentation_changes = {
+        path: change for path, change in documentation_changes.items()
+        if path not in ignored_document_paths
+    }
     documentation_change_paths = {
         path
         for item in documentation_changes.values()
         for path in (item.get("path"), item.get("old_path"), item.get("new_path"))
         if path
-    }
+    } | {path for path in changed if path in ignored_document_paths}
     updated_docs = sorted(documentation_changes)
     code_changes = [
         path for path in changed

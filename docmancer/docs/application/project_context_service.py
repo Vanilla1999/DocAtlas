@@ -468,6 +468,8 @@ def project_context_pack(*, question: str = "", project_docs: ProjectDocsResult 
             token_estimate = max(1, len(item.content) // 4) if item.content else 0
             freshness = "stale" if item.stale else "current"
             source_taxonomy = project_source_taxonomy(item.path, doc_scope=item.doc_scope, module_path=item.module_path)
+            if item.authority:
+                source_taxonomy["authority"] = item.authority
             if _should_skip_low_trust_project_source(question, source_taxonomy):
                 continue
             pack.append({
@@ -481,6 +483,9 @@ def project_context_pack(*, question: str = "", project_docs: ProjectDocsResult 
                 "module_name": item.module_name,
                 "module_path": item.module_path,
                 "module_type": item.module_type,
+                "description": item.description,
+                "lifecycle_status": item.lifecycle_status,
+                "impact_policy": item.impact_policy,
                 "path": item.path,
                 "url": item.url,
                 "title": item.title,
@@ -500,6 +505,9 @@ def project_context_pack(*, question: str = "", project_docs: ProjectDocsResult 
                     "module_name": item.module_name,
                     "module_path": item.module_path,
                     "module_type": item.module_type,
+                    "description": item.description,
+                    "lifecycle_status": item.lifecycle_status,
+                    "impact_policy": item.impact_policy,
                     "path": item.path,
                     "url": item.url,
                     "title": item.title,

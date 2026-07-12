@@ -502,6 +502,10 @@ class ProjectDocsService:
                     "module_name": candidate.module_name,
                     "module_path": candidate.module_path,
                     "module_type": candidate.module_type,
+                    "project_doc_description": candidate.description,
+                    "project_doc_authority": candidate.authority,
+                    "project_doc_lifecycle_status": candidate.lifecycle_status,
+                    "project_doc_impact_policy": candidate.impact_policy,
                     "project_doc_sections": section_result.sections,
                     "project_doc_sections_status": section_result.status,
                     "project_doc_sections_reason": section_result.reason_code,
@@ -1014,6 +1018,10 @@ class ProjectDocsService:
         }
         safe_chunks = []
         dropped_placeholder_chunks = 0
+        history_requested = any(
+            term in query.lower()
+            for term in ("history", "historical", "roadmap", "completed", "superseded", "previous plan")
+        )
         for chunk in chunks:
             metadata_for_chunk = chunk.metadata or {}
             chunk_path = metadata_for_chunk.get("project_doc_path") or metadata_for_chunk.get("source_path")
@@ -1021,6 +1029,9 @@ class ProjectDocsService:
             if not current_source:
                 continue
             if metadata_for_chunk.get("project_doc_content_hash") != current_source.get("content_hash"):
+                continue
+            lifecycle_status = metadata_for_chunk.get("project_doc_lifecycle_status") or "active"
+            if lifecycle_status != "active" and not history_requested:
                 continue
             if self._looks_like_placeholder_search_result(chunk_path, chunk.text):
                 dropped_placeholder_chunks += 1
@@ -1045,6 +1056,10 @@ class ProjectDocsService:
                 "module_name": (chunk.metadata or {}).get("module_name"),
                 "module_path": (chunk.metadata or {}).get("module_path"),
                 "module_type": (chunk.metadata or {}).get("module_type"),
+                "description": (chunk.metadata or {}).get("project_doc_description"),
+                "authority": (chunk.metadata or {}).get("project_doc_authority"),
+                "lifecycle_status": (chunk.metadata or {}).get("project_doc_lifecycle_status"),
+                "impact_policy": (chunk.metadata or {}).get("project_doc_impact_policy"),
             })
         stale_paths = {item.get("path") for item in stale_sources}
         results = [
@@ -1065,6 +1080,10 @@ class ProjectDocsService:
                 module_name=(chunk.metadata or {}).get("module_name"),
                 module_path=(chunk.metadata or {}).get("module_path"),
                 module_type=(chunk.metadata or {}).get("module_type"),
+                description=(chunk.metadata or {}).get("project_doc_description"),
+                authority=(chunk.metadata or {}).get("project_doc_authority"),
+                lifecycle_status=(chunk.metadata or {}).get("project_doc_lifecycle_status"),
+                impact_policy=(chunk.metadata or {}).get("project_doc_impact_policy"),
             )
             for chunk in chunks
         ]

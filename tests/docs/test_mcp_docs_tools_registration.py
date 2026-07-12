@@ -282,12 +282,12 @@ def test_project_docs_workflow_documents_index_template_and_verification_loop():
     docs = Path(__file__).resolve().parents[2] / "docs" / "project-docs-mcp-workflow.md"
     text = docs.read_text(encoding="utf-8")
 
-    assert "## Maintained docs index" in text
-    assert "docs/INDEX.md" in text
-    assert "# Documentation Index" in text
-    assert "canonical map of maintained project-owned documentation" in text
-    assert "Generated or tooling docs to ignore" in text
-    assert "indexed_source_not_discovered" in text
+    assert "## Maintained project-doc catalog" in text
+    assert "docatlas.project-docs.yaml" in text
+    assert "schema_version: 1" in text
+    assert "indexes only validated catalog entries" in text
+    assert "cold-start fallback" in text
+    assert "fail closed with warnings" in text
     assert "## Verification loop" in text
     assert "inspect_project_docs(project_path)" in text
     assert "prepare_docs(action=\"sync_project_docs\"" in text

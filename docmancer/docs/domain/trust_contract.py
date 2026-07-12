@@ -29,6 +29,9 @@ def build_project_context_trust_contract(
                 doc_scope=source.get("doc_scope") or "project",
                 module_path=source.get("module_path"),
             )
+            explicit_authority = source.get("authority")
+            if explicit_authority:
+                source_taxonomy["authority"] = explicit_authority
             selected_sources.append({
                 "source_class": "project_file",
                 "source_type": source_taxonomy["source_type"],
@@ -45,7 +48,7 @@ def build_project_context_trust_contract(
                 "freshness": "current",
                 "reason": "repo-owned project docs matched the question",
                 "why_selected": "repo-owned project docs matched the question",
-                "provenance_confidence": "repository_configured",
+                "provenance_confidence": "repository_configured" if explicit_authority else "repository_discovered",
                 "trust_level": "provenance_verified_non_instructional",
                 **source_trust_dimensions(
                     path=str(source.get("path") or source.get("source") or ""),
