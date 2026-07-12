@@ -285,6 +285,7 @@ class DocsJobTracker:
         *,
         request_identity: str | None = None,
         predecessor_job_id: str | None = None,
+        with_generation: bool = True,
     ) -> DocsJob:
         now = self._now()
         request_identity = _safe_text(request_identity) if request_identity else None
@@ -302,7 +303,7 @@ class DocsJobTracker:
         job = DocsJob(
             job_id=uuid.uuid4().hex,
             kind=kind,
-            generation_id=uuid.uuid4().hex,
+            generation_id=uuid.uuid4().hex if with_generation else None,
             lease_id=self.lease_id,
             predecessor_job_id=predecessor_job_id,
             request_identity=request_identity,

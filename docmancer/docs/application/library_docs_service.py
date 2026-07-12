@@ -684,7 +684,36 @@ class LibraryDocsApplicationService:
                 },
                 sort_keys=True,
             )
-            job = self.jobs.create("prefetch_library_docs", request_identity=request_identity)
+            if not self.job_executor.try_reserve():
+                capacity = self.job_executor.capacity()
+                rejected = self.jobs.create(
+                    "prefetch_library_docs",
+                    request_identity=request_identity,
+                    with_generation=False,
+                )
+                self.jobs.update(
+                    rejected.job_id,
+                    status="failed",
+                    phase="done",
+                    reason_code="busy",
+                    retryable=True,
+                    running_jobs=capacity.running,
+                    queued_jobs=capacity.queued,
+                    max_running_jobs=capacity.max_running,
+                    max_queued_jobs=capacity.max_queued,
+                    message="Library documentation capacity is full; retry after 2 seconds.",
+                )
+                return DocsJobStartResult(
+                    job_id=rejected.job_id,
+                    status="busy",
+                    message="Library documentation capacity is full; retry after 2 seconds.",
+                )
+
+            try:
+                job = self.jobs.create("prefetch_library_docs", request_identity=request_identity)
+            except Exception:
+                self.job_executor.release_reservation()
+                raise
             deadline_seconds = self._library_job_timeout_seconds()
             deadline_at = datetime.now(timezone.utc) + timedelta(seconds=deadline_seconds)
             self.jobs.update(
@@ -720,37 +749,46 @@ class LibraryDocsApplicationService:
                     message="Library docs prefetch exceeded its configured deadline.",
                 )
 
-            accepted = self.job_executor.submit(
-                lambda: self._run_prefetch_docs_job(
-                    job.job_id,
-                    library,
-                    ecosystem,
-                    versions,
-                    docs_url,
-                    docs_url_template,
-                    source_type,
-                    force_refresh,
-                    continue_on_error,
-                    deadline_seconds,
-                ),
-                deadline_seconds=deadline_seconds,
-                cancelled=lambda: self.jobs.cancellation_requested(job.job_id),
-                terminalize=terminalize,
-            )
-            if not accepted:
+            def update_capacity(capacity: Any) -> None:
                 self.jobs.update(
                     job.job_id,
-                    status="failed",
-                    phase="done",
-                    reason_code="busy",
-                    retryable=True,
-                    message="Library documentation capacity is full; retry after 2 seconds.",
+                    queue_position=capacity.queue_position,
+                    running_jobs=capacity.running,
+                    queued_jobs=capacity.queued,
+                    max_running_jobs=capacity.max_running,
+                    max_queued_jobs=capacity.max_queued,
                 )
-                return DocsJobStartResult(
-                    job_id=job.job_id,
-                    status="busy",
-                    message="Library documentation capacity is full; retry after 2 seconds.",
+
+            try:
+                capacity = self.job_executor.submit_reserved(
+                    lambda: self._run_prefetch_docs_job(
+                        job.job_id,
+                        library,
+                        ecosystem,
+                        versions,
+                        docs_url,
+                        docs_url_template,
+                        source_type,
+                        force_refresh,
+                        continue_on_error,
+                        deadline_seconds,
+                    ),
+                    deadline_seconds=deadline_seconds,
+                    cancelled=lambda: self.jobs.cancellation_requested(job.job_id),
+                    terminalize=terminalize,
+                    on_capacity=update_capacity,
                 )
+            except Exception:
+                self.job_executor.release_reservation()
+                raise
+            self.jobs.update(
+                job.job_id,
+                queue_position=capacity.queue_position,
+                running_jobs=capacity.running,
+                queued_jobs=capacity.queued,
+                max_running_jobs=capacity.max_running,
+                max_queued_jobs=capacity.max_queued,
+            )
             return DocsJobStartResult(job_id=job.job_id, status="pending", message="Queued library docs prefetch job.")
 
         return self._prefetch_docs_sync(
@@ -787,6 +825,7 @@ class LibraryDocsApplicationService:
             job_id,
             status="running",
             phase="resolving",
+            queue_position=None,
             message="Started library docs prefetch job.",
         )
 

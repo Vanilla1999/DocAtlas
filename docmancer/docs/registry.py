@@ -100,6 +100,49 @@ class LibraryRegistry:
                 "ON doc_libraries(normalized_name, ecosystem, version, source_type)"
             )
 
+    def restore(self, record: LibraryRecord) -> None:
+        """Restore an exact pre-publication registry snapshot during rollback."""
+        with self._connect() as conn:
+            conn.execute(
+                """
+                UPDATE doc_libraries SET
+                    source_id = ?, canonical_id = ?, name = ?, normalized_name = ?, ecosystem = ?,
+                    version = ?, source_type = ?, docs_url = ?, docs_url_template = ?, aliases_json = ?,
+                    status = ?, added_at = ?, last_checked_at = ?, last_refreshed_at = ?, last_error = ?,
+                    requested_version = ?, resolved_version = ?, version_source = ?, version_confidence = ?,
+                    version_inferred = ?, docs_url_resolved = ?, docs_snapshot_exact = ?,
+                    legacy_ids_json = ?, target_spec_json = ?
+                WHERE library_id = ?
+                """,
+                (
+                    record.source_id,
+                    record.canonical_id,
+                    record.name,
+                    record.normalized_name,
+                    record.ecosystem,
+                    record.version,
+                    record.source_type,
+                    record.docs_url,
+                    record.docs_url_template,
+                    json.dumps(record.aliases),
+                    record.status,
+                    record.added_at,
+                    record.last_checked_at,
+                    record.last_refreshed_at,
+                    record.last_error,
+                    record.requested_version,
+                    record.resolved_version,
+                    record.version_source,
+                    record.version_confidence,
+                    int(record.version_inferred),
+                    record.docs_url_resolved,
+                    int(record.docs_snapshot_exact),
+                    json.dumps(record.legacy_ids or []),
+                    json.dumps(record.target_spec) if record.target_spec is not None else None,
+                    record.library_id,
+                ),
+            )
+
     @staticmethod
     def _ensure_column(conn: sqlite3.Connection, table: str, column: str, definition: str) -> None:
         columns = {row["name"] for row in conn.execute(f"PRAGMA table_info({table})")}
