@@ -7,7 +7,7 @@ from typing import Any
 import warnings
 
 from docmancer.core.config import DocmancerConfig
-from docmancer.docs.application.docs_job_service import DOCS_JOB_SERVICE, DocsJobService, DocsJobTracker
+from docmancer.docs.application.docs_job_service import DocsJobService, DocsJobTracker
 from docmancer.docs.application.docs_manifest_service import DocsManifestService
 from docmancer.docs.application.docs_prefetch_service import DocsPrefetchService
 from docmancer.docs.application.docs_target_service import DocsTargetService, target_result_summary
@@ -41,7 +41,18 @@ class LibraryDocsService:
         self.lock_gateway = FilesystemLockGateway()
         self.project_reader = project_reader or ProjectMetadataReader()
         self.stale_after_days = stale_after_days
-        self.jobs = DocsJobService(job_tracker) if job_tracker is not None else DOCS_JOB_SERVICE
+        self.jobs = (
+            DocsJobService(job_tracker)
+            if job_tracker is not None
+            else DocsJobService(
+                DocsJobTracker(
+                    db_path=self.config.index.db_path,
+                    max_history=self.config.docs_jobs.max_terminal_jobs,
+                    retention_days=self.config.docs_jobs.retention_days,
+                    max_events=self.config.docs_jobs.max_events,
+                )
+            )
+        )
         self.library_docs = LibraryDocsApplicationService(self)
         self.project_docs = ProjectDocsService(self)
         self.project_context = ProjectContextService(self)

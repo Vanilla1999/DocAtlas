@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import json
 import logging
+import os
 from pathlib import Path
 from typing import Any, Callable
 import shutil
@@ -143,6 +145,28 @@ class LibraryRefreshOps:
 
     def __init__(self, dependencies: Any):
         self.dependencies = dependencies
+        self._cleanup_orphaned_staging()
+
+    def _cleanup_orphaned_staging(self, max_age_seconds: float = 24 * 60 * 60) -> None:
+        config = getattr(self.dependencies, "config", None)
+        if config is None:
+            return
+        parent = Path(config.index.db_path).expanduser().resolve().parent
+        cutoff = time.time() - max_age_seconds
+        for root in parent.glob(".docatlas-staging-*"):
+            marker = root / ".docatlas-staging-owner.json"
+            try:
+                if not marker.is_file() or marker.stat().st_mtime >= cutoff:
+                    continue
+                owner = json.loads(marker.read_text(encoding="utf-8"))
+                job_id = str(owner["job_id"])
+                generation_id = str(owner["generation_id"])
+                jobs = getattr(self.dependencies, "jobs", None)
+                if jobs is not None and jobs.generation_active(job_id, generation_id):
+                    continue
+                shutil.rmtree(root)
+            except (OSError, ValueError, KeyError, TypeError):
+                logger.warning("Unable to clean orphaned staging directory: %s", root)
 
     def __getattr__(self, name: str) -> Any:
         return getattr(self.dependencies, name)
@@ -154,6 +178,7 @@ class LibraryRefreshOps:
         force: bool,
         should_cancel: Callable[[], bool] | None = None,
         begin_commit: Callable[[], bool] | None = None,
+        staging_owner: dict[str, str] | None = None,
     ) -> RefreshResult:
         started = time.monotonic()
         if not record.docs_url:
@@ -182,7 +207,7 @@ class LibraryRefreshOps:
                 targets_completed=1,
             )
 
-        staging = self._create_staging_index(record) if should_cancel else None
+        staging = self._create_staging_index(record, staging_owner=staging_owner) if should_cancel else None
 
         sections_indexed = 0
         discovery_diagnostics: list[dict[str, Any]] = []
@@ -281,7 +306,7 @@ class LibraryRefreshOps:
 
         def _commit_registry(**values: Any) -> Any:
             update = lambda: self.registry.upsert(**values)
-            return self._publish_staging_and_update(record, staging, update)
+            return self._publish_staging_and_update(record, staging, update, commit_guard=begin_commit)
 
         if sections_indexed == 0 or pages_after == 0 or chunks_after == 0:
             refreshed_at = self._now()
@@ -468,6 +493,7 @@ class LibraryRefreshOps:
         continue_on_error: bool = True,
         should_cancel: Callable[[], bool] | None = None,
         begin_commit: Callable[[], bool] | None = None,
+        staging_owner: dict[str, str] | None = None,
     ) -> RefreshResult:
         started = time.monotonic()
         if should_cancel and should_cancel():
@@ -511,6 +537,7 @@ class LibraryRefreshOps:
                     continue_on_error=continue_on_error,
                     should_cancel=should_cancel,
                     begin_commit=begin_commit,
+                    staging_owner=staging_owner,
                 )
                 if last.status == "updated":
                     updated += 1
@@ -573,7 +600,13 @@ class LibraryRefreshOps:
             )
         if should_cancel:
             record = self.registry.get(record.library_id, None, source_type=record.source_type) or record
-            return self.refresh_record(record, force=force, should_cancel=should_cancel, begin_commit=begin_commit)
+            return self.refresh_record(
+                record,
+                force=force,
+                should_cancel=should_cancel,
+                begin_commit=begin_commit,
+                staging_owner=staging_owner,
+            )
         with self._lock_for(record.library_id):
             record = self.registry.get(record.library_id, None, source_type=record.source_type) or record
             return self.refresh_record(record, force=force)
@@ -590,6 +623,7 @@ class LibraryRefreshOps:
         continue_on_error: bool = True,
         should_cancel: Callable[[], bool] | None = None,
         begin_commit: Callable[[], bool] | None = None,
+        staging_owner: dict[str, str] | None = None,
     ) -> RefreshResult:
         selected_versions = versions or ["latest"]
         result = self.refresh_docs(
@@ -603,6 +637,7 @@ class LibraryRefreshOps:
             continue_on_error=continue_on_error,
             should_cancel=should_cancel,
             begin_commit=begin_commit,
+            staging_owner=staging_owner,
         )
         messages = []
         if not versions:
@@ -629,11 +664,20 @@ class LibraryRefreshOps:
             )
         return result
 
-    def _create_staging_index(self, record: LibraryRecord) -> tuple[Any, Path]:
+    def _create_staging_index(
+        self,
+        record: LibraryRecord,
+        *,
+        staging_owner: dict[str, str] | None = None,
+    ) -> tuple[Any, Path]:
         production = self._index_config_for(record)
         db_path = Path(production.index.db_path)
         db_path.parent.mkdir(parents=True, exist_ok=True)
         root = Path(tempfile.mkdtemp(prefix=".docatlas-staging-", dir=db_path.parent))
+        (root / ".docatlas-staging-owner.json").write_text(
+            json.dumps({"created_at": time.time(), "pid": os.getpid(), **(staging_owner or {})}),
+            encoding="utf-8",
+        )
         staging = production.model_copy(deep=True)
         staging.index.db_path = str(root / "index.db")
         staging.index.extracted_dir = str(root / "extracted")
@@ -667,6 +711,7 @@ class LibraryRefreshOps:
         record: LibraryRecord,
         staging: tuple[Any, Path] | None,
         registry_update: Callable[[], Any],
+        commit_guard: Callable[[], bool] | None = None,
     ) -> Any:
         if staging is None:
             return registry_update()
@@ -686,6 +731,8 @@ class LibraryRefreshOps:
         result: Any = None
         with self._lock_for(record.library_id):
             try:
+                if commit_guard is not None and not commit_guard():
+                    raise RuntimeError("docs_job_generation_revoked")
                 if staging_db.exists():
                     with sqlite3.connect(staging_db) as source, sqlite3.connect(candidate_db) as destination:
                         source.backup(destination)

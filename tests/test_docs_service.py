@@ -4877,3 +4877,24 @@ def test_sync_project_docs_dedup_duplicate_indexed_sources(tmp_path, monkeypatch
     query_result = service.get_project_docs(str(project), "DedupDuplicateNeedle", tokens=1200, limit=5)
     assert query_result.answer_available is True
     assert "DedupDuplicateNeedle" in query_result.results[0].content
+
+
+def test_service_startup_removes_only_old_owned_staging_directories(tmp_path, monkeypatch):
+    old_owned = tmp_path / ".docatlas-staging-old"
+    fresh_owned = tmp_path / ".docatlas-staging-fresh"
+    old_unowned = tmp_path / ".docatlas-staging-unowned"
+    for root in (old_owned, fresh_owned, old_unowned):
+        root.mkdir()
+    old_marker = old_owned / ".docatlas-staging-owner.json"
+    fresh_marker = fresh_owned / ".docatlas-staging-owner.json"
+    owner = '{"job_id":"orphan-job","generation_id":"revoked-generation"}'
+    old_marker.write_text(owner, encoding="utf-8")
+    fresh_marker.write_text(owner, encoding="utf-8")
+    old_time = time.time() - (25 * 60 * 60)
+    os.utime(old_marker, (old_time, old_time))
+
+    _service(tmp_path, monkeypatch)
+
+    assert not old_owned.exists()
+    assert fresh_owned.exists()
+    assert old_unowned.exists()
