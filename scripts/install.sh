@@ -77,8 +77,21 @@ fi
 # C. doc-atlas
 # ---------------------------------------------------------------------------
 info "Installing doc-atlas..."
-uv tool install --upgrade doc-atlas
+INSTALL_SOURCE="${DOCATLAS_INSTALL_SOURCE:-doc-atlas}"
+if [ -n "${DOCATLAS_INSTALL_VERSION:-}" ] && [ "$INSTALL_SOURCE" = "doc-atlas" ]; then
+  INSTALL_SOURCE="doc-atlas==${DOCATLAS_INSTALL_VERSION}"
+fi
+uv tool install --upgrade "$INSTALL_SOURCE"
 ensure_path
+
+if [ -n "${DOCATLAS_EXPECT_VERSION:-${DOCATLAS_INSTALL_VERSION:-}}" ]; then
+  EXPECTED_VERSION="${DOCATLAS_EXPECT_VERSION:-$DOCATLAS_INSTALL_VERSION}"
+  INSTALLED_VERSION="$(doc-atlas --version 2>/dev/null || true)"
+  case "$INSTALLED_VERSION" in
+    *"$EXPECTED_VERSION"*) : ;;
+    *) die "installed version mismatch: expected $EXPECTED_VERSION, got ${INSTALLED_VERSION:-<no output>}" ;;
+  esac
+fi
 have doc-atlas || die "doc-atlas was installed but is not on PATH. Ensure \$HOME/.local/bin is on PATH and re-run."
 ok "doc-atlas $(doc-atlas --version 2>/dev/null || echo installed)"
 

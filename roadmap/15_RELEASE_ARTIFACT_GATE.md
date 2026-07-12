@@ -1,5 +1,7 @@
 # Task 15 — test and release the product users actually install
 
+Status: implemented in `feat/task15-release-artifact-gate`.
+
 ## Priority
 
 P0 release gate. Do not publish automatically from this implementation PR.

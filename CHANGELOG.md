@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-07-12
+
 ### Added
 
 - **Three-tool Docs MCP workflow:** documented and tested `get_docs_context`, `prepare_docs`, and `docs_status` as the public Docs MCP inventory and recommended lifecycle workflow. Task 11 retains ownership of removing remaining retrieval compatibility flags.

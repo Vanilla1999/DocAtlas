@@ -23,6 +23,10 @@ Use this checklist before promoting a release. A source checkout passing tests i
 ## Release controls
 
 - [ ] CI is green for every claimed Python version.
-- [ ] Publish has one explicit trigger and maintainer authorization.
+- [ ] A maintainer creates the version tag, then manually dispatches `Release artifact gate and publish` with that exact tag.
+- [ ] The protected `release` environment approval is granted only after all artifact jobs pass; this is the explicit human publication authorization.
+- [ ] Publish has one explicit trigger (`workflow_dispatch`); neither tag pushes nor pull requests publish.
+- [ ] Trusted Publishing is configured for the repository/environment in PyPI; no long-lived PyPI token is stored.
+- [ ] Download `release-manifest.json` and retain its wheel/sdist SHA-256 values with the release record.
 - [ ] Public artifacts, tag, changelog, and release metadata agree after publishing.
 - [ ] Do not call the release Stable until the artifact gate and required live external-ingest evidence are green.
