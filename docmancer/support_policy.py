@@ -21,6 +21,19 @@ _REQUIRED_NON_CORE = {
     "failure_budget",
 }
 
+# Registration boundary for services that are intentionally shipped as
+# supported product surfaces. Adding a new public service requires updating
+# this registry; the policy test then requires a matching classified entry.
+SHIPPED_SERVICE_SURFACE_IDS = frozenset({
+    "service:browser-fetcher",
+    "service:crawl4ai-fetcher",
+    "service:mcp-packs-runtime",
+    "service:qdrant-store",
+    "service:sqlite-vec-store",
+    "service:uspto-ingestion",
+    "service:web-fetch-pipeline",
+})
+
 
 def _version_tuple(value: str) -> tuple[int, ...] | None:
     if not re.fullmatch(r"\d+(?:\.\d+)+", value):

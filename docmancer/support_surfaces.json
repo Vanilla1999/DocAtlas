@@ -17,14 +17,26 @@
     {
       "id": "cli:add",
       "kind": "cli",
+      "tier": "core",
+      "owner": "DocAtlas maintainers",
+      "docs": "docs/support-surface-policy.md",
+      "test_tier": "core-offline",
+      "network_dependencies": ["optional_remote_service"],
+      "compatibility": "stable within the current major release",
+      "removal_rule": "breaking release with migration notes",
+      "failure_budget": "offline fetch policy and shared security regressions block release; remote source outages do not make local Docs unhealthy"
+    },
+    {
+      "id": "cli-compat:add-local-path",
+      "kind": "compatibility",
       "tier": "deprecated",
       "owner": "DocAtlas maintainers",
       "docs": "docs/support-surface-policy.md",
-      "test_tier": "advanced-offline",
+      "test_tier": "core-offline",
       "network_dependencies": [],
-      "compatibility": "compatibility only until the bounded deadline",
-      "removal_rule": "remove in the next planned breaking release after warning period",
-      "failure_budget": "network/provider outages must not make local Docs MCP unhealthy; shared security and storage regressions block release",
+      "compatibility": "local-path compatibility only until the bounded deadline",
+      "removal_rule": "remove in 2.0.0 after the 1.x warning period",
+      "failure_budget": "compatibility regressions block release until the declared deadline",
       "deprecation": {
         "deadline": "2.0.0",
         "resolution": "deadline_extended"

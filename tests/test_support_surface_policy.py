@@ -15,7 +15,11 @@ from docmancer.mcp.docs_server import (
     DocsServerConfig,
     build_docs_surface,
 )
-from docmancer.support_policy import load_support_policy, validate_support_policy
+from docmancer.support_policy import (
+    SHIPPED_SERVICE_SURFACE_IDS,
+    load_support_policy,
+    validate_support_policy,
+)
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -101,6 +105,23 @@ def test_support_policy_classifies_every_public_connector_and_store() -> None:
     policy = load_support_policy()
     assert connectors == _ids(policy, "connector")
     assert stores == _ids(policy, "store")
+
+
+def test_support_policy_classifies_every_registered_public_service() -> None:
+    assert SHIPPED_SERVICE_SURFACE_IDS == _ids(load_support_policy(), "service")
+
+
+def test_add_url_is_core_while_only_local_path_compatibility_is_deprecated() -> None:
+    policy = load_support_policy()
+    tiers = {item["id"]: item["tier"] for item in policy["surfaces"]}
+
+    assert tiers["cli:add"] == "core"
+    assert tiers["cli-compat:add-local-path"] == "deprecated"
+
+    result = CliRunner().invoke(cli, ["add", "--help"])
+    assert result.exit_code == 0
+    assert "[core]" in result.output
+    assert "[deprecated]" not in result.output
 
 
 def test_non_core_surfaces_have_complete_ownership_and_release_policy() -> None:

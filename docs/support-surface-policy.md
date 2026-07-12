@@ -14,6 +14,8 @@ Status: release policy for shipped DocAtlas surfaces. The machine-readable sourc
 
 Every non-core inventory entry records its owner, documentation entrypoint, test tier, network dependencies, compatibility promise, removal rule, and failure budget. The owning decision contact is `DocAtlas maintainers` unless an entry is transferred explicitly.
 
+Public service surfaces must also be registered in `SHIPPED_SERVICE_SURFACE_IDS` in `docmancer/support_policy.py`. CI compares that registration boundary with the machine inventory, so a service cannot become supported without an explicit tier decision.
+
 ## Failure budgets
 
 - A core retrieval, local SQLite storage, trust-boundary, or shared security regression blocks release.

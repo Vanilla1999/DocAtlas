@@ -119,4 +119,3 @@ def _resolved_source_path(path: str, repository_root: str | Path) -> Path:
     if not candidate.is_absolute():
         candidate = Path(repository_root).resolve() / candidate
     return candidate.resolve()
-

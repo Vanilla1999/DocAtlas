@@ -1057,7 +1057,7 @@ def add_cmd(
             )
             click.echo(
                 "Warning: local paths now belong to `doc-atlas ingest`. "
-                "`doc-atlas add ./path` still works during the 0.4.x compatibility window.",
+                "`doc-atlas add ./path` remains compatible through 1.x and is scheduled for removal in 2.0.0.",
                 err=True,
             )
             total = agent.add(path, recreate=recreate)
