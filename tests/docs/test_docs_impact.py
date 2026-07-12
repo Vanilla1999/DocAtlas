@@ -118,16 +118,11 @@ def test_deleted_module_docs_are_reported_as_a_gap(tmp_path: Path) -> None:
 def test_git_diff_includes_deleted_paths(tmp_path: Path, monkeypatch) -> None:
     calls: list[list[str]] = []
 
-    class Completed:
-        returncode = 0
-        stdout = "packages/auth/README.md\n"
-        stderr = ""
-
     def fake_run(command, **_kwargs):
         calls.append(command)
-        return Completed()
+        return b"packages/auth/README.md\0", b"", 0, False, False
 
-    monkeypatch.setattr(impact.subprocess, "run", fake_run)
+    monkeypatch.setattr(impact, "_run_process_bounded", fake_run)
 
     assert changed_files_from_git(tmp_path, "base") == ["packages/auth/README.md"]
     assert "--diff-filter=ACDMR" in calls[0]
