@@ -1,97 +1,114 @@
-name: Publish to PyPI
+name: Release artifact gate and publish
 
 on:
-  release:
-    types: [published]
-  push:
-    tags:
-      # Glob (not regex): three-part semver tags like v0.1.1
-      - "v*.*.*"
-      - "*.*.*"
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing release tag (for example v1.2.0)
+        required: true
+        type: string
+
+permissions:
+  contents: read
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
 
 jobs:
-  smoke-test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-
-      - name: Set up Python
-        uses: actions/setup-python@v6
-        with:
-          python-version: "3.11"
-
-      - name: Install package and build tools
-        run: pip install -e ".[dev]" build twine "hatchling<1.27"
-
-      - name: Verify tag matches package version
-        env:
-          RELEASE_TAG: ${{ github.event.release.tag_name || github.ref_name }}
-        run: |
-          TAG="${RELEASE_TAG#v}"
-          PKG="$(python -c "from docmancer._version import __version__; print(__version__)")"
-          if [[ "$TAG" != "$PKG" ]]; then
-            echo "::error::Git tag $RELEASE_TAG does not match docmancer._version ($PKG). Bump docmancer/_version.py before tagging."
-            exit 1
-          fi
-
-      - name: Run tests
-        run: pytest tests/ -v
-
-      - name: Run smoke CLI checks
-        run: |
-          doc-atlas --help
-          TMP_DIR="$(mktemp -d)"
-          doc-atlas init --dir "$TMP_DIR"
-          test -f "$TMP_DIR/docmancer.yaml"
-          doc-atlas doctor --config "$TMP_DIR/docmancer.yaml"
-
-      - name: Build artifacts
-        run: python -m build --no-isolation
-
-      - name: Check artifacts
-        run: python -m twine check dist/*
-
   build:
-    needs: smoke-test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
-
-      - name: Set up Python
-        uses: actions/setup-python@v6
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: ${{ inputs.tag || github.sha }}
+      - uses: actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38 # v5.4.0
         with:
           python-version: "3.11"
-
-      - name: Install build tools
-        run: pip install build twine "hatchling<1.27"
-
-      - name: Build
-        run: python -m build --no-isolation
-
-      - name: Check artifacts
-        run: python -m twine check dist/*
-
-      - name: Upload dist artifacts
-        uses: actions/upload-artifact@v4
+      - run: python -m pip install build "hatchling<1.27"
+      - run: python -m build
+      - env:
+          RELEASE_TAG: ${{ inputs.tag }}
+        run: |
+          if [ -n "$RELEASE_TAG" ]; then
+            python scripts/release_gate.py --tag "$RELEASE_TAG" --manifest dist/release-manifest.json
+          else
+            python scripts/release_gate.py --manifest dist/release-manifest.json
+          fi
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: dist
+          name: release-dist
           path: dist/
+          if-no-files-found: error
 
-  publish-pypi:
+  wheel:
+    needs: build
+    strategy:
+      matrix:
+        python: ["3.11", "3.12", "3.13"]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: ${{ inputs.tag || github.sha }}
+      - uses: actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38 # v5.4.0
+        with:
+          python-version: ${{ matrix.python }}
+      - uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
+        with:
+          name: release-dist
+          path: dist
+      - run: python scripts/release_gate.py
+      - run: python -m pip install dist/*.whl
+      - run: |
+          cd "$(mktemp -d)"
+          doc-atlas --help
+          doc-atlas --version
+          python "$GITHUB_WORKSPACE/scripts/docs_mcp_stdio_smoke.py"
+
+  sdist-and-installer:
     needs: build
     runs-on: ubuntu-latest
-    environment: release
     steps:
-      - name: Download dist artifacts
-        uses: actions/download-artifact@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
-          name: dist
-          path: dist/
+          ref: ${{ inputs.tag || github.sha }}
+      - uses: actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38 # v5.4.0
+        with:
+          python-version: "3.11"
+      - uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
+        with:
+          name: release-dist
+          path: dist
+      - run: python -m pip install dist/*.tar.gz
+      - run: |
+          cd "$(mktemp -d)"
+          python "$GITHUB_WORKSPACE/scripts/docs_mcp_stdio_smoke.py"
+      - run: |
+          EXPECTED_VERSION="$(python -c 'from docmancer._version import __version__; print(__version__)')"
+          DOCATLAS_INSTALL_SOURCE="$(find "$PWD/dist" -name '*.whl' -print -quit)" \
+          DOCATLAS_EXPECT_VERSION="$EXPECTED_VERSION" \
+          DOCATLAS_AGENT=none sh scripts/install.sh
+          cd "$(mktemp -d)"
+          doc-atlas --help
+          python "$GITHUB_WORKSPACE/scripts/docs_mcp_stdio_smoke.py"
 
-      - name: Publish to PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
+  publish:
+    if: github.event_name == 'workflow_dispatch'
+    needs: [wheel, sdist-and-installer]
+    runs-on: ubuntu-latest
+    environment: release
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+    steps:
+      - uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
         with:
-          password: ${{ secrets.PYPI_API_TOKEN }}
+          name: release-dist
+          path: dist
+      - run: rm dist/release-manifest.json
+      - uses: actions/attest-build-provenance@e8998f949152b193b063cb0ec769d69d929409be # v2.4.0
+        with:
+          subject-path: "dist/*"
+      - uses: pypa/gh-action-pypi-publish@ed0c53931b1dc9bd32cbe73a98c7f6766f8a527e # release/v1
