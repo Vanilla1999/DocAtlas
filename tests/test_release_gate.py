@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import subprocess
+import sys
 from pathlib import Path
 
 
@@ -18,6 +19,7 @@ def test_publish_workflow_is_manual_build_once_and_oidc() -> None:
     assert "PYPI_API_TOKEN" not in text
     assert "environment: release" in text
     assert "if: github.event_name == 'workflow_dispatch'" in text
+    assert "refs/tags/${{ inputs.tag }}" in text
     for line in text.splitlines():
         if "uses:" in line:
             ref = line.split("@", 1)[1].split()[0]
@@ -36,6 +38,34 @@ def test_publish_excludes_release_manifest_from_pypi_upload() -> None:
     assert remove_manifest < publish_action
 
 
+def test_sdist_gate_builds_and_smokes_its_own_wheel() -> None:
+    text = (ROOT / ".github/workflows/publish.yml").read_text()
+    assert "python -m pip wheel --no-deps --wheel-dir sdist-wheel dist/*.tar.gz" in text
+    assert "python -m pip install --force-reinstall sdist-wheel/*.whl" in text
+    assert "python scripts/release_gate.py --dist sdist-wheel" in text
+
+
+def test_publish_runs_exact_public_version_smoke() -> None:
+    text = (ROOT / ".github/workflows/publish.yml").read_text()
+    publish = text[text.index("  publish:"):]
+    assert "RELEASE_TAG: ${{ inputs.tag }}" in publish
+    assert 'RELEASE_VERSION="${RELEASE_TAG#v}"' in publish
+    assert 'RELEASE_VERSION="${{ inputs.tag }}"' not in publish
+    assert "DOCATLAS_INSTALL_VERSION=\"$RELEASE_VERSION\"" in publish
+    assert "for attempt in 1 2 3 4 5" in publish
+    assert "scripts/docs_mcp_stdio_smoke.py" in publish
+
+
+def test_stdio_smoke_requires_cited_content() -> None:
+    text = (ROOT / "scripts/docs_mcp_stdio_smoke.py").read_text()
+    assert "assert NEEDLE in rendered" in text
+
+
+def test_installer_compares_exact_version_output() -> None:
+    text = (ROOT / "scripts/install.sh").read_text()
+    assert '[ "$INSTALLED_VERSION" = "doc-atlas $EXPECTED_VERSION" ]' in text
+
+
 def test_installer_accepts_pinned_and_local_sources() -> None:
     text = (ROOT / "scripts/install.sh").read_text()
     assert "DOCATLAS_INSTALL_SOURCE" in text
@@ -44,4 +74,4 @@ def test_installer_accepts_pinned_and_local_sources() -> None:
 
 
 def test_release_gate_help() -> None:
-    subprocess.run(["python", str(ROOT / "scripts/release_gate.py"), "--help"], check=True)
+    subprocess.run([sys.executable, str(ROOT / "scripts/release_gate.py"), "--help"], check=True)

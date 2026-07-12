@@ -39,7 +39,12 @@ async def smoke() -> None:
                 await session.initialize()
                 names = {tool.name for tool in (await session.list_tools()).tools}
                 assert names == TOOLS, f"unexpected public Docs tools: {sorted(names)}"
-                query = {"question": QUESTION, "project_path": str(project), "mode": "project"}
+                query = {
+                    "question": QUESTION,
+                    "project_path": str(project),
+                    "mode": "project",
+                    "output_mode": "compact",
+                }
                 await session.call_tool("get_docs_context", query)
                 sync = payload(await session.call_tool("prepare_docs", {
                     "action": "sync_project_docs", "project_path": str(project), "with_vectors": False,
@@ -48,7 +53,8 @@ async def smoke() -> None:
                 answer = payload(await session.call_tool("get_docs_context", query))
                 rendered = json.dumps(answer, sort_keys=True)
                 assert "README.md" in rendered, answer
-                sources = answer.get("selected_sources") or []
+                assert NEEDLE in rendered, answer
+                sources = answer.get("selected_sources") or answer.get("context_pack") or []
                 assert any(source.get("path") == "README.md" for source in sources), answer
     print("Docs MCP installed-artifact stdio smoke: PASS")
 
