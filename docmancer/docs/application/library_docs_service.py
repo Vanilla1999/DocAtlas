@@ -929,6 +929,7 @@ class LibraryDocsApplicationService:
             completed_pages=int(result.pages_indexed or 0),
             indexed_pages=int(result.pages_indexed or 0),
             failed_pages=int(result.pages_failed or 0),
+            page_failure_summary=list(failure.get("page_failure_summary") or []),
             total_chunks=int(result.chunks_indexed or 0),
             completed_chunks=int(result.chunks_indexed or 0),
             reason_code=reason_code,

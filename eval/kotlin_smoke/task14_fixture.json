@@ -1,0 +1,18 @@
+{
+  "canonical_source_identity": "github:Kotlin/kotlinx.coroutines@1.8.1",
+  "citations": [
+    "https://github.com/Kotlin/kotlinx.coroutines/blob/1.8.1/docs/topics/coroutines-basics.md"
+  ],
+  "code_match": true,
+  "command": "kotlin_live_smoke.py --mode fixture --timeout 180 --output task14_fixture.json",
+  "docatlas_commit": "task14-offline-fixture",
+  "elapsed_ms": 0,
+  "mode": "fixture",
+  "query": "coroutines launch async example with code",
+  "recorded_at": "2026-07-12T00:00:00+00:00",
+  "requested_version": "1.8.1",
+  "resolved_version": "1.8.1",
+  "schema_version": "kotlin-smoke-1.0",
+  "source_ref": "Kotlin/kotlinx.coroutines@1.8.1",
+  "terminal_status": "partial"
+}

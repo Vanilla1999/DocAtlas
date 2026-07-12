@@ -70,11 +70,15 @@ def _merged_discovery_diagnostics(items: list[dict[str, Any]]) -> dict[str, Any]
             "seed_pages": 0,
             "fallback_pages": 0,
             "warnings": [],
+            "page_ledger": [],
+            "page_failure_count": 0,
+            "page_failure_summary": [],
         }
     strategies = []
     warnings: list[dict[str, Any]] = []
     sitemap_pages = seed_pages = fallback_pages = 0
     fallback_reasons = []
+    page_ledger: list[dict[str, Any]] = []
     for item in items:
         strategy = item.get("discovery_strategy")
         if strategy and strategy not in strategies:
@@ -85,14 +89,24 @@ def _merged_discovery_diagnostics(items: list[dict[str, Any]]) -> dict[str, Any]
         fallback_reason = item.get("fallback_reason")
         if fallback_reason and fallback_reason not in fallback_reasons:
             fallback_reasons.append(str(fallback_reason))
+        for page in item.get("page_ledger") or []:
+            if isinstance(page, dict):
+                page_ledger.append(dict(page))
     for reason in fallback_reasons:
         warnings.append({"code": reason, "blocking": False})
+    failed_pages = [page for page in page_ledger if page.get("outcome") in {"failed", "skipped"}]
     return {
         "discovery_strategy": "+".join(strategies) if strategies else "unknown",
         "sitemap_pages": sitemap_pages,
         "seed_pages": seed_pages,
         "fallback_pages": fallback_pages,
         "warnings": warnings,
+        "page_ledger": page_ledger[:200],
+        "page_failure_count": len(failed_pages),
+        "page_failure_summary": [
+            {"url": page.get("discovered_url"), "reason_code": page.get("reason_code")}
+            for page in failed_pages[:20]
+        ],
     }
 
 
@@ -300,6 +314,13 @@ class LibraryRefreshOps:
         pages_after, chunks_after = (
             self._count_index_config(staging[0]) if staging else self.registry_ops.count_index_entries(record)
         )
+        crawl_diagnostics = _merged_discovery_diagnostics(discovery_diagnostics)
+        page_failures = int(crawl_diagnostics.get("page_failure_count") or 0)
+        page_reason_codes = list(dict.fromkeys(
+            str(item.get("reason_code"))
+            for item in crawl_diagnostics.get("page_failure_summary") or []
+            if item.get("reason_code")
+        ))
         if begin_commit and not begin_commit():
             self._discard_staging(staging)
             return self._cancelled_result(record, started)
@@ -367,7 +388,7 @@ class LibraryRefreshOps:
                     "docs_url": record.docs_url,
                     "docs_url_resolved": record.docs_url_resolved or record.docs_url,
                     "source_type": record.source_type or "api",
-                    **_merged_discovery_diagnostics(discovery_diagnostics),
+                    **crawl_diagnostics,
                     "pages_indexed": pages_after,
                     "chunks_indexed": chunks_after,
                     "index_path": db_path,
@@ -410,6 +431,7 @@ class LibraryRefreshOps:
                 message=message,
                 duration_ms=int((time.monotonic() - started) * 1000),
                 pages_indexed=pages_after,
+                pages_failed=page_failures,
                 chunks_indexed=chunks_after,
                 targets_completed=1,
                 reason_codes=["vector_indexing_failed"],
@@ -426,7 +448,7 @@ class LibraryRefreshOps:
             "docs_url_resolved": record.docs_url_resolved or record.docs_url,
             "docset_root": record.docs_url_resolved or record.docs_url,
             "source_type": record.source_type or "api",
-            **_merged_discovery_diagnostics(discovery_diagnostics),
+            **crawl_diagnostics,
             "pages_indexed": pages_after,
             "chunks_indexed": chunks_after,
             "index_path": str(db_path) if db_path else None,
@@ -461,9 +483,28 @@ class LibraryRefreshOps:
                 message=_safe_failure_message(fetch_failure, failure_code),
                 duration_ms=int((time.monotonic() - started) * 1000),
                 pages_indexed=pages_after,
+                pages_failed=max(page_failures, 1),
                 chunks_indexed=chunks_after,
                 targets_completed=1,
                 reason_codes=[failure_code],
+                preindex=preindex,
+            )
+
+        if page_failures:
+            return RefreshResult(
+                library_id=record.library_id,
+                status="partial",
+                docs_url=record.docs_url,
+                last_refreshed_at=refreshed_at,
+                version=record.version,
+                source_type=record.source_type,
+                message=f"partial_page_failures: {page_failures} page(s) failed or were skipped.",
+                duration_ms=int((time.monotonic() - started) * 1000),
+                pages_indexed=pages_after,
+                pages_failed=page_failures,
+                chunks_indexed=chunks_after,
+                targets_completed=1,
+                reason_codes=page_reason_codes or ["partial_page_failures"],
                 preindex=preindex,
             )
 
