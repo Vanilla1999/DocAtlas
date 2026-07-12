@@ -13,6 +13,7 @@ from docmancer.docs.domain.answer_completeness import (
 )
 from docmancer.docs.domain.project_doc_ranking import is_changelog_path, normalize_doc_path, project_source_taxonomy, rerank_project_doc_chunks
 from docmancer.docs.domain.project_query_intent import classify_project_query_intent
+from docmancer.docs.domain.project_state import evaluate_documentation_sections
 from docmancer.docs.domain.quality import has_code_symbol_evidence, internal_noise_score, is_trivial_section, looks_like_code_or_command
 from docmancer.docs.domain.snippets import best_context_pack_snippet, build_snippet_presentation, validate_response_style
 from docmancer.docs.domain.source_map import build_project_repo_map, build_project_source_evidence, source_evidence_diagnostics, source_map_diagnostics
@@ -88,8 +89,13 @@ def _source_ground_documentation_gap(
         evidence.append({"category": "source map and code graph", "paths": code_paths})
     for action in _documentation_gap_actions(actions):
         gap = dict(action.get("documentation_gap") or {})
+        sections, evidence_complete = evaluate_documentation_sections(
+            list(gap.get("required_sections") or []),
+            evidence,
+        )
+        gap["required_sections"] = sections
         gap["evidence_to_collect"] = evidence
-        gap["evidence_complete"] = bool(evidence)
+        gap["evidence_complete"] = evidence_complete
         action["documentation_gap"] = gap
 
 

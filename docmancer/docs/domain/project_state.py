@@ -78,11 +78,66 @@ def _documentation_gap_evidence(root: Path, query: str | None) -> list[dict[str,
     return evidence
 
 
+def evaluate_documentation_sections(
+    required_sections: list[dict[str, Any]],
+    evidence: list[dict[str, Any]],
+) -> tuple[list[dict[str, Any]], bool]:
+    """Evaluate claim support conservatively for each requested document section."""
+    evidence_by_category: dict[str, dict[str, list[str]]] = {}
+    for item in evidence:
+        raw_category = item.get("category")
+        if not isinstance(raw_category, str) or not (category := raw_category.strip()):
+            continue
+        raw_paths = item.get("paths")
+        raw_facts = item.get("facts")
+        paths = [value.strip() for value in raw_paths if isinstance(value, str) and value.strip()] if isinstance(raw_paths, list) else []
+        facts = [value.strip() for value in raw_facts if isinstance(value, str) and value.strip()] if isinstance(raw_facts, list) else []
+        if not paths and not facts:
+            continue
+        combined = evidence_by_category.setdefault(category, {"paths": [], "facts": []})
+        combined["paths"] = list(dict.fromkeys([*combined["paths"], *paths]))
+        combined["facts"] = list(dict.fromkeys([*combined["facts"], *facts]))
+    sections: list[dict[str, Any]] = []
+    for required in required_sections:
+        categories = [
+            category.strip()
+            for category in required.get("evidence") or []
+            if isinstance(category, str) and category.strip()
+        ]
+        matched = [evidence_by_category[category] for category in categories if category in evidence_by_category]
+        missing = [category for category in categories if category not in evidence_by_category]
+        if not categories:
+            missing = ["required evidence categories"]
+        state = "complete" if not missing else ("partial" if matched else "missing")
+        paths = list(dict.fromkeys(path for item in matched for path in item["paths"]))
+        facts = list(dict.fromkeys(fact for item in matched for fact in item["facts"]))
+        sections.append({
+            **required,
+            "state": state,
+            "evidence_paths": paths,
+            "facts": facts,
+            "missing_evidence": missing,
+            "discovery_suggestions": [
+                f"Inspect repository files for {category}; keep the claim unknown if no evidence is found."
+                for category in missing
+            ],
+        })
+    return sections, bool(sections) and all(section["state"] == "complete" for section in sections)
+
+
 def create_project_docs_next_action(root: Path, query: str | None = None, *, reason: str | None = None) -> dict[str, Any]:
     get_docs_context_args = {"project_path": str(root)}
     if query:
         get_docs_context_args["question"] = query
     evidence_to_collect = _documentation_gap_evidence(root, query)
+    required_sections = [
+        {"name": "purpose", "evidence": ["manifests", "root entrypoints"]},
+        {"name": "entrypoints", "evidence": ["root entrypoints", "runtime configuration"]},
+        {"name": "modules", "evidence": ["module directories", "module imports"]},
+        {"name": "runtime flow", "evidence": ["entrypoints", "module imports", "runtime configuration"]},
+        {"name": "development commands", "evidence": ["manifests", "test and build configuration"]},
+    ]
+    required_sections, evidence_complete = evaluate_documentation_sections(required_sections, evidence_to_collect)
     return {
         "action": "create_reviewable_project_doc",
         "requires_confirmation": True,
@@ -92,15 +147,9 @@ def create_project_docs_next_action(root: Path, query: str | None = None, *, rea
         "agent_guidance": "If the user approves, inspect the listed evidence, create ARCHITECTURE.md as a normal reviewable file, then use the returned public prepare_docs action before retrying get_docs_context.",
         "documentation_gap": {
             "suggested_path": "ARCHITECTURE.md",
-            "required_sections": [
-                {"name": "purpose", "evidence": ["manifests", "root entrypoints"]},
-                {"name": "entrypoints", "evidence": ["root entrypoints", "runtime configuration"]},
-                {"name": "modules", "evidence": ["module directories", "module imports"]},
-                {"name": "runtime flow", "evidence": ["entrypoints", "module imports", "runtime configuration"]},
-                {"name": "development commands", "evidence": ["manifests", "test and build configuration"]},
-            ],
+            "required_sections": required_sections,
             "evidence_to_collect": evidence_to_collect,
-            "evidence_complete": bool(evidence_to_collect),
+            "evidence_complete": evidence_complete,
             "rules": [
                 "do not invent unsupported facts",
                 "cite repository paths for factual claims",

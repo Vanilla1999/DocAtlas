@@ -1142,8 +1142,14 @@ def test_project_context_returns_source_grounded_public_docs_handoff(tmp_path, m
     action = next(item for item in result.next_actions if item.get("action") == "create_reviewable_project_doc")
     assert result.next_action is action
     assert result.requires_confirmation is True
-    assert action["documentation_gap"]["evidence_complete"] is True
-    assert any("pubspec.yaml" in item["paths"] for item in action["documentation_gap"]["evidence_to_collect"])
+    gap = action["documentation_gap"]
+    assert gap["evidence_complete"] is False
+    sections = {section["name"]: section for section in gap["required_sections"]}
+    assert sections["purpose"]["state"] == "partial"
+    assert sections["runtime flow"]["state"] == "missing"
+    assert sections["runtime flow"]["missing_evidence"]
+    assert sections["runtime flow"]["discovery_suggestions"]
+    assert any("pubspec.yaml" in item["paths"] for item in gap["evidence_to_collect"])
     assert [item["tool"] for item in action["after"]] == ["prepare_docs", "get_docs_context"]
 
     public = service.get_docs_context(
@@ -1152,7 +1158,7 @@ def test_project_context_returns_source_grounded_public_docs_handoff(tmp_path, m
         mode="project",
     )
     assert public.next_action["action"] == "create_reviewable_project_doc"
-    assert public.next_action["documentation_gap"]["evidence_complete"] is True
+    assert public.next_action["documentation_gap"]["evidence_complete"] is False
     assert [item["tool"] for item in public.next_action["after"]] == ["prepare_docs", "get_docs_context"]
 
 
