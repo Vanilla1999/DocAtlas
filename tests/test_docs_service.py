@@ -551,17 +551,27 @@ def test_ingest_project_docs_indexes_only_discovered_candidates_with_metadata(tm
     assert metadata["project_path"] == str(project.resolve())
     assert metadata["project_doc_path"] == "README.md"
     assert metadata["project_doc_reason"] == "root_readme"
+    assert metadata["project_doc_sections_status"] == "parsed"
+    assert metadata["project_doc_sections_reason"] == "section_metadata_parsed"
     assert metadata["project_doc_sections"] == [{
         "source_document_path": "README.md",
         "heading_path": ["App"],
         "mentioned_paths": [],
         "mentioned_symbols": [],
+        "paths_truncated": False,
+        "symbols_truncated": False,
+        "fields_truncated": False,
+        "document_sections_truncated": False,
         "content_hash": metadata["project_doc_sections"][0]["content_hash"],
     }, {
         "source_document_path": "README.md",
         "heading_path": ["App", "Authentication"],
         "mentioned_paths": ["lib/auth/token.dart"],
         "mentioned_symbols": ["issue_token"],
+        "paths_truncated": False,
+        "symbols_truncated": False,
+        "fields_truncated": False,
+        "document_sections_truncated": False,
         "content_hash": metadata["project_doc_sections"][1]["content_hash"],
     }]
     assert metadata["project_doc_sections"][0]["content_hash"].startswith("sha256:")

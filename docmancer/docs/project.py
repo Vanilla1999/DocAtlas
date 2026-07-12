@@ -72,7 +72,10 @@ LIB_MODULE_ROOT_DIRECTORIES = {
 
 
 class ProjectMetadataReader:
-    def read(self, project_path: str | Path) -> ProjectMetadata:
+    def __init__(self, *, max_docs_hash_bytes: int | None = None):
+        self.max_docs_hash_bytes = max_docs_hash_bytes
+
+    def read(self, project_path: str | Path, *, docs_candidate_limit: int | None = None) -> ProjectMetadata:
         root = Path(project_path).expanduser().resolve()
         warnings: list[str] = []
         if not root.exists():
@@ -88,7 +91,7 @@ class ProjectMetadataReader:
         cargo_packages, rust_observations = self._read_cargo(root, warnings)
         npm_packages, npm_direct_dependencies, npm_observations = read_node_project(root, warnings)
         python_packages, python_direct_dependencies, python_observations = read_python_project(root, warnings)
-        docs_candidates = self.discover_docs(root, warnings)
+        docs_candidates = self.discover_docs(root, warnings, limit=docs_candidate_limit)
         all_packages = {**packages, **cargo_packages, **npm_packages, **python_packages}
         direct_dependencies = sorted({*direct_dependencies, *npm_direct_dependencies, *python_direct_dependencies})
         dependencies = [*pub_observations, *pub_manifest_observations, *rust_observations, *npm_observations, *python_observations]
@@ -108,7 +111,13 @@ class ProjectMetadataReader:
             warnings=warnings,
         )
 
-    def discover_docs(self, project_path: str | Path, warnings: list[str] | None = None) -> list[ProjectDocsCandidate]:
+    def discover_docs(
+        self,
+        project_path: str | Path,
+        warnings: list[str] | None = None,
+        *,
+        limit: int | None = None,
+    ) -> list[ProjectDocsCandidate]:
         root = Path(project_path).expanduser().resolve()
         warnings = warnings if warnings is not None else []
         if not root.exists():
@@ -119,31 +128,49 @@ class ProjectMetadataReader:
             return []
 
         candidates: dict[str, ProjectDocsCandidate] = {}
-        for child in sorted(root.iterdir(), key=lambda item: item.name.lower()):
-            if child.name in EXCLUDED_DIR_NAMES:
-                continue
+        internal_limit = limit + 1 if limit is not None else None
+        children = [child for child in sorted(root.iterdir(), key=lambda item: item.name.lower()) if child.name not in EXCLUDED_DIR_NAMES]
+        # Preserve the most actionable surfaces under a bounded scan: root
+        # authority docs first, then module docs, then broad nested docs trees.
+        for child in children:
+            if internal_limit is not None and len(candidates) >= internal_limit:
+                break
             if child.is_file() and self._is_root_doc_file(child):
                 self._add_candidate(candidates, root, child, self._root_doc_reason(child))
-            elif child.is_dir() and child.name.lower() in DOC_DIRECTORIES:
-                self._discover_docs_in_dir(candidates, root, child, DOC_DIRECTORIES[child.name.lower()])
-            elif child.is_dir() and child.name.lower() in MODULE_ROOT_DIRECTORIES:
-                self._discover_module_docs(candidates, root, child, MODULE_ROOT_DIRECTORIES[child.name.lower()])
-            elif child.is_dir() and child.name.lower() == "lib":
-                self._discover_lib_module_docs(candidates, root, child)
-        return sorted(candidates.values(), key=lambda item: item.path)
+        for child in children:
+            if internal_limit is not None and len(candidates) >= internal_limit:
+                break
+            if child.is_dir() and not child.is_symlink() and child.name.lower() in MODULE_ROOT_DIRECTORIES:
+                self._discover_module_docs(candidates, root, child, MODULE_ROOT_DIRECTORIES[child.name.lower()], limit=internal_limit)
+            elif child.is_dir() and not child.is_symlink() and child.name.lower() == "lib":
+                self._discover_lib_module_docs(candidates, root, child, limit=internal_limit)
+        for child in children:
+            if internal_limit is not None and len(candidates) >= internal_limit:
+                break
+            if child.is_dir() and not child.is_symlink() and child.name.lower() in DOC_DIRECTORIES:
+                self._discover_docs_in_dir(candidates, root, child, DOC_DIRECTORIES[child.name.lower()], limit=internal_limit)
+        ordered = sorted(candidates.values(), key=lambda item: item.path)
+        if limit is not None and len(ordered) > limit:
+            warnings.append(f"Project docs discovery truncated at {limit} candidates for bounded analysis.")
+            return ordered[:limit]
+        return ordered
 
     def _discover_lib_module_docs(
         self,
         candidates: dict[str, ProjectDocsCandidate],
         root: Path,
         lib_directory: Path,
+        *,
+        limit: int | None = None,
     ) -> None:
         for child in sorted(lib_directory.iterdir(), key=lambda item: item.name.lower()):
-            if child.name in EXCLUDED_DIR_NAMES or not child.is_dir():
+            if limit is not None and len(candidates) >= limit:
+                return
+            if child.name in EXCLUDED_DIR_NAMES or not child.is_dir() or child.is_symlink():
                 continue
             module_type = LIB_MODULE_ROOT_DIRECTORIES.get(child.name.lower())
             if module_type:
-                self._discover_module_docs(candidates, root, child, module_type)
+                self._discover_module_docs(candidates, root, child, module_type, limit=limit)
 
     def _discover_module_docs(
         self,
@@ -151,9 +178,13 @@ class ProjectMetadataReader:
         root: Path,
         modules_directory: Path,
         module_type: str,
+        *,
+        limit: int | None = None,
     ) -> None:
         for module_root in sorted(modules_directory.iterdir(), key=lambda item: item.name.lower()):
-            if module_root.name in EXCLUDED_DIR_NAMES or not module_root.is_dir():
+            if limit is not None and len(candidates) >= limit:
+                return
+            if module_root.name in EXCLUDED_DIR_NAMES or not module_root.is_dir() or module_root.is_symlink():
                 continue
             try:
                 module_path = module_root.relative_to(root).as_posix()
@@ -161,6 +192,8 @@ class ProjectMetadataReader:
                 continue
             module_name = module_root.name
             for child in sorted(module_root.iterdir(), key=lambda item: item.name.lower()):
+                if limit is not None and len(candidates) >= limit:
+                    return
                 if child.name in EXCLUDED_DIR_NAMES:
                     continue
                 if child.is_file() and self._is_root_doc_file(child):
@@ -175,7 +208,7 @@ class ProjectMetadataReader:
                         module_path=module_path,
                         module_type=module_type,
                     )
-                elif child.is_dir() and child.name.lower() in DOC_DIRECTORIES:
+                elif child.is_dir() and not child.is_symlink() and child.name.lower() in DOC_DIRECTORIES:
                     self._discover_docs_in_dir(
                         candidates,
                         root,
@@ -186,6 +219,7 @@ class ProjectMetadataReader:
                         module_name=module_name,
                         module_path=module_path,
                         module_type=module_type,
+                        limit=limit,
                     )
 
     def _discover_docs_in_dir(
@@ -200,8 +234,11 @@ class ProjectMetadataReader:
         module_name: str | None = None,
         module_path: str | None = None,
         module_type: str | None = None,
+        limit: int | None = None,
     ) -> None:
-        for path in sorted(directory.rglob("*"), key=lambda item: str(item.relative_to(root)).lower()):
+        for path in self._iter_docs_tree(directory):
+            if limit is not None and len(candidates) >= limit:
+                return
             if self._is_excluded_path(path, root):
                 continue
             if path.is_file() and self._is_docs_file(path):
@@ -216,6 +253,18 @@ class ProjectMetadataReader:
                     module_path=module_path,
                     module_type=module_type,
                 )
+
+    def _iter_docs_tree(self, directory: Path):
+        try:
+            children = sorted(directory.iterdir(), key=lambda item: item.name.lower())
+        except OSError:
+            return
+        for child in children:
+            if child.name in EXCLUDED_DIR_NAMES:
+                continue
+            yield child
+            if child.is_dir() and not child.is_symlink():
+                yield from self._iter_docs_tree(child)
 
     def _add_candidate(
         self,
@@ -262,10 +311,11 @@ class ProjectMetadataReader:
             module_type=module_type,
         )
 
-    @staticmethod
-    def _content_hash(path: Path) -> str | None:
+    def _content_hash(self, path: Path) -> str | None:
         digest = hashlib.sha256()
         try:
+            if self.max_docs_hash_bytes is not None and path.stat().st_size > self.max_docs_hash_bytes:
+                return None
             with path.open("rb") as handle:
                 for chunk in iter(lambda: handle.read(1024 * 1024), b""):
                     digest.update(chunk)

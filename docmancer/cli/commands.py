@@ -1956,27 +1956,51 @@ def eval_cmd(
 @click.option("--head", default="HEAD", show_default=True, help="Head git ref used with --base.")
 @click.option("--changed-file", "changed_files", multiple=True, help="Changed repository path; may be repeated instead of --base.")
 @click.option("--changed-symbol", "changed_symbols", multiple=True, help="Changed API symbol or config key; may be repeated for section-level hints.")
+@click.option("--candidate-offset", type=click.IntRange(min=0), default=0, show_default=True, help="Section-candidate offset used to continue a bounded report.")
+@click.option("--candidate-limit", type=click.IntRange(min=1, max=200), default=200, show_default=True, help="Maximum section candidates returned in this page.")
 @click.option("output_format", "--format", type=click.Choice(["markdown", "json"], case_sensitive=False), default="markdown", show_default=True)
 @click.option("--fail-on-missing", is_flag=True, default=False, help="Exit non-zero when a changed module has no maintained docs.")
+@click.option("--config", "config_path", default=None, help="Path to docmancer.yaml.")
 def docs_impact_cmd(
     project_path: str,
     base: str | None,
     head: str,
     changed_files: tuple[str, ...],
     changed_symbols: tuple[str, ...],
+    candidate_offset: int,
+    candidate_limit: int,
     output_format: str,
     fail_on_missing: bool,
+    config_path: str | None,
 ):
     """Report which maintained docs should be reviewed after a code change."""
-    from docmancer.docs.impact import analyze_docs_impact, changed_files_from_git, format_docs_impact_markdown
+    from docmancer.docs.impact import analyze_docs_impact, changed_evidence_from_git, format_docs_impact_markdown
+    from docmancer.docs.application.project_section_index import ProjectSectionIndexReader
 
     if base and changed_files:
         raise click.UsageError("Use either --base/--head or --changed-file, not both.")
     if not base and not changed_files:
         raise click.UsageError("Pass --base to read git diff paths, or at least one --changed-file.")
     try:
-        paths = changed_files_from_git(project_path, base, head) if base else list(changed_files)
-        report = analyze_docs_impact(project_path, paths, changed_symbols=list(changed_symbols))
+        effective_config_path = _effective_config(config_path)
+        config = _load_config(effective_config_path)
+        resolved_config_path = _resolve_config_file(effective_config_path)
+        diff_evidence = changed_evidence_from_git(project_path, base, head) if base else None
+        paths = diff_evidence["paths"] if diff_evidence else list(changed_files)
+        report = analyze_docs_impact(
+            project_path,
+            paths,
+            changed_symbols=list(changed_symbols),
+            diff_evidence=diff_evidence,
+            section_reader=ProjectSectionIndexReader(config.index.db_path),
+            candidate_offset=candidate_offset,
+            candidate_limit=candidate_limit,
+            continuation_context={
+                "project_path": str(Path(project_path).expanduser().resolve()),
+                "config_path": str(resolved_config_path),
+                "fail_on_missing": fail_on_missing,
+            },
+        )
     except ValueError as exc:
         raise click.ClickException(str(exc)) from exc
     if output_format.lower() == "json":

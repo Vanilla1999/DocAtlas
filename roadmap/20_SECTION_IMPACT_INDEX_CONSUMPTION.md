@@ -1,5 +1,7 @@
 # Task 20 — consume section metadata for precise documentation impact
 
+Status: implemented in `feat/task20-section-impact-index-consumption`.
+
 ## Priority
 
 P1 local-project maintenance.
