@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Any
 
 from docmancer.docs.domain.project_doc_ranking import normalize_doc_path, project_source_taxonomy
+from docmancer.docs.domain.content_trust import source_trust_dimensions
 from docmancer.docs.models import DocsResult, ProjectDocsResult
 
 
@@ -44,7 +45,13 @@ def build_project_context_trust_contract(
                 "freshness": "current",
                 "reason": "repo-owned project docs matched the question",
                 "why_selected": "repo-owned project docs matched the question",
-                "trust_level": "trusted",
+                "provenance_confidence": "repository_configured",
+                "trust_level": "provenance_verified_non_instructional",
+                **source_trust_dimensions(
+                    path=str(source.get("path") or source.get("source") or ""),
+                    scope="project",
+                    repository_root=project_docs.project_path,
+                ),
             })
         for source in project_docs.stale_sources:
             risky = {
@@ -85,7 +92,12 @@ def build_project_context_trust_contract(
                 "freshness": "stale" if dependency_docs.stale_before_refresh else "current",
                 "reason": "dependency docs resolved through Docmancer registry/project metadata",
                 "why_selected": "dependency docs resolved through Docmancer registry/project metadata",
-                "trust_level": "trusted" if dependency_docs.docs_exactness == "exact" else "best_effort",
+                "provenance_confidence": "version_exact" if dependency_docs.docs_exactness == "exact" else "version_best_effort",
+                "trust_level": "provenance_verified_non_instructional" if dependency_docs.docs_exactness == "exact" else "best_effort_non_instructional",
+                "source_provenance": {"owner": "external_source", "source_class": "dependency_docs"},
+                "version_exactness": dependency_docs.docs_exactness or "unknown",
+                "repository_authority": "not_applicable",
+                "instruction_trust": "untrusted_data",
             })
         for warning in dependency_docs.warnings:
             risky = {
@@ -121,7 +133,7 @@ def build_project_context_trust_contract(
         })
 
     contract = {
-        "schema_version": "trust-contract-1.1",
+        "schema_version": "trust-contract-1.2",
         "sources": {
             "selected": selected_sources,
             "rejected": rejected_sources,
@@ -133,6 +145,8 @@ def build_project_context_trust_contract(
         "policy": {
             "direct_webfetch": "forbidden" if selected_sources else "discovery_only",
             "reason_code": "trusted_context_available" if selected_sources else "no_trusted_context",
+            "document_content": "cited_data_never_lifecycle_instruction",
+            "instruction_precedence": "system_user_tool_policy_over_scoped_repository_policy_over_document_data",
         },
     }
     if include_legacy_aliases:

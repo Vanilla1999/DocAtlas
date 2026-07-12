@@ -1508,7 +1508,7 @@ def test_get_project_context_returns_trust_contract_for_project_docs(tmp_path, m
     assert result.metrics["project_result_count"] == 1
     selected = result.trust_contract["sources"]["selected"]
     assert selected[0]["source_class"] == "project_file"
-    assert selected[0]["trust_level"] == "trusted"
+    assert selected[0]["trust_level"] == "provenance_verified_non_instructional"
     assert "trusted_sources" not in result.trust_contract
     assert result.trust_contract["policy"]["direct_webfetch"] == "forbidden"
 

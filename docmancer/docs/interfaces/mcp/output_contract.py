@@ -146,7 +146,7 @@ def _fit_payload(payload: dict[str, Any], *, max_bytes: int) -> dict[str, Any]:
         "status", "tool", "schema_version", "answer_available", "answer_type", "answer_completeness",
         "mode", "reason", "message", "response_style", "primary_snippet", "context_pack", "supporting_snippets",
         "next_actions", "next_action", "arguments_patch", "warnings", "mcp_compaction", "output_mode",
-        "full_output_available", "requires_confirmation", "confirmation_reason",
+        "full_output_available", "requires_confirmation", "confirmation_reason", "document_content_policy",
     }
     omitted = [key for key in compact if key not in keep_keys]
     compact = {key: value for key, value in compact.items() if key in keep_keys}
@@ -169,7 +169,7 @@ def compact_mcp_payload(
     original_bytes = json_bytes(payload)
     compact = deepcopy(payload)
     if include_sections:
-        allowed = {"status", "tool", "schema_version", "answer_available", "answer_type", "warnings", "mcp_compaction", *include_sections}
+        allowed = {"status", "tool", "schema_version", "answer_available", "answer_type", "warnings", "document_content_policy", "mcp_compaction", *include_sections}
         compact = {key: value for key, value in compact.items() if key in allowed}
 
     has_context_pack = "context_pack" in compact

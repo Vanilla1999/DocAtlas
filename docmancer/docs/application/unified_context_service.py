@@ -5,6 +5,7 @@ from dataclasses import asdict, is_dataclass, replace
 from typing import Any
 
 from docmancer.docs.application.project_context_service import context_pack_snippet
+from docmancer.docs.domain.content_trust import annotate_context_pack
 from docmancer.docs.domain.library_source_options import library_docs_source_options, source_required_diagnostics
 from docmancer.docs.domain.snippets import build_snippet_presentation, validate_response_style
 from docmancer.docs.exact_version import resolve_python_versioned_docs
@@ -332,6 +333,8 @@ class UnifiedDocsContextService:
         if snippet_fallback:
             context_pack, contamination, deduplication = self._dedupe_and_guard(context_pack, libs, project_path)
             routing["snippet_first_fallback"] = snippet_fallback
+        context_pack, content_trust_warnings = annotate_context_pack(context_pack, repository_root=project_path)
+        warnings.extend(content_trust_warnings)
         self._refresh_lane_counts(lanes, context_pack)
         trust_contract = self._trust_contract(context_pack, project_result, library_results)
         source_summary = self._source_summary(context_pack, trust_contract)
@@ -893,6 +896,10 @@ class UnifiedDocsContextService:
                 "why_selected": item.get("why_selected"),
                 "freshness": item.get("freshness"),
                 "version_binding": item.get("docs_exactness") or item.get("version") or item.get("version_binding"),
+                "source_provenance": item.get("source_provenance"),
+                "repository_authority": item.get("repository_authority"),
+                "instruction_trust": item.get("instruction_trust") or "untrusted_data",
+                "content_boundary": item.get("content_boundary"),
                 "risk_flags": [],
             }
             if item.get("freshness") == "stale":
@@ -907,7 +914,18 @@ class UnifiedDocsContextService:
             for warning in result.warnings or []:
                 if "fallback" in warning or "stale" in warning:
                     risky.append({"source": result.library_id, "doc_scope": "library", "origin_lane": "library", "why_selected": str(warning), "freshness": "unknown", "version_binding": result.docs_exactness, "risk_flags": [str(warning)]})
-        return {"selected": selected, "rejected": rejected, "risky": risky}
+        sources = {"selected": selected, "rejected": rejected, "risky": risky}
+        return {
+            "schema_version": "trust-contract-1.2",
+            "sources": sources,
+            "source_dimensions": ["source_provenance", "version_exactness", "repository_authority", "instruction_trust"],
+            "policy": {
+                "document_content": "cited_data_never_lifecycle_instruction",
+                "typed_lifecycle_actions_only": True,
+            },
+            # Compatibility aliases for pre-1.2 consumers.
+            **sources,
+        }
 
 
     @staticmethod

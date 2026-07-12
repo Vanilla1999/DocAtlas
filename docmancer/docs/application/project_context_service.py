@@ -18,6 +18,7 @@ from docmancer.docs.domain.snippets import best_context_pack_snippet, build_snip
 from docmancer.docs.domain.source_map import build_project_repo_map, build_project_source_evidence, source_evidence_diagnostics, source_map_diagnostics
 from docmancer.docs.domain.code_graph import build_code_graph_context_items, build_project_code_graph, code_graph_context_diagnostics, code_graph_diagnostics
 from docmancer.docs.domain.trust_contract import build_project_context_trust_contract
+from docmancer.docs.domain.content_trust import annotate_context_pack
 from docmancer.docs.models import SOURCE_CLASS_PROJECT_FILE, DocsChunk, DocsResult, ProjectContextResult, ProjectDocsChunk, ProjectDocsResult, ProjectMetadata
 
 LOW_TRUST_PROJECT_RISK_FLAGS = frozenset({
@@ -250,6 +251,8 @@ class ProjectContextService:
             confirmation_reason = "repo_write"
             next_action = gap_actions[0]
             arguments_patch = {"project_path": str(root)}
+        context_pack, content_trust_warnings = annotate_context_pack(context_pack, repository_root=root)
+        warnings.extend(warning["code"] for warning in content_trust_warnings)
         trust_contract = build_project_context_trust_contract(
             project_docs=project_docs,
             dependency_docs=dependency_docs,
@@ -323,7 +326,7 @@ class ProjectContextService:
             metrics.setdefault("quality", {}).setdefault("warnings", []).append(warning)
             next_actions.append({
                 "tool": "code_search",
-                "reason": "No selected trusted source contains high-signal query terms; search project docs/source before answering.",
+                "reason": "No selected cited source contains high-signal query terms; search project docs/source before answering.",
                 "query_terms": relevance_gate.get("required_terms", [])[:8],
             })
         if getattr(intent, "wants_code_symbols", False) and not any(
