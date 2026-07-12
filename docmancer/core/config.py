@@ -42,6 +42,13 @@ class WebFetchConfig(BaseSettings):
     model_config = SettingsConfigDict(env_prefix="DOCMANCER_WEB_FETCH_", extra="ignore")
 
 
+class DocsJobsConfig(BaseSettings):
+    max_terminal_jobs: int = Field(default=1000, ge=1)
+    retention_days: int = Field(default=30, ge=1)
+    max_events: int = Field(default=50, ge=1)
+    model_config = SettingsConfigDict(env_prefix="DOCMANCER_DOCS_JOBS_", extra="ignore")
+
+
 class LoaderFormatConfig(BaseModel):
     chunk_size: int | None = Field(default=None, ge=100)
     chunk_overlap: int | None = Field(default=None, ge=0)
@@ -143,6 +150,7 @@ class DocmancerConfig(BaseModel):
     index: IndexConfig = Field(default_factory=IndexConfig)
     query: QueryConfig = Field(default_factory=QueryConfig)
     web_fetch: WebFetchConfig = Field(default_factory=WebFetchConfig)
+    docs_jobs: DocsJobsConfig = Field(default_factory=DocsJobsConfig)
     loaders: LoadersConfig = Field(default_factory=LoadersConfig)
     vector_store: VectorStoreConfig = Field(default_factory=VectorStoreConfig)
     embeddings: EmbeddingsConfig = Field(default_factory=EmbeddingsConfig)

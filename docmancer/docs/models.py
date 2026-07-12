@@ -194,6 +194,10 @@ class DocsTargetsPrefetchResult:
 class DocsJob:
     job_id: str
     kind: str
+    generation_id: str | None = None
+    lease_id: str | None = None
+    predecessor_job_id: str | None = None
+    request_identity: str | None = None
     status: str = "pending"
     phase: str = "validating"
     total_targets: int = 0
@@ -220,6 +224,7 @@ class DocsJob:
     errors: list[str] = field(default_factory=list)
     target_results: list[dict[str, Any]] = field(default_factory=list)
     events: list[dict[str, Any]] = field(default_factory=list)
+    queued_at: str | None = None
     started_at: str | None = None
     updated_at: str | None = None
     last_event_at: str | None = None

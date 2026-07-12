@@ -15,6 +15,7 @@ import yaml
 
 from docmancer.core.config import DocmancerConfig
 from docmancer.docs.discovery_candidates import discovery_candidates_for
+from docmancer.docs.fetch_policy import redact_url
 from docmancer.docs.domain.policies import docs_policy, is_stale
 from docmancer.docs.domain.project_state import create_project_docs_next_action, has_high_level_project_overview, partition_project_doc_state, project_docs_structured_next_action
 from docmancer.docs.domain.quality import is_trivial_section
@@ -664,7 +665,17 @@ class LibraryDocsApplicationService:
         async_: bool = False,
     ) -> RefreshResult | DocsJobStartResult:
         if async_:
-            job = self.jobs.create("prefetch_library_docs")
+            request_identity = json.dumps(
+                {
+                    "library": library,
+                    "ecosystem": ecosystem,
+                    "docs_url": redact_url(docs_url) if docs_url else None,
+                    "docs_url_template": redact_url(docs_url_template) if docs_url_template else None,
+                    "versions": versions or [],
+                },
+                sort_keys=True,
+            )
+            job = self.jobs.create("prefetch_library_docs", request_identity=request_identity)
             deadline_seconds = self._library_job_timeout_seconds()
             deadline_at = datetime.now(timezone.utc) + timedelta(seconds=deadline_seconds)
             self.jobs.update(
@@ -706,6 +717,8 @@ class LibraryDocsApplicationService:
         continue_on_error: bool,
         deadline_seconds: float,
     ) -> None:
+        initial = self.jobs.get(job_id)
+        generation_id = initial.generation_id if initial else None
         completed = threading.Event()
         deadline_expired = threading.Event()
         outcome: dict[str, Any] = {}
@@ -713,6 +726,8 @@ class LibraryDocsApplicationService:
 
         def _cancelled() -> bool:
             return (
+                not self.jobs.generation_active(job_id, generation_id)
+                or
                 self.jobs.cancellation_requested(job_id)
                 or deadline_expired.is_set()
                 or time.monotonic() >= deadline
@@ -737,6 +752,7 @@ class LibraryDocsApplicationService:
                     continue_on_error=continue_on_error,
                     should_cancel=_cancelled,
                     begin_commit=_begin_commit,
+                    staging_owner={"job_id": job_id, "generation_id": generation_id or ""},
                 )
             except Exception as exc:
                 outcome["exception"] = exc
@@ -766,6 +782,8 @@ class LibraryDocsApplicationService:
                         message="Deadline exceeded; waiting for staging cleanup.",
                     )
 
+        if not self.jobs.generation_active(job_id, generation_id):
+            return
         if self.jobs.cancellation_requested(job_id):
             self.jobs.update(
                 job_id,
@@ -901,6 +919,7 @@ class LibraryDocsApplicationService:
         continue_on_error: bool = True,
         should_cancel: Callable[[], bool] | None = None,
         begin_commit: Callable[[], bool] | None = None,
+        staging_owner: dict[str, str] | None = None,
     ) -> RefreshResult:
         return self.refresh_ops.prefetch_docs(
             library,
@@ -913,6 +932,7 @@ class LibraryDocsApplicationService:
             continue_on_error=continue_on_error,
             should_cancel=should_cancel,
             begin_commit=begin_commit,
+            staging_owner=staging_owner,
         )
 
     def get_docs(
