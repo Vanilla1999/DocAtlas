@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import dataclasses
+import re
 from collections import Counter
 from dataclasses import replace
 from typing import Any
@@ -487,6 +488,19 @@ def rerank_project_doc_chunks(chunks: list[Any], *, question: str, intent: Any, 
         path = getattr(chunk, "path", None)
         base = chunk_base_score(chunk, index)
         score = base * source_weight_for_intent(path, getattr(chunk, "heading_path", None), intent) * source_requirement_boost(path, question, intent)
+        description = str(getattr(chunk, "description", None) or "")
+        query_terms = set(re.findall(r"[\w-]+", question.lower()))
+        description_terms = set(re.findall(r"[\w-]+", description.lower()))
+        description_overlap = query_terms & description_terms
+        if description_overlap:
+            score *= 1.0 + min(1.0, 0.2 * len(description_overlap))
+        authority = str(getattr(chunk, "authority", None) or "")
+        score *= {
+            "source_of_truth": 1.5,
+            "supporting": 1.0,
+            "historical": 0.45,
+            "generated": 0.3,
+        }.get(authority, 1.0)
         if getattr(intent, "wants_code_symbols", False):
             if has_code_symbol_evidence(getattr(chunk, "content", ""), getattr(chunk, "title", None), getattr(chunk, "heading_path", None), path):
                 score *= 2.5

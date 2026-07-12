@@ -11,6 +11,7 @@ import yaml
 from docmancer.docs.models import DependencyObservation, ProjectDocsCandidate, ProjectMetadata, SOURCE_CLASS_PROJECT_FILE
 from docmancer.docs.node_project import read_node_project
 from docmancer.docs.python_project import read_python_project
+from docmancer.docs.project_docs_catalog import read_project_docs_catalog
 
 
 DOC_FILE_EXTENSIONS = {".md", ".mdx", ".rst", ".txt", ".adoc"}
@@ -91,7 +92,12 @@ class ProjectMetadataReader:
         cargo_packages, rust_observations = self._read_cargo(root, warnings)
         npm_packages, npm_direct_dependencies, npm_observations = read_node_project(root, warnings)
         python_packages, python_direct_dependencies, python_observations = read_python_project(root, warnings)
-        docs_candidates = self.discover_docs(root, warnings, limit=docs_candidate_limit)
+        catalog = read_project_docs_catalog(root)
+        warnings.extend(catalog.warnings)
+        if catalog.present:
+            docs_candidates = self._catalog_docs(root, catalog.entries, limit=docs_candidate_limit) if catalog.valid else []
+        else:
+            docs_candidates = self.discover_docs(root, warnings, limit=docs_candidate_limit)
         all_packages = {**packages, **cargo_packages, **npm_packages, **python_packages}
         direct_dependencies = sorted({*direct_dependencies, *npm_direct_dependencies, *python_direct_dependencies})
         dependencies = [*pub_observations, *pub_manifest_observations, *rust_observations, *npm_observations, *python_observations]
@@ -109,7 +115,40 @@ class ProjectMetadataReader:
             docs_candidates=docs_candidates,
             detected_ecosystems=detected_ecosystems,
             warnings=warnings,
+            docs_catalog_present=catalog.present,
+            docs_catalog_valid=catalog.valid,
         )
+
+    def _catalog_docs(self, root: Path, entries: list[Any], *, limit: int | None) -> list[ProjectDocsCandidate]:
+        candidates: list[ProjectDocsCandidate] = []
+        for entry in entries[:limit] if limit is not None else entries:
+            path = root / entry.path
+            try:
+                stat = path.stat()
+            except OSError:
+                continue
+            candidates.append(ProjectDocsCandidate(
+                path=entry.path,
+                reason=entry.role,
+                size_bytes=stat.st_size,
+                mtime_ns=stat.st_mtime_ns,
+                content_hash=self._content_hash(path),
+                doc_scope=entry.scope,
+                module_id=entry.module_path,
+                module_name=Path(entry.module_path).name if entry.module_path else None,
+                module_path=entry.module_path,
+                module_type="catalog_module" if entry.module_path else None,
+                description=entry.description,
+                authority=entry.authority,
+                lifecycle_status=entry.status,
+                impact_policy=entry.impact,
+                catalog_entry_hash="sha256:" + hashlib.sha256(json.dumps({
+                    "path": entry.path, "role": entry.role, "scope": entry.scope,
+                    "description": entry.description, "module_path": entry.module_path,
+                    "authority": entry.authority, "status": entry.status, "impact": entry.impact,
+                }, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest(),
+            ))
+        return candidates
 
     def discover_docs(
         self,

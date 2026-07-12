@@ -759,6 +759,43 @@ def test_sync_project_docs_prunes_orphaned_sources_and_indexes_new_docs(tmp_path
     assert "NewSyncNeedle" in new_query.results[0].content
 
 
+def test_invalid_explicit_catalog_blocks_lifecycle_and_preserves_index(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    (project / "README.md").write_text("# App\n\nExisting indexed docs.", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+    service.ingest_project_docs(str(project), with_vectors=False)
+    (project / "docatlas.project-docs.yaml").write_text(
+        "schema_version: 9\n",
+        encoding="utf-8",
+    )
+
+    inspect = service.inspect_project_docs(str(project))
+    get_result = service.get_project_docs(str(project), "architecture")
+    context = service.get_project_context(str(project), "architecture", mode="project-only")
+    ingest = service.ingest_project_docs(str(project), with_vectors=False)
+    sync = service.sync_project_docs(str(project), with_vectors=False)
+
+    assert inspect.reason_code == "invalid_project_docs_catalog"
+    assert inspect.next_action["type"] == "fix_project_docs_catalog"
+    assert inspect.ignored_sources == []
+    assert len(inspect.project_docs["preserved_indexed"]) == 1
+    assert inspect.diagnostics["indexed_sources_preserved"] == 1
+    assert [item["type"] for item in inspect.recommended_next_actions if "type" in item] == [
+        "fix_project_docs_catalog"
+    ]
+    assert "Do not create docs, sync, or prune" in (inspect.agent_guidance or "")
+    assert get_result.status == "invalid_project_docs_catalog"
+    assert get_result.next_action["type"] == "fix_project_docs_catalog"
+    assert context.answer_available is False
+    assert context.next_action["type"] == "fix_project_docs_catalog"
+    assert ingest.status == "invalid_project_docs_catalog"
+    assert sync.status == "invalid_project_docs_catalog"
+    assert sync.removed_sources == []
+    assert sync.diagnostics["indexed_sources_preserved"] == 1
+    with service._agent_instance().store._connect() as conn:
+        assert conn.execute("SELECT COUNT(*) FROM sources").fetchone()[0] == 1
+
+
 def test_sync_project_docs_ingests_only_exact_discovered_candidates(tmp_path, monkeypatch):
     project = _flutter_project(tmp_path)
     (project / "README.md").write_text("# App\n\nRoot project overview.", encoding="utf-8")

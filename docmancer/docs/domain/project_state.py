@@ -23,13 +23,15 @@ def partition_project_doc_state(
                 "stale": True,
                 "reason": "indexed_source_not_discovered",
                 "meaning": "This source exists in the index, but current project-doc discovery did not select it as a candidate.",
-                "recommended_next_action": "Link it from docs/INDEX.md or root docs, move it under a discovered docs location, adjust discovery, or refresh/remove obsolete index entries.",
+                "recommended_next_action": "Add or correct its entry in docatlas.project-docs.yaml, or refresh/remove the obsolete indexed source.",
             })
             continue
         stale_reasons: list[str] = []
         metadata_drift_reasons: list[str] = []
         if candidate.get("content_hash") != indexed.get("content_hash"):
             stale_reasons.append("content_hash_changed")
+        if candidate.get("catalog_entry_hash") != indexed.get("catalog_entry_hash"):
+            stale_reasons.append("catalog_metadata_changed")
         if candidate.get("mtime_ns") != indexed.get("mtime_ns"):
             metadata_drift_reasons.append("mtime_changed")
         merged = {**indexed, "candidate": candidate, "stale": bool(stale_reasons)}
@@ -51,7 +53,7 @@ def has_high_level_project_overview(candidates: list[dict[str, Any]]) -> bool:
         path = Path(str(candidate.get("path") or ""))
         stem = path.stem.lower()
         parts = {part.lower() for part in path.parts}
-        if reason in {"root_readme", "architecture"}:
+        if reason in {"root_readme", "architecture", "overview", "project_architecture"}:
             return True
         if stem in {"overview", "introduction", "intro", "index", "readme"}:
             return True

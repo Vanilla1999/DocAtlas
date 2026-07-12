@@ -8,6 +8,10 @@ from docmancer.docs.models import DependencyObservation, DocsChunk, DocsResult, 
 
 class FakeProjectContextFacade:
     def __init__(self):
+        self.metadata = ProjectMetadata(
+            project_path="/repo",
+            dependencies=[DependencyObservation(ecosystem="pub", package_name="go_router")],
+        )
         self.project_docs = ProjectDocsResult(
             project_path="/repo",
             query="needle",
@@ -35,7 +39,7 @@ class FakeProjectContextFacade:
 
     def read_project_metadata(self, project_path):
         self.calls.append(("metadata", project_path))
-        return ProjectMetadata(project_path=project_path, dependencies=[DependencyObservation(ecosystem="pub", package_name="go_router")])
+        return self.metadata
 
     def get_project_docs(self, project_path, question, **kwargs):
         self.calls.append(("project", project_path, question, kwargs))
@@ -291,6 +295,132 @@ def test_architecture_query_injects_root_architecture_when_retrieval_misses_it(t
     injected = next(chunk for chunk in result.project_docs.results if chunk.path == "ARCHITECTURE.md")
     assert injected.source_class == "project_file"
     assert injected.metadata["injection_policy"] == "root_reviewable_project_doc_after_preflight"
+
+
+def test_architecture_query_only_injects_authoritative_catalog_candidates(tmp_path):
+    (tmp_path / "README.md").write_text("# Unlisted readme\n", encoding="utf-8")
+    (tmp_path / "handbook").mkdir()
+    system_doc = tmp_path / "handbook" / "system.md"
+    system_doc.write_text(
+        "Project architecture overview: UI -> application -> domain -> infrastructure.\n",
+        encoding="utf-8",
+    )
+    facade = FakeProjectContextFacade()
+    facade.metadata = ProjectMetadata(
+        project_path=str(tmp_path),
+        docs_catalog_present=True,
+        docs_catalog_valid=True,
+    )
+    facade.project_docs = ProjectDocsResult(
+        project_path=str(tmp_path),
+        query="архитектура",
+        results=[
+            ProjectDocsChunk(
+                title="Feature plan",
+                content="A narrow feature plan that mentions architecture.",
+                source=str(tmp_path / "feature.md"),
+                url=None,
+                path="feature.md",
+            ),
+        ],
+        candidate_sources=[
+            {
+                "path": "handbook/system.md",
+                "reason": "project_architecture",
+                "doc_scope": "project",
+                "description": "Whole-project architecture.",
+                "authority": "source_of_truth",
+                "lifecycle_status": "active",
+                "impact_policy": "track",
+            },
+        ],
+    )
+
+    result = ProjectContextService(facade).get_project_context(
+        str(tmp_path), "архитектура", mode="project-only"
+    )
+
+    assert result.project_docs is not None
+    assert {chunk.path for chunk in result.project_docs.results} == {
+        "feature.md",
+        "handbook/system.md",
+    }
+    assert all(chunk.path != "README.md" for chunk in result.project_docs.results)
+    injected = next(
+        chunk for chunk in result.project_docs.results if chunk.path == "handbook/system.md"
+    )
+    assert injected.description == "Whole-project architecture."
+    assert injected.authority == "source_of_truth"
+
+
+def test_architecture_query_does_not_fall_back_when_catalog_is_invalid(tmp_path):
+    (tmp_path / "ARCHITECTURE.md").write_text(
+        "This guessed source must not bypass an invalid explicit catalog.\n",
+        encoding="utf-8",
+    )
+    facade = FakeProjectContextFacade()
+    facade.metadata = ProjectMetadata(
+        project_path=str(tmp_path),
+        docs_catalog_present=True,
+        docs_catalog_valid=False,
+    )
+    facade.project_docs = ProjectDocsResult(
+        project_path=str(tmp_path),
+        query="архитектура",
+        results=[
+            ProjectDocsChunk(
+                title="Existing safe result",
+                content="Existing indexed result retained for this isolated boundary test.",
+                source=str(tmp_path / "existing.md"),
+                url=None,
+                path="existing.md",
+            ),
+        ],
+        candidate_sources=[],
+    )
+
+    result = ProjectContextService(facade).get_project_context(
+        str(tmp_path), "архитектура", mode="project-only"
+    )
+
+    assert result.project_docs is not None
+    assert all(chunk.path != "ARCHITECTURE.md" for chunk in result.project_docs.results)
+
+
+def test_architecture_injection_excludes_historical_and_module_catalog_docs(tmp_path):
+    for rel in ("active.md", "completed.md", "module.md"):
+        (tmp_path / rel).write_text(f"# {rel}\nArchitecture details.\n", encoding="utf-8")
+    facade = FakeProjectContextFacade()
+    facade.metadata = ProjectMetadata(
+        project_path=str(tmp_path),
+        docs_catalog_present=True,
+        docs_catalog_valid=True,
+    )
+    facade.project_docs = ProjectDocsResult(
+        project_path=str(tmp_path),
+        query="architecture",
+        results=[
+            ProjectDocsChunk(
+                title="Existing",
+                content="Existing architecture result.",
+                source=str(tmp_path / "existing.md"),
+                url=None,
+                path="existing.md",
+            ),
+        ],
+        candidate_sources=[
+            {"path": "active.md", "reason": "project_architecture", "doc_scope": "project", "lifecycle_status": "active"},
+            {"path": "completed.md", "reason": "project_architecture", "doc_scope": "project", "lifecycle_status": "completed", "authority": "source_of_truth"},
+            {"path": "module.md", "reason": "module_architecture", "doc_scope": "module", "lifecycle_status": "active", "authority": "source_of_truth"},
+        ],
+    )
+
+    result = ProjectContextService(facade).get_project_context(
+        str(tmp_path), "architecture", mode="project-only"
+    )
+
+    assert result.project_docs is not None
+    assert {chunk.path for chunk in result.project_docs.results} == {"existing.md", "active.md"}
 
 
 def test_story_specific_project_context_with_only_docs_matched_terms_requires_source_search():

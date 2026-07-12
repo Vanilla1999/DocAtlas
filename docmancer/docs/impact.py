@@ -364,7 +364,7 @@ def _safe_git_change(change: dict[str, Any]) -> dict[str, Any]:
 def _impact_candidate_priority(candidate: Any, changed_modules: set[str | None]) -> tuple[int, str]:
     if candidate.module_path and candidate.module_path in changed_modules:
         tier = 0
-    elif candidate.reason in {"architecture", "root_readme"} or candidate.path == "docs/INDEX.md":
+    elif _is_project_authority_candidate(candidate):
         tier = 1
     else:
         tier = 2
@@ -375,7 +375,7 @@ def _fallback_doc_candidates(candidates: list[Any]) -> list[Any]:
     return sorted(
         candidates,
         key=lambda candidate: (
-            0 if candidate.reason in {"architecture", "root_readme"} or candidate.path == "docs/INDEX.md" else 1,
+            0 if _is_project_authority_candidate(candidate) else 1,
             candidate.path,
         ),
     )[:_MAX_FALLBACK_DOCS]
@@ -463,7 +463,19 @@ def analyze_docs_impact(
     else:
         automatic_symbols = list((diff_evidence or {}).get("symbols") or [])
     symbols = _normalized_symbols([*automatic_symbols, *(changed_symbols or [])])
-    all_candidates = [candidate for candidate in metadata.docs_candidates if candidate.path]
+    catalog_authoritative = metadata.docs_catalog_present
+    catalog_document_paths = {candidate.path for candidate in metadata.docs_candidates if candidate.path}
+    ignored_document_paths = {
+        candidate.path for candidate in metadata.docs_candidates
+        if candidate.path
+        and (candidate.lifecycle_status != "active" or candidate.impact_policy != "track")
+    }
+    all_candidates = [
+        candidate for candidate in metadata.docs_candidates
+        if candidate.path
+        and candidate.lifecycle_status == "active"
+        and candidate.impact_policy == "track"
+    ]
     candidates_by_path = {candidate.path: candidate for candidate in all_candidates}
     changed_modules = {_module_path(path) for path in changed}
     candidates = sorted(all_candidates, key=lambda candidate: _impact_candidate_priority(candidate, changed_modules))
@@ -475,7 +487,11 @@ def analyze_docs_impact(
     root_readmes = [
         candidate.path
         for candidate in candidates
-        if candidate.doc_scope == "project" and candidate.reason == "root_readme"
+        if (
+            _is_project_authority_candidate(candidate)
+            if catalog_authoritative
+            else candidate.doc_scope == "project" and candidate.reason == "root_readme"
+        )
     ]
 
     change_records = list((diff_evidence or {}).get("changes") or [])
@@ -489,8 +505,8 @@ def analyze_docs_impact(
         new_path = str(change.get("new_path") or "")
         paths = [str(path) for path in change.get("paths") or [] if path]
         if kind == "renamed":
-            old_is_doc = _looks_like_doc_path(old_path)
-            new_is_doc = _looks_like_doc_path(new_path)
+            old_is_doc = _is_changed_doc_path(old_path, catalog_document_paths, catalog_authoritative)
+            new_is_doc = _is_changed_doc_path(new_path, catalog_document_paths, catalog_authoritative)
             if old_is_doc and new_is_doc:
                 key = new_path or old_path
                 documentation_changes[key] = {
@@ -503,27 +519,31 @@ def analyze_docs_impact(
         elif kind == "copied":
             if old_path:
                 unchanged_copy_sources.add(old_path)
-            if new_path and _looks_like_doc_path(new_path):
+            if new_path and _is_changed_doc_path(new_path, catalog_document_paths, catalog_authoritative):
                 documentation_changes[new_path] = {"path": new_path, "status": "updated"}
-        elif kind == "deleted" and paths and _looks_like_doc_path(paths[0]):
+        elif kind == "deleted" and paths and _is_changed_doc_path(paths[0], catalog_document_paths, catalog_authoritative):
             documentation_changes[paths[0]] = {"path": paths[0], "status": "deleted"}
         else:
             for path in paths:
-                if _looks_like_doc_path(path):
+                if _is_changed_doc_path(path, catalog_document_paths, catalog_authoritative):
                     documentation_changes[path] = {"path": path, "status": "updated"}
     for path in changed:
         if path in unchanged_copy_sources:
             continue
         if path in candidates_by_path:
             documentation_changes.setdefault(path, {"path": path, "status": "updated"})
-        elif not change_records and _looks_like_doc_path(path):
+        elif not change_records and _is_changed_doc_path(path, catalog_document_paths, catalog_authoritative):
             documentation_changes.setdefault(path, {"path": path, "status": "changed_or_deleted"})
+    documentation_changes = {
+        path: change for path, change in documentation_changes.items()
+        if path not in ignored_document_paths
+    }
     documentation_change_paths = {
         path
         for item in documentation_changes.values()
         for path in (item.get("path"), item.get("old_path"), item.get("new_path"))
         if path
-    }
+    } | {path for path in changed if path in ignored_document_paths}
     updated_docs = sorted(documentation_changes)
     code_changes = [
         path for path in changed
@@ -565,7 +585,7 @@ def analyze_docs_impact(
             continue
         matched_project_doc = False
         for candidate in candidates:
-            if candidate.reason in {"architecture", "root_readme"} or candidate.path == "docs/INDEX.md":
+            if _is_project_authority_candidate(candidate):
                 reason = "diff_symbol_parser_fallback" if path in parser_fallback_paths else "project_code_changed"
                 _add_impact(impacts, candidate.path, reason=reason, changed_file=path, module_path=None)
                 matched_project_doc = True
@@ -697,7 +717,7 @@ def analyze_docs_impact(
             _add_section_impacts(impacts, candidate.path, hints=bounded_hints, module_path=candidate.module_path)
         for hint in bounded_hints:
             reason_code = "section_reference_changed_path" if hint["reason"] == "references_changed_path" else "section_reference_changed_symbol"
-            authority_boost = 5 if candidate.reason in {"architecture", "root_readme"} else 0
+            authority_boost = 5 if _is_project_authority_candidate(candidate) else 0
             score = (100 if hint["reason"] == "references_changed_symbol" else 95) + authority_boost
             section_candidates.append({
                 "path": candidate.path,
@@ -708,7 +728,7 @@ def analyze_docs_impact(
                 "confidence": "high",
                 "score": score,
                 "metadata_source": metadata_source,
-                "authority": candidate.reason,
+                "authority": candidate.authority or candidate.reason,
             })
 
     missing = [{
@@ -838,6 +858,8 @@ def analyze_docs_impact(
         incomplete_reasons.append("section_formats_unsupported")
     if metadata_diagnostics["read_errors"]:
         incomplete_reasons.append("section_document_read_errors")
+    if metadata.docs_catalog_present and not metadata.docs_catalog_valid:
+        incomplete_reasons.append("project_docs_catalog_invalid")
     if changed_input_truncated:
         incomplete_reasons.append("changed_paths_truncated")
     for diagnostic_key in (
@@ -1266,6 +1288,23 @@ def _looks_like_doc_path(path: str) -> bool:
     if file_path.suffix.lower() in DOC_FILE_EXTENSIONS:
         return True
     return file_path.name.lower() in ROOT_DOC_FILES
+
+
+def _is_changed_doc_path(path: str, catalog_paths: set[str], catalog_authoritative: bool) -> bool:
+    normalized = str(path or "").replace("\\", "/").strip("/")
+    return normalized in catalog_paths if catalog_authoritative else _looks_like_doc_path(normalized)
+
+
+def _is_project_authority_candidate(candidate: Any) -> bool:
+    if getattr(candidate, "doc_scope", "project") != "project":
+        return False
+    role = str(getattr(candidate, "reason", "") or "")
+    authority = str(getattr(candidate, "authority", "") or "")
+    return (
+        role in {"architecture", "root_readme", "overview", "project_architecture"}
+        or getattr(candidate, "path", "") == "docs/INDEX.md"
+        or authority == "source_of_truth"
+    )
 
 
 def _is_test_path(path: str) -> bool:

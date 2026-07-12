@@ -137,7 +137,12 @@ class ProjectContextService:
             if project_docs and project_docs.requires_confirmation and project_docs.confirmation_reason == "project_docs_preflight":
                 return _project_docs_preflight_confirmation_result(root=root, question=question, mode=mode, project_docs=project_docs)
             if project_docs and project_docs.results:
-                project_docs = _inject_broad_architecture_docs(project_docs, root=root, intent=intent)
+                project_docs = _inject_broad_architecture_docs(
+                    project_docs, root=root, intent=intent,
+                    # The mere presence of an explicit catalog disables guessed
+                    # architecture sources. An invalid catalog must fail closed.
+                    catalog_authoritative=metadata.docs_catalog_present,
+                )
                 project_docs = replace(
                     project_docs,
                     results=rerank_project_doc_chunks(project_docs.results, question=question, intent=intent, limit=limit),
@@ -187,8 +192,19 @@ class ProjectContextService:
             next_actions.append(dependency_confirmation)
         requires_confirmation = bool(project_docs and project_docs.requires_confirmation) or bool(dependency_confirmation and explicit_dependency_requested)
         confirmation_reason = project_docs.confirmation_reason if project_docs and project_docs.requires_confirmation else ("network_fetch" if dependency_confirmation and explicit_dependency_requested else None)
-        next_action = project_docs.next_action if project_docs and project_docs.requires_confirmation else (dependency_confirmation or {})
-        arguments_patch = project_docs.arguments_patch if project_docs and project_docs.requires_confirmation else ({"allow_network": True} if dependency_confirmation else {})
+        project_docs_blocked = bool(
+            project_docs and project_docs.status == "invalid_project_docs_catalog"
+        )
+        next_action = (
+            project_docs.next_action
+            if project_docs and (project_docs.requires_confirmation or project_docs_blocked)
+            else (dependency_confirmation or {})
+        )
+        arguments_patch = (
+            project_docs.arguments_patch
+            if project_docs and (project_docs.requires_confirmation or project_docs_blocked)
+            else ({"allow_network": True} if dependency_confirmation else {})
+        )
         if mode in {"auto", "project-only"} and project_docs and hasattr(self.facade, "inspect_project_docs"):
             inspection = self.facade.inspect_project_docs(str(root))
             if (
@@ -468,6 +484,8 @@ def project_context_pack(*, question: str = "", project_docs: ProjectDocsResult 
             token_estimate = max(1, len(item.content) // 4) if item.content else 0
             freshness = "stale" if item.stale else "current"
             source_taxonomy = project_source_taxonomy(item.path, doc_scope=item.doc_scope, module_path=item.module_path)
+            if item.authority:
+                source_taxonomy["authority"] = item.authority
             if _should_skip_low_trust_project_source(question, source_taxonomy):
                 continue
             pack.append({
@@ -481,6 +499,9 @@ def project_context_pack(*, question: str = "", project_docs: ProjectDocsResult 
                 "module_name": item.module_name,
                 "module_path": item.module_path,
                 "module_type": item.module_type,
+                "description": item.description,
+                "lifecycle_status": item.lifecycle_status,
+                "impact_policy": item.impact_policy,
                 "path": item.path,
                 "url": item.url,
                 "title": item.title,
@@ -500,6 +521,9 @@ def project_context_pack(*, question: str = "", project_docs: ProjectDocsResult 
                     "module_name": item.module_name,
                     "module_path": item.module_path,
                     "module_type": item.module_type,
+                    "description": item.description,
+                    "lifecycle_status": item.lifecycle_status,
+                    "impact_policy": item.impact_policy,
                     "path": item.path,
                     "url": item.url,
                     "title": item.title,
@@ -606,12 +630,32 @@ def _project_docs_preflight_confirmation_result(*, root: Path, question: str, mo
     )
 
 
-def _inject_broad_architecture_docs(project_docs: ProjectDocsResult, *, root: Path, intent: Any) -> ProjectDocsResult:
+def _inject_broad_architecture_docs(
+    project_docs: ProjectDocsResult,
+    *,
+    root: Path,
+    intent: Any,
+    catalog_authoritative: bool = False,
+) -> ProjectDocsResult:
     if not getattr(intent, "wants_architecture", False):
         return project_docs
     existing = {normalize_doc_path(chunk.path) for chunk in project_docs.results}
     injected: list[ProjectDocsChunk] = []
-    for rel in ("ARCHITECTURE.md", "docs/INDEX.md", "README.md"):
+    if catalog_authoritative:
+        injection_rows = [
+            item
+            for item in project_docs.candidate_sources
+            if item.get("reason") in {"overview", "project_architecture"}
+            and item.get("doc_scope") == "project"
+            and (item.get("lifecycle_status") or "active") == "active"
+        ][:3]
+    else:
+        injection_rows = [
+            {"path": rel, "doc_scope": "project"}
+            for rel in ("ARCHITECTURE.md", "docs/INDEX.md", "README.md")
+        ]
+    for row in injection_rows:
+        rel = str(row.get("path") or "")
         if normalize_doc_path(rel) in existing:
             continue
         path = root / rel
@@ -628,7 +672,15 @@ def _inject_broad_architecture_docs(project_docs: ProjectDocsResult, *, root: Pa
             metadata={"score": 1.0, "injected_for": "broad_architecture_query", "injection_policy": "root_reviewable_project_doc_after_preflight"},
             source_class=SOURCE_CLASS_PROJECT_FILE,
             path=rel,
-            doc_scope="project",
+            doc_scope=str(row.get("doc_scope") or "project"),
+            module_id=row.get("module_id"),
+            module_name=row.get("module_name"),
+            module_path=row.get("module_path"),
+            module_type=row.get("module_type"),
+            description=row.get("description"),
+            authority=row.get("authority"),
+            lifecycle_status=row.get("lifecycle_status"),
+            impact_policy=row.get("impact_policy"),
         ))
     if not injected:
         return project_docs

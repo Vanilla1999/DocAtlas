@@ -67,6 +67,10 @@ class ProjectDocsChunk(DocsChunk):
     module_name: str | None = None
     module_path: str | None = None
     module_type: str | None = None
+    description: str | None = None
+    authority: str | None = None
+    lifecycle_status: str | None = None
+    impact_policy: str | None = None
 
 
 @dataclass(frozen=True)
@@ -329,6 +333,11 @@ class ProjectDocsCandidate:
     module_name: str | None = None
     module_path: str | None = None
     module_type: str | None = None
+    description: str | None = None
+    authority: str | None = None
+    lifecycle_status: str = "active"
+    impact_policy: str = "track"
+    catalog_entry_hash: str | None = None
 
 
 @dataclass(frozen=True)
@@ -343,6 +352,8 @@ class ProjectMetadata:
     docs_candidates: list[ProjectDocsCandidate] = field(default_factory=list)
     detected_ecosystems: list[str] = field(default_factory=list)
     warnings: list[str] = field(default_factory=list)
+    docs_catalog_present: bool = False
+    docs_catalog_valid: bool = True
 
 
 @dataclass(frozen=True)
