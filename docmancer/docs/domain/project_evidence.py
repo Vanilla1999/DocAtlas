@@ -198,9 +198,58 @@ def _runtime_configuration_facts(root: Path, repo_map: list[dict[str, Any]]) -> 
                     key = node.args[0].value if node.args and isinstance(node.args[0], ast.Constant) else "<dynamic>"
                     facts.append((relative, f"runtime environment read via {name}({key!r})"))
                     break
-        elif _RUNTIME_ACCESS_RE.search(text):
+        elif _RUNTIME_ACCESS_RE.search(_code_without_comments_or_strings(text)):
             facts.append((relative, "parsed runtime environment access expression"))
     return facts
+
+
+def _code_without_comments_or_strings(text: str) -> str:
+    """Keep executable tokens while blanking common comments and string literals."""
+    output: list[str] = []
+    index = 0
+    quote: str | None = None
+    line_comment = False
+    block_comment = False
+    escaped = False
+    while index < len(text):
+        char = text[index]
+        following = text[index + 1] if index + 1 < len(text) else ""
+        if line_comment:
+            if char == "\n":
+                line_comment = False
+                output.append(char)
+            else:
+                output.append(" ")
+        elif block_comment:
+            if char == "*" and following == "/":
+                output.extend((" ", " "))
+                block_comment = False
+                index += 1
+            else:
+                output.append("\n" if char == "\n" else " ")
+        elif quote:
+            output.append("\n" if char == "\n" else " ")
+            if escaped:
+                escaped = False
+            elif char == "\\":
+                escaped = True
+            elif char == quote:
+                quote = None
+        elif char == "/" and following == "/":
+            output.extend((" ", " "))
+            line_comment = True
+            index += 1
+        elif char == "/" and following == "*":
+            output.extend((" ", " "))
+            block_comment = True
+            index += 1
+        elif char in {"'", '"', "`"}:
+            quote = char
+            output.append(" ")
+        else:
+            output.append(char)
+        index += 1
+    return "".join(output)
 
 
 def _call_name(node: ast.expr) -> str:

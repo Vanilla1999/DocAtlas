@@ -117,6 +117,7 @@ def collect_project_source_facts(
     question: str = "",
     max_files: int = 24,
     token_budget: int = 4000,
+    include_unmatched: bool = False,
 ) -> list[dict[str, Any]]:
     """Collect deterministic source facts for repo_map and future graph layers.
 
@@ -129,10 +130,23 @@ def collect_project_source_facts(
     if max_files <= 0 or token_budget <= 0 or not root.exists() or not root.is_dir():
         return []
 
-    return _select_project_source_facts(root, question=question, max_files=max_files, token_budget=token_budget)
+    return _select_project_source_facts(
+        root,
+        question=question,
+        max_files=max_files,
+        token_budget=token_budget,
+        include_unmatched=include_unmatched,
+    )
 
 
-def _select_project_source_facts(root: Path, *, question: str, max_files: int, token_budget: int) -> list[dict[str, Any]]:
+def _select_project_source_facts(
+    root: Path,
+    *,
+    question: str,
+    max_files: int,
+    token_budget: int,
+    include_unmatched: bool = False,
+) -> list[dict[str, Any]]:
     query_terms = _query_terms(question)
     candidates: list[dict[str, Any]] = []
     for path in _iter_source_files(root):
@@ -141,7 +155,7 @@ def _select_project_source_facts(root: Path, *, question: str, max_files: int, t
             continue
         item["matched_terms"] = _matched_terms(item, query_terms)
         item["selection_score"] = _selection_score(item, query_terms)
-        if item["selection_score"] <= 0:
+        if item["selection_score"] <= 0 and not include_unmatched:
             continue
         candidates.append(item)
 

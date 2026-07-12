@@ -17,8 +17,8 @@ from docmancer.docs.domain.project_state import evaluate_documentation_sections
 from docmancer.docs.domain.project_evidence import classify_project_evidence
 from docmancer.docs.domain.quality import has_code_symbol_evidence, internal_noise_score, is_trivial_section, looks_like_code_or_command
 from docmancer.docs.domain.snippets import best_context_pack_snippet, build_snippet_presentation, validate_response_style
-from docmancer.docs.domain.source_map import build_project_repo_map, build_project_source_evidence, source_evidence_diagnostics, source_map_diagnostics
-from docmancer.docs.domain.code_graph import CodeGraph, build_code_graph_context_items, build_project_code_graph, code_graph_context_diagnostics, code_graph_diagnostics
+from docmancer.docs.domain.source_map import build_project_repo_map, build_project_source_evidence, collect_project_source_facts, source_evidence_diagnostics, source_map_diagnostics
+from docmancer.docs.domain.code_graph import build_code_graph_context_items, build_project_code_graph, code_graph_context_diagnostics, code_graph_diagnostics
 from docmancer.docs.domain.trust_contract import build_project_context_trust_contract
 from docmancer.docs.domain.content_trust import annotate_context_pack
 from docmancer.docs.models import SOURCE_CLASS_PROJECT_FILE, DocsChunk, DocsResult, ProjectContextResult, ProjectDocsChunk, ProjectDocsResult, ProjectMetadata
@@ -69,12 +69,25 @@ def _source_ground_documentation_gap(
     actions: list[dict[str, Any]],
     *,
     root: Path,
-    repo_map: list[dict[str, Any]],
-    code_graph: CodeGraph | None,
 ) -> None:
     """Attach bounded, discovered paths to a host-only documentation handoff."""
+    gap_actions = _documentation_gap_actions(actions)
+    if not gap_actions:
+        return
+    repo_map = collect_project_source_facts(
+        root,
+        max_files=24,
+        token_budget=4000,
+        include_unmatched=True,
+    )
+    code_graph = build_project_code_graph(
+        root,
+        max_files=24,
+        token_budget=4000,
+        include_unmatched=True,
+    )
     evidence = classify_project_evidence(root, repo_map=repo_map, code_graph=code_graph)
-    for action in _documentation_gap_actions(actions):
+    for action in gap_actions:
         gap = dict(action.get("documentation_gap") or {})
         sections, evidence_complete = evaluate_documentation_sections(
             list(gap.get("required_sections") or []),
@@ -234,8 +247,6 @@ class ProjectContextService:
         _source_ground_documentation_gap(
             next_actions,
             root=root,
-            repo_map=repo_map_items,
-            code_graph=code_graph,
         )
         gap_actions = _documentation_gap_actions(next_actions)
         if gap_actions:

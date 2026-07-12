@@ -3,11 +3,12 @@ from __future__ import annotations
 from pathlib import Path
 
 from docmancer.docs.application.project_context_service import ProjectContextService
+from docmancer.docs.domain.project_evidence import classify_project_evidence
 from docmancer.docs.domain.project_state import create_project_docs_next_action
 from docmancer.docs.models import ProjectDocsInspectResult, ProjectDocsResult, ProjectMetadata
 
 
-QUESTION = "Explain architecture main service run DEMO_PORT runtime modules entrypoints test and build configuration"
+QUESTION = "Explain the architecture"
 
 
 class ProductionGapFacade:
@@ -123,3 +124,32 @@ def test_source_filename_alone_does_not_prove_entrypoint_or_runtime_config(tmp_p
 
     assert "entrypoints" not in categories
     assert "runtime configuration" not in categories
+
+
+def test_non_python_runtime_detection_ignores_comments_and_strings(tmp_path):
+    path = tmp_path / "app.js"
+    path.write_text(
+        "// process.env.COMMENT_ONLY\nconst example = 'process.env.STRING_ONLY';\n",
+        encoding="utf-8",
+    )
+
+    evidence = classify_project_evidence(
+        tmp_path,
+        repo_map=[{"path": "app.js", "symbols": []}],
+        code_graph=None,
+    )
+
+    assert "runtime configuration" not in {item["category"] for item in evidence}
+
+
+def test_non_python_runtime_detection_keeps_executable_access(tmp_path):
+    path = tmp_path / "app.js"
+    path.write_text("const port = process.env.DEMO_PORT;\n", encoding="utf-8")
+
+    evidence = classify_project_evidence(
+        tmp_path,
+        repo_map=[{"path": "app.js", "symbols": []}],
+        code_graph=None,
+    )
+
+    assert "runtime configuration" in {item["category"] for item in evidence}
