@@ -21,7 +21,7 @@ jobs:
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
-          ref: ${{ inputs.tag || github.sha }}
+          ref: ${{ inputs.tag && format('refs/tags/{0}', inputs.tag) || github.sha }}
       - uses: actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38 # v5.4.0
         with:
           python-version: "3.11"
@@ -50,7 +50,7 @@ jobs:
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
-          ref: ${{ inputs.tag || github.sha }}
+          ref: ${{ inputs.tag && format('refs/tags/{0}', inputs.tag) || github.sha }}
       - uses: actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38 # v5.4.0
         with:
           python-version: ${{ matrix.python }}
@@ -72,7 +72,7 @@ jobs:
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
-          ref: ${{ inputs.tag || github.sha }}
+          ref: ${{ inputs.tag && format('refs/tags/{0}', inputs.tag) || github.sha }}
       - uses: actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38 # v5.4.0
         with:
           python-version: "3.11"
@@ -80,7 +80,12 @@ jobs:
         with:
           name: release-dist
           path: dist
-      - run: python -m pip install dist/*.tar.gz
+      - run: |
+          mkdir sdist-wheel
+          cp dist/*.tar.gz sdist-wheel/
+          python -m pip wheel --no-deps --wheel-dir sdist-wheel dist/*.tar.gz
+          python scripts/release_gate.py --dist sdist-wheel
+      - run: python -m pip install --force-reinstall sdist-wheel/*.whl
       - run: |
           cd "$(mktemp -d)"
           python "$GITHUB_WORKSPACE/scripts/docs_mcp_stdio_smoke.py"
@@ -103,6 +108,12 @@ jobs:
       id-token: write
       attestations: write
     steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: refs/tags/${{ inputs.tag }}
+      - uses: actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38 # v5.4.0
+        with:
+          python-version: "3.11"
       - uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
         with:
           name: release-dist
@@ -112,3 +123,12 @@ jobs:
         with:
           subject-path: "dist/*"
       - uses: pypa/gh-action-pypi-publish@ed0c53931b1dc9bd32cbe73a98c7f6766f8a527e # release/v1
+      - name: Verify the exact public release
+        run: |
+          RELEASE_VERSION="${{ inputs.tag }}"
+          RELEASE_VERSION="${RELEASE_VERSION#v}"
+          DOCATLAS_INSTALL_VERSION="$RELEASE_VERSION" \
+          DOCATLAS_EXPECT_VERSION="$RELEASE_VERSION" \
+          DOCATLAS_AGENT=none sh scripts/install.sh
+          cd "$(mktemp -d)"
+          python "$GITHUB_WORKSPACE/scripts/docs_mcp_stdio_smoke.py"
