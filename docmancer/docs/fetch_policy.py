@@ -12,12 +12,24 @@ Resolver: TypeAlias = Callable[[str], Iterable[IPAddress]]
 
 
 class DocsFetchSecurityError(ValueError):
-    """A safe, serializable reason why a documentation target was rejected."""
+    """A safe, serializable Docs-fetch failure with no raw transport details."""
 
-    def __init__(self, category: str, redacted_url: str):
+    def __init__(
+        self,
+        category: str,
+        redacted_url: str,
+        *,
+        phase: str = "validation",
+        retryable: bool = False,
+        status_code: int | None = None,
+    ):
         super().__init__(category)
         self.category = category
         self.redacted_url = redacted_url
+        self.failed_url = redacted_url
+        self.phase = phase
+        self.retryable = retryable
+        self.status_code = status_code
 
 
 @dataclass(frozen=True)
@@ -85,9 +97,9 @@ class DocsFetchPolicy:
                 else tuple((self.resolver or resolve_host)(normalized_host))
             )
         except (OSError, UnicodeError, ValueError):
-            raise DocsFetchSecurityError("host_resolution_failed", redacted) from None
+            raise DocsFetchSecurityError("dns_failure", redacted, phase="resolving", retryable=True) from None
         if not answers:
-            raise DocsFetchSecurityError("host_resolution_failed", redacted)
+            raise DocsFetchSecurityError("dns_failure", redacted, phase="resolving", retryable=True)
         for answer in answers:
             if _is_blocked_ip(answer):
                 raise DocsFetchSecurityError("private_network_blocked", redacted)

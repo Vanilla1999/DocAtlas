@@ -434,6 +434,8 @@ class DocmancerAgent:
             max_redirects=getattr(self.config.web_fetch, "max_redirects", 5),
             connect_timeout=self.config.web_fetch.connect_timeout_seconds,
             max_total_seconds=self.config.web_fetch.max_total_seconds,
+            use_env_proxy=getattr(self.config.web_fetch, "use_env_proxy", False),
+            proxy_url=getattr(self.config.web_fetch, "proxy_url", None),
             max_response_bytes=getattr(self.config.web_fetch, "max_response_bytes", 8 * 1024 * 1024),
             max_decoded_text_bytes=getattr(
                 self.config.web_fetch, "max_decoded_text_bytes", 16 * 1024 * 1024
@@ -479,6 +481,7 @@ class DocmancerAgent:
             cancellation_callback=cancellation_callback,
         )
         documents = f.fetch(url)
+        self.last_fetch_failure = getattr(f, "last_fetch_failure", None)
         if cancellation_callback and cancellation_callback():
             raise RuntimeError("Documentation ingestion cancelled before indexing.")
         self.last_discovery_diagnostics = dict(getattr(f, "last_discovery_diagnostics", {}) or {})

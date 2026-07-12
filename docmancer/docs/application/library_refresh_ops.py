@@ -11,6 +11,7 @@ import time
 import httpx
 
 from docmancer.docs.models import RefreshResult
+from docmancer.docs.fetch_policy import DocsFetchSecurityError
 from docmancer.docs.registry import LibraryRecord
 from docmancer.docs.dart_official_docs import build_dart_diagnostics, canonical_dart_ecosystem
 
@@ -19,6 +20,8 @@ logger = logging.getLogger(__name__)
 
 def _refresh_failure_code(exc: Exception) -> str:
     """Return a stable, safe failure category for a library ingestion attempt."""
+    if isinstance(exc, DocsFetchSecurityError):
+        return exc.category
     if isinstance(exc, httpx.ConnectTimeout):
         return "connect_timeout"
     if isinstance(exc, httpx.ReadTimeout):
@@ -35,6 +38,26 @@ def _refresh_failure_code(exc: Exception) -> str:
     if "extract" in message:
         return "extraction_failed"
     return "indexing_failed"
+
+
+def _retryable_failure(exc: Exception, reason_code: str) -> bool:
+    if isinstance(exc, DocsFetchSecurityError):
+        return exc.retryable
+    return reason_code in {
+        "dns_failure",
+        "network_unreachable",
+        "connect_timeout",
+        "read_timeout",
+        "tls_failure",
+        "network_timeout",
+        "network_transport_error",
+    }
+
+
+def _safe_failure_message(exc: Exception, reason_code: str) -> str:
+    if isinstance(exc, DocsFetchSecurityError):
+        return f"{reason_code}: {exc.failed_url}"
+    return reason_code
 
 
 def _merged_discovery_diagnostics(items: list[dict[str, Any]]) -> dict[str, Any]:
@@ -163,6 +186,7 @@ class LibraryRefreshOps:
 
         sections_indexed = 0
         discovery_diagnostics: list[dict[str, Any]] = []
+        fetch_failure: Exception | None = None
         try:
             target = self._target_from_record(record)
             urls = self._record_urls(record)
@@ -188,6 +212,7 @@ class LibraryRefreshOps:
                     sections_indexed += indexed_sections
                 if getattr(agent, "last_discovery_diagnostics", None):
                     discovery_diagnostics.append(dict(agent.last_discovery_diagnostics))
+                fetch_failure = getattr(agent, "last_fetch_failure", None) or fetch_failure
         except Exception as exc:
             if should_cancel and should_cancel():
                 self._discard_staging(staging)
@@ -196,21 +221,23 @@ class LibraryRefreshOps:
                 self._discard_staging(staging)
                 return self._cancelled_result(record, started)
             self._discard_staging(staging)
-            logger.exception("Refresh failed for record %s: %s", record.library_id, exc)
             reason_code = _refresh_failure_code(exc)
-            message = f"{reason_code}: {exc}"
-            self.registry.upsert(
-                library=record.name,
-                ecosystem=record.ecosystem,
-                version=record.version,
-                docs_url=record.docs_url,
-                docs_url_template=record.docs_url_template,
-                source_type=record.source_type,
-                now=self._now(),
-                status="failed",
-                last_error=message,
-                target_spec=record.target_spec,
-            )
+            retryable = _retryable_failure(exc, reason_code)
+            message = _safe_failure_message(exc, reason_code)
+            logger.warning("Refresh failed for record %s: %s", record.library_id, reason_code)
+            if not retryable:
+                self.registry.upsert(
+                    library=record.name,
+                    ecosystem=record.ecosystem,
+                    version=record.version,
+                    docs_url=record.docs_url,
+                    docs_url_template=record.docs_url_template,
+                    source_type=record.source_type,
+                    now=self._now(),
+                    status="failed",
+                    last_error=message,
+                    target_spec=record.target_spec,
+                )
             return RefreshResult(
                 library_id=record.library_id,
                 status="failed",
@@ -227,6 +254,10 @@ class LibraryRefreshOps:
                     "canonical_id": record.canonical_id,
                     "docs_url": record.docs_url,
                     "reason_code": reason_code,
+                    "failure_phase": getattr(exc, "phase", "indexing"),
+                    "failed_url": getattr(exc, "failed_url", None),
+                    "http_status": getattr(exc, "status_code", None),
+                    "retryable": retryable,
                     **_dart_refresh_diagnostics(
                         record,
                         pages_discovered=sections_indexed,
@@ -383,6 +414,32 @@ class LibraryRefreshOps:
             ),
             "elapsed_ms": int((time.monotonic() - started) * 1000),
         }
+
+        if fetch_failure is not None:
+            failure_code = _refresh_failure_code(fetch_failure)
+            retryable = _retryable_failure(fetch_failure, failure_code)
+            preindex.update(
+                reason_code=failure_code,
+                failure_phase=getattr(fetch_failure, "phase", "fetching"),
+                failed_url=getattr(fetch_failure, "failed_url", None),
+                http_status=getattr(fetch_failure, "status_code", None),
+                retryable=retryable,
+            )
+            return RefreshResult(
+                library_id=record.library_id,
+                status="partial",
+                docs_url=record.docs_url,
+                last_refreshed_at=refreshed_at,
+                version=record.version,
+                source_type=record.source_type,
+                message=_safe_failure_message(fetch_failure, failure_code),
+                duration_ms=int((time.monotonic() - started) * 1000),
+                pages_indexed=pages_after,
+                chunks_indexed=chunks_after,
+                targets_completed=1,
+                reason_codes=[failure_code],
+                preindex=preindex,
+            )
 
         return RefreshResult(
             library_id=record.library_id,

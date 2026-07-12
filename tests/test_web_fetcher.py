@@ -22,6 +22,33 @@ def _mock_response(text: str, status: int = 200, content_type: str = "text/html"
     return resp
 
 
+def test_identical_retry_uses_fresh_client_and_recovers_in_same_process():
+    url = "https://example.com/llms.txt"
+    request = httpx.Request("GET", url)
+    offline = MagicMock()
+    offline.get.side_effect = httpx.ConnectError("offline", request=request)
+    online = MagicMock()
+    online.get.return_value = _mock_response(
+        "# Guide\n\nRecovered documentation content.",
+        content_type="text/plain",
+    )
+    policy = DocsFetchPolicy(resolver=lambda _host: (ipaddress.ip_address("93.184.216.34"),))
+
+    with patch(
+        "docmancer.connectors.fetchers.web.httpx.Client",
+        side_effect=[offline, online],
+    ) as client_factory:
+        fetcher = WebFetcher(fetch_policy=policy)
+        with pytest.raises(DocsFetchSecurityError) as first:
+            fetcher.fetch(url)
+        documents = fetcher.fetch(url)
+
+    assert first.value.category == "network_unreachable"
+    assert len(documents) == 1
+    assert documents[0].source == url
+    assert client_factory.call_count == 2
+
+
 HOMEPAGE_HTML = """<!DOCTYPE html>
 <html lang="en">
 <head><meta name="generator" content="Docusaurus v3.0">
@@ -283,6 +310,11 @@ class TestWebFetcherErrors:
 
 
 class TestWebFetcherProtocol:
+    def test_default_client_ignores_ambient_proxy_environment(self):
+        fetcher = WebFetcher()
+
+        assert fetcher._client_kwargs()["trust_env"] is False
+
     def test_implements_fetcher_protocol(self):
         """WebFetcher should satisfy the Fetcher protocol."""
         from docmancer.connectors.fetchers.base import Fetcher

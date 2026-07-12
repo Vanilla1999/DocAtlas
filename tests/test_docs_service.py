@@ -2051,6 +2051,10 @@ def test_library_prefetch_reports_retryable_network_failure_category(tmp_path, m
     assert result.status == "failed"
     assert "reason_code=network_unreachable" in result.message
     assert result.preindex["reason_code"] == "network_unreachable"
+    record = service.registry.get("example-docs", "web", "latest")
+    assert record is not None
+    assert record.status == "available"
+    assert record.last_error is None
 
 
 def test_missing_version_falls_back_to_latest_with_warning(tmp_path, monkeypatch):

@@ -212,6 +212,9 @@ class DocsJob:
     message: str | None = None
     reason_code: str | None = None
     retryable: bool | None = None
+    failure_phase: str | None = None
+    failed_url: str | None = None
+    http_status: int | None = None
     deadline_at: str | None = None
     warnings: list[str] = field(default_factory=list)
     errors: list[str] = field(default_factory=list)

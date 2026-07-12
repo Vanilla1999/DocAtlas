@@ -153,7 +153,12 @@ class DocsTargetService:
                 allowed_hosts=tuple(target.allowed_domains),
                 path_prefixes=tuple(target.path_prefixes),
             )
-            raw_client = httpx.Client(timeout=30.0, follow_redirects=False, headers={"User-Agent": "docmancer/1.0"})
+            raw_client = httpx.Client(
+                timeout=30.0,
+                follow_redirects=False,
+                headers={"User-Agent": "docmancer/1.0"},
+                trust_env=False,
+            )
             with DocsHttpClient(raw_client, policy) as client:
                 resp = client.get(root_url)
                 if resp.status_code != 200:

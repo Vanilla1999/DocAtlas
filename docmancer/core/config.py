@@ -37,6 +37,8 @@ class WebFetchConfig(BaseSettings):
     max_total_seconds: float = Field(default=120.0, gt=0)
     max_response_bytes: int = Field(default=8 * 1024 * 1024, ge=1)
     max_decoded_text_bytes: int = Field(default=16 * 1024 * 1024, ge=1)
+    use_env_proxy: bool = False
+    proxy_url: str | None = None
     model_config = SettingsConfigDict(env_prefix="DOCMANCER_WEB_FETCH_", extra="ignore")
 
 

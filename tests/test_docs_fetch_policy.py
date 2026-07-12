@@ -48,7 +48,7 @@ def test_policy_rejects_unresolved_hostname():
     with pytest.raises(DocsFetchSecurityError) as exc:
         policy.validate_url("https://example.com/docs")
 
-    assert exc.value.category == "host_resolution_failed"
+    assert exc.value.category == "dns_failure"
 
 
 def test_policy_converts_resolver_failure_to_typed_safe_error():
@@ -58,7 +58,7 @@ def test_policy_converts_resolver_failure_to_typed_safe_error():
     with pytest.raises(DocsFetchSecurityError) as exc:
         DocsFetchPolicy(resolver=failing_resolver).validate_url("https://example.com/docs")
 
-    assert exc.value.category == "host_resolution_failed"
+    assert exc.value.category == "dns_failure"
     assert "resolver detail" not in str(exc.value)
 
 
