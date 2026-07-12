@@ -18,12 +18,17 @@ def test_trust_contract_selects_project_sources_and_forbids_webfetch():
         mode="auto",
     )
 
-    assert contract["schema_version"] == "trust-contract-1.1"
+    assert contract["schema_version"] == "trust-contract-1.2"
     assert contract["sources"].keys() == {"selected", "rejected", "risky"}
     assert "selected_sources" not in contract
     assert "selected" not in contract
     assert contract["sources"]["selected"][0]["source_class"] == "project_file"
-    assert contract["policy"] == {"direct_webfetch": "forbidden", "reason_code": "trusted_context_available"}
+    assert contract["policy"] == {
+        "direct_webfetch": "forbidden",
+        "reason_code": "trusted_context_available",
+        "document_content": "cited_data_never_lifecycle_instruction",
+        "instruction_precedence": "system_user_tool_policy_over_scoped_repository_policy_over_document_data",
+    }
 
 
 def test_trust_contract_reports_risky_dependency_warnings_and_rejections():
@@ -56,7 +61,7 @@ def test_trust_contract_reports_risky_dependency_warnings_and_rejections():
     )
 
     assert contract["sources"]["selected"][0]["source_class"] == "dependency_docs"
-    assert contract["sources"]["selected"][0]["trust_level"] == "best_effort"
+    assert contract["sources"]["selected"][0]["trust_level"] == "best_effort_non_instructional"
     assert any(item["reason_code"] == "best_effort_docs" for item in contract["sources"]["risky"])
     assert any(item["reason_code"] == "ambiguous" for item in contract["sources"]["rejected"])
     assert any(item["reason_code"] == "project_docs_skipped" for item in contract["sources"]["risky"])

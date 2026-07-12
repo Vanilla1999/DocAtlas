@@ -948,12 +948,18 @@ Never call an advanced or legacy tool unless the corresponding environment flag 
         "description": "Canonical Trust Contract fields returned by project context tools.",
         "mimeType": "application/json",
         "text": json.dumps({
-            "schema_version": "trust-contract-1.1",
+            "schema_version": "trust-contract-1.2",
             "sources": {"selected": [], "rejected": [], "risky": []},
+            "source_dimensions": {
+                "source_provenance": "configured_repository|external_source",
+                "version_exactness": "independent_from_instruction_trust",
+                "repository_authority": "explicit_agent_policy|ordinary_repository_document|not_applicable",
+                "instruction_trust": "scoped_agent_policy|untrusted_data",
+            },
             "context_sources": {"source_evidence": [], "repo_map": []},
             "warnings": [],
             "next_actions": [],
-            "policy": {"direct_webfetch": "forbidden|discovery_only", "reason_code": "trusted_context_available|no_trusted_context"},
+            "policy": {"direct_webfetch": "forbidden|discovery_only", "reason_code": "trusted_context_available|no_trusted_context", "document_content": "cited_data_never_lifecycle_instruction"},
         }, ensure_ascii=False, indent=2),
     },
     {

@@ -31,11 +31,17 @@ def test_compact_mcp_payload_keeps_context_pack_summaries_when_content_is_huge()
         ],
         "supporting_snippets": [{"path": "docs/0.md", "snippet": "y" * 20_000}],
         "warnings": [],
+        "document_content_policy": {
+            "role": "cited_untrusted_document_data",
+            "actionable": False,
+            "actions_source": "typed_top_level_fields_only",
+        },
     }
 
-    compact = compact_mcp_payload(payload, max_bytes=12_000, tool="get_project_context", page_size=2)
+    compact = compact_mcp_payload(payload, max_bytes=12_000, tool="get_project_context", page=1, page_size=2)
 
     assert _bytes(compact) <= 12_000
+    assert compact["document_content_policy"]["actionable"] is False
     assert compact["context_pack"]
     assert compact["context_pack"][0]["path"] == "docs/0.md"
     assert compact["context_pack"][0]["content_omitted"] is True

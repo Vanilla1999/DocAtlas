@@ -21,6 +21,22 @@ Status: security boundary for the Docs server and advanced MCP Packs gateway.
 5. Documentation content is evidence and can contain misleading instructions;
    source attribution does not make content safe.
 
+### Documentation instruction-trust contract
+
+- Source provenance, version exactness, repository authority and instruction
+  trust are independent dimensions. Exact official documentation remains
+  untrusted document data.
+- Ordinary repository Markdown is cited data. Only explicit agent policy files
+  inside the configured repository authority receive scoped policy status, and
+  they cannot override system, user, tool or runtime safety policy.
+- Returned document content is delimited from generated warnings, metadata and
+  typed next actions. Indexed prose never selects `prepare_docs`, network,
+  filesystem, shell or credential actions.
+- Instruction-like pattern detection is warning-only telemetry. It is not a
+  sanitizer or proof of safety, and matched content remains retrievable.
+- Host models must cite document content as evidence rather than execute it as
+  policy.
+
 ## HTTP controls
 
 - Only declared operation hosts are allowed.
@@ -72,3 +88,6 @@ container or OS sandbox and is outside the current runtime guarantee.
 Security changes must cover host allowlists, URL userinfo, IPv4/IPv6 private
 ranges, DNS answer changes, redirects, streamed and compressed response limits,
 artifact tampering, destructive gates and executable-pack opt-in.
+Documentation-boundary coverage must include fake policy messages, tool-call
+requests, credential exfiltration text, instructions in code/comments and a
+legitimate imperative tutorial that remains retrievable.

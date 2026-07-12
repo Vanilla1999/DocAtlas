@@ -586,7 +586,7 @@ def test_mcp_read_resource_returns_workflow_and_schema_guidance():
     assert "get_library_docs" not in library_workflow["text"].split("Legacy tools")[0]
     assert "Do not use WebFetch" in library_workflow["text"]
     assert schema is not None
-    assert '"schema_version": "trust-contract-1.1"' in schema["text"]
+    assert '"schema_version": "trust-contract-1.2"' in schema["text"]
     assert '"selected"' in schema["text"]
     assert selection is not None
     assert "Natural documentation" in selection["text"]

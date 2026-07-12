@@ -156,7 +156,7 @@ def build_snippet_presentation(chunks: list[Any], *, question: str, response_sty
     scored = [_score_candidate(candidate, question=question, intent=intent, lane_priority=lane_priority) for candidate in raw_candidates]
     usable = [candidate for candidate in scored if candidate.final_score > 0 and not _is_noisy(candidate)]
     if not usable:
-        warning = {"code": "snippet_not_available", "message": "No usable code example was found in the selected trusted sources."}
+        warning = {"code": "snippet_not_available", "message": "No usable code example was found in the selected cited sources."}
         return SnippetPresentation("evidence-first", None, [], len(raw_candidates), [warning], _snippet_metrics(raw_candidates, [], 0, 0, False, requested_style))
     usable.sort(key=lambda c: (-c.final_score, c.block_index or 0, c.source or ""))
     selected: list[SnippetCandidate] = []
@@ -177,7 +177,7 @@ def build_snippet_presentation(chunks: list[Any], *, question: str, response_sty
         if len(selected) >= max_supporting + 1:
             break
     if not selected:
-        warning = {"code": "snippet_not_available", "message": "No usable code example was found in the selected trusted sources."}
+        warning = {"code": "snippet_not_available", "message": "No usable code example was found in the selected cited sources."}
         return SnippetPresentation("evidence-first", None, [], len(raw_candidates), [warning], _snippet_metrics(raw_candidates, [], duplicates_dropped, 0, False, requested_style))
     primary = _snippet_payload(selected[0], max_chars=MAX_PRIMARY_SNIPPET_CHARS)
     supporting = [_snippet_payload(candidate, max_chars=MAX_SUPPORTING_SNIPPET_CHARS) for candidate in selected[1:]]
@@ -270,7 +270,7 @@ def _score_candidate(candidate: SnippetCandidate, *, question: str, intent: Snip
         why.append("matches exact requested version")
     if intent_score:
         why.append("matches query intent")
-    candidate.why_relevant = "; ".join(why) or "code example extracted from selected trusted source"
+    candidate.why_relevant = "; ".join(why) or "code example extracted from selected cited source"
     return candidate
 
 
@@ -297,6 +297,20 @@ def _snippet_payload(candidate: SnippetCandidate, *, max_chars: int) -> dict[str
         "exact_version_match": candidate.exact_version_match,
         "version_binding": "latest_fallback" if fallback else candidate.metadata.get("docs_exactness") or candidate.metadata.get("version_binding"),
         "risk_flags": risk_flags,
+        "source_provenance": candidate.metadata.get("source_provenance"),
+        "repository_authority": candidate.metadata.get("repository_authority"),
+        "instruction_trust": candidate.metadata.get("instruction_trust") or "untrusted_data",
+        "content_boundary": candidate.metadata.get("content_boundary") or {
+            "role": "cited_document_data",
+            "schema": "docmancer-document-data-v1",
+            "executable_policy": False,
+        },
+        "document_data": {
+            "schema": "docmancer-document-data-v1",
+            "instruction_trust": candidate.metadata.get("instruction_trust") or "untrusted_data",
+            "content": code,
+        },
+        "instruction_risk_flags": list(candidate.metadata.get("instruction_risk_flags") or []),
         "complete": candidate.complete and not truncated,
         "truncated": truncated or candidate.truncated,
         "block_index": candidate.block_index,
@@ -419,7 +433,7 @@ def _primary_snippet_confidence(selected: list[SnippetCandidate]) -> str:
 
 
 def _primary_snippet_selection_reason(candidate: SnippetCandidate, *, confidence: str) -> str:
-    return f"{confidence} confidence primary snippet selected by score {candidate.final_score:.3f}: {candidate.why_relevant or 'selected trusted source'}"
+    return f"{confidence} confidence primary snippet selected by score {candidate.final_score:.3f}: {candidate.why_relevant or 'selected cited source'}"
 
 
 def _version_relevance_score(candidate: SnippetCandidate) -> float:
@@ -487,7 +501,7 @@ def _metadata(chunk: Any) -> dict[str, Any]:
         source = chunk.get("source") if isinstance(chunk.get("source"), dict) else {}
         section = chunk.get("section") if isinstance(chunk.get("section"), dict) else {}
         metadata = dict(chunk.get("metadata") or {})
-        for key in ("source_class", "doc_scope", "origin_lane", "canonical_id", "library_id", "dependency", "version", "resolved_version", "requested_version", "docs_exactness", "docs_binding_source", "freshness", "path", "url", "source_url", "title", "heading_path"):
+        for key in ("source_class", "doc_scope", "origin_lane", "canonical_id", "library_id", "dependency", "version", "resolved_version", "requested_version", "docs_exactness", "docs_binding_source", "freshness", "path", "url", "source_url", "title", "heading_path", "source_provenance", "repository_authority", "instruction_trust", "content_boundary", "instruction_risk_flags"):
             if key in chunk and key not in metadata:
                 metadata[key] = chunk.get(key)
         for key in ("url", "source_url", "path", "title"):
