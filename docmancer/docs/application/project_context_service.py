@@ -13,9 +13,11 @@ from docmancer.docs.domain.answer_completeness import (
 )
 from docmancer.docs.domain.project_doc_ranking import is_changelog_path, normalize_doc_path, project_source_taxonomy, rerank_project_doc_chunks
 from docmancer.docs.domain.project_query_intent import classify_project_query_intent
+from docmancer.docs.domain.project_state import evaluate_documentation_sections
+from docmancer.docs.domain.project_evidence import classify_project_evidence
 from docmancer.docs.domain.quality import has_code_symbol_evidence, internal_noise_score, is_trivial_section, looks_like_code_or_command
 from docmancer.docs.domain.snippets import best_context_pack_snippet, build_snippet_presentation, validate_response_style
-from docmancer.docs.domain.source_map import build_project_repo_map, build_project_source_evidence, source_evidence_diagnostics, source_map_diagnostics
+from docmancer.docs.domain.source_map import build_project_repo_map, build_project_source_evidence, collect_project_source_facts, source_evidence_diagnostics, source_map_diagnostics
 from docmancer.docs.domain.code_graph import build_code_graph_context_items, build_project_code_graph, code_graph_context_diagnostics, code_graph_diagnostics
 from docmancer.docs.domain.trust_contract import build_project_context_trust_contract
 from docmancer.docs.domain.content_trust import annotate_context_pack
@@ -67,29 +69,33 @@ def _source_ground_documentation_gap(
     actions: list[dict[str, Any]],
     *,
     root: Path,
-    repo_map: list[dict[str, Any]],
-    source_evidence: list[dict[str, Any]],
-    code_graph: list[dict[str, Any]],
 ) -> None:
     """Attach bounded, discovered paths to a host-only documentation handoff."""
-    manifests = [
-        name for name in ("pyproject.toml", "package.json", "Cargo.toml", "pubspec.yaml")
-        if (root / name).exists()
-    ]
-    code_paths = list(dict.fromkeys(
-        str(item.get("path"))
-        for item in [*repo_map, *source_evidence, *code_graph]
-        if item.get("path")
-    ))[:8]
-    evidence = []
-    if manifests:
-        evidence.append({"category": "manifests", "paths": manifests})
-    if code_paths:
-        evidence.append({"category": "source map and code graph", "paths": code_paths})
-    for action in _documentation_gap_actions(actions):
+    gap_actions = _documentation_gap_actions(actions)
+    if not gap_actions:
+        return
+    repo_map = collect_project_source_facts(
+        root,
+        max_files=24,
+        token_budget=4000,
+        include_unmatched=True,
+    )
+    code_graph = build_project_code_graph(
+        root,
+        max_files=24,
+        token_budget=4000,
+        include_unmatched=True,
+    )
+    evidence = classify_project_evidence(root, repo_map=repo_map, code_graph=code_graph)
+    for action in gap_actions:
         gap = dict(action.get("documentation_gap") or {})
+        sections, evidence_complete = evaluate_documentation_sections(
+            list(gap.get("required_sections") or []),
+            evidence,
+        )
+        gap["required_sections"] = sections
         gap["evidence_to_collect"] = evidence
-        gap["evidence_complete"] = bool(evidence)
+        gap["evidence_complete"] = evidence_complete
         action["documentation_gap"] = gap
 
 
@@ -241,9 +247,6 @@ class ProjectContextService:
         _source_ground_documentation_gap(
             next_actions,
             root=root,
-            repo_map=repo_map_items,
-            source_evidence=source_evidence_items,
-            code_graph=code_graph_items,
         )
         gap_actions = _documentation_gap_actions(next_actions)
         if gap_actions:
