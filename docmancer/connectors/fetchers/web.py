@@ -47,7 +47,7 @@ from docmancer.connectors.fetchers.pipeline.robots import RobotsChecker
 from docmancer.core.html_utils import looks_like_html
 from docmancer.core.models import Document
 from docmancer.docs.dartdoc import DARTDOC_ENTITY_SUFFIXES
-from docmancer.docs.fetch_policy import DocsFetchPolicy, redact_url
+from docmancer.docs.fetch_policy import DocsFetchPolicy, DocsFetchSecurityError, redact_url
 from docmancer.docs.fetch_transport import DocsHttpClient
 
 logger = logging.getLogger(__name__)
@@ -114,6 +114,8 @@ class WebFetcher:
         max_redirects: int = 5,
         connect_timeout: float = 10.0,
         max_total_seconds: float = 120.0,
+        use_env_proxy: bool = False,
+        proxy_url: str | None = None,
     ):
         self._timeout = timeout
         self._max_pages = max_pages
@@ -135,6 +137,8 @@ class WebFetcher:
         self._max_redirects = max_redirects
         self._connect_timeout = connect_timeout
         self._max_total_seconds = max_total_seconds
+        self._use_env_proxy = use_env_proxy
+        self._proxy_url = proxy_url
         self.last_discovery_diagnostics: dict | None = None
 
     def _emit_progress(self, event: dict) -> None:
@@ -155,11 +159,21 @@ class WebFetcher:
             ),
             "follow_redirects": False,
             "headers": {"User-Agent": _DEFAULT_USER_AGENT},
+            "trust_env": self._use_env_proxy,
+            **({"proxy": self._proxy_url} if self._proxy_url else {}),
         }
 
     def _new_client(self, policy: DocsFetchPolicy | None = None) -> DocsHttpClient:
+        try:
+            raw_client = httpx.Client(**self._client_kwargs())
+        except ImportError:
+            if not self._proxy_url and not self._use_env_proxy:
+                raise
+            raise DocsFetchSecurityError(
+                "proxy_configuration_error", "<configured-proxy>", phase="configuring", retryable=False
+            ) from None
         return DocsHttpClient(
-            httpx.Client(**self._client_kwargs()),
+            raw_client,
             policy or self._fetch_policy,
             max_redirects=self._max_redirects,
             max_response_bytes=self._max_response_bytes,
@@ -189,6 +203,7 @@ class WebFetcher:
         Raises:
             ValueError: If no documentation pages could be discovered or fetched.
         """
+        self.last_fetch_failure: DocsFetchSecurityError | None = None
         self._raise_if_cancelled()
         policy = self._policy_for(url)
         policy.validate_url(url)
@@ -304,7 +319,13 @@ class WebFetcher:
             raise ValueError(f"Could not fetch documentation page {redact_url(url)!r}: transport_error") from None
 
         if resp.status_code != 200:
-            raise ValueError(f"Could not fetch documentation page {redact_url(url)!r}: status {resp.status_code}")
+            raise DocsFetchSecurityError(
+                "not_found" if resp.status_code == 404 else "http_failure",
+                redact_url(url),
+                phase="fetching",
+                retryable=resp.status_code in {408, 429} or resp.status_code >= 500,
+                status_code=resp.status_code,
+            )
         if not resp.text.strip():
             raise ValueError(f"Could not fetch documentation page {redact_url(url)!r}: empty response")
         if looks_like_html(resp.text):
@@ -429,6 +450,7 @@ class WebFetcher:
                 for disc in unique_discovered
             }
         cancelled = False
+        terminal_failure: DocsFetchSecurityError | None = None
         try:
             deduplicator.reset()
             while pending:
@@ -437,7 +459,11 @@ class WebFetcher:
                 for future in done:
                     completed_fetches = getattr(self, "_completed_fetches", 0) + 1
                     self._completed_fetches = completed_fetches
-                    page = future.result()
+                    try:
+                        page = future.result()
+                    except DocsFetchSecurityError as exc:
+                        terminal_failure = terminal_failure or exc
+                        page = None
                     if page is None:
                         self._emit_progress(
                             {
@@ -479,6 +505,8 @@ class WebFetcher:
             executor.shutdown(wait=not cancelled, cancel_futures=cancelled)
 
         if not documents:
+            if terminal_failure is not None:
+                raise terminal_failure
             last_url = unique_discovered[-1].url if unique_discovered else base_url
             if self._is_dartdoc_url(base_url):
                 candidate_hint = ""
@@ -494,6 +522,7 @@ class WebFetcher:
                 "Try class/library seed URLs or browser=true."
             )
 
+        self.last_fetch_failure = terminal_failure
         return documents
 
     def _fetch_page(
@@ -541,12 +570,17 @@ class WebFetcher:
 
             if resp.status_code in {429, 503}:
                 rate_limiter.record_rate_limit(fetch_url)
-                logger.warning("Rate limited on %s (status %d), skipping", fetch_url, resp.status_code)
-                return None
+                logger.warning("Rate limited on %s (status %d)", fetch_url, resp.status_code)
             if resp.status_code != 200:
-                logger.debug("Skipped %s (status %d)", fetch_url, resp.status_code)
                 self._emit_progress({"phase": "fetching", "message": f"Fetch failed with status {resp.status_code}: {url}", "url": url})
-                return None
+                retryable = resp.status_code in {408, 425, 429} or resp.status_code >= 500
+                raise DocsFetchSecurityError(
+                    "not_found" if resp.status_code == 404 else "http_failure",
+                    redact_url(fetch_url),
+                    phase="fetching",
+                    retryable=retryable,
+                    status_code=resp.status_code,
+                )
 
             rate_limiter.reset_backoff(fetch_url)
             resp_url = getattr(resp, "url", None)

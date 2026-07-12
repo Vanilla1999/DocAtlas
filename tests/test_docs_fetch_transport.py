@@ -93,10 +93,34 @@ def test_transport_error_exposes_only_safe_category_and_redacted_url():
     with pytest.raises(DocsFetchSecurityError) as exc:
         DocsHttpClient(transport, policy).get(str(request.url))
 
-    assert exc.value.category == "transport_error"
+    assert exc.value.category == "network_unreachable"
     assert "secret" not in exc.value.redacted_url
     assert "password" not in str(exc.value)
     assert exc.value.__cause__ is None
+
+
+@pytest.mark.parametrize(
+    ("transport_error", "category"),
+    [
+        (httpx.ConnectTimeout("connect timed out"), "connect_timeout"),
+        (httpx.ReadTimeout("read timed out"), "read_timeout"),
+        (httpx.ConnectError("network unavailable"), "network_unreachable"),
+    ],
+)
+def test_transport_error_keeps_stable_network_category_and_safe_request_context(transport_error, category):
+    transport = MagicMock()
+    request = httpx.Request("GET", "https://example.com/docs?token=secret")
+    transport_error.request = request
+    transport.get.side_effect = transport_error
+    policy = DocsFetchPolicy(resolver=lambda _host: (__import__("ipaddress").ip_address(PUBLIC),))
+
+    with pytest.raises(DocsFetchSecurityError) as exc:
+        DocsHttpClient(transport, policy).get(str(request.url))
+
+    assert exc.value.category == category
+    assert exc.value.phase == "fetching"
+    assert exc.value.redacted_url == "https://example.com/docs"
+    assert exc.value.retryable is True
 
 
 def test_client_revalidates_reported_final_response_url():

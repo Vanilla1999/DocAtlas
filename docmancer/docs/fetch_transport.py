@@ -1,6 +1,8 @@
 """Policy-aware HTTP transport for documentation ingestion."""
 from __future__ import annotations
 
+import socket
+import ssl
 from time import monotonic
 from typing import Callable
 from urllib.parse import urljoin, urlsplit, urlunsplit
@@ -64,8 +66,13 @@ class DocsHttpClient:
                 raise DocsFetchSecurityError("request_timeout", first.redacted_url)
             try:
                 response = self._request_once(current, first, **kwargs)
-            except httpx.RequestError:
-                raise DocsFetchSecurityError("transport_error", first.redacted_url) from None
+            except httpx.RequestError as exc:
+                raise DocsFetchSecurityError(
+                    _network_failure_category(exc),
+                    first.redacted_url,
+                    phase="fetching",
+                    retryable=True,
+                ) from None
             try:
                 reported_url = response.url
             except (AttributeError, RuntimeError):
@@ -188,3 +195,23 @@ def _pinned_url(url: str, address: str) -> str:
     if parsed.port is not None:
         host = f"{host}:{parsed.port}"
     return urlunsplit((parsed.scheme, host, parsed.path, parsed.query, parsed.fragment))
+
+
+def _network_failure_category(exc: httpx.RequestError) -> str:
+    """Map httpx's transport hierarchy to the public Docs-job vocabulary."""
+    if isinstance(exc, httpx.ConnectTimeout):
+        return "connect_timeout"
+    if isinstance(exc, httpx.ReadTimeout):
+        return "read_timeout"
+    if isinstance(exc, httpx.TimeoutException):
+        return "connect_timeout"
+    cause: BaseException | None = exc
+    seen: set[int] = set()
+    while cause is not None and id(cause) not in seen:
+        seen.add(id(cause))
+        if isinstance(cause, (socket.gaierror, UnicodeError)):
+            return "dns_failure"
+        if isinstance(cause, ssl.SSLError):
+            return "tls_failure"
+        cause = cause.__cause__ or cause.__context__
+    return "network_unreachable"

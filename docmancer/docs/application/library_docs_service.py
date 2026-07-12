@@ -821,6 +821,7 @@ class LibraryDocsApplicationService:
             status = "failed"
         reason_code = self._result_reason_code(result, status)
         retryable = self._result_retryable(result, reason_code)
+        failure = result.preindex or {}
         if status in {"failed", "partial"} and result.message:
             self.jobs.append_error(job_id, result.message)
         self.jobs.update(
@@ -839,6 +840,9 @@ class LibraryDocsApplicationService:
             completed_chunks=int(result.chunks_indexed or 0),
             reason_code=reason_code,
             retryable=retryable,
+            failure_phase=failure.get("failure_phase"),
+            failed_url=failure.get("failed_url"),
+            http_status=failure.get("http_status"),
             message=result.message or f"Library docs prefetch {status}.",
         )
 
@@ -850,6 +854,16 @@ class LibraryDocsApplicationService:
         if status == "succeeded":
             return "healthy"
         if status == "partial":
+            network_codes = {
+                "connect_timeout",
+                "read_timeout",
+                "dns_failure",
+                "tls_failure",
+                "network_unreachable",
+                "http_failure",
+            }
+            if code := next((code for code in result.reason_codes if code in network_codes), None):
+                return code
             return "partial_failure"
         if result.status == "needs_docs_url":
             return "needs_docs_url"
@@ -866,6 +880,8 @@ class LibraryDocsApplicationService:
         return reason_code in {
             "connect_timeout",
             "read_timeout",
+            "dns_failure",
+            "tls_failure",
             "network_timeout",
             "network_unreachable",
             "network_transport_error",

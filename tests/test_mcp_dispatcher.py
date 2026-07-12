@@ -9,6 +9,8 @@ from docmancer.mcp.dispatcher import CALL_TOOL, SEARCH_TOOL, Dispatcher
 from docmancer.mcp.executors import http as http_executor
 from docmancer.mcp.manifest import InstalledPackage, Manifest
 
+pytestmark = pytest.mark.mock_network_dns
+
 
 # Synthetic fixture exercising bearer auth, form-encoded bodies, wire-pinned
 # version headers, and idempotency-key injection. Not modelled on any real API.
