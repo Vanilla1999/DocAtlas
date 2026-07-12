@@ -882,6 +882,16 @@ def analyze_docs_impact(
         candidate_limit=candidate_limit,
         has_more=has_more_evaluated_candidates,
     )
+    authoring_brief = _build_documentation_update_brief(
+        root=root,
+        changed_paths=changed,
+        changed_symbols=symbols,
+        section_candidates=candidate_window,
+        missing=missing,
+        incomplete_reasons=incomplete_reasons,
+        documentation_changes=documentation_changes,
+        diff_evidence=diff_evidence,
+    )
     report = {
         "schema_version": "docs-impact-2",
         "project_path": str(root),
@@ -929,6 +939,7 @@ def analyze_docs_impact(
             ),
         },
         "section_metadata": metadata_diagnostics,
+        "authoring_brief": authoring_brief,
         "next_actions": ([{
             "tool": "prepare_docs",
             "arguments_patch": {"action": "sync_project_docs", "project_path": str(root)},
@@ -995,6 +1006,30 @@ def format_docs_impact_markdown(report: dict[str, Any]) -> str:
                 f"consider `{_markdown_cell(item['suggested_path'])}`."
             )
         lines.append("")
+    brief = report.get("authoring_brief") or {}
+    if brief:
+        lines.extend(["### Host-model documentation update brief", ""])
+        lines.append(f"Status: `{_markdown_cell(brief.get('status', 'unknown'))}`.")
+        lines.append("")
+        allowed_edits = brief.get("allowed_edits") or []
+        if allowed_edits:
+            lines.append("Allowed edits:")
+            lines.extend(
+                f"- `{_markdown_cell(item.get('path'))}` — `{_markdown_cell(' > '.join(item.get('heading_path') or []) or '(document)')}`"
+                for item in allowed_edits
+            )
+            lines.append("")
+        for value in brief.get("must_not_invent") or []:
+            lines.append(f"- Do not invent: {_markdown_cell(value)}")
+        if brief.get("must_not_invent"):
+            lines.append("")
+        follow_up = brief.get("follow_up") or {}
+        if follow_up:
+            lines.append(
+                f"After review, call `{follow_up.get('tool')}` with "
+                f"`{_markdown_cell(json.dumps(follow_up.get('arguments_patch') or {}, ensure_ascii=False, sort_keys=True))}`."
+            )
+            lines.append("")
     bounds = report.get("bounds") or {}
     if bounds.get("truncated"):
         lines.extend([
@@ -1126,6 +1161,9 @@ def _trim_auxiliary_report_list(report: dict[str, Any], omitted: dict[str, int])
         ("changed_symbols", report.get("changed_symbols") or []),
         ("diff_evidence.supported_paths", (report.get("diff_evidence") or {}).get("supported_paths") or []),
         ("diff_evidence.fallback_paths", (report.get("diff_evidence") or {}).get("fallback_paths") or []),
+        ("authoring_brief.allowed_edits", (report.get("authoring_brief") or {}).get("allowed_edits") or []),
+        ("authoring_brief.facts_to_verify", (report.get("authoring_brief") or {}).get("facts_to_verify") or []),
+        ("authoring_brief.missing_evidence", (report.get("authoring_brief") or {}).get("missing_evidence") or []),
     ])
     for name, values in locations:
         if values:
@@ -1178,6 +1216,15 @@ def _minimal_bounded_report(report: dict[str, Any], omitted: dict[str, int]) -> 
             "indexed_current": [], "reparsed_missing": [], "reparsed_stale": [],
             "skipped_oversize": [], "truncated": [],
         },
+        "authoring_brief": {
+            "schema_version": "documentation-update-brief-1",
+            "status": "output_truncated",
+            "allowed_edits": [],
+            "facts_to_verify": [],
+            "missing_evidence": ["output_truncated"],
+            "must_not_invent": ["Do not edit documentation until the impact report is rerun with a narrower diff."],
+            "follow_up": {},
+        },
         "next_actions": [],
         "diff_evidence": {"reason_code": "output_truncated"},
         "missing": [],
@@ -1190,6 +1237,102 @@ def _minimal_bounded_report(report: dict[str, Any], omitted: dict[str, int]) -> 
 
 def _bounded_text(value: object, max_characters: int) -> str:
     return str(value or "")[:max_characters]
+
+
+def _build_documentation_update_brief(
+    *,
+    root: Path,
+    changed_paths: list[str],
+    changed_symbols: list[str],
+    section_candidates: list[dict[str, Any]],
+    missing: list[dict[str, Any]],
+    incomplete_reasons: list[str],
+    documentation_changes: dict[str, dict[str, Any]],
+    diff_evidence: dict[str, Any] | None,
+) -> dict[str, Any]:
+    actionable = [
+        item for item in section_candidates
+        if item.get("impact") in {"must_update", "review"}
+    ]
+    allowed_edits: list[dict[str, Any]] = []
+    seen_edit_targets: set[tuple[str, tuple[str, ...]]] = set()
+    for item in actionable:
+        if not item.get("path"):
+            continue
+        target = (
+            str(item.get("path") or ""),
+            tuple(str(value) for value in item.get("heading_path") or []),
+        )
+        if target in seen_edit_targets:
+            continue
+        seen_edit_targets.add(target)
+        allowed_edits.append({
+            "path": str(item.get("path") or ""),
+            "heading_path": list(item.get("heading_path") or []),
+            "reason_code": str(item.get("reason_code") or "unknown"),
+            "confidence": str(item.get("confidence") or "unknown"),
+        })
+    allowed_paths = list(dict.fromkeys(item["path"] for item in allowed_edits))
+    facts_to_verify: list[dict[str, Any]] = []
+    symbol_evidence = list((diff_evidence or {}).get("symbol_evidence") or [])
+    for item in symbol_evidence[:64]:
+        if not isinstance(item, dict) or not item.get("symbol") or not item.get("path"):
+            continue
+        facts_to_verify.append({
+            "kind": "changed_symbol",
+            "symbol": str(item["symbol"]),
+            "source_path": str(item["path"]),
+            "verification_sources": [str(item["path"]), "tests", "runtime configuration"],
+        })
+    if not facts_to_verify:
+        facts_to_verify.extend({
+            "kind": "changed_path",
+            "source_path": path,
+            "verification_sources": [path, "tests", "runtime configuration"],
+        } for path in changed_paths[:64])
+    missing_evidence = [
+        {"reason_code": reason, "required_action": "narrow the diff or collect the missing repository evidence"}
+        for reason in incomplete_reasons
+    ]
+    missing_evidence.extend({
+        "reason_code": "missing_module_documentation",
+        "module_path": item.get("module_path"),
+        "suggested_path": item.get("suggested_path"),
+        "required_action": "inspect module code, configuration, and tests before proposing a new reviewable document",
+    } for item in missing)
+    status = (
+        "needs_evidence" if missing_evidence
+        else "ready_for_host_edit" if allowed_edits
+        else "docs_already_changed" if documentation_changes
+        else "no_documentation_edit_recommended"
+    )
+    follow_up_paths = list(dict.fromkeys([
+        *allowed_paths,
+        *[str(path) for path in documentation_changes if path],
+    ]))
+    return {
+        "schema_version": "documentation-update-brief-1",
+        "status": status,
+        "changed_paths": changed_paths[:64],
+        "changed_symbols": changed_symbols[:64],
+        "facts_to_verify": facts_to_verify,
+        "allowed_edits": allowed_edits,
+        "missing_evidence": missing_evidence,
+        "must_not_invent": [
+            "Do not claim behavior that is not verified in repository code, configuration, or tests.",
+            "Do not edit files or sections outside allowed_edits without rerunning impact analysis.",
+            "Do not treat an uncommitted or rejected documentation proposal as accepted project truth.",
+        ],
+        "follow_up": {
+            "tool": "prepare_docs",
+            "arguments_patch": {
+                "action": "sync_project_docs",
+                "project_path": str(root),
+                "changed_paths": follow_up_paths[:64],
+            },
+            "when": "after the user or host agent reviews and saves the documentation patch",
+        } if follow_up_paths else {},
+    }
 
 
 def _serialized_size(value: object) -> int:
