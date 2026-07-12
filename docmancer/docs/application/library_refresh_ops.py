@@ -304,9 +304,32 @@ class LibraryRefreshOps:
             self._discard_staging(staging)
             return self._cancelled_result(record, started)
 
+        vector_failure: Exception | None = None
+
+        def _sync_vectors_before_commit() -> None:
+            nonlocal vector_failure
+            try:
+                production_agent = self._agent_instance(record)
+                sync_vectors = getattr(production_agent, "sync_vectors", None)
+                if callable(sync_vectors):
+                    sync_vectors()
+            except Exception as exc:
+                vector_failure = exc
+
         def _commit_registry(**values: Any) -> Any:
-            update = lambda: self.registry.upsert(**values)
-            return self._publish_staging_and_update(record, staging, update, commit_guard=begin_commit)
+            def update() -> Any:
+                if vector_failure is not None:
+                    values["last_error"] = f"vector_indexing_failed: {vector_failure}"
+                return self.registry.upsert(**values)
+
+            post_publish = _sync_vectors_before_commit if staging and sections_indexed > 0 else None
+            return self._publish_staging_and_update(
+                record,
+                staging,
+                update,
+                commit_guard=begin_commit,
+                post_publish=post_publish,
+            )
 
         if sections_indexed == 0 or pages_after == 0 or chunks_after == 0:
             refreshed_at = self._now()
@@ -375,44 +398,22 @@ class LibraryRefreshOps:
             target_spec=record.target_spec,
         )
 
-        if staging:
-            try:
-                production_agent = self._agent_instance(record)
-                sync_vectors = getattr(production_agent, "sync_vectors", None)
-                if callable(sync_vectors):
-                    sync_vectors()
-            except Exception as exc:
-                message = f"vector_indexing_failed: {exc}"
-                try:
-                    self.registry.upsert(
-                        library=record.name,
-                        ecosystem=record.ecosystem,
-                        version=record.version,
-                        docs_url=record.docs_url,
-                        docs_url_template=record.docs_url_template,
-                        source_type=record.source_type,
-                        now=self._now(),
-                        status="available",
-                        last_refreshed_at=refreshed_at,
-                        last_error=message,
-                        target_spec=record.target_spec,
-                    )
-                except Exception:
-                    logger.warning("Could not persist vector failure diagnostics for %s", record.library_id, exc_info=True)
-                return RefreshResult(
-                    library_id=record.library_id,
-                    status="partial",
-                    docs_url=record.docs_url,
-                    last_refreshed_at=refreshed_at,
-                    version=record.version,
-                    source_type=record.source_type,
-                    message=message,
-                    duration_ms=int((time.monotonic() - started) * 1000),
-                    pages_indexed=pages_after,
-                    chunks_indexed=chunks_after,
-                    targets_completed=1,
-                    reason_codes=["vector_indexing_failed"],
-                )
+        if vector_failure is not None:
+            message = f"vector_indexing_failed: {vector_failure}"
+            return RefreshResult(
+                library_id=record.library_id,
+                status="partial",
+                docs_url=record.docs_url,
+                last_refreshed_at=refreshed_at,
+                version=record.version,
+                source_type=record.source_type,
+                message=message,
+                duration_ms=int((time.monotonic() - started) * 1000),
+                pages_indexed=pages_after,
+                chunks_indexed=chunks_after,
+                targets_completed=1,
+                reason_codes=["vector_indexing_failed"],
+            )
 
         # Build preindex diagnostics
         index_config = self._index_config_for(record)
@@ -712,6 +713,7 @@ class LibraryRefreshOps:
         staging: tuple[Any, Path] | None,
         registry_update: Callable[[], Any],
         commit_guard: Callable[[], bool] | None = None,
+        post_publish: Callable[[], None] | None = None,
     ) -> Any:
         if staging is None:
             return registry_update()
@@ -728,37 +730,60 @@ class LibraryRefreshOps:
 
         committed = False
         rolled_back = False
+        database_backed_up = False
+        database_published = False
+        extracted_backed_up = False
+        extracted_published = False
+        registry_changed = False
         result: Any = None
         with self._lock_for(record.library_id):
             try:
-                if commit_guard is not None and not commit_guard():
-                    raise RuntimeError("docs_job_generation_revoked")
+                def require_active_generation() -> None:
+                    if commit_guard is not None and not commit_guard():
+                        raise RuntimeError("docs_job_generation_revoked")
+
+                require_active_generation()
                 if staging_db.exists():
                     with sqlite3.connect(staging_db) as source, sqlite3.connect(candidate_db) as destination:
                         source.backup(destination)
+                require_active_generation()
                 if production_db.exists():
                     production_db.replace(backup_db)
+                    database_backed_up = True
                 if production_extracted.exists():
                     production_extracted.replace(backup_extracted)
+                    extracted_backed_up = True
                 production_db.parent.mkdir(parents=True, exist_ok=True)
+                require_active_generation()
                 if candidate_db.exists():
                     candidate_db.replace(production_db)
+                    database_published = True
+                require_active_generation()
                 if staging_extracted.exists():
                     production_extracted.parent.mkdir(parents=True, exist_ok=True)
                     staging_extracted.replace(production_extracted)
+                    extracted_published = True
+                require_active_generation()
+                if post_publish is not None:
+                    post_publish()
+                require_active_generation()
                 result = registry_update()
+                registry_changed = True
+                require_active_generation()
                 committed = True
             except Exception as commit_error:
                 try:
-                    if production_db.exists():
+                    if database_published and production_db.exists():
                         production_db.unlink()
-                    if backup_db.exists():
+                    if database_backed_up and backup_db.exists():
                         backup_db.replace(production_db)
-                    if production_extracted.exists():
+                    if extracted_published and production_extracted.exists():
                         shutil.rmtree(production_extracted)
-                    if backup_extracted.exists():
+                    if extracted_backed_up and backup_extracted.exists():
                         production_extracted.parent.mkdir(parents=True, exist_ok=True)
                         backup_extracted.replace(production_extracted)
+                    if registry_changed:
+                        self.registry.restore(record)
                     rolled_back = True
                 except Exception as rollback_error:
                     raise RuntimeError(

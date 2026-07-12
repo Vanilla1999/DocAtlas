@@ -6,7 +6,6 @@ from pathlib import Path
 from typing import Any, Callable
 import json
 import re
-import threading
 import time
 from urllib.parse import urlparse
 
@@ -39,6 +38,7 @@ from docmancer.docs.dart_official_docs import (
 )
 from docmancer.docs.application.library_registry_ops import LibraryRegistryOps
 from docmancer.docs.application.library_refresh_ops import LibraryRefreshOps
+from docmancer.docs.application.library_job_executor import LibraryJobExecutor, shared_library_job_executor
 
 STALE_AFTER_DAYS = 30
 DEFAULT_DOC_TOKENS = 4000
@@ -53,10 +53,19 @@ FLUTTER_CHANNEL_DOCS_WARNING = (
 )
 
 class LibraryDocsApplicationService:
-    def __init__(self, facade: Any):
+    def __init__(self, facade: Any, job_executor: LibraryJobExecutor | None = None):
         self.facade = facade
         self.registry_ops = LibraryRegistryOps(facade)
         self.refresh_ops = LibraryRefreshOps(self)
+        jobs_config = getattr(getattr(facade, "config", None), "docs_jobs", None)
+        max_running = getattr(jobs_config, "library_max_running", 2)
+        max_queued = getattr(jobs_config, "library_max_queued", 8)
+        grace = getattr(jobs_config, "terminalization_grace_seconds", 2.0)
+        self.job_executor = job_executor or shared_library_job_executor(
+            max_workers=max_running if isinstance(max_running, int) else 2,
+            max_queued=max_queued if isinstance(max_queued, int) else 8,
+            terminalization_grace_seconds=grace if isinstance(grace, (int, float)) else 2.0,
+        )
 
     def __getattr__(self, name: str) -> Any:
         return getattr(self.facade, name)
@@ -675,23 +684,112 @@ class LibraryDocsApplicationService:
                 },
                 sort_keys=True,
             )
-            job = self.jobs.create("prefetch_library_docs", request_identity=request_identity)
+            if not self.job_executor.try_reserve():
+                capacity = self.job_executor.capacity()
+                rejected = self.jobs.create(
+                    "prefetch_library_docs",
+                    request_identity=request_identity,
+                    with_generation=False,
+                )
+                self.jobs.update(
+                    rejected.job_id,
+                    status="failed",
+                    phase="done",
+                    reason_code="busy",
+                    retryable=True,
+                    running_jobs=capacity.running,
+                    queued_jobs=capacity.queued,
+                    max_running_jobs=capacity.max_running,
+                    max_queued_jobs=capacity.max_queued,
+                    message="Library documentation capacity is full; retry after 2 seconds.",
+                )
+                return DocsJobStartResult(
+                    job_id=rejected.job_id,
+                    status="busy",
+                    message="Library documentation capacity is full; retry after 2 seconds.",
+                )
+
+            try:
+                job = self.jobs.create("prefetch_library_docs", request_identity=request_identity)
+            except Exception:
+                self.job_executor.release_reservation()
+                raise
             deadline_seconds = self._library_job_timeout_seconds()
             deadline_at = datetime.now(timezone.utc) + timedelta(seconds=deadline_seconds)
             self.jobs.update(
                 job.job_id,
-                status="running",
-                phase="resolving",
+                status="pending",
+                phase="queued",
                 current_target=library,
-                message="Started library docs prefetch job.",
+                message="Queued library docs prefetch job.",
                 deadline_at=deadline_at.isoformat(timespec="seconds"),
             )
-            threading.Thread(
-                target=self._run_prefetch_docs_job,
-                args=(job.job_id, library, ecosystem, versions, docs_url, docs_url_template, source_type, force_refresh, continue_on_error, deadline_seconds),
-                daemon=True,
-            ).start()
-            return DocsJobStartResult(job_id=job.job_id, status="running", message="Started library docs prefetch job.")
+
+            def terminalize(reason: str) -> None:
+                current = self.jobs.get(job.job_id)
+                if current is None or current.status in {"succeeded", "partial", "failed", "cancelled", "interrupted"}:
+                    return
+                if reason == "cancelled":
+                    self.jobs.update(
+                        job.job_id,
+                        status="cancelled",
+                        phase="done",
+                        reason_code="cancelled",
+                        retryable=True,
+                        message="Library docs prefetch cancelled.",
+                    )
+                    return
+                self.jobs.append_error(job.job_id, "Library docs prefetch exceeded its configured deadline.")
+                self.jobs.update(
+                    job.job_id,
+                    status="failed",
+                    phase="done",
+                    reason_code="job_deadline_exceeded",
+                    retryable=True,
+                    message="Library docs prefetch exceeded its configured deadline.",
+                )
+
+            def update_capacity(capacity: Any) -> None:
+                self.jobs.update(
+                    job.job_id,
+                    queue_position=capacity.queue_position,
+                    running_jobs=capacity.running,
+                    queued_jobs=capacity.queued,
+                    max_running_jobs=capacity.max_running,
+                    max_queued_jobs=capacity.max_queued,
+                )
+
+            try:
+                capacity = self.job_executor.submit_reserved(
+                    lambda: self._run_prefetch_docs_job(
+                        job.job_id,
+                        library,
+                        ecosystem,
+                        versions,
+                        docs_url,
+                        docs_url_template,
+                        source_type,
+                        force_refresh,
+                        continue_on_error,
+                        deadline_seconds,
+                    ),
+                    deadline_seconds=deadline_seconds,
+                    cancelled=lambda: self.jobs.cancellation_requested(job.job_id),
+                    terminalize=terminalize,
+                    on_capacity=update_capacity,
+                )
+            except Exception:
+                self.job_executor.release_reservation()
+                raise
+            self.jobs.update(
+                job.job_id,
+                queue_position=capacity.queue_position,
+                running_jobs=capacity.running,
+                queued_jobs=capacity.queued,
+                max_running_jobs=capacity.max_running,
+                max_queued_jobs=capacity.max_queued,
+            )
+            return DocsJobStartResult(job_id=job.job_id, status="pending", message="Queued library docs prefetch job.")
 
         return self._prefetch_docs_sync(
             library,
@@ -719,17 +817,23 @@ class LibraryDocsApplicationService:
     ) -> None:
         initial = self.jobs.get(job_id)
         generation_id = initial.generation_id if initial else None
-        completed = threading.Event()
-        deadline_expired = threading.Event()
-        outcome: dict[str, Any] = {}
         deadline = time.monotonic() + deadline_seconds
+
+        if not self.jobs.generation_active(job_id, generation_id):
+            return
+        self.jobs.update(
+            job_id,
+            status="running",
+            phase="resolving",
+            queue_position=None,
+            message="Started library docs prefetch job.",
+        )
 
         def _cancelled() -> bool:
             return (
                 not self.jobs.generation_active(job_id, generation_id)
                 or
                 self.jobs.cancellation_requested(job_id)
-                or deadline_expired.is_set()
                 or time.monotonic() >= deadline
             )
 
@@ -739,48 +843,36 @@ class LibraryDocsApplicationService:
             self.jobs.update(job_id, phase="committing", message="Publishing staged library index.")
             return not _cancelled()
 
-        def _work() -> None:
-            try:
-                outcome["result"] = self._prefetch_docs_sync(
-                    library,
-                    ecosystem=ecosystem,
-                    versions=versions,
-                    docs_url=docs_url,
-                    docs_url_template=docs_url_template,
-                    source_type=source_type,
-                    force_refresh=force_refresh,
-                    continue_on_error=continue_on_error,
-                    should_cancel=_cancelled,
-                    begin_commit=_begin_commit,
-                    staging_owner={"job_id": job_id, "generation_id": generation_id or ""},
-                )
-            except Exception as exc:
-                outcome["exception"] = exc
-            finally:
-                completed.set()
-
-        # A third-party extractor can ignore HTTP timeouts.  Keep it isolated
-        # from the job controller so status becomes terminal at the configured
-        # deadline rather than being stuck at `running` forever.
-        threading.Thread(target=_work, daemon=True).start()
-        while not completed.wait(timeout=max(0.01, min(0.1, max(deadline - time.monotonic(), 0.0)))):
+        try:
+            result = self._prefetch_docs_sync(
+                library,
+                ecosystem=ecosystem,
+                versions=versions,
+                docs_url=docs_url,
+                docs_url_template=docs_url_template,
+                source_type=source_type,
+                force_refresh=force_refresh,
+                continue_on_error=continue_on_error,
+                should_cancel=_cancelled,
+                begin_commit=_begin_commit,
+                staging_owner={"job_id": job_id, "generation_id": generation_id or ""},
+            )
+        except Exception as exc:
+            if not self.jobs.generation_active(job_id, generation_id):
+                return
             if self.jobs.cancellation_requested(job_id):
-                continue
-            if time.monotonic() >= deadline:
-                current = self.jobs.get(job_id)
-                if current and current.phase == "committing":
-                    continue
-                if not deadline_expired.is_set():
-                    deadline_expired.set()
-                    self.jobs.append_error(job_id, "Library docs prefetch exceeded its configured deadline.")
-                    self.jobs.update(
-                        job_id,
-                        status="cancelling",
-                        phase="cancelling",
-                        reason_code="job_deadline_exceeded",
-                        retryable=True,
-                        message="Deadline exceeded; waiting for staging cleanup.",
-                    )
+                self.jobs.update(
+                    job_id,
+                    status="cancelled",
+                    phase="done",
+                    reason_code="cancelled",
+                    retryable=True,
+                    message="Library docs prefetch cancelled.",
+                )
+                return
+            self.jobs.append_error(job_id, str(exc))
+            self.jobs.update(job_id, status="failed", phase="done", reason_code="indexing_failed", retryable=False, message=str(exc))
+            return
 
         if not self.jobs.generation_active(job_id, generation_id):
             return
@@ -794,23 +886,6 @@ class LibraryDocsApplicationService:
                 message="Library docs prefetch cancelled.",
             )
             return
-        if deadline_expired.is_set():
-            self.jobs.update(
-                job_id,
-                status="failed",
-                phase="done",
-                reason_code="job_deadline_exceeded",
-                retryable=True,
-                message="Library docs prefetch exceeded its configured deadline.",
-            )
-            return
-        if "exception" in outcome:
-            exc = outcome["exception"]
-            self.jobs.append_error(job_id, str(exc))
-            self.jobs.update(job_id, status="failed", phase="done", reason_code="indexing_failed", retryable=False, message=str(exc))
-            return
-
-        result = outcome["result"]
         if result.status == "cancelled":
             if self.jobs.cancellation_requested(job_id):
                 self.jobs.update(

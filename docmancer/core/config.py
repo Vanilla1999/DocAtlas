@@ -46,6 +46,9 @@ class DocsJobsConfig(BaseSettings):
     max_terminal_jobs: int = Field(default=1000, ge=1)
     retention_days: int = Field(default=30, ge=1)
     max_events: int = Field(default=50, ge=1)
+    library_max_running: int = Field(default=2, ge=1)
+    library_max_queued: int = Field(default=8, ge=0)
+    terminalization_grace_seconds: float = Field(default=2.0, gt=0, le=2.0)
     model_config = SettingsConfigDict(env_prefix="DOCMANCER_DOCS_JOBS_", extra="ignore")
 
 

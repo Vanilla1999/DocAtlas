@@ -220,6 +220,11 @@ class DocsJob:
     failed_url: str | None = None
     http_status: int | None = None
     deadline_at: str | None = None
+    queue_position: int | None = None
+    running_jobs: int | None = None
+    queued_jobs: int | None = None
+    max_running_jobs: int | None = None
+    max_queued_jobs: int | None = None
     warnings: list[str] = field(default_factory=list)
     errors: list[str] = field(default_factory=list)
     target_results: list[dict[str, Any]] = field(default_factory=list)
