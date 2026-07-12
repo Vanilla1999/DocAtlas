@@ -24,6 +24,18 @@ def test_publish_workflow_is_manual_build_once_and_oidc() -> None:
             assert len(ref) == 40 and all(c in "0123456789abcdef" for c in ref)
 
 
+def test_installer_smoke_passes_an_existing_wheel_path() -> None:
+    text = (ROOT / ".github/workflows/publish.yml").read_text()
+    assert 'DOCATLAS_INSTALL_SOURCE="$(find "$PWD/dist" -name \'*.whl\' -print -quit)"' in text
+
+
+def test_publish_excludes_release_manifest_from_pypi_upload() -> None:
+    text = (ROOT / ".github/workflows/publish.yml").read_text()
+    remove_manifest = text.index("rm dist/release-manifest.json")
+    publish_action = text.index("pypa/gh-action-pypi-publish@")
+    assert remove_manifest < publish_action
+
+
 def test_installer_accepts_pinned_and_local_sources() -> None:
     text = (ROOT / "scripts/install.sh").read_text()
     assert "DOCATLAS_INSTALL_SOURCE" in text

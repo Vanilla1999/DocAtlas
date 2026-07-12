@@ -86,7 +86,7 @@ jobs:
           python "$GITHUB_WORKSPACE/scripts/docs_mcp_stdio_smoke.py"
       - run: |
           EXPECTED_VERSION="$(python -c 'from docmancer._version import __version__; print(__version__)')"
-          DOCATLAS_INSTALL_SOURCE="$PWD/$(find dist -name '*.whl' -printf '%f\n')" \
+          DOCATLAS_INSTALL_SOURCE="$(find "$PWD/dist" -name '*.whl' -print -quit)" \
           DOCATLAS_EXPECT_VERSION="$EXPECTED_VERSION" \
           DOCATLAS_AGENT=none sh scripts/install.sh
           cd "$(mktemp -d)"
@@ -107,6 +107,7 @@ jobs:
         with:
           name: release-dist
           path: dist
+      - run: rm dist/release-manifest.json
       - uses: actions/attest-build-provenance@e8998f949152b193b063cb0ec769d69d929409be # v2.4.0
         with:
           subject-path: "dist/*"
