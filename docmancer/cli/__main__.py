@@ -29,6 +29,7 @@ from docmancer.cli.mcp_commands import (
     uninstall_pack_cmd,
 )
 from docmancer.cli.qdrant_commands import qdrant_group
+from docmancer.support_policy import label_cli_commands
 
 
 def _show_version(ctx: click.Context, param: click.Parameter, value: bool) -> None:
@@ -49,7 +50,7 @@ def _show_version(ctx: click.Context, param: click.Parameter, value: bool) -> No
         'doc-atlas query "How do I authenticate?"',
         "doc-atlas install claude-code",
         "doc-atlas install github-copilot --project",
-    ),
+    ) + "\n\nSupport tiers and compatibility deadlines: docs/support-surface-policy.md",
 )
 @click.option(
     "--version",
@@ -92,6 +93,7 @@ cli.add_command(mcp_group, "mcp")
 cli.add_command(install_pack_cmd, "install-pack")
 cli.add_command(uninstall_pack_cmd, "uninstall")
 cli.add_command(qdrant_group, "qdrant")
+label_cli_commands(cli)
 
 
 if __name__ == "__main__":

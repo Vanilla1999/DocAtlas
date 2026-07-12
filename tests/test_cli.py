@@ -281,6 +281,9 @@ def test_add_shows_total_and_calls_agent(tmp_path):
     assert f"Extracted docs: {display_path(extracted_dir)} (1.0 KB)" in result.output
     mock_agent.add.assert_called_once_with(str(tmp_path), recreate=False)
     assert "local paths now belong to `doc-atlas ingest`" in result.output
+    assert "compatible through 1.x" in result.output
+    assert "removal in 2.0.0" in result.output
+    assert "0.4.x compatibility window" not in result.output
 
 
 def test_ingest_shows_total_and_calls_agent(tmp_path):
