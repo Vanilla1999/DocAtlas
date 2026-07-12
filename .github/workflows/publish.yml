@@ -124,11 +124,21 @@ jobs:
           subject-path: "dist/*"
       - uses: pypa/gh-action-pypi-publish@ed0c53931b1dc9bd32cbe73a98c7f6766f8a527e # release/v1
       - name: Verify the exact public release
+        env:
+          RELEASE_TAG: ${{ inputs.tag }}
         run: |
-          RELEASE_VERSION="${{ inputs.tag }}"
-          RELEASE_VERSION="${RELEASE_VERSION#v}"
-          DOCATLAS_INSTALL_VERSION="$RELEASE_VERSION" \
-          DOCATLAS_EXPECT_VERSION="$RELEASE_VERSION" \
-          DOCATLAS_AGENT=none sh scripts/install.sh
+          RELEASE_VERSION="${RELEASE_TAG#v}"
+          for attempt in 1 2 3 4 5; do
+            if DOCATLAS_INSTALL_VERSION="$RELEASE_VERSION" \
+              DOCATLAS_EXPECT_VERSION="$RELEASE_VERSION" \
+              DOCATLAS_AGENT=none sh scripts/install.sh; then
+              break
+            fi
+            if [ "$attempt" -eq 5 ]; then
+              echo "::error::Public package doc-atlas==$RELEASE_VERSION was not installable after 5 attempts"
+              exit 1
+            fi
+            sleep "$((attempt * 15))"
+          done
           cd "$(mktemp -d)"
           python "$GITHUB_WORKSPACE/scripts/docs_mcp_stdio_smoke.py"

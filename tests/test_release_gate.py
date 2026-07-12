@@ -48,7 +48,11 @@ def test_sdist_gate_builds_and_smokes_its_own_wheel() -> None:
 def test_publish_runs_exact_public_version_smoke() -> None:
     text = (ROOT / ".github/workflows/publish.yml").read_text()
     publish = text[text.index("  publish:"):]
+    assert "RELEASE_TAG: ${{ inputs.tag }}" in publish
+    assert 'RELEASE_VERSION="${RELEASE_TAG#v}"' in publish
+    assert 'RELEASE_VERSION="${{ inputs.tag }}"' not in publish
     assert "DOCATLAS_INSTALL_VERSION=\"$RELEASE_VERSION\"" in publish
+    assert "for attempt in 1 2 3 4 5" in publish
     assert "scripts/docs_mcp_stdio_smoke.py" in publish
 
 
