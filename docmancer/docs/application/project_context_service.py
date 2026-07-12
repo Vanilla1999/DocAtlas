@@ -192,8 +192,19 @@ class ProjectContextService:
             next_actions.append(dependency_confirmation)
         requires_confirmation = bool(project_docs and project_docs.requires_confirmation) or bool(dependency_confirmation and explicit_dependency_requested)
         confirmation_reason = project_docs.confirmation_reason if project_docs and project_docs.requires_confirmation else ("network_fetch" if dependency_confirmation and explicit_dependency_requested else None)
-        next_action = project_docs.next_action if project_docs and project_docs.requires_confirmation else (dependency_confirmation or {})
-        arguments_patch = project_docs.arguments_patch if project_docs and project_docs.requires_confirmation else ({"allow_network": True} if dependency_confirmation else {})
+        project_docs_blocked = bool(
+            project_docs and project_docs.status == "invalid_project_docs_catalog"
+        )
+        next_action = (
+            project_docs.next_action
+            if project_docs and (project_docs.requires_confirmation or project_docs_blocked)
+            else (dependency_confirmation or {})
+        )
+        arguments_patch = (
+            project_docs.arguments_patch
+            if project_docs and (project_docs.requires_confirmation or project_docs_blocked)
+            else ({"allow_network": True} if dependency_confirmation else {})
+        )
         if mode in {"auto", "project-only"} and project_docs and hasattr(self.facade, "inspect_project_docs"):
             inspection = self.facade.inspect_project_docs(str(root))
             if (
@@ -635,8 +646,9 @@ def _inject_broad_architecture_docs(
             item
             for item in project_docs.candidate_sources
             if item.get("reason") in {"overview", "project_architecture"}
-            or item.get("authority") == "source_of_truth"
-        ]
+            and item.get("doc_scope") == "project"
+            and (item.get("lifecycle_status") or "active") == "active"
+        ][:3]
     else:
         injection_rows = [
             {"path": rel, "doc_scope": "project"}

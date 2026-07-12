@@ -7,6 +7,7 @@ from pathlib import Path, PurePosixPath
 from typing import Any
 
 import yaml
+from yaml.constructor import ConstructorError
 
 
 CATALOG_FILENAME = "docatlas.project-docs.yaml"
@@ -24,6 +25,45 @@ IMPACT_POLICIES = {"track", "search_only"}
 TOP_LEVEL_FIELDS = ("schema_version", "documents")
 DOCUMENT_FIELDS = (
     "path", "role", "scope", "description", "module_path", "authority", "status", "impact",
+)
+
+
+class _UniqueKeySafeLoader(yaml.SafeLoader):
+    """Safe YAML loader that rejects duplicate mapping keys."""
+
+
+def _construct_unique_mapping(
+    loader: _UniqueKeySafeLoader,
+    node: yaml.MappingNode,
+    deep: bool = False,
+) -> dict[Any, Any]:
+    loader.flatten_mapping(node)
+    mapping: dict[Any, Any] = {}
+    for key_node, value_node in node.value:
+        key = loader.construct_object(key_node, deep=deep)
+        try:
+            duplicate = key in mapping
+        except TypeError as exc:
+            raise ConstructorError(
+                "while constructing a mapping",
+                node.start_mark,
+                "found an unhashable mapping key",
+                key_node.start_mark,
+            ) from exc
+        if duplicate:
+            raise ConstructorError(
+                "while constructing a mapping",
+                node.start_mark,
+                f"found duplicate key {key!r}",
+                key_node.start_mark,
+            )
+        mapping[key] = loader.construct_object(value_node, deep=deep)
+    return mapping
+
+
+_UniqueKeySafeLoader.add_constructor(
+    yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG,
+    _construct_unique_mapping,
 )
 
 
@@ -62,10 +102,17 @@ def read_project_docs_catalog(root: Path) -> ProjectDocCatalog:
                 True, False, CATALOG_FILENAME,
                 warnings=[f"Project docs catalog exceeds the {MAX_CATALOG_BYTES}-byte limit."],
             )
-        data = yaml.safe_load(catalog_path.read_text(encoding="utf-8"))
+        data = yaml.load(
+            catalog_path.read_text(encoding="utf-8"),
+            Loader=_UniqueKeySafeLoader,
+        )
     except (OSError, UnicodeError, yaml.YAMLError) as exc:
         return ProjectDocCatalog(True, False, CATALOG_FILENAME, warnings=[f"Could not read project docs catalog: {exc}"])
-    if not isinstance(data, dict) or data.get("schema_version") != 1:
+    if (
+        not isinstance(data, dict)
+        or type(data.get("schema_version")) is not int
+        or data.get("schema_version") != 1
+    ):
         return ProjectDocCatalog(True, False, CATALOG_FILENAME, warnings=["Project docs catalog schema_version must be 1."])
     unknown_top_level_fields = sorted(
         str(field_name) for field_name in data if field_name not in TOP_LEVEL_FIELDS
@@ -120,6 +167,7 @@ def _validated_entry(root: Path, raw: Any) -> tuple[ProjectDocCatalogEntry | Non
     pure = PurePosixPath(relative)
     if not relative or pure.is_absolute() or ".." in pure.parts or (pure.parts and pure.parts[0].endswith(":")):
         return None, "path must stay within the repository."
+    relative = pure.as_posix()
     role = str(raw.get("role") or "")
     scope = str(raw.get("scope") or "project")
     description = str(raw.get("description") or "").strip()
@@ -140,6 +188,8 @@ def _validated_entry(root: Path, raw: Any) -> tuple[ProjectDocCatalogEntry | Non
         return None, "project scope must not declare module_path."
     if module_path and (PurePosixPath(module_path).is_absolute() or ".." in PurePosixPath(module_path).parts):
         return None, "module_path must stay within the repository."
+    if module_path:
+        module_path = PurePosixPath(module_path).as_posix()
     if scope == "module":
         module_pure = PurePosixPath(module_path or "")
         module_candidate = root / Path(*module_pure.parts)

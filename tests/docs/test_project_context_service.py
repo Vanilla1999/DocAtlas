@@ -387,6 +387,42 @@ def test_architecture_query_does_not_fall_back_when_catalog_is_invalid(tmp_path)
     assert all(chunk.path != "ARCHITECTURE.md" for chunk in result.project_docs.results)
 
 
+def test_architecture_injection_excludes_historical_and_module_catalog_docs(tmp_path):
+    for rel in ("active.md", "completed.md", "module.md"):
+        (tmp_path / rel).write_text(f"# {rel}\nArchitecture details.\n", encoding="utf-8")
+    facade = FakeProjectContextFacade()
+    facade.metadata = ProjectMetadata(
+        project_path=str(tmp_path),
+        docs_catalog_present=True,
+        docs_catalog_valid=True,
+    )
+    facade.project_docs = ProjectDocsResult(
+        project_path=str(tmp_path),
+        query="architecture",
+        results=[
+            ProjectDocsChunk(
+                title="Existing",
+                content="Existing architecture result.",
+                source=str(tmp_path / "existing.md"),
+                url=None,
+                path="existing.md",
+            ),
+        ],
+        candidate_sources=[
+            {"path": "active.md", "reason": "project_architecture", "doc_scope": "project", "lifecycle_status": "active"},
+            {"path": "completed.md", "reason": "project_architecture", "doc_scope": "project", "lifecycle_status": "completed", "authority": "source_of_truth"},
+            {"path": "module.md", "reason": "module_architecture", "doc_scope": "module", "lifecycle_status": "active", "authority": "source_of_truth"},
+        ],
+    )
+
+    result = ProjectContextService(facade).get_project_context(
+        str(tmp_path), "architecture", mode="project-only"
+    )
+
+    assert result.project_docs is not None
+    assert {chunk.path for chunk in result.project_docs.results} == {"existing.md", "active.md"}
+
+
 def test_story_specific_project_context_with_only_docs_matched_terms_requires_source_search():
     facade = FakeProjectContextFacade()
     facade.project_docs = ProjectDocsResult(

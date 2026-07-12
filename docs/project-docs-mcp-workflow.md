@@ -204,7 +204,7 @@ documents:
     impact: track
 ```
 
-The host coding model may edit this normal Git file after inspecting the repository. DocAtlas only validates and consumes it. Invalid paths, traversal, symlinks, duplicates, missing files, and unsupported formats fail closed with warnings. Use `status: completed` or `superseded` and `impact: search_only` for historical material.
+The host coding model may edit this normal Git file after inspecting the repository. DocAtlas only validates and consumes it. Invalid paths, traversal, symlinks, duplicates, missing files, and unsupported formats fail closed with warnings. An invalid explicit catalog blocks retrieval, ingestion, and synchronization without pruning the existing index; fix the catalog and inspect again. Catalog paths and descriptions are untrusted routing metadata, not agent instructions. Use `status: completed` or `superseded` and `impact: search_only` for historical material.
 
 ## Verification loop
 

@@ -135,6 +135,19 @@ class ProjectDocsService:
         return create_project_docs_next_action(root, query, reason=reason)
 
     @staticmethod
+    def _invalid_project_docs_catalog_action(root: Path, warnings: list[str]) -> dict[str, Any]:
+        return {
+            "type": "fix_project_docs_catalog",
+            "action": "fix_project_docs_catalog",
+            "handled_by": "coding_agent",
+            "requires_confirmation": False,
+            "path": str(root / "docatlas.project-docs.yaml"),
+            "arguments_patch": {"project_path": str(root)},
+            "reason": "The explicit project-doc catalog is invalid. Fix it before discovery, indexing, or synchronization.",
+            "validation_errors": list(warnings),
+        }
+
+    @staticmethod
 
     def _project_docs_structured_next_action(
         *,
@@ -328,9 +341,16 @@ class ProjectDocsService:
             return self.facade._project_inspect_project_docs_impl(project_path)
         root = Path(project_path).expanduser().resolve()
         metadata = self.read_project_metadata(str(root))
+        catalog_invalid = metadata.docs_catalog_present and not metadata.docs_catalog_valid
         candidate_sources = [asdict(item) for item in metadata.docs_candidates]
         indexed_sources_all = self._indexed_project_doc_sources(str(root))
         indexed_sources, stale_sources, ignored_sources = self._partition_project_doc_state(candidate_sources, indexed_sources_all)
+        preserved_indexed_sources = indexed_sources_all if catalog_invalid else []
+        if catalog_invalid:
+            # An invalid authoritative catalog cannot classify existing index
+            # rows as current, stale, or orphaned. Preserve them without
+            # attaching lifecycle guidance that could trigger pruning.
+            indexed_sources, stale_sources, ignored_sources = [], [], []
         candidate_paths = {item.get("path") for item in candidate_sources if item.get("path")}
         indexed_paths = {item.get("path") for item in [*indexed_sources, *stale_sources] if item.get("path")}
         missing_candidate_count = len(candidate_paths - indexed_paths)
@@ -343,27 +363,49 @@ class ProjectDocsService:
         ]
         dependency_docs_state = self._project_dependency_docs_state(metadata)
         exact_versions_available = dependency_docs_state["dependency_docs_available"]
-        if stale_sources or ignored_sources:
+        if catalog_invalid:
+            base_reason_code = "invalid_project_docs_catalog"
+        elif stale_sources or ignored_sources:
             base_reason_code = "project_docs_stale"
         elif not candidate_sources:
             base_reason_code = "no_project_docs"
-        elif not has_high_level_overview:
+        elif not catalog_invalid and not has_high_level_overview:
             base_reason_code = "architecture_doc_creation_recommended"
         elif missing_candidate_count:
             base_reason_code = "project_docs_found_not_indexed"
         else:
             base_reason_code = "project_docs_ready"
         active_index = self.active_index_diagnostics(str(root))
-        preflight = self._project_docs_preflight(
-            root,
-            base_reason_code=base_reason_code,
-            candidate_sources=candidate_sources,
-            stale_sources=stale_sources,
-            ignored_sources=ignored_sources,
-            active_index=active_index,
+        preflight = (
+            {
+                "status": "blocked",
+                "requires_confirmation": False,
+                "safe_to_sync_without_confirmation": False,
+                "base_reason_code": base_reason_code,
+                "risk_count": 1,
+                "risks": [{
+                    "code": "invalid_project_docs_catalog",
+                    "severity": "major",
+                    "message": "The explicit project-doc catalog is invalid.",
+                    "recommended_action": "Fix docatlas.project-docs.yaml before indexing or synchronization.",
+                }],
+            }
+            if catalog_invalid
+            else self._project_docs_preflight(
+                root,
+                base_reason_code=base_reason_code,
+                candidate_sources=candidate_sources,
+                stale_sources=stale_sources,
+                ignored_sources=ignored_sources,
+                active_index=active_index,
+            )
         )
         recommended_next_actions: list[dict[str, Any]] = []
-        if preflight["requires_confirmation"]:
+        if catalog_invalid:
+            recommended_next_actions.append(
+                self._invalid_project_docs_catalog_action(root, metadata.warnings)
+            )
+        elif preflight["requires_confirmation"]:
             recommended_next_actions.append(self._project_docs_preflight_recommended_action(root, preflight))
         elif stale_sources or ignored_sources:
             recommended_next_actions.append({
@@ -385,14 +427,22 @@ class ProjectDocsService:
                 "requires_confirmation": True,
                 "reason": "Exact dependency versions found in project lockfiles; fetching docs may use network.",
             })
-        if not candidate_sources:
+        if not candidate_sources and not catalog_invalid:
             recommended_next_actions.append(self._create_project_docs_next_action(root))
-        elif not has_high_level_overview:
+        elif not catalog_invalid and not has_high_level_overview:
             recommended_next_actions.append(self._create_project_docs_next_action(
                 root,
                 reason="Project docs exist, but no high-level architecture or overview document was discovered. Ask the user before creating a reviewable ARCHITECTURE.md file.",
             ))
-        if preflight["requires_confirmation"]:
+        if catalog_invalid:
+            reason_code = base_reason_code
+            next_action = self._invalid_project_docs_catalog_action(root, metadata.warnings)
+            arguments_patch = {"project_path": str(root)}
+            agent_message = "Fix the invalid explicit project-doc catalog before indexing, synchronization, or project-doc retrieval."
+            user_message = "docatlas.project-docs.yaml is invalid. Fix the reported catalog errors before continuing."
+            requires_confirmation = False
+            confirmation_reason = None
+        elif preflight["requires_confirmation"]:
             reason_code = "project_docs_preflight_confirmation_required"
             next_action, arguments_patch, agent_message, user_message = self._project_docs_preflight_next_action(root, preflight)
             requires_confirmation = True
@@ -408,6 +458,7 @@ class ProjectDocsService:
             "indexed": indexed_sources,
             "stale": stale_sources,
             "ignored": ignored_sources,
+            "preserved_indexed": preserved_indexed_sources,
             "high_level_overview_found": has_high_level_overview,
             "modules": self._module_summaries(candidate_sources),
             "indexed_modules": self._module_summaries(indexed_sources),
@@ -438,9 +489,17 @@ class ProjectDocsService:
             arguments_patch=arguments_patch,
             agent_message=agent_message,
             user_message=user_message,
-            agent_guidance="Inspect diagnostics.preflight first. If it requires confirmation, ask the user to update docs or confirm before sync_project_docs. Otherwise call get_project_docs for repo-specific questions after project docs are synced. If docs are missing, ask before creating a reviewable ARCHITECTURE.md, then inspect and sync it. Ask before network dependency docs fetches.",
+            agent_guidance=(
+                "Fix docatlas.project-docs.yaml and re-run inspect_project_docs. Do not create docs, sync, or prune the existing index while the explicit catalog is invalid."
+                if catalog_invalid
+                else "Inspect diagnostics.preflight first. If it requires confirmation, ask the user to update docs or confirm before sync_project_docs. Otherwise call get_project_docs for repo-specific questions after project docs are synced. If docs are missing, ask before creating a reviewable ARCHITECTURE.md, then inspect and sync it. Ask before network dependency docs fetches."
+            ),
             source_state_guidance=self._source_state_guidance(),
-            diagnostics={"active_index": active_index, "preflight": preflight},
+            diagnostics={
+                "active_index": active_index,
+                "preflight": preflight,
+                "indexed_sources_preserved": len(preserved_indexed_sources),
+            },
             warnings=metadata.warnings,
         )
 
@@ -457,6 +516,14 @@ class ProjectDocsService:
         metadata = self.read_project_metadata(str(root))
         warnings = list(metadata.warnings)
         candidates = list(metadata.docs_candidates)
+        if metadata.docs_catalog_present and not metadata.docs_catalog_valid:
+            return ProjectDocsIngestResult(
+                status="invalid_project_docs_catalog",
+                project=metadata,
+                candidate_count=0,
+                warnings=warnings,
+                message="docatlas.project-docs.yaml is invalid; no project docs were indexed.",
+            )
         if not candidates:
             return ProjectDocsIngestResult(
                 status="no_project_docs",
@@ -589,6 +656,20 @@ class ProjectDocsService:
         warnings = list(metadata.warnings)
         candidate_sources = [asdict(item) for item in metadata.docs_candidates]
         before_indexed_all = self._indexed_project_doc_sources(str(root))
+        if metadata.docs_catalog_present and not metadata.docs_catalog_valid:
+            return ProjectDocsSyncResult(
+                status="invalid_project_docs_catalog",
+                project=metadata,
+                candidate_count=0,
+                indexed_sources=before_indexed_all,
+                diagnostics={
+                    "active_index": self.active_index_diagnostics(str(root)),
+                    "indexed_sources_preserved": len(before_indexed_all),
+                    "catalog_valid": False,
+                },
+                warnings=warnings,
+                message="docatlas.project-docs.yaml is invalid; the existing project-doc index was preserved unchanged.",
+            )
         agent = self._agent_instance()
         dedup_removed = 0
         path_groups: dict[str, list[dict[str, Any]]] = {}
@@ -866,6 +947,21 @@ class ProjectDocsService:
         if scope and scope not in {"project", "module", "all"}:
             raise ValueError("scope must be one of: project, module, all")
         metadata = self.read_project_metadata(str(root))
+        if metadata.docs_catalog_present and not metadata.docs_catalog_valid:
+            next_action = self._invalid_project_docs_catalog_action(root, metadata.warnings)
+            return ProjectDocsResult(
+                project_path=str(root),
+                query=query,
+                status="invalid_project_docs_catalog",
+                reason_code="invalid_project_docs_catalog",
+                next_action=next_action,
+                arguments_patch={"project_path": str(root)},
+                answer_available=False,
+                reason="invalid_project_docs_catalog",
+                warnings=metadata.warnings,
+                next_actions=[next_action],
+                message="docatlas.project-docs.yaml is invalid; fix the catalog before retrieving project documentation.",
+            )
         candidate_sources = [asdict(item) for item in metadata.docs_candidates]
         module_summaries = self._module_summaries(candidate_sources)
         resolved_module_path, module_error = self._resolve_module_filter(module_summaries, module=module, module_path=module_path)
