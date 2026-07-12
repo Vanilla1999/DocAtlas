@@ -268,7 +268,10 @@ class ProjectDocsService:
                 continue
             path = Path(candidate_path)
             reason = str(candidate.get("reason") or "")
-            if not (path.name.lower().startswith("readme") or reason == "architecture"):
+            if not (
+                path.name.lower().startswith("readme")
+                or reason in {"architecture", "overview", "project_architecture"}
+            ):
                 continue
             text = self._read_text_prefix(root / candidate_path)
             if text is not None and self._looks_like_placeholder_project_doc(text):
@@ -506,6 +509,7 @@ class ProjectDocsService:
                     "project_doc_authority": candidate.authority,
                     "project_doc_lifecycle_status": candidate.lifecycle_status,
                     "project_doc_impact_policy": candidate.impact_policy,
+                    "project_doc_catalog_entry_hash": candidate.catalog_entry_hash,
                     "project_doc_sections": section_result.sections,
                     "project_doc_sections_status": section_result.status,
                     "project_doc_sections_reason": section_result.reason_code,

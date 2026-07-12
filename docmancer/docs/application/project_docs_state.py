@@ -47,6 +47,11 @@ class ProjectDocsState:
                     "module_name": metadata.get("module_name"),
                     "module_path": metadata.get("module_path"),
                     "module_type": metadata.get("module_type"),
+                    "description": metadata.get("project_doc_description"),
+                    "authority": metadata.get("project_doc_authority"),
+                    "lifecycle_status": metadata.get("project_doc_lifecycle_status"),
+                    "impact_policy": metadata.get("project_doc_impact_policy"),
+                    "catalog_entry_hash": metadata.get("project_doc_catalog_entry_hash"),
                     "ingested_at": row["ingested_at"],
                 })
         return rows
@@ -60,15 +65,15 @@ class ProjectDocsState:
             },
             "indexed_source_not_discovered": {
                 "meaning": "The source exists in the index, but the current discovery pass did not select it as a project-doc candidate. This does not by itself mean the file is deleted or invalid.",
-                "next_action": "Link the file from docs/INDEX.md or root docs, move it under a discovered docs location, adjust discovery, or run sync_project_docs to remove obsolete index entries.",
+                "next_action": "Add or correct the file in docatlas.project-docs.yaml, or run sync_project_docs to remove obsolete index entries.",
             },
             "ignored_generated_or_tooling_doc": {
                 "meaning": "Generated, build, dependency, or tooling docs are not treated as reviewable project-owned docs by default.",
-                "next_action": "Usually no action is required. If the file is official project documentation, link it from docs/INDEX.md or move it to a reviewable docs location.",
+                "next_action": "Usually no action is required. If the file is official project documentation, add it to docatlas.project-docs.yaml.",
             },
             "missing_expected_source": {
                 "meaning": "A document the user expected was not selected or cited.",
-                "next_action": "Check inspect_project_docs output, docs/INDEX.md links, discovery scope, manifest entries, and ingestion freshness.",
+                "next_action": "Check inspect_project_docs output, docatlas.project-docs.yaml entries, scope, and ingestion freshness.",
             },
         }
 

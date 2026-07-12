@@ -229,7 +229,7 @@ Checklist:
    - Use terms that should only appear in the expected docs.
    - Confirm the expected files are cited in `selected_sources`, `indexed_sources`, or result chunks.
 5. If expected files are not cited, fix the source map instead of guessing:
-   - add or correct links in `docs/INDEX.md` or root docs;
+   - add or correct entries in `docatlas.project-docs.yaml`;
    - move maintained docs under `docs/`, `wiki/`, ADR, roadmap, or runbook-style locations;
    - update discovery configuration or `docmancer.docs.yaml` manifest entries if the docs are external dependency/public docs;
    - re-run sync and repeat the smoke test.
@@ -239,7 +239,7 @@ Suggested smoke-test questions:
 ```text
 get_docs_context(project_path=..., question="What is the architecture decision for <unique ADR term>?", mode="project")
 get_docs_context(project_path=..., question="How do we deploy <unique service/module name>?", mode="project")
-get_docs_context(project_path=..., question="<unique heading or phrase from docs/INDEX.md target>", mode="project")
+get_docs_context(project_path=..., question="<description or unique phrase from a cataloged document>", mode="project")
 get_docs_context(project_path=..., question="<unique module phrase>", mode="project", module_path="<module>", scope="module")
 get_docs_context(project_path=..., question="<module-specific question>", mode="project", module_path="<module>", scope="module")
 ```

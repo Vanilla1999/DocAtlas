@@ -271,6 +271,7 @@ def test_project_docs_candidate_has_stable_serializable_shape_and_freshness(tmp_
             "authority": None,
             "lifecycle_status": "active",
             "impact_policy": "track",
+            "catalog_entry_hash": None,
         }
 
 

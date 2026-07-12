@@ -452,9 +452,15 @@ class SQLiteStore:
                 ),
             )
             row_id = int(cursor.lastrowid)
+            search_text = text
+            project_doc_description = metadata.get("project_doc_description")
+            if isinstance(project_doc_description, str) and project_doc_description.strip():
+                # Catalog descriptions are routing metadata only: searchable
+                # in FTS, but never injected into the cited section body.
+                search_text = f"{text}\n{project_doc_description.strip()}"
             conn.execute(
                 "INSERT INTO sections_fts(rowid, title, text, source) VALUES (?, ?, ?, ?)",
-                (row_id, title, text, doc.source),
+                (row_id, title, search_text, doc.source),
             )
             section_count += 1
         return section_count

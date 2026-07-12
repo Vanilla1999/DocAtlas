@@ -20,7 +20,6 @@ def build_agent_contract(project_path: str | Path) -> dict[str, Any]:
     """
 
     metadata = ProjectMetadataReader().read(project_path)
-    catalog_present = (Path(metadata.project_path) / CATALOG_FILENAME).is_file()
     docs = [
         {
             "path": candidate.path,
@@ -53,7 +52,8 @@ def build_agent_contract(project_path: str | Path) -> dict[str, Any]:
             "documentation": docs,
             "documentation_catalog": {
                 "path": CATALOG_FILENAME,
-                "mode": "explicit" if catalog_present else "cold_start_discovery",
+                "mode": "explicit" if metadata.docs_catalog_present else "cold_start_discovery",
+                "valid": metadata.docs_catalog_valid,
             },
             "dependencies": dependencies,
         },
@@ -104,6 +104,11 @@ def format_agent_contract_markdown(contract: dict[str, Any]) -> str:
         "# DocAtlas agent contract",
         "",
         f"Project: `{project['path']}`",
+        (
+            "Documentation catalog: "
+            f"`{project['documentation_catalog']['mode']}` "
+            f"(valid: {'yes' if project['documentation_catalog']['valid'] else 'no'})"
+        ),
         "",
         "## Required tool selection",
         "",
@@ -119,7 +124,10 @@ def format_agent_contract_markdown(contract: dict[str, Any]) -> str:
             scope = item["scope"]
             if item["module_path"]:
                 scope = f"{scope}: {item['module_path']}"
-            lines.append(f"| `{item['path']}` | {scope} | {item['role']} | {item.get('description') or ''} |")
+            lines.append(
+                f"| `{_markdown_cell(item['path'])}` | {_markdown_cell(scope)} | "
+                f"{_markdown_cell(item['role'])} | {_markdown_cell(item.get('description') or '')} |"
+            )
     else:
         lines.append("No maintained documentation files were discovered.")
     lines.extend(["", "## Evidence rules", ""])
@@ -128,3 +136,7 @@ def format_agent_contract_markdown(contract: dict[str, Any]) -> str:
     lines.append(f"- Check doc impact: `{contract['maintenance']['check_docs_after_code_change']}`")
     lines.append(f"- Refresh indexed project docs: {contract['maintenance']['refresh_project_docs']}")
     return "\n".join(lines)
+
+
+def _markdown_cell(value: object) -> str:
+    return str(value).replace("|", "\\|").replace("`", "&#96;").replace("\r", "").replace("\n", "<br>")

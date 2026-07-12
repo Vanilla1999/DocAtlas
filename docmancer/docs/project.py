@@ -94,11 +94,10 @@ class ProjectMetadataReader:
         python_packages, python_direct_dependencies, python_observations = read_python_project(root, warnings)
         catalog = read_project_docs_catalog(root)
         warnings.extend(catalog.warnings)
-        docs_candidates = (
-            self._catalog_docs(root, catalog.entries, limit=docs_candidate_limit)
-            if catalog.present
-            else self.discover_docs(root, warnings, limit=docs_candidate_limit)
-        )
+        if catalog.present:
+            docs_candidates = self._catalog_docs(root, catalog.entries, limit=docs_candidate_limit) if catalog.valid else []
+        else:
+            docs_candidates = self.discover_docs(root, warnings, limit=docs_candidate_limit)
         all_packages = {**packages, **cargo_packages, **npm_packages, **python_packages}
         direct_dependencies = sorted({*direct_dependencies, *npm_direct_dependencies, *python_direct_dependencies})
         dependencies = [*pub_observations, *pub_manifest_observations, *rust_observations, *npm_observations, *python_observations]
@@ -116,6 +115,8 @@ class ProjectMetadataReader:
             docs_candidates=docs_candidates,
             detected_ecosystems=detected_ecosystems,
             warnings=warnings,
+            docs_catalog_present=catalog.present,
+            docs_catalog_valid=catalog.valid,
         )
 
     def _catalog_docs(self, root: Path, entries: list[Any], *, limit: int | None) -> list[ProjectDocsCandidate]:
@@ -141,6 +142,11 @@ class ProjectMetadataReader:
                 authority=entry.authority,
                 lifecycle_status=entry.status,
                 impact_policy=entry.impact,
+                catalog_entry_hash="sha256:" + hashlib.sha256(json.dumps({
+                    "path": entry.path, "role": entry.role, "scope": entry.scope,
+                    "description": entry.description, "module_path": entry.module_path,
+                    "authority": entry.authority, "status": entry.status, "impact": entry.impact,
+                }, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest(),
             ))
         return candidates
 

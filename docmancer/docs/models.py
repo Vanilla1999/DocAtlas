@@ -337,6 +337,7 @@ class ProjectDocsCandidate:
     authority: str | None = None
     lifecycle_status: str = "active"
     impact_policy: str = "track"
+    catalog_entry_hash: str | None = None
 
 
 @dataclass(frozen=True)
@@ -351,6 +352,8 @@ class ProjectMetadata:
     docs_candidates: list[ProjectDocsCandidate] = field(default_factory=list)
     detected_ecosystems: list[str] = field(default_factory=list)
     warnings: list[str] = field(default_factory=list)
+    docs_catalog_present: bool = False
+    docs_catalog_valid: bool = True
 
 
 @dataclass(frozen=True)
