@@ -14,7 +14,7 @@ from datetime import datetime, timezone
 
 from docmancer.core.config import DocmancerConfig
 from docmancer.core.models import Document, RetrievedChunk
-from docmancer.core.sqlite_store import SQLiteStore
+from docmancer.core.sqlite_store import SQLiteStore, document_section_count
 
 logger = logging.getLogger(__name__)
 
@@ -484,7 +484,20 @@ class DocmancerAgent:
         self.last_fetch_failure = getattr(f, "last_fetch_failure", None)
         if cancellation_callback and cancellation_callback():
             raise RuntimeError("Documentation ingestion cancelled before indexing.")
-        self.last_discovery_diagnostics = dict(getattr(f, "last_discovery_diagnostics", {}) or {})
+        section_counts = {document.source: document_section_count(document) for document in documents}
+        ledger = list(getattr(f, "last_page_ledger", []) or [])
+        for page in ledger:
+            if page.get("outcome") != "usable":
+                continue
+            page["chunks"] = int(
+                section_counts.get(str(page.get("canonical_url")))
+                or section_counts.get(str(page.get("discovered_url")))
+                or 0
+            )
+        diagnostics = dict(getattr(f, "last_discovery_diagnostics", {}) or {})
+        if ledger:
+            diagnostics["page_ledger"] = ledger
+        self.last_discovery_diagnostics = diagnostics
         if metadata:
             for document in documents:
                 source_metadata = dict(document.metadata or {})

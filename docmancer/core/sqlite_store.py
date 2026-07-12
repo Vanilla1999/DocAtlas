@@ -142,6 +142,11 @@ def _sections_for_document(doc: Document) -> list[tuple[str, int, str, dict[str,
     ]
 
 
+def document_section_count(doc: Document) -> int:
+    """Return the exact number of SQLite sections that ingest will create."""
+    return len(_sections_for_document(doc))
+
+
 def _chunk_hash(text: str) -> str:
     return hashlib.sha256(text.encode("utf-8")).hexdigest()
 

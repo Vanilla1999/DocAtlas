@@ -12,6 +12,7 @@ Implements the full ingestion pipeline:
 from __future__ import annotations
 
 import logging
+import time
 import threading
 from concurrent.futures import FIRST_COMPLETED, ThreadPoolExecutor, wait
 from dataclasses import dataclass, replace
@@ -140,6 +141,8 @@ class WebFetcher:
         self._use_env_proxy = use_env_proxy
         self._proxy_url = proxy_url
         self.last_discovery_diagnostics: dict | None = None
+        self.last_page_ledger: list[dict] = []
+        self._ledger_lock = threading.Lock()
 
     def _emit_progress(self, event: dict) -> None:
         if not self._progress_callback:
@@ -204,6 +207,7 @@ class WebFetcher:
             ValueError: If no documentation pages could be discovered or fetched.
         """
         self.last_fetch_failure: DocsFetchSecurityError | None = None
+        self.last_page_ledger = []
         self._raise_if_cancelled()
         policy = self._policy_for(url)
         policy.validate_url(url)
@@ -211,8 +215,24 @@ class WebFetcher:
         public_base_url = redact_url(base_url)
 
         with self._new_client(policy) as client:
+            if self._github_blob_raw_url(base_url):
+                page = self._fetch_page(
+                    DiscoveredUrl(url=base_url, strategy=DiscoveryStrategy.SEED_URLS),
+                    base_url,
+                    Platform.GENERIC,
+                    robots=None,
+                    rate_limiter=RateLimiter(delay=0.0),
+                    redirect_tracker=RedirectTracker(),
+                    redirect_lock=threading.Lock(),
+                )
+                if page is None:
+                    raise ValueError(f"GitHub documentation page {public_base_url!r} had no usable content.")
+                self.last_discovery_diagnostics = self._with_page_ledger({"discovery_strategy": "github-blob"})
+                return [page.document]
             if self._is_direct_text_url(base_url):
-                return [self._fetch_direct_text_page(base_url, client)]
+                document = self._fetch_direct_text_page(base_url, client)
+                self.last_discovery_diagnostics = self._with_page_ledger({"discovery_strategy": "direct-url"})
+                return [document]
             if self._is_direct_dartdoc_url(base_url):
                 page = self._fetch_dartdoc_direct_page(base_url, base_url, client, Platform.GENERIC)
                 if page is None:
@@ -220,6 +240,7 @@ class WebFetcher:
                         f"Dartdoc page {public_base_url!r} had no extractable article content. "
                         "Try concrete class/library seed URLs or browser=true."
                     )
+                self.last_discovery_diagnostics = self._with_page_ledger({"discovery_strategy": "dartdoc-direct"})
                 return [page.document]
 
             # Step 1: Fetch homepage and detect platform
@@ -286,10 +307,67 @@ class WebFetcher:
                 and discovered[0].strategy == DiscoveryStrategy.LLMS_FULL_TXT
                 and discovered[0].content
             ):
-                return self._build_llms_full_documents(discovered[0], platform)
+                documents = self._build_llms_full_documents(discovered[0], platform)
+                content = discovered[0].content or ""
+                self._record_page(
+                    requested_url=discovered[0].url,
+                    discovered_url=discovered[0].url,
+                    canonical_url=discovered[0].url,
+                    redirect_url=None,
+                    fetch_url=discovered[0].url,
+                    fetcher="llms-full.txt",
+                    outcome="usable",
+                    reason_code="ok",
+                    bytes=len(content.encode("utf-8")),
+                    chunks=0,
+                    elapsed_ms=0,
+                )
+                self.last_discovery_diagnostics = self._with_page_ledger(self.last_discovery_diagnostics or {})
+                return documents
 
             # Step 5: Fetch and extract each page
-            return self._fetch_pages(discovered, base_url, client, platform, robots)
+            documents = self._fetch_pages(discovered, base_url, client, platform, robots)
+            self.last_discovery_diagnostics = self._with_page_ledger(self.last_discovery_diagnostics or {})
+            return documents
+
+    def _with_page_ledger(self, diagnostics: dict) -> dict:
+        ledger = list(self.last_page_ledger)
+        failed = [item for item in ledger if item.get("outcome") in {"failed", "skipped"}]
+        return {
+            **diagnostics,
+            "page_ledger": ledger,
+            "page_failure_count": len(failed),
+            "page_failure_summary": [
+                {"url": item.get("discovered_url"), "reason_code": item.get("reason_code")}
+                for item in failed[:20]
+            ],
+        }
+
+    def _record_page(self, **values) -> None:
+        safe = {
+            **values,
+            "requested_url": redact_url(str(values.get("requested_url") or "")),
+            "discovered_url": redact_url(str(values.get("discovered_url") or "")),
+            "canonical_url": redact_url(str(values.get("canonical_url") or "")) or None,
+            "redirect_url": redact_url(str(values.get("redirect_url") or "")) or None,
+            "fetch_url": redact_url(str(values.get("fetch_url") or "")) or None,
+        }
+        with self._ledger_lock:
+            self.last_page_ledger.append(safe)
+
+    @staticmethod
+    def _github_blob_raw_url(url: str) -> str | None:
+        parsed = urlparse(url)
+        if parsed.hostname != "github.com":
+            return None
+        parts = [part for part in parsed.path.split("/") if part]
+        if len(parts) < 5 or parts[2] != "blob":
+            return None
+        owner, repo, _, ref = parts[:4]
+        file_path = "/".join(parts[4:])
+        if not owner or not repo or not ref or not file_path or any(part in {".", ".."} for part in parts):
+            return None
+        return f"https://raw.githubusercontent.com/{owner}/{repo}/{ref}/{file_path}"
 
     def _raise_if_cancelled(self) -> None:
         if self._cancellation_callback and self._cancellation_callback():
@@ -313,12 +391,31 @@ class WebFetcher:
 
     def _fetch_direct_text_page(self, url: str, client: httpx.Client) -> Document:
         """Fetch an exact markdown/text docs URL without running site discovery."""
+        started = time.monotonic()
         try:
             resp = client.get(url)
+        except DocsFetchSecurityError as exc:
+            self._record_page(
+                requested_url=url, discovered_url=url, canonical_url=None, redirect_url=None,
+                fetch_url=url, fetcher="direct-url", outcome="failed", reason_code=exc.category,
+                bytes=0, chunks=0, elapsed_ms=int((time.monotonic() - started) * 1000),
+            )
+            raise
         except httpx.RequestError:
+            self._record_page(
+                requested_url=url, discovered_url=url, canonical_url=None, redirect_url=None,
+                fetch_url=url, fetcher="direct-url", outcome="failed", reason_code="network_transport_error",
+                bytes=0, chunks=0, elapsed_ms=int((time.monotonic() - started) * 1000),
+            )
             raise ValueError(f"Could not fetch documentation page {redact_url(url)!r}: transport_error") from None
 
         if resp.status_code != 200:
+            self._record_page(
+                requested_url=url, discovered_url=url, canonical_url=None, redirect_url=None,
+                fetch_url=url, fetcher="direct-url", outcome="failed",
+                reason_code="not_found" if resp.status_code == 404 else "http_failure",
+                bytes=len(resp.content), chunks=0, elapsed_ms=int((time.monotonic() - started) * 1000),
+            )
             raise DocsFetchSecurityError(
                 "not_found" if resp.status_code == 404 else "http_failure",
                 redact_url(url),
@@ -327,8 +424,18 @@ class WebFetcher:
                 status_code=resp.status_code,
             )
         if not resp.text.strip():
+            self._record_page(
+                requested_url=url, discovered_url=url, canonical_url=None, redirect_url=None,
+                fetch_url=url, fetcher="direct-url", outcome="failed", reason_code="empty_response",
+                bytes=0, chunks=0, elapsed_ms=int((time.monotonic() - started) * 1000),
+            )
             raise ValueError(f"Could not fetch documentation page {redact_url(url)!r}: empty response")
         if looks_like_html(resp.text):
+            self._record_page(
+                requested_url=url, discovered_url=url, canonical_url=None, redirect_url=None,
+                fetch_url=url, fetcher="direct-url", outcome="failed", reason_code="unexpected_html",
+                bytes=len(resp.content), chunks=0, elapsed_ms=int((time.monotonic() - started) * 1000),
+            )
             raise ValueError(f"Could not fetch documentation page {redact_url(url)!r}: response appears to be HTML")
 
         resp_url = getattr(resp, "url", None)
@@ -341,7 +448,7 @@ class WebFetcher:
         content_hash = ContentDeduplicator.content_hash(content)
         suffix = urlparse(final_url).path.lower().rsplit(".", 1)[-1]
         fmt = "markdown" if suffix == "md" else "text"
-        return Document(
+        document = Document(
             source=final_url,
             content=content,
             metadata={
@@ -359,6 +466,13 @@ class WebFetcher:
                 "fetched_at": fetched_at,
             },
         )
+        self._record_page(
+            requested_url=url, discovered_url=url, canonical_url=final_url, redirect_url=final_url if final_url != url else None,
+            fetch_url=url, fetcher="direct-url", outcome="usable", reason_code="ok",
+            bytes=len(content.encode("utf-8")), chunks=0,
+            elapsed_ms=int((time.monotonic() - started) * 1000),
+        )
+        return document
 
     def _fetch_dartdoc_direct_page(
         self,
@@ -535,27 +649,63 @@ class WebFetcher:
         redirect_tracker: RedirectTracker,
         redirect_lock: threading.Lock,
     ) -> _FetchedPage | None:
+        started = time.monotonic()
         url = normalize_url(disc.url)
         self._emit_progress({"phase": "fetching", "message": f"Fetching {url}", "url": url})
         is_seed_url = disc.strategy == DiscoveryStrategy.SEED_URLS
         if robots and not robots.can_fetch(url):
             logger.debug("Skipped %s (blocked by robots.txt)", url)
+            self._record_page(
+                requested_url=url, discovered_url=url, canonical_url=None, redirect_url=None,
+                fetch_url=None, fetcher="web", outcome="skipped", reason_code="robots_disallowed",
+                bytes=0, chunks=0, elapsed_ms=int((time.monotonic() - started) * 1000),
+            )
             return None
         if not is_seed_url and not is_docs_url(url, base_url):
             logger.debug("Skipped %s (out of docs scope)", url)
+            reason = "cross_domain_skipped" if urlparse(url).hostname != urlparse(base_url).hostname else "path_policy_skipped"
+            self._record_page(
+                requested_url=url, discovered_url=url, canonical_url=None, redirect_url=None,
+                fetch_url=None, fetcher="web", outcome="skipped", reason_code=reason,
+                bytes=0, chunks=0, elapsed_ms=int((time.monotonic() - started) * 1000),
+            )
             return None
 
         with redirect_lock:
             predicted_url = redirect_tracker.predict_final_url(url)
-        fetch_url = predicted_url or url
+        github_raw_url = self._github_blob_raw_url(url)
+        fetch_url = github_raw_url or predicted_url or url
 
-        with self._new_client() as client:
+        request_policy = self._fetch_policy
+        if github_raw_url:
+            allowed = set(request_policy.allowed_hosts)
+            allowed.update({"github.com", "raw.githubusercontent.com"})
+            request_policy = replace(
+                request_policy,
+                allowed_hosts=tuple(sorted(allowed)),
+                path_prefixes=(urlparse(github_raw_url).path,),
+            )
+        with self._new_client(request_policy) as client:
             rate_limiter.wait(fetch_url)
             try:
                 resp = client.get(fetch_url)
+            except DocsFetchSecurityError as exc:
+                self._record_page(
+                    requested_url=fetch_url, discovered_url=url, canonical_url=None, redirect_url=None,
+                    fetch_url=fetch_url, fetcher="github-raw" if github_raw_url else "web",
+                    outcome="failed", reason_code=exc.category, bytes=0, chunks=0,
+                    elapsed_ms=int((time.monotonic() - started) * 1000),
+                )
+                raise
             except httpx.RequestError as exc:
                 logger.warning("Failed to fetch %s: %s", fetch_url, exc)
                 self._emit_progress({"phase": "fetching", "message": f"Fetch failed: {url}", "url": url})
+                self._record_page(
+                    requested_url=fetch_url, discovered_url=url, canonical_url=None, redirect_url=None,
+                    fetch_url=fetch_url, fetcher="github-raw" if github_raw_url else "web",
+                    outcome="failed", reason_code="network_transport_error", bytes=0, chunks=0,
+                    elapsed_ms=int((time.monotonic() - started) * 1000),
+                )
                 return None
 
             if resp.status_code == 404 and predicted_url and fetch_url == predicted_url:
@@ -574,6 +724,12 @@ class WebFetcher:
             if resp.status_code != 200:
                 self._emit_progress({"phase": "fetching", "message": f"Fetch failed with status {resp.status_code}: {url}", "url": url})
                 retryable = resp.status_code in {408, 425, 429} or resp.status_code >= 500
+                self._record_page(
+                    requested_url=fetch_url, discovered_url=url, canonical_url=None, redirect_url=None,
+                    fetch_url=fetch_url, fetcher="github-raw" if github_raw_url else "web",
+                    outcome="failed", reason_code="not_found" if resp.status_code == 404 else "http_failure",
+                    bytes=len(resp.content), chunks=0, elapsed_ms=int((time.monotonic() - started) * 1000),
+                )
                 raise DocsFetchSecurityError(
                     "not_found" if resp.status_code == 404 else "http_failure",
                     redact_url(fetch_url),
@@ -607,6 +763,12 @@ class WebFetcher:
 
         if not content or not content.strip():
             logger.debug("Skipped %s (empty after extraction)", url)
+            self._record_page(
+                requested_url=fetch_url, discovered_url=url, canonical_url=None, redirect_url=final_url if final_url != fetch_url else None,
+                fetch_url=fetch_url, fetcher="github-raw" if github_raw_url else "web",
+                outcome="failed", reason_code="extraction_empty", bytes=len(raw_html.encode("utf-8")), chunks=0,
+                elapsed_ms=int((time.monotonic() - started) * 1000),
+            )
             return None
 
         if self._browser and len(content.split()) < 100 and looks_like_html(raw_html):
@@ -635,7 +797,24 @@ class WebFetcher:
                 "lang": meta.get("lang") or "en",
                 "http_status": resp.status_code,
                 "fetched_at": datetime.now(timezone.utc).isoformat(),
+                "requested_url": redact_url(fetch_url),
+                "discovered_url": redact_url(url),
+                "fetch_url": redact_url(fetch_url),
+                "redirect_url": redact_url(final_url) if final_url != fetch_url else None,
             },
+        )
+        self._record_page(
+            requested_url=fetch_url,
+            discovered_url=url,
+            canonical_url=canonical,
+            redirect_url=final_url if final_url != fetch_url else None,
+            fetch_url=fetch_url,
+            fetcher="github-raw" if github_raw_url else "web",
+            outcome="usable",
+            reason_code="ok",
+            bytes=len(raw_html.encode("utf-8")),
+            chunks=0,
+            elapsed_ms=int((time.monotonic() - started) * 1000),
         )
         return _FetchedPage(document=doc, final_url=final_url)
 

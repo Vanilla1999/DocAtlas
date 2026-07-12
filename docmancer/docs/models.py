@@ -211,6 +211,7 @@ class DocsJob:
     total_pages: int = 0
     completed_pages: int = 0
     failed_pages: int = 0
+    page_failure_summary: list[dict[str, Any]] = field(default_factory=list)
     total_chunks: int = 0
     completed_chunks: int = 0
     message: str | None = None

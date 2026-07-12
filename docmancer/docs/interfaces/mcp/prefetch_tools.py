@@ -56,7 +56,7 @@ def _job_summary(job: Any) -> dict[str, Any]:
     fields = (
         "job_id", "kind", "status", "phase", "message", "reason_code", "retryable",
         "deadline_at", "queue_position", "running_jobs", "queued_jobs",
-        "max_running_jobs", "max_queued_jobs", "started_at", "updated_at",
+        "max_running_jobs", "max_queued_jobs", "page_failure_summary", "started_at", "updated_at",
     )
     return {field: getattr(job, field) for field in fields}
 
