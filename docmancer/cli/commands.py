@@ -1051,7 +1051,7 @@ def add_cmd(
         else:
             warnings.warn(
                 "doc-atlas add for local files is deprecated. Use doc-atlas ingest <path>. "
-                "The compatibility path will be removed after the 0.4.x line.",
+                "The compatibility path is retained through 1.x and scheduled for removal in 2.0.0.",
                 DeprecationWarning,
                 stacklevel=2,
             )

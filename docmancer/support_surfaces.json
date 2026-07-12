@@ -1,0 +1,1045 @@
+{
+  "schema_version": "support-surfaces-1.0",
+  "owners": {
+    "DocAtlas maintainers": "GitHub CODEOWNERS and release maintainers"
+  },
+  "ci_policy": {
+    "core": "offline-hermetic and release-blocking",
+    "advanced": "offline contract/security tests are release-blocking; live provider tests are advisory",
+    "live": "scheduled or manual and non-blocking for core Docs health"
+  },
+  "dependency_policy": {
+    "current_core": ["pydantic", "pydantic-settings", "httpx", "click", "pyyaml", "filelock", "trafilatura", "markdownify", "w3lib", "ultimate-sitemap-parser", "beautifulsoup4", "jsonschema", "mcp", "sqlite-vec", "qdrant-client", "fastembed", "charset-normalizer", "pdfplumber", "pypdf", "python-docx", "striprtf"],
+    "task24_extra_candidates": ["qdrant-client", "fastembed", "pdfplumber", "pypdf", "python-docx", "striprtf"],
+    "decision": "Keep current placement in Task 29 for compatibility; Task 24 owns install-profile migration."
+  },
+  "surfaces": [
+    {
+      "id": "cli:add",
+      "kind": "cli",
+      "tier": "deprecated",
+      "owner": "DocAtlas maintainers",
+      "docs": "docs/support-surface-policy.md",
+      "test_tier": "advanced-offline",
+      "network_dependencies": [],
+      "compatibility": "compatibility only until the bounded deadline",
+      "removal_rule": "remove in the next planned breaking release after warning period",
+      "failure_budget": "network/provider outages must not make local Docs MCP unhealthy; shared security and storage regressions block release",
+      "deprecation": {
+        "deadline": "2.0.0",
+        "resolution": "deadline_extended"
+      }
+    },
+    {
+      "id": "cli:agent-contract",
+      "kind": "cli",
+      "tier": "advanced-supported",
+      "owner": "DocAtlas maintainers",
+      "docs": "docs/support-surface-policy.md",
+      "test_tier": "advanced-offline",
+      "network_dependencies": [],
+      "compatibility": "stable within the current major release",
+      "removal_rule": "breaking release with migration notes",
+      "failure_budget": "network/provider outages must not make local Docs MCP unhealthy; shared security and storage regressions block release"
+    },
+    {
+      "id": "cli:clear",
+      "kind": "cli",
+      "tier": "core",
+      "owner": "DocAtlas maintainers",
+      "docs": "docs/support-surface-policy.md",
+      "test_tier": "core-offline",
+      "network_dependencies": [],
+      "compatibility": "stable within the current major release",
+      "removal_rule": "breaking release with migration notes",
+      "failure_budget": "blocks release and local Docs health"
+    },
+    {
+      "id": "cli:context",
+      "kind": "cli",
+      "tier": "core",
+      "owner": "DocAtlas maintainers",
+      "docs": "docs/support-surface-policy.md",
+      "test_tier": "core-offline",
+      "network_dependencies": [],
+      "compatibility": "stable within the current major release",
+      "removal_rule": "breaking release with migration notes",
+      "failure_budget": "blocks release and local Docs health"
+    },
+    {
+      "id": "cli:docs-impact",
+      "kind": "cli",
+      "tier": "advanced-supported",
+      "owner": "DocAtlas maintainers",
+      "docs": "docs/support-surface-policy.md",
+      "test_tier": "advanced-offline",
+      "network_dependencies": [],
+      "compatibility": "stable within the current major release",
+      "removal_rule": "breaking release with migration notes",
+      "failure_budget": "network/provider outages must not make local Docs MCP unhealthy; shared security and storage regressions block release"
+    },
+    {
+      "id": "cli:doctor",
+      "kind": "cli",
+      "tier": "core",
+      "owner": "DocAtlas maintainers",
+      "docs": "docs/support-surface-policy.md",
+      "test_tier": "core-offline",
+      "network_dependencies": [],
+      "compatibility": "stable within the current major release",
+      "removal_rule": "breaking release with migration notes",
+      "failure_budget": "blocks release and local Docs health"
+    },
+    {
+      "id": "cli:eval",
+      "kind": "cli",
+      "tier": "maintenance-only",
+      "owner": "DocAtlas maintainers",
+      "docs": "docs/support-surface-policy.md",
+      "test_tier": "advanced-offline",
+      "network_dependencies": [],
+      "compatibility": "best effort; no core availability guarantee",
+      "removal_rule": "breaking release with migration notes",
+      "failure_budget": "network/provider outages must not make local Docs MCP unhealthy; shared security and storage regressions block release"
+    },
+    {
+      "id": "cli:fetch",
+      "kind": "cli",
+      "tier": "core",
+      "owner": "DocAtlas maintainers",
+      "docs": "docs/support-surface-policy.md",
+      "test_tier": "core-offline",
+      "network_dependencies": [
+        "optional_remote_service"
+      ],
+      "compatibility": "stable within the current major release",
+      "removal_rule": "breaking release with migration notes",
+      "failure_budget": "offline fetch policy, typed errors, and security regressions block release; remote source outages do not make local Docs unhealthy"
+    },
+    {
+      "id": "cli:ingest",
+      "kind": "cli",
+      "tier": "core",
+      "owner": "DocAtlas maintainers",
+      "docs": "docs/support-surface-policy.md",
+      "test_tier": "core-offline",
+      "network_dependencies": [],
+      "compatibility": "stable within the current major release",
+      "removal_rule": "breaking release with migration notes",
+      "failure_budget": "blocks release and local Docs health"
+    },
+    {
+      "id": "cli:ingest-uspto",
+      "kind": "cli",
+      "tier": "maintenance-only",
+      "owner": "DocAtlas maintainers",
+      "docs": "docs/support-surface-policy.md",
+      "test_tier": "advanced-offline",
+      "network_dependencies": [
+        "optional_remote_service"
+      ],
+      "compatibility": "best effort; no core availability guarantee",
+      "removal_rule": "breaking release with migration notes",
+      "failure_budget": "network/provider outages must not make local Docs MCP unhealthy; shared security and storage regressions block release"
+    },
+    {
+      "id": "cli:init",
+      "kind": "cli",
+      "tier": "core",
+      "owner": "DocAtlas maintainers",
+      "docs": "docs/support-surface-policy.md",
+      "test_tier": "core-offline",
+      "network_dependencies": [],
+      "compatibility": "stable within the current major release",
+      "removal_rule": "breaking release with migration notes",
+      "failure_budget": "blocks release and local Docs health"
+    },
+    {
+      "id": "cli:inspect",
+      "kind": "cli",
+      "tier": "core",
+      "owner": "DocAtlas maintainers",
+      "docs": "docs/support-surface-policy.md",
+      "test_tier": "core-offline",
+      "network_dependencies": [],
+      "compatibility": "stable within the current major release",
+      "removal_rule": "breaking release with migration notes",
+      "failure_budget": "blocks release and local Docs health"
+    },
+    {
+      "id": "cli:install",
+      "kind": "cli",
+      "tier": "core",
+      "owner": "DocAtlas maintainers",
+      "docs": "docs/support-surface-policy.md",
+      "test_tier": "core-offline",
+      "network_dependencies": [],
+      "compatibility": "stable within the current major release",
+      "removal_rule": "breaking release with migration notes",
+      "failure_budget": "blocks release and local Docs health"
+    },
+    {
+      "id": "cli:install-pack",
+      "kind": "cli",
+      "tier": "advanced-supported",
+      "owner": "DocAtlas maintainers",
+      "docs": "docs/support-surface-policy.md",
+      "test_tier": "advanced-offline",
+      "network_dependencies": [],
+      "compatibility": "stable within the current major release",
+      "removal_rule": "breaking release with migration notes",
+      "failure_budget": "network/provider outages must not make local Docs MCP unhealthy; shared security and storage regressions block release"
+    },
+    {
+      "id": "cli:list",
+      "kind": "cli",
+      "tier": "core",
+      "owner": "DocAtlas maintainers",
+      "docs": "docs/support-surface-policy.md",
+      "test_tier": "core-offline",
+      "network_dependencies": [],
+      "compatibility": "stable within the current major release",
+      "removal_rule": "breaking release with migration notes",
+      "failure_budget": "blocks release and local Docs health"
+    },
+    {
+      "id": "cli:mcp",
+      "kind": "cli",
+      "tier": "advanced-supported",
+      "owner": "DocAtlas maintainers",
+      "docs": "docs/support-surface-policy.md",
+      "test_tier": "advanced-offline",
+      "network_dependencies": [],
+      "compatibility": "stable within the current major release",
+      "removal_rule": "breaking release with migration notes",
+      "failure_budget": "network/provider outages must not make local Docs MCP unhealthy; shared security and storage regressions block release"
+    },
+    {
+      "id": "cli:mcp/disable",
+      "kind": "cli",
+      "tier": "advanced-supported",
+      "owner": "DocAtlas maintainers",
+      "docs": "docs/support-surface-policy.md",
+      "test_tier": "advanced-offline",
+      "network_dependencies": [],
+      "compatibility": "stable within the current major release",
+      "removal_rule": "breaking release with migration notes",
+      "failure_budget": "network/provider outages must not make local Docs MCP unhealthy; shared security and storage regressions block release"
+    },
+    {
+      "id": "cli:mcp/docs-serve",
+      "kind": "cli",
+      "tier": "core",
+      "owner": "DocAtlas maintainers",
+      "docs": "docs/support-surface-policy.md",
+      "test_tier": "core-offline",
+      "network_dependencies": [],
+      "compatibility": "stable within the current major release",
+      "removal_rule": "breaking release with migration notes",
+      "failure_budget": "blocks release and local Docs health"
+    },
+    {
+      "id": "cli:mcp/doctor",
+      "kind": "cli",
+      "tier": "advanced-supported",
+      "owner": "DocAtlas maintainers",
+      "docs": "docs/support-surface-policy.md",
+      "test_tier": "advanced-offline",
+      "network_dependencies": [],
+      "compatibility": "stable within the current major release",
+      "removal_rule": "breaking release with migration notes",
+      "failure_budget": "network/provider outages must not make local Docs MCP unhealthy; shared security and storage regressions block release"
+    },
+    {
+      "id": "cli:mcp/enable",
+      "kind": "cli",
+      "tier": "advanced-supported",
+      "owner": "DocAtlas maintainers",
+      "docs": "docs/support-surface-policy.md",
+      "test_tier": "advanced-offline",
+      "network_dependencies": [],
+      "compatibility": "stable within the current major release",
+      "removal_rule": "breaking release with migration notes",
+      "failure_budget": "network/provider outages must not make local Docs MCP unhealthy; shared security and storage regressions block release"
+    },
+    {
+      "id": "cli:mcp/list",
+      "kind": "cli",
+      "tier": "advanced-supported",
+      "owner": "DocAtlas maintainers",
+      "docs": "docs/support-surface-policy.md",
+      "test_tier": "advanced-offline",
+      "network_dependencies": [],
+      "compatibility": "stable within the current major release",
+      "removal_rule": "breaking release with migration notes",
+      "failure_budget": "network/provider outages must not make local Docs MCP unhealthy; shared security and storage regressions block release"
+    },
+    {
+      "id": "cli:mcp/packs-serve",
+      "kind": "cli",
+      "tier": "advanced-supported",
+      "owner": "DocAtlas maintainers",
+      "docs": "docs/support-surface-policy.md",
+      "test_tier": "advanced-offline",
+      "network_dependencies": [],
+      "compatibility": "stable within the current major release",
+      "removal_rule": "breaking release with migration notes",
+      "failure_budget": "network/provider outages must not make local Docs MCP unhealthy; shared security and storage regressions block release"
+    },
+    {
+      "id": "cli:mcp/remove",
+      "kind": "cli",
+      "tier": "advanced-supported",
+      "owner": "DocAtlas maintainers",
+      "docs": "docs/support-surface-policy.md",
+      "test_tier": "advanced-offline",
+      "network_dependencies": [],
+      "compatibility": "stable within the current major release",
+      "removal_rule": "breaking release with migration notes",
+      "failure_budget": "network/provider outages must not make local Docs MCP unhealthy; shared security and storage regressions block release"
+    },
+    {
+      "id": "cli:mcp/serve",
+      "kind": "cli",
+      "tier": "deprecated",
+      "owner": "DocAtlas maintainers",
+      "docs": "docs/support-surface-policy.md",
+      "test_tier": "advanced-offline",
+      "network_dependencies": [],
+      "compatibility": "compatibility only until the bounded deadline",
+      "removal_rule": "remove in the next planned breaking release after warning period",
+      "failure_budget": "network/provider outages must not make local Docs MCP unhealthy; shared security and storage regressions block release",
+      "deprecation": {
+        "deadline": "2.0.0",
+        "resolution": "deadline_extended"
+      }
+    },
+    {
+      "id": "cli:patch-review",
+      "kind": "cli",
+      "tier": "advanced-supported",
+      "owner": "DocAtlas maintainers",
+      "docs": "docs/support-surface-policy.md",
+      "test_tier": "advanced-offline",
+      "network_dependencies": [],
+      "compatibility": "stable within the current major release",
+      "removal_rule": "breaking release with migration notes",
+      "failure_budget": "network/provider outages must not make local Docs MCP unhealthy; shared security and storage regressions block release"
+    },
+    {
+      "id": "cli:qdrant",
+      "kind": "cli",
+      "tier": "maintenance-only",
+      "owner": "DocAtlas maintainers",
+      "docs": "docs/support-surface-policy.md",
+      "test_tier": "advanced-offline",
+      "network_dependencies": [],
+      "compatibility": "best effort; no core availability guarantee",
+      "removal_rule": "breaking release with migration notes",
+      "failure_budget": "network/provider outages must not make local Docs MCP unhealthy; shared security and storage regressions block release"
+    },
+    {
+      "id": "cli:qdrant/down",
+      "kind": "cli",
+      "tier": "maintenance-only",
+      "owner": "DocAtlas maintainers",
+      "docs": "docs/support-surface-policy.md",
+      "test_tier": "advanced-offline",
+      "network_dependencies": [],
+      "compatibility": "best effort; no core availability guarantee",
+      "removal_rule": "breaking release with migration notes",
+      "failure_budget": "network/provider outages must not make local Docs MCP unhealthy; shared security and storage regressions block release"
+    },
+    {
+      "id": "cli:qdrant/logs",
+      "kind": "cli",
+      "tier": "maintenance-only",
+      "owner": "DocAtlas maintainers",
+      "docs": "docs/support-surface-policy.md",
+      "test_tier": "advanced-offline",
+      "network_dependencies": [],
+      "compatibility": "best effort; no core availability guarantee",
+      "removal_rule": "breaking release with migration notes",
+      "failure_budget": "network/provider outages must not make local Docs MCP unhealthy; shared security and storage regressions block release"
+    },
+    {
+      "id": "cli:qdrant/status",
+      "kind": "cli",
+      "tier": "maintenance-only",
+      "owner": "DocAtlas maintainers",
+      "docs": "docs/support-surface-policy.md",
+      "test_tier": "advanced-offline",
+      "network_dependencies": [],
+      "compatibility": "best effort; no core availability guarantee",
+      "removal_rule": "breaking release with migration notes",
+      "failure_budget": "network/provider outages must not make local Docs MCP unhealthy; shared security and storage regressions block release"
+    },
+    {
+      "id": "cli:qdrant/up",
+      "kind": "cli",
+      "tier": "maintenance-only",
+      "owner": "DocAtlas maintainers",
+      "docs": "docs/support-surface-policy.md",
+      "test_tier": "advanced-offline",
+      "network_dependencies": [],
+      "compatibility": "best effort; no core availability guarantee",
+      "removal_rule": "breaking release with migration notes",
+      "failure_budget": "network/provider outages must not make local Docs MCP unhealthy; shared security and storage regressions block release"
+    },
+    {
+      "id": "cli:qdrant/upgrade",
+      "kind": "cli",
+      "tier": "maintenance-only",
+      "owner": "DocAtlas maintainers",
+      "docs": "docs/support-surface-policy.md",
+      "test_tier": "advanced-offline",
+      "network_dependencies": [],
+      "compatibility": "best effort; no core availability guarantee",
+      "removal_rule": "breaking release with migration notes",
+      "failure_budget": "network/provider outages must not make local Docs MCP unhealthy; shared security and storage regressions block release"
+    },
+    {
+      "id": "cli:query",
+      "kind": "cli",
+      "tier": "core",
+      "owner": "DocAtlas maintainers",
+      "docs": "docs/support-surface-policy.md",
+      "test_tier": "core-offline",
+      "network_dependencies": [],
+      "compatibility": "stable within the current major release",
+      "removal_rule": "breaking release with migration notes",
+      "failure_budget": "blocks release and local Docs health"
+    },
+    {
+      "id": "cli:remove",
+      "kind": "cli",
+      "tier": "core",
+      "owner": "DocAtlas maintainers",
+      "docs": "docs/support-surface-policy.md",
+      "test_tier": "core-offline",
+      "network_dependencies": [],
+      "compatibility": "stable within the current major release",
+      "removal_rule": "breaking release with migration notes",
+      "failure_budget": "blocks release and local Docs health"
+    },
+    {
+      "id": "cli:setup",
+      "kind": "cli",
+      "tier": "core",
+      "owner": "DocAtlas maintainers",
+      "docs": "docs/support-surface-policy.md",
+      "test_tier": "core-offline",
+      "network_dependencies": [],
+      "compatibility": "stable within the current major release",
+      "removal_rule": "breaking release with migration notes",
+      "failure_budget": "blocks release and local Docs health"
+    },
+    {
+      "id": "cli:uninstall",
+      "kind": "cli",
+      "tier": "advanced-supported",
+      "owner": "DocAtlas maintainers",
+      "docs": "docs/support-surface-policy.md",
+      "test_tier": "advanced-offline",
+      "network_dependencies": [],
+      "compatibility": "stable within the current major release",
+      "removal_rule": "breaking release with migration notes",
+      "failure_budget": "network/provider outages must not make local Docs MCP unhealthy; shared security and storage regressions block release"
+    },
+    {
+      "id": "cli:update",
+      "kind": "cli",
+      "tier": "core",
+      "owner": "DocAtlas maintainers",
+      "docs": "docs/support-surface-policy.md",
+      "test_tier": "core-offline",
+      "network_dependencies": [],
+      "compatibility": "stable within the current major release",
+      "removal_rule": "breaking release with migration notes",
+      "failure_budget": "blocks release and local Docs health"
+    },
+    {
+      "id": "extra:browser",
+      "kind": "extra",
+      "tier": "advanced-supported",
+      "owner": "DocAtlas maintainers",
+      "docs": "docs/support-surface-policy.md",
+      "test_tier": "advanced-offline",
+      "network_dependencies": [
+        "optional_remote_service"
+      ],
+      "compatibility": "stable within the current major release",
+      "removal_rule": "breaking release with migration notes",
+      "failure_budget": "network/provider outages must not make local Docs MCP unhealthy; shared security and storage regressions block release"
+    },
+    {
+      "id": "extra:crawl4ai",
+      "kind": "extra",
+      "tier": "advanced-supported",
+      "owner": "DocAtlas maintainers",
+      "docs": "docs/support-surface-policy.md",
+      "test_tier": "advanced-offline",
+      "network_dependencies": [
+        "optional_remote_service"
+      ],
+      "compatibility": "stable within the current major release",
+      "removal_rule": "breaking release with migration notes",
+      "failure_budget": "network/provider outages must not make local Docs MCP unhealthy; shared security and storage regressions block release"
+    },
+    {
+      "id": "extra:dev",
+      "kind": "extra",
+      "tier": "internal",
+      "owner": "DocAtlas maintainers",
+      "docs": "docs/support-surface-policy.md",
+      "test_tier": "advanced-offline",
+      "network_dependencies": [],
+      "compatibility": "best effort; no core availability guarantee",
+      "removal_rule": "maintainer decision",
+      "failure_budget": "network/provider outages must not make local Docs MCP unhealthy; shared security and storage regressions block release"
+    },
+    {
+      "id": "extra:embeddings-cohere",
+      "kind": "extra",
+      "tier": "advanced-supported",
+      "owner": "DocAtlas maintainers",
+      "docs": "docs/support-surface-policy.md",
+      "test_tier": "advanced-offline",
+      "network_dependencies": [
+        "optional_remote_service"
+      ],
+      "compatibility": "stable within the current major release",
+      "removal_rule": "breaking release with migration notes",
+      "failure_budget": "network/provider outages must not make local Docs MCP unhealthy; shared security and storage regressions block release"
+    },
+    {
+      "id": "extra:embeddings-openai",
+      "kind": "extra",
+      "tier": "advanced-supported",
+      "owner": "DocAtlas maintainers",
+      "docs": "docs/support-surface-policy.md",
+      "test_tier": "advanced-offline",
+      "network_dependencies": [
+        "optional_remote_service"
+      ],
+      "compatibility": "stable within the current major release",
+      "removal_rule": "breaking release with migration notes",
+      "failure_budget": "network/provider outages must not make local Docs MCP unhealthy; shared security and storage regressions block release"
+    },
+    {
+      "id": "extra:embeddings-voyage",
+      "kind": "extra",
+      "tier": "advanced-supported",
+      "owner": "DocAtlas maintainers",
+      "docs": "docs/support-surface-policy.md",
+      "test_tier": "advanced-offline",
+      "network_dependencies": [
+        "optional_remote_service"
+      ],
+      "compatibility": "stable within the current major release",
+      "removal_rule": "breaking release with migration notes",
+      "failure_budget": "network/provider outages must not make local Docs MCP unhealthy; shared security and storage regressions block release"
+    },
+    {
+      "id": "mcp:docs/bootstrap_project_docs",
+      "kind": "mcp_tool",
+      "tier": "maintenance-only",
+      "owner": "DocAtlas maintainers",
+      "docs": "docs/support-surface-policy.md",
+      "test_tier": "shared-security",
+      "network_dependencies": [],
+      "compatibility": "best effort; no core availability guarantee",
+      "removal_rule": "breaking release with migration notes",
+      "failure_budget": "network/provider outages must not make local Docs MCP unhealthy; shared security and storage regressions block release"
+    },
+    {
+      "id": "mcp:docs/cancel_docs_job",
+      "kind": "mcp_tool",
+      "tier": "maintenance-only",
+      "owner": "DocAtlas maintainers",
+      "docs": "docs/support-surface-policy.md",
+      "test_tier": "shared-security",
+      "network_dependencies": [],
+      "compatibility": "best effort; no core availability guarantee",
+      "removal_rule": "breaking release with migration notes",
+      "failure_budget": "network/provider outages must not make local Docs MCP unhealthy; shared security and storage regressions block release"
+    },
+    {
+      "id": "mcp:docs/docs_job",
+      "kind": "mcp_tool",
+      "tier": "advanced-supported",
+      "owner": "DocAtlas maintainers",
+      "docs": "docs/support-surface-policy.md",
+      "test_tier": "shared-security",
+      "network_dependencies": [],
+      "compatibility": "stable within the current major release",
+      "removal_rule": "breaking release with migration notes",
+      "failure_budget": "network/provider outages must not make local Docs MCP unhealthy; shared security and storage regressions block release"
+    },
+    {
+      "id": "mcp:docs/docs_status",
+      "kind": "mcp_tool",
+      "tier": "core",
+      "owner": "DocAtlas maintainers",
+      "docs": "docs/mcp-docs-server.md",
+      "test_tier": "core-offline",
+      "network_dependencies": [],
+      "compatibility": "stable within the current major release",
+      "removal_rule": "breaking release with migration notes",
+      "failure_budget": "blocks release and local Docs health"
+    },
+    {
+      "id": "mcp:docs/get_code_context",
+      "kind": "mcp_tool",
+      "tier": "advanced-supported",
+      "owner": "DocAtlas maintainers",
+      "docs": "docs/support-surface-policy.md",
+      "test_tier": "shared-security",
+      "network_dependencies": [],
+      "compatibility": "stable within the current major release",
+      "removal_rule": "breaking release with migration notes",
+      "failure_budget": "network/provider outages must not make local Docs MCP unhealthy; shared security and storage regressions block release"
+    },
+    {
+      "id": "mcp:docs/get_docs_context",
+      "kind": "mcp_tool",
+      "tier": "core",
+      "owner": "DocAtlas maintainers",
+      "docs": "docs/mcp-docs-server.md",
+      "test_tier": "core-offline",
+      "network_dependencies": [],
+      "compatibility": "stable within the current major release",
+      "removal_rule": "breaking release with migration notes",
+      "failure_budget": "blocks release and local Docs health"
+    },
+    {
+      "id": "mcp:docs/get_docs_job_status",
+      "kind": "mcp_tool",
+      "tier": "maintenance-only",
+      "owner": "DocAtlas maintainers",
+      "docs": "docs/support-surface-policy.md",
+      "test_tier": "shared-security",
+      "network_dependencies": [],
+      "compatibility": "best effort; no core availability guarantee",
+      "removal_rule": "breaking release with migration notes",
+      "failure_budget": "network/provider outages must not make local Docs MCP unhealthy; shared security and storage regressions block release"
+    },
+    {
+      "id": "mcp:docs/get_library_docs",
+      "kind": "mcp_tool",
+      "tier": "maintenance-only",
+      "owner": "DocAtlas maintainers",
+      "docs": "docs/support-surface-policy.md",
+      "test_tier": "shared-security",
+      "network_dependencies": [],
+      "compatibility": "best effort; no core availability guarantee",
+      "removal_rule": "breaking release with migration notes",
+      "failure_budget": "network/provider outages must not make local Docs MCP unhealthy; shared security and storage regressions block release"
+    },
+    {
+      "id": "mcp:docs/get_patch_constraints",
+      "kind": "mcp_tool",
+      "tier": "advanced-supported",
+      "owner": "DocAtlas maintainers",
+      "docs": "docs/support-surface-policy.md",
+      "test_tier": "shared-security",
+      "network_dependencies": [],
+      "compatibility": "stable within the current major release",
+      "removal_rule": "breaking release with migration notes",
+      "failure_budget": "network/provider outages must not make local Docs MCP unhealthy; shared security and storage regressions block release"
+    },
+    {
+      "id": "mcp:docs/get_patch_plan_context",
+      "kind": "mcp_tool",
+      "tier": "advanced-supported",
+      "owner": "DocAtlas maintainers",
+      "docs": "docs/support-surface-policy.md",
+      "test_tier": "shared-security",
+      "network_dependencies": [],
+      "compatibility": "stable within the current major release",
+      "removal_rule": "breaking release with migration notes",
+      "failure_budget": "network/provider outages must not make local Docs MCP unhealthy; shared security and storage regressions block release"
+    },
+    {
+      "id": "mcp:docs/get_project_context",
+      "kind": "mcp_tool",
+      "tier": "maintenance-only",
+      "owner": "DocAtlas maintainers",
+      "docs": "docs/support-surface-policy.md",
+      "test_tier": "shared-security",
+      "network_dependencies": [],
+      "compatibility": "best effort; no core availability guarantee",
+      "removal_rule": "breaking release with migration notes",
+      "failure_budget": "network/provider outages must not make local Docs MCP unhealthy; shared security and storage regressions block release"
+    },
+    {
+      "id": "mcp:docs/get_project_docs",
+      "kind": "mcp_tool",
+      "tier": "maintenance-only",
+      "owner": "DocAtlas maintainers",
+      "docs": "docs/support-surface-policy.md",
+      "test_tier": "shared-security",
+      "network_dependencies": [],
+      "compatibility": "best effort; no core availability guarantee",
+      "removal_rule": "breaking release with migration notes",
+      "failure_budget": "network/provider outages must not make local Docs MCP unhealthy; shared security and storage regressions block release"
+    },
+    {
+      "id": "mcp:docs/ingest_project_docs",
+      "kind": "mcp_tool",
+      "tier": "maintenance-only",
+      "owner": "DocAtlas maintainers",
+      "docs": "docs/support-surface-policy.md",
+      "test_tier": "shared-security",
+      "network_dependencies": [],
+      "compatibility": "best effort; no core availability guarantee",
+      "removal_rule": "breaking release with migration notes",
+      "failure_budget": "network/provider outages must not make local Docs MCP unhealthy; shared security and storage regressions block release"
+    },
+    {
+      "id": "mcp:docs/inspect_library_docs",
+      "kind": "mcp_tool",
+      "tier": "maintenance-only",
+      "owner": "DocAtlas maintainers",
+      "docs": "docs/support-surface-policy.md",
+      "test_tier": "shared-security",
+      "network_dependencies": [],
+      "compatibility": "best effort; no core availability guarantee",
+      "removal_rule": "breaking release with migration notes",
+      "failure_budget": "network/provider outages must not make local Docs MCP unhealthy; shared security and storage regressions block release"
+    },
+    {
+      "id": "mcp:docs/inspect_project_docs",
+      "kind": "mcp_tool",
+      "tier": "advanced-supported",
+      "owner": "DocAtlas maintainers",
+      "docs": "docs/support-surface-policy.md",
+      "test_tier": "shared-security",
+      "network_dependencies": [],
+      "compatibility": "stable within the current major release",
+      "removal_rule": "breaking release with migration notes",
+      "failure_budget": "network/provider outages must not make local Docs MCP unhealthy; shared security and storage regressions block release"
+    },
+    {
+      "id": "mcp:docs/list_docs_jobs",
+      "kind": "mcp_tool",
+      "tier": "maintenance-only",
+      "owner": "DocAtlas maintainers",
+      "docs": "docs/support-surface-policy.md",
+      "test_tier": "shared-security",
+      "network_dependencies": [],
+      "compatibility": "best effort; no core availability guarantee",
+      "removal_rule": "breaking release with migration notes",
+      "failure_budget": "network/provider outages must not make local Docs MCP unhealthy; shared security and storage regressions block release"
+    },
+    {
+      "id": "mcp:docs/list_docs_sources",
+      "kind": "mcp_tool",
+      "tier": "maintenance-only",
+      "owner": "DocAtlas maintainers",
+      "docs": "docs/support-surface-policy.md",
+      "test_tier": "shared-security",
+      "network_dependencies": [],
+      "compatibility": "best effort; no core availability guarantee",
+      "removal_rule": "breaking release with migration notes",
+      "failure_budget": "network/provider outages must not make local Docs MCP unhealthy; shared security and storage regressions block release"
+    },
+    {
+      "id": "mcp:docs/list_library_docs",
+      "kind": "mcp_tool",
+      "tier": "maintenance-only",
+      "owner": "DocAtlas maintainers",
+      "docs": "docs/support-surface-policy.md",
+      "test_tier": "shared-security",
+      "network_dependencies": [],
+      "compatibility": "best effort; no core availability guarantee",
+      "removal_rule": "breaking release with migration notes",
+      "failure_budget": "network/provider outages must not make local Docs MCP unhealthy; shared security and storage regressions block release"
+    },
+    {
+      "id": "mcp:docs/prefetch_docs_manifest",
+      "kind": "mcp_tool",
+      "tier": "maintenance-only",
+      "owner": "DocAtlas maintainers",
+      "docs": "docs/support-surface-policy.md",
+      "test_tier": "shared-security",
+      "network_dependencies": [
+        "optional_remote_service"
+      ],
+      "compatibility": "best effort; no core availability guarantee",
+      "removal_rule": "breaking release with migration notes",
+      "failure_budget": "network/provider outages must not make local Docs MCP unhealthy; shared security and storage regressions block release"
+    },
+    {
+      "id": "mcp:docs/prefetch_docs_targets",
+      "kind": "mcp_tool",
+      "tier": "maintenance-only",
+      "owner": "DocAtlas maintainers",
+      "docs": "docs/support-surface-policy.md",
+      "test_tier": "shared-security",
+      "network_dependencies": [
+        "optional_remote_service"
+      ],
+      "compatibility": "best effort; no core availability guarantee",
+      "removal_rule": "breaking release with migration notes",
+      "failure_budget": "network/provider outages must not make local Docs MCP unhealthy; shared security and storage regressions block release"
+    },
+    {
+      "id": "mcp:docs/prefetch_library_docs",
+      "kind": "mcp_tool",
+      "tier": "maintenance-only",
+      "owner": "DocAtlas maintainers",
+      "docs": "docs/support-surface-policy.md",
+      "test_tier": "shared-security",
+      "network_dependencies": [
+        "optional_remote_service"
+      ],
+      "compatibility": "best effort; no core availability guarantee",
+      "removal_rule": "breaking release with migration notes",
+      "failure_budget": "network/provider outages must not make local Docs MCP unhealthy; shared security and storage regressions block release"
+    },
+    {
+      "id": "mcp:docs/prefetch_project_dependency_docs",
+      "kind": "mcp_tool",
+      "tier": "maintenance-only",
+      "owner": "DocAtlas maintainers",
+      "docs": "docs/support-surface-policy.md",
+      "test_tier": "shared-security",
+      "network_dependencies": [
+        "optional_remote_service"
+      ],
+      "compatibility": "best effort; no core availability guarantee",
+      "removal_rule": "breaking release with migration notes",
+      "failure_budget": "network/provider outages must not make local Docs MCP unhealthy; shared security and storage regressions block release"
+    },
+    {
+      "id": "mcp:docs/prefetch_project_docs",
+      "kind": "mcp_tool",
+      "tier": "deprecated",
+      "owner": "DocAtlas maintainers",
+      "docs": "docs/support-surface-policy.md",
+      "test_tier": "shared-security",
+      "network_dependencies": [
+        "optional_remote_service"
+      ],
+      "compatibility": "compatibility only until the bounded deadline",
+      "removal_rule": "remove in the next planned breaking release after warning period",
+      "failure_budget": "network/provider outages must not make local Docs MCP unhealthy; shared security and storage regressions block release",
+      "deprecation": {
+        "deadline": "2.0.0",
+        "resolution": "deadline_extended"
+      }
+    },
+    {
+      "id": "mcp:docs/prepare_docs",
+      "kind": "mcp_tool",
+      "tier": "core",
+      "owner": "DocAtlas maintainers",
+      "docs": "docs/mcp-docs-server.md",
+      "test_tier": "core-offline",
+      "network_dependencies": [],
+      "compatibility": "stable within the current major release",
+      "removal_rule": "breaking release with migration notes",
+      "failure_budget": "blocks release and local Docs health"
+    },
+    {
+      "id": "mcp:docs/prune_library_docs",
+      "kind": "mcp_tool",
+      "tier": "maintenance-only",
+      "owner": "DocAtlas maintainers",
+      "docs": "docs/support-surface-policy.md",
+      "test_tier": "shared-security",
+      "network_dependencies": [],
+      "compatibility": "best effort; no core availability guarantee",
+      "removal_rule": "breaking release with migration notes",
+      "failure_budget": "network/provider outages must not make local Docs MCP unhealthy; shared security and storage regressions block release"
+    },
+    {
+      "id": "mcp:docs/refresh_library_docs",
+      "kind": "mcp_tool",
+      "tier": "maintenance-only",
+      "owner": "DocAtlas maintainers",
+      "docs": "docs/support-surface-policy.md",
+      "test_tier": "shared-security",
+      "network_dependencies": [
+        "optional_remote_service"
+      ],
+      "compatibility": "best effort; no core availability guarantee",
+      "removal_rule": "breaking release with migration notes",
+      "failure_budget": "network/provider outages must not make local Docs MCP unhealthy; shared security and storage regressions block release"
+    },
+    {
+      "id": "mcp:docs/remove_library_docs",
+      "kind": "mcp_tool",
+      "tier": "maintenance-only",
+      "owner": "DocAtlas maintainers",
+      "docs": "docs/support-surface-policy.md",
+      "test_tier": "shared-security",
+      "network_dependencies": [],
+      "compatibility": "best effort; no core availability guarantee",
+      "removal_rule": "breaking release with migration notes",
+      "failure_budget": "network/provider outages must not make local Docs MCP unhealthy; shared security and storage regressions block release"
+    },
+    {
+      "id": "mcp:docs/resolve_library_id",
+      "kind": "mcp_tool",
+      "tier": "maintenance-only",
+      "owner": "DocAtlas maintainers",
+      "docs": "docs/support-surface-policy.md",
+      "test_tier": "shared-security",
+      "network_dependencies": [],
+      "compatibility": "best effort; no core availability guarantee",
+      "removal_rule": "breaking release with migration notes",
+      "failure_budget": "network/provider outages must not make local Docs MCP unhealthy; shared security and storage regressions block release"
+    },
+    {
+      "id": "mcp:docs/sync_project_docs",
+      "kind": "mcp_tool",
+      "tier": "maintenance-only",
+      "owner": "DocAtlas maintainers",
+      "docs": "docs/support-surface-policy.md",
+      "test_tier": "shared-security",
+      "network_dependencies": [],
+      "compatibility": "best effort; no core availability guarantee",
+      "removal_rule": "breaking release with migration notes",
+      "failure_budget": "network/provider outages must not make local Docs MCP unhealthy; shared security and storage regressions block release"
+    },
+    {
+      "id": "mcp:docs/validate_docs_manifest",
+      "kind": "mcp_tool",
+      "tier": "maintenance-only",
+      "owner": "DocAtlas maintainers",
+      "docs": "docs/support-surface-policy.md",
+      "test_tier": "shared-security",
+      "network_dependencies": [],
+      "compatibility": "best effort; no core availability guarantee",
+      "removal_rule": "breaking release with migration notes",
+      "failure_budget": "network/provider outages must not make local Docs MCP unhealthy; shared security and storage regressions block release"
+    },
+    {
+      "id": "mcp:docs/validate_patch_against_constraints",
+      "kind": "mcp_tool",
+      "tier": "advanced-supported",
+      "owner": "DocAtlas maintainers",
+      "docs": "docs/support-surface-policy.md",
+      "test_tier": "shared-security",
+      "network_dependencies": [],
+      "compatibility": "stable within the current major release",
+      "removal_rule": "breaking release with migration notes",
+      "failure_budget": "network/provider outages must not make local Docs MCP unhealthy; shared security and storage regressions block release"
+    },
+    {
+      "id": "service:browser-fetcher",
+      "kind": "service",
+      "tier": "advanced-supported",
+      "owner": "DocAtlas maintainers",
+      "docs": "docs/support-surface-policy.md",
+      "test_tier": "advanced-offline",
+      "network_dependencies": [
+        "optional_remote_service"
+      ],
+      "compatibility": "stable within the current major release",
+      "removal_rule": "breaking release with migration notes",
+      "failure_budget": "network/provider outages must not make local Docs MCP unhealthy; shared security and storage regressions block release"
+    },
+    {
+      "id": "service:crawl4ai-fetcher",
+      "kind": "service",
+      "tier": "advanced-supported",
+      "owner": "DocAtlas maintainers",
+      "docs": "docs/support-surface-policy.md",
+      "test_tier": "advanced-offline",
+      "network_dependencies": [
+        "optional_remote_service"
+      ],
+      "compatibility": "stable within the current major release",
+      "removal_rule": "breaking release with migration notes",
+      "failure_budget": "network/provider outages must not make local Docs MCP unhealthy; shared security and storage regressions block release"
+    },
+    {
+      "id": "service:mcp-packs-runtime",
+      "kind": "service",
+      "tier": "advanced-supported",
+      "owner": "DocAtlas maintainers",
+      "docs": "docs/support-surface-policy.md",
+      "test_tier": "advanced-offline",
+      "network_dependencies": [
+        "optional_remote_service"
+      ],
+      "compatibility": "stable within the current major release",
+      "removal_rule": "breaking release with migration notes",
+      "failure_budget": "network/provider outages must not make local Docs MCP unhealthy; shared security and storage regressions block release"
+    },
+    {
+      "id": "service:qdrant-store",
+      "kind": "service",
+      "tier": "core",
+      "owner": "DocAtlas maintainers",
+      "docs": "docs/support-surface-policy.md",
+      "test_tier": "core-offline",
+      "network_dependencies": [],
+      "compatibility": "stable within the current major release",
+      "removal_rule": "breaking release with migration notes",
+      "failure_budget": "default store contracts and shared storage/security regressions block release; external download availability does not make local Docs unhealthy"
+    },
+    {
+      "id": "service:sqlite-vec-store",
+      "kind": "service",
+      "tier": "core",
+      "owner": "DocAtlas maintainers",
+      "docs": "docs/support-surface-policy.md",
+      "test_tier": "core-offline",
+      "network_dependencies": [],
+      "compatibility": "stable within the current major release",
+      "removal_rule": "breaking release with migration notes",
+      "failure_budget": "blocks release and local Docs health"
+    },
+    {
+      "id": "service:uspto-ingestion",
+      "kind": "service",
+      "tier": "maintenance-only",
+      "owner": "DocAtlas maintainers",
+      "docs": "docs/support-surface-policy.md",
+      "test_tier": "advanced-offline",
+      "network_dependencies": [
+        "optional_remote_service"
+      ],
+      "compatibility": "best effort; no core availability guarantee",
+      "removal_rule": "breaking release with migration notes",
+      "failure_budget": "network/provider outages must not make local Docs MCP unhealthy; shared security and storage regressions block release"
+    },
+    {
+      "id": "service:web-fetch-pipeline",
+      "kind": "service",
+      "tier": "core",
+      "owner": "DocAtlas maintainers",
+      "docs": "docs/support-surface-policy.md",
+      "test_tier": "core-offline",
+      "network_dependencies": [
+        "optional_remote_service"
+      ],
+      "compatibility": "stable within the current major release",
+      "removal_rule": "breaking release with migration notes",
+      "failure_budget": "offline fetch policy, typed errors, and security regressions block release; remote source outages do not make local Docs unhealthy"
+    },
+    {"id":"connector:crawl4ai","kind":"connector","tier":"advanced-supported","owner":"DocAtlas maintainers","docs":"docs/support-surface-policy.md","test_tier":"advanced-offline","network_dependencies":["remote_documentation_source"],"compatibility":"stable within the current major release","removal_rule":"breaking release with migration notes","failure_budget":"network/provider outages must not make local Docs MCP unhealthy; shared security and storage regressions block release"},
+    {"id":"connector:gitbook","kind":"connector","tier":"advanced-supported","owner":"DocAtlas maintainers","docs":"docs/support-surface-policy.md","test_tier":"advanced-offline","network_dependencies":["remote_documentation_source"],"compatibility":"stable within the current major release","removal_rule":"breaking release with migration notes","failure_budget":"remote source outages do not make local Docs MCP unhealthy; offline fetch policy and shared security regressions block release"},
+    {"id":"connector:github","kind":"connector","tier":"advanced-supported","owner":"DocAtlas maintainers","docs":"docs/support-surface-policy.md","test_tier":"advanced-offline","network_dependencies":["remote_documentation_source"],"compatibility":"stable within the current major release","removal_rule":"breaking release with migration notes","failure_budget":"remote source outages do not make local Docs MCP unhealthy; offline fetch policy and shared security regressions block release"},
+    {"id":"connector:llms-txt","kind":"connector","tier":"advanced-supported","owner":"DocAtlas maintainers","docs":"docs/support-surface-policy.md","test_tier":"advanced-offline","network_dependencies":["remote_documentation_source"],"compatibility":"stable within the current major release","removal_rule":"breaking release with migration notes","failure_budget":"remote source outages do not make local Docs MCP unhealthy; offline fetch policy and shared security regressions block release"},
+    {"id":"connector:mintlify","kind":"connector","tier":"advanced-supported","owner":"DocAtlas maintainers","docs":"docs/support-surface-policy.md","test_tier":"advanced-offline","network_dependencies":["remote_documentation_source"],"compatibility":"stable within the current major release","removal_rule":"breaking release with migration notes","failure_budget":"remote source outages do not make local Docs MCP unhealthy; offline fetch policy and shared security regressions block release"},
+    {"id":"connector:web","kind":"connector","tier":"advanced-supported","owner":"DocAtlas maintainers","docs":"docs/support-surface-policy.md","test_tier":"advanced-offline","network_dependencies":["remote_documentation_source"],"compatibility":"stable within the current major release","removal_rule":"breaking release with migration notes","failure_budget":"remote source outages do not make local Docs MCP unhealthy; offline fetch policy and shared security regressions block release"},
+    {"id":"connector:uspto-tm","kind":"connector","tier":"maintenance-only","owner":"DocAtlas maintainers","docs":"docs/support-surface-policy.md","test_tier":"advanced-offline","network_dependencies":["USPTO source files or service"],"compatibility":"best effort; no core availability guarantee","removal_rule":"breaking release with migration notes","failure_budget":"network/provider outages must not make local Docs MCP unhealthy; shared security and storage regressions block release"},
+    {"id":"store:sqlite-vec","kind":"store","tier":"core","owner":"DocAtlas maintainers","docs":"docs/support-surface-policy.md","test_tier":"core-offline","network_dependencies":[],"compatibility":"stable within the current major release","removal_rule":"breaking release with migration notes","failure_budget":"blocks release and local Docs health"},
+    {"id":"store:qdrant","kind":"store","tier":"core","owner":"DocAtlas maintainers","docs":"docs/support-surface-policy.md","test_tier":"core-offline","network_dependencies":[],"compatibility":"stable within the current major release","removal_rule":"breaking release with migration notes","failure_budget":"default store contracts and shared storage/security regressions block release; external download availability does not make local Docs unhealthy"},
+    {"id":"mcp-resource:docmancer://agent/quickstart","kind":"mcp_resource","tier":"core","owner":"DocAtlas maintainers","docs":"docs/mcp-docs-server.md","test_tier":"core-offline","network_dependencies":[],"compatibility":"stable within the current major release","removal_rule":"breaking release with migration notes","failure_budget":"blocks release and local Docs health"},
+    {"id":"mcp-resource:docmancer://workflow/project-docs","kind":"mcp_resource","tier":"core","owner":"DocAtlas maintainers","docs":"docs/mcp-docs-server.md","test_tier":"core-offline","network_dependencies":[],"compatibility":"stable within the current major release","removal_rule":"breaking release with migration notes","failure_budget":"blocks release and local Docs health"},
+    {"id":"mcp-resource:docmancer://agent/tool-selection","kind":"mcp_resource","tier":"core","owner":"DocAtlas maintainers","docs":"docs/mcp-docs-server.md","test_tier":"core-offline","network_dependencies":[],"compatibility":"stable within the current major release","removal_rule":"breaking release with migration notes","failure_budget":"blocks release and local Docs health"},
+    {"id":"mcp-resource:docmancer://schema/trust-contract","kind":"mcp_resource","tier":"core","owner":"DocAtlas maintainers","docs":"docs/mcp-docs-server.md","test_tier":"core-offline","network_dependencies":[],"compatibility":"schema-versioned","removal_rule":"breaking release with migration notes","failure_budget":"blocks release and local Docs health"},
+    {"id":"mcp-resource:docmancer://workflow/library-docs","kind":"mcp_resource","tier":"core","owner":"DocAtlas maintainers","docs":"docs/mcp-docs-server.md","test_tier":"core-offline","network_dependencies":[],"compatibility":"stable within the current major release","removal_rule":"breaking release with migration notes","failure_budget":"blocks release and local Docs health"},
+    {"id":"mcp-template:docmancer://workflow/project-docs/{project_path}","kind":"mcp_template","tier":"core","owner":"DocAtlas maintainers","docs":"docs/mcp-docs-server.md","test_tier":"core-offline","network_dependencies":[],"compatibility":"stable within the current major release","removal_rule":"breaking release with migration notes","failure_budget":"blocks release and local Docs health"},
+    {"id":"mcp-template:docmancer://library/{ecosystem}/{library}/{version}","kind":"mcp_template","tier":"core","owner":"DocAtlas maintainers","docs":"docs/mcp-docs-server.md","test_tier":"core-offline","network_dependencies":[],"compatibility":"stable within the current major release","removal_rule":"breaking release with migration notes","failure_budget":"blocks release and local Docs health"},
+    {"id":"mcp-packs:docmancer_search_tools","kind":"mcp_dynamic","tier":"advanced-supported","owner":"DocAtlas maintainers","docs":"wiki/MCP-Packs.md","test_tier":"advanced-offline","network_dependencies":[],"compatibility":"stable within the current major release","removal_rule":"breaking release with migration notes","failure_budget":"Packs failure must not make local Docs MCP unhealthy; shared security regressions block release"},
+    {"id":"mcp-packs:docmancer_call_tool","kind":"mcp_dynamic","tier":"advanced-supported","owner":"DocAtlas maintainers","docs":"wiki/MCP-Packs.md","test_tier":"advanced-offline","network_dependencies":[],"compatibility":"stable within the current major release","removal_rule":"breaking release with migration notes","failure_budget":"Packs failure must not make local Docs MCP unhealthy; shared security regressions block release"},
+    {"id":"mcp-packs:dynamic-namespace","kind":"mcp_dynamic","tier":"advanced-supported","owner":"DocAtlas maintainers","docs":"wiki/MCP-Packs.md","test_tier":"advanced-offline","network_dependencies":["configured pack providers"],"compatibility":"pack manifest and schema versioning","removal_rule":"breaking release with migration notes","failure_budget":"Packs failure must not make local Docs MCP unhealthy; shared security regressions block release"}
+  ]
+}

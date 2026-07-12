@@ -686,6 +686,6 @@ def handle_project_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
         result = dependency_docs_app.prefetch_project_dependency_docs if name == "prefetch_project_dependency_docs" else dependency_docs_app.prefetch_project_docs
         payload = asdict(result(args["project_path"], include_flutter=bool(args.get("include_flutter") if args.get("include_flutter") is not None else True), include_dart=bool(args.get("include_dart") or False), include_rust=bool(args.get("include_rust") if args.get("include_rust") is not None else True), include_packages=args.get("include_packages") or [], force_refresh=bool(args.get("force_refresh") or False), continue_on_error=bool(args.get("continue_on_error") if args.get("continue_on_error") is not None else True), async_=bool(args.get("async") or False)))
         if name == "prefetch_project_docs":
-            payload.setdefault("warnings", []).append({"code": "deprecated_tool_alias", "message": "Use prefetch_project_dependency_docs instead; this alias will be removed in a future release."})
+            payload.setdefault("warnings", []).append({"code": "deprecated_tool_alias", "message": "Use prefetch_project_dependency_docs instead; this compatibility alias is scheduled for removal in 2.0.0."})
         return payload
     return None

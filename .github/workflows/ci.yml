@@ -8,6 +8,7 @@ on:
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+  DOCMANCER_OFFLINE: "1"
 
 jobs:
   docs-impact:
@@ -56,5 +57,22 @@ jobs:
       - name: Install dependencies
         run: pip install -e ".[dev]"
 
-      - name: Run tests
-        run: pytest tests/ -v
+      - name: Run offline core tests
+        run: pytest tests/ -m "not advanced and not live and not live_network" -v
+
+  advanced-contract:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -e ".[dev]"
+
+      - name: Run offline advanced contract and shared-security tests
+        run: pytest tests/ -m advanced -v

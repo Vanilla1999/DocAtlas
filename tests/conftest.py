@@ -23,6 +23,8 @@ os.environ.setdefault("DOCMANCER_REGISTRY_API_URL", "http://127.0.0.1:1")
 
 
 def pytest_configure(config):
+    config.addinivalue_line("markers", "advanced: optional advanced/maintenance surface contract test")
+    config.addinivalue_line("markers", "live: optional live provider test; never part of core CI")
     config.addinivalue_line(
         "markers",
         "live_network: allows real network access; skipped unless DOCMANCER_RUN_LIVE_TESTS=1",
@@ -34,6 +36,32 @@ def pytest_configure(config):
 
 
 def pytest_collection_modifyitems(config, items):
+    advanced_modules = {
+        "test_context7_parity_eval.py",
+        "test_eval.py",
+        "test_mcp_cli.py",
+        "test_mcp_dispatcher.py",
+        "test_mcp_executor_extras.py",
+        "test_mcp_python_executor.py",
+        "test_openai_embeddings.py",
+        "test_patch_review_command.py",
+        "test_qdrant_manager.py",
+        "test_uspto_tm.py",
+    }
+    advanced_prefixes = (
+        "test_mcp_patch_",
+        "test_patch_constraint_",
+        "test_patch_constraints_",
+    )
+    for item in items:
+        if item.get_closest_marker("live_network"):
+            item.add_marker(pytest.mark.live)
+        if (
+            item.path.name in advanced_modules
+            or item.path.name.startswith(advanced_prefixes)
+            or "task_level" in item.path.parts
+        ):
+            item.add_marker(pytest.mark.advanced)
     if os.getenv("DOCMANCER_RUN_LIVE_TESTS") == "1":
         return
     skip = pytest.mark.skip(reason="live network tests require DOCMANCER_RUN_LIVE_TESTS=1")
