@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 import random
 import re
 from collections import Counter, defaultdict
@@ -64,6 +65,38 @@ def validate_protocol(protocol: dict[str, Any]) -> list[str]:
     if protocol.get("decision_rule") != PREDECLARED_DECISION_RULE:
         errors.append("predeclared_decision_rule_mismatch")
     return errors
+
+
+def apply_protocol_amendment(protocol: dict[str, Any], amendment: dict[str, Any]) -> dict[str, Any]:
+    """Apply a screening-only task replacement without permitting rule drift."""
+    if amendment.get("schema_version") != "task23-protocol-amendment-1":
+        raise ValueError("schema_version")
+    if amendment.get("base_protocol_id") != protocol.get("protocol_id"):
+        raise ValueError("base_protocol_id")
+    for field in ("frozen_before_replacement_results", "conditions_unchanged", "decision_rule_unchanged"):
+        if amendment.get(field) is not True:
+            raise ValueError(field)
+    if amendment.get("reason") != "predeclared_screening_exclusion":
+        raise ValueError("reason")
+    if amendment.get("excluded_screening_status") not in {"rejected_too_easy", "rejected_invalid"}:
+        raise ValueError("excluded_screening_status")
+
+    excluded = amendment.get("excluded_task_id")
+    tasks = list(protocol.get("tasks", []))
+    if sum(task.get("task_id") == excluded for task in tasks) != 1:
+        raise ValueError("excluded_task_id")
+    replacement = amendment.get("replacement_task")
+    if not isinstance(replacement, dict):
+        raise ValueError("replacement_task")
+
+    effective = copy.deepcopy(protocol)
+    effective["tasks"] = [task for task in tasks if task.get("task_id") != excluded] + [copy.deepcopy(replacement)]
+    errors = validate_protocol(effective)
+    if errors:
+        raise ValueError("invalid_effective_protocol:" + ",".join(errors))
+    effective["amendment_id"] = amendment.get("amendment_id")
+    effective["base_protocol_id"] = protocol.get("protocol_id")
+    return effective
 
 
 def evaluate_predeclared_rule(

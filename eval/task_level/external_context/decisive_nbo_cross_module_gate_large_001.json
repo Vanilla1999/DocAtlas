@@ -1,0 +1,10 @@
+{
+  "schema_version": "audited-external-context-1",
+  "task_id": "decisive_nbo_cross_module_gate_large_001",
+  "library": "permission_handler",
+  "version": "11.4.0",
+  "source_url": "https://pub.dev/packages/permission_handler/versions/11.4.0",
+  "retrieved_at": "2026-07-13T09:30:00Z",
+  "content_sha256": "045883e5e9e1e0475aba9256deb8053dd9ae4d5554949dc69254c889960cf291",
+  "content": "permission_handler 11.4.0 exposes Permission.status values including granted, denied, restricted, permanentlyDenied, limited, and provisional. Calling request() on a Permission requests it and returns the resulting PermissionStatus; requesting multiple permissions returns a map keyed by Permission. The package documentation distinguishes runtime permission status from associated service status. On Android 10+, locationAlways cannot be requested directly before locationWhenInUse is granted; the foreground permission must be requested first and the background permission requested afterwards."
+}

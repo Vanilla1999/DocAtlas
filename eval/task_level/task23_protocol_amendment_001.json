@@ -1,0 +1,31 @@
+{
+  "schema_version": "task23-protocol-amendment-1",
+  "amendment_id": "task23-replacement-after-screening-001",
+  "base_protocol_id": "task23-real-project-value-token-001",
+  "base_protocol_sha256": "618858e95c3aaa0f6e0d7433e30ffb2dfa37cb64a81b13291fd3142d1319ff76",
+  "frozen_before_replacement_results": true,
+  "reason": "predeclared_screening_exclusion",
+  "screening_run_id": "task23_screening_001",
+  "screening_results_sha256": "6e3cda6c7a998596566008352b00371714e3d9de9906811092089c3c17f91883",
+  "excluded_task_id": "real_project_nbo_flavor_scoped_external_links_001",
+  "excluded_screening_status": "rejected_too_easy",
+  "excluded_repo_only_resolved": 3,
+  "excluded_repo_only_repeats": 3,
+  "replacement_task": {
+    "task_id": "decisive_nbo_cross_module_gate_large_001",
+    "source_project": "nbo",
+    "domain": "mobile-cross-module-permission-gating",
+    "fixture_hash": "603712341cdeffb1332492ccbebeb04b022ddf665b1b305c9827765c69a629df",
+    "oracle_sha256": "7bef2b9e21966f10c12d7ac9d742e61f2b45395b1a8874b98e6f999adcf683a2",
+    "external_context_sha256": "7372ccee933b47ec72a614966b03a62faf0298a9293733ae46e869183c69fcc0"
+  },
+  "replacement_screening": {
+    "condition": "repo_only_strict_offline",
+    "repeats": 3,
+    "accept_if_resolved_at_most": 1
+  },
+  "conditions_unchanged": true,
+  "decision_rule_unchanged": true,
+  "controls_unchanged": true,
+  "scientific_limitation": "The replacement identity was fixed after observing the original candidate's screening exclusion. Thresholds, conditions, runner settings, hashes, and the replacement screening rule remain unchanged; final claims must disclose this amendment."
+}

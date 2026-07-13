@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from eval.task_level.analysis.task23_decision import evaluate_predeclared_rule, validate_protocol
+from eval.task_level.analysis.task23_decision import apply_protocol_amendment, evaluate_predeclared_rule, validate_protocol
 from eval.task_level.fixtures.builder import fixture_hash
 
 
@@ -88,6 +88,82 @@ def test_frozen_protocol_matches_fixture_oracle_and_context_artifacts():
             ("external_context_sha256", PROJECT_ROOT / "eval/task_level/external_context" / f"{task_id}.json"),
         ):
             assert hashlib.sha256(path.read_bytes()).hexdigest() == task[field]
+
+
+def test_protocol_amendment_replaces_only_screening_rejection_without_changing_rules():
+    protocol = _protocol()
+    protocol["protocol_id"] = "task23-test"
+    amendment = {
+        "schema_version": "task23-protocol-amendment-1",
+        "base_protocol_id": "task23-test",
+        "frozen_before_replacement_results": True,
+        "reason": "predeclared_screening_exclusion",
+        "excluded_task_id": "task_1",
+        "excluded_screening_status": "rejected_too_easy",
+        "replacement_task": {
+            "task_id": "task_replacement",
+            "source_project": "project_replacement",
+            "domain": "domain_replacement",
+            "fixture_hash": "d" * 64,
+            "oracle_sha256": "e" * 64,
+            "external_context_sha256": "f" * 64,
+        },
+        "conditions_unchanged": True,
+        "decision_rule_unchanged": True,
+    }
+
+    effective = apply_protocol_amendment(protocol, amendment)
+
+    assert [task["task_id"] for task in effective["tasks"]] == ["task_2", "task_3", "task_replacement"]
+    assert effective["conditions"] == protocol["conditions"]
+    assert effective["decision_rule"] == protocol["decision_rule"]
+
+
+def test_checked_in_protocol_amendment_matches_replacement_artifacts():
+    protocol_path = PROJECT_ROOT / "eval/task_level/task23_protocol.json"
+    amendment_path = PROJECT_ROOT / "eval/task_level/task23_protocol_amendment_001.json"
+    protocol = json.loads(protocol_path.read_text())
+    amendment = json.loads(amendment_path.read_text())
+
+    assert amendment["base_protocol_sha256"] == hashlib.sha256(protocol_path.read_bytes()).hexdigest()
+    screening = PROJECT_ROOT / "eval/task_level/task23_screening_001.json"
+    assert amendment["screening_results_sha256"] == hashlib.sha256(screening.read_bytes()).hexdigest()
+
+    effective = apply_protocol_amendment(protocol, amendment)
+    replacement = amendment["replacement_task"]
+    task_id = replacement["task_id"]
+    assert fixture_hash(PROJECT_ROOT / "eval/task_level/fixtures/templates" / task_id) == replacement["fixture_hash"]
+    assert hashlib.sha256((PROJECT_ROOT / "eval/task_level/oracles" / f"{task_id}.patch").read_bytes()).hexdigest() == replacement["oracle_sha256"]
+    assert hashlib.sha256((PROJECT_ROOT / "eval/task_level/external_context" / f"{task_id}.json").read_bytes()).hexdigest() == replacement["external_context_sha256"]
+    assert task_id in {task["task_id"] for task in effective["tasks"]}
+
+
+@pytest.mark.parametrize("field", ["conditions_unchanged", "decision_rule_unchanged", "frozen_before_replacement_results"])
+def test_protocol_amendment_fails_closed_when_frozen_rules_can_drift(field: str):
+    protocol = _protocol()
+    protocol["protocol_id"] = "task23-test"
+    amendment = {
+        "schema_version": "task23-protocol-amendment-1",
+        "base_protocol_id": "task23-test",
+        "frozen_before_replacement_results": True,
+        "reason": "predeclared_screening_exclusion",
+        "excluded_task_id": "task_1",
+        "excluded_screening_status": "rejected_too_easy",
+        "replacement_task": {
+            "task_id": "task_replacement",
+            "source_project": "project_replacement",
+            "domain": "domain_replacement",
+            "fixture_hash": "d" * 64,
+            "oracle_sha256": "e" * 64,
+            "external_context_sha256": "f" * 64,
+        },
+        "conditions_unchanged": True,
+        "decision_rule_unchanged": True,
+    }
+    amendment[field] = False
+
+    with pytest.raises(ValueError, match=field):
+        apply_protocol_amendment(protocol, amendment)
 
 
 def test_protocol_rejects_lane_or_control_drift():

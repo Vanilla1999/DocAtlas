@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import shutil
 import subprocess
 import time
@@ -102,11 +103,26 @@ class CodexRunner:
 
         finished_at = datetime.now(timezone.utc).isoformat()
         wall = round(time.monotonic() - started, 4)
-        stdout_path.write_text(_redact(stdout), encoding="utf-8")
-        stderr_path.write_text(_redact(stderr), encoding="utf-8")
-        events_path.write_text(_redact(stdout), encoding="utf-8")
-        normalized, tool_calls, input_tokens, output_tokens = _normalize_jsonl(stdout)
+        sanitized_stdout = _redact(stdout)
+        sanitized_stderr = _redact(stderr)
+        stdout_path.write_text(sanitized_stdout, encoding="utf-8")
+        stderr_path.write_text(sanitized_stderr, encoding="utf-8")
+        events_path.write_text(sanitized_stdout, encoding="utf-8")
+        normalized, tool_calls, input_tokens, output_tokens = _normalize_jsonl(sanitized_stdout)
         normalized_path.write_text(json.dumps(normalized, indent=2, sort_keys=True), encoding="utf-8")
+        (request.output_dir / "sanitization_report.json").write_text(
+            json.dumps(
+                {
+                    "schema_version": "task-trace-sanitizer-1",
+                    "stdout_changed": sanitized_stdout != stdout,
+                    "stderr_changed": sanitized_stderr != stderr,
+                    "normalized_from_sanitized_events": True,
+                },
+                indent=2,
+                sort_keys=True,
+            ),
+            encoding="utf-8",
+        )
 
         return AgentRunOutput(
             status=status,
@@ -232,4 +248,6 @@ def _redact(text: str) -> str:
     for key, value in os.environ.items():
         if any(marker in key.upper() for marker in ("KEY", "TOKEN", "SECRET", "PASSWORD")) and value:
             redacted = redacted.replace(value, "<redacted>")
+    redacted = re.sub(r"/(?:home|tmp)/[^\s\"']+", "<path>", redacted)
+    redacted = re.sub(r"https?://[^/@\s:]+:[^/@\s]+@", "https://<redacted>@", redacted)
     return redacted

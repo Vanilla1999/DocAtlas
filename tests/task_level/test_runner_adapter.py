@@ -10,6 +10,7 @@ import pytest
 from eval.task_level.execution import capture_patch, run_canary
 from eval.task_level.runners.base import AgentRunOutput, AgentRunRequest
 from eval.task_level.runners.claude import ClaudeRunner
+from eval.task_level.runners.codex import _normalize_jsonl, _redact
 from eval.task_level.runners.opencode import _normalize_events, _write_opencode_config
 
 
@@ -78,6 +79,25 @@ def test_missing_token_metrics_remain_null(tmp_path: Path):
     assert result["status"] == "passed"
     output = MockRunner().run
     assert output is not None
+
+
+def test_codex_normalized_trajectory_uses_sanitized_events(monkeypatch: pytest.MonkeyPatch):
+    monkeypatch.setenv("PRIVATE_TOKEN", "super-secret-value")
+    raw = json.dumps({
+        "type": "item.completed",
+        "item": {
+            "type": "command_execution",
+            "command": "inspect /home/alice/private/project with super-secret-value",
+        },
+    })
+
+    normalized, _calls, _input, _output = _normalize_jsonl(_redact(raw))
+    serialized = json.dumps(normalized)
+
+    assert "super-secret-value" not in serialized
+    assert "/home/alice/private/project" not in serialized
+    assert "<redacted>" in serialized
+    assert "<path>" in serialized
 
 
 def test_opencode_normalizes_json_events_for_policy_audit():
