@@ -1,0 +1,10 @@
+{
+  "schema_version": "audited-external-context-1",
+  "task_id": "real_project_help_chat_linearizable_module_lifecycle_001",
+  "library": "get_it",
+  "version": "7.2.0",
+  "source_url": "https://pub.dev/packages/get_it/versions/7.2.0",
+  "retrieved_at": "2026-07-13T00:00:00Z",
+  "content_sha256": "5d081a96cfdc6150003a42ebb9e3fbc27a7bcba93834e5098070e3fa5be10f8b",
+  "content": "Pinned get_it 7.2.0 contract (audited excerpt): registering the same type more than once is rejected unless explicit reassignment is enabled. isRegistered and unregister operate on one registration; unregister may run asynchronous disposal and callers should await it. GetIt.reset clears every registration in the global locator and therefore is unsafe for an embedded package that shares GetIt.instance with its host. This snapshot describes exact-version lifecycle semantics without prescribing a synchronization implementation."
+}

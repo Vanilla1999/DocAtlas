@@ -1,0 +1,30 @@
+diff --git a/android/app/src/tanderStore/AndroidManifest.xml b/android/app/src/tanderStore/AndroidManifest.xml
+--- a/android/app/src/tanderStore/AndroidManifest.xml
++++ b/android/app/src/tanderStore/AndroidManifest.xml
+@@ -1 +1 @@
+-<manifest xmlns:android="http://schemas.android.com/apk/res/android"><application><activity android:name=".MainActivity" android:exported="true" android:launchMode="singleTask"><meta-data android:name="flutter_deeplinking_enabled" android:value="false"/><intent-filter><action android:name="com.example.enterprise.SDK"/><category android:name="android.intent.category.DEFAULT"/></intent-filter><intent-filter><action android:name="com.example.enterprise.OPEN"/><category android:name="android.intent.category.DEFAULT"/></intent-filter><intent-filter><action android:name="android.intent.action.VIEW"/><category android:name="android.intent.category.DEFAULT"/><category android:name="android.intent.category.BROWSABLE"/><data android:scheme="http"/><data android:scheme="https"/></intent-filter></activity></application></manifest>
++<manifest xmlns:android="http://schemas.android.com/apk/res/android"><application><activity android:name=".MainActivity" android:exported="true" android:launchMode="singleTask"><meta-data android:name="flutter_deeplinking_enabled" android:value="false"/><intent-filter><action android:name="com.example.enterprise.SDK"/><category android:name="android.intent.category.DEFAULT"/></intent-filter><intent-filter><action android:name="com.example.enterprise.OPEN"/><category android:name="android.intent.category.DEFAULT"/></intent-filter><intent-filter><action android:name="android.intent.action.VIEW"/><category android:name="android.intent.category.DEFAULT"/><category android:name="android.intent.category.BROWSABLE"/></intent-filter></activity></application></manifest>
+
+diff --git a/lib/app/domain/services/external_browser_intent_service.dart b/lib/app/domain/services/external_browser_intent_service.dart
+--- a/lib/app/domain/services/external_browser_intent_service.dart
++++ b/lib/app/domain/services/external_browser_intent_service.dart
+@@ -5,11 +5,16 @@
+ 
+   Future<Uri?> getInitialExternalUrl() async {
+     final uri = await _appLinks.getInitialLink();
+-    if (uri == null || !_isHttpUri(uri)) return null;
++    if (!_isValidHttpUri(uri)) return null;
+     return uri;
+   }
+ 
+-  Stream<Uri> get externalUrlStream => _appLinks.uriLinkStream.where(_isHttpUri);
++  Stream<Uri> get externalUrlStream => _appLinks.uriLinkStream.where(_isValidHttpUri);
+ 
+-  bool _isHttpUri(Uri uri) => uri.scheme == 'http' || uri.scheme == 'https';
++  bool _isValidHttpUri(Uri? uri) {
++    if (uri == null) return false;
++    if (uri.scheme != 'http' && uri.scheme != 'https') return false;
++    if (uri.host.isEmpty) return false;
++    return true;
++  }
+ }

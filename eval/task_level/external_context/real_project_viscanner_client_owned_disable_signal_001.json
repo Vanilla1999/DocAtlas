@@ -1,0 +1,10 @@
+{
+  "schema_version": "audited-external-context-1",
+  "task_id": "real_project_viscanner_client_owned_disable_signal_001",
+  "library": "Android AIDL",
+  "version": "Android 14",
+  "source_url": "https://developer.android.com/develop/background-work/services/aidl",
+  "retrieved_at": "2026-07-13T00:00:00Z",
+  "content_sha256": "98ed1ba1697112c39951ca1310387a17bf2ba765da015621ba562433e247fb5a",
+  "content": "Audited Android AIDL contract excerpt: methods declared in an AIDL interface are implemented by the generated Stub boundary, and callbacks can be added to the client listener when supported consumers are rebuilt together. Binder callbacks should remain small and dispatch application work to the intended coroutine/thread boundary. Remote callback failures must not cause the service to retain unrelated audio resources. This platform snapshot supplies boundary semantics; product lifecycle and vendor-beep policy remain project-owned."
+}

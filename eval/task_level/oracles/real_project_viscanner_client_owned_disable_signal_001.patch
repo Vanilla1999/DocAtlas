@@ -1,0 +1,94 @@
+diff --git a/ViScannerAIDL/src/main/aidl/com/example/ViScannerAidl.aidl b/ViScannerAIDL/src/main/aidl/com/example/ViScannerAidl.aidl
+--- a/ViScannerAIDL/src/main/aidl/com/example/ViScannerAidl.aidl
++++ b/ViScannerAIDL/src/main/aidl/com/example/ViScannerAidl.aidl
+@@ -2,4 +2,6 @@
+   void prepare();
+   void pause();
+   void release();
++  void enableScanner();
++  void disableScanner();
+ }
+
+diff --git a/ViScannerAIDL/src/main/aidl/com/example/ScannerListener.aidl b/ViScannerAIDL/src/main/aidl/com/example/ScannerListener.aidl
+--- a/ViScannerAIDL/src/main/aidl/com/example/ScannerListener.aidl
++++ b/ViScannerAIDL/src/main/aidl/com/example/ScannerListener.aidl
+@@ -1,3 +1,4 @@
+ interface ScannerListener {
+   void onScan(String barcode);
++  void onDisabledScanAttempt();
+ }
+
+diff --git a/ViScanner/src/main/kotlin/com/example/ViScanner.kt b/ViScanner/src/main/kotlin/com/example/ViScanner.kt
+--- a/ViScanner/src/main/kotlin/com/example/ViScanner.kt
++++ b/ViScanner/src/main/kotlin/com/example/ViScanner.kt
+@@ -1,9 +1,14 @@
+ object ViScanner {
+   private var needScan = true
++  private var disabledScannerCallback: (() -> Unit)? = null
+   private val callbacks = mutableListOf<(String) -> Unit>()
+   private val scannerListener = object : ScannerListener.Stub() {
+     override fun onScan(barcode: String) {
+       if (needScan) callbacks.toList().forEach { it(barcode) }
+     }
++    override fun onDisabledScanAttempt() { disabledScannerCallback?.invoke() }
+   }
++  fun setDisabledScannerListener(callback: (() -> Unit)?) { disabledScannerCallback = callback }
++  suspend fun enableScanner() { needScan = true; viScannerAidl?.enableScanner() }
++  suspend fun disableScanner() { needScan = false; viScannerAidl?.disableScanner() }
+ }
+
+diff --git a/ViScannerService/src/main/kotlin/com/example/ViScannerService.kt b/ViScannerService/src/main/kotlin/com/example/ViScannerService.kt
+--- a/ViScannerService/src/main/kotlin/com/example/ViScannerService.kt
++++ b/ViScannerService/src/main/kotlin/com/example/ViScannerService.kt
+@@ -3,5 +3,7 @@
+     override fun prepare() { launchMain { Scanner.prepare() } }
+     override fun pause() { launchMain { Scanner.pause() } }
+     override fun release() { launchMain { Scanner.release() } }
++    override fun enableScanner() { launchMain { Scanner.enableScanner() } }
++    override fun disableScanner() { launchMain { Scanner.disableScanner() } }
+   }
+ }
+
+diff --git a/ViScannerService/src/main/kotlin/com/example/Scanner.kt b/ViScannerService/src/main/kotlin/com/example/Scanner.kt
+--- a/ViScannerService/src/main/kotlin/com/example/Scanner.kt
++++ b/ViScannerService/src/main/kotlin/com/example/Scanner.kt
+@@ -1,6 +1,8 @@
+ object Scanner {
+   private var scanner: AbstractScanner? = null
+   suspend fun prepare() = scanner?.prepare()
+-  suspend fun pause() = scanner?.pause()
+-  suspend fun release() = scanner?.release()
++  suspend fun enableScanner() = scanner?.enableScanner()
++  suspend fun disableScanner() = scanner?.disableScanner()
++  suspend fun pause() { scanner?.enableScanner(); scanner?.pause() }
++  suspend fun release() { scanner?.enableScanner(); scanner?.release() }
+ }
+
+diff --git a/ViScannerService/src/main/kotlin/com/example/scanners/AbstractScanner.kt b/ViScannerService/src/main/kotlin/com/example/scanners/AbstractScanner.kt
+--- a/ViScannerService/src/main/kotlin/com/example/scanners/AbstractScanner.kt
++++ b/ViScannerService/src/main/kotlin/com/example/scanners/AbstractScanner.kt
+@@ -1,9 +1,15 @@
++enum class ScannerWorkState { ENABLED, DISABLED }
+ abstract class AbstractScanner {
+   protected var needScan = true
++  protected var scannerWorkState = ScannerWorkState.ENABLED
+   protected var listeners: List<ScannerListener> = emptyList()
+   fun sendBarcodeToClients(barcode: String) {
++    if (scannerWorkState == ScannerWorkState.DISABLED) { listeners.forEach { it.onDisabledScanAttempt() }; return }
+     if (needScan) listeners.forEach { it.onScan(barcode) }
+   }
++  open suspend fun enableScanner() { scannerWorkState = ScannerWorkState.ENABLED; needScan = true; setStandardBeepEnabled(true) }
++  open suspend fun disableScanner() { scannerWorkState = ScannerWorkState.DISABLED; needScan = false; setStandardBeepEnabled(false) }
++  protected open fun setStandardBeepEnabled(enabled: Boolean) {}
+   open suspend fun pause() { needScan = false }
+   open suspend fun release() { needScan = false }
+ }
+
+diff --git a/ViScannerService/src/main/kotlin/com/example/scanners/UrovoScanner.kt b/ViScannerService/src/main/kotlin/com/example/scanners/UrovoScanner.kt
+--- a/ViScannerService/src/main/kotlin/com/example/scanners/UrovoScanner.kt
++++ b/ViScannerService/src/main/kotlin/com/example/scanners/UrovoScanner.kt
+@@ -1,3 +1,4 @@
+ class UrovoScanner : AbstractScanner() {
+   private fun setProperty(name: String, value: String) { /* vendor API */ }
++  override fun setStandardBeepEnabled(enabled: Boolean) { setProperty("decode_beep", if (enabled) "1" else "0") }
+ }

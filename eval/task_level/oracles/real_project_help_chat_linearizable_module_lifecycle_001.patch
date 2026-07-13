@@ -1,0 +1,69 @@
+diff --git a/lib/src/help_request_module.dart b/lib/src/help_request_module.dart
+--- a/lib/src/help_request_module.dart
++++ b/lib/src/help_request_module.dart
+@@ -3,24 +3,56 @@
+ class HelpRequestModule {
+   static final _getIt = GetIt.instance;
+   static bool _isInitialized = false;
++  static Future<void>? _operation;
++  static int _generation = 0;
+ 
+   static Future<void> init({required HelpRequestConfig config, HelpRequestMode mode = HelpRequestMode.live}) async {
++    final current = _operation;
++    if (current != null) {
++      await current;
++      if (isInitialized) return;
++    }
+     if (isInitialized) return;
+-    if (_isInitialized) await reset();
+-    if (mode != HelpRequestMode.mock) {
+-      final token = await config.getToken?.call();
+-      if (token == null) throw StateError('token is null');
++    final generation = _generation;
++    late final Future<void> operation;
++    operation = _initialize(config, mode, generation).whenComplete(() {
++      if (identical(_operation, operation)) _operation = null;
++    });
++    _operation = operation;
++    await operation;
++  }
++
++  static Future<void> _initialize(HelpRequestConfig config, HelpRequestMode mode, int generation) async {
++    try {
++      if (mode != HelpRequestMode.mock) {
++        final token = await config.getToken?.call();
++        if (token == null) throw StateError('token is null');
++      }
++      if (generation != _generation) return;
++      HelpRequestUtils.setConfig(config);
++      _getIt.registerSingleton<HelpRequestMediaService>(DefaultHelpRequestMediaService());
++      initHelpRequestLocator();
++      await initializeDateFormatting();
++      if (generation != _generation) { await _resetOwned(); return; }
++      _isInitialized = true;
++    } catch (_) {
++      await _resetOwned();
++      rethrow;
+     }
+-    HelpRequestUtils.setConfig(config);
+-    _getIt.registerSingleton<HelpRequestMediaService>(DefaultHelpRequestMediaService());
+-    initHelpRequestLocator();
+-    await initializeDateFormatting();
+-    _isInitialized = true;
+   }
+ 
+   static bool get isInitialized => _isInitialized && HelpRequestUtils.isConfigured;
+ 
+   static Future<void> reset() async {
++    _generation++;
++    final current = _operation;
++    if (current != null) {
++      try { await current; } catch (_) { /* cleanup below */ }
++    }
++    await _resetOwned();
++  }
++
++  static Future<void> _resetOwned() async {
+     await resetHelpRequestLocator();
+     if (_getIt.isRegistered<HelpRequestMediaService>()) {
+       await _getIt.unregister<HelpRequestMediaService>();

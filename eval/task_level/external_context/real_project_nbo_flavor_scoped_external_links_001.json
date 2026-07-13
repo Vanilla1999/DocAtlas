@@ -1,0 +1,10 @@
+{
+  "schema_version": "audited-external-context-1",
+  "task_id": "real_project_nbo_flavor_scoped_external_links_001",
+  "library": "app_links",
+  "version": "6.4.1",
+  "source_url": "https://pub.dev/documentation/app_links/6.4.1/",
+  "retrieved_at": "2026-07-13T00:00:00Z",
+  "content_sha256": "761f957ba261b0a2dd6251784d14acc58760fcbec32f10ee60d95758740cb4bc",
+  "content": "Pinned app_links 6.4.1 contract (audited excerpt): AppLinks.getInitialLink returns Future<Uri?> for the link that launched the application. AppLinks.uriLinkStream emits Uri values received while the application is running. Android URL handling is registered with manifest intent filters; Dart stream filtering does not change which applications Android offers as handlers. When Flutter deep-link handling is disabled, the application integration owns delivery consistently. This snapshot supplies API semantics only and does not prescribe project files or a patch."
+}

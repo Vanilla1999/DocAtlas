@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import random
@@ -32,7 +33,22 @@ from eval.task_level.schemas import RESULTS_ROOT, TASK_LEVEL_ROOT, RunMetrics, T
 
 
 RUNTIME_ROOT = TASK_LEVEL_ROOT / "runtime"
-ALLOWED_PATCH_PREFIXES = ("src/", "tests/", "lib/", "README.md", "docs/", "pyproject.toml", "pubspec.yaml", "pubspec.lock")
+ALLOWED_PATCH_PREFIXES = (
+    "src/",
+    "tests/",
+    "lib/",
+    "android/",
+    "example/",
+    "ViScanner/",
+    "ViScannerAIDL/",
+    "ViScannerService/",
+    "README.md",
+    "ARCHITECTURE.md",
+    "docs/",
+    "pyproject.toml",
+    "pubspec.yaml",
+    "pubspec.lock",
+)
 DOCATLAS_CONDITIONS = {
     "docatlas_snippet_first",
     "docatlas_tool_optional",
@@ -45,6 +61,7 @@ DOCATLAS_CONDITIONS = {
     "docatlas_tool_required_once",
 }
 CONTEXT_INJECTION_LIMIT_CHARS = 10000
+AUDITED_EXTERNAL_CONTEXT_ROOT = TASK_LEVEL_ROOT / "external_context"
 
 
 def _estimate_tokens(text: str) -> int:
@@ -127,6 +144,7 @@ def build_tool_policy(condition_id: str, output_dir: Path) -> tuple[Path, Path |
         "inject_docatlas_context": policy.inject_docatlas_context,
         "inject_action_checklist": policy.inject_action_checklist,
         "inject_patch_constraints": policy.inject_patch_constraints,
+        "inject_external_context": policy.inject_external_context,
         "max_constraint_packet_tokens": policy.max_constraint_packet_tokens,
         "max_constraints": policy.max_constraints,
         "max_sources": policy.max_sources,
@@ -136,7 +154,7 @@ def build_tool_policy(condition_id: str, output_dir: Path) -> tuple[Path, Path |
     }, indent=2, sort_keys=True), encoding="utf-8")
 
     mcp_path = output_dir / "mcp_config.json"
-    if condition_id in {"repo_only", "repo_only_strict_offline", "repo_only_web_audited"}:
+    if condition_id in {"repo_only", "repo_only_strict_offline", "repo_only_web_audited", "repo_plus_audited_external_context"}:
         mcp_path.write_text(json.dumps({"mcpServers": {}}, indent=2), encoding="utf-8")
     elif condition_id in DOCATLAS_CONDITIONS:
         mcp_path.write_text(json.dumps({
@@ -352,6 +370,12 @@ def execute_pilot(tasks: list[TaskSpec], conditions: list[str], repeats: int, ru
                         diagnostics = prepare_docatlas(task, workspace, run_output_dir, env)
                         setup_failed = diagnostics.get("status") == "condition_setup_failed"
                     prompt = prompt_template.format(issue_text=task.issue_text) + "\nUse the tools available in this environment when they are useful.\n"
+                    if CONDITIONS[condition_id].tool_policy.inject_external_context:
+                        external = inject_audited_external_context(task, run_output_dir)
+                        if external.get("status") == "condition_setup_failed":
+                            setup_failed = True
+                        else:
+                            prompt += "\n" + (run_output_dir / "audited_external_context.md").read_text(encoding="utf-8") + "\n"
                     if CONDITIONS[condition_id].tool_policy.inject_docatlas_context or CONDITIONS[condition_id].tool_policy.inject_action_checklist or CONDITIONS[condition_id].tool_policy.inject_patch_constraints:
                         injected = inject_docatlas_context(task, workspace, run_output_dir, env)
                         if injected.get("status") == "condition_setup_failed":
@@ -449,6 +473,57 @@ def write_run_progress(run_dir: Path, results: list[dict[str, Any]], total_runs:
         ],
     }
     _write_json_atomic(run_dir / "status.json", payload)
+
+
+def inject_audited_external_context(
+    task: TaskSpec,
+    output_dir: Path,
+    *,
+    snapshot_path: Path | None = None,
+) -> dict[str, Any]:
+    output_dir.mkdir(parents=True, exist_ok=True)
+    source_path = snapshot_path or AUDITED_EXTERNAL_CONTEXT_ROOT / f"{task.task_id}.json"
+    snapshot = _load_optional_json(source_path)
+    content = snapshot.get("content") if isinstance(snapshot.get("content"), str) else ""
+    actual_hash = hashlib.sha256(content.encode()).hexdigest()
+    errors: list[str] = []
+    if snapshot.get("schema_version") != "audited-external-context-1":
+        errors.append("unsupported_schema_version")
+    if snapshot.get("task_id") != task.task_id:
+        errors.append("task_id_mismatch")
+    if not content:
+        errors.append("empty_content")
+    if snapshot.get("content_sha256") != actual_hash:
+        errors.append("content_hash_mismatch")
+    if any(not snapshot.get(field) for field in ("library", "version", "source_url", "retrieved_at")):
+        errors.append("missing_provenance")
+    if errors:
+        payload = {"status": "condition_setup_failed", "errors": errors, "snapshot_path": str(source_path)}
+        _write_json_atomic(output_dir / "audited_external_context.json", payload)
+        return payload
+
+    markdown = (
+        "# Audited external dependency context\n\n"
+        f"Library: {snapshot['library']} {snapshot['version']}\n"
+        f"Source: {snapshot['source_url']}\n"
+        f"Snapshot SHA-256: {actual_hash}\n\n"
+        f"{content}\n"
+    )
+    if len(markdown) > CONTEXT_INJECTION_LIMIT_CHARS:
+        markdown = markdown[:CONTEXT_INJECTION_LIMIT_CHARS] + "\n\n[truncated by benchmark harness]\n"
+    (output_dir / "audited_external_context.md").write_text(markdown, encoding="utf-8")
+    payload = {
+        "status": "success",
+        "task_id": task.task_id,
+        "library": snapshot["library"],
+        "version": snapshot["version"],
+        "source_url": snapshot["source_url"],
+        "retrieved_at": snapshot["retrieved_at"],
+        "content_sha256": actual_hash,
+        "injected_context_tokens": _estimate_tokens(markdown),
+    }
+    _write_json_atomic(output_dir / "audited_external_context.json", payload)
+    return payload
 
 
 def prepare_docatlas(task: TaskSpec, workspace: Path, output_dir: Path, env: dict[str, str]) -> dict[str, Any]:

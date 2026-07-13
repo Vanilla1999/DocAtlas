@@ -60,7 +60,7 @@ def audit_trajectory(condition_id: str, trajectory_path: Path | None, output_pat
 
     network_attempts = web_calls + network_shell_calls
 
-    if condition_id in {"repo_only", "repo_only_strict_offline"}:
+    if condition_id in {"repo_only", "repo_only_strict_offline", "repo_plus_audited_external_context"}:
         if docatlas_calls:
             violations.append(f"{condition_id} used DocAtlas tools")
         if context7_calls:

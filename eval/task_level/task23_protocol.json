@@ -1,0 +1,85 @@
+{
+  "schema_version": "task23-protocol-1",
+  "protocol_id": "task23-real-project-value-token-001",
+  "frozen_before_results": true,
+  "freeze_parent_commit": "dc102f387117dad7834db366d123e2f5ee545b51",
+  "tasks": [
+    {
+      "task_id": "real_project_nbo_flavor_scoped_external_links_001",
+      "source_project": "nbo",
+      "domain": "mobile-flavor-link-routing",
+      "fixture_hash": "73e67cae89d080e5022f639adec0a2591370ff2b8b9011d70d4da1604928ad7c",
+      "oracle_sha256": "42782e5bc924e1fc6aa76248738e7965eb8691df37803609ed25cbbfe4525f7f",
+      "external_context_sha256": "941830093e5a1561f900eef893cba390868b37b6e1bbdd4d6c4a3b48099d94c6"
+    },
+    {
+      "task_id": "real_project_help_chat_linearizable_module_lifecycle_001",
+      "source_project": "help_chat",
+      "domain": "concurrent-feature-module-lifecycle",
+      "fixture_hash": "b27644625f104feb1c96a923b43a72c0200307123bf0a7041f1d8376788bf8c5",
+      "oracle_sha256": "1359c3c9d6d9a48c78013192d367ee2aa35204c5749dbe66436f6ef3f4d91388",
+      "external_context_sha256": "99965b2213d45ec4db3d7306d3738cbf04faab5ae6b856c0dce0b6943742f018"
+    },
+    {
+      "task_id": "real_project_viscanner_client_owned_disable_signal_001",
+      "source_project": "viscanner",
+      "domain": "android-cross-process-scanner-state",
+      "fixture_hash": "88fc356240c55621546b2ddba2437684d9d72e74b6064df949a45ba4394a36dd",
+      "oracle_sha256": "f34ee28003e09b5005b6c2ba415ec912969c9f7cbcd36df2a9875286f740050e",
+      "external_context_sha256": "f51f949a918db29ebb310ae46c56574194c5402662223099ab6efdad83c876ef"
+    }
+  ],
+  "conditions": [
+    "repo_only_strict_offline",
+    "repo_plus_audited_external_context",
+    "docatlas_tool_optional",
+    "docatlas_tool_recommended"
+  ],
+  "repeats_per_task_condition": 3,
+  "runner": {
+    "adapter": "codex",
+    "cli_version": "0.144.1",
+    "model": "gpt-5.3-codex",
+    "reasoning_effort": "medium",
+    "timeout_seconds": 1500,
+    "seed": 23
+  },
+  "controls": {
+    "same_model": true,
+    "same_prompt_policy": true,
+    "same_context_limits": true,
+    "same_attempt_budget": true,
+    "same_starting_state": true
+  },
+  "screening": {
+    "condition": "repo_only_strict_offline",
+    "repeats": 3,
+    "accept_if_resolved_at_most": 1,
+    "require_validation_status": "validated",
+    "require_policy_clean": true,
+    "require_artifact_integrity": true,
+    "post_result_threshold_edits_forbidden": true
+  },
+  "statistical_procedure": {
+    "pairing": "task_id_and_repeat",
+    "bootstrap": "paired_nonparametric_with_replacement",
+    "bootstrap_samples": 4000,
+    "seed": 23,
+    "confidence_level": 0.95,
+    "scope": "frozen_task23_run_only"
+  },
+  "decision_rule": {
+    "resolved_rate_improvement_min": 0.1,
+    "median_total_tokens_increase_max": 0.1,
+    "resolved_rate_equivalence_margin": 0.02,
+    "median_total_tokens_reduction_min": 0.25,
+    "median_latency_increase_max": 0.1,
+    "confidence_level": 0.95,
+    "fail_closed_on_missing_metrics": true
+  },
+  "allowed_outcomes": [
+    "CONTINUE",
+    "PIVOT_REQUIRED",
+    "INCONCLUSIVE"
+  ]
+}

@@ -1,0 +1,4 @@
+packages:
+  get_it:
+    dependency: direct main
+    version: "7.2.0"

@@ -19,6 +19,11 @@ CONDITIONS: dict[str, Condition] = {
         label="A2 - repo-only web/network audited",
         tool_policy=ToolPolicy(allow_web=True),
     ),
+    "repo_plus_audited_external_context": Condition(
+        condition_id="repo_plus_audited_external_context",
+        label="A3 - repo plus pinned audited external context",
+        tool_policy=ToolPolicy(inject_external_context=True),
+    ),
     "context7": Condition(
         condition_id="context7",
         label="B - Context7",

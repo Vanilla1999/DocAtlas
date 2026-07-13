@@ -1,0 +1,19 @@
+{
+  "base": {
+    "compile_success": true,
+    "expected_tests_failed": true,
+    "setup_success": true,
+    "unexpected_failures": []
+  },
+  "fixture_hash": "73e67cae89d080e5022f639adec0a2591370ff2b8b9011d70d4da1604928ad7c",
+  "gold": {
+    "compile_success": true,
+    "hidden_tests_passed": true,
+    "patch_applied": true,
+    "public_tests_passed": true
+  },
+  "oracle_isolated": true,
+  "status": "validated",
+  "task_id": "real_project_nbo_flavor_scoped_external_links_001",
+  "validated_at": "2026-07-13T09:06:56.294943+00:00"
+}

@@ -25,6 +25,9 @@ FIXTURE_TASKS = {
     "decisive_nbo_cross_module_gate_large_001",
     "real_project_nbo_distributed_permission_policy_001",
     "real_project_nbo_cross_module_permission_contract_001",
+    "real_project_nbo_flavor_scoped_external_links_001",
+    "real_project_help_chat_linearizable_module_lifecycle_001",
+    "real_project_viscanner_client_owned_disable_signal_001",
 }
 TEMPLATE_ROOT = TASK_LEVEL_ROOT / "fixtures" / "templates"
 ORACLE_ROOT = TASK_LEVEL_ROOT / "oracles"

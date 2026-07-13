@@ -9,6 +9,7 @@ ConditionId = Literal[
     "repo_only",
     "repo_only_strict_offline",
     "repo_only_web_audited",
+    "repo_plus_audited_external_context",
     "context7",
     "docatlas_evidence_first",
     "docatlas_snippet_first",
@@ -109,6 +110,7 @@ class ToolPolicy:
     inject_docatlas_context: bool = False
     inject_action_checklist: bool = False
     inject_patch_constraints: bool = False
+    inject_external_context: bool = False
     recommend_docatlas_before_edit: bool = False
     require_docatlas_call_before_edit: bool = False
     max_constraint_packet_tokens: int = 1200
