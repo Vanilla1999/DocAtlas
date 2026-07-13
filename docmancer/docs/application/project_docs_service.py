@@ -831,6 +831,11 @@ class ProjectDocsService:
                 candidate_count=0,
                 message="No changed project docs required indexing.",
             )
+            # A deletion-only handoff has no ingest call to drive the vector
+            # pipeline. Explicitly synchronize so stale vector points and
+            # embedding bookkeeping are pruned from the production index.
+            if with_vectors and (removed_sources or dedup_removed):
+                agent.sync_vectors()
 
         indexed_after = self._indexed_project_doc_sources(str(root))
         indexed_sources, stale_sources, _ignored_sources = self._partition_project_doc_state(

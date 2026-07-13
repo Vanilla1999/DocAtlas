@@ -56,6 +56,31 @@ def test_incomplete_impact_brief_forbids_unverified_claims(tmp_path: Path) -> No
         for item in brief["missing_evidence"]
     )
     assert any("Do not claim behavior" in item for item in brief["must_not_invent"])
+    assert brief["allowed_edits"] == []
+    assert brief["follow_up"] == {}
+
+
+def test_paginated_impact_brief_is_fail_closed(tmp_path: Path) -> None:
+    docs = tmp_path / "docs"
+    docs.mkdir()
+    for index in range(12):
+        (docs / f"guide-{index}.md").write_text(
+            f"# Guide {index}\n\nUse `ChangedSymbol`.\n", encoding="utf-8"
+        )
+
+    report = analyze_docs_impact(
+        tmp_path,
+        ["src/change.py"],
+        changed_symbols=["ChangedSymbol"],
+        candidate_limit=5,
+    )
+
+    brief = report["authoring_brief"]
+    assert report["bounds"]["continuation"]
+    assert brief["status"] == "needs_evidence"
+    assert brief["allowed_edits"] == []
+    assert brief["follow_up"] == {}
+    assert any(item["reason_code"] == "candidate_page_incomplete" for item in brief["missing_evidence"])
 
 
 def test_changed_document_is_forwarded_to_reviewed_sync_handoff(tmp_path: Path) -> None:
@@ -136,8 +161,14 @@ def test_change_aware_metric_fixture_meets_predeclared_budgets(tmp_path: Path) -
             changed_symbols=case.get("changed_symbols") or [],
         )
         latencies_ms.append((time.perf_counter() - started) * 1000)
-        actual = {item["path"] for item in report["authoring_brief"]["allowed_edits"]}
-        expected = set(case["expected_allowed_paths"])
+        actual = {
+            (item["path"], tuple(item.get("heading_path") or []))
+            for item in report["authoring_brief"]["allowed_edits"]
+        }
+        expected = {
+            (item["path"], tuple(item.get("heading_path") or []))
+            for item in case["expected_allowed_sections"]
+        }
         true_positive += len(actual & expected)
         false_positive += len(actual - expected)
         false_negative += len(expected - actual)

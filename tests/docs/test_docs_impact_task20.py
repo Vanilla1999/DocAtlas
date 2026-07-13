@@ -794,6 +794,43 @@ def test_hard_output_bound_truncates_adversarial_individual_paths():
     assert bounded["bounds"]["serialized_bytes"] == serialized
 
 
+def test_hard_output_bound_invalidates_actionable_authoring_brief():
+    report = {
+        "schema_version": "docs-impact-2",
+        "project_path": "/repo",
+        "summary": {},
+        "changed_files": [],
+        "changed_symbols": [],
+        "impacts": [{"path": f"docs/{index}.md", "evidence": "x" * 1000} for index in range(100)],
+        "section_candidates": {"must_update": [], "review": [], "unlikely": []},
+        "bounds": {"truncated": False, "max_output_bytes": 32 * 1024},
+        "section_metadata": {},
+        "authoring_brief": {
+            "schema_version": "documentation-update-brief-1",
+            "status": "ready_for_host_edit",
+            "allowed_edits": [{"path": "docs/guide.md", "heading_path": ["Guide"]}],
+            "missing_evidence": [],
+            "follow_up": {"tool": "prepare_docs", "arguments_patch": {"action": "sync_project_docs"}},
+        },
+        "next_actions": [],
+        "diff_evidence": {},
+        "missing": [],
+        "recommendation": "review",
+        "warnings": [],
+    }
+
+    bounded = impact._bound_report(report)
+
+    assert len(json.dumps(bounded, ensure_ascii=False).encode("utf-8")) <= 32 * 1024
+    assert bounded["bounds"]["output_truncated"] is True
+    assert bounded["authoring_brief"]["allowed_edits"] == []
+    assert bounded["authoring_brief"]["follow_up"] == {}
+    assert any(
+        item["reason_code"] == "output_truncated"
+        for item in bounded["authoring_brief"]["missing_evidence"]
+    )
+
+
 def test_markdown_preserves_unlikely_and_truncation_contract(tmp_path):
     root = tmp_path / "repo"
     root.mkdir()
@@ -832,6 +869,9 @@ def test_candidate_offset_produces_a_progressing_continuation(tmp_path):
     assert f"--project-path {root}" in first["bounds"]["continuation"]
     assert "--changed-symbol ChangedSymbol" in first["bounds"]["continuation"]
     assert "prepare_docs" not in first["bounds"]["continuation"]
+    assert first["authoring_brief"]["allowed_edits"] == []
+    assert second["authoring_brief"]["allowed_edits"] == []
+    assert second["authoring_brief"]["follow_up"] == {}
 
 
 def test_continuation_stops_at_candidate_evaluation_ceiling(tmp_path, monkeypatch):

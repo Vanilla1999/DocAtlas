@@ -913,6 +913,10 @@ def analyze_docs_impact(
     has_more_evaluated_candidates = (
         candidate_offset + len(candidate_window) < min(total_section_candidates, len(section_candidates))
     )
+    if has_more_evaluated_candidates:
+        incomplete_reasons.append("candidate_page_incomplete")
+    if candidate_offset:
+        incomplete_reasons.append("candidate_page_offset")
     continuation = _continuation_command(
         diff_evidence,
         project_path=str(root),
@@ -1197,9 +1201,39 @@ def _bound_report(report: dict[str, Any]) -> dict[str, Any]:
         for _ in range(2):
             report["bounds"]["serialized_bytes"] = _serialized_size(report)
     _refresh_continuation(report)
+    if (report.get("bounds") or {}).get("output_truncated"):
+        _invalidate_authoring_brief(report, "output_truncated")
     for _ in range(2):
         report["bounds"]["serialized_bytes"] = _serialized_size(report)
     return report
+
+
+def bound_docs_impact_report(report: dict[str, Any]) -> dict[str, Any]:
+    """Re-apply the public output contract after callers attach extra fields."""
+    return _bound_report(report)
+
+
+def _invalidate_authoring_brief(report: dict[str, Any], reason_code: str) -> None:
+    brief = report.get("authoring_brief")
+    if not isinstance(brief, dict):
+        return
+    evidence = brief.get("missing_evidence")
+    if not isinstance(evidence, list):
+        evidence = []
+    if not any(
+        (item.get("reason_code") if isinstance(item, dict) else item) == reason_code
+        for item in evidence
+    ):
+        evidence.append({
+            "reason_code": reason_code,
+            "required_action": "rerun impact analysis with a narrower diff or the next candidate page",
+        })
+    brief.update({
+        "status": "output_truncated" if brief.get("status") == "output_truncated" else "needs_evidence",
+        "allowed_edits": [],
+        "missing_evidence": evidence,
+        "follow_up": {},
+    })
 
 
 def _trim_auxiliary_report_list(report: dict[str, Any], omitted: dict[str, int]) -> bool:
@@ -1221,6 +1255,8 @@ def _trim_auxiliary_report_list(report: dict[str, Any], omitted: dict[str, int])
         ("authoring_brief.allowed_edits", (report.get("authoring_brief") or {}).get("allowed_edits") or []),
         ("authoring_brief.facts_to_verify", (report.get("authoring_brief") or {}).get("facts_to_verify") or []),
         ("authoring_brief.missing_evidence", (report.get("authoring_brief") or {}).get("missing_evidence") or []),
+        ("sync.tombstones", (report.get("sync") or {}).get("tombstones") or []),
+        ("sync.warnings", (report.get("sync") or {}).get("warnings") or []),
     ])
     for name, values in locations:
         if values:
@@ -1278,7 +1314,10 @@ def _minimal_bounded_report(report: dict[str, Any], omitted: dict[str, int]) -> 
             "status": "output_truncated",
             "allowed_edits": [],
             "facts_to_verify": [],
-            "missing_evidence": ["output_truncated"],
+            "missing_evidence": [{
+                "reason_code": "output_truncated",
+                "required_action": "rerun impact analysis with a narrower diff or the next candidate page",
+            }],
             "must_not_invent": ["Do not edit documentation until the impact report is rerun with a narrower diff."],
             "follow_up": {},
         },
@@ -1289,6 +1328,20 @@ def _minimal_bounded_report(report: dict[str, Any], omitted: dict[str, int]) -> 
         "warnings": [],
         "omitted": omitted,
     }
+    sync = report.get("sync") or {}
+    if isinstance(sync, dict) and sync:
+        compact["sync"] = {
+            "status": _bounded_text(sync.get("status"), 64),
+            "mode": _bounded_text(sync.get("mode"), 64),
+            "message": _bounded_text(sync.get("message"), 512),
+            "metrics": {
+                key: value for key, value in (sync.get("metrics") or {}).items()
+                if key in {"files_reprocessed", "sections_reprocessed", "derived_writes", "derived_deletes", "latency_ms"}
+                and isinstance(value, (int, float, bool))
+            },
+            "tombstones": [],
+            "warnings": [],
+        }
     return compact
 
 
@@ -1363,6 +1416,10 @@ def _build_documentation_update_brief(
         else "docs_already_changed" if documentation_changes
         else "no_documentation_edit_recommended"
     )
+    if missing_evidence:
+        # A partial analysis is navigation evidence, never an edit allow-list.
+        allowed_edits = []
+        allowed_paths = []
     follow_up_changed = list(allowed_paths)
     follow_up_deleted: list[str] = []
     follow_up_renamed: list[dict[str, str]] = []
@@ -1389,7 +1446,7 @@ def _build_documentation_update_brief(
         follow_up_args["deleted_paths"] = follow_up_deleted[:64]
     if follow_up_renamed:
         follow_up_args["renamed_paths"] = follow_up_renamed[:64]
-    has_follow_up = len(follow_up_args) > 2
+    has_follow_up = not missing_evidence and len(follow_up_args) > 2
     return {
         "schema_version": "documentation-update-brief-1",
         "status": status,

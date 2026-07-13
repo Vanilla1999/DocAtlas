@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+import json
 
 from docmancer.docs.interfaces.mcp.context_tools import CONTEXT_TOOL_NAMES
 from docmancer.docs.interfaces.mcp.docs_tools import LIBRARY_TOOL_NAMES
@@ -453,6 +454,29 @@ def test_prepare_docs_forwards_bounded_incremental_sync_contract():
             "renamed_paths": [{"old_path": "docs/a.md", "new_path": "docs/b.md"}],
         },
     )
+
+
+def test_prepare_docs_compacts_large_project_sync_inventory():
+    from docmancer.docs.models import ProjectDocsSyncResult, ProjectMetadata
+
+    class Service:
+        def sync_project_docs(self, project_path, **_kwargs):
+            return ProjectDocsSyncResult(
+                status="success",
+                project=ProjectMetadata(project_path=project_path),
+                indexed_sources=[{"path": f"docs/{index}.md", "content": "x" * 500} for index in range(500)],
+                current_count=500,
+            )
+
+    result = call_docs_tool_payload(
+        "prepare_docs",
+        {"action": "sync_project_docs", "project_path": "/repo"},
+        Service(),
+    )
+
+    assert len(json.dumps(result, ensure_ascii=False).encode("utf-8")) <= 32_000
+    assert result["summary"]["current_count"] == 500
+    assert "indexed_sources" not in result
 
 
 def test_prepare_docs_rejects_malformed_incremental_sync_paths():

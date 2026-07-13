@@ -979,6 +979,27 @@ def test_incremental_sync_handles_rename_and_deletion_without_pruning_unrelated_
     assert "KeepNeedle" in service.get_project_docs(str(project), "KeepNeedle").results[0].content
 
 
+def test_deletion_only_incremental_sync_drives_vector_pruning(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    docs = project / "docs"
+    docs.mkdir()
+    removed = docs / "removed.md"
+    removed.write_text("# Removed\n\nVectorDeleteNeedle.\n", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+    service.sync_project_docs(str(project), with_vectors=False)
+    removed.unlink()
+    sync_vectors = MagicMock()
+    service._agent_instance().sync_vectors = sync_vectors
+
+    result = service.sync_project_docs(
+        str(project), with_vectors=True, deleted_paths=["docs/removed.md"]
+    )
+
+    assert result.status == "success"
+    assert result.diagnostics["metrics"]["files_reprocessed"] == 0
+    sync_vectors.assert_called_once_with()
+
+
 def test_incremental_sync_rejects_paths_outside_project(tmp_path, monkeypatch):
     project = _flutter_project(tmp_path)
     service = _service_with_real_agent(tmp_path, monkeypatch)

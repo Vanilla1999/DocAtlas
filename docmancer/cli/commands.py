@@ -1981,7 +1981,7 @@ def docs_impact_cmd(
     config_path: str | None,
 ):
     """Report which maintained docs should be reviewed after a code change."""
-    from docmancer.docs.impact import analyze_docs_impact, changed_evidence_from_git, format_docs_impact_markdown, unaccepted_worktree_changes
+    from docmancer.docs.impact import analyze_docs_impact, bound_docs_impact_report, changed_evidence_from_git, format_docs_impact_markdown, unaccepted_worktree_changes
     from docmancer.docs.application.project_section_index import ProjectSectionIndexReader
 
     if base and changed_files:
@@ -2072,6 +2072,7 @@ def docs_impact_cmd(
                 "tombstones": (sync.get("tombstones") or [])[:100],
                 "warnings": sync.get("warnings") or [],
             }
+            report = bound_docs_impact_report(report)
     except ValueError as exc:
         raise click.ClickException(str(exc)) from exc
     if output_format.lower() == "json":

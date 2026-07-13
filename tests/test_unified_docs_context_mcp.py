@@ -23,6 +23,36 @@ def test_get_docs_context_schema():
     assert {"allow_network", "force_refresh", "prefetch_auto", "prepare_project_docs"}.isdisjoint(schema["properties"])
     assert schema["properties"]["output_mode"]["enum"] == ["answer", "compact", "debug", "full"]
     assert schema["properties"]["mode"]["enum"] == ["auto", "project", "library", "dependency", "mixed"]
+    assert "maintenance" in schema["properties"]
+
+
+def test_get_docs_context_exposes_fail_closed_change_maintenance_brief(tmp_path):
+    docs = tmp_path / "docs"
+    docs.mkdir()
+    for index in range(3):
+        (docs / f"guide-{index}.md").write_text(
+            f"# Guide {index}\n\nUse `ChangedSymbol`.\n", encoding="utf-8"
+        )
+
+    result = call_docs_tool_payload(
+        "get_docs_context",
+        {
+            "question": "Which documentation should be updated?",
+            "project_path": str(tmp_path),
+            "maintenance": {
+                "changed_paths": ["src/change.py"],
+                "changed_symbols": ["ChangedSymbol"],
+                "candidate_limit": 1,
+            },
+        },
+        object(),
+    )
+
+    assert result["answer_type"] == "documentation_update_brief"
+    assert result["authoring_brief"]["status"] == "needs_evidence"
+    assert result["authoring_brief"]["allowed_edits"] == []
+    assert result["authoring_brief"]["follow_up"] == {}
+    assert len(json.dumps(result, ensure_ascii=False).encode("utf-8")) <= 32_000
 
 
 def test_docmancer_agent_quickstart_resource_exists():

@@ -5,7 +5,7 @@ from typing import Any
 from urllib.parse import urlparse
 
 from docmancer.docs.service import LibraryDocsService
-from docmancer.docs.interfaces.mcp.project_tools import _bounded_int_arg, handle_project_tool
+from docmancer.docs.interfaces.mcp.project_tools import _bounded_int_arg, _compact_mcp_payload, handle_project_tool
 
 
 PREFETCH_TOOL_NAMES = {
@@ -61,6 +61,32 @@ def _job_summary(job: Any) -> dict[str, Any]:
         "max_running_jobs", "max_queued_jobs", "page_failure_summary", "started_at", "updated_at",
     )
     return {field: getattr(job, field) for field in fields}
+
+
+def _compact_project_sync(result: Any) -> dict[str, Any]:
+    """Expose counts and bounded diagnostics, not the full project inventory."""
+    raw = asdict(result)
+    diagnostics = dict(raw.get("diagnostics") or {})
+    return {
+        "status": raw.get("status"),
+        "project_path": (raw.get("project") or {}).get("project_path"),
+        "candidate_count": raw.get("candidate_count"),
+        "summary": {
+            key: raw.get(key)
+            for key in (
+                "current_count", "new_count", "changed_count", "orphaned_count",
+                "orphaned_removed", "dedup_removed", "stale_removed", "sections_indexed",
+            )
+        },
+        "metrics": diagnostics.get("metrics") or {},
+        "unmatched_changed_paths": diagnostics.get("unmatched_changed_paths") or [],
+        "unmatched_deleted_paths": diagnostics.get("unmatched_deleted_paths") or [],
+        "remaining_deleted_sources": diagnostics.get("remaining_deleted_sources") or 0,
+        "tombstones": raw.get("tombstones") or [],
+        "tombstones_omitted": diagnostics.get("tombstones_omitted") or 0,
+        "warnings": raw.get("warnings") or [],
+        "message": raw.get("message"),
+    }
 
 
 def _prepare_validation_error(action: str, message: str) -> dict[str, Any]:
@@ -228,7 +254,7 @@ def handle_prefetch_tool(name: str, args: dict[str, Any], service: LibraryDocsSe
         elif action == "prefetch_docs_targets":
             payload = asdict(docs_prefetch_app.prefetch_docs_targets(_bounded_targets(args.get("targets")), force_refresh=bool(args.get("force_refresh") or False), continue_on_error=bool(args.get("continue_on_error") if args.get("continue_on_error") is not None else True), async_=True))
         elif action == "sync_project_docs":
-            payload = asdict(project_docs_app.sync_project_docs(
+            payload = _compact_project_sync(project_docs_app.sync_project_docs(
                 args["project_path"],
                 with_vectors=bool(args.get("with_vectors") if args.get("with_vectors") is not None else True),
                 changed_paths=args.get("changed_paths"),
@@ -264,6 +290,7 @@ def handle_prefetch_tool(name: str, args: dict[str, Any], service: LibraryDocsSe
         if isinstance(payload, dict):
             payload.setdefault("action", action)
             payload.setdefault("tool", "prepare_docs")
+            payload = _compact_mcp_payload(payload)
         return payload
     if name == "docs_job":
         action = str(args.get("action") or "").strip()

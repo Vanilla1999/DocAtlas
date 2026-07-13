@@ -16,7 +16,9 @@
       },
       "changed_paths": ["src/auth.py"],
       "changed_symbols": ["issue_token"],
-      "expected_allowed_paths": ["docs/auth.md"]
+      "expected_allowed_sections": [
+        {"path": "docs/auth.md", "heading_path": ["Authentication"]}
+      ]
     },
     {
       "id": "dependency_config",
@@ -25,7 +27,9 @@
       },
       "changed_paths": ["requirements.txt"],
       "changed_symbols": [],
-      "expected_allowed_paths": ["README.md"]
+      "expected_allowed_sections": [
+        {"path": "README.md", "heading_path": []}
+      ]
     },
     {
       "id": "one_monorepo_module",
@@ -36,7 +40,9 @@
       },
       "changed_paths": ["packages/auth/src/token.py"],
       "changed_symbols": ["issue_token"],
-      "expected_allowed_paths": ["packages/auth/README.md"]
+      "expected_allowed_sections": [
+        {"path": "packages/auth/README.md", "heading_path": ["Auth"]}
+      ]
     }
   ]
 }
