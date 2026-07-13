@@ -1,0 +1,163 @@
+{
+  "schema_version": "task33-evaluation-contracts-1",
+  "tasks": [
+    {
+      "task_id": "decisive_nbo_cross_module_gate_large_001",
+      "patch_contract_id": "task33-nbo-cross-module-gate-1",
+      "public_test_command": "uv run --offline pytest tests/test_browser_permission_gate.py",
+      "local_test_command": "python -m pytest tests/test_browser_permission_gate.py",
+      "semantic_test_command": "python -m pytest tests/hidden",
+      "compile_gate": {
+        "mode": "not_applicable",
+        "reason": "The benchmark is a source-only Dart contract fixture and does not contain a buildable Flutter application. Public and evaluator-private structural tests are the executable validation gates."
+      },
+      "artifact_identity": {
+        "fixture_hash_algorithm": "sha256-length-prefixed-v2",
+        "fixture_sha256": "1ba6cb88a61dc5871eca8d2aec13e5d89ce57b2cfe977441da34ad49f7bd48ae",
+        "protocol_fixture_hash_algorithm": "sha256-concat-v1",
+        "protocol_fixture_sha256": "603712341cdeffb1332492ccbebeb04b022ddf665b1b305c9827765c69a629df",
+        "oracle_sha256": "7bef2b9e21966f10c12d7ac9d742e61f2b45395b1a8874b98e6f999adcf683a2",
+        "hidden_tests_hash_algorithm": "sha256-length-prefixed-v2",
+        "hidden_tests_sha256": "012438802bdde4c5d1749f2729a212feffadfaad333a9c8bfe7c85ae9f80290e",
+        "external_context_sha256": "7372ccee933b47ec72a614966b03a62faf0298a9293733ae46e869183c69fcc0"
+      },
+      "allowed_paths": [
+        "lib/modules/browser/application/browser_permission_gate.dart",
+        "lib/modules/permission/application/permission_service.dart",
+        "lib/modules/scan/application/scan_permission_gate.dart",
+        "lib/modules/sync/application/offline_sync_gate.dart"
+      ],
+      "forbidden_paths": [
+        "docs/**",
+        "pubspec.lock",
+        "pubspec.yaml",
+        "tests/**",
+        "lib/**/*.freezed.dart",
+        "lib/**/*.g.dart"
+      ],
+      "semantic_checks": [
+        {
+          "id": "canonical-entry-delegation",
+          "description": "all flow entry gates delegate to the canonical permission decision",
+          "test_ids": [
+            "test_browser_scan_and_sync_delegate_to_shared_entry_contract",
+            "test_no_duplicate_immediate_permission_interpretation_in_flow_gates"
+          ]
+        },
+        {
+          "id": "partial-results-blocked",
+          "description": "partial permission results cannot pass through offline handoff",
+          "test_ids": ["test_permission_service_blocks_partial_results_for_entry_even_when_offline_fallback_exists"]
+        },
+        {
+          "id": "generated-dependency-boundary",
+          "description": "generated and dependency files remain unchanged",
+          "test_ids": ["test_generated_and_dependency_files_are_not_changed"]
+        }
+      ]
+    },
+    {
+      "task_id": "real_project_help_chat_linearizable_module_lifecycle_001",
+      "patch_contract_id": "task33-help-chat-lifecycle-1",
+      "public_test_command": "pytest tests/test_module_lifecycle.py",
+      "local_test_command": "python -m pytest tests/test_module_lifecycle.py",
+      "semantic_test_command": "python -m pytest tests/hidden",
+      "compile_gate": {
+        "mode": "not_applicable",
+        "reason": "The benchmark is a source-only Dart lifecycle fixture without a Dart or Flutter build graph. Public and evaluator-private structural tests are the executable validation gates."
+      },
+      "artifact_identity": {
+        "fixture_hash_algorithm": "sha256-length-prefixed-v2",
+        "fixture_sha256": "4927f5a90f638d7362f66f66b5da954d96135fbe767a8f8135ea9a9ac9a6feef",
+        "protocol_fixture_hash_algorithm": "sha256-concat-v1",
+        "protocol_fixture_sha256": "b27644625f104feb1c96a923b43a72c0200307123bf0a7041f1d8376788bf8c5",
+        "oracle_sha256": "1359c3c9d6d9a48c78013192d367ee2aa35204c5749dbe66436f6ef3f4d91388",
+        "hidden_tests_hash_algorithm": "sha256-length-prefixed-v2",
+        "hidden_tests_sha256": "ec1e9207fafd18249a237e29f2ad2cab0e6941e9eab809d4cc27d01910021947",
+        "external_context_sha256": "99965b2213d45ec4db3d7306d3738cbf04faab5ae6b856c0dce0b6943742f018"
+      },
+      "allowed_paths": [
+        "lib/src/di/help_request_locator.dart",
+        "lib/src/help_request_module.dart",
+        "lib/src/utils/help_request_utils.dart"
+      ],
+      "forbidden_paths": [
+        "ARCHITECTURE.md",
+        "README.md",
+        "example/**",
+        "pubspec.lock",
+        "pubspec.yaml",
+        "tests/**"
+      ],
+      "semantic_checks": [
+        {
+          "id": "linearizable-lifecycle",
+          "description": "initialization and reset are linearizable and failed initialization remains retryable",
+          "test_ids": ["test_reset_wins_over_inflight_init_and_waits_failures"]
+        },
+        {
+          "id": "host-ownership-boundary",
+          "description": "host-owned registrations and public APIs remain unchanged",
+          "test_ids": ["test_owned_cleanup_preserves_host_registrations_and_public_modes"]
+        },
+        {
+          "id": "dependency-example-boundary",
+          "description": "dependencies and examples remain unchanged",
+          "test_ids": ["test_no_dependency_or_example_drift"]
+        }
+      ]
+    },
+    {
+      "task_id": "real_project_viscanner_client_owned_disable_signal_001",
+      "patch_contract_id": "task33-viscanner-disable-signal-1",
+      "public_test_command": "pytest tests/test_scanner_disable_contract.py",
+      "local_test_command": "python -m pytest tests/test_scanner_disable_contract.py",
+      "semantic_test_command": "python -m pytest tests/hidden",
+      "compile_gate": {
+        "mode": "not_applicable",
+        "reason": "The benchmark is a source-only Kotlin/AIDL boundary fixture without an Android Gradle build graph. Public and evaluator-private structural tests are the executable validation gates."
+      },
+      "artifact_identity": {
+        "fixture_hash_algorithm": "sha256-length-prefixed-v2",
+        "fixture_sha256": "98b1115b26e8990d762702c3e216d1a212a7c32578aa8928e3e4de727c96d44f",
+        "protocol_fixture_hash_algorithm": "sha256-concat-v1",
+        "protocol_fixture_sha256": "88fc356240c55621546b2ddba2437684d9d72e74b6064df949a45ba4394a36dd",
+        "oracle_sha256": "f34ee28003e09b5005b6c2ba415ec912969c9f7cbcd36df2a9875286f740050e",
+        "hidden_tests_hash_algorithm": "sha256-length-prefixed-v2",
+        "hidden_tests_sha256": "3eb71cc6484c6e85d989ea6fdc478db2b4a57f0b57682730e5cddce1a2ddacb9",
+        "external_context_sha256": "f51f949a918db29ebb310ae46c56574194c5402662223099ab6efdad83c876ef"
+      },
+      "allowed_paths": [
+        "ViScanner/src/main/kotlin/com/example/ViScanner.kt",
+        "ViScannerAIDL/src/main/aidl/com/example/ScannerListener.aidl",
+        "ViScannerAIDL/src/main/aidl/com/example/ViScannerAidl.aidl",
+        "ViScannerService/src/main/kotlin/com/example/Scanner.kt",
+        "ViScannerService/src/main/kotlin/com/example/ViScannerService.kt",
+        "ViScannerService/src/main/kotlin/com/example/scanners/AbstractScanner.kt",
+        "ViScannerService/src/main/kotlin/com/example/scanners/UrovoScanner.kt"
+      ],
+      "forbidden_paths": [
+        "README.md",
+        "docs/**",
+        "tests/**"
+      ],
+      "semantic_checks": [
+        {
+          "id": "client-disable-signal",
+          "description": "disabled scans are suppressed and notify the client",
+          "test_ids": ["test_aar_listener_and_methods_bridge_to_service"]
+        },
+        {
+          "id": "supported-vendor-beep",
+          "description": "only the supported vendor beep is disabled",
+          "test_ids": ["test_only_urovo_overrides_standard_beep_hook"]
+        },
+        {
+          "id": "vendor-state-restoration",
+          "description": "pause and release restore vendor state without service-owned custom audio",
+          "test_ids": ["test_pause_and_release_restore_vendor_state_first"]
+        }
+      ]
+    }
+  ]
+}

@@ -134,7 +134,10 @@ class RunMetrics:
     input_tokens: int | None = None
     output_tokens: int | None = None
     total_tokens: int | None = None
-    agent_turns: int | None = None
+    cached_input_tokens: int | None = None
+    uncached_input_tokens: int | None = None
+    reasoning_tokens: int | None = None
+    completed_turn_events: int | None = None
     shell_calls: int = 0
     file_reads: int = 0
     file_searches: int = 0

@@ -15,6 +15,7 @@ from .base import AgentRunOutput, AgentRunRequest, RunnerCapabilities
 
 class CodexRunner:
     runner_id = "codex"
+    hard_turn_limit_enforced = False
 
     def __init__(self, executable: str = "codex", *, sandbox_mode: str = "workspace-write") -> None:
         if sandbox_mode not in {"workspace-write", "danger-full-access"}:
@@ -42,6 +43,7 @@ class CodexRunner:
             token_usage=found,
             independent_process=found,
             verified=False,
+            hard_turn_limit=self.hard_turn_limit_enforced,
             verification_notes=[
                 "CLI capability detection is not causal verification; runner canary must pass before causal pilot execution.",
                 "Uses `codex exec --json --ephemeral` for fresh non-interactive sessions.",
@@ -113,6 +115,7 @@ class CodexRunner:
         stderr_path.write_text(sanitized_stderr, encoding="utf-8")
         events_path.write_text(sanitized_stdout, encoding="utf-8")
         normalized, tool_calls, input_tokens, output_tokens = _normalize_jsonl(sanitized_stdout)
+        token_usage = _token_usage_summary(normalized)
         normalized_path.write_text(json.dumps(normalized, indent=2, sort_keys=True), encoding="utf-8")
         (request.output_dir / "sanitization_report.json").write_text(
             json.dumps(
@@ -146,6 +149,7 @@ class CodexRunner:
             output_tokens=output_tokens,
             model=request.model,
             runner_version=self._version(),
+            token_usage=token_usage,
             notes=notes,
         )
 
@@ -267,6 +271,35 @@ def _normalize_jsonl(stdout: str) -> tuple[list[dict[str, Any]], list[dict[str, 
             # not the provider-specific raw envelope.
             tool_calls.append(normalized_event)
     return events, tool_calls, input_tokens, output_tokens
+
+
+def _token_usage_summary(events: list[dict[str, Any]]) -> dict[str, int | None]:
+    summary: dict[str, int | None] = {
+        "input_tokens": None,
+        "output_tokens": None,
+        "cached_input_tokens": None,
+        "reasoning_tokens": None,
+        "completed_turn_events": None,
+    }
+    aliases = {
+        "input_tokens": ("input_tokens",),
+        "output_tokens": ("output_tokens",),
+        "cached_input_tokens": ("cached_input_tokens", "cache_read_input_tokens"),
+        "reasoning_tokens": ("reasoning_tokens", "reasoning_output_tokens"),
+    }
+    for event in events:
+        if event.get("source_event_type") == "turn.completed":
+            summary["completed_turn_events"] = int(summary["completed_turn_events"] or 0) + 1
+        usage = event.get("tokens")
+        if not isinstance(usage, dict):
+            continue
+        for target, source_names in aliases.items():
+            for source_name in source_names:
+                value = usage.get(source_name)
+                if isinstance(value, int) and not isinstance(value, bool) and value >= 0:
+                    summary[target] = value
+                    break
+    return summary
 
 
 def _tool_result_text(item: dict[str, Any], message: dict[str, Any]) -> str:

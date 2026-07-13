@@ -11,7 +11,11 @@ from typing import Any
 from uuid import uuid4
 
 from eval.task_level.analysis.task23_decision import apply_protocol_amendment, evaluate_predeclared_rule, validate_protocol_amendment_artifacts
+from eval.task_level.evaluators.task_contract import evaluation_contract_registry_sha256, evaluation_contract_sha256, load_task_evaluation_contracts
 from eval.task_level.execution import is_infrastructure_failure
+
+
+TASK33_EVALUATION_CONTRACTS = load_task_evaluation_contracts()
 
 
 def _metric(row: dict[str, Any], name: str) -> Any:
@@ -24,14 +28,22 @@ def _median(values: list[Any]) -> float | int | None:
     return median(numbers) if numbers else None
 
 
-def _failure_reason(row: dict[str, Any]) -> str:
+def _failure_reason(row: dict[str, Any], required_contract_task_ids: set[str] | None = None) -> str:
     if is_infrastructure_failure(row):
         status = str(row.get("status") or "")
         return status if status in {"runner_unavailable", "runner_failed", "condition_setup_failed", "timeout"} else "runner_output_missing"
     if not row.get("policy_clean"):
         return "policy_violation"
-    if not row.get("compile_success"):
+    if required_contract_task_ids and _row_requires_contract(row, required_contract_task_ids) and not _row_has_valid_contract(row):
+        return "evaluation_contract_invalid"
+    evaluation_contract = row.get("evaluation_contract")
+    if isinstance(evaluation_contract, dict) and evaluation_contract.get("status") == "invalid":
+        return "evaluation_contract_invalid"
+    compile_status = row.get("compile_status")
+    if compile_status == "failed":
         return "compile_failed"
+    if compile_status not in {"passed", "not_applicable"} and not row.get("compile_success"):
+        return "compile_gate_unknown"
     if not row.get("public_tests_passed"):
         return "public_tests_failed"
     if not row.get("hidden_tests_passed"):
@@ -136,6 +148,16 @@ def build_task23_report(
         decision["decision"] = "INCONCLUSIVE"
         decision.setdefault("reasons", []).append("max_turn_budget_not_enforced")
         decision["reasons"] = list(dict.fromkeys(decision["reasons"]))
+    required_contract_task_ids = (
+        set(task_ids)
+        if effective.get("protocol_id") == "task23-real-project-value-token-001"
+        else set()
+    )
+    evaluation_contract_integrity = _evaluation_contract_integrity(selected_rows, required_contract_task_ids)
+    if not evaluation_contract_integrity["ok"]:
+        decision["decision"] = "INCONCLUSIVE"
+        decision.setdefault("reasons", []).append("missing_or_invalid_evaluation_contract")
+        decision["reasons"] = list(dict.fromkeys(decision["reasons"]))
 
     condition_summaries: dict[str, Any] = {}
     failure_taxonomy: dict[str, Any] = {}
@@ -153,7 +175,8 @@ def build_task23_report(
             "resolved": sum(bool(row.get("resolved")) for row in valid_rows),
             "resolved_rate": mean(bool(row.get("resolved")) for row in valid_rows) if valid_rows and full_coverage else None,
             "diagnostic_resolved_rate_valid_runs": mean(bool(row.get("resolved")) for row in valid_rows) if valid_rows else None,
-            "compile_success_rate": mean(bool(row.get("compile_success")) for row in valid_rows) if valid_rows else None,
+            "compile_success_rate": _compile_success_rate(valid_rows),
+            "compile_not_applicable_runs": sum(row.get("compile_status") == "not_applicable" for row in valid_rows),
             "public_tests_passed_rate": mean(bool(row.get("public_tests_passed")) for row in valid_rows) if valid_rows else None,
             "hidden_tests_passed_rate": mean(bool(row.get("hidden_tests_passed")) for row in valid_rows) if valid_rows else None,
             "median_total_tokens": _median([_metric(row, "total_tokens") for row in valid_rows]),
@@ -178,9 +201,13 @@ def build_task23_report(
                 or row["budget"].get("max_turns_enforced_by_runner") is not True
                 for row in valid_rows
             ),
+            "evaluation_contract_invalid_runs": sum(
+                _row_requires_contract(row, required_contract_task_ids) and not _row_has_valid_contract(row)
+                for row in valid_rows
+            ),
         }
         failure_taxonomy[condition] = dict(sorted(Counter(
-            _failure_reason(row) for row in condition_rows if not row.get("resolved")
+            _failure_reason(row, required_contract_task_ids) for row in condition_rows if not row.get("resolved")
         ).items()))
 
     return {
@@ -214,6 +241,7 @@ def build_task23_report(
             "output_budget_exceeded_runs": output_budget_exceeded_runs,
             "max_turns_unenforced_runs": max_turns_unenforced_runs,
         },
+        "evaluation_contract_integrity": evaluation_contract_integrity,
         "conditions": condition_summaries,
         "failure_taxonomy": failure_taxonomy,
         "decision": decision,
@@ -226,6 +254,57 @@ def build_task23_report(
             "replacement_screening_run_id": amendment.get("replacement_screening_run_id"),
         }] if amendment else [],
         "scientific_limitation": amendment.get("scientific_limitation") if amendment else None,
+    }
+
+
+def _compile_success_rate(rows: list[dict[str, Any]]) -> float | None:
+    applicable = [row for row in rows if row.get("compile_status") != "not_applicable"]
+    return mean(bool(row.get("compile_success")) for row in applicable) if applicable else None
+
+
+def _row_requires_contract(row: dict[str, Any], required_task_ids: set[str]) -> bool:
+    return row.get("task_id") in required_task_ids
+
+
+def _row_has_valid_contract(row: dict[str, Any]) -> bool:
+    task_id = row.get("task_id")
+    expected = TASK33_EVALUATION_CONTRACTS.get(task_id)
+    evidence = row.get("evaluation_contract")
+    if expected is None:
+        return False
+    identity = evidence.get("artifact_identity") if isinstance(evidence, dict) else None
+    return (
+        isinstance(evidence, dict)
+        and evidence.get("status") == "valid"
+        and evidence.get("patch_contract_id") == expected.patch_contract_id
+        and evidence.get("contract_sha256") == evaluation_contract_sha256(expected)
+        and evidence.get("registry_sha256") == evaluation_contract_registry_sha256()
+        and isinstance(identity, dict)
+        and identity.get("fixture_hash_algorithm") == "sha256-length-prefixed-v2"
+        and identity.get("fixture_sha256") == expected.fixture_sha256
+        and identity.get("protocol_fixture_hash_algorithm") == "sha256-concat-v1"
+        and identity.get("protocol_fixture_sha256") == expected.protocol_fixture_sha256
+        and identity.get("oracle_sha256") == expected.oracle_sha256
+        and identity.get("hidden_tests_sha256") == expected.hidden_tests_sha256
+        and identity.get("external_context_sha256") == expected.external_context_sha256
+    )
+
+
+def _evaluation_contract_integrity(rows: list[dict[str, Any]], required_task_ids: set[str]) -> dict[str, Any]:
+    missing_registry_task_ids = required_task_ids - set(TASK33_EVALUATION_CONTRACTS)
+    required = [row for row in rows if _row_requires_contract(row, required_task_ids)]
+    invalid = [
+        [row.get("task_id"), row.get("condition_id"), row.get("repeat")]
+        for row in required
+        if not _row_has_valid_contract(row)
+    ]
+    return {
+        "ok": not invalid and not missing_registry_task_ids,
+        "required_runs": len(required),
+        "valid_runs": len(required) - len(invalid),
+        "invalid_cells": invalid,
+        "registry_sha256": evaluation_contract_registry_sha256(),
+        "missing_registry_task_ids": sorted(missing_registry_task_ids),
     }
 
 
@@ -333,6 +412,8 @@ def write_sanitized_run_bundle(
             "contract": row.get("contract") or {},
             "actionability": row.get("actionability") or {},
             "budget": row.get("budget") or {},
+            "evaluation_contract": row.get("evaluation_contract") or {},
+            "token_attribution": row.get("token_attribution") or {},
             "fixture_hash": task.get("fixture_hash"),
             "oracle_sha256": task.get("oracle_sha256"),
             "external_context_sha256": task.get("external_context_sha256"),

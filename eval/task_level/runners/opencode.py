@@ -14,6 +14,7 @@ from .base import AgentRunOutput, AgentRunRequest, RunnerCapabilities
 
 class OpenCodeRunner:
     runner_id = "opencode"
+    hard_turn_limit_enforced = False
 
     def __init__(self, executable: str = "opencode") -> None:
         self.executable = executable
@@ -38,6 +39,7 @@ class OpenCodeRunner:
             token_usage=found,
             independent_process=found,
             verified=found and auth,
+            hard_turn_limit=self.hard_turn_limit_enforced,
             verification_notes=[
                 "Uses `opencode run --format json` in a fresh non-interactive process.",
                 "Writes a per-run XDG_CONFIG_HOME/opencode/opencode.json from the condition MCP config so repo-only has no MCP servers and DocAtlas conditions expose only docmancer-docs.",
