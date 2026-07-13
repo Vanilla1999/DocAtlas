@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Added
+
+- **Bounded direct context delivery:** `get_docs_context` can return a versioned, source-attributed `ActionPacket` capped at 2,000 estimated tokens without exposing raw retrieval content to the parent coding session.
+
 ## [1.2.0] - 2026-07-12
 
 ### Added

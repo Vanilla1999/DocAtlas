@@ -83,6 +83,7 @@ RAW_TOOLS: list[dict[str, Any]] = [
 Agent workflow:
 - Call get_docs_context first. It performs safe project preflight internally.
 - For coding/API questions, set response_style=\"snippet-first\".
+- For one compact pre-edit handoff, set delivery_strategy=\"bounded_direct\"; only a validated ActionPacket enters model context.
 - Call prepare_docs only when this response explicitly returns it as next_action.
 - Use docs_status only for explicit health, freshness, source-state, or job-status requests.
 - If answer_type is navigation_only or partial_navigational, do not answer yet; read/search the suggested files first.
@@ -95,6 +96,8 @@ Agent workflow:
                 "question": {"type": "string"},
                 "project_path": {"type": ["string", "null"]},
                 "response_style": {"type": ["string", "null"], "enum": ["auto", "snippet-first", "evidence-first", None], "default": "auto", "description": "Choose snippet-first presentation for coding tasks or preserve evidence-first context."},
+                "delivery_strategy": {"type": ["string", "null"], "enum": ["bounded_direct", None], "description": "Return one deterministic, source-attributed ActionPacket without exposing raw retrieval content."},
+                "packet_tokens": {"type": ["integer", "null"], "minimum": 256, "maximum": 2000, "default": 1500, "description": "ActionPacket budget; the server always enforces the 2000-token hard ceiling."},
                 "library": {"type": ["string", "null"]},
                 "libraries": {"type": ["array", "null"], "items": {"type": "string"}},
                 "ecosystem": {"type": ["string", "null"]},

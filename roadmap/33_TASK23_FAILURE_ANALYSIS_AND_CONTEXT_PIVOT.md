@@ -139,6 +139,12 @@ Implement the task in reviewable pull requests:
 3. **Task 33C — isolated delivery experiment:** host-side fresh worker integration behind a capability flag, minimal delegation envelope, read-only boundary, timeout and one-attempt limit, plus the four-lane engineering pilot.
 4. **Task 33D — routed delivery, only if justified:** freeze deterministic thresholds, add cache identity using index revision/task fingerprint/schema version/compressor identity, and evaluate `bounded_routed` before any formal rerun.
 
+Implementation status on 2026-07-13:
+
+- Task 33A is merged in `main` at `6729066cf3bf495d3460f7208b4fb51ecdb3a362`.
+- Task 33B is implemented in `feat/task33b-bounded-action-packet`: the existing `get_docs_context` tool accepts `delivery_strategy="bounded_direct"`, returns only the validated packet, keeps the public inventory at three tools, and has three focused tests covering the production handoff, attribution/deduplication, truncation, conflicts, and insufficient evidence.
+- Task 33C and Task 33D remain open. No isolated-worker or routing claim is made by Task 33B.
+
 Do not put the worker/session implementation inside the MCP server, require model credentials in DocAtlas, add a fourth public Docs MCP tool, or make subagent support mandatory for clients.
 
 Task 33A must preserve both fixture identities during the transition to collision-safe hashing: the frozen Task 23 `sha256-concat-v1` value and the current `sha256-length-prefixed-v2` value. Causal execution verifies both values plus the oracle patch, hidden semantic suite, and audited external-context hashes before starting a runner. Each semantic requirement is bound to explicit hidden-test IDs. A runner that cannot prove a hard turn limit is rejected before any benchmark cell starts; a timeout or a count of top-level completion events is not relabelled as turn-limit enforcement.

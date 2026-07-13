@@ -5,6 +5,7 @@ from dataclasses import asdict, is_dataclass
 from typing import Any
 
 from docmancer.docs.domain.tool_selection import normalize_public_docs_actions
+from docmancer.docs.application.action_packet import build_action_packet, validate_action_packet
 from docmancer.docs.service import LibraryDocsService
 from docmancer.docs.interfaces.mcp.output_contract import normalize_output_mode
 from docmancer.docs.interfaces.mcp.project_tools import _attach_output_contract, _bad_request, _bounded_int_arg, _clean_string, _compact_mcp_payload, _strip_mcp_debug_noise
@@ -221,6 +222,22 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
     raw["document_content_policy"] = DOCUMENT_CONTENT_POLICY
     raw = normalize_public_docs_actions(raw)
     raw = _replace_network_retries_with_prepare_actions(raw, args)
+    if args.get("delivery_strategy") == "bounded_direct":
+        packet = build_action_packet(
+            question=question,
+            context_pack=raw.get("context_pack") or [],
+            trust_contract=raw.get("trust_contract") or {},
+            max_tokens=_bounded_int_arg(args, "packet_tokens", default=1_500, min_value=256, max_value=2_000) or 1_500,
+        )
+        validation_errors = validate_action_packet(packet)
+        if validation_errors:
+            return _bad_request("invalid_action_packet", "; ".join(validation_errors))
+        return {
+            "tool": "get_docs_context",
+            "delivery_strategy": "bounded_direct",
+            "action_packet": packet,
+            "document_content_policy": DOCUMENT_CONTENT_POLICY,
+        }
     mode = _output_mode(args)
     if mode == "full":
         raw["output_mode"] = "full"

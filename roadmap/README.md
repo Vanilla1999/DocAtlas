@@ -37,6 +37,7 @@ DocAtlas must not silently author or commit official documentation. When documen
 | 08 Docs/release hygiene | Open | Task file exists | Product narrative, changelog, classifier, wiki and release truth still drift |
 | 09 External ingest | Partial | Async mismatch, background execution, staging and GitHub fetch path were improved | Version propagation, hard deadlines, durable status, real failure taxonomy/recovery, reliable partial-page preservation and Kotlin evidence remain; see 11–14, 30–31 |
 | 23 Product decision benchmark | Pivot required | The complete 36-cell run found no resolved-rate gain and materially higher token/latency cost | Perform patch-level failure analysis and a bounded context-delivery pivot; see 33 |
+| 33 Bounded context pivot | In progress | Task 33A evaluation contracts are merged; Task 33B adds deterministic bounded-direct `ActionPacket` delivery | Review Task 33B, then implement and measure isolated delivery in Task 33C |
 
 `Done for scope` means the original bounded PR is complete; it does not mean the entire subsystem is mature.
 
@@ -71,7 +72,7 @@ Do not publish a Stable release before every Stage A implementation and separate
 
 ### Stage D — conditional external-library expansion
 
-Paused because Task 23 is formally `INCONCLUSIVE` under the hardened budget gate. Do not start this stage until Task 33 produces an evidence-complete frozen benchmark that meets its decision gate. Context7/web remains the complementary external-library source during the pause.
+Paused by Task 23's `PIVOT_REQUIRED` result. Do not start this stage until Task 33 produces a new frozen benchmark that meets its decision gate. Context7/web remains the complementary external-library source during the pause.
 
 17. `16_EXACT_SOURCE_CATALOG_AND_CACHE.md`
 18. `17_LOCKFILE_WORKSPACE_VERSION_IDENTITY.md`
