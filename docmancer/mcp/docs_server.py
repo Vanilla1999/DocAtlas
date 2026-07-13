@@ -10,6 +10,7 @@ from typing import Any, Callable, Mapping, cast
 
 import jsonschema
 
+from docmancer.docs.application.action_packet import ACTION_PACKET_OUTPUT_SCHEMA
 from docmancer.docs.interfaces.mcp.error_contract import build_mcp_error_payload, debug_errors_enabled
 from docmancer.docs.service import LibraryDocsService
 from docmancer.docs.interfaces.mcp.context_tools import context_tools, handle_context_tool
@@ -41,9 +42,13 @@ class ToolSpec:
     description: str
     input_schema: dict[str, Any]
     handler: ToolHandler
+    output_schema: dict[str, Any] | None = None
 
     def to_tool_dict(self) -> dict[str, Any]:
-        return {"name": self.name, "description": self.description, "inputSchema": copy.deepcopy(self.input_schema)}
+        result = {"name": self.name, "description": self.description, "inputSchema": copy.deepcopy(self.input_schema)}
+        if self.output_schema is not None:
+            result["outputSchema"] = copy.deepcopy(self.output_schema)
+        return result
 
 
 @dataclass(frozen=True)
@@ -75,6 +80,20 @@ DOCS_TARGET_INPUT_SCHEMA: dict[str, Any] = {
 }
 
 
+GET_DOCS_CONTEXT_OUTPUT_SCHEMA: dict[str, Any] = {
+    "type": "object",
+    "required": ["tool"],
+    "properties": {
+        "tool": {"const": "get_docs_context"},
+        "delivery_strategy": {"enum": ["bounded_direct"]},
+        "action_packet": ACTION_PACKET_OUTPUT_SCHEMA,
+        "document_content_policy": {"type": "object"},
+        "recommended_next_action": {"type": "object"},
+    },
+    "additionalProperties": True,
+}
+
+
 RAW_TOOLS: list[dict[str, Any]] = [
     {
         "name": "get_docs_context",
@@ -83,7 +102,7 @@ RAW_TOOLS: list[dict[str, Any]] = [
 Agent workflow:
 - Call get_docs_context first. It performs safe project preflight internally.
 - For coding/API questions, set response_style=\"snippet-first\".
-- For one compact pre-edit handoff, set delivery_strategy=\"bounded_direct\"; raw retrieval stays hidden and only a validated ActionPacket plus bounded recovery metadata enters model context.
+- For coding and patch tasks, use delivery_strategy=\"bounded_direct\" as the default pre-edit handoff; raw retrieval stays hidden and only a validated ActionPacket plus bounded recovery metadata enters model context.
 - Call prepare_docs only when this response explicitly returns it as next_action.
 - Use docs_status only for explicit health, freshness, source-state, or job-status requests.
 - If answer_type is navigation_only or partial_navigational, do not answer yet; read/search the suggested files first.
@@ -97,7 +116,7 @@ Agent workflow:
                 "project_path": {"type": ["string", "null"]},
                 "response_style": {"type": ["string", "null"], "enum": ["auto", "snippet-first", "evidence-first", None], "default": "auto", "description": "Choose snippet-first presentation for coding tasks or preserve evidence-first context."},
                 "delivery_strategy": {"type": ["string", "null"], "enum": ["bounded_direct", None], "description": "Return one deterministic, source-attributed ActionPacket without exposing raw retrieval content."},
-                "packet_tokens": {"type": ["integer", "null"], "minimum": 256, "maximum": 2000, "default": 1500, "description": "ActionPacket budget; the server always enforces the 2000-token hard ceiling."},
+                "packet_tokens": {"type": ["integer", "null"], "minimum": 256, "maximum": 2000, "default": 1500, "description": "Total bounded MCP payload budget; wrapper and recovery metadata are included in the 2000-token hard ceiling."},
                 "library": {"type": ["string", "null"]},
                 "libraries": {"type": ["array", "null"], "items": {"type": "string"}},
                 "ecosystem": {"type": ["string", "null"]},
@@ -131,7 +150,15 @@ Agent workflow:
                 },
             },
             "required": ["question"],
+            "allOf": [{
+                "if": {"required": ["packet_tokens"]},
+                "then": {
+                    "required": ["delivery_strategy"],
+                    "properties": {"delivery_strategy": {"const": "bounded_direct"}},
+                },
+            }],
         },
+        "outputSchema": GET_DOCS_CONTEXT_OUTPUT_SCHEMA,
     },
     {
         "name": "prepare_docs",
@@ -738,6 +765,7 @@ def _tool_spec(raw: dict[str, Any]) -> ToolSpec:
         description=str(raw["description"]),
         input_schema=_strip_null_enum_values(copy.deepcopy(raw["inputSchema"])),
         handler=_handler_for_tool(name),
+        output_schema=copy.deepcopy(raw.get("outputSchema")),
     )
 
 
@@ -1048,7 +1076,7 @@ def read_docs_resource(uri: str) -> dict[str, str] | None:
             "mimeType": "text/markdown",
             "text": f"""# Project docs workflow for `{project_path}`
 
-1. `get_docs_context(project_path=\"{project_path}\", question=..., mode=\"auto\", output_mode=\"compact\")`
+1. `get_docs_context(project_path=\"{project_path}\", question=..., mode=\"auto\", delivery_strategy=\"bounded_direct\")`
 2. If the response returns `prepare_docs` as next_action, follow it and retry `get_docs_context`.
 3. Inspect `trust_contract.sources.selected`, `trust_contract.sources.rejected`, and `trust_contract.sources.risky` before using the answer.
 """,
@@ -1069,7 +1097,8 @@ def read_docs_resource(uri: str) -> dict[str, str] | None:
        ecosystem=\"{ecosystem}\",
        version=\"{version}\",
        mode=\"library\",
-       response_style=\"snippet-first\"
+       response_style=\"snippet-first\",
+       delivery_strategy=\"bounded_direct\"
    )`
 
 2. If docs are missing/stale and network is approved:
@@ -1101,10 +1130,7 @@ async def _run_async(service: LibraryDocsService) -> None:
 
     @server.list_tools()
     async def _list_tools() -> list[mcp_types.Tool]:
-        return [
-            mcp_types.Tool(name=tool["name"], description=tool["description"], inputSchema=tool["inputSchema"])
-            for tool in current_tools()
-        ]
+        return [mcp_types.Tool(**tool) for tool in current_tools()]
 
     @server.list_resources()
     async def _list_resources() -> list[mcp_types.Resource]:
@@ -1138,12 +1164,15 @@ async def _run_async(service: LibraryDocsService) -> None:
         return resource["text"]
 
     @server.call_tool()
-    async def _call_tool(name: str, arguments: dict[str, Any]) -> list[mcp_types.TextContent]:
+    async def _call_tool(name: str, arguments: dict[str, Any]) -> mcp_types.CallToolResult:
         # Tool handlers include synchronous indexing and HTTP clients.  Keep
         # them off the MCP event loop so docs_status can report a running job
         # while another request is still doing bounded compatibility work.
         payload = await asyncio.to_thread(call_docs_tool_payload, name, arguments, service)
-        return _json_text(mcp_types, payload)
+        return mcp_types.CallToolResult(
+            content=_json_text(mcp_types, payload),
+            structuredContent=payload,
+        )
 
     async with stdio_server() as (read_stream, write_stream):
         await server.run(read_stream, write_stream, server.create_initialization_options())

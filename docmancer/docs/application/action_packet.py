@@ -3,32 +3,69 @@ from __future__ import annotations
 import hashlib
 import json
 import math
+import os
 import re
+from pathlib import Path
 from typing import Any, Iterable
 
 
 ACTION_PACKET_SCHEMA_VERSION = 1
 DEFAULT_ACTION_PACKET_TOKENS = 1_500
 HARD_ACTION_PACKET_TOKENS = 2_000
-MIN_ACTION_PACKET_TOKENS = 256
+MIN_ACTION_PACKET_TOKENS = 128
 
 _FORBIDDEN_RE = re.compile(r"\b(must\s+not|do\s+not|don't|never|forbidden|prohibited)\b", re.I)
-_REQUIRED_RE = re.compile(r"\b(must|required|requires|shall|should|invariant)\b", re.I)
-_VALIDATION_RE = re.compile(
-    r"(?:^|\s)(?:python\s+-m\s+(?:pytest|unittest|compileall)|pytest|uv\s+run|npm\s+(?:test|run)|pnpm\s+(?:test|run)|"
-    r"yarn\s+(?:test|run|build)|cargo\s+(?:test|check|build)|go\s+test|gradle\w*|flutter\s+test|"
-    r"dart\s+(?:test|analyze)|make|ruff|mypy|tsc|go\s+(?:build|vet)|"
-    r"dotnet\s+(?:test|build)|mvn\s+(?:test|package)|swift\s+test)(?=\s|$|[.;])",
+_REQUIRED_RE = re.compile(r"\b(must|required|requires|shall|invariant)\b", re.I)
+_NOT_REQUIRED_RE = re.compile(r"\b(?:not|required\s+not\s+to)\s+required\b", re.I)
+_VALIDATION_START_RE = re.compile(
+    r"^(?:run\s+)?(?:python\s+-m\s+(?:pytest|unittest|compileall)|pytest|"
+    r"uv\s+run\s+(?:pytest|ruff|mypy|python\s+-m\s+(?:pytest|unittest|compileall))|"
+    r"npm\s+(?:test|run\s+[A-Za-z0-9_.:-]+)|pnpm\s+(?:test|run\s+[A-Za-z0-9_.:-]+)|"
+    r"yarn\s+(?:test|run\s+[A-Za-z0-9_.:-]+|build)|cargo\s+(?:test|check|build)|"
+    r"go\s+(?:test|build|vet)|(?:\./)?gradlew?|flutter\s+test|dart\s+(?:test|analyze)|"
+    r"make(?:\s+[A-Za-z0-9_.:-]+)?|ruff|mypy|tsc|dotnet\s+(?:test|build)|"
+    r"mvn\s+(?:test|package)|swift\s+test)(?:\s+[A-Za-z0-9_./:=,@+%\-]+)*\.?$",
     re.I,
 )
-_SYMBOL_RE = re.compile(r"\b[A-Za-z_][A-Za-z0-9_]{2,}\b")
+_UNSAFE_COMMAND_RE = re.compile(r"(?:[;&|<>`]|\$\(|\n|\r)")
+_SYMBOL_RE = re.compile(
+    r"(?:[A-Za-z_][A-Za-z0-9_]*)(?:(?:\.|::|#)[A-Za-z_][A-Za-z0-9_]*)*"
+)
 _CODE_SOURCE_CLASSES = {"repo_map", "source_evidence", "code_graph"}
+_MAX_SOURCE_PATH = 500
+_MAX_SOURCE_SECTION = 300
+
+
+ACTION_PACKET_OUTPUT_SCHEMA: dict[str, Any] = {
+    "type": "object",
+    "additionalProperties": False,
+    "required": [
+        "schema_version", "status", "task_interpretation", "source_of_truth", "target_surface",
+        "required_invariants", "forbidden_changes", "implementation_guidance", "validation",
+        "uncertainties", "missing_evidence", "omitted_counts", "estimated_tokens",
+    ],
+    "properties": {
+        "schema_version": {"const": ACTION_PACKET_SCHEMA_VERSION},
+        "status": {"enum": ["ok", "truncated", "insufficient_evidence"]},
+        "task_interpretation": {"type": "object"},
+        "source_of_truth": {"type": "array"},
+        "target_surface": {"type": "object"},
+        "required_invariants": {"type": "array"},
+        "forbidden_changes": {"type": "array"},
+        "implementation_guidance": {"type": "array"},
+        "validation": {"type": "object"},
+        "uncertainties": {"type": "array"},
+        "missing_evidence": {"type": "array"},
+        "omitted_counts": {"type": "object"},
+        "estimated_tokens": {"type": "integer", "minimum": 1, "maximum": HARD_ACTION_PACKET_TOKENS},
+    },
+}
 
 
 def estimate_action_packet_tokens(value: Any) -> int:
-    """Estimate tokens deterministically as ceil(canonical UTF-8 bytes / 4)."""
+    """Estimate tokens deterministically as ceil(serialized UTF-8 bytes / 4)."""
 
-    encoded = json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    encoded = json.dumps(value, ensure_ascii=False, sort_keys=True).encode("utf-8")
     return max(1, math.ceil(len(encoded) / 4))
 
 
@@ -38,6 +75,9 @@ def build_action_packet(
     context_pack: Iterable[dict[str, Any]],
     trust_contract: dict[str, Any] | None = None,
     max_tokens: int = DEFAULT_ACTION_PACKET_TOKENS,
+    project_path: str | None = None,
+    module_path: str | None = None,
+    retrieval_issues: Iterable[str] | None = None,
 ) -> dict[str, Any]:
     """Render selected retrieval evidence into a bounded, deterministic packet.
 
@@ -50,16 +90,36 @@ def build_action_packet(
         max(MIN_ACTION_PACKET_TOKENS, int(max_tokens or DEFAULT_ACTION_PACKET_TOKENS)),
     )
     raw_items = [dict(item) for item in context_pack if isinstance(item, dict)]
-    authority_conflicts = _authority_conflicts(raw_items)
-    items = _rank_and_dedupe(raw_items, trust_contract or {})
+    code_target_hints = [
+            _source_path(item)
+            for item in raw_items
+            if str(item.get("source_class") or "") in _CODE_SOURCE_CLASSES and _source_path(item)
+    ]
+    target_hints = [module_path] if module_path else code_target_hints
+    oversized_sources = 0
+    scoped_items: list[dict[str, Any]] = []
+    for item in raw_items:
+        path, section = _source_path(item), _section(item)
+        if (
+            not path
+            or len(path) > _MAX_SOURCE_PATH
+            or len(section) > _MAX_SOURCE_SECTION
+            or len(_source_scope(item)) > _MAX_SOURCE_SECTION
+            or len(_version_binding(item)) > 100
+        ):
+            oversized_sources += 1
+            continue
+        item["_packet_authority"] = _effective_authority(
+            item,
+            project_path=project_path,
+            target_paths=target_hints,
+        )
+        scoped_items.append(item)
+    authority_conflicts = _authority_conflicts(scoped_items, trust_contract or {})
+    items = _rank_and_dedupe(scoped_items, trust_contract or {})
     objective, objective_omitted = _bounded_text(question.strip(), 1_000)
     source_rows = [_source_row(item) for item in items if _source_path(item)]
-    source_rows = _dedupe_dicts(source_rows, ("path", "symbol_or_section"))
-    evidence_by_item = {
-        _item_identity(item): _evidence_id(item)
-        for item in items
-        if _source_path(item)
-    }
+    source_rows = _dedupe_dicts(source_rows, ("evidence_id",))
 
     required: list[dict[str, Any]] = []
     forbidden: list[dict[str, Any]] = []
@@ -67,37 +127,43 @@ def build_action_packet(
     test_checks: list[dict[str, Any]] = []
     semantic_checks: list[dict[str, Any]] = []
     guidance: list[dict[str, Any]] = []
+    critical_fact_omissions = 0
+    snippet_omissions = 0
+    risky_content_omissions = 0
+    untrusted_validation_omissions = 0
     for item in items:
-        evidence_id = evidence_by_item.get(_item_identity(item))
+        evidence_id = _evidence_id(item) if _source_path(item) else None
         if not evidence_id:
             continue
-        for fact in _facts(str(item.get("content") or "")):
+        facts, omitted_facts = _extract_facts(str(item.get("content") or ""))
+        if _instruction_risk_flags(item):
+            risky_content_omissions += len(facts) + (1 if item.get("snippet") else 0)
+            continue
+        critical_fact_omissions += omitted_facts if _authority(item) == "canonical" else 0
+        for fact_type, fact in facts:
             cited = {"text": fact, "evidence_ids": [evidence_id]}
-            # Only explicitly canonical repository policy may become a hard
-            # constraint or validation command. Supporting docs remain cited
-            # references/snippets, never executable policy.
             if _authority(item) != "canonical":
                 continue
-            if _FORBIDDEN_RE.search(fact):
+            if fact_type == "forbidden":
                 forbidden.append(cited)
-            elif _VALIDATION_RE.search(fact):
+            elif fact_type == "validation":
+                if not _may_guide_workflow(item):
+                    untrusted_validation_omissions += 1
+                    continue
                 bucket = _validation_bucket(fact)
                 {"compile": compile_checks, "tests": test_checks, "semantic": semantic_checks}[bucket].append(cited)
-            elif _REQUIRED_RE.search(fact):
+            elif fact_type == "required":
                 required.append(cited)
-        snippet = _snippet_text(item.get("snippet"))
+        snippet, snippet_omitted = _snippet_text(item.get("snippet"))
+        snippet_omissions += snippet_omitted
         if snippet:
             guidance.append({"text": snippet, "evidence_ids": [evidence_id]})
 
-    target_files: list[str] = []
     symbols: list[dict[str, Any]] = []
     for item in items:
-        evidence_id = evidence_by_item.get(_item_identity(item))
+        evidence_id = _evidence_id(item) if _source_path(item) else None
         if not evidence_id or str(item.get("source_class") or "") not in _CODE_SOURCE_CLASSES:
             continue
-        path = _source_path(item)
-        if path:
-            target_files.append(path)
         for symbol in _explicit_symbols(item):
             symbols.append({"name": symbol, "evidence_ids": [evidence_id]})
 
@@ -110,21 +176,21 @@ def build_action_packet(
         },
         "source_of_truth": source_rows,
         "target_surface": {
-            "likely_files": _dedupe_dicts([
-                {"path": path, "evidence_ids": [evidence_by_item[_item_identity(item)]]}
+            "likely_files": _dedupe_cited([
+                {"path": _source_path(item), "evidence_ids": [_evidence_id(item)]}
                 for item in items
-                if (path := _source_path(item)) in target_files
-                and _item_identity(item) in evidence_by_item
-            ], ("path",)),
-            "symbols": _dedupe_dicts(symbols, ("name",)),
+                if str(item.get("source_class") or "") in _CODE_SOURCE_CLASSES
+                and _source_path(item)
+            ], "path"),
+            "symbols": _dedupe_cited(symbols, "name"),
         },
-        "required_invariants": _dedupe_dicts(required, ("text",)),
-        "forbidden_changes": _dedupe_dicts(forbidden, ("text",)),
-        "implementation_guidance": _dedupe_dicts(guidance, ("text",)),
+        "required_invariants": _dedupe_cited(required, "text"),
+        "forbidden_changes": _dedupe_cited(forbidden, "text"),
+        "implementation_guidance": _dedupe_cited(guidance, "text"),
         "validation": {
-            "compile": _dedupe_dicts(compile_checks, ("text",)),
-            "tests": _dedupe_dicts(test_checks, ("text",)),
-            "semantic_checks": _dedupe_dicts(semantic_checks, ("text",)),
+            "compile": _dedupe_cited(compile_checks, "text"),
+            "tests": _dedupe_cited(test_checks, "text"),
+            "semantic_checks": _dedupe_cited(semantic_checks, "text"),
         },
         "uncertainties": [],
         "missing_evidence": [],
@@ -135,27 +201,54 @@ def build_action_packet(
         packet["status"] = "truncated"
         packet["omitted_counts"]["task_interpretation.objective_characters"] = objective_omitted
 
+    for field, count in (
+        ("oversized_source_identifiers", oversized_sources),
+        ("critical_source_facts", critical_fact_omissions),
+        ("implementation_guidance", snippet_omissions),
+        ("risky_document_items", risky_content_omissions),
+        ("untrusted_validation_commands", untrusted_validation_omissions),
+    ):
+        if count:
+            packet["omitted_counts"][field] = count
+            if packet["status"] == "ok":
+                packet["status"] = "truncated"
+
+    if critical_fact_omissions:
+        packet["status"] = "insufficient_evidence"
+        packet["missing_evidence"].append(
+            "At least one critical canonical fact was too large to include as a complete item."
+        )
+
     if authority_conflicts:
         packet["status"] = "insufficient_evidence"
         packet["uncertainties"] = [
             {"type": "authority_conflict", "path": path, "symbol_or_section": section}
             for path, section in authority_conflicts
         ]
-        packet["missing_evidence"] = ["Conflicting canonical evidence must be resolved before editing."]
+        packet["missing_evidence"].append("Conflicting canonical evidence must be resolved before editing.")
 
-    if not source_rows:
+    for issue in list(retrieval_issues or [])[:5]:
+        text, _ = _bounded_text(str(issue).strip(), 240)
+        if text and text not in packet["missing_evidence"]:
+            packet["missing_evidence"].append(text)
+    if packet["missing_evidence"]:
         packet["status"] = "insufficient_evidence"
-        packet["missing_evidence"] = ["No selected source-backed evidence matched the request."]
-    elif not any((
-        required, forbidden, compile_checks, test_checks, semantic_checks,
-        guidance, target_files, symbols,
-    )):
+
+    _prune_orphan_sources(packet)
+
+    if not packet["source_of_truth"]:
         packet["status"] = "insufficient_evidence"
-        packet["missing_evidence"] = [
-            "Selected sources do not contain explicit constraints, validation commands, or code-surface evidence."
-        ]
+        message = "No selected source-backed evidence matched the request."
+        if message not in packet["missing_evidence"]:
+            packet["missing_evidence"].append(message)
+    elif not _has_actionable_items(packet):
+        packet["status"] = "insufficient_evidence"
+        message = "Selected sources do not contain explicit constraints, validation commands, or code-surface evidence."
+        if message not in packet["missing_evidence"]:
+            packet["missing_evidence"].append(message)
 
     _fit_packet(packet, budget)
+    _ensure_post_fit_status(packet)
     _refresh_estimated_tokens(packet)
     # Account for the estimate field itself. If it crosses the caller budget,
     # remove another complete item and recompute rather than slicing text.
@@ -163,15 +256,18 @@ def build_action_packet(
         _refresh_estimated_tokens(packet)
     _refresh_estimated_tokens(packet)
     if packet["estimated_tokens"] > budget:
-        packet["status"] = "insufficient_evidence"
-        message = "The requested token budget is smaller than the ActionPacket schema overhead."
-        if message not in packet["missing_evidence"]:
-            packet["missing_evidence"].append(message)
-        _refresh_estimated_tokens(packet)
+        _compact_failure_packet(packet, budget)
     return packet
 
 
-def validate_action_packet(packet: Any) -> list[str]:
+def validate_action_packet(
+    packet: Any,
+    *,
+    evidence_items: Iterable[dict[str, Any]] | None = None,
+    max_tokens: int = HARD_ACTION_PACKET_TOKENS,
+    project_path: str | None = None,
+    module_path: str | None = None,
+) -> list[str]:
     errors: list[str] = []
     if not isinstance(packet, dict):
         return ["ActionPacket must be an object"]
@@ -213,22 +309,35 @@ def validate_action_packet(packet: Any) -> list[str]:
     if not isinstance(packet.get("source_of_truth"), list):
         errors.append("source_of_truth must be an array")
     evidence_ids: set[Any] = set()
+    source_by_evidence: dict[str, dict[str, Any]] = {}
     for index, row in enumerate(sources):
         if not isinstance(row, dict):
             errors.append(f"source_of_truth[{index}] must be an object")
             continue
-        expected = {"path", "symbol_or_section", "authority", "evidence_id"}
+        expected = {
+            "path", "symbol_or_section", "authority", "instruction_trust",
+            "scope", "version_binding", "evidence_id",
+        }
         if set(row) != expected:
             errors.append(f"source_of_truth[{index}] fields must be {sorted(expected)}")
         if not all(
             isinstance(row.get(key), str) and row[key].strip()
-            for key in ("path", "symbol_or_section", "evidence_id")
+            for key in (
+                "path", "symbol_or_section", "instruction_trust", "scope",
+                "version_binding", "evidence_id",
+            )
         ):
-            errors.append("source_of_truth entries require path, symbol_or_section, authority, and evidence_id")
+            errors.append("source_of_truth entries require complete source, trust, scope, version, and evidence fields")
             continue
         if row.get("authority") not in {"canonical", "supporting"}:
             errors.append("invalid source authority")
-        evidence_ids.add(row.get("evidence_id"))
+        if row.get("instruction_trust") not in {"scoped_agent_policy", "untrusted_data"}:
+            errors.append("invalid source instruction_trust")
+        evidence_id = str(row.get("evidence_id"))
+        if evidence_id in evidence_ids:
+            errors.append("duplicate source evidence_id")
+        evidence_ids.add(evidence_id)
+        source_by_evidence[evidence_id] = row
 
     for key in ("required_invariants", "forbidden_changes", "implementation_guidance"):
         _validate_cited_items(packet.get(key), key, "text", errors)
@@ -240,13 +349,27 @@ def validate_action_packet(packet: Any) -> list[str]:
             errors.append("factual item has missing or unknown evidence_ids")
             break
 
+    for field in ("required_invariants", "forbidden_changes"):
+        for item in packet.get(field) or []:
+            if any(source_by_evidence.get(ref, {}).get("authority") != "canonical" for ref in item.get("evidence_ids") or []):
+                errors.append(f"{field} may cite only canonical evidence")
+                break
+    for field in ("compile", "tests", "semantic_checks"):
+        for item in (validation.get(field) or []):
+            if any(
+                source_by_evidence.get(ref, {}).get("instruction_trust") != "scoped_agent_policy"
+                for ref in item.get("evidence_ids") or []
+            ):
+                errors.append(f"validation.{field} may cite only scoped agent policy")
+                break
+
     uncertainties = packet.get("uncertainties")
     if not isinstance(uncertainties, list):
         errors.append("uncertainties must be an array")
     else:
         for index, item in enumerate(uncertainties):
             expected = {"type", "path", "symbol_or_section"}
-            if not isinstance(item, dict) or set(item) != expected or not all(
+            if not isinstance(item, dict) or set(item) != expected or item.get("type") != "authority_conflict" or not all(
                 isinstance(item.get(key), str) and item[key].strip() for key in expected
             ):
                 errors.append(f"uncertainties[{index}] must be a complete authority-conflict object")
@@ -267,10 +390,39 @@ def validate_action_packet(packet: Any) -> list[str]:
     status = packet.get("status")
     if status == "ok" and (missing_evidence or omitted_counts):
         errors.append("ok packets cannot report missing evidence or omissions")
+    if status == "ok" and (not sources or not _has_actionable_items(packet)):
+        errors.append("ok packets require cited actionable evidence")
+    if status == "ok" and uncertainties:
+        errors.append("ok packets cannot report uncertainties")
     if status == "truncated" and not omitted_counts:
         errors.append("truncated packets must report omitted_counts")
     if status == "insufficient_evidence" and not missing_evidence:
         errors.append("insufficient_evidence packets must explain missing_evidence")
+    if isinstance(omitted_counts, dict) and any(
+        key in omitted_counts for key in ("required_invariants", "forbidden_changes", "critical_source_facts")
+    ) and status != "insufficient_evidence":
+        errors.append("critical omissions require insufficient_evidence status")
+
+    if evidence_items is not None:
+        raw_evidence_items = [item for item in evidence_items if isinstance(item, dict)]
+        code_targets = [
+            _source_path(item) for item in raw_evidence_items
+            if str(item.get("source_class") or "") in _CODE_SOURCE_CLASSES and _source_path(item)
+        ]
+        target_hints = [module_path] if module_path else code_targets
+        bound_items: list[dict[str, Any]] = []
+        for original in raw_evidence_items:
+            item = dict(original)
+            item["_packet_authority"] = _effective_authority(
+                item, project_path=project_path, target_paths=target_hints,
+            )
+            bound_items.append(item)
+        evidence_map = {
+            _evidence_id(item): item
+            for item in bound_items
+            if _source_path(item)
+        }
+        _validate_evidence_fidelity(packet, evidence_map, errors)
 
     declared = packet.get("estimated_tokens")
     declared_tokens = declared if isinstance(declared, int) and not isinstance(declared, bool) else -1
@@ -279,7 +431,8 @@ def validate_action_packet(packet: Any) -> list[str]:
     except (TypeError, ValueError):
         actual = HARD_ACTION_PACKET_TOKENS + 1
         errors.append("ActionPacket must be JSON serializable")
-    if actual > HARD_ACTION_PACKET_TOKENS or declared_tokens != actual:
+    effective_limit = min(HARD_ACTION_PACKET_TOKENS, max(MIN_ACTION_PACKET_TOKENS, int(max_tokens)))
+    if actual > effective_limit or declared_tokens != actual:
         errors.append("estimated_tokens mismatch or hard limit exceeded")
     return errors
 
@@ -301,6 +454,7 @@ def _validate_cited_items(value: Any, field: str, text_key: str, errors: list[st
         errors.append(f"{field} must be an array")
         return
     expected = {text_key, "evidence_ids"}
+    seen: set[tuple[str, tuple[str, ...]]] = set()
     for index, item in enumerate(value):
         if not isinstance(item, dict) or set(item) != expected:
             errors.append(f"{field}[{index}] fields must be {sorted(expected)}")
@@ -310,6 +464,11 @@ def _validate_cited_items(value: Any, field: str, text_key: str, errors: list[st
         refs = item.get("evidence_ids")
         if not isinstance(refs, list) or not refs or any(not isinstance(ref, str) or not ref for ref in refs):
             errors.append(f"{field}[{index}].evidence_ids must be a non-empty string array")
+            continue
+        identity = (str(item.get(text_key) or ""), tuple(refs))
+        if identity in seen:
+            errors.append(f"{field} contains duplicate cited items")
+        seen.add(identity)
 
 
 def _all_cited_items(
@@ -332,6 +491,60 @@ def _all_cited_items(
     return [item for value in values if isinstance(value, list) for item in value if isinstance(item, dict)]
 
 
+def _validate_evidence_fidelity(
+    packet: dict[str, Any], evidence_map: dict[str, dict[str, Any]], errors: list[str]
+) -> None:
+    sources = packet.get("source_of_truth") or []
+    for row in sources:
+        if not isinstance(row, dict):
+            continue
+        evidence_id = str(row.get("evidence_id") or "")
+        evidence = evidence_map.get(evidence_id)
+        if evidence is None:
+            errors.append("source_of_truth contains evidence not present in the retrieval result")
+            continue
+        expected = _source_row(evidence)
+        if any(row.get(key) != expected.get(key) for key in expected):
+            errors.append("source attribution does not match the bound retrieval evidence")
+
+    for field in ("required_invariants", "forbidden_changes"):
+        expected_type = "required" if field == "required_invariants" else "forbidden"
+        for item in packet.get(field) or []:
+            text = str(item.get("text") or "")
+            if any(
+                (expected_type, text) not in _extract_facts(
+                    str(evidence_map.get(ref, {}).get("content") or "")
+                )[0]
+                for ref in item.get("evidence_ids") or []
+            ):
+                errors.append(f"{field} contains text not present in its cited evidence")
+                break
+    for field in ("compile", "tests", "semantic_checks"):
+        for item in (packet.get("validation") or {}).get(field) or []:
+            text = str(item.get("text") or "")
+            if any(
+                ("validation", text) not in _extract_facts(
+                    str(evidence_map.get(ref, {}).get("content") or "")
+                )[0]
+                for ref in item.get("evidence_ids") or []
+            ):
+                errors.append(f"validation.{field} contains a command not present in its cited evidence")
+                break
+    for item in packet.get("implementation_guidance") or []:
+        text = str(item.get("text") or "")
+        if any(text != _snippet_text(evidence_map.get(ref, {}).get("snippet"))[0] for ref in item.get("evidence_ids") or []):
+            errors.append("implementation_guidance does not match its cited snippet")
+            break
+    for item in (packet.get("target_surface") or {}).get("likely_files") or []:
+        if any(item.get("path") != _source_path(evidence_map.get(ref, {})) for ref in item.get("evidence_ids") or []):
+            errors.append("target_surface.likely_files does not match its cited source")
+            break
+    for item in (packet.get("target_surface") or {}).get("symbols") or []:
+        if any(item.get("name") not in _explicit_symbols(evidence_map.get(ref, {})) for ref in item.get("evidence_ids") or []):
+            errors.append("target_surface.symbols does not match its cited source")
+            break
+
+
 def _refresh_estimated_tokens(packet: dict[str, Any]) -> None:
     packet["estimated_tokens"] = 0
     for _ in range(8):
@@ -341,53 +554,245 @@ def _refresh_estimated_tokens(packet: dict[str, Any]) -> None:
         packet["estimated_tokens"] = actual
 
 
-def _authority_conflicts(items: Iterable[dict[str, Any]]) -> list[tuple[str, str]]:
+def _authority_conflicts(
+    items: Iterable[dict[str, Any]], trust_contract: dict[str, Any]
+) -> list[tuple[str, str]]:
     canonical: dict[tuple[str, str], set[str]] = {}
+    constraints: dict[str, dict[str, set[tuple[str, str]]]] = {}
+    risky_sources = _risky_source_keys(trust_contract)
     for item in items:
-        if _authority(item) != "canonical" or item.get("freshness") == "stale" or not _source_path(item):
+        if (
+            _authority(item) != "canonical"
+            or item.get("freshness") == "stale"
+            or not _source_path(item)
+            or _instruction_risk_flags(item)
+            or _item_source_keys(item) & risky_sources
+        ):
             continue
         identity = _item_identity(item)
         content = str(item.get("content") or "").strip()
         if content:
             canonical.setdefault(identity, set()).add(hashlib.sha256(content.encode("utf-8")).hexdigest())
-    return sorted(identity for identity, hashes in canonical.items() if len(hashes) > 1)
+        facts, _ = _extract_facts(content)
+        for fact_type, fact in facts:
+            if fact_type not in {"required", "forbidden"}:
+                continue
+            signature = _constraint_signature(fact)
+            if signature:
+                constraints.setdefault(signature, {}).setdefault(fact_type, set()).add(identity)
+    conflicts = {identity for identity, hashes in canonical.items() if len(hashes) > 1}
+    for by_type in constraints.values():
+        if by_type.get("required") and by_type.get("forbidden"):
+            conflicts.update(by_type["required"])
+            conflicts.update(by_type["forbidden"])
+    return sorted(conflicts)
+
+
+def _constraint_signature(value: str) -> str:
+    normalized = re.sub(
+        r"\b(?:must|shall|required|requires?|invariant|do|not|never|forbidden|prohibited|this|is|be)\b",
+        " ",
+        value.lower(),
+    )
+    return " ".join(re.findall(r"[a-z0-9_]+", normalized))
+
+
+def _effective_authority(
+    item: dict[str, Any], *, project_path: str | None, target_paths: Iterable[str]
+) -> str:
+    declared = {
+        str(value).lower()
+        for value in (item.get("authority"), item.get("repository_authority"))
+        if value
+    }
+    if not declared & {"canonical", "source_of_truth", "explicit_agent_policy"}:
+        return "supporting"
+    if _instruction_risk_flags(item):
+        return "supporting"
+    if item.get("repository_authority") == "explicit_agent_policy":
+        return "canonical" if _scope_applies(item, project_path=project_path, target_paths=target_paths) else "supporting"
+    if str(item.get("doc_scope") or "") == "module" or item.get("module_path"):
+        return "canonical" if _scope_applies(item, project_path=project_path, target_paths=target_paths) else "supporting"
+    return "canonical"
+
+
+def _scope_applies(
+    item: dict[str, Any], *, project_path: str | None, target_paths: Iterable[str]
+) -> bool:
+    root = str(item.get("authority_root") or project_path or "").strip()
+    raw_scope = str(item.get("policy_scope") or item.get("module_path") or root).strip()
+    if not raw_scope:
+        return False
+    scope = _absolute_scope(raw_scope, root)
+    targets = [str(value).strip() for value in target_paths if str(value).strip()]
+    if not targets:
+        return bool(root and _same_path(scope, _absolute_scope(root, root)))
+    return all(_is_within(_absolute_scope(target, root), scope) for target in targets)
+
+
+def _absolute_scope(value: str, root: str) -> str:
+    if "://" in value:
+        return value
+    path = Path(value)
+    if not path.is_absolute() and root:
+        path = Path(root) / path
+    return os.path.normcase(os.path.normpath(str(path)))
+
+
+def _same_path(left: str, right: str) -> bool:
+    return os.path.normcase(os.path.normpath(left)) == os.path.normcase(os.path.normpath(right))
+
+
+def _is_within(path: str, scope: str) -> bool:
+    if "://" in path or "://" in scope:
+        return path == scope or path.startswith(scope.rstrip("/") + "/")
+    try:
+        return os.path.commonpath([path, scope]) == scope
+    except ValueError:
+        return False
+
+
+def _instruction_risk_flags(item: dict[str, Any]) -> list[str]:
+    values: list[Any] = []
+    for raw in (item.get("instruction_risk_flags"), item.get("risk_flags")):
+        if isinstance(raw, (list, tuple, set)):
+            values.extend(raw)
+        elif raw:
+            values.append(raw)
+    return [
+        str(value)
+        for value in values
+        if value
+    ]
+
+
+def _may_guide_workflow(item: dict[str, Any]) -> bool:
+    return (
+        _authority(item) == "canonical"
+        and item.get("repository_authority") == "explicit_agent_policy"
+        and item.get("instruction_trust") == "scoped_agent_policy"
+        and bool(item.get("scope_verified"))
+        and not _instruction_risk_flags(item)
+    )
+
+
+def _source_scope(item: dict[str, Any]) -> str:
+    return str(
+        item.get("module_path")
+        or item.get("policy_scope")
+        or item.get("doc_scope")
+        or "unscoped"
+    )
+
+
+def _version_binding(item: dict[str, Any]) -> str:
+    return str(
+        item.get("docs_exactness")
+        or item.get("version_binding")
+        or item.get("version")
+        or "not_applicable"
+    )
+
+
+def _relevance_score(item: dict[str, Any]) -> float:
+    for key in ("score", "relevance_score", "similarity", "rank_score"):
+        value = item.get(key)
+        if isinstance(value, (int, float)) and not isinstance(value, bool):
+            return float(value)
+    return 0.0
 
 
 def _rank_and_dedupe(items: Iterable[dict[str, Any]], trust_contract: dict[str, Any]) -> list[dict[str, Any]]:
-    trust_sources = trust_contract.get("sources") if isinstance(trust_contract.get("sources"), dict) else {}
-    risky_sources = {
-        str(row.get("source") or row.get("path") or "")
-        for row in [*(trust_contract.get("risky") or []), *(trust_sources.get("risky") or [])]
-        if isinstance(row, dict)
-    }
-    ranked: list[tuple[tuple[int, int, str, str, int, str], dict[str, Any]]] = []
+    risky_sources = _risky_source_keys(trust_contract)
+    ranked: list[tuple[tuple[int, int, float, int, str, str, str, str], dict[str, Any]]] = []
     for original in items:
         if not isinstance(original, dict):
             continue
         item = dict(original)
         path = _source_path(item)
         section = _section(item)
-        if not path or path in risky_sources or item.get("freshness") == "stale":
+        source_keys = _item_source_keys(item)
+        if not path or source_keys & risky_sources or item.get("freshness") == "stale":
             continue
         authority = _authority(item)
         authority_rank = 0 if authority == "canonical" else 1
         class_rank = 0 if item.get("source_class") in _CODE_SOURCE_CLASSES else 1
         content = str(item.get("content") or "")
-        actionable_rank = -len(_facts(content)) - (1 if _snippet_text(item.get("snippet")) else 0)
+        facts, _ = _extract_facts(content)
+        snippet, _ = _snippet_text(item.get("snippet"))
+        actionable_rank = -len(facts) - (1 if snippet else 0)
+        relevance_rank = -_relevance_score(item)
         content_hash = hashlib.sha256(content.encode("utf-8")).hexdigest()
-        ranked.append(((authority_rank, class_rank, path, section, actionable_rank, content_hash), item))
+        supplemental = json.dumps(
+            {
+                "snippet": item.get("snippet"),
+                "symbols": item.get("symbols"),
+                "metadata": item.get("metadata"),
+            },
+            ensure_ascii=False,
+            sort_keys=True,
+            default=str,
+        )
+        supplemental_hash = hashlib.sha256(supplemental.encode("utf-8")).hexdigest()
+        ranked.append((
+            (
+                authority_rank, class_rank, relevance_rank, actionable_rank,
+                path, section, content_hash, supplemental_hash,
+            ),
+            item,
+        ))
     selected: list[dict[str, Any]] = []
-    seen: set[tuple[str, str]] = set()
+    seen: set[str] = set()
     for _, item in sorted(ranked, key=lambda row: row[0]):
-        identity = _item_identity(item)
-        if identity in seen:
+        evidence_id = _evidence_id(item)
+        if evidence_id in seen:
             continue
-        seen.add(identity)
+        seen.add(evidence_id)
         selected.append(item)
     return selected
 
 
+def _risky_source_keys(trust_contract: dict[str, Any]) -> set[str]:
+    trust_sources = trust_contract.get("sources") if isinstance(trust_contract.get("sources"), dict) else {}
+    rows: list[Any] = []
+    for value in (trust_contract.get("risky"), trust_sources.get("risky")):
+        if isinstance(value, list):
+            rows.extend(value)
+        elif isinstance(value, (str, dict)):
+            rows.append(value)
+    return {
+        key
+        for row in rows
+        if isinstance(row, (str, dict))
+        if (key := _normalized_source_key(
+            row.get("source") or row.get("path") or row.get("url") or ""
+            if isinstance(row, dict) else row
+        ))
+    }
+
+
+def _item_source_keys(item: dict[str, Any]) -> set[str]:
+    return {
+        key
+        for value in (
+            _source_path(item), item.get("url"), item.get("canonical_id"),
+            item.get("library_id"), item.get("library"),
+        )
+        if value
+        if (key := _normalized_source_key(value))
+    }
+
+
+def _normalized_source_key(value: Any) -> str:
+    if isinstance(value, dict):
+        value = value.get("path") or value.get("source") or value.get("url") or ""
+    return str(value).strip().replace("\\", "/").rstrip("/").lower()
+
+
 def _authority(item: dict[str, Any]) -> str:
+    packet_authority = item.get("_packet_authority")
+    if packet_authority in {"canonical", "supporting"}:
+        return str(packet_authority)
     declared = {
         str(value).lower()
         for value in (item.get("authority"), item.get("repository_authority"))
@@ -403,16 +808,23 @@ def _source_row(item: dict[str, Any]) -> dict[str, Any]:
         "path": _source_path(item),
         "symbol_or_section": _section(item),
         "authority": _authority(item),
+        "instruction_trust": str(item.get("instruction_trust") or "untrusted_data"),
+        "scope": _source_scope(item),
+        "version_binding": _version_binding(item),
         "evidence_id": _evidence_id(item),
     }
 
 
 def _source_path(item: dict[str, Any]) -> str:
-    return str(item.get("path") or item.get("source") or item.get("url") or "").strip()
+    value = item.get("path") or item.get("source") or item.get("url") or ""
+    if isinstance(value, dict):
+        value = value.get("path") or value.get("source") or value.get("url") or ""
+    return str(value).strip()
 
 
 def _section(item: dict[str, Any]) -> str:
-    value = item.get("heading_path") or item.get("title") or (item.get("section") or {}).get("title") or "document"
+    section = item.get("section") if isinstance(item.get("section"), dict) else {}
+    value = item.get("heading_path") or item.get("title") or section.get("heading_path") or section.get("title") or "document"
     if isinstance(value, list):
         return " > ".join(str(part) for part in value)
     return str(value)
@@ -423,26 +835,81 @@ def _item_identity(item: dict[str, Any]) -> tuple[str, str]:
 
 
 def _evidence_id(item: dict[str, Any]) -> str:
-    identity = "\0".join((_source_path(item), _section(item), str(item.get("content") or "")))
+    identity = json.dumps(
+        {
+            "path": _source_path(item),
+            "section": _section(item),
+            "content": str(item.get("content") or ""),
+            "snippet": item.get("snippet"),
+            "symbols": item.get("symbols"),
+            "metadata_symbols": (
+                item.get("metadata", {}).get("symbols")
+                if isinstance(item.get("metadata"), dict) else None
+            ),
+        },
+        ensure_ascii=False,
+        sort_keys=True,
+        default=str,
+    )
     return "ev-" + hashlib.sha256(identity.encode("utf-8")).hexdigest()[:16]
 
 
-def _facts(content: str) -> list[str]:
-    facts: list[str] = []
+def _extract_facts(content: str) -> tuple[list[tuple[str, str]], int]:
+    facts: list[tuple[str, str]] = []
+    omitted_critical = 0
+    in_fence = False
     for raw in content.splitlines():
-        line = raw.strip().lstrip("-* ").strip().replace("`", "")
-        if not line or len(line) > 500:
+        stripped = raw.strip()
+        if stripped.startswith("```") or stripped.startswith("~~~"):
+            in_fence = not in_fence
             continue
-        if _FORBIDDEN_RE.search(line) or _REQUIRED_RE.search(line) or _VALIDATION_RE.search(line):
-            facts.append(line)
-    return facts
+        if (
+            in_fence
+            or stripped.startswith(">")
+            or stripped.startswith("#")
+            or (stripped.startswith("|") and stripped.count("|") >= 2)
+        ):
+            continue
+        line = stripped.lstrip("-* ").strip().replace("`", "")
+        if not line:
+            continue
+        segments = re.split(r"(?<=[.!?])\s+(?=[A-Z0-9])", line)
+        for segment in segments:
+            fact = segment.strip()
+            if not fact:
+                continue
+            looks_critical = bool(
+                _FORBIDDEN_RE.search(fact)
+                or (_REQUIRED_RE.search(fact) and not _NOT_REQUIRED_RE.search(fact))
+                or _validation_command(fact)
+            )
+            if len(fact) > 500:
+                omitted_critical += int(looks_critical)
+                continue
+            if _FORBIDDEN_RE.search(fact):
+                facts.append(("forbidden", fact))
+                continue
+            command = _validation_command(fact)
+            if command:
+                facts.append(("validation", command))
+                continue
+            if _REQUIRED_RE.search(fact) and not _NOT_REQUIRED_RE.search(fact):
+                facts.append(("required", fact))
+    return facts, omitted_critical
+
+
+def _validation_command(value: str) -> str | None:
+    command = value.strip()
+    if _UNSAFE_COMMAND_RE.search(command):
+        return None
+    return command if _VALIDATION_START_RE.fullmatch(command) else None
 
 
 def _validation_bucket(fact: str) -> str:
     lowered = fact.lower()
     if re.search(
         r"\b(python\s+-m\s+compileall|cargo\s+(check|build)|tsc|dart\s+analyze|"
-        r"gradle\w*\s+.*build|(?:npm|pnpm|yarn)\s+(?:run\s+)?build|make\s+build|"
+        r"(?:\./)?gradlew?\s+.*build|(?:npm|pnpm|yarn)\s+(?:run\s+)?build|make\s+build|"
         r"go\s+build|dotnet\s+build|mvn\s+package)\b",
         lowered,
     ):
@@ -470,13 +937,15 @@ def _explicit_symbols(item: dict[str, Any]) -> list[str]:
     ))
 
 
-def _snippet_text(value: Any) -> str:
+def _snippet_text(value: Any) -> tuple[str, int]:
     if isinstance(value, dict):
         value = value.get("code") or value.get("content") or value.get("text")
     if not isinstance(value, str):
-        return ""
+        return "", 0
     text = value.strip()
-    return text if 0 < len(text) <= 1_000 else ""
+    if not text:
+        return "", 0
+    return (text, 0) if len(text) <= 1_000 else ("", 1)
 
 
 def _bounded_text(value: str, max_characters: int) -> tuple[str, int]:
@@ -500,9 +969,64 @@ def _dedupe_dicts(rows: Iterable[dict[str, Any]], keys: tuple[str, ...]) -> list
     return result
 
 
+def _dedupe_cited(rows: Iterable[dict[str, Any]], key: str) -> list[dict[str, Any]]:
+    merged: dict[str, dict[str, Any]] = {}
+    for row in rows:
+        identity = str(row.get(key) or "")
+        if not identity:
+            continue
+        if identity not in merged:
+            merged[identity] = {key: identity, "evidence_ids": []}
+        refs = [str(ref) for ref in row.get("evidence_ids") or [] if ref]
+        merged[identity]["evidence_ids"] = sorted(set([*merged[identity]["evidence_ids"], *refs]))
+    return list(merged.values())
+
+
+def _cited_evidence_ids(packet: dict[str, Any]) -> set[str]:
+    rows = [
+        *packet["target_surface"]["likely_files"],
+        *packet["target_surface"]["symbols"],
+        *packet["required_invariants"],
+        *packet["forbidden_changes"],
+        *packet["implementation_guidance"],
+        *packet["validation"]["compile"],
+        *packet["validation"]["tests"],
+        *packet["validation"]["semantic_checks"],
+    ]
+    return {
+        str(ref)
+        for row in rows
+        for ref in (row.get("evidence_ids") or [])
+        if isinstance(row, dict) and ref
+    }
+
+
+def _prune_orphan_sources(packet: dict[str, Any]) -> None:
+    used = _cited_evidence_ids(packet)
+    packet["source_of_truth"] = [
+        row for row in packet["source_of_truth"] if row.get("evidence_id") in used
+    ]
+
+
+def _has_actionable_items(packet: dict[str, Any]) -> bool:
+    target = packet.get("target_surface") if isinstance(packet.get("target_surface"), dict) else {}
+    validation = packet.get("validation") if isinstance(packet.get("validation"), dict) else {}
+    return any((
+        target.get("likely_files"),
+        target.get("symbols"),
+        packet.get("required_invariants"),
+        packet.get("forbidden_changes"),
+        packet.get("implementation_guidance"),
+        validation.get("compile"),
+        validation.get("tests"),
+        validation.get("semantic_checks"),
+    ))
+
+
 def _fit_packet(packet: dict[str, Any], budget: int) -> None:
     while estimate_action_packet_tokens(packet) > budget and _remove_one_budget_item(packet):
         pass
+    _prune_orphan_sources(packet)
     if not packet["source_of_truth"]:
         packet["status"] = "insufficient_evidence"
         message = "No source attribution fit the requested packet budget."
@@ -518,6 +1042,7 @@ def _remove_one_budget_item(packet: dict[str, Any]) -> bool:
         if rows:
             rows.pop()
             _record_omission(packet, name)
+            _prune_orphan_sources(packet)
             return True
 
     objective = str(packet["task_interpretation"].get("objective") or "")
@@ -536,7 +1061,6 @@ def _remove_one_budget_item(packet: dict[str, Any]) -> bool:
         ("validation.tests", packet["validation"]["tests"]),
         ("forbidden_changes", packet["forbidden_changes"]),
         ("required_invariants", packet["required_invariants"]),
-        ("source_of_truth", packet["source_of_truth"]),
     ]
     for name, rows in rows_by_name:
         if rows:
@@ -547,8 +1071,49 @@ def _remove_one_budget_item(packet: dict[str, Any]) -> bool:
                 message = "Critical constraints did not fit the requested packet budget."
                 if message not in packet["missing_evidence"]:
                     packet["missing_evidence"].append(message)
+            _prune_orphan_sources(packet)
             return True
     return False
+
+
+def _ensure_post_fit_status(packet: dict[str, Any]) -> None:
+    _prune_orphan_sources(packet)
+    if not _has_actionable_items(packet):
+        packet["status"] = "insufficient_evidence"
+        message = "No actionable evidence remained after applying the packet budget."
+        if message not in packet["missing_evidence"]:
+            packet["missing_evidence"].append(message)
+    if not packet["source_of_truth"]:
+        packet["status"] = "insufficient_evidence"
+        message = "No source attribution remained after applying the packet budget."
+        if message not in packet["missing_evidence"]:
+            packet["missing_evidence"].append(message)
+
+
+def _compact_failure_packet(packet: dict[str, Any], budget: int) -> None:
+    omitted_total = sum(
+        int(value) for value in packet.get("omitted_counts", {}).values()
+        if isinstance(value, int) and not isinstance(value, bool)
+    )
+    packet.update({
+        "status": "insufficient_evidence",
+        "source_of_truth": [],
+        "target_surface": {"likely_files": [], "symbols": []},
+        "required_invariants": [],
+        "forbidden_changes": [],
+        "implementation_guidance": [],
+        "validation": {"compile": [], "tests": [], "semantic_checks": []},
+        "uncertainties": [],
+        "missing_evidence": ["The available evidence did not fit the requested packet budget."],
+        "omitted_counts": {"packet_items": max(1, omitted_total)},
+    })
+    objective = str(packet["task_interpretation"].get("objective") or "task")
+    packet["task_interpretation"]["objective"] = objective[:64] or "task"
+    _refresh_estimated_tokens(packet)
+    if packet["estimated_tokens"] > budget:
+        packet["task_interpretation"]["objective"] = "task"
+        packet["missing_evidence"] = ["Evidence did not fit the packet budget."]
+        _refresh_estimated_tokens(packet)
 
 
 def _record_omission(packet: dict[str, Any], field: str, count: int = 1) -> None:

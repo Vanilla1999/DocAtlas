@@ -328,7 +328,7 @@ if [ -n "$SELECTION" ]; then
 fi
 printf '\nNext steps:\n'
 printf '  1. Start your coding agent in a project.\n'
-printf '  2. Ask it to call get_docs_context first.\n'
+printf '  2. Ask it to call get_docs_context first with delivery_strategy="bounded_direct" for coding tasks.\n'
 printf '  3. If it receives a prepare_docs next action, let it follow that action and retry.\n'
 printf '  4. Answer from the returned sources.\n'
 printf '  Docs MCP server: doc-atlas mcp docs-serve\n'

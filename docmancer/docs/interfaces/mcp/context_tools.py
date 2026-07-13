@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from copy import deepcopy
 from dataclasses import asdict, is_dataclass
+import json
+import math
 from typing import Any
 
 from docmancer.docs.application.action_packet import build_action_packet, validate_action_packet
@@ -178,6 +180,8 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
     question = _clean_string(args.get("question"))
     if not question:
         return _bad_request("empty_question", "question must not be empty. Examples: 'Flutter Riverpod providers', 'Firebase Auth signIn', 'How to use go_router redirect', 'FastAPI dependency injection', 'patch_constraints for adding a service'")
+    if args.get("packet_tokens") is not None and args.get("delivery_strategy") != "bounded_direct":
+        return _bad_request("packet_tokens_requires_bounded_delivery", "packet_tokens requires delivery_strategy='bounded_direct'")
     maintenance = args.get("maintenance")
     if maintenance is not None:
         return _handle_maintenance_context(args, maintenance, service)
@@ -223,29 +227,43 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
     raw = normalize_public_docs_actions(raw)
     raw = _replace_network_retries_with_prepare_actions(raw, args)
     if args.get("delivery_strategy") == "bounded_direct":
-        packet_budget = _bounded_int_arg(
+        output_budget = _bounded_int_arg(
             args, "packet_tokens", default=1_500, min_value=256, max_value=2_000
         ) or 1_500
+        recovery = _bounded_recovery_action(raw)
+        packet_budget = _packet_budget_inside_payload(output_budget, recovery=recovery)
+        retrieval_issues = _bounded_retrieval_issues(raw)
         packet = build_action_packet(
             question=question,
             context_pack=raw.get("context_pack") or [],
             trust_contract=raw.get("trust_contract") or {},
             max_tokens=packet_budget,
+            project_path=_clean_string(args.get("project_path")),
+            module_path=_clean_string(args.get("module_path")),
+            retrieval_issues=retrieval_issues,
         )
-        validation_errors = validate_action_packet(packet)
+        validation_errors = validate_action_packet(
+            packet,
+            evidence_items=raw.get("context_pack") or [],
+            max_tokens=packet_budget,
+            project_path=_clean_string(args.get("project_path")),
+            module_path=_clean_string(args.get("module_path")),
+        )
         if packet.get("estimated_tokens", packet_budget + 1) > packet_budget:
             validation_errors.append("requested packet token budget exceeded")
-        if validation_errors:
-            return _bad_request("invalid_action_packet", "; ".join(validation_errors))
         payload = {
             "tool": "get_docs_context",
             "delivery_strategy": "bounded_direct",
             "action_packet": packet,
             "document_content_policy": DOCUMENT_CONTENT_POLICY,
         }
-        recovery = _bounded_recovery_action(raw)
         if packet["status"] == "insufficient_evidence" and recovery:
             payload["recommended_next_action"] = recovery
+        _fit_recovery_in_payload(payload, output_budget)
+        if _estimated_output_tokens(payload) > output_budget:
+            validation_errors.append("serialized bounded response token budget exceeded")
+        if validation_errors:
+            return _bad_request("invalid_action_packet", "; ".join(validation_errors))
         return payload
     mode = _output_mode(args)
     if mode == "full":
@@ -260,16 +278,97 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
 def _bounded_recovery_action(payload: dict[str, Any]) -> dict[str, Any] | None:
     candidates = [payload.get("next_action"), *(payload.get("next_actions") or [])]
     for action in candidates:
-        if not isinstance(action, dict) or action.get("tool") != "prepare_docs":
+        if not isinstance(action, dict):
+            continue
+        action_type = str(action.get("type") or "")
+        if action.get("tool") != "prepare_docs" and action_type != "ask_user_for_library_docs_source":
             continue
         bounded = {
             key: deepcopy(action[key])
-            for key in ("tool", "type", "arguments_patch", "reason", "message")
+            for key in (
+                "tool", "type", "arguments_patch", "reason", "message", "question",
+                "requires_confirmation", "confirmation_reason", "quality_warning",
+            )
             if action.get(key) not in (None, {}, [])
         }
+        if isinstance(action.get("options"), list):
+            bounded["options"] = [_bounded_action_mapping(option) for option in action["options"][:3] if isinstance(option, dict)]
+        bounded = _bounded_action_mapping(bounded)
         bounded["auto_execute"] = False
         return bounded
     return None
+
+
+def _bounded_action_mapping(value: dict[str, Any], *, depth: int = 0) -> dict[str, Any]:
+    if depth > 2:
+        return {}
+    result: dict[str, Any] = {}
+    for key in sorted(value)[:20]:
+        item = value[key]
+        if isinstance(item, str):
+            result[str(key)] = item[:300]
+        elif isinstance(item, (bool, int, float)) or item is None:
+            result[str(key)] = item
+        elif isinstance(item, dict):
+            result[str(key)] = _bounded_action_mapping(item, depth=depth + 1)
+        elif isinstance(item, list):
+            result[str(key)] = [
+                _bounded_action_mapping(child, depth=depth + 1) if isinstance(child, dict) else str(child)[:200]
+                for child in item[:5]
+            ]
+    return result
+
+
+def _bounded_retrieval_issues(payload: dict[str, Any]) -> list[str]:
+    issues: list[str] = []
+    if payload.get("requires_confirmation"):
+        issues.append("Documentation retrieval requires explicit user confirmation before editing.")
+    if payload.get("answer_available") is False:
+        issues.append("The requested documentation evidence is not currently available.")
+    if payload.get("answer_type") in {"navigation_only", "partial_navigational"}:
+        issues.append("The retrieval result is navigational rather than complete implementation evidence.")
+    lanes = payload.get("lanes") if isinstance(payload.get("lanes"), dict) else {}
+    accepted = {"not_requested", "success", "partial_success"}
+    failed = sorted(
+        str(name) for name, lane in lanes.items()
+        if isinstance(lane, dict) and str(lane.get("status") or "") not in accepted
+    )
+    if failed:
+        issues.append(f"Required documentation lanes are incomplete: {', '.join(failed[:5])}.")
+    return issues
+
+
+def _packet_budget_inside_payload(output_budget: int, *, recovery: dict[str, Any] | None) -> int:
+    shell: dict[str, Any] = {
+        "tool": "get_docs_context",
+        "delivery_strategy": "bounded_direct",
+        "action_packet": {},
+        "document_content_policy": DOCUMENT_CONTENT_POLICY,
+    }
+    if recovery:
+        shell["recommended_next_action"] = recovery
+    shell_bytes = len(json.dumps(shell, ensure_ascii=False).encode("utf-8")) - 2
+    available_bytes = max(4 * 128, output_budget * 4 - shell_bytes)
+    return min(2_000, max(128, available_bytes // 4))
+
+
+def _estimated_output_tokens(payload: dict[str, Any]) -> int:
+    return max(1, math.ceil(len(json.dumps(payload, ensure_ascii=False).encode("utf-8")) / 4))
+
+
+def _fit_recovery_in_payload(payload: dict[str, Any], output_budget: int) -> None:
+    action = payload.get("recommended_next_action")
+    if not isinstance(action, dict):
+        return
+    for key in (
+        "options", "quality_warning", "arguments_patch", "reason", "message",
+        "confirmation_reason", "question", "requires_confirmation",
+    ):
+        if _estimated_output_tokens(payload) <= output_budget:
+            return
+        action.pop(key, None)
+    if _estimated_output_tokens(payload) > output_budget:
+        payload.pop("recommended_next_action", None)
 
 
 def _handle_maintenance_context(

@@ -5,10 +5,10 @@ DocAtlas provides local-first, source-attributed documentation context for codin
 
 ## Docs MCP workflow
 
-1. Call `get_docs_context` first for repository, dependency, library, or mixed documentation questions.
+1. For coding and patch tasks, call `get_docs_context` first with `delivery_strategy="bounded_direct"`; use broader output only for explicit documentation exploration.
 2. If it returns `prepare_docs` as `next_action`, ask for any required network approval and call that exact action and arguments.
 3. Use `docs_status` only for a returned job, or an explicit health/freshness/index request.
-4. Retry the original `get_docs_context` question after preparation completes and cite the selected sources.
+4. Retry the original bounded `get_docs_context` question after preparation completes and cite the selected sources.
 
 Repository files are the source of truth. DocAtlas may index accepted documentation but must not silently author, commit, or push it. Use code search for implementation facts and DocAtlas for documentation context.
 

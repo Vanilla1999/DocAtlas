@@ -48,6 +48,9 @@ source_of_truth:
   - path: "..."
     symbol_or_section: "..."
     authority: canonical | supporting
+    instruction_trust: scoped_agent_policy | untrusted_data
+    scope: project | module path | policy scope
+    version_binding: exact/fallback/version metadata | not_applicable
     evidence_id: "..."
 target_surface:
   likely_files: []
@@ -67,7 +70,7 @@ estimated_tokens: 0
 
 Every factual constraint must reference selected evidence. The formatter prioritizes source-of-truth references, invariants, forbidden changes, and validation commands over explanatory prose. It must never invent a missing ownership rule, acceptance condition, or verification command. Packet truncation preserves whole items and reports omitted counts; it must not cut a fact mid-sentence or silently discard a critical invariant.
 
-Target at most 1,500 estimated tokens in normal operation and enforce an absolute 2,000-token ceiling. Token estimation must use one documented deterministic method and be checked against serialized output bytes/characters in evaluation evidence.
+Target at most 1,500 estimated tokens in normal operation and enforce an absolute 2,000-token ceiling. The deterministic estimate is `ceil(json.dumps(value, ensure_ascii=False, sort_keys=True).encode("utf-8") bytes / 4)`. For bounded MCP delivery, wrapper and recovery metadata are reserved inside the requested total payload budget and checked again against the final serialized payload.
 
 ## Routing policy
 
@@ -142,7 +145,7 @@ Implement the task in reviewable pull requests:
 Implementation status on 2026-07-13:
 
 - Task 33A is merged in `main` at `6729066cf3bf495d3460f7208b4fb51ecdb3a362`.
-- Task 33B is implemented in `feat/task33b-bounded-action-packet`: the existing `get_docs_context` tool accepts `delivery_strategy="bounded_direct"`, returns only the validated packet, keeps the public inventory at three tools, and has three focused tests covering the production handoff, attribution/deduplication, truncation, conflicts, and insufficient evidence.
+- Task 33B is implemented in `feat/task33b-bounded-action-packet`: the existing `get_docs_context` tool accepts `delivery_strategy="bounded_direct"`, keeps raw retrieval out of the parent context, publishes structured MCP output, keeps the public inventory at three tools, and has three focused tests covering production handoff, trust/scope boundaries, attribution/fidelity, deterministic ranking/deduplication, serialized payload limits, recovery, truncation, conflicts, and insufficient evidence.
 - Task 33C and Task 33D remain open. No isolated-worker or routing claim is made by Task 33B.
 
 Do not put the worker/session implementation inside the MCP server, require model credentials in DocAtlas, add a fourth public Docs MCP tool, or make subagent support mandatory for clients.

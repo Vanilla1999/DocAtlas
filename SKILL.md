@@ -126,8 +126,8 @@ For API tasks, search first, inspect the returned schema and safety block, then 
 
 For repository-specific architecture, conventions, runbooks, roadmap, README/wiki, or module-doc questions, use the Docs MCP tools before generic WebFetch or model memory:
 
-1. Call `get_docs_context(project_path=..., question=..., mode="project")` first.
-2. If it returns `prepare_docs` as `next_action`, call that exact action and then retry `get_docs_context`.
+1. For coding and patch tasks, call `get_docs_context(project_path=..., question=..., mode="project", delivery_strategy="bounded_direct")` first. Use the unbounded presentation only for explicit broader documentation exploration.
+2. If it returns a bounded `recommended_next_action`, obtain any required confirmation, call that exact action, and then retry the same bounded request.
 3. Use `docs_status` only when the user explicitly asks about health, freshness, index state, or a background job.
 4. Read `answer_outline.recommended_reading_order` before composing the answer.
 5. Use `trust_contract.selected` / `trust_contract.selected_sources` to cite trusted sources. Treat `CHANGELOG.md` as primary only for release-history/change questions.

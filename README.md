@@ -91,12 +91,12 @@ By default the server exposes exactly three mutually exclusive tools:
 For most MCP clients and coding agents:
 
 ```text
-get_docs_context(question=..., project_path=...)
+get_docs_context(question=..., project_path=..., delivery_strategy="bounded_direct")
 → prepare_docs(...) only when returned as next_action
-→ retry get_docs_context(...)
+→ retry get_docs_context(..., delivery_strategy="bounded_direct")
 ```
 
-This makes `get_docs_context` the single high-level entry point. For coding/API/command questions, it accepts `response_style=auto`, `snippet-first`, or `evidence-first`; snippets are extracted from indexed sources and retain attribution.
+This makes `get_docs_context` the single high-level entry point. Coding and patch tasks should use `delivery_strategy="bounded_direct"`, which returns a source-bound ActionPacket within the requested total payload budget. For API questions, combine it with `response_style="snippet-first"`.
 
 `prepare_docs(action="sync_project_docs")` replaces the old two-step `inspect → ingest` loop. It:
 1. discovers current candidates from the filesystem;
