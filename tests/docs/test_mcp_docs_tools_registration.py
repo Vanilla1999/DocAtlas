@@ -419,6 +419,60 @@ def test_prepare_docs_rejects_invalid_types_before_service_call():
     assert service.called is False
 
 
+def test_prepare_docs_forwards_bounded_incremental_sync_contract():
+    from docmancer.docs.models import ProjectDocsSyncResult, ProjectMetadata
+
+    class Service:
+        received = None
+
+        def sync_project_docs(self, project_path, **kwargs):
+            self.received = (project_path, kwargs)
+            return ProjectDocsSyncResult(status="success", project=ProjectMetadata(project_path=project_path))
+
+    service = Service()
+    result = call_docs_tool_payload(
+        "prepare_docs",
+        {
+            "action": "sync_project_docs",
+            "project_path": "/repo",
+            "with_vectors": False,
+            "changed_paths": ["docs/guide.md"],
+            "deleted_paths": ["docs/old.md"],
+            "renamed_paths": [{"old_path": "docs/a.md", "new_path": "docs/b.md"}],
+        },
+        service,
+    )
+
+    assert result["status"] == "success"
+    assert service.received == (
+        "/repo",
+        {
+            "with_vectors": False,
+            "changed_paths": ["docs/guide.md"],
+            "deleted_paths": ["docs/old.md"],
+            "renamed_paths": [{"old_path": "docs/a.md", "new_path": "docs/b.md"}],
+        },
+    )
+
+
+def test_prepare_docs_rejects_malformed_incremental_sync_paths():
+    class Service:
+        def sync_project_docs(self, *_args, **_kwargs):
+            raise AssertionError("validation should have stopped this call")
+
+    malformed = call_docs_tool_payload(
+        "prepare_docs",
+        {
+            "action": "sync_project_docs",
+            "project_path": "/repo",
+            "renamed_paths": [{"old_path": "docs/a.md"}],
+        },
+        Service(),
+    )
+
+    assert malformed["reason_code"] == "validation_error"
+
+
 def test_prepare_docs_preserves_singular_version_for_library_prefetch():
     class Service:
         received = None

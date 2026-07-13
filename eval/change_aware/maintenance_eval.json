@@ -1,0 +1,42 @@
+{
+  "schema_version": "change-aware-maintenance-eval-1",
+  "budgets": {
+    "minimum_precision": 1.0,
+    "minimum_recall": 1.0,
+    "maximum_brief_bytes": 8192,
+    "maximum_local_latency_ms": 2000,
+    "maximum_unrelated_files_reprocessed": 0,
+    "maximum_unchanged_derived_writes": 0
+  },
+  "cases": [
+    {
+      "id": "single_section",
+      "files": {
+        "docs/auth.md": "# Authentication\n\nUse `issue_token` from `src/auth.py`.\n"
+      },
+      "changed_paths": ["src/auth.py"],
+      "changed_symbols": ["issue_token"],
+      "expected_allowed_paths": ["docs/auth.md"]
+    },
+    {
+      "id": "dependency_config",
+      "files": {
+        "README.md": "# Project\n\nDependencies and setup.\n"
+      },
+      "changed_paths": ["requirements.txt"],
+      "changed_symbols": [],
+      "expected_allowed_paths": ["README.md"]
+    },
+    {
+      "id": "one_monorepo_module",
+      "files": {
+        "README.md": "# Workspace\n",
+        "packages/auth/README.md": "# Auth\n\nUse `issue_token`.\n",
+        "packages/billing/README.md": "# Billing\n\nUse `invoice_total`.\n"
+      },
+      "changed_paths": ["packages/auth/src/token.py"],
+      "changed_symbols": ["issue_token"],
+      "expected_allowed_paths": ["packages/auth/README.md"]
+    }
+  ]
+}

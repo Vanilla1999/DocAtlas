@@ -146,6 +146,18 @@ Agent workflow:
                 "include_rust": {"type": ["boolean", "null"]},
                 "include_packages": {"type": ["array", "null"], "items": {"type": "string"}},
                 "with_vectors": {"type": ["boolean", "null"]},
+                "changed_paths": {"type": ["array", "null"], "maxItems": 500, "items": {"type": "string"}},
+                "deleted_paths": {"type": ["array", "null"], "maxItems": 500, "items": {"type": "string"}},
+                "renamed_paths": {
+                    "type": ["array", "null"],
+                    "maxItems": 500,
+                    "items": {
+                        "type": "object",
+                        "properties": {"old_path": {"type": "string"}, "new_path": {"type": "string"}},
+                        "required": ["old_path", "new_path"],
+                        "additionalProperties": False,
+                    },
+                },
                 "force_refresh": {"type": ["boolean", "null"]},
                 "force": {"type": ["boolean", "null"]},
                 "continue_on_error": {"type": ["boolean", "null"]},

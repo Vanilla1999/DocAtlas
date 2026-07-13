@@ -149,6 +149,47 @@ def changed_evidence_from_git(project_path: str | Path, base: str, head: str = "
     }
 
 
+def unaccepted_worktree_changes(
+    project_path: str | Path,
+    head: str,
+    paths: list[str],
+) -> list[str]:
+    """Return affected paths whose working-tree bytes are not the accepted head snapshot."""
+    if not paths:
+        return []
+    root = Path(project_path).expanduser().resolve()
+    selected = _ordered_unique(paths)[:_MAX_CHANGED_FILES]
+    stdout, stderr, returncode, truncated, timed_out = _run_process_bounded(
+        ["git", "-C", str(root), "diff", "--name-only", "-z", head, "--", *selected],
+        max_stdout_bytes=_MAX_GIT_STATUS_BYTES,
+    )
+    if timed_out or truncated:
+        raise ValueError("Could not verify accepted documentation snapshot within the bounded Git deadline")
+    if returncode != 0:
+        message = os.fsdecode(stderr).strip() or "git diff failed"
+        raise ValueError(f"Could not verify accepted documentation snapshot: {message}")
+    dirty = {_safe_git_text(os.fsdecode(value)) for value in stdout.split(b"\0") if value}
+
+    status_stdout, status_stderr, status_returncode, status_truncated, status_timed_out = _run_process_bounded(
+        [
+            "git", "-C", str(root), "status", "--porcelain=v1", "-z",
+            "--untracked-files=all", "--", *selected,
+        ],
+        max_stdout_bytes=_MAX_GIT_STATUS_BYTES,
+    )
+    if status_timed_out or status_truncated:
+        raise ValueError("Could not verify uncommitted documentation paths within the bounded Git deadline")
+    if status_returncode != 0:
+        message = os.fsdecode(status_stderr).strip() or "git status failed"
+        raise ValueError(f"Could not verify uncommitted documentation paths: {message}")
+    if status_stdout:
+        # Porcelain rename records are awkward to parse safely and a dirty result
+        # is already a stop condition. Return the bounded affected set instead of
+        # pretending an individual path was proven clean.
+        dirty.update(selected)
+    return sorted(dirty)
+
+
 def _parse_name_status_z(output: bytes) -> list[dict[str, Any]]:
     changes: list[dict[str, Any]] = []
     fields = output.split(b"\0")
@@ -1066,6 +1107,22 @@ def format_docs_impact_markdown(report: dict[str, Any]) -> str:
         for action in actions:
             lines.append(f"- `{action.get('tool', 'unknown')}` — `{action.get('reason_code', 'unknown')}`")
         lines.append("")
+    sync = report.get("sync") or {}
+    if sync:
+        metrics = sync.get("metrics") or {}
+        lines.extend([
+            "### Incremental sync",
+            "",
+            f"Status: `{_markdown_cell(sync.get('status', 'unknown'))}`. {_markdown_cell(sync.get('message') or '')}",
+            "",
+            "Metrics: "
+            f"files={metrics.get('files_reprocessed', 0)}, "
+            f"sections={metrics.get('sections_reprocessed', 0)}, "
+            f"writes={metrics.get('derived_writes', 0)}, "
+            f"deletes={metrics.get('derived_deletes', 0)}, "
+            f"latency_ms={metrics.get('latency_ms', 0)}.",
+            "",
+        ])
     lines.append(f"**Recommendation:** {report['recommendation']}")
     return "\n".join(lines)
 
@@ -1306,10 +1363,33 @@ def _build_documentation_update_brief(
         else "docs_already_changed" if documentation_changes
         else "no_documentation_edit_recommended"
     )
-    follow_up_paths = list(dict.fromkeys([
-        *allowed_paths,
-        *[str(path) for path in documentation_changes if path],
-    ]))
+    follow_up_changed = list(allowed_paths)
+    follow_up_deleted: list[str] = []
+    follow_up_renamed: list[dict[str, str]] = []
+    for change in documentation_changes.values():
+        change_status = change.get("status")
+        if change_status in {"updated", "changed"} and change.get("path"):
+            follow_up_changed.append(str(change["path"]))
+        elif change_status == "deleted" and change.get("path"):
+            follow_up_deleted.append(str(change["path"]))
+        elif change_status == "renamed" and change.get("old_path") and change.get("new_path"):
+            follow_up_renamed.append({
+                "old_path": str(change["old_path"]),
+                "new_path": str(change["new_path"]),
+            })
+    follow_up_changed = list(dict.fromkeys(follow_up_changed))
+    follow_up_deleted = list(dict.fromkeys(follow_up_deleted))
+    follow_up_args: dict[str, Any] = {
+        "action": "sync_project_docs",
+        "project_path": str(root),
+    }
+    if follow_up_changed:
+        follow_up_args["changed_paths"] = follow_up_changed[:64]
+    if follow_up_deleted:
+        follow_up_args["deleted_paths"] = follow_up_deleted[:64]
+    if follow_up_renamed:
+        follow_up_args["renamed_paths"] = follow_up_renamed[:64]
+    has_follow_up = len(follow_up_args) > 2
     return {
         "schema_version": "documentation-update-brief-1",
         "status": status,
@@ -1325,13 +1405,9 @@ def _build_documentation_update_brief(
         ],
         "follow_up": {
             "tool": "prepare_docs",
-            "arguments_patch": {
-                "action": "sync_project_docs",
-                "project_path": str(root),
-                "changed_paths": follow_up_paths[:64],
-            },
+            "arguments_patch": follow_up_args,
             "when": "after the user or host agent reviews and saves the documentation patch",
-        } if follow_up_paths else {},
+        } if has_follow_up else {},
     }
 
 

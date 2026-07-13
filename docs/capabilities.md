@@ -11,6 +11,7 @@ The beginner workflow is documented in [README](../README.md) and the detailed M
 | Index accepted project docs | `prepare_docs(action="sync_project_docs")` |
 | Check a returned job or index health | `docs_status` |
 | Review docs affected by a code diff | `doc-atlas docs-impact --base origin/main` |
+| Incrementally index accepted docs from an exact diff | `doc-atlas docs-impact --base origin/main --sync-saved-docs` |
 | Generate a local agent contract | `doc-atlas agent-contract --project-path . --format markdown` |
 
 Use `doc-atlas --help` and `doc-atlas <command> --help` for the installed command surface. The `mcp` group is visible from root help; use `doc-atlas mcp --help` for its subcommands.

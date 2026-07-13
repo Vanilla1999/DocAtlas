@@ -489,6 +489,7 @@ class ProjectDocsSyncResult:
     stale_sources: list[dict[str, Any]] = field(default_factory=list)
     missing_sources: list[dict[str, Any]] = field(default_factory=list)
     removed_sources: list[dict[str, Any]] = field(default_factory=list)
+    tombstones: list[dict[str, Any]] = field(default_factory=list)
     skipped_sources: list[dict[str, Any]] = field(default_factory=list)
     diagnostics: dict[str, Any] = field(default_factory=dict)
     warnings: list[str] = field(default_factory=list)

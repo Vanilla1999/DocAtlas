@@ -9,6 +9,7 @@ import time
 from unittest.mock import MagicMock, patch
 
 import httpx
+import pytest
 from click.testing import CliRunner
 
 from docmancer.cli.__main__ import cli
@@ -882,6 +883,126 @@ def test_sync_project_docs_reindexes_changed_sources_and_removes_stale_index(tmp
     assert old_query.results == []
     assert new_query.answer_available is True
     assert "NewChangedNeedle" in new_query.results[0].content
+
+
+def test_incremental_sync_reindexes_only_accepted_changed_doc(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    readme = project / "README.md"
+    readme.write_text("# App\n\nOriginal overview.", encoding="utf-8")
+    docs = project / "docs"
+    docs.mkdir()
+    guide = docs / "guide.md"
+    guide.write_text("# Guide\n\nOldIncrementalNeedle.", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+    service.sync_project_docs(str(project), with_vectors=False)
+    readme_source_before = next(
+        item for item in service._indexed_project_doc_sources(str(project))
+        if item["path"] == "README.md"
+    )
+    guide.write_text("# Guide\n\nNewIncrementalNeedle.", encoding="utf-8")
+
+    result = service.sync_project_docs(
+        str(project), with_vectors=False, changed_paths=["docs/guide.md"]
+    )
+    readme_source_after = next(
+        item for item in service._indexed_project_doc_sources(str(project))
+        if item["path"] == "README.md"
+    )
+
+    assert result.status == "success"
+    assert result.changed_count == 1
+    assert result.diagnostics["mode"] == "incremental"
+    assert result.diagnostics["metrics"]["files_reprocessed"] == 1
+    assert result.diagnostics["metrics"]["derived_writes"] == 1
+    assert readme_source_after["ingested_at"] == readme_source_before["ingested_at"]
+    assert service.get_project_docs(str(project), "OldIncrementalNeedle").results == []
+    assert "NewIncrementalNeedle" in service.get_project_docs(
+        str(project), "NewIncrementalNeedle"
+    ).results[0].content
+
+
+def test_incremental_sync_is_idempotent_for_unchanged_save(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    (project / "README.md").write_text("# App\n\nStable docs.", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+    service.sync_project_docs(str(project), with_vectors=False)
+
+    result = service.sync_project_docs(
+        str(project), with_vectors=False, changed_paths=["README.md"]
+    )
+
+    assert result.status == "success"
+    assert result.sections_indexed == 0
+    assert result.removed_sources == []
+    assert result.tombstones == []
+    assert result.diagnostics["metrics"] | {"latency_ms": 0} == {
+        "files_reprocessed": 0,
+        "sections_reprocessed": 0,
+        "unchanged_files": 1,
+        "derived_deletes": 0,
+        "derived_writes": 0,
+        "latency_ms": 0,
+    }
+    assert result.diagnostics["metrics"]["latency_ms"] >= 0
+
+
+def test_incremental_sync_handles_rename_and_deletion_without_pruning_unrelated_docs(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    docs = project / "docs"
+    docs.mkdir()
+    old = docs / "old.md"
+    deleted = docs / "deleted.md"
+    keep = docs / "keep.md"
+    old.write_text("# Old\n\nRenameOldNeedle.", encoding="utf-8")
+    deleted.write_text("# Deleted\n\nDeleteNeedle.", encoding="utf-8")
+    keep.write_text("# Keep\n\nKeepNeedle.", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+    service.sync_project_docs(str(project), with_vectors=False)
+    new = docs / "new.md"
+    old.rename(new)
+    deleted.unlink()
+
+    result = service.sync_project_docs(
+        str(project),
+        with_vectors=False,
+        deleted_paths=["docs/deleted.md"],
+        renamed_paths=[{"old_path": "docs/old.md", "new_path": "docs/new.md"}],
+    )
+
+    assert result.status == "success"
+    assert {item["path"] for item in result.tombstones} == {
+        "docs/deleted.md", "docs/old.md",
+    }
+    assert next(item for item in result.tombstones if item["path"] == "docs/old.md")["renamed_to"] == "docs/new.md"
+    assert service.get_project_docs(str(project), "DeleteNeedle").results == []
+    assert service.get_project_docs(str(project), "RenameOldNeedle").results[0].source.endswith("docs/new.md")
+    assert "KeepNeedle" in service.get_project_docs(str(project), "KeepNeedle").results[0].content
+
+
+def test_incremental_sync_rejects_paths_outside_project(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+
+    with pytest.raises(ValueError, match="escapes project_path"):
+        service.sync_project_docs(
+            str(project), with_vectors=False, deleted_paths=["../outside.md"]
+        )
+
+
+def test_incremental_sync_rejects_deletion_while_document_still_exists(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    (project / "README.md").write_text("# App\n\nStill accepted.", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+    service.sync_project_docs(str(project), with_vectors=False)
+
+    with pytest.raises(ValueError, match="still exist as project documentation candidates"):
+        service.sync_project_docs(
+            str(project), with_vectors=False, deleted_paths=["README.md"]
+        )
+
+    assert "Still accepted" in service.get_project_docs(
+        str(project), "Still accepted"
+    ).results[0].content
 
 
 def test_sync_project_docs_prunes_orphaned_sources_when_all_docs_removed(tmp_path, monkeypatch):
