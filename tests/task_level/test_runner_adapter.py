@@ -192,6 +192,17 @@ def test_codex_runner_allows_explicit_sandbox_override(tmp_path: Path, monkeypat
     assert command[command.index("--sandbox") + 1] == "danger-full-access"
 
 
+def test_codex_redaction_preserves_json_literals_from_short_env_values(monkeypatch: pytest.MonkeyPatch):
+    monkeypatch.setenv("SHORT_TOKEN", "true")
+    monkeypatch.setenv("API_TOKEN", "super-secret-value")
+    raw = '{"details":true,"token":"super-secret-value"}\n'
+
+    redacted = _redact(raw)
+
+    assert json.loads(redacted)["details"] is True
+    assert json.loads(redacted)["token"] == "<redacted>"
+
+
 def test_codex_detects_error_event_stream_with_provider_403_as_failure():
     stdout = "\n".join([
         '{"type":"thread.started","thread_id":"thread-1"}',

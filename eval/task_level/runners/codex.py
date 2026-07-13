@@ -296,7 +296,10 @@ def _event_arguments(item: dict[str, Any], message: dict[str, Any]) -> dict[str,
 def _redact(text: str) -> str:
     redacted = text
     for key, value in os.environ.items():
-        if any(marker in key.upper() for marker in ("KEY", "TOKEN", "SECRET", "PASSWORD")) and value:
+        if (
+            any(marker in key.upper() for marker in ("KEY", "TOKEN", "SECRET", "PASSWORD"))
+            and len(value) >= 8
+        ):
             redacted = redacted.replace(value, "<redacted>")
     redacted = re.sub(r"/(?:home|tmp)/[^\s\"']+", "<path>", redacted)
     redacted = re.sub(r"https?://[^/@\s:]+:[^/@\s]+@", "https://<redacted>@", redacted)
