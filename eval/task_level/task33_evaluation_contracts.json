@@ -1,0 +1,91 @@
+{
+  "schema_version": "task33-evaluation-contracts-1",
+  "tasks": [
+    {
+      "task_id": "decisive_nbo_cross_module_gate_large_001",
+      "patch_contract_id": "task33-nbo-cross-module-gate-1",
+      "public_test_command": "uv run --offline pytest tests/test_browser_permission_gate.py",
+      "local_test_command": "python -m pytest tests/test_browser_permission_gate.py",
+      "compile_gate": {
+        "mode": "not_applicable",
+        "reason": "The benchmark is a source-only Dart contract fixture and does not contain a buildable Flutter application. Public and evaluator-private structural tests are the executable validation gates."
+      },
+      "allowed_paths": [
+        "lib/modules/browser/application/browser_permission_gate.dart",
+        "lib/modules/permission/application/permission_service.dart",
+        "lib/modules/scan/application/scan_permission_gate.dart",
+        "lib/modules/sync/application/offline_sync_gate.dart"
+      ],
+      "forbidden_paths": [
+        "docs/**",
+        "pubspec.lock",
+        "pubspec.yaml",
+        "tests/**",
+        "lib/**/*.freezed.dart",
+        "lib/**/*.g.dart"
+      ],
+      "semantic_checks": [
+        "all flow entry gates delegate to the canonical permission decision",
+        "partial permission results cannot pass through offline handoff",
+        "generated and dependency files remain unchanged"
+      ]
+    },
+    {
+      "task_id": "real_project_help_chat_linearizable_module_lifecycle_001",
+      "patch_contract_id": "task33-help-chat-lifecycle-1",
+      "public_test_command": "pytest tests/test_module_lifecycle.py",
+      "local_test_command": "python -m pytest tests/test_module_lifecycle.py",
+      "compile_gate": {
+        "mode": "not_applicable",
+        "reason": "The benchmark is a source-only Dart lifecycle fixture without a Dart or Flutter build graph. Public and evaluator-private structural tests are the executable validation gates."
+      },
+      "allowed_paths": [
+        "lib/src/di/help_request_locator.dart",
+        "lib/src/help_request_module.dart",
+        "lib/src/utils/help_request_utils.dart"
+      ],
+      "forbidden_paths": [
+        "ARCHITECTURE.md",
+        "README.md",
+        "example/**",
+        "pubspec.lock",
+        "pubspec.yaml",
+        "tests/**"
+      ],
+      "semantic_checks": [
+        "initialization and reset are linearizable",
+        "failed initialization is retryable without global reset",
+        "host-owned registrations and public APIs remain unchanged"
+      ]
+    },
+    {
+      "task_id": "real_project_viscanner_client_owned_disable_signal_001",
+      "patch_contract_id": "task33-viscanner-disable-signal-1",
+      "public_test_command": "pytest tests/test_scanner_disable_contract.py",
+      "local_test_command": "python -m pytest tests/test_scanner_disable_contract.py",
+      "compile_gate": {
+        "mode": "not_applicable",
+        "reason": "The benchmark is a source-only Kotlin/AIDL boundary fixture without an Android Gradle build graph. Public and evaluator-private structural tests are the executable validation gates."
+      },
+      "allowed_paths": [
+        "ViScanner/src/main/kotlin/com/example/ViScanner.kt",
+        "ViScannerAIDL/src/main/aidl/com/example/ScannerListener.aidl",
+        "ViScannerAIDL/src/main/aidl/com/example/ViScannerAidl.aidl",
+        "ViScannerService/src/main/kotlin/com/example/Scanner.kt",
+        "ViScannerService/src/main/kotlin/com/example/ViScannerService.kt",
+        "ViScannerService/src/main/kotlin/com/example/scanners/AbstractScanner.kt",
+        "ViScannerService/src/main/kotlin/com/example/scanners/UrovoScanner.kt"
+      ],
+      "forbidden_paths": [
+        "README.md",
+        "docs/**",
+        "tests/**"
+      ],
+      "semantic_checks": [
+        "disabled scans are suppressed and notify the client",
+        "only the supported vendor beep is disabled",
+        "pause and release restore vendor state without service-owned custom audio"
+      ]
+    }
+  ]
+}

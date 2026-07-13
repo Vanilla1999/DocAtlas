@@ -5,7 +5,7 @@ import subprocess
 from pathlib import Path
 
 from eval.task_level.execution import run_artifact_integrity, write_run_progress
-from eval.task_level.fixtures.builder import materialize_fixture, workspace_has_no_oracles
+from eval.task_level.fixtures.builder import materialize_fixture, run_local_test_command, workspace_has_no_oracles
 from eval.task_level.runner import load_tasks
 from eval.task_level.schemas import TASKS_PATH
 
@@ -18,7 +18,7 @@ def _task():
 
 
 def _run(command: str, cwd: Path) -> subprocess.CompletedProcess[str]:
-    return subprocess.run(command, cwd=cwd, shell=True, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False)
+    return run_local_test_command(command, cwd)
 
 
 def _apply_gold(workspace: Path) -> subprocess.CompletedProcess[str]:

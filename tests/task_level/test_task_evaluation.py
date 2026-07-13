@@ -31,10 +31,11 @@ def _runner_output(tmp_path: Path) -> AgentRunOutput:
         trajectory_path=str(trajectory),
         patch_path=None,
         tool_calls=[],
-        input_tokens=None,
-        output_tokens=None,
+        input_tokens=100,
+        output_tokens=20,
         model="mock",
         runner_version="mock",
+        token_usage={"cached_input_tokens": 60, "reasoning_tokens": 5, "agent_turns": 2},
         notes=[],
     )
 
@@ -54,6 +55,11 @@ def test_resolved_requires_public_and_hidden_tests(tmp_path: Path):
     assert result["hidden_tests_passed"] is False
     assert result["budget"]["max_input_tokens"] == task.max_input_tokens
     assert result["budget"]["max_turns_enforced_by_runner"] is False
+    assert result["metrics"]["cached_input_tokens"] == 60
+    assert result["metrics"]["uncached_input_tokens"] == 40
+    assert result["metrics"]["reasoning_tokens"] == 5
+    assert result["metrics"]["turns"] == 2
+    assert result["token_attribution"]["system_total_tokens"] == 120
 
 
 def test_each_run_uses_fresh_workspace(tmp_path: Path):

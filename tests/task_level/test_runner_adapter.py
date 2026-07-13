@@ -10,7 +10,7 @@ import pytest
 from eval.task_level.execution import capture_patch, run_canary
 from eval.task_level.runners.base import AgentRunOutput, AgentRunRequest
 from eval.task_level.runners.claude import ClaudeRunner
-from eval.task_level.runners.codex import _is_provider_failure, _normalize_jsonl, _redact
+from eval.task_level.runners.codex import _is_provider_failure, _normalize_jsonl, _redact, _token_usage_summary
 from eval.task_level.runners.opencode import _normalize_events, _write_opencode_config
 
 
@@ -100,6 +100,12 @@ def test_codex_normalized_trajectory_uses_sanitized_events(monkeypatch: pytest.M
     monkeypatch.setenv("PRIVATE_TOKEN", "super-secret-value")
     raw = json.dumps({
         "type": "item.completed",
+        "usage": {
+            "input_tokens": 100,
+            "output_tokens": 20,
+            "cached_input_tokens": 60,
+            "reasoning_tokens": 5,
+        },
         "item": {
             "type": "command_execution",
             "command": "inspect /home/alice/private/project with super-secret-value",
@@ -118,6 +124,12 @@ def test_codex_normalized_trajectory_uses_sanitized_events(monkeypatch: pytest.M
 def test_codex_normalizes_measurable_tool_output():
     raw = json.dumps({
         "type": "item.completed",
+        "usage": {
+            "input_tokens": 100,
+            "output_tokens": 20,
+            "cached_input_tokens": 60,
+            "reasoning_tokens": 5,
+        },
         "item": {
             "type": "mcp_tool_call",
             "server": "docmancer-docs",
@@ -132,6 +144,13 @@ def test_codex_normalizes_measurable_tool_output():
     assert tool_calls == [events[0]]
     assert tool_calls[0]["result_chars"] > 0
     assert "PermissionService owns the gate" in tool_calls[0]["result_summary"]
+    assert _token_usage_summary(events) == {
+        "input_tokens": 100,
+        "output_tokens": 20,
+        "cached_input_tokens": 60,
+        "reasoning_tokens": 5,
+        "agent_turns": 0,
+    }
 
 
 def test_codex_runner_uses_workspace_write_sandbox(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
