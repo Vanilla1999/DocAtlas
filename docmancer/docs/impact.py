@@ -937,6 +937,11 @@ def analyze_docs_impact(
         documentation_changes=documentation_changes,
         diff_evidence=diff_evidence,
     )
+    if any(
+        isinstance(item, dict) and item.get("reason_code") == "authoring_brief_limit_exceeded"
+        for item in authoring_brief.get("missing_evidence") or []
+    ):
+        incomplete_reasons.append("authoring_brief_limit_exceeded")
     report = {
         "schema_version": "docs-impact-2",
         "project_path": str(root),
@@ -1410,16 +1415,6 @@ def _build_documentation_update_brief(
         "suggested_path": item.get("suggested_path"),
         "required_action": "inspect module code, configuration, and tests before proposing a new reviewable document",
     } for item in missing)
-    status = (
-        "needs_evidence" if missing_evidence
-        else "ready_for_host_edit" if allowed_edits
-        else "docs_already_changed" if documentation_changes
-        else "no_documentation_edit_recommended"
-    )
-    if missing_evidence:
-        # A partial analysis is navigation evidence, never an edit allow-list.
-        allowed_edits = []
-        allowed_paths = []
     follow_up_changed = list(allowed_paths)
     follow_up_deleted: list[str] = []
     follow_up_renamed: list[dict[str, str]] = []
@@ -1436,16 +1431,45 @@ def _build_documentation_update_brief(
             })
     follow_up_changed = list(dict.fromkeys(follow_up_changed))
     follow_up_deleted = list(dict.fromkeys(follow_up_deleted))
+    if any(
+        len(values) > 64
+        for values in (
+            changed_paths,
+            changed_symbols,
+            symbol_evidence,
+            facts_to_verify,
+            allowed_edits,
+            follow_up_changed,
+            follow_up_deleted,
+            follow_up_renamed,
+        )
+    ):
+        missing_evidence.append({
+            "reason_code": "authoring_brief_limit_exceeded",
+            "required_action": "narrow the diff so the complete edit and sync handoff fits in one authoring brief",
+        })
+    status = (
+        "needs_evidence" if missing_evidence
+        else "ready_for_host_edit" if allowed_edits
+        else "docs_already_changed" if documentation_changes
+        else "no_documentation_edit_recommended"
+    )
+    if missing_evidence:
+        # A partial analysis is navigation evidence, never an edit allow-list.
+        allowed_edits = []
+        follow_up_changed = []
+        follow_up_deleted = []
+        follow_up_renamed = []
     follow_up_args: dict[str, Any] = {
         "action": "sync_project_docs",
         "project_path": str(root),
     }
     if follow_up_changed:
-        follow_up_args["changed_paths"] = follow_up_changed[:64]
+        follow_up_args["changed_paths"] = follow_up_changed
     if follow_up_deleted:
-        follow_up_args["deleted_paths"] = follow_up_deleted[:64]
+        follow_up_args["deleted_paths"] = follow_up_deleted
     if follow_up_renamed:
-        follow_up_args["renamed_paths"] = follow_up_renamed[:64]
+        follow_up_args["renamed_paths"] = follow_up_renamed
     has_follow_up = not missing_evidence and len(follow_up_args) > 2
     return {
         "schema_version": "documentation-update-brief-1",

@@ -893,6 +893,17 @@ class SQLiteStore:
                 for row in rows
             }
 
+    def section_ids_for_source(self, source: str) -> list[int]:
+        """Return stable chunk ids before a source is removed."""
+        with self._connect() as conn:
+            return [
+                int(row["id"])
+                for row in conn.execute(
+                    "SELECT id FROM sections WHERE source = ? ORDER BY id",
+                    (source,),
+                )
+            ]
+
     def record_embedding_upserts(
         self,
         collection: str,

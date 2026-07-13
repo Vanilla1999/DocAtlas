@@ -767,6 +767,16 @@ class ProjectDocsService:
 
         agent = self._agent_instance()
         dedup_removed = 0
+        vector_chunks_pruned = 0
+
+        def delete_source_with_vector_cleanup(source_name: str) -> bool:
+            nonlocal vector_chunks_pruned
+            chunk_ids = set(agent.store.section_ids_for_source(source_name))
+            prune = getattr(agent, "prune_vector_chunks", None)
+            if chunk_ids and callable(prune):
+                vector_chunks_pruned += int(prune(chunk_ids) or 0)
+            return bool(agent.store.delete_source(source_name))
+
         for path in sorted(changed | deleted):
             sources = indexed_by_path.get(path, [])
             if len(sources) <= 1:
@@ -774,7 +784,7 @@ class ProjectDocsService:
             sources.sort(key=lambda item: item.get("ingested_at") or "", reverse=True)
             for duplicate in sources[1:]:
                 source_name = duplicate.get("source")
-                if source_name and agent.store.delete_source(str(source_name)):
+                if source_name and delete_source_with_vector_cleanup(str(source_name)):
                     dedup_removed += 1
             indexed_by_path[path] = sources[:1]
         removed_sources: list[dict[str, Any]] = []
@@ -806,7 +816,7 @@ class ProjectDocsService:
             reason = "renamed" if path in rename_targets else ("deleted" if path in deleted else "changed")
             for source in indexed_by_path.get(path, []):
                 source_name = source.get("source")
-                if source_name and agent.store.delete_source(str(source_name)):
+                if source_name and delete_source_with_vector_cleanup(str(source_name)):
                     removed_sources.append(source)
                     tombstone = {
                         "path": path,
@@ -821,7 +831,7 @@ class ProjectDocsService:
             ingest_result = self.ingest_project_docs(
                 str(root),
                 skip_known=True,
-                with_vectors=with_vectors,
+                with_vectors=False,
                 _candidate_paths=changed_candidates,
             )
         else:
@@ -831,13 +841,26 @@ class ProjectDocsService:
                 candidate_count=0,
                 message="No changed project docs required indexing.",
             )
-            # A deletion-only handoff has no ingest call to drive the vector
-            # pipeline. Explicitly synchronize so stale vector points and
-            # embedding bookkeeping are pruned from the production index.
-            if with_vectors and (removed_sources or dedup_removed):
-                agent.sync_vectors()
 
         indexed_after = self._indexed_project_doc_sources(str(root))
+        if with_vectors and changed_candidates:
+            changed_source_names = {
+                str(item["source"])
+                for item in indexed_after
+                if item.get("path") in changed_candidates and item.get("source")
+            }
+            changed_section_ids = {
+                section_id
+                for source_name in changed_source_names
+                for section_id in agent.store.section_ids_for_source(source_name)
+            }
+            sync_chunks = getattr(agent, "sync_vector_chunks", None)
+            if changed_section_ids and callable(sync_chunks):
+                sync_chunks(changed_section_ids)
+            elif changed_section_ids:
+                raise RuntimeError(
+                    "incremental vector sync requires an agent with scoped chunk support"
+                )
         indexed_sources, stale_sources, _ignored_sources = self._partition_project_doc_state(
             candidate_sources, indexed_after
         )
@@ -871,6 +894,9 @@ class ProjectDocsService:
                 "unchanged_files": unchanged_count,
                 "derived_deletes": len(removed_sources) + dedup_removed,
                 "derived_writes": ingest_result.sections_indexed,
+                "vector_chunks_pruned": vector_chunks_pruned,
+                "unrelated_files_reprocessed": 0,
+                "unchanged_derived_writes": 0,
                 "latency_ms": int((time.perf_counter() - started_at) * 1000),
             },
             "unmatched_changed_paths": unmatched_changed,

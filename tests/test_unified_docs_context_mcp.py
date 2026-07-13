@@ -24,6 +24,9 @@ def test_get_docs_context_schema():
     assert schema["properties"]["output_mode"]["enum"] == ["answer", "compact", "debug", "full"]
     assert schema["properties"]["mode"]["enum"] == ["auto", "project", "library", "dependency", "mixed"]
     assert "maintenance" in schema["properties"]
+    maintenance = schema["properties"]["maintenance"]["properties"]
+    assert maintenance["changed_paths"]["maxItems"] == 200
+    assert maintenance["candidate_limit"]["maximum"] == 200
 
 
 def test_get_docs_context_exposes_fail_closed_change_maintenance_brief(tmp_path):

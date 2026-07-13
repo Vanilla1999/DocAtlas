@@ -119,10 +119,10 @@ Agent workflow:
                     "properties": {
                         "base": {"type": ["string", "null"]},
                         "head": {"type": ["string", "null"], "default": "HEAD"},
-                        "changed_paths": {"type": ["array", "null"], "maxItems": 500, "items": {"type": "string"}},
-                        "changed_symbols": {"type": ["array", "null"], "maxItems": 500, "items": {"type": "string"}},
+                        "changed_paths": {"type": ["array", "null"], "maxItems": 200, "items": {"type": "string"}},
+                        "changed_symbols": {"type": ["array", "null"], "maxItems": 200, "items": {"type": "string"}},
                         "candidate_offset": {"type": ["integer", "null"], "minimum": 0},
-                        "candidate_limit": {"type": ["integer", "null"], "minimum": 1, "maximum": 500},
+                        "candidate_limit": {"type": ["integer", "null"], "minimum": 1, "maximum": 200},
                     },
                     "additionalProperties": False,
                 },

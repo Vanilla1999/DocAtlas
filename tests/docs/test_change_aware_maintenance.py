@@ -83,6 +83,28 @@ def test_paginated_impact_brief_is_fail_closed(tmp_path: Path) -> None:
     assert any(item["reason_code"] == "candidate_page_incomplete" for item in brief["missing_evidence"])
 
 
+def test_authoring_brief_does_not_silently_truncate_sync_handoff(tmp_path: Path) -> None:
+    docs = tmp_path / "docs"
+    docs.mkdir()
+    changed_paths = []
+    for index in range(70):
+        relative = f"docs/guide-{index:02}.md"
+        changed_paths.append(relative)
+        (tmp_path / relative).write_text(f"# Guide {index}\n", encoding="utf-8")
+
+    report = analyze_docs_impact(tmp_path, changed_paths)
+
+    brief = report["authoring_brief"]
+    assert report["bounds"]["analysis_complete"] is False
+    assert brief["status"] == "needs_evidence"
+    assert brief["allowed_edits"] == []
+    assert brief["follow_up"] == {}
+    assert any(
+        item["reason_code"] == "authoring_brief_limit_exceeded"
+        for item in brief["missing_evidence"]
+    )
+
+
 def test_changed_document_is_forwarded_to_reviewed_sync_handoff(tmp_path: Path) -> None:
     docs = tmp_path / "docs"
     docs.mkdir()
