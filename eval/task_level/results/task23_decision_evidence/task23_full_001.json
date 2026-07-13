@@ -1,0 +1,174 @@
+{
+  "amendment_id": "task23-replacement-after-screening-001",
+  "artifact_integrity": {
+    "actual_runs": 36,
+    "duplicate_cells": [],
+    "expected_runs": 36,
+    "missing_cells": [],
+    "ok": true
+  },
+  "conditions": {
+    "docatlas_tool_optional": {
+      "compile_success_rate": 1,
+      "descriptive_metrics_scope": "valid_runner_outputs_only",
+      "diagnostic_resolved_rate_valid_runs": 0,
+      "hidden_tests_passed_rate": 0,
+      "infrastructure_failed_runs": 5,
+      "median_audited_external_context_tokens": null,
+      "median_condition_setup_wall_time_seconds": 0.01845,
+      "median_first_required_evidence_rank": 5.5,
+      "median_input_tokens": 152685.5,
+      "median_output_tokens": 4317.0,
+      "median_required_evidence_recall": 0.75,
+      "median_tool_output_tokens_estimate": 4.0,
+      "median_total_tokens": 156832.0,
+      "median_useful_context_ratio": 0.75,
+      "median_wall_time_seconds": 108.4383,
+      "metric_coverage_ratio": 0.4444444444444444,
+      "metric_valid_runs": 4,
+      "policy_violations": 0,
+      "public_tests_passed_rate": 1,
+      "resolved": 0,
+      "resolved_rate": null,
+      "runs": 9
+    },
+    "docatlas_tool_recommended": {
+      "compile_success_rate": 1,
+      "descriptive_metrics_scope": "valid_runner_outputs_only",
+      "diagnostic_resolved_rate_valid_runs": 0,
+      "hidden_tests_passed_rate": 0,
+      "infrastructure_failed_runs": 6,
+      "median_audited_external_context_tokens": null,
+      "median_condition_setup_wall_time_seconds": 0.0355,
+      "median_first_required_evidence_rank": 8,
+      "median_input_tokens": 309491,
+      "median_output_tokens": 5322,
+      "median_required_evidence_recall": 0.8333333333333334,
+      "median_tool_output_tokens_estimate": 4,
+      "median_total_tokens": 314813,
+      "median_useful_context_ratio": 0.8333333333333334,
+      "median_wall_time_seconds": 152.7947,
+      "metric_coverage_ratio": 0.3333333333333333,
+      "metric_valid_runs": 3,
+      "policy_violations": 0,
+      "public_tests_passed_rate": 1,
+      "resolved": 0,
+      "resolved_rate": null,
+      "runs": 9
+    },
+    "repo_only_strict_offline": {
+      "compile_success_rate": 1,
+      "descriptive_metrics_scope": "valid_runner_outputs_only",
+      "diagnostic_resolved_rate_valid_runs": 0,
+      "hidden_tests_passed_rate": 0,
+      "infrastructure_failed_runs": 6,
+      "median_audited_external_context_tokens": null,
+      "median_condition_setup_wall_time_seconds": 0,
+      "median_first_required_evidence_rank": 5,
+      "median_input_tokens": 128545,
+      "median_output_tokens": 4469,
+      "median_required_evidence_recall": 0.8333333333333334,
+      "median_tool_output_tokens_estimate": 3,
+      "median_total_tokens": 133014,
+      "median_useful_context_ratio": 0.8333333333333334,
+      "median_wall_time_seconds": 104.6691,
+      "metric_coverage_ratio": 0.3333333333333333,
+      "metric_valid_runs": 3,
+      "policy_violations": 0,
+      "public_tests_passed_rate": 1,
+      "resolved": 0,
+      "resolved_rate": null,
+      "runs": 9
+    },
+    "repo_plus_audited_external_context": {
+      "compile_success_rate": 1,
+      "descriptive_metrics_scope": "valid_runner_outputs_only",
+      "diagnostic_resolved_rate_valid_runs": 0,
+      "hidden_tests_passed_rate": 0,
+      "infrastructure_failed_runs": 5,
+      "median_audited_external_context_tokens": 199.0,
+      "median_condition_setup_wall_time_seconds": 0.00022014650039636763,
+      "median_first_required_evidence_rank": 5.0,
+      "median_input_tokens": 175721.5,
+      "median_output_tokens": 4400.5,
+      "median_required_evidence_recall": 0.8333333333333334,
+      "median_tool_output_tokens_estimate": 4.5,
+      "median_total_tokens": 178842.0,
+      "median_useful_context_ratio": 0.8333333333333334,
+      "median_wall_time_seconds": 104.34800000000001,
+      "metric_coverage_ratio": 0.4444444444444444,
+      "metric_valid_runs": 4,
+      "policy_violations": 0,
+      "public_tests_passed_rate": 1,
+      "resolved": 0,
+      "resolved_rate": null,
+      "runs": 9
+    }
+  },
+  "decision": {
+    "decision": "INCONCLUSIVE",
+    "pairs": 9,
+    "reasons": [
+      "missing_total_tokens",
+      "runner_output_missing"
+    ],
+    "threshold_met": null,
+    "uncertainty": {}
+  },
+  "failure_taxonomy": {
+    "docatlas_tool_optional": {
+      "hidden_tests_failed": 4,
+      "runner_output_missing": 5
+    },
+    "docatlas_tool_recommended": {
+      "hidden_tests_failed": 3,
+      "runner_output_missing": 6
+    },
+    "repo_only_strict_offline": {
+      "hidden_tests_failed": 3,
+      "runner_output_missing": 6
+    },
+    "repo_plus_audited_external_context": {
+      "hidden_tests_failed": 4,
+      "runner_output_missing": 5
+    }
+  },
+  "protocol_id": "task23-real-project-value-token-001",
+  "replacement_screening": {
+    "results": [
+      {
+        "policy_clean": true,
+        "repo_only_hidden_passed": 0,
+        "repo_only_public_passed": 3,
+        "repo_only_repeats": 3,
+        "repo_only_resolved": 0,
+        "status": "accepted_differentiating",
+        "task_id": "decisive_nbo_cross_module_gate_large_001"
+      }
+    ],
+    "run_id": "task23_replacement_screening_001"
+  },
+  "runtime_integrity": {
+    "infrastructure_failed_runs": 22,
+    "ok": false,
+    "valid_runs": 14
+  },
+  "schema_version": "task23-report-1",
+  "scientific_limitation": "The replacement identity was fixed after observing the original candidate's screening exclusion. Thresholds, conditions, runner settings, hashes, and the replacement screening rule remain unchanged; final claims must disclose this amendment.",
+  "screening_exclusions": [
+    {
+      "excluded_screening_status": "rejected_too_easy",
+      "excluded_task_id": "real_project_nbo_flavor_scoped_external_links_001",
+      "replacement_screening_run_id": "task23_replacement_screening_001",
+      "replacement_task_id": "decisive_nbo_cross_module_gate_large_001",
+      "screening_results_sha256": "6e3cda6c7a998596566008352b00371714e3d9de9906811092089c3c17f91883",
+      "screening_run_id": "task23_screening_001"
+    }
+  ],
+  "source_artifacts": {
+    "amendment_sha256": "f6de21a8307f5d7ec27b07d281dfeae82a68fa81b43d7f874e9da66b51aa06ad",
+    "protocol_sha256": "618858e95c3aaa0f6e0d7433e30ffb2dfa37cb64a81b13291fd3142d1319ff76",
+    "replacement_screening_sha256": "20c5ab62094c58bd24eff62827b2d7dba0c33192dd398bb746a0a3f32796d776",
+    "runs_jsonl_sha256": "db6fd50eef1df3a864266f3d45e5ca82fb7f45c6a51eda6c02816d84e4928122"
+  }
+}

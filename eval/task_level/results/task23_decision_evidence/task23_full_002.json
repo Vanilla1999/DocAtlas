@@ -1,0 +1,413 @@
+{
+  "amendment_id": "task23-replacement-after-screening-001",
+  "artifact_integrity": {
+    "actual_runs": 36,
+    "duplicate_cells": [],
+    "expected_runs": 36,
+    "missing_cells": [],
+    "ok": true
+  },
+  "conditions": {
+    "docatlas_tool_optional": {
+      "compile_success_rate": 1,
+      "descriptive_metrics_scope": "valid_runner_outputs_only",
+      "diagnostic_resolved_rate_valid_runs": 0,
+      "hidden_tests_passed_rate": 0,
+      "infrastructure_failed_runs": 0,
+      "median_audited_external_context_tokens": null,
+      "median_condition_setup_wall_time_seconds": 0.0348,
+      "median_first_required_evidence_rank": 6,
+      "median_input_tokens": 157351,
+      "median_output_tokens": 4874,
+      "median_required_evidence_recall": 0.7142857142857143,
+      "median_tool_output_tokens_estimate": 4,
+      "median_total_tokens": 160750,
+      "median_useful_context_ratio": 0.7142857142857143,
+      "median_wall_time_seconds": 116.6056,
+      "metric_coverage_ratio": 1.0,
+      "metric_valid_runs": 9,
+      "policy_violations": 0,
+      "public_tests_passed_rate": 1,
+      "resolved": 0,
+      "resolved_rate": 0,
+      "runs": 9
+    },
+    "docatlas_tool_recommended": {
+      "compile_success_rate": 1,
+      "descriptive_metrics_scope": "valid_runner_outputs_only",
+      "diagnostic_resolved_rate_valid_runs": 0,
+      "hidden_tests_passed_rate": 0,
+      "infrastructure_failed_runs": 0,
+      "median_audited_external_context_tokens": null,
+      "median_condition_setup_wall_time_seconds": 0.031,
+      "median_first_required_evidence_rank": 7,
+      "median_input_tokens": 332238,
+      "median_output_tokens": 5332,
+      "median_required_evidence_recall": 0.8333333333333334,
+      "median_tool_output_tokens_estimate": 7,
+      "median_total_tokens": 338323,
+      "median_useful_context_ratio": 0.8333333333333334,
+      "median_wall_time_seconds": 139.3809,
+      "metric_coverage_ratio": 1.0,
+      "metric_valid_runs": 9,
+      "policy_violations": 0,
+      "public_tests_passed_rate": 1,
+      "resolved": 0,
+      "resolved_rate": 0,
+      "runs": 9
+    },
+    "repo_only_strict_offline": {
+      "compile_success_rate": 1,
+      "descriptive_metrics_scope": "valid_runner_outputs_only",
+      "diagnostic_resolved_rate_valid_runs": 0,
+      "hidden_tests_passed_rate": 0,
+      "infrastructure_failed_runs": 0,
+      "median_audited_external_context_tokens": null,
+      "median_condition_setup_wall_time_seconds": 0,
+      "median_first_required_evidence_rank": 5,
+      "median_input_tokens": 134890,
+      "median_output_tokens": 4374,
+      "median_required_evidence_recall": 0.75,
+      "median_tool_output_tokens_estimate": 4,
+      "median_total_tokens": 139183,
+      "median_useful_context_ratio": 0.75,
+      "median_wall_time_seconds": 101.5192,
+      "metric_coverage_ratio": 1.0,
+      "metric_valid_runs": 9,
+      "policy_violations": 0,
+      "public_tests_passed_rate": 1,
+      "resolved": 0,
+      "resolved_rate": 0,
+      "runs": 9
+    },
+    "repo_plus_audited_external_context": {
+      "compile_success_rate": 1,
+      "descriptive_metrics_scope": "valid_runner_outputs_only",
+      "diagnostic_resolved_rate_valid_runs": 0,
+      "hidden_tests_passed_rate": 0,
+      "infrastructure_failed_runs": 0,
+      "median_audited_external_context_tokens": 192,
+      "median_condition_setup_wall_time_seconds": 0.00019763799718930386,
+      "median_first_required_evidence_rank": 5,
+      "median_input_tokens": 130439,
+      "median_output_tokens": 4251,
+      "median_required_evidence_recall": 0.7142857142857143,
+      "median_tool_output_tokens_estimate": 4,
+      "median_total_tokens": 134915,
+      "median_useful_context_ratio": 0.7142857142857143,
+      "median_wall_time_seconds": 102.5065,
+      "metric_coverage_ratio": 1.0,
+      "metric_valid_runs": 9,
+      "policy_violations": 0,
+      "public_tests_passed_rate": 1,
+      "resolved": 0,
+      "resolved_rate": 0,
+      "runs": 9
+    }
+  },
+  "decision": {
+    "decision": "PIVOT_REQUIRED",
+    "pairs": 9,
+    "reasons": [
+      "predeclared_threshold_not_met"
+    ],
+    "threshold_met": null,
+    "uncertainty": {
+      "latency_change_ratio": {
+        "estimate": 0.372951,
+        "lower": 0.21098,
+        "upper": 1.235517
+      },
+      "resolved_rate_delta": {
+        "estimate": 0.0,
+        "lower": 0.0,
+        "upper": 0.0
+      },
+      "token_change_ratio": {
+        "estimate": 1.430778,
+        "lower": 1.116007,
+        "upper": 2.776368
+      }
+    }
+  },
+  "failure_taxonomy": {
+    "docatlas_tool_optional": {
+      "hidden_tests_failed": 9
+    },
+    "docatlas_tool_recommended": {
+      "hidden_tests_failed": 9
+    },
+    "repo_only_strict_offline": {
+      "hidden_tests_failed": 9
+    },
+    "repo_plus_audited_external_context": {
+      "hidden_tests_failed": 9
+    }
+  },
+  "protocol_id": "task23-real-project-value-token-001",
+  "replacement_screening": {
+    "results": [
+      {
+        "policy_clean": true,
+        "repo_only_hidden_passed": 0,
+        "repo_only_public_passed": 3,
+        "repo_only_repeats": 3,
+        "repo_only_resolved": 0,
+        "status": "accepted_differentiating",
+        "task_id": "decisive_nbo_cross_module_gate_large_001"
+      }
+    ],
+    "run_id": "task23_replacement_screening_001"
+  },
+  "retry_provenance": {
+    "cells": [
+      {
+        "attempts": [
+          {
+            "attempt": 1,
+            "status": "runner_unavailable"
+          }
+        ],
+        "condition_id": "docatlas_tool_optional",
+        "repeat": 2,
+        "task_id": "decisive_nbo_cross_module_gate_large_001"
+      },
+      {
+        "attempts": [
+          {
+            "attempt": 1,
+            "status": "runner_unavailable"
+          }
+        ],
+        "condition_id": "repo_only_strict_offline",
+        "repeat": 2,
+        "task_id": "decisive_nbo_cross_module_gate_large_001"
+      },
+      {
+        "attempts": [
+          {
+            "attempt": 1,
+            "status": "runner_unavailable"
+          }
+        ],
+        "condition_id": "docatlas_tool_optional",
+        "repeat": 0,
+        "task_id": "real_project_help_chat_linearizable_module_lifecycle_001"
+      },
+      {
+        "attempts": [
+          {
+            "attempt": 1,
+            "status": "runner_unavailable"
+          }
+        ],
+        "condition_id": "docatlas_tool_optional",
+        "repeat": 1,
+        "task_id": "real_project_help_chat_linearizable_module_lifecycle_001"
+      },
+      {
+        "attempts": [
+          {
+            "attempt": 1,
+            "status": "runner_unavailable"
+          }
+        ],
+        "condition_id": "docatlas_tool_optional",
+        "repeat": 2,
+        "task_id": "real_project_help_chat_linearizable_module_lifecycle_001"
+      },
+      {
+        "attempts": [
+          {
+            "attempt": 1,
+            "status": "runner_unavailable"
+          }
+        ],
+        "condition_id": "docatlas_tool_recommended",
+        "repeat": 0,
+        "task_id": "real_project_help_chat_linearizable_module_lifecycle_001"
+      },
+      {
+        "attempts": [
+          {
+            "attempt": 1,
+            "status": "runner_unavailable"
+          }
+        ],
+        "condition_id": "docatlas_tool_recommended",
+        "repeat": 1,
+        "task_id": "real_project_help_chat_linearizable_module_lifecycle_001"
+      },
+      {
+        "attempts": [
+          {
+            "attempt": 1,
+            "status": "runner_unavailable"
+          }
+        ],
+        "condition_id": "docatlas_tool_recommended",
+        "repeat": 2,
+        "task_id": "real_project_help_chat_linearizable_module_lifecycle_001"
+      },
+      {
+        "attempts": [
+          {
+            "attempt": 1,
+            "status": "runner_unavailable"
+          }
+        ],
+        "condition_id": "repo_only_strict_offline",
+        "repeat": 0,
+        "task_id": "real_project_help_chat_linearizable_module_lifecycle_001"
+      },
+      {
+        "attempts": [
+          {
+            "attempt": 1,
+            "status": "runner_unavailable"
+          }
+        ],
+        "condition_id": "repo_only_strict_offline",
+        "repeat": 1,
+        "task_id": "real_project_help_chat_linearizable_module_lifecycle_001"
+      },
+      {
+        "attempts": [
+          {
+            "attempt": 1,
+            "status": "runner_unavailable"
+          }
+        ],
+        "condition_id": "repo_only_strict_offline",
+        "repeat": 2,
+        "task_id": "real_project_help_chat_linearizable_module_lifecycle_001"
+      },
+      {
+        "attempts": [
+          {
+            "attempt": 1,
+            "status": "runner_unavailable"
+          }
+        ],
+        "condition_id": "repo_plus_audited_external_context",
+        "repeat": 0,
+        "task_id": "real_project_help_chat_linearizable_module_lifecycle_001"
+      },
+      {
+        "attempts": [
+          {
+            "attempt": 1,
+            "status": "runner_unavailable"
+          }
+        ],
+        "condition_id": "repo_plus_audited_external_context",
+        "repeat": 1,
+        "task_id": "real_project_help_chat_linearizable_module_lifecycle_001"
+      },
+      {
+        "attempts": [
+          {
+            "attempt": 1,
+            "status": "runner_unavailable"
+          }
+        ],
+        "condition_id": "repo_plus_audited_external_context",
+        "repeat": 2,
+        "task_id": "real_project_help_chat_linearizable_module_lifecycle_001"
+      },
+      {
+        "attempts": [
+          {
+            "attempt": 1,
+            "status": "runner_unavailable"
+          }
+        ],
+        "condition_id": "docatlas_tool_optional",
+        "repeat": 0,
+        "task_id": "real_project_viscanner_client_owned_disable_signal_001"
+      },
+      {
+        "attempts": [
+          {
+            "attempt": 1,
+            "status": "runner_unavailable"
+          }
+        ],
+        "condition_id": "docatlas_tool_recommended",
+        "repeat": 0,
+        "task_id": "real_project_viscanner_client_owned_disable_signal_001"
+      },
+      {
+        "attempts": [
+          {
+            "attempt": 1,
+            "status": "runner_unavailable"
+          }
+        ],
+        "condition_id": "docatlas_tool_recommended",
+        "repeat": 1,
+        "task_id": "real_project_viscanner_client_owned_disable_signal_001"
+      },
+      {
+        "attempts": [
+          {
+            "attempt": 1,
+            "status": "runner_unavailable"
+          }
+        ],
+        "condition_id": "repo_only_strict_offline",
+        "repeat": 0,
+        "task_id": "real_project_viscanner_client_owned_disable_signal_001"
+      },
+      {
+        "attempts": [
+          {
+            "attempt": 1,
+            "status": "runner_unavailable"
+          }
+        ],
+        "condition_id": "repo_only_strict_offline",
+        "repeat": 1,
+        "task_id": "real_project_viscanner_client_owned_disable_signal_001"
+      },
+      {
+        "attempts": [
+          {
+            "attempt": 1,
+            "status": "runner_unavailable"
+          }
+        ],
+        "condition_id": "repo_plus_audited_external_context",
+        "repeat": 0,
+        "task_id": "real_project_viscanner_client_owned_disable_signal_001"
+      }
+    ],
+    "retried_cells": 20,
+    "retry_attempts_sha256": "37ef97158140cebc94a0717fe4310e38d183d6b840199911038ae14afebb2df8",
+    "selection_rule": "infrastructure_failures_only",
+    "total_retry_attempts": 20
+  },
+  "runtime_integrity": {
+    "infrastructure_failed_runs": 0,
+    "ok": true,
+    "valid_runs": 36
+  },
+  "schema_version": "task23-report-1",
+  "scientific_limitation": "The replacement identity was fixed after observing the original candidate's screening exclusion. Thresholds, conditions, runner settings, hashes, and the replacement screening rule remain unchanged; final claims must disclose this amendment.",
+  "screening_exclusions": [
+    {
+      "excluded_screening_status": "rejected_too_easy",
+      "excluded_task_id": "real_project_nbo_flavor_scoped_external_links_001",
+      "replacement_screening_run_id": "task23_replacement_screening_001",
+      "replacement_task_id": "decisive_nbo_cross_module_gate_large_001",
+      "screening_results_sha256": "6e3cda6c7a998596566008352b00371714e3d9de9906811092089c3c17f91883",
+      "screening_run_id": "task23_screening_001"
+    }
+  ],
+  "source_artifacts": {
+    "amendment_sha256": "f6de21a8307f5d7ec27b07d281dfeae82a68fa81b43d7f874e9da66b51aa06ad",
+    "protocol_sha256": "618858e95c3aaa0f6e0d7433e30ffb2dfa37cb64a81b13291fd3142d1319ff76",
+    "replacement_screening_sha256": "20c5ab62094c58bd24eff62827b2d7dba0c33192dd398bb746a0a3f32796d776",
+    "runs_jsonl_sha256": "e862d3fcc52e3874d67fcc0455f8c69952ae12d5027f9b8bbc3ddf223c946354"
+  }
+}

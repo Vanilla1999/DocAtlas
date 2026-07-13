@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import copy
+import hashlib
 import random
 import re
 from collections import Counter, defaultdict
@@ -73,7 +74,7 @@ def apply_protocol_amendment(protocol: dict[str, Any], amendment: dict[str, Any]
         raise ValueError("schema_version")
     if amendment.get("base_protocol_id") != protocol.get("protocol_id"):
         raise ValueError("base_protocol_id")
-    for field in ("frozen_before_replacement_results", "conditions_unchanged", "decision_rule_unchanged"):
+    for field in ("frozen_before_replacement_results", "conditions_unchanged", "controls_unchanged", "decision_rule_unchanged"):
         if amendment.get(field) is not True:
             raise ValueError(field)
     if amendment.get("reason") != "predeclared_screening_exclusion":
@@ -97,6 +98,20 @@ def apply_protocol_amendment(protocol: dict[str, Any], amendment: dict[str, Any]
     effective["amendment_id"] = amendment.get("amendment_id")
     effective["base_protocol_id"] = protocol.get("protocol_id")
     return effective
+
+
+def validate_protocol_amendment_artifacts(
+    amendment: dict[str, Any],
+    protocol_bytes: bytes,
+    screening_results_bytes: bytes,
+) -> None:
+    expected = {
+        "base_protocol_sha256": hashlib.sha256(protocol_bytes).hexdigest(),
+        "screening_results_sha256": hashlib.sha256(screening_results_bytes).hexdigest(),
+    }
+    for field, actual in expected.items():
+        if amendment.get(field) != actual:
+            raise ValueError(field)
 
 
 def evaluate_predeclared_rule(

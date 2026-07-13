@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 
 from eval.task_level.conditions import CONDITIONS, DEFAULT_CONDITIONS
-from eval.task_level.execution import count_jsonl_records, execute_pilot, run_artifact_integrity, serialize_run_results_jsonl, write_run_progress
+from eval.task_level.execution import _archive_run_attempt, count_jsonl_records, execute_pilot, run_artifact_integrity, serialize_run_results_jsonl, write_run_progress
 from eval.task_level.report import bootstrap_delta_ci, write_report
 from eval.task_level.runner import load_tasks, run_smoke
 from eval.task_level.runners.base import RunnerCapabilities
@@ -132,6 +132,7 @@ class FailingRunner:
         )
 
     def run(self, request):
+        self.calls = getattr(self, "calls", 0) + 1
         raise NotImplementedError("runner unavailable in test")
 
 
@@ -156,10 +157,55 @@ def test_execute_pilot_records_runner_blocked_rows(tmp_path: Path, monkeypatch):
     assert result["resolved"] is False
     assert result["constraint_violations_after_patch"] == 0
     assert (tmp_path / "runner_blocked" / "runs.jsonl").exists()
+    status = json.loads((tmp_path / "runner_blocked" / "status.json").read_text(encoding="utf-8"))
+    assert status["artifact_integrity"]["ok"] is True
+    assert status["runtime_integrity"] == {
+        "ok": False,
+        "valid_runs": 0,
+        "infrastructure_failed_runs": 1,
+    }
     run_dir = tmp_path / "runner_blocked" / task.task_id / "repo_only_strict_offline" / "repeat_0"
     assert json.loads((run_dir / "changed_files.json").read_text(encoding="utf-8")) == []
     assert (run_dir / "patch.diff").read_text(encoding="utf-8") == ""
     assert json.loads((run_dir / "validation.json").read_text(encoding="utf-8"))["constraint_validation"]["violated"] == 0
+
+
+def test_execute_pilot_retries_only_infrastructure_failures_without_duplicate_rows(tmp_path: Path, monkeypatch):
+    monkeypatch.setattr("eval.task_level.execution.RESULTS_ROOT", tmp_path)
+    task = next(task for task in load_tasks(TASKS_PATH) if task.task_id == "decisive_docmancer_vector_timeout_fallback_001")
+    runner = FailingRunner()
+    kwargs = {
+        "tasks": [task],
+        "conditions": ["repo_only_strict_offline"],
+        "repeats": 1,
+        "run_id": "retry_runner_blocked",
+        "runner": runner,
+        "model": "test",
+        "timeout_seconds": 1,
+        "prompt_template": "Issue:\n{issue_text}",
+    }
+    execute_pilot(**kwargs)
+
+    results = execute_pilot(**kwargs, retry_infrastructure_failures=True)
+
+    assert runner.calls == 2
+    assert len(results) == 1
+    assert results[0]["status"] == "runner_unavailable"
+    run_dir = tmp_path / "retry_runner_blocked" / task.task_id / "repo_only_strict_offline" / "repeat_0"
+    assert (run_dir / "attempts" / "attempt_1" / "runner_error.json").exists()
+    assert len((tmp_path / "retry_runner_blocked" / "runs.jsonl").read_text(encoding="utf-8").splitlines()) == 1
+
+
+def test_archive_run_attempt_moves_stale_artifacts_out_of_active_cell(tmp_path: Path):
+    (tmp_path / "runner_error.json").write_text("{}", encoding="utf-8")
+    (tmp_path / "stdout.log").write_text("failed", encoding="utf-8")
+
+    _archive_run_attempt(tmp_path)
+
+    assert not (tmp_path / "runner_error.json").exists()
+    assert not (tmp_path / "stdout.log").exists()
+    assert (tmp_path / "attempts" / "attempt_1" / "runner_error.json").exists()
+    assert (tmp_path / "attempts" / "attempt_1" / "stdout.log").read_text(encoding="utf-8") == "failed"
 
 
 def test_report_summarizes_runner_unavailable_failures(tmp_path: Path):

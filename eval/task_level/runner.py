@@ -284,6 +284,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--verify-runner", action="store_true")
     parser.add_argument("--verify-docatlas-tool", action="store_true")
     parser.add_argument("--execute", action="store_true")
+    parser.add_argument("--retry-infrastructure-failures", action="store_true")
     parser.add_argument("--screen-tasks", action="store_true")
     parser.add_argument("--patch-constraints-targeted-pilot", action="store_true")
     parser.add_argument("--accepted-pool", type=Path)
@@ -393,7 +394,17 @@ def main(argv: list[str] | None = None) -> int:
         if args.dry_run:
             results = [{"status": "dry_run", "task_id": task.task_id, "condition_id": condition, "repeat": repeat, "resolved": False, "metrics": {}} for task in tasks for repeat in range(args.repeats) for condition in args.conditions]
         else:
-            results = execute_pilot(tasks, args.conditions, args.repeats, args.run_id, runner, args.model, args.timeout_seconds, BASE_PROMPT)
+            results = execute_pilot(
+                tasks,
+                args.conditions,
+                args.repeats,
+                args.run_id,
+                runner,
+                args.model,
+                args.timeout_seconds,
+                BASE_PROMPT,
+                retry_infrastructure_failures=args.retry_infrastructure_failures,
+            )
 
     write_report(run_dir, metadata, results)
     if args.screen_tasks:

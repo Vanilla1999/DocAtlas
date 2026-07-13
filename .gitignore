@@ -43,6 +43,8 @@ eval/task_level/results/*
 !eval/task_level/results/decisive_real_project_benchmark/**
 !eval/task_level/results/cost_accuracy_analysis/
 !eval/task_level/results/cost_accuracy_analysis/**
+!eval/task_level/results/task23_decision_evidence/
+!eval/task_level/results/task23_decision_evidence/**
 eval/task_level/runtime/
 eval/task_level/workspaces/
 eval/task_level/.cache/

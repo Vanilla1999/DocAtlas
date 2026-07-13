@@ -33,6 +33,21 @@ from eval.task_level.schemas import RESULTS_ROOT, TASK_LEVEL_ROOT, RunMetrics, T
 
 
 RUNTIME_ROOT = TASK_LEVEL_ROOT / "runtime"
+INFRASTRUCTURE_FAILURE_STATUSES = frozenset({
+    "runner_unavailable",
+    "runner_failed",
+    "condition_setup_failed",
+    "timeout",
+})
+
+
+def is_infrastructure_failure(result: dict[str, Any]) -> bool:
+    if result.get("status") in INFRASTRUCTURE_FAILURE_STATUSES:
+        return True
+    metrics = result.get("metrics") or {}
+    return result.get("status") == "no_patch" and metrics.get("total_tokens") is None
+
+
 ALLOWED_PATCH_PREFIXES = (
     "src/",
     "tests/",
@@ -390,10 +405,43 @@ def _run_setup(task: TaskSpec, workspace: Path) -> subprocess.CompletedProcess[s
     return subprocess.run(command, cwd=workspace, shell=True, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=300, check=False)
 
 
-def execute_pilot(tasks: list[TaskSpec], conditions: list[str], repeats: int, run_id: str, runner: AgentRunner, model: str, timeout_seconds: int, prompt_template: str) -> list[dict[str, Any]]:
-    results: list[dict[str, Any]] = []
+def _archive_run_attempt(run_output_dir: Path) -> None:
+    existing = [path for path in run_output_dir.iterdir() if path.name != "attempts"]
+    if not existing:
+        return
+    attempts_dir = run_output_dir / "attempts"
+    attempt_dir = attempts_dir / f"attempt_{len(list(attempts_dir.glob('attempt_*'))) + 1}"
+    attempt_dir.mkdir(parents=True, exist_ok=False)
+    for path in existing:
+        shutil.move(str(path), str(attempt_dir / path.name))
+
+
+def _load_run_results(path: Path) -> list[dict[str, Any]]:
+    return [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
+
+
+def execute_pilot(
+    tasks: list[TaskSpec],
+    conditions: list[str],
+    repeats: int,
+    run_id: str,
+    runner: AgentRunner,
+    model: str,
+    timeout_seconds: int,
+    prompt_template: str,
+    *,
+    retry_infrastructure_failures: bool = False,
+) -> list[dict[str, Any]]:
     run_dir = RESULTS_ROOT / run_id
     run_dir.mkdir(parents=True, exist_ok=True)
+    runs_path = run_dir / "runs.jsonl"
+    if retry_infrastructure_failures and not runs_path.exists():
+        raise FileNotFoundError(f"Cannot retry without existing run results: {runs_path}")
+    results = _load_run_results(runs_path) if retry_infrastructure_failures else []
+    result_indexes = {
+        (result.get("task_id"), result.get("condition_id"), result.get("repeat")): index
+        for index, result in enumerate(results)
+    }
     runtime_root = Path(tempfile.mkdtemp(prefix=f"docatlas-task-level-{run_id}-"))
     try:
         total_runs = len(tasks) * len(conditions) * repeats
@@ -404,6 +452,12 @@ def execute_pilot(tasks: list[TaskSpec], conditions: list[str], repeats: int, ru
                 for condition_id in randomized:
                     run_output_dir = run_dir / task.task_id / condition_id / f"repeat_{repeat}"
                     run_output_dir.mkdir(parents=True, exist_ok=True)
+                    cell = (task.task_id, condition_id, repeat)
+                    existing_index = result_indexes.get(cell)
+                    if existing_index is not None and not is_infrastructure_failure(results[existing_index]):
+                        continue
+                    if existing_index is not None:
+                        _archive_run_attempt(run_output_dir)
                     workspace = runtime_root / task.task_id / condition_id / f"repeat_{repeat}" / "workspace"
                     materialized = materialize_fixture(task, workspace)
                     (run_output_dir / "materialized.json").write_text(json.dumps(materialized, indent=2, sort_keys=True), encoding="utf-8")
@@ -447,7 +501,11 @@ def execute_pilot(tasks: list[TaskSpec], conditions: list[str], repeats: int, ru
                         prompt += "\nDiagnostic policy: Before your first code edit, call the available documentation-context tool once with a task-specific question. Use or ignore the returned context based on relevance.\n"
                     if setup_failed:
                         result = condition_setup_failed_result(task, condition_id, run_output_dir)
-                        results.append(result)
+                        if existing_index is None:
+                            result_indexes[cell] = len(results)
+                            results.append(result)
+                        else:
+                            results[existing_index] = result
                         write_run_progress(run_dir, results, total_runs, current={"task_id": task.task_id, "condition_id": condition_id, "repeat": repeat, "status": result["status"]})
                         continue
                     request = AgentRunRequest(
@@ -476,7 +534,11 @@ def execute_pilot(tasks: list[TaskSpec], conditions: list[str], repeats: int, ru
                         )
                     else:
                         result = evaluate_agent_patch(task, workspace, run_output_dir, condition_id, output.trajectory_path, output)
-                    results.append(result)
+                    if existing_index is None:
+                        result_indexes[cell] = len(results)
+                        results.append(result)
+                    else:
+                        results[existing_index] = result
                     write_run_progress(run_dir, results, total_runs, current={"task_id": task.task_id, "condition_id": condition_id, "repeat": repeat, "status": result["status"]})
     finally:
         shutil.rmtree(runtime_root, ignore_errors=True)
@@ -491,6 +553,7 @@ def write_run_progress(run_dir: Path, results: list[dict[str, Any]], total_runs:
     status = "finished" if finished else "running"
     if finished and not integrity["ok"]:
         status = "artifact_integrity_failed"
+    infrastructure_failed_runs = sum(is_infrastructure_failure(result) for result in results)
     payload = {
         "status": status,
         "completed_runs": completed,
@@ -499,6 +562,11 @@ def write_run_progress(run_dir: Path, results: list[dict[str, Any]], total_runs:
         "current": current,
         "updated_at": datetime.now(timezone.utc).isoformat(),
         "artifact_integrity": integrity,
+        "runtime_integrity": {
+            "ok": integrity["ok"] and infrastructure_failed_runs == 0,
+            "valid_runs": completed - infrastructure_failed_runs,
+            "infrastructure_failed_runs": infrastructure_failed_runs,
+        },
         "latest_results": [
             {
                 "task_id": result.get("task_id"),

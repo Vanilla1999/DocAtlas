@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from eval.task_level.analysis.task23_decision import apply_protocol_amendment, evaluate_predeclared_rule, validate_protocol
+from eval.task_level.analysis.task23_decision import apply_protocol_amendment, evaluate_predeclared_rule, validate_protocol, validate_protocol_amendment_artifacts
 from eval.task_level.fixtures.builder import fixture_hash
 
 
@@ -109,6 +109,7 @@ def test_protocol_amendment_replaces_only_screening_rejection_without_changing_r
             "external_context_sha256": "f" * 64,
         },
         "conditions_unchanged": True,
+        "controls_unchanged": True,
         "decision_rule_unchanged": True,
     }
 
@@ -138,7 +139,19 @@ def test_checked_in_protocol_amendment_matches_replacement_artifacts():
     assert task_id in {task["task_id"] for task in effective["tasks"]}
 
 
-@pytest.mark.parametrize("field", ["conditions_unchanged", "decision_rule_unchanged", "frozen_before_replacement_results"])
+def test_protocol_amendment_artifact_hashes_fail_closed_on_tampering():
+    protocol_path = PROJECT_ROOT / "eval/task_level/task23_protocol.json"
+    screening_path = PROJECT_ROOT / "eval/task_level/task23_screening_001.json"
+    amendment = json.loads((PROJECT_ROOT / "eval/task_level/task23_protocol_amendment_001.json").read_text())
+
+    validate_protocol_amendment_artifacts(amendment, protocol_path.read_bytes(), screening_path.read_bytes())
+    with pytest.raises(ValueError, match="base_protocol_sha256"):
+        validate_protocol_amendment_artifacts(amendment, protocol_path.read_bytes() + b" ", screening_path.read_bytes())
+    with pytest.raises(ValueError, match="screening_results_sha256"):
+        validate_protocol_amendment_artifacts(amendment, protocol_path.read_bytes(), screening_path.read_bytes() + b" ")
+
+
+@pytest.mark.parametrize("field", ["conditions_unchanged", "controls_unchanged", "decision_rule_unchanged", "frozen_before_replacement_results"])
 def test_protocol_amendment_fails_closed_when_frozen_rules_can_drift(field: str):
     protocol = _protocol()
     protocol["protocol_id"] = "task23-test"
@@ -158,6 +171,7 @@ def test_protocol_amendment_fails_closed_when_frozen_rules_can_drift(field: str)
             "external_context_sha256": "f" * 64,
         },
         "conditions_unchanged": True,
+        "controls_unchanged": True,
         "decision_rule_unchanged": True,
     }
     amendment[field] = False

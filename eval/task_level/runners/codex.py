@@ -124,6 +124,9 @@ class CodexRunner:
             encoding="utf-8",
         )
 
+        if _is_provider_failure(stdout, stderr):
+            raise RuntimeError("Codex provider unavailable: terminal provider failure event")
+
         return AgentRunOutput(
             status=status,
             exit_code=exit_code,
@@ -141,6 +144,30 @@ class CodexRunner:
             runner_version=self._version(),
             notes=notes,
         )
+
+
+def _is_provider_failure(stdout: str, stderr: str) -> bool:
+    event_types: set[str] = set()
+    for line in stdout.splitlines():
+        try:
+            payload = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        if isinstance(payload, dict) and isinstance(payload.get("type"), str):
+            event_types.add(payload["type"])
+    if "turn.completed" in event_types:
+        return False
+    lowered = f"{stdout}\n{stderr}".lower()
+    provider_marker = any(
+        marker in lowered
+        for marker in (
+            "403 forbidden",
+            "failed to connect to websocket",
+            "failed to refresh available models",
+            "transport channel closed",
+        )
+    )
+    return provider_marker and (not stdout.strip() or "turn.failed" in event_types)
 
 
 def _prepare_codex_home(request: AgentRunRequest) -> Path:

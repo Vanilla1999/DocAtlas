@@ -10,7 +10,7 @@ import pytest
 from eval.task_level.execution import capture_patch, run_canary
 from eval.task_level.runners.base import AgentRunOutput, AgentRunRequest
 from eval.task_level.runners.claude import ClaudeRunner
-from eval.task_level.runners.codex import _normalize_jsonl, _redact
+from eval.task_level.runners.codex import _is_provider_failure, _normalize_jsonl, _redact
 from eval.task_level.runners.opencode import _normalize_events, _write_opencode_config
 
 
@@ -98,6 +98,19 @@ def test_codex_normalized_trajectory_uses_sanitized_events(monkeypatch: pytest.M
     assert "/home/alice/private/project" not in serialized
     assert "<redacted>" in serialized
     assert "<path>" in serialized
+
+
+def test_codex_detects_error_event_stream_with_provider_403_as_failure():
+    stdout = "\n".join([
+        '{"type":"thread.started","thread_id":"thread-1"}',
+        '{"type":"turn.started"}',
+        '{"type":"error","message":"unexpected status 403 Forbidden"}',
+        '{"type":"turn.failed","error":{"message":"unexpected status 403 Forbidden"}}',
+    ])
+    stderr = "failed to refresh available models: 403 Forbidden\nfailed to connect to websocket: HTTP error: 403 Forbidden"
+
+    assert _is_provider_failure(stdout, stderr) is True
+    assert _is_provider_failure("{\"type\":\"turn.completed\"}\n", stderr) is False
 
 
 def test_opencode_normalizes_json_events_for_policy_audit():
