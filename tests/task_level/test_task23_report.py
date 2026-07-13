@@ -4,7 +4,7 @@ import hashlib
 
 import pytest
 
-from eval.task_level.analysis.task23_report import _retry_provenance, _source_artifact_hashes, build_task23_report
+from eval.task_level.analysis.task23_report import _retry_provenance, _source_artifact_hashes, build_task23_report, write_sanitized_run_bundle
 
 
 CONDITIONS = [
@@ -43,15 +43,47 @@ def test_source_artifact_hashes_are_reproducible(tmp_path):
     protocol.write_bytes(b"protocol\n")
     amendment.write_bytes(b"amendment\n")
     replacement_screening.write_bytes(b"replacement\n")
+    sanitized = tmp_path / "sanitized.jsonl"
+    sanitized.write_bytes(b"sanitized\n")
 
-    hashes = _source_artifact_hashes(runs, protocol, amendment, replacement_screening)
+    hashes = _source_artifact_hashes(runs, protocol, amendment, replacement_screening, sanitized)
 
     assert hashes == {
         "runs_jsonl_sha256": hashlib.sha256(b"runs\n").hexdigest(),
         "protocol_sha256": hashlib.sha256(b"protocol\n").hexdigest(),
         "amendment_sha256": hashlib.sha256(b"amendment\n").hexdigest(),
         "replacement_screening_sha256": hashlib.sha256(b"replacement\n").hexdigest(),
+        "sanitized_runs_sha256": hashlib.sha256(b"sanitized\n").hexdigest(),
     }
+
+
+def test_sanitized_bundle_keeps_rescorable_patch_and_removes_local_paths(tmp_path):
+    run_dir = tmp_path / "run"
+    cell = run_dir / "task_a" / "condition_a" / "repeat_0"
+    cell.mkdir(parents=True)
+    (cell / "patch.diff").write_text("diff --git a/a b/a\n", encoding="utf-8")
+    (cell / "trajectory.normalized.json").write_text(
+        '[{"sequence": 1, "tool_name": "Bash", "result_summary": "checked"}]',
+        encoding="utf-8",
+    )
+    output = tmp_path / "bundle.jsonl"
+    rows = [{
+        "task_id": "task_a",
+        "condition_id": "condition_a",
+        "repeat": 0,
+        "status": "completed",
+        "resolved": False,
+        "patch_path": "/private/local/patch.diff",
+        "trajectory_path": "/private/local/trajectory.json",
+        "metrics": {"total_tokens": 10},
+    }]
+
+    write_sanitized_run_bundle(rows, run_dir, output)
+    payload = __import__("json").loads(output.read_text(encoding="utf-8"))
+
+    assert payload["patch"] == "diff --git a/a b/a\n"
+    assert payload["trajectory"][0]["result_summary"] == "checked"
+    assert "/private/local" not in output.read_text(encoding="utf-8")
 
 
 def _protocol() -> dict:
@@ -107,10 +139,15 @@ def _rows() -> list[dict]:
                     "public_tests_passed": True,
                     "hidden_tests_passed": recommended,
                     "policy_clean": True,
+                    "budget": {
+                        "input_tokens_exceeded": recommended,
+                        "output_tokens_exceeded": False,
+                    },
                     "metrics": {
                         "total_tokens": 1050 if recommended else 1000,
                         "wall_time_seconds": 105 if recommended else 100,
                         "tool_output_tokens_estimate": 100,
+                        "useful_context_ratio": 0.25,
                         "condition_setup_wall_time_seconds": 1.0,
                         "required_evidence_recall": 0.5,
                         "first_required_evidence_rank": 2,
@@ -129,7 +166,8 @@ def test_report_checks_full_matrix_and_emits_predeclared_decision():
     assert report["conditions"]["repo_only_strict_offline"]["median_total_tokens"] == 1000
     assert report["conditions"]["repo_only_strict_offline"]["public_tests_passed_rate"] == 1.0
     assert report["conditions"]["repo_only_strict_offline"]["hidden_tests_passed_rate"] == 0.0
-    assert report["conditions"]["repo_only_strict_offline"]["median_useful_context_ratio"] == 0.5
+    assert report["conditions"]["repo_only_strict_offline"]["median_useful_context_ratio"] == 0.25
+    assert report["conditions"]["docatlas_tool_recommended"]["input_budget_exceeded_runs"] == 9
     assert report["failure_taxonomy"]["repo_only_strict_offline"] == {"hidden_tests_failed": 9}
 
 

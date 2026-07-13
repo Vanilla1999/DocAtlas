@@ -36,6 +36,7 @@ DocAtlas must not silently author or commit official documentation. When documen
 | 07 Product scope | Done for scope cleanup | Core journey and honest claim boundaries exist | Benchmark is a negative signal, not product proof; see 23 |
 | 08 Docs/release hygiene | Open | Task file exists | Product narrative, changelog, classifier, wiki and release truth still drift |
 | 09 External ingest | Partial | Async mismatch, background execution, staging and GitHub fetch path were improved | Version propagation, hard deadlines, durable status, real failure taxonomy/recovery, reliable partial-page preservation and Kotlin evidence remain; see 11–14, 30–31 |
+| 23 Product decision benchmark | Pivot required | The complete 36-cell run found no resolved-rate gain and materially higher token/latency cost | Perform patch-level failure analysis and a bounded context-delivery pivot; see 33 |
 
 `Done for scope` means the original bounded PR is complete; it does not mean the entire subsystem is mature.
 
@@ -66,10 +67,11 @@ Do not publish a Stable release before every Stage A implementation and separate
 ### Stage C — make the product investment decision
 
 15. `23_REAL_PROJECT_VALUE_AND_TOKEN_BENCHMARK.md`
+16. `33_TASK23_FAILURE_ANALYSIS_AND_CONTEXT_PIVOT.md`
 
 ### Stage D — conditional external-library expansion
 
-Run this stage only if task 23's predeclared decision supports continued external-library parity investment. Otherwise revise or close these tasks explicitly.
+Paused by Task 23's `PIVOT_REQUIRED` result. Do not start this stage until Task 33 produces a new frozen benchmark that meets its decision gate. Context7/web remains the complementary external-library source during the pause.
 
 16. `16_EXACT_SOURCE_CATALOG_AND_CACHE.md`
 17. `17_LOCKFILE_WORKSPACE_VERSION_IDENTITY.md`

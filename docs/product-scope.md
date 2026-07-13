@@ -34,3 +34,5 @@ Each claim must name its metric:
 | DocAtlas helps complete coding tasks | public and hidden test pass rate across repeated policy-clean runs | Superiority over repo-only until the comparison is repeated. |
 
 Current saved public-doc comparisons measure retrieval only. DocAtlas must not claim to beat repo-only agents or Context7 for project-aware coding tasks until repeated, policy-clean benchmark runs support that statement.
+
+Task 23's completed 36-cell task benchmark produced `PIVOT_REQUIRED`: both repo-only and DocAtlas-recommended resolved 0/9 attempts, while the recommended workflow increased median total tokens by about 143% and median latency by about 37%. This result blocks broader Context7-parity investment. It does not prove that local project documentation has no value; it requires a narrower, bounded context-delivery experiment before another unchanged-task benchmark.

@@ -5,7 +5,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from types import SimpleNamespace
 
-from eval.task_level.execution import evaluate_agent_patch, trajectory_evidence_metrics
+from eval.task_level.execution import evaluate_agent_patch, trajectory_evidence_metrics, trajectory_tool_output_metrics
 from eval.task_level.fixtures.builder import materialize_fixture
 from eval.task_level.runner import load_tasks, run_smoke
 from eval.task_level.runners.base import AgentRunOutput
@@ -52,6 +52,8 @@ def test_resolved_requires_public_and_hidden_tests(tmp_path: Path):
     assert not result["resolved"]
     assert result["patch_path"]
     assert result["hidden_tests_passed"] is False
+    assert result["budget"]["max_input_tokens"] == task.max_input_tokens
+    assert result["budget"]["max_turns_enforced_by_runner"] is False
 
 
 def test_each_run_uses_fresh_workspace(tmp_path: Path):
@@ -91,3 +93,19 @@ def test_trajectory_evidence_metrics_measure_recall_and_first_observation_rank(t
         "required_evidence_recall": 2 / 3,
         "first_required_evidence_rank": 1,
     }
+
+
+def test_tool_output_metrics_use_measured_chars_and_do_not_alias_recall():
+    task = SimpleNamespace(expected_symbols=["PermissionService"], expected_project_docs=[])
+    calls = [
+        {"tool_name": "get_docs_context", "result_summary": "PermissionService owns the gate", "result_chars": 32},
+        {"tool_name": "Bash", "result_summary": "unrelated test output", "result_chars": 20},
+    ]
+
+    metrics = trajectory_tool_output_metrics(task, calls)
+
+    assert metrics["tool_output_chars"] == 52
+    assert metrics["tool_output_tokens_estimate"] == 13
+    assert metrics["docs_context_output_chars"] == 32
+    assert metrics["useful_context_ratio"] == 1.0
+    assert metrics["useful_context_ratio_method"] == "evidence-bearing-docs-tool-output-chars"

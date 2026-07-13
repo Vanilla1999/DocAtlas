@@ -100,6 +100,54 @@ def test_codex_normalized_trajectory_uses_sanitized_events(monkeypatch: pytest.M
     assert "<path>" in serialized
 
 
+def test_codex_normalizes_measurable_tool_output():
+    raw = json.dumps({
+        "type": "item.completed",
+        "item": {
+            "type": "mcp_tool_call",
+            "server": "docmancer-docs",
+            "tool": "get_docs_context",
+            "arguments": {"question": "architecture"},
+            "result": {"content": [{"type": "text", "text": "PermissionService owns the gate"}]},
+        },
+    })
+
+    events, tool_calls, _input, _output = _normalize_jsonl(raw)
+
+    assert tool_calls == [events[0]]
+    assert tool_calls[0]["result_chars"] > 0
+    assert "PermissionService owns the gate" in tool_calls[0]["result_summary"]
+
+
+def test_codex_runner_uses_workspace_write_sandbox(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+    captured: list[list[str]] = []
+
+    def fake_run(command, **kwargs):
+        captured.append(command)
+        return subprocess.CompletedProcess(command, 0, '{"type":"turn.completed","usage":{"input_tokens":1,"output_tokens":1}}\n', "")
+
+    monkeypatch.setattr(subprocess, "run", fake_run)
+    request = AgentRunRequest(
+        task_id="task",
+        condition_id="repo_only",
+        workspace=tmp_path,
+        prompt="inspect",
+        model="model",
+        timeout_seconds=30,
+        max_turns=1,
+        environment={},
+        mcp_config_path=None,
+        tool_policy_path=tmp_path / "policy.json",
+        output_dir=tmp_path / "out",
+    )
+
+    from eval.task_level.runners.codex import CodexRunner
+    CodexRunner("codex").run(request)
+
+    command = next(command for command in captured if "exec" in command)
+    assert command[command.index("--sandbox") + 1] == "workspace-write"
+
+
 def test_codex_detects_error_event_stream_with_provider_403_as_failure():
     stdout = "\n".join([
         '{"type":"thread.started","thread_id":"thread-1"}',

@@ -43,8 +43,9 @@ class CodexRunner:
                 "CLI capability detection is not causal verification; runner canary must pass before causal pilot execution.",
                 "Uses `codex exec --json --ephemeral` for fresh non-interactive sessions.",
                 "Uses per-run CODEX_HOME with copied auth material and generated MCP config.",
-                "Uses Codex exec with an explicit sandbox mode. In this host, workspace-write may fail at bwrap setup; danger-full-access is used only with policy/trajectory audit.",
+                "Uses Codex exec with explicit workspace-write isolation; policy and trajectory audits remain defense in depth.",
                 "Codex JSONL result events expose concrete input/output token usage in observed canary and pilot runs.",
+                "Codex exec does not expose a hard max-turn or cumulative-token flag; the harness records declared budget overruns and controls attempts with one ephemeral process plus a timeout.",
             ],
         )
 
@@ -70,7 +71,7 @@ class CodexRunner:
             "--model",
             request.model,
             "--sandbox",
-            "danger-full-access",
+            "workspace-write",
             "--cd",
             str(request.workspace),
             request.prompt,
@@ -236,26 +237,45 @@ def _normalize_jsonl(stdout: str) -> tuple[list[dict[str, Any]], list[dict[str, 
             tool_name = "Edit"
         elif not tool_name and item_type == "mcp_tool_call":
             tool_name = str(item.get("tool") or "mcp_tool_call")
-        content = json.dumps(message, sort_keys=True)[:500]
+        result_text = _tool_result_text(item, message)
+        content = result_text[:4000] if result_text else json.dumps(message, sort_keys=True)[:500]
         event_type = "tool_call" if tool_name or "tool" in raw_type.lower() or "exec" in raw_type.lower() else "assistant"
-        if event_type == "tool_call":
-            tool_calls.append(raw)
         usage = message.get("usage") if isinstance(message.get("usage"), dict) else raw.get("usage") if isinstance(raw.get("usage"), dict) else {}
         if isinstance(usage.get("input_tokens"), int):
             input_tokens = usage["input_tokens"]
         if isinstance(usage.get("output_tokens"), int):
             output_tokens = usage["output_tokens"]
-        events.append({
+        normalized_event = {
             "sequence": sequence,
             "timestamp": datetime.now(timezone.utc).isoformat(),
             "event_type": event_type,
             "tool_name": tool_name,
             "arguments": _event_arguments(item, message),
             "result_summary": content,
+            "result_chars": len(result_text),
+            "result_truncated": len(result_text) > len(content),
             "source": "codex_jsonl",
+            "source_event_type": raw_type,
             "tokens": usage or None,
-        })
+        }
+        events.append(normalized_event)
+        if event_type == "tool_call":
+            # Downstream accounting must consume the sanitized normalized event,
+            # not the provider-specific raw envelope.
+            tool_calls.append(normalized_event)
     return events, tool_calls, input_tokens, output_tokens
+
+
+def _tool_result_text(item: dict[str, Any], message: dict[str, Any]) -> str:
+    for container in (item, message):
+        for field in ("result", "output", "aggregated_output", "content"):
+            value = container.get(field)
+            if value in (None, ""):
+                continue
+            if isinstance(value, str):
+                return value
+            return json.dumps(value, sort_keys=True, ensure_ascii=False)
+    return ""
 
 
 def _event_arguments(item: dict[str, Any], message: dict[str, Any]) -> dict[str, Any]:

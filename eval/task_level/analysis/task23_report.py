@@ -105,10 +105,13 @@ def build_task23_report(
             "median_tool_output_tokens_estimate": _median([_metric(row, "tool_output_tokens_estimate") for row in valid_rows]),
             "median_condition_setup_wall_time_seconds": _median([_metric(row, "condition_setup_wall_time_seconds") for row in valid_rows]),
             "median_required_evidence_recall": _median([_metric(row, "required_evidence_recall") for row in valid_rows]),
-            "median_useful_context_ratio": _median([_metric(row, "required_evidence_recall") for row in valid_rows]),
+            "median_useful_context_ratio": _median([_metric(row, "useful_context_ratio") for row in valid_rows]),
+            "useful_context_ratio_method": "evidence-bearing-docs-tool-output-chars",
             "median_first_required_evidence_rank": _median([_metric(row, "first_required_evidence_rank") for row in valid_rows]),
             "median_audited_external_context_tokens": _median([_metric(row, "audited_external_context_tokens") for row in valid_rows]),
             "policy_violations": sum(not bool(row.get("policy_clean")) for row in condition_rows),
+            "input_budget_exceeded_runs": sum(bool((row.get("budget") or {}).get("input_tokens_exceeded")) for row in valid_rows),
+            "output_budget_exceeded_runs": sum(bool((row.get("budget") or {}).get("output_tokens_exceeded")) for row in valid_rows),
         }
         failure_taxonomy[condition] = dict(sorted(Counter(
             _failure_reason(row) for row in condition_rows if not row.get("resolved")
@@ -156,6 +159,65 @@ def _load_jsonl(path: Path) -> list[dict[str, Any]]:
     return [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
 
 
+def write_sanitized_run_bundle(rows: list[dict[str, Any]], run_dir: Path, output: Path) -> Path:
+    """Persist enough per-cell evidence to rescore and inspect patches without local paths."""
+    sanitized: list[dict[str, Any]] = []
+    for row in rows:
+        task_id = str(row.get("task_id") or "")
+        condition_id = str(row.get("condition_id") or "")
+        repeat = int(row.get("repeat") or 0)
+        cell_dir = run_dir / task_id / condition_id / f"repeat_{repeat}"
+        patch = _read_text(cell_dir / "patch.diff")
+        trajectory = _load_json_list(cell_dir / "trajectory.normalized.json")
+        sanitized.append({
+            "schema_version": "task23-sanitized-run-1",
+            "task_id": task_id,
+            "condition_id": condition_id,
+            "repeat": repeat,
+            "status": row.get("status"),
+            "resolved": row.get("resolved"),
+            "compile_success": row.get("compile_success"),
+            "public_tests_passed": row.get("public_tests_passed"),
+            "hidden_tests_passed": row.get("hidden_tests_passed"),
+            "policy_clean": row.get("policy_clean"),
+            "model": row.get("model"),
+            "runner_id": row.get("runner_id"),
+            "runner_version": row.get("runner_version"),
+            "changed_files": row.get("changed_files") or [],
+            "forbidden_changes": row.get("forbidden_changes") or [],
+            "metrics": row.get("metrics") or {},
+            "policy": row.get("policy") or {},
+            "docatlas": row.get("docatlas") or {},
+            "contract": row.get("contract") or {},
+            "actionability": row.get("actionability") or {},
+            "budget": row.get("budget") or {},
+            "patch_sha256": hashlib.sha256(patch.encode()).hexdigest(),
+            "patch": patch,
+            "trajectory": trajectory,
+        })
+    output.parent.mkdir(parents=True, exist_ok=True)
+    output.write_text(
+        "".join(json.dumps(row, sort_keys=True, ensure_ascii=False) + "\n" for row in sanitized),
+        encoding="utf-8",
+    )
+    return output
+
+
+def _read_text(path: Path) -> str:
+    try:
+        return path.read_text(encoding="utf-8")
+    except OSError:
+        return ""
+
+
+def _load_json_list(path: Path) -> list[dict[str, Any]]:
+    try:
+        value = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return []
+    return [item for item in value if isinstance(item, dict)] if isinstance(value, list) else []
+
+
 def _retry_provenance(run_dir: Path) -> dict[str, Any]:
     cells: dict[tuple[str, str, int], list[dict[str, Any]]] = {}
     for attempt_dir in sorted(run_dir.glob("*/*/repeat_*/attempts/attempt_*")):
@@ -197,6 +259,7 @@ def _source_artifact_hashes(
     protocol_path: Path,
     amendment_path: Path | None,
     replacement_screening_path: Path | None = None,
+    sanitized_bundle_path: Path | None = None,
 ) -> dict[str, str]:
     hashes = {
         "runs_jsonl_sha256": hashlib.sha256(runs_path.read_bytes()).hexdigest(),
@@ -206,6 +269,8 @@ def _source_artifact_hashes(
         hashes["amendment_sha256"] = hashlib.sha256(amendment_path.read_bytes()).hexdigest()
     if replacement_screening_path is not None:
         hashes["replacement_screening_sha256"] = hashlib.sha256(replacement_screening_path.read_bytes()).hexdigest()
+    if sanitized_bundle_path is not None:
+        hashes["sanitized_runs_sha256"] = hashlib.sha256(sanitized_bundle_path.read_bytes()).hexdigest()
     return hashes
 
 
@@ -225,8 +290,9 @@ def main() -> int:
             args.protocol.read_bytes(),
             screening_path.read_bytes(),
         )
+    rows = _load_jsonl(args.run_dir / "runs.jsonl")
     report = build_task23_report(
-        _load_jsonl(args.run_dir / "runs.jsonl"),
+        rows,
         protocol=_load_json(args.protocol),
         amendment=amendment,
     )
@@ -241,13 +307,16 @@ def main() -> int:
     retry_provenance = _retry_provenance(args.run_dir)
     if retry_provenance["retried_cells"]:
         report["retry_provenance"] = retry_provenance
+    output = args.output or args.run_dir / "task23_report.json"
+    bundle_path = output.with_name(output.stem + "_runs.sanitized.jsonl")
+    write_sanitized_run_bundle(rows, args.run_dir, bundle_path)
     report["source_artifacts"] = _source_artifact_hashes(
         args.run_dir / "runs.jsonl",
         args.protocol,
         args.amendment,
         args.replacement_screening,
+        bundle_path,
     )
-    output = args.output or args.run_dir / "task23_report.json"
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     print(output)

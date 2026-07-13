@@ -106,6 +106,37 @@ def trajectory_evidence_metrics(task: Any, trajectory_path: Path) -> dict[str, A
     }
 
 
+def trajectory_tool_output_metrics(task: Any, tool_calls: list[dict[str, Any]]) -> dict[str, Any]:
+    evidence = [item.lower() for item in dict.fromkeys([*task.expected_symbols, *task.expected_project_docs])]
+    total_chars = 0
+    docs_chars = 0
+    useful_docs_chars = 0
+    for call in tool_calls:
+        if not isinstance(call, dict):
+            continue
+        summary = str(call.get("result_summary") or "")
+        result_chars = call.get("result_chars")
+        chars = result_chars if isinstance(result_chars, int) and result_chars >= 0 else len(summary)
+        total_chars += chars
+        tool_name = str(call.get("tool_name") or "").lower()
+        is_docs_context = any(marker in tool_name for marker in ("get_docs_context", "prepare_docs", "docs_status", "docmancer", "doc-atlas"))
+        if is_docs_context:
+            docs_chars += chars
+            if evidence and any(marker in summary.lower() for marker in evidence):
+                useful_docs_chars += chars
+    return {
+        "tool_output_chars": total_chars,
+        "tool_output_tokens_estimate": _estimate_tokens_from_chars(total_chars),
+        "docs_context_output_chars": docs_chars,
+        "useful_context_ratio": useful_docs_chars / docs_chars if docs_chars else None,
+        "useful_context_ratio_method": "evidence-bearing-docs-tool-output-chars",
+    }
+
+
+def _estimate_tokens_from_chars(chars: int) -> int:
+    return max(1, (chars + 3) // 4) if chars else 0
+
+
 def _load_optional_json(path: Path) -> dict[str, Any]:
     try:
         data = json.loads(path.read_text(encoding="utf-8"))
@@ -298,12 +329,19 @@ def evaluate_agent_patch(task: TaskSpec, workspace: Path, run_output_dir: Path, 
     trajectory = Path(trajectory_path) if trajectory_path else run_output_dir / "missing-trajectory.json"
     evidence_metrics = trajectory_evidence_metrics(task, trajectory)
     tool_calls = getattr(runner_output, "tool_calls", [])
-    tool_output_text = "\n".join(
-        str(call.get("result_summary", "")) for call in tool_calls if isinstance(call, dict)
-    )
+    tool_output_metrics = trajectory_tool_output_metrics(task, tool_calls)
     input_tokens = getattr(runner_output, "input_tokens", None)
     output_tokens = getattr(runner_output, "output_tokens", None)
     total_tokens = input_tokens + output_tokens if isinstance(input_tokens, int) and isinstance(output_tokens, int) else None
+    budget = {
+        "max_input_tokens": task.max_input_tokens,
+        "max_output_tokens": task.max_output_tokens,
+        "max_turns": task.max_turns,
+        "input_tokens_exceeded": isinstance(input_tokens, int) and input_tokens > task.max_input_tokens,
+        "output_tokens_exceeded": isinstance(output_tokens, int) and output_tokens > task.max_output_tokens,
+        "max_turns_enforced_by_runner": False,
+        "attempt_control": "one_ephemeral_process_with_timeout",
+    }
     setup_wall_time = sum(
         float(payload.get("wall_time_seconds", 0.0))
         for payload in (external_injection, docatlas_preparation, injection, checklist_injection, constraints_injection)
@@ -363,7 +401,7 @@ def evaluate_agent_patch(task: TaskSpec, workspace: Path, run_output_dir: Path, 
             "input_tokens": metrics.input_tokens,
             "output_tokens": metrics.output_tokens,
             "total_tokens": total_tokens,
-            "tool_output_tokens_estimate": _estimate_tokens(tool_output_text),
+            **tool_output_metrics,
             "condition_setup_wall_time_seconds": setup_wall_time,
             "audited_external_context_tokens": _optional_int(external_injection.get("injected_context_tokens")),
             "turns": None,
@@ -391,6 +429,7 @@ def evaluate_agent_patch(task: TaskSpec, workspace: Path, run_output_dir: Path, 
             "utilization_rate": 1.0 if utilization.context_used else 0.0 if utilization.context_retrieved or audit.docatlas_calls else None,
         },
         "notes": getattr(runner_output, "notes", []),
+        "budget": budget,
     }
     if setup is not None and setup.returncode != 0:
         result["notes"].append("setup command failed before evaluator tests")
