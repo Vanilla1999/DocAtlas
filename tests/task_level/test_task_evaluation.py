@@ -107,5 +107,7 @@ def test_tool_output_metrics_use_measured_chars_and_do_not_alias_recall():
     assert metrics["tool_output_chars"] == 52
     assert metrics["tool_output_tokens_estimate"] == 13
     assert metrics["docs_context_output_chars"] == 32
-    assert metrics["useful_context_ratio"] == 1.0
-    assert metrics["useful_context_ratio_method"] == "evidence-bearing-docs-tool-output-chars"
+    assert metrics["docs_output_evidence_coverage"] == 1.0
+    assert metrics["docs_output_evidence_found"] == 1
+    assert metrics["useful_context_ratio"] is None
+    assert metrics["useful_context_ratio_method"] == "not_measured_without_chunk_usage_attribution"

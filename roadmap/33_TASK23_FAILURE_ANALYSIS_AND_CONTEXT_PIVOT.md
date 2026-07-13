@@ -24,8 +24,8 @@ Explain the failed patches requirement by requirement, then test one compact act
    - likely target files;
    - post-edit checks.
 5. Cap the packet at 2,000 estimated tokens and one pre-edit retrieval call. Return an explicit truncation/insufficient-evidence state instead of silently expanding context.
-6. Measure real normalized tool-output characters/tokens. Do not alias required-evidence recall to useful-context ratio.
-7. Freeze the rerun protocol before results. Keep the three tasks, four original lanes, three repeats, decision rule, starting fixtures, and model policy unchanged. Record any unavoidable runner-version change as a comparability limitation.
+6. Measure real normalized tool-output characters/tokens and evidence coverage. Do not report useful-context ratio until chunk-level usage attribution exists, and do not alias required-evidence recall to it.
+7. Freeze the rerun protocol before results. Keep the three tasks, four original lanes, three repeats, decision rule, starting fixtures, and model policy unchanged. Record any unavoidable runner-version change as a comparability limitation. Bootstrap by task cluster rather than treating task/repeat pairs as independent samples.
 8. Add the bounded action-packet lane only as a separately named pivot candidate; do not replace or rewrite historical Task 23 results.
 
 ## Decision gate
@@ -42,8 +42,10 @@ The pivot may continue only if it improves resolved rate under Task 23's existin
 ## Acceptance criteria
 
 - Every one of the 36 historical or replacement runs has independently inspectable sanitized evidence.
+- Bundle generation fails closed on missing completed patches, missing valid-run trajectories, unsanitized paths or credential-like values, and records per-cell fixture/oracle hashes.
 - Failure categories name the missed requirement and the evidence that was available to the agent.
 - Tool-output and context-efficiency metrics have tested, non-aliased definitions.
 - The compact packet is source-attributed, at most 2,000 estimated tokens, and invoked no more than once before editing.
 - The frozen rerun is complete and produces `CONTINUE`, `PIVOT_REQUIRED`, or `INCONCLUSIVE` without post-result threshold changes.
+- Runner and DocAtlas visibility canaries pass in the same causal invocation; declared input/output token budget overruns force `INCONCLUSIVE`.
 - Product claims and Stage D status match the result; focused suites and `git diff --check` pass.

@@ -11,3 +11,15 @@ The legacy `task23_full_001.json` and `task23_full_002.json` reports predate the
 - `runtime_integrity` describes whether the recorded attempts produced valid runner outputs.
 
 The first attempt is intentionally retained as `INCONCLUSIVE`: 22 of 36 cells encountered provider transport failures. Diagnostic medians cover only valid runner outputs and are not product-decision estimates. The second attempt has complete artifact and runtime integrity (36 of 36 valid cells); under the frozen decision rule, no quality gain and increased token use produce `PIVOT_REQUIRED`.
+
+## Legacy evidence limitations
+
+The two tracked reports are historical artifacts and are not regenerated with newer analysis code. In particular:
+
+- their raw patches and normalized trajectories were not preserved in a tracked sanitized bundle, so the 36 cells cannot be independently patch-rescored from this repository;
+- their `useful_context_ratio` is an earlier proxy that aliases evidence-marker recall and must not be interpreted as observed context use;
+- their tool-output token estimate predates measured normalized `result_chars`;
+- task-level input/output limits were recorded in the protocol but were not an execution gate, and maximum turns were not runner-enforced;
+- their confidence interval resampled task/repeat pairs rather than clustering by the three independent tasks.
+
+These limitations prevent a reproducibility-complete positive product claim. They do not reverse the conservative pivot signal: no lane resolved a hidden test, while the recommended lane used materially more aggregate tokens and time. Task 33 owns a replacement evidence-complete, task-clustered protocol; historical JSON remains unchanged rather than being silently reinterpreted.

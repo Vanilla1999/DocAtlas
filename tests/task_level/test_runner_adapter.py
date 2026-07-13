@@ -73,6 +73,21 @@ def test_patch_capture(tmp_path: Path):
     assert changed == ["file.txt"]
 
 
+def test_patch_capture_includes_pure_untracked_file(tmp_path: Path):
+    subprocess.run(["git", "init"], cwd=tmp_path, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
+    subprocess.run(["git", "config", "user.email", "benchmark@example.invalid"], cwd=tmp_path, check=True)
+    subprocess.run(["git", "config", "user.name", "Task Benchmark"], cwd=tmp_path, check=True)
+    (tmp_path / "base.txt").write_text("base\n", encoding="utf-8")
+    subprocess.run(["git", "add", "."], cwd=tmp_path, check=True)
+    subprocess.run(["git", "commit", "-m", "base"], cwd=tmp_path, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
+    (tmp_path / "new.txt").write_text("new content\n", encoding="utf-8")
+
+    patch_path, _status_path, _changed_path, changed = capture_patch(tmp_path, tmp_path)
+
+    assert changed == ["new.txt"]
+    assert "new content" in patch_path.read_text(encoding="utf-8")
+
+
 def test_missing_token_metrics_remain_null(tmp_path: Path):
     result = run_canary(MockRunner(), "mock", 30, tmp_path)
 

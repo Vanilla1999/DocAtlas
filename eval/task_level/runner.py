@@ -15,7 +15,7 @@ from typing import Any
 
 from eval.task_level.conditions import CONDITIONS, DEFAULT_CONDITIONS
 from eval.task_level.evaluators.tests import run_command
-from eval.task_level.execution import execute_pilot, run_canary, run_docatlas_tool_visibility_canary, runner_verification_payload, serialize_run_results_jsonl
+from eval.task_level.execution import DOCATLAS_CONDITIONS, execute_pilot, run_canary, run_docatlas_tool_visibility_canary, runner_verification_payload, serialize_run_results_jsonl
 from eval.task_level.fixtures.builder import FIXTURE_TASKS, materialize_fixture, validate_fixture
 from eval.task_level.patch_constraints_pilot import TARGETED_PILOT_CONDITIONS, build_targeted_pilot_plan, select_targeted_pilot_tasks, write_targeted_pilot_dry_run
 from eval.task_level.report import write_report
@@ -276,6 +276,26 @@ def _load_json(path: Path) -> dict[str, Any]:
     return data if isinstance(data, dict) else {}
 
 
+def _causal_gate_error(
+    conditions: list[str],
+    *,
+    verify_runner_requested: bool,
+    runner_canary: dict[str, Any] | None,
+    verify_docatlas_requested: bool,
+    docatlas_canary: dict[str, Any] | None,
+) -> str | None:
+    if not verify_runner_requested:
+        return "causal execution requires --verify-runner in the same invocation"
+    if not runner_canary or runner_canary.get("status") != "passed":
+        return "runner canary did not pass; causal execution was not started"
+    if any(condition in DOCATLAS_CONDITIONS for condition in conditions):
+        if not verify_docatlas_requested:
+            return "DocAtlas conditions require --verify-docatlas-tool in the same invocation"
+        if not docatlas_canary or not docatlas_canary.get("docatlas_tool_visibility_verified"):
+            return "DocAtlas tool visibility canary did not pass; causal execution was not started"
+    return None
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Task-level patch benchmark harness")
     parser.add_argument("--manifest", type=Path, default=TASKS_PATH)
@@ -329,19 +349,21 @@ def main(argv: list[str] | None = None) -> int:
                 materialized.append(materialize_fixture(task, materialize_root / task.task_id))
         (run_dir / "materialized_summary.json").write_text(json.dumps(materialized, indent=2, sort_keys=True), encoding="utf-8")
 
+    runner_canary: dict[str, Any] | None = None
+    docatlas_canary: dict[str, Any] | None = None
     if args.verify_runner:
-        canary = run_canary(runner, args.model, args.timeout_seconds, run_dir / "runner_canary") if not args.dry_run else {"status": "dry_run"}
+        runner_canary = run_canary(runner, args.model, args.timeout_seconds, run_dir / "runner_canary") if not args.dry_run else {"status": "dry_run"}
         VALIDATION_ROOT.mkdir(parents=True, exist_ok=True)
-        (VALIDATION_ROOT / "runner_canary.json").write_text(json.dumps(canary, indent=2, sort_keys=True), encoding="utf-8")
-        (run_dir / "runner_canary.json").write_text(json.dumps(canary, indent=2, sort_keys=True), encoding="utf-8")
+        (VALIDATION_ROOT / "runner_canary.json").write_text(json.dumps(runner_canary, indent=2, sort_keys=True), encoding="utf-8")
+        (run_dir / "runner_canary.json").write_text(json.dumps(runner_canary, indent=2, sort_keys=True), encoding="utf-8")
 
     if args.verify_docatlas_tool:
-        canary = run_docatlas_tool_visibility_canary(runner, args.model, args.timeout_seconds, run_dir / "docatlas_tool_visibility_canary") if not args.dry_run else {"status": "dry_run"}
+        docatlas_canary = run_docatlas_tool_visibility_canary(runner, args.model, args.timeout_seconds, run_dir / "docatlas_tool_visibility_canary") if not args.dry_run else {"status": "dry_run"}
         VALIDATION_ROOT.mkdir(parents=True, exist_ok=True)
-        (VALIDATION_ROOT / "docatlas_tool_visibility_canary.json").write_text(json.dumps(canary, indent=2, sort_keys=True), encoding="utf-8")
-        (run_dir / "docatlas_tool_visibility_canary.json").write_text(json.dumps(canary, indent=2, sort_keys=True), encoding="utf-8")
-        metadata["docatlas_tool_visibility_canary"] = canary
-        if not canary.get("docatlas_tool_visibility_verified"):
+        (VALIDATION_ROOT / "docatlas_tool_visibility_canary.json").write_text(json.dumps(docatlas_canary, indent=2, sort_keys=True), encoding="utf-8")
+        (run_dir / "docatlas_tool_visibility_canary.json").write_text(json.dumps(docatlas_canary, indent=2, sort_keys=True), encoding="utf-8")
+        metadata["docatlas_tool_visibility_canary"] = docatlas_canary
+        if not docatlas_canary.get("docatlas_tool_visibility_verified"):
             metadata["decision"] = "ITERATE_TOOL_DISCOVERABILITY"
             (run_dir / "metadata.json").write_text(json.dumps(metadata, indent=2, sort_keys=True), encoding="utf-8")
 
@@ -394,6 +416,20 @@ def main(argv: list[str] | None = None) -> int:
         if args.dry_run:
             results = [{"status": "dry_run", "task_id": task.task_id, "condition_id": condition, "repeat": repeat, "resolved": False, "metrics": {}} for task in tasks for repeat in range(args.repeats) for condition in args.conditions]
         else:
+            gate_error = _causal_gate_error(
+                args.conditions,
+                verify_runner_requested=args.verify_runner,
+                runner_canary=runner_canary,
+                verify_docatlas_requested=args.verify_docatlas_tool,
+                docatlas_canary=docatlas_canary,
+            )
+            if gate_error:
+                metadata["executive_result"] = "Causal execution blocked before the pilot."
+                metadata["decision"] = "BLOCKED_BY_CANARY_GATE"
+                metadata["canary_gate_error"] = gate_error
+                write_report(run_dir, metadata, results)
+                print(run_dir)
+                return 2
             results = execute_pilot(
                 tasks,
                 args.conditions,

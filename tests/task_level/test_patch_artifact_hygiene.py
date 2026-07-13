@@ -12,6 +12,7 @@ from eval.task_level.artifact_hygiene import (
     normalize_repo_path,
 )
 from eval.task_level.execution import capture_patch
+from eval.task_level.evaluators.patch import forbidden_changed_paths
 
 
 def test_runtime_artifacts_are_filtered_from_changed_files():
@@ -79,6 +80,10 @@ def test_runtime_artifact_detection_does_not_hide_real_generated_paths():
     assert not is_runtime_artifact("package-lock.json")
 
 
+def test_forbidden_path_classification_includes_untracked_inventory():
+    assert forbidden_changed_paths(["src/ok.py", "secrets/new.txt"], ("src/",)) == ["secrets/new.txt"]
+
+
 def test_capture_patch_writes_raw_and_normalized_hygiene_artifacts(tmp_path: Path):
     subprocess.run(["git", "init"], cwd=tmp_path, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False)
     subprocess.run(["git", "config", "user.email", "benchmark@example.invalid"], cwd=tmp_path, check=False)
@@ -92,6 +97,7 @@ def test_capture_patch_writes_raw_and_normalized_hygiene_artifacts(tmp_path: Pat
     subprocess.run(["git", "commit", "-m", "base"], cwd=tmp_path, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False)
 
     (tmp_path / "src" / "example.py").write_text("after\n", encoding="utf-8")
+    subprocess.run(["git", "add", "src/example.py"], cwd=tmp_path, check=True)
     (pycache / "test_example.cpython-311.pyc").write_text("after\n", encoding="utf-8")
     (tmp_path / "a").mkdir()
     (tmp_path / "a" / "service.py").write_text("new\n", encoding="utf-8")
@@ -117,4 +123,8 @@ def test_capture_patch_writes_raw_and_normalized_hygiene_artifacts(tmp_path: Pat
     assert hygiene["filtered_counts"]["changed_files"] == 3
     assert hygiene["filtered_counts"]["ignored_runtime_artifacts"] == 2
     assert (tmp_path / "patch.raw.diff").exists()
-    assert "__pycache__" not in patch_path.read_text(encoding="utf-8", errors="replace")
+    patch = patch_path.read_text(encoding="utf-8", errors="replace")
+    assert "__pycache__" not in patch
+    assert "+after" in patch
+    assert "+new" in patch
+    assert "package-lock.json" in patch

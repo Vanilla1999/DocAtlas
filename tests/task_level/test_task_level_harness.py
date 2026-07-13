@@ -6,7 +6,7 @@ from pathlib import Path
 from eval.task_level.conditions import CONDITIONS, DEFAULT_CONDITIONS
 from eval.task_level.execution import _archive_run_attempt, count_jsonl_records, execute_pilot, run_artifact_integrity, serialize_run_results_jsonl, write_run_progress
 from eval.task_level.report import bootstrap_delta_ci, write_report
-from eval.task_level.runner import load_tasks, run_smoke
+from eval.task_level.runner import _causal_gate_error, load_tasks, run_smoke
 from eval.task_level.runners.base import RunnerCapabilities
 from eval.task_level.schemas import TASKS_PATH
 
@@ -44,6 +44,32 @@ def test_smoke_results_are_explicitly_not_causal(tmp_path: Path):
     assert results
     assert {result["status"] for result in results} == {"smoke_not_causal"}
     assert not any(result["resolved"] for result in results)
+
+
+def test_causal_gate_requires_successful_canaries():
+    conditions = ["repo_only_strict_offline", "docatlas_tool_recommended"]
+
+    assert _causal_gate_error(
+        conditions,
+        verify_runner_requested=False,
+        runner_canary=None,
+        verify_docatlas_requested=False,
+        docatlas_canary=None,
+    )
+    assert _causal_gate_error(
+        conditions,
+        verify_runner_requested=True,
+        runner_canary={"status": "passed"},
+        verify_docatlas_requested=False,
+        docatlas_canary=None,
+    )
+    assert _causal_gate_error(
+        conditions,
+        verify_runner_requested=True,
+        runner_canary={"status": "passed"},
+        verify_docatlas_requested=True,
+        docatlas_canary={"docatlas_tool_visibility_verified": True},
+    ) is None
 
 
 def test_bootstrap_delta_ci_is_paired_and_directional():

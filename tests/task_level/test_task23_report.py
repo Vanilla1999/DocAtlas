@@ -78,12 +78,70 @@ def test_sanitized_bundle_keeps_rescorable_patch_and_removes_local_paths(tmp_pat
         "metrics": {"total_tokens": 10},
     }]
 
-    write_sanitized_run_bundle(rows, run_dir, output)
+    integrity = write_sanitized_run_bundle(rows, run_dir, output)
     payload = __import__("json").loads(output.read_text(encoding="utf-8"))
 
     assert payload["patch"] == "diff --git a/a b/a\n"
     assert payload["trajectory"][0]["result_summary"] == "checked"
     assert "/private/local" not in output.read_text(encoding="utf-8")
+    assert integrity["integrity_ok"] is True
+
+
+def test_sanitized_bundle_fails_closed_on_missing_completed_patch(tmp_path):
+    cell = tmp_path / "run" / "task_a" / "condition_a" / "repeat_0"
+    cell.mkdir(parents=True)
+    (cell / "trajectory.normalized.json").write_text("[]", encoding="utf-8")
+
+    with pytest.raises(ValueError, match="has no patch"):
+        write_sanitized_run_bundle([{
+            "task_id": "task_a", "condition_id": "condition_a", "repeat": 0,
+            "status": "completed", "metrics": {"total_tokens": 1},
+        }], tmp_path / "run", tmp_path / "bundle.jsonl")
+
+
+def test_sanitized_bundle_rejects_local_paths_inside_trajectory(tmp_path):
+    cell = tmp_path / "run" / "task_a" / "condition_a" / "repeat_0"
+    cell.mkdir(parents=True)
+    (cell / "patch.diff").write_text("diff --git a/a b/a\n", encoding="utf-8")
+    (cell / "trajectory.normalized.json").write_text(
+        '[{"result_summary":"read /workspace/private/source.py"}]', encoding="utf-8",
+    )
+
+    with pytest.raises(ValueError, match="Unsanitized"):
+        write_sanitized_run_bundle([{
+            "task_id": "task_a", "condition_id": "condition_a", "repeat": 0,
+            "status": "completed", "metrics": {"total_tokens": 1},
+        }], tmp_path / "run", tmp_path / "bundle.jsonl")
+
+
+def test_sanitized_bundle_requires_protocol_identifiers(tmp_path):
+    cell = tmp_path / "run" / "task_a" / "condition_a" / "repeat_0"
+    cell.mkdir(parents=True)
+    (cell / "patch.diff").write_text("diff --git a/a b/a\n", encoding="utf-8")
+    (cell / "trajectory.normalized.json").write_text("[]", encoding="utf-8")
+
+    with pytest.raises(ValueError, match="immutable task identifiers"):
+        write_sanitized_run_bundle([{
+            "task_id": "task_a", "condition_id": "condition_a", "repeat": 0,
+            "status": "completed", "metrics": {"total_tokens": 1},
+        }], tmp_path / "run", tmp_path / "bundle.jsonl", protocol={"tasks": [{"task_id": "task_a"}]})
+
+
+def test_sanitized_bundle_allows_local_path_literal_in_patch_body(tmp_path):
+    cell = tmp_path / "run" / "task_a" / "condition_a" / "repeat_0"
+    cell.mkdir(parents=True)
+    (cell / "patch.diff").write_text(
+        "diff --git a/test.py b/test.py\n--- a/test.py\n+++ b/test.py\n@@ -0,0 +1 @@\n+TMP = '/tmp/example'\n",
+        encoding="utf-8",
+    )
+    (cell / "trajectory.normalized.json").write_text("[]", encoding="utf-8")
+
+    integrity = write_sanitized_run_bundle([{
+        "task_id": "task_a", "condition_id": "condition_a", "repeat": 0,
+        "status": "completed", "metrics": {"total_tokens": 1},
+    }], tmp_path / "run", tmp_path / "bundle.jsonl")
+
+    assert integrity["integrity_ok"] is True
 
 
 def _protocol() -> dict:
@@ -140,14 +198,15 @@ def _rows() -> list[dict]:
                     "hidden_tests_passed": recommended,
                     "policy_clean": True,
                     "budget": {
-                        "input_tokens_exceeded": recommended,
+                        "input_tokens_exceeded": False,
                         "output_tokens_exceeded": False,
                     },
                     "metrics": {
                         "total_tokens": 1050 if recommended else 1000,
                         "wall_time_seconds": 105 if recommended else 100,
                         "tool_output_tokens_estimate": 100,
-                        "useful_context_ratio": 0.25,
+                        "useful_context_ratio": None,
+                        "docs_output_evidence_coverage": 0.25,
                         "condition_setup_wall_time_seconds": 1.0,
                         "required_evidence_recall": 0.5,
                         "first_required_evidence_rank": 2,
@@ -166,8 +225,9 @@ def test_report_checks_full_matrix_and_emits_predeclared_decision():
     assert report["conditions"]["repo_only_strict_offline"]["median_total_tokens"] == 1000
     assert report["conditions"]["repo_only_strict_offline"]["public_tests_passed_rate"] == 1.0
     assert report["conditions"]["repo_only_strict_offline"]["hidden_tests_passed_rate"] == 0.0
-    assert report["conditions"]["repo_only_strict_offline"]["median_useful_context_ratio"] == 0.25
-    assert report["conditions"]["docatlas_tool_recommended"]["input_budget_exceeded_runs"] == 9
+    assert report["conditions"]["repo_only_strict_offline"]["median_useful_context_ratio"] is None
+    assert report["conditions"]["repo_only_strict_offline"]["median_docs_output_evidence_coverage"] == 0.25
+    assert report["conditions"]["docatlas_tool_recommended"]["input_budget_exceeded_runs"] == 0
     assert report["failure_taxonomy"]["repo_only_strict_offline"] == {"hidden_tests_failed": 9}
 
 
@@ -177,6 +237,17 @@ def test_report_fails_closed_when_any_lane_cell_is_missing():
     assert report["artifact_integrity"]["ok"] is False
     assert report["decision"]["decision"] == "INCONCLUSIVE"
     assert "incomplete_full_condition_matrix" in report["decision"]["reasons"]
+
+
+def test_report_fails_closed_when_declared_token_budget_is_exceeded():
+    rows = _rows()
+    rows[0]["budget"]["input_tokens_exceeded"] = True
+
+    report = build_task23_report(rows, protocol=_protocol())
+
+    assert report["budget_integrity"]["ok"] is False
+    assert report["decision"]["decision"] == "INCONCLUSIVE"
+    assert "declared_token_budget_exceeded" in report["decision"]["reasons"]
 
 
 def test_report_classifies_missing_runner_output_as_infrastructure_failure():

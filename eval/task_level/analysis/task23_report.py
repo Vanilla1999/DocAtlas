@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import re
 from collections import Counter
 from pathlib import Path
 from statistics import mean, median
@@ -79,6 +80,13 @@ def build_task23_report(
             _failure_reason(row) for row in selected_rows if is_infrastructure_failure(row)
         }))
         decision["reasons"] = list(dict.fromkeys(decision["reasons"]))
+    budget_known_runs = sum(isinstance(row.get("budget"), dict) and bool(row.get("budget")) for row in selected_rows)
+    input_budget_exceeded_runs = sum(bool((row.get("budget") or {}).get("input_tokens_exceeded")) for row in selected_rows)
+    output_budget_exceeded_runs = sum(bool((row.get("budget") or {}).get("output_tokens_exceeded")) for row in selected_rows)
+    if input_budget_exceeded_runs or output_budget_exceeded_runs:
+        decision["decision"] = "INCONCLUSIVE"
+        decision.setdefault("reasons", []).append("declared_token_budget_exceeded")
+        decision["reasons"] = list(dict.fromkeys(decision["reasons"]))
 
     condition_summaries: dict[str, Any] = {}
     failure_taxonomy: dict[str, Any] = {}
@@ -106,7 +114,8 @@ def build_task23_report(
             "median_condition_setup_wall_time_seconds": _median([_metric(row, "condition_setup_wall_time_seconds") for row in valid_rows]),
             "median_required_evidence_recall": _median([_metric(row, "required_evidence_recall") for row in valid_rows]),
             "median_useful_context_ratio": _median([_metric(row, "useful_context_ratio") for row in valid_rows]),
-            "useful_context_ratio_method": "evidence-bearing-docs-tool-output-chars",
+            "useful_context_ratio_method": "not_measured_without_chunk_usage_attribution",
+            "median_docs_output_evidence_coverage": _median([_metric(row, "docs_output_evidence_coverage") for row in valid_rows]),
             "median_first_required_evidence_rank": _median([_metric(row, "first_required_evidence_rank") for row in valid_rows]),
             "median_audited_external_context_tokens": _median([_metric(row, "audited_external_context_tokens") for row in valid_rows]),
             "policy_violations": sum(not bool(row.get("policy_clean")) for row in condition_rows),
@@ -132,6 +141,14 @@ def build_task23_report(
             "ok": integrity_ok and infrastructure_failed_runs == 0,
             "valid_runs": len(selected_rows) - infrastructure_failed_runs,
             "infrastructure_failed_runs": infrastructure_failed_runs,
+        },
+        "budget_integrity": {
+            "ok": input_budget_exceeded_runs == 0 and output_budget_exceeded_runs == 0,
+            "known_runs": budget_known_runs,
+            "unknown_runs": len(selected_rows) - budget_known_runs,
+            "input_budget_exceeded_runs": input_budget_exceeded_runs,
+            "output_budget_exceeded_runs": output_budget_exceeded_runs,
+            "max_turns_enforced_by_runner": False,
         },
         "conditions": condition_summaries,
         "failure_taxonomy": failure_taxonomy,
@@ -159,17 +176,75 @@ def _load_jsonl(path: Path) -> list[dict[str, Any]]:
     return [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
 
 
-def write_sanitized_run_bundle(rows: list[dict[str, Any]], run_dir: Path, output: Path) -> Path:
-    """Persist enough per-cell evidence to rescore and inspect patches without local paths."""
+_LOCAL_PATH = re.compile(r"(?:/(?:home|tmp|workspace|root|Users|private)/|/var/folders/|[A-Za-z]:\\)", re.IGNORECASE)
+_CREDENTIAL_LIKE = re.compile(
+    r"(?:(?:ghp_|github_pat_|sk-)[A-Za-z0-9_-]{8,}|Bearer\s+(?!<redacted>)[^\s]+|https?://[^\s/@]+:[^\s/@]+@)",
+    re.IGNORECASE,
+)
+
+
+def _assert_sanitized(value: Any, *, location: str) -> None:
+    if isinstance(value, dict):
+        for key, item in value.items():
+            if key == "patch" and isinstance(item, str):
+                _assert_patch_sanitized(item, location=f"{location}.{key}")
+            else:
+                _assert_sanitized(item, location=f"{location}.{key}")
+    elif isinstance(value, list):
+        for index, item in enumerate(value):
+            _assert_sanitized(item, location=f"{location}[{index}]")
+    elif isinstance(value, str) and (_LOCAL_PATH.search(value) or _CREDENTIAL_LIKE.search(value)):
+        raise ValueError(f"Unsanitized path or credential-like value in {location}")
+
+
+def _assert_patch_sanitized(patch: str, *, location: str) -> None:
+    if _CREDENTIAL_LIKE.search(patch):
+        raise ValueError(f"Credential-like value in {location}")
+    for line in patch.splitlines():
+        if line.startswith(("diff --git ", "--- ", "+++ ")) and _LOCAL_PATH.search(line):
+            raise ValueError(f"Unsanitized diff header path in {location}")
+
+
+def write_sanitized_run_bundle(
+    rows: list[dict[str, Any]],
+    run_dir: Path,
+    output: Path,
+    *,
+    protocol: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Persist rescorable per-cell evidence, failing closed on missing or unsafe artifacts."""
     sanitized: list[dict[str, Any]] = []
-    for row in rows:
+    task_metadata = {
+        str(task.get("task_id")): task
+        for task in (protocol or {}).get("tasks", [])
+        if isinstance(task, dict)
+    }
+    ordered_rows = sorted(rows, key=lambda row: (str(row.get("task_id")), str(row.get("condition_id")), int(row.get("repeat") or 0)))
+    for row in ordered_rows:
         task_id = str(row.get("task_id") or "")
         condition_id = str(row.get("condition_id") or "")
         repeat = int(row.get("repeat") or 0)
         cell_dir = run_dir / task_id / condition_id / f"repeat_{repeat}"
-        patch = _read_text(cell_dir / "patch.diff")
-        trajectory = _load_json_list(cell_dir / "trajectory.normalized.json")
-        sanitized.append({
+        patch_path = cell_dir / "patch.diff"
+        trajectory_path = cell_dir / "trajectory.normalized.json"
+        infrastructure_failure = is_infrastructure_failure(row)
+        patch = _read_text_strict(patch_path) if patch_path.exists() else ""
+        if row.get("status") == "completed" and not patch.strip():
+            raise ValueError(f"Completed cell has no patch: {task_id}/{condition_id}/repeat_{repeat}")
+        if not infrastructure_failure and not trajectory_path.exists():
+            raise ValueError(f"Valid runner cell has no normalized trajectory: {task_id}/{condition_id}/repeat_{repeat}")
+        trajectory = _load_json_list_strict(trajectory_path) if trajectory_path.exists() else []
+        task = task_metadata.get(task_id, {})
+        if protocol is not None:
+            missing_identifiers = [
+                name for name in ("fixture_hash", "oracle_sha256", "external_context_sha256")
+                if not task.get(name)
+            ]
+            if missing_identifiers:
+                raise ValueError(
+                    f"Missing immutable task identifiers for {task_id}: {', '.join(missing_identifiers)}"
+                )
+        payload = {
             "schema_version": "task23-sanitized-run-1",
             "task_id": task_id,
             "condition_id": condition_id,
@@ -191,31 +266,43 @@ def write_sanitized_run_bundle(rows: list[dict[str, Any]], run_dir: Path, output
             "contract": row.get("contract") or {},
             "actionability": row.get("actionability") or {},
             "budget": row.get("budget") or {},
+            "fixture_hash": task.get("fixture_hash"),
+            "oracle_sha256": task.get("oracle_sha256"),
+            "external_context_sha256": task.get("external_context_sha256"),
+            "artifact_presence": {
+                "patch": bool(patch),
+                "trajectory": trajectory_path.exists(),
+                "infrastructure_failure": infrastructure_failure,
+            },
             "patch_sha256": hashlib.sha256(patch.encode()).hexdigest(),
             "patch": patch,
             "trajectory": trajectory,
-        })
+        }
+        _assert_sanitized(payload, location=f"{task_id}/{condition_id}/repeat_{repeat}")
+        sanitized.append(payload)
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(
         "".join(json.dumps(row, sort_keys=True, ensure_ascii=False) + "\n" for row in sanitized),
         encoding="utf-8",
     )
-    return output
+    return {
+        "schema_version": "task23-sanitized-run-1",
+        "rows_expected": len(rows),
+        "rows_written": len(sanitized),
+        "sha256": hashlib.sha256(output.read_bytes()).hexdigest(),
+        "integrity_ok": len(sanitized) == len(rows),
+    }
 
 
-def _read_text(path: Path) -> str:
-    try:
-        return path.read_text(encoding="utf-8")
-    except OSError:
-        return ""
+def _read_text_strict(path: Path) -> str:
+    return path.read_text(encoding="utf-8")
 
 
-def _load_json_list(path: Path) -> list[dict[str, Any]]:
-    try:
-        value = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError):
-        return []
-    return [item for item in value if isinstance(item, dict)] if isinstance(value, list) else []
+def _load_json_list_strict(path: Path) -> list[dict[str, Any]]:
+    value = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(value, list) or any(not isinstance(item, dict) for item in value):
+        raise ValueError(f"Expected a JSON array of objects: {path}")
+    return value
 
 
 def _retry_provenance(run_dir: Path) -> dict[str, Any]:
@@ -291,9 +378,11 @@ def main() -> int:
             screening_path.read_bytes(),
         )
     rows = _load_jsonl(args.run_dir / "runs.jsonl")
+    protocol = _load_json(args.protocol)
+    effective_protocol = apply_protocol_amendment(protocol, amendment) if amendment else protocol
     report = build_task23_report(
         rows,
-        protocol=_load_json(args.protocol),
+        protocol=protocol,
         amendment=amendment,
     )
     if args.replacement_screening is not None:
@@ -309,7 +398,12 @@ def main() -> int:
         report["retry_provenance"] = retry_provenance
     output = args.output or args.run_dir / "task23_report.json"
     bundle_path = output.with_name(output.stem + "_runs.sanitized.jsonl")
-    write_sanitized_run_bundle(rows, args.run_dir, bundle_path)
+    report["sanitized_bundle_integrity"] = write_sanitized_run_bundle(
+        rows,
+        args.run_dir,
+        bundle_path,
+        protocol=effective_protocol,
+    )
     report["source_artifacts"] = _source_artifact_hashes(
         args.run_dir / "runs.jsonl",
         args.protocol,

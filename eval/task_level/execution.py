@@ -23,7 +23,7 @@ from eval.task_level.evaluators.actionability import evaluate_actionability
 from eval.task_level.evaluators.constraint_validation import validate_patch_against_constraints
 from eval.task_level.evaluators.contract import evaluate_contract
 from eval.task_level.evaluators.docatlas_utilization import evaluate_docatlas_utilization
-from eval.task_level.evaluators.patch import patch_touches_forbidden_paths
+from eval.task_level.evaluators.patch import forbidden_changed_paths
 from eval.task_level.evaluators.patch_constraints import evaluate_patch_constraint_usage, load_patch_constraint_packet
 from eval.task_level.evaluators.policy import audit_trajectory
 from eval.task_level.evaluators.tests import run_command
@@ -110,7 +110,7 @@ def trajectory_tool_output_metrics(task: Any, tool_calls: list[dict[str, Any]]) 
     evidence = [item.lower() for item in dict.fromkeys([*task.expected_symbols, *task.expected_project_docs])]
     total_chars = 0
     docs_chars = 0
-    useful_docs_chars = 0
+    evidence_found: set[str] = set()
     for call in tool_calls:
         if not isinstance(call, dict):
             continue
@@ -122,14 +122,17 @@ def trajectory_tool_output_metrics(task: Any, tool_calls: list[dict[str, Any]]) 
         is_docs_context = any(marker in tool_name for marker in ("get_docs_context", "prepare_docs", "docs_status", "docmancer", "doc-atlas"))
         if is_docs_context:
             docs_chars += chars
-            if evidence and any(marker in summary.lower() for marker in evidence):
-                useful_docs_chars += chars
+            summary_lower = summary.lower()
+            evidence_found.update(marker for marker in evidence if marker in summary_lower)
     return {
         "tool_output_chars": total_chars,
         "tool_output_tokens_estimate": _estimate_tokens_from_chars(total_chars),
         "docs_context_output_chars": docs_chars,
-        "useful_context_ratio": useful_docs_chars / docs_chars if docs_chars else None,
-        "useful_context_ratio_method": "evidence-bearing-docs-tool-output-chars",
+        "docs_output_evidence_total": len(evidence),
+        "docs_output_evidence_found": len(evidence_found),
+        "docs_output_evidence_coverage": len(evidence_found) / len(evidence) if evidence else None,
+        "useful_context_ratio": None,
+        "useful_context_ratio_method": "not_measured_without_chunk_usage_attribution",
     }
 
 
@@ -259,15 +262,34 @@ def fresh_run_environment(run_output_dir: Path) -> dict[str, str]:
 
 def capture_patch(workspace: Path, output_dir: Path) -> tuple[Path, Path, Path, list[str]]:
     status = subprocess.run(["git", "status", "--porcelain", "-uall"], cwd=workspace, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False)
-    diff = subprocess.run(["git", "diff", "--binary", "--no-ext-diff"], cwd=workspace, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False)
-    changed = subprocess.run(["git", "diff", "--name-only"], cwd=workspace, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False)
+    diff = subprocess.run(["git", "diff", "HEAD", "--binary", "--no-ext-diff"], cwd=workspace, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False)
+    changed = subprocess.run(["git", "diff", "HEAD", "--name-only"], cwd=workspace, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False)
     untracked = subprocess.run(["git", "ls-files", "--others", "--exclude-standard"], cwd=workspace, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False)
     patch_path = output_dir / "patch.diff"
     status_path = output_dir / "git_status.txt"
     changed_path = output_dir / "changed_files.json"
     files = [line for line in changed.stdout.splitlines() if line]
-    files.extend(line for line in untracked.stdout.splitlines() if line and not is_runtime_artifact(line))
-    hygiene = write_patch_hygiene_artifacts(output_dir, raw_status=status.stdout, raw_changed_files=files, raw_patch_diff=diff.stdout)
+    untracked_files = [line for line in untracked.stdout.splitlines() if line and not is_runtime_artifact(line)]
+    files.extend(untracked_files)
+    untracked_diff = ""
+    for path in untracked_files:
+        completed = subprocess.run(
+            ["git", "diff", "--binary", "--no-index", "--", "/dev/null", path],
+            cwd=workspace,
+            text=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            check=False,
+        )
+        if completed.returncode not in {0, 1}:
+            raise RuntimeError(f"Could not capture untracked file {path}: {completed.stderr.strip()}")
+        untracked_diff += completed.stdout
+    hygiene = write_patch_hygiene_artifacts(
+        output_dir,
+        raw_status=status.stdout,
+        raw_changed_files=files,
+        raw_patch_diff=diff.stdout + untracked_diff,
+    )
     return patch_path, status_path, changed_path, hygiene.filtered_changed_files
 
 
@@ -281,7 +303,7 @@ def evaluate_agent_patch(task: TaskSpec, workspace: Path, run_output_dir: Path, 
         copy_hidden_tests(task.task_id, workspace)
         hidden = run_command("pytest tests/hidden", workspace, 180)
     compile_result = run_command("python -m compileall -q src", workspace, 120) if patch_exists and (setup is None or setup.returncode == 0) else None
-    forbidden = patch_touches_forbidden_paths(workspace, ALLOWED_PATCH_PREFIXES) if patch_exists else []
+    forbidden = forbidden_changed_paths(changed_files, ALLOWED_PATCH_PREFIXES) if patch_exists else []
     audit = audit_trajectory(condition_id, Path(trajectory_path) if trajectory_path else None, run_output_dir / "policy_audit.json")
     stats = diff_stats_from_patch(patch_path.read_text(encoding="utf-8", errors="replace")) if patch_exists else None
     utilization = evaluate_docatlas_utilization(

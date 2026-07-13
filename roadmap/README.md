@@ -73,16 +73,16 @@ Do not publish a Stable release before every Stage A implementation and separate
 
 Paused by Task 23's `PIVOT_REQUIRED` result. Do not start this stage until Task 33 produces a new frozen benchmark that meets its decision gate. Context7/web remains the complementary external-library source during the pause.
 
-16. `16_EXACT_SOURCE_CATALOG_AND_CACHE.md`
-17. `17_LOCKFILE_WORKSPACE_VERSION_IDENTITY.md`
-18. `18_CONTEXT7_PARITY_PROTOCOL_AND_CAPTURE.md`
+17. `16_EXACT_SOURCE_CATALOG_AND_CACHE.md`
+18. `17_LOCKFILE_WORKSPACE_VERSION_IDENTITY.md`
+19. `18_CONTEXT7_PARITY_PROTOCOL_AND_CAPTURE.md`
 
 ### Stage E — reduce install and maintenance cost
 
-19. `29_MAINTENANCE_SURFACE_POLICY.md`
-20. `24_INSTALL_PROFILE_AND_DEPENDENCY_BUDGET.md`
-21. `25_CARGO_PROJECT_ADAPTER_EXTRACTION.md`
-22. `26_PUB_PROJECT_ADAPTER_EXTRACTION.md`
-23. `27_LIBRARY_SERVICE_DECOMPOSITION.md`
+20. `29_MAINTENANCE_SURFACE_POLICY.md`
+21. `24_INSTALL_PROFILE_AND_DEPENDENCY_BUDGET.md`
+22. `25_CARGO_PROJECT_ADAPTER_EXTRACTION.md`
+23. `26_PUB_PROJECT_ADAPTER_EXTRACTION.md`
+24. `27_LIBRARY_SERVICE_DECOMPOSITION.md`
 
 After each PR, update this table with the merge commit and evidence. A later task may not silently reinterpret an earlier acceptance criterion.

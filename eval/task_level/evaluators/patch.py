@@ -48,3 +48,16 @@ def patch_touches_forbidden_paths(repo: Path, allowed_prefixes: tuple[str, ...])
         if not any(path == prefix or path.startswith(prefix.rstrip("/") + "/") for prefix in allowed_prefixes):
             forbidden.append(path)
     return forbidden
+
+
+def forbidden_changed_paths(changed_files: list[str], allowed_prefixes: tuple[str, ...]) -> list[str]:
+    """Classify the already-captured pre-evaluation patch inventory.
+
+    Using the captured inventory avoids both untracked-file blind spots and changes
+    introduced later by hidden-test materialization.
+    """
+    return [
+        path
+        for path in changed_files
+        if not any(path == prefix or path.startswith(prefix.rstrip("/") + "/") for prefix in allowed_prefixes)
+    ]
