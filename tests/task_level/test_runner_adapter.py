@@ -149,7 +149,7 @@ def test_codex_normalizes_measurable_tool_output():
         "output_tokens": 20,
         "cached_input_tokens": 60,
         "reasoning_tokens": 5,
-        "agent_turns": 0,
+        "completed_turn_events": None,
     }
 
 

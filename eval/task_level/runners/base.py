@@ -17,6 +17,7 @@ class RunnerCapabilities:
     token_usage: bool
     independent_process: bool
     verified: bool
+    hard_turn_limit: bool = False
     verification_notes: list[str] = field(default_factory=list)
 
 
@@ -51,6 +52,7 @@ class AgentRunOutput:
     output_tokens: int | None
     model: str
     runner_version: str
+    max_turns_enforced: bool = False
     token_usage: dict[str, Any] = field(default_factory=dict)
     notes: list[str] = field(default_factory=list)
 

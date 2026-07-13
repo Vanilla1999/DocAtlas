@@ -35,7 +35,7 @@ def _runner_output(tmp_path: Path) -> AgentRunOutput:
         output_tokens=20,
         model="mock",
         runner_version="mock",
-        token_usage={"cached_input_tokens": 60, "reasoning_tokens": 5, "agent_turns": 2},
+        token_usage={"cached_input_tokens": 60, "reasoning_tokens": 5, "completed_turn_events": 2},
         notes=[],
     )
 
@@ -58,7 +58,7 @@ def test_resolved_requires_public_and_hidden_tests(tmp_path: Path):
     assert result["metrics"]["cached_input_tokens"] == 60
     assert result["metrics"]["uncached_input_tokens"] == 40
     assert result["metrics"]["reasoning_tokens"] == 5
-    assert result["metrics"]["turns"] == 2
+    assert result["metrics"]["completed_turn_events"] == 2
     assert result["token_attribution"]["system_total_tokens"] == 120
 
 

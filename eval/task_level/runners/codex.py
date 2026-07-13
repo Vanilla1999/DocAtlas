@@ -15,6 +15,7 @@ from .base import AgentRunOutput, AgentRunRequest, RunnerCapabilities
 
 class CodexRunner:
     runner_id = "codex"
+    hard_turn_limit_enforced = False
 
     def __init__(self, executable: str = "codex", *, sandbox_mode: str = "workspace-write") -> None:
         if sandbox_mode not in {"workspace-write", "danger-full-access"}:
@@ -42,6 +43,7 @@ class CodexRunner:
             token_usage=found,
             independent_process=found,
             verified=False,
+            hard_turn_limit=self.hard_turn_limit_enforced,
             verification_notes=[
                 "CLI capability detection is not causal verification; runner canary must pass before causal pilot execution.",
                 "Uses `codex exec --json --ephemeral` for fresh non-interactive sessions.",
@@ -277,7 +279,7 @@ def _token_usage_summary(events: list[dict[str, Any]]) -> dict[str, int | None]:
         "output_tokens": None,
         "cached_input_tokens": None,
         "reasoning_tokens": None,
-        "agent_turns": 0,
+        "completed_turn_events": None,
     }
     aliases = {
         "input_tokens": ("input_tokens",),
@@ -287,7 +289,7 @@ def _token_usage_summary(events: list[dict[str, Any]]) -> dict[str, int | None]:
     }
     for event in events:
         if event.get("source_event_type") == "turn.completed":
-            summary["agent_turns"] = int(summary["agent_turns"] or 0) + 1
+            summary["completed_turn_events"] = int(summary["completed_turn_events"] or 0) + 1
         usage = event.get("tokens")
         if not isinstance(usage, dict):
             continue

@@ -15,7 +15,7 @@ from typing import Any
 
 from eval.task_level.conditions import CONDITIONS, DEFAULT_CONDITIONS
 from eval.task_level.evaluators.tests import run_command
-from eval.task_level.execution import DOCATLAS_CONDITIONS, execute_pilot, run_canary, run_docatlas_tool_visibility_canary, runner_verification_payload, serialize_run_results_jsonl
+from eval.task_level.execution import DOCATLAS_CONDITIONS, TASK23_PROTOCOL_TASKS, execute_pilot, run_canary, run_docatlas_tool_visibility_canary, runner_verification_payload, serialize_run_results_jsonl
 from eval.task_level.fixtures.builder import FIXTURE_TASKS, materialize_fixture, validate_fixture
 from eval.task_level.patch_constraints_pilot import TARGETED_PILOT_CONDITIONS, build_targeted_pilot_plan, select_targeted_pilot_tasks, write_targeted_pilot_dry_run
 from eval.task_level.report import write_report
@@ -283,11 +283,15 @@ def _causal_gate_error(
     runner_canary: dict[str, Any] | None,
     verify_docatlas_requested: bool,
     docatlas_canary: dict[str, Any] | None,
+    requires_hard_turn_limit: bool = False,
+    runner_hard_turn_limit: bool = True,
 ) -> str | None:
     if not verify_runner_requested:
         return "causal execution requires --verify-runner in the same invocation"
     if not runner_canary or runner_canary.get("status") != "passed":
         return "runner canary did not pass; causal execution was not started"
+    if requires_hard_turn_limit and not runner_hard_turn_limit:
+        return "Task 33 requires a runner with a proven hard turn limit; causal execution was not started"
     if any(condition in DOCATLAS_CONDITIONS for condition in conditions):
         if not verify_docatlas_requested:
             return "DocAtlas conditions require --verify-docatlas-tool in the same invocation"
@@ -429,6 +433,8 @@ def main(argv: list[str] | None = None) -> int:
                 runner_canary=runner_canary,
                 verify_docatlas_requested=args.verify_docatlas_tool,
                 docatlas_canary=docatlas_canary,
+                requires_hard_turn_limit=any(task.task_id in TASK23_PROTOCOL_TASKS for task in tasks),
+                runner_hard_turn_limit=capabilities.hard_turn_limit,
             )
             if gate_error:
                 metadata["executive_result"] = "Causal execution blocked before the pilot."

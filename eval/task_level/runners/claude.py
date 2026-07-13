@@ -14,6 +14,7 @@ from .base import AgentRunOutput, AgentRunRequest, RunnerCapabilities
 
 class ClaudeRunner:
     runner_id = "claude"
+    hard_turn_limit_enforced = False
 
     def __init__(self, executable: str = "claude") -> None:
         self.executable = executable
@@ -38,6 +39,7 @@ class ClaudeRunner:
             token_usage=False,
             independent_process=found,
             verified=False,
+            hard_turn_limit=self.hard_turn_limit_enforced,
             verification_notes=[
                 "CLI capability detection is not causal verification; runner canary must pass before causal pilot execution.",
                 "Uses `claude -p --output-format stream-json --no-session-persistence --bare` for fresh non-interactive process.",

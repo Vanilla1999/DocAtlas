@@ -26,7 +26,7 @@ from eval.task_level.evaluators.docatlas_utilization import evaluate_docatlas_ut
 from eval.task_level.evaluators.patch import forbidden_changed_paths
 from eval.task_level.evaluators.patch_constraints import evaluate_patch_constraint_usage, load_patch_constraint_packet
 from eval.task_level.evaluators.policy import audit_trajectory
-from eval.task_level.evaluators.task_contract import evaluate_patch_surface, evaluation_contract_registry_sha256, evaluation_contract_sha256, load_task_evaluation_contracts, run_compile_gate, validate_task_evaluation_contract
+from eval.task_level.evaluators.task_contract import ContractValidation, evaluate_patch_surface, evaluation_contract_registry_sha256, evaluation_contract_sha256, load_effective_task23_protocol_tasks, load_task_evaluation_contracts, run_compile_gate, validate_task_evaluation_artifacts, validate_task_evaluation_contract
 from eval.task_level.evaluators.tests import run_command
 from eval.task_level.fixtures.builder import copy_hidden_tests, materialize_fixture
 from eval.task_level.runners.base import AgentRunRequest, AgentRunner, RunnerCapabilities
@@ -79,6 +79,7 @@ DOCATLAS_CONDITIONS = {
 CONTEXT_INJECTION_LIMIT_CHARS = 10000
 AUDITED_EXTERNAL_CONTEXT_ROOT = TASK_LEVEL_ROOT / "external_context"
 TASK33_EVALUATION_CONTRACTS = load_task_evaluation_contracts()
+TASK23_PROTOCOL_TASKS = load_effective_task23_protocol_tasks()
 
 
 def _estimate_tokens(text: str) -> int:
@@ -151,7 +152,20 @@ def _load_optional_json(path: Path) -> dict[str, Any]:
 
 
 def _optional_int(value: Any) -> int | None:
-    return value if isinstance(value, int) else None
+    return value if isinstance(value, int) and not isinstance(value, bool) else None
+
+
+def _task_contract_validation(
+    task: TaskSpec,
+    contract: Any,
+    protocol_task: dict[str, Any] | None,
+) -> ContractValidation:
+    if task.task_id not in TASK23_PROTOCOL_TASKS and contract is None:
+        return ContractValidation("valid", ())
+    definition = validate_task_evaluation_contract(task, contract)
+    artifacts = validate_task_evaluation_artifacts(contract, protocol_task)
+    errors = tuple(dict.fromkeys((*definition.errors, *artifacts.errors)))
+    return ContractValidation("invalid" if errors else "valid", errors)
 
 
 def serialize_run_results_jsonl(results: list[dict[str, Any]]) -> str:
@@ -298,29 +312,31 @@ def capture_patch(workspace: Path, output_dir: Path) -> tuple[Path, Path, Path, 
 def evaluate_agent_patch(task: TaskSpec, workspace: Path, run_output_dir: Path, condition_id: str, trajectory_path: str | None, runner_output: Any) -> dict[str, Any]:
     patch_path, _, _, changed_files = capture_patch(workspace, run_output_dir)
     patch_exists = bool(patch_path.read_text(encoding="utf-8").strip())
+    task_evaluation_contract = TASK33_EVALUATION_CONTRACTS.get(task.task_id)
+    protocol_task = TASK23_PROTOCOL_TASKS.get(task.task_id)
+    contract_validation = _task_contract_validation(task, task_evaluation_contract, protocol_task)
     setup = _run_setup(task, workspace) if patch_exists and task.setup_command else None
     public = run_command(task.test_command, workspace, 180) if patch_exists and (setup is None or setup.returncode == 0) else None
     hidden = None
-    if patch_exists:
+    if patch_exists and contract_validation.valid:
         copy_hidden_tests(task.task_id, workspace)
-        hidden = run_command("python -m pytest tests/hidden", workspace, 180)
-    task_evaluation_contract = TASK33_EVALUATION_CONTRACTS.get(task.task_id)
-    if task_evaluation_contract is not None:
-        contract_validation = validate_task_evaluation_contract(task, task_evaluation_contract)
+        hidden_command = task_evaluation_contract.semantic_test_command if task_evaluation_contract else "python -m pytest tests/hidden"
+        hidden = run_command(hidden_command, workspace, 180)
+    if task.task_id in TASK23_PROTOCOL_TASKS or task_evaluation_contract is not None:
         compile_gate = (
             run_compile_gate(task_evaluation_contract, workspace)
-            if patch_exists and (setup is None or setup.returncode == 0) and contract_validation.valid
+            if task_evaluation_contract is not None and patch_exists and (setup is None or setup.returncode == 0) and contract_validation.valid
             else {
                 "status": "not_run",
                 "passed": False,
-                "command": task_evaluation_contract.compile_gate.command,
+                "command": task_evaluation_contract.compile_gate.command if task_evaluation_contract else None,
                 "reason": "evaluation_contract_invalid_or_setup_failed",
                 "returncode": None,
                 "stdout": "",
                 "stderr": "",
             }
         )
-        patch_surface = evaluate_patch_surface(task_evaluation_contract, changed_files) if patch_exists else {
+        patch_surface = evaluate_patch_surface(task_evaluation_contract, changed_files) if task_evaluation_contract and patch_exists and contract_validation.valid else {
             "status": "not_run",
             "violations": [],
         }
@@ -376,6 +392,21 @@ def evaluate_agent_patch(task: TaskSpec, workspace: Path, run_output_dir: Path, 
     (run_output_dir / "validation.json").write_text(json.dumps(constraint_validation, indent=2, sort_keys=True), encoding="utf-8")
     public_passed = bool(public and public.passed)
     hidden_passed = bool(hidden and hidden.passed)
+    semantic_gate = {
+        "command": task_evaluation_contract.semantic_test_command if task_evaluation_contract else None,
+        "status": "passed" if hidden_passed else "failed" if hidden is not None else "not_run",
+        "passed": hidden_passed,
+        "returncode": hidden.returncode if hidden is not None else None,
+        "hidden_tests_sha256": task_evaluation_contract.hidden_tests_sha256 if task_evaluation_contract else None,
+        "checks": [
+            {
+                "id": check.check_id,
+                "test_ids": list(check.test_ids),
+                "status": "passed" if hidden_passed else "failed" if hidden is not None else "not_run",
+            }
+            for check in task_evaluation_contract.semantic_checks
+        ] if task_evaluation_contract else [],
+    }
     compile_success = (
         None if compile_gate["status"] == "not_applicable" else bool(compile_gate["passed"])
     )
@@ -397,6 +428,7 @@ def evaluate_agent_patch(task: TaskSpec, workspace: Path, run_output_dir: Path, 
     constraints_injection = _load_optional_json(run_output_dir / "patch_constraints_injection.json")
     external_injection = _load_optional_json(run_output_dir / "audited_external_context.json")
     docatlas_preparation = _load_optional_json(run_output_dir / "docatlas_preparation.json")
+    materialized_identity = _load_optional_json(run_output_dir / "materialized.json")
     trajectory = Path(trajectory_path) if trajectory_path else run_output_dir / "missing-trajectory.json"
     evidence_metrics = trajectory_evidence_metrics(task, trajectory)
     tool_calls = getattr(runner_output, "tool_calls", [])
@@ -407,7 +439,7 @@ def evaluate_agent_patch(task: TaskSpec, workspace: Path, run_output_dir: Path, 
     provider_usage = provider_usage if isinstance(provider_usage, dict) else {}
     cached_input_tokens = _optional_int(provider_usage.get("cached_input_tokens"))
     reasoning_tokens = _optional_int(provider_usage.get("reasoning_tokens"))
-    agent_turns = _optional_int(provider_usage.get("agent_turns"))
+    completed_turn_events = _optional_int(provider_usage.get("completed_turn_events"))
     uncached_input_tokens = (
         input_tokens - cached_input_tokens
         if isinstance(input_tokens, int)
@@ -422,7 +454,7 @@ def evaluate_agent_patch(task: TaskSpec, workspace: Path, run_output_dir: Path, 
         "max_turns": task.max_turns,
         "input_tokens_exceeded": isinstance(input_tokens, int) and input_tokens > task.max_input_tokens,
         "output_tokens_exceeded": isinstance(output_tokens, int) and output_tokens > task.max_output_tokens,
-        "max_turns_enforced_by_runner": False,
+        "max_turns_enforced_by_runner": bool(getattr(runner_output, "max_turns_enforced", False)),
         "attempt_control": "one_ephemeral_process_with_timeout",
     }
     setup_wall_time = sum(
@@ -437,7 +469,7 @@ def evaluate_agent_patch(task: TaskSpec, workspace: Path, run_output_dir: Path, 
         cached_input_tokens=cached_input_tokens,
         uncached_input_tokens=uncached_input_tokens,
         reasoning_tokens=reasoning_tokens,
-        agent_turns=agent_turns,
+        completed_turn_events=completed_turn_events,
         shell_calls=sum(1 for call in tool_calls if "bash" in json.dumps(call).lower()),
         edit_calls=sum(1 for call in tool_calls if "edit" in json.dumps(call).lower()),
         test_runs=sum(1 for call in tool_calls if "pytest" in json.dumps(call).lower()),
@@ -473,9 +505,19 @@ def evaluate_agent_patch(task: TaskSpec, workspace: Path, run_output_dir: Path, 
             "patch_contract_id": task_evaluation_contract.patch_contract_id if task_evaluation_contract else None,
             "contract_sha256": evaluation_contract_sha256(task_evaluation_contract) if task_evaluation_contract else None,
             "registry_sha256": evaluation_contract_registry_sha256() if task_evaluation_contract else None,
+            "artifact_identity": {
+                "fixture_hash_algorithm": materialized_identity.get("fixture_hash_algorithm"),
+                "fixture_sha256": materialized_identity.get("fixture_hash"),
+                "protocol_fixture_hash_algorithm": materialized_identity.get("protocol_fixture_hash_algorithm"),
+                "protocol_fixture_sha256": materialized_identity.get("protocol_fixture_hash"),
+                "oracle_sha256": task_evaluation_contract.oracle_sha256 if task_evaluation_contract else None,
+                "hidden_tests_sha256": task_evaluation_contract.hidden_tests_sha256 if task_evaluation_contract else None,
+                "external_context_sha256": task_evaluation_contract.external_context_sha256 if task_evaluation_contract else None,
+            },
             "compile_gate": compile_gate,
+            "semantic_gate": semantic_gate,
             "patch_surface": patch_surface,
-            "semantic_checks": list(task_evaluation_contract.semantic_checks) if task_evaluation_contract else [],
+            "semantic_checks": [check.to_json() for check in task_evaluation_contract.semantic_checks] if task_evaluation_contract else [],
         },
         "policy_clean": audit.clean,
         "policy": audit.to_json(),
@@ -505,7 +547,7 @@ def evaluate_agent_patch(task: TaskSpec, workspace: Path, run_output_dir: Path, 
             **tool_output_metrics,
             "condition_setup_wall_time_seconds": setup_wall_time,
             "audited_external_context_tokens": _optional_int(external_injection.get("injected_context_tokens")),
-            "turns": metrics.agent_turns,
+            "completed_turn_events": metrics.completed_turn_events,
             "shell_calls": metrics.shell_calls,
             "edit_calls": metrics.edit_calls,
             "test_runs": metrics.test_runs,
@@ -552,7 +594,7 @@ def evaluate_agent_patch(task: TaskSpec, workspace: Path, run_output_dir: Path, 
             "action_packet_tokens": None,
             "system_total_tokens": total_tokens,
             "provider_fields_available": sorted(
-                key for key in ("cached_input_tokens", "reasoning_tokens", "agent_turns")
+                key for key in ("cached_input_tokens", "reasoning_tokens", "completed_turn_events")
                 if provider_usage.get(key) is not None
             ),
         },
@@ -597,6 +639,7 @@ def execute_pilot(
     *,
     retry_infrastructure_failures: bool = False,
 ) -> list[dict[str, Any]]:
+    _assert_task33_run_preconditions(tasks, runner)
     run_dir = RESULTS_ROOT / run_id
     run_dir.mkdir(parents=True, exist_ok=True)
     runs_path = run_dir / "runs.jsonl"
@@ -625,6 +668,13 @@ def execute_pilot(
                         _archive_run_attempt(run_output_dir)
                     workspace = runtime_root / task.task_id / condition_id / f"repeat_{repeat}" / "workspace"
                     materialized = materialize_fixture(task, workspace)
+                    task_contract = TASK33_EVALUATION_CONTRACTS.get(task.task_id)
+                    if task.task_id in TASK23_PROTOCOL_TASKS and (
+                        task_contract is None
+                        or materialized.get("fixture_hash") != task_contract.fixture_sha256
+                        or materialized.get("protocol_fixture_hash") != task_contract.protocol_fixture_sha256
+                    ):
+                        raise ValueError(f"Task 33 materialized fixture identity mismatch: {task.task_id}")
                     (run_output_dir / "materialized.json").write_text(json.dumps(materialized, indent=2, sort_keys=True), encoding="utf-8")
                     policy_path, mcp_config = build_tool_policy(condition_id, run_output_dir)
                     env = fresh_run_environment(run_output_dir)
@@ -709,6 +759,24 @@ def execute_pilot(
         shutil.rmtree(runtime_root, ignore_errors=True)
     write_run_progress(run_dir, results, len(tasks) * len(conditions) * repeats, current=None, finished=True)
     return results
+
+
+def _assert_task33_run_preconditions(tasks: list[TaskSpec], runner: AgentRunner) -> None:
+    formal_tasks = [task for task in tasks if task.task_id in TASK23_PROTOCOL_TASKS]
+    if not formal_tasks:
+        return
+    errors: list[str] = []
+    for task in formal_tasks:
+        validation = _task_contract_validation(
+            task,
+            TASK33_EVALUATION_CONTRACTS.get(task.task_id),
+            TASK23_PROTOCOL_TASKS.get(task.task_id),
+        )
+        errors.extend(f"{task.task_id}:{error}" for error in validation.errors)
+    if errors:
+        raise ValueError("Task 33 evaluation preconditions failed: " + ",".join(errors))
+    if not bool(getattr(runner, "hard_turn_limit_enforced", False)):
+        raise ValueError("Task 33 causal execution requires a runner with a proven hard turn limit")
 
 
 def write_run_progress(run_dir: Path, results: list[dict[str, Any]], total_runs: int, *, current: dict[str, Any] | None, finished: bool = False) -> None:
@@ -1282,6 +1350,7 @@ def runner_verification_payload(capabilities: RunnerCapabilities) -> dict[str, A
         "version": capabilities.version,
         "causal_patch_runner_verified": capabilities.verified and capabilities.structured_trajectory and capabilities.patch_capture and capabilities.tool_isolation and capabilities.mcp_isolation and capabilities.independent_process,
         "efficiency_metrics_verified": capabilities.token_usage,
+        "hard_turn_limit_verified": capabilities.hard_turn_limit,
         "trajectory_format": "stream-json normalized to trajectory.normalized.json" if capabilities.structured_trajectory else "unverified",
         "tool_isolation": "strict MCP config plus allowed/disallowed tools plus trajectory audit" if capabilities.tool_isolation else "unverified",
         "network_enforcement": "policy_and_trajectory_audit",

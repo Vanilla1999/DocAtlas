@@ -141,6 +141,8 @@ Implement the task in reviewable pull requests:
 
 Do not put the worker/session implementation inside the MCP server, require model credentials in DocAtlas, add a fourth public Docs MCP tool, or make subagent support mandatory for clients.
 
+Task 33A must preserve both fixture identities during the transition to collision-safe hashing: the frozen Task 23 `sha256-concat-v1` value and the current `sha256-length-prefixed-v2` value. Causal execution verifies both values plus the oracle patch, hidden semantic suite, and audited external-context hashes before starting a runner. Each semantic requirement is bound to explicit hidden-test IDs. A runner that cannot prove a hard turn limit is rejected before any benchmark cell starts; a timeout or a count of top-level completion events is not relabelled as turn-limit enforcement.
+
 ## Research basis
 
 The design follows these externally documented constraints, accessed 2026-07-13:
