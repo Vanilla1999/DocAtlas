@@ -68,6 +68,29 @@ def _estimate_tokens(text: str) -> int:
     return max(1, (len(text) + 3) // 4) if text else 0
 
 
+def trajectory_evidence_metrics(task: Any, trajectory_path: Path) -> dict[str, Any]:
+    evidence = list(dict.fromkeys([*task.expected_symbols, *task.expected_project_docs]))
+    try:
+        events = json.loads(trajectory_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        events = []
+    ranked_text = [json.dumps(event, sort_keys=True).lower() for event in events if isinstance(event, dict)]
+    ranks = [
+        index
+        for item in evidence
+        for index, text in enumerate(ranked_text, start=1)
+        if item.lower() in text
+        for _ in [None]
+    ]
+    found = sum(1 for item in evidence if any(item.lower() in text for text in ranked_text))
+    return {
+        "required_evidence_total": len(evidence),
+        "required_evidence_found": found,
+        "required_evidence_recall": found / len(evidence) if evidence else None,
+        "first_required_evidence_rank": min(ranks) if ranks else None,
+    }
+
+
 def _load_optional_json(path: Path) -> dict[str, Any]:
     try:
         data = json.loads(path.read_text(encoding="utf-8"))
@@ -255,13 +278,29 @@ def evaluate_agent_patch(task: TaskSpec, workspace: Path, run_output_dir: Path, 
     injection = _load_optional_json(run_output_dir / "docatlas_context_injection.json")
     checklist_injection = _load_optional_json(run_output_dir / "action_checklist_injection.json")
     constraints_injection = _load_optional_json(run_output_dir / "patch_constraints_injection.json")
+    external_injection = _load_optional_json(run_output_dir / "audited_external_context.json")
+    docatlas_preparation = _load_optional_json(run_output_dir / "docatlas_preparation.json")
+    trajectory = Path(trajectory_path) if trajectory_path else run_output_dir / "missing-trajectory.json"
+    evidence_metrics = trajectory_evidence_metrics(task, trajectory)
+    tool_calls = getattr(runner_output, "tool_calls", [])
+    tool_output_text = "\n".join(
+        str(call.get("result_summary", "")) for call in tool_calls if isinstance(call, dict)
+    )
+    input_tokens = getattr(runner_output, "input_tokens", None)
+    output_tokens = getattr(runner_output, "output_tokens", None)
+    total_tokens = input_tokens + output_tokens if isinstance(input_tokens, int) and isinstance(output_tokens, int) else None
+    setup_wall_time = sum(
+        float(payload.get("wall_time_seconds", 0.0))
+        for payload in (external_injection, docatlas_preparation, injection, checklist_injection, constraints_injection)
+        if isinstance(payload.get("wall_time_seconds"), (int, float))
+    )
     metrics = RunMetrics(
         wall_time_seconds=getattr(runner_output, "wall_time_seconds", None),
-        input_tokens=getattr(runner_output, "input_tokens", None),
-        output_tokens=getattr(runner_output, "output_tokens", None),
-        shell_calls=sum(1 for call in getattr(runner_output, "tool_calls", []) if "bash" in json.dumps(call).lower()),
-        edit_calls=sum(1 for call in getattr(runner_output, "tool_calls", []) if "edit" in json.dumps(call).lower()),
-        test_runs=sum(1 for call in getattr(runner_output, "tool_calls", []) if "pytest" in json.dumps(call).lower()),
+        input_tokens=input_tokens,
+        output_tokens=output_tokens,
+        shell_calls=sum(1 for call in tool_calls if "bash" in json.dumps(call).lower()),
+        edit_calls=sum(1 for call in tool_calls if "edit" in json.dumps(call).lower()),
+        test_runs=sum(1 for call in tool_calls if "pytest" in json.dumps(call).lower()),
         docs_tool_calls=audit.docatlas_calls,
         patch_files_changed=stats[0] if stats else 0,
         patch_lines_added=stats[1] if stats else 0,
@@ -308,6 +347,10 @@ def evaluate_agent_patch(task: TaskSpec, workspace: Path, run_output_dir: Path, 
             "time_to_first_test": None,
             "input_tokens": metrics.input_tokens,
             "output_tokens": metrics.output_tokens,
+            "total_tokens": total_tokens,
+            "tool_output_tokens_estimate": _estimate_tokens(tool_output_text),
+            "condition_setup_wall_time_seconds": setup_wall_time,
+            "audited_external_context_tokens": _optional_int(external_injection.get("injected_context_tokens")),
             "turns": None,
             "shell_calls": metrics.shell_calls,
             "edit_calls": metrics.edit_calls,
@@ -325,6 +368,7 @@ def evaluate_agent_patch(task: TaskSpec, workspace: Path, run_output_dir: Path, 
             "fallback_source": getattr(utilization, "fallback_source", None),
             "docatlas_retrieval_status": utilization.docatlas_retrieval_status,
             "vector_indexing_timed_out": utilization.vector_indexing_timed_out,
+            **evidence_metrics,
         },
         "context": {
             "retrieved_count": int(utilization.context_retrieved) + audit.docatlas_calls,
@@ -481,6 +525,7 @@ def inject_audited_external_context(
     *,
     snapshot_path: Path | None = None,
 ) -> dict[str, Any]:
+    started = time.monotonic()
     output_dir.mkdir(parents=True, exist_ok=True)
     source_path = snapshot_path or AUDITED_EXTERNAL_CONTEXT_ROOT / f"{task.task_id}.json"
     snapshot = _load_optional_json(source_path)
@@ -498,7 +543,12 @@ def inject_audited_external_context(
     if any(not snapshot.get(field) for field in ("library", "version", "source_url", "retrieved_at")):
         errors.append("missing_provenance")
     if errors:
-        payload = {"status": "condition_setup_failed", "errors": errors, "snapshot_path": str(source_path)}
+        payload = {
+            "status": "condition_setup_failed",
+            "errors": errors,
+            "snapshot_path": str(source_path),
+            "wall_time_seconds": time.monotonic() - started,
+        }
         _write_json_atomic(output_dir / "audited_external_context.json", payload)
         return payload
 
@@ -521,6 +571,7 @@ def inject_audited_external_context(
         "retrieved_at": snapshot["retrieved_at"],
         "content_sha256": actual_hash,
         "injected_context_tokens": _estimate_tokens(markdown),
+        "wall_time_seconds": time.monotonic() - started,
     }
     _write_json_atomic(output_dir / "audited_external_context.json", payload)
     return payload

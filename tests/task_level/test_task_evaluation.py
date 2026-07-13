@@ -3,8 +3,9 @@ from __future__ import annotations
 import json
 from datetime import datetime, timezone
 from pathlib import Path
+from types import SimpleNamespace
 
-from eval.task_level.execution import evaluate_agent_patch
+from eval.task_level.execution import evaluate_agent_patch, trajectory_evidence_metrics
 from eval.task_level.fixtures.builder import materialize_fixture
 from eval.task_level.runner import load_tasks, run_smoke
 from eval.task_level.runners.base import AgentRunOutput
@@ -72,3 +73,21 @@ def test_smoke_results_remain_non_causal(tmp_path: Path):
 
     assert {result["status"] for result in results} == {"smoke_not_causal"}
     assert not any(result["resolved"] for result in results)
+
+
+def test_trajectory_evidence_metrics_measure_recall_and_first_observation_rank(tmp_path: Path):
+    trajectory = tmp_path / "trajectory.json"
+    trajectory.write_text(json.dumps([
+        {"sequence": 1, "arguments": {"command": "read docs/policy.md"}, "result_summary": "policy"},
+        {"sequence": 2, "arguments": {"command": "inspect src"}, "result_summary": "PermissionService owns the gate"},
+    ]))
+    task = SimpleNamespace(expected_symbols=["PermissionService", "MissingSymbol"], expected_project_docs=["docs/policy.md"])
+
+    metrics = trajectory_evidence_metrics(task, trajectory)
+
+    assert metrics == {
+        "required_evidence_total": 3,
+        "required_evidence_found": 2,
+        "required_evidence_recall": 2 / 3,
+        "first_required_evidence_rank": 1,
+    }

@@ -47,6 +47,7 @@ def test_audited_external_context_injection_verifies_hash_and_writes_provenance(
     provenance = json.loads((output_dir / "audited_external_context.json").read_text(encoding="utf-8"))
     assert provenance["source_url"] == "https://example.test/docs/1.2.3"
     assert provenance["version"] == "1.2.3"
+    assert provenance["wall_time_seconds"] >= 0
 
 
 def test_audited_external_context_injection_fails_closed_on_hash_or_task_mismatch(tmp_path):
