@@ -1,0 +1,285 @@
+{
+  "amendment_id": "task23-replacement-after-screening-001",
+  "artifact_integrity": {
+    "actual_runs": 23,
+    "duplicate_cells": [],
+    "expected_runs": 36,
+    "missing_cells": [
+      [
+        "real_project_help_chat_linearizable_module_lifecycle_001",
+        "docatlas_tool_optional",
+        2
+      ],
+      [
+        "real_project_viscanner_client_owned_disable_signal_001",
+        "docatlas_tool_optional",
+        0
+      ],
+      [
+        "real_project_viscanner_client_owned_disable_signal_001",
+        "docatlas_tool_optional",
+        1
+      ],
+      [
+        "real_project_viscanner_client_owned_disable_signal_001",
+        "docatlas_tool_optional",
+        2
+      ],
+      [
+        "real_project_viscanner_client_owned_disable_signal_001",
+        "docatlas_tool_recommended",
+        0
+      ],
+      [
+        "real_project_viscanner_client_owned_disable_signal_001",
+        "docatlas_tool_recommended",
+        1
+      ],
+      [
+        "real_project_viscanner_client_owned_disable_signal_001",
+        "docatlas_tool_recommended",
+        2
+      ],
+      [
+        "real_project_viscanner_client_owned_disable_signal_001",
+        "repo_only_strict_offline",
+        0
+      ],
+      [
+        "real_project_viscanner_client_owned_disable_signal_001",
+        "repo_only_strict_offline",
+        1
+      ],
+      [
+        "real_project_viscanner_client_owned_disable_signal_001",
+        "repo_only_strict_offline",
+        2
+      ],
+      [
+        "real_project_viscanner_client_owned_disable_signal_001",
+        "repo_plus_audited_external_context",
+        0
+      ],
+      [
+        "real_project_viscanner_client_owned_disable_signal_001",
+        "repo_plus_audited_external_context",
+        1
+      ],
+      [
+        "real_project_viscanner_client_owned_disable_signal_001",
+        "repo_plus_audited_external_context",
+        2
+      ]
+    ],
+    "ok": false,
+    "unexpected_cells": []
+  },
+  "budget_integrity": {
+    "expected_runs": 23,
+    "input_budget_exceeded_runs": 21,
+    "known_runs": 23,
+    "max_turns_unenforced_runs": 23,
+    "ok": false,
+    "output_budget_exceeded_runs": 0,
+    "unknown_runs": 0
+  },
+  "conditions": {
+    "docatlas_tool_optional": {
+      "budget_known_runs": 5,
+      "budget_unknown_runs": 0,
+      "compile_success_rate": 0,
+      "descriptive_metrics_scope": "valid_runner_outputs_only",
+      "diagnostic_resolved_rate_valid_runs": 0,
+      "hidden_tests_passed_rate": 0,
+      "infrastructure_failed_runs": 0,
+      "input_budget_exceeded_runs": 5,
+      "max_turns_unenforced_runs": 5,
+      "median_audited_external_context_tokens": null,
+      "median_condition_setup_wall_time_seconds": 0.036,
+      "median_docs_output_evidence_coverage": 0.0,
+      "median_first_required_evidence_rank": 5,
+      "median_input_tokens": 192493,
+      "median_output_tokens": 3514,
+      "median_required_evidence_recall": 0.9166666666666666,
+      "median_tool_output_tokens_estimate": 5989,
+      "median_total_tokens": 195418,
+      "median_useful_context_ratio": null,
+      "median_wall_time_seconds": 98.2214,
+      "metric_coverage_ratio": 1.0,
+      "metric_valid_runs": 5,
+      "output_budget_exceeded_runs": 0,
+      "policy_violations": 0,
+      "public_tests_passed_rate": 1,
+      "resolved": 0,
+      "resolved_rate": 0,
+      "runs": 5,
+      "useful_context_ratio_method": "not_measured_without_chunk_usage_attribution"
+    },
+    "docatlas_tool_recommended": {
+      "budget_known_runs": 6,
+      "budget_unknown_runs": 0,
+      "compile_success_rate": 0,
+      "descriptive_metrics_scope": "valid_runner_outputs_only",
+      "diagnostic_resolved_rate_valid_runs": 0,
+      "hidden_tests_passed_rate": 0,
+      "infrastructure_failed_runs": 0,
+      "input_budget_exceeded_runs": 6,
+      "max_turns_unenforced_runs": 6,
+      "median_audited_external_context_tokens": null,
+      "median_condition_setup_wall_time_seconds": 0.0363,
+      "median_docs_output_evidence_coverage": 0.08333333333333333,
+      "median_first_required_evidence_rank": 10.0,
+      "median_input_tokens": 299216.5,
+      "median_output_tokens": 4967.0,
+      "median_required_evidence_recall": 1.0,
+      "median_tool_output_tokens_estimate": 5775.0,
+      "median_total_tokens": 304314.0,
+      "median_useful_context_ratio": null,
+      "median_wall_time_seconds": 128.3228,
+      "metric_coverage_ratio": 1.0,
+      "metric_valid_runs": 6,
+      "output_budget_exceeded_runs": 0,
+      "policy_violations": 0,
+      "public_tests_passed_rate": 1,
+      "resolved": 0,
+      "resolved_rate": 0,
+      "runs": 6,
+      "useful_context_ratio_method": "not_measured_without_chunk_usage_attribution"
+    },
+    "repo_only_strict_offline": {
+      "budget_known_runs": 6,
+      "budget_unknown_runs": 0,
+      "compile_success_rate": 0,
+      "descriptive_metrics_scope": "valid_runner_outputs_only",
+      "diagnostic_resolved_rate_valid_runs": 0,
+      "hidden_tests_passed_rate": 0,
+      "infrastructure_failed_runs": 0,
+      "input_budget_exceeded_runs": 4,
+      "max_turns_unenforced_runs": 6,
+      "median_audited_external_context_tokens": null,
+      "median_condition_setup_wall_time_seconds": 0.0,
+      "median_docs_output_evidence_coverage": 0.0,
+      "median_first_required_evidence_rank": 5.0,
+      "median_input_tokens": 132899.0,
+      "median_output_tokens": 3838.0,
+      "median_required_evidence_recall": 1.0,
+      "median_tool_output_tokens_estimate": 4179.0,
+      "median_total_tokens": 136581.5,
+      "median_useful_context_ratio": null,
+      "median_wall_time_seconds": 99.2248,
+      "metric_coverage_ratio": 1.0,
+      "metric_valid_runs": 6,
+      "output_budget_exceeded_runs": 0,
+      "policy_violations": 0,
+      "public_tests_passed_rate": 1,
+      "resolved": 0,
+      "resolved_rate": 0,
+      "runs": 6,
+      "useful_context_ratio_method": "not_measured_without_chunk_usage_attribution"
+    },
+    "repo_plus_audited_external_context": {
+      "budget_known_runs": 6,
+      "budget_unknown_runs": 0,
+      "compile_success_rate": 0,
+      "descriptive_metrics_scope": "valid_runner_outputs_only",
+      "diagnostic_resolved_rate_valid_runs": 0,
+      "hidden_tests_passed_rate": 0,
+      "infrastructure_failed_runs": 0,
+      "input_budget_exceeded_runs": 6,
+      "max_turns_unenforced_runs": 6,
+      "median_audited_external_context_tokens": 194.5,
+      "median_condition_setup_wall_time_seconds": 0.00013112050146446563,
+      "median_docs_output_evidence_coverage": 0.0,
+      "median_first_required_evidence_rank": 5.0,
+      "median_input_tokens": 181675.0,
+      "median_output_tokens": 4330.5,
+      "median_required_evidence_recall": 1.0,
+      "median_tool_output_tokens_estimate": 5636.0,
+      "median_total_tokens": 186571.0,
+      "median_useful_context_ratio": null,
+      "median_wall_time_seconds": 110.91650000000001,
+      "metric_coverage_ratio": 1.0,
+      "metric_valid_runs": 6,
+      "output_budget_exceeded_runs": 0,
+      "policy_violations": 0,
+      "public_tests_passed_rate": 1,
+      "resolved": 0,
+      "resolved_rate": 0,
+      "runs": 6,
+      "useful_context_ratio_method": "not_measured_without_chunk_usage_attribution"
+    }
+  },
+  "decision": {
+    "decision": "INCONCLUSIVE",
+    "pairs": 6,
+    "reasons": [
+      "task_repeat_matrix_mismatch",
+      "incomplete_full_condition_matrix",
+      "declared_token_budget_exceeded",
+      "max_turn_budget_not_enforced"
+    ],
+    "threshold_met": null,
+    "uncertainty": {}
+  },
+  "failure_taxonomy": {
+    "docatlas_tool_optional": {
+      "compile_failed": 5
+    },
+    "docatlas_tool_recommended": {
+      "compile_failed": 6
+    },
+    "repo_only_strict_offline": {
+      "compile_failed": 6
+    },
+    "repo_plus_audited_external_context": {
+      "compile_failed": 6
+    }
+  },
+  "protocol_id": "task23-real-project-value-token-001",
+  "replacement_screening": {
+    "results": [
+      {
+        "policy_clean": true,
+        "repo_only_hidden_passed": 0,
+        "repo_only_public_passed": 3,
+        "repo_only_repeats": 3,
+        "repo_only_resolved": 0,
+        "status": "accepted_differentiating",
+        "task_id": "decisive_nbo_cross_module_gate_large_001"
+      }
+    ],
+    "run_id": "task23_replacement_screening_001"
+  },
+  "runtime_integrity": {
+    "infrastructure_failed_runs": 0,
+    "ok": false,
+    "valid_runs": 23
+  },
+  "sanitized_bundle_integrity": {
+    "integrity_ok": true,
+    "path": "task23_causal_005_partial_runs.sanitized.jsonl",
+    "rows_expected": 23,
+    "rows_written": 23,
+    "schema_version": "task23-sanitized-run-1",
+    "sha256": "04a36b34ba730ab3535ab84bc908d1853ecc2f4f4d1249deb87c9f8d1737c29a"
+  },
+  "schema_version": "task23-report-1",
+  "scientific_limitation": "The replacement identity was fixed after observing the original candidate's screening exclusion. Thresholds, conditions, runner settings, hashes, and the replacement screening rule remain unchanged; final claims must disclose this amendment.",
+  "screening_exclusions": [
+    {
+      "excluded_screening_status": "rejected_too_easy",
+      "excluded_task_id": "real_project_nbo_flavor_scoped_external_links_001",
+      "replacement_screening_run_id": "task23_replacement_screening_001",
+      "replacement_task_id": "decisive_nbo_cross_module_gate_large_001",
+      "screening_results_sha256": "6e3cda6c7a998596566008352b00371714e3d9de9906811092089c3c17f91883",
+      "screening_run_id": "task23_screening_001"
+    }
+  ],
+  "source_artifacts": {
+    "amendment_sha256": "f6de21a8307f5d7ec27b07d281dfeae82a68fa81b43d7f874e9da66b51aa06ad",
+    "protocol_sha256": "618858e95c3aaa0f6e0d7433e30ffb2dfa37cb64a81b13291fd3142d1319ff76",
+    "replacement_screening_sha256": "20c5ab62094c58bd24eff62827b2d7dba0c33192dd398bb746a0a3f32796d776",
+    "runs_jsonl_sha256": "f53591c69549dd895175f2b155c9d4eda9e86b29c7604c921aa2c3bb1ff05e48",
+    "sanitized_runs_sha256": "04a36b34ba730ab3535ab84bc908d1853ecc2f4f4d1249deb87c9f8d1737c29a"
+  }
+}
