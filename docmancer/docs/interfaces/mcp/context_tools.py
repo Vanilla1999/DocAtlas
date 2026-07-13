@@ -4,8 +4,8 @@ from copy import deepcopy
 from dataclasses import asdict, is_dataclass
 from typing import Any
 
-from docmancer.docs.domain.tool_selection import normalize_public_docs_actions
 from docmancer.docs.application.action_packet import build_action_packet, validate_action_packet
+from docmancer.docs.domain.tool_selection import normalize_public_docs_actions
 from docmancer.docs.service import LibraryDocsService
 from docmancer.docs.interfaces.mcp.output_contract import normalize_output_mode
 from docmancer.docs.interfaces.mcp.project_tools import _attach_output_contract, _bad_request, _bounded_int_arg, _clean_string, _compact_mcp_payload, _strip_mcp_debug_noise
@@ -223,21 +223,30 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
     raw = normalize_public_docs_actions(raw)
     raw = _replace_network_retries_with_prepare_actions(raw, args)
     if args.get("delivery_strategy") == "bounded_direct":
+        packet_budget = _bounded_int_arg(
+            args, "packet_tokens", default=1_500, min_value=256, max_value=2_000
+        ) or 1_500
         packet = build_action_packet(
             question=question,
             context_pack=raw.get("context_pack") or [],
             trust_contract=raw.get("trust_contract") or {},
-            max_tokens=_bounded_int_arg(args, "packet_tokens", default=1_500, min_value=256, max_value=2_000) or 1_500,
+            max_tokens=packet_budget,
         )
         validation_errors = validate_action_packet(packet)
+        if packet.get("estimated_tokens", packet_budget + 1) > packet_budget:
+            validation_errors.append("requested packet token budget exceeded")
         if validation_errors:
             return _bad_request("invalid_action_packet", "; ".join(validation_errors))
-        return {
+        payload = {
             "tool": "get_docs_context",
             "delivery_strategy": "bounded_direct",
             "action_packet": packet,
             "document_content_policy": DOCUMENT_CONTENT_POLICY,
         }
+        recovery = _bounded_recovery_action(raw)
+        if packet["status"] == "insufficient_evidence" and recovery:
+            payload["recommended_next_action"] = recovery
+        return payload
     mode = _output_mode(args)
     if mode == "full":
         raw["output_mode"] = "full"
@@ -246,6 +255,21 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
     payload["output_mode"] = mode
     payload = _compact_mcp_payload(payload, page=_bounded_int_arg(args, "page", default=1, max_value=10_000), page_size=_bounded_int_arg(args, "page_size", default=None, max_value=20), include_sections=args.get("include_sections"))
     return _attach_output_contract(payload, output_mode=mode) if mode == "debug" else _strip_mcp_debug_noise(payload)
+
+
+def _bounded_recovery_action(payload: dict[str, Any]) -> dict[str, Any] | None:
+    candidates = [payload.get("next_action"), *(payload.get("next_actions") or [])]
+    for action in candidates:
+        if not isinstance(action, dict) or action.get("tool") != "prepare_docs":
+            continue
+        bounded = {
+            key: deepcopy(action[key])
+            for key in ("tool", "type", "arguments_patch", "reason", "message")
+            if action.get(key) not in (None, {}, [])
+        }
+        bounded["auto_execute"] = False
+        return bounded
+    return None
 
 
 def _handle_maintenance_context(

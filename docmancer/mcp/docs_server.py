@@ -83,7 +83,7 @@ RAW_TOOLS: list[dict[str, Any]] = [
 Agent workflow:
 - Call get_docs_context first. It performs safe project preflight internally.
 - For coding/API questions, set response_style=\"snippet-first\".
-- For one compact pre-edit handoff, set delivery_strategy=\"bounded_direct\"; only a validated ActionPacket enters model context.
+- For one compact pre-edit handoff, set delivery_strategy=\"bounded_direct\"; raw retrieval stays hidden and only a validated ActionPacket plus bounded recovery metadata enters model context.
 - Call prepare_docs only when this response explicitly returns it as next_action.
 - Use docs_status only for explicit health, freshness, source-state, or job-status requests.
 - If answer_type is navigation_only or partial_navigational, do not answer yet; read/search the suggested files first.
