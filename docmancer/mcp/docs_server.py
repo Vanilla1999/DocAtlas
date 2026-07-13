@@ -87,6 +87,7 @@ Agent workflow:
 - Use docs_status only for explicit health, freshness, source-state, or job-status requests.
 - If answer_type is navigation_only or partial_navigational, do not answer yet; read/search the suggested files first.
 - This tool provides source-grounded context, not a full code audit or test substitute.
+- For change-aware documentation maintenance, pass maintenance with either base/head or explicit changed_paths; obey its fail-closed authoring brief.
 """,
         "inputSchema": {
             "type": "object",
@@ -113,6 +114,18 @@ Agent workflow:
                 "include_sections": {"type": ["array", "null"], "items": {"type": "string", "enum": ["context_pack", "supporting_snippets", "trust_contract", "diagnostics", "metrics"]}},
                 "output_mode": {"type": ["string", "null"], "enum": ["answer", "compact", "debug", "full", None], "default": "answer", "description": "answer is the default minimal agent-friendly response; compact includes structured context; debug includes diagnostics; full returns raw output."},
                 "details": {"type": ["boolean", "null"]},
+                "maintenance": {
+                    "type": ["object", "null"],
+                    "properties": {
+                        "base": {"type": ["string", "null"]},
+                        "head": {"type": ["string", "null"], "default": "HEAD"},
+                        "changed_paths": {"type": ["array", "null"], "maxItems": 200, "items": {"type": "string"}},
+                        "changed_symbols": {"type": ["array", "null"], "maxItems": 200, "items": {"type": "string"}},
+                        "candidate_offset": {"type": ["integer", "null"], "minimum": 0},
+                        "candidate_limit": {"type": ["integer", "null"], "minimum": 1, "maximum": 200},
+                    },
+                    "additionalProperties": False,
+                },
             },
             "required": ["question"],
         },
@@ -146,6 +159,18 @@ Agent workflow:
                 "include_rust": {"type": ["boolean", "null"]},
                 "include_packages": {"type": ["array", "null"], "items": {"type": "string"}},
                 "with_vectors": {"type": ["boolean", "null"]},
+                "changed_paths": {"type": ["array", "null"], "maxItems": 500, "items": {"type": "string"}},
+                "deleted_paths": {"type": ["array", "null"], "maxItems": 500, "items": {"type": "string"}},
+                "renamed_paths": {
+                    "type": ["array", "null"],
+                    "maxItems": 500,
+                    "items": {
+                        "type": "object",
+                        "properties": {"old_path": {"type": "string"}, "new_path": {"type": "string"}},
+                        "required": ["old_path", "new_path"],
+                        "additionalProperties": False,
+                    },
+                },
                 "force_refresh": {"type": ["boolean", "null"]},
                 "force": {"type": ["boolean", "null"]},
                 "continue_on_error": {"type": ["boolean", "null"]},

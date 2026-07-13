@@ -1960,6 +1960,12 @@ def eval_cmd(
 @click.option("--candidate-limit", type=click.IntRange(min=1, max=200), default=200, show_default=True, help="Maximum section candidates returned in this page.")
 @click.option("output_format", "--format", type=click.Choice(["markdown", "json"], case_sensitive=False), default="markdown", show_default=True)
 @click.option("--fail-on-missing", is_flag=True, default=False, help="Exit non-zero when a changed module has no maintained docs.")
+@click.option(
+    "--sync-saved-docs",
+    is_flag=True,
+    default=False,
+    help="Incrementally index accepted doc changes from the exact --base/--head Git diff; never writes repository files.",
+)
 @click.option("--config", "config_path", default=None, help="Path to docmancer.yaml.")
 def docs_impact_cmd(
     project_path: str,
@@ -1971,16 +1977,19 @@ def docs_impact_cmd(
     candidate_limit: int,
     output_format: str,
     fail_on_missing: bool,
+    sync_saved_docs: bool,
     config_path: str | None,
 ):
     """Report which maintained docs should be reviewed after a code change."""
-    from docmancer.docs.impact import analyze_docs_impact, changed_evidence_from_git, format_docs_impact_markdown
+    from docmancer.docs.impact import analyze_docs_impact, bound_docs_impact_report, changed_evidence_from_git, format_docs_impact_markdown, unaccepted_worktree_changes
     from docmancer.docs.application.project_section_index import ProjectSectionIndexReader
 
     if base and changed_files:
         raise click.UsageError("Use either --base/--head or --changed-file, not both.")
     if not base and not changed_files:
         raise click.UsageError("Pass --base to read git diff paths, or at least one --changed-file.")
+    if sync_saved_docs and not base:
+        raise click.UsageError("--sync-saved-docs requires --base/--head so accepted rename and deletion status is exact.")
     try:
         effective_config_path = _effective_config(config_path)
         config = _load_config(effective_config_path)
@@ -2001,6 +2010,69 @@ def docs_impact_cmd(
                 "fail_on_missing": fail_on_missing,
             },
         )
+        if sync_saved_docs:
+            from dataclasses import asdict
+            from docmancer.docs.service import LibraryDocsService
+
+            bounds = report.get("bounds") or {}
+            if bounds.get("truncated") or not bounds.get("analysis_complete", False):
+                raise click.ClickException(
+                    "Refusing incremental sync because the documentation impact report is incomplete; narrow the diff first."
+                )
+
+            changed_docs: list[str] = []
+            deleted_docs: list[str] = []
+            renamed_docs: list[dict[str, str]] = []
+            ambiguous_docs: list[str] = []
+            for item in report.get("impacts") or []:
+                status = item.get("status")
+                if status in {"updated", "changed"} and item.get("path"):
+                    changed_docs.append(str(item["path"]))
+                elif status == "deleted" and item.get("path"):
+                    deleted_docs.append(str(item["path"]))
+                elif status == "renamed" and item.get("old_path") and item.get("new_path"):
+                    renamed_docs.append({
+                        "old_path": str(item["old_path"]),
+                        "new_path": str(item["new_path"]),
+                    })
+                elif status == "changed_or_deleted" and item.get("path"):
+                    ambiguous_docs.append(str(item["path"]))
+            if ambiguous_docs:
+                raise click.ClickException(
+                    "Cannot sync ambiguous documentation lifecycle evidence: "
+                    + ", ".join(sorted(ambiguous_docs))
+                )
+            affected_docs = [
+                *changed_docs,
+                *deleted_docs,
+                *[path for item in renamed_docs for path in (item["old_path"], item["new_path"])],
+            ]
+            unaccepted = unaccepted_worktree_changes(project_path, head, affected_docs)
+            if unaccepted:
+                raise click.ClickException(
+                    "Refusing to index uncommitted or rejected documentation content: "
+                    + ", ".join(unaccepted)
+                )
+            started_at = datetime.now(timezone.utc)
+            sync = asdict(LibraryDocsService(config=config).sync_project_docs(
+                project_path,
+                with_vectors=False,
+                changed_paths=sorted(set(changed_docs)),
+                deleted_paths=sorted(set(deleted_docs)),
+                renamed_paths=renamed_docs,
+            ))
+            elapsed_ms = int((datetime.now(timezone.utc) - started_at).total_seconds() * 1000)
+            metrics = dict((sync.get("diagnostics") or {}).get("metrics") or {})
+            metrics["latency_ms"] = elapsed_ms
+            report["sync"] = {
+                "status": sync.get("status"),
+                "mode": "incremental",
+                "message": sync.get("message"),
+                "metrics": metrics,
+                "tombstones": (sync.get("tombstones") or [])[:100],
+                "warnings": sync.get("warnings") or [],
+            }
+            report = bound_docs_impact_report(report)
     except ValueError as exc:
         raise click.ClickException(str(exc)) from exc
     if output_format.lower() == "json":

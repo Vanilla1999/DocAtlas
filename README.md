@@ -140,9 +140,12 @@ Pass `"details": true` for the full structured response.
 ```bash
 doc-atlas docs-impact --base origin/main
 doc-atlas docs-impact --changed-file packages/auth/src/token_service.ts --format json
+doc-atlas docs-impact --base origin/main --sync-saved-docs --format json
 ```
 
-The bundled GitHub Actions workflow publishes this report in every pull request summary. It highlights module docs that need review and module changes with no maintained documentation, while leaving the final documentation edit to an explicit, reviewable change.
+The report includes a bounded authoring brief for the host model: exact files/sections it may edit, repository facts it must verify, and claims it must not invent. After the documentation patch is reviewed and saved, `prepare_docs(action="sync_project_docs", changed_paths=..., deleted_paths=..., renamed_paths=...)` updates only affected index rows. The optional `--sync-saved-docs` CI mode performs that local indexing step from an exact Git diff; it never edits, commits, comments, or fetches from the network.
+
+The bundled GitHub Actions workflow publishes the advisory report in every pull request summary. It highlights module docs that need review and module changes with no maintained documentation, while leaving the final documentation edit to an explicit, reviewable change.
 
 ### Agent contract for a local project
 

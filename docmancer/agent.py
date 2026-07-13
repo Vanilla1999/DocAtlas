@@ -140,7 +140,12 @@ class DocmancerAgent:
         slug = Path(self.config.index.db_path).stem or "docmancer"
         return f"docmancer_{slug}"
 
-    def _sync_vectors_if_enabled(self) -> None:
+    def _sync_vectors_if_enabled(
+        self,
+        *,
+        section_ids: set[int] | None = None,
+        prune_ids: set[int] | None = None,
+    ) -> None:
         """Embed any new chunks and upsert into the configured vector store.
 
         Vector retrieval is on by default. Bare ``doc-atlas ingest`` will
@@ -219,6 +224,8 @@ class DocmancerAgent:
             vector_store=vector_store,
             collection=self._vector_collection_name(),
             include_sparse=include_sparse,
+            section_ids=section_ids,
+            prune_ids=prune_ids,
         )
         logger.info(
             "vectors: embedded=%d upserted=%d cache_hits=%d unchanged=%d pruned=%d",
@@ -232,6 +239,49 @@ class DocmancerAgent:
     def sync_vectors(self) -> None:
         """Synchronize the committed SQLite index into its production vector collection."""
         self._sync_vectors_if_enabled()
+
+    def sync_vector_chunks(self, section_ids: set[int]) -> None:
+        """Upsert only explicitly affected chunks without reconciling unrelated rows."""
+        if section_ids:
+            self._sync_vectors_if_enabled(section_ids=set(section_ids), prune_ids=set())
+
+    def prune_vector_chunks(self, chunk_ids: set[int]) -> int:
+        """Delete exact tracked vector ids without embedding or starting a backend."""
+        import os as _os
+
+        if not chunk_ids:
+            return 0
+        collection = self._vector_collection_name()
+        tracked = set(self.store.list_embedding_upserts(collection)) & {
+            int(value) for value in chunk_ids
+        }
+        if not tracked:
+            return 0
+        try:
+            from docmancer.runtime.qdrant_manager import QdrantManager
+            from docmancer.stores.base import get_vector_store
+        except ImportError as exc:
+            raise RuntimeError(f"vector cleanup unavailable: {exc}") from exc
+
+        vs_config = self.config.vector_store
+        if vs_config.provider == "qdrant" and not vs_config.url:
+            explicit_url = _os.environ.get("DOCMANCER_QDRANT_URL")
+            if explicit_url:
+                vs_config = vs_config.model_copy(update={"url": explicit_url})
+            else:
+                status = QdrantManager().status()
+                if not (status.get("alive") and status.get("owned") and status.get("healthy")):
+                    raise RuntimeError(
+                        "vector cleanup requires the existing managed Qdrant process; "
+                        "refusing to start or download it during incremental maintenance"
+                    )
+                vs_config = vs_config.model_copy(update={"url": status.get("url")})
+        vector_store = get_vector_store(
+            vs_config, embeddings_dim=self.config.embeddings.dimensions
+        )
+        deleted = vector_store.delete_points(collection, sorted(tracked))
+        self.store.delete_embedding_upserts(collection, sorted(tracked))
+        return deleted
 
     def ingest(
         self,

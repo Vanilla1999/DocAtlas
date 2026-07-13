@@ -75,14 +75,22 @@ def sync_vector_store(
     vector_store: VectorStore,
     collection: str,
     include_sparse: bool = False,
+    section_ids: set[int] | None = None,
+    prune_ids: set[int] | None = None,
 ) -> SyncResult:
-    """Embed every SQLite section, upsert into the vector store, record state.
+    """Embed selected SQLite sections, upsert them, and record state.
 
-    Cache hits are reused; sections whose ``content_hash`` already matches
-    the recorded upsert state are skipped entirely. The collection is
-    created on the fly if needed.
+    With no explicit ids this reconciles the full index. Scoped callers may
+    provide ``section_ids`` and ``prune_ids`` so unrelated chunks are neither
+    embedded nor deleted. Cache hits and unchanged selected sections are
+    skipped. The collection is created on the fly if needed.
     """
-    sections = store.list_sections_for_embedding()
+    all_sections = store.list_sections_for_embedding()
+    sections = (
+        all_sections
+        if section_ids is None
+        else [section for section in all_sections if int(section["section_id"]) in section_ids]
+    )
     cache = EmbeddingsCache(config.embeddings.cache)
 
     # Resolve the real dimension from the live provider rather than trusting
@@ -145,13 +153,17 @@ def sync_vector_store(
     index_meta.put(collection, want_meta)
 
     existing = store.list_embedding_upserts(collection)
-    current_ids = {int(sec["section_id"]) for sec in sections}
+    current_ids = {int(sec["section_id"]) for sec in all_sections}
 
     # Prune: any chunk_id recorded in embedding_upserts but absent from the
     # current sections table belongs to a deleted/recreated source. Delete the
     # vector points and the upsert bookkeeping rows so dense/hybrid retrieval
     # cannot resurrect points that have no SQLite section to hydrate.
-    stale_ids = [chunk_id for chunk_id in existing if chunk_id not in current_ids]
+    stale_ids = (
+        [chunk_id for chunk_id in existing if chunk_id not in current_ids]
+        if prune_ids is None
+        else [chunk_id for chunk_id in existing if chunk_id in prune_ids]
+    )
     pruned = 0
     if stale_ids:
         try:
@@ -180,7 +192,7 @@ def sync_vector_store(
         except Exception:
             count_after = 0
         expected_total = len(current_ids)
-        if expected_total > 0 and count_after < expected_total:
+        if section_ids is None and expected_total > 0 and count_after < expected_total:
             raise RuntimeError(
                 f"vector index {collection!r} is incomplete: expected {expected_total} "
                 f"indexed points but the vector store reports {count_after}. Rebuild with "
@@ -253,7 +265,7 @@ def sync_vector_store(
     except Exception:
         count_after = count_before
     expected_total = len(current_ids)
-    if expected_total > 0 and count_after < max(1, expected_total):
+    if section_ids is None and expected_total > 0 and count_after < max(1, expected_total):
         raise RuntimeError(
             f"vector upsert into {collection!r} did not land: expected {expected_total} "
             f"indexed points but the vector store reports {count_after}. The most common cause is "

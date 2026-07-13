@@ -1,6 +1,7 @@
 import json
 import os
 from pathlib import Path
+import subprocess
 from unittest.mock import MagicMock, patch
 
 import yaml
@@ -151,6 +152,74 @@ def test_docs_impact_cli_accepts_changed_symbols_for_section_hints(tmp_path):
 
     assert result.exit_code == 0, result.output
     assert json.loads(result.output)["impacts"][0]["sections"][0]["evidence"] == ["issue_token"]
+
+
+def test_docs_impact_cli_requires_exact_git_evidence_before_sync(tmp_path):
+    (tmp_path / "README.md").write_text("# Project\n", encoding="utf-8")
+
+    result = CliRunner().invoke(
+        cli,
+        [
+            "docs-impact",
+            "--project-path", str(tmp_path),
+            "--changed-file", "README.md",
+            "--sync-saved-docs",
+        ],
+    )
+
+    assert result.exit_code == 2
+    assert "requires --base/--head" in result.output
+
+
+def test_docs_impact_cli_incrementally_syncs_exact_committed_doc_diff(tmp_path):
+    project = tmp_path / "repo"
+    project.mkdir()
+    readme = project / "README.md"
+    readme.write_text("# Project\n\nOld accepted docs.\n", encoding="utf-8")
+    subprocess.run(["git", "-C", str(project), "init"], check=True, capture_output=True)
+    subprocess.run(["git", "-C", str(project), "config", "user.email", "tests@example.com"], check=True)
+    subprocess.run(["git", "-C", str(project), "config", "user.name", "Tests"], check=True)
+    subprocess.run(["git", "-C", str(project), "add", "README.md"], check=True)
+    subprocess.run(["git", "-C", str(project), "commit", "-m", "base"], check=True, capture_output=True)
+    base = subprocess.run(
+        ["git", "-C", str(project), "rev-parse", "HEAD"],
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout.strip()
+    readme.write_text("# Project\n\nNew accepted docs.\n", encoding="utf-8")
+    subprocess.run(["git", "-C", str(project), "add", "README.md"], check=True)
+    subprocess.run(["git", "-C", str(project), "commit", "-m", "docs"], check=True, capture_output=True)
+    config = tmp_path / "docmancer.yaml"
+    config.write_text(
+        "index:\n"
+        "  provider: sqlite\n"
+        f"  db_path: {tmp_path / 'index.db'}\n"
+        f"  extracted_dir: {tmp_path / 'extracted'}\n",
+        encoding="utf-8",
+    )
+    arguments = [
+        "docs-impact",
+        "--project-path", str(project),
+        "--base", base,
+        "--sync-saved-docs",
+        "--format", "json",
+        "--config", str(config),
+    ]
+
+    first = CliRunner().invoke(cli, arguments)
+    second = CliRunner().invoke(cli, arguments)
+
+    assert first.exit_code == 0, first.output
+    assert second.exit_code == 0, second.output
+    first_sync = json.loads(first.output)["sync"]
+    second_sync = json.loads(second.output)["sync"]
+    assert first_sync["status"] == "success"
+    assert first_sync["metrics"]["files_reprocessed"] == 1
+    assert first_sync["metrics"]["derived_writes"] == 1
+    assert second_sync["metrics"]["files_reprocessed"] == 0
+    assert second_sync["metrics"]["derived_writes"] == 0
+    assert len(first.output.encode("utf-8")) <= 32 * 1024
 
 
 def test_agent_contract_cli_describes_project_sources_and_tool_selection(tmp_path):

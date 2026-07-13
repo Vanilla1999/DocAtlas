@@ -177,6 +177,9 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
     question = _clean_string(args.get("question"))
     if not question:
         return _bad_request("empty_question", "question must not be empty. Examples: 'Flutter Riverpod providers', 'Firebase Auth signIn', 'How to use go_router redirect', 'FastAPI dependency injection', 'patch_constraints for adding a service'")
+    maintenance = args.get("maintenance")
+    if maintenance is not None:
+        return _handle_maintenance_context(args, maintenance, service)
     app = getattr(service, "unified_context", service)
     result = app.get_docs_context(
         question,
@@ -226,6 +229,47 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
     payload["output_mode"] = mode
     payload = _compact_mcp_payload(payload, page=_bounded_int_arg(args, "page", default=1, max_value=10_000), page_size=_bounded_int_arg(args, "page_size", default=None, max_value=20), include_sections=args.get("include_sections"))
     return _attach_output_contract(payload, output_mode=mode) if mode == "debug" else _strip_mcp_debug_noise(payload)
+
+
+def _handle_maintenance_context(
+    request: dict[str, Any], maintenance: Any, service: LibraryDocsService
+) -> dict[str, Any]:
+    """Return a fail-closed host-authoring brief through the public retrieval tool."""
+    if not isinstance(maintenance, dict):
+        return _bad_request("invalid_maintenance_request", "maintenance must be an object")
+    project_path = _clean_string(request.get("project_path"))
+    if not project_path:
+        return _bad_request("project_path_required", "project_path is required with maintenance")
+    base = _clean_string(maintenance.get("base"))
+    head = _clean_string(maintenance.get("head")) or "HEAD"
+    changed_paths = maintenance.get("changed_paths")
+    if base and changed_paths:
+        return _bad_request("ambiguous_change_evidence", "use either maintenance.base/head or changed_paths")
+    if not base and not changed_paths:
+        return _bad_request("change_evidence_required", "maintenance requires base/head or changed_paths")
+    from docmancer.docs.impact import analyze_docs_impact, bound_docs_impact_report, changed_evidence_from_git
+
+    try:
+        evidence = changed_evidence_from_git(project_path, base, head) if base else None
+        paths = evidence["paths"] if evidence else list(changed_paths or [])
+        report = analyze_docs_impact(
+            project_path,
+            paths,
+            changed_symbols=list(maintenance.get("changed_symbols") or []),
+            diff_evidence=evidence,
+            candidate_offset=int(maintenance.get("candidate_offset") or 0),
+            candidate_limit=int(maintenance.get("candidate_limit") or 100),
+        )
+    except (OSError, ValueError) as exc:
+        return _bad_request("invalid_change_evidence", str(exc))
+    report.update({
+        "tool": "get_docs_context",
+        "status": "success",
+        "answer_type": "documentation_update_brief",
+        "answer_available": True,
+        "document_content_policy": DOCUMENT_CONTENT_POLICY,
+    })
+    return bound_docs_impact_report(report)
 
 
 def _replace_network_retries_with_prepare_actions(payload: dict[str, Any], request: dict[str, Any]) -> dict[str, Any]:

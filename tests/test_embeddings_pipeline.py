@@ -6,6 +6,7 @@ import pytest
 pytest.importorskip("sqlite_vec")
 
 from docmancer.core.config import DocmancerConfig, VectorStoreConfig
+from docmancer.agent import DocmancerAgent
 from docmancer.core.models import Document
 from docmancer.core.sqlite_store import SQLiteStore
 from docmancer.embeddings.base import EmbeddingsProvider
@@ -99,3 +100,59 @@ def test_sync_prunes_vectors_for_removed_sections(tmp_path, monkeypatch):
     assert set(upsert_rows.keys()).issubset(surviving_chunk_ids)
     # Vector point count never exceeds current section count.
     assert vector_store.count(collection) <= len(surviving_chunk_ids)
+
+
+def test_scoped_sync_writes_only_requested_sections(tmp_path, monkeypatch):
+    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
+    config = _config(tmp_path)
+    store = SQLiteStore(config.index.db_path)
+    vector_store = get_vector_store(config.vector_store, embeddings_dim=DIM)
+    provider = StubProvider()
+    collection = "dm_test_scoped"
+    store.add_documents([
+        _make_doc("changed.md", "# Changed\n\nnew content.\n"),
+        _make_doc("unrelated.md", "# Unrelated\n\nuntouched content.\n"),
+    ])
+    changed_ids = set(store.section_ids_for_source("changed.md"))
+
+    result = sync_vector_store(
+        store=store,
+        config=config,
+        provider=provider,
+        vector_store=vector_store,
+        collection=collection,
+        section_ids=changed_ids,
+        prune_ids=set(),
+    )
+
+    assert result.upserted == len(changed_ids)
+    assert set(store.list_embedding_upserts(collection)) == changed_ids
+
+
+def test_agent_prunes_exact_chunks_without_embedding_unrelated_sections(tmp_path, monkeypatch):
+    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
+    monkeypatch.delenv("DOCMANCER_AUTO_VECTORS", raising=False)
+    config = _config(tmp_path)
+    collection = "dm_test_exact_prune"
+    config.vector_store = config.vector_store.model_copy(update={"collection": collection})
+    store = SQLiteStore(config.index.db_path)
+    vector_store = get_vector_store(config.vector_store, embeddings_dim=DIM)
+    store.add_documents([
+        _make_doc("removed.md", "# Removed\n\nold content.\n"),
+        _make_doc("kept.md", "# Kept\n\ncurrent content.\n"),
+    ])
+    sync_vector_store(
+        store=store,
+        config=config,
+        provider=StubProvider(),
+        vector_store=vector_store,
+        collection=collection,
+    )
+    removed_ids = set(store.section_ids_for_source("removed.md"))
+    kept_ids = set(store.section_ids_for_source("kept.md"))
+
+    deleted = DocmancerAgent(config=config).prune_vector_chunks(removed_ids)
+
+    assert deleted == len(removed_ids)
+    assert set(store.list_embedding_upserts(collection)) == kept_ids
+    assert vector_store.count(collection) == len(kept_ids)
