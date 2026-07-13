@@ -198,11 +198,15 @@ def _rows() -> list[dict]:
                     "hidden_tests_passed": recommended,
                     "policy_clean": True,
                     "budget": {
+                        "max_input_tokens": 2000,
+                        "max_output_tokens": 1000,
                         "input_tokens_exceeded": False,
                         "output_tokens_exceeded": False,
                     },
                     "metrics": {
                         "total_tokens": 1050 if recommended else 1000,
+                        "input_tokens": 900,
+                        "output_tokens": 100,
                         "wall_time_seconds": 105 if recommended else 100,
                         "tool_output_tokens_estimate": 100,
                         "useful_context_ratio": None,
@@ -241,6 +245,7 @@ def test_report_fails_closed_when_any_lane_cell_is_missing():
 
 def test_report_fails_closed_when_declared_token_budget_is_exceeded():
     rows = _rows()
+    rows[0]["metrics"]["input_tokens"] = 2001
     rows[0]["budget"]["input_tokens_exceeded"] = True
 
     report = build_task23_report(rows, protocol=_protocol())
@@ -248,6 +253,40 @@ def test_report_fails_closed_when_declared_token_budget_is_exceeded():
     assert report["budget_integrity"]["ok"] is False
     assert report["decision"]["decision"] == "INCONCLUSIVE"
     assert "declared_token_budget_exceeded" in report["decision"]["reasons"]
+
+
+@pytest.mark.parametrize(
+    "mutation",
+    [
+        lambda row: row.pop("budget"),
+        lambda row: row["budget"].pop("max_input_tokens"),
+        lambda row: row["budget"].pop("input_tokens_exceeded"),
+        lambda row: row["budget"].update(input_tokens_exceeded=True),
+    ],
+)
+def test_report_fails_closed_when_budget_is_missing_incomplete_or_inconsistent(mutation):
+    rows = _rows()
+    mutation(rows[0])
+
+    report = build_task23_report(rows, protocol=_protocol())
+
+    assert report["budget_integrity"]["ok"] is False
+    assert report["budget_integrity"]["unknown_runs"] == 1
+    assert report["conditions"]["repo_only_strict_offline"]["budget_unknown_runs"] == 1
+    assert report["conditions"]["repo_only_strict_offline"]["input_budget_exceeded_runs"] == 0
+    assert report["decision"]["decision"] == "INCONCLUSIVE"
+    assert "missing_or_invalid_budget_metrics" in report["decision"]["reasons"]
+
+
+def test_report_never_republishes_legacy_useful_context_proxy():
+    rows = _rows()
+    rows[0]["metrics"]["useful_context_ratio"] = 0.75
+
+    report = build_task23_report(rows, protocol=_protocol())
+
+    summary = report["conditions"]["repo_only_strict_offline"]
+    assert summary["median_useful_context_ratio"] is None
+    assert summary["useful_context_ratio_method"] == "not_measured_without_chunk_usage_attribution"
 
 
 def test_report_classifies_missing_runner_output_as_infrastructure_failure():

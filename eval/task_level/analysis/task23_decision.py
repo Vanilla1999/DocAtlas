@@ -37,6 +37,9 @@ def validate_protocol(protocol: dict[str, Any]) -> list[str]:
     errors: list[str] = []
     raw_tasks = protocol.get("tasks")
     tasks = raw_tasks if isinstance(raw_tasks, list) else []
+    task_ids = [str(task.get("task_id") or "") for task in tasks if isinstance(task, dict)]
+    if not task_ids or any(not task_id for task_id in task_ids) or len(set(task_ids)) != len(task_ids):
+        errors.append("unique_nonempty_task_ids_required")
     domains = {
         str(task.get("domain") or task.get("source_project"))
         for task in tasks
@@ -131,9 +134,24 @@ def evaluate_predeclared_rule(
     pairs = _paired_rows(rows, baseline_condition, candidate_condition)
     paired_rows = list(pairs.values())
     expected_repeats = int(protocol.get("repeats_per_task_condition") or 0)
-    counts = Counter(task_id for (task_id, _repeat) in pairs)
-    if not pairs or any(count < expected_repeats for count in counts.values()):
-        reasons.append("incomplete_task_repeat_matrix")
+    expected_pair_keys = {
+        (str(task.get("task_id") or ""), repeat)
+        for task in protocol.get("tasks", [])
+        if isinstance(task, dict)
+        for repeat in range(expected_repeats)
+    }
+    expected_cells = {
+        (task_id, repeat, condition)
+        for task_id, repeat in expected_pair_keys
+        for condition in (baseline_condition, candidate_condition)
+    }
+    actual_cells = Counter(
+        (str(row.get("task_id") or ""), int(row.get("repeat") or 0), str(row.get("condition_id") or ""))
+        for row in rows
+        if row.get("condition_id") in {baseline_condition, candidate_condition}
+    )
+    if set(pairs) != expected_pair_keys or set(actual_cells) != expected_cells or any(count != 1 for count in actual_cells.values()):
+        reasons.append("task_repeat_matrix_mismatch")
     if any(pair[0].get("total_tokens") is None or pair[1].get("total_tokens") is None for pair in paired_rows):
         reasons.append("missing_total_tokens")
     if any(pair[0].get("wall_time_seconds") is None or pair[1].get("wall_time_seconds") is None for pair in paired_rows):

@@ -47,5 +47,5 @@ The pivot may continue only if it improves resolved rate under Task 23's existin
 - Tool-output and context-efficiency metrics have tested, non-aliased definitions.
 - The compact packet is source-attributed, at most 2,000 estimated tokens, and invoked no more than once before editing.
 - The frozen rerun is complete and produces `CONTINUE`, `PIVOT_REQUIRED`, or `INCONCLUSIVE` without post-result threshold changes.
-- Runner and DocAtlas visibility canaries pass in the same causal invocation; declared input/output token budget overruns force `INCONCLUSIVE`.
+- Runner and DocAtlas visibility canaries pass in the same causal invocation; missing, invalid, inconsistent, or exceeded input/output token budgets force `INCONCLUSIVE`.
 - Product claims and Stage D status match the result; focused suites and `git diff --check` pass.

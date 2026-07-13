@@ -38,6 +38,29 @@ def _failure_reason(row: dict[str, Any]) -> str:
     return str(row.get("status") or "unknown")
 
 
+def _valid_budget(row: dict[str, Any]) -> dict[str, Any] | None:
+    budget = row.get("budget")
+    metrics = row.get("metrics")
+    if not isinstance(budget, dict) or not isinstance(metrics, dict):
+        return None
+    max_input = budget.get("max_input_tokens")
+    max_output = budget.get("max_output_tokens")
+    input_tokens = metrics.get("input_tokens")
+    output_tokens = metrics.get("output_tokens")
+    input_exceeded = budget.get("input_tokens_exceeded")
+    output_exceeded = budget.get("output_tokens_exceeded")
+    numeric_values = (max_input, max_output, input_tokens, output_tokens)
+    if any(not isinstance(value, int) or isinstance(value, bool) for value in numeric_values):
+        return None
+    if max_input <= 0 or max_output <= 0 or input_tokens < 0 or output_tokens < 0:
+        return None
+    if not isinstance(input_exceeded, bool) or not isinstance(output_exceeded, bool):
+        return None
+    if input_exceeded != (input_tokens > max_input) or output_exceeded != (output_tokens > max_output):
+        return None
+    return budget
+
+
 def build_task23_report(
     rows: list[dict[str, Any]],
     *,
@@ -80,9 +103,16 @@ def build_task23_report(
             _failure_reason(row) for row in selected_rows if is_infrastructure_failure(row)
         }))
         decision["reasons"] = list(dict.fromkeys(decision["reasons"]))
-    budget_known_runs = sum(isinstance(row.get("budget"), dict) and bool(row.get("budget")) for row in selected_rows)
-    input_budget_exceeded_runs = sum(bool((row.get("budget") or {}).get("input_tokens_exceeded")) for row in selected_rows)
-    output_budget_exceeded_runs = sum(bool((row.get("budget") or {}).get("output_tokens_exceeded")) for row in selected_rows)
+    budget_rows = [row for row in selected_rows if not is_infrastructure_failure(row)]
+    valid_budgets = [_valid_budget(row) for row in budget_rows]
+    budget_known_runs = sum(budget is not None for budget in valid_budgets)
+    budget_unknown_runs = len(budget_rows) - budget_known_runs
+    input_budget_exceeded_runs = sum(bool(budget and budget["input_tokens_exceeded"]) for budget in valid_budgets)
+    output_budget_exceeded_runs = sum(bool(budget and budget["output_tokens_exceeded"]) for budget in valid_budgets)
+    if budget_unknown_runs:
+        decision["decision"] = "INCONCLUSIVE"
+        decision.setdefault("reasons", []).append("missing_or_invalid_budget_metrics")
+        decision["reasons"] = list(dict.fromkeys(decision["reasons"]))
     if input_budget_exceeded_runs or output_budget_exceeded_runs:
         decision["decision"] = "INCONCLUSIVE"
         decision.setdefault("reasons", []).append("declared_token_budget_exceeded")
@@ -93,6 +123,7 @@ def build_task23_report(
     for condition in conditions:
         condition_rows = [row for row in selected_rows if row.get("condition_id") == condition]
         valid_rows = [row for row in condition_rows if not is_infrastructure_failure(row)]
+        condition_budgets = [_valid_budget(row) for row in valid_rows]
         full_coverage = len(valid_rows) == len(condition_rows)
         condition_summaries[condition] = {
             "runs": len(condition_rows),
@@ -113,14 +144,16 @@ def build_task23_report(
             "median_tool_output_tokens_estimate": _median([_metric(row, "tool_output_tokens_estimate") for row in valid_rows]),
             "median_condition_setup_wall_time_seconds": _median([_metric(row, "condition_setup_wall_time_seconds") for row in valid_rows]),
             "median_required_evidence_recall": _median([_metric(row, "required_evidence_recall") for row in valid_rows]),
-            "median_useful_context_ratio": _median([_metric(row, "useful_context_ratio") for row in valid_rows]),
+            "median_useful_context_ratio": None,
             "useful_context_ratio_method": "not_measured_without_chunk_usage_attribution",
             "median_docs_output_evidence_coverage": _median([_metric(row, "docs_output_evidence_coverage") for row in valid_rows]),
             "median_first_required_evidence_rank": _median([_metric(row, "first_required_evidence_rank") for row in valid_rows]),
             "median_audited_external_context_tokens": _median([_metric(row, "audited_external_context_tokens") for row in valid_rows]),
             "policy_violations": sum(not bool(row.get("policy_clean")) for row in condition_rows),
-            "input_budget_exceeded_runs": sum(bool((row.get("budget") or {}).get("input_tokens_exceeded")) for row in valid_rows),
-            "output_budget_exceeded_runs": sum(bool((row.get("budget") or {}).get("output_tokens_exceeded")) for row in valid_rows),
+            "budget_known_runs": sum(budget is not None for budget in condition_budgets),
+            "budget_unknown_runs": sum(budget is None for budget in condition_budgets),
+            "input_budget_exceeded_runs": sum(bool(budget and budget["input_tokens_exceeded"]) for budget in condition_budgets),
+            "output_budget_exceeded_runs": sum(bool(budget and budget["output_tokens_exceeded"]) for budget in condition_budgets),
         }
         failure_taxonomy[condition] = dict(sorted(Counter(
             _failure_reason(row) for row in condition_rows if not row.get("resolved")
@@ -143,9 +176,10 @@ def build_task23_report(
             "infrastructure_failed_runs": infrastructure_failed_runs,
         },
         "budget_integrity": {
-            "ok": input_budget_exceeded_runs == 0 and output_budget_exceeded_runs == 0,
+            "ok": budget_unknown_runs == 0 and input_budget_exceeded_runs == 0 and output_budget_exceeded_runs == 0,
+            "expected_runs": len(budget_rows),
             "known_runs": budget_known_runs,
-            "unknown_runs": len(selected_rows) - budget_known_runs,
+            "unknown_runs": budget_unknown_runs,
             "input_budget_exceeded_runs": input_budget_exceeded_runs,
             "output_budget_exceeded_runs": output_budget_exceeded_runs,
             "max_turns_enforced_by_runner": False,

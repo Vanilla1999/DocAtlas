@@ -9,6 +9,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from eval.task_level.artifact_hygiene import is_runtime_artifact
 from eval.task_level.schemas import TASK_LEVEL_ROOT, VALIDATION_ROOT, TaskSpec
 
 
@@ -103,7 +104,10 @@ def copy_hidden_tests(task_id: str, workspace: Path) -> Path:
 def fixture_hash(path: Path) -> str:
     digest = hashlib.sha256()
     for file_path in sorted(p for p in path.rglob("*") if p.is_file()):
-        digest.update(str(file_path.relative_to(path)).encode())
+        relative = str(file_path.relative_to(path))
+        if is_runtime_artifact(relative):
+            continue
+        digest.update(relative.encode())
         digest.update(file_path.read_bytes())
     return digest.hexdigest()
 

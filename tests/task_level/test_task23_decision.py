@@ -58,7 +58,7 @@ def _protocol(*, domains: list[str] | None = None, repeats: int = 3) -> dict:
 def _rows(*, doc_resolved: list[bool], base_resolved: list[bool], doc_tokens: int, base_tokens: int, doc_latency: float, base_latency: float) -> list[dict]:
     rows: list[dict] = []
     for index, (base, doc) in enumerate(zip(base_resolved, doc_resolved, strict=True)):
-        task_id = f"task_{index // 3}"
+        task_id = f"task_{index // 3 + 1}"
         repeat = index % 3
         rows.extend(
             [
@@ -88,6 +88,16 @@ def test_frozen_protocol_matches_fixture_oracle_and_context_artifacts():
             ("external_context_sha256", PROJECT_ROOT / "eval/task_level/external_context" / f"{task_id}.json"),
         ):
             assert hashlib.sha256(path.read_bytes()).hexdigest() == task[field]
+
+
+def test_fixture_hash_ignores_runtime_cache_artifacts(tmp_path):
+    (tmp_path / "source.py").write_text("VALUE = 1\n", encoding="utf-8")
+    expected = fixture_hash(tmp_path)
+    cache = tmp_path / "__pycache__"
+    cache.mkdir()
+    (cache / "source.cpython-312.pyc").write_bytes(b"runtime cache")
+
+    assert fixture_hash(tmp_path) == expected
 
 
 def test_protocol_amendment_replaces_only_screening_rejection_without_changing_rules():
@@ -202,10 +212,17 @@ def test_protocol_requires_immutable_fixture_oracle_and_external_context_hashes(
     assert "immutable_task_artifact_missing:task_3:oracle_sha256" in errors
 
 
+def test_protocol_requires_unique_nonempty_task_ids():
+    protocol = _protocol()
+    protocol["tasks"][1]["task_id"] = protocol["tasks"][0]["task_id"]
+
+    assert "unique_nonempty_task_ids_required" in validate_protocol(protocol)
+
+
 def test_quality_threshold_requires_confidence_interval_to_clear_ten_points():
     rows = _rows(
-        base_resolved=[False] * 12,
-        doc_resolved=[True] * 12,
+        base_resolved=[False] * 9,
+        doc_resolved=[True] * 9,
         base_tokens=1000,
         doc_tokens=1050,
         base_latency=100,
@@ -220,7 +237,7 @@ def test_quality_threshold_requires_confidence_interval_to_clear_ten_points():
 
 
 def test_token_efficiency_threshold_accepts_equivalent_success_with_lower_cost():
-    resolved = [True, False] * 6
+    resolved = [True, False, True] * 3
     rows = _rows(
         base_resolved=resolved,
         doc_resolved=resolved,
@@ -251,23 +268,28 @@ def test_decision_fails_closed_when_metrics_or_repeats_are_incomplete():
     result = evaluate_predeclared_rule(rows, protocol=_protocol())
 
     assert result["decision"] == "INCONCLUSIVE"
-    assert "incomplete_task_repeat_matrix" in result["reasons"]
+    assert "task_repeat_matrix_mismatch" in result["reasons"]
     assert "missing_total_tokens" in result["reasons"]
 
 
 def test_token_change_uses_condition_medians_not_mean_of_pair_ratios():
     rows = _rows(
-        base_resolved=[False, False, False],
-        doc_resolved=[False, False, False],
+        base_resolved=[False] * 9,
+        doc_resolved=[False] * 9,
         base_tokens=100,
         doc_tokens=90,
         base_latency=100,
         doc_latency=100,
     )
-    baseline = next(row for row in rows if row["condition_id"] == "repo_only_strict_offline" and row["repeat"] == 2)
-    candidate = next(row for row in rows if row["condition_id"] == "docatlas_tool_recommended" and row["repeat"] == 2)
-    baseline["total_tokens"] = 1000
-    candidate["total_tokens"] = 2000
+    baseline_rows = [row for row in rows if row["condition_id"] == "repo_only_strict_offline"]
+    candidate_by_pair = {
+        (row["task_id"], row["repeat"]): row
+        for row in rows
+        if row["condition_id"] == "docatlas_tool_recommended"
+    }
+    for baseline in baseline_rows[:4]:
+        baseline["total_tokens"] = 1000
+        candidate_by_pair[(baseline["task_id"], baseline["repeat"])]["total_tokens"] = 2000
 
     result = evaluate_predeclared_rule(rows, protocol=_protocol())
 
@@ -280,3 +302,38 @@ def test_protocol_rejects_changed_predeclared_numeric_rule():
 
     with pytest.raises(ValueError, match="predeclared_decision_rule_mismatch"):
         evaluate_predeclared_rule([], protocol=protocol)
+
+
+def test_decision_rejects_rows_for_tasks_not_in_protocol():
+    rows = _rows(
+        base_resolved=[False] * 9,
+        doc_resolved=[True] * 9,
+        base_tokens=1000,
+        doc_tokens=900,
+        base_latency=100,
+        doc_latency=90,
+    )
+    for row in rows:
+        row["task_id"] = "unexpected_" + str(row["task_id"])
+
+    result = evaluate_predeclared_rule(rows, protocol=_protocol())
+
+    assert result["decision"] == "INCONCLUSIVE"
+    assert "task_repeat_matrix_mismatch" in result["reasons"]
+
+
+def test_decision_rejects_duplicate_task_repeat_lane():
+    rows = _rows(
+        base_resolved=[False] * 9,
+        doc_resolved=[True] * 9,
+        base_tokens=1000,
+        doc_tokens=900,
+        base_latency=100,
+        doc_latency=90,
+    )
+    rows.append(dict(rows[0]))
+
+    result = evaluate_predeclared_rule(rows, protocol=_protocol())
+
+    assert result["decision"] == "INCONCLUSIVE"
+    assert "task_repeat_matrix_mismatch" in result["reasons"]
