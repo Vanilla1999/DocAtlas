@@ -121,11 +121,11 @@ def validate_task(task: TaskSpec) -> dict[str, Any]:
     return _write_validation(task, "external_repo_not_checked_out", {"repo": task.repo}).read_text(encoding="utf-8")
 
 
-def select_runner(runner_id: str):
+def select_runner(runner_id: str, *, codex_sandbox_mode: str = "workspace-write"):
     if runner_id == "claude":
         return ClaudeRunner()
     if runner_id == "codex":
-        return CodexRunner()
+        return CodexRunner(sandbox_mode=codex_sandbox_mode)
     if runner_id == "opencode":
         return OpenCodeRunner()
     raise SystemExit(f"Unknown runner: {runner_id}")
@@ -309,6 +309,11 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--patch-constraints-targeted-pilot", action="store_true")
     parser.add_argument("--accepted-pool", type=Path)
     parser.add_argument("--runner", default="claude")
+    parser.add_argument(
+        "--codex-sandbox-mode",
+        choices=("workspace-write", "danger-full-access"),
+        default="workspace-write",
+    )
     parser.add_argument("--tasks", nargs="*")
     parser.add_argument("--smoke", action="store_true")
     parser.add_argument("--conditions", nargs="*", default=list(DEFAULT_CONDITIONS))
@@ -336,9 +341,11 @@ def main(argv: list[str] | None = None) -> int:
         "decision": "ITERATE: harness and task manifest are ready; execute with verified independent runner before product claims.",
     }
 
-    runner = select_runner(args.runner)
+    runner = select_runner(args.runner, codex_sandbox_mode=args.codex_sandbox_mode)
     capabilities = runner.verify()
     metadata["runner_verification"] = runner_verification_payload(capabilities)
+    if args.runner == "codex":
+        metadata["runner_verification"]["sandbox_mode"] = args.codex_sandbox_mode
     (run_dir / "metadata.json").write_text(json.dumps(metadata, indent=2, sort_keys=True), encoding="utf-8")
 
     if args.materialize:

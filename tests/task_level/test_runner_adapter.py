@@ -163,6 +163,35 @@ def test_codex_runner_uses_workspace_write_sandbox(tmp_path: Path, monkeypatch: 
     assert command[command.index("--sandbox") + 1] == "workspace-write"
 
 
+def test_codex_runner_allows_explicit_sandbox_override(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+    captured: list[list[str]] = []
+
+    def fake_run(command, **kwargs):
+        captured.append(command)
+        return subprocess.CompletedProcess(command, 0, '{"type":"turn.completed","usage":{"input_tokens":1,"output_tokens":1}}\n', "")
+
+    monkeypatch.setattr(subprocess, "run", fake_run)
+    request = AgentRunRequest(
+        task_id="task",
+        condition_id="repo_only_strict_offline",
+        prompt="fix it",
+        workspace=tmp_path,
+        model="model",
+        timeout_seconds=30,
+        max_turns=1,
+        environment={},
+        mcp_config_path=None,
+        tool_policy_path=tmp_path / "policy.json",
+        output_dir=tmp_path / "out",
+    )
+
+    from eval.task_level.runners.codex import CodexRunner
+    CodexRunner("codex", sandbox_mode="danger-full-access").run(request)
+
+    command = next(command for command in captured if "exec" in command)
+    assert command[command.index("--sandbox") + 1] == "danger-full-access"
+
+
 def test_codex_detects_error_event_stream_with_provider_403_as_failure():
     stdout = "\n".join([
         '{"type":"thread.started","thread_id":"thread-1"}',

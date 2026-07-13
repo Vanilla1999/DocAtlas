@@ -16,8 +16,11 @@ from .base import AgentRunOutput, AgentRunRequest, RunnerCapabilities
 class CodexRunner:
     runner_id = "codex"
 
-    def __init__(self, executable: str = "codex") -> None:
+    def __init__(self, executable: str = "codex", *, sandbox_mode: str = "workspace-write") -> None:
+        if sandbox_mode not in {"workspace-write", "danger-full-access"}:
+            raise ValueError(f"Unsupported Codex sandbox mode: {sandbox_mode}")
         self.executable = executable
+        self.sandbox_mode = sandbox_mode
 
     def _version(self) -> str:
         if not shutil.which(self.executable):
@@ -71,7 +74,7 @@ class CodexRunner:
             "--model",
             request.model,
             "--sandbox",
-            "workspace-write",
+            self.sandbox_mode,
             "--cd",
             str(request.workspace),
             request.prompt,
