@@ -101,14 +101,22 @@ def copy_hidden_tests(task_id: str, workspace: Path) -> Path:
     return target
 
 
-def fixture_hash(path: Path) -> str:
+def fixture_hash(path: Path, *, algorithm: str = "sha256-length-prefixed-v2") -> str:
+    if algorithm not in {"sha256-concat-v1", "sha256-length-prefixed-v2"}:
+        raise ValueError(f"Unsupported fixture hash algorithm: {algorithm}")
     digest = hashlib.sha256()
     for file_path in sorted(p for p in path.rglob("*") if p.is_file()):
         relative = str(file_path.relative_to(path))
         if is_runtime_artifact(relative):
             continue
-        digest.update(relative.encode())
-        digest.update(file_path.read_bytes())
+        content = file_path.read_bytes()
+        relative_bytes = relative.encode()
+        if algorithm == "sha256-length-prefixed-v2":
+            digest.update(len(relative_bytes).to_bytes(8, "big"))
+        digest.update(relative_bytes)
+        if algorithm == "sha256-length-prefixed-v2":
+            digest.update(len(content).to_bytes(8, "big"))
+        digest.update(content)
     return digest.hexdigest()
 
 

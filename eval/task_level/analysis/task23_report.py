@@ -8,6 +8,7 @@ from collections import Counter
 from pathlib import Path
 from statistics import mean, median
 from typing import Any
+from uuid import uuid4
 
 from eval.task_level.analysis.task23_decision import apply_protocol_amendment, evaluate_predeclared_rule, validate_protocol_amendment_artifacts
 from eval.task_level.execution import is_infrastructure_failure
@@ -38,6 +39,17 @@ def _failure_reason(row: dict[str, Any]) -> str:
     return str(row.get("status") or "unknown")
 
 
+def _matrix_cell(row: dict[str, Any]) -> tuple[Any, Any, Any]:
+    task_id = row.get("task_id")
+    condition_id = row.get("condition_id")
+    repeat = row.get("repeat")
+    return (
+        task_id if isinstance(task_id, str) else f"<invalid task_id:{task_id!r}>",
+        condition_id if isinstance(condition_id, str) else f"<invalid condition_id:{condition_id!r}>",
+        repeat if type(repeat) is int else f"<invalid repeat:{repeat!r}>",
+    )
+
+
 def _valid_budget(row: dict[str, Any]) -> dict[str, Any] | None:
     budget = row.get("budget")
     metrics = row.get("metrics")
@@ -45,14 +57,15 @@ def _valid_budget(row: dict[str, Any]) -> dict[str, Any] | None:
         return None
     max_input = budget.get("max_input_tokens")
     max_output = budget.get("max_output_tokens")
+    max_turns = budget.get("max_turns")
     input_tokens = metrics.get("input_tokens")
     output_tokens = metrics.get("output_tokens")
     input_exceeded = budget.get("input_tokens_exceeded")
     output_exceeded = budget.get("output_tokens_exceeded")
-    numeric_values = (max_input, max_output, input_tokens, output_tokens)
+    numeric_values = (max_input, max_output, max_turns, input_tokens, output_tokens)
     if any(not isinstance(value, int) or isinstance(value, bool) for value in numeric_values):
         return None
-    if max_input <= 0 or max_output <= 0 or input_tokens < 0 or output_tokens < 0:
+    if max_input <= 0 or max_output <= 0 or max_turns <= 0 or input_tokens < 0 or output_tokens < 0:
         return None
     if not isinstance(input_exceeded, bool) or not isinstance(output_exceeded, bool):
         return None
@@ -72,19 +85,16 @@ def build_task23_report(
     conditions = list(effective["conditions"])
     repeats = int(effective["repeats_per_task_condition"])
     expected_cells = {(task_id, condition, repeat) for task_id in task_ids for condition in conditions for repeat in range(repeats)}
-    actual_cells = [
-        (row.get("task_id"), row.get("condition_id"), row.get("repeat"))
-        for row in rows
-        if row.get("task_id") in task_ids and row.get("condition_id") in conditions
-    ]
+    actual_cells = [_matrix_cell(row) for row in rows]
     counts = Counter(actual_cells)
     missing = sorted(expected_cells - set(actual_cells))
-    duplicates = sorted(cell for cell, count in counts.items() if count != 1)
+    duplicates = sorted((cell for cell, count in counts.items() if count != 1), key=repr)
+    unexpected = sorted((cell for cell in counts if cell not in expected_cells), key=repr)
     selected_rows = [
         row for row in rows
-        if row.get("task_id") in task_ids and row.get("condition_id") in conditions
+        if _matrix_cell(row) in expected_cells
     ]
-    integrity_ok = not missing and not duplicates and len(selected_rows) == len(expected_cells)
+    integrity_ok = not missing and not duplicates and not unexpected and len(rows) == len(expected_cells)
 
     decision_rows = []
     for row in selected_rows:
@@ -109,6 +119,11 @@ def build_task23_report(
     budget_unknown_runs = len(budget_rows) - budget_known_runs
     input_budget_exceeded_runs = sum(bool(budget and budget["input_tokens_exceeded"]) for budget in valid_budgets)
     output_budget_exceeded_runs = sum(bool(budget and budget["output_tokens_exceeded"]) for budget in valid_budgets)
+    max_turns_unenforced_runs = sum(
+        not isinstance(row.get("budget"), dict)
+        or row["budget"].get("max_turns_enforced_by_runner") is not True
+        for row in budget_rows
+    )
     if budget_unknown_runs:
         decision["decision"] = "INCONCLUSIVE"
         decision.setdefault("reasons", []).append("missing_or_invalid_budget_metrics")
@@ -116,6 +131,10 @@ def build_task23_report(
     if input_budget_exceeded_runs or output_budget_exceeded_runs:
         decision["decision"] = "INCONCLUSIVE"
         decision.setdefault("reasons", []).append("declared_token_budget_exceeded")
+        decision["reasons"] = list(dict.fromkeys(decision["reasons"]))
+    if max_turns_unenforced_runs:
+        decision["decision"] = "INCONCLUSIVE"
+        decision.setdefault("reasons", []).append("max_turn_budget_not_enforced")
         decision["reasons"] = list(dict.fromkeys(decision["reasons"]))
 
     condition_summaries: dict[str, Any] = {}
@@ -154,6 +173,11 @@ def build_task23_report(
             "budget_unknown_runs": sum(budget is None for budget in condition_budgets),
             "input_budget_exceeded_runs": sum(bool(budget and budget["input_tokens_exceeded"]) for budget in condition_budgets),
             "output_budget_exceeded_runs": sum(bool(budget and budget["output_tokens_exceeded"]) for budget in condition_budgets),
+            "max_turns_unenforced_runs": sum(
+                not isinstance(row.get("budget"), dict)
+                or row["budget"].get("max_turns_enforced_by_runner") is not True
+                for row in valid_rows
+            ),
         }
         failure_taxonomy[condition] = dict(sorted(Counter(
             _failure_reason(row) for row in condition_rows if not row.get("resolved")
@@ -166,9 +190,10 @@ def build_task23_report(
         "artifact_integrity": {
             "ok": integrity_ok,
             "expected_runs": len(expected_cells),
-            "actual_runs": len(selected_rows),
+            "actual_runs": len(rows),
             "missing_cells": [list(cell) for cell in missing],
             "duplicate_cells": [list(cell) for cell in duplicates],
+            "unexpected_cells": [list(cell) for cell in unexpected],
         },
         "runtime_integrity": {
             "ok": integrity_ok and infrastructure_failed_runs == 0,
@@ -176,13 +201,18 @@ def build_task23_report(
             "infrastructure_failed_runs": infrastructure_failed_runs,
         },
         "budget_integrity": {
-            "ok": budget_unknown_runs == 0 and input_budget_exceeded_runs == 0 and output_budget_exceeded_runs == 0,
+            "ok": (
+                budget_unknown_runs == 0
+                and input_budget_exceeded_runs == 0
+                and output_budget_exceeded_runs == 0
+                and max_turns_unenforced_runs == 0
+            ),
             "expected_runs": len(budget_rows),
             "known_runs": budget_known_runs,
             "unknown_runs": budget_unknown_runs,
             "input_budget_exceeded_runs": input_budget_exceeded_runs,
             "output_budget_exceeded_runs": output_budget_exceeded_runs,
-            "max_turns_enforced_by_runner": False,
+            "max_turns_unenforced_runs": max_turns_unenforced_runs,
         },
         "conditions": condition_summaries,
         "failure_taxonomy": failure_taxonomy,
@@ -210,7 +240,10 @@ def _load_jsonl(path: Path) -> list[dict[str, Any]]:
     return [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
 
 
-_LOCAL_PATH = re.compile(r"(?:/(?:home|tmp|workspace|root|Users|private)/|/var/folders/|[A-Za-z]:\\)", re.IGNORECASE)
+_LOCAL_PATH = re.compile(
+    r"(?:/(?:home|tmp|workspace|root|Users|private|etc)/|/var/folders/|(?<![A-Za-z0-9_])[A-Za-z]:\\|\\\\[A-Za-z0-9._$-]+\\[A-Za-z0-9._$-]+)",
+    re.IGNORECASE,
+)
 _CREDENTIAL_LIKE = re.compile(
     r"(?:(?:ghp_|github_pat_|sk-)[A-Za-z0-9_-]{8,}|Bearer\s+(?!<redacted>)[^\s]+|https?://[^\s/@]+:[^\s/@]+@)",
     re.IGNORECASE,
@@ -339,6 +372,47 @@ def _load_json_list_strict(path: Path) -> list[dict[str, Any]]:
     return value
 
 
+def _publish_report_artifacts(
+    report: dict[str, Any],
+    rows: list[dict[str, Any]],
+    run_dir: Path,
+    output: Path,
+    sanitized_bundle: Path,
+    *,
+    protocol: dict[str, Any],
+) -> None:
+    output.parent.mkdir(parents=True, exist_ok=True)
+    token = uuid4().hex
+    staged_output = output.with_name(f".{output.name}.{token}.tmp")
+    staged_bundle = sanitized_bundle.with_name(f".{sanitized_bundle.name}.{token}.tmp")
+    try:
+        report["sanitized_bundle_integrity"] = write_sanitized_run_bundle(
+            rows,
+            run_dir,
+            staged_bundle,
+            protocol=protocol,
+        )
+        staged_bundle_sha256 = hashlib.sha256(staged_bundle.read_bytes()).hexdigest()
+        report.setdefault("source_artifacts", {})["sanitized_runs_sha256"] = staged_bundle_sha256
+        report["sanitized_bundle_integrity"]["sha256"] = staged_bundle_sha256
+        report["sanitized_bundle_integrity"]["path"] = sanitized_bundle.name
+
+        if sanitized_bundle.exists():
+            published_sha256 = hashlib.sha256(sanitized_bundle.read_bytes()).hexdigest()
+            if published_sha256 != staged_bundle_sha256:
+                raise FileExistsError(
+                    f"Refusing to overwrite immutable sanitized bundle: {sanitized_bundle}"
+                )
+        else:
+            staged_bundle.replace(sanitized_bundle)
+
+        staged_output.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+        staged_output.replace(output)
+    finally:
+        staged_output.unlink(missing_ok=True)
+        staged_bundle.unlink(missing_ok=True)
+
+
 def _retry_provenance(run_dir: Path) -> dict[str, Any]:
     cells: dict[tuple[str, str, int], list[dict[str, Any]]] = {}
     for attempt_dir in sorted(run_dir.glob("*/*/repeat_*/attempts/attempt_*")):
@@ -432,21 +506,20 @@ def main() -> int:
         report["retry_provenance"] = retry_provenance
     output = args.output or args.run_dir / "task23_report.json"
     bundle_path = output.with_name(output.stem + "_runs.sanitized.jsonl")
-    report["sanitized_bundle_integrity"] = write_sanitized_run_bundle(
-        rows,
-        args.run_dir,
-        bundle_path,
-        protocol=effective_protocol,
-    )
     report["source_artifacts"] = _source_artifact_hashes(
         args.run_dir / "runs.jsonl",
         args.protocol,
         args.amendment,
         args.replacement_screening,
-        bundle_path,
     )
-    output.parent.mkdir(parents=True, exist_ok=True)
-    output.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    _publish_report_artifacts(
+        report,
+        rows,
+        args.run_dir,
+        output,
+        bundle_path,
+        protocol=effective_protocol,
+    )
     print(output)
     return 0
 

@@ -82,7 +82,10 @@ def test_frozen_protocol_matches_fixture_oracle_and_context_artifacts():
     assert validate_protocol(protocol) == []
     for task in protocol["tasks"]:
         task_id = task["task_id"]
-        assert fixture_hash(PROJECT_ROOT / "eval/task_level/fixtures/templates" / task_id) == task["fixture_hash"]
+        assert fixture_hash(
+            PROJECT_ROOT / "eval/task_level/fixtures/templates" / task_id,
+            algorithm="sha256-concat-v1",
+        ) == task["fixture_hash"]
         for field, path in (
             ("oracle_sha256", PROJECT_ROOT / "eval/task_level/oracles" / f"{task_id}.patch"),
             ("external_context_sha256", PROJECT_ROOT / "eval/task_level/external_context" / f"{task_id}.json"),
@@ -98,6 +101,17 @@ def test_fixture_hash_ignores_runtime_cache_artifacts(tmp_path):
     (cache / "source.cpython-312.pyc").write_bytes(b"runtime cache")
 
     assert fixture_hash(tmp_path) == expected
+
+
+def test_fixture_hash_distinguishes_path_content_boundaries(tmp_path):
+    fixture_a = tmp_path / "fixture_a"
+    fixture_b = tmp_path / "fixture_b"
+    fixture_a.mkdir()
+    fixture_b.mkdir()
+    (fixture_a / "a").write_bytes(b"bc")
+    (fixture_b / "ab").write_bytes(b"c")
+
+    assert fixture_hash(fixture_a) != fixture_hash(fixture_b)
 
 
 def test_protocol_amendment_replaces_only_screening_rejection_without_changing_rules():
@@ -143,7 +157,10 @@ def test_checked_in_protocol_amendment_matches_replacement_artifacts():
     effective = apply_protocol_amendment(protocol, amendment)
     replacement = amendment["replacement_task"]
     task_id = replacement["task_id"]
-    assert fixture_hash(PROJECT_ROOT / "eval/task_level/fixtures/templates" / task_id) == replacement["fixture_hash"]
+    assert fixture_hash(
+        PROJECT_ROOT / "eval/task_level/fixtures/templates" / task_id,
+        algorithm="sha256-concat-v1",
+    ) == replacement["fixture_hash"]
     assert hashlib.sha256((PROJECT_ROOT / "eval/task_level/oracles" / f"{task_id}.patch").read_bytes()).hexdigest() == replacement["oracle_sha256"]
     assert hashlib.sha256((PROJECT_ROOT / "eval/task_level/external_context" / f"{task_id}.json").read_bytes()).hexdigest() == replacement["external_context_sha256"]
     assert task_id in {task["task_id"] for task in effective["tasks"]}
@@ -270,6 +287,25 @@ def test_decision_fails_closed_when_metrics_or_repeats_are_incomplete():
     assert result["decision"] == "INCONCLUSIVE"
     assert "task_repeat_matrix_mismatch" in result["reasons"]
     assert "missing_total_tokens" in result["reasons"]
+
+
+@pytest.mark.parametrize("invalid_repeat", ["0", [0], True])
+def test_decision_fails_closed_on_invalid_repeat_indices(invalid_repeat):
+    rows = _rows(
+        base_resolved=[False] * 9,
+        doc_resolved=[False] * 9,
+        base_tokens=1000,
+        doc_tokens=1000,
+        base_latency=100,
+        doc_latency=100,
+    )
+    for row in rows:
+        row["repeat"] = invalid_repeat
+
+    result = evaluate_predeclared_rule(rows, protocol=_protocol())
+
+    assert result["decision"] == "INCONCLUSIVE"
+    assert "task_repeat_matrix_mismatch" in result["reasons"]
 
 
 def test_token_change_uses_condition_medians_not_mean_of_pair_ratios():

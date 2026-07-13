@@ -71,7 +71,7 @@ Do not publish a Stable release before every Stage A implementation and separate
 
 ### Stage D — conditional external-library expansion
 
-Paused by Task 23's `PIVOT_REQUIRED` result. Do not start this stage until Task 33 produces a new frozen benchmark that meets its decision gate. Context7/web remains the complementary external-library source during the pause.
+Paused because Task 23 is formally `INCONCLUSIVE` under the hardened budget gate. Do not start this stage until Task 33 produces an evidence-complete frozen benchmark that meets its decision gate. Context7/web remains the complementary external-library source during the pause.
 
 17. `16_EXACT_SOURCE_CATALOG_AND_CACHE.md`
 18. `17_LOCKFILE_WORKSPACE_VERSION_IDENTITY.md`

@@ -4,7 +4,13 @@ import hashlib
 
 import pytest
 
-from eval.task_level.analysis.task23_report import _retry_provenance, _source_artifact_hashes, build_task23_report, write_sanitized_run_bundle
+from eval.task_level.analysis.task23_report import (
+    _publish_report_artifacts,
+    _retry_provenance,
+    _source_artifact_hashes,
+    build_task23_report,
+    write_sanitized_run_bundle,
+)
 
 
 CONDITIONS = [
@@ -114,6 +120,38 @@ def test_sanitized_bundle_rejects_local_paths_inside_trajectory(tmp_path):
         }], tmp_path / "run", tmp_path / "bundle.jsonl")
 
 
+def test_sanitized_bundle_allows_file_marker_ending_in_backslash(tmp_path):
+    cell = tmp_path / "run" / "task_a" / "condition_a" / "repeat_0"
+    cell.mkdir(parents=True)
+    (cell / "patch.diff").write_text("diff --git a/a b/a\n", encoding="utf-8")
+    (cell / "trajectory.normalized.json").write_text(
+        __import__("json").dumps([{"result_summary": "FILE:\\"}]), encoding="utf-8",
+    )
+
+    integrity = write_sanitized_run_bundle([{
+        "task_id": "task_a", "condition_id": "condition_a", "repeat": 0,
+        "status": "completed", "metrics": {"total_tokens": 1},
+    }], tmp_path / "run", tmp_path / "bundle.jsonl")
+
+    assert integrity["integrity_ok"] is True
+
+
+@pytest.mark.parametrize("local_path", ["E:\\private\\file.txt", "/etc/passwd", "\\\\server\\share\\secret"])
+def test_sanitized_bundle_rejects_absolute_local_paths(tmp_path, local_path):
+    cell = tmp_path / "run" / "task_a" / "condition_a" / "repeat_0"
+    cell.mkdir(parents=True)
+    (cell / "patch.diff").write_text("diff --git a/a b/a\n", encoding="utf-8")
+    (cell / "trajectory.normalized.json").write_text(
+        __import__("json").dumps([{"result_summary": f"read {local_path}"}]), encoding="utf-8",
+    )
+
+    with pytest.raises(ValueError, match="Unsanitized"):
+        write_sanitized_run_bundle([{
+            "task_id": "task_a", "condition_id": "condition_a", "repeat": 0,
+            "status": "completed", "metrics": {"total_tokens": 1},
+        }], tmp_path / "run", tmp_path / "bundle.jsonl")
+
+
 def test_sanitized_bundle_requires_protocol_identifiers(tmp_path):
     cell = tmp_path / "run" / "task_a" / "condition_a" / "repeat_0"
     cell.mkdir(parents=True)
@@ -142,6 +180,83 @@ def test_sanitized_bundle_allows_local_path_literal_in_patch_body(tmp_path):
     }], tmp_path / "run", tmp_path / "bundle.jsonl")
 
     assert integrity["integrity_ok"] is True
+
+
+def test_report_publication_preserves_previous_artifacts_when_staging_fails(tmp_path, monkeypatch):
+    output = tmp_path / "report.json"
+    bundle = tmp_path / "report_runs.sanitized.jsonl"
+    output.write_text("old report", encoding="utf-8")
+    bundle.write_text("old bundle", encoding="utf-8")
+
+    def fail_bundle(*args, **kwargs):
+        raise ValueError("staging failed")
+
+    monkeypatch.setattr(
+        "eval.task_level.analysis.task23_report.write_sanitized_run_bundle",
+        fail_bundle,
+    )
+
+    with pytest.raises(ValueError, match="staging failed"):
+        _publish_report_artifacts({}, [], tmp_path, output, bundle, protocol={})
+
+    assert output.read_text(encoding="utf-8") == "old report"
+    assert bundle.read_text(encoding="utf-8") == "old bundle"
+    assert not list(tmp_path.glob("*.tmp"))
+
+
+def test_report_publication_preserves_consistent_pair_when_report_replace_fails(tmp_path, monkeypatch):
+    output = tmp_path / "report.json"
+    bundle = tmp_path / "report_runs.sanitized.jsonl"
+    old_bundle = b"old bundle"
+    old_hash = hashlib.sha256(old_bundle).hexdigest()
+    old_report = {"source_artifacts": {"sanitized_runs_sha256": old_hash}}
+    output.write_text(__import__("json").dumps(old_report), encoding="utf-8")
+    bundle.write_bytes(old_bundle)
+
+    def write_same_bundle(rows, run_dir, destination, *, protocol=None):
+        destination.write_bytes(old_bundle)
+        return {"integrity_ok": True, "rows_written": 0, "sha256": old_hash}
+
+    original_replace = __import__("pathlib").Path.replace
+
+    def fail_report_replace(path, target):
+        if target == output:
+            raise OSError("report replace failed")
+        return original_replace(path, target)
+
+    monkeypatch.setattr(
+        "eval.task_level.analysis.task23_report.write_sanitized_run_bundle",
+        write_same_bundle,
+    )
+    monkeypatch.setattr("pathlib.Path.replace", fail_report_replace)
+
+    with pytest.raises(OSError, match="report replace failed"):
+        _publish_report_artifacts({"source_artifacts": {}}, [], tmp_path, output, bundle, protocol={})
+
+    assert __import__("json").loads(output.read_text(encoding="utf-8")) == old_report
+    assert hashlib.sha256(bundle.read_bytes()).hexdigest() == old_hash
+
+
+def test_report_publication_refuses_to_overwrite_immutable_bundle(tmp_path, monkeypatch):
+    output = tmp_path / "report.json"
+    bundle = tmp_path / "report_runs.sanitized.jsonl"
+    output.write_text("old report", encoding="utf-8")
+    bundle.write_bytes(b"old bundle")
+
+    def write_changed_bundle(rows, run_dir, destination, *, protocol=None):
+        destination.write_bytes(b"new bundle")
+        return {"integrity_ok": True, "rows_written": 0}
+
+    monkeypatch.setattr(
+        "eval.task_level.analysis.task23_report.write_sanitized_run_bundle",
+        write_changed_bundle,
+    )
+
+    with pytest.raises(FileExistsError, match="immutable sanitized bundle"):
+        _publish_report_artifacts({}, [], tmp_path, output, bundle, protocol={})
+
+    assert output.read_text(encoding="utf-8") == "old report"
+    assert bundle.read_bytes() == b"old bundle"
 
 
 def _protocol() -> dict:
@@ -200,6 +315,8 @@ def _rows() -> list[dict]:
                     "budget": {
                         "max_input_tokens": 2000,
                         "max_output_tokens": 1000,
+                        "max_turns": 40,
+                        "max_turns_enforced_by_runner": True,
                         "input_tokens_exceeded": False,
                         "output_tokens_exceeded": False,
                     },
@@ -243,6 +360,42 @@ def test_report_fails_closed_when_any_lane_cell_is_missing():
     assert "incomplete_full_condition_matrix" in report["decision"]["reasons"]
 
 
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("task_id", "unexpected_task"),
+        ("condition_id", "unexpected_condition"),
+        ("repeat", 3),
+        ("repeat", "0"),
+        ("repeat", [0]),
+    ],
+)
+def test_report_fails_closed_on_out_of_protocol_rows(field, value):
+    rows = _rows()
+    extra = dict(rows[0])
+    extra[field] = value
+    rows.append(extra)
+
+    report = build_task23_report(rows, protocol=_protocol())
+
+    assert report["artifact_integrity"]["ok"] is False
+    assert report["artifact_integrity"]["actual_runs"] == 37
+    assert report["artifact_integrity"]["unexpected_cells"]
+    assert report["decision"]["decision"] == "INCONCLUSIVE"
+    assert "incomplete_full_condition_matrix" in report["decision"]["reasons"]
+
+
+def test_report_fails_closed_on_duplicate_expected_cell():
+    rows = _rows()
+    rows.append(dict(rows[0]))
+
+    report = build_task23_report(rows, protocol=_protocol())
+
+    assert report["artifact_integrity"]["ok"] is False
+    assert report["artifact_integrity"]["duplicate_cells"]
+    assert report["decision"]["decision"] == "INCONCLUSIVE"
+
+
 def test_report_fails_closed_when_declared_token_budget_is_exceeded():
     rows = _rows()
     rows[0]["metrics"]["input_tokens"] = 2001
@@ -276,6 +429,19 @@ def test_report_fails_closed_when_budget_is_missing_incomplete_or_inconsistent(m
     assert report["conditions"]["repo_only_strict_offline"]["input_budget_exceeded_runs"] == 0
     assert report["decision"]["decision"] == "INCONCLUSIVE"
     assert "missing_or_invalid_budget_metrics" in report["decision"]["reasons"]
+
+
+def test_report_fails_closed_when_max_turn_budget_is_not_enforced():
+    rows = _rows()
+    rows[0]["budget"]["max_turns_enforced_by_runner"] = False
+
+    report = build_task23_report(rows, protocol=_protocol())
+
+    assert report["budget_integrity"]["ok"] is False
+    assert report["budget_integrity"]["max_turns_unenforced_runs"] == 1
+    assert report["conditions"]["repo_only_strict_offline"]["max_turns_unenforced_runs"] == 1
+    assert report["decision"]["decision"] == "INCONCLUSIVE"
+    assert "max_turn_budget_not_enforced" in report["decision"]["reasons"]
 
 
 def test_report_never_republishes_legacy_useful_context_proxy():

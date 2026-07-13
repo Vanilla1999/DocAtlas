@@ -146,7 +146,11 @@ def evaluate_predeclared_rule(
         for condition in (baseline_condition, candidate_condition)
     }
     actual_cells = Counter(
-        (str(row.get("task_id") or ""), int(row.get("repeat") or 0), str(row.get("condition_id") or ""))
+        (
+            str(row.get("task_id") or ""),
+            row.get("repeat") if type(row.get("repeat")) is int else f"<invalid repeat:{row.get('repeat')!r}>",
+            str(row.get("condition_id") or ""),
+        )
         for row in rows
         if row.get("condition_id") in {baseline_condition, candidate_condition}
     )
@@ -225,7 +229,10 @@ def _paired_rows(
         condition = str(row.get("condition_id") or "")
         if condition not in {baseline_condition, candidate_condition}:
             continue
-        key = (str(row.get("task_id") or ""), int(row.get("repeat") or 0))
+        repeat = row.get("repeat")
+        if type(repeat) is not int:
+            continue
+        key = (str(row.get("task_id") or ""), repeat)
         grouped[key][condition] = row
     return {
         key: (by_condition[baseline_condition], by_condition[candidate_condition])
