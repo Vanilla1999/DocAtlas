@@ -13,6 +13,7 @@ on:
 
 permissions:
   contents: read
+  models: read
 
 concurrency:
   group: task33c-actions-probe-${{ github.event.pull_request.number || github.ref }}
@@ -81,6 +82,93 @@ jobs:
               json.dumps(report, indent=2, sort_keys=True) + "\n",
               encoding="utf-8",
           )
+          PY
+
+      - name: Probe GitHub Models usage accounting
+        id: model
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          import urllib.error
+          import urllib.request
+          from pathlib import Path
+
+          model = "openai/gpt-4.1"
+          payload = {
+              "model": model,
+              "messages": [{"role": "user", "content": "Reply with the single word READY."}],
+              "max_tokens": 16,
+              "temperature": 0,
+              "stream": True,
+              "stream_options": {"include_usage": True},
+          }
+          request = urllib.request.Request(
+              "https://models.github.ai/inference/chat/completions?api-version=2026-03-10",
+              data=json.dumps(payload).encode("utf-8"),
+              headers={
+                  "Accept": "text/event-stream",
+                  "Authorization": "Bearer " + os.environ["GITHUB_TOKEN"],
+                  "Content-Type": "application/json",
+                  "X-GitHub-Api-Version": "2026-03-10",
+              },
+              method="POST",
+          )
+          report = {"schema_version": 1, "status": "failed", "provider": "github-models", "model": model}
+          try:
+              with urllib.request.urlopen(request, timeout=45) as response:
+                  request_ids = {
+                      name: response.headers.get(name)
+                      for name in ("x-github-request-id", "x-ms-request-id", "apim-request-id")
+                      if response.headers.get(name)
+                  }
+                  chunks = []
+                  usage = None
+                  for raw_line in response:
+                      line = raw_line.decode("utf-8", errors="replace").strip()
+                      if not line.startswith("data:"):
+                          continue
+                      data = line.removeprefix("data:").strip()
+                      if data == "[DONE]":
+                          continue
+                      event = json.loads(data)
+                      if isinstance(event.get("usage"), dict):
+                          usage = event["usage"]
+                      for choice in event.get("choices", []):
+                          delta = choice.get("delta", {}) if isinstance(choice, dict) else {}
+                          if isinstance(delta.get("content"), str):
+                              chunks.append(delta["content"])
+                  report.update({
+                      "request_ids": request_ids,
+                      "usage": usage,
+                      "response": "".join(chunks),
+                  })
+          except urllib.error.HTTPError as exc:
+              report["http_status"] = exc.code
+              report["error"] = exc.read(2_000).decode("utf-8", errors="replace")
+          except Exception as exc:
+              report["error"] = exc.__class__.__name__ + ":" + str(exc)[:1_000]
+
+          usage = report.get("usage")
+          token_fields = ("prompt_tokens", "completion_tokens", "total_tokens")
+          verified = (
+              isinstance(usage, dict)
+              and all(isinstance(usage.get(name), int) and not isinstance(usage.get(name), bool) for name in token_fields)
+              and usage["prompt_tokens"] > 0
+              and usage["completion_tokens"] > 0
+              and usage["total_tokens"] == usage["prompt_tokens"] + usage["completion_tokens"]
+              and bool(report.get("request_ids"))
+          )
+          report["status"] = "verified" if verified else "failed"
+          Path("task33c-actions-probe/model-usage-probe.json").write_text(
+              json.dumps(report, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+          if not verified:
+              raise SystemExit("GitHub Models usage accounting was not verified")
           PY
 
       - name: Run executable sandbox canary
@@ -255,6 +343,7 @@ jobs:
             echo "| --- | --- |"
             echo "| bubblewrap sandbox canary | ${{ steps.sandbox.outcome }} |"
             echo "| Docker sandbox canary | ${{ steps.docker.outcome }} |"
+            echo "| GitHub Models usage | ${{ steps.model.outcome }} |"
             echo "| frozen host retrieval | ${{ steps.retrieval.outcome }} |"
             echo "| focused adversarial tests | ${{ steps.focused.outcome }} |"
           } >> "$GITHUB_STEP_SUMMARY"
@@ -273,6 +362,7 @@ jobs:
         env:
           SANDBOX_OUTCOME: ${{ steps.sandbox.outcome }}
           DOCKER_OUTCOME: ${{ steps.docker.outcome }}
+          MODEL_OUTCOME: ${{ steps.model.outcome }}
           RETRIEVAL_OUTCOME: ${{ steps.retrieval.outcome }}
           FOCUSED_OUTCOME: ${{ steps.focused.outcome }}
         run: |
@@ -280,5 +370,6 @@ jobs:
             echo "No verified sandbox backend is available"
             exit 1
           fi
+          test "$MODEL_OUTCOME" = success
           test "$RETRIEVAL_OUTCOME" = success
           test "$FOCUSED_OUTCOME" = success
