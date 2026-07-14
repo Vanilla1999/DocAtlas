@@ -10,9 +10,14 @@ from typing import Any, Callable, Mapping, cast
 
 import jsonschema
 
+from docmancer.docs.application.action_packet import ACTION_PACKET_OUTPUT_SCHEMA
 from docmancer.docs.interfaces.mcp.error_contract import build_mcp_error_payload, debug_errors_enabled
 from docmancer.docs.service import LibraryDocsService
-from docmancer.docs.interfaces.mcp.context_tools import context_tools, handle_context_tool
+from docmancer.docs.interfaces.mcp.context_tools import (
+    BOUNDED_STRUCTURED_CONTENT_MARKER,
+    context_tools,
+    handle_context_tool,
+)
 from docmancer.docs.interfaces.mcp.docs_tools import handle_library_tool, library_tools
 from docmancer.docs.interfaces.mcp.prefetch_tools import handle_prefetch_tool, prefetch_tools
 from docmancer.docs.interfaces.mcp.project_tools import handle_project_tool, project_tools
@@ -41,9 +46,13 @@ class ToolSpec:
     description: str
     input_schema: dict[str, Any]
     handler: ToolHandler
+    output_schema: dict[str, Any] | None = None
 
     def to_tool_dict(self) -> dict[str, Any]:
-        return {"name": self.name, "description": self.description, "inputSchema": copy.deepcopy(self.input_schema)}
+        result = {"name": self.name, "description": self.description, "inputSchema": copy.deepcopy(self.input_schema)}
+        if self.output_schema is not None:
+            result["outputSchema"] = copy.deepcopy(self.output_schema)
+        return result
 
 
 @dataclass(frozen=True)
@@ -75,6 +84,27 @@ DOCS_TARGET_INPUT_SCHEMA: dict[str, Any] = {
 }
 
 
+GET_DOCS_CONTEXT_OUTPUT_SCHEMA: dict[str, Any] = {
+    "type": "object",
+    "required": ["tool"],
+    "properties": {
+        "tool": {"const": "get_docs_context"},
+        "delivery_strategy": {"enum": ["bounded_direct"]},
+        "action_packet": ACTION_PACKET_OUTPUT_SCHEMA,
+        "document_content_policy": {"type": "object"},
+        "recommended_next_action": {"type": "object"},
+    },
+    "additionalProperties": True,
+    "allOf": [{
+        "if": {
+            "required": ["delivery_strategy"],
+            "properties": {"delivery_strategy": {"const": "bounded_direct"}},
+        },
+        "then": {"required": ["action_packet", "document_content_policy"]},
+    }],
+}
+
+
 RAW_TOOLS: list[dict[str, Any]] = [
     {
         "name": "get_docs_context",
@@ -83,9 +113,10 @@ RAW_TOOLS: list[dict[str, Any]] = [
 Agent workflow:
 - Call get_docs_context first. It performs safe project preflight internally.
 - For coding/API questions, set response_style=\"snippet-first\".
-- Call prepare_docs only when this response explicitly returns it as next_action.
+- For coding and patch tasks, use delivery_strategy=\"bounded_direct\" as the default pre-edit handoff; raw retrieval stays hidden and only a validated ActionPacket plus bounded recovery metadata enters model context.
+- In bounded delivery call prepare_docs only from recommended_next_action; unbounded compatibility output may use next_action.
 - Use docs_status only for explicit health, freshness, source-state, or job-status requests.
-- If answer_type is navigation_only or partial_navigational, do not answer yet; read/search the suggested files first.
+- In bounded delivery, stop before editing when action_packet.status is insufficient_evidence. In unbounded exploration, navigation_only or partial_navigational requires source search before answering.
 - This tool provides source-grounded context, not a full code audit or test substitute.
 - For change-aware documentation maintenance, pass maintenance with either base/head or explicit changed_paths; obey its fail-closed authoring brief.
 """,
@@ -95,6 +126,8 @@ Agent workflow:
                 "question": {"type": "string"},
                 "project_path": {"type": ["string", "null"]},
                 "response_style": {"type": ["string", "null"], "enum": ["auto", "snippet-first", "evidence-first", None], "default": "auto", "description": "Choose snippet-first presentation for coding tasks or preserve evidence-first context."},
+                "delivery_strategy": {"type": ["string", "null"], "enum": ["bounded_direct", None], "description": "Return one deterministic, source-attributed ActionPacket without exposing raw retrieval content."},
+                "packet_tokens": {"type": ["integer", "null"], "minimum": 256, "maximum": 2000, "default": 1500, "description": "Bounded structured response budget; ActionPacket wrapper and recovery metadata are included in the 2000-token hard ceiling."},
                 "library": {"type": ["string", "null"]},
                 "libraries": {"type": ["array", "null"], "items": {"type": "string"}},
                 "ecosystem": {"type": ["string", "null"]},
@@ -128,14 +161,25 @@ Agent workflow:
                 },
             },
             "required": ["question"],
+            "allOf": [{
+                "if": {
+                    "required": ["packet_tokens"],
+                    "properties": {"packet_tokens": {"type": "integer"}},
+                },
+                "then": {
+                    "required": ["delivery_strategy"],
+                    "properties": {"delivery_strategy": {"const": "bounded_direct"}},
+                },
+            }],
         },
+        "outputSchema": GET_DOCS_CONTEXT_OUTPUT_SCHEMA,
     },
     {
         "name": "prepare_docs",
         "description": """Unified confirmation-first lifecycle/admin tool for docs preparation: sync project docs, prefetch dependency/library/manifest/target docs, refresh, prune, or remove registered docs sources.
 
 Agent workflow:
-- Use prepare_docs only after get_docs_context returns prepare_docs as next_action, or when the user explicitly asks to sync, refresh, prefetch, prune, or remove docs.
+- Use prepare_docs only after get_docs_context returns bounded recommended_next_action or unbounded next_action, or when the user explicitly asks to sync, refresh, prefetch, prune, or remove docs.
 - Use prepare_docs(action=\"prefetch_library_docs\") for public/dependency docs only after network access is approved.
 - Prefer this over separate ingest/sync/prefetch/refresh/prune/remove tools.
 """,
@@ -735,6 +779,7 @@ def _tool_spec(raw: dict[str, Any]) -> ToolSpec:
         description=str(raw["description"]),
         input_schema=_strip_null_enum_values(copy.deepcopy(raw["inputSchema"])),
         handler=_handler_for_tool(name),
+        output_schema=copy.deepcopy(raw.get("outputSchema")),
     )
 
 
@@ -880,24 +925,28 @@ Use Docmancer before generic code search when the user asks about:
 
 The default public surface has exactly three tools:
 - `get_docs_context`: first tool for content and coding questions;
-- `prepare_docs`: lifecycle work only after a returned next_action or explicit user request;
+- `prepare_docs`: lifecycle work only after bounded recommended_next_action, unbounded next_action, or an explicit user request;
 - `docs_status`: explicit freshness, health, source-state, or job-progress checks.
 
 ## Default project workflow
 
-1. Call:
-   `get_docs_context(project_path=..., question=..., mode="auto", response_style="snippet-first", output_mode="answer")`
+1. For coding and patch tasks, call once before the first edit:
+   `get_docs_context(project_path=..., question=..., mode="auto", response_style="snippet-first", delivery_strategy="bounded_direct")`
+
+   Use broader unbounded output only when the user explicitly asks to explore documentation. Do not repeat bounded retrieval before the first edit unless an explicit `prepare_docs` recovery action was completed.
 
 2. If and only if the response returns `prepare_docs` as its next action, follow it. For example:
    `prepare_docs(action="sync_project_docs", project_path=..., with_vectors=true)`
 
 3. Retry `get_docs_context` after successful preparation.
 
-4. Interpret the result:
-   - `answer_type="direct"`: you may answer from the returned snippets/sources.
-   - `answer_type="navigation_only"`: do not answer yet. Read/search the suggested files first, then answer.
-   - `partial_navigational`: treat it as source-search guidance, not a complete answer.
-   - `requires_confirmation=true`: ask the user before network/dependency fetches.
+4. Interpret the bounded result:
+   - `action_packet.status="ok"`: work from the cited packet evidence.
+   - `action_packet.status="truncated"`: honor `omitted_counts`; only non-critical material was omitted.
+   - `action_packet.status="insufficient_evidence"`: do not edit. Follow only a typed `recommended_next_action` after required confirmation.
+
+Broader unbounded exploration may expose `answer_type`, `answer_completeness`, `trust_contract`, and raw context fields; these are intentionally absent from bounded delivery.
+In that unbounded mode, treat `navigation_only` and `partial_navigational` as source-search guidance, not complete evidence.
 
 Use `docs_status(action="project", project_path=...)` only when the user asks
 whether documentation is indexed, stale, or healthy. Use `action="jobs"` or
@@ -907,7 +956,7 @@ whether documentation is indexed, stale, or healthy. Use `action="jobs"` or
 
 For public/dependency docs, use the canonical public tool:
 
-`get_docs_context(question=..., library=..., ecosystem=..., version=..., mode="library" | "mixed", response_style="snippet-first")`
+`get_docs_context(question=..., library=..., ecosystem=..., version=..., mode="library" | "mixed", response_style="snippet-first", delivery_strategy="bounded_direct")`
 
 If docs are missing/stale and the user approves network access, use:
 
@@ -917,7 +966,7 @@ Do not use WebFetch as a substitute for registered Docmancer docs until Docmance
 
 ## Patch workflow
 
-Before editing code, call `get_docs_context(...)`, then use normal source
+Before editing code, call `get_docs_context(..., delivery_strategy="bounded_direct")` once, then use normal source
 read/search tools and run tests/linters. Optional code/plan/constraint tools are
 available only when the advanced surface is explicitly enabled with
 `DOCMANCER_MCP_ADVANCED_TOOLS=1`.
@@ -946,11 +995,12 @@ Always separate:
         "mimeType": "text/markdown",
         "text": """# Project docs workflow
 
-1. Call `get_docs_context(project_path=..., question=..., mode="auto", output_mode="compact")`.
-2. If the response explicitly returns `prepare_docs` as next_action, follow it and retry `get_docs_context`.
-3. Inspect `answer_available`, `answer_type`, `answer_completeness`, and `trust_contract.sources`.
-4. Treat `partial_navigational` as navigation/source-search guidance, not a complete answer.
-5. Use dependency/public network fetches only with explicit approval (`allow_network=true`).
+1. For coding and patch tasks, call `get_docs_context(project_path=..., question=..., mode="auto", delivery_strategy="bounded_direct")` once before the first edit. Use broader output only for explicit documentation exploration.
+2. If the response explicitly returns `prepare_docs` as `recommended_next_action`, follow it and retry the same bounded request.
+3. Inspect `action_packet.status`, `source_of_truth`, `missing_evidence`, and `omitted_counts`.
+4. Do not edit on `insufficient_evidence`; follow only the bounded typed recovery action after confirmation.
+5. Only unbounded exploration exposes `trust_contract.sources`; do not expect it in bounded delivery.
+6. Use dependency/public network fetches only with explicit approval (`allow_network=true`).
 """,
     },
     {
@@ -961,8 +1011,10 @@ Always separate:
         "text": """# Public tool selection
 
 1. Natural documentation, API, dependency, architecture, convention, and coding questions → `get_docs_context`.
-2. Explicit sync/refresh/prefetch/prune/remove request, or a returned next_action → `prepare_docs`.
+2. Explicit sync/refresh/prefetch/prune/remove request, bounded `recommended_next_action`, or unbounded `next_action` → `prepare_docs`.
 3. Explicit index freshness, health, source-state, or async job-progress request → `docs_status`.
+
+For coding and patch tasks, use `delivery_strategy="bounded_direct"` on the single pre-edit `get_docs_context` call.
 
 Never call an advanced or legacy tool unless the corresponding environment flag exposes it.
 """,
@@ -997,18 +1049,18 @@ Never call an advanced or legacy tool unless the corresponding environment flag 
 Use the public unified tool first:
 
 1. Call:
-   `get_docs_context(question=..., library=..., ecosystem=..., version=..., mode="library", response_style="snippet-first")`
+   `get_docs_context(question=..., library=..., ecosystem=..., version=..., mode="library", response_style="snippet-first", delivery_strategy="bounded_direct")`
 
-2. If the response returns `requires_confirmation=true`, `reason_code=network_required`, or missing/stale docs, ask the user before network access.
+2. If `action_packet.status="insufficient_evidence"` and `recommended_next_action.requires_confirmation=true`, ask the user before network access.
 
 3. If approved, call:
    `prepare_docs(action="prefetch_library_docs", library=..., ecosystem=..., version=..., force_refresh=false)`
 
 4. Retry:
-   `get_docs_context(question=..., library=..., ecosystem=..., version=..., mode="library", response_style="snippet-first")`
+   `get_docs_context(question=..., library=..., ecosystem=..., version=..., mode="library", response_style="snippet-first", delivery_strategy="bounded_direct")`
 
 5. If working inside a repository, call:
-   `get_docs_context(project_path=..., question=..., mode="mixed", response_style="snippet-first")`
+   `get_docs_context(project_path=..., question=..., mode="mixed", response_style="snippet-first", delivery_strategy="bounded_direct")`
 
 Do not use WebFetch as a substitute for registered docs before Docmancer has returned no trusted route.
 
@@ -1045,9 +1097,9 @@ def read_docs_resource(uri: str) -> dict[str, str] | None:
             "mimeType": "text/markdown",
             "text": f"""# Project docs workflow for `{project_path}`
 
-1. `get_docs_context(project_path=\"{project_path}\", question=..., mode=\"auto\", output_mode=\"compact\")`
-2. If the response returns `prepare_docs` as next_action, follow it and retry `get_docs_context`.
-3. Inspect `trust_contract.sources.selected`, `trust_contract.sources.rejected`, and `trust_contract.sources.risky` before using the answer.
+1. `get_docs_context(project_path=\"{project_path}\", question=..., mode=\"auto\", delivery_strategy=\"bounded_direct\")`
+2. If the response returns `prepare_docs` as `recommended_next_action`, follow it and retry the same bounded request.
+3. Inspect `action_packet.status` and cite `action_packet.source_of_truth` through each factual item's `evidence_ids`.
 """,
         }
     if uri.startswith("docmancer://library/"):
@@ -1066,7 +1118,8 @@ def read_docs_resource(uri: str) -> dict[str, str] | None:
        ecosystem=\"{ecosystem}\",
        version=\"{version}\",
        mode=\"library\",
-       response_style=\"snippet-first\"
+       response_style=\"snippet-first\",
+       delivery_strategy=\"bounded_direct\"
    )`
 
 2. If docs are missing/stale and network is approved:
@@ -1086,6 +1139,8 @@ Do not assume legacy `resolve_library_id` / `get_library_docs` tools are availab
 
 
 def _json_text(mcp_types: Any, payload: dict[str, Any]) -> list[Any]:
+    if payload.get("delivery_strategy") == "bounded_direct" and isinstance(payload.get("action_packet"), dict):
+        return [mcp_types.TextContent(type="text", text=BOUNDED_STRUCTURED_CONTENT_MARKER)]
     return [mcp_types.TextContent(type="text", text=json.dumps(payload, ensure_ascii=False))]
 
 
@@ -1098,10 +1153,7 @@ async def _run_async(service: LibraryDocsService) -> None:
 
     @server.list_tools()
     async def _list_tools() -> list[mcp_types.Tool]:
-        return [
-            mcp_types.Tool(name=tool["name"], description=tool["description"], inputSchema=tool["inputSchema"])
-            for tool in current_tools()
-        ]
+        return [mcp_types.Tool(**tool) for tool in current_tools()]
 
     @server.list_resources()
     async def _list_resources() -> list[mcp_types.Resource]:
@@ -1135,12 +1187,15 @@ async def _run_async(service: LibraryDocsService) -> None:
         return resource["text"]
 
     @server.call_tool()
-    async def _call_tool(name: str, arguments: dict[str, Any]) -> list[mcp_types.TextContent]:
+    async def _call_tool(name: str, arguments: dict[str, Any]) -> mcp_types.CallToolResult:
         # Tool handlers include synchronous indexing and HTTP clients.  Keep
         # them off the MCP event loop so docs_status can report a running job
         # while another request is still doing bounded compatibility work.
         payload = await asyncio.to_thread(call_docs_tool_payload, name, arguments, service)
-        return _json_text(mcp_types, payload)
+        return mcp_types.CallToolResult(
+            content=_json_text(mcp_types, payload),
+            structuredContent=payload,
+        )
 
     async with stdio_server() as (read_stream, write_stream):
         await server.run(read_stream, write_stream, server.create_initialization_options())

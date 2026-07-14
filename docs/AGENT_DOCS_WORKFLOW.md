@@ -5,18 +5,19 @@ documentation server.
 
 ## Repository questions
 
-1. Call `get_docs_context(project_path=..., question=..., mode="project")`.
-2. If the response returns `prepare_docs` as `next_action`, call that exact
-   action and then retry `get_docs_context`.
+1. For coding and patch tasks, call `get_docs_context(project_path=..., question=..., mode="project", delivery_strategy="bounded_direct")`.
+2. Follow `recommended_next_action`: ask its source-choice question, or obtain
+   confirmation, call its exact typed action, and retry the same bounded request.
 3. Use `docs_status` only for an explicit health, freshness, index, or
    background-job status request.
-4. Use only selected sources from the Trust Contract. If the response is
-   navigation-only, read or search the suggested files before answering.
+4. Inspect `action_packet.status`, cite `action_packet.source_of_truth` through
+   factual `evidence_ids`, and do not edit when status is `insufficient_evidence`.
+   Trust Contract and navigation fields belong to explicit unbounded exploration.
 
 ## Library and dependency questions
 
 Call
-`get_docs_context(question=..., library=..., ecosystem=..., version=..., mode="library", response_style="snippet-first")`.
+`get_docs_context(question=..., library=..., ecosystem=..., version=..., mode="library", response_style="snippet-first", delivery_strategy="bounded_direct")`.
 
 Network access is opt-in. If documentation must be fetched or refreshed, ask the
 user and then use `prepare_docs` with the returned action and arguments.

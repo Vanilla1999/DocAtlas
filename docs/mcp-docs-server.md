@@ -28,10 +28,10 @@ The Docs MCP server exposes exactly three public tools. The table describes the 
 The normal flow is:
 
 ```text
-get_docs_context(question, project_path)
-→ returned next_action? call prepare_docs with that exact action and arguments
+get_docs_context(question, project_path, delivery_strategy="bounded_direct")
+→ returned recommended_next_action? obtain confirmation and call that exact action
 → if a job was returned, poll docs_status(job_id)
-→ retry the original get_docs_context question
+→ retry the original bounded get_docs_context question
 ```
 
 ## Project documentation

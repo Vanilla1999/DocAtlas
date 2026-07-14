@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Added
+
+- **Bounded direct context delivery:** coding agents can request a versioned, source-attributed `ActionPacket`; wrapper and recovery metadata are included in the 2,000 estimated-token payload ceiling, and raw retrieval content does not enter the parent coding session.
+
+### Changed
+
+- **MCP SDK floor:** require `mcp>=1.27.2`, matching the structured tool output and output-schema transport used by bounded delivery.
+
 ## [1.2.0] - 2026-07-12
 
 ### Added
