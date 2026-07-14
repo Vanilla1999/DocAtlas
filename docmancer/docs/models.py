@@ -588,6 +588,8 @@ class UnifiedDocsContextResult:
     mode_selected: str = "auto"
     routing: dict[str, Any] = field(default_factory=dict)
     answer_available: bool = True
+    answer_type: str | None = None
+    answer_completeness: dict[str, Any] = field(default_factory=dict)
     context_pack: list[dict[str, Any]] = field(default_factory=list)
     lanes: dict[str, Any] = field(default_factory=dict)
     source_summary: dict[str, int] = field(default_factory=dict)

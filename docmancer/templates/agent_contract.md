@@ -1,11 +1,13 @@
 ## DocAtlas documentation workflow
 
-Use the default Docs MCP server as a three-tool router.
+Use the default three-tool Docs MCP router.
 
-1. For a repository, library, dependency, or mixed documentation question, call `get_docs_context` first.
-2. If it returns `next_action`, ask for any required network or write approval, then call `prepare_docs` with the returned `action` and only its supported arguments from `arguments_patch`.
+1. For coding or patch tasks, call `get_docs_context` once before the first edit with `delivery_strategy="bounded_direct"`; raw retrieval stays outside model context. Use unbounded output only for explicit documentation exploration.
+2. Follow `recommended_next_action`: ask its question, or obtain approval and call its typed `prepare_docs` action and `arguments_patch`.
 3. Use `docs_status` only for explicit health, freshness, or index diagnostics, or when a returned job id needs progress or status.
-4. After preparation succeeds, retry the original `get_docs_context` question unchanged.
+4. After preparation succeeds, retry the original `get_docs_context` question unchanged with bounded delivery. Otherwise do not repeat before the first edit.
+
+Inspect ActionPacket status; stop before editing on `insufficient_evidence` and cite `source_of_truth` through factual `evidence_ids`.
 
 Project documentation proves repository conventions and decisions. Dependency documentation proves external APIs. For current implementation facts, prefer repository code search. Do not use legacy direct documentation tools in this workflow.
 

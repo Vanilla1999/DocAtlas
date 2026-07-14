@@ -4,12 +4,7 @@ import re
 from pathlib import Path, PurePosixPath
 from typing import Any
 
-_POLICY_FILENAMES = {
-    "agents.md",
-    "claude.md",
-    ".cursorrules",
-    "copilot-instructions.md",
-}
+_SCOPED_POLICY_FILENAMES = {"agents.md", "claude.md"}
 _RISK_PATTERNS = {
     "fake_policy_message": re.compile(r"\b(system|developer)\s+(message|prompt)\b", re.IGNORECASE),
     "tool_execution_request": re.compile(r"\b(call|invoke|run|execute)\s+(the\s+)?(tool|shell|terminal|command)\b", re.IGNORECASE),
@@ -35,7 +30,8 @@ def annotate_context_pack(
         item = dict(source_item)
         path = str(item.get("path") or item.get("source") or "")
         scope = str(item.get("doc_scope") or item.get("origin_lane") or "unknown")
-        policy_file = _is_policy_file(path, repository_root=repository_root) and scope == "project"
+        policy_scope = _policy_scope(path, repository_root=repository_root) if scope == "project" else None
+        policy_file = policy_scope is not None
         already_annotated = isinstance(item.get("content_boundary"), dict)
         risk_flags = list(item.get("instruction_risk_flags") or detect_instruction_like_patterns(
             str(item.get("content") or item.get("snippet") or "")
@@ -60,7 +56,7 @@ def annotate_context_pack(
             "content": item.get("content") if "content" in item else item.get("snippet"),
         }
         item["authority_root"] = str(Path(repository_root).resolve()) if policy_file and repository_root else None
-        item["policy_scope"] = str(_resolved_source_path(path, repository_root).parent) if policy_file and repository_root else None
+        item["policy_scope"] = str(policy_scope) if policy_scope is not None else None
         item["scope_verified"] = bool(policy_file)
         item["instruction_risk_flags"] = risk_flags
 
@@ -83,7 +79,8 @@ def detect_instruction_like_patterns(text: str) -> list[str]:
 def source_trust_dimensions(
     *, path: str, scope: str, version_exactness: str | None = None, repository_root: str | Path | None = None,
 ) -> dict[str, Any]:
-    policy_file = _is_policy_file(path, repository_root=repository_root) and scope == "project"
+    policy_scope = _policy_scope(path, repository_root=repository_root) if scope == "project" else None
+    policy_file = policy_scope is not None
     return {
         "source_provenance": {
             "owner": "configured_repository" if scope == "project" else "external_source",
@@ -94,28 +91,32 @@ def source_trust_dimensions(
         ),
         "instruction_trust": "scoped_agent_policy" if policy_file else "untrusted_data",
         "authority_root": str(Path(repository_root).resolve()) if policy_file and repository_root else None,
-        "policy_scope": str(_resolved_source_path(path, repository_root).parent) if policy_file and repository_root else None,
+        "policy_scope": str(policy_scope) if policy_scope is not None else None,
         "scope_verified": bool(policy_file),
     }
 
 
 def _is_policy_file(path: str, *, repository_root: str | Path | None) -> bool:
-    normalized = path.replace("\\", "/").lower()
-    if PurePosixPath(normalized).name not in _POLICY_FILENAMES or repository_root is None:
-        return False
+    return _policy_scope(path, repository_root=repository_root) is not None
+
+
+def _policy_scope(path: str, *, repository_root: str | Path | None) -> Path | None:
+    if repository_root is None:
+        return None
     root = Path(repository_root).resolve()
     candidate = Path(path)
     if not candidate.is_absolute():
         candidate = root / candidate
     try:
-        candidate.resolve().relative_to(root)
+        resolved = candidate.resolve()
+        relative = resolved.relative_to(root)
     except (OSError, ValueError):
-        return False
-    return True
-
-
-def _resolved_source_path(path: str, repository_root: str | Path) -> Path:
-    candidate = Path(path)
-    if not candidate.is_absolute():
-        candidate = Path(repository_root).resolve() / candidate
-    return candidate.resolve()
+        return None
+    normalized = PurePosixPath(relative.as_posix().lower())
+    if normalized.name in _SCOPED_POLICY_FILENAMES:
+        return resolved.parent
+    if normalized.as_posix() == ".cursorrules":
+        return root
+    if normalized.as_posix() == ".github/copilot-instructions.md":
+        return root
+    return None

@@ -19,6 +19,7 @@ DOCUMENT_CONTENT_POLICY = {
     "actionable": False,
     "actions_source": "typed_top_level_fields_only",
 }
+BOUNDED_STRUCTURED_CONTENT_MARKER = "Bounded ActionPacket is available in structuredContent."
 
 
 def context_tools(tools: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -232,7 +233,9 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
         ) or 1_500
         recovery = _bounded_recovery_action(raw)
         packet_budget = _packet_budget_inside_payload(output_budget, recovery=recovery)
-        retrieval_issues = _bounded_retrieval_issues(raw)
+        retrieval_issues = _bounded_retrieval_issues(
+            raw, project_evidence_required=bool(_clean_string(args.get("project_path")))
+        )
         packet = build_action_packet(
             question=question,
             context_pack=raw.get("context_pack") or [],
@@ -260,7 +263,8 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
         if packet["status"] == "insufficient_evidence" and recovery:
             payload["recommended_next_action"] = recovery
         _fit_recovery_in_payload(payload, output_budget)
-        if _estimated_output_tokens(payload) > output_budget:
+        marker_tokens = max(1, math.ceil(len(BOUNDED_STRUCTURED_CONTENT_MARKER.encode("utf-8")) / 4))
+        if _estimated_output_tokens(payload) + marker_tokens > output_budget:
             validation_errors.append("serialized bounded response token budget exceeded")
         if validation_errors:
             return _bad_request("invalid_action_packet", "; ".join(validation_errors))
@@ -319,16 +323,31 @@ def _bounded_action_mapping(value: dict[str, Any], *, depth: int = 0) -> dict[st
     return result
 
 
-def _bounded_retrieval_issues(payload: dict[str, Any]) -> list[str]:
+def _bounded_retrieval_issues(
+    payload: dict[str, Any], *, project_evidence_required: bool = False
+) -> list[str]:
     issues: list[str] = []
+    status = str(payload.get("status") or "").strip().lower()
+    if status and status not in {"success"}:
+        issues.append(f"Documentation retrieval is incomplete (status={status}).")
     if payload.get("requires_confirmation"):
         issues.append("Documentation retrieval requires explicit user confirmation before editing.")
     if payload.get("answer_available") is False:
         issues.append("The requested documentation evidence is not currently available.")
+    if project_evidence_required and payload.get("answer_type") is None:
+        issues.append("Project answer completeness metadata is missing.")
     if payload.get("answer_type") in {"navigation_only", "partial_navigational"}:
         issues.append("The retrieval result is navigational rather than complete implementation evidence.")
+    elif payload.get("answer_type") in {"partial", "unavailable"}:
+        issues.append("The retrieval result does not contain complete implementation evidence.")
+    completeness = payload.get("answer_completeness") if isinstance(payload.get("answer_completeness"), dict) else {}
+    if completeness.get("source_search_required"):
+        issues.append("Source search is required before the documentation evidence can guide an edit.")
+    completeness_status = str(completeness.get("status") or "").strip().lower()
+    if completeness_status and completeness_status not in {"exact", "complete"}:
+        issues.append(f"Project evidence completeness is {completeness_status}.")
     lanes = payload.get("lanes") if isinstance(payload.get("lanes"), dict) else {}
-    accepted = {"not_requested", "success", "partial_success"}
+    accepted = {"not_requested", "success"}
     failed = sorted(
         str(name) for name, lane in lanes.items()
         if isinstance(lane, dict) and str(lane.get("status") or "") not in accepted
@@ -348,7 +367,8 @@ def _packet_budget_inside_payload(output_budget: int, *, recovery: dict[str, Any
     if recovery:
         shell["recommended_next_action"] = recovery
     shell_bytes = len(json.dumps(shell, ensure_ascii=False).encode("utf-8")) - 2
-    available_bytes = max(4 * 128, output_budget * 4 - shell_bytes)
+    marker_bytes = len(BOUNDED_STRUCTURED_CONTENT_MARKER.encode("utf-8"))
+    available_bytes = max(4 * 128, output_budget * 4 - shell_bytes - marker_bytes)
     return min(2_000, max(128, available_bytes // 4))
 
 

@@ -83,7 +83,7 @@ By default the server exposes exactly three mutually exclusive tools:
 | Tool | Purpose |
 |---|---|
 | `get_docs_context` | Default first call for project, library, dependency, or mixed documentation questions. It performs read-only preflight and returns the next action when preparation is required. |
-| `prepare_docs` | Lifecycle work only: sync, refresh, index, or prefetch. Call it from the returned `next_action`, or for an explicit user request. Network actions require approval. |
+| `prepare_docs` | Lifecycle work only: sync, refresh, index, or prefetch. Call it from bounded `recommended_next_action`, unbounded `next_action`, or an explicit user request. Network actions require approval. |
 | `docs_status` | Explicit health, freshness, index, or background-job status requests only. It is not a discovery step. |
 
 ### Recommended workflow
@@ -92,7 +92,7 @@ For most MCP clients and coding agents:
 
 ```text
 get_docs_context(question=..., project_path=..., delivery_strategy="bounded_direct")
-→ prepare_docs(...) only when returned as next_action
+→ prepare_docs(...) only when returned as recommended_next_action
 → retry get_docs_context(..., delivery_strategy="bounded_direct")
 ```
 

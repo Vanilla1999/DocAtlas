@@ -4,8 +4,11 @@ import json
 import math
 
 import jsonschema
+import pytest
 
+from docmancer.cli.commands import _get_template_content
 from docmancer.docs.application.action_packet import (
+    ACTION_PACKET_OUTPUT_SCHEMA,
     build_action_packet,
     estimate_action_packet_tokens,
     validate_action_packet,
@@ -14,7 +17,7 @@ from docmancer.docs.application.unified_context_service import UnifiedDocsContex
 from docmancer.docs.domain.content_trust import annotate_context_pack
 from docmancer.docs.interfaces.mcp.context_tools import handle_context_tool
 from docmancer.docs.models import ProjectContextResult
-from docmancer.mcp.docs_server import TOOLS
+from docmancer.mcp.docs_server import MCP_RESOURCES, TOOLS, _json_text
 
 
 def test_bounded_direct_is_one_existing_tool_call_and_returns_only_action_packet():
@@ -22,6 +25,18 @@ def test_bounded_direct_is_one_existing_tool_call_and_returns_only_action_packet
     assert tool["inputSchema"]["properties"]["delivery_strategy"]["enum"] == ["bounded_direct"]
     assert tool["outputSchema"]["properties"]["action_packet"]["properties"]["schema_version"]["const"] == 1
     assert len(TOOLS) == 3
+    installed_contract = _get_template_content("project_bootstrap.md")
+    assert 'delivery_strategy="bounded_direct"' in installed_contract
+    assert "Otherwise do not repeat before the first edit" in installed_contract
+    project_workflow = next(item for item in MCP_RESOURCES if item["uri"] == "docmancer://workflow/project-docs")
+    library_workflow = next(item for item in MCP_RESOURCES if item["uri"] == "docmancer://workflow/library-docs")
+    quickstart = next(item for item in MCP_RESOURCES if item["uri"] == "docmancer://agent/quickstart")
+    assert 'delivery_strategy="bounded_direct"' in project_workflow["text"]
+    assert 'delivery_strategy="bounded_direct"' in library_workflow["text"]
+    assert quickstart["text"].count('delivery_strategy="bounded_direct"') >= 3
+    jsonschema.validate({"question": "q", "packet_tokens": None}, tool["inputSchema"])
+    with pytest.raises(jsonschema.ValidationError):
+        jsonschema.validate({"tool": "get_docs_context", "delivery_strategy": "bounded_direct"}, tool["outputSchema"])
 
     class Backend:
         calls = 0
@@ -66,6 +81,20 @@ def test_bounded_direct_is_one_existing_tool_call_and_returns_only_action_packet
     assert validate_action_packet(result["action_packet"]) == []
     jsonschema.validate(result, tool["outputSchema"])
     assert math.ceil(len(json.dumps(result, ensure_ascii=False).encode("utf-8")) / 4) <= 1_500
+
+    class FakeMcpTypes:
+        class TextContent:
+            def __init__(self, *, type, text):
+                self.type = type
+                self.text = text
+
+    compatibility_text = _json_text(FakeMcpTypes, result)[0].text
+    assert "structuredContent" in compatibility_text
+    assert "source attribution" not in compatibility_text
+    combined_tokens = math.ceil(len(json.dumps(result, ensure_ascii=False).encode("utf-8")) / 4) + math.ceil(
+        len(compatibility_text.encode("utf-8")) / 4
+    )
+    assert combined_tokens <= 1_500
 
     packet_without_strategy = handle_context_tool("get_docs_context", {
         "question": "Bound this", "project_path": "/repo", "packet_tokens": 500,
@@ -118,6 +147,75 @@ def test_bounded_direct_is_one_existing_tool_call_and_returns_only_action_packet
     assert source_choice["recommended_next_action"]["requires_confirmation"] is True
     assert math.ceil(len(json.dumps(source_choice, ensure_ascii=False).encode("utf-8")) / 4) <= 500
 
+    class PartialFacade:
+        def get_docs_context(self, question, **kwargs):
+            return {
+                "tool": "get_docs_context",
+                "status": "partial_success",
+                "answer_available": True,
+                "answer_type": "partial_navigational",
+                "answer_completeness": {"status": "partial", "source_search_required": True},
+                "context_pack": [{
+                    "path": "src/navigation.py", "source_class": "repo_map",
+                    "symbols": ["navigation"], "content": "navigation only",
+                }],
+                "lanes": {"project": {"status": "partial_success", "source_count": 1}},
+                "trust_contract": {},
+            }
+
+    partial = handle_context_tool("get_docs_context", {
+        "question": "Change navigation", "project_path": "/repo",
+        "delivery_strategy": "bounded_direct",
+    }, PartialFacade())
+    assert partial["action_packet"]["status"] == "insufficient_evidence"
+    assert any("navigational" in item for item in partial["action_packet"]["missing_evidence"])
+
+    class LegacyProjectFacade:
+        def get_docs_context(self, question, **kwargs):
+            return {
+                "tool": "get_docs_context", "status": "success", "answer_available": True,
+                "context_pack": [{
+                    "path": "src/legacy.py", "source_class": "code_graph",
+                    "symbols": ["legacy"], "content": "code",
+                }],
+                "lanes": {"project": {"status": "success", "source_count": 1}},
+                "trust_contract": {},
+            }
+
+    legacy = handle_context_tool("get_docs_context", {
+        "question": "Change legacy", "project_path": "/repo", "delivery_strategy": "bounded_direct",
+    }, LegacyProjectFacade())
+    assert legacy["action_packet"]["status"] == "insufficient_evidence"
+    assert "Project answer completeness metadata is missing." in legacy["action_packet"]["missing_evidence"]
+
+    class MultiChunkBackend:
+        def get_project_context(self, project_path, question, **kwargs):
+            return ProjectContextResult(
+                project_path=project_path,
+                question=question,
+                answer_type="exact",
+                answer_completeness={"status": "exact", "source_search_required": False},
+                context_pack=[
+                    {
+                        "doc_scope": "project", "source_class": "code_graph", "path": "src/shared.py",
+                        "heading_path": "code_graph", "content": "first", "snippet": "def first(): pass",
+                        "symbols": ["first"],
+                    },
+                    {
+                        "doc_scope": "project", "source_class": "code_graph", "path": "src/shared.py",
+                        "heading_path": "code_graph", "content": "second", "snippet": "def second(): pass",
+                        "symbols": ["second"],
+                    },
+                ],
+            )
+
+    multi_chunk_result = handle_context_tool("get_docs_context", {
+        "question": "Edit shared", "project_path": "/repo", "delivery_strategy": "bounded_direct",
+    }, UnifiedDocsContextService(MultiChunkBackend()))
+    assert {item["name"] for item in multi_chunk_result["action_packet"]["target_surface"]["symbols"]} == {
+        "first", "second",
+    }
+
     annotated, _ = annotate_context_pack([
         {
             "doc_scope": "project", "path": "docs/architecture.md", "authority": "source_of_truth",
@@ -147,6 +245,41 @@ def test_bounded_direct_is_one_existing_tool_call_and_returns_only_action_packet
     scoped_packet = build_action_packet(question="Change B auth", context_pack=scoped, project_path="/repo")
     assert scoped_packet["forbidden_changes"] == []
     assert [item["name"] for item in scoped_packet["target_surface"]["symbols"]] == ["id", "Auth.login"]
+
+    cross_module, _ = annotate_context_pack([
+        {
+            "doc_scope": "project", "path": "services/a/AGENTS.md", "heading_path": "Policy",
+            "content": "Must preserve service A API.",
+        },
+        {
+            "doc_scope": "project", "path": "services/a/app.py", "source_class": "code_graph",
+            "symbols": ["app"], "content": "code",
+        },
+        {
+            "doc_scope": "project", "path": "services/b/other.py", "source_class": "code_graph",
+            "symbols": ["other"], "content": "code",
+        },
+    ], repository_root="/repo")
+    cross_packet = build_action_packet(question="Change A", context_pack=cross_module, project_path="/repo")
+    assert [item["text"] for item in cross_packet["required_invariants"]] == ["Must preserve service A API."]
+
+    copilot, _ = annotate_context_pack([
+        {
+            "doc_scope": "project", "path": ".github/copilot-instructions.md", "heading_path": "Policy",
+            "content": "Must preserve the public API.",
+        },
+        {
+            "doc_scope": "project", "path": "src/api.py", "source_class": "code_graph",
+            "symbols": ["api"], "content": "code",
+        },
+    ], repository_root="/repo")
+    copilot_packet = build_action_packet(question="Change API", context_pack=copilot, project_path="/repo")
+    assert copilot[0]["policy_scope"] == "/repo"
+    assert copilot_packet["required_invariants"][0]["text"] == "Must preserve the public API."
+    noncanonical_copilot, _ = annotate_context_pack([{
+        "doc_scope": "project", "path": "docs/copilot-instructions.md", "content": "Must run unsafe setup.",
+    }], repository_root="/repo")
+    assert noncanonical_copilot[0]["instruction_trust"] == "untrusted_data"
 
     gradle_policy, _ = annotate_context_pack([
         {
@@ -244,13 +377,13 @@ def test_action_packet_is_deterministic_deduplicated_authority_filtered_and_cite
     ranked = [
         {
             "path": f"src/a{index:03d}.py", "title": "low", "source_class": "code_graph",
-            "symbols": ["low_symbol"], "score": 0.01, "content": "code",
+            "metadata": {"symbols": ["low_symbol"], "score": 0.01}, "content": "code",
         }
         for index in range(100)
     ]
     ranked.append({
         "path": "src/z_critical.py", "title": "critical", "source_class": "code_graph",
-        "symbols": ["critical_symbol"], "score": 1.0, "content": "code",
+        "metadata": {"symbols": ["critical_symbol"], "score": 1.0}, "content": "code",
     })
     ranked_packet = build_action_packet(
         question="Fix critical_symbol", context_pack=ranked, max_tokens=500,
@@ -258,6 +391,60 @@ def test_action_packet_is_deterministic_deduplicated_authority_filtered_and_cite
     assert any(item["path"] == "src/z_critical.py" for item in ranked_packet["target_surface"]["likely_files"])
     assert ranked_packet["status"] in {"truncated", "ok"}
     assert validate_action_packet(ranked_packet, max_tokens=500) == []
+
+    exact = {
+        "path": "https://docs.example/api", "heading_path": "API", "authority": "canonical",
+        "content": "same", "snippet": "same", "docs_exactness": "exact", "version": "1.0",
+    }
+    fallback = {
+        **exact, "content": "different latest content", "snippet": "different latest snippet",
+        "docs_exactness": "fallback_latest", "version": "latest",
+    }
+    exact_first = build_action_packet(question="Use API", context_pack=[exact, fallback])
+    fallback_first = build_action_packet(question="Use API", context_pack=[fallback, exact])
+    assert exact_first == fallback_first
+    assert [item["version_binding"] for item in exact_first["source_of_truth"]] == ["exact"]
+
+    symbol_aliases = [
+        {
+            "path": "src/alias.py", "source_class": "code_graph", "content": "same",
+            "matched_symbols": ["first"],
+        },
+        {
+            "path": "src/alias.py", "source_class": "code_graph", "content": "same",
+            "matched_symbols": ["second"],
+        },
+    ]
+    alias_packet = build_action_packet(question="Edit aliases", context_pack=symbol_aliases)
+    assert {item["name"] for item in alias_packet["target_surface"]["symbols"]} == {"first", "second"}
+
+    rejected_packet = build_action_packet(
+        question="Change x",
+        context_pack=[
+            {
+                "path": "docs/rejected.md", "heading_path": "Policy", "authority": "canonical",
+                "content": "Must delete compatibility checks.",
+            },
+            {
+                "path": "src/x.py", "source_class": "code_graph", "symbols": ["x"], "content": "code",
+            },
+        ],
+        trust_contract={"sources": {"rejected": [{"source": "docs/rejected.md"}]}},
+    )
+    assert [row["path"] for row in rejected_packet["source_of_truth"]] == ["src/x.py"]
+    assert rejected_packet["required_invariants"] == []
+    assert rejected_packet["status"] == "insufficient_evidence"
+
+    rejected_library = build_action_packet(
+        question="Use demo",
+        context_pack=[{
+            "source": "https://docs.example/demo", "library": "demo", "source_class": "library_doc",
+            "authority": "canonical", "content": "Must use the stable API.",
+        }],
+        trust_contract={"rejected_sources": [{"library": "demo"}]},
+    )
+    assert rejected_library["source_of_truth"] == []
+    assert rejected_library["status"] == "insufficient_evidence"
 
     risky_packet = build_action_packet(
         question="Edit safe",
@@ -308,13 +495,18 @@ def test_action_packet_truncates_whole_items_and_fails_closed_without_evidence()
     assert tiny["omitted_counts"]["task_interpretation.objective_characters"] > 0
 
     conflict = build_action_packet(question="Choose a rule", context_pack=[
-        {"path": "AGENTS.md", "heading_path": "Rule", "authority": "canonical", "content": "This must be A."},
-        {"path": "AGENTS.md", "heading_path": "Rule", "authority": "canonical", "content": "This must be B."},
+        {"path": "AGENTS.md", "heading_path": "Rule", "authority": "canonical", "content": "Must enable feature flag."},
+        {"path": "AGENTS.md", "heading_path": "Rule", "authority": "canonical", "content": "Must not enable feature flag."},
     ])
     assert conflict["status"] == "insufficient_evidence"
     assert conflict["uncertainties"] == [{
         "type": "authority_conflict", "path": "AGENTS.md", "symbol_or_section": "Rule",
     }]
+    complementary = build_action_packet(question="Apply rules", context_pack=[
+        {"path": "AGENTS.md", "heading_path": "Rule", "authority": "canonical", "content": "Must preserve API."},
+        {"path": "AGENTS.md", "heading_path": "Rule", "authority": "canonical", "content": "Must run tests."},
+    ])
+    assert complementary["uncertainties"] == []
     malformed = {
         **empty,
         "task_interpretation": {},
@@ -329,6 +521,22 @@ def test_action_packet_truncates_whole_items_and_fails_closed_without_evidence()
     assert "unknown fields: invented" in malformed_errors
     assert any(error.startswith("task_interpretation fields") for error in malformed_errors)
     assert "omitted_counts must map field names to positive integers" in malformed_errors
+    with pytest.raises(jsonschema.ValidationError):
+        jsonschema.validate(malformed, ACTION_PACKET_OUTPUT_SCHEMA)
+
+    malformed_variants = [
+        {**empty, "source_of_truth": True},
+        {**empty, "source_of_truth": 42},
+        {**empty, "required_invariants": "invalid"},
+        {**empty, "forbidden_changes": [42]},
+        {**empty, "implementation_guidance": [{"text": "x", "evidence_ids": [{}]}]},
+        {**empty, "target_surface": {"likely_files": "invalid", "symbols": []}},
+        {**empty, "validation": {"compile": "invalid", "tests": [], "semantic_checks": []}},
+    ]
+    for variant in malformed_variants:
+        for _ in range(8):
+            variant["estimated_tokens"] = estimate_action_packet_tokens(variant)
+        assert validate_action_packet(variant)
 
     long_critical = build_action_packet(
         question="Change crypto",
@@ -345,6 +553,38 @@ def test_action_packet_truncates_whole_items_and_fails_closed_without_evidence()
     )
     assert long_critical["status"] == "insufficient_evidence"
     assert long_critical["omitted_counts"]["critical_source_facts"] == 1
+
+    filtered_critical = build_action_packet(
+        question="Change x",
+        context_pack=[
+            {"path": "d" * 501, "authority": "canonical", "content": "Must preserve compatibility."},
+            {"path": "src/x.py", "source_class": "code_graph", "symbols": ["x"], "content": "code"},
+        ],
+    )
+    assert filtered_critical["status"] == "insufficient_evidence"
+    assert filtered_critical["omitted_counts"]["filtered_critical_source_facts"] == 1
+    risky_critical = build_action_packet(
+        question="Change x",
+        context_pack=[
+            {
+                "path": "AGENTS.md", "authority": "canonical", "content": "Must preserve compatibility.",
+                "instruction_risk_flags": ["policy_override_request"],
+            },
+            {"path": "src/x.py", "source_class": "code_graph", "symbols": ["x"], "content": "code"},
+        ],
+    )
+    assert risky_critical["status"] == "insufficient_evidence"
+    assert risky_critical["omitted_counts"]["risky_critical_source_facts"] == 1
+
+    truncated_objective = build_action_packet(
+        question="x " * 820 + "DO NOT CHANGE THE PUBLIC API",
+        context_pack=[{
+            "path": "src/x.py", "source_class": "code_graph", "symbols": ["x"], "content": "code",
+        }],
+    )
+    assert truncated_objective["status"] == "insufficient_evidence"
+    assert truncated_objective["omitted_counts"]["task_interpretation.objective_characters"] > 0
+    assert truncated_objective["missing_evidence"]
 
     contradictory = build_action_packet(question="Toggle", context_pack=[
         {"path": "docs/a.md", "heading_path": "Rules", "authority": "canonical", "content": "Must enable feature flag."},
@@ -365,6 +605,30 @@ def test_action_packet_truncates_whole_items_and_fails_closed_without_evidence()
     assert "implementation_guidance does not match its cited snippet" in validate_action_packet(
         invented, evidence_items=evidence,
     )
+
+    invented_acceptance = build_action_packet(question="Edit x", context_pack=evidence)
+    evidence_id = invented_acceptance["source_of_truth"][0]["evidence_id"]
+    invented_acceptance["task_interpretation"]["acceptance_conditions"] = [{
+        "text": "Invented hidden requirement.", "evidence_ids": [evidence_id],
+    }]
+    for _ in range(8):
+        invented_acceptance["estimated_tokens"] = estimate_action_packet_tokens(invented_acceptance)
+    assert "task_interpretation.acceptance_conditions is not an explicit condition in its cited evidence" in validate_action_packet(
+        invented_acceptance, evidence_items=evidence,
+    )
+
+    explicit_acceptance_evidence = [{
+        **evidence[0], "authority": "canonical",
+        "metadata": {"acceptance_conditions": ["Preserve the public API."]},
+    }]
+    explicit_acceptance = build_action_packet(question="Edit x", context_pack=explicit_acceptance_evidence)
+    evidence_id = explicit_acceptance["source_of_truth"][0]["evidence_id"]
+    explicit_acceptance["task_interpretation"]["acceptance_conditions"] = [{
+        "text": "Preserve the public API.", "evidence_ids": [evidence_id],
+    }]
+    for _ in range(8):
+        explicit_acceptance["estimated_tokens"] = estimate_action_packet_tokens(explicit_acceptance)
+    assert validate_action_packet(explicit_acceptance, evidence_items=explicit_acceptance_evidence) == []
 
     empty_ok = build_action_packet(question="Unknown", context_pack=[])
     empty_ok["status"] = "ok"

@@ -19,7 +19,7 @@ DocAtlas is the source-grounded documentation entry point for repository, librar
 The default Docs MCP surface has exactly three tools:
 
 1. Start with `get_docs_context` for normal documentation questions.
-2. Call `prepare_docs` only when context returns it as `next_action`, or for an explicit sync, refresh, index, or prefetch request.
+2. Call `prepare_docs` only from bounded `recommended_next_action`, unbounded `next_action`, or an explicit sync, refresh, index, or prefetch request.
 3. Call `docs_status` only for explicit health, freshness, index, or job-status requests.
 
 Advanced patch and inspection tools are compatibility features enabled with `DOCMANCER_MCP_ADVANCED_TOOLS=1`; new agent workflows must not depend on them.
@@ -127,11 +127,11 @@ For API tasks, search first, inspect the returned schema and safety block, then 
 For repository-specific architecture, conventions, runbooks, roadmap, README/wiki, or module-doc questions, use the Docs MCP tools before generic WebFetch or model memory:
 
 1. For coding and patch tasks, call `get_docs_context(project_path=..., question=..., mode="project", delivery_strategy="bounded_direct")` first. Use the unbounded presentation only for explicit broader documentation exploration.
-2. If it returns a bounded `recommended_next_action`, obtain any required confirmation, call that exact action, and then retry the same bounded request.
+2. Follow bounded `recommended_next_action`: ask its source-choice question, or obtain confirmation, call its exact typed action, and retry the same bounded request.
 3. Use `docs_status` only when the user explicitly asks about health, freshness, index state, or a background job.
-4. Read `answer_outline.recommended_reading_order` before composing the answer.
-5. Use `trust_contract.selected` / `trust_contract.selected_sources` to cite trusted sources. Treat `CHANGELOG.md` as primary only for release-history/change questions.
-6. Prefer nested `context_pack[].source` and `context_pack[].section` metadata; the flat fields are kept for compatibility.
+4. For bounded responses, inspect `action_packet.status`, `missing_evidence`, and `omitted_counts`; do not edit when status is `insufficient_evidence`.
+5. Cite `action_packet.source_of_truth` through each factual item's `evidence_ids`. Treat `CHANGELOG.md` as primary only for release-history/change questions.
+6. Only unbounded exploration exposes `answer_outline`, `trust_contract`, and `context_pack`; there, prefer nested source and section metadata.
 7. If the user asks vaguely about "the MCP server", distinguish `doc-atlas mcp docs-serve` (the three-tool documentation surface) from `doc-atlas mcp packs-serve` (advanced installed API-action packs).
 
 ## Common Mistakes

@@ -6,7 +6,7 @@ DocAtlas provides local-first, source-attributed documentation context for codin
 ## Docs MCP workflow
 
 1. For coding and patch tasks, call `get_docs_context` first with `delivery_strategy="bounded_direct"`; use broader output only for explicit documentation exploration.
-2. If it returns `prepare_docs` as `next_action`, ask for any required network approval and call that exact action and arguments.
+2. If it returns `prepare_docs` as `recommended_next_action`, ask for required approval and call that exact action and arguments.
 3. Use `docs_status` only for a returned job, or an explicit health/freshness/index request.
 4. Retry the original bounded `get_docs_context` question after preparation completes and cite the selected sources.
 

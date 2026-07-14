@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import re
 from dataclasses import asdict, is_dataclass, replace
 from typing import Any
@@ -391,6 +392,8 @@ class UnifiedDocsContextService:
             mode_selected=mode_selected,
             routing=routing,
             answer_available=answer_available,
+            answer_type=getattr(project_result, "answer_type", None) if project_result else None,
+            answer_completeness=dict(getattr(project_result, "answer_completeness", None) or {}) if project_result else {},
             context_pack=context_pack,
             lanes=lanes,
             source_summary=source_summary,
@@ -876,7 +879,39 @@ class UnifiedDocsContextService:
             source_identity = item.get("canonical_id") or item.get("source") or item.get("url") or item.get("path")
             if isinstance(source_identity, dict):
                 source_identity = source_identity.get("url") or source_identity.get("path") or source_identity.get("source") or str(sorted(source_identity.items()))
-            stable = (str(source_identity), item.get("heading_path") or (item.get("section") or {}).get("heading_path") or item.get("title"))
+            metadata = item.get("metadata") if isinstance(item.get("metadata"), dict) else {}
+            section = item.get("section") if isinstance(item.get("section"), dict) else {}
+            evidence_payload = json.dumps(
+                {
+                    "content": item.get("content"),
+                    "snippet": item.get("snippet"),
+                    "symbols": item.get("symbols"),
+                    "metadata_symbols": metadata.get("symbols"),
+                    "line_start": item.get("line_start"),
+                    "line_end": item.get("line_end"),
+                    "docs_exactness": item.get("docs_exactness"),
+                    "version": item.get("version"),
+                    "requested_version": item.get("requested_version"),
+                },
+                ensure_ascii=False,
+                sort_keys=True,
+                default=str,
+            )
+            source_class = str(item.get("source_class") or "")
+            payload_distinguishes_evidence = bool(
+                source_class in {"code_graph", "repo_map", "source_evidence", "library_doc", "dependency_doc"}
+                or item.get("snippet")
+                or item.get("symbols")
+                or metadata.get("symbols")
+                or item.get("line_start") is not None
+                or item.get("line_end") is not None
+                or item.get("docs_exactness")
+            )
+            stable = (
+                str(source_identity),
+                item.get("heading_path") or section.get("heading_path") or item.get("title"),
+                evidence_payload if payload_distinguishes_evidence else None,
+            )
             if stable in seen:
                 dedup_dropped += 1
                 dedup_reasons.append("duplicate_source")
