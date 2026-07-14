@@ -7,6 +7,7 @@ from pathlib import Path
 import pytest
 
 from eval.task_level.github_models import (
+    GitHubModelsClient,
     GitHubModelsCompletion,
     GitHubModelsIsolatedWorker,
     GitHubModelsRunner,
@@ -96,14 +97,63 @@ def test_github_models_runner_enforces_turns_and_edits_with_closed_tool_loop(
     assert output.status == "completed"
     assert output.exit_code == 0
     assert output.max_turns_enforced is True
-    assert output.input_tokens == 300
-    assert output.output_tokens == 60
-    assert calls == 3
+    assert output.input_tokens == 200
+    assert output.output_tokens == 40
+    assert calls == 2
     assert "return a + b" in (workspace / "calc.py").read_text(encoding="utf-8")
     trajectory = json.loads((output_dir / "trajectory.normalized.json").read_text(encoding="utf-8"))
     assert any(event["tool_name"] == "Edit.replace_text" for event in trajectory)
     assert any("pytest" in event["tool_name"].lower() for event in trajectory)
     assert "Bearer token" not in (output_dir / "github_models_usage.json").read_text(encoding="utf-8")
+
+
+def test_github_models_client_streams_structured_output_and_usage(
+    monkeypatch: pytest.MonkeyPatch,
+):
+    class Response:
+        headers = {"x-github-request-id": "request-stream-1"}
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_args):
+            return None
+
+        def __iter__(self):
+            events = [
+                {
+                    "model": "gpt-4.1-mini-2025-04-14",
+                    "choices": [{"delta": {"content": '{"selected_'}, "finish_reason": None}],
+                },
+                {"choices": [{"delta": {"content": 'indices":[0,1,2]}'}, "finish_reason": "stop"}]},
+                {"choices": [], "usage": {"prompt_tokens": 10, "completion_tokens": 8, "total_tokens": 18}},
+            ]
+            return iter([*(f"data: {json.dumps(event)}\n\n".encode() for event in events), b"data: [DONE]\n\n"])
+
+    captured = {}
+
+    def fake_urlopen(request, timeout):
+        captured["payload"] = json.loads(request.data)
+        captured["timeout"] = timeout
+        return Response()
+
+    monkeypatch.setattr("eval.task_level.github_models.urllib.request.urlopen", fake_urlopen)
+
+    value, completion = GitHubModelsClient("token").complete_json(
+        model="openai/gpt-4.1-mini",
+        messages=[{"role": "user", "content": "select"}],
+        schema_name="selection",
+        schema={"type": "object"},
+        timeout_seconds=10,
+        max_tokens=64,
+    )
+
+    assert value == {"selected_indices": [0, 1, 2]}
+    assert completion.request_id == "request-stream-1"
+    assert completion.input_tokens == 10
+    assert completion.output_tokens == 8
+    assert captured["payload"]["stream"] is True
+    assert captured["payload"]["stream_options"] == {"include_usage": True}
 
 
 def test_github_models_runner_forbids_test_edits(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):

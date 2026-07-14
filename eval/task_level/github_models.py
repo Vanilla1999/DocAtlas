@@ -74,6 +74,8 @@ class GitHubModelsClient:
             "messages": messages,
             "temperature": 0,
             "max_tokens": max_tokens,
+            "stream": True,
+            "stream_options": {"include_usage": True},
             "response_format": {
                 "type": "json_schema",
                 "json_schema": {
@@ -88,7 +90,7 @@ class GitHubModelsClient:
             self.endpoint,
             data=json.dumps(payload, ensure_ascii=False).encode("utf-8"),
             headers={
-                "Accept": "application/json",
+                "Accept": "text/event-stream",
                 "Authorization": "Bearer " + self._token,
                 "Content-Type": "application/json",
                 "X-GitHub-Api-Version": "2026-03-10",
@@ -97,27 +99,55 @@ class GitHubModelsClient:
         )
         try:
             with urllib.request.urlopen(request, timeout=timeout_seconds) as response:
-                body = response.read(4_000_001)
-                if len(body) > 4_000_000:
-                    raise RuntimeError("GitHub Models response exceeded 4 MB")
                 request_ids = {
                     name: value
                     for name in ("x-github-request-id", "apim-request-id", "x-ms-request-id")
                     if (value := response.headers.get(name))
                 }
+                chunks: list[str] = []
+                usage: dict[str, Any] | None = None
+                response_model = model
+                finish_reasons: list[str] = []
+                received_bytes = 0
+                for raw_line in response:
+                    received_bytes += len(raw_line)
+                    if received_bytes > 4_000_000:
+                        raise RuntimeError("GitHub Models response exceeded 4 MB")
+                    line = raw_line.decode("utf-8", errors="replace").strip()
+                    if not line.startswith("data:"):
+                        continue
+                    data = line.removeprefix("data:").strip()
+                    if not data or data == "[DONE]":
+                        continue
+                    event = json.loads(data)
+                    if isinstance(event.get("error"), dict):
+                        raise RuntimeError("GitHub Models stream returned an error event")
+                    if isinstance(event.get("model"), str):
+                        response_model = event["model"]
+                    if isinstance(event.get("usage"), dict):
+                        usage = event["usage"]
+                    for choice in event.get("choices", []):
+                        if not isinstance(choice, dict):
+                            continue
+                        delta = choice.get("delta")
+                        if isinstance(delta, dict) and isinstance(delta.get("content"), str):
+                            chunks.append(delta["content"])
+                        if isinstance(choice.get("finish_reason"), str):
+                            finish_reasons.append(choice["finish_reason"])
         except urllib.error.HTTPError as exc:
             detail = exc.read(2_000).decode("utf-8", errors="replace")
             raise RuntimeError(f"GitHub Models HTTP {exc.code}: {detail}") from exc
         except urllib.error.URLError as exc:
             raise RuntimeError(f"GitHub Models transport failure: {exc.reason}") from exc
 
+        content = "".join(chunks)
         try:
-            result = json.loads(body.decode("utf-8"))
-            content = result["choices"][0]["message"]["content"]
-            usage = result["usage"]
             value = json.loads(content)
-        except (KeyError, IndexError, TypeError, UnicodeDecodeError, json.JSONDecodeError) as exc:
-            raise RuntimeError("GitHub Models returned an invalid structured completion") from exc
+        except json.JSONDecodeError as exc:
+            finish = ",".join(finish_reasons) or "missing"
+            raise RuntimeError(
+                f"GitHub Models returned an invalid structured completion (finish={finish}, chars={len(content)})"
+            ) from exc
         if not isinstance(value, dict) or not isinstance(usage, dict):
             raise RuntimeError("GitHub Models structured completion contract failed")
         input_tokens = _strict_nonnegative_int(usage.get("prompt_tokens"), "prompt_tokens")
@@ -134,7 +164,7 @@ class GitHubModelsClient:
         request_id = request_ids.get("x-github-request-id") or request_ids.get("apim-request-id") or next(iter(request_ids.values()))
         completion = GitHubModelsCompletion(
             content=content,
-            model=str(result.get("model") or model),
+            model=response_model,
             request_id=request_id,
             request_ids=request_ids,
             input_tokens=input_tokens,
@@ -395,6 +425,21 @@ class GitHubModelsRunner:
                 result,
             )
             events.append(event)
+            if tool == "replace_text" and result.startswith("UPDATED "):
+                test_result = _execute_agent_tool(request, {"tool": "run_tests"}, read_paths=read_paths)
+                events.append(_event(
+                    len(events) + 1,
+                    "tool_call",
+                    "Bash.pytest",
+                    {"command": "uv run --offline pytest", "trigger": "post_edit_verification"},
+                    test_result,
+                ))
+                stdout_rows.append(json.dumps({
+                    "turn": turn,
+                    "post_edit_verification": test_result[:4_000],
+                }, ensure_ascii=False, sort_keys=True))
+                status, exit_code = "completed", 0
+                break
             if tool == "run_tests" and result.startswith("exit_code=0\n"):
                 status, exit_code = "completed", 0
                 break
