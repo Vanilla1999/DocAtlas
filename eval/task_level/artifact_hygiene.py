@@ -13,6 +13,7 @@ RUNTIME_DIR_PARTS = {
     ".hypothesis",
     ".tox",
     ".nox",
+    ".venv",
 }
 RUNTIME_FILE_NAMES = {
     ".coverage",

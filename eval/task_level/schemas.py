@@ -22,6 +22,8 @@ ConditionId = Literal[
     "docatlas_action_checklist_only",
     "docatlas_tool_required_once",
     "docatlas_zero_setup",
+    "docatlas_bounded_direct",
+    "docatlas_bounded_subagent",
 ]
 
 
@@ -116,6 +118,8 @@ class ToolPolicy:
     max_constraint_packet_tokens: int = 1200
     max_constraints: int = 12
     max_sources: int = 8
+    delivery_strategy: Literal["bounded_direct", "bounded_subagent"] | None = None
+    isolated_worker_required: bool = False
 
 
 @dataclass(frozen=True)

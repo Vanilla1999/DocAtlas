@@ -341,6 +341,7 @@ def test_action_packet_is_deterministic_deduplicated_authority_filtered_and_cite
         "get_docs_context", "ActionPacketWorker",
     ]
     assert not any("supporting evidence" in item["text"] for item in first["required_invariants"])
+    assert any("supporting evidence" in item["text"] for item in first["implementation_guidance"])
     evidence_ids = {row["evidence_id"] for row in first["source_of_truth"]}
     for fact in [
         *first["required_invariants"], *first["forbidden_changes"],

@@ -11,6 +11,8 @@ The pilot conditions are:
 - `docatlas_evidence_first`: repo-only plus preindexed DocAtlas `get_docs_context` with `response_style=evidence-first`.
 - `docatlas_snippet_first`: repo-only plus preindexed DocAtlas `get_docs_context` with `response_style=snippet-first`.
 - `docatlas_zero_setup`: exploratory DocAtlas without preindexing; never mixed with preindexed storage.
+- `docatlas_bounded_direct`: one deterministic, validated ActionPacket enters the parent session.
+- `docatlas_bounded_subagent`: the host freezes the same one-call evidence snapshot used by the direct lane, then a fresh worker compresses it; only its validated ActionPacket enters the parent session.
 
 Run safety:
 
@@ -29,3 +31,32 @@ Example smoke command:
 ```bash
 python3 -m eval.task_level.runner --validate --smoke --repeats 1
 ```
+
+Task 33C dry-run protocol (exactly one task, four lanes, one repeat):
+
+```bash
+python3 -m eval.task_level.runner \
+  --task33c-pilot --dry-run \
+  --tasks decisive_nbo_cross_module_gate_large_001 \
+  --run-id task33c_dry_run
+```
+
+For a causal isolated lane, provide `--runner-factory module.path:factory` for a runner that proves the hard turn limit and `--isolated-worker-factory module.path:factory` for a host-owned worker adapter. The adapter must expose verified capability evidence and provider-usage proof. The harness derives a frozen project-doc query from repeated domain terms in the task objective (without evaluator/gold fields), freezes one host retrieval for both bounded lanes, checks its objective/query derivation, project/index revisions, and evidence hash, and validates the returned packet only against that snapshot.
+
+The bundled JSON subprocess adapter is a non-causal protocol scaffold unless a host-side provider-usage verifier is injected. Its worker runs under bubblewrap with user, mount, network, and PID namespaces; an executable canary must prove that the working directory is read-only, the workspace is absent, networking is denied, and a detached descendant cannot outlive the worker. Missing or failed canaries, missing provider proof, `insufficient_evidence`, a second attempt, or incomplete pilot metrics produce a fail-closed/`INCONCLUSIVE` result. Merely supplying a flag or finding a `bwrap` executable is not verification.
+
+GitHub Actions can inject the controlled GitHub Models adapters with its ephemeral `GITHUB_TOKEN` and `models: read` permission:
+
+```bash
+python -m eval.task_level.runner \
+  --task33c-pilot \
+  --tasks decisive_nbo_cross_module_gate_large_001 \
+  --runner-factory eval.task_level.github_models:create_github_models_runner \
+  --isolated-worker-factory eval.task_level.github_models:create_github_models_worker \
+  --verify-runner --verify-docatlas-tool \
+  --model openai/gpt-4o-mini
+```
+
+The parent adapter exposes a hard-turn-controlled repository tool allowlist. The isolated worker is a one-shot, tool-less hosted inference request over immutable host-owned evidence: it selects evidence, while the host constructs and validates the ActionPacket and binds token usage to provider request IDs. It has no local process, repository mount, general network tool, or recursive delegation surface.
+
+The engineering pilot freezes a 24-turn limit per parent cell and uses the low-rate-tier `openai/gpt-4o-mini` adapter so a worst-case four-lane run remains below the free API's daily request budget. A turn-limit exhaustion or provider 429 is infrastructure-incomplete, never a completed causal cell.

@@ -61,14 +61,32 @@ def evaluate_docatlas_utilization(
 ) -> DocAtlasUtilization:
     available = condition_id.startswith("docatlas_")
     response_path = run_output_dir / "docatlas_response.json"
+    packet_path = run_output_dir / "action_packet.json"
     injected_path = run_output_dir / "injected_context.md"
     sources_path = run_output_dir / "context_sources.json"
     injection_path = run_output_dir / "docatlas_context_injection.json"
-    context_retrieved = response_path.exists()
-    context_injected = injected_path.exists()
-    harness_calls = 1 if context_retrieved else 0
+    host_retrieval = _load_json(run_output_dir / "host_retrieval_metrics.json")
+    bounded_delivery = bool(host_retrieval)
+    context_retrieved = (
+        host_retrieval.get("status") == "success"
+        and isinstance(host_retrieval.get("evidence_count"), int)
+        and not isinstance(host_retrieval.get("evidence_count"), bool)
+        and host_retrieval["evidence_count"] > 0
+    ) if bounded_delivery else response_path.exists()
+    context_injected = injected_path.exists() or packet_path.exists()
+    delivery_metrics = _load_json(run_output_dir / "isolated_delivery_metrics.json") or _load_json(run_output_dir / "bounded_direct_metrics.json")
+    raw_harness_calls = host_retrieval.get("retrieval_calls") if bounded_delivery else delivery_metrics.get("retrieval_calls")
+    harness_calls = (
+        raw_harness_calls
+        if isinstance(raw_harness_calls, int) and not isinstance(raw_harness_calls, bool) and raw_harness_calls >= 0
+        else 1 if context_retrieved else 0
+    )
     injection = _load_json(injection_path)
-    retrieval_status = injection.get("docatlas_retrieval_status") or injection.get("status")
+    retrieval_status = (
+        host_retrieval.get("status")
+        if bounded_delivery
+        else injection.get("docatlas_retrieval_status") or injection.get("status")
+    )
     fallback_used = bool(injection.get("fallback_used"))
     vector_timed_out = bool(injection.get("vector_indexing_timed_out"))
     fallback_source = str(injection.get("fallback_source")) if injection.get("fallback_source") else None
@@ -82,6 +100,8 @@ def evaluate_docatlas_utilization(
         context_text += injected_path.read_text(encoding="utf-8")
     if response_path.exists():
         context_text += "\n" + response_path.read_text(encoding="utf-8")[:12000]
+    if packet_path.exists():
+        context_text += "\n" + packet_path.read_text(encoding="utf-8")
     if agent_docatlas_calls and trajectory_path and trajectory_path.exists():
         context_text += "\n" + trajectory_path.read_text(encoding="utf-8")[:20000]
     if not context_text.strip():
@@ -99,7 +119,7 @@ def evaluate_docatlas_utilization(
 
     candidate_symbols = _candidate_symbols(task, context_text)
     used_symbols = sorted(symbol for symbol in candidate_symbols if symbol and symbol in patch_text)
-    used_sources = _used_sources(sources_path, trajectory_text)
+    used_sources = _used_sources(sources_path, f"{trajectory_text}\n{patch_text}", packet_path)
     used_project_constraints = _used_project_constraints(task, patch_text, context_text)
     used_version_info = _used_version_info(task, patch_text, context_text, trajectory_text)
 
@@ -127,7 +147,9 @@ def evaluate_docatlas_utilization(
         vector_indexing_timed_out=vector_timed_out,
         fallback_used=fallback_used,
         fallback_source=fallback_source,
-        docatlas_tool_success=agent_docatlas_calls > 0 or (context_retrieved and not fallback_used),
+        docatlas_tool_success=agent_docatlas_calls > 0 or (
+            context_retrieved and not fallback_used and retrieval_status == "success"
+        ),
         docatlas_fallback_success=fallback_used and confidence != "none",
     )
 
@@ -140,7 +162,18 @@ def _candidate_symbols(task: TaskSpec, context_text: str) -> set[str]:
     return symbols
 
 
-def _used_sources(sources_path: Path, trajectory_text: str) -> list[str]:
+def _used_sources(sources_path: Path, trajectory_text: str, packet_path: Path) -> list[str]:
+    if packet_path.exists():
+        packet = _load_json(packet_path)
+        return sorted({
+            str(row.get("path") or "")
+            for row in packet.get("source_of_truth", [])
+            if (
+                isinstance(row, dict)
+                and str(row.get("path") or "")
+                and str(row.get("path") or "") in trajectory_text
+            )
+        })
     if not sources_path.exists():
         return []
     try:

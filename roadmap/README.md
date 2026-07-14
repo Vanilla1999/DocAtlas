@@ -37,7 +37,7 @@ DocAtlas must not silently author or commit official documentation. When documen
 | 08 Docs/release hygiene | Open | Task file exists | Product narrative, changelog, classifier, wiki and release truth still drift |
 | 09 External ingest | Partial | Async mismatch, background execution, staging and GitHub fetch path were improved | Version propagation, hard deadlines, durable status, real failure taxonomy/recovery, reliable partial-page preservation and Kotlin evidence remain; see 11–14, 30–31 |
 | 23 Product decision benchmark | Pivot required | The complete 36-cell run found no resolved-rate gain and materially higher token/latency cost | Perform patch-level failure analysis and a bounded context-delivery pivot; see 33 |
-| 33 Bounded context pivot | In progress | Task 33A evaluation contracts are merged; Task 33B adds deterministic bounded-direct `ActionPacket` delivery | Review Task 33B, then implement and measure isolated delivery in Task 33C |
+| 33 Bounded context pivot | In progress | Tasks 33A/33B are merged; Task 33C has an opt-in isolated-worker host boundary and frozen four-lane pilot | Run the Task 33C engineering pilot with a verified worker/runner; only then decide whether Task 33D routing is justified |
 
 `Done for scope` means the original bounded PR is complete; it does not mean the entire subsystem is mature.
 

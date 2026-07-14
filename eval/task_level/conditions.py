@@ -142,6 +142,25 @@ CONDITIONS: dict[str, Condition] = {
             preindex=False,
         ),
     ),
+    "docatlas_bounded_direct": Condition(
+        condition_id="docatlas_bounded_direct",
+        label="J - DocAtlas bounded direct ActionPacket",
+        tool_policy=ToolPolicy(
+            allow_docatlas=False,
+            preindex=True,
+            delivery_strategy="bounded_direct",
+        ),
+    ),
+    "docatlas_bounded_subagent": Condition(
+        condition_id="docatlas_bounded_subagent",
+        label="K - DocAtlas bounded isolated worker",
+        tool_policy=ToolPolicy(
+            allow_docatlas=False,
+            preindex=True,
+            delivery_strategy="bounded_subagent",
+            isolated_worker_required=True,
+        ),
+    ),
 }
 
 

@@ -65,6 +65,30 @@ def write_report(run_dir: Path, metadata: dict[str, Any], results: list[dict[str
             f"{result.get('constraint_packet_tokens', metrics.get('constraint_packet_tokens', ''))} |"
         )
 
+    if any(isinstance(result.get("evaluation_execution"), dict) for result in results):
+        lines.extend([
+            "",
+            "## Evaluation execution",
+            "| task | condition | setup_phase | setup_status | setup_rc | public_status | public_rc | hidden_status | hidden_rc | compile_gate | contract |",
+            "|---|---|---|---|---:|---|---:|---|---:|---|---|",
+        ])
+        for result in results:
+            execution = result.get("evaluation_execution")
+            if not isinstance(execution, dict):
+                continue
+            setup = execution.get("setup") if isinstance(execution.get("setup"), dict) else {}
+            public = execution.get("public_tests") if isinstance(execution.get("public_tests"), dict) else {}
+            hidden = execution.get("hidden_tests") if isinstance(execution.get("hidden_tests"), dict) else {}
+            contract = result.get("evaluation_contract")
+            contract = contract if isinstance(contract, dict) else {}
+            lines.append(
+                f"| {result.get('task_id', '')} | {result.get('condition_id', '')} | "
+                f"{setup.get('phase', '')} | {setup.get('status', '')} | {setup.get('returncode', '')} | "
+                f"{public.get('status', '')} | {public.get('returncode', '')} | "
+                f"{hidden.get('status', '')} | {hidden.get('returncode', '')} | "
+                f"{result.get('compile_status', '')} | {contract.get('status', '')} |"
+            )
+
     status_path = run_dir / "status.json"
     if status_path.exists():
         try:
@@ -80,6 +104,31 @@ def write_report(run_dir: Path, metadata: dict[str, Any], results: list[dict[str
         times = [t for t in times if isinstance(t, (int, float))]
         rate = sum(resolved) / len(resolved) if resolved else 0.0
         lines.append(f"- `{condition}`: resolved={sum(resolved)}/{len(resolved)} ({rate:.1%}), median_time={median(times) if times else 'n/a'}")
+
+    if any(result.get("condition_id") in {"docatlas_bounded_direct", "docatlas_bounded_subagent"} for result in results):
+        lines.extend([
+            "",
+            "## Task 33 delivery metrics",
+            "| condition | packet_status | packet_tokens | retained_context | parent_tokens | worker_tokens | system_tokens | retrieval_calls | first_edit | total_latency | evidence_fingerprint |",
+            "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---|",
+        ])
+        for result in results:
+            if result.get("condition_id") not in {"docatlas_bounded_direct", "docatlas_bounded_subagent"}:
+                continue
+            metrics = result.get("metrics") if isinstance(result.get("metrics"), dict) else {}
+            parent_total = metrics.get("total_tokens")
+            worker_total = metrics.get("worker_total_tokens")
+            lines.append(
+                f"| {result.get('condition_id')} | {metrics.get('action_packet_status', '')} | "
+                f"{metrics.get('action_packet_tokens', '')} | {metrics.get('parent_retained_context_tokens', '')} | "
+                f"{parent_total if parent_total is not None else ''} | {worker_total if worker_total is not None else ''} | "
+                f"{metrics.get('system_total_tokens', '')} | {metrics.get('delivery_retrieval_calls', '')} | "
+                f"{metrics.get('time_to_first_edit', '')} | {metrics.get('total_latency', '')} | "
+                f"{metrics.get('evidence_fingerprint', '')} |"
+            )
+        completeness = metadata.get("task33c_completeness")
+        if isinstance(completeness, dict):
+            lines.extend(["", "Task 33C completeness:", "```json", json.dumps(completeness, indent=2, sort_keys=True), "```"])
 
     lines.extend([
         "",
@@ -97,10 +146,16 @@ def write_report(run_dir: Path, metadata: dict[str, Any], results: list[dict[str
                 f"- `{condition}`: agent_docatlas_calls={sum(agent_calls)}, context_used={sum(used)}/{len(used)}"
             )
 
-    blocked = sum(1 for result in results if result.get("status") in {"runner_unavailable", "runner_failed", "timeout"})
+    blocked_statuses = {
+        "condition_setup_failed", "runner_unavailable", "runner_failed", "timeout",
+    }
+    blocked = sum(1 for result in results if result.get("status") in blocked_statuses)
     failure_summary = metadata.get("failure_summary")
     if failure_summary is None and blocked:
-        failure_summary = f"{blocked} run(s) did not produce patches because the independent runner was unavailable, failed, or timed out."
+        failure_summary = (
+            f"{blocked} run(s) did not produce a valid evaluated result because setup, "
+            "the independent runner, or its execution budget failed."
+        )
     lines.extend([
         "",
         "## Failures",
