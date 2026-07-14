@@ -35,7 +35,10 @@ _TASK33_QUERY_STOP_WORDS = frozenset({
     "one", "outcomes", "path", "paths", "reach", "related", "result", "shared", "so",
     "the", "through", "use", "users", "while", "with",
 })
-TASK33_QUERY_DERIVATION = "task33c-domain-coverage-v2"
+_TASK33_DOMAIN_DETAIL_TERMS = (
+    "offline", "sync", "architecture", "partial", "handoff", "deferred",
+)
+TASK33_QUERY_DERIVATION = "task33c-domain-coverage-v3"
 
 
 def derive_task33_retrieval_query(task_objective: str) -> str:
@@ -53,15 +56,22 @@ def derive_task33_retrieval_query(task_objective: str) -> str:
     for word in candidates:
         if counts[word] >= 2 and word not in selected:
             selected.append(word)
-    # Repeated domain terms anchor the query, while unique high-signal terms
-    # preserve the cross-module details that distinguish the task from a
-    # generic permission-gate lookup.
-    for word in candidates:
-        if word not in selected:
-            selected.append(word)
-        if len(selected) >= 10:
-            break
-    query = " ".join(selected[:10])
+    # Repeated domain terms anchor the query. Add at most two objective-owned
+    # domain details so the query spans offline/sync behavior without turning
+    # every narrative word into a completeness requirement.
+    if selected:
+        for word in _TASK33_DOMAIN_DETAIL_TERMS:
+            if word in candidates and word not in selected:
+                selected.append(word)
+            if len(selected) >= 6:
+                break
+    else:
+        for word in candidates:
+            if word not in selected:
+                selected.append(word)
+            if len(selected) >= 6:
+                break
+    query = " ".join(selected[:6])
     if not query:
         raise IsolatedDeliveryError("task33_retrieval_query_derivation_empty")
     return query

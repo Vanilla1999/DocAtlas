@@ -283,7 +283,17 @@ def test_task33c_four_lane_plan_and_flags_are_frozen(tmp_path):
     objective = (
         "Browser and scan users see a permission gate conflict. Fix the permission gate so browser and scan agree."
     )
-    assert derive_task33_retrieval_query(objective) == "browser scan permission gate conflict agree"
+    assert derive_task33_retrieval_query(objective) == "browser scan permission gate"
+    domain_objective = (
+        "Browser and scan users can reach inconsistent permission outcomes after a partial "
+        "permission result: one path can continue through an offline handoff while related "
+        "paths do not agree on the shared gate. Fix the cross-module permission gate contract "
+        "so browser, scan, and deferred sync decisions use the local permission architecture "
+        "consistently."
+    )
+    assert derive_task33_retrieval_query(domain_objective) == (
+        "browser scan permission gate offline sync"
+    )
     assert tuple(plan["conditions"]) == TASK33C_PILOT_CONDITIONS
     with pytest.raises(ValueError, match="frozen"):
         build_task33c_pilot_plan("another_task")
