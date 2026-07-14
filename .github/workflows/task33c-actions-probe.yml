@@ -108,6 +108,88 @@ jobs:
               raise SystemExit("Task 33C bubblewrap canary was not verified")
           PY
 
+      - name: Run Docker sandbox canary
+        id: docker
+        continue-on-error: true
+        run: |
+          python - <<'PY'
+          import json
+          import subprocess
+          from pathlib import Path
+
+          script = r'''
+          cwd_writable=true
+          touch /canary 2>/dev/null || cwd_writable=false
+          workspace_visible=false
+          test -e /workspace && workspace_visible=true
+          network_reachable=true
+          wget -q -T 1 -O /tmp/network-check https://example.com 2>/dev/null || network_reachable=false
+          sleep 30 &
+          printf '{"cwd":"%s","cwd_writable":%s,"workspace_visible":%s,"network_reachable":%s,"detached_descendant_spawned":true}\n' \
+            "$(pwd)" "$cwd_writable" "$workspace_visible" "$network_reachable"
+          '''
+          command = [
+              "docker", "run", "--rm", "--pull=always",
+              "--network", "none",
+              "--read-only",
+              "--pids-limit", "64",
+              "--memory", "256m",
+              "--cpus", "1",
+              "--cap-drop", "ALL",
+              "--security-opt", "no-new-privileges",
+              "--user", "65532:65532",
+              "--tmpfs", "/tmp:rw,noexec,nosuid,nodev,size=16m",
+              "alpine:3.22",
+              "sh", "-ec", script,
+          ]
+          process = subprocess.run(
+              command,
+              text=True,
+              stdout=subprocess.PIPE,
+              stderr=subprocess.PIPE,
+              timeout=30,
+              check=False,
+          )
+          try:
+              checks = json.loads(process.stdout)
+          except json.JSONDecodeError:
+              checks = {}
+          expected = {
+              "cwd": "/",
+              "cwd_writable": False,
+              "workspace_visible": False,
+              "network_reachable": False,
+              "detached_descendant_spawned": True,
+          }
+          verified = process.returncode == 0 and checks == expected
+          report = {
+              "schema_version": 1,
+              "status": "verified" if verified else "failed",
+              "backend": "docker",
+              "image": "alpine:3.22",
+              "command_policy": {
+                  "network": "none",
+                  "read_only_root": True,
+                  "user": "65532:65532",
+                  "cap_drop": "ALL",
+                  "no_new_privileges": True,
+                  "pids_limit": 64,
+                  "memory": "256m",
+                  "cpus": 1,
+                  "workspace_mounted": False,
+              },
+              "returncode": process.returncode,
+              "checks": checks,
+              "stderr": process.stderr[-2_000:],
+          }
+          Path("task33c-actions-probe/docker-sandbox-canary.json").write_text(
+              json.dumps(report, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+          if not verified:
+              raise SystemExit("Task 33C Docker canary was not verified")
+          PY
+
       - name: Run frozen host-retrieval probe
         id: retrieval
         continue-on-error: true
@@ -172,6 +254,7 @@ jobs:
             echo "| Check | Outcome |"
             echo "| --- | --- |"
             echo "| bubblewrap sandbox canary | ${{ steps.sandbox.outcome }} |"
+            echo "| Docker sandbox canary | ${{ steps.docker.outcome }} |"
             echo "| frozen host retrieval | ${{ steps.retrieval.outcome }} |"
             echo "| focused adversarial tests | ${{ steps.focused.outcome }} |"
           } >> "$GITHUB_STEP_SUMMARY"
@@ -189,9 +272,13 @@ jobs:
         if: always()
         env:
           SANDBOX_OUTCOME: ${{ steps.sandbox.outcome }}
+          DOCKER_OUTCOME: ${{ steps.docker.outcome }}
           RETRIEVAL_OUTCOME: ${{ steps.retrieval.outcome }}
           FOCUSED_OUTCOME: ${{ steps.focused.outcome }}
         run: |
-          test "$SANDBOX_OUTCOME" = success
+          if test "$SANDBOX_OUTCOME" != success && test "$DOCKER_OUTCOME" != success; then
+            echo "No verified sandbox backend is available"
+            exit 1
+          fi
           test "$RETRIEVAL_OUTCOME" = success
           test "$FOCUSED_OUTCOME" = success

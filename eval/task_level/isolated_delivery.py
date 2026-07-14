@@ -575,6 +575,7 @@ class JsonSubprocessIsolatedWorker:
                 **base,
                 "status": "failed",
                 "reason": f"sandbox_canary_exit_{process.returncode}",
+                "stderr": stderr.decode("utf-8", errors="replace")[:2_000],
                 "stderr_sha256": hashlib.sha256(stderr).hexdigest(),
                 "wall_time_seconds": round(time.monotonic() - started, 6),
             }
