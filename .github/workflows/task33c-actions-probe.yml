@@ -97,7 +97,7 @@ jobs:
           import urllib.request
           from pathlib import Path
 
-          model = "openai/gpt-4.1"
+          model = "openai/gpt-4.1-mini"
           payload = {
               "model": model,
               "messages": [{"role": "user", "content": "Reply with the single word READY."}],
@@ -107,7 +107,7 @@ jobs:
               "stream_options": {"include_usage": True},
           }
           request = urllib.request.Request(
-              "https://models.github.ai/inference/chat/completions?api-version=2026-03-10",
+              "https://models.github.ai/inference/chat/completions",
               data=json.dumps(payload).encode("utf-8"),
               headers={
                   "Accept": "text/event-stream",
