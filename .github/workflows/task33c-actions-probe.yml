@@ -382,7 +382,9 @@ jobs:
 
   causal-pilot:
     name: GitHub Models causal pilot
-    if: github.event_name == 'workflow_dispatch' && inputs.run_causal_pilot
+    # One-shot PR execution for validating the fail-closed Task 33C fixes.
+    # The follow-up commit restores the dispatch-only gate.
+    if: github.event_name == 'pull_request' || (github.event_name == 'workflow_dispatch' && inputs.run_causal_pilot)
     needs: capability-probe
     runs-on: ubuntu-latest
     timeout-minutes: 50
