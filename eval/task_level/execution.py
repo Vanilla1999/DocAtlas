@@ -625,7 +625,13 @@ def evaluate_agent_patch(task: TaskSpec, workspace: Path, run_output_dir: Path, 
         "task_id": task.task_id,
         "condition_id": condition_id,
         "repeat": int(run_output_dir.name.removeprefix("repeat_")),
-        "runner_id": "codex" if "codex" in str(getattr(runner_output, "runner_version", "")).lower() else "claude",
+        "runner_id": (
+            "github-models"
+            if "github-models" in str(getattr(runner_output, "runner_version", "")).lower()
+            else "codex"
+            if "codex" in str(getattr(runner_output, "runner_version", "")).lower()
+            else "claude"
+        ),
         "runner_version": getattr(runner_output, "runner_version", "unknown"),
         "model": getattr(runner_output, "model", "unknown"),
         "status": status,

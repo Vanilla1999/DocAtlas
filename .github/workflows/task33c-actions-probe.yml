@@ -2,6 +2,12 @@ name: Task 33C Actions probe
 
 on:
   workflow_dispatch:
+    inputs:
+      run_causal_pilot:
+        description: Run the one-task/four-lane GitHub Models engineering pilot
+        required: false
+        default: false
+        type: boolean
   pull_request:
     branches: [main]
     paths:
@@ -373,3 +379,76 @@ jobs:
           test "$MODEL_OUTCOME" = success
           test "$RETRIEVAL_OUTCOME" = success
           test "$FOCUSED_OUTCOME" = success
+
+  causal-pilot:
+    name: GitHub Models causal pilot
+    # PR #53 uses the pull_request arm once to obtain the first causal evidence;
+    # follow-up commits restore the explicit dispatch-only gate.
+    if: github.event_name == 'pull_request' || (github.event_name == 'workflow_dispatch' && inputs.run_causal_pilot)
+    needs: capability-probe
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Install DocAtlas
+        run: pip install -e ".[dev]"
+
+      - name: Run controlled GitHub Models pilot
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          TASK33C_GITHUB_MODEL: openai/gpt-4.1-mini
+        run: |
+          python -m eval.task_level.runner \
+            --task33c-pilot \
+            --tasks decisive_nbo_cross_module_gate_large_001 \
+            --runner-factory eval.task_level.github_models:create_github_models_runner \
+            --isolated-worker-factory eval.task_level.github_models:create_github_models_worker \
+            --verify-runner \
+            --verify-docatlas-tool \
+            --model openai/gpt-4.1-mini \
+            --timeout-seconds 900 \
+            --isolated-worker-timeout-seconds 90 \
+            --run-id "task33c_github_models_${GITHUB_RUN_ID}"
+
+      - name: Publish pilot decision
+        if: always()
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          run_dir = Path("eval/task_level/results") / f"task33c_github_models_{os.environ['GITHUB_RUN_ID']}"
+          completeness_path = run_dir / "task33c_completeness.json"
+          if completeness_path.exists():
+              completeness = json.loads(completeness_path.read_text(encoding="utf-8"))
+              lines = [
+                  "## Task 33C GitHub Models pilot",
+                  "",
+                  f"Decision: **{completeness.get('decision')}**",
+                  "",
+                  f"Complete: `{completeness.get('complete')}`",
+                  "",
+                  "Errors: " + (", ".join(completeness.get("errors", [])) or "none"),
+              ]
+          else:
+              lines = ["## Task 33C GitHub Models pilot", "", "Pilot did not produce a completeness artifact."]
+          with Path(os.environ["GITHUB_STEP_SUMMARY"]).open("a", encoding="utf-8") as handle:
+              handle.write("\n".join(lines) + "\n")
+          PY
+
+      - name: Upload causal pilot evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: task33c-github-models-pilot-${{ github.run_id }}
+          path: eval/task_level/results/task33c_github_models_${{ github.run_id }}/
+          if-no-files-found: warn
+          retention-days: 30
