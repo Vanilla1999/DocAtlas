@@ -447,6 +447,13 @@ def main(argv: list[str] | None = None) -> int:
     capabilities = runner.verify()
     metadata["runner_verification"] = runner_verification_payload(capabilities)
     metadata["runner_factory"] = args.runner_factory
+    metadata["environment"]["runner_detection"] = {
+        "runner_id": capabilities.runner_id,
+        "version": capabilities.version,
+        "independent_runner_verified": capabilities.verified,
+        "hard_turn_limit": capabilities.hard_turn_limit,
+        "source": "selected runner verification",
+    }
     if args.runner == "codex" and not args.runner_factory:
         metadata["runner_verification"]["sandbox_mode"] = args.codex_sandbox_mode
     (run_dir / "metadata.json").write_text(json.dumps(metadata, indent=2, sort_keys=True), encoding="utf-8")
@@ -565,6 +572,26 @@ def main(argv: list[str] | None = None) -> int:
             if completeness["complete"]
             else "Task 33C engineering pilot is INCONCLUSIVE because required evidence or measurements are incomplete."
         )
+        metadata["failure_summary"] = (
+            "No Task 33C cell may be interpreted causally until the completeness gate is green."
+            if not completeness["complete"]
+            else "All four Task 33C engineering-pilot cells passed the completeness gate."
+        )
+        metadata["claims_can_make"] = (
+            "The one-task engineering pilot produced a complete, auditable comparison bundle."
+            if completeness["complete"]
+            else "The harness fail-closed and preserved the reasons the engineering pilot is inconclusive."
+        )
+        metadata["claims_cannot_make"] = (
+            "A one-task engineering pilot cannot establish general product impact or replace the frozen formal protocol."
+            if completeness["complete"]
+            else "No causal comparison or Task 33C product claim can be made from incomplete cells."
+        )
+        metadata["next_experiment"] = (
+            "Review the valid one-task evidence bundle, then run the frozen 3 tasks x 4 conditions x 3 repeats protocol."
+            if completeness["complete"]
+            else "Repair the reported completeness errors and rerun the same one-task/four-condition engineering pilot before any formal 3 x 4 x 3 run."
+        )
         (run_dir / "task33c_completeness.json").write_text(
             json.dumps(completeness, indent=2, sort_keys=True) + "\n", encoding="utf-8"
         )
@@ -573,6 +600,8 @@ def main(argv: list[str] | None = None) -> int:
     if args.screen_tasks:
         write_screening_summary(run_dir, tasks, results, args.repeats)
     print(run_dir)
+    if args.task33c_pilot and not args.dry_run and not metadata.get("task33c_completeness", {}).get("complete"):
+        return 3
     return 0
 
 

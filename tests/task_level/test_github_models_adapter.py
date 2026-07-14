@@ -12,7 +12,11 @@ from eval.task_level.github_models import (
     GitHubModelsIsolatedWorker,
     GitHubModelsRunner,
 )
-from eval.task_level.isolated_delivery import DelegationEnvelope, HostEvidenceSnapshot
+from eval.task_level.isolated_delivery import (
+    DelegationEnvelope,
+    HostEvidenceSnapshot,
+    TASK33_QUERY_DERIVATION,
+)
 from eval.task_level.runners.base import AgentRunRequest
 
 
@@ -97,9 +101,9 @@ def test_github_models_runner_enforces_turns_and_edits_with_closed_tool_loop(
     assert output.status == "completed"
     assert output.exit_code == 0
     assert output.max_turns_enforced is True
-    assert output.input_tokens == 200
-    assert output.output_tokens == 40
-    assert calls == 2
+    assert output.input_tokens == 400
+    assert output.output_tokens == 80
+    assert calls == 4
     assert "return a + b" in (workspace / "calc.py").read_text(encoding="utf-8")
     trajectory = json.loads((output_dir / "trajectory.normalized.json").read_text(encoding="utf-8"))
     assert any(event["tool_name"] == "Edit.replace_text" for event in trajectory)
@@ -193,6 +197,51 @@ def test_github_models_runner_forbids_test_edits(tmp_path: Path, monkeypatch: py
     assert test_path.read_text(encoding="utf-8") == "assert False\n"
 
 
+def test_github_models_runner_does_not_claim_rejected_test_execution(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    workspace = tmp_path / "workspace"
+    workspace.mkdir()
+    (workspace / "module.py").write_text("VALUE = 1\n", encoding="utf-8")
+    actions = iter([
+        _action("run_tests"),
+        _action("finish", summary="test command unavailable"),
+    ])
+
+    def fake_complete(self, **kwargs):
+        value = next(actions)
+        return value, _completion(value)
+
+    monkeypatch.setattr(
+        "eval.task_level.github_models.GitHubModelsClient.complete_json",
+        fake_complete,
+    )
+    output_dir = tmp_path / "output"
+    request = AgentRunRequest(
+        task_id="task",
+        condition_id="repo_only_strict_offline",
+        workspace=workspace,
+        prompt="test",
+        model="model",
+        timeout_seconds=30,
+        max_turns=2,
+        environment={},
+        mcp_config_path=None,
+        tool_policy_path=tmp_path / "policy.json",
+        output_dir=output_dir,
+        test_command="definitely-missing-test-command",
+    )
+
+    GitHubModelsRunner("token").run(request)
+
+    trajectory = json.loads((output_dir / "trajectory.normalized.json").read_text(encoding="utf-8"))
+    rejected = [event for event in trajectory if event["tool_name"] == "Repo.run_tests_rejected"]
+    assert len(rejected) == 1
+    assert rejected[0]["arguments"]["executed"] is False
+    assert not any(event["tool_name"].startswith("Bash.") for event in trajectory)
+
+
 def test_github_models_worker_selects_host_evidence_and_binds_usage(
     monkeypatch: pytest.MonkeyPatch,
 ):
@@ -209,13 +258,14 @@ def test_github_models_worker_selects_host_evidence_and_binds_usage(
         "path": f"docs/permission-{index}.md",
         "heading_path": "Permission gate",
         "authority": "canonical",
+        "source_class": "project_doc",
         "instruction_trust": "scoped_agent_policy",
         "content": "The shared permission gate must block missing immediate permissions.",
     } for index in range(4))
     snapshot = HostEvidenceSnapshot(
         query="permission gates consistent",
         objective_sha256=hashlib.sha256(objective.encode("utf-8")).hexdigest(),
-        query_derivation="task33c-repeated-domain-terms-v1",
+        query_derivation=TASK33_QUERY_DERIVATION,
         evidence_items=items,
         trust_contract={"selected": [], "rejected": [], "risky": []},
         retrieval_issues=(),

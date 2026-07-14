@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import shutil
 import subprocess
 import sys
 import time
@@ -21,6 +22,7 @@ from eval.task_level.isolated_delivery import (
     IsolatedWorkerCapabilities,
     IsolatedWorkerOutput,
     JsonSubprocessIsolatedWorker,
+    TASK33_QUERY_DERIVATION,
     WorkerUsage,
     _communicate_bounded,
     derive_task33_retrieval_query,
@@ -50,6 +52,7 @@ def _evidence() -> list[dict]:
         "path": "AGENTS.md",
         "heading_path": "Permission checks",
         "authority": "canonical",
+        "source_class": "project_doc",
         "instruction_trust": "scoped_agent_policy",
         "content": (
             "The permission boundary must remain centralized.\n"
@@ -62,7 +65,7 @@ def _snapshot() -> HostEvidenceSnapshot:
     return HostEvidenceSnapshot(
         query=derive_task33_retrieval_query(_envelope().task_objective),
         objective_sha256=hashlib.sha256(_envelope().task_objective.encode("utf-8")).hexdigest(),
-        query_derivation="task33c-repeated-domain-terms-v1",
+        query_derivation=TASK33_QUERY_DERIVATION,
         evidence_items=tuple(_evidence()),
         trust_contract={"selected": [{"source": "AGENTS.md"}], "rejected": [], "risky": []},
         retrieval_issues=(),
@@ -257,7 +260,7 @@ def test_subprocess_worker_is_fail_closed_and_bounds_both_output_streams(tmp_pat
     assert all(str(Path.cwd()) not in part for part in command)
 
     process = subprocess.Popen(
-        [sys.executable, "-c", "import sys; sys.stderr.write('x' * 100000)"],
+        [shutil.which("python3") or sys.executable, "-c", "import sys; sys.stderr.write('x' * 100000)"],
         stdin=subprocess.PIPE,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
@@ -280,7 +283,7 @@ def test_task33c_four_lane_plan_and_flags_are_frozen(tmp_path):
     objective = (
         "Browser and scan users see a permission gate conflict. Fix the permission gate so browser and scan agree."
     )
-    assert derive_task33_retrieval_query(objective) == "browser scan permission gate"
+    assert derive_task33_retrieval_query(objective) == "browser scan permission gate conflict agree"
     assert tuple(plan["conditions"]) == TASK33C_PILOT_CONDITIONS
     with pytest.raises(ValueError, match="frozen"):
         build_task33c_pilot_plan("another_task")
@@ -320,6 +323,7 @@ def test_task33c_decision_gate_requires_complete_comparable_measurements():
                 "delivery_retrieval_calls": 1,
                 "action_packet_status": "ok",
                 "evidence_fingerprint": "shared-evidence",
+                "action_packet_project_doc_coverage": 0.5,
             })
         if condition == "docatlas_bounded_subagent":
             metrics.update({
@@ -333,6 +337,24 @@ def test_task33c_decision_gate_requires_complete_comparable_measurements():
             "repeat": 0,
             "status": "success",
             "metrics": metrics,
+            "evaluation_execution": {
+                "setup": {
+                    "phase": "pre_runner",
+                    "status": "success",
+                    "returncode": 0,
+                },
+                "public_tests": {"status": "executed", "returncode": 1},
+                "hidden_tests": {"status": "executed", "returncode": 1},
+            },
+            "evaluation_contract": {
+                "status": "valid",
+                "compile_gate": {"status": "not_applicable"},
+            },
+            "budget": {
+                "max_turns_enforced_by_runner": True,
+                "input_tokens_exceeded": False,
+                "output_tokens_exceeded": False,
+            },
         })
 
     complete = evaluate_task33c_pilot_completeness(results)
@@ -346,3 +368,8 @@ def test_task33c_decision_gate_requires_complete_comparable_measurements():
     results[-1]["metrics"]["delivery_retrieval_calls"] = True
     incomplete = evaluate_task33c_pilot_completeness(results)
     assert "docatlas_bounded_subagent:invalid_retrieval_call_count" in incomplete["errors"]
+
+    results[-1]["metrics"]["delivery_retrieval_calls"] = 1
+    results[-1]["evaluation_execution"]["setup"]["status"] = "condition_setup_failed"
+    incomplete = evaluate_task33c_pilot_completeness(results)
+    assert "docatlas_bounded_subagent:setup_not_successful" in incomplete["errors"]

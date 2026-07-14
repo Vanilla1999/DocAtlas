@@ -74,6 +74,33 @@ def evaluate_task33c_pilot_completeness(results: list[dict[str, Any]]) -> dict[s
             continue
         if result.get("status") in {"runner_unavailable", "runner_failed", "condition_setup_failed", "timeout"}:
             errors.append(f"{condition}:infrastructure_status:{result.get('status')}")
+        execution = result.get("evaluation_execution") if isinstance(result.get("evaluation_execution"), dict) else {}
+        setup = execution.get("setup") if isinstance(execution.get("setup"), dict) else {}
+        if setup.get("phase") != "pre_runner":
+            errors.append(f"{condition}:setup_not_pre_runner")
+        if setup.get("status") not in {"success", "not_required"}:
+            errors.append(f"{condition}:setup_not_successful")
+        if setup.get("status") == "success" and (
+            isinstance(setup.get("returncode"), bool) or setup.get("returncode") != 0
+        ):
+            errors.append(f"{condition}:invalid_setup_returncode")
+        for gate_name in ("public_tests", "hidden_tests"):
+            gate = execution.get(gate_name) if isinstance(execution.get(gate_name), dict) else {}
+            if gate.get("status") != "executed":
+                errors.append(f"{condition}:{gate_name}_not_executed")
+            if isinstance(gate.get("returncode"), bool) or not isinstance(gate.get("returncode"), int):
+                errors.append(f"{condition}:{gate_name}_missing_returncode")
+        contract = result.get("evaluation_contract") if isinstance(result.get("evaluation_contract"), dict) else {}
+        if contract.get("status") != "valid":
+            errors.append(f"{condition}:invalid_evaluation_contract")
+        compile_gate = contract.get("compile_gate") if isinstance(contract.get("compile_gate"), dict) else {}
+        if compile_gate.get("status") not in {"passed", "not_applicable"}:
+            errors.append(f"{condition}:compile_gate_not_measured")
+        budget = result.get("budget") if isinstance(result.get("budget"), dict) else {}
+        if budget.get("max_turns_enforced_by_runner") is not True:
+            errors.append(f"{condition}:hard_turn_limit_not_verified")
+        if budget.get("input_tokens_exceeded") or budget.get("output_tokens_exceeded"):
+            errors.append(f"{condition}:token_budget_exceeded")
         metrics = result.get("metrics") if isinstance(result.get("metrics"), dict) else {}
         for field in ("input_tokens", "output_tokens"):
             value = metrics.get(field)
@@ -89,6 +116,9 @@ def evaluate_task33c_pilot_completeness(results: list[dict[str, Any]]) -> dict[s
                 errors.append(f"{condition}:invalid_retrieval_call_count")
             if metrics.get("action_packet_status") == "insufficient_evidence":
                 errors.append(f"{condition}:insufficient_evidence")
+            coverage = metrics.get("action_packet_project_doc_coverage")
+            if not isinstance(coverage, (int, float)) or isinstance(coverage, bool) or coverage <= 0:
+                errors.append(f"{condition}:project_docs_missing_from_action_packet")
             if not metrics.get("evidence_fingerprint"):
                 errors.append(f"{condition}:missing_evidence_fingerprint")
         if condition == "docatlas_bounded_subagent":

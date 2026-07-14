@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from dataclasses import replace
 from pathlib import Path
 
 from eval.task_level.conditions import CONDITIONS, DEFAULT_CONDITIONS
@@ -162,6 +163,40 @@ class FailingRunner:
         raise NotImplementedError("runner unavailable in test")
 
 
+def test_execute_pilot_blocks_runner_when_pre_runner_setup_fails(tmp_path: Path, monkeypatch):
+    monkeypatch.setattr("eval.task_level.execution.RESULTS_ROOT", tmp_path)
+    base_task = next(
+        task for task in load_tasks(TASKS_PATH)
+        if task.task_id == "decisive_docmancer_vector_timeout_fallback_001"
+    )
+    task = replace(base_task, setup_command="definitely-missing-task33-setup-command")
+    runner = FailingRunner()
+
+    results = execute_pilot(
+        [task],
+        ["repo_only_strict_offline"],
+        repeats=1,
+        run_id="setup_blocked",
+        runner=runner,
+        model="test",
+        timeout_seconds=1,
+        prompt_template="Issue:\n{issue_text}",
+    )
+
+    assert getattr(runner, "calls", 0) == 0
+    assert results[0]["status"] == "condition_setup_failed"
+    assert results[0]["evaluation_execution"]["public_tests"]["status"] == "not_run"
+    assert results[0]["evaluation_execution"]["hidden_tests"]["status"] == "not_run"
+    run_dir = (
+        tmp_path / "setup_blocked" / task.task_id
+        / "repo_only_strict_offline" / "repeat_0"
+    )
+    setup = json.loads((run_dir / "condition_setup.json").read_text(encoding="utf-8"))
+    assert setup["phase"] == "pre_runner"
+    assert setup["status"] == "condition_setup_failed"
+    assert setup["returncode"] != 0
+
+
 def test_execute_pilot_records_runner_blocked_rows(tmp_path: Path, monkeypatch):
     monkeypatch.setattr("eval.task_level.execution.RESULTS_ROOT", tmp_path)
     task = next(task for task in load_tasks(TASKS_PATH) if task.task_id == "decisive_docmancer_vector_timeout_fallback_001")
@@ -255,4 +290,4 @@ def test_report_summarizes_runner_unavailable_failures(tmp_path: Path):
     )
 
     text = report.read_text(encoding="utf-8")
-    assert "1 run(s) did not produce patches" in text
+    assert "1 run(s) did not produce a valid evaluated result" in text

@@ -390,18 +390,40 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      - name: Set up Python
+      - name: Set up fixture Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.14"
+
+      - name: Install pinned uv
+        run: python -m pip install "uv==0.9.25"
+
+      - name: Prewarm frozen fixture dependencies
+        env:
+          UV_CACHE_DIR: ${{ runner.temp }}/task33c-uv-cache
+          UV_PROJECT_ENVIRONMENT: ${{ runner.temp }}/task33c-prewarm-environment
+        run: |
+          mkdir -p "${RUNNER_TEMP}/task33c-prewarm-project"
+          cp eval/task_level/fixtures/templates/decisive_nbo_cross_module_gate_large_001/pyproject.toml \
+            "${RUNNER_TEMP}/task33c-prewarm-project/pyproject.toml"
+          cd "${RUNNER_TEMP}/task33c-prewarm-project"
+          uv sync --python 3.14
+
+      - name: Set up harness Python
         uses: actions/setup-python@v6
         with:
           python-version: "3.12"
 
       - name: Install DocAtlas
-        run: pip install -e ".[dev]"
+        run: |
+          python -m pip install "uv==0.9.25"
+          python -m pip install -e ".[dev]"
 
       - name: Run controlled GitHub Models pilot
         env:
           GITHUB_TOKEN: ${{ github.token }}
           TASK33C_GITHUB_MODEL: openai/gpt-4.1-mini
+          UV_CACHE_DIR: ${{ runner.temp }}/task33c-uv-cache
         run: |
           python -m eval.task_level.runner \
             --task33c-pilot \
@@ -450,3 +472,26 @@ jobs:
           path: eval/task_level/results/task33c_github_models_${{ github.run_id }}/
           if-no-files-found: warn
           retention-days: 30
+
+      - name: Enforce causal completeness gate
+        if: always()
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          path = (
+              Path("eval/task_level/results")
+              / f"task33c_github_models_{os.environ['GITHUB_RUN_ID']}"
+              / "task33c_completeness.json"
+          )
+          if not path.is_file():
+              raise SystemExit("Task 33C completeness artifact is missing")
+          result = json.loads(path.read_text(encoding="utf-8"))
+          if result.get("complete") is not True or result.get("decision") != "ENGINEERING_PILOT_COMPLETE":
+              raise SystemExit(
+                  "Task 33C causal pilot is inconclusive: "
+                  + ",".join(result.get("errors") or ["unknown"])
+              )
+          PY

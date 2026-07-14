@@ -21,13 +21,24 @@ class MockRunner:
         target = request.workspace / "calc.py"
         if target.exists():
             target.write_text("def add(a, b):\n    return a + b\n", encoding="utf-8")
+        normalization = request.workspace / "normalization.py"
+        if normalization.exists():
+            normalization.write_text(
+                "def normalize(value):\n    return abs(value)\n",
+                encoding="utf-8",
+            )
         request.output_dir.mkdir(parents=True, exist_ok=True)
         stdout = request.output_dir / "stdout.log"
         stderr = request.output_dir / "stderr.log"
         trajectory = request.output_dir / "trajectory.normalized.json"
         stdout.write_text("{}\n", encoding="utf-8")
         stderr.write_text("", encoding="utf-8")
-        trajectory.write_text(json.dumps([{"event_type": "edit", "tool_name": "Edit", "arguments": {}, "result_summary": "edited calc.py"}]), encoding="utf-8")
+        trajectory.write_text(json.dumps([{
+            "event_type": "edit",
+            "tool_name": "Edit",
+            "arguments": {},
+            "result_summary": "edited calc.py and normalization.py",
+        }]), encoding="utf-8")
         now = datetime.now(timezone.utc).isoformat()
         return AgentRunOutput(
             status="completed",
@@ -51,7 +62,7 @@ class MockRunner:
 def test_runner_canary_produces_patch(tmp_path: Path):
     result = run_canary(MockRunner(), "mock", 30, tmp_path)
 
-    assert result["status"] == "passed"
+    assert result["status"] == "passed", json.dumps(result, sort_keys=True)
     assert result["patch_exists"]
     assert result["pytest_passes"]
 
@@ -91,7 +102,7 @@ def test_patch_capture_includes_pure_untracked_file(tmp_path: Path):
 def test_missing_token_metrics_remain_null(tmp_path: Path):
     result = run_canary(MockRunner(), "mock", 30, tmp_path)
 
-    assert result["status"] == "passed"
+    assert result["status"] == "passed", json.dumps(result, sort_keys=True)
     output = MockRunner().run
     assert output is not None
 

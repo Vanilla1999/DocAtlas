@@ -35,6 +35,7 @@ _TASK33_QUERY_STOP_WORDS = frozenset({
     "one", "outcomes", "path", "paths", "reach", "related", "result", "shared", "so",
     "the", "through", "use", "users", "while", "with",
 })
+TASK33_QUERY_DERIVATION = "task33c-domain-coverage-v2"
 
 
 def derive_task33_retrieval_query(task_objective: str) -> str:
@@ -52,13 +53,15 @@ def derive_task33_retrieval_query(task_objective: str) -> str:
     for word in candidates:
         if counts[word] >= 2 and word not in selected:
             selected.append(word)
-    if len(selected) < 2:
-        for word in candidates:
-            if word not in selected:
-                selected.append(word)
-            if len(selected) >= 8:
-                break
-    query = " ".join(selected[:12])
+    # Repeated domain terms anchor the query, while unique high-signal terms
+    # preserve the cross-module details that distinguish the task from a
+    # generic permission-gate lookup.
+    for word in candidates:
+        if word not in selected:
+            selected.append(word)
+        if len(selected) >= 10:
+            break
+    query = " ".join(selected[:10])
     if not query:
         raise IsolatedDeliveryError("task33_retrieval_query_derivation_empty")
     return query
@@ -172,7 +175,7 @@ class HostEvidenceSnapshot:
             raise IsolatedDeliveryError("invalid_host_retrieval_query")
         if not isinstance(self.objective_sha256, str) or not re.fullmatch(r"[0-9a-f]{64}", self.objective_sha256):
             raise IsolatedDeliveryError("invalid_host_objective_fingerprint")
-        if self.query_derivation != "task33c-repeated-domain-terms-v1":
+        if self.query_derivation != TASK33_QUERY_DERIVATION:
             raise IsolatedDeliveryError("unsupported_host_query_derivation")
         if (
             isinstance(self.retrieval_calls, bool)
@@ -623,6 +626,29 @@ class JsonSubprocessIsolatedWorker:
         return command
 
 
+def missing_packet_evidence_categories(
+    packet: dict[str, Any],
+    evidence_items: tuple[dict[str, Any], ...],
+    required_categories: tuple[str, ...],
+) -> list[str]:
+    packet_paths = {
+        str(row.get("path") or "").strip().replace("\\", "/")
+        for row in packet.get("source_of_truth", [])
+        if isinstance(row, dict) and str(row.get("path") or "").strip()
+    }
+    available: set[str] = set()
+    for item in evidence_items:
+        path = str(item.get("path") or item.get("source") or "").strip().replace("\\", "/")
+        if path not in packet_paths:
+            continue
+        source_class = str(item.get("source_class") or "").strip().lower()
+        if source_class in {"project_doc", "project_docs"}:
+            available.add("project_docs")
+        if source_class in {"repo_map", "code_graph", "symbol", "symbols"}:
+            available.add("symbols")
+    return sorted(set(required_categories) - available)
+
+
 def deliver_with_isolated_worker(
     *,
     worker: IsolatedWorker,
@@ -721,6 +747,15 @@ def deliver_with_isolated_worker(
     }
     if packet.get("status") != "insufficient_evidence" and not cited_ids:
         raise IsolatedDeliveryError("action_packet_has_no_host_evidence")
+    missing_categories = missing_packet_evidence_categories(
+        packet,
+        evidence.evidence_items,
+        envelope.required_evidence_categories,
+    )
+    if packet.get("status") != "insufficient_evidence" and missing_categories:
+        raise IsolatedDeliveryError(
+            "action_packet_missing_required_evidence_categories:" + ",".join(missing_categories)
+        )
     if evidence.retrieval_issues and packet.get("status") != "insufficient_evidence":
         raise IsolatedDeliveryError("action_packet_ignored_host_retrieval_issues")
 

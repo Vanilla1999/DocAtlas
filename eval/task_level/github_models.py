@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import shlex
 import subprocess
 import threading
 import time
@@ -190,11 +191,16 @@ class GitHubModelsIsolatedWorker:
         return {
             "schema_version": 1,
             "status": "verified" if bool(self.token.strip()) else "unavailable",
+            "boundary_type": "remote_toolless_inference",
             "boundary": "tool-less hosted inference request",
+            "provider_endpoint": self.endpoint,
             "fresh_context": "one stateless request with no conversation reuse",
             "documentation_access": "only the serialized host-owned evidence snapshot",
             "tools": [],
             "network_tools": [],
+            "host_filesystem_access": "not mounted or serialized",
+            "host_process_access": "not exposed by the provider API",
+            "provider_transport": "host-owned HTTPS request only",
             "local_process_execution": False,
             "recursive_delegation": False,
             "hard_timeout": "host urllib deadline plus broker wall-clock enforcement",
@@ -290,7 +296,13 @@ class GitHubModelsIsolatedWorker:
         proof = {
             "schema_version": 1,
             "provider": "github-models",
+            "boundary_type": "remote_toolless_inference",
+            "endpoint": self.endpoint,
             "model": completion.model,
+            "prompt_revision": _WORKER_PROMPT_REVISION,
+            "response_schema_sha256": _json_sha256(_evidence_selection_schema()),
+            "message_count": 2,
+            "tools": [],
             "request_id": completion.request_id,
             "input_tokens": completion.input_tokens,
             "output_tokens": completion.output_tokens,
@@ -421,35 +433,37 @@ class GitHubModelsRunner:
                 len(events) + 1,
                 "tool_call",
                 _trajectory_tool_name(str(tool), result),
-                _trajectory_arguments(action),
+                _trajectory_arguments(action, result=result, request=request),
                 result,
             )
             events.append(event)
+            observed_result = result
             if tool == "replace_text" and result.startswith("UPDATED "):
                 test_result = _execute_agent_tool(request, {"tool": "run_tests"}, read_paths=read_paths)
                 events.append(_event(
                     len(events) + 1,
                     "tool_call",
-                    "Bash.pytest",
-                    {"command": "uv run --offline pytest", "trigger": "post_edit_verification"},
+                    _trajectory_tool_name("run_tests", test_result),
+                    {
+                        **_trajectory_arguments(
+                            {"tool": "run_tests"}, result=test_result, request=request
+                        ),
+                        "trigger": "post_edit_verification",
+                    },
                     test_result,
                 ))
                 stdout_rows.append(json.dumps({
                     "turn": turn,
                     "post_edit_verification": test_result[:4_000],
                 }, ensure_ascii=False, sort_keys=True))
-                status, exit_code = "completed", 0
-                break
-            if tool == "run_tests" and result.startswith("exit_code=0\n"):
-                status, exit_code = "completed", 0
-                break
+                observed_result += "\n\nPost-edit verification:\n" + test_result
             recent_messages.append({
                 "role": "assistant",
                 "content": json.dumps(_compact_action_history(action), ensure_ascii=False, sort_keys=True),
             })
             recent_messages.append({
                 "role": "user",
-                "content": "Observed tool output:\n" + result[:6_000],
+                "content": "Observed tool output:\n" + observed_result[:8_000],
             })
 
         finished_at = datetime.now(timezone.utc).isoformat()
@@ -598,7 +612,7 @@ def _execute_agent_tool(
             terms = [term.lower() for term in query.split() if len(term) >= 3]
             rows: list[tuple[int, str]] = []
             for path in paths:
-                if ".git" in path.parts or "__pycache__" in path.parts:
+                if ".git" in path.parts or "__pycache__" in path.parts or ".venv" in path.parts:
                     continue
                 for number, line in enumerate(path.read_text(encoding="utf-8", errors="replace").splitlines(), 1):
                     lowered = line.lower()
@@ -631,12 +645,7 @@ def _execute_agent_tool(
             path.write_text(text.replace(old, new, 1), encoding="utf-8")
             return f"UPDATED {path.relative_to(request.workspace).as_posix()}"
         if tool == "run_tests":
-            if (request.workspace / "test_calc.py").is_file():
-                command = ["python", "-m", "pytest", "test_calc.py", "-q"]
-            elif (request.workspace / "tests/test_browser_permission_gate.py").is_file():
-                command = ["uv", "run", "--offline", "pytest", "tests/test_browser_permission_gate.py", "-q"]
-            else:
-                command = ["python", "-m", "pytest", "-q"]
+            command = _test_command(request)
             completed = subprocess.run(
                 command,
                 cwd=request.workspace,
@@ -711,6 +720,8 @@ def _event(sequence: int, event_type: str, tool_name: str, arguments: dict[str, 
 def _trajectory_tool_name(tool: str, result: str) -> str:
     if tool == "replace_text" and not result.startswith("UPDATED "):
         return "Repo.replace_text_rejected"
+    if tool == "run_tests" and not result.startswith("exit_code="):
+        return "Repo.run_tests_rejected"
     return {
         "replace_text": "Edit.replace_text",
         "run_tests": "Bash.pytest",
@@ -718,13 +729,30 @@ def _trajectory_tool_name(tool: str, result: str) -> str:
     }.get(tool, f"Repo.{tool}")
 
 
-def _trajectory_arguments(action: dict[str, Any]) -> dict[str, Any]:
-    result = {key: value for key, value in action.items() if key != "summary" and value is not None}
+def _trajectory_arguments(
+    action: dict[str, Any],
+    *,
+    result: str | None = None,
+    request: AgentRunRequest | None = None,
+) -> dict[str, Any]:
+    arguments = {key: value for key, value in action.items() if key != "summary" and value is not None}
     if action.get("tool") == "get_docs_context":
-        result.update({"server": "docmancer-docs", "tool": "get_docs_context"})
+        arguments.update({"server": "docmancer-docs", "tool": "get_docs_context"})
     if action.get("tool") == "run_tests":
-        result["command"] = "uv run --offline pytest"
-    return result
+        command = _test_command(request) if request is not None else []
+        arguments["command"] = shlex.join(command) if command else None
+        arguments["executed"] = bool(result and result.startswith("exit_code="))
+    return arguments
+
+
+def _test_command(request: AgentRunRequest) -> list[str]:
+    if request.test_command:
+        return shlex.split(request.test_command)
+    if (request.workspace / "test_calc.py").is_file():
+        return ["python", "-m", "pytest", "test_calc.py", "-q"]
+    if (request.workspace / "tests/test_browser_permission_gate.py").is_file():
+        return ["uv", "run", "--offline", "pytest", "tests/test_browser_permission_gate.py", "-q"]
+    return ["python", "-m", "pytest", "-q"]
 
 
 def _docatlas_allowed(condition_id: str) -> bool:
@@ -744,7 +772,10 @@ def _list_repository_files(workspace: Path) -> str:
     files = [
         path.relative_to(workspace).as_posix()
         for path in workspace.rglob("*")
-        if path.is_file() and ".git" not in path.parts and "__pycache__" not in path.parts
+        if path.is_file()
+        and ".git" not in path.parts
+        and "__pycache__" not in path.parts
+        and ".venv" not in path.parts
     ]
     return "\n".join(sorted(files)[:500])[:12_000]
 
@@ -761,6 +792,7 @@ def _repository_source_snapshot(workspace: Path) -> tuple[str, tuple[str, ...]]:
             or ".git" in relative.parts
             or "tests" in relative.parts
             or "__pycache__" in relative.parts
+            or ".venv" in relative.parts
             or path.name.startswith("test_")
             or path.name.endswith(("_test.py", ".freezed.dart", ".g.dart"))
         ):

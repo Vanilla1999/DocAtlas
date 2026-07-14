@@ -4,6 +4,7 @@ import hashlib
 import json
 import os
 import random
+import shlex
 import signal
 import shutil
 import subprocess
@@ -36,8 +37,10 @@ from eval.task_level.isolated_delivery import (
     HostEvidenceSnapshot,
     IsolatedDeliveryError,
     IsolatedWorker,
+    TASK33_QUERY_DERIVATION,
     derive_task33_retrieval_query,
     deliver_with_isolated_worker,
+    missing_packet_evidence_categories,
     persist_host_evidence,
 )
 from eval.task_level.runners.base import AgentRunRequest, AgentRunner, RunnerCapabilities
@@ -153,6 +156,27 @@ def trajectory_tool_output_metrics(task: Any, tool_calls: list[dict[str, Any]]) 
     }
 
 
+def action_packet_project_doc_metrics(task: Any, packet: dict[str, Any]) -> dict[str, Any]:
+    expected = {
+        str(path).strip().replace("\\", "/").lower()
+        for path in getattr(task, "expected_project_docs", ())
+        if str(path).strip()
+    }
+    rows = packet.get("source_of_truth") if isinstance(packet.get("source_of_truth"), list) else []
+    packet_paths = {
+        str(row.get("path") or "").strip().replace("\\", "/").lower()
+        for row in rows
+        if isinstance(row, dict) and str(row.get("path") or "").strip()
+    }
+    found = expected & packet_paths
+    return {
+        "action_packet_project_docs_total": len(expected),
+        "action_packet_project_docs_found": len(found),
+        "action_packet_project_doc_coverage": len(found) / len(expected) if expected else None,
+        "action_packet_project_doc_paths": sorted(found),
+    }
+
+
 def _estimate_tokens_from_chars(chars: int) -> int:
     return max(1, (chars + 3) // 4) if chars else 0
 
@@ -230,7 +254,7 @@ def _trajectory_event_matches(event: dict[str, Any], event_kind: str) -> bool:
     if event_kind == "edit":
         return any(token in tool_name for token in ("edit", "write", "apply_patch")) or '"changes"' in arguments
     if event_kind == "test":
-        return any(token in arguments for token in (
+        return '"executed": true' in arguments and any(token in arguments for token in (
             "pytest", "unittest", "npm test", "cargo test", "go test", "dart test", "flutter test",
         ))
     return False
@@ -352,7 +376,7 @@ def fresh_run_environment(run_output_dir: Path) -> dict[str, str]:
     docmancer_home = env_root / "docmancer_home"
     for path in (home, xdg_config, xdg_cache, docmancer_home):
         path.mkdir(parents=True, exist_ok=True)
-    return {
+    environment = {
         "HOME": str(home),
         "XDG_CONFIG_HOME": str(xdg_config),
         "XDG_CACHE_HOME": str(xdg_cache),
@@ -360,7 +384,13 @@ def fresh_run_environment(run_output_dir: Path) -> dict[str, str]:
         "DOCMANCER_AUTO_VECTORS": "0",
         "DOCMANCER_INDEX_DB_PATH": str(docmancer_home / "docmancer.db"),
         "DOCMANCER_EMBEDDINGS_CACHE": str(docmancer_home / "embeddings-cache"),
+        # Keep dependency environments outside the repository so setup output
+        # cannot appear in the agent patch or repository inventory.
+        "UV_PROJECT_ENVIRONMENT": str(env_root / "project_venv"),
     }
+    if os.environ.get("UV_CACHE_DIR"):
+        environment["UV_CACHE_DIR"] = os.environ["UV_CACHE_DIR"]
+    return environment
 
 
 @contextmanager
@@ -416,17 +446,29 @@ def evaluate_agent_patch(task: TaskSpec, workspace: Path, run_output_dir: Path, 
     task_evaluation_contract = TASK33_EVALUATION_CONTRACTS.get(task.task_id)
     protocol_task = TASK23_PROTOCOL_TASKS.get(task.task_id)
     contract_validation = _task_contract_validation(task, task_evaluation_contract, protocol_task)
-    setup = _run_setup(task, workspace) if patch_exists and task.setup_command else None
-    public = run_command(task.test_command, workspace, 180) if patch_exists and (setup is None or setup.returncode == 0) else None
+    setup_evidence = _load_optional_json(run_output_dir / "condition_setup.json")
+    if not setup_evidence:
+        # Direct evaluator callers predate the pre-run setup gate. Keep them
+        # functional, but mark this fallback so Task 33 completeness cannot
+        # mistake a post-run setup for causal precondition evidence.
+        setup_evidence = _run_condition_setup(
+            task,
+            workspace,
+            run_output_dir,
+            {},
+            phase="evaluator_fallback",
+        )
+    setup_ok = setup_evidence.get("status") in {"success", "not_required"}
+    public = run_command(task.test_command, workspace, 180) if patch_exists and setup_ok else None
     hidden = None
-    if patch_exists and contract_validation.valid:
+    if patch_exists and setup_ok and contract_validation.valid:
         copy_hidden_tests(task.task_id, workspace)
         hidden_command = task_evaluation_contract.semantic_test_command if task_evaluation_contract else "python -m pytest tests/hidden"
         hidden = run_command(hidden_command, workspace, 180)
     if task.task_id in TASK23_PROTOCOL_TASKS or task_evaluation_contract is not None:
         compile_gate = (
             run_compile_gate(task_evaluation_contract, workspace)
-            if task_evaluation_contract is not None and patch_exists and (setup is None or setup.returncode == 0) and contract_validation.valid
+            if task_evaluation_contract is not None and patch_exists and setup_ok and contract_validation.valid
             else {
                 "status": "not_run",
                 "passed": False,
@@ -444,7 +486,7 @@ def evaluate_agent_patch(task: TaskSpec, workspace: Path, run_output_dir: Path, 
         evaluation_contract_status = contract_validation.status
         evaluation_contract_errors = list(contract_validation.errors)
     else:
-        legacy_compile = run_command("python -m compileall -q src", workspace, 120) if patch_exists and (setup is None or setup.returncode == 0) else None
+        legacy_compile = run_command("python -m compileall -q src", workspace, 120) if patch_exists and setup_ok else None
         compile_gate = {
             "status": "passed" if legacy_compile and legacy_compile.passed else "failed" if legacy_compile else "not_run",
             "passed": bool(legacy_compile and legacy_compile.passed),
@@ -521,7 +563,18 @@ def evaluate_agent_patch(task: TaskSpec, workspace: Path, run_output_dir: Path, 
         and audit.clean
         and not forbidden
     )
-    status = "completed" if resolved or patch_exists else "no_patch"
+    runner_status = str(getattr(runner_output, "status", "completed") or "completed")
+    if not setup_ok:
+        status = "condition_setup_failed"
+    elif runner_status in INFRASTRUCTURE_FAILURE_STATUSES:
+        status = runner_status
+    elif runner_status == "completed":
+        status = "completed" if resolved or patch_exists else "no_patch"
+    else:
+        # Budget exhaustion and an explicit non-successful finish are valid
+        # agent outcomes. Preserve them rather than relabelling any patch as a
+        # successful runner completion.
+        status = runner_status
     if not audit.clean:
         status = "policy_violation"
     injection = _load_optional_json(run_output_dir / "docatlas_context_injection.json")
@@ -533,6 +586,7 @@ def evaluate_agent_patch(task: TaskSpec, workspace: Path, run_output_dir: Path, 
     bounded_direct = _load_optional_json(run_output_dir / "bounded_direct_metrics.json")
     host_retrieval = _load_optional_json(run_output_dir / "host_retrieval_metrics.json")
     action_packet = _load_optional_json(run_output_dir / "action_packet.json")
+    packet_evidence_metrics = action_packet_project_doc_metrics(task, action_packet)
     materialized_identity = _load_optional_json(run_output_dir / "materialized.json")
     trajectory = Path(trajectory_path) if trajectory_path else run_output_dir / "missing-trajectory.json"
     evidence_metrics = trajectory_evidence_metrics(task, trajectory)
@@ -579,7 +633,7 @@ def evaluate_agent_patch(task: TaskSpec, workspace: Path, run_output_dir: Path, 
         "max_turns_enforced_by_runner": bool(getattr(runner_output, "max_turns_enforced", False)),
         "attempt_control": "one_ephemeral_process_with_timeout",
     }
-    setup_wall_time = sum(
+    setup_wall_time = float(setup_evidence.get("wall_time_seconds") or 0.0) + sum(
         float(payload.get("wall_time_seconds", 0.0))
         for payload in (external_injection, docatlas_preparation, injection, checklist_injection, constraints_injection)
         if isinstance(payload.get("wall_time_seconds"), (int, float))
@@ -608,7 +662,12 @@ def evaluate_agent_patch(task: TaskSpec, workspace: Path, run_output_dir: Path, 
         completed_turn_events=completed_turn_events,
         shell_calls=sum(1 for call in tool_calls if "bash" in json.dumps(call).lower()),
         edit_calls=sum(1 for call in tool_calls if "edit" in json.dumps(call).lower()),
-        test_runs=sum(1 for call in tool_calls if "pytest" in json.dumps(call).lower()),
+        test_runs=sum(
+            1
+            for call in tool_calls
+            if str(call.get("tool_name") or "").lower().startswith("bash.")
+            and bool((call.get("arguments") or {}).get("executed"))
+        ),
         docs_tool_calls=audit.docatlas_calls,
         patch_files_changed=stats[0] if stats else 0,
         patch_lines_added=stats[1] if stats else 0,
@@ -641,6 +700,19 @@ def evaluate_agent_patch(task: TaskSpec, workspace: Path, run_output_dir: Path, 
         "tests_passed": public_passed,
         "compile_success": compile_success,
         "compile_status": compile_gate["status"],
+        "evaluation_execution": {
+            "setup": setup_evidence,
+            "public_tests": {
+                "status": "executed" if public is not None else "not_run",
+                "command": task.test_command,
+                "returncode": public.returncode if public is not None else None,
+            },
+            "hidden_tests": {
+                "status": "executed" if hidden is not None else "not_run",
+                "command": task_evaluation_contract.semantic_test_command if task_evaluation_contract else None,
+                "returncode": hidden.returncode if hidden is not None else None,
+            },
+        },
         "evaluation_contract": {
             "status": evaluation_contract_status,
             "errors": evaluation_contract_errors,
@@ -717,6 +789,7 @@ def evaluate_agent_patch(task: TaskSpec, workspace: Path, run_output_dir: Path, 
             "action_packet_truncated": action_packet.get("status") == "truncated",
             "action_packet_insufficient_evidence": action_packet.get("status") == "insufficient_evidence",
             "action_packet_fidelity": "validated" if action_packet else "not_applicable",
+            **packet_evidence_metrics,
             "evidence_fingerprint": (
                 isolated_delivery.get("evidence_fingerprint")
                 or bounded_direct.get("evidence_fingerprint")
@@ -772,17 +845,124 @@ def evaluate_agent_patch(task: TaskSpec, workspace: Path, run_output_dir: Path, 
             ),
         },
     }
-    if setup is not None and setup.returncode != 0:
-        result["notes"].append("setup command failed before evaluator tests")
+    if not setup_ok:
+        result["notes"].append("condition setup was not valid; evaluator tests were not run")
     (run_output_dir / "result.json").write_text(json.dumps(result, indent=2, sort_keys=True), encoding="utf-8")
     return result
 
 
 def _run_setup(task: TaskSpec, workspace: Path) -> subprocess.CompletedProcess[str]:
     command = task.setup_command
-    if command.startswith("python -m pip "):
+    if task.task_id not in TASK23_PROTOCOL_TASKS and command.startswith("python -m pip "):
         command = "uv pip " + command.removeprefix("python -m pip ") + f" --python {sys.executable}"
     return subprocess.run(command, cwd=workspace, shell=True, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=300, check=False)
+
+
+def _run_condition_setup(
+    task: TaskSpec,
+    workspace: Path,
+    run_output_dir: Path,
+    env: dict[str, str],
+    *,
+    phase: str = "pre_runner",
+) -> dict[str, Any]:
+    started = time.monotonic()
+    command = task.setup_command.strip()
+    if not command:
+        payload = {
+            "schema_version": 1,
+            "phase": phase,
+            "status": "not_required",
+            "command": "",
+            "returncode": 0,
+            "stdout": "",
+            "stderr": "",
+            "wall_time_seconds": 0.0,
+        }
+        _write_json_atomic(run_output_dir / "condition_setup.json", payload)
+        return payload
+    try:
+        with _activated_run_environment(env):
+            completed = _run_setup(task, workspace)
+    except (OSError, subprocess.SubprocessError, TimeoutError) as exc:
+        payload = {
+            "schema_version": 1,
+            "phase": phase,
+            "status": "condition_setup_failed",
+            "command": command,
+            "returncode": None,
+            "stdout": "",
+            "stderr": f"{exc.__class__.__name__}: {str(exc)[:2_000]}",
+            "wall_time_seconds": round(time.monotonic() - started, 6),
+        }
+    else:
+        payload = {
+            "schema_version": 1,
+            "phase": phase,
+            "status": "success" if completed.returncode == 0 else "condition_setup_failed",
+            "command": command,
+            "returncode": completed.returncode,
+            "stdout": completed.stdout[-20_000:],
+            "stderr": completed.stderr[-20_000:],
+            "wall_time_seconds": round(time.monotonic() - started, 6),
+        }
+        if completed.returncode == 0:
+            baseline = _seal_condition_setup_baseline(workspace)
+            payload.update(baseline)
+            if baseline.get("baseline_status") != "sealed":
+                payload["status"] = "condition_setup_failed"
+                payload["stderr"] = (
+                    payload["stderr"] + "\nsetup baseline sealing failed: "
+                    + str(baseline.get("baseline_error") or "unknown")
+                ).strip()
+    _write_json_atomic(run_output_dir / "condition_setup.json", payload)
+    return payload
+
+
+def _seal_condition_setup_baseline(workspace: Path) -> dict[str, Any]:
+    status = subprocess.run(
+        ["git", "status", "--porcelain", "-uall"],
+        cwd=workspace,
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        check=False,
+    )
+    if status.returncode != 0:
+        return {"baseline_status": "failed", "baseline_error": status.stderr[-2_000:]}
+    changed_files = sorted({
+        line[3:].split(" -> ")[-1].strip()
+        for line in status.stdout.splitlines()
+        if len(line) > 3 and line[3:].strip()
+    })
+    if changed_files:
+        added = subprocess.run(
+            ["git", "add", "-A"], cwd=workspace, text=True,
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False,
+        )
+        if added.returncode != 0:
+            return {"baseline_status": "failed", "baseline_error": added.stderr[-2_000:]}
+        committed = subprocess.run(
+            ["git", "commit", "-m", "condition setup baseline"],
+            cwd=workspace,
+            text=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            check=False,
+        )
+        if committed.returncode != 0:
+            return {"baseline_status": "failed", "baseline_error": committed.stderr[-2_000:]}
+    revision = subprocess.run(
+        ["git", "rev-parse", "HEAD"], cwd=workspace, text=True,
+        stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False,
+    )
+    if revision.returncode != 0:
+        return {"baseline_status": "failed", "baseline_error": revision.stderr[-2_000:]}
+    return {
+        "baseline_status": "sealed",
+        "baseline_revision": revision.stdout.strip(),
+        "baseline_changed_files": changed_files,
+    }
 
 
 def _archive_run_attempt(run_output_dir: Path) -> None:
@@ -905,9 +1085,15 @@ def execute_pilot(
                     (run_output_dir / "materialized.json").write_text(json.dumps(materialized, indent=2, sort_keys=True), encoding="utf-8")
                     policy_path, mcp_config = build_tool_policy(condition_id, run_output_dir)
                     env = fresh_run_environment(run_output_dir)
-                    setup_failed = False
+                    condition_setup = _run_condition_setup(
+                        task,
+                        workspace,
+                        run_output_dir,
+                        env,
+                    )
+                    setup_failed = condition_setup.get("status") == "condition_setup_failed"
                     delivery_strategy = CONDITIONS[condition_id].tool_policy.delivery_strategy
-                    if delivery_strategy:
+                    if not setup_failed and delivery_strategy:
                         if shared_evidence is None:
                             setup_failed = True
                             _write_json_atomic(run_output_dir / "host_retrieval_error.json", {
@@ -916,7 +1102,7 @@ def execute_pilot(
                             })
                         else:
                             stage_task33_host_evidence(shared_evidence, shared_preparation, run_output_dir)
-                    elif condition_id in DOCATLAS_CONDITIONS:
+                    elif not setup_failed and condition_id in DOCATLAS_CONDITIONS:
                         diagnostics = prepare_docatlas(task, workspace, run_output_dir, env)
                         setup_failed = diagnostics.get("status") == "condition_setup_failed"
                     prompt = prompt_template.format(issue_text=task.issue_text) + "\nUse the tools available in this environment when they are useful.\n"
@@ -1030,6 +1216,7 @@ def execute_pilot(
                         mcp_config_path=mcp_config,
                         tool_policy_path=policy_path,
                         output_dir=run_output_dir,
+                        test_command=task.test_command,
                     )
                     try:
                         output = runner.run(request)
@@ -1262,7 +1449,7 @@ def capture_task33_host_evidence(
     snapshot = HostEvidenceSnapshot(
         query=retrieval_query,
         objective_sha256=objective_sha256,
-        query_derivation="task33c-repeated-domain-terms-v1",
+        query_derivation=TASK33_QUERY_DERIVATION,
         evidence_items=context_pack,
         trust_contract=trust_contract,
         retrieval_issues=issues,
@@ -1436,6 +1623,15 @@ def build_bounded_direct_packet(
     )
     if errors:
         raise IsolatedDeliveryError("invalid_bounded_direct_packet:" + ";".join(errors))
+    missing_categories = missing_packet_evidence_categories(
+        packet,
+        evidence.evidence_items,
+        TASK33C_REQUIRED_EVIDENCE_CATEGORIES,
+    )
+    if packet.get("status") != "insufficient_evidence" and missing_categories:
+        raise IsolatedDeliveryError(
+            "bounded_direct_missing_required_evidence_categories:" + ",".join(missing_categories)
+        )
     persist_host_evidence(evidence, output_dir)
     _write_json_atomic(output_dir / "action_packet.json", packet)
     _write_json_atomic(output_dir / "bounded_direct_metrics.json", {
@@ -1670,7 +1866,12 @@ def condition_setup_failed_result(task: TaskSpec, condition_id: str, run_output_
         or _load_optional_json(run_output_dir / "bounded_direct_metrics.json")
     )
     host_retrieval = _load_optional_json(run_output_dir / "host_retrieval_metrics.json")
+    condition_setup = _load_optional_json(run_output_dir / "condition_setup.json")
     reason_payload = (
+        condition_setup
+        if condition_setup.get("status") == "condition_setup_failed"
+        else {}
+    ) or (
         _load_optional_json(run_output_dir / "isolated_delivery_error.json")
         or _load_optional_json(run_output_dir / "bounded_direct_error.json")
         or _load_optional_json(run_output_dir / "host_retrieval_error.json")
@@ -1687,6 +1888,12 @@ def condition_setup_failed_result(task: TaskSpec, condition_id: str, run_output_
         "hidden_tests_passed": False,
         "tests_passed": False,
         "compile_success": False,
+        "compile_status": "not_run",
+        "evaluation_execution": {
+            "setup": condition_setup,
+            "public_tests": {"status": "not_run", "command": task.test_command, "returncode": None},
+            "hidden_tests": {"status": "not_run", "command": None, "returncode": None},
+        },
         "policy_clean": False,
         "policy": {"clean": False, "violations": ["condition_setup_failed"]},
         "docatlas": {
@@ -1715,11 +1922,20 @@ def condition_setup_failed_result(task: TaskSpec, condition_id: str, run_output_
             "worker_input_tokens": _optional_int(delivery.get("worker_input_tokens")),
             "worker_output_tokens": _optional_int(delivery.get("worker_output_tokens")),
             "time_to_first_edit": None,
-            "total_latency": None,
+            "total_latency": (
+                float(condition_setup["wall_time_seconds"])
+                if isinstance(condition_setup.get("wall_time_seconds"), (int, float))
+                and not isinstance(condition_setup.get("wall_time_seconds"), bool)
+                else None
+            ),
         },
         "notes": [
-            "DocAtlas condition setup failed; agent was not run.",
-            str(reason_payload.get("reason") or "condition_setup_failed"),
+            "Condition setup failed; agent and evaluator tests were not run.",
+            str(
+                reason_payload.get("reason")
+                or reason_payload.get("stderr")
+                or "condition_setup_failed"
+            )[:2_000],
         ],
     }
     (run_output_dir / "result.json").write_text(json.dumps(result, indent=2, sort_keys=True), encoding="utf-8")
@@ -1731,7 +1947,13 @@ def run_canary(runner: AgentRunner, model: str, timeout_seconds: int, output_dir
     workspace = Path(tempfile.mkdtemp(prefix="docatlas-runner-canary-"))
     try:
         (workspace / "calc.py").write_text("def add(a, b):\n    return a - b\n", encoding="utf-8")
-        (workspace / "test_calc.py").write_text("from calc import add\n\n\ndef test_add():\n    assert add(2, 3) == 5\n", encoding="utf-8")
+        (workspace / "normalization.py").write_text("def normalize(value):\n    return value - 1\n", encoding="utf-8")
+        (workspace / "test_calc.py").write_text(
+            "from calc import add\nfrom normalization import normalize\n\n\n"
+            "def test_add():\n    assert add(2, 3) == 5\n\n\n"
+            "def test_normalize():\n    assert normalize(-4) == 4\n",
+            encoding="utf-8",
+        )
         subprocess.run(["git", "init"], cwd=workspace, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False)
         subprocess.run(["git", "config", "user.email", "benchmark@example.invalid"], cwd=workspace, check=False)
         subprocess.run(["git", "config", "user.name", "Task Benchmark"], cwd=workspace, check=False)
@@ -1739,11 +1961,16 @@ def run_canary(runner: AgentRunner, model: str, timeout_seconds: int, output_dir
         subprocess.run(["git", "commit", "-m", "canary base"], cwd=workspace, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False)
         policy_path, mcp_config = build_tool_policy("repo_only", output_dir)
         env = fresh_run_environment(output_dir)
+        canary_test_command = f"{shlex.quote(sys.executable)} -m pytest test_calc.py -q"
         request = AgentRunRequest(
             task_id="runner_canary",
             condition_id="repo_only",
             workspace=workspace,
-            prompt="Fix add(a, b), which currently subtracts. Run the tests. Do not use web, curl, wget, or external network.",
+            prompt=(
+                "Fix both independent defects: add(a, b) currently subtracts and normalize(value) "
+                "must return the absolute magnitude. Change both source files and run the tests. "
+                "Do not use web, curl, wget, or external network."
+            ),
             model=model,
             timeout_seconds=timeout_seconds,
             max_turns=8,
@@ -1751,17 +1978,18 @@ def run_canary(runner: AgentRunner, model: str, timeout_seconds: int, output_dir
             mcp_config_path=mcp_config,
             tool_policy_path=policy_path,
             output_dir=output_dir,
+            test_command=canary_test_command,
         )
         runner_output = runner.run(request)
         patch_path, _, _, changed = capture_patch(workspace, output_dir)
-        tests = run_command("python -m pytest test_calc.py", workspace, 60)
+        tests = run_command(canary_test_command, workspace, 60)
         audit = audit_trajectory("repo_only", Path(runner_output.trajectory_path) if runner_output.trajectory_path else None, output_dir / "policy_audit.json")
         raw_stdout = Path(runner_output.raw_stdout_path).read_text(encoding="utf-8") if Path(runner_output.raw_stdout_path).exists() else ""
         network_probe_denied = "blocked by benchmark network policy" in raw_stdout
         canary_policy_clean = audit.clean or (network_probe_denied and audit.docatlas_calls == 0 and audit.context7_calls == 0)
         payload = {
             "task_id": "runner_canary",
-            "status": "passed" if patch_path.read_text(encoding="utf-8").strip() and tests.passed and canary_policy_clean and runner_output.exit_code is not None else "failed",
+            "status": "passed" if patch_path.read_text(encoding="utf-8").strip() and tests.passed and canary_policy_clean and runner_output.exit_code is not None and {"calc.py", "normalization.py"}.issubset(changed) else "failed",
             "runner_status": runner_output.status,
             "runner_exit_code": runner_output.exit_code,
             "patch_exists": bool(patch_path.read_text(encoding="utf-8").strip()),
@@ -1771,6 +1999,7 @@ def run_canary(runner: AgentRunner, model: str, timeout_seconds: int, output_dir
             "policy_clean": canary_policy_clean,
             "network_probe_denied": network_probe_denied,
             "changed_files": changed,
+            "multi_file_edit_proven": {"calc.py", "normalization.py"}.issubset(changed),
             "failure_summary": "runner did not produce a patch" if not patch_path.read_text(encoding="utf-8").strip() else "",
             "workspace": str(workspace),
             "validated_at": datetime.now(timezone.utc).isoformat(),

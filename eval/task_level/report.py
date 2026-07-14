@@ -65,6 +65,30 @@ def write_report(run_dir: Path, metadata: dict[str, Any], results: list[dict[str
             f"{result.get('constraint_packet_tokens', metrics.get('constraint_packet_tokens', ''))} |"
         )
 
+    if any(isinstance(result.get("evaluation_execution"), dict) for result in results):
+        lines.extend([
+            "",
+            "## Evaluation execution",
+            "| task | condition | setup_phase | setup_status | setup_rc | public_status | public_rc | hidden_status | hidden_rc | compile_gate | contract |",
+            "|---|---|---|---|---:|---|---:|---|---:|---|---|",
+        ])
+        for result in results:
+            execution = result.get("evaluation_execution")
+            if not isinstance(execution, dict):
+                continue
+            setup = execution.get("setup") if isinstance(execution.get("setup"), dict) else {}
+            public = execution.get("public_tests") if isinstance(execution.get("public_tests"), dict) else {}
+            hidden = execution.get("hidden_tests") if isinstance(execution.get("hidden_tests"), dict) else {}
+            contract = result.get("evaluation_contract")
+            contract = contract if isinstance(contract, dict) else {}
+            lines.append(
+                f"| {result.get('task_id', '')} | {result.get('condition_id', '')} | "
+                f"{setup.get('phase', '')} | {setup.get('status', '')} | {setup.get('returncode', '')} | "
+                f"{public.get('status', '')} | {public.get('returncode', '')} | "
+                f"{hidden.get('status', '')} | {hidden.get('returncode', '')} | "
+                f"{result.get('compile_status', '')} | {contract.get('status', '')} |"
+            )
+
     status_path = run_dir / "status.json"
     if status_path.exists():
         try:
@@ -122,10 +146,17 @@ def write_report(run_dir: Path, metadata: dict[str, Any], results: list[dict[str
                 f"- `{condition}`: agent_docatlas_calls={sum(agent_calls)}, context_used={sum(used)}/{len(used)}"
             )
 
-    blocked = sum(1 for result in results if result.get("status") in {"runner_unavailable", "runner_failed", "timeout"})
+    blocked_statuses = {
+        "condition_setup_failed", "runner_unavailable", "runner_failed", "timeout",
+        "max_turns_exhausted",
+    }
+    blocked = sum(1 for result in results if result.get("status") in blocked_statuses)
     failure_summary = metadata.get("failure_summary")
     if failure_summary is None and blocked:
-        failure_summary = f"{blocked} run(s) did not produce patches because the independent runner was unavailable, failed, or timed out."
+        failure_summary = (
+            f"{blocked} run(s) did not produce a valid evaluated result because setup, "
+            "the independent runner, or its execution budget failed."
+        )
     lines.extend([
         "",
         "## Failures",

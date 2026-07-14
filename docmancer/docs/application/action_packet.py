@@ -203,6 +203,7 @@ def build_action_packet(
             for item in raw_items
             if str(item.get("source_class") or "") in _CODE_SOURCE_CLASSES
             and _source_path(item)
+            and _editable_target_path(_source_path(item))
             and len(_source_path(item)) <= _MAX_SOURCE_PATH
             and item.get("freshness") != "stale"
             and not _instruction_risk_flags(item)
@@ -309,6 +310,7 @@ def build_action_packet(
                 for item in items
                 if str(item.get("source_class") or "") in _CODE_SOURCE_CLASSES
                 and _source_path(item)
+                and _editable_target_path(_source_path(item))
             ], "path"),
             "symbols": _dedupe_cited(symbols, "name"),
         },
@@ -789,7 +791,7 @@ def _effective_authority(
         for value in (item.get("authority"), item.get("repository_authority"))
         if value
     }
-    if not declared & {"canonical", "source_of_truth", "explicit_agent_policy"}:
+    if not declared & {"canonical", "source_of_truth", "explicit_agent_policy", "primary"}:
         return "supporting"
     if _instruction_risk_flags(item):
         return "supporting"
@@ -806,7 +808,7 @@ def _declares_canonical_authority(item: dict[str, Any]) -> bool:
         for value in (item.get("authority"), item.get("repository_authority"))
         if value
     }
-    return bool(declared & {"canonical", "source_of_truth", "explicit_agent_policy"})
+    return bool(declared & {"canonical", "source_of_truth", "explicit_agent_policy", "primary"})
 
 
 def _critical_fact_count(item: dict[str, Any]) -> int:
@@ -1053,7 +1055,7 @@ def _authority(item: dict[str, Any]) -> str:
         for value in (item.get("authority"), item.get("repository_authority"))
         if value
     }
-    if declared & {"canonical", "source_of_truth", "explicit_agent_policy"}:
+    if declared & {"canonical", "source_of_truth", "explicit_agent_policy", "primary"}:
         return "canonical"
     return "supporting"
 
@@ -1075,6 +1077,20 @@ def _source_path(item: dict[str, Any]) -> str:
     if isinstance(value, dict):
         value = value.get("path") or value.get("source") or value.get("url") or ""
     return str(value).strip()
+
+
+def _editable_target_path(value: str) -> bool:
+    normalized = value.strip().replace("\\", "/").lstrip("./")
+    if not normalized:
+        return False
+    parts = tuple(part.lower() for part in normalized.split("/") if part)
+    name = parts[-1] if parts else ""
+    return not (
+        parts[:1] in {("tests",), ("test",), ("docs",)}
+        or name in {"readme.md", "architecture.md", "pubspec.lock", "pyproject.toml"}
+        or name.startswith("test_")
+        or name.endswith(("_test.py", ".freezed.dart", ".g.dart"))
+    )
 
 
 def _section(item: dict[str, Any]) -> str:
