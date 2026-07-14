@@ -14,6 +14,7 @@ TASK33C_PILOT_CONDITIONS = (
 )
 TASK33C_PILOT_TASK_ID = "decisive_nbo_cross_module_gate_large_001"
 TASK33C_REQUIRED_EVIDENCE_CATEGORIES = ("project_docs",)
+TASK33C_AGENT_TURN_LIMIT = 24
 
 
 def build_task33c_pilot_plan(task_id: str) -> dict[str, Any]:
@@ -28,6 +29,7 @@ def build_task33c_pilot_plan(task_id: str) -> dict[str, Any]:
         "capability_flag": "isolated_worker",
         "retrieval_call_budget": 1,
         "isolated_worker_attempt_budget": 1,
+        "agent_turn_limit": TASK33C_AGENT_TURN_LIMIT,
         "packet_token_budget": 1_500,
         "packet_hard_ceiling": 2_000,
         "required_evidence_categories": list(TASK33C_REQUIRED_EVIDENCE_CATEGORIES),
@@ -72,7 +74,10 @@ def evaluate_task33c_pilot_completeness(results: list[dict[str, Any]]) -> dict[s
         result = cells.get(condition)
         if result is None:
             continue
-        if result.get("status") in {"runner_unavailable", "runner_failed", "condition_setup_failed", "timeout"}:
+        if result.get("status") in {
+            "runner_unavailable", "runner_failed", "condition_setup_failed", "timeout",
+            "max_turns_exhausted",
+        }:
             errors.append(f"{condition}:infrastructure_status:{result.get('status')}")
         execution = result.get("evaluation_execution") if isinstance(result.get("evaluation_execution"), dict) else {}
         setup = execution.get("setup") if isinstance(execution.get("setup"), dict) else {}

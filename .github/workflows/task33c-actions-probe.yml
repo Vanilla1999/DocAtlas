@@ -103,7 +103,7 @@ jobs:
           import urllib.request
           from pathlib import Path
 
-          model = "openai/gpt-4.1-mini"
+          model = "openai/gpt-4o-mini"
           payload = {
               "model": model,
               "messages": [{"role": "user", "content": "Reply with the single word READY."}],
@@ -424,7 +424,7 @@ jobs:
       - name: Run controlled GitHub Models pilot
         env:
           GITHUB_TOKEN: ${{ github.token }}
-          TASK33C_GITHUB_MODEL: openai/gpt-4.1-mini
+          TASK33C_GITHUB_MODEL: openai/gpt-4o-mini
           UV_CACHE_DIR: ${{ runner.temp }}/task33c-uv-cache
         run: |
           python -m eval.task_level.runner \
@@ -434,7 +434,7 @@ jobs:
             --isolated-worker-factory eval.task_level.github_models:create_github_models_worker \
             --verify-runner \
             --verify-docatlas-tool \
-            --model openai/gpt-4.1-mini \
+            --model openai/gpt-4o-mini \
             --timeout-seconds 900 \
             --isolated-worker-timeout-seconds 90 \
             --run-id "task33c_github_models_${GITHUB_RUN_ID}"

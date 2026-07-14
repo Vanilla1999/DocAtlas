@@ -54,7 +54,9 @@ python -m eval.task_level.runner \
   --runner-factory eval.task_level.github_models:create_github_models_runner \
   --isolated-worker-factory eval.task_level.github_models:create_github_models_worker \
   --verify-runner --verify-docatlas-tool \
-  --model openai/gpt-4.1-mini
+  --model openai/gpt-4o-mini
 ```
 
 The parent adapter exposes a hard-turn-controlled repository tool allowlist. The isolated worker is a one-shot, tool-less hosted inference request over immutable host-owned evidence: it selects evidence, while the host constructs and validates the ActionPacket and binds token usage to provider request IDs. It has no local process, repository mount, general network tool, or recursive delegation surface.
+
+The engineering pilot freezes a 24-turn limit per parent cell and uses the low-rate-tier `openai/gpt-4o-mini` adapter so a worst-case four-lane run remains below the free API's daily request budget. A turn-limit exhaustion or provider 429 is infrastructure-incomplete, never a completed causal cell.

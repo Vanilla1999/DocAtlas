@@ -45,7 +45,10 @@ from eval.task_level.isolated_delivery import (
 )
 from eval.task_level.runners.base import AgentRunRequest, AgentRunner, RunnerCapabilities
 from eval.task_level.schemas import RESULTS_ROOT, TASK_LEVEL_ROOT, RunMetrics, TaskSpec
-from eval.task_level.task33_pilot import TASK33C_REQUIRED_EVIDENCE_CATEGORIES
+from eval.task_level.task33_pilot import (
+    TASK33C_AGENT_TURN_LIMIT,
+    TASK33C_REQUIRED_EVIDENCE_CATEGORIES,
+)
 
 
 RUNTIME_ROOT = TASK_LEVEL_ROOT / "runtime"
@@ -1211,7 +1214,11 @@ def execute_pilot(
                         prompt=prompt,
                         model=model,
                         timeout_seconds=timeout_seconds,
-                        max_turns=task.max_turns,
+                        max_turns=(
+                            min(task.max_turns, TASK33C_AGENT_TURN_LIMIT)
+                            if task.task_id in TASK23_PROTOCOL_TASKS
+                            else task.max_turns
+                        ),
                         environment=env,
                         mcp_config_path=mcp_config,
                         tool_policy_path=policy_path,

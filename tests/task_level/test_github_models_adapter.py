@@ -74,6 +74,11 @@ def test_github_models_runner_enforces_turns_and_edits_with_closed_tool_loop(
     def fake_complete(self, **kwargs):
         nonlocal calls
         calls += 1
+        if calls >= 3:
+            assert any(
+                "Latest exact test output" in message.get("content", "")
+                for message in kwargs["messages"]
+            )
         value = next(actions)
         return value, _completion(value, turn=calls)
 

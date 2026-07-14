@@ -299,6 +299,7 @@ def test_task33c_four_lane_plan_and_flags_are_frozen(tmp_path):
         build_task33c_pilot_plan("another_task")
     assert plan["repeats"] == 1
     assert plan["retrieval_call_budget"] == plan["isolated_worker_attempt_budget"] == 1
+    assert plan["agent_turn_limit"] == 24
     assert plan["required_evidence_categories"] == ["project_docs"]
     assert plan["claims"]["may_claim_product_improvement"] is False
     direct = CONDITIONS["docatlas_bounded_direct"].tool_policy

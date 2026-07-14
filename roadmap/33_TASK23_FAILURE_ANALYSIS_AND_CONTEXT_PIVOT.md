@@ -156,6 +156,7 @@ Task 33C implementation status on 2026-07-14:
 - Parent, worker, raw-retrieval, packet, system-token, time-to-first-edit, and total-latency fields are recorded separately. Worker usage requires a host-side verifier and persisted provider proof; incomplete measurements or `insufficient_evidence` force the Task 33C decision to `INCONCLUSIVE`.
 - The built-in CLI runners still do not prove the hard turn limit. The GitHub Models factories provide a host-controlled multi-turn repository loop and a one-shot remote tool-less worker with provider request IDs and usage proof. GitHub Actions supplies Python 3.14 for the frozen fixture, Python 3.12 for the DocAtlas harness, and a prewarmed offline `uv` cache.
 - The earlier Actions attempt did not run the frozen setup before the model and is invalid/inconclusive; its apparent downstream test status is not causal evidence. The harness now persists and gates on pre-run setup plus explicit public/hidden-test execution, returns non-zero for incomplete Task 33C runs, and requires a fresh valid one-task/four-lane rerun. No causal Task 33C result exists yet.
+- The engineering rerun uses the same frozen 24-turn parent budget in all four lanes and a low-tier GitHub Models adapter so the complete run fits the provider's free daily request quota. Provider 429 and turn exhaustion remain infrastructure-incomplete outcomes.
 
 Do not put the worker/session implementation inside the MCP server, require model credentials in DocAtlas, add a fourth public Docs MCP tool, or make subagent support mandatory for clients.
 

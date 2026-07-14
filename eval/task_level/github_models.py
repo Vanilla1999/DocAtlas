@@ -29,7 +29,7 @@ from .runners.base import AgentRunOutput, AgentRunRequest, RunnerCapabilities
 
 
 GITHUB_MODELS_ENDPOINT = "https://models.github.ai/inference/chat/completions"
-DEFAULT_GITHUB_MODEL = "openai/gpt-4.1-mini"
+DEFAULT_GITHUB_MODEL = "openai/gpt-4o-mini"
 _RUNNER_VERSION = "github-models-controlled-agent-v1"
 _WORKER_PROMPT_REVISION = "task33c-evidence-selector-v1"
 _MIN_REQUEST_INTERVAL_SECONDS = 6.2
@@ -394,6 +394,7 @@ class GitHubModelsRunner:
         exit_code = 2
         client = GitHubModelsClient(self._token, endpoint=self._endpoint)
         read_paths: set[str] = set(bootstrap_read_paths)
+        last_test_result: str | None = None
 
         for turn in range(1, request.max_turns + 1):
             remaining = deadline - time.monotonic()
@@ -401,9 +402,19 @@ class GitHubModelsRunner:
                 status, exit_code = "timeout", 124
                 break
             try:
+                pinned_test_feedback = (
+                    [{
+                        "role": "user",
+                        "content": (
+                            "Latest exact test output (do not lose this while repairing):\n"
+                            + last_test_result[:8_000]
+                        ),
+                    }]
+                    if last_test_result is not None else []
+                )
                 action, completion = client.complete_json(
                     model=model,
-                    messages=[*base_messages, *recent_messages[-6:]],
+                    messages=[*base_messages, *recent_messages[-6:], *pinned_test_feedback],
                     schema_name="controlled_agent_action",
                     schema=_agent_action_schema(_docatlas_allowed(request.condition_id)),
                     timeout_seconds=min(remaining, 90),
@@ -438,8 +449,12 @@ class GitHubModelsRunner:
             )
             events.append(event)
             observed_result = result
+            if tool == "run_tests" and result.startswith("exit_code="):
+                last_test_result = result
             if tool == "replace_text" and result.startswith("UPDATED "):
                 test_result = _execute_agent_tool(request, {"tool": "run_tests"}, read_paths=read_paths)
+                if test_result.startswith("exit_code="):
+                    last_test_result = test_result
                 events.append(_event(
                     len(events) + 1,
                     "tool_call",
@@ -634,6 +649,11 @@ def _execute_agent_tool(
             text = path.read_text(encoding="utf-8")
             count = text.count(old)
             if count != 1:
+                if text == new:
+                    return (
+                        f"NO_CHANGE_ALREADY_APPLIED {relative}. Do not submit this replacement again; "
+                        "use the latest test output to choose a different action."
+                    )
                 lines = text.splitlines()
                 start = max(1, action.get("start_line") if isinstance(action.get("start_line"), int) else 1)
                 end = min(len(lines), action.get("end_line") if isinstance(action.get("end_line"), int) else start + 80)
