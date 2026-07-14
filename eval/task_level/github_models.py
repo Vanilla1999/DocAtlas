@@ -264,7 +264,7 @@ class GitHubModelsIsolatedWorker:
                 schema_name="task33c_evidence_selection",
                 schema=_evidence_selection_schema(),
                 timeout_seconds=timeout_seconds,
-                max_tokens=256,
+                max_tokens=512,
             )
         except Exception as exc:
             raise IsolatedDeliveryError(
@@ -395,7 +395,7 @@ class GitHubModelsRunner:
                     schema_name="controlled_agent_action",
                     schema=_agent_action_schema(_docatlas_allowed(request.condition_id)),
                     timeout_seconds=min(remaining, 90),
-                    max_tokens=900,
+                    max_tokens=2_048,
                 )
             except Exception as exc:
                 stderr_rows.append(f"turn {turn}: {exc.__class__.__name__}: {exc}")
@@ -796,7 +796,7 @@ def _compact_worker_evidence(item: dict[str, Any]) -> dict[str, Any]:
         if item.get(key) is not None
     }
     content = str(item.get("content") or item.get("snippet") or "")
-    compact["content_excerpt"] = content[:1_400]
+    compact["content_excerpt"] = content[:800]
     return compact
 
 
@@ -819,6 +819,10 @@ def _provider_failure_class(exc: Exception) -> str:
         return "content_filtered"
     if "invalid structured completion" in text:
         return "invalid_structured_completion"
+    if "structured completion contract failed" in text:
+        return "missing_stream_usage_or_contract"
+    if "omitted valid" in text or "usage totals are inconsistent" in text:
+        return "invalid_provider_usage"
     return exc.__class__.__name__.lower()
 
 
