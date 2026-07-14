@@ -2,6 +2,9 @@ from __future__ import annotations
 
 import hashlib
 import json
+import shlex
+import subprocess
+import time
 from pathlib import Path
 
 import pytest
@@ -18,6 +21,28 @@ from eval.task_level.isolated_delivery import (
     TASK33_QUERY_DERIVATION,
 )
 from eval.task_level.runners.base import AgentRunRequest
+from eval.task_level.sandbox_execution import SandboxCommandResult
+
+
+class _TestSandbox:
+    def verify(self) -> dict[str, object]:
+        return {"schema_version": 1, "status": "verified", "image_id_sha256": "test-boundary"}
+
+    def run(self, command, workspace: Path, timeout_seconds: float) -> SandboxCommandResult:
+        argv = tuple(shlex.split(command) if isinstance(command, str) else command)
+        started = time.monotonic()
+        completed = subprocess.run(
+            argv, cwd=workspace, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+            timeout=timeout_seconds, check=False,
+        )
+        return SandboxCommandResult(
+            command=argv,
+            returncode=completed.returncode,
+            stdout=completed.stdout,
+            stderr=completed.stderr,
+            wall_time_seconds=time.monotonic() - started,
+            boundary=self.verify(),
+        )
 
 
 def _completion(content: dict, *, turn: int = 1) -> GitHubModelsCompletion:
@@ -99,9 +124,10 @@ def test_github_models_runner_enforces_turns_and_edits_with_closed_tool_loop(
         mcp_config_path=None,
         tool_policy_path=tmp_path / "policy.json",
         output_dir=output_dir,
+        allowed_write_paths=("calc.py",),
     )
 
-    output = GitHubModelsRunner("token").run(request)
+    output = GitHubModelsRunner("token", sandbox=_TestSandbox()).run(request)
 
     assert output.status == "completed"
     assert output.exit_code == 0
@@ -165,13 +191,16 @@ def test_github_models_client_streams_structured_output_and_usage(
     assert captured["payload"]["stream_options"] == {"include_usage": True}
 
 
-def test_github_models_runner_forbids_test_edits(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+def test_github_models_runner_forbids_root_conftest_edits_outside_contract(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
     workspace = tmp_path / "workspace"
-    (workspace / "tests").mkdir(parents=True)
-    test_path = workspace / "tests/test_example.py"
+    workspace.mkdir(parents=True)
+    test_path = workspace / "conftest.py"
     test_path.write_text("assert False\n", encoding="utf-8")
     actions = iter([
-        _action("replace_text", path="tests/test_example.py", old="False", new="True"),
+        _action("replace_text", path="conftest.py", old="False", new="True"),
         _action("finish", summary="done"),
     ])
 
@@ -195,9 +224,10 @@ def test_github_models_runner_forbids_test_edits(tmp_path: Path, monkeypatch: py
         mcp_config_path=None,
         tool_policy_path=tmp_path / "policy.json",
         output_dir=tmp_path / "output",
+        allowed_write_paths=("module.py",),
     )
 
-    GitHubModelsRunner("token").run(request)
+    GitHubModelsRunner("token", sandbox=_TestSandbox()).run(request)
 
     assert test_path.read_text(encoding="utf-8") == "assert False\n"
 
@@ -236,9 +266,10 @@ def test_github_models_runner_does_not_claim_rejected_test_execution(
         tool_policy_path=tmp_path / "policy.json",
         output_dir=output_dir,
         test_command="definitely-missing-test-command",
+        allowed_write_paths=("module.py",),
     )
 
-    GitHubModelsRunner("token").run(request)
+    GitHubModelsRunner("token", sandbox=_TestSandbox()).run(request)
 
     trajectory = json.loads((output_dir / "trajectory.normalized.json").read_text(encoding="utf-8"))
     rejected = [event for event in trajectory if event["tool_name"] == "Repo.run_tests_rejected"]

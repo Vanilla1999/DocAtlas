@@ -119,7 +119,7 @@ def evaluate_docatlas_utilization(
 
     candidate_symbols = _candidate_symbols(task, context_text)
     used_symbols = sorted(symbol for symbol in candidate_symbols if symbol and symbol in patch_text)
-    used_sources = _used_sources(sources_path, trajectory_text)
+    used_sources = _used_sources(sources_path, f"{trajectory_text}\n{patch_text}", packet_path)
     used_project_constraints = _used_project_constraints(task, patch_text, context_text)
     used_version_info = _used_version_info(task, patch_text, context_text, trajectory_text)
 
@@ -162,7 +162,18 @@ def _candidate_symbols(task: TaskSpec, context_text: str) -> set[str]:
     return symbols
 
 
-def _used_sources(sources_path: Path, trajectory_text: str) -> list[str]:
+def _used_sources(sources_path: Path, trajectory_text: str, packet_path: Path) -> list[str]:
+    if packet_path.exists():
+        packet = _load_json(packet_path)
+        return sorted({
+            str(row.get("path") or "")
+            for row in packet.get("source_of_truth", [])
+            if (
+                isinstance(row, dict)
+                and str(row.get("path") or "")
+                and str(row.get("path") or "") in trajectory_text
+            )
+        })
     if not sources_path.exists():
         return []
     try:

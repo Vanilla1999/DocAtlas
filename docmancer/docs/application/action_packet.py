@@ -272,6 +272,12 @@ def build_action_packet(
         for fact_type, fact in facts:
             cited = {"text": fact, "evidence_ids": [evidence_id]}
             if _authority(item) != "canonical":
+                if fact_type in {"required", "forbidden"}:
+                    # Supporting repository documents may inform an edit but
+                    # cannot become canonical invariants or prohibitions.
+                    # Keep the distinction explicit through the cited source
+                    # row's authority instead of silently dropping the fact.
+                    guidance.append(cited)
                 continue
             if fact_type == "forbidden":
                 forbidden.append(cited)
@@ -706,7 +712,16 @@ def _validate_evidence_fidelity(
                 break
     for item in _cited_dict_items(packet.get("implementation_guidance")):
         text = str(item.get("text") or "")
-        if any(text != _snippet_text(evidence_map.get(ref, {}).get("snippet"))[0] for ref in _string_refs(item)):
+        if any(
+            text != _snippet_text(evidence_map.get(ref, {}).get("snippet"))[0]
+            and text not in {
+                fact for fact_type, fact in _extract_facts(
+                    str(evidence_map.get(ref, {}).get("content") or "")
+                )[0]
+                if fact_type in {"required", "forbidden"}
+            }
+            for ref in _string_refs(item)
+        ):
             errors.append("implementation_guidance does not match its cited snippet")
             break
     target_surface = packet.get("target_surface") if isinstance(packet.get("target_surface"), dict) else {}

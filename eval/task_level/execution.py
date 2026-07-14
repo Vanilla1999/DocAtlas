@@ -30,7 +30,7 @@ from eval.task_level.evaluators.patch import forbidden_changed_paths
 from eval.task_level.evaluators.patch_constraints import evaluate_patch_constraint_usage, load_patch_constraint_packet
 from eval.task_level.evaluators.policy import audit_trajectory
 from eval.task_level.evaluators.task_contract import ContractValidation, evaluate_patch_surface, evaluation_contract_registry_sha256, evaluation_contract_sha256, load_effective_task23_protocol_tasks, load_task_evaluation_contracts, run_compile_gate, validate_task_evaluation_artifacts, validate_task_evaluation_contract
-from eval.task_level.evaluators.tests import run_command
+from eval.task_level.evaluators.tests import CommandResult, run_command
 from eval.task_level.fixtures.builder import copy_hidden_tests, materialize_fixture
 from eval.task_level.isolated_delivery import (
     DelegationEnvelope,
@@ -41,13 +41,16 @@ from eval.task_level.isolated_delivery import (
     derive_task33_retrieval_query,
     deliver_with_isolated_worker,
     missing_packet_evidence_categories,
+    missing_packet_evidence_paths,
     persist_host_evidence,
 )
 from eval.task_level.runners.base import AgentRunRequest, AgentRunner, RunnerCapabilities
+from eval.task_level.sandbox_execution import persist_boundary, verified_task33_sandbox
 from eval.task_level.schemas import RESULTS_ROOT, TASK_LEVEL_ROOT, RunMetrics, TaskSpec
 from eval.task_level.task33_pilot import (
     TASK33C_AGENT_TURN_LIMIT,
     TASK33C_REQUIRED_EVIDENCE_CATEGORIES,
+    TASK33C_REQUIRED_EVIDENCE_PATHS,
 )
 
 
@@ -172,11 +175,18 @@ def action_packet_project_doc_metrics(task: Any, packet: dict[str, Any]) -> dict
         if isinstance(row, dict) and str(row.get("path") or "").strip()
     }
     found = expected & packet_paths
+    target = packet.get("target_surface") if isinstance(packet.get("target_surface"), dict) else {}
+    target_paths = {
+        str(row.get("path") or "").strip().replace("\\", "/")
+        for row in target.get("likely_files", [])
+        if isinstance(row, dict) and str(row.get("path") or "").strip()
+    }
     return {
         "action_packet_project_docs_total": len(expected),
         "action_packet_project_docs_found": len(found),
         "action_packet_project_doc_coverage": len(found) / len(expected) if expected else None,
         "action_packet_project_doc_paths": sorted(found),
+        "action_packet_target_paths": sorted(target_paths),
     }
 
 
@@ -462,16 +472,25 @@ def evaluate_agent_patch(task: TaskSpec, workspace: Path, run_output_dir: Path, 
             phase="evaluator_fallback",
         )
     setup_ok = setup_evidence.get("status") in {"success", "not_required"}
-    public = run_command(task.test_command, workspace, 180) if patch_exists and setup_ok else None
+    evaluation_errors: list[str] = []
+    public = None
+    if setup_ok:
+        try:
+            public = _run_evaluation_command(task, task.test_command, workspace, run_output_dir, "public", 180)
+        except Exception as exc:
+            evaluation_errors.append(f"public:{exc.__class__.__name__}:{str(exc)[:1_000]}")
     hidden = None
-    if patch_exists and setup_ok and contract_validation.valid:
+    if setup_ok and contract_validation.valid and not evaluation_errors:
         copy_hidden_tests(task.task_id, workspace)
         hidden_command = task_evaluation_contract.semantic_test_command if task_evaluation_contract else "python -m pytest tests/hidden"
-        hidden = run_command(hidden_command, workspace, 180)
+        try:
+            hidden = _run_evaluation_command(task, hidden_command, workspace, run_output_dir, "hidden", 180)
+        except Exception as exc:
+            evaluation_errors.append(f"hidden:{exc.__class__.__name__}:{str(exc)[:1_000]}")
     if task.task_id in TASK23_PROTOCOL_TASKS or task_evaluation_contract is not None:
         compile_gate = (
-            run_compile_gate(task_evaluation_contract, workspace)
-            if task_evaluation_contract is not None and patch_exists and setup_ok and contract_validation.valid
+            _run_compile_gate(task, task_evaluation_contract, workspace, run_output_dir)
+            if task_evaluation_contract is not None and setup_ok and contract_validation.valid and not evaluation_errors
             else {
                 "status": "not_run",
                 "passed": False,
@@ -482,7 +501,7 @@ def evaluate_agent_patch(task: TaskSpec, workspace: Path, run_output_dir: Path, 
                 "stderr": "",
             }
         )
-        patch_surface = evaluate_patch_surface(task_evaluation_contract, changed_files) if task_evaluation_contract and patch_exists and contract_validation.valid else {
+        patch_surface = evaluate_patch_surface(task_evaluation_contract, changed_files) if task_evaluation_contract and contract_validation.valid else {
             "status": "not_run",
             "violations": [],
         }
@@ -580,6 +599,8 @@ def evaluate_agent_patch(task: TaskSpec, workspace: Path, run_output_dir: Path, 
         status = runner_status
     if not audit.clean:
         status = "policy_violation"
+    if evaluation_errors:
+        status = "runner_failed"
     injection = _load_optional_json(run_output_dir / "docatlas_context_injection.json")
     checklist_injection = _load_optional_json(run_output_dir / "action_checklist_injection.json")
     constraints_injection = _load_optional_json(run_output_dir / "patch_constraints_injection.json")
@@ -589,6 +610,8 @@ def evaluate_agent_patch(task: TaskSpec, workspace: Path, run_output_dir: Path, 
     bounded_direct = _load_optional_json(run_output_dir / "bounded_direct_metrics.json")
     host_retrieval = _load_optional_json(run_output_dir / "host_retrieval_metrics.json")
     action_packet = _load_optional_json(run_output_dir / "action_packet.json")
+    runner_boundary = _load_optional_json(run_output_dir / "runner_execution_boundary.json")
+    evaluator_boundary = _load_optional_json(run_output_dir / "evaluator_execution_boundary.json")
     packet_evidence_metrics = action_packet_project_doc_metrics(task, action_packet)
     materialized_identity = _load_optional_json(run_output_dir / "materialized.json")
     trajectory = Path(trajectory_path) if trajectory_path else run_output_dir / "missing-trajectory.json"
@@ -602,6 +625,7 @@ def evaluate_agent_patch(task: TaskSpec, workspace: Path, run_output_dir: Path, 
     cached_input_tokens = _optional_int(provider_usage.get("cached_input_tokens"))
     reasoning_tokens = _optional_int(provider_usage.get("reasoning_tokens"))
     completed_turn_events = _optional_int(provider_usage.get("completed_turn_events"))
+    effective_max_turns = _optional_int(provider_usage.get("effective_max_turns"))
     uncached_input_tokens = (
         input_tokens - cached_input_tokens
         if isinstance(input_tokens, int)
@@ -630,7 +654,9 @@ def evaluate_agent_patch(task: TaskSpec, workspace: Path, run_output_dir: Path, 
     budget = {
         "max_input_tokens": task.max_input_tokens,
         "max_output_tokens": task.max_output_tokens,
-        "max_turns": task.max_turns,
+        "configured_max_turns": task.max_turns,
+        "effective_max_turns": effective_max_turns,
+        "max_turns": effective_max_turns,
         "input_tokens_exceeded": isinstance(input_tokens, int) and input_tokens > task.max_input_tokens,
         "output_tokens_exceeded": isinstance(output_tokens, int) and output_tokens > task.max_output_tokens,
         "max_turns_enforced_by_runner": bool(getattr(runner_output, "max_turns_enforced", False)),
@@ -705,15 +731,21 @@ def evaluate_agent_patch(task: TaskSpec, workspace: Path, run_output_dir: Path, 
         "compile_status": compile_gate["status"],
         "evaluation_execution": {
             "setup": setup_evidence,
+            "boundaries": {
+                "runner": runner_boundary,
+                "evaluator": evaluator_boundary,
+            },
             "public_tests": {
-                "status": "executed" if public is not None else "not_run",
+                "status": "executed" if public is not None else "execution_failed" if evaluation_errors else "not_run",
                 "command": task.test_command,
                 "returncode": public.returncode if public is not None else None,
+                "errors": evaluation_errors,
             },
             "hidden_tests": {
-                "status": "executed" if hidden is not None else "not_run",
+                "status": "executed" if hidden is not None else "execution_failed" if evaluation_errors else "not_run",
                 "command": task_evaluation_contract.semantic_test_command if task_evaluation_contract else None,
                 "returncode": hidden.returncode if hidden is not None else None,
+                "errors": evaluation_errors,
             },
         },
         "evaluation_contract": {
@@ -754,6 +786,7 @@ def evaluate_agent_patch(task: TaskSpec, workspace: Path, run_output_dir: Path, 
         "metrics": {
             "wall_time_seconds": metrics.wall_time_seconds,
             "time_to_first_edit": metrics.time_to_first_edit,
+            "made_edit": metrics.time_to_first_edit is not None,
             "time_to_first_test": metrics.time_to_first_test,
             "total_latency": total_latency,
             "parent_retained_context_tokens": parent_retained_context_tokens,
@@ -787,6 +820,9 @@ def evaluate_agent_patch(task: TaskSpec, workspace: Path, run_output_dir: Path, 
             "system_total_tokens": system_total_tokens,
             "delivery_retrieval_calls": _optional_int(
                 (isolated_delivery or bounded_direct).get("retrieval_calls")
+            ),
+            "delivery_attempts": _optional_int(
+                (isolated_delivery or bounded_direct).get("attempts")
             ),
             "action_packet_status": action_packet.get("status"),
             "action_packet_truncated": action_packet.get("status") == "truncated",
@@ -850,8 +886,57 @@ def evaluate_agent_patch(task: TaskSpec, workspace: Path, run_output_dir: Path, 
     }
     if not setup_ok:
         result["notes"].append("condition setup was not valid; evaluator tests were not run")
+    if evaluation_errors:
+        result["notes"].append("evaluator command boundary failed: " + "; ".join(evaluation_errors))
     (run_output_dir / "result.json").write_text(json.dumps(result, indent=2, sort_keys=True), encoding="utf-8")
     return result
+
+
+def _run_evaluation_command(
+    task: TaskSpec,
+    command: str,
+    workspace: Path,
+    run_output_dir: Path,
+    phase: str,
+    timeout_seconds: int,
+) -> CommandResult:
+    if task.task_id not in TASK23_PROTOCOL_TASKS:
+        return run_command(command, workspace, timeout_seconds)
+    image = os.environ.get("TASK33C_TEST_CONTAINER_IMAGE", "")
+    sandbox, boundary = verified_task33_sandbox(image)
+    persist_boundary(run_output_dir / "evaluator_execution_boundary.json", boundary)
+    if boundary.get("status") != "verified":
+        raise RuntimeError(f"Task 33 evaluator sandbox is not verified for {phase}")
+    completed = sandbox.run(command, workspace, timeout_seconds)
+    return CommandResult(
+        command=shlex.join(completed.command),
+        returncode=completed.returncode,
+        stdout=completed.stdout[-20_000:],
+        stderr=completed.stderr[-20_000:],
+    )
+
+
+def _run_compile_gate(
+    task: TaskSpec,
+    contract: Any,
+    workspace: Path,
+    run_output_dir: Path,
+) -> dict[str, Any]:
+    gate = contract.compile_gate
+    if gate.mode == "not_applicable":
+        return run_compile_gate(contract, workspace)
+    completed = _run_evaluation_command(
+        task, gate.command or "", workspace, run_output_dir, "compile", 120
+    )
+    return {
+        "status": "passed" if completed.passed else "failed",
+        "passed": completed.passed,
+        "command": completed.command,
+        "reason": None,
+        "returncode": completed.returncode,
+        "stdout": completed.stdout,
+        "stderr": completed.stderr,
+    }
 
 
 def _run_setup(task: TaskSpec, workspace: Path) -> subprocess.CompletedProcess[str]:
@@ -910,7 +995,11 @@ def _run_condition_setup(
             "wall_time_seconds": round(time.monotonic() - started, 6),
         }
         if completed.returncode == 0:
-            baseline = _seal_condition_setup_baseline(workspace)
+            baseline = _seal_condition_setup_baseline(
+                workspace,
+                run_output_dir,
+                allowed_changed_files=("uv.lock",) if task.task_id in TASK23_PROTOCOL_TASKS else None,
+            )
             payload.update(baseline)
             if baseline.get("baseline_status") != "sealed":
                 payload["status"] = "condition_setup_failed"
@@ -922,7 +1011,12 @@ def _run_condition_setup(
     return payload
 
 
-def _seal_condition_setup_baseline(workspace: Path) -> dict[str, Any]:
+def _seal_condition_setup_baseline(
+    workspace: Path,
+    run_output_dir: Path,
+    *,
+    allowed_changed_files: tuple[str, ...] | None,
+) -> dict[str, Any]:
     status = subprocess.run(
         ["git", "status", "--porcelain", "-uall"],
         cwd=workspace,
@@ -938,6 +1032,26 @@ def _seal_condition_setup_baseline(workspace: Path) -> dict[str, Any]:
         for line in status.stdout.splitlines()
         if len(line) > 3 and line[3:].strip()
     })
+    if allowed_changed_files is not None:
+        unexpected = sorted(set(changed_files) - set(allowed_changed_files))
+        if unexpected:
+            return {
+                "baseline_status": "failed",
+                "baseline_error": "setup changed files outside frozen allowlist: " + ", ".join(unexpected),
+                "baseline_changed_files": changed_files,
+                "baseline_allowed_changed_files": list(allowed_changed_files),
+            }
+    artifact_hashes: dict[str, str] = {}
+    artifact_dir = run_output_dir / "setup_baseline_artifacts"
+    for relative in changed_files if allowed_changed_files is not None else ():
+        source = (workspace / relative).resolve()
+        if workspace.resolve() not in source.parents or not source.is_file():
+            continue
+        artifact_dir.mkdir(parents=True, exist_ok=True)
+        destination = artifact_dir / relative
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(source, destination)
+        artifact_hashes[relative] = hashlib.sha256(source.read_bytes()).hexdigest()
     if changed_files:
         added = subprocess.run(
             ["git", "add", "-A"], cwd=workspace, text=True,
@@ -945,9 +1059,15 @@ def _seal_condition_setup_baseline(workspace: Path) -> dict[str, Any]:
         )
         if added.returncode != 0:
             return {"baseline_status": "failed", "baseline_error": added.stderr[-2_000:]}
+        commit_env = {
+            **os.environ,
+            "GIT_AUTHOR_DATE": "2000-01-01T00:00:00+00:00",
+            "GIT_COMMITTER_DATE": "2000-01-01T00:00:00+00:00",
+        }
         committed = subprocess.run(
             ["git", "commit", "-m", "condition setup baseline"],
             cwd=workspace,
+            env=commit_env,
             text=True,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
@@ -961,10 +1081,19 @@ def _seal_condition_setup_baseline(workspace: Path) -> dict[str, Any]:
     )
     if revision.returncode != 0:
         return {"baseline_status": "failed", "baseline_error": revision.stderr[-2_000:]}
+    tree = subprocess.run(
+        ["git", "rev-parse", "HEAD^{tree}"], cwd=workspace, text=True,
+        stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False,
+    )
+    if tree.returncode != 0:
+        return {"baseline_status": "failed", "baseline_error": tree.stderr[-2_000:]}
     return {
         "baseline_status": "sealed",
         "baseline_revision": revision.stdout.strip(),
+        "baseline_tree": tree.stdout.strip(),
         "baseline_changed_files": changed_files,
+        "baseline_allowed_changed_files": list(allowed_changed_files or ()),
+        "baseline_artifact_sha256": artifact_hashes,
     }
 
 
@@ -1139,11 +1268,13 @@ def execute_pilot(
                         elif not setup_failed and shared_evidence is not None:
                             envelope = DelegationEnvelope(
                                 task_objective=task.issue_text,
-                                suspected_modules=(),
+                                suspected_modules=task_contract.allowed_paths if task_contract else (),
                                 changed_files=(),
                                 required_evidence_categories=TASK33C_REQUIRED_EVIDENCE_CATEGORIES,
                                 project_revision=shared_evidence.project_revision,
                                 index_revision=shared_evidence.index_revision,
+                                required_evidence_paths=TASK33C_REQUIRED_EVIDENCE_PATHS,
+                                token_budget=2_000,
                             )
                             try:
                                 handoff = deliver_with_isolated_worker(
@@ -1224,6 +1355,7 @@ def execute_pilot(
                         tool_policy_path=policy_path,
                         output_dir=run_output_dir,
                         test_command=task.test_command,
+                        allowed_write_paths=task_contract.allowed_paths if task_contract else (),
                     )
                     try:
                         output = runner.run(request)
@@ -1435,8 +1567,8 @@ def capture_task33_host_evidence(
                 response_style="snippet-first",
                 allow_network=False,
                 allow_latest_fallback=False,
-                tokens=2_500,
-                limit=6,
+                tokens=4_000,
+                limit=12,
             )
     except Exception as exc:
         raise IsolatedDeliveryError(f"host_retrieval_failed:{exc.__class__.__name__}") from exc
@@ -1450,7 +1582,14 @@ def capture_task33_host_evidence(
         dict(item) for item in response.get("context_pack", []) if isinstance(item, dict)
     )
     trust_contract = response.get("trust_contract") if isinstance(response.get("trust_contract"), dict) else {}
-    issues = tuple(bounded_retrieval_issues(response, project_evidence_required=True))
+    retrieval_issues = list(bounded_retrieval_issues(response, project_evidence_required=True))
+    available_paths = {
+        str(item.get("path") or "").strip().replace("\\", "/") for item in context_pack
+    }
+    for required_path in TASK33C_REQUIRED_EVIDENCE_PATHS:
+        if required_path not in available_paths:
+            retrieval_issues.append("missing_required_evidence_path:" + required_path)
+    issues = tuple(dict.fromkeys(retrieval_issues))
     categories = _host_evidence_categories(context_pack)
     wall = round(time.monotonic() - started, 6)
     snapshot = HostEvidenceSnapshot(
@@ -1621,12 +1760,11 @@ def build_bounded_direct_packet(
         question=task.issue_text,
         context_pack=evidence.evidence_items,
         trust_contract=evidence.trust_contract,
-        max_tokens=1_500,
-        project_path=str(workspace),
+        max_tokens=2_000,
         retrieval_issues=evidence.retrieval_issues,
     )
     errors = validate_action_packet(
-        packet, evidence_items=evidence.evidence_items, max_tokens=1_500, project_path=str(workspace),
+        packet, evidence_items=evidence.evidence_items, max_tokens=2_000,
     )
     if errors:
         raise IsolatedDeliveryError("invalid_bounded_direct_packet:" + ";".join(errors))
@@ -1638,6 +1776,25 @@ def build_bounded_direct_packet(
     if packet.get("status") != "insufficient_evidence" and missing_categories:
         raise IsolatedDeliveryError(
             "bounded_direct_missing_required_evidence_categories:" + ",".join(missing_categories)
+        )
+    missing_paths = missing_packet_evidence_paths(
+        packet, evidence.evidence_items, TASK33C_REQUIRED_EVIDENCE_PATHS
+    )
+    if packet.get("status") != "insufficient_evidence" and missing_paths:
+        raise IsolatedDeliveryError(
+            "bounded_direct_missing_required_evidence_paths:" + ",".join(missing_paths)
+        )
+    contract = TASK33_EVALUATION_CONTRACTS.get(task.task_id)
+    target_surface = packet.get("target_surface") if isinstance(packet.get("target_surface"), dict) else {}
+    packet_targets = {
+        str(row.get("path") or "").strip().replace("\\", "/")
+        for row in target_surface.get("likely_files", [])
+        if isinstance(row, dict)
+    }
+    missing_targets = sorted(set(contract.allowed_paths if contract else ()) - packet_targets)
+    if packet.get("status") != "insufficient_evidence" and missing_targets:
+        raise IsolatedDeliveryError(
+            "bounded_direct_missing_required_target_modules:" + ",".join(missing_targets)
         )
     persist_host_evidence(evidence, output_dir)
     _write_json_atomic(output_dir / "action_packet.json", packet)
@@ -1986,10 +2143,24 @@ def run_canary(runner: AgentRunner, model: str, timeout_seconds: int, output_dir
             tool_policy_path=policy_path,
             output_dir=output_dir,
             test_command=canary_test_command,
+            allowed_write_paths=("calc.py", "normalization.py"),
         )
         runner_output = runner.run(request)
         patch_path, _, _, changed = capture_patch(workspace, output_dir)
-        tests = run_command(canary_test_command, workspace, 60)
+        if os.environ.get("TASK33C_REQUIRE_DOCKER_SANDBOX") == "1":
+            sandbox, boundary = verified_task33_sandbox(os.environ.get("TASK33C_TEST_CONTAINER_IMAGE", ""))
+            persist_boundary(output_dir / "canary_execution_boundary.json", boundary)
+            if boundary.get("status") != "verified":
+                raise RuntimeError("runner canary requires a verified Docker execution boundary")
+            sandbox_result = sandbox.run(canary_test_command, workspace, 60)
+            tests = CommandResult(
+                command=shlex.join(sandbox_result.command),
+                returncode=sandbox_result.returncode,
+                stdout=sandbox_result.stdout,
+                stderr=sandbox_result.stderr,
+            )
+        else:
+            tests = run_command(canary_test_command, workspace, 60)
         audit = audit_trajectory("repo_only", Path(runner_output.trajectory_path) if runner_output.trajectory_path else None, output_dir / "policy_audit.json")
         raw_stdout = Path(runner_output.raw_stdout_path).read_text(encoding="utf-8") if Path(runner_output.raw_stdout_path).exists() else ""
         network_probe_denied = "blocked by benchmark network policy" in raw_stdout

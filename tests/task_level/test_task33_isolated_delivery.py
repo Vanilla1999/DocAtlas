@@ -29,8 +29,12 @@ from eval.task_level.isolated_delivery import (
     deliver_with_isolated_worker,
 )
 from eval.task_level.task33_pilot import (
+    TASK33C_AGENT_TURN_LIMIT,
     TASK33C_PILOT_CONDITIONS,
     TASK33C_PILOT_TASK_ID,
+    TASK33C_REQUIRED_EVIDENCE_CATEGORIES,
+    TASK33C_REQUIRED_EVIDENCE_PATHS,
+    TASK33C_REQUIRED_TARGET_PATHS,
     build_task33c_pilot_plan,
     evaluate_task33c_pilot_completeness,
 )
@@ -300,7 +304,7 @@ def test_task33c_four_lane_plan_and_flags_are_frozen(tmp_path):
     assert plan["repeats"] == 1
     assert plan["retrieval_call_budget"] == plan["isolated_worker_attempt_budget"] == 1
     assert plan["agent_turn_limit"] == 24
-    assert plan["required_evidence_categories"] == ["project_docs"]
+    assert plan["required_evidence_categories"] == list(TASK33C_REQUIRED_EVIDENCE_CATEGORIES)
     assert plan["claims"]["may_claim_product_improvement"] is False
     direct = CONDITIONS["docatlas_bounded_direct"].tool_policy
     isolated = CONDITIONS["docatlas_bounded_subagent"].tool_policy
@@ -328,31 +332,55 @@ def test_task33c_decision_gate_requires_complete_comparable_measurements():
             "output_tokens": 50,
             "total_latency": 1.5,
             "time_to_first_edit": 0.5,
+            "made_edit": True,
+            "system_total_tokens": 150,
+            "completed_turn_events": 4,
         }
         if condition in {"docatlas_bounded_direct", "docatlas_bounded_subagent"}:
             metrics.update({
                 "delivery_retrieval_calls": 1,
+                "delivery_attempts": 1,
                 "action_packet_status": "ok",
                 "evidence_fingerprint": "shared-evidence",
                 "action_packet_project_doc_coverage": 0.5,
+                "action_packet_project_doc_paths": list(TASK33C_REQUIRED_EVIDENCE_PATHS),
+                "action_packet_target_paths": list(TASK33C_REQUIRED_TARGET_PATHS),
+                "raw_tool_output_tokens_estimate": 300,
+                "action_packet_tokens": 120,
             })
         if condition == "docatlas_bounded_subagent":
             metrics.update({
                 "worker_input_tokens": 200,
                 "worker_output_tokens": 80,
                 "system_total_tokens": 430,
+                "worker_reasoning_tokens": 0,
             })
         results.append({
             "task_id": TASK33C_PILOT_TASK_ID,
             "condition_id": condition,
             "repeat": 0,
             "status": "success",
+            "hidden_tests_passed": False,
             "metrics": metrics,
+            "token_attribution": {
+                "parent": {"cached_input_tokens": 0, "uncached_input_tokens": 100},
+                "raw_tool_output_tokens_estimate": 300 if condition.startswith("docatlas_bounded_") else None,
+                "action_packet_tokens": 120 if condition.startswith("docatlas_bounded_") else None,
+                "system_total_complete": True,
+            },
             "evaluation_execution": {
                 "setup": {
                     "phase": "pre_runner",
                     "status": "success",
                     "returncode": 0,
+                    "baseline_status": "sealed",
+                    "baseline_tree": "shared-setup-tree",
+                    "baseline_changed_files": ["uv.lock"],
+                    "baseline_artifact_sha256": {"uv.lock": "shared-lock-hash"},
+                },
+                "boundaries": {
+                    "runner": {"status": "verified"},
+                    "evaluator": {"status": "verified"},
                 },
                 "public_tests": {"status": "executed", "returncode": 1},
                 "hidden_tests": {"status": "executed", "returncode": 1},
@@ -363,6 +391,7 @@ def test_task33c_decision_gate_requires_complete_comparable_measurements():
             },
             "budget": {
                 "max_turns_enforced_by_runner": True,
+                "effective_max_turns": TASK33C_AGENT_TURN_LIMIT,
                 "input_tokens_exceeded": False,
                 "output_tokens_exceeded": False,
             },

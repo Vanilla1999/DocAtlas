@@ -38,7 +38,7 @@ _TASK33_QUERY_STOP_WORDS = frozenset({
 _TASK33_DOMAIN_DETAIL_TERMS = (
     "offline", "sync", "architecture", "partial", "handoff", "deferred",
 )
-TASK33_QUERY_DERIVATION = "task33c-domain-coverage-v3"
+TASK33_QUERY_DERIVATION = "task33c-domain-coverage-v4-limit12"
 
 
 def derive_task33_retrieval_query(task_objective: str) -> str:
@@ -101,6 +101,7 @@ class DelegationEnvelope:
     required_evidence_categories: tuple[str, ...]
     project_revision: str
     index_revision: str
+    required_evidence_paths: tuple[str, ...] = ()
     packet_schema_version: int = ACTION_PACKET_SCHEMA_VERSION
     token_budget: int = 1_500
     schema_version: int = 1
@@ -125,7 +126,10 @@ class DelegationEnvelope:
             raise IsolatedDeliveryError("invalid_token_budget")
         if not isinstance(self.required_evidence_categories, tuple) or not self.required_evidence_categories:
             raise IsolatedDeliveryError("missing_required_evidence_categories")
-        for field_name in ("suspected_modules", "changed_files", "required_evidence_categories"):
+        for field_name in (
+            "suspected_modules", "changed_files", "required_evidence_categories",
+            "required_evidence_paths",
+        ):
             values = getattr(self, field_name)
             if (
                 not isinstance(values, tuple) or len(values) > 32
@@ -148,6 +152,7 @@ class DelegationEnvelope:
             "suspected_modules": list(self.suspected_modules),
             "changed_files": list(self.changed_files),
             "required_evidence_categories": list(self.required_evidence_categories),
+            "required_evidence_paths": list(self.required_evidence_paths),
         }
 
     @property
@@ -659,6 +664,23 @@ def missing_packet_evidence_categories(
     return sorted(set(required_categories) - available)
 
 
+def missing_packet_evidence_paths(
+    packet: dict[str, Any],
+    evidence_items: tuple[dict[str, Any], ...],
+    required_paths: tuple[str, ...],
+) -> list[str]:
+    cited_paths = {
+        str(row.get("path") or "").strip().replace("\\", "/")
+        for row in packet.get("source_of_truth", [])
+        if isinstance(row, dict) and str(row.get("path") or "").strip()
+    }
+    evidence_paths = {
+        str(item.get("path") or "").strip().replace("\\", "/")
+        for item in evidence_items
+    }
+    return sorted(path for path in required_paths if path not in cited_paths or path not in evidence_paths)
+
+
 def deliver_with_isolated_worker(
     *,
     worker: IsolatedWorker,
@@ -765,6 +787,27 @@ def deliver_with_isolated_worker(
     if packet.get("status") != "insufficient_evidence" and missing_categories:
         raise IsolatedDeliveryError(
             "action_packet_missing_required_evidence_categories:" + ",".join(missing_categories)
+        )
+    missing_paths = missing_packet_evidence_paths(
+        packet, evidence.evidence_items, envelope.required_evidence_paths
+    )
+    if packet.get("status") != "insufficient_evidence" and missing_paths:
+        raise IsolatedDeliveryError(
+            "action_packet_missing_required_evidence_paths:" + ",".join(missing_paths)
+        )
+    target_surface = packet.get("target_surface") if isinstance(packet.get("target_surface"), dict) else {}
+    target_paths = {
+        str(row.get("path") or "").strip().replace("\\", "/")
+        for row in target_surface.get("likely_files", [])
+        if isinstance(row, dict)
+    }
+    required_target_files = {
+        path for path in envelope.suspected_modules if Path(path).suffix
+    }
+    missing_modules = sorted(required_target_files - target_paths)
+    if packet.get("status") != "insufficient_evidence" and missing_modules:
+        raise IsolatedDeliveryError(
+            "action_packet_missing_required_target_modules:" + ",".join(missing_modules)
         )
     if evidence.retrieval_issues and packet.get("status") != "insufficient_evidence":
         raise IsolatedDeliveryError("action_packet_ignored_host_retrieval_issues")

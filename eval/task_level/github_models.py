@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import signal
 import shlex
 import subprocess
 import threading
@@ -26,12 +27,13 @@ from .isolated_delivery import (
     WorkerUsage,
 )
 from .runners.base import AgentRunOutput, AgentRunRequest, RunnerCapabilities
+from .sandbox_execution import DockerCommandSandbox, persist_boundary
 
 
 GITHUB_MODELS_ENDPOINT = "https://models.github.ai/inference/chat/completions"
 DEFAULT_GITHUB_MODEL = "openai/gpt-4o-mini"
-_RUNNER_VERSION = "github-models-controlled-agent-v1"
-_WORKER_PROMPT_REVISION = "task33c-evidence-selector-v1"
+_RUNNER_VERSION = "github-models-controlled-agent-v2-docker-boundary"
+_WORKER_PROMPT_REVISION = "task33c-evidence-selector-v2-full-snapshot"
 _MIN_REQUEST_INTERVAL_SECONDS = 6.2
 _REQUEST_RATE_LOCK = threading.Lock()
 _LAST_REQUEST_AT = 0.0
@@ -70,6 +72,7 @@ class GitHubModelsClient:
     ) -> tuple[dict[str, Any], GitHubModelsCompletion]:
         if timeout_seconds <= 0:
             raise TimeoutError("GitHub Models request deadline expired")
+        deadline = time.monotonic() + timeout_seconds
         payload = {
             "model": model,
             "messages": messages,
@@ -87,6 +90,9 @@ class GitHubModelsClient:
             },
         }
         _pace_github_models_request()
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            raise TimeoutError("GitHub Models request deadline expired during rate pacing")
         request = urllib.request.Request(
             self.endpoint,
             data=json.dumps(payload, ensure_ascii=False).encode("utf-8"),
@@ -99,7 +105,7 @@ class GitHubModelsClient:
             method="POST",
         )
         try:
-            with urllib.request.urlopen(request, timeout=timeout_seconds) as response:
+            with _absolute_deadline(remaining), urllib.request.urlopen(request, timeout=remaining) as response:
                 request_ids = {
                     name: value
                     for name in ("x-github-request-id", "apim-request-id", "x-ms-request-id")
@@ -183,14 +189,15 @@ class GitHubModelsIsolatedWorker:
     token: str
     model: str = DEFAULT_GITHUB_MODEL
     endpoint: str = GITHUB_MODELS_ENDPOINT
-    compressor_identity: str = "github-models-task33c-selector-v1"
-    usage_verifier_identity: str = "github-models-response-headers-and-usage-v1"
+    compressor_identity: str = "github-models-task33c-selector-v2"
+    usage_verifier_identity: str = "github-models-response-headers-and-usage-v2"
 
     @property
     def capability_evidence(self) -> dict[str, Any]:
+        deadline_supported = _absolute_deadline_supported()
         return {
             "schema_version": 1,
-            "status": "verified" if bool(self.token.strip()) else "unavailable",
+            "status": "verified" if bool(self.token.strip()) and deadline_supported else "unavailable",
             "boundary_type": "remote_toolless_inference",
             "boundary": "tool-less hosted inference request",
             "provider_endpoint": self.endpoint,
@@ -203,7 +210,8 @@ class GitHubModelsIsolatedWorker:
             "provider_transport": "host-owned HTTPS request only",
             "local_process_execution": False,
             "recursive_delegation": False,
-            "hard_timeout": "host urllib deadline plus broker wall-clock enforcement",
+            "hard_timeout": "POSIX signal-interruptible absolute transport deadline plus broker wall-clock enforcement",
+            "absolute_deadline_supported": deadline_supported,
             "token_accounting": "provider response usage bound to provider request headers",
         }
 
@@ -232,7 +240,7 @@ class GitHubModelsIsolatedWorker:
 
     @property
     def sandbox_identity(self) -> str:
-        return "github-models:tool-less-hosted-inference-v1"
+        return "github-models:tool-less-hosted-inference-v2-absolute-deadline"
 
     def run(
         self,
@@ -246,20 +254,24 @@ class GitHubModelsIsolatedWorker:
         if not self.capabilities.verified:
             raise IsolatedDeliveryError("github_models_worker_unavailable")
         indexed = [
-            {"index": index, "evidence": _compact_worker_evidence(item)}
+            {"index": index, "evidence": _worker_evidence(item)}
             for index, item in enumerate(evidence.evidence_items)
         ]
         system = (
             "You are a one-shot evidence compressor. You have no tools, filesystem, network, "
             "or delegation. Select 3 to 6 evidence items that are most useful for implementing "
             "the objective. Prefer canonical project architecture and source evidence spanning "
-            "all affected modules. Return only the required JSON object."
+            "all affected modules. Every item is host-owned and immutable; do not invent or rewrite evidence. "
+            "Return only the required JSON object."
         )
         user = json.dumps({
             "prompt_revision": _WORKER_PROMPT_REVISION,
             "objective": envelope.task_objective,
             "required_evidence_categories": list(envelope.required_evidence_categories),
+            "required_evidence_paths": list(envelope.required_evidence_paths),
+            "required_target_modules": list(envelope.suspected_modules),
             "evidence_fingerprint": evidence.fingerprint,
+            "serialized_evidence_sha256": _json_sha256(indexed),
             "evidence": indexed,
         }, ensure_ascii=False, sort_keys=True)
         started = time.monotonic()
@@ -334,12 +346,21 @@ class GitHubModelsRunner:
     runner_id = "github-models"
     hard_turn_limit_enforced = True
 
-    def __init__(self, token: str, *, endpoint: str = GITHUB_MODELS_ENDPOINT) -> None:
+    def __init__(
+        self,
+        token: str,
+        *,
+        endpoint: str = GITHUB_MODELS_ENDPOINT,
+        sandbox: DockerCommandSandbox | None = None,
+    ) -> None:
         self._token = token
         self._endpoint = endpoint
+        self._sandbox = sandbox or DockerCommandSandbox.from_environment()
 
     def verify(self) -> RunnerCapabilities:
-        available = bool(self._token.strip())
+        boundary = self._sandbox.verify()
+        deadline_supported = _absolute_deadline_supported()
+        available = bool(self._token.strip()) and boundary.get("status") == "verified" and deadline_supported
         return RunnerCapabilities(
             runner_id=self.runner_id,
             version=_RUNNER_VERSION,
@@ -354,15 +375,23 @@ class GitHubModelsRunner:
             hard_turn_limit=True,
             verification_notes=[
                 "Each model turn is a stateless GitHub Models request in a host-controlled loop.",
-                "The runner exposes only bounded repository reads, exact text replacement, local tests, and condition-scoped DocAtlas retrieval.",
+                "The runner exposes only bounded repository reads, contract-allowlisted exact text replacement, sandboxed local tests, and condition-scoped DocAtlas retrieval.",
                 "No arbitrary shell, network, MCP, recursive-agent, or generated-file editing tool is exposed.",
                 "The Python loop enforces the requested maximum number of model turns and a monotonic wall-clock deadline.",
                 "Provider token usage and request IDs are persisted per turn without persisting the bearer token.",
+                f"Docker command boundary: {boundary.get('status')}; image identity: {boundary.get('image_id_sha256') or 'missing'}.",
+                f"Interruptible absolute provider deadline: {deadline_supported}.",
             ],
         )
 
     def run(self, request: AgentRunRequest) -> AgentRunOutput:
         request.output_dir.mkdir(parents=True, exist_ok=True)
+        boundary = self._sandbox.verify()
+        persist_boundary(request.output_dir / "runner_execution_boundary.json", boundary)
+        if boundary.get("status") != "verified" or not _absolute_deadline_supported():
+            raise RuntimeError("GitHub Models runner requires a verified Docker boundary and interruptible absolute deadlines")
+        if not request.allowed_write_paths and request.task_id != "docatlas_tool_visibility_canary":
+            raise RuntimeError("controlled runner requires an explicit write-path allowlist")
         stdout_path = request.output_dir / "stdout.log"
         stderr_path = request.output_dir / "stderr.log"
         trajectory_path = request.output_dir / "trajectory.normalized.json"
@@ -395,6 +424,7 @@ class GitHubModelsRunner:
         client = GitHubModelsClient(self._token, endpoint=self._endpoint)
         read_paths: set[str] = set(bootstrap_read_paths)
         last_test_result: str | None = None
+        rejected_actions: dict[str, int] = {}
 
         for turn in range(1, request.max_turns + 1):
             remaining = deadline - time.monotonic()
@@ -420,6 +450,10 @@ class GitHubModelsRunner:
                     timeout_seconds=min(remaining, 90),
                     max_tokens=2_048,
                 )
+            except TimeoutError as exc:
+                stderr_rows.append(f"turn {turn}: TimeoutError: {exc}")
+                status, exit_code = "timeout", 124
+                break
             except Exception as exc:
                 stderr_rows.append(f"turn {turn}: {exc.__class__.__name__}: {exc}")
                 status, exit_code = "runner_failed", 1
@@ -439,7 +473,22 @@ class GitHubModelsRunner:
                 events.append(_event(len(events) + 1, "assistant", "", {}, summary))
                 status, exit_code = "completed", 0
                 break
-            result = _execute_agent_tool(request, action, read_paths=read_paths)
+            action_fingerprint = _action_fingerprint(action)
+            terminate_repetition = False
+            if action_fingerprint in rejected_actions:
+                rejected_actions[action_fingerprint] += 1
+                result = (
+                    "ERROR: exact rejected action repeated; inspect current state and choose a different action. "
+                    f"fingerprint={action_fingerprint}"
+                )
+                terminate_repetition = rejected_actions[action_fingerprint] >= 3
+            else:
+                result = _execute_agent_tool(
+                    request, action, read_paths=read_paths,
+                    sandbox=self._sandbox, deadline=deadline,
+                )
+                if result.startswith(("ERROR:", "NO_CHANGE_ALREADY_APPLIED")):
+                    rejected_actions[action_fingerprint] = 1
             event = _event(
                 len(events) + 1,
                 "tool_call",
@@ -452,7 +501,10 @@ class GitHubModelsRunner:
             if tool == "run_tests" and result.startswith("exit_code="):
                 last_test_result = result
             if tool == "replace_text" and result.startswith("UPDATED "):
-                test_result = _execute_agent_tool(request, {"tool": "run_tests"}, read_paths=read_paths)
+                test_result = _execute_agent_tool(
+                    request, {"tool": "run_tests"}, read_paths=read_paths,
+                    sandbox=self._sandbox, deadline=deadline,
+                )
                 if test_result.startswith("exit_code="):
                     last_test_result = test_result
                 events.append(_event(
@@ -480,6 +532,9 @@ class GitHubModelsRunner:
                 "role": "user",
                 "content": "Observed tool output:\n" + observed_result[:8_000],
             })
+            if terminate_repetition:
+                status, exit_code = "stalled_action_loop", 2
+                break
 
         finished_at = datetime.now(timezone.utc).isoformat()
         stdout_path.write_text("\n".join(stdout_rows) + ("\n" if stdout_rows else ""), encoding="utf-8")
@@ -493,19 +548,26 @@ class GitHubModelsRunner:
         }, indent=2, sort_keys=True), encoding="utf-8")
         input_tokens = sum(row["usage"]["prompt_tokens"] for row in usage_rows)
         output_tokens = sum(row["usage"]["completion_tokens"] for row in usage_rows)
-        cached_input_tokens = sum(
-            value
+        cached_values = [
+            details.get("cached_tokens") if isinstance(details, dict) else None
             for row in usage_rows
-            if isinstance(row["usage"].get("prompt_tokens_details"), dict)
-            for value in [row["usage"]["prompt_tokens_details"].get("cached_tokens")]
-            if isinstance(value, int) and not isinstance(value, bool) and value >= 0
+            for details in [row["usage"].get("prompt_tokens_details")]
+        ]
+        cached_input_tokens = (
+            sum(cached_values)
+            if all(isinstance(value, int) and not isinstance(value, bool) and value >= 0 for value in cached_values)
+            else None
         )
         reasoning_values = [
-            row["usage"].get("completion_tokens_details", {}).get("reasoning_tokens")
+            details.get("reasoning_tokens") if isinstance(details, dict) else None
             for row in usage_rows
-            if isinstance(row["usage"].get("completion_tokens_details"), dict)
+            for details in [row["usage"].get("completion_tokens_details")]
         ]
-        reasoning_tokens = sum(value for value in reasoning_values if isinstance(value, int) and not isinstance(value, bool))
+        reasoning_tokens = (
+            sum(reasoning_values)
+            if all(isinstance(value, int) and not isinstance(value, bool) and value >= 0 for value in reasoning_values)
+            else None
+        )
         return AgentRunOutput(
             status=status,
             exit_code=exit_code,
@@ -526,8 +588,9 @@ class GitHubModelsRunner:
                 "cached_input_tokens": cached_input_tokens,
                 "reasoning_tokens": reasoning_tokens,
                 "completed_turn_events": len(usage_rows),
+                "effective_max_turns": request.max_turns,
             },
-            notes=["GitHub Models controlled tool loop; no arbitrary shell or network tools exposed."],
+            notes=["GitHub Models controlled tool loop; tests execute inside the verified Docker boundary."],
         )
 
 
@@ -590,6 +653,7 @@ def _runner_system_prompt(request: AgentRunRequest) -> str:
         "You are a controlled coding agent. Take exactly one action per turn using the JSON schema. "
         f"Available actions: {tools}. Inspect before editing, make the smallest source-code fix, run tests, "
         "then finish. Never edit tests, documentation, lockfiles, generated files, or files outside the repository. "
+        f"The only writable paths are: {', '.join(request.allowed_write_paths) or '(none)'}. "
         "You have no internet or arbitrary shell. "
         "The user message contains the exact repository inventory; never invent a path outside it. "
         "Files present in the initial source snapshot count as read; otherwise you must read a source file before "
@@ -604,6 +668,8 @@ def _execute_agent_tool(
     action: dict[str, Any],
     *,
     read_paths: set[str] | None = None,
+    sandbox: DockerCommandSandbox,
+    deadline: float,
 ) -> str:
     read_paths = read_paths if read_paths is not None else set()
     tool = action.get("tool")
@@ -637,7 +703,10 @@ def _execute_agent_tool(
             ranked = [row for _score, row in sorted(rows, key=lambda item: (-item[0], item[1]))[:80]]
             return "\n".join(ranked)[:6_000] or "NO MATCHES"
         if tool == "replace_text":
-            path = _safe_path(request.workspace, action.get("path"), write=True)
+            path = _safe_path(
+                request.workspace, action.get("path"), write=True,
+                allowed_write_paths=request.allowed_write_paths,
+            )
             relative = path.relative_to(request.workspace.resolve()).as_posix()
             if relative not in read_paths:
                 return "ERROR: read_file must successfully inspect this exact path before replace_text"
@@ -666,17 +735,12 @@ def _execute_agent_tool(
             return f"UPDATED {path.relative_to(request.workspace).as_posix()}"
         if tool == "run_tests":
             command = _test_command(request)
-            completed = subprocess.run(
-                command,
-                cwd=request.workspace,
-                env={**os.environ, **request.environment, "DOCMANCER_OFFLINE": "1"},
-                text=True,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.STDOUT,
-                timeout=min(180, request.timeout_seconds),
-                check=False,
-            )
-            return f"exit_code={completed.returncode}\n{completed.stdout[-18_000:]}"
+            remaining = deadline - time.monotonic()
+            if remaining <= 0:
+                raise TimeoutError("runner deadline expired before test execution")
+            completed = sandbox.run(command, request.workspace, min(180, remaining))
+            output = (completed.stdout + ("\n" + completed.stderr if completed.stderr else ""))[-18_000:]
+            return f"exit_code={completed.returncode}\n{output}"
         if tool == "get_docs_context" and _docatlas_allowed(request.condition_id):
             query = action.get("query")
             if not isinstance(query, str) or not query.strip() or len(query) > 1_000:
@@ -703,7 +767,13 @@ def _execute_agent_tool(
         return f"ERROR: tool failed closed: {exc.__class__.__name__}: {str(exc)[:1_000]}"
 
 
-def _safe_path(root: Path, value: Any, *, write: bool) -> Path:
+def _safe_path(
+    root: Path,
+    value: Any,
+    *,
+    write: bool,
+    allowed_write_paths: tuple[str, ...] = (),
+) -> Path:
     if not isinstance(value, str) or not value.strip() or "\x00" in value:
         raise ValueError("invalid repository path")
     candidate = (root / value).resolve()
@@ -713,6 +783,8 @@ def _safe_path(root: Path, value: Any, *, write: bool) -> Path:
     relative = candidate.relative_to(resolved_root)
     if ".git" in relative.parts:
         raise ValueError("git metadata is not exposed")
+    if write and relative.as_posix() not in allowed_write_paths:
+        raise ValueError("path is outside the frozen task write allowlist")
     if write and (
         relative.parts[:1] in (("tests",), ("docs",))
         or candidate.name in {"README.md", "pubspec.lock", "pyproject.toml"}
@@ -828,25 +900,29 @@ def _repository_source_snapshot(workspace: Path) -> tuple[str, tuple[str, ...]]:
 
 
 def _compact_action_history(action: dict[str, Any]) -> dict[str, Any]:
-    return {
+    compact = {
         key: value
         for key, value in action.items()
         if value is not None and key not in {"old", "new"}
     }
-
-
-def _compact_worker_evidence(item: dict[str, Any]) -> dict[str, Any]:
-    compact = {
-        key: item.get(key)
-        for key in (
-            "evidence_id", "path", "heading_path", "section", "source_class",
-            "authority", "instruction_trust", "scope", "version_binding", "symbols",
-        )
-        if item.get(key) is not None
-    }
-    content = str(item.get("content") or item.get("snippet") or "")
-    compact["content_excerpt"] = content[:800]
+    for key in ("old", "new"):
+        value = action.get(key)
+        if isinstance(value, str):
+            compact[f"{key}_sha256"] = hashlib.sha256(value.encode("utf-8")).hexdigest()
+            compact[f"{key}_chars"] = len(value)
+    compact["action_fingerprint"] = _action_fingerprint(action)
     return compact
+
+
+def _action_fingerprint(action: dict[str, Any]) -> str:
+    normalized = {key: value for key, value in action.items() if key != "summary"}
+    return hashlib.sha256(
+        json.dumps(normalized, ensure_ascii=False, sort_keys=True).encode("utf-8")
+    ).hexdigest()
+
+
+def _worker_evidence(item: dict[str, Any]) -> dict[str, Any]:
+    return dict(item)
 
 
 def _pace_github_models_request() -> None:
@@ -897,6 +973,41 @@ def _jsonable(value: Any) -> Any:
     if isinstance(value, (list, tuple)):
         return [_jsonable(item) for item in value]
     return value
+
+
+def _absolute_deadline_supported() -> bool:
+    return (
+        os.name == "posix"
+        and hasattr(signal, "setitimer")
+        and threading.current_thread() is threading.main_thread()
+    )
+
+
+@contextmanager
+def _absolute_deadline(seconds: float) -> Iterator[None]:
+    """Interrupt DNS, connect, and streaming reads at one monotonic deadline."""
+
+    if seconds <= 0:
+        raise TimeoutError("absolute deadline expired")
+    if not _absolute_deadline_supported():
+        raise RuntimeError("interruptible absolute deadlines require the POSIX main thread")
+    previous_handler = signal.getsignal(signal.SIGALRM)
+    previous_timer = signal.getitimer(signal.ITIMER_REAL)
+    started = time.monotonic()
+
+    def _raise_timeout(_signum: int, _frame: Any) -> None:
+        raise TimeoutError("absolute provider deadline expired")
+
+    signal.signal(signal.SIGALRM, _raise_timeout)
+    signal.setitimer(signal.ITIMER_REAL, seconds)
+    try:
+        yield
+    finally:
+        signal.setitimer(signal.ITIMER_REAL, 0)
+        signal.signal(signal.SIGALRM, previous_handler)
+        if previous_timer[0] > 0:
+            remaining = max(0.000_001, previous_timer[0] - (time.monotonic() - started))
+            signal.setitimer(signal.ITIMER_REAL, remaining, previous_timer[1])
 
 
 @contextmanager

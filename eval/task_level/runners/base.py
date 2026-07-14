@@ -35,6 +35,7 @@ class AgentRunRequest:
     tool_policy_path: Path
     output_dir: Path
     test_command: str | None = None
+    allowed_write_paths: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)

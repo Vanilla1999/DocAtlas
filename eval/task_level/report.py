@@ -148,7 +148,6 @@ def write_report(run_dir: Path, metadata: dict[str, Any], results: list[dict[str
 
     blocked_statuses = {
         "condition_setup_failed", "runner_unavailable", "runner_failed", "timeout",
-        "max_turns_exhausted",
     }
     blocked = sum(1 for result in results if result.get("status") in blocked_statuses)
     failure_summary = metadata.get("failure_summary")
