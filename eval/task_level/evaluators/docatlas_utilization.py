@@ -65,12 +65,28 @@ def evaluate_docatlas_utilization(
     injected_path = run_output_dir / "injected_context.md"
     sources_path = run_output_dir / "context_sources.json"
     injection_path = run_output_dir / "docatlas_context_injection.json"
-    context_retrieved = response_path.exists() or packet_path.exists()
+    host_retrieval = _load_json(run_output_dir / "host_retrieval_metrics.json")
+    bounded_delivery = bool(host_retrieval)
+    context_retrieved = (
+        host_retrieval.get("status") == "success"
+        and isinstance(host_retrieval.get("evidence_count"), int)
+        and not isinstance(host_retrieval.get("evidence_count"), bool)
+        and host_retrieval["evidence_count"] > 0
+    ) if bounded_delivery else response_path.exists()
     context_injected = injected_path.exists() or packet_path.exists()
     delivery_metrics = _load_json(run_output_dir / "isolated_delivery_metrics.json") or _load_json(run_output_dir / "bounded_direct_metrics.json")
-    harness_calls = int(delivery_metrics.get("retrieval_calls") or (1 if context_retrieved else 0))
+    raw_harness_calls = host_retrieval.get("retrieval_calls") if bounded_delivery else delivery_metrics.get("retrieval_calls")
+    harness_calls = (
+        raw_harness_calls
+        if isinstance(raw_harness_calls, int) and not isinstance(raw_harness_calls, bool) and raw_harness_calls >= 0
+        else 1 if context_retrieved else 0
+    )
     injection = _load_json(injection_path)
-    retrieval_status = injection.get("docatlas_retrieval_status") or injection.get("status")
+    retrieval_status = (
+        host_retrieval.get("status")
+        if bounded_delivery
+        else injection.get("docatlas_retrieval_status") or injection.get("status")
+    )
     fallback_used = bool(injection.get("fallback_used"))
     vector_timed_out = bool(injection.get("vector_indexing_timed_out"))
     fallback_source = str(injection.get("fallback_source")) if injection.get("fallback_source") else None
@@ -131,7 +147,9 @@ def evaluate_docatlas_utilization(
         vector_indexing_timed_out=vector_timed_out,
         fallback_used=fallback_used,
         fallback_source=fallback_source,
-        docatlas_tool_success=agent_docatlas_calls > 0 or (context_retrieved and not fallback_used),
+        docatlas_tool_success=agent_docatlas_calls > 0 or (
+            context_retrieved and not fallback_used and retrieval_status == "success"
+        ),
         docatlas_fallback_success=fallback_used and confidence != "none",
     )
 

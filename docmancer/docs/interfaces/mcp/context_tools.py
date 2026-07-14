@@ -233,7 +233,7 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
         ) or 1_500
         recovery = _bounded_recovery_action(raw)
         packet_budget = _packet_budget_inside_payload(output_budget, recovery=recovery)
-        retrieval_issues = _bounded_retrieval_issues(
+        retrieval_issues = bounded_retrieval_issues(
             raw, project_evidence_required=bool(_clean_string(args.get("project_path")))
         )
         packet = build_action_packet(
@@ -323,7 +323,7 @@ def _bounded_action_mapping(value: dict[str, Any], *, depth: int = 0) -> dict[st
     return result
 
 
-def _bounded_retrieval_issues(
+def bounded_retrieval_issues(
     payload: dict[str, Any], *, project_evidence_required: bool = False
 ) -> list[str]:
     issues: list[str] = []

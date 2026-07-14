@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import importlib
 import json
 import os
 import random
@@ -18,7 +19,7 @@ from eval.task_level.conditions import CONDITIONS, DEFAULT_CONDITIONS
 from eval.task_level.evaluators.tests import run_command
 from eval.task_level.execution import DOCATLAS_CONDITIONS, TASK23_PROTOCOL_TASKS, execute_pilot, run_canary, run_docatlas_tool_visibility_canary, runner_verification_payload, serialize_run_results_jsonl
 from eval.task_level.fixtures.builder import FIXTURE_TASKS, materialize_fixture, validate_fixture
-from eval.task_level.isolated_delivery import JsonSubprocessIsolatedWorker, IsolatedWorkerCapabilities
+from eval.task_level.isolated_delivery import JsonSubprocessIsolatedWorker
 from eval.task_level.patch_constraints_pilot import TARGETED_PILOT_CONDITIONS, build_targeted_pilot_plan, select_targeted_pilot_tasks, write_targeted_pilot_dry_run
 from eval.task_level.report import write_report
 from eval.task_level.runners.claude import ClaudeRunner
@@ -26,7 +27,7 @@ from eval.task_level.runners.codex import CodexRunner
 from eval.task_level.runners.opencode import OpenCodeRunner
 from eval.task_level.schemas import RESULTS_ROOT, TASKS_PATH, VALIDATION_ROOT, RunMetrics, RunResult, TaskSpec
 from eval.task_level.task_selection import decide_candidate_status, decide_screening_result, write_screening_artifacts
-from eval.task_level.task33_pilot import TASK33C_PILOT_CONDITIONS, TASK33C_PILOT_TASK_ID, build_task33c_pilot_plan
+from eval.task_level.task33_pilot import TASK33C_PILOT_CONDITIONS, TASK33C_PILOT_TASK_ID, build_task33c_pilot_plan, evaluate_task33c_pilot_completeness
 
 
 BASE_PROMPT = """You are working in a software repository at the supplied base commit.
@@ -132,6 +133,40 @@ def select_runner(runner_id: str, *, codex_sandbox_mode: str = "workspace-write"
     if runner_id == "opencode":
         return OpenCodeRunner()
     raise SystemExit(f"Unknown runner: {runner_id}")
+
+
+def load_runner_factory(spec: str):
+    module_name, separator, attribute = spec.partition(":")
+    if not separator or not module_name or not attribute:
+        raise SystemExit("--runner-factory must use module.path:factory format")
+    try:
+        module = importlib.import_module(module_name)
+        factory = getattr(module, attribute)
+        runner = factory()
+    except Exception as exc:
+        raise SystemExit(f"Unable to load runner factory {spec}: {exc}") from exc
+    if not callable(getattr(runner, "verify", None)) or not callable(getattr(runner, "run", None)):
+        raise SystemExit("Runner factory must return an object implementing verify() and run()")
+    return runner
+
+
+def load_isolated_worker_factory(spec: str):
+    module_name, separator, attribute = spec.partition(":")
+    if not separator or not module_name or not attribute:
+        raise SystemExit("--isolated-worker-factory must use module.path:factory format")
+    try:
+        module = importlib.import_module(module_name)
+        factory = getattr(module, attribute)
+        worker = factory()
+    except Exception as exc:
+        raise SystemExit(f"Unable to load isolated worker factory {spec}: {exc}") from exc
+    required = (
+        "run", "capabilities", "capability_evidence", "compressor_identity",
+        "command_fingerprint", "sandbox_identity", "usage_verifier_identity",
+    )
+    if any(not hasattr(worker, name) for name in required) or not callable(getattr(worker, "run", None)):
+        raise SystemExit("Isolated worker factory returned an incomplete host adapter")
+    return worker
 
 
 def filter_tasks(tasks: list[TaskSpec], selected: list[str] | None) -> list[TaskSpec]:
@@ -315,13 +350,15 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--screen-tasks", action="store_true")
     parser.add_argument("--patch-constraints-targeted-pilot", action="store_true")
     parser.add_argument("--task33c-pilot", action="store_true", help="Run the frozen one-task, four-lane engineering pilot")
-    parser.add_argument("--isolated-worker-command", help="Absolute JSON worker command; enables the Task 33C host capability")
+    parser.add_argument("--isolated-worker-command", help="Absolute JSON worker command for non-causal protocol smoke; provider usage remains unverified")
+    parser.add_argument("--isolated-worker-factory", help="Inject a verified host-owned worker adapter as module.path:factory")
     parser.add_argument("--isolated-worker-identity", help="Versioned model/prompt identity for the isolated compressor")
     parser.add_argument("--isolated-worker-timeout-seconds", type=int, default=60)
     parser.add_argument("--isolated-worker-env", action="append", default=[], metavar="NAME", help="Explicitly pass one environment variable to the isolated worker")
-    parser.add_argument("--isolated-worker-root-sandbox-verified", action="store_true", help="Attest that the worker command applies an independently verified root-safe OS sandbox")
+    parser.add_argument("--isolated-worker-sandbox-executable", default="/usr/bin/bwrap", help="Absolute bubblewrap executable; the pilot fails closed when unavailable")
     parser.add_argument("--accepted-pool", type=Path)
     parser.add_argument("--runner", default="claude")
+    parser.add_argument("--runner-factory", help="Inject a verified runner as module.path:factory")
     parser.add_argument(
         "--codex-sandbox-mode",
         choices=("workspace-write", "danger-full-access"),
@@ -344,12 +381,16 @@ def main(argv: list[str] | None = None) -> int:
     tasks = filter_tasks(load_tasks(args.manifest), args.tasks)
     if args.task33c_pilot and (args.patch_constraints_targeted_pilot or args.screen_tasks or args.smoke):
         raise SystemExit("--task33c-pilot cannot be combined with another pilot/screen/smoke mode")
+    if args.task33c_pilot and args.retry_infrastructure_failures:
+        raise SystemExit("--task33c-pilot enforces one attempt per cell and cannot be retried")
     if args.task33c_pilot:
         if len(tasks) != 1 or tasks[0].task_id != TASK33C_PILOT_TASK_ID:
             raise SystemExit(f"--task33c-pilot requires --tasks {TASK33C_PILOT_TASK_ID}")
         args.conditions = list(TASK33C_PILOT_CONDITIONS)
         args.repeats = 1
-    isolated_worker = None
+    if args.isolated_worker_command and args.isolated_worker_factory:
+        raise SystemExit("Use either --isolated-worker-command or --isolated-worker-factory, not both")
+    isolated_worker = load_isolated_worker_factory(args.isolated_worker_factory) if args.isolated_worker_factory else None
     if args.isolated_worker_command:
         if not args.isolated_worker_identity:
             raise SystemExit("--isolated-worker-command requires --isolated-worker-identity")
@@ -364,17 +405,12 @@ def main(argv: list[str] | None = None) -> int:
             command=command,
             compressor_identity=args.isolated_worker_identity,
             environment=environment,
-            capabilities=IsolatedWorkerCapabilities(
-                fresh_context=True,
-                read_only_documentation=True,
-                recursive_delegation_disabled=True,
-                hard_timeout=True,
-                token_accounting=True,
-            ),
-            root_sandbox_verified=args.isolated_worker_root_sandbox_verified,
+            sandbox_executable=args.isolated_worker_sandbox_executable,
         )
     if "docatlas_bounded_subagent" in args.conditions and isolated_worker is None and not args.dry_run:
-        raise SystemExit("docatlas_bounded_subagent requires --isolated-worker-command and --isolated-worker-identity")
+        raise SystemExit("docatlas_bounded_subagent requires --isolated-worker-factory or a dry-run command scaffold")
+    if isolated_worker is not None and not isolated_worker.capabilities.verified and not args.dry_run:
+        raise SystemExit("docatlas_bounded_subagent requires verified sandbox canaries and host-owned provider usage proof")
     if args.patch_constraints_targeted_pilot and not args.tasks:
         tasks = select_targeted_pilot_tasks(tasks, accepted_pool_path=args.accepted_pool)
         args.conditions = list(TARGETED_PILOT_CONDITIONS)
@@ -395,13 +431,23 @@ def main(argv: list[str] | None = None) -> int:
         metadata["isolated_worker_host"] = {
             "configured": isolated_worker is not None,
             "compressor_identity": isolated_worker.compressor_identity if isolated_worker else None,
-            "root_sandbox_verified": bool(isolated_worker and isolated_worker.root_sandbox_verified),
+            "sandbox_identity": isolated_worker.sandbox_identity if isolated_worker else None,
+            "sandbox_capabilities": (
+                isolated_worker.capabilities.__dict__ if isolated_worker else None
+            ),
+            "capability_evidence": isolated_worker.capability_evidence if isolated_worker else None,
+            "usage_verifier_identity": isolated_worker.usage_verifier_identity if isolated_worker else None,
         }
 
-    runner = select_runner(args.runner, codex_sandbox_mode=args.codex_sandbox_mode)
+    runner = (
+        load_runner_factory(args.runner_factory)
+        if args.runner_factory
+        else select_runner(args.runner, codex_sandbox_mode=args.codex_sandbox_mode)
+    )
     capabilities = runner.verify()
     metadata["runner_verification"] = runner_verification_payload(capabilities)
-    if args.runner == "codex":
+    metadata["runner_factory"] = args.runner_factory
+    if args.runner == "codex" and not args.runner_factory:
         metadata["runner_verification"]["sandbox_mode"] = args.codex_sandbox_mode
     (run_dir / "metadata.json").write_text(json.dumps(metadata, indent=2, sort_keys=True), encoding="utf-8")
 
@@ -510,6 +556,19 @@ def main(argv: list[str] | None = None) -> int:
                 isolated_worker_timeout_seconds=args.isolated_worker_timeout_seconds,
             )
 
+    if args.task33c_pilot and not args.dry_run:
+        completeness = evaluate_task33c_pilot_completeness(results)
+        metadata["task33c_completeness"] = completeness
+        metadata["decision"] = completeness["decision"]
+        metadata["executive_result"] = (
+            "Task 33C engineering pilot produced a complete measurement bundle."
+            if completeness["complete"]
+            else "Task 33C engineering pilot is INCONCLUSIVE because required evidence or measurements are incomplete."
+        )
+        (run_dir / "task33c_completeness.json").write_text(
+            json.dumps(completeness, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+        )
+        (run_dir / "metadata.json").write_text(json.dumps(metadata, indent=2, sort_keys=True), encoding="utf-8")
     write_report(run_dir, metadata, results)
     if args.screen_tasks:
         write_screening_summary(run_dir, tasks, results, args.repeats)

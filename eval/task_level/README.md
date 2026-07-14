@@ -12,7 +12,7 @@ The pilot conditions are:
 - `docatlas_snippet_first`: repo-only plus preindexed DocAtlas `get_docs_context` with `response_style=snippet-first`.
 - `docatlas_zero_setup`: exploratory DocAtlas without preindexing; never mixed with preindexed storage.
 - `docatlas_bounded_direct`: one deterministic, validated ActionPacket enters the parent session.
-- `docatlas_bounded_subagent`: one fresh host worker retrieves/compresses; only its validated ActionPacket enters the parent session.
+- `docatlas_bounded_subagent`: the host freezes the same one-call evidence snapshot used by the direct lane, then a fresh worker compresses it; only its validated ActionPacket enters the parent session.
 
 Run safety:
 
@@ -41,4 +41,6 @@ python3 -m eval.task_level.runner \
   --run-id task33c_dry_run
 ```
 
-For a causal isolated lane, also provide an absolute JSON-in/JSON-out worker command and a versioned identity. The host passes no parent transcript or repository path, uses a fresh read-only working directory, permits only explicitly named environment variables, allows one attempt, kills the process group on timeout, and rejects any response other than the bounded result contract. The built-in permission boundary fails closed when run as root because mode bits cannot constrain a privileged worker; use a non-root host or a separately verified OS sandbox. A root host must explicitly record that external proof with `--isolated-worker-root-sandbox-verified`; the flag is persisted in pilot metadata and must not be used as a substitute for the proof.
+For a causal isolated lane, provide `--runner-factory module.path:factory` for a runner that proves the hard turn limit and `--isolated-worker-factory module.path:factory` for a host-owned worker adapter. The adapter must expose verified capability evidence and provider-usage proof. The harness derives a frozen project-doc query from repeated domain terms in the task objective (without evaluator/gold fields), freezes one host retrieval for both bounded lanes, checks its objective/query derivation, project/index revisions, and evidence hash, and validates the returned packet only against that snapshot.
+
+The bundled JSON subprocess adapter is a non-causal protocol scaffold unless a host-side provider-usage verifier is injected. Its worker runs under bubblewrap with user, mount, network, and PID namespaces; an executable canary must prove that the working directory is read-only, the workspace is absent, networking is denied, and a detached descendant cannot outlive the worker. Missing or failed canaries, missing provider proof, `insufficient_evidence`, a second attempt, or incomplete pilot metrics produce a fail-closed/`INCONCLUSIVE` result. Merely supplying a flag or finding a `bwrap` executable is not verification.

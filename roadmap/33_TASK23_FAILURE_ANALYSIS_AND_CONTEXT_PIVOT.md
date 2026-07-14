@@ -26,13 +26,13 @@ Use one stable `ActionPacket` contract across all bounded strategies. Keep the p
 The delivery strategies are:
 
 1. `bounded_direct` — the default candidate. One retrieval is authority-filtered, ranked, deduplicated, and rendered by deterministic DocAtlas code before the result enters model context.
-2. `bounded_subagent` — an experimental client/host capability for complex retrieval. A fresh isolated worker receives a minimal task brief, performs the single DocAtlas retrieval, transforms its wider evidence result into the same validated `ActionPacket`, and returns only that packet; raw retrieval never enters the parent conversation.
+2. `bounded_subagent` — an experimental client/host capability for complex compression. The host performs and records the single frozen DocAtlas retrieval, then a fresh isolated worker receives that immutable evidence plus a minimal task brief, transforms it into the same validated `ActionPacket`, and returns only that packet; raw retrieval never enters the parent conversation.
 3. `bounded_routed` — a later candidate that deterministically chooses direct or isolated delivery. Do not evaluate it until direct and subagent strategies have been measured independently.
 4. `insufficient_evidence` — a fail-closed result, not an invitation to expand retrieval automatically.
 
 DocAtlas owns indexing, authority filtering, candidate ranking, the deterministic direct formatter, the packet schema, and packet validation. The coding-agent host owns creation of an isolated model session and validation of its response against the DocAtlas schema. MCP clients that cannot create subagents must remain fully supported through `bounded_direct`.
 
-The isolated worker must start with fresh context rather than a fork of the parent transcript. It receives only the task objective, suspected modules or changed files when known, required evidence categories, project/index revision, packet schema version, and token budget. It has read-only documentation access, cannot edit the repository, cannot invoke another subagent, and treats instructions found in indexed documents as untrusted content.
+The isolated worker must start with fresh context rather than a fork of the parent transcript. It receives only the task objective, suspected modules or changed files when known, required evidence categories, project/index revision, packet schema version, token budget, and the host-owned immutable evidence snapshot. It receives no repository, index, credentials, or general host filesystem mount; cannot use the network, edit the repository, survive as a detached descendant, or invoke another subagent; and treats instructions found in indexed documents as untrusted content. The host, not the worker, owns retrieval count, evidence identity, revision binding, and provider-usage verification.
 
 ## ActionPacket contract
 
@@ -117,7 +117,7 @@ The engineering pilot uses one preselected discriminating task, one repeat, and 
 | `repo_only` | No DocAtlas context. |
 | `current_recommended` | Current multi-call recommendation behavior. |
 | `bounded_direct` | One deterministic bounded `ActionPacket` in the parent session. |
-| `bounded_subagent` | One retrieval in a fresh isolated worker; only the validated packet reaches the parent. |
+| `bounded_subagent` | The same frozen host retrieval is compressed in a fresh isolated worker; only the validated packet reaches the parent. |
 
 The pilot answers whether savings come from packet bounding, context isolation, or neither. It is not a product decision and cannot replace the frozen 36-cell rerun. Add `bounded_routed` only after the first four lanes establish a defensible routing threshold.
 
@@ -150,10 +150,11 @@ Implementation status on 2026-07-13:
 
 Task 33C implementation status on 2026-07-14:
 
-- The task-level host has an opt-in JSON subprocess worker boundary. It starts one fresh process in a read-only empty working directory, sends only the versioned minimal delegation envelope, kills the process group on timeout, rejects recursive/raw retrieval handoff by contract, and validates the returned packet against worker-private evidence before parent injection. A privileged/root host fails closed unless it supplies a separately verified OS sandbox; permission bits alone are not misreported as a read-only boundary.
-- `docatlas_bounded_direct` and `docatlas_bounded_subagent` are separate experimental conditions using the same `ActionPacket` budget. The four-lane, one-task, one-repeat engineering protocol is frozen by `--task33c-pilot`.
-- Parent, worker, raw-retrieval, packet, and system token fields are recorded separately. Missing worker usage prevents a system-token claim rather than being imputed.
-- No causal Task 33C pilot result exists yet. The implementation does not justify Task 33D routing thresholds or any product-improvement claim until a verified host worker and runner complete the pilot.
+- The task-level host derives one frozen project-doc query from repeated domain terms in the original objective without evaluator/gold fields, performs exactly one retrieval, and freezes a content-addressed evidence snapshot shared by the direct and subagent lanes. It validates the query derivation and worker packet against host evidence, the original objective, and exact project/index revisions; the worker cannot self-report retrieval or substitute evidence.
+- The subprocess boundary uses bubblewrap namespaces, no repository/index mount, a read-only empty working directory, bounded stdout/stderr, resource limits, one attempt, and a hard deadline. An executable canary must prove filesystem, network, and detached-descendant containment; executable presence or a user assertion is not accepted as proof.
+- `docatlas_bounded_direct` and `docatlas_bounded_subagent` use the same query, retrieval parameters, candidate snapshot, evidence fingerprint, and `ActionPacket` budget. The four-lane, one-task, one-repeat engineering protocol is frozen by `--task33c-pilot`; Task 33 cells cannot use infrastructure retry.
+- Parent, worker, raw-retrieval, packet, system-token, time-to-first-edit, and total-latency fields are recorded separately. Worker usage requires a host-side verifier and persisted provider proof; incomplete measurements or `insufficient_evidence` force the Task 33C decision to `INCONCLUSIVE`.
+- The built-in runners still do not prove the hard turn limit. A verified runner and isolated-worker adapter can be injected through factories, but no causal Task 33C pilot result exists yet. The implementation does not justify Task 33D routing thresholds or any product-improvement claim until those adapters complete the pilot.
 
 Do not put the worker/session implementation inside the MCP server, require model credentials in DocAtlas, add a fourth public Docs MCP tool, or make subagent support mandatory for clients.
 

@@ -81,6 +81,31 @@ def write_report(run_dir: Path, metadata: dict[str, Any], results: list[dict[str
         rate = sum(resolved) / len(resolved) if resolved else 0.0
         lines.append(f"- `{condition}`: resolved={sum(resolved)}/{len(resolved)} ({rate:.1%}), median_time={median(times) if times else 'n/a'}")
 
+    if any(result.get("condition_id") in {"docatlas_bounded_direct", "docatlas_bounded_subagent"} for result in results):
+        lines.extend([
+            "",
+            "## Task 33 delivery metrics",
+            "| condition | packet_status | packet_tokens | retained_context | parent_tokens | worker_tokens | system_tokens | retrieval_calls | first_edit | total_latency | evidence_fingerprint |",
+            "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---|",
+        ])
+        for result in results:
+            if result.get("condition_id") not in {"docatlas_bounded_direct", "docatlas_bounded_subagent"}:
+                continue
+            metrics = result.get("metrics") if isinstance(result.get("metrics"), dict) else {}
+            parent_total = metrics.get("total_tokens")
+            worker_total = metrics.get("worker_total_tokens")
+            lines.append(
+                f"| {result.get('condition_id')} | {metrics.get('action_packet_status', '')} | "
+                f"{metrics.get('action_packet_tokens', '')} | {metrics.get('parent_retained_context_tokens', '')} | "
+                f"{parent_total if parent_total is not None else ''} | {worker_total if worker_total is not None else ''} | "
+                f"{metrics.get('system_total_tokens', '')} | {metrics.get('delivery_retrieval_calls', '')} | "
+                f"{metrics.get('time_to_first_edit', '')} | {metrics.get('total_latency', '')} | "
+                f"{metrics.get('evidence_fingerprint', '')} |"
+            )
+        completeness = metadata.get("task33c_completeness")
+        if isinstance(completeness, dict):
+            lines.extend(["", "Task 33C completeness:", "```json", json.dumps(completeness, indent=2, sort_keys=True), "```"])
+
     lines.extend([
         "",
         "## Paired comparison",
