@@ -233,6 +233,8 @@ def test_github_models_worker_selects_host_evidence_and_binds_usage(
     )
 
     def fake_complete(self, **kwargs):
+        selected = kwargs["schema"]["properties"]["selected_indices"]
+        assert selected == {"type": "array", "items": {"type": "integer"}}
         value = {"selected_indices": [0, 1, 2]}
         return value, _completion(value)
 

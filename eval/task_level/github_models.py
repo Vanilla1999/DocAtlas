@@ -521,10 +521,7 @@ def _evidence_selection_schema() -> dict[str, Any]:
         "properties": {
             "selected_indices": {
                 "type": "array",
-                "minItems": 3,
-                "maxItems": 6,
-                "uniqueItems": True,
-                "items": {"type": "integer", "minimum": 0},
+                "items": {"type": "integer"},
             },
         },
     }
@@ -815,6 +812,8 @@ def _provider_failure_class(exc: Exception) -> str:
         return "rate_limited"
     if "http 413" in text or "tokens_limit_reached" in text:
         return "context_too_large"
+    if "http 400" in text:
+        return "invalid_request_contract"
     if "content_filter" in text or "responsibleaipolicyviolation" in text:
         return "content_filtered"
     if "invalid structured completion" in text:
