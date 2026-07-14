@@ -72,6 +72,15 @@ def audit_trajectory(condition_id: str, trajectory_path: Path | None, output_pat
             violations.append("repo_only_web_audited used DocAtlas tools")
         if context7_calls:
             violations.append("repo_only_web_audited used Context7 tools")
+    elif condition_id in {"docatlas_bounded_direct", "docatlas_bounded_subagent"}:
+        if docatlas_calls:
+            violations.append("bounded delivery exposed a parent-visible DocAtlas tool call")
+        if context7_calls:
+            violations.append("docatlas condition used Context7 tools")
+        if web_calls or network_shell_calls:
+            violations.append("docatlas condition used web or network shell tools")
+        if foreign_mcp_calls:
+            violations.append("docatlas condition used foreign MCP tools")
     elif condition_id in {"docatlas_snippet_first", "docatlas_tool_optional", "docatlas_tool_recommended", "docatlas_context_injected", "docatlas_tool_required_once", "docatlas_action_checklist_injected", "docatlas_patch_constraints_injected", "docatlas_patch_constraints_workflow", "docatlas_action_checklist_only"}:
         if context7_calls:
             violations.append("docatlas condition used Context7 tools")

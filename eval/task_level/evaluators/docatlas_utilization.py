@@ -61,12 +61,14 @@ def evaluate_docatlas_utilization(
 ) -> DocAtlasUtilization:
     available = condition_id.startswith("docatlas_")
     response_path = run_output_dir / "docatlas_response.json"
+    packet_path = run_output_dir / "action_packet.json"
     injected_path = run_output_dir / "injected_context.md"
     sources_path = run_output_dir / "context_sources.json"
     injection_path = run_output_dir / "docatlas_context_injection.json"
-    context_retrieved = response_path.exists()
-    context_injected = injected_path.exists()
-    harness_calls = 1 if context_retrieved else 0
+    context_retrieved = response_path.exists() or packet_path.exists()
+    context_injected = injected_path.exists() or packet_path.exists()
+    delivery_metrics = _load_json(run_output_dir / "isolated_delivery_metrics.json") or _load_json(run_output_dir / "bounded_direct_metrics.json")
+    harness_calls = int(delivery_metrics.get("retrieval_calls") or (1 if context_retrieved else 0))
     injection = _load_json(injection_path)
     retrieval_status = injection.get("docatlas_retrieval_status") or injection.get("status")
     fallback_used = bool(injection.get("fallback_used"))
@@ -82,6 +84,8 @@ def evaluate_docatlas_utilization(
         context_text += injected_path.read_text(encoding="utf-8")
     if response_path.exists():
         context_text += "\n" + response_path.read_text(encoding="utf-8")[:12000]
+    if packet_path.exists():
+        context_text += "\n" + packet_path.read_text(encoding="utf-8")
     if agent_docatlas_calls and trajectory_path and trajectory_path.exists():
         context_text += "\n" + trajectory_path.read_text(encoding="utf-8")[:20000]
     if not context_text.strip():

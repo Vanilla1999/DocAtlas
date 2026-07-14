@@ -148,6 +148,13 @@ Implementation status on 2026-07-13:
 - Task 33B is implemented in `feat/task33b-bounded-action-packet`: the existing `get_docs_context` tool accepts `delivery_strategy="bounded_direct"`, keeps raw retrieval out of the parent context, publishes structured MCP output, keeps the public inventory at three tools, and has three focused tests covering production handoff, trust/scope boundaries, attribution/fidelity, deterministic ranking/deduplication, serialized payload limits, recovery, truncation, conflicts, and insufficient evidence.
 - Task 33C and Task 33D remain open. No isolated-worker or routing claim is made by Task 33B.
 
+Task 33C implementation status on 2026-07-14:
+
+- The task-level host has an opt-in JSON subprocess worker boundary. It starts one fresh process in a read-only empty working directory, sends only the versioned minimal delegation envelope, kills the process group on timeout, rejects recursive/raw retrieval handoff by contract, and validates the returned packet against worker-private evidence before parent injection. A privileged/root host fails closed unless it supplies a separately verified OS sandbox; permission bits alone are not misreported as a read-only boundary.
+- `docatlas_bounded_direct` and `docatlas_bounded_subagent` are separate experimental conditions using the same `ActionPacket` budget. The four-lane, one-task, one-repeat engineering protocol is frozen by `--task33c-pilot`.
+- Parent, worker, raw-retrieval, packet, and system token fields are recorded separately. Missing worker usage prevents a system-token claim rather than being imputed.
+- No causal Task 33C pilot result exists yet. The implementation does not justify Task 33D routing thresholds or any product-improvement claim until a verified host worker and runner complete the pilot.
+
 Do not put the worker/session implementation inside the MCP server, require model credentials in DocAtlas, add a fourth public Docs MCP tool, or make subagent support mandatory for clients.
 
 Task 33A must preserve both fixture identities during the transition to collision-safe hashing: the frozen Task 23 `sha256-concat-v1` value and the current `sha256-length-prefixed-v2` value. Causal execution verifies both values plus the oracle patch, hidden semantic suite, and audited external-context hashes before starting a runner. Each semantic requirement is bound to explicit hidden-test IDs. A runner that cannot prove a hard turn limit is rejected before any benchmark cell starts; a timeout or a count of top-level completion events is not relabelled as turn-limit enforcement.

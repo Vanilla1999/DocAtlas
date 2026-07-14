@@ -29,6 +29,13 @@ from eval.task_level.evaluators.policy import audit_trajectory
 from eval.task_level.evaluators.task_contract import ContractValidation, evaluate_patch_surface, evaluation_contract_registry_sha256, evaluation_contract_sha256, load_effective_task23_protocol_tasks, load_task_evaluation_contracts, run_compile_gate, validate_task_evaluation_artifacts, validate_task_evaluation_contract
 from eval.task_level.evaluators.tests import run_command
 from eval.task_level.fixtures.builder import copy_hidden_tests, materialize_fixture
+from eval.task_level.isolated_delivery import (
+    DelegationEnvelope,
+    IsolatedDeliveryError,
+    IsolatedWorker,
+    JsonSubprocessIsolatedWorker,
+    deliver_with_isolated_worker,
+)
 from eval.task_level.runners.base import AgentRunRequest, AgentRunner, RunnerCapabilities
 from eval.task_level.schemas import RESULTS_ROOT, TASK_LEVEL_ROOT, RunMetrics, TaskSpec
 
@@ -75,6 +82,8 @@ DOCATLAS_CONDITIONS = {
     "docatlas_patch_constraints_workflow",
     "docatlas_action_checklist_only",
     "docatlas_tool_required_once",
+    "docatlas_bounded_direct",
+    "docatlas_bounded_subagent",
 }
 CONTEXT_INJECTION_LIMIT_CHARS = 10000
 AUDITED_EXTERNAL_CONTEXT_ROOT = TASK_LEVEL_ROOT / "external_context"
@@ -153,6 +162,30 @@ def _load_optional_json(path: Path) -> dict[str, Any]:
 
 def _optional_int(value: Any) -> int | None:
     return value if isinstance(value, int) and not isinstance(value, bool) else None
+
+
+def _first_optional_int(*values: Any) -> int | None:
+    for value in values:
+        parsed = _optional_int(value)
+        if parsed is not None:
+            return parsed
+    return None
+
+
+def _directory_sha256(root: Path) -> str:
+    digest = hashlib.sha256()
+    if not root.is_dir():
+        return digest.hexdigest()
+    for path in sorted(item for item in root.rglob("*") if item.is_file()):
+        relative = path.relative_to(root).as_posix().encode("utf-8")
+        digest.update(len(relative).to_bytes(8, "big"))
+        digest.update(relative)
+        size = path.stat().st_size
+        digest.update(size.to_bytes(8, "big"))
+        with path.open("rb") as handle:
+            for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+                digest.update(chunk)
+    return digest.hexdigest()
 
 
 def _task_contract_validation(
@@ -238,11 +271,15 @@ def build_tool_policy(condition_id: str, output_dir: Path) -> tuple[Path, Path |
         "max_sources": policy.max_sources,
         "recommend_docatlas_before_edit": policy.recommend_docatlas_before_edit,
         "require_docatlas_call_before_edit": policy.require_docatlas_call_before_edit,
+        "delivery_strategy": policy.delivery_strategy,
+        "isolated_worker_required": policy.isolated_worker_required,
         "network_enforcement": "policy_and_trajectory_audit",
     }, indent=2, sort_keys=True), encoding="utf-8")
 
     mcp_path = output_dir / "mcp_config.json"
     if condition_id in {"repo_only", "repo_only_strict_offline", "repo_only_web_audited", "repo_plus_audited_external_context"}:
+        mcp_path.write_text(json.dumps({"mcpServers": {}}, indent=2), encoding="utf-8")
+    elif condition_id in {"docatlas_bounded_direct", "docatlas_bounded_subagent"}:
         mcp_path.write_text(json.dumps({"mcpServers": {}}, indent=2), encoding="utf-8")
     elif condition_id in DOCATLAS_CONDITIONS:
         mcp_path.write_text(json.dumps({
@@ -428,6 +465,9 @@ def evaluate_agent_patch(task: TaskSpec, workspace: Path, run_output_dir: Path, 
     constraints_injection = _load_optional_json(run_output_dir / "patch_constraints_injection.json")
     external_injection = _load_optional_json(run_output_dir / "audited_external_context.json")
     docatlas_preparation = _load_optional_json(run_output_dir / "docatlas_preparation.json")
+    isolated_delivery = _load_optional_json(run_output_dir / "isolated_delivery_metrics.json")
+    bounded_direct = _load_optional_json(run_output_dir / "bounded_direct_metrics.json")
+    action_packet = _load_optional_json(run_output_dir / "action_packet.json")
     materialized_identity = _load_optional_json(run_output_dir / "materialized.json")
     trajectory = Path(trajectory_path) if trajectory_path else run_output_dir / "missing-trajectory.json"
     evidence_metrics = trajectory_evidence_metrics(task, trajectory)
@@ -448,6 +488,17 @@ def evaluate_agent_patch(task: TaskSpec, workspace: Path, run_output_dir: Path, 
         else None
     )
     total_tokens = input_tokens + output_tokens if isinstance(input_tokens, int) and isinstance(output_tokens, int) else None
+    worker_input_tokens = _optional_int(isolated_delivery.get("worker_input_tokens"))
+    worker_output_tokens = _optional_int(isolated_delivery.get("worker_output_tokens"))
+    worker_total_tokens = (
+        worker_input_tokens + worker_output_tokens
+        if worker_input_tokens is not None and worker_output_tokens is not None else None
+    )
+    system_total_tokens = (
+        total_tokens + worker_total_tokens
+        if total_tokens is not None and worker_total_tokens is not None
+        else total_tokens if not isolated_delivery and total_tokens is not None else None
+    )
     budget = {
         "max_input_tokens": task.max_input_tokens,
         "max_output_tokens": task.max_output_tokens,
@@ -459,9 +510,10 @@ def evaluate_agent_patch(task: TaskSpec, workspace: Path, run_output_dir: Path, 
     }
     setup_wall_time = sum(
         float(payload.get("wall_time_seconds", 0.0))
-        for payload in (external_injection, docatlas_preparation, injection, checklist_injection, constraints_injection)
+        for payload in (external_injection, docatlas_preparation, injection, checklist_injection, constraints_injection, isolated_delivery)
         if isinstance(payload.get("wall_time_seconds"), (int, float))
     )
+    setup_wall_time += float(isolated_delivery.get("broker_wall_time_seconds") or 0.0)
     metrics = RunMetrics(
         wall_time_seconds=getattr(runner_output, "wall_time_seconds", None),
         input_tokens=input_tokens,
@@ -560,6 +612,15 @@ def evaluate_agent_patch(task: TaskSpec, workspace: Path, run_output_dir: Path, 
             "retrieved_context_tokens": metrics.retrieved_context_tokens,
             "constraint_packet_tokens": metrics.constraint_packet_tokens,
             "raw_doc_context_tokens": metrics.raw_doc_context_tokens,
+            "action_packet_tokens": _optional_int(action_packet.get("estimated_tokens")),
+            "worker_input_tokens": worker_input_tokens,
+            "worker_output_tokens": worker_output_tokens,
+            "worker_reasoning_tokens": _optional_int(isolated_delivery.get("worker_reasoning_tokens")),
+            "worker_total_tokens": worker_total_tokens,
+            "system_total_tokens": system_total_tokens,
+            "delivery_retrieval_calls": _optional_int(
+                (isolated_delivery or bounded_direct).get("retrieval_calls")
+            ),
             "fallback_used": utilization.fallback_used,
             "fallback_source": getattr(utilization, "fallback_source", None),
             "docatlas_retrieval_status": utilization.docatlas_retrieval_status,
@@ -584,15 +645,26 @@ def evaluate_agent_patch(task: TaskSpec, workspace: Path, run_output_dir: Path, 
                 "total_tokens": total_tokens,
             },
             "worker": {
-                "status": "not_applicable",
-                "input_tokens": None,
-                "output_tokens": None,
-                "reasoning_tokens": None,
-                "total_tokens": None,
+                "status": (
+                    "measured" if isolated_delivery and worker_total_tokens is not None
+                    else "partial" if isolated_delivery else "not_applicable"
+                ),
+                "input_tokens": worker_input_tokens,
+                "output_tokens": worker_output_tokens,
+                "reasoning_tokens": _optional_int(isolated_delivery.get("worker_reasoning_tokens")),
+                "total_tokens": worker_total_tokens,
             },
-            "raw_tool_output_tokens_estimate": tool_output_metrics.get("tool_output_tokens_estimate"),
-            "action_packet_tokens": None,
-            "system_total_tokens": total_tokens,
+            "raw_tool_output_tokens_estimate": _first_optional_int(
+                isolated_delivery.get("raw_retrieval_tokens"),
+                bounded_direct.get("raw_retrieval_tokens"),
+                tool_output_metrics.get("tool_output_tokens_estimate"),
+            ),
+            "action_packet_tokens": _optional_int(action_packet.get("estimated_tokens")),
+            "system_total_tokens": system_total_tokens,
+            "system_total_definition": "parent provider total plus worker provider input/output; raw retrieval is reported separately to avoid double counting worker input",
+            "system_total_complete": total_tokens is not None and (
+                not isolated_delivery or worker_total_tokens is not None
+            ),
             "provider_fields_available": sorted(
                 key for key in ("cached_input_tokens", "reasoning_tokens", "completed_turn_events")
                 if provider_usage.get(key) is not None
@@ -638,6 +710,8 @@ def execute_pilot(
     prompt_template: str,
     *,
     retry_infrastructure_failures: bool = False,
+    isolated_worker: IsolatedWorker | None = None,
+    isolated_worker_timeout_seconds: int = 60,
 ) -> list[dict[str, Any]]:
     _assert_task33_run_preconditions(tasks, runner)
     run_dir = RESULTS_ROOT / run_id
@@ -683,6 +757,71 @@ def execute_pilot(
                         diagnostics = prepare_docatlas(task, workspace, run_output_dir, env)
                         setup_failed = diagnostics.get("status") == "condition_setup_failed"
                     prompt = prompt_template.format(issue_text=task.issue_text) + "\nUse the tools available in this environment when they are useful.\n"
+                    delivery_strategy = CONDITIONS[condition_id].tool_policy.delivery_strategy
+                    if delivery_strategy == "bounded_direct":
+                        injected = inject_docatlas_context(task, workspace, run_output_dir, env)
+                        if injected.get("status") == "condition_setup_failed":
+                            setup_failed = True
+                        else:
+                            try:
+                                packet = build_bounded_direct_packet(task, workspace, run_output_dir)
+                            except IsolatedDeliveryError as exc:
+                                setup_failed = True
+                                _write_json_atomic(run_output_dir / "bounded_direct_error.json", {
+                                    "status": "condition_setup_failed", "reason": str(exc),
+                                })
+                            else:
+                                prompt += "\nDocAtlas ActionPacket (bounded direct):\n" + json.dumps(packet, sort_keys=True) + "\n"
+                    elif delivery_strategy == "bounded_subagent":
+                        if isolated_worker is None:
+                            setup_failed = True
+                            _write_json_atomic(run_output_dir / "isolated_delivery_error.json", {
+                                "status": "condition_setup_failed",
+                                "reason": "isolated_worker_capability_unavailable",
+                            })
+                        else:
+                            categories = tuple(name for name, present in (
+                                ("project_docs", bool(task.expected_project_docs)),
+                                ("symbols", bool(task.expected_symbols)),
+                                ("dependencies", bool(task.dependencies)),
+                            ) if present)
+                            suspected_modules = tuple(dict.fromkeys(
+                                parent for value in task.expected_project_docs[:8]
+                                for parent in [Path(value).parent.as_posix()]
+                                if parent not in {"", "."}
+                            ))
+                            envelope = DelegationEnvelope(
+                                task_objective=task.issue_text,
+                                suspected_modules=suspected_modules,
+                                changed_files=(),
+                                required_evidence_categories=categories,
+                                project_revision=str(materialized["fixture_hash"]),
+                                index_revision=_directory_sha256(Path(env["DOCMANCER_HOME"])),
+                            )
+                            try:
+                                worker_for_run = isolated_worker
+                                if isinstance(isolated_worker, JsonSubprocessIsolatedWorker):
+                                    worker_for_run = JsonSubprocessIsolatedWorker(
+                                        command=isolated_worker.command,
+                                        compressor_identity=isolated_worker.compressor_identity,
+                                        environment={**isolated_worker.environment, "DOCMANCER_HOME": env["DOCMANCER_HOME"]},
+                                        capabilities=isolated_worker.capabilities,
+                                        max_output_bytes=isolated_worker.max_output_bytes,
+                                        root_sandbox_verified=isolated_worker.root_sandbox_verified,
+                                    )
+                                handoff = deliver_with_isolated_worker(
+                                    worker=worker_for_run,
+                                    envelope=envelope,
+                                    output_dir=run_output_dir,
+                                    timeout_seconds=isolated_worker_timeout_seconds,
+                                )
+                            except IsolatedDeliveryError as exc:
+                                setup_failed = True
+                                _write_json_atomic(run_output_dir / "isolated_delivery_error.json", {
+                                    "status": "condition_setup_failed", "reason": str(exc),
+                                })
+                            else:
+                                prompt += "\nDocAtlas ActionPacket (isolated worker):\n" + json.dumps(handoff["packet"], sort_keys=True) + "\n"
                     if CONDITIONS[condition_id].tool_policy.inject_external_context:
                         external = inject_audited_external_context(task, run_output_dir)
                         if external.get("status") == "condition_setup_failed":
@@ -986,6 +1125,41 @@ def inject_docatlas_context(task: TaskSpec, workspace: Path, output_dir: Path, e
     }
     (output_dir / "docatlas_context_injection.json").write_text(json.dumps(payload, indent=2, sort_keys=True), encoding="utf-8")
     return payload
+
+
+def build_bounded_direct_packet(task: TaskSpec, workspace: Path, output_dir: Path) -> dict[str, Any]:
+    """Convert the single harness retrieval into the same parent-visible packet."""
+
+    from docmancer.docs.application.action_packet import build_action_packet, validate_action_packet
+
+    response = _load_optional_json(output_dir / "docatlas_response.json")
+    context_pack = response.get("context_pack") if isinstance(response.get("context_pack"), list) else []
+    trust_contract = response.get("trust_contract") if isinstance(response.get("trust_contract"), dict) else {}
+    packet = build_action_packet(
+        question=task.issue_text,
+        context_pack=context_pack,
+        trust_contract=trust_contract,
+        max_tokens=1_500,
+        project_path=str(workspace),
+        retrieval_issues=response.get("warnings") if isinstance(response.get("warnings"), list) else None,
+    )
+    errors = validate_action_packet(
+        packet, evidence_items=context_pack, max_tokens=1_500, project_path=str(workspace),
+    )
+    if errors:
+        raise IsolatedDeliveryError("invalid_bounded_direct_packet:" + ";".join(errors))
+    _write_json_atomic(output_dir / "action_packet.json", packet)
+    injection = _load_optional_json(output_dir / "docatlas_context_injection.json")
+    _write_json_atomic(output_dir / "bounded_direct_metrics.json", {
+        "schema_version": 1,
+        "strategy": "bounded_direct",
+        "attempts": 1,
+        "retrieval_calls": 1,
+        "parent_visible_raw_retrieval": False,
+        "parent_packet_tokens": packet["estimated_tokens"],
+        "raw_retrieval_tokens": injection.get("raw_doc_context_tokens"),
+    })
+    return packet
 
 
 def _fallback_project_context(task: TaskSpec, workspace: Path, reason: str) -> dict[str, Any]:

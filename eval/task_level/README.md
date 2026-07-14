@@ -11,6 +11,8 @@ The pilot conditions are:
 - `docatlas_evidence_first`: repo-only plus preindexed DocAtlas `get_docs_context` with `response_style=evidence-first`.
 - `docatlas_snippet_first`: repo-only plus preindexed DocAtlas `get_docs_context` with `response_style=snippet-first`.
 - `docatlas_zero_setup`: exploratory DocAtlas without preindexing; never mixed with preindexed storage.
+- `docatlas_bounded_direct`: one deterministic, validated ActionPacket enters the parent session.
+- `docatlas_bounded_subagent`: one fresh host worker retrieves/compresses; only its validated ActionPacket enters the parent session.
 
 Run safety:
 
@@ -29,3 +31,14 @@ Example smoke command:
 ```bash
 python3 -m eval.task_level.runner --validate --smoke --repeats 1
 ```
+
+Task 33C dry-run protocol (exactly one task, four lanes, one repeat):
+
+```bash
+python3 -m eval.task_level.runner \
+  --task33c-pilot --dry-run \
+  --tasks decisive_nbo_cross_module_gate_large_001 \
+  --run-id task33c_dry_run
+```
+
+For a causal isolated lane, also provide an absolute JSON-in/JSON-out worker command and a versioned identity. The host passes no parent transcript or repository path, uses a fresh read-only working directory, permits only explicitly named environment variables, allows one attempt, kills the process group on timeout, and rejects any response other than the bounded result contract. The built-in permission boundary fails closed when run as root because mode bits cannot constrain a privileged worker; use a non-root host or a separately verified OS sandbox. A root host must explicitly record that external proof with `--isolated-worker-root-sandbox-verified`; the flag is persisted in pilot metadata and must not be used as a substitute for the proof.
