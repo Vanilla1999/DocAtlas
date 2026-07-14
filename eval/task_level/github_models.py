@@ -31,7 +31,7 @@ GITHUB_MODELS_ENDPOINT = "https://models.github.ai/inference/chat/completions"
 DEFAULT_GITHUB_MODEL = "openai/gpt-4.1-mini"
 _RUNNER_VERSION = "github-models-controlled-agent-v1"
 _WORKER_PROMPT_REVISION = "task33c-evidence-selector-v1"
-_MIN_REQUEST_INTERVAL_SECONDS = 4.2
+_MIN_REQUEST_INTERVAL_SECONDS = 6.2
 _REQUEST_RATE_LOCK = threading.Lock()
 _LAST_REQUEST_AT = 0.0
 
@@ -237,7 +237,9 @@ class GitHubModelsIsolatedWorker:
                 max_tokens=256,
             )
         except Exception as exc:
-            raise IsolatedDeliveryError("github_models_worker_request_failed") from exc
+            raise IsolatedDeliveryError(
+                "github_models_worker_request_failed:" + _provider_failure_class(exc)
+            ) from exc
         indices = selection.get("selected_indices")
         if (
             not isinstance(indices, list)
@@ -328,11 +330,17 @@ class GitHubModelsRunner:
         deadline = started + request.timeout_seconds
         model = _normalize_model(request.model)
         inventory = _list_repository_files(request.workspace)
+        source_snapshot, bootstrap_read_paths = _repository_source_snapshot(request.workspace)
         base_messages: list[dict[str, str]] = [
             {"role": "system", "content": _runner_system_prompt(request)},
             {
                 "role": "user",
-                "content": request.prompt + "\n\nExact repository file inventory:\n" + inventory,
+                "content": (
+                    request.prompt
+                    + "\n\nExact repository file inventory:\n" + inventory
+                    + "\n\nInitial source snapshot (these paths count as already inspected):\n"
+                    + source_snapshot
+                ),
             },
         ]
         recent_messages: list[dict[str, str]] = []
@@ -343,7 +351,7 @@ class GitHubModelsRunner:
         status = "max_turns_exhausted"
         exit_code = 2
         client = GitHubModelsClient(self._token, endpoint=self._endpoint)
-        read_paths: set[str] = set()
+        read_paths: set[str] = set(bootstrap_read_paths)
 
         for turn in range(1, request.max_turns + 1):
             remaining = deadline - time.monotonic()
@@ -387,6 +395,9 @@ class GitHubModelsRunner:
                 result,
             )
             events.append(event)
+            if tool == "run_tests" and result.startswith("exit_code=0\n"):
+                status, exit_code = "completed", 0
+                break
             recent_messages.append({
                 "role": "assistant",
                 "content": json.dumps(_compact_action_history(action), ensure_ascii=False, sort_keys=True),
@@ -510,7 +521,8 @@ def _runner_system_prompt(request: AgentRunRequest) -> str:
         "then finish. Never edit tests, documentation, lockfiles, generated files, or files outside the repository. "
         "You have no internet or arbitrary shell. "
         "The user message contains the exact repository inventory; never invent a path outside it. "
-        "You must read a source file before editing it. For exact replacement, old must match the current file "
+        "Files present in the initial source snapshot count as read; otherwise you must read a source file before "
+        "editing it. For exact replacement, old must match the current file "
         "byte-for-byte. If replacement fails, read the file again and do not repeat the same failed action. "
         f"The hard turn limit is {request.max_turns}."
     )
@@ -633,6 +645,8 @@ def _safe_path(root: Path, value: Any, *, write: bool) -> Path:
     if write and (
         relative.parts[:1] in (("tests",), ("docs",))
         or candidate.name in {"README.md", "pubspec.lock", "pyproject.toml"}
+        or candidate.name.startswith("test_")
+        or candidate.name.endswith("_test.py")
         or candidate.name.endswith((".freezed.dart", ".g.dart"))
     ):
         raise ValueError("editing this path is forbidden by runner policy")
@@ -693,6 +707,32 @@ def _list_repository_files(workspace: Path) -> str:
     return "\n".join(sorted(files)[:500])[:12_000]
 
 
+def _repository_source_snapshot(workspace: Path) -> tuple[str, tuple[str, ...]]:
+    allowed_suffixes = {".dart", ".py", ".js", ".jsx", ".ts", ".tsx"}
+    rows: list[str] = []
+    paths: list[str] = []
+    used = 0
+    for path in sorted(item for item in workspace.rglob("*") if item.is_file()):
+        relative = path.relative_to(workspace)
+        if (
+            path.suffix not in allowed_suffixes
+            or ".git" in relative.parts
+            or "tests" in relative.parts
+            or "__pycache__" in relative.parts
+            or path.name.startswith("test_")
+            or path.name.endswith(("_test.py", ".freezed.dart", ".g.dart"))
+        ):
+            continue
+        text = path.read_text(encoding="utf-8", errors="replace")
+        block = f"\n--- {relative.as_posix()} ---\n{text[:4_000]}"
+        if used + len(block) > 16_000:
+            continue
+        rows.append(block)
+        paths.append(relative.as_posix())
+        used += len(block)
+    return ("".join(rows) or "(no eligible source files)", tuple(paths))
+
+
 def _compact_action_history(action: dict[str, Any]) -> dict[str, Any]:
     return {
         key: value
@@ -722,6 +762,19 @@ def _pace_github_models_request() -> None:
         if delay > 0:
             time.sleep(delay)
         _LAST_REQUEST_AT = time.monotonic()
+
+
+def _provider_failure_class(exc: Exception) -> str:
+    text = str(exc).lower()
+    if "http 429" in text:
+        return "rate_limited"
+    if "http 413" in text or "tokens_limit_reached" in text:
+        return "context_too_large"
+    if "content_filter" in text or "responsibleaipolicyviolation" in text:
+        return "content_filtered"
+    if "invalid structured completion" in text:
+        return "invalid_structured_completion"
+    return exc.__class__.__name__.lower()
 
 
 def _strict_nonnegative_int(value: Any, name: str) -> int:

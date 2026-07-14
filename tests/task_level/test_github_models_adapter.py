@@ -96,9 +96,9 @@ def test_github_models_runner_enforces_turns_and_edits_with_closed_tool_loop(
     assert output.status == "completed"
     assert output.exit_code == 0
     assert output.max_turns_enforced is True
-    assert output.input_tokens == 400
-    assert output.output_tokens == 80
-    assert calls == 4
+    assert output.input_tokens == 300
+    assert output.output_tokens == 60
+    assert calls == 3
     assert "return a + b" in (workspace / "calc.py").read_text(encoding="utf-8")
     trajectory = json.loads((output_dir / "trajectory.normalized.json").read_text(encoding="utf-8"))
     assert any(event["tool_name"] == "Edit.replace_text" for event in trajectory)
