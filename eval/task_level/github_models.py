@@ -142,7 +142,9 @@ class GitHubModelsClient:
                         if isinstance(choice.get("finish_reason"), str):
                             finish_reasons.append(choice["finish_reason"])
         except urllib.error.HTTPError as exc:
-            detail = exc.read(2_000).decode("utf-8", errors="replace")
+            # HTTPError is file-like; reading its body here would happen after
+            # the transport deadline context has unwound and could block.
+            detail = str(exc.reason or "provider error")[:1_000]
             raise RuntimeError(f"GitHub Models HTTP {exc.code}: {detail}") from exc
         except urllib.error.URLError as exc:
             raise RuntimeError(f"GitHub Models transport failure: {exc.reason}") from exc
