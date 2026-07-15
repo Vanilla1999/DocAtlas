@@ -153,6 +153,7 @@ jobs:
             tests/docs/test_action_packet.py \
             tests/task_level/test_github_models_adapter.py \
             tests/task_level/test_task33_isolated_delivery.py \
+            tests/task_level/test_task33_local.py \
             tests/task_level/test_task33_validation.py
 
       - name: Upload capability evidence
@@ -248,6 +249,7 @@ jobs:
         run: |
           python -m eval.task_level.runner \
             --task33c-pilot \
+            --task33c-provider-profile github-models \
             --tasks decisive_nbo_cross_module_gate_large_001 \
             --runner-factory eval.task_level.github_models:create_github_models_runner \
             --isolated-worker-factory eval.task_level.github_models:create_github_models_worker \

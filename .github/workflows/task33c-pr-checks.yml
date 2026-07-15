@@ -45,6 +45,7 @@ jobs:
             tests/docs/test_action_packet.py \
             tests/task_level/test_github_models_adapter.py \
             tests/task_level/test_task33_isolated_delivery.py \
+            tests/task_level/test_task33_local.py \
             tests/task_level/test_task33_validation.py
 
       - name: Static validation

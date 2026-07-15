@@ -746,12 +746,8 @@ def evaluate_agent_patch(task: TaskSpec, workspace: Path, run_output_dir: Path, 
         "task_id": task.task_id,
         "condition_id": condition_id,
         "repeat": int(run_output_dir.name.removeprefix("repeat_")),
-        "runner_id": (
-            "github-models"
-            if "github-models" in str(getattr(runner_output, "runner_version", "")).lower()
-            else "codex"
-            if "codex" in str(getattr(runner_output, "runner_version", "")).lower()
-            else "claude"
+        "runner_id": _runner_id_from_version(
+            str(getattr(runner_output, "runner_version", ""))
         ),
         "runner_version": getattr(runner_output, "runner_version", "unknown"),
         "model": getattr(runner_output, "model", "unknown"),
@@ -1433,6 +1429,14 @@ def _assert_task33_run_preconditions(tasks: list[TaskSpec], runner: AgentRunner)
         raise ValueError("Task 33 evaluation preconditions failed: " + ",".join(errors))
     if not bool(getattr(runner, "hard_turn_limit_enforced", False)):
         raise ValueError("Task 33 causal execution requires a runner with a proven hard turn limit")
+
+
+def _runner_id_from_version(version: str) -> str:
+    normalized = version.lower()
+    for runner_id in ("github-models", "openai-api", "codex"):
+        if runner_id in normalized:
+            return runner_id
+    return "claude"
 
 
 def write_run_progress(run_dir: Path, results: list[dict[str, Any]], total_runs: int, *, current: dict[str, Any] | None, finished: bool = False) -> None:

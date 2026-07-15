@@ -27,6 +27,9 @@ def test_frozen_protocol_matches_live_evaluation_contract():
     assert protocol["task_id"] == "decisive_nbo_cross_module_gate_large_001"
     assert len(protocol["conditions"]) == 4
     assert protocol["provider_input_token_limit"] == 7_000
+    assert set(protocol["provider_profiles"]) == {"github-models", "openai-api"}
+    assert protocol["provider_profiles"]["openai-api"]["credential_environment"] == "OPENAI_API_KEY"
+    assert protocol["provider_profiles"]["openai-api"]["model"] == "gpt-4o-mini-2024-07-18"
     assert protocol["provider_request_budget"] == (
         len(protocol["conditions"]) * protocol["agent_turn_limit"] + 8 + 8 + 1
     )
@@ -82,7 +85,18 @@ def test_artifact_manifest_is_allowlist_only_and_rejects_symlinks(tmp_path: Path
 
 def test_independent_validator_rejects_synthetic_self_reported_completeness(tmp_path: Path):
     protocol = load_protocol()
+    profile = protocol["provider_profiles"]["github-models"]
     (tmp_path / PROTOCOL_PATH.name).write_bytes(PROTOCOL_PATH.read_bytes())
+    import hashlib
+    profile_hash = hashlib.sha256(
+        json.dumps(profile, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode()
+    ).hexdigest()
+    _write(tmp_path / "task33c_provider_selection.json", {
+        "schema_version": 1,
+        "profile_id": "github-models",
+        "profile": profile,
+        "profile_sha256": profile_hash,
+    })
     _write(tmp_path / "task33c_pilot_plan.json", {
         "task_id": protocol["task_id"],
         "conditions": protocol["conditions"],
@@ -125,7 +139,12 @@ def test_independent_validator_rejects_synthetic_self_reported_completeness(tmp_
 
 def test_runner_usage_is_recomputed_and_rejects_bool_or_forged_totals(tmp_path: Path):
     protocol = load_protocol()
+    profile = protocol["provider_profiles"]["github-models"]
     usage = {
+        "provider": "github-models",
+        "endpoint": profile["endpoint"],
+        "model": profile["model"],
+        "prompt_revision": protocol["runner_prompt_revision"],
         "turns": [{
             "request_id": "request-1",
             "request_ids": {"x-github-request-id": "request-1"},
@@ -156,22 +175,73 @@ def test_runner_usage_is_recomputed_and_rejects_bool_or_forged_totals(tmp_path: 
         }},
     }
     errors: list[str] = []
-    assert _check_runner_usage("lane", tmp_path, row, protocol, set(), errors) == {"request-1"}
+    assert _check_runner_usage("lane", tmp_path, row, protocol, profile, set(), errors) == {"request-1"}
     assert errors == []
 
     usage["turns"][0]["usage"]["prompt_tokens"] = True
     _write(tmp_path / "github_models_usage.json", usage)
     errors = []
-    _check_runner_usage("lane", tmp_path, row, protocol, set(), errors)
+    _check_runner_usage("lane", tmp_path, row, protocol, profile, set(), errors)
     assert "lane:invalid_provider_usage" in errors
     assert "lane:provider_total_mismatch:input_tokens" in errors
 
 
+def test_openai_usage_requires_the_frozen_server_request_header(tmp_path: Path):
+    protocol = load_protocol()
+    profile = protocol["provider_profiles"]["openai-api"]
+    usage = {
+        "provider": "openai-api",
+        "endpoint": profile["endpoint"],
+        "model": profile["model"],
+        "prompt_revision": protocol["runner_prompt_revision"],
+        "turns": [{
+            "request_id": "openai-request",
+            "request_ids": {"x-client-request-id": "forged-client-id"},
+            "request_payload_sha256": "a" * 64,
+            "estimated_input_tokens": 100,
+            "usage": {
+                "prompt_tokens": 10,
+                "completion_tokens": 4,
+                "total_tokens": 14,
+                "prompt_tokens_details": {"cached_tokens": 2},
+                "completion_tokens_details": {"reasoning_tokens": 1},
+            },
+        }],
+    }
+    _write(tmp_path / "openai_api_usage.json", usage)
+    row = {
+        "metrics": {
+            "input_tokens": 10,
+            "output_tokens": 4,
+            "cached_input_tokens": 2,
+            "reasoning_tokens": 1,
+        },
+        "token_attribution": {"parent": {
+            "input_tokens": 10,
+            "output_tokens": 4,
+            "cached_input_tokens": 2,
+            "reasoning_tokens": 1,
+        }},
+    }
+    errors: list[str] = []
+
+    _check_runner_usage("lane", tmp_path, row, protocol, profile, set(), errors)
+
+    assert "lane:provider_request_header_mismatch" in errors
+    usage["turns"][0]["request_ids"]["x-request-id"] = "openai-request"
+    _write(tmp_path / "openai_api_usage.json", usage)
+    errors = []
+    _check_runner_usage("lane", tmp_path, row, protocol, profile, set(), errors)
+    assert errors == []
+
+
 def test_worker_usage_is_bound_to_proof_and_unique_request(tmp_path: Path):
     protocol = load_protocol()
+    profile = protocol["provider_profiles"]["github-models"]
     proof = {
         "schema_version": 1,
         "provider": "github-models",
+        "endpoint": profile["endpoint"],
         "requested_model": protocol["model"],
         "model": protocol["model"],
         "prompt_revision": protocol["worker_prompt_revision"],
@@ -215,15 +285,16 @@ def test_worker_usage_is_bound_to_proof_and_unique_request(tmp_path: Path):
     }}
     errors: list[str] = []
 
-    assert _check_worker_usage(tmp_path, row, protocol, set(), errors) == {"worker-request"}
+    assert _check_worker_usage(tmp_path, row, protocol, profile, set(), errors) == {"worker-request"}
     assert errors == []
     errors = []
-    _check_worker_usage(tmp_path, row, protocol, {"worker-request"}, errors)
+    _check_worker_usage(tmp_path, row, protocol, profile, {"worker-request"}, errors)
     assert "docatlas_bounded_subagent:duplicate_or_missing_worker_request_id" in errors
 
 
 def test_cell_validation_requires_independent_test_and_boundary_artifacts(tmp_path: Path):
     protocol = load_protocol()
+    profile = protocol["provider_profiles"]["github-models"]
     evaluation = protocol["evaluation"]
     row = {
         "model": protocol["model"],
@@ -246,7 +317,7 @@ def test_cell_validation_requires_independent_test_and_boundary_artifacts(tmp_pa
         },
     }
     errors: list[str] = []
-    _check_cell_result("lane", tmp_path, row, protocol, errors)
+    _check_cell_result("lane", tmp_path, row, protocol, profile, errors)
     assert "lane:public_tests_artifact_mismatch" in errors
     assert "lane:hidden_tests_artifact_mismatch" in errors
 

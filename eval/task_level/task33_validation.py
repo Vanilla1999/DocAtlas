@@ -35,6 +35,7 @@ _TOP_LEVEL_ALLOWLIST = frozenset({
     "status.json",
     "task33c_completeness.json",
     "task33c_pilot_plan.json",
+    "task33c_provider_selection.json",
     "task33c_protocol.lock.json",
     "task33c_sandbox_provenance.json",
 })
@@ -52,6 +53,7 @@ _CELL_ALLOWLIST = frozenset({
     "git_status.raw.txt",
     "git_status.txt",
     "github_models_usage.json",
+    "openai_api_usage.json",
     "hidden_test_result.json",
     "host_evidence_manifest.json",
     "host_evidence_snapshot.json",
@@ -114,6 +116,19 @@ def validate_task33c_run(
     plan = _load_optional_json(run_dir / "task33c_pilot_plan.json")
     _check_plan(plan, protocol, errors)
     checks["pilot_plan"] = not any(error.startswith("plan_") for error in errors)
+    selection = _load_optional_json(run_dir / "task33c_provider_selection.json")
+    profile_id = selection.get("profile_id")
+    profiles = protocol.get("provider_profiles") or {}
+    provider_profile = profiles.get(profile_id) if isinstance(profile_id, str) else None
+    if not isinstance(provider_profile, dict):
+        errors.append("provider_profile_unknown_or_missing")
+        provider_profile = {}
+    else:
+        if selection.get("profile") != provider_profile:
+            errors.append("provider_profile_snapshot_mismatch")
+        if selection.get("profile_sha256") != _json_sha256(provider_profile):
+            errors.append("provider_profile_hash_mismatch")
+    checks["provider_profile"] = not any(error.startswith("provider_profile_") for error in errors)
     runner_canary = _load_optional_json(run_dir / "runner_canary.json")
     if (
         runner_canary.get("status") != "passed"
@@ -169,11 +184,19 @@ def validate_task33c_run(
             continue
         if _json_sha256(persisted) != _json_sha256(row):
             errors.append(f"{condition}:result_jsonl_mismatch")
-        _check_cell_result(condition, cell_dir, row, protocol, errors)
+        _check_cell_result(condition, cell_dir, row, protocol, provider_profile, errors)
         _check_setup_artifacts(condition, cell_dir, row, errors)
         image_id_hashes.update(_check_boundaries(condition, cell_dir, row, errors))
         provider_request_ids.update(
-            _check_runner_usage(condition, cell_dir, row, protocol, provider_request_ids, errors)
+            _check_runner_usage(
+                condition,
+                cell_dir,
+                row,
+                protocol,
+                provider_profile,
+                provider_request_ids,
+                errors,
+            )
         )
         if condition.startswith("docatlas_bounded_"):
             identity = _check_bounded_evidence(condition, cell_dir, row, protocol, errors)
@@ -181,7 +204,14 @@ def validate_task33c_run(
                 bounded_identities.append(identity)
         if condition == "docatlas_bounded_subagent":
             provider_request_ids.update(
-                _check_worker_usage(cell_dir, row, protocol, provider_request_ids, errors)
+                _check_worker_usage(
+                    cell_dir,
+                    row,
+                    protocol,
+                    provider_profile,
+                    provider_request_ids,
+                    errors,
+                )
             )
 
     if len(set(bounded_identities)) != 1 or len(bounded_identities) != 2:
@@ -198,6 +228,10 @@ def validate_task33c_run(
         errors.append("sandbox_provenance_requirements_mismatch")
     if provenance.get("protocol_sha256") != _file_sha256(protocol_path):
         errors.append("sandbox_provenance_protocol_mismatch")
+    if provenance.get("provider_profile_id") != profile_id:
+        errors.append("sandbox_provenance_provider_profile_mismatch")
+    if provenance.get("provider_profile_sha256") != selection.get("profile_sha256"):
+        errors.append("sandbox_provenance_provider_hash_mismatch")
     if provenance.get("boundary_status") != "verified":
         errors.append("sandbox_provenance_boundary_not_verified")
     if image_id_hashes and provenance.get("image_id_sha256") not in image_id_hashes:
@@ -287,6 +321,36 @@ def _artifact_allowed(relative: Path) -> bool:
 
 
 def _check_live_protocol(protocol: dict[str, Any], errors: list[str]) -> None:
+    profiles = protocol.get("provider_profiles")
+    expected_profiles = {
+        "github-models": {
+            "runner_id": "github-models",
+            "usage_artifact": "github_models_usage.json",
+            "request_id_headers": ["x-github-request-id", "apim-request-id", "x-ms-request-id"],
+            "credential_environment": "GITHUB_TOKEN",
+            "endpoint": "https://models.github.ai/inference/chat/completions",
+        },
+        "openai-api": {
+            "runner_id": "openai-api",
+            "usage_artifact": "openai_api_usage.json",
+            "request_id_headers": ["x-request-id"],
+            "credential_environment": "OPENAI_API_KEY",
+            "endpoint": "https://api.openai.com/v1/chat/completions",
+        },
+    }
+    if not isinstance(profiles, dict) or set(profiles) != set(expected_profiles):
+        errors.append("protocol_live_mismatch:provider_profiles")
+    else:
+        for profile_id, expected_fields in expected_profiles.items():
+            profile = profiles.get(profile_id) or {}
+            if profile.get("provider_id") != profile_id or any(
+                profile.get(field) != value for field, value in expected_fields.items()
+            ):
+                errors.append("protocol_live_mismatch:provider_profile:" + profile_id)
+            if not isinstance(profile.get("model"), str) or not profile["model"].strip():
+                errors.append("protocol_live_mismatch:provider_model:" + profile_id)
+    if protocol.get("default_provider_profile") != "github-models":
+        errors.append("protocol_live_mismatch:default_provider_profile")
     contracts = load_task_evaluation_contracts()
     contract = contracts.get(protocol["task_id"])
     if contract is None:
@@ -359,11 +423,12 @@ def _check_cell_result(
     cell_dir: Path,
     row: dict[str, Any],
     protocol: dict[str, Any],
+    provider_profile: dict[str, Any],
     errors: list[str],
 ) -> None:
-    if row.get("model") != protocol["model"]:
+    if row.get("model") != provider_profile.get("model"):
         errors.append(f"{condition}:model_mismatch")
-    if row.get("runner_id") != "github-models":
+    if row.get("runner_id") != provider_profile.get("runner_id"):
         errors.append(f"{condition}:runner_mismatch")
     if row.get("forbidden_changes") != []:
         errors.append(f"{condition}:forbidden_changes")
@@ -429,10 +494,22 @@ def _check_runner_usage(
     cell_dir: Path,
     row: dict[str, Any],
     protocol: dict[str, Any],
+    provider_profile: dict[str, Any],
     seen: set[str],
     errors: list[str],
 ) -> set[str]:
-    usage = _load_optional_json(cell_dir / "github_models_usage.json")
+    usage_filename = provider_profile.get("usage_artifact")
+    usage = _load_optional_json(
+        cell_dir / usage_filename if isinstance(usage_filename, str) else cell_dir / "missing-usage.json"
+    )
+    if usage.get("provider") != provider_profile.get("provider_id"):
+        errors.append(f"{condition}:provider_identity_mismatch")
+    if usage.get("endpoint") != provider_profile.get("endpoint"):
+        errors.append(f"{condition}:provider_endpoint_mismatch")
+    if usage.get("model") != provider_profile.get("model"):
+        errors.append(f"{condition}:provider_usage_model_mismatch")
+    if usage.get("prompt_revision") != protocol.get("runner_prompt_revision"):
+        errors.append(f"{condition}:provider_prompt_revision_mismatch")
     turns = usage.get("turns") if isinstance(usage.get("turns"), list) else []
     if not turns:
         errors.append(f"{condition}:runner_usage_missing")
@@ -445,6 +522,17 @@ def _check_runner_usage(
             errors.append(f"{condition}:duplicate_or_missing_request_id")
         else:
             request_ids.add(request_id)
+        raw_request_ids = turn.get("request_ids")
+        allowed_headers = provider_profile.get("request_id_headers") or []
+        if (
+            not isinstance(raw_request_ids, dict)
+            or not any(
+                isinstance(raw_request_ids.get(header), str)
+                and raw_request_ids[header] == request_id
+                for header in allowed_headers
+            )
+        ):
+            errors.append(f"{condition}:provider_request_header_mismatch")
         raw = turn.get("usage") or {}
         prompt = raw.get("prompt_tokens")
         completion = raw.get("completion_tokens")
@@ -570,6 +658,7 @@ def _check_worker_usage(
     cell_dir: Path,
     row: dict[str, Any],
     protocol: dict[str, Any],
+    provider_profile: dict[str, Any],
     seen: set[str],
     errors: list[str],
 ) -> set[str]:
@@ -591,7 +680,11 @@ def _check_worker_usage(
     for field, value in expected.items():
         if proof.get(field) != value:
             errors.append(f"{condition}:worker_usage_proof_mismatch:{field}")
-    if proof.get("requested_model") != protocol["model"]:
+    if proof.get("provider") != provider_profile.get("provider_id"):
+        errors.append(f"{condition}:worker_provider_mismatch")
+    if proof.get("endpoint") != provider_profile.get("endpoint"):
+        errors.append(f"{condition}:worker_endpoint_mismatch")
+    if proof.get("requested_model") != provider_profile.get("model"):
         errors.append(f"{condition}:worker_model_mismatch")
     if proof.get("prompt_revision") != protocol["worker_prompt_revision"]:
         errors.append(f"{condition}:worker_prompt_revision_mismatch")
@@ -613,7 +706,14 @@ def _check_worker_usage(
     if not _nonnegative_int(estimated_input) or estimated_input > protocol["provider_input_token_limit"]:
         errors.append(f"{condition}:worker_input_budget_unproven")
     request_ids = proof.get("request_ids")
-    if not isinstance(request_ids, dict) or request_id not in request_ids.values():
+    allowed_headers = provider_profile.get("request_id_headers") or []
+    if (
+        not isinstance(request_ids, dict)
+        or not any(
+            isinstance(request_ids.get(header), str) and request_ids[header] == request_id
+            for header in allowed_headers
+        )
+    ):
         errors.append(f"{condition}:worker_request_identity_mismatch")
     raw = proof.get("usage") or {}
     prompt = raw.get("prompt_tokens")

@@ -69,3 +69,18 @@ python -m eval.task_level.task33_validation \
 ```
 
 GitHub execution is intentionally split. `task33c-pr-checks.yml` runs untrusted pull-request validation without GitHub Models access. `task33c-actions-probe.yml` is manual-only. First dispatch it with `run_causal_pilot=false` on the trusted branch and inspect the structured-model, retrieval, and Docker canary artifact. After that probe passes and the protected `task33c-causal-pilot` environment is approved, dispatch the same frozen ref once with `run_causal_pilot=true`. The causal artifact contains only files listed in `task33c_artifact_manifest.json`; virtual environments and workspace copies are never uploaded.
+
+The same protocol can run locally without GitHub Actions or GitHub Models. The local profile uses the pinned `gpt-4o-mini-2024-07-18` snapshot through the direct OpenAI Chat Completions API. It preserves the same host-controlled tool loop, structured schemas, request budget, Docker boundary, evidence snapshot, and independent verifier. Only `OPENAI_API_KEY` is required; the key is never forwarded to Docker or persisted. Run the fail-closed preflight first:
+
+```bash
+export OPENAI_API_KEY="..."
+python -m eval.task_level.task33_local
+```
+
+This builds the digest-pinned evaluator image, prewarms the frozen fixture dependencies, and writes provider, Docker, and retrieval probes. It does not run causal cells. After inspecting a `verified` preflight, explicitly request the one-attempt pilot:
+
+```bash
+python -m eval.task_level.task33_local --run-causal-pilot
+```
+
+The local result is acceptable only when `task33c_validation.json` reports `VALID`. GitHub Models and direct OpenAI API are separate frozen provider profiles; a single run must use exactly one profile for all four cells, and their results must not be pooled as if they used the same provider.

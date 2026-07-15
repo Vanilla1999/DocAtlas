@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import importlib
 import json
 import os
@@ -28,7 +29,7 @@ from eval.task_level.runners.opencode import OpenCodeRunner
 from eval.task_level.schemas import RESULTS_ROOT, TASKS_PATH, VALIDATION_ROOT, RunMetrics, RunResult, TaskSpec
 from eval.task_level.task_selection import decide_candidate_status, decide_screening_result, write_screening_artifacts
 from eval.task_level.task33_pilot import TASK33C_PILOT_CONDITIONS, TASK33C_PILOT_TASK_ID, build_task33c_pilot_plan, evaluate_task33c_pilot_completeness
-from eval.task_level.task33_validation import PROTOCOL_PATH, protocol_sha256, validate_task33c_run
+from eval.task_level.task33_validation import PROTOCOL_PATH, load_protocol, protocol_sha256, validate_task33c_run
 
 
 BASE_PROMPT = """You are working in a software repository at the supplied base commit.
@@ -351,6 +352,11 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--screen-tasks", action="store_true")
     parser.add_argument("--patch-constraints-targeted-pilot", action="store_true")
     parser.add_argument("--task33c-pilot", action="store_true", help="Run the frozen one-task, four-lane engineering pilot")
+    parser.add_argument(
+        "--task33c-provider-profile",
+        default="github-models",
+        help="Frozen hosted-model profile: github-models or openai-api",
+    )
     parser.add_argument("--isolated-worker-command", help="Absolute JSON worker command for non-causal protocol smoke; provider usage remains unverified")
     parser.add_argument("--isolated-worker-factory", help="Inject a verified host-owned worker adapter as module.path:factory")
     parser.add_argument("--isolated-worker-identity", help="Versioned model/prompt identity for the isolated compressor")
@@ -385,8 +391,22 @@ def main(argv: list[str] | None = None) -> int:
     if args.task33c_pilot and args.retry_infrastructure_failures:
         raise SystemExit("--task33c-pilot enforces one attempt per cell and cannot be retried")
     if args.task33c_pilot:
+        protocol = load_protocol()
+        provider_profiles = protocol.get("provider_profiles") or {}
+        if args.task33c_provider_profile not in provider_profiles:
+            raise SystemExit(
+                "Unknown Task 33C provider profile: " + args.task33c_provider_profile
+            )
+        provider_profile = provider_profiles[args.task33c_provider_profile]
         if len(tasks) != 1 or tasks[0].task_id != TASK33C_PILOT_TASK_ID:
             raise SystemExit(f"--task33c-pilot requires --tasks {TASK33C_PILOT_TASK_ID}")
+        if args.model == "sonnet":
+            args.model = str(provider_profile.get("model"))
+        elif args.model != provider_profile.get("model"):
+            raise SystemExit(
+                "--model must match the frozen Task 33C provider profile: "
+                + str(provider_profile.get("model"))
+            )
         args.conditions = list(TASK33C_PILOT_CONDITIONS)
         args.repeats = 1
     if args.isolated_worker_command and args.isolated_worker_factory:
@@ -412,6 +432,21 @@ def main(argv: list[str] | None = None) -> int:
         raise SystemExit("docatlas_bounded_subagent requires --isolated-worker-factory or a dry-run command scaffold")
     if isolated_worker is not None and not isolated_worker.capabilities.verified and not args.dry_run:
         raise SystemExit("docatlas_bounded_subagent requires verified sandbox canaries and host-owned provider usage proof")
+    if args.task33c_pilot and isolated_worker is not None and not args.dry_run:
+        worker_provider = isolated_worker.capability_evidence.get("provider")
+        worker_endpoint = isolated_worker.capability_evidence.get("provider_endpoint")
+        worker_model = isolated_worker.capability_evidence.get("model")
+        if (
+            worker_provider != provider_profile.get("provider_id")
+            or worker_endpoint != provider_profile.get("endpoint")
+            or worker_model != provider_profile.get("model")
+        ):
+            raise SystemExit(
+                "Task 33C worker/profile mismatch: expected frozen provider/endpoint/model "
+                + str(provider_profile.get("provider_id"))
+                + "/"
+                + str(provider_profile.get("endpoint"))
+            )
     if args.patch_constraints_targeted_pilot and not args.tasks:
         tasks = select_targeted_pilot_tasks(tasks, accepted_pool_path=args.accepted_pool)
         args.conditions = list(TARGETED_PILOT_CONDITIONS)
@@ -426,6 +461,23 @@ def main(argv: list[str] | None = None) -> int:
     if args.task33c_pilot:
         plan = build_task33c_pilot_plan(tasks[0].task_id)
         shutil.copy2(PROTOCOL_PATH, run_dir / PROTOCOL_PATH.name)
+        provider_selection = {
+            "schema_version": 1,
+            "profile_id": args.task33c_provider_profile,
+            "profile": provider_profile,
+            "profile_sha256": hashlib.sha256(
+                json.dumps(
+                    provider_profile,
+                    ensure_ascii=False,
+                    sort_keys=True,
+                    separators=(",", ":"),
+                ).encode("utf-8")
+            ).hexdigest(),
+        }
+        (run_dir / "task33c_provider_selection.json").write_text(
+            json.dumps(provider_selection, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
         (run_dir / "task33c_pilot_plan.json").write_text(
             json.dumps(plan, indent=2, sort_keys=True) + "\n", encoding="utf-8",
         )
@@ -435,6 +487,7 @@ def main(argv: list[str] | None = None) -> int:
             "sha256": protocol_sha256(),
             "enforcement": "independent_disk_artifact_verifier",
         }
+        metadata["task33c_provider_selection"] = provider_selection
         metadata["isolated_worker_host"] = {
             "configured": isolated_worker is not None,
             "compressor_identity": isolated_worker.compressor_identity if isolated_worker else None,
@@ -452,6 +505,24 @@ def main(argv: list[str] | None = None) -> int:
         else select_runner(args.runner, codex_sandbox_mode=args.codex_sandbox_mode)
     )
     capabilities = runner.verify()
+    if (
+        args.task33c_pilot
+        and not args.dry_run
+        and capabilities.runner_id != provider_profile.get("runner_id")
+    ):
+        raise SystemExit(
+            "Task 33C runner/profile mismatch: expected "
+            + str(provider_profile.get("runner_id"))
+            + ", got "
+            + capabilities.runner_id
+        )
+    if args.task33c_pilot and not args.dry_run:
+        provider_identity = getattr(runner, "provider_identity", {})
+        if not isinstance(provider_identity, dict) or any(
+            provider_identity.get(field) != provider_profile.get(field)
+            for field in ("provider_id", "runner_id", "endpoint")
+        ):
+            raise SystemExit("Task 33C runner endpoint does not match the frozen provider profile")
     if args.task33c_pilot and not args.dry_run:
         boundary_evidence = getattr(runner, "boundary_evidence", {})
         boundary_evidence = boundary_evidence if isinstance(boundary_evidence, dict) else {}
@@ -465,6 +536,8 @@ def main(argv: list[str] | None = None) -> int:
                 "image_id_sha256": boundary_evidence.get("image_id_sha256"),
                 "boundary_status": boundary_evidence.get("status"),
                 "protocol_sha256": protocol_sha256(),
+                "provider_profile_id": args.task33c_provider_profile,
+                "provider_profile_sha256": provider_selection["profile_sha256"],
             }, indent=2, sort_keys=True) + "\n",
             encoding="utf-8",
         )

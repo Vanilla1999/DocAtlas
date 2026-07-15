@@ -14,6 +14,33 @@
   "packet_schema_version": 1,
   "packet_token_budget": 2000,
   "model": "openai/gpt-4o-mini",
+  "default_provider_profile": "github-models",
+  "provider_profiles": {
+    "github-models": {
+      "provider_id": "github-models",
+      "runner_id": "github-models",
+      "model": "openai/gpt-4o-mini",
+      "usage_artifact": "github_models_usage.json",
+      "request_id_headers": [
+        "x-github-request-id",
+        "apim-request-id",
+        "x-ms-request-id"
+      ],
+      "credential_environment": "GITHUB_TOKEN",
+      "endpoint": "https://models.github.ai/inference/chat/completions"
+    },
+    "openai-api": {
+      "provider_id": "openai-api",
+      "runner_id": "openai-api",
+      "model": "gpt-4o-mini-2024-07-18",
+      "usage_artifact": "openai_api_usage.json",
+      "request_id_headers": [
+        "x-request-id"
+      ],
+      "credential_environment": "OPENAI_API_KEY",
+      "endpoint": "https://api.openai.com/v1/chat/completions"
+    }
+  },
   "runner_prompt_revision": "github-models-controlled-agent-v3-bounded-context",
   "worker_prompt_revision": "task33c-evidence-selector-v2-full-snapshot",
   "provider_input_token_limit": 7000,
@@ -59,5 +86,5 @@
     "setup_python": "actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
     "upload_artifact": "actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02"
   },
-  "freeze_policy": "No task, fixture, oracle, hidden test, query, model, condition, turn limit, packet budget, or decision threshold changes after the first causal dispatch."
+  "freeze_policy": "No task, fixture, oracle, hidden test, query, allowed provider profile, model, endpoint, condition, turn limit, packet budget, or decision threshold changes after the first causal dispatch."
 }

@@ -10,6 +10,7 @@ import threading
 import time
 import urllib.error
 import urllib.request
+import uuid
 from contextlib import contextmanager
 from dataclasses import dataclass
 from datetime import datetime, timezone
@@ -32,6 +33,8 @@ from .sandbox_execution import DockerCommandSandbox, persist_boundary
 
 GITHUB_MODELS_ENDPOINT = "https://models.github.ai/inference/chat/completions"
 DEFAULT_GITHUB_MODEL = "openai/gpt-4o-mini"
+OPENAI_API_ENDPOINT = "https://api.openai.com/v1/chat/completions"
+DEFAULT_OPENAI_MODEL = "gpt-4o-mini-2024-07-18"
 _RUNNER_VERSION = "github-models-controlled-agent-v3-bounded-context"
 _RUNNER_PROMPT_REVISION = "github-models-controlled-agent-v3-bounded-context"
 _WORKER_PROMPT_REVISION = "task33c-evidence-selector-v2-full-snapshot"
@@ -42,6 +45,41 @@ _REQUEST_RATE_LOCK = threading.Lock()
 _LAST_REQUEST_AT = 0.0
 _PROCESS_REQUEST_COUNT = 0
 _PROCESS_REQUEST_BUDGET = 113
+
+
+@dataclass(frozen=True)
+class HostedProviderConfig:
+    provider_id: str
+    runner_id: str
+    runner_version: str
+    endpoint: str
+    default_model: str
+    usage_filename: str
+    request_id_headers: tuple[str, ...]
+    extra_headers: tuple[tuple[str, str], ...] = ()
+    minimum_request_interval_seconds: float = 0.0
+
+
+GITHUB_MODELS_PROVIDER = HostedProviderConfig(
+    provider_id="github-models",
+    runner_id="github-models",
+    runner_version=_RUNNER_VERSION,
+    endpoint=GITHUB_MODELS_ENDPOINT,
+    default_model=DEFAULT_GITHUB_MODEL,
+    usage_filename="github_models_usage.json",
+    request_id_headers=("x-github-request-id", "apim-request-id", "x-ms-request-id"),
+    extra_headers=(("X-GitHub-Api-Version", "2026-03-10"),),
+    minimum_request_interval_seconds=_MIN_REQUEST_INTERVAL_SECONDS,
+)
+OPENAI_API_PROVIDER = HostedProviderConfig(
+    provider_id="openai-api",
+    runner_id="openai-api",
+    runner_version="openai-api-controlled-agent-v1-bounded-context",
+    endpoint=OPENAI_API_ENDPOINT,
+    default_model=DEFAULT_OPENAI_MODEL,
+    usage_filename="openai_api_usage.json",
+    request_id_headers=("x-request-id",),
+)
 
 
 @dataclass(frozen=True)
@@ -59,13 +97,20 @@ class GitHubModelsCompletion:
 
 
 class GitHubModelsClient:
-    """Small, auditable client for GitHub Models structured completions."""
+    """Small, auditable client for hosted OpenAI-compatible structured completions."""
 
-    def __init__(self, token: str, *, endpoint: str = GITHUB_MODELS_ENDPOINT) -> None:
+    def __init__(
+        self,
+        token: str,
+        *,
+        endpoint: str | None = None,
+        provider: HostedProviderConfig = GITHUB_MODELS_PROVIDER,
+    ) -> None:
         if not token.strip():
-            raise ValueError("GITHUB_TOKEN is required")
+            raise ValueError(f"credential is required for {provider.provider_id}")
         self._token = token
-        self.endpoint = endpoint
+        self.provider = provider
+        self.endpoint = endpoint or provider.endpoint
 
     def complete_json(
         self,
@@ -78,7 +123,7 @@ class GitHubModelsClient:
         max_tokens: int,
     ) -> tuple[dict[str, Any], GitHubModelsCompletion]:
         if timeout_seconds <= 0:
-            raise TimeoutError("GitHub Models request deadline expired")
+            raise TimeoutError(f"{self.provider.provider_id} request deadline expired")
         deadline = time.monotonic() + timeout_seconds
         payload = {
             "model": model,
@@ -102,31 +147,40 @@ class GitHubModelsClient:
         estimated_input_tokens = _estimate_message_tokens(messages)
         if estimated_input_tokens > _PROVIDER_INPUT_TOKEN_LIMIT:
             raise RuntimeError(
-                "GitHub Models input budget exceeded: "
+                f"{self.provider.provider_id} input budget exceeded: "
                 f"{estimated_input_tokens}>{_PROVIDER_INPUT_TOKEN_LIMIT}"
             )
-        _pace_github_models_request()
+        _pace_provider_request(self.provider.minimum_request_interval_seconds)
         remaining = deadline - time.monotonic()
         if remaining <= 0:
-            raise TimeoutError("GitHub Models request deadline expired during rate pacing")
+            raise TimeoutError(f"{self.provider.provider_id} request deadline expired during rate pacing")
+        client_request_id = str(uuid.uuid4())
+        headers = {
+            "Accept": "text/event-stream",
+            "Authorization": "Bearer " + self._token,
+            "Content-Type": "application/json",
+            "X-Client-Request-Id": client_request_id,
+            **dict(self.provider.extra_headers),
+        }
         request = urllib.request.Request(
             self.endpoint,
             data=serialized_payload,
-            headers={
-                "Accept": "text/event-stream",
-                "Authorization": "Bearer " + self._token,
-                "Content-Type": "application/json",
-                "X-GitHub-Api-Version": "2026-03-10",
-            },
+            headers=headers,
             method="POST",
         )
         try:
             with _absolute_deadline(remaining), urllib.request.urlopen(request, timeout=remaining) as response:
-                request_ids = {
+                provider_request_ids = {
                     name: value
-                    for name in ("x-github-request-id", "apim-request-id", "x-ms-request-id")
+                    for name in self.provider.request_id_headers
                     if (value := response.headers.get(name))
                 }
+                if not provider_request_ids:
+                    raise RuntimeError(
+                        f"{self.provider.provider_id} response omitted provider request identity"
+                    )
+                request_ids = dict(provider_request_ids)
+                request_ids["x-client-request-id"] = client_request_id
                 chunks: list[str] = []
                 usage: dict[str, Any] | None = None
                 response_model = model
@@ -135,7 +189,7 @@ class GitHubModelsClient:
                 for raw_line in response:
                     received_bytes += len(raw_line)
                     if received_bytes > 4_000_000:
-                        raise RuntimeError("GitHub Models response exceeded 4 MB")
+                        raise RuntimeError(f"{self.provider.provider_id} response exceeded 4 MB")
                     line = raw_line.decode("utf-8", errors="replace").strip()
                     if not line.startswith("data:"):
                         continue
@@ -144,7 +198,7 @@ class GitHubModelsClient:
                         continue
                     event = json.loads(data)
                     if isinstance(event.get("error"), dict):
-                        raise RuntimeError("GitHub Models stream returned an error event")
+                        raise RuntimeError(f"{self.provider.provider_id} stream returned an error event")
                     if isinstance(event.get("model"), str):
                         response_model = event["model"]
                     if isinstance(event.get("usage"), dict):
@@ -161,9 +215,9 @@ class GitHubModelsClient:
             # HTTPError is file-like; reading its body here would happen after
             # the transport deadline context has unwound and could block.
             detail = str(exc.reason or "provider error")[:1_000]
-            raise RuntimeError(f"GitHub Models HTTP {exc.code}: {detail}") from exc
+            raise RuntimeError(f"{self.provider.provider_id} HTTP {exc.code}: {detail}") from exc
         except urllib.error.URLError as exc:
-            raise RuntimeError(f"GitHub Models transport failure: {exc.reason}") from exc
+            raise RuntimeError(f"{self.provider.provider_id} transport failure: {exc.reason}") from exc
 
         content = "".join(chunks)
         try:
@@ -171,24 +225,27 @@ class GitHubModelsClient:
         except json.JSONDecodeError as exc:
             finish = ",".join(finish_reasons) or "missing"
             raise RuntimeError(
-                f"GitHub Models returned an invalid structured completion (finish={finish}, chars={len(content)})"
+                f"{self.provider.provider_id} returned an invalid structured completion "
+                f"(finish={finish}, chars={len(content)})"
             ) from exc
         if not isinstance(value, dict) or not isinstance(usage, dict):
-            raise RuntimeError("GitHub Models structured completion contract failed")
+            raise RuntimeError(f"{self.provider.provider_id} structured completion contract failed")
         input_tokens = _strict_nonnegative_int(usage.get("prompt_tokens"), "prompt_tokens")
         output_tokens = _strict_nonnegative_int(usage.get("completion_tokens"), "completion_tokens")
         total_tokens = _strict_nonnegative_int(usage.get("total_tokens"), "total_tokens")
         if total_tokens != input_tokens + output_tokens:
-            raise RuntimeError("GitHub Models usage totals are inconsistent")
+            raise RuntimeError(f"{self.provider.provider_id} usage totals are inconsistent")
         details = usage.get("completion_tokens_details")
         reasoning = details.get("reasoning_tokens") if isinstance(details, dict) else None
         reasoning = _strict_nonnegative_int(reasoning, "reasoning_tokens")
         prompt_details = usage.get("prompt_tokens_details")
         cached = prompt_details.get("cached_tokens") if isinstance(prompt_details, dict) else None
         _strict_nonnegative_int(cached, "cached_tokens")
-        if not request_ids:
-            raise RuntimeError("GitHub Models response omitted provider request identity")
-        request_id = request_ids.get("x-github-request-id") or request_ids.get("apim-request-id") or next(iter(request_ids.values()))
+        request_id = next(
+            request_ids[name]
+            for name in self.provider.request_id_headers
+            if name in request_ids
+        )
         completion = GitHubModelsCompletion(
             content=content,
             model=response_model,
@@ -213,6 +270,7 @@ class GitHubModelsIsolatedWorker:
     endpoint: str = GITHUB_MODELS_ENDPOINT
     compressor_identity: str = "github-models-task33c-selector-v2"
     usage_verifier_identity: str = "github-models-response-headers-and-usage-v2"
+    provider: HostedProviderConfig = GITHUB_MODELS_PROVIDER
 
     @property
     def capability_evidence(self) -> dict[str, Any]:
@@ -222,7 +280,9 @@ class GitHubModelsIsolatedWorker:
             "status": "verified" if bool(self.token.strip()) and deadline_supported else "unavailable",
             "boundary_type": "remote_toolless_inference",
             "boundary": "tool-less hosted inference request",
+            "provider": self.provider.provider_id,
             "provider_endpoint": self.endpoint,
+            "model": self.model,
             "fresh_context": "one stateless request with no conversation reuse",
             "documentation_access": "only the serialized host-owned evidence snapshot",
             "tools": [],
@@ -254,6 +314,7 @@ class GitHubModelsIsolatedWorker:
     @property
     def command_fingerprint(self) -> str:
         return _json_sha256({
+            "provider": self.provider.provider_id,
             "endpoint": self.endpoint,
             "model": self.model,
             "prompt_revision": _WORKER_PROMPT_REVISION,
@@ -262,7 +323,7 @@ class GitHubModelsIsolatedWorker:
 
     @property
     def sandbox_identity(self) -> str:
-        return "github-models:tool-less-hosted-inference-v2-absolute-deadline"
+        return f"{self.provider.provider_id}:tool-less-hosted-inference-v2-absolute-deadline"
 
     def run(
         self,
@@ -274,7 +335,7 @@ class GitHubModelsIsolatedWorker:
         envelope.validate()
         evidence.validate(envelope)
         if not self.capabilities.verified:
-            raise IsolatedDeliveryError("github_models_worker_unavailable")
+            raise IsolatedDeliveryError(f"{self.provider.provider_id}_worker_unavailable")
         indexed = [
             {"index": index, "evidence": _worker_evidence(item)}
             for index, item in enumerate(evidence.evidence_items)
@@ -298,7 +359,11 @@ class GitHubModelsIsolatedWorker:
         }, ensure_ascii=False, sort_keys=True)
         started = time.monotonic()
         try:
-            selection, completion = GitHubModelsClient(self.token, endpoint=self.endpoint).complete_json(
+            selection, completion = GitHubModelsClient(
+                self.token,
+                endpoint=self.endpoint,
+                provider=self.provider,
+            ).complete_json(
                 model=self.model,
                 messages=[{"role": "system", "content": system}, {"role": "user", "content": user}],
                 schema_name="task33c_evidence_selection",
@@ -308,7 +373,7 @@ class GitHubModelsIsolatedWorker:
             )
         except Exception as exc:
             raise IsolatedDeliveryError(
-                "github_models_worker_request_failed:" + _provider_failure_class(exc)
+                f"{self.provider.provider_id}_worker_request_failed:" + _provider_failure_class(exc)
             ) from exc
         indices = selection.get("selected_indices")
         if (
@@ -329,7 +394,7 @@ class GitHubModelsIsolatedWorker:
         )
         proof = {
             "schema_version": 1,
-            "provider": "github-models",
+            "provider": self.provider.provider_id,
             "boundary_type": "remote_toolless_inference",
             "endpoint": self.endpoint,
             "requested_model": self.model,
@@ -354,7 +419,7 @@ class GitHubModelsIsolatedWorker:
             "selected_indices": indices,
         }
         usage = WorkerUsage(
-            provider="github-models",
+            provider=self.provider.provider_id,
             model=completion.model,
             request_id=completion.request_id,
             input_tokens=completion.input_tokens,
@@ -379,11 +444,14 @@ class GitHubModelsRunner:
         self,
         token: str,
         *,
-        endpoint: str = GITHUB_MODELS_ENDPOINT,
+        endpoint: str | None = None,
         sandbox: DockerCommandSandbox | None = None,
+        provider: HostedProviderConfig = GITHUB_MODELS_PROVIDER,
     ) -> None:
         self._token = token
-        self._endpoint = endpoint
+        self._provider = provider
+        self._endpoint = endpoint or provider.endpoint
+        self.runner_id = provider.runner_id
         self._sandbox = sandbox or DockerCommandSandbox.from_environment()
 
     def verify(self) -> RunnerCapabilities:
@@ -392,7 +460,7 @@ class GitHubModelsRunner:
         available = bool(self._token.strip()) and boundary.get("status") == "verified" and deadline_supported
         return RunnerCapabilities(
             runner_id=self.runner_id,
-            version=_RUNNER_VERSION,
+            version=self._provider.runner_version,
             structured_trajectory=available,
             patch_capture=available,
             tool_isolation=available,
@@ -403,7 +471,7 @@ class GitHubModelsRunner:
             verified=available,
             hard_turn_limit=True,
             verification_notes=[
-                "Each model turn is a stateless GitHub Models request in a host-controlled loop.",
+                f"Each model turn is a stateless {self._provider.provider_id} request in a host-controlled loop.",
                 "The runner exposes only bounded repository reads, contract-allowlisted exact text replacement, sandboxed local tests, and condition-scoped DocAtlas retrieval.",
                 "No arbitrary shell, network, MCP, recursive-agent, or generated-file editing tool is exposed.",
                 "The Python loop enforces the requested maximum number of model turns and a monotonic wall-clock deadline.",
@@ -417,26 +485,38 @@ class GitHubModelsRunner:
     def boundary_evidence(self) -> dict[str, object]:
         return self._sandbox.verify()
 
+    @property
+    def provider_identity(self) -> dict[str, str]:
+        return {
+            "provider_id": self._provider.provider_id,
+            "runner_id": self._provider.runner_id,
+            "endpoint": self._endpoint,
+        }
+
     def run(self, request: AgentRunRequest) -> AgentRunOutput:
         if request.max_turns > _TASK33C_MAX_RUNNER_REQUESTS:
             raise RuntimeError(
-                f"GitHub Models runner request budget exceeds {_TASK33C_MAX_RUNNER_REQUESTS} turns"
+                f"{self._provider.provider_id} runner request budget exceeds "
+                f"{_TASK33C_MAX_RUNNER_REQUESTS} turns"
             )
         request.output_dir.mkdir(parents=True, exist_ok=True)
         boundary = self._sandbox.verify()
         persist_boundary(request.output_dir / "runner_execution_boundary.json", boundary)
         if boundary.get("status") != "verified" or not _absolute_deadline_supported():
-            raise RuntimeError("GitHub Models runner requires a verified Docker boundary and interruptible absolute deadlines")
+            raise RuntimeError(
+                f"{self._provider.provider_id} runner requires a verified Docker boundary "
+                "and interruptible absolute deadlines"
+            )
         if not request.allowed_write_paths and request.task_id != "docatlas_tool_visibility_canary":
             raise RuntimeError("controlled runner requires an explicit write-path allowlist")
         stdout_path = request.output_dir / "stdout.log"
         stderr_path = request.output_dir / "stderr.log"
         trajectory_path = request.output_dir / "trajectory.normalized.json"
-        usage_path = request.output_dir / "github_models_usage.json"
+        usage_path = request.output_dir / self._provider.usage_filename
         started_at = datetime.now(timezone.utc).isoformat()
         started = time.monotonic()
         deadline = started + request.timeout_seconds
-        model = _normalize_model(request.model)
+        model = _normalize_model(request.model, self._provider)
         inventory = _list_repository_files(request.workspace)
         source_snapshot, bootstrap_read_paths = _repository_source_snapshot(request.workspace)
         base_messages: list[dict[str, str]] = [
@@ -458,7 +538,11 @@ class GitHubModelsRunner:
         stderr_rows: list[str] = []
         status = "max_turns_exhausted"
         exit_code = 2
-        client = GitHubModelsClient(self._token, endpoint=self._endpoint)
+        client = GitHubModelsClient(
+            self._token,
+            endpoint=self._endpoint,
+            provider=self._provider,
+        )
         read_paths: set[str] = set(bootstrap_read_paths)
         last_test_result: str | None = None
         rejected_actions: dict[str, int] = {}
@@ -505,7 +589,7 @@ class GitHubModelsRunner:
                 break
             usage_rows.append({
                 "turn": turn,
-                "provider": "github-models",
+                "provider": self._provider.provider_id,
                 "model": completion.model,
                 "request_id": completion.request_id,
                 "request_ids": completion.request_ids,
@@ -590,7 +674,8 @@ class GitHubModelsRunner:
         trajectory_path.write_text(json.dumps(events, indent=2, sort_keys=True), encoding="utf-8")
         usage_path.write_text(json.dumps({
             "schema_version": 1,
-            "provider": "github-models",
+            "provider": self._provider.provider_id,
+            "endpoint": self._endpoint,
             "model": model,
             "prompt_revision": _RUNNER_PROMPT_REVISION,
             "provider_input_token_limit": _PROVIDER_INPUT_TOKEN_LIMIT,
@@ -634,7 +719,7 @@ class GitHubModelsRunner:
             input_tokens=input_tokens,
             output_tokens=output_tokens,
             model=model,
-            runner_version=_RUNNER_VERSION,
+            runner_version=self._provider.runner_version,
             max_turns_enforced=True,
             token_usage={
                 "cached_input_tokens": cached_input_tokens,
@@ -642,7 +727,10 @@ class GitHubModelsRunner:
                 "completed_turn_events": len(usage_rows),
                 "effective_max_turns": request.max_turns,
             },
-            notes=["GitHub Models controlled tool loop; tests execute inside the verified Docker boundary."],
+            notes=[
+                f"{self._provider.provider_id} controlled tool loop; tests execute inside the "
+                "verified Docker boundary."
+            ],
         )
 
 
@@ -654,6 +742,25 @@ def create_github_models_worker() -> GitHubModelsIsolatedWorker:
     return GitHubModelsIsolatedWorker(
         os.environ.get("GITHUB_TOKEN", ""),
         model=os.environ.get("TASK33C_GITHUB_MODEL", DEFAULT_GITHUB_MODEL),
+    )
+
+
+def create_openai_api_runner() -> GitHubModelsRunner:
+    return GitHubModelsRunner(
+        os.environ.get("OPENAI_API_KEY", ""),
+        endpoint=OPENAI_API_ENDPOINT,
+        provider=OPENAI_API_PROVIDER,
+    )
+
+
+def create_openai_api_worker() -> GitHubModelsIsolatedWorker:
+    return GitHubModelsIsolatedWorker(
+        os.environ.get("OPENAI_API_KEY", ""),
+        model=os.environ.get("TASK33C_OPENAI_MODEL", DEFAULT_OPENAI_MODEL),
+        endpoint=OPENAI_API_ENDPOINT,
+        compressor_identity="openai-api-task33c-selector-v2",
+        usage_verifier_identity="openai-api-response-headers-and-usage-v1",
+        provider=OPENAI_API_PROVIDER,
     )
 
 
@@ -908,8 +1015,11 @@ def _docatlas_allowed(condition_id: str) -> bool:
     }
 
 
-def _normalize_model(model: str) -> str:
-    return model if "/" in model else DEFAULT_GITHUB_MODEL
+def _normalize_model(model: str, provider: HostedProviderConfig = GITHUB_MODELS_PROVIDER) -> str:
+    value = model.strip()
+    if provider.provider_id == "github-models":
+        return value if "/" in value else provider.default_model
+    return value or provider.default_model
 
 
 def _list_repository_files(workspace: Path) -> str:
@@ -1003,7 +1113,7 @@ def _bounded_runner_messages(
             if message.get("role") != "system" and len(message.get("content", "")) > 800
         ]
         if not candidates:
-            raise RuntimeError("GitHub Models base prompt cannot fit the frozen input budget")
+            raise RuntimeError("hosted model base prompt cannot fit the frozen input budget")
         _length, index = max(candidates)
         content = messages[index]["content"]
         target = max(800, int(len(content) * 0.75))
@@ -1037,6 +1147,38 @@ def run_github_models_capability_probe(
 ) -> dict[str, Any]:
     """Exercise the production structured adapter and every required usage field."""
 
+    return _run_hosted_models_capability_probe(
+        token,
+        model=model,
+        endpoint=endpoint,
+        provider=GITHUB_MODELS_PROVIDER,
+    )
+
+
+def run_openai_api_capability_probe(
+    token: str,
+    *,
+    model: str = DEFAULT_OPENAI_MODEL,
+    endpoint: str = OPENAI_API_ENDPOINT,
+) -> dict[str, Any]:
+    """Exercise the direct OpenAI API contract used by the local Task 33C profile."""
+
+    return _run_hosted_models_capability_probe(
+        token,
+        model=model,
+        endpoint=endpoint,
+        provider=OPENAI_API_PROVIDER,
+    )
+
+
+def _run_hosted_models_capability_probe(
+    token: str,
+    *,
+    model: str,
+    endpoint: str,
+    provider: HostedProviderConfig,
+) -> dict[str, Any]:
+
     schema = _agent_action_schema(False)
     messages = [
         {
@@ -1045,7 +1187,11 @@ def run_github_models_capability_probe(
         },
         {"role": "user", "content": "Finish now with summary set to capability probe."},
     ]
-    action, completion = GitHubModelsClient(token, endpoint=endpoint).complete_json(
+    action, completion = GitHubModelsClient(
+        token,
+        endpoint=endpoint,
+        provider=provider,
+    ).complete_json(
         model=model,
         messages=messages,
         schema_name="controlled_agent_action",
@@ -1068,7 +1214,7 @@ def run_github_models_capability_probe(
     return {
         "schema_version": 1,
         "status": "verified" if verified else "failed",
-        "provider": "github-models",
+        "provider": provider.provider_id,
         "model": completion.model,
         "prompt_revision": _RUNNER_PROMPT_REVISION,
         "response_schema_sha256": _json_sha256(schema),
@@ -1085,15 +1231,15 @@ def _strict_probe_int(value: Any) -> bool:
     return isinstance(value, int) and not isinstance(value, bool) and value >= 0
 
 
-def _pace_github_models_request() -> None:
+def _pace_provider_request(minimum_interval_seconds: float) -> None:
     global _LAST_REQUEST_AT, _PROCESS_REQUEST_COUNT
     with _REQUEST_RATE_LOCK:
         if _PROCESS_REQUEST_COUNT >= _PROCESS_REQUEST_BUDGET:
             raise RuntimeError(
-                f"GitHub Models frozen process request budget exceeded: {_PROCESS_REQUEST_BUDGET}"
+                f"hosted provider frozen process request budget exceeded: {_PROCESS_REQUEST_BUDGET}"
             )
         _PROCESS_REQUEST_COUNT += 1
-        delay = _MIN_REQUEST_INTERVAL_SECONDS - (time.monotonic() - _LAST_REQUEST_AT)
+        delay = minimum_interval_seconds - (time.monotonic() - _LAST_REQUEST_AT)
         if delay > 0:
             time.sleep(delay)
         _LAST_REQUEST_AT = time.monotonic()
