@@ -1,0 +1,18 @@
+{
+  "allow_network": false,
+  "chunks": 1,
+  "contamination": 0,
+  "docmancer_home": "/home/viadmin/StudioProjects/hermes/docmancer/eval/task_level/results/task33c_codex_host_metrics_20260715_101702/decisive_nbo_cross_module_gate_large_001/docatlas_tool_recommended/repeat_0/env/docmancer_home",
+  "expected_domains_present": [],
+  "limitation": "Offline pilot preparation syncs project-owned docs only. Exact dependency docs must already be locally cached; no network fetch is performed.",
+  "pages": 1,
+  "project_docs_sync_error": null,
+  "project_docs_sync_status": "success",
+  "sources": [
+    "fixture README/docs",
+    "FastAPI docs preindex not fetched during unit validation"
+  ],
+  "status": "prepared_with_local_project_docs_only",
+  "task_id": "decisive_nbo_cross_module_gate_large_001",
+  "wall_time_seconds": 0.1048
+}

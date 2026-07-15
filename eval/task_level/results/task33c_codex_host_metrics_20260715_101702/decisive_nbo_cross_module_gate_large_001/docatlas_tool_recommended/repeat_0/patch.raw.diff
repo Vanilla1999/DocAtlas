@@ -1,0 +1,65 @@
+diff --git a/lib/modules/browser/application/browser_permission_gate.dart b/lib/modules/browser/application/browser_permission_gate.dart
+index 573bbff..2a5806a 100644
+--- a/lib/modules/browser/application/browser_permission_gate.dart
++++ b/lib/modules/browser/application/browser_permission_gate.dart
+@@ -11,7 +11,7 @@ class BrowserPermissionGate {
+       result,
+       allowOfflineFallback: true,
+     );
+-    return decision != PermissionDecision.block;
++    return decision == PermissionDecision.allow;
+   }
+ 
+   String blockedReason(PermissionResult result) {
+diff --git a/lib/modules/permission/application/permission_service.dart b/lib/modules/permission/application/permission_service.dart
+index 0c28abf..3c06c57 100644
+--- a/lib/modules/permission/application/permission_service.dart
++++ b/lib/modules/permission/application/permission_service.dart
+@@ -6,12 +6,10 @@ class PermissionService {
+     bool allowOfflineFallback = false,
+   }) {
+     if (result.hasMissingImmediatePermission) {
+-      // BUG: offline fallback was meant only for network availability, not for
+-      // missing critical permissions. Returning deferFollowUp lets browser/sync
+-      // proceed on partial permission results.
+-      return allowOfflineFallback
+-          ? PermissionDecision.deferFollowUp
+-          : PermissionDecision.block;
++      return PermissionDecision.block;
++    }
++    if (allowOfflineFallback && result.hasDeferredBackgroundLocation) {
++      return PermissionDecision.deferFollowUp;
+     }
+     return PermissionDecision.allow;
+   }
+diff --git a/lib/modules/scan/application/scan_permission_gate.dart b/lib/modules/scan/application/scan_permission_gate.dart
+index bc5179a..a0c4108 100644
+--- a/lib/modules/scan/application/scan_permission_gate.dart
++++ b/lib/modules/scan/application/scan_permission_gate.dart
+@@ -7,9 +7,7 @@ class ScanPermissionGate {
+   final PermissionService _permissionService;
+ 
+   bool canEnter(PermissionResult result) {
+-    if (!result.cameraGranted || !result.locationGranted) {
+-      return false;
+-    }
+-    return true;
++    final decision = _permissionService.evaluateFlowEntry(result);
++    return decision == PermissionDecision.allow;
+   }
+ }
+diff --git a/lib/modules/sync/application/offline_sync_gate.dart b/lib/modules/sync/application/offline_sync_gate.dart
+index b499a85..8eedc9e 100644
+--- a/lib/modules/sync/application/offline_sync_gate.dart
++++ b/lib/modules/sync/application/offline_sync_gate.dart
+@@ -9,8 +9,8 @@ class OfflineSyncGate {
+   bool canAcceptQueuedWork(PermissionResult result) {
+     final decision = _permissionService.evaluateFlowEntry(
+       result,
+-      allowOfflineFallback: true,
++      allowOfflineFallback: false,
+     );
+-    return decision != PermissionDecision.block;
++    return decision == PermissionDecision.allow;
+   }
+ }

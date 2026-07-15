@@ -1,0 +1,372 @@
+{
+  "actionability": {
+    "action_checklist_precision": 0.0,
+    "action_checklist_used": false,
+    "checklist_items": [],
+    "condition_id": "repo_only_strict_offline",
+    "critical_contract_recall": 0.0,
+    "critical_contract_salience": 0.0,
+    "hidden_only_requirements_excluded": [],
+    "patch_contract_satisfaction": {
+      "behavioral_contract_score": 0.0,
+      "form_contract_score": 0.0,
+      "missing_requirements": [
+        "contract_not_defined"
+      ],
+      "project_convention_score": 0.0,
+      "satisfied_requirements": [],
+      "version_contract_score": null
+    },
+    "task_id": "decisive_nbo_cross_module_gate_large_001",
+    "warnings": []
+  },
+  "budget": {
+    "attempt_control": "one_ephemeral_process_with_timeout",
+    "configured_max_turns": 40,
+    "effective_max_turns": null,
+    "input_tokens_exceeded": true,
+    "max_input_tokens": 120000,
+    "max_output_tokens": 30000,
+    "max_turns": null,
+    "max_turns_enforced_by_runner": false,
+    "output_tokens_exceeded": false
+  },
+  "causal_eligible": false,
+  "changed_files": [
+    "lib/modules/browser/application/browser_permission_gate.dart",
+    "lib/modules/permission/application/permission_service.dart",
+    "lib/modules/scan/application/scan_permission_gate.dart",
+    "lib/modules/sync/application/offline_sync_gate.dart"
+  ],
+  "compile_status": "not_applicable",
+  "compile_success": null,
+  "condition_id": "repo_only_strict_offline",
+  "constraint_count": 0,
+  "constraint_packet_tokens": null,
+  "constraint_used": false,
+  "constraint_validation": {
+    "satisfied": 0,
+    "total_constraints": 0,
+    "unknown": 0,
+    "violated": 0,
+    "violations": []
+  },
+  "constraint_violations_after_patch": 0,
+  "context": {
+    "retrieved_count": 0,
+    "used_count": 0,
+    "utilization_rate": null
+  },
+  "contract": {
+    "behavioral_contract_score": 0.0,
+    "form_contract_score": 0.0,
+    "missing_requirements": [
+      "contract_not_defined"
+    ],
+    "project_convention_score": 0.0,
+    "satisfied_requirements": [],
+    "version_contract_score": null
+  },
+  "docatlas": {
+    "agent_calls": 0,
+    "available": false,
+    "context_injected": false,
+    "context_retrieved": false,
+    "context_used": false,
+    "context_used_confidence": "none",
+    "docatlas_fallback_success": false,
+    "docatlas_retrieval_status": null,
+    "docatlas_tool_success": false,
+    "fallback_source": null,
+    "fallback_used": false,
+    "harness_calls": 0,
+    "prompt_injected_sources": [],
+    "used_project_constraints": [],
+    "used_sources": [],
+    "used_symbols": [],
+    "used_version_info": [],
+    "vector_indexing_timed_out": false
+  },
+  "evaluation_contract": {
+    "artifact_identity": {
+      "external_context_sha256": "7372ccee933b47ec72a614966b03a62faf0298a9293733ae46e869183c69fcc0",
+      "fixture_hash_algorithm": "sha256-length-prefixed-v2",
+      "fixture_sha256": "1ba6cb88a61dc5871eca8d2aec13e5d89ce57b2cfe977441da34ad49f7bd48ae",
+      "hidden_tests_sha256": "012438802bdde4c5d1749f2729a212feffadfaad333a9c8bfe7c85ae9f80290e",
+      "oracle_sha256": "7bef2b9e21966f10c12d7ac9d742e61f2b45395b1a8874b98e6f999adcf683a2",
+      "protocol_fixture_hash_algorithm": "sha256-concat-v1",
+      "protocol_fixture_sha256": "603712341cdeffb1332492ccbebeb04b022ddf665b1b305c9827765c69a629df"
+    },
+    "compile_gate": {
+      "command": null,
+      "passed": true,
+      "reason": "The benchmark is a source-only Dart contract fixture and does not contain a buildable Flutter application. Public and evaluator-private structural tests are the executable validation gates.",
+      "returncode": null,
+      "status": "not_applicable",
+      "stderr": "",
+      "stdout": ""
+    },
+    "contract_sha256": "d70b8eb40c3c741e4062b60dc954643b70223026910b849a3002ea1e37d259a8",
+    "errors": [],
+    "patch_contract_id": "task33-nbo-cross-module-gate-1",
+    "patch_surface": {
+      "allowed_paths": [
+        "lib/modules/browser/application/browser_permission_gate.dart",
+        "lib/modules/permission/application/permission_service.dart",
+        "lib/modules/scan/application/scan_permission_gate.dart",
+        "lib/modules/sync/application/offline_sync_gate.dart"
+      ],
+      "changed_files": [
+        "lib/modules/browser/application/browser_permission_gate.dart",
+        "lib/modules/permission/application/permission_service.dart",
+        "lib/modules/scan/application/scan_permission_gate.dart",
+        "lib/modules/sync/application/offline_sync_gate.dart"
+      ],
+      "forbidden_changes": [],
+      "forbidden_paths": [
+        "docs/**",
+        "pubspec.lock",
+        "pubspec.yaml",
+        "tests/**",
+        "lib/**/*.freezed.dart",
+        "lib/**/*.g.dart"
+      ],
+      "outside_allowed_surface": [],
+      "status": "passed",
+      "violations": []
+    },
+    "registry_sha256": "0d891f708c7aef1202c1b0a9384145451653b1ced50e44e24904beb80890e514",
+    "semantic_checks": [
+      {
+        "description": "all flow entry gates delegate to the canonical permission decision",
+        "id": "canonical-entry-delegation",
+        "test_ids": [
+          "test_browser_scan_and_sync_delegate_to_shared_entry_contract",
+          "test_no_duplicate_immediate_permission_interpretation_in_flow_gates"
+        ]
+      },
+      {
+        "description": "partial permission results cannot pass through offline handoff",
+        "id": "partial-results-blocked",
+        "test_ids": [
+          "test_permission_service_blocks_partial_results_for_entry_even_when_offline_fallback_exists"
+        ]
+      },
+      {
+        "description": "generated and dependency files remain unchanged",
+        "id": "generated-dependency-boundary",
+        "test_ids": [
+          "test_generated_and_dependency_files_are_not_changed"
+        ]
+      }
+    ],
+    "semantic_gate": {
+      "checks": [
+        {
+          "id": "canonical-entry-delegation",
+          "status": "failed",
+          "test_ids": [
+            "test_browser_scan_and_sync_delegate_to_shared_entry_contract",
+            "test_no_duplicate_immediate_permission_interpretation_in_flow_gates"
+          ]
+        },
+        {
+          "id": "partial-results-blocked",
+          "status": "failed",
+          "test_ids": [
+            "test_permission_service_blocks_partial_results_for_entry_even_when_offline_fallback_exists"
+          ]
+        },
+        {
+          "id": "generated-dependency-boundary",
+          "status": "failed",
+          "test_ids": [
+            "test_generated_and_dependency_files_are_not_changed"
+          ]
+        }
+      ],
+      "command": "python -m pytest tests/hidden",
+      "hidden_tests_sha256": "012438802bdde4c5d1749f2729a212feffadfaad333a9c8bfe7c85ae9f80290e",
+      "passed": false,
+      "returncode": 1,
+      "status": "failed"
+    },
+    "status": "valid"
+  },
+  "evaluation_execution": {
+    "boundaries": {
+      "evaluator": {
+        "backend": "host",
+        "causal_claim_allowed": false,
+        "schema_version": 1,
+        "status": "exploratory_unisolated",
+        "validator_eligible": false
+      },
+      "runner": {}
+    },
+    "hidden_tests": {
+      "command": "python -m pytest tests/hidden",
+      "errors": [],
+      "returncode": 1,
+      "status": "executed"
+    },
+    "public_tests": {
+      "command": "uv run --offline pytest tests/test_browser_permission_gate.py",
+      "errors": [],
+      "returncode": 0,
+      "status": "executed"
+    },
+    "setup": {
+      "baseline_allowed_changed_files": [
+        "uv.lock"
+      ],
+      "baseline_artifact_sha256": {
+        "uv.lock": "c6f71e4352747fb1baa6855a4be4ee17bce7c23cf07ab995bffbce91f6613929"
+      },
+      "baseline_changed_files": [
+        "uv.lock"
+      ],
+      "baseline_revision": "a6342306d8ebca547c6f3c66035b3d3ea7539759",
+      "baseline_status": "sealed",
+      "baseline_tree": "7801b590e5c9e9c1e3a815e5273cd896b9de9bd8",
+      "command": "uv sync --offline --python 3.14",
+      "phase": "pre_runner",
+      "returncode": 0,
+      "schema_version": 1,
+      "status": "success",
+      "stderr": "warning: `VIRTUAL_ENV=/home/viadmin/StudioProjects/hermes/docmancer/.venv` does not match the project environment path `/home/viadmin/StudioProjects/hermes/docmancer/eval/task_level/results/task33c_codex_host_metrics_20260715_101702/decisive_nbo_cross_module_gate_large_001/repo_only_strict_offline/repeat_0/env/project_venv` and will be ignored; use `--active` to target the active environment instead\nUsing CPython 3.14.3 interpreter at: /home/linuxbrew/.linuxbrew/opt/python@3.14/bin/python3.14\nCreating virtual environment at: /home/viadmin/StudioProjects/hermes/docmancer/eval/task_level/results/task33c_codex_host_metrics_20260715_101702/decisive_nbo_cross_module_gate_large_001/repo_only_strict_offline/repeat_0/env/project_venv\nResolved 7 packages in 2ms\nInstalled 5 packages in 5ms\n + iniconfig==2.3.0\n + packaging==26.2\n + pluggy==1.6.0\n + pygments==2.20.0\n + pytest==9.0.3\n",
+      "stdout": "",
+      "wall_time_seconds": 0.065608
+    }
+  },
+  "execution_classification": "EXPLORATORY_NON_CAUSAL",
+  "forbidden_changes": [],
+  "hard_turn_limit_verified": false,
+  "hidden_tests_passed": false,
+  "metrics": {
+    "action_packet_fidelity": "not_applicable",
+    "action_packet_insufficient_evidence": false,
+    "action_packet_project_doc_coverage": 0.0,
+    "action_packet_project_doc_paths": [],
+    "action_packet_project_docs_found": 0,
+    "action_packet_project_docs_total": 6,
+    "action_packet_status": null,
+    "action_packet_target_paths": [],
+    "action_packet_tokens": null,
+    "action_packet_truncated": false,
+    "agent_docatlas_calls": 0,
+    "audited_external_context_tokens": null,
+    "cached_input_tokens": 323968,
+    "checklist_tokens": null,
+    "completed_turn_events": 1,
+    "condition_setup_wall_time_seconds": 0.065608,
+    "constraint_packet_tokens": null,
+    "delivery_attempts": null,
+    "delivery_retrieval_calls": null,
+    "docatlas_calls": 0,
+    "docatlas_retrieval_status": null,
+    "docs_context_output_chars": 0,
+    "docs_output_evidence_coverage": 0.0,
+    "docs_output_evidence_found": 0,
+    "docs_output_evidence_total": 12,
+    "edit_calls": 10,
+    "evidence_fingerprint": null,
+    "fallback_source": null,
+    "fallback_used": false,
+    "first_required_evidence_rank": 5,
+    "harness_docatlas_calls": 0,
+    "injected_context_tokens": null,
+    "input_tokens": 344625,
+    "made_edit": true,
+    "network_attempts": 0,
+    "output_tokens": 6862,
+    "parent_retained_context_tokens": 6882,
+    "raw_doc_context_tokens": null,
+    "reasoning_tokens": 2804,
+    "required_evidence_found": 11,
+    "required_evidence_recall": 0.9166666666666666,
+    "required_evidence_total": 12,
+    "retrieved_context_tokens": null,
+    "shell_calls": 34,
+    "system_total_tokens": 351487,
+    "test_runs": 0,
+    "time_to_first_edit": 44.518524,
+    "time_to_first_test": null,
+    "tool_output_chars": 27526,
+    "tool_output_tokens_estimate": 6882,
+    "total_latency": 44.578607999999996,
+    "total_tokens": 351487,
+    "uncached_input_tokens": 20657,
+    "useful_context_ratio": null,
+    "useful_context_ratio_method": "not_measured_without_chunk_usage_attribution",
+    "vector_indexing_timed_out": false,
+    "wall_time_seconds": 44.513,
+    "worker_input_tokens": null,
+    "worker_output_tokens": null,
+    "worker_reasoning_tokens": null,
+    "worker_total_tokens": null
+  },
+  "model": "gpt-5.3-codex-spark",
+  "notes": [],
+  "patch_constraints": {
+    "constraint_count": 0,
+    "constraint_matches": [],
+    "constraint_packet_tokens": null,
+    "constraint_used": false
+  },
+  "patch_path": "/home/viadmin/StudioProjects/hermes/docmancer/eval/task_level/results/task33c_codex_host_metrics_20260715_101702/decisive_nbo_cross_module_gate_large_001/repo_only_strict_offline/repeat_0/patch.diff",
+  "policy": {
+    "clean": true,
+    "condition_id": "repo_only_strict_offline",
+    "context7_calls": 0,
+    "docatlas_calls": 0,
+    "docatlas_tool_name_seen": null,
+    "first_docatlas_call_before_first_edit": false,
+    "first_docatlas_sequence": null,
+    "first_edit_sequence": 40,
+    "foreign_mcp_calls": 0,
+    "network_attempts": 0,
+    "network_shell_calls": 0,
+    "violations": [],
+    "web_calls": 0
+  },
+  "policy_clean": true,
+  "public_tests_passed": true,
+  "repeat": 0,
+  "resolved": false,
+  "run_id": "task33c_codex_host_metrics_20260715_101702",
+  "runner_id": "codex",
+  "runner_version": "codex-cli 0.144.1",
+  "status": "completed",
+  "task_id": "decisive_nbo_cross_module_gate_large_001",
+  "tests_passed": true,
+  "token_attribution": {
+    "action_packet_tokens": null,
+    "parent": {
+      "cached_input_tokens": 323968,
+      "input_tokens": 344625,
+      "output_tokens": 6862,
+      "reasoning_tokens": 2804,
+      "total_tokens": 351487,
+      "uncached_input_tokens": 20657
+    },
+    "provider_fields_available": [
+      "cached_input_tokens",
+      "completed_turn_events",
+      "reasoning_tokens"
+    ],
+    "raw_tool_output_tokens_estimate": 6882,
+    "schema_version": "task33-token-attribution-1",
+    "system_total_complete": true,
+    "system_total_definition": "parent provider total plus worker provider input/output; raw retrieval is reported separately to avoid double counting worker input",
+    "system_total_tokens": 351487,
+    "worker": {
+      "input_tokens": null,
+      "output_tokens": null,
+      "reasoning_tokens": null,
+      "status": "not_applicable",
+      "total_tokens": null
+    }
+  },
+  "trajectory_path": "/home/viadmin/StudioProjects/hermes/docmancer/eval/task_level/results/task33c_codex_host_metrics_20260715_101702/decisive_nbo_cross_module_gate_large_001/repo_only_strict_offline/repeat_0/trajectory.normalized.json"
+}

@@ -1,0 +1,15 @@
+{
+  "clean": true,
+  "condition_id": "repo_only",
+  "context7_calls": 0,
+  "docatlas_calls": 0,
+  "docatlas_tool_name_seen": null,
+  "first_docatlas_call_before_first_edit": false,
+  "first_docatlas_sequence": null,
+  "first_edit_sequence": 18,
+  "foreign_mcp_calls": 0,
+  "network_attempts": 0,
+  "network_shell_calls": 0,
+  "violations": [],
+  "web_calls": 0
+}

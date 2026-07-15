@@ -1,0 +1,24 @@
+diff --git a/calc.py b/calc.py
+index 12ee743..4693ad3 100644
+--- a/calc.py
++++ b/calc.py
+@@ -1,2 +1,2 @@
+ def add(a, b):
+-    return a - b
++    return a + b
+diff --git a/normalization.py b/normalization.py
+index 3b54c51..82ebfaa 100644
+--- a/normalization.py
++++ b/normalization.py
+@@ -1,2 +1,2 @@
+ def normalize(value):
+-    return value - 1
++    return abs(value)
+diff --git a/policy.py b/policy.py
+index 82af1c1..ef8296e 100644
+--- a/policy.py
++++ b/policy.py
+@@ -1,2 +1,2 @@
+ def may_enter(allowed):
+-    return not allowed
++    return allowed

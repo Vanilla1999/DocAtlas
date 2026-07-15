@@ -1,0 +1,20 @@
+{
+  "evidence_categories": [
+    "project_docs",
+    "symbols"
+  ],
+  "evidence_count": 13,
+  "evidence_fingerprint": "1ea0fabd78cbbbf9a348adcb38812d94c8afac8d5eac323e6807e077eb3fb93e",
+  "index_revision": "390c0e11cab2df96ada48d70df638f870332975ad2dd9f46deceb807e8bf5a8f",
+  "objective_sha256": "c80be7bb5a646df5ce05b8e250e34fde2b4e33edb8e1fea21fc4ba42162be6f7",
+  "project_revision": "1ba6cb88a61dc5871eca8d2aec13e5d89ce57b2cfe977441da34ad49f7bd48ae",
+  "query_derivation": "task33c-domain-coverage-v4-limit12",
+  "query_sha256": "4656dac5ca6ae4b4466c80dce994e63a6756aaa4a912532e3455348b668932bd",
+  "raw_retrieval_tokens": 20604,
+  "retrieval_calls": 1,
+  "retrieval_issues": [],
+  "retrieval_wall_time_seconds": 0.053685,
+  "schema_version": 1,
+  "shared_frozen_capture": true,
+  "status": "success"
+}

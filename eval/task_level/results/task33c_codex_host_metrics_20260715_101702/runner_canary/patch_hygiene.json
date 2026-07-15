@@ -1,0 +1,31 @@
+{
+  "filtered_changed_files": [
+    "calc.py",
+    "normalization.py",
+    "policy.py"
+  ],
+  "filtered_counts": {
+    "changed_files": 3,
+    "ignored_runtime_artifacts": 4,
+    "preserved_generated_candidates": 0
+  },
+  "hygiene_warnings": [
+    "runtime/cache artifacts were excluded from normalized patch metrics"
+  ],
+  "ignored_runtime_artifacts": [
+    "__pycache__/calc.cpython-313.pyc",
+    "__pycache__/normalization.cpython-313.pyc",
+    "__pycache__/policy.cpython-313.pyc",
+    "__pycache__/test_calc.cpython-313-pytest-9.0.3.pyc"
+  ],
+  "preserved_generated_candidates": [],
+  "raw_changed_files": [
+    "calc.py",
+    "normalization.py",
+    "policy.py"
+  ],
+  "raw_counts": {
+    "changed_files": 3,
+    "status_paths": 7
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "base_commit": "159b0ceff4043a916293b1225776d656bd21e991",
+  "fixture_hash": "1ba6cb88a61dc5871eca8d2aec13e5d89ce57b2cfe977441da34ad49f7bd48ae",
+  "fixture_hash_algorithm": "sha256-length-prefixed-v2",
+  "protocol_fixture_hash": "603712341cdeffb1332492ccbebeb04b022ddf665b1b305c9827765c69a629df",
+  "protocol_fixture_hash_algorithm": "sha256-concat-v1",
+  "task_id": "decisive_nbo_cross_module_gate_large_001",
+  "workspace": "/home/viadmin/StudioProjects/hermes/docmancer/eval/task_level/results/task33c_codex_host_metrics_20260715_101702_preflight/runtime/docatlas-task-level-task33c_codex_host_metrics_20260715_101702-eur4gjl9/decisive_nbo_cross_module_gate_large_001/docatlas_bounded_subagent/repeat_0/workspace"
+}

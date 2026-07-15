@@ -1,0 +1,67 @@
+[
+  {
+    "content_sha256": "7825c72e1ed48abb705244525ffa8b688faeb2d41aaf125df804e200ab935cb6",
+    "path": "README.md",
+    "section": "NBO Permission Gate Contract Snapshot"
+  },
+  {
+    "content_sha256": "fd2ff747ebc710b26385a56073ec1d294c6cd17e7c2e499172ef089bf8cdf6a0",
+    "path": "README.md",
+    "section": "NBO Permission Gate Contract Snapshot > Fixture map"
+  },
+  {
+    "content_sha256": "d95dc5bf25e44a9720996c8979e546a7f88c954fa50d6dda1f2f5bdafd77fa81",
+    "path": "README.md",
+    "section": "NBO Permission Gate Contract Snapshot > Local constraints"
+  },
+  {
+    "content_sha256": "ed6560d5dac38127ae11bf95361a31426f5c437b93f4a7cf6c45213a78c88e6d",
+    "path": "docs/permission-architecture.md",
+    "section": "Permission Architecture"
+  },
+  {
+    "content_sha256": "9d887df4420a8bf58ed7006579a51c3fd3dd4f4455b77638e52eda96ad353e09",
+    "path": "docs/offline-sync.md",
+    "section": "Offline Sync Permission Contract"
+  },
+  {
+    "content_sha256": "3c7d8163d61468bd1cf9fc9ea430637c9c8d2988f20c3129bbb6e76088c842e5",
+    "path": "tests/test_browser_permission_gate.py",
+    "section": "repo_map"
+  },
+  {
+    "content_sha256": "054d605227c4f5d5c4a1bf666fdd7143f6b64ca71b7b8e9df6e7739ef6c3bb39",
+    "path": "lib/modules/browser/application/browser_permission_gate.dart",
+    "section": "repo_map"
+  },
+  {
+    "content_sha256": "a435eaf6612112e7bc670f4719d7fef7ddeac4650c8aa96cf7764ab8e2e86471",
+    "path": "lib/modules/sync/application/offline_sync_gate.dart",
+    "section": "repo_map"
+  },
+  {
+    "content_sha256": "83e0071e46ca7654d1587d00f034ef6609bef73856c88d73dba202236dc70379",
+    "path": "lib/modules/scan/application/scan_permission_gate.dart",
+    "section": "repo_map"
+  },
+  {
+    "content_sha256": "9503599955872e64fcf904b6ccac12dcdfcd2ec775e8d659525240a7a7f565ae",
+    "path": "lib/modules/review/application/permission_review_policy.dart",
+    "section": "repo_map"
+  },
+  {
+    "content_sha256": "3f79a64bca9e0b6118a1d04e6b5f76acc0d26ee8ac25695c591ee9e3082e89e4",
+    "path": "lib/modules/permission/application/permission_service.dart",
+    "section": "repo_map"
+  },
+  {
+    "content_sha256": "49bcf43695f9698435376148c9d60eed3a040b18ae7559209bc0393840a898b1",
+    "path": "lib/modules/permission/domain/permission_result.dart",
+    "section": "repo_map"
+  },
+  {
+    "content_sha256": "e8b541a23aa32ccd853ece3a156b4dad7c19e848c2b3469cb0c28bebe3de48ae",
+    "path": "tests/test_browser_permission_gate.py",
+    "section": "code_graph"
+  }
+]

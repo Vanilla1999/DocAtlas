@@ -1,0 +1,75 @@
+{
+  "artifact_integrity": {
+    "expected_total_runs": 4,
+    "finished": true,
+    "in_memory_results": 4,
+    "ok": true,
+    "reason": null,
+    "runs_jsonl_records": 4
+  },
+  "completed_runs": 4,
+  "current": null,
+  "latest_results": [
+    {
+      "agent_docatlas_calls": 0,
+      "checklist_items": 0,
+      "checklist_used": false,
+      "condition_id": "docatlas_tool_recommended",
+      "context_used": false,
+      "hidden_tests_passed": false,
+      "policy_clean": true,
+      "public_tests_passed": true,
+      "resolved": false,
+      "status": "completed",
+      "task_id": "decisive_nbo_cross_module_gate_large_001"
+    },
+    {
+      "agent_docatlas_calls": 0,
+      "checklist_items": 0,
+      "checklist_used": false,
+      "condition_id": "docatlas_bounded_direct",
+      "context_used": false,
+      "hidden_tests_passed": false,
+      "policy_clean": false,
+      "public_tests_passed": false,
+      "resolved": false,
+      "status": "condition_setup_failed",
+      "task_id": "decisive_nbo_cross_module_gate_large_001"
+    },
+    {
+      "agent_docatlas_calls": 0,
+      "checklist_items": 0,
+      "checklist_used": false,
+      "condition_id": "docatlas_bounded_subagent",
+      "context_used": true,
+      "hidden_tests_passed": false,
+      "policy_clean": true,
+      "public_tests_passed": true,
+      "resolved": false,
+      "status": "completed",
+      "task_id": "decisive_nbo_cross_module_gate_large_001"
+    },
+    {
+      "agent_docatlas_calls": 0,
+      "checklist_items": 0,
+      "checklist_used": false,
+      "condition_id": "repo_only_strict_offline",
+      "context_used": false,
+      "hidden_tests_passed": false,
+      "policy_clean": true,
+      "public_tests_passed": true,
+      "resolved": false,
+      "status": "completed",
+      "task_id": "decisive_nbo_cross_module_gate_large_001"
+    }
+  ],
+  "remaining_runs": 0,
+  "runtime_integrity": {
+    "infrastructure_failed_runs": 1,
+    "ok": false,
+    "valid_runs": 3
+  },
+  "status": "finished",
+  "total_runs": 4,
+  "updated_at": "2026-07-15T10:19:51.199598+00:00"
+}

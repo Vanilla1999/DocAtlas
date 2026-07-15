@@ -1,0 +1,21 @@
+{
+  "allow_network": false,
+  "chunks": 1,
+  "contamination": 0,
+  "docmancer_home": "<task33-shared-capture>/output/env/docmancer_home",
+  "evidence_fingerprint": "1ea0fabd78cbbbf9a348adcb38812d94c8afac8d5eac323e6807e077eb3fb93e",
+  "expected_domains_present": [],
+  "index_revision": "390c0e11cab2df96ada48d70df638f870332975ad2dd9f46deceb807e8bf5a8f",
+  "limitation": "Offline pilot preparation syncs project-owned docs only. Exact dependency docs must already be locally cached; no network fetch is performed.",
+  "pages": 1,
+  "project_docs_sync_error": null,
+  "project_docs_sync_status": "success",
+  "shared_frozen_capture": true,
+  "sources": [
+    "fixture README/docs",
+    "FastAPI docs preindex not fetched during unit validation"
+  ],
+  "status": "prepared_with_local_project_docs_only",
+  "task_id": "decisive_nbo_cross_module_gate_large_001",
+  "wall_time_seconds": 0.1099
+}

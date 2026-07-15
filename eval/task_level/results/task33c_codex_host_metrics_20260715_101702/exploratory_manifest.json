@@ -1,0 +1,23 @@
+{
+  "causal_claim_allowed": false,
+  "classification": "EXPLORATORY_NON_CAUSAL",
+  "conditions": [
+    "repo_only_strict_offline",
+    "docatlas_tool_recommended",
+    "docatlas_bounded_direct",
+    "docatlas_bounded_subagent"
+  ],
+  "execution_backend": "host_exploratory",
+  "hard_turn_limit_verified": false,
+  "host_execution_unisolated": true,
+  "model": "gpt-5.3-codex-spark",
+  "parent_sandbox": "danger-full-access",
+  "protocol_sha256_before": "045b69d3e448364f09332d0f2f07dc9e12f6b46f276a5922901202c4eedb58c5",
+  "provider_usage_verified": false,
+  "repeats": 1,
+  "schema_version": 1,
+  "selector_sandbox": "danger-full-access",
+  "server_request_ids_verified": false,
+  "task_id": "decisive_nbo_cross_module_gate_large_001",
+  "validator_eligible": false
+}
