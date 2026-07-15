@@ -77,7 +77,14 @@ def test_required_docatlas_call_must_precede_edit(tmp_path: Path):
 def test_required_docatlas_call_before_edit_is_clean(tmp_path: Path):
     trajectory = tmp_path / "trajectory.normalized.json"
     trajectory.write_text(json.dumps([
-        {"sequence": 1, "tool_name": "get_docs_context", "arguments": {"server": "docmancer-docs", "tool": "get_docs_context"}},
+        {"sequence": 1, "tool_name": "get_docs_context", "arguments": {
+            "server": "docmancer-docs",
+            "tool": "get_docs_context",
+            "delivery_strategy": "bounded_direct",
+            "question_matches_task_objective": True,
+            "retrieval_succeeded": True,
+            "action_packet_status": "ok",
+        }},
         {"sequence": 2, "tool_name": "Edit", "arguments": {"changes": ["src/app.py"]}},
     ]), encoding="utf-8")
 
@@ -85,7 +92,39 @@ def test_required_docatlas_call_before_edit_is_clean(tmp_path: Path):
 
     assert audit.clean
     assert audit.docatlas_calls == 1
+    assert audit.get_docs_context_calls == 1
+    assert audit.prepare_docs_calls == 0
     assert audit.first_docatlas_call_before_first_edit is True
+
+
+def test_required_docatlas_call_rejects_duplicate_retrieval(tmp_path: Path):
+    trajectory = tmp_path / "trajectory.normalized.json"
+    trajectory.write_text(json.dumps([
+        {"sequence": 1, "tool_name": "get_docs_context", "arguments": {"server": "docmancer-docs", "tool": "get_docs_context"}},
+        {"sequence": 2, "tool_name": "get_docs_context", "arguments": {"server": "docmancer-docs", "tool": "get_docs_context"}},
+        {"sequence": 3, "tool_name": "Edit", "arguments": {"changes": ["src/app.py"]}},
+    ]), encoding="utf-8")
+
+    audit = audit_trajectory("docatlas_tool_required_once", trajectory)
+
+    assert not audit.clean
+    assert audit.get_docs_context_calls == 2
+    assert "required_get_docs_context_call_count:2" in audit.violations
+
+
+def test_required_docatlas_call_rejects_prepare_docs(tmp_path: Path):
+    trajectory = tmp_path / "trajectory.normalized.json"
+    trajectory.write_text(json.dumps([
+        {"sequence": 1, "tool_name": "prepare_docs", "arguments": {"server": "docmancer-docs", "tool": "prepare_docs"}},
+        {"sequence": 2, "tool_name": "get_docs_context", "arguments": {"server": "docmancer-docs", "tool": "get_docs_context"}},
+        {"sequence": 3, "tool_name": "Edit", "arguments": {"changes": ["src/app.py"]}},
+    ]), encoding="utf-8")
+
+    audit = audit_trajectory("docatlas_tool_required_once", trajectory)
+
+    assert not audit.clean
+    assert audit.prepare_docs_calls == 1
+    assert "prepare_docs_forbidden" in audit.violations
 
 
 def test_each_run_uses_fresh_home(tmp_path: Path):

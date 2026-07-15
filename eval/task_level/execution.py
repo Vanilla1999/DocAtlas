@@ -17,7 +17,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from eval.task_level.conditions import CONDITIONS
+from eval.task_level.conditions import CONDITIONS, TOOL_REQUIRED_ONCE_INSTRUCTION
 from eval.task_level.artifact_hygiene import diff_stats_from_patch, is_runtime_artifact, write_patch_hygiene_artifacts
 from eval.task_level.context.action_checklist import build_action_checklist, save_action_checklist
 from eval.task_level.context.patch_constraints import build_patch_constraint_packet, save_patch_constraint_packet
@@ -39,18 +39,27 @@ from eval.task_level.isolated_delivery import (
     IsolatedWorker,
     TASK33_QUERY_DERIVATION,
     derive_task33_retrieval_query,
+    deliver_with_exploratory_worker,
     deliver_with_isolated_worker,
     missing_packet_evidence_categories,
     missing_packet_evidence_paths,
     persist_host_evidence,
 )
 from eval.task_level.runners.base import AgentRunRequest, AgentRunner, RunnerCapabilities
-from eval.task_level.sandbox_execution import persist_boundary, verified_task33_sandbox
+from eval.task_level.sandbox_execution import (
+    configured_runtime_root,
+    persist_boundary,
+    verified_task33_sandbox,
+)
 from eval.task_level.schemas import RESULTS_ROOT, TASK_LEVEL_ROOT, RunMetrics, TaskSpec
 from eval.task_level.task33_pilot import (
     TASK33C_AGENT_TURN_LIMIT,
+    TASK33C_PILOT_CONDITIONS,
+    TASK33C_PILOT_TASK_ID,
     TASK33C_REQUIRED_EVIDENCE_CATEGORIES,
     TASK33C_REQUIRED_EVIDENCE_PATHS,
+    TASK33C_REQUIRED_TARGET_PATHS,
+    build_task33c_validation_evidence,
 )
 
 
@@ -350,7 +359,7 @@ def run_artifact_integrity(run_dir: Path, *, in_memory_results: int, total_runs:
     }
 
 
-def build_tool_policy(condition_id: str, output_dir: Path) -> tuple[Path, Path | None]:
+def build_tool_policy(condition_id: str, output_dir: Path) -> tuple[Path, Path]:
     output_dir.mkdir(parents=True, exist_ok=True)
     policy = CONDITIONS[condition_id].tool_policy
     policy_path = output_dir / "tool_policy.json"
@@ -466,7 +475,16 @@ def capture_patch(workspace: Path, output_dir: Path) -> tuple[Path, Path, Path, 
     return patch_path, status_path, changed_path, hygiene.filtered_changed_files
 
 
-def evaluate_agent_patch(task: TaskSpec, workspace: Path, run_output_dir: Path, condition_id: str, trajectory_path: str | None, runner_output: Any) -> dict[str, Any]:
+def evaluate_agent_patch(
+    task: TaskSpec,
+    workspace: Path,
+    run_output_dir: Path,
+    condition_id: str,
+    trajectory_path: str | None,
+    runner_output: Any,
+    *,
+    evaluation_backend: str = "docker",
+) -> dict[str, Any]:
     patch_path, _, _, changed_files = capture_patch(workspace, run_output_dir)
     patch_exists = bool(patch_path.read_text(encoding="utf-8").strip())
     task_evaluation_contract = TASK33_EVALUATION_CONTRACTS.get(task.task_id)
@@ -489,7 +507,15 @@ def evaluate_agent_patch(task: TaskSpec, workspace: Path, run_output_dir: Path, 
     public = None
     if setup_ok:
         try:
-            public = _run_evaluation_command(task, task.test_command, workspace, run_output_dir, "public", 180)
+            public = _run_evaluation_command(
+                task,
+                task.test_command,
+                workspace,
+                run_output_dir,
+                "public",
+                180,
+                evaluation_backend=evaluation_backend,
+            )
         except Exception as exc:
             evaluation_errors.append(f"public:{exc.__class__.__name__}:{str(exc)[:1_000]}")
     _write_json_atomic(run_output_dir / "public_test_result.json", {
@@ -506,7 +532,15 @@ def evaluate_agent_patch(task: TaskSpec, workspace: Path, run_output_dir: Path, 
         copy_hidden_tests(task.task_id, workspace)
         hidden_command = task_evaluation_contract.semantic_test_command if task_evaluation_contract else "python -m pytest tests/hidden"
         try:
-            hidden = _run_evaluation_command(task, hidden_command, workspace, run_output_dir, "hidden", 180)
+            hidden = _run_evaluation_command(
+                task,
+                hidden_command,
+                workspace,
+                run_output_dir,
+                "hidden",
+                180,
+                evaluation_backend=evaluation_backend,
+            )
         except Exception as exc:
             evaluation_errors.append(f"hidden:{exc.__class__.__name__}:{str(exc)[:1_000]}")
     _write_json_atomic(run_output_dir / "hidden_test_result.json", {
@@ -522,7 +556,13 @@ def evaluate_agent_patch(task: TaskSpec, workspace: Path, run_output_dir: Path, 
     })
     if task.task_id in TASK23_PROTOCOL_TASKS or task_evaluation_contract is not None:
         compile_gate = (
-            _run_compile_gate(task, task_evaluation_contract, workspace, run_output_dir)
+            _run_compile_gate(
+                task,
+                task_evaluation_contract,
+                workspace,
+                run_output_dir,
+                evaluation_backend=evaluation_backend,
+            )
             if task_evaluation_contract is not None and setup_ok and contract_validation.valid and not evaluation_errors
             else {
                 "status": "not_run",
@@ -687,6 +727,13 @@ def evaluate_agent_patch(task: TaskSpec, workspace: Path, run_output_dir: Path, 
     budget = {
         "max_input_tokens": task.max_input_tokens,
         "max_output_tokens": task.max_output_tokens,
+        "measured_input_tokens": input_tokens,
+        "input_token_basis": (
+            "parent_provider_reported_input_including_cached"
+            if isinstance(input_tokens, int)
+            else None
+        ),
+        "indexing_provider_tokens_included": False,
         "configured_max_turns": task.max_turns,
         "effective_max_turns": effective_max_turns,
         "max_turns": effective_max_turns,
@@ -896,6 +943,16 @@ def evaluate_agent_patch(task: TaskSpec, workspace: Path, run_output_dir: Path, 
                 "reasoning_tokens": _optional_int(isolated_delivery.get("worker_reasoning_tokens")),
                 "total_tokens": worker_total_tokens,
             },
+            "indexing": {
+                "status": docatlas_preparation.get("status") or "not_applicable",
+                "provider_input_tokens": (
+                    _optional_int(docatlas_preparation.get("provider_input_tokens")) or 0
+                ),
+                "provider_output_tokens": (
+                    _optional_int(docatlas_preparation.get("provider_output_tokens")) or 0
+                ),
+                "included_in_parent_budget": False,
+            },
             "raw_tool_output_tokens_estimate": _first_optional_int(
                 isolated_delivery.get("raw_retrieval_tokens"),
                 bounded_direct.get("raw_retrieval_tokens"),
@@ -928,7 +985,23 @@ def _run_evaluation_command(
     run_output_dir: Path,
     phase: str,
     timeout_seconds: int,
+    *,
+    evaluation_backend: str = "docker",
 ) -> CommandResult:
+    if evaluation_backend == "host_exploratory":
+        persist_boundary(
+            run_output_dir / "evaluator_execution_boundary.json",
+            {
+                "schema_version": 1,
+                "status": "exploratory_unisolated",
+                "backend": "host",
+                "causal_claim_allowed": False,
+                "validator_eligible": False,
+            },
+        )
+        return run_command(command, workspace, timeout_seconds)
+    if evaluation_backend != "docker":
+        raise ValueError("Unknown evaluation backend: " + evaluation_backend)
     if task.task_id not in TASK23_PROTOCOL_TASKS:
         return run_command(command, workspace, timeout_seconds)
     image = os.environ.get("TASK33C_TEST_CONTAINER_IMAGE", "")
@@ -950,12 +1023,20 @@ def _run_compile_gate(
     contract: Any,
     workspace: Path,
     run_output_dir: Path,
+    *,
+    evaluation_backend: str = "docker",
 ) -> dict[str, Any]:
     gate = contract.compile_gate
     if gate.mode == "not_applicable":
         return run_compile_gate(contract, workspace)
     completed = _run_evaluation_command(
-        task, gate.command or "", workspace, run_output_dir, "compile", 120
+        task,
+        gate.command or "",
+        workspace,
+        run_output_dir,
+        "compile",
+        120,
+        evaluation_backend=evaluation_backend,
     )
     return {
         "status": "passed" if completed.passed else "failed",
@@ -1194,8 +1275,17 @@ def execute_pilot(
     retry_infrastructure_failures: bool = False,
     isolated_worker: IsolatedWorker | None = None,
     isolated_worker_timeout_seconds: int = 60,
+    evidence_tier: str = "causal",
+    evaluation_backend: str = "docker",
 ) -> list[dict[str, Any]]:
-    _assert_task33_run_preconditions(tasks, runner)
+    _assert_task33_run_preconditions(
+        tasks,
+        runner,
+        evidence_tier=evidence_tier,
+        conditions=conditions,
+        repeats=repeats,
+        evaluation_backend=evaluation_backend,
+    )
     if retry_infrastructure_failures and any(task.task_id in TASK23_PROTOCOL_TASKS for task in tasks):
         raise ValueError("Task 33 one-attempt cells cannot use infrastructure retry")
     run_dir = RESULTS_ROOT / run_id
@@ -1208,7 +1298,13 @@ def execute_pilot(
         (result.get("task_id"), result.get("condition_id"), result.get("repeat")): index
         for index, result in enumerate(results)
     }
-    runtime_root = Path(tempfile.mkdtemp(prefix=f"docatlas-task-level-{run_id}-"))
+    configured_root = configured_runtime_root()
+    runtime_root = Path(
+        tempfile.mkdtemp(
+            prefix=f"docatlas-task-level-{run_id}-",
+            dir=str(configured_root) if configured_root is not None else None,
+        )
+    )
     try:
         total_runs = len(tasks) * len(conditions) * repeats
         for task in tasks:
@@ -1307,7 +1403,12 @@ def execute_pilot(
                                 token_budget=2_000,
                             )
                             try:
-                                handoff = deliver_with_isolated_worker(
+                                delivery = (
+                                    deliver_with_exploratory_worker
+                                    if evidence_tier == "exploratory"
+                                    else deliver_with_isolated_worker
+                                )
+                                handoff = delivery(
                                     worker=isolated_worker,
                                     envelope=envelope,
                                     evidence=shared_evidence,
@@ -1359,9 +1460,10 @@ def execute_pilot(
                     elif CONDITIONS[condition_id].tool_policy.recommend_docatlas_before_edit:
                         prompt += "\nDocAtlas workflow guidance: Use DocAtlas/docmancer documentation context before making code changes when the task may depend on library APIs, exact dependency versions, or project docs. Ask a task-specific documentation question, then use or ignore the returned context based on relevance.\n"
                     if CONDITIONS[condition_id].tool_policy.require_docatlas_call_before_edit:
-                        prompt += "\nDiagnostic policy: Before your first code edit, call the available documentation-context tool once with a task-specific question. Use or ignore the returned context based on relevance.\n"
+                        prompt += "\n" + TOOL_REQUIRED_ONCE_INSTRUCTION + "\n"
                     if setup_failed:
                         result = condition_setup_failed_result(task, condition_id, run_output_dir)
+                        _mark_exploratory_result(result, run_output_dir, evidence_tier)
                         if existing_index is None:
                             result_indexes[cell] = len(results)
                             results.append(result)
@@ -1387,6 +1489,7 @@ def execute_pilot(
                         output_dir=run_output_dir,
                         test_command=task.test_command,
                         allowed_write_paths=task_contract.allowed_paths if task_contract else (),
+                        task_objective=task.issue_text,
                     )
                     try:
                         output = runner.run(request)
@@ -1400,7 +1503,16 @@ def execute_pilot(
                             model=model,
                         )
                     else:
-                        result = evaluate_agent_patch(task, workspace, run_output_dir, condition_id, output.trajectory_path, output)
+                        result = evaluate_agent_patch(
+                            task,
+                            workspace,
+                            run_output_dir,
+                            condition_id,
+                            output.trajectory_path,
+                            output,
+                            evaluation_backend=evaluation_backend,
+                        )
+                    _mark_exploratory_result(result, run_output_dir, evidence_tier)
                     if existing_index is None:
                         result_indexes[cell] = len(results)
                         results.append(result)
@@ -1413,10 +1525,37 @@ def execute_pilot(
     return results
 
 
-def _assert_task33_run_preconditions(tasks: list[TaskSpec], runner: AgentRunner) -> None:
+def _mark_exploratory_result(
+    result: dict[str, Any],
+    output_dir: Path,
+    evidence_tier: str,
+) -> None:
+    if evidence_tier != "exploratory":
+        return
+    result["execution_classification"] = "EXPLORATORY_NON_CAUSAL"
+    result["causal_eligible"] = False
+    result["hard_turn_limit_verified"] = False
+    _write_json_atomic(output_dir / "result.json", result)
+
+
+def _assert_task33_run_preconditions(
+    tasks: list[TaskSpec],
+    runner: AgentRunner,
+    *,
+    evidence_tier: str = "causal",
+    conditions: list[str] | tuple[str, ...] | None = None,
+    repeats: int | None = None,
+    evaluation_backend: str = "docker",
+) -> None:
+    if evidence_tier not in {"causal", "exploratory"}:
+        raise ValueError("Unknown Task 33 evidence tier: " + evidence_tier)
     formal_tasks = [task for task in tasks if task.task_id in TASK23_PROTOCOL_TASKS]
     if not formal_tasks:
         return
+    if evaluation_backend not in {"docker", "host_exploratory"}:
+        raise ValueError("Unknown evaluation backend: " + evaluation_backend)
+    if evaluation_backend == "host_exploratory" and evidence_tier != "exploratory":
+        raise ValueError("Task 33 host evaluator requires exploratory evidence tier")
     errors: list[str] = []
     for task in formal_tasks:
         validation = _task_contract_validation(
@@ -1427,8 +1566,21 @@ def _assert_task33_run_preconditions(tasks: list[TaskSpec], runner: AgentRunner)
         errors.extend(f"{task.task_id}:{error}" for error in validation.errors)
     if errors:
         raise ValueError("Task 33 evaluation preconditions failed: " + ",".join(errors))
-    if not bool(getattr(runner, "hard_turn_limit_enforced", False)):
-        raise ValueError("Task 33 causal execution requires a runner with a proven hard turn limit")
+    if evidence_tier == "causal":
+        if not bool(getattr(runner, "hard_turn_limit_enforced", False)):
+            raise ValueError(
+                "Task 33 causal execution requires a runner with a proven hard turn limit"
+            )
+        return
+    if (
+        [task.task_id for task in tasks] != [TASK33C_PILOT_TASK_ID]
+        or list(conditions or ()) != list(TASK33C_PILOT_CONDITIONS)
+        or repeats != 1
+        or getattr(runner, "runner_id", None) != "codex"
+    ):
+        raise ValueError(
+            "Task 33 exploratory execution requires Codex and exactly the frozen protocol cells"
+        )
 
 
 def _runner_id_from_version(version: str) -> str:
@@ -1542,16 +1694,52 @@ def prepare_docatlas(task: TaskSpec, workspace: Path, output_dir: Path, env: dic
     started = time.monotonic()
     sync_status = "not_run"
     sync_error = None
+    sync_counts = {
+        "current": 0,
+        "new": 0,
+        "changed": 0,
+        "orphaned_removed": 0,
+        "stale_removed": 0,
+        "sections_indexed": 0,
+    }
     try:
         from docmancer.docs.service import LibraryDocsService
 
         with _activated_run_environment(env):
             sync_result = LibraryDocsService().sync_project_docs(str(workspace), with_vectors=False)
             sync_status = getattr(sync_result, "status", "success")
+            sync_counts = {
+                "current": int(getattr(sync_result, "current_count", 0) or 0),
+                "new": int(getattr(sync_result, "new_count", 0) or 0),
+                "changed": int(getattr(sync_result, "changed_count", 0) or 0),
+                "orphaned_removed": int(
+                    getattr(sync_result, "orphaned_removed", 0) or 0
+                ),
+                "stale_removed": int(getattr(sync_result, "stale_removed", 0) or 0),
+                "sections_indexed": int(
+                    getattr(sync_result, "sections_indexed", 0) or 0
+                ),
+            }
     except Exception as exc:
         sync_status = "failed"
         sync_error = repr(exc)
 
+    index_changed = any(
+        sync_counts[key]
+        for key in (
+            "new",
+            "changed",
+            "orphaned_removed",
+            "stale_removed",
+            "sections_indexed",
+        )
+    )
+    if sync_status == "failed":
+        index_state = "condition_setup_failed"
+    elif sync_counts["current"] > 0 and not index_changed:
+        index_state = "already_current"
+    else:
+        index_state = "updated_local"
     diagnostics = {
         "task_id": task.task_id,
         "status": "prepared_with_local_project_docs_only" if sync_status != "failed" else "condition_setup_failed",
@@ -1559,6 +1747,11 @@ def prepare_docatlas(task: TaskSpec, workspace: Path, output_dir: Path, env: dic
         "docmancer_home": env["DOCMANCER_HOME"],
         "project_docs_sync_status": sync_status,
         "project_docs_sync_error": sync_error,
+        "index_state": index_state,
+        "with_vectors": False,
+        "provider_input_tokens": 0,
+        "provider_output_tokens": 0,
+        "sync_counts": sync_counts,
         "sources": ["fixture README/docs", "FastAPI docs preindex not fetched during unit validation"],
         "pages": 1 if sync_status != "failed" else 0,
         "chunks": 1 if sync_status != "failed" else 0,
@@ -1795,15 +1988,25 @@ def build_bounded_direct_packet(
     from docmancer.docs.application.action_packet import build_action_packet, validate_action_packet
 
     evidence.validate()
+    packet_evidence = [
+        *evidence.evidence_items,
+        build_task33c_validation_evidence(task.test_command),
+    ]
     packet = build_action_packet(
         question=task.issue_text,
-        context_pack=evidence.evidence_items,
+        context_pack=packet_evidence,
         trust_contract=evidence.trust_contract,
         max_tokens=2_000,
+        project_path=str(workspace),
         retrieval_issues=evidence.retrieval_issues,
+        required_evidence_paths=TASK33C_REQUIRED_EVIDENCE_PATHS,
+        required_target_paths=TASK33C_REQUIRED_TARGET_PATHS,
     )
     errors = validate_action_packet(
-        packet, evidence_items=evidence.evidence_items, max_tokens=2_000,
+        packet,
+        evidence_items=packet_evidence,
+        max_tokens=2_000,
+        project_path=str(workspace),
     )
     if errors:
         raise IsolatedDeliveryError("invalid_bounded_direct_packet:" + ";".join(errors))

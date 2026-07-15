@@ -6,11 +6,16 @@ from pathlib import Path
 from typing import Any
 
 
-TASK33C_PILOT_CONDITIONS = (
+TASK33C_V1_PILOT_CONDITIONS = (
     "repo_only_strict_offline",
     "docatlas_tool_recommended",
     "docatlas_bounded_direct",
     "docatlas_bounded_subagent",
+)
+TASK33C_PILOT_CONDITIONS = (
+    "repo_only_strict_offline",
+    "docatlas_tool_required_once",
+    "docatlas_bounded_direct",
 )
 TASK33C_PILOT_TASK_ID = "decisive_nbo_cross_module_gate_large_001"
 TASK33C_REQUIRED_EVIDENCE_CATEGORIES = ("project_docs", "symbols")
@@ -24,7 +29,20 @@ TASK33C_REQUIRED_TARGET_PATHS = (
     "lib/modules/scan/application/scan_permission_gate.dart",
     "lib/modules/sync/application/offline_sync_gate.dart",
 )
-TASK33C_AGENT_TURN_LIMIT = 24
+TASK33C_AGENT_TURN_LIMIT = 12
+
+
+def build_task33c_validation_evidence(test_command: str) -> dict[str, Any]:
+    return {
+        "path": "host-policy://task33c/validation",
+        "heading_path": "Public validation",
+        "authority": "canonical",
+        "repository_authority": "explicit_agent_policy",
+        "instruction_trust": "scoped_agent_policy",
+        "scope_verified": True,
+        "source_class": "project_doc",
+        "content": f"Run {test_command}",
+    }
 
 
 def build_task33c_pilot_plan(task_id: str) -> dict[str, Any]:
@@ -38,13 +56,12 @@ def build_task33c_pilot_plan(task_id: str) -> dict[str, Any]:
         "conditions": list(TASK33C_PILOT_CONDITIONS),
         "capability_flag": "isolated_worker",
         "retrieval_call_budget": 1,
-        "isolated_worker_attempt_budget": 1,
+        "isolated_worker_attempt_budget": 0,
         "agent_turn_limit": TASK33C_AGENT_TURN_LIMIT,
         "packet_token_budget": 2_000,
         "packet_hard_ceiling": 2_000,
         "comparison_estimand": "delivery_bundle_not_isolation_only",
         "bounded_direct_selection": "deterministic_formatter_over_full_host_snapshot",
-        "bounded_subagent_selection": "fresh_hosted_selector_then_same_deterministic_formatter",
         "required_evidence_categories": list(TASK33C_REQUIRED_EVIDENCE_CATEGORIES),
         "required_evidence_paths": list(TASK33C_REQUIRED_EVIDENCE_PATHS),
         "required_target_paths": list(TASK33C_REQUIRED_TARGET_PATHS),
@@ -53,9 +70,6 @@ def build_task33c_pilot_plan(task_id: str) -> dict[str, Any]:
             "parent_output_tokens",
             "parent_cached_input_tokens",
             "parent_uncached_input_tokens",
-            "worker_input_tokens",
-            "worker_output_tokens",
-            "worker_reasoning_tokens",
             "raw_retrieval_tokens",
             "serialized_packet_tokens",
             "retrieval_calls",

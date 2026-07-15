@@ -96,6 +96,7 @@ def test_bounded_direct_is_one_existing_tool_call_and_returns_only_action_packet
     )
     assert combined_tokens <= 1_500
 
+
     packet_without_strategy = handle_context_tool("get_docs_context", {
         "question": "Bound this", "project_path": "/repo", "packet_tokens": 500,
     }, UnifiedDocsContextService(backend))
@@ -646,3 +647,67 @@ def test_action_packet_truncates_whole_items_and_fails_closed_without_evidence()
     assert prose_only["required_invariants"] == []
     assert prose_only["forbidden_changes"] == []
     assert not any(prose_only["validation"].values())
+
+
+def test_required_evidence_and_targets_survive_packet_budget():
+    required_doc = {
+        "path": "docs/permission-architecture.md",
+        "heading_path": "Contract",
+        "authority": "canonical",
+        "instruction_trust": "scoped_agent_policy",
+        "source_class": "project_doc",
+        "content": (
+            "PermissionService must own immediate-entry interpretation.\n"
+            "Generated files must not be edited."
+        ),
+    }
+    workflow_policy = {
+        "path": "AGENTS.md",
+        "heading_path": "Validation",
+        "authority": "canonical",
+        "repository_authority": "explicit_agent_policy",
+        "instruction_trust": "scoped_agent_policy",
+        "scope_verified": True,
+        "source_class": "project_doc",
+        "content": (
+            "Run uv run --offline pytest tests/test_permission_gate.py.\n"
+            "Run ruff check lib."
+        ),
+    }
+    target = {
+        "path": "lib/permission_service.dart",
+        "heading_path": "PermissionService",
+        "authority": "canonical",
+        "instruction_trust": "scoped_agent_policy",
+        "source_class": "code_graph",
+        "symbols": ["PermissionService.evaluateFlowEntry"],
+        "content": "PermissionService must return block for missing immediate permission.",
+    }
+    noise = [{
+        "path": f"docs/noise-{index}.md",
+        "heading_path": "Noise",
+        "authority": "supporting",
+        "instruction_trust": "untrusted_data",
+        "source_class": "project_doc",
+        "content": "Supporting explanation. " * 80,
+        "snippet": "More supporting explanation. " * 80,
+    } for index in range(8)]
+
+    packet = build_action_packet(
+        question="Fix the shared permission gate.",
+        context_pack=[*noise, required_doc, target, workflow_policy],
+        max_tokens=1_200,
+        project_path="/repo",
+        required_evidence_paths=("docs/permission-architecture.md",),
+        required_target_paths=("lib/permission_service.dart",),
+    )
+
+    assert packet["estimated_tokens"] <= 1_200
+    assert "docs/permission-architecture.md" in {row["path"] for row in packet["source_of_truth"]}
+    assert "lib/permission_service.dart" in {
+        row["path"] for row in packet["target_surface"]["likely_files"]
+    }
+    assert packet["required_invariants"]
+    assert packet["forbidden_changes"]
+    assert packet["validation"]["tests"]
+    assert packet["validation"]["semantic_checks"]

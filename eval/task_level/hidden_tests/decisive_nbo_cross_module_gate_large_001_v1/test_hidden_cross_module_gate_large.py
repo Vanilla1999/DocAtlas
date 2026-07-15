@@ -19,23 +19,6 @@ def _text(path: Path) -> str:
     return path.read_text(encoding="utf-8")
 
 
-def _delegates_and_requires_allow(source: str) -> bool:
-    direct = re.search(
-        r"\breturn\s+(?:\w+\.)?evaluateFlowEntry\s*"
-        r"\(\s*result\s*\)\s*==\s*PermissionDecision\.allow\s*;",
-        source,
-        re.DOTALL,
-    )
-    assigned = re.search(
-        r"final\s+(\w+)\s*=\s*(?:\w+\.)?evaluateFlowEntry\s*"
-        r"\(\s*result\s*\)\s*;.*?return\s+\1\s*==\s*"
-        r"PermissionDecision\.allow\s*;",
-        source,
-        re.DOTALL,
-    )
-    return direct is not None or assigned is not None
-
-
 def _changed_files() -> list[str]:
     result = subprocess.run(["git", "diff", "--name-only"], cwd=ROOT, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False)
     assert result.returncode == 0, result.stderr
@@ -73,7 +56,7 @@ def test_browser_scan_and_sync_delegate_to_shared_entry_contract():
     sync = _method_body(SYNC, "canAcceptQueuedWork")
 
     assert "evaluateFlowEntry" in browser and "== PermissionDecision.allow" in browser
-    assert _delegates_and_requires_allow(scan)
+    assert "evaluateFlowEntry(result) == PermissionDecision.allow" in scan
     assert "evaluateFlowEntry" in sync and "allowOfflineFallback: false" in sync and "== PermissionDecision.allow" in sync
 
 

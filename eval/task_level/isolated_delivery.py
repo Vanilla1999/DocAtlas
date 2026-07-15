@@ -8,7 +8,6 @@ import os
 import resource
 import re
 import selectors
-import shutil
 import signal
 import subprocess
 import tempfile
@@ -390,12 +389,23 @@ class IsolatedWorkerOutput:
 
 
 class IsolatedWorker(Protocol):
-    capabilities: IsolatedWorkerCapabilities
-    compressor_identity: str
-    command_fingerprint: str
-    sandbox_identity: str
-    capability_evidence: dict[str, Any]
-    usage_verifier_identity: str
+    @property
+    def capabilities(self) -> IsolatedWorkerCapabilities: ...
+
+    @property
+    def compressor_identity(self) -> str: ...
+
+    @property
+    def command_fingerprint(self) -> str: ...
+
+    @property
+    def sandbox_identity(self) -> str: ...
+
+    @property
+    def capability_evidence(self) -> dict[str, Any]: ...
+
+    @property
+    def usage_verifier_identity(self) -> str: ...
 
     def run(
         self,
@@ -689,20 +699,69 @@ def deliver_with_isolated_worker(
     output_dir: Path,
     timeout_seconds: int,
 ) -> dict[str, Any]:
-    """Validate one isolated compression handoff against host-owned evidence."""
+    """Validate one causal isolated compression handoff."""
 
+    return _deliver_with_worker(
+        worker=worker,
+        envelope=envelope,
+        evidence=evidence,
+        output_dir=output_dir,
+        timeout_seconds=timeout_seconds,
+        evidence_tier="causal",
+    )
+
+
+def deliver_with_exploratory_worker(
+    *,
+    worker: IsolatedWorker,
+    envelope: DelegationEnvelope,
+    evidence: HostEvidenceSnapshot,
+    output_dir: Path,
+    timeout_seconds: int,
+) -> dict[str, Any]:
+    """Validate an explicitly non-causal exploratory compression handoff."""
+
+    return _deliver_with_worker(
+        worker=worker,
+        envelope=envelope,
+        evidence=evidence,
+        output_dir=output_dir,
+        timeout_seconds=timeout_seconds,
+        evidence_tier="exploratory",
+    )
+
+
+def _deliver_with_worker(
+    *,
+    worker: IsolatedWorker,
+    envelope: DelegationEnvelope,
+    evidence: HostEvidenceSnapshot,
+    output_dir: Path,
+    timeout_seconds: int,
+    evidence_tier: str,
+) -> dict[str, Any]:
     envelope.validate()
     evidence.validate(envelope)
     if timeout_seconds < 1:
         raise IsolatedDeliveryError("invalid_worker_timeout")
+    if evidence_tier not in {"causal", "exploratory"}:
+        raise IsolatedDeliveryError("invalid_isolated_delivery_evidence_tier")
     capabilities = worker.capabilities
-    if not isinstance(capabilities, IsolatedWorkerCapabilities) or not capabilities.verified:
+    if not isinstance(capabilities, IsolatedWorkerCapabilities):
+        raise IsolatedDeliveryError("isolated_worker_capability_unverified")
+    if evidence_tier == "causal" and not capabilities.verified:
         raise IsolatedDeliveryError("isolated_worker_capability_unverified")
     compressor_identity = str(worker.compressor_identity).strip()
     if not compressor_identity:
         raise IsolatedDeliveryError("missing_compressor_identity")
     capability_evidence = getattr(worker, "capability_evidence", None)
-    if not isinstance(capability_evidence, dict) or capability_evidence.get("status") != "verified":
+    expected_capability_status = (
+        "verified" if evidence_tier == "causal" else "exploratory_unverified"
+    )
+    if (
+        not isinstance(capability_evidence, dict)
+        or capability_evidence.get("status") != expected_capability_status
+    ):
         raise IsolatedDeliveryError("isolated_worker_capability_evidence_unverified")
     try:
         capability_evidence = copy.deepcopy(capability_evidence)
@@ -818,6 +877,11 @@ def deliver_with_isolated_worker(
     metrics = {
         "schema_version": 2,
         "strategy": "bounded_subagent",
+        "evidence_tier": evidence_tier,
+        "causal_claim_allowed": evidence_tier == "causal",
+        "server_request_id_verified": bool(
+            (usage.proof or {}).get("server_request_id_verified", evidence_tier == "causal")
+        ),
         "status": packet_payload["status"],
         "attempts": 1,
         "retrieval_calls": evidence.retrieval_calls,

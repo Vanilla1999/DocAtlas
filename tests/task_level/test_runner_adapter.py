@@ -7,7 +7,9 @@ from pathlib import Path
 
 import pytest
 
+from docmancer.docs.application.action_packet import build_action_packet
 from eval.task_level.execution import capture_patch, run_canary
+from eval.task_level.evaluators.policy import audit_trajectory
 from eval.task_level.runners.base import AgentRunOutput, AgentRunRequest
 from eval.task_level.runners.claude import ClaudeRunner
 from eval.task_level.runners.codex import _is_provider_failure, _normalize_jsonl, _redact, _token_usage_summary
@@ -170,6 +172,95 @@ def test_codex_normalizes_measurable_tool_output():
     }
 
 
+def test_codex_counts_started_and_completed_events_as_one_tool_call(tmp_path: Path):
+    item = {
+        "id": "item-1",
+        "type": "mcp_tool_call",
+        "server": "docmancer-docs",
+        "tool": "get_docs_context",
+        "arguments": {"question": "architecture"},
+    }
+    raw = "\n".join([
+        json.dumps({"type": "item.started", "item": item}),
+        json.dumps({
+            "type": "item.completed",
+            "item": {
+                **item,
+                "result": {"content": [{"type": "text", "text": "PermissionService owns the gate"}]},
+            },
+        }),
+    ])
+
+    events, tool_calls, _input, _output = _normalize_jsonl(raw)
+    trajectory = tmp_path / "trajectory.normalized.json"
+    trajectory.write_text(json.dumps(events), encoding="utf-8")
+    audit = audit_trajectory("docatlas_tool_required_once", trajectory)
+
+    assert len(events) == 1
+    assert len(tool_calls) == 1
+    assert events == tool_calls
+    assert events[0]["sequence"] == 1
+    assert tool_calls[0]["source_event_type"] == "item.completed"
+    assert tool_calls[0]["result_chars"] > 0
+    assert audit.get_docs_context_calls == 1
+    assert "required_get_docs_context_call_count:2" not in audit.violations
+
+
+def test_codex_normalizes_successful_required_once_retrieval_metadata(tmp_path: Path):
+    objective = "Preserve the permission gate contract."
+    packet = build_action_packet(
+        question=objective,
+        context_pack=[{
+            "doc_scope": "project",
+            "source_class": "project_doc",
+            "path": "AGENTS.md",
+            "heading_path": "Permission gate",
+            "authority": "canonical",
+            "content": "Must preserve the permission gate contract.",
+        }],
+        max_tokens=2_000,
+    )
+    item = {
+        "id": "item-1",
+        "type": "mcp_tool_call",
+        "server": "docmancer-docs",
+        "tool": "get_docs_context",
+        "arguments": {
+            "question": objective,
+            "delivery_strategy": "bounded_direct",
+        },
+    }
+    raw = "\n".join([
+        json.dumps({"type": "item.started", "item": item}),
+        json.dumps({
+            "type": "item.completed",
+            "item": {
+                **item,
+                "result": {
+                    "structured_content": {
+                        "delivery_strategy": "bounded_direct",
+                        "action_packet": packet,
+                    },
+                },
+            },
+        }),
+    ])
+
+    events, _tool_calls, _input, _output = _normalize_jsonl(
+        raw,
+        task_objective=objective,
+    )
+    trajectory = tmp_path / "trajectory.normalized.json"
+    trajectory.write_text(json.dumps(events), encoding="utf-8")
+    audit = audit_trajectory("docatlas_tool_required_once", trajectory)
+
+    assert audit.clean
+    assert events[0]["arguments"]["question_matches_task_objective"] is True
+    assert events[0]["arguments"]["retrieval_succeeded"] is True
+    assert events[0]["arguments"]["delivery_strategy"] == "bounded_direct"
+    assert events[0]["arguments"]["action_packet_status"] == packet["status"]
+
+
 def test_codex_runner_uses_workspace_write_sandbox(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
     captured: list[list[str]] = []
 
@@ -226,6 +317,122 @@ def test_codex_runner_allows_explicit_sandbox_override(tmp_path: Path, monkeypat
 
     command = next(command for command in captured if "exec" in command)
     assert command[command.index("--sandbox") + 1] == "danger-full-access"
+
+
+def test_codex_runner_can_use_allowlisted_process_environment(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    source_home = tmp_path / "source-codex-home"
+    source_home.mkdir()
+    (source_home / "auth.json").write_text('{"tokens": {}}')
+    monkeypatch.setenv("CODEX_HOME", str(source_home))
+    monkeypatch.setenv("UNRELATED_SECRET", "must-not-be-forwarded")
+    captured: dict[str, object] = {}
+
+    def fake_run(command, **kwargs):
+        if "exec" in command:
+            captured["env"] = kwargs.get("env")
+        return subprocess.CompletedProcess(
+            command, 0,
+            '{"type":"turn.completed","usage":{"input_tokens":1,"output_tokens":1}}\n',
+            "",
+        )
+
+    monkeypatch.setattr(subprocess, "run", fake_run)
+    request = AgentRunRequest(
+        task_id="task",
+        condition_id="repo_only_strict_offline",
+        prompt="inspect",
+        workspace=tmp_path,
+        model="model",
+        timeout_seconds=30,
+        max_turns=1,
+        environment={},
+        mcp_config_path=None,
+        tool_policy_path=tmp_path / "policy.json",
+        output_dir=tmp_path / "out",
+    )
+
+    from eval.task_level.runners.codex import CodexRunner
+    CodexRunner("codex", inherit_environment=False).run(request)
+
+    assert "UNRELATED_SECRET" not in captured["env"]
+
+
+def test_codex_runner_removes_copied_oauth_material_from_artifacts(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    source_home = tmp_path / "source-codex-home"
+    source_home.mkdir()
+    (source_home / "auth.json").write_text('{"secret":"oauth-material"}')
+    monkeypatch.setenv("CODEX_HOME", str(source_home))
+    monkeypatch.setattr(
+        subprocess,
+        "run",
+        lambda command, **kwargs: subprocess.CompletedProcess(
+            command, 0, '{"type":"turn.completed","usage":{"input_tokens":1,"output_tokens":1}}\n', ""
+        ),
+    )
+    request = AgentRunRequest(
+        task_id="task",
+        condition_id="repo_only_strict_offline",
+        prompt="inspect",
+        workspace=tmp_path,
+        model="model",
+        timeout_seconds=30,
+        max_turns=1,
+        environment={},
+        mcp_config_path=None,
+        tool_policy_path=tmp_path / "policy.json",
+        output_dir=tmp_path / "out",
+    )
+
+    from eval.task_level.runners.codex import CodexRunner
+    CodexRunner("codex", sandbox_mode="danger-full-access").run(request)
+
+    assert not (request.output_dir / "env" / "codex_home" / "auth.json").exists()
+    assert "oauth-material" not in "".join(
+        path.read_text(errors="replace")
+        for path in request.output_dir.rglob("*")
+        if path.is_file()
+    )
+
+
+def test_codex_runner_removes_copied_oauth_when_setup_fails(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    source_home = tmp_path / "source-codex-home"
+    source_home.mkdir()
+    (source_home / "auth.json").write_text('{"secret":"oauth-material"}')
+    monkeypatch.setenv("CODEX_HOME", str(source_home))
+    request = AgentRunRequest(
+        task_id="task",
+        condition_id="repo_only_strict_offline",
+        prompt="inspect",
+        workspace=tmp_path,
+        model="model",
+        timeout_seconds=30,
+        max_turns=1,
+        environment={},
+        mcp_config_path=None,
+        tool_policy_path=tmp_path / "policy.json",
+        output_dir=tmp_path / "out",
+    )
+
+    import eval.task_level.runners.codex as codex_module
+    monkeypatch.setattr(
+        codex_module,
+        "_prepare_blocked_network_tools",
+        lambda request: (_ for _ in ()).throw(RuntimeError("setup failed")),
+    )
+
+    with pytest.raises(RuntimeError, match="setup failed"):
+        codex_module.CodexRunner("codex").run(request)
+
+    assert not (request.output_dir / "env" / "codex_home" / "auth.json").exists()
 
 
 def test_codex_redaction_preserves_json_literals_from_short_env_values(monkeypatch: pytest.MonkeyPatch):

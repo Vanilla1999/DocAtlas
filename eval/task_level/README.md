@@ -32,7 +32,7 @@ Example smoke command:
 python3 -m eval.task_level.runner --validate --smoke --repeats 1
 ```
 
-Task 33C dry-run protocol (exactly one task, four lanes, one repeat):
+Task 33C dry-run protocol (exactly one task, three cells, one repeat):
 
 ```bash
 python3 -m eval.task_level.runner \
@@ -41,7 +41,7 @@ python3 -m eval.task_level.runner \
   --run-id task33c_dry_run
 ```
 
-For a causal isolated lane, provide `--runner-factory module.path:factory` for a runner that proves the hard turn limit and `--isolated-worker-factory module.path:factory` for a host-owned worker adapter. The adapter must expose verified capability evidence and provider-usage proof. The harness derives a frozen project-doc query from repeated domain terms in the task objective (without evaluator/gold fields), freezes one host retrieval for both bounded lanes, checks its objective/query derivation, project/index revisions, and evidence hash, and validates the returned packet only against that snapshot.
+For a causal run, provide `--runner-factory module.path:factory` for a runner that proves the hard turn limit. The harness derives a frozen project-doc query from repeated domain terms in the task objective (without evaluator/gold fields), freezes one host retrieval for the bounded-direct cell, checks its objective/query derivation, project/index revisions, and evidence hash, and validates the returned packet only against that snapshot. The required-once cell exposes exactly one agent-callable `get_docs_context` action before editing and requires a valid bounded-direct ActionPacket for the original task objective.
 
 The bundled JSON subprocess adapter is a non-causal protocol scaffold unless a host-side provider-usage verifier is injected. Its worker runs under bubblewrap with user, mount, network, and PID namespaces; an executable canary must prove that the working directory is read-only, the workspace is absent, networking is denied, and a detached descendant cannot outlive the worker. Missing or failed canaries, missing provider proof, `insufficient_evidence`, a second attempt, or incomplete pilot metrics produce a fail-closed/`INCONCLUSIVE` result. Merely supplying a flag or finding a `bwrap` executable is not verification.
 
@@ -52,14 +52,13 @@ python -m eval.task_level.runner \
   --task33c-pilot \
   --tasks decisive_nbo_cross_module_gate_large_001 \
   --runner-factory eval.task_level.github_models:create_github_models_runner \
-  --isolated-worker-factory eval.task_level.github_models:create_github_models_worker \
   --verify-runner --verify-docatlas-tool \
   --model openai/gpt-4o-mini
 ```
 
-The parent adapter exposes a hard-turn-controlled repository tool allowlist. The isolated worker is a one-shot, tool-less hosted inference request over immutable host-owned evidence: it selects evidence, while the host constructs and validates the ActionPacket and binds token usage to provider request IDs. It has no local process, repository mount, general network tool, or recursive delegation surface.
+The parent adapter exposes a hard-turn-controlled repository tool allowlist. The bounded-direct ActionPacket is constructed and validated deterministically by the host from immutable host-owned evidence; no isolated worker or worker prompt is used by the v2 causal protocol.
 
-The engineering pilot freezes a 24-turn limit per parent cell and uses the low-rate-tier `openai/gpt-4o-mini` adapter so a worst-case four-lane run remains below the free API's daily request budget. A turn-limit exhaustion or provider 429 is infrastructure-incomplete, never a completed causal cell.
+The engineering pilot freezes a 12-turn limit per parent cell and uses the low-rate-tier `openai/gpt-4o-mini` adapter so a worst-case three-cell run remains below the free API's daily request budget. A turn-limit exhaustion or provider 429 is infrastructure-incomplete, never a completed causal cell.
 
 The machine-readable protocol is `task33c_protocol.lock.json`. Do not edit the task, query, model, conditions, budgets, fixture/oracle/hidden-test identities, or decision thresholds after the first causal dispatch. `task33c_completeness.json` is diagnostic only; the authoritative gate is the independent `task33c_validation.json` produced by:
 
@@ -83,4 +82,18 @@ This builds the digest-pinned evaluator image, prewarms the frozen fixture depen
 python -m eval.task_level.task33_local --run-causal-pilot
 ```
 
-The local result is acceptable only when `task33c_validation.json` reports `VALID`. GitHub Models and direct OpenAI API are separate frozen provider profiles; a single run must use exactly one profile for all four cells, and their results must not be pooled as if they used the same provider.
+The local result is acceptable only when `task33c_validation.json` reports `VALID`. GitHub Models and direct OpenAI API are separate frozen provider profiles; a single run must use exactly one profile for all three cells, and their results must not be pooled as if they used the same provider.
+
+For directional local iteration without an API key, an explicitly non-causal Codex OAuth path is also available. It does not modify the frozen provider profiles and can never produce `task33c_validation.json` or a `VALID` verdict. Run its preflight first:
+
+```bash
+python3 -m eval.task_level.task33_codex_exploratory
+```
+
+After `preflight-summary.json` reports `READY_FOR_EXPLORATORY_RUN`, run the three one-attempt cells:
+
+```bash
+python3 -m eval.task_level.task33_codex_exploratory --run-exploratory-pilot
+```
+
+Artifacts are written under `eval/task_level/results/task33c_codex_exploratory_<timestamp>[_preflight]/`. `task33c_exploratory_summary.json` records correctness, directional token counts, and latency per lane. Time-to-first-edit remains `null` because current Codex JSONL normalization is not stream-timed. Codex CLI thread IDs are labeled as client identifiers, not server request IDs. The selector runs read-only in an empty temporary workspace; parent coding runs with `workspace-write`; both receive allowlisted environments, and copied OAuth material is deleted after each invocation. Codex CLI still lacks frozen hard-turn and server-usage proof, so this path must not be used for causal or release claims. If either the Docker or Codex namespace sandbox cannot start, preflight fails closed; it never falls back to `danger-full-access`.

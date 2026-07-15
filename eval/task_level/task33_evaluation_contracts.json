@@ -18,7 +18,7 @@
         "protocol_fixture_sha256": "603712341cdeffb1332492ccbebeb04b022ddf665b1b305c9827765c69a629df",
         "oracle_sha256": "7bef2b9e21966f10c12d7ac9d742e61f2b45395b1a8874b98e6f999adcf683a2",
         "hidden_tests_hash_algorithm": "sha256-length-prefixed-v2",
-        "hidden_tests_sha256": "012438802bdde4c5d1749f2729a212feffadfaad333a9c8bfe7c85ae9f80290e",
+        "hidden_tests_sha256": "490a887a3115717f9ba1b03f607a6ab10c7449a5e963298d99b4c27c89fd9006",
         "external_context_sha256": "7372ccee933b47ec72a614966b03a62faf0298a9293733ae46e869183c69fcc0"
       },
       "allowed_paths": [

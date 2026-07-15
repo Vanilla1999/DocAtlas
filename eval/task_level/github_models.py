@@ -17,8 +17,12 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterator
 
-from docmancer.docs.application.action_packet import build_action_packet
+from docmancer.docs.application.action_packet import (
+    build_action_packet,
+    validate_action_packet,
+)
 
+from .conditions import TOOL_REQUIRED_ONCE_INSTRUCTION
 from .isolated_delivery import (
     DelegationEnvelope,
     HostEvidenceSnapshot,
@@ -35,16 +39,16 @@ GITHUB_MODELS_ENDPOINT = "https://models.github.ai/inference/chat/completions"
 DEFAULT_GITHUB_MODEL = "openai/gpt-4o-mini"
 OPENAI_API_ENDPOINT = "https://api.openai.com/v1/chat/completions"
 DEFAULT_OPENAI_MODEL = "gpt-4o-mini-2024-07-18"
-_RUNNER_VERSION = "github-models-controlled-agent-v3-bounded-context"
-_RUNNER_PROMPT_REVISION = "github-models-controlled-agent-v3-bounded-context"
+_RUNNER_VERSION = "github-models-controlled-agent-v4-required-once"
+_RUNNER_PROMPT_REVISION = "github-models-controlled-agent-v4-required-once"
 _WORKER_PROMPT_REVISION = "task33c-evidence-selector-v2-full-snapshot"
 _PROVIDER_INPUT_TOKEN_LIMIT = 7_000
-_TASK33C_MAX_RUNNER_REQUESTS = 24
+_TASK33C_MAX_RUNNER_REQUESTS = 12
 _MIN_REQUEST_INTERVAL_SECONDS = 6.2
 _REQUEST_RATE_LOCK = threading.Lock()
 _LAST_REQUEST_AT = 0.0
 _PROCESS_REQUEST_COUNT = 0
-_PROCESS_REQUEST_BUDGET = 113
+_PROCESS_REQUEST_BUDGET = 53
 
 
 @dataclass(frozen=True)
@@ -547,6 +551,7 @@ class GitHubModelsRunner:
         last_test_result: str | None = None
         rejected_actions: dict[str, int] = {}
         compaction_rows: list[dict[str, Any]] = []
+        required_once_retrieval_succeeded = False
 
         for turn in range(1, request.max_turns + 1):
             remaining = deadline - time.monotonic()
@@ -614,6 +619,16 @@ class GitHubModelsRunner:
                     f"fingerprint={action_fingerprint}"
                 )
                 terminate_repetition = rejected_actions[action_fingerprint] >= 3
+            elif (
+                tool == "replace_text"
+                and request.condition_id == "docatlas_tool_required_once"
+                and not required_once_retrieval_succeeded
+            ):
+                result = (
+                    "ERROR: successful bounded_direct get_docs_context retrieval with the "
+                    "original task objective is required before replace_text"
+                )
+                rejected_actions[action_fingerprint] = 1
             else:
                 result = _execute_agent_tool(
                     request, action, read_paths=read_paths,
@@ -621,6 +636,12 @@ class GitHubModelsRunner:
                 )
                 if result.startswith(("ERROR:", "NO_CHANGE_ALREADY_APPLIED")):
                     rejected_actions[action_fingerprint] = 1
+            if tool == "get_docs_context" and request.condition_id == "docatlas_tool_required_once":
+                required_once_retrieval_succeeded = bool(
+                    _required_once_retrieval_metadata(request, action, result)[
+                        "retrieval_succeeded"
+                    ]
+                )
             event = _event(
                 len(events) + 1,
                 "tool_call",
@@ -904,21 +925,30 @@ def _execute_agent_tool(
             query = action.get("query")
             if not isinstance(query, str) or not query.strip() or len(query) > 1_000:
                 return "ERROR: invalid documentation query"
+            from docmancer.docs.interfaces.mcp.context_tools import handle_context_tool
             from docmancer.docs.service import LibraryDocsService
 
             with _activated_environment(request.environment):
-                result = LibraryDocsService().get_docs_context(
-                    query,
-                    project_path=str(request.workspace),
-                    ecosystem=None,
-                    mode="project",
-                    response_style="snippet-first",
-                    allow_network=False,
-                    allow_latest_fallback=False,
-                    tokens=2_500,
-                    limit=6,
+                result = handle_context_tool(
+                    "get_docs_context",
+                    {
+                        "question": query,
+                        "project_path": str(request.workspace),
+                        "delivery_strategy": "bounded_direct",
+                        "packet_tokens": 2_000,
+                        "mode": "project",
+                        "response_style": "snippet-first",
+                        "prepare_project_docs": False,
+                        "allow_network": False,
+                        "allow_latest_fallback": False,
+                        "tokens": 2_500,
+                        "limit": 6,
+                    },
+                    LibraryDocsService(),
                 )
-            return json.dumps(_jsonable(result), ensure_ascii=False, sort_keys=True)[:6_000]
+            if result is None:
+                return "ERROR: bounded documentation retrieval was not handled"
+            return json.dumps(_jsonable(result), ensure_ascii=False, sort_keys=True)
         return "ERROR: unavailable action"
     except (OSError, ValueError, subprocess.SubprocessError) as exc:
         return f"ERROR: {exc.__class__.__name__}: {str(exc)[:1_000]}"
@@ -988,7 +1018,17 @@ def _trajectory_arguments(
 ) -> dict[str, Any]:
     arguments = {key: value for key, value in action.items() if key != "summary" and value is not None}
     if action.get("tool") == "get_docs_context":
-        arguments.update({"server": "docmancer-docs", "tool": "get_docs_context"})
+        arguments["question"] = arguments.pop("query", None)
+        arguments.update({
+            "server": "docmancer-docs",
+            "tool": "get_docs_context",
+            "project_path": ".",
+            "delivery_strategy": "bounded_direct",
+        })
+        if request is not None and result is not None:
+            arguments.update(
+                _required_once_retrieval_metadata(request, action, result)
+            )
     if action.get("tool") == "run_tests":
         command = _test_command(request) if request is not None else []
         arguments["command"] = shlex.join(command) if command else None
@@ -1012,6 +1052,51 @@ def _docatlas_allowed(condition_id: str) -> bool:
         "docatlas_tool_recommended",
         "docatlas_tool_required_once",
         "docatlas_tool_visibility_canary",
+    }
+
+
+def _required_once_objective(request: AgentRunRequest) -> str:
+    if request.task_objective is not None:
+        return request.task_objective.strip()
+    return request.prompt.split(TOOL_REQUIRED_ONCE_INSTRUCTION, 1)[0].strip()
+
+
+def _required_once_retrieval_metadata(
+    request: AgentRunRequest,
+    action: dict[str, Any],
+    result: str,
+) -> dict[str, Any]:
+    query = action.get("query")
+    question_matches = (
+        isinstance(query, str)
+        and query.strip() == _required_once_objective(request)
+    )
+    payload: dict[str, Any] = {}
+    if not result.startswith("ERROR:"):
+        try:
+            loaded = json.loads(result)
+        except (json.JSONDecodeError, TypeError):
+            loaded = {}
+        if isinstance(loaded, dict):
+            payload = loaded
+    delivery_strategy = payload.get("delivery_strategy")
+    packet = payload.get("action_packet")
+    packet_status = packet.get("status") if isinstance(packet, dict) else None
+    packet_errors = (
+        validate_action_packet(packet, max_tokens=2_000)
+        if isinstance(packet, dict)
+        else ["ActionPacket missing"]
+    )
+    succeeded = (
+        question_matches
+        and delivery_strategy == "bounded_direct"
+        and packet_status in {"ok", "truncated"}
+        and not packet_errors
+    )
+    return {
+        "question_matches_task_objective": question_matches,
+        "retrieval_succeeded": succeeded,
+        "action_packet_status": packet_status,
     }
 
 

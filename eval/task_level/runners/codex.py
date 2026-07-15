@@ -13,15 +13,32 @@ from typing import Any
 from .base import AgentRunOutput, AgentRunRequest, RunnerCapabilities
 
 
+_SAFE_PROCESS_ENV = (
+    "LANG",
+    "LC_ALL",
+    "PATH",
+    "SSL_CERT_DIR",
+    "SSL_CERT_FILE",
+    "TERM",
+)
+
+
 class CodexRunner:
     runner_id = "codex"
     hard_turn_limit_enforced = False
 
-    def __init__(self, executable: str = "codex", *, sandbox_mode: str = "workspace-write") -> None:
+    def __init__(
+        self,
+        executable: str = "codex",
+        *,
+        sandbox_mode: str = "workspace-write",
+        inherit_environment: bool = True,
+    ) -> None:
         if sandbox_mode not in {"workspace-write", "danger-full-access"}:
             raise ValueError(f"Unsupported Codex sandbox mode: {sandbox_mode}")
         self.executable = executable
         self.sandbox_mode = sandbox_mode
+        self.inherit_environment = inherit_environment
 
     def _version(self) -> str:
         if not shutil.which(self.executable):
@@ -63,30 +80,40 @@ class CodexRunner:
         started_at = datetime.now(timezone.utc).isoformat()
         started = time.monotonic()
 
-        env = os.environ.copy()
+        env = (
+            os.environ.copy()
+            if self.inherit_environment
+            else {
+                key: value
+                for key in _SAFE_PROCESS_ENV
+                if (value := os.environ.get(key)) is not None
+            }
+        )
         env.update(request.environment)
-        env["CODEX_HOME"] = str(_prepare_codex_home(request))
-        env["PATH"] = f"{_prepare_blocked_network_tools(request)}{os.pathsep}{env.get('PATH', '')}"
-
-        command = [
-            self.executable,
-            "exec",
-            "--json",
-            "--ephemeral",
-            "--model",
-            request.model,
-            "--sandbox",
-            self.sandbox_mode,
-            "--cd",
-            str(request.workspace),
-            request.prompt,
-        ]
-
+        codex_home = _prepare_codex_home(request)
         notes: list[str] = []
         exit_code: int | None = None
         stdout = ""
         stderr = ""
         try:
+            env["CODEX_HOME"] = str(codex_home)
+            env["PATH"] = (
+                f"{_prepare_blocked_network_tools(request)}"
+                f"{os.pathsep}{env.get('PATH', '')}"
+            )
+            command = [
+                self.executable,
+                "exec",
+                "--json",
+                "--ephemeral",
+                "--model",
+                request.model,
+                "--sandbox",
+                self.sandbox_mode,
+                "--cd",
+                str(request.workspace),
+                request.prompt,
+            ]
             completed = subprocess.run(
                 command,
                 cwd=request.workspace,
@@ -106,6 +133,8 @@ class CodexRunner:
             stderr = exc.stderr if isinstance(exc.stderr, str) else ""
             status = "timeout"
             notes.append(f"Timed out after {request.timeout_seconds}s")
+        finally:
+            (codex_home / "auth.json").unlink(missing_ok=True)
 
         finished_at = datetime.now(timezone.utc).isoformat()
         wall = round(time.monotonic() - started, 4)
@@ -114,7 +143,10 @@ class CodexRunner:
         stdout_path.write_text(sanitized_stdout, encoding="utf-8")
         stderr_path.write_text(sanitized_stderr, encoding="utf-8")
         events_path.write_text(sanitized_stdout, encoding="utf-8")
-        normalized, tool_calls, input_tokens, output_tokens = _normalize_jsonl(sanitized_stdout)
+        normalized, tool_calls, input_tokens, output_tokens = _normalize_jsonl(
+            sanitized_stdout,
+            task_objective=request.task_objective,
+        )
         token_usage = _token_usage_summary(normalized)
         normalized_path.write_text(json.dumps(normalized, indent=2, sort_keys=True), encoding="utf-8")
         (request.output_dir / "sanitization_report.json").write_text(
@@ -183,11 +215,16 @@ def _prepare_codex_home(request: AgentRunRequest) -> Path:
     codex_home.mkdir(parents=True, exist_ok=True)
     source_home = Path(os.environ.get("CODEX_HOME", str(Path.home() / ".codex")))
     auth = source_home / "auth.json"
-    if auth.exists():
-        shutil.copy2(auth, codex_home / "auth.json")
-    config = _codex_config(request)
-    (codex_home / "config.toml").write_text(config, encoding="utf-8")
-    return codex_home
+    copied_auth = codex_home / "auth.json"
+    try:
+        if auth.exists():
+            shutil.copy2(auth, copied_auth)
+        config = _codex_config(request)
+        (codex_home / "config.toml").write_text(config, encoding="utf-8")
+        return codex_home
+    except Exception:
+        copied_auth.unlink(missing_ok=True)
+        raise
 
 
 def _prepare_blocked_network_tools(request: AgentRunRequest) -> Path:
@@ -221,9 +258,13 @@ def _codex_config(request: AgentRunRequest) -> str:
     return "\n".join(lines)
 
 
-def _normalize_jsonl(stdout: str) -> tuple[list[dict[str, Any]], list[dict[str, Any]], int | None, int | None]:
+def _normalize_jsonl(
+    stdout: str,
+    *,
+    task_objective: str | None = None,
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]], int | None, int | None]:
     events: list[dict[str, Any]] = []
-    tool_calls: list[dict[str, Any]] = []
+    tool_event_index_by_item_id: dict[str, int] = {}
     input_tokens: int | None = None
     output_tokens: int | None = None
     sequence = 0
@@ -252,12 +293,17 @@ def _normalize_jsonl(stdout: str) -> tuple[list[dict[str, Any]], list[dict[str, 
             input_tokens = usage["input_tokens"]
         if isinstance(usage.get("output_tokens"), int):
             output_tokens = usage["output_tokens"]
+        arguments = _event_arguments(item, message)
+        if item_type == "mcp_tool_call" and item.get("tool") == "get_docs_context":
+            arguments.update(
+                _required_once_retrieval_metadata(item, task_objective=task_objective)
+            )
         normalized_event = {
             "sequence": sequence,
             "timestamp": datetime.now(timezone.utc).isoformat(),
             "event_type": event_type,
             "tool_name": tool_name,
-            "arguments": _event_arguments(item, message),
+            "arguments": arguments,
             "result_summary": content,
             "result_chars": len(result_text),
             "result_truncated": len(result_text) > len(content),
@@ -265,11 +311,25 @@ def _normalize_jsonl(stdout: str) -> tuple[list[dict[str, Any]], list[dict[str, 
             "source_event_type": raw_type,
             "tokens": usage or None,
         }
-        events.append(normalized_event)
         if event_type == "tool_call":
             # Downstream accounting must consume the sanitized normalized event,
-            # not the provider-specific raw envelope.
-            tool_calls.append(normalized_event)
+            # not the provider-specific raw envelope. Codex emits started and
+            # completed lifecycle records for one stable tool item; persist one
+            # logical event so trajectory policy audits do not double-count it.
+            item_id = item.get("id")
+            if isinstance(item_id, str) and item_id:
+                existing = tool_event_index_by_item_id.get(item_id)
+                if existing is None:
+                    tool_event_index_by_item_id[item_id] = len(events)
+                    events.append(normalized_event)
+                elif raw_type == "item.completed" or result_text:
+                    normalized_event["sequence"] = events[existing]["sequence"]
+                    events[existing] = normalized_event
+            else:
+                events.append(normalized_event)
+        else:
+            events.append(normalized_event)
+    tool_calls = [event for event in events if event.get("event_type") == "tool_call"]
     return events, tool_calls, input_tokens, output_tokens
 
 
@@ -324,6 +384,47 @@ def _event_arguments(item: dict[str, Any], message: dict[str, Any]) -> dict[str,
     if item.get("type") == "mcp_tool_call":
         return {"server": item.get("server", ""), "tool": item.get("tool", ""), "arguments": item.get("arguments", {})}
     return {}
+
+
+def _required_once_retrieval_metadata(
+    item: dict[str, Any],
+    *,
+    task_objective: str | None,
+) -> dict[str, Any]:
+    call_arguments = item.get("arguments")
+    call_arguments = call_arguments if isinstance(call_arguments, dict) else {}
+    question = call_arguments.get("question")
+    question_matches = (
+        isinstance(question, str)
+        and isinstance(task_objective, str)
+        and question.strip() == task_objective.strip()
+    )
+    result = item.get("result")
+    result = result if isinstance(result, dict) else {}
+    payload = result.get("structured_content") or result.get("structuredContent")
+    payload = payload if isinstance(payload, dict) else result
+    delivery_strategy = payload.get("delivery_strategy") or call_arguments.get(
+        "delivery_strategy"
+    )
+    packet = payload.get("action_packet")
+    packet_status = packet.get("status") if isinstance(packet, dict) else None
+    packet_errors: list[str] = ["ActionPacket missing"]
+    if isinstance(packet, dict):
+        from docmancer.docs.application.action_packet import validate_action_packet
+
+        packet_errors = validate_action_packet(packet, max_tokens=2_000)
+    return {
+        "question": question,
+        "delivery_strategy": delivery_strategy,
+        "question_matches_task_objective": question_matches,
+        "retrieval_succeeded": (
+            question_matches
+            and delivery_strategy == "bounded_direct"
+            and packet_status in {"ok", "truncated"}
+            and not packet_errors
+        ),
+        "action_packet_status": packet_status,
+    }
 
 
 def _redact(text: str) -> str:

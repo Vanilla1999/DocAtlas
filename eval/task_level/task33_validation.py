@@ -20,7 +20,10 @@ from eval.task_level.isolated_delivery import (
     missing_packet_evidence_categories,
     missing_packet_evidence_paths,
 )
-from eval.task_level.task33_pilot import evaluate_task33c_pilot_completeness
+from eval.task_level.task33_pilot import (
+    build_task33c_validation_evidence,
+    evaluate_task33c_pilot_completeness,
+)
 
 
 PROTOCOL_PATH = Path(__file__).with_name("task33c_protocol.lock.json")
@@ -82,7 +85,10 @@ _CELL_ALLOWLIST = frozenset({
 
 def load_protocol(path: Path = PROTOCOL_PATH) -> dict[str, Any]:
     value = _load_json(path)
-    if value.get("schema_version") != "task33c-frozen-protocol-1":
+    if value.get("schema_version") not in {
+        "task33c-frozen-protocol-1",
+        "task33c-frozen-protocol-2",
+    }:
         raise ValueError("unsupported Task 33C protocol lock")
     return value
 
@@ -104,6 +110,10 @@ def validate_task33c_run(
     errors: list[str] = []
     warnings: list[str] = []
     checks: dict[str, bool] = {}
+
+    if (run_dir / "exploratory_manifest.json").is_file():
+        errors.append("exploratory_run_not_causal")
+    checks["causal_classification"] = "exploratory_run_not_causal" not in errors
 
     _check_live_protocol(protocol, errors)
     frozen_copy = run_dir / protocol_path.name
@@ -167,7 +177,7 @@ def validate_task33c_run(
         errors.append("unexpected_cell:" + key[1])
     if len(rows) != len(protocol["conditions"]):
         errors.append("run_row_count_mismatch")
-    checks["four_unique_cells"] = set(indexed) == expected_cells and len(rows) == len(expected_cells)
+    checks["expected_cells"] = set(indexed) == expected_cells and len(rows) == len(expected_cells)
 
     provider_request_ids: set[str] = set()
     bounded_identities: list[tuple[str, str, str]] = []
@@ -214,7 +224,10 @@ def validate_task33c_run(
                 )
             )
 
-    if len(set(bounded_identities)) != 1 or len(bounded_identities) != 2:
+    expected_bounded = sum(
+        condition.startswith("docatlas_bounded_") for condition in protocol["conditions"]
+    )
+    if len(set(bounded_identities)) != 1 or len(bounded_identities) != expected_bounded:
         errors.append("bounded_lanes_do_not_share_exact_evidence")
     if len(provider_request_ids) > protocol["provider_request_budget"]:
         errors.append("provider_request_budget_exceeded")
@@ -236,7 +249,9 @@ def validate_task33c_run(
         errors.append("sandbox_provenance_boundary_not_verified")
     if image_id_hashes and provenance.get("image_id_sha256") not in image_id_hashes:
         errors.append("sandbox_provenance_image_id_mismatch")
-    checks["shared_frozen_evidence"] = len(bounded_identities) == 2 and len(set(bounded_identities)) == 1
+    checks["shared_frozen_evidence"] = (
+        len(bounded_identities) == expected_bounded and len(set(bounded_identities)) == 1
+    )
     checks["provider_request_identity"] = not any("request_id" in error for error in errors)
     checks["provider_request_budget"] = (
         len(provider_request_ids) <= protocol["provider_request_budget"]
@@ -432,6 +447,15 @@ def _check_cell_result(
         errors.append(f"{condition}:runner_mismatch")
     if row.get("forbidden_changes") != []:
         errors.append(f"{condition}:forbidden_changes")
+    if row.get("policy_clean") is not True:
+        errors.append(f"{condition}:policy_violation")
+    row_metrics = row.get("metrics")
+    metrics: dict[str, Any] = row_metrics if isinstance(row_metrics, dict) else {}
+    if (
+        condition == "docatlas_tool_required_once"
+        and metrics.get("agent_docatlas_calls") != 1
+    ):
+        errors.append(f"{condition}:get_docs_context_call_count_mismatch")
     identity = ((row.get("evaluation_contract") or {}).get("artifact_identity") or {})
     expected = protocol["evaluation"]
     for result_field, protocol_field in (
@@ -613,8 +637,14 @@ def _check_bounded_evidence(
         if retrieval.get(field) != expected:
             errors.append(f"{condition}:retrieval_trace_mismatch:{field}")
     packet = _load_optional_json(cell_dir / "action_packet.json")
+    packet_evidence = [
+        *snapshot.evidence_items,
+        build_task33c_validation_evidence(
+            protocol["evaluation"]["public_test_command"]
+        ),
+    ]
     packet_errors = validate_action_packet(
-        packet, evidence_items=snapshot.evidence_items,
+        packet, evidence_items=packet_evidence,
         max_tokens=protocol["packet_token_budget"],
     )
     errors.extend(f"{condition}:action_packet:{error}" for error in packet_errors)

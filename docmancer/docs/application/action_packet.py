@@ -19,7 +19,7 @@ _REQUIRED_RE = re.compile(r"\b(must|required|requires|shall|invariant)\b", re.I)
 _NOT_REQUIRED_RE = re.compile(r"\b(?:not|required\s+not\s+to)\s+required\b", re.I)
 _VALIDATION_START_RE = re.compile(
     r"^(?:run\s+)?(?:python\s+-m\s+(?:pytest|unittest|compileall)|pytest|"
-    r"uv\s+run\s+(?:pytest|ruff|mypy|python\s+-m\s+(?:pytest|unittest|compileall))|"
+    r"uv\s+run(?:\s+--offline)?\s+(?:pytest|ruff|mypy|python\s+-m\s+(?:pytest|unittest|compileall))|"
     r"npm\s+(?:test|run\s+[A-Za-z0-9_.:-]+)|pnpm\s+(?:test|run\s+[A-Za-z0-9_.:-]+)|"
     r"yarn\s+(?:test|run\s+[A-Za-z0-9_.:-]+|build)|cargo\s+(?:test|check|build)|"
     r"go\s+(?:test|build|vet)|(?:\./)?gradlew?|flutter\s+test|dart\s+(?:test|analyze)|"
@@ -185,6 +185,8 @@ def build_action_packet(
     project_path: str | None = None,
     module_path: str | None = None,
     retrieval_issues: Iterable[str] | None = None,
+    required_evidence_paths: Iterable[str] = (),
+    required_target_paths: Iterable[str] = (),
 ) -> dict[str, Any]:
     """Render selected retrieval evidence into a bounded, deterministic packet.
 
@@ -197,6 +199,12 @@ def build_action_packet(
         max(MIN_ACTION_PACKET_TOKENS, int(max_tokens or DEFAULT_ACTION_PACKET_TOKENS)),
     )
     raw_items = [dict(item) for item in context_pack if isinstance(item, dict)]
+    required_source_keys = {
+        _normalized_source_key(path) for path in required_evidence_paths if str(path).strip()
+    }
+    required_target_keys = {
+        _normalized_source_key(path) for path in required_target_paths if str(path).strip()
+    }
     blocked_scope_sources = _blocked_source_keys(trust_contract or {})
     code_target_hints = [
             _source_path(item)
@@ -241,6 +249,11 @@ def build_action_packet(
         if _declares_canonical_authority(item) and _item_source_keys(item) & rejected_sources
     )
     items = _rank_and_dedupe(scoped_items, trust_contract or {})
+    items.sort(key=lambda item: (
+        0 if _normalized_source_key(_source_path(item)) in required_source_keys else
+        1 if _normalized_source_key(_source_path(item)) in required_target_keys else
+        2
+    ))
     objective, objective_omitted = _bounded_text(question.strip(), 1_000)
     source_rows = [_source_row(item) for item in items if _source_path(item)]
     source_rows = _dedupe_dicts(source_rows, ("evidence_id",))
@@ -376,7 +389,21 @@ def build_action_packet(
     if packet["missing_evidence"]:
         packet["status"] = "insufficient_evidence"
 
-    _prune_orphan_sources(packet)
+    available_paths = {_normalized_source_key(_source_path(item)) for item in items}
+    missing_required_sources = sorted(required_source_keys - available_paths)
+    missing_required_targets = sorted(required_target_keys - available_paths)
+    if missing_required_sources:
+        packet["status"] = "insufficient_evidence"
+        packet["missing_evidence"].append(
+            "Required evidence paths were not retrieved: " + ", ".join(missing_required_sources)
+        )
+    if missing_required_targets:
+        packet["status"] = "insufficient_evidence"
+        packet["missing_evidence"].append(
+            "Required target paths were not retrieved: " + ", ".join(missing_required_targets)
+        )
+
+    _prune_orphan_sources(packet, required_source_keys)
 
     if not packet["source_of_truth"]:
         packet["status"] = "insufficient_evidence"
@@ -389,12 +416,14 @@ def build_action_packet(
         if message not in packet["missing_evidence"]:
             packet["missing_evidence"].append(message)
 
-    _fit_packet(packet, budget)
-    _ensure_post_fit_status(packet)
+    _fit_packet(packet, budget, required_source_keys, required_target_keys)
+    _ensure_post_fit_status(packet, required_source_keys)
     _refresh_estimated_tokens(packet)
     # Account for the estimate field itself. If it crosses the caller budget,
     # remove another complete item and recompute rather than slicing text.
-    while packet["estimated_tokens"] > budget and _remove_one_budget_item(packet):
+    while packet["estimated_tokens"] > budget and _remove_one_budget_item(
+        packet, required_source_keys, required_target_keys
+    ):
         _refresh_estimated_tokens(packet)
     _refresh_estimated_tokens(packet)
     if packet["estimated_tokens"] > budget:
@@ -1316,10 +1345,14 @@ def _cited_evidence_ids(packet: dict[str, Any]) -> set[str]:
     }
 
 
-def _prune_orphan_sources(packet: dict[str, Any]) -> None:
+def _prune_orphan_sources(
+    packet: dict[str, Any], required_source_keys: set[str] | frozenset[str] = frozenset()
+) -> None:
     used = _cited_evidence_ids(packet)
     packet["source_of_truth"] = [
-        row for row in packet["source_of_truth"] if row.get("evidence_id") in used
+        row for row in packet["source_of_truth"]
+        if row.get("evidence_id") in used
+        or _normalized_source_key(row.get("path")) in required_source_keys
     ]
 
 
@@ -1338,10 +1371,17 @@ def _has_actionable_items(packet: dict[str, Any]) -> bool:
     ))
 
 
-def _fit_packet(packet: dict[str, Any], budget: int) -> None:
-    while estimate_action_packet_tokens(packet) > budget and _remove_one_budget_item(packet):
+def _fit_packet(
+    packet: dict[str, Any],
+    budget: int,
+    required_source_keys: set[str],
+    required_target_keys: set[str],
+) -> None:
+    while estimate_action_packet_tokens(packet) > budget and _remove_one_budget_item(
+        packet, required_source_keys, required_target_keys
+    ):
         pass
-    _prune_orphan_sources(packet)
+    _prune_orphan_sources(packet, required_source_keys)
     if not packet["source_of_truth"]:
         packet["status"] = "insufficient_evidence"
         message = "No source attribution fit the requested packet budget."
@@ -1349,16 +1389,17 @@ def _fit_packet(packet: dict[str, Any], budget: int) -> None:
             packet["missing_evidence"].append(message)
 
 
-def _remove_one_budget_item(packet: dict[str, Any]) -> bool:
-    rows_by_name = [
-        ("implementation_guidance", packet["implementation_guidance"]),
-    ]
-    for name, rows in rows_by_name:
-        if rows:
-            rows.pop()
-            _record_omission(packet, name)
-            _prune_orphan_sources(packet)
-            return True
+def _remove_one_budget_item(
+    packet: dict[str, Any],
+    required_source_keys: set[str],
+    required_target_keys: set[str],
+) -> bool:
+    guidance = packet["implementation_guidance"]
+    if guidance:
+        guidance.pop()
+        _record_omission(packet, "implementation_guidance")
+        _prune_orphan_sources(packet, required_source_keys)
+        return True
 
     objective = str(packet["task_interpretation"].get("objective") or "")
     if len(objective) > 32:
@@ -1368,17 +1409,32 @@ def _remove_one_budget_item(packet: dict[str, Any]) -> bool:
         _record_omission(packet, "task_interpretation.objective_characters", removed)
         return True
 
-    rows_by_name = [
-        ("target_surface.symbols", packet["target_surface"]["symbols"]),
-        ("target_surface.likely_files", packet["target_surface"]["likely_files"]),
-        ("validation.semantic_checks", packet["validation"]["semantic_checks"]),
-        ("validation.compile", packet["validation"]["compile"]),
-        ("validation.tests", packet["validation"]["tests"]),
-        ("forbidden_changes", packet["forbidden_changes"]),
-        ("required_invariants", packet["required_invariants"]),
-    ]
-    for name, rows in rows_by_name:
-        if rows:
+    symbols = packet["target_surface"]["symbols"]
+    if symbols:
+        symbols.pop()
+        _record_omission(packet, "target_surface.symbols")
+        _prune_orphan_sources(packet, required_source_keys)
+        return True
+
+    likely_files = packet["target_surface"]["likely_files"]
+    for index in range(len(likely_files) - 1, -1, -1):
+        if _normalized_source_key(likely_files[index].get("path")) in required_target_keys:
+            continue
+        likely_files.pop(index)
+        _record_omission(packet, "target_surface.likely_files")
+        _prune_orphan_sources(packet, required_source_keys)
+        return True
+    if not required_source_keys and not required_target_keys:
+        rows_by_name = [
+            ("validation.semantic_checks", packet["validation"]["semantic_checks"]),
+            ("validation.compile", packet["validation"]["compile"]),
+            ("validation.tests", packet["validation"]["tests"]),
+            ("forbidden_changes", packet["forbidden_changes"]),
+            ("required_invariants", packet["required_invariants"]),
+        ]
+        for name, rows in rows_by_name:
+            if not rows:
+                continue
             rows.pop()
             _record_omission(packet, name)
             if name in {"forbidden_changes", "required_invariants"}:
@@ -1386,13 +1442,15 @@ def _remove_one_budget_item(packet: dict[str, Any]) -> bool:
                 message = "Critical constraints did not fit the requested packet budget."
                 if message not in packet["missing_evidence"]:
                     packet["missing_evidence"].append(message)
-            _prune_orphan_sources(packet)
+            _prune_orphan_sources(packet, required_source_keys)
             return True
     return False
 
 
-def _ensure_post_fit_status(packet: dict[str, Any]) -> None:
-    _prune_orphan_sources(packet)
+def _ensure_post_fit_status(
+    packet: dict[str, Any], required_source_keys: set[str] | frozenset[str] = frozenset()
+) -> None:
+    _prune_orphan_sources(packet, required_source_keys)
     if "task_interpretation.objective_characters" in packet.get("omitted_counts", {}):
         packet["status"] = "insufficient_evidence"
         message = "The complete task objective did not fit the bounded handoff."

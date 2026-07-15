@@ -12,7 +12,7 @@ from pathlib import Path
 import pytest
 
 from docmancer.docs.application.action_packet import build_action_packet, estimate_action_packet_tokens
-from eval.task_level.conditions import CONDITIONS
+from eval.task_level.conditions import CONDITIONS, TOOL_REQUIRED_ONCE_INSTRUCTION
 from eval.task_level.evaluators.policy import audit_trajectory
 from eval.task_level.execution import build_tool_policy
 from eval.task_level.isolated_delivery import (
@@ -281,7 +281,7 @@ def test_subprocess_worker_is_fail_closed_and_bounds_both_output_streams(tmp_pat
     assert process.poll() is not None
 
 
-def test_task33c_four_lane_plan_and_flags_are_frozen(tmp_path):
+def test_task33c_three_lane_plan_and_flags_are_frozen(tmp_path):
     plan = build_task33c_pilot_plan(TASK33C_PILOT_TASK_ID)
 
     objective = (
@@ -302,26 +302,36 @@ def test_task33c_four_lane_plan_and_flags_are_frozen(tmp_path):
     with pytest.raises(ValueError, match="frozen"):
         build_task33c_pilot_plan("another_task")
     assert plan["repeats"] == 1
-    assert plan["retrieval_call_budget"] == plan["isolated_worker_attempt_budget"] == 1
-    assert plan["agent_turn_limit"] == 24
+    assert plan["retrieval_call_budget"] == 1
+    assert plan["isolated_worker_attempt_budget"] == 0
+    assert plan["agent_turn_limit"] == 12
     assert plan["required_evidence_categories"] == list(TASK33C_REQUIRED_EVIDENCE_CATEGORIES)
     assert plan["claims"]["may_claim_product_improvement"] is False
     direct = CONDITIONS["docatlas_bounded_direct"].tool_policy
-    isolated = CONDITIONS["docatlas_bounded_subagent"].tool_policy
+    required = CONDITIONS["docatlas_tool_required_once"].tool_policy
     assert direct.delivery_strategy == "bounded_direct" and not direct.isolated_worker_required
-    assert isolated.delivery_strategy == "bounded_subagent" and isolated.isolated_worker_required
-    assert not direct.allow_docatlas and not isolated.allow_docatlas
-    _, mcp_path = build_tool_policy("docatlas_bounded_subagent", tmp_path)
-    assert json.loads(mcp_path.read_text(encoding="utf-8")) == {"mcpServers": {}}
+    assert required.allow_docatlas and required.require_docatlas_call_before_edit
+    assert not direct.allow_docatlas
+    assert "`get_docs_context` exactly once" in TOOL_REQUIRED_ONCE_INSTRUCTION
+    assert 'project_path="."' in TOOL_REQUIRED_ONCE_INSTRUCTION
+    assert 'delivery_strategy="bounded_direct"' in TOOL_REQUIRED_ONCE_INSTRUCTION
+    assert "Do not make another documentation retrieval call" in TOOL_REQUIRED_ONCE_INSTRUCTION
+    assert "Do not call `prepare_docs`" in TOOL_REQUIRED_ONCE_INSTRUCTION
+    _, mcp_path = build_tool_policy("docatlas_tool_required_once", tmp_path)
+    assert list(json.loads(mcp_path.read_text(encoding="utf-8"))["mcpServers"]) == ["docmancer-docs"]
     trajectory = tmp_path / "trajectory.json"
     trajectory.write_text(json.dumps([{
         "sequence": 1, "tool_name": "mcp", "arguments": {
             "server": "docmancer-docs", "tool": "get_docs_context",
+            "delivery_strategy": "bounded_direct",
+            "question_matches_task_objective": True,
+            "retrieval_succeeded": True,
+            "action_packet_status": "ok",
         },
     }]), encoding="utf-8")
-    audit = audit_trajectory("docatlas_bounded_subagent", trajectory)
-    assert not audit.clean
-    assert audit.violations == ["bounded delivery exposed a parent-visible DocAtlas tool call"]
+    audit = audit_trajectory("docatlas_tool_required_once", trajectory)
+    assert audit.clean
+    assert audit.get_docs_context_calls == 1
 
 
 def test_task33c_decision_gate_requires_complete_comparable_measurements():
@@ -336,7 +346,7 @@ def test_task33c_decision_gate_requires_complete_comparable_measurements():
             "system_total_tokens": 150,
             "completed_turn_events": 4,
         }
-        if condition in {"docatlas_bounded_direct", "docatlas_bounded_subagent"}:
+        if condition == "docatlas_bounded_direct":
             metrics.update({
                 "delivery_retrieval_calls": 1,
                 "delivery_attempts": 1,
@@ -347,13 +357,6 @@ def test_task33c_decision_gate_requires_complete_comparable_measurements():
                 "action_packet_target_paths": list(TASK33C_REQUIRED_TARGET_PATHS),
                 "raw_tool_output_tokens_estimate": 300,
                 "action_packet_tokens": 120,
-            })
-        if condition == "docatlas_bounded_subagent":
-            metrics.update({
-                "worker_input_tokens": 200,
-                "worker_output_tokens": 80,
-                "system_total_tokens": 430,
-                "worker_reasoning_tokens": 0,
             })
         results.append({
             "task_id": TASK33C_PILOT_TASK_ID,
@@ -400,16 +403,12 @@ def test_task33c_decision_gate_requires_complete_comparable_measurements():
     complete = evaluate_task33c_pilot_completeness(results)
     assert complete["decision"] == "ENGINEERING_PILOT_COMPLETE"
     assert complete["complete"] is True
-    results[-1]["metrics"]["worker_input_tokens"] = None
-    incomplete = evaluate_task33c_pilot_completeness(results)
-    assert incomplete["decision"] == "INCONCLUSIVE"
-    assert "docatlas_bounded_subagent:missing_worker_input_tokens" in incomplete["errors"]
-    results[-1]["metrics"]["worker_input_tokens"] = 200
     results[-1]["metrics"]["delivery_retrieval_calls"] = True
     incomplete = evaluate_task33c_pilot_completeness(results)
-    assert "docatlas_bounded_subagent:invalid_retrieval_call_count" in incomplete["errors"]
+    assert incomplete["decision"] == "INCONCLUSIVE"
+    assert "docatlas_bounded_direct:invalid_retrieval_call_count" in incomplete["errors"]
 
     results[-1]["metrics"]["delivery_retrieval_calls"] = 1
     results[-1]["evaluation_execution"]["setup"]["status"] = "condition_setup_failed"
     incomplete = evaluate_task33c_pilot_completeness(results)
-    assert "docatlas_bounded_subagent:setup_not_successful" in incomplete["errors"]
+    assert "docatlas_bounded_direct:setup_not_successful" in incomplete["errors"]
