@@ -14,6 +14,8 @@ from eval.task_level.github_models import (
     GitHubModelsCompletion,
     GitHubModelsIsolatedWorker,
     GitHubModelsRunner,
+    _bounded_runner_messages,
+    _estimate_message_tokens,
 )
 from eval.task_level.isolated_delivery import (
     DelegationEnvelope,
@@ -58,8 +60,11 @@ def _completion(content: dict, *, turn: int = 1) -> GitHubModelsCompletion:
             "prompt_tokens": 100,
             "completion_tokens": 20,
             "total_tokens": 120,
+            "prompt_tokens_details": {"cached_tokens": 0},
             "completion_tokens_details": {"reasoning_tokens": 0},
         },
+        request_payload_sha256=hashlib.sha256(f"request-{turn}".encode()).hexdigest(),
+        estimated_input_tokens=100,
     )
 
 
@@ -161,7 +166,13 @@ def test_github_models_client_streams_structured_output_and_usage(
                     "choices": [{"delta": {"content": '{"selected_'}, "finish_reason": None}],
                 },
                 {"choices": [{"delta": {"content": 'indices":[0,1,2]}'}, "finish_reason": "stop"}]},
-                {"choices": [], "usage": {"prompt_tokens": 10, "completion_tokens": 8, "total_tokens": 18}},
+                {"choices": [], "usage": {
+                    "prompt_tokens": 10,
+                    "completion_tokens": 8,
+                    "total_tokens": 18,
+                    "prompt_tokens_details": {"cached_tokens": 0},
+                    "completion_tokens_details": {"reasoning_tokens": 0},
+                }},
             ]
             return iter([*(f"data: {json.dumps(event)}\n\n".encode() for event in events), b"data: [DONE]\n\n"])
 
@@ -336,3 +347,23 @@ def test_github_models_worker_selects_host_evidence_and_binds_usage(
     assert output.usage.provider == "github-models"
     assert output.usage.proof["selected_indices"] == [0, 1, 2]
     output.usage.validate()
+
+
+def test_runner_context_compaction_is_deterministic_and_hard_bounded():
+    base = [
+        {"role": "system", "content": "system"},
+        {"role": "user", "content": "objective\n" + ("source line\n" * 4_000)},
+    ]
+    recent = [
+        {"role": "assistant" if index % 2 == 0 else "user", "content": str(index) * 8_000}
+        for index in range(8)
+    ]
+    pinned = [{"role": "user", "content": "latest test\n" + ("failure\n" * 2_000)}]
+
+    first, first_proof = _bounded_runner_messages(base, recent, pinned, token_limit=7_000)
+    second, second_proof = _bounded_runner_messages(base, recent, pinned, token_limit=7_000)
+
+    assert first == second
+    assert first_proof == second_proof
+    assert _estimate_message_tokens(first) <= 7_000
+    assert first_proof["dropped_message_sha256"] or first_proof["clipped_messages"]

@@ -60,3 +60,12 @@ python -m eval.task_level.runner \
 The parent adapter exposes a hard-turn-controlled repository tool allowlist. The isolated worker is a one-shot, tool-less hosted inference request over immutable host-owned evidence: it selects evidence, while the host constructs and validates the ActionPacket and binds token usage to provider request IDs. It has no local process, repository mount, general network tool, or recursive delegation surface.
 
 The engineering pilot freezes a 24-turn limit per parent cell and uses the low-rate-tier `openai/gpt-4o-mini` adapter so a worst-case four-lane run remains below the free API's daily request budget. A turn-limit exhaustion or provider 429 is infrastructure-incomplete, never a completed causal cell.
+
+The machine-readable protocol is `task33c_protocol.lock.json`. Do not edit the task, query, model, conditions, budgets, fixture/oracle/hidden-test identities, or decision thresholds after the first causal dispatch. `task33c_completeness.json` is diagnostic only; the authoritative gate is the independent `task33c_validation.json` produced by:
+
+```bash
+python -m eval.task_level.task33_validation \
+  eval/task_level/results/task33c_github_models_RUN_ID
+```
+
+GitHub execution is intentionally split. `task33c-pr-checks.yml` runs untrusted pull-request validation without GitHub Models access. `task33c-actions-probe.yml` is manual-only. First dispatch it with `run_causal_pilot=false` on the trusted branch and inspect the structured-model, retrieval, and Docker canary artifact. After that probe passes and the protected `task33c-causal-pilot` environment is approved, dispatch the same frozen ref once with `run_causal_pilot=true`. The causal artifact contains only files listed in `task33c_artifact_manifest.json`; virtual environments and workspace copies are never uploaded.

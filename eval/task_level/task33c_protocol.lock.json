@@ -1,0 +1,63 @@
+{
+  "schema_version": "task33c-frozen-protocol-1",
+  "task_id": "decisive_nbo_cross_module_gate_large_001",
+  "repeat": 0,
+  "conditions": [
+    "repo_only_strict_offline",
+    "docatlas_tool_recommended",
+    "docatlas_bounded_direct",
+    "docatlas_bounded_subagent"
+  ],
+  "agent_turn_limit": 24,
+  "retrieval_call_budget": 1,
+  "isolated_worker_attempt_budget": 1,
+  "packet_schema_version": 1,
+  "packet_token_budget": 2000,
+  "model": "openai/gpt-4o-mini",
+  "runner_prompt_revision": "github-models-controlled-agent-v3-bounded-context",
+  "worker_prompt_revision": "task33c-evidence-selector-v2-full-snapshot",
+  "provider_input_token_limit": 7000,
+  "provider_request_budget": 113,
+  "query": "browser scan permission gate offline sync",
+  "query_derivation": "task33c-domain-coverage-v4-limit12",
+  "query_sha256": "4656dac5ca6ae4b4466c80dce994e63a6756aaa4a912532e3455348b668932bd",
+  "objective_sha256": "c80be7bb5a646df5ce05b8e250e34fde2b4e33edb8e1fea21fc4ba42162be6f7",
+  "required_evidence_categories": [
+    "project_docs",
+    "symbols"
+  ],
+  "required_evidence_paths": [
+    "docs/permission-architecture.md",
+    "docs/offline-sync.md"
+  ],
+  "required_target_paths": [
+    "lib/modules/browser/application/browser_permission_gate.dart",
+    "lib/modules/permission/application/permission_service.dart",
+    "lib/modules/scan/application/scan_permission_gate.dart",
+    "lib/modules/sync/application/offline_sync_gate.dart"
+  ],
+  "evaluation": {
+    "patch_contract_id": "task33-nbo-cross-module-gate-1",
+    "contract_sha256": "d70b8eb40c3c741e4062b60dc954643b70223026910b849a3002ea1e37d259a8",
+    "registry_sha256": "0d891f708c7aef1202c1b0a9384145451653b1ced50e44e24904beb80890e514",
+    "fixture_sha256": "1ba6cb88a61dc5871eca8d2aec13e5d89ce57b2cfe977441da34ad49f7bd48ae",
+    "protocol_fixture_sha256": "603712341cdeffb1332492ccbebeb04b022ddf665b1b305c9827765c69a629df",
+    "oracle_sha256": "7bef2b9e21966f10c12d7ac9d742e61f2b45395b1a8874b98e6f999adcf683a2",
+    "hidden_tests_sha256": "012438802bdde4c5d1749f2729a212feffadfaad333a9c8bfe7c85ae9f80290e",
+    "external_context_sha256": "7372ccee933b47ec72a614966b03a62faf0298a9293733ae46e869183c69fcc0",
+    "setup_command": "uv sync --offline --python 3.14",
+    "public_test_command": "uv run --offline pytest tests/test_browser_permission_gate.py",
+    "hidden_test_command": "python -m pytest tests/hidden"
+  },
+  "container": {
+    "base_image": "python:3.14.6-slim@sha256:d3400aa122fa42cf0af0dbe8ec3091b047eac5c8f7e3539f7135e86d855dc015",
+    "platform": "linux/amd64",
+    "requirements_sha256": "6ae3eade04b844c3f42d8d56b2001fd117729c0f1ae2f68cab50f417d3bea681"
+  },
+  "github_actions": {
+    "checkout": "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+    "setup_python": "actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+    "upload_artifact": "actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02"
+  },
+  "freeze_policy": "No task, fixture, oracle, hidden test, query, model, condition, turn limit, packet budget, or decision threshold changes after the first causal dispatch."
+}

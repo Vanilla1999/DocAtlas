@@ -32,11 +32,16 @@ from .sandbox_execution import DockerCommandSandbox, persist_boundary
 
 GITHUB_MODELS_ENDPOINT = "https://models.github.ai/inference/chat/completions"
 DEFAULT_GITHUB_MODEL = "openai/gpt-4o-mini"
-_RUNNER_VERSION = "github-models-controlled-agent-v2-docker-boundary"
+_RUNNER_VERSION = "github-models-controlled-agent-v3-bounded-context"
+_RUNNER_PROMPT_REVISION = "github-models-controlled-agent-v3-bounded-context"
 _WORKER_PROMPT_REVISION = "task33c-evidence-selector-v2-full-snapshot"
+_PROVIDER_INPUT_TOKEN_LIMIT = 7_000
+_TASK33C_MAX_RUNNER_REQUESTS = 24
 _MIN_REQUEST_INTERVAL_SECONDS = 6.2
 _REQUEST_RATE_LOCK = threading.Lock()
 _LAST_REQUEST_AT = 0.0
+_PROCESS_REQUEST_COUNT = 0
+_PROCESS_REQUEST_BUDGET = 113
 
 
 @dataclass(frozen=True)
@@ -49,6 +54,8 @@ class GitHubModelsCompletion:
     output_tokens: int
     reasoning_tokens: int | None
     raw_usage: dict[str, Any]
+    request_payload_sha256: str = ""
+    estimated_input_tokens: int = 0
 
 
 class GitHubModelsClient:
@@ -89,13 +96,22 @@ class GitHubModelsClient:
                 },
             },
         }
+        serialized_payload = json.dumps(
+            payload, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+        ).encode("utf-8")
+        estimated_input_tokens = _estimate_message_tokens(messages)
+        if estimated_input_tokens > _PROVIDER_INPUT_TOKEN_LIMIT:
+            raise RuntimeError(
+                "GitHub Models input budget exceeded: "
+                f"{estimated_input_tokens}>{_PROVIDER_INPUT_TOKEN_LIMIT}"
+            )
         _pace_github_models_request()
         remaining = deadline - time.monotonic()
         if remaining <= 0:
             raise TimeoutError("GitHub Models request deadline expired during rate pacing")
         request = urllib.request.Request(
             self.endpoint,
-            data=json.dumps(payload, ensure_ascii=False).encode("utf-8"),
+            data=serialized_payload,
             headers={
                 "Accept": "text/event-stream",
                 "Authorization": "Bearer " + self._token,
@@ -166,8 +182,10 @@ class GitHubModelsClient:
             raise RuntimeError("GitHub Models usage totals are inconsistent")
         details = usage.get("completion_tokens_details")
         reasoning = details.get("reasoning_tokens") if isinstance(details, dict) else None
-        if reasoning is not None:
-            reasoning = _strict_nonnegative_int(reasoning, "reasoning_tokens")
+        reasoning = _strict_nonnegative_int(reasoning, "reasoning_tokens")
+        prompt_details = usage.get("prompt_tokens_details")
+        cached = prompt_details.get("cached_tokens") if isinstance(prompt_details, dict) else None
+        _strict_nonnegative_int(cached, "cached_tokens")
         if not request_ids:
             raise RuntimeError("GitHub Models response omitted provider request identity")
         request_id = request_ids.get("x-github-request-id") or request_ids.get("apim-request-id") or next(iter(request_ids.values()))
@@ -180,6 +198,8 @@ class GitHubModelsClient:
             output_tokens=output_tokens,
             reasoning_tokens=reasoning,
             raw_usage=dict(usage),
+            request_payload_sha256=hashlib.sha256(serialized_payload).hexdigest(),
+            estimated_input_tokens=estimated_input_tokens,
         )
         return value, completion
 
@@ -312,6 +332,7 @@ class GitHubModelsIsolatedWorker:
             "provider": "github-models",
             "boundary_type": "remote_toolless_inference",
             "endpoint": self.endpoint,
+            "requested_model": self.model,
             "model": completion.model,
             "prompt_revision": _WORKER_PROMPT_REVISION,
             "response_schema_sha256": _json_sha256(_evidence_selection_schema()),
@@ -323,6 +344,12 @@ class GitHubModelsIsolatedWorker:
             "reasoning_tokens": completion.reasoning_tokens,
             "request_ids": completion.request_ids,
             "usage": completion.raw_usage,
+            "request_payload_sha256": completion.request_payload_sha256,
+            "estimated_input_tokens": completion.estimated_input_tokens,
+            "message_sha256": _json_sha256([
+                {"role": "system", "content": system},
+                {"role": "user", "content": user},
+            ]),
             "evidence_fingerprint": evidence.fingerprint,
             "selected_indices": indices,
         }
@@ -386,7 +413,15 @@ class GitHubModelsRunner:
             ],
         )
 
+    @property
+    def boundary_evidence(self) -> dict[str, object]:
+        return self._sandbox.verify()
+
     def run(self, request: AgentRunRequest) -> AgentRunOutput:
+        if request.max_turns > _TASK33C_MAX_RUNNER_REQUESTS:
+            raise RuntimeError(
+                f"GitHub Models runner request budget exceeds {_TASK33C_MAX_RUNNER_REQUESTS} turns"
+            )
         request.output_dir.mkdir(parents=True, exist_ok=True)
         boundary = self._sandbox.verify()
         persist_boundary(request.output_dir / "runner_execution_boundary.json", boundary)
@@ -427,6 +462,7 @@ class GitHubModelsRunner:
         read_paths: set[str] = set(bootstrap_read_paths)
         last_test_result: str | None = None
         rejected_actions: dict[str, int] = {}
+        compaction_rows: list[dict[str, Any]] = []
 
         for turn in range(1, request.max_turns + 1):
             remaining = deadline - time.monotonic()
@@ -444,14 +480,21 @@ class GitHubModelsRunner:
                     }]
                     if last_test_result is not None else []
                 )
+                messages, compaction = _bounded_runner_messages(
+                    base_messages,
+                    recent_messages,
+                    pinned_test_feedback,
+                    token_limit=_PROVIDER_INPUT_TOKEN_LIMIT,
+                )
                 action, completion = client.complete_json(
                     model=model,
-                    messages=[*base_messages, *recent_messages[-6:], *pinned_test_feedback],
+                    messages=messages,
                     schema_name="controlled_agent_action",
                     schema=_agent_action_schema(_docatlas_allowed(request.condition_id)),
                     timeout_seconds=min(remaining, 90),
                     max_tokens=2_048,
                 )
+                compaction_rows.append({"turn": turn, **compaction})
             except TimeoutError as exc:
                 stderr_rows.append(f"turn {turn}: TimeoutError: {exc}")
                 status, exit_code = "timeout", 124
@@ -467,6 +510,9 @@ class GitHubModelsRunner:
                 "request_id": completion.request_id,
                 "request_ids": completion.request_ids,
                 "usage": completion.raw_usage,
+                "request_payload_sha256": completion.request_payload_sha256,
+                "estimated_input_tokens": completion.estimated_input_tokens,
+                "prompt_revision": _RUNNER_PROMPT_REVISION,
             })
             stdout_rows.append(json.dumps({"turn": turn, "action": action}, ensure_ascii=False, sort_keys=True))
             tool = action.get("tool")
@@ -546,6 +592,10 @@ class GitHubModelsRunner:
             "schema_version": 1,
             "provider": "github-models",
             "model": model,
+            "prompt_revision": _RUNNER_PROMPT_REVISION,
+            "provider_input_token_limit": _PROVIDER_INPUT_TOKEN_LIMIT,
+            "request_budget": min(request.max_turns, _TASK33C_MAX_RUNNER_REQUESTS),
+            "compaction": compaction_rows,
             "turns": usage_rows,
         }, indent=2, sort_keys=True), encoding="utf-8")
         input_tokens = sum(row["usage"]["prompt_tokens"] for row in usage_rows)
@@ -927,9 +977,122 @@ def _worker_evidence(item: dict[str, Any]) -> dict[str, Any]:
     return dict(item)
 
 
+def _estimate_message_tokens(messages: list[dict[str, str]]) -> int:
+    serialized = json.dumps(messages, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+    return max(1, (len(serialized) + 3) // 4)
+
+
+def _bounded_runner_messages(
+    base_messages: list[dict[str, str]],
+    recent_messages: list[dict[str, str]],
+    pinned_messages: list[dict[str, str]],
+    *,
+    token_limit: int,
+) -> tuple[list[dict[str, str]], dict[str, Any]]:
+    recent = [dict(message) for message in recent_messages[-6:]]
+    dropped: list[str] = []
+    while recent and _estimate_message_tokens([*base_messages, *recent, *pinned_messages]) > token_limit:
+        removed = recent.pop(0)
+        dropped.append(_json_sha256(removed))
+    messages = [dict(message) for message in [*base_messages, *recent, *pinned_messages]]
+    clipped: list[dict[str, Any]] = []
+    while _estimate_message_tokens(messages) > token_limit:
+        candidates = [
+            (len(message.get("content", "")), index)
+            for index, message in enumerate(messages)
+            if message.get("role") != "system" and len(message.get("content", "")) > 800
+        ]
+        if not candidates:
+            raise RuntimeError("GitHub Models base prompt cannot fit the frozen input budget")
+        _length, index = max(candidates)
+        content = messages[index]["content"]
+        target = max(800, int(len(content) * 0.75))
+        head = int(target * 0.6)
+        tail = target - head
+        digest = hashlib.sha256(content.encode("utf-8")).hexdigest()
+        marker = f"\n[deterministically compacted sha256={digest} original_chars={len(content)}]\n"
+        messages[index]["content"] = content[:head] + marker + content[-tail:]
+        clipped.append({
+            "message_index": index,
+            "original_sha256": digest,
+            "original_chars": len(content),
+            "retained_chars": len(messages[index]["content"]),
+        })
+    estimate = _estimate_message_tokens(messages)
+    return messages, {
+        "schema_version": 1,
+        "input_token_limit": token_limit,
+        "estimated_input_tokens": estimate,
+        "dropped_message_sha256": dropped,
+        "clipped_messages": clipped,
+        "messages_sha256": _json_sha256(messages),
+    }
+
+
+def run_github_models_capability_probe(
+    token: str,
+    *,
+    model: str = DEFAULT_GITHUB_MODEL,
+    endpoint: str = GITHUB_MODELS_ENDPOINT,
+) -> dict[str, Any]:
+    """Exercise the production structured adapter and every required usage field."""
+
+    schema = _agent_action_schema(False)
+    messages = [
+        {
+            "role": "system",
+            "content": "Return one schema-valid finish action. Use null for every field except summary.",
+        },
+        {"role": "user", "content": "Finish now with summary set to capability probe."},
+    ]
+    action, completion = GitHubModelsClient(token, endpoint=endpoint).complete_json(
+        model=model,
+        messages=messages,
+        schema_name="controlled_agent_action",
+        schema=schema,
+        timeout_seconds=60,
+        max_tokens=256,
+    )
+    expected_keys = set(schema["required"])
+    valid_action = set(action) == expected_keys and action.get("tool") == "finish"
+    prompt_details = completion.raw_usage.get("prompt_tokens_details") or {}
+    completion_details = completion.raw_usage.get("completion_tokens_details") or {}
+    verified = (
+        valid_action
+        and bool(completion.request_ids)
+        and _strict_probe_int(prompt_details.get("cached_tokens"))
+        and _strict_probe_int(completion_details.get("reasoning_tokens"))
+        and bool(completion.request_payload_sha256)
+        and 0 < completion.estimated_input_tokens <= _PROVIDER_INPUT_TOKEN_LIMIT
+    )
+    return {
+        "schema_version": 1,
+        "status": "verified" if verified else "failed",
+        "provider": "github-models",
+        "model": completion.model,
+        "prompt_revision": _RUNNER_PROMPT_REVISION,
+        "response_schema_sha256": _json_sha256(schema),
+        "request_id": completion.request_id,
+        "request_ids": completion.request_ids,
+        "request_payload_sha256": completion.request_payload_sha256,
+        "estimated_input_tokens": completion.estimated_input_tokens,
+        "usage": completion.raw_usage,
+        "action": action,
+    }
+
+
+def _strict_probe_int(value: Any) -> bool:
+    return isinstance(value, int) and not isinstance(value, bool) and value >= 0
+
+
 def _pace_github_models_request() -> None:
-    global _LAST_REQUEST_AT
+    global _LAST_REQUEST_AT, _PROCESS_REQUEST_COUNT
     with _REQUEST_RATE_LOCK:
+        if _PROCESS_REQUEST_COUNT >= _PROCESS_REQUEST_BUDGET:
+            raise RuntimeError(
+                f"GitHub Models frozen process request budget exceeded: {_PROCESS_REQUEST_BUDGET}"
+            )
+        _PROCESS_REQUEST_COUNT += 1
         delay = _MIN_REQUEST_INTERVAL_SECONDS - (time.monotonic() - _LAST_REQUEST_AT)
         if delay > 0:
             time.sleep(delay)

@@ -27,6 +27,12 @@ class MockRunner:
                 "def normalize(value):\n    return abs(value)\n",
                 encoding="utf-8",
             )
+        policy = request.workspace / "policy.py"
+        if policy.exists():
+            policy.write_text(
+                "def may_enter(allowed):\n    return allowed\n",
+                encoding="utf-8",
+            )
         request.output_dir.mkdir(parents=True, exist_ok=True)
         stdout = request.output_dir / "stdout.log"
         stderr = request.output_dir / "stderr.log"
@@ -37,7 +43,7 @@ class MockRunner:
             "event_type": "edit",
             "tool_name": "Edit",
             "arguments": {},
-            "result_summary": "edited calc.py and normalization.py",
+            "result_summary": "edited calc.py, normalization.py, and policy.py",
         }]), encoding="utf-8")
         now = datetime.now(timezone.utc).isoformat()
         return AgentRunOutput(

@@ -28,6 +28,7 @@ from eval.task_level.runners.opencode import OpenCodeRunner
 from eval.task_level.schemas import RESULTS_ROOT, TASKS_PATH, VALIDATION_ROOT, RunMetrics, RunResult, TaskSpec
 from eval.task_level.task_selection import decide_candidate_status, decide_screening_result, write_screening_artifacts
 from eval.task_level.task33_pilot import TASK33C_PILOT_CONDITIONS, TASK33C_PILOT_TASK_ID, build_task33c_pilot_plan, evaluate_task33c_pilot_completeness
+from eval.task_level.task33_validation import PROTOCOL_PATH, protocol_sha256, validate_task33c_run
 
 
 BASE_PROMPT = """You are working in a software repository at the supplied base commit.
@@ -424,10 +425,16 @@ def main(argv: list[str] | None = None) -> int:
     }
     if args.task33c_pilot:
         plan = build_task33c_pilot_plan(tasks[0].task_id)
+        shutil.copy2(PROTOCOL_PATH, run_dir / PROTOCOL_PATH.name)
         (run_dir / "task33c_pilot_plan.json").write_text(
             json.dumps(plan, indent=2, sort_keys=True) + "\n", encoding="utf-8",
         )
         metadata["task33c_engineering_pilot"] = plan
+        metadata["task33c_protocol"] = {
+            "path": PROTOCOL_PATH.name,
+            "sha256": protocol_sha256(),
+            "enforcement": "independent_disk_artifact_verifier",
+        }
         metadata["isolated_worker_host"] = {
             "configured": isolated_worker is not None,
             "compressor_identity": isolated_worker.compressor_identity if isolated_worker else None,
@@ -445,6 +452,22 @@ def main(argv: list[str] | None = None) -> int:
         else select_runner(args.runner, codex_sandbox_mode=args.codex_sandbox_mode)
     )
     capabilities = runner.verify()
+    if args.task33c_pilot and not args.dry_run:
+        boundary_evidence = getattr(runner, "boundary_evidence", {})
+        boundary_evidence = boundary_evidence if isinstance(boundary_evidence, dict) else {}
+        (run_dir / "task33c_sandbox_provenance.json").write_text(
+            json.dumps({
+                "schema_version": 1,
+                "base_image": os.environ.get("TASK33C_BASE_IMAGE"),
+                "requirements_sha256": os.environ.get("TASK33C_EVALUATOR_REQUIREMENTS_SHA256"),
+                "evaluator_image": os.environ.get("TASK33C_TEST_CONTAINER_IMAGE"),
+                "image_id": boundary_evidence.get("image_id"),
+                "image_id_sha256": boundary_evidence.get("image_id_sha256"),
+                "boundary_status": boundary_evidence.get("status"),
+                "protocol_sha256": protocol_sha256(),
+            }, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
     metadata["runner_verification"] = runner_verification_payload(capabilities)
     metadata["runner_factory"] = args.runner_factory
     metadata["environment"]["runner_detection"] = {
@@ -597,10 +620,28 @@ def main(argv: list[str] | None = None) -> int:
         )
         (run_dir / "metadata.json").write_text(json.dumps(metadata, indent=2, sort_keys=True), encoding="utf-8")
     write_report(run_dir, metadata, results)
+    task33c_validation: dict[str, Any] | None = None
+    if args.task33c_pilot and not args.dry_run:
+        task33c_validation = validate_task33c_run(run_dir)
+        metadata["task33c_independent_validation"] = {
+            "valid": task33c_validation["valid"],
+            "verdict": task33c_validation["verdict"],
+            "errors": task33c_validation["errors"],
+            "artifact": "task33c_validation.json",
+        }
+        metadata["decision"] = (
+            "ENGINEERING_PILOT_COMPLETE"
+            if task33c_validation["valid"]
+            else "INCONCLUSIVE"
+        )
+        (run_dir / "metadata.json").write_text(
+            json.dumps(metadata, indent=2, sort_keys=True), encoding="utf-8"
+        )
+        task33c_validation = validate_task33c_run(run_dir)
     if args.screen_tasks:
         write_screening_summary(run_dir, tasks, results, args.repeats)
     print(run_dir)
-    if args.task33c_pilot and not args.dry_run and not metadata.get("task33c_completeness", {}).get("complete"):
+    if args.task33c_pilot and not args.dry_run and not (task33c_validation or {}).get("valid"):
         return 3
     return 0
 
