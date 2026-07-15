@@ -47,6 +47,7 @@ class DockerCommandSandbox:
         self.image = image.strip()
         self.docker = docker
         self._verification: dict[str, object] | None = None
+        self._last_cleanup_verified = False
 
     @classmethod
     def from_environment(cls) -> DockerCommandSandbox:
@@ -100,6 +101,25 @@ class DockerCommandSandbox:
                     "image_id": inspected.stdout.strip(),
                     "reason": f"canary:{exc.__class__.__name__}:{exc}",
                 }
+            detached_container_removed = self._last_cleanup_verified
+            output_limit_enforced = False
+            output_container_removed = False
+            timeout_enforced = False
+            timeout_container_removed = False
+            try:
+                self._run(
+                    ("python", "-c", f"import sys;sys.stdout.write('x'*{_STDOUT_LIMIT + 1})"),
+                    workspace,
+                    timeout_seconds=8,
+                )
+            except RuntimeError as exc:
+                output_limit_enforced = "stdout exceeded" in str(exc)
+                output_container_removed = self._last_cleanup_verified
+            try:
+                self._run(("python", "-c", "import time;time.sleep(5)"), workspace, timeout_seconds=0.5)
+            except TimeoutError:
+                timeout_enforced = True
+                timeout_container_removed = self._last_cleanup_verified
         checks = {
             key: row.get(key) is True
             for key in ("root_read_only", "network_denied", "host_secret_absent", "workspace_read_only", "host_root_absent")
@@ -109,6 +129,13 @@ class DockerCommandSandbox:
             and not isinstance(row.get("detached_pid"), bool)
             and result.wall_time_seconds < 8
         )
+        checks["output_limit_enforced"] = output_limit_enforced
+        checks["timeout_enforced"] = timeout_enforced
+        checks["container_removed_after_exit"] = all((
+            detached_container_removed,
+            output_container_removed,
+            timeout_container_removed,
+        ))
         self._verification = {
             "schema_version": 1,
             "status": "verified" if all(checks.values()) and result.returncode == 0 else "failed",
@@ -139,6 +166,7 @@ class DockerCommandSandbox:
     ) -> SandboxCommandResult:
         if timeout_seconds <= 0:
             raise TimeoutError("sandbox command deadline expired")
+        self._last_cleanup_verified = False
         workspace = workspace.resolve()
         if not workspace.is_dir():
             raise ValueError("sandbox workspace does not exist")
@@ -190,14 +218,21 @@ class DockerCommandSandbox:
             if remaining <= 0:
                 raise TimeoutError("sandbox command exceeded absolute deadline")
             returncode = process.wait(timeout=remaining)
+            if self._container_exists(name):
+                self._remove_container(name)
+                raise RuntimeError("sandbox container survived command completion")
+            self._last_cleanup_verified = True
         except Exception as exc:
             failure = exc
             self._remove_container(name)
+            self._last_cleanup_verified = not self._container_exists(name)
             try:
                 os.killpg(process.pid, signal.SIGKILL)
             except (ProcessLookupError, PermissionError):
                 pass
             process.wait(timeout=10)
+            if not self._last_cleanup_verified:
+                raise RuntimeError("sandbox container cleanup could not be verified") from exc
             raise
         finally:
             selector.close()
@@ -224,6 +259,20 @@ class DockerCommandSandbox:
             )
         except (OSError, subprocess.SubprocessError):
             pass
+
+    def _container_exists(self, name: str) -> bool:
+        try:
+            inspected = subprocess.run(
+                [self.docker, "container", "inspect", name],
+                stdin=subprocess.DEVNULL,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                timeout=10,
+                check=False,
+            )
+        except (OSError, subprocess.SubprocessError):
+            return True
+        return inspected.returncode == 0
 
 
 def normalize_python_test_command(command: Sequence[str]) -> tuple[str, ...]:

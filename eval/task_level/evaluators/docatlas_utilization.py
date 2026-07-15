@@ -19,6 +19,7 @@ class DocAtlasUtilization:
     context_used_confidence: str = "none"
     used_symbols: list[str] = field(default_factory=list)
     used_sources: list[str] = field(default_factory=list)
+    prompt_injected_sources: list[str] = field(default_factory=list)
     used_project_constraints: list[str] = field(default_factory=list)
     used_version_info: list[str] = field(default_factory=list)
     docatlas_retrieval_status: str | None = None
@@ -39,6 +40,7 @@ class DocAtlasUtilization:
             "context_used_confidence": self.context_used_confidence,
             "used_symbols": self.used_symbols,
             "used_sources": self.used_sources,
+            "prompt_injected_sources": self.prompt_injected_sources,
             "used_project_constraints": self.used_project_constraints,
             "used_version_info": self.used_version_info,
             "docatlas_retrieval_status": self.docatlas_retrieval_status,
@@ -64,6 +66,7 @@ def evaluate_docatlas_utilization(
     packet_path = run_output_dir / "action_packet.json"
     injected_path = run_output_dir / "injected_context.md"
     sources_path = run_output_dir / "context_sources.json"
+    prompt_sources_path = run_output_dir / "delivery_prompt_sources.json"
     injection_path = run_output_dir / "docatlas_context_injection.json"
     host_retrieval = _load_json(run_output_dir / "host_retrieval_metrics.json")
     bounded_delivery = bool(host_retrieval)
@@ -120,6 +123,7 @@ def evaluate_docatlas_utilization(
     candidate_symbols = _candidate_symbols(task, context_text)
     used_symbols = sorted(symbol for symbol in candidate_symbols if symbol and symbol in patch_text)
     used_sources = _used_sources(sources_path, f"{trajectory_text}\n{patch_text}", packet_path)
+    prompt_injected_sources = _load_prompt_sources(prompt_sources_path)
     used_project_constraints = _used_project_constraints(task, patch_text, context_text)
     used_version_info = _used_version_info(task, patch_text, context_text, trajectory_text)
 
@@ -141,6 +145,7 @@ def evaluate_docatlas_utilization(
         context_used_confidence=confidence,
         used_symbols=used_symbols,
         used_sources=used_sources,
+        prompt_injected_sources=prompt_injected_sources,
         used_project_constraints=used_project_constraints,
         used_version_info=used_version_info,
         docatlas_retrieval_status=retrieval_status,
@@ -186,6 +191,20 @@ def _used_sources(sources_path: Path, trajectory_text: str, packet_path: Path) -
         if path and path in trajectory_text:
             used.append(path)
     return sorted(set(used))
+
+
+def _load_prompt_sources(path: Path) -> list[str]:
+    try:
+        value = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return []
+    if not isinstance(value, list):
+        return []
+    return sorted({
+        str(item.get("path") or "")
+        for item in value
+        if isinstance(item, dict) and str(item.get("path") or "")
+    })
 
 
 def _used_project_constraints(task: TaskSpec, patch_text: str, context_text: str) -> list[str]:

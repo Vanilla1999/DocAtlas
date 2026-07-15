@@ -1,289 +1,95 @@
-name: Task 33C Actions probe
+name: Task 33C trusted causal pilot
 
 on:
   workflow_dispatch:
     inputs:
       run_causal_pilot:
-        description: Run the one-task/four-lane GitHub Models engineering pilot
-        required: false
+        description: Run the frozen one-task/four-lane causal pilot after the capability probe
+        required: true
         default: false
         type: boolean
-  pull_request:
-    branches: [main]
-    paths:
-      - ".github/workflows/task33c-actions-probe.yml"
-      - "docmancer/docs/application/action_packet.py"
-      - "docmancer/docs/interfaces/mcp/context_tools.py"
-      - "eval/task_level/**"
-      - "tests/docs/test_action_packet.py"
-      - "tests/task_level/**"
-      - "roadmap/33_TASK23_FAILURE_ANALYSIS_AND_CONTEXT_PIVOT.md"
 
 permissions:
   contents: read
-  models: read
 
 concurrency:
-  group: task33c-actions-probe-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
+  group: task33c-causal-pilot-${{ github.ref }}
+  cancel-in-progress: false
 
 env:
   DOCMANCER_OFFLINE: "1"
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+  TASK33C_GITHUB_MODEL: openai/gpt-4o-mini
+  TASK33C_BASE_IMAGE: python:3.14.6-slim@sha256:d3400aa122fa42cf0af0dbe8ec3091b047eac5c8f7e3539f7135e86d855dc015
+  TASK33C_EVALUATOR_REQUIREMENTS_SHA256: 6ae3eade04b844c3f42d8d56b2001fd117729c0f1ae2f68cab50f417d3bea681
 
 jobs:
   capability-probe:
-    name: Sandbox and frozen-retrieval probe
+    name: Trusted structured-model and sandbox probe
     runs-on: ubuntu-latest
     timeout-minutes: 25
+    permissions:
+      contents: read
+      models: read
 
     steps:
-      - uses: actions/checkout@v5
+      - name: Checkout trusted ref without persisted credentials
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
 
       - name: Set up Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
         with:
           python-version: "3.12"
 
-      - name: Install bubblewrap
-        run: |
-          sudo apt-get update
-          sudo apt-get install --no-install-recommends --yes bubblewrap
+      - name: Install frozen harness
+        run: python -m pip install -e ".[dev]"
 
-      - name: Install DocAtlas
-        run: pip install -e ".[dev]"
-
-      - name: Record runner capabilities
-        run: |
-          mkdir -p task33c-actions-probe
-          python - <<'PY'
-          import json
-          import platform
-          import shutil
-          import subprocess
-          from pathlib import Path
-
-          def command(command):
-              process = subprocess.run(
-                  command,
-                  text=True,
-                  stdout=subprocess.PIPE,
-                  stderr=subprocess.STDOUT,
-                  check=False,
-              )
-              return {
-                  "command": command,
-                  "returncode": process.returncode,
-                  "output": process.stdout[-20_000:],
-              }
-
-          report = {
-              "schema_version": 1,
-              "platform": platform.platform(),
-              "bubblewrap": shutil.which("bwrap"),
-              "docker": shutil.which("docker"),
-              "bubblewrap_version": command(["bwrap", "--version"]),
-              "docker_version": command(["docker", "version"]),
-              "docker_info": command(["docker", "info"]),
-          }
-          Path("task33c-actions-probe/environment.json").write_text(
-              json.dumps(report, indent=2, sort_keys=True) + "\n",
-              encoding="utf-8",
-          )
-          PY
-
-      - name: Probe GitHub Models usage accounting
+      - name: Probe production structured GitHub Models adapter
         id: model
         continue-on-error: true
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: |
+          mkdir -p task33c-actions-probe
           python - <<'PY'
           import json
           import os
-          import urllib.error
-          import urllib.request
           from pathlib import Path
 
-          model = "openai/gpt-4o-mini"
-          payload = {
-              "model": model,
-              "messages": [{"role": "user", "content": "Reply with the single word READY."}],
-              "max_tokens": 16,
-              "temperature": 0,
-              "stream": True,
-              "stream_options": {"include_usage": True},
-          }
-          request = urllib.request.Request(
-              "https://models.github.ai/inference/chat/completions",
-              data=json.dumps(payload).encode("utf-8"),
-              headers={
-                  "Accept": "text/event-stream",
-                  "Authorization": "Bearer " + os.environ["GITHUB_TOKEN"],
-                  "Content-Type": "application/json",
-                  "X-GitHub-Api-Version": "2026-03-10",
-              },
-              method="POST",
-          )
-          report = {"schema_version": 1, "status": "failed", "provider": "github-models", "model": model}
-          try:
-              with urllib.request.urlopen(request, timeout=45) as response:
-                  request_ids = {
-                      name: response.headers.get(name)
-                      for name in ("x-github-request-id", "x-ms-request-id", "apim-request-id")
-                      if response.headers.get(name)
-                  }
-                  chunks = []
-                  usage = None
-                  for raw_line in response:
-                      line = raw_line.decode("utf-8", errors="replace").strip()
-                      if not line.startswith("data:"):
-                          continue
-                      data = line.removeprefix("data:").strip()
-                      if data == "[DONE]":
-                          continue
-                      event = json.loads(data)
-                      if isinstance(event.get("usage"), dict):
-                          usage = event["usage"]
-                      for choice in event.get("choices", []):
-                          delta = choice.get("delta", {}) if isinstance(choice, dict) else {}
-                          if isinstance(delta.get("content"), str):
-                              chunks.append(delta["content"])
-                  report.update({
-                      "request_ids": request_ids,
-                      "usage": usage,
-                      "response": "".join(chunks),
-                  })
-          except urllib.error.HTTPError as exc:
-              report["http_status"] = exc.code
-              report["error"] = exc.read(2_000).decode("utf-8", errors="replace")
-          except Exception as exc:
-              report["error"] = exc.__class__.__name__ + ":" + str(exc)[:1_000]
+          from eval.task_level.github_models import run_github_models_capability_probe
 
-          usage = report.get("usage")
-          token_fields = ("prompt_tokens", "completion_tokens", "total_tokens")
-          verified = (
-              isinstance(usage, dict)
-              and all(isinstance(usage.get(name), int) and not isinstance(usage.get(name), bool) for name in token_fields)
-              and usage["prompt_tokens"] > 0
-              and usage["completion_tokens"] > 0
-              and usage["total_tokens"] == usage["prompt_tokens"] + usage["completion_tokens"]
-              and bool(report.get("request_ids"))
+          report = run_github_models_capability_probe(
+              os.environ["GITHUB_TOKEN"],
+              model=os.environ["TASK33C_GITHUB_MODEL"],
           )
-          report["status"] = "verified" if verified else "failed"
           Path("task33c-actions-probe/model-usage-probe.json").write_text(
               json.dumps(report, indent=2, sort_keys=True) + "\n",
               encoding="utf-8",
           )
-          if not verified:
-              raise SystemExit("GitHub Models usage accounting was not verified")
-          PY
-
-      - name: Run executable sandbox canary
-        id: sandbox
-        continue-on-error: true
-        run: |
-          python - <<'PY'
-          import json
-          from pathlib import Path
-
-          from eval.task_level.isolated_delivery import JsonSubprocessIsolatedWorker
-
-          worker = JsonSubprocessIsolatedWorker(
-              command=("/usr/bin/python3", "-c", "raise SystemExit(0)"),
-              compressor_identity="task33c-actions-canary-v1",
-              environment={},
-              sandbox_executable="/usr/bin/bwrap",
-          )
-          report = worker.capability_evidence
-          Path("task33c-actions-probe/sandbox-canary.json").write_text(
-              json.dumps(report, indent=2, sort_keys=True) + "\n",
-              encoding="utf-8",
-          )
           if report.get("status") != "verified":
-              raise SystemExit("Task 33C bubblewrap canary was not verified")
+              raise SystemExit("production structured GitHub Models adapter was not verified")
           PY
 
-      - name: Run Docker sandbox canary
+      - name: Run live Docker adversarial canaries
         id: docker
         continue-on-error: true
         run: |
           python - <<'PY'
           import json
-          import subprocess
+          import os
           from pathlib import Path
 
-          script = r'''
-          cwd_writable=true
-          touch /canary 2>/dev/null || cwd_writable=false
-          workspace_visible=false
-          test -e /workspace && workspace_visible=true
-          network_reachable=true
-          wget -q -T 1 -O /tmp/network-check https://example.com 2>/dev/null || network_reachable=false
-          sleep 30 &
-          printf '{"cwd":"%s","cwd_writable":%s,"workspace_visible":%s,"network_reachable":%s,"detached_descendant_spawned":true}\n' \
-            "$(pwd)" "$cwd_writable" "$workspace_visible" "$network_reachable"
-          '''
-          command = [
-              "docker", "run", "--rm", "--pull=always",
-              "--network", "none",
-              "--read-only",
-              "--pids-limit", "64",
-              "--memory", "256m",
-              "--cpus", "1",
-              "--cap-drop", "ALL",
-              "--security-opt", "no-new-privileges",
-              "--user", "65532:65532",
-              "--tmpfs", "/tmp:rw,noexec,nosuid,nodev,size=16m",
-              "alpine:3.22",
-              "sh", "-ec", script,
-          ]
-          process = subprocess.run(
-              command,
-              text=True,
-              stdout=subprocess.PIPE,
-              stderr=subprocess.PIPE,
-              timeout=30,
-              check=False,
-          )
-          try:
-              checks = json.loads(process.stdout)
-          except json.JSONDecodeError:
-              checks = {}
-          expected = {
-              "cwd": "/",
-              "cwd_writable": False,
-              "workspace_visible": False,
-              "network_reachable": False,
-              "detached_descendant_spawned": True,
-          }
-          verified = process.returncode == 0 and checks == expected
-          report = {
-              "schema_version": 1,
-              "status": "verified" if verified else "failed",
-              "backend": "docker",
-              "image": "alpine:3.22",
-              "command_policy": {
-                  "network": "none",
-                  "read_only_root": True,
-                  "user": "65532:65532",
-                  "cap_drop": "ALL",
-                  "no_new_privileges": True,
-                  "pids_limit": 64,
-                  "memory": "256m",
-                  "cpus": 1,
-                  "workspace_mounted": False,
-              },
-              "returncode": process.returncode,
-              "checks": checks,
-              "stderr": process.stderr[-2_000:],
-          }
+          from eval.task_level.sandbox_execution import DockerCommandSandbox
+
+          report = DockerCommandSandbox(os.environ["TASK33C_BASE_IMAGE"]).verify()
           Path("task33c-actions-probe/docker-sandbox-canary.json").write_text(
               json.dumps(report, indent=2, sort_keys=True) + "\n",
               encoding="utf-8",
           )
-          if not verified:
-              raise SystemExit("Task 33C Docker canary was not verified")
+          if report.get("status") != "verified":
+              raise SystemExit("Task 33C Docker adversarial canaries were not verified")
           PY
 
       - name: Run frozen host-retrieval probe
@@ -300,15 +106,15 @@ jobs:
           from eval.task_level.task33_pilot import (
               TASK33C_PILOT_TASK_ID,
               TASK33C_REQUIRED_EVIDENCE_CATEGORIES,
+              TASK33C_REQUIRED_EVIDENCE_PATHS,
           )
 
           task = next(task for task in load_tasks() if task.task_id == TASK33C_PILOT_TASK_ID)
           with tempfile.TemporaryDirectory(prefix="task33c-actions-retrieval-") as temp_dir:
               evidence, preparation = _prepare_shared_task33_evidence(task, Path(temp_dir), 0)
-
-          missing_categories = sorted(
-              set(TASK33C_REQUIRED_EVIDENCE_CATEGORIES) - set(evidence.evidence_categories)
-          )
+          paths = {str(item.get("path") or "") for item in evidence.evidence_items}
+          missing_categories = sorted(set(TASK33C_REQUIRED_EVIDENCE_CATEGORIES) - set(evidence.evidence_categories))
+          missing_paths = sorted(set(TASK33C_REQUIRED_EVIDENCE_PATHS) - paths)
           report = {
               "schema_version": 1,
               "status": evidence.response_status,
@@ -319,12 +125,14 @@ jobs:
               "evidence_count": len(evidence.evidence_items),
               "evidence_categories": list(evidence.evidence_categories),
               "evidence_fingerprint": evidence.fingerprint,
+              "project_revision": evidence.project_revision,
+              "index_revision": evidence.index_revision,
               "missing_required_categories": missing_categories,
+              "missing_required_paths": missing_paths,
               "preparation_status": preparation.get("status"),
           }
           Path("task33c-actions-probe/frozen-retrieval.json").write_text(
-              json.dumps(report, indent=2, sort_keys=True) + "\n",
-              encoding="utf-8",
+              json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8"
           )
           if (
               evidence.response_status != "success"
@@ -332,79 +140,72 @@ jobs:
               or evidence.retrieval_issues
               or not evidence.evidence_items
               or missing_categories
+              or missing_paths
           ):
               raise SystemExit("Task 33C frozen retrieval was not usable")
           PY
 
-      - name: Run focused adversarial tests
+      - name: Run focused hardening tests
         id: focused
         continue-on-error: true
-        run: pytest tests/task_level/test_task33_isolated_delivery.py -q
-
-      - name: Publish probe summary
-        if: always()
         run: |
-          {
-            echo "## Task 33C Actions probe"
-            echo
-            echo "| Check | Outcome |"
-            echo "| --- | --- |"
-            echo "| bubblewrap sandbox canary | ${{ steps.sandbox.outcome }} |"
-            echo "| Docker sandbox canary | ${{ steps.docker.outcome }} |"
-            echo "| GitHub Models usage | ${{ steps.model.outcome }} |"
-            echo "| frozen host retrieval | ${{ steps.retrieval.outcome }} |"
-            echo "| focused adversarial tests | ${{ steps.focused.outcome }} |"
-          } >> "$GITHUB_STEP_SUMMARY"
+          pytest -q \
+            tests/docs/test_action_packet.py \
+            tests/task_level/test_github_models_adapter.py \
+            tests/task_level/test_task33_isolated_delivery.py \
+            tests/task_level/test_task33_local.py \
+            tests/task_level/test_task33_validation.py
 
-      - name: Upload probe evidence
+      - name: Upload capability evidence
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: task33c-actions-probe-${{ github.run_id }}
+          name: task33c-capability-probe-${{ github.run_id }}
           path: task33c-actions-probe/
           if-no-files-found: error
           retention-days: 14
 
-      - name: Enforce probe gate
+      - name: Enforce capability gate
         if: always()
         env:
-          SANDBOX_OUTCOME: ${{ steps.sandbox.outcome }}
-          DOCKER_OUTCOME: ${{ steps.docker.outcome }}
           MODEL_OUTCOME: ${{ steps.model.outcome }}
+          DOCKER_OUTCOME: ${{ steps.docker.outcome }}
           RETRIEVAL_OUTCOME: ${{ steps.retrieval.outcome }}
           FOCUSED_OUTCOME: ${{ steps.focused.outcome }}
         run: |
-          if test "$SANDBOX_OUTCOME" != success && test "$DOCKER_OUTCOME" != success; then
-            echo "No verified sandbox backend is available"
-            exit 1
-          fi
           test "$MODEL_OUTCOME" = success
+          test "$DOCKER_OUTCOME" = success
           test "$RETRIEVAL_OUTCOME" = success
           test "$FOCUSED_OUTCOME" = success
 
   causal-pilot:
-    name: GitHub Models causal pilot
-    if: github.event_name == 'workflow_dispatch' && inputs.run_causal_pilot
+    name: Frozen GitHub Models causal pilot
+    if: inputs.run_causal_pilot
     needs: capability-probe
     runs-on: ubuntu-latest
-    timeout-minutes: 50
+    timeout-minutes: 55
+    environment: task33c-causal-pilot
+    permissions:
+      contents: read
+      models: read
 
     steps:
-      - uses: actions/checkout@v5
+      - name: Checkout trusted ref without persisted credentials
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
 
       - name: Set up fixture Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
         with:
           python-version: "3.14"
 
-      - name: Install pinned uv
-        run: python -m pip install "uv==0.9.25"
-
-      - name: Prewarm frozen fixture dependencies
+      - name: Install pinned uv and prewarm frozen fixture dependencies
         env:
           UV_CACHE_DIR: ${{ runner.temp }}/task33c-uv-cache
           UV_PROJECT_ENVIRONMENT: ${{ runner.temp }}/task33c-prewarm-environment
         run: |
+          python -m pip install "uv==0.9.25"
           mkdir -p "${RUNNER_TEMP}/task33c-prewarm-project"
           cp eval/task_level/fixtures/templates/decisive_nbo_cross_module_gate_large_001/pyproject.toml \
             "${RUNNER_TEMP}/task33c-prewarm-project/pyproject.toml"
@@ -412,39 +213,43 @@ jobs:
           uv sync --python 3.14
 
       - name: Set up harness Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
         with:
           python-version: "3.12"
 
-      - name: Install DocAtlas
+      - name: Install frozen harness
         run: |
           python -m pip install "uv==0.9.25"
           python -m pip install -e ".[dev]"
 
-      - name: Build credential-free evaluator sandbox
+      - name: Build digest-pinned evaluator sandbox with hash-locked packages
         env:
           TASK33C_SANDBOX_IMAGE: docatlas-task33c-evaluator:${{ github.sha }}
         run: |
-          docker build --pull --tag "$TASK33C_SANDBOX_IMAGE" - <<'DOCKERFILE'
-          FROM python:3.14.6-slim
-          RUN python -m pip install --no-cache-dir \
-              "iniconfig==2.3.0" "packaging==26.2" "pluggy==1.6.0" \
-              "pygments==2.20.0" "pytest==9.0.3"
+          docker build --pull --tag "$TASK33C_SANDBOX_IMAGE" --file - . <<DOCKERFILE
+          FROM --platform=linux/amd64 ${TASK33C_BASE_IMAGE}
+          COPY eval/task_level/task33c_evaluator_requirements.txt /tmp/requirements.txt
+          RUN python -m pip install --no-cache-dir --require-hashes -r /tmp/requirements.txt
           DOCKERFILE
           image_id="$(docker image inspect --format '{{.Id}}' "$TASK33C_SANDBOX_IMAGE")"
           echo "TASK33C_TEST_CONTAINER_IMAGE=$TASK33C_SANDBOX_IMAGE" >> "$GITHUB_ENV"
           mkdir -p task33c-sandbox-image
           printf '%s\n' "$image_id" > task33c-sandbox-image/image-id.txt
+          printf '%s\n' "$TASK33C_BASE_IMAGE" > task33c-sandbox-image/base-image.txt
+          sha256sum eval/task_level/task33c_evaluator_requirements.txt \
+            > task33c-sandbox-image/requirements.sha256
 
-      - name: Run controlled GitHub Models pilot
+      - name: Run controlled frozen pilot
+        id: pilot
+        continue-on-error: true
         env:
           GITHUB_TOKEN: ${{ github.token }}
-          TASK33C_GITHUB_MODEL: openai/gpt-4o-mini
           UV_CACHE_DIR: ${{ runner.temp }}/task33c-uv-cache
           TASK33C_REQUIRE_DOCKER_SANDBOX: "1"
         run: |
           python -m eval.task_level.runner \
             --task33c-pilot \
+            --task33c-provider-profile github-models \
             --tasks decisive_nbo_cross_module_gate_large_001 \
             --runner-factory eval.task_level.github_models:create_github_models_runner \
             --isolated-worker-factory eval.task_level.github_models:create_github_models_worker \
@@ -455,7 +260,41 @@ jobs:
             --isolated-worker-timeout-seconds 90 \
             --run-id "task33c_github_models_${GITHUB_RUN_ID}"
 
-      - name: Publish pilot decision
+      - name: Recompute independent validation and stage allowlisted evidence
+        id: validation
+        if: always()
+        continue-on-error: true
+        run: |
+          python - <<'PY'
+          import hashlib
+          import json
+          import os
+          import shutil
+          from pathlib import Path
+
+          from eval.task_level.task33_validation import validate_task33c_run
+
+          run_dir = Path("eval/task_level/results") / f"task33c_github_models_{os.environ['GITHUB_RUN_ID']}"
+          validation = validate_task33c_run(run_dir)
+          manifest = json.loads((run_dir / "task33c_artifact_manifest.json").read_text(encoding="utf-8"))
+          upload = Path("task33c-upload")
+          for item in manifest["files"]:
+              source = run_dir / item["path"]
+              if hashlib.sha256(source.read_bytes()).hexdigest() != item["sha256"]:
+                  raise SystemExit("artifact changed after independent validation: " + item["path"])
+              destination = upload / "run" / item["path"]
+              destination.parent.mkdir(parents=True, exist_ok=True)
+              shutil.copy2(source, destination)
+          for name in ("task33c_artifact_manifest.json", "task33c_validation.json"):
+              destination = upload / "run" / name
+              destination.parent.mkdir(parents=True, exist_ok=True)
+              shutil.copy2(run_dir / name, destination)
+          shutil.copytree("task33c-sandbox-image", upload / "sandbox-image", dirs_exist_ok=True)
+          if validation.get("valid") is not True:
+              raise SystemExit("Task 33C independent validation is INCONCLUSIVE")
+          PY
+
+      - name: Publish independent decision
         if: always()
         run: |
           python - <<'PY'
@@ -463,55 +302,35 @@ jobs:
           import os
           from pathlib import Path
 
-          run_dir = Path("eval/task_level/results") / f"task33c_github_models_{os.environ['GITHUB_RUN_ID']}"
-          completeness_path = run_dir / "task33c_completeness.json"
-          if completeness_path.exists():
-              completeness = json.loads(completeness_path.read_text(encoding="utf-8"))
+          path = Path("eval/task_level/results") / f"task33c_github_models_{os.environ['GITHUB_RUN_ID']}" / "task33c_validation.json"
+          if path.is_file():
+              result = json.loads(path.read_text(encoding="utf-8"))
               lines = [
-                  "## Task 33C GitHub Models pilot",
+                  "## Task 33C independent validation",
                   "",
-                  f"Decision: **{completeness.get('decision')}**",
+                  f"Verdict: **{result.get('verdict')}**",
                   "",
-                  f"Complete: `{completeness.get('complete')}`",
+                  f"Valid: `{result.get('valid')}`",
                   "",
-                  "Errors: " + (", ".join(completeness.get("errors", [])) or "none"),
+                  "Errors: " + (", ".join(result.get("errors", [])) or "none"),
               ]
           else:
-              lines = ["## Task 33C GitHub Models pilot", "", "Pilot did not produce a completeness artifact."]
+              lines = ["## Task 33C independent validation", "", "Validation artifact is missing."]
           with Path(os.environ["GITHUB_STEP_SUMMARY"]).open("a", encoding="utf-8") as handle:
               handle.write("\n".join(lines) + "\n")
           PY
 
-      - name: Upload causal pilot evidence
+      - name: Upload allowlisted causal evidence
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: task33c-github-models-pilot-${{ github.run_id }}
-          path: |
-            eval/task_level/results/task33c_github_models_${{ github.run_id }}/
-            task33c-sandbox-image/
+          name: task33c-causal-evidence-${{ github.run_id }}
+          path: task33c-upload/
           if-no-files-found: warn
           retention-days: 30
 
-      - name: Enforce causal completeness gate
+      - name: Enforce independent validation gate
         if: always()
-        run: |
-          python - <<'PY'
-          import json
-          import os
-          from pathlib import Path
-
-          path = (
-              Path("eval/task_level/results")
-              / f"task33c_github_models_{os.environ['GITHUB_RUN_ID']}"
-              / "task33c_completeness.json"
-          )
-          if not path.is_file():
-              raise SystemExit("Task 33C completeness artifact is missing")
-          result = json.loads(path.read_text(encoding="utf-8"))
-          if result.get("complete") is not True or result.get("decision") != "ENGINEERING_PILOT_COMPLETE":
-              raise SystemExit(
-                  "Task 33C causal pilot is inconclusive: "
-                  + ",".join(result.get("errors") or ["unknown"])
-              )
-          PY
+        env:
+          VALIDATION_OUTCOME: ${{ steps.validation.outcome }}
+        run: test "$VALIDATION_OUTCOME" = success

@@ -52,3 +52,34 @@ def test_patch_symbol_from_context_counts_as_medium_signal(tmp_path: Path):
     assert result.context_used
     assert result.context_used_confidence == "medium"
     assert "Depends" in result.used_symbols
+
+
+def test_bounded_delivery_reports_prompt_sources_without_claiming_usage(tmp_path: Path):
+    task = _task("decisive_nbo_cross_module_gate_large_001")
+    patch = tmp_path / "patch.diff"
+    patch.write_text("", encoding="utf-8")
+    (tmp_path / "host_retrieval_metrics.json").write_text(
+        json.dumps({"status": "success", "evidence_count": 2, "retrieval_calls": 1}),
+        encoding="utf-8",
+    )
+    (tmp_path / "action_packet.json").write_text(
+        json.dumps({"source_of_truth": [{"path": "docs/permission-architecture.md"}]}),
+        encoding="utf-8",
+    )
+    (tmp_path / "delivery_prompt_sources.json").write_text(
+        json.dumps([{"evidence_id": "e1", "path": "docs/permission-architecture.md"}]),
+        encoding="utf-8",
+    )
+
+    result = evaluate_docatlas_utilization(
+        task=task,
+        condition_id="docatlas_bounded_direct",
+        run_output_dir=tmp_path,
+        patch_path=patch,
+        trajectory_path=None,
+        agent_docatlas_calls=0,
+    )
+
+    assert result.prompt_injected_sources == ["docs/permission-architecture.md"]
+    assert result.used_sources == []
+    assert result.context_used is False

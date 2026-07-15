@@ -190,6 +190,19 @@ def action_packet_project_doc_metrics(task: Any, packet: dict[str, Any]) -> dict
     }
 
 
+def _persist_delivery_prompt_sources(output_dir: Path, packet: dict[str, Any]) -> None:
+    rows = packet.get("source_of_truth") if isinstance(packet.get("source_of_truth"), list) else []
+    sources = [
+        {
+            "evidence_id": row.get("evidence_id"),
+            "path": row.get("path"),
+        }
+        for row in rows
+        if isinstance(row, dict) and isinstance(row.get("path"), str) and row["path"]
+    ]
+    _write_json_atomic(output_dir / "delivery_prompt_sources.json", sources)
+
+
 def _estimate_tokens_from_chars(chars: int) -> int:
     return max(1, (chars + 3) // 4) if chars else 0
 
@@ -309,7 +322,7 @@ def _write_text_atomic(path: Path, text: str) -> None:
     tmp_path.replace(path)
 
 
-def _write_json_atomic(path: Path, payload: dict[str, Any]) -> None:
+def _write_json_atomic(path: Path, payload: Any) -> None:
     _write_text_atomic(path, json.dumps(payload, indent=2, sort_keys=True) + "\n")
 
 
@@ -479,6 +492,15 @@ def evaluate_agent_patch(task: TaskSpec, workspace: Path, run_output_dir: Path, 
             public = _run_evaluation_command(task, task.test_command, workspace, run_output_dir, "public", 180)
         except Exception as exc:
             evaluation_errors.append(f"public:{exc.__class__.__name__}:{str(exc)[:1_000]}")
+    _write_json_atomic(run_output_dir / "public_test_result.json", {
+        "schema_version": 1,
+        "status": "executed" if public is not None else "execution_failed" if evaluation_errors else "not_run",
+        "command": public.command if public is not None else task.test_command,
+        "returncode": public.returncode if public is not None else None,
+        "stdout": public.stdout if public is not None else "",
+        "stderr": public.stderr if public is not None else "",
+        "errors": list(evaluation_errors),
+    })
     hidden = None
     if setup_ok and contract_validation.valid and not evaluation_errors:
         copy_hidden_tests(task.task_id, workspace)
@@ -487,6 +509,17 @@ def evaluate_agent_patch(task: TaskSpec, workspace: Path, run_output_dir: Path, 
             hidden = _run_evaluation_command(task, hidden_command, workspace, run_output_dir, "hidden", 180)
         except Exception as exc:
             evaluation_errors.append(f"hidden:{exc.__class__.__name__}:{str(exc)[:1_000]}")
+    _write_json_atomic(run_output_dir / "hidden_test_result.json", {
+        "schema_version": 1,
+        "status": "executed" if hidden is not None else "execution_failed" if evaluation_errors else "not_run",
+        "command": hidden.command if hidden is not None else (
+            task_evaluation_contract.semantic_test_command if task_evaluation_contract else None
+        ),
+        "returncode": hidden.returncode if hidden is not None else None,
+        "stdout": hidden.stdout if hidden is not None else "",
+        "stderr": hidden.stderr if hidden is not None else "",
+        "errors": list(evaluation_errors),
+    })
     if task.task_id in TASK23_PROTOCOL_TASKS or task_evaluation_contract is not None:
         compile_gate = (
             _run_compile_gate(task, task_evaluation_contract, workspace, run_output_dir)
@@ -713,12 +746,8 @@ def evaluate_agent_patch(task: TaskSpec, workspace: Path, run_output_dir: Path, 
         "task_id": task.task_id,
         "condition_id": condition_id,
         "repeat": int(run_output_dir.name.removeprefix("repeat_")),
-        "runner_id": (
-            "github-models"
-            if "github-models" in str(getattr(runner_output, "runner_version", "")).lower()
-            else "codex"
-            if "codex" in str(getattr(runner_output, "runner_version", "")).lower()
-            else "claude"
+        "runner_id": _runner_id_from_version(
+            str(getattr(runner_output, "runner_version", ""))
         ),
         "runner_version": getattr(runner_output, "runner_version", "unknown"),
         "model": getattr(runner_output, "model", "unknown"),
@@ -1257,6 +1286,7 @@ def execute_pilot(
                                         "reason": "bounded_direct_insufficient_evidence",
                                     })
                                 else:
+                                    _persist_delivery_prompt_sources(run_output_dir, packet)
                                     prompt += "\nDocAtlas ActionPacket (bounded direct):\n" + json.dumps(packet, sort_keys=True) + "\n"
                     elif delivery_strategy == "bounded_subagent":
                         if isolated_worker is None:
@@ -1297,6 +1327,7 @@ def execute_pilot(
                                         "reason": "isolated_action_packet_insufficient_evidence",
                                     })
                                 else:
+                                    _persist_delivery_prompt_sources(run_output_dir, handoff["packet"])
                                     prompt += "\nDocAtlas ActionPacket (isolated worker):\n" + json.dumps(handoff["packet"], sort_keys=True) + "\n"
                     if CONDITIONS[condition_id].tool_policy.inject_external_context:
                         external = inject_audited_external_context(task, run_output_dir)
@@ -1398,6 +1429,14 @@ def _assert_task33_run_preconditions(tasks: list[TaskSpec], runner: AgentRunner)
         raise ValueError("Task 33 evaluation preconditions failed: " + ",".join(errors))
     if not bool(getattr(runner, "hard_turn_limit_enforced", False)):
         raise ValueError("Task 33 causal execution requires a runner with a proven hard turn limit")
+
+
+def _runner_id_from_version(version: str) -> str:
+    normalized = version.lower()
+    for runner_id in ("github-models", "openai-api", "codex"):
+        if runner_id in normalized:
+            return runner_id
+    return "claude"
 
 
 def write_run_progress(run_dir: Path, results: list[dict[str, Any]], total_runs: int, *, current: dict[str, Any] | None, finished: bool = False) -> None:
@@ -2112,10 +2151,12 @@ def run_canary(runner: AgentRunner, model: str, timeout_seconds: int, output_dir
     try:
         (workspace / "calc.py").write_text("def add(a, b):\n    return a - b\n", encoding="utf-8")
         (workspace / "normalization.py").write_text("def normalize(value):\n    return value - 1\n", encoding="utf-8")
+        (workspace / "policy.py").write_text("def may_enter(allowed):\n    return not allowed\n", encoding="utf-8")
         (workspace / "test_calc.py").write_text(
-            "from calc import add\nfrom normalization import normalize\n\n\n"
+            "from calc import add\nfrom normalization import normalize\nfrom policy import may_enter\n\n\n"
             "def test_add():\n    assert add(2, 3) == 5\n\n\n"
-            "def test_normalize():\n    assert normalize(-4) == 4\n",
+            "def test_normalize():\n    assert normalize(-4) == 4\n\n\n"
+            "def test_policy():\n    assert may_enter(True) is True\n    assert may_enter(False) is False\n",
             encoding="utf-8",
         )
         subprocess.run(["git", "init"], cwd=workspace, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False)
@@ -2131,8 +2172,9 @@ def run_canary(runner: AgentRunner, model: str, timeout_seconds: int, output_dir
             condition_id="repo_only",
             workspace=workspace,
             prompt=(
-                "Fix both independent defects: add(a, b) currently subtracts and normalize(value) "
-                "must return the absolute magnitude. Change both source files and run the tests. "
+                "Fix three independent defects: add(a, b) currently subtracts, normalize(value) "
+                "must return the absolute magnitude, and may_enter(allowed) must preserve the allowed boolean. "
+                "Change all three source files and run the tests. "
                 "Do not use web, curl, wget, or external network."
             ),
             model=model,
@@ -2143,7 +2185,7 @@ def run_canary(runner: AgentRunner, model: str, timeout_seconds: int, output_dir
             tool_policy_path=policy_path,
             output_dir=output_dir,
             test_command=canary_test_command,
-            allowed_write_paths=("calc.py", "normalization.py"),
+            allowed_write_paths=("calc.py", "normalization.py", "policy.py"),
         )
         runner_output = runner.run(request)
         patch_path, _, _, changed = capture_patch(workspace, output_dir)
@@ -2167,7 +2209,7 @@ def run_canary(runner: AgentRunner, model: str, timeout_seconds: int, output_dir
         canary_policy_clean = audit.clean or (network_probe_denied and audit.docatlas_calls == 0 and audit.context7_calls == 0)
         payload = {
             "task_id": "runner_canary",
-            "status": "passed" if patch_path.read_text(encoding="utf-8").strip() and tests.passed and canary_policy_clean and runner_output.exit_code is not None and {"calc.py", "normalization.py"}.issubset(changed) else "failed",
+            "status": "passed" if patch_path.read_text(encoding="utf-8").strip() and tests.passed and canary_policy_clean and runner_output.exit_code is not None and {"calc.py", "normalization.py", "policy.py"}.issubset(changed) else "failed",
             "runner_status": runner_output.status,
             "runner_exit_code": runner_output.exit_code,
             "patch_exists": bool(patch_path.read_text(encoding="utf-8").strip()),
@@ -2177,7 +2219,8 @@ def run_canary(runner: AgentRunner, model: str, timeout_seconds: int, output_dir
             "policy_clean": canary_policy_clean,
             "network_probe_denied": network_probe_denied,
             "changed_files": changed,
-            "multi_file_edit_proven": {"calc.py", "normalization.py"}.issubset(changed),
+            "multi_file_edit_proven": {"calc.py", "normalization.py", "policy.py"}.issubset(changed),
+            "same_shape_three_file_canary": True,
             "failure_summary": "runner did not produce a patch" if not patch_path.read_text(encoding="utf-8").strip() else "",
             "workspace": str(workspace),
             "validated_at": datetime.now(timezone.utc).isoformat(),

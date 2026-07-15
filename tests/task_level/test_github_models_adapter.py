@@ -10,10 +10,13 @@ from pathlib import Path
 import pytest
 
 from eval.task_level.github_models import (
+    OPENAI_API_PROVIDER,
     GitHubModelsClient,
     GitHubModelsCompletion,
     GitHubModelsIsolatedWorker,
     GitHubModelsRunner,
+    _bounded_runner_messages,
+    _estimate_message_tokens,
 )
 from eval.task_level.isolated_delivery import (
     DelegationEnvelope,
@@ -58,8 +61,11 @@ def _completion(content: dict, *, turn: int = 1) -> GitHubModelsCompletion:
             "prompt_tokens": 100,
             "completion_tokens": 20,
             "total_tokens": 120,
+            "prompt_tokens_details": {"cached_tokens": 0},
             "completion_tokens_details": {"reasoning_tokens": 0},
         },
+        request_payload_sha256=hashlib.sha256(f"request-{turn}".encode()).hexdigest(),
+        estimated_input_tokens=100,
     )
 
 
@@ -161,7 +167,13 @@ def test_github_models_client_streams_structured_output_and_usage(
                     "choices": [{"delta": {"content": '{"selected_'}, "finish_reason": None}],
                 },
                 {"choices": [{"delta": {"content": 'indices":[0,1,2]}'}, "finish_reason": "stop"}]},
-                {"choices": [], "usage": {"prompt_tokens": 10, "completion_tokens": 8, "total_tokens": 18}},
+                {"choices": [], "usage": {
+                    "prompt_tokens": 10,
+                    "completion_tokens": 8,
+                    "total_tokens": 18,
+                    "prompt_tokens_details": {"cached_tokens": 0},
+                    "completion_tokens_details": {"reasoning_tokens": 0},
+                }},
             ]
             return iter([*(f"data: {json.dumps(event)}\n\n".encode() for event in events), b"data: [DONE]\n\n"])
 
@@ -189,6 +201,101 @@ def test_github_models_client_streams_structured_output_and_usage(
     assert completion.output_tokens == 8
     assert captured["payload"]["stream"] is True
     assert captured["payload"]["stream_options"] == {"include_usage": True}
+
+
+def test_openai_api_profile_uses_server_request_id_and_separate_usage_artifact(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    class Response:
+        headers = {"x-request-id": "openai-request-1"}
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_args):
+            return None
+
+        def __iter__(self):
+            action = _action("finish", summary="done")
+            events = [
+                {"model": "gpt-4o-mini-2024-07-18", "choices": [{
+                    "delta": {"content": json.dumps(action)}, "finish_reason": "stop",
+                }]},
+                {"choices": [], "usage": {
+                    "prompt_tokens": 10,
+                    "completion_tokens": 8,
+                    "total_tokens": 18,
+                    "prompt_tokens_details": {"cached_tokens": 0},
+                    "completion_tokens_details": {"reasoning_tokens": 0},
+                }},
+            ]
+            return iter([*(f"data: {json.dumps(event)}\n\n".encode() for event in events), b"data: [DONE]\n\n"])
+
+    captured = {}
+
+    def fake_urlopen(request, timeout):
+        captured["headers"] = dict(request.header_items())
+        return Response()
+
+    monkeypatch.setattr("eval.task_level.github_models.urllib.request.urlopen", fake_urlopen)
+    value, completion = GitHubModelsClient(
+        "openai-key",
+        provider=OPENAI_API_PROVIDER,
+    ).complete_json(
+        model=OPENAI_API_PROVIDER.default_model,
+        messages=[{"role": "user", "content": "finish"}],
+        schema_name="controlled_agent_action",
+        schema={"type": "object"},
+        timeout_seconds=10,
+        max_tokens=64,
+    )
+
+    assert value["tool"] == "finish"
+    assert completion.request_id == "openai-request-1"
+    assert completion.request_ids["x-client-request-id"]
+    assert "X-github-api-version" not in captured["headers"]
+    assert captured["headers"]["Authorization"] == "Bearer openai-key"
+
+    workspace = tmp_path / "workspace"
+    workspace.mkdir()
+    (workspace / "module.py").write_text("VALUE = 1\n", encoding="utf-8")
+
+    def fake_complete(self, **kwargs):
+        action = _action("finish", summary="done")
+        completion = _completion(action)
+        return action, GitHubModelsCompletion(
+            **{**completion.__dict__, "model": OPENAI_API_PROVIDER.default_model}
+        )
+
+    monkeypatch.setattr(
+        "eval.task_level.github_models.GitHubModelsClient.complete_json",
+        fake_complete,
+    )
+    request = AgentRunRequest(
+        task_id="task",
+        condition_id="repo_only_strict_offline",
+        workspace=workspace,
+        prompt="inspect",
+        model=OPENAI_API_PROVIDER.default_model,
+        timeout_seconds=30,
+        max_turns=2,
+        environment={},
+        mcp_config_path=None,
+        tool_policy_path=tmp_path / "policy.json",
+        output_dir=tmp_path / "output",
+        allowed_write_paths=("module.py",),
+    )
+    output = GitHubModelsRunner(
+        "openai-key",
+        provider=OPENAI_API_PROVIDER,
+        sandbox=_TestSandbox(),
+    ).run(request)
+
+    assert output.status == "completed"
+    usage = json.loads((tmp_path / "output" / "openai_api_usage.json").read_text())
+    assert usage["provider"] == "openai-api"
+    assert usage["endpoint"] == OPENAI_API_PROVIDER.endpoint
 
 
 def test_github_models_runner_forbids_root_conftest_edits_outside_contract(
@@ -336,3 +443,23 @@ def test_github_models_worker_selects_host_evidence_and_binds_usage(
     assert output.usage.provider == "github-models"
     assert output.usage.proof["selected_indices"] == [0, 1, 2]
     output.usage.validate()
+
+
+def test_runner_context_compaction_is_deterministic_and_hard_bounded():
+    base = [
+        {"role": "system", "content": "system"},
+        {"role": "user", "content": "objective\n" + ("source line\n" * 4_000)},
+    ]
+    recent = [
+        {"role": "assistant" if index % 2 == 0 else "user", "content": str(index) * 8_000}
+        for index in range(8)
+    ]
+    pinned = [{"role": "user", "content": "latest test\n" + ("failure\n" * 2_000)}]
+
+    first, first_proof = _bounded_runner_messages(base, recent, pinned, token_limit=7_000)
+    second, second_proof = _bounded_runner_messages(base, recent, pinned, token_limit=7_000)
+
+    assert first == second
+    assert first_proof == second_proof
+    assert _estimate_message_tokens(first) <= 7_000
+    assert first_proof["dropped_message_sha256"] or first_proof["clipped_messages"]

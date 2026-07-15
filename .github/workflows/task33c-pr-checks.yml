@@ -1,0 +1,54 @@
+name: Task 33C pull-request checks
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - ".github/workflows/task33c-*.yml"
+      - "docmancer/docs/application/action_packet.py"
+      - "eval/task_level/**"
+      - "tests/docs/test_action_packet.py"
+      - "tests/task_level/**"
+      - "roadmap/33_TASK23_FAILURE_ANALYSIS_AND_CONTEXT_PIVOT.md"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: task33c-pr-checks-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  safe-validation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout without persisted credentials
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: "3.12"
+
+      - name: Install test environment
+        run: python -m pip install -e ".[dev]"
+
+      - name: Run Task 33C hardening tests
+        run: |
+          pytest -q \
+            tests/docs/test_action_packet.py \
+            tests/task_level/test_github_models_adapter.py \
+            tests/task_level/test_task33_isolated_delivery.py \
+            tests/task_level/test_task33_local.py \
+            tests/task_level/test_task33_validation.py
+
+      - name: Static validation
+        run: |
+          python -m compileall -q docmancer eval tests
+          git diff --check
