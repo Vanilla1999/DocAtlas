@@ -91,12 +91,16 @@ By default the server exposes exactly three mutually exclusive tools:
 For most MCP clients and coding agents:
 
 ```text
-get_docs_context(question=..., project_path=..., delivery_strategy="bounded_direct")
+get_docs_context(question=..., project_path=...)
 → prepare_docs(...) only when returned as recommended_next_action
-→ retry get_docs_context(..., delivery_strategy="bounded_direct")
+→ retry get_docs_context(...)
 ```
 
-This makes `get_docs_context` the single high-level entry point. Coding and patch tasks should use `delivery_strategy="bounded_direct"`, which returns a source-bound ActionPacket within the requested total payload budget. For API questions, combine it with `response_style="snippet-first"`.
+This makes `get_docs_context` the single high-level entry point. Documentation questions receive one bounded `docs_answer`; coding and patch tasks receive one source-bound `patch_context`; missing critical evidence returns fail-closed `insufficient_evidence`. Delivery strategy, debug shape, and packet budget are server-owned policy. Broader compatibility output is reserved for explicit documentation exploration.
+
+MCP responses carry the complete payload in `structuredContent` and only a constant marker in text. For legacy clients without structured-content support, set `DOCATLAS_MCP_TEXT_FALLBACK=1`; this switches to text-only JSON instead of sending the payload twice. Previously accepted advanced arguments remain available during the compatibility transition but are no longer advertised to normal coding agents.
+
+An optional provider-neutral [one-call host-loop contract](./docs/one-call-agent-loop.md) locally enforces cumulative request, retained-history, repair, test, and output budgets after a model initiates DocAtlas retrieval. Existing generic clients remain supported but are not labelled verified unless their host proves every required control.
 
 `prepare_docs(action="sync_project_docs")` replaces the old two-step `inspect → ingest` loop. It:
 1. discovers current candidates from the filesystem;

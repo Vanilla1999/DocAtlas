@@ -126,6 +126,26 @@ def test_source_filename_alone_does_not_prove_entrypoint_or_runtime_config(tmp_p
     assert "runtime configuration" not in categories
 
 
+def test_gap_recovery_reports_repo_map_overflow_in_host_diagnostics(tmp_path):
+    _write_project(tmp_path, manifest_only=True)
+    package = tmp_path / "src" / "many_modules"
+    package.mkdir(parents=True)
+    for index in range(20):
+        (package / f"module_{index}.py").write_text(
+            f"def function_{index}():\n    return {index}\n", encoding="utf-8",
+        )
+
+    result = ProjectContextService(ProductionGapFacade()).get_project_context(
+        str(tmp_path), QUESTION, mode="project-only", limit=8,
+    )
+    stage = result.diagnostics["retrieval_routing"]["stages"]["repo_map"]
+
+    assert stage["observed_item_count"] > stage["item_count"]
+    assert stage["budget_exceeded"] is True
+    assert stage["status"] == "insufficient"
+    assert "retrieval_stage_budget_exceeded" in result.warnings
+
+
 def test_non_python_runtime_detection_ignores_comments_and_strings(tmp_path):
     path = tmp_path / "app.js"
     path.write_text(

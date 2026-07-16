@@ -551,8 +551,8 @@ def test_mcp_exposes_three_public_tools_with_mutually_exclusive_guidance():
     tools = {tool["name"]: tool for tool in TOOLS}
 
     assert set(tools) == PUBLIC_TOOL_NAMES
-    assert "Default first tool" in tools["get_docs_context"]["description"]
-    assert "only after get_docs_context" in tools["prepare_docs"]["description"]
+    assert "Default source-grounded" in tools["get_docs_context"]["description"]
+    assert "Call only from get_docs_context" in tools["prepare_docs"]["description"]
     assert "explicitly asks" in tools["docs_status"]["description"]
     assert tools["docs_status"]["inputSchema"]["required"] == ["action"]
     assert tools["docs_status"]["inputSchema"]["properties"]["action"]["enum"] == [
@@ -658,7 +658,7 @@ def test_mcp_read_resource_returns_workflow_and_schema_guidance():
     assert library_workflow is not None
     assert "get_docs_context" in library_workflow["text"]
     assert "mode=\"library\"" in library_workflow["text"]
-    assert "response_style=\"snippet-first\"" in library_workflow["text"]
+    assert "response_style=\"snippet-first\"" not in library_workflow["text"]
     assert "Legacy tools" in library_workflow["text"]
     assert "resolve_library_id" not in library_workflow["text"].split("Legacy tools")[0]
     assert "get_library_docs" not in library_workflow["text"].split("Legacy tools")[0]

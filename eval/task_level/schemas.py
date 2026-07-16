@@ -143,6 +143,12 @@ class RunMetrics:
     reasoning_tokens: int | None = None
     completed_turn_events: int | None = None
     shell_calls: int = 0
+    successful_shell_calls: int = 0
+    failed_shell_calls: int = 0
+    unknown_shell_outcomes: int = 0
+    exec_error_count: int = 0
+    retried_command_count: int = 0
+    pytest_invocations: int = 0
     file_reads: int = 0
     file_searches: int = 0
     edit_calls: int = 0

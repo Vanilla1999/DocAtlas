@@ -4,6 +4,7 @@ import hashlib
 import json
 import os
 import random
+import re
 import shlex
 import signal
 import shutil
@@ -168,6 +169,162 @@ def trajectory_tool_output_metrics(task: Any, tool_calls: list[dict[str, Any]]) 
         "docs_output_evidence_coverage": len(evidence_found) / len(evidence) if evidence else None,
         "useful_context_ratio": None,
         "useful_context_ratio_method": "not_measured_without_chunk_usage_attribution",
+    }
+
+
+_SHELL_TOOL_NAMES = frozenset({"bash", "shell", "command", "command_execution"})
+_SUCCESS_STATUSES = frozenset({"completed", "success", "succeeded", "ok"})
+_FAILURE_STATUSES = frozenset({"failed", "failure", "error", "cancelled", "canceled", "timeout", "timed_out"})
+
+
+def _shell_command(call: dict[str, Any]) -> str | None:
+    tool_name = str(
+        call.get("tool_name") or call.get("name") or call.get("tool") or ""
+    ).strip().lower()
+    if tool_name not in _SHELL_TOOL_NAMES and not tool_name.startswith("bash."):
+        return None
+    arguments = call.get("arguments")
+    if not isinstance(arguments, dict):
+        arguments = call.get("input") if isinstance(call.get("input"), dict) else {}
+    command = arguments.get("command") or arguments.get("cmd") or arguments.get("script")
+    if isinstance(command, list):
+        command = " ".join(str(item) for item in command)
+    return str(command).strip() if command not in (None, "") else ""
+
+
+def _shell_outcome(call: dict[str, Any]) -> bool | None:
+    exit_code = call.get("exit_code")
+    if isinstance(exit_code, int) and not isinstance(exit_code, bool):
+        return exit_code == 0
+    is_error = call.get("is_error")
+    if isinstance(is_error, bool):
+        return not is_error
+    status = str(call.get("execution_status") or call.get("status") or "").strip().lower()
+    if status in _SUCCESS_STATUSES:
+        return True
+    if status in _FAILURE_STATUSES:
+        return False
+    return None
+
+
+def _shell_exec_error(call: dict[str, Any]) -> bool:
+    """Distinguish runner/spawn failure from a command that executed and exited non-zero."""
+
+    exit_code = call.get("exit_code")
+    if isinstance(exit_code, int) and not isinstance(exit_code, bool):
+        return False
+    status = str(call.get("execution_status") or call.get("status") or "").strip().lower()
+    if status in {"runner_failed", "spawn_failed", "exec_error", "transport_error"}:
+        return True
+    return call.get("is_error") is True and exit_code is None
+
+
+def _unwrap_shell_command(command: str) -> str:
+    try:
+        tokens = shlex.split(command)
+    except ValueError:
+        return re.sub(r"\s+", " ", command).strip()
+    if not tokens:
+        return ""
+    executable = Path(tokens[0]).name.lower()
+    if executable in {"bash", "sh", "zsh"}:
+        for index, token in enumerate(tokens[1:], start=1):
+            if token in {"-c", "-lc", "-cl"} and index + 1 < len(tokens):
+                return re.sub(r"\s+", " ", tokens[index + 1]).strip()
+    return re.sub(r"\s+", " ", command).strip()
+
+
+def _command_fingerprint(command: str) -> str:
+    normalized = _unwrap_shell_command(command)
+    return hashlib.sha256(normalized.encode("utf-8")).hexdigest()
+
+
+def _test_runner_for_segment(segment: str) -> str | None:
+    try:
+        tokens = shlex.split(segment)
+    except ValueError:
+        return None
+    while tokens and "=" in tokens[0] and not tokens[0].startswith(("/", "./")):
+        tokens.pop(0)
+    if not tokens:
+        return None
+    executable = Path(tokens[0]).name.lower()
+    rest = [token.lower() for token in tokens[1:]]
+    if executable in {"pytest", "py.test"}:
+        return "pytest"
+    if executable in {"python", "python3", "pypy", "pypy3"}:
+        if len(rest) >= 2 and rest[0] == "-m" and rest[1] in {"pytest", "unittest"}:
+            return rest[1]
+        return None
+    if executable == "uv" and "run" in rest:
+        run_index = rest.index("run") + 1
+        nested = tokens[run_index + 1 :]
+        while nested and nested[0].startswith("-"):
+            nested.pop(0)
+        return _test_runner_for_segment(shlex.join(nested)) if nested else None
+    if executable in {"flutter", "dart", "cargo", "go", "npm", "pnpm", "yarn", "dotnet", "mvn", "swift"}:
+        return executable if rest and rest[0] == "test" else None
+    if executable in {"gradle", "gradlew"} or executable.endswith("gradlew"):
+        return "gradle" if any(token == "test" or token.endswith(":test") for token in rest) else None
+    return None
+
+
+def _test_runner(command: str) -> str | None:
+    unwrapped = _unwrap_shell_command(command)
+    for segment in re.split(r"\s*(?:&&|\|\||;)\s*", unwrapped):
+        runner = _test_runner_for_segment(segment)
+        if runner:
+            return runner
+    return None
+
+
+def shell_call_metrics(tool_calls: list[dict[str, Any]]) -> dict[str, int]:
+    """Normalize shell/test outcomes without assuming one runner event shape."""
+
+    shell_calls = 0
+    successful = 0
+    failed = 0
+    unknown = 0
+    retries = 0
+    test_runs = 0
+    pytest_invocations = 0
+    exec_errors = 0
+    failed_fingerprints: set[str] = set()
+    for call in tool_calls:
+        if not isinstance(call, dict):
+            continue
+        command = _shell_command(call)
+        if command is None:
+            continue
+        shell_calls += 1
+        fingerprint = _command_fingerprint(command) if command else None
+        if fingerprint is not None and fingerprint in failed_fingerprints:
+            retries += 1
+        outcome = _shell_outcome(call)
+        if _shell_exec_error(call):
+            exec_errors += 1
+        if outcome is True:
+            successful += 1
+        elif outcome is False:
+            failed += 1
+            if fingerprint is not None:
+                failed_fingerprints.add(fingerprint)
+        else:
+            unknown += 1
+        runner = _test_runner(command)
+        if runner:
+            test_runs += 1
+            if runner == "pytest":
+                pytest_invocations += 1
+    return {
+        "shell_calls": shell_calls,
+        "successful_shell_calls": successful,
+        "failed_shell_calls": failed,
+        "unknown_shell_outcomes": unknown,
+        "exec_error_count": exec_errors,
+        "retried_command_count": retries,
+        "test_runs": test_runs,
+        "pytest_invocations": pytest_invocations,
     }
 
 
@@ -759,6 +916,7 @@ def evaluate_agent_patch(
         injection.get("injected_context_tokens"),
         tool_output_metrics.get("tool_output_tokens_estimate"),
     )
+    normalized_shell_metrics = shell_call_metrics(tool_calls)
     metrics = RunMetrics(
         wall_time_seconds=getattr(runner_output, "wall_time_seconds", None),
         time_to_first_edit=time_to_first_edit,
@@ -769,14 +927,15 @@ def evaluate_agent_patch(
         uncached_input_tokens=uncached_input_tokens,
         reasoning_tokens=reasoning_tokens,
         completed_turn_events=completed_turn_events,
-        shell_calls=sum(1 for call in tool_calls if "bash" in json.dumps(call).lower()),
+        shell_calls=normalized_shell_metrics["shell_calls"],
+        successful_shell_calls=normalized_shell_metrics["successful_shell_calls"],
+        failed_shell_calls=normalized_shell_metrics["failed_shell_calls"],
+        unknown_shell_outcomes=normalized_shell_metrics["unknown_shell_outcomes"],
+        exec_error_count=normalized_shell_metrics["exec_error_count"],
+        retried_command_count=normalized_shell_metrics["retried_command_count"],
+        pytest_invocations=normalized_shell_metrics["pytest_invocations"],
         edit_calls=sum(1 for call in tool_calls if "edit" in json.dumps(call).lower()),
-        test_runs=sum(
-            1
-            for call in tool_calls
-            if str(call.get("tool_name") or "").lower().startswith("bash.")
-            and bool((call.get("arguments") or {}).get("executed"))
-        ),
+        test_runs=normalized_shell_metrics["test_runs"],
         docs_tool_calls=audit.docatlas_calls,
         patch_files_changed=stats[0] if stats else 0,
         patch_lines_added=stats[1] if stats else 0,
@@ -877,6 +1036,12 @@ def evaluate_agent_patch(
             "audited_external_context_tokens": _optional_int(external_injection.get("injected_context_tokens")),
             "completed_turn_events": metrics.completed_turn_events,
             "shell_calls": metrics.shell_calls,
+            "successful_shell_calls": metrics.successful_shell_calls,
+            "failed_shell_calls": metrics.failed_shell_calls,
+            "unknown_shell_outcomes": metrics.unknown_shell_outcomes,
+            "exec_error_count": metrics.exec_error_count,
+            "retried_command_count": metrics.retried_command_count,
+            "pytest_invocations": metrics.pytest_invocations,
             "edit_calls": metrics.edit_calls,
             "test_runs": metrics.test_runs,
             "docatlas_calls": audit.docatlas_calls,

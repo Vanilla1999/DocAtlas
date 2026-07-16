@@ -307,6 +307,8 @@ def _normalize_jsonl(
             "result_summary": content,
             "result_chars": len(result_text),
             "result_truncated": len(result_text) > len(content),
+            "execution_status": item.get("status"),
+            "exit_code": item.get("exit_code"),
             "source": "codex_jsonl",
             "source_event_type": raw_type,
             "tokens": usage or None,

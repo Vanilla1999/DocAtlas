@@ -21,12 +21,9 @@ def test_get_docs_context_schema():
     schema = tool["inputSchema"]
     assert schema["required"] == ["question"]
     assert {"allow_network", "force_refresh", "prefetch_auto", "prepare_project_docs"}.isdisjoint(schema["properties"])
-    assert schema["properties"]["output_mode"]["enum"] == ["answer", "compact", "debug", "full"]
-    assert schema["properties"]["mode"]["enum"] == ["auto", "project", "library", "dependency", "mixed"]
-    assert "maintenance" in schema["properties"]
-    maintenance = schema["properties"]["maintenance"]["properties"]
-    assert maintenance["changed_paths"]["maxItems"] == 200
-    assert maintenance["candidate_limit"]["maximum"] == 200
+    assert set(schema["properties"]) == {"question", "project_path", "library", "version", "mode"}
+    assert schema["properties"]["mode"]["enum"] == ["auto", "project", "library", "mixed"]
+    assert {"delivery_strategy", "packet_tokens", "output_mode", "maintenance", "details"}.isdisjoint(schema["properties"])
 
 
 def test_get_docs_context_exposes_fail_closed_change_maintenance_brief(tmp_path):
@@ -68,7 +65,8 @@ def test_docmancer_agent_quickstart_resource_exists():
     assert "Docmancer is a local documentation/context router" in text
     assert "not a code auditor" in text
     assert "get_docs_context" in text
-    assert "response_style=\"snippet-first\"" in text
+    assert "response_style=\"snippet-first\"" not in text
+    assert "bounded structured" in text
     assert "navigation_only" in text
 
 
@@ -83,7 +81,7 @@ def test_library_workflow_resource_uses_public_unified_tool_not_legacy_aliases()
 
     assert "get_docs_context" in text
     assert "mode=\"library\"" in text
-    assert "response_style=\"snippet-first\"" in text
+    assert "response_style=\"snippet-first\"" not in text
     assert "resolve_library_id" not in text.split("Legacy tools")[0]
     assert "get_library_docs" not in text.split("Legacy tools")[0]
 
@@ -170,8 +168,10 @@ def test_missing_kotlin_corpus_uses_prepare_docs_through_real_application_bounda
         UnifiedDocsContextService(Facade()),
     )
 
-    assert payload["next_action"]["tool"] == "prepare_docs"
-    assert payload["next_action"]["arguments_patch"] == {
+    assert payload["kind"] == "docs_answer"
+    assert payload["status"] == "insufficient_evidence"
+    assert payload["recommended_next_action"]["tool"] == "prepare_docs"
+    assert payload["recommended_next_action"]["arguments_patch"] == {
         "action": "prefetch_library_docs",
         "library": "kotlin",
         "ecosystem": "kotlin",

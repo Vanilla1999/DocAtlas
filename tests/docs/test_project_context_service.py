@@ -453,7 +453,7 @@ def test_story_specific_project_context_with_only_docs_matched_terms_requires_so
     assert result.recommended_next_actions[-1]["action"] == "search_project_sources"
 
 
-def test_project_context_includes_repo_map_lane_for_matching_source_files(tmp_path):
+def test_project_context_skips_repo_map_when_source_evidence_proves_single_target(tmp_path):
     lib = tmp_path / "lib"
     lib.mkdir()
     (lib / "help_request_details_screen.dart").write_text(
@@ -492,18 +492,17 @@ class HelpRequestDetailsScreen extends StatelessWidget {
     )
 
     repo_map_items = [item for item in result.context_pack if item["source_class"] == "repo_map"]
-    assert [item["path"] for item in repo_map_items] == ["lib/help_request_details_screen.dart"]
-    assert repo_map_items[0]["language"] == "dart"
-    assert repo_map_items[0]["string_literals"] == ["Вернуть в работу"]
+    assert repo_map_items == []
     source_evidence_items = [item for item in result.context_pack if item["source_class"] == "source_evidence"]
     assert len(source_evidence_items) == 1
     assert source_evidence_items[0]["evidence_class"] == "source_snippet"
     assert source_evidence_items[0]["path"] == "lib/help_request_details_screen.dart"
     assert source_evidence_items[0]["line_start"] == 5
     assert source_evidence_items[0]["snippet"] == "final label = 'Вернуть в работу';"
-    assert "repo_map" in result.metrics["source_classes"]
+    assert "repo_map" not in result.metrics["source_classes"]
     assert "source_evidence" in result.metrics["source_classes"]
-    assert result.diagnostics["repo_map"]["selected_files"] == 1
+    assert "repo_map" not in result.diagnostics
+    assert result.diagnostics["retrieval_routing"]["stages"]["repo_map"]["status"] == "skipped"
     assert result.diagnostics["source_evidence"]["matched_terms"] == ["Вернуть в работу"]
     assert result.answer_type == "exact"
     assert result.answer_completeness["missing_terms"] == []
@@ -597,7 +596,7 @@ def test_project_context_code_graph_failure_is_non_fatal(tmp_path, monkeypatch):
 
     result = ProjectContextService(facade).get_project_context(
         str(tmp_path),
-        "HelpRequestScreen",
+        "Find references to HelpRequestScreen",
         mode="project-only",
     )
 
@@ -658,11 +657,8 @@ class HelpRequestDetailsScreen {
     assert snippet["missing_terms"] == []
     assert snippet["reason"] == "requirement term matched a concrete project source line"
 
-    repo_map = context_sources["repo_map"][0]
-    assert repo_map["source_class"] == "repo_map"
-    assert repo_map["role"] == "navigation_context"
-    assert repo_map["proof_role"] == "navigation_only"
-    assert repo_map["path"] == "lib/help_request_details_screen.dart"
+    assert context_sources["repo_map"] == []
+    assert result.diagnostics["retrieval_routing"]["stages"]["repo_map"]["status"] == "skipped"
 
 
 def test_project_context_source_evidence_exposes_absent_terms_without_proof(tmp_path):

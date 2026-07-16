@@ -128,6 +128,8 @@ def test_codex_normalized_trajectory_uses_sanitized_events(monkeypatch: pytest.M
         "item": {
             "type": "command_execution",
             "command": "inspect /home/alice/private/project with super-secret-value",
+            "exit_code": 2,
+            "status": "failed",
         },
     })
 
@@ -138,6 +140,8 @@ def test_codex_normalized_trajectory_uses_sanitized_events(monkeypatch: pytest.M
     assert "/home/alice/private/project" not in serialized
     assert "<redacted>" in serialized
     assert "<path>" in serialized
+    assert normalized[0]["exit_code"] == 2
+    assert normalized[0]["execution_status"] == "failed"
 
 
 def test_codex_normalizes_measurable_tool_output():

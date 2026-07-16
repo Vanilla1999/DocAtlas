@@ -176,6 +176,12 @@ def estimate_action_packet_tokens(value: Any) -> int:
     return max(1, math.ceil(len(encoded) / 4))
 
 
+def evidence_identity_for_item(item: dict[str, Any]) -> tuple[str, str, str]:
+    """Expose the immutable ActionPacket evidence identity to projection code."""
+
+    return _evidence_id(item), _source_path(item), _section(item)
+
+
 def build_action_packet(
     *,
     question: str,

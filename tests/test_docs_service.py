@@ -1878,7 +1878,8 @@ def test_get_project_context_can_return_project_and_dependency_context(tmp_path,
     assert result.dependency_docs is not None
     context_source_classes = {item["source_class"] for item in result.context_pack}
     assert {"project_doc", "dependency_doc"}.issubset(context_source_classes)
-    assert any(item.get("source_class") == "source_evidence" and item.get("evidence_class") == "absent_in_source" for item in result.context_pack)
+    assert not any(item.get("source_class") in {"source_evidence", "repo_map", "code_graph"} for item in result.context_pack)
+    assert result.diagnostics["retrieval_routing"]["stages"]["source_evidence"]["status"] == "skipped"
     assert result.metrics["project_result_count"] >= 1
     assert result.metrics["dependency_result_count"] >= 1
     selected_classes = {item["source_class"] for item in result.trust_contract["sources"]["selected"]}

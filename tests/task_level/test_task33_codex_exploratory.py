@@ -113,6 +113,7 @@ def test_codex_exploratory_worker_uses_oauth_jsonl_without_claiming_verified_usa
         assert "uniqueItems" not in schema["properties"]["selected_indices"]
         return subprocess.CompletedProcess(command, 0, stdout=stdout, stderr="")
 
+    monkeypatch.setattr(task33_codex_exploratory.shutil, "which", lambda _name: "/usr/bin/codex")
     monkeypatch.setattr(task33_codex_exploratory, "_run_bounded_codex", fake_run)
     worker = CodexExploratoryWorker(model="gpt-test", temp_root=tmp_path)
 

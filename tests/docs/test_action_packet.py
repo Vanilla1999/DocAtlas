@@ -17,24 +17,43 @@ from docmancer.docs.application.unified_context_service import UnifiedDocsContex
 from docmancer.docs.domain.content_trust import annotate_context_pack
 from docmancer.docs.interfaces.mcp.context_tools import handle_context_tool
 from docmancer.docs.models import ProjectContextResult
-from docmancer.mcp.docs_server import MCP_RESOURCES, TOOLS, _json_text
+from docmancer.mcp.docs_server import MCP_RESOURCES, TOOLS, _json_text, _mcp_tool_result, call_docs_tool_payload
+
+
+def test_public_mcp_errors_are_bounded_and_match_the_advertised_schema():
+    class FailingFacade:
+        def get_docs_context(self, question, **kwargs):
+            raise ValueError("X" * 200_000)
+
+    tool = next(item for item in TOOLS if item["name"] == "get_docs_context")
+    payload = call_docs_tool_payload(
+        "get_docs_context", {"question": "How?"}, FailingFacade(),
+    )
+
+    assert payload["status"] == "failed"
+    assert len(json.dumps(payload, ensure_ascii=False).encode("utf-8")) < 10_000
+    jsonschema.validate(payload, tool["outputSchema"])
 
 
 def test_bounded_direct_is_one_existing_tool_call_and_returns_only_action_packet():
     tool = next(item for item in TOOLS if item["name"] == "get_docs_context")
-    assert tool["inputSchema"]["properties"]["delivery_strategy"]["enum"] == ["bounded_direct"]
-    assert tool["outputSchema"]["properties"]["action_packet"]["properties"]["schema_version"]["const"] == 1
+    assert set(tool["inputSchema"]["properties"]) == {
+        "question", "project_path", "library", "version", "mode",
+    }
+    assert "delivery_strategy" not in tool["inputSchema"]["properties"]
+    assert tool["outputSchema"]["properties"]["kind"]["enum"] == ["docs_answer", "patch_context"]
     assert len(TOOLS) == 3
     installed_contract = _get_template_content("project_bootstrap.md")
-    assert 'delivery_strategy="bounded_direct"' in installed_contract
+    assert 'delivery_strategy="bounded_direct"' not in installed_contract
+    assert "bounded structured" in installed_contract
     assert "Otherwise do not repeat before the first edit" in installed_contract
     project_workflow = next(item for item in MCP_RESOURCES if item["uri"] == "docmancer://workflow/project-docs")
     library_workflow = next(item for item in MCP_RESOURCES if item["uri"] == "docmancer://workflow/library-docs")
     quickstart = next(item for item in MCP_RESOURCES if item["uri"] == "docmancer://agent/quickstart")
-    assert 'delivery_strategy="bounded_direct"' in project_workflow["text"]
-    assert 'delivery_strategy="bounded_direct"' in library_workflow["text"]
-    assert quickstart["text"].count('delivery_strategy="bounded_direct"') >= 3
-    jsonschema.validate({"question": "q", "packet_tokens": None}, tool["inputSchema"])
+    assert 'delivery_strategy="bounded_direct"' not in project_workflow["text"]
+    assert 'delivery_strategy="bounded_direct"' not in library_workflow["text"]
+    assert 'delivery_strategy="bounded_direct"' not in quickstart["text"]
+    jsonschema.validate({"question": "q"}, tool["inputSchema"])
     with pytest.raises(jsonschema.ValidationError):
         jsonschema.validate({"tool": "get_docs_context", "delivery_strategy": "bounded_direct"}, tool["outputSchema"])
 
@@ -71,14 +90,13 @@ def test_bounded_direct_is_one_existing_tool_call_and_returns_only_action_packet
     }, UnifiedDocsContextService(backend))
 
     assert backend.calls == 1
-    assert set(result) == {"tool", "delivery_strategy", "action_packet", "document_content_policy"}
+    assert result["kind"] == "patch_context"
     assert "context_pack" not in json.dumps(result)
-    assert result["action_packet"]["status"] == "ok"
-    assert result["action_packet"]["validation"]["tests"][0]["text"].endswith("test_action_packet.py.")
-    assert len(result["action_packet"]["validation"]["compile"]) == 2
-    assert result["action_packet"]["validation"]["semantic_checks"][0]["text"].startswith("Run ruff")
-    assert result["action_packet"]["required_invariants"]
-    assert validate_action_packet(result["action_packet"]) == []
+    assert result["status"] == "ok"
+    assert result["checks"]["tests"][0]["text"].endswith("test_action_packet.py.")
+    assert len(result["checks"]["compile"]) == 2
+    assert result["checks"]["semantic_checks"][0]["text"].startswith("Run ruff")
+    assert result["invariants"]
     jsonschema.validate(result, tool["outputSchema"])
     assert math.ceil(len(json.dumps(result, ensure_ascii=False).encode("utf-8")) / 4) <= 1_500
 
@@ -88,6 +106,10 @@ def test_bounded_direct_is_one_existing_tool_call_and_returns_only_action_packet
                 self.type = type
                 self.text = text
 
+        class CallToolResult:
+            def __init__(self, **kwargs):
+                self.__dict__.update(kwargs)
+
     compatibility_text = _json_text(FakeMcpTypes, result)[0].text
     assert "structuredContent" in compatibility_text
     assert "source attribution" not in compatibility_text
@@ -96,11 +118,18 @@ def test_bounded_direct_is_one_existing_tool_call_and_returns_only_action_packet
     )
     assert combined_tokens <= 1_500
 
+    structured_result = _mcp_tool_result(FakeMcpTypes, result, text_fallback=False)
+    assert structured_result.structuredContent is result
+    assert "source attribution" not in structured_result.content[0].text
+    text_fallback = _mcp_tool_result(FakeMcpTypes, result, text_fallback=True)
+    assert not hasattr(text_fallback, "structuredContent")
+    assert json.loads(text_fallback.content[0].text) == result
 
-    packet_without_strategy = handle_context_tool("get_docs_context", {
-        "question": "Bound this", "project_path": "/repo", "packet_tokens": 500,
+    packet_without_strategy = call_docs_tool_payload("get_docs_context", {
+        "question": "Implement bounded context", "project_path": "/repo",
     }, UnifiedDocsContextService(backend))
-    assert packet_without_strategy["reason_code"] == "packet_tokens_requires_bounded_delivery"
+    assert packet_without_strategy["kind"] == "patch_context"
+    assert packet_without_strategy["status"] == "ok"
 
     class MissingFacade:
         def get_docs_context(self, question, **kwargs):
@@ -118,7 +147,8 @@ def test_bounded_direct_is_one_existing_tool_call_and_returns_only_action_packet
     missing = handle_context_tool("get_docs_context", {
         "question": "Kotlin coroutines", "library": "kotlin", "delivery_strategy": "bounded_direct",
     }, MissingFacade())
-    assert missing["action_packet"]["status"] == "insufficient_evidence"
+    assert missing["status"] == "insufficient_evidence"
+    assert missing["kind"] == "docs_answer"
     assert missing["recommended_next_action"] == {
         "tool": "prepare_docs",
         "type": "prepare_docs",
@@ -143,7 +173,7 @@ def test_bounded_direct_is_one_existing_tool_call_and_returns_only_action_packet
         "question": "Kotlin coroutines", "library": "kotlin",
         "delivery_strategy": "bounded_direct", "packet_tokens": 500,
     }, SourceChoiceFacade())
-    assert source_choice["action_packet"]["status"] == "insufficient_evidence"
+    assert source_choice["status"] == "insufficient_evidence"
     assert source_choice["recommended_next_action"]["type"] == "ask_user_for_library_docs_source"
     assert source_choice["recommended_next_action"]["requires_confirmation"] is True
     assert math.ceil(len(json.dumps(source_choice, ensure_ascii=False).encode("utf-8")) / 4) <= 500
@@ -168,8 +198,8 @@ def test_bounded_direct_is_one_existing_tool_call_and_returns_only_action_packet
         "question": "Change navigation", "project_path": "/repo",
         "delivery_strategy": "bounded_direct",
     }, PartialFacade())
-    assert partial["action_packet"]["status"] == "insufficient_evidence"
-    assert any("navigational" in item for item in partial["action_packet"]["missing_evidence"])
+    assert partial["status"] == "insufficient_evidence"
+    assert any("navigational" in item for item in partial["missing"])
 
     class LegacyProjectFacade:
         def get_docs_context(self, question, **kwargs):
@@ -186,8 +216,8 @@ def test_bounded_direct_is_one_existing_tool_call_and_returns_only_action_packet
     legacy = handle_context_tool("get_docs_context", {
         "question": "Change legacy", "project_path": "/repo", "delivery_strategy": "bounded_direct",
     }, LegacyProjectFacade())
-    assert legacy["action_packet"]["status"] == "insufficient_evidence"
-    assert "Project answer completeness metadata is missing." in legacy["action_packet"]["missing_evidence"]
+    assert legacy["status"] == "insufficient_evidence"
+    assert "Project answer completeness metadata is missing." in legacy["missing"]
 
     class MultiChunkBackend:
         def get_project_context(self, project_path, question, **kwargs):
@@ -213,7 +243,7 @@ def test_bounded_direct_is_one_existing_tool_call_and_returns_only_action_packet
     multi_chunk_result = handle_context_tool("get_docs_context", {
         "question": "Edit shared", "project_path": "/repo", "delivery_strategy": "bounded_direct",
     }, UnifiedDocsContextService(MultiChunkBackend()))
-    assert {item["name"] for item in multi_chunk_result["action_packet"]["target_surface"]["symbols"]} == {
+    assert {item["name"] for item in multi_chunk_result["targets"]["symbols"]} == {
         "first", "second",
     }
 
