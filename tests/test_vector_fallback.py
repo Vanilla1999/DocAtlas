@@ -72,7 +72,7 @@ def test_vector_sync_failure_after_fts_ingest_raises(tmp_path, monkeypatch):
 
     agent = DocmancerAgent(config=config)
 
-    def fail_vectors():
+    def fail_vectors(**_kwargs):
         raise RuntimeError("qdrant collection missing")
 
     monkeypatch.setattr(agent, "_sync_vectors_if_enabled", fail_vectors)
@@ -92,7 +92,7 @@ def test_vector_sync_failure_after_record_ingest_raises(tmp_path, monkeypatch):
 
     agent = DocmancerAgent(config=config)
 
-    def fail_vectors():
+    def fail_vectors(**_kwargs):
         raise RuntimeError("qdrant collection missing")
 
     monkeypatch.setattr(agent, "_sync_vectors_if_enabled", fail_vectors)

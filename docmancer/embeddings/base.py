@@ -112,13 +112,17 @@ def embed_with_cache(
     *,
     cache: EmbeddingsCache | None,
     model: str | None = None,
+    cache_identity: list[str] | None = None,
     progress_callback=None,
 ) -> list[list[float]]:
     """Embed ``texts``, satisfying cache hits and only calling the provider for misses."""
     if cache is None:
         return provider.embed(texts)
+    if cache_identity is not None and len(cache_identity) != len(texts):
+        raise ValueError("cache_identity must have one value per embedding text")
     model_name = model or provider.name
-    keys = [content_cache_key(provider.name, model_name, t) for t in texts]
+    identity_texts = cache_identity if cache_identity is not None else texts
+    keys = [content_cache_key(provider.name, model_name, value) for value in identity_texts]
     vectors: list[list[float] | None] = [cache.get(k) for k in keys]
     miss_idx = [i for i, v in enumerate(vectors) if v is None]
     if miss_idx:

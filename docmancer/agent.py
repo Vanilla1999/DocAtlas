@@ -90,12 +90,44 @@ class DocmancerAgent:
         *,
         with_vectors: bool = True,
     ) -> int:
+        for document in documents:
+            if str(document.metadata.get("format") or "").casefold() == "markdown":
+                document.metadata.setdefault("chunking_schema", "parent-child-v1")
+                document.metadata.setdefault("child_target_tokens", 160)
+                document.metadata.setdefault("child_hard_max_tokens", 512)
         logger.info("Indexing %d document(s) with SQLite FTS5", len(documents))
-        result = self.store.add_documents(documents, recreate=recreate)
+        result = self.store.add_documents(
+            documents,
+            recreate=recreate,
+            activate_generation=not with_vectors,
+        )
         logger.info("Stored %d source(s), %d section(s)", result.sources, result.sections)
         if with_vectors:
             try:
-                self._sync_vectors_if_enabled()
+                if result.generation_id:
+                    info = self.store.generation_info(result.generation_id) or {}
+                    collection = (
+                        f"{self._base_vector_collection_name()}_pc_"
+                        f"{str(info.get('config_hash') or '')[:12]}_"
+                        f"{str(result.generation_id).removeprefix('gen-')[:12]}"
+                    )
+                    self.store.set_generation_vector_collection(
+                        result.generation_id, collection
+                    )
+                    synced = self._sync_vectors_if_enabled(
+                        generation_id=result.generation_id,
+                        prune_stale=False,
+                    )
+                    self.store.activate_generation(result.generation_id)
+                    if synced:
+                        self._sync_vectors_if_enabled(
+                            generation_id=result.generation_id,
+                            prune_stale=True,
+                        )
+                else:
+                    self._sync_vectors_if_enabled(
+                        generation_id=self.store.active_generation_id()
+                    )
             except Exception as exc:
                 raise RuntimeError(f"vector indexing failed after FTS5 ingest: {exc}") from exc
         return result.sections
@@ -128,24 +160,35 @@ class DocmancerAgent:
         )
         if with_vectors:
             try:
-                self._sync_vectors_if_enabled()
+                self._sync_vectors_if_enabled(
+                    generation_id=self.store.active_generation_id()
+                )
             except Exception as exc:
                 raise RuntimeError(f"vector indexing failed after FTS5 ingest: {exc}") from exc
         return result.sections
 
-    def _vector_collection_name(self) -> str:
+    def _base_vector_collection_name(self) -> str:
         explicit = self.config.vector_store.collection
         if explicit:
             return explicit
         slug = Path(self.config.index.db_path).stem or "docmancer"
         return f"docmancer_{slug}"
 
+    def _vector_collection_name(self) -> str:
+        """Resolve the collection activated with the SQLite generation."""
+        generation = self.store.generation_info()
+        if generation and generation.get("vector_collection"):
+            return str(generation["vector_collection"])
+        return self._base_vector_collection_name()
+
     def _sync_vectors_if_enabled(
         self,
         *,
         section_ids: set[int] | None = None,
         prune_ids: set[int] | None = None,
-    ) -> None:
+        generation_id: str | None = None,
+        prune_stale: bool = True,
+    ) -> bool:
         """Embed any new chunks and upsert into the configured vector store.
 
         Vector retrieval is on by default. Bare ``doc-atlas ingest`` will
@@ -166,7 +209,7 @@ class DocmancerAgent:
 
         if _os.environ.get("DOCMANCER_AUTO_VECTORS") == "0":
             logger.debug("vector sync disabled by DOCMANCER_AUTO_VECTORS=0")
-            return
+            return False
 
         try:
             from docmancer.embeddings import get_embeddings_provider
@@ -175,7 +218,7 @@ class DocmancerAgent:
             from docmancer.stores.base import get_vector_store
         except ImportError as exc:
             logger.info("vector indexing disabled: %s", exc)
-            return
+            return False
 
         # Graceful fallback: cloud embedding providers need an API key. When
         # the configured provider has no key in env, log once and skip the
@@ -195,7 +238,7 @@ class DocmancerAgent:
                 emb_provider,
                 required_key,
             )
-            return
+            return False
 
         vs_config = self.config.vector_store
         if vs_config.provider == "qdrant" and not vs_config.url:
@@ -213,20 +256,35 @@ class DocmancerAgent:
             vector_store = get_vector_store(vs_config, embeddings_dim=self.config.embeddings.dimensions)
         except ImportError as exc:
             logger.info("vector indexing disabled (missing extra): %s", exc)
-            return
+            return False
 
         provider = get_embeddings_provider(self.config.embeddings)
         include_sparse = self.config.retrieval.default_mode in {"sparse", "hybrid"}
+        generation_info = self.store.generation_info(generation_id) if generation_id else None
+        collection = (
+            str(generation_info["vector_collection"])
+            if generation_info else self._vector_collection_name()
+        )
         result = sync_vector_store(
             store=self.store,
             config=self.config,
             provider=provider,
             vector_store=vector_store,
-            collection=self._vector_collection_name(),
+            collection=collection,
             include_sparse=include_sparse,
             section_ids=section_ids,
             prune_ids=prune_ids,
+            generation_id=generation_id,
+            prune_stale=prune_stale,
         )
+        if generation_id and section_ids is None:
+            expected = len(self.store.list_sections_for_embedding(generation_id))
+            actual = vector_store.count(collection)
+            if actual != expected:
+                raise RuntimeError(
+                    "candidate vector collection parity failed: "
+                    f"expected={expected}, actual={actual}, collection={collection}"
+                )
         logger.info(
             "vectors: embedded=%d upserted=%d cache_hits=%d unchanged=%d pruned=%d",
             result.embedded,
@@ -235,15 +293,20 @@ class DocmancerAgent:
             result.skipped_unchanged,
             result.pruned,
         )
+        return True
 
     def sync_vectors(self) -> None:
         """Synchronize the committed SQLite index into its production vector collection."""
-        self._sync_vectors_if_enabled()
+        self._sync_vectors_if_enabled(generation_id=self.store.active_generation_id())
 
     def sync_vector_chunks(self, section_ids: set[int]) -> None:
         """Upsert only explicitly affected chunks without reconciling unrelated rows."""
         if section_ids:
-            self._sync_vectors_if_enabled(section_ids=set(section_ids), prune_ids=set())
+            self._sync_vectors_if_enabled(
+                section_ids=set(section_ids),
+                prune_ids=set(),
+                generation_id=self.store.active_generation_id(),
+            )
 
     def prune_vector_chunks(self, chunk_ids: set[int]) -> int:
         """Delete exact tracked vector ids without embedding or starting a backend."""
@@ -251,12 +314,34 @@ class DocmancerAgent:
 
         if not chunk_ids:
             return 0
+        generation_id = self.store.active_generation_id()
         collection = self._vector_collection_name()
-        tracked = set(self.store.list_embedding_upserts(collection)) & {
-            int(value) for value in chunk_ids
-        }
-        if not tracked:
-            return 0
+        generation_records: dict[str, dict[str, str]] = {}
+        tracked_stable_ids: list[str] = []
+        vector_ids: list[str | int]
+        if generation_id:
+            generation_records = self.store.list_generation_vector_upserts(collection)
+            wanted = {int(value) for value in chunk_ids}
+            active_rows = self.store.list_sections_for_embedding(generation_id)
+            tracked_stable_ids = [
+                str(row["stable_chunk_id"])
+                for row in active_rows
+                if int(row["section_id"]) in wanted
+                and str(row["stable_chunk_id"]) in generation_records
+            ]
+            vector_ids = [
+                generation_records[stable_id]["vector_id"]
+                for stable_id in tracked_stable_ids
+            ]
+            if not vector_ids:
+                return 0
+        else:
+            tracked = set(self.store.list_embedding_upserts(collection)) & {
+                int(value) for value in chunk_ids
+            }
+            if not tracked:
+                return 0
+            vector_ids = sorted(tracked)
         try:
             from docmancer.runtime.qdrant_manager import QdrantManager
             from docmancer.stores.base import get_vector_store
@@ -279,8 +364,15 @@ class DocmancerAgent:
         vector_store = get_vector_store(
             vs_config, embeddings_dim=self.config.embeddings.dimensions
         )
-        deleted = vector_store.delete_points(collection, sorted(tracked))
-        self.store.delete_embedding_upserts(collection, sorted(tracked))
+        deleted = vector_store.delete_points(collection, vector_ids)
+        if generation_id:
+            self.store.delete_generation_vector_upserts(
+                collection, tracked_stable_ids
+            )
+        else:
+            self.store.delete_embedding_upserts(
+                collection, [int(value) for value in vector_ids]
+            )
         return deleted
 
     def ingest(
@@ -362,6 +454,10 @@ class DocmancerAgent:
                 format_name = "markdown" if suffix in {"md", "markdown"} else suffix
                 document.metadata.setdefault("format", format_name)
                 document.metadata.setdefault("chunking_strategy", getattr(loader, "chunking_strategy", "heading"))
+                if format_name == "markdown":
+                    document.metadata.setdefault("chunking_schema", "parent-child-v1")
+                    document.metadata.setdefault("child_target_tokens", 160)
+                    document.metadata.setdefault("child_hard_max_tokens", 512)
                 chunk_size, chunk_overlap = self.config.loaders.settings_for(format_name)
                 document.metadata.setdefault("chunk_size", chunk_size)
                 document.metadata.setdefault("chunk_overlap", chunk_overlap)

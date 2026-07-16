@@ -22,6 +22,7 @@ from docmancer.docs.interfaces.mcp.project_tools import handle_project_tool
 from docmancer.docs.registry import LibraryRegistry
 from docmancer.docs.service import DocsJobTracker, LibraryDocsService
 from docmancer.docs.application.library_job_executor import LibraryJobExecutor
+from docmancer.docs.application.project_docs_service import ProjectDocsService
 from docmancer.mcp.docs_server import call_docs_tool_payload
 
 
@@ -321,6 +322,35 @@ sdks:
         encoding="utf-8",
     )
     return project
+
+
+def test_project_repository_identity_is_clone_stable_when_remote_is_available(tmp_path):
+    first = tmp_path / "first"
+    second = tmp_path / "second"
+    remotes = (
+        "https://secret-token@github.com/example/project.git",
+        "git@github.com:example/project.git",
+    )
+    for root, remote in zip((first, second), remotes, strict=True):
+        (root / ".git").mkdir(parents=True)
+        (root / ".git" / "config").write_text(
+            f'[remote "origin"]\n\turl = {remote}\n',
+            encoding="utf-8",
+        )
+
+    identity = ProjectDocsService._repository_identity(first)
+    assert identity == ProjectDocsService._repository_identity(second)
+    assert identity == "git:github.com/example/project"
+    assert "secret-token" not in identity
+
+
+def test_project_repository_identity_isolates_unversioned_directories(tmp_path):
+    first = tmp_path / "first"
+    second = tmp_path / "second"
+    first.mkdir()
+    second.mkdir()
+
+    assert ProjectDocsService._repository_identity(first) != ProjectDocsService._repository_identity(second)
 
 
 def _rust_project(tmp_path):

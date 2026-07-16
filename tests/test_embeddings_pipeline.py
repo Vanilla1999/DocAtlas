@@ -53,6 +53,19 @@ def _make_doc(source: str, content: str) -> Document:
     return Document(source=source, content=content, metadata={"format": "markdown"})
 
 
+def _make_parent_child_doc(source: str, content: str) -> Document:
+    return Document(
+        source=source,
+        content=content,
+        metadata={
+            "format": "markdown",
+            "chunking_schema": "parent-child-v1",
+            "child_target_tokens": 32,
+            "child_hard_max_tokens": 64,
+        },
+    )
+
+
 def test_sync_prunes_vectors_for_removed_sections(tmp_path, monkeypatch):
     monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
     config = _config(tmp_path)
@@ -127,6 +140,67 @@ def test_scoped_sync_writes_only_requested_sections(tmp_path, monkeypatch):
 
     assert result.upserted == len(changed_ids)
     assert set(store.list_embedding_upserts(collection)) == changed_ids
+
+
+def test_real_sqlite_vec_parent_child_incremental_uuid_sync(tmp_path, monkeypatch):
+    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
+    config = _config(tmp_path)
+    store = SQLiteStore(config.index.db_path)
+    vector_store = get_vector_store(config.vector_store, embeddings_dim=DIM)
+    provider = StubProvider()
+    collection = "dm_task40_uuid"
+    before = "# Alpha\n\nunchanged\n\n# Beta\n\nold value\n"
+
+    first = store.add_documents(
+        [_make_parent_child_doc("guide.md", before)],
+        activate_generation=False,
+    )
+    store.set_generation_vector_collection(str(first.generation_id), collection)
+    initial = sync_vector_store(
+        store=store, config=config, provider=provider,
+        vector_store=vector_store, collection=collection,
+        generation_id=first.generation_id,
+    )
+    store.activate_generation(str(first.generation_id))
+
+    unchanged = store.add_documents(
+        [_make_parent_child_doc("guide.md", before)],
+        activate_generation=False,
+    )
+    unchanged_sync = sync_vector_store(
+        store=store, config=config, provider=provider,
+        vector_store=vector_store, collection=collection,
+        generation_id=unchanged.generation_id, prune_stale=False,
+    )
+    store.activate_generation(str(unchanged.generation_id))
+    unchanged_prune = sync_vector_store(
+        store=store, config=config, provider=provider,
+        vector_store=vector_store, collection=collection,
+        generation_id=unchanged.generation_id, prune_stale=True,
+    )
+
+    edited = store.add_documents(
+        [_make_parent_child_doc("guide.md", before.replace("old value", "new value"))],
+        activate_generation=False,
+    )
+    edited_sync = sync_vector_store(
+        store=store, config=config, provider=provider,
+        vector_store=vector_store, collection=collection,
+        generation_id=edited.generation_id, prune_stale=False,
+    )
+    store.activate_generation(str(edited.generation_id))
+    edited_prune = sync_vector_store(
+        store=store, config=config, provider=provider,
+        vector_store=vector_store, collection=collection,
+        generation_id=edited.generation_id, prune_stale=True,
+    )
+
+    assert initial.upserted > 0
+    assert unchanged_sync.upserted == 0
+    assert unchanged_prune.pruned == 0
+    assert edited_sync.upserted == 1
+    assert edited_prune.pruned == 1
+    assert vector_store.count(collection) == len(store.list_sections_for_embedding())
 
 
 def test_agent_prunes_exact_chunks_without_embedding_unrelated_sections(tmp_path, monkeypatch):
