@@ -118,8 +118,12 @@ def test_kotlin_good_broken_cross_domain_and_github_fixture_is_queryable_partial
     assert {item["reason_code"] for item in ledger} >= {"ok", "http_failure", "cross_domain_skipped"}
     assert all(item["chunks"] > 0 for item in ledger if item["outcome"] == "usable")
     github = next(item for item in ledger if item["fetcher"] == "github-raw")
+    assert github["requested_url"].startswith(
+        "https://github.com/Kotlin/kotlinx.coroutines/blob/1.8.1/"
+    )
     assert github["discovered_url"].startswith("https://github.com/Kotlin/kotlinx.coroutines/blob/1.8.1/")
     assert github["fetch_url"].startswith("https://raw.githubusercontent.com/Kotlin/kotlinx.coroutines/1.8.1/")
+    assert github["requested_url"] != github["fetch_url"]
 
     result = service.get_docs(
         "kotlinx.coroutines",
