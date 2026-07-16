@@ -1,0 +1,93 @@
+{
+  "actionability": {
+    "action_checklist_used": false,
+    "checklist_items": []
+  },
+  "causal_eligible": false,
+  "compile_status": "not_run",
+  "compile_success": false,
+  "condition_id": "docatlas_bounded_direct",
+  "contract": {},
+  "docatlas": {
+    "agent_calls": 0,
+    "available": true,
+    "context_injected": false,
+    "context_retrieved": true,
+    "context_used": false,
+    "context_used_confidence": "none",
+    "docatlas_retrieval_status": "success",
+    "harness_calls": 1,
+    "used_sources": [],
+    "used_symbols": []
+  },
+  "evaluation_execution": {
+    "hidden_tests": {
+      "command": null,
+      "returncode": null,
+      "status": "not_run"
+    },
+    "public_tests": {
+      "command": "uv run --offline pytest tests/test_browser_permission_gate.py",
+      "returncode": null,
+      "status": "not_run"
+    },
+    "setup": {
+      "baseline_allowed_changed_files": [
+        "uv.lock"
+      ],
+      "baseline_artifact_sha256": {
+        "uv.lock": "c6f71e4352747fb1baa6855a4be4ee17bce7c23cf07ab995bffbce91f6613929"
+      },
+      "baseline_changed_files": [
+        "uv.lock"
+      ],
+      "baseline_revision": "ada5ed3f8f971f9812aa0379449c6ef986a21295",
+      "baseline_status": "sealed",
+      "baseline_tree": "7801b590e5c9e9c1e3a815e5273cd896b9de9bd8",
+      "command": "uv sync --offline --python 3.14",
+      "phase": "pre_runner",
+      "returncode": 0,
+      "schema_version": 1,
+      "status": "success",
+      "stderr": "warning: `VIRTUAL_ENV=/home/viadmin/StudioProjects/hermes/docmancer/.venv` does not match the project environment path `/home/viadmin/StudioProjects/hermes/docmancer/eval/task_level/results/task33c_codex_host_metrics_20260715_101702/decisive_nbo_cross_module_gate_large_001/docatlas_bounded_direct/repeat_0/env/project_venv` and will be ignored; use `--active` to target the active environment instead\nUsing CPython 3.14.3 interpreter at: /home/linuxbrew/.linuxbrew/opt/python@3.14/bin/python3.14\nCreating virtual environment at: /home/viadmin/StudioProjects/hermes/docmancer/eval/task_level/results/task33c_codex_host_metrics_20260715_101702/decisive_nbo_cross_module_gate_large_001/docatlas_bounded_direct/repeat_0/env/project_venv\nResolved 7 packages in 2ms\nInstalled 5 packages in 6ms\n + iniconfig==2.3.0\n + packaging==26.2\n + pluggy==1.6.0\n + pygments==2.20.0\n + pytest==9.0.3\n",
+      "stdout": "",
+      "wall_time_seconds": 0.039553
+    }
+  },
+  "execution_classification": "EXPLORATORY_NON_CAUSAL",
+  "hard_turn_limit_verified": false,
+  "hidden_tests_passed": false,
+  "metrics": {
+    "action_packet_fidelity": "not_available",
+    "action_packet_insufficient_evidence": false,
+    "action_packet_status": null,
+    "action_packet_tokens": null,
+    "action_packet_truncated": false,
+    "delivery_retrieval_calls": 1,
+    "evidence_fingerprint": "1ea0fabd78cbbbf9a348adcb38812d94c8afac8d5eac323e6807e077eb3fb93e",
+    "raw_doc_context_tokens": 20604,
+    "time_to_first_edit": null,
+    "total_latency": 0.039553,
+    "worker_input_tokens": null,
+    "worker_output_tokens": null
+  },
+  "notes": [
+    "Condition setup failed; agent and evaluator tests were not run.",
+    "bounded_direct_missing_required_evidence_paths:docs/offline-sync.md"
+  ],
+  "policy": {
+    "clean": false,
+    "violations": [
+      "condition_setup_failed"
+    ]
+  },
+  "policy_clean": false,
+  "public_tests_passed": false,
+  "repeat": 0,
+  "resolved": false,
+  "run_id": "task33c_codex_host_metrics_20260715_101702",
+  "runner_id": "not_run",
+  "status": "condition_setup_failed",
+  "task_id": "decisive_nbo_cross_module_gate_large_001",
+  "tests_passed": false
+}

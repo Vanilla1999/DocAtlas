@@ -6,9 +6,15 @@ import shlex
 import subprocess
 import time
 from pathlib import Path
+from typing import cast
 
 import pytest
 
+from docmancer.docs.application.action_packet import (
+    build_action_packet,
+    estimate_action_packet_tokens,
+    validate_action_packet,
+)
 from eval.task_level.github_models import (
     OPENAI_API_PROVIDER,
     GitHubModelsClient,
@@ -17,14 +23,16 @@ from eval.task_level.github_models import (
     GitHubModelsRunner,
     _bounded_runner_messages,
     _estimate_message_tokens,
+    _required_once_retrieval_metadata,
 )
+from eval.task_level.evaluators.policy import audit_trajectory
 from eval.task_level.isolated_delivery import (
     DelegationEnvelope,
     HostEvidenceSnapshot,
     TASK33_QUERY_DERIVATION,
 )
 from eval.task_level.runners.base import AgentRunRequest
-from eval.task_level.sandbox_execution import SandboxCommandResult
+from eval.task_level.sandbox_execution import DockerCommandSandbox, SandboxCommandResult
 
 
 class _TestSandbox:
@@ -146,6 +154,236 @@ def test_github_models_runner_enforces_turns_and_edits_with_closed_tool_loop(
     assert any(event["tool_name"] == "Edit.replace_text" for event in trajectory)
     assert any("pytest" in event["tool_name"].lower() for event in trajectory)
     assert "Bearer token" not in (output_dir / "github_models_usage.json").read_text(encoding="utf-8")
+
+
+def test_required_once_runner_uses_bounded_direct_docs_delivery(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    workspace = tmp_path / "workspace"
+    workspace.mkdir()
+    module = workspace / "module.py"
+    module.write_text("VALUE = 1\n", encoding="utf-8")
+    actions = iter([
+        _action("get_docs_context", query="Fix the permission gate."),
+        _action("replace_text", path="module.py", old="VALUE = 1", new="VALUE = 2"),
+        _action("finish", summary="used documentation"),
+    ])
+    captured: dict[str, object] = {}
+
+    def fake_complete(self, **kwargs):
+        value = next(actions)
+        return value, _completion(value)
+
+    def fake_handle(name, args, service):
+        packet = build_action_packet(
+            question="Fix the permission gate.",
+            context_pack=[{
+                "doc_scope": "project",
+                "path": "AGENTS.md",
+                "heading_path": "Architecture",
+                "authority": "canonical",
+                "source_class": "project_doc",
+                "content": (
+                    "The permission gate must preserve whole facts. "
+                    "Do not bypass the gate."
+                ),
+            }],
+            max_tokens=2_000,
+        )
+        evidence_id = packet["source_of_truth"][0]["evidence_id"]
+        packet["task_interpretation"]["acceptance_conditions"] = [{
+            "text": "Preserve the documented permission semantics. " + "x" * 5_200,
+            "evidence_ids": [evidence_id],
+        }]
+        for _ in range(3):
+            packet["estimated_tokens"] = estimate_action_packet_tokens(packet)
+        assert not validate_action_packet(packet, max_tokens=2_000)
+        payload = {
+            "delivery_strategy": "bounded_direct",
+            "action_packet": packet,
+        }
+        captured.update({
+            "name": name,
+            "args": args,
+            "service": service,
+            "payload_chars": len(json.dumps(payload, ensure_ascii=False, sort_keys=True)),
+        })
+        return payload
+
+    sentinel_service = object()
+    monkeypatch.setattr(
+        "eval.task_level.github_models.GitHubModelsClient.complete_json",
+        fake_complete,
+    )
+    monkeypatch.setattr(
+        "docmancer.docs.interfaces.mcp.context_tools.handle_context_tool",
+        fake_handle,
+    )
+    monkeypatch.setattr(
+        "docmancer.docs.service.LibraryDocsService",
+        lambda: sentinel_service,
+    )
+    output_dir = tmp_path / "output"
+    request = AgentRunRequest(
+        task_id="task",
+        condition_id="docatlas_tool_required_once",
+        workspace=workspace,
+        prompt="Fix the permission gate.",
+        model="openai/gpt-4.1-mini",
+        timeout_seconds=30,
+        max_turns=3,
+        environment={},
+        mcp_config_path=None,
+        tool_policy_path=tmp_path / "policy.json",
+        output_dir=output_dir,
+        allowed_write_paths=("module.py",),
+        task_objective="Fix the permission gate.",
+    )
+
+    sandbox = cast(DockerCommandSandbox, _TestSandbox())
+    output = GitHubModelsRunner("token", sandbox=sandbox).run(request)
+
+    assert output.status == "completed"
+    assert module.read_text(encoding="utf-8") == "VALUE = 2\n"
+    assert isinstance(captured["payload_chars"], int)
+    assert captured["payload_chars"] > 6_000
+    assert captured["name"] == "get_docs_context"
+    assert captured["service"] is sentinel_service
+    args = captured["args"]
+    assert isinstance(args, dict)
+    assert args["question"] == "Fix the permission gate."
+    assert args["project_path"] == str(workspace)
+    assert args["delivery_strategy"] == "bounded_direct"
+    assert args["prepare_project_docs"] is False
+    trajectory = json.loads((output_dir / "trajectory.normalized.json").read_text())
+    assert trajectory[0]["arguments"]["project_path"] == "."
+    assert trajectory[0]["arguments"]["delivery_strategy"] == "bounded_direct"
+    assert trajectory[0]["arguments"]["question_matches_task_objective"] is True
+    assert trajectory[0]["arguments"]["retrieval_succeeded"] is True
+    assert trajectory[0]["arguments"]["action_packet_status"] == "ok"
+
+
+def test_required_once_runner_blocks_edit_after_insufficient_evidence(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    workspace = tmp_path / "workspace"
+    workspace.mkdir()
+    module = workspace / "module.py"
+    module.write_text("VALUE = 1\n", encoding="utf-8")
+    actions = iter([
+        _action("get_docs_context", query="Fix the permission gate."),
+        _action("replace_text", path="module.py", old="VALUE = 1", new="VALUE = 2"),
+        _action("finish", summary="retrieval failed"),
+    ])
+
+    def fake_complete(self, **kwargs):
+        value = next(actions)
+        return value, _completion(value)
+
+    monkeypatch.setattr(
+        "eval.task_level.github_models.GitHubModelsClient.complete_json",
+        fake_complete,
+    )
+    monkeypatch.setattr(
+        "docmancer.docs.interfaces.mcp.context_tools.handle_context_tool",
+        lambda *args, **kwargs: {
+            "delivery_strategy": "bounded_direct",
+            "action_packet": {
+                "status": "insufficient_evidence",
+                "missing_evidence": ["permission architecture"],
+            },
+        },
+    )
+    monkeypatch.setattr(
+        "docmancer.docs.service.LibraryDocsService",
+        lambda: object(),
+    )
+    output_dir = tmp_path / "output"
+    request = AgentRunRequest(
+        task_id="task",
+        condition_id="docatlas_tool_required_once",
+        workspace=workspace,
+        prompt="Fix the permission gate.",
+        model="openai/gpt-4.1-mini",
+        timeout_seconds=30,
+        max_turns=3,
+        environment={},
+        mcp_config_path=None,
+        tool_policy_path=tmp_path / "policy.json",
+        output_dir=output_dir,
+        allowed_write_paths=("module.py",),
+    )
+
+    output = GitHubModelsRunner(
+        "token", sandbox=cast(DockerCommandSandbox, _TestSandbox())
+    ).run(request)
+
+    assert output.status == "completed"
+    assert module.read_text(encoding="utf-8") == "VALUE = 1\n"
+    trajectory_path = output_dir / "trajectory.normalized.json"
+    trajectory = json.loads(trajectory_path.read_text(encoding="utf-8"))
+    assert trajectory[0]["arguments"]["retrieval_succeeded"] is False
+    assert trajectory[0]["arguments"]["action_packet_status"] == "insufficient_evidence"
+    assert trajectory[1]["tool_name"] == "Repo.replace_text_rejected"
+    audit = audit_trajectory("docatlas_tool_required_once", trajectory_path)
+    assert not audit.clean
+    assert "required_docatlas_retrieval_unsuccessful" in audit.violations
+
+
+def test_required_once_retrieval_rejects_wrong_objective_error_and_malformed_packet(
+    tmp_path: Path,
+):
+    request = AgentRunRequest(
+        task_id="task",
+        condition_id="docatlas_tool_required_once",
+        workspace=tmp_path,
+        prompt="wrapped prompt with runner guidance",
+        model="model",
+        timeout_seconds=30,
+        max_turns=1,
+        environment={},
+        mcp_config_path=None,
+        tool_policy_path=tmp_path / "policy.json",
+        output_dir=tmp_path / "output",
+        task_objective="Fix the permission gate.",
+    )
+    valid_packet = build_action_packet(
+        question="Fix the permission gate.",
+        context_pack=[{
+            "doc_scope": "project",
+            "source_class": "project_doc",
+            "path": "AGENTS.md",
+            "heading_path": "Architecture",
+            "authority": "canonical",
+            "content": "The permission gate must preserve whole facts.",
+        }],
+        max_tokens=2_000,
+    )
+    valid_result = json.dumps({
+        "delivery_strategy": "bounded_direct",
+        "action_packet": valid_packet,
+    })
+
+    assert _required_once_retrieval_metadata(
+        request,
+        {"tool": "get_docs_context", "query": "Different objective"},
+        valid_result,
+    )["retrieval_succeeded"] is False
+    assert _required_once_retrieval_metadata(
+        request,
+        {"tool": "get_docs_context", "query": "Fix the permission gate."},
+        "ERROR: retrieval failed",
+    )["retrieval_succeeded"] is False
+    assert _required_once_retrieval_metadata(
+        request,
+        {"tool": "get_docs_context", "query": "Fix the permission gate."},
+        json.dumps({
+            "delivery_strategy": "bounded_direct",
+            "action_packet": {"status": "ok"},
+        }),
+    )["retrieval_succeeded"] is False
 
 
 def test_github_models_client_streams_structured_output_and_usage(

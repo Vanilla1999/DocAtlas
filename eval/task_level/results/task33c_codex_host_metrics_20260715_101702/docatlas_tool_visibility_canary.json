@@ -1,0 +1,13 @@
+{
+  "agent_docatlas_calls": 1,
+  "docatlas_calls": 1,
+  "docatlas_tool_visibility_verified": true,
+  "failure_reason": null,
+  "get_docs_context_seen": true,
+  "no_code_edits": true,
+  "response_saved": true,
+  "status": "passed",
+  "tool_name_seen": "get_docs_context",
+  "trajectory_path": "/home/viadmin/StudioProjects/hermes/docmancer/eval/task_level/results/task33c_codex_host_metrics_20260715_101702/docatlas_tool_visibility_canary/trajectory.normalized.json",
+  "validated_at": "2026-07-15T10:17:37.616058+00:00"
+}

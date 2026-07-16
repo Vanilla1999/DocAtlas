@@ -1,0 +1,16 @@
+{
+  "filtered_changed_files": [],
+  "filtered_counts": {
+    "changed_files": 0,
+    "ignored_runtime_artifacts": 0,
+    "preserved_generated_candidates": 0
+  },
+  "hygiene_warnings": [],
+  "ignored_runtime_artifacts": [],
+  "preserved_generated_candidates": [],
+  "raw_changed_files": [],
+  "raw_counts": {
+    "changed_files": 0,
+    "status_paths": 0
+  }
+}

@@ -1,0 +1,204 @@
+{
+  "estimated_tokens": 1185,
+  "forbidden_changes": [],
+  "implementation_guidance": [
+    {
+      "evidence_ids": [
+        "ev-caa6bda4e6c35cce"
+      ],
+      "text": "strings: \"permission-required\", \"ready\""
+    },
+    {
+      "evidence_ids": [
+        "ev-fa7a4e500330888d"
+      ],
+      "text": "A flow-entry decision must consider the normalized PermissionResult contract:"
+    },
+    {
+      "evidence_ids": [
+        "ev-fa7a4e500330888d"
+      ],
+      "text": "PermissionDecision.allow means all permissions required for immediate entry are available."
+    },
+    {
+      "evidence_ids": [
+        "ev-fa7a4e500330888d"
+      ],
+      "text": "Offline sync must also delegate to the same permission service before accepting work created by either flow."
+    },
+    {
+      "evidence_ids": [
+        "ev-fa7a4e500330888d"
+      ],
+      "text": "Flow-specific gates must not duplicate permission policy with checks such as direct cameraGranted, locationGranted, nearbyGranted, notificationGranted, hasMissingImmediatePermission, or hasPartialImmediateGrant branches."
+    },
+    {
+      "evidence_ids": [
+        "ev-37246da5f65a00b3"
+      ],
+      "text": "It must reject work that was created from a permission state that would not pass flow entry."
+    },
+    {
+      "evidence_ids": [
+        "ev-37246da5f65a00b3"
+      ],
+      "text": "Do not copy browser-specific fallback logic into sync."
+    }
+  ],
+  "missing_evidence": [],
+  "omitted_counts": {},
+  "required_invariants": [],
+  "schema_version": 1,
+  "source_of_truth": [
+    {
+      "authority": "supporting",
+      "evidence_id": "ev-caa6bda4e6c35cce",
+      "instruction_trust": "untrusted_data",
+      "path": "lib/modules/browser/application/browser_permission_gate.dart",
+      "scope": "project",
+      "symbol_or_section": "Source map: lib/modules/browser/application/browser_permission_gate.dart",
+      "version_binding": "not_applicable"
+    },
+    {
+      "authority": "supporting",
+      "evidence_id": "ev-586aedc474dff85b",
+      "instruction_trust": "untrusted_data",
+      "path": "lib/modules/permission/application/permission_service.dart",
+      "scope": "project",
+      "symbol_or_section": "Source map: lib/modules/permission/application/permission_service.dart",
+      "version_binding": "not_applicable"
+    },
+    {
+      "authority": "supporting",
+      "evidence_id": "ev-02f4bffb81858110",
+      "instruction_trust": "untrusted_data",
+      "path": "lib/modules/scan/application/scan_permission_gate.dart",
+      "scope": "project",
+      "symbol_or_section": "Source map: lib/modules/scan/application/scan_permission_gate.dart",
+      "version_binding": "not_applicable"
+    },
+    {
+      "authority": "supporting",
+      "evidence_id": "ev-37463cd221c22ce7",
+      "instruction_trust": "untrusted_data",
+      "path": "lib/modules/sync/application/offline_sync_gate.dart",
+      "scope": "project",
+      "symbol_or_section": "Source map: lib/modules/sync/application/offline_sync_gate.dart",
+      "version_binding": "not_applicable"
+    },
+    {
+      "authority": "supporting",
+      "evidence_id": "ev-fa7a4e500330888d",
+      "instruction_trust": "untrusted_data",
+      "path": "docs/permission-architecture.md",
+      "scope": "project",
+      "symbol_or_section": "Permission Architecture",
+      "version_binding": "not_applicable"
+    },
+    {
+      "authority": "supporting",
+      "evidence_id": "ev-37246da5f65a00b3",
+      "instruction_trust": "untrusted_data",
+      "path": "docs/offline-sync.md",
+      "scope": "project",
+      "symbol_or_section": "Offline Sync Permission Contract",
+      "version_binding": "not_applicable"
+    }
+  ],
+  "status": "ok",
+  "target_surface": {
+    "likely_files": [
+      {
+        "evidence_ids": [
+          "ev-caa6bda4e6c35cce"
+        ],
+        "path": "lib/modules/browser/application/browser_permission_gate.dart"
+      },
+      {
+        "evidence_ids": [
+          "ev-586aedc474dff85b"
+        ],
+        "path": "lib/modules/permission/application/permission_service.dart"
+      },
+      {
+        "evidence_ids": [
+          "ev-02f4bffb81858110"
+        ],
+        "path": "lib/modules/scan/application/scan_permission_gate.dart"
+      },
+      {
+        "evidence_ids": [
+          "ev-37463cd221c22ce7"
+        ],
+        "path": "lib/modules/sync/application/offline_sync_gate.dart"
+      }
+    ],
+    "symbols": [
+      {
+        "evidence_ids": [
+          "ev-caa6bda4e6c35cce"
+        ],
+        "name": "BrowserPermissionGate"
+      },
+      {
+        "evidence_ids": [
+          "ev-02f4bffb81858110",
+          "ev-caa6bda4e6c35cce"
+        ],
+        "name": "canEnter"
+      },
+      {
+        "evidence_ids": [
+          "ev-caa6bda4e6c35cce"
+        ],
+        "name": "blockedReason"
+      },
+      {
+        "evidence_ids": [
+          "ev-586aedc474dff85b"
+        ],
+        "name": "PermissionService"
+      },
+      {
+        "evidence_ids": [
+          "ev-586aedc474dff85b"
+        ],
+        "name": "evaluateFlowEntry"
+      },
+      {
+        "evidence_ids": [
+          "ev-586aedc474dff85b"
+        ],
+        "name": "evaluateReview"
+      },
+      {
+        "evidence_ids": [
+          "ev-02f4bffb81858110"
+        ],
+        "name": "ScanPermissionGate"
+      },
+      {
+        "evidence_ids": [
+          "ev-37463cd221c22ce7"
+        ],
+        "name": "OfflineSyncGate"
+      },
+      {
+        "evidence_ids": [
+          "ev-37463cd221c22ce7"
+        ],
+        "name": "canAcceptQueuedWork"
+      }
+    ]
+  },
+  "task_interpretation": {
+    "acceptance_conditions": [],
+    "objective": "Browser and scan users can reach inconsistent permission outcomes after a partial permission result: one path can continue through an offline handoff while related paths do not agree on the shared gate. Fix the cross-module permission gate contract so browser, scan, and deferred sync decisions use the local permission architecture consistently."
+  },
+  "uncertainties": [],
+  "validation": {
+    "compile": [],
+    "semantic_checks": [],
+    "tests": []
+  }
+}

@@ -9,6 +9,8 @@ from typing import Any
 
 NETWORK_PATTERNS = (r"\bcurl\b", r"\bwget\b", r"https?://", r"WebFetch", r"WebSearch", r"browser")
 DOCATLAS_PATTERNS = ("docmancer", "doc-atlas", "get_docs_context", "docmancer-docs")
+GET_DOCS_CONTEXT_PATTERNS = ("get_docs_context",)
+PREPARE_DOCS_PATTERNS = ("prepare_docs",)
 CONTEXT7_PATTERNS = ("context7", "resolve-library-id", "query-docs")
 
 
@@ -17,6 +19,8 @@ class PolicyAudit:
     condition_id: str
     clean: bool
     docatlas_calls: int
+    get_docs_context_calls: int
+    prepare_docs_calls: int
     context7_calls: int
     web_calls: int
     network_shell_calls: int
@@ -46,16 +50,18 @@ def audit_trajectory(condition_id: str, trajectory_path: Path | None, output_pat
             events = []
 
     docatlas_calls = _count_tool_patterns(events, DOCATLAS_PATTERNS)
+    get_docs_context_calls = _count_tool_patterns(events, GET_DOCS_CONTEXT_PATTERNS)
+    prepare_docs_calls = _count_tool_patterns(events, PREPARE_DOCS_PATTERNS)
     context7_calls = _count_tool_patterns(events, CONTEXT7_PATTERNS)
     web_calls = _count_web_tool_calls(events)
     network_shell_calls = _count_network_shell(events, text)
     foreign_mcp_calls = _count_foreign_mcp_calls(events)
-    first_docatlas_sequence = _first_tool_sequence(events, DOCATLAS_PATTERNS)
+    first_docatlas_sequence = _first_tool_sequence(events, GET_DOCS_CONTEXT_PATTERNS)
     first_edit_sequence = _first_edit_sequence(events)
     before_edit = None
     if first_docatlas_sequence is not None or first_edit_sequence is not None:
         before_edit = first_docatlas_sequence is not None and (first_edit_sequence is None or first_docatlas_sequence < first_edit_sequence)
-    tool_name_seen = _first_tool_name(events, DOCATLAS_PATTERNS)
+    tool_name_seen = _first_tool_name(events, GET_DOCS_CONTEXT_PATTERNS)
     violations: list[str] = []
 
     network_attempts = web_calls + network_shell_calls
@@ -88,13 +94,35 @@ def audit_trajectory(condition_id: str, trajectory_path: Path | None, output_pat
             violations.append("docatlas condition used web or network shell tools")
         if foreign_mcp_calls:
             violations.append("docatlas condition used foreign MCP tools")
-        if condition_id == "docatlas_tool_required_once" and not before_edit:
-            violations.append("required_docatlas_call_missing")
+        if condition_id == "docatlas_tool_required_once":
+            if get_docs_context_calls != 1:
+                violations.append(f"required_get_docs_context_call_count:{get_docs_context_calls}")
+            if get_docs_context_calls == 1 and not before_edit:
+                violations.append("required_docatlas_call_missing")
+            if prepare_docs_calls:
+                violations.append("prepare_docs_forbidden")
+            required_events = [
+                event for event in events
+                if _matches_patterns(event, GET_DOCS_CONTEXT_PATTERNS)
+            ]
+            if len(required_events) == 1:
+                arguments = required_events[0].get("arguments", {})
+                arguments = arguments if isinstance(arguments, dict) else {}
+                if arguments.get("question_matches_task_objective") is not True:
+                    violations.append("required_docatlas_objective_mismatch")
+                if arguments.get("retrieval_succeeded") is not True:
+                    violations.append("required_docatlas_retrieval_unsuccessful")
+                if arguments.get("delivery_strategy") != "bounded_direct":
+                    violations.append("required_docatlas_delivery_strategy_mismatch")
+                if arguments.get("action_packet_status") not in {"ok", "truncated"}:
+                    violations.append("required_docatlas_action_packet_invalid")
 
     audit = PolicyAudit(
         condition_id=condition_id,
         clean=not violations,
         docatlas_calls=docatlas_calls,
+        get_docs_context_calls=get_docs_context_calls,
+        prepare_docs_calls=prepare_docs_calls,
         context7_calls=context7_calls,
         web_calls=web_calls,
         network_shell_calls=network_shell_calls,

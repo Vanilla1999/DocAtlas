@@ -1,0 +1,7 @@
+{
+  "backend": "host",
+  "causal_claim_allowed": false,
+  "schema_version": 1,
+  "status": "exploratory_unisolated",
+  "validator_eligible": false
+}

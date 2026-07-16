@@ -7,6 +7,17 @@ import math
 from typing import Any
 
 from docmancer.docs.application.action_packet import build_action_packet, validate_action_packet
+from docmancer.docs.application.model_visible_projection import (
+    DOCS_ANSWER_MAX_TOKENS,
+    INSUFFICIENT_EVIDENCE_MAX_TOKENS,
+    PATCH_CONTEXT_HARD_TOKENS,
+    canonical_projection_bytes,
+    project_docs_answer,
+    project_insufficient,
+    project_patch_context,
+    projection_kind,
+    validate_model_visible_projection,
+)
 from docmancer.docs.domain.tool_selection import normalize_public_docs_actions
 from docmancer.docs.service import LibraryDocsService
 from docmancer.docs.interfaces.mcp.output_contract import normalize_output_mode
@@ -19,7 +30,7 @@ DOCUMENT_CONTENT_POLICY = {
     "actionable": False,
     "actions_source": "typed_top_level_fields_only",
 }
-BOUNDED_STRUCTURED_CONTENT_MARKER = "Bounded ActionPacket is available in structuredContent."
+BOUNDED_STRUCTURED_CONTENT_MARKER = "Structured DocAtlas result attached in structuredContent."
 
 
 def context_tools(tools: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -232,7 +243,35 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
             args, "packet_tokens", default=1_500, min_value=256, max_value=2_000
         ) or 1_500
         recovery = _bounded_recovery_action(raw)
-        packet_budget = _packet_budget_inside_payload(output_budget, recovery=recovery)
+        kind = projection_kind(question)
+        if kind == "docs_answer":
+            projection, snapshot = project_docs_answer(
+                question=question,
+                retrieval=raw,
+                max_tokens=min(DOCS_ANSWER_MAX_TOKENS, output_budget),
+            )
+            if projection.get("status") == "insufficient_evidence" and recovery:
+                projection = project_insufficient(
+                    kind="docs_answer",
+                    missing=projection.get("missing") or [],
+                    recommended_next_action=recovery,
+                    max_tokens=min(INSUFFICIENT_EVIDENCE_MAX_TOKENS, output_budget),
+                )
+            validation_errors = validate_model_visible_projection(
+                projection,
+                snapshot=snapshot,
+                max_tokens=(
+                    INSUFFICIENT_EVIDENCE_MAX_TOKENS
+                    if projection.get("status") == "insufficient_evidence"
+                    else min(DOCS_ANSWER_MAX_TOKENS, output_budget)
+                ),
+            )
+            if validation_errors:
+                return _bad_request("invalid_model_visible_projection", "; ".join(validation_errors))
+            _record_model_visible_bytes(raw, projection)
+            return projection
+
+        packet_budget = min(PATCH_CONTEXT_HARD_TOKENS, output_budget)
         retrieval_issues = bounded_retrieval_issues(
             raw, project_evidence_required=bool(_clean_string(args.get("project_path")))
         )
@@ -254,21 +293,33 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
         )
         if packet.get("estimated_tokens", packet_budget + 1) > packet_budget:
             validation_errors.append("requested packet token budget exceeded")
-        payload = {
-            "tool": "get_docs_context",
-            "delivery_strategy": "bounded_direct",
-            "action_packet": packet,
-            "document_content_policy": DOCUMENT_CONTENT_POLICY,
-        }
-        if packet["status"] == "insufficient_evidence" and recovery:
-            payload["recommended_next_action"] = recovery
-        _fit_recovery_in_payload(payload, output_budget)
-        marker_tokens = max(1, math.ceil(len(BOUNDED_STRUCTURED_CONTENT_MARKER.encode("utf-8")) / 4))
-        if _estimated_output_tokens(payload) + marker_tokens > output_budget:
-            validation_errors.append("serialized bounded response token budget exceeded")
         if validation_errors:
             return _bad_request("invalid_action_packet", "; ".join(validation_errors))
-        return payload
+        projection, snapshot = project_patch_context(
+            packet=packet,
+            evidence_items=raw.get("context_pack") or [],
+            max_tokens=output_budget,
+        )
+        if projection.get("status") == "insufficient_evidence" and recovery:
+            projection = project_insufficient(
+                kind="patch_context",
+                missing=projection.get("missing") or [],
+                recommended_next_action=recovery,
+                max_tokens=min(INSUFFICIENT_EVIDENCE_MAX_TOKENS, output_budget),
+            )
+        projection_errors = validate_model_visible_projection(
+            projection,
+            snapshot=snapshot,
+            max_tokens=(
+                INSUFFICIENT_EVIDENCE_MAX_TOKENS
+                if projection.get("status") == "insufficient_evidence"
+                else min(PATCH_CONTEXT_HARD_TOKENS, output_budget)
+            ),
+        )
+        if projection_errors:
+            return _bad_request("invalid_model_visible_projection", "; ".join(projection_errors))
+        _record_model_visible_bytes(raw, projection)
+        return projection
     mode = _output_mode(args)
     if mode == "full":
         raw["output_mode"] = "full"
@@ -355,6 +406,15 @@ def bounded_retrieval_issues(
     if failed:
         issues.append(f"Required documentation lanes are incomplete: {', '.join(failed[:5])}.")
     return issues
+
+
+def _record_model_visible_bytes(raw: dict[str, Any], projection: dict[str, Any]) -> None:
+    diagnostics = raw.get("diagnostics")
+    if not isinstance(diagnostics, dict):
+        return
+    routing = diagnostics.get("retrieval_routing")
+    if isinstance(routing, dict):
+        routing["model_visible_bytes"] = len(canonical_projection_bytes(projection))
 
 
 def _packet_budget_inside_payload(output_budget: int, *, recovery: dict[str, Any] | None) -> int:

@@ -1,0 +1,111 @@
+{
+  "evidence_categories": [
+    "project_docs",
+    "symbols"
+  ],
+  "evidence_fingerprint": "1ea0fabd78cbbbf9a348adcb38812d94c8afac8d5eac323e6807e077eb3fb93e",
+  "index_revision": "390c0e11cab2df96ada48d70df638f870332975ad2dd9f46deceb807e8bf5a8f",
+  "items": [
+    {
+      "content_sha256": "7825c72e1ed48abb705244525ffa8b688faeb2d41aaf125df804e200ab935cb6",
+      "index": 0,
+      "item_sha256": "b24eff7bdc9ebdcd7a33cb69a2a0ae76beb5bc86e4a0eacffa022e5536a77a65",
+      "path": "README.md",
+      "section": "NBO Permission Gate Contract Snapshot"
+    },
+    {
+      "content_sha256": "fd2ff747ebc710b26385a56073ec1d294c6cd17e7c2e499172ef089bf8cdf6a0",
+      "index": 1,
+      "item_sha256": "de0db7970c2d79dfccafdea8d1344c8bee871ae204a5c134598c2ce44c2adf2c",
+      "path": "README.md",
+      "section": "NBO Permission Gate Contract Snapshot > Fixture map"
+    },
+    {
+      "content_sha256": "d95dc5bf25e44a9720996c8979e546a7f88c954fa50d6dda1f2f5bdafd77fa81",
+      "index": 2,
+      "item_sha256": "916f4131387c4aef045da6a487bc8a43fbd2147b80ddd1f4a27b7520288d4d42",
+      "path": "README.md",
+      "section": "NBO Permission Gate Contract Snapshot > Local constraints"
+    },
+    {
+      "content_sha256": "ed6560d5dac38127ae11bf95361a31426f5c437b93f4a7cf6c45213a78c88e6d",
+      "index": 3,
+      "item_sha256": "e6c90e7828072407f4733ded98e36e387128a72ec83798b997bfe96425b5b37e",
+      "path": "docs/permission-architecture.md",
+      "section": "Permission Architecture"
+    },
+    {
+      "content_sha256": "9d887df4420a8bf58ed7006579a51c3fd3dd4f4455b77638e52eda96ad353e09",
+      "index": 4,
+      "item_sha256": "c537ffafeb4b0822b7cd4ef84de9e8bb1fa8a0ab24bf002ee88e983f4048e58a",
+      "path": "docs/offline-sync.md",
+      "section": "Offline Sync Permission Contract"
+    },
+    {
+      "content_sha256": "3c7d8163d61468bd1cf9fc9ea430637c9c8d2988f20c3129bbb6e76088c842e5",
+      "index": 5,
+      "item_sha256": "a075ea2b71887fbc50aa722704f4eb1329fb2702cc288bb2a5bdefc647a381c8",
+      "path": "tests/test_browser_permission_gate.py",
+      "section": "repo_map"
+    },
+    {
+      "content_sha256": "054d605227c4f5d5c4a1bf666fdd7143f6b64ca71b7b8e9df6e7739ef6c3bb39",
+      "index": 6,
+      "item_sha256": "a9871777c22a0691b3bc43356ede095b2c757396153f3ba5071f05443ea400d0",
+      "path": "lib/modules/browser/application/browser_permission_gate.dart",
+      "section": "repo_map"
+    },
+    {
+      "content_sha256": "a435eaf6612112e7bc670f4719d7fef7ddeac4650c8aa96cf7764ab8e2e86471",
+      "index": 7,
+      "item_sha256": "e563d621e7db908c34d908eec78f23744460492ebb702dfa5f661ddadf3863db",
+      "path": "lib/modules/sync/application/offline_sync_gate.dart",
+      "section": "repo_map"
+    },
+    {
+      "content_sha256": "83e0071e46ca7654d1587d00f034ef6609bef73856c88d73dba202236dc70379",
+      "index": 8,
+      "item_sha256": "6dc3618beb96fc26befb5a41a4204ae460d5c05300690467dfe6ddf7466a8186",
+      "path": "lib/modules/scan/application/scan_permission_gate.dart",
+      "section": "repo_map"
+    },
+    {
+      "content_sha256": "9503599955872e64fcf904b6ccac12dcdfcd2ec775e8d659525240a7a7f565ae",
+      "index": 9,
+      "item_sha256": "1588d08abff38a79c57e15c62ba8710f175bf4ea757c45678feceeebdf37e356",
+      "path": "lib/modules/review/application/permission_review_policy.dart",
+      "section": "repo_map"
+    },
+    {
+      "content_sha256": "3f79a64bca9e0b6118a1d04e6b5f76acc0d26ee8ac25695c591ee9e3082e89e4",
+      "index": 10,
+      "item_sha256": "69323d1efa918f59f9520c0258c92bce9359dedd8914bc6efef1c9ed6a1edbc8",
+      "path": "lib/modules/permission/application/permission_service.dart",
+      "section": "repo_map"
+    },
+    {
+      "content_sha256": "49bcf43695f9698435376148c9d60eed3a040b18ae7559209bc0393840a898b1",
+      "index": 11,
+      "item_sha256": "b154cb368ac924706078c15bbd5a505b1cc717fd40fd8c68bdca282bdf69629a",
+      "path": "lib/modules/permission/domain/permission_result.dart",
+      "section": "repo_map"
+    },
+    {
+      "content_sha256": "e8b541a23aa32ccd853ece3a156b4dad7c19e848c2b3469cb0c28bebe3de48ae",
+      "index": 12,
+      "item_sha256": "cdb4af9d70c1f847c18057b1a54d035c664a9637f1c5884b24e369bd8a3caaa2",
+      "path": "tests/test_browser_permission_gate.py",
+      "section": "code_graph"
+    }
+  ],
+  "objective_sha256": "c80be7bb5a646df5ce05b8e250e34fde2b4e33edb8e1fea21fc4ba42162be6f7",
+  "project_revision": "1ba6cb88a61dc5871eca8d2aec13e5d89ce57b2cfe977441da34ad49f7bd48ae",
+  "query_derivation": "task33c-domain-coverage-v4-limit12",
+  "query_sha256": "4656dac5ca6ae4b4466c80dce994e63a6756aaa4a912532e3455348b668932bd",
+  "raw_retrieval_tokens": 20604,
+  "response_status": "success",
+  "retrieval_calls": 1,
+  "retrieval_issues": [],
+  "retrieval_wall_time_seconds": 0.053685,
+  "schema_version": 1
+}

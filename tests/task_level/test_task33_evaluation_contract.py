@@ -10,6 +10,9 @@ from eval.task_level.evaluators.task_contract import evaluate_patch_surface, eva
 from eval.task_level.execution import _assert_task33_run_preconditions
 from eval.task_level.fixtures import builder
 from eval.task_level.fixtures.builder import materialize_fixture, validate_fixture
+from eval.task_level.hidden_tests.decisive_nbo_cross_module_gate_large_001.test_hidden_cross_module_gate_large import (
+    _delegates_and_requires_allow,
+)
 from eval.task_level.runner import load_tasks
 from eval.task_level.schemas import TASKS_PATH, TASK_LEVEL_ROOT
 
@@ -44,6 +47,24 @@ def test_task33_contracts_cover_exactly_the_three_effective_tasks():
         protocol_tasks[broken.task_id],
     ).errors
     assert len(evaluation_contract_registry_sha256()) == 64
+
+
+def test_scan_gate_oracle_requires_exact_shared_entry_call_semantics():
+    assert _delegates_and_requires_allow(
+        "return PermissionService.evaluateFlowEntry(result) == PermissionDecision.allow;"
+    )
+    assert _delegates_and_requires_allow(
+        "final decision = PermissionService.evaluateFlowEntry(result);\n"
+        "return decision == PermissionDecision.allow;"
+    )
+    assert not _delegates_and_requires_allow(
+        "return PermissionService.evaluateFlowEntry("
+        "result, allowOfflineFallback: true) == PermissionDecision.allow;"
+    )
+    assert not _delegates_and_requires_allow(
+        "return wrap(PermissionService.evaluateFlowEntry(result)) "
+        "== PermissionDecision.allow;"
+    )
 
 
 def test_three_task33_fixtures_validate_locally_without_language_sdks(tmp_path, monkeypatch):

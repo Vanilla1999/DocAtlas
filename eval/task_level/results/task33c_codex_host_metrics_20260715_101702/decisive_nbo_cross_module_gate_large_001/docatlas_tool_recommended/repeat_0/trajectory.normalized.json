@@ -1,0 +1,962 @@
+[
+  {
+    "arguments": {},
+    "event_type": "assistant",
+    "result_chars": 0,
+    "result_summary": "{\"thread_id\": \"019f6548-3521-75d3-83d4-32f5450d71a9\", \"type\": \"thread.started\"}",
+    "result_truncated": false,
+    "sequence": 1,
+    "source": "codex_jsonl",
+    "source_event_type": "thread.started",
+    "timestamp": "2026-07-15T10:18:14.122873+00:00",
+    "tokens": null,
+    "tool_name": ""
+  },
+  {
+    "arguments": {},
+    "event_type": "assistant",
+    "result_chars": 0,
+    "result_summary": "{\"type\": \"turn.started\"}",
+    "result_truncated": false,
+    "sequence": 2,
+    "source": "codex_jsonl",
+    "source_event_type": "turn.started",
+    "timestamp": "2026-07-15T10:18:14.122895+00:00",
+    "tokens": null,
+    "tool_name": ""
+  },
+  {
+    "arguments": {},
+    "event_type": "assistant",
+    "result_chars": 0,
+    "result_summary": "{\"item\": {\"id\": \"item_0\", \"text\": \"I\\u2019ll locate the permission gate code paths for browser, scan, and deferred sync, inspect the local permission architecture they should share, then patch the inconsistent branch and run the targeted tests to confirm behavior. I\\u2019ll start by checking the repo layout and then open only the files needed.\", \"type\": \"agent_message\"}, \"type\": \"item.completed\"}",
+    "result_truncated": false,
+    "sequence": 3,
+    "source": "codex_jsonl",
+    "source_event_type": "item.completed",
+    "timestamp": "2026-07-15T10:18:14.122915+00:00",
+    "tokens": null,
+    "tool_name": ""
+  },
+  {
+    "arguments": {
+      "command": "/bin/bash -lc 'ls -la'"
+    },
+    "event_type": "tool_call",
+    "result_chars": 0,
+    "result_summary": "{\"item\": {\"aggregated_output\": \"\", \"command\": \"/bin/bash -lc 'ls -la'\", \"exit_code\": null, \"id\": \"item_1\", \"status\": \"in_progress\", \"type\": \"command_execution\"}, \"type\": \"item.started\"}",
+    "result_truncated": false,
+    "sequence": 4,
+    "source": "codex_jsonl",
+    "source_event_type": "item.started",
+    "timestamp": "2026-07-15T10:18:14.122931+00:00",
+    "tokens": null,
+    "tool_name": "Bash"
+  },
+  {
+    "arguments": {
+      "command": "/bin/bash -lc 'ls -la'"
+    },
+    "event_type": "tool_call",
+    "result_chars": 779,
+    "result_summary": "total 60\ndrwxrwxr-x 8 viadmin viadmin 4096 Jul 15 13:17 .\ndrwxrwxr-x 3 viadmin viadmin 4096 Jul 15 13:17 ..\ndrwxrwxr-x 8 viadmin viadmin 4096 Jul 15 13:17 .git\n-rw-rw-r-- 1 viadmin viadmin 1592 Jun 29 11:46 README.md\ndrwxrwxr-x 2 viadmin viadmin 4096 Jul 13 18:26 __pycache__\n-rw-rw-r-- 1 viadmin viadmin  685 Jun 29 11:46 conftest.py\ndrwxrwxr-x 2 viadmin viadmin 4096 Jun 29 11:46 docs\ndrwxrwxr-x 3 viadmin viadmin 4096 Jun 29 11:46 lib\n-rw-rw-r-- 1 viadmin viadmin  514 Jun 29 11:46 pubspec.lock\n-rw-rw-r-- 1 viadmin viadmin  166 Jun 29 11:46 pubspec.yaml\n-rw-rw-r-- 1 viadmin viadmin  142 Jun 29 11:46 pyproject.toml\ndrwxrwxr-x 3 viadmin viadmin 4096 Jul 13 17:22 src\ndrwxrwxr-x 3 viadmin viadmin 4096 Jul 13 17:22 tests\n-rw-rw-r-- 1 viadmin viadmin 4642 Jul 15 13:17 uv.lock\n",
+    "result_truncated": false,
+    "sequence": 5,
+    "source": "codex_jsonl",
+    "source_event_type": "item.completed",
+    "timestamp": "2026-07-15T10:18:14.122942+00:00",
+    "tokens": null,
+    "tool_name": "Bash"
+  },
+  {
+    "arguments": {
+      "command": "/bin/bash -lc 'rg -n \"permission|permission gate|permission_gate|gated|offline|deferred|scan|browser|handoff\" src tests lib'"
+    },
+    "event_type": "tool_call",
+    "result_chars": 0,
+    "result_summary": "{\"item\": {\"aggregated_output\": \"\", \"command\": \"/bin/bash -lc 'rg -n \\\"permission|permission gate|permission_gate|gated|offline|deferred|scan|browser|handoff\\\" src tests lib'\", \"exit_code\": null, \"id\": \"item_2\", \"status\": \"in_progress\", \"type\": \"command_execution\"}, \"type\": \"item.started\"}",
+    "result_truncated": false,
+    "sequence": 6,
+    "source": "codex_jsonl",
+    "source_event_type": "item.started",
+    "timestamp": "2026-07-15T10:18:14.122955+00:00",
+    "tokens": null,
+    "tool_name": "Bash"
+  },
+  {
+    "arguments": {
+      "command": "/bin/bash -lc 'rg -n \"permission|permission gate|permission_gate|gated|offline|deferred|scan|browser|handoff\" src tests lib'"
+    },
+    "event_type": "tool_call",
+    "result_chars": 4365,
+    "result_summary": "tests/test_browser_permission_gate.py:8:SERVICE = ROOT / \"lib/modules/permission/application/permission_service.dart\"\ntests/test_browser_permission_gate.py:9:BROWSER = ROOT / \"lib/modules/browser/application/browser_permission_gate.dart\"\ntests/test_browser_permission_gate.py:10:SCAN = ROOT / \"lib/modules/scan/application/scan_permission_gate.dart\"\ntests/test_browser_permission_gate.py:11:REVIEW = ROOT / \"lib/modules/review/application/permission_review_policy.dart\"\ntests/test_browser_permission_gate.py:24:def test_browser_blocks_partial_permission_result_even_with_offline_fallback():\ntests/test_browser_permission_gate.py:25:    browser = _method_body(BROWSER, \"canEnter\")\ntests/test_browser_permission_gate.py:28:    assert \"allowOfflineFallback: true\" in browser\ntests/test_browser_permission_gate.py:29:    assert \"== PermissionDecision.allow\" in browser\ntests/test_browser_permission_gate.py:42:def test_scan_source_still_exposes_gate_for_cross_module_contract():\ntests/test_browser_permission_gate.py:43:    scan = _text(SCAN)\ntests/test_browser_permission_gate.py:45:    assert \"class ScanPermissionGate\" in scan\ntests/test_browser_permission_gate.py:46:    assert \"PermissionService _permissionService\" in scan\nlib/modules/permission/application/permission_service.dart:1:import '../domain/permission_result.dart';\nlib/modules/permission/application/permission_service.dart:9:      // BUG: offline fallback was meant only for network availability, not for\nlib/modules/permission/application/permission_service.dart:10:      // missing critical permissions. Returning deferFollowUp lets browser/sync\nlib/modules/permission/application/permission_service.dart:11:      // proceed on partial permission results.\nlib/modules/review/application/permission_review_policy.dart:1:import '../../permission/application/permission_service.dart';\nlib/modules/review/application/permission_review_policy.dart:2:import '../../permission/domain/permission_result.dart';\nlib/modules/review/application/permission_review_policy.dart:5:  PermissionReviewPolicy(this._permissionService);\nlib/modules/review/application/permission_review_policy.dart:7:  final PermissionService _permissionService;\nlib/modules/review/application/permission_review_policy.dart:10:    final decision = _permissionService.evaluateReview(result);\nlib/modules/review/application/permission_review_policy.dart:15:        return 'fix permissions';\nlib/modules/permission/domain/permission_result.freezed.dart:4:part of 'permission_result.dart';\nlib/modules/sync/application/offline_sync_gate.dart:1:import '../../permission/application/permission_service.dart';\nlib/modules/sync/application/offline_sync_gate.dart:2:import '../../permission/domain/permission_result.dart';\nlib/modules/sync/application/offline_sync_gate.dart:5:  OfflineSyncGate(this._permissionService);\nlib/modules/sync/application/offline_sync_gate.dart:7:  final PermissionService _permissionService;\nlib/modules/sync/application/offline_sync_gate.dart:10:    final decision = _permissionService.evaluateFlowEntry(\nlib/modules/browser/application/browser_permission_gate.dart:1:import '../../permission/application/permission_service.dart';\nlib/modules/browser/application/browser_permission_gate.dart:2:import '../../permission/domain/permission_result.dart';\nlib/modules/browser/application/browser_permission_gate.dart:5:  BrowserPermissionGate(this._permissionService);\nlib/modules/browser/application/browser_permission_gate.dart:7:  final PermissionService _permissionService;\nlib/modules/browser/application/browser_permission_gate.dart:10:    final decision = _permissionService.evaluateFlowEntry(\nlib/modules/browser/application/browser_permission_gate.dart:18:    final decision = _permissionService.evaluateFlowEntry(result);\nlib/modules/browser/application/browser_permission_gate.dart:19:    return decision == PermissionDecision.block ? 'permission-required' : 'ready';\nlib/modules/scan/application/scan_permission_gate.dart:1:import '../../permi",
+    "result_truncated": true,
+    "sequence": 7,
+    "source": "codex_jsonl",
+    "source_event_type": "item.completed",
+    "timestamp": "2026-07-15T10:18:14.122969+00:00",
+    "tokens": null,
+    "tool_name": "Bash"
+  },
+  {
+    "arguments": {},
+    "event_type": "assistant",
+    "result_chars": 0,
+    "result_summary": "{\"item\": {\"id\": \"item_3\", \"text\": \"I found a likely hotspot: `permission_service.dart` already has a bug note about partial permission results, and there are dedicated gate classes for browser/scan/sync plus tests around this flow. Next I\\u2019ll inspect those files plus test specs and patch them consistently.\", \"type\": \"agent_message\"}, \"type\": \"item.completed\"}",
+    "result_truncated": false,
+    "sequence": 8,
+    "source": "codex_jsonl",
+    "source_event_type": "item.completed",
+    "timestamp": "2026-07-15T10:18:14.122981+00:00",
+    "tokens": null,
+    "tool_name": ""
+  },
+  {
+    "arguments": {
+      "command": "/bin/bash -lc \"sed -n '1,220p' lib/modules/permission/application/permission_service.dart\""
+    },
+    "event_type": "tool_call",
+    "result_chars": 0,
+    "result_summary": "{\"item\": {\"aggregated_output\": \"\", \"command\": \"/bin/bash -lc \\\"sed -n '1,220p' lib/modules/permission/application/permission_service.dart\\\"\", \"exit_code\": null, \"id\": \"item_4\", \"status\": \"in_progress\", \"type\": \"command_execution\"}, \"type\": \"item.started\"}",
+    "result_truncated": false,
+    "sequence": 9,
+    "source": "codex_jsonl",
+    "source_event_type": "item.started",
+    "timestamp": "2026-07-15T10:18:14.122991+00:00",
+    "tokens": null,
+    "tool_name": "Bash"
+  },
+  {
+    "arguments": {
+      "command": "/bin/bash -lc \"sed -n '1,220p' lib/modules/permission/application/permission_service.dart\""
+    },
+    "event_type": "tool_call",
+    "result_chars": 909,
+    "result_summary": "import '../domain/permission_result.dart';\n\nclass PermissionService {\n  PermissionDecision evaluateFlowEntry(\n    PermissionResult result, {\n    bool allowOfflineFallback = false,\n  }) {\n    if (result.hasMissingImmediatePermission) {\n      // BUG: offline fallback was meant only for network availability, not for\n      // missing critical permissions. Returning deferFollowUp lets browser/sync\n      // proceed on partial permission results.\n      return allowOfflineFallback\n          ? PermissionDecision.deferFollowUp\n          : PermissionDecision.block;\n    }\n    return PermissionDecision.allow;\n  }\n\n  PermissionDecision evaluateReview(PermissionResult result) {\n    if (result.hasMissingImmediatePermission) {\n      return PermissionDecision.block;\n    }\n    if (result.hasDeferredBackgroundLocation) {\n      return PermissionDecision.deferFollowUp;\n    }\n    return PermissionDecision.allow;\n  }\n}\n",
+    "result_truncated": false,
+    "sequence": 10,
+    "source": "codex_jsonl",
+    "source_event_type": "item.completed",
+    "timestamp": "2026-07-15T10:18:14.123001+00:00",
+    "tokens": null,
+    "tool_name": "Bash"
+  },
+  {
+    "arguments": {
+      "command": "/bin/bash -lc pwd"
+    },
+    "event_type": "tool_call",
+    "result_chars": 0,
+    "result_summary": "{\"item\": {\"aggregated_output\": \"\", \"command\": \"/bin/bash -lc pwd\", \"exit_code\": null, \"id\": \"item_5\", \"status\": \"in_progress\", \"type\": \"command_execution\"}, \"type\": \"item.started\"}",
+    "result_truncated": false,
+    "sequence": 11,
+    "source": "codex_jsonl",
+    "source_event_type": "item.started",
+    "timestamp": "2026-07-15T10:18:14.123010+00:00",
+    "tokens": null,
+    "tool_name": "Bash"
+  },
+  {
+    "arguments": {
+      "command": "/bin/bash -lc pwd"
+    },
+    "event_type": "tool_call",
+    "result_chars": 6,
+    "result_summary": "<path>",
+    "result_truncated": false,
+    "sequence": 12,
+    "source": "codex_jsonl",
+    "source_event_type": "item.completed",
+    "timestamp": "2026-07-15T10:18:14.123015+00:00",
+    "tokens": null,
+    "tool_name": "Bash"
+  },
+  {
+    "arguments": {},
+    "event_type": "assistant",
+    "result_chars": 0,
+    "result_summary": "{\"item\": {\"id\": \"item_6\", \"text\": \"I hit a typo in the workspace path, but I confirmed the repo root. I\\u2019ll now read the browser/scan/sync gate implementations and the focused tests in one pass before patching.\", \"type\": \"agent_message\"}, \"type\": \"item.completed\"}",
+    "result_truncated": false,
+    "sequence": 13,
+    "source": "codex_jsonl",
+    "source_event_type": "item.completed",
+    "timestamp": "2026-07-15T10:18:14.123024+00:00",
+    "tokens": null,
+    "tool_name": ""
+  },
+  {
+    "arguments": {
+      "command": "/bin/bash -lc \"sed -n '1,220p' lib/modules/browser/application/browser_permission_gate.dart\""
+    },
+    "event_type": "tool_call",
+    "result_chars": 0,
+    "result_summary": "{\"item\": {\"aggregated_output\": \"\", \"command\": \"/bin/bash -lc \\\"sed -n '1,220p' lib/modules/browser/application/browser_permission_gate.dart\\\"\", \"exit_code\": null, \"id\": \"item_7\", \"status\": \"in_progress\", \"type\": \"command_execution\"}, \"type\": \"item.started\"}",
+    "result_truncated": false,
+    "sequence": 14,
+    "source": "codex_jsonl",
+    "source_event_type": "item.started",
+    "timestamp": "2026-07-15T10:18:14.123036+00:00",
+    "tokens": null,
+    "tool_name": "Bash"
+  },
+  {
+    "arguments": {
+      "command": "/bin/bash -lc \"sed -n '1,220p' lib/modules/scan/application/scan_permission_gate.dart\""
+    },
+    "event_type": "tool_call",
+    "result_chars": 0,
+    "result_summary": "{\"item\": {\"aggregated_output\": \"\", \"command\": \"/bin/bash -lc \\\"sed -n '1,220p' lib/modules/scan/application/scan_permission_gate.dart\\\"\", \"exit_code\": null, \"id\": \"item_8\", \"status\": \"in_progress\", \"type\": \"command_execution\"}, \"type\": \"item.started\"}",
+    "result_truncated": false,
+    "sequence": 15,
+    "source": "codex_jsonl",
+    "source_event_type": "item.started",
+    "timestamp": "2026-07-15T10:18:14.123046+00:00",
+    "tokens": null,
+    "tool_name": "Bash"
+  },
+  {
+    "arguments": {
+      "command": "/bin/bash -lc \"sed -n '1,220p' lib/modules/browser/application/browser_permission_gate.dart\""
+    },
+    "event_type": "tool_call",
+    "result_chars": 666,
+    "result_summary": "import '../../permission/application/permission_service.dart';\nimport '../../permission/domain/permission_result.dart';\n\nclass BrowserPermissionGate {\n  BrowserPermissionGate(this._permissionService);\n\n  final PermissionService _permissionService;\n\n  bool canEnter(PermissionResult result) {\n    final decision = _permissionService.evaluateFlowEntry(\n      result,\n      allowOfflineFallback: true,\n    );\n    return decision != PermissionDecision.block;\n  }\n\n  String blockedReason(PermissionResult result) {\n    final decision = _permissionService.evaluateFlowEntry(result);\n    return decision == PermissionDecision.block ? 'permission-required' : 'ready';\n  }\n}\n",
+    "result_truncated": false,
+    "sequence": 16,
+    "source": "codex_jsonl",
+    "source_event_type": "item.completed",
+    "timestamp": "2026-07-15T10:18:14.123055+00:00",
+    "tokens": null,
+    "tool_name": "Bash"
+  },
+  {
+    "arguments": {
+      "command": "/bin/bash -lc \"sed -n '1,220p' lib/modules/scan/application/scan_permission_gate.dart\""
+    },
+    "event_type": "tool_call",
+    "result_chars": 395,
+    "result_summary": "import '../../permission/application/permission_service.dart';\nimport '../../permission/domain/permission_result.dart';\n\nclass ScanPermissionGate {\n  ScanPermissionGate(this._permissionService);\n\n  final PermissionService _permissionService;\n\n  bool canEnter(PermissionResult result) {\n    if (!result.cameraGranted || !result.locationGranted) {\n      return false;\n    }\n    return true;\n  }\n}\n",
+    "result_truncated": false,
+    "sequence": 17,
+    "source": "codex_jsonl",
+    "source_event_type": "item.completed",
+    "timestamp": "2026-07-15T10:18:14.123062+00:00",
+    "tokens": null,
+    "tool_name": "Bash"
+  },
+  {
+    "arguments": {
+      "command": "/bin/bash -lc \"sed -n '1,220p' lib/modules/sync/application/offline_sync_gate.dart\""
+    },
+    "event_type": "tool_call",
+    "result_chars": 0,
+    "result_summary": "{\"item\": {\"aggregated_output\": \"\", \"command\": \"/bin/bash -lc \\\"sed -n '1,220p' lib/modules/sync/application/offline_sync_gate.dart\\\"\", \"exit_code\": null, \"id\": \"item_9\", \"status\": \"in_progress\", \"type\": \"command_execution\"}, \"type\": \"item.started\"}",
+    "result_truncated": false,
+    "sequence": 18,
+    "source": "codex_jsonl",
+    "source_event_type": "item.started",
+    "timestamp": "2026-07-15T10:18:14.123071+00:00",
+    "tokens": null,
+    "tool_name": "Bash"
+  },
+  {
+    "arguments": {
+      "command": "/bin/bash -lc \"sed -n '1,220p' lib/modules/sync/application/offline_sync_gate.dart\""
+    },
+    "event_type": "tool_call",
+    "result_chars": 460,
+    "result_summary": "import '../../permission/application/permission_service.dart';\nimport '../../permission/domain/permission_result.dart';\n\nclass OfflineSyncGate {\n  OfflineSyncGate(this._permissionService);\n\n  final PermissionService _permissionService;\n\n  bool canAcceptQueuedWork(PermissionResult result) {\n    final decision = _permissionService.evaluateFlowEntry(\n      result,\n      allowOfflineFallback: true,\n    );\n    return decision != PermissionDecision.block;\n  }\n}\n",
+    "result_truncated": false,
+    "sequence": 19,
+    "source": "codex_jsonl",
+    "source_event_type": "item.completed",
+    "timestamp": "2026-07-15T10:18:14.123078+00:00",
+    "tokens": null,
+    "tool_name": "Bash"
+  },
+  {
+    "arguments": {
+      "command": "/bin/bash -lc \"sed -n '1,260p' tests/test_browser_permission_gate.py\""
+    },
+    "event_type": "tool_call",
+    "result_chars": 0,
+    "result_summary": "{\"item\": {\"aggregated_output\": \"\", \"command\": \"/bin/bash -lc \\\"sed -n '1,260p' tests/test_browser_permission_gate.py\\\"\", \"exit_code\": null, \"id\": \"item_10\", \"status\": \"in_progress\", \"type\": \"command_execution\"}, \"type\": \"item.started\"}",
+    "result_truncated": false,
+    "sequence": 20,
+    "source": "codex_jsonl",
+    "source_event_type": "item.started",
+    "timestamp": "2026-07-15T10:18:14.123088+00:00",
+    "tokens": null,
+    "tool_name": "Bash"
+  },
+  {
+    "arguments": {
+      "command": "/bin/bash -lc \"sed -n '1,260p' tests/test_browser_permission_gate.py\""
+    },
+    "event_type": "tool_call",
+    "result_chars": 1776,
+    "result_summary": "from __future__ import annotations\n\nimport re\nfrom pathlib import Path\n\n\nROOT = Path(__file__).resolve().parents[1]\nSERVICE = ROOT / \"lib/modules/permission/application/permission_service.dart\"\nBROWSER = ROOT / \"lib/modules/browser/application/browser_permission_gate.dart\"\nSCAN = ROOT / \"lib/modules/scan/application/scan_permission_gate.dart\"\nREVIEW = ROOT / \"lib/modules/review/application/permission_review_policy.dart\"\n\n\ndef _text(path: Path) -> str:\n    return path.read_text(encoding=\"utf-8\")\n\n\ndef _method_body(path: Path, method: str) -> str:\n    match = re.search(rf\"{method}\\(PermissionResult result\\) \\{{([\\s\\S]*?)\\n  \\}}\", _text(path))\n    assert match, f\"{path.name} must expose {method}(PermissionResult result)\"\n    return match.group(1)\n\n\ndef test_browser_blocks_partial_permission_result_even_with_offline_fallback():\n    browser = _method_body(BROWSER, \"canEnter\")\n    service = _text(SERVICE)\n\n    assert \"allowOfflineFallback: true\" in browser\n    assert \"== PermissionDecision.allow\" in browser\n    assert \"? PermissionDecision.deferFollowUp\" not in service\n\n\ndef test_allowed_result_still_has_allow_and_block_decisions():\n    service = _text(SERVICE)\n\n    assert \"PermissionDecision allow\" not in service\n    assert \"PermissionDecision.allow\" in service\n    assert \"PermissionDecision.block\" in service\n    assert \"hasMissingImmediatePermission\" in service\n\n\ndef test_scan_source_still_exposes_gate_for_cross_module_contract():\n    scan = _text(SCAN)\n\n    assert \"class ScanPermissionGate\" in scan\n    assert \"PermissionService _permissionService\" in scan\n\n\ndef test_review_policy_remains_descriptive_not_entry_gate():\n    review = _text(REVIEW)\n\n    assert \"evaluateReview\" in review\n    assert \"labelFor\" in review\n    assert \"canEnter\" not in review\n",
+    "result_truncated": false,
+    "sequence": 21,
+    "source": "codex_jsonl",
+    "source_event_type": "item.completed",
+    "timestamp": "2026-07-15T10:18:14.123099+00:00",
+    "tokens": null,
+    "tool_name": "Bash"
+  },
+  {
+    "arguments": {
+      "command": "/bin/bash -lc \"sed -n '1,220p' lib/modules/permission/domain/permission_result.dart\""
+    },
+    "event_type": "tool_call",
+    "result_chars": 0,
+    "result_summary": "{\"item\": {\"aggregated_output\": \"\", \"command\": \"/bin/bash -lc \\\"sed -n '1,220p' lib/modules/permission/domain/permission_result.dart\\\"\", \"exit_code\": null, \"id\": \"item_11\", \"status\": \"in_progress\", \"type\": \"command_execution\"}, \"type\": \"item.started\"}",
+    "result_truncated": false,
+    "sequence": 22,
+    "source": "codex_jsonl",
+    "source_event_type": "item.started",
+    "timestamp": "2026-07-15T10:18:14.123109+00:00",
+    "tokens": null,
+    "tool_name": "Bash"
+  },
+  {
+    "arguments": {
+      "command": "/bin/bash -lc \"sed -n '1,220p' lib/modules/permission/domain/permission_result.dart\""
+    },
+    "event_type": "tool_call",
+    "result_chars": 885,
+    "result_summary": "enum PermissionDecision {\n  allow,\n  block,\n  deferFollowUp,\n}\n\nclass PermissionResult {\n  const PermissionResult({\n    required this.cameraGranted,\n    required this.locationGranted,\n    required this.nearbyGranted,\n    required this.notificationGranted,\n    required this.backgroundLocationGranted,\n    this.source = 'unknown',\n  });\n\n  final bool cameraGranted;\n  final bool locationGranted;\n  final bool nearbyGranted;\n  final bool notificationGranted;\n  final bool backgroundLocationGranted;\n  final String source;\n\n  bool get hasMissingImmediatePermission =>\n      !cameraGranted || !locationGranted || !nearbyGranted || !notificationGranted;\n\n  bool get hasDeferredBackgroundLocation => !backgroundLocationGranted;\n\n  bool get hasPartialImmediateGrant =>\n      (cameraGranted || locationGranted || nearbyGranted || notificationGranted) &&\n      hasMissingImmediatePermission;\n}\n",
+    "result_truncated": false,
+    "sequence": 23,
+    "source": "codex_jsonl",
+    "source_event_type": "item.completed",
+    "timestamp": "2026-07-15T10:18:14.123117+00:00",
+    "tokens": null,
+    "tool_name": "Bash"
+  },
+  {
+    "arguments": {},
+    "event_type": "assistant",
+    "result_chars": 0,
+    "result_summary": "{\"item\": {\"id\": \"item_12\", \"text\": \"The service and core result model confirm the inconsistency: partial immediate permission logic returns `deferFollowUp` when offline fallback is enabled. I\\u2019ll verify the remaining review gate behavior and then patch the evaluation logic plus scan gate call path to align all modules.\", \"type\": \"agent_message\"}, \"type\": \"item.completed\"}",
+    "result_truncated": false,
+    "sequence": 24,
+    "source": "codex_jsonl",
+    "source_event_type": "item.completed",
+    "timestamp": "2026-07-15T10:18:14.123128+00:00",
+    "tokens": null,
+    "tool_name": ""
+  },
+  {
+    "arguments": {
+      "command": "/bin/bash -lc \"sed -n '1,220p' lib/modules/review/application/permission_review_policy.dart\""
+    },
+    "event_type": "tool_call",
+    "result_chars": 0,
+    "result_summary": "{\"item\": {\"aggregated_output\": \"\", \"command\": \"/bin/bash -lc \\\"sed -n '1,220p' lib/modules/review/application/permission_review_policy.dart\\\"\", \"exit_code\": null, \"id\": \"item_13\", \"status\": \"in_progress\", \"type\": \"command_execution\"}, \"type\": \"item.started\"}",
+    "result_truncated": false,
+    "sequence": 25,
+    "source": "codex_jsonl",
+    "source_event_type": "item.started",
+    "timestamp": "2026-07-15T10:18:14.123137+00:00",
+    "tokens": null,
+    "tool_name": "Bash"
+  },
+  {
+    "arguments": {
+      "command": "/bin/bash -lc \"sed -n '1,220p' lib/modules/review/application/permission_review_policy.dart\""
+    },
+    "event_type": "tool_call",
+    "result_chars": 622,
+    "result_summary": "import '../../permission/application/permission_service.dart';\nimport '../../permission/domain/permission_result.dart';\n\nclass PermissionReviewPolicy {\n  PermissionReviewPolicy(this._permissionService);\n\n  final PermissionService _permissionService;\n\n  String labelFor(PermissionResult result) {\n    final decision = _permissionService.evaluateReview(result);\n    switch (decision) {\n      case PermissionDecision.allow:\n        return 'ready';\n      case PermissionDecision.block:\n        return 'fix permissions';\n      case PermissionDecision.deferFollowUp:\n        return 'complete follow-up after entry';\n    }\n  }\n}\n",
+    "result_truncated": false,
+    "sequence": 26,
+    "source": "codex_jsonl",
+    "source_event_type": "item.completed",
+    "timestamp": "2026-07-15T10:18:14.123145+00:00",
+    "tokens": null,
+    "tool_name": "Bash"
+  },
+  {
+    "arguments": {
+      "command": "/bin/bash -lc \"sed -n '1,260p' tests/test_sync_permission_gate.py\""
+    },
+    "event_type": "tool_call",
+    "result_chars": 0,
+    "result_summary": "{\"item\": {\"aggregated_output\": \"\", \"command\": \"/bin/bash -lc \\\"sed -n '1,260p' tests/test_sync_permission_gate.py\\\"\", \"exit_code\": null, \"id\": \"item_14\", \"status\": \"in_progress\", \"type\": \"command_execution\"}, \"type\": \"item.started\"}",
+    "result_truncated": false,
+    "sequence": 27,
+    "source": "codex_jsonl",
+    "source_event_type": "item.started",
+    "timestamp": "2026-07-15T10:18:14.123155+00:00",
+    "tokens": null,
+    "tool_name": "Bash"
+  },
+  {
+    "arguments": {
+      "command": "/bin/bash -lc \"sed -n '1,260p' tests/test_sync_permission_gate.py\""
+    },
+    "event_type": "tool_call",
+    "result_chars": 78,
+    "result_summary": "sed: can't read tests/test_sync_permission_gate.py: No such file or directory\n",
+    "result_truncated": false,
+    "sequence": 28,
+    "source": "codex_jsonl",
+    "source_event_type": "item.completed",
+    "timestamp": "2026-07-15T10:18:14.123161+00:00",
+    "tokens": null,
+    "tool_name": "Bash"
+  },
+  {
+    "arguments": {
+      "command": "/bin/bash -lc 'ls -la tests'"
+    },
+    "event_type": "tool_call",
+    "result_chars": 0,
+    "result_summary": "{\"item\": {\"aggregated_output\": \"\", \"command\": \"/bin/bash -lc 'ls -la tests'\", \"exit_code\": null, \"id\": \"item_15\", \"status\": \"in_progress\", \"type\": \"command_execution\"}, \"type\": \"item.started\"}",
+    "result_truncated": false,
+    "sequence": 29,
+    "source": "codex_jsonl",
+    "source_event_type": "item.started",
+    "timestamp": "2026-07-15T10:18:14.123169+00:00",
+    "tokens": null,
+    "tool_name": "Bash"
+  },
+  {
+    "arguments": {
+      "command": "/bin/bash -lc 'ls -la tests'"
+    },
+    "event_type": "tool_call",
+    "result_chars": 246,
+    "result_summary": "total 16\ndrwxrwxr-x 3 viadmin viadmin 4096 Jul 13 17:22 .\ndrwxrwxr-x 8 viadmin viadmin 4096 Jul 15 13:17 ..\ndrwxrwxr-x 2 viadmin viadmin 4096 Jul 13 18:26 __pycache__\n-rw-rw-r-- 1 viadmin viadmin 1776 Jun 29 11:46 test_browser_permission_gate.py\n",
+    "result_truncated": false,
+    "sequence": 30,
+    "source": "codex_jsonl",
+    "source_event_type": "item.completed",
+    "timestamp": "2026-07-15T10:18:14.123175+00:00",
+    "tokens": null,
+    "tool_name": "Bash"
+  },
+  {
+    "arguments": {
+      "command": "/bin/bash -lc 'rg -n \"evaluateFlowEntry|PermissionDecision|ScanPermissionGate|BrowserPermissionGate|OfflineSyncGate|allowOfflineFallback|hasPartialImmediateGrant\" lib tests'"
+    },
+    "event_type": "tool_call",
+    "result_chars": 0,
+    "result_summary": "{\"item\": {\"aggregated_output\": \"\", \"command\": \"/bin/bash -lc 'rg -n \\\"evaluateFlowEntry|PermissionDecision|ScanPermissionGate|BrowserPermissionGate|OfflineSyncGate|allowOfflineFallback|hasPartialImmediateGrant\\\" lib tests'\", \"exit_code\": null, \"id\": \"item_16\", \"status\": \"in_progress\", \"type\": \"command_execution\"}, \"type\": \"item.started\"}",
+    "result_truncated": false,
+    "sequence": 31,
+    "source": "codex_jsonl",
+    "source_event_type": "item.started",
+    "timestamp": "2026-07-15T10:18:14.123184+00:00",
+    "tokens": null,
+    "tool_name": "Bash"
+  },
+  {
+    "arguments": {
+      "command": "/bin/bash -lc 'rg -n \"evaluateFlowEntry|PermissionDecision|ScanPermissionGate|BrowserPermissionGate|OfflineSyncGate|allowOfflineFallback|hasPartialImmediateGrant\" lib tests'"
+    },
+    "event_type": "tool_call",
+    "result_chars": 3663,
+    "result_summary": "tests/test_browser_permission_gate.py:28:    assert \"allowOfflineFallback: true\" in browser\ntests/test_browser_permission_gate.py:29:    assert \"== PermissionDecision.allow\" in browser\ntests/test_browser_permission_gate.py:30:    assert \"? PermissionDecision.deferFollowUp\" not in service\ntests/test_browser_permission_gate.py:36:    assert \"PermissionDecision allow\" not in service\ntests/test_browser_permission_gate.py:37:    assert \"PermissionDecision.allow\" in service\ntests/test_browser_permission_gate.py:38:    assert \"PermissionDecision.block\" in service\ntests/test_browser_permission_gate.py:45:    assert \"class ScanPermissionGate\" in scan\nlib/modules/scan/application/scan_permission_gate.dart:4:class ScanPermissionGate {\nlib/modules/scan/application/scan_permission_gate.dart:5:  ScanPermissionGate(this._permissionService);\nlib/modules/permission/application/permission_service.dart:4:  PermissionDecision evaluateFlowEntry(\nlib/modules/permission/application/permission_service.dart:6:    bool allowOfflineFallback = false,\nlib/modules/permission/application/permission_service.dart:12:      return allowOfflineFallback\nlib/modules/permission/application/permission_service.dart:13:          ? PermissionDecision.deferFollowUp\nlib/modules/permission/application/permission_service.dart:14:          : PermissionDecision.block;\nlib/modules/permission/application/permission_service.dart:16:    return PermissionDecision.allow;\nlib/modules/permission/application/permission_service.dart:19:  PermissionDecision evaluateReview(PermissionResult result) {\nlib/modules/permission/application/permission_service.dart:21:      return PermissionDecision.block;\nlib/modules/permission/application/permission_service.dart:24:      return PermissionDecision.deferFollowUp;\nlib/modules/permission/application/permission_service.dart:26:    return PermissionDecision.allow;\nlib/modules/review/application/permission_review_policy.dart:12:      case PermissionDecision.allow:\nlib/modules/review/application/permission_review_policy.dart:14:      case PermissionDecision.block:\nlib/modules/review/application/permission_review_policy.dart:16:      case PermissionDecision.deferFollowUp:\nlib/modules/permission/domain/permission_result.dart:1:enum PermissionDecision {\nlib/modules/permission/domain/permission_result.dart:29:  bool get hasPartialImmediateGrant =>\nlib/modules/sync/application/offline_sync_gate.dart:4:class OfflineSyncGate {\nlib/modules/sync/application/offline_sync_gate.dart:5:  OfflineSyncGate(this._permissionService);\nlib/modules/sync/application/offline_sync_gate.dart:10:    final decision = _permissionService.evaluateFlowEntry(\nlib/modules/sync/application/offline_sync_gate.dart:12:      allowOfflineFallback: true,\nlib/modules/sync/application/offline_sync_gate.dart:14:    return decision != PermissionDecision.block;\nlib/modules/browser/application/browser_permission_gate.dart:4:class BrowserPermissionGate {\nlib/modules/browser/application/browser_permission_gate.dart:5:  BrowserPermissionGate(this._permissionService);\nlib/modules/browser/application/browser_permission_gate.dart:10:    final decision = _permissionService.evaluateFlowEntry(\nlib/modules/browser/application/browser_permission_gate.dart:12:      allowOfflineFallback: true,\nlib/modules/browser/application/browser_permission_gate.dart:14:    return decision != PermissionDecision.block;\nlib/modules/browser/application/browser_permission_gate.dart:18:    final decision = _permissionService.evaluateFlowEntry(result);\nlib/modules/browser/application/browser_permission_gate.dart:19:    return decision == PermissionDecision.block ? 'permission-required' : 'ready';\n",
+    "result_truncated": false,
+    "sequence": 32,
+    "source": "codex_jsonl",
+    "source_event_type": "item.completed",
+    "timestamp": "2026-07-15T10:18:14.123195+00:00",
+    "tokens": null,
+    "tool_name": "Bash"
+  },
+  {
+    "arguments": {},
+    "event_type": "assistant",
+    "result_chars": 0,
+    "result_summary": "{\"item\": {\"id\": \"item_17\", \"text\": \"I\\u2019m done with code discovery and will now pull the run instructions from README and then implement the minimum contract fix so all three gates share the same decision semantics and keep offline fallback meaningful.\", \"type\": \"agent_message\"}, \"type\": \"item.completed\"}",
+    "result_truncated": false,
+    "sequence": 33,
+    "source": "codex_jsonl",
+    "source_event_type": "item.completed",
+    "timestamp": "2026-07-15T10:18:14.123204+00:00",
+    "tokens": null,
+    "tool_name": ""
+  },
+  {
+    "arguments": {
+      "command": "/bin/bash -lc \"sed -n '1,240p' README.md\""
+    },
+    "event_type": "tool_call",
+    "result_chars": 0,
+    "result_summary": "{\"item\": {\"aggregated_output\": \"\", \"command\": \"/bin/bash -lc \\\"sed -n '1,240p' README.md\\\"\", \"exit_code\": null, \"id\": \"item_18\", \"status\": \"in_progress\", \"type\": \"command_execution\"}, \"type\": \"item.started\"}",
+    "result_truncated": false,
+    "sequence": 34,
+    "source": "codex_jsonl",
+    "source_event_type": "item.started",
+    "timestamp": "2026-07-15T10:18:14.123213+00:00",
+    "tokens": null,
+    "tool_name": "Bash"
+  },
+  {
+    "arguments": {
+      "command": "/bin/bash -lc \"sed -n '1,240p' README.md\""
+    },
+    "event_type": "tool_call",
+    "result_chars": 1592,
+    "result_summary": "# NBO Permission Gate Contract Snapshot\n\nThis benchmark fixture is a sanitized real-project-derived snapshot from a Flutter/Dart permission subsystem. It is intentionally limited to permission, browser, scan, sync, and review excerpts.\n\nExcluded: private git history, remotes, credentials, environment files, runtime/build output, dependency caches, IDE files, product-specific domain data, customer/user records, and raw trajectories.\n\n## Fixture map\n\n- `lib/modules/permission/application/permission_service.dart` owns the canonical flow-entry decision contract.\n- `lib/modules/permission/domain/permission_result.dart` is the source result model used by all flow gates.\n- `lib/modules/browser/application/browser_permission_gate.dart` controls browser entry.\n- `lib/modules/scan/application/scan_permission_gate.dart` controls scanner entry.\n- `lib/modules/sync/application/offline_sync_gate.dart` controls deferred offline handoff after either flow.\n- `lib/modules/review/application/permission_review_policy.dart` renders copy/action hints after a block.\n- `docs/permission-architecture.md`, `docs/browser-flow.md`, `docs/scan-flow.md`, and `docs/offline-sync.md` define the cross-module contract.\n\n## Local constraints\n\n- Browser, scan, and offline-sync gates must delegate entry decisions to the permission module.\n- Flow modules may pass flow-specific options, but must not duplicate the meaning of partial/degraded permission results.\n- Review policy may describe a decision, but must not become the entry gate.\n- Generated files are not source-of-truth and must not be hand-edited.\n",
+    "result_truncated": false,
+    "sequence": 35,
+    "source": "codex_jsonl",
+    "source_event_type": "item.completed",
+    "timestamp": "2026-07-15T10:18:14.123221+00:00",
+    "tokens": null,
+    "tool_name": "Bash"
+  },
+  {
+    "arguments": {},
+    "event_type": "assistant",
+    "result_chars": 0,
+    "result_summary": "{\"item\": {\"id\": \"item_19\", \"text\": \"I found explicit contract docs in `docs/`; I\\u2019ll read the relevant architecture/flow docs now to ensure the fix matches the intended shared contract before changing code.\", \"type\": \"agent_message\"}, \"type\": \"item.completed\"}",
+    "result_truncated": false,
+    "sequence": 36,
+    "source": "codex_jsonl",
+    "source_event_type": "item.completed",
+    "timestamp": "2026-07-15T10:18:14.123230+00:00",
+    "tokens": null,
+    "tool_name": ""
+  },
+  {
+    "arguments": {
+      "command": "/bin/bash -lc \"sed -n '1,240p' docs/permission-architecture.md\""
+    },
+    "event_type": "tool_call",
+    "result_chars": 0,
+    "result_summary": "{\"item\": {\"aggregated_output\": \"\", \"command\": \"/bin/bash -lc \\\"sed -n '1,240p' docs/permission-architecture.md\\\"\", \"exit_code\": null, \"id\": \"item_20\", \"status\": \"in_progress\", \"type\": \"command_execution\"}, \"type\": \"item.started\"}",
+    "result_truncated": false,
+    "sequence": 37,
+    "source": "codex_jsonl",
+    "source_event_type": "item.started",
+    "timestamp": "2026-07-15T10:18:14.123239+00:00",
+    "tokens": null,
+    "tool_name": "Bash"
+  },
+  {
+    "arguments": {
+      "command": "/bin/bash -lc \"sed -n '1,240p' docs/permission-architecture.md\""
+    },
+    "event_type": "tool_call",
+    "result_chars": 1426,
+    "result_summary": "# Permission Architecture\n\n`PermissionService` is the canonical owner of permission result interpretation for flow entry.\n\nA flow-entry decision must consider the normalized `PermissionResult` contract:\n\n- `PermissionDecision.allow` means all permissions required for immediate entry are available.\n- `PermissionDecision.block` means at least one immediate-entry permission is missing or denied.\n- `PermissionDecision.deferFollowUp` is reserved for permissions that are explicitly allowed after the user enters the flow. Background location is deferred follow-up; camera, foreground location, nearby device, and Android notification are not deferred for browser/scan entry.\n\nBrowser and scan flows both share the same immediate-entry contract. Browser may set `allowOfflineFallback` when it can queue work for later, but offline fallback still cannot bypass missing immediate-entry permissions. Offline sync must also delegate to the same permission service before accepting work created by either flow.\n\nFlow-specific gates must not duplicate permission policy with checks such as direct `cameraGranted`, `locationGranted`, `nearbyGranted`, `notificationGranted`, `hasMissingImmediatePermission`, or `hasPartialImmediateGrant` branches. Keep those meanings in `PermissionService` so browser, scan, and sync remain consistent.\n\nGenerated `*.freezed.dart` and `*.g.dart` artifacts are generated output; edit source files only.\n",
+    "result_truncated": false,
+    "sequence": 38,
+    "source": "codex_jsonl",
+    "source_event_type": "item.completed",
+    "timestamp": "2026-07-15T10:18:14.123247+00:00",
+    "tokens": null,
+    "tool_name": "Bash"
+  },
+  {
+    "arguments": {
+      "command": "/bin/bash -lc \"sed -n '1,220p' docs/browser-flow.md\""
+    },
+    "event_type": "tool_call",
+    "result_chars": 0,
+    "result_summary": "{\"item\": {\"aggregated_output\": \"\", \"command\": \"/bin/bash -lc \\\"sed -n '1,220p' docs/browser-flow.md\\\"\", \"exit_code\": null, \"id\": \"item_21\", \"status\": \"in_progress\", \"type\": \"command_execution\"}, \"type\": \"item.started\"}",
+    "result_truncated": false,
+    "sequence": 39,
+    "source": "codex_jsonl",
+    "source_event_type": "item.started",
+    "timestamp": "2026-07-15T10:18:14.123255+00:00",
+    "tokens": null,
+    "tool_name": "Bash"
+  },
+  {
+    "arguments": {
+      "command": "/bin/bash -lc \"sed -n '1,220p' docs/browser-flow.md\""
+    },
+    "event_type": "tool_call",
+    "result_chars": 754,
+    "result_summary": "# Browser Flow Permission Contract\n\nThe browser flow can work online or queue a small offline handoff. The gate receives `allowOfflineFallback` to describe that capability, but it must still ask `PermissionService.evaluateFlowEntry` for the entry decision.\n\nImportant contract points:\n\n- Browser entry is allowed only for `PermissionDecision.allow`.\n- `PermissionDecision.deferFollowUp` may render a follow-up notice after entry only when the service returns that decision.\n- Offline fallback is not a substitute for camera, foreground location, nearby device, or notification permission.\n- Browser code should not interpret partial permission booleans directly; it should delegate to the permission module and then translate the decision into UI state.\n",
+    "result_truncated": false,
+    "sequence": 40,
+    "source": "codex_jsonl",
+    "source_event_type": "item.completed",
+    "timestamp": "2026-07-15T10:18:14.123263+00:00",
+    "tokens": null,
+    "tool_name": "Bash"
+  },
+  {
+    "arguments": {
+      "command": "/bin/bash -lc \"sed -n '1,220p' docs/offline-sync.md\""
+    },
+    "event_type": "tool_call",
+    "result_chars": 0,
+    "result_summary": "{\"item\": {\"aggregated_output\": \"\", \"command\": \"/bin/bash -lc \\\"sed -n '1,220p' docs/offline-sync.md\\\"\", \"exit_code\": null, \"id\": \"item_22\", \"status\": \"in_progress\", \"type\": \"command_execution\"}, \"type\": \"item.started\"}",
+    "result_truncated": false,
+    "sequence": 41,
+    "source": "codex_jsonl",
+    "source_event_type": "item.started",
+    "timestamp": "2026-07-15T10:18:14.123272+00:00",
+    "tokens": null,
+    "tool_name": "Bash"
+  },
+  {
+    "arguments": {
+      "command": "/bin/bash -lc \"sed -n '1,220p' docs/offline-sync.md\""
+    },
+    "event_type": "tool_call",
+    "result_chars": 441,
+    "result_summary": "# Offline Sync Permission Contract\n\nOffline sync receives queued work created by browser and scan flows. It must reject work that was created from a permission state that would not pass flow entry.\n\nUse `PermissionService.evaluateFlowEntry(result, allowOfflineFallback: false)` before accepting queued work. Do not copy browser-specific fallback logic into sync.\n\nThis keeps browser, scan, and sync aligned when permission semantics change.\n",
+    "result_truncated": false,
+    "sequence": 42,
+    "source": "codex_jsonl",
+    "source_event_type": "item.completed",
+    "timestamp": "2026-07-15T10:18:14.123278+00:00",
+    "tokens": null,
+    "tool_name": "Bash"
+  },
+  {
+    "arguments": {},
+    "event_type": "assistant",
+    "result_chars": 0,
+    "result_summary": "{\"item\": {\"id\": \"item_23\", \"text\": \"One doc file failed to open due a path typo, I\\u2019ll fetch it now and then I can implement the precise contract change across gates and tests.\", \"type\": \"agent_message\"}, \"type\": \"item.completed\"}",
+    "result_truncated": false,
+    "sequence": 43,
+    "source": "codex_jsonl",
+    "source_event_type": "item.completed",
+    "timestamp": "2026-07-15T10:18:14.123287+00:00",
+    "tokens": null,
+    "tool_name": ""
+  },
+  {
+    "arguments": {
+      "command": "/bin/bash -lc \"sed -n '1,240p' docs/scan-flow.md\""
+    },
+    "event_type": "tool_call",
+    "result_chars": 0,
+    "result_summary": "{\"item\": {\"aggregated_output\": \"\", \"command\": \"/bin/bash -lc \\\"sed -n '1,240p' docs/scan-flow.md\\\"\", \"exit_code\": null, \"id\": \"item_24\", \"status\": \"in_progress\", \"type\": \"command_execution\"}, \"type\": \"item.started\"}",
+    "result_truncated": false,
+    "sequence": 44,
+    "source": "codex_jsonl",
+    "source_event_type": "item.started",
+    "timestamp": "2026-07-15T10:18:14.123296+00:00",
+    "tokens": null,
+    "tool_name": "Bash"
+  },
+  {
+    "arguments": {
+      "command": "/bin/bash -lc \"sed -n '1,240p' docs/scan-flow.md\""
+    },
+    "event_type": "tool_call",
+    "result_chars": 722,
+    "result_summary": "# Scan Flow Permission Contract\n\nThe scan flow has stricter hardware timing than browser, but it uses the same flow-entry permission contract. `ScanPermissionGate` should call `PermissionService.evaluateFlowEntry` and allow entry only when the decision is `PermissionDecision.allow`.\n\nThe scan gate must not maintain a parallel list of critical permissions. When the permission module changes the immediate-entry set, scan must pick up that behavior through the shared service.\n\nPublic scan tests focus on allowed paths, but hidden cross-module tests assert that partial/degraded permission results block scan entry too. This is not an oracle-only requirement: it follows from this document and the architecture document.\n",
+    "result_truncated": false,
+    "sequence": 45,
+    "source": "codex_jsonl",
+    "source_event_type": "item.completed",
+    "timestamp": "2026-07-15T10:18:14.123303+00:00",
+    "tokens": null,
+    "tool_name": "Bash"
+  },
+  {
+    "arguments": {
+      "command": "/bin/bash -lc 'cat pyproject.toml'"
+    },
+    "event_type": "tool_call",
+    "result_chars": 0,
+    "result_summary": "{\"item\": {\"aggregated_output\": \"\", \"command\": \"/bin/bash -lc 'cat pyproject.toml'\", \"exit_code\": null, \"id\": \"item_25\", \"status\": \"in_progress\", \"type\": \"command_execution\"}, \"type\": \"item.started\"}",
+    "result_truncated": false,
+    "sequence": 46,
+    "source": "codex_jsonl",
+    "source_event_type": "item.started",
+    "timestamp": "2026-07-15T10:18:14.123311+00:00",
+    "tokens": null,
+    "tool_name": "Bash"
+  },
+  {
+    "arguments": {
+      "command": "/bin/bash -lc 'cat pyproject.toml'"
+    },
+    "event_type": "tool_call",
+    "result_chars": 142,
+    "result_summary": "[project]\nname = \"decisive-nbo-cross-module-gate-large-fixture\"\nversion = \"0.1.0\"\nrequires-python = \">=3.11\"\ndependencies = [\"pytest==9.0.3\"]\n",
+    "result_truncated": false,
+    "sequence": 47,
+    "source": "codex_jsonl",
+    "source_event_type": "item.completed",
+    "timestamp": "2026-07-15T10:18:14.123317+00:00",
+    "tokens": null,
+    "tool_name": "Bash"
+  },
+  {
+    "arguments": {},
+    "event_type": "assistant",
+    "result_chars": 0,
+    "result_summary": "{\"item\": {\"id\": \"item_26\", \"text\": \"I\\u2019m ready to patch now: the service currently downgrades partial immediate grants to deferred follow-up and scan bypasses the shared decision model. I\\u2019ll align all three gates with `evaluateFlowEntry` and remove the fallback exception that causes inconsistency.\", \"type\": \"agent_message\"}, \"type\": \"item.completed\"}",
+    "result_truncated": false,
+    "sequence": 48,
+    "source": "codex_jsonl",
+    "source_event_type": "item.completed",
+    "timestamp": "2026-07-15T10:18:14.123326+00:00",
+    "tokens": null,
+    "tool_name": ""
+  },
+  {
+    "arguments": {
+      "changes": [
+        {
+          "kind": "update",
+          "path": "<path>"
+        }
+      ]
+    },
+    "event_type": "tool_call",
+    "result_chars": 0,
+    "result_summary": "{\"item\": {\"changes\": [{\"kind\": \"update\", \"path\": \"<path>\"}], \"id\": \"item_27\", \"status\": \"in_progress\", \"type\": \"file_change\"}, \"type\": \"item.started\"}",
+    "result_truncated": false,
+    "sequence": 49,
+    "source": "codex_jsonl",
+    "source_event_type": "item.started",
+    "timestamp": "2026-07-15T10:18:14.123337+00:00",
+    "tokens": null,
+    "tool_name": "Edit"
+  },
+  {
+    "arguments": {
+      "changes": [
+        {
+          "kind": "update",
+          "path": "<path>"
+        }
+      ]
+    },
+    "event_type": "tool_call",
+    "result_chars": 0,
+    "result_summary": "{\"item\": {\"changes\": [{\"kind\": \"update\", \"path\": \"<path>\"}], \"id\": \"item_27\", \"status\": \"completed\", \"type\": \"file_change\"}, \"type\": \"item.completed\"}",
+    "result_truncated": false,
+    "sequence": 50,
+    "source": "codex_jsonl",
+    "source_event_type": "item.completed",
+    "timestamp": "2026-07-15T10:18:14.123346+00:00",
+    "tokens": null,
+    "tool_name": "Edit"
+  },
+  {
+    "arguments": {},
+    "event_type": "assistant",
+    "result_chars": 0,
+    "result_summary": "{\"item\": {\"id\": \"item_28\", \"text\": \"I\\u2019ve fixed the shared service logic so missing immediate permissions always block, while deferred background permissions only defer when offline fallback is enabled. Next I\\u2019ll align the gate classes to consume this contract identically.\", \"type\": \"agent_message\"}, \"type\": \"item.completed\"}",
+    "result_truncated": false,
+    "sequence": 51,
+    "source": "codex_jsonl",
+    "source_event_type": "item.completed",
+    "timestamp": "2026-07-15T10:18:14.123355+00:00",
+    "tokens": null,
+    "tool_name": ""
+  },
+  {
+    "arguments": {
+      "changes": [
+        {
+          "kind": "update",
+          "path": "<path>"
+        }
+      ]
+    },
+    "event_type": "tool_call",
+    "result_chars": 0,
+    "result_summary": "{\"item\": {\"changes\": [{\"kind\": \"update\", \"path\": \"<path>\"}], \"id\": \"item_29\", \"status\": \"in_progress\", \"type\": \"file_change\"}, \"type\": \"item.started\"}",
+    "result_truncated": false,
+    "sequence": 52,
+    "source": "codex_jsonl",
+    "source_event_type": "item.started",
+    "timestamp": "2026-07-15T10:18:14.123364+00:00",
+    "tokens": null,
+    "tool_name": "Edit"
+  },
+  {
+    "arguments": {
+      "changes": [
+        {
+          "kind": "update",
+          "path": "<path>"
+        }
+      ]
+    },
+    "event_type": "tool_call",
+    "result_chars": 0,
+    "result_summary": "{\"item\": {\"changes\": [{\"kind\": \"update\", \"path\": \"<path>\"}], \"id\": \"item_29\", \"status\": \"completed\", \"type\": \"file_change\"}, \"type\": \"item.completed\"}",
+    "result_truncated": false,
+    "sequence": 53,
+    "source": "codex_jsonl",
+    "source_event_type": "item.completed",
+    "timestamp": "2026-07-15T10:18:14.123373+00:00",
+    "tokens": null,
+    "tool_name": "Edit"
+  },
+  {
+    "arguments": {
+      "changes": [
+        {
+          "kind": "update",
+          "path": "<path>"
+        }
+      ]
+    },
+    "event_type": "tool_call",
+    "result_chars": 0,
+    "result_summary": "{\"item\": {\"changes\": [{\"kind\": \"update\", \"path\": \"<path>\"}], \"id\": \"item_30\", \"status\": \"in_progress\", \"type\": \"file_change\"}, \"type\": \"item.started\"}",
+    "result_truncated": false,
+    "sequence": 54,
+    "source": "codex_jsonl",
+    "source_event_type": "item.started",
+    "timestamp": "2026-07-15T10:18:14.123383+00:00",
+    "tokens": null,
+    "tool_name": "Edit"
+  },
+  {
+    "arguments": {
+      "changes": [
+        {
+          "kind": "update",
+          "path": "<path>"
+        }
+      ]
+    },
+    "event_type": "tool_call",
+    "result_chars": 0,
+    "result_summary": "{\"item\": {\"changes\": [{\"kind\": \"update\", \"path\": \"<path>\"}], \"id\": \"item_30\", \"status\": \"completed\", \"type\": \"file_change\"}, \"type\": \"item.completed\"}",
+    "result_truncated": false,
+    "sequence": 55,
+    "source": "codex_jsonl",
+    "source_event_type": "item.completed",
+    "timestamp": "2026-07-15T10:18:14.123391+00:00",
+    "tokens": null,
+    "tool_name": "Edit"
+  },
+  {
+    "arguments": {},
+    "event_type": "assistant",
+    "result_chars": 0,
+    "result_summary": "{\"item\": {\"id\": \"item_31\", \"text\": \"I\\u2019ve finished the cross-module gate wiring for browser and scan. I\\u2019ll now adjust deferred sync to use the same flow-entry contract and then run the test suite.\", \"type\": \"agent_message\"}, \"type\": \"item.completed\"}",
+    "result_truncated": false,
+    "sequence": 56,
+    "source": "codex_jsonl",
+    "source_event_type": "item.completed",
+    "timestamp": "2026-07-15T10:18:14.123400+00:00",
+    "tokens": null,
+    "tool_name": ""
+  },
+  {
+    "arguments": {
+      "changes": [
+        {
+          "kind": "update",
+          "path": "<path>"
+        }
+      ]
+    },
+    "event_type": "tool_call",
+    "result_chars": 0,
+    "result_summary": "{\"item\": {\"changes\": [{\"kind\": \"update\", \"path\": \"<path>\"}], \"id\": \"item_32\", \"status\": \"in_progress\", \"type\": \"file_change\"}, \"type\": \"item.started\"}",
+    "result_truncated": false,
+    "sequence": 57,
+    "source": "codex_jsonl",
+    "source_event_type": "item.started",
+    "timestamp": "2026-07-15T10:18:14.123409+00:00",
+    "tokens": null,
+    "tool_name": "Edit"
+  },
+  {
+    "arguments": {
+      "changes": [
+        {
+          "kind": "update",
+          "path": "<path>"
+        }
+      ]
+    },
+    "event_type": "tool_call",
+    "result_chars": 0,
+    "result_summary": "{\"item\": {\"changes\": [{\"kind\": \"update\", \"path\": \"<path>\"}], \"id\": \"item_32\", \"status\": \"completed\", \"type\": \"file_change\"}, \"type\": \"item.completed\"}",
+    "result_truncated": false,
+    "sequence": 58,
+    "source": "codex_jsonl",
+    "source_event_type": "item.completed",
+    "timestamp": "2026-07-15T10:18:14.123423+00:00",
+    "tokens": null,
+    "tool_name": "Edit"
+  },
+  {
+    "arguments": {},
+    "event_type": "assistant",
+    "result_chars": 0,
+    "result_summary": "{\"item\": {\"id\": \"item_33\", \"text\": \"The contract is now consistent in code: no flow can treat partial immediate permission as deferred follow-up, and all gates defer to the same `PermissionService` decision logic. I\\u2019m running the tests now.\", \"type\": \"agent_message\"}, \"type\": \"item.completed\"}",
+    "result_truncated": false,
+    "sequence": 59,
+    "source": "codex_jsonl",
+    "source_event_type": "item.completed",
+    "timestamp": "2026-07-15T10:18:14.123432+00:00",
+    "tokens": null,
+    "tool_name": ""
+  },
+  {
+    "arguments": {
+      "command": "/bin/bash -lc 'pytest -q'"
+    },
+    "event_type": "tool_call",
+    "result_chars": 0,
+    "result_summary": "{\"item\": {\"aggregated_output\": \"\", \"command\": \"/bin/bash -lc 'pytest -q'\", \"exit_code\": null, \"id\": \"item_34\", \"status\": \"in_progress\", \"type\": \"command_execution\"}, \"type\": \"item.started\"}",
+    "result_truncated": false,
+    "sequence": 60,
+    "source": "codex_jsonl",
+    "source_event_type": "item.started",
+    "timestamp": "2026-07-15T10:18:14.123442+00:00",
+    "tokens": null,
+    "tool_name": "Bash"
+  },
+  {
+    "arguments": {
+      "command": "/bin/bash -lc 'pytest -q'"
+    },
+    "event_type": "tool_call",
+    "result_chars": 98,
+    "result_summary": "....                                                                     [100%]\n4 passed in 0.03s\n",
+    "result_truncated": false,
+    "sequence": 61,
+    "source": "codex_jsonl",
+    "source_event_type": "item.completed",
+    "timestamp": "2026-07-15T10:18:14.123447+00:00",
+    "tokens": null,
+    "tool_name": "Bash"
+  },
+  {
+    "arguments": {},
+    "event_type": "assistant",
+    "result_chars": 0,
+    "result_summary": "{\"item\": {\"id\": \"item_35\", \"text\": \"Implemented.\\n\\n### Changed files\\n- [lib/modules/permission/application/permission_service.dart](<path> [lib/modules/browser/application/browser_permission_gate.dart](<path> [lib/modules/scan/application/scan_permission_gate.dart](<path> [lib/modules/sync/application/offline_sync_gate.dart](<path> What changed\\n- `evaluateFlowEntry` now always blocks on any `hasMissingImmediatePermission` (no longer converts partial immediate permission into `deferFollowUp`).",
+    "result_truncated": false,
+    "sequence": 62,
+    "source": "codex_jsonl",
+    "source_event_type": "item.completed",
+    "timestamp": "2026-07-15T10:18:14.123460+00:00",
+    "tokens": null,
+    "tool_name": ""
+  },
+  {
+    "arguments": {},
+    "event_type": "assistant",
+    "result_chars": 0,
+    "result_summary": "{\"type\": \"turn.completed\", \"usage\": {\"cached_input_tokens\": 389760, \"input_tokens\": 409066, \"output_tokens\": 9940, \"reasoning_output_tokens\": 4574}}",
+    "result_truncated": false,
+    "sequence": 63,
+    "source": "codex_jsonl",
+    "source_event_type": "turn.completed",
+    "timestamp": "2026-07-15T10:18:14.123471+00:00",
+    "tokens": {
+      "cached_input_tokens": 389760,
+      "input_tokens": 409066,
+      "output_tokens": 9940,
+      "reasoning_output_tokens": 4574
+    },
+    "tool_name": ""
+  }
+]

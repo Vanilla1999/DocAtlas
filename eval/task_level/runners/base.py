@@ -36,6 +36,7 @@ class AgentRunRequest:
     output_dir: Path
     test_command: str | None = None
     allowed_write_paths: tuple[str, ...] = ()
+    task_objective: str | None = None
 
 
 @dataclass(frozen=True)

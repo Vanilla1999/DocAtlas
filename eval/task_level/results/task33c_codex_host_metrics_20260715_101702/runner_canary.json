@@ -1,0 +1,22 @@
+{
+  "changed_files": [
+    "calc.py",
+    "normalization.py",
+    "policy.py"
+  ],
+  "failure_summary": "",
+  "multi_file_edit_proven": true,
+  "network_probe_denied": false,
+  "patch_exists": true,
+  "policy_clean": true,
+  "pytest_passes": true,
+  "runner_exit_code": 0,
+  "runner_exit_interpretable": true,
+  "runner_status": "completed",
+  "same_shape_three_file_canary": true,
+  "status": "passed",
+  "task_id": "runner_canary",
+  "trajectory_exists": true,
+  "validated_at": "2026-07-15T10:17:27.773896+00:00",
+  "workspace": "/tmp/docatlas-runner-canary-ve4zwe4r"
+}

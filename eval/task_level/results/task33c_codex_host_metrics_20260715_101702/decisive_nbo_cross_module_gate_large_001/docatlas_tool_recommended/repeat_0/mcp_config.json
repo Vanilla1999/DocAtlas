@@ -1,0 +1,18 @@
+{
+  "mcpServers": {
+    "docmancer-docs": {
+      "command": "uv",
+      "args": [
+        "run",
+        "--project",
+        "/home/viadmin/StudioProjects/hermes/docmancer",
+        "doc-atlas",
+        "mcp",
+        "docs-serve"
+      ],
+      "env": {
+        "DOCMANCER_TASK_LEVEL_ALLOW_NETWORK": "false"
+      }
+    }
+  }
+}

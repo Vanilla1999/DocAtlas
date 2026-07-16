@@ -1,11 +1,20 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import re
 from pathlib import Path
 
+import eval.task_level.task33_validation as task33_validation
+from eval.task_level.isolated_delivery import (
+    HostEvidenceSnapshot,
+    TASK33_QUERY_DERIVATION,
+    derive_task33_retrieval_query,
+    persist_host_evidence,
+)
 from eval.task_level.task33_validation import (
     PROTOCOL_PATH,
+    _check_bounded_evidence,
     _check_boundaries,
     _check_cell_result,
     _check_runner_usage,
@@ -24,8 +33,16 @@ def _write(path: Path, value: object) -> None:
 def test_frozen_protocol_matches_live_evaluation_contract():
     protocol = load_protocol()
 
+    assert protocol["schema_version"] == "task33c-frozen-protocol-2"
     assert protocol["task_id"] == "decisive_nbo_cross_module_gate_large_001"
-    assert len(protocol["conditions"]) == 4
+    assert protocol["conditions"] == [
+        "repo_only_strict_offline",
+        "docatlas_tool_required_once",
+        "docatlas_bounded_direct",
+    ]
+    assert protocol["agent_turn_limit"] == 12
+    assert protocol["isolated_worker_attempt_budget"] == 0
+    assert protocol["worker_prompt_revision"] == "disabled"
     assert protocol["provider_input_token_limit"] == 7_000
     assert set(protocol["provider_profiles"]) == {"github-models", "openai-api"}
     assert protocol["provider_profiles"]["openai-api"]["credential_environment"] == "OPENAI_API_KEY"
@@ -35,6 +52,33 @@ def test_frozen_protocol_matches_live_evaluation_contract():
     )
     assert "@sha256:" in protocol["container"]["base_image"]
     assert all("@" in action and len(action.rsplit("@", 1)[1]) == 40 for action in protocol["github_actions"].values())
+
+
+def test_required_once_validator_reads_agent_call_count_from_metrics(tmp_path: Path):
+    protocol = load_protocol()
+    profile = protocol["provider_profiles"]["github-models"]
+    row = {
+        "model": protocol["model"],
+        "runner_id": profile["runner_id"],
+        "forbidden_changes": [],
+        "policy_clean": True,
+        "metrics": {"agent_docatlas_calls": 1},
+    }
+    errors: list[str] = []
+
+    _check_cell_result(
+        "docatlas_tool_required_once",
+        tmp_path,
+        row,
+        protocol,
+        profile,
+        errors,
+    )
+
+    assert (
+        "docatlas_tool_required_once:get_docs_context_call_count_mismatch"
+        not in errors
+    )
 
 
 def test_workflows_split_untrusted_pr_from_model_permission():
@@ -83,6 +127,97 @@ def test_artifact_manifest_is_allowlist_only_and_rejects_symlinks(tmp_path: Path
     assert all("/env/" not in item["path"] for item in manifest["files"])
 
 
+def test_independent_validator_explicitly_rejects_exploratory_manifest(tmp_path: Path):
+    _write(
+        tmp_path / "exploratory_manifest.json",
+        {
+            "classification": "EXPLORATORY_NON_CAUSAL",
+            "validator_eligible": False,
+        },
+    )
+
+    result = validate_task33c_run(tmp_path)
+
+    assert result["valid"] is False
+    assert result["verdict"] == "INCONCLUSIVE"
+    assert "exploratory_run_not_causal" in result["errors"]
+
+
+def test_bounded_validator_reconstructs_host_owned_validation_evidence(
+    tmp_path: Path,
+    monkeypatch,
+):
+    objective = "Fix the permission gate."
+    query = derive_task33_retrieval_query(objective)
+    snapshot = HostEvidenceSnapshot(
+        query=query,
+        objective_sha256=hashlib.sha256(objective.encode()).hexdigest(),
+        query_derivation=TASK33_QUERY_DERIVATION,
+        evidence_items=({
+            "path": "docs/permission-architecture.md",
+            "heading_path": "Gate",
+            "authority": "canonical",
+            "source_class": "project_doc",
+            "instruction_trust": "scoped_agent_policy",
+            "content": "The permission gate must remain centralized.",
+        },),
+        trust_contract={"selected": [], "rejected": [], "risky": []},
+        retrieval_issues=(),
+        evidence_categories=("project_docs",),
+        project_revision="project-revision",
+        index_revision="index-revision",
+        response_status="success",
+        raw_retrieval_tokens=10,
+        retrieval_wall_time_seconds=0.1,
+    )
+    persist_host_evidence(snapshot, tmp_path)
+    _write(tmp_path / "host_retrieval_metrics.json", {
+        "evidence_fingerprint": snapshot.fingerprint,
+        "project_revision": snapshot.project_revision,
+        "index_revision": snapshot.index_revision,
+        "retrieval_calls": 1,
+    })
+    _write(tmp_path / "action_packet.json", {
+        "task_interpretation": {"objective": objective},
+        "source_of_truth": [],
+        "target_surface": {"likely_files": []},
+    })
+    _write(tmp_path / "delivery_prompt_sources.json", [])
+    captured: dict[str, object] = {}
+
+    def fake_validate(packet, *, evidence_items, max_tokens):
+        captured["evidence_items"] = list(evidence_items)
+        return []
+
+    monkeypatch.setattr(task33_validation, "validate_action_packet", fake_validate)
+    errors: list[str] = []
+    _check_bounded_evidence(
+        "docatlas_bounded_direct",
+        tmp_path,
+        {"metrics": {"evidence_fingerprint": snapshot.fingerprint}},
+        {
+            "query": query,
+            "query_sha256": hashlib.sha256(query.encode()).hexdigest(),
+            "objective_sha256": snapshot.objective_sha256,
+            "packet_token_budget": 2_000,
+            "required_evidence_categories": [],
+            "required_evidence_paths": [],
+            "required_target_paths": [],
+            "evaluation": {
+                "public_test_command": "uv run --offline pytest tests/test_gate.py",
+            },
+        },
+        errors,
+    )
+
+    packet_evidence = captured["evidence_items"]
+    assert isinstance(packet_evidence, list)
+    assert packet_evidence[-1]["path"] == "host-policy://task33c/validation"
+    assert packet_evidence[-1]["content"] == (
+        "Run uv run --offline pytest tests/test_gate.py"
+    )
+
+
 def test_independent_validator_rejects_synthetic_self_reported_completeness(tmp_path: Path):
     protocol = load_protocol()
     profile = protocol["provider_profiles"]["github-models"]
@@ -103,7 +238,7 @@ def test_independent_validator_rejects_synthetic_self_reported_completeness(tmp_
         "repeats": 1,
         "agent_turn_limit": protocol["agent_turn_limit"],
         "retrieval_call_budget": 1,
-        "isolated_worker_attempt_budget": 1,
+        "isolated_worker_attempt_budget": protocol["isolated_worker_attempt_budget"],
         "packet_token_budget": protocol["packet_token_budget"],
         "required_evidence_categories": protocol["required_evidence_categories"],
         "required_evidence_paths": protocol["required_evidence_paths"],

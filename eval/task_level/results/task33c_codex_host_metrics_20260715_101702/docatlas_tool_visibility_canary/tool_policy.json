@@ -1,0 +1,19 @@
+{
+  "allow_context7": false,
+  "allow_docatlas": true,
+  "allow_web": false,
+  "condition_id": "docatlas_tool_optional",
+  "delivery_strategy": null,
+  "docatlas_response_style": "snippet-first",
+  "inject_action_checklist": false,
+  "inject_docatlas_context": false,
+  "inject_external_context": false,
+  "inject_patch_constraints": false,
+  "isolated_worker_required": false,
+  "max_constraint_packet_tokens": 1200,
+  "max_constraints": 12,
+  "max_sources": 8,
+  "network_enforcement": "policy_and_trajectory_audit",
+  "recommend_docatlas_before_edit": false,
+  "require_docatlas_call_before_edit": false
+}

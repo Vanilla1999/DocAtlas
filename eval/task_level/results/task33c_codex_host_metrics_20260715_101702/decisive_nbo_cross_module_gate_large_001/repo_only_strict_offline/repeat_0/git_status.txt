@@ -1,0 +1,4 @@
+ M lib/modules/browser/application/browser_permission_gate.dart
+ M lib/modules/permission/application/permission_service.dart
+ M lib/modules/scan/application/scan_permission_gate.dart
+ M lib/modules/sync/application/offline_sync_gate.dart

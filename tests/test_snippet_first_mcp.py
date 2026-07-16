@@ -18,8 +18,8 @@ def legacy_tool_schema(name):
     return next(tool for tool in ALL_TOOLS if tool["name"] == name)["inputSchema"]
 
 
-def test_response_style_registered_in_get_docs_context_schema():
-    assert "response_style" in tool_schema("get_docs_context")["properties"]
+def test_response_style_is_internal_compatibility_not_public_catalog_cost():
+    assert "response_style" not in tool_schema("get_docs_context")["properties"]
 
 
 def test_response_style_registered_in_get_library_docs_schema():

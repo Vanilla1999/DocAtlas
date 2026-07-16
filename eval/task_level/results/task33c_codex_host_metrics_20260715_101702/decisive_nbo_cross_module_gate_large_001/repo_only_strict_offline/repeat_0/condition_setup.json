@@ -1,0 +1,22 @@
+{
+  "baseline_allowed_changed_files": [
+    "uv.lock"
+  ],
+  "baseline_artifact_sha256": {
+    "uv.lock": "c6f71e4352747fb1baa6855a4be4ee17bce7c23cf07ab995bffbce91f6613929"
+  },
+  "baseline_changed_files": [
+    "uv.lock"
+  ],
+  "baseline_revision": "a6342306d8ebca547c6f3c66035b3d3ea7539759",
+  "baseline_status": "sealed",
+  "baseline_tree": "7801b590e5c9e9c1e3a815e5273cd896b9de9bd8",
+  "command": "uv sync --offline --python 3.14",
+  "phase": "pre_runner",
+  "returncode": 0,
+  "schema_version": 1,
+  "status": "success",
+  "stderr": "warning: `VIRTUAL_ENV=/home/viadmin/StudioProjects/hermes/docmancer/.venv` does not match the project environment path `/home/viadmin/StudioProjects/hermes/docmancer/eval/task_level/results/task33c_codex_host_metrics_20260715_101702/decisive_nbo_cross_module_gate_large_001/repo_only_strict_offline/repeat_0/env/project_venv` and will be ignored; use `--active` to target the active environment instead\nUsing CPython 3.14.3 interpreter at: /home/linuxbrew/.linuxbrew/opt/python@3.14/bin/python3.14\nCreating virtual environment at: /home/viadmin/StudioProjects/hermes/docmancer/eval/task_level/results/task33c_codex_host_metrics_20260715_101702/decisive_nbo_cross_module_gate_large_001/repo_only_strict_offline/repeat_0/env/project_venv\nResolved 7 packages in 2ms\nInstalled 5 packages in 5ms\n + iniconfig==2.3.0\n + packaging==26.2\n + pluggy==1.6.0\n + pygments==2.20.0\n + pytest==9.0.3\n",
+  "stdout": "",
+  "wall_time_seconds": 0.065608
+}

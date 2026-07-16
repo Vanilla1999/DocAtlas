@@ -1,0 +1,6 @@
+{
+  "normalized_from_sanitized_events": true,
+  "schema_version": "task-trace-sanitizer-1",
+  "stderr_changed": false,
+  "stdout_changed": true
+}

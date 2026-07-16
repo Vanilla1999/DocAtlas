@@ -20,6 +20,15 @@ _STDOUT_LIMIT = 1_000_000
 _STDERR_LIMIT = 250_000
 
 
+def configured_runtime_root() -> Path | None:
+    raw = os.environ.get("TASK33C_RUNTIME_ROOT", "").strip()
+    if not raw:
+        return None
+    root = Path(raw).expanduser().resolve()
+    root.mkdir(parents=True, exist_ok=True)
+    return root
+
+
 @dataclass(frozen=True)
 class SandboxCommandResult:
     command: tuple[str, ...]
@@ -72,7 +81,11 @@ class DockerCommandSandbox:
         if inspected.returncode != 0 or not inspected.stdout.strip():
             return {"schema_version": 1, "status": "unavailable", "reason": inspected.stderr[-2_000:]}
 
-        with tempfile.TemporaryDirectory(prefix="task33c-sandbox-canary-") as raw_workspace:
+        runtime_root = configured_runtime_root()
+        with tempfile.TemporaryDirectory(
+            prefix="task33c-sandbox-canary-",
+            dir=str(runtime_root) if runtime_root is not None else None,
+        ) as raw_workspace:
             workspace = Path(raw_workspace)
             command = (
                 "python", "-c",
@@ -92,7 +105,13 @@ class DockerCommandSandbox:
             )
             try:
                 result = self._run(command, workspace, timeout_seconds=8)
-                row = json.loads(result.stdout.strip().splitlines()[-1])
+                output_lines = result.stdout.strip().splitlines()
+                if not output_lines:
+                    raise ValueError(
+                        "canary produced no JSON output; "
+                        f"returncode={result.returncode}; stderr={result.stderr[-2_000:]}"
+                    )
+                row = json.loads(output_lines[-1])
             except (OSError, ValueError, json.JSONDecodeError, subprocess.SubprocessError, TimeoutError, RuntimeError) as exc:
                 return {
                     "schema_version": 1,

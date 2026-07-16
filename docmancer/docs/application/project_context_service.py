@@ -21,6 +21,16 @@ from docmancer.docs.domain.source_map import build_project_repo_map, build_proje
 from docmancer.docs.domain.code_graph import build_code_graph_context_items, build_project_code_graph, code_graph_context_diagnostics, code_graph_diagnostics
 from docmancer.docs.domain.trust_contract import build_project_context_trust_contract
 from docmancer.docs.domain.content_trust import annotate_context_pack
+from docmancer.docs.domain.retrieval_routing import (
+    fit_stage_items,
+    new_routing_record,
+    record_stage,
+    route_gap_recovery_stages,
+    route_initial_stages,
+    should_run_code_graph,
+    should_run_repo_map,
+    validate_routing_record,
+)
 from docmancer.docs.models import SOURCE_CLASS_PROJECT_FILE, DocsChunk, DocsResult, ProjectContextResult, ProjectDocsChunk, ProjectDocsResult, ProjectMetadata
 
 LOW_TRUST_PROJECT_RISK_FLAGS = frozenset({
@@ -69,23 +79,32 @@ def _source_ground_documentation_gap(
     actions: list[dict[str, Any]],
     *,
     root: Path,
-) -> None:
-    """Attach bounded, discovered paths to a host-only documentation handoff."""
+    repo_map: list[dict[str, Any]] | None = None,
+    code_graph: Any = None,
+    allow_repo_map_build: bool = True,
+    allow_code_graph_build: bool = True,
+) -> tuple[list[dict[str, Any]], Any]:
+    """Attach bounded paths while returning the observed repo map for host diagnostics."""
     gap_actions = _documentation_gap_actions(actions)
     if not gap_actions:
-        return
-    repo_map = collect_project_source_facts(
-        root,
-        max_files=24,
-        token_budget=4000,
-        include_unmatched=True,
-    )
-    code_graph = build_project_code_graph(
-        root,
-        max_files=24,
-        token_budget=4000,
-        include_unmatched=True,
-    )
+        return repo_map or [], code_graph
+    observed_repo_map = repo_map
+    if repo_map is None and allow_repo_map_build:
+        observed_repo_map = collect_project_source_facts(
+            root,
+            max_files=24,
+            token_budget=4000,
+            include_unmatched=True,
+        )
+        repo_map, _ = fit_stage_items("repo_map", observed_repo_map)
+    repo_map = repo_map or []
+    if code_graph is None and allow_code_graph_build:
+        code_graph = build_project_code_graph(
+            root,
+            max_files=24,
+            token_budget=4000,
+            include_unmatched=True,
+        )
     evidence = classify_project_evidence(root, repo_map=repo_map, code_graph=code_graph)
     for action in gap_actions:
         gap = dict(action.get("documentation_gap") or {})
@@ -97,6 +116,7 @@ def _source_ground_documentation_gap(
         gap["evidence_to_collect"] = evidence
         gap["evidence_complete"] = evidence_complete
         action["documentation_gap"] = gap
+    return observed_repo_map or repo_map, code_graph
 
 
 class ProjectContextService:
@@ -125,6 +145,8 @@ class ProjectContextService:
         allow_network: bool = False,
     ) -> ProjectContextResult:
         response_style = validate_response_style(response_style)
+        routing_budget_issues: list[str] = []
+        routing_stage_observed: dict[str, list[Any]] = {}
         mode = mode.lower()
         if mode not in {"auto", "project-only", "deps-only", "public-docs"}:
             raise ValueError("mode must be one of: auto, project-only, deps-only, public-docs")
@@ -147,6 +169,11 @@ class ProjectContextService:
                     project_docs,
                     results=rerank_project_doc_chunks(project_docs.results, question=question, intent=intent, limit=limit),
                 )
+                routing_stage_observed["project_docs"] = list(project_docs.results)
+                bounded_results, budget_issue = fit_stage_items("project_docs", project_docs.results)
+                project_docs = replace(project_docs, results=bounded_results)
+                if budget_issue:
+                    routing_budget_issues.append(f"project_docs: {budget_issue}")
 
         explicit_dependency = library or (libraries[0] if libraries else None)
         inferred_dependency = self.dependency_mentioned_in_question(metadata, question)
@@ -181,6 +208,11 @@ class ProjectContextService:
                     version=version,
                     project_path=str(root),
                 )
+                routing_stage_observed["dependency_docs"] = list(dependency_docs.results)
+                bounded_results, budget_issue = fit_stage_items("dependency_docs", dependency_docs.results)
+                if budget_issue:
+                    dependency_docs = replace(dependency_docs, results=bounded_results)
+                    routing_budget_issues.append(f"dependency_docs: {budget_issue}")
 
         warnings = [*(project_docs.warnings if project_docs else [])]
         if dependency_docs:
@@ -222,27 +254,84 @@ class ProjectContextService:
                     next_actions.append(gap_action)
         context_pack = project_context_pack(question=question, project_docs=project_docs, dependency_docs=dependency_docs)
         requirements = extract_project_answer_requirements(question)
+        retrieval_route = route_initial_stages(
+            question=question,
+            mode=mode,
+            dependency_requested=bool(selected_dependency),
+            project_doc_items=(project_docs.results if project_docs else []),
+        )
+        routing_record = new_routing_record(
+            retrieval_route,
+            project_docs_used=bool(project_docs),
+            dependency_docs_used=bool(dependency_docs),
+        )
+        record_stage(
+            routing_record, "project_docs",
+            status="used" if project_docs else "skipped",
+            reason="selected project documentation mode" if project_docs else "project documentation not selected",
+            items=(routing_stage_observed.get("project_docs", project_docs.results if project_docs else [])),
+        )
+        record_stage(
+            routing_record, "dependency_docs",
+            status="used" if dependency_docs else "skipped",
+            reason="selected exact-version dependency documentation" if dependency_docs else "dependency documentation not selected or not available",
+            items=(routing_stage_observed.get("dependency_docs", dependency_docs.results if dependency_docs else [])),
+        )
         repo_map_items: list[dict[str, Any]] = []
         source_evidence_items: list[dict[str, Any]] = []
         code_graph = None
         code_graph_items: list[dict[str, Any]] = []
         code_graph_error: str | None = None
-        if mode in {"auto", "project-only"}:
-            repo_map_items = build_project_repo_map(
-                root,
-                question=question,
-                max_files=max(1, min(8, limit or 4)),
-                token_budget=_repo_map_token_budget(tokens),
-            )
-            context_pack.extend(repo_map_items)
-            source_evidence_items = build_project_source_evidence(
+        if retrieval_route.use_source_evidence:
+            observed_source_evidence = build_project_source_evidence(
                 root,
                 question=question,
                 requirements=requirements,
                 max_items=max(1, min(12, (limit or 4) * 2)),
                 token_budget=_source_evidence_token_budget(tokens),
             )
+            source_evidence_items, budget_issue = fit_stage_items("source_evidence", observed_source_evidence)
+            if budget_issue:
+                routing_budget_issues.append(f"source_evidence: {budget_issue}")
             context_pack.extend(source_evidence_items)
+            record_stage(
+                routing_record, "source_evidence",
+                status="used" if source_evidence_items else "insufficient",
+                reason=retrieval_route.source_reason,
+                items=observed_source_evidence,
+            )
+        else:
+            record_stage(
+                routing_record, "source_evidence", status="skipped",
+                reason=retrieval_route.source_reason,
+            )
+        run_repo_map, repo_reason = should_run_repo_map(retrieval_route, source_evidence_items)
+        if run_repo_map:
+            observed_repo_map = build_project_repo_map(
+                root,
+                question=question,
+                max_files=max(1, min(8, limit or 4)),
+                token_budget=_repo_map_token_budget(tokens),
+            )
+            repo_map_items, budget_issue = fit_stage_items("repo_map", observed_repo_map)
+            if budget_issue:
+                routing_budget_issues.append(f"repo_map: {budget_issue}")
+            context_pack.extend(repo_map_items)
+            record_stage(
+                routing_record, "repo_map",
+                status="used" if repo_map_items else "insufficient",
+                reason=repo_reason,
+                items=observed_repo_map,
+            )
+        else:
+            record_stage(routing_record, "repo_map", status="skipped", reason=repo_reason)
+        run_code_graph, graph_reason = should_run_code_graph(
+            retrieval_route,
+            question=question,
+            source_items=source_evidence_items,
+            repo_map_items=repo_map_items,
+        )
+        if run_code_graph:
             try:
                 code_graph = build_project_code_graph(
                     root,
@@ -251,19 +340,69 @@ class ProjectContextService:
                     max_files=max(8, min(24, (limit or 4) * 3)),
                     token_budget=_code_graph_build_token_budget(tokens),
                 )
-                code_graph_items = build_code_graph_context_items(
+                observed_code_graph_items = build_code_graph_context_items(
                     code_graph,
                     question=question,
                     max_items=max(1, min(8, limit or 4)),
                     token_budget=_code_graph_context_token_budget(tokens),
                 )
+                code_graph_items, budget_issue = fit_stage_items("code_graph", observed_code_graph_items)
+                if budget_issue:
+                    routing_budget_issues.append(f"code_graph: {budget_issue}")
                 context_pack.extend(code_graph_items)
+                record_stage(
+                    routing_record, "code_graph",
+                    status="used" if code_graph_items else "insufficient",
+                    reason=graph_reason,
+                    items=observed_code_graph_items,
+                )
             except Exception as exc:
                 code_graph_error = f"{type(exc).__name__}: {exc}"
-        _source_ground_documentation_gap(
+                record_stage(
+                    routing_record, "code_graph", status="failed", reason=graph_reason,
+                    error=type(exc).__name__,
+                )
+        else:
+            record_stage(routing_record, "code_graph", status="skipped", reason=graph_reason)
+        gap_route = route_gap_recovery_stages(
+            has_documentation_gap=bool(_documentation_gap_actions(next_actions)),
+            repo_map_attempted=run_repo_map,
+            code_graph_attempted=run_code_graph,
+        )
+        gap_repo_map, gap_code_graph = _source_ground_documentation_gap(
             next_actions,
             root=root,
+            repo_map=(repo_map_items if run_repo_map else None),
+            code_graph=code_graph,
+            allow_repo_map_build=gap_route.use_repo_map,
+            allow_code_graph_build=gap_route.use_code_graph,
         )
+        if _documentation_gap_actions(next_actions):
+            if not run_repo_map:
+                _, gap_repo_budget_issue = fit_stage_items("repo_map", gap_repo_map)
+                if gap_repo_budget_issue:
+                    routing_budget_issues.append(f"repo_map: {gap_repo_budget_issue}")
+                record_stage(
+                    routing_record, "repo_map", status="used" if gap_repo_map else "insufficient",
+                    reason=gap_route.repo_map_reason,
+                    items=gap_repo_map,
+                )
+            if not run_code_graph:
+                observed_gap_graph_items = (
+                    build_code_graph_context_items(
+                        gap_code_graph, question=question,
+                        max_items=max(1, min(8, limit or 4)),
+                        token_budget=_code_graph_context_token_budget(tokens),
+                    ) if gap_code_graph is not None else []
+                )
+                _, gap_graph_budget_issue = fit_stage_items("code_graph", observed_gap_graph_items)
+                if gap_graph_budget_issue:
+                    routing_budget_issues.append(f"code_graph: {gap_graph_budget_issue}")
+                record_stage(
+                    routing_record, "code_graph", status="used" if observed_gap_graph_items else "insufficient",
+                    reason=gap_route.code_graph_reason,
+                    items=observed_gap_graph_items,
+                )
         gap_actions = _documentation_gap_actions(next_actions)
         if gap_actions:
             requires_confirmation = True
@@ -289,7 +428,13 @@ class ProjectContextService:
             lane_priority=lane_priority,
         )
         metrics["snippet_metrics"] = snippet_presentation.metrics
-        diagnostics: dict[str, Any] = {"query_intent": intent.name}
+        routing_errors = validate_routing_record(routing_record)
+        if routing_errors:
+            raise ValueError("invalid retrieval routing record: " + "; ".join(routing_errors))
+        diagnostics: dict[str, Any] = {
+            "query_intent": intent.name,
+            "retrieval_routing": routing_record,
+        }
         if repo_map_items:
             diagnostics["repo_map"] = source_map_diagnostics(repo_map_items)
         if source_evidence_items:
@@ -324,6 +469,14 @@ class ProjectContextService:
             for item in source_evidence_items
         )
         answer_available = bool(project_docs and project_docs.answer_available) or bool(dependency_docs and dependency_docs.results) or source_evidence_answer_available
+        if routing_budget_issues:
+            answer_available = False
+            warnings.append("retrieval_stage_budget_exceeded")
+            next_actions.append({
+                "tool": "get_docs_context",
+                "reason": "Narrow the question because a deterministic retrieval-stage budget was exceeded.",
+                "arguments_patch": {"question": question, "project_path": str(root)},
+            })
         relevance_gate = _query_relevance_gate(
             question=question,
             intent=intent,

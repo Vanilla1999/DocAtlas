@@ -1,0 +1,23 @@
+{
+  "cached_input_tokens": 8192,
+  "codex_thread_id": "019f6548-c514-7141-9332-deeaea1188bd",
+  "input_tokens": 22080,
+  "measurement_source": "codex_cli_jsonl",
+  "model": "gpt-5.3-codex-spark",
+  "output_tokens": 1353,
+  "provider": "codex-oauth",
+  "provider_usage_verified": false,
+  "reasoning_tokens": 1325,
+  "request_id": "client-thread:019f6548-c514-7141-9332-deeaea1188bd",
+  "request_id_kind": "client_thread_id",
+  "schema_version": 1,
+  "selected_indices": [
+    3,
+    4,
+    6,
+    7,
+    8,
+    10
+  ],
+  "server_request_id_verified": false
+}

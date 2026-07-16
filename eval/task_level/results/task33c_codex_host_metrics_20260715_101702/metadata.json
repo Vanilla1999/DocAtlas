@@ -1,0 +1,13 @@
+{
+  "claims_can_make": "The four local lanes provide directional correctness, token, and latency metrics.",
+  "claims_cannot_make": "This run cannot establish causal impact or receive a VALID Task 33C verdict.",
+  "decision": "INCONCLUSIVE",
+  "environment": {
+    "evidence_tier": "exploratory",
+    "execution_backend": "host_exploratory",
+    "model": "gpt-5.3-codex-spark",
+    "runner": "codex-cli-oauth"
+  },
+  "executive_result": "Directional local evidence only. This summary is not accepted by task33_validation.py and cannot produce a VALID verdict.",
+  "failure_summary": "One or more exploratory cells were blocked or missing."
+}

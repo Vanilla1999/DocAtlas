@@ -1,0 +1,26 @@
+[
+  {
+    "evidence_id": "ev-caa6bda4e6c35cce",
+    "path": "lib/modules/browser/application/browser_permission_gate.dart"
+  },
+  {
+    "evidence_id": "ev-586aedc474dff85b",
+    "path": "lib/modules/permission/application/permission_service.dart"
+  },
+  {
+    "evidence_id": "ev-02f4bffb81858110",
+    "path": "lib/modules/scan/application/scan_permission_gate.dart"
+  },
+  {
+    "evidence_id": "ev-37463cd221c22ce7",
+    "path": "lib/modules/sync/application/offline_sync_gate.dart"
+  },
+  {
+    "evidence_id": "ev-fa7a4e500330888d",
+    "path": "docs/permission-architecture.md"
+  },
+  {
+    "evidence_id": "ev-37246da5f65a00b3",
+    "path": "docs/offline-sync.md"
+  }
+]

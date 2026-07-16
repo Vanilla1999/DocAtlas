@@ -1,0 +1,9 @@
+{
+  "command": "uv run --offline pytest tests/test_browser_permission_gate.py",
+  "errors": [],
+  "returncode": 0,
+  "schema_version": 1,
+  "status": "executed",
+  "stderr": "warning: `VIRTUAL_ENV=/home/viadmin/StudioProjects/hermes/docmancer/.venv` does not match the project environment path `.venv` and will be ignored; use `--active` to target the active environment instead\nUsing CPython 3.13.12\nCreating virtual environment at: .venv\nInstalled 5 packages in 6ms\n",
+  "stdout": "============================= test session starts ==============================\nplatform linux -- Python 3.13.12, pytest-9.0.3, pluggy-1.6.0\nrootdir: /home/viadmin/StudioProjects/hermes/docmancer\nconfigfile: pytest.ini\ncollected 4 items\n\ntests/test_browser_permission_gate.py ....                               [100%]\n\n=============================== warnings summary ===============================\n.venv/lib/python3.13/site-packages/_pytest/config/__init__.py:1434\n  /home/viadmin/StudioProjects/hermes/docmancer/eval/task_level/results/task33c_codex_host_metrics_20260715_101702_preflight/runtime/docatlas-task-level-task33c_codex_host_metrics_20260715_101702-eur4gjl9/decisive_nbo_cross_module_gate_large_001/repo_only_strict_offline/repeat_0/workspace/.venv/lib/python3.13/site-packages/_pytest/config/__init__.py:1434: PytestConfigWarning: Unknown config option: asyncio_mode\n  \n    self._warn_or_fail_if_strict(f\"Unknown config option: {key}\\n\")\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n========================= 4 passed, 1 warning in 0.02s =========================\n"
+}

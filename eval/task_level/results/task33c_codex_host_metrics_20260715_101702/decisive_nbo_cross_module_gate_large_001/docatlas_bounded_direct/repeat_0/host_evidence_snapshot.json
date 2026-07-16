@@ -1,0 +1,2054 @@
+{
+  "evidence_categories": [
+    "project_docs",
+    "symbols"
+  ],
+  "evidence_items": [
+    {
+      "authority": "primary",
+      "authority_root": null,
+      "canonical_id": null,
+      "content": "# NBO Permission Gate Contract Snapshot\n\nThis benchmark fixture is a sanitized real-project-derived snapshot from a Flutter/Dart permission subsystem. It is intentionally limited to permission, browser, scan, sync, and review excerpts.\n\nExcluded: private git history, remotes, credentials, environment files, runtime/build output, dependency caches, IDE files, product-specific domain data, customer/user records, and raw trajectories.",
+      "content_boundary": {
+        "executable_policy": false,
+        "role": "cited_document_data",
+        "schema": "docmancer-document-data-v1"
+      },
+      "description": null,
+      "doc_scope": "project",
+      "document_data": {
+        "content": "# NBO Permission Gate Contract Snapshot\n\nThis benchmark fixture is a sanitized real-project-derived snapshot from a Flutter/Dart permission subsystem. It is intentionally limited to permission, browser, scan, sync, and review excerpts.\n\nExcluded: private git history, remotes, credentials, environment files, runtime/build output, dependency caches, IDE files, product-specific domain data, customer/user records, and raw trajectories.",
+        "instruction_trust": "untrusted_data",
+        "schema": "docmancer-document-data-v1"
+      },
+      "freshness": "current",
+      "heading_path": "NBO Permission Gate Contract Snapshot",
+      "impact_policy": "track",
+      "instruction_risk_flags": [],
+      "instruction_trust": "untrusted_data",
+      "library_id": null,
+      "lifecycle_status": "active",
+      "module_id": null,
+      "module_name": null,
+      "module_path": null,
+      "module_type": null,
+      "origin_lane": "project",
+      "path": "README.md",
+      "policy_scope": null,
+      "repository_authority": "ordinary_repository_document",
+      "risk_flags": [],
+      "scope_verified": false,
+      "section": {
+        "freshness": "current",
+        "heading_path": "NBO Permission Gate Contract Snapshot",
+        "title": "NBO Permission Gate Contract Snapshot"
+      },
+      "source": {
+        "authority": "primary",
+        "description": null,
+        "doc_scope": "project",
+        "impact_policy": "track",
+        "lifecycle_status": "active",
+        "module_id": null,
+        "module_name": null,
+        "module_path": null,
+        "module_type": null,
+        "path": "README.md",
+        "risk_flags": [],
+        "source_class": "project_doc",
+        "source_kind": "readme",
+        "source_type": "readme",
+        "title": "NBO Permission Gate Contract Snapshot",
+        "url": null
+      },
+      "source_class": "project_doc",
+      "source_kind": "readme",
+      "source_provenance": {
+        "origin_lane": "project",
+        "owner": "configured_repository"
+      },
+      "source_type": "readme",
+      "title": "NBO Permission Gate Contract Snapshot",
+      "token_estimate": 108,
+      "url": null,
+      "version": null,
+      "version_exactness": "not_applicable",
+      "why_selected": "selected as high-level project overview / usage documentation; ranked by lexical/vector relevance with neutral source weighting"
+    },
+    {
+      "authority": "primary",
+      "authority_root": null,
+      "canonical_id": null,
+      "content": "## Fixture map\n\n- `lib/modules/permission/application/permission_service.dart` owns the canonical flow-entry decision contract.\n- `lib/modules/permission/domain/permission_result.dart` is the source result model used by all flow gates.\n- `lib/modules/browser/application/browser_permission_gate.dart` controls browser entry.\n- `lib/modules/scan/application/scan_permission_gate.dart` controls scanner entry.\n- `lib/modules/sync/application/offline_sync_gate.dart` controls deferred offline handoff after either flow.\n- `lib/modules/review/application/permission_review_policy.dart` renders copy/action hints after a block.\n- `docs/permission-architecture.md`, `docs/browser-flow.md`, `docs/scan-flow.md`, and `docs/offline-sync.md` define the cross-module contract.",
+      "content_boundary": {
+        "executable_policy": false,
+        "role": "cited_document_data",
+        "schema": "docmancer-document-data-v1"
+      },
+      "description": null,
+      "doc_scope": "project",
+      "document_data": {
+        "content": "## Fixture map\n\n- `lib/modules/permission/application/permission_service.dart` owns the canonical flow-entry decision contract.\n- `lib/modules/permission/domain/permission_result.dart` is the source result model used by all flow gates.\n- `lib/modules/browser/application/browser_permission_gate.dart` controls browser entry.\n- `lib/modules/scan/application/scan_permission_gate.dart` controls scanner entry.\n- `lib/modules/sync/application/offline_sync_gate.dart` controls deferred offline handoff after either flow.\n- `lib/modules/review/application/permission_review_policy.dart` renders copy/action hints after a block.\n- `docs/permission-architecture.md`, `docs/browser-flow.md`, `docs/scan-flow.md`, and `docs/offline-sync.md` define the cross-module contract.",
+        "instruction_trust": "untrusted_data",
+        "schema": "docmancer-document-data-v1"
+      },
+      "freshness": "current",
+      "heading_path": "NBO Permission Gate Contract Snapshot > Fixture map",
+      "impact_policy": "track",
+      "instruction_risk_flags": [],
+      "instruction_trust": "untrusted_data",
+      "library_id": null,
+      "lifecycle_status": "active",
+      "module_id": null,
+      "module_name": null,
+      "module_path": null,
+      "module_type": null,
+      "origin_lane": "project",
+      "path": "README.md",
+      "policy_scope": null,
+      "repository_authority": "ordinary_repository_document",
+      "risk_flags": [],
+      "scope_verified": false,
+      "section": {
+        "freshness": "current",
+        "heading_path": "NBO Permission Gate Contract Snapshot > Fixture map",
+        "title": "Fixture map"
+      },
+      "source": {
+        "authority": "primary",
+        "description": null,
+        "doc_scope": "project",
+        "impact_policy": "track",
+        "lifecycle_status": "active",
+        "module_id": null,
+        "module_name": null,
+        "module_path": null,
+        "module_type": null,
+        "path": "README.md",
+        "risk_flags": [],
+        "source_class": "project_doc",
+        "source_kind": "readme",
+        "source_type": "readme",
+        "title": "Fixture map",
+        "url": null
+      },
+      "source_class": "project_doc",
+      "source_kind": "readme",
+      "source_provenance": {
+        "origin_lane": "project",
+        "owner": "configured_repository"
+      },
+      "source_type": "readme",
+      "title": "Fixture map",
+      "token_estimate": 191,
+      "url": null,
+      "version": null,
+      "version_exactness": "not_applicable",
+      "why_selected": "selected as high-level project overview / usage documentation; ranked by lexical/vector relevance with neutral source weighting"
+    },
+    {
+      "authority": "primary",
+      "authority_root": null,
+      "canonical_id": null,
+      "content": "## Local constraints\n\n- Browser, scan, and offline-sync gates must delegate entry decisions to the permission module.\n- Flow modules may pass flow-specific options, but must not duplicate the meaning of partial/degraded permission results.\n- Review policy may describe a decision, but must not become the entry gate.\n- Generated files are not source-of-truth and must not be hand-edited.",
+      "content_boundary": {
+        "executable_policy": false,
+        "role": "cited_document_data",
+        "schema": "docmancer-document-data-v1"
+      },
+      "description": null,
+      "doc_scope": "project",
+      "document_data": {
+        "content": "## Local constraints\n\n- Browser, scan, and offline-sync gates must delegate entry decisions to the permission module.\n- Flow modules may pass flow-specific options, but must not duplicate the meaning of partial/degraded permission results.\n- Review policy may describe a decision, but must not become the entry gate.\n- Generated files are not source-of-truth and must not be hand-edited.",
+        "instruction_trust": "untrusted_data",
+        "schema": "docmancer-document-data-v1"
+      },
+      "freshness": "current",
+      "heading_path": "NBO Permission Gate Contract Snapshot > Local constraints",
+      "impact_policy": "track",
+      "instruction_risk_flags": [],
+      "instruction_trust": "untrusted_data",
+      "library_id": null,
+      "lifecycle_status": "active",
+      "module_id": null,
+      "module_name": null,
+      "module_path": null,
+      "module_type": null,
+      "origin_lane": "project",
+      "path": "README.md",
+      "policy_scope": null,
+      "repository_authority": "ordinary_repository_document",
+      "risk_flags": [],
+      "scope_verified": false,
+      "section": {
+        "freshness": "current",
+        "heading_path": "NBO Permission Gate Contract Snapshot > Local constraints",
+        "title": "Local constraints"
+      },
+      "source": {
+        "authority": "primary",
+        "description": null,
+        "doc_scope": "project",
+        "impact_policy": "track",
+        "lifecycle_status": "active",
+        "module_id": null,
+        "module_name": null,
+        "module_path": null,
+        "module_type": null,
+        "path": "README.md",
+        "risk_flags": [],
+        "source_class": "project_doc",
+        "source_kind": "readme",
+        "source_type": "readme",
+        "title": "Local constraints",
+        "url": null
+      },
+      "source_class": "project_doc",
+      "source_kind": "readme",
+      "source_provenance": {
+        "origin_lane": "project",
+        "owner": "configured_repository"
+      },
+      "source_type": "readme",
+      "title": "Local constraints",
+      "token_estimate": 96,
+      "url": null,
+      "version": null,
+      "version_exactness": "not_applicable",
+      "why_selected": "selected as high-level project overview / usage documentation; ranked by lexical/vector relevance with neutral source weighting"
+    },
+    {
+      "authority": "supporting",
+      "authority_root": null,
+      "canonical_id": null,
+      "content": "# Permission Architecture\n\n`PermissionService` is the canonical owner of permission result interpretation for flow entry.\n\nA flow-entry decision must consider the normalized `PermissionResult` contract:\n\n- `PermissionDecision.allow` means all permissions required for immediate entry are available.\n- `PermissionDecision.block` means at least one immediate-entry permission is missing or denied.\n- `PermissionDecision.deferFollowUp` is reserved for permissions that are explicitly allowed after the user enters the flow. Background location is deferred follow-up; camera, foreground location, nearby device, and Android notification are not deferred for browser/scan entry.\n\nBrowser and scan flows both share the same immediate-entry contract. Browser may set `allowOfflineFallback` when it can queue work for later, but offline fallback still cannot bypass missing immediate-entry permissions. Offline sync must also delegate to the same permission service before accepting work created by either flow.\n\nFlow-specific gates must not duplicate permission policy with checks such as direct `cameraGranted`, `locationGranted`, `nearbyGranted`, `notificationGranted`, `hasMissingImmediatePermission`, or `hasPartialImmediateGrant` branches. Keep those meanings in `PermissionService` so browser, scan, and sync remain consistent.\n\nGenerated `*.freezed.dart` and `*.g.dart` artifacts are generated output; edit source files only.",
+      "content_boundary": {
+        "executable_policy": false,
+        "role": "cited_document_data",
+        "schema": "docmancer-document-data-v1"
+      },
+      "description": null,
+      "doc_scope": "project",
+      "document_data": {
+        "content": "# Permission Architecture\n\n`PermissionService` is the canonical owner of permission result interpretation for flow entry.\n\nA flow-entry decision must consider the normalized `PermissionResult` contract:\n\n- `PermissionDecision.allow` means all permissions required for immediate entry are available.\n- `PermissionDecision.block` means at least one immediate-entry permission is missing or denied.\n- `PermissionDecision.deferFollowUp` is reserved for permissions that are explicitly allowed after the user enters the flow. Background location is deferred follow-up; camera, foreground location, nearby device, and Android notification are not deferred for browser/scan entry.\n\nBrowser and scan flows both share the same immediate-entry contract. Browser may set `allowOfflineFallback` when it can queue work for later, but offline fallback still cannot bypass missing immediate-entry permissions. Offline sync must also delegate to the same permission service before accepting work created by either flow.\n\nFlow-specific gates must not duplicate permission policy with checks such as direct `cameraGranted`, `locationGranted`, `nearbyGranted`, `notificationGranted`, `hasMissingImmediatePermission`, or `hasPartialImmediateGrant` branches. Keep those meanings in `PermissionService` so browser, scan, and sync remain consistent.\n\nGenerated `*.freezed.dart` and `*.g.dart` artifacts are generated output; edit source files only.",
+        "instruction_trust": "untrusted_data",
+        "schema": "docmancer-document-data-v1"
+      },
+      "freshness": "current",
+      "heading_path": "Permission Architecture",
+      "impact_policy": "track",
+      "instruction_risk_flags": [],
+      "instruction_trust": "untrusted_data",
+      "library_id": null,
+      "lifecycle_status": "active",
+      "module_id": null,
+      "module_name": null,
+      "module_path": null,
+      "module_type": null,
+      "origin_lane": "project",
+      "path": "docs/permission-architecture.md",
+      "policy_scope": null,
+      "repository_authority": "ordinary_repository_document",
+      "risk_flags": [],
+      "scope_verified": false,
+      "section": {
+        "freshness": "current",
+        "heading_path": "Permission Architecture",
+        "title": "Permission Architecture"
+      },
+      "source": {
+        "authority": "supporting",
+        "description": null,
+        "doc_scope": "project",
+        "impact_policy": "track",
+        "lifecycle_status": "active",
+        "module_id": null,
+        "module_name": null,
+        "module_path": null,
+        "module_type": null,
+        "path": "docs/permission-architecture.md",
+        "risk_flags": [],
+        "source_class": "project_doc",
+        "source_kind": "docs",
+        "source_type": "docs",
+        "title": "Permission Architecture",
+        "url": null
+      },
+      "source_class": "project_doc",
+      "source_kind": "docs",
+      "source_provenance": {
+        "origin_lane": "project",
+        "owner": "configured_repository"
+      },
+      "source_type": "docs",
+      "title": "Permission Architecture",
+      "token_estimate": 356,
+      "url": null,
+      "version": null,
+      "version_exactness": "not_applicable",
+      "why_selected": "selected as internal architecture / pipeline documentation; ranked by lexical/vector relevance with neutral source weighting"
+    },
+    {
+      "authority": "supporting",
+      "authority_root": null,
+      "canonical_id": null,
+      "content": "# Offline Sync Permission Contract\n\nOffline sync receives queued work created by browser and scan flows. It must reject work that was created from a permission state that would not pass flow entry.\n\nUse `PermissionService.evaluateFlowEntry(result, allowOfflineFallback: false)` before accepting queued work. Do not copy browser-specific fallback logic into sync.\n\nThis keeps browser, scan, and sync aligned when permission semantics change.",
+      "content_boundary": {
+        "executable_policy": false,
+        "role": "cited_document_data",
+        "schema": "docmancer-document-data-v1"
+      },
+      "description": null,
+      "doc_scope": "project",
+      "document_data": {
+        "content": "# Offline Sync Permission Contract\n\nOffline sync receives queued work created by browser and scan flows. It must reject work that was created from a permission state that would not pass flow entry.\n\nUse `PermissionService.evaluateFlowEntry(result, allowOfflineFallback: false)` before accepting queued work. Do not copy browser-specific fallback logic into sync.\n\nThis keeps browser, scan, and sync aligned when permission semantics change.",
+        "instruction_trust": "untrusted_data",
+        "schema": "docmancer-document-data-v1"
+      },
+      "freshness": "current",
+      "heading_path": "Offline Sync Permission Contract",
+      "impact_policy": "track",
+      "instruction_risk_flags": [],
+      "instruction_trust": "untrusted_data",
+      "library_id": null,
+      "lifecycle_status": "active",
+      "module_id": null,
+      "module_name": null,
+      "module_path": null,
+      "module_type": null,
+      "origin_lane": "project",
+      "path": "docs/offline-sync.md",
+      "policy_scope": null,
+      "repository_authority": "ordinary_repository_document",
+      "risk_flags": [],
+      "scope_verified": false,
+      "section": {
+        "freshness": "current",
+        "heading_path": "Offline Sync Permission Contract",
+        "title": "Offline Sync Permission Contract"
+      },
+      "source": {
+        "authority": "supporting",
+        "description": null,
+        "doc_scope": "project",
+        "impact_policy": "track",
+        "lifecycle_status": "active",
+        "module_id": null,
+        "module_name": null,
+        "module_path": null,
+        "module_type": null,
+        "path": "docs/offline-sync.md",
+        "risk_flags": [],
+        "source_class": "project_doc",
+        "source_kind": "docs",
+        "source_type": "docs",
+        "title": "Offline Sync Permission Contract",
+        "url": null
+      },
+      "source_class": "project_doc",
+      "source_kind": "docs",
+      "source_provenance": {
+        "origin_lane": "project",
+        "owner": "configured_repository"
+      },
+      "source_type": "docs",
+      "title": "Offline Sync Permission Contract",
+      "token_estimate": 110,
+      "url": null,
+      "version": null,
+      "version_exactness": "not_applicable",
+      "why_selected": "selected because it matched repo-owned project documentation for the question; ranked by lexical/vector relevance with neutral source weighting"
+    },
+    {
+      "authority_root": null,
+      "canonical_id": null,
+      "char_count": 1776,
+      "content": "repo_map tests/test_browser_permission_gate.py (python, lines 1-54)\nimports: __future__.annotations, re, pathlib.Path\nsymbols: function _text:14, function _method_body:18, function test_browser_blocks_partial_permission_result_even_with_offline_fallback:24, function test_allowed_result_still_has_allow_and_block_decisions:33, function test_scan_source_still_exposes_gate_for_cross_module_contract:42, function test_review_policy_remains_descriptive_not_entry_gate:49\nreferences: annotations, re, Path, ROOT, SERVICE, permission_service, BROWSER, browser_permission_gate, SCAN, scan_permission_gate\nstrings: \"lib/modules/permission/application/permission_service.dart\", \"lib/modules/browser/application/browser_permission_gate.dart\", \"lib/modules/scan/application/scan_permission_gate.dart\", \"lib/modules/review/application/permission_review_policy.dart\", \"utf-8\", \"{method}\\(PermissionResult result\\) \\{{([\\s\\S]*?)\\n  \\}}\", \"{path.name} must expose {method}(PermissionResult result)\", \"canEnter\"",
+      "content_boundary": {
+        "executable_policy": false,
+        "role": "cited_document_data",
+        "schema": "docmancer-document-data-v1"
+      },
+      "doc_scope": "project",
+      "document_data": {
+        "content": "repo_map tests/test_browser_permission_gate.py (python, lines 1-54)\nimports: __future__.annotations, re, pathlib.Path\nsymbols: function _text:14, function _method_body:18, function test_browser_blocks_partial_permission_result_even_with_offline_fallback:24, function test_allowed_result_still_has_allow_and_block_decisions:33, function test_scan_source_still_exposes_gate_for_cross_module_contract:42, function test_review_policy_remains_descriptive_not_entry_gate:49\nreferences: annotations, re, Path, ROOT, SERVICE, permission_service, BROWSER, browser_permission_gate, SCAN, scan_permission_gate\nstrings: \"lib/modules/permission/application/permission_service.dart\", \"lib/modules/browser/application/browser_permission_gate.dart\", \"lib/modules/scan/application/scan_permission_gate.dart\", \"lib/modules/review/application/permission_review_policy.dart\", \"utf-8\", \"{method}\\(PermissionResult result\\) \\{{([\\s\\S]*?)\\n  \\}}\", \"{path.name} must expose {method}(PermissionResult result)\", \"canEnter\"",
+        "instruction_trust": "untrusted_data",
+        "schema": "docmancer-document-data-v1"
+      },
+      "freshness": "current",
+      "imports": [
+        "__future__.annotations",
+        "re",
+        "pathlib.Path"
+      ],
+      "instruction_risk_flags": [],
+      "instruction_trust": "untrusted_data",
+      "language": "python",
+      "library_id": null,
+      "line_count": 54,
+      "line_end": 54,
+      "line_start": 1,
+      "matched_terms": [
+        "browser",
+        "scan",
+        "permission",
+        "gate",
+        "offline"
+      ],
+      "origin_lane": "project",
+      "path": "tests/test_browser_permission_gate.py",
+      "policy_scope": null,
+      "references": [
+        "annotations",
+        "re",
+        "Path",
+        "ROOT",
+        "SERVICE",
+        "permission_service",
+        "BROWSER",
+        "browser_permission_gate",
+        "SCAN",
+        "scan_permission_gate",
+        "REVIEW",
+        "permission_review_policy",
+        "read_text",
+        "PermissionResult",
+        "PermissionDecision",
+        "ScanPermissionGate",
+        "PermissionService"
+      ],
+      "repository_authority": "ordinary_repository_document",
+      "scope_verified": false,
+      "section": {
+        "freshness": "current",
+        "heading_path": "repo_map",
+        "title": "Source map: tests/test_browser_permission_gate.py"
+      },
+      "selection_score": 57.5,
+      "source": {
+        "path": "tests/test_browser_permission_gate.py",
+        "source_class": "repo_map",
+        "title": "Source map: tests/test_browser_permission_gate.py"
+      },
+      "source_class": "repo_map",
+      "source_provenance": {
+        "origin_lane": "project",
+        "owner": "configured_repository"
+      },
+      "status_like_tokens": [],
+      "string_literals": [
+        "lib/modules/permission/application/permission_service.dart",
+        "lib/modules/browser/application/browser_permission_gate.dart",
+        "lib/modules/scan/application/scan_permission_gate.dart",
+        "lib/modules/review/application/permission_review_policy.dart",
+        "utf-8",
+        "{method}\\(PermissionResult result\\) \\{{([\\s\\S]*?)\\n  \\}}",
+        "{path.name} must expose {method}(PermissionResult result)",
+        "canEnter",
+        "allowOfflineFallback: true",
+        "== PermissionDecision.allow",
+        "? PermissionDecision.deferFollowUp",
+        "PermissionDecision allow",
+        "PermissionDecision.allow",
+        "PermissionDecision.block",
+        "hasMissingImmediatePermission",
+        "class ScanPermissionGate",
+        "PermissionService _permissionService",
+        "evaluateReview",
+        "labelFor"
+      ],
+      "symbols": [
+        {
+          "kind": "function",
+          "line_end": 15,
+          "line_start": 14,
+          "name": "_text"
+        },
+        {
+          "kind": "function",
+          "line_end": 21,
+          "line_start": 18,
+          "name": "_method_body"
+        },
+        {
+          "kind": "function",
+          "line_end": 30,
+          "line_start": 24,
+          "name": "test_browser_blocks_partial_permission_result_even_with_offline_fallback"
+        },
+        {
+          "kind": "function",
+          "line_end": 39,
+          "line_start": 33,
+          "name": "test_allowed_result_still_has_allow_and_block_decisions"
+        },
+        {
+          "kind": "function",
+          "line_end": 46,
+          "line_start": 42,
+          "name": "test_scan_source_still_exposes_gate_for_cross_module_contract"
+        },
+        {
+          "kind": "function",
+          "line_end": 54,
+          "line_start": 49,
+          "name": "test_review_policy_remains_descriptive_not_entry_gate"
+        }
+      ],
+      "title": "Source map: tests/test_browser_permission_gate.py",
+      "token_estimate": 249,
+      "version": null,
+      "version_exactness": "not_applicable",
+      "why_selected": "compact static source map selected by deterministic query/path/symbol ranking"
+    },
+    {
+      "authority_root": null,
+      "canonical_id": null,
+      "char_count": 666,
+      "content": "repo_map lib/modules/browser/application/browser_permission_gate.dart (dart, lines 1-21)\nimports: ../../permission/application/permission_service.dart, ../../permission/domain/permission_result.dart\nsymbols: class BrowserPermissionGate:4, method canEnter:8, method blockedReason:16\nreferences: dart, permission_service, permission_result, PermissionService, PermissionResult, PermissionDecision, String\nstrings: \"permission-required\", \"ready\"",
+      "content_boundary": {
+        "executable_policy": false,
+        "role": "cited_document_data",
+        "schema": "docmancer-document-data-v1"
+      },
+      "doc_scope": "project",
+      "document_data": {
+        "content": "repo_map lib/modules/browser/application/browser_permission_gate.dart (dart, lines 1-21)\nimports: ../../permission/application/permission_service.dart, ../../permission/domain/permission_result.dart\nsymbols: class BrowserPermissionGate:4, method canEnter:8, method blockedReason:16\nreferences: dart, permission_service, permission_result, PermissionService, PermissionResult, PermissionDecision, String\nstrings: \"permission-required\", \"ready\"",
+        "instruction_trust": "untrusted_data",
+        "schema": "docmancer-document-data-v1"
+      },
+      "freshness": "current",
+      "imports": [
+        "../../permission/application/permission_service.dart",
+        "../../permission/domain/permission_result.dart"
+      ],
+      "instruction_risk_flags": [],
+      "instruction_trust": "untrusted_data",
+      "language": "dart",
+      "library_id": null,
+      "line_count": 21,
+      "line_end": 21,
+      "line_start": 1,
+      "matched_terms": [
+        "browser",
+        "permission",
+        "gate"
+      ],
+      "origin_lane": "project",
+      "path": "lib/modules/browser/application/browser_permission_gate.dart",
+      "policy_scope": null,
+      "references": [
+        "dart",
+        "permission_service",
+        "permission_result",
+        "PermissionService",
+        "PermissionResult",
+        "PermissionDecision",
+        "String"
+      ],
+      "repository_authority": "ordinary_repository_document",
+      "scope_verified": false,
+      "section": {
+        "freshness": "current",
+        "heading_path": "repo_map",
+        "title": "Source map: lib/modules/browser/application/browser_permission_gate.dart"
+      },
+      "selection_score": 33.5,
+      "source": {
+        "path": "lib/modules/browser/application/browser_permission_gate.dart",
+        "source_class": "repo_map",
+        "title": "Source map: lib/modules/browser/application/browser_permission_gate.dart"
+      },
+      "source_class": "repo_map",
+      "source_provenance": {
+        "origin_lane": "project",
+        "owner": "configured_repository"
+      },
+      "status_like_tokens": [],
+      "string_literals": [
+        "permission-required",
+        "ready"
+      ],
+      "symbols": [
+        {
+          "kind": "class",
+          "line_end": 4,
+          "line_start": 4,
+          "name": "BrowserPermissionGate"
+        },
+        {
+          "kind": "method",
+          "line_end": 8,
+          "line_start": 8,
+          "name": "canEnter"
+        },
+        {
+          "kind": "method",
+          "line_end": 16,
+          "line_start": 16,
+          "name": "blockedReason"
+        }
+      ],
+      "title": "Source map: lib/modules/browser/application/browser_permission_gate.dart",
+      "token_estimate": 110,
+      "version": null,
+      "version_exactness": "not_applicable",
+      "why_selected": "compact static source map selected by deterministic query/path/symbol ranking"
+    },
+    {
+      "authority_root": null,
+      "canonical_id": null,
+      "char_count": 460,
+      "content": "repo_map lib/modules/sync/application/offline_sync_gate.dart (dart, lines 1-16)\nimports: ../../permission/application/permission_service.dart, ../../permission/domain/permission_result.dart\nsymbols: class OfflineSyncGate:4, method canAcceptQueuedWork:8\nreferences: dart, permission_service, permission_result, PermissionService, PermissionResult, PermissionDecision",
+      "content_boundary": {
+        "executable_policy": false,
+        "role": "cited_document_data",
+        "schema": "docmancer-document-data-v1"
+      },
+      "doc_scope": "project",
+      "document_data": {
+        "content": "repo_map lib/modules/sync/application/offline_sync_gate.dart (dart, lines 1-16)\nimports: ../../permission/application/permission_service.dart, ../../permission/domain/permission_result.dart\nsymbols: class OfflineSyncGate:4, method canAcceptQueuedWork:8\nreferences: dart, permission_service, permission_result, PermissionService, PermissionResult, PermissionDecision",
+        "instruction_trust": "untrusted_data",
+        "schema": "docmancer-document-data-v1"
+      },
+      "freshness": "current",
+      "imports": [
+        "../../permission/application/permission_service.dart",
+        "../../permission/domain/permission_result.dart"
+      ],
+      "instruction_risk_flags": [],
+      "instruction_trust": "untrusted_data",
+      "language": "dart",
+      "library_id": null,
+      "line_count": 16,
+      "line_end": 16,
+      "line_start": 1,
+      "matched_terms": [
+        "permission",
+        "gate",
+        "offline",
+        "sync"
+      ],
+      "origin_lane": "project",
+      "path": "lib/modules/sync/application/offline_sync_gate.dart",
+      "policy_scope": null,
+      "references": [
+        "dart",
+        "permission_service",
+        "permission_result",
+        "PermissionService",
+        "PermissionResult",
+        "PermissionDecision"
+      ],
+      "repository_authority": "ordinary_repository_document",
+      "scope_verified": false,
+      "section": {
+        "freshness": "current",
+        "heading_path": "repo_map",
+        "title": "Source map: lib/modules/sync/application/offline_sync_gate.dart"
+      },
+      "selection_score": 30.0,
+      "source": {
+        "path": "lib/modules/sync/application/offline_sync_gate.dart",
+        "source_class": "repo_map",
+        "title": "Source map: lib/modules/sync/application/offline_sync_gate.dart"
+      },
+      "source_class": "repo_map",
+      "source_provenance": {
+        "origin_lane": "project",
+        "owner": "configured_repository"
+      },
+      "status_like_tokens": [],
+      "string_literals": [],
+      "symbols": [
+        {
+          "kind": "class",
+          "line_end": 4,
+          "line_start": 4,
+          "name": "OfflineSyncGate"
+        },
+        {
+          "kind": "method",
+          "line_end": 8,
+          "line_start": 8,
+          "name": "canAcceptQueuedWork"
+        }
+      ],
+      "title": "Source map: lib/modules/sync/application/offline_sync_gate.dart",
+      "token_estimate": 91,
+      "version": null,
+      "version_exactness": "not_applicable",
+      "why_selected": "compact static source map selected by deterministic query/path/symbol ranking"
+    },
+    {
+      "authority_root": null,
+      "canonical_id": null,
+      "char_count": 395,
+      "content": "repo_map lib/modules/scan/application/scan_permission_gate.dart (dart, lines 1-15)\nimports: ../../permission/application/permission_service.dart, ../../permission/domain/permission_result.dart\nsymbols: class ScanPermissionGate:4, method canEnter:8\nreferences: dart, permission_service, permission_result, PermissionService, PermissionResult",
+      "content_boundary": {
+        "executable_policy": false,
+        "role": "cited_document_data",
+        "schema": "docmancer-document-data-v1"
+      },
+      "doc_scope": "project",
+      "document_data": {
+        "content": "repo_map lib/modules/scan/application/scan_permission_gate.dart (dart, lines 1-15)\nimports: ../../permission/application/permission_service.dart, ../../permission/domain/permission_result.dart\nsymbols: class ScanPermissionGate:4, method canEnter:8\nreferences: dart, permission_service, permission_result, PermissionService, PermissionResult",
+        "instruction_trust": "untrusted_data",
+        "schema": "docmancer-document-data-v1"
+      },
+      "freshness": "current",
+      "imports": [
+        "../../permission/application/permission_service.dart",
+        "../../permission/domain/permission_result.dart"
+      ],
+      "instruction_risk_flags": [],
+      "instruction_trust": "untrusted_data",
+      "language": "dart",
+      "library_id": null,
+      "line_count": 15,
+      "line_end": 15,
+      "line_start": 1,
+      "matched_terms": [
+        "scan",
+        "permission",
+        "gate"
+      ],
+      "origin_lane": "project",
+      "path": "lib/modules/scan/application/scan_permission_gate.dart",
+      "policy_scope": null,
+      "references": [
+        "dart",
+        "permission_service",
+        "permission_result",
+        "PermissionService",
+        "PermissionResult"
+      ],
+      "repository_authority": "ordinary_repository_document",
+      "scope_verified": false,
+      "section": {
+        "freshness": "current",
+        "heading_path": "repo_map",
+        "title": "Source map: lib/modules/scan/application/scan_permission_gate.dart"
+      },
+      "selection_score": 29.5,
+      "source": {
+        "path": "lib/modules/scan/application/scan_permission_gate.dart",
+        "source_class": "repo_map",
+        "title": "Source map: lib/modules/scan/application/scan_permission_gate.dart"
+      },
+      "source_class": "repo_map",
+      "source_provenance": {
+        "origin_lane": "project",
+        "owner": "configured_repository"
+      },
+      "status_like_tokens": [],
+      "string_literals": [],
+      "symbols": [
+        {
+          "kind": "class",
+          "line_end": 4,
+          "line_start": 4,
+          "name": "ScanPermissionGate"
+        },
+        {
+          "kind": "method",
+          "line_end": 8,
+          "line_start": 8,
+          "name": "canEnter"
+        }
+      ],
+      "title": "Source map: lib/modules/scan/application/scan_permission_gate.dart",
+      "token_estimate": 85,
+      "version": null,
+      "version_exactness": "not_applicable",
+      "why_selected": "compact static source map selected by deterministic query/path/symbol ranking"
+    },
+    {
+      "authority_root": null,
+      "canonical_id": null,
+      "char_count": 622,
+      "content": "repo_map lib/modules/review/application/permission_review_policy.dart (dart, lines 1-20)\nimports: ../../permission/application/permission_service.dart, ../../permission/domain/permission_result.dart\nsymbols: class PermissionReviewPolicy:4, method labelFor:8\nreferences: dart, permission_service, permission_result, PermissionService, String, PermissionResult, PermissionDecision\nstrings: \"ready\", \"fix permissions\", \"complete follow-up after entry\"",
+      "content_boundary": {
+        "executable_policy": false,
+        "role": "cited_document_data",
+        "schema": "docmancer-document-data-v1"
+      },
+      "doc_scope": "project",
+      "document_data": {
+        "content": "repo_map lib/modules/review/application/permission_review_policy.dart (dart, lines 1-20)\nimports: ../../permission/application/permission_service.dart, ../../permission/domain/permission_result.dart\nsymbols: class PermissionReviewPolicy:4, method labelFor:8\nreferences: dart, permission_service, permission_result, PermissionService, String, PermissionResult, PermissionDecision\nstrings: \"ready\", \"fix permissions\", \"complete follow-up after entry\"",
+        "instruction_trust": "untrusted_data",
+        "schema": "docmancer-document-data-v1"
+      },
+      "freshness": "current",
+      "imports": [
+        "../../permission/application/permission_service.dart",
+        "../../permission/domain/permission_result.dart"
+      ],
+      "instruction_risk_flags": [],
+      "instruction_trust": "untrusted_data",
+      "language": "dart",
+      "library_id": null,
+      "line_count": 20,
+      "line_end": 20,
+      "line_start": 1,
+      "matched_terms": [
+        "permission"
+      ],
+      "origin_lane": "project",
+      "path": "lib/modules/review/application/permission_review_policy.dart",
+      "policy_scope": null,
+      "references": [
+        "dart",
+        "permission_service",
+        "permission_result",
+        "PermissionService",
+        "String",
+        "PermissionResult",
+        "PermissionDecision"
+      ],
+      "repository_authority": "ordinary_repository_document",
+      "scope_verified": false,
+      "section": {
+        "freshness": "current",
+        "heading_path": "repo_map",
+        "title": "Source map: lib/modules/review/application/permission_review_policy.dart"
+      },
+      "selection_score": 14.5,
+      "source": {
+        "path": "lib/modules/review/application/permission_review_policy.dart",
+        "source_class": "repo_map",
+        "title": "Source map: lib/modules/review/application/permission_review_policy.dart"
+      },
+      "source_class": "repo_map",
+      "source_provenance": {
+        "origin_lane": "project",
+        "owner": "configured_repository"
+      },
+      "status_like_tokens": [],
+      "string_literals": [
+        "ready",
+        "fix permissions",
+        "complete follow-up after entry"
+      ],
+      "symbols": [
+        {
+          "kind": "class",
+          "line_end": 4,
+          "line_start": 4,
+          "name": "PermissionReviewPolicy"
+        },
+        {
+          "kind": "method",
+          "line_end": 8,
+          "line_start": 8,
+          "name": "labelFor"
+        }
+      ],
+      "title": "Source map: lib/modules/review/application/permission_review_policy.dart",
+      "token_estimate": 112,
+      "version": null,
+      "version_exactness": "not_applicable",
+      "why_selected": "compact static source map selected by deterministic query/path/symbol ranking"
+    },
+    {
+      "authority_root": null,
+      "canonical_id": null,
+      "char_count": 909,
+      "content": "repo_map lib/modules/permission/application/permission_service.dart (dart, lines 1-28)\nimports: ../domain/permission_result.dart\nsymbols: class PermissionService:3, method evaluateFlowEntry:4, method evaluateReview:18\nreferences: dart, permission_result, PermissionDecision, PermissionResult, BUG, Returning",
+      "content_boundary": {
+        "executable_policy": false,
+        "role": "cited_document_data",
+        "schema": "docmancer-document-data-v1"
+      },
+      "doc_scope": "project",
+      "document_data": {
+        "content": "repo_map lib/modules/permission/application/permission_service.dart (dart, lines 1-28)\nimports: ../domain/permission_result.dart\nsymbols: class PermissionService:3, method evaluateFlowEntry:4, method evaluateReview:18\nreferences: dart, permission_result, PermissionDecision, PermissionResult, BUG, Returning",
+        "instruction_trust": "untrusted_data",
+        "schema": "docmancer-document-data-v1"
+      },
+      "freshness": "current",
+      "imports": [
+        "../domain/permission_result.dart"
+      ],
+      "instruction_risk_flags": [],
+      "instruction_trust": "untrusted_data",
+      "language": "dart",
+      "library_id": null,
+      "line_count": 28,
+      "line_end": 28,
+      "line_start": 1,
+      "matched_terms": [
+        "permission"
+      ],
+      "origin_lane": "project",
+      "path": "lib/modules/permission/application/permission_service.dart",
+      "policy_scope": null,
+      "references": [
+        "dart",
+        "permission_result",
+        "PermissionDecision",
+        "PermissionResult",
+        "BUG",
+        "Returning"
+      ],
+      "repository_authority": "ordinary_repository_document",
+      "scope_verified": false,
+      "section": {
+        "freshness": "current",
+        "heading_path": "repo_map",
+        "title": "Source map: lib/modules/permission/application/permission_service.dart"
+      },
+      "selection_score": 10.5,
+      "source": {
+        "path": "lib/modules/permission/application/permission_service.dart",
+        "source_class": "repo_map",
+        "title": "Source map: lib/modules/permission/application/permission_service.dart"
+      },
+      "source_class": "repo_map",
+      "source_provenance": {
+        "origin_lane": "project",
+        "owner": "configured_repository"
+      },
+      "status_like_tokens": [],
+      "string_literals": [],
+      "symbols": [
+        {
+          "kind": "class",
+          "line_end": 3,
+          "line_start": 3,
+          "name": "PermissionService"
+        },
+        {
+          "kind": "method",
+          "line_end": 4,
+          "line_start": 4,
+          "name": "evaluateFlowEntry"
+        },
+        {
+          "kind": "method",
+          "line_end": 18,
+          "line_start": 18,
+          "name": "evaluateReview"
+        }
+      ],
+      "title": "Source map: lib/modules/permission/application/permission_service.dart",
+      "token_estimate": 76,
+      "version": null,
+      "version_exactness": "not_applicable",
+      "why_selected": "compact static source map selected by deterministic query/path/symbol ranking"
+    },
+    {
+      "authority_root": null,
+      "canonical_id": null,
+      "char_count": 885,
+      "content": "repo_map lib/modules/permission/domain/permission_result.dart (dart, lines 1-32)\nsymbols: class PermissionDecision:1, class PermissionResult:7, method PermissionResult:8\nreferences: String\nstrings: \"unknown\"",
+      "content_boundary": {
+        "executable_policy": false,
+        "role": "cited_document_data",
+        "schema": "docmancer-document-data-v1"
+      },
+      "doc_scope": "project",
+      "document_data": {
+        "content": "repo_map lib/modules/permission/domain/permission_result.dart (dart, lines 1-32)\nsymbols: class PermissionDecision:1, class PermissionResult:7, method PermissionResult:8\nreferences: String\nstrings: \"unknown\"",
+        "instruction_trust": "untrusted_data",
+        "schema": "docmancer-document-data-v1"
+      },
+      "freshness": "current",
+      "imports": [],
+      "instruction_risk_flags": [],
+      "instruction_trust": "untrusted_data",
+      "language": "dart",
+      "library_id": null,
+      "line_count": 32,
+      "line_end": 32,
+      "line_start": 1,
+      "matched_terms": [
+        "permission"
+      ],
+      "origin_lane": "project",
+      "path": "lib/modules/permission/domain/permission_result.dart",
+      "policy_scope": null,
+      "references": [
+        "String"
+      ],
+      "repository_authority": "ordinary_repository_document",
+      "scope_verified": false,
+      "section": {
+        "freshness": "current",
+        "heading_path": "repo_map",
+        "title": "Source map: lib/modules/permission/domain/permission_result.dart"
+      },
+      "selection_score": 9.5,
+      "source": {
+        "path": "lib/modules/permission/domain/permission_result.dart",
+        "source_class": "repo_map",
+        "title": "Source map: lib/modules/permission/domain/permission_result.dart"
+      },
+      "source_class": "repo_map",
+      "source_provenance": {
+        "origin_lane": "project",
+        "owner": "configured_repository"
+      },
+      "status_like_tokens": [],
+      "string_literals": [
+        "unknown"
+      ],
+      "symbols": [
+        {
+          "kind": "class",
+          "line_end": 1,
+          "line_start": 1,
+          "name": "PermissionDecision"
+        },
+        {
+          "kind": "class",
+          "line_end": 7,
+          "line_start": 7,
+          "name": "PermissionResult"
+        },
+        {
+          "kind": "method",
+          "line_end": 8,
+          "line_start": 8,
+          "name": "PermissionResult"
+        }
+      ],
+      "title": "Source map: lib/modules/permission/domain/permission_result.dart",
+      "token_estimate": 51,
+      "version": null,
+      "version_exactness": "not_applicable",
+      "why_selected": "compact static source map selected by deterministic query/path/symbol ranking"
+    },
+    {
+      "authority_root": null,
+      "canonical_id": null,
+      "content": "Code graph slice: tests/test_browser_permission_gate.py\nDefines:\n- function _text:14\n- function _method_body:18\n- function test_browser_blocks_partial_permission_result_even_with_offline_fallback:24\n- function test_allowed_result_still_has_allow_and_block_decisions:33\n- function test_scan_source_still_exposes_gate_for_cross_module_contract:42\n- function test_review_policy_remains_descriptive_not_entry_gate:49\nReferences:\n- browser_permission_gate -> lib/modules/browser/application/browser_permission_gate.dart [references, heuristic]\n- PermissionService -> lib/modules/permission/application/permission_service.dart [references, heuristic]\n- permission_service -> lib/modules/permission/application/permission_service.dart [references, heuristic]\n- PermissionDecision -> lib/modules/permission/domain/permission_result.dart [references, heuristic]\n- permission_review_policy -> lib/modules/review/application/permission_review_policy.dart [references, heuristic]\n- ScanPermissionGate -> lib/modules/scan/application/scan_permission_gate.dart [references, heuristic]\nStrings:\n- 'lib/modules/permission/application/permission_service.dart'\n- 'lib/modules/browser/application/browser_permission_gate.dart'\n- 'lib/modules/scan/application/scan_permission_gate.dart'\n- 'lib/modules/review/application/permission_review_policy.dart'\nLikely linked files:\n- lib/modules/browser/application/browser_permission_gate.dart via references\n- lib/modules/permission/application/permission_service.dart via references\n- lib/modules/permission/domain/permission_result.dart via references\n- lib/modules/review/application/permission_review_policy.dart via references",
+      "content_boundary": {
+        "executable_policy": false,
+        "role": "cited_document_data",
+        "schema": "docmancer-document-data-v1"
+      },
+      "doc_scope": "project",
+      "document_data": {
+        "content": "Code graph slice: tests/test_browser_permission_gate.py\nDefines:\n- function _text:14\n- function _method_body:18\n- function test_browser_blocks_partial_permission_result_even_with_offline_fallback:24\n- function test_allowed_result_still_has_allow_and_block_decisions:33\n- function test_scan_source_still_exposes_gate_for_cross_module_contract:42\n- function test_review_policy_remains_descriptive_not_entry_gate:49\nReferences:\n- browser_permission_gate -> lib/modules/browser/application/browser_permission_gate.dart [references, heuristic]\n- PermissionService -> lib/modules/permission/application/permission_service.dart [references, heuristic]\n- permission_service -> lib/modules/permission/application/permission_service.dart [references, heuristic]\n- PermissionDecision -> lib/modules/permission/domain/permission_result.dart [references, heuristic]\n- permission_review_policy -> lib/modules/review/application/permission_review_policy.dart [references, heuristic]\n- ScanPermissionGate -> lib/modules/scan/application/scan_permission_gate.dart [references, heuristic]\nStrings:\n- 'lib/modules/permission/application/permission_service.dart'\n- 'lib/modules/browser/application/browser_permission_gate.dart'\n- 'lib/modules/scan/application/scan_permission_gate.dart'\n- 'lib/modules/review/application/permission_review_policy.dart'\nLikely linked files:\n- lib/modules/browser/application/browser_permission_gate.dart via references\n- lib/modules/permission/application/permission_service.dart via references\n- lib/modules/permission/domain/permission_result.dart via references\n- lib/modules/review/application/permission_review_policy.dart via references",
+        "instruction_trust": "untrusted_data",
+        "schema": "docmancer-document-data-v1"
+      },
+      "freshness": "current",
+      "instruction_risk_flags": [],
+      "instruction_trust": "untrusted_data",
+      "language": "python",
+      "library_id": null,
+      "line_end": 54,
+      "line_start": 1,
+      "metadata": {
+        "confidence_summary": {
+          "heuristic": 6
+        },
+        "edge_ids": [
+          "edge:b2836b4f6869588a",
+          "edge:4bb711559a5d9819",
+          "edge:1a0091b31258f0ed",
+          "edge:c92c04ff62be452e",
+          "edge:5b48b0dba441b4f8",
+          "edge:52f997ec4c3f07a6"
+        ],
+        "edge_kinds": [
+          "references",
+          "references",
+          "references",
+          "references",
+          "references",
+          "references"
+        ],
+        "linked_paths": [
+          "lib/modules/browser/application/browser_permission_gate.dart",
+          "lib/modules/permission/application/permission_service.dart",
+          "lib/modules/permission/domain/permission_result.dart",
+          "lib/modules/review/application/permission_review_policy.dart"
+        ],
+        "node_ids": [
+          "file:tests/test_browser_permission_gate.py",
+          "symbol:tests/test_browser_permission_gate.py:14:_text",
+          "symbol:tests/test_browser_permission_gate.py:18:_method_body",
+          "symbol:tests/test_browser_permission_gate.py:24:test_browser_blocks_partial_permission_result_even_with_offline_fallback",
+          "symbol:tests/test_browser_permission_gate.py:33:test_allowed_result_still_has_allow_and_block_decisions",
+          "symbol:tests/test_browser_permission_gate.py:42:test_scan_source_still_exposes_gate_for_cross_module_contract",
+          "symbol:tests/test_browser_permission_gate.py:49:test_review_policy_remains_descriptive_not_entry_gate"
+        ],
+        "score": 107.4,
+        "score_breakdown": [
+          {
+            "confidence": "parser",
+            "evidence": "test_scan_source_still_exposes_gate_for_cross_module_contract",
+            "points": 5.0,
+            "reason": "symbol_match"
+          },
+          {
+            "confidence": "exact",
+            "evidence": "lib/modules/scan/application/scan_permission_gate.dart",
+            "points": 8.0,
+            "reason": "string_or_status_match"
+          },
+          {
+            "confidence": "heuristic",
+            "evidence": "scan",
+            "points": 4.0,
+            "reason": "source_evidence_term"
+          },
+          {
+            "confidence": "heuristic",
+            "evidence": "ScanPermissionGate",
+            "points": 2.5,
+            "reason": "reference_match"
+          },
+          {
+            "confidence": "heuristic",
+            "evidence": "scan_permission_gate",
+            "points": 2.5,
+            "reason": "reference_match"
+          },
+          {
+            "confidence": "unresolved",
+            "evidence": "SCAN",
+            "points": 0.3,
+            "reason": "unresolved_reference_search_hint"
+          },
+          {
+            "confidence": "parser",
+            "evidence": "test_review_policy_remains_descriptive_not_entry_gate",
+            "points": 5.0,
+            "reason": "symbol_match"
+          },
+          {
+            "confidence": "exact",
+            "evidence": "lib/modules/browser/application/browser_permission_gate.dart",
+            "points": 8.0,
+            "reason": "string_or_status_match"
+          },
+          {
+            "confidence": "exact",
+            "evidence": "tests/test_browser_permission_gate.py",
+            "points": 5.0,
+            "reason": "path_match"
+          },
+          {
+            "confidence": "heuristic",
+            "evidence": "gate",
+            "points": 4.0,
+            "reason": "source_evidence_term"
+          },
+          {
+            "confidence": "heuristic",
+            "evidence": "browser_permission_gate",
+            "points": 2.5,
+            "reason": "reference_match"
+          },
+          {
+            "confidence": "parser",
+            "evidence": "test_browser_blocks_partial_permission_result_even_with_offline_fallback",
+            "points": 5.0,
+            "reason": "symbol_match"
+          },
+          {
+            "confidence": "heuristic",
+            "evidence": "offline",
+            "points": 4.0,
+            "reason": "source_evidence_term"
+          },
+          {
+            "confidence": "heuristic",
+            "evidence": "browser",
+            "points": 4.0,
+            "reason": "source_evidence_term"
+          },
+          {
+            "confidence": "unresolved",
+            "evidence": "BROWSER",
+            "points": 0.3,
+            "reason": "unresolved_reference_search_hint"
+          },
+          {
+            "confidence": "exact",
+            "evidence": "lib/modules/permission/application/permission_service.dart",
+            "points": 8.0,
+            "reason": "string_or_status_match"
+          },
+          {
+            "confidence": "exact",
+            "evidence": "lib/modules/review/application/permission_review_policy.dart",
+            "points": 8.0,
+            "reason": "string_or_status_match"
+          },
+          {
+            "confidence": "exact",
+            "evidence": "{method}\\(PermissionResult result\\) \\{{([\\s\\S]*?)\\n  \\}}",
+            "points": 8.0,
+            "reason": "string_or_status_match"
+          },
+          {
+            "confidence": "exact",
+            "evidence": "{path.name} must expose {method}(PermissionResult result)",
+            "points": 8.0,
+            "reason": "string_or_status_match"
+          },
+          {
+            "confidence": "heuristic",
+            "evidence": "permission",
+            "points": 4.0,
+            "reason": "source_evidence_term"
+          }
+        ],
+        "score_reasons": [
+          "symbol_match:test_scan_source_still_exposes_gate_for_cross_module_contract:+5.0[parser]",
+          "string_or_status_match:lib/modules/scan/application/scan_permission_gate.dart:+8.0[exact]",
+          "source_evidence_term:scan:+4.0[heuristic]",
+          "reference_match:ScanPermissionGate:+2.5[heuristic]",
+          "reference_match:scan_permission_gate:+2.5[heuristic]",
+          "unresolved_reference_search_hint:SCAN:+0.3[unresolved]",
+          "symbol_match:test_review_policy_remains_descriptive_not_entry_gate:+5.0[parser]",
+          "string_or_status_match:lib/modules/browser/application/browser_permission_gate.dart:+8.0[exact]",
+          "path_match:tests/test_browser_permission_gate.py:+5.0[exact]",
+          "source_evidence_term:gate:+4.0[heuristic]",
+          "reference_match:browser_permission_gate:+2.5[heuristic]",
+          "symbol_match:test_browser_blocks_partial_permission_result_even_with_offline_fallback:+5.0[parser]",
+          "source_evidence_term:offline:+4.0[heuristic]",
+          "source_evidence_term:browser:+4.0[heuristic]",
+          "unresolved_reference_search_hint:BROWSER:+0.3[unresolved]",
+          "string_or_status_match:lib/modules/permission/application/permission_service.dart:+8.0[exact]",
+          "string_or_status_match:lib/modules/review/application/permission_review_policy.dart:+8.0[exact]",
+          "string_or_status_match:{method}\\(PermissionResult result\\) \\{{([\\s\\S]*?)\\n  \\}}:+8.0[exact]",
+          "string_or_status_match:{path.name} must expose {method}(PermissionResult result):+8.0[exact]",
+          "source_evidence_term:permission:+4.0[heuristic]",
+          "reference_match:PermissionService:+2.5[heuristic]",
+          "reference_match:permission_service:+2.5[heuristic]",
+          "reference_match:PermissionDecision:+2.5[heuristic]",
+          "reference_match:permission_review_policy:+2.5[heuristic]",
+          "unresolved_reference_search_hint:PermissionResult:+0.3[unresolved]",
+          "connected_to_matched_file:tests/test_browser_permission_gate.py:+1.0[heuristic]"
+        ],
+        "symbols": [
+          "_text",
+          "_method_body",
+          "test_browser_blocks_partial_permission_result_even_with_offline_fallback",
+          "test_allowed_result_still_has_allow_and_block_decisions",
+          "test_scan_source_still_exposes_gate_for_cross_module_contract",
+          "test_review_policy_remains_descriptive_not_entry_gate"
+        ]
+      },
+      "origin_lane": "project",
+      "path": "tests/test_browser_permission_gate.py",
+      "policy_scope": null,
+      "repository_authority": "ordinary_repository_document",
+      "scope_verified": false,
+      "section": {
+        "freshness": "current",
+        "heading_path": "code_graph",
+        "title": "Code graph: tests/test_browser_permission_gate.py"
+      },
+      "source": {
+        "path": "tests/test_browser_permission_gate.py",
+        "source_class": "code_graph",
+        "title": "Code graph: tests/test_browser_permission_gate.py"
+      },
+      "source_class": "code_graph",
+      "source_provenance": {
+        "origin_lane": "project",
+        "owner": "configured_repository"
+      },
+      "title": "Code graph: tests/test_browser_permission_gate.py",
+      "token_estimate": 413,
+      "version": null,
+      "version_exactness": "not_applicable",
+      "why_selected": "symbol_match:test_scan_source_still_exposes_gate_for_cross_module_contract:+5.0[parser]; string_or_status_match:lib/modules/scan/application/scan_permission_gate.dart:+8.0[exact]; source_evidence_term:scan:+4.0[heuristic]; reference_match:ScanPermissionGate:+2.5[heuristic]; reference_match:scan_permission_gate:+2.5[heuristic]; unresolved_reference_search_hint:SCAN:+0.3[unresolved]; symbol_match:test_review_policy_remains_descriptive_not_entry_gate:+5.0[parser]; string_or_status_match:lib/modules/browser/application/browser_permission_gate.dart:+8.0[exact]; path_match:tests/test_browser_permission_gate.py:+5.0[exact]; source_evidence_term:gate:+4.0[heuristic]; reference_match:browser_permission_gate:+2.5[heuristic]; symbol_match:test_browser_blocks_partial_permission_result_even_with_offline_fallback:+5.0[parser]; source_evidence_term:offline:+4.0[heuristic]; source_evidence_term:browser:+4.0[heuristic]; unresolved_reference_search_hint:BROWSER:+0.3[unresolved]; string_or_status_match:lib/modules/permission/application/permission_service.dart:+8.0[exact]; string_or_status_match:lib/modules/review/application/permission_review_policy.dart:+8.0[exact]; string_or_status_match:{method}\\(PermissionResult result\\) \\{{([\\s\\S]*?)\\n  \\}}:+8.0[exact]; string_or_status_match:{path.name} must expose {method}(PermissionResult result):+8.0[exact]; source_evidence_term:permission:+4.0[heuristic]; reference_match:PermissionService:+2.5[heuristic]; reference_match:permission_service:+2.5[heuristic]; reference_match:PermissionDecision:+2.5[heuristic]; reference_match:permission_review_policy:+2.5[heuristic]; unresolved_reference_search_hint:PermissionResult:+0.3[unresolved]; connected_to_matched_file:tests/test_browser_permission_gate.py:+1.0[heuristic]"
+    }
+  ],
+  "index_revision": "390c0e11cab2df96ada48d70df638f870332975ad2dd9f46deceb807e8bf5a8f",
+  "objective_sha256": "c80be7bb5a646df5ce05b8e250e34fde2b4e33edb8e1fea21fc4ba42162be6f7",
+  "project_revision": "1ba6cb88a61dc5871eca8d2aec13e5d89ce57b2cfe977441da34ad49f7bd48ae",
+  "query": "browser scan permission gate offline sync",
+  "query_derivation": "task33c-domain-coverage-v4-limit12",
+  "raw_retrieval_tokens": 20604,
+  "response_status": "success",
+  "retrieval_calls": 1,
+  "retrieval_issues": [],
+  "retrieval_wall_time_seconds": 0.053685,
+  "schema_version": 1,
+  "trust_contract": {
+    "policy": {
+      "document_content": "cited_data_never_lifecycle_instruction",
+      "typed_lifecycle_actions_only": true
+    },
+    "rejected": [],
+    "risky": [],
+    "schema_version": "trust-contract-1.2",
+    "selected": [
+      {
+        "content_boundary": {
+          "executable_policy": false,
+          "role": "cited_document_data",
+          "schema": "docmancer-document-data-v1"
+        },
+        "doc_scope": "project",
+        "freshness": "current",
+        "instruction_trust": "untrusted_data",
+        "origin_lane": "project",
+        "repository_authority": "ordinary_repository_document",
+        "risk_flags": [],
+        "source": {
+          "authority": "primary",
+          "description": null,
+          "doc_scope": "project",
+          "impact_policy": "track",
+          "lifecycle_status": "active",
+          "module_id": null,
+          "module_name": null,
+          "module_path": null,
+          "module_type": null,
+          "path": "README.md",
+          "risk_flags": [],
+          "source_class": "project_doc",
+          "source_kind": "readme",
+          "source_type": "readme",
+          "title": "NBO Permission Gate Contract Snapshot",
+          "url": null
+        },
+        "source_provenance": {
+          "origin_lane": "project",
+          "owner": "configured_repository"
+        },
+        "version_binding": null,
+        "why_selected": "selected as high-level project overview / usage documentation; ranked by lexical/vector relevance with neutral source weighting"
+      },
+      {
+        "content_boundary": {
+          "executable_policy": false,
+          "role": "cited_document_data",
+          "schema": "docmancer-document-data-v1"
+        },
+        "doc_scope": "project",
+        "freshness": "current",
+        "instruction_trust": "untrusted_data",
+        "origin_lane": "project",
+        "repository_authority": "ordinary_repository_document",
+        "risk_flags": [],
+        "source": {
+          "authority": "primary",
+          "description": null,
+          "doc_scope": "project",
+          "impact_policy": "track",
+          "lifecycle_status": "active",
+          "module_id": null,
+          "module_name": null,
+          "module_path": null,
+          "module_type": null,
+          "path": "README.md",
+          "risk_flags": [],
+          "source_class": "project_doc",
+          "source_kind": "readme",
+          "source_type": "readme",
+          "title": "Fixture map",
+          "url": null
+        },
+        "source_provenance": {
+          "origin_lane": "project",
+          "owner": "configured_repository"
+        },
+        "version_binding": null,
+        "why_selected": "selected as high-level project overview / usage documentation; ranked by lexical/vector relevance with neutral source weighting"
+      },
+      {
+        "content_boundary": {
+          "executable_policy": false,
+          "role": "cited_document_data",
+          "schema": "docmancer-document-data-v1"
+        },
+        "doc_scope": "project",
+        "freshness": "current",
+        "instruction_trust": "untrusted_data",
+        "origin_lane": "project",
+        "repository_authority": "ordinary_repository_document",
+        "risk_flags": [],
+        "source": {
+          "authority": "primary",
+          "description": null,
+          "doc_scope": "project",
+          "impact_policy": "track",
+          "lifecycle_status": "active",
+          "module_id": null,
+          "module_name": null,
+          "module_path": null,
+          "module_type": null,
+          "path": "README.md",
+          "risk_flags": [],
+          "source_class": "project_doc",
+          "source_kind": "readme",
+          "source_type": "readme",
+          "title": "Local constraints",
+          "url": null
+        },
+        "source_provenance": {
+          "origin_lane": "project",
+          "owner": "configured_repository"
+        },
+        "version_binding": null,
+        "why_selected": "selected as high-level project overview / usage documentation; ranked by lexical/vector relevance with neutral source weighting"
+      },
+      {
+        "content_boundary": {
+          "executable_policy": false,
+          "role": "cited_document_data",
+          "schema": "docmancer-document-data-v1"
+        },
+        "doc_scope": "project",
+        "freshness": "current",
+        "instruction_trust": "untrusted_data",
+        "origin_lane": "project",
+        "repository_authority": "ordinary_repository_document",
+        "risk_flags": [],
+        "source": {
+          "authority": "supporting",
+          "description": null,
+          "doc_scope": "project",
+          "impact_policy": "track",
+          "lifecycle_status": "active",
+          "module_id": null,
+          "module_name": null,
+          "module_path": null,
+          "module_type": null,
+          "path": "docs/permission-architecture.md",
+          "risk_flags": [],
+          "source_class": "project_doc",
+          "source_kind": "docs",
+          "source_type": "docs",
+          "title": "Permission Architecture",
+          "url": null
+        },
+        "source_provenance": {
+          "origin_lane": "project",
+          "owner": "configured_repository"
+        },
+        "version_binding": null,
+        "why_selected": "selected as internal architecture / pipeline documentation; ranked by lexical/vector relevance with neutral source weighting"
+      },
+      {
+        "content_boundary": {
+          "executable_policy": false,
+          "role": "cited_document_data",
+          "schema": "docmancer-document-data-v1"
+        },
+        "doc_scope": "project",
+        "freshness": "current",
+        "instruction_trust": "untrusted_data",
+        "origin_lane": "project",
+        "repository_authority": "ordinary_repository_document",
+        "risk_flags": [],
+        "source": {
+          "authority": "supporting",
+          "description": null,
+          "doc_scope": "project",
+          "impact_policy": "track",
+          "lifecycle_status": "active",
+          "module_id": null,
+          "module_name": null,
+          "module_path": null,
+          "module_type": null,
+          "path": "docs/offline-sync.md",
+          "risk_flags": [],
+          "source_class": "project_doc",
+          "source_kind": "docs",
+          "source_type": "docs",
+          "title": "Offline Sync Permission Contract",
+          "url": null
+        },
+        "source_provenance": {
+          "origin_lane": "project",
+          "owner": "configured_repository"
+        },
+        "version_binding": null,
+        "why_selected": "selected because it matched repo-owned project documentation for the question; ranked by lexical/vector relevance with neutral source weighting"
+      },
+      {
+        "content_boundary": {
+          "executable_policy": false,
+          "role": "cited_document_data",
+          "schema": "docmancer-document-data-v1"
+        },
+        "doc_scope": "project",
+        "freshness": "current",
+        "instruction_trust": "untrusted_data",
+        "origin_lane": "project",
+        "repository_authority": "ordinary_repository_document",
+        "risk_flags": [],
+        "source": {
+          "path": "tests/test_browser_permission_gate.py",
+          "source_class": "repo_map",
+          "title": "Source map: tests/test_browser_permission_gate.py"
+        },
+        "source_provenance": {
+          "origin_lane": "project",
+          "owner": "configured_repository"
+        },
+        "version_binding": null,
+        "why_selected": "compact static source map selected by deterministic query/path/symbol ranking"
+      },
+      {
+        "content_boundary": {
+          "executable_policy": false,
+          "role": "cited_document_data",
+          "schema": "docmancer-document-data-v1"
+        },
+        "doc_scope": "project",
+        "freshness": "current",
+        "instruction_trust": "untrusted_data",
+        "origin_lane": "project",
+        "repository_authority": "ordinary_repository_document",
+        "risk_flags": [],
+        "source": {
+          "path": "lib/modules/browser/application/browser_permission_gate.dart",
+          "source_class": "repo_map",
+          "title": "Source map: lib/modules/browser/application/browser_permission_gate.dart"
+        },
+        "source_provenance": {
+          "origin_lane": "project",
+          "owner": "configured_repository"
+        },
+        "version_binding": null,
+        "why_selected": "compact static source map selected by deterministic query/path/symbol ranking"
+      },
+      {
+        "content_boundary": {
+          "executable_policy": false,
+          "role": "cited_document_data",
+          "schema": "docmancer-document-data-v1"
+        },
+        "doc_scope": "project",
+        "freshness": "current",
+        "instruction_trust": "untrusted_data",
+        "origin_lane": "project",
+        "repository_authority": "ordinary_repository_document",
+        "risk_flags": [],
+        "source": {
+          "path": "lib/modules/sync/application/offline_sync_gate.dart",
+          "source_class": "repo_map",
+          "title": "Source map: lib/modules/sync/application/offline_sync_gate.dart"
+        },
+        "source_provenance": {
+          "origin_lane": "project",
+          "owner": "configured_repository"
+        },
+        "version_binding": null,
+        "why_selected": "compact static source map selected by deterministic query/path/symbol ranking"
+      },
+      {
+        "content_boundary": {
+          "executable_policy": false,
+          "role": "cited_document_data",
+          "schema": "docmancer-document-data-v1"
+        },
+        "doc_scope": "project",
+        "freshness": "current",
+        "instruction_trust": "untrusted_data",
+        "origin_lane": "project",
+        "repository_authority": "ordinary_repository_document",
+        "risk_flags": [],
+        "source": {
+          "path": "lib/modules/scan/application/scan_permission_gate.dart",
+          "source_class": "repo_map",
+          "title": "Source map: lib/modules/scan/application/scan_permission_gate.dart"
+        },
+        "source_provenance": {
+          "origin_lane": "project",
+          "owner": "configured_repository"
+        },
+        "version_binding": null,
+        "why_selected": "compact static source map selected by deterministic query/path/symbol ranking"
+      },
+      {
+        "content_boundary": {
+          "executable_policy": false,
+          "role": "cited_document_data",
+          "schema": "docmancer-document-data-v1"
+        },
+        "doc_scope": "project",
+        "freshness": "current",
+        "instruction_trust": "untrusted_data",
+        "origin_lane": "project",
+        "repository_authority": "ordinary_repository_document",
+        "risk_flags": [],
+        "source": {
+          "path": "lib/modules/review/application/permission_review_policy.dart",
+          "source_class": "repo_map",
+          "title": "Source map: lib/modules/review/application/permission_review_policy.dart"
+        },
+        "source_provenance": {
+          "origin_lane": "project",
+          "owner": "configured_repository"
+        },
+        "version_binding": null,
+        "why_selected": "compact static source map selected by deterministic query/path/symbol ranking"
+      },
+      {
+        "content_boundary": {
+          "executable_policy": false,
+          "role": "cited_document_data",
+          "schema": "docmancer-document-data-v1"
+        },
+        "doc_scope": "project",
+        "freshness": "current",
+        "instruction_trust": "untrusted_data",
+        "origin_lane": "project",
+        "repository_authority": "ordinary_repository_document",
+        "risk_flags": [],
+        "source": {
+          "path": "lib/modules/permission/application/permission_service.dart",
+          "source_class": "repo_map",
+          "title": "Source map: lib/modules/permission/application/permission_service.dart"
+        },
+        "source_provenance": {
+          "origin_lane": "project",
+          "owner": "configured_repository"
+        },
+        "version_binding": null,
+        "why_selected": "compact static source map selected by deterministic query/path/symbol ranking"
+      },
+      {
+        "content_boundary": {
+          "executable_policy": false,
+          "role": "cited_document_data",
+          "schema": "docmancer-document-data-v1"
+        },
+        "doc_scope": "project",
+        "freshness": "current",
+        "instruction_trust": "untrusted_data",
+        "origin_lane": "project",
+        "repository_authority": "ordinary_repository_document",
+        "risk_flags": [],
+        "source": {
+          "path": "lib/modules/permission/domain/permission_result.dart",
+          "source_class": "repo_map",
+          "title": "Source map: lib/modules/permission/domain/permission_result.dart"
+        },
+        "source_provenance": {
+          "origin_lane": "project",
+          "owner": "configured_repository"
+        },
+        "version_binding": null,
+        "why_selected": "compact static source map selected by deterministic query/path/symbol ranking"
+      },
+      {
+        "content_boundary": {
+          "executable_policy": false,
+          "role": "cited_document_data",
+          "schema": "docmancer-document-data-v1"
+        },
+        "doc_scope": "project",
+        "freshness": "current",
+        "instruction_trust": "untrusted_data",
+        "origin_lane": "project",
+        "repository_authority": "ordinary_repository_document",
+        "risk_flags": [],
+        "source": {
+          "path": "tests/test_browser_permission_gate.py",
+          "source_class": "code_graph",
+          "title": "Code graph: tests/test_browser_permission_gate.py"
+        },
+        "source_provenance": {
+          "origin_lane": "project",
+          "owner": "configured_repository"
+        },
+        "version_binding": null,
+        "why_selected": "symbol_match:test_scan_source_still_exposes_gate_for_cross_module_contract:+5.0[parser]; string_or_status_match:lib/modules/scan/application/scan_permission_gate.dart:+8.0[exact]; source_evidence_term:scan:+4.0[heuristic]; reference_match:ScanPermissionGate:+2.5[heuristic]; reference_match:scan_permission_gate:+2.5[heuristic]; unresolved_reference_search_hint:SCAN:+0.3[unresolved]; symbol_match:test_review_policy_remains_descriptive_not_entry_gate:+5.0[parser]; string_or_status_match:lib/modules/browser/application/browser_permission_gate.dart:+8.0[exact]; path_match:tests/test_browser_permission_gate.py:+5.0[exact]; source_evidence_term:gate:+4.0[heuristic]; reference_match:browser_permission_gate:+2.5[heuristic]; symbol_match:test_browser_blocks_partial_permission_result_even_with_offline_fallback:+5.0[parser]; source_evidence_term:offline:+4.0[heuristic]; source_evidence_term:browser:+4.0[heuristic]; unresolved_reference_search_hint:BROWSER:+0.3[unresolved]; string_or_status_match:lib/modules/permission/application/permission_service.dart:+8.0[exact]; string_or_status_match:lib/modules/review/application/permission_review_policy.dart:+8.0[exact]; string_or_status_match:{method}\\(PermissionResult result\\) \\{{([\\s\\S]*?)\\n  \\}}:+8.0[exact]; string_or_status_match:{path.name} must expose {method}(PermissionResult result):+8.0[exact]; source_evidence_term:permission:+4.0[heuristic]; reference_match:PermissionService:+2.5[heuristic]; reference_match:permission_service:+2.5[heuristic]; reference_match:PermissionDecision:+2.5[heuristic]; reference_match:permission_review_policy:+2.5[heuristic]; unresolved_reference_search_hint:PermissionResult:+0.3[unresolved]; connected_to_matched_file:tests/test_browser_permission_gate.py:+1.0[heuristic]"
+      }
+    ],
+    "source_dimensions": [
+      "source_provenance",
+      "version_exactness",
+      "repository_authority",
+      "instruction_trust"
+    ],
+    "sources": {
+      "rejected": [],
+      "risky": [],
+      "selected": [
+        {
+          "content_boundary": {
+            "executable_policy": false,
+            "role": "cited_document_data",
+            "schema": "docmancer-document-data-v1"
+          },
+          "doc_scope": "project",
+          "freshness": "current",
+          "instruction_trust": "untrusted_data",
+          "origin_lane": "project",
+          "repository_authority": "ordinary_repository_document",
+          "risk_flags": [],
+          "source": {
+            "authority": "primary",
+            "description": null,
+            "doc_scope": "project",
+            "impact_policy": "track",
+            "lifecycle_status": "active",
+            "module_id": null,
+            "module_name": null,
+            "module_path": null,
+            "module_type": null,
+            "path": "README.md",
+            "risk_flags": [],
+            "source_class": "project_doc",
+            "source_kind": "readme",
+            "source_type": "readme",
+            "title": "NBO Permission Gate Contract Snapshot",
+            "url": null
+          },
+          "source_provenance": {
+            "origin_lane": "project",
+            "owner": "configured_repository"
+          },
+          "version_binding": null,
+          "why_selected": "selected as high-level project overview / usage documentation; ranked by lexical/vector relevance with neutral source weighting"
+        },
+        {
+          "content_boundary": {
+            "executable_policy": false,
+            "role": "cited_document_data",
+            "schema": "docmancer-document-data-v1"
+          },
+          "doc_scope": "project",
+          "freshness": "current",
+          "instruction_trust": "untrusted_data",
+          "origin_lane": "project",
+          "repository_authority": "ordinary_repository_document",
+          "risk_flags": [],
+          "source": {
+            "authority": "primary",
+            "description": null,
+            "doc_scope": "project",
+            "impact_policy": "track",
+            "lifecycle_status": "active",
+            "module_id": null,
+            "module_name": null,
+            "module_path": null,
+            "module_type": null,
+            "path": "README.md",
+            "risk_flags": [],
+            "source_class": "project_doc",
+            "source_kind": "readme",
+            "source_type": "readme",
+            "title": "Fixture map",
+            "url": null
+          },
+          "source_provenance": {
+            "origin_lane": "project",
+            "owner": "configured_repository"
+          },
+          "version_binding": null,
+          "why_selected": "selected as high-level project overview / usage documentation; ranked by lexical/vector relevance with neutral source weighting"
+        },
+        {
+          "content_boundary": {
+            "executable_policy": false,
+            "role": "cited_document_data",
+            "schema": "docmancer-document-data-v1"
+          },
+          "doc_scope": "project",
+          "freshness": "current",
+          "instruction_trust": "untrusted_data",
+          "origin_lane": "project",
+          "repository_authority": "ordinary_repository_document",
+          "risk_flags": [],
+          "source": {
+            "authority": "primary",
+            "description": null,
+            "doc_scope": "project",
+            "impact_policy": "track",
+            "lifecycle_status": "active",
+            "module_id": null,
+            "module_name": null,
+            "module_path": null,
+            "module_type": null,
+            "path": "README.md",
+            "risk_flags": [],
+            "source_class": "project_doc",
+            "source_kind": "readme",
+            "source_type": "readme",
+            "title": "Local constraints",
+            "url": null
+          },
+          "source_provenance": {
+            "origin_lane": "project",
+            "owner": "configured_repository"
+          },
+          "version_binding": null,
+          "why_selected": "selected as high-level project overview / usage documentation; ranked by lexical/vector relevance with neutral source weighting"
+        },
+        {
+          "content_boundary": {
+            "executable_policy": false,
+            "role": "cited_document_data",
+            "schema": "docmancer-document-data-v1"
+          },
+          "doc_scope": "project",
+          "freshness": "current",
+          "instruction_trust": "untrusted_data",
+          "origin_lane": "project",
+          "repository_authority": "ordinary_repository_document",
+          "risk_flags": [],
+          "source": {
+            "authority": "supporting",
+            "description": null,
+            "doc_scope": "project",
+            "impact_policy": "track",
+            "lifecycle_status": "active",
+            "module_id": null,
+            "module_name": null,
+            "module_path": null,
+            "module_type": null,
+            "path": "docs/permission-architecture.md",
+            "risk_flags": [],
+            "source_class": "project_doc",
+            "source_kind": "docs",
+            "source_type": "docs",
+            "title": "Permission Architecture",
+            "url": null
+          },
+          "source_provenance": {
+            "origin_lane": "project",
+            "owner": "configured_repository"
+          },
+          "version_binding": null,
+          "why_selected": "selected as internal architecture / pipeline documentation; ranked by lexical/vector relevance with neutral source weighting"
+        },
+        {
+          "content_boundary": {
+            "executable_policy": false,
+            "role": "cited_document_data",
+            "schema": "docmancer-document-data-v1"
+          },
+          "doc_scope": "project",
+          "freshness": "current",
+          "instruction_trust": "untrusted_data",
+          "origin_lane": "project",
+          "repository_authority": "ordinary_repository_document",
+          "risk_flags": [],
+          "source": {
+            "authority": "supporting",
+            "description": null,
+            "doc_scope": "project",
+            "impact_policy": "track",
+            "lifecycle_status": "active",
+            "module_id": null,
+            "module_name": null,
+            "module_path": null,
+            "module_type": null,
+            "path": "docs/offline-sync.md",
+            "risk_flags": [],
+            "source_class": "project_doc",
+            "source_kind": "docs",
+            "source_type": "docs",
+            "title": "Offline Sync Permission Contract",
+            "url": null
+          },
+          "source_provenance": {
+            "origin_lane": "project",
+            "owner": "configured_repository"
+          },
+          "version_binding": null,
+          "why_selected": "selected because it matched repo-owned project documentation for the question; ranked by lexical/vector relevance with neutral source weighting"
+        },
+        {
+          "content_boundary": {
+            "executable_policy": false,
+            "role": "cited_document_data",
+            "schema": "docmancer-document-data-v1"
+          },
+          "doc_scope": "project",
+          "freshness": "current",
+          "instruction_trust": "untrusted_data",
+          "origin_lane": "project",
+          "repository_authority": "ordinary_repository_document",
+          "risk_flags": [],
+          "source": {
+            "path": "tests/test_browser_permission_gate.py",
+            "source_class": "repo_map",
+            "title": "Source map: tests/test_browser_permission_gate.py"
+          },
+          "source_provenance": {
+            "origin_lane": "project",
+            "owner": "configured_repository"
+          },
+          "version_binding": null,
+          "why_selected": "compact static source map selected by deterministic query/path/symbol ranking"
+        },
+        {
+          "content_boundary": {
+            "executable_policy": false,
+            "role": "cited_document_data",
+            "schema": "docmancer-document-data-v1"
+          },
+          "doc_scope": "project",
+          "freshness": "current",
+          "instruction_trust": "untrusted_data",
+          "origin_lane": "project",
+          "repository_authority": "ordinary_repository_document",
+          "risk_flags": [],
+          "source": {
+            "path": "lib/modules/browser/application/browser_permission_gate.dart",
+            "source_class": "repo_map",
+            "title": "Source map: lib/modules/browser/application/browser_permission_gate.dart"
+          },
+          "source_provenance": {
+            "origin_lane": "project",
+            "owner": "configured_repository"
+          },
+          "version_binding": null,
+          "why_selected": "compact static source map selected by deterministic query/path/symbol ranking"
+        },
+        {
+          "content_boundary": {
+            "executable_policy": false,
+            "role": "cited_document_data",
+            "schema": "docmancer-document-data-v1"
+          },
+          "doc_scope": "project",
+          "freshness": "current",
+          "instruction_trust": "untrusted_data",
+          "origin_lane": "project",
+          "repository_authority": "ordinary_repository_document",
+          "risk_flags": [],
+          "source": {
+            "path": "lib/modules/sync/application/offline_sync_gate.dart",
+            "source_class": "repo_map",
+            "title": "Source map: lib/modules/sync/application/offline_sync_gate.dart"
+          },
+          "source_provenance": {
+            "origin_lane": "project",
+            "owner": "configured_repository"
+          },
+          "version_binding": null,
+          "why_selected": "compact static source map selected by deterministic query/path/symbol ranking"
+        },
+        {
+          "content_boundary": {
+            "executable_policy": false,
+            "role": "cited_document_data",
+            "schema": "docmancer-document-data-v1"
+          },
+          "doc_scope": "project",
+          "freshness": "current",
+          "instruction_trust": "untrusted_data",
+          "origin_lane": "project",
+          "repository_authority": "ordinary_repository_document",
+          "risk_flags": [],
+          "source": {
+            "path": "lib/modules/scan/application/scan_permission_gate.dart",
+            "source_class": "repo_map",
+            "title": "Source map: lib/modules/scan/application/scan_permission_gate.dart"
+          },
+          "source_provenance": {
+            "origin_lane": "project",
+            "owner": "configured_repository"
+          },
+          "version_binding": null,
+          "why_selected": "compact static source map selected by deterministic query/path/symbol ranking"
+        },
+        {
+          "content_boundary": {
+            "executable_policy": false,
+            "role": "cited_document_data",
+            "schema": "docmancer-document-data-v1"
+          },
+          "doc_scope": "project",
+          "freshness": "current",
+          "instruction_trust": "untrusted_data",
+          "origin_lane": "project",
+          "repository_authority": "ordinary_repository_document",
+          "risk_flags": [],
+          "source": {
+            "path": "lib/modules/review/application/permission_review_policy.dart",
+            "source_class": "repo_map",
+            "title": "Source map: lib/modules/review/application/permission_review_policy.dart"
+          },
+          "source_provenance": {
+            "origin_lane": "project",
+            "owner": "configured_repository"
+          },
+          "version_binding": null,
+          "why_selected": "compact static source map selected by deterministic query/path/symbol ranking"
+        },
+        {
+          "content_boundary": {
+            "executable_policy": false,
+            "role": "cited_document_data",
+            "schema": "docmancer-document-data-v1"
+          },
+          "doc_scope": "project",
+          "freshness": "current",
+          "instruction_trust": "untrusted_data",
+          "origin_lane": "project",
+          "repository_authority": "ordinary_repository_document",
+          "risk_flags": [],
+          "source": {
+            "path": "lib/modules/permission/application/permission_service.dart",
+            "source_class": "repo_map",
+            "title": "Source map: lib/modules/permission/application/permission_service.dart"
+          },
+          "source_provenance": {
+            "origin_lane": "project",
+            "owner": "configured_repository"
+          },
+          "version_binding": null,
+          "why_selected": "compact static source map selected by deterministic query/path/symbol ranking"
+        },
+        {
+          "content_boundary": {
+            "executable_policy": false,
+            "role": "cited_document_data",
+            "schema": "docmancer-document-data-v1"
+          },
+          "doc_scope": "project",
+          "freshness": "current",
+          "instruction_trust": "untrusted_data",
+          "origin_lane": "project",
+          "repository_authority": "ordinary_repository_document",
+          "risk_flags": [],
+          "source": {
+            "path": "lib/modules/permission/domain/permission_result.dart",
+            "source_class": "repo_map",
+            "title": "Source map: lib/modules/permission/domain/permission_result.dart"
+          },
+          "source_provenance": {
+            "origin_lane": "project",
+            "owner": "configured_repository"
+          },
+          "version_binding": null,
+          "why_selected": "compact static source map selected by deterministic query/path/symbol ranking"
+        },
+        {
+          "content_boundary": {
+            "executable_policy": false,
+            "role": "cited_document_data",
+            "schema": "docmancer-document-data-v1"
+          },
+          "doc_scope": "project",
+          "freshness": "current",
+          "instruction_trust": "untrusted_data",
+          "origin_lane": "project",
+          "repository_authority": "ordinary_repository_document",
+          "risk_flags": [],
+          "source": {
+            "path": "tests/test_browser_permission_gate.py",
+            "source_class": "code_graph",
+            "title": "Code graph: tests/test_browser_permission_gate.py"
+          },
+          "source_provenance": {
+            "origin_lane": "project",
+            "owner": "configured_repository"
+          },
+          "version_binding": null,
+          "why_selected": "symbol_match:test_scan_source_still_exposes_gate_for_cross_module_contract:+5.0[parser]; string_or_status_match:lib/modules/scan/application/scan_permission_gate.dart:+8.0[exact]; source_evidence_term:scan:+4.0[heuristic]; reference_match:ScanPermissionGate:+2.5[heuristic]; reference_match:scan_permission_gate:+2.5[heuristic]; unresolved_reference_search_hint:SCAN:+0.3[unresolved]; symbol_match:test_review_policy_remains_descriptive_not_entry_gate:+5.0[parser]; string_or_status_match:lib/modules/browser/application/browser_permission_gate.dart:+8.0[exact]; path_match:tests/test_browser_permission_gate.py:+5.0[exact]; source_evidence_term:gate:+4.0[heuristic]; reference_match:browser_permission_gate:+2.5[heuristic]; symbol_match:test_browser_blocks_partial_permission_result_even_with_offline_fallback:+5.0[parser]; source_evidence_term:offline:+4.0[heuristic]; source_evidence_term:browser:+4.0[heuristic]; unresolved_reference_search_hint:BROWSER:+0.3[unresolved]; string_or_status_match:lib/modules/permission/application/permission_service.dart:+8.0[exact]; string_or_status_match:lib/modules/review/application/permission_review_policy.dart:+8.0[exact]; string_or_status_match:{method}\\(PermissionResult result\\) \\{{([\\s\\S]*?)\\n  \\}}:+8.0[exact]; string_or_status_match:{path.name} must expose {method}(PermissionResult result):+8.0[exact]; source_evidence_term:permission:+4.0[heuristic]; reference_match:PermissionService:+2.5[heuristic]; reference_match:permission_service:+2.5[heuristic]; reference_match:PermissionDecision:+2.5[heuristic]; reference_match:permission_review_policy:+2.5[heuristic]; unresolved_reference_search_hint:PermissionResult:+0.3[unresolved]; connected_to_matched_file:tests/test_browser_permission_gate.py:+1.0[heuristic]"
+        }
+      ]
+    }
+  }
+}

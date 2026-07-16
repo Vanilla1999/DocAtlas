@@ -4,6 +4,11 @@ import os
 import traceback
 from typing import Any
 
+
+MAX_ERROR_MESSAGE_CHARS = 1_000
+MAX_ERROR_TRACEBACK_CHARS = 4_000
+MAX_ERROR_HINTS = 5
+
 _RETRYABLE_BY_REASON: dict[str, bool | None] = {
     "bad_request": False,
     "validation_error": False,
@@ -81,24 +86,56 @@ def build_mcp_error_payload(
     warnings: list[Any] | None = None,
     debug: bool = False,
 ) -> dict[str, Any]:
-    exception_type = type(exception).__name__ if exception is not None else None
+    bounded_message = _bounded_text(message, MAX_ERROR_MESSAGE_CHARS)
+    bounded_reason = _bounded_text(reason_code, 100)
+    exception_type = _bounded_text(type(exception).__name__, 200) if exception is not None else None
     error: dict[str, Any] = {
-        "reason_code": reason_code,
-        "message": message,
+        "reason_code": bounded_reason,
+        "message": bounded_message,
         "exception_type": exception_type,
         "retryable": _retryable_for(reason_code) if retryable is None else retryable,
-        "where": {"tool": tool, "handler": handler, "phase": phase},
-        "hints": _hints_for(reason_code, hints),
+        "where": {
+            "tool": _bounded_text(tool, 200) if tool is not None else None,
+            "handler": _bounded_text(handler, 200) if handler is not None else None,
+            "phase": _bounded_text(phase, 100),
+        },
+        "hints": [
+            _bounded_text(item, 500)
+            for item in _hints_for(reason_code, hints)[:MAX_ERROR_HINTS]
+        ],
     }
     if debug and exception is not None:
-        error["traceback"] = "".join(traceback.format_exception(type(exception), exception, exception.__traceback__))
+        error["traceback"] = _bounded_text(
+            "".join(traceback.format_exception(type(exception), exception, exception.__traceback__)),
+            MAX_ERROR_TRACEBACK_CHARS,
+        )
     return {
         "status": "failed",
         "error": error,
-        "reason_code": reason_code,
-        "message": message,
-        "warnings": list(warnings or []),
+        "reason_code": bounded_reason,
+        "message": bounded_message,
+        "warnings": [_bounded_warning(item) for item in list(warnings or [])[:MAX_ERROR_HINTS]],
     }
+
+
+def _bounded_text(value: Any, limit: int) -> str:
+    text = str(value or "")
+    if len(text) <= limit:
+        return text
+    return text[: max(0, limit - 1)] + "…"
+
+
+def _bounded_warning(value: Any) -> Any:
+    if isinstance(value, str):
+        return _bounded_text(value, 500)
+    if isinstance(value, dict):
+        allowed = ("code", "message", "reason", "path")
+        return {
+            key: _bounded_text(value[key], 500)
+            for key in allowed
+            if value.get(key) not in (None, "")
+        }
+    return _bounded_text(value, 500)
 
 
 def build_bad_request_payload(reason_code: str, message: str, *, tool: str | None = None) -> dict[str, Any]:

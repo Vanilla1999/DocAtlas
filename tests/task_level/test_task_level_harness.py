@@ -5,7 +5,7 @@ from dataclasses import replace
 from pathlib import Path
 
 from eval.task_level.conditions import CONDITIONS, DEFAULT_CONDITIONS
-from eval.task_level.execution import _archive_run_attempt, count_jsonl_records, execute_pilot, run_artifact_integrity, serialize_run_results_jsonl, write_run_progress
+from eval.task_level.execution import _archive_run_attempt, count_jsonl_records, execute_pilot, run_artifact_integrity, serialize_run_results_jsonl, shell_call_metrics, write_run_progress
 from eval.task_level.report import bootstrap_delta_ci, write_report
 from eval.task_level.runner import _causal_gate_error, load_tasks, run_smoke
 from eval.task_level.runners.base import RunnerCapabilities
@@ -79,6 +79,66 @@ def test_bootstrap_delta_ci_is_paired_and_directional():
     observed, low, high = ci
     assert observed == 0.5
     assert low <= observed <= high
+
+
+def test_shell_call_metrics_normalize_runner_shapes_test_commands_and_retries():
+    pytest_command = "/bin/bash -lc 'uv run --offline pytest tests/docs'"
+    metrics = shell_call_metrics([
+        {
+            "tool_name": "Bash",
+            "arguments": {"command": pytest_command},
+            "exit_code": 2,
+            "execution_status": "failed",
+        },
+        {
+            "tool_name": "Shell",
+            "arguments": {"command": pytest_command},
+            "exit_code": 0,
+            "execution_status": "completed",
+        },
+        {
+            "tool_name": "command_execution",
+            "arguments": {"command": "python -m pytest tests/unit"},
+            "status": "succeeded",
+        },
+        {
+            "tool_name": "bash.legacy",
+            "arguments": {"command": "flutter test", "executed": True},
+        },
+        {
+            "tool_name": "Bash",
+            "arguments": {"command": "rg -n pytest tests"},
+            "exit_code": 0,
+        },
+        {
+            "tool_name": "Edit",
+            "arguments": {"command": "pytest should not count"},
+        },
+    ])
+
+    assert metrics == {
+        "shell_calls": 5,
+        "successful_shell_calls": 3,
+        "failed_shell_calls": 1,
+        "unknown_shell_outcomes": 1,
+        "exec_error_count": 0,
+        "retried_command_count": 1,
+        "test_runs": 4,
+        "pytest_invocations": 3,
+    }
+
+
+def test_shell_exec_errors_are_distinct_from_nonzero_command_exits():
+    metrics = shell_call_metrics([
+        {"tool_name": "Shell", "arguments": {"command": "pytest a.py"}, "exit_code": 1},
+        {
+            "tool_name": "Shell", "arguments": {"command": "pytest b.py"},
+            "execution_status": "runner_failed", "is_error": True,
+        },
+    ])
+
+    assert metrics["failed_shell_calls"] == 2
+    assert metrics["exec_error_count"] == 1
 
 
 def _sample_run_result(index: int) -> dict[str, object]:

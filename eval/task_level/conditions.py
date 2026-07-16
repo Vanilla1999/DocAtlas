@@ -171,5 +171,20 @@ DEFAULT_CONDITIONS = (
     "docatlas_tool_recommended",
 )
 
+TOOL_REQUIRED_ONCE_INSTRUCTION = """
+Before making the first code edit, call the DocAtlas MCP tool
+`get_docs_context` exactly once.
+
+Use:
+- project_path="."
+- delivery_strategy="bounded_direct"
+- question="<original task objective>"
+
+Use the returned ActionPacket as the source of project constraints.
+Do not make another documentation retrieval call.
+Do not call `prepare_docs` in this benchmark lane; the documentation index
+has already been prepared by the harness.
+""".strip()
+
 
 DOCATLAS_OPTIONAL_ALIASES = {"docatlas_snippet_first", "docatlas_tool_optional"}

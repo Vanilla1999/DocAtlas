@@ -1,0 +1,21 @@
+{
+  "action_checklist_precision": 0.0,
+  "action_checklist_used": false,
+  "checklist_items": [],
+  "condition_id": "docatlas_tool_recommended",
+  "critical_contract_recall": 0.0,
+  "critical_contract_salience": 0.0,
+  "hidden_only_requirements_excluded": [],
+  "patch_contract_satisfaction": {
+    "behavioral_contract_score": 0.0,
+    "form_contract_score": 0.0,
+    "missing_requirements": [
+      "contract_not_defined"
+    ],
+    "project_convention_score": 0.0,
+    "satisfied_requirements": [],
+    "version_contract_score": null
+  },
+  "task_id": "decisive_nbo_cross_module_gate_large_001",
+  "warnings": []
+}
