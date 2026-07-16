@@ -1,0 +1,142 @@
+{
+  "candidates": [
+    {
+      "authority": "canonical",
+      "content_sha256": "7433ffc7f6ea15bdd4ce726f85fc7c37793d569223a6248cea0b2a1f2362e406",
+      "excerpt": "# Configure widget cache mode Set cache_mode in widget.toml. Supported values are bounded and disabled. ```toml cache_mode = \"bounded\" ```",
+      "rank": 1,
+      "ranking": {
+        "base_utility": 8.273062792974,
+        "candidate_pool_size": 2,
+        "feature_contributions": {
+          "leading_exact_phrase_boost": 2.0,
+          "task_action_title_boost": 1.5,
+          "title_term_boost": 6.0
+        },
+        "final_rank": 1,
+        "final_utility": 17.773062792974,
+        "rank_delta": 1,
+        "raw_component_ranks": {
+          "fts5_bm25_cost": -8.273062792974
+        },
+        "raw_rank": 2,
+        "score_direction": "higher_is_better",
+        "section_id": 2,
+        "stable_id": "lex-cde98ff32cc592ecc053"
+      },
+      "section": "Configure widget cache mode",
+      "source": "docs/configuration.md",
+      "stable_id": "lex-cde98ff32cc592ecc053",
+      "token_estimate": 35,
+      "version": "2.0"
+    },
+    {
+      "authority": "legal",
+      "content_sha256": "06241adb57207ab5f15fa76030449741ba1c08a77608da09ce8edada1a5844b0",
+      "excerpt": "# Terms and Conditions for configure widget cache mode configure widget cache mode configure widget cache mode configure widget cache mode. This legal agreement does not define product behavior.",
+      "rank": 2,
+      "ranking": {
+        "base_utility": 8.687095596603,
+        "candidate_pool_size": 2,
+        "feature_contributions": {
+          "boilerplate_title_penalty": -6.0,
+          "leading_exact_phrase_boost": 2.0,
+          "non_legal_query_legal_source_penalty": -4.0,
+          "task_action_title_boost": 1.5,
+          "title_term_boost": 6.0
+        },
+        "final_rank": 2,
+        "final_utility": 8.187095596603,
+        "rank_delta": -1,
+        "raw_component_ranks": {
+          "fts5_bm25_cost": -8.687095596603
+        },
+        "raw_rank": 1,
+        "score_direction": "higher_is_better",
+        "section_id": 11,
+        "stable_id": "lex-d3648ab7a53d3b844e9d"
+      },
+      "section": "Terms and Conditions for configure widget cache mode",
+      "source": "legal/terms.md",
+      "stable_id": "lex-d3648ab7a53d3b844e9d",
+      "token_estimate": 49,
+      "version": "unversioned"
+    }
+  ],
+  "capabilities": {
+    "dense": "not_requested",
+    "hybrid": "not_requested",
+    "lexical": "available",
+    "sparse": "not_requested"
+  },
+  "expected_sources": [
+    {
+      "relevance": 3,
+      "source": "docs/configuration.md"
+    }
+  ],
+  "first_expected_rank": 1,
+  "forbidden_source_hits": [
+    "legal/terms.md"
+  ],
+  "forbidden_version_hits": [],
+  "found_facts": [
+    "cache_mode",
+    "widget.toml"
+  ],
+  "id": "legal_title_distractor",
+  "metrics": {
+    "authoritative_source_at_1": true,
+    "candidate_tokens": 84,
+    "degraded_mode": false,
+    "duplicate_rate@5": 0.0,
+    "exact_identifier_at_1": null,
+    "forbidden_source_violation": true,
+    "forbidden_version_violation": false,
+    "insufficient_evidence_pass": null,
+    "latency_ms": 1.0382070031482726,
+    "model_visible_tokens": 286,
+    "ndcg@20": 1.0,
+    "recall@1": 1.0,
+    "recall@20": 1.0,
+    "recall@3": 1.0,
+    "recall@5": 1.0,
+    "reciprocal_rank": 1.0,
+    "required_fact_pass": true,
+    "required_facts_per_1000_model_visible_tokens": 6.993006993006993,
+    "selected_evidence_tokens": 84,
+    "snippet_required_pass": true,
+    "unique_sources@5": 2,
+    "unknown_version_rate": 0.0
+  },
+  "paraphrase_group": "cache_mode_configuration",
+  "projection": {
+    "estimated_tokens": 286,
+    "kind": "docs_answer",
+    "source_content_hashes": [
+      "183911f8a85268cced9a2ff52f94c0f55850bbc75aa5f403daefbb1e4c6ba059",
+      "5d0e12c66496b41aa83769289e380b249c078e2c494833b6cea3382a5f9be13a"
+    ],
+    "source_evidence_ids": [
+      "ev-b2251825b6dc8fad",
+      "ev-4e43b9fadabdfab1"
+    ],
+    "source_paths": [
+      "docs/configuration.md",
+      "legal/terms.md"
+    ],
+    "status": "ok"
+  },
+  "query": "configure widget cache mode",
+  "required_facts": [
+    "cache_mode",
+    "widget.toml"
+  ],
+  "schema_version": "retrieval-quality-case-result-v1",
+  "selected_evidence_ids": [
+    "lex-cde98ff32cc592ecc053",
+    "lex-d3648ab7a53d3b844e9d"
+  ],
+  "split": "adversarial",
+  "taxonomy_class": "legal_distractor"
+}

@@ -1,0 +1,102 @@
+{
+  "candidates": [
+    {
+      "authority": "canonical",
+      "content_sha256": "d545e007b1aa51c2d815a6d4db508c705dbb29b988e892458975b8a4ccff8d0c",
+      "excerpt": "# Ограничение нагрузки очереди Ограниченная очередь защищает медленного потребителя: производитель приостанавливается при достижении верхнего порога нагрузки.",
+      "rank": 1,
+      "ranking": {
+        "base_utility": 11.903141934047,
+        "candidate_pool_size": 1,
+        "feature_contributions": {
+          "title_term_boost": 3.0
+        },
+        "final_rank": 1,
+        "final_utility": 14.903141934047,
+        "rank_delta": 0,
+        "raw_component_ranks": {
+          "fts5_bm25_cost": -11.903141934047
+        },
+        "raw_rank": 1,
+        "score_direction": "higher_is_better",
+        "section_id": 9,
+        "stable_id": "lex-9df484285789d68aa56b"
+      },
+      "section": "Ограничение нагрузки очереди",
+      "source": "docs/ru-backpressure.md",
+      "stable_id": "lex-9df484285789d68aa56b",
+      "token_estimate": 40,
+      "version": "2.0"
+    }
+  ],
+  "capabilities": {
+    "dense": "not_requested",
+    "hybrid": "not_requested",
+    "lexical": "available",
+    "sparse": "not_requested"
+  },
+  "expected_sources": [
+    {
+      "relevance": 3,
+      "source": "docs/ru-backpressure.md"
+    }
+  ],
+  "first_expected_rank": 1,
+  "forbidden_source_hits": [],
+  "forbidden_version_hits": [],
+  "found_facts": [
+    "медленного потребителя",
+    "верхнего порога"
+  ],
+  "id": "russian_paraphrase",
+  "metrics": {
+    "authoritative_source_at_1": true,
+    "candidate_tokens": 40,
+    "degraded_mode": false,
+    "duplicate_rate@5": 0.0,
+    "exact_identifier_at_1": null,
+    "forbidden_source_violation": false,
+    "forbidden_version_violation": false,
+    "insufficient_evidence_pass": null,
+    "latency_ms": 0.8987879991764203,
+    "model_visible_tokens": 255,
+    "ndcg@20": 1.0,
+    "recall@1": 1.0,
+    "recall@20": 1.0,
+    "recall@3": 1.0,
+    "recall@5": 1.0,
+    "reciprocal_rank": 1.0,
+    "required_fact_pass": true,
+    "required_facts_per_1000_model_visible_tokens": 7.8431372549019605,
+    "selected_evidence_tokens": 40,
+    "snippet_required_pass": null,
+    "unique_sources@5": 1,
+    "unknown_version_rate": 0.0
+  },
+  "paraphrase_group": "bounded_backpressure",
+  "projection": {
+    "estimated_tokens": 255,
+    "kind": "docs_answer",
+    "source_content_hashes": [
+      "00b40366ed5a3aee81331babde55a3ef37ec150f0d6ba869564c814c7982dc34"
+    ],
+    "source_evidence_ids": [
+      "ev-1bf20f43f19682ba"
+    ],
+    "source_paths": [
+      "docs/ru-backpressure.md"
+    ],
+    "status": "ok"
+  },
+  "query": "очередь ограничение нагрузки производитель потребитель",
+  "required_facts": [
+    "медленного потребителя",
+    "верхнего порога"
+  ],
+  "schema_version": "retrieval-quality-case-result-v1",
+  "selected_evidence_ids": [
+    "lex-9df484285789d68aa56b"
+  ],
+  "split": "holdout",
+  "taxonomy_class": "russian_paraphrase"
+}

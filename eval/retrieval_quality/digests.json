@@ -1,0 +1,9 @@
+{
+  "schema_version": "retrieval-quality-digests-v1",
+  "corpus": "aa7a75c3c677637fe9e72b91cf1fe0b757097db9772e16be3ef3f0f6c52ca1c5",
+  "datasets": {
+    "adversarial": "bb27912453799b058f486f3b00c07601636a79fd311e76b926b3c44a93163163",
+    "development": "82d288b48c90cac8d4554fdf9e88cb1f6b4ce6116ad581b923eb3574ead3e294",
+    "holdout": "b952111a1c76834f1e44956aefc370fd140dc6ae2af437dfbed54e180d6a37e3"
+  }
+}

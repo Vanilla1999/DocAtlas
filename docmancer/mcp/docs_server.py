@@ -110,7 +110,15 @@ PUBLIC_GET_DOCS_CONTEXT_OUTPUT_SCHEMA: dict[str, Any] = {
     "type": "object",
     "required": ["status"],
     "properties": {
-        "status": {"enum": ["ok", "truncated", "insufficient_evidence", "failed"]},
+        # The advertised tool defaults to the canonical bounded projection,
+        # but explicitly requested compatibility output keeps the underlying
+        # unified-context lifecycle status.  MCP clients validate both shapes
+        # against this one output schema before returning the tool result.
+        "status": {"enum": [
+            "ok", "truncated", "insufficient_evidence", "failed",
+            "success", "partial_success", "confirmation_required",
+            "not_found", "invalid_request",
+        ]},
         "kind": {"enum": ["docs_answer", "patch_context"]},
         "estimated_tokens": {"type": "integer"},
         "reason_code": {"type": "string"},

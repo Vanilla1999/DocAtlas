@@ -1,0 +1,102 @@
+{
+  "candidates": [
+    {
+      "authority": "canonical",
+      "content_sha256": "f5eb2d83112c04a9a2e0d964d74d15944f53ddac8a3a8eafec7a1c58c03fedf9",
+      "excerpt": "# WidgetClient version 2 migration In version 2, fetch_record is async. Migrate by awaiting WidgetClient.fetch_record and remove the legacy blocking adapter.",
+      "rank": 1,
+      "ranking": {
+        "base_utility": 9.966314935296,
+        "candidate_pool_size": 1,
+        "feature_contributions": {
+          "title_term_boost": 4.5
+        },
+        "final_rank": 1,
+        "final_utility": 14.466314935296,
+        "rank_delta": 0,
+        "raw_component_ranks": {
+          "fts5_bm25_cost": -9.966314935296
+        },
+        "raw_rank": 1,
+        "score_direction": "higher_is_better",
+        "section_id": 6,
+        "stable_id": "lex-97cb7d3764a92933ade6"
+      },
+      "section": "WidgetClient version 2 migration",
+      "source": "docs/migration-v2.md",
+      "stable_id": "lex-97cb7d3764a92933ade6",
+      "token_estimate": 40,
+      "version": "2.0"
+    }
+  ],
+  "capabilities": {
+    "dense": "not_requested",
+    "hybrid": "not_requested",
+    "lexical": "available",
+    "sparse": "not_requested"
+  },
+  "expected_sources": [
+    {
+      "relevance": 3,
+      "source": "docs/migration-v2.md"
+    }
+  ],
+  "first_expected_rank": 1,
+  "forbidden_source_hits": [],
+  "forbidden_version_hits": [],
+  "found_facts": [
+    "version 2",
+    "async"
+  ],
+  "id": "stale_version_distractor",
+  "metrics": {
+    "authoritative_source_at_1": true,
+    "candidate_tokens": 40,
+    "degraded_mode": false,
+    "duplicate_rate@5": 0.0,
+    "exact_identifier_at_1": null,
+    "forbidden_source_violation": false,
+    "forbidden_version_violation": false,
+    "insufficient_evidence_pass": null,
+    "latency_ms": 0.8202860044548288,
+    "model_visible_tokens": 178,
+    "ndcg@20": 1.0,
+    "recall@1": 1.0,
+    "recall@20": 1.0,
+    "recall@3": 1.0,
+    "recall@5": 1.0,
+    "reciprocal_rank": 1.0,
+    "required_fact_pass": true,
+    "required_facts_per_1000_model_visible_tokens": 11.235955056179776,
+    "selected_evidence_tokens": 40,
+    "snippet_required_pass": null,
+    "unique_sources@5": 1,
+    "unknown_version_rate": 0.0
+  },
+  "paraphrase_group": "widgetclient_v2_migration",
+  "projection": {
+    "estimated_tokens": 178,
+    "kind": "docs_answer",
+    "source_content_hashes": [
+      "caa4da3084faee7cd58b1f8c2bd726a3a58101df3ef137149d36e4e78dbd8514"
+    ],
+    "source_evidence_ids": [
+      "ev-15f4fd85e932fe77"
+    ],
+    "source_paths": [
+      "docs/migration-v2.md"
+    ],
+    "status": "ok"
+  },
+  "query": "WidgetClient version 2 fetch_record async",
+  "required_facts": [
+    "version 2",
+    "async"
+  ],
+  "schema_version": "retrieval-quality-case-result-v1",
+  "selected_evidence_ids": [
+    "lex-97cb7d3764a92933ade6"
+  ],
+  "split": "adversarial",
+  "taxonomy_class": "wrong_version_distractor"
+}

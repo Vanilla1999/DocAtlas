@@ -1,0 +1,102 @@
+{
+  "candidates": [
+    {
+      "authority": "canonical",
+      "content_sha256": "7e3910e53bfa18695a0061f935ab879bb9462df28242acb88abf5ae2e96898e8",
+      "excerpt": "# widget-sync command reference Run widget-sync --dry-run to validate a synchronization without changing stored records.",
+      "rank": 1,
+      "ranking": {
+        "base_utility": 9.675184884509,
+        "candidate_pool_size": 1,
+        "feature_contributions": {
+          "title_term_boost": 3.0
+        },
+        "final_rank": 1,
+        "final_utility": 12.675184884509,
+        "rank_delta": 0,
+        "raw_component_ranks": {
+          "fts5_bm25_cost": -9.675184884509
+        },
+        "raw_rank": 1,
+        "score_direction": "higher_is_better",
+        "section_id": 3,
+        "stable_id": "lex-38f13fc9dd762e64222c"
+      },
+      "section": "widget-sync command reference",
+      "source": "docs/cli.md",
+      "stable_id": "lex-38f13fc9dd762e64222c",
+      "token_estimate": 31,
+      "version": "2.0"
+    }
+  ],
+  "capabilities": {
+    "dense": "not_requested",
+    "hybrid": "not_requested",
+    "lexical": "available",
+    "sparse": "not_requested"
+  },
+  "expected_sources": [
+    {
+      "relevance": 3,
+      "source": "docs/cli.md"
+    }
+  ],
+  "first_expected_rank": 1,
+  "forbidden_source_hits": [],
+  "forbidden_version_hits": [],
+  "found_facts": [
+    "widget-sync",
+    "--dry-run"
+  ],
+  "id": "cli_flag",
+  "metrics": {
+    "authoritative_source_at_1": true,
+    "candidate_tokens": 31,
+    "degraded_mode": false,
+    "duplicate_rate@5": 0.0,
+    "exact_identifier_at_1": true,
+    "forbidden_source_violation": false,
+    "forbidden_version_violation": false,
+    "insufficient_evidence_pass": null,
+    "latency_ms": 1.0087840055348352,
+    "model_visible_tokens": 156,
+    "ndcg@20": 1.0,
+    "recall@1": 1.0,
+    "recall@20": 1.0,
+    "recall@3": 1.0,
+    "recall@5": 1.0,
+    "reciprocal_rank": 1.0,
+    "required_fact_pass": true,
+    "required_facts_per_1000_model_visible_tokens": 12.820512820512821,
+    "selected_evidence_tokens": 31,
+    "snippet_required_pass": null,
+    "unique_sources@5": 1,
+    "unknown_version_rate": 0.0
+  },
+  "paraphrase_group": null,
+  "projection": {
+    "estimated_tokens": 156,
+    "kind": "docs_answer",
+    "source_content_hashes": [
+      "f523adbe6a112d8b887b228681319effedbfb50f253b5641c90d6f96434b60ca"
+    ],
+    "source_evidence_ids": [
+      "ev-dd2f568a9eefcc93"
+    ],
+    "source_paths": [
+      "docs/cli.md"
+    ],
+    "status": "ok"
+  },
+  "query": "widget sync dry run",
+  "required_facts": [
+    "widget-sync",
+    "--dry-run"
+  ],
+  "schema_version": "retrieval-quality-case-result-v1",
+  "selected_evidence_ids": [
+    "lex-38f13fc9dd762e64222c"
+  ],
+  "split": "development",
+  "taxonomy_class": "cli_flag"
+}

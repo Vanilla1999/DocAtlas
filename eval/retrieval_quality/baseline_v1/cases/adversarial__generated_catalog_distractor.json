@@ -1,0 +1,139 @@
+{
+  "candidates": [
+    {
+      "authority": "canonical",
+      "content_sha256": "a0670d0567fcb5f9ace882d725c7d8331f608fbf3d091c53bb7d789076edf786",
+      "excerpt": "# E_WIDGET_42 retry budget E_WIDGET_42 means the retry budget was exhausted. Inspect backoff configuration and retry at most three times.",
+      "rank": 1,
+      "ranking": {
+        "base_utility": 7.752800151905,
+        "candidate_pool_size": 2,
+        "feature_contributions": {
+          "leading_exact_phrase_boost": 2.0,
+          "title_term_boost": 4.5
+        },
+        "final_rank": 1,
+        "final_utility": 14.252800151905,
+        "rank_delta": 1,
+        "raw_component_ranks": {
+          "fts5_bm25_cost": -7.752800151905
+        },
+        "raw_rank": 2,
+        "score_direction": "higher_is_better",
+        "section_id": 4,
+        "stable_id": "lex-f1fc1139c3dd23dada8f"
+      },
+      "section": "E_WIDGET_42 retry budget",
+      "source": "docs/errors.md",
+      "stable_id": "lex-f1fc1139c3dd23dada8f",
+      "token_estimate": 35,
+      "version": "2.0"
+    },
+    {
+      "authority": "generated",
+      "content_sha256": "2f9847615c7923faaa1f648d77139c58e9e416c80c97ef04c56b60b9610295db",
+      "excerpt": "# Generated E_WIDGET_42 retry budget catalog E_WIDGET_42 retry budget E_WIDGET_42 retry budget. Generated navigation only; consult the canonical error guide.",
+      "rank": 2,
+      "ranking": {
+        "base_utility": 7.920006361424,
+        "candidate_pool_size": 2,
+        "feature_contributions": {
+          "generated_authority_penalty": -3.0,
+          "leading_exact_phrase_boost": 2.0,
+          "title_term_boost": 4.5
+        },
+        "final_rank": 2,
+        "final_utility": 11.420006361424,
+        "rank_delta": -1,
+        "raw_component_ranks": {
+          "fts5_bm25_cost": -7.920006361424
+        },
+        "raw_rank": 1,
+        "score_direction": "higher_is_better",
+        "section_id": 12,
+        "stable_id": "lex-6d2c1c07f089729eabc5"
+      },
+      "section": "Generated E_WIDGET_42 retry budget catalog",
+      "source": "generated/error-catalog.md",
+      "stable_id": "lex-6d2c1c07f089729eabc5",
+      "token_estimate": 40,
+      "version": "2.0"
+    }
+  ],
+  "capabilities": {
+    "dense": "not_requested",
+    "hybrid": "not_requested",
+    "lexical": "available",
+    "sparse": "not_requested"
+  },
+  "expected_sources": [
+    {
+      "relevance": 3,
+      "source": "docs/errors.md"
+    }
+  ],
+  "first_expected_rank": 1,
+  "forbidden_source_hits": [
+    "generated/error-catalog.md"
+  ],
+  "forbidden_version_hits": [],
+  "found_facts": [
+    "exhausted",
+    "backoff"
+  ],
+  "id": "generated_catalog_distractor",
+  "metrics": {
+    "authoritative_source_at_1": true,
+    "candidate_tokens": 75,
+    "degraded_mode": false,
+    "duplicate_rate@5": 0.0,
+    "exact_identifier_at_1": null,
+    "forbidden_source_violation": true,
+    "forbidden_version_violation": false,
+    "insufficient_evidence_pass": null,
+    "latency_ms": 0.9938029979821295,
+    "model_visible_tokens": 269,
+    "ndcg@20": 1.0,
+    "recall@1": 1.0,
+    "recall@20": 1.0,
+    "recall@3": 1.0,
+    "recall@5": 1.0,
+    "reciprocal_rank": 1.0,
+    "required_fact_pass": true,
+    "required_facts_per_1000_model_visible_tokens": 7.434944237918216,
+    "selected_evidence_tokens": 75,
+    "snippet_required_pass": null,
+    "unique_sources@5": 2,
+    "unknown_version_rate": 0.0
+  },
+  "paraphrase_group": "widget_retry_error",
+  "projection": {
+    "estimated_tokens": 269,
+    "kind": "docs_answer",
+    "source_content_hashes": [
+      "39c36adbcc1692af3ecb221b7849eb43728a3fa5aeab51b140438151f395d583",
+      "b2ac1f13c16b9efd4b7876ff993b49ae8e27af41aa76e3fc32402b870d87b2f0"
+    ],
+    "source_evidence_ids": [
+      "ev-bc22584e143984f5",
+      "ev-cafb8582317b1c69"
+    ],
+    "source_paths": [
+      "docs/errors.md",
+      "generated/error-catalog.md"
+    ],
+    "status": "ok"
+  },
+  "query": "E_WIDGET_42 retry budget",
+  "required_facts": [
+    "exhausted",
+    "backoff"
+  ],
+  "schema_version": "retrieval-quality-case-result-v1",
+  "selected_evidence_ids": [
+    "lex-f1fc1139c3dd23dada8f",
+    "lex-6d2c1c07f089729eabc5"
+  ],
+  "split": "adversarial",
+  "taxonomy_class": "generated_distractor"
+}

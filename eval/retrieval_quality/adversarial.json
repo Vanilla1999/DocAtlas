@@ -1,0 +1,63 @@
+{
+  "schema_version": "retrieval-quality-cases-v1",
+  "split": "adversarial",
+  "cases": [
+    {
+      "id": "legal_title_distractor",
+      "taxonomy_class": "legal_distractor",
+      "paraphrase_group": "cache_mode_configuration",
+      "query": "configure widget cache mode",
+      "expected_sources": [{"source": "docs/configuration.md", "relevance": 3}],
+      "required_facts": ["cache_mode", "widget.toml"],
+      "forbidden_sources": ["legal/terms.md"],
+      "requires_code_snippet": true,
+      "expected_authority": "canonical"
+    },
+    {
+      "id": "stale_version_distractor",
+      "taxonomy_class": "wrong_version_distractor",
+      "paraphrase_group": "widgetclient_v2_migration",
+      "query": "WidgetClient version 2 fetch_record async",
+      "expected_sources": [{"source": "docs/migration-v2.md", "relevance": 3}],
+      "required_facts": ["version 2", "async"],
+      "forbidden_sources": ["archive/widget-v1.md"],
+      "forbidden_versions": ["1.0"],
+      "requires_code_snippet": false,
+      "expected_authority": "canonical"
+    },
+    {
+      "id": "unversioned_mirror_distractor",
+      "taxonomy_class": "locale_mirror_distractor",
+      "paraphrase_group": "widgetclient_fetch_record",
+      "query": "WidgetClient fetch_record timeout API",
+      "expected_sources": [{"source": "docs/api-client.md", "relevance": 3}],
+      "required_facts": ["timeout", "record_id"],
+      "forbidden_sources": ["mirrors/api-client-es.md"],
+      "forbidden_versions": ["unknown"],
+      "requires_code_snippet": true,
+      "expected_authority": "canonical"
+    },
+    {
+      "id": "generated_catalog_distractor",
+      "taxonomy_class": "generated_distractor",
+      "paraphrase_group": "widget_retry_error",
+      "query": "E_WIDGET_42 retry budget",
+      "expected_sources": [{"source": "docs/errors.md", "relevance": 3}],
+      "required_facts": ["exhausted", "backoff"],
+      "forbidden_sources": ["generated/error-catalog.md"],
+      "requires_code_snippet": false,
+      "expected_authority": "canonical"
+    },
+    {
+      "id": "project_over_generic",
+      "taxonomy_class": "authority_conflict",
+      "paraphrase_group": "docatlas_offline_policy",
+      "query": "DocAtlas offline source policy repository rule",
+      "expected_sources": [{"source": "docs/project-policy.md", "relevance": 3}],
+      "required_facts": ["project decisions", "generic external"],
+      "forbidden_sources": ["external/generic-policy.md"],
+      "requires_code_snippet": false,
+      "expected_authority": "project_rule"
+    }
+  ]
+}

@@ -1,0 +1,104 @@
+{
+  "schema_version": "retrieval-quality-corpus-v1",
+  "corpus_id": "docatlas-synthetic-docs-v1",
+  "documents": [
+    {
+      "source": "docs/api-client.md",
+      "title": "WidgetClient fetch_record API",
+      "authority": "canonical",
+      "version": "2.0",
+      "content": "# WidgetClient fetch_record API\n\nWidgetClient.fetch_record(record_id, timeout=5) fetches one record. The timeout argument is measured in seconds.\n\n```python\nrecord = WidgetClient().fetch_record(record_id=\"r-7\", timeout=5)\n```"
+    },
+    {
+      "source": "docs/configuration.md",
+      "title": "Configure widget cache mode",
+      "authority": "canonical",
+      "version": "2.0",
+      "content": "# Configure widget cache mode\n\nSet cache_mode in widget.toml. Supported values are bounded and disabled.\n\n```toml\ncache_mode = \"bounded\"\n```"
+    },
+    {
+      "source": "docs/cli.md",
+      "title": "widget-sync command reference",
+      "authority": "canonical",
+      "version": "2.0",
+      "content": "# widget-sync command reference\n\nRun widget-sync --dry-run to validate a synchronization without changing stored records."
+    },
+    {
+      "source": "docs/errors.md",
+      "title": "E_WIDGET_42 retry budget",
+      "authority": "canonical",
+      "version": "2.0",
+      "content": "# E_WIDGET_42 retry budget\n\nE_WIDGET_42 means the retry budget was exhausted. Inspect backoff configuration and retry at most three times."
+    },
+    {
+      "source": "docs/backpressure.md",
+      "title": "Queue backpressure",
+      "authority": "canonical",
+      "version": "2.0",
+      "content": "# Queue backpressure\n\nBackpressure keeps a fast producer from overwhelming a slow consumer. Use a bounded queue and pause the producer at the high-water mark."
+    },
+    {
+      "source": "docs/migration-v2.md",
+      "title": "WidgetClient version 2 migration",
+      "authority": "canonical",
+      "version": "2.0",
+      "content": "# WidgetClient version 2 migration\n\nIn version 2, fetch_record is async. Migrate by awaiting WidgetClient.fetch_record and remove the legacy blocking adapter."
+    },
+    {
+      "source": "docs/project-policy.md",
+      "title": "DocAtlas canonical offline source policy",
+      "authority": "project_rule",
+      "version": "project",
+      "content": "# DocAtlas canonical offline source policy\n\nThis repository rule makes repository-owned documentation authoritative for project decisions. Offline retrieval must not silently substitute generic external guidance."
+    },
+    {
+      "source": "docs/cross-module.md",
+      "title": "Gateway worker idempotency contract",
+      "authority": "project_rule",
+      "version": "project",
+      "content": "# Gateway worker idempotency contract\n\nThe gateway creates an idempotency key and the worker persists it before acknowledgement. Both modules must preserve the same request identifier."
+    },
+    {
+      "source": "docs/ru-backpressure.md",
+      "title": "Ограничение нагрузки очереди",
+      "authority": "canonical",
+      "version": "2.0",
+      "content": "# Ограничение нагрузки очереди\n\nОграниченная очередь защищает медленного потребителя: производитель приостанавливается при достижении верхнего порога нагрузки."
+    },
+    {
+      "source": "archive/widget-v1.md",
+      "title": "WidgetClient version 1 fetch_record",
+      "authority": "stale",
+      "version": "1.0",
+      "content": "# WidgetClient version 1 fetch_record\n\nIn version 1, WidgetClient fetch_record is blocking and uses the legacy adapter."
+    },
+    {
+      "source": "legal/terms.md",
+      "title": "Terms and Conditions for configure widget cache mode",
+      "authority": "legal",
+      "version": "unversioned",
+      "content": "# Terms and Conditions for configure widget cache mode\n\nconfigure widget cache mode configure widget cache mode configure widget cache mode. This legal agreement does not define product behavior."
+    },
+    {
+      "source": "generated/error-catalog.md",
+      "title": "Generated E_WIDGET_42 retry budget catalog",
+      "authority": "generated",
+      "version": "2.0",
+      "content": "# Generated E_WIDGET_42 retry budget catalog\n\nE_WIDGET_42 retry budget E_WIDGET_42 retry budget. Generated navigation only; consult the canonical error guide."
+    },
+    {
+      "source": "mirrors/api-client-es.md",
+      "title": "WidgetClient fetch_record unofficial mirror",
+      "authority": "mirror",
+      "version": "unknown",
+      "content": "# WidgetClient fetch_record unofficial mirror\n\nWidgetClient fetch_record official API copy. This mirror has no verified version binding."
+    },
+    {
+      "source": "external/generic-policy.md",
+      "title": "Generic offline documentation policy",
+      "authority": "external_generic",
+      "version": "unversioned",
+      "content": "# Generic offline documentation policy\n\nGeneric offline source policy advice may differ from the DocAtlas repository rule."
+    }
+  ]
+}

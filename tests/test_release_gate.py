@@ -61,6 +61,24 @@ def test_stdio_smoke_requires_cited_content() -> None:
     assert "assert NEEDLE in rendered" in text
 
 
+def test_stdio_smoke_accepts_structured_content_and_legacy_json_text() -> None:
+    from scripts.docs_mcp_stdio_smoke import payload
+
+    class Text:
+        def __init__(self, text: str) -> None:
+            self.text = text
+
+    class Result:
+        def __init__(self, *, structured=None, text: str = "") -> None:
+            if structured is not None:
+                self.structuredContent = structured
+            self.content = [Text(text)]
+
+    expected = {"status": "ok", "kind": "docs_answer"}
+    assert payload(Result(structured=expected, text="not JSON")) is expected
+    assert payload(Result(text='{"status": "ok", "kind": "docs_answer"}')) == expected
+
+
 def test_installer_compares_exact_version_output() -> None:
     text = (ROOT / "scripts/install.sh").read_text()
     assert '[ "$INSTALLED_VERSION" = "doc-atlas $EXPECTED_VERSION" ]' in text

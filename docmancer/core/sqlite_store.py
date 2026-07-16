@@ -38,6 +38,40 @@ _QUERY_STOPWORDS = frozenset({
     "be", "have", "has", "will", "we", "you", "your", "me",
 })
 
+INDEX_SCHEMA_VERSION = "sqlite-sections-v1"
+
+
+@dataclass(frozen=True, slots=True)
+class RankingCandidate:
+    """Auditable lexical candidate with one explicit score direction.
+
+    SQLite FTS5 exposes BM25 as a lower-is-better cost.  DocAtlas converts
+    that cost to a higher-is-better utility before applying named features;
+    callers never have to infer whether adding a value is a boost or penalty.
+    """
+
+    stable_id: str
+    section_id: int
+    raw_component_ranks: tuple[tuple[str, float], ...]
+    base_utility: float
+    feature_contributions: tuple[tuple[str, float], ...]
+    final_utility: float
+
+    def trace(self) -> dict[str, Any]:
+        return {
+            "stable_id": self.stable_id,
+            "section_id": self.section_id,
+            "score_direction": "higher_is_better",
+            "raw_component_ranks": {
+                name: round(value, 12) for name, value in self.raw_component_ranks
+            },
+            "base_utility": round(self.base_utility, 12),
+            "feature_contributions": {
+                name: round(value, 12) for name, value in self.feature_contributions
+            },
+            "final_utility": round(self.final_utility, 12),
+        }
+
 
 @dataclass(slots=True)
 class IndexResult:
@@ -476,54 +510,34 @@ class SQLiteStore:
     ) -> list[RetrievedChunk]:
         expand_mode = expand or "none"
         rows = [dict(r) for r in self._search_rows(text, max(limit * 4, limit), filters=filters)]
-
-        # --- Re-ranking passes (BM25 rank is negative, lower = better) ---
-        query_lower = text.lower()
         content_terms = set(re.findall(r"\w+", self._strip_stopwords(text).lower()))
-
-        for r in rows:
-            tokens = int(r["token_estimate"])
-            title_lower = r["title"].lower()
-            title_words = set(re.findall(r"\w+", title_lower))
-            text_lower = r["text"].lower()
-
-            # 1. Penalize long sections to prefer focused matches.
-            if tokens > 600:
-                r["rank"] -= 0.3 * (tokens - 600) / 600
-
-            # 2. Penalize boilerplate/legal sections.  Use keyword overlap
-            #    so numbered headings ("12. Miscellaneous") and subsections
-            #    ("1. Modifications") are caught, not just exact titles.
-            boilerplate_overlap = title_words & _BOILERPLATE_KEYWORDS
-            if boilerplate_overlap:
-                # Scale penalty by how many boilerplate keywords match.
-                r["rank"] -= 3.0 * len(boilerplate_overlap)
-
-            # 3. Boost sections where content terms appear in the title.
-            title_term_overlap = title_words & content_terms
-            if title_term_overlap:
-                r["rank"] += 1.5 * len(title_term_overlap)
-
-            # 4. Boost sections where the stripped query phrase appears
-            #    verbatim in the first 500 chars of body text.
-            stripped_query = self._strip_stopwords(text).lower()
-            if stripped_query and stripped_query in text_lower[:500]:
-                r["rank"] += 2.0
-
-            # 5. Boost sections with action verbs in the title when the
-            #    query is task-oriented.
-            _task_signals = {"how", "create", "setup", "set", "configure",
-                             "install", "add", "build", "deploy", "start",
-                             "connect", "enable", "generate", "register"}
-            if content_terms & _task_signals:
-                _action_verbs = {"create", "set", "setup", "configure",
-                                 "install", "add", "build", "deploy", "start",
-                                 "connect", "enable", "initialize", "register",
-                                 "sign", "generate", "getting", "started"}
-                if title_words & _action_verbs:
-                    r["rank"] += 1.5
-
-        rows.sort(key=lambda r: r["rank"])
+        ranked = [(self._ranking_candidate(row, text, content_terms), row) for row in rows]
+        raw_order = {
+            candidate.stable_id: index
+            for index, (candidate, _) in enumerate(
+                sorted(
+                    ranked,
+                    key=lambda item: (
+                        dict(item[0].raw_component_ranks)["fts5_bm25_cost"],
+                        item[0].stable_id,
+                    ),
+                ),
+                start=1,
+            )
+        }
+        ranked.sort(key=lambda item: (-item[0].final_utility, item[0].stable_id))
+        for final_rank, (candidate, row) in enumerate(ranked, start=1):
+            trace = candidate.trace()
+            trace.update(
+                {
+                    "raw_rank": raw_order[candidate.stable_id],
+                    "final_rank": final_rank,
+                    "rank_delta": raw_order[candidate.stable_id] - final_rank,
+                    "candidate_pool_size": len(ranked),
+                }
+            )
+            row["_ranking_trace"] = trace
+        rows = [row for _, row in ranked]
         selected: list[dict] = []
         used_ids: set[int] = set()
         seen_content: set[str] = set()
@@ -573,6 +587,8 @@ class SQLiteStore:
                     "runway_multiplier": round(runway, 2),
                 }
             )
+            if isinstance(row, dict) and isinstance(row.get("_ranking_trace"), dict):
+                metadata["ranking"] = dict(row["_ranking_trace"])
             # FTS5 bm25 is lower-is-better. Present a positive rank-like score.
             score = max(0.0, 1.0 - (index * 0.05))
             results.append(
@@ -585,6 +601,77 @@ class SQLiteStore:
                 )
             )
         return results
+
+    @classmethod
+    def _ranking_candidate(
+        cls,
+        row: dict[str, Any],
+        query: str,
+        content_terms: set[str],
+    ) -> RankingCandidate:
+        bm25_cost = float(row["rank"])
+        title_words = set(re.findall(r"\w+", str(row["title"]).lower()))
+        body_lower = str(row["text"]).lower()
+        contributions: list[tuple[str, float]] = []
+
+        tokens = int(row["token_estimate"])
+        if tokens > 600:
+            contributions.append(("long_section_penalty", -0.3 * (tokens - 600) / 600))
+
+        boilerplate_overlap = title_words & _BOILERPLATE_KEYWORDS
+        if boilerplate_overlap:
+            contributions.append(
+                ("boilerplate_title_penalty", -3.0 * len(boilerplate_overlap))
+            )
+
+        title_term_overlap = title_words & content_terms
+        if title_term_overlap:
+            contributions.append(("title_term_boost", 1.5 * len(title_term_overlap)))
+
+        stripped_query = cls._strip_stopwords(query).lower()
+        if stripped_query and stripped_query in body_lower[:500]:
+            contributions.append(("leading_exact_phrase_boost", 2.0))
+
+        task_signals = {
+            "how", "create", "setup", "set", "configure", "install", "add",
+            "build", "deploy", "start", "connect", "enable", "generate", "register",
+        }
+        action_verbs = {
+            "create", "set", "setup", "configure", "install", "add", "build",
+            "deploy", "start", "connect", "enable", "initialize", "register",
+            "sign", "generate", "getting", "started",
+        }
+        if content_terms & task_signals and title_words & action_verbs:
+            contributions.append(("task_action_title_boost", 1.5))
+
+        metadata = json.loads(str(row.get("metadata_json") or "{}"))
+        authority = str(metadata.get("authority") or "").casefold()
+        legal_intent = bool(content_terms & _BOILERPLATE_KEYWORDS)
+        if authority == "legal" and not legal_intent:
+            contributions.append(("non_legal_query_legal_source_penalty", -4.0))
+        elif authority in {"generated", "mirror", "stale"}:
+            contributions.append((f"{authority}_authority_penalty", -3.0))
+        elif authority == "external_generic":
+            contributions.append(("external_generic_authority_penalty", -1.5))
+        project_signals = {"project", "repository", "repo", "docatlas", "rule", "policy"}
+        if authority == "project_rule" and content_terms & project_signals:
+            contributions.append(("project_rule_authority_boost", 2.0))
+
+        source = str(row["source"])
+        chunk_index = int(row["chunk_index"])
+        content_hash = str(row.get("content_hash") or _chunk_hash(str(row["text"])))
+        stable_id = "lex-" + hashlib.sha256(
+            f"{source}\0{chunk_index}\0{content_hash}".encode("utf-8")
+        ).hexdigest()[:20]
+        base_utility = -bm25_cost
+        return RankingCandidate(
+            stable_id=stable_id,
+            section_id=int(row["id"]),
+            raw_component_ranks=(("fts5_bm25_cost", bm25_cost),),
+            base_utility=base_utility,
+            feature_contributions=tuple(contributions),
+            final_utility=base_utility + sum(value for _, value in contributions),
+        )
 
     def fetch_sections_by_id(
         self,
@@ -678,7 +765,7 @@ class SQLiteStore:
                         JOIN sections ON sections.id = sections_fts.rowid
                         WHERE sections_fts MATCH ?
                         {filter_sql}
-                        ORDER BY rank
+                        ORDER BY rank, sections.source, sections.chunk_index, sections.content_hash
                         LIMIT ?
                         """,
                         (cleaned, *filter_params, limit),
@@ -700,7 +787,7 @@ class SQLiteStore:
                     JOIN sections ON sections.id = sections_fts.rowid
                     WHERE sections_fts MATCH ?
                     {filter_sql}
-                    ORDER BY rank
+                    ORDER BY rank, sections.source, sections.chunk_index, sections.content_hash
                     LIMIT ?
                     """,
                     (fallback_query, *filter_params, limit),

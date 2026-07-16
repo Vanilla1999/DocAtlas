@@ -1,0 +1,102 @@
+{
+  "candidates": [
+    {
+      "authority": "canonical",
+      "content_sha256": "a92aae16b08c418e7e63de4fffc770ef9a041526c55085c311d15c7018665004",
+      "excerpt": "# WidgetClient fetch_record API WidgetClient.fetch_record(record_id, timeout=5) fetches one record. The timeout argument is measured in seconds. ```python record = WidgetClient().fetch_record(record_i",
+      "rank": 1,
+      "ranking": {
+        "base_utility": 8.323864227846,
+        "candidate_pool_size": 1,
+        "feature_contributions": {
+          "title_term_boost": 4.5
+        },
+        "final_rank": 1,
+        "final_utility": 12.823864227846,
+        "rank_delta": 0,
+        "raw_component_ranks": {
+          "fts5_bm25_cost": -8.323864227846
+        },
+        "raw_rank": 1,
+        "score_direction": "higher_is_better",
+        "section_id": 1,
+        "stable_id": "lex-49ea156c36dd7d6b497e"
+      },
+      "section": "WidgetClient fetch_record API",
+      "source": "docs/api-client.md",
+      "stable_id": "lex-49ea156c36dd7d6b497e",
+      "token_estimate": 57,
+      "version": "2.0"
+    }
+  ],
+  "capabilities": {
+    "dense": "not_requested",
+    "hybrid": "not_requested",
+    "lexical": "available",
+    "sparse": "not_requested"
+  },
+  "expected_sources": [
+    {
+      "relevance": 3,
+      "source": "docs/api-client.md"
+    }
+  ],
+  "first_expected_rank": 1,
+  "forbidden_source_hits": [],
+  "forbidden_version_hits": [],
+  "found_facts": [
+    "timeout",
+    "record_id"
+  ],
+  "id": "unversioned_mirror_distractor",
+  "metrics": {
+    "authoritative_source_at_1": true,
+    "candidate_tokens": 57,
+    "degraded_mode": false,
+    "duplicate_rate@5": 0.0,
+    "exact_identifier_at_1": null,
+    "forbidden_source_violation": false,
+    "forbidden_version_violation": false,
+    "insufficient_evidence_pass": null,
+    "latency_ms": 0.7814429991412908,
+    "model_visible_tokens": 213,
+    "ndcg@20": 1.0,
+    "recall@1": 1.0,
+    "recall@20": 1.0,
+    "recall@3": 1.0,
+    "recall@5": 1.0,
+    "reciprocal_rank": 1.0,
+    "required_fact_pass": true,
+    "required_facts_per_1000_model_visible_tokens": 9.389671361502348,
+    "selected_evidence_tokens": 57,
+    "snippet_required_pass": true,
+    "unique_sources@5": 1,
+    "unknown_version_rate": 0.0
+  },
+  "paraphrase_group": "widgetclient_fetch_record",
+  "projection": {
+    "estimated_tokens": 213,
+    "kind": "docs_answer",
+    "source_content_hashes": [
+      "abc0af42673077bb9379d2f9fc5dcc7926a83ede208a5ef6b494c15b31cebe69"
+    ],
+    "source_evidence_ids": [
+      "ev-03e96cc51dcf04f5"
+    ],
+    "source_paths": [
+      "docs/api-client.md"
+    ],
+    "status": "ok"
+  },
+  "query": "WidgetClient fetch_record timeout API",
+  "required_facts": [
+    "timeout",
+    "record_id"
+  ],
+  "schema_version": "retrieval-quality-case-result-v1",
+  "selected_evidence_ids": [
+    "lex-49ea156c36dd7d6b497e"
+  ],
+  "split": "adversarial",
+  "taxonomy_class": "locale_mirror_distractor"
+}
