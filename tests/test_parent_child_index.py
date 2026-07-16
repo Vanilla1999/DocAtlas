@@ -140,6 +140,30 @@ def test_additive_migration_keeps_v1_rows_readable(tmp_path):
         assert conn.execute("SELECT COUNT(*) FROM generation_sources").fetchone()[0] == 1
 
 
+def test_legacy_promoted_filter_preserves_multi_term_fts_semantics(tmp_path):
+    store = SQLiteStore(tmp_path / "index.db")
+    store.add_documents(
+        [
+            Document(
+                source="both.md",
+                content="alpha beta exact sentinel",
+                metadata={"library_id": "sdk"},
+            ),
+            Document(
+                source="alpha.md",
+                content="alpha only sentinel",
+                metadata={"library_id": "sdk"},
+            ),
+        ]
+    )
+
+    results = store.query(
+        "alpha beta", limit=10, budget=500, filters={"library_id": "sdk"}
+    )
+
+    assert [result.source for result in results] == ["both.md"]
+
+
 def test_failed_v2_rebuild_rolls_back_to_previous_source_rows(tmp_path):
     store = SQLiteStore(tmp_path / "index.db")
     store.add_documents([_doc("# Stable\n\nold searchable fact\n")])

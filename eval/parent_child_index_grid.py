@@ -32,6 +32,7 @@ from eval.retrieval_quality_baseline import (
 
 GRID = (160, 256, 384, 512)
 TASK39_BASELINE = DATA_ROOT / "baseline_v1" / "summary.json"
+TASK41_PUBLISHED_COMMIT_SHA = "9afb20d7aca6c0411b14739781dacceb292cb78f"
 
 
 class _GridProvider(EmbeddingsProvider):
@@ -493,6 +494,7 @@ def run_grid(output_path: Path) -> dict[str, Any]:
     report = {
         "schema_version": "parent-child-grid-v1",
         "provider_free": True,
+        "published_commit_sha": TASK41_PUBLISHED_COMMIT_SHA,
         "task39_baseline": TASK39_BASELINE.relative_to(ROOT).as_posix(),
         "stress_baseline": stress_baseline,
         "variants": variants,
