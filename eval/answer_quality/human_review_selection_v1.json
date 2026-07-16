@@ -1,0 +1,36 @@
+{
+  "schema_version": "task43-human-review-selection-v1",
+  "dimensions": [
+    "directness",
+    "ambiguity",
+    "citation_usefulness",
+    "snippet_completeness",
+    "omission_disclosure"
+  ],
+  "cases": [
+    {
+      "contract_id": "t39-dev-exact-api",
+      "reason": "exact API signature and identifier grounding"
+    },
+    {
+      "contract_id": "t39-holdout-cross-module",
+      "reason": "multi-fact conceptual answer across a module contract"
+    },
+    {
+      "contract_id": "t42-docs-version",
+      "reason": "exact-version answer with a higher-ranked stale distractor"
+    },
+    {
+      "contract_id": "t42-patch-policy-target-test",
+      "reason": "patch objective, target, invariant, and public check completeness"
+    },
+    {
+      "contract_id": "t39-holdout-insufficient",
+      "reason": "honest bounded insufficient-evidence response"
+    },
+    {
+      "contract_id": "t42-adv-forbidden-source",
+      "reason": "safe answer despite a forbidden high-ranked source"
+    }
+  ]
+}
