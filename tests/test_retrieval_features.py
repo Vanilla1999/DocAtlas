@@ -29,6 +29,12 @@ class FakeVectorStore:
     def ensure_collection(self, *args, **kwargs):
         return None
 
+    def collection_metadata(self, collection):
+        return {"provider": "fake", "model": "fake", "dim": 4, "sparse_model": "fake-sparse"}
+
+    def count(self, collection):
+        return 1
+
     def search(self, collection, query_vector, *, limit, filters=None, sparse_vector=None, mode="dense"):
         key = _filter_key(filters)
         self.calls.append({"mode": mode, "filters": filters, "limit": limit})
@@ -62,6 +68,21 @@ class EmptyVectorStore(FakeVectorStore):
         return 0
 
 
+class MismatchedVectorStore(FakeVectorStore):
+    def collection_metadata(self, collection):
+        return {"provider": "other", "model": "other", "dim": 99, "sparse_model": None}
+
+
+class Stage2FailingVectorStore(FakeVectorStore):
+    def search(self, collection, query_vector, *, limit, filters=None, sparse_vector=None, mode="dense"):
+        if filters and "document_title_hash" in filters:
+            raise ValueError("stage two unavailable")
+        return super().search(
+            collection, query_vector, limit=limit, filters=filters,
+            sparse_vector=sparse_vector, mode=mode,
+        )
+
+
 class FakeProvider:
     name = "fake"
     dimensions = 4
@@ -88,8 +109,8 @@ def _hashable(v):
     return v
 
 
-def _hit(sid, score=1.0):
-    return VectorHit(id=str(sid), score=score, payload={})
+def _hit(sid, score=1.0, **payload):
+    return VectorHit(id=str(sid), score=score, payload=payload)
 
 
 def _agent(tmp_path):
@@ -148,6 +169,23 @@ def test_router_first_match_wins(tmp_path):
     assert vstore.calls and vstore.calls[0]["filters"] == {"a": 1}
 
 
+def test_router_does_not_override_caller_filter(tmp_path):
+    config, store = _agent(tmp_path)
+    config.retrieval.routers = [
+        QueryRouter(match=r"latest", filters={"status_code": "LIVE", "scope": "docs"}),
+    ]
+    vstore = FakeVectorStore(hits_by_filter={})
+    RetrievalDispatcher(
+        store=store, config=config, vector_store=vstore,
+        provider=FakeProvider(), collection="c",
+    ).run(
+        "latest", mode="dense", limit=1,
+        filters={"status_code": "PINNED"},
+    )
+
+    assert vstore.calls[0]["filters"] == {"status_code": "PINNED", "scope": "docs"}
+
+
 def test_router_invalid_regex_is_skipped(tmp_path):
     config, store = _agent(tmp_path)
     # An unbalanced bracket would raise re.error; the dispatcher must skip it
@@ -188,8 +226,24 @@ def test_dense_failure_can_degrade_when_requested(tmp_path):
         collection="c",
     )
     result = dispatcher.run("alpha", mode="dense", limit=1, allow_degraded=True)
-    assert result.mode_used == "lexical-fallback"
+    assert result.mode_used == "dense/lexical_fallback_degraded"
     assert "dense" in result.failures
+
+
+def test_dense_zero_hits_stays_empty_in_strict_mode(tmp_path):
+    config, store = _agent(tmp_path)
+    _populate(store, [("Doc", "doc", "# Doc\n\nalpha lexical fallback bait.\n")])
+    result = RetrievalDispatcher(
+        store=store,
+        config=config,
+        vector_store=FakeVectorStore(hits_by_filter={}),
+        provider=FakeProvider(),
+        collection="c",
+    ).run("alpha", mode="dense", limit=1)
+
+    assert result.chunks == []
+    assert result.mode_used == "dense"
+    assert result.failures == {}
 
 
 def test_empty_vector_collection_is_hard_error(tmp_path):
@@ -204,6 +258,73 @@ def test_empty_vector_collection_is_hard_error(tmp_path):
     )
     with pytest.raises(HybridRetrievalError, match="no indexed vectors"):
         dispatcher.run("alpha", mode="hybrid", limit=1)
+
+
+def test_vector_collection_requires_exact_active_generation_parity(tmp_path):
+    config, store = _agent(tmp_path)
+    documents = [
+        Document(
+            source=f"doc-{index}.md",
+            content=f"# Doc {index}\n\nalpha {index}.\n",
+            metadata={"format": "markdown", "chunking_schema": "parent-child-v1"},
+        )
+        for index in range(2)
+    ]
+    store.add_documents(documents, recreate=True)
+    collection = str(store.generation_info()["vector_collection"])
+    dispatcher = RetrievalDispatcher(
+        store=store, config=config, vector_store=FakeVectorStore({}),
+        provider=FakeProvider(), collection=collection,
+    )
+
+    with pytest.raises(HybridRetrievalError, match="point parity"):
+        dispatcher.run("alpha", mode="dense", limit=1)
+
+
+def test_missing_vector_capabilities_are_explicit_and_require_degraded_opt_in(tmp_path):
+    config, store = _agent(tmp_path)
+    _populate(store, [("Doc", "doc", "# Doc\n\nalpha.\n")])
+    dispatcher = RetrievalDispatcher(store=store, config=config)
+
+    with pytest.raises(HybridRetrievalError, match="vector store is not configured"):
+        dispatcher.run("alpha", mode="hybrid", limit=1)
+
+    result = dispatcher.run(
+        "alpha", mode="hybrid", limit=1, allow_degraded=True
+    )
+    assert result.mode_used == "hybrid/lexical_fallback_degraded"
+    assert set(result.failures) == {"vector", "embedding"}
+
+
+def test_degraded_mismatch_never_queries_unverified_vector_lane(tmp_path):
+    config, store = _agent(tmp_path)
+    _populate(store, [("Doc", "doc", "# Doc\n\nalpha.\n")])
+    vstore = MismatchedVectorStore({})
+    result = RetrievalDispatcher(
+        store=store, config=config, vector_store=vstore,
+        provider=FakeProvider(), collection="c",
+    ).run("alpha", mode="dense", limit=1, allow_degraded=True)
+
+    assert not vstore.calls
+    assert result.mode_used == "dense/lexical_fallback_degraded"
+    assert "capability mismatch" in result.failures["vector"]
+
+
+def test_lexical_and_supplemental_paths_enforce_forbidden_sources(tmp_path):
+    config, store = _agent(tmp_path)
+    store.add_documents([
+        Document(source="allowed", content="# Allowed\n\nUse `Client.open`."),
+        Document(source="forbidden", content="# Forbidden\n\nUse `Client.open`."),
+    ], recreate=True)
+
+    result = RetrievalDispatcher(store=store, config=config).run(
+        "How do I call `Client.open`?", mode="lexical", limit=10,
+        filters={"forbidden_sources": ["forbidden"]},
+    )
+
+    assert result.chunks
+    assert {chunk.source for chunk in result.chunks} == {"allowed"}
+    assert all("final_rank" in chunk.metadata["retrieval_trace"] for chunk in result.chunks)
 
 
 def test_hybrid_skips_sparse_when_collection_is_dense_only(tmp_path):
@@ -223,6 +344,47 @@ def test_hybrid_skips_sparse_when_collection_is_dense_only(tmp_path):
     assert "sparse" not in result.candidate_counts
     assert "sparse" not in result.failures
     assert [call["mode"] for call in vstore.calls] == ["dense"]
+    assert result.query_plan_hash
+    assert result.fusion_config_hash
+    assert result.chunks[0].metadata["query_plan_hash"] == result.query_plan_hash
+
+
+def test_hybrid_fuses_on_stable_child_id_and_hydrates_integer_id(tmp_path):
+    config, store = _agent(tmp_path)
+    store.add_documents([Document(
+        source="doc.md",
+        content="# Doc\n\nalpha.\n",
+        metadata={
+            "title": "Doc",
+            "format": "markdown",
+            "chunking_schema": "parent-child-v1",
+            "child_target_tokens": 32,
+            "child_hard_max_tokens": 64,
+        },
+    )])
+    section = store.list_sections_for_embedding()[0]
+    collection = str(store.generation_info()["vector_collection"])
+    section_id = int(section["section_id"])
+    stable_id = section["stable_chunk_id"]
+    vector_hit = VectorHit(
+        id=section["vector_id"],
+        score=1.0,
+        payload={"section_id": section_id, "stable_chunk_id": stable_id},
+    )
+    vstore = DenseOnlyVectorStore(hits_by_filter={
+        ("dense", None): [vector_hit],
+    })
+
+    result = RetrievalDispatcher(
+        store=store,
+        config=config,
+        vector_store=vstore,
+        provider=FakeProvider(),
+        collection=collection,
+    ).run("alpha", mode="hybrid", limit=1)
+
+    assert result.chunks[0].metadata["section_id"] == section_id
+    assert result.contributions[section_id] == {"lexical": 1, "dense": 1}
 
 
 # ---------------- hierarchical retrieval ----------------
@@ -250,12 +412,11 @@ def test_hierarchical_two_stage_filters_to_top_docs(tmp_path):
     a_ids = next(sids for src, sids in by_source.items() if "doc-a" in src)[:2]
     b_ids = next(sids for src, sids in by_source.items() if "doc-b" in src)[:1]
     stage1 = [_hit(a_ids[0]), _hit(a_ids[1]), _hit(b_ids[0])]
-    # Stage 2: filtered call returns only doc-a sections.
-    stage2 = [_hit(a_ids[0])]
-
     # Get document_title_hash values for the filter expectation.
     doc_hashes = store.document_title_hashes_for(section_ids)
     a_doc_hash = doc_hashes[a_ids[0]]
+    # Stage 2: filtered call returns only doc-a sections.
+    stage2 = [_hit(a_ids[0], document_title_hash=a_doc_hash)]
 
     hits_by_filter = {
         ("dense", None): stage1,
@@ -279,6 +440,55 @@ def test_hierarchical_two_stage_filters_to_top_docs(tmp_path):
     assert len(vstore.calls) == 2
     assert vstore.calls[0]["filters"] is None
     assert vstore.calls[1]["filters"] == {"document_title_hash": {"in": [a_doc_hash]}}
+
+
+def test_hierarchical_degraded_result_preserves_stage_failures(tmp_path):
+    config, store = _agent(tmp_path)
+    _populate(store, [("Doc", "doc", "# Doc\n\n## Auth\nalpha authentication.\n")])
+    section_id = int(store.list_sections_for_embedding()[0]["section_id"])
+    config.retrieval.hierarchical = HierarchicalConfig(
+        enabled=True, documents_limit=1, candidate_pool=10, sections_per_document=2
+    )
+    vstore = Stage2FailingVectorStore({("dense", None): [_hit(section_id)]})
+
+    result = RetrievalDispatcher(
+        store=store, config=config, vector_store=vstore,
+        provider=FakeProvider(), collection="c",
+    ).run("authentication", mode="dense", limit=1, allow_degraded=True)
+
+    assert "dense.stage2" in result.failures
+    assert "degraded" in result.mode_used
+
+
+def test_hierarchical_fusion_honors_weighted_rrf(tmp_path):
+    config, store = _agent(tmp_path)
+    _populate(store, [
+        ("First", "first", "# First\n\nalpha first.\n"),
+        ("Second", "second", "# Second\n\nalpha second.\n"),
+    ])
+    rows = store.list_sections_for_embedding()
+    first_id = int(next(row for row in rows if row["source"] == "first")["section_id"])
+    second_id = int(next(row for row in rows if row["source"] == "second")["section_id"])
+    config.retrieval.fusion.method = "weighted_rrf"
+    config.retrieval.fusion.weights = {"dense": 10.0, "lexical": 1.0}
+    dispatcher = RetrievalDispatcher(store=store, config=config)
+
+    result = dispatcher._fuse_and_hydrate(
+        {
+            "lexical": [
+                {"id": "first", "hydration_id": first_id},
+                {"id": "second", "hydration_id": second_id},
+            ],
+            "dense": [
+                {"id": "second", "hydration_id": second_id},
+                {"id": "first", "hydration_id": first_id},
+            ],
+        },
+        query="alpha", limit=1, budget=100, expand=None,
+        counts={"lexical": 2, "dense": 2}, mode="hybrid/hierarchical", filters=None,
+    )
+
+    assert result.chunks[0].metadata["section_id"] == second_id
 
 
 # ---------------- hierarchical auto-enable ----------------
@@ -306,7 +516,9 @@ def test_hierarchical_auto_enables_above_threshold(tmp_path):
     a_doc_hash = store.document_title_hashes_for([a_id])[a_id]
     hits_by_filter = {
         ("dense", None): [_hit(a_id)],
-        ("dense", _filter_key({"document_title_hash": {"in": [a_doc_hash]}})): [_hit(a_id)],
+        ("dense", _filter_key({"document_title_hash": {"in": [a_doc_hash]}})): [
+            _hit(a_id, document_title_hash=a_doc_hash)
+        ],
     }
     vstore = FakeVectorStore(hits_by_filter=hits_by_filter)
     result = RetrievalDispatcher(

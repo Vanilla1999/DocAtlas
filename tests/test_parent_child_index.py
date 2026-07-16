@@ -31,7 +31,10 @@ def test_v2_indexes_retrieval_context_but_delivers_verbatim_text(tmp_path):
     assert "Document: docs/guide.md" not in results[0].text
     assert results[0].metadata["stable_chunk_id"].startswith("child-")
     embedded = store.list_sections_for_embedding()
-    assert embedded[0]["text"].startswith("Document: docs/guide.md\nHeading: Install")
+    assert embedded[0]["text"].startswith(
+        "Document Title: guide\nLocation: docs/guide.md\n"
+        "Heading Path: Install"
+    )
     assert embedded[0]["display_text"] == source
 
 
@@ -51,6 +54,58 @@ def test_reindex_local_edit_preserves_unaffected_ids_and_reports_prune_set(tmp_p
     assert ids_before["# Alpha\n\nunchanged\n\n"] == ids_after["# Alpha\n\nunchanged\n\n"]
     assert ids_before["# Beta\n\nold value\n"] not in set(ids_after.values())
     assert store.index_health()["ok"] is True
+
+
+def test_metadata_only_edit_preserves_child_identity_but_refreshes_context(tmp_path):
+    store = SQLiteStore(tmp_path / "index.db")
+    content = "# Configure\n\nCall Client.connect().\n"
+    store.add_documents([_doc(content, title="Old title", authority="community")])
+    before = store.list_sections_for_embedding()[0]
+
+    store.add_documents([_doc(content, title="New title", authority="official")])
+    after = store.list_sections_for_embedding()[0]
+
+    assert after["stable_chunk_id"] == before["stable_chunk_id"]
+    assert after["vector_id"] == before["vector_id"]
+    assert after["section_id"] == before["section_id"]
+    assert after["content_hash"] != before["content_hash"]
+    assert after["context_content_hash"] != before["context_content_hash"]
+    assert after["text"].startswith("Document Title: New title")
+
+
+def test_context_generation_persists_provenance_and_filter_columns(tmp_path):
+    db = tmp_path / "index.db"
+    store = SQLiteStore(db)
+    store.add_documents([_doc(
+        "# Configure\n\nUse CONFIG_KEY.\n",
+        title="SDK guide",
+        library_id="example-sdk",
+        resolved_version="2.4.1",
+        version_family="2.x",
+        project_identity="acme/project",
+        project_doc_path="docs/guide.md",
+        module_id="client",
+        doc_scope="runtime",
+        source_class="project_file",
+        authority="official",
+        docs_snapshot_exact=True,
+    )])
+
+    info = store.generation_info()
+    assert info is not None
+    assert info["context_schema_version"] == "deterministic-context-v2"
+    assert info["context_config_hash"]
+    assert info["retrieval_config_hash"]
+    with sqlite3.connect(db) as conn:
+        conn.row_factory = sqlite3.Row
+        row = conn.execute("SELECT * FROM retrieval_children").fetchone()
+        assert row is not None
+        assert row["library_id"] == "example-sdk"
+        assert row["resolved_version"] == "2.4.1"
+        assert row["project_path"] == "docs/guide.md"
+        assert row["authority"] == "official"
+        assert row["docs_snapshot_exact"] == 1
+        assert "/tmp/" not in row["context_prefix"]
 
 
 def test_expansion_never_crosses_parent_boundary(tmp_path):
@@ -239,3 +294,44 @@ def test_legacy_recreate_and_delete_all_cannot_leave_stale_active_generation(tmp
     assert store.delete_all() is True
     assert store.active_generation_id() is None
     assert not store.query("active sentinel", limit=3, budget=100)
+
+
+def test_superseded_generation_retention_is_bounded_and_cannot_delete_active(tmp_path):
+    store = SQLiteStore(tmp_path / "index.db")
+    for version in range(4):
+        store.add_documents([_doc(f"# Version\n\nvalue {version}\n")])
+    active = store.active_generation_id()
+    candidates = store.superseded_generation_candidates(retain=1)
+
+    assert len(candidates) == 2
+    assert all(row["generation_id"] != active for row in candidates)
+    assert store.delete_superseded_generations(
+        [active, *(row["generation_id"] for row in candidates)]
+    ) == 2
+    assert store.active_generation_id() == active
+    assert store.index_health()["ok"] is True
+
+
+def test_delete_rebuilds_pre_contextual_active_generation(tmp_path):
+    store = SQLiteStore(tmp_path / "index.db")
+    first = _doc("# Remove\n\nremove legacy sentinel\n")
+    second = Document(
+        source="docs/keep.md",
+        content="# Keep\n\nkeep legacy sentinel\n",
+        metadata={**first.metadata},
+    )
+    store.add_documents([first, second])
+    active = store.active_generation_id()
+    with store._connect() as conn:
+        conn.execute(
+            """UPDATE index_generations
+               SET context_schema_version = '', context_config_hash = '',
+                   retrieval_config_hash = ''
+               WHERE generation_id = ?""",
+            (active,),
+        )
+
+    assert store.delete_source(first.source) is True
+    info = store.generation_info()
+    assert info and info["context_config_hash"] and info["retrieval_config_hash"]
+    assert store.query("keep legacy sentinel", limit=1, budget=100)[0].source == second.source

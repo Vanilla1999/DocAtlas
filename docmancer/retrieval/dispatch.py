@@ -13,7 +13,14 @@ from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any
 
+from .contracts import canonical_hash
 from .fusion import reciprocal_rank_fusion, weighted_rrf
+from .query_planning import (
+    build_query_plan,
+    compile_backend_filters,
+    extract_exact_terms,
+    metadata_matches_filters,
+)
 
 if TYPE_CHECKING:
     from docmancer.core.config import DocmancerConfig
@@ -32,6 +39,8 @@ class DispatchResult:
     mode_used: str = "lexical"
     candidate_counts: dict[str, int] = field(default_factory=dict)
     failures: dict[str, str] = field(default_factory=dict)
+    query_plan_hash: str = ""
+    fusion_config_hash: str = ""
 
 
 class HybridRetrievalError(RuntimeError):
@@ -83,38 +92,112 @@ class RetrievalDispatcher:
             or (configured_mode if isinstance(configured_mode, str) else None)
             or "lexical"
         ).lower()
-        limit = limit or self.config.query.default_limit
+        limit = min(40, limit or self.config.query.default_limit)
         budget = budget or self.config.query.default_budget
-        per_source_limit = max(limit * 3, 20)
+        per_source_limit = min(40, max(limit * 3, 20))
 
         # Query-aware routing: first matching router merges its filters into
         # the dispatcher's filters for this call (e.g. ``status_code=LIVE``,
         # ``international_class=030``).
         merged_filters = self._apply_router(query, filters)
-
+        backend_filters = compile_backend_filters(merged_filters) or None
+        requested_lanes = (
+            ("lexical", "dense", "sparse")
+            if effective_mode == "hybrid"
+            else (effective_mode,)
+        )
+        query_plan = build_query_plan(
+            query, filters=merged_filters, requested_lanes=requested_lanes
+        )
         # Effective expand: per-call > retrieval.expand > query.default_expand.
         retrieval_expand = (
             expand
             or getattr(self.config.retrieval, "expand", None)
             or self.config.query.default_expand
         )
+        fusion_config_hash = canonical_hash({
+            "schema_version": "stable-child-rrf-v1",
+            "method": self.config.retrieval.fusion.method or "rrf",
+            "rrf_k": int(self.config.retrieval.fusion.rrf_k or 60),
+            "weights": dict(self.config.retrieval.fusion.weights or {}),
+            "candidate_limits": {"per_lane": 40, "fused": 60},
+            "post_fusion": {
+                "exact_supplement": "api-term-supplement-v2",
+                "intent_rerank": "intent-metadata-rerank-v2",
+                "expand": retrieval_expand,
+                "max_sections_per_source": getattr(
+                    self.config.retrieval, "max_sections_per_source", None
+                ),
+            },
+        })
 
-        if effective_mode == "lexical" or self.vector_store is None or self.provider is None:
+        def finalized(result: DispatchResult) -> DispatchResult:
+            result.query_plan_hash = query_plan.plan_hash
+            result.fusion_config_hash = fusion_config_hash
+            for final_rank, chunk in enumerate(result.chunks, start=1):
+                metadata = getattr(chunk, "metadata", None)
+                if isinstance(metadata, dict):
+                    metadata["query_plan_hash"] = query_plan.plan_hash
+                    metadata["fusion_config_hash"] = fusion_config_hash
+                    section_id = metadata.get("section_id")
+                    metadata["retrieval_trace"] = {
+                        "component_ranks": dict(result.contributions.get(section_id, {})),
+                        "pre_post_rank": metadata.pop("_pre_post_rank", final_rank),
+                        "intent_boost": metadata.pop("_intent_boost", 0.0),
+                        "supplemental_rank": metadata.pop("_supplemental_rank", None),
+                        "final_rank": final_rank,
+                    }
+            return result
+
+        missing_capabilities: dict[str, str] = {}
+        if effective_mode != "lexical":
+            if self.vector_store is None:
+                missing_capabilities["vector"] = "vector store is not configured"
+            if self.provider is None:
+                missing_capabilities["embedding"] = "embedding provider is not configured"
+        if missing_capabilities and not allow_degraded:
+            raise HybridRetrievalError(missing_capabilities)
+
+        if effective_mode == "lexical" or missing_capabilities:
             query_limit = self._candidate_limit_for_diversity(limit, retrieval_expand)
-            chunks = self.store.query(query, limit=query_limit, budget=budget, expand=retrieval_expand)
-            chunks = self._append_api_term_matches(query, chunks, budget=budget, expand=retrieval_expand)
+            chunks = self.store.query(query, limit=query_limit, budget=budget, expand=retrieval_expand, filters=backend_filters)
+            chunks = self._filter_chunks(chunks, merged_filters)
+            chunks = self._append_api_term_matches(query, chunks, budget=budget, expand=retrieval_expand, backend_filters=backend_filters, verification_filters=merged_filters)
             chunks = self._rerank_intent_matches(query, chunks, expand=retrieval_expand)
             chunks = self._limit_sections_per_source(chunks, limit=limit, expand=retrieval_expand)
-            return DispatchResult(
+            return finalized(DispatchResult(
                 chunks=chunks,
                 contributions={c.metadata.get("section_id"): {"lexical": idx + 1} for idx, c in enumerate(chunks) if c.metadata.get("section_id") is not None},
-                mode_used="lexical",
+                mode_used=(
+                    "lexical"
+                    if effective_mode == "lexical"
+                    else f"{effective_mode}/lexical_fallback_degraded"
+                ),
                 candidate_counts={"lexical": len(chunks)},
-            )
+                failures=missing_capabilities,
+            ))
+
+        ready_failure = self._vector_readiness_failure(effective_mode)
+        if ready_failure and not allow_degraded:
+            raise HybridRetrievalError(ready_failure)
+        if ready_failure:
+            query_limit = self._candidate_limit_for_diversity(limit, retrieval_expand)
+            chunks = self.store.query(query, limit=query_limit, budget=budget, expand=retrieval_expand, filters=backend_filters)
+            chunks = self._filter_chunks(chunks, merged_filters)
+            chunks = self._append_api_term_matches(query, chunks, budget=budget, expand=retrieval_expand, backend_filters=backend_filters, verification_filters=merged_filters)
+            chunks = self._rerank_intent_matches(query, chunks, expand=retrieval_expand)
+            chunks = self._limit_sections_per_source(chunks, limit=limit, expand=retrieval_expand)
+            return finalized(DispatchResult(
+                chunks=chunks,
+                contributions={c.metadata.get("section_id"): {"lexical": idx + 1} for idx, c in enumerate(chunks) if c.metadata.get("section_id") is not None},
+                mode_used=f"{effective_mode}/lexical_fallback_degraded",
+                candidate_counts={"lexical": len(chunks)},
+                failures=ready_failure,
+            ))
 
         hierarchical = getattr(self.config.retrieval, "hierarchical", None)
         if hierarchical is not None and self._hierarchical_active(hierarchical):
-            return self._run_hierarchical(
+            return finalized(self._run_hierarchical(
                 query=query,
                 mode=effective_mode,
                 limit=limit,
@@ -122,49 +205,52 @@ class RetrievalDispatcher:
                 filters=merged_filters,
                 expand=retrieval_expand,
                 allow_degraded=allow_degraded,
-            )
-
-        ready_failure = self._vector_readiness_failure(effective_mode)
-        if ready_failure and not allow_degraded:
-            raise HybridRetrievalError(ready_failure)
+            ))
 
         candidate_lists, raw_counts, failures = self._fan_out(
             query=query,
             mode=effective_mode,
             per_source_limit=per_source_limit,
-            filters=merged_filters,
+            filters=backend_filters,
+            verification_filters=merged_filters,
         )
 
         if failures and effective_mode != "lexical" and not allow_degraded:
             raise HybridRetrievalError(failures)
 
         if not candidate_lists:
-            if ready_failure and allow_degraded:
-                raw_counts.update({source: 0 for source in ready_failure})
-                failures.update(ready_failure)
+            if not failures:
+                return finalized(DispatchResult(
+                    chunks=[],
+                    mode_used=effective_mode,
+                    candidate_counts=raw_counts,
+                ))
             query_limit = self._candidate_limit_for_diversity(limit, retrieval_expand)
-            chunks = self.store.query(query, limit=query_limit, budget=budget, expand=retrieval_expand)
-            chunks = self._append_api_term_matches(query, chunks, budget=budget, expand=retrieval_expand)
+            chunks = self.store.query(query, limit=query_limit, budget=budget, expand=retrieval_expand, filters=backend_filters)
+            chunks = self._filter_chunks(chunks, merged_filters)
+            chunks = self._append_api_term_matches(query, chunks, budget=budget, expand=retrieval_expand, backend_filters=backend_filters, verification_filters=merged_filters)
             chunks = self._rerank_intent_matches(query, chunks, expand=retrieval_expand)
             chunks = self._limit_sections_per_source(chunks, limit=limit, expand=retrieval_expand)
-            return DispatchResult(
+            return finalized(DispatchResult(
                 chunks=chunks,
-                mode_used="lexical-fallback",
+                mode_used=f"{effective_mode}/lexical_fallback_degraded",
                 candidate_counts=raw_counts,
                 failures=failures,
-            )
+            ))
 
-        fusion_method = self.config.retrieval.fusion.method or "rrf"
-        k_rrf = int(self.config.retrieval.fusion.rrf_k or 60)
-        weights = dict(self.config.retrieval.fusion.weights or {})
-
-        if fusion_method == "weighted_rrf" and weights:
-            ranked = weighted_rrf(candidate_lists, weights=weights, k_rrf=k_rrf)
-        else:
-            ranked = reciprocal_rank_fusion(candidate_lists, k_rrf=k_rrf)
-
-        section_ids = self._top_section_ids(ranked, limit=self._candidate_limit_for_diversity(limit, retrieval_expand))
-        contributions = {sid: dict(c) for hid, _s, c in ranked for sid in [int(hid)] if sid in section_ids}
+        ranked = self._rank_candidate_lists(candidate_lists)[:60]
+        hydration_by_stable = self._hydration_by_stable(candidate_lists)
+        section_ids = self._top_section_ids(
+            ranked,
+            hydration_by_stable=hydration_by_stable,
+            limit=self._candidate_limit_for_diversity(limit, retrieval_expand),
+        )
+        contributions = {
+            hydration_by_stable[stable_id]: dict(component_ranks)
+            for stable_id, _score, component_ranks in ranked
+            if stable_id in hydration_by_stable
+            and hydration_by_stable[stable_id] in section_ids
+        }
 
         # Neighbor expansion in hybrid mode: pull adjacent section ids before
         # hydrate. Lexical mode handles this inside ``SQLiteStore.query``;
@@ -177,17 +263,18 @@ class RetrievalDispatcher:
             )
 
         chunks = self._hydrate(section_ids, budget=budget)
-        chunks = self._append_api_term_matches(query, chunks, budget=budget, expand=retrieval_expand)
+        chunks = self._filter_chunks(chunks, merged_filters)
+        chunks = self._append_api_term_matches(query, chunks, budget=budget, expand=retrieval_expand, backend_filters=backend_filters, verification_filters=merged_filters)
         chunks = self._rerank_intent_matches(query, chunks, expand=retrieval_expand)
         chunks = self._limit_sections_per_source(chunks, limit=limit, expand=retrieval_expand)
         reported_mode = self._degraded_mode_name(effective_mode, candidate_lists, failures)
-        return DispatchResult(
+        return finalized(DispatchResult(
             chunks=chunks,
             contributions=contributions,
             mode_used=reported_mode,
             candidate_counts=raw_counts,
             failures=failures,
-        )
+        ))
 
     def _hierarchical_active(self, hcfg: Any) -> bool:
         """Decide whether to run the two-stage hierarchical pass for this call.
@@ -222,6 +309,40 @@ class RetrievalDispatcher:
     def _vector_readiness_failure(self, mode: str) -> dict[str, str]:
         if mode == "lexical" or self.vector_store is None or not self.collection:
             return {}
+        generation_info = self.store.generation_info()
+        if generation_info and str(generation_info.get("vector_collection") or "") != self.collection:
+            return {
+                "vector": (
+                    "collection identity does not match the active SQLite generation: "
+                    f"expected {generation_info.get('vector_collection')!r}, "
+                    f"got {self.collection!r}"
+                )
+            }
+        metadata: dict[str, Any] | None = None
+        metadata_fn = getattr(self.vector_store, "collection_metadata", None)
+        if callable(metadata_fn):
+            try:
+                metadata = metadata_fn(self.collection)
+            except Exception as exc:
+                return {"vector": f"collection metadata unavailable: {type(exc).__name__}: {exc}"}
+        if not metadata:
+            metadata = self._sidecar_collection_metadata()
+        if not metadata:
+            return {"vector": "collection capability metadata is not verified"}
+        expected_provider = str(getattr(self.provider, "name", ""))
+        expected_model = str(getattr(self.provider, "model_name", expected_provider))
+        expected_dim = int(getattr(self.provider, "dimensions", 0) or 0)
+        mismatches = []
+        if str(metadata.get("provider") or "") != expected_provider:
+            mismatches.append("provider")
+        if str(metadata.get("model") or "") != expected_model:
+            mismatches.append("model")
+        if expected_dim and int(metadata.get("dim") or 0) != expected_dim:
+            mismatches.append("dimensions")
+        if mode == "sparse" and not metadata.get("sparse_model"):
+            mismatches.append("sparse_model")
+        if mismatches:
+            return {"vector": "collection capability mismatch: " + ", ".join(mismatches)}
         count_fn = getattr(self.vector_store, "count", None)
         if not callable(count_fn):
             return {}
@@ -231,7 +352,35 @@ class RetrievalDispatcher:
             return {"vector": f"{type(exc).__name__}: {exc}"}
         if points <= 0:
             return {"vector": f"collection {self.collection!r} has no indexed vectors"}
+        if generation_info:
+            generation_id = str(generation_info.get("generation_id") or "")
+            expected = len(self.store.list_sections_for_embedding(generation_id))
+            if points != expected:
+                return {
+                    "vector": (
+                        "collection point parity does not match the active SQLite generation: "
+                        f"expected {expected}, got {points}"
+                    )
+                }
         return {}
+
+    def _sidecar_collection_metadata(self) -> dict[str, Any]:
+        if not self.collection:
+            return {}
+        try:
+            from docmancer.core import index_meta
+
+            metadata = index_meta.get(self.collection)
+        except Exception:
+            return {}
+        if metadata is None:
+            return {}
+        return {
+            "provider": metadata.provider,
+            "model": metadata.model,
+            "dim": metadata.dim,
+            "sparse_model": metadata.sparse_model,
+        }
 
     # ------------------ hierarchical retrieval ------------------
 
@@ -248,7 +397,8 @@ class RetrievalDispatcher:
     ) -> DispatchResult:
         """Two-stage retrieval: top documents first, then top sections inside them."""
         hcfg = self.config.retrieval.hierarchical
-        candidate_pool = int(hcfg.candidate_pool)
+        candidate_pool = min(40, int(hcfg.candidate_pool))
+        backend_filters = compile_backend_filters(filters) or None
         ready_failure = self._vector_readiness_failure(mode)
         if ready_failure and not allow_degraded:
             raise HybridRetrievalError(ready_failure)
@@ -258,19 +408,27 @@ class RetrievalDispatcher:
             query=query,
             mode=mode,
             per_source_limit=candidate_pool,
-            filters=filters,
+            filters=backend_filters,
+            verification_filters=filters,
         )
         if stage1_failures and mode != "lexical" and not allow_degraded:
             raise HybridRetrievalError(stage1_failures)
         if not stage1_candidates:
+            if not stage1_failures:
+                return DispatchResult(
+                    chunks=[],
+                    mode_used=mode,
+                    candidate_counts=stage1_counts,
+                )
             query_limit = self._candidate_limit_for_diversity(limit, expand)
-            chunks = self.store.query(query, limit=query_limit, budget=budget, expand=expand)
-            chunks = self._append_api_term_matches(query, chunks, budget=budget, expand=expand)
+            chunks = self.store.query(query, limit=query_limit, budget=budget, expand=expand, filters=backend_filters)
+            chunks = self._filter_chunks(chunks, filters)
+            chunks = self._append_api_term_matches(query, chunks, budget=budget, expand=expand, backend_filters=backend_filters, verification_filters=filters)
             chunks = self._rerank_intent_matches(query, chunks, expand=expand)
             chunks = self._limit_sections_per_source(chunks, limit=limit, expand=expand)
             return DispatchResult(
                 chunks=chunks,
-                mode_used="lexical-fallback",
+                mode_used=f"{mode}/lexical_fallback_degraded",
                 candidate_counts=stage1_counts,
                 failures=stage1_failures,
             )
@@ -279,7 +437,7 @@ class RetrievalDispatcher:
         for source, shaped in stage1_candidates.items():
             payload_lookup = self._payload_lookup_for(source, shaped)
             for rank, hit in enumerate(shaped, start=1):
-                sid = int(hit["id"])
+                sid = int(hit["hydration_id"])
                 doc_hash = payload_lookup.get(sid, "")
                 if not doc_hash:
                     continue
@@ -288,7 +446,11 @@ class RetrievalDispatcher:
         if not doc_scores:
             # No payloads carry document_title_hash (e.g. mixed corpus where
             # only some loaders set it). Fall through to a flat fusion.
-            return self._fuse_and_hydrate(stage1_candidates, query=query, limit=limit, budget=budget, expand=expand, counts=stage1_counts, mode=mode)
+            return self._fuse_and_hydrate(
+                stage1_candidates, query=query, limit=limit, budget=budget,
+                expand=expand, counts=stage1_counts, mode=mode, filters=filters,
+                failures=stage1_failures,
+            )
 
         top_docs = [h for h, _ in sorted(doc_scores.items(), key=lambda kv: kv[1], reverse=True)[: hcfg.documents_limit]]
 
@@ -298,13 +460,24 @@ class RetrievalDispatcher:
         stage2_candidates, stage2_counts, stage2_failures = self._fan_out(
             query=query,
             mode=mode,
-            per_source_limit=max(limit * 3, hcfg.sections_per_document * hcfg.documents_limit),
-            filters=stage2_filters,
+            per_source_limit=min(
+                40, max(limit * 3, hcfg.sections_per_document * hcfg.documents_limit)
+            ),
+            filters=compile_backend_filters(stage2_filters),
+            verification_filters=stage2_filters,
         )
         if stage2_failures and mode != "lexical" and not allow_degraded:
             raise HybridRetrievalError(stage2_failures)
+        combined_failures = {
+            **stage1_failures,
+            **{f"{key}.stage2": value for key, value in stage2_failures.items()},
+        }
         if not stage2_candidates:
-            return self._fuse_and_hydrate(stage1_candidates, query=query, limit=limit, budget=budget, expand=expand, counts=stage1_counts, mode=mode)
+            return self._fuse_and_hydrate(
+                stage1_candidates, query=query, limit=limit, budget=budget,
+                expand=expand, counts=stage1_counts, mode=mode, filters=filters,
+                failures=combined_failures,
+            )
         return self._fuse_and_hydrate(
             stage2_candidates,
             query=query,
@@ -313,6 +486,8 @@ class RetrievalDispatcher:
             expand=expand,
             counts={**stage1_counts, **{f"{k}.stage2": v for k, v in stage2_counts.items()}},
             mode=f"{mode}/hierarchical",
+            filters=stage2_filters,
+            failures=combined_failures,
         )
 
     def _fuse_and_hydrate(
@@ -325,24 +500,42 @@ class RetrievalDispatcher:
         expand: str | None,
         counts: dict[str, int],
         mode: str,
+        filters: dict | None,
+        failures: dict[str, str] | None = None,
     ) -> DispatchResult:
-        k_rrf = int(self.config.retrieval.fusion.rrf_k or 60)
-        ranked = reciprocal_rank_fusion(candidate_lists, k_rrf=k_rrf)
-        section_ids = self._top_section_ids(ranked, limit=self._candidate_limit_for_diversity(limit, expand))
-        contributions = {sid: dict(c) for hid, _s, c in ranked for sid in [int(hid)] if sid in section_ids}
+        failures = dict(failures or {})
+        ranked = self._rank_candidate_lists(candidate_lists)[:60]
+        hydration_by_stable = self._hydration_by_stable(candidate_lists)
+        section_ids = self._top_section_ids(
+            ranked,
+            hydration_by_stable=hydration_by_stable,
+            limit=self._candidate_limit_for_diversity(limit, expand),
+        )
+        contributions = {
+            hydration_by_stable[stable_id]: dict(component_ranks)
+            for stable_id, _score, component_ranks in ranked
+            if stable_id in hydration_by_stable
+            and hydration_by_stable[stable_id] in section_ids
+        }
         if (expand or "").lower() in {"adjacent", "page"}:
             section_ids = self._expand_section_ids(
                 section_ids, mode=expand, budget_cap=limit * 3
             )
         chunks = self._hydrate(section_ids, budget=budget)
-        chunks = self._append_api_term_matches(query, chunks, budget=budget, expand=expand)
+        chunks = self._filter_chunks(chunks, filters)
+        chunks = self._append_api_term_matches(
+            query, chunks, budget=budget, expand=expand,
+            backend_filters=compile_backend_filters(filters),
+            verification_filters=filters,
+        )
         chunks = self._rerank_intent_matches(query, chunks, expand=expand)
         chunks = self._limit_sections_per_source(chunks, limit=limit, expand=expand)
         return DispatchResult(
             chunks=chunks,
             contributions=contributions,
-            mode_used=mode,
+            mode_used=self._degraded_mode_name(mode, candidate_lists, failures),
             candidate_counts=counts,
+            failures=failures,
         )
 
     # ------------------ helpers ------------------
@@ -362,7 +555,7 @@ class RetrievalDispatcher:
                 if _re.search(pattern, query, _re.IGNORECASE):
                     merged = dict(filters or {})
                     for k, v in (router.filters or {}).items():
-                        merged[k] = v
+                        merged.setdefault(k, v)
                     logger.debug("router matched: %s", getattr(router, "description", None) or pattern)
                     return merged
             except _re.error:
@@ -370,13 +563,35 @@ class RetrievalDispatcher:
                 continue
         return filters
 
-    def _top_section_ids(self, ranked, *, limit: int) -> list[int]:
+    def _rank_candidate_lists(self, candidate_lists: dict[str, list[Any]]):
+        method = self.config.retrieval.fusion.method or "rrf"
+        k_rrf = int(self.config.retrieval.fusion.rrf_k or 60)
+        weights = dict(self.config.retrieval.fusion.weights or {})
+        if method == "weighted_rrf":
+            return weighted_rrf(candidate_lists, weights=weights, k_rrf=k_rrf)
+        return reciprocal_rank_fusion(candidate_lists, k_rrf=k_rrf)
+
+    @staticmethod
+    def _hydration_by_stable(candidate_lists: dict[str, list[Any]]) -> dict[str, int]:
+        mapping: dict[str, int] = {}
+        for hits in candidate_lists.values():
+            for hit in hits:
+                mapping.setdefault(str(hit["id"]), int(hit["hydration_id"]))
+        return mapping
+
+    def _top_section_ids(
+        self,
+        ranked,
+        *,
+        hydration_by_stable: dict[str, int],
+        limit: int,
+    ) -> list[int]:
         section_ids: list[int] = []
-        for hit_id, _score, _contrib in ranked:
-            try:
-                section_ids.append(int(hit_id))
-            except (TypeError, ValueError):
+        for stable_id, _score, _contrib in ranked:
+            hydration_id = hydration_by_stable.get(str(stable_id))
+            if hydration_id is None:
                 continue
+            section_ids.append(hydration_id)
             if len(section_ids) >= limit:
                 break
         return section_ids
@@ -410,7 +625,7 @@ class RetrievalDispatcher:
         out: dict[int, str] = {}
         if source == "lexical" and hasattr(self.store, "document_title_hashes_for"):
             try:
-                out.update(self.store.document_title_hashes_for([int(h["id"]) for h in shaped]))
+                out.update(self.store.document_title_hashes_for([int(h["hydration_id"]) for h in shaped]))
             except Exception:
                 pass
             return out
@@ -420,7 +635,7 @@ class RetrievalDispatcher:
         # document_title_hash.
         if hasattr(self.store, "document_title_hashes_for"):
             try:
-                out.update(self.store.document_title_hashes_for([int(h["id"]) for h in shaped]))
+                out.update(self.store.document_title_hashes_for([int(h["hydration_id"]) for h in shaped]))
             except Exception:
                 pass
         return out
@@ -434,16 +649,26 @@ class RetrievalDispatcher:
         mode: str,
         per_source_limit: int,
         filters: dict | None,
+        verification_filters: dict | None,
     ) -> tuple[dict[str, list[Any]], dict[str, int], dict[str, str]]:
         from .dense import dense_search
         from .lexical import lexical_search
         from .sparse import sparse_search
 
         tasks: dict[str, Any] = {}
+        # Backends may score a wider internal window, but only the first
+        # verified ``per_source_limit`` hits enter the candidate lane. This is
+        # required for sqlite-vec, which cannot push metadata predicates down.
+        vector_scoring_limit = min(160, max(40, per_source_limit * 4))
         with ThreadPoolExecutor(max_workers=3) as ex:
             if mode in {"hybrid"}:
                 tasks["lexical"] = ex.submit(
-                    lexical_search, self.store, query, limit=per_source_limit, budget=10_000
+                    lexical_search,
+                    self.store,
+                    query,
+                    limit=min(40, per_source_limit),
+                    budget=10_000,
+                    filters=filters,
                 )
                 tasks["dense"] = ex.submit(
                     dense_search,
@@ -451,7 +676,7 @@ class RetrievalDispatcher:
                     provider=self.provider,
                     collection=self.collection,
                     query=query,
-                    limit=per_source_limit,
+                    limit=vector_scoring_limit,
                     filters=filters,
                 )
                 if self._sparse_supported():
@@ -461,7 +686,7 @@ class RetrievalDispatcher:
                         provider=self.provider,
                         collection=self.collection,
                         query=query,
-                        limit=per_source_limit,
+                        limit=vector_scoring_limit,
                         filters=filters,
                     )
             elif mode == "dense":
@@ -471,7 +696,7 @@ class RetrievalDispatcher:
                         provider=self.provider,
                         collection=self.collection,
                         query=query,
-                        limit=per_source_limit,
+                        limit=vector_scoring_limit,
                         filters=filters,
                 )
             elif mode == "sparse":
@@ -481,7 +706,7 @@ class RetrievalDispatcher:
                     provider=self.provider,
                     collection=self.collection,
                     query=query,
-                    limit=per_source_limit,
+                    limit=vector_scoring_limit,
                     filters=filters,
                 )
             else:
@@ -500,6 +725,17 @@ class RetrievalDispatcher:
                 if not hits:
                     counts[source] = 0
                     continue
+                if source == "lexical":
+                    hits = self._filter_chunks(hits, verification_filters)
+                else:
+                    hits = [
+                        hit for hit in hits
+                        if metadata_matches_filters(
+                            getattr(hit, "payload", {}) or {},
+                            verification_filters,
+                            source=str((getattr(hit, "payload", {}) or {}).get("source") or ""),
+                        )
+                    ][:per_source_limit]
                 shaped = _shape_for_fusion(source, hits)
                 if shaped:
                     candidate_lists[source] = shaped
@@ -511,13 +747,13 @@ class RetrievalDispatcher:
             return False
         metadata_fn = getattr(self.vector_store, "collection_metadata", None)
         if not callable(metadata_fn):
-            return True
+            return bool(self._sidecar_collection_metadata().get("sparse_model"))
         try:
             metadata = metadata_fn(self.collection)
         except Exception:
-            return True
+            return False
         if metadata is None:
-            return True
+            return bool(self._sidecar_collection_metadata().get("sparse_model"))
         return bool(metadata.get("sparse_model"))
 
     def _hydrate(self, section_ids: list[int], *, budget: int) -> list:
@@ -553,6 +789,19 @@ class RetrievalDispatcher:
                 break
         return out
 
+    @staticmethod
+    def _filter_chunks(chunks: list[Any], filters: dict | None) -> list[Any]:
+        if not filters:
+            return chunks
+        return [
+            chunk for chunk in chunks
+            if metadata_matches_filters(
+                getattr(chunk, "metadata", {}) or {},
+                filters,
+                source=str(getattr(chunk, "source", "") or ""),
+            )
+        ]
+
     def _rerank_intent_matches(self, query: str, chunks: list[Any], *, expand: str | None = None) -> list[Any]:
         if not query or len(chunks) < 2:
             return chunks
@@ -585,6 +834,9 @@ class RetrievalDispatcher:
                 boost += 1.0
             boost += _intent_source_score(query_lower, intent_terms, source, haystack, text)
             boost += _snippet_intent_score(query_lower, intent_terms, query_terms, metadata, text)
+            if isinstance(metadata, dict):
+                metadata["_pre_post_rank"] = index + 1
+                metadata["_intent_boost"] = boost
             scored.append((boost, index, chunk))
 
         if not any(boost for boost, _index, _chunk in scored):
@@ -592,14 +844,31 @@ class RetrievalDispatcher:
         scored.sort(key=lambda item: (-item[0], item[1]))
         return [chunk for _boost, _index, chunk in scored]
 
-    def _append_api_term_matches(self, query: str, chunks: list[Any], *, budget: int, expand: str | None = None) -> list[Any]:
+    def _append_api_term_matches(
+        self,
+        query: str,
+        chunks: list[Any],
+        *,
+        budget: int,
+        expand: str | None = None,
+        backend_filters: dict | None = None,
+        verification_filters: dict | None = None,
+    ) -> list[Any]:
         query_terms = _query_api_terms(query)
         if not query_terms:
             return chunks
         try:
-            supplemental = self.store.query(" ".join(sorted(query_terms)), limit=10, budget=budget, expand=expand)
+            supplemental = self.store.query(
+                " ".join(sorted(query_terms)), limit=10, budget=budget,
+                expand=expand, filters=backend_filters,
+            )
         except Exception:
             return chunks
+        supplemental = self._filter_chunks(supplemental, verification_filters)
+        for rank, chunk in enumerate(supplemental, start=1):
+            metadata = getattr(chunk, "metadata", None)
+            if isinstance(metadata, dict):
+                metadata["_supplemental_rank"] = rank
         seen: set[Any] = set()
         out: list[Any] = []
         for chunk in [*chunks, *supplemental]:
@@ -621,32 +890,45 @@ class RetrievalDispatcher:
 
 
 def _shape_for_fusion(source: str, hits: list[Any]) -> list[dict]:
-    """Reduce heterogeneous hit shapes to ``[{"id": <section_id>, ...}, ...]``."""
+    """Reduce hits to stable child identity plus a separate hydration key."""
     shaped: list[dict] = []
     for hit in hits:
         if source == "lexical":
             section_id = (hit.metadata or {}).get("section_id") if hasattr(hit, "metadata") else None
             if section_id is None:
                 continue
-            shaped.append({"id": int(section_id), "score": float(getattr(hit, "score", 0.0))})
+            metadata = hit.metadata or {}
+            stable_id = str(metadata.get("stable_chunk_id") or f"hydration:{section_id}")
+            shaped.append({
+                "id": stable_id,
+                "hydration_id": int(section_id),
+                "score": float(getattr(hit, "score", 0.0)),
+            })
         else:
+            payload = hit.payload or {}
             try:
                 section_id = int(hit.id)
             except (TypeError, ValueError):
-                section_id = (hit.payload or {}).get("section_id")
+                section_id = payload.get("section_id")
                 if section_id is None:
                     continue
                 section_id = int(section_id)
-            shaped.append({"id": section_id, "score": float(getattr(hit, "score", 0.0))})
+            stable_id = str(payload.get("stable_chunk_id") or f"hydration:{section_id}")
+            shaped.append({
+                "id": stable_id,
+                "hydration_id": section_id,
+                "score": float(getattr(hit, "score", 0.0)),
+            })
     return shaped
 
 
 def _query_api_terms(query: str) -> set[str]:
-    terms = set(re.findall(r"[A-Za-z_]\w*\.[A-Za-z_]\w*", query))
-    for token in re.findall(r"`([^`]+)`", query):
-        if "." in token:
-            terms.add(token.strip())
-    return {term for term in terms if len(term) >= 4}
+    return {
+        term.value
+        for term in extract_exact_terms(query)
+        if term.kind in {"symbol", "flag", "config_key", "error_code", "path", "quoted"}
+        and len(term.value) >= 3
+    }
 
 
 def _query_intent_terms(query: str) -> set[str]:

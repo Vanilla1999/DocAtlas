@@ -47,7 +47,7 @@ def _embedding_hash(vector: list[float]) -> str:
 
 
 def _payload_for_section(section: dict, *, docset_root: str | None = None) -> dict:
-    return {
+    payload = {
         "section_id": int(section["section_id"]),
         "vector_id": section.get("vector_id") or "",
         "generation_id": section.get("generation_id") or "",
@@ -68,9 +68,23 @@ def _payload_for_section(section: dict, *, docset_root: str | None = None) -> di
         "parent_logical_id": section.get("parent_logical_id") or "",
         "chunk_schema_version": section.get("chunk_schema_version") or "",
         "chunk_config_hash": section.get("chunk_config_hash") or "",
+        "context_schema_version": section.get("context_schema_version") or "",
+        "context_config_hash": section.get("context_config_hash") or "",
+        "context_content_hash": section.get("context_content_hash") or "",
+        "embedding_input_hash": section.get("embedding_input_hash") or "",
+        "retrieval_config_hash": section.get("retrieval_config_hash") or "",
         "token_estimate": section.get("token_estimate", 0),
         "docset_root": docset_root or "",
     }
+    for key in (
+        "library_id", "resolved_version", "version_family", "project_identity",
+        "project_path", "module_id", "doc_scope", "source_class", "authority",
+        "docs_snapshot_exact", "source_identity", "canonical_url", "source_url",
+    ):
+        value = section.get(key)
+        if value is not None:
+            payload[key] = value
+    return payload
 
 
 def sync_vector_store(
@@ -260,6 +274,8 @@ def sync_vector_store(
             (
                 str(sec.get("chunk_schema_version") or "sqlite-sections-v1"),
                 str(sec.get("chunk_config_hash") or "legacy"),
+                str(sec.get("context_schema_version") or "legacy"),
+                str(sec.get("context_config_hash") or "legacy"),
                 sec["text"],
             )
         )
