@@ -1,6 +1,6 @@
-# docmancer Wiki
+# DocAtlas Wiki
 
-This wiki is the deep-dive reference for Docmancer's local, version-aware docs runtime for coding agents. The [README](../README.md) is the on-ramp: install, quickstart lanes, and a high-level overview. Once you need flags, YAML keys, or internals, you're in the right place.
+This wiki is the deep-dive reference for DocAtlas's local, version-aware documentation runtime for coding agents. The [README](../README.md) is the on-ramp: install, quickstart lanes, and a high-level overview. Once you need flags, YAML keys, or internals, you're in the right place.
 
 ## Pick a page
 

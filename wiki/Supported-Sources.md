@@ -2,8 +2,8 @@
 
 This page covers two surfaces:
 
-- **Docmancer Docs sources** consumed by `doc-atlas ingest`, `doc-atlas add`, or docs MCP prefetch tools and indexed into the local docs runtime.
-- **Advanced Docmancer Packs sources** compiled by the pipeline into version-pinned API tool surfaces and installed by `doc-atlas install-pack`.
+- **DocAtlas Docs sources** consumed by `doc-atlas ingest`, `doc-atlas add`, or Docs MCP prefetch tools and indexed into the local documentation runtime.
+- **Advanced DocAtlas MCP Packs sources** compiled by the pipeline into version-pinned API tool surfaces and installed by `doc-atlas install-pack`.
 
 For how each surface fits into the overall system, see [Architecture](./Architecture.md).
 
@@ -57,7 +57,7 @@ Run `doc-atlas update` to re-fetch and re-index all existing sources. To update 
 doc-atlas update https://docs.example.com
 ```
 
-Docmancer detects which content changed and updates only the affected sections. See [Commands](./Commands.md) for the full option reference.
+DocAtlas detects which content changed and updates only the affected sections. See [Commands](./Commands.md) for the full option reference.
 
 ## How indexing works
 

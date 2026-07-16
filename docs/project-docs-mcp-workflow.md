@@ -1,6 +1,6 @@
 # Project docs MCP workflow
 
-Project docs are the reviewable documentation files that belong to a repository: `README.md`, `docs/`, `wiki/`, `ARCHITECTURE.md`, ADRs, runbooks, roadmap files, module/package docs, and similar files. Docmancer can discover, index, reconcile, and query those files through MCP so coding agents answer from the repo's own docs before falling back to generic public documentation.
+Project docs are the reviewable documentation files that belong to a repository: `README.md`, `docs/`, `wiki/`, `ARCHITECTURE.md`, ADRs, runbooks, roadmap files, module/package docs, and similar files. DocAtlas can discover, index, reconcile, and query those files through MCP so coding agents answer from the repo's own docs before falling back to generic public documentation.
 
 ## Use this workflow when
 
@@ -105,7 +105,7 @@ plugins/*
 components/*
 ```
 
-Within each module root, Docmancer looks for maintained docs such as `README*`, `ARCHITECTURE*`, `CHANGELOG*`, `CONTRIBUTING*`, `docs/`, `doc/`, ADR folders, and runbook folders. It does not index source code as module docs.
+Within each module root, DocAtlas looks for maintained docs such as `README*`, `ARCHITECTURE*`, `CHANGELOG*`, `CONTRIBUTING*`, `docs/`, `doc/`, ADR folders, and runbook folders. It does not index source code as module docs.
 
 Prefer `module_path` over `module` when known:
 
@@ -135,7 +135,7 @@ When `requires_confirmation` is `true`, the agent should explain the proposed ac
 
 ## Creating `ARCHITECTURE.md`
 
-Docmancer does not create architecture docs itself. If `inspect_project_docs` or `bootstrap_project_docs` returns `no_project_docs` or `architecture_doc_creation_recommended`, the coding agent should ask:
+DocAtlas does not create architecture docs itself. If `inspect_project_docs` or `bootstrap_project_docs` returns `no_project_docs` or `architecture_doc_creation_recommended`, the coding agent should ask:
 
 ```text
 I could inspect the repository and create ARCHITECTURE.md as a reviewable project doc. Should I do that?

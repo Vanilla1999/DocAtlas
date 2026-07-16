@@ -20,7 +20,7 @@ The public Docs MCP server exposes exactly three tools:
 | `prepare_docs` | Explicit lifecycle work such as syncing accepted project docs or fetching an approved external source. |
 | `docs_status` | A returned job, freshness, health, or index-status question. |
 
-`get_docs_context` is the normal entry point. The target contract is for it to return the exact `prepare_docs` action and arguments when preparation is required, then let the agent retry the original question. Task 11 hardens this boundary; until then, compatibility flags remain and agents must not use them for speculative lifecycle/network work.
+`get_docs_context` is the normal entry point. It returns the exact `prepare_docs` action and arguments when preparation is required, then lets the agent retry the original question. Retrieval remains read-only; lifecycle and network work stay behind the explicit `prepare_docs` boundary.
 
 ## Product boundaries
 
@@ -28,7 +28,7 @@ The public Docs MCP server exposes exactly three tools:
 - DocAtlas does not silently author, commit, or push official project documentation.
 - When docs are missing or stale, it gives the host coding agent a bounded evidence-gathering and file-editing brief. The host agent makes a normal reviewable Git change; DocAtlas then indexes the accepted file.
 - Project code search answers implementation facts. DocAtlas supplies documentation context and provenance.
-- Network acquisition is the target explicit lifecycle contract. Task 11 still has to remove hidden compatibility paths from normal retrieval.
+- Network acquisition is an explicit lifecycle action. Normal retrieval does not silently fetch, crawl, index, or start a mutation job.
 
 ## Current capabilities
 
@@ -51,7 +51,7 @@ Patch constraints are advisory/non-blocking evidence helpers. They do not prove 
 
 ## Maturity
 
-DocAtlas is currently **Beta** for the primary Docs MCP workflow. The project must not be described as Production/Stable until the built release artifact passes the primary stdio MCP smoke and the release checklist.
+DocAtlas is currently **Beta** for the primary Docs MCP workflow. [Task 15](../roadmap/15_RELEASE_ARTIFACT_GATE.md) proves the wheel, sdist, installer override, and primary stdio MCP flow before publication. A Production/Stable claim still requires the [Task 14](../roadmap/14_KOTLIN_PARTIAL_CRAWL_ACCEPTANCE.md) live external-ingest closure plus an explicitly approved post-publish check of the exact public PyPI version, tag, changelog, installer target, and MCP smoke.
 
 ## Documentation maintenance rule
 

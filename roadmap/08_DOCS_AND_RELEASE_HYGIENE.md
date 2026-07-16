@@ -2,7 +2,7 @@
 
 ## Audit status
 
-Open and next. The 2026-07-11 audit found every major drift named below still present, plus installer/PyPI and model-instruction drift.
+Done for documentation and release-hygiene scope. The original alignment landed in `66c1e2a` and review follow-up `311eba6`; the closing audit adds executable documentation contracts and reconciles the roadmap with the completed release gates.
 
 ## Problem
 
@@ -40,3 +40,14 @@ Create one consistent product narrative and a release checklist that prevents do
 - Commands shown as primary, including the MCP server command, are discoverable from the documented `--help` path or the docs explicitly show the intermediate help command.
 - A repository test proves every intended active `docs/` path is tracked/trackable under `.gitignore`.
 - Until task 15 proves the built release artifact, the maturity classifier is no higher than Beta.
+
+## Completion evidence
+
+- The active product narrative is local-first documentation context, with patch constraints labelled advanced/advisory.
+- The default Docs MCP inventory is exactly `get_docs_context`, `prepare_docs`, and `docs_status`.
+- `tests/docs/test_documented_cli_contract.py` checks active Markdown commands and options against the Click command tree without executing them.
+- `tests/docs/test_user_facing_docs_branding.py` protects package naming, Git trackability, the canonical workflow boundary, and the 1,000-line release-documentation budget. The checked set is 423 lines at closure.
+- `pyproject.toml` remains `Development Status :: 4 - Beta`.
+- Task 15's release workflow builds wheel/sdist once, tests Python 3.11-3.13, runs the installed primary stdio smoke, and keeps publication behind the explicit release environment.
+
+Residual ownership remains separate: Task 14 owns live external-ingest closure, Task 18 owns comparable Context7 capture, Task 21 owns generated/installed agent wording, and Stable promotion requires an explicitly approved post-publish verification of the exact public release.

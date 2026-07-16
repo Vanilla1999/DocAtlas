@@ -6,7 +6,7 @@ Use this checklist before promoting a release. A source checkout passing tests i
 
 - [ ] `docmancer/_version.py`, release tag, and changelog heading name the same version.
 - [ ] README install text matches the version that the installer actually resolves.
-- [ ] README, product brief, Docs MCP reference, wiki command/troubleshooting pages, and changelog agree that the public Docs MCP tools are `get_docs_context`, `prepare_docs`, and `docs_status`.
+- [ ] README, product brief, [Docs MCP reference](./mcp-docs-server.md), wiki command/troubleshooting pages, and changelog agree that the public Docs MCP tools are `get_docs_context`, `prepare_docs`, and `docs_status`.
 - [ ] Advanced Packs and patch constraints are labelled advanced/advisory.
 - [ ] New active documentation is tracked by Git and does not duplicate the canonical Docs MCP workflow.
 - [ ] The canonical user-facing release set (`README.md`, product brief, Docs MCP reference, capability reference, release checklist) is at most 1,000 lines, or this release records a reviewed exception and removal plan.
@@ -29,4 +29,4 @@ Use this checklist before promoting a release. A source checkout passing tests i
 - [ ] Trusted Publishing is configured for the repository/environment in PyPI; no long-lived PyPI token is stored.
 - [ ] Download `release-manifest.json` and retain its wheel/sdist SHA-256 values with the release record.
 - [ ] Public artifacts, tag, changelog, and release metadata agree after publishing.
-- [ ] Do not call the release Stable until the artifact gate and required live external-ingest evidence are green.
+- [ ] Do not call the release Stable until [Task 14](../roadmap/14_KOTLIN_PARTIAL_CRAWL_ACCEPTANCE.md)'s required live external-ingest evidence and the explicitly approved post-publish check of the exact public PyPI version are green.

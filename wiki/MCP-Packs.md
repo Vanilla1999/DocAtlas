@@ -1,6 +1,6 @@
 # MCP Packs
 
-MCP Packs are Docmancer's advanced product layer. If your goal is source-grounded answers from documentation, start with Docmancer Docs: `doc-atlas ingest`, `doc-atlas add`, `doc-atlas query`, or `doc-atlas mcp docs-serve`. Use Packs when an agent needs version-pinned API action tools.
+MCP Packs are DocAtlas's advanced API-action layer. If your goal is source-grounded answers from documentation, start with the DocAtlas Docs workflow: `doc-atlas ingest`, `doc-atlas add`, `doc-atlas query`, or `doc-atlas mcp docs-serve`. Use Packs when an agent needs version-pinned API action tools.
 
 MCP packs are version-pinned tool bundles compiled from public API documentation sources such as OpenAPI, GraphQL introspection, TypeDoc, and Sphinx. Installed packs are exposed to agents through one local stdio gateway, `doc-atlas mcp packs-serve`, using two meta-tools. `doc-atlas mcp serve` remains a compatibility alias:
 
@@ -18,7 +18,7 @@ doc-atlas install-pack open-meteo@v1
 `install-pack` resolves artifacts in this order:
 
 1. Local cache.
-2. The hosted Docmancer artifact API.
+2. The hosted compatibility Docmancer artifact API.
 3. Built-in known-source fallback. Open-Meteo packs can be compiled locally from the public OpenAPI spec when precompiled artifacts are not available.
 
 Package specs parse from the rightmost `@`, so scoped names like `@scope/pkg@1.2.3` work.
