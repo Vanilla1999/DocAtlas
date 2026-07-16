@@ -1,0 +1,32 @@
+{
+  "schema_version": "task42-evidence-baseline-v1",
+  "status": "PASS",
+  "selector": "legacy-top-k-fit-v1",
+  "commit_sha": "9afb20d7aca6c0411b14739781dacceb292cb78f",
+  "candidate_limit": 20,
+  "token_ceilings": {
+    "docs_answer": 800,
+    "patch_context_target": 1500,
+    "patch_context_absolute": 2000,
+    "insufficient_evidence": 300
+  },
+  "dataset_digests": {
+    "adversarial_cases.json": "5b5929a4a0431797e454fca865716b9015334a82fb7c43bfd618bcfd8fb1d2a4",
+    "docs_cases.json": "f74a73055673a6ca78df60ce586c36e146449027c88d664cd831f31f32815317",
+    "patch_cases.json": "e951a4fd7bfb5eca4466a72e7a2ad6f897c503bafce236d8e1a39560fbcf4ef5"
+  },
+  "task41_candidate_trace_hash": "37cfcf3acd07eb4aafb06124f34ba2c07deb09e6eabcb142223fc5915342f105",
+  "retrieval_config_hash": "7614071e250bef9b0d9d3170f05b9682c8a41723f742ddb8e3f69a5c9b4362c6",
+  "metrics": {
+    "docs_answer": {
+      "cases": 8,
+      "median_legacy_budgeted_tokens": 129.0
+    },
+    "patch_context": {
+      "cases": 5,
+      "median_legacy_budgeted_tokens": 487
+    }
+  },
+  "blockers": [],
+  "note": "The frozen provider-free Task 41 candidate trace is green; Task 42 must preserve correctness and not exceed the legacy median budgeted token cost."
+}

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import hashlib
 import math
 
 import jsonschema
@@ -13,6 +14,65 @@ from docmancer.docs.application.action_packet import (
     estimate_action_packet_tokens,
     validate_action_packet,
 )
+
+
+def test_post_format_sufficiency_fails_closed_when_public_fact_is_not_rendered():
+    text = "OpaqueContractValue-739 is the selected contract value."
+    packet = build_action_packet(
+        question="Apply the change",
+        context_pack=[{
+            "stable_chunk_id": "fact",
+            "parent_logical_id": "parent:fact",
+            "source": "docs/fact.md",
+            "display_text": text,
+            "display_content_hash": hashlib.sha256(text.encode("utf-8")).hexdigest(),
+            "authority": "official",
+        }],
+        public_requirements=[text],
+        max_tokens=1500,
+    )
+
+    assert packet["status"] == "insufficient_evidence"
+    assert packet["omitted_counts"]["mandatory_requirements"] >= 1
+
+
+def test_post_format_sufficiency_fails_closed_when_exact_symbol_is_dropped():
+    text = "Change RareExactSymbol without altering public behavior."
+    packet = build_action_packet(
+        question="Apply the change",
+        context_pack=[{
+            "stable_chunk_id": "symbol",
+            "parent_logical_id": "parent:symbol",
+            "source": "src/example.py",
+            "display_text": text,
+            "display_content_hash": hashlib.sha256(text.encode("utf-8")).hexdigest(),
+            "authority": "official",
+        }],
+        public_requirements=["RareExactSymbol"],
+        max_tokens=1500,
+    )
+
+    assert packet["status"] == "insufficient_evidence"
+    assert packet["omitted_counts"]["mandatory_requirements"] == 1
+
+
+def test_display_only_canonical_child_is_rendered_and_hash_bound():
+    text = "The formatter must preserve stable child citations."
+    item = {
+        "stable_chunk_id": "display-child",
+        "parent_logical_id": "parent:display-child",
+        "source": "AGENTS.md",
+        "display_text": text,
+        "display_content_hash": hashlib.sha256(text.encode("utf-8")).hexdigest(),
+        "authority": "canonical",
+        "doc_scope": "project",
+    }
+
+    packet = build_action_packet(question="Update the formatter", context_pack=[item])
+
+    assert packet["status"] == "ok"
+    assert packet["required_invariants"][0]["text"] == text
+    assert validate_action_packet(packet, evidence_items=[item]) == []
 from docmancer.docs.application.unified_context_service import UnifiedDocsContextService
 from docmancer.docs.domain.content_trust import annotate_context_pack
 from docmancer.docs.interfaces.mcp.context_tools import handle_context_tool

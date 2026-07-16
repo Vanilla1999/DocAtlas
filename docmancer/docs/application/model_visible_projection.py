@@ -9,6 +9,10 @@ from copy import deepcopy
 from typing import Any, Iterable
 
 from docmancer.docs.application.action_packet import evidence_identity_for_item
+from docmancer.docs.application.evidence_selection import (
+    docs_selection_config,
+    select_evidence,
+)
 from docmancer.docs.domain.request_intent import model_projection_kind
 
 
@@ -40,34 +44,46 @@ def projection_kind(question: str) -> str:
 
 
 def project_docs_answer(
-    *, question: str, retrieval: dict[str, Any], max_tokens: int = DOCS_ANSWER_MAX_TOKENS
+    *,
+    question: str,
+    retrieval: dict[str, Any],
+    max_tokens: int = DOCS_ANSWER_MAX_TOKENS,
+    selection_diagnostics: dict[str, Any] | None = None,
 ) -> tuple[dict[str, Any], dict[str, dict[str, Any]]]:
     """Create one deduplicated source list and an internal immutable snapshot."""
 
     candidates = _docs_candidates(retrieval)
+    decision = select_evidence(
+        candidates,
+        question=question,
+        config=docs_selection_config(max_tokens),
+        trust_contract=retrieval.get("trust_contract") or {},
+        exact_version=_requested_exact_version(retrieval),
+        required_evidence_paths=retrieval.get("required_evidence_paths") or (),
+        required_target_paths=retrieval.get("required_target_paths") or (),
+        public_requirements=retrieval.get("public_requirements") or (),
+        project_identity=retrieval.get("project_identity"),
+        module_id=retrieval.get("module_id"),
+    )
+    if selection_diagnostics is not None:
+        selection_diagnostics.update(decision.audit_manifest())
     sources: list[dict[str, Any]] = []
     snapshot: dict[str, dict[str, Any]] = {}
-    seen: set[tuple[str, str, str]] = set()
-    omitted = 0
-    for item in candidates:
+    omitted = len(decision.omissions)
+    for item in decision.selected_items:
         normalized = _docs_source(item)
         if normalized is None:
             omitted += 1
             continue
-        identity = (normalized["path_or_url"], normalized["section"], normalized["content_sha256"])
-        if identity in seen:
-            continue
-        seen.add(identity)
         evidence_id = normalized["evidence_id"]
         sources.append(normalized)
         snapshot[evidence_id] = {"source": deepcopy(item), **normalized}
-        if len(sources) == MAX_DOCS_SOURCES:
-            omitted += max(0, len(candidates) - len(seen))
-            break
 
     retrieval_issues = _docs_retrieval_issues(retrieval)
-    if not sources or retrieval_issues:
+    if decision.status != "ok" or not sources or retrieval_issues:
         missing = [str(retrieval.get("message") or "No complete source-backed documentation answer is available.")]
+        missing.extend(decision.missing_requirements)
+        missing.extend(decision.unresolved_conflicts)
         missing.extend(retrieval_issues)
         return project_insufficient(
             kind="docs_answer", missing=missing,
@@ -85,16 +101,22 @@ def project_docs_answer(
         "estimated_tokens": 0,
     }
     _refresh_estimate(payload)
-    while estimate_projection_tokens(payload) > min(DOCS_ANSWER_MAX_TOKENS, max_tokens) and len(sources) > 1:
-        sources.pop()
-        payload["omitted_counts"]["sources"] = payload["omitted_counts"].get("sources", 0) + 1
-        _refresh_estimate(payload)
     if estimate_projection_tokens(payload) > min(DOCS_ANSWER_MAX_TOKENS, max_tokens):
         return project_insufficient(
             kind="docs_answer", missing=["The selected documentation evidence exceeds the bounded answer budget."],
             recommended_next_action=None, max_tokens=INSUFFICIENT_EVIDENCE_MAX_TOKENS,
         ), snapshot
     return payload, snapshot
+
+
+def _requested_exact_version(retrieval: dict[str, Any]) -> str | None:
+    """Return a version only when retrieval says the binding is exact."""
+
+    exactness = str(retrieval.get("docs_exactness") or "").casefold().replace("-", "_")
+    if exactness not in {"exact", "exact_version", "version_exact", "exact_version_indexed"}:
+        return None
+    value = retrieval.get("requested_version") or retrieval.get("resolved_version")
+    return str(value).strip() if value is not None and str(value).strip() else None
 
 
 def project_patch_context(

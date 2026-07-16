@@ -1,0 +1,56 @@
+{
+  "schema_version": "task42-evidence-cases-v1",
+  "cases": [
+    {
+      "case_id": "patch_policy_target_and_test",
+      "result_kind": "patch_context",
+      "question": "Update Worker.run",
+      "required_evidence_paths": ["AGENTS.md"],
+      "required_target_paths": ["src/worker.py"],
+      "required_facts": ["must preserve isolation", "pytest tests/test_worker.py"],
+      "project_path": "/project",
+      "candidates": [
+        {"stable_chunk_id": "policy", "parent_logical_id": "agents-rules", "source": "AGENTS.md", "display_text": "The worker must preserve isolation.\npytest tests/test_worker.py", "authority": "canonical", "repository_authority": "explicit_agent_policy", "instruction_trust": "scoped_agent_policy", "scope_verified": true, "policy_scope": "/project", "source_class": "project_doc", "doc_scope": "project", "retrieval_rank": 2},
+        {"stable_chunk_id": "target", "parent_logical_id": "worker-run", "source": "src/worker.py", "display_text": "def run(): pass", "source_class": "code_graph", "symbols": ["Worker.run"], "retrieval_rank": 1}
+      ],
+      "expected_status": "ok",
+      "expected_selected": ["policy", "target"],
+      "maximum_visible_tokens": 1500
+    },
+    {
+      "case_id": "patch_missing_target",
+      "result_kind": "patch_context",
+      "question": "Update missing target",
+      "required_target_paths": ["src/missing.py"],
+      "candidates": [
+        {"stable_chunk_id": "other", "parent_logical_id": "other", "source": "src/other.py", "display_text": "def other(): pass", "source_class": "code_graph", "symbols": ["other"]}
+      ],
+      "expected_status": "insufficient_evidence",
+      "maximum_visible_tokens": 1500
+    },
+    {
+      "case_id": "patch_exact_identifier_boundary",
+      "result_kind": "patch_context",
+      "question": "Update Auth.login",
+      "required_target_paths": ["src/auth.py"],
+      "candidates": [
+        {"stable_chunk_id": "legacy-login", "parent_logical_id": "legacy", "source": "src/legacy_auth.py", "display_text": "def loginLegacy(): pass", "source_class": "code_graph", "symbols": ["Auth.loginLegacy"], "retrieval_rank": 1},
+        {"stable_chunk_id": "current-login", "parent_logical_id": "current", "source": "src/auth.py", "display_text": "def login(): pass", "source_class": "code_graph", "symbols": ["Auth.login"], "retrieval_rank": 2}
+      ],
+      "expected_status": "ok",
+      "maximum_visible_tokens": 1500
+    },
+    {
+      "case_id": "patch_scope_missing_identity",
+      "result_kind": "patch_context",
+      "question": "Update runtime worker",
+      "project_identity": "acme/project",
+      "module_id": "runtime",
+      "candidates": [
+        {"stable_chunk_id": "worker", "parent_logical_id": "worker", "source": "src/worker.py", "display_text": "def run(): pass", "source_class": "code_graph", "symbols": ["Worker.run"], "project_identity": "acme/project"}
+      ],
+      "expected_status": "insufficient_evidence",
+      "maximum_visible_tokens": 1500
+    }
+  ]
+}
