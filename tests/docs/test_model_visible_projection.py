@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from copy import deepcopy
 
+import pytest
+
 from docmancer.docs.application.action_packet import build_action_packet, validate_action_packet
 from docmancer.docs.application.model_visible_projection import (
     FORBIDDEN_MODEL_KEYS,
@@ -111,6 +113,242 @@ def test_patch_projection_retains_validated_citations_without_raw_evidence():
                 tampered, snapshot=snapshot, max_tokens=1_500
             )
         )
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("path_or_url", "docs/foreign.md"),
+        ("section", "Foreign section"),
+        ("snippet", "unbound text"),
+        ("version_binding", "999"),
+        ("content_sha256", "0" * 64),
+    ],
+)
+def test_docs_projection_rejects_every_mutated_source_field(field, value):
+    projection, snapshot = project_docs_answer(
+        question="How do I set RETRY_LIMIT?",
+        retrieval={
+            "status": "success",
+            "answer_available": True,
+            "primary_snippet": {
+                "source": "docs/retries.md",
+                "title": "Retries",
+                "content": "Set RETRY_LIMIT=3.",
+                "version": "2.0",
+            },
+        },
+    )
+    tampered = deepcopy(projection)
+    tampered["sources"][0][field] = value
+    tampered["estimated_tokens"] = estimate_projection_tokens(tampered)
+
+    errors = validate_model_visible_projection(
+        tampered, snapshot=snapshot, max_tokens=800
+    )
+
+    assert errors
+    assert any(field in error or "hash" in error for error in errors)
+
+
+@pytest.mark.parametrize(
+    "field",
+    [
+        "evidence_id",
+        "path_or_url",
+        "section",
+        "snippet",
+        "version_binding",
+        "content_sha256",
+    ],
+)
+def test_docs_projection_rejects_deleted_source_fields(field):
+    projection, snapshot = project_docs_answer(
+        question="How do I set RETRY_LIMIT?",
+        retrieval={
+            "status": "success",
+            "answer_available": True,
+            "primary_snippet": {
+                "source": "docs/retries.md",
+                "content": "Set RETRY_LIMIT=3.",
+            },
+        },
+    )
+    tampered = deepcopy(projection)
+    tampered["sources"][0].pop(field)
+    tampered["estimated_tokens"] = estimate_projection_tokens(tampered)
+
+    errors = validate_model_visible_projection(
+        tampered, snapshot=snapshot, max_tokens=800
+    )
+
+    assert errors
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("path", "src/foreign.py"),
+        ("symbol_or_section", "Foreign.run"),
+        ("authority", "canonical"),
+        ("instruction_trust", "scoped_agent_policy"),
+        ("scope", "/foreign"),
+        ("version_binding", "999"),
+        ("content_sha256", "0" * 64),
+    ],
+)
+def test_patch_projection_rejects_every_mutated_source_field(field, value):
+    evidence = [{
+        "path": "AGENTS.md",
+        "heading_path": "Rules",
+        "authority": "canonical",
+        "repository_authority": "explicit_agent_policy",
+        "instruction_trust": "scoped_agent_policy",
+        "scope_verified": True,
+        "policy_scope": "/project",
+        "content": (
+            "The patch must preserve source IDs.\n"
+            "Run pytest tests/docs/test_mcp_boundary.py."
+        ),
+    }]
+    packet = build_action_packet(
+        question="Implement canonical projection",
+        context_pack=evidence,
+        project_path="/project",
+    )
+    projection, snapshot = project_patch_context(
+        packet=packet, evidence_items=evidence
+    )
+    original = projection["sources"][0][field]
+    tampered = deepcopy(projection)
+    tampered["sources"][0][field] = (
+        value if value != original else f"mutated-{value}"
+    )
+    tampered["estimated_tokens"] = estimate_projection_tokens(tampered)
+
+    errors = validate_model_visible_projection(
+        tampered, snapshot=snapshot, max_tokens=1_500
+    )
+
+    assert errors
+    assert any(field in error or "hash" in error for error in errors)
+
+
+@pytest.mark.parametrize(
+    "field",
+    [
+        "evidence_id",
+        "path",
+        "symbol_or_section",
+        "authority",
+        "instruction_trust",
+        "scope",
+        "version_binding",
+        "content_sha256",
+    ],
+)
+def test_patch_projection_rejects_deleted_source_fields(field):
+    evidence = [{
+        "path": "AGENTS.md",
+        "heading_path": "Rules",
+        "authority": "canonical",
+        "repository_authority": "explicit_agent_policy",
+        "instruction_trust": "scoped_agent_policy",
+        "scope_verified": True,
+        "policy_scope": "/project",
+        "content": "The patch must preserve source IDs.",
+    }]
+    packet = build_action_packet(
+        question="Implement canonical projection",
+        context_pack=evidence,
+        project_path="/project",
+    )
+    projection, snapshot = project_patch_context(
+        packet=packet, evidence_items=evidence
+    )
+    tampered = deepcopy(projection)
+    tampered["sources"][0].pop(field)
+    tampered["estimated_tokens"] = estimate_projection_tokens(tampered)
+
+    errors = validate_model_visible_projection(
+        tampered, snapshot=snapshot, max_tokens=1_500
+    )
+
+    assert errors
+
+
+def test_projection_rejects_unknown_source_field_after_estimate_refresh():
+    projection, snapshot = project_docs_answer(
+        question="What is the retry policy?",
+        retrieval={
+            "status": "success",
+            "answer_available": True,
+            "primary_snippet": {
+                "source": "docs/retries.md",
+                "content": "Retries are bounded.",
+            },
+        },
+    )
+    tampered = deepcopy(projection)
+    tampered["sources"][0]["authority"] = "canonical"
+    tampered["estimated_tokens"] = estimate_projection_tokens(tampered)
+
+    assert "projection source contains unknown fields: authority" in (
+        validate_model_visible_projection(
+            tampered, snapshot=snapshot, max_tokens=800
+        )
+    )
+
+
+def test_actionable_question_discloses_when_safe_evidence_is_not_actionable():
+    projection, snapshot = project_docs_answer(
+        question="How do I configure retries?",
+        retrieval={
+            "status": "success",
+            "answer_available": True,
+            "primary_snippet": {
+                "source": "docs/safe.md",
+                "content": "Keep retries bounded.",
+            },
+        },
+    )
+
+    assert projection["status"] == "ok"
+    assert projection["answer"] == "Keep retries bounded."
+    assert "does not provide a concrete configuration" in projection[
+        "limitations"
+    ][0]
+    assert projection["omitted_counts"]["answer_details"] == 1
+    assert validate_model_visible_projection(
+        projection, snapshot=snapshot, max_tokens=800
+    ) == []
+
+
+@pytest.mark.parametrize(
+    ("question", "snippet"),
+    [
+        ("How do I configure retries?", "Set RETRY_LIMIT=3."),
+        (
+            "How do I call WidgetClient.fetch_record?",
+            "WidgetClient.fetch_record(record_id, timeout=5)",
+        ),
+        ("What is the retry policy?", "Keep retries bounded."),
+    ],
+)
+def test_actionable_or_conceptual_answers_do_not_get_false_limitations(
+    question, snippet
+):
+    projection, _ = project_docs_answer(
+        question=question,
+        retrieval={
+            "status": "success",
+            "answer_available": True,
+            "primary_snippet": {"source": "docs/retries.md", "content": snippet},
+        },
+    )
+
+    assert "limitations" not in projection
+    assert "answer_details" not in projection["omitted_counts"]
 
 
 def test_insufficient_projection_is_fail_closed_and_at_most_300_tokens():

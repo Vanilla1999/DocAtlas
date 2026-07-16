@@ -4,7 +4,7 @@ This directory contains the first real execution of the frozen Task 43
 protocol. The execution is bound to protocol SHA-256
 `2a9725df3dd31ed09eea84cf16cc84d747b34856d5ce5fac9405b1d3695cb2de`
 and deterministic result digest
-`ab40b26b58fb7e98424906144e971f560425e62f547d7aca867d2d8e235a0245`.
+`5e4b1603d59f1895a929a3545e465c3883364c83a135331317462b0ab02f3680`.
 
 The deterministic automated gate and frozen Pareto gate are **PASS**:
 
@@ -13,11 +13,14 @@ The deterministic automated gate and frozen Pareto gate are **PASS**:
   can still select it;
 - exact identifier requests omit prefix lookalikes such as
   `Auth.loginLegacy` for `Auth.login`;
-- docs and patch source mutations are rejected against their internal
-  snapshots;
+- docs and patch source fields, including trust and scope metadata, are
+  exactly bound to their internal snapshots;
 - required-fact coverage, citation validity, and holdout Recall@5 are 100%;
-- paired p95 retrieval-plus-projection latency remains within the frozen 10%
-  bound for both docs and patch results.
+- baseline and candidate p95 retrieval-plus-projection latency are measured in
+  one Python process and remain within the frozen 10% bound for both docs and
+  patch results;
+- actionable questions backed only by general guidance disclose the missing
+  configuration detail instead of presenting that guidance as complete.
 
 Task 39 and Task 42 lower-layer gates pass, including the Task 42 reversed
 candidate-order determinism check.
@@ -25,6 +28,9 @@ candidate-order determinism check.
 The overall provider-free verdict is **INCONCLUSIVE** because human review is
 still pending. The production-model experiment also remains **INCONCLUSIVE**.
 No human ratings, provider usage, or production-model savings are claimed.
+The six human-review inputs now carry their public questions and applicable
+version/path constraints so directness and ambiguity can be reviewed without
+consulting hidden evaluator state.
 
 Run the provider-free observation with:
 

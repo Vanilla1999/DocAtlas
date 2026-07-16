@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import copy
 import hashlib
+import importlib
 import json
 import math
 import os
@@ -15,6 +16,7 @@ import sys
 import tarfile
 import tempfile
 import time
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Callable
 
@@ -65,6 +67,28 @@ PRODUCT_CODE_PATHS = (
 )
 
 
+@dataclass(frozen=True)
+class _ProductAPI:
+    document_type: Any
+    store_type: Any
+    build_action_packet: Callable[..., dict[str, Any]]
+    validate_action_packet: Callable[..., list[str]]
+    project_docs_answer: Callable[..., tuple[dict[str, Any], dict[str, Any]]]
+    project_patch_context: Callable[..., tuple[dict[str, Any], dict[str, Any]]]
+    validate_projection: Callable[..., list[str]]
+
+
+CANDIDATE_PRODUCT = _ProductAPI(
+    document_type=Document,
+    store_type=SQLiteStore,
+    build_action_packet=build_action_packet,
+    validate_action_packet=validate_action_packet,
+    project_docs_answer=project_docs_answer,
+    project_patch_context=project_patch_context,
+    validate_projection=validate_model_visible_projection,
+)
+
+
 def run(output_dir: Path) -> dict[str, Any]:
     protocol = load_protocol()
     protocol_errors = validate_protocol(protocol)
@@ -97,7 +121,8 @@ def run(output_dir: Path) -> dict[str, Any]:
                 results.append(case_result)
                 timing_samples[contract["contract_id"]] = measured["samples_ms"]
                 _record_auxiliary_inputs(
-                    contract, measured, review_inputs, integrity_inputs
+                    contract, measured, review_inputs, integrity_inputs,
+                    review_context=_review_context(case, contract),
                 )
 
     for group in ("docs_cases", "patch_cases", "adversarial_cases"):
@@ -111,7 +136,10 @@ def run(output_dir: Path) -> dict[str, Any]:
             case_result = _evaluate_measured_case(contract, measured)
             results.append(case_result)
             timing_samples[contract["contract_id"]] = measured["samples_ms"]
-            _record_auxiliary_inputs(contract, measured, review_inputs, integrity_inputs)
+            _record_auxiliary_inputs(
+                contract, measured, review_inputs, integrity_inputs,
+                review_context=_review_context(case, contract),
+            )
 
     results.sort(key=lambda row: row["contract_id"])
     measured_groups = {
@@ -232,17 +260,17 @@ def run(output_dir: Path) -> dict[str, Any]:
         == baseline.get("product_code_digests")
     )
     comparison_baseline = copy.deepcopy(baseline)
-    if identity_candidate:
-        for kind in ("docs_answer", "patch_context"):
-            candidate_baseline["groups"][kind][
-                "retrieval_projection_p95_ms"
-            ] = baseline["groups"][kind]["retrieval_projection_p95_ms"]
-    elif os.environ.get("DOCATLAS_TASK43_SKIP_PAIRED_BASELINE") != "1":
-        paired_groups = _paired_baseline_groups(protocol)
-        for kind in ("docs_answer", "patch_context"):
-            comparison_baseline["groups"][kind][
-                "retrieval_projection_p95_ms"
-            ] = paired_groups[kind]["retrieval_projection_p95_ms"]
+    process_identity = {
+        "candidate_pid": os.getpid(),
+        "baseline_pid": os.getpid(),
+    }
+    paired = _paired_baseline_groups(protocol, candidate_pid=os.getpid())
+    paired_groups = paired["groups"]
+    process_identity = paired["process_identity"]
+    for kind in ("docs_answer", "patch_context"):
+        comparison_baseline["groups"][kind][
+            "retrieval_projection_p95_ms"
+        ] = paired_groups[kind]["retrieval_projection_p95_ms"]
     pareto_errors = compare_pareto_candidate(
         candidate_baseline, comparison_baseline
     )
@@ -265,7 +293,7 @@ def run(output_dir: Path) -> dict[str, Any]:
     }
     timing = _timing_artifact(
         protocol, timing_samples, measured_groups, comparison_baseline["groups"],
-        identity_candidate,
+        identity_candidate, process_identity,
     )
     human_inputs = _human_review_artifact(protocol, review_inputs, stable_digest)
     _write_json(output_dir / "baseline_v1.json", baseline)
@@ -275,8 +303,10 @@ def run(output_dir: Path) -> dict[str, Any]:
     return report
 
 
-def _paired_baseline_groups(protocol: dict[str, Any]) -> dict[str, Any]:
-    """Measure the frozen product revision in the same evaluator invocation."""
+def _paired_baseline_groups(
+    protocol: dict[str, Any], *, candidate_pid: int
+) -> dict[str, Any]:
+    """Measure the frozen product revision in this Python interpreter."""
 
     with tempfile.TemporaryDirectory(prefix="docatlas-task43-paired-") as temporary:
         root = Path(temporary)
@@ -304,45 +334,106 @@ def _paired_baseline_groups(protocol: dict[str, Any]) -> dict[str, Any]:
                 ):
                     raise RuntimeError("unsafe member in frozen git archive")
             bundle.extractall(checkout)
-        output = root / "result"
-        environment = dict(os.environ)
-        environment["DOCATLAS_TASK43_SKIP_PAIRED_BASELINE"] = "1"
-        environment["PYTHONPATH"] = os.pathsep.join(
-            [str(ROOT), environment.get("PYTHONPATH", "")]
-        ).rstrip(os.pathsep)
-        completed = subprocess.run(
-            [
-                sys.executable, "-c",
-                (
-                    "from pathlib import Path; "
-                    "from eval.answer_quality_runner import run; "
-                    f"run(Path({str(output)!r}))"
-                ),
-            ],
-            cwd=checkout, env=environment, stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE, text=True, check=False,
-        )
-        if completed.returncode:
+        baseline_pid = os.getpid()
+        if baseline_pid != candidate_pid:
             raise RuntimeError(
-                "paired Task 43 baseline execution failed: " + completed.stderr
+                "paired Task 43 timing must use one Python process"
             )
-        latency = load_json(output / "latency_v1.json")
+        baseline_product = _load_product_api(checkout)
+        groups = _measure_product_groups(protocol, baseline_product)
         return {
-            kind: {
-                "retrieval_projection_p95_ms": latency["groups"][kind][
-                    "candidate_p95_ms"
-                ]
-            }
-            for kind in ("docs_answer", "patch_context")
+            "groups": groups,
+            "process_identity": {
+                "candidate_pid": candidate_pid,
+                "baseline_pid": baseline_pid,
+            },
         }
 
 
-def _build_task39_store(root: Path) -> SQLiteStore:
+def _load_product_api(root: Path) -> _ProductAPI:
+    """Load one frozen product tree without replacing candidate references."""
+
+    prefix = "docmancer"
+    preserved = {
+        name: module
+        for name, module in sys.modules.items()
+        if name == prefix or name.startswith(prefix + ".")
+    }
+    original_path = list(sys.path)
+    try:
+        for name in preserved:
+            sys.modules.pop(name, None)
+        sys.path.insert(0, str(root))
+        importlib.invalidate_caches()
+        models = importlib.import_module("docmancer.core.models")
+        store = importlib.import_module("docmancer.core.sqlite_store")
+        packet = importlib.import_module(
+            "docmancer.docs.application.action_packet"
+        )
+        projection = importlib.import_module(
+            "docmancer.docs.application.model_visible_projection"
+        )
+        return _ProductAPI(
+            document_type=models.Document,
+            store_type=store.SQLiteStore,
+            build_action_packet=packet.build_action_packet,
+            validate_action_packet=packet.validate_action_packet,
+            project_docs_answer=projection.project_docs_answer,
+            project_patch_context=projection.project_patch_context,
+            validate_projection=projection.validate_model_visible_projection,
+        )
+    finally:
+        for name in tuple(sys.modules):
+            if name == prefix or name.startswith(prefix + "."):
+                sys.modules.pop(name, None)
+        sys.modules.update(preserved)
+        sys.path[:] = original_path
+        importlib.invalidate_caches()
+
+
+def _measure_product_groups(
+    protocol: dict[str, Any], product: _ProductAPI
+) -> dict[str, dict[str, float]]:
+    samples: dict[str, list[float]] = {
+        "docs_answer": [],
+        "patch_context": [],
+    }
+    with tempfile.TemporaryDirectory(
+        prefix="docatlas-task43-baseline-quality-"
+    ) as temporary:
+        store = _build_task39_store(Path(temporary), product=product)
+        for split in SPLITS:
+            dataset = load_json(TASK39_DATA / f"{split}.json")
+            for case in dataset["cases"]:
+                measured = _measure_case(
+                    lambda case=case: _task39_projection(
+                        store, case, product=product
+                    ),
+                    protocol,
+                )
+                samples["docs_answer"].extend(measured["samples_ms"])
+    for group in ("docs_cases", "patch_cases", "adversarial_cases"):
+        dataset = load_json(TASK42_DATA / f"{group}.json")
+        for case in dataset["cases"]:
+            measured = _measure_case(
+                lambda case=case: _task42_projection(case, product=product),
+                protocol,
+            )
+            samples[str(case["result_kind"])].extend(measured["samples_ms"])
+    return {
+        kind: {"retrieval_projection_p95_ms": _percentile(values, 0.95)}
+        for kind, values in samples.items()
+    }
+
+
+def _build_task39_store(
+    root: Path, *, product: _ProductAPI = CANDIDATE_PRODUCT
+) -> Any:
     corpus = load_json(TASK39_DATA / "corpus.json")
-    store = SQLiteStore(root / "index.db", root / "extracted")
+    store = product.store_type(root / "index.db", root / "extracted")
     store.add_documents(
         [
-            Document(
+            product.document_type(
                 source=row["source"],
                 content=row["content"],
                 metadata={
@@ -360,7 +451,10 @@ def _build_task39_store(root: Path) -> SQLiteStore:
 
 
 def _task39_projection(
-    store: SQLiteStore, case: dict[str, Any]
+    store: Any,
+    case: dict[str, Any],
+    *,
+    product: _ProductAPI = CANDIDATE_PRODUCT,
 ) -> tuple[dict[str, Any], dict[str, dict[str, Any]], list[str]]:
     chunks = store.query(
         str(case["query"]),
@@ -384,12 +478,12 @@ def _task39_projection(
     if items:
         retrieval["primary_snippet"] = items[0]
         retrieval["supporting_snippets"] = items[1:]
-    projection, snapshot = project_docs_answer(
+    projection, snapshot = product.project_docs_answer(
         question=str(case["query"]),
         retrieval=retrieval,
         max_tokens=RETRIEVAL_CONFIG["projection_budget"],
     )
-    errors = validate_model_visible_projection(
+    errors = product.validate_projection(
         projection,
         snapshot=snapshot,
         max_tokens=(
@@ -401,6 +495,8 @@ def _task39_projection(
 
 def _task42_projection(
     case: dict[str, Any],
+    *,
+    product: _ProductAPI = CANDIDATE_PRODUCT,
 ) -> tuple[dict[str, Any], dict[str, dict[str, Any]], list[str]]:
     maximum = int(case["maximum_visible_tokens"])
     candidates = [_host_bind_candidate(item) for item in case["candidates"]]
@@ -413,7 +509,7 @@ def _task42_projection(
     }
     errors: list[str] = []
     if case["result_kind"] == "docs_answer":
-        projection, snapshot = project_docs_answer(
+        projection, snapshot = product.project_docs_answer(
             question=case["question"],
             retrieval={
                 "status": "success",
@@ -431,7 +527,7 @@ def _task42_projection(
             max_tokens=maximum,
         )
     else:
-        packet = build_action_packet(
+        packet = product.build_action_packet(
             question=case["question"],
             context_pack=candidates,
             trust_contract=trust,
@@ -445,18 +541,18 @@ def _task42_projection(
             module_id=case.get("module_id"),
         )
         errors.extend(
-            validate_action_packet(
+            product.validate_action_packet(
                 packet,
                 evidence_items=candidates,
                 max_tokens=maximum,
                 project_path=case.get("project_path"),
             )
         )
-        projection, snapshot = project_patch_context(
+        projection, snapshot = product.project_patch_context(
             packet=packet, evidence_items=candidates, max_tokens=maximum
         )
     errors.extend(
-        validate_model_visible_projection(
+        product.validate_projection(
             projection,
             snapshot=snapshot,
             max_tokens=(
@@ -545,8 +641,13 @@ def _validate_patch_source_paths(
             continue
         evidence_id = str(source.get("evidence_id") or "")
         bound = snapshot.get(evidence_id) or {}
+        projected_bound = bound.get("projected_source") or bound
         path = str(source.get("path") or source.get("path_or_url") or "")
-        bound_path = str(bound.get("path") or bound.get("path_or_url") or "")
+        bound_path = str(
+            projected_bound.get("path")
+            or projected_bound.get("path_or_url")
+            or ""
+        )
         if path != bound_path:
             errors.append("citation:path_mismatch")
         if path in allowed:
@@ -565,6 +666,8 @@ def _record_auxiliary_inputs(
     integrity_inputs: dict[
         str, tuple[dict[str, Any], dict[str, dict[str, Any]], int]
     ],
+    *,
+    review_context: dict[str, Any],
 ) -> None:
     selection = load_json(DATA_ROOT / "human_review_selection_v1.json")
     selected = {row["contract_id"] for row in selection["cases"]}
@@ -572,6 +675,7 @@ def _record_auxiliary_inputs(
         review_inputs[contract["contract_id"]] = {
             "contract_id": contract["contract_id"],
             "source_ref": contract["source_ref"],
+            "review_context": review_context,
             "projection": measured["projection"],
             "evidence_manifest": sanitized_projection_manifest(measured["snapshot"]),
         }
@@ -593,6 +697,25 @@ def _record_auxiliary_inputs(
             measured["projection"], measured["snapshot"],
             int(contract["maximum_visible_tokens"]),
         )
+
+
+def _review_context(
+    case: dict[str, Any], contract: dict[str, Any]
+) -> dict[str, Any]:
+    """Return only public request context needed by the frozen human rubric."""
+
+    question = str(case.get("query") or case.get("question") or "").strip()
+    context: dict[str, Any] = {
+        "question": question,
+        "result_kind": contract["result_kind"],
+        "required_evidence_paths": list(
+            case.get("required_evidence_paths") or []
+        ),
+        "required_target_paths": list(case.get("required_target_paths") or []),
+    }
+    if case.get("exact_version") not in (None, ""):
+        context["exact_version"] = str(case["exact_version"])
+    return context
 
 
 def _run_integrity_mutation_gate(
@@ -672,11 +795,16 @@ def _timing_artifact(
     groups: dict[str, Any],
     baseline_groups: dict[str, Any],
     identity_candidate: bool,
+    process_identity: dict[str, int],
 ) -> dict[str, Any]:
+    if process_identity["candidate_pid"] != process_identity["baseline_pid"]:
+        raise RuntimeError("paired Task 43 timing used different processes")
     return {
         "schema_version": "task43-latency-observation-v1",
         "protocol_sha256": file_sha256(DATA_ROOT / "protocol_v1.lock.json"),
         "identity_candidate": identity_candidate,
+        "measurement_mode": "paired_same_process",
+        "process_identity": process_identity,
         "warmup_repeats_per_case": protocol["timing"]["warmup_repeats_per_case"],
         "measured_repeats_per_case": protocol["timing"]["measured_repeats_per_case"],
         "machine_identity": {

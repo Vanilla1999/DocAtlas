@@ -31,6 +31,12 @@
         ],
         "status": "ok"
       },
+      "review_context": {
+        "question": "WidgetClient fetch_record timeout",
+        "required_evidence_paths": [],
+        "required_target_paths": [],
+        "result_kind": "docs_answer"
+      },
       "source_ref": "task39:development:exact_api_identifier"
     },
     {
@@ -63,6 +69,12 @@
           }
         ],
         "status": "ok"
+      },
+      "review_context": {
+        "question": "gateway worker idempotency contract identifier",
+        "required_evidence_paths": [],
+        "required_target_paths": [],
+        "result_kind": "docs_answer"
       },
       "source_ref": "task39:holdout:cross_module_contract"
     },
@@ -99,22 +111,35 @@
         ],
         "status": "ok"
       },
+      "review_context": {
+        "exact_version": "2.0",
+        "question": "How do I set RETRY_LIMIT?",
+        "required_evidence_paths": [],
+        "required_target_paths": [],
+        "result_kind": "docs_answer"
+      },
       "source_ref": "task42:docs_cases:docs_wrong_version_high_rank"
     },
     {
       "contract_id": "t42-patch-policy-target-test",
       "evidence_manifest": [
         {
+          "authority": "supporting",
           "content_sha256": "3450941f78e1976474b4416dd01ee04cc1015f23afdebfefed62bfc97de53142",
           "evidence_id": "ev-088fd8fccab410b3",
+          "instruction_trust": "untrusted_data",
           "path": "src/worker.py",
+          "scope": "unscoped",
           "symbol_or_section": "document",
           "version_binding": "not_applicable"
         },
         {
+          "authority": "canonical",
           "content_sha256": "1fd27fbac60b4d1044a455bf4212619c79d817775211a7e8a2025c0d38bf4485",
           "evidence_id": "ev-2b0c97530e3b81cc",
+          "instruction_trust": "scoped_agent_policy",
           "path": "AGENTS.md",
+          "scope": "/project",
           "symbol_or_section": "document",
           "version_binding": "not_applicable"
         }
@@ -191,6 +216,16 @@
         },
         "uncertainties": []
       },
+      "review_context": {
+        "question": "Update Worker.run",
+        "required_evidence_paths": [
+          "AGENTS.md"
+        ],
+        "required_target_paths": [
+          "src/worker.py"
+        ],
+        "result_kind": "patch_context"
+      },
       "source_ref": "task42:patch_cases:patch_policy_target_and_test"
     },
     {
@@ -205,6 +240,12 @@
           "The requested documentation evidence is not currently available."
         ],
         "status": "insufficient_evidence"
+      },
+      "review_context": {
+        "question": "quantum teleportation quasar protocol",
+        "required_evidence_paths": [],
+        "required_target_paths": [],
+        "result_kind": "docs_answer"
       },
       "source_ref": "task39:holdout:insufficient_evidence"
     },
@@ -224,9 +265,13 @@
         "answer_evidence_ids": [
           "ev-ded06a0bc69e7cc3"
         ],
-        "estimated_tokens": 105,
+        "estimated_tokens": 139,
         "kind": "docs_answer",
+        "limitations": [
+          "The selected evidence does not provide a concrete configuration key, value, command, or API call."
+        ],
         "omitted_counts": {
+          "answer_details": 1,
           "sources": 1
         },
         "sources": [
@@ -241,10 +286,16 @@
         ],
         "status": "ok"
       },
+      "review_context": {
+        "question": "How do I configure retries?",
+        "required_evidence_paths": [],
+        "required_target_paths": [],
+        "result_kind": "docs_answer"
+      },
       "source_ref": "task42:adversarial_cases:forbidden_source_cannot_fallback"
     }
   ],
-  "deterministic_result_digest": "ab40b26b58fb7e98424906144e971f560425e62f547d7aca867d2d8e235a0245",
+  "deterministic_result_digest": "5e4b1603d59f1895a929a3545e465c3883364c83a135331317462b0ab02f3680",
   "protocol_sha256": "2a9725df3dd31ed09eea84cf16cc84d747b34856d5ce5fac9405b1d3695cb2de",
   "review_status": "PENDING_HUMAN_REVIEW",
   "rubric_path": "eval/answer_quality/human_review_rubric.md",
