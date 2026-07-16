@@ -46,18 +46,42 @@ Use an additive, migratable schema. Exact names may follow existing conventions,
 - chunking schema/config hash;
 - index revision.
 
-A child identity must not depend only on an auto-increment SQLite row ID. Derive it from versioned canonical material such as:
+A child identity must not depend only on an auto-increment SQLite row ID. Keep
+snapshot binding separate from logical identity: including the hash of the whole
+source in every child ID would invalidate unaffected children after a local edit.
+Derive identities from versioned canonical material as follows:
 
 ```text
-index schema
-canonical source identity
-source content hash
-parent heading path
-child ordinal/span
-display-text hash
+source snapshot binding = canonical source identity + source content hash
+parent logical ID = index schema + canonical source identity + heading path/levels + repeated-heading occurrence
+parent revision ID = parent logical ID + parent display-text hash
+child stable ID = parent logical ID + chunking config hash + child display-text hash + duplicate occurrence
 ```
 
-SQLite row IDs may remain internal hydration keys, but vector/cache/audit identity must use the stable ID.
+Exact spans and ordinals are stored and audited but are not part of stable child
+identity: inserting text before an otherwise unchanged child must not change its
+ID. SQLite hydration uses a deterministic non-zero 63-bit projection of the
+child stable ID, while the vector point ID is a deterministic UUID. Collisions
+fail the transaction instead of silently aliasing chunks. Vector/cache/audit
+records retain the full stable ID.
+
+## Delivery sequence
+
+1. Add the deterministic span-aware chunker and adversarial unit corpus.
+2. Add the parent/child schema additively while retaining the v1 reader.
+3. Build explicitly marked Markdown ingest as an immutable candidate generation.
+   Validate child/FTS parity, parent/source links, exact Unicode spans, duplicate
+   identities and the retrieval hard ceiling before switching the active pointer.
+4. Make lexical and dense retrieval index `retrieval_text` while hydration and
+   citations return only `display_text`.
+5. Bound adjacent/page expansion to the winning parent and preserve byte-span
+   deduplication before model delivery.
+6. Run the 160/256/384/512 grid against the frozen Task 39 corpus, then select a
+   default only if all quality gates pass and token efficiency improves.
+7. Prepare the config-bound vector collection using stable UUID point IDs before
+   activation; switch SQLite and vector ownership together, then prune stale IDs.
+8. Publish migration, rollback, index-health, incremental-vector, focused
+   retrieval, provider-free suite, compile and whitespace evidence.
 
 ## Structured chunking rules
 
@@ -154,6 +178,74 @@ Include adversarial documents with:
 - Do not force vector dependencies into the base install.
 - Do not expand every hit to the full parent document.
 - Do not claim provider-token savings from smaller stored chunks alone.
+
+## Implemented result
+
+Task 40 is implemented on `agent/task40-token-aware-parent-child-index`.
+
+- Production Markdown ingestion explicitly selects `parent-child-v1`; existing
+  `sections` remain the readable `sqlite-sections-v1` compatibility layer.
+- `index_generations` and the singleton active pointer separate candidate,
+  active and superseded index state. `generation_sources` stores immutable
+  content/metadata/token snapshots, so a failed candidate cannot invalidate the
+  old active generation by changing the mutable source catalog.
+- `retrieval_parents` stores logical and revision identities.
+  `retrieval_children` stores stable child IDs, deterministic UUID vector IDs,
+  stable hydration IDs, atom identity/type, exact char/UTF-8-byte/line spans,
+  display/retrieval text and hashes, estimator/config/schema versions.
+- FTS and dense embeddings consume retrieval-only heading context. Public query
+  hydration and citations consume verbatim display slices only. Split code and
+  table fragments receive retrieval-only wrappers and are re-split when wrapper
+  overhead would exceed the hard retrieval ceiling; source spans are never
+  rewritten.
+- Candidate validation checks child/FTS parity, parent and immutable-source
+  links, exact character/byte reconstruction, stable-ID uniqueness and the hard
+  retrieval-token ceiling before the active pointer can move.
+- Vector collections include the chunk config hash. A candidate is upserted by
+  deterministic UUID without pruning the active collection, SQLite activation
+  follows successful preparation, and stale points are pruned afterward.
+  Unchanged records are rebound to the new generation without re-embedding.
+- Additive legacy sections remain both vector-indexable and hydratable while a
+  parent/child generation is active; switching v2 on does not silently remove
+  non-Markdown/vector evidence.
+- `adjacent` and `page` expansion are bounded to the winning parent for v2.
+  Zero overlap is the selected v1 policy, so canonical delivery has no
+  overlap-only duplication.
+- Source deletion publishes a validated generation without that source instead
+  of mutating active retrieval rows. `index_health()` audits active status,
+  mixed versions, missing parents/source snapshots, invalid spans, duplicate
+  stable IDs, FTS parity and stale bookkeeping.
+
+### Grid decision
+
+The provider-free runner `eval/parent_child_index_grid.py` binds to the frozen
+Task 39 corpus/dataset digests and evaluates 160/256/384/512. Every variant
+passes the per-case and aggregate Task 39 gates and has zero oversized/visible
+overlap rate in the fixture. Incremental counts now come from the production
+`sync_vector_store` path with a deterministic in-memory vector backend: every
+variant records zero upserts and zero prunes for an unchanged rebuild, while the
+local edit records actual changed upserts and stale UUID prunes.
+
+The separate eight-case structure stress corpus covers long/headingless/nested/repeated
+sections, oversized code/table/list atoms, duplicate versions, Russian text and
+a preamble. Its legacy heading-sized median is 1,006.5 estimated evidence tokens.
+The selected 160 target records mean 53.9, median 69 and max 95; selection first
+requires all quality/incremental gates, then minimizes stress mean, max and
+target in that order. These are deterministic UTF-8 bytes/4 engineering
+estimates, not model-provider token usage.
+
+### Validation evidence
+
+- focused Task 40/chunker/vector/grid/compatibility checks: `27 passed`;
+- provider-free grid: PASS, selected target 160;
+- full suite: `2228 passed, 10 skipped`, plus one asynchronous job-status
+  polling timeout under full-suite load; that test passed on immediate isolated
+  retry (`1 passed`);
+- `compileall`: PASS;
+- `git diff --check`: PASS.
+
+These are executable local engineering checks, not a model or provider-token
+benchmark.
 
 ## Handoff to the next task
 

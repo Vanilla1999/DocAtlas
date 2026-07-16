@@ -49,6 +49,8 @@ def _embedding_hash(vector: list[float]) -> str:
 def _payload_for_section(section: dict, *, docset_root: str | None = None) -> dict:
     return {
         "section_id": int(section["section_id"]),
+        "vector_id": section.get("vector_id") or "",
+        "generation_id": section.get("generation_id") or "",
         "source": section["source"],
         "chunk_index": int(section["chunk_index"]),
         "title": section["title"],
@@ -62,6 +64,10 @@ def _payload_for_section(section: dict, *, docset_root: str | None = None) -> di
         "format": section.get("format") or "",
         "anchor": section.get("anchor") or "",
         "content_hash": section.get("content_hash") or "",
+        "stable_chunk_id": section.get("stable_chunk_id") or "",
+        "parent_logical_id": section.get("parent_logical_id") or "",
+        "chunk_schema_version": section.get("chunk_schema_version") or "",
+        "chunk_config_hash": section.get("chunk_config_hash") or "",
         "token_estimate": section.get("token_estimate", 0),
         "docset_root": docset_root or "",
     }
@@ -77,6 +83,8 @@ def sync_vector_store(
     include_sparse: bool = False,
     section_ids: set[int] | None = None,
     prune_ids: set[int] | None = None,
+    generation_id: str | None = None,
+    prune_stale: bool = True,
 ) -> SyncResult:
     """Embed selected SQLite sections, upsert them, and record state.
 
@@ -85,7 +93,11 @@ def sync_vector_store(
     embedded nor deleted. Cache hits and unchanged selected sections are
     skipped. The collection is created on the fly if needed.
     """
-    all_sections = store.list_sections_for_embedding()
+    effective_generation_id = generation_id or store.active_generation_id()
+    all_sections = store.list_sections_for_embedding(
+        generation_id=effective_generation_id
+    )
+    generation_mode = bool(effective_generation_id)
     sections = (
         all_sections
         if section_ids is None
@@ -152,25 +164,44 @@ def sync_vector_store(
     )
     index_meta.put(collection, want_meta)
 
-    existing = store.list_embedding_upserts(collection)
+    existing = (
+        store.list_generation_vector_upserts(collection)
+        if generation_mode
+        else store.list_embedding_upserts(collection)
+    )
     current_ids = {int(sec["section_id"]) for sec in all_sections}
+    current_stable_ids = {
+        str(sec.get("stable_chunk_id") or "") for sec in all_sections
+        if sec.get("stable_chunk_id")
+    }
 
     # Prune: any chunk_id recorded in embedding_upserts but absent from the
     # current sections table belongs to a deleted/recreated source. Delete the
     # vector points and the upsert bookkeeping rows so dense/hybrid retrieval
     # cannot resurrect points that have no SQLite section to hydrate.
-    stale_ids = (
-        [chunk_id for chunk_id in existing if chunk_id not in current_ids]
-        if prune_ids is None
-        else [chunk_id for chunk_id in existing if chunk_id in prune_ids]
-    )
+    if generation_mode:
+        stale_keys = [
+            stable_id for stable_id in existing
+            if stable_id not in current_stable_ids
+        ] if prune_stale else []
+        stale_ids = [existing[key]["vector_id"] for key in stale_keys]
+    else:
+        stale_keys = []
+        stale_ids = (
+            [chunk_id for chunk_id in existing if chunk_id not in current_ids]
+            if prune_ids is None
+            else [chunk_id for chunk_id in existing if chunk_id in prune_ids]
+        )
     pruned = 0
     if stale_ids:
         try:
             pruned = vector_store.delete_points(collection, stale_ids)
         except NotImplementedError:
             pruned = 0
-        store.delete_embedding_upserts(collection, stale_ids)
+        if generation_mode:
+            store.delete_generation_vector_upserts(collection, stale_keys)
+        else:
+            store.delete_embedding_upserts(collection, stale_ids)
 
     if not sections:
         return SyncResult(
@@ -178,20 +209,37 @@ def sync_vector_store(
         )
 
     pending: list[dict] = []
+    carried_records: list[dict] = []
     skipped_unchanged = 0
     for sec in sections:
-        prev = existing.get(int(sec["section_id"]))
+        lookup_id = (
+            str(sec.get("stable_chunk_id") or "")
+            if generation_mode else int(sec["section_id"])
+        )
+        prev = existing.get(lookup_id)
         if prev and prev.get("content_hash") == (sec.get("content_hash") or ""):
             skipped_unchanged += 1
+            if generation_mode:
+                carried_records.append({
+                    "stable_chunk_id": str(sec["stable_chunk_id"]),
+                    "vector_id": str(sec["vector_id"]),
+                    "content_hash": str(sec.get("content_hash") or ""),
+                    "embedding_hash": str(prev.get("embedding_hash") or ""),
+                    "status": str(prev.get("status") or "ok"),
+                })
             continue
         pending.append(sec)
 
     if not pending:
+        if generation_mode and carried_records:
+            store.record_generation_vector_upserts(
+                collection, str(effective_generation_id), carried_records
+            )
         try:
             count_after = int(vector_store.count(collection))
         except Exception:
             count_after = 0
-        expected_total = len(current_ids)
+        expected_total = len(current_stable_ids) if generation_mode else len(current_ids)
         if section_ids is None and expected_total > 0 and count_after < expected_total:
             raise RuntimeError(
                 f"vector index {collection!r} is incomplete: expected {expected_total} "
@@ -207,9 +255,19 @@ def sync_vector_store(
         )
 
     texts = [sec["text"] for sec in pending]
+    cache_identity = [
+        "\0".join(
+            (
+                str(sec.get("chunk_schema_version") or "sqlite-sections-v1"),
+                str(sec.get("chunk_config_hash") or "legacy"),
+                sec["text"],
+            )
+        )
+        for sec in pending
+    ]
     pre_cache_keys = [
-        content_cache_key(provider.name, getattr(provider, "model_name", provider.name), t)
-        for t in texts
+        content_cache_key(provider.name, getattr(provider, "model_name", provider.name), identity)
+        for identity in cache_identity
     ]
     cache_hits_before = sum(1 for k in pre_cache_keys if cache.get(k) is not None)
     vectors = embed_with_cache(
@@ -217,6 +275,7 @@ def sync_vector_store(
         texts,
         cache=cache,
         model=getattr(provider, "model_name", provider.name),
+        cache_identity=cache_identity,
         progress_callback=lambda done, total: logger.info(
             "embedding sections %d/%d", done, total
         ),
@@ -239,7 +298,7 @@ def sync_vector_store(
         # We reuse the SQLite section id directly so reconciliation is trivial.
         points.append(
             VectorPoint(
-                id=int(sec["section_id"]),
+                id=(str(sec["vector_id"]) if generation_mode else int(sec["section_id"])),
                 vector=vectors[idx],
                 payload=_payload_for_section(sec),
                 sparse_vector=sparse_payload,
@@ -264,7 +323,7 @@ def sync_vector_store(
         count_after = int(vector_store.count(collection))
     except Exception:
         count_after = count_before
-    expected_total = len(current_ids)
+    expected_total = len(current_stable_ids) if generation_mode else len(current_ids)
     if section_ids is None and expected_total > 0 and count_after < max(1, expected_total):
         raise RuntimeError(
             f"vector upsert into {collection!r} did not land: expected {expected_total} "
@@ -274,18 +333,23 @@ def sync_vector_store(
             f"--keep-models` to wipe the index."
         )
 
-    store.record_embedding_upserts(
-        collection,
-        [
-            {
-                "chunk_id": int(sec["section_id"]),
-                "content_hash": sec.get("content_hash") or "",
-                "embedding_hash": _embedding_hash(vectors[idx]),
-                "status": "ok",
-            }
-            for idx, sec in enumerate(pending)
-        ],
-    )
+    records = [
+        {
+            "chunk_id": int(sec["section_id"]),
+            "content_hash": sec.get("content_hash") or "",
+            "embedding_hash": _embedding_hash(vectors[idx]),
+            "status": "ok",
+            "stable_chunk_id": sec.get("stable_chunk_id") or "",
+            "vector_id": sec.get("vector_id") or "",
+        }
+        for idx, sec in enumerate(pending)
+    ]
+    if generation_mode:
+        store.record_generation_vector_upserts(
+            collection, str(effective_generation_id), [*carried_records, *records]
+        )
+    else:
+        store.record_embedding_upserts(collection, records)
 
     return SyncResult(
         embedded=len(pending) - cache_hits_before,

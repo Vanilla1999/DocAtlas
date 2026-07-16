@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import configparser
 from dataclasses import asdict, replace
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -45,6 +46,68 @@ PLACEHOLDER_PROJECT_DOC_RE = re.compile(
 )
 
 class ProjectDocsService:
+    @staticmethod
+    def _canonical_git_remote(remote: str) -> str:
+        value = remote.strip().rstrip("/")
+        parsed = urlparse(value)
+        if parsed.scheme and parsed.hostname:
+            host = parsed.hostname.lower()
+            path = parsed.path.strip("/")
+            if path.endswith(".git"):
+                path = path[:-4]
+            return f"{host}/{path}"
+        scp_like = re.fullmatch(r"(?:[^@/]+@)?([^:/]+):(.+)", value)
+        if scp_like:
+            host, path = scp_like.groups()
+            path = path.strip("/")
+            if path.endswith(".git"):
+                path = path[:-4]
+            return f"{host.lower()}/{path}"
+        return value
+
+    @staticmethod
+    def _repository_identity(root: Path) -> str:
+        """Return a clone-stable identity when Git metadata is available.
+
+        Unversioned directories have no portable identity by definition.  Keep
+        them isolated in a deterministic local namespace instead of allowing
+        equal relative paths from unrelated projects to collide in one index.
+        """
+        git_entry = root / ".git"
+        config_path = git_entry / "config"
+        if git_entry.is_file():
+            try:
+                marker = git_entry.read_text(encoding="utf-8").strip()
+            except OSError:
+                marker = ""
+            if marker.lower().startswith("gitdir:"):
+                git_dir = Path(marker.split(":", 1)[1].strip())
+                if not git_dir.is_absolute():
+                    git_dir = (root / git_dir).resolve()
+                config_path = git_dir / "config"
+
+        parser = configparser.RawConfigParser()
+        try:
+            if config_path.is_file():
+                parser.read(config_path, encoding="utf-8")
+        except (OSError, configparser.Error):
+            parser = configparser.RawConfigParser()
+        remote_sections = sorted(
+            section for section in parser.sections()
+            if section.startswith('remote "') and section.endswith('"')
+        )
+        preferred = 'remote "origin"'
+        if preferred in remote_sections:
+            remote_sections.remove(preferred)
+            remote_sections.insert(0, preferred)
+        for section in remote_sections:
+            remote = parser.get(section, "url", fallback="").strip().rstrip("/")
+            if remote:
+                return f"git:{ProjectDocsService._canonical_git_remote(remote)}"
+
+        local_digest = hashlib.sha256(str(root).encode("utf-8")).hexdigest()
+        return f"local:{local_digest}"
+
     def __init__(self, facade: Any):
         self.facade = facade
         self.project_state = ProjectDocsState(facade)
@@ -519,6 +582,7 @@ class ProjectDocsService:
             return self.facade._project_ingest_project_docs_impl(project_path, **kwargs)
         root = Path(project_path).expanduser().resolve()
         metadata = self.read_project_metadata(str(root))
+        repository_identity = self._repository_identity(root)
         warnings = list(metadata.warnings)
         candidates = list(metadata.docs_candidates)
         if metadata.docs_catalog_present and not metadata.docs_catalog_valid:
@@ -564,6 +628,7 @@ class ProjectDocsService:
             candidate = candidate_by_abs.get(path.resolve())
             result: dict[str, Any] = {
                 "project_path": str(root),
+                "repository_identity": repository_identity,
                 "source_class": "project_file",
                 "project_docs": True,
             }
@@ -600,7 +665,12 @@ class ProjectDocsService:
                 recursive=True,
                 skip_known=skip_known,
                 with_vectors=with_vectors,
-                metadata={"project_path": str(root), "source_class": "project_file", "project_docs": True},
+                metadata={
+                    "project_path": str(root),
+                    "repository_identity": repository_identity,
+                    "source_class": "project_file",
+                    "project_docs": True,
+                },
                 metadata_for_file=_metadata_for_file,
             )
         except ValueError as exc:
