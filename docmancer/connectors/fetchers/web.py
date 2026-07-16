@@ -691,7 +691,7 @@ class WebFetcher:
                 resp = client.get(fetch_url)
             except DocsFetchSecurityError as exc:
                 self._record_page(
-                    requested_url=fetch_url, discovered_url=url, canonical_url=None, redirect_url=None,
+                    requested_url=url, discovered_url=url, canonical_url=None, redirect_url=None,
                     fetch_url=fetch_url, fetcher="github-raw" if github_raw_url else "web",
                     outcome="failed", reason_code=exc.category, bytes=0, chunks=0,
                     elapsed_ms=int((time.monotonic() - started) * 1000),
@@ -701,7 +701,7 @@ class WebFetcher:
                 logger.warning("Failed to fetch %s: %s", fetch_url, exc)
                 self._emit_progress({"phase": "fetching", "message": f"Fetch failed: {url}", "url": url})
                 self._record_page(
-                    requested_url=fetch_url, discovered_url=url, canonical_url=None, redirect_url=None,
+                    requested_url=url, discovered_url=url, canonical_url=None, redirect_url=None,
                     fetch_url=fetch_url, fetcher="github-raw" if github_raw_url else "web",
                     outcome="failed", reason_code="network_transport_error", bytes=0, chunks=0,
                     elapsed_ms=int((time.monotonic() - started) * 1000),
@@ -725,7 +725,7 @@ class WebFetcher:
                 self._emit_progress({"phase": "fetching", "message": f"Fetch failed with status {resp.status_code}: {url}", "url": url})
                 retryable = resp.status_code in {408, 425, 429} or resp.status_code >= 500
                 self._record_page(
-                    requested_url=fetch_url, discovered_url=url, canonical_url=None, redirect_url=None,
+                    requested_url=url, discovered_url=url, canonical_url=None, redirect_url=None,
                     fetch_url=fetch_url, fetcher="github-raw" if github_raw_url else "web",
                     outcome="failed", reason_code="not_found" if resp.status_code == 404 else "http_failure",
                     bytes=len(resp.content), chunks=0, elapsed_ms=int((time.monotonic() - started) * 1000),
@@ -764,7 +764,7 @@ class WebFetcher:
         if not content or not content.strip():
             logger.debug("Skipped %s (empty after extraction)", url)
             self._record_page(
-                requested_url=fetch_url, discovered_url=url, canonical_url=None, redirect_url=final_url if final_url != fetch_url else None,
+                requested_url=url, discovered_url=url, canonical_url=None, redirect_url=final_url if final_url != fetch_url else None,
                 fetch_url=fetch_url, fetcher="github-raw" if github_raw_url else "web",
                 outcome="failed", reason_code="extraction_empty", bytes=len(raw_html.encode("utf-8")), chunks=0,
                 elapsed_ms=int((time.monotonic() - started) * 1000),
@@ -797,14 +797,14 @@ class WebFetcher:
                 "lang": meta.get("lang") or "en",
                 "http_status": resp.status_code,
                 "fetched_at": datetime.now(timezone.utc).isoformat(),
-                "requested_url": redact_url(fetch_url),
+                "requested_url": redact_url(url),
                 "discovered_url": redact_url(url),
                 "fetch_url": redact_url(fetch_url),
                 "redirect_url": redact_url(final_url) if final_url != fetch_url else None,
             },
         )
         self._record_page(
-            requested_url=fetch_url,
+            requested_url=url,
             discovered_url=url,
             canonical_url=canonical,
             redirect_url=final_url if final_url != fetch_url else None,

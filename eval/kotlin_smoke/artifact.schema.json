@@ -12,17 +12,31 @@
     "schema_version": {"const": "kotlin-smoke-1.0"},
     "mode": {"enum": ["fixture", "live"]},
     "command": {"type": "string", "minLength": 1},
-    "docatlas_commit": {"type": "string", "minLength": 1},
-    "source_ref": {"type": "string", "pattern": "^Kotlin/kotlinx\\.coroutines@"},
+    "docatlas_commit": {
+      "type": "string",
+      "pattern": "^(?:[0-9a-f]{40}|task14-offline-fixture)$"
+    },
+    "source_ref": {"const": "Kotlin/kotlinx.coroutines@1.8.1"},
     "elapsed_ms": {"type": "integer", "minimum": 0},
     "terminal_status": {"enum": ["succeeded", "partial"]},
     "citations": {
       "type": "array", "minItems": 1, "maxItems": 20,
-      "items": {"type": "string", "pattern": "^https://"}
+      "items": {
+        "type": "string",
+        "pattern": "^https://(?:github\\.com/Kotlin/kotlinx\\.coroutines/blob/1\\.8\\.1/|raw\\.githubusercontent\\.com/Kotlin/kotlinx\\.coroutines/1\\.8\\.1/).+"
+      }
     },
-    "requested_version": {"type": "string", "minLength": 1},
-    "resolved_version": {"type": "string", "minLength": 1},
-    "canonical_source_identity": {"type": "string", "minLength": 1},
+    "requested_version": {"const": "1.8.1"},
+    "resolved_version": {"const": "1.8.1"},
+    "canonical_source_identity": {
+      "anyOf": [
+        {"const": "github:Kotlin/kotlinx.coroutines@1.8.1"},
+        {
+          "type": "string",
+          "pattern": "^https://(?:github\\.com/Kotlin/kotlinx\\.coroutines/blob/1\\.8\\.1/|raw\\.githubusercontent\\.com/Kotlin/kotlinx\\.coroutines/1\\.8\\.1/).+"
+        }
+      ]
+    },
     "query": {"const": "coroutines launch async example with code"},
     "code_match": {"const": true},
     "recorded_at": {"type": "string", "format": "date-time"}

@@ -16,6 +16,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - **MCP SDK floor:** require `mcp>=1.27.2`, matching the structured tool output and output-schema transport used by bounded delivery.
 - **Release maturity truth:** clarify that artifact-level Task 15 evidence is complete while a Stable claim still requires Task 14 live external-ingest evidence and an approved post-publish verification of the exact public release.
 
+### Fixed
+
+- **Kotlin acceptance provenance:** preserve the original GitHub blob request separately from its raw fetch identity, and make the pinned live-smoke gate reject echoed questions, unrelated citations, missing exact-version provenance, unpinned machine artifacts, and non-isolated live runs.
+
 ## [1.2.0] - 2026-07-12
 
 ### Added

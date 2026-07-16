@@ -4,6 +4,17 @@
 
 P0 acceptance closure for task 09. Complete after tasks 11–13, 28, 30, and 31.
 
+## Implementation status
+
+Done for the deterministic offline and PR merge gate. The real fetch boundary records
+page-level requested/discovered/canonical/redirect/fetch provenance, preserves usable pages
+under partial failure, reports skipped/failed pages through job status, and routes pinned
+GitHub blob sources through an auditable raw fetch identity. The smoke harness and machine
+schema require isolated execution, exact `1.8.1` provenance, and cited code-bearing evidence.
+
+The separately owned live evidence gate remains pending. Task 09 and Stable promotion must
+remain open until a successful sanitized pinned live artifact lands in an evidence-only PR.
+
 ## Problem
 
 Fake-agent tests cover parts of ingest, but there is no end-to-end evidence for the reported Kotlin workflow. A crawl can discover a GitHub `blob` page, lose page-level provenance, or collapse one bad page into total `not_found`.

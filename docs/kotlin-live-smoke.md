@@ -19,8 +19,12 @@ DOCMANCER_HOME="$(mktemp -d)" python scripts/kotlin_live_smoke.py \
 
 The script requires `prepare_docs` to return a job id within one second, polls responsive
 `docs_status`, and repeats `coroutines launch async example with code` through
-`get_docs_context`. The output is a small sanitized artifact: it contains identity, timing,
-terminal status, and citations, but no downloaded page content or credentials.
+`get_docs_context`. Live mode refuses to start unless `DOCMANCER_HOME` explicitly points
+outside the default home. The runner requests full provenance internally, but accepts only
+code-bearing evidence tied to the pinned official GitHub source; an echoed question or an
+unrelated citation cannot satisfy the gate. The output remains a small sanitized artifact:
+it contains identity, timing, terminal status, and citations, but no downloaded page content
+or credentials.
 
 The machine schema is `eval/kotlin_smoke/artifact.schema.json`; the committed
 `eval/kotlin_smoke/task14_fixture.json` proves the offline artifact contract only.
