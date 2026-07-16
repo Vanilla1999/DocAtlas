@@ -1,0 +1,230 @@
+{
+  "case_gates": {
+    "t39-adv-generated-catalog": {
+      "errors": [],
+      "estimated_tokens": 167,
+      "passed": true,
+      "source_ref": "task39:adversarial:generated_catalog_distractor"
+    },
+    "t39-adv-legal-distractor": {
+      "errors": [
+        "citation:unacceptable_evidence:legal/terms.md"
+      ],
+      "estimated_tokens": 286,
+      "passed": false,
+      "source_ref": "task39:adversarial:legal_title_distractor"
+    },
+    "t39-adv-project-over-generic": {
+      "errors": [],
+      "estimated_tokens": 211,
+      "passed": true,
+      "source_ref": "task39:adversarial:project_over_generic"
+    },
+    "t39-adv-stale-version": {
+      "errors": [],
+      "estimated_tokens": 178,
+      "passed": true,
+      "source_ref": "task39:adversarial:stale_version_distractor"
+    },
+    "t39-adv-unversioned-mirror": {
+      "errors": [],
+      "estimated_tokens": 213,
+      "passed": true,
+      "source_ref": "task39:adversarial:unversioned_mirror_distractor"
+    },
+    "t39-dev-cli": {
+      "errors": [],
+      "estimated_tokens": 156,
+      "passed": true,
+      "source_ref": "task39:development:cli_flag"
+    },
+    "t39-dev-code-example": {
+      "errors": [],
+      "estimated_tokens": 216,
+      "passed": true,
+      "source_ref": "task39:development:code_example"
+    },
+    "t39-dev-conceptual": {
+      "errors": [],
+      "estimated_tokens": 174,
+      "passed": true,
+      "source_ref": "task39:development:concept_synonyms"
+    },
+    "t39-dev-configuration": {
+      "errors": [],
+      "estimated_tokens": 171,
+      "passed": true,
+      "source_ref": "task39:development:configuration_key"
+    },
+    "t39-dev-error": {
+      "errors": [],
+      "estimated_tokens": 164,
+      "passed": true,
+      "source_ref": "task39:development:error_code"
+    },
+    "t39-dev-exact-api": {
+      "errors": [],
+      "estimated_tokens": 213,
+      "passed": true,
+      "source_ref": "task39:development:exact_api_identifier"
+    },
+    "t39-holdout-cross-module": {
+      "errors": [],
+      "estimated_tokens": 193,
+      "passed": true,
+      "source_ref": "task39:holdout:cross_module_contract"
+    },
+    "t39-holdout-insufficient": {
+      "errors": [],
+      "estimated_tokens": 71,
+      "passed": true,
+      "source_ref": "task39:holdout:insufficient_evidence"
+    },
+    "t39-holdout-project-policy": {
+      "errors": [],
+      "estimated_tokens": 208,
+      "passed": true,
+      "source_ref": "task39:holdout:project_rule_authority"
+    },
+    "t39-holdout-russian": {
+      "errors": [],
+      "estimated_tokens": 255,
+      "passed": true,
+      "source_ref": "task39:holdout:russian_paraphrase"
+    },
+    "t39-holdout-version": {
+      "errors": [],
+      "estimated_tokens": 178,
+      "passed": true,
+      "source_ref": "task39:holdout:version_migration"
+    },
+    "t42-adv-forbidden-source": {
+      "errors": [],
+      "estimated_tokens": 105,
+      "passed": true,
+      "source_ref": "task42:adversarial_cases:forbidden_source_cannot_fallback"
+    },
+    "t42-adv-invalid-identity": {
+      "errors": [],
+      "estimated_tokens": 51,
+      "passed": true,
+      "source_ref": "task42:adversarial_cases:invalid_identity_cannot_supply_required_fact"
+    },
+    "t42-adv-navigation-only": {
+      "errors": [],
+      "estimated_tokens": 38,
+      "passed": true,
+      "source_ref": "task42:adversarial_cases:docs_navigation_only"
+    },
+    "t42-adv-stable-id-collision": {
+      "errors": [],
+      "estimated_tokens": 102,
+      "passed": true,
+      "source_ref": "task42:adversarial_cases:stable_identity_content_collision"
+    },
+    "t42-docs-identifier-boundary": {
+      "errors": [],
+      "estimated_tokens": 114,
+      "passed": true,
+      "source_ref": "task42:docs_cases:docs_exact_identifier_boundary"
+    },
+    "t42-docs-malformed-rank": {
+      "errors": [],
+      "estimated_tokens": 104,
+      "passed": true,
+      "source_ref": "task42:docs_cases:docs_malformed_rank"
+    },
+    "t42-docs-scope-missing": {
+      "errors": [],
+      "estimated_tokens": 38,
+      "passed": true,
+      "source_ref": "task42:docs_cases:docs_scope_missing_identity"
+    },
+    "t42-docs-signature": {
+      "errors": [],
+      "estimated_tokens": 115,
+      "passed": true,
+      "source_ref": "task42:docs_cases:docs_exact_signature"
+    },
+    "t42-docs-version": {
+      "errors": [],
+      "estimated_tokens": 103,
+      "passed": true,
+      "source_ref": "task42:docs_cases:docs_wrong_version_high_rank"
+    },
+    "t42-patch-identifier-boundary": {
+      "errors": [
+        "citation:unacceptable_evidence:src/legacy_auth.py",
+        "claim:forbidden:Auth.loginLegacy",
+        "claim:forbidden:src/legacy_auth.py"
+      ],
+      "estimated_tokens": 301,
+      "passed": false,
+      "source_ref": "task42:patch_cases:patch_exact_identifier_boundary"
+    },
+    "t42-patch-missing-target": {
+      "errors": [],
+      "estimated_tokens": 77,
+      "passed": true,
+      "source_ref": "task42:patch_cases:patch_missing_target"
+    },
+    "t42-patch-policy-target-test": {
+      "errors": [],
+      "estimated_tokens": 307,
+      "passed": true,
+      "source_ref": "task42:patch_cases:patch_policy_target_and_test"
+    },
+    "t42-patch-scope-missing": {
+      "errors": [],
+      "estimated_tokens": 86,
+      "passed": true,
+      "source_ref": "task42:patch_cases:patch_scope_missing_identity"
+    }
+  },
+  "deterministic_result_digest": "b7fead9ca5c8141bb0ae7ab4242df12cb0409263d9fc910f91105543d0d6ece6",
+  "groups": {
+    "docs_answer": {
+      "answer_fact_coverage": 1.0,
+      "cases": 24,
+      "citation_validity_rate": 0.95,
+      "forbidden_source_violations": 1,
+      "forbidden_version_violations": 0,
+      "insufficient_false_success_rate": 0.0,
+      "median_visible_tokens": 169.0,
+      "passed": 23,
+      "required_fact_rate": 1.0,
+      "retrieval_projection_p95_ms": 2.897641,
+      "unsupported_claim_violations": 0
+    },
+    "patch_context": {
+      "answer_fact_coverage": 1.0,
+      "cases": 5,
+      "citation_validity_rate": 0.5,
+      "forbidden_source_violations": 1,
+      "forbidden_version_violations": 0,
+      "insufficient_false_success_rate": 0.0,
+      "median_visible_tokens": 102,
+      "passed": 4,
+      "required_fact_rate": 1.0,
+      "retrieval_projection_p95_ms": 2.647019,
+      "unsupported_claim_violations": 0
+    }
+  },
+  "holdout": {
+    "answer_fact_coverage": 1.0,
+    "recall@5": 1.0
+  },
+  "product_code_digests": {
+    "docmancer/core/sqlite_store.py": "df37895baa3353a7e825570a5b0f78b002354b7c324b11f4fa585beb6dcafe60",
+    "docmancer/docs/application/action_packet.py": "0eb5b56dd600c06a009a71c958fde13f117fb632660bc7278109626669354d02",
+    "docmancer/docs/application/evidence_selection.py": "2e80b26beb8f3be26da3d482e0b5aa45924de84b2c7cf4bcb0d404e80d875d8d",
+    "docmancer/docs/application/model_visible_projection.py": "ec24552885b6a80d30af320f390ba98624d3d470fd6a2b278d2084b17fdd63d0",
+    "docmancer/docs/interfaces/mcp/context_tools.py": "aba806d93044c58b3092d858f351e73457e40abf4e88b4614b15c15d72bce88c"
+  },
+  "protocol_sha256": "2a9725df3dd31ed09eea84cf16cc84d747b34856d5ce5fac9405b1d3695cb2de",
+  "schema_version": "task43-answer-quality-baseline-v1",
+  "source_revision": {
+    "commit_sha": "59aa94c39c6885b30018a9af6e9b81fa1839075d",
+    "tree_sha": "468e17f991dd1bf938353dd5c92b1d39f45ce6d0"
+  }
+}
