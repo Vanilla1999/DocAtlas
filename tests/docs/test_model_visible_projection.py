@@ -101,6 +101,17 @@ def test_patch_projection_retains_validated_citations_without_raw_evidence():
     assert estimate_projection_tokens(projection) <= 1_500
     assert validate_model_visible_projection(projection, snapshot=snapshot, max_tokens=1_500) == []
 
+    for field in ("path", "symbol_or_section"):
+        tampered = deepcopy(projection)
+        tampered["sources"][0][field] = "tampered-value"
+        tampered["estimated_tokens"] = estimate_projection_tokens(tampered)
+        assert (
+            f"projection source {field} does not match the internal snapshot"
+            in validate_model_visible_projection(
+                tampered, snapshot=snapshot, max_tokens=1_500
+            )
+        )
+
 
 def test_insufficient_projection_is_fail_closed_and_at_most_300_tokens():
     payload = project_insufficient(

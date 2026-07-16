@@ -27,6 +27,11 @@ _PATCH_FACT_RE = re.compile(
     r"dart\s+(?:test|analyze)|go\s+test|make\s+test)\b",
     re.IGNORECASE,
 )
+_LEGAL_INTENT_TERMS = frozenset({
+    "agreement", "arbitration", "conditions", "copyright", "disclaimer",
+    "dmca", "eula", "governing", "indemnification", "jurisdiction", "legal",
+    "liability", "license", "privacy", "terms", "warranties", "waiver",
+})
 _ALLOWED_REQUIREMENT_PROVENANCE = frozenset({
     "query_exact_term",
     "public_task_contract",
@@ -40,6 +45,7 @@ _ALLOWED_REQUIREMENT_PROVENANCE = frozenset({
 OmissionReason = Literal[
     "wrong_version", "unknown_version", "forbidden_source", "outside_scope",
     "stale", "instruction_risk", "invalid_identity", "navigation_only",
+    "query_identifier_conflict", "query_intent_mismatch",
     "authority_conflict", "exact_duplicate", "overlap_duplicate",
     "near_duplicate", "source_cap", "zero_marginal_utility", "budget",
     "dominated", "candidate_cap",
@@ -504,7 +510,15 @@ def normalize_candidates(
             ),
             component_ranks=component_ranks,
             relevance_millis=int(round(float(score) * 1000)),
-            authority=_authority(item), source_class=str(item.get("source_class") or ""),
+            authority=_authority(item),
+            source_class=str(
+                item.get("source_class")
+                or (
+                    "legal"
+                    if str(item.get("authority") or "").casefold() == "legal"
+                    else ""
+                )
+            ),
             version_binding=_version_binding(item),
             resolved_version=_resolved_version(item),
             docs_snapshot_exact=(item.get("docs_snapshot_exact") if isinstance(item.get("docs_snapshot_exact"), bool) else None),
@@ -634,7 +648,7 @@ def select_evidence(
     eligible, hard_omissions, critical_failures = _eligible_candidates(
         raw_candidates, trust_contract or {}, requirements,
         project_identity=project_identity, module_id=module_id,
-        result_kind=config.result_kind,
+        result_kind=config.result_kind, question=question,
     )
     omissions.extend(hard_omissions)
     requirements = _with_canonical_policy_requirements(requirements, eligible, config.result_kind)
@@ -782,12 +796,17 @@ def _eligible_candidates(
     project_identity: str | None,
     module_id: str | None,
     result_kind: str,
+    question: str,
 ) -> tuple[list[EvidenceCandidate], list[Omission], set[str]]:
     forbidden = _trust_source_keys(trust_contract, "rejected") | _trust_source_keys(trust_contract, "risky")
     exact_versions = {item.value for item in requirements if item.kind == "exact_version" and item.mandatory}
     canonical_policy_required = any(
         item.kind == "canonical_policy" and item.mandatory for item in requirements
     )
+    legal_intent = bool(
+        set(_TOKEN_RE.findall(question.casefold())).intersection(_LEGAL_INTENT_TERMS)
+    )
+    query_identifiers = _query_identifier_values(requirements)
     eligible: list[EvidenceCandidate] = []
     omissions: list[Omission] = []
     critical: set[str] = set()
@@ -817,11 +836,64 @@ def _eligible_candidates(
             reason = "wrong_version"
         elif result_kind == "docs_answer" and candidate.navigation_only:
             reason = "navigation_only"
+        elif (
+            candidate.source_class.casefold() == "legal"
+            and not legal_intent
+        ):
+            reason = "query_intent_mismatch"
+        elif _query_identifier_conflict(candidate, query_identifiers):
+            reason = "query_identifier_conflict"
         if reason:
             omissions.append(Omission(candidate.stable_id, reason))
         else:
             eligible.append(candidate)
     return eligible, omissions, critical
+
+
+def _query_identifier_conflict(
+    candidate: EvidenceCandidate,
+    query_identifiers: Sequence[str],
+) -> bool:
+    """Reject prefix lookalikes without excluding unrelated supporting evidence."""
+
+    haystack = "\n".join((candidate.display_text, *candidate.symbols)).casefold()
+    for value in query_identifiers:
+        exact_match = False
+        prefix_match = False
+        start = haystack.find(value)
+        while start >= 0:
+            before = haystack[start - 1] if start else ""
+            after_index = start + len(value)
+            after = haystack[after_index] if after_index < len(haystack) else ""
+            if not (before == "_" or before.isalnum()):
+                if after == "_" or after.isalnum():
+                    prefix_match = True
+                else:
+                    exact_match = True
+                    break
+            start = haystack.find(value, start + 1)
+        if prefix_match and not exact_match:
+            return True
+    return False
+
+
+def _query_identifier_values(
+    requirements: Sequence[EvidenceRequirement],
+) -> tuple[str, ...]:
+    return tuple(
+        requirement.value.casefold()
+        for requirement in requirements
+        if requirement.public_provenance == "query_exact_term"
+        and (
+            "_" in requirement.value
+            or "." in requirement.value
+            or "::" in requirement.value
+            or (
+                any(char.isupper() for char in requirement.value[1:])
+                and any(char.islower() for char in requirement.value)
+            )
+        )
+    )
 
 
 def _trust_source_keys(contract: Mapping[str, Any], field: str) -> set[str]:

@@ -4,26 +4,27 @@ This directory contains the first real execution of the frozen Task 43
 protocol. The execution is bound to protocol SHA-256
 `2a9725df3dd31ed09eea84cf16cc84d747b34856d5ce5fac9405b1d3695cb2de`
 and deterministic result digest
-`b7fead9ca5c8141bb0ae7ab4242df12cb0409263d9fc910f91105543d0d6ece6`.
+`ab40b26b58fb7e98424906144e971f560425e62f547d7aca867d2d8e235a0245`.
 
-The provider-free verdict is **FAIL**. This is a truthful baseline, not an
-accepted default:
+The deterministic automated gate and frozen Pareto gate are **PASS**:
 
-- `t39-adv-legal-distractor` exposes `legal/terms.md` alongside the required
-  `docs/configuration.md` evidence.
-- `t42-patch-identifier-boundary` exposes `src/legacy_auth.py` and
-  `Auth.loginLegacy` alongside the required exact identifier.
-- the patch projection validator does not reject a mutation of
-  `sources[].path` against its internal snapshot. The runner requires the
-  explicit snapshot-binding error and therefore fails closed.
+- all 29 frozen contracts pass independently;
+- non-legal queries omit legal-authority evidence while explicit legal intent
+  can still select it;
+- exact identifier requests omit prefix lookalikes such as
+  `Auth.loginLegacy` for `Auth.login`;
+- docs and patch source mutations are rejected against their internal
+  snapshots;
+- required-fact coverage, citation validity, and holdout Recall@5 are 100%;
+- paired p95 retrieval-plus-projection latency remains within the frozen 10%
+  bound for both docs and patch results.
 
 Task 39 and Task 42 lower-layer gates pass, including the Task 42 reversed
-candidate-order determinism check. Required-fact coverage and holdout Recall@5
-remain 100%, but those metrics cannot compensate for citation or integrity
-failures under the frozen Pareto rule.
+candidate-order determinism check.
 
-Human review and the production-model experiment remain **INCONCLUSIVE**. No
-human ratings, provider usage, or production-model savings are claimed.
+The overall provider-free verdict is **INCONCLUSIVE** because human review is
+still pending. The production-model experiment also remains **INCONCLUSIVE**.
+No human ratings, provider usage, or production-model savings are claimed.
 
 Run the provider-free observation with:
 
@@ -31,6 +32,5 @@ Run the provider-free observation with:
 python -m eval.answer_quality_runner --output-dir eval/answer_quality
 ```
 
-The command intentionally exits non-zero while the provider-free verdict is
-not `PASS`. Product fixes belong in a subsequent branch and must consume the
-same frozen protocol and cases without rewriting them.
+The command intentionally exits non-zero while human review keeps the overall
+provider-free verdict from becoming `PASS`.

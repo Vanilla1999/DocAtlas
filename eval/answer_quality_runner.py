@@ -7,8 +7,12 @@ import copy
 import hashlib
 import json
 import math
+import os
 import platform
 import statistics
+import subprocess
+import sys
+import tarfile
 import tempfile
 import time
 from pathlib import Path
@@ -227,12 +231,22 @@ def run(output_dir: Path) -> dict[str, Any]:
         candidate_baseline["product_code_digests"]
         == baseline.get("product_code_digests")
     )
+    comparison_baseline = copy.deepcopy(baseline)
     if identity_candidate:
         for kind in ("docs_answer", "patch_context"):
             candidate_baseline["groups"][kind][
                 "retrieval_projection_p95_ms"
             ] = baseline["groups"][kind]["retrieval_projection_p95_ms"]
-    pareto_errors = compare_pareto_candidate(candidate_baseline, baseline)
+    elif os.environ.get("DOCATLAS_TASK43_SKIP_PAIRED_BASELINE") != "1":
+        paired_groups = _paired_baseline_groups(protocol)
+        for kind in ("docs_answer", "patch_context"):
+            comparison_baseline["groups"][kind][
+                "retrieval_projection_p95_ms"
+            ] = paired_groups[kind]["retrieval_projection_p95_ms"]
+    pareto_errors = compare_pareto_candidate(
+        candidate_baseline, comparison_baseline
+    )
+    provider_pass = automated_pass and not pareto_errors
     report = {
         **stable,
         "deterministic_result_digest": stable_digest,
@@ -241,14 +255,16 @@ def run(output_dir: Path) -> dict[str, Any]:
             "errors": pareto_errors,
         },
         "provider_free_verdict": (
-            "INCONCLUSIVE" if automated_pass else "FAIL"
+            "INCONCLUSIVE" if provider_pass else "FAIL"
         ),
         "verdict_reason": (
-            "human_review_pending" if automated_pass else "automated_gate_failed"
+            "human_review_pending"
+            if provider_pass else "frozen_pareto_gate_failed"
+            if automated_pass else "automated_gate_failed"
         ),
     }
     timing = _timing_artifact(
-        protocol, timing_samples, measured_groups, baseline["groups"],
+        protocol, timing_samples, measured_groups, comparison_baseline["groups"],
         identity_candidate,
     )
     human_inputs = _human_review_artifact(protocol, review_inputs, stable_digest)
@@ -257,6 +273,68 @@ def run(output_dir: Path) -> dict[str, Any]:
     _write_json(output_dir / "latency_v1.json", timing)
     _write_json(output_dir / "human_review_inputs_v1.json", human_inputs)
     return report
+
+
+def _paired_baseline_groups(protocol: dict[str, Any]) -> dict[str, Any]:
+    """Measure the frozen product revision in the same evaluator invocation."""
+
+    with tempfile.TemporaryDirectory(prefix="docatlas-task43-paired-") as temporary:
+        root = Path(temporary)
+        archive = root / "baseline.tar"
+        checkout = root / "baseline"
+        checkout.mkdir()
+        with archive.open("wb") as stream:
+            completed = subprocess.run(
+                ["git", "archive", protocol["source_revision"]["commit_sha"]],
+                cwd=ROOT, stdout=stream, stderr=subprocess.PIPE, check=False,
+            )
+        if completed.returncode:
+            raise RuntimeError(
+                "could not materialize the frozen Task 43 source revision: "
+                + completed.stderr.decode("utf-8", errors="replace")
+            )
+        with tarfile.open(archive) as bundle:
+            destination = checkout.resolve()
+            for member in bundle.getmembers():
+                target = (checkout / member.name).resolve()
+                if (
+                    not target.is_relative_to(destination)
+                    or member.issym()
+                    or member.islnk()
+                ):
+                    raise RuntimeError("unsafe member in frozen git archive")
+            bundle.extractall(checkout)
+        output = root / "result"
+        environment = dict(os.environ)
+        environment["DOCATLAS_TASK43_SKIP_PAIRED_BASELINE"] = "1"
+        environment["PYTHONPATH"] = os.pathsep.join(
+            [str(ROOT), environment.get("PYTHONPATH", "")]
+        ).rstrip(os.pathsep)
+        completed = subprocess.run(
+            [
+                sys.executable, "-c",
+                (
+                    "from pathlib import Path; "
+                    "from eval.answer_quality_runner import run; "
+                    f"run(Path({str(output)!r}))"
+                ),
+            ],
+            cwd=checkout, env=environment, stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE, text=True, check=False,
+        )
+        if completed.returncode:
+            raise RuntimeError(
+                "paired Task 43 baseline execution failed: " + completed.stderr
+            )
+        latency = load_json(output / "latency_v1.json")
+        return {
+            kind: {
+                "retrieval_projection_p95_ms": latency["groups"][kind][
+                    "candidate_p95_ms"
+                ]
+            }
+            for kind in ("docs_answer", "patch_context")
+        }
 
 
 def _build_task39_store(root: Path) -> SQLiteStore:
@@ -295,6 +373,7 @@ def _task39_projection(
             "title": chunk.metadata.get("title"),
             "content": chunk.text,
             "version": chunk.metadata.get("version", "unversioned"),
+            "authority": chunk.metadata.get("authority"),
         }
         for chunk in chunks[: RETRIEVAL_CONFIG["selected_limit"]]
     ]
@@ -617,7 +696,7 @@ def _timing_artifact(
                 ),
                 "status": (
                     "BASELINE_IDENTITY_OBSERVATION"
-                    if identity_candidate else "CANDIDATE_OBSERVATION"
+                    if identity_candidate else "PAIRED_CANDIDATE_OBSERVATION"
                 ),
             }
             for kind, row in groups.items()
