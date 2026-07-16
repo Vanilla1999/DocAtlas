@@ -1,0 +1,70 @@
+{
+  "schema_version": "task42-evidence-cases-v1",
+  "cases": [
+    {
+      "case_id": "docs_exact_signature",
+      "result_kind": "docs_answer",
+      "question": "How do I call Client.open?",
+      "candidates": [
+        {"stable_chunk_id": "docs-open", "parent_logical_id": "api-client", "source": "docs/api.md", "display_text": "Call Client.open(config) to create the client.", "authority": "official", "docs_exactness": "exact", "version": "2.0", "retrieval_rank": 1},
+        {"stable_chunk_id": "docs-overview", "parent_logical_id": "overview", "source": "docs/overview.md", "display_text": "The client supports configuration.", "authority": "official", "docs_exactness": "exact", "version": "2.0", "retrieval_rank": 2}
+      ],
+      "required_facts": ["Client.open"],
+      "expected_status": "ok",
+      "expected_selected": ["docs-open"],
+      "maximum_visible_tokens": 800
+    },
+    {
+      "case_id": "docs_wrong_version_high_rank",
+      "result_kind": "docs_answer",
+      "question": "How do I set RETRY_LIMIT?",
+      "exact_version": "2.0",
+      "candidates": [
+        {"stable_chunk_id": "wrong-version", "parent_logical_id": "config-v3", "source": "docs/v3/config.md", "display_text": "Set RETRY_LIMIT=9.", "authority": "official", "docs_exactness": "exact", "version": "3.0", "score": 1.0, "retrieval_rank": 1},
+        {"stable_chunk_id": "right-version", "parent_logical_id": "config-v2", "source": "docs/v2/config.md", "display_text": "Set RETRY_LIMIT=3.", "authority": "official", "docs_exactness": "exact", "version": "2.0", "score": 0.1, "retrieval_rank": 20}
+      ],
+      "required_facts": ["RETRY_LIMIT"],
+      "forbidden_versions": ["3.0"],
+      "expected_status": "ok",
+      "expected_selected": ["right-version"],
+      "maximum_visible_tokens": 800
+    },
+    {
+      "case_id": "docs_exact_identifier_boundary",
+      "result_kind": "docs_answer",
+      "question": "How do I call Auth.login?",
+      "candidates": [
+        {"stable_chunk_id": "login-prefix", "parent_logical_id": "auth-old", "source": "docs/auth-old.md", "display_text": "Call Auth.loginLegacy() for old clients.", "authority": "official", "retrieval_rank": 1},
+        {"stable_chunk_id": "login-exact", "parent_logical_id": "auth-current", "source": "docs/auth.md", "display_text": "Call Auth.login() for current clients.", "authority": "official", "retrieval_rank": 2}
+      ],
+      "required_facts": ["Auth.login"],
+      "expected_status": "ok",
+      "expected_selected": ["login-exact"],
+      "maximum_visible_tokens": 800
+    },
+    {
+      "case_id": "docs_scope_missing_identity",
+      "result_kind": "docs_answer",
+      "question": "How are bounded retries configured?",
+      "project_identity": "acme/project",
+      "module_id": "runtime",
+      "candidates": [
+        {"stable_chunk_id": "unscoped", "parent_logical_id": "retry", "source": "docs/retry.md", "display_text": "Use bounded retries.", "project_identity": "acme/project", "authority": "official"}
+      ],
+      "expected_status": "insufficient_evidence",
+      "maximum_visible_tokens": 800
+    },
+    {
+      "case_id": "docs_malformed_rank",
+      "result_kind": "docs_answer",
+      "question": "How is CACHE_MODE configured?",
+      "candidates": [
+        {"stable_chunk_id": "cache-mode", "parent_logical_id": "config", "source": "docs/config.md", "display_text": "Set CACHE_MODE=bounded.", "authority": "official", "retrieval_rank": "not-a-rank"}
+      ],
+      "required_facts": ["CACHE_MODE"],
+      "expected_status": "ok",
+      "expected_selected": ["cache-mode"],
+      "maximum_visible_tokens": 800
+    }
+  ]
+}

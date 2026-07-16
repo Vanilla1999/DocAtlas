@@ -8,6 +8,13 @@ import re
 from pathlib import Path
 from typing import Any, Iterable
 
+from docmancer.docs.application.evidence_selection import (
+    SelectionDecision,
+    normalize_candidates,
+    patch_selection_config,
+    select_evidence,
+)
+
 
 ACTION_PACKET_SCHEMA_VERSION = 1
 DEFAULT_ACTION_PACKET_TOKENS = 1_500
@@ -193,6 +200,11 @@ def build_action_packet(
     retrieval_issues: Iterable[str] | None = None,
     required_evidence_paths: Iterable[str] = (),
     required_target_paths: Iterable[str] = (),
+    public_requirements: Iterable[dict[str, Any] | str] = (),
+    exact_version: str | None = None,
+    project_identity: str | None = None,
+    module_id: str | None = None,
+    selection_diagnostics: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Render selected retrieval evidence into a bounded, deterministic packet.
 
@@ -204,7 +216,11 @@ def build_action_packet(
         HARD_ACTION_PACKET_TOKENS,
         max(MIN_ACTION_PACKET_TOKENS, int(max_tokens or DEFAULT_ACTION_PACKET_TOKENS)),
     )
+    required_evidence_paths = tuple(required_evidence_paths)
+    required_target_paths = tuple(required_target_paths)
+    public_requirements = tuple(public_requirements)
     raw_items = [dict(item) for item in context_pack if isinstance(item, dict)]
+    retrieval_issue_list = [str(issue) for issue in (retrieval_issues or []) if str(issue).strip()]
     required_source_keys = {
         _normalized_source_key(path) for path in required_evidence_paths if str(path).strip()
     }
@@ -247,9 +263,59 @@ def build_action_packet(
         )
         scoped_items.append(item)
     scoped_items = _drop_superseded_fallbacks(scoped_items)
+    selection = select_evidence(
+        scoped_items,
+        question=question,
+        config=patch_selection_config(budget),
+        trust_contract=trust_contract or {},
+        required_evidence_paths=required_evidence_paths,
+        required_target_paths=required_target_paths,
+        public_requirements=public_requirements,
+        exact_version=exact_version,
+        project_identity=project_identity,
+        module_id=module_id,
+    )
+    if selection_diagnostics is not None:
+        selection_diagnostics.update(selection.audit_manifest())
+    normalized_scoped, _ = normalize_candidates(scoped_items, result_kind="patch_context")
+    scoped_by_id = {candidate.stable_id: candidate for candidate in normalized_scoped}
+    selector_rejected_critical_facts = sum(
+        _critical_fact_count(dict(scoped_by_id[omission.stable_id].original))
+        for omission in selection.omissions
+        if omission.reason_code == "forbidden_source"
+        and omission.stable_id in scoped_by_id
+        and scoped_by_id[omission.stable_id].authority == "canonical"
+    )
+    selector_risky_critical_facts = sum(
+        _critical_fact_count(dict(scoped_by_id[omission.stable_id].original))
+        for omission in selection.omissions
+        if omission.reason_code == "instruction_risk"
+        and omission.stable_id in scoped_by_id
+        and scoped_by_id[omission.stable_id].authority == "canonical"
+    )
+    selection_budget_critical_facts = 0
+    budget_omission_ids = {
+        omission.stable_id for omission in selection.omissions if omission.reason_code == "budget"
+    }
+    if budget_omission_ids:
+        selection_budget_critical_facts = sum(
+            _critical_fact_count(dict(candidate.original))
+            for candidate in normalized_scoped
+            if candidate.stable_id in budget_omission_ids and candidate.authority == "canonical"
+        )
+    if selection.status == "insufficient_evidence":
+        retrieval_issue_list.extend(
+            f"Missing required evidence: {requirement}"
+            for requirement in selection.missing_requirements
+        )
+        retrieval_issue_list.extend(
+            f"Unresolved evidence conflict: {conflict}"
+            for conflict in selection.unresolved_conflicts
+        )
+    scoped_items = selection.selected_items
     authority_conflicts = _authority_conflicts(scoped_items, trust_contract or {})
     rejected_sources = _rejected_source_keys(trust_contract or {})
-    rejected_critical_facts = sum(
+    rejected_critical_facts = selector_rejected_critical_facts + sum(
         _critical_fact_count(item)
         for item in scoped_items
         if _declares_canonical_authority(item) and _item_source_keys(item) & rejected_sources
@@ -273,13 +339,13 @@ def build_action_packet(
     critical_fact_omissions = 0
     snippet_omissions = 0
     risky_content_omissions = 0
-    risky_critical_omissions = 0
+    risky_critical_omissions = selector_risky_critical_facts
     untrusted_validation_omissions = 0
     for item in items:
         evidence_id = _evidence_id(item) if _source_path(item) else None
         if not evidence_id:
             continue
-        facts, omitted_facts = _extract_facts(str(item.get("content") or ""))
+        facts, omitted_facts = _extract_facts(_content_text(item))
         if _instruction_risk_flags(item):
             risky_content_omissions += len(facts) + (1 if item.get("snippet") else 0)
             if _declares_canonical_authority(item):
@@ -368,6 +434,7 @@ def build_action_packet(
         ("risky_document_items", risky_content_omissions),
         ("risky_critical_source_facts", risky_critical_omissions),
         ("untrusted_validation_commands", untrusted_validation_omissions),
+        ("required_invariants", selection_budget_critical_facts),
     ):
         if count:
             packet["omitted_counts"][field] = count
@@ -388,7 +455,7 @@ def build_action_packet(
         ]
         packet["missing_evidence"].append("Conflicting canonical evidence must be resolved before editing.")
 
-    for issue in list(retrieval_issues or [])[:5]:
+    for issue in retrieval_issue_list[:5]:
         text, _ = _bounded_text(str(issue).strip(), 240)
         if text and text not in packet["missing_evidence"]:
             packet["missing_evidence"].append(text)
@@ -431,10 +498,90 @@ def build_action_packet(
         packet, required_source_keys, required_target_keys
     ):
         _refresh_estimated_tokens(packet)
+    _ensure_selection_survives_packet(packet, selection)
     _refresh_estimated_tokens(packet)
     if packet["estimated_tokens"] > budget:
         _compact_failure_packet(packet, budget)
     return packet
+
+
+def _ensure_selection_survives_packet(
+    packet: dict[str, Any], selection: SelectionDecision
+) -> None:
+    """Fail closed if formatting removed a selector-owned requirement."""
+
+    visible_values: list[str] = []
+    for row in packet.get("source_of_truth") or []:
+        if isinstance(row, dict):
+            visible_values.extend(str(row.get(key) or "") for key in (
+                "path", "symbol_or_section", "version_binding",
+            ))
+    target = packet.get("target_surface") if isinstance(packet.get("target_surface"), dict) else {}
+    for key, value_key in (("likely_files", "path"), ("symbols", "name")):
+        visible_values.extend(
+            str(row.get(value_key) or "")
+            for row in target.get(key) or []
+            if isinstance(row, dict)
+        )
+    for rows in (
+        packet.get("required_invariants"), packet.get("forbidden_changes"),
+        packet.get("implementation_guidance"),
+        *((packet.get("validation") or {}).values()),
+    ):
+        visible_values.extend(
+            str(row.get("text") or "") for row in rows or [] if isinstance(row, dict)
+        )
+    visible_text = "\n".join(visible_values).casefold()
+    retained_evidence_ids = {
+        str(row.get("evidence_id") or "")
+        for row in packet.get("source_of_truth") or []
+        if isinstance(row, dict)
+    }
+    selected_by_stable = {item.stable_id: item for item in selection.selected_candidates}
+    missing: list[str] = []
+    for requirement in selection.requirements:
+        if not requirement.mandatory:
+            continue
+        covering = [
+            item for item in selection.selected_candidates
+            if requirement.requirement_id in item.covered_requirement_ids
+        ]
+        if requirement.kind == "evidence_path":
+            paths = {
+                _normalized_source_key(row.get("path"))
+                for row in packet.get("source_of_truth") or [] if isinstance(row, dict)
+            }
+            satisfied = _normalized_source_key(requirement.value) in paths
+        elif requirement.kind == "target_path":
+            paths = {
+                _normalized_source_key(row.get("path"))
+                for row in target.get("likely_files") or [] if isinstance(row, dict)
+            }
+            satisfied = _normalized_source_key(requirement.value) in paths
+        elif requirement.kind == "exact_version":
+            satisfied = any(
+                _evidence_id(dict(item.original)) in retained_evidence_ids
+                and item.resolved_version.casefold() == requirement.value.casefold()
+                for item in covering
+            )
+        elif requirement.kind == "canonical_policy":
+            candidate = selected_by_stable.get(requirement.value)
+            facts = _extract_facts(_content_text(candidate.original))[0] if candidate else []
+            satisfied = bool(candidate) and (
+                all(fact.casefold() in visible_text for _, fact in facts)
+                if facts else _evidence_id(dict(candidate.original)) in retained_evidence_ids
+            )
+        else:
+            satisfied = requirement.value.casefold() in visible_text
+        if not satisfied:
+            missing.append(requirement.requirement_id)
+    if not missing:
+        return
+    packet["status"] = "insufficient_evidence"
+    packet["omitted_counts"]["mandatory_requirements"] = len(missing)
+    message = "Mandatory selected evidence was not preserved by packet formatting: " + ", ".join(missing[:3])
+    if message not in packet["missing_evidence"]:
+        packet["missing_evidence"].append(message)
 
 
 def validate_action_packet(
@@ -726,7 +873,7 @@ def _validate_evidence_fidelity(
             refs = _string_refs(item)
             if any(
                 (expected_type, text) not in _extract_facts(
-                    str(evidence_map.get(ref, {}).get("content") or "")
+                    _content_text(evidence_map.get(ref, {}))
                 )[0]
                 for ref in refs
             ):
@@ -739,7 +886,7 @@ def _validate_evidence_fidelity(
             refs = _string_refs(item)
             if any(
                 ("validation", text) not in _extract_facts(
-                    str(evidence_map.get(ref, {}).get("content") or "")
+                    _content_text(evidence_map.get(ref, {}))
                 )[0]
                 for ref in refs
             ):
@@ -751,7 +898,7 @@ def _validate_evidence_fidelity(
             text != _snippet_text(evidence_map.get(ref, {}).get("snippet"))[0]
             and text not in {
                 fact for fact_type, fact in _extract_facts(
-                    str(evidence_map.get(ref, {}).get("content") or "")
+                    _content_text(evidence_map.get(ref, {}))
                 )[0]
                 if fact_type in {"required", "forbidden"}
             }
@@ -808,7 +955,7 @@ def _authority_conflicts(
         ):
             continue
         identity = _item_identity(item)
-        content = str(item.get("content") or "").strip()
+        content = _content_text(item).strip()
         facts, _ = _extract_facts(content)
         for fact_type, fact in facts:
             if fact_type not in {"required", "forbidden"}:
@@ -862,7 +1009,7 @@ def _declares_canonical_authority(item: dict[str, Any]) -> bool:
 
 
 def _critical_fact_count(item: dict[str, Any]) -> int:
-    facts, oversized = _extract_facts(str(item.get("content") or ""))
+    facts, oversized = _extract_facts(_content_text(item))
     return oversized + sum(
         1 for fact_type, _ in facts if fact_type in {"required", "forbidden", "validation"}
     )
@@ -1005,7 +1152,7 @@ def _rank_and_dedupe(items: Iterable[dict[str, Any]], trust_contract: dict[str, 
         authority_rank = 0 if authority == "canonical" else 1
         class_rank = 0 if item.get("source_class") in _CODE_SOURCE_CLASSES else 1
         version_rank = _version_exactness_rank(item)
-        content = str(item.get("content") or "")
+        content = _content_text(item)
         facts, _ = _extract_facts(content)
         snippet, _ = _snippet_text(item.get("snippet"))
         actionable_rank = -len(facts) - (1 if snippet else 0)
@@ -1162,7 +1309,7 @@ def _dedupe_id(item: dict[str, Any]) -> str:
         {
             "path": _source_path(item),
             "section": _section(item),
-            "content": str(item.get("content") or ""),
+            "content": _content_text(item),
             "snippet": item.get("snippet"),
             "symbols": _explicit_symbols(item),
             "source_class": item.get("source_class"),
@@ -1185,7 +1332,7 @@ def _evidence_id(item: dict[str, Any]) -> str:
             "canonical_id": item.get("canonical_id"),
             "library_id": item.get("library_id"),
             "section": _section(item),
-            "content": str(item.get("content") or ""),
+            "content": _content_text(item),
             "snippet": item.get("snippet"),
             "symbols": _explicit_symbols(item),
             "source_class": item.get("source_class"),
@@ -1202,6 +1349,12 @@ def _evidence_id(item: dict[str, Any]) -> str:
         default=str,
     )
     return "ev-" + hashlib.sha256(identity.encode("utf-8")).hexdigest()[:16]
+
+
+def _content_text(item: Any) -> str:
+    if not isinstance(item, dict):
+        return ""
+    return str(item.get("display_text") or item.get("content") or "")
 
 
 def _extract_facts(content: str) -> tuple[list[tuple[str, str]], int]:

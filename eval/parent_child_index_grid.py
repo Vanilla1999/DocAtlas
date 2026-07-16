@@ -416,6 +416,20 @@ def _run_variant(target: int, corpus: dict[str, Any], baseline: dict[str, Any]) 
                 "local_edit_pruned": edited_prune.pruned,
                 "measured_by": "sync_vector_store",
             },
+            "candidate_trace_hash": hashlib.sha256(
+                json.dumps(
+                    [
+                        {
+                            "case_id": f"{case['split']}:{case['id']}",
+                            "candidates": case["candidates"],
+                        }
+                        for case in all_cases
+                    ],
+                    ensure_ascii=False,
+                    sort_keys=True,
+                    separators=(",", ":"),
+                ).encode("utf-8")
+            ).hexdigest(),
             "case_gates": {
                 f"{case['split']}:{case['id']}": {
                     "recall@5": case["metrics"]["recall@5"],

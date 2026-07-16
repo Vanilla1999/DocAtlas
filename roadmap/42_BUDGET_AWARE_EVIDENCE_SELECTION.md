@@ -1,5 +1,58 @@
 # Task 42 — budget-aware minimal evidence selection
 
+## Implementation record (2026-07-16)
+
+Status: **implemented locally; provider-free acceptance `PASS`**.
+
+Implemented in `agent/task42-budget-aware-evidence-selection`:
+
+- a standalone, provider-free selector with canonical config, candidate trace,
+  requirement and selection hashes;
+- Task 40 child identity validation plus an explicit legacy identity adapter;
+- deterministic token re-estimation, scope/version/trust/risk/freshness filters,
+  and fail-closed identity checks;
+- exact, parent-overlap and shingle/Jaccard near-duplicate collapse without
+  synthetic merged citations;
+- whole-item reservation for query identifiers, required paths, public facts,
+  exact versions and canonical project policy;
+- a bounded one/two-item repair pass followed by marginal utility per 100
+  tokens, source caps and deterministic tie-breaking;
+- integration before both documentation projection and ActionPacket fact
+  extraction; the old formatters remain serialization safety clamps;
+- host-only omission/coverage/token diagnostics. No selector trace or rejected
+  evidence is copied into the model-visible response;
+- digest-bound docs, patch and adversarial fixtures plus a provider-free gate.
+
+Review hardening additionally closes formatter and identity bypasses: mandatory
+requirements are revalidated after final packet fitting; stable children require
+their display hash and well-formed supplied spans; every source alias participates
+in trust filtering; candidate traces bind authority/version/scope/risk metadata;
+the MCP boundary forwards host-owned requirement and scope contracts; and the
+acceptance harness validates the actual model-visible docs/patch projections.
+
+Final hardening also rejects one stable ID bound to different content or metadata,
+fails closed when requested project/module identity is absent, uses exact identifier
+boundaries instead of substring coverage, bounds malformed ranks, binds invalid
+candidates plus relevance/symbol inputs into the trace hash, and records every
+omitted ID and reason in the host audit manifest.
+
+Local evidence:
+
+- docs plus Task 39–42 selector/retrieval/index regression suite: `593 passed`;
+- full repository regression suite after stacked hardening: `2290 passed, 10 skipped`;
+- provider-free fixture correctness gate: `PASS` for all 13 frozen cases;
+- upstream Task 41 parent/child candidate trace and retrieval configuration are
+  hash-bound and `PASS` at the selected 160-token profile;
+- median budgeted evidence cost decreased from `129` to `125.5` tokens for docs
+  and from `487` to `393` tokens for patch context;
+- provider-free overall verdict: `PASS`;
+- no provider, model or network call is used by selection or evaluation.
+
+The cache remains disabled in `SelectionConfig`; cache invalidation remains a
+separate optimization and is not needed to claim the measured selection saving.
+The next implementation task is Task 43, using this frozen Task 41 candidate
+trace and Task 42 selector baseline.
+
 ## Priority
 
 P1 direct model-token reduction without quality loss. Start after Task 41 produces a reproducible candidate pool.

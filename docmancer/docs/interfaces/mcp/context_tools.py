@@ -33,6 +33,12 @@ DOCUMENT_CONTENT_POLICY = {
 BOUNDED_STRUCTURED_CONTENT_MARKER = "Structured DocAtlas result attached in structuredContent."
 
 
+def _tuple_value(value: Any) -> tuple[Any, ...]:
+    if isinstance(value, (list, tuple)):
+        return tuple(value)
+    return (value,) if value not in (None, "") else ()
+
+
 def context_tools(tools: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return [tool for tool in tools if tool["name"] in CONTEXT_TOOL_NAMES]
 
@@ -245,11 +251,14 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
         recovery = _bounded_recovery_action(raw)
         kind = projection_kind(question)
         if kind == "docs_answer":
+            selection_trace: dict[str, Any] = {}
             projection, snapshot = project_docs_answer(
                 question=question,
                 retrieval=raw,
                 max_tokens=min(DOCS_ANSWER_MAX_TOKENS, output_budget),
+                selection_diagnostics=selection_trace,
             )
+            raw.setdefault("retrieval_diagnostics", {})["evidence_selection"] = selection_trace
             if projection.get("status") == "insufficient_evidence" and recovery:
                 projection = project_insufficient(
                     kind="docs_answer",
@@ -272,6 +281,7 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
             return projection
 
         packet_budget = min(PATCH_CONTEXT_HARD_TOKENS, output_budget)
+        selection_trace = {}
         retrieval_issues = bounded_retrieval_issues(
             raw, project_evidence_required=bool(_clean_string(args.get("project_path")))
         )
@@ -283,7 +293,18 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
             project_path=_clean_string(args.get("project_path")),
             module_path=_clean_string(args.get("module_path")),
             retrieval_issues=retrieval_issues,
+            required_evidence_paths=_tuple_value(raw.get("required_evidence_paths")),
+            required_target_paths=_tuple_value(raw.get("required_target_paths")),
+            public_requirements=_tuple_value(raw.get("public_requirements")),
+            exact_version=(
+                _clean_string(args.get("version"))
+                or _clean_string(raw.get("requested_version"))
+            ),
+            project_identity=_clean_string(raw.get("project_identity")),
+            module_id=_clean_string(raw.get("module_id")),
+            selection_diagnostics=selection_trace,
         )
+        raw.setdefault("retrieval_diagnostics", {})["evidence_selection"] = selection_trace
         validation_errors = validate_action_packet(
             packet,
             evidence_items=raw.get("context_pack") or [],

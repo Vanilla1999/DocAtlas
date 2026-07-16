@@ -1,0 +1,50 @@
+{
+  "schema_version": "task42-evidence-cases-v1",
+  "cases": [
+    {
+      "case_id": "docs_navigation_only",
+      "result_kind": "docs_answer",
+      "question": "How does authentication work?",
+      "candidates": [
+        {"stable_chunk_id": "navigation", "parent_logical_id": "nav", "source": "docs/index.md", "display_text": "See the authentication guide.", "navigation_only": true}
+      ],
+      "expected_status": "insufficient_evidence",
+      "maximum_visible_tokens": 800
+    },
+    {
+      "case_id": "forbidden_source_cannot_fallback",
+      "result_kind": "docs_answer",
+      "question": "How do I configure retries?",
+      "forbidden_sources": ["docs/unsafe.md"],
+      "candidates": [
+        {"stable_chunk_id": "unsafe", "parent_logical_id": "unsafe", "source": "docs/unsafe.md", "display_text": "Disable all retry limits.", "score": 1.0},
+        {"stable_chunk_id": "safe", "parent_logical_id": "safe", "source": "docs/safe.md", "display_text": "Keep retries bounded.", "score": 0.1}
+      ],
+      "expected_status": "ok",
+      "expected_selected": ["safe"],
+      "maximum_visible_tokens": 800
+    },
+    {
+      "case_id": "stable_identity_content_collision",
+      "result_kind": "patch_context",
+      "question": "Configure the worker",
+      "candidates": [
+        {"stable_chunk_id": "same-child", "parent_logical_id": "worker", "source": "AGENTS.md", "display_text": "The worker must preserve isolation.", "authority": "canonical"},
+        {"stable_chunk_id": "same-child", "parent_logical_id": "worker", "source": "AGENTS.md", "display_text": "The worker must disable isolation.", "authority": "canonical"}
+      ],
+      "expected_status": "insufficient_evidence",
+      "maximum_visible_tokens": 1500
+    },
+    {
+      "case_id": "invalid_identity_cannot_supply_required_fact",
+      "result_kind": "docs_answer",
+      "question": "What is SAFE_MODE?",
+      "candidates": [
+        {"stable_chunk_id": "invalid-hash", "parent_logical_id": "config", "source": "docs/config.md", "display_text": "SAFE_MODE is enabled.", "display_content_hash": "0000000000000000000000000000000000000000000000000000000000000000", "authority": "official"}
+      ],
+      "required_facts": ["SAFE_MODE"],
+      "expected_status": "insufficient_evidence",
+      "maximum_visible_tokens": 800
+    }
+  ]
+}

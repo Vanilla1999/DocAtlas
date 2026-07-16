@@ -57,12 +57,14 @@ def test_docs_answer_is_deterministic_deduplicated_hashed_and_bounded():
     assert snapshot == second_snapshot
     assert first["kind"] == "docs_answer"
     assert first["status"] == "ok"
-    assert len(first["sources"]) == 3
+    # The exact FooClient identifier is fully supported by one span; Task 42
+    # must not fill the remaining budget with unrelated optional sources.
+    assert len(first["sources"]) == 1
     assert first["omitted_counts"]["sources"] >= 1
     assert estimate_projection_tokens(first) <= 800
     assert not _forbidden_occurrences(first)
     manifest = sanitized_projection_manifest(snapshot)
-    assert len(manifest) == 3
+    assert len(manifest) == 1
     assert all("source" not in row and "snippet" not in row for row in manifest)
     assert validate_model_visible_projection(first, snapshot=snapshot, max_tokens=800) == []
 
@@ -79,11 +81,16 @@ def test_patch_projection_retains_validated_citations_without_raw_evidence():
         "path": "AGENTS.md",
         "heading_path": "Rules",
         "authority": "canonical",
+        "repository_authority": "explicit_agent_policy",
         "instruction_trust": "scoped_agent_policy",
+        "scope_verified": True,
+        "policy_scope": "/project",
         "content": "The patch must preserve source IDs.\nRun pytest tests/docs/test_mcp_boundary.py.",
     }]
-    packet = build_action_packet(question="Implement canonical projection", context_pack=evidence)
-    assert validate_action_packet(packet, evidence_items=evidence) == []
+    packet = build_action_packet(
+        question="Implement canonical projection", context_pack=evidence, project_path="/project",
+    )
+    assert validate_action_packet(packet, evidence_items=evidence, project_path="/project") == []
 
     projection, snapshot = project_patch_context(packet=packet, evidence_items=evidence)
 
@@ -179,6 +186,31 @@ def test_partial_navigational_docs_result_fails_closed():
 
     assert payload["status"] == "insufficient_evidence"
     assert "answer" not in payload
+
+
+def test_docs_projection_forwards_host_requirements_and_scope_to_selector():
+    retrieval = {
+        "status": "success",
+        "answer_available": True,
+        "project_identity": "acme/project",
+        "module_id": "runtime",
+        "public_requirements": ["bounded retry"],
+        "context_pack": [{
+            "source": "docs/retry.md",
+            "content": "Use bounded retry for failures.",
+            "project_identity": "acme/project",
+            "module_id": "runtime",
+        }],
+    }
+    ok, _ = project_docs_answer(question="How are retries handled?", retrieval=retrieval)
+    missing_scope = deepcopy(retrieval)
+    missing_scope["context_pack"][0].pop("module_id")
+    blocked, _ = project_docs_answer(
+        question="How are retries handled?", retrieval=missing_scope
+    )
+
+    assert ok["status"] == "ok"
+    assert blocked["status"] == "insufficient_evidence"
 
 
 def test_patch_projection_binds_duplicate_path_sections_by_exact_evidence_id():
