@@ -9,10 +9,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Added
 
 - **Bounded direct context delivery:** coding agents can request a versioned, source-attributed `ActionPacket`; wrapper and recovery metadata are included in the 2,000 estimated-token payload ceiling, and raw retrieval content does not enter the parent coding session.
+- **Documentation contract gate:** active user documentation is checked against the real Click command tree and option inventory, while branding, Git trackability, canonical-workflow ownership, and documentation-size budgets remain regression-tested.
 
 ### Changed
 
 - **MCP SDK floor:** require `mcp>=1.27.2`, matching the structured tool output and output-schema transport used by bounded delivery.
+- **Release maturity truth:** clarify that artifact-level Task 15 evidence is complete while a Stable claim still requires Task 14 live external-ingest evidence and an approved post-publish verification of the exact public release.
 
 ## [1.2.0] - 2026-07-12
 
