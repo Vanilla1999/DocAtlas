@@ -1,0 +1,252 @@
+{
+  "cases": [
+    {
+      "contract_id": "t39-dev-exact-api",
+      "evidence_manifest": [
+        {
+          "content_sha256": "abc0af42673077bb9379d2f9fc5dcc7926a83ede208a5ef6b494c15b31cebe69",
+          "evidence_id": "ev-03e96cc51dcf04f5",
+          "path_or_url": "docs/api-client.md",
+          "section": "WidgetClient fetch_record API",
+          "version_binding": "2.0"
+        }
+      ],
+      "projection": {
+        "answer": "# WidgetClient fetch_record API\n\nWidgetClient.fetch_record(record_id, timeout=5) fetches one record. The timeout argument is measured in seconds.\n\n```python\nrecord = WidgetClient().fetch_record(record_id=\"r-7\", timeout=5)\n```",
+        "answer_evidence_ids": [
+          "ev-03e96cc51dcf04f5"
+        ],
+        "estimated_tokens": 213,
+        "kind": "docs_answer",
+        "omitted_counts": {},
+        "sources": [
+          {
+            "content_sha256": "abc0af42673077bb9379d2f9fc5dcc7926a83ede208a5ef6b494c15b31cebe69",
+            "evidence_id": "ev-03e96cc51dcf04f5",
+            "path_or_url": "docs/api-client.md",
+            "section": "WidgetClient fetch_record API",
+            "snippet": "# WidgetClient fetch_record API\n\nWidgetClient.fetch_record(record_id, timeout=5) fetches one record. The timeout argument is measured in seconds.\n\n```python\nrecord = WidgetClient().fetch_record(record_id=\"r-7\", timeout=5)\n```",
+            "version_binding": "2.0"
+          }
+        ],
+        "status": "ok"
+      },
+      "source_ref": "task39:development:exact_api_identifier"
+    },
+    {
+      "contract_id": "t39-holdout-cross-module",
+      "evidence_manifest": [
+        {
+          "content_sha256": "b23200cf9a2fe1ce5bfd767e4a5288536a7516304de0e49f360347184b7d118a",
+          "evidence_id": "ev-3664491ff57747ba",
+          "path_or_url": "docs/cross-module.md",
+          "section": "Gateway worker idempotency contract",
+          "version_binding": "project"
+        }
+      ],
+      "projection": {
+        "answer": "# Gateway worker idempotency contract\n\nThe gateway creates an idempotency key and the worker persists it before acknowledgement. Both modules must preserve the same request identifier.",
+        "answer_evidence_ids": [
+          "ev-3664491ff57747ba"
+        ],
+        "estimated_tokens": 193,
+        "kind": "docs_answer",
+        "omitted_counts": {},
+        "sources": [
+          {
+            "content_sha256": "b23200cf9a2fe1ce5bfd767e4a5288536a7516304de0e49f360347184b7d118a",
+            "evidence_id": "ev-3664491ff57747ba",
+            "path_or_url": "docs/cross-module.md",
+            "section": "Gateway worker idempotency contract",
+            "snippet": "# Gateway worker idempotency contract\n\nThe gateway creates an idempotency key and the worker persists it before acknowledgement. Both modules must preserve the same request identifier.",
+            "version_binding": "project"
+          }
+        ],
+        "status": "ok"
+      },
+      "source_ref": "task39:holdout:cross_module_contract"
+    },
+    {
+      "contract_id": "t42-docs-version",
+      "evidence_manifest": [
+        {
+          "content_sha256": "7d69b8df85ffaaef9a6120070fa0154b18256eae2ea9c1271801be5a70b6bceb",
+          "evidence_id": "ev-bbd25f6dbe2a6995",
+          "path_or_url": "docs/v2/config.md",
+          "section": "document",
+          "version_binding": "2.0"
+        }
+      ],
+      "projection": {
+        "answer": "Set RETRY_LIMIT=3.",
+        "answer_evidence_ids": [
+          "ev-bbd25f6dbe2a6995"
+        ],
+        "estimated_tokens": 103,
+        "kind": "docs_answer",
+        "omitted_counts": {
+          "sources": 1
+        },
+        "sources": [
+          {
+            "content_sha256": "7d69b8df85ffaaef9a6120070fa0154b18256eae2ea9c1271801be5a70b6bceb",
+            "evidence_id": "ev-bbd25f6dbe2a6995",
+            "path_or_url": "docs/v2/config.md",
+            "section": "document",
+            "snippet": "Set RETRY_LIMIT=3.",
+            "version_binding": "2.0"
+          }
+        ],
+        "status": "ok"
+      },
+      "source_ref": "task42:docs_cases:docs_wrong_version_high_rank"
+    },
+    {
+      "contract_id": "t42-patch-policy-target-test",
+      "evidence_manifest": [
+        {
+          "content_sha256": "3450941f78e1976474b4416dd01ee04cc1015f23afdebfefed62bfc97de53142",
+          "evidence_id": "ev-088fd8fccab410b3",
+          "path": "src/worker.py",
+          "symbol_or_section": "document",
+          "version_binding": "not_applicable"
+        },
+        {
+          "content_sha256": "1fd27fbac60b4d1044a455bf4212619c79d817775211a7e8a2025c0d38bf4485",
+          "evidence_id": "ev-2b0c97530e3b81cc",
+          "path": "AGENTS.md",
+          "symbol_or_section": "document",
+          "version_binding": "not_applicable"
+        }
+      ],
+      "projection": {
+        "acceptance_conditions": [],
+        "checks": {
+          "compile": [],
+          "semantic_checks": [],
+          "tests": [
+            {
+              "evidence_ids": [
+                "ev-2b0c97530e3b81cc"
+              ],
+              "text": "pytest tests/test_worker.py"
+            }
+          ]
+        },
+        "estimated_tokens": 307,
+        "forbidden_changes": [],
+        "implementation_guidance": [],
+        "invariants": [
+          {
+            "evidence_ids": [
+              "ev-2b0c97530e3b81cc"
+            ],
+            "text": "The worker must preserve isolation."
+          }
+        ],
+        "kind": "patch_context",
+        "objective": "Update Worker.run",
+        "omitted_counts": {},
+        "schema_version": 1,
+        "sources": [
+          {
+            "authority": "canonical",
+            "content_sha256": "1fd27fbac60b4d1044a455bf4212619c79d817775211a7e8a2025c0d38bf4485",
+            "evidence_id": "ev-2b0c97530e3b81cc",
+            "instruction_trust": "scoped_agent_policy",
+            "path": "AGENTS.md",
+            "scope": "/project",
+            "symbol_or_section": "document",
+            "version_binding": "not_applicable"
+          },
+          {
+            "authority": "supporting",
+            "content_sha256": "3450941f78e1976474b4416dd01ee04cc1015f23afdebfefed62bfc97de53142",
+            "evidence_id": "ev-088fd8fccab410b3",
+            "instruction_trust": "untrusted_data",
+            "path": "src/worker.py",
+            "scope": "unscoped",
+            "symbol_or_section": "document",
+            "version_binding": "not_applicable"
+          }
+        ],
+        "status": "ok",
+        "targets": {
+          "likely_files": [
+            {
+              "evidence_ids": [
+                "ev-088fd8fccab410b3"
+              ],
+              "path": "src/worker.py"
+            }
+          ],
+          "symbols": [
+            {
+              "evidence_ids": [
+                "ev-088fd8fccab410b3"
+              ],
+              "name": "Worker.run"
+            }
+          ]
+        },
+        "uncertainties": []
+      },
+      "source_ref": "task42:patch_cases:patch_policy_target_and_test"
+    },
+    {
+      "contract_id": "t39-holdout-insufficient",
+      "evidence_manifest": [],
+      "projection": {
+        "estimated_tokens": 71,
+        "kind": "docs_answer",
+        "missing": [
+          "No complete source-backed documentation answer is available.",
+          "Documentation retrieval is incomplete (status=unavailable).",
+          "The requested documentation evidence is not currently available."
+        ],
+        "status": "insufficient_evidence"
+      },
+      "source_ref": "task39:holdout:insufficient_evidence"
+    },
+    {
+      "contract_id": "t42-adv-forbidden-source",
+      "evidence_manifest": [
+        {
+          "content_sha256": "27daaf3756c022a390982376b4383581d3354be48c1ffa5839e75ba3391d1a63",
+          "evidence_id": "ev-ded06a0bc69e7cc3",
+          "path_or_url": "docs/safe.md",
+          "section": "document",
+          "version_binding": "unversioned"
+        }
+      ],
+      "projection": {
+        "answer": "Keep retries bounded.",
+        "answer_evidence_ids": [
+          "ev-ded06a0bc69e7cc3"
+        ],
+        "estimated_tokens": 105,
+        "kind": "docs_answer",
+        "omitted_counts": {
+          "sources": 1
+        },
+        "sources": [
+          {
+            "content_sha256": "27daaf3756c022a390982376b4383581d3354be48c1ffa5839e75ba3391d1a63",
+            "evidence_id": "ev-ded06a0bc69e7cc3",
+            "path_or_url": "docs/safe.md",
+            "section": "document",
+            "snippet": "Keep retries bounded.",
+            "version_binding": "unversioned"
+          }
+        ],
+        "status": "ok"
+      },
+      "source_ref": "task42:adversarial_cases:forbidden_source_cannot_fallback"
+    }
+  ],
+  "deterministic_result_digest": "b7fead9ca5c8141bb0ae7ab4242df12cb0409263d9fc910f91105543d0d6ece6",
+  "protocol_sha256": "2a9725df3dd31ed09eea84cf16cc84d747b34856d5ce5fac9405b1d3695cb2de",
+  "review_status": "PENDING_HUMAN_REVIEW",
+  "rubric_path": "eval/answer_quality/human_review_rubric.md",
+  "schema_version": "task43-human-review-inputs-v1"
+}

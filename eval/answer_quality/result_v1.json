@@ -1,0 +1,1148 @@
+{
+  "automated_quality_gate": "FAIL",
+  "case_gates": {
+    "t39-adv-generated-catalog": {
+      "errors": [],
+      "estimated_tokens": 167,
+      "passed": true,
+      "source_ref": "task39:adversarial:generated_catalog_distractor"
+    },
+    "t39-adv-legal-distractor": {
+      "errors": [
+        "citation:unacceptable_evidence:legal/terms.md"
+      ],
+      "estimated_tokens": 286,
+      "passed": false,
+      "source_ref": "task39:adversarial:legal_title_distractor"
+    },
+    "t39-adv-project-over-generic": {
+      "errors": [],
+      "estimated_tokens": 211,
+      "passed": true,
+      "source_ref": "task39:adversarial:project_over_generic"
+    },
+    "t39-adv-stale-version": {
+      "errors": [],
+      "estimated_tokens": 178,
+      "passed": true,
+      "source_ref": "task39:adversarial:stale_version_distractor"
+    },
+    "t39-adv-unversioned-mirror": {
+      "errors": [],
+      "estimated_tokens": 213,
+      "passed": true,
+      "source_ref": "task39:adversarial:unversioned_mirror_distractor"
+    },
+    "t39-dev-cli": {
+      "errors": [],
+      "estimated_tokens": 156,
+      "passed": true,
+      "source_ref": "task39:development:cli_flag"
+    },
+    "t39-dev-code-example": {
+      "errors": [],
+      "estimated_tokens": 216,
+      "passed": true,
+      "source_ref": "task39:development:code_example"
+    },
+    "t39-dev-conceptual": {
+      "errors": [],
+      "estimated_tokens": 174,
+      "passed": true,
+      "source_ref": "task39:development:concept_synonyms"
+    },
+    "t39-dev-configuration": {
+      "errors": [],
+      "estimated_tokens": 171,
+      "passed": true,
+      "source_ref": "task39:development:configuration_key"
+    },
+    "t39-dev-error": {
+      "errors": [],
+      "estimated_tokens": 164,
+      "passed": true,
+      "source_ref": "task39:development:error_code"
+    },
+    "t39-dev-exact-api": {
+      "errors": [],
+      "estimated_tokens": 213,
+      "passed": true,
+      "source_ref": "task39:development:exact_api_identifier"
+    },
+    "t39-holdout-cross-module": {
+      "errors": [],
+      "estimated_tokens": 193,
+      "passed": true,
+      "source_ref": "task39:holdout:cross_module_contract"
+    },
+    "t39-holdout-insufficient": {
+      "errors": [],
+      "estimated_tokens": 71,
+      "passed": true,
+      "source_ref": "task39:holdout:insufficient_evidence"
+    },
+    "t39-holdout-project-policy": {
+      "errors": [],
+      "estimated_tokens": 208,
+      "passed": true,
+      "source_ref": "task39:holdout:project_rule_authority"
+    },
+    "t39-holdout-russian": {
+      "errors": [],
+      "estimated_tokens": 255,
+      "passed": true,
+      "source_ref": "task39:holdout:russian_paraphrase"
+    },
+    "t39-holdout-version": {
+      "errors": [],
+      "estimated_tokens": 178,
+      "passed": true,
+      "source_ref": "task39:holdout:version_migration"
+    },
+    "t42-adv-forbidden-source": {
+      "errors": [],
+      "estimated_tokens": 105,
+      "passed": true,
+      "source_ref": "task42:adversarial_cases:forbidden_source_cannot_fallback"
+    },
+    "t42-adv-invalid-identity": {
+      "errors": [],
+      "estimated_tokens": 51,
+      "passed": true,
+      "source_ref": "task42:adversarial_cases:invalid_identity_cannot_supply_required_fact"
+    },
+    "t42-adv-navigation-only": {
+      "errors": [],
+      "estimated_tokens": 38,
+      "passed": true,
+      "source_ref": "task42:adversarial_cases:docs_navigation_only"
+    },
+    "t42-adv-stable-id-collision": {
+      "errors": [],
+      "estimated_tokens": 102,
+      "passed": true,
+      "source_ref": "task42:adversarial_cases:stable_identity_content_collision"
+    },
+    "t42-docs-identifier-boundary": {
+      "errors": [],
+      "estimated_tokens": 114,
+      "passed": true,
+      "source_ref": "task42:docs_cases:docs_exact_identifier_boundary"
+    },
+    "t42-docs-malformed-rank": {
+      "errors": [],
+      "estimated_tokens": 104,
+      "passed": true,
+      "source_ref": "task42:docs_cases:docs_malformed_rank"
+    },
+    "t42-docs-scope-missing": {
+      "errors": [],
+      "estimated_tokens": 38,
+      "passed": true,
+      "source_ref": "task42:docs_cases:docs_scope_missing_identity"
+    },
+    "t42-docs-signature": {
+      "errors": [],
+      "estimated_tokens": 115,
+      "passed": true,
+      "source_ref": "task42:docs_cases:docs_exact_signature"
+    },
+    "t42-docs-version": {
+      "errors": [],
+      "estimated_tokens": 103,
+      "passed": true,
+      "source_ref": "task42:docs_cases:docs_wrong_version_high_rank"
+    },
+    "t42-patch-identifier-boundary": {
+      "errors": [
+        "citation:unacceptable_evidence:src/legacy_auth.py",
+        "claim:forbidden:Auth.loginLegacy",
+        "claim:forbidden:src/legacy_auth.py"
+      ],
+      "estimated_tokens": 301,
+      "passed": false,
+      "source_ref": "task42:patch_cases:patch_exact_identifier_boundary"
+    },
+    "t42-patch-missing-target": {
+      "errors": [],
+      "estimated_tokens": 77,
+      "passed": true,
+      "source_ref": "task42:patch_cases:patch_missing_target"
+    },
+    "t42-patch-policy-target-test": {
+      "errors": [],
+      "estimated_tokens": 307,
+      "passed": true,
+      "source_ref": "task42:patch_cases:patch_policy_target_and_test"
+    },
+    "t42-patch-scope-missing": {
+      "errors": [],
+      "estimated_tokens": 86,
+      "passed": true,
+      "source_ref": "task42:patch_cases:patch_scope_missing_identity"
+    }
+  },
+  "deterministic_result_digest": "b7fead9ca5c8141bb0ae7ab4242df12cb0409263d9fc910f91105543d0d6ece6",
+  "frozen_baseline_pareto_gate": {
+    "errors": [
+      "docs_answer:citation_validity_regressed",
+      "patch_context:citation_validity_regressed"
+    ],
+    "status": "FAIL"
+  },
+  "groups": {
+    "docs_answer": {
+      "answer_fact_coverage": 1.0,
+      "cases": 24,
+      "citation_validity_rate": 0.95,
+      "forbidden_source_violations": 1,
+      "forbidden_version_violations": 0,
+      "insufficient_false_success_rate": 0.0,
+      "median_visible_tokens": 169.0,
+      "passed": 23,
+      "required_fact_rate": 1.0,
+      "unsupported_claim_violations": 0
+    },
+    "patch_context": {
+      "answer_fact_coverage": 1.0,
+      "cases": 5,
+      "citation_validity_rate": 0.5,
+      "forbidden_source_violations": 1,
+      "forbidden_version_violations": 0,
+      "insufficient_false_success_rate": 0.0,
+      "median_visible_tokens": 102,
+      "passed": 4,
+      "required_fact_rate": 1.0,
+      "unsupported_claim_violations": 0
+    }
+  },
+  "holdout": {
+    "answer_fact_coverage": 1.0,
+    "recall@5": 1.0
+  },
+  "human_review_gate": "INCONCLUSIVE",
+  "integrity_mutation_gate": {
+    "checks": {
+      "docs_answer": {
+        "expected_validator_error": "projection source path_or_url does not match the internal snapshot",
+        "mutation": "sources[0].path_or_url",
+        "passed": true,
+        "validator_errors": [
+          "projection estimate mismatch or budget exceeded",
+          "projection source path_or_url does not match the internal snapshot"
+        ]
+      },
+      "patch_context": {
+        "expected_validator_error": "projection source path does not match the internal snapshot",
+        "mutation": "sources[0].path",
+        "passed": false,
+        "validator_errors": [
+          "projection estimate mismatch or budget exceeded"
+        ]
+      }
+    },
+    "status": "FAIL"
+  },
+  "lower_layers": {
+    "task39": {
+      "deterministic_result_digest": "5417264ada9369a0d6c3e55cc708e62dbbb448e7bcd0d08b4f11ee95110b9e8c",
+      "errors": [],
+      "status": "PASS"
+    },
+    "task42": {
+      "candidate_order_permutation_gate": "PASS",
+      "correctness_gate": "PASS",
+      "status": "PASS",
+      "task41_gate": {
+        "baseline_match": true,
+        "candidate_trace_hash": "37cfcf3acd07eb4aafb06124f34ba2c07deb09e6eabcb142223fc5915342f105",
+        "commit_sha_match": true,
+        "expected_commit_sha": "9afb20d7aca6c0411b14739781dacceb292cb78f",
+        "observed_commit_sha": "9afb20d7aca6c0411b14739781dacceb292cb78f",
+        "retrieval_config_hash": "7614071e250bef9b0d9d3170f05b9682c8a41723f742ddb8e3f69a5c9b4362c6",
+        "selected_target_tokens": 160,
+        "status": "PASS"
+      }
+    }
+  },
+  "product_code_digests": {
+    "docmancer/core/sqlite_store.py": "df37895baa3353a7e825570a5b0f78b002354b7c324b11f4fa585beb6dcafe60",
+    "docmancer/docs/application/action_packet.py": "0eb5b56dd600c06a009a71c958fde13f117fb632660bc7278109626669354d02",
+    "docmancer/docs/application/evidence_selection.py": "2e80b26beb8f3be26da3d482e0b5aa45924de84b2c7cf4bcb0d404e80d875d8d",
+    "docmancer/docs/application/model_visible_projection.py": "ec24552885b6a80d30af320f390ba98624d3d470fd6a2b278d2084b17fdd63d0",
+    "docmancer/docs/interfaces/mcp/context_tools.py": "aba806d93044c58b3092d858f351e73457e40abf4e88b4614b15c15d72bce88c"
+  },
+  "production_model_gate": "INCONCLUSIVE",
+  "protocol_merge_commit_sha": "bd516eb0eb426ccc5233cd08347dcb8218f73657",
+  "protocol_sha256": "2a9725df3dd31ed09eea84cf16cc84d747b34856d5ce5fac9405b1d3695cb2de",
+  "provider_free": true,
+  "provider_free_verdict": "FAIL",
+  "results": [
+    {
+      "contract_id": "t39-adv-generated-catalog",
+      "errors": [],
+      "estimated_tokens": 167,
+      "expected_status": "ok",
+      "passed": true,
+      "projection_digest": "03095bcb4fd2e6df64dd5e84fe6fffa0c2a8826a6546ceeac68e82376c74ea09",
+      "required_covered": 2,
+      "required_total": 2,
+      "result_kind": "docs_answer",
+      "source_manifest": [
+        {
+          "content_sha256": "39c36adbcc1692af3ecb221b7849eb43728a3fa5aeab51b140438151f395d583",
+          "evidence_id": "ev-bc22584e143984f5",
+          "path_or_url": "docs/errors.md",
+          "section": "E_WIDGET_42 retry budget",
+          "version_binding": "2.0"
+        }
+      ],
+      "source_ref": "task39:adversarial:generated_catalog_distractor",
+      "status": "ok",
+      "taxonomy": "distractor"
+    },
+    {
+      "contract_id": "t39-adv-legal-distractor",
+      "errors": [
+        "citation:unacceptable_evidence:legal/terms.md"
+      ],
+      "estimated_tokens": 286,
+      "expected_status": "ok",
+      "passed": false,
+      "projection_digest": "9baf627c3b33f83b4a0bc7cd9ae5d98f3fb7d5178d966c1312fbc2aaa302235c",
+      "required_covered": 2,
+      "required_total": 2,
+      "result_kind": "docs_answer",
+      "source_manifest": [
+        {
+          "content_sha256": "5d0e12c66496b41aa83769289e380b249c078e2c494833b6cea3382a5f9be13a",
+          "evidence_id": "ev-4e43b9fadabdfab1",
+          "path_or_url": "legal/terms.md",
+          "section": "Terms and Conditions for configure widget cache mode",
+          "version_binding": "unversioned"
+        },
+        {
+          "content_sha256": "183911f8a85268cced9a2ff52f94c0f55850bbc75aa5f403daefbb1e4c6ba059",
+          "evidence_id": "ev-b2251825b6dc8fad",
+          "path_or_url": "docs/configuration.md",
+          "section": "Configure widget cache mode",
+          "version_binding": "2.0"
+        }
+      ],
+      "source_ref": "task39:adversarial:legal_title_distractor",
+      "status": "ok",
+      "taxonomy": "distractor"
+    },
+    {
+      "contract_id": "t39-adv-project-over-generic",
+      "errors": [],
+      "estimated_tokens": 211,
+      "expected_status": "ok",
+      "passed": true,
+      "projection_digest": "2820ac63a2653a6013af2c6d9eeaae5b577a506f37e125aade0bcd08eb1dd153",
+      "required_covered": 2,
+      "required_total": 2,
+      "result_kind": "docs_answer",
+      "source_manifest": [
+        {
+          "content_sha256": "ebcf1bd81ddbdaf0417740686ce8b6aa5f239efd4669d7355a8ff7d70a8c8302",
+          "evidence_id": "ev-3e9c937b7d7d7170",
+          "path_or_url": "docs/project-policy.md",
+          "section": "DocAtlas canonical offline source policy",
+          "version_binding": "project"
+        }
+      ],
+      "source_ref": "task39:adversarial:project_over_generic",
+      "status": "ok",
+      "taxonomy": "project_policy"
+    },
+    {
+      "contract_id": "t39-adv-stale-version",
+      "errors": [],
+      "estimated_tokens": 178,
+      "expected_status": "ok",
+      "passed": true,
+      "projection_digest": "32a946adb9ee63e54973fd2cddd99f08a9a1e68c3d086ee3dc12868be3717fbe",
+      "required_covered": 2,
+      "required_total": 2,
+      "result_kind": "docs_answer",
+      "source_manifest": [
+        {
+          "content_sha256": "caa4da3084faee7cd58b1f8c2bd726a3a58101df3ef137149d36e4e78dbd8514",
+          "evidence_id": "ev-15f4fd85e932fe77",
+          "path_or_url": "docs/migration-v2.md",
+          "section": "WidgetClient version 2 migration",
+          "version_binding": "2.0"
+        }
+      ],
+      "source_ref": "task39:adversarial:stale_version_distractor",
+      "status": "ok",
+      "taxonomy": "version_migration"
+    },
+    {
+      "contract_id": "t39-adv-unversioned-mirror",
+      "errors": [],
+      "estimated_tokens": 213,
+      "expected_status": "ok",
+      "passed": true,
+      "projection_digest": "3843344dabe65a0ba993deab903059f73682cefd08d4c43703022b25deabcb24",
+      "required_covered": 2,
+      "required_total": 2,
+      "result_kind": "docs_answer",
+      "source_manifest": [
+        {
+          "content_sha256": "abc0af42673077bb9379d2f9fc5dcc7926a83ede208a5ef6b494c15b31cebe69",
+          "evidence_id": "ev-03e96cc51dcf04f5",
+          "path_or_url": "docs/api-client.md",
+          "section": "WidgetClient fetch_record API",
+          "version_binding": "2.0"
+        }
+      ],
+      "source_ref": "task39:adversarial:unversioned_mirror_distractor",
+      "status": "ok",
+      "taxonomy": "distractor"
+    },
+    {
+      "contract_id": "t39-dev-cli",
+      "errors": [],
+      "estimated_tokens": 156,
+      "expected_status": "ok",
+      "passed": true,
+      "projection_digest": "5dc74bd4d8038f3a810ee03e63cf05cdb6e4e8619e7c1e8b8cc2543c68c21069",
+      "required_covered": 2,
+      "required_total": 2,
+      "result_kind": "docs_answer",
+      "source_manifest": [
+        {
+          "content_sha256": "f523adbe6a112d8b887b228681319effedbfb50f253b5641c90d6f96434b60ca",
+          "evidence_id": "ev-dd2f568a9eefcc93",
+          "path_or_url": "docs/cli.md",
+          "section": "widget-sync command reference",
+          "version_binding": "2.0"
+        }
+      ],
+      "source_ref": "task39:development:cli_flag",
+      "status": "ok",
+      "taxonomy": "cli"
+    },
+    {
+      "contract_id": "t39-dev-code-example",
+      "errors": [],
+      "estimated_tokens": 216,
+      "expected_status": "ok",
+      "passed": true,
+      "projection_digest": "7ed384a236f3770b1d0ab750bc6cd7638f25eb13f93527f96e996b9042c20b6d",
+      "required_covered": 2,
+      "required_total": 2,
+      "result_kind": "docs_answer",
+      "source_manifest": [
+        {
+          "content_sha256": "abc0af42673077bb9379d2f9fc5dcc7926a83ede208a5ef6b494c15b31cebe69",
+          "evidence_id": "ev-03e96cc51dcf04f5",
+          "path_or_url": "docs/api-client.md",
+          "section": "WidgetClient fetch_record API",
+          "version_binding": "2.0"
+        }
+      ],
+      "source_ref": "task39:development:code_example",
+      "status": "ok",
+      "taxonomy": "code_example"
+    },
+    {
+      "contract_id": "t39-dev-conceptual",
+      "errors": [],
+      "estimated_tokens": 174,
+      "expected_status": "ok",
+      "passed": true,
+      "projection_digest": "04851ae2f881a3560cc1b16f5ab0055876c0a463f3c24758b713511377d5dcd1",
+      "required_covered": 2,
+      "required_total": 2,
+      "result_kind": "docs_answer",
+      "source_manifest": [
+        {
+          "content_sha256": "318cec0b7f1b47b4baf3cb8f2ce825061cdf92bb501323e3bc2da34e99de051c",
+          "evidence_id": "ev-c1b6bfc546c57dc0",
+          "path_or_url": "docs/backpressure.md",
+          "section": "Queue backpressure",
+          "version_binding": "2.0"
+        }
+      ],
+      "source_ref": "task39:development:concept_synonyms",
+      "status": "ok",
+      "taxonomy": "conceptual"
+    },
+    {
+      "contract_id": "t39-dev-configuration",
+      "errors": [],
+      "estimated_tokens": 171,
+      "expected_status": "ok",
+      "passed": true,
+      "projection_digest": "0c17a526674270438bf4f55eddb6d7163966fd8d1bde8abddeb6f3ec1215030c",
+      "required_covered": 2,
+      "required_total": 2,
+      "result_kind": "docs_answer",
+      "source_manifest": [
+        {
+          "content_sha256": "183911f8a85268cced9a2ff52f94c0f55850bbc75aa5f403daefbb1e4c6ba059",
+          "evidence_id": "ev-b2251825b6dc8fad",
+          "path_or_url": "docs/configuration.md",
+          "section": "Configure widget cache mode",
+          "version_binding": "2.0"
+        }
+      ],
+      "source_ref": "task39:development:configuration_key",
+      "status": "ok",
+      "taxonomy": "configuration"
+    },
+    {
+      "contract_id": "t39-dev-error",
+      "errors": [],
+      "estimated_tokens": 164,
+      "expected_status": "ok",
+      "passed": true,
+      "projection_digest": "21716945b1ae2f60a1909d61e8c72f1e3cb8cb4f4fe4832616ec66d39eb3fc20",
+      "required_covered": 2,
+      "required_total": 2,
+      "result_kind": "docs_answer",
+      "source_manifest": [
+        {
+          "content_sha256": "39c36adbcc1692af3ecb221b7849eb43728a3fa5aeab51b140438151f395d583",
+          "evidence_id": "ev-bc22584e143984f5",
+          "path_or_url": "docs/errors.md",
+          "section": "E_WIDGET_42 retry budget",
+          "version_binding": "2.0"
+        }
+      ],
+      "source_ref": "task39:development:error_code",
+      "status": "ok",
+      "taxonomy": "error"
+    },
+    {
+      "contract_id": "t39-dev-exact-api",
+      "errors": [],
+      "estimated_tokens": 213,
+      "expected_status": "ok",
+      "passed": true,
+      "projection_digest": "3843344dabe65a0ba993deab903059f73682cefd08d4c43703022b25deabcb24",
+      "required_covered": 2,
+      "required_total": 2,
+      "result_kind": "docs_answer",
+      "source_manifest": [
+        {
+          "content_sha256": "abc0af42673077bb9379d2f9fc5dcc7926a83ede208a5ef6b494c15b31cebe69",
+          "evidence_id": "ev-03e96cc51dcf04f5",
+          "path_or_url": "docs/api-client.md",
+          "section": "WidgetClient fetch_record API",
+          "version_binding": "2.0"
+        }
+      ],
+      "source_ref": "task39:development:exact_api_identifier",
+      "status": "ok",
+      "taxonomy": "exact_api"
+    },
+    {
+      "contract_id": "t39-holdout-cross-module",
+      "errors": [],
+      "estimated_tokens": 193,
+      "expected_status": "ok",
+      "passed": true,
+      "projection_digest": "88ace590a444c555b0e3c6f166996078e3fd45ba57442c21197a5915e13e0d04",
+      "required_covered": 3,
+      "required_total": 3,
+      "result_kind": "docs_answer",
+      "source_manifest": [
+        {
+          "content_sha256": "b23200cf9a2fe1ce5bfd767e4a5288536a7516304de0e49f360347184b7d118a",
+          "evidence_id": "ev-3664491ff57747ba",
+          "path_or_url": "docs/cross-module.md",
+          "section": "Gateway worker idempotency contract",
+          "version_binding": "project"
+        }
+      ],
+      "source_ref": "task39:holdout:cross_module_contract",
+      "status": "ok",
+      "taxonomy": "cross_module"
+    },
+    {
+      "contract_id": "t39-holdout-insufficient",
+      "errors": [],
+      "estimated_tokens": 71,
+      "expected_status": "insufficient_evidence",
+      "passed": true,
+      "projection_digest": "deb696beafd47a2421c26b280eb06ed47343a7e7ea364d59f9c3a0492be829db",
+      "required_covered": 0,
+      "required_total": 0,
+      "result_kind": "docs_answer",
+      "source_manifest": [],
+      "source_ref": "task39:holdout:insufficient_evidence",
+      "status": "insufficient_evidence",
+      "taxonomy": "insufficient_evidence"
+    },
+    {
+      "contract_id": "t39-holdout-project-policy",
+      "errors": [],
+      "estimated_tokens": 208,
+      "expected_status": "ok",
+      "passed": true,
+      "projection_digest": "127649054e75c36a1313a596bfa98080441c4c4c2bd5e50397c204bccd1b75fb",
+      "required_covered": 2,
+      "required_total": 2,
+      "result_kind": "docs_answer",
+      "source_manifest": [
+        {
+          "content_sha256": "ebcf1bd81ddbdaf0417740686ce8b6aa5f239efd4669d7355a8ff7d70a8c8302",
+          "evidence_id": "ev-3e9c937b7d7d7170",
+          "path_or_url": "docs/project-policy.md",
+          "section": "DocAtlas canonical offline source policy",
+          "version_binding": "project"
+        }
+      ],
+      "source_ref": "task39:holdout:project_rule_authority",
+      "status": "ok",
+      "taxonomy": "project_policy"
+    },
+    {
+      "contract_id": "t39-holdout-russian",
+      "errors": [],
+      "estimated_tokens": 255,
+      "expected_status": "ok",
+      "passed": true,
+      "projection_digest": "2cb7ae0fa9c3862bf11fcfd663c86fbf3aa60252a2dc41a32736fa63f518028f",
+      "required_covered": 2,
+      "required_total": 2,
+      "result_kind": "docs_answer",
+      "source_manifest": [
+        {
+          "content_sha256": "00b40366ed5a3aee81331babde55a3ef37ec150f0d6ba869564c814c7982dc34",
+          "evidence_id": "ev-1bf20f43f19682ba",
+          "path_or_url": "docs/ru-backpressure.md",
+          "section": "Ограничение нагрузки очереди",
+          "version_binding": "2.0"
+        }
+      ],
+      "source_ref": "task39:holdout:russian_paraphrase",
+      "status": "ok",
+      "taxonomy": "paraphrase"
+    },
+    {
+      "contract_id": "t39-holdout-version",
+      "errors": [],
+      "estimated_tokens": 178,
+      "expected_status": "ok",
+      "passed": true,
+      "projection_digest": "32a946adb9ee63e54973fd2cddd99f08a9a1e68c3d086ee3dc12868be3717fbe",
+      "required_covered": 2,
+      "required_total": 2,
+      "result_kind": "docs_answer",
+      "source_manifest": [
+        {
+          "content_sha256": "caa4da3084faee7cd58b1f8c2bd726a3a58101df3ef137149d36e4e78dbd8514",
+          "evidence_id": "ev-15f4fd85e932fe77",
+          "path_or_url": "docs/migration-v2.md",
+          "section": "WidgetClient version 2 migration",
+          "version_binding": "2.0"
+        }
+      ],
+      "source_ref": "task39:holdout:version_migration",
+      "status": "ok",
+      "taxonomy": "version_migration"
+    },
+    {
+      "contract_id": "t42-adv-forbidden-source",
+      "errors": [],
+      "estimated_tokens": 105,
+      "expected_status": "ok",
+      "passed": true,
+      "projection_digest": "0312e28108b3a31d77563edaaac5112219b4e4343c3c3e14e6e7d9c69d9deca5",
+      "required_covered": 2,
+      "required_total": 2,
+      "result_kind": "docs_answer",
+      "source_manifest": [
+        {
+          "content_sha256": "27daaf3756c022a390982376b4383581d3354be48c1ffa5839e75ba3391d1a63",
+          "evidence_id": "ev-ded06a0bc69e7cc3",
+          "path_or_url": "docs/safe.md",
+          "section": "document",
+          "version_binding": "unversioned"
+        }
+      ],
+      "source_ref": "task42:adversarial_cases:forbidden_source_cannot_fallback",
+      "status": "ok",
+      "taxonomy": "distractor"
+    },
+    {
+      "contract_id": "t42-adv-invalid-identity",
+      "errors": [],
+      "estimated_tokens": 51,
+      "expected_status": "insufficient_evidence",
+      "passed": true,
+      "projection_digest": "ac83c7ee93bf13e692ccbd2353c06896498dd9658154dc225133356eaef8b39f",
+      "required_covered": 0,
+      "required_total": 0,
+      "result_kind": "docs_answer",
+      "source_manifest": [],
+      "source_ref": "task42:adversarial_cases:invalid_identity_cannot_supply_required_fact",
+      "status": "insufficient_evidence",
+      "taxonomy": "identity"
+    },
+    {
+      "contract_id": "t42-adv-navigation-only",
+      "errors": [],
+      "estimated_tokens": 38,
+      "expected_status": "insufficient_evidence",
+      "passed": true,
+      "projection_digest": "2e159a1cfc157d2137df340261585544f750a21267c2e8af0305de346afc0b24",
+      "required_covered": 0,
+      "required_total": 0,
+      "result_kind": "docs_answer",
+      "source_manifest": [],
+      "source_ref": "task42:adversarial_cases:docs_navigation_only",
+      "status": "insufficient_evidence",
+      "taxonomy": "insufficient_evidence"
+    },
+    {
+      "contract_id": "t42-adv-stable-id-collision",
+      "errors": [],
+      "estimated_tokens": 102,
+      "expected_status": "insufficient_evidence",
+      "passed": true,
+      "projection_digest": "c3eaf5ad4e92036c854876604a4985272a9d54741d5c838e71b65889af82960d",
+      "required_covered": 0,
+      "required_total": 0,
+      "result_kind": "patch_context",
+      "source_manifest": [],
+      "source_ref": "task42:adversarial_cases:stable_identity_content_collision",
+      "status": "insufficient_evidence",
+      "taxonomy": "identity"
+    },
+    {
+      "contract_id": "t42-docs-identifier-boundary",
+      "errors": [],
+      "estimated_tokens": 114,
+      "expected_status": "ok",
+      "passed": true,
+      "projection_digest": "1d2e1fcd5876a0054bde3d63b536576a11976146dc6c63df1b6f3d42af0431e2",
+      "required_covered": 1,
+      "required_total": 1,
+      "result_kind": "docs_answer",
+      "source_manifest": [
+        {
+          "content_sha256": "60a1065e25b38cab57fad4770e1e3501098355c0ab6bc60fbe22e36e67a0e14b",
+          "evidence_id": "ev-0460abde851501f1",
+          "path_or_url": "docs/auth.md",
+          "section": "document",
+          "version_binding": "unversioned"
+        }
+      ],
+      "source_ref": "task42:docs_cases:docs_exact_identifier_boundary",
+      "status": "ok",
+      "taxonomy": "exact_api"
+    },
+    {
+      "contract_id": "t42-docs-malformed-rank",
+      "errors": [],
+      "estimated_tokens": 104,
+      "expected_status": "ok",
+      "passed": true,
+      "projection_digest": "c272cac27122f366cadf5fe24f457991d06028dd60e2c483fee30dee5bf93035",
+      "required_covered": 2,
+      "required_total": 2,
+      "result_kind": "docs_answer",
+      "source_manifest": [
+        {
+          "content_sha256": "238c5d892405a35038e70af981a92c4fae3b9b7573a7a9a925edc1f33f8c5d55",
+          "evidence_id": "ev-69bed9c753e2586d",
+          "path_or_url": "docs/config.md",
+          "section": "document",
+          "version_binding": "unversioned"
+        }
+      ],
+      "source_ref": "task42:docs_cases:docs_malformed_rank",
+      "status": "ok",
+      "taxonomy": "configuration"
+    },
+    {
+      "contract_id": "t42-docs-scope-missing",
+      "errors": [],
+      "estimated_tokens": 38,
+      "expected_status": "insufficient_evidence",
+      "passed": true,
+      "projection_digest": "2e159a1cfc157d2137df340261585544f750a21267c2e8af0305de346afc0b24",
+      "required_covered": 0,
+      "required_total": 0,
+      "result_kind": "docs_answer",
+      "source_manifest": [],
+      "source_ref": "task42:docs_cases:docs_scope_missing_identity",
+      "status": "insufficient_evidence",
+      "taxonomy": "scope"
+    },
+    {
+      "contract_id": "t42-docs-signature",
+      "errors": [],
+      "estimated_tokens": 115,
+      "expected_status": "ok",
+      "passed": true,
+      "projection_digest": "1d53837e1c64882a45f1e157a054ef81192ac1c952951b2ad1460861910bfbed",
+      "required_covered": 1,
+      "required_total": 1,
+      "result_kind": "docs_answer",
+      "source_manifest": [
+        {
+          "content_sha256": "22a45664e37f2269c0721f2a535d02a16a7b1269c6f41a64c2b331b0396e2a28",
+          "evidence_id": "ev-00a0be5c5c6c7438",
+          "path_or_url": "docs/api.md",
+          "section": "document",
+          "version_binding": "2.0"
+        }
+      ],
+      "source_ref": "task42:docs_cases:docs_exact_signature",
+      "status": "ok",
+      "taxonomy": "exact_api"
+    },
+    {
+      "contract_id": "t42-docs-version",
+      "errors": [],
+      "estimated_tokens": 103,
+      "expected_status": "ok",
+      "passed": true,
+      "projection_digest": "8899b62871c986df3e19ae6755091a14e4b83dbc5ce927fb6538395cd21e8a11",
+      "required_covered": 2,
+      "required_total": 2,
+      "result_kind": "docs_answer",
+      "source_manifest": [
+        {
+          "content_sha256": "7d69b8df85ffaaef9a6120070fa0154b18256eae2ea9c1271801be5a70b6bceb",
+          "evidence_id": "ev-bbd25f6dbe2a6995",
+          "path_or_url": "docs/v2/config.md",
+          "section": "document",
+          "version_binding": "2.0"
+        }
+      ],
+      "source_ref": "task42:docs_cases:docs_wrong_version_high_rank",
+      "status": "ok",
+      "taxonomy": "version_migration"
+    },
+    {
+      "contract_id": "t42-patch-identifier-boundary",
+      "errors": [
+        "citation:unacceptable_evidence:src/legacy_auth.py",
+        "claim:forbidden:Auth.loginLegacy",
+        "claim:forbidden:src/legacy_auth.py"
+      ],
+      "estimated_tokens": 301,
+      "expected_status": "ok",
+      "passed": false,
+      "projection_digest": "cdb53b341fbb77369aa9069d073d75742e450a0f552ba5bec3054fa12221a0a9",
+      "required_covered": 3,
+      "required_total": 3,
+      "result_kind": "patch_context",
+      "source_manifest": [
+        {
+          "content_sha256": "375d5133e652d96d5ea0aec5d16fd002289b74dd6b66cf3e52daecd77cd4ebd2",
+          "evidence_id": "ev-14fb9d06ec1b6c17",
+          "path": "src/legacy_auth.py",
+          "symbol_or_section": "document",
+          "version_binding": "not_applicable"
+        },
+        {
+          "content_sha256": "fb2749e1f4d23e66c593aa7e6639f96f6f61ab3cbf98855af6c95b2b7da9fa4e",
+          "evidence_id": "ev-c5b9e3807f9df007",
+          "path": "src/auth.py",
+          "symbol_or_section": "document",
+          "version_binding": "not_applicable"
+        }
+      ],
+      "source_ref": "task42:patch_cases:patch_exact_identifier_boundary",
+      "status": "ok",
+      "taxonomy": "patch_contract"
+    },
+    {
+      "contract_id": "t42-patch-missing-target",
+      "errors": [],
+      "estimated_tokens": 77,
+      "expected_status": "insufficient_evidence",
+      "passed": true,
+      "projection_digest": "d600774870a951655c6fdc726edf98254283b15bb7ed1ca98c564b2a530d2b79",
+      "required_covered": 0,
+      "required_total": 0,
+      "result_kind": "patch_context",
+      "source_manifest": [],
+      "source_ref": "task42:patch_cases:patch_missing_target",
+      "status": "insufficient_evidence",
+      "taxonomy": "insufficient_evidence"
+    },
+    {
+      "contract_id": "t42-patch-policy-target-test",
+      "errors": [],
+      "estimated_tokens": 307,
+      "expected_status": "ok",
+      "passed": true,
+      "projection_digest": "1fc6daad9f88b7574e3a1c463e1385ca1f6c80a0f0a062528d10391bf25e04e7",
+      "required_covered": 5,
+      "required_total": 5,
+      "result_kind": "patch_context",
+      "source_manifest": [
+        {
+          "content_sha256": "3450941f78e1976474b4416dd01ee04cc1015f23afdebfefed62bfc97de53142",
+          "evidence_id": "ev-088fd8fccab410b3",
+          "path": "src/worker.py",
+          "symbol_or_section": "document",
+          "version_binding": "not_applicable"
+        },
+        {
+          "content_sha256": "1fd27fbac60b4d1044a455bf4212619c79d817775211a7e8a2025c0d38bf4485",
+          "evidence_id": "ev-2b0c97530e3b81cc",
+          "path": "AGENTS.md",
+          "symbol_or_section": "document",
+          "version_binding": "not_applicable"
+        }
+      ],
+      "source_ref": "task42:patch_cases:patch_policy_target_and_test",
+      "status": "ok",
+      "taxonomy": "patch_contract"
+    },
+    {
+      "contract_id": "t42-patch-scope-missing",
+      "errors": [],
+      "estimated_tokens": 86,
+      "expected_status": "insufficient_evidence",
+      "passed": true,
+      "projection_digest": "2dc4d20cd5f698b673d3be79e81ddac89d2e159f1472a6f2dcb0e370892bc9aa",
+      "required_covered": 0,
+      "required_total": 0,
+      "result_kind": "patch_context",
+      "source_manifest": [],
+      "source_ref": "task42:patch_cases:patch_scope_missing_identity",
+      "status": "insufficient_evidence",
+      "taxonomy": "scope"
+    }
+  ],
+  "schema_version": "task43-provider-free-result-v1",
+  "source_revision": {
+    "commit_sha": "59aa94c39c6885b30018a9af6e9b81fa1839075d",
+    "tree_sha": "468e17f991dd1bf938353dd5c92b1d39f45ce6d0"
+  },
+  "taxonomy_groups": {
+    "docs_answer": {
+      "cli": {
+        "answer_fact_coverage": 1.0,
+        "cases": 1,
+        "citation_validity_rate": 1.0,
+        "forbidden_source_violations": 0,
+        "forbidden_version_violations": 0,
+        "insufficient_false_success_rate": 0.0,
+        "median_visible_tokens": 156,
+        "passed": 1,
+        "required_fact_rate": 1.0,
+        "unsupported_claim_violations": 0
+      },
+      "code_example": {
+        "answer_fact_coverage": 1.0,
+        "cases": 1,
+        "citation_validity_rate": 1.0,
+        "forbidden_source_violations": 0,
+        "forbidden_version_violations": 0,
+        "insufficient_false_success_rate": 0.0,
+        "median_visible_tokens": 216,
+        "passed": 1,
+        "required_fact_rate": 1.0,
+        "unsupported_claim_violations": 0
+      },
+      "conceptual": {
+        "answer_fact_coverage": 1.0,
+        "cases": 1,
+        "citation_validity_rate": 1.0,
+        "forbidden_source_violations": 0,
+        "forbidden_version_violations": 0,
+        "insufficient_false_success_rate": 0.0,
+        "median_visible_tokens": 174,
+        "passed": 1,
+        "required_fact_rate": 1.0,
+        "unsupported_claim_violations": 0
+      },
+      "configuration": {
+        "answer_fact_coverage": 1.0,
+        "cases": 2,
+        "citation_validity_rate": 1.0,
+        "forbidden_source_violations": 0,
+        "forbidden_version_violations": 0,
+        "insufficient_false_success_rate": 0.0,
+        "median_visible_tokens": 137.5,
+        "passed": 2,
+        "required_fact_rate": 1.0,
+        "unsupported_claim_violations": 0
+      },
+      "cross_module": {
+        "answer_fact_coverage": 1.0,
+        "cases": 1,
+        "citation_validity_rate": 1.0,
+        "forbidden_source_violations": 0,
+        "forbidden_version_violations": 0,
+        "insufficient_false_success_rate": 0.0,
+        "median_visible_tokens": 193,
+        "passed": 1,
+        "required_fact_rate": 1.0,
+        "unsupported_claim_violations": 0
+      },
+      "distractor": {
+        "answer_fact_coverage": 1.0,
+        "cases": 4,
+        "citation_validity_rate": 0.75,
+        "forbidden_source_violations": 1,
+        "forbidden_version_violations": 0,
+        "insufficient_false_success_rate": 0.0,
+        "median_visible_tokens": 190.0,
+        "passed": 3,
+        "required_fact_rate": 1.0,
+        "unsupported_claim_violations": 0
+      },
+      "error": {
+        "answer_fact_coverage": 1.0,
+        "cases": 1,
+        "citation_validity_rate": 1.0,
+        "forbidden_source_violations": 0,
+        "forbidden_version_violations": 0,
+        "insufficient_false_success_rate": 0.0,
+        "median_visible_tokens": 164,
+        "passed": 1,
+        "required_fact_rate": 1.0,
+        "unsupported_claim_violations": 0
+      },
+      "exact_api": {
+        "answer_fact_coverage": 1.0,
+        "cases": 3,
+        "citation_validity_rate": 1.0,
+        "forbidden_source_violations": 0,
+        "forbidden_version_violations": 0,
+        "insufficient_false_success_rate": 0.0,
+        "median_visible_tokens": 115,
+        "passed": 3,
+        "required_fact_rate": 1.0,
+        "unsupported_claim_violations": 0
+      },
+      "identity": {
+        "answer_fact_coverage": 1.0,
+        "cases": 1,
+        "citation_validity_rate": 1.0,
+        "forbidden_source_violations": 0,
+        "forbidden_version_violations": 0,
+        "insufficient_false_success_rate": 0.0,
+        "median_visible_tokens": 51,
+        "passed": 1,
+        "required_fact_rate": 1.0,
+        "unsupported_claim_violations": 0
+      },
+      "insufficient_evidence": {
+        "answer_fact_coverage": 1.0,
+        "cases": 2,
+        "citation_validity_rate": 1.0,
+        "forbidden_source_violations": 0,
+        "forbidden_version_violations": 0,
+        "insufficient_false_success_rate": 0.0,
+        "median_visible_tokens": 54.5,
+        "passed": 2,
+        "required_fact_rate": 1.0,
+        "unsupported_claim_violations": 0
+      },
+      "paraphrase": {
+        "answer_fact_coverage": 1.0,
+        "cases": 1,
+        "citation_validity_rate": 1.0,
+        "forbidden_source_violations": 0,
+        "forbidden_version_violations": 0,
+        "insufficient_false_success_rate": 0.0,
+        "median_visible_tokens": 255,
+        "passed": 1,
+        "required_fact_rate": 1.0,
+        "unsupported_claim_violations": 0
+      },
+      "project_policy": {
+        "answer_fact_coverage": 1.0,
+        "cases": 2,
+        "citation_validity_rate": 1.0,
+        "forbidden_source_violations": 0,
+        "forbidden_version_violations": 0,
+        "insufficient_false_success_rate": 0.0,
+        "median_visible_tokens": 209.5,
+        "passed": 2,
+        "required_fact_rate": 1.0,
+        "unsupported_claim_violations": 0
+      },
+      "scope": {
+        "answer_fact_coverage": 1.0,
+        "cases": 1,
+        "citation_validity_rate": 1.0,
+        "forbidden_source_violations": 0,
+        "forbidden_version_violations": 0,
+        "insufficient_false_success_rate": 0.0,
+        "median_visible_tokens": 38,
+        "passed": 1,
+        "required_fact_rate": 1.0,
+        "unsupported_claim_violations": 0
+      },
+      "version_migration": {
+        "answer_fact_coverage": 1.0,
+        "cases": 3,
+        "citation_validity_rate": 1.0,
+        "forbidden_source_violations": 0,
+        "forbidden_version_violations": 0,
+        "insufficient_false_success_rate": 0.0,
+        "median_visible_tokens": 178,
+        "passed": 3,
+        "required_fact_rate": 1.0,
+        "unsupported_claim_violations": 0
+      }
+    },
+    "patch_context": {
+      "identity": {
+        "answer_fact_coverage": 1.0,
+        "cases": 1,
+        "citation_validity_rate": 1.0,
+        "forbidden_source_violations": 0,
+        "forbidden_version_violations": 0,
+        "insufficient_false_success_rate": 0.0,
+        "median_visible_tokens": 102,
+        "passed": 1,
+        "required_fact_rate": 1.0,
+        "unsupported_claim_violations": 0
+      },
+      "insufficient_evidence": {
+        "answer_fact_coverage": 1.0,
+        "cases": 1,
+        "citation_validity_rate": 1.0,
+        "forbidden_source_violations": 0,
+        "forbidden_version_violations": 0,
+        "insufficient_false_success_rate": 0.0,
+        "median_visible_tokens": 77,
+        "passed": 1,
+        "required_fact_rate": 1.0,
+        "unsupported_claim_violations": 0
+      },
+      "patch_contract": {
+        "answer_fact_coverage": 1.0,
+        "cases": 2,
+        "citation_validity_rate": 0.5,
+        "forbidden_source_violations": 1,
+        "forbidden_version_violations": 0,
+        "insufficient_false_success_rate": 0.0,
+        "median_visible_tokens": 304.0,
+        "passed": 1,
+        "required_fact_rate": 1.0,
+        "unsupported_claim_violations": 0
+      },
+      "scope": {
+        "answer_fact_coverage": 1.0,
+        "cases": 1,
+        "citation_validity_rate": 1.0,
+        "forbidden_source_violations": 0,
+        "forbidden_version_violations": 0,
+        "insufficient_false_success_rate": 0.0,
+        "median_visible_tokens": 86,
+        "passed": 1,
+        "required_fact_rate": 1.0,
+        "unsupported_claim_violations": 0
+      }
+    }
+  },
+  "verdict_reason": "automated_gate_failed"
+}
