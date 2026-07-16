@@ -17,7 +17,7 @@ doc-atlas mcp --help
 
 ## Public tool contract
 
-The Docs MCP server exposes exactly three public tools. The table describes the recommended contract; task 11 still removes compatibility flags that can currently blur the retrieval/lifecycle boundary.
+The Docs MCP server exposes exactly three public tools. Retrieval is read-only; lifecycle and network work require the explicit `prepare_docs` boundary.
 
 | Tool | Default use | Must not be used for |
 |---|---|---|
