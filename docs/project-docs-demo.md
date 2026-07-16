@@ -1,6 +1,6 @@
 # Project docs MCP demo
 
-This demo shows the local-first workflow for answering repository-specific questions with Docmancer project docs instead of generic hosted documentation.
+This demo shows the local-first workflow for answering repository-specific questions with DocAtlas project docs instead of generic hosted documentation.
 
 ## Setup
 
@@ -10,9 +10,9 @@ Start the MCP docs server:
 doc-atlas mcp docs-serve
 ```
 
-Inside the Docmancer repository, ask the agent a repo-specific question such as:
+Inside the DocAtlas repository, ask the agent a repo-specific question such as:
 
-> I thought Docmancer was like Context7. What else does it do for this repo's own docs?
+> I thought DocAtlas was like Context7. What else does it do for this repo's own docs?
 
 ## Expected agent flow
 
@@ -29,13 +29,13 @@ Older docs surfaces may expose direct inspection or project-doc verbs. Treat tho
 
 ## Success criteria
 
-- The agent does not WebFetch before trying Docmancer project docs.
+- The agent does not WebFetch before trying DocAtlas project docs.
 - The answer cites repo-owned files such as `README.md`, `DOCMANCER_PRODUCT_BRIEF.md`, or `roadmap/08_project_docs/*.md`.
 - If project docs are missing, not indexed, stale, or missing a high-level overview, the agent follows structured `reason_code`, `next_action`, `requires_confirmation`, and `arguments_patch` instead of guessing.
 
 ## Bootstrapping a repo with no docs
 
-If `inspect_project_docs(project_path=".")` or `get_docs_context(mode="project")` reports `no_project_docs`, Docmancer should return `next_action.type = "ask_user_to_create_project_doc"` with `suggested_file: "ARCHITECTURE.md"`, `requires_confirmation: true`, and `confirmation_reason: "repo_write"`.
+If `inspect_project_docs(project_path=".")` or `get_docs_context(mode="project")` reports `no_project_docs`, DocAtlas should return `next_action.type = "ask_user_to_create_project_doc"` with `suggested_file: "ARCHITECTURE.md"`, `requires_confirmation: true`, and `confirmation_reason: "repo_write"`.
 
 Expected agent flow:
 
