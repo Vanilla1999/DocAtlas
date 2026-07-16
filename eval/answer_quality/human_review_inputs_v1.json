@@ -244,7 +244,7 @@
       "source_ref": "task42:adversarial_cases:forbidden_source_cannot_fallback"
     }
   ],
-  "deterministic_result_digest": "b7fead9ca5c8141bb0ae7ab4242df12cb0409263d9fc910f91105543d0d6ece6",
+  "deterministic_result_digest": "ab40b26b58fb7e98424906144e971f560425e62f547d7aca867d2d8e235a0245",
   "protocol_sha256": "2a9725df3dd31ed09eea84cf16cc84d747b34856d5ce5fac9405b1d3695cb2de",
   "review_status": "PENDING_HUMAN_REVIEW",
   "rubric_path": "eval/answer_quality/human_review_rubric.md",

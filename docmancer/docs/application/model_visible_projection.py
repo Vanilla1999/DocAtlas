@@ -246,7 +246,10 @@ def validate_model_visible_projection(
         bound_source = bound.get("source")
         if not isinstance(bound_source, dict) or _source_digest(bound_source) != bound.get("content_sha256"):
             errors.append("internal snapshot hash does not match its source content")
-        for key in ("path_or_url", "section", "snippet", "version_binding"):
+        for key in (
+            "path_or_url", "path", "section", "symbol_or_section", "snippet",
+            "version_binding",
+        ):
             if key in source and source.get(key) != bound.get(key):
                 errors.append(f"projection source {key} does not match the internal snapshot")
         ids.add(evidence_id)

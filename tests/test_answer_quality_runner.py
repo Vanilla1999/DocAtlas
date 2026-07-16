@@ -75,7 +75,7 @@ def test_integrity_gate_accepts_explicit_snapshot_binding_rejections(monkeypatch
     assert report["checks"]["patch_context"]["passed"] is True
 
 
-def test_checked_provider_free_observation_fails_closed():
+def test_checked_provider_free_observation_passes_automated_gates():
     data = Path("eval/answer_quality")
     result = json.loads((data / "result_v1.json").read_text(encoding="utf-8"))
     baseline = json.loads((data / "baseline_v1.json").read_text(encoding="utf-8"))
@@ -84,13 +84,11 @@ def test_checked_provider_free_observation_fails_closed():
     )
 
     failed = {row["contract_id"] for row in result["results"] if not row["passed"]}
-    assert failed == {
-        "t39-adv-legal-distractor",
-        "t42-patch-identifier-boundary",
-    }
-    assert result["provider_free_verdict"] == "FAIL"
-    assert result["integrity_mutation_gate"]["status"] == "FAIL"
-    assert result["frozen_baseline_pareto_gate"]["status"] == "FAIL"
+    assert failed == set()
+    assert result["provider_free_verdict"] == "INCONCLUSIVE"
+    assert result["automated_quality_gate"] == "PASS"
+    assert result["integrity_mutation_gate"]["status"] == "PASS"
+    assert result["frozen_baseline_pareto_gate"]["status"] == "PASS"
     assert result["lower_layers"]["task39"]["status"] == "PASS"
     assert result["lower_layers"]["task42"]["status"] == "PASS"
     assert (
@@ -100,6 +98,9 @@ def test_checked_provider_free_observation_fails_closed():
     assert "retrieval_projection_p95_ms" not in result["groups"]["docs_answer"]
     assert "retrieval_projection_p95_ms" in baseline["groups"]["docs_answer"]
     assert human["review_status"] == "PENDING_HUMAN_REVIEW"
-    assert baseline["deterministic_result_digest"] == result[
+    assert baseline["deterministic_result_digest"] != result[
         "deterministic_result_digest"
-    ] == human["deterministic_result_digest"]
+    ]
+    assert result["deterministic_result_digest"] == human[
+        "deterministic_result_digest"
+    ]

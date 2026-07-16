@@ -1,5 +1,5 @@
 {
-  "automated_quality_gate": "FAIL",
+  "automated_quality_gate": "PASS",
   "case_gates": {
     "t39-adv-generated-catalog": {
       "errors": [],
@@ -8,11 +8,9 @@
       "source_ref": "task39:adversarial:generated_catalog_distractor"
     },
     "t39-adv-legal-distractor": {
-      "errors": [
-        "citation:unacceptable_evidence:legal/terms.md"
-      ],
-      "estimated_tokens": 286,
-      "passed": false,
+      "errors": [],
+      "estimated_tokens": 174,
+      "passed": true,
       "source_ref": "task39:adversarial:legal_title_distractor"
     },
     "t39-adv-project-over-generic": {
@@ -154,13 +152,9 @@
       "source_ref": "task42:docs_cases:docs_wrong_version_high_rank"
     },
     "t42-patch-identifier-boundary": {
-      "errors": [
-        "citation:unacceptable_evidence:src/legacy_auth.py",
-        "claim:forbidden:Auth.loginLegacy",
-        "claim:forbidden:src/legacy_auth.py"
-      ],
-      "estimated_tokens": 301,
-      "passed": false,
+      "errors": [],
+      "estimated_tokens": 192,
+      "passed": true,
       "source_ref": "task42:patch_cases:patch_exact_identifier_boundary"
     },
     "t42-patch-missing-target": {
@@ -182,36 +176,33 @@
       "source_ref": "task42:patch_cases:patch_scope_missing_identity"
     }
   },
-  "deterministic_result_digest": "b7fead9ca5c8141bb0ae7ab4242df12cb0409263d9fc910f91105543d0d6ece6",
+  "deterministic_result_digest": "ab40b26b58fb7e98424906144e971f560425e62f547d7aca867d2d8e235a0245",
   "frozen_baseline_pareto_gate": {
-    "errors": [
-      "docs_answer:citation_validity_regressed",
-      "patch_context:citation_validity_regressed"
-    ],
-    "status": "FAIL"
+    "errors": [],
+    "status": "PASS"
   },
   "groups": {
     "docs_answer": {
       "answer_fact_coverage": 1.0,
       "cases": 24,
-      "citation_validity_rate": 0.95,
-      "forbidden_source_violations": 1,
+      "citation_validity_rate": 1.0,
+      "forbidden_source_violations": 0,
       "forbidden_version_violations": 0,
       "insufficient_false_success_rate": 0.0,
       "median_visible_tokens": 169.0,
-      "passed": 23,
+      "passed": 24,
       "required_fact_rate": 1.0,
       "unsupported_claim_violations": 0
     },
     "patch_context": {
       "answer_fact_coverage": 1.0,
       "cases": 5,
-      "citation_validity_rate": 0.5,
-      "forbidden_source_violations": 1,
+      "citation_validity_rate": 1.0,
+      "forbidden_source_violations": 0,
       "forbidden_version_violations": 0,
       "insufficient_false_success_rate": 0.0,
       "median_visible_tokens": 102,
-      "passed": 4,
+      "passed": 5,
       "required_fact_rate": 1.0,
       "unsupported_claim_violations": 0
     }
@@ -235,13 +226,14 @@
       "patch_context": {
         "expected_validator_error": "projection source path does not match the internal snapshot",
         "mutation": "sources[0].path",
-        "passed": false,
+        "passed": true,
         "validator_errors": [
-          "projection estimate mismatch or budget exceeded"
+          "projection estimate mismatch or budget exceeded",
+          "projection source path does not match the internal snapshot"
         ]
       }
     },
-    "status": "FAIL"
+    "status": "PASS"
   },
   "lower_layers": {
     "task39": {
@@ -268,15 +260,15 @@
   "product_code_digests": {
     "docmancer/core/sqlite_store.py": "df37895baa3353a7e825570a5b0f78b002354b7c324b11f4fa585beb6dcafe60",
     "docmancer/docs/application/action_packet.py": "0eb5b56dd600c06a009a71c958fde13f117fb632660bc7278109626669354d02",
-    "docmancer/docs/application/evidence_selection.py": "2e80b26beb8f3be26da3d482e0b5aa45924de84b2c7cf4bcb0d404e80d875d8d",
-    "docmancer/docs/application/model_visible_projection.py": "ec24552885b6a80d30af320f390ba98624d3d470fd6a2b278d2084b17fdd63d0",
+    "docmancer/docs/application/evidence_selection.py": "f111ac4578c13a29e660357ca779485fb0d3920241b5b7dd21fff9c1410b5cff",
+    "docmancer/docs/application/model_visible_projection.py": "6b8981527b76c64dc2053977e293554b266517b00b038672f75f5d603c1491ec",
     "docmancer/docs/interfaces/mcp/context_tools.py": "aba806d93044c58b3092d858f351e73457e40abf4e88b4614b15c15d72bce88c"
   },
   "production_model_gate": "INCONCLUSIVE",
   "protocol_merge_commit_sha": "bd516eb0eb426ccc5233cd08347dcb8218f73657",
   "protocol_sha256": "2a9725df3dd31ed09eea84cf16cc84d747b34856d5ce5fac9405b1d3695cb2de",
   "provider_free": true,
-  "provider_free_verdict": "FAIL",
+  "provider_free_verdict": "INCONCLUSIVE",
   "results": [
     {
       "contract_id": "t39-adv-generated-catalog",
@@ -303,24 +295,15 @@
     },
     {
       "contract_id": "t39-adv-legal-distractor",
-      "errors": [
-        "citation:unacceptable_evidence:legal/terms.md"
-      ],
-      "estimated_tokens": 286,
+      "errors": [],
+      "estimated_tokens": 174,
       "expected_status": "ok",
-      "passed": false,
-      "projection_digest": "9baf627c3b33f83b4a0bc7cd9ae5d98f3fb7d5178d966c1312fbc2aaa302235c",
+      "passed": true,
+      "projection_digest": "21d7e080e9986dcae6fde386589bc6e8ba9f84a8aba51c8d406ed8591ddf2fe3",
       "required_covered": 2,
       "required_total": 2,
       "result_kind": "docs_answer",
       "source_manifest": [
-        {
-          "content_sha256": "5d0e12c66496b41aa83769289e380b249c078e2c494833b6cea3382a5f9be13a",
-          "evidence_id": "ev-4e43b9fadabdfab1",
-          "path_or_url": "legal/terms.md",
-          "section": "Terms and Conditions for configure widget cache mode",
-          "version_binding": "unversioned"
-        },
         {
           "content_sha256": "183911f8a85268cced9a2ff52f94c0f55850bbc75aa5f403daefbb1e4c6ba059",
           "evidence_id": "ev-b2251825b6dc8fad",
@@ -824,26 +807,15 @@
     },
     {
       "contract_id": "t42-patch-identifier-boundary",
-      "errors": [
-        "citation:unacceptable_evidence:src/legacy_auth.py",
-        "claim:forbidden:Auth.loginLegacy",
-        "claim:forbidden:src/legacy_auth.py"
-      ],
-      "estimated_tokens": 301,
+      "errors": [],
+      "estimated_tokens": 192,
       "expected_status": "ok",
-      "passed": false,
-      "projection_digest": "cdb53b341fbb77369aa9069d073d75742e450a0f552ba5bec3054fa12221a0a9",
+      "passed": true,
+      "projection_digest": "0c9488f84461631f9097e19dc701952c6451f8fb887aef7de5887c3286eed83a",
       "required_covered": 3,
       "required_total": 3,
       "result_kind": "patch_context",
       "source_manifest": [
-        {
-          "content_sha256": "375d5133e652d96d5ea0aec5d16fd002289b74dd6b66cf3e52daecd77cd4ebd2",
-          "evidence_id": "ev-14fb9d06ec1b6c17",
-          "path": "src/legacy_auth.py",
-          "symbol_or_section": "document",
-          "version_binding": "not_applicable"
-        },
         {
           "content_sha256": "fb2749e1f4d23e66c593aa7e6639f96f6f61ab3cbf98855af6c95b2b7da9fa4e",
           "evidence_id": "ev-c5b9e3807f9df007",
@@ -987,12 +959,12 @@
       "distractor": {
         "answer_fact_coverage": 1.0,
         "cases": 4,
-        "citation_validity_rate": 0.75,
-        "forbidden_source_violations": 1,
+        "citation_validity_rate": 1.0,
+        "forbidden_source_violations": 0,
         "forbidden_version_violations": 0,
         "insufficient_false_success_rate": 0.0,
-        "median_visible_tokens": 190.0,
-        "passed": 3,
+        "median_visible_tokens": 170.5,
+        "passed": 4,
         "required_fact_rate": 1.0,
         "unsupported_claim_violations": 0
       },
@@ -1121,12 +1093,12 @@
       "patch_contract": {
         "answer_fact_coverage": 1.0,
         "cases": 2,
-        "citation_validity_rate": 0.5,
-        "forbidden_source_violations": 1,
+        "citation_validity_rate": 1.0,
+        "forbidden_source_violations": 0,
         "forbidden_version_violations": 0,
         "insufficient_false_success_rate": 0.0,
-        "median_visible_tokens": 304.0,
-        "passed": 1,
+        "median_visible_tokens": 249.5,
+        "passed": 2,
         "required_fact_rate": 1.0,
         "unsupported_claim_violations": 0
       },
@@ -1144,5 +1116,5 @@
       }
     }
   },
-  "verdict_reason": "automated_gate_failed"
+  "verdict_reason": "human_review_pending"
 }

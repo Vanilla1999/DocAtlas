@@ -352,6 +352,74 @@ def test_exact_identifier_coverage_uses_boundaries_not_substrings():
     assert _ids(decision) == ["exact"]
 
 
+def test_non_legal_query_omits_legal_authority_from_visible_evidence():
+    decision = select_evidence(
+        [
+            _candidate(
+                "legal", "configure widget cache mode",
+                source="legal/terms.md", authority="legal", retrieval_rank=1,
+            ),
+            _candidate(
+                "config", "Set cache_mode in widget.toml.",
+                source="docs/configuration.md", authority="canonical",
+                retrieval_rank=2,
+            ),
+        ],
+        question="configure widget cache mode",
+        config=docs_selection_config(800),
+    )
+
+    assert decision.status == "ok"
+    assert _ids(decision) == ["config"]
+    assert any(
+        item.stable_id == "legal" and item.reason_code == "query_intent_mismatch"
+        for item in decision.omissions
+    )
+
+
+def test_legal_intent_can_select_legal_authority():
+    decision = select_evidence(
+        [
+            _candidate(
+                "legal", "The governing agreement uses Warsaw jurisdiction.",
+                source="legal/terms.md", authority="legal",
+            )
+        ],
+        question="What is the governing agreement jurisdiction?",
+        config=docs_selection_config(800),
+    )
+
+    assert decision.status == "ok"
+    assert _ids(decision) == ["legal"]
+
+
+def test_patch_selection_omits_prefix_identifier_conflict_after_exact_match():
+    decision = select_evidence(
+        [
+            _candidate(
+                "legacy", "def loginLegacy(): pass",
+                source="src/legacy_auth.py", symbols=["Auth.loginLegacy"],
+                retrieval_rank=1,
+            ),
+            _candidate(
+                "current", "def login(): pass",
+                source="src/auth.py", symbols=["Auth.login"], retrieval_rank=2,
+            ),
+        ],
+        question="Update Auth.login",
+        config=patch_selection_config(1_500),
+        required_target_paths=["src/auth.py"],
+    )
+
+    assert decision.status == "ok"
+    assert _ids(decision) == ["current"]
+    assert any(
+        item.stable_id == "legacy"
+        and item.reason_code == "query_identifier_conflict"
+        for item in decision.omissions
+    )
+
+
 def test_malformed_rank_is_bounded_and_hashes_bind_scores_symbols_and_invalid_rows():
     base = _candidate("base", "Use Client.open().", retrieval_rank="not-an-int")
     first = select_evidence(
