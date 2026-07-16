@@ -11,6 +11,30 @@ env:
   DOCMANCER_OFFLINE: "1"
 
 jobs:
+  docs-contract:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -e ".[dev]"
+
+      - name: Verify documented CLI and public Docs MCP contracts
+        run: |
+          pytest -q \
+            tests/docs/test_user_facing_docs_branding.py \
+            tests/docs/test_documented_cli_contract.py \
+            tests/docs/test_mcp_docs_tools_registration.py \
+            tests/docs/test_tool_choice_eval.py \
+            tests/test_cli.py \
+            tests/test_support_surface_policy.py
+
   docs-impact:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
