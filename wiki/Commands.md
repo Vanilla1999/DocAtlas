@@ -1,6 +1,6 @@
 # Commands
 
-Reference for the main Docmancer Docs runtime commands, vector lifecycle commands, docs MCP tools, and advanced MCP pack commands. For how these fit into the overall system, see [Architecture](./Architecture.md). For configuration that affects command defaults, see [Configuration](./Configuration.md).
+Reference for the main DocAtlas documentation runtime commands, vector lifecycle commands, Docs MCP tools, and advanced MCP Pack commands. For how these fit into the overall system, see [Architecture](./Architecture.md). For configuration that affects command defaults, see [Configuration](./Configuration.md).
 
 ## Core commands
 
@@ -136,10 +136,10 @@ See [Configuration](./Configuration.md) for the full key-by-key reference.
 
 | Extra | What it enables |
 |-------|-----------------|
-| `docmancer[embeddings-openai]` | OpenAI cloud embeddings (`text-embedding-3-small` / `-large`) with batched requests and rate-limit retries. Requires `OPENAI_API_KEY`. |
-| `docmancer[embeddings-voyage]` | Voyage AI cloud embeddings provider. Requires `VOYAGE_API_KEY`. |
-| `docmancer[embeddings-cohere]` | Cohere cloud embeddings provider. Requires `COHERE_API_KEY`. |
-| `docmancer[browser]` | Playwright fetcher for JS-heavy sites (used by `add --browser`). |
-| `docmancer[crawl4ai]` | Alternative fetcher for hard-to-scrape sites. |
+| `doc-atlas[embeddings-openai]` | OpenAI cloud embeddings (`text-embedding-3-small` / `-large`) with batched requests and rate-limit retries. Requires `OPENAI_API_KEY`. |
+| `doc-atlas[embeddings-voyage]` | Voyage AI cloud embeddings provider. Requires `VOYAGE_API_KEY`. |
+| `doc-atlas[embeddings-cohere]` | Cohere cloud embeddings provider. Requires `COHERE_API_KEY`. |
+| `doc-atlas[browser]` | Playwright fetcher for JS-heavy sites (used by `add --browser`). |
+| `doc-atlas[crawl4ai]` | Alternative fetcher for hard-to-scrape sites. |
 
 The PDF / DOCX / RTF / HTML loaders, the Qdrant client, sqlite-vec, and FastEmbed all ship in the core install. No extra is needed for the default hybrid path.
