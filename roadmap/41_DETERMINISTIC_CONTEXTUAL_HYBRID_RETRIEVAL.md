@@ -1,5 +1,122 @@
 # Task 41 — deterministic contextual hybrid retrieval
 
+## Implementation status (2026-07-16)
+
+The implementation is intentionally split at the measurement boundary. The
+provider-free foundation is implemented on
+`agent/task41-deterministic-contextual-hybrid-retrieval`; promotion to a new
+default remains blocked on the Task 39 quality gate.
+
+Completed foundation:
+
+- deterministic, bounded contextual prefixes with per-field provenance;
+- separate verbatim `display_text`, contextual retrieval text, manifests, and
+  content/config hashes;
+- additive SQLite generation columns and promoted typed filter fields;
+- metadata-only invalidation without changing stable child/vector identity;
+- embedding/cache identity bound to chunk and context configuration;
+- vector collection names/cache identity bound to retrieval configuration, with
+  the selected collection recorded and verified on each SQLite generation;
+- deterministic query plans with bounded exact terms and concept queries;
+- hard filter propagation to lexical, dense, and sparse lanes;
+- stable-child RRF identity with a separate mutable hydration key;
+- fixed per-lane/fused candidate ceilings and query/fusion trace hashes;
+- explicit strict failure or opt-in lexical degraded mode when vector
+  capabilities are missing or incompatible.
+
+Still gated, not silently treated as complete:
+
+- Task 39 ablations and the Task 41 acceptance report;
+- measured removal/replacement of compatibility intent rules;
+- a separate sparse-capable configuration run;
+- optional local reranker implementation, which starts only if the measured
+  contextual lexical+dense result leaves a justified quality gap;
+- immutable vector collection copy/rebuild and atomic activation per corpus
+  revision (config-compatible incremental generations currently reuse the
+  verified collection so delete-only updates cannot activate an empty copy);
+- changing the default retrieval mode from lexical.
+
+No benchmark/model run is required to build or test the foundation. Context is
+computed offline from source-owned metadata; it increases only index-time input,
+not model-visible evidence. Task 42 remains the sole owner of evidence selection
+and the prompt token ceiling.
+
+## Ordered delivery slices
+
+### 41A — contracts and contextual generation
+
+1. Freeze `ContextConfig`, context manifest, query/candidate contracts, schema
+   versions, and canonical hash encoding.
+2. Build prefixes only from allow-listed source metadata, heading ancestry, and
+   symbols extracted from the verbatim child span.
+3. Strip URL credentials/query strings and machine-specific absolute roots.
+4. Store the prefix, provenance manifest, schema/config/content hashes, and
+   embedding-input hash separately from `display_text`.
+5. Promote project/library/version/scope/authority fields into typed columns;
+   retain JSON metadata for compatibility.
+6. Validate byte/token bounds, manifest hashes, promoted-column parity, source
+   spans, and FTS parity before generation activation.
+7. Prove that a metadata-only edit keeps stable child/vector IDs while changing
+   derived retrieval and embedding hashes.
+
+### 41B — deterministic query plan and lexical lane
+
+1. Extract no more than 12 exact terms from quoted strings, flags, config keys,
+   error codes, API symbols, and paths.
+2. Produce at most three normalized concept queries without an LLM rewriter.
+3. Convert caller/host filters into a typed `FilterSpec`; never infer exact
+   versions from the word `latest`.
+4. Apply the same hard filters before lexical, dense, and sparse candidate
+   collection.
+5. Use explicit FTS column weights and preserve punctuation-bearing exact terms
+   through the exact-term supplemental path.
+6. Persist only query-plan/config hashes in normal traces; do not duplicate raw
+   evidence or the full raw query.
+
+### 41C — stable hybrid fusion and capability truth
+
+1. Cap each lane at 40 candidates and the deduplicated fused pool at 60.
+2. Fuse by `stable_chunk_id`; translate to integer `hydration_id` only after
+   ranking.
+3. Bind every vector collection to provider/model/dimensions and
+   contextual/chunk configuration; record its selected identity on the SQLite
+   generation.
+4. Reject selected-collection or provider/model/dimension mismatches.
+5. Require explicit `allow_degraded` for a requested non-lexical mode to fall
+   back to lexical; record failures, selected mode, component counts, query-plan
+   hash, and fusion-config hash.
+6. Keep model-visible evidence limits unchanged.
+7. Before claiming full corpus-revision binding, add backend copy/rebuild into a
+   candidate collection, validate point parity, and switch it atomically with
+   the SQLite generation. Never create a fresh empty collection for a
+   delete-only generation.
+
+### 41D — offline ablation and acceptance report
+
+1. Freeze the Task 39 corpus revision and split before tuning.
+2. Run lexical baseline, contextual lexical, dense-only, lexical+dense, and the
+   sparse-capable configuration where capability proof exists.
+3. Record per-case Recall@5, reciprocal rank, required facts, contamination,
+   p50/p95 latency, index size/build time, candidate counts, and
+   selected/model-visible tokens.
+4. Fail on any protected exact symbol/path/error/version regression or forbidden
+   contamination increase.
+5. Publish wins/losses and classify the result `PASS`, `FAIL`, or `INCONCLUSIVE`;
+   missing lanes or incomplete metrics cannot become `PASS`.
+6. Only a `PASS` may propose changing the default retrieval mode.
+
+### 41E — optional local reranker experiment
+
+1. Start only if 41D demonstrates a specific unresolved ranking gap.
+2. Keep the dependency outside the base install and verify local/offline
+   capability before use.
+3. Limit input to 40 candidates, cap query+candidate tokens, enforce a hard
+   deadline, and return scores only.
+4. Compare it as a separate configuration; record model/version/hash and
+   latency.
+5. Drop the reranker if it does not clear the same quality, contamination,
+   latency, and token gates.
+
 ## Priority
 
 P1 quality improvement under a fixed model-visible budget. Start after Task 40 provides stable child identities and a measured chunking baseline.

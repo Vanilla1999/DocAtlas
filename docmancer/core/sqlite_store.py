@@ -17,8 +17,15 @@ from docmancer.core.structured_chunking import (
     SCHEMA_VERSION as PARENT_CHILD_SCHEMA_VERSION,
     ChunkingConfig,
     chunk_markdown_parent_child,
+    estimate_utf8_tokens,
 )
 from docmancer.docs.domain.quality import looks_like_code_or_command
+from docmancer.retrieval.contextual_indexing import (
+    build_context_prefix,
+    embedding_input,
+    normalized_filter_metadata,
+)
+from docmancer.retrieval.contracts import ContextConfig, canonical_hash
 
 
 HEADING_RE = re.compile(r"^(#{1,6})\s+(.+?)\s*$", re.MULTILINE)
@@ -373,6 +380,9 @@ class SQLiteStore:
                     schema_version TEXT NOT NULL,
                     config_hash TEXT NOT NULL,
                     config_json TEXT NOT NULL DEFAULT '{}',
+                    context_schema_version TEXT NOT NULL DEFAULT '',
+                    context_config_hash TEXT NOT NULL DEFAULT '',
+                    retrieval_config_hash TEXT NOT NULL DEFAULT '',
                     status TEXT NOT NULL,
                     vector_collection TEXT NOT NULL,
                     validation_json TEXT NOT NULL DEFAULT '{}',
@@ -443,6 +453,12 @@ class SQLiteStore:
                     retrieval_content_hash TEXT NOT NULL,
                     display_token_estimate INTEGER NOT NULL,
                     retrieval_token_estimate INTEGER NOT NULL,
+                    context_prefix TEXT NOT NULL DEFAULT '',
+                    context_manifest_json TEXT NOT NULL DEFAULT '{}',
+                    context_schema_version TEXT NOT NULL DEFAULT '',
+                    context_config_hash TEXT NOT NULL DEFAULT '',
+                    context_content_hash TEXT NOT NULL DEFAULT '',
+                    embedding_input_hash TEXT NOT NULL DEFAULT '',
                     char_start INTEGER NOT NULL,
                     char_end INTEGER NOT NULL,
                     byte_start INTEGER NOT NULL,
@@ -453,6 +469,16 @@ class SQLiteStore:
                     document_title TEXT,
                     format TEXT,
                     anchor TEXT,
+                    library_id TEXT,
+                    resolved_version TEXT,
+                    version_family TEXT,
+                    project_identity TEXT,
+                    project_path TEXT,
+                    module_id TEXT,
+                    doc_scope TEXT,
+                    source_class TEXT,
+                    authority TEXT,
+                    docs_snapshot_exact INTEGER,
                     metadata_json TEXT NOT NULL DEFAULT '{}',
                     UNIQUE (generation_id, stable_chunk_id),
                     UNIQUE (generation_id, vector_id),
@@ -490,7 +516,29 @@ class SQLiteStore:
             self._ensure_nullable_column(conn, "sources", "content_hash", "TEXT")
             self._ensure_nullable_column(conn, "sources", "index_schema_version", "TEXT")
             self._ensure_nullable_column(conn, "index_generations", "config_json", "TEXT NOT NULL DEFAULT '{}'")
+            self._ensure_nullable_column(conn, "index_generations", "context_schema_version", "TEXT NOT NULL DEFAULT ''")
+            self._ensure_nullable_column(conn, "index_generations", "context_config_hash", "TEXT NOT NULL DEFAULT ''")
+            self._ensure_nullable_column(conn, "index_generations", "retrieval_config_hash", "TEXT NOT NULL DEFAULT ''")
             self._ensure_nullable_column(conn, "retrieval_children", "hydration_id", "INTEGER")
+            for column, declaration in (
+                ("context_prefix", "TEXT NOT NULL DEFAULT ''"),
+                ("context_manifest_json", "TEXT NOT NULL DEFAULT '{}'"),
+                ("context_schema_version", "TEXT NOT NULL DEFAULT ''"),
+                ("context_config_hash", "TEXT NOT NULL DEFAULT ''"),
+                ("context_content_hash", "TEXT NOT NULL DEFAULT ''"),
+                ("embedding_input_hash", "TEXT NOT NULL DEFAULT ''"),
+                ("library_id", "TEXT"),
+                ("resolved_version", "TEXT"),
+                ("version_family", "TEXT"),
+                ("project_identity", "TEXT"),
+                ("project_path", "TEXT"),
+                ("module_id", "TEXT"),
+                ("doc_scope", "TEXT"),
+                ("source_class", "TEXT"),
+                ("authority", "TEXT"),
+                ("docs_snapshot_exact", "INTEGER"),
+            ):
+                self._ensure_nullable_column(conn, "retrieval_children", column, declaration)
             conn.execute(
                 "UPDATE retrieval_children SET hydration_id = id WHERE hydration_id IS NULL"
             )
@@ -527,6 +575,13 @@ class SQLiteStore:
                     ON retrieval_children(generation_id, source_id, chunk_index);
                 CREATE UNIQUE INDEX IF NOT EXISTS idx_retrieval_children_hydration
                     ON retrieval_children(generation_id, hydration_id);
+                CREATE INDEX IF NOT EXISTS idx_retrieval_children_filters
+                    ON retrieval_children(
+                        generation_id, project_identity, library_id,
+                        resolved_version, version_family, source_class, authority
+                    );
+                CREATE INDEX IF NOT EXISTS idx_retrieval_children_project_scope
+                    ON retrieval_children(generation_id, module_id, doc_scope);
                 """
             )
             conn.executescript(
@@ -850,20 +905,29 @@ class SQLiteStore:
         if len(configs) != 1:
             raise ValueError("one index generation cannot mix chunking configurations")
         config = next(iter(configs))
+        context_config = ContextConfig()
+        retrieval_config_hash = canonical_hash({
+            "schema_version": "contextual-retrieval-v1",
+            "chunk_config_hash": config.config_hash,
+            "context_config_hash": context_config.config_hash,
+        })
         generation_id = "gen-" + uuid.uuid4().hex
         active = self._active_generation_id(conn)
-        vector_collection = f"docmancer_pc_{config.config_hash[:16]}"
+        vector_collection = f"docmancer_ctx_{retrieval_config_hash[:16]}"
         active_same_config = False
         if active:
             active_info = conn.execute(
                 """
-                SELECT config_hash, vector_collection FROM index_generations
+                SELECT config_hash, retrieval_config_hash, vector_collection
+                FROM index_generations
                 WHERE generation_id = ?
                 """,
                 (active,),
             ).fetchone()
             active_same_config = bool(
-                active_info and str(active_info["config_hash"]) == config.config_hash
+                active_info
+                and str(active_info["config_hash"]) == config.config_hash
+                and str(active_info["retrieval_config_hash"] or "") == retrieval_config_hash
             )
             if active_same_config:
                 vector_collection = str(active_info["vector_collection"])
@@ -871,9 +935,11 @@ class SQLiteStore:
         conn.execute(
             """
             INSERT INTO index_generations
-                (generation_id, schema_version, config_hash, config_json, status,
-                 vector_collection, validation_json, created_at)
-            VALUES (?, ?, ?, ?, 'building', ?, '{}', ?)
+                (generation_id, schema_version, config_hash, config_json,
+                 context_schema_version, context_config_hash,
+                 retrieval_config_hash, status, vector_collection,
+                 validation_json, created_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, 'building', ?, '{}', ?)
             """,
             (
                 generation_id,
@@ -884,7 +950,17 @@ class SQLiteStore:
                     "hard_max_tokens": config.hard_max_tokens,
                     "overlap_tokens": config.overlap_tokens,
                     "estimator_version": config.estimator_version,
+                    "context": {
+                        "schema_version": context_config.schema_version,
+                        "max_prefix_bytes": context_config.max_prefix_bytes,
+                        "max_prefix_tokens": context_config.max_prefix_tokens,
+                        "allowed_fields": list(context_config.allowed_fields),
+                        "symbol_extractor_version": context_config.symbol_extractor_version,
+                    },
                 }, sort_keys=True),
+                context_config.schema_version,
+                context_config.config_hash,
+                retrieval_config_hash,
                 vector_collection,
                 now,
             ),
@@ -1025,7 +1101,26 @@ class SQLiteStore:
                 parent = parent_by_id[child.parent_logical_id]
                 anchor = " > ".join(parent.heading_path) or parent.title
                 display_hash = _chunk_hash(child.display_text)
-                retrieval_hash = _chunk_hash(child.retrieval_text)
+                context_prefix = build_context_prefix(
+                    {
+                        **metadata,
+                        "document_title": document_title,
+                        "source_path": metadata.get("source_path") or source_path,
+                    },
+                    heading_path=parent.heading_path,
+                    display_text=child.display_text,
+                    config=context_config,
+                    available_tokens=max(
+                        0, config.hard_max_tokens - child.token_estimate - 2
+                    ),
+                )
+                retrieval_text = embedding_input(context_prefix, child.display_text)
+                retrieval_hash = _chunk_hash(retrieval_text)
+                filter_metadata = normalized_filter_metadata({
+                    **metadata,
+                    "source_path": metadata.get("source_path") or source_path,
+                })
+                context_manifest = context_prefix.manifest()
                 child_metadata = {
                     **metadata,
                     "section_title": parent.title,
@@ -1039,6 +1134,11 @@ class SQLiteStore:
                     "anchor": anchor,
                     "content_hash": display_hash,
                     "retrieval_content_hash": retrieval_hash,
+                    "context_schema_version": context_prefix.schema_version,
+                    "context_config_hash": context_prefix.config_hash,
+                    "context_content_hash": context_prefix.content_hash,
+                    "context_manifest": context_manifest,
+                    "embedding_input_hash": retrieval_hash,
                     "stable_chunk_id": child.stable_id,
                     "vector_id": child.vector_id,
                     "parent_logical_id": child.parent_logical_id,
@@ -1055,7 +1155,7 @@ class SQLiteStore:
                     "chunk_config_hash": config.config_hash,
                     "token_estimator_version": child.estimator_version,
                     "display_token_estimate": child.token_estimate,
-                    "retrieval_token_estimate": child.retrieval_token_estimate,
+                    "retrieval_token_estimate": estimate_utf8_tokens(retrieval_text),
                     "generation_id": generation_id,
                 }
                 snippets = _code_snippets(child.display_text)
@@ -1071,22 +1171,39 @@ class SQLiteStore:
                          atom_id, display_text, retrieval_text,
                          display_content_hash, retrieval_content_hash,
                          display_token_estimate, retrieval_token_estimate,
+                         context_prefix, context_manifest_json,
+                         context_schema_version, context_config_hash,
+                         context_content_hash, embedding_input_hash,
                          char_start, char_end, byte_start, byte_end, line_start,
                          line_end, source_path, document_title, format, anchor,
+                         library_id, resolved_version, version_family,
+                         project_identity, project_path, module_id, doc_scope,
+                         source_class, authority, docs_snapshot_exact,
                          metadata_json)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     """,
                     (
                         generation_id, child.sqlite_id, child.stable_id, child.vector_id,
                         child.parent_logical_id, source_id, doc.source,
                         source_identity, global_index, child.ordinal,
                         parent.title, parent.level, child.atom_type,
-                        child.atom_id, child.display_text, child.retrieval_text,
+                        child.atom_id, child.display_text, retrieval_text,
                         display_hash, retrieval_hash, child.token_estimate,
-                        child.retrieval_token_estimate, child.char_start,
+                        estimate_utf8_tokens(retrieval_text), context_prefix.text,
+                        json.dumps(context_manifest, ensure_ascii=False, sort_keys=True),
+                        context_prefix.schema_version, context_prefix.config_hash,
+                        context_prefix.content_hash, retrieval_hash, child.char_start,
                         child.char_end, child.byte_start, child.byte_end,
                         child.line_start, child.line_end, source_path,
                         document_title, format_name, anchor,
+                        filter_metadata["library_id"],
+                        filter_metadata["resolved_version"],
+                        filter_metadata["version_family"],
+                        filter_metadata["project_identity"],
+                        filter_metadata["project_path"],
+                        filter_metadata["module_id"], filter_metadata["doc_scope"],
+                        filter_metadata["source_class"], filter_metadata["authority"],
+                        filter_metadata["docs_snapshot_exact"],
                         json.dumps(child_metadata, ensure_ascii=False),
                     ),
                 ).lastrowid
@@ -1095,10 +1212,12 @@ class SQLiteStore:
                     INSERT INTO retrieval_children_fts(rowid, title, retrieval_text, source)
                     VALUES (?, ?, ?, ?)
                     """,
-                    (int(child_id), parent.title, child.retrieval_text, doc.source),
+                    (int(child_id), parent.title, retrieval_text, doc.source),
                 )
 
-        validation = self._validate_generation(conn, generation_id, config)
+        validation = self._validate_generation(
+            conn, generation_id, config, context_config
+        )
         conn.execute(
             """
             UPDATE index_generations
@@ -1121,8 +1240,13 @@ class SQLiteStore:
             "title", "level", "atom_type", "atom_id", "display_text",
             "retrieval_text", "display_content_hash", "retrieval_content_hash",
             "display_token_estimate", "retrieval_token_estimate", "char_start",
+            "context_prefix", "context_manifest_json", "context_schema_version",
+            "context_config_hash", "context_content_hash", "embedding_input_hash",
             "char_end", "byte_start", "byte_end", "line_start", "line_end",
             "source_path", "document_title", "format", "anchor", "metadata_json",
+            "library_id", "resolved_version", "version_family", "project_identity",
+            "project_path", "module_id", "doc_scope", "source_class", "authority",
+            "docs_snapshot_exact",
         )
         placeholders = ", ".join("?" for _ in range(len(columns) + 1))
         cursor = conn.execute(
@@ -1137,6 +1261,7 @@ class SQLiteStore:
         conn: sqlite3.Connection,
         generation_id: str,
         config: ChunkingConfig,
+        context_config: ContextConfig,
     ) -> dict[str, Any]:
         child_count = int(conn.execute(
             "SELECT COUNT(*) AS count FROM retrieval_children WHERE generation_id = ?",
@@ -1211,6 +1336,7 @@ class SQLiteStore:
             )
         span_errors = 0
         token_errors = 0
+        context_errors = 0
         rows = conn.execute(
             """
             SELECT c.*, gs.content AS source_content
@@ -1236,10 +1362,42 @@ class SQLiteStore:
                 span_errors += 1
             if int(row["retrieval_token_estimate"]) > config.hard_max_tokens:
                 token_errors += 1
-        if span_errors or token_errors:
+            try:
+                manifest = json.loads(str(row["context_manifest_json"] or "{}"))
+                fields = manifest.get("fields", [])
+                expected_context_hash = canonical_hash(fields)
+                expected_retrieval = (
+                    f"{row['context_prefix']}\n\n{display}"
+                    if row["context_prefix"] else display
+                )
+                metadata = json.loads(str(row["metadata_json"] or "{}"))
+                promoted = normalized_filter_metadata(metadata)
+                promoted_matches = all(
+                    row[name] == value
+                    for name, value in promoted.items()
+                )
+                context_errors += int(
+                    str(row["context_schema_version"]) != context_config.schema_version
+                    or str(row["context_config_hash"]) != context_config.config_hash
+                    or str(row["context_content_hash"]) != expected_context_hash
+                    or manifest.get("schema_version") != context_config.schema_version
+                    or manifest.get("config_hash") != context_config.config_hash
+                    or manifest.get("content_hash") != expected_context_hash
+                    or str(row["embedding_input_hash"]) != _chunk_hash(expected_retrieval)
+                    or str(row["retrieval_text"]) != expected_retrieval
+                    or len(str(row["context_prefix"]).encode("utf-8"))
+                    > context_config.max_prefix_bytes
+                    or estimate_utf8_tokens(str(row["context_prefix"]))
+                    > context_config.max_prefix_tokens
+                    or not promoted_matches
+                )
+            except (TypeError, json.JSONDecodeError):
+                context_errors += 1
+        if span_errors or token_errors or context_errors:
             raise ValueError(
                 f"generation validation failed: span_errors={span_errors}, "
-                f"retrieval_token_errors={token_errors}"
+                f"retrieval_token_errors={token_errors}, "
+                f"context_errors={context_errors}"
             )
         accepted_config = ChunkingConfig()
         accepted_profile_status = (
@@ -1252,6 +1410,9 @@ class SQLiteStore:
             "span_errors": 0,
             "duplicate_id_errors": 0,
             "retrieval_token_errors": 0,
+            "context_errors": 0,
+            "context_schema_version": context_config.schema_version,
+            "context_config_hash": context_config.config_hash,
             "source_snapshot_hash_errors": 0,
             "parent_snapshot_hash_errors": 0,
             "accepted_profile": {
@@ -1326,6 +1487,68 @@ class SQLiteStore:
             ).fetchone()
             return dict(row) if row else None
 
+    def superseded_generation_candidates(self, *, retain: int = 1) -> list[dict[str, Any]]:
+        """List old immutable generations eligible for bounded retention cleanup."""
+        if retain < 0:
+            raise ValueError("retain must be non-negative")
+        with self._connect() as conn:
+            rows = list(conn.execute(
+                """
+                SELECT generation_id, vector_collection, activated_at, created_at
+                FROM index_generations
+                WHERE status = 'superseded'
+                ORDER BY COALESCE(activated_at, created_at) DESC, generation_id DESC
+                """
+            ))
+        return [dict(row) for row in rows[retain:]]
+
+    def delete_superseded_generations(self, generation_ids: Iterable[str]) -> int:
+        """Delete only generations that remain superseded at cleanup time."""
+        requested = tuple(dict.fromkeys(str(value) for value in generation_ids if str(value)))
+        if not requested:
+            return 0
+        deleted = 0
+        with self._connect() as conn:
+            for generation_id in requested:
+                row = conn.execute(
+                    "SELECT status FROM index_generations WHERE generation_id = ?",
+                    (generation_id,),
+                ).fetchone()
+                if row is None or str(row["status"]) != "superseded":
+                    continue
+                child_ids = [
+                    int(item["id"])
+                    for item in conn.execute(
+                        "SELECT id FROM retrieval_children WHERE generation_id = ?",
+                        (generation_id,),
+                    )
+                ]
+                for child_id in child_ids:
+                    conn.execute(
+                        "DELETE FROM retrieval_children_fts WHERE rowid = ?", (child_id,)
+                    )
+                conn.execute(
+                    "DELETE FROM generation_vector_upserts WHERE generation_id = ?",
+                    (generation_id,),
+                )
+                conn.execute(
+                    "DELETE FROM retrieval_children WHERE generation_id = ?",
+                    (generation_id,),
+                )
+                conn.execute(
+                    "DELETE FROM retrieval_parents WHERE generation_id = ?",
+                    (generation_id,),
+                )
+                conn.execute(
+                    "DELETE FROM generation_sources WHERE generation_id = ?",
+                    (generation_id,),
+                )
+                deleted += conn.execute(
+                    "DELETE FROM index_generations WHERE generation_id = ? AND status = 'superseded'",
+                    (generation_id,),
+                ).rowcount
+        return deleted
+
     def set_generation_vector_collection(
         self, generation_id: str, collection: str
     ) -> None:
@@ -1381,18 +1604,59 @@ class SQLiteStore:
         ).fetchone()
         if previous is None:
             raise ValueError(f"active generation {active!r} is missing")
+        if not str(previous["context_config_hash"] or "") or not str(
+            previous["retrieval_config_hash"] or ""
+        ):
+            # A pre-contextual Task 40 generation has additive columns filled
+            # with empty defaults. Cloning it would validate those legacy rows
+            # against the Task 41 context contract and fail delete-only updates.
+            config = self._chunking_config_from_generation(previous)
+            remaining: list[Document] = []
+            for row in conn.execute(
+                f"""
+                SELECT source, content, metadata_json
+                FROM generation_sources
+                WHERE generation_id = ? AND source NOT IN ({placeholders})
+                ORDER BY source
+                """,
+                (active, *sorted(excluded_sources)),
+            ):
+                try:
+                    metadata = json.loads(row["metadata_json"] or "{}")
+                except json.JSONDecodeError:
+                    metadata = {}
+                metadata.update({
+                    "chunking_schema": config.schema_version,
+                    "child_target_tokens": config.target_tokens,
+                    "child_hard_max_tokens": config.hard_max_tokens,
+                })
+                remaining.append(Document(
+                    source=str(row["source"]),
+                    content=str(row["content"]),
+                    metadata=metadata,
+                ))
+            if remaining:
+                generation_id = self._build_candidate_generation(
+                    conn, remaining, recreate=True
+                )
+                self._activate_generation(conn, generation_id)
+                return generation_id
         generation_id = "gen-" + uuid.uuid4().hex
         now = datetime.now(timezone.utc).isoformat(timespec="seconds")
         conn.execute(
             """
             INSERT INTO index_generations
                 (generation_id, schema_version, config_hash, config_json,
-                 status, vector_collection, validation_json, created_at)
-            VALUES (?, ?, ?, ?, 'building', ?, '{}', ?)
+                 context_schema_version, context_config_hash,
+                 retrieval_config_hash, status, vector_collection,
+                 validation_json, created_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, 'building', ?, '{}', ?)
             """,
             (
                 generation_id, previous["schema_version"], previous["config_hash"],
-                previous["config_json"], previous["vector_collection"], now,
+                previous["config_json"], previous["context_schema_version"],
+                previous["context_config_hash"], previous["retrieval_config_hash"],
+                previous["vector_collection"], now,
             ),
         )
         exclusion = f"AND source NOT IN ({placeholders})"
@@ -1447,7 +1711,9 @@ class SQLiteStore:
                 (child_id, row["title"], row["retrieval_text"], row["source"]),
             )
         config = self._chunking_config_from_generation(previous)
-        validation = self._validate_generation(conn, generation_id, config)
+        validation = self._validate_generation(
+            conn, generation_id, config, ContextConfig()
+        )
         conn.execute(
             """
             UPDATE index_generations
@@ -1469,6 +1735,9 @@ class SQLiteStore:
         filters: dict[str, Any] | None = None,
     ) -> list[RetrievedChunk]:
         expand_mode = expand or "none"
+        # The FTS scoring window is internal; the returned candidate lane is
+        # still capped by the dispatcher. Keeping the wider scoring window is
+        # required for authority/diversity reranking to displace contamination.
         rows = [dict(r) for r in self._search_rows(text, max(limit * 4, limit), filters=filters)]
         content_terms = set(re.findall(r"\w+", self._strip_stopwords(text).lower()))
         ranked = [(self._ranking_candidate(row, text, content_terms), row) for row in rows]
@@ -1736,7 +2005,8 @@ class SQLiteStore:
     ) -> list[sqlite3.Row]:
         cleaned = self._strip_stopwords(query)
         terms = [token for token in re.findall(r"\w+", cleaned) if token]
-        filter_sql, filter_params = self._metadata_filter_sql(filters)
+        filter_sql, filter_params = self._metadata_filter_sql(filters, promoted=True)
+        legacy_filter_sql, legacy_filter_params = self._metadata_filter_sql(filters)
         with self._connect() as conn:
             active_generation = self._active_generation_id(conn)
             if active_generation:
@@ -1748,7 +2018,7 @@ class SQLiteStore:
                                    sections.display_text AS text,
                                    sections.display_token_estimate AS token_estimate,
                                    sections.display_content_hash AS content_hash,
-                                   bm25(retrieval_children_fts) AS rank
+                                   bm25(retrieval_children_fts, 6.0, 2.0, 0.5) AS rank
                             FROM retrieval_children_fts
                             JOIN retrieval_children AS sections
                               ON sections.id = retrieval_children_fts.rowid
@@ -1773,11 +2043,11 @@ class SQLiteStore:
                                   SELECT source FROM retrieval_children
                                   WHERE generation_id = ?
                               )
-                            {filter_sql}
+                            {legacy_filter_sql}
                             ORDER BY rank, sections.source, sections.chunk_index
                             LIMIT ?
                             """,
-                            (cleaned, active_generation, *filter_params, limit),
+                            (cleaned, active_generation, *legacy_filter_params, limit),
                         )
                     )
                     combined = sorted(
@@ -1801,7 +2071,7 @@ class SQLiteStore:
                                sections.display_text AS text,
                                sections.display_token_estimate AS token_estimate,
                                sections.display_content_hash AS content_hash,
-                               bm25(retrieval_children_fts) AS rank
+                               bm25(retrieval_children_fts, 6.0, 2.0, 0.5) AS rank
                         FROM retrieval_children_fts
                         JOIN retrieval_children AS sections
                           ON sections.id = retrieval_children_fts.rowid
@@ -1826,11 +2096,11 @@ class SQLiteStore:
                               SELECT source FROM retrieval_children
                               WHERE generation_id = ?
                           )
-                        {filter_sql}
+                        {legacy_filter_sql}
                         ORDER BY rank, sections.source, sections.chunk_index
                         LIMIT ?
                         """,
-                        (fallback_query, active_generation, *filter_params, limit),
+                        (fallback_query, active_generation, *legacy_filter_params, limit),
                     )
                 )
                 return sorted(
@@ -1852,7 +2122,7 @@ class SQLiteStore:
                         ORDER BY rank, sections.source, sections.chunk_index, sections.content_hash
                         LIMIT ?
                         """,
-                        (cleaned, *filter_params, limit),
+                        (cleaned, *legacy_filter_params, limit),
                     )
                 )
                 if rows or len(terms) <= 1:
@@ -1870,16 +2140,20 @@ class SQLiteStore:
                     FROM sections_fts
                     JOIN sections ON sections.id = sections_fts.rowid
                     WHERE sections_fts MATCH ?
-                    {filter_sql}
+                    {legacy_filter_sql}
                     ORDER BY rank, sections.source, sections.chunk_index, sections.content_hash
                     LIMIT ?
                     """,
-                    (fallback_query, *filter_params, limit),
+                    (fallback_query, *legacy_filter_params, limit),
                 )
             )
 
     @staticmethod
-    def _metadata_filter_sql(filters: dict[str, Any] | None) -> tuple[str, list[Any]]:
+    def _metadata_filter_sql(
+        filters: dict[str, Any] | None,
+        *,
+        promoted: bool = False,
+    ) -> tuple[str, list[Any]]:
         if not filters:
             return "", []
         clauses: list[str] = []
@@ -1890,21 +2164,36 @@ class SQLiteStore:
             if not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", str(key)):
                 raise ValueError(f"Unsupported metadata filter key: {key!r}")
             json_path = f"$.{key}"
+            column = str(key) if promoted and key in {
+                "library_id", "resolved_version", "version_family", "project_identity",
+                "project_path", "module_id", "doc_scope", "source_class", "authority",
+                "docs_snapshot_exact", "source", "source_identity",
+            } else None
+            expression = f"sections.{column}" if column else "json_extract(sections.metadata_json, ?)"
+            if not column:
+                params.append(json_path)
             if isinstance(value, bool):
-                clauses.append("json_extract(sections.metadata_json, ?) = ?")
-                params.extend([json_path, 1 if value else 0])
+                clauses.append(f"{expression} = ?")
+                params.append(1 if value else 0)
+            elif isinstance(value, dict) and "in" in value:
+                values = list(value["in"])
+                if not values:
+                    clauses.append("0")
+                    continue
+                placeholders = ", ".join("?" for _ in values)
+                clauses.append(f"{expression} IN ({placeholders})")
+                params.extend(values)
             elif isinstance(value, (list, tuple, set, frozenset)):
                 values = list(value)
                 if not values:
                     clauses.append("0")
                     continue
                 placeholders = ", ".join("?" for _ in values)
-                clauses.append(f"json_extract(sections.metadata_json, ?) IN ({placeholders})")
-                params.append(json_path)
+                clauses.append(f"{expression} IN ({placeholders})")
                 params.extend(values)
             else:
-                clauses.append("json_extract(sections.metadata_json, ?) = ?")
-                params.extend([json_path, value])
+                clauses.append(f"{expression} = ?")
+                params.append(value)
         if not clauses:
             return "", []
         return "AND " + " AND ".join(f"({clause})" for clause in clauses), params
@@ -2785,7 +3074,13 @@ class SQLiteStore:
                            format, anchor, display_content_hash,
                            retrieval_content_hash, stable_chunk_id, vector_id,
                            parent_logical_id, generation_id, char_start, char_end,
-                           byte_start, byte_end, metadata_json
+                           byte_start, byte_end, metadata_json,
+                           context_schema_version, context_config_hash,
+                           context_content_hash, embedding_input_hash,
+                           source_identity, library_id, resolved_version,
+                           version_family, project_identity, project_path,
+                           module_id, doc_scope, source_class, authority,
+                           docs_snapshot_exact
                     FROM retrieval_children
                     WHERE generation_id = ?
                     ORDER BY source, chunk_index
@@ -2793,11 +3088,17 @@ class SQLiteStore:
                     (target_generation,),
                 )
                 info = conn.execute(
-                    "SELECT schema_version, config_hash FROM index_generations WHERE generation_id = ?",
+                    """SELECT schema_version, config_hash, retrieval_config_hash
+                       FROM index_generations WHERE generation_id = ?""",
                     (target_generation,),
                 ).fetchone()
-                embedded = [
-                    {
+                embedded = []
+                for row in rows:
+                    try:
+                        source_metadata = json.loads(str(row["metadata_json"] or "{}"))
+                    except (TypeError, json.JSONDecodeError):
+                        source_metadata = {}
+                    item = {
                         "section_id": int(row["id"]),
                         "vector_id": str(row["vector_id"]),
                         "source": str(row["source"]),
@@ -2823,9 +3124,29 @@ class SQLiteStore:
                         "byte_end": int(row["byte_end"]),
                         "chunk_schema_version": str(info["schema_version"]),
                         "chunk_config_hash": str(info["config_hash"]),
+                        "context_schema_version": str(row["context_schema_version"]),
+                        "context_config_hash": str(row["context_config_hash"]),
+                        "context_content_hash": str(row["context_content_hash"]),
+                        "embedding_input_hash": str(row["embedding_input_hash"]),
+                        "retrieval_config_hash": str(info["retrieval_config_hash"] or ""),
+                        "source_identity": str(row["source_identity"] or ""),
+                        "library_id": str(row["library_id"] or ""),
+                        "resolved_version": str(row["resolved_version"] or ""),
+                        "version_family": str(row["version_family"] or ""),
+                        "project_identity": str(row["project_identity"] or ""),
+                        "project_path": str(row["project_path"] or ""),
+                        "module_id": str(row["module_id"] or ""),
+                        "doc_scope": str(row["doc_scope"] or ""),
+                        "source_class": str(row["source_class"] or ""),
+                        "authority": str(row["authority"] or "unknown"),
+                        "docs_snapshot_exact": (
+                            bool(row["docs_snapshot_exact"])
+                            if row["docs_snapshot_exact"] is not None else None
+                        ),
+                        "canonical_url": str(source_metadata.get("canonical_url") or ""),
+                        "source_url": str(source_metadata.get("source_url") or ""),
                     }
-                    for row in rows
-                ]
+                    embedded.append(item)
                 legacy_rows = conn.execute(
                     """
                     SELECT id, source, chunk_index, title, level, text,
@@ -2876,6 +3197,11 @@ class SQLiteStore:
                         "generation_id": str(target_generation),
                         "chunk_schema_version": INDEX_SCHEMA_VERSION,
                         "chunk_config_hash": "legacy-compatibility-v1",
+                        "context_schema_version": "",
+                        "context_config_hash": "",
+                        "context_content_hash": "",
+                        "embedding_input_hash": retrieval_hash,
+                        "retrieval_config_hash": "legacy-compatibility-v1",
                     })
                 return embedded
             rows = conn.execute(

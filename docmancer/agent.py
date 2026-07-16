@@ -108,7 +108,7 @@ class DocmancerAgent:
                     info = self.store.generation_info(result.generation_id) or {}
                     collection = (
                         f"{self._base_vector_collection_name()}_pc_"
-                        f"{str(info.get('config_hash') or '')[:12]}_"
+                        f"{str(info.get('retrieval_config_hash') or info.get('config_hash') or '')[:12]}_"
                         f"{str(result.generation_id).removeprefix('gen-')[:12]}"
                     )
                     self.store.set_generation_vector_collection(
@@ -285,6 +285,24 @@ class DocmancerAgent:
                     "candidate vector collection parity failed: "
                     f"expected={expected}, actual={actual}, collection={collection}"
                 )
+            if prune_stale and generation_id == self.store.active_generation_id():
+                removable: list[str] = []
+                for candidate in self.store.superseded_generation_candidates(retain=1):
+                    stale_generation = str(candidate["generation_id"])
+                    stale_collection = str(candidate.get("vector_collection") or "")
+                    if stale_collection and stale_collection != collection:
+                        try:
+                            vector_store.delete_collection(stale_collection)
+                        except Exception as exc:
+                            logger.warning(
+                                "retaining generation %s because vector collection cleanup failed: %s",
+                                stale_generation,
+                                exc,
+                            )
+                            continue
+                    removable.append(stale_generation)
+                if removable:
+                    self.store.delete_superseded_generations(removable)
         logger.info(
             "vectors: embedded=%d upserted=%d cache_hits=%d unchanged=%d pruned=%d",
             result.embedded,
