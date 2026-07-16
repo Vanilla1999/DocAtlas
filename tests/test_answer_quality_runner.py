@@ -1,7 +1,11 @@
 from __future__ import annotations
 
 import json
+import inspect
+import os
 from pathlib import Path
+
+import pytest
 
 from eval import answer_quality_runner as runner
 
@@ -104,3 +108,102 @@ def test_checked_provider_free_observation_passes_automated_gates():
     assert result["deterministic_result_digest"] == human[
         "deterministic_result_digest"
     ]
+    assert len(human["cases"]) == 6
+    assert all(
+        row["review_context"]["question"].strip() for row in human["cases"]
+    )
+    forbidden = next(
+        row
+        for row in human["cases"]
+        if row["contract_id"] == "t42-adv-forbidden-source"
+    )
+    assert forbidden["projection"]["status"] == "ok"
+    assert forbidden["projection"]["limitations"] == [
+        "The selected evidence does not provide a concrete configuration key, "
+        "value, command, or API call."
+    ]
+
+
+def test_paired_baseline_does_not_spawn_a_python_evaluator():
+    source = inspect.getsource(runner._paired_baseline_groups)
+
+    assert "sys.executable" not in source
+    assert "_measure_product_groups" in source
+
+
+def test_timing_artifact_requires_one_process():
+    protocol = {
+        "timing": {
+            "warmup_repeats_per_case": 1,
+            "measured_repeats_per_case": 2,
+        }
+    }
+    groups = {
+        kind: {"retrieval_projection_p95_ms": 1.0}
+        for kind in ("docs_answer", "patch_context")
+    }
+
+    artifact = runner._timing_artifact(
+        protocol,
+        {},
+        groups,
+        groups,
+        False,
+        {"candidate_pid": os.getpid(), "baseline_pid": os.getpid()},
+    )
+
+    assert artifact["measurement_mode"] == "paired_same_process"
+    assert artifact["process_identity"]["candidate_pid"] == artifact[
+        "process_identity"
+    ]["baseline_pid"]
+    with pytest.raises(RuntimeError, match="different processes"):
+        runner._timing_artifact(
+            protocol,
+            {},
+            groups,
+            groups,
+            False,
+            {"candidate_pid": 1, "baseline_pid": 2},
+        )
+
+
+def test_measure_case_obeys_frozen_repeat_counts():
+    calls = 0
+
+    def projection():
+        nonlocal calls
+        calls += 1
+        return ({"status": "ok"}, {}, [])
+
+    measured = runner._measure_case(
+        projection,
+        {
+            "timing": {
+                "warmup_repeats_per_case": 3,
+                "measured_repeats_per_case": 5,
+            }
+        },
+    )
+
+    assert calls == 8
+    assert len(measured["samples_ms"]) == 5
+
+
+def test_review_context_contains_public_question_without_expected_answer():
+    context = runner._review_context(
+        {
+            "question": "How do I set retries?",
+            "exact_version": "2.0",
+            "required_evidence_paths": ["docs/retries.md"],
+        },
+        {"result_kind": "docs_answer"},
+    )
+
+    assert context == {
+        "question": "How do I set retries?",
+        "result_kind": "docs_answer",
+        "required_evidence_paths": ["docs/retries.md"],
+        "required_target_paths": [],
+        "exact_version": "2.0",
+    }
+    assert not set(context).intersection({"expected_status", "expected_selected"})

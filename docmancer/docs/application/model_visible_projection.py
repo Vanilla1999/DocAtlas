@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 import json
 import math
+import re
 from copy import deepcopy
 from typing import Any, Iterable
 
@@ -21,6 +22,30 @@ PATCH_CONTEXT_TARGET_TOKENS = 1_500
 PATCH_CONTEXT_HARD_TOKENS = 2_000
 INSUFFICIENT_EVIDENCE_MAX_TOKENS = 300
 MAX_DOCS_SOURCES = 3
+DOCS_SOURCE_FIELDS = frozenset({
+    "evidence_id", "path_or_url", "section", "snippet", "version_binding",
+    "content_sha256",
+})
+PATCH_SOURCE_FIELDS = frozenset({
+    "evidence_id", "path", "symbol_or_section", "authority",
+    "instruction_trust", "scope", "version_binding", "content_sha256",
+})
+_ACTIONABLE_QUESTION_RE = re.compile(
+    r"\b(?:how\s+(?:do|can|should)\s+(?:i|we)\s+(?:configure|set|call|run|use)"
+    r"|(?:configure|set|call|run)\s+(?:up\s+)?(?:the\s+)?"
+    r"|command\s+to\b)",
+    re.IGNORECASE,
+)
+_ACTIONABLE_SNIPPET_RE = re.compile(
+    r"(?:[A-Za-z_][\w.-]*\s*=\s*[^=]|\b[A-Za-z_]\w*(?:\.[A-Za-z_]\w*)+\s*\("
+    r"|(?:^|\n)\s*(?:\$\s*)?[\w./-]+\s+--?[\w-]+"
+    r"|```|\b(?:set|configure|export)\s+[A-Za-z_][\w.-]*\s+(?:to\s+)?\S+)",
+    re.IGNORECASE,
+)
+_ACTIONABLE_LIMITATION = (
+    "The selected evidence does not provide a concrete configuration key, "
+    "value, command, or API call."
+)
 FORBIDDEN_MODEL_KEYS = frozenset({
     "context_pack", "content", "surrounding_context", "ingestion_diagnostics",
     "retrieval_diagnostics", "diagnostics", "repo_map", "code_graph",
@@ -77,7 +102,7 @@ def project_docs_answer(
             continue
         evidence_id = normalized["evidence_id"]
         sources.append(normalized)
-        snapshot[evidence_id] = {"source": deepcopy(item), **normalized}
+        snapshot[evidence_id] = _snapshot_entry(item, normalized)
 
     retrieval_issues = _docs_retrieval_issues(retrieval)
     if decision.status != "ok" or not sources or retrieval_issues:
@@ -90,16 +115,23 @@ def project_docs_answer(
             recommended_next_action=retrieval.get("next_action"), max_tokens=INSUFFICIENT_EVIDENCE_MAX_TOKENS,
         ), snapshot
 
-    answer, answer_evidence_ids = _answer_text(question, retrieval, sources)
+    answer, answer_evidence_ids, answer_limited = _answer_text(
+        question, retrieval, sources
+    )
+    omitted_counts = {"sources": omitted} if omitted else {}
+    if answer_limited:
+        omitted_counts["answer_details"] = 1
     payload: dict[str, Any] = {
         "status": "ok",
         "kind": "docs_answer",
         "answer": answer,
         "answer_evidence_ids": answer_evidence_ids,
         "sources": sources,
-        "omitted_counts": {"sources": omitted} if omitted else {},
+        "omitted_counts": omitted_counts,
         "estimated_tokens": 0,
     }
+    if answer_limited:
+        payload["limitations"] = [_ACTIONABLE_LIMITATION]
     _refresh_estimate(payload)
     if estimate_projection_tokens(payload) > min(DOCS_ANSWER_MAX_TOKENS, max_tokens):
         return project_insufficient(
@@ -151,7 +183,7 @@ def project_patch_context(
         digest = _source_digest(item)
         projected = {**deepcopy(row), "content_sha256": digest}
         sources.append(projected)
-        snapshot[evidence_id] = {"source": item, **projected}
+        snapshot[evidence_id] = _snapshot_entry(item, projected)
 
     payload: dict[str, Any] = {
         "status": packet.get("status"),
@@ -232,6 +264,9 @@ def validate_model_visible_projection(
     if kind == "docs_answer" and len(sources) > MAX_DOCS_SOURCES:
         errors.append("docs_answer exceeds source limit")
     ids: set[str] = set()
+    allowed_fields = (
+        DOCS_SOURCE_FIELDS if kind == "docs_answer" else PATCH_SOURCE_FIELDS
+    )
     for source in sources:
         if not isinstance(source, dict):
             errors.append("projection source must be an object")
@@ -241,16 +276,30 @@ def validate_model_visible_projection(
         if not evidence_id or not bound:
             errors.append("projection evidence_id does not resolve to the internal snapshot")
             continue
-        if source.get("content_sha256") != bound.get("content_sha256"):
+        expected = bound.get("projected_source")
+        if not isinstance(expected, dict):
+            errors.append("internal snapshot is missing its canonical projected source")
+            continue
+        missing = sorted(allowed_fields - set(source))
+        unknown = sorted(set(source) - allowed_fields)
+        for key in missing:
+            errors.append(f"projection source field is missing: {key}")
+        if unknown:
+            errors.append(
+                "projection source contains unknown fields: " + ", ".join(unknown)
+            )
+        if set(expected) != allowed_fields:
+            errors.append("internal snapshot projected source schema is invalid")
+        if source.get("content_sha256") != expected.get("content_sha256"):
             errors.append("projection source hash does not match the internal snapshot")
         bound_source = bound.get("source")
-        if not isinstance(bound_source, dict) or _source_digest(bound_source) != bound.get("content_sha256"):
-            errors.append("internal snapshot hash does not match its source content")
-        for key in (
-            "path_or_url", "path", "section", "symbol_or_section", "snippet",
-            "version_binding",
+        if (
+            not isinstance(bound_source, dict)
+            or _source_digest(bound_source) != expected.get("content_sha256")
         ):
-            if key in source and source.get(key) != bound.get(key):
+            errors.append("internal snapshot hash does not match its source content")
+        for key in sorted(allowed_fields & set(source) & set(expected)):
+            if source.get(key) != expected.get(key):
                 errors.append(f"projection source {key} does not match the internal snapshot")
         ids.add(evidence_id)
     if kind == "docs_answer":
@@ -269,10 +318,19 @@ def validate_model_visible_projection(
 def sanitized_projection_manifest(snapshot: dict[str, dict[str, Any]]) -> list[dict[str, Any]]:
     """Return deterministic audit metadata without full source text."""
 
-    allowed = ("evidence_id", "path_or_url", "path", "section", "symbol_or_section", "version_binding", "content_sha256")
+    allowed = (
+        "evidence_id", "path_or_url", "path", "section", "symbol_or_section",
+        "authority", "instruction_trust", "scope", "version_binding",
+        "content_sha256",
+    )
     rows = [
-        {key: deepcopy(value[key]) for key in allowed if value.get(key) not in (None, "")}
+        {
+            key: deepcopy(projected[key])
+            for key in allowed
+            if projected.get(key) not in (None, "")
+        }
         for _, value in sorted(snapshot.items())
+        for projected in [value.get("projected_source") or value]
     ]
     return rows
 
@@ -318,9 +376,25 @@ def _source_digest(item: dict[str, Any]) -> str:
     return hashlib.sha256(canonical_projection_bytes(material)).hexdigest()
 
 
+def _snapshot_entry(
+    original: dict[str, Any], projected: dict[str, Any]
+) -> dict[str, Any]:
+    """Bind both raw source content and the exact model-visible source row."""
+
+    canonical = dict(projected)
+    # Keep the flat fields for the frozen Task 43 evaluator. New validation is
+    # deliberately bound to projected_source so deleting or injecting a field
+    # cannot exploit the evaluator's backwards-compatible snapshot shape.
+    return {
+        "source": deepcopy(original),
+        "projected_source": canonical,
+        **canonical,
+    }
+
+
 def _answer_text(
     question: str, retrieval: dict[str, Any], sources: list[dict[str, Any]]
-) -> tuple[str, list[str]]:
+) -> tuple[str, list[str], bool]:
     """Return only text that is directly present in one or more projected sources."""
 
     explicit = retrieval.get("answer")
@@ -332,9 +406,20 @@ def _answer_text(
             if normalized and normalized in " ".join(str(source.get("snippet") or "").split()).casefold()
         ]
         if refs:
-            return explicit.strip(), refs
+            answer = explicit.strip()
+            limited = _needs_actionable_limitation(question, answer)
+            return answer, refs, limited
     primary = sources[0]
-    return str(primary["snippet"]), [str(primary["evidence_id"])]
+    answer = str(primary["snippet"])
+    limited = _needs_actionable_limitation(question, answer)
+    return answer, [str(primary["evidence_id"])], limited
+
+
+def _needs_actionable_limitation(question: str, answer: str) -> bool:
+    return bool(
+        _ACTIONABLE_QUESTION_RE.search(question)
+        and not _ACTIONABLE_SNIPPET_RE.search(answer)
+    )
 
 
 def _docs_retrieval_issues(retrieval: dict[str, Any]) -> list[str]:
