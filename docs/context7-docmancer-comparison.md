@@ -1,4 +1,4 @@
-# Docmancer MCP vs Context7 — comparison report
+# DocAtlas MCP vs Context7 — comparison report
 
 Status: initial comparison plus first retrieval-quality fixes, based on the Riverpod benchmark, a FastAPI mini-benchmark, and the benchmark plan in `eval/context7_benchmark_plan.md`.
 
@@ -7,15 +7,15 @@ Status: initial comparison plus first retrieval-quality fixes, based on the Rive
 The first comparison shows a clear split:
 
 - **Context7 is better for zero-setup public documentation lookup.** It returned relevant Riverpod content for all 5 benchmark queries, presented code snippets cleanly, and avoided translation/duplicate noise.
-- **Docmancer MCP is better positioned for local, repeated, project-aware work.** After indexing, it was faster per query, can work offline, reports token efficiency, and can combine public docs with repo-owned docs and exact project dependency metadata.
-- **Docmancer's initial public-docs retrieval gap was source hygiene and deterministic ranking, not the core product direction.** The Riverpod miss was caused by translated pages and repeated sections diluting top-K results; the first fix pass now ranks all 5 Riverpod golden queries at rank 1 with zero locale contamination.
-- **The FastAPI mini-benchmark showed a ranking gap, not a recall gap.** Docmancer returned the needed facts for 3/3 FastAPI queries; after intent-sensitive reranking, all 3 FastAPI golden queries now rank the canonical source first.
-- **The strongest Docmancer claims still need a dedicated benchmark.** The current Riverpod run used latest `riverpod.dev` docs for both tools, so it did not fully test exact-version Dartdoc ingestion or project-owned docs retrieval.
+- **DocAtlas MCP is better positioned for local, repeated, project-aware work.** After indexing, it was faster per query, can work offline, reports token efficiency, and can combine public docs with repo-owned docs and exact project dependency metadata.
+- **DocAtlas's initial public-docs retrieval gap was source hygiene and deterministic ranking, not the core product direction.** The Riverpod miss was caused by translated pages and repeated sections diluting top-K results; the first fix pass now ranks all 5 Riverpod golden queries at rank 1 with zero locale contamination.
+- **The FastAPI mini-benchmark showed a ranking gap, not a recall gap.** DocAtlas returned the needed facts for 3/3 FastAPI queries; after intent-sensitive reranking, all 3 FastAPI golden queries now rank the canonical source first.
+- **The strongest DocAtlas claims still need a dedicated benchmark.** The current Riverpod run used latest `riverpod.dev` docs for both tools, so it did not fully test exact-version Dartdoc ingestion or project-owned docs retrieval.
 
 Recommended positioning from this run:
 
 - Use **Context7** for quick one-off public API questions.
-- Use **Docmancer MCP** when the agent needs local docs, offline docs, exact dependency versions, source metadata, token-aware context packs, or project-owned README/docs/ADR context.
+- Use **DocAtlas MCP** when the agent needs local docs, offline docs, exact dependency versions, source metadata, token-aware context packs, or project-owned README/docs/ADR context.
 
 DocAtlas now exposes trusted code examples as first-class snippet-first context while preserving project context, source attribution, and exact-version diagnostics. This closes a presentation gap with Context7 for coding queries, but it does not mean every documentation page contains executable code or that DocAtlas wins every public-doc lookup.
 
@@ -30,11 +30,11 @@ This report uses the available Riverpod comparison artifacts:
 - `roadmap/arhive/09_riverpod_context7_benchmark_followups.md`
 - benchmark plan: `eval/context7_benchmark_plan.md`
 
-It also includes a small FastAPI public-docs mini-benchmark run directly through Context7 and Docmancer MCP tools.
+It also includes a small FastAPI public-docs mini-benchmark run directly through Context7 and DocAtlas MCP tools.
 
 The benchmark compared:
 
-| Dimension | Context7 | Docmancer MCP |
+| Dimension | Context7 | DocAtlas MCP |
 |---|---|---|
 | Source | `/websites/riverpod_dev` hosted corpus | `https://riverpod.dev` indexed locally |
 | Version | latest Riverpod docs | latest Riverpod docs |
@@ -42,27 +42,27 @@ The benchmark compared:
 | Setup time | 0s | ~2 min for `doc-atlas add` + indexing |
 | Offline after setup | No | Yes |
 
-Important limitation: this was a public-docs parity test, not a full exact-version/project-aware test. The benchmark did not yet prove Docmancer's strongest advantage: resolving and querying the exact dependency documentation from a project lockfile.
+Important limitation: this was a public-docs parity test, not a full exact-version/project-aware test. The benchmark did not yet prove DocAtlas's strongest advantage: resolving and querying the exact dependency documentation from a project lockfile.
 
 ## Retrieval results
 
 ### Aggregate metrics
 
-| Metric | Docmancer MCP | Context7 | Notes |
+| Metric | DocAtlas MCP | Context7 | Notes |
 |---|---:|---:|---|
 | Hit@1 | 0.8 | 1.0 manual | Context7 assessment was manual, not yet snapshot-graded. |
 | Hit@3 | 0.8 | not separately measured | Context7 returned relevant content at rank 1 for all 5 queries. |
-| Hit@5 | 0.8 | 1.0 manual | Docmancer missed 1 of 5 queries. |
+| Hit@5 | 0.8 | 1.0 manual | DocAtlas missed 1 of 5 queries. |
 | MRR | 0.8 | 1.0 manual | Same limitation: Context7 needs persisted snapshots. |
-| p50 latency | ~1101ms | ~2s manual | Docmancer faster after indexing. |
-| p95 latency | ~1625ms | ~2s manual | Docmancer faster after indexing. |
+| p50 latency | ~1101ms | ~2s manual | DocAtlas faster after indexing. |
+| p95 latency | ~1625ms | ~2s manual | DocAtlas faster after indexing. |
 | Setup/cold-start | ~2 min | ~0s | Context7 wins first-use UX. |
-| Offline readiness | Yes after index | No | Docmancer wins offline/repeated loop. |
+| Offline readiness | Yes after index | No | DocAtlas wins offline/repeated loop. |
 | Token savings | measured on one query: 45.5% | not reported | Need token metrics for all queries. |
 
 After the first source-hygiene, source-diversity, and intent-ranking fixes, the saved Riverpod eval snapshot reports:
 
-| Metric | Docmancer MCP after fixes | Notes |
+| Metric | DocAtlas MCP after fixes | Notes |
 |---|---:|---|
 | Hit@1 | 1.0 | 5-query `eval/riverpod_golden.yaml` suite. |
 | Hit@5 | 1.0 | `rp_ref_watch_listen` now ranks `https://riverpod.dev/docs/concepts2/refs` at rank 1. |
@@ -72,11 +72,11 @@ After the first source-hygiene, source-diversity, and intent-ranking fixes, the 
 
 ### Per-query outcome
 
-| Query | Docmancer MCP | Context7 | Main observation |
+| Query | DocAtlas MCP | Context7 | Main observation |
 |---|---|---|---|
-| `rp_provider_lifecycle` — `autoDispose` + `keepAlive` | Hit, rank 1 | Hit | Docmancer returned relevant content but repeated `auto_dispose` sections. |
-| `rp_family_code_example` — `family` + `FutureProvider` | Hit, rank 1 | Hit | Docmancer returned several sections from the same `family` page. |
-| `rp_notifier_vs_asyncnotifier` — migration from `StateNotifier` | Hit, rank 1 | Hit | Docmancer content was relevant but less diverse than Context7 snippets. |
+| `rp_provider_lifecycle` — `autoDispose` + `keepAlive` | Hit, rank 1 | Hit | DocAtlas returned relevant content but repeated `auto_dispose` sections. |
+| `rp_family_code_example` — `family` + `FutureProvider` | Hit, rank 1 | Hit | DocAtlas returned several sections from the same `family` page. |
+| `rp_notifier_vs_asyncnotifier` — migration from `StateNotifier` | Hit, rank 1 | Hit | DocAtlas content was relevant but less diverse than Context7 snippets. |
 | `rp_ref_watch_listen` — `ref.watch` vs `ref.listen` lifecycle | Initial miss; rank 1 after fixes | Hit | The expected `refs` page now ranks first after URL replace-update and API-term intent rerank. |
 | `rp_autodispose_generator` — `@riverpod` annotation | Hit, rank 1 | Hit | Both tools found relevant content. |
 
@@ -86,13 +86,13 @@ This follow-up run tested a small public-docs suite for FastAPI. It is not a ful
 
 Setup:
 
-| Dimension | Context7 | Docmancer MCP |
+| Dimension | Context7 | DocAtlas MCP |
 |---|---|---|
 | Library | `/websites/fastapi_tiangolo` | `FastAPI`, `ecosystem=python`, `source_type=web` |
 | Docs source | hosted Context7 corpus | `https://fastapi.tiangolo.com/` |
 | Query count | 3 | 3 |
 | Version | latest/default | latest/default |
-| First Docmancer call | not applicable | refreshed stale registered source at `2026-06-06T08:20:26+00:00` |
+| First DocAtlas call | not applicable | refreshed stale registered source at `2026-06-06T08:20:26+00:00` |
 
 Queries:
 
@@ -102,32 +102,32 @@ Queries:
 
 ### FastAPI retrieval outcome
 
-| Query | Context7 result | Docmancer MCP result | Assessment |
+| Query | Context7 result | DocAtlas MCP result | Assessment |
 |---|---|---|---|
-| `fastapi_depends_basic` | Rank 1: `https://fastapi.tiangolo.com/tutorial/dependencies` with direct `common_parameters` example. | Initial rank 1: `dependencies-with-yield`; after fixes rank 1: `tutorial/dependencies`. | Both returned required facts and usable `Depends` examples; Docmancer now ranks the canonical tutorial first. |
-| `fastapi_http_exception` | Rank 1: `reference/exceptions` with constructor, parameters, and minimal 404 example; also `tutorial/handling-errors`. | Initial rank 1: `dependencies-with-yield`; after fixes rank 1: `tutorial/handling-errors`. | Both returned correct `HTTPException` facts; Docmancer now avoids advanced dependency-yield pages as the first result for this basic error query. |
+| `fastapi_depends_basic` | Rank 1: `https://fastapi.tiangolo.com/tutorial/dependencies` with direct `common_parameters` example. | Initial rank 1: `dependencies-with-yield`; after fixes rank 1: `tutorial/dependencies`. | Both returned required facts and usable `Depends` examples; DocAtlas now ranks the canonical tutorial first. |
+| `fastapi_http_exception` | Rank 1: `reference/exceptions` with constructor, parameters, and minimal 404 example; also `tutorial/handling-errors`. | Initial rank 1: `dependencies-with-yield`; after fixes rank 1: `tutorial/handling-errors`. | Both returned correct `HTTPException` facts; DocAtlas now avoids advanced dependency-yield pages as the first result for this basic error query. |
 | `fastapi_testclient` | Rank 1: `tutorial/testing` with `from fastapi.testclient import TestClient`, `client = TestClient(app)`, and pytest-style assertions. | After fixes rank 1: `tutorial/testing`; includes same import/client/assert pattern. | Both hit the canonical testing tutorial at rank 1. |
 
 ### FastAPI aggregate assessment
 
-| Metric | Docmancer MCP | Context7 | Notes |
+| Metric | DocAtlas MCP | Context7 | Notes |
 |---|---:|---:|---|
 | Fact-level Hit@5 | 3/3 | 3/3 | Both providers returned enough facts to answer correctly. |
 | Canonical-source Hit@1 | Initial 1/3; after fixes 3/3 | 3/3 | Saved after-fix snapshot: `eval/results/docmancer_fastapi_results.json`. |
-| Canonical-source Hit@5 | 3/3 | 3/3 | Docmancer included expected sources within top-K for all three queries. |
-| Snippet present@5 | 3/3 | high | Docmancer now records snippet presence in eval metrics; Context7 still presents snippets more cleanly. |
-| Source diversity | medium | high | Docmancer mixed relevant pages but sometimes over-weighted advanced sections. |
+| Canonical-source Hit@5 | 3/3 | 3/3 | DocAtlas included expected sources within top-K for all three queries. |
+| Snippet present@5 | 3/3 | high | DocAtlas now records snippet presence in eval metrics; Context7 still presents snippets more cleanly. |
+| Source diversity | medium | high | DocAtlas mixed relevant pages but sometimes over-weighted advanced sections. |
 | Version exactness | not tested | not tested | Both used latest/default docs. |
 | Latency | not measured from MCP tool output | not measured from Context7 tool output | Riverpod latency findings remain the only measured latency data in this document. |
 
 ### FastAPI findings
 
 1. Context7 still wins zero-setup UX for public docs lookup.
-2. Docmancer MCP returned enough information to answer all 3 queries, so this was not a recall failure.
-3. Docmancer's initial ranking issue was subtler than Riverpod: no locale pollution was observed, but advanced pages such as `dependencies-with-yield` outranked simpler tutorial/reference pages for basic questions.
+2. DocAtlas MCP returned enough information to answer all 3 queries, so this was not a recall failure.
+3. DocAtlas's initial ranking issue was subtler than Riverpod: no locale pollution was observed, but advanced pages such as `dependencies-with-yield` outranked simpler tutorial/reference pages for basic questions.
 4. The first intent-ranking fix now prefers introductory/tutorial pages for basic usage and testing queries, while preserving advanced pages as secondary context.
 5. The snippet evidence MVP now records `code_snippets`, `has_code_snippet`, `snippet_present_at_5_rate`, and `snippet_sections_at_5_avg` so code-example quality is measured instead of only manually inspected.
-5. The FastAPI run supports the same product conclusion as Riverpod: Context7 is excellent for quick public-doc snippets; Docmancer remains more differentiated when local/project/version-aware context is needed.
+5. The FastAPI run supports the same product conclusion as Riverpod: Context7 is excellent for quick public-doc snippets; DocAtlas remains more differentiated when local/project/version-aware context is needed.
 
 ## Qualitative findings
 
@@ -138,15 +138,15 @@ Queries:
 3. **Snippet presentation.** Context7 extracts code examples as clear snippets, which is convenient for coding agents.
 4. **Public-docs hit rate in this run.** All 5 Riverpod queries returned relevant content at rank 1 by manual assessment.
 
-### Where Docmancer MCP wins
+### Where DocAtlas MCP wins
 
-1. **Warm query latency.** After indexing, Docmancer returned results around ~1s versus Context7's observed ~2s.
+1. **Warm query latency.** After indexing, DocAtlas returned results around ~1s versus Context7's observed ~2s.
 2. **Offline readiness.** Once indexed, the docs are local and can be queried without network access.
-3. **Token-aware context packs.** Docmancer reports raw-token equivalent, compact context tokens, savings percent, and agentic runway. Context7 does not expose equivalent token metrics in this comparison.
-4. **Source and section attribution.** Docmancer returns URL/title plus local section metadata, and project docs can include `source_class`, file path, heading path, and stale state.
-5. **Project-aware wedge.** Docmancer can inspect repo docs and dependency metadata through MCP. This is the major product distinction from Context7, but it still needs a dedicated benchmark run.
+3. **Token-aware context packs.** DocAtlas reports raw-token equivalent, compact context tokens, savings percent, and agentic runway. Context7 does not expose equivalent token metrics in this comparison.
+4. **Source and section attribution.** DocAtlas returns URL/title plus local section metadata, and project docs can include `source_class`, file path, heading path, and stale state.
+5. **Project-aware wedge.** DocAtlas can inspect repo docs and dependency metadata through MCP. This is the major product distinction from Context7, but it still needs a dedicated benchmark run.
 
-## Root causes of Docmancer misses
+## Root causes of DocAtlas misses
 
 ### 1. Locale/translation pollution
 
@@ -168,7 +168,7 @@ This polluted the corpus and contributed to the `rp_ref_watch_listen` miss. The 
 
 ### 2. Low source diversity in top-K
 
-Docmancer often returned multiple sections from the same source page:
+DocAtlas often returned multiple sections from the same source page:
 
 - `auto_dispose` repeated for provider lifecycle;
 - `family` repeated for family/FutureProvider;
@@ -178,7 +178,7 @@ This is sometimes useful, but it wastes top-K slots when a coding agent needs br
 
 ### 3. Code examples are embedded, not snippet-first
 
-Docmancer included examples inside sections, while Context7 presented snippets more directly. For agent coding tasks, snippet usability should be scored explicitly.
+DocAtlas included examples inside sections, while Context7 presented snippets more directly. For agent coding tasks, snippet usability should be scored explicitly.
 
 ### 4. Hybrid degradation was under-reported
 
@@ -194,11 +194,11 @@ The eval JSON did not make this degradation visible enough. Future reports shoul
 
 | Hypothesis | Current result | Assessment |
 |---|---|---|
-| H1 — Public docs / quick lookup | Context7 5/5, Docmancer 4/5 | Context7 currently wins. Docmancer is close but needs source hygiene and top-K diversity. |
+| H1 — Public docs / quick lookup | Context7 5/5, DocAtlas 4/5 | Context7 currently wins. DocAtlas is close but needs source hygiene and top-K diversity. |
 | H2 — Project-aware exact versions | Not tested | Needs dedicated Dartdoc/lockfile suite. |
 | H3 — Project-owned docs + library docs | Not tested in this Riverpod run | Product capability exists, but comparison needs a fixture where local docs are required. |
-| H4 — Offline / repeated loop | Docmancer indexed locally and was faster warm | Docmancer wins warm/offline scenario. |
-| H5 — Context efficiency | Docmancer reported 45.5% token savings on one query | Promising, but must measure every query. |
+| H4 — Offline / repeated loop | DocAtlas indexed locally and was faster warm | DocAtlas wins warm/offline scenario. |
+| H5 — Context efficiency | DocAtlas reported 45.5% token savings on one query | Promising, but must measure every query. |
 
 ## Product interpretation
 
@@ -215,9 +215,9 @@ It is particularly good when:
 - snippet presentation matters more than local ownership;
 - the user wants no setup and no indexing.
 
-### Docmancer MCP's best lane
+### DocAtlas MCP's best lane
 
-Docmancer is strongest when the user asks:
+DocAtlas is strongest when the user asks:
 
 > “Answer from the docs this project actually uses.”
 
@@ -237,13 +237,13 @@ It is particularly valuable when:
 Current Context7 scoring is manual. The next run should:
 
 - persist Context7 raw outputs as snapshots;
-- normalize Context7 and Docmancer results into the same schema;
+- normalize Context7 and DocAtlas results into the same schema;
 - grade both providers with the same evaluator;
 - measure token counts for every query;
 - add `unique_sources@5`, redundancy rate, and locale contamination rate;
 - mark degraded retrieval mode in the result JSON.
 
-### 2. Re-run Riverpod after Docmancer source hygiene fixes
+### 2. Re-run Riverpod after DocAtlas source hygiene fixes
 
 Target improvements:
 
@@ -254,7 +254,7 @@ Target improvements:
 
 Target outcome:
 
-| Metric | Current Docmancer | Target Docmancer |
+| Metric | Current DocAtlas | Target DocAtlas |
 |---|---:|---:|
 | Riverpod Hit@5 | 0.8 | 1.0 |
 | Locale contamination | high | 0 in default top 5 |
@@ -263,7 +263,7 @@ Target outcome:
 
 ### 3. Add exact-version Dartdoc benchmark
 
-This is the most important next suite because it tests Docmancer's differentiation.
+This is the most important next suite because it tests DocAtlas's differentiation.
 
 Use a Flutter/Riverpod fixture with `pubspec.lock`, then index concrete Dartdoc pages, not only root pages. Candidate seed pages:
 
@@ -292,7 +292,7 @@ Create a fixture where the correct answer requires both:
 
 Success criteria:
 
-- Docmancer result includes at least one project-owned source and one library source;
+- DocAtlas result includes at least one project-owned source and one library source;
 - Context7 cannot pass by using only public docs unless project context is manually injected;
 - answer includes project-specific constraints, not just generic library advice.
 
@@ -316,7 +316,7 @@ Measure:
 - docs tokens consumed;
 - correction loops.
 
-## Roadmap actions for Docmancer
+## Roadmap actions for DocAtlas
 
 Priority fixes from this comparison:
 
@@ -330,10 +330,10 @@ Priority fixes from this comparison:
 
 ## Final conclusion
 
-The current result is not “Context7 wins” or “Docmancer wins” globally. The result is:
+The current result is not “Context7 wins” or “DocAtlas wins” globally. The result is:
 
 - **Context7 wins the current public-docs quick lookup benchmark.** It is cleaner and requires no setup.
-- **Docmancer wins the local/repeated/offline/token-aware direction.** It already shows faster warm queries and richer context metadata.
-- **Docmancer's decisive comparison still needs exact-version and project-owned-docs suites.** Those are the scenarios where Context7 is least able to substitute Docmancer's local MCP workflow.
+- **DocAtlas wins the local/repeated/offline/token-aware direction.** It already shows faster warm queries and richer context metadata.
+- **DocAtlas's decisive comparison still needs exact-version and project-owned-docs suites.** Those are the scenarios where Context7 is least able to substitute DocAtlas's local MCP workflow.
 
 The next report should therefore not only re-run Riverpod. It should add exact-version Dartdoc and project-docs tasks, because those test the actual product wedge: docs context from the project and dependency versions the agent is really working with.
