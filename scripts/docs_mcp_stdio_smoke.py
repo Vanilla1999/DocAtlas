@@ -18,6 +18,9 @@ NEEDLE = "The amber lighthouse invariant requires deterministic offline release 
 
 
 def payload(result: object) -> dict:
+    structured = getattr(result, "structuredContent", None)
+    if isinstance(structured, dict):
+        return structured
     content = getattr(result, "content", [])
     if not content or not hasattr(content[0], "text"):
         raise AssertionError(f"missing JSON tool response: {result!r}")

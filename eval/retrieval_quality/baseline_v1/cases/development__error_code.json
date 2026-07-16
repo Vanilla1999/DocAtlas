@@ -1,0 +1,102 @@
+{
+  "candidates": [
+    {
+      "authority": "canonical",
+      "content_sha256": "a0670d0567fcb5f9ace882d725c7d8331f608fbf3d091c53bb7d789076edf786",
+      "excerpt": "# E_WIDGET_42 retry budget E_WIDGET_42 means the retry budget was exhausted. Inspect backoff configuration and retry at most three times.",
+      "rank": 1,
+      "ranking": {
+        "base_utility": 9.933273334751,
+        "candidate_pool_size": 1,
+        "feature_contributions": {
+          "title_term_boost": 4.5
+        },
+        "final_rank": 1,
+        "final_utility": 14.433273334751,
+        "rank_delta": 0,
+        "raw_component_ranks": {
+          "fts5_bm25_cost": -9.933273334751
+        },
+        "raw_rank": 1,
+        "score_direction": "higher_is_better",
+        "section_id": 4,
+        "stable_id": "lex-f1fc1139c3dd23dada8f"
+      },
+      "section": "E_WIDGET_42 retry budget",
+      "source": "docs/errors.md",
+      "stable_id": "lex-f1fc1139c3dd23dada8f",
+      "token_estimate": 35,
+      "version": "2.0"
+    }
+  ],
+  "capabilities": {
+    "dense": "not_requested",
+    "hybrid": "not_requested",
+    "lexical": "available",
+    "sparse": "not_requested"
+  },
+  "expected_sources": [
+    {
+      "relevance": 3,
+      "source": "docs/errors.md"
+    }
+  ],
+  "first_expected_rank": 1,
+  "forbidden_source_hits": [],
+  "forbidden_version_hits": [],
+  "found_facts": [
+    "E_WIDGET_42",
+    "three times"
+  ],
+  "id": "error_code",
+  "metrics": {
+    "authoritative_source_at_1": true,
+    "candidate_tokens": 35,
+    "degraded_mode": false,
+    "duplicate_rate@5": 0.0,
+    "exact_identifier_at_1": true,
+    "forbidden_source_violation": false,
+    "forbidden_version_violation": false,
+    "insufficient_evidence_pass": null,
+    "latency_ms": 1.6305329918395728,
+    "model_visible_tokens": 164,
+    "ndcg@20": 1.0,
+    "recall@1": 1.0,
+    "recall@20": 1.0,
+    "recall@3": 1.0,
+    "recall@5": 1.0,
+    "reciprocal_rank": 1.0,
+    "required_fact_pass": true,
+    "required_facts_per_1000_model_visible_tokens": 12.195121951219512,
+    "selected_evidence_tokens": 35,
+    "snippet_required_pass": null,
+    "unique_sources@5": 1,
+    "unknown_version_rate": 0.0
+  },
+  "paraphrase_group": "widget_retry_error",
+  "projection": {
+    "estimated_tokens": 164,
+    "kind": "docs_answer",
+    "source_content_hashes": [
+      "39c36adbcc1692af3ecb221b7849eb43728a3fa5aeab51b140438151f395d583"
+    ],
+    "source_evidence_ids": [
+      "ev-bc22584e143984f5"
+    ],
+    "source_paths": [
+      "docs/errors.md"
+    ],
+    "status": "ok"
+  },
+  "query": "E_WIDGET_42 retry budget exhausted",
+  "required_facts": [
+    "E_WIDGET_42",
+    "three times"
+  ],
+  "schema_version": "retrieval-quality-case-result-v1",
+  "selected_evidence_ids": [
+    "lex-f1fc1139c3dd23dada8f"
+  ],
+  "split": "development",
+  "taxonomy_class": "error_code"
+}

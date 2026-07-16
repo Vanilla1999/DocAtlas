@@ -177,3 +177,21 @@ No claim about real-model token savings or answer quality is permitted from this
 ## Handoff to the next task
 
 Task 40 may start only from Task 39's frozen baseline. Every proposed chunking/index variant must be evaluated against the same digests and must report both quality and model-visible token impact.
+
+## Implementation evidence
+
+Implemented on `agent/task39-retrieval-ranking-truth` with these provider-free boundaries:
+
+- `python -m eval.retrieval_quality_baseline --output-dir <dir>` builds a temporary local SQLite fixture index and writes one scalar summary plus bounded per-case candidate traces;
+- `--baseline eval/retrieval_quality/baseline_v1/summary.json` fails on Recall@5, MRR, required-fact, or forbidden-source/version regressions in any split;
+- the frozen deterministic result digest is `7339967d86d77dfd3a1a30b56cc2190ced5b69171ff67a2f34073925575a286b`;
+- development, holdout, and adversarial Recall@5, MRR, and required-fact pass rate are all `1.0` in the frozen run;
+- development and holdout forbidden-source/version violation rates are zero;
+- adversarial candidate traces deliberately retain selected-context contamination as a separate visible metric. Task 39 proves candidate ordering; Task 42 must remove ineligible supporting evidence before model projection.
+- the gate compares every protected case independently, so an aggregate improvement cannot hide a case-level Recall@5, reciprocal-rank, required-fact, contamination, or visible-budget regression;
+- source revision binding uses a digest of the ranking, projection, and runner source files, rather than an unresolvable intermediate local Git commit;
+- legacy external-corpus goldens are digest-inventoried as snapshot-only and are not falsely reported as locally executed;
+- the checked-in holdout is the frozen baseline for Task 40 and later variants. It is not a blind pre-change control and therefore does not prove that Task 39 itself improved product quality;
+- focused ranking/baseline validation passes with `28 passed`; the full provider-free suite passes with `2208 passed, 10 skipped`; `compileall` and `git diff --check` pass.
+
+This evidence does not claim real-model token savings or answer correctness.

@@ -3,6 +3,8 @@ from __future__ import annotations
 import json
 from typing import Any, cast
 
+import jsonschema
+
 from docmancer.docs.interfaces.mcp.context_tools import context_tools, handle_context_tool
 from docmancer.docs.application.unified_context_service import UnifiedDocsContextService
 from docmancer.docs.models import LibraryInfo
@@ -24,6 +26,17 @@ def test_get_docs_context_schema():
     assert set(schema["properties"]) == {"question", "project_path", "library", "version", "mode"}
     assert schema["properties"]["mode"]["enum"] == ["auto", "project", "library", "mixed"]
     assert {"delivery_strategy", "packet_tokens", "output_mode", "maintenance", "details"}.isdisjoint(schema["properties"])
+
+
+def test_get_docs_context_output_schema_accepts_bounded_and_compatibility_statuses():
+    tool = next(tool for tool in TOOLS if tool["name"] == "get_docs_context")
+
+    for status in (
+        "ok", "truncated", "insufficient_evidence", "failed",
+        "success", "partial_success", "confirmation_required",
+        "not_found", "invalid_request",
+    ):
+        jsonschema.validate({"status": status}, tool["outputSchema"])
 
 
 def test_get_docs_context_exposes_fail_closed_change_maintenance_brief(tmp_path):

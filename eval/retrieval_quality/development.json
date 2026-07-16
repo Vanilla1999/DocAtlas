@@ -1,0 +1,75 @@
+{
+  "schema_version": "retrieval-quality-cases-v1",
+  "split": "development",
+  "cases": [
+    {
+      "id": "exact_api_identifier",
+      "taxonomy_class": "exact_api_identifier",
+      "paraphrase_group": "widgetclient_fetch_record",
+      "query": "WidgetClient fetch_record timeout",
+      "expected_sources": [{"source": "docs/api-client.md", "relevance": 3}],
+      "required_facts": ["WidgetClient.fetch_record", "timeout"],
+      "forbidden_sources": ["mirrors/api-client-es.md"],
+      "exact_identifier": "WidgetClient.fetch_record",
+      "requires_code_snippet": true,
+      "expected_authority": "canonical"
+    },
+    {
+      "id": "configuration_key",
+      "taxonomy_class": "configuration_key",
+      "paraphrase_group": "cache_mode_configuration",
+      "query": "cache_mode widget.toml bounded",
+      "expected_sources": [{"source": "docs/configuration.md", "relevance": 3}],
+      "required_facts": ["cache_mode", "bounded"],
+      "forbidden_sources": ["legal/terms.md"],
+      "exact_identifier": "cache_mode",
+      "requires_code_snippet": true,
+      "expected_authority": "canonical"
+    },
+    {
+      "id": "cli_flag",
+      "taxonomy_class": "cli_flag",
+      "query": "widget sync dry run",
+      "expected_sources": [{"source": "docs/cli.md", "relevance": 3}],
+      "required_facts": ["widget-sync", "--dry-run"],
+      "forbidden_sources": [],
+      "exact_identifier": "--dry-run",
+      "requires_code_snippet": false,
+      "expected_authority": "canonical"
+    },
+    {
+      "id": "error_code",
+      "taxonomy_class": "error_code",
+      "paraphrase_group": "widget_retry_error",
+      "query": "E_WIDGET_42 retry budget exhausted",
+      "expected_sources": [{"source": "docs/errors.md", "relevance": 3}],
+      "required_facts": ["E_WIDGET_42", "three times"],
+      "forbidden_sources": ["generated/error-catalog.md"],
+      "exact_identifier": "E_WIDGET_42",
+      "requires_code_snippet": false,
+      "expected_authority": "canonical"
+    },
+    {
+      "id": "concept_synonyms",
+      "taxonomy_class": "conceptual_synonyms",
+      "paraphrase_group": "bounded_backpressure",
+      "query": "backpressure producer consumer bounded queue",
+      "expected_sources": [{"source": "docs/backpressure.md", "relevance": 3}],
+      "required_facts": ["high-water mark", "bounded queue"],
+      "forbidden_sources": [],
+      "requires_code_snippet": false,
+      "expected_authority": "canonical"
+    },
+    {
+      "id": "code_example",
+      "taxonomy_class": "code_example",
+      "query": "WidgetClient fetch_record record_id example",
+      "expected_sources": [{"source": "docs/api-client.md", "relevance": 3}],
+      "required_facts": ["record_id", "WidgetClient"],
+      "forbidden_sources": [],
+      "exact_identifier": "WidgetClient.fetch_record",
+      "requires_code_snippet": true,
+      "expected_authority": "canonical"
+    }
+  ]
+}

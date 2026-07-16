@@ -1,0 +1,102 @@
+{
+  "candidates": [
+    {
+      "authority": "canonical",
+      "content_sha256": "db100b35104e867beebcf3351ab8bd90ec6d02007fb3ee445dc748659aae4c87",
+      "excerpt": "# Queue backpressure Backpressure keeps a fast producer from overwhelming a slow consumer. Use a bounded queue and pause the producer at the high-water mark.",
+      "rank": 1,
+      "ranking": {
+        "base_utility": 13.055475864456,
+        "candidate_pool_size": 1,
+        "feature_contributions": {
+          "title_term_boost": 3.0
+        },
+        "final_rank": 1,
+        "final_utility": 16.055475864456,
+        "rank_delta": 0,
+        "raw_component_ranks": {
+          "fts5_bm25_cost": -13.055475864456
+        },
+        "raw_rank": 1,
+        "score_direction": "higher_is_better",
+        "section_id": 5,
+        "stable_id": "lex-7d73122094b9c16cee9d"
+      },
+      "section": "Queue backpressure",
+      "source": "docs/backpressure.md",
+      "stable_id": "lex-7d73122094b9c16cee9d",
+      "token_estimate": 40,
+      "version": "2.0"
+    }
+  ],
+  "capabilities": {
+    "dense": "not_requested",
+    "hybrid": "not_requested",
+    "lexical": "available",
+    "sparse": "not_requested"
+  },
+  "expected_sources": [
+    {
+      "relevance": 3,
+      "source": "docs/backpressure.md"
+    }
+  ],
+  "first_expected_rank": 1,
+  "forbidden_source_hits": [],
+  "forbidden_version_hits": [],
+  "found_facts": [
+    "high-water mark",
+    "bounded queue"
+  ],
+  "id": "concept_synonyms",
+  "metrics": {
+    "authoritative_source_at_1": true,
+    "candidate_tokens": 40,
+    "degraded_mode": false,
+    "duplicate_rate@5": 0.0,
+    "exact_identifier_at_1": null,
+    "forbidden_source_violation": false,
+    "forbidden_version_violation": false,
+    "insufficient_evidence_pass": null,
+    "latency_ms": 2.1243989904178306,
+    "model_visible_tokens": 174,
+    "ndcg@20": 1.0,
+    "recall@1": 1.0,
+    "recall@20": 1.0,
+    "recall@3": 1.0,
+    "recall@5": 1.0,
+    "reciprocal_rank": 1.0,
+    "required_fact_pass": true,
+    "required_facts_per_1000_model_visible_tokens": 11.494252873563218,
+    "selected_evidence_tokens": 40,
+    "snippet_required_pass": null,
+    "unique_sources@5": 1,
+    "unknown_version_rate": 0.0
+  },
+  "paraphrase_group": "bounded_backpressure",
+  "projection": {
+    "estimated_tokens": 174,
+    "kind": "docs_answer",
+    "source_content_hashes": [
+      "318cec0b7f1b47b4baf3cb8f2ce825061cdf92bb501323e3bc2da34e99de051c"
+    ],
+    "source_evidence_ids": [
+      "ev-c1b6bfc546c57dc0"
+    ],
+    "source_paths": [
+      "docs/backpressure.md"
+    ],
+    "status": "ok"
+  },
+  "query": "backpressure producer consumer bounded queue",
+  "required_facts": [
+    "high-water mark",
+    "bounded queue"
+  ],
+  "schema_version": "retrieval-quality-case-result-v1",
+  "selected_evidence_ids": [
+    "lex-7d73122094b9c16cee9d"
+  ],
+  "split": "development",
+  "taxonomy_class": "conceptual_synonyms"
+}

@@ -1,0 +1,140 @@
+{
+  "candidates": [
+    {
+      "authority": "project_rule",
+      "content_sha256": "3cd7340af5bd064ec513e04aa1afa7935b8abe2a60ca795d0a9b81452b0641ab",
+      "excerpt": "# DocAtlas canonical offline source policy This repository rule makes repository-owned documentation authoritative for project decisions. Offline retrieval must not silently substitute generic externa",
+      "rank": 1,
+      "ranking": {
+        "base_utility": 12.89661591625,
+        "candidate_pool_size": 2,
+        "feature_contributions": {
+          "boilerplate_title_penalty": -3.0,
+          "project_rule_authority_boost": 2.0,
+          "title_term_boost": 6.0
+        },
+        "final_rank": 1,
+        "final_utility": 17.89661591625,
+        "rank_delta": 0,
+        "raw_component_ranks": {
+          "fts5_bm25_cost": -12.89661591625
+        },
+        "raw_rank": 1,
+        "score_direction": "higher_is_better",
+        "section_id": 7,
+        "stable_id": "lex-e98fc50fd16723d1cd75"
+      },
+      "section": "DocAtlas canonical offline source policy",
+      "source": "docs/project-policy.md",
+      "stable_id": "lex-e98fc50fd16723d1cd75",
+      "token_estimate": 53,
+      "version": "project"
+    },
+    {
+      "authority": "external_generic",
+      "content_sha256": "710de3bbe7f775f9fa0d6688fd57a40cfad6629d0c43b5432f97ad20c5d08cce",
+      "excerpt": "# Generic offline documentation policy Generic offline source policy advice may differ from the DocAtlas repository rule.",
+      "rank": 2,
+      "ranking": {
+        "base_utility": 12.522868633616,
+        "candidate_pool_size": 2,
+        "feature_contributions": {
+          "boilerplate_title_penalty": -3.0,
+          "external_generic_authority_penalty": -1.5,
+          "title_term_boost": 3.0
+        },
+        "final_rank": 2,
+        "final_utility": 11.022868633616,
+        "rank_delta": 0,
+        "raw_component_ranks": {
+          "fts5_bm25_cost": -12.522868633616
+        },
+        "raw_rank": 2,
+        "score_direction": "higher_is_better",
+        "section_id": 14,
+        "stable_id": "lex-1c408c74ee93f37628a8"
+      },
+      "section": "Generic offline documentation policy",
+      "source": "external/generic-policy.md",
+      "stable_id": "lex-1c408c74ee93f37628a8",
+      "token_estimate": 31,
+      "version": "unversioned"
+    }
+  ],
+  "capabilities": {
+    "dense": "not_requested",
+    "hybrid": "not_requested",
+    "lexical": "available",
+    "sparse": "not_requested"
+  },
+  "expected_sources": [
+    {
+      "relevance": 3,
+      "source": "docs/project-policy.md"
+    }
+  ],
+  "first_expected_rank": 1,
+  "forbidden_source_hits": [
+    "external/generic-policy.md"
+  ],
+  "forbidden_version_hits": [],
+  "found_facts": [
+    "project decisions",
+    "generic external"
+  ],
+  "id": "project_over_generic",
+  "metrics": {
+    "authoritative_source_at_1": true,
+    "candidate_tokens": 84,
+    "degraded_mode": false,
+    "duplicate_rate@5": 0.0,
+    "exact_identifier_at_1": null,
+    "forbidden_source_violation": true,
+    "forbidden_version_violation": false,
+    "insufficient_evidence_pass": null,
+    "latency_ms": 1.0084300010930747,
+    "model_visible_tokens": 304,
+    "ndcg@20": 1.0,
+    "recall@1": 1.0,
+    "recall@20": 1.0,
+    "recall@3": 1.0,
+    "recall@5": 1.0,
+    "reciprocal_rank": 1.0,
+    "required_fact_pass": true,
+    "required_facts_per_1000_model_visible_tokens": 6.578947368421052,
+    "selected_evidence_tokens": 84,
+    "snippet_required_pass": null,
+    "unique_sources@5": 2,
+    "unknown_version_rate": 0.0
+  },
+  "paraphrase_group": "docatlas_offline_policy",
+  "projection": {
+    "estimated_tokens": 304,
+    "kind": "docs_answer",
+    "source_content_hashes": [
+      "ebcf1bd81ddbdaf0417740686ce8b6aa5f239efd4669d7355a8ff7d70a8c8302",
+      "cf2b7e356518d5189a7efdf182d6b9ab2ef8c6fccb53e6845cc180e7a9434967"
+    ],
+    "source_evidence_ids": [
+      "ev-3e9c937b7d7d7170",
+      "ev-fb1987cbdd10c92c"
+    ],
+    "source_paths": [
+      "docs/project-policy.md",
+      "external/generic-policy.md"
+    ],
+    "status": "ok"
+  },
+  "query": "DocAtlas offline source policy repository rule",
+  "required_facts": [
+    "project decisions",
+    "generic external"
+  ],
+  "schema_version": "retrieval-quality-case-result-v1",
+  "selected_evidence_ids": [
+    "lex-e98fc50fd16723d1cd75",
+    "lex-1c408c74ee93f37628a8"
+  ],
+  "split": "adversarial",
+  "taxonomy_class": "authority_conflict"
+}

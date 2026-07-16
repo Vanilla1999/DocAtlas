@@ -1,0 +1,197 @@
+{
+  "candidates": [
+    {
+      "authority": "canonical",
+      "content_sha256": "a92aae16b08c418e7e63de4fffc770ef9a041526c55085c311d15c7018665004",
+      "excerpt": "# WidgetClient fetch_record API WidgetClient.fetch_record(record_id, timeout=5) fetches one record. The timeout argument is measured in seconds. ```python record = WidgetClient().fetch_record(record_i",
+      "rank": 1,
+      "ranking": {
+        "base_utility": 5.495339400139,
+        "candidate_pool_size": 4,
+        "feature_contributions": {
+          "title_term_boost": 3.0
+        },
+        "final_rank": 1,
+        "final_utility": 8.495339400139,
+        "rank_delta": 0,
+        "raw_component_ranks": {
+          "fts5_bm25_cost": -5.495339400139
+        },
+        "raw_rank": 1,
+        "score_direction": "higher_is_better",
+        "section_id": 1,
+        "stable_id": "lex-49ea156c36dd7d6b497e"
+      },
+      "section": "WidgetClient fetch_record API",
+      "source": "docs/api-client.md",
+      "stable_id": "lex-49ea156c36dd7d6b497e",
+      "token_estimate": 57,
+      "version": "2.0"
+    },
+    {
+      "authority": "canonical",
+      "content_sha256": "f5eb2d83112c04a9a2e0d964d74d15944f53ddac8a3a8eafec7a1c58c03fedf9",
+      "excerpt": "# WidgetClient version 2 migration In version 2, fetch_record is async. Migrate by awaiting WidgetClient.fetch_record and remove the legacy blocking adapter.",
+      "rank": 2,
+      "ranking": {
+        "base_utility": 2.485045056803,
+        "candidate_pool_size": 4,
+        "feature_contributions": {
+          "title_term_boost": 1.5
+        },
+        "final_rank": 2,
+        "final_utility": 3.985045056803,
+        "rank_delta": 2,
+        "raw_component_ranks": {
+          "fts5_bm25_cost": -2.485045056803
+        },
+        "raw_rank": 4,
+        "score_direction": "higher_is_better",
+        "section_id": 6,
+        "stable_id": "lex-97cb7d3764a92933ade6"
+      },
+      "section": "WidgetClient version 2 migration",
+      "source": "docs/migration-v2.md",
+      "stable_id": "lex-97cb7d3764a92933ade6",
+      "token_estimate": 40,
+      "version": "2.0"
+    },
+    {
+      "authority": "stale",
+      "content_sha256": "2503f547100051bdc9c95c992f0085a878478abc5f648711d6c1f51776b96e76",
+      "excerpt": "# WidgetClient version 1 fetch_record In version 1, WidgetClient fetch_record is blocking and uses the legacy adapter.",
+      "rank": 3,
+      "ranking": {
+        "base_utility": 2.728823212216,
+        "candidate_pool_size": 4,
+        "feature_contributions": {
+          "stale_authority_penalty": -3.0,
+          "title_term_boost": 3.0
+        },
+        "final_rank": 3,
+        "final_utility": 2.728823212216,
+        "rank_delta": -1,
+        "raw_component_ranks": {
+          "fts5_bm25_cost": -2.728823212216
+        },
+        "raw_rank": 2,
+        "score_direction": "higher_is_better",
+        "section_id": 10,
+        "stable_id": "lex-9de4814ec8b0c8e85838"
+      },
+      "section": "WidgetClient version 1 fetch_record",
+      "source": "archive/widget-v1.md",
+      "stable_id": "lex-9de4814ec8b0c8e85838",
+      "token_estimate": 30,
+      "version": "1.0"
+    },
+    {
+      "authority": "mirror",
+      "content_sha256": "2f36fbe6db9383d51b350df18bcd51367ac359b3f5ed24118bc39362e530e55c",
+      "excerpt": "# WidgetClient fetch_record unofficial mirror WidgetClient fetch_record official API copy. This mirror has no verified version binding.",
+      "rank": 4,
+      "ranking": {
+        "base_utility": 2.709271766479,
+        "candidate_pool_size": 4,
+        "feature_contributions": {
+          "mirror_authority_penalty": -3.0,
+          "title_term_boost": 3.0
+        },
+        "final_rank": 4,
+        "final_utility": 2.709271766479,
+        "rank_delta": -1,
+        "raw_component_ranks": {
+          "fts5_bm25_cost": -2.709271766479
+        },
+        "raw_rank": 3,
+        "score_direction": "higher_is_better",
+        "section_id": 13,
+        "stable_id": "lex-0b54db91e156c7969be8"
+      },
+      "section": "WidgetClient fetch_record unofficial mirror",
+      "source": "mirrors/api-client-es.md",
+      "stable_id": "lex-0b54db91e156c7969be8",
+      "token_estimate": 34,
+      "version": "unknown"
+    }
+  ],
+  "capabilities": {
+    "dense": "not_requested",
+    "hybrid": "not_requested",
+    "lexical": "available",
+    "sparse": "not_requested"
+  },
+  "expected_sources": [
+    {
+      "relevance": 3,
+      "source": "docs/api-client.md"
+    }
+  ],
+  "first_expected_rank": 1,
+  "forbidden_source_hits": [],
+  "forbidden_version_hits": [],
+  "found_facts": [
+    "record_id",
+    "WidgetClient"
+  ],
+  "id": "code_example",
+  "metrics": {
+    "authoritative_source_at_1": true,
+    "candidate_tokens": 161,
+    "degraded_mode": false,
+    "duplicate_rate@5": 0.0,
+    "exact_identifier_at_1": true,
+    "forbidden_source_violation": false,
+    "forbidden_version_violation": false,
+    "insufficient_evidence_pass": null,
+    "latency_ms": 2.762894000625238,
+    "model_visible_tokens": 407,
+    "ndcg@20": 1.0,
+    "recall@1": 1.0,
+    "recall@20": 1.0,
+    "recall@3": 1.0,
+    "recall@5": 1.0,
+    "reciprocal_rank": 1.0,
+    "required_fact_pass": true,
+    "required_facts_per_1000_model_visible_tokens": 4.914004914004914,
+    "selected_evidence_tokens": 161,
+    "snippet_required_pass": true,
+    "unique_sources@5": 4,
+    "unknown_version_rate": 0.25
+  },
+  "paraphrase_group": null,
+  "projection": {
+    "estimated_tokens": 407,
+    "kind": "docs_answer",
+    "source_content_hashes": [
+      "abc0af42673077bb9379d2f9fc5dcc7926a83ede208a5ef6b494c15b31cebe69",
+      "caa4da3084faee7cd58b1f8c2bd726a3a58101df3ef137149d36e4e78dbd8514",
+      "3a4afbb13600490d9514565289844bc63c0dd2bd9fc5bf836f4619150f6d898b"
+    ],
+    "source_evidence_ids": [
+      "ev-03e96cc51dcf04f5",
+      "ev-15f4fd85e932fe77",
+      "ev-ca137d62ffa7f5cc"
+    ],
+    "source_paths": [
+      "docs/api-client.md",
+      "docs/migration-v2.md",
+      "archive/widget-v1.md"
+    ],
+    "status": "ok"
+  },
+  "query": "WidgetClient fetch_record record_id example",
+  "required_facts": [
+    "record_id",
+    "WidgetClient"
+  ],
+  "schema_version": "retrieval-quality-case-result-v1",
+  "selected_evidence_ids": [
+    "lex-49ea156c36dd7d6b497e",
+    "lex-97cb7d3764a92933ade6",
+    "lex-9de4814ec8b0c8e85838",
+    "lex-0b54db91e156c7969be8"
+  ],
+  "split": "development",
+  "taxonomy_class": "code_example"
+}

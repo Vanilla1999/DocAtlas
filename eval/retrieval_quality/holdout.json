@@ -1,0 +1,61 @@
+{
+  "schema_version": "retrieval-quality-cases-v1",
+  "split": "holdout",
+  "cases": [
+    {
+      "id": "version_migration",
+      "taxonomy_class": "migration_version",
+      "paraphrase_group": "widgetclient_v2_migration",
+      "query": "WidgetClient version 2 migration async fetch_record",
+      "expected_sources": [{"source": "docs/migration-v2.md", "relevance": 3}],
+      "required_facts": ["version 2", "awaiting"],
+      "forbidden_sources": ["archive/widget-v1.md"],
+      "forbidden_versions": ["1.0"],
+      "exact_identifier": "fetch_record",
+      "requires_code_snippet": false,
+      "expected_authority": "canonical"
+    },
+    {
+      "id": "project_rule_authority",
+      "taxonomy_class": "project_rule",
+      "paraphrase_group": "docatlas_offline_policy",
+      "query": "DocAtlas canonical offline source policy",
+      "expected_sources": [{"source": "docs/project-policy.md", "relevance": 3}],
+      "required_facts": ["Repository-owned", "authoritative"],
+      "forbidden_sources": ["external/generic-policy.md"],
+      "requires_code_snippet": false,
+      "expected_authority": "project_rule"
+    },
+    {
+      "id": "cross_module_contract",
+      "taxonomy_class": "multi_document_requirement",
+      "query": "gateway worker idempotency contract identifier",
+      "expected_sources": [{"source": "docs/cross-module.md", "relevance": 3}],
+      "required_facts": ["gateway", "worker", "request identifier"],
+      "forbidden_sources": [],
+      "requires_code_snippet": false,
+      "expected_authority": "project_rule"
+    },
+    {
+      "id": "russian_paraphrase",
+      "taxonomy_class": "russian_paraphrase",
+      "paraphrase_group": "bounded_backpressure",
+      "query": "очередь ограничение нагрузки производитель потребитель",
+      "expected_sources": [{"source": "docs/ru-backpressure.md", "relevance": 3}],
+      "required_facts": ["медленного потребителя", "верхнего порога"],
+      "forbidden_sources": [],
+      "requires_code_snippet": false,
+      "expected_authority": "canonical"
+    },
+    {
+      "id": "insufficient_evidence",
+      "taxonomy_class": "insufficient_evidence",
+      "query": "quantum teleportation quasar protocol",
+      "expected_sources": [],
+      "required_facts": [],
+      "forbidden_sources": [],
+      "requires_code_snippet": false,
+      "expect_insufficient_evidence": true
+    }
+  ]
+}

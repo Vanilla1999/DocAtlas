@@ -1,0 +1,102 @@
+{
+  "candidates": [
+    {
+      "authority": "canonical",
+      "content_sha256": "7433ffc7f6ea15bdd4ce726f85fc7c37793d569223a6248cea0b2a1f2362e406",
+      "excerpt": "# Configure widget cache mode Set cache_mode in widget.toml. Supported values are bounded and disabled. ```toml cache_mode = \"bounded\" ```",
+      "rank": 1,
+      "ranking": {
+        "base_utility": 8.615285207463,
+        "candidate_pool_size": 1,
+        "feature_contributions": {
+          "title_term_boost": 1.5
+        },
+        "final_rank": 1,
+        "final_utility": 10.115285207463,
+        "rank_delta": 0,
+        "raw_component_ranks": {
+          "fts5_bm25_cost": -8.615285207463
+        },
+        "raw_rank": 1,
+        "score_direction": "higher_is_better",
+        "section_id": 2,
+        "stable_id": "lex-cde98ff32cc592ecc053"
+      },
+      "section": "Configure widget cache mode",
+      "source": "docs/configuration.md",
+      "stable_id": "lex-cde98ff32cc592ecc053",
+      "token_estimate": 35,
+      "version": "2.0"
+    }
+  ],
+  "capabilities": {
+    "dense": "not_requested",
+    "hybrid": "not_requested",
+    "lexical": "available",
+    "sparse": "not_requested"
+  },
+  "expected_sources": [
+    {
+      "relevance": 3,
+      "source": "docs/configuration.md"
+    }
+  ],
+  "first_expected_rank": 1,
+  "forbidden_source_hits": [],
+  "forbidden_version_hits": [],
+  "found_facts": [
+    "cache_mode",
+    "bounded"
+  ],
+  "id": "configuration_key",
+  "metrics": {
+    "authoritative_source_at_1": true,
+    "candidate_tokens": 35,
+    "degraded_mode": false,
+    "duplicate_rate@5": 0.0,
+    "exact_identifier_at_1": true,
+    "forbidden_source_violation": false,
+    "forbidden_version_violation": false,
+    "insufficient_evidence_pass": null,
+    "latency_ms": 0.9941640018951148,
+    "model_visible_tokens": 171,
+    "ndcg@20": 1.0,
+    "recall@1": 1.0,
+    "recall@20": 1.0,
+    "recall@3": 1.0,
+    "recall@5": 1.0,
+    "reciprocal_rank": 1.0,
+    "required_fact_pass": true,
+    "required_facts_per_1000_model_visible_tokens": 11.695906432748538,
+    "selected_evidence_tokens": 35,
+    "snippet_required_pass": true,
+    "unique_sources@5": 1,
+    "unknown_version_rate": 0.0
+  },
+  "paraphrase_group": "cache_mode_configuration",
+  "projection": {
+    "estimated_tokens": 171,
+    "kind": "docs_answer",
+    "source_content_hashes": [
+      "183911f8a85268cced9a2ff52f94c0f55850bbc75aa5f403daefbb1e4c6ba059"
+    ],
+    "source_evidence_ids": [
+      "ev-b2251825b6dc8fad"
+    ],
+    "source_paths": [
+      "docs/configuration.md"
+    ],
+    "status": "ok"
+  },
+  "query": "cache_mode widget.toml bounded",
+  "required_facts": [
+    "cache_mode",
+    "bounded"
+  ],
+  "schema_version": "retrieval-quality-case-result-v1",
+  "selected_evidence_ids": [
+    "lex-cde98ff32cc592ecc053"
+  ],
+  "split": "development",
+  "taxonomy_class": "configuration_key"
+}

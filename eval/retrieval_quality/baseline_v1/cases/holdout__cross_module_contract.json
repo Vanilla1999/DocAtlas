@@ -1,0 +1,104 @@
+{
+  "candidates": [
+    {
+      "authority": "project_rule",
+      "content_sha256": "9c63565881e1fd6149aacf1d6ebda3b6912491b42b63f8c95701494deed45d05",
+      "excerpt": "# Gateway worker idempotency contract The gateway creates an idempotency key and the worker persists it before acknowledgement. Both modules must preserve the same request identifier.",
+      "rank": 1,
+      "ranking": {
+        "base_utility": 15.248952108247,
+        "candidate_pool_size": 1,
+        "feature_contributions": {
+          "title_term_boost": 6.0
+        },
+        "final_rank": 1,
+        "final_utility": 21.248952108247,
+        "rank_delta": 0,
+        "raw_component_ranks": {
+          "fts5_bm25_cost": -15.248952108247
+        },
+        "raw_rank": 1,
+        "score_direction": "higher_is_better",
+        "section_id": 8,
+        "stable_id": "lex-f89d7ec74b55d21c7373"
+      },
+      "section": "Gateway worker idempotency contract",
+      "source": "docs/cross-module.md",
+      "stable_id": "lex-f89d7ec74b55d21c7373",
+      "token_estimate": 46,
+      "version": "project"
+    }
+  ],
+  "capabilities": {
+    "dense": "not_requested",
+    "hybrid": "not_requested",
+    "lexical": "available",
+    "sparse": "not_requested"
+  },
+  "expected_sources": [
+    {
+      "relevance": 3,
+      "source": "docs/cross-module.md"
+    }
+  ],
+  "first_expected_rank": 1,
+  "forbidden_source_hits": [],
+  "forbidden_version_hits": [],
+  "found_facts": [
+    "gateway",
+    "worker",
+    "request identifier"
+  ],
+  "id": "cross_module_contract",
+  "metrics": {
+    "authoritative_source_at_1": true,
+    "candidate_tokens": 46,
+    "degraded_mode": false,
+    "duplicate_rate@5": 0.0,
+    "exact_identifier_at_1": null,
+    "forbidden_source_violation": false,
+    "forbidden_version_violation": false,
+    "insufficient_evidence_pass": null,
+    "latency_ms": 2.726867009187117,
+    "model_visible_tokens": 193,
+    "ndcg@20": 1.0,
+    "recall@1": 1.0,
+    "recall@20": 1.0,
+    "recall@3": 1.0,
+    "recall@5": 1.0,
+    "reciprocal_rank": 1.0,
+    "required_fact_pass": true,
+    "required_facts_per_1000_model_visible_tokens": 15.544041450777202,
+    "selected_evidence_tokens": 46,
+    "snippet_required_pass": null,
+    "unique_sources@5": 1,
+    "unknown_version_rate": 0.0
+  },
+  "paraphrase_group": null,
+  "projection": {
+    "estimated_tokens": 193,
+    "kind": "docs_answer",
+    "source_content_hashes": [
+      "b23200cf9a2fe1ce5bfd767e4a5288536a7516304de0e49f360347184b7d118a"
+    ],
+    "source_evidence_ids": [
+      "ev-3664491ff57747ba"
+    ],
+    "source_paths": [
+      "docs/cross-module.md"
+    ],
+    "status": "ok"
+  },
+  "query": "gateway worker idempotency contract identifier",
+  "required_facts": [
+    "gateway",
+    "worker",
+    "request identifier"
+  ],
+  "schema_version": "retrieval-quality-case-result-v1",
+  "selected_evidence_ids": [
+    "lex-f89d7ec74b55d21c7373"
+  ],
+  "split": "holdout",
+  "taxonomy_class": "multi_document_requirement"
+}
