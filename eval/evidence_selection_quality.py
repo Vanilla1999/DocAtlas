@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import re
 import statistics
 import sys
 import tempfile
@@ -34,6 +35,7 @@ CODE_FILES = (
     "docmancer/docs/application/model_visible_projection.py",
     "docmancer/docs/interfaces/mcp/context_tools.py",
 )
+COMMIT_SHA_PATTERN = re.compile(r"[0-9a-f]{40}")
 
 
 def _canonical_bytes(value: Any) -> bytes:
@@ -53,6 +55,40 @@ def load_cases() -> tuple[list[dict[str, Any]], dict[str, str]]:
         cases.extend(payload["cases"])
         digests[name] = _digest(path)
     return cases, digests
+
+
+def _task41_baseline_gate(
+    task41_report: dict[str, Any],
+    selected_variant: dict[str, Any] | None,
+    baseline: dict[str, Any],
+) -> dict[str, Any]:
+    expected_commit_sha = str(baseline.get("commit_sha") or "")
+    observed_commit_sha = str(task41_report.get("published_commit_sha") or "")
+    commit_sha_match = (
+        COMMIT_SHA_PATTERN.fullmatch(expected_commit_sha) is not None
+        and observed_commit_sha == expected_commit_sha
+    )
+    candidate_trace_hash = str(
+        (selected_variant or {}).get("candidate_trace_hash") or ""
+    )
+    retrieval_config_hash = str(
+        (selected_variant or {}).get("retrieval_config_hash") or ""
+    )
+    baseline_match = (
+        task41_report.get("status") == "PASS"
+        and commit_sha_match
+        and candidate_trace_hash == baseline.get("task41_candidate_trace_hash")
+        and retrieval_config_hash == baseline.get("retrieval_config_hash")
+    )
+    return {
+        "status": task41_report.get("status"),
+        "expected_commit_sha": expected_commit_sha,
+        "observed_commit_sha": observed_commit_sha,
+        "commit_sha_match": commit_sha_match,
+        "candidate_trace_hash": candidate_trace_hash,
+        "retrieval_config_hash": retrieval_config_hash,
+        "baseline_match": baseline_match,
+    }
 
 
 def evaluate_case(case: dict[str, Any]) -> dict[str, Any]:
@@ -173,9 +209,7 @@ def evaluate() -> dict[str, Any]:
         ),
         None,
     )
-    task41_trace_hash = str(
-        (selected_variant or {}).get("candidate_trace_hash") or ""
-    )
+    task41_gate = _task41_baseline_gate(task41_report, selected_variant, baseline)
     groups: dict[str, Any] = {}
     for kind in ("docs_answer", "patch_context"):
         rows = [row for row in results if row["result_kind"] == kind]
@@ -201,12 +235,7 @@ def evaluate() -> dict[str, Any]:
         }
         for kind in groups
     }
-    task41_match = (
-        task41_report["status"] == "PASS"
-        and task41_trace_hash == baseline.get("task41_candidate_trace_hash")
-        and (selected_variant or {}).get("retrieval_config_hash")
-            == baseline.get("retrieval_config_hash")
-    )
+    task41_match = task41_gate["baseline_match"]
     token_gate = all(
         row["median_selector_budgeted_tokens"] <= row["median_legacy_budgeted_tokens"]
         for row in groups.values()
@@ -224,11 +253,8 @@ def evaluate() -> dict[str, Any]:
         "baseline_dataset_digest_match": digest_match,
         "baseline_metrics_match": baseline_metrics_match,
         "task41_gate": {
-            "status": task41_report["status"],
+            **task41_gate,
             "selected_target_tokens": task41_report["selected_target_tokens"],
-            "candidate_trace_hash": task41_trace_hash,
-            "retrieval_config_hash": (selected_variant or {}).get("retrieval_config_hash"),
-            "baseline_match": task41_match,
         },
         "token_gate": "PASS" if token_gate else "FAIL",
         "dataset_digests": digests,

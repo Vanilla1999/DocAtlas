@@ -10,12 +10,12 @@ Reviewed Git tree: `72151113751d159ed059f171faf9aaeb79ae4ee3`
 
 ## Verdict
 
-The stacked merge order and final tree are correct, and no new defect was found in PR #56 (Task 39) or PR #57 (Task 40). Two correctness defects remain in the merged stack:
+The stacked merge order and final tree are correct, and no new defect was found in PR #56 (Task 39) or PR #57 (Task 40). The review found two correctness defects in the merged stack:
 
 1. PR #58 silently broadens filtered legacy lexical queries from FTS AND semantics to OR semantics.
 2. PR #59 stores the published Task 41 SHA but never evaluates it, so the claimed commit binding is not enforced.
 
-Both findings are reproducible from the merged `main` tree. This review branch intentionally changes no production code.
+Both findings were reproducible from the merged `main` tree and are fixed on this review branch with regression coverage.
 
 ## Reviewed merge boundaries
 
@@ -66,6 +66,11 @@ Recommended correction:
 - add a regression test proving that a promoted metadata filter preserves the original multi-term FTS semantics on a legacy-only index;
 - consider narrowing the caught `OperationalError` path or recording the fallback reason so schema mistakes cannot silently alter retrieval semantics.
 
+Resolution on this branch:
+
+- the primary legacy-only query now uses `legacy_filter_sql` together with `legacy_filter_params`;
+- `test_legacy_promoted_filter_preserves_multi_term_fts_semantics` proves that a promoted metadata filter does not broaden a two-term query to OR matching.
+
 ### [P2] Task 41 `commit_sha` is stored but not enforced by the Task 42 acceptance gate
 
 Affected PR: #59
@@ -95,6 +100,12 @@ Recommended correction:
 - expose the expected and observed identity in `task41_gate`;
 - add a regression test that mutates only the baseline identity and requires a failing verdict.
 
+Resolution on this branch:
+
+- the provider-free Task 41 grid now declares `published_commit_sha` independently of the Task 42 baseline;
+- the Task 42 gate validates and compares expected and observed SHA values, exposes both values plus `commit_sha_match`, and fails closed on a mismatch;
+- `test_task42_task41_gate_rejects_commit_sha_mismatch` mutates only the baseline SHA and requires the binding to fail.
+
 ## Review coverage
 
 The review inspected the exact per-PR diffs and the merged behavior for:
@@ -110,7 +121,8 @@ Evidence considered:
 - the existing full-suite result `2291 passed, 10 skipped` and successful post-merge CI supplied with the stack;
 - static data-flow tracing for the unused `commit_sha` field;
 - an isolated executable SQLite reproduction for the legacy filtered-query regression.
+- executable post-fix checks for legacy filtered-query AND semantics and Task 41 SHA mismatch rejection.
 
 ## Suggested follow-up
 
-Fix both findings in a separate implementation PR. Keep the changes narrow: one query-variable correction plus a regression test for Finding 1, and one explicit provenance contract plus a mismatch test for Finding 2. Re-run the Task 39–42 provider-free gates, the full suite, `compileall`, `git diff --check`, and the release artifact gate before merging.
+Merge this focused fix branch after the full suite and release artifact gate pass. Then start Task 43, freezing its answer-quality/Pareto protocol before reading or tuning against Task 43 results, as required by `roadmap/43_ANSWER_QUALITY_AND_END_TO_END_TOKEN_GATE.md`.

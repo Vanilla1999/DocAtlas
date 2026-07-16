@@ -2118,7 +2118,7 @@ class SQLiteStore:
                         FROM sections_fts
                         JOIN sections ON sections.id = sections_fts.rowid
                         WHERE sections_fts MATCH ?
-                        {filter_sql}
+                        {legacy_filter_sql}
                         ORDER BY rank, sections.source, sections.chunk_index, sections.content_hash
                         LIMIT ?
                         """,
