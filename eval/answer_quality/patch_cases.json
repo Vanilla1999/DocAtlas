@@ -1,0 +1,73 @@
+{
+  "schema_version": "task43-case-contracts-v1",
+  "cases": [
+    {
+      "contract_id": "t42-patch-policy-target-test",
+      "source_ref": "task42:patch_cases:patch_policy_target_and_test",
+      "taxonomy": "patch_contract",
+      "result_kind": "patch_context",
+      "expected_status": "ok",
+      "required_answer_facts": [],
+      "acceptable_evidence": ["AGENTS.md", "src/worker.py"],
+      "forbidden_claims": [],
+      "forbidden_versions": [],
+      "exact_identifiers": ["Worker.run"],
+      "required_patch_fields": {
+        "objective": ["Update Worker.run"],
+        "targets": ["src/worker.py"],
+        "invariants": ["must preserve isolation"],
+        "checks": ["pytest tests/test_worker.py"]
+      },
+      "required_public_commands": ["pytest tests/test_worker.py"],
+      "maximum_visible_tokens": 1500
+    },
+    {
+      "contract_id": "t42-patch-missing-target",
+      "source_ref": "task42:patch_cases:patch_missing_target",
+      "taxonomy": "insufficient_evidence",
+      "result_kind": "patch_context",
+      "expected_status": "insufficient_evidence",
+      "required_answer_facts": [],
+      "acceptable_evidence": [],
+      "forbidden_claims": [],
+      "forbidden_versions": [],
+      "exact_identifiers": [],
+      "required_patch_fields": {},
+      "required_public_commands": [],
+      "maximum_visible_tokens": 1500
+    },
+    {
+      "contract_id": "t42-patch-identifier-boundary",
+      "source_ref": "task42:patch_cases:patch_exact_identifier_boundary",
+      "taxonomy": "patch_contract",
+      "result_kind": "patch_context",
+      "expected_status": "ok",
+      "required_answer_facts": [],
+      "acceptable_evidence": ["src/auth.py"],
+      "forbidden_claims": ["Auth.loginLegacy", "src/legacy_auth.py"],
+      "forbidden_versions": [],
+      "exact_identifiers": ["Auth.login"],
+      "required_patch_fields": {
+        "objective": ["Update Auth.login"],
+        "targets": ["src/auth.py", "Auth.login"]
+      },
+      "required_public_commands": [],
+      "maximum_visible_tokens": 1500
+    },
+    {
+      "contract_id": "t42-patch-scope-missing",
+      "source_ref": "task42:patch_cases:patch_scope_missing_identity",
+      "taxonomy": "scope",
+      "result_kind": "patch_context",
+      "expected_status": "insufficient_evidence",
+      "required_answer_facts": [],
+      "acceptable_evidence": [],
+      "forbidden_claims": [],
+      "forbidden_versions": [],
+      "exact_identifiers": [],
+      "required_patch_fields": {},
+      "required_public_commands": [],
+      "maximum_visible_tokens": 1500
+    }
+  ]
+}

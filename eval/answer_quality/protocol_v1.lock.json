@@ -1,0 +1,113 @@
+{
+  "schema_version": "task43-answer-quality-protocol-v1",
+  "phase": "protocol_freeze",
+  "provider_free": true,
+  "source_revision": {
+    "commit_sha": "59aa94c39c6885b30018a9af6e9b81fa1839075d",
+    "tree_sha": "468e17f991dd1bf938353dd5c92b1d39f45ce6d0"
+  },
+  "lower_layer_bindings": {
+    "task39_baseline": "eval/retrieval_quality/baseline_v1/summary.json",
+    "task41_published_commit_sha": "9afb20d7aca6c0411b14739781dacceb292cb78f",
+    "task42_baseline": "eval/evidence_selection/baseline_v1.json"
+  },
+  "case_contract_files": [
+    "eval/answer_quality/docs_cases.json",
+    "eval/answer_quality/patch_cases.json",
+    "eval/answer_quality/adversarial_cases.json"
+  ],
+  "case_counts": {
+    "task39": 16,
+    "task42": 13,
+    "total": 29
+  },
+  "file_bindings": {
+    "eval/answer_quality/adversarial_cases.json": "80b67ed3d43b12f5048d200ca4456dba5de7fa3cd05429fcb7554158dfd47d1a",
+    "eval/answer_quality/docs_cases.json": "a4fa910a8c56efcf63b5c55ce5e516923790843d76fab555eb77e2c5a6167621",
+    "eval/answer_quality/human_review_rubric.md": "8b699b1e6f7827d2494599d098908e4c9f687061f853d323a797593549b6ad6d",
+    "eval/answer_quality/human_review_selection_v1.json": "821b396faf432121fdfa69beb47aeb40f7794ee0102f9b62a5ddb93868587c91",
+    "eval/answer_quality/patch_cases.json": "2588fc079b58eb6c2b237f3001cb9155be8c0455ae7ce416d0bc9f43e205eed4",
+    "eval/answer_quality_gate.py": "bbfe0673321e270549e89d77a04c45010f1faee953f21956357a3abf85d27eab",
+    "eval/evidence_selection/adversarial_cases.json": "5b5929a4a0431797e454fca865716b9015334a82fb7c43bfd618bcfd8fb1d2a4",
+    "eval/evidence_selection/baseline_v1.json": "7ae80d49967cdf701a2bcc854bbad7145010ce94beda1d81d2fcf35354d79995",
+    "eval/evidence_selection/docs_cases.json": "f74a73055673a6ca78df60ce586c36e146449027c88d664cd831f31f32815317",
+    "eval/evidence_selection/patch_cases.json": "e951a4fd7bfb5eca4466a72e7a2ad6f897c503bafce236d8e1a39560fbcf4ef5",
+    "eval/retrieval_quality/adversarial.json": "bb27912453799b058f486f3b00c07601636a79fd311e76b926b3c44a93163163",
+    "eval/retrieval_quality/baseline_v1/summary.json": "3bf87252e18ecf86dafc352f11aabf93454b9377f5c1eeb00036d06c60b878b7",
+    "eval/retrieval_quality/development.json": "82d288b48c90cac8d4554fdf9e88cb1f6b4ce6116ad581b923eb3574ead3e294",
+    "eval/retrieval_quality/holdout.json": "b952111a1c76834f1e44956aefc370fd140dc6ae2af437dfbed54e180d6a37e3",
+    "roadmap/43_ANSWER_QUALITY_AND_END_TO_END_TOKEN_GATE.md": "76fd7d21eac18c393efd4f4df89a9914ff75f98c3773ad6f11e7ed792d306d0b"
+  },
+  "quality_gates": {
+    "protected_required_fact_rate_min_delta": 0.0,
+    "forbidden_source_violations_max": 0,
+    "forbidden_version_violations_max": 0,
+    "unsupported_claim_violations_max": 0,
+    "citation_validity_rate_min": 1.0,
+    "insufficient_false_success_rate_max_delta": 0.0,
+    "docs_median_visible_tokens_max_delta": 0.0,
+    "patch_median_visible_tokens_max_delta": 0.0,
+    "retrieval_projection_p95_latency_ratio_max": 1.1
+  },
+  "projection_budgets": {
+    "docs_answer_max_tokens": 800,
+    "patch_context_target_tokens": 1500,
+    "patch_context_absolute_tokens": 2000,
+    "insufficient_evidence_max_tokens": 300
+  },
+  "aggregation_policy": {
+    "docs_and_patch_must_pass_independently": true,
+    "taxonomy_groups_must_be_reported": true,
+    "per_case_regressions_cannot_be_hidden_by_aggregates": true,
+    "weighted_quality_score_is_authoritative": false
+  },
+  "timing": {
+    "scope": "local_retrieval_plus_projection",
+    "warmup_repeats_per_case": 5,
+    "measured_repeats_per_case": 25,
+    "candidate_to_baseline_p95_ratio_max": 1.1,
+    "paired_same_process": true,
+    "raw_measurements_in_deterministic_digest": false,
+    "timing_artifact": "eval/answer_quality/latency_v1.json"
+  },
+  "determinism": {
+    "canonical_json": true,
+    "candidate_order_permutation_check": true,
+    "raw_source_text_in_report": false,
+    "excluded_from_result_digest": ["latency_samples", "timestamps", "machine_identity"]
+  },
+  "human_review": {
+    "rubric_path": "eval/answer_quality/human_review_rubric.md",
+    "selection_path": "eval/answer_quality/human_review_selection_v1.json",
+    "required_case_count": 6,
+    "required_dimensions": [
+      "directness",
+      "ambiguity",
+      "citation_usefulness",
+      "snippet_completeness",
+      "omission_disclosure"
+    ],
+    "missing_or_inconclusive_rating_verdict": "INCONCLUSIVE"
+  },
+  "production_model_gate": {
+    "task_id": "decisive_nbo_cross_module_gate_large_001",
+    "conditions": ["repo_only_strict_offline", "docatlas_bounded_direct"],
+    "repeats": 3,
+    "max_model_requests": 12,
+    "max_serialized_input_tokens_per_request": 7000,
+    "max_repair_passes": 1,
+    "max_test_invocations": 2,
+    "correctness_parity_required": true,
+    "median_total_token_ratio_max": 0.75,
+    "median_latency_ratio_max": 1.1,
+    "missing_credentials_canaries_or_usage_verdict": "INCONCLUSIVE",
+    "provider_usage_source": "provider_records_only"
+  },
+  "execution_policy": {
+    "real_case_execution": "forbidden_until_protocol_merge",
+    "production_model_execution": "deferred_operator_gate",
+    "protocol_or_case_tuning_after_first_real_result": "forbidden",
+    "production_code_changes_in_protocol_phase": "forbidden"
+  },
+  "freeze_policy": "Merge this protocol before executing any real Task 43 case. Later runners and product fixes must consume these exact bindings and may not rewrite them after observing results."
+}
