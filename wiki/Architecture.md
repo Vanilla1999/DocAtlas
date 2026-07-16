@@ -1,12 +1,12 @@
 # Architecture
 
-Docmancer is a local, version-aware docs runtime for coding agents. It has two product layers: **Docmancer Docs**, the primary docs context/runtime layer, and **Docmancer Packs**, the advanced API action-tool layer.
+DocAtlas is a local, version-aware documentation runtime for coding agents. Its primary product workflow is **DocAtlas Docs**; **DocAtlas MCP Packs** is a separate advanced API-action surface.
 
-Docmancer runs two cooperating local pipelines.
+DocAtlas runs two cooperating local runtimes.
 
-The primary **Docmancer Docs pipeline** fetches documentation with `doc-atlas add` (URL), `doc-atlas ingest` (local files), or the docs MCP server's prefetch tools, normalizes it into sections, indexes those sections in a local SQLite FTS5 database plus a managed local Qdrant for dense and sparse vectors, and retrieves compact context packs through the CLI or MCP docs tools. No hosted query API; the only background process is the docmancer-owned Qdrant.
+The primary **DocAtlas Docs pipeline** fetches documentation with `doc-atlas add` (URL), `doc-atlas ingest` (local files), or the Docs MCP server's prefetch tools, normalizes it into sections, indexes those sections in a local SQLite FTS5 database plus a managed local Qdrant for dense and sparse vectors, and retrieves compact context packs through the CLI or Docs MCP tools. No hosted query API; the only background process is the docmancer-owned Qdrant.
 
-The advanced **Docmancer Packs runtime** installs version-pinned API packs from a registry with `doc-atlas install-pack <package>@<version>`, then exposes every installed pack to your agent through a single shared stdio MCP gateway (`doc-atlas mcp packs-serve`; `serve` remains a compatibility alias) using the Tool Search pattern: two meta-tools regardless of how many packs you install. The dispatcher enforces auth, destructive-call gating, schema validation, idempotency-key auto-injection and reuse, version pinning on the wire, and SHA-256 verification of every artifact before install.
+The advanced **DocAtlas MCP Packs runtime** installs version-pinned API packs from a registry with `doc-atlas install-pack <package>@<version>`, then exposes every installed pack to your agent through a single shared stdio MCP gateway (`doc-atlas mcp packs-serve`; `serve` remains a compatibility alias) using the Tool Search pattern: two meta-tools regardless of how many packs you install. The dispatcher enforces auth, destructive-call gating, schema validation, idempotency-key auto-injection and reuse, version pinning on the wire, and SHA-256 verification of every artifact before install.
 
 For the full command reference, see [Commands](./Commands.md). For configuration options, see [Configuration](./Configuration.md).
 
@@ -186,7 +186,7 @@ The docs policy system in `_docs_policy` produces machine-readable WebFetch rule
 {"direct_webfetch": "discovery_only", "reason_code": "no_registered_source"}
 ```
 
-Registered sources forbid direct WebFetch (agent must use Docmancer). Unknown sources permit discovery-mode WebFetch only.
+Registered sources forbid direct WebFetch (the agent must use DocAtlas). Unknown sources permit discovery-mode WebFetch only.
 
 ### Version provenance on every response
 
