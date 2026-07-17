@@ -1,5 +1,18 @@
 # Task 29 — bound advanced and maintenance-only surfaces
 
+Status: Done for bounded support-policy scope (`86d76d9`).
+
+## Completion evidence
+
+- `docmancer/support_surfaces.json` classifies the currently shipped 100-entry surface inventory across `core`, `advanced-supported`, `maintenance-only`, `deprecated`, and `internal` tiers, with ownership, documentation, test tier, network dependencies, compatibility, removal rules, and failure budgets for every non-core entry.
+- `tests/test_support_surface_policy.py` introspects the complete Click command tree, all public/advanced/legacy/admin Docs MCP configurations, MCP resources and templates, the Packs dynamic namespace, installed extras, connectors, stores, and the explicit shipped-service registration boundary. A newly shipped unclassified surface fails the policy contract.
+- Core CI runs offline with `DOCMANCER_OFFLINE=1`; the test harness blocks unregistered outbound DNS and sockets, while advanced/maintenance contracts run in a separate release-blocking offline job and real live-provider work remains outside core CI.
+- Deprecated local-path `add`, the `mcp serve` Packs alias, and the legacy `prefetch_project_docs` alias have explicit replacements and a bounded `2.0.0` removal deadline. The validator rejects malformed or already-expired deadlines.
+- Runtime CLI help derives support-tier labels from the same inventory. Beginner documentation leads with the three-tool Docs MCP workflow, while advanced and maintenance surfaces link to `docs/support-surface-policy.md` and state their tier.
+- The dependency policy records the current core set and leaves the Qdrant, FastEmbed, and document-reader install-profile decision to Task 24 without changing package compatibility in Task 29.
+
+The implementation was merged to `main` in `86d76d9`. This post-Tasks-34–43 audit revalidated the inventory against `main` at `f8a30dc`; it does not promote maintenance-only surfaces or weaken shared security/storage release gates.
+
 ## Priority
 
 P2 sustainability after core evidence is available.
