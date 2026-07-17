@@ -16,6 +16,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - **MCP SDK floor:** require `mcp>=1.27.2`, matching the structured tool output and output-schema transport used by bounded delivery.
 - **Release maturity truth:** clarify that artifact-level Task 15 evidence is complete while a Stable claim still requires Task 14 live external-ingest evidence and an approved post-publish verification of the exact public release.
+- **Section-impact roadmap truth:** reconcile the active roadmap with the merged hash-bound section index, automatic base/head symbol extraction, conservative fallback, and bounded evidence-bearing ranking gates.
 
 ### Fixed
 
