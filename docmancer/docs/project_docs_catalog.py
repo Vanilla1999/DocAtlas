@@ -13,6 +13,7 @@ from yaml.constructor import ConstructorError
 CATALOG_FILENAME = "docatlas.project-docs.yaml"
 SUPPORTED_EXTENSIONS = {".md", ".mdx", ".rst", ".txt", ".adoc"}
 MAX_CATALOG_DOCUMENTS = 500
+MAX_CATALOG_ROOTS = 100
 MAX_CATALOG_BYTES = 1024 * 1024
 MAX_DESCRIPTION_CHARACTERS = 512
 ROLES = {
@@ -22,10 +23,11 @@ ROLES = {
 AUTHORITIES = {"source_of_truth", "supporting", "historical", "generated"}
 STATUSES = {"active", "completed", "superseded"}
 IMPACT_POLICIES = {"track", "search_only"}
-TOP_LEVEL_FIELDS = ("schema_version", "documents")
+TOP_LEVEL_FIELDS = ("schema_version", "documents", "roots")
 DOCUMENT_FIELDS = (
     "path", "role", "scope", "description", "module_path", "authority", "status", "impact",
 )
+ROOT_FIELDS = ("path", "scope", "module_path", "authority", "status", "index")
 
 
 class _UniqueKeySafeLoader(yaml.SafeLoader):
@@ -80,11 +82,22 @@ class ProjectDocCatalogEntry:
 
 
 @dataclass(frozen=True)
+class ProjectDocCatalogRoot:
+    path: str
+    scope: str = "project"
+    module_path: str | None = None
+    authority: str = "supporting"
+    status: str = "active"
+    index: str | None = None
+
+
+@dataclass(frozen=True)
 class ProjectDocCatalog:
     present: bool
     valid: bool = True
     path: str | None = None
     entries: list[ProjectDocCatalogEntry] = field(default_factory=list)
+    roots: list[ProjectDocCatalogRoot] = field(default_factory=list)
     warnings: list[str] = field(default_factory=list)
 
 
@@ -124,16 +137,25 @@ def read_project_docs_catalog(root: Path) -> ProjectDocCatalog:
             CATALOG_FILENAME,
             warnings=[f"Project docs catalog has unknown fields: {', '.join(unknown_top_level_fields)}."],
         )
-    raw_documents = data.get("documents")
+    raw_roots = data.get("roots", [])
+    raw_documents = data.get("documents", [] if "roots" in data else None)
     if not isinstance(raw_documents, list):
         return ProjectDocCatalog(True, False, CATALOG_FILENAME, warnings=["Project docs catalog documents must be a list."])
+    if not isinstance(raw_roots, list):
+        return ProjectDocCatalog(True, False, CATALOG_FILENAME, warnings=["Project docs catalog roots must be a list."])
     warnings: list[str] = []
     entries: list[ProjectDocCatalogEntry] = []
+    roots: list[ProjectDocCatalogRoot] = []
     seen: set[str] = set()
     if len(raw_documents) > MAX_CATALOG_DOCUMENTS:
         return ProjectDocCatalog(
             True, False, CATALOG_FILENAME,
             warnings=[f"Project docs catalog exceeds the {MAX_CATALOG_DOCUMENTS}-document limit."],
+        )
+    if len(raw_roots) > MAX_CATALOG_ROOTS:
+        return ProjectDocCatalog(
+            True, False, CATALOG_FILENAME,
+            warnings=[f"Project docs catalog exceeds the {MAX_CATALOG_ROOTS}-root limit."],
         )
     for index, raw in enumerate(raw_documents[:MAX_CATALOG_DOCUMENTS]):
         entry, error = _validated_entry(root, raw)
@@ -146,9 +168,96 @@ def read_project_docs_catalog(root: Path) -> ProjectDocCatalog:
             continue
         seen.add(entry.path)
         entries.append(entry)
+    seen_roots: set[str] = set()
+    for index, raw in enumerate(raw_roots[:MAX_CATALOG_ROOTS]):
+        catalog_root, error = _validated_root(root, raw)
+        if error:
+            warnings.append(f"Catalog roots[{index}]: {error}")
+            continue
+        assert catalog_root is not None
+        if catalog_root.path in seen_roots:
+            warnings.append(f"Catalog roots[{index}]: duplicate path {catalog_root.path!r}.")
+            continue
+        seen_roots.add(catalog_root.path)
+        roots.append(catalog_root)
     if warnings:
         return ProjectDocCatalog(True, False, CATALOG_FILENAME, warnings=warnings)
-    return ProjectDocCatalog(True, True, CATALOG_FILENAME, entries, [])
+    return ProjectDocCatalog(True, True, CATALOG_FILENAME, entries, roots, [])
+
+
+def _validated_root(root: Path, raw: Any) -> tuple[ProjectDocCatalogRoot | None, str | None]:
+    if not isinstance(raw, dict):
+        return None, "entry must be a mapping."
+    unknown_fields = sorted(str(field_name) for field_name in raw if field_name not in ROOT_FIELDS)
+    if unknown_fields:
+        return None, f"unknown fields: {', '.join(unknown_fields)}."
+    for field_name in ROOT_FIELDS:
+        if field_name in raw and raw[field_name] is not None and not isinstance(raw[field_name], str):
+            return None, f"{field_name} must be a string."
+    relative, error = _safe_relative_path(str(raw.get("path") or ""), field_name="path")
+    if error:
+        return None, error
+    assert relative is not None
+    scope = str(raw.get("scope") or "project")
+    module_path, module_error = _optional_module_path(str(raw.get("module_path") or ""))
+    if module_error:
+        return None, module_error
+    authority = str(raw.get("authority") or "supporting")
+    status = str(raw.get("status") or "active")
+    raw_index = str(raw.get("index") or "")
+    index, index_error = _safe_relative_path(raw_index, field_name="index", optional=True)
+    if index_error:
+        return None, index_error
+    if scope not in {"project", "module"}:
+        return None, f"invalid scope {scope!r}."
+    if scope == "module" and not module_path:
+        return None, "module scope requires module_path."
+    if scope == "project" and module_path:
+        return None, "project scope must not declare module_path."
+    if authority not in AUTHORITIES or status not in STATUSES:
+        return None, "invalid authority or status."
+    pure = PurePosixPath(relative)
+    candidate = root / Path(*pure.parts)
+    if _has_symlink_component(root, pure) or not candidate.is_dir():
+        return None, "path must reference an existing non-symlinked directory."
+    if module_path:
+        module_pure = PurePosixPath(module_path)
+        module_candidate = root / Path(*module_pure.parts)
+        if _has_symlink_component(root, module_pure) or not module_candidate.is_dir():
+            return None, "module_path must reference an existing non-symlinked directory."
+    if index:
+        index_pure = PurePosixPath(index)
+        index_path = candidate / Path(*index_pure.parts)
+        relative_to_repo = PurePosixPath(relative) / index_pure
+        if _has_symlink_component(root, relative_to_repo) or not index_path.is_file():
+            return None, "index must reference an existing non-symlinked file within the configured root."
+        if index_path.suffix.lower() not in SUPPORTED_EXTENSIONS:
+            return None, "index uses an unsupported project documentation format."
+    return ProjectDocCatalogRoot(relative, scope, module_path, authority, status, index), None
+
+
+def _safe_relative_path(
+    raw: str,
+    *,
+    field_name: str,
+    optional: bool = False,
+) -> tuple[str | None, str | None]:
+    value = raw.replace("\\", "/")
+    if not value and optional:
+        return None, None
+    if value.startswith("/"):
+        return None, f"{field_name} must stay within its configured root."
+    relative = value.strip("/")
+    pure = PurePosixPath(relative)
+    if not relative or pure.is_absolute() or ".." in pure.parts or (pure.parts and pure.parts[0].endswith(":")):
+        return None, f"{field_name} must stay within its configured root."
+    return pure.as_posix(), None
+
+
+def _optional_module_path(raw: str) -> tuple[str | None, str | None]:
+    if not raw:
+        return None, None
+    return _safe_relative_path(raw, field_name="module_path")
 
 
 def _validated_entry(root: Path, raw: Any) -> tuple[ProjectDocCatalogEntry | None, str | None]:

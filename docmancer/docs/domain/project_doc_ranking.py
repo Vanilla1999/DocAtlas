@@ -272,6 +272,28 @@ def query_requests_artifact_sources(question: str) -> bool:
     )
 
 
+def query_requests_history(question: str) -> bool:
+    q = " ".join((question or "").lower().split())
+    if any(phrase in q for phrase in ("previous plan", "old plan", "past decision")):
+        return True
+    if re.search(r"\bhistorical\b", q):
+        return True
+    if re.search(r"\bhistory\s+(?:of|for)\b", q):
+        return True
+    if re.search(
+        r"\b(?:project|repository|decision|release|roadmap|plan)\s+history\b",
+        q,
+    ):
+        return True
+    return bool(
+        re.search(
+            r"\b(?:completed|superseded)\s+(?:roadmap|plan|task|document|docs?)\b"
+            r"|\b(?:roadmap|plan|task|document|docs?)\s+(?:completed|superseded)\b",
+            q,
+        )
+    )
+
+
 def source_weight_reason(path: str | None, heading_path: str | None, intent: Any) -> str:
     """Human-readable reason for source weighting in project-doc ranking."""
     p = normalize_doc_path(path)
@@ -480,6 +502,18 @@ def ensure_broad_query_sources(selected: list[Any], candidates: list[Any], *, qu
 
 
 def rerank_project_doc_chunks(chunks: list[Any], *, question: str, intent: Any, limit: int | None = None, broad_max_per_source: int = 2, narrow_max_per_source: int = 4) -> list[Any]:
+    if not chunks:
+        return []
+    history_requested = query_requests_history(question)
+    chunks = [
+        chunk
+        for chunk in chunks
+        if (
+            (getattr(chunk, "lifecycle_status", None) or "active") == "active"
+            or history_requested
+        )
+        and not bool(getattr(chunk, "stale", False))
+    ]
     if not chunks:
         return []
     scored = []

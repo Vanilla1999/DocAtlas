@@ -4,14 +4,20 @@ import hashlib
 import json
 import re
 from pathlib import Path
+from pathlib import PurePosixPath
 from typing import Any
+from urllib.parse import unquote, urlsplit
 
 import yaml
 
 from docmancer.docs.models import DependencyObservation, ProjectDocsCandidate, ProjectMetadata, SOURCE_CLASS_PROJECT_FILE
 from docmancer.docs.node_project import read_node_project
 from docmancer.docs.python_project import read_python_project
-from docmancer.docs.project_docs_catalog import read_project_docs_catalog
+from docmancer.docs.project_docs_catalog import (
+    MAX_CATALOG_DOCUMENTS,
+    ProjectDocCatalogRoot,
+    read_project_docs_catalog,
+)
 
 
 DOC_FILE_EXTENSIONS = {".md", ".mdx", ".rst", ".txt", ".adoc"}
@@ -70,6 +76,9 @@ LIB_MODULE_ROOT_DIRECTORIES = {
     "modules": "module",
     "features": "feature",
 }
+_MARKDOWN_LINK_RE = re.compile(r"(?<!!)\[[^\]]*\]\(([^)\s]+)(?:\s+[^)]*)?\)")
+_MAX_INDEX_FILE_BYTES = 256 * 1024
+_MAX_INDEX_LINKS_PER_FILE = 200
 
 
 class ProjectMetadataReader:
@@ -95,7 +104,13 @@ class ProjectMetadataReader:
         catalog = read_project_docs_catalog(root)
         warnings.extend(catalog.warnings)
         if catalog.present:
-            docs_candidates = self._catalog_docs(root, catalog.entries, limit=docs_candidate_limit) if catalog.valid else []
+            docs_candidates = self._catalog_docs(
+                root,
+                catalog.entries,
+                catalog.roots,
+                warnings,
+                limit=docs_candidate_limit,
+            ) if catalog.valid else []
         else:
             docs_candidates = self.discover_docs(root, warnings, limit=docs_candidate_limit)
         all_packages = {**packages, **cargo_packages, **npm_packages, **python_packages}
@@ -119,15 +134,30 @@ class ProjectMetadataReader:
             docs_catalog_valid=catalog.valid,
         )
 
-    def _catalog_docs(self, root: Path, entries: list[Any], *, limit: int | None) -> list[ProjectDocsCandidate]:
-        candidates: list[ProjectDocsCandidate] = []
-        for entry in entries[:limit] if limit is not None else entries:
+    def _catalog_docs(
+        self,
+        root: Path,
+        entries: list[Any],
+        roots: list[ProjectDocCatalogRoot],
+        warnings: list[str],
+        *,
+        limit: int | None,
+    ) -> list[ProjectDocsCandidate]:
+        candidates: dict[str, ProjectDocsCandidate] = {}
+        output_limit = min(limit, MAX_CATALOG_DOCUMENTS) if limit is not None else MAX_CATALOG_DOCUMENTS
+        scan_limit = output_limit + 1
+        explicit_paths: list[str] = []
+        truncated = False
+        for entry in entries:
+            if len(explicit_paths) >= output_limit:
+                truncated = True
+                break
             path = root / entry.path
             try:
                 stat = path.stat()
             except OSError:
                 continue
-            candidates.append(ProjectDocsCandidate(
+            candidates[entry.path] = ProjectDocsCandidate(
                 path=entry.path,
                 reason=entry.role,
                 size_bytes=stat.st_size,
@@ -147,8 +177,201 @@ class ProjectMetadataReader:
                     "description": entry.description, "module_path": entry.module_path,
                     "authority": entry.authority, "status": entry.status, "impact": entry.impact,
                 }, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest(),
-            ))
-        return candidates
+            )
+            explicit_paths.append(entry.path)
+        if roots and len(explicit_paths) >= output_limit:
+            truncated = True
+        else:
+            for catalog_root in roots:
+                if len(candidates) >= scan_limit:
+                    truncated = True
+                    break
+                self._discover_catalog_root(
+                    candidates,
+                    root,
+                    catalog_root,
+                    warnings,
+                    limit=scan_limit,
+                )
+        explicit = [candidates[path] for path in explicit_paths]
+        explicit_path_set = set(explicit_paths)
+        root_candidates = sorted(
+            (candidate for path, candidate in candidates.items() if path not in explicit_path_set),
+            key=lambda item: item.path,
+        )
+        remaining = max(0, output_limit - len(explicit))
+        if len(root_candidates) > remaining:
+            truncated = True
+        selected = [*explicit, *root_candidates[:remaining]]
+        if truncated:
+            warnings.append(
+                f"Configured project docs discovery truncated at {output_limit} candidates for bounded analysis."
+            )
+        return sorted(selected, key=lambda item: item.path)
+
+    def _discover_catalog_root(
+        self,
+        candidates: dict[str, ProjectDocsCandidate],
+        repository_root: Path,
+        catalog_root: ProjectDocCatalogRoot,
+        warnings: list[str],
+        *,
+        limit: int | None,
+    ) -> None:
+        directory = repository_root / catalog_root.path
+        module_name = Path(catalog_root.module_path).name if catalog_root.module_path else None
+        common = {
+            "doc_scope": catalog_root.scope,
+            "module_id": catalog_root.module_path,
+            "module_name": module_name,
+            "module_path": catalog_root.module_path,
+            "module_type": "catalog_module" if catalog_root.module_path else None,
+            "authority": catalog_root.authority,
+            "lifecycle_status": catalog_root.status,
+            "impact_policy": (
+                "track"
+                if catalog_root.status == "active" and catalog_root.authority not in {"historical", "generated"}
+                else "search_only"
+            ),
+            "catalog_entry_hash": self._catalog_root_hash(catalog_root),
+        }
+        if catalog_root.index:
+            self._discover_docs_from_index(
+                candidates,
+                repository_root,
+                directory,
+                catalog_root,
+                warnings,
+                common=common,
+                limit=limit,
+            )
+            return
+        self._discover_docs_in_dir(
+            candidates,
+            repository_root,
+            directory,
+            "configured_docs_root",
+            warnings=warnings,
+            limit=limit,
+            **common,
+        )
+
+    def _discover_docs_from_index(
+        self,
+        candidates: dict[str, ProjectDocsCandidate],
+        repository_root: Path,
+        directory: Path,
+        catalog_root: ProjectDocCatalogRoot,
+        warnings: list[str],
+        *,
+        common: dict[str, Any],
+        limit: int | None,
+    ) -> None:
+        visited: set[str] = set()
+        visiting: set[str] = set()
+
+        def visit(relative: str) -> None:
+            if limit is not None and len(candidates) >= limit:
+                return
+            if relative in visiting:
+                warnings.append(
+                    f"Project docs index loop skipped in {catalog_root.path}: {relative}."
+                )
+                return
+            if relative in visited:
+                return
+            visiting.add(relative)
+            path = directory / Path(*PurePosixPath(relative).parts)
+            repository_relative = PurePosixPath(catalog_root.path) / PurePosixPath(relative)
+            if self._has_symlink_component(repository_root, repository_relative):
+                warnings.append(f"Project docs index target is a symlink and was skipped: {repository_relative.as_posix()}.")
+                visiting.remove(relative)
+                visited.add(relative)
+                return
+            if not path.is_file() or not self._is_docs_file(path):
+                warnings.append(f"Project docs index target is missing or unsupported: {repository_relative.as_posix()}.")
+                visiting.remove(relative)
+                visited.add(relative)
+                return
+            self._add_candidate(
+                candidates,
+                repository_root,
+                path,
+                "index" if relative == catalog_root.index else self._nested_doc_reason(path, "configured_docs_index"),
+                **common,
+            )
+            try:
+                if path.stat().st_size > _MAX_INDEX_FILE_BYTES:
+                    warnings.append(
+                        f"Project docs index link scan skipped for oversized file: {repository_relative.as_posix()}."
+                    )
+                    text = ""
+                else:
+                    text = path.read_text(encoding="utf-8")
+            except (OSError, UnicodeError):
+                text = ""
+            links = _MARKDOWN_LINK_RE.findall(text)
+            if len(links) > _MAX_INDEX_LINKS_PER_FILE:
+                warnings.append(
+                    f"Project docs index links truncated at {_MAX_INDEX_LINKS_PER_FILE} for bounded analysis: "
+                    f"{repository_relative.as_posix()}."
+                )
+            for href in links[:_MAX_INDEX_LINKS_PER_FILE]:
+                target, escaped = self._resolve_index_link(relative, href)
+                if escaped:
+                    warnings.append(
+                        f"Project docs index link outside the configured root was skipped: {href}."
+                    )
+                    continue
+                if target is None:
+                    continue
+                if target in visiting:
+                    warnings.append(
+                        f"Project docs index loop skipped in {catalog_root.path}: {target}."
+                    )
+                    continue
+                visit(target)
+            visiting.remove(relative)
+            visited.add(relative)
+
+        assert catalog_root.index is not None
+        visit(catalog_root.index)
+
+    @staticmethod
+    def _resolve_index_link(source: str, href: str) -> tuple[str | None, bool]:
+        parsed = urlsplit(href)
+        if parsed.scheme or parsed.netloc or not parsed.path:
+            return None, False
+        decoded = unquote(parsed.path).replace("\\", "/")
+        if decoded.startswith("/"):
+            return None, True
+        parts = list(PurePosixPath(source).parent.parts)
+        for part in PurePosixPath(decoded).parts:
+            if part in {"", "."}:
+                continue
+            if part == "..":
+                if not parts:
+                    return None, True
+                parts.pop()
+                continue
+            parts.append(part)
+        if not parts:
+            return None, False
+        return PurePosixPath(*parts).as_posix(), False
+
+    @staticmethod
+    def _catalog_root_hash(catalog_root: ProjectDocCatalogRoot) -> str:
+        payload = {
+            "path": catalog_root.path,
+            "scope": catalog_root.scope,
+            "module_path": catalog_root.module_path,
+            "authority": catalog_root.authority,
+            "status": catalog_root.status,
+            "index": catalog_root.index,
+        }
+        return "sha256:" + hashlib.sha256(
+            json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
+        ).hexdigest()
 
     def discover_docs(
         self,
@@ -273,12 +496,27 @@ class ProjectMetadataReader:
         module_name: str | None = None,
         module_path: str | None = None,
         module_type: str | None = None,
+        authority: str | None = None,
+        lifecycle_status: str = "active",
+        impact_policy: str = "track",
+        catalog_entry_hash: str | None = None,
+        warnings: list[str] | None = None,
         limit: int | None = None,
     ) -> None:
         for path in self._iter_docs_tree(directory):
             if limit is not None and len(candidates) >= limit:
                 return
             if self._is_excluded_path(path, root):
+                continue
+            if path.is_symlink():
+                if warnings is not None:
+                    try:
+                        relative = path.relative_to(root).as_posix()
+                    except ValueError:
+                        relative = str(path)
+                    warnings.append(
+                        f"Configured project docs symlink was skipped: {relative}."
+                    )
                 continue
             if path.is_file() and self._is_docs_file(path):
                 self._add_candidate(
@@ -291,6 +529,10 @@ class ProjectMetadataReader:
                     module_name=module_name,
                     module_path=module_path,
                     module_type=module_type,
+                    authority=authority,
+                    lifecycle_status=lifecycle_status,
+                    impact_policy=impact_policy,
+                    catalog_entry_hash=catalog_entry_hash,
                 )
 
     def _iter_docs_tree(self, directory: Path):
@@ -317,6 +559,10 @@ class ProjectMetadataReader:
         module_name: str | None = None,
         module_path: str | None = None,
         module_type: str | None = None,
+        authority: str | None = None,
+        lifecycle_status: str = "active",
+        impact_policy: str = "track",
+        catalog_entry_hash: str | None = None,
     ) -> None:
         try:
             resolved = path.resolve()
@@ -326,6 +572,8 @@ class ProjectMetadataReader:
         try:
             relative = path.relative_to(root).as_posix()
         except ValueError:
+            return
+        if relative in candidates:
             return
         if any(part in EXCLUDED_DIR_NAMES for part in Path(relative).parts):
             return
@@ -348,7 +596,20 @@ class ProjectMetadataReader:
             module_name=module_name,
             module_path=module_path,
             module_type=module_type,
+            authority=authority,
+            lifecycle_status=lifecycle_status,
+            impact_policy=impact_policy,
+            catalog_entry_hash=catalog_entry_hash,
         )
+
+    @staticmethod
+    def _has_symlink_component(root: Path, relative: PurePosixPath) -> bool:
+        current = root
+        for part in relative.parts:
+            current = current / part
+            if current.is_symlink():
+                return True
+        return False
 
     def _content_hash(self, path: Path) -> str | None:
         digest = hashlib.sha256()
