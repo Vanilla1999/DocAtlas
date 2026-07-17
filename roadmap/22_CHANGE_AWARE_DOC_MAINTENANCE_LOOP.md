@@ -1,5 +1,19 @@
 # Task 22 — close the change-aware documentation maintenance loop
 
+Status: Done for bounded local maintenance scope (`dc102f3`).
+
+## Completion evidence
+
+- The Task 20 impact path emits one bounded `documentation-update-brief-1` handoff with changed paths/symbols, repository facts to verify, explicit missing evidence, a fail-closed edit allow-list, non-invention rules, and the existing `prepare_docs(sync_project_docs)` follow-up.
+- Incremental project-doc sync accepts changed, deleted, and renamed paths, validates repository-relative inputs, reprocesses only affected candidates, and scopes vector updates and pruning to affected chunk identities.
+- Content-hash identity makes repeated unchanged syncs perform zero file reprocessing, zero derived writes, and zero unrelated-file work.
+- Accepted deletions and rename sources are removed from lexical and vector retrieval and return bounded, traceable tombstone diagnostics; unrelated indexed documentation remains available.
+- `doc-atlas docs-impact --base ... --head ... --sync-saved-docs` derives lifecycle state from an exact Git diff and rejects dirty or otherwise unaccepted affected paths before indexing. The optional adapter performs no authoring, commits, comments, pushes, or network access.
+- The public MCP inventory remains `get_docs_context`, `prepare_docs`, and `docs_status`; incremental sync is an action of `prepare_docs`, not a fourth tool.
+- `eval/change_aware/maintenance_eval.json` freezes precision/recall, 8 KiB brief size, 2-second local latency, zero unrelated reprocessing, and zero unchanged derived-write budgets. `tests/docs/test_change_aware_maintenance.py`, `tests/test_docs_service.py`, `tests/test_cli.py`, and MCP contract tests cover the required fixtures and boundaries.
+
+The implementation was merged to `main` in `dc102f387117dad7834db366d123e2f5ee545b51`. This closure audit records the already-verified bounded workflow; it does not authorize DocAtlas to edit official documentation or claim a production-model quality result.
+
 ## Priority
 
 P1 core product goal.
