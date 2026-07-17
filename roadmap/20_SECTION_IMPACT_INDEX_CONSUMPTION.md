@@ -1,6 +1,17 @@
 # Task 20 — consume section metadata for precise documentation impact
 
-Status: implemented in `feat/task20-section-impact-index-consumption`.
+Status: Done for bounded section-impact scope (`a685767`).
+
+## Completion evidence
+
+- `ProjectSectionIndexReader` consumes stored section metadata only when its schema and document content hash match the repository file; stale or missing metadata is reparsed and reported through the existing `prepare_docs` refresh boundary.
+- `changed_evidence_from_git()` derives bounded Python, TypeScript/JavaScript, and Dart symbol evidence from the exact base/head diff, preserving rename, deletion, move, parser-fallback, and truncation diagnostics.
+- Every ranked section candidate carries a stable reason code, evidence, confidence, metadata source, and authority, separated into `must_update`, `review`, and `unlikely` groups.
+- The default contract is bounded to 200 returned section candidates and 32 KiB serialized output, with deterministic totals, omission accounting, and continuation guidance.
+- `tests/docs/test_docs_impact_task20.py` covers current/stale hashes, supported-language diffs, conservative fallbacks, ranking, bounds, continuation, and the 30-change quality corpus. The frozen gates require must-update recall at least 0.90 and precision at least 0.75.
+- The `docs-impact` CI job checks out full history and invokes the installed CLI with the pull request's exact base and head SHA; `--changed-symbol` remains an explicit override/debug input.
+
+The implementation was merged to `main` in `a685767b016219923139983a97f046a60ab395f1`. This audit closes the stale roadmap state; it does not broaden the implementation or claim automatic documentation editing.
 
 ## Priority
 
