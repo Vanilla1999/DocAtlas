@@ -211,7 +211,7 @@ def _is_provider_failure(stdout: str, stderr: str) -> bool:
 
 
 def _prepare_codex_home(request: AgentRunRequest) -> Path:
-    codex_home = request.output_dir / "env" / "codex_home"
+    codex_home = (request.output_dir / "env" / "codex_home").resolve()
     codex_home.mkdir(parents=True, exist_ok=True)
     source_home = Path(os.environ.get("CODEX_HOME", str(Path.home() / ".codex")))
     auth = source_home / "auth.json"
@@ -228,7 +228,7 @@ def _prepare_codex_home(request: AgentRunRequest) -> Path:
 
 
 def _prepare_blocked_network_tools(request: AgentRunRequest) -> Path:
-    bin_dir = request.output_dir / "env" / "blocked_bin"
+    bin_dir = (request.output_dir / "env" / "blocked_bin").resolve()
     bin_dir.mkdir(parents=True, exist_ok=True)
     script = "#!/bin/sh\nprintf '%s\n' 'blocked by benchmark network policy' >&2\nexit 126\n"
     for name in ("curl", "wget"):

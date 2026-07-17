@@ -12,7 +12,7 @@ import time
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any
+from typing import Any, Iterable
 
 from docmancer.docs.application.action_packet import build_action_packet
 
@@ -33,7 +33,11 @@ from .runners.codex import CodexRunner
 from .sandbox_execution import DockerCommandSandbox
 from .schemas import RESULTS_ROOT
 from .task33_local import _build_image, _prewarm_fixture_dependencies, _probe_retrieval
-from .task33_pilot import TASK33C_PILOT_CONDITIONS, TASK33C_PILOT_TASK_ID
+from .task33_pilot import (
+    TASK33C_EXPLORATORY_SMOKE_CONDITIONS,
+    TASK33C_PILOT_CONDITIONS,
+    TASK33C_PILOT_TASK_ID,
+)
 from .task33_validation import PROTOCOL_PATH, load_protocol
 
 
@@ -277,6 +281,11 @@ def main(argv: list[str] | None = None) -> int:
     )
     parser.add_argument("--run-exploratory-pilot", action="store_true")
     parser.add_argument(
+        "--two-cell-smoke",
+        action="store_true",
+        help="Run only repo-only and bounded-direct with one runner canary.",
+    )
+    parser.add_argument(
         "--host-exploratory",
         action="store_true",
         help="Skip Docker and run Codex plus evaluator commands on the host; never causal or VALID.",
@@ -293,6 +302,13 @@ def main(argv: list[str] | None = None) -> int:
         ),
     )
     args = parser.parse_args(argv)
+    if args.two_cell_smoke and not args.host_exploratory:
+        parser.error("--two-cell-smoke requires --host-exploratory")
+    selected_conditions = (
+        TASK33C_EXPLORATORY_SMOKE_CONDITIONS
+        if args.two_cell_smoke
+        else TASK33C_PILOT_CONDITIONS
+    )
 
     required = ("codex", "uv") if args.host_exploratory else ("codex", "docker", "uv")
     missing = [name for name in required if shutil.which(name) is None]
@@ -357,10 +373,17 @@ def main(argv: list[str] | None = None) -> int:
             preflight["status"] = "inconclusive_exploratory"
             return 3
         selector_sandbox = "danger-full-access" if args.host_exploratory else "read-only"
-        selector = _probe_codex_selector(
-            args.model,
-            args.worker_timeout_seconds,
-            sandbox_mode=selector_sandbox,
+        selector = (
+            {
+                "status": "not_required",
+                "reason": "two_cell_smoke_has_no_isolated_worker_lane",
+            }
+            if args.two_cell_smoke
+            else _probe_codex_selector(
+                args.model,
+                args.worker_timeout_seconds,
+                sandbox_mode=selector_sandbox,
+            )
         )
         preflight["checks"]["codex_oauth_selector"] = selector
         statuses = {
@@ -373,6 +396,7 @@ def main(argv: list[str] | None = None) -> int:
             "skipped_by_user",
             "exploratory_verified",
             "exploratory_unisolated",
+            "not_required",
         }:
             preflight["status"] = "inconclusive_exploratory"
             return 3
@@ -407,8 +431,10 @@ def main(argv: list[str] | None = None) -> int:
             "provider_usage_verified": False,
             "server_request_ids_verified": False,
             "task_id": TASK33C_PILOT_TASK_ID,
-            "conditions": list(TASK33C_PILOT_CONDITIONS),
+            "conditions": list(selected_conditions),
             "repeats": 1,
+            "two_cell_smoke": args.two_cell_smoke,
+            "provider_call_cap": 3 if args.two_cell_smoke else None,
             "model": args.model,
             "protocol_sha256_before": protocol_sha256_before,
             "execution_backend": "host_exploratory" if args.host_exploratory else "docker",
@@ -428,17 +454,27 @@ def main(argv: list[str] | None = None) -> int:
         runner_canary = run_canary(
             runner, args.model, args.timeout_seconds, run_dir / "runner_canary"
         )
-        docatlas_canary = run_docatlas_tool_visibility_canary(
-            runner,
-            args.model,
-            args.timeout_seconds,
-            run_dir / "docatlas_tool_visibility_canary",
+        docatlas_canary = (
+            {
+                "status": "not_required",
+                "reason": "two_cell_smoke_has_no_agent_tool_lane",
+            }
+            if args.two_cell_smoke
+            else run_docatlas_tool_visibility_canary(
+                runner,
+                args.model,
+                args.timeout_seconds,
+                run_dir / "docatlas_tool_visibility_canary",
+            )
         )
         _write_json(run_dir / "runner_canary.json", runner_canary)
         _write_json(run_dir / "docatlas_tool_visibility_canary.json", docatlas_canary)
         if (
             runner_canary.get("status") != "passed"
-            or docatlas_canary.get("docatlas_tool_visibility_verified") is not True
+            or (
+                not args.two_cell_smoke
+                and docatlas_canary.get("docatlas_tool_visibility_verified") is not True
+            )
         ):
             summary = {
                 "schema_version": 1,
@@ -455,16 +491,20 @@ def main(argv: list[str] | None = None) -> int:
         task = next(task for task in load_tasks() if task.task_id == TASK33C_PILOT_TASK_ID)
         results = execute_pilot(
             [task],
-            list(TASK33C_PILOT_CONDITIONS),
+            list(selected_conditions),
             1,
             args.run_id,
             runner,
             args.model,
             args.timeout_seconds,
             BASE_PROMPT,
-            isolated_worker=CodexExploratoryWorker(
-                model=args.model,
-                sandbox_mode=selector_sandbox,
+            isolated_worker=(
+                None
+                if args.two_cell_smoke
+                else CodexExploratoryWorker(
+                    model=args.model,
+                    sandbox_mode=selector_sandbox,
+                )
             ),
             isolated_worker_timeout_seconds=args.worker_timeout_seconds,
             evidence_tier="exploratory",
@@ -472,7 +512,10 @@ def main(argv: list[str] | None = None) -> int:
                 "host_exploratory" if args.host_exploratory else "docker"
             ),
         )
-        summary = summarize_exploratory_results(results)
+        summary = summarize_exploratory_results(
+            results,
+            expected_conditions=selected_conditions,
+        )
         protocol_sha256_after = hashlib.sha256(PROTOCOL_PATH.read_bytes()).hexdigest()
         summary["runner_canary"] = runner_canary
         summary["docatlas_canary"] = docatlas_canary
@@ -495,7 +538,7 @@ def main(argv: list[str] | None = None) -> int:
             "executive_result": summary["warning"],
             "decision": summary["verdict"],
             "claims_can_make": (
-                "The three local cells provide directional correctness, token, and latency metrics."
+                f"The {len(selected_conditions)} local cells provide directional correctness, token, and latency metrics."
             ),
             "claims_cannot_make": (
                 "This run cannot establish causal impact or receive a VALID Task 33C verdict."
@@ -658,7 +701,11 @@ def _write_json(path: Path, value: dict[str, Any]) -> None:
     path.write_text(json.dumps(value, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
 
-def summarize_exploratory_results(results: list[dict[str, Any]]) -> dict[str, Any]:
+def summarize_exploratory_results(
+    results: list[dict[str, Any]],
+    *,
+    expected_conditions: Iterable[str] | None = None,
+) -> dict[str, Any]:
     blocked_statuses = {
         "condition_setup_failed",
         "runner_unavailable",
@@ -716,11 +763,12 @@ def summarize_exploratory_results(results: list[dict[str, Any]]) -> dict[str, An
             "action_packet_tokens": metrics.get("action_packet_tokens"),
             "evidence_fingerprint": metrics.get("evidence_fingerprint"),
         }
-    expected = set(load_protocol()["conditions"])
+    expected_order = list(expected_conditions or load_protocol()["conditions"])
+    expected = set(expected_order)
     missing = sorted(expected - set(rows))
     missing_indexing_attribution = [
         condition
-        for condition in load_protocol()["conditions"]
+        for condition in expected_order
         if condition in rows and condition not in indexing_attribution_present
     ]
     blocked = sorted(

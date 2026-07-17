@@ -84,16 +84,58 @@ python -m eval.task_level.task33_local --run-causal-pilot
 
 The local result is acceptable only when `task33c_validation.json` reports `VALID`. GitHub Models and direct OpenAI API are separate frozen provider profiles; a single run must use exactly one profile for all three cells, and their results must not be pooled as if they used the same provider.
 
-For directional local iteration without an API key, an explicitly non-causal Codex OAuth path is also available. It does not modify the frozen provider profiles and can never produce `task33c_validation.json` or a `VALID` verdict. Run its preflight first:
+For directional local iteration without an API key, an explicitly non-causal Codex OAuth path is available. It does not modify the frozen provider profiles and can never produce `task33c_validation.json` or a `VALID` verdict.
 
-```bash
-python3 -m eval.task_level.task33_codex_exploratory
-```
+### Local two-cell smoke procedure
 
-After `preflight-summary.json` reports `READY_FOR_EXPLORATORY_RUN`, run the three one-attempt cells:
+Use this procedure to compare `repo_only_strict_offline` with `docatlas_bounded_direct`. Do not substitute the legacy three-cell exploratory pilot or expand to a matrix without explicit approval.
 
-```bash
-python3 -m eval.task_level.task33_codex_exploratory --run-exploratory-pilot
-```
+1. Run a provider-free preflight with a unique ID:
 
-Artifacts are written under `eval/task_level/results/task33c_codex_exploratory_<timestamp>[_preflight]/`. `task33c_exploratory_summary.json` records correctness, directional token counts, and latency per lane. Time-to-first-edit remains `null` because current Codex JSONL normalization is not stream-timed. Codex CLI thread IDs are labeled as client identifiers, not server request IDs. The selector runs read-only in an empty temporary workspace; parent coding runs with `workspace-write`; both receive allowlisted environments, and copied OAuth material is deleted after each invocation. Codex CLI still lacks frozen hard-turn and server-usage proof, so this path must not be used for causal or release claims. If either the Docker or Codex namespace sandbox cannot start, preflight fails closed; it never falls back to `danger-full-access`.
+   ```bash
+   run_id="task43_smoke_preflight_$(date -u +%Y%m%d_%H%M%S)"
+   uv run --python 3.13 --extra dev python \
+     -m eval.task_level.task33_codex_exploratory \
+     --host-exploratory \
+     --two-cell-smoke \
+     --run-id "$run_id"
+   ```
+
+   Require `preflight-summary.json` to report `READY_FOR_EXPLORATORY_RUN`, retrieval `status=verified`, exactly one retrieval call, no missing required paths/categories, and `codex_oauth_selector.status=not_required`. This command must not create Codex/provider event artifacts.
+
+2. Use a new unique ID for the bounded run. Result directories are immutable; never reuse the preflight ID:
+
+   ```bash
+   run_id="task43_smoke_run_$(date -u +%Y%m%d_%H%M%S)"
+   uv run --python 3.13 --extra dev python \
+     -m eval.task_level.task33_codex_exploratory \
+     --host-exploratory \
+     --two-cell-smoke \
+     --run-exploratory-pilot \
+     --run-id "$run_id" \
+     --timeout-seconds 600 \
+     --worker-timeout-seconds 120
+   ```
+
+   The entrypoint reruns the free preflight, performs one runner canary, and starts exactly two cells only after the canary passes. The provider-call cap is three: one canary, one repo-only cell, and one bounded-direct cell. Selector and DocAtlas tool-visibility canaries are not required because neither omitted lane is present.
+
+3. Do not retry a failed canary or cell in the same cycle. Preserve and classify the artifact, stop with zero or partial cells as applicable, fix infrastructure separately, and obtain explicit approval for a new cycle.
+
+4. Audit cardinality before reporting metrics. There must be exactly three `events.jsonl` streams under the run directory, and each must contain one `thread.started` and one `turn.completed`. Confirm `exploratory_manifest.json` records the exact two conditions, `repeats=1`, `two_cell_smoke=true`, and `provider_call_cap=3`.
+
+5. Verify the harness and frozen lock after local changes:
+
+   ```bash
+   uv run --python 3.13 --extra dev python -m pytest \
+     tests/task_level/test_task33_codex_exploratory.py \
+     tests/task_level/test_task_evaluation.py \
+     tests/task_level/test_runner_adapter.py \
+     tests/task_level/test_task33_validation.py -q
+   git diff --check
+   sha256sum eval/task_level/task33c_protocol.lock.json
+   git diff --quiet -- eval/task_level/task33c_protocol.lock.json
+   ```
+
+6. Compare correctness first (`resolved`, public tests, hidden tests), then evidence recall, total/uncached/output tokens, latency, tool calls, and failure class. A correctness tie with higher cost is not an improvement even if evidence recall rises. One task with one repeat is directional only; never make causal, statistical, release, or generalized performance claims.
+
+Artifacts are written under `eval/task_level/results/<run-id>[_preflight]/`. `task33c_exploratory_summary.json` records correctness, directional token counts, and latency per lane. Time-to-first-edit remains `null` in the summary because current Codex JSONL normalization is not stream-timed. Codex CLI thread IDs are client identifiers, not server request IDs. Host exploratory execution is unisolated, provider usage/server request IDs and hard-turn enforcement are not independently verified, and this path is not validator eligible.

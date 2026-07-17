@@ -8,11 +8,18 @@ from pathlib import Path
 import pytest
 
 from docmancer.docs.application.action_packet import build_action_packet
-from eval.task_level.execution import capture_patch, run_canary
+from eval.task_level.execution import capture_patch, fresh_run_environment, run_canary
 from eval.task_level.evaluators.policy import audit_trajectory
 from eval.task_level.runners.base import AgentRunOutput, AgentRunRequest
 from eval.task_level.runners.claude import ClaudeRunner
-from eval.task_level.runners.codex import _is_provider_failure, _normalize_jsonl, _redact, _token_usage_summary
+from eval.task_level.runners.codex import (
+    _is_provider_failure,
+    _normalize_jsonl,
+    _prepare_blocked_network_tools,
+    _prepare_codex_home,
+    _redact,
+    _token_usage_summary,
+)
 from eval.task_level.runners.opencode import _normalize_events, _write_opencode_config
 
 
@@ -73,6 +80,44 @@ def test_runner_canary_produces_patch(tmp_path: Path):
     assert result["status"] == "passed", json.dumps(result, sort_keys=True)
     assert result["patch_exists"]
     assert result["pytest_passes"]
+
+
+def test_relative_result_root_produces_absolute_subprocess_runtime_paths(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    monkeypatch.chdir(tmp_path)
+    source_home = tmp_path / "source-codex-home"
+    source_home.mkdir()
+    monkeypatch.setenv("CODEX_HOME", str(source_home))
+    output_dir = Path("results/run")
+    environment = fresh_run_environment(output_dir)
+    request = AgentRunRequest(
+        task_id="task",
+        condition_id="repo_only_strict_offline",
+        prompt="inspect",
+        workspace=tmp_path,
+        model="model",
+        timeout_seconds=30,
+        max_turns=1,
+        environment=environment,
+        mcp_config_path=None,
+        tool_policy_path=tmp_path / "policy.json",
+        output_dir=output_dir,
+    )
+
+    for name in (
+        "HOME",
+        "XDG_CONFIG_HOME",
+        "XDG_CACHE_HOME",
+        "DOCMANCER_HOME",
+        "DOCMANCER_INDEX_DB_PATH",
+        "DOCMANCER_EMBEDDINGS_CACHE",
+        "UV_PROJECT_ENVIRONMENT",
+    ):
+        assert Path(environment[name]).is_absolute(), name
+    assert _prepare_codex_home(request).is_absolute()
+    assert _prepare_blocked_network_tools(request).is_absolute()
 
 
 def test_patch_capture(tmp_path: Path):

@@ -232,6 +232,33 @@ def test_task33_preconditions_allow_codex_only_for_explicit_exploratory_tier():
         )
 
 
+def test_task33_preconditions_allow_only_exact_two_cell_exploratory_smoke():
+    task = next(task for task in load_tasks() if task.task_id == load_protocol()["task_id"])
+    runner = CodexRunner(sandbox_mode="workspace-write")
+    smoke_conditions = (
+        "repo_only_strict_offline",
+        "docatlas_bounded_direct",
+    )
+
+    _assert_task33_run_preconditions(
+        [task],
+        runner,
+        evidence_tier="exploratory",
+        conditions=smoke_conditions,
+        repeats=1,
+        evaluation_backend="host_exploratory",
+    )
+    with pytest.raises(ValueError, match="exactly the frozen protocol cells or two-cell smoke"):
+        _assert_task33_run_preconditions(
+            [task],
+            runner,
+            evidence_tier="exploratory",
+            conditions=smoke_conditions[:1],
+            repeats=1,
+            evaluation_backend="host_exploratory",
+        )
+
+
 def test_host_exploratory_evaluator_runs_without_docker(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
@@ -359,6 +386,96 @@ def test_preflight_stops_before_codex_probe_when_docker_boundary_fails(
     assert "codex_oauth_selector" not in summary["checks"]
 
 
+def test_two_cell_smoke_uses_one_canary_and_exactly_two_provider_cells(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    monkeypatch.setattr(task33_codex_exploratory, "RESULTS_ROOT", tmp_path)
+    monkeypatch.setattr(
+        task33_codex_exploratory.shutil,
+        "which",
+        lambda name: f"/usr/bin/{name}",
+    )
+    monkeypatch.setattr(
+        task33_codex_exploratory,
+        "_prewarm_fixture_dependencies",
+        lambda output: output / "uv-cache",
+    )
+    monkeypatch.setattr(
+        task33_codex_exploratory,
+        "_probe_retrieval",
+        lambda output: {"status": "verified"},
+    )
+    monkeypatch.setattr(
+        task33_codex_exploratory,
+        "_probe_codex_selector",
+        lambda *args, **kwargs: pytest.fail("selector must not run for two-cell smoke"),
+    )
+    monkeypatch.setattr(
+        task33_codex_exploratory,
+        "run_docatlas_tool_visibility_canary",
+        lambda *args, **kwargs: pytest.fail("tool canary must not run for two-cell smoke"),
+    )
+    monkeypatch.setattr(
+        task33_codex_exploratory,
+        "CodexExploratoryWorker",
+        lambda *args, **kwargs: pytest.fail("worker must not be created for two-cell smoke"),
+    )
+    monkeypatch.setattr(task33_codex_exploratory, "CodexRunner", lambda **kwargs: object())
+    canary_calls = []
+
+    def fake_canary(*args, **kwargs):
+        canary_calls.append((args, kwargs))
+        return {"status": "passed"}
+
+    monkeypatch.setattr(task33_codex_exploratory, "run_canary", fake_canary)
+    captured_conditions = []
+
+    def fake_execute(tasks, conditions, *args, **kwargs):
+        captured_conditions.extend(conditions)
+        return [
+            {
+                "condition_id": condition,
+                "status": "completed",
+                "resolved": True,
+                "metrics": {},
+                "budget": {},
+                "token_attribution": {
+                    "indexing": {
+                        "status": "already_current",
+                        "provider_input_tokens": 0,
+                        "provider_output_tokens": 0,
+                        "included_in_parent_budget": False,
+                    },
+                },
+            }
+            for condition in conditions
+        ]
+
+    monkeypatch.setattr(task33_codex_exploratory, "execute_pilot", fake_execute)
+    monkeypatch.setattr(task33_codex_exploratory, "write_report", lambda *args, **kwargs: None)
+    monkeypatch.setattr(task33_codex_exploratory, "_contains_auth_artifact", lambda root: False)
+
+    rc = task33_codex_exploratory.main([
+        "--host-exploratory",
+        "--two-cell-smoke",
+        "--run-exploratory-pilot",
+        "--run-id",
+        "two-cell-smoke",
+    ])
+
+    manifest = json.loads((tmp_path / "two-cell-smoke" / "exploratory_manifest.json").read_text())
+    assert rc == 0
+    assert len(canary_calls) == 1
+    assert captured_conditions == [
+        "repo_only_strict_offline",
+        "docatlas_bounded_direct",
+    ]
+    assert manifest["conditions"] == captured_conditions
+    assert manifest["provider_call_cap"] == 3
+    assert manifest["two_cell_smoke"] is True
+
+
 def test_exploratory_summary_reports_metrics_without_valid_verdict():
     conditions = load_protocol()["conditions"]
     results = [
@@ -407,6 +524,34 @@ def test_exploratory_summary_reports_metrics_without_valid_verdict():
         summary["conditions"]["docatlas_bounded_direct"]["time_to_first_edit_reason"]
         == "codex_jsonl_not_stream_timed"
     )
+
+
+def test_exploratory_summary_accepts_declared_two_cell_smoke_scope():
+    conditions = ("repo_only_strict_offline", "docatlas_bounded_direct")
+    results = [
+        {
+            "condition_id": condition,
+            "status": "completed",
+            "resolved": True,
+            "metrics": {},
+            "budget": {},
+            "token_attribution": {
+                "indexing": {
+                    "status": "already_current",
+                    "provider_input_tokens": 0,
+                    "provider_output_tokens": 0,
+                    "included_in_parent_budget": False,
+                },
+            },
+        }
+        for condition in conditions
+    ]
+
+    summary = summarize_exploratory_results(results, expected_conditions=conditions)
+
+    assert summary["status"] == "complete_exploratory"
+    assert summary["missing_conditions"] == []
+    assert set(summary["conditions"]) == set(conditions)
 
 
 def test_exploratory_summary_is_inconclusive_when_indexing_attribution_is_missing():

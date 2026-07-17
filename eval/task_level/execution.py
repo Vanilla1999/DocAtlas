@@ -55,6 +55,7 @@ from eval.task_level.sandbox_execution import (
 from eval.task_level.schemas import RESULTS_ROOT, TASK_LEVEL_ROOT, RunMetrics, TaskSpec
 from eval.task_level.task33_pilot import (
     TASK33C_AGENT_TURN_LIMIT,
+    TASK33C_EXPLORATORY_SMOKE_CONDITIONS,
     TASK33C_PILOT_CONDITIONS,
     TASK33C_PILOT_TASK_ID,
     TASK33C_REQUIRED_EVIDENCE_CATEGORIES,
@@ -561,7 +562,7 @@ def build_tool_policy(condition_id: str, output_dir: Path) -> tuple[Path, Path]:
 
 
 def fresh_run_environment(run_output_dir: Path) -> dict[str, str]:
-    env_root = run_output_dir / "env"
+    env_root = (run_output_dir / "env").resolve()
     home = env_root / "home"
     xdg_config = env_root / "xdg_config"
     xdg_cache = env_root / "xdg_cache"
@@ -1737,14 +1738,18 @@ def _assert_task33_run_preconditions(
                 "Task 33 causal execution requires a runner with a proven hard turn limit"
             )
         return
+    allowed_conditions = {
+        tuple(TASK33C_PILOT_CONDITIONS),
+        tuple(TASK33C_EXPLORATORY_SMOKE_CONDITIONS),
+    }
     if (
         [task.task_id for task in tasks] != [TASK33C_PILOT_TASK_ID]
-        or list(conditions or ()) != list(TASK33C_PILOT_CONDITIONS)
+        or tuple(conditions or ()) not in allowed_conditions
         or repeats != 1
         or getattr(runner, "runner_id", None) != "codex"
     ):
         raise ValueError(
-            "Task 33 exploratory execution requires Codex and exactly the frozen protocol cells"
+            "Task 33 exploratory execution requires Codex and exactly the frozen protocol cells or two-cell smoke"
         )
 
 
@@ -1967,17 +1972,22 @@ def capture_task33_host_evidence(
                 tokens=4_000,
                 limit=12,
             )
+        response = _replace_path_in_json(_jsonable(result), workspace, "<repo>")
+        retrieved_context_pack = tuple(
+            dict(item) for item in response.get("context_pack", []) if isinstance(item, dict)
+        )
+        context_pack = _augment_task33_host_context(
+            workspace,
+            retrieval_query,
+            retrieved_context_pack,
+        )
     except Exception as exc:
         raise IsolatedDeliveryError(f"host_retrieval_failed:{exc.__class__.__name__}") from exc
     finally:
         signal.alarm(0)
         signal.signal(signal.SIGALRM, old_handler)
 
-    response = _replace_path_in_json(_jsonable(result), workspace, "<repo>")
     status = str(response.get("status") or "unknown")
-    context_pack = tuple(
-        dict(item) for item in response.get("context_pack", []) if isinstance(item, dict)
-    )
     trust_contract = response.get("trust_contract") if isinstance(response.get("trust_contract"), dict) else {}
     retrieval_issues = list(bounded_retrieval_issues(response, project_evidence_required=True))
     available_paths = {
@@ -1988,6 +1998,8 @@ def capture_task33_host_evidence(
             retrieval_issues.append("missing_required_evidence_path:" + required_path)
     issues = tuple(dict.fromkeys(retrieval_issues))
     categories = _host_evidence_categories(context_pack)
+    accounted_response = dict(response)
+    accounted_response["context_pack"] = list(context_pack)
     wall = round(time.monotonic() - started, 6)
     snapshot = HostEvidenceSnapshot(
         query=retrieval_query,
@@ -2000,7 +2012,11 @@ def capture_task33_host_evidence(
         project_revision=project_revision,
         index_revision=index_revision,
         response_status=status,
-        raw_retrieval_tokens=_estimate_tokens(json.dumps(response, ensure_ascii=False, sort_keys=True)),
+        raw_retrieval_tokens=_estimate_tokens(json.dumps(
+            accounted_response,
+            ensure_ascii=False,
+            sort_keys=True,
+        )),
         retrieval_wall_time_seconds=wall,
     )
     snapshot.validate()
@@ -2023,6 +2039,103 @@ def capture_task33_host_evidence(
         "retrieval_issues": list(issues),
     })
     return snapshot
+
+
+def _augment_task33_host_context(
+    workspace: Path,
+    query: str,
+    retrieved_items: tuple[dict[str, Any], ...],
+) -> tuple[dict[str, Any], ...]:
+    """Add bounded deterministic local evidence without another retrieval call."""
+
+    from docmancer.docs.domain.project_doc_ranking import project_source_taxonomy
+    from docmancer.docs.domain.content_trust import annotate_context_pack
+    from docmancer.docs.domain.source_map import (
+        build_project_repo_map,
+        build_project_source_evidence,
+    )
+    from docmancer.docs.project import ProjectMetadataReader
+
+    root = workspace.resolve()
+    query_terms = {
+        term.lower()
+        for term in re.findall(r"[A-Za-z0-9_]+", query)
+        if len(term) >= 3
+    }
+    ranked_docs: list[tuple[int, str, dict[str, Any]]] = []
+    metadata = ProjectMetadataReader().read(root, docs_candidate_limit=64)
+    for candidate in metadata.docs_candidates:
+        relative = str(candidate.path or "").strip().replace("\\", "/")
+        path = (root / relative).resolve()
+        if not relative or not path.is_relative_to(root) or not path.is_file():
+            continue
+        content = path.read_text(encoding="utf-8", errors="replace")[:4_000]
+        searchable = " ".join((relative, str(candidate.description or ""), content)).lower()
+        score = sum(term in searchable for term in query_terms)
+        if not score:
+            continue
+        taxonomy = project_source_taxonomy(
+            relative,
+            doc_scope=candidate.doc_scope,
+            module_path=candidate.module_path,
+        )
+        ranked_docs.append((score, relative, {
+            "source_class": "project_doc",
+            "source_type": taxonomy["source_type"],
+            "source_kind": taxonomy["source_kind"],
+            "authority": candidate.authority or taxonomy["authority"],
+            "risk_flags": taxonomy["risk_flags"],
+            "doc_scope": candidate.doc_scope,
+            "module_path": candidate.module_path,
+            "description": candidate.description,
+            "lifecycle_status": candidate.lifecycle_status,
+            "impact_policy": candidate.impact_policy,
+            "path": relative,
+            "title": relative,
+            "heading_path": relative,
+            "freshness": "current",
+            "why_selected": "derived retrieval query matched discovered project documentation",
+            "content": content,
+            "token_estimate": max(1, len(content) // 4),
+        }))
+
+    local_items = [
+        item for _, _, item in sorted(ranked_docs, key=lambda row: (-row[0], row[1]))[:6]
+    ]
+    local_items.extend(
+        item
+        for item in build_project_source_evidence(
+            root,
+            question=query,
+            max_items=8,
+            token_budget=1_500,
+        )
+        if item.get("evidence_class") == "source_snippet"
+    )
+    local_items.extend(build_project_repo_map(
+        root,
+        question=query,
+        max_files=8,
+        token_budget=2_000,
+    ))
+    for item in local_items:
+        item.setdefault("origin_lane", "project")
+    local_items, _ = annotate_context_pack(local_items, repository_root=root)
+
+    merged: list[dict[str, Any]] = []
+    seen: set[tuple[str, str, str, str]] = set()
+    for item in (*retrieved_items, *local_items):
+        key = (
+            str(item.get("source_class") or ""),
+            str(item.get("path") or ""),
+            str(item.get("line_start") or ""),
+            str(item.get("heading_path") or ""),
+        )
+        if key in seen:
+            continue
+        seen.add(key)
+        merged.append(dict(item))
+    return tuple(merged)
 
 
 def stage_task33_host_evidence(
@@ -2057,7 +2170,12 @@ def _host_evidence_categories(items: tuple[dict[str, Any], ...]) -> tuple[str, .
         source_class = str(item.get("source_class") or item.get("source_kind") or "").lower()
         if "project" in source_class or source_class in {"readme", "agent_policy"}:
             categories.add("project_docs")
-        if source_class in {"repo_map", "source_evidence", "code_graph"}:
+        symbols = item.get("symbols")
+        has_explicit_symbols = isinstance(symbols, (list, tuple)) and any(
+            str(symbol.get("name") or "").strip() if isinstance(symbol, dict) else str(symbol).strip()
+            for symbol in symbols
+        )
+        if source_class in {"repo_map", "code_graph"} and has_explicit_symbols:
             categories.add("symbols")
         if source_class in {"library_doc", "dependency_doc", "package_doc"}:
             categories.add("dependencies")

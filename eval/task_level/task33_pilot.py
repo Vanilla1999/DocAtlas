@@ -17,6 +17,10 @@ TASK33C_PILOT_CONDITIONS = (
     "docatlas_tool_required_once",
     "docatlas_bounded_direct",
 )
+TASK33C_EXPLORATORY_SMOKE_CONDITIONS = (
+    "repo_only_strict_offline",
+    "docatlas_bounded_direct",
+)
 TASK33C_PILOT_TASK_ID = "decisive_nbo_cross_module_gate_large_001"
 TASK33C_REQUIRED_EVIDENCE_CATEGORIES = ("project_docs", "symbols")
 TASK33C_REQUIRED_EVIDENCE_PATHS = (
