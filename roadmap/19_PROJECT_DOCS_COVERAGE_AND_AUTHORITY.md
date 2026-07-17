@@ -4,6 +4,22 @@
 
 P1 local-project quality.
 
+## Implementation status
+
+Done for the bounded local Task 19 scope. Documentation gaps are evaluated per required
+section from parsed production evidence; aggregate completeness fails closed whenever one
+section is partial or missing. The reviewable catalog supports exact documents, configured
+monorepo roots, and optional local index graphs with repository containment, symlink,
+traversal, loop, and work-count bounds. Authority and lifecycle metadata keep completed or
+superseded plans out of ordinary retrieval while preserving explicit history search. The
+coding-model handoff retains missing-evidence and sync/retry actions within a deterministic
+12 KiB serialized ceiling and reports omissions.
+
+Evidence: `tests/docs/test_project_state.py`,
+`tests/docs/test_project_evidence_production.py`,
+`tests/docs/test_project_docs_catalog.py`, and
+`tests/docs/test_task19_project_docs_closure.py`.
+
 ## Problem
 
 The missing-doc handoff can set `evidence_complete=true` merely because some evidence was found. A minimal manifest can therefore be presented as enough to document entrypoints, modules, runtime flow, configuration, and tests. Documentation discovery is also tied to a small set of directory names, while roadmap/research prompts can be indexed without a reliable active/completed authority.

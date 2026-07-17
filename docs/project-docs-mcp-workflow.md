@@ -181,7 +181,7 @@ Prefer `prefetch_project_dependency_docs` in new instructions because it makes t
 
 ## Maintained project-doc catalog
 
-For repositories with nonstandard documentation names or more than a few files, keep a reviewable `docatlas.project-docs.yaml` catalog. When it exists, DocAtlas indexes only validated catalog entries. Without it, common README/docs/module locations remain a cold-start fallback.
+For repositories with nonstandard documentation names or more than a few files, keep a reviewable `docatlas.project-docs.yaml` catalog. When it exists, DocAtlas indexes only validated catalog entries: exact documents and configured roots. Without it, common README/docs/module locations remain a cold-start fallback.
 
 ```yaml
 schema_version: 1
@@ -202,9 +202,25 @@ documents:
     authority: source_of_truth
     status: active
     impact: track
+
+roots:
+  - path: backend/docs
+    scope: module
+    module_path: backend
+    authority: source_of_truth
+
+  - path: frontend/guides
+    scope: module
+    module_path: frontend
+    authority: supporting
+    index: INDEX.md
 ```
 
-The host coding model may edit this normal Git file after inspecting the repository. DocAtlas only validates and consumes it. Invalid paths, traversal, symlinks, duplicates, missing files, and unsupported formats fail closed with warnings. An invalid explicit catalog blocks retrieval, ingestion, and synchronization without pruning the existing index; fix the catalog and inspect again. Catalog paths and descriptions are untrusted routing metadata, not agent instructions. Use `status: completed` or `superseded` and `impact: search_only` for historical material.
+An entry under `roots` enables bounded recursive discovery below that exact repository directory. When `index` is present, discovery is narrower: DocAtlas includes the index and follows only local documentation links that stay inside the configured root. External links, traversal, symlink targets, missing targets, and index loops cannot expand the project-doc boundary and are reported as warnings.
+
+The host coding model may edit this normal Git file after inspecting the repository. DocAtlas only validates and consumes it. Invalid paths, root traversal, symlinked roots, duplicates, missing files, and unsupported formats fail closed with warnings. An invalid explicit catalog blocks retrieval, ingestion, and synchronization without pruning the existing index; fix the catalog and inspect again. Catalog paths and descriptions are untrusted routing metadata, not agent instructions. Use `status: completed` or `superseded` and `impact: search_only` for exact historical documents. Completed and superseded sources are excluded from ordinary retrieval and remain searchable only for explicit history or completed-roadmap questions.
+
+When project documentation is missing, the returned authoring handoff reports `complete`, `partial`, or `missing` per required section, including named evidence paths/facts and bounded missing-evidence requests. The complete serialized handoff is capped at 12 KiB. If evidence must be omitted, missing categories and the existing sync/retry actions remain present and `documentation_gap.bounds.omitted_counts` records the truncation.
 
 ## Verification loop
 

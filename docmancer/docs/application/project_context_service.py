@@ -13,7 +13,7 @@ from docmancer.docs.domain.answer_completeness import (
 )
 from docmancer.docs.domain.project_doc_ranking import is_changelog_path, normalize_doc_path, project_source_taxonomy, rerank_project_doc_chunks
 from docmancer.docs.domain.project_query_intent import classify_project_query_intent
-from docmancer.docs.domain.project_state import evaluate_documentation_sections
+from docmancer.docs.domain.project_state import bound_project_docs_handoff, evaluate_documentation_sections
 from docmancer.docs.domain.project_evidence import classify_project_evidence
 from docmancer.docs.domain.quality import has_code_symbol_evidence, internal_noise_score, is_trivial_section, looks_like_code_or_command
 from docmancer.docs.domain.snippets import best_context_pack_snippet, build_snippet_presentation, validate_response_style
@@ -116,6 +116,9 @@ def _source_ground_documentation_gap(
         gap["evidence_to_collect"] = evidence
         gap["evidence_complete"] = evidence_complete
         action["documentation_gap"] = gap
+        compact = bound_project_docs_handoff(action)
+        action.clear()
+        action.update(compact)
     return observed_repo_map or repo_map, code_graph
 
 

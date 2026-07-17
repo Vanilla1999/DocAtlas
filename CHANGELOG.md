@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - **Bounded direct context delivery:** coding agents can request a versioned, source-attributed `ActionPacket`; wrapper and recovery metadata are included in the 2,000 estimated-token payload ceiling, and raw retrieval content does not enter the parent coding session.
 - **Documentation contract gate:** active user documentation is checked against the real Click command tree and option inventory, while branding, Git trackability, canonical-workflow ownership, and documentation-size budgets remain regression-tested.
+- **Project documentation roots:** reviewable project-doc catalogs can select bounded monorepo documentation roots and optional local indexes without allowing traversal, symlink expansion, or index loops.
 
 ### Changed
 
@@ -19,6 +20,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Fixed
 
 - **Kotlin acceptance provenance:** preserve the original GitHub blob request separately from its raw fetch identity, and make the pinned live-smoke gate reject echoed questions, unrelated citations, missing exact-version provenance, unpinned machine artifacts, and non-isolated live runs.
+- **Project documentation authority:** keep incomplete evidence handoffs honest per section, cap them at 12 KiB with deterministic omission accounting, and exclude completed or superseded project plans from ordinary retrieval unless history is explicitly requested.
 
 ## [1.2.0] - 2026-07-12
 

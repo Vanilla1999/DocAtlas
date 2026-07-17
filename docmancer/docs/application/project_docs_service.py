@@ -18,6 +18,7 @@ import yaml
 
 from docmancer.core.config import DocmancerConfig
 from docmancer.docs.domain.policies import docs_policy, is_stale
+from docmancer.docs.domain.project_doc_ranking import query_requests_history
 from docmancer.docs.domain.project_state import create_project_docs_next_action, has_high_level_project_overview, partition_project_doc_state, project_docs_structured_next_action
 from docmancer.docs.domain.source_identity import docs_exactness, docs_identity, docs_request
 from docmancer.docs.domain.target_security import host_allowed, is_remote_url, path_allowed, url_security_error
@@ -1497,10 +1498,7 @@ class ProjectDocsService:
         }
         safe_chunks = []
         dropped_placeholder_chunks = 0
-        history_requested = any(
-            term in query.lower()
-            for term in ("history", "historical", "roadmap", "completed", "superseded", "previous plan")
-        )
+        history_requested = query_requests_history(query)
         for chunk in chunks:
             metadata_for_chunk = chunk.metadata or {}
             chunk_path = metadata_for_chunk.get("project_doc_path") or metadata_for_chunk.get("source_path")

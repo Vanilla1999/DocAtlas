@@ -1,9 +1,200 @@
 from __future__ import annotations
 
+from copy import deepcopy
+import json
 from pathlib import Path
 from typing import Any
 
 from docmancer.docs.domain.source_map import build_project_repo_map
+
+
+PROJECT_DOCS_HANDOFF_MAX_BYTES = 12 * 1024
+
+
+def _serialized_bytes(value: Any) -> int:
+    return len(
+        json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    )
+
+
+def _bounded_strings(
+    values: Any,
+    *,
+    limit: int,
+    max_characters: int,
+) -> tuple[list[str], int, int]:
+    if not isinstance(values, list):
+        return [], 0, 0
+    strings = [value.strip() for value in values if isinstance(value, str) and value.strip()]
+    bounded = [value[:max_characters] for value in strings[:limit]]
+    omitted_characters = sum(max(0, len(value) - max_characters) for value in strings[:limit])
+    return bounded, max(0, len(strings) - len(bounded)), omitted_characters
+
+
+def bound_project_docs_handoff(
+    action: dict[str, Any],
+    *,
+    max_bytes: int = PROJECT_DOCS_HANDOFF_MAX_BYTES,
+) -> dict[str, Any]:
+    """Return a deterministic compact handoff while retaining gaps and follow-up actions."""
+    bounded = deepcopy(action)
+    gap = dict(bounded.get("documentation_gap") or {})
+    existing_bounds = gap.get("bounds") if isinstance(gap.get("bounds"), dict) else {}
+    existing_omitted = existing_bounds.get("omitted_counts") if isinstance(existing_bounds, dict) else {}
+    omitted: dict[str, int] = {
+        key: value
+        for key, value in (existing_omitted.items() if isinstance(existing_omitted, dict) else [])
+        if isinstance(key, str) and isinstance(value, int) and value > 0
+    }
+
+    def record(key: str, count: int) -> None:
+        if count > 0:
+            omitted[key] = omitted.get(key, 0) + count
+
+    sections: list[dict[str, Any]] = []
+    raw_sections = gap.get("required_sections")
+    if isinstance(raw_sections, list):
+        for index, raw in enumerate(raw_sections):
+            if not isinstance(raw, dict):
+                record("required_sections.invalid", 1)
+                continue
+            section = {
+                key: raw[key]
+                for key in (
+                    "name", "state", "evidence", "evidence_paths", "facts",
+                    "missing_evidence", "discovery_suggestions",
+                )
+                if key in raw
+            }
+            record("required_sections.unknown_fields", len(set(raw) - set(section)))
+            for key, limit, characters in (
+                ("evidence", 12, 160),
+                ("evidence_paths", 12, 320),
+                ("facts", 6, 320),
+                ("missing_evidence", 16, 160),
+                ("discovery_suggestions", 4, 320),
+            ):
+                values, count, character_count = _bounded_strings(
+                    section.get(key), limit=limit, max_characters=characters
+                )
+                section[key] = values
+                record(f"required_sections.{key}", count)
+                record(f"required_sections.{key}_characters", character_count)
+            if isinstance(section.get("name"), str):
+                original = section["name"]
+                section["name"] = original[:160]
+                record("required_sections.name_characters", max(0, len(original) - 160))
+            sections.append(section)
+    gap["required_sections"] = sections
+    gap["missing_evidence"] = list(dict.fromkeys(
+        item
+        for section in sections
+        for item in section.get("missing_evidence") or []
+        if isinstance(item, str) and item
+    ))
+
+    evidence_rows: list[dict[str, Any]] = []
+    raw_evidence = gap.get("evidence_to_collect")
+    if isinstance(raw_evidence, list):
+        for raw in raw_evidence[:24]:
+            if not isinstance(raw, dict):
+                record("evidence_to_collect.invalid", 1)
+                continue
+            row = {
+                key: raw[key]
+                for key in ("category", "paths", "facts")
+                if key in raw
+            }
+            record("evidence_to_collect.unknown_fields", len(set(raw) - set(row)))
+            if isinstance(row.get("category"), str):
+                original = row["category"]
+                row["category"] = original[:160]
+                record("evidence_to_collect.category_characters", max(0, len(original) - 160))
+            for key, limit, characters in (("paths", 12, 320), ("facts", 6, 320)):
+                values, count, character_count = _bounded_strings(
+                    row.get(key), limit=limit, max_characters=characters
+                )
+                row[key] = values
+                record(f"evidence_to_collect.{key}", count)
+                record(f"evidence_to_collect.{key}_characters", character_count)
+            evidence_rows.append(row)
+        record("evidence_to_collect.rows", max(0, len(raw_evidence) - 24))
+    gap["evidence_to_collect"] = evidence_rows
+    gap["bounds"] = {
+        "max_serialized_bytes": max_bytes,
+        "serialized_bytes": 0,
+        "truncated": bool(omitted),
+        "omitted_counts": omitted,
+    }
+    bounded["documentation_gap"] = gap
+
+    argument_holders = [
+        *(bounded.get("after") or []),
+        bounded.get("after_file_change"),
+    ]
+    for follow_up in argument_holders:
+        if not isinstance(follow_up, dict):
+            continue
+        arguments = follow_up.get("arguments_patch")
+        if not isinstance(arguments, dict):
+            continue
+        for key, value in list(arguments.items()):
+            if not isinstance(value, str):
+                continue
+            max_characters = 512 if key == "question" else 1024
+            if len(value) > max_characters:
+                arguments[key] = value[:max_characters]
+                record(
+                    f"action.arguments_patch.{key}_characters",
+                    len(value) - max_characters,
+                )
+    for key, max_characters in (("reason", 1024), ("agent_guidance", 1024)):
+        value = bounded.get(key)
+        if isinstance(value, str) and len(value) > max_characters:
+            bounded[key] = value[:max_characters]
+            record(f"action.{key}_characters", len(value) - max_characters)
+
+    def over_budget() -> bool:
+        return _serialized_bytes(bounded) > max_bytes
+
+    removable_lists: list[tuple[str, list[Any], int]] = []
+    for row in reversed(evidence_rows):
+        removable_lists.extend([
+            ("evidence_to_collect.facts", row.get("facts") or [], 0),
+            ("evidence_to_collect.paths", row.get("paths") or [], 0),
+        ])
+    for section in reversed(sections):
+        removable_lists.extend([
+            ("required_sections.facts", section.get("facts") or [], 0),
+            ("required_sections.evidence_paths", section.get("evidence_paths") or [], 0),
+            ("required_sections.discovery_suggestions", section.get("discovery_suggestions") or [], 1),
+        ])
+    for key, values, minimum in removable_lists:
+        while over_budget() and len(values) > minimum:
+            values.pop()
+            record(key, 1)
+
+    while over_budget() and evidence_rows:
+        evidence_rows.pop()
+        record("evidence_to_collect.rows", 1)
+
+    for key in ("reason", "agent_guidance", "suggested_paths"):
+        if over_budget() and key in bounded:
+            bounded.pop(key)
+            record(f"action.{key}", 1)
+
+    while over_budget() and sections:
+        sections.pop()
+        record("required_sections.rows", 1)
+
+    bounds = gap["bounds"]
+    bounds["truncated"] = bool(omitted)
+    bounds["omitted_counts"] = dict(sorted(omitted.items()))
+    for _ in range(3):
+        bounds["serialized_bytes"] = _serialized_bytes(bounded)
+    if bounds["serialized_bytes"] > max_bytes:
+        raise ValueError("project docs handoff cannot fit the configured byte limit")
+    return bounded
 
 
 def partition_project_doc_state(
@@ -140,7 +331,7 @@ def create_project_docs_next_action(root: Path, query: str | None = None, *, rea
         {"name": "development commands", "evidence": ["manifests", "test and build configuration"]},
     ]
     required_sections, evidence_complete = evaluate_documentation_sections(required_sections, evidence_to_collect)
-    return {
+    action = {
         "action": "create_reviewable_project_doc",
         "requires_confirmation": True,
         "preferred_path": "ARCHITECTURE.md",
@@ -171,6 +362,7 @@ def create_project_docs_next_action(root: Path, query: str | None = None, *, rea
             {"tool": "get_docs_context", "requires_confirmation": False, "arguments_patch": get_docs_context_args},
         ],
     }
+    return bound_project_docs_handoff(action)
 
 
 def project_docs_structured_next_action(
@@ -196,8 +388,7 @@ def project_docs_structured_next_action(
         if reason_code == "architecture_doc_creation_recommended":
             agent_message = "Project docs exist, but no high-level architecture or overview document was found. Ask the user before creating ARCHITECTURE.md as a repository file, then inspect and sync it after creation."
             user_message = "I could not find a high-level project architecture document. Do you want me to inspect the repository and create ARCHITECTURE.md as a reviewable file?"
-        return (
-            {
+        structured_handoff = bound_project_docs_handoff({
                 "action": "create_reviewable_project_doc",
                 "type": "ask_user_to_create_project_doc",
                 "suggested_file": "ARCHITECTURE.md",
@@ -205,7 +396,9 @@ def project_docs_structured_next_action(
                 "documentation_gap": handoff["documentation_gap"],
                 "after_file_change": handoff["after_file_change"],
                 "after": handoff["after"],
-            },
+            })
+        return (
+            structured_handoff,
             True,
             "repo_write",
             project_args,
