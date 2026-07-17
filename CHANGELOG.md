@@ -18,6 +18,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - **Release maturity truth:** clarify that artifact-level Task 15 evidence is complete while a Stable claim still requires Task 14 live external-ingest evidence and an approved post-publish verification of the exact public release.
 - **Section-impact roadmap truth:** reconcile the active roadmap with the merged hash-bound section index, automatic base/head symbol extraction, conservative fallback, and bounded evidence-bearing ranking gates.
 - **Change-aware maintenance roadmap truth:** record the merged evidence-bounded authoring handoff, hash-idempotent incremental sync, exact-diff acceptance guard, scoped derived work, and three-tool MCP boundary as complete for local scope.
+- **Maintenance-surface roadmap truth:** revalidate and close the machine-classified support inventory, offline CI separation, bounded deprecations, tier-labelled help, and Task 24 dependency-placement handoff after the compact retrieval stack landed.
 
 ### Fixed
 
