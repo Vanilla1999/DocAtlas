@@ -7,6 +7,7 @@ from typing import Any, Literal
 
 from eval.task_level.evaluators.contract import ContractEvaluation
 from eval.task_level.schemas import TaskSpec
+from eval.task_level.task33_pilot import TASK33C_PILOT_TASK_ID
 
 
 SourceType = Literal["issue", "project_doc", "code_symbol", "library_doc", "hidden_test"]
@@ -21,6 +22,7 @@ class ContractRequirement:
     allowed_for_agent: bool
     expected_symbols: list[str] = field(default_factory=list)
     expected_files: list[str] = field(default_factory=list)
+    match_all_symbols: bool = False
 
 
 @dataclass(frozen=True)
@@ -93,6 +95,61 @@ def requirements_for_task(task_id: str) -> list[ContractRequirement]:
             ContractRequirement(task_id, "no_flow_duplicate_policy", "Flow gates must not duplicate permission policy.", "project_doc", True, ["evaluatePreflight"], ["docs/permission-architecture.md"]),
             ContractRequirement(task_id, "generated_files_untouched", "Generated permission result files must not be edited.", "project_doc", True, [".freezed.dart", ".g.dart"], ["docs/generated-files.md"]),
         ]
+    if task_id == TASK33C_PILOT_TASK_ID:
+        return [
+            ContractRequirement(
+                task_id,
+                "shared_entry_decision",
+                "PermissionService.evaluateFlowEntry owns the canonical flow-entry decision.",
+                "project_doc",
+                True,
+                ["PermissionService", "evaluateFlowEntry", "PermissionDecision"],
+                [
+                    "docs/permission-architecture.md",
+                    "lib/modules/permission/application/permission_service.dart",
+                ],
+                match_all_symbols=True,
+            ),
+            ContractRequirement(
+                task_id,
+                "browser_gate_delegates",
+                "BrowserPermissionGate delegates flow entry to PermissionService.evaluateFlowEntry.",
+                "project_doc",
+                True,
+                ["BrowserPermissionGate", "evaluateFlowEntry"],
+                [
+                    "docs/browser-flow.md",
+                    "lib/modules/browser/application/browser_permission_gate.dart",
+                ],
+                match_all_symbols=True,
+            ),
+            ContractRequirement(
+                task_id,
+                "scan_gate_delegates",
+                "ScanPermissionGate delegates flow entry to PermissionService.evaluateFlowEntry.",
+                "project_doc",
+                True,
+                ["ScanPermissionGate", "evaluateFlowEntry"],
+                [
+                    "docs/scan-flow.md",
+                    "lib/modules/scan/application/scan_permission_gate.dart",
+                ],
+                match_all_symbols=True,
+            ),
+            ContractRequirement(
+                task_id,
+                "offline_sync_uses_shared_gate",
+                "OfflineSyncGate uses PermissionService.evaluateFlowEntry before accepting queued work.",
+                "project_doc",
+                True,
+                ["OfflineSyncGate", "evaluateFlowEntry"],
+                [
+                    "docs/offline-sync.md",
+                    "lib/modules/sync/application/offline_sync_gate.dart",
+                ],
+                match_all_symbols=True,
+            ),
+        ]
     return []
 
 
@@ -147,6 +204,10 @@ def _load_checklist(path: Path) -> list[dict[str, Any]]:
 
 
 def _requirement_in_text(requirement: ContractRequirement, text: str) -> bool:
+    if requirement.match_all_symbols:
+        return bool(requirement.expected_symbols) and all(
+            symbol and symbol in text for symbol in requirement.expected_symbols
+        )
     if any(symbol and symbol in text for symbol in requirement.expected_symbols):
         return True
     return any(path and path in text for path in requirement.expected_files)

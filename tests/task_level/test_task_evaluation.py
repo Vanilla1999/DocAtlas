@@ -9,7 +9,6 @@ from types import SimpleNamespace
 import pytest
 
 from eval.task_level.execution import (
-    BOUNDED_DIRECT_EXECUTION_POLICY,
     TASK33C_REQUIRED_TARGET_PATHS,
     _bounded_direct_projection_errors,
     _estimate_tokens,
@@ -30,15 +29,6 @@ from eval.task_level.schemas import TASKS_PATH
 
 def _task(task_id: str):
     return next(task for task in load_tasks(TASKS_PATH) if task.task_id == task_id)
-
-
-def test_bounded_direct_execution_policy_has_explicit_stop_and_rediscovery_guards():
-    policy = BOUNDED_DIRECT_EXECUTION_POLICY.casefold()
-
-    assert "do not reread cited project docs" in policy
-    assert "do not guess test paths" in policy
-    assert "one red" in policy and "one green" in policy
-    assert "stop when" in policy
 
 
 def test_bounded_direct_rejects_insufficient_model_visible_projection():

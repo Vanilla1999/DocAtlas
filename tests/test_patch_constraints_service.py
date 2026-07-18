@@ -653,31 +653,11 @@ class HelpAppStrings {
     assert any(candidate["matched_symbol"] == "helpRequestReturnToWorkBtn" for candidate in packet.symbol_candidates)
 
 
-# Backward-compatible smoke names from the first production PR.
-def test_generated_file_constraint_extraction(tmp_path: Path):
-    test_extracts_generated_file_constraint_from_docs(tmp_path)
-
-
-def test_source_of_truth_extraction(tmp_path: Path):
-    test_extracts_source_of_truth_service_layer_constraint(tmp_path)
-
-
-def test_pinned_dependency_extraction(tmp_path: Path):
-    test_extracts_pinned_dependency_from_pubspec_lock(tmp_path)
-
-
 def test_constraints_have_source_attribution(tmp_path: Path):
     packet = _packet(_workspace(tmp_path))
     assert packet.constraints
     assert all(c.source and c.evidence and c.confidence in {"high", "medium", "low"} for c in packet.constraints)
 
-
-def test_budget_limits_keep_must_high_confidence_first(tmp_path: Path):
-    test_budget_keeps_must_high_confidence_constraints(tmp_path)
-
-
-def test_no_benchmark_oracle_hidden_test_leakage(tmp_path: Path):
-    test_does_not_emit_hidden_or_benchmark_oracle_sources(tmp_path)
 
 def test_drops_non_actionable_headings_tree_and_owner_noise(tmp_path: Path):
     root = _workspace(

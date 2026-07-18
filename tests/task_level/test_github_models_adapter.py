@@ -156,6 +156,55 @@ def test_github_models_runner_enforces_turns_and_edits_with_closed_tool_loop(
     assert "Bearer token" not in (output_dir / "github_models_usage.json").read_text(encoding="utf-8")
 
 
+def test_github_models_runner_stops_at_host_owned_turn_limit(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    workspace = tmp_path / "workspace"
+    workspace.mkdir()
+    (workspace / "module.py").write_text("VALUE = 1\n", encoding="utf-8")
+    calls = 0
+
+    def fake_complete(self, **kwargs):
+        nonlocal calls
+        calls += 1
+        action = _action("read_file", path="module.py")
+        return action, _completion(action, turn=calls)
+
+    monkeypatch.setattr(
+        "eval.task_level.github_models.GitHubModelsClient.complete_json",
+        fake_complete,
+    )
+    output_dir = tmp_path / "output"
+    request = AgentRunRequest(
+        task_id="runner_canary",
+        condition_id="repo_only",
+        workspace=workspace,
+        prompt="Keep reading forever.",
+        model="openai/gpt-4.1-mini",
+        timeout_seconds=30,
+        max_turns=2,
+        environment={},
+        mcp_config_path=None,
+        tool_policy_path=tmp_path / "policy.json",
+        output_dir=output_dir,
+        allowed_write_paths=("module.py",),
+    )
+
+    output = GitHubModelsRunner(
+        "token", sandbox=cast(DockerCommandSandbox, _TestSandbox())
+    ).run(request)
+    usage = json.loads((output_dir / "github_models_usage.json").read_text(encoding="utf-8"))
+
+    assert calls == 2
+    assert output.status == "max_turns_exhausted"
+    assert output.exit_code == 2
+    assert output.max_turns_enforced is True
+    assert [turn["turn"] for turn in usage["turns"]] == [1, 2]
+    assert output.token_usage["completed_turn_events"] == 2
+    assert output.token_usage["effective_max_turns"] == 2
+
+
 def test_required_once_runner_uses_bounded_direct_docs_delivery(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,

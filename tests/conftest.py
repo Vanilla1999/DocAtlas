@@ -10,8 +10,15 @@ from __future__ import annotations
 import ipaddress
 import os
 import socket
+from pathlib import Path
 
 import pytest
+
+from tests.diagnostic_labels import (
+    apply_diagnostic_label,
+    load_diagnostic_manifest,
+    validate_diagnostic_inventory,
+)
 
 os.environ.setdefault("DOCMANCER_AUTO_VECTORS", "0")
 
@@ -33,9 +40,33 @@ def pytest_configure(config):
         "markers",
         "mock_network_dns: replaces public DNS with a deterministic documentation address",
     )
+    for name, description in {
+        "behavioral": "executes production behavior and checks a semantic outcome",
+        "schema": "checks a static or wire-format shape without proving producer behavior",
+        "artifact": "checks a committed artifact without executing its producer",
+        "serialization": "checks encoding or decoding compatibility only",
+        "compatibility": "checks a deliberately supported backward-compatible surface",
+        "diagnostic_unclassified": "temporary fail-closed diagnostic inventory marker",
+    }.items():
+        config.addinivalue_line("markers", f"{name}: {description}")
 
 
 def pytest_collection_modifyitems(config, items):
+    manifest = load_diagnostic_manifest(Path(__file__).with_name("diagnostic_labels.json"))
+    complete_modules: set[str] = set()
+    for selection in config.args:
+        if "::" in selection:
+            continue
+        selected_path = Path(selection).resolve()
+        if selected_path.is_file() and selected_path.suffix == ".py":
+            complete_modules.add(selected_path.relative_to(Path.cwd()).as_posix())
+        elif selected_path.is_dir():
+            complete_modules.update(
+                module
+                for module in manifest["module_labels"]
+                if (Path.cwd() / module).resolve().is_relative_to(selected_path)
+            )
+    validate_diagnostic_inventory(items, manifest, complete_modules)
     advanced_modules = {
         "test_context7_parity_eval.py",
         "test_eval.py",
@@ -54,6 +85,7 @@ def pytest_collection_modifyitems(config, items):
         "test_patch_constraints_",
     )
     for item in items:
+        apply_diagnostic_label(item, manifest)
         if item.get_closest_marker("live_network"):
             item.add_marker(pytest.mark.live)
         if (

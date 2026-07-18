@@ -602,7 +602,6 @@ class TestGuardDroppedAll:
             ),
         ]
 
-        original_query = agent.query
         def guarded_query(text, limit=None, budget=None, expand=None):
             return wrong_chunks
         agent.query = guarded_query
@@ -626,24 +625,20 @@ class TestGuardDroppedAll:
             force_refresh=False,
         )
 
-        # All chunks should be filtered → empty result
-        if docs_result.status == "empty_library_index":
-            diagnostics = docs_result.diagnostics or {}
-            reason = diagnostics.get("reason_code")
-            # When all chunks are dropped by guard, the check is `dropped > 0`
-            # which evaluates True, so we should see guard_dropped_all
-            if "guard_dropped_all" in str(diagnostics.get("warnings", [])):
-                assert True, "guard_dropped_all indicated in warnings"
-            else:
-                # The inline code checks `dropped > 0` which should be 2 here
-                # So reason_code should be guard_dropped_all
-                pass
-        else:
-            # If the mock data allows some through, verify no cross-contamination
-            for chunk in docs_result.results:
-                meta = chunk.metadata or {}
-                if meta.get("library_id"):
-                    assert "test-lib" in meta["library_id"]
+        diagnostics = docs_result.diagnostics or {}
+        warnings = diagnostics.get("warnings", [])
 
-        # Restore
-        agent.query = original_query
+        assert docs_result.status == "empty_library_index"
+        assert diagnostics["reason_code"] == "guard_dropped_all"
+        assert {
+            warning["code"]: warning["dropped"]
+            for warning in warnings
+            if warning.get("code") in {
+                "cross_source_contamination_filtered",
+                "wrong_library_id",
+            }
+        } == {
+            "cross_source_contamination_filtered": 2,
+            "wrong_library_id": 2,
+        }
+        assert docs_result.results == []

@@ -100,3 +100,15 @@ jobs:
 
       - name: Run offline advanced contract and shared-security tests
         run: pytest tests/ -m advanced -v
+
+      - name: Run critical mutation gate
+        run: python scripts/run_critical_mutation_gate.py
+
+      - name: Upload critical mutation gate artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: critical-mutation-gate-${{ github.run_id }}
+          path: ${{ runner.temp }}/docmancer-mutation-*
+          if-no-files-found: warn
+          retention-days: 14

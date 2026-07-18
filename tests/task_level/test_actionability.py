@@ -1,12 +1,15 @@
 from __future__ import annotations
 
 import json
+from dataclasses import asdict
 from pathlib import Path
 
 from eval.task_level.context.action_checklist import build_action_checklist, save_action_checklist
-from eval.task_level.evaluators.actionability import evaluate_actionability
+from eval.task_level.evaluators.actionability import evaluate_actionability, requirements_for_task
 from eval.task_level.evaluators.contract import ContractEvaluation
-from eval.task_level.schemas import TaskSpec
+from eval.task_level.runner import load_tasks
+from eval.task_level.schemas import TASKS_PATH, TaskSpec
+from eval.task_level.task33_pilot import TASK33C_PILOT_TASK_ID, TASK33C_REQUIRED_TARGET_PATHS
 
 
 def _task(task_id: str = "mixed_fastapi_project_001") -> TaskSpec:
@@ -179,3 +182,127 @@ def test_actionability_report_marks_missing_contracts(tmp_path: Path):
 
     assert result.critical_contract_recall == 0.0
     assert result.hidden_only_requirements_excluded == []
+
+
+def _evaluate_task33_checklist_text(tmp_path: Path, text: str):
+    run_dir = tmp_path / "run"
+    run_dir.mkdir()
+    (run_dir / "action_checklist.json").write_text(
+        json.dumps(
+            [{
+                "text": text,
+                "source": "docs/permission-architecture.md",
+                "evidence_type": "project_doc",
+                "symbols": [],
+                "files": [],
+            }]
+        ),
+        encoding="utf-8",
+    )
+    patch = run_dir / "patch.diff"
+    patch.write_text("", encoding="utf-8")
+    return evaluate_actionability(
+        task=_task(TASK33C_PILOT_TASK_ID),
+        condition_id="docatlas_action_checklist",
+        run_output_dir=run_dir,
+        patch_path=patch,
+        trajectory_path=None,
+        contract=ContractEvaluation(1.0, 1.0, 1.0),
+    )
+
+
+def test_task33_common_entry_symbol_does_not_recall_all_requirements(tmp_path: Path):
+    result = _evaluate_task33_checklist_text(tmp_path, "Call evaluateFlowEntry.")
+
+    assert result.critical_contract_recall == 0.0
+    assert result.critical_contract_salience == 0.0
+
+
+def test_task33_complete_symbol_groups_recall_all_requirements(tmp_path: Path):
+    result = _evaluate_task33_checklist_text(
+        tmp_path,
+        "PermissionService evaluateFlowEntry returns PermissionDecision; "
+        "BrowserPermissionGate evaluateFlowEntry; "
+        "ScanPermissionGate evaluateFlowEntry; "
+        "OfflineSyncGate evaluateFlowEntry.",
+    )
+
+    assert result.critical_contract_recall == 1.0
+    assert result.critical_contract_salience == 1.0
+
+
+def test_active_task33_protocol_has_public_actionability_contract():
+    protocol_path = Path(__file__).parents[2] / "eval/task_level/task33c_protocol.lock.json"
+    protocol_task_id = json.loads(protocol_path.read_text(encoding="utf-8"))["task_id"]
+    task = next(task for task in load_tasks(TASKS_PATH) if task.task_id == protocol_task_id)
+    expected = [
+        {
+            "task_id": protocol_task_id,
+            "requirement_id": "shared_entry_decision",
+            "description": "PermissionService.evaluateFlowEntry owns the canonical flow-entry decision.",
+            "source_type": "project_doc",
+            "allowed_for_agent": True,
+            "expected_symbols": ["PermissionService", "evaluateFlowEntry", "PermissionDecision"],
+            "expected_files": [
+                "docs/permission-architecture.md",
+                "lib/modules/permission/application/permission_service.dart",
+            ],
+            "match_all_symbols": True,
+        },
+        {
+            "task_id": protocol_task_id,
+            "requirement_id": "browser_gate_delegates",
+            "description": "BrowserPermissionGate delegates flow entry to PermissionService.evaluateFlowEntry.",
+            "source_type": "project_doc",
+            "allowed_for_agent": True,
+            "expected_symbols": ["BrowserPermissionGate", "evaluateFlowEntry"],
+            "expected_files": [
+                "docs/browser-flow.md",
+                "lib/modules/browser/application/browser_permission_gate.dart",
+            ],
+            "match_all_symbols": True,
+        },
+        {
+            "task_id": protocol_task_id,
+            "requirement_id": "scan_gate_delegates",
+            "description": "ScanPermissionGate delegates flow entry to PermissionService.evaluateFlowEntry.",
+            "source_type": "project_doc",
+            "allowed_for_agent": True,
+            "expected_symbols": ["ScanPermissionGate", "evaluateFlowEntry"],
+            "expected_files": [
+                "docs/scan-flow.md",
+                "lib/modules/scan/application/scan_permission_gate.dart",
+            ],
+            "match_all_symbols": True,
+        },
+        {
+            "task_id": protocol_task_id,
+            "requirement_id": "offline_sync_uses_shared_gate",
+            "description": "OfflineSyncGate uses PermissionService.evaluateFlowEntry before accepting queued work.",
+            "source_type": "project_doc",
+            "allowed_for_agent": True,
+            "expected_symbols": ["OfflineSyncGate", "evaluateFlowEntry"],
+            "expected_files": [
+                "docs/offline-sync.md",
+                "lib/modules/sync/application/offline_sync_gate.dart",
+            ],
+            "match_all_symbols": True,
+        },
+    ]
+
+    assert protocol_task_id == TASK33C_PILOT_TASK_ID
+    actual = requirements_for_task(protocol_task_id)
+    assert [asdict(requirement) for requirement in actual] == expected
+    allowed_files = set(task.expected_project_docs) | set(TASK33C_REQUIRED_TARGET_PATHS)
+    for requirement in actual:
+        assert requirement.expected_symbols
+        assert requirement.expected_files
+        assert set(requirement.expected_symbols) <= set(task.expected_symbols)
+        assert set(requirement.expected_files) <= allowed_files
+        assert requirement.source_type == "project_doc"
+        assert requirement.allowed_for_agent is True
+        assert not any(
+            token in path.casefold()
+            for path in requirement.expected_files
+            for token in ("hidden", "oracle", "private")
+        )
