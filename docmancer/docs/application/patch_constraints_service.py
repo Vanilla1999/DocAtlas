@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Any
 
 from docmancer.docs.domain.code_graph import build_code_graph_context_items, build_project_code_graph
+from docmancer.docs.domain.normative_language import has_normative_language
 from docmancer.docs.domain.source_map import build_project_repo_map, build_project_source_evidence
 from docmancer.docs.models import DependencyObservation, PatchConstraint, PatchConstraintPacket
 
@@ -614,7 +615,7 @@ class PatchConstraintsService:
 
     @staticmethod
     def _has_normative_language(line: str) -> bool:
-        return bool(re.search(
+        return has_normative_language(line) or bool(re.search(
             r"\b(must(?:\s+not)?|should(?:\s+not)?|do\s+not|don't|required|requires|forbidden|never|"
             r"source[- ]of[- ]truth|single\s+source|canonical|owned\s+by|owns|belongs\s+in|"
             r"delegate(?:s)?\s+to|do\s+not\s+duplicate|do\s+not\s+bypass|do\s+not\s+hardcode)\b",

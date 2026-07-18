@@ -114,6 +114,24 @@ CONTEXT_INJECTION_LIMIT_CHARS = 10000
 AUDITED_EXTERNAL_CONTEXT_ROOT = TASK_LEVEL_ROOT / "external_context"
 TASK33_EVALUATION_CONTRACTS = load_task_evaluation_contracts()
 TASK23_PROTOCOL_TASKS = load_effective_task23_protocol_tasks()
+BOUNDED_DIRECT_EXECUTION_POLICY = """Host execution policy:
+- The cited project docs have already been reduced to the source-backed patch contract below.
+- Do not reread cited project docs unless an explicit uncertainty requires it.
+- Read only target implementation files needed for the edit.
+- Do not guess test paths; use only checks supplied by the contract.
+- Allow at most one RED validation run and one GREEN validation run.
+- After GREEN, verify the diff against every contract item.
+- Stop when the contract is satisfied and the supplied validation is GREEN.
+"""
+
+
+def _bounded_direct_projection_errors(
+    projection: dict[str, Any], validation_errors: list[str]
+) -> list[str]:
+    errors = list(validation_errors)
+    if projection.get("status") not in {"ok", "truncated"}:
+        errors.append("bounded direct requires a successful model-visible projection")
+    return errors
 
 
 def _estimate_tokens(text: str) -> int:
@@ -1549,7 +1567,15 @@ def execute_pilot(
                                     })
                                 else:
                                     _persist_delivery_prompt_sources(run_output_dir, packet)
-                                    prompt += "\nDocAtlas ActionPacket (bounded direct):\n" + json.dumps(packet, sort_keys=True) + "\n"
+                                    projection = _load_optional_json(
+                                        run_output_dir / "model_visible_patch_context.json"
+                                    )
+                                    prompt += (
+                                        "\nDocAtlas source-backed Patch Contract (bounded direct):\n"
+                                        + json.dumps(projection, sort_keys=True)
+                                        + "\n"
+                                        + BOUNDED_DIRECT_EXECUTION_POLICY
+                                    )
                     elif delivery_strategy == "bounded_subagent":
                         if isolated_worker is None:
                             setup_failed = True
@@ -2269,6 +2295,10 @@ def build_bounded_direct_packet(
     """Format the same frozen host evidence supplied to the isolated worker."""
 
     from docmancer.docs.application.action_packet import build_action_packet, validate_action_packet
+    from docmancer.docs.application.model_visible_projection import (
+        project_patch_context,
+        validate_model_visible_projection,
+    )
 
     evidence.validate()
     packet_evidence = [
@@ -2284,6 +2314,7 @@ def build_bounded_direct_packet(
         retrieval_issues=evidence.retrieval_issues,
         required_evidence_paths=TASK33C_REQUIRED_EVIDENCE_PATHS,
         required_target_paths=TASK33C_REQUIRED_TARGET_PATHS,
+        behavioral_contract_required=True,
     )
     errors = validate_action_packet(
         packet,
@@ -2321,8 +2352,27 @@ def build_bounded_direct_packet(
         raise IsolatedDeliveryError(
             "bounded_direct_missing_required_target_modules:" + ",".join(missing_targets)
         )
+    projection, projection_snapshot = project_patch_context(
+        packet=packet,
+        evidence_items=packet_evidence,
+        max_tokens=2_000,
+    )
+    projection_errors = _bounded_direct_projection_errors(
+        projection,
+        validate_model_visible_projection(
+            projection,
+            snapshot=projection_snapshot,
+            max_tokens=2_000,
+        ),
+    )
+    if projection_errors:
+        raise IsolatedDeliveryError(
+            "invalid_bounded_direct_projection:" + ";".join(projection_errors)
+        )
     persist_host_evidence(evidence, output_dir)
     _write_json_atomic(output_dir / "action_packet.json", packet)
+    _write_json_atomic(output_dir / "model_visible_patch_context.json", projection)
+    _write_json_atomic(output_dir / "model_visible_evidence_snapshot.json", projection_snapshot)
     _write_json_atomic(output_dir / "bounded_direct_metrics.json", {
         "schema_version": 2,
         "strategy": "bounded_direct",
@@ -2331,6 +2381,7 @@ def build_bounded_direct_packet(
         "retrieval_calls": evidence.retrieval_calls,
         "parent_visible_raw_retrieval": False,
         "parent_packet_tokens": packet["estimated_tokens"],
+        "model_visible_projection_tokens": projection["estimated_tokens"],
         "raw_retrieval_tokens": evidence.raw_retrieval_tokens,
         "retrieval_wall_time_seconds": evidence.retrieval_wall_time_seconds,
         "evidence_fingerprint": evidence.fingerprint,

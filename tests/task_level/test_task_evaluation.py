@@ -6,8 +6,12 @@ from datetime import datetime, timezone
 from pathlib import Path
 from types import SimpleNamespace
 
+import pytest
+
 from eval.task_level.execution import (
+    BOUNDED_DIRECT_EXECUTION_POLICY,
     TASK33C_REQUIRED_TARGET_PATHS,
+    _bounded_direct_projection_errors,
     _estimate_tokens,
     _host_evidence_categories,
     build_bounded_direct_packet,
@@ -18,6 +22,7 @@ from eval.task_level.execution import (
     trajectory_tool_output_metrics,
 )
 from eval.task_level.fixtures.builder import materialize_fixture
+from eval.task_level.isolated_delivery import IsolatedDeliveryError
 from eval.task_level.runner import load_tasks, run_smoke
 from eval.task_level.runners.base import AgentRunOutput
 from eval.task_level.schemas import TASKS_PATH
@@ -25,6 +30,24 @@ from eval.task_level.schemas import TASKS_PATH
 
 def _task(task_id: str):
     return next(task for task in load_tasks(TASKS_PATH) if task.task_id == task_id)
+
+
+def test_bounded_direct_execution_policy_has_explicit_stop_and_rediscovery_guards():
+    policy = BOUNDED_DIRECT_EXECUTION_POLICY.casefold()
+
+    assert "do not reread cited project docs" in policy
+    assert "do not guess test paths" in policy
+    assert "one red" in policy and "one green" in policy
+    assert "stop when" in policy
+
+
+def test_bounded_direct_rejects_insufficient_model_visible_projection():
+    errors = _bounded_direct_projection_errors(
+        {"status": "insufficient_evidence", "kind": "patch_context"},
+        [],
+    )
+
+    assert errors == ["bounded direct requires a successful model-visible projection"]
 
 
 def _runner_output(tmp_path: Path, *, input_tokens: int | None = 100) -> AgentRunOutput:
@@ -281,6 +304,12 @@ def test_task33_host_evidence_augments_project_docs_with_deterministic_local_evi
     assert snapshot.retrieval_calls == 1
     packet = build_bounded_direct_packet(task, workspace, output_dir, snapshot)
     assert packet["status"] != "insufficient_evidence", packet
+    projection = json.loads(
+        (output_dir / "model_visible_patch_context.json").read_text(encoding="utf-8")
+    )
+    assert projection["kind"] == "patch_context"
+    assert "source_of_truth" not in projection
+    assert projection["implementation_guidance"]
 
 
 def test_task33_deadline_remains_active_during_local_augmentation(
@@ -400,8 +429,11 @@ def test_task33_local_hostile_doc_remains_untrusted_document_data(
     assert {"policy_override_request", "tool_execution_request"}.issubset(
         hostile["instruction_risk_flags"]
     )
-    packet = build_bounded_direct_packet(task, workspace, output_dir, snapshot)
-    assert packet["status"] == "insufficient_evidence"
+    with pytest.raises(
+        IsolatedDeliveryError,
+        match="bounded direct requires a successful model-visible projection",
+    ):
+        build_bounded_direct_packet(task, workspace, output_dir, snapshot)
 
 
 def test_each_run_uses_fresh_workspace(tmp_path: Path):

@@ -12,8 +12,10 @@ from docmancer.docs.application.evidence_selection import (
     SelectionDecision,
     normalize_candidates,
     patch_selection_config,
+    requirement_value_visible,
     select_evidence,
 )
+from docmancer.docs.domain.normative_language import classify_normative_modality
 
 
 ACTION_PACKET_SCHEMA_VERSION = 1
@@ -21,9 +23,6 @@ DEFAULT_ACTION_PACKET_TOKENS = 1_500
 HARD_ACTION_PACKET_TOKENS = 2_000
 MIN_ACTION_PACKET_TOKENS = 128
 
-_FORBIDDEN_RE = re.compile(r"\b(must\s+not|do\s+not|don't|never|forbidden|prohibited)\b", re.I)
-_REQUIRED_RE = re.compile(r"\b(must|required|requires|shall|invariant)\b", re.I)
-_NOT_REQUIRED_RE = re.compile(r"\b(?:not|required\s+not\s+to)\s+required\b", re.I)
 _VALIDATION_START_RE = re.compile(
     r"^(?:run\s+)?(?:python\s+-m\s+(?:pytest|unittest|compileall)|pytest|"
     r"uv\s+run(?:\s+--offline)?\s+(?:pytest|ruff|mypy|python\s+-m\s+(?:pytest|unittest|compileall))|"
@@ -41,6 +40,28 @@ _SYMBOL_RE = re.compile(
 _CODE_SOURCE_CLASSES = {"repo_map", "source_evidence", "code_graph"}
 _MAX_SOURCE_PATH = 500
 _MAX_SOURCE_SECTION = 300
+_DANGEROUS_CONTENT_PATTERNS = (
+    (
+        "credential_exfiltration_instruction",
+        re.compile(
+            r"\b(?:(?:must|should)\s+(?!not\b)|(?:please|need\s+to|required\s+to)\s+)"
+            r"(?:[a-z]+\s+){0,4}(?:upload|send|post|transmit|share|paste|provide)\b"
+            r".{0,120}\b(?:credentials?|tokens?|secrets?|passwords?)\b",
+            re.IGNORECASE,
+        ),
+    ),
+    (
+        "network_tool_instruction",
+        re.compile(r"\b(?:run|execute|invoke)\s+(?:curl|wget|ssh|scp|nc)\b", re.IGNORECASE),
+    ),
+    (
+        "remote_instruction",
+        re.compile(
+            r"\b(?:must|should|please|visit|open|fetch|download|upload)\b.{0,100}https?://",
+            re.IGNORECASE,
+        ),
+    ),
+)
 
 
 def _non_empty_string_schema(*, max_length: int | None = None) -> dict[str, Any]:
@@ -205,6 +226,7 @@ def build_action_packet(
     project_identity: str | None = None,
     module_id: str | None = None,
     selection_diagnostics: dict[str, Any] | None = None,
+    behavioral_contract_required: bool = False,
 ) -> dict[str, Any]:
     """Render selected retrieval evidence into a bounded, deterministic packet.
 
@@ -355,6 +377,11 @@ def build_action_packet(
             continue
         critical_fact_omissions += omitted_facts if _authority(item) == "canonical" else 0
         for fact_type, fact in facts:
+            if _content_instruction_risk_flags(fact):
+                risky_content_omissions += 1
+                if _authority(item) == "canonical":
+                    risky_critical_omissions += 1
+                continue
             cited = {"text": fact, "evidence_ids": [evidence_id]}
             if _authority(item) != "canonical":
                 if fact_type in {"required", "forbidden"}:
@@ -376,7 +403,9 @@ def build_action_packet(
                 required.append(cited)
         snippet, snippet_omitted = _snippet_text(item.get("snippet"))
         snippet_omissions += snippet_omitted
-        if snippet:
+        if snippet and _content_instruction_risk_flags(snippet):
+            risky_content_omissions += 1
+        elif snippet:
             guidance.append({"text": snippet, "evidence_ids": [evidence_id]})
 
     symbols: list[dict[str, Any]] = []
@@ -488,6 +517,11 @@ def build_action_packet(
         message = "Selected sources do not contain explicit constraints, validation commands, or code-surface evidence."
         if message not in packet["missing_evidence"]:
             packet["missing_evidence"].append(message)
+    if behavioral_contract_required and not _has_behavioral_contract(packet):
+        packet["status"] = "insufficient_evidence"
+        message = "Source-backed behavioral contract is required before editing."
+        if message not in packet["missing_evidence"]:
+            packet["missing_evidence"].append(message)
 
     _fit_packet(packet, budget, required_source_keys, required_target_keys)
     _ensure_post_fit_status(packet, required_source_keys)
@@ -499,6 +533,11 @@ def build_action_packet(
     ):
         _refresh_estimated_tokens(packet)
     _ensure_selection_survives_packet(packet, selection)
+    if behavioral_contract_required and not _has_behavioral_contract(packet):
+        packet["status"] = "insufficient_evidence"
+        message = "Source-backed behavioral contract is required before editing."
+        if message not in packet["missing_evidence"]:
+            packet["missing_evidence"].append(message)
     _refresh_estimated_tokens(packet)
     if packet["estimated_tokens"] > budget:
         _compact_failure_packet(packet, budget)
@@ -572,7 +611,7 @@ def _ensure_selection_survives_packet(
                 if facts else _evidence_id(dict(candidate.original)) in retained_evidence_ids
             )
         else:
-            satisfied = requirement.value.casefold() in visible_text
+            satisfied = requirement_value_visible(requirement.value, visible_text)
         if not satisfied:
             missing.append(requirement.requirement_id)
     if not missing:
@@ -1065,6 +1104,14 @@ def _instruction_risk_flags(item: dict[str, Any]) -> list[str]:
     ]
 
 
+def _content_instruction_risk_flags(text: str) -> list[str]:
+    return [
+        reason
+        for reason, pattern in _DANGEROUS_CONTENT_PATTERNS
+        if pattern.search(str(text or ""))
+    ]
+
+
 def _may_guide_workflow(item: dict[str, Any]) -> bool:
     return (
         _authority(item) == "canonical"
@@ -1381,23 +1428,23 @@ def _extract_facts(content: str) -> tuple[list[tuple[str, str]], int]:
             fact = segment.strip()
             if not fact:
                 continue
+            modality = classify_normative_modality(fact)
             looks_critical = bool(
-                _FORBIDDEN_RE.search(fact)
-                or (_REQUIRED_RE.search(fact) and not _NOT_REQUIRED_RE.search(fact))
+                modality
                 or _validation_command(fact)
             )
             if len(fact) > 500:
                 omitted_critical += int(looks_critical)
                 continue
-            if _FORBIDDEN_RE.search(fact):
-                facts.append(("forbidden", fact))
+            if modality == "forbidden":
+                facts.append((modality, fact))
                 continue
             command = _validation_command(fact)
             if command:
                 facts.append(("validation", command))
                 continue
-            if _REQUIRED_RE.search(fact) and not _NOT_REQUIRED_RE.search(fact):
-                facts.append(("required", fact))
+            if modality == "required":
+                facts.append((modality, fact))
     return facts, omitted_critical
 
 
@@ -1530,6 +1577,22 @@ def _has_actionable_items(packet: dict[str, Any]) -> bool:
     ))
 
 
+def _has_behavioral_contract(packet: dict[str, Any]) -> bool:
+    raw_task = packet.get("task_interpretation")
+    task: dict[str, Any] = raw_task if isinstance(raw_task, dict) else {}
+    rows = [
+        *(task.get("acceptance_conditions") or []),
+        *(packet.get("required_invariants") or []),
+        *(packet.get("forbidden_changes") or []),
+        *(packet.get("implementation_guidance") or []),
+    ]
+    return any(
+        classify_normative_modality(str(row.get("text") or "")) is not None
+        for row in rows
+        if isinstance(row, dict)
+    )
+
+
 def _fit_packet(
     packet: dict[str, Any],
     budget: int,
@@ -1632,6 +1695,12 @@ def _compact_failure_packet(packet: dict[str, Any], budget: int) -> None:
         int(value) for value in packet.get("omitted_counts", {}).values()
         if isinstance(value, int) and not isinstance(value, bool)
     )
+    contract_reason = "Source-backed behavioral contract is required before editing."
+    failure_reason = (
+        contract_reason
+        if contract_reason in packet.get("missing_evidence", [])
+        else "The available evidence did not fit the requested packet budget."
+    )
     packet.update({
         "status": "insufficient_evidence",
         "source_of_truth": [],
@@ -1641,7 +1710,7 @@ def _compact_failure_packet(packet: dict[str, Any], budget: int) -> None:
         "implementation_guidance": [],
         "validation": {"compile": [], "tests": [], "semantic_checks": []},
         "uncertainties": [],
-        "missing_evidence": ["The available evidence did not fit the requested packet budget."],
+        "missing_evidence": [failure_reason],
         "omitted_counts": {"packet_items": max(1, omitted_total)},
     })
     objective = str(packet["task_interpretation"].get("objective") or "task")

@@ -22,7 +22,8 @@ MAX_SELECTOR_CANDIDATES = 20
 _HEX_SHA256 = re.compile(r"^[0-9a-f]{64}$")
 _TOKEN_RE = re.compile(r"[\w.+:/-]+", re.UNICODE)
 _PATCH_FACT_RE = re.compile(
-    r"\b(?:must|shall|required|requires?|never|forbidden|prohibited|"
+    r"\b(?:must|shall|required|requires?|never|cannot|may\s+not|forbidden|prohibited|"
+    r"is\s+reserved\s+for|only\s+(?:after|before|when|if)|is\s+allowed\s+only|"
     r"pytest|compileall|cargo\s+(?:test|check|build)|npm\s+(?:test|run)|"
     r"dart\s+(?:test|analyze)|go\s+test|make\s+test)\b",
     re.IGNORECASE,
@@ -68,6 +69,26 @@ def _positive_int(value: Any, *, default: int) -> int:
 
 def _normalized_source(value: Any) -> str:
     return str(value or "").strip().replace("\\", "/").rstrip("/").casefold()
+
+
+def requirement_value_visible(value: str, text: str) -> bool:
+    """Match exact query terms, including a bounded CamelCase→snake_case alias."""
+
+    wanted = str(value or "").strip()
+    haystack = str(text or "")
+    if not wanted:
+        return False
+    if re.search(rf"(?<![\w]){re.escape(wanted)}(?![\w])", haystack, re.I):
+        return True
+    if not (
+        re.fullmatch(r"[A-Za-z][A-Za-z0-9]*", wanted)
+        and any(char.isupper() for char in wanted[1:])
+        and any(char.islower() for char in wanted)
+    ):
+        return False
+    acronym_split = re.sub(r"(.)([A-Z][a-z]+)", r"\1_\2", wanted)
+    snake_case = re.sub(r"([a-z0-9])([A-Z])", r"\1_\2", acronym_split).casefold()
+    return bool(re.search(rf"(?<![\w]){re.escape(snake_case)}(?![\w])", haystack, re.I))
 
 
 def _text(value: Any) -> str:
@@ -935,9 +956,7 @@ def _with_coverage(candidate: EvidenceCandidate, requirements: Sequence[Evidence
         elif requirement.kind == "exact_version":
             matches = candidate.resolved_version.casefold() == value and _version_rank(candidate.version_binding) == 0
         elif requirement.kind == "exact_term":
-            matches = bool(re.search(
-                rf"(?<![\w]){re.escape(value)}(?![\w])", haystack
-            ))
+            matches = requirement_value_visible(requirement.value, haystack)
         else:
             matches = value in haystack
         if matches:
