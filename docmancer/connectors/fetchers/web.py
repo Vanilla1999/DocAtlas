@@ -60,11 +60,29 @@ _DIRECT_TEXT_SUFFIXES = {".md", ".txt"}
 _DIRECT_DARTDOC_SUFFIXES = DARTDOC_ENTITY_SUFFIXES
 
 
+def _github_blob_raw_url(url: str) -> str | None:
+    parsed = urlparse(url)
+    if parsed.hostname != "github.com":
+        return None
+    parts = [part for part in parsed.path.split("/") if part]
+    if len(parts) < 5 or parts[2] != "blob":
+        return None
+    owner, repo, _, ref = parts[:4]
+    file_path = "/".join(parts[4:])
+    if not owner or not repo or not ref or not file_path or any(part in {".", ".."} for part in parts):
+        return None
+    return f"https://raw.githubusercontent.com/{owner}/{repo}/{ref}/{file_path}"
+
+
 def _source_docset_root(final_url: str, base_url: str) -> str:
+    normalized_base = normalize_url(base_url)
+    normalized_final = normalize_url(final_url)
     base_host = urlparse(base_url).hostname
     final = urlparse(final_url)
     if base_host == final.hostname:
-        return normalize_url(base_url)
+        return normalized_base
+    if _github_blob_raw_url(normalized_base) == normalized_final:
+        return normalized_base
     parts = [part for part in final.path.split("/") if part]
     if final.hostname == "pub.dev" and len(parts) >= 3 and parts[0] == "documentation":
         return normalize_url(f"{final.scheme}://{final.netloc}/{'/'.join(parts[:3])}")
@@ -357,17 +375,7 @@ class WebFetcher:
 
     @staticmethod
     def _github_blob_raw_url(url: str) -> str | None:
-        parsed = urlparse(url)
-        if parsed.hostname != "github.com":
-            return None
-        parts = [part for part in parsed.path.split("/") if part]
-        if len(parts) < 5 or parts[2] != "blob":
-            return None
-        owner, repo, _, ref = parts[:4]
-        file_path = "/".join(parts[4:])
-        if not owner or not repo or not ref or not file_path or any(part in {".", ".."} for part in parts):
-            return None
-        return f"https://raw.githubusercontent.com/{owner}/{repo}/{ref}/{file_path}"
+        return _github_blob_raw_url(url)
 
     def _raise_if_cancelled(self) -> None:
         if self._cancellation_callback and self._cancellation_callback():

@@ -208,8 +208,16 @@ def _run_smoke(
         raise RuntimeError(
             "get_docs_context did not return cited code-bearing evidence from the pinned official Kotlin source"
         )
-    identity = context.get("identity") if isinstance(context.get("identity"), dict) else {}
-    resolved_version = context.get("resolved_version") or identity.get("resolved_version") or identity.get("version")
+    raw_identity = context.get("identity")
+    identity: dict[str, Any] = raw_identity if isinstance(raw_identity, dict) else {}
+    raw_exact_version = context.get("exact_version")
+    exact_version: dict[str, Any] = raw_exact_version if isinstance(raw_exact_version, dict) else {}
+    resolved_version = (
+        context.get("resolved_version")
+        or identity.get("resolved_version")
+        or identity.get("version")
+        or exact_version.get("used")
+    )
     canonical_source_identity = (
         context.get("canonical_source_identity")
         or identity.get("docs_url")

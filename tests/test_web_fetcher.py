@@ -10,7 +10,7 @@ import pytest
 
 from docmancer.connectors.fetchers.web import WebFetcher
 from docmancer.connectors.fetchers.pipeline.detection import Platform
-from docmancer.connectors.fetchers.pipeline.discovery import DiscoveryStrategy, discover_urls
+from docmancer.connectors.fetchers.pipeline.discovery import DiscoveredUrl, DiscoveryStrategy, discover_urls
 from docmancer.docs.fetch_policy import DocsFetchPolicy, DocsFetchSecurityError
 
 
@@ -159,6 +159,43 @@ def test_default_policy_scope_allows_only_target_and_declared_seed_hosts():
     with pytest.raises(DocsFetchSecurityError, match="host_not_allowed"):
         scoped.validate_url("https://evil.test/docs")
     assert fetcher._fetch_policy.allowed_hosts == ()
+
+
+def test_github_blob_raw_fetch_keeps_canonical_docset_root():
+    blob_url = "https://github.com/Kotlin/kotlinx.coroutines/blob/1.8.1/docs/topics/coroutines-basics.md"
+    raw_url = "https://raw.githubusercontent.com/Kotlin/kotlinx.coroutines/1.8.1/docs/topics/coroutines-basics.md"
+    fetcher = WebFetcher(
+        delay=0.0,
+        fetch_policy=DocsFetchPolicy(
+            resolver=lambda _host: (ipaddress.ip_address("93.184.216.34"),),
+            allowed_hosts=("github.com", "raw.githubusercontent.com"),
+        ),
+    )
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        assert request.headers["host"] == "raw.githubusercontent.com"
+        assert request.url.path == "/Kotlin/kotlinx.coroutines/1.8.1/docs/topics/coroutines-basics.md"
+        return httpx.Response(200, request=request, text="# Coroutines\n\nUse `launch` for concurrent work.")
+
+    real_client = httpx.Client
+
+    def client_factory(**kwargs):
+        return real_client(transport=httpx.MockTransport(handler))
+
+    with real_client(transport=httpx.MockTransport(handler)) as discovery_client:
+        with patch("docmancer.connectors.fetchers.web.httpx.Client", side_effect=client_factory):
+            documents = fetcher._fetch_pages(
+                [DiscoveredUrl(blob_url, DiscoveryStrategy.SEED_URLS)],
+                blob_url,
+                client=discovery_client,
+                platform=Platform.GENERIC,
+                robots=None,
+            )
+
+    assert len(documents) == 1
+    assert documents[0].source == blob_url
+    assert documents[0].metadata["fetch_url"] == raw_url
+    assert documents[0].metadata["docset_root"] == blob_url
 
 
 class TestWebFetcherLlmsFull:

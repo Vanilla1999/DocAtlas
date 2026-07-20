@@ -144,6 +144,41 @@ def test_smoke_requests_full_provenance_and_rejects_missing_identity():
     assert observed_context_arguments["output_mode"] == "full"
 
 
+def test_smoke_reads_resolved_version_from_exact_version_contract():
+    def call_tool(name, arguments):
+        if name == "prepare_docs":
+            return {"status": "pending", "job_id": "job-1"}
+        if name == "docs_status":
+            return {"status": "succeeded", "job_id": arguments["job_id"]}
+        if name == "get_docs_context":
+            return {
+                "status": "success",
+                "exact_version": {
+                    "expected": SMOKE.VERSION,
+                    "used": SMOKE.VERSION,
+                    "match": True,
+                    "fallback": False,
+                    "status": "exact_version_indexed",
+                },
+                "context_pack": [
+                    {
+                        "source": SMOKE.SOURCE_URL,
+                        "content": "```kotlin\nrunBlocking { launch { println(1) } }\n```",
+                    }
+                ],
+            }
+        raise AssertionError(name)
+
+    artifact = SMOKE.run_smoke(
+        call_tool,
+        mode="live",
+        timeout_seconds=5,
+        command="kotlin_live_smoke.py --mode live",
+    )
+
+    assert artifact["resolved_version"] == SMOKE.VERSION
+
+
 def test_committed_fixture_artifact_matches_machine_schema():
     schema = json.loads((ROOT / "eval/kotlin_smoke/artifact.schema.json").read_text(encoding="utf-8"))
     artifact = json.loads((ROOT / "eval/kotlin_smoke/task14_fixture.json").read_text(encoding="utf-8"))
