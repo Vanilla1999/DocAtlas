@@ -5,6 +5,6 @@ The browser flow can work online or queue a small offline handoff. The gate rece
 Important contract points:
 
 - Browser entry is allowed only for `PermissionDecision.allow`.
-- `PermissionDecision.deferFollowUp` may render a follow-up notice after entry only when the service returns that decision.
+- `PermissionService.evaluateFlowEntry` owns entry decisions; `PermissionService.evaluateReview` owns review/follow-up handling, so the browser gate must not admit `PermissionDecision.deferFollowUp`.
 - Offline fallback is not a substitute for camera, foreground location, nearby device, or notification permission.
 - Browser code should not interpret partial permission booleans directly; it should delegate to the permission module and then translate the decision into UI state.

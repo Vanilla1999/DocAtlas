@@ -6,6 +6,7 @@ import os
 import signal
 import shlex
 import subprocess
+import sys
 import threading
 import time
 import urllib.error
@@ -443,6 +444,7 @@ class GitHubModelsRunner:
 
     runner_id = "github-models"
     hard_turn_limit_enforced = True
+    hard_input_budget_enforced = False
 
     def __init__(
         self,
@@ -474,11 +476,13 @@ class GitHubModelsRunner:
             independent_process=available,
             verified=available,
             hard_turn_limit=True,
+            hard_input_budget=False,
             verification_notes=[
                 f"Each model turn is a stateless {self._provider.provider_id} request in a host-controlled loop.",
                 "The runner exposes only bounded repository reads, contract-allowlisted exact text replacement, sandboxed local tests, and condition-scoped DocAtlas retrieval.",
                 "No arbitrary shell, network, MCP, recursive-agent, or generated-file editing tool is exposed.",
                 "The Python loop enforces the requested maximum number of model turns and a monotonic wall-clock deadline.",
+                "Cumulative provider-reported input usage is recorded after requests, not hard-stopped before budget exceedance.",
                 "Provider token usage and request IDs are persisted per turn without persisting the bearer token.",
                 f"Docker command boundary: {boundary.get('status')}; image identity: {boundary.get('image_id_sha256') or 'missing'}.",
                 f"Interruptible absolute provider deadline: {deadline_supported}.",
@@ -1040,10 +1044,10 @@ def _test_command(request: AgentRunRequest) -> list[str]:
     if request.test_command:
         return shlex.split(request.test_command)
     if (request.workspace / "test_calc.py").is_file():
-        return ["python", "-m", "pytest", "test_calc.py", "-q"]
+        return [sys.executable, "-m", "pytest", "test_calc.py", "-q"]
     if (request.workspace / "tests/test_browser_permission_gate.py").is_file():
         return ["uv", "run", "--offline", "pytest", "tests/test_browser_permission_gate.py", "-q"]
-    return ["python", "-m", "pytest", "-q"]
+    return [sys.executable, "-m", "pytest", "-q"]
 
 
 def _docatlas_allowed(condition_id: str) -> bool:

@@ -1,19 +1,99 @@
 {
   "base": {
-    "compile_success": true,
+    "compile_status": "not_applicable",
+    "compile_success": null,
     "expected_tests_failed": true,
     "setup_success": true,
     "unexpected_failures": []
   },
-  "fixture_hash": "603712341cdeffb1332492ccbebeb04b022ddf665b1b305c9827765c69a629df",
+  "evaluation_contract": {
+    "compile_gate": {
+      "command": null,
+      "passed": true,
+      "reason": "The benchmark is a source-only Dart contract fixture and does not contain a buildable Flutter application. Public and evaluator-private structural tests are the executable validation gates.",
+      "returncode": null,
+      "status": "not_applicable",
+      "stderr": "",
+      "stdout": ""
+    },
+    "contract_sha256": "db0e59fd58402b8ecdc406acb128a5b57703cb57295a1716b9fbee60bea6f81f",
+    "errors": [],
+    "local_commands": true,
+    "patch_contract_id": "task33-nbo-cross-module-gate-1",
+    "patch_surface": {
+      "allowed_paths": [
+        "lib/modules/browser/application/browser_permission_gate.dart",
+        "lib/modules/permission/application/permission_service.dart",
+        "lib/modules/scan/application/scan_permission_gate.dart",
+        "lib/modules/sync/application/offline_sync_gate.dart"
+      ],
+      "changed_files": [
+        "lib/modules/browser/application/browser_permission_gate.dart",
+        "lib/modules/permission/application/permission_service.dart",
+        "lib/modules/scan/application/scan_permission_gate.dart",
+        "lib/modules/sync/application/offline_sync_gate.dart"
+      ],
+      "forbidden_changes": [],
+      "forbidden_paths": [
+        "docs/**",
+        "pubspec.lock",
+        "pubspec.yaml",
+        "tests/**",
+        "lib/**/*.freezed.dart",
+        "lib/**/*.g.dart"
+      ],
+      "outside_allowed_surface": [],
+      "status": "passed",
+      "violations": []
+    },
+    "registry_sha256": "d5ddbfc02de155cf0cee20a2e08279dbf8bb4c2614fd58bf74712d762abff5fa",
+    "semantic_gate": {
+      "checks": [
+        {
+          "id": "canonical-entry-delegation",
+          "status": "passed",
+          "test_ids": [
+            "test_browser_scan_and_sync_delegate_to_shared_entry_contract",
+            "test_no_duplicate_immediate_permission_interpretation_in_flow_gates"
+          ]
+        },
+        {
+          "id": "partial-results-blocked",
+          "status": "passed",
+          "test_ids": [
+            "test_permission_service_blocks_partial_results_for_entry_even_when_offline_fallback_exists"
+          ]
+        },
+        {
+          "id": "generated-dependency-boundary",
+          "status": "passed",
+          "test_ids": [
+            "test_generated_and_dependency_files_are_not_changed"
+          ]
+        }
+      ],
+      "command": "python -m pytest tests/hidden",
+      "hidden_tests_sha256": "fb53ce0585f0f5164edf1200e40e70d05413e084822c650b427c9fb5357879b9",
+      "passed": true,
+      "returncode": 0,
+      "status": "passed"
+    },
+    "status": "valid",
+    "test_command": "python -m pytest tests/test_browser_permission_gate.py"
+  },
+  "fixture_hash": "59bcf243cb35eb622c2b313648fc64dc7201155fa5b8026735cf307a4b3b9bc6",
+  "fixture_hash_algorithm": "sha256-length-prefixed-v2",
   "gold": {
-    "compile_success": true,
+    "compile_status": "not_applicable",
+    "compile_success": null,
     "hidden_tests_passed": true,
     "patch_applied": true,
     "public_tests_passed": true
   },
   "oracle_isolated": true,
+  "protocol_fixture_hash": "db6e7b9646c2191c88ef9c9213c9521d250a2ecc78e021fefc84599fc881b023",
+  "protocol_fixture_hash_algorithm": "sha256-concat-v1",
   "status": "validated",
   "task_id": "decisive_nbo_cross_module_gate_large_001",
-  "validated_at": "2026-06-28T09:44:19.317489+00:00"
+  "validated_at": "2026-07-20T13:08:33.186029+00:00"
 }

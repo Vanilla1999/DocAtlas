@@ -9,6 +9,7 @@ SCHEMA_VERSION = "answer-completeness-1.0"
 _PROOF_SOURCE_CLASSES = {"project_doc", "dependency_doc", "source_evidence"}
 _SOURCE_BACKED_PROOF_SOURCE_CLASSES = {"source_evidence", "test_evidence"}
 _ABSENT_EVIDENCE_CLASSES = {"absent_in_source"}
+_STRONG_AUTHORITIES = {"primary", "primary_source", "source_of_truth"}
 
 _QUOTED_TERM_RE = re.compile(r"[\"'`“”‘’«»„]+([^\"'`“”‘’«»„]{2,120})[\"'`“”‘’«»„]+")
 _CODE_TERM_RE = re.compile(
@@ -206,7 +207,7 @@ def evaluate_project_answer_completeness(
 
     has_strong_evidence = any(
         item.get("source_class") in ("dependency_doc", "source_evidence")
-        or (item.get("authority") in ("primary", "primary_source"))
+        or item.get("authority") in _STRONG_AUTHORITIES
         for item in proof_context_pack
     )
     has_exact_dependency = any(
@@ -517,8 +518,19 @@ def _source_backed_context_pack(context_pack: list[dict[str, Any]]) -> list[dict
     return [
         item
         for item in context_pack
-        if item.get("source_class") in _SOURCE_BACKED_PROOF_SOURCE_CLASSES and _is_positive_proof_item(item)
+        if (
+            item.get("source_class") in _SOURCE_BACKED_PROOF_SOURCE_CLASSES
+            or _is_catalog_source_of_truth(item)
+        )
+        and _is_positive_proof_item(item)
     ]
+
+
+def _is_catalog_source_of_truth(item: dict[str, Any]) -> bool:
+    return (
+        item.get("source_class") == "project_doc"
+        and item.get("authority") == "source_of_truth"
+    )
 
 
 def _is_positive_proof_item(item: dict[str, Any]) -> bool:

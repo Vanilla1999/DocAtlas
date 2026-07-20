@@ -253,6 +253,8 @@ def test_task33_host_evidence_augments_project_docs_with_deterministic_local_evi
     assert {"project_docs", "symbols"}.issubset(snapshot.evidence_categories)
     assert {
         "docs/permission-architecture.md",
+        "docs/browser-flow.md",
+        "docs/scan-flow.md",
         "docs/offline-sync.md",
     }.issubset(evidence_paths)
     assert set(TASK33C_REQUIRED_TARGET_PATHS).issubset(evidence_paths)
@@ -294,6 +296,7 @@ def test_task33_host_evidence_augments_project_docs_with_deterministic_local_evi
     assert snapshot.retrieval_calls == 1
     packet = build_bounded_direct_packet(task, workspace, output_dir, snapshot)
     assert packet["status"] != "insufficient_evidence", packet
+    assert packet["task_interpretation"]["acceptance_conditions"]
     projection = json.loads(
         (output_dir / "model_visible_patch_context.json").read_text(encoding="utf-8")
     )

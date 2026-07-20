@@ -12,10 +12,14 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable
 
-from eval.task_level.execution import _prepare_shared_task33_evidence
+from eval.task_level.execution import (
+    _assert_task33_run_preconditions,
+    _prepare_shared_task33_evidence,
+)
 from eval.task_level.github_models import (
     DEFAULT_OPENAI_MODEL,
     OPENAI_API_ENDPOINT,
+    create_openai_api_runner,
     run_openai_api_capability_probe,
 )
 from eval.task_level.runner import load_tasks
@@ -95,6 +99,28 @@ def main(argv: Iterable[str] | None = None) -> int:
         "checks": {},
     }
     try:
+        if args.run_causal_pilot:
+            task = next(
+                task for task in load_tasks()
+                if task.task_id == TASK33C_PILOT_TASK_ID
+            )
+            try:
+                _assert_task33_run_preconditions(
+                    [task],
+                    create_openai_api_runner(),
+                    conditions=list(protocol["conditions"]),
+                    repeats=1,
+                    evaluation_backend="docker",
+                )
+            except ValueError as exc:
+                summary["status"] = "unsupported"
+                summary["checks"]["resource_budget"] = {
+                    "status": "unsupported",
+                    "reason": str(exc),
+                    "provider_input_token_limit": protocol["provider_input_token_limit"],
+                    "max_input_tokens": task.max_input_tokens,
+                }
+                return 3
         if not args.skip_image_build:
             summary["checks"]["image_build"] = _build_image(args.image, container["base_image"])
         else:

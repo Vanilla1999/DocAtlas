@@ -1236,6 +1236,7 @@ vector_store:
     monkeypatch.setenv("SUPER_SECRET_DOCMANCER_TOKEN", "super-secret-token-value")
     monkeypatch.setenv("HOME", str(tmp_path / "user-home"))
     monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "docmancer-home"))
+    monkeypatch.delenv("DOCMANCER_INDEX_DB_PATH", raising=False)
     service = LibraryDocsService(job_tracker=DocsJobTracker())
 
     inspect = service.inspect_project_docs(str(project))

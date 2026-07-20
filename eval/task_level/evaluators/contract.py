@@ -46,6 +46,8 @@ def evaluate_contract(task: TaskSpec, workspace: Path, patch_path: Path) -> Cont
         return _evaluate_nbo_distributed_permission_policy(combined, patch_text, files.get("lib/modules/permission/application/permission_service.dart", ""))
     if task.task_id == "real_project_nbo_cross_module_permission_contract_001":
         return _evaluate_nbo_cross_module_permission_contract(combined, patch_text, files)
+    if task.task_id == "decisive_nbo_cross_module_gate_large_001":
+        return _evaluate_task33_cross_module_gate(patch_text, files)
     return ContractEvaluation(0.0, 0.0, 0.0, missing_requirements=["contract_not_defined"])
 
 
@@ -241,6 +243,206 @@ def _evaluate_nbo_cross_module_permission_contract(text: str, patch_text: str, f
         "source_model_not_generated_model": "permission_result.freezed.dart" not in patch_text,
     }
     return _scores_with_version(behavioral_checks, form_checks, project_checks, version_checks)
+
+
+_DART_NON_CODE = re.compile(
+    r"'(?:\\.|[^'\\])*'|\"(?:\\.|[^\"\\])*\"|//[^\n]*|/\*[\s\S]*?\*/"
+)
+_TASK33_ENTRY_RECEIVER = r"(?:_permissionService|this\._permissionService)"
+_TASK33_METHOD_RETURN_TYPES = {
+    "canAcceptQueuedWork": "bool",
+    "canEnter": "bool",
+    "evaluateFlowEntry": "PermissionDecision",
+}
+
+
+def _evaluate_task33_cross_module_gate(
+    patch_text: str,
+    files: dict[str, str],
+) -> ContractEvaluation:
+    service = _strip_dart_non_code(files.get("lib/modules/permission/application/permission_service.dart", ""))
+    browser = _strip_dart_non_code(files.get("lib/modules/browser/application/browser_permission_gate.dart", ""))
+    scan = _strip_dart_non_code(files.get("lib/modules/scan/application/scan_permission_gate.dart", ""))
+    sync = _strip_dart_non_code(files.get("lib/modules/sync/application/offline_sync_gate.dart", ""))
+    entry = _task33_method_body(service, "PermissionService", "evaluateFlowEntry")
+    browser_entry = _task33_method_body(browser, "BrowserPermissionGate", "canEnter")
+    scan_entry = _task33_method_body(scan, "ScanPermissionGate", "canEnter")
+    sync_entry = _task33_method_body(sync, "OfflineSyncGate", "canAcceptQueuedWork")
+    behavioral_checks = {
+        "shared_entry_decision": _task33_blocks_missing_immediate(entry),
+        "browser_gate_delegates": _task33_delegates_and_requires_allow(
+            browser_entry,
+            required_fallback=True,
+        ),
+        "scan_gate_delegates": _task33_delegates_and_requires_allow(scan_entry),
+        "offline_sync_uses_shared_gate": _task33_delegates_and_requires_allow(
+            sync_entry,
+            required_fallback=False,
+        ),
+    }
+    form_checks = {
+        "shared_service_dependencies": all(
+            _task33_has_permission_service_field(source, class_name)
+            for source, class_name in (
+                (browser, "BrowserPermissionGate"),
+                (scan, "ScanPermissionGate"),
+                (sync, "OfflineSyncGate"),
+            )
+        ),
+        "flow_entry_methods_present": all((entry, browser_entry, scan_entry, sync_entry)),
+        "no_duplicate_flow_interpretation": all(
+            token not in "\n".join((browser, scan, sync))
+            for token in (
+                "cameraGranted ||",
+                "locationGranted ||",
+                "nearbyGranted ||",
+                "notificationGranted ||",
+                "hasMissingImmediatePermission",
+                "hasPartialImmediateGrant",
+                "decision != PermissionDecision.block",
+            )
+        ),
+    }
+    project_checks = {
+        "generated_files_untouched": ".g.dart" not in patch_text and ".freezed.dart" not in patch_text,
+        "dependency_files_untouched": "pubspec.yaml" not in patch_text and "pubspec.lock" not in patch_text,
+    }
+    return _scores(behavioral_checks, form_checks, project_checks)
+
+
+def _task33_delegates_and_requires_allow(
+    source: str,
+    *,
+    required_fallback: bool | None = None,
+) -> bool:
+    if required_fallback is None:
+        call_args = (
+            r"\(\s*result\s*"
+            r"(?:,\s*allowOfflineFallback\s*:\s*false\s*,?)?\s*\)"
+        )
+    else:
+        fallback = "true" if required_fallback else "false"
+        call_args = (
+            r"\(\s*result\s*,\s*allowOfflineFallback\s*:\s*"
+            + fallback
+            + r"\s*,?\s*\)"
+        )
+    direct = re.fullmatch(
+        rf"\s*return\s+{_TASK33_ENTRY_RECEIVER}\.evaluateFlowEntry\s*"
+        + call_args
+        + r"\s*==\s*PermissionDecision\.allow\s*;\s*",
+        source,
+    )
+    assigned = re.fullmatch(
+        r"\s*final\s+(?:PermissionDecision\s+)?(\w+)\s*=\s*"
+        rf"{_TASK33_ENTRY_RECEIVER}\.evaluateFlowEntry\s*"
+        + call_args
+        + r"\s*;\s*return\s+\1\s*==\s*PermissionDecision\.allow\s*;\s*",
+        source,
+    )
+    return direct is not None or assigned is not None
+
+
+def _task33_blocks_missing_immediate(source: str) -> bool:
+    return re.match(
+        r"\s*if\s*\(\s*result\.hasMissingImmediatePermission\s*\)\s*"
+        r"\{\s*return\s+PermissionDecision\.block\s*;\s*\}",
+        source,
+    ) is not None
+
+
+def _task33_method_body(text: str, class_name: str, method: str) -> str:
+    class_body = _task33_class_body(text, class_name)
+    if not class_body:
+        return ""
+    return_type = _TASK33_METHOD_RETURN_TYPES[method]
+    match = re.search(
+        rf"(?m)^[ \t]*{re.escape(return_type)}[ \t]+"
+        rf"{re.escape(method)}\s*\([\s\S]*?\)\s*(\{{)",
+        class_body,
+    )
+    if match is None:
+        return ""
+    body_start = match.end(1)
+    depth = 1
+    for index in range(body_start, len(class_body)):
+        if class_body[index] == "{":
+            depth += 1
+        elif class_body[index] == "}":
+            depth -= 1
+            if depth == 0:
+                return class_body[body_start:index]
+    return ""
+
+
+def _task33_class_body(text: str, class_name: str) -> str:
+    match = re.search(rf"\bclass\s+{re.escape(class_name)}\b[^{{]*(\{{)", text)
+    if match is None:
+        return ""
+    body_start = match.end(1)
+    depth = 1
+    for index in range(body_start, len(text)):
+        if text[index] == "{":
+            depth += 1
+        elif text[index] == "}":
+            depth -= 1
+            if depth == 0:
+                return text[body_start:index]
+    return ""
+
+
+def _task33_has_permission_service_field(text: str, class_name: str) -> bool:
+    return re.search(
+        r"(?m)^[ \t]*(?:(?:late|final)\s+)*PermissionService[ \t]+"
+        r"_permissionService\s*;",
+        _task33_class_body(text, class_name),
+    ) is not None
+
+
+def _strip_dart_non_code(text: str) -> str:
+    masked = list(text)
+    index = 0
+    while index < len(text):
+        if text.startswith("//", index):
+            end = text.find("\n", index)
+            end = len(text) if end < 0 else end
+            for position in range(index, end):
+                masked[position] = " "
+            index = end
+            continue
+        if text.startswith("/*", index):
+            depth = 1
+            end = index + 2
+            while end < len(text) and depth:
+                if text.startswith("/*", end):
+                    depth += 1
+                    end += 2
+                elif text.startswith("*/", end):
+                    depth -= 1
+                    end += 2
+                else:
+                    end += 1
+            for position in range(index, end):
+                if masked[position] != "\n":
+                    masked[position] = " "
+            index = end
+            continue
+        if text[index] in {"'", '"'}:
+            quote = text[index]
+            delimiter = quote * 3 if text.startswith(quote * 3, index) else quote
+            end = index + len(delimiter)
+            while end < len(text):
+                if text.startswith(delimiter, end):
+                    end += len(delimiter)
+                    break
+                end += 2 if len(delimiter) == 1 and text[end] == "\\" else 1
+            for position in range(index, min(end, len(text))):
+                if masked[position] != "\n":
+                    masked[position] = " "
+            index = end
+            continue
+        index += 1
+    return "".join(masked)
 
 
 def _scores_with_version(behavioral: dict[str, bool], form: dict[str, bool], project: dict[str, bool], version: dict[str, bool]) -> ContractEvaluation:

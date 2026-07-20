@@ -44,6 +44,12 @@ def test_frozen_protocol_matches_live_evaluation_contract():
     assert protocol["isolated_worker_attempt_budget"] == 0
     assert protocol["worker_prompt_revision"] == "disabled"
     assert protocol["provider_input_token_limit"] == 7_000
+    assert protocol["required_evidence_paths"] == [
+        "docs/permission-architecture.md",
+        "docs/browser-flow.md",
+        "docs/scan-flow.md",
+        "docs/offline-sync.md",
+    ]
     assert set(protocol["provider_profiles"]) == {"github-models", "openai-api"}
     assert protocol["provider_profiles"]["openai-api"]["credential_environment"] == "OPENAI_API_KEY"
     assert protocol["provider_profiles"]["openai-api"]["model"] == "gpt-4o-mini-2024-07-18"
@@ -52,6 +58,9 @@ def test_frozen_protocol_matches_live_evaluation_contract():
     )
     assert "@sha256:" in protocol["container"]["base_image"]
     assert all("@" in action and len(action.rsplit("@", 1)[1]) == 40 for action in protocol["github_actions"].values())
+    live_errors: list[str] = []
+    task33_validation._check_live_protocol(protocol, live_errors)
+    assert live_errors == []
 
 
 def test_required_once_validator_reads_agent_call_count_from_metrics(tmp_path: Path):

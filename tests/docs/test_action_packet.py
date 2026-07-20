@@ -78,6 +78,39 @@ def test_post_format_sufficiency_accepts_camel_case_symbol_in_snake_case_source_
     assert packet["omitted_counts"].get("mandatory_requirements", 0) == 0
 
 
+def test_validator_rejects_truncated_packets_with_unclosed_required_evidence():
+    text = "Required: preserve the source-backed permission contract."
+    item = {
+        "stable_chunk_id": "required-contract",
+        "parent_logical_id": "parent:required-contract",
+        "source": "docs/contract.md",
+        "display_text": text,
+        "display_content_hash": hashlib.sha256(text.encode("utf-8")).hexdigest(),
+        "authority": "official",
+    }
+    packet = build_action_packet(
+        question="Apply the permission contract",
+        context_pack=[item],
+        max_tokens=1500,
+    )
+    assert packet["status"] == "ok"
+
+    packet["status"] = "truncated"
+    packet["missing_evidence"] = ["Required evidence was not preserved."]
+    packet["omitted_counts"] = {"implementation_guidance": 1}
+    for _ in range(3):
+        packet["estimated_tokens"] = estimate_action_packet_tokens(packet)
+    errors = validate_action_packet(packet, evidence_items=[item], max_tokens=1500)
+    assert "missing evidence requires insufficient_evidence status" in errors
+
+    packet["missing_evidence"] = []
+    packet["omitted_counts"] = {"mandatory_requirements": 1}
+    for _ in range(3):
+        packet["estimated_tokens"] = estimate_action_packet_tokens(packet)
+    errors = validate_action_packet(packet, evidence_items=[item], max_tokens=1500)
+    assert "critical omissions require insufficient_evidence status" in errors
+
+
 def test_display_only_canonical_child_is_rendered_and_hash_bound():
     text = "The formatter must preserve stable child citations."
     item = {
@@ -844,15 +877,20 @@ def test_action_packet_truncates_whole_items_and_fails_closed_without_evidence()
 
     explicit_acceptance_evidence = [{
         **evidence[0], "authority": "canonical",
-        "metadata": {"acceptance_conditions": ["Preserve the public API."]},
+        "metadata": {"acceptance_conditions": [
+            "Preserve the public API.",
+            {"condition": "Sync must call evaluateFlowEntry with allowOfflineFallback: false."},
+        ]},
     }]
     explicit_acceptance = build_action_packet(question="Edit x", context_pack=explicit_acceptance_evidence)
     evidence_id = explicit_acceptance["source_of_truth"][0]["evidence_id"]
-    explicit_acceptance["task_interpretation"]["acceptance_conditions"] = [{
-        "text": "Preserve the public API.", "evidence_ids": [evidence_id],
-    }]
-    for _ in range(8):
-        explicit_acceptance["estimated_tokens"] = estimate_action_packet_tokens(explicit_acceptance)
+    assert explicit_acceptance["task_interpretation"]["acceptance_conditions"] == [
+        {"text": "Preserve the public API.", "evidence_ids": [evidence_id]},
+        {
+            "text": "Sync must call evaluateFlowEntry with allowOfflineFallback: false.",
+            "evidence_ids": [evidence_id],
+        },
+    ]
     assert validate_action_packet(explicit_acceptance, evidence_items=explicit_acceptance_evidence) == []
 
     empty_ok = build_action_packet(question="Unknown", context_pack=[])
@@ -867,6 +905,7 @@ def test_action_packet_truncates_whole_items_and_fails_closed_without_evidence()
         "path": "docs/history.md", "heading_path": "History", "authority": "canonical",
         "content": "## Must preserve legacy behavior\n| Rule | Must never change |\n> Must run pytest",
     }])
+    assert prose_only["task_interpretation"]["acceptance_conditions"] == []
     assert prose_only["required_invariants"] == []
     assert prose_only["forbidden_changes"] == []
     assert not any(prose_only["validation"].values())

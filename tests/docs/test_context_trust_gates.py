@@ -210,6 +210,56 @@ def test_answer_type_not_exact_without_strong_evidence():
     assert "missing_strong_evidence_for_exact" in result["answer_completeness"]["reason_codes"] or "high_signal_query_terms_missing_from_context" in result["answer_completeness"]["reason_codes"]
 
 
+def test_catalog_source_of_truth_is_strong_evidence_for_exact_project_answer():
+    result = evaluate_project_answer_completeness(
+        question="Task33 evaluation contract",
+        context_pack=[
+            {
+                "source_class": "project_doc",
+                "source_type": "docs",
+                "path": "TASK33C_CAUSAL_BUDGET_CONTRACT.md",
+                "authority": "source_of_truth",
+                "instruction_trust": "untrusted_data",
+                "content": "The Task33 evaluation contract defines benchmark truth.",
+            }
+        ],
+        answer_available=True,
+        intent=_intent(),
+    )
+
+    assert result["answer_type"] == "exact"
+    assert result["answer_completeness"]["status"] == "exact"
+    assert result["answer_completeness"]["reason_codes"] == []
+
+
+def test_story_specific_catalog_source_of_truth_is_source_backed_without_instruction_promotion():
+    source = {
+        "source_class": "project_doc",
+        "source_type": "docs",
+        "path": "TASK33C_CAUSAL_BUDGET_CONTRACT.md",
+        "authority": "source_of_truth",
+        "instruction_trust": "untrusted_data",
+        "content": (
+            "The evaluateFlowEntry method must bind to its "
+            "PermissionDecision declaration."
+        ),
+    }
+
+    result = evaluate_project_answer_completeness(
+        question=(
+            "How must `evaluateFlowEntry` bind to its "
+            "PermissionDecision declaration?"
+        ),
+        context_pack=[source],
+        answer_available=True,
+        intent=_intent(),
+    )
+
+    assert result["answer_type"] == "exact"
+    assert result["answer_completeness"]["status"] == "exact"
+    assert source["instruction_trust"] == "untrusted_data"
+
+
 def test_answer_type_exact_only_with_strong_evidence():
     result = evaluate_project_answer_completeness(
         question="PermissionService grant access",

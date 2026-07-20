@@ -15,7 +15,7 @@
     "task_id": "decisive_nbo_cross_module_gate_large_001",
     "source_project": "nbo",
     "domain": "mobile-cross-module-permission-gating",
-    "fixture_hash": "603712341cdeffb1332492ccbebeb04b022ddf665b1b305c9827765c69a629df",
+    "fixture_hash": "db6e7b9646c2191c88ef9c9213c9521d250a2ecc78e021fefc84599fc881b023",
     "oracle_sha256": "7bef2b9e21966f10c12d7ac9d742e61f2b45395b1a8874b98e6f999adcf683a2",
     "external_context_sha256": "7372ccee933b47ec72a614966b03a62faf0298a9293733ae46e869183c69fcc0"
   },

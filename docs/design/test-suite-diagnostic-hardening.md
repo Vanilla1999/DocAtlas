@@ -21,6 +21,12 @@ This design is grounded in the current repository surfaces:
 - `pytest.ini:29-30` and `tests/conftest.py:25-70` define existing operational markers (`advanced`, `live`, `live_network`, `integration`).
 - `.github/workflows/ci.yml:67-102` runs core and advanced suites separately.
 
+### Task33C causal input-budget contract
+
+Task33C combines three distinct frozen limits. `agent_turn_limit=12` is the hard per-cell turn limit from `eval/task_level/task33c_protocol.lock.json`. `provider_input_token_limit=7000` is an estimated per-request input limit used to compact and reject oversized request payloads; it is not by itself proof of a hard cumulative provider-token bound. `TaskSpec.max_input_tokens=120000` is the cumulative per-cell budget measured from provider-reported input-token usage.
+
+A runner is causally eligible only when it can prove both the 12-turn hard limit and hard enforcement of the cumulative 120000-input-token budget before a request could exceed it. Post-completion usage reporting or the 7000-token request estimate alone is insufficient. A runner without that proof must fail Task33C preflight before the canary, experimental cells, or any provider/model call and must produce an unsupported/infrastructure-incomplete result rather than a causally valid result.
+
 ## Non-goals
 
 - Do not change `task33c_protocol.lock.json`, task fixtures, oracle files, hidden tests, causal thresholds, or benchmark conditions.

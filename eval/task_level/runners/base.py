@@ -18,6 +18,7 @@ class RunnerCapabilities:
     independent_process: bool
     verified: bool
     hard_turn_limit: bool = False
+    hard_input_budget: bool = False
     verification_notes: list[str] = field(default_factory=list)
 
 
@@ -37,6 +38,7 @@ class AgentRunRequest:
     test_command: str | None = None
     allowed_write_paths: tuple[str, ...] = ()
     task_objective: str | None = None
+    max_input_tokens: int | None = None
 
 
 @dataclass(frozen=True)

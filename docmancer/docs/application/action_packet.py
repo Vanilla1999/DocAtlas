@@ -352,6 +352,7 @@ def build_action_packet(
     source_rows = [_source_row(item) for item in items if _source_path(item)]
     source_rows = _dedupe_dicts(source_rows, ("evidence_id",))
 
+    acceptance_conditions: list[dict[str, Any]] = []
     required: list[dict[str, Any]] = []
     forbidden: list[dict[str, Any]] = []
     compile_checks: list[dict[str, Any]] = []
@@ -375,6 +376,20 @@ def build_action_packet(
                     1 for fact_type, _ in facts if fact_type in {"required", "forbidden", "validation"}
                 ) + omitted_facts
             continue
+        if _authority(item) == "canonical":
+            for condition in sorted(_explicit_acceptance_conditions(item)):
+                bounded_condition, omitted = _bounded_text(condition, 1_000)
+                if omitted:
+                    critical_fact_omissions += 1
+                    continue
+                if _content_instruction_risk_flags(bounded_condition):
+                    risky_content_omissions += 1
+                    risky_critical_omissions += 1
+                    continue
+                acceptance_conditions.append({
+                    "text": bounded_condition,
+                    "evidence_ids": [evidence_id],
+                })
         critical_fact_omissions += omitted_facts if _authority(item) == "canonical" else 0
         for fact_type, fact in facts:
             if _content_instruction_risk_flags(fact):
@@ -421,7 +436,7 @@ def build_action_packet(
         "status": "ok",
         "task_interpretation": {
             "objective": objective,
-            "acceptance_conditions": [],
+            "acceptance_conditions": _dedupe_cited(acceptance_conditions, "text"),
         },
         "source_of_truth": source_rows,
         "target_surface": {
@@ -563,6 +578,7 @@ def _ensure_selection_survives_packet(
             if isinstance(row, dict)
         )
     for rows in (
+        (packet.get("task_interpretation") or {}).get("acceptance_conditions"),
         packet.get("required_invariants"), packet.get("forbidden_changes"),
         packet.get("implementation_guidance"),
         *((packet.get("validation") or {}).values()),
@@ -764,6 +780,8 @@ def validate_action_packet(
     status = packet.get("status")
     if status == "ok" and (missing_evidence or omitted_counts):
         errors.append("ok packets cannot report missing evidence or omissions")
+    if status == "truncated" and missing_evidence:
+        errors.append("missing evidence requires insufficient_evidence status")
     if status == "ok" and (not sources or not _has_actionable_items(packet)):
         errors.append("ok packets require cited actionable evidence")
     if status == "ok" and uncertainties:
@@ -777,6 +795,7 @@ def validate_action_packet(
             "required_invariants", "forbidden_changes", "critical_source_facts",
             "filtered_critical_source_facts", "rejected_critical_source_facts",
             "risky_critical_source_facts", "task_interpretation.objective_characters",
+            "mandatory_requirements",
         )
     ) and status != "insufficient_evidence":
         errors.append("critical omissions require insufficient_evidence status")
@@ -1534,6 +1553,7 @@ def _dedupe_cited(rows: Iterable[dict[str, Any]], key: str) -> list[dict[str, An
 
 def _cited_evidence_ids(packet: dict[str, Any]) -> set[str]:
     rows = [
+        *(packet["task_interpretation"].get("acceptance_conditions") or []),
         *packet["target_surface"]["likely_files"],
         *packet["target_surface"]["symbols"],
         *packet["required_invariants"],
@@ -1566,6 +1586,7 @@ def _has_actionable_items(packet: dict[str, Any]) -> bool:
     target = packet.get("target_surface") if isinstance(packet.get("target_surface"), dict) else {}
     validation = packet.get("validation") if isinstance(packet.get("validation"), dict) else {}
     return any((
+        (packet.get("task_interpretation") or {}).get("acceptance_conditions"),
         target.get("likely_files"),
         target.get("symbols"),
         packet.get("required_invariants"),
@@ -1651,6 +1672,10 @@ def _remove_one_budget_item(
             ("validation.semantic_checks", packet["validation"]["semantic_checks"]),
             ("validation.compile", packet["validation"]["compile"]),
             ("validation.tests", packet["validation"]["tests"]),
+            (
+                "task_interpretation.acceptance_conditions",
+                packet["task_interpretation"]["acceptance_conditions"],
+            ),
             ("forbidden_changes", packet["forbidden_changes"]),
             ("required_invariants", packet["required_invariants"]),
         ]
@@ -1659,7 +1684,11 @@ def _remove_one_budget_item(
                 continue
             rows.pop()
             _record_omission(packet, name)
-            if name in {"forbidden_changes", "required_invariants"}:
+            if name in {
+                "task_interpretation.acceptance_conditions",
+                "forbidden_changes",
+                "required_invariants",
+            }:
                 packet["status"] = "insufficient_evidence"
                 message = "Critical constraints did not fit the requested packet budget."
                 if message not in packet["missing_evidence"]:
@@ -1715,6 +1744,7 @@ def _compact_failure_packet(packet: dict[str, Any], budget: int) -> None:
     })
     objective = str(packet["task_interpretation"].get("objective") or "task")
     packet["task_interpretation"]["objective"] = objective[:64] or "task"
+    packet["task_interpretation"]["acceptance_conditions"] = []
     _refresh_estimated_tokens(packet)
     if packet["estimated_tokens"] > budget:
         packet["task_interpretation"]["objective"] = "task"

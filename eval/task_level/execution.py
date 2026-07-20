@@ -30,7 +30,7 @@ from eval.task_level.evaluators.docatlas_utilization import evaluate_docatlas_ut
 from eval.task_level.evaluators.patch import forbidden_changed_paths
 from eval.task_level.evaluators.patch_constraints import evaluate_patch_constraint_usage, load_patch_constraint_packet
 from eval.task_level.evaluators.policy import audit_trajectory
-from eval.task_level.evaluators.task_contract import ContractValidation, evaluate_patch_surface, evaluation_contract_registry_sha256, evaluation_contract_sha256, load_effective_task23_protocol_tasks, load_task_evaluation_contracts, run_compile_gate, validate_task_evaluation_artifacts, validate_task_evaluation_contract
+from eval.task_level.evaluators.task_contract import ContractValidation, SemanticCheck, evaluate_patch_surface, evaluation_contract_registry_sha256, evaluation_contract_sha256, load_effective_task23_protocol_tasks, load_task_evaluation_contracts, run_compile_gate, validate_task_evaluation_artifacts, validate_task_evaluation_contract
 from eval.task_level.evaluators.tests import CommandResult, run_command
 from eval.task_level.fixtures.builder import copy_hidden_tests, materialize_fixture
 from eval.task_level.isolated_delivery import (
@@ -79,6 +79,47 @@ def is_infrastructure_failure(result: dict[str, Any]) -> bool:
         return True
     metrics = result.get("metrics") or {}
     return result.get("status") == "no_patch" and metrics.get("total_tokens") is None
+
+
+def _semantic_check_execution_rows(
+    checks: tuple[SemanticCheck, ...],
+    result: CommandResult | None,
+) -> list[dict[str, Any]]:
+    if result is None:
+        status_by_check = {check.check_id: "not_run" for check in checks}
+    elif result.returncode == 0:
+        status_by_check = {check.check_id: "passed" for check in checks}
+    elif result.returncode == 1:
+        output = result.stdout + "\n" + result.stderr
+        observed_test_ids: dict[str, set[str]] = {}
+        for status in ("PASSED", "FAILED"):
+            nodes = re.findall(rf"(?m)^{status}\s+(\S+::\S+)", output)
+            nodes.extend(re.findall(rf"(?m)^(\S+::\S+)\s+{status}\b", output))
+            observed_test_ids[status] = {
+                node.split("::")[-1].split("[", 1)[0]
+                for node in nodes
+            }
+        status_by_check = {}
+        for check in checks:
+            test_ids = set(check.test_ids)
+            if test_ids.intersection(observed_test_ids["FAILED"]):
+                status = "failed"
+            elif test_ids and test_ids.issubset(observed_test_ids["PASSED"]):
+                status = "passed"
+            else:
+                status = "unknown"
+            status_by_check[check.check_id] = status
+    else:
+        status_by_check = {check.check_id: "unknown" for check in checks}
+    return [
+        {
+            "id": check.check_id,
+            "description": check.description,
+            "test_ids": list(check.test_ids),
+            "status": status_by_check[check.check_id],
+        }
+        for check in checks
+    ]
 
 
 ALLOWED_PATCH_PREFIXES = (
@@ -131,6 +172,11 @@ def _bounded_direct_projection_errors(
     errors = list(validation_errors)
     if projection.get("status") not in {"ok", "truncated"}:
         errors.append("bounded direct requires a successful model-visible projection")
+        errors.extend(
+            f"projection missing: {item}"
+            for item in projection.get("missing", [])
+            if isinstance(item, str) and item.strip()
+        )
     return errors
 
 
@@ -806,20 +852,17 @@ def evaluate_agent_patch(
     (run_output_dir / "validation.json").write_text(json.dumps(constraint_validation, indent=2, sort_keys=True), encoding="utf-8")
     public_passed = bool(public and public.passed)
     hidden_passed = bool(hidden and hidden.passed)
+    semantic_check_rows = _semantic_check_execution_rows(
+        task_evaluation_contract.semantic_checks,
+        hidden,
+    ) if task_evaluation_contract else []
     semantic_gate = {
         "command": task_evaluation_contract.semantic_test_command if task_evaluation_contract else None,
         "status": "passed" if hidden_passed else "failed" if hidden is not None else "not_run",
         "passed": hidden_passed,
         "returncode": hidden.returncode if hidden is not None else None,
         "hidden_tests_sha256": task_evaluation_contract.hidden_tests_sha256 if task_evaluation_contract else None,
-        "checks": [
-            {
-                "id": check.check_id,
-                "test_ids": list(check.test_ids),
-                "status": "passed" if hidden_passed else "failed" if hidden is not None else "not_run",
-            }
-            for check in task_evaluation_contract.semantic_checks
-        ] if task_evaluation_contract else [],
+        "checks": semantic_check_rows,
     }
     compile_success = (
         None if compile_gate["status"] == "not_applicable" else bool(compile_gate["passed"])
@@ -1020,7 +1063,7 @@ def evaluate_agent_patch(
             "compile_gate": compile_gate,
             "semantic_gate": semantic_gate,
             "patch_surface": patch_surface,
-            "semantic_checks": [check.to_json() for check in task_evaluation_contract.semantic_checks] if task_evaluation_contract else [],
+            "semantic_checks": semantic_check_rows,
         },
         "policy_clean": audit.clean,
         "policy": audit.to_json(),
@@ -1682,6 +1725,7 @@ def execute_pilot(
                         test_command=task.test_command,
                         allowed_write_paths=task_contract.allowed_paths if task_contract else (),
                         task_objective=task.issue_text,
+                        max_input_tokens=task.max_input_tokens,
                     )
                     try:
                         output = runner.run(request)
@@ -1762,6 +1806,10 @@ def _assert_task33_run_preconditions(
         if not bool(getattr(runner, "hard_turn_limit_enforced", False)):
             raise ValueError(
                 "Task 33 causal execution requires a runner with a proven hard turn limit"
+            )
+        if not bool(getattr(runner, "hard_input_budget_enforced", False)):
+            raise ValueError(
+                "Task 33 causal execution requires a runner with a proven hard cumulative input budget"
             )
         return
     allowed_conditions = {
@@ -2105,7 +2153,7 @@ def _augment_task33_host_context(
             doc_scope=candidate.doc_scope,
             module_path=candidate.module_path,
         )
-        ranked_docs.append((score, relative, {
+        item = {
             "source_class": "project_doc",
             "source_type": taxonomy["source_type"],
             "source_kind": taxonomy["source_kind"],
@@ -2123,7 +2171,8 @@ def _augment_task33_host_context(
             "why_selected": "derived retrieval query matched discovered project documentation",
             "content": content,
             "token_estimate": max(1, len(content) // 4),
-        }))
+        }
+        ranked_docs.append((score, relative, item))
 
     local_items = [
         item for _, _, item in sorted(ranked_docs, key=lambda row: (-row[0], row[1]))[:6]

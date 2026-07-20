@@ -60,6 +60,8 @@ The parent adapter exposes a hard-turn-controlled repository tool allowlist. The
 
 The engineering pilot freezes a 12-turn limit per parent cell and uses the low-rate-tier `openai/gpt-4o-mini` adapter so a worst-case three-cell run remains below the free API's daily request budget. A turn-limit exhaustion or provider 429 is infrastructure-incomplete, never a completed causal cell.
 
+Task33C treats its input limits separately. `provider_input_token_limit=7000` is an estimated per-request limit used for request compaction and rejection; it does not prove hard cumulative enforcement. `TaskSpec.max_input_tokens=120000` is the cumulative per-cell budget measured from provider-reported input-token usage. Causal eligibility requires the runner to prove both the hard 12-turn limit and hard enforcement of the cumulative input budget before a request could exceed it. A runner that can only report cumulative usage after completion must fail preflight before the canary, experimental cells, or any provider/model call and produce an unsupported/infrastructure-incomplete result.
+
 The machine-readable protocol is `task33c_protocol.lock.json`. Do not edit the task, query, model, conditions, budgets, fixture/oracle/hidden-test identities, or decision thresholds after the first causal dispatch. `task33c_completeness.json` is diagnostic only; the authoritative gate is the independent `task33c_validation.json` produced by:
 
 ```bash

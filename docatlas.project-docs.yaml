@@ -1,0 +1,46 @@
+schema_version: 1
+documents:
+  - path: TASK33C_CAUSAL_BUDGET_CONTRACT.md
+    role: api_contract
+    scope: project
+    description: Authoritative Task33C evaluation, ActionPacket, and causal budget contract.
+    authority: source_of_truth
+    status: active
+    impact: track
+
+  - path: README.md
+    role: overview
+    scope: project
+    description: Project overview, capabilities, and entry points.
+    authority: supporting
+    status: active
+    impact: track
+
+  - path: CHANGELOG.md
+    role: other
+    scope: project
+    description: Released and pending project changes.
+    authority: supporting
+    status: active
+    impact: track
+
+  - path: CONTRIBUTING.md
+    role: development
+    scope: project
+    description: Development and contribution workflow.
+    authority: supporting
+    status: active
+    impact: track
+
+roots:
+  - path: docs
+    scope: project
+    authority: supporting
+
+  - path: roadmap
+    scope: project
+    authority: supporting
+
+  - path: wiki
+    scope: project
+    authority: supporting

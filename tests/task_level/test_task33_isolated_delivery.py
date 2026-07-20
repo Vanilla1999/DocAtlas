@@ -306,6 +306,38 @@ def test_task33c_three_lane_plan_and_flags_are_frozen(tmp_path):
     assert plan["isolated_worker_attempt_budget"] == 0
     assert plan["agent_turn_limit"] == 12
     assert plan["required_evidence_categories"] == list(TASK33C_REQUIRED_EVIDENCE_CATEGORIES)
+    assert plan["required_evidence_paths"] == [
+        "docs/permission-architecture.md",
+        "docs/browser-flow.md",
+        "docs/scan-flow.md",
+        "docs/offline-sync.md",
+    ]
+    evidence = [
+        {
+            "path": path,
+            "heading_path": "Task33 contract",
+            "authority": "canonical",
+            "source_class": "project_doc",
+            "content": "Task33 source evidence.",
+            **({
+                "metadata": {
+                    "acceptance_conditions": [
+                        "Sync must call evaluateFlowEntry with allowOfflineFallback: false."
+                    ]
+                }
+            } if path == "docs/offline-sync.md" else {}),
+        }
+        for path in TASK33C_REQUIRED_EVIDENCE_PATHS
+    ]
+    packet = build_action_packet(
+        question=domain_objective,
+        context_pack=evidence,
+        required_evidence_paths=TASK33C_REQUIRED_EVIDENCE_PATHS,
+    )
+    assert {row["path"] for row in packet["source_of_truth"]} == set(TASK33C_REQUIRED_EVIDENCE_PATHS)
+    assert [
+        row["text"] for row in packet["task_interpretation"]["acceptance_conditions"]
+    ] == ["Sync must call evaluateFlowEntry with allowOfflineFallback: false."]
     assert plan["claims"]["may_claim_product_improvement"] is False
     direct = CONDITIONS["docatlas_bounded_direct"].tool_policy
     required = CONDITIONS["docatlas_tool_required_once"].tool_policy

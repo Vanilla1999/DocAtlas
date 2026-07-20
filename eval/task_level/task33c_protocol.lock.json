@@ -54,6 +54,8 @@
   ],
   "required_evidence_paths": [
     "docs/permission-architecture.md",
+    "docs/browser-flow.md",
+    "docs/scan-flow.md",
     "docs/offline-sync.md"
   ],
   "required_target_paths": [
@@ -64,12 +66,12 @@
   ],
   "evaluation": {
     "patch_contract_id": "task33-nbo-cross-module-gate-1",
-    "contract_sha256": "27a90e424671760466d262fdb97c7588ab65e6fb5f13df9bada66faddc8c9c18",
-    "registry_sha256": "9dfd6de04642ce71d2851208cc26a22d220e17694814c2f68d276e38e031936c",
-    "fixture_sha256": "1ba6cb88a61dc5871eca8d2aec13e5d89ce57b2cfe977441da34ad49f7bd48ae",
-    "protocol_fixture_sha256": "603712341cdeffb1332492ccbebeb04b022ddf665b1b305c9827765c69a629df",
+    "contract_sha256": "db0e59fd58402b8ecdc406acb128a5b57703cb57295a1716b9fbee60bea6f81f",
+    "registry_sha256": "d5ddbfc02de155cf0cee20a2e08279dbf8bb4c2614fd58bf74712d762abff5fa",
+    "fixture_sha256": "59bcf243cb35eb622c2b313648fc64dc7201155fa5b8026735cf307a4b3b9bc6",
+    "protocol_fixture_sha256": "db6e7b9646c2191c88ef9c9213c9521d250a2ecc78e021fefc84599fc881b023",
     "oracle_sha256": "7bef2b9e21966f10c12d7ac9d742e61f2b45395b1a8874b98e6f999adcf683a2",
-    "hidden_tests_sha256": "490a887a3115717f9ba1b03f607a6ab10c7449a5e963298d99b4c27c89fd9006",
+    "hidden_tests_sha256": "fb53ce0585f0f5164edf1200e40e70d05413e084822c650b427c9fb5357879b9",
     "external_context_sha256": "7372ccee933b47ec72a614966b03a62faf0298a9293733ae46e869183c69fcc0",
     "setup_command": "uv sync --offline --python 3.14",
     "public_test_command": "uv run --offline pytest tests/test_browser_permission_gate.py",

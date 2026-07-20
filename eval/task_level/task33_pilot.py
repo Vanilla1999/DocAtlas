@@ -25,6 +25,8 @@ TASK33C_PILOT_TASK_ID = "decisive_nbo_cross_module_gate_large_001"
 TASK33C_REQUIRED_EVIDENCE_CATEGORIES = ("project_docs", "symbols")
 TASK33C_REQUIRED_EVIDENCE_PATHS = (
     "docs/permission-architecture.md",
+    "docs/browser-flow.md",
+    "docs/scan-flow.md",
     "docs/offline-sync.md",
 )
 TASK33C_REQUIRED_TARGET_PATHS = (
@@ -46,6 +48,11 @@ def build_task33c_validation_evidence(test_command: str) -> dict[str, Any]:
         "scope_verified": True,
         "source_class": "project_doc",
         "content": f"Run {test_command}",
+        "metadata": {
+            "acceptance_conditions": [
+                "Sync flow must call evaluateFlowEntry with allowOfflineFallback: false."
+            ]
+        },
     }
 
 

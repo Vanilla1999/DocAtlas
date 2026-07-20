@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+import shlex
 import shutil
 import subprocess
 import sys
@@ -192,10 +193,13 @@ def workspace_has_no_oracles(workspace: Path) -> bool:
 
 
 def run_local_test_command(command: str, workspace: Path, timeout_seconds: int = 120) -> subprocess.CompletedProcess[str]:
+    python = shlex.quote(sys.executable)
     if command.startswith("pytest "):
-        command = "python -m pytest " + command.removeprefix("pytest ")
+        command = f"{python} -m pytest " + command.removeprefix("pytest ")
     elif command.startswith("uv run --offline pytest "):
-        command = "python -m pytest " + command.removeprefix("uv run --offline pytest ")
+        command = f"{python} -m pytest " + command.removeprefix("uv run --offline pytest ")
+    elif command == "python" or command.startswith("python "):
+        command = python + command.removeprefix("python")
     return _run_shell(command, workspace, timeout_seconds, env=_local_validation_env())
 
 
@@ -252,11 +256,14 @@ def _run(command: list[str], cwd: Path, timeout_seconds: int) -> subprocess.Comp
 def _run_shell(command: str, cwd: Path, timeout_seconds: int, *, env: dict[str, str] | None = None) -> subprocess.CompletedProcess[str]:
     if command.startswith("python -m pip "):
         command = "uv pip " + command.removeprefix("python -m pip ") + f" --python {sys.executable}"
+    elif command == "python" or command.startswith("python "):
+        command = shlex.quote(sys.executable) + command.removeprefix("python")
     return subprocess.run(command, cwd=cwd, env=env, shell=True, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=timeout_seconds, check=False)
 
 
 def _local_validation_env() -> dict[str, str]:
     env = os.environ.copy()
+    env["PYTHONDONTWRITEBYTECODE"] = "1"
     import_paths = [
         str(Path(path).resolve())
         for path in sys.path

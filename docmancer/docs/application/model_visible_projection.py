@@ -203,9 +203,22 @@ def project_patch_context(
     }
     _refresh_estimate(payload)
     limit = min(PATCH_CONTEXT_HARD_TOKENS, max(256, int(max_tokens)))
-    if estimate_projection_tokens(payload) > limit:
+    estimated_tokens = estimate_projection_tokens(payload)
+    while estimated_tokens > limit and payload["implementation_guidance"]:
+        payload["implementation_guidance"].pop()
+        payload["status"] = "truncated"
+        payload["omitted_counts"]["implementation_guidance"] = (
+            payload["omitted_counts"].get("implementation_guidance", 0) + 1
+        )
+        _refresh_estimate(payload)
+        estimated_tokens = estimate_projection_tokens(payload)
+    if estimated_tokens > limit:
         return project_insufficient(
-            kind="patch_context", missing=["The validated patch context exceeds the model-visible budget."],
+            kind="patch_context",
+            missing=[
+                "The validated patch context exceeds the model-visible budget "
+                f"({estimated_tokens} > {limit})."
+            ],
             recommended_next_action=None, max_tokens=INSUFFICIENT_EVIDENCE_MAX_TOKENS,
         ), snapshot
     return payload, snapshot
