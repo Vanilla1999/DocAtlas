@@ -164,15 +164,88 @@ class LibraryRegistryOps:
         indexed = len(matched)
         return expected, indexed, expected - indexed, stale_orphans, target_spec.get("active_manifest_digest") or manifest.get("digest")
 
+    def manifest_fetched(self, record: LibraryRecord) -> int:
+        """Count manifest identities whose fetched source provenance is present.
+
+        Fetch success and extraction/index success are distinct inspection diagnostics,
+        so this intentionally does not require any sections for a matching source.
+        """
+        target_spec = record.target_spec or {}
+        manifest = target_spec.get("source_manifest") or {}
+        if manifest.get("schema_version") != 2:
+            return 0
+        documents = manifest.get("documents") or []
+        expected_by_url = {
+            str(document.get("blob_url") or ""): document
+            for document in documents
+            if isinstance(document, dict) and document.get("blob_url")
+        }
+        if len(expected_by_url) != len(documents):
+            return 0
+        db_path = Path(self.deps._index_config_for(record).index.db_path)
+        if not db_path.exists():
+            return 0
+        try:
+            with sqlite3.connect(db_path) as conn:
+                rows = conn.execute("SELECT source, content, metadata_json FROM sources").fetchall()
+        except sqlite3.Error:
+            return 0
+        resolved_commit = str((manifest.get("discovery") or {}).get("resolved_commit_sha") or "")
+        fetched: set[str] = set()
+        for source, content, raw_metadata in rows:
+            try:
+                metadata = json.loads(raw_metadata or "{}")
+            except (TypeError, json.JSONDecodeError):
+                continue
+            canonical_url = str(metadata.get("canonical_url") or source or "")
+            document = expected_by_url.get(canonical_url)
+            if (
+                document is not None
+                and canonical_url not in fetched
+                and str(metadata.get("resolved_commit_sha") or "") == resolved_commit
+                and str(metadata.get("git_blob_sha") or "") == str(document.get("git_blob_sha") or "")
+                and str(metadata.get("content_sha256") or "") == hashlib.sha256(
+                    str(content or "").encode("utf-8")
+                ).hexdigest()
+            ):
+                fetched.add(canonical_url)
+        return len(fetched)
+
+    def active_generation_id(self, record: LibraryRecord) -> str | None:
+        db_path = Path(self.deps._index_config_for(record).index.db_path)
+        if not db_path.exists():
+            return None
+        try:
+            with sqlite3.connect(db_path) as conn:
+                row = conn.execute(
+                    "SELECT active_generation_id FROM index_state WHERE singleton = 1"
+                ).fetchone()
+        except sqlite3.Error:
+            return None
+        return str(row[0]) if row and row[0] else None
+
     def inspect_library_docs(self, canonical_id: str) -> DocsInspectResult:
         record = self.deps.registry.get(canonical_id)
         if record is None:
             return DocsInspectResult(canonical_id=canonical_id, status="missing", reason_code="missing", message="library docs target not found")
         size_bytes = self.index_size_for(record)
         pages, chunks = self.count_index_entries(record)
-        manifest_expected, manifest_indexed, manifest_missing, manifest_stale_orphans, active_manifest_digest = self.manifest_coverage(record, pages)
+        manifest_expected, manifest_indexed, manifest_missing, manifest_stale_orphans, covered_manifest_digest = self.manifest_coverage(record, pages)
+        active_manifest_digest = (record.target_spec or {}).get("active_manifest_digest") or covered_manifest_digest
+        manifest_fetched = self.manifest_fetched(record)
         status = self.status_for(record, size_bytes)
         manifest = ((record.target_spec or {}).get("source_manifest") or {})
+        discovery = manifest.get("discovery") or {}
+        raw_attempt_diagnostics = (record.target_spec or {}).get("last_attempt_manifest_diagnostics")
+        attempt_diagnostics = (
+            {
+                str(key): str(value)
+                for key, value in raw_attempt_diagnostics.items()
+                if key in {"attempted_manifest_digest", "reason_code"}
+            }
+            if isinstance(raw_attempt_diagnostics, dict)
+            else None
+        )
         manifest_incomplete = manifest.get("schema_version") == 2 and (
             not manifest.get("complete") or bool(manifest.get("truncated"))
         )
@@ -187,6 +260,7 @@ class LibraryRegistryOps:
             version=record.version,
             source_type=record.source_type,
             docs_url=record.docs_url,
+            docs_url_template=record.docs_url_template,
             docs_url_resolved=record.docs_url_resolved,
             docs_snapshot_exact=record.docs_snapshot_exact,
             requested_version=record.requested_version,
@@ -199,12 +273,20 @@ class LibraryRegistryOps:
             pages=pages,
             chunks=chunks,
             manifest_expected=manifest_expected,
+            manifest_fetched=manifest_fetched,
             manifest_indexed=manifest_indexed,
             manifest_missing=manifest_missing,
             manifest_stale_orphans=manifest_stale_orphans,
             active_manifest_digest=active_manifest_digest,
             last_attempt_manifest_digest=(record.target_spec or {}).get("last_attempt_manifest_digest"),
             last_complete_manifest_digest=(record.target_spec or {}).get("last_complete_manifest_digest"),
+            last_attempt_manifest_diagnostics=attempt_diagnostics,
+            requested_ref=discovery.get("requested_ref"),
+            resolved_commit_sha=discovery.get("resolved_commit_sha"),
+            manifest_complete=manifest.get("complete") if manifest.get("schema_version") == 2 else None,
+            manifest_truncated=manifest.get("truncated") if manifest.get("schema_version") == 2 else None,
+            ingestion_policy_version=(record.target_spec or {}).get("ingestion_policy_version"),
+            active_generation_id=self.active_generation_id(record),
             reason_code=self.reason_code_for(record, status),
             size_bytes=size_bytes,
             warnings=[record.last_error] if record.last_error else [],

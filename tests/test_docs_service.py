@@ -83,7 +83,7 @@ class FakeAgent:
         ]
 
 
-def _add_manifest_documents(service, record, manifest, documents=None) -> None:
+def _add_manifest_documents(service, record, manifest, documents=None, *, generation=False) -> None:
     """Populate a fixture index with the exact source identities in a manifest."""
     selected = documents if documents is not None else manifest["documents"]
     commit = manifest["discovery"]["resolved_commit_sha"]
@@ -102,6 +102,7 @@ def _add_manifest_documents(service, record, manifest, documents=None) -> None:
                 "content_sha256": hashlib.sha256(
                     f"# {document['path']}\nExact manifest fixture.".encode("utf-8")
                 ).hexdigest(),
+                **({"chunking_schema": "parent-child-v1"} if generation else {}),
             },
         )
         for document in selected
@@ -4555,7 +4556,9 @@ def test_failed_manifest_candidates_retain_active_metadata_and_diagnostics(
             "last_complete_manifest_digest": previous_manifest["digest"],
         },
     )
-    service._agent_instance(active).add("https://docs.example.com/old/")
+    _add_manifest_documents(service, active, previous_manifest, generation=True)
+    active_inspection = service.inspect_library_docs(active.library_id)
+    assert active_inspection.active_generation_id is not None
     attempted_manifest = normalize_resolved_github_manifest({
         "schema_version": 2, "official": True,
         "discovery": {"kind": "github_directory", "owner": "acme", "repository": "sample", "requested_ref": "v1", "resolved_commit_sha": "2" * 40, "directory": "docs"},
@@ -4581,11 +4584,27 @@ def test_failed_manifest_candidates_retain_active_metadata_and_diagnostics(
     assert restored is not None
     assert restored.status == active.status
     assert restored.docs_url == active.docs_url
+    assert restored.docs_url_template == active.docs_url_template
     assert restored.last_refreshed_at == active.last_refreshed_at
     assert restored.target_spec is not None
     assert restored.target_spec["active_manifest_digest"] == previous_manifest["digest"]
     assert restored.target_spec["last_complete_manifest_digest"] == previous_manifest["digest"]
     assert restored.target_spec["last_attempt_manifest_diagnostics"] == {
+        "attempted_manifest_digest": attempted_manifest["digest"],
+        "reason_code": expected_reason,
+    }
+    inspection = service.inspect_library_docs(restored.library_id)
+    assert inspection.docs_url == active.docs_url
+    assert inspection.docs_url_template == active.docs_url_template
+    assert inspection.active_manifest_digest == previous_manifest["digest"]
+    assert inspection.last_complete_manifest_digest == previous_manifest["digest"]
+    assert inspection.active_generation_id == active_inspection.active_generation_id
+    assert inspection.requested_ref == "v0"
+    assert inspection.resolved_commit_sha == "0" * 40
+    assert inspection.manifest_complete is True
+    assert inspection.manifest_truncated is False
+    assert inspection.last_attempt_manifest_digest == attempted_manifest["digest"]
+    assert inspection.last_attempt_manifest_diagnostics == {
         "attempted_manifest_digest": attempted_manifest["digest"],
         "reason_code": expected_reason,
     }
@@ -4621,6 +4640,48 @@ def test_inspect_library_docs_reports_complete_manifest_coverage(tmp_path, monke
     assert result.manifest_missing == 0
     assert result.manifest_stale_orphans == 0
     assert result.active_manifest_digest == manifest["digest"]
+
+
+def test_inspect_library_docs_exposes_complete_manifest_and_generation_identity(tmp_path, monkeypatch):
+    agent = FakeAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+    manifest = normalize_resolved_github_manifest({
+        "schema_version": 2,
+        "official": True,
+        "discovery": {
+            "kind": "github_directory", "owner": "acme", "repository": "sample",
+            "requested_ref": "v1", "resolved_commit_sha": "1" * 40, "directory": "docs",
+        },
+        "documents": [{"path": "docs/guide.md", "git_blob_sha": "2" * 40, "size": 12}],
+        "complete": True,
+        "truncated": False,
+    })
+    record = service.registry.upsert(
+        library="manifest-inspection", ecosystem="web", version="latest", source_type="guides",
+        docs_url="https://github.com/acme/sample/blob/v1/docs/guide.md",
+        docs_url_template="https://github.com/acme/sample/blob/{version}/docs/guide.md",
+        now=service._now(), status="available", last_refreshed_at=service._now(),
+        target_spec={
+            "source_manifest": manifest,
+            "active_manifest_digest": manifest["digest"],
+            "last_attempt_manifest_digest": manifest["digest"],
+            "last_complete_manifest_digest": manifest["digest"],
+            "ingestion_policy_version": 1,
+        },
+    )
+    _add_manifest_documents(service, record, manifest, generation=True)
+
+    result = service.inspect_library_docs(record.library_id)
+
+    assert result.docs_url_template == "https://github.com/acme/sample/blob/{version}/docs/guide.md"
+    assert result.manifest_fetched == 1
+    assert result.requested_ref == "v1"
+    assert result.resolved_commit_sha == "1" * 40
+    assert result.manifest_complete is True
+    assert result.manifest_truncated is False
+    assert result.ingestion_policy_version == 1
+    assert result.active_generation_id is not None
+    assert result.active_generation_id.startswith("gen-")
 
 
 def test_inspect_library_docs_marks_old_manifest_policy_needs_refresh(tmp_path, monkeypatch):

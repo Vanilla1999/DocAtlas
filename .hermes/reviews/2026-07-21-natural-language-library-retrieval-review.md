@@ -1,0 +1,294 @@
+# Критическое ревью: Natural-language library retrieval
+
+**Дата:** 2026-07-21
+**Ветка:** `feat/natural-language-library-retrieval`
+**План:** `.hermes/plans/2026-07-20-natural-language-library-retrieval.md`
+**Вердикт:** **НЕ ГОТОВО К MERGE**
+
+## 1. Краткий вывод
+
+В worktree реализована значительная часть Phases 1–3.1: manifest-first GitHub ingestion, generation-aware publication/inspection, evidence requirements, support projection, raw-topic lexical dispatch, record filters и retrieval telemetry. Однако статус «Phase 2 done» в плане завышен, Phase 3.1 закрыта не по всем acceptance criteria, а Phase 3.2 пока не существует как воспроизводимый A/B harness.
+
+Главные блокеры текущего worktree:
+
+1. `UnifiedContextService` всё ещё считает `answer_available = bool(context_pack)` и не производит canonical support decision для обычного публичного `get_docs_context` path;
+2. failed/empty candidate refresh способен логически выключить либо опубликовать поверх предыдущего active корпуса, что нарушает rollback invariant;
+3. publication и coverage проверяют агрегатные counts, а не точный manifest source set/provenance;
+4. code-group policy жёстко кодирует Kotlin `async {` / `.await()`, нарушая non-Kotlin/generalization требования плана;
+5. Phase 3.2 baseline оценивает frozen pre-ranked candidates, а не lexical/hybrid dispatcher lanes;
+6. Phase 3.1 не реализует bounded index-witness probe, необходимый для честного `retrieval_miss`.
+
+После первичного ревью stale diagnostic manifest и потеря support envelope **в projection path** исправлены минимальным TDD-циклом. Свежая проверка: `40 passed` для projection module и `152 passed` для затронутого набора. Это не закрывает production wiring/rollback/source-set blockers.
+
+Первоначальный hybrid probe с `dense=0`, `sparse=0` не доказал поломку Qdrant или dispatcher. Probe обошёл production parent-child ingest и generation/collection lifecycle. После приведения probe к production contract filtered dense/sparse retrieval и hybrid dispatcher заработали.
+
+## 2. Объём и состояние patch
+
+На момент ревью:
+
+- 26 tracked-файлов изменены;
+- 7 путей/групп файлов были untracked до создания этого review-файла;
+- изменения Phases 0–3.1 смешаны в одном незакоммиченном worktree;
+- `git diff --check` проходит;
+- исходный целевой pytest gate не проходил collection preflight; после review/fix diagnostic manifest синхронизирован, а целевой набор проходит (см. §9).
+
+Это противоречит рекомендуемой в плане последовательности маленьких phase-scoped patches и сильно затрудняет review/rollback/bisect.
+
+## 3. Сопоставление фаз с реализацией
+
+| Фаза | Фактический вердикт | Комментарий |
+|---|---|---|
+| Phase 0 | Выполнена как characterization | Fixtures, RED/compatibility contracts и thin frozen adapter соответствуют цели этой фазы; они намеренно не доказывают качество реального dispatcher. |
+| Phase 1.1 | В основном выполнена | Есть schema-v2 manifest, immutable commit resolution, exact blob set, content/blob verification, cancellation/deadline handling и fail-closed fetch. |
+| Phase 1.2 | Не принята | Candidate generation есть, но rollback старого active корпуса и exact source-set validation нарушены. |
+| Phase 1.3 | Не принята | Coverage рассчитывается по counts, а не identity path/blob set; inspection contract неполон. |
+| Phase 2.1 | Частично выполнена | `EvidenceRequirementSet` есть, но extraction в основном English-regex/fixture-contract driven; query planning не использует тот же requirement set. |
+| Phase 2.2 | Не принята end-to-end | Projection-loss исправлен, но публичный unified path не производит canonical selection decision и приравнивает context к answer. |
+| Phase 2.3 | Не принята | Projection envelope тестируется, но code-group policy hardcoded под Kotlin и ordinary output modes не имеют producer decision. |
+| Phase 3.1 | Частично выполнена | Raw topic, lexical dispatcher, typed record filters и telemetry есть. Нет bounded index-witness probe и полного shared-requirements contract с query planning. |
+| Phase 3.2 | Не выполнена | Нет checked-in variant runner, реального holdout A/B и multilingual lane. Default lexical корректно не изменён. |
+| Phase 5 | Не начата | Canary/readiness contract не оценивался. |
+
+## 4. Findings
+
+### RESOLVED AFTER REVIEW — stale diagnostic manifest и projection envelope
+
+Первичный targeted pytest был остановлен stale module-node hash для `tests/docs/test_model_visible_projection.py`. После детерминированной синхронизации hash новый test дал ожидаемый RED: `KeyError: 'decision_hash'`.
+
+`_docs_support_decision()` теперь:
+
+- сохраняет immutable support fields, если они уже пришли из upstream retrieval;
+- иначе публикует `decision_hash = SelectionDecision.selection_hash`.
+
+Exact-key public projection test обновлён на canonical envelope, не ослаблен до subset. Проверка после fix: projection module — `40 passed`; затронутый набор — `152 passed`.
+
+### BLOCKER-1 — обычный публичный path не производит canonical support decision
+
+`UnifiedContextService` устанавливает `answer_available = bool(context_pack)` (`docmancer/docs/application/unified_context_service.py:350`) и формирует `UnifiedDocsContextResult` без `answer_supported`, `support_status`, missing/selected evidence IDs, `decision_hash`, `selection_profile` и library requirement contract (`:388-428`).
+
+Следствие: исправление projection корректно сохраняет upstream envelope, но для normal `get_docs_context` этот envelope обычно некому произвести. Это нарушает главный Phase 2 контракт `context_available != answer_supported` и один immutable producer decision до всех serializers.
+
+**Что требуется:** интегрировать canonical selection до создания `UnifiedDocsContextResult`; serializers должны только сохранять решение, а не изобретать его поздно.
+
+### BLOCKER-2 — failed/empty candidate нарушает rollback старого active корпуса
+
+При non-retryable indexing exception refresh перезаписывает registry status как `failed` (`library_refresh_ops.py:313-337`). `status_for()` немедленно возвращает `failed`, независимо от физически сохранённого старого индекса (`library_registry_ops.py:70-73`).
+
+Для empty candidate `_commit_registry()` всё равно вызывает staging publication (`library_refresh_ops.py:404-429`), хотя инвариант плана требует сохранить предыдущий active generation при zero chunks/extraction/index/vector failure.
+
+**Что требуется:** разделить candidate-attempt diagnostics от active registry state; publication разрешать только после exact corpus validation, не при aggregate non-zero/empty checks.
+
+### BLOCKER-3 — publication и coverage не валидируют exact source set
+
+Перед публикацией проверяются только `sections_indexed`, pages и chunks (`library_refresh_ops.py:372-414`), без exact equality approved manifest paths, per-document chunk existence, blob/content identity и orphan absence.
+
+`manifest_coverage()` вычисляет coverage только по количеству pages: `min(pages, expected)`, `expected-pages`, `pages-expected` (`library_registry_ops.py:107-113`). Равные по размеру, но разные source sets ошибочно выглядят healthy.
+
+**Что требуется:** сравнивать canonical manifest document identity (path + commit/blob/content hash) с indexed source identity до publication и в inspect health check.
+
+### BLOCKER-4 — code-group policy hardcoded под Kotlin
+
+**Код**
+
+`docmancer/docs/application/model_visible_projection.py:206-224` всегда использует:
+
+```text
+witnesses = ["async {", ".await()"]
+```
+
+**Риск**
+
+- Python case `create_task(...); value = await task` не может быть доказан этим механизмом;
+- любые другие библиотеки требуют редактирования core projection;
+- это прямо нарушает Non-goal плана: не hardcode Kotlin API names как universal fix;
+- единственный test code-group находится в Kotlin fixture (`tests/test_library_natural_language_retrieval.py:210-215`), поэтому generalization не проверяется.
+
+**Подтверждённая граница быстрого fix:** Python fixture содержит code block с `asyncio.create_task(...)` и `await task`, но текущий selector выбирает `task-cancellation.md`; projection-only contract-derived implementation поэтому честно вернула бы `satisfied=false`. Значит, code group должен быть частью eligibility/sufficiency `EvidenceRequirementSet`, а не только презентационным полем после selection.
+
+**Что требуется**
+
+Перенести code groups в canonical `EvidenceRequirementSet`/public requirement contract. Projection должна сериализовать решение selector, а не изобретать библиотечную policy.
+
+### HIGH-1 — Phase 3.2 baseline не измеряет retrieval variants
+
+`eval/library_retrieval_quality_baseline.py` загружает candidates с уже заданным `retrieval_rank` и вызывает projection/selection. Он не:
+
+- строит record-specific SQLite/Qdrant index;
+- вызывает `RetrievalDispatcher` в lexical/hybrid variants;
+- сохраняет `mode_requested`/`mode_used` и lane failures;
+- сравнивает реальные candidate sets/ranks;
+- измеряет multilingual lane.
+
+Поэтому текущие baseline-метрики нельзя использовать для решения «включать hybrid или нет».
+
+Dataset содержит только 3 cases (development/holdout/adversarial по одному). Это недостаточно для заявленного Phase 3.2 grid: English explicit, conceptual paraphrase, launch-only control, unrelated API overlap, non-Kotlin case, Russian cross-language case и incomplete-corpus cases.
+
+**Что требуется**
+
+Checked-in provider-free runner с immutable dataset digests, отдельными record scopes, реальным dispatcher и variant identity. Multilingual variant должен быть отдельно промаркирован и запускаться только с задокументированной multilingual model.
+
+### HIGH-2 — отсутствует bounded index-witness probe
+
+План различает:
+
+- `retrieval_miss`: witness существует в полном индексе, но retrieval его не выбрал;
+- `required_evidence_missing`: witness в corpus/candidate bundle не доказан.
+
+В текущем library path нет bounded exact-term/code-pattern probe и нет `index_witness` diagnostics. Поэтому причины недостаточности всё ещё нельзя классифицировать по заявленному контракту.
+
+**Что требуется**
+
+После miss запускать bounded deterministic probe только по mandatory requirements, с теми же library/version/snapshot filters. Публиковать bounded witness metadata без raw corpus leakage.
+
+### HIGH-3 — Phase 1.3 inspection contract неполон относительно плана
+
+`DocsInspectResult` (`docmancer/docs/models.py:269-299`) содержит:
+
+- `manifest_expected/indexed/missing/stale_orphans`;
+- active/attempt/complete manifest digests.
+
+Но не содержит заявленные в плане:
+
+- `manifest_fetched`;
+- active generation identity;
+- явные `requested_ref`, `resolved_commit_sha`, `complete`, `truncated` в inspection result.
+
+Часть данных может жить в registry `target_spec`, но acceptance contract требует их на inspection/telemetry surface.
+
+**Закрыто для текущего Phase 1.3 scope (2026-07-22).** `DocsInspectResult` теперь публикует `manifest_fetched`, active generation ID, `requested_ref`, `resolved_commit_sha`, `manifest_complete`, `manifest_truncated`, ingestion-policy version, active `docs_url_template` и bounded last-attempt diagnostics вместе с ранее добавленными digest/count fields. Parameterized rollback test проверяет no-chunk, source-set-mismatch и vector failure без изменения active identity; `pytest -q tests/test_docs_service.py -k 'manifest or inspect or status or generation' --tb=short` → `40 passed, 183 deselected`; shared manifest/fetch contracts → `66 passed`.
+
+### HIGH-4 — shared `EvidenceRequirementSet` не доведён до query planning
+
+`EvidenceRequirementSet` реализован в `evidence_selection.py`, но `retrieval/query_planning.py` не принимает entities/facets/requirements. Phase 3.1 требует использовать тот же canonical requirement set для query planning и answer support либо явно доказать эквивалентность. Сейчас retrieval и sufficiency всё ещё анализируют query независимо.
+
+### MEDIUM-1 — status table плана устарела и противоречива
+
+План одновременно утверждает:
+
+- Phase 2 `done` и сохранение immutable envelope;
+- Phases 3,5 `not started` (`plan:20-27`).
+
+Фактически Phase 2 имеет blockers, а Phase 3.1 уже реализована. Статусная таблица не является надёжным источником текущего состояния.
+
+### MEDIUM-2 — Qdrant client/server version drift
+
+Локально:
+
+- Qdrant server: `1.14.1`;
+- Python client: `1.18.0`.
+
+Client предупреждает о несовместимости minor versions. Это нужно устранить или зафиксировать в reproducible environment до формального benchmark. Однако это **не причина** исходных нулевых vector lanes: прямой filtered search и hybrid retrieval работают после исправления probe lifecycle.
+
+### MEDIUM-3 — тесты чрезмерно fixture-driven
+
+`RecordScopedGateway` в `tests/test_library_natural_language_retrieval.py:49-79` возвращает corpus documents в fixture order и не выполняет lexical ranking. Поэтому тесты хорошо проверяют support semantics на заранее заданном candidate bundle, но не доказывают natural-language retrieval quality. Название suite создаёт более сильное впечатление, чем реально проверяемый контракт.
+
+## 5. Почему первоначальный hybrid test «не работал»
+
+### Наблюдение
+
+Первый probe показывал:
+
+```text
+collection_count=4
+sync upserted=4
+dense=0
+sparse=0
+failures={}
+```
+
+Это выглядело как проблема Qdrant/dispatcher, но прямой probe уточнил картину:
+
+```text
+dense_unfiltered=5
+dense_filtered=0
+sparse_unfiltered=4
+sparse_filtered=0
+Qdrant payload library_id отсутствует
+```
+
+### Корневая причина
+
+Probe напрямую вызвал `SQLiteStore.add_documents()` и создал legacy sections. Он не прошёл production `DocmancerAgent.ingest_documents()` lifecycle, который для Markdown включает:
+
+```text
+format=markdown
+chunking_schema=parent-child-v1
+```
+
+(`docmancer/agent.py:86-103`).
+
+Typed fields (`library_id`, `resolved_version`, `docs_snapshot_exact`) сохраняются в parent-child retrieval generation и попадают в payload через `SQLiteStore.list_sections_for_embedding()` (`sqlite_store.py:3066-3148`). Legacy embedding rows не несут этот typed payload. Поэтому dispatcher filter:
+
+```text
+{"library_id": "phase32-fixture"}
+```
+
+правильно отбрасывал все vector hits.
+
+Вторая ошибка probe: произвольная Qdrant collection не была связана с candidate SQLite generation. Readiness guard корректно отклонил её сообщением `collection identity does not match the active SQLite generation`.
+
+### Контрольный повтор
+
+После приведения probe к production lifecycle:
+
+1. `format=markdown`, `chunking_schema=parent-child-v1`;
+2. `activate_generation=False`;
+3. `set_generation_vector_collection(generation_id, collection)`;
+4. vector sync для того же `generation_id`;
+5. activation generation после sync;
+
+получено:
+
+```text
+collection_count=4
+dense_filtered=4
+sparse_filtered=4
+payload library_id=phase32-fixture
+hybrid candidate_counts:
+  dense=4
+  sparse=4
+  lexical=2 или 4
+failures={}
+```
+
+Итого: hybrid engine в этом probe работает. Не работал **тестовый setup**, потому что он обошёл обязательные ingest и generation identity contracts. Warning Qdrant client/server не был root cause.
+
+## 6. Что сделано хорошо
+
+1. Raw user topic доходит до record-scoped dispatcher без library-name prefix.
+2. Default library retrieval остаётся lexical; hybrid не включён молча.
+3. Typed filters ограничивают `library_id`, non-empty `resolved_version` и exact snapshot; post-guard сохранён как defense in depth.
+4. Retrieval diagnostics включают requested/used mode, query hash, candidate counts, failures, component ranks и post-guard counts без публикации raw topic.
+5. Manifest-first path fail-closed проверяет immutable commit/blob/content identity.
+6. Candidate generation/collection readiness guard поймал некорректный probe вместо silent cross-generation retrieval.
+7. Frozen dataset digests и source/version contamination checks — правильная основа, хотя runner пока не измеряет retrieval variants.
+
+## 7. Рекомендуемый порядок исправлений
+
+1. Встроить canonical support-decision producer в `UnifiedContextService`; projection fix уже зелёный, но один producer отсутствует.
+2. Защитить active registry/index от failed и empty candidate; добавлять candidate-attempt diagnostics без publication/status downgrade текущего корпуса.
+3. Ввести exact manifest source-set validation перед publication и identity-based coverage health.
+4. Перенести code groups в canonical `EvidenceRequirementSet`, чтобы selector требовал один source/version/code block до projection.
+5. Добавить bounded index-witness probe и `retrieval_miss` diagnostics.
+6. Довести inspection contract Phase 1.3 до полей плана либо явно скорректировать plan/acceptance.
+7. Создать checked-in Phase 3.2 dispatcher A/B runner с record-separated corpora; затем расширить dataset всеми объявленными cells и отдельно измерить multilingual model.
+8. Зафиксировать совместимые Qdrant server/client версии, разделить worktree на phase-scoped commits и обновить status table плана по факту.
+
+## 8. Итоговый verdict
+
+- **Phase 1:** не принята: rollback и exact source-set publication должны быть исправлены до acceptance.
+- **Phase 2:** projection envelope fix зелёный, но Phase 2 не принята без production producer и requirement-derived code groups.
+- **Phase 3.1:** полезная интеграция выполнена, но acceptance неполон без shared requirements/index witness.
+- **Phase 3.2:** не реализована как benchmark; exploratory probe доказал работоспособность hybrid engine, но не quality uplift.
+- **Merge:** **BLOCKED** до устранения production BLOCKER-1..4 и повторной верификации.
+
+## 9. Verification after review/fix
+
+Исправленный review slice проверен командой:
+
+```text
+pytest -q tests/test_github_source_manifest.py tests/test_library_natural_language_retrieval.py tests/test_library_retrieval_quality_baseline.py tests/docs/test_agent_index_gateway.py tests/docs/test_evidence_selection.py tests/docs/test_model_visible_projection.py tests/test_unified_docs_context_mcp.py tests/test_diagnostic_labels.py --tb=short
+```
+
+Результат: `152 passed in 2.58s`. Перед запуском `git diff --check` завершился без ошибок.

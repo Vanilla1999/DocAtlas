@@ -275,6 +275,7 @@ class DocsInspectResult:
     version: str | None = None
     source_type: str | None = None
     docs_url: str | None = None
+    docs_url_template: str | None = None
     docs_url_resolved: str | None = None
     docs_snapshot_exact: bool | None = None
     requested_version: str | None = None
@@ -287,12 +288,20 @@ class DocsInspectResult:
     pages: int = 0
     chunks: int = 0
     manifest_expected: int = 0
+    manifest_fetched: int = 0
     manifest_indexed: int = 0
     manifest_missing: int = 0
     manifest_stale_orphans: int = 0
     active_manifest_digest: str | None = None
     last_attempt_manifest_digest: str | None = None
     last_complete_manifest_digest: str | None = None
+    last_attempt_manifest_diagnostics: dict[str, str] | None = None
+    requested_ref: str | None = None
+    resolved_commit_sha: str | None = None
+    manifest_complete: bool | None = None
+    manifest_truncated: bool | None = None
+    ingestion_policy_version: int | None = None
+    active_generation_id: str | None = None
     reason_code: str = ""
     size_bytes: int = 0
     warnings: list[str] = field(default_factory=list)
