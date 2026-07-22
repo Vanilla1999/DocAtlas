@@ -4,6 +4,7 @@ from dataclasses import asdict, replace
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Callable
+import hashlib
 import json
 import re
 import time
@@ -39,6 +40,11 @@ from docmancer.docs.dart_official_docs import (
 from docmancer.docs.application.library_registry_ops import LibraryRegistryOps
 from docmancer.docs.application.library_refresh_ops import LibraryRefreshOps
 from docmancer.docs.application.library_job_executor import LibraryJobExecutor, shared_library_job_executor
+from docmancer.docs.application.evidence_selection import (
+    build_requirements,
+    library_docs_selection_config,
+    select_evidence,
+)
 
 STALE_AFTER_DAYS = 30
 DEFAULT_DOC_TOKENS = 4000
@@ -1024,21 +1030,27 @@ class LibraryDocsApplicationService:
         force_refresh: bool = False,
         project_path: str | None = None,
         response_style: str | None = None,
+        library_requirement_contract: dict[str, list[str]] | None = None,
     ) -> DocsResult:
         response_style = validate_response_style(response_style)
         if hasattr(self.facade, "_library_get_docs_impl"):
+            hook_kwargs = {
+                "topic": topic,
+                "tokens": tokens,
+                "ecosystem": ecosystem,
+                "version": version,
+                "docs_url": docs_url,
+                "docs_url_template": docs_url_template,
+                "source_type": source_type,
+                "force_refresh": force_refresh,
+                "project_path": project_path,
+                "response_style": response_style,
+            }
+            if library_requirement_contract is not None:
+                hook_kwargs["library_requirement_contract"] = library_requirement_contract
             return self.facade._library_get_docs_impl(
                 library,
-                topic=topic,
-                tokens=tokens,
-                ecosystem=ecosystem,
-                version=version,
-                docs_url=docs_url,
-                docs_url_template=docs_url_template,
-                source_type=source_type,
-                force_refresh=force_refresh,
-                project_path=project_path,
-                response_style=response_style,
+                **hook_kwargs,
             )
         input_args = {
             "library": library,
@@ -1435,8 +1447,47 @@ class LibraryDocsApplicationService:
                 diagnostics=resolution.diagnostics,
                 diagnostic_warnings=diagnostic_warnings,
             )
-        query = f"{info.library} {topic}".strip() if topic else info.library
-        chunks = self._agent_instance(record).query(query, budget=tokens or DEFAULT_DOC_TOKENS)
+        query = topic.strip() if topic else info.library
+        retrieval_filters = {"library_id": record.library_id}
+        resolved_version = record.resolved_version or record.version
+        if resolved_version:
+            retrieval_filters["resolved_version"] = resolved_version
+        if record.docs_snapshot_exact is True:
+            retrieval_filters["exact_snapshot_required"] = True
+        requirements = build_requirements(
+            query,
+            exact_version=resolved_version,
+            profile="library_docs_answer",
+            library_requirement_contract=library_requirement_contract,
+        )
+        dispatch_result = self.facade.agent_gateway.query_library(
+            record,
+            query,
+            budget=tokens or DEFAULT_DOC_TOKENS,
+            filters=retrieval_filters,
+            requirements=requirements,
+        )
+        chunks = getattr(dispatch_result, "chunks", dispatch_result)
+        retrieval_diagnostics = {
+            "requested": {
+                "mode": "lexical",
+                "raw_topic_sha256": hashlib.sha256(query.encode()).hexdigest(),
+                "filters": retrieval_filters,
+                "record": {
+                    "library_id": record.library_id,
+                    "canonical_id": record.canonical_id,
+                    "resolved_version": resolved_version,
+                    "docs_snapshot_exact": record.docs_snapshot_exact,
+                },
+            },
+            "used": {
+                "mode": getattr(dispatch_result, "mode_used", "legacy_agent_query"),
+                "candidate_counts": getattr(dispatch_result, "candidate_counts", {"legacy": len(chunks)}),
+                "failures": getattr(dispatch_result, "failures", {}),
+                "query_plan_hash": getattr(dispatch_result, "query_plan_hash", ""),
+                "component_ranks": {},
+            },
+        }
         allowed_ids = {info.library_id}
         if info.version:
             allowed_ids.add(legacy_library_id(info.library, info.version))
@@ -1456,10 +1507,22 @@ class LibraryDocsApplicationService:
             diagnostic_warnings.append({"code": "cross_source_contamination_filtered", "blocking": False, "dropped": dropped})
             for code, count in sorted(rejection_counts.items()):
                 diagnostic_warnings.append({"code": code, "blocking": False, "dropped": count})
-        chunks = [chunk for chunk in chunks if not _drop_low_value_library_section(chunk.text, (chunk.metadata or {}).get("title"))]
+        chunks_before_low_value_guard = list(chunks)
+        chunks = [chunk for chunk in chunks_before_low_value_guard if not _drop_low_value_library_section(chunk.text, (chunk.metadata or {}).get("title"))]
+        retrieval_diagnostics["used"]["component_ranks"] = {
+            str((chunk.metadata or {}).get("section_id") or index):
+            dict(((chunk.metadata or {}).get("retrieval_trace") or {}).get("component_ranks") or {})
+            for index, chunk in enumerate(chunks, start=1)
+        }
+        retrieval_diagnostics["post_guard"] = {
+            "before": len(chunks_before_guard),
+            "accepted": len(filtered_chunks),
+            "rejected": rejection_counts,
+            "low_value_dropped": len(chunks_before_low_value_guard) - len(chunks),
+        }
         if not chunks:
             reason_code = "guard_dropped_all" if dropped > 0 else "no_library_docs_results"
-            reason_diagnostics = {**resolution.diagnostics, "reason_code": reason_code, "warnings": diagnostic_warnings}
+            reason_diagnostics = {**resolution.diagnostics, "retrieval": retrieval_diagnostics, "reason_code": reason_code, "warnings": diagnostic_warnings}
             reason_diagnostics = self._with_dart_diagnostics(
                 reason_diagnostics,
                 info=latest,
@@ -1498,48 +1561,11 @@ class LibraryDocsApplicationService:
                 next_actions=next_actions,
             )
         chunks, quality_diagnostics = _postprocess_library_chunks(chunks, query)
-        if topic and chunks and canonical_dart_ecosystem(latest.ecosystem) == "dart" and quality_diagnostics.get("top_relevance", 0.0) < 0.25:
-            diagnostic_warnings.append({"code": "low_relevance_query_results", "blocking": True})
-            reason_diagnostics = self._with_dart_diagnostics(
-                {**resolution.diagnostics, **quality_diagnostics, "reason_code": "low_relevance_query_results", "warnings": diagnostic_warnings},
-                info=latest,
-                pages_discovered=pages,
-                pages_extracted=pages,
-                chunks_created=0,
-            )
-            return DocsResult(
-                library_id=info.library_id,
-                library=latest.library,
-                version=latest.version,
-                topic=topic,
-                refreshed=refreshed,
-                stale_before_refresh=stale_before,
-                warning=warning,
-                last_refreshed_at=latest.last_refreshed_at,
-                source_type=info.source_type,
-                results=[],
-                warnings=[*warnings, "low_relevance_query_results"],
-                requested_version=requested_version,
-                resolved_version=latest.resolved_version or latest.version,
-                version_source=version_source,
-                docs_snapshot_exact=docs_snapshot_exact,
-                docs_exactness=docs_exactness,
-                docs_binding_source=docs_binding_source,
-                confidence=confidence,
-                status="no_results",
-                decision="stop",
-                reason_code="low_relevance_query_results",
-                request=self._docs_request(input_args, info),
-                identity=self._docs_identity(info, docs_url_source=docs_url_source),
-                policy=self._docs_policy("error", has_registered_source=True),
-                diagnostics=reason_diagnostics,
-                next_actions=["Narrow the topic to concrete API symbols or refresh with a more focused docs source."],
-            )
         latest_stale = self._is_stale(latest.last_refreshed_at)
         freshness = _freshness_diagnostics(latest.last_refreshed_at, self.stale_after_days, latest_stale)
         
         # Build exact-version diagnostics if applicable
-        final_diagnostics = {**resolution.diagnostics, **quality_diagnostics, "freshness": freshness, "warnings": diagnostic_warnings}
+        final_diagnostics = {**resolution.diagnostics, **quality_diagnostics, "retrieval": retrieval_diagnostics, "freshness": freshness, "warnings": diagnostic_warnings}
         resolved_version = latest.resolved_version or latest.version
         exact_version_match = docs_snapshot_is_exact(requested_version, latest.docs_url_resolved or latest.docs_url) and resolved_version == requested_version if requested_version else None
         if exact_version_resolution and requested_version:
@@ -1592,8 +1618,51 @@ class LibraryDocsApplicationService:
             }
             for chunk in result_chunks
         ]
+        selection_candidates = []
+        chunks_by_stable_id = {}
+        for index, (chunk, item) in enumerate(zip(result_chunks, snippet_chunks, strict=True)):
+            metadata = item["metadata"]
+            stable_id = str(
+                metadata.get("stable_chunk_id")
+                or metadata.get("section_id")
+                or metadata.get("chunk_id")
+                or "library-" + hashlib.sha256(
+                    f"{chunk.source}\0{chunk.title}\0{chunk.content}".encode("utf-8")
+                ).hexdigest()[:16]
+            )
+            candidate = {
+                **item,
+                "stable_chunk_id": stable_id,
+                "parent_logical_id": str(
+                    metadata.get("parent_logical_id")
+                    or metadata.get("source_id")
+                    or chunk.source
+                ),
+                "display_content_hash": hashlib.sha256(chunk.content.encode("utf-8")).hexdigest(),
+                "authority": metadata.get("authority") or "official",
+                "docs_exactness": metadata.get("docs_exactness") or docs_exactness,
+                "resolved_version": metadata.get("version") or resolved_version,
+                "version": metadata.get("version") or resolved_version,
+                "docs_snapshot_exact": docs_snapshot_exact,
+                "retrieval_rank": index + 1,
+            }
+            chunk.metadata["stable_chunk_id"] = stable_id
+            selection_candidates.append(candidate)
+            chunks_by_stable_id[stable_id] = chunk
+        selection_decision = select_evidence(
+            selection_candidates,
+            question=query,
+            config=library_docs_selection_config(tokens or DEFAULT_DOC_TOKENS),
+            requirements=requirements,
+        )
+        support_decision = selection_decision.support_decision
+        selected_stable_ids = set(support_decision.selected_evidence_ids)
+        selected_snippet_chunks = [
+            item for item in selection_candidates
+            if item["stable_chunk_id"] in selected_stable_ids
+        ]
         snippet_presentation = build_snippet_presentation(
-            snippet_chunks,
+            selected_snippet_chunks,
             question=topic or library,
             response_style=response_style,
             lane_priority=["library"],
@@ -1618,7 +1687,6 @@ class LibraryDocsApplicationService:
             docs_binding_source=docs_binding_source,
             confidence=confidence,
             status="success",
-            decision="answer_returned",
             request=self._docs_request(input_args, info),
             identity=self._docs_identity(info, docs_url_source=docs_url_source),
             policy=self._docs_policy("success", has_registered_source=True),
@@ -1631,6 +1699,25 @@ class LibraryDocsApplicationService:
             primary_snippet_selection_reason=snippet_presentation.primary_snippet_selection_reason,
             primary_snippet_alternatives=snippet_presentation.primary_snippet_alternatives,
             snippet_metrics=snippet_presentation.metrics,
+            requirements=requirements,
+            selection_decision=selection_decision,
+            support_decision=support_decision,
+            context_available=bool(result_chunks),
+            answer_supported=support_decision.answer_supported,
+            answer_available=support_decision.answer_supported,
+            support_status=support_decision.support_status,
+            reason_code=support_decision.reason_code,
+            decision=(
+                "answer_returned"
+                if support_decision.answer_supported
+                else "insufficient_evidence"
+            ),
+            missing_requirement_ids=list(support_decision.missing_requirement_ids),
+            satisfied_requirement_ids=list(support_decision.satisfied_requirement_ids),
+            mandatory_requirement_ids=list(support_decision.mandatory_requirement_ids),
+            mandatory_coverage=support_decision.mandatory_coverage,
+            selected_evidence_ids=list(support_decision.selected_evidence_ids),
+            decision_hash=support_decision.decision_hash,
         )
 
     def _index_size_for(self, record: LibraryRecord) -> int:

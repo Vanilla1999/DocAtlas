@@ -39,6 +39,14 @@ def _tuple_value(value: Any) -> tuple[Any, ...]:
     return (value,) if value not in (None, "") else ()
 
 
+def _refresh_projection_estimate(payload: dict[str, Any]) -> None:
+    for _ in range(4):
+        estimate = max(1, math.ceil(len(canonical_projection_bytes(payload)) / 4))
+        if payload.get("estimated_tokens") == estimate:
+            return
+        payload["estimated_tokens"] = estimate
+
+
 def context_tools(tools: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return [tool for tool in tools if tool["name"] in CONTEXT_TOOL_NAMES]
 
@@ -75,8 +83,13 @@ def _answer_payload(payload: dict[str, Any]) -> dict[str, Any]:
     primary_snippet = payload.get("primary_snippet")
     supporting_snippets = payload.get("supporting_snippets") or []
     has_direct_answer = bool(primary_snippet or supporting_snippets)
-    answer_available = bool(payload.get("answer_available")) and has_direct_answer
-    answer_type = "direct" if answer_available else "navigation_only"
+    canonical_support = payload.get("answer_supported")
+    answer_available = (
+        bool(canonical_support)
+        if canonical_support is not None
+        else bool(payload.get("answer_available")) and has_direct_answer
+    )
+    answer_type = "direct" if answer_available and has_direct_answer else "navigation_only"
     answer = {
         "tool": payload.get("tool"),
         "status": payload.get("status"),
@@ -96,6 +109,14 @@ def _answer_payload(payload: dict[str, Any]) -> dict[str, Any]:
         "next_actions": payload.get("next_actions") or [],
         "arguments_patch": payload.get("arguments_patch"),
         "warnings": payload.get("warnings") or [],
+        "answer_supported": payload.get("answer_supported"),
+        "support_status": payload.get("support_status"),
+        "missing_requirement_ids": payload.get("missing_requirement_ids"),
+        "satisfied_requirement_ids": payload.get("satisfied_requirement_ids"),
+        "mandatory_requirement_ids": payload.get("mandatory_requirement_ids"),
+        "mandatory_coverage": payload.get("mandatory_coverage"),
+        "selected_evidence_ids": payload.get("selected_evidence_ids"),
+        "decision_hash": payload.get("decision_hash"),
         "document_content_policy": DOCUMENT_CONTENT_POLICY,
     }
     if payload.get("requires_confirmation"):
@@ -105,10 +126,15 @@ def _answer_payload(payload: dict[str, Any]) -> dict[str, Any]:
 
 
 def _compact_payload(payload: dict[str, Any]) -> dict[str, Any]:
+    canonical_support = payload.get("answer_supported")
     return {
         "tool": payload.get("tool"),
         "status": payload.get("status"),
-        "answer_available": payload.get("answer_available"),
+        "answer_available": (
+            bool(canonical_support)
+            if canonical_support is not None
+            else payload.get("answer_available")
+        ),
         "mode_requested": payload.get("mode_requested"),
         "mode_selected": payload.get("mode_selected"),
         "routing": payload.get("routing") or {},
@@ -131,6 +157,14 @@ def _compact_payload(payload: dict[str, Any]) -> dict[str, Any]:
         "confirmation_reason": payload.get("confirmation_reason"),
         "ingestion_diagnostics": payload.get("ingestion_diagnostics") or {},
         "retrieval_diagnostics": payload.get("retrieval_diagnostics") or {},
+        "answer_supported": payload.get("answer_supported"),
+        "support_status": payload.get("support_status"),
+        "missing_requirement_ids": payload.get("missing_requirement_ids"),
+        "satisfied_requirement_ids": payload.get("satisfied_requirement_ids"),
+        "mandatory_requirement_ids": payload.get("mandatory_requirement_ids"),
+        "mandatory_coverage": payload.get("mandatory_coverage"),
+        "selected_evidence_ids": payload.get("selected_evidence_ids"),
+        "decision_hash": payload.get("decision_hash"),
     }
 
 
@@ -231,6 +265,7 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
         details=args.get("details"),
         response_style=args.get("response_style"),
     )
+    canonical_selection = getattr(result, "selection_decision", None)
     if is_dataclass(result):
         raw = asdict(result)
     elif isinstance(result, dict):
@@ -241,6 +276,8 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
             if hasattr(result, key):
                 raw[key] = getattr(result, key)
     raw = _align_trust_contract_with_snippets(raw)
+    if _clean_string(args.get("library")):
+        raw.setdefault("selection_profile", "library_docs_answer")
     raw["document_content_policy"] = DOCUMENT_CONTENT_POLICY
     raw = normalize_public_docs_actions(raw)
     raw = _replace_network_retries_with_prepare_actions(raw, args)
@@ -257,15 +294,29 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
                 retrieval=raw,
                 max_tokens=min(DOCS_ANSWER_MAX_TOKENS, output_budget),
                 selection_diagnostics=selection_trace,
+                canonical_selection=canonical_selection,
             )
             raw.setdefault("retrieval_diagnostics", {})["evidence_selection"] = selection_trace
             if projection.get("status") == "insufficient_evidence" and recovery:
+                support_projection = {
+                    key: projection[key]
+                    for key in (
+                        "operational_status", "context_available", "answer_supported",
+                        "answer_available", "support_status", "reason_code",
+                        "missing_requirement_ids", "satisfied_requirement_ids",
+                        "mandatory_requirement_ids", "mandatory_coverage",
+                        "evidence_coverage", "selected_evidence_ids", "decision_hash",
+                    )
+                    if key in projection
+                }
                 projection = project_insufficient(
                     kind="docs_answer",
                     missing=projection.get("missing") or [],
                     recommended_next_action=recovery,
                     max_tokens=min(INSUFFICIENT_EVIDENCE_MAX_TOKENS, output_budget),
                 )
+                projection.update(support_projection)
+            _refresh_projection_estimate(projection)
             validation_errors = validate_model_visible_projection(
                 projection,
                 snapshot=snapshot,

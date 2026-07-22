@@ -2507,7 +2507,7 @@ def test_registered_web_docs_without_docs_url_returns_success(tmp_path, monkeypa
 
     assert result.status == "success"
     assert result.tool == "get_library_docs"
-    assert result.schema_version == "2.0-mvp"
+    assert result.schema_version == "2.1-mvp"
     assert result.decision == "answer_returned"
     assert result.result is None
     assert result.library_id == "flutter-adaptive-responsive"

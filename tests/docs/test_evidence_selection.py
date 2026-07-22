@@ -8,6 +8,7 @@ import pytest
 from docmancer.docs.application.evidence_selection import (
     EvidenceRequirementSet,
     SelectionConfig,
+    SupportDecision,
     build_requirements,
     docs_selection_config,
     library_docs_selection_config,
@@ -37,6 +38,33 @@ def _candidate(stable_id: str, text: str, **overrides):
 
 def _ids(decision):
     return [item.stable_id for item in decision.selected_candidates]
+
+
+def test_selector_returns_one_immutable_auditable_support_decision():
+    question = "Compare create_task with gather and explain how the scheduled task result is obtained"
+    decision = select_evidence(
+        [_candidate(
+            "runtime",
+            "Compare create_task with gather; obtain the scheduled task result from create_task.",
+        )],
+        question=question,
+        config=library_docs_selection_config(800),
+    )
+
+    support = decision.support_decision
+
+    assert isinstance(support, SupportDecision)
+    assert support.answer_supported is True
+    assert support.support_status == "supported"
+    assert support.mandatory_coverage == 1.0
+    assert support.missing_requirement_ids == ()
+    assert support.selected_evidence_ids == ("runtime",)
+    assert support.requirements is decision.requirements
+    assert support.requirements_hash == decision.requirements.requirements_hash
+    assert support.selection_hash == decision.selection_hash
+    assert support.decision_hash
+    with pytest.raises(AttributeError):
+        support.answer_supported = False
 
 
 def test_requirement_set_hash_is_deterministic_under_input_ordering_differences():
@@ -239,6 +267,23 @@ def test_wrong_exact_version_cannot_win_with_a_higher_score():
     assert decision.status == "ok"
     assert _ids(decision) == ["right"]
     assert any(item.stable_id == "wrong" and item.reason_code == "wrong_version" for item in decision.omissions)
+
+
+def test_registered_exact_version_url_satisfies_the_exact_version_requirement():
+    decision = select_evidence(
+        [_candidate(
+            "registered",
+            "Use API.call() from this versioned documentation source.",
+            version="2.0",
+            docs_exactness="exact_version_url",
+        )],
+        question="How do I call API.call?",
+        config=docs_selection_config(800),
+        exact_version="2.0",
+    )
+
+    assert decision.support_decision.answer_supported is True
+    assert decision.support_decision.missing_requirement_ids == ()
 
 
 def test_forbidden_source_and_instruction_risk_never_reenter_scoring():

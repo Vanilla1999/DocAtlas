@@ -344,17 +344,59 @@ class UnifiedDocsContextService:
             question=question,
             response_style=response_style,
             lane_priority=lane_priority,
+            support_decision=(
+                library_results[0].support_decision
+                if len(library_results) == 1 else None
+            ),
+            requirements=(
+                library_results[0].requirements
+                if len(library_results) == 1 else None
+            ),
         )
         if snippet_fallback and snippet_presentation.primary_snippet:
             warnings = _without_snippet_not_available(warnings)
-        answer_available = bool(context_pack)
+        context_available = bool(context_pack)
+        support_decision = (
+            library_results[0].support_decision
+            if len(library_results) == 1 else None
+        )
+        if library_results:
+            answer_supported = bool(
+                support_decision and support_decision.answer_supported
+            )
+            support_payload = (
+                support_decision.as_payload()
+                if support_decision is not None else {
+                    "support_status": "insufficient_evidence",
+                    "reason_code": "canonical_support_decision_missing",
+                    "missing_requirement_ids": [],
+                    "satisfied_requirement_ids": [],
+                    "mandatory_requirement_ids": [],
+                    "mandatory_coverage": 0.0,
+                    "selected_evidence_ids": [],
+                    "decision_hash": None,
+                }
+            )
+        else:
+            answer_supported = context_available
+            support_payload = {
+                "support_status": "supported" if answer_supported else "insufficient_evidence",
+                "reason_code": None if answer_supported else "no_docs_context_available",
+                "missing_requirement_ids": [],
+                "satisfied_requirement_ids": [],
+                "mandatory_requirement_ids": [],
+                "mandatory_coverage": 1.0 if answer_supported else 0.0,
+                "selected_evidence_ids": [],
+                "decision_hash": None,
+            }
+        answer_available = answer_supported
         pending_actions = self._collect_pending_actions(pending_lane_results)
         requested_lanes = [name for name, lane in lanes.items() if lane.get("status") != "not_requested"]
         successful_lanes = [name for name, lane in lanes.items() if self._lane_succeeded(lane)]
         pending_confirmation_lanes = [name for name, lane in lanes.items() if lane.get("requires_confirmation") or lane.get("status") == "confirmation_required"]
         failed_lanes = [name for name, lane in lanes.items() if lane.get("status") not in {"not_requested", "success", "partial_success", "confirmation_required"} and not self._lane_succeeded(lane)]
         status = self._aggregate_status(requested_lanes, successful_lanes, pending_confirmation_lanes, failed_lanes)
-        reason = None if answer_available else "no_docs_context_available"
+        reason = support_payload["reason_code"]
         combined_next_actions = [*next_actions, *pending_actions.get("next_actions", [])]
         patch_constraints_action = self._patch_constraints_next_action(question, project_path, mode_selected, mode_requested)
         if patch_constraints_action:
@@ -392,6 +434,20 @@ class UnifiedDocsContextService:
             mode_selected=mode_selected,
             routing=routing,
             answer_available=answer_available,
+            context_available=context_available,
+            answer_supported=answer_supported,
+            support_status=support_payload["support_status"],
+            missing_requirement_ids=list(support_payload["missing_requirement_ids"]),
+            satisfied_requirement_ids=list(support_payload["satisfied_requirement_ids"]),
+            mandatory_requirement_ids=list(support_payload["mandatory_requirement_ids"]),
+            mandatory_coverage=float(support_payload["mandatory_coverage"]),
+            selected_evidence_ids=list(support_payload["selected_evidence_ids"]),
+            decision_hash=support_payload["decision_hash"],
+            selection_decision=(
+                library_results[0].selection_decision
+                if len(library_results) == 1 else None
+            ),
+            support_decision=support_decision,
             answer_type=getattr(project_result, "answer_type", None) if project_result else None,
             answer_completeness=dict(getattr(project_result, "answer_completeness", None) or {}) if project_result else {},
             context_pack=context_pack,
@@ -425,6 +481,7 @@ class UnifiedDocsContextService:
             lane_details=lane_details if details else {},
             ingestion_diagnostics=ingestion_diagnostics,
             retrieval_diagnostics=retrieval_diagnostics,
+            requirements=(library_results[0].requirements if len(library_results) == 1 else None),
         )
         return payload
 
@@ -819,7 +876,8 @@ class UnifiedDocsContextService:
 
     def _library_context_pack(self, result: DocsResult) -> list[dict[str, Any]]:
         items = []
-        for chunk in result.results or []:
+        result_chunks = result.results or []
+        for index, chunk in enumerate(result_chunks):
             token_estimate = max(1, len(chunk.content or "") // 4)
             chunk_metadata = chunk.metadata or {}
             item = {
@@ -843,6 +901,12 @@ class UnifiedDocsContextService:
                 "token_estimate": token_estimate,
                 "section": {"title": chunk.title, "freshness": "stale" if result.stale_before_refresh else "current"},
             }
+            if (
+                "stable_chunk_id" not in item
+                and len(result.selected_evidence_ids) == len(result_chunks)
+                and index < len(result.selected_evidence_ids)
+            ):
+                item["stable_chunk_id"] = result.selected_evidence_ids[index]
             snippet = context_pack_snippet(chunk)
             if snippet:
                 item["snippet"] = snippet

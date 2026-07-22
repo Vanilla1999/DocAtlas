@@ -113,7 +113,7 @@ def test_characterization_registered_docs_source_reused_without_docs_url(tmp_pat
 
     assert result.status == "success"
     assert result.tool == "get_library_docs"
-    assert result.schema_version == "2.0-mvp"
+    assert result.schema_version == "2.1-mvp"
     assert result.decision == "answer_returned"
     assert result.identity["docs_url"] == "https://docs.pytest.org/"
     assert result.identity["docs_url_source"] == "registry"

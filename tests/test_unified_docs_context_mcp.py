@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import hashlib
 import json
+from types import SimpleNamespace
 from typing import Any, cast
 
 import jsonschema
@@ -356,6 +358,68 @@ def test_document_content_policy_survives_every_output_mode():
         assert result.get("next_actions") in (None, [])
 
 
+def test_support_decision_survives_all_compatibility_and_bounded_modes():
+    from docmancer.docs.application.evidence_selection import (
+        library_docs_selection_config,
+        select_evidence,
+    )
+
+    question = "Compare async with launch and explain how to obtain the async result"
+    text = "launch starts a coroutine."
+    candidate = {
+        "stable_chunk_id": "chunk-launch",
+        "parent_logical_id": "coroutines",
+        "source": "https://example.test/coroutines",
+        "display_text": text,
+        "display_content_hash": hashlib.sha256(text.encode()).hexdigest(),
+        "authority": "official",
+        "docs_exactness": "exact",
+        "version": "1.0",
+    }
+    selection = select_evidence(
+        [candidate],
+        question=question,
+        config=library_docs_selection_config(800),
+    )
+    support = selection.support_decision.as_payload()
+    shared_retrieval = {
+        "tool": "get_docs_context",
+        "status": "success",
+        "context_available": True,
+        "answer_available": False,
+        "selection_profile": "library_docs_answer",
+        "selection_decision": selection,
+        "context_pack": [candidate],
+        "trust_contract": {"selected": [], "rejected": [], "risky": []},
+        **support,
+    }
+    support_keys = (
+        "answer_supported", "support_status", "missing_requirement_ids",
+        "selected_evidence_ids", "decision_hash",
+    )
+    expected = {key: support[key] for key in support_keys}
+
+    class Facade:
+        def get_docs_context(self, question, **kwargs):
+            # Every serializer consumes the exact immutable selector decision.
+            return SimpleNamespace(**shared_retrieval)
+
+    observed = [cast(dict[str, Any], handle_context_tool(
+        "get_docs_context", {"question": question, "library": "kotlin", "output_mode": mode}, cast(Any, Facade())
+    )) for mode in ("answer", "compact", "full", "debug")]
+    observed.append(cast(dict[str, Any], handle_context_tool(
+        "get_docs_context",
+        {"question": question, "library": "kotlin", "delivery_strategy": "bounded_direct"},
+        cast(Any, Facade()),
+    )))
+
+    assert expected["decision_hash"]
+    assert expected["selected_evidence_ids"]
+    for result in observed:
+        assert {key: result[key] for key in support_keys} == expected
+    assert observed[-1]["status"] == "insufficient_evidence"
+
+
 def test_get_docs_context_default_answer_reports_compaction_without_debug_noise():
     large = "x" * 120_000
 
@@ -560,3 +624,38 @@ def test_get_docs_context_direct_answer_has_agent_instruction():
     assert result["answer_type"] == "direct"
     assert result["safe_to_answer"] is True
     assert result["required_next_step"] == "answer_from_returned_context"
+
+
+def test_answer_mode_cannot_manufacture_support_from_a_snippet():
+    class Facade:
+        def get_docs_context(self, question, **kwargs):
+            return {
+                "tool": "get_docs_context",
+                "status": "success",
+                "answer_available": True,
+                "answer_supported": False,
+                "support_status": "insufficient_evidence",
+                "reason_code": "required_evidence_missing",
+                "missing_requirement_ids": ["result_access"],
+                "satisfied_requirement_ids": ["comparison"],
+                "mandatory_requirement_ids": ["comparison", "result_access"],
+                "mandatory_coverage": 0.5,
+                "selected_evidence_ids": ["partial"],
+                "decision_hash": "decision-1",
+                "primary_snippet": {
+                    "source": "docs/partial.md",
+                    "content": "A comparison without result-access evidence.",
+                },
+            }
+
+    result = cast(dict[str, Any], handle_context_tool(
+        "get_docs_context",
+        {"question": "Compare the APIs and retrieve the result", "library": "example"},
+        cast(Any, Facade()),
+    ))
+
+    assert result["answer_supported"] is False
+    assert result["answer_available"] is False
+    assert result["reason_code"] == "required_evidence_missing"
+    assert result["mandatory_requirement_ids"] == ["comparison", "result_access"]
+    assert result["mandatory_coverage"] == 0.5

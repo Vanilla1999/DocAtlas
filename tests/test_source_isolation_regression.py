@@ -156,7 +156,9 @@ def test_project_query_then_library_query_uses_per_library_agent(tmp_path, monke
     assert result.status == "success"
     assert [chunk.content for chunk in result.results] == ["Click command docs."]
     assert default_agent.query_calls == ["project query"]
-    assert library_agent.query_calls == ["click commands"]
+    # Record-specific lexical retrieval must receive the user's topic unchanged;
+    # library scope is already enforced by this per-record agent/index.
+    assert library_agent.query_calls == ["commands"]
 
 
 def test_chunks_without_library_id_are_filtered_out(tmp_path, monkeypatch):
@@ -256,7 +258,7 @@ def test_failed_registered_library_source_does_not_auto_refresh_on_query(tmp_pat
     assert result.diagnostics["reason_code"] == "registered_source_failed"
 
 
-def test_low_relevance_library_results_are_not_returned_as_answer(tmp_path, monkeypatch):
+def test_low_relevance_library_context_is_retained_but_not_supported(tmp_path, monkeypatch):
     agent = RecordingAgent([
         _chunk(
             "Riverpod migration updateShouldNotify changed behavior for generated providers.",
@@ -269,7 +271,12 @@ def test_low_relevance_library_results_are_not_returned_as_answer(tmp_path, monk
 
     result = service.get_docs("flutter_riverpod", ecosystem="pub", version="latest", source_type="api", topic="NotifierProvider ref watch AsyncValue")
 
-    assert result.status == "no_results"
-    assert result.reason_code == "low_relevance_query_results"
-    assert result.results == []
-    assert any(warning["code"] == "low_relevance_query_results" for warning in result.diagnostics["warnings"] if isinstance(warning, dict))
+    assert result.status == "success"
+    assert result.context_available is True
+    assert result.answer_supported is False
+    assert result.answer_available is False
+    assert result.support_status == "insufficient_evidence"
+    assert result.reason_code == "required_evidence_missing"
+    assert result.mandatory_coverage < 1.0
+    assert result.missing_requirement_ids
+    assert result.results

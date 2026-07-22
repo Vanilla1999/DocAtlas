@@ -188,7 +188,10 @@ def _resolved_version(item: Mapping[str, Any]) -> str:
 
 def _version_rank(value: str) -> int:
     normalized = value.casefold().replace("-", "_")
-    if normalized in {"exact", "exact_version", "version_exact", "exact_version_indexed"}:
+    if normalized in {
+        "exact", "exact_snapshot", "exact_version", "exact_version_indexed",
+        "exact_version_url", "version_exact",
+    }:
         return 0
     if normalized in {"", "unknown", "latest", "unversioned", "not_applicable"} or "fallback" in normalized:
         return 2
@@ -398,6 +401,54 @@ class Omission:
     stable_id: str
     reason_code: OmissionReason
     representative_stable_id: str | None = None
+
+
+@dataclass(frozen=True, slots=True)
+class SupportDecision:
+    """Immutable public support verdict produced only by ``select_evidence``."""
+
+    answer_supported: bool
+    support_status: Literal["supported", "insufficient_evidence"]
+    reason_code: str | None
+    missing_requirement_ids: tuple[str, ...]
+    satisfied_requirement_ids: tuple[str, ...]
+    mandatory_requirement_ids: tuple[str, ...]
+    mandatory_coverage: float
+    selected_evidence_ids: tuple[str, ...]
+    requirements_hash: str
+    selector_config_hash: str
+    eligibility_contract_hash: str
+    candidate_trace_hash: str
+    selection_hash: str
+    decision_hash: str
+    requirements: EvidenceRequirementSet = field(compare=False, repr=False)
+
+    @property
+    def answer_available(self) -> bool:
+        return self.answer_supported
+
+    def as_payload(self) -> dict[str, Any]:
+        return {
+            "answer_supported": self.answer_supported,
+            "answer_available": self.answer_supported,
+            "support_status": self.support_status,
+            "decision": self.support_status,
+            "reason_code": self.reason_code,
+            "missing_requirement_ids": list(self.missing_requirement_ids),
+            "satisfied_requirement_ids": list(self.satisfied_requirement_ids),
+            "mandatory_requirement_ids": list(self.mandatory_requirement_ids),
+            "mandatory_coverage": self.mandatory_coverage,
+            "evidence_coverage": self.mandatory_coverage,
+            "selected_evidence_ids": list(self.selected_evidence_ids),
+            "requirements_hash": self.requirements_hash,
+            "selector_config_hash": self.selector_config_hash,
+            "eligibility_contract_hash": self.eligibility_contract_hash,
+            "candidate_trace_hash": self.candidate_trace_hash,
+            "selection_hash": self.selection_hash,
+            "decision_hash": self.decision_hash,
+        }
+
+
 @dataclass(frozen=True, slots=True)
 class SelectionDecision:
     status: Literal["ok", "insufficient_evidence"]
@@ -410,6 +461,7 @@ class SelectionDecision:
     eligibility_contract_hash: str
     candidate_trace_hash: str
     selection_hash: str
+    support_decision: SupportDecision
     requirements: EvidenceRequirementSet = field(
         default_factory=EvidenceRequirementSet, compare=False, repr=False,
     )
@@ -444,6 +496,7 @@ class SelectionDecision:
             "requirements_hash": self.requirements.requirements_hash,
             "candidate_trace_hash": self.candidate_trace_hash,
             "selection_hash": self.selection_hash,
+            "support_decision": self.support_decision.as_payload(),
         }
 
 
@@ -458,6 +511,16 @@ def docs_selection_config(max_tokens: int) -> SelectionConfig:
 
 def library_docs_selection_config(max_tokens: int) -> SelectionConfig:
     return replace(docs_selection_config(max_tokens), profile="library_docs_answer")
+
+
+def _public_support_requirement_id(requirement_id: str) -> str:
+    if requirement_id.startswith("query_exact:"):
+        return requirement_id.rsplit(":", 1)[-1]
+    if requirement_id.startswith("entity:"):
+        return requirement_id.removeprefix("entity:")
+    if requirement_id.startswith("facet:"):
+        return requirement_id.split(":", 2)[1]
+    return requirement_id
 
 
 def patch_selection_config(max_tokens: int) -> SelectionConfig:
@@ -994,13 +1057,57 @@ def select_evidence(
         "omissions": [asdict(item) for item in sorted_omissions],
         "missing": sorted(missing), "conflicts": sorted(conflicts),
     })
+    covered_ids = (
+        set().union(*(item.covered_requirement_ids for item in selected))
+        if selected else set()
+    )
+    covered_mandatory = mandatory & covered_ids
+    mandatory_coverage = (
+        len(covered_mandatory) / len(mandatory)
+        if mandatory else (1.0 if selected else 0.0)
+    )
+    public_missing = tuple(sorted({
+        _public_support_requirement_id(value) for value in missing
+    }))
+    public_satisfied = tuple(sorted({
+        _public_support_requirement_id(value) for value in covered_ids
+    }))
+    public_mandatory = tuple(sorted({
+        _public_support_requirement_id(value) for value in mandatory
+    }))
+    reason_code = (
+        None if status == "ok" else
+        "authority_conflict" if conflicts else
+        "required_evidence_missing" if missing else
+        "no_eligible_evidence"
+    )
+    support_payload = {
+        "answer_supported": status == "ok",
+        "support_status": "supported" if status == "ok" else "insufficient_evidence",
+        "reason_code": reason_code,
+        "missing_requirement_ids": public_missing,
+        "satisfied_requirement_ids": public_satisfied,
+        "mandatory_requirement_ids": public_mandatory,
+        "mandatory_coverage": mandatory_coverage,
+        "selected_evidence_ids": tuple(item.stable_id for item in selected),
+        "requirements_hash": requirements.requirements_hash,
+        "selector_config_hash": config.config_hash,
+        "eligibility_contract_hash": eligibility_contract_hash,
+        "candidate_trace_hash": candidate_trace_hash,
+        "selection_hash": selection_hash,
+    }
+    support_decision = SupportDecision(
+        **support_payload,
+        decision_hash=canonical_hash(support_payload),
+        requirements=requirements,
+    )
     return SelectionDecision(
         status=status, selected_candidates=tuple(selected), omissions=sorted_omissions,
         missing_requirements=tuple(sorted(missing)), unresolved_conflicts=tuple(sorted(conflicts)),
         metrics=metrics, selector_config_hash=config.config_hash,
         eligibility_contract_hash=eligibility_contract_hash,
         candidate_trace_hash=candidate_trace_hash, selection_hash=selection_hash,
-        requirements=requirements,
+        support_decision=support_decision, requirements=requirements,
     )
 
 

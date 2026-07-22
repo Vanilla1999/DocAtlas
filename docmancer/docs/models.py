@@ -105,7 +105,7 @@ class DocsResult:
     docs_binding_source: str | None = None
     confidence: str | None = None
     tool: str = "get_library_docs"
-    schema_version: str = "2.0-mvp"
+    schema_version: str = "2.1-mvp"
     status: str = "success"
     decision: str = "answer_returned"
     reason_code: str | None = None
@@ -128,6 +128,19 @@ class DocsResult:
     result: Any = None
     candidates: list[dict[str, Any]] = field(default_factory=list)
     discovery_candidates: list[dict[str, Any]] = field(default_factory=list)
+    requirements: Any = None
+    selection_decision: Any = None
+    support_decision: Any = None
+    context_available: bool = False
+    answer_supported: bool = False
+    answer_available: bool = False
+    support_status: str = "insufficient_evidence"
+    missing_requirement_ids: list[str] = field(default_factory=list)
+    satisfied_requirement_ids: list[str] = field(default_factory=list)
+    mandatory_requirement_ids: list[str] = field(default_factory=list)
+    mandatory_coverage: float = 0.0
+    selected_evidence_ids: list[str] = field(default_factory=list)
+    decision_hash: str | None = None
 
 
 @dataclass(frozen=True)
@@ -605,6 +618,17 @@ class UnifiedDocsContextResult:
     mode_selected: str = "auto"
     routing: dict[str, Any] = field(default_factory=dict)
     answer_available: bool = True
+    context_available: bool = False
+    answer_supported: bool = False
+    support_status: str = "insufficient_evidence"
+    missing_requirement_ids: list[str] = field(default_factory=list)
+    satisfied_requirement_ids: list[str] = field(default_factory=list)
+    mandatory_requirement_ids: list[str] = field(default_factory=list)
+    mandatory_coverage: float = 0.0
+    selected_evidence_ids: list[str] = field(default_factory=list)
+    decision_hash: str | None = None
+    selection_decision: Any = None
+    support_decision: Any = None
     answer_type: str | None = None
     answer_completeness: dict[str, Any] = field(default_factory=dict)
     context_pack: list[dict[str, Any]] = field(default_factory=list)
@@ -638,3 +662,4 @@ class UnifiedDocsContextResult:
     lane_details: dict[str, Any] = field(default_factory=dict)
     ingestion_diagnostics: dict[str, Any] = field(default_factory=dict)
     retrieval_diagnostics: dict[str, Any] = field(default_factory=dict)
+    requirements: Any = None

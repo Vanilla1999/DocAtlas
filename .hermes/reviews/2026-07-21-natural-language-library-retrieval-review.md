@@ -11,7 +11,7 @@
 
 Главные блокеры текущего worktree:
 
-1. `UnifiedContextService` всё ещё считает `answer_available = bool(context_pack)` и не производит canonical support decision для обычного публичного `get_docs_context` path;
+1. **RESOLVED in Task 2.2:** `UnifiedContextService` consumes the canonical immutable `SupportDecision` produced by `select_evidence`; nonempty context can no longer manufacture answer support;
 2. failed/empty candidate refresh способен логически выключить либо опубликовать поверх предыдущего active корпуса, что нарушает rollback invariant;
 3. publication и coverage проверяют агрегатные counts, а не точный manifest source set/provenance;
 4. code-group policy жёстко кодирует Kotlin `async {` / `.await()`, нарушая non-Kotlin/generalization требования плана;
@@ -43,8 +43,8 @@
 | Phase 1.2 | Не принята | Candidate generation есть, но rollback старого active корпуса и exact source-set validation нарушены. |
 | Phase 1.3 | Не принята | Coverage рассчитывается по counts, а не identity path/blob set; inspection contract неполон. |
 | Phase 2.1 | Выполнена для shared-requirements scope | Один immutable `EvidenceRequirementSet` владеет entities/facets, provenance, deterministic query spans, явными source/version/snapshot/project/module scope requirements и complete-contract hash. Comparison spans вычисляются из capture-group coordinates фактического raw-query regex match: canonical values удаляют optional backtick wrappers, но exact span сохраняет raw wrappers. Exhaustive regression требует один точный query slice у каждого query-derived requirement и покрывает повторённый ранее RHS и bare/backticked варианты всех трёх поддерживаемых comparison patterns. Query planner, dispatcher и library gateway сохраняют тот же instance; selector больше не пересобирает его без фактического policy enrichment. Fresh focused gate: `pytest -q tests/docs/test_evidence_selection.py tests/docs/test_agent_index_gateway.py tests/test_query_planning.py --tb=short` → `51 passed` (2026-07-22), including ordered-input determinism and non-Kotlin `create_task`/`gather` coverage. |
-| Phase 2.2 | Не принята end-to-end | Projection-loss исправлен, но публичный unified path не производит canonical selection decision и приравнивает context к answer. |
-| Phase 2.3 | Не принята | Projection envelope тестируется, но code-group policy hardcoded под Kotlin и ordinary output modes не имеют producer decision. |
+| Phase 2.2 | Принята для single-owner support scope | `select_evidence()` alone produces immutable `SupportDecision`; public unified/model-visible/MCP modes preserve its verdict, provenance, mandatory coverage, selected evidence IDs, reason and hash. Missing decisions and snippet-only fallbacks fail closed; `answer_available` aliases `answer_supported`. |
+| Phase 2.3 | Не принята | Code-group policy остаётся hardcoded под Kotlin; presentation-only snippet constraints и их отдельная acceptance-проверка ещё не закрыты. |
 | Phase 3.1 | Частично выполнена | Raw topic, lexical dispatcher, typed record filters и telemetry есть. Нет bounded index-witness probe и полного shared-requirements contract с query planning. |
 | Phase 3.2 | Не выполнена | Нет checked-in variant runner, реального holdout A/B и multilingual lane. Default lexical корректно не изменён. |
 | Phase 5 | Не начата | Canary/readiness contract не оценивался. |
@@ -62,13 +62,11 @@
 
 Exact-key public projection test обновлён на canonical envelope, не ослаблен до subset. Проверка после fix: projection module — `40 passed`; затронутый набор — `152 passed`.
 
-### BLOCKER-1 — обычный публичный path не производит canonical support decision
+### RESOLVED — BLOCKER-1: обычный публичный path потребляет canonical support decision
 
-`UnifiedContextService` устанавливает `answer_available = bool(context_pack)` (`docmancer/docs/application/unified_context_service.py:350`) и формирует `UnifiedDocsContextResult` без `answer_supported`, `support_status`, missing/selected evidence IDs, `decision_hash`, `selection_profile` и library requirement contract (`:388-428`).
+`LibraryDocsApplicationService` now calls `select_evidence()` once after guarded retrieval and stores the resulting frozen `SupportDecision` with the unchanged canonical `EvidenceRequirementSet`. `UnifiedContextService`, model-visible projection, MCP bounded/answer/compact output, and unsupported/error paths consume that decision instead of recomputing eligibility or coverage. `answer_available` is a compatibility alias of `answer_supported`; absent canonical decisions fail closed, and snippets cannot manufacture support. `DocsResult.schema_version` is `2.1-mvp`.
 
-Следствие: исправление projection корректно сохраняет upstream envelope, но для normal `get_docs_context` этот envelope обычно некому произвести. Это нарушает главный Phase 2 контракт `context_available != answer_supported` и один immutable producer decision до всех serializers.
-
-**Что требуется:** интегрировать canonical selection до создания `UnifiedDocsContextResult`; serializers должны только сохранять решение, а не изобретать его поздно.
+Verification (2026-07-22): focused plus directly affected selector/model/MCP/gateway/planner/diagnostic/baseline/unified/service/snippet/isolation/action-packet gate → `271 passed`; full offline suite with the known unrelated Phase 3.1 Riverpod retrieval node deselected → `2526 passed, 1 skipped, 1 deselected`. Novel comparison-only evidence produced `answer_supported=false`, `answer_available=false`, mandatory coverage `0.8`, and missing `result_access`.
 
 ### BLOCKER-2 — failed/empty candidate нарушает rollback старого active корпуса
 

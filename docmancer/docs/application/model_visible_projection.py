@@ -11,7 +11,9 @@ from typing import Any, Iterable
 
 from docmancer.docs.application.action_packet import evidence_identity_for_item
 from docmancer.docs.application.evidence_selection import (
+    SelectionDecision,
     docs_selection_config,
+    library_docs_selection_config,
     select_evidence,
 )
 from docmancer.docs.domain.request_intent import model_projection_kind
@@ -74,22 +76,60 @@ def project_docs_answer(
     retrieval: dict[str, Any],
     max_tokens: int = DOCS_ANSWER_MAX_TOKENS,
     selection_diagnostics: dict[str, Any] | None = None,
+    canonical_selection: SelectionDecision | None = None,
 ) -> tuple[dict[str, Any], dict[str, dict[str, Any]]]:
     """Create one deduplicated source list and an internal immutable snapshot."""
 
     candidates = _docs_candidates(retrieval)
-    decision = select_evidence(
-        candidates,
-        question=question,
-        config=docs_selection_config(max_tokens),
-        trust_contract=retrieval.get("trust_contract") or {},
-        exact_version=_requested_exact_version(retrieval),
-        required_evidence_paths=retrieval.get("required_evidence_paths") or (),
-        required_target_paths=retrieval.get("required_target_paths") or (),
-        public_requirements=retrieval.get("public_requirements") or (),
-        project_identity=retrieval.get("project_identity"),
-        module_id=retrieval.get("module_id"),
+    selection_config = (
+        library_docs_selection_config(max_tokens)
+        if retrieval.get("selection_profile") == "library_docs_answer"
+        else docs_selection_config(max_tokens)
     )
+    is_library_answer = retrieval.get("selection_profile") == "library_docs_answer"
+    if is_library_answer:
+        decision = canonical_selection
+        if decision is None and isinstance(retrieval.get("selection_decision"), SelectionDecision):
+            decision = retrieval["selection_decision"]
+        if decision is None:
+            payload = project_insufficient(
+                kind="docs_answer",
+                missing=["Canonical library support decision is unavailable."],
+                recommended_next_action=retrieval.get("next_action"),
+                max_tokens=INSUFFICIENT_EVIDENCE_MAX_TOKENS,
+            )
+            payload.update({
+                "operational_status": str(retrieval.get("status") or "unknown"),
+                "context_available": bool(candidates),
+                "answer_supported": False,
+                "answer_available": False,
+                "support_status": "insufficient_evidence",
+                "reason_code": "canonical_support_decision_missing",
+                "missing_requirement_ids": ["canonical_support_decision"],
+                "satisfied_requirement_ids": [],
+                "mandatory_requirement_ids": [],
+                "mandatory_coverage": 0.0,
+                "evidence_coverage": 0.0,
+                "selected_evidence_ids": [],
+                "decision_hash": None,
+            })
+            _refresh_estimate(payload)
+            return payload, {}
+    else:
+        decision = select_evidence(
+            candidates,
+            question=question,
+            config=selection_config,
+            trust_contract=retrieval.get("trust_contract") or {},
+            exact_version=_requested_exact_version(retrieval),
+            required_evidence_paths=retrieval.get("required_evidence_paths") or (),
+            required_target_paths=retrieval.get("required_target_paths") or (),
+            public_requirements=retrieval.get("public_requirements") or (),
+            requirements=retrieval.get("requirements"),
+            library_requirement_contract=retrieval.get("library_requirement_contract"),
+            project_identity=retrieval.get("project_identity"),
+            module_id=retrieval.get("module_id"),
+        )
     if selection_diagnostics is not None:
         selection_diagnostics.update(decision.audit_manifest())
     sources: list[dict[str, Any]] = []
@@ -105,15 +145,27 @@ def project_docs_answer(
         snapshot[evidence_id] = _snapshot_entry(item, normalized)
 
     retrieval_issues = _docs_retrieval_issues(retrieval)
+    support = (
+        _docs_support_decision(
+            retrieval=retrieval,
+            decision=decision,
+            context_available=bool(candidates),
+        )
+        if is_library_answer
+        else {}
+    )
     if decision.status != "ok" or not sources or retrieval_issues:
         missing = [str(retrieval.get("message") or "No complete source-backed documentation answer is available.")]
         missing.extend(decision.missing_requirements)
         missing.extend(decision.unresolved_conflicts)
         missing.extend(retrieval_issues)
-        return project_insufficient(
+        payload = project_insufficient(
             kind="docs_answer", missing=missing,
             recommended_next_action=retrieval.get("next_action"), max_tokens=INSUFFICIENT_EVIDENCE_MAX_TOKENS,
-        ), snapshot
+        )
+        payload.update(support)
+        _refresh_estimate(payload)
+        return payload, snapshot
 
     answer, answer_evidence_ids, answer_limited = _answer_text(
         question, retrieval, sources
@@ -128,6 +180,7 @@ def project_docs_answer(
         "answer_evidence_ids": answer_evidence_ids,
         "sources": sources,
         "omitted_counts": omitted_counts,
+        **support,
         "estimated_tokens": 0,
     }
     if answer_limited:
@@ -149,6 +202,36 @@ def _requested_exact_version(retrieval: dict[str, Any]) -> str | None:
         return None
     value = retrieval.get("requested_version") or retrieval.get("resolved_version")
     return str(value).strip() if value is not None and str(value).strip() else None
+
+
+def _docs_support_decision(*, retrieval: dict[str, Any], decision: Any, context_available: bool) -> dict[str, Any]:
+    canonical = decision.support_decision
+    missing = list(canonical.missing_requirement_ids)
+    rejected = [
+        {
+            "candidate_id": omission.stable_id,
+            "reason_code": omission.reason_code,
+            "missing_requirement_ids": missing,
+        }
+        for omission in decision.omissions[:20]
+    ]
+    support = {
+        "operational_status": str(retrieval.get("status") or "unknown"),
+        "context_available": context_available,
+        "answer_supported": canonical.answer_supported,
+        "answer_available": canonical.answer_available,
+        "support_status": canonical.support_status,
+        "reason_code": canonical.reason_code,
+        "missing_requirement_ids": list(canonical.missing_requirement_ids),
+        "satisfied_requirement_ids": list(canonical.satisfied_requirement_ids),
+        "mandatory_requirement_ids": list(canonical.mandatory_requirement_ids),
+        "mandatory_coverage": canonical.mandatory_coverage,
+        "evidence_coverage": canonical.mandatory_coverage,
+        "selected_evidence_ids": list(canonical.selected_evidence_ids),
+        "rejected_candidates": rejected,
+        "decision_hash": canonical.decision_hash,
+    }
+    return support
 
 
 def project_patch_context(

@@ -379,7 +379,7 @@ def test_projection_intent_distinguishes_change_from_documentation_question():
     assert projection_kind("What is the retry policy?") == "docs_answer"
 
 
-def test_normal_public_call_returns_only_one_canonical_projection():
+def test_library_public_call_without_canonical_decision_fails_closed():
     class Facade:
         def get_docs_context(self, question, **kwargs):
             return {
@@ -402,11 +402,14 @@ def test_normal_public_call_returns_only_one_canonical_projection():
         Facade(),
     )
 
-    assert payload["status"] == "ok"
+    assert payload["status"] == "insufficient_evidence"
     assert payload["kind"] == "docs_answer"
-    assert set(payload) == {
-        "status", "kind", "answer", "answer_evidence_ids", "sources", "omitted_counts", "estimated_tokens",
-    }
+    assert payload["answer_supported"] is False
+    assert payload["answer_available"] is False
+    assert payload["reason_code"] == "canonical_support_decision_missing"
+    assert payload["mandatory_coverage"] == 0.0
+    assert payload["selected_evidence_ids"] == []
+    assert "answer" not in payload
     assert not _forbidden_occurrences(payload)
 
 
@@ -460,6 +463,60 @@ def test_docs_projection_forwards_host_requirements_and_scope_to_selector():
 
     assert ok["status"] == "ok"
     assert blocked["status"] == "insufficient_evidence"
+
+
+def test_docs_projection_uses_the_canonical_requirement_set_without_rebuilding_it():
+    from docmancer.docs.application.evidence_selection import build_requirements
+
+    requirements = build_requirements(
+        "How are retries handled?", public_requirements=["bounded retry"],
+    )
+    diagnostics = {}
+    payload, _ = project_docs_answer(
+        question="How are retries handled?",
+        retrieval={
+            "status": "success", "answer_available": True, "requirements": requirements,
+            "context_pack": [{"source": "docs/retry.md", "content": "Use bounded retry for failures."}],
+        },
+        selection_diagnostics=diagnostics,
+    )
+
+    assert payload["status"] == "ok"
+    assert diagnostics["requirements_hash"] == requirements.requirements_hash
+
+
+def test_docs_projection_preserves_underlying_support_decision_fields():
+    from docmancer.docs.application.evidence_selection import (
+        library_docs_selection_config,
+        select_evidence,
+    )
+
+    question = "Compare async with launch and explain how to obtain the async result"
+    candidate = {"source": "docs/launch.md", "content": "launch starts fire-and-forget work."}
+    selection = select_evidence(
+        [candidate], question=question, config=library_docs_selection_config(800),
+    )
+    full_support = selection.support_decision.as_payload()
+    support = {
+        key: full_support[key]
+        for key in (
+            "answer_supported", "answer_available", "support_status", "reason_code",
+            "missing_requirement_ids", "satisfied_requirement_ids",
+            "mandatory_requirement_ids", "mandatory_coverage", "evidence_coverage",
+            "selected_evidence_ids", "decision_hash",
+        )
+    }
+    projection, _ = project_docs_answer(
+        question=question,
+        retrieval={
+            "status": "success", "context_available": True,
+            "answer_available": False, "selection_profile": "library_docs_answer",
+            "selection_decision": selection, "context_pack": [candidate], **support,
+        },
+    )
+
+    assert {key: projection[key] for key in support} == support
+    assert projection["status"] == "insufficient_evidence"
 
 
 def test_patch_projection_binds_duplicate_path_sections_by_exact_evidence_id():

@@ -1,9 +1,11 @@
 from __future__ import annotations
 
+import hashlib
 from dataclasses import dataclass, field, replace
 from pathlib import Path
 from typing import Any
 
+from docmancer.docs.application.evidence_selection import library_docs_selection_config, select_evidence
 from docmancer.docs.application.unified_context_service import UnifiedDocsContextService
 from docmancer.docs.models import DocsChunk, DocsResult, LibraryInfo, ProjectContextResult, UnifiedDocsContextResult
 
@@ -124,6 +126,40 @@ def test_auto_with_library_only_routes_to_library_docs():
     assert result.mode_selected == "library"
     assert "get_docs" in _call_names(facade)
     assert result.source_summary["library"] == 1
+
+
+def test_library_context_consumes_selector_support_instead_of_context_presence():
+    facade = FakeFacade()
+    question = "Compare async with launch and explain how to obtain the async result"
+    selection = select_evidence(
+        [{
+            "stable_chunk_id": "launch-only",
+            "parent_logical_id": "docs/launch.md",
+            "source": "docs/launch.md",
+            "content": "launch starts fire-and-forget work.",
+            "display_content_hash": hashlib.sha256(
+                b"launch starts fire-and-forget work."
+            ).hexdigest(),
+        }],
+        question=question,
+        config=library_docs_selection_config(800),
+    )
+    facade.library_result = replace(
+        facade.library_result,
+        topic=question,
+        selection_decision=selection,
+        support_decision=selection.support_decision,
+    )
+
+    result = _service(facade).get_docs_context(question, library="fastapi")
+
+    assert result.context_available is True
+    assert result.answer_supported is False
+    assert result.answer_available is result.answer_supported
+    assert result.support_status == "insufficient_evidence"
+    assert result.mandatory_coverage < 1.0
+    assert result.selected_evidence_ids == ["launch-only"]
+    assert result.decision_hash == selection.support_decision.decision_hash
 
 
 def test_hostile_library_text_cannot_create_typed_lifecycle_action():

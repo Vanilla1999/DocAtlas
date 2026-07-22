@@ -55,6 +55,32 @@ def test_click_group_query_selects_click_group_snippet():
     assert "@click.group" in primary["code"]
 
 
+def test_insufficient_support_decision_cannot_report_high_snippet_confidence():
+    item = chunk("Click", "```python\n@click.group()\ndef cli():\n    pass\n```")
+    presentation = build_snippet_presentation(
+        [item],
+        question="Show a Click command group example",
+        response_style="auto",
+        support_decision={"answer_supported": False},
+    )
+    assert presentation.primary_snippet_confidence != "high"
+
+
+def test_canonical_requirement_ids_are_presentation_annotations_only():
+    item = chunk("Click", "```python\n@click.group()\ndef cli():\n    pass\n```")
+    presentation = build_snippet_presentation(
+        [item],
+        question="Show a Click command group example",
+        response_style="auto",
+        support_decision={"answer_supported": False, "missing_requirement_ids": ["facet:result"]},
+        requirements=[{"requirement_id": "entity:click"}, {"requirement_id": "facet:result"}],
+    )
+    assert presentation.primary_snippet_confidence != "high"
+    assert presentation.primary_snippet is not None
+    assert "matched requirements: entity:click" in presentation.primary_snippet["why_relevant"]
+    assert "missing requirements: facet:result" in presentation.primary_snippet["why_relevant"]
+
+
 def test_riverpod_autodispose_selects_relevant_dart_snippet():
     item = chunk("autoDispose", "```dart\nfinal userProvider = FutureProvider.autoDispose((ref) async {\n  ref.keepAlive();\n});\n```")
     primary = build_snippet_presentation([item], question="Riverpod autoDispose example", response_style="auto").primary_snippet
