@@ -2,10 +2,12 @@
 
 from __future__ import annotations
 
+import base64
 import hashlib
 import json
 import math
 import re
+import zlib
 from copy import deepcopy
 from typing import Any, Iterable
 
@@ -54,8 +56,15 @@ FORBIDDEN_MODEL_KEYS = frozenset({
     "primary_snippet", "primary_snippets", "primary_snippet_alternatives",
     "supporting_snippets", "successful_logs", "indexing_logs", "test_logs",
 })
-_CODE_REQUEST_RE = re.compile(r"\b(?:show|provide|write)\s+(?:the\s+)?code\b", re.IGNORECASE)
-_CODE_FENCE_RE = re.compile(r"```[^\n]*\n(.*?)```", re.DOTALL)
+SUPPORT_ENVELOPE_KEYS = (
+    "answer_supported", "answer_available", "support_status", "decision",
+    "reason_code", "missing_requirement_ids", "satisfied_requirement_ids",
+    "mandatory_requirement_ids", "mandatory_coverage", "evidence_coverage",
+    "selected_evidence_ids", "requirements_hash", "selector_config_hash",
+    "eligibility_contract_hash", "candidate_trace_hash", "selection_hash",
+    "decision_hash",
+)
+SUPPORT_ENVELOPE_ENCODING = "zlib+base64url"
 
 def canonical_projection_bytes(value: Any) -> bytes:
     return json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
@@ -64,6 +73,42 @@ def canonical_projection_bytes(value: Any) -> bytes:
 def estimate_projection_tokens(value: Any) -> int:
     size = len(canonical_projection_bytes(value))
     return max(1, math.ceil(size / 4))
+
+
+def encode_support_envelope(value: dict[str, Any]) -> dict[str, str]:
+    """Encode a complete canonical support envelope for tiny public budgets."""
+
+    canonical = {
+        key: deepcopy(value[key])
+        for key in SUPPORT_ENVELOPE_KEYS
+        if key in value
+    }
+    compressed = zlib.compress(canonical_projection_bytes(canonical), level=9)
+    return {
+        "encoding": SUPPORT_ENVELOPE_ENCODING,
+        "data": base64.urlsafe_b64encode(compressed).decode("ascii").rstrip("="),
+    }
+
+
+def decode_support_envelope(value: Any) -> dict[str, Any]:
+    """Decode the deterministic bounded transport, rejecting malformed input."""
+
+    if not isinstance(value, dict) or value.get("encoding") != SUPPORT_ENVELOPE_ENCODING:
+        raise ValueError("unsupported support envelope encoding")
+    encoded = value.get("data")
+    if not isinstance(encoded, str) or not encoded or len(encoded) > 8_192:
+        raise ValueError("invalid support envelope data")
+    padded = encoded + "=" * (-len(encoded) % 4)
+    try:
+        raw = zlib.decompress(base64.b64decode(padded, altchars=b"-_", validate=True))
+        decoded = json.loads(raw)
+    except (ValueError, TypeError, zlib.error, json.JSONDecodeError) as exc:
+        raise ValueError("invalid support envelope data") from exc
+    if len(raw) > 32_000 or not isinstance(decoded, dict):
+        raise ValueError("invalid support envelope payload")
+    if set(decoded) != set(SUPPORT_ENVELOPE_KEYS):
+        raise ValueError("incomplete support envelope payload")
+    return decoded
 
 
 def projection_kind(question: str) -> str:
@@ -139,7 +184,10 @@ def project_docs_answer(
     omitted = len(decision.omissions)
     for candidate in decision.selected_candidates:
         item = dict(candidate.original)
-        normalized = _docs_source(item, evidence_id=candidate.stable_id)
+        normalized = _docs_source(
+            item,
+            evidence_id=candidate.stable_id if is_library_answer else None,
+        )
         if normalized is None:
             omitted += 1
             continue
@@ -157,6 +205,25 @@ def project_docs_answer(
         if is_library_answer
         else {}
     )
+    if is_library_answer and decision.support_decision.answer_supported:
+        selected_ids = list(decision.support_decision.selected_evidence_ids)
+        visible_ids = [source["evidence_id"] for source in sources]
+        if visible_ids != selected_ids:
+            payload = project_insufficient(
+                kind="docs_answer",
+                missing=["A selected support witness could not be materialized safely."],
+                recommended_next_action=None,
+                max_tokens=INSUFFICIENT_EVIDENCE_MAX_TOKENS,
+            )
+            payload.update({
+                "operational_status": str(retrieval.get("status") or "unknown"),
+                "context_available": bool(candidates),
+                "reason_code": "support_witness_not_materialized",
+            })
+            bound_insufficient_projection(
+                payload, max_tokens=INSUFFICIENT_EVIDENCE_MAX_TOKENS,
+            )
+            return payload, snapshot
     if decision.status != "ok" or not sources or retrieval_issues:
         missing = [str(retrieval.get("message") or "No complete source-backed documentation answer is available.")]
         missing.extend(decision.missing_requirements)
@@ -167,8 +234,9 @@ def project_docs_answer(
             recommended_next_action=retrieval.get("next_action"), max_tokens=INSUFFICIENT_EVIDENCE_MAX_TOKENS,
         )
         payload.update(support)
-        _refresh_estimate(payload)
-        _trim_insufficient_presentation(payload)
+        bound_insufficient_projection(
+            payload, max_tokens=INSUFFICIENT_EVIDENCE_MAX_TOKENS,
+        )
         return payload, snapshot
 
     answer, answer_evidence_ids, answer_limited = _answer_text(
@@ -186,11 +254,6 @@ def project_docs_answer(
         "answer_evidence_ids": answer_evidence_ids,
         "sources": sources,
         "omitted_counts": omitted_counts,
-        **(
-            {"required_code_groups": _required_code_groups(question, decision)}
-            if is_library_answer
-            else {}
-        ),
         **support,
         "estimated_tokens": 0,
     }
@@ -203,8 +266,9 @@ def project_docs_answer(
             recommended_next_action=None, max_tokens=INSUFFICIENT_EVIDENCE_MAX_TOKENS,
         )
         fallback.update(support)
-        _refresh_estimate(fallback)
-        _trim_insufficient_presentation(fallback)
+        bound_insufficient_projection(
+            fallback, max_tokens=INSUFFICIENT_EVIDENCE_MAX_TOKENS,
+        )
         return fallback, snapshot
     return payload, snapshot
 
@@ -229,30 +293,32 @@ def _docs_support_decision(*, retrieval: dict[str, Any], decision: Any, context_
     return support
 
 
-def _trim_insufficient_presentation(payload: dict[str, Any]) -> None:
-    """Trim only presentation metadata; the canonical support envelope is mandatory."""
+def bound_insufficient_projection(payload: dict[str, Any], *, max_tokens: int) -> None:
+    """Fit fail-closed delivery without truncating canonical support semantics."""
 
-    if estimate_projection_tokens(payload) <= INSUFFICIENT_EVIDENCE_MAX_TOKENS:
+    limit = min(INSUFFICIENT_EVIDENCE_MAX_TOKENS, max(1, int(max_tokens)))
+    _refresh_estimate(payload)
+    if estimate_projection_tokens(payload) <= limit:
         return
     payload.pop("recommended_next_action", None)
     payload.pop("missing", None)
     _refresh_estimate(payload)
-
-
-def _required_code_groups(question: str, decision: Any) -> list[dict[str, Any]]:
-    if not _CODE_REQUEST_RE.search(question):
-        return []
-    witnesses = ["async {", ".await()"]
-    evidence: list[dict[str, str]] = []
-    for candidate in decision.selected_candidates:
-        for block in _CODE_FENCE_RE.findall(candidate.display_text):
-            if all(witness.casefold() in block.casefold() for witness in witnesses):
-                evidence.append({
-                    "source": candidate.path_or_url,
-                    "version": candidate.resolved_version or candidate.version_binding,
-                    "code_block_id": hashlib.sha256(block.encode("utf-8")).hexdigest()[:16],
-                })
-    return [{"witnesses": witnesses, "satisfied": bool(evidence), "evidence": evidence[:1]}]
+    if estimate_projection_tokens(payload) <= limit:
+        return
+    envelope = {
+        key: payload[key]
+        for key in SUPPORT_ENVELOPE_KEYS
+        if key in payload
+    }
+    if envelope:
+        payload["support_envelope"] = encode_support_envelope(envelope)
+        for key in SUPPORT_ENVELOPE_KEYS:
+            payload.pop(key, None)
+        _refresh_estimate(payload)
+    if estimate_projection_tokens(payload) > limit:
+        payload.pop("operational_status", None)
+        payload.pop("context_available", None)
+        _refresh_estimate(payload)
 
 
 def project_patch_context(
@@ -366,11 +432,25 @@ def validate_model_visible_projection(
         errors.append("invalid projection kind")
     if status not in {"ok", "truncated", "insufficient_evidence"}:
         errors.append("invalid projection status")
-    limit = INSUFFICIENT_EVIDENCE_MAX_TOKENS if status == "insufficient_evidence" else max_tokens
+    limit = (
+        min(INSUFFICIENT_EVIDENCE_MAX_TOKENS, max_tokens)
+        if status == "insufficient_evidence"
+        else max_tokens
+    )
     actual = estimate_projection_tokens(payload)
     if payload.get("estimated_tokens") != actual or actual > limit:
         errors.append("projection estimate mismatch or budget exceeded")
     if status == "insufficient_evidence":
+        transport = payload.get("support_envelope")
+        if transport is not None:
+            try:
+                decode_support_envelope(transport)
+            except ValueError as exc:
+                errors.append(str(exc))
+        if transport is not None and any(
+            key in payload for key in SUPPORT_ENVELOPE_KEYS
+        ):
+            errors.append("support envelope must use exactly one public representation")
         if payload.get("implementation_guidance") or payload.get("invariants") or payload.get("targets"):
             errors.append("insufficient evidence must not authorize edits")
         return errors
@@ -462,7 +542,10 @@ def _docs_source(
 ) -> dict[str, Any] | None:
     path = str(item.get("source_url") or item.get("url") or item.get("path") or item.get("source") or "").strip()
     section = str(item.get("heading_path") or item.get("title") or "document").strip()
-    snippet = item.get("code") or item.get("snippet") or item.get("content")
+    snippet = (
+        item.get("code") or item.get("snippet") or item.get("content")
+        or item.get("display_text")
+    )
     if isinstance(snippet, dict):
         snippet = snippet.get("code") or snippet.get("text")
     snippet = str(snippet or "").strip()
@@ -488,7 +571,7 @@ def _source_digest(item: dict[str, Any]) -> str:
     material = {
         "path": item.get("path") or item.get("source") or item.get("url") or item.get("source_url"),
         "section": item.get("heading_path") or item.get("title"),
-        "content": item.get("content"),
+        "content": item.get("content") or item.get("display_text"),
         "snippet": item.get("snippet") or item.get("code"),
         "version": item.get("version_binding") or item.get("version") or item.get("requested_version"),
     }

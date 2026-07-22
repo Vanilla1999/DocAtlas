@@ -417,6 +417,54 @@ def test_support_decision_survives_all_compatibility_and_bounded_modes():
     assert observed[-1]["status"] == "insufficient_evidence"
 
 
+def test_bounded_library_delivery_at_256_tokens_transports_complete_support_envelope():
+    from docmancer.docs.application.evidence_selection import (
+        library_docs_selection_config,
+        select_evidence,
+    )
+    from docmancer.docs.application.model_visible_projection import (
+        estimate_projection_tokens,
+    )
+
+    question = "Compare create_task with gather and explain how the scheduled task result is obtained"
+    candidate = {
+        "stable_id": "runtime-witness", "source": "docs/runtime.md",
+        "content": "Compare create_task with gather; obtain the scheduled task result from create_task.",
+    }
+    selection = select_evidence(
+        [candidate], question=question, config=library_docs_selection_config(800),
+    )
+
+    class Facade:
+        def get_docs_context(self, question, **kwargs):
+            return SimpleNamespace(
+                status="success", answer_available=True,
+                selection_profile="library_docs_answer",
+                selection_decision=selection, context_pack=[candidate],
+                trust_contract={"selected": [], "rejected": [], "risky": []},
+            )
+
+    result = cast(dict[str, Any], handle_context_tool(
+        "get_docs_context",
+        {
+            "question": question, "library": "runtime",
+            "delivery_strategy": "bounded_direct", "packet_tokens": 256,
+        },
+        cast(Any, Facade()),
+    ))
+
+    assert result.get("reason_code") != "invalid_model_visible_projection"
+    assert estimate_projection_tokens(result) <= 256
+    import base64
+    import zlib
+
+    encoded = result["support_envelope"]["data"]
+    encoded += "=" * (-len(encoded) % 4)
+    assert json.loads(zlib.decompress(base64.urlsafe_b64decode(encoded))) == (
+        selection.support_decision.as_payload()
+    )
+
+
 def test_get_docs_context_default_answer_reports_compaction_without_debug_noise():
     large = "x" * 120_000
 

@@ -240,7 +240,7 @@
     "tests/docs/test_mcp_error_contract.py": "a0f7f9fe37934b5b6a528e6d6b1ba9bad42b0349a9f901ee50a318308f015ca8",
     "tests/docs/test_mcp_output_contract.py": "3c3d49013141661658cb5b008a3ae59f336523cf1b1f1ee01f2b9c0b62995b6b",
     "tests/docs/test_mcp_token_footprint.py": "34b40986931303bc312678f8e64bb6b3f31129baa6b402508b5181f7e4518833",
-    "tests/docs/test_model_visible_projection.py": "1addd79e86d229cf271caf6066f7d9e445408be91c09ff599053ab6f56864574",
+    "tests/docs/test_model_visible_projection.py": "6ccaf25a084088b015a73ea37d9c9526ee6d66faa441e2cdc31145b11b322a3d",
     "tests/docs/test_normative_language.py": "1186e06315bd02b2b59008718e6695d46cb68b8100714ce7984352b0442bed49",
     "tests/docs/test_patch_plan_context.py": "9966266603b99a9086b3f416dc266a209cf787089bb21fc2361993be7a53d1bc",
     "tests/docs/test_policies.py": "81afa7f8b7fa24d08679e77ced4f1a9ef54114f6882055df3c9fd98e160405a0",
@@ -420,7 +420,7 @@
     "tests/test_support_surface_policy.py": "e590f30e582da0241b7ba2a102b0f5c777fec2bb09c2759f31dc20e4a82a2aac",
     "tests/test_tool_selection_policy.py": "33867170e76a90489c37c0e26d19b5f4e8bef63f4ca4b223757d7e7e43842eb1",
     "tests/test_unified_docs_context.py": "ee7d86e13d014677a88be289960ab6943b4df8f2442b1facdd4b8069ed523b1e",
-    "tests/test_unified_docs_context_mcp.py": "c28424e5ff7ad85720828e9ce3b1c7a4d3a4fe3fddbf7bc08f061fe15b8050e7",
+    "tests/test_unified_docs_context_mcp.py": "cdd5a223c5cf1368fd76ca0d6afe02794354009e561312e799365c648c97a24b",
     "tests/test_uspto_tm.py": "92f3214036e4547c97bfe9c55398e9f137756c3813fd5d0e9f4497a18f3dc2e1",
     "tests/test_vector_fallback.py": "18314fc3296754c198f39308cc79b501cad3d81f648ca507f09eb3514d424f52",
     "tests/test_web_fetcher.py": "febd506d3ba198bfaf1a22a3746180d7a0e5eb9f678b3412301842a169ceaa9f"

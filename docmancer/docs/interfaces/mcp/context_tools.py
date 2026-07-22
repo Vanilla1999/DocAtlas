@@ -11,6 +11,8 @@ from docmancer.docs.application.model_visible_projection import (
     DOCS_ANSWER_MAX_TOKENS,
     INSUFFICIENT_EVIDENCE_MAX_TOKENS,
     PATCH_CONTEXT_HARD_TOKENS,
+    SUPPORT_ENVELOPE_KEYS,
+    bound_insufficient_projection,
     canonical_projection_bytes,
     project_docs_answer,
     project_insufficient,
@@ -25,14 +27,6 @@ from docmancer.docs.interfaces.mcp.project_tools import _attach_output_contract,
 
 
 CONTEXT_TOOL_NAMES = {"get_docs_context"}
-SUPPORT_ENVELOPE_KEYS = (
-    "answer_supported", "answer_available", "support_status", "decision",
-    "reason_code", "missing_requirement_ids", "satisfied_requirement_ids",
-    "mandatory_requirement_ids", "mandatory_coverage", "evidence_coverage",
-    "selected_evidence_ids", "requirements_hash", "selector_config_hash",
-    "eligibility_contract_hash", "candidate_trace_hash", "selection_hash",
-    "decision_hash",
-)
 DOCUMENT_CONTENT_POLICY = {
     "role": "cited_untrusted_document_data",
     "actionable": False,
@@ -307,6 +301,10 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
             if projection.get("status") == "insufficient_evidence" and recovery:
                 support_projection = {
                     **_support_envelope(projection),
+                    **(
+                        {"support_envelope": deepcopy(projection["support_envelope"])}
+                        if "support_envelope" in projection else {}
+                    ),
                     **{
                         key: projection[key]
                         for key in ("operational_status", "context_available")
@@ -320,16 +318,15 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
                     max_tokens=min(INSUFFICIENT_EVIDENCE_MAX_TOKENS, output_budget),
                 )
                 projection.update(support_projection)
-                _refresh_projection_estimate(projection)
-                if projection["estimated_tokens"] > INSUFFICIENT_EVIDENCE_MAX_TOKENS:
-                    projection.pop("recommended_next_action", None)
-                    projection.pop("missing", None)
+                bound_insufficient_projection(projection, max_tokens=output_budget)
+            if projection.get("status") == "insufficient_evidence":
+                bound_insufficient_projection(projection, max_tokens=output_budget)
             _refresh_projection_estimate(projection)
             validation_errors = validate_model_visible_projection(
                 projection,
                 snapshot=snapshot,
                 max_tokens=(
-                    INSUFFICIENT_EVIDENCE_MAX_TOKENS
+                    min(INSUFFICIENT_EVIDENCE_MAX_TOKENS, output_budget)
                     if projection.get("status") == "insufficient_evidence"
                     else min(DOCS_ANSWER_MAX_TOKENS, output_budget)
                 ),
