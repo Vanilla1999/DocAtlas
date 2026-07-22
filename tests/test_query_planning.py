@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from docmancer.docs.application.evidence_selection import build_requirements
 from docmancer.retrieval.query_planning import (
     MAX_EXACT_TERMS,
     build_query_plan,
@@ -60,6 +61,22 @@ def test_query_plan_has_bounded_concept_query_and_typed_filters():
     assert plan.filters.source_classes == ("official_doc", "project_file")
     assert plan.filters.exact_snapshot_required is True
     assert plan.filters.forbidden_sources == ("mirror.example",)
+
+
+def test_query_plan_preserves_the_canonical_requirement_set_and_uses_its_entities():
+    requirements = build_requirements(
+        "Compare create_task with gather and explain how the scheduled task result is obtained",
+        profile="library_docs_answer",
+    )
+
+    plan = build_query_plan(
+        "Compare create_task with gather and explain how the scheduled task result is obtained",
+        requirements=requirements,
+    )
+
+    assert plan.requirements is requirements
+    assert plan.requirements_hash == requirements.requirements_hash
+    assert {term.normalized_value for term in plan.exact_terms} >= {"create_task", "gather"}
 
 
 def test_query_plan_binds_arbitrary_executed_filters_without_exposing_values():

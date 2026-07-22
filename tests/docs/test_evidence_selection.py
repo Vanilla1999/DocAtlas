@@ -6,8 +6,11 @@ from dataclasses import replace
 import pytest
 
 from docmancer.docs.application.evidence_selection import (
+    EvidenceRequirementSet,
     SelectionConfig,
+    build_requirements,
     docs_selection_config,
+    library_docs_selection_config,
     patch_selection_config,
     select_evidence,
     validate_evidence_sufficiency,
@@ -34,6 +37,76 @@ def _candidate(stable_id: str, text: str, **overrides):
 
 def _ids(decision):
     return [item.stable_id for item in decision.selected_candidates]
+
+
+def test_requirement_set_hash_is_deterministic_under_input_ordering_differences():
+    first = build_requirements(
+        "Update `Client.open` with --dry-run",
+        required_evidence_paths=["docs/b.md", "docs/a.md"],
+        required_target_paths=["src/z.py", "src/a.py"],
+        public_requirements=["preserve compatibility", {"text": "keep audit output"}],
+    )
+    second = build_requirements(
+        "Update `Client.open` with --dry-run",
+        required_evidence_paths=["docs/a.md", "docs/b.md"],
+        required_target_paths=["src/a.py", "src/z.py"],
+        public_requirements=[{"text": "keep audit output"}, "preserve compatibility"],
+    )
+
+    assert isinstance(first, EvidenceRequirementSet)
+    assert first.requirements_hash == second.requirements_hash
+    assert first.query_extraction_provenance == second.query_extraction_provenance
+    assert first.query_extraction_provenance
+    assert EvidenceRequirementSet(tuple(reversed(first.requirements))).requirements_hash == first.requirements_hash
+
+
+def test_requirement_set_extracts_lowercase_comparison_and_result_access_facets():
+    requirements = build_requirements(
+        "When should I use async instead of launch, and how do I obtain its result?"
+    )
+
+    assert requirements.required_entities == ("async", "launch")
+    assert requirements.required_facets == (
+        "comparison:async:launch",
+        "result_access:async:obtain its result",
+    )
+
+
+def test_requirement_set_extracts_non_kotlin_comparison_and_passive_result_access_facets():
+    requirements = build_requirements(
+        "Compare create_task with gather and explain how the scheduled task result is obtained"
+    )
+
+    assert requirements.required_entities == ("create_task", "gather")
+    assert requirements.required_facets == (
+        "comparison:create_task:gather",
+        "result_access:create_task:the scheduled task result is obtained",
+    )
+
+
+def test_library_docs_profile_requires_one_item_to_cover_query_entities_and_facets():
+    complete = select_evidence(
+        [_candidate(
+            "complete",
+            "launch returns a Job, while async returns Deferred. Obtain that result with await().",
+        )],
+        question="When should I use async instead of launch, and how do I obtain its result?",
+        config=library_docs_selection_config(800),
+    )
+    partial = select_evidence(
+        [_candidate("partial", "launch starts a fire-and-forget coroutine and returns a Job.")],
+        question="When should I use async instead of launch, and how do I obtain its result?",
+        config=library_docs_selection_config(800),
+    )
+
+    assert complete.status == "ok"
+    assert complete.missing_requirements == ()
+    assert partial.status == "insufficient_evidence"
+    assert set(partial.missing_requirements) >= {
+        "entity:async",
+        "facet:comparison:async:launch",
+        "facet:result_access:async:obtain its result",
+    }
 
 
 def test_selection_is_byte_deterministic_under_candidate_permutation():

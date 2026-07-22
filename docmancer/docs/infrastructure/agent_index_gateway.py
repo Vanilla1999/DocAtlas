@@ -57,17 +57,20 @@ class AgentIndexGateway:
         *,
         budget: int | None = None,
         filters: dict[str, Any] | None = None,
+        requirements: Any | None = None,
     ) -> Any:
         """Run the dispatcher against the isolated index for one library record."""
         agent = self.agent_instance(record)
         if not hasattr(agent, "store"):
             return agent.query(topic, budget=budget)
-        return RetrievalDispatcher(store=agent.store, config=agent.config).run(
-            topic,
-            mode="lexical",
-            budget=budget,
-            filters=filters,
-        )
+        dispatch_args: dict[str, Any] = {
+            "mode": "lexical",
+            "budget": budget,
+            "filters": filters,
+        }
+        if requirements is not None:
+            dispatch_args["requirements"] = requirements
+        return RetrievalDispatcher(store=agent.store, config=agent.config).run(topic, **dispatch_args)
 
     def drop_library_agent(self, record_or_library_id: LibraryRecord | str) -> None:
         if isinstance(record_or_library_id, LibraryRecord):

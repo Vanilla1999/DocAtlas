@@ -42,7 +42,7 @@
 | Phase 1.1 | В основном выполнена | Есть schema-v2 manifest, immutable commit resolution, exact blob set, content/blob verification, cancellation/deadline handling и fail-closed fetch. |
 | Phase 1.2 | Не принята | Candidate generation есть, но rollback старого active корпуса и exact source-set validation нарушены. |
 | Phase 1.3 | Не принята | Coverage рассчитывается по counts, а не identity path/blob set; inspection contract неполон. |
-| Phase 2.1 | Частично выполнена | `EvidenceRequirementSet` есть, но extraction в основном English-regex/fixture-contract driven; query planning не использует тот же requirement set. |
+| Phase 2.1 | Выполнена для shared-requirements scope | Один immutable `EvidenceRequirementSet` владеет entities/facets/provenance и deterministic hash; query planner получает тот же instance как bounded retrieval hints, dispatcher и library gateway сохраняют identity. Fresh focused gate: `pytest -q tests/docs/test_evidence_selection.py tests/docs/test_agent_index_gateway.py tests/test_query_planning.py --tb=short` → `42 passed` (2026-07-22), including ordered-input determinism and non-Kotlin `create_task`/`gather` coverage. |
 | Phase 2.2 | Не принята end-to-end | Projection-loss исправлен, но публичный unified path не производит canonical selection decision и приравнивает context к answer. |
 | Phase 2.3 | Не принята | Projection envelope тестируется, но code-group policy hardcoded под Kotlin и ordinary output modes не имеют producer decision. |
 | Phase 3.1 | Частично выполнена | Raw topic, lexical dispatcher, typed record filters и telemetry есть. Нет bounded index-witness probe и полного shared-requirements contract с query planning. |
@@ -157,9 +157,9 @@ Checked-in provider-free runner с immutable dataset digests, отдельным
 
 **Закрыто для текущего Phase 1.3 scope (2026-07-22).** `DocsInspectResult` теперь публикует `manifest_fetched`, active generation ID, `requested_ref`, `resolved_commit_sha`, `manifest_complete`, `manifest_truncated`, ingestion-policy version, active `docs_url_template` и bounded last-attempt diagnostics вместе с ранее добавленными digest/count fields. Parameterized rollback test проверяет no-chunk, source-set-mismatch и vector failure без изменения active identity; `pytest -q tests/test_docs_service.py -k 'manifest or inspect or status or generation' --tb=short` → `40 passed, 183 deselected`; shared manifest/fetch contracts → `66 passed`.
 
-### HIGH-4 — shared `EvidenceRequirementSet` не доведён до query planning
+### RESOLVED AFTER REVIEW — shared `EvidenceRequirementSet` propagated to query planning
 
-`EvidenceRequirementSet` реализован в `evidence_selection.py`, но `retrieval/query_planning.py` не принимает entities/facets/requirements. Phase 3.1 требует использовать тот же canonical requirement set для query planning и answer support либо явно доказать эквивалентность. Сейчас retrieval и sufficiency всё ещё анализируют query независимо.
+`EvidenceRequirementSet` is now the canonical immutable contract from `build_requirements()`. `retrieval/query_planning.py` accepts the same instance and projects its exact-term/entity requirements into bounded retrieval hints without reconstructing it; `RetrievalDispatcher` and `AgentIndexGateway` preserve the identity and hash. The focused gate above covers deterministic ordering, non-Kotlin extraction, planner identity/hash propagation, and gateway identity propagation.
 
 ### MEDIUM-1 — status table плана устарела и противоречива
 

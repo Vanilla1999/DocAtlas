@@ -141,6 +141,8 @@ class QueryPlan:
     requested_lanes: tuple[str, ...]
     executed_filters_hash: str
     plan_hash: str
+    requirements_hash: str = ""
+    requirements: Any | None = field(default=None, compare=False, repr=False)
 
 
 @dataclass(frozen=True, slots=True)

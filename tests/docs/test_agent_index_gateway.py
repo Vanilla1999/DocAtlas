@@ -1,5 +1,6 @@
 from pathlib import Path
 
+from docmancer.docs.application.evidence_selection import build_requirements
 from docmancer.core.config import DocmancerConfig
 from docmancer.docs.infrastructure.agent_index_gateway import AgentIndexGateway
 from docmancer.docs.registry import LibraryRecord
@@ -18,6 +19,17 @@ class FakeAgent:
     def query(self, query, **kwargs):
         self.query_calls.append((query, kwargs))
         return []
+
+
+class RecordingDispatcher:
+    calls = []
+
+    def __init__(self, **kwargs):
+        self.kwargs = kwargs
+
+    def run(self, query, **kwargs):
+        self.calls.append((self.kwargs, query, kwargs))
+        return "dispatch-result"
 
 
 def _record(library_id="/pub/riverpod/2.0/api", canonical_id=None):
@@ -91,6 +103,50 @@ def test_library_query_uses_per_library_agent(tmp_path, monkeypatch):
 
     assert library_agent is not default
     assert Path(library_agent.config.index.db_path) == tmp_path / "home" / "docs-indexes" / "pub-riverpod-2-0-api.db"
+
+
+def test_query_library_dispatches_raw_topic_in_lexical_mode(tmp_path, monkeypatch):
+    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
+    monkeypatch.setattr(
+        "docmancer.docs.infrastructure.agent_index_gateway.RetrievalDispatcher",
+        RecordingDispatcher,
+        raising=False,
+    )
+    gateway = AgentIndexGateway(DocmancerConfig(), agent_factory=FakeAgent)
+    record = _record()
+    agent = gateway.agent_instance(record)
+    agent.store = object()
+    RecordingDispatcher.calls.clear()
+
+    filters = {"library_id": record.library_id, "resolved_version": "2.0"}
+    assert gateway.query_library(record, "Provider", budget=120, filters=filters) == "dispatch-result"
+    dispatcher_args, query, run_args = RecordingDispatcher.calls[0]
+    assert query == "Provider"
+    assert dispatcher_args == {"store": agent.store, "config": agent.config}
+    assert run_args == {"mode": "lexical", "budget": 120, "filters": filters}
+
+
+def test_query_library_preserves_the_canonical_requirement_set_for_dispatch(tmp_path, monkeypatch):
+    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
+    monkeypatch.setattr(
+        "docmancer.docs.infrastructure.agent_index_gateway.RetrievalDispatcher",
+        RecordingDispatcher,
+        raising=False,
+    )
+    gateway = AgentIndexGateway(DocmancerConfig(), agent_factory=FakeAgent)
+    record = _record()
+    agent = gateway.agent_instance(record)
+    agent.store = object()
+    requirements = build_requirements(
+        "Compare create_task with gather and explain how the scheduled task result is obtained",
+        profile="library_docs_answer",
+    )
+    RecordingDispatcher.calls.clear()
+
+    gateway.query_library(record, "Compare create_task with gather", requirements=requirements)
+
+    _, _, run_args = RecordingDispatcher.calls[0]
+    assert run_args["requirements"] is requirements
 
 
 def test_default_agent_created_by_project_does_not_hijack_library_query(tmp_path, monkeypatch):
