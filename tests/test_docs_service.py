@@ -4541,6 +4541,8 @@ def test_failed_manifest_candidates_retain_active_metadata_and_diagnostics(
     tmp_path, monkeypatch, agent, failure, expected_reason,
 ):
     service = _service(tmp_path, monkeypatch, agent)
+    active_docs_url_template = "https://docs.example.com/active/{version}/"
+    attempted_docs_url_template = "https://docs.example.com/attempted/{version}/"
     previous_manifest = normalize_resolved_github_manifest({
         "schema_version": 2, "official": True,
         "discovery": {"kind": "github_directory", "owner": "acme", "repository": "sample", "requested_ref": "v0", "resolved_commit_sha": "0" * 40, "directory": "docs"},
@@ -4550,6 +4552,7 @@ def test_failed_manifest_candidates_retain_active_metadata_and_diagnostics(
     active = service.registry.upsert(
         library="manifest-candidate-rollback", ecosystem="web", version="latest",
         source_type="guides", docs_url="https://docs.example.com/old/", now=service._now(),
+        docs_url_template=active_docs_url_template,
         status="available", target_spec={
             "source_manifest": previous_manifest,
             "active_manifest_digest": previous_manifest["digest"],
@@ -4565,12 +4568,17 @@ def test_failed_manifest_candidates_retain_active_metadata_and_diagnostics(
         "documents": [{"path": "docs/guide.md", "git_blob_sha": "3" * 40, "size": 12}],
         "complete": True, "truncated": False,
     })
-    candidate = replace(active, docs_url=attempted_manifest["documents"][0]["blob_url"], target_spec={
-        "source_manifest": attempted_manifest,
-        "active_source_manifest": previous_manifest,
-        "active_manifest_digest": previous_manifest["digest"],
-        "last_complete_manifest_digest": previous_manifest["digest"],
-    })
+    candidate = replace(
+        active,
+        docs_url=attempted_manifest["documents"][0]["blob_url"],
+        docs_url_template=attempted_docs_url_template,
+        target_spec={
+            "source_manifest": attempted_manifest,
+            "active_source_manifest": previous_manifest,
+            "active_manifest_digest": previous_manifest["digest"],
+            "last_complete_manifest_digest": previous_manifest["digest"],
+        },
+    )
     if failure == "source_set":
         monkeypatch.setattr(
             service.library_docs.registry_ops, "manifest_coverage",
@@ -4584,7 +4592,8 @@ def test_failed_manifest_candidates_retain_active_metadata_and_diagnostics(
     assert restored is not None
     assert restored.status == active.status
     assert restored.docs_url == active.docs_url
-    assert restored.docs_url_template == active.docs_url_template
+    assert restored.docs_url_template == active_docs_url_template
+    assert restored.docs_url_template != candidate.docs_url_template
     assert restored.last_refreshed_at == active.last_refreshed_at
     assert restored.target_spec is not None
     assert restored.target_spec["active_manifest_digest"] == previous_manifest["digest"]
@@ -4595,7 +4604,8 @@ def test_failed_manifest_candidates_retain_active_metadata_and_diagnostics(
     }
     inspection = service.inspect_library_docs(restored.library_id)
     assert inspection.docs_url == active.docs_url
-    assert inspection.docs_url_template == active.docs_url_template
+    assert inspection.docs_url_template == active_docs_url_template
+    assert inspection.docs_url_template != candidate.docs_url_template
     assert inspection.active_manifest_digest == previous_manifest["digest"]
     assert inspection.last_complete_manifest_digest == previous_manifest["digest"]
     assert inspection.active_generation_id == active_inspection.active_generation_id
