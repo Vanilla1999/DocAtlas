@@ -393,10 +393,7 @@ def test_support_decision_survives_all_compatibility_and_bounded_modes():
         "trust_contract": {"selected": [], "rejected": [], "risky": []},
         **support,
     }
-    support_keys = (
-        "answer_supported", "support_status", "missing_requirement_ids",
-        "selected_evidence_ids", "decision_hash",
-    )
+    support_keys = tuple(support)
     expected = {key: support[key] for key in support_keys}
 
     class Facade:

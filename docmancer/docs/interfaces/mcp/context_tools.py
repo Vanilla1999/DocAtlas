@@ -25,6 +25,14 @@ from docmancer.docs.interfaces.mcp.project_tools import _attach_output_contract,
 
 
 CONTEXT_TOOL_NAMES = {"get_docs_context"}
+SUPPORT_ENVELOPE_KEYS = (
+    "answer_supported", "answer_available", "support_status", "decision",
+    "reason_code", "missing_requirement_ids", "satisfied_requirement_ids",
+    "mandatory_requirement_ids", "mandatory_coverage", "evidence_coverage",
+    "selected_evidence_ids", "requirements_hash", "selector_config_hash",
+    "eligibility_contract_hash", "candidate_trace_hash", "selection_hash",
+    "decision_hash",
+)
 DOCUMENT_CONTENT_POLICY = {
     "role": "cited_untrusted_document_data",
     "actionable": False,
@@ -53,6 +61,18 @@ def context_tools(tools: list[dict[str, Any]]) -> list[dict[str, Any]]:
 
 def _output_mode(args: dict[str, Any]) -> str:
     return normalize_output_mode(args)
+
+
+def _support_envelope(payload: dict[str, Any]) -> dict[str, Any]:
+    if "answer_supported" not in payload:
+        return {}
+    envelope = {
+        key: payload[key]
+        for key in SUPPORT_ENVELOPE_KEYS
+        if key in payload
+    }
+    envelope["answer_available"] = bool(envelope["answer_supported"])
+    return envelope
 
 
 def _agent_instruction(answer_type: str) -> dict[str, Any]:
@@ -109,20 +129,14 @@ def _answer_payload(payload: dict[str, Any]) -> dict[str, Any]:
         "next_actions": payload.get("next_actions") or [],
         "arguments_patch": payload.get("arguments_patch"),
         "warnings": payload.get("warnings") or [],
-        "answer_supported": payload.get("answer_supported"),
-        "support_status": payload.get("support_status"),
-        "missing_requirement_ids": payload.get("missing_requirement_ids"),
-        "satisfied_requirement_ids": payload.get("satisfied_requirement_ids"),
-        "mandatory_requirement_ids": payload.get("mandatory_requirement_ids"),
-        "mandatory_coverage": payload.get("mandatory_coverage"),
-        "selected_evidence_ids": payload.get("selected_evidence_ids"),
-        "decision_hash": payload.get("decision_hash"),
         "document_content_policy": DOCUMENT_CONTENT_POLICY,
     }
     if payload.get("requires_confirmation"):
         answer["requires_confirmation"] = payload.get("requires_confirmation")
         answer["confirmation_reason"] = payload.get("confirmation_reason")
-    return {key: value for key, value in answer.items() if value not in (None, {}, [])}
+    compact = {key: value for key, value in answer.items() if value not in (None, {}, [])}
+    compact.update(_support_envelope(payload))
+    return compact
 
 
 def _compact_payload(payload: dict[str, Any]) -> dict[str, Any]:
@@ -157,14 +171,7 @@ def _compact_payload(payload: dict[str, Any]) -> dict[str, Any]:
         "confirmation_reason": payload.get("confirmation_reason"),
         "ingestion_diagnostics": payload.get("ingestion_diagnostics") or {},
         "retrieval_diagnostics": payload.get("retrieval_diagnostics") or {},
-        "answer_supported": payload.get("answer_supported"),
-        "support_status": payload.get("support_status"),
-        "missing_requirement_ids": payload.get("missing_requirement_ids"),
-        "satisfied_requirement_ids": payload.get("satisfied_requirement_ids"),
-        "mandatory_requirement_ids": payload.get("mandatory_requirement_ids"),
-        "mandatory_coverage": payload.get("mandatory_coverage"),
-        "selected_evidence_ids": payload.get("selected_evidence_ids"),
-        "decision_hash": payload.get("decision_hash"),
+        **_support_envelope(payload),
     }
 
 
@@ -299,15 +306,12 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
             raw.setdefault("retrieval_diagnostics", {})["evidence_selection"] = selection_trace
             if projection.get("status") == "insufficient_evidence" and recovery:
                 support_projection = {
-                    key: projection[key]
-                    for key in (
-                        "operational_status", "context_available", "answer_supported",
-                        "answer_available", "support_status", "reason_code",
-                        "missing_requirement_ids", "satisfied_requirement_ids",
-                        "mandatory_requirement_ids", "mandatory_coverage",
-                        "evidence_coverage", "selected_evidence_ids", "decision_hash",
-                    )
-                    if key in projection
+                    **_support_envelope(projection),
+                    **{
+                        key: projection[key]
+                        for key in ("operational_status", "context_available")
+                        if key in projection
+                    },
                 }
                 projection = project_insufficient(
                     kind="docs_answer",
@@ -316,6 +320,10 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
                     max_tokens=min(INSUFFICIENT_EVIDENCE_MAX_TOKENS, output_budget),
                 )
                 projection.update(support_projection)
+                _refresh_projection_estimate(projection)
+                if projection["estimated_tokens"] > INSUFFICIENT_EVIDENCE_MAX_TOKENS:
+                    projection.pop("recommended_next_action", None)
+                    projection.pop("missing", None)
             _refresh_projection_estimate(projection)
             validation_errors = validate_model_visible_projection(
                 projection,

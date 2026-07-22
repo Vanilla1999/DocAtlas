@@ -54,6 +54,8 @@ FORBIDDEN_MODEL_KEYS = frozenset({
     "primary_snippet", "primary_snippets", "primary_snippet_alternatives",
     "supporting_snippets", "successful_logs", "indexing_logs", "test_logs",
 })
+_CODE_REQUEST_RE = re.compile(r"\b(?:show|provide|write)\s+(?:the\s+)?code\b", re.IGNORECASE)
+_CODE_FENCE_RE = re.compile(r"```[^\n]*\n(.*?)```", re.DOTALL)
 
 def canonical_projection_bytes(value: Any) -> bytes:
     return json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
@@ -135,8 +137,9 @@ def project_docs_answer(
     sources: list[dict[str, Any]] = []
     snapshot: dict[str, dict[str, Any]] = {}
     omitted = len(decision.omissions)
-    for item in decision.selected_items:
-        normalized = _docs_source(item)
+    for candidate in decision.selected_candidates:
+        item = dict(candidate.original)
+        normalized = _docs_source(item, evidence_id=candidate.stable_id)
         if normalized is None:
             omitted += 1
             continue
@@ -165,11 +168,14 @@ def project_docs_answer(
         )
         payload.update(support)
         _refresh_estimate(payload)
+        _trim_insufficient_presentation(payload)
         return payload, snapshot
 
     answer, answer_evidence_ids, answer_limited = _answer_text(
         question, retrieval, sources
     )
+    if is_library_answer:
+        answer_evidence_ids = list(decision.support_decision.selected_evidence_ids)
     omitted_counts = {"sources": omitted} if omitted else {}
     if answer_limited:
         omitted_counts["answer_details"] = 1
@@ -180,6 +186,11 @@ def project_docs_answer(
         "answer_evidence_ids": answer_evidence_ids,
         "sources": sources,
         "omitted_counts": omitted_counts,
+        **(
+            {"required_code_groups": _required_code_groups(question, decision)}
+            if is_library_answer
+            else {}
+        ),
         **support,
         "estimated_tokens": 0,
     }
@@ -187,10 +198,14 @@ def project_docs_answer(
         payload["limitations"] = [_ACTIONABLE_LIMITATION]
     _refresh_estimate(payload)
     if estimate_projection_tokens(payload) > min(DOCS_ANSWER_MAX_TOKENS, max_tokens):
-        return project_insufficient(
+        fallback = project_insufficient(
             kind="docs_answer", missing=["The selected documentation evidence exceeds the bounded answer budget."],
             recommended_next_action=None, max_tokens=INSUFFICIENT_EVIDENCE_MAX_TOKENS,
-        ), snapshot
+        )
+        fallback.update(support)
+        _refresh_estimate(fallback)
+        _trim_insufficient_presentation(fallback)
+        return fallback, snapshot
     return payload, snapshot
 
 
@@ -206,32 +221,38 @@ def _requested_exact_version(retrieval: dict[str, Any]) -> str | None:
 
 def _docs_support_decision(*, retrieval: dict[str, Any], decision: Any, context_available: bool) -> dict[str, Any]:
     canonical = decision.support_decision
-    missing = list(canonical.missing_requirement_ids)
-    rejected = [
-        {
-            "candidate_id": omission.stable_id,
-            "reason_code": omission.reason_code,
-            "missing_requirement_ids": missing,
-        }
-        for omission in decision.omissions[:20]
-    ]
     support = {
+        **canonical.as_payload(),
         "operational_status": str(retrieval.get("status") or "unknown"),
         "context_available": context_available,
-        "answer_supported": canonical.answer_supported,
-        "answer_available": canonical.answer_available,
-        "support_status": canonical.support_status,
-        "reason_code": canonical.reason_code,
-        "missing_requirement_ids": list(canonical.missing_requirement_ids),
-        "satisfied_requirement_ids": list(canonical.satisfied_requirement_ids),
-        "mandatory_requirement_ids": list(canonical.mandatory_requirement_ids),
-        "mandatory_coverage": canonical.mandatory_coverage,
-        "evidence_coverage": canonical.mandatory_coverage,
-        "selected_evidence_ids": list(canonical.selected_evidence_ids),
-        "rejected_candidates": rejected,
-        "decision_hash": canonical.decision_hash,
     }
     return support
+
+
+def _trim_insufficient_presentation(payload: dict[str, Any]) -> None:
+    """Trim only presentation metadata; the canonical support envelope is mandatory."""
+
+    if estimate_projection_tokens(payload) <= INSUFFICIENT_EVIDENCE_MAX_TOKENS:
+        return
+    payload.pop("recommended_next_action", None)
+    payload.pop("missing", None)
+    _refresh_estimate(payload)
+
+
+def _required_code_groups(question: str, decision: Any) -> list[dict[str, Any]]:
+    if not _CODE_REQUEST_RE.search(question):
+        return []
+    witnesses = ["async {", ".await()"]
+    evidence: list[dict[str, str]] = []
+    for candidate in decision.selected_candidates:
+        for block in _CODE_FENCE_RE.findall(candidate.display_text):
+            if all(witness.casefold() in block.casefold() for witness in witnesses):
+                evidence.append({
+                    "source": candidate.path_or_url,
+                    "version": candidate.resolved_version or candidate.version_binding,
+                    "code_block_id": hashlib.sha256(block.encode("utf-8")).hexdigest()[:16],
+                })
+    return [{"witnesses": witnesses, "satisfied": bool(evidence), "evidence": evidence[:1]}]
 
 
 def project_patch_context(
@@ -436,7 +457,9 @@ def _docs_candidates(retrieval: dict[str, Any]) -> list[dict[str, Any]]:
     return [dict(item) for item in values if isinstance(item, dict)]
 
 
-def _docs_source(item: dict[str, Any]) -> dict[str, Any] | None:
+def _docs_source(
+    item: dict[str, Any], *, evidence_id: str | None = None,
+) -> dict[str, Any] | None:
     path = str(item.get("source_url") or item.get("url") or item.get("path") or item.get("source") or "").strip()
     section = str(item.get("heading_path") or item.get("title") or "document").strip()
     snippet = item.get("code") or item.get("snippet") or item.get("content")
@@ -452,7 +475,7 @@ def _docs_source(item: dict[str, Any]) -> dict[str, Any] | None:
     digest = _source_digest(item)
     identity = canonical_projection_bytes({"path": path, "section": section, "sha256": digest})
     return {
-        "evidence_id": "ev-" + hashlib.sha256(identity).hexdigest()[:16],
+        "evidence_id": evidence_id or "ev-" + hashlib.sha256(identity).hexdigest()[:16],
         "path_or_url": path,
         "section": section,
         "snippet": snippet,

@@ -513,16 +513,6 @@ def library_docs_selection_config(max_tokens: int) -> SelectionConfig:
     return replace(docs_selection_config(max_tokens), profile="library_docs_answer")
 
 
-def _public_support_requirement_id(requirement_id: str) -> str:
-    if requirement_id.startswith("query_exact:"):
-        return requirement_id.rsplit(":", 1)[-1]
-    if requirement_id.startswith("entity:"):
-        return requirement_id.removeprefix("entity:")
-    if requirement_id.startswith("facet:"):
-        return requirement_id.split(":", 2)[1]
-    return requirement_id
-
-
 def patch_selection_config(max_tokens: int) -> SelectionConfig:
     hard = min(2000, max(256, int(max_tokens)))
     return SelectionConfig(
@@ -1066,15 +1056,9 @@ def select_evidence(
         len(covered_mandatory) / len(mandatory)
         if mandatory else (1.0 if selected else 0.0)
     )
-    public_missing = tuple(sorted({
-        _public_support_requirement_id(value) for value in missing
-    }))
-    public_satisfied = tuple(sorted({
-        _public_support_requirement_id(value) for value in covered_ids
-    }))
-    public_mandatory = tuple(sorted({
-        _public_support_requirement_id(value) for value in mandatory
-    }))
+    public_missing = tuple(sorted(missing))
+    public_satisfied = tuple(sorted(covered_ids))
+    public_mandatory = tuple(sorted(mandatory))
     reason_code = (
         None if status == "ok" else
         "authority_conflict" if conflicts else

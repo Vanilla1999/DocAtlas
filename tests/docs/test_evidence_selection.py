@@ -67,6 +67,36 @@ def test_selector_returns_one_immutable_auditable_support_decision():
         support.answer_supported = False
 
 
+def test_support_decision_preserves_full_canonical_requirement_ids_without_collisions():
+    question = "When should I use async instead of launch, and how do I obtain its result?"
+    decision = select_evidence(
+        [_candidate(
+            "launch-only",
+            "launch starts fire-and-forget work and returns a Job.",
+        )],
+        question=question,
+        config=library_docs_selection_config(800),
+    )
+
+    support = decision.support_decision
+    canonical_mandatory = {
+        requirement.requirement_id
+        for requirement in decision.requirements
+        if requirement.mandatory
+    }
+
+    assert set(support.mandatory_requirement_ids) == canonical_mandatory
+    assert set(support.missing_requirement_ids) == set(decision.missing_requirements)
+    assert {
+        "entity:async",
+        "facet:comparison:async:launch",
+        "facet:result_access:async:obtain its result",
+    } <= set(support.missing_requirement_ids)
+    assert "async" not in support.missing_requirement_ids
+    assert "comparison" not in support.missing_requirement_ids
+    assert "result_access" not in support.missing_requirement_ids
+
+
 def test_requirement_set_hash_is_deterministic_under_input_ordering_differences():
     first = build_requirements(
         "Update `Client.open` with --dry-run",

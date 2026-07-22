@@ -283,10 +283,12 @@ failures={}
 
 ## 9. Verification after review/fix
 
-Исправленный review slice проверен командой:
+Phase 2.2 correction повторно проверен обязательным affected gate:
 
 ```text
-pytest -q tests/test_github_source_manifest.py tests/test_library_natural_language_retrieval.py tests/test_library_retrieval_quality_baseline.py tests/docs/test_agent_index_gateway.py tests/docs/test_evidence_selection.py tests/docs/test_model_visible_projection.py tests/test_unified_docs_context_mcp.py tests/test_diagnostic_labels.py --tb=short
+pytest -q tests/docs/test_evidence_selection.py tests/docs/test_docs_service_characterization.py tests/docs/test_model_visible_projection.py tests/test_docs_service.py tests/test_snippet_presentation.py tests/test_source_isolation_regression.py tests/test_unified_docs_context.py tests/test_unified_docs_context_mcp.py tests/test_diagnostic_labels.py --tb=short
 ```
 
-Результат: `152 passed in 2.58s`. Перед запуском `git diff --check` завершился без ошибок.
+Результат: `459 passed in 57.36s`; `git diff --check` завершился без ошибок. Отдельные provider-free probes подтвердили: canonical scoped IDs без collisions, единый selector/source/answer evidence-ID namespace, byte-identical `SupportDecision` envelope при normal/tiny budgets и невозможность snippet/presentation слоя повысить canonical abstention до supported.
+
+Полный диагностический `pytest -q --tb=short` не объявляется зелёным: `2521 passed, 1 skipped, 9 failed`. Из них пять относятся к untracked Phase 3.1 тестам со старым ожиданием коротких alias IDs или model-visible `rejected_candidates`, три — к frozen evaluation/baseline gates вне Phase 2.2, один — к ранее известному isolated Riverpod retrieval miss. Это явно сохранённый residual rollout scope; closure `BLOCKER-1` основан на обязательном Phase 2.2 gate и semantic probes, а не на ложном утверждении о полном suite pass.

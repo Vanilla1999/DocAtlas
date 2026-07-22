@@ -519,6 +519,89 @@ def test_docs_projection_preserves_underlying_support_decision_fields():
     assert projection["status"] == "insufficient_evidence"
 
 
+def test_supported_library_projection_shares_decision_and_visible_evidence_ids():
+    from docmancer.docs.application.evidence_selection import (
+        library_docs_selection_config,
+        select_evidence,
+    )
+
+    question = "Compare create_task with gather and explain how the scheduled task result is obtained"
+    candidate = {
+        "stable_id": "runtime-witness",
+        "source": "docs/runtime.md",
+        "content": (
+            "Compare create_task with gather; obtain the scheduled task result "
+            "from create_task."
+        ),
+    }
+    selection = select_evidence(
+        [candidate],
+        question=question,
+        config=library_docs_selection_config(800),
+    )
+
+    projection, _ = project_docs_answer(
+        question=question,
+        retrieval={
+            "status": "success",
+            "answer_available": True,
+            "selection_profile": "library_docs_answer",
+            "selection_decision": selection,
+            "context_pack": [candidate],
+        },
+    )
+
+    selected_ids = list(selection.support_decision.selected_evidence_ids)
+    assert projection["status"] == "ok"
+    assert [source["evidence_id"] for source in projection["sources"]] == selected_ids
+    assert projection["answer_evidence_ids"] == selected_ids
+    assert projection["selected_evidence_ids"] == selected_ids
+
+
+def test_tiny_budget_preserves_complete_canonical_support_envelope():
+    from docmancer.docs.application.evidence_selection import (
+        library_docs_selection_config,
+        select_evidence,
+    )
+
+    question = "Compare create_task with gather and explain how the scheduled task result is obtained"
+    candidate = {
+        "stable_id": "runtime-witness",
+        "source": "docs/runtime.md",
+        "content": (
+            "Compare create_task with gather; obtain the scheduled task result "
+            "from create_task."
+        ),
+    }
+    selection = select_evidence(
+        [candidate],
+        question=question,
+        config=library_docs_selection_config(800),
+    )
+    retrieval = {
+        "status": "success",
+        "answer_available": True,
+        "selection_profile": "library_docs_answer",
+        "selection_decision": selection,
+        "context_pack": [candidate],
+    }
+
+    normal, _ = project_docs_answer(
+        question=question, retrieval=retrieval, max_tokens=800,
+    )
+    tiny, _ = project_docs_answer(
+        question=question, retrieval=retrieval, max_tokens=100,
+    )
+    support_keys = tuple(selection.support_decision.as_payload())
+
+    assert {key: normal[key] for key in support_keys} == (
+        selection.support_decision.as_payload()
+    )
+    assert {key: tiny[key] for key in support_keys} == {
+        key: normal[key] for key in support_keys
+    }
+
+
 def test_patch_projection_binds_duplicate_path_sections_by_exact_evidence_id():
     evidence = [
         {
