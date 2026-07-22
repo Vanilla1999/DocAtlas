@@ -481,6 +481,14 @@ def _extract_requirement_entities_and_facets(question: str) -> tuple[tuple[str, 
     return tuple(sorted(entities)), tuple(sorted(facets))
 
 
+def _comparison_query_span(question: str, left: str, right: str) -> tuple[int, int] | None:
+    for pattern in (_LOWERCASE_COMPARISON_RE, _COMPARE_WITH_RE, _COMPARING_AND_RE):
+        for match in pattern.finditer(question):
+            if (match.group(1).casefold(), match.group(2).casefold()) == (left, right):
+                return match.start(1), match.end(2)
+    return None
+
+
 def _with_query_requirement_spans(
     question: str,
     requirements: tuple[EvidenceRequirement, ...],
@@ -496,8 +504,8 @@ def _with_query_requirement_spans(
             _, _, detail = value.partition(":")
             if value.startswith("comparison:"):
                 left, _, right = detail.partition(":")
-                start, right_start = folded.find(left), folded.find(right)
-                end = right_start + len(right) if start >= 0 and right_start >= 0 else -1
+                comparison_span = _comparison_query_span(question, left, right)
+                start, end = comparison_span if comparison_span is not None else (-1, -1)
             else:
                 _, _, phrase = detail.partition(":")
                 start, end = folded.find(phrase), -1

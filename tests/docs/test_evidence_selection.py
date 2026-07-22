@@ -84,6 +84,52 @@ def test_requirement_set_extracts_non_kotlin_comparison_and_passive_result_acces
     )
 
 
+def test_comparison_requirement_span_uses_the_matched_repeated_rhs():
+    question = (
+        "gather is familiar. Compare create_task with gather and explain how "
+        "the scheduled task result is obtained"
+    )
+
+    requirements = build_requirements(question, profile="library_docs_answer")
+    comparison = next(
+        item
+        for item in requirements
+        if item.requirement_id == "facet:comparison:create_task:gather"
+    )
+
+    assert comparison.query_span_start == question.index("create_task")
+    assert comparison.query_span_end == question.rindex("gather") + len("gather")
+    assert comparison.query_span_text == "create_task with gather"
+
+
+@pytest.mark.parametrize(
+    "question",
+    [
+        "When should I use ASYNC instead of Launch, and how do I obtain its result?",
+        (
+            "gather is familiar. Compare create_task with gather and explain how "
+            "the scheduled task result is obtained"
+        ),
+        "I am comparing create_task and gather; how is the result obtained?",
+    ],
+)
+def test_every_query_derived_library_requirement_has_one_exact_query_span(question):
+    requirements = build_requirements(question, profile="library_docs_answer")
+    query_requirements = tuple(
+        item for item in requirements if item.public_provenance == "query_exact_term"
+    )
+
+    assert query_requirements
+    assert any(item.kind == "facet" and item.value.startswith("comparison:") for item in query_requirements)
+    for requirement in query_requirements:
+        start = requirement.query_span_start
+        end = requirement.query_span_end
+        assert isinstance(start, int), requirement.requirement_id
+        assert isinstance(end, int), requirement.requirement_id
+        assert 0 <= start < end <= len(question), requirement.requirement_id
+        assert requirement.query_span_text == question[start:end], requirement.requirement_id
+
+
 def test_canonical_requirement_set_preserves_identity_spans_and_scope_through_selection():
     question = "Compare create_task with gather and explain how the scheduled task result is obtained"
     requirements = build_requirements(
