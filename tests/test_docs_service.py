@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+import hashlib
+from contextlib import nullcontext
+from dataclasses import replace
 from datetime import datetime, timedelta, timezone
 import json
 import os
@@ -17,7 +20,8 @@ from docmancer.core.config import DocmancerConfig
 from docmancer.core.models import Document, RetrievedChunk
 from docmancer.core.sqlite_store import SQLiteStore
 from docmancer.agent import DocmancerAgent
-from docmancer.docs.models import DocsChunk, DocsResult, DocsTarget, ProjectContextResult, SOURCE_CLASS_PROJECT_FILE
+from docmancer.docs.github_source_manifest import normalize_resolved_github_manifest
+from docmancer.docs.models import DocsChunk, DocsResult, ProjectContextResult, SOURCE_CLASS_PROJECT_FILE
 from docmancer.docs.interfaces.mcp.project_tools import handle_project_tool
 from docmancer.docs.registry import LibraryRegistry
 from docmancer.docs.service import DocsJobTracker, LibraryDocsService
@@ -40,6 +44,27 @@ class FakeAgent:
             store = SQLiteStore(self.config.index.db_path, self.config.index.extracted_dir)
             metadata = dict(kwargs.get("metadata") or {})
             metadata.setdefault("title", "Guide")
+            manifest = kwargs.get("source_manifest") or {}
+            if manifest.get("schema_version") == 2:
+                commit = manifest["discovery"]["resolved_commit_sha"]
+                documents = []
+                for document in manifest["documents"]:
+                    document_metadata = {
+                        **metadata,
+                        "canonical_url": document["blob_url"],
+                        "resolved_commit_sha": commit,
+                        "git_blob_sha": document["git_blob_sha"],
+                        "content_sha256": hashlib.sha256(
+                            f"# {document['path']}\nManifest fixture content.".encode("utf-8")
+                        ).hexdigest(),
+                    }
+                    documents.append(Document(
+                        source=document["blob_url"],
+                        content=f"# {document['path']}\nManifest fixture content.",
+                        metadata=document_metadata,
+                    ))
+                store.add_documents(documents, recreate=recreate)
+                return len(documents)
             store.add_documents([Document(source=docs_url.rstrip("/") + "/guide", content="# Guide\nUse parametrize for generated cases.", metadata=metadata)], recreate=recreate)
         return 1
 
@@ -58,12 +83,44 @@ class FakeAgent:
         ]
 
 
+def _add_manifest_documents(service, record, manifest, documents=None) -> None:
+    """Populate a fixture index with the exact source identities in a manifest."""
+    selected = documents if documents is not None else manifest["documents"]
+    commit = manifest["discovery"]["resolved_commit_sha"]
+    store = SQLiteStore(
+        service._index_config_for(record).index.db_path,
+        service._index_config_for(record).index.extracted_dir,
+    )
+    store.add_documents([
+        Document(
+            source=document["blob_url"],
+            content=f"# {document['path']}\nExact manifest fixture.",
+            metadata={
+                "canonical_url": document["blob_url"],
+                "resolved_commit_sha": commit,
+                "git_blob_sha": document["git_blob_sha"],
+                "content_sha256": hashlib.sha256(
+                    f"# {document['path']}\nExact manifest fixture.".encode("utf-8")
+                ).hexdigest(),
+            },
+        )
+        for document in selected
+    ], recreate=True)
+
+
 class FailingAgent(FakeAgent):
     def add(self, docs_url: str, recreate: bool = False, **kwargs) -> int:
         if "bad-version" in docs_url:
             self.add_calls.append(docs_url)
             self.add_kwargs.append(kwargs)
             raise RuntimeError("404 docs")
+        return super().add(docs_url, recreate=recreate, **kwargs)
+
+
+class FailingManifestAgent(FakeAgent):
+    def add(self, docs_url: str, recreate: bool = False, **kwargs) -> int:
+        if kwargs.get("source_manifest"):
+            raise RuntimeError("manifest fetch failed")
         return super().add(docs_url, recreate=recreate, **kwargs)
 
 
@@ -145,6 +202,14 @@ class ZeroPageAgent(FakeAgent):
         self.add_calls.append(docs_url)
         self.add_kwargs.append(kwargs)
         return 0
+
+
+class ZeroManifestAgent(FakeAgent):
+    def add(self, docs_url: str, recreate: bool = False, **kwargs) -> int:
+        if kwargs.get("source_manifest"):
+            super().add(docs_url, recreate=recreate, **kwargs)
+            return 0
+        return super().add(docs_url, recreate=recreate, **kwargs)
 
 
 class AlwaysFailingAgent(FakeAgent):
@@ -2491,6 +2556,50 @@ def test_registered_web_docs_reports_resolver_diagnostics(tmp_path, monkeypatch)
     }
 
 
+def test_library_docs_exposes_lexical_dispatch_diagnostics(tmp_path, monkeypatch):
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+    now = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    record = service.registry.upsert(
+        library="fastapi",
+        ecosystem="python",
+        docs_url="https://fastapi.tiangolo.com/",
+        now=now,
+        status="available",
+        last_refreshed_at=now,
+    )
+    _write_library_index(service, record, "# Depends\nUse Depends for callable injection.")
+
+    result = service.get_docs("fastapi", ecosystem="python", topic="Depends")
+
+    retrieval = result.diagnostics["retrieval"]
+    assert retrieval["requested"] == {
+        "mode": "lexical",
+        "raw_topic_sha256": retrieval["requested"]["raw_topic_sha256"],
+        "filters": {
+            "library_id": record.library_id,
+            **({"resolved_version": record.resolved_version or record.version}
+               if record.resolved_version or record.version else {}),
+        },
+        "record": {
+            "library_id": record.library_id,
+            "canonical_id": record.canonical_id,
+            "resolved_version": record.resolved_version or record.version,
+            "docs_snapshot_exact": record.docs_snapshot_exact,
+        },
+    }
+    assert retrieval["used"] == {
+        "mode": "lexical",
+        "candidate_counts": {"lexical": 1},
+        "failures": {},
+        "query_plan_hash": retrieval["used"]["query_plan_hash"],
+        "component_ranks": retrieval["used"]["component_ranks"],
+    }
+    assert retrieval["requested"]["raw_topic_sha256"]
+    assert retrieval["used"]["query_plan_hash"]
+    assert len(retrieval["used"]["component_ranks"]) == 1
+    assert retrieval["post_guard"] == {"before": 1, "accepted": 1, "rejected": {}, "low_value_dropped": 0}
+
+
 def test_code_example_blocks_detected_and_ranked_first(tmp_path, monkeypatch):
     service = _service(tmp_path, monkeypatch)
     now = datetime.now(timezone.utc).isoformat(timespec="seconds")
@@ -2513,7 +2622,10 @@ def test_code_example_blocks_detected_and_ranked_first(tmp_path, monkeypatch):
     result = service.get_docs("fastapi", ecosystem="python", topic="Depends callable injection")
 
     assert result.results[0].source.endswith("/depends")
-    assert result.results[0].metadata["code_snippets"] == 1
+    assert result.results[0].metadata["code_snippets"] == [
+        {"language": "python", "code": "def get_db():\n    return Depends(callable)"}
+    ]
+    assert result.results[0].metadata["code_snippet_count"] == 1
     assert result.diagnostics["code_snippets"] == 1
 
 
@@ -2885,7 +2997,7 @@ def test_query_isolation_between_two_riverpod_versions(tmp_path, monkeypatch):
         last_refreshed_at=now,
     )
 
-    result = service.get_docs("riverpod", ecosystem="pub", version="2.6.1", topic="Provider")
+    result = service.get_docs("riverpod", ecosystem="pub", version="2.6.1", topic="Riverpod")
 
     assert [chunk.content for chunk in result.results] == ["Riverpod 2 APIs."]
 
@@ -3726,7 +3838,7 @@ def test_staged_prefetch_syncs_vectors_only_from_production_index(tmp_path, monk
     assert status.status == "succeeded"
     assert agent.add_kwargs[0]["with_vectors"] is False
     assert agent.sync_calls == 1
-    assert Path(agent.sync_db_paths[0]).name != "index.db"
+    assert Path(agent.sync_db_paths[0]).parent.name.startswith(".docatlas-staging-")
 
 
 def test_cancelled_staged_prefetch_never_syncs_vectors(tmp_path, monkeypatch):
@@ -3763,19 +3875,56 @@ def test_vector_sync_failure_keeps_fts_index_and_returns_partial(tmp_path, monke
 
     for _ in range(30):
         status = service.get_docs_job_status(result.job_id)
-        if status and status.status == "partial":
+        if status and status.status == "failed":
             break
         time.sleep(0.02)
 
     record = service.registry.get("example-docs", "web", "latest")
     assert record is not None
     assert status is not None
-    assert status.status == "partial"
-    assert status.reason_code == "partial_failure"
-    assert status.retryable is True
-    assert record.last_error.startswith("vector_indexing_failed:")
-    assert service.library_docs.registry_ops.count_index_entries(record) == (1, 1)
+    assert status.status == "failed"
+    assert status.reason_code == "vector_indexing_failed"
+    assert "vector_indexing_failed" in status.message
+    assert service.library_docs.registry_ops.count_index_entries(record) == (0, 0)
 
+
+
+def test_vector_sync_failure_retains_existing_active_corpus(tmp_path, monkeypatch):
+    agent = VectorTrackingAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+
+    initial = service.prefetch_docs(
+        "example-docs", ecosystem="web", docs_url="https://example.com/docs/", async_=True,
+    )
+    for _ in range(30):
+        initial_status = service.get_docs_job_status(initial.job_id)
+        if initial_status and initial_status.status == "succeeded":
+            break
+        time.sleep(0.02)
+    record_before = service.registry.get("example-docs", "web", "latest")
+    assert record_before is not None
+    assert service.library_docs.registry_ops.count_index_entries(record_before) == (1, 1)
+    refreshed_before = record_before.last_refreshed_at
+
+    agent.fail_sync = True
+    failed = service.prefetch_docs(
+        "example-docs", ecosystem="web", docs_url="https://example.com/docs/",
+        force_refresh=True, async_=True,
+    )
+    for _ in range(30):
+        failed_status = service.get_docs_job_status(failed.job_id)
+        if failed_status and failed_status.status == "failed":
+            break
+        time.sleep(0.02)
+
+    record_after = service.registry.get("example-docs", "web", "latest")
+    assert failed_status is not None
+    assert failed_status.status == "failed"
+    assert record_after is not None
+    assert record_after.status == record_before.status
+    assert record_after.target_spec == record_before.target_spec
+    assert record_after.last_refreshed_at == refreshed_before
+    assert service.library_docs.registry_ops.count_index_entries(record_after) == (1, 1)
 
 def test_library_prefetch_job_cancellation_reaches_terminal_cancelled_state(tmp_path, monkeypatch):
     agent = SlowAgent()
@@ -4040,7 +4189,7 @@ def test_registry_commit_failure_rolls_back_published_staging_index(tmp_path, mo
         lambda *args, **kwargs: (_ for _ in ()).throw(RuntimeError("registry commit failed")),
     )
     agent.release.set()
-    for _ in range(30):
+    for _ in range(100):
         status = service.get_docs_job_status(result.job_id)
         if status and status.status == "failed":
             break
@@ -4086,7 +4235,7 @@ def test_partial_library_prefetch_job_never_reports_healthy_reason(tmp_path, mon
         async_=True,
     )
 
-    for _ in range(30):
+    for _ in range(100):
         status = service.get_docs_job_status(result.job_id)
         if status and status.status in {"partial", "failed", "succeeded"}:
             break
@@ -4123,6 +4272,462 @@ def test_prefetch_docs_targets_passes_doc_format_to_agent(tmp_path, monkeypatch)
     assert result.status == "ok"
     assert agent.add_kwargs[0]["doc_format"] == "dartdoc"
     assert agent.add_kwargs[0]["browser"] is False
+
+
+@pytest.mark.parametrize("document_count", [0, 2])
+def test_github_manifest_prefetch_and_refresh_use_one_canonical_operation(
+    tmp_path, monkeypatch, document_count,
+):
+    agent = FakeAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+    commit = "1" * 40
+    documents = [
+        {
+            "path": f"docs/guide-{index}.md",
+            "git_blob_sha": str(index + 2) * 40,
+            "size": index + 10,
+        }
+        for index in reversed(range(document_count))
+    ]
+    raw_manifest = {
+        "schema_version": 2,
+        "official": True,
+        "discovery": {
+            "kind": "github_directory",
+            "owner": "acme",
+            "repository": "sample",
+            "requested_ref": "v1",
+            "resolved_commit_sha": commit,
+            "directory": "docs",
+        },
+        "documents": documents,
+        "complete": True,
+        "truncated": False,
+        "ignored_untrusted_field": "not persisted or forwarded",
+    }
+    canonical_manifest = normalize_resolved_github_manifest(raw_manifest)
+    approved = "https://github.com/acme/sample/blob/v1/docs/approved.md"
+    target = {
+        "library": "sample",
+        "ecosystem": "web",
+        "version": "v1",
+        "source_type": "guides",
+        "docs_url": approved,
+        "allowed_domains": ["github.com"],
+        "path_prefixes": ["/acme/sample/blob/"],
+        "source_manifest": raw_manifest,
+    }
+
+    prefetch = service.prefetch_docs_targets([target], force_refresh=True)
+
+    if document_count == 0:
+        assert prefetch.status == "failed"
+        assert prefetch.results[0].status == "failed"  # type: ignore[index]
+        return
+
+    assert prefetch.status == "ok"
+    assert agent.add_calls == [canonical_manifest["documents"][0]["blob_url"]]
+    assert agent.add_kwargs[0]["source_manifest"] == canonical_manifest
+
+    agent.add_calls.clear()
+    agent.add_kwargs.clear()
+    refreshed = service.refresh_docs(
+        "sample",
+        ecosystem="web",
+        version="v1",
+        source_type="guides",
+        force=True,
+    )
+
+    assert refreshed.status == "updated"
+    assert agent.add_calls == [canonical_manifest["documents"][0]["blob_url"]]
+    assert agent.add_kwargs[0]["source_manifest"] == canonical_manifest
+    persisted = service.registry.get("sample", "web", "v1", "guides")
+    assert persisted is not None
+    assert persisted.target_spec is not None
+    assert persisted.target_spec["active_manifest_digest"] == canonical_manifest["digest"]
+    assert persisted.target_spec["last_attempt_manifest_digest"] == canonical_manifest["digest"]
+    assert persisted.target_spec["last_complete_manifest_digest"] == canonical_manifest["digest"]
+
+
+def test_prefetch_resolves_approved_github_directory_before_indexing(tmp_path, monkeypatch):
+    agent = FakeAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+    commit = "1" * 40
+    commit_response = MagicMock(status_code=200, content=b'{}')
+    commit_response.json.return_value = {"sha": commit}
+    listing_response = MagicMock(status_code=200, content=b'[]')
+    listing_response.json.return_value = [
+        {"path": "docs/a.md", "type": "file", "sha": "2" * 40, "size": 1}
+    ]
+    client = MagicMock()
+    client.get.side_effect = [commit_response, listing_response]
+    service.docs_targets.github_api_client_factory = lambda: nullcontext(client)
+
+    result = service.prefetch_docs_targets(
+        [{
+            "library": "sample",
+            "ecosystem": "web",
+            "version": "v1",
+            "source_type": "guides",
+            "docs_url": "https://github.com/acme/sample/blob/v1/docs/a.md",
+            "allowed_domains": ["github.com"],
+            "path_prefixes": ["/acme/sample/blob/"],
+            "source_manifest": {
+                "schema_version": 2,
+                "official": True,
+                "discovery": {
+                    "kind": "github_directory", "owner": "acme", "repository": "sample",
+                    "requested_ref": "v1", "directory": "docs",
+                },
+            },
+        }],
+        force_refresh=True,
+    )
+
+    assert result.status == "ok"
+    assert len(client.get.call_args_list) == 2
+    manifest = agent.add_kwargs[0]["source_manifest"]
+    assert manifest["complete"] is True
+    assert manifest["discovery"]["resolved_commit_sha"] == commit
+    assert agent.add_calls == [manifest["documents"][0]["blob_url"]]
+    record = service.registry.get("sample", "web", "v1", "guides")
+    assert record is not None
+    assert record.target_spec is not None
+    assert record.target_spec["active_manifest_digest"] == manifest["digest"]
+    assert record.target_spec["last_attempt_manifest_digest"] == manifest["digest"]
+    assert record.target_spec["last_complete_manifest_digest"] == manifest["digest"]
+    assert record.target_spec["ingestion_policy_version"] == 1
+    inspection = service.inspect_library_docs(record.library_id)
+    assert inspection.active_manifest_digest == manifest["digest"]
+    assert inspection.last_attempt_manifest_digest == manifest["digest"]
+    assert inspection.last_complete_manifest_digest == manifest["digest"]
+
+
+def test_manifest_prefetch_replaces_prior_library_corpus(tmp_path, monkeypatch):
+    agent = FakeAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+    before = service.registry.upsert(
+        library="manifest-library",
+        ecosystem="web",
+        version="latest",
+        source_type="guides",
+        docs_url="https://docs.example.com/old/",
+        now=service._now(),
+        status="available",
+    )
+    service._agent_instance(before).add("https://docs.example.com/old/")
+    assert service.library_docs.registry_ops.count_index_entries(before) == (1, 1)
+
+    raw_manifest = {
+        "schema_version": 2,
+        "official": True,
+        "discovery": {
+            "kind": "github_directory",
+            "owner": "acme",
+            "repository": "sample",
+            "requested_ref": "v1",
+            "resolved_commit_sha": "1" * 40,
+            "directory": "docs",
+        },
+        "documents": [{"path": "docs/guide.md", "git_blob_sha": "2" * 40, "size": 12}],
+        "complete": True,
+        "truncated": False,
+    }
+    result = service.prefetch_docs_targets(
+        [{
+            "library": "manifest-library",
+            "ecosystem": "web",
+            "version": "latest",
+            "source_type": "guides",
+            "docs_url": "https://github.com/acme/sample/blob/v1/docs/guide.md",
+            "allowed_domains": ["github.com"],
+            "path_prefixes": ["/acme/sample/blob/"],
+            "source_manifest": normalize_resolved_github_manifest(raw_manifest),
+        }],
+        force_refresh=True,
+        async_=False,
+    )
+
+    record = service.registry.get("manifest-library", "web", "latest", "guides")
+    assert result.status == "ok", result.results[0].message  # type: ignore[union-attr]
+    assert record is not None
+    assert service.library_docs.registry_ops.count_index_entries(record) == (1, 1)
+
+
+def test_failed_manifest_prefetch_keeps_active_library_corpus(tmp_path, monkeypatch):
+    agent = FailingManifestAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+    previous_manifest = normalize_resolved_github_manifest({
+        "schema_version": 2,
+        "official": True,
+        "discovery": {
+            "kind": "github_directory", "owner": "acme", "repository": "sample",
+            "requested_ref": "v0", "resolved_commit_sha": "0" * 40, "directory": "docs",
+        },
+        "documents": [{"path": "docs/old.md", "git_blob_sha": "1" * 40, "size": 12}],
+        "complete": True,
+        "truncated": False,
+    })
+    record = service.registry.upsert(
+        library="manifest-rollback",
+        ecosystem="web",
+        version="latest",
+        source_type="guides",
+        docs_url="https://docs.example.com/old/",
+        now=service._now(),
+        status="available",
+        target_spec={
+            "source_manifest": previous_manifest,
+            "active_manifest_digest": previous_manifest["digest"],
+            "last_attempt_manifest_digest": previous_manifest["digest"],
+            "last_complete_manifest_digest": previous_manifest["digest"],
+        },
+    )
+    service._agent_instance(record).add("https://docs.example.com/old/")
+    assert service.library_docs.registry_ops.count_index_entries(record) == (1, 1)
+    attempted_manifest = normalize_resolved_github_manifest({
+        "schema_version": 2,
+        "official": True,
+        "discovery": {
+            "kind": "github_directory", "owner": "acme", "repository": "sample",
+            "requested_ref": "v1", "resolved_commit_sha": "2" * 40, "directory": "docs",
+        },
+        "documents": [{"path": "docs/guide.md", "git_blob_sha": "3" * 40, "size": 12}],
+        "complete": True,
+        "truncated": False,
+    })
+
+    result = service.prefetch_docs_targets(
+        [{
+            "library": "manifest-rollback",
+            "ecosystem": "web",
+            "version": "latest",
+            "source_type": "guides",
+            "docs_url": "https://github.com/acme/sample/blob/v1/docs/guide.md",
+            "allowed_domains": ["github.com"],
+            "path_prefixes": ["/acme/sample/blob/"],
+            "source_manifest": attempted_manifest,
+        }],
+        force_refresh=True,
+        async_=False,
+    )
+
+    active = service.registry.get("manifest-rollback", "web", "latest", "guides")
+    assert result.status == "failed"
+    assert active is not None
+    assert active.status == "available"
+    assert service.library_docs.registry_ops.count_index_entries(active) == (1, 1)
+    assert active.target_spec is not None
+    assert active.target_spec["active_manifest_digest"] == previous_manifest["digest"]
+    assert active.target_spec["last_complete_manifest_digest"] == previous_manifest["digest"]
+    assert active.target_spec["last_attempt_manifest_digest"] == attempted_manifest["digest"]
+    assert active.target_spec["last_attempt_manifest_diagnostics"] == {
+        "attempted_manifest_digest": attempted_manifest["digest"],
+        "reason_code": "indexing_failed",
+    }
+
+
+@pytest.mark.parametrize(
+    ("agent", "failure", "expected_reason"),
+    [
+        (ZeroManifestAgent(), "no_chunks", "no_extractable_content"),
+        (FakeAgent(), "source_set", "manifest_source_set_mismatch"),
+        (VectorTrackingAgent(fail_sync=True), "vector", "vector_indexing_failed"),
+    ],
+)
+def test_failed_manifest_candidates_retain_active_metadata_and_diagnostics(
+    tmp_path, monkeypatch, agent, failure, expected_reason,
+):
+    service = _service(tmp_path, monkeypatch, agent)
+    previous_manifest = normalize_resolved_github_manifest({
+        "schema_version": 2, "official": True,
+        "discovery": {"kind": "github_directory", "owner": "acme", "repository": "sample", "requested_ref": "v0", "resolved_commit_sha": "0" * 40, "directory": "docs"},
+        "documents": [{"path": "docs/old.md", "git_blob_sha": "1" * 40, "size": 12}],
+        "complete": True, "truncated": False,
+    })
+    active = service.registry.upsert(
+        library="manifest-candidate-rollback", ecosystem="web", version="latest",
+        source_type="guides", docs_url="https://docs.example.com/old/", now=service._now(),
+        status="available", target_spec={
+            "source_manifest": previous_manifest,
+            "active_manifest_digest": previous_manifest["digest"],
+            "last_complete_manifest_digest": previous_manifest["digest"],
+        },
+    )
+    service._agent_instance(active).add("https://docs.example.com/old/")
+    attempted_manifest = normalize_resolved_github_manifest({
+        "schema_version": 2, "official": True,
+        "discovery": {"kind": "github_directory", "owner": "acme", "repository": "sample", "requested_ref": "v1", "resolved_commit_sha": "2" * 40, "directory": "docs"},
+        "documents": [{"path": "docs/guide.md", "git_blob_sha": "3" * 40, "size": 12}],
+        "complete": True, "truncated": False,
+    })
+    candidate = replace(active, docs_url=attempted_manifest["documents"][0]["blob_url"], target_spec={
+        "source_manifest": attempted_manifest,
+        "active_source_manifest": previous_manifest,
+        "active_manifest_digest": previous_manifest["digest"],
+        "last_complete_manifest_digest": previous_manifest["digest"],
+    })
+    if failure == "source_set":
+        monkeypatch.setattr(
+            service.library_docs.registry_ops, "manifest_coverage",
+            lambda *args, **kwargs: (1, 0, 1, 0, attempted_manifest["digest"]),
+        )
+
+    result = service._refresh_record_unlocked(candidate, force=True)
+
+    restored = service.registry.get(active.library_id, source_type=active.source_type)
+    assert result.status in {"failed", "empty_index"}
+    assert restored is not None
+    assert restored.status == active.status
+    assert restored.docs_url == active.docs_url
+    assert restored.last_refreshed_at == active.last_refreshed_at
+    assert restored.target_spec is not None
+    assert restored.target_spec["active_manifest_digest"] == previous_manifest["digest"]
+    assert restored.target_spec["last_complete_manifest_digest"] == previous_manifest["digest"]
+    assert restored.target_spec["last_attempt_manifest_diagnostics"] == {
+        "attempted_manifest_digest": attempted_manifest["digest"],
+        "reason_code": expected_reason,
+    }
+
+
+def test_inspect_library_docs_reports_complete_manifest_coverage(tmp_path, monkeypatch):
+    agent = FakeAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+    manifest = normalize_resolved_github_manifest({
+        "schema_version": 2,
+        "official": True,
+        "discovery": {
+            "kind": "github_directory", "owner": "acme", "repository": "sample",
+            "requested_ref": "v1", "resolved_commit_sha": "1" * 40, "directory": "docs",
+        },
+        "documents": [{"path": "docs/guide.md", "git_blob_sha": "2" * 40, "size": 12}],
+        "complete": True,
+        "truncated": False,
+    })
+    record = service.registry.upsert(
+        library="manifest-health", ecosystem="web", version="latest", source_type="guides",
+        docs_url="https://github.com/acme/sample/blob/v1/docs/guide.md",
+        now=service._now(), status="available", last_refreshed_at=service._now(),
+        target_spec={"source_manifest": manifest},
+    )
+    _add_manifest_documents(service, record, manifest)
+
+    result = service.inspect_library_docs(record.library_id)
+
+    assert result.status == "indexed"
+    assert result.manifest_expected == 1
+    assert result.manifest_indexed == 1
+    assert result.manifest_missing == 0
+    assert result.manifest_stale_orphans == 0
+    assert result.active_manifest_digest == manifest["digest"]
+
+
+def test_inspect_library_docs_marks_old_manifest_policy_needs_refresh(tmp_path, monkeypatch):
+    agent = FakeAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+    manifest = normalize_resolved_github_manifest({
+        "schema_version": 2,
+        "official": True,
+        "discovery": {
+            "kind": "github_directory", "owner": "acme", "repository": "sample",
+            "requested_ref": "v1", "resolved_commit_sha": "1" * 40, "directory": "docs",
+        },
+        "documents": [{"path": "docs/guide.md", "git_blob_sha": "2" * 40, "size": 12}],
+        "complete": True,
+        "truncated": False,
+    })
+    record = service.registry.upsert(
+        library="manifest-old-policy", ecosystem="web", version="latest", source_type="guides",
+        docs_url="https://github.com/acme/sample/blob/v1/docs/guide.md",
+        now=service._now(), status="available", last_refreshed_at=service._now(),
+        target_spec={"source_manifest": manifest, "ingestion_policy_version": 0},
+    )
+    _add_manifest_documents(service, record, manifest)
+
+    result = service.inspect_library_docs(record.library_id)
+
+    assert result.status == "needs_refresh"
+    assert result.reason_code == "needs_refresh"
+
+
+def test_inspect_library_docs_marks_incomplete_manifest_unhealthy(tmp_path, monkeypatch):
+    agent = FakeAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+    manifest = normalize_resolved_github_manifest({
+        "schema_version": 2,
+        "official": True,
+        "discovery": {
+            "kind": "github_directory", "owner": "acme", "repository": "sample",
+            "requested_ref": "v1", "resolved_commit_sha": "1" * 40, "directory": "docs",
+        },
+        "documents": [
+            {"path": "docs/guide.md", "git_blob_sha": "2" * 40, "size": 12},
+            {"path": "docs/extra.md", "git_blob_sha": "3" * 40, "size": 12},
+        ],
+        "complete": True,
+        "truncated": False,
+    })
+    record = service.registry.upsert(
+        library="manifest-incomplete", ecosystem="web", version="latest", source_type="guides",
+        docs_url="https://github.com/acme/sample/blob/v1/docs/guide.md",
+        now=service._now(), status="available", last_refreshed_at=service._now(),
+        target_spec={"source_manifest": manifest},
+    )
+    _add_manifest_documents(service, record, manifest, manifest["documents"][:1])
+    store = SQLiteStore(
+        service._index_config_for(record).index.db_path,
+        service._index_config_for(record).index.extracted_dir,
+    )
+    store.add_documents([Document(
+        source="https://github.com/acme/sample/blob/" + "1" * 40 + "/docs/stale.md",
+        content="# stale\nWrong manifest source.",
+        metadata={
+            "canonical_url": "https://github.com/acme/sample/blob/" + "1" * 40 + "/docs/stale.md",
+            "resolved_commit_sha": "1" * 40,
+            "git_blob_sha": "4" * 40,
+        },
+    )])
+
+    result = service.inspect_library_docs(record.library_id)
+
+    assert result.status == "corpus_incomplete"
+    assert result.reason_code == "corpus_incomplete"
+    assert result.manifest_expected == 2
+    assert result.manifest_indexed == 1
+    assert result.manifest_missing == 1
+    assert result.manifest_stale_orphans == 1
+
+
+def test_inspect_library_docs_marks_truncated_manifest_unhealthy(tmp_path, monkeypatch):
+    agent = FakeAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+    manifest = normalize_resolved_github_manifest({
+        "schema_version": 2,
+        "official": True,
+        "discovery": {
+            "kind": "github_directory", "owner": "acme", "repository": "sample",
+            "requested_ref": "v1", "resolved_commit_sha": "1" * 40, "directory": "docs",
+        },
+        "documents": [{"path": "docs/guide.md", "git_blob_sha": "2" * 40, "size": 12}],
+        "complete": False,
+        "truncated": True,
+    })
+    record = service.registry.upsert(
+        library="manifest-truncated", ecosystem="web", version="latest", source_type="guides",
+        docs_url="https://github.com/acme/sample/blob/v1/docs/guide.md",
+        now=service._now(), status="available", last_refreshed_at=service._now(),
+        target_spec={"source_manifest": manifest},
+    )
+    _add_manifest_documents(service, record, manifest)
+
+    result = service.inspect_library_docs(record.library_id)
+
+    assert result.status == "corpus_incomplete"
+    assert result.reason_code == "corpus_incomplete"
+    assert result.manifest_expected == 1
+    assert result.manifest_indexed == 1
+    assert result.manifest_missing == 0
 
 
 def test_docs_job_status_changes_to_succeeded_and_tracks_counts(tmp_path, monkeypatch):

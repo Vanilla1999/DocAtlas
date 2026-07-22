@@ -8,6 +8,7 @@ SOURCE_CLASS_PROJECT_FILE = "project_file"
 SOURCE_CLASS_LOCAL_MEMORY = "local_memory"
 SOURCE_CLASS_DEPENDENCY_DOCS = "dependency_docs"
 SOURCE_CLASS_PUBLIC_DOCS = "public_docs"
+MANIFEST_INGESTION_POLICY_VERSION = 1
 SOURCE_CLASSES = {
     SOURCE_CLASS_PROJECT_FILE,
     SOURCE_CLASS_LOCAL_MEMORY,
@@ -285,6 +286,13 @@ class DocsInspectResult:
     stale: bool = False
     pages: int = 0
     chunks: int = 0
+    manifest_expected: int = 0
+    manifest_indexed: int = 0
+    manifest_missing: int = 0
+    manifest_stale_orphans: int = 0
+    active_manifest_digest: str | None = None
+    last_attempt_manifest_digest: str | None = None
+    last_complete_manifest_digest: str | None = None
     reason_code: str = ""
     size_bytes: int = 0
     warnings: list[str] = field(default_factory=list)

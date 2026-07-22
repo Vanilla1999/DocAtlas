@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from contextlib import nullcontext
+
 import json
 import logging
 import os
@@ -12,7 +14,8 @@ import time
 
 import httpx
 
-from docmancer.docs.models import RefreshResult
+from docmancer.docs.models import MANIFEST_INGESTION_POLICY_VERSION, RefreshResult
+from docmancer.docs.github_source_manifest import normalize_resolved_github_manifest
 from docmancer.docs.fetch_policy import DocsFetchSecurityError
 from docmancer.docs.registry import LibraryRecord
 from docmancer.docs.dart_official_docs import build_dart_diagnostics, canonical_dart_ecosystem
@@ -154,6 +157,47 @@ def _metadata_for_record(record: LibraryRecord) -> dict[str, Any]:
     return {key: value for key, value in metadata.items() if value is not None}
 
 
+def _manifest_attempt_spec(target_spec: dict | None) -> dict:
+    spec = dict(target_spec or {})
+    manifest = spec.get("source_manifest") or {}
+    digest = manifest.get("digest") if manifest.get("schema_version") == 2 else None
+    if digest:
+        spec["last_attempt_manifest_digest"] = digest
+    return spec
+
+
+def _rollback_safe_manifest_spec(target_spec: dict | None) -> dict:
+    spec = dict(target_spec or {})
+    active_manifest = spec.pop("active_source_manifest", None)
+    if active_manifest is not None:
+        spec["source_manifest"] = active_manifest
+    return spec
+
+
+def _manifest_rollback_spec(target_spec: dict | None, reason_code: str) -> dict:
+    """Keep the active manifest while recording one bounded failed candidate outcome."""
+    spec = _rollback_safe_manifest_spec(target_spec)
+    attempted_digest = spec.get("last_attempt_manifest_digest")
+    if attempted_digest:
+        spec["last_attempt_manifest_diagnostics"] = {
+            "attempted_manifest_digest": attempted_digest,
+            "reason_code": reason_code,
+        }
+    return spec
+
+
+def _published_manifest_spec(target_spec: dict | None) -> dict:
+    spec = dict(target_spec or {})
+    spec.pop("active_source_manifest", None)
+    manifest = spec.get("source_manifest") or {}
+    digest = manifest.get("digest") if manifest.get("schema_version") == 2 else None
+    if digest and manifest.get("complete") is True and not manifest.get("truncated"):
+        spec["active_manifest_digest"] = digest
+        spec["last_complete_manifest_digest"] = digest
+        spec["ingestion_policy_version"] = MANIFEST_INGESTION_POLICY_VERSION
+    return spec
+
+
 class LibraryRefreshOps:
     """Refresh and prefetch operations for registered library docs."""
 
@@ -185,6 +229,23 @@ class LibraryRefreshOps:
     def __getattr__(self, name: str) -> Any:
         return getattr(self.dependencies, name)
 
+    def _persist_manifest_rollback_diagnostics(self, record: LibraryRecord, reason_code: str) -> None:
+        if (record.target_spec or {}).get("last_attempt_manifest_digest") is None:
+            return
+        active = self.registry.get(record.library_id, source_type=record.source_type)
+        self.registry.upsert(
+            library=record.name,
+            ecosystem=record.ecosystem,
+            version=record.version,
+            docs_url=active.docs_url if active is not None else record.docs_url,
+            docs_url_template=(
+                active.docs_url_template if active is not None else record.docs_url_template
+            ),
+            source_type=record.source_type,
+            now=self._now(),
+            target_spec=_manifest_rollback_spec(record.target_spec, reason_code),
+        )
+
     def refresh_record(
         self,
         record: LibraryRecord,
@@ -193,6 +254,7 @@ class LibraryRefreshOps:
         should_cancel: Callable[[], bool] | None = None,
         begin_commit: Callable[[], bool] | None = None,
         staging_owner: dict[str, str] | None = None,
+        lock_held: bool = False,
     ) -> RefreshResult:
         started = time.monotonic()
         if not record.docs_url:
@@ -221,20 +283,47 @@ class LibraryRefreshOps:
                 targets_completed=1,
             )
 
-        staging = self._create_staging_index(record, staging_owner=staging_owner) if should_cancel else None
+        target = self._target_from_record(record)
+        manifest = (
+            normalize_resolved_github_manifest(target.source_manifest)
+            if target.source_manifest.get("schema_version") == 2 else None
+        )
+        if manifest:
+            active = self.registry.get(record.library_id, source_type=record.source_type)
+            attempted_target_spec = _manifest_attempt_spec(record.target_spec)
+            persisted_attempt_spec = _rollback_safe_manifest_spec(attempted_target_spec)
+            self.registry.upsert(
+                library=record.name,
+                ecosystem=record.ecosystem,
+                version=record.version,
+                docs_url=active.docs_url if active is not None else record.docs_url,
+                docs_url_template=(
+                    active.docs_url_template if active is not None else record.docs_url_template
+                ),
+                source_type=record.source_type,
+                now=self._now(),
+                target_spec=persisted_attempt_spec,
+            )
+            record = LibraryRecord(**{**record.__dict__, "target_spec": attempted_target_spec})
+        staging = self._create_staging_index(
+            record,
+            staging_owner=staging_owner,
+            empty=bool(manifest),
+        ) if should_cancel or manifest else None
 
         sections_indexed = 0
         discovery_diagnostics: list[dict[str, Any]] = []
         fetch_failure: Exception | None = None
         try:
-            target = self._target_from_record(record)
             urls = self._record_urls(record)
             seed_urls_for_discovery = list(target.seed_urls)
             if seed_urls_for_discovery and (target.docs_url or target.docs_url_template):
                 urls = urls[:1]
             per_url_max_pages = target.max_pages if target.doc_format == "dartdoc" else (1 if target.seed_urls and not target.docs_url and not target.docs_url_template else target.max_pages)
             agent = self.agent_gateway.agent_for_config(staging[0]) if staging else self._agent_instance(record)
-            for url in urls:
+
+            operation_urls = urls[:1] if manifest else urls
+            for url in operation_urls:
                 indexed_sections = agent.add(
                     url,
                     recreate=False,
@@ -245,6 +334,7 @@ class LibraryRefreshOps:
                     path_prefixes=target.path_prefixes,
                     metadata=_metadata_for_record(record),
                     cancellation_callback=should_cancel,
+                    source_manifest=manifest,
                     with_vectors=False if staging else True,
                 )
                 if isinstance(indexed_sections, int):
@@ -264,7 +354,9 @@ class LibraryRefreshOps:
             retryable = _retryable_failure(exc, reason_code)
             message = _safe_failure_message(exc, reason_code)
             logger.warning("Refresh failed for record %s: %s", record.library_id, reason_code)
-            if not retryable:
+            if manifest:
+                self._persist_manifest_rollback_diagnostics(record, reason_code)
+            if not retryable and index_empty:
                 self.registry.upsert(
                     library=record.name,
                     ecosystem=record.ecosystem,
@@ -275,7 +367,7 @@ class LibraryRefreshOps:
                     now=self._now(),
                     status="failed",
                     last_error=message,
-                    target_spec=record.target_spec,
+                    target_spec=_manifest_rollback_spec(record.target_spec, reason_code),
                 )
             return RefreshResult(
                 library_id=record.library_id,
@@ -325,13 +417,36 @@ class LibraryRefreshOps:
             self._discard_staging(staging)
             return self._cancelled_result(record, started)
 
+        if manifest and staging is not None:
+            _, _, manifest_missing, manifest_stale_orphans, _ = self.registry_ops.manifest_coverage(
+                record,
+                pages_after,
+                config=staging[0],
+            )
+            if manifest_missing or manifest_stale_orphans:
+                self._discard_staging(staging)
+                self._persist_manifest_rollback_diagnostics(record, "manifest_source_set_mismatch")
+                return RefreshResult(
+                    library_id=record.library_id,
+                    status="failed",
+                    docs_url=record.docs_url,
+                    last_refreshed_at=record.last_refreshed_at,
+                    version=record.version,
+                    source_type=record.source_type,
+                    message="manifest_source_set_mismatch: retained the previous active corpus.",
+                    duration_ms=int((time.monotonic() - started) * 1000),
+                    targets_failed=1,
+                )
+
         vector_failure: Exception | None = None
 
         def _sync_vectors_before_commit() -> None:
             nonlocal vector_failure
+            if staging is None:
+                return
             try:
-                production_agent = self._agent_instance(record)
-                sync_vectors = getattr(production_agent, "sync_vectors", None)
+                staging_agent = self.agent_gateway.agent_for_config(staging[0])
+                sync_vectors = getattr(staging_agent, "sync_vectors", None)
                 if callable(sync_vectors):
                     sync_vectors()
             except Exception as exc:
@@ -339,22 +454,33 @@ class LibraryRefreshOps:
 
         def _commit_registry(**values: Any) -> Any:
             def update() -> Any:
-                if vector_failure is not None:
-                    values["last_error"] = f"vector_indexing_failed: {vector_failure}"
                 return self.registry.upsert(**values)
 
-            post_publish = _sync_vectors_before_commit if staging and sections_indexed > 0 else None
             return self._publish_staging_and_update(
                 record,
                 staging,
                 update,
                 commit_guard=begin_commit,
-                post_publish=post_publish,
+                lock_held=lock_held,
             )
 
         if sections_indexed == 0 or pages_after == 0 or chunks_after == 0:
             refreshed_at = self._now()
             reason = "ingest_produced_no_chunks" if sections_indexed > 0 else "no_extractable_content"
+            if staging is not None and not index_empty:
+                self._discard_staging(staging)
+                self._persist_manifest_rollback_diagnostics(record, reason)
+                return RefreshResult(
+                    library_id=record.library_id,
+                    status="empty_index",
+                    docs_url=record.docs_url,
+                    last_refreshed_at=record.last_refreshed_at,
+                    version=record.version,
+                    source_type=record.source_type,
+                    message=f"{reason}: retained the previous active corpus.",
+                    duration_ms=int((time.monotonic() - started) * 1000),
+                    targets_failed=1,
+                )
             _commit_registry(
                 library=record.name,
                 ecosystem=record.ecosystem,
@@ -366,7 +492,7 @@ class LibraryRefreshOps:
                 status="empty_index",
                 last_refreshed_at=record.last_refreshed_at,
                 last_error=reason,
-                target_spec=record.target_spec,
+                target_spec=_rollback_safe_manifest_spec(record.target_spec),
             )
             index_config = self._index_config_for(record) if hasattr(self, "_index_config_for") else None
             db_path = str(Path(index_config.index.db_path).resolve()) if index_config and index_config.index else None
@@ -404,6 +530,24 @@ class LibraryRefreshOps:
                 },
             )
 
+        if staging is not None and sections_indexed > 0:
+            _sync_vectors_before_commit()
+            if vector_failure is not None:
+                self._discard_staging(staging)
+                self._persist_manifest_rollback_diagnostics(record, "vector_indexing_failed")
+                return RefreshResult(
+                    library_id=record.library_id,
+                    status="failed",
+                    docs_url=record.docs_url,
+                    last_refreshed_at=record.last_refreshed_at,
+                    version=record.version,
+                    source_type=record.source_type,
+                    message=f"vector_indexing_failed: retained the previous active corpus: {vector_failure}",
+                    duration_ms=int((time.monotonic() - started) * 1000),
+                    targets_failed=1,
+                    reason_codes=["vector_indexing_failed"],
+                )
+
         refreshed_at = self._now()
         _commit_registry(
             library=record.name,
@@ -416,26 +560,8 @@ class LibraryRefreshOps:
             status="available",
             last_refreshed_at=refreshed_at,
             last_error="",
-            target_spec=record.target_spec,
+            target_spec=_published_manifest_spec(record.target_spec),
         )
-
-        if vector_failure is not None:
-            message = f"vector_indexing_failed: {vector_failure}"
-            return RefreshResult(
-                library_id=record.library_id,
-                status="partial",
-                docs_url=record.docs_url,
-                last_refreshed_at=refreshed_at,
-                version=record.version,
-                source_type=record.source_type,
-                message=message,
-                duration_ms=int((time.monotonic() - started) * 1000),
-                pages_indexed=pages_after,
-                pages_failed=page_failures,
-                chunks_indexed=chunks_after,
-                targets_completed=1,
-                reason_codes=["vector_indexing_failed"],
-            )
 
         # Build preindex diagnostics
         index_config = self._index_config_for(record)
@@ -651,7 +777,7 @@ class LibraryRefreshOps:
             )
         with self._lock_for(record.library_id):
             record = self.registry.get(record.library_id, None, source_type=record.source_type) or record
-            return self.refresh_record(record, force=force)
+            return self.refresh_record(record, force=force, lock_held=True)
 
     def prefetch_docs(
         self,
@@ -711,6 +837,7 @@ class LibraryRefreshOps:
         record: LibraryRecord,
         *,
         staging_owner: dict[str, str] | None = None,
+        empty: bool = False,
     ) -> tuple[Any, Path]:
         production = self._index_config_for(record)
         db_path = Path(production.index.db_path)
@@ -724,11 +851,11 @@ class LibraryRefreshOps:
         staging.index.db_path = str(root / "index.db")
         staging.index.extracted_dir = str(root / "extracted")
         try:
-            if db_path.exists():
+            if db_path.exists() and not empty:
                 with sqlite3.connect(db_path) as source, sqlite3.connect(staging.index.db_path) as destination:
                     source.backup(destination)
             extracted = Path(production.index.extracted_dir)
-            if extracted.exists():
+            if extracted.exists() and not empty:
                 shutil.copytree(extracted, staging.index.extracted_dir)
         except Exception:
             shutil.rmtree(root, ignore_errors=True)
@@ -755,6 +882,7 @@ class LibraryRefreshOps:
         registry_update: Callable[[], Any],
         commit_guard: Callable[[], bool] | None = None,
         post_publish: Callable[[], None] | None = None,
+        lock_held: bool = False,
     ) -> Any:
         if staging is None:
             return registry_update()
@@ -777,7 +905,7 @@ class LibraryRefreshOps:
         extracted_published = False
         registry_changed = False
         result: Any = None
-        with self._lock_for(record.library_id):
+        with nullcontext() if lock_held else self._lock_for(record.library_id):
             try:
                 def require_active_generation() -> None:
                     if commit_guard is not None and not commit_guard():

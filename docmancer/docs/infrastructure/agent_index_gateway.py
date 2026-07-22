@@ -6,6 +6,7 @@ from docmancer.core.config import DocmancerConfig
 from docmancer.docs.registry import LibraryRecord
 from docmancer.docs.resolver import normalize_library_name
 from docmancer.mcp import paths
+from docmancer.retrieval.dispatch import RetrievalDispatcher
 
 
 class AgentIndexGateway:
@@ -48,6 +49,25 @@ class AgentIndexGateway:
     def agent_for_config(self, config: DocmancerConfig) -> Any:
         """Create an uncached agent for an isolated staging index."""
         return self._agent_factory(config=config)
+
+    def query_library(
+        self,
+        record: LibraryRecord,
+        topic: str,
+        *,
+        budget: int | None = None,
+        filters: dict[str, Any] | None = None,
+    ) -> Any:
+        """Run the dispatcher against the isolated index for one library record."""
+        agent = self.agent_instance(record)
+        if not hasattr(agent, "store"):
+            return agent.query(topic, budget=budget)
+        return RetrievalDispatcher(store=agent.store, config=agent.config).run(
+            topic,
+            mode="lexical",
+            budget=budget,
+            filters=filters,
+        )
 
     def drop_library_agent(self, record_or_library_id: LibraryRecord | str) -> None:
         if isinstance(record_or_library_id, LibraryRecord):
