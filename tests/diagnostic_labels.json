@@ -228,7 +228,7 @@
     "tests/docs/test_docs_service_characterization.py": "25e9ca2a93fc47594b90213e1721fb4aa78e4926cf3b4744cc3299b3efdce7ed",
     "tests/docs/test_docs_target_service.py": "77e6fb036142ade3e9bdfdaf8e873933f8b75cd41b45d5bebf8f9f8543e489c5",
     "tests/docs/test_documented_cli_contract.py": "d7eaff517ba35ccb62a38b1648ce3f7d8ea2c39526d98c4880f963047a1f5cb8",
-    "tests/docs/test_evidence_selection.py": "7308b48c2e7c4ca82bdf2de623dd74ad486fc9c69fc1447baa7ff600b1b67978",
+    "tests/docs/test_evidence_selection.py": "d70bb60a5879429bded386d601e53329e26a87e65b646fe21bfee62e3d4611a0",
     "tests/docs/test_filesystem_locks.py": "03f0471042c68a8d12436b5d02c16377e83be3303821829082ff9802fee9d275",
     "tests/docs/test_library_docs_service.py": "1aab24e59160221924f3457587f6c9b535ef7276d5088a277be6ae6cf27635ed",
     "tests/docs/test_library_job_executor.py": "7cea5c314072ca415a95ec5258e31be657ba4a5c4585366bcfed283ebd5c9bf9",

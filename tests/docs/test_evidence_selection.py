@@ -102,15 +102,33 @@ def test_comparison_requirement_span_uses_the_matched_repeated_rhs():
     assert comparison.query_span_text == "create_task with gather"
 
 
+def test_backticked_comparison_requirement_span_uses_the_raw_matched_identifiers():
+    question = "Compare `create_task` with `gather`"
+
+    requirements = build_requirements(question, profile="library_docs_answer")
+    comparison = next(
+        item
+        for item in requirements
+        if item.requirement_id == "facet:comparison:create_task:gather"
+    )
+
+    assert comparison.query_span_start == question.index("`create_task`")
+    assert comparison.query_span_end == question.index("`gather`") + len("`gather`")
+    assert comparison.query_span_text == "`create_task` with `gather`"
+
+
 @pytest.mark.parametrize(
     "question",
     [
         "When should I use ASYNC instead of Launch, and how do I obtain its result?",
+        "When should I use `ASYNC` instead of `Launch`, and how do I obtain its result?",
         (
             "gather is familiar. Compare create_task with gather and explain how "
             "the scheduled task result is obtained"
         ),
+        "Compare `create_task` with `gather` and explain how the result is obtained",
         "I am comparing create_task and gather; how is the result obtained?",
+        "I am comparing `create_task` and `gather`; how is the result obtained?",
     ],
 )
 def test_every_query_derived_library_requirement_has_one_exact_query_span(question):

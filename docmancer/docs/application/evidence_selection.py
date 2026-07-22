@@ -21,12 +21,17 @@ SELECTOR_SCHEMA_VERSION = "budget-aware-evidence-selector-v2"
 MAX_SELECTOR_CANDIDATES = 20
 _HEX_SHA256 = re.compile(r"^[0-9a-f]{64}$")
 _TOKEN_RE = re.compile(r"[\w.+:/-]+", re.UNICODE)
+_COMPARISON_IDENTIFIER = r"(?<![a-z0-9_`])(`?[a-z][a-z0-9_]*`?)(?![a-z0-9_`])"
 _LOWERCASE_COMPARISON_RE = re.compile(
-    r"\b([a-z][a-z0-9_]*)\s+instead\s+of\s+([a-z][a-z0-9_]*)\b",
+    rf"{_COMPARISON_IDENTIFIER}\s+instead\s+of\s+{_COMPARISON_IDENTIFIER}",
     re.IGNORECASE,
 )
-_COMPARE_WITH_RE = re.compile(r"\bcompare\s+([a-z][a-z0-9_]*)\s+with\s+([a-z][a-z0-9_]*)\b", re.IGNORECASE)
-_COMPARING_AND_RE = re.compile(r"\bcomparing\s+([a-z][a-z0-9_]*)\s+and\s+([a-z][a-z0-9_]*)\b", re.IGNORECASE)
+_COMPARE_WITH_RE = re.compile(
+    rf"\bcompare\s+{_COMPARISON_IDENTIFIER}\s+with\s+{_COMPARISON_IDENTIFIER}", re.IGNORECASE,
+)
+_COMPARING_AND_RE = re.compile(
+    rf"\bcomparing\s+{_COMPARISON_IDENTIFIER}\s+and\s+{_COMPARISON_IDENTIFIER}", re.IGNORECASE,
+)
 _RESULT_ACCESS_RE = re.compile(r"\b(?:obtain|get|retrieve)\s+(?:its|the)\s+result\b", re.IGNORECASE)
 _PASSIVE_RESULT_ACCESS_RE = re.compile(
     r"\b(?:the\s+)?(?:scheduled\s+task\s+)?result\s+is\s+obtained\b", re.IGNORECASE,
@@ -465,13 +470,12 @@ def patch_selection_config(max_tokens: int) -> SelectionConfig:
 
 
 def _extract_requirement_entities_and_facets(question: str) -> tuple[tuple[str, ...], tuple[str, ...]]:
-    question = question.replace("`", "")
     entities: set[str] = set()
     facets: set[str] = set()
     comparison_entities: list[str] = []
     for pattern in (_LOWERCASE_COMPARISON_RE, _COMPARE_WITH_RE, _COMPARING_AND_RE):
         for match in pattern.finditer(question):
-            left, right = (match.group(1).casefold(), match.group(2).casefold())
+            left, right = (match.group(1).strip("`").casefold(), match.group(2).strip("`").casefold())
             entities.update((left, right))
             comparison_entities.append(left)
             facets.add(f"comparison:{left}:{right}")
@@ -484,7 +488,8 @@ def _extract_requirement_entities_and_facets(question: str) -> tuple[tuple[str, 
 def _comparison_query_span(question: str, left: str, right: str) -> tuple[int, int] | None:
     for pattern in (_LOWERCASE_COMPARISON_RE, _COMPARE_WITH_RE, _COMPARING_AND_RE):
         for match in pattern.finditer(question):
-            if (match.group(1).casefold(), match.group(2).casefold()) == (left, right):
+            matched_values = (match.group(1).strip("`").casefold(), match.group(2).strip("`").casefold())
+            if matched_values == (left, right):
                 return match.start(1), match.end(2)
     return None
 
