@@ -49,6 +49,7 @@ _ALLOWED_REQUIREMENT_PROVENANCE = frozenset({
     "required_evidence_paths",
     "required_target_paths",
     "exact_dependency_binding",
+    "selector_scope_requirement",
     "canonical_policy_requirement",
     "disclosed_authority_version_conflict",
 })
@@ -268,6 +269,9 @@ class EvidenceRequirement:
     # Hash-bound provenance from the pure query analyser; it does not alter
     # selection semantics.
     query_extraction_kind: str | None = None
+    query_span_start: int | None = None
+    query_span_end: int | None = None
+    query_span_text: str | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -282,6 +286,7 @@ class EvidenceRequirementSet(Sequence[EvidenceRequirement]):
     required_entities: tuple[str, ...] = ()
     required_facets: tuple[str, ...] = ()
     query_extraction_provenance: tuple[tuple[str, str, str], ...] = ()
+    query_requirement_spans: tuple[tuple[str, int, int, str], ...] = ()
 
     def __post_init__(self) -> None:
         canonical_requirements = tuple(sorted(self.requirements, key=lambda item: item.requirement_id))
@@ -297,10 +302,24 @@ class EvidenceRequirementSet(Sequence[EvidenceRequirement]):
                 (str(requirement_id), str(kind), str(value).casefold())
                 for requirement_id, kind, value in self.query_extraction_provenance
             }))
+        spans = tuple(sorted({
+            (item.requirement_id, item.query_span_start, item.query_span_end, item.query_span_text)
+            for item in canonical_requirements
+            if item.query_span_start is not None
+            and item.query_span_end is not None
+            and item.query_span_text is not None
+        }))
+        if self.query_requirement_spans:
+            spans = tuple(sorted({
+                (str(requirement_id), int(start), int(end), str(text))
+                for requirement_id, start, end, text in self.query_requirement_spans
+                if int(start) >= 0 and int(end) > int(start) and str(text)
+            }))
         object.__setattr__(self, "requirements", canonical_requirements)
         object.__setattr__(self, "required_entities", entities)
         object.__setattr__(self, "required_facets", facets)
         object.__setattr__(self, "query_extraction_provenance", provenance)
+        object.__setattr__(self, "query_requirement_spans", spans)
 
     def __len__(self) -> int:
         return len(self.requirements)
@@ -321,6 +340,7 @@ class EvidenceRequirementSet(Sequence[EvidenceRequirement]):
             "required_entities": list(self.required_entities),
             "required_facets": list(self.required_facets),
             "query_extraction_provenance": [list(item) for item in self.query_extraction_provenance],
+            "query_requirement_spans": [list(item) for item in self.query_requirement_spans],
         }
 
     @property
@@ -461,6 +481,41 @@ def _extract_requirement_entities_and_facets(question: str) -> tuple[tuple[str, 
     return tuple(sorted(entities)), tuple(sorted(facets))
 
 
+def _with_query_requirement_spans(
+    question: str,
+    requirements: tuple[EvidenceRequirement, ...],
+) -> tuple[EvidenceRequirement, ...]:
+    folded = question.casefold()
+    spanned: list[EvidenceRequirement] = []
+    for requirement in requirements:
+        if requirement.public_provenance != "query_exact_term":
+            spanned.append(requirement)
+            continue
+        value = requirement.value.casefold()
+        if requirement.kind == "facet":
+            _, _, detail = value.partition(":")
+            if value.startswith("comparison:"):
+                left, _, right = detail.partition(":")
+                start, right_start = folded.find(left), folded.find(right)
+                end = right_start + len(right) if start >= 0 and right_start >= 0 else -1
+            else:
+                _, _, phrase = detail.partition(":")
+                start, end = folded.find(phrase), -1
+                if start >= 0:
+                    end = start + len(phrase)
+        else:
+            start, end = folded.find(value), -1
+            if start >= 0:
+                end = start + len(value)
+        spanned.append(replace(
+            requirement,
+            query_span_start=start if start >= 0 else None,
+            query_span_end=end if end > start else None,
+            query_span_text=question[start:end] if start >= 0 and end > start else None,
+        ))
+    return tuple(spanned)
+
+
 def build_requirements(
     question: str,
     *,
@@ -468,6 +523,9 @@ def build_requirements(
     required_target_paths: Iterable[str] = (),
     public_requirements: Iterable[Mapping[str, Any] | str] = (),
     exact_version: str | None = None,
+    exact_snapshot_required: bool = False,
+    project_identity: str | None = None,
+    module_id: str | None = None,
     profile: Literal["generic", "library_docs_answer"] = "generic",
     library_requirement_contract: Mapping[str, Iterable[str]] | None = None,
 ) -> EvidenceRequirementSet:
@@ -517,6 +575,18 @@ def build_requirements(
             value=str(exact_version), public_provenance="exact_dependency_binding",
             version_binding=str(exact_version),
         ))
+    for kind, value in (
+        ("exact_snapshot", "true" if exact_snapshot_required else ""),
+        ("project_identity", project_identity or ""),
+        ("module_id", module_id or ""),
+    ):
+        if str(value).strip():
+            requirements.append(EvidenceRequirement(
+                requirement_id=f"{kind}:{str(value).strip()}",
+                kind=kind,
+                value=str(value).strip(),
+                public_provenance="selector_scope_requirement",
+            ))
     for index, raw in enumerate(sorted(public_requirements, key=canonical_hash)):
         if isinstance(raw, Mapping):
             value = str(raw.get("value") or raw.get("text") or "").strip()
@@ -560,8 +630,11 @@ def build_requirements(
                 requirement_id="library_query_coverage", kind="unsupported_query", value="",
                 public_provenance="query_exact_term", query_extraction_kind="no_canonical_library_requirement",
             )
+    canonical_requirements = _with_query_requirement_spans(
+        question, tuple(unique[key] for key in sorted(unique))
+    )
     return EvidenceRequirementSet(
-        tuple(unique[key] for key in sorted(unique)),
+        canonical_requirements,
         required_entities=entities,
         required_facets=facets,
     )
@@ -721,9 +794,18 @@ def select_evidence(
             public_requirements=public_requirements,
             library_requirement_contract=library_requirement_contract,
             exact_version=exact_version,
+            project_identity=project_identity,
+            module_id=module_id,
             profile=config.profile,
         )
     )
+    canonical_project_identity = _scope_requirement_value(requirements, "project_identity")
+    canonical_module_id = _scope_requirement_value(requirements, "module_id")
+    if isinstance(requirements, EvidenceRequirementSet):
+        if project_identity and canonical_project_identity != project_identity:
+            raise ValueError("canonical requirements must contain the requested project identity")
+        if module_id and canonical_module_id != module_id:
+            raise ValueError("canonical requirements must contain the requested module id")
     invalid_provenance = sorted({
         item.public_provenance
         for item in requirements
@@ -813,13 +895,13 @@ def select_evidence(
     }])
     eligible, hard_omissions, critical_failures = _eligible_candidates(
         raw_candidates, trust_contract or {}, requirements,
-        project_identity=project_identity, module_id=module_id,
+        project_identity=canonical_project_identity, module_id=canonical_module_id,
         result_kind=config.result_kind, question=question,
     )
     omissions.extend(hard_omissions)
-    requirements = EvidenceRequirementSet(_with_canonical_policy_requirements(
-        requirements, eligible, config.result_kind
-    ))
+    policy_requirements = _with_canonical_policy_requirements(requirements, eligible, config.result_kind)
+    if policy_requirements != requirements.requirements:
+        requirements = EvidenceRequirementSet(policy_requirements)
     covered = [_with_coverage(candidate, requirements) for candidate in eligible]
     mandatory_ids = {item.requirement_id for item in requirements if item.mandatory}
     ordered = sorted(covered, key=lambda candidate: (
@@ -958,6 +1040,15 @@ def validate_evidence_sufficiency(
     if expected != decision.selection_hash:
         errors.append("selection hash does not match the decision")
     return errors
+
+
+def _scope_requirement_value(
+    requirements: Sequence[EvidenceRequirement], kind: str,
+) -> str | None:
+    values = {item.value for item in requirements if item.kind == kind and item.mandatory}
+    if len(values) > 1:
+        raise ValueError(f"canonical requirements contain conflicting {kind} scope")
+    return next(iter(values), None)
 
 
 def _eligible_candidates(
@@ -1130,6 +1221,12 @@ def _with_coverage(candidate: EvidenceCandidate, requirements: Sequence[Evidence
             matches = source == wanted or source.endswith("/" + wanted) or wanted.endswith("/" + source)
         elif requirement.kind == "exact_version":
             matches = candidate.resolved_version.casefold() == value and _version_rank(candidate.version_binding) == 0
+        elif requirement.kind == "exact_snapshot":
+            matches = candidate.docs_snapshot_exact is True
+        elif requirement.kind == "project_identity":
+            matches = candidate.project_identity == requirement.value
+        elif requirement.kind == "module_id":
+            matches = candidate.module_id == requirement.value
         elif requirement.kind == "exact_term":
             matches = requirement_value_visible(requirement.value, haystack)
         elif requirement.kind == "entity":

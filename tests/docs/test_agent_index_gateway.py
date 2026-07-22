@@ -140,6 +140,9 @@ def test_query_library_preserves_the_canonical_requirement_set_for_dispatch(tmp_
     requirements = build_requirements(
         "Compare create_task with gather and explain how the scheduled task result is obtained",
         profile="library_docs_answer",
+        exact_snapshot_required=True,
+        project_identity="project:example",
+        module_id="runtime",
     )
     RecordingDispatcher.calls.clear()
 
@@ -147,6 +150,8 @@ def test_query_library_preserves_the_canonical_requirement_set_for_dispatch(tmp_
 
     _, _, run_args = RecordingDispatcher.calls[0]
     assert run_args["requirements"] is requirements
+    assert run_args["requirements"].requirements_hash == requirements.requirements_hash
+    assert run_args["requirements"].query_requirement_spans == requirements.query_requirement_spans
 
 
 def test_default_agent_created_by_project_does_not_hijack_library_query(tmp_path, monkeypatch):

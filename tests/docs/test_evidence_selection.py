@@ -84,6 +84,43 @@ def test_requirement_set_extracts_non_kotlin_comparison_and_passive_result_acces
     )
 
 
+def test_canonical_requirement_set_preserves_identity_spans_and_scope_through_selection():
+    question = "Compare create_task with gather and explain how the scheduled task result is obtained"
+    requirements = build_requirements(
+        question,
+        profile="library_docs_answer",
+        required_evidence_paths=["docs/runtime.md"],
+        exact_version="3.12",
+        exact_snapshot_required=True,
+        project_identity="project:example",
+        module_id="runtime",
+    )
+
+    decision = select_evidence(
+        [_candidate(
+            "runtime",
+            "create_task schedules work while gather combines tasks and obtains the result.",
+            source="docs/runtime.md",
+            version="3.12",
+            docs_snapshot_exact=True,
+            project_identity="project:example",
+            module_id="runtime",
+        )],
+        question=question,
+        config=library_docs_selection_config(800),
+        requirements=requirements,
+    )
+
+    assert decision.requirements is requirements
+    assert decision.requirements.requirements_hash == requirements.requirements_hash
+    assert requirements.query_requirement_spans
+    assert all(start >= 0 and end > start for _, start, end, _ in requirements.query_requirement_spans)
+    assert {item.kind for item in requirements} >= {
+        "evidence_path", "exact_version", "exact_snapshot", "project_identity", "module_id",
+    }
+    assert requirements.hash_payload["query_requirement_spans"] == [list(item) for item in requirements.query_requirement_spans]
+
+
 def test_library_docs_profile_requires_one_item_to_cover_query_entities_and_facets():
     complete = select_evidence(
         [_candidate(

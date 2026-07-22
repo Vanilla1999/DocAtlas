@@ -67,6 +67,9 @@ def test_query_plan_preserves_the_canonical_requirement_set_and_uses_its_entitie
     requirements = build_requirements(
         "Compare create_task with gather and explain how the scheduled task result is obtained",
         profile="library_docs_answer",
+        exact_snapshot_required=True,
+        project_identity="project:example",
+        module_id="runtime",
     )
 
     plan = build_query_plan(
@@ -76,6 +79,8 @@ def test_query_plan_preserves_the_canonical_requirement_set_and_uses_its_entitie
 
     assert plan.requirements is requirements
     assert plan.requirements_hash == requirements.requirements_hash
+    assert requirements.query_requirement_spans
+    assert {item.kind for item in requirements} >= {"exact_snapshot", "project_identity", "module_id"}
     assert {term.normalized_value for term in plan.exact_terms} >= {"create_task", "gather"}
 
 
