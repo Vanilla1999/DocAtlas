@@ -285,10 +285,19 @@ class LibraryRefreshOps:
 
         target = self._target_from_record(record)
         source_manifest = target.source_manifest or {}
-        if source_manifest.get("schema_version") == 2 and "documents" not in source_manifest:
-            for field in ("complete", "truncated"):
-                if field in source_manifest and type(source_manifest[field]) is not bool:
-                    raise ValueError(f"{field} must be a boolean")
+        discovery = source_manifest.get("discovery")
+        unresolved_github_directory = (
+            source_manifest.get("schema_version") == 2
+            and "documents" not in source_manifest
+            and not any(
+                field in source_manifest
+                for field in ("complete", "truncated", "digest", "reason_code")
+            )
+            and isinstance(discovery, dict)
+            and discovery.get("kind") == "github_directory"
+            and "resolved_commit_sha" not in discovery
+        )
+        if unresolved_github_directory:
             target = self._resolve_github_directory_target(target)
             resolved_urls, target_error = self._target_urls(target)
             if target_error:
