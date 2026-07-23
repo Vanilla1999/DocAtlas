@@ -276,6 +276,9 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
         for key in ("tool", "status", "reason_code", "message", "response_style", "primary_snippet", "primary_snippets", "primary_snippet_confidence", "primary_snippet_selection_reason", "primary_snippet_alternatives", "supporting_snippets", "snippet_metrics"):
             if hasattr(result, key):
                 raw[key] = getattr(result, key)
+    canonical_support = getattr(canonical_selection, "support_decision", None)
+    if canonical_support is not None:
+        raw.update(canonical_support.as_payload())
     raw = _align_trust_contract_with_snippets(raw)
     if _clean_string(args.get("library")):
         raw.setdefault("selection_profile", "library_docs_answer")
@@ -321,6 +324,7 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
                 bound_insufficient_projection(projection, max_tokens=output_budget)
             if projection.get("status") == "insufficient_evidence":
                 bound_insufficient_projection(projection, max_tokens=output_budget)
+            _omit_nullable_reason_code(projection)
             _refresh_projection_estimate(projection)
             validation_errors = validate_model_visible_projection(
                 projection,
@@ -384,6 +388,8 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
                 recommended_next_action=recovery,
                 max_tokens=min(INSUFFICIENT_EVIDENCE_MAX_TOKENS, output_budget),
             )
+        _omit_nullable_reason_code(projection)
+        _refresh_projection_estimate(projection)
         projection_errors = validate_model_visible_projection(
             projection,
             snapshot=snapshot,
@@ -397,6 +403,7 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
             return _bad_request("invalid_model_visible_projection", "; ".join(projection_errors))
         _record_model_visible_bytes(raw, projection)
         return projection
+    _omit_nullable_reason_code(raw)
     mode = _output_mode(args)
     if mode == "full":
         raw["output_mode"] = "full"
@@ -404,7 +411,13 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
     payload = raw if mode == "debug" else (_compact_payload(raw) if mode == "compact" else _answer_payload(raw))
     payload["output_mode"] = mode
     payload = _compact_mcp_payload(payload, page=_bounded_int_arg(args, "page", default=1, max_value=10_000), page_size=_bounded_int_arg(args, "page_size", default=None, max_value=20), include_sections=args.get("include_sections"))
+    _omit_nullable_reason_code(payload)
     return _attach_output_contract(payload, output_mode=mode) if mode == "debug" else _strip_mcp_debug_noise(payload)
+
+
+def _omit_nullable_reason_code(payload: dict[str, Any]) -> None:
+    if payload.get("reason_code") is None:
+        payload.pop("reason_code", None)
 
 
 def _bounded_recovery_action(payload: dict[str, Any]) -> dict[str, Any] | None:

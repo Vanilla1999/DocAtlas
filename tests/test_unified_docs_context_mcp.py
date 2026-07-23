@@ -391,10 +391,13 @@ def test_support_decision_survives_all_compatibility_and_bounded_modes():
         "selection_decision": selection,
         "context_pack": [candidate],
         "trust_contract": {"selected": [], "rejected": [], "risky": []},
-        **support,
     }
     support_keys = tuple(support)
     expected = {key: support[key] for key in support_keys}
+    public_schema = next(
+        tool["outputSchema"] for tool in TOOLS
+        if tool["name"] == "get_docs_context"
+    )
 
     class Facade:
         def get_docs_context(self, question, **kwargs):
@@ -413,7 +416,16 @@ def test_support_decision_survives_all_compatibility_and_bounded_modes():
     assert expected["decision_hash"]
     assert expected["selected_evidence_ids"]
     for result in observed:
-        assert {key: result[key] for key in support_keys} == expected
+        assert {
+            key: result[key] for key in support_keys
+            if key != "reason_code"
+        } == {
+            key: value for key, value in expected.items()
+            if key != "reason_code"
+        }
+        if "reason_code" in result:
+            assert isinstance(result["reason_code"], str)
+        jsonschema.validate(result, public_schema)
     assert observed[-1]["status"] == "insufficient_evidence"
 
 
