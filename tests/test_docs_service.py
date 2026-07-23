@@ -3797,6 +3797,99 @@ def test_prepare_library_docs_queues_network_ingest_and_keeps_status_responsive(
     agent.release.set()
 
 
+def test_prepare_library_docs_resolves_curated_github_manifest_before_indexing(tmp_path, monkeypatch):
+    agent = FakeAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+    commit = "62137874ff26dd74d2fea80ff528a7fd9ca7a5e7"
+    commit_response = MagicMock(status_code=200, content=b"{}")
+    commit_response.json.return_value = {"sha": commit}
+    listing_response = MagicMock(status_code=200, content=b"[]")
+    listing_response.json.return_value = [
+        {"path": "docs/index.md", "type": "file", "sha": "2" * 40, "size": 12}
+    ]
+    client = MagicMock()
+    client.get.side_effect = [commit_response, listing_response]
+    service.docs_targets.github_api_client_factory = lambda: nullcontext(client)
+
+    payload = call_docs_tool_payload(
+        "prepare_docs",
+        {
+            "action": "prefetch_library_docs",
+            "library": "mcp",
+            "ecosystem": "python",
+            "version": "1.27.2",
+        },
+        service,
+    )
+
+    status = None
+    for _ in range(50):
+        status = service.get_docs_job_status(payload["job_id"])
+        if status and status.status in {"succeeded", "failed"}:
+            break
+        time.sleep(0.02)
+
+    assert status is not None
+    assert status.status == "succeeded", status.message
+    assert len(client.get.call_args_list) == 2
+    manifest = agent.add_kwargs[0]["source_manifest"]
+    assert manifest["complete"] is True
+    assert manifest["truncated"] is False
+    assert manifest["discovery"]["resolved_commit_sha"] == commit
+    assert status.completed_pages == 1
+    assert status.failed_pages == 0
+
+
+def test_library_prefetch_rejects_non_boolean_curated_manifest_completion(tmp_path, monkeypatch):
+    service = _service(tmp_path, monkeypatch, FakeAgent())
+    info = service.resolve_library("mcp", ecosystem="python", version="1.27.2")
+    assert info.library_id is not None
+    record = service.registry.get(info.library_id, source_type="api")
+    assert record is not None
+    target_spec = dict(record.target_spec or {})
+    target_spec["source_manifest"] = {
+        **target_spec["source_manifest"],
+        "complete": "true",
+    }
+    service.registry.restore(replace(record, target_spec=target_spec))
+    resolver_calls = []
+
+    def resolve(target):
+        resolver_calls.append(target)
+        return replace(
+            target,
+            source_manifest=normalize_resolved_github_manifest({
+                "schema_version": 2,
+                "official": True,
+                "discovery": {
+                    "kind": "github_directory",
+                    "owner": "modelcontextprotocol",
+                    "repository": "python-sdk",
+                    "requested_ref": "62137874ff26dd74d2fea80ff528a7fd9ca7a5e7",
+                    "resolved_commit_sha": "62137874ff26dd74d2fea80ff528a7fd9ca7a5e7",
+                    "directory": "docs",
+                },
+                "documents": [
+                    {"path": "docs/index.md", "git_blob_sha": "2" * 40, "size": 12}
+                ],
+                "complete": True,
+                "truncated": False,
+            }),
+        )
+
+    monkeypatch.setattr(service.docs_targets, "resolve_github_directory_target", resolve)
+
+    with pytest.raises(ValueError, match="complete must be a boolean"):
+        service.prefetch_docs(
+            "mcp",
+            ecosystem="python",
+            versions=["1.27.2"],
+            force_refresh=True,
+        )
+
+    assert resolver_calls == []
+
+
 def test_successful_library_prefetch_atomically_publishes_staged_index(tmp_path, monkeypatch):
     service = _service(tmp_path, monkeypatch, FakeAgent())
     result = service.prefetch_docs(

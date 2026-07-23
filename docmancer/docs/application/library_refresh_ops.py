@@ -284,6 +284,22 @@ class LibraryRefreshOps:
             )
 
         target = self._target_from_record(record)
+        source_manifest = target.source_manifest or {}
+        if source_manifest.get("schema_version") == 2 and "documents" not in source_manifest:
+            for field in ("complete", "truncated"):
+                if field in source_manifest and type(source_manifest[field]) is not bool:
+                    raise ValueError(f"{field} must be a boolean")
+            target = self._resolve_github_directory_target(target)
+            resolved_urls, target_error = self._target_urls(target)
+            if target_error:
+                raise ValueError(target_error)
+            resolved_spec = self._target_to_spec(target, resolved_urls)
+            record = LibraryRecord(
+                **{
+                    **record.__dict__,
+                    "target_spec": {**(record.target_spec or {}), **resolved_spec},
+                }
+            )
         manifest = (
             normalize_resolved_github_manifest(target.source_manifest)
             if target.source_manifest.get("schema_version") == 2 else None
