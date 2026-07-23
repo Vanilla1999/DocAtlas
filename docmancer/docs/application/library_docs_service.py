@@ -1853,9 +1853,18 @@ _ANCHOR_RE = re.compile(r"\s*\[¶\]")
 _EMOJI_RE = re.compile("[\U0001F300-\U0001FAFF\U00002700-\U000027BF]")
 _TERM_RE = re.compile(r"[A-Za-z0-9_]+")
 _EXPLICIT_QUERY_LIST_RE = re.compile(
-    r"\bwhat\s+do\s+([^?]{1,200}?)\s+mean\b",
+    r"\b(?:"
+    r"what\s+do|explain|(?:give\s+)?(?:the\s+)?(?:meaning|semantics)\s+of|"
+    r"describe\s+(?:these\s+)?(?:[A-Za-z_][A-Za-z0-9_.]*\s+)?"
+    r"(?:attributes?|properties?|symbols?|fields?)"
+    r")\s*:?\s+([^?;.]{1,200}?)(?=\s+(?:mean|for|in|when|while|after|before|using|with)\b|[?;.]|$)",
+    re.IGNORECASE | re.DOTALL,
+)
+_EXPLICIT_QUERY_LIST_SEPARATOR_RE = re.compile(
+    r"\s*(?:,\s*(?:and\b|or\b)?|/|\bplus\b|\band\b|\bor\b)\s*",
     re.IGNORECASE,
 )
+_EXPLICIT_QUERY_SYMBOL_RE = re.compile(r"`?([A-Za-z_][A-Za-z0-9_.:]*)`?")
 _RST_SYMBOL_DIRECTIVE_RE = re.compile(
     r"^\.\.\s+(module|function|method|attribute|class|exception)::\s+(.+?)\s*$",
     re.MULTILINE,
@@ -1878,11 +1887,12 @@ def _query_terms(query: str | None) -> set[str]:
 def _explicit_library_query_values(query: str) -> list[str]:
     values: set[str] = set()
     for match in _EXPLICIT_QUERY_LIST_RE.finditer(query):
-        values.update(
-            token
-            for token in _TERM_RE.findall(match.group(1))
-            if token.casefold() not in {"and", "or"}
-        )
+        items = _EXPLICIT_QUERY_LIST_SEPARATOR_RE.split(match.group(1).strip())
+        if len(items) < 2:
+            continue
+        symbols = [_EXPLICIT_QUERY_SYMBOL_RE.fullmatch(item.strip()) for item in items]
+        if all(symbols):
+            values.update(symbol.group(1) for symbol in symbols if symbol is not None)
     return sorted(values, key=str.casefold)
 
 

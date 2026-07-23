@@ -234,6 +234,21 @@ ZLIB_EVIDENCE_QUESTION = (
     "and what do eof, unused_data, and unconsumed_tail mean? Return source-backed evidence only."
 )
 
+ZLIB_EVIDENCE_PARAPHRASES = (
+    (
+        "How does Python 3.13 zlib.Decompress.decompress(data, max_length) limit returned output? "
+        "Explain eof plus unused_data and unconsumed_tail."
+    ),
+    (
+        "For Python 3.13 zlib.Decompress.decompress(data, max_length), describe these "
+        "Decompress attributes: eof, unused_data, and unconsumed_tail."
+    ),
+    (
+        "In Python 3.13, explain max_length for zlib.Decompress.decompress(data, max_length); "
+        "give the meaning of eof / unused_data / unconsumed_tail."
+    ),
+)
+
 
 def _oversized_zlib_source() -> str:
     return "\n".join([
@@ -389,6 +404,89 @@ def test_exact_python_source_derives_bounded_canonical_zlib_evidence(tmp_path, m
         snapshot={},
         max_tokens=256,
     ) == []
+
+
+@pytest.mark.parametrize("question", ZLIB_EVIDENCE_PARAPHRASES)
+def test_python_semantic_list_paraphrases_require_all_named_zlib_attributes(
+    tmp_path,
+    monkeypatch,
+    question,
+):
+    service = _zlib_fixture_service(tmp_path, monkeypatch)
+
+    result = service.get_docs(
+        "python",
+        ecosystem="python",
+        version="3.13",
+        source_type="api",
+        topic=question,
+    )
+    repeated = service.get_docs(
+        "python",
+        ecosystem="python",
+        version="3.13",
+        source_type="api",
+        topic=question,
+    )
+    projection = _public_library_projection(question, result)
+
+    requirement_values = {requirement.value for requirement in result.requirements}
+    assert requirement_values >= {
+        "zlib.Decompress.decompress",
+        "max_length",
+        "eof",
+        "unused_data",
+        "unconsumed_tail",
+    }
+    assert result.answer_supported is True
+    assert result.answer_available is True
+    assert result.support_status == "supported"
+    assert result.mandatory_coverage == 1.0
+    assert result.missing_requirement_ids == []
+    assert result.selected_evidence_ids
+    assert result.decision_hash
+    assert repeated.selected_evidence_ids == result.selected_evidence_ids
+    assert repeated.decision_hash == result.decision_hash
+    assert result.library_id == "python:python@3.13:api"
+    assert result.resolved_version == "3.13"
+    assert {chunk.source for chunk in result.results} == {
+        "https://docs.python.org/3.13/_sources/library/zlib.rst.txt"
+    }
+    assert projection["status"] == "ok"
+    assert projection["selected_evidence_ids"] == result.selected_evidence_ids
+    assert projection["decision_hash"] == result.decision_hash
+
+
+def test_unrelated_eof_prose_does_not_create_a_typed_requirement_or_support(
+    tmp_path,
+    monkeypatch,
+):
+    service = _zlib_fixture_service(tmp_path, monkeypatch)
+    question = (
+        "The diagnostic log happened to mention eof as background. How does Python 3.13 "
+        "zlib.Decompress.nonexistent_api(data) work?"
+    )
+
+    result = service.get_docs(
+        "python",
+        ecosystem="python",
+        version="3.13",
+        source_type="api",
+        topic=question,
+    )
+    projection = _public_library_projection(question, result, max_tokens=256)
+
+    assert not result.requirements or "eof" not in {
+        requirement.value.casefold() for requirement in result.requirements
+    }
+    assert result.answer_supported is False
+    assert result.answer_available is False
+    assert result.selected_evidence_ids == []
+    assert result.decision_hash is None
+    assert projection["status"] == "insufficient_evidence"
+    assert projection["selected_evidence_ids"] == []
+    assert projection["decision_hash"] is None
+    assert "sources" not in projection
 
 
 def _python_direct_text_result(
