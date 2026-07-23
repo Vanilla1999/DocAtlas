@@ -3,6 +3,8 @@ from __future__ import annotations
 from datetime import datetime, timezone
 from pathlib import Path
 
+import pytest
+
 from docmancer.core.config import DocmancerConfig
 from docmancer.core.models import RetrievedChunk
 from docmancer.docs.application.docs_job_service import DocsJobTracker
@@ -219,6 +221,165 @@ def test_python_direct_text_exact_sources_override_broad_docset_root(tmp_path, m
             {library_id},
             expected_roots,
         ) == expected_reason
+
+
+def _python_direct_text_result(
+    tmp_path,
+    monkeypatch,
+    metadata: dict,
+    *,
+    chunk_source: str = "https://docs.python.org/3.13/library/base64.html",
+):
+    source_url = "https://docs.python.org/3.13/library/base64.html"
+    chunk = _chunk(
+        "Python 3.13 base64.b64encode encodes bytes with the Base64 alphabet.",
+        chunk_source,
+        {"stable_chunk_id": "probe", **metadata},
+    )
+    service = _service(tmp_path, monkeypatch, RecordingAgent([chunk]))
+    now = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    record = service.registry.upsert(
+        library="python",
+        ecosystem="python",
+        version="3.13",
+        source_type="api",
+        docs_url=source_url,
+        target_spec={"seed_urls": [source_url]},
+        now=now,
+        status="available",
+        last_refreshed_at=now,
+    )
+    marker = Path(service._index_config_for(record).index.extracted_dir) / "chunk.md"
+    marker.parent.mkdir(parents=True, exist_ok=True)
+    marker.write_text("indexed chunk", encoding="utf-8")
+    return service.get_docs(
+        "python",
+        ecosystem="python",
+        version="3.13",
+        source_type="api",
+        topic="base64 b64encode",
+    )
+
+
+def test_python_direct_text_broad_root_accepts_complete_resolved_version_identity(tmp_path, monkeypatch):
+    library_id = "python:python@3.13:api"
+    metadata = {
+        "library_id": library_id,
+        "canonical_id": library_id,
+        "ecosystem": "python",
+        "resolved_version": "3.13",
+        "source_type": "api",
+        "docset_root": "https://docs.python.org",
+    }
+    result = _python_direct_text_result(tmp_path / "first", monkeypatch, metadata)
+    repeated = _python_direct_text_result(tmp_path / "repeated", monkeypatch, metadata)
+
+    assert result.status == "success"
+    assert isinstance(result.selection_decision, SelectionDecision)
+    assert getattr(SelectionDecision, "__dataclass_params__").frozen is True
+    assert result.selected_evidence_ids == ["probe"]
+    assert result.decision_hash
+    assert repeated.decision_hash == result.decision_hash
+
+
+@pytest.mark.parametrize("omitted_field", ["canonical_id", "ecosystem", "version", "source_type"])
+def test_python_direct_text_broad_root_requires_complete_identity(tmp_path, monkeypatch, omitted_field):
+    library_id = "python:python@3.13:api"
+    complete_metadata = {
+        "library_id": library_id,
+        "canonical_id": library_id,
+        "ecosystem": "python",
+        "version": "3.13",
+        "source_type": "api",
+        "docset_root": "https://docs.python.org",
+    }
+    metadata = {key: value for key, value in complete_metadata.items() if key != omitted_field}
+    result = _python_direct_text_result(tmp_path, monkeypatch, metadata)
+    assert result.status == "empty_library_index"
+    assert result.selection_decision is None
+    assert result.selected_evidence_ids == []
+    assert result.decision_hash is None
+
+
+@pytest.mark.parametrize("conflicting_alias", ["source_url", "url"])
+def test_python_direct_text_broad_root_rejects_conflicting_url_aliases(tmp_path, monkeypatch, conflicting_alias):
+    source_url = "https://docs.python.org/3.13/library/base64.html"
+    library_id = "python:python@3.13:api"
+    complete_metadata = {
+        "library_id": library_id,
+        "canonical_id": library_id,
+        "ecosystem": "python",
+        "version": "3.13",
+        "source_type": "api",
+        "docset_root": "https://docs.python.org",
+    }
+    exact_alias = "url" if conflicting_alias == "source_url" else "source_url"
+    metadata = {
+        **complete_metadata,
+        exact_alias: source_url,
+        conflicting_alias: "https://attacker.invalid/base64.html",
+    }
+    result = _python_direct_text_result(tmp_path, monkeypatch, metadata)
+    assert result.status == "empty_library_index"
+    assert result.selection_decision is None
+    assert result.selected_evidence_ids == []
+    assert result.decision_hash is None
+
+
+@pytest.mark.parametrize(
+    "invalid_case",
+    [
+        "wrong_version",
+        "malformed_version",
+        "wrong_authority",
+        "prefix_confusable",
+        "query",
+        "fragment",
+        "absent_source",
+        "metadata_only_root",
+        "unrelated_same_authority",
+        "cross_docset",
+    ],
+)
+def test_python_direct_text_broad_root_negative_matrix_has_no_selection_decision(tmp_path, monkeypatch, invalid_case):
+    source_url = "https://docs.python.org/3.13/library/base64.html"
+    library_id = "python:python@3.13:api"
+    metadata: dict = {
+        "library_id": library_id,
+        "canonical_id": library_id,
+        "ecosystem": "python",
+        "version": "3.13",
+        "source_type": "api",
+        "docset_root": "https://docs.python.org",
+    }
+    chunk_source = source_url
+    if invalid_case == "wrong_version":
+        metadata["version"] = "3.12"
+    elif invalid_case == "malformed_version":
+        metadata["version"] = {"malformed": True}
+    elif invalid_case == "wrong_authority":
+        chunk_source = "https://attacker.invalid/3.13/library/base64.html"
+    elif invalid_case == "prefix_confusable":
+        chunk_source = source_url + ".attacker"
+    elif invalid_case == "query":
+        chunk_source = source_url + "?download=1"
+    elif invalid_case == "fragment":
+        chunk_source = source_url + "#functions"
+    elif invalid_case == "absent_source":
+        chunk_source = ""
+    elif invalid_case == "metadata_only_root":
+        metadata = {"docset_root": "https://docs.python.org"}
+        chunk_source = ""
+    elif invalid_case == "unrelated_same_authority":
+        chunk_source = "https://docs.python.org/3.13/library/asyncio.html"
+    elif invalid_case == "cross_docset":
+        metadata["library_id"] = metadata["canonical_id"] = "python:other@3.13:api"
+
+    result = _python_direct_text_result(tmp_path, monkeypatch, metadata, chunk_source=chunk_source)
+    assert result.status == "empty_library_index"
+    assert result.selection_decision is None
+    assert result.selected_evidence_ids == []
+    assert result.decision_hash is None
 
 
 def test_flutter_bloc_query_does_not_return_unrelated_project_docs(tmp_path, monkeypatch):

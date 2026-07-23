@@ -488,18 +488,33 @@ class LibraryDocsApplicationService:
             source,
             {str(docset_root)},
         )
+        has_complete_exact_identity = bool(canonical_id) and canonical_id == info.canonical_id
+        has_complete_exact_identity = (
+            has_complete_exact_identity
+            and bool(ecosystem)
+            and ecosystem == info.ecosystem
+            and bool(version)
+            and version == info.version
+            and bool(source_type)
+            and source_type == info.source_type
+        )
         if (
             docset_root
             and expected_roots
             and not self._url_within_root(str(docset_root), expected_roots)
-            and not (source_matches_exact_root and broad_docset_root_contains_source)
+            and not (
+                source_matches_exact_root
+                and broad_docset_root_contains_source
+                and has_complete_exact_identity
+            )
         ):
             return "wrong_docset_root"
-        url = metadata.get("url") or metadata.get("source_url")
         if not self._url_within_root(source, expected_roots):
             return "wrong_docset_root"
-        if url and not self._url_within_root(url, expected_roots):
-            return "wrong_docset_root"
+        for url_key in ("url", "source_url"):
+            url = metadata.get(url_key)
+            if url and not self._url_within_root(url, expected_roots):
+                return "wrong_docset_root"
         return None
 
     def _library_chunk_allowed(self, chunk: Any, info: LibraryInfo, allowed_ids: set[str], expected_roots: set[str]) -> bool:
