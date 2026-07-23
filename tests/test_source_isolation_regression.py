@@ -6,6 +6,7 @@ from pathlib import Path
 from docmancer.core.config import DocmancerConfig
 from docmancer.core.models import RetrievedChunk
 from docmancer.docs.application.docs_job_service import DocsJobTracker
+from docmancer.docs.application.evidence_selection import SelectionDecision
 from docmancer.docs.registry import LibraryRegistry
 from docmancer.docs.service import LibraryDocsService
 
@@ -96,6 +97,128 @@ def test_click_query_does_not_return_fastapi_or_flutter(tmp_path, monkeypatch):
 
     assert result.status == "success"
     assert [chunk.content for chunk in result.results] == ["Click command docs."]
+
+
+def test_python_direct_text_exact_sources_override_broad_docset_root(tmp_path, monkeypatch):
+    base64_url = "https://docs.python.org/3.13/library/base64.html"
+    zlib_url = "https://docs.python.org/3.13/library/zlib.html"
+    library_id = "python:python@3.13:api"
+    base64_chunk = _chunk(
+        "Python 3.13 base64.b64encode encodes bytes with the Base64 alphabet.",
+        base64_url,
+        {
+            "stable_chunk_id": "python-3.13-base64",
+            "library_id": library_id,
+            "canonical_id": library_id,
+            "ecosystem": "python",
+            "version": "3.13",
+            "source_type": "api",
+            "docset_root": "https://docs.python.org",
+        },
+    )
+    zlib_chunk = _chunk(
+        "Python 3.13 zlib.compress returns compressed bytes for input data.",
+        zlib_url,
+        {
+            "stable_chunk_id": "python-3.13-zlib",
+            "library_id": library_id,
+            "canonical_id": library_id,
+            "ecosystem": "python",
+            "version": "3.13",
+            "source_type": "api",
+            "docset_root": "https://docs.python.org",
+        },
+    )
+    agent = RecordingAgent([base64_chunk, zlib_chunk])
+    service = _service(tmp_path, monkeypatch, agent)
+    now = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    record = service.registry.upsert(
+        library="python",
+        ecosystem="python",
+        version="3.13",
+        source_type="api",
+        docs_url=base64_url,
+        target_spec={"seed_urls": [base64_url, zlib_url]},
+        now=now,
+        status="available",
+        last_refreshed_at=now,
+    )
+    config = service._index_config_for(record)
+    marker = Path(config.index.extracted_dir) / "chunk.md"
+    marker.parent.mkdir(parents=True, exist_ok=True)
+    marker.write_text("indexed chunk", encoding="utf-8")
+
+    base64_result = service.get_docs(
+        "python",
+        ecosystem="python",
+        version="3.13",
+        source_type="api",
+        topic="base64 b64encode",
+    )
+    agent.chunks = [zlib_chunk]
+    zlib_result = service.get_docs(
+        "python",
+        ecosystem="python",
+        version="3.13",
+        source_type="api",
+        topic="zlib compress",
+    )
+    agent.chunks = [base64_chunk, zlib_chunk]
+    repeated_base64_result = service.get_docs(
+        "python",
+        ecosystem="python",
+        version="3.13",
+        source_type="api",
+        topic="base64 b64encode",
+    )
+
+    assert base64_result.status == zlib_result.status == "success"
+    assert base64_result.diagnostics["retrieval"]["post_guard"]["accepted"] == 2
+    assert isinstance(base64_result.selection_decision, SelectionDecision)
+    assert isinstance(zlib_result.selection_decision, SelectionDecision)
+    assert base64_result.selected_evidence_ids == ["python-3.13-base64"]
+    assert zlib_result.selected_evidence_ids == ["python-3.13-zlib"]
+    assert base64_result.decision_hash
+    assert zlib_result.decision_hash
+    assert repeated_base64_result.decision_hash == base64_result.decision_hash
+
+    info = service.resolve_library("python", ecosystem="python", version="3.13", source_type="api")
+    expected_roots = {base64_url, zlib_url}
+    exact_metadata = {
+        "library_id": library_id,
+        "canonical_id": library_id,
+        "ecosystem": "python",
+        "version": "3.13",
+        "source_type": "api",
+        "docset_root": "https://docs.python.org",
+    }
+    assert service.library_docs._library_chunk_rejection_reason(
+        _chunk("Base64 docs.", base64_url + "/", exact_metadata),
+        info,
+        {library_id},
+        expected_roots,
+    ) is None
+    fail_closed_cases = [
+        (base64_url + "?download=1", exact_metadata, "wrong_docset_root"),
+        (base64_url + "#functions", exact_metadata, "wrong_docset_root"),
+        (base64_url + ".attacker", exact_metadata, "wrong_docset_root"),
+        ("https://docs.python.org.attacker/3.13/library/base64.html", exact_metadata, "wrong_docset_root"),
+        ("", exact_metadata, "wrong_docset_root"),
+        (base64_url, {**exact_metadata, "docset_root": "https://attacker.invalid"}, "wrong_docset_root"),
+        (base64_url, {**exact_metadata, "url": "https://attacker.invalid/base64.html"}, "wrong_docset_root"),
+        (base64_url, {**exact_metadata, "version": "3.12"}, "wrong_version"),
+        (base64_url, {**exact_metadata, "version": {"malformed": True}}, "wrong_version"),
+        (base64_url, {"docset_root": "https://docs.python.org"}, "missing_library_metadata"),
+        (base64_url, {**exact_metadata, "library_id": "python:other@3.13:api"}, "wrong_library_id"),
+    ]
+    for source, metadata, expected_reason in fail_closed_cases:
+        chunk = _chunk("Untrusted docs.", source, metadata)
+        assert service.library_docs._library_chunk_rejection_reason(
+            chunk,
+            info,
+            {library_id},
+            expected_roots,
+        ) == expected_reason
 
 
 def test_flutter_bloc_query_does_not_return_unrelated_project_docs(tmp_path, monkeypatch):

@@ -477,10 +477,24 @@ class LibraryDocsApplicationService:
             return "wrong_source_type"
         if metadata.get("project_path"):
             return "project_doc_leak"
-        docset_root = metadata.get("docset_root")
-        if docset_root and expected_roots and not self._url_within_root(str(docset_root), expected_roots):
-            return "wrong_docset_root"
         source = getattr(chunk, "source", None)
+        source_matches_exact_root = bool(source) and any(
+            str(source).rstrip("/") == root.rstrip("/")
+            for root in expected_roots
+            if root
+        )
+        docset_root = metadata.get("docset_root")
+        broad_docset_root_contains_source = bool(docset_root) and self._url_within_root(
+            source,
+            {str(docset_root)},
+        )
+        if (
+            docset_root
+            and expected_roots
+            and not self._url_within_root(str(docset_root), expected_roots)
+            and not (source_matches_exact_root and broad_docset_root_contains_source)
+        ):
+            return "wrong_docset_root"
         url = metadata.get("url") or metadata.get("source_url")
         if not self._url_within_root(source, expected_roots):
             return "wrong_docset_root"
