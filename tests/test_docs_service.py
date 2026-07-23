@@ -1657,6 +1657,19 @@ Every public mode preserves the same decision_hash and selected evidence IDs.
 Library lexical retrieval invokes RetrievalDispatcher with the raw topic unchanged.
 EvidenceRequirementSet supplies recall hints but never a second support decision.
 The first production mode remains lexical and must not call vectors or embeddings.
+
+## Phase 3.1: index-witness retrieval-miss classification
+
+Files:
+
+- docmancer/docs/application/library_docs_service.py
+- docmancer/docs/infrastructure/agent_index_gateway.py
+
+Classify retrieval_miss only when the complete same-library, exact-version corpus
+contains mandatory-requirement witnesses confirmed by a bounded index-level probe
+outside the selected candidates. Never infer retrieval_miss from an empty candidate
+list. Keep the default lexical path provider-free: it makes no vector, embedding,
+or provider calls.
 """,
         encoding="utf-8",
     )
@@ -1735,6 +1748,55 @@ roots:
         "raw topic unchanged" in source["snippet"]
         and "must not call vectors or embeddings" in source["snippet"]
         for source in dispatcher_payload["sources"]
+    )
+
+    index_witness_question = (
+        "Fix library_docs_service.py Phase 3.1 retrieval_miss classification for the "
+        "complete same-library exact-version corpus using a bounded index witness probe, "
+        "without forbidden calls."
+    )
+    index_witness_payload = handle_context_tool(
+        "get_docs_context",
+        {
+            "question": index_witness_question,
+            "project_path": str(project),
+            "mode": "project",
+            "delivery_strategy": "bounded_direct",
+        },
+        service,
+    )
+    assert index_witness_payload is not None
+    assert index_witness_payload["status"] != "insufficient_evidence", index_witness_payload
+    assert index_witness_payload["kind"] == "patch_context"
+    assert any(
+        source["path"].endswith("zz-authoritative-plan.md")
+        and "index-witness retrieval-miss classification" in source["symbol_or_section"]
+        and source["evidence_id"]
+        for source in index_witness_payload["sources"]
+    )
+
+    novel_index_witness_payload = handle_context_tool(
+        "get_docs_context",
+        {
+            "question": (
+                "Implement in library_docs_service.py candidate-omission retrieval_miss handling "
+                "for one pinned library release: require its evidence proof and preserve local "
+                "retrieval restrictions."
+            ),
+            "project_path": str(project),
+            "mode": "project",
+            "delivery_strategy": "bounded_direct",
+        },
+        service,
+    )
+    assert novel_index_witness_payload is not None
+    assert novel_index_witness_payload["status"] != "insufficient_evidence", novel_index_witness_payload
+    assert novel_index_witness_payload["kind"] == "patch_context"
+    assert any(
+        source["path"].endswith("zz-authoritative-plan.md")
+        and "index-witness retrieval-miss classification" in source["symbol_or_section"]
+        and source["evidence_id"]
+        for source in novel_index_witness_payload["sources"]
     )
 
     absent = handle_context_tool(

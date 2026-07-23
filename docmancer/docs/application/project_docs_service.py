@@ -1313,9 +1313,14 @@ class ProjectDocsService:
         )
         authoritative_chunks = agent.query(
             query,
-            limit=effective_limit,
+            # Source-of-truth documents often split one bounded implementation
+            # contract across adjacent sections. Recall a bounded superset before
+            # applying the public result limit so canonical selection can see the
+            # complete project-owned contract instead of only its best lexical
+            # fragment.
+            limit=max(effective_limit, 20),
             budget=budget,
-            expand=expand,
+            expand=expand or "page",
             filters={**filters, "project_doc_authority": "source_of_truth"},
         )
 
@@ -1326,14 +1331,20 @@ class ProjectDocsService:
             key = (chunk.source, chunk.chunk_index)
             if key in seen:
                 continue
+            if len(selected) >= effective_limit:
+                anchor = selected[0]
+                same_authoritative_source = (
+                    chunk.source == anchor.source
+                    and len(selected) < max(effective_limit, 4)
+                )
+                if not same_authoritative_source:
+                    continue
             chunk_tokens = int((chunk.metadata or {}).get("token_estimate") or 0)
             if selected and token_total + chunk_tokens > budget:
                 continue
             selected.append(chunk)
             seen.add(key)
             token_total += chunk_tokens
-            if len(selected) >= effective_limit:
-                break
         return selected
 
     def get_project_docs(
