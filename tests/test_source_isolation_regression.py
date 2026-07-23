@@ -249,6 +249,24 @@ ZLIB_EVIDENCE_PARAPHRASES = (
     ),
 )
 
+ZLIB_DELIMITER_PROSE_CONTROLS = (
+    (
+        "For Python 3.13 zlib.Decompress.decompress(data, max_length), explain output and data "
+        "for this workflow.",
+        {"output", "data"},
+    ),
+    (
+        "For Python 3.13 zlib.Decompress.decompress(data, max_length), describe these fields: "
+        "output, data.",
+        {"output", "data"},
+    ),
+    (
+        "For Python 3.13 zlib.Decompress.decompress(data, max_length), give the semantics of "
+        "bytes / output.",
+        {"bytes", "output"},
+    ),
+)
+
 
 def _oversized_zlib_source() -> str:
     return "\n".join([
@@ -455,6 +473,53 @@ def test_python_semantic_list_paraphrases_require_all_named_zlib_attributes(
     assert projection["status"] == "ok"
     assert projection["selected_evidence_ids"] == result.selected_evidence_ids
     assert projection["decision_hash"] == result.decision_hash
+
+
+@pytest.mark.parametrize(("question", "ordinary_words"), ZLIB_DELIMITER_PROSE_CONTROLS)
+def test_delimiter_like_prose_does_not_promote_ordinary_words_or_change_canonical_support(
+    tmp_path,
+    monkeypatch,
+    question,
+    ordinary_words,
+):
+    service = _zlib_fixture_service(tmp_path, monkeypatch)
+    baseline_question = (
+        "For Python 3.13 zlib.Decompress.decompress(data, max_length), explain this workflow."
+    )
+
+    result = service.get_docs(
+        "python",
+        ecosystem="python",
+        version="3.13",
+        source_type="api",
+        topic=question,
+    )
+    baseline = service.get_docs(
+        "python",
+        ecosystem="python",
+        version="3.13",
+        source_type="api",
+        topic=baseline_question,
+    )
+    projection = _public_library_projection(question, result)
+
+    requirement_values = {
+        requirement.value.casefold() for requirement in (result.requirements or [])
+    }
+    assert requirement_values.isdisjoint(ordinary_words)
+    assert result.answer_supported is False
+    assert result.answer_available is False
+    assert result.selected_evidence_ids == []
+    assert result.decision_hash is None
+    assert result.reason_code == "unqualified_explicit_query_list"
+    assert baseline.answer_supported is True
+    assert baseline.answer_available is True
+    assert baseline.selected_evidence_ids
+    assert baseline.decision_hash
+    assert projection["status"] == "insufficient_evidence"
+    assert projection["selected_evidence_ids"] == []
+    assert projection["decision_hash"] is None
+    assert "sources" not in projection
 
 
 def test_unrelated_eof_prose_does_not_create_a_typed_requirement_or_support(

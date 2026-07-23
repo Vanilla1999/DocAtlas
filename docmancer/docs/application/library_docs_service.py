@@ -1490,7 +1490,9 @@ class LibraryDocsApplicationService:
             profile="library_docs_answer",
             library_requirement_contract=library_requirement_contract,
         )
-        explicit_query_values = _explicit_library_query_values(query)
+        explicit_query_values, has_unqualified_explicit_query_list = (
+            _explicit_library_query_analysis(query)
+        )
         existing_requirement_values = {
             requirement.value.casefold() for requirement in requirements
         }
@@ -1514,6 +1516,12 @@ class LibraryDocsApplicationService:
             requirements=requirements,
         )
         chunks = getattr(dispatch_result, "chunks", dispatch_result)
+        if has_unqualified_explicit_query_list:
+            chunks = []
+            diagnostic_warnings.append({
+                "code": "unqualified_explicit_query_list",
+                "blocking": True,
+            })
         retrieval_diagnostics = {
             "requested": {
                 "mode": "lexical",
@@ -1567,7 +1575,12 @@ class LibraryDocsApplicationService:
             "low_value_dropped": len(chunks_before_low_value_guard) - len(chunks),
         }
         if not chunks:
-            reason_code = "guard_dropped_all" if dropped > 0 else "no_library_docs_results"
+            reason_code = (
+                "unqualified_explicit_query_list"
+                if has_unqualified_explicit_query_list
+                else "guard_dropped_all" if dropped > 0
+                else "no_library_docs_results"
+            )
             reason_diagnostics = {**resolution.diagnostics, "retrieval": retrieval_diagnostics, "reason_code": reason_code, "warnings": diagnostic_warnings}
             reason_diagnostics = self._with_dart_diagnostics(
                 reason_diagnostics,
@@ -1577,7 +1590,12 @@ class LibraryDocsApplicationService:
                 chunks_created=0,
             )
             status = "empty_library_index" if dropped > 0 else "no_results"
-            next_actions = ["Call refresh_library_docs to ingest this library's docs."] if dropped > 0 else ["Narrow or rephrase the topic, or inspect_library_docs to verify indexed coverage before refreshing."]
+            next_actions = (
+                ["Qualify at least one requested symbol with backticks or a dotted, underscored, or colon-qualified name."]
+                if has_unqualified_explicit_query_list
+                else ["Call refresh_library_docs to ingest this library's docs."] if dropped > 0
+                else ["Narrow or rephrase the topic, or inspect_library_docs to verify indexed coverage before refreshing."]
+            )
             return DocsResult(
                 library_id=info.library_id,
                 library=latest.library,
@@ -1884,16 +1902,32 @@ def _query_terms(query: str | None) -> set[str]:
     return {term.lower() for term in _TERM_RE.findall(query or "") if len(term) > 1}
 
 
-def _explicit_library_query_values(query: str) -> list[str]:
+def _explicit_library_query_analysis(query: str) -> tuple[list[str], bool]:
     values: set[str] = set()
+    has_unqualified_list = False
     for match in _EXPLICIT_QUERY_LIST_RE.finditer(query):
-        items = _EXPLICIT_QUERY_LIST_SEPARATOR_RE.split(match.group(1).strip())
+        items = [
+            item.strip()
+            for item in _EXPLICIT_QUERY_LIST_SEPARATOR_RE.split(match.group(1).strip())
+        ]
         if len(items) < 2:
             continue
-        symbols = [_EXPLICIT_QUERY_SYMBOL_RE.fullmatch(item.strip()) for item in items]
-        if all(symbols):
+        symbols = [_EXPLICIT_QUERY_SYMBOL_RE.fullmatch(item) for item in items]
+        has_qualified_symbol = any(
+            (item.startswith("`") and item.endswith("`"))
+            or any(marker in symbol.group(1) for marker in (".", "_", ":"))
+            for item, symbol in zip(items, symbols, strict=True)
+            if symbol is not None
+        )
+        if all(symbols) and has_qualified_symbol:
             values.update(symbol.group(1) for symbol in symbols if symbol is not None)
-    return sorted(values, key=str.casefold)
+        else:
+            has_unqualified_list = True
+    return sorted(values, key=str.casefold), has_unqualified_list
+
+
+def _explicit_library_query_values(query: str) -> list[str]:
+    return _explicit_library_query_analysis(query)[0]
 
 
 def _clean_library_section(content: str) -> str:
