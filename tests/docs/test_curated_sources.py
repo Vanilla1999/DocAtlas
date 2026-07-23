@@ -88,7 +88,16 @@ def test_exact_request_does_not_register_unversioned_curated_docs(tmp_path: Path
     assert info.status == "needs_docs_url"
 
 
-def test_exact_curated_source_renders_the_requested_version(tmp_path: Path) -> None:
+@pytest.mark.parametrize(
+    "refresh_direct_text",
+    [False, True],
+    ids=["resolution", "refresh-dispatch"],
+)
+def test_exact_curated_source_renders_the_requested_version(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    refresh_direct_text: bool,
+) -> None:
     source = curated_source_for("go_router", "flutter", "16.2.0")
     assert source is not None
     assert source.exact_snapshot is True
@@ -120,6 +129,34 @@ def test_exact_curated_source_renders_the_requested_version(tmp_path: Path) -> N
         assert record is not None
         assert record.target_spec is not None
         assert record.target_spec["docs_url"] == expected_url
+
+    if not refresh_direct_text:
+        return
+
+    calls: list[tuple[str, list[str] | None]] = []
+
+    class FakeAgent:
+        def add(self, url: str, **kwargs: object) -> int:
+            calls.append((url, cast(list[str] | None, kwargs["seed_urls"])))
+            return 0
+
+    agent = FakeAgent()
+    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
+    config = DocmancerConfig()
+    config.index.db_path = str(tmp_path / "docs.db")
+    config.index.extracted_dir = str(tmp_path / "extracted")
+    service = LibraryDocsService(config=config, agent_factory=lambda **_kwargs: agent)
+
+    resolved = service.resolve_library(
+        "python", ecosystem="python", version="3.13", source_type="api"
+    )
+    result = service.refresh_docs(resolved.library_id, source_type="api", force=True)
+
+    assert result.status == "empty_index"
+    assert calls == [
+        ("https://docs.python.org/3.13/_sources/library/base64.rst.txt", []),
+        ("https://docs.python.org/3.13/_sources/library/zlib.rst.txt", []),
+    ]
 
 
 def test_full_curated_manifest_passes_offline_target_validation() -> None:
