@@ -22,6 +22,7 @@ from docmancer.core.sqlite_store import SQLiteStore
 from docmancer.agent import DocmancerAgent
 from docmancer.docs.github_source_manifest import normalize_resolved_github_manifest
 from docmancer.docs.models import DocsChunk, DocsResult, ProjectContextResult, SOURCE_CLASS_PROJECT_FILE
+from docmancer.docs.interfaces.mcp.context_tools import handle_context_tool
 from docmancer.docs.interfaces.mcp.project_tools import handle_project_tool
 from docmancer.docs.registry import LibraryRegistry
 from docmancer.docs.service import DocsJobTracker, LibraryDocsService
@@ -1630,20 +1631,151 @@ def test_query_project_docs_filters_by_project_path_and_source_class(tmp_path, m
 
 
 def test_project_query_does_not_return_non_project_docs_with_same_terms(tmp_path, monkeypatch):
-    project = _flutter_project(tmp_path)
-    (project / "README.md").write_text("# Architecture\n\nNeedleTerm project answer lives here.", encoding="utf-8")
-    unrelated = tmp_path / "unrelated.md"
-    unrelated.write_text("# Architecture\n\nNeedleTerm public docs answer should not leak.", encoding="utf-8")
+    project = tmp_path / "app"
+    project.mkdir()
+    docs = project / "docs"
+    docs.mkdir()
+    distractor = (
+        "# Presentation plan notes\n\n"
+        "Phase 2.3 presentation-only snippets mention EvidenceRequirementSet, "
+        "SupportDecision, and decision_hash, but this supporting note does not "
+        "define the acceptance contract.\n"
+    )
+    for index in range(24):
+        (docs / f"note-{index:02d}.md").write_text(distractor, encoding="utf-8")
+    (project / "zz-authoritative-plan.md").write_text(
+        """# Approved retrieval plan
+
+## Phase 2.3: presentation-only snippets
+
+EvidenceRequirementSet and SupportDecision are canonical selector inputs.
+Presentation cannot determine support or drop a mandatory-facet witness.
+Every public mode preserves the same decision_hash and selected evidence IDs.
+
+## Phase 3.1: dispatcher reuse
+
+Library lexical retrieval invokes RetrievalDispatcher with the raw topic unchanged.
+EvidenceRequirementSet supplies recall hints but never a second support decision.
+The first production mode remains lexical and must not call vectors or embeddings.
+""",
+        encoding="utf-8",
+    )
+    (project / "README.md").write_text(
+        "# Project overview\n\nThis repository owns the approved retrieval plan.\n",
+        encoding="utf-8",
+    )
+    (project / "docatlas.project-docs.yaml").write_text(
+        """schema_version: 1
+documents:
+  - path: zz-authoritative-plan.md
+    role: development
+    scope: project
+    description: Approved implementation plan and acceptance contract.
+    authority: source_of_truth
+    status: active
+    impact: track
+  - path: README.md
+    role: overview
+    scope: project
+    description: Project overview.
+    authority: supporting
+    status: active
+    impact: track
+roots:
+  - path: docs
+    scope: project
+    authority: supporting
+""",
+        encoding="utf-8",
+    )
     service = _service_with_real_agent(tmp_path, monkeypatch)
-    service._agent_instance().ingest(unrelated, with_vectors=False)
-    service.ingest_project_docs(str(project), with_vectors=False)
+    ingest = service.ingest_project_docs(str(project), with_vectors=False)
+    assert ingest.status == "success", ingest.message
 
-    chunks = service.query_project_docs(str(project), "NeedleTerm Architecture", tokens=1200, limit=5)
+    question = (
+        "What exact Phase 2.3 presentation-only snippet contract governs "
+        "EvidenceRequirementSet, SupportDecision, and decision_hash?"
+    )
+    payload = handle_context_tool(
+        "get_docs_context",
+        {
+            "question": question,
+            "project_path": str(project),
+            "mode": "project",
+            "delivery_strategy": "bounded_direct",
+        },
+        service,
+    )
 
-    assert chunks
-    assert all(chunk.metadata.get("project_path") == str(project.resolve()) for chunk in chunks)
-    assert any("project answer" in chunk.text for chunk in chunks)
-    assert not any("public docs answer" in chunk.text for chunk in chunks)
+    assert payload is not None
+    assert payload["status"] == "ok", payload.get("missing")
+    assert any(source["path_or_url"].endswith("zz-authoritative-plan.md") for source in payload["sources"])
+    assert any(
+        "cannot determine support" in source["snippet"]
+        and "mandatory-facet witness" in source["snippet"]
+        for source in payload["sources"]
+    )
+
+    dispatcher_payload = handle_context_tool(
+        "get_docs_context",
+        {
+            "question": (
+                "What does Phase 3.1 require for RetrievalDispatcher, the raw topic, "
+                "EvidenceRequirementSet hints, and vector or embedding calls?"
+            ),
+            "project_path": str(project),
+            "mode": "project",
+            "delivery_strategy": "bounded_direct",
+        },
+        service,
+    )
+    assert dispatcher_payload is not None
+    assert dispatcher_payload["status"] == "ok", dispatcher_payload.get("missing")
+    assert any(
+        "raw topic unchanged" in source["snippet"]
+        and "must not call vectors or embeddings" in source["snippet"]
+        for source in dispatcher_payload["sources"]
+    )
+
+    absent = handle_context_tool(
+        "get_docs_context",
+        {
+            "question": question.replace("decision_hash", "missing_decision_audit_symbol"),
+            "project_path": str(project),
+            "mode": "project",
+            "delivery_strategy": "bounded_direct",
+        },
+        service,
+    )
+    assert absent is not None
+    assert absent["status"] == "insufficient_evidence"
+
+    foreign_root = tmp_path / "foreign"
+    foreign_root.mkdir()
+    foreign = foreign_root / "app"
+    foreign.mkdir()
+    (foreign / "README.md").write_text(
+        "# Foreign plan\n\nmissing_decision_audit_symbol is defined only here.\n",
+        encoding="utf-8",
+    )
+    foreign_ingest = service.ingest_project_docs(str(foreign), with_vectors=False)
+    assert foreign_ingest.status == "success", foreign_ingest.message
+    isolated = handle_context_tool(
+        "get_docs_context",
+        {
+            "question": "Where is missing_decision_audit_symbol defined?",
+            "project_path": str(project),
+            "mode": "project",
+            "delivery_strategy": "bounded_direct",
+        },
+        service,
+    )
+    assert isolated is not None
+    assert isolated["status"] == "insufficient_evidence"
+    assert all(
+        not source.get("path_or_url", "").startswith(str(foreign))
+        for source in isolated.get("sources", [])
+    )
 
 
 def test_get_project_docs_returns_scoped_docs_result(tmp_path, monkeypatch):

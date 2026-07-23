@@ -1301,13 +1301,40 @@ class ProjectDocsService:
             filters["doc_scope"] = scope
         if module_path:
             filters["module_path"] = module_path
-        return self._agent_instance().query(
+        agent = self._agent_instance()
+        effective_limit = limit or agent.config.query.default_limit
+        budget = tokens or DEFAULT_DOC_TOKENS
+        chunks = agent.query(
             query,
-            limit=limit,
-            budget=tokens or DEFAULT_DOC_TOKENS,
+            limit=effective_limit,
+            budget=budget,
             expand=expand,
             filters=filters,
         )
+        authoritative_chunks = agent.query(
+            query,
+            limit=effective_limit,
+            budget=budget,
+            expand=expand,
+            filters={**filters, "project_doc_authority": "source_of_truth"},
+        )
+
+        selected = []
+        seen: set[tuple[str, int]] = set()
+        token_total = 0
+        for chunk in [*authoritative_chunks, *chunks]:
+            key = (chunk.source, chunk.chunk_index)
+            if key in seen:
+                continue
+            chunk_tokens = int((chunk.metadata or {}).get("token_estimate") or 0)
+            if selected and token_total + chunk_tokens > budget:
+                continue
+            selected.append(chunk)
+            seen.add(key)
+            token_total += chunk_tokens
+            if len(selected) >= effective_limit:
+                break
+        return selected
 
     def get_project_docs(
         self,
