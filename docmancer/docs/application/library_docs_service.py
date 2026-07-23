@@ -43,6 +43,7 @@ from docmancer.docs.application.library_job_executor import LibraryJobExecutor, 
 from docmancer.docs.application.evidence_selection import (
     build_requirements,
     library_docs_selection_config,
+    requirement_value_visible,
     select_evidence,
 )
 
@@ -1489,6 +1490,22 @@ class LibraryDocsApplicationService:
             profile="library_docs_answer",
             library_requirement_contract=library_requirement_contract,
         )
+        explicit_query_values = _explicit_library_query_values(query)
+        existing_requirement_values = {
+            requirement.value.casefold() for requirement in requirements
+        }
+        missing_explicit_values = [
+            value for value in explicit_query_values
+            if value.casefold() not in existing_requirement_values
+        ]
+        if missing_explicit_values:
+            requirements = build_requirements(
+                query,
+                public_requirements=missing_explicit_values,
+                exact_version=resolved_version,
+                profile="library_docs_answer",
+                library_requirement_contract=library_requirement_contract,
+            )
         dispatch_result = self.facade.agent_gateway.query_library(
             record,
             query,
@@ -1590,6 +1607,39 @@ class LibraryDocsApplicationService:
                 next_actions=next_actions,
             )
         chunks, quality_diagnostics = _postprocess_library_chunks(chunks, query)
+        chunks, excerpt_diagnostics = _bounded_library_evidence_chunks(
+            chunks,
+            requirements=requirements,
+            max_tokens=tokens or DEFAULT_DOC_TOKENS,
+        )
+        quality_diagnostics.update(excerpt_diagnostics)
+        if not chunks:
+            return self._empty_library_index_result(
+                info=info,
+                latest=latest,
+                topic=topic,
+                refreshed=refreshed,
+                stale_before=stale_before,
+                warning=warning,
+                warnings=warnings,
+                requested_version=requested_version,
+                version_source=version_source,
+                docs_snapshot_exact=docs_snapshot_exact,
+                docs_exactness=docs_exactness,
+                docs_binding_source=docs_binding_source,
+                confidence=confidence,
+                input_args=input_args,
+                docs_url_source=docs_url_source,
+                diagnostics={
+                    **resolution.diagnostics,
+                    **quality_diagnostics,
+                    "retrieval": retrieval_diagnostics,
+                },
+                diagnostic_warnings=[
+                    *diagnostic_warnings,
+                    {"code": "no_qualifying_bounded_passage", "blocking": True},
+                ],
+            )
         latest_stale = self._is_stale(latest.last_refreshed_at)
         freshness = _freshness_diagnostics(latest.last_refreshed_at, self.stale_after_days, latest_stale)
         
@@ -1802,6 +1852,14 @@ _CODE_BLOCK_RE = re.compile(r"```([A-Za-z0-9_+.#-]*)\s*\n(.*?)```", re.DOTALL)
 _ANCHOR_RE = re.compile(r"\s*\[¶\]")
 _EMOJI_RE = re.compile("[\U0001F300-\U0001FAFF\U00002700-\U000027BF]")
 _TERM_RE = re.compile(r"[A-Za-z0-9_]+")
+_EXPLICIT_QUERY_LIST_RE = re.compile(
+    r"\bwhat\s+do\s+([^?]{1,200}?)\s+mean\b",
+    re.IGNORECASE,
+)
+_RST_SYMBOL_DIRECTIVE_RE = re.compile(
+    r"^\.\.\s+(module|function|method|attribute|class|exception)::\s+(.+?)\s*$",
+    re.MULTILINE,
+)
 _NOISE_LINES = {
     "copy",
     "copy code",
@@ -1815,6 +1873,17 @@ _NOISE_LINES = {
 
 def _query_terms(query: str | None) -> set[str]:
     return {term.lower() for term in _TERM_RE.findall(query or "") if len(term) > 1}
+
+
+def _explicit_library_query_values(query: str) -> list[str]:
+    values: set[str] = set()
+    for match in _EXPLICIT_QUERY_LIST_RE.finditer(query):
+        values.update(
+            token
+            for token in _TERM_RE.findall(match.group(1))
+            if token.casefold() not in {"and", "or"}
+        )
+    return sorted(values, key=str.casefold)
 
 
 def _clean_library_section(content: str) -> str:
@@ -1873,6 +1942,113 @@ def _copy_chunk(chunk: Any, *, text: str, metadata: dict[str, Any]) -> Any:
     chunk.text = text
     chunk.metadata = metadata
     return chunk
+
+
+def _rst_symbol_sections(content: str) -> list[dict[str, Any]]:
+    matches = list(_RST_SYMBOL_DIRECTIVE_RE.finditer(content))
+    modules = [match.group(2).strip() for match in matches if match.group(1) == "module"]
+    module = modules[0] if len(set(modules)) == 1 else ""
+    sections = []
+    for index, match in enumerate(matches):
+        if match.group(1) == "module":
+            continue
+        end = matches[index + 1].start() if index + 1 < len(matches) else len(content)
+        raw_symbol = match.group(2).strip().split("(", 1)[0]
+        qualified_symbol = (
+            raw_symbol
+            if not module or raw_symbol.startswith(module + ".")
+            else f"{module}.{raw_symbol}"
+        )
+        sections.append({
+            "start": match.start(),
+            "text": content[match.start():end].strip(),
+            "symbols": (raw_symbol, qualified_symbol),
+        })
+    return sections
+
+
+def _bounded_library_evidence_chunks(
+    chunks: list[Any],
+    *,
+    requirements: Any,
+    max_tokens: int,
+) -> tuple[list[Any], dict[str, Any]]:
+    config = library_docs_selection_config(max_tokens)
+    available_tokens = max(1, config.hard_tokens - config.wrapper_reserve_tokens)
+    available_bytes = available_tokens * 4
+    bounded = []
+    derived = 0
+    rejected = 0
+    mandatory = [
+        requirement
+        for requirement in requirements
+        if requirement.mandatory and requirement.kind != "exact_version"
+    ]
+    for chunk in chunks:
+        if len(chunk.text.encode("utf-8")) <= available_bytes:
+            bounded.append(chunk)
+            continue
+        ranked = []
+        for section in _rst_symbol_sections(chunk.text):
+            haystack = "\n".join([section["text"], *section["symbols"]])
+            covered = {
+                requirement.requirement_id
+                for requirement in mandatory
+                if requirement_value_visible(requirement.value, haystack)
+            }
+            if covered:
+                ranked.append((section, covered))
+        selected = []
+        remaining = {requirement.requirement_id for requirement in mandatory}
+        spent = 0
+        while remaining:
+            options = [
+                (section, covered)
+                for section, covered in ranked
+                if section not in selected and covered & remaining
+            ]
+            if not options:
+                break
+            section, covered = min(options, key=lambda item: (
+                -len(item[1] & remaining),
+                len(item[0]["text"].encode("utf-8")),
+                item[0]["start"],
+            ))
+            section_bytes = len(section["text"].encode("utf-8"))
+            if spent + section_bytes > available_bytes:
+                break
+            selected.append(section)
+            spent += section_bytes
+            remaining -= covered
+        if remaining:
+            rejected += 1
+            continue
+        selected.sort(key=lambda section: section["start"])
+        excerpt = "\n\n".join(section["text"] for section in selected)
+        metadata = dict(chunk.metadata or {})
+        parent_id = str(
+            metadata.get("stable_chunk_id")
+            or metadata.get("section_id")
+            or metadata.get("chunk_id")
+            or chunk.source
+        )
+        digest = hashlib.sha256(excerpt.encode("utf-8")).hexdigest()
+        metadata.update({
+            "stable_chunk_id": f"{parent_id}:excerpt:{digest[:16]}",
+            "parent_logical_id": parent_id,
+            "symbols": sorted({symbol for section in selected for symbol in section["symbols"]}),
+            "source_excerpt": True,
+            "source_excerpt_sha256": digest,
+        })
+        bounded.append(_copy_chunk(chunk, text=excerpt, metadata=metadata))
+        derived += 1
+    return bounded, {
+        "bounded_evidence": {
+            "available_tokens": available_tokens,
+            "derived_excerpts": derived,
+            "rejected_oversized_sources": rejected,
+        }
+    }
 
 
 def _postprocess_library_chunks(chunks: list[Any], query: str) -> tuple[list[Any], dict[str, Any]]:

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -9,6 +10,11 @@ from docmancer.core.config import DocmancerConfig
 from docmancer.core.models import RetrievedChunk
 from docmancer.docs.application.docs_job_service import DocsJobTracker
 from docmancer.docs.application.evidence_selection import SelectionDecision
+from docmancer.docs.application.model_visible_projection import (
+    estimate_projection_tokens,
+    project_docs_answer,
+    validate_model_visible_projection,
+)
 from docmancer.docs.registry import LibraryRegistry
 from docmancer.docs.service import LibraryDocsService
 
@@ -221,6 +227,168 @@ def test_python_direct_text_exact_sources_override_broad_docset_root(tmp_path, m
             {library_id},
             expected_roots,
         ) == expected_reason
+
+
+ZLIB_EVIDENCE_QUESTION = (
+    "How does Python 3.13 zlib.Decompress.decompress(data, max_length) limit returned output, "
+    "and what do eof, unused_data, and unconsumed_tail mean? Return source-backed evidence only."
+)
+
+
+def _oversized_zlib_source() -> str:
+    return "\n".join([
+        "zlib — Compression compatible with gzip",
+        "==========================================",
+        "",
+        ".. module:: zlib",
+        "",
+        *("General compression background that does not describe the requested API." for _ in range(900)),
+        "",
+        ".. attribute:: Decompress.unused_data",
+        "",
+        "   A bytes object which contains any bytes past the end of the compressed data.",
+        "",
+        ".. attribute:: Decompress.unconsumed_tail",
+        "",
+        "   A bytes object that contains compressed input not consumed because output was limited.",
+        "",
+        ".. attribute:: Decompress.eof",
+        "",
+        "   A boolean indicating whether the end of the compressed data stream has been reached.",
+        "",
+        ".. method:: Decompress.decompress(data, max_length=0)",
+        "",
+        "   If max_length is non-zero, the returned output is no longer than max_length.",
+    ])
+
+
+def _zlib_fixture_service(tmp_path, monkeypatch) -> LibraryDocsService:
+    source_url = "https://docs.python.org/3.13/_sources/library/zlib.rst.txt"
+    library_id = "python:python@3.13:api"
+    chunk = _chunk(
+        _oversized_zlib_source(),
+        source_url,
+        {
+            "stable_chunk_id": "python-3.13-zlib-source",
+            "library_id": library_id,
+            "canonical_id": library_id,
+            "ecosystem": "python",
+            "version": "3.13",
+            "source_type": "api",
+            "docset_root": "https://docs.python.org",
+        },
+    )
+    service = _service(tmp_path, monkeypatch, RecordingAgent([chunk]))
+    now = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    record = service.registry.upsert(
+        library="python",
+        ecosystem="python",
+        version="3.13",
+        source_type="api",
+        docs_url=source_url,
+        target_spec={"seed_urls": [source_url]},
+        now=now,
+        status="available",
+        last_refreshed_at=now,
+    )
+    marker = Path(service._index_config_for(record).index.extracted_dir) / "chunk.md"
+    marker.parent.mkdir(parents=True, exist_ok=True)
+    marker.write_text("indexed chunk", encoding="utf-8")
+    return service
+
+
+def _public_library_projection(question: str, result, *, max_tokens: int = 800):
+    context_pack = [
+        {
+            "source": chunk.source,
+            "content": chunk.content,
+            "version": result.resolved_version,
+            "docs_exactness": "exact",
+            "stable_chunk_id": chunk.metadata.get("stable_chunk_id"),
+            "parent_logical_id": chunk.metadata.get("parent_logical_id") or chunk.source,
+            "display_content_hash": hashlib.sha256(chunk.content.encode("utf-8")).hexdigest(),
+            "authority": "official",
+        }
+        for chunk in result.results
+    ]
+    return project_docs_answer(
+        question=question,
+        retrieval={
+            "status": result.status,
+            "context_available": bool(result.results),
+            "answer_available": bool(result.results),
+            "context_pack": context_pack,
+            "selection_profile": "library_docs_answer",
+            "selection_decision": result.selection_decision,
+            "requested_version": "3.13",
+            "docs_exactness": "exact",
+        },
+        canonical_selection=result.selection_decision,
+        max_tokens=max_tokens,
+    )[0]
+
+
+def test_exact_python_source_derives_bounded_canonical_zlib_evidence(tmp_path, monkeypatch):
+    service = _zlib_fixture_service(tmp_path, monkeypatch)
+
+    result = service.get_docs(
+        "python",
+        ecosystem="python",
+        version="3.13",
+        source_type="api",
+        topic=ZLIB_EVIDENCE_QUESTION,
+    )
+    projection = _public_library_projection(ZLIB_EVIDENCE_QUESTION, result)
+
+    assert isinstance(result.selection_decision, SelectionDecision)
+    assert result.answer_supported is True
+    assert result.answer_available is True
+    assert result.support_status == "supported"
+    assert result.mandatory_coverage == 1.0
+    assert result.missing_requirement_ids == []
+    assert result.selected_evidence_ids
+    assert result.decision_hash
+    assert {requirement.value for requirement in result.requirements} >= {
+        "zlib.Decompress.decompress",
+        "max_length",
+        "eof",
+        "unused_data",
+        "unconsumed_tail",
+    }
+    evidence = "\n".join(chunk.content for chunk in result.results)
+    assert "returned output is no longer than max_length" in evidence
+    assert "end of the compressed data stream has been reached" in evidence
+    assert "bytes past the end of the compressed data" in evidence
+    assert "compressed input not consumed because output was limited" in evidence
+    assert len(evidence.encode("utf-8")) <= 680 * 4
+    assert projection["status"] == "ok"
+    assert projection["answer_supported"] is True
+    assert projection["selected_evidence_ids"] == result.selected_evidence_ids
+    assert projection["decision_hash"] == result.decision_hash
+
+    control_question = "How does Python 3.13 zlib.Decompress.nonexistent_api(data) work?"
+    control = service.get_docs(
+        "python",
+        ecosystem="python",
+        version="3.13",
+        source_type="api",
+        topic=control_question,
+    )
+    control_projection = _public_library_projection(control_question, control, max_tokens=256)
+    assert control_projection["status"] == "insufficient_evidence"
+    assert control_projection["support_status"] == "insufficient_evidence"
+    assert control_projection["answer_supported"] is False
+    assert control_projection["answer_available"] is False
+    assert control_projection["selected_evidence_ids"] == []
+    assert control_projection["decision_hash"] is None
+    assert "support_envelope" not in control_projection
+    assert "sources" not in control_projection
+    assert control_projection["estimated_tokens"] == estimate_projection_tokens(control_projection)
+    assert validate_model_visible_projection(
+        control_projection,
+        snapshot={},
+        max_tokens=256,
+    ) == []
 
 
 def _python_direct_text_result(
