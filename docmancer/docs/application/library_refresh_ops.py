@@ -316,7 +316,8 @@ class LibraryRefreshOps:
         fetch_failure: Exception | None = None
         try:
             urls = self._record_urls(record)
-            seed_urls_for_discovery = list(target.seed_urls)
+            direct_text_operations = target.doc_format == "direct-text"
+            seed_urls_for_discovery = [] if direct_text_operations else list(target.seed_urls)
             if seed_urls_for_discovery and (target.docs_url or target.docs_url_template):
                 urls = urls[:1]
             per_url_max_pages = target.max_pages if target.doc_format == "dartdoc" else (1 if target.seed_urls and not target.docs_url and not target.docs_url_template else target.max_pages)

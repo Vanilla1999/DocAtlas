@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import json
 import hashlib
+from copy import deepcopy
 from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
@@ -33,16 +34,23 @@ class CuratedSource:
     extraction_format: str
     max_pages: int
     path_prefixes: tuple[str, ...] = ()
+    locked_versions: tuple[str, ...] = ()
+    verified_seeds: bool = False
+    source_manifest: dict[str, Any] | None = None
 
     def render(self, version: str | None) -> str | None:
         if self.version_rule == "exact" and not version:
+            return None
+        if self.locked_versions and version not in self.locked_versions:
             return None
         value = version or "latest"
         return self.docs_url.format(library=self.library, version=value)
 
     @property
     def exact_snapshot(self) -> bool:
-        return self.version_rule == "exact" and "{version}" in self.docs_url
+        return self.version_rule == "exact" and (
+            "{version}" in self.docs_url or bool(self.locked_versions)
+        )
 
 
 def _ecosystem_aliases(ecosystem: str | None) -> set[str]:
@@ -60,7 +68,8 @@ def _validation_error(source: CuratedSource, field: str, detail: str) -> ValueEr
 
 def _render_url_template(source: CuratedSource, template: str, field: str) -> str:
     try:
-        rendered = template.format(library=source.library, version=_VALIDATION_VERSION)
+        validation_version = source.locked_versions[0] if source.locked_versions else _VALIDATION_VERSION
+        rendered = template.format(library=source.library, version=validation_version)
     except (KeyError, ValueError) as exc:
         raise _validation_error(source, field, f"unresolved template: {exc}") from exc
     if "{" in rendered or "}" in rendered:
@@ -101,8 +110,14 @@ def validate_curated_sources(sources: tuple[CuratedSource, ...] | list[CuratedSo
             raise _validation_error(source, "library", "library and ecosystem are required")
         if source.version_rule not in _SUPPORTED_VERSION_RULES:
             raise _validation_error(source, "version_rule", f"unsupported value {source.version_rule!r}")
-        if source.version_rule == "exact" and "{version}" not in source.docs_url:
-            raise _validation_error(source, "docs_url", "exact source must bind {version}")
+        if source.version_rule == "exact" and "{version}" not in source.docs_url and not source.locked_versions:
+            raise _validation_error(source, "docs_url", "exact source must bind {version} or locked_versions")
+        if source.locked_versions and source.version_rule != "exact":
+            raise _validation_error(source, "locked_versions", "only exact sources may lock versions")
+        if any(not version.strip() for version in source.locked_versions):
+            raise _validation_error(source, "locked_versions", "values must be non-empty")
+        if source.verified_seeds and not source.preferred_seeds:
+            raise _validation_error(source, "verified_seeds", "preferred_seeds is required")
         if not source.extraction_format:
             raise _validation_error(source, "extraction_format", "value is required")
         if source.max_pages <= 0:
@@ -138,6 +153,13 @@ def curated_sources() -> tuple[CuratedSource, ...]:
             extraction_format=str(raw.get("extraction_format") or ""),
             max_pages=max_pages,
             path_prefixes=tuple(str(value) for value in raw.get("path_prefixes") or []),
+            locked_versions=tuple(str(value) for value in raw.get("locked_versions") or []),
+            verified_seeds=raw.get("verified_seeds") is True,
+            source_manifest=(
+                dict(raw["source_manifest"])
+                if isinstance(raw.get("source_manifest"), dict)
+                else None
+            ),
         ))
     validate_curated_sources(entries)
     return tuple(entries)
@@ -163,10 +185,17 @@ def curated_target_spec(source: CuratedSource, *, version: str | None) -> dict[s
     docs_url = source.render(version)
     if not docs_url:
         return None
-    # Manifest seed hints are advisory and historically included mechanically
-    # appended, non-existent llms.txt/sitemap.xml paths.  The canonical docs URL
-    # is the safe bounded starting point until a seed has been verified.
-    seeds: list[str] = []
+    # Most historical seed hints are advisory and mechanically generated. Only
+    # entries explicitly marked verified may cross the fetch boundary.
+    seeds = (
+        [seed.format(library=source.library, version=version or "latest") for seed in source.preferred_seeds]
+        if source.verified_seeds else []
+    )
+    source_manifest = deepcopy(source.source_manifest) if source.source_manifest is not None else {
+        "schema_version": 1,
+        "version_rule": source.version_rule,
+        "official": True,
+    }
     return {
         "library": source.library,
         "ecosystem": source.ecosystem,
@@ -178,7 +207,7 @@ def curated_target_spec(source: CuratedSource, *, version: str | None) -> dict[s
         "path_prefixes": list(source.path_prefixes),
         "max_pages": source.max_pages,
         "doc_format": source.extraction_format,
-        "source_manifest": {"schema_version": 1, "version_rule": source.version_rule, "official": True},
+        "source_manifest": source_manifest,
     }
 
 
