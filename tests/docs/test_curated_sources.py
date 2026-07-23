@@ -29,6 +29,8 @@ def test_curated_manifest_covers_the_parity_libraries_with_bounded_official_sour
 
     assert len(sources) >= 30
     assert curated_source_for("fastapi", "python", None) is not None
+    assert curated_source_for("mcp", "python", "1.27.2") is not None
+    assert curated_source_for("python", "python", "3.13") is not None
     assert curated_source_for("react", "typescript", None) is not None
     assert curated_source_for("go_router", "flutter", "14.8.1") is not None
     assert all(source.allowed_domains and source.max_pages <= 24 for source in sources)
@@ -71,16 +73,68 @@ def test_exact_request_does_not_register_unversioned_curated_docs(tmp_path: Path
     assert info.status == "needs_docs_url"
 
 
-def test_exact_curated_source_renders_the_requested_version() -> None:
+def test_exact_curated_source_renders_the_requested_version(tmp_path: Path) -> None:
     source = curated_source_for("go_router", "flutter", "16.2.0")
     assert source is not None
     assert source.exact_snapshot is True
     assert source.render("16.2.0") == "https://pub.dev/documentation/go_router/16.2.0/"
     assert curated_target_spec(source, version="16.2.0")["seed_urls"] == []
 
+    service = _service(tmp_path)
+    expected_urls = {
+        ("mcp", "1.27.2"): "https://github.com/modelcontextprotocol/python-sdk/tree/v1.27.2/docs/",
+        ("python", "3.13"): "https://docs.python.org/3.13/",
+    }
+    for (library, version), expected_url in expected_urls.items():
+        resolved = service.resolve_library(
+            library,
+            ecosystem="python",
+            version=version,
+            source_type="api",
+        )
+        assert resolved.status == "available"
+        assert resolved.library_id == f"python:{library}@{version}:api"
+        assert resolved.docs_url == expected_url
+        assert resolved.docs_snapshot_exact is True
+        record = service.registry.get(
+            library,
+            ecosystem="python",
+            version=version,
+            source_type="api",
+        )
+        assert record is not None
+        assert record.target_spec is not None
+        assert record.target_spec["docs_url"] == expected_url
+
 
 def test_full_curated_manifest_passes_offline_target_validation() -> None:
     validate_curated_sources()
+
+    expected_targets = {
+        ("mcp", "1.27.2"): (
+            "https://github.com/modelcontextprotocol/python-sdk/tree/v1.27.2/docs/",
+            "github.com",
+        ),
+        ("python", "3.13"): ("https://docs.python.org/3.13/", "docs.python.org"),
+    }
+    for (library, version), (expected_url, expected_domain) in expected_targets.items():
+        source = curated_source_for(library, "python", version)
+        assert source is not None
+        assert source.exact_snapshot is True
+        target_spec = curated_target_spec(source, version=version)
+        assert target_spec is not None
+        assert target_spec["docs_url"] == expected_url
+        assert target_spec["allowed_domains"] == [expected_domain]
+        assert target_spec["source_manifest"] == {
+            "schema_version": 1,
+            "version_rule": "exact",
+            "official": True,
+        }
+        urls, error = DocsTargetService(
+            lambda template, name, resolved: template.format(library=name, version=resolved)
+        ).target_urls(DocsTargetService.target_from_dict(target_spec))
+        assert error is None
+        assert urls == [expected_url]
 
 
 def test_flutter_bloc_exact_target_is_allowed() -> None:

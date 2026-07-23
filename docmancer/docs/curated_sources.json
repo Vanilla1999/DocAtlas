@@ -2,6 +2,30 @@
   "schema_version": 1,
   "sources": [
     {
+      "library": "mcp",
+      "ecosystem": "python",
+      "version_rule": "exact",
+      "docs_url": "https://github.com/modelcontextprotocol/python-sdk/tree/v{version}/docs/",
+      "allowed_domains": [
+        "github.com"
+      ],
+      "preferred_seeds": [],
+      "extraction_format": "html",
+      "max_pages": 24
+    },
+    {
+      "library": "python",
+      "ecosystem": "python",
+      "version_rule": "exact",
+      "docs_url": "https://docs.python.org/{version}/",
+      "allowed_domains": [
+        "docs.python.org"
+      ],
+      "preferred_seeds": [],
+      "extraction_format": "html",
+      "max_pages": 24
+    },
+    {
       "library": "fastapi",
       "ecosystem": "python",
       "version_rule": "unversioned",
