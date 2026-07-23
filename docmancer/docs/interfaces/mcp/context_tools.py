@@ -7,6 +7,7 @@ import math
 from typing import Any
 
 from docmancer.docs.application.action_packet import build_action_packet, validate_action_packet
+from docmancer.docs.application.evidence_selection import SelectionDecision
 from docmancer.docs.application.model_visible_projection import (
     DOCS_ANSWER_MAX_TOKENS,
     INSUFFICIENT_EVIDENCE_MAX_TOKENS,
@@ -266,7 +267,13 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
         details=args.get("details"),
         response_style=args.get("response_style"),
     )
-    canonical_selection = getattr(result, "selection_decision", None)
+    canonical_selection = (
+        result.get("selection_decision")
+        if isinstance(result, dict)
+        else getattr(result, "selection_decision", None)
+    )
+    if not isinstance(canonical_selection, SelectionDecision):
+        canonical_selection = None
     if is_dataclass(result):
         raw = asdict(result)
     elif isinstance(result, dict):

@@ -363,70 +363,88 @@ def test_support_decision_survives_all_compatibility_and_bounded_modes():
         library_docs_selection_config,
         select_evidence,
     )
+    from docmancer.docs.application.model_visible_projection import (
+        estimate_projection_tokens,
+    )
 
     question = "Compare async with launch and explain how to obtain the async result"
-    text = "launch starts a coroutine."
-    candidate = {
-        "stable_chunk_id": "chunk-launch",
-        "parent_logical_id": "coroutines",
-        "source": "https://example.test/coroutines",
-        "display_text": text,
-        "display_content_hash": hashlib.sha256(text.encode()).hexdigest(),
-        "authority": "official",
-        "docs_exactness": "exact",
-        "version": "1.0",
-    }
-    selection = select_evidence(
-        [candidate],
-        question=question,
-        config=library_docs_selection_config(800),
+    scenarios = (
+        ("launch starts a coroutine.", "required_evidence_missing"),
+        (
+            "Compare async with launch: async returns a Deferred result, launch returns "
+            "a Job; call await on Deferred to obtain the async result.",
+            None,
+        ),
     )
-    support = selection.support_decision.as_payload()
-    shared_retrieval = {
-        "tool": "get_docs_context",
-        "status": "success",
-        "context_available": True,
-        "answer_available": False,
-        "selection_profile": "library_docs_answer",
-        "selection_decision": selection,
-        "context_pack": [candidate],
-        "trust_contract": {"selected": [], "rejected": [], "risky": []},
-    }
-    support_keys = tuple(support)
-    expected = {key: support[key] for key in support_keys}
     public_schema = next(
         tool["outputSchema"] for tool in TOOLS
         if tool["name"] == "get_docs_context"
     )
 
-    class Facade:
-        def get_docs_context(self, question, **kwargs):
-            # Every serializer consumes the exact immutable selector decision.
-            return SimpleNamespace(**shared_retrieval)
-
-    observed = [cast(dict[str, Any], handle_context_tool(
-        "get_docs_context", {"question": question, "library": "kotlin", "output_mode": mode}, cast(Any, Facade())
-    )) for mode in ("answer", "compact", "full", "debug")]
-    observed.append(cast(dict[str, Any], handle_context_tool(
-        "get_docs_context",
-        {"question": question, "library": "kotlin", "delivery_strategy": "bounded_direct"},
-        cast(Any, Facade()),
-    )))
-
-    assert expected["decision_hash"]
-    assert expected["selected_evidence_ids"]
-    for result in observed:
-        assert {
-            key: result[key] for key in support_keys
-            if key != "reason_code"
-        } == {
-            key: value for key, value in expected.items()
-            if key != "reason_code"
+    for text, expected_reason in scenarios:
+        candidate = {
+            "stable_chunk_id": "chunk-dict-witness",
+            "parent_logical_id": "coroutines",
+            "source": "https://example.test/coroutines",
+            "display_text": text,
+            "display_content_hash": hashlib.sha256(text.encode()).hexdigest(),
+            "authority": "official",
+            "docs_exactness": "exact",
+            "version": "1.0",
         }
-        if "reason_code" in result:
-            assert isinstance(result["reason_code"], str)
-        jsonschema.validate(result, public_schema)
-    assert observed[-1]["status"] == "insufficient_evidence"
+        selection = select_evidence(
+            [candidate],
+            question=question,
+            config=library_docs_selection_config(800),
+        )
+        expected = selection.support_decision.as_payload()
+        shared_retrieval = {
+            "tool": "get_docs_context",
+            "status": "success",
+            "context_available": True,
+            "selection_profile": "library_docs_answer",
+            "selection_decision": selection,
+            "context_pack": [candidate],
+            "trust_contract": {"selected": [], "rejected": [], "risky": []},
+        }
+
+        for result_shape in ("object", "dict"):
+            class Facade:
+                def get_docs_context(self, question, **kwargs):
+                    # Fresh values prevent one serializer call from seeding the next.
+                    if result_shape == "dict":
+                        return dict(shared_retrieval)
+                    return SimpleNamespace(**shared_retrieval)
+
+            observed = [cast(dict[str, Any], handle_context_tool(
+                "get_docs_context",
+                {"question": question, "library": "kotlin", "output_mode": mode},
+                cast(Any, Facade()),
+            )) for mode in ("answer", "compact", "full", "debug")]
+            observed.append(cast(dict[str, Any], handle_context_tool(
+                "get_docs_context",
+                {
+                    "question": question,
+                    "library": "kotlin",
+                    "delivery_strategy": "bounded_direct",
+                },
+                cast(Any, Facade()),
+            )))
+
+            for result in observed:
+                assert {
+                    key: result[key] for key in expected
+                    if key != "reason_code"
+                } == {
+                    key: value for key, value in expected.items()
+                    if key != "reason_code"
+                }
+                if expected_reason is None:
+                    assert "reason_code" not in result
+                else:
+                    assert result["reason_code"] == expected_reason
+                jsonschema.validate(result, public_schema)
+            assert observed[-1]["estimated_tokens"] == estimate_projection_tokens(observed[-1])
 
 
 def test_bounded_library_delivery_at_256_tokens_transports_complete_support_envelope():
