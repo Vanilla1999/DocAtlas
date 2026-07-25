@@ -1480,7 +1480,11 @@ class LibraryDocsApplicationService:
         query = topic.strip() if topic else info.library
         retrieval_filters = {"library_id": record.library_id}
         resolved_version = record.resolved_version or record.version
-        if resolved_version:
+        # The index deliberately normalizes the floating ``latest`` version to
+        # an empty promoted field.  Its canonical library ID still contains the
+        # version and source identity, so applying that unrepresentable filter
+        # would hide the same isolated corpus immediately after refresh.
+        if resolved_version and resolved_version.casefold() != "latest":
             retrieval_filters["resolved_version"] = resolved_version
         if record.docs_snapshot_exact is True:
             retrieval_filters["exact_snapshot_required"] = True
