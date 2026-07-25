@@ -412,7 +412,7 @@
     "tests/test_snippet_first_services.py": "5b9b8f9d142d2cb781624930fa14f6b4fdf45a63640501ea415b87c21b37b24b",
     "tests/test_snippet_presentation.py": "3c4bafd01fefb38b07f54251b5b634351d53650e7b101a49a95bc3d9b80756b3",
     "tests/test_snippet_quality.py": "b96228677e9f088229d4b375bdaec23bf6a5a7f067a5e3b3c751489b02d98613",
-    "tests/test_source_isolation_regression.py": "b11401a0b08288fc674e43f1367e046a1b5e096348064332438b4636780e4f9d",
+    "tests/test_source_isolation_regression.py": "44f779e039978d43c0bc2dddcf254f90eb8e86adb162b7b53034beef40d81362",
     "tests/test_sqlite_ranking_truth.py": "a0b4242be491257171a4ef1321938b1f20b2cd18401769eb4b13e1209d0a2ce8",
     "tests/test_sqlite_store_embedding_sections.py": "c713272d8a39b7656e7b1b078e5aa1f5f84e6f13455bdf8cde6cebd0fbcaf3e4",
     "tests/test_sqlite_vec_store.py": "765cc69880e5e929e0c7a0f037253aa07f5f7998d13e190a16d67244b2253da2",
