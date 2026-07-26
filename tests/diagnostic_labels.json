@@ -215,7 +215,7 @@
   },
   "module_node_hashes": {
     "tests/docs/test_action_packet.py": "a1fa95e4208b86daaa5c0c6c521d2fb30ce454400b616130c51096ae278d38cc",
-    "tests/docs/test_agent_index_gateway.py": "b22d7127218f10e65904f4ff6c399af32e10c0c6ba417d3cec6c28b578c22aea",
+    "tests/docs/test_agent_index_gateway.py": "e870608d4ce9b818606a402ae790105562ea5300d92d432d641078ef7cbc30f1",
     "tests/docs/test_change_aware_maintenance.py": "691793ef8fa0c653ef44065b82dbe85da2488a33ce7ffd4578867139426cf5cb",
     "tests/docs/test_code_graph.py": "e0b649da530df23b24e9f6fa33d6e6718481c26da4fd6daf915f5cb66c4ddf78",
     "tests/docs/test_code_graph_golden.py": "b05c19d8d26bb5ea8e60ad1ed74addf23526ba38baae59c0ba2f094e522f22ea",
@@ -348,7 +348,7 @@
     "tests/test_install_cmd.py": "7d1ef7fdb722b0dd50ecc5ebc21e09e12b31fccf022483eba11dcef6435bfda6",
     "tests/test_install_mcp_handshake.py": "349ad67d90e64481663cb023f9ace244bad44fcd6e8dd502ae6fc840a991c54d",
     "tests/test_internal_noise_filter.py": "27843e3122ac2e4b56e9b788969d9f05116fe4530bc18fc17815e173c6dcb05f",
-    "tests/test_library_natural_language_retrieval.py": "07239f9db22dbd6d994c0a7ba605e20a6f244e05739fe5a067f082f1df133226",
+    "tests/test_library_natural_language_retrieval.py": "ebcbe185c7eeea5aaabbf78cd1d84450c52bbdeaad550b309ce3bffb24588e5b",
     "tests/test_library_retrieval_quality_baseline.py": "49a66ee06a7362221103135815fe043089f33b79a970e635b58dfec3548ae9f4",
     "tests/test_kotlin_live_smoke.py": "ba4a9e615b26992339d1a6c1c60068005934c910a7f2ab572073bbd953d812c0",
     "tests/test_kotlin_partial_crawl.py": "1a8d39f0d758cb9b5c96725702af477aa434f69eaa63455a0cd7ad962fe40b0c",

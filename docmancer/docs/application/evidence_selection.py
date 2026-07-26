@@ -454,6 +454,35 @@ class SupportDecision:
             "decision_hash": self.decision_hash,
         }
 
+    def with_insufficient_reason_code(self, reason_code: str) -> "SupportDecision":
+        """Return an insufficient verdict with one audited runtime reason."""
+
+        if self.answer_supported or self.support_status != "insufficient_evidence":
+            raise ValueError("only an insufficient support decision can carry an insufficiency reason")
+        if not reason_code:
+            raise ValueError("an insufficiency reason code is required")
+
+        payload = {
+            "answer_supported": self.answer_supported,
+            "support_status": self.support_status,
+            "reason_code": reason_code,
+            "missing_requirement_ids": self.missing_requirement_ids,
+            "satisfied_requirement_ids": self.satisfied_requirement_ids,
+            "mandatory_requirement_ids": self.mandatory_requirement_ids,
+            "mandatory_coverage": self.mandatory_coverage,
+            "selected_evidence_ids": self.selected_evidence_ids,
+            "requirements_hash": self.requirements_hash,
+            "selector_config_hash": self.selector_config_hash,
+            "eligibility_contract_hash": self.eligibility_contract_hash,
+            "candidate_trace_hash": self.candidate_trace_hash,
+            "selection_hash": self.selection_hash,
+        }
+        return replace(
+            self,
+            reason_code=str(reason_code),
+            decision_hash=canonical_hash(payload),
+        )
+
 
 @dataclass(frozen=True, slots=True)
 class SelectionDecision:
@@ -1374,6 +1403,25 @@ def _code_group_requirement_matches(value: str, candidate: EvidenceCandidate) ->
         all(fragment.casefold() in block.casefold() for fragment in fragments)
         for block in _candidate_code_blocks(candidate)
     )
+
+
+def requirement_probe_query(requirement: EvidenceRequirement) -> str | None:
+    """Return a bounded lexical witness query for one canonical requirement."""
+
+    if requirement.kind in {"exact_term", "entity"}:
+        return requirement.value.strip() or None
+    if requirement.kind == "facet":
+        kind, _, detail = requirement.value.partition(":")
+        if kind == "comparison":
+            left, separator, right = detail.partition(":")
+            return f"{left} {right}" if separator else None
+        if kind == "result_access":
+            entity, separator, _ = detail.partition(":")
+            return f"{entity} result" if separator else None
+    if requirement.kind == "code_group":
+        fragments = _code_group_fragments(requirement.value)
+        return " ".join(fragments) if fragments else None
+    return None
 
 
 def _with_coverage(candidate: EvidenceCandidate, requirements: Sequence[EvidenceRequirement]) -> EvidenceCandidate:

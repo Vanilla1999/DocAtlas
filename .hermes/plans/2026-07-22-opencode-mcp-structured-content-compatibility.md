@@ -33,15 +33,15 @@ Relevant existing contracts:
 - `tests/test_unified_docs_context.py:825-857`
 - `tests/test_unified_docs_context_mcp.py:222-247`
 
-## Execution status
+## Execution status (updated 2026-07-26)
 
 | Task | Status | Gate |
 | --- | --- | --- |
-| 1. Freeze the OpenCode model-visible transport regression | not started | RED proves generated OpenCode config and a text-only client cannot currently consume the payload. |
-| 2. Register OpenCode with text-only fallback | not started | Generated and migrated OpenCode entries preserve user settings and set the compatibility environment. |
-| 3. Add provider-free generated-config transport smoke | not started | Exact generated command/environment returns JSON through `content` with no duplicate structured payload. |
-| 4. Correct project-index recovery ordering | not started | Explicit project mode with discovered-but-unindexed docs recommends confirmed `sync_project_docs`, never dependency prefetch as the primary action. |
-| 5. Documentation, affected regression, and NBO validation | not started | Focused suites pass; NBO status becomes model-visible. Any NBO sync remains confirmation-gated. |
+| 1. Freeze the OpenCode model-visible transport regression | complete | Default structured and text-only fallback lanes are covered without duplicating the payload. |
+| 2. Register OpenCode with text-only fallback | complete | Python registration and `scripts/install.sh` merge `DOCATLAS_MCP_TEXT_FALLBACK=1`, preserve user settings, and reject malformed environments. |
+| 3. Add provider-free generated-config transport smoke | complete | The release stdio smoke exercises the generated OpenCode command/environment and requires JSON in `content` with no `structuredContent`. |
+| 4. Correct project-index recovery ordering | complete | Explicit project mode with discovered-but-unindexed docs recommends confirmed `prepare_docs(action="sync_project_docs")` before dependency prefetch. |
+| 5. Documentation, affected regression, and NBO validation | partial | README/MCP documentation and regression coverage were updated. A read-only NBO validation artifact remains pending; NBO sync and live network access remain confirmation-gated. |
 
 ## Scope boundaries
 
