@@ -103,7 +103,7 @@ def register_server(target: AgentTarget) -> tuple[bool, str]:
         )
     merged = {**(existing or {}), **desired}
     if target.style == "json_opencode_mcp":
-        environment = (existing or {}).get("environment") or {}
+        environment = {} if existing is None or "environment" not in existing else existing["environment"]
         if not isinstance(environment, dict):
             raise ValueError(
                 f"Existing MCP server {SERVER_KEY!r} in {target.config_path} has a non-object environment; refusing to overwrite it."

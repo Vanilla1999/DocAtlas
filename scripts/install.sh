@@ -303,7 +303,10 @@ if existing is not None and existing.get("command") not in (
 ):
     print(f"opencode MCP server {name!r} has a different command; refusing to overwrite it", file=sys.stderr)
     sys.exit(2)
-environment = (existing or {}).get("environment") or {}
+if existing is None or "environment" not in existing:
+    environment = {}
+else:
+    environment = existing["environment"]
 if not isinstance(environment, dict):
     print(f"opencode MCP server {name!r} has a non-object environment; refusing to overwrite it", file=sys.stderr)
     sys.exit(2)
