@@ -195,6 +195,21 @@ class UnifiedDocsContextService:
             lane_details["project_bootstrap"] = self._to_dict(bootstrap)
             bootstrap_reason = getattr(bootstrap, "reason_code", None) or "project_docs_confirmation_required"
             if getattr(bootstrap, "requires_confirmation", False) and "dependency_docs" not in bootstrap_reason:
+                project_recovery_action = self._project_index_recovery_action(bootstrap, project_path)
+                if mode_selected == "project" and project_recovery_action:
+                    return self._confirmation_result(
+                        question=question,
+                        mode_requested=mode_requested,
+                        mode_selected=mode_selected,
+                        routing=routing,
+                        reason_code=bootstrap_reason,
+                        confirmation_reason=getattr(bootstrap, "confirmation_reason", None),
+                        next_action=project_recovery_action,
+                        arguments_patch=project_recovery_action["arguments_patch"],
+                        lanes=lanes,
+                        lane_details=lane_details if details else {},
+                        warnings=list(getattr(bootstrap, "warnings", []) or []),
+                    )
                 if self._can_return_partial_project_context(bootstrap):
                     project_preflight_pending = bootstrap
                     warnings.append({
@@ -1120,6 +1135,28 @@ class UnifiedDocsContextService:
         next_action = getattr(bootstrap, "next_action", None) or {}
         risk_codes = set(next_action.get("risk_codes") or []) if isinstance(next_action, dict) else set()
         return bool(risk_codes) and risk_codes <= {"placeholder_project_doc"}
+
+    @staticmethod
+    def _project_index_recovery_action(bootstrap: Any, project_path: str) -> dict[str, Any] | None:
+        """Return typed sync recovery when discovered project docs have no index evidence."""
+        inspect_result = getattr(bootstrap, "inspect_result", None)
+        project_docs = getattr(inspect_result, "project_docs", None)
+        if not isinstance(project_docs, dict):
+            return None
+        found = project_docs.get("found") or []
+        indexed = project_docs.get("indexed") or []
+        next_action = getattr(bootstrap, "next_action", None) or {}
+        if not found or indexed or not isinstance(next_action, dict):
+            return None
+        if next_action.get("tool_after_confirmation") != "sync_project_docs":
+            return None
+        return {
+            "type": "prepare_docs",
+            "tool": "prepare_docs",
+            "arguments_patch": {"action": "sync_project_docs", "project_path": project_path},
+            "requires_confirmation": True,
+            "confirmation_reason": getattr(bootstrap, "confirmation_reason", None),
+        }
 
     @staticmethod
     def _collect_pending_actions(lane_results: list[Any]) -> dict[str, Any]:

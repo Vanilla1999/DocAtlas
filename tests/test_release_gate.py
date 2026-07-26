@@ -4,6 +4,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+import pytest
+
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -62,7 +64,7 @@ def test_stdio_smoke_requires_cited_content() -> None:
 
 
 def test_stdio_smoke_accepts_structured_content_and_legacy_json_text() -> None:
-    from scripts.docs_mcp_stdio_smoke import payload
+    from scripts.docs_mcp_stdio_smoke import payload, text_payload
 
     class Text:
         def __init__(self, text: str) -> None:
@@ -77,6 +79,16 @@ def test_stdio_smoke_accepts_structured_content_and_legacy_json_text() -> None:
     expected = {"status": "ok", "kind": "docs_answer"}
     assert payload(Result(structured=expected, text="not JSON")) is expected
     assert payload(Result(text='{"status": "ok", "kind": "docs_answer"}')) == expected
+    assert text_payload(Result(text='{"status": "ok", "kind": "docs_answer"}')) == expected
+    with pytest.raises(AssertionError, match="included structuredContent"):
+        text_payload(Result(structured=expected, text='{"status": "ok"}'))
+
+
+def test_opencode_installer_enables_text_fallback_without_overwriting_other_environment() -> None:
+    text = (ROOT / "scripts/install.sh").read_text()
+    assert '"DOCATLAS_MCP_TEXT_FALLBACK": "1"' in text
+    assert '"environment": {**environment, **desired["environment"]}' in text
+    assert "has a different command; refusing to overwrite it" in text
 
 
 def test_installer_compares_exact_version_output() -> None:

@@ -75,7 +75,7 @@ Older direct documentation APIs and internal facade names may remain for compati
 
 The public catalog intentionally omits legacy formatting, pagination, maintenance, delivery, and packet-budget arguments. Existing integrations may still pass those fields during the transition, but ordinary coding calls should omit them and accept the server-owned bounded result. Integrations that explicitly request `output_mode`, pagination, sections, details, or maintenance retain the broader compatibility response.
 
-By default, the full result is attached only as MCP `structuredContent`; text contains a short constant marker. Set `DOCATLAS_MCP_TEXT_FALLBACK=1` only for an older client that cannot consume structured content. Fallback mode sends the full JSON in text and omits `structuredContent`, so the payload is never duplicated across both channels.
+By default, the full result is attached only as MCP `structuredContent`; text contains a short constant marker. OpenCode registration automatically sets `DOCATLAS_MCP_TEXT_FALLBACK=1` because OpenCode currently does not preserve structured content in model-visible tool output; manual OpenCode configurations must set it too. Other clients retain the default structured lane. Fallback mode sends the full JSON in text and omits `structuredContent`, so the payload is never duplicated across both channels.
 
 ## Release and support
 

@@ -857,6 +857,41 @@ def test_placeholder_preflight_returns_partial_project_context_without_blind_syn
     assert any(call[0] == "get_project_context" for call in facade.calls)
 
 
+def test_project_mode_prioritizes_confirmed_sync_for_discovered_unindexed_docs():
+    class UnindexedPreflightFacade(FakeFacade):
+        def bootstrap_project_docs(self, project_path, question=None) -> Any:
+            self.calls.append(("bootstrap_project_docs", {"project_path": project_path, "question": question}))
+            inspect_result = type("Inspect", (), {
+                "project_docs": {"found": [{"path": "README.md"}], "indexed": []},
+            })()
+            return type("Bootstrap", (), {
+                "requires_confirmation": True,
+                "warnings": [],
+                "reason_code": "project_docs_preflight_confirmation_required",
+                "confirmation_reason": "project_docs_preflight",
+                "next_action": {
+                    "type": "ask_user_to_update_or_confirm_project_docs",
+                    "tool_after_confirmation": "sync_project_docs",
+                },
+                "arguments_patch": {"project_path": project_path, "with_vectors": True},
+                "inspect_result": inspect_result,
+            })()
+
+    facade = UnindexedPreflightFacade()
+    result = _service(facade).get_docs_context("architecture", project_path="/repo", mode="project")
+
+    assert result.status == "confirmation_required"
+    assert result.answer_available is False
+    assert result.next_action == {
+        "type": "prepare_docs",
+        "tool": "prepare_docs",
+        "arguments_patch": {"action": "sync_project_docs", "project_path": "/repo"},
+        "requires_confirmation": True,
+        "confirmation_reason": "project_docs_preflight",
+    }
+    assert _call_names(facade) == ["bootstrap_project_docs"]
+
+
 def test_auto_dependency_question_selects_dependency():
     facade = FakeFacade()
     facade.project_context = replace(facade.project_context, context_pack=[{"doc_scope": "dependency", "source_class": "dependency_doc", "dependency": "riverpod", "title": "autoDispose", "content": "dep"}])
