@@ -65,6 +65,8 @@ def test_selector_returns_one_immutable_auditable_support_decision():
     assert support.decision_hash
     with pytest.raises(AttributeError):
         support.answer_supported = False
+    with pytest.raises(ValueError, match="insufficient support decision"):
+        support.with_insufficient_reason_code("retrieval_miss")
 
 
 def test_support_decision_preserves_full_canonical_requirement_ids_without_collisions():

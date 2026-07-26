@@ -4,6 +4,7 @@ import json
 import hashlib
 from datetime import datetime, timezone
 from pathlib import Path
+from types import SimpleNamespace
 from typing import Any
 
 import pytest
@@ -11,10 +12,19 @@ import pytest
 from docmancer.core.config import DocmancerConfig
 from docmancer.core.models import RetrievedChunk
 from docmancer.docs.application.docs_job_service import DocsJobTracker
+from docmancer.docs.application.evidence_selection import (
+    build_requirements,
+    library_docs_selection_config,
+    select_evidence,
+)
+from docmancer.docs.application.library_docs_service import LibraryDocsApplicationService
 from docmancer.docs.application.model_visible_projection import (
     decode_support_envelope,
     project_docs_answer,
 )
+from docmancer.docs.infrastructure.agent_index_gateway import LibraryWitnessProbe
+from docmancer.docs.models import LibraryInfo
+from docmancer.docs.registry import LibraryRecord
 from docmancer.docs.registry import LibraryRegistry
 from docmancer.docs.service import LibraryDocsService
 
@@ -229,6 +239,114 @@ def test_complete_code_support_is_one_source_version_and_code_block(tmp_path, mo
     groups = [item for item in operational.requirements if item.kind == "code_group"]
     assert len(groups) == 1
     assert groups[0].requirement_id in operational.satisfied_requirement_ids
+
+
+def test_complete_manifest_index_witness_reclassifies_dispatcher_omission_without_leaking_text():
+    question = "Compare async with launch and explain how to obtain the async result"
+    requirements = build_requirements(
+        question,
+        profile="library_docs_answer",
+        library_requirement_contract={
+            "entities": ["async", "launch"],
+            "facets": ["comparison", "result_access"],
+        },
+    )
+    initial = select_evidence(
+        [{
+            "stable_chunk_id": "launch-only",
+            "parent_logical_id": "launch-guide",
+            "display_content_hash": hashlib.sha256(b"launch starts fire-and-forget work").hexdigest(),
+            "source": "https://docs.example.test/coroutines/launch",
+            "content": "launch starts fire-and-forget work",
+            "authority": "official",
+            "version": "1.8.1",
+        }],
+        question=question,
+        config=library_docs_selection_config(4000),
+        requirements=requirements,
+    ).support_decision
+    assert initial.answer_supported is False
+
+    witness_chunk = RetrievedChunk(
+        source="https://docs.example.test/coroutines/async",
+        chunk_index=0,
+        text="Use async instead of launch for a deferred result; call await to obtain that result.",
+        score=1.0,
+        metadata={
+            "stable_chunk_id": "async-witness",
+            "title": "Async result",
+            "library_id": "kotlinx.coroutines@1.8.1:web",
+            "canonical_id": "kotlinx.coroutines@1.8.1:web",
+            "ecosystem": "kotlin",
+            "version": "1.8.1",
+            "source_type": "web",
+            "docset_root": "https://docs.example.test/coroutines",
+        },
+    )
+
+    class WitnessGateway:
+        def probe_library_requirements(self, *args, **kwargs):
+            return LibraryWitnessProbe(
+                status="ok",
+                queried_requirement_ids=tuple(kwargs["missing_requirement_ids"]),
+                chunks=(witness_chunk,),
+            )
+
+    record = LibraryRecord(
+        library_id="kotlinx.coroutines@1.8.1:web",
+        source_id="source-id",
+        canonical_id="kotlinx.coroutines@1.8.1:web",
+        name="kotlinx.coroutines",
+        normalized_name="kotlinx.coroutines",
+        ecosystem="kotlin",
+        version="1.8.1",
+        source_type="web",
+        docs_url="https://docs.example.test/coroutines",
+        docs_url_template=None,
+        aliases=[],
+        status="available",
+        added_at="2026-01-01T00:00:00+00:00",
+        last_checked_at=None,
+        last_refreshed_at=None,
+        last_error=None,
+    )
+    info = LibraryInfo(
+        library_id=record.library_id,
+        canonical_id=record.canonical_id,
+        library=record.name,
+        ecosystem=record.ecosystem,
+        version=record.version,
+        source_type=record.source_type,
+    )
+    service = object.__new__(LibraryDocsApplicationService)
+    service.facade = SimpleNamespace(agent_gateway=WitnessGateway())
+    service._library_manifest_is_complete = lambda _: True
+    diagnostics = service._bounded_library_index_witness(
+        record=record,
+        info=info,
+        requirements=requirements,
+        support_decision=initial,
+        retrieval_filters={"library_id": record.library_id},
+        allowed_ids={record.library_id},
+        expected_roots={"https://docs.example.test/coroutines"},
+        dispatcher_candidate_ids={"launch-only"},
+        resolved_version="1.8.1",
+        requested_version="1.8.1",
+        docs_exactness="exact",
+        docs_snapshot_exact=True,
+        exact_version_match=True,
+    )
+
+    assert diagnostics["status"] == "witness_found"
+    assert diagnostics["witnesses"] == [{
+        "evidence_id": "async-witness",
+        "covered_requirement_ids": sorted(initial.missing_requirement_ids),
+    }]
+    assert "async instead" not in json.dumps(diagnostics)
+    revised = initial.with_insufficient_reason_code("retrieval_miss")
+    assert revised.reason_code == "retrieval_miss"
+    assert revised.missing_requirement_ids == initial.missing_requirement_ids
+    assert revised.decision_hash != initial.decision_hash
 
 
 def test_exact_source_and_version_contamination_is_zero(tmp_path, monkeypatch):
