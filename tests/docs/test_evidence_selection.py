@@ -142,6 +142,76 @@ def test_requirement_set_extracts_non_kotlin_comparison_and_passive_result_acces
     )
 
 
+def test_library_code_group_is_a_canonical_requirement_and_needs_one_code_block():
+    question = "Show code comparing async with launch and explain how to obtain the async result"
+    requirements = build_requirements(
+        question,
+        profile="library_docs_answer",
+        library_requirement_contract={
+            "entities": ["async", "launch"],
+            "facets": ["comparison", "result_access"],
+            "code_groups": [["async {", ".await()"]],
+        },
+    )
+    code_groups = [item for item in requirements if item.kind == "code_group"]
+
+    assert len(code_groups) == 1
+    assert code_groups[0].mandatory is True
+    assert code_groups[0].requirement_id.startswith("code_group:")
+
+    split = select_evidence(
+        [
+            _candidate(
+                "async-only",
+                "```kotlin\nval deferred = async { computeAnswer() }\n```",
+            ),
+            _candidate(
+                "await-only",
+                "```kotlin\nval answer = deferred.await()\n```",
+            ),
+        ],
+        question=question,
+        config=library_docs_selection_config(800),
+        requirements=requirements,
+    )
+    assert split.support_decision.answer_supported is False
+    assert code_groups[0].requirement_id in split.support_decision.missing_requirement_ids
+
+    complete = select_evidence(
+        [_candidate(
+            "combined",
+            "async instead of launch; await obtains the result.\n"
+            "```kotlin\nval deferred = async { computeAnswer() }\nval answer = deferred.await()\n```",
+        )],
+        question=question,
+        config=library_docs_selection_config(800),
+        requirements=requirements,
+    )
+    assert complete.support_decision.answer_supported is True
+    assert code_groups[0].requirement_id in complete.support_decision.satisfied_requirement_ids
+
+    standalone_question = "Show code using WidgetClient.fetch_record"
+    standalone_requirements = build_requirements(
+        standalone_question,
+        profile="library_docs_answer",
+        library_requirement_contract={
+            "code_groups": [["fetch_record(", "timeout=5"]],
+        },
+    )
+    standalone_group = next(item for item in standalone_requirements if item.kind == "code_group")
+    legacy_metadata = select_evidence(
+        [_candidate(
+            "legacy-code-snippet-count",
+            "```python\nWidgetClient.fetch_record(record_id, timeout=5)\n```",
+            metadata={"code_snippets": 1},
+        )],
+        question=standalone_question,
+        config=library_docs_selection_config(800),
+        requirements=standalone_requirements,
+    )
+    assert standalone_group.requirement_id in legacy_metadata.support_decision.satisfied_requirement_ids
+
+
 def test_comparison_requirement_span_uses_the_matched_repeated_rhs():
     question = (
         "gather is familiar. Compare create_task with gather and explain how "

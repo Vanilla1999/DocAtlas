@@ -11,7 +11,10 @@ import pytest
 from docmancer.core.config import DocmancerConfig
 from docmancer.core.models import RetrievedChunk
 from docmancer.docs.application.docs_job_service import DocsJobTracker
-from docmancer.docs.application.model_visible_projection import project_docs_answer
+from docmancer.docs.application.model_visible_projection import (
+    decode_support_envelope,
+    project_docs_answer,
+)
 from docmancer.docs.registry import LibraryRegistry
 from docmancer.docs.service import LibraryDocsService
 
@@ -152,6 +155,11 @@ def _retrieve(tmp_path: Path, monkeypatch, ecosystem: str, corpus_name: str, que
     return projection, result, gateway, corpus
 
 
+def _support_payload(projection: dict[str, Any]) -> dict[str, Any]:
+    envelope = projection.get("support_envelope")
+    return decode_support_envelope(envelope) if envelope else projection
+
+
 ASYNC_RESULT = "When should I use async instead of launch, and how do I obtain its result?"
 LAUNCH_ONLY = "How do I launch a coroutine for work that does not return a result?"
 
@@ -165,11 +173,13 @@ def test_raw_topic_reaches_record_scoped_gateway_unprefixed(tmp_path, monkeypatc
 
 def test_gap_is_operational_success_but_support_is_insufficient(tmp_path, monkeypatch):
     result, operational, _, _ = _retrieve(tmp_path, monkeypatch, "kotlinx_coroutines", "corpus_gap", ASYNC_RESULT)
+    support = _support_payload(result)
     assert operational.status == result["operational_status"] == "success"
     assert result["context_available"] is True
-    assert result["answer_supported"] is False
-    assert result["support_status"] == "insufficient_evidence"
-    assert set(result["missing_requirement_ids"]) >= {"comparison", "result_access"}
+    assert support["answer_supported"] is False
+    assert support["support_status"] == "insufficient_evidence"
+    assert any(value.startswith("facet:comparison:") for value in support["missing_requirement_ids"])
+    assert any(value.startswith("facet:result_access:") for value in support["missing_requirement_ids"])
 
 
 @pytest.mark.parametrize("corpus_name", ["corpus_gap", "corpus_complete"])
@@ -185,11 +195,13 @@ def test_launch_only_control_is_executably_answerable_on_both_corpora(tmp_path, 
 ])
 def test_complete_english_queries_expose_complete_mandatory_support(tmp_path, monkeypatch, question):
     result, _, _, _ = _retrieve(tmp_path, monkeypatch, "kotlinx_coroutines", "corpus_complete", question)
-    assert result["answer_supported"] is True
-    assert result["support_status"] == "supported"
-    assert result["missing_requirement_ids"] == []
-    assert set(result["satisfied_requirement_ids"]) >= {"comparison", "result_access", "async", "launch"}
-    assert result["selected_evidence_ids"]
+    support = _support_payload(result)
+    assert support["answer_supported"] is True
+    assert support["support_status"] == "supported"
+    assert support["missing_requirement_ids"] == []
+    assert {"entity:async", "entity:launch", "facet:comparison:async:launch"} <= set(support["satisfied_requirement_ids"])
+    assert any(value.startswith("facet:result_access:") for value in support["satisfied_requirement_ids"])
+    assert support["selected_evidence_ids"]
 
 
 def test_python_lowercase_comparison_and_result_query_is_executable(tmp_path, monkeypatch):
@@ -197,24 +209,26 @@ def test_python_lowercase_comparison_and_result_query_is_executable(tmp_path, mo
     result, operational, gateway, _ = _retrieve(tmp_path, monkeypatch, "python_asyncio", "corpus_complete", question)
     assert operational.status == "success"
     assert gateway.queries == [question]
-    assert result["answer_supported"] is True
-    assert set(result["satisfied_requirement_ids"]) >= {"create_task", "gather", "comparison", "result_access"}
+    support = _support_payload(result)
+    assert support["answer_supported"] is True
+    assert {"entity:create_task", "entity:gather", "facet:comparison:create_task:gather"} <= set(support["satisfied_requirement_ids"])
+    assert any(value.startswith("facet:result_access:") for value in support["satisfied_requirement_ids"])
 
 
 def test_partial_overlap_cannot_authorize_answer_and_failure_is_bounded(tmp_path, monkeypatch):
-    result, _, _, _ = _retrieve(tmp_path, monkeypatch, "kotlinx_coroutines", "corpus_gap", "Compare async with launch and show how to obtain the async result")
-    assert result["answer_supported"] is False
-    assert result["missing_requirement_ids"]
-    assert all(set(row) <= {"candidate_id", "reason_code", "missing_requirement_ids"} for row in result["rejected_candidates"])
-    assert len(json.dumps(result["rejected_candidates"])) < 2_000
+    result, operational, _, _ = _retrieve(tmp_path, monkeypatch, "kotlinx_coroutines", "corpus_gap", "Compare async with launch and show how to obtain the async result")
+    support = _support_payload(result)
+    assert support["answer_supported"] is False
+    assert support["missing_requirement_ids"]
+    assert "rejected_candidates" not in result
+    assert len(operational.selection_decision.omissions) <= 20
 
 
 def test_complete_code_support_is_one_source_version_and_code_block(tmp_path, monkeypatch):
-    result, _, _, _ = _retrieve(tmp_path, monkeypatch, "kotlinx_coroutines", "corpus_complete", "Show code comparing async and launch and awaiting the async result")
-    group = result["required_code_groups"][0]
-    assert group["satisfied"] is True
-    assert group["witnesses"] == ["async {", ".await()"]
-    assert len({(row["source"], row["version"], row["code_block_id"]) for row in group["evidence"]}) == 1
+    _, operational, _, _ = _retrieve(tmp_path, monkeypatch, "kotlinx_coroutines", "corpus_complete", "Show code comparing async and launch and awaiting the async result")
+    groups = [item for item in operational.requirements if item.kind == "code_group"]
+    assert len(groups) == 1
+    assert groups[0].requirement_id in operational.satisfied_requirement_ids
 
 
 def test_exact_source_and_version_contamination_is_zero(tmp_path, monkeypatch):

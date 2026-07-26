@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import hashlib
 import itertools
+import json
 import math
 import re
 from dataclasses import asdict, dataclass, field, replace
@@ -35,6 +36,11 @@ _COMPARING_AND_RE = re.compile(
 _RESULT_ACCESS_RE = re.compile(r"\b(?:obtain|get|retrieve)\s+(?:its|the)\s+result\b", re.IGNORECASE)
 _PASSIVE_RESULT_ACCESS_RE = re.compile(
     r"\b(?:the\s+)?(?:scheduled\s+task\s+)?result\s+is\s+obtained\b", re.IGNORECASE,
+)
+_CODE_REQUEST_RE = re.compile(
+    r"\b(?:show|write|give|provide|need)\s+(?:an?\s+)?(?:code|example|snippet)\b"
+    r"|\b(?:code|example|snippet)\s+(?:for|that|showing)\b",
+    re.IGNORECASE,
 )
 _PATCH_FACT_RE = re.compile(
     r"\b(?:must|shall|required|requires?|never|cannot|may\s+not|forbidden|prohibited|"
@@ -671,8 +677,9 @@ def build_requirements(
     unique = {item.requirement_id: item for item in requirements}
     entities, facets = _extract_requirement_entities_and_facets(question)
     if profile == "library_docs_answer":
-        comparison_intent = bool(re.search(r"\b(?:compare|comparison|instead|versus|vs\.?|difference)\b", question, re.IGNORECASE))
-        contract = (library_requirement_contract or {}) if comparison_intent else {}
+        comparison_intent = bool(re.search(r"\b(?:compare|comparing|comparison|instead|versus|vs\.?|difference)\b", question, re.IGNORECASE))
+        raw_contract = library_requirement_contract or {}
+        contract = raw_contract if comparison_intent else {}
         contract_entities = tuple(sorted({str(value).casefold() for value in contract.get("entities", ()) if str(value).strip()}))
         entities = tuple(sorted(set(entities) | set(contract_entities)))
         if len(contract_entities) == 2:
@@ -690,6 +697,27 @@ def build_requirements(
             unique[f"facet:{facet}"] = EvidenceRequirement(
                 requirement_id=f"facet:{facet}", kind="facet", value=facet,
                 public_provenance="query_exact_term", query_extraction_kind="answer_facet",
+            )
+        raw_groups = (raw_contract.get("code_groups") or ()) if _CODE_REQUEST_RE.search(question) else ()
+        if not raw_groups and _CODE_REQUEST_RE.search(question) and raw_contract.get("required_code_group"):
+            raw_groups = (raw_contract["required_code_group"],)
+        for index, raw_group in enumerate(raw_groups):
+            fragments = tuple(
+                str(value).strip() for value in raw_group
+                if str(value).strip()
+            ) if isinstance(raw_group, (list, tuple, set)) else ()
+            if not fragments:
+                continue
+            encoded_group = json.dumps(
+                sorted(set(fragments), key=str.casefold),
+                ensure_ascii=False,
+                separators=(",", ":"),
+            )
+            unique[f"code_group:{index}:{canonical_hash(encoded_group)[:12]}"] = EvidenceRequirement(
+                requirement_id=f"code_group:{index}:{canonical_hash(encoded_group)[:12]}",
+                kind="code_group",
+                value=encoded_group,
+                public_provenance="public_task_contract",
             )
         if not entities and not facets and re.search(r"[\u0400-\u04ff]", question):
             unique["library_query_coverage"] = EvidenceRequirement(
@@ -1309,6 +1337,45 @@ def _facet_requirement_matches(value: str, haystack: str) -> bool:
     return False
 
 
+def _code_group_fragments(value: str) -> tuple[str, ...]:
+    try:
+        decoded = json.loads(value)
+    except (TypeError, ValueError, json.JSONDecodeError):
+        return ()
+    if not isinstance(decoded, list):
+        return ()
+    return tuple(
+        str(fragment).strip()
+        for fragment in decoded
+        if str(fragment).strip()
+    )
+
+
+def _candidate_code_blocks(candidate: EvidenceCandidate) -> tuple[str, ...]:
+    metadata = candidate.original.get("metadata")
+    snippets = metadata.get("code_snippets") if isinstance(metadata, Mapping) else None
+    if not isinstance(snippets, (list, tuple)):
+        snippets = ()
+    blocks = [
+        str(item.get("code") or "").strip()
+        for item in snippets or ()
+        if isinstance(item, Mapping) and str(item.get("code") or "").strip()
+    ]
+    if blocks:
+        return tuple(blocks)
+    return tuple(match.group(1).strip() for match in re.finditer(
+        r"```[^\n]*\n(.*?)```", candidate.display_text, re.DOTALL,
+    ) if match.group(1).strip())
+
+
+def _code_group_requirement_matches(value: str, candidate: EvidenceCandidate) -> bool:
+    fragments = _code_group_fragments(value)
+    return bool(fragments) and any(
+        all(fragment.casefold() in block.casefold() for fragment in fragments)
+        for block in _candidate_code_blocks(candidate)
+    )
+
+
 def _with_coverage(candidate: EvidenceCandidate, requirements: Sequence[EvidenceRequirement]) -> EvidenceCandidate:
     haystack = "\n".join([
         candidate.display_text, candidate.path_or_url, candidate.section,
@@ -1337,6 +1404,8 @@ def _with_coverage(candidate: EvidenceCandidate, requirements: Sequence[Evidence
             matches = requirement_value_visible(requirement.value, haystack)
         elif requirement.kind == "facet":
             matches = _facet_requirement_matches(requirement.value, haystack)
+        elif requirement.kind == "code_group":
+            matches = _code_group_requirement_matches(requirement.value, candidate)
         elif requirement.kind == "unsupported_query":
             matches = False
         else:
