@@ -9,8 +9,8 @@
   ],
   "requirements": {
     "entities": ["async", "launch"],
-    "facets": ["comparison", "result_access"]
+    "facets": ["comparison", "result_access"],
+    "code_groups": [["async {", ".await()"]]
   },
-  "expected_support": true,
-  "required_code_group": ["async {", ".await()"]
+  "expected_support": true
 }
