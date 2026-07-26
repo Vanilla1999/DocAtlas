@@ -1767,6 +1767,8 @@ class LibraryDocsApplicationService:
             question=topic or library,
             response_style=response_style,
             lane_priority=["library"],
+            support_decision=support_decision,
+            requirements=requirements,
         )
         return DocsResult(
             library_id=info.library_id,
@@ -2108,7 +2110,8 @@ def _postprocess_library_chunks(chunks: list[Any], query: str) -> tuple[list[Any
         snippets = _code_snippets(cleaned)
         snippet_count += len(snippets)
         metadata = dict(chunk.metadata or {})
-        metadata["code_snippets"] = len(snippets)
+        metadata["code_snippets"] = snippets
+        metadata["code_snippet_count"] = len(snippets)
         if snippets:
             metadata["top_code_language"] = snippets[0]["language"] or None
         candidates.append(

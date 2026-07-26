@@ -1,0 +1,16 @@
+{
+  "library": "kotlinx.coroutines",
+  "version": "1.8.1",
+  "source_root": "https://github.com/Kotlin/kotlinx.coroutines/blob/fixture-commit/docs/topics",
+  "documents": [
+    "coroutines-basics.md",
+    "launch-distractor.md",
+    "composing-suspending-functions.md"
+  ],
+  "requirements": {
+    "entities": ["async", "launch"],
+    "facets": ["comparison", "result_access"]
+  },
+  "expected_support": true,
+  "required_code_group": ["async {", ".await()"]
+}

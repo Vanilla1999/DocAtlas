@@ -1,0 +1,48 @@
+{
+  "schema_version": "library-retrieval-quality-cases-v1",
+  "cases": [
+    {
+      "case_id": "python_asyncio_result_holdout",
+      "result_kind": "docs_answer",
+      "question": "When should I use create_task instead of gather, and how do I obtain the task result?",
+      "exact_version": "3.13",
+      "candidates": [
+        {
+          "stable_chunk_id": "python-cancel",
+          "parent_logical_id": "tasks",
+          "source": "https://docs.python.org/3.13/library/asyncio-task.html#task-cancellation",
+          "display_text": "create_task schedules a coroutine. task.cancel() cancels it.",
+          "authority": "official",
+          "docs_exactness": "exact",
+          "version": "3.13",
+          "retrieval_rank": 1
+        },
+        {
+          "stable_chunk_id": "python-results",
+          "parent_logical_id": "tasks-results",
+          "source": "https://docs.python.org/3.13/library/asyncio-task.html#running-tasks-concurrently",
+          "display_text": "create_task returns a Task; gather collects multiple results. task = create_task(compute()); value = await task",
+          "code_blocks": ["task = create_task(compute())\nvalue = await task"],
+          "authority": "official",
+          "docs_exactness": "exact",
+          "version": "3.13",
+          "retrieval_rank": 2
+        }
+      ],
+      "required_facts": ["create_task", "gather", "await"],
+      "required_code_group": ["create_task(", "await task"],
+      "expected_status": "ok",
+      "expected_selected": ["python-results"],
+      "output_mode_decisions": {
+        "bounded_direct": {"status": "ok", "selected_evidence_ids": ["python-results"]},
+        "project_docs": {"status": "ok", "selected_evidence_ids": ["python-results"]},
+        "project_docs_answer": {"status": "ok", "selected_evidence_ids": ["python-results"]},
+        "answer": {"status": "ok", "selected_evidence_ids": ["python-results"]},
+        "compact": {"status": "ok", "selected_evidence_ids": ["python-results"]},
+        "full": {"status": "ok", "selected_evidence_ids": ["python-results"]},
+        "debug": {"status": "ok", "selected_evidence_ids": ["python-results"]}
+      },
+      "maximum_visible_tokens": 800
+    }
+  ]
+}

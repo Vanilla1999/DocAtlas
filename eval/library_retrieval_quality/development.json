@@ -1,0 +1,38 @@
+{
+  "schema_version": "library-retrieval-quality-cases-v1",
+  "cases": [
+    {
+      "case_id": "kotlin_async_result_complete",
+      "result_kind": "docs_answer",
+      "question": "When should I use async instead of launch, and how do I obtain its result?",
+      "exact_version": "1.8.1",
+      "candidates": [
+        {
+          "stable_chunk_id": "kotlin-composing",
+          "parent_logical_id": "composing",
+          "source": "https://github.com/Kotlin/kotlinx.coroutines/blob/fixture-commit/docs/topics/composing-suspending-functions.md",
+          "display_text": "launch returns Job without a result. async returns Deferred<T>. val deferred = async { computeAnswer() }; val answer = deferred.await()",
+          "code_blocks": ["val deferred = async { computeAnswer() }\nval answer = deferred.await()"],
+          "authority": "official",
+          "docs_exactness": "exact",
+          "version": "1.8.1",
+          "retrieval_rank": 1
+        }
+      ],
+      "required_facts": ["async", "launch", "Deferred", "await"],
+      "required_code_group": ["async {", ".await()"],
+      "expected_status": "ok",
+      "expected_selected": ["kotlin-composing"],
+      "output_mode_decisions": {
+        "bounded_direct": {"status": "ok", "selected_evidence_ids": ["kotlin-composing"]},
+        "project_docs": {"status": "ok", "selected_evidence_ids": ["kotlin-composing"]},
+        "project_docs_answer": {"status": "ok", "selected_evidence_ids": ["kotlin-composing"]},
+        "answer": {"status": "ok", "selected_evidence_ids": ["kotlin-composing"]},
+        "compact": {"status": "ok", "selected_evidence_ids": ["kotlin-composing"]},
+        "full": {"status": "ok", "selected_evidence_ids": ["kotlin-composing"]},
+        "debug": {"status": "ok", "selected_evidence_ids": ["kotlin-composing"]}
+      },
+      "maximum_visible_tokens": 800
+    }
+  ]
+}

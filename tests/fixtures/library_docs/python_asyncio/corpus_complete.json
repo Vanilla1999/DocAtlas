@@ -1,0 +1,16 @@
+{
+  "library": "python.asyncio",
+  "version": "3.13",
+  "source_root": "https://docs.python.org/3.13/library/asyncio-task.html",
+  "documents": [
+    "task-cancellation.md",
+    "task-results.md"
+  ],
+  "requirements": {
+    "entities": ["create_task", "gather"],
+    "facets": ["comparison", "result_access"]
+  },
+  "distractor": "task-cancellation.md",
+  "authoritative": "task-results.md",
+  "expected_support": true
+}
