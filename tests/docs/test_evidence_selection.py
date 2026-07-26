@@ -190,6 +190,27 @@ def test_library_code_group_is_a_canonical_requirement_and_needs_one_code_block(
     assert complete.support_decision.answer_supported is True
     assert code_groups[0].requirement_id in complete.support_decision.satisfied_requirement_ids
 
+    standalone_question = "Show code using WidgetClient.fetch_record"
+    standalone_requirements = build_requirements(
+        standalone_question,
+        profile="library_docs_answer",
+        library_requirement_contract={
+            "code_groups": [["fetch_record(", "timeout=5"]],
+        },
+    )
+    standalone_group = next(item for item in standalone_requirements if item.kind == "code_group")
+    legacy_metadata = select_evidence(
+        [_candidate(
+            "legacy-code-snippet-count",
+            "```python\nWidgetClient.fetch_record(record_id, timeout=5)\n```",
+            metadata={"code_snippets": 1},
+        )],
+        question=standalone_question,
+        config=library_docs_selection_config(800),
+        requirements=standalone_requirements,
+    )
+    assert standalone_group.requirement_id in legacy_metadata.support_decision.satisfied_requirement_ids
+
 
 def test_comparison_requirement_span_uses_the_matched_repeated_rhs():
     question = (

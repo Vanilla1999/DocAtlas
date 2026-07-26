@@ -678,7 +678,8 @@ def build_requirements(
     entities, facets = _extract_requirement_entities_and_facets(question)
     if profile == "library_docs_answer":
         comparison_intent = bool(re.search(r"\b(?:compare|comparing|comparison|instead|versus|vs\.?|difference)\b", question, re.IGNORECASE))
-        contract = (library_requirement_contract or {}) if comparison_intent else {}
+        raw_contract = library_requirement_contract or {}
+        contract = raw_contract if comparison_intent else {}
         contract_entities = tuple(sorted({str(value).casefold() for value in contract.get("entities", ()) if str(value).strip()}))
         entities = tuple(sorted(set(entities) | set(contract_entities)))
         if len(contract_entities) == 2:
@@ -697,9 +698,9 @@ def build_requirements(
                 requirement_id=f"facet:{facet}", kind="facet", value=facet,
                 public_provenance="query_exact_term", query_extraction_kind="answer_facet",
             )
-        raw_groups = (contract.get("code_groups") or ()) if _CODE_REQUEST_RE.search(question) else ()
-        if not raw_groups and _CODE_REQUEST_RE.search(question) and contract.get("required_code_group"):
-            raw_groups = (contract["required_code_group"],)
+        raw_groups = (raw_contract.get("code_groups") or ()) if _CODE_REQUEST_RE.search(question) else ()
+        if not raw_groups and _CODE_REQUEST_RE.search(question) and raw_contract.get("required_code_group"):
+            raw_groups = (raw_contract["required_code_group"],)
         for index, raw_group in enumerate(raw_groups):
             fragments = tuple(
                 str(value).strip() for value in raw_group
@@ -1353,6 +1354,8 @@ def _code_group_fragments(value: str) -> tuple[str, ...]:
 def _candidate_code_blocks(candidate: EvidenceCandidate) -> tuple[str, ...]:
     metadata = candidate.original.get("metadata")
     snippets = metadata.get("code_snippets") if isinstance(metadata, Mapping) else None
+    if not isinstance(snippets, (list, tuple)):
+        snippets = ()
     blocks = [
         str(item.get("code") or "").strip()
         for item in snippets or ()
