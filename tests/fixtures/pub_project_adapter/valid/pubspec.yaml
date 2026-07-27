@@ -1,0 +1,11 @@
+name: adapter_fixture
+dependencies:
+  flutter:
+    sdk: flutter
+  go_router: ^14.0.0
+  local_widgets:
+    path: ../local_widgets
+  git_client:
+    git: https://example.invalid/git_client.git
+dev_dependencies:
+  test: ^1.25.0

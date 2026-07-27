@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 from dataclasses import asdict, replace
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Callable
-import json
+from typing import Any
+import hashlib
 import re
 import time
 from urllib.parse import urlparse
@@ -14,7 +14,6 @@ import yaml
 
 from docmancer.core.config import DocmancerConfig
 from docmancer.docs.discovery_candidates import discovery_candidates_for
-from docmancer.docs.fetch_policy import redact_url
 from docmancer.docs.domain.policies import docs_policy, is_stale
 from docmancer.docs.domain.project_state import create_project_docs_next_action, has_high_level_project_overview, partition_project_doc_state, project_docs_structured_next_action
 from docmancer.docs.domain.quality import is_trivial_section
@@ -39,6 +38,14 @@ from docmancer.docs.dart_official_docs import (
 from docmancer.docs.application.library_registry_ops import LibraryRegistryOps
 from docmancer.docs.application.library_refresh_ops import LibraryRefreshOps
 from docmancer.docs.application.library_job_executor import LibraryJobExecutor, shared_library_job_executor
+from docmancer.docs.application.library_ingest_orchestrator import LibraryIngestOrchestrator
+from docmancer.docs.application.library_ingest_ports import LibraryIngestPorts, LibraryPublicationPorts, LibraryRefreshPorts
+from docmancer.docs.application.evidence_selection import (
+    build_requirements,
+    library_docs_selection_config,
+    requirement_value_visible,
+    select_evidence,
+)
 
 STALE_AFTER_DAYS = 30
 DEFAULT_DOC_TOKENS = 4000
@@ -56,7 +63,8 @@ class LibraryDocsApplicationService:
     def __init__(self, facade: Any, job_executor: LibraryJobExecutor | None = None):
         self.facade = facade
         self.registry_ops = LibraryRegistryOps(facade)
-        self.refresh_ops = LibraryRefreshOps(self)
+        self._refresh_ops: LibraryRefreshOps | None = None
+        self._ingest_orchestrator: LibraryIngestOrchestrator | None = None
         jobs_config = getattr(getattr(facade, "config", None), "docs_jobs", None)
         max_running = getattr(jobs_config, "library_max_running", 2)
         max_queued = getattr(jobs_config, "library_max_queued", 8)
@@ -66,6 +74,57 @@ class LibraryDocsApplicationService:
             max_queued=max_queued if isinstance(max_queued, int) else 8,
             terminalization_grace_seconds=grace if isinstance(grace, (int, float)) else 2.0,
         )
+        # Preserve startup cleanup for real services while lightweight facade doubles
+        # can still construct the public read delegates without ingest dependencies.
+        if getattr(facade, "config", None) is not None:
+            _ = self.refresh_ops
+
+    @property
+    def refresh_ops(self) -> LibraryRefreshOps:
+        if self._refresh_ops is None:
+            ports = LibraryRefreshPorts(
+                staging_parent=lambda: Path(self.config.index.db_path).expanduser().resolve().parent,
+                jobs=self.jobs,
+                registry=self.registry,
+                registry_ops=self.registry_ops,
+                agent_gateway=self.agent_gateway,
+                resolve_library=self.resolve_library,
+                record_from_info=self._record_from_info,
+                target_from_record=self._target_from_record,
+                record_urls=self._record_urls,
+                agent_instance=self._agent_instance,
+                is_stale=self._is_stale,
+                now=self._now,
+                index_config_for=self._index_config_for,
+                lock_for=self._lock_for,
+                resolve_github_directory_target=self.facade._resolve_github_directory_target,
+                target_urls=self.facade._target_urls,
+                target_to_spec=self.facade._target_to_spec,
+                monotonic=time.monotonic,
+                utc_now=lambda: datetime.now(timezone.utc),
+                publication=LibraryPublicationPorts(
+                    index_config_for=self._index_config_for,
+                    lock_for=self._lock_for,
+                    restore_record=self.registry.restore,
+                    drop_library_agent=self.agent_gateway.drop_library_agent,
+                    monotonic=time.monotonic,
+                ),
+            )
+            self._refresh_ops = LibraryRefreshOps(ports)
+        return self._refresh_ops
+
+    @property
+    def ingest_orchestrator(self) -> LibraryIngestOrchestrator:
+        if self._ingest_orchestrator is None:
+            self._ingest_orchestrator = LibraryIngestOrchestrator(
+                LibraryIngestPorts(
+                    jobs=self.jobs,
+                    prefetch=self.refresh_ops.prefetch_docs,
+                    timeout_seconds=self._library_job_timeout_seconds,
+                    executor=lambda: self.job_executor,
+                )
+            )
+        return self._ingest_orchestrator
 
     def __getattr__(self, name: str) -> Any:
         return getattr(self.facade, name)
@@ -471,15 +530,44 @@ class LibraryDocsApplicationService:
             return "wrong_source_type"
         if metadata.get("project_path"):
             return "project_doc_leak"
-        docset_root = metadata.get("docset_root")
-        if docset_root and expected_roots and not self._url_within_root(str(docset_root), expected_roots):
-            return "wrong_docset_root"
         source = getattr(chunk, "source", None)
-        url = metadata.get("url") or metadata.get("source_url")
+        source_matches_exact_root = bool(source) and any(
+            str(source).rstrip("/") == root.rstrip("/")
+            for root in expected_roots
+            if root
+        )
+        docset_root = metadata.get("docset_root")
+        broad_docset_root_contains_source = bool(docset_root) and self._url_within_root(
+            source,
+            {str(docset_root)},
+        )
+        has_complete_exact_identity = bool(canonical_id) and canonical_id == info.canonical_id
+        has_complete_exact_identity = (
+            has_complete_exact_identity
+            and bool(ecosystem)
+            and ecosystem == info.ecosystem
+            and bool(version)
+            and version == info.version
+            and bool(source_type)
+            and source_type == info.source_type
+        )
+        if (
+            docset_root
+            and expected_roots
+            and not self._url_within_root(str(docset_root), expected_roots)
+            and not (
+                source_matches_exact_root
+                and broad_docset_root_contains_source
+                and has_complete_exact_identity
+            )
+        ):
+            return "wrong_docset_root"
         if not self._url_within_root(source, expected_roots):
             return "wrong_docset_root"
-        if url and not self._url_within_root(url, expected_roots):
-            return "wrong_docset_root"
+        for url_key in ("url", "source_url"):
+            url = metadata.get(url_key)
+            if url and not self._url_within_root(url, expected_roots):
+                return "wrong_docset_root"
         return None
 
     def _library_chunk_allowed(self, chunk: Any, info: LibraryInfo, allowed_ids: set[str], expected_roots: set[str]) -> bool:
@@ -673,125 +761,7 @@ class LibraryDocsApplicationService:
         continue_on_error: bool = True,
         async_: bool = False,
     ) -> RefreshResult | DocsJobStartResult:
-        if async_:
-            request_identity = json.dumps(
-                {
-                    "library": library,
-                    "ecosystem": ecosystem,
-                    "docs_url": redact_url(docs_url) if docs_url else None,
-                    "docs_url_template": redact_url(docs_url_template) if docs_url_template else None,
-                    "versions": versions or [],
-                },
-                sort_keys=True,
-            )
-            if not self.job_executor.try_reserve():
-                capacity = self.job_executor.capacity()
-                rejected = self.jobs.create(
-                    "prefetch_library_docs",
-                    request_identity=request_identity,
-                    with_generation=False,
-                )
-                self.jobs.update(
-                    rejected.job_id,
-                    status="failed",
-                    phase="done",
-                    reason_code="busy",
-                    retryable=True,
-                    running_jobs=capacity.running,
-                    queued_jobs=capacity.queued,
-                    max_running_jobs=capacity.max_running,
-                    max_queued_jobs=capacity.max_queued,
-                    message="Library documentation capacity is full; retry after 2 seconds.",
-                )
-                return DocsJobStartResult(
-                    job_id=rejected.job_id,
-                    status="busy",
-                    message="Library documentation capacity is full; retry after 2 seconds.",
-                )
-
-            try:
-                job = self.jobs.create("prefetch_library_docs", request_identity=request_identity)
-            except Exception:
-                self.job_executor.release_reservation()
-                raise
-            deadline_seconds = self._library_job_timeout_seconds()
-            deadline_at = datetime.now(timezone.utc) + timedelta(seconds=deadline_seconds)
-            self.jobs.update(
-                job.job_id,
-                status="pending",
-                phase="queued",
-                current_target=library,
-                message="Queued library docs prefetch job.",
-                deadline_at=deadline_at.isoformat(timespec="seconds"),
-            )
-
-            def terminalize(reason: str) -> None:
-                current = self.jobs.get(job.job_id)
-                if current is None or current.status in {"succeeded", "partial", "failed", "cancelled", "interrupted"}:
-                    return
-                if reason == "cancelled":
-                    self.jobs.update(
-                        job.job_id,
-                        status="cancelled",
-                        phase="done",
-                        reason_code="cancelled",
-                        retryable=True,
-                        message="Library docs prefetch cancelled.",
-                    )
-                    return
-                self.jobs.append_error(job.job_id, "Library docs prefetch exceeded its configured deadline.")
-                self.jobs.update(
-                    job.job_id,
-                    status="failed",
-                    phase="done",
-                    reason_code="job_deadline_exceeded",
-                    retryable=True,
-                    message="Library docs prefetch exceeded its configured deadline.",
-                )
-
-            def update_capacity(capacity: Any) -> None:
-                self.jobs.update(
-                    job.job_id,
-                    queue_position=capacity.queue_position,
-                    running_jobs=capacity.running,
-                    queued_jobs=capacity.queued,
-                    max_running_jobs=capacity.max_running,
-                    max_queued_jobs=capacity.max_queued,
-                )
-
-            try:
-                capacity = self.job_executor.submit_reserved(
-                    lambda: self._run_prefetch_docs_job(
-                        job.job_id,
-                        library,
-                        ecosystem,
-                        versions,
-                        docs_url,
-                        docs_url_template,
-                        source_type,
-                        force_refresh,
-                        continue_on_error,
-                        deadline_seconds,
-                    ),
-                    deadline_seconds=deadline_seconds,
-                    cancelled=lambda: self.jobs.cancellation_requested(job.job_id),
-                    terminalize=terminalize,
-                    on_capacity=update_capacity,
-                )
-            except Exception:
-                self.job_executor.release_reservation()
-                raise
-            self.jobs.update(
-                job.job_id,
-                queue_position=capacity.queue_position,
-                running_jobs=capacity.running,
-                queued_jobs=capacity.queued,
-                max_running_jobs=capacity.max_running,
-                max_queued_jobs=capacity.max_queued,
-            )
-            return DocsJobStartResult(job_id=job.job_id, status="pending", message="Queued library docs prefetch job.")
-
-        return self._prefetch_docs_sync(
+        return self.ingest_orchestrator.prefetch_docs(
             library,
             ecosystem=ecosystem,
             versions=versions,
@@ -800,216 +770,11 @@ class LibraryDocsApplicationService:
             source_type=source_type,
             force_refresh=force_refresh,
             continue_on_error=continue_on_error,
-        )
-
-    def _run_prefetch_docs_job(
-        self,
-        job_id: str,
-        library: str,
-        ecosystem: str | None,
-        versions: list[str] | None,
-        docs_url: str | None,
-        docs_url_template: str | None,
-        source_type: str | None,
-        force_refresh: bool,
-        continue_on_error: bool,
-        deadline_seconds: float,
-    ) -> None:
-        initial = self.jobs.get(job_id)
-        generation_id = initial.generation_id if initial else None
-        deadline = time.monotonic() + deadline_seconds
-
-        if not self.jobs.generation_active(job_id, generation_id):
-            return
-        self.jobs.update(
-            job_id,
-            status="running",
-            phase="resolving",
-            queue_position=None,
-            message="Started library docs prefetch job.",
-        )
-
-        def _cancelled() -> bool:
-            return (
-                not self.jobs.generation_active(job_id, generation_id)
-                or
-                self.jobs.cancellation_requested(job_id)
-                or time.monotonic() >= deadline
-            )
-
-        def _begin_commit() -> bool:
-            if _cancelled():
-                return False
-            self.jobs.update(job_id, phase="committing", message="Publishing staged library index.")
-            return not _cancelled()
-
-        try:
-            result = self._prefetch_docs_sync(
-                library,
-                ecosystem=ecosystem,
-                versions=versions,
-                docs_url=docs_url,
-                docs_url_template=docs_url_template,
-                source_type=source_type,
-                force_refresh=force_refresh,
-                continue_on_error=continue_on_error,
-                should_cancel=_cancelled,
-                begin_commit=_begin_commit,
-                staging_owner={"job_id": job_id, "generation_id": generation_id or ""},
-            )
-        except Exception as exc:
-            if not self.jobs.generation_active(job_id, generation_id):
-                return
-            if self.jobs.cancellation_requested(job_id):
-                self.jobs.update(
-                    job_id,
-                    status="cancelled",
-                    phase="done",
-                    reason_code="cancelled",
-                    retryable=True,
-                    message="Library docs prefetch cancelled.",
-                )
-                return
-            self.jobs.append_error(job_id, str(exc))
-            self.jobs.update(job_id, status="failed", phase="done", reason_code="indexing_failed", retryable=False, message=str(exc))
-            return
-
-        if not self.jobs.generation_active(job_id, generation_id):
-            return
-        if self.jobs.cancellation_requested(job_id):
-            self.jobs.update(
-                job_id,
-                status="cancelled",
-                phase="done",
-                reason_code="cancelled",
-                retryable=True,
-                message="Library docs prefetch cancelled.",
-            )
-            return
-        if result.status == "cancelled":
-            if self.jobs.cancellation_requested(job_id):
-                self.jobs.update(
-                    job_id,
-                    status="cancelled",
-                    phase="done",
-                    reason_code="cancelled",
-                    retryable=True,
-                    message="Library docs prefetch cancelled.",
-                )
-            else:
-                self.jobs.append_error(job_id, "Library docs prefetch exceeded its configured deadline.")
-                self.jobs.update(
-                    job_id,
-                    status="failed",
-                    phase="done",
-                    reason_code="job_deadline_exceeded",
-                    retryable=True,
-                    message="Library docs prefetch exceeded its configured deadline.",
-                )
-            return
-        failed = int(result.targets_failed or 0)
-        succeeded = int(result.targets_completed or 0)
-        status = "partial" if result.status == "partial" else ("succeeded" if failed == 0 else ("partial" if succeeded else "failed"))
-        if result.status in {"failed", "needs_docs_url", "aborted"} and not succeeded:
-            status = "failed"
-        reason_code = self._result_reason_code(result, status)
-        retryable = self._result_retryable(result, reason_code)
-        failure = result.preindex or {}
-        if status in {"failed", "partial"} and result.message:
-            self.jobs.append_error(job_id, result.message)
-        self.jobs.update(
-            job_id,
-            status=status,
-            phase="done",
-            current_target=library,
-            total_targets=max(succeeded + failed, 1),
-            completed_targets=succeeded,
-            failed_targets=failed,
-            total_pages=int(result.pages_indexed or 0) + int(result.pages_failed or 0),
-            completed_pages=int(result.pages_indexed or 0),
-            indexed_pages=int(result.pages_indexed or 0),
-            failed_pages=int(result.pages_failed or 0),
-            page_failure_summary=list(failure.get("page_failure_summary") or []),
-            total_chunks=int(result.chunks_indexed or 0),
-            completed_chunks=int(result.chunks_indexed or 0),
-            reason_code=reason_code,
-            retryable=retryable,
-            failure_phase=failure.get("failure_phase"),
-            failed_url=failure.get("failed_url"),
-            http_status=failure.get("http_status"),
-            message=result.message or f"Library docs prefetch {status}.",
+            async_=async_,
         )
 
     def _library_job_timeout_seconds(self) -> float:
         return float(getattr(self.config.web_fetch, "library_job_timeout_seconds", 120.0))
-
-    @staticmethod
-    def _result_reason_code(result: RefreshResult, status: str) -> str:
-        if status == "succeeded":
-            return "healthy"
-        if status == "partial":
-            network_codes = {
-                "connect_timeout",
-                "read_timeout",
-                "dns_failure",
-                "tls_failure",
-                "network_unreachable",
-                "http_failure",
-            }
-            if code := next((code for code in result.reason_codes if code in network_codes), None):
-                return code
-            return "partial_failure"
-        if result.status == "needs_docs_url":
-            return "needs_docs_url"
-        return str(result.reason_codes[0] if result.reason_codes else (result.preindex or {}).get("reason_code") or "indexing_failed")
-
-    @classmethod
-    def _result_retryable(cls, result: RefreshResult, reason_code: str) -> bool:
-        return cls._retryable_reason_code(reason_code) or any(
-            cls._retryable_reason_code(code) for code in result.reason_codes
-        )
-
-    @staticmethod
-    def _retryable_reason_code(reason_code: str) -> bool:
-        return reason_code in {
-            "connect_timeout",
-            "read_timeout",
-            "dns_failure",
-            "tls_failure",
-            "network_timeout",
-            "network_unreachable",
-            "network_transport_error",
-            "job_deadline_exceeded",
-            "vector_indexing_failed",
-        }
-
-    def _prefetch_docs_sync(
-        self,
-        library: str,
-        ecosystem: str | None = None,
-        versions: list[str] | None = None,
-        docs_url: str | None = None,
-        docs_url_template: str | None = None,
-        source_type: str | None = None,
-        force_refresh: bool = False,
-        continue_on_error: bool = True,
-        should_cancel: Callable[[], bool] | None = None,
-        begin_commit: Callable[[], bool] | None = None,
-        staging_owner: dict[str, str] | None = None,
-    ) -> RefreshResult:
-        return self.refresh_ops.prefetch_docs(
-            library,
-            ecosystem=ecosystem,
-            versions=versions,
-            docs_url=docs_url,
-            docs_url_template=docs_url_template,
-            source_type=source_type,
-            force_refresh=force_refresh,
-            continue_on_error=continue_on_error,
-            should_cancel=should_cancel,
-            begin_commit=begin_commit,
-            staging_owner=staging_owner,
-        )
 
     def get_docs(
         self,
@@ -1024,21 +789,27 @@ class LibraryDocsApplicationService:
         force_refresh: bool = False,
         project_path: str | None = None,
         response_style: str | None = None,
+        library_requirement_contract: dict[str, list[str]] | None = None,
     ) -> DocsResult:
         response_style = validate_response_style(response_style)
         if hasattr(self.facade, "_library_get_docs_impl"):
+            hook_kwargs = {
+                "topic": topic,
+                "tokens": tokens,
+                "ecosystem": ecosystem,
+                "version": version,
+                "docs_url": docs_url,
+                "docs_url_template": docs_url_template,
+                "source_type": source_type,
+                "force_refresh": force_refresh,
+                "project_path": project_path,
+                "response_style": response_style,
+            }
+            if library_requirement_contract is not None:
+                hook_kwargs["library_requirement_contract"] = library_requirement_contract
             return self.facade._library_get_docs_impl(
                 library,
-                topic=topic,
-                tokens=tokens,
-                ecosystem=ecosystem,
-                version=version,
-                docs_url=docs_url,
-                docs_url_template=docs_url_template,
-                source_type=source_type,
-                force_refresh=force_refresh,
-                project_path=project_path,
-                response_style=response_style,
+                **hook_kwargs,
             )
         input_args = {
             "library": library,
@@ -1435,8 +1206,75 @@ class LibraryDocsApplicationService:
                 diagnostics=resolution.diagnostics,
                 diagnostic_warnings=diagnostic_warnings,
             )
-        query = f"{info.library} {topic}".strip() if topic else info.library
-        chunks = self._agent_instance(record).query(query, budget=tokens or DEFAULT_DOC_TOKENS)
+        query = topic.strip() if topic else info.library
+        retrieval_filters = {"library_id": record.library_id}
+        resolved_version = record.resolved_version or record.version
+        # The index deliberately normalizes the floating ``latest`` version to
+        # an empty promoted field.  Its canonical library ID still contains the
+        # version and source identity, so applying that unrepresentable filter
+        # would hide the same isolated corpus immediately after refresh.
+        if resolved_version and resolved_version.casefold() != "latest":
+            retrieval_filters["resolved_version"] = resolved_version
+        if record.docs_snapshot_exact is True:
+            retrieval_filters["exact_snapshot_required"] = True
+        requirements = build_requirements(
+            query,
+            exact_version=resolved_version,
+            profile="library_docs_answer",
+            library_requirement_contract=library_requirement_contract,
+        )
+        explicit_query_values, has_unqualified_explicit_query_list = (
+            _explicit_library_query_analysis(query)
+        )
+        existing_requirement_values = {
+            requirement.value.casefold() for requirement in requirements
+        }
+        missing_explicit_values = [
+            value for value in explicit_query_values
+            if value.casefold() not in existing_requirement_values
+        ]
+        if missing_explicit_values:
+            requirements = build_requirements(
+                query,
+                public_requirements=missing_explicit_values,
+                exact_version=resolved_version,
+                profile="library_docs_answer",
+                library_requirement_contract=library_requirement_contract,
+            )
+        dispatch_result = self.facade.agent_gateway.query_library(
+            record,
+            query,
+            budget=tokens or DEFAULT_DOC_TOKENS,
+            filters=retrieval_filters,
+            requirements=requirements,
+        )
+        chunks = getattr(dispatch_result, "chunks", dispatch_result)
+        if has_unqualified_explicit_query_list:
+            chunks = []
+            diagnostic_warnings.append({
+                "code": "unqualified_explicit_query_list",
+                "blocking": True,
+            })
+        retrieval_diagnostics = {
+            "requested": {
+                "mode": "lexical",
+                "raw_topic_sha256": hashlib.sha256(query.encode()).hexdigest(),
+                "filters": retrieval_filters,
+                "record": {
+                    "library_id": record.library_id,
+                    "canonical_id": record.canonical_id,
+                    "resolved_version": resolved_version,
+                    "docs_snapshot_exact": record.docs_snapshot_exact,
+                },
+            },
+            "used": {
+                "mode": getattr(dispatch_result, "mode_used", "legacy_agent_query"),
+                "candidate_counts": getattr(dispatch_result, "candidate_counts", {"legacy": len(chunks)}),
+                "failures": getattr(dispatch_result, "failures", {}),
+                "query_plan_hash": getattr(dispatch_result, "query_plan_hash", ""),
+                "component_ranks": {},
+            },
+        }
         allowed_ids = {info.library_id}
         if info.version:
             allowed_ids.add(legacy_library_id(info.library, info.version))
@@ -1456,10 +1294,27 @@ class LibraryDocsApplicationService:
             diagnostic_warnings.append({"code": "cross_source_contamination_filtered", "blocking": False, "dropped": dropped})
             for code, count in sorted(rejection_counts.items()):
                 diagnostic_warnings.append({"code": code, "blocking": False, "dropped": count})
-        chunks = [chunk for chunk in chunks if not _drop_low_value_library_section(chunk.text, (chunk.metadata or {}).get("title"))]
+        chunks_before_low_value_guard = list(chunks)
+        chunks = [chunk for chunk in chunks_before_low_value_guard if not _drop_low_value_library_section(chunk.text, (chunk.metadata or {}).get("title"))]
+        retrieval_diagnostics["used"]["component_ranks"] = {
+            str((chunk.metadata or {}).get("section_id") or index):
+            dict(((chunk.metadata or {}).get("retrieval_trace") or {}).get("component_ranks") or {})
+            for index, chunk in enumerate(chunks, start=1)
+        }
+        retrieval_diagnostics["post_guard"] = {
+            "before": len(chunks_before_guard),
+            "accepted": len(filtered_chunks),
+            "rejected": rejection_counts,
+            "low_value_dropped": len(chunks_before_low_value_guard) - len(chunks),
+        }
         if not chunks:
-            reason_code = "guard_dropped_all" if dropped > 0 else "no_library_docs_results"
-            reason_diagnostics = {**resolution.diagnostics, "reason_code": reason_code, "warnings": diagnostic_warnings}
+            reason_code = (
+                "unqualified_explicit_query_list"
+                if has_unqualified_explicit_query_list
+                else "guard_dropped_all" if dropped > 0
+                else "no_library_docs_results"
+            )
+            reason_diagnostics = {**resolution.diagnostics, "retrieval": retrieval_diagnostics, "reason_code": reason_code, "warnings": diagnostic_warnings}
             reason_diagnostics = self._with_dart_diagnostics(
                 reason_diagnostics,
                 info=latest,
@@ -1468,7 +1323,12 @@ class LibraryDocsApplicationService:
                 chunks_created=0,
             )
             status = "empty_library_index" if dropped > 0 else "no_results"
-            next_actions = ["Call refresh_library_docs to ingest this library's docs."] if dropped > 0 else ["Narrow or rephrase the topic, or inspect_library_docs to verify indexed coverage before refreshing."]
+            next_actions = (
+                ["Qualify at least one requested symbol with backticks or a dotted, underscored, or colon-qualified name."]
+                if has_unqualified_explicit_query_list
+                else ["Call refresh_library_docs to ingest this library's docs."] if dropped > 0
+                else ["Narrow or rephrase the topic, or inspect_library_docs to verify indexed coverage before refreshing."]
+            )
             return DocsResult(
                 library_id=info.library_id,
                 library=latest.library,
@@ -1498,48 +1358,44 @@ class LibraryDocsApplicationService:
                 next_actions=next_actions,
             )
         chunks, quality_diagnostics = _postprocess_library_chunks(chunks, query)
-        if topic and chunks and canonical_dart_ecosystem(latest.ecosystem) == "dart" and quality_diagnostics.get("top_relevance", 0.0) < 0.25:
-            diagnostic_warnings.append({"code": "low_relevance_query_results", "blocking": True})
-            reason_diagnostics = self._with_dart_diagnostics(
-                {**resolution.diagnostics, **quality_diagnostics, "reason_code": "low_relevance_query_results", "warnings": diagnostic_warnings},
-                info=latest,
-                pages_discovered=pages,
-                pages_extracted=pages,
-                chunks_created=0,
-            )
-            return DocsResult(
-                library_id=info.library_id,
-                library=latest.library,
-                version=latest.version,
+        chunks, excerpt_diagnostics = _bounded_library_evidence_chunks(
+            chunks,
+            requirements=requirements,
+            max_tokens=tokens or DEFAULT_DOC_TOKENS,
+        )
+        quality_diagnostics.update(excerpt_diagnostics)
+        if not chunks:
+            return self._empty_library_index_result(
+                info=info,
+                latest=latest,
                 topic=topic,
                 refreshed=refreshed,
-                stale_before_refresh=stale_before,
+                stale_before=stale_before,
                 warning=warning,
-                last_refreshed_at=latest.last_refreshed_at,
-                source_type=info.source_type,
-                results=[],
-                warnings=[*warnings, "low_relevance_query_results"],
+                warnings=warnings,
                 requested_version=requested_version,
-                resolved_version=latest.resolved_version or latest.version,
                 version_source=version_source,
                 docs_snapshot_exact=docs_snapshot_exact,
                 docs_exactness=docs_exactness,
                 docs_binding_source=docs_binding_source,
                 confidence=confidence,
-                status="no_results",
-                decision="stop",
-                reason_code="low_relevance_query_results",
-                request=self._docs_request(input_args, info),
-                identity=self._docs_identity(info, docs_url_source=docs_url_source),
-                policy=self._docs_policy("error", has_registered_source=True),
-                diagnostics=reason_diagnostics,
-                next_actions=["Narrow the topic to concrete API symbols or refresh with a more focused docs source."],
+                input_args=input_args,
+                docs_url_source=docs_url_source,
+                diagnostics={
+                    **resolution.diagnostics,
+                    **quality_diagnostics,
+                    "retrieval": retrieval_diagnostics,
+                },
+                diagnostic_warnings=[
+                    *diagnostic_warnings,
+                    {"code": "no_qualifying_bounded_passage", "blocking": True},
+                ],
             )
         latest_stale = self._is_stale(latest.last_refreshed_at)
         freshness = _freshness_diagnostics(latest.last_refreshed_at, self.stale_after_days, latest_stale)
         
         # Build exact-version diagnostics if applicable
-        final_diagnostics = {**resolution.diagnostics, **quality_diagnostics, "freshness": freshness, "warnings": diagnostic_warnings}
+        final_diagnostics = {**resolution.diagnostics, **quality_diagnostics, "retrieval": retrieval_diagnostics, "freshness": freshness, "warnings": diagnostic_warnings}
         resolved_version = latest.resolved_version or latest.version
         exact_version_match = docs_snapshot_is_exact(requested_version, latest.docs_url_resolved or latest.docs_url) and resolved_version == requested_version if requested_version else None
         if exact_version_resolution and requested_version:
@@ -1592,11 +1448,78 @@ class LibraryDocsApplicationService:
             }
             for chunk in result_chunks
         ]
+        selection_candidates = []
+        chunks_by_stable_id = {}
+        for index, (chunk, item) in enumerate(zip(result_chunks, snippet_chunks, strict=True)):
+            metadata = item["metadata"]
+            stable_id = str(
+                metadata.get("stable_chunk_id")
+                or metadata.get("section_id")
+                or metadata.get("chunk_id")
+                or "library-" + hashlib.sha256(
+                    f"{chunk.source}\0{chunk.title}\0{chunk.content}".encode("utf-8")
+                ).hexdigest()[:16]
+            )
+            candidate = {
+                **item,
+                "stable_chunk_id": stable_id,
+                "parent_logical_id": str(
+                    metadata.get("parent_logical_id")
+                    or metadata.get("source_id")
+                    or chunk.source
+                ),
+                "display_content_hash": hashlib.sha256(chunk.content.encode("utf-8")).hexdigest(),
+                "authority": metadata.get("authority") or "official",
+                "docs_exactness": metadata.get("docs_exactness") or docs_exactness,
+                "resolved_version": metadata.get("version") or resolved_version,
+                "version": metadata.get("version") or resolved_version,
+                "docs_snapshot_exact": docs_snapshot_exact,
+                "retrieval_rank": index + 1,
+            }
+            chunk.metadata["stable_chunk_id"] = stable_id
+            selection_candidates.append(candidate)
+            chunks_by_stable_id[stable_id] = chunk
+        selection_decision = select_evidence(
+            selection_candidates,
+            question=query,
+            config=library_docs_selection_config(tokens or DEFAULT_DOC_TOKENS),
+            requirements=requirements,
+        )
+        support_decision = selection_decision.support_decision
+        witness_diagnostics = self._bounded_library_index_witness(
+            record=record,
+            info=info,
+            requirements=requirements,
+            support_decision=support_decision,
+            retrieval_filters=retrieval_filters,
+            allowed_ids=allowed_ids,
+            expected_roots=expected_roots,
+            dispatcher_candidate_ids={item["stable_chunk_id"] for item in selection_candidates},
+            resolved_version=resolved_version,
+            requested_version=requested_version,
+            docs_exactness=docs_exactness,
+            docs_snapshot_exact=docs_snapshot_exact,
+            exact_version_match=exact_version_match,
+        )
+        retrieval_diagnostics["index_witness"] = witness_diagnostics
+        if witness_diagnostics.get("status") == "witness_found":
+            support_decision = support_decision.with_insufficient_reason_code("retrieval_miss")
+            selection_decision = replace(
+                selection_decision,
+                support_decision=support_decision,
+            )
+        selected_stable_ids = set(support_decision.selected_evidence_ids)
+        selected_snippet_chunks = [
+            item for item in selection_candidates
+            if item["stable_chunk_id"] in selected_stable_ids
+        ]
         snippet_presentation = build_snippet_presentation(
-            snippet_chunks,
+            selected_snippet_chunks,
             question=topic or library,
             response_style=response_style,
             lane_priority=["library"],
+            support_decision=support_decision,
+            requirements=requirements,
         )
         return DocsResult(
             library_id=info.library_id,
@@ -1618,7 +1541,6 @@ class LibraryDocsApplicationService:
             docs_binding_source=docs_binding_source,
             confidence=confidence,
             status="success",
-            decision="answer_returned",
             request=self._docs_request(input_args, info),
             identity=self._docs_identity(info, docs_url_source=docs_url_source),
             policy=self._docs_policy("success", has_registered_source=True),
@@ -1631,7 +1553,149 @@ class LibraryDocsApplicationService:
             primary_snippet_selection_reason=snippet_presentation.primary_snippet_selection_reason,
             primary_snippet_alternatives=snippet_presentation.primary_snippet_alternatives,
             snippet_metrics=snippet_presentation.metrics,
+            requirements=requirements,
+            selection_decision=selection_decision,
+            support_decision=support_decision,
+            context_available=bool(result_chunks),
+            answer_supported=support_decision.answer_supported,
+            answer_available=support_decision.answer_supported,
+            support_status=support_decision.support_status,
+            reason_code=support_decision.reason_code,
+            decision=(
+                "answer_returned"
+                if support_decision.answer_supported
+                else "insufficient_evidence"
+            ),
+            missing_requirement_ids=list(support_decision.missing_requirement_ids),
+            satisfied_requirement_ids=list(support_decision.satisfied_requirement_ids),
+            mandatory_requirement_ids=list(support_decision.mandatory_requirement_ids),
+            mandatory_coverage=support_decision.mandatory_coverage,
+            selected_evidence_ids=list(support_decision.selected_evidence_ids),
+            decision_hash=support_decision.decision_hash,
         )
+
+    def _bounded_library_index_witness(
+        self,
+        *,
+        record: LibraryRecord,
+        info: LibraryInfo,
+        requirements: Any,
+        support_decision: Any,
+        retrieval_filters: dict[str, Any],
+        allowed_ids: set[str],
+        expected_roots: set[str],
+        dispatcher_candidate_ids: set[str],
+        resolved_version: str | None,
+        requested_version: str | None,
+        docs_exactness: str | None,
+        docs_snapshot_exact: bool | None,
+        exact_version_match: bool | None,
+    ) -> dict[str, Any]:
+        """Prove an omission only from a complete manifest-owned corpus.
+
+        The probe is diagnostic-only and retains no text in public diagnostics.
+        It never upgrades a support verdict; it only replaces the insufficiency
+        reason after finding a missing requirement outside dispatcher results.
+        """
+
+        if support_decision.answer_supported or not support_decision.missing_requirement_ids:
+            return {"status": "not_needed"}
+        if not self._library_manifest_is_complete(record):
+            return {"status": "not_attempted", "reason_code": "corpus_not_proven_complete"}
+        probe = self.facade.agent_gateway.probe_library_requirements(
+            record,
+            requirements,
+            missing_requirement_ids=support_decision.missing_requirement_ids,
+            filters=retrieval_filters,
+        )
+        summary: dict[str, Any] = {
+            "status": probe.status,
+            "queried_requirement_ids": list(probe.queried_requirement_ids),
+            "candidate_count": len(probe.chunks),
+            "failure_count": probe.failure_count,
+        }
+        if probe.status != "ok":
+            return summary
+        candidates: list[dict[str, Any]] = []
+        for index, chunk in enumerate(probe.chunks, start=1):
+            if self._library_chunk_rejection_reason(chunk, info, allowed_ids, expected_roots):
+                continue
+            metadata = dict(getattr(chunk, "metadata", None) or {})
+            if _drop_low_value_library_section(str(getattr(chunk, "text", "")), metadata.get("title")):
+                continue
+            content = str(getattr(chunk, "text", ""))
+            source = str(getattr(chunk, "source", ""))
+            stable_id = str(
+                metadata.get("stable_chunk_id")
+                or metadata.get("section_id")
+                or metadata.get("chunk_id")
+                or "library-witness-" + hashlib.sha256(
+                    f"{source}\0{metadata.get('title')}\0{content}".encode("utf-8")
+                ).hexdigest()[:16]
+            )
+            candidates.append({
+                "title": metadata.get("title"),
+                "content": content,
+                "source": source,
+                "url": source if source.startswith(("http://", "https://")) else None,
+                "metadata": {
+                    **metadata,
+                    "source_class": "library_doc",
+                    "doc_scope": "library",
+                    "origin_lane": "library_index_witness",
+                    "canonical_id": info.library_id,
+                    "library_id": info.library_id,
+                    "version": resolved_version,
+                    "requested_version": requested_version,
+                    "docs_exactness": docs_exactness,
+                    "exact_version_match": exact_version_match,
+                },
+                "stable_chunk_id": stable_id,
+                "parent_logical_id": str(metadata.get("parent_logical_id") or metadata.get("source_id") or source),
+                "display_content_hash": hashlib.sha256(content.encode("utf-8")).hexdigest(),
+                "authority": metadata.get("authority") or "official",
+                "docs_exactness": metadata.get("docs_exactness") or docs_exactness,
+                "resolved_version": metadata.get("version") or resolved_version,
+                "version": metadata.get("version") or resolved_version,
+                "docs_snapshot_exact": docs_snapshot_exact,
+                "retrieval_rank": index,
+            })
+        if not candidates:
+            summary["status"] = "no_witness"
+            return summary
+        witness_selection = select_evidence(
+            candidates,
+            question="",
+            config=library_docs_selection_config(DEFAULT_DOC_TOKENS),
+            requirements=requirements,
+        )
+        missing = set(support_decision.missing_requirement_ids)
+        witnesses = [
+            {
+                "evidence_id": candidate.stable_id,
+                "covered_requirement_ids": sorted(
+                    set(candidate.covered_requirement_ids) & missing
+                ),
+            }
+            for candidate in witness_selection.selected_candidates
+            if candidate.stable_id not in dispatcher_candidate_ids
+            and set(candidate.covered_requirement_ids) & missing
+        ]
+        summary["witnesses"] = witnesses
+        summary["status"] = "witness_found" if witnesses else "no_witness"
+        return summary
+
+    def _library_manifest_is_complete(self, record: LibraryRecord) -> bool:
+        manifest = ((record.target_spec or {}).get("source_manifest") or {})
+        if manifest.get("schema_version") != 2 or manifest.get("complete") is not True:
+            return False
+        if manifest.get("truncated") is True:
+            return False
+        pages, _ = self.registry_ops.count_index_entries(record)
+        expected, indexed, missing, stale_orphans, _ = self.registry_ops.manifest_coverage(
+            record, pages,
+        )
+        return bool(expected) and indexed == expected and not missing and not stale_orphans
 
     def _index_size_for(self, record: LibraryRecord) -> int:
         return self.registry_ops.index_size_for(record)
@@ -1686,6 +1750,23 @@ _CODE_BLOCK_RE = re.compile(r"```([A-Za-z0-9_+.#-]*)\s*\n(.*?)```", re.DOTALL)
 _ANCHOR_RE = re.compile(r"\s*\[¶\]")
 _EMOJI_RE = re.compile("[\U0001F300-\U0001FAFF\U00002700-\U000027BF]")
 _TERM_RE = re.compile(r"[A-Za-z0-9_]+")
+_EXPLICIT_QUERY_LIST_RE = re.compile(
+    r"\b(?:"
+    r"what\s+do|explain|(?:give\s+)?(?:the\s+)?(?:meaning|semantics)\s+of|"
+    r"describe\s+(?:these\s+)?(?:[A-Za-z_][A-Za-z0-9_.]*\s+)?"
+    r"(?:attributes?|properties?|symbols?|fields?)"
+    r")\s*:?\s+([^?;.]{1,200}?)(?=\s+(?:mean|for|in|when|while|after|before|using|with)\b|[?;.]|$)",
+    re.IGNORECASE | re.DOTALL,
+)
+_EXPLICIT_QUERY_LIST_SEPARATOR_RE = re.compile(
+    r"\s*(?:,\s*(?:and\b|or\b)?|/|\bplus\b|\band\b|\bor\b)\s*",
+    re.IGNORECASE,
+)
+_EXPLICIT_QUERY_SYMBOL_RE = re.compile(r"`?([A-Za-z_][A-Za-z0-9_.:]*)`?")
+_RST_SYMBOL_DIRECTIVE_RE = re.compile(
+    r"^\.\.\s+(module|function|method|attribute|class|exception)::\s+(.+?)\s*$",
+    re.MULTILINE,
+)
 _NOISE_LINES = {
     "copy",
     "copy code",
@@ -1699,6 +1780,34 @@ _NOISE_LINES = {
 
 def _query_terms(query: str | None) -> set[str]:
     return {term.lower() for term in _TERM_RE.findall(query or "") if len(term) > 1}
+
+
+def _explicit_library_query_analysis(query: str) -> tuple[list[str], bool]:
+    values: set[str] = set()
+    has_unqualified_list = False
+    for match in _EXPLICIT_QUERY_LIST_RE.finditer(query):
+        items = [
+            item.strip()
+            for item in _EXPLICIT_QUERY_LIST_SEPARATOR_RE.split(match.group(1).strip())
+        ]
+        if len(items) < 2:
+            continue
+        symbols = [_EXPLICIT_QUERY_SYMBOL_RE.fullmatch(item) for item in items]
+        has_qualified_symbol = any(
+            (item.startswith("`") and item.endswith("`"))
+            or any(marker in symbol.group(1) for marker in (".", "_", ":"))
+            for item, symbol in zip(items, symbols, strict=True)
+            if symbol is not None
+        )
+        if all(symbols) and has_qualified_symbol:
+            values.update(symbol.group(1) for symbol in symbols if symbol is not None)
+        else:
+            has_unqualified_list = True
+    return sorted(values, key=str.casefold), has_unqualified_list
+
+
+def _explicit_library_query_values(query: str) -> list[str]:
+    return _explicit_library_query_analysis(query)[0]
 
 
 def _clean_library_section(content: str) -> str:
@@ -1759,6 +1868,113 @@ def _copy_chunk(chunk: Any, *, text: str, metadata: dict[str, Any]) -> Any:
     return chunk
 
 
+def _rst_symbol_sections(content: str) -> list[dict[str, Any]]:
+    matches = list(_RST_SYMBOL_DIRECTIVE_RE.finditer(content))
+    modules = [match.group(2).strip() for match in matches if match.group(1) == "module"]
+    module = modules[0] if len(set(modules)) == 1 else ""
+    sections = []
+    for index, match in enumerate(matches):
+        if match.group(1) == "module":
+            continue
+        end = matches[index + 1].start() if index + 1 < len(matches) else len(content)
+        raw_symbol = match.group(2).strip().split("(", 1)[0]
+        qualified_symbol = (
+            raw_symbol
+            if not module or raw_symbol.startswith(module + ".")
+            else f"{module}.{raw_symbol}"
+        )
+        sections.append({
+            "start": match.start(),
+            "text": content[match.start():end].strip(),
+            "symbols": (raw_symbol, qualified_symbol),
+        })
+    return sections
+
+
+def _bounded_library_evidence_chunks(
+    chunks: list[Any],
+    *,
+    requirements: Any,
+    max_tokens: int,
+) -> tuple[list[Any], dict[str, Any]]:
+    config = library_docs_selection_config(max_tokens)
+    available_tokens = max(1, config.hard_tokens - config.wrapper_reserve_tokens)
+    available_bytes = available_tokens * 4
+    bounded = []
+    derived = 0
+    rejected = 0
+    mandatory = [
+        requirement
+        for requirement in requirements
+        if requirement.mandatory and requirement.kind != "exact_version"
+    ]
+    for chunk in chunks:
+        if len(chunk.text.encode("utf-8")) <= available_bytes:
+            bounded.append(chunk)
+            continue
+        ranked = []
+        for section in _rst_symbol_sections(chunk.text):
+            haystack = "\n".join([section["text"], *section["symbols"]])
+            covered = {
+                requirement.requirement_id
+                for requirement in mandatory
+                if requirement_value_visible(requirement.value, haystack)
+            }
+            if covered:
+                ranked.append((section, covered))
+        selected = []
+        remaining = {requirement.requirement_id for requirement in mandatory}
+        spent = 0
+        while remaining:
+            options = [
+                (section, covered)
+                for section, covered in ranked
+                if section not in selected and covered & remaining
+            ]
+            if not options:
+                break
+            section, covered = min(options, key=lambda item: (
+                -len(item[1] & remaining),
+                len(item[0]["text"].encode("utf-8")),
+                item[0]["start"],
+            ))
+            section_bytes = len(section["text"].encode("utf-8"))
+            if spent + section_bytes > available_bytes:
+                break
+            selected.append(section)
+            spent += section_bytes
+            remaining -= covered
+        if remaining:
+            rejected += 1
+            continue
+        selected.sort(key=lambda section: section["start"])
+        excerpt = "\n\n".join(section["text"] for section in selected)
+        metadata = dict(chunk.metadata or {})
+        parent_id = str(
+            metadata.get("stable_chunk_id")
+            or metadata.get("section_id")
+            or metadata.get("chunk_id")
+            or chunk.source
+        )
+        digest = hashlib.sha256(excerpt.encode("utf-8")).hexdigest()
+        metadata.update({
+            "stable_chunk_id": f"{parent_id}:excerpt:{digest[:16]}",
+            "parent_logical_id": parent_id,
+            "symbols": sorted({symbol for section in selected for symbol in section["symbols"]}),
+            "source_excerpt": True,
+            "source_excerpt_sha256": digest,
+        })
+        bounded.append(_copy_chunk(chunk, text=excerpt, metadata=metadata))
+        derived += 1
+    return bounded, {
+        "bounded_evidence": {
+            "available_tokens": available_tokens,
+            "derived_excerpts": derived,
+            "rejected_oversized_sources": rejected,
+        }
+    }
+
+
 def _postprocess_library_chunks(chunks: list[Any], query: str) -> tuple[list[Any], dict[str, Any]]:
     terms = _query_terms(query)
     candidates: list[dict[str, Any]] = []
@@ -1768,7 +1984,8 @@ def _postprocess_library_chunks(chunks: list[Any], query: str) -> tuple[list[Any
         snippets = _code_snippets(cleaned)
         snippet_count += len(snippets)
         metadata = dict(chunk.metadata or {})
-        metadata["code_snippets"] = len(snippets)
+        metadata["code_snippets"] = snippets
+        metadata["code_snippet_count"] = len(snippets)
         if snippets:
             metadata["top_code_language"] = snippets[0]["language"] or None
         candidates.append(

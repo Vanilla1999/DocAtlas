@@ -575,6 +575,7 @@ class DocmancerAgent:
         path_prefixes: list[str] | None = None,
         progress_callback: Callable[[dict[str, Any]], None] | None = None,
         cancellation_callback: Callable[[], bool] | None = None,
+        source_manifest: dict[str, Any] | None = None,
     ):
         if fetcher is not None:
             return fetcher
@@ -606,6 +607,7 @@ class DocmancerAgent:
             ),
             progress_callback=progress_callback,
             cancellation_callback=cancellation_callback,
+            source_manifest=source_manifest,
         )
 
     def _auto_detect_provider(self, url: str) -> str:
@@ -629,6 +631,7 @@ class DocmancerAgent:
         progress_callback: Callable[[dict[str, Any]], None] | None = None,
         cancellation_callback: Callable[[], bool] | None = None,
         with_vectors: bool = True,
+        source_manifest: dict[str, Any] | None = None,
     ) -> int:
         f = self._get_fetcher(
             provider,
@@ -643,6 +646,7 @@ class DocmancerAgent:
             path_prefixes=path_prefixes,
             progress_callback=progress_callback,
             cancellation_callback=cancellation_callback,
+            source_manifest=source_manifest,
         )
         documents = f.fetch(url)
         self.last_fetch_failure = getattr(f, "last_fetch_failure", None)

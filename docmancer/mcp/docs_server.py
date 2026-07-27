@@ -30,6 +30,7 @@ class DocsServerConfig:
     expose_legacy: bool = False
     expose_admin: bool = False
     expose_advanced: bool = False
+    text_fallback: bool = False
 
     @classmethod
     def from_env(cls, env: Mapping[str, str]) -> "DocsServerConfig":
@@ -37,6 +38,7 @@ class DocsServerConfig:
             expose_legacy=env.get("DOCMANCER_MCP_LEGACY_TOOLS") == "1",
             expose_admin=env.get("DOCMANCER_MCP_ADMIN_TOOLS") == "1",
             expose_advanced=env.get("DOCMANCER_MCP_ADVANCED_TOOLS") == "1",
+            text_fallback=env.get("DOCATLAS_MCP_TEXT_FALLBACK") == "1",
         )
 
 
@@ -861,7 +863,7 @@ def _strip_null_enum_values(value: Any) -> Any:
     return value
 
 
-def _tool_spec(raw: dict[str, Any]) -> ToolSpec:
+def _tool_spec(raw: dict[str, Any], *, text_fallback: bool = False) -> ToolSpec:
     name = str(raw["name"])
     validation_schema = _strip_null_enum_values(copy.deepcopy(raw["inputSchema"]))
     return ToolSpec(
@@ -871,8 +873,10 @@ def _tool_spec(raw: dict[str, Any]) -> ToolSpec:
             PUBLIC_ADVERTISED_INPUT_SCHEMAS.get(name, raw["inputSchema"])
         )),
         handler=_handler_for_tool(name),
-        output_schema=copy.deepcopy(
-            PUBLIC_ADVERTISED_OUTPUT_SCHEMAS.get(name, raw.get("outputSchema"))
+        output_schema=(
+            None
+            if text_fallback
+            else copy.deepcopy(PUBLIC_ADVERTISED_OUTPUT_SCHEMAS.get(name, raw.get("outputSchema")))
         ),
         validation_schema=validation_schema,
     )
@@ -890,7 +894,7 @@ def build_docs_surface(config: DocsServerConfig) -> DocsMcpSurface:
             continue
         if name in ADVANCED_TOOL_NAMES and not config.expose_advanced:
             continue
-        specs.append(_tool_spec(raw))
+        specs.append(_tool_spec(raw, text_fallback=config.text_fallback))
     return DocsMcpSurface(
         tools=tuple(specs),
         handlers={spec.name: spec.handler for spec in specs},

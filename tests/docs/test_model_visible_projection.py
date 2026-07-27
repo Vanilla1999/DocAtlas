@@ -29,6 +29,16 @@ def _forbidden_occurrences(value):
     return []
 
 
+def _decode_support_envelope(value):
+    import base64
+    import json
+    import zlib
+
+    encoded = value["data"]
+    encoded += "=" * (-len(encoded) % 4)
+    return json.loads(zlib.decompress(base64.urlsafe_b64decode(encoded)))
+
+
 def test_docs_answer_is_deterministic_deduplicated_hashed_and_bounded():
     snippet = {
         "source": "https://example.test/api",
@@ -379,7 +389,7 @@ def test_projection_intent_distinguishes_change_from_documentation_question():
     assert projection_kind("What is the retry policy?") == "docs_answer"
 
 
-def test_normal_public_call_returns_only_one_canonical_projection():
+def test_library_public_call_without_canonical_decision_fails_closed():
     class Facade:
         def get_docs_context(self, question, **kwargs):
             return {
@@ -402,11 +412,14 @@ def test_normal_public_call_returns_only_one_canonical_projection():
         Facade(),
     )
 
-    assert payload["status"] == "ok"
+    assert payload["status"] == "insufficient_evidence"
     assert payload["kind"] == "docs_answer"
-    assert set(payload) == {
-        "status", "kind", "answer", "answer_evidence_ids", "sources", "omitted_counts", "estimated_tokens",
-    }
+    assert payload["answer_supported"] is False
+    assert payload["answer_available"] is False
+    assert payload["reason_code"] == "canonical_support_decision_missing"
+    assert payload["mandatory_coverage"] == 0.0
+    assert payload["selected_evidence_ids"] == []
+    assert "answer" not in payload
     assert not _forbidden_occurrences(payload)
 
 
@@ -460,6 +473,225 @@ def test_docs_projection_forwards_host_requirements_and_scope_to_selector():
 
     assert ok["status"] == "ok"
     assert blocked["status"] == "insufficient_evidence"
+
+
+def test_docs_projection_uses_the_canonical_requirement_set_without_rebuilding_it():
+    from docmancer.docs.application.evidence_selection import build_requirements
+
+    requirements = build_requirements(
+        "How are retries handled?", public_requirements=["bounded retry"],
+    )
+    diagnostics = {}
+    payload, _ = project_docs_answer(
+        question="How are retries handled?",
+        retrieval={
+            "status": "success", "answer_available": True, "requirements": requirements,
+            "context_pack": [{"source": "docs/retry.md", "content": "Use bounded retry for failures."}],
+        },
+        selection_diagnostics=diagnostics,
+    )
+
+    assert payload["status"] == "ok"
+    assert diagnostics["requirements_hash"] == requirements.requirements_hash
+
+
+def test_docs_projection_preserves_underlying_support_decision_fields():
+    from docmancer.docs.application.evidence_selection import (
+        library_docs_selection_config,
+        select_evidence,
+    )
+
+    question = "Compare async with launch and explain how to obtain the async result"
+    candidate = {"source": "docs/launch.md", "content": "launch starts fire-and-forget work."}
+    selection = select_evidence(
+        [candidate], question=question, config=library_docs_selection_config(800),
+    )
+    full_support = selection.support_decision.as_payload()
+    support = {
+        key: full_support[key]
+        for key in (
+            "answer_supported", "answer_available", "support_status", "reason_code",
+            "missing_requirement_ids", "satisfied_requirement_ids",
+            "mandatory_requirement_ids", "mandatory_coverage", "evidence_coverage",
+            "selected_evidence_ids", "decision_hash",
+        )
+    }
+    projection, _ = project_docs_answer(
+        question=question,
+        retrieval={
+            "status": "success", "context_available": True,
+            "answer_available": False, "selection_profile": "library_docs_answer",
+            "selection_decision": selection, "context_pack": [candidate], **support,
+        },
+    )
+
+    assert {key: projection[key] for key in support} == support
+    assert projection["status"] == "insufficient_evidence"
+
+
+def test_supported_library_projection_shares_decision_and_visible_evidence_ids():
+    from docmancer.docs.application.evidence_selection import (
+        library_docs_selection_config,
+        select_evidence,
+    )
+
+    question = "Compare create_task with gather and explain how the scheduled task result is obtained"
+    candidate = {
+        "stable_id": "runtime-witness",
+        "source": "docs/runtime.md",
+        "content": (
+            "Compare create_task with gather; obtain the scheduled task result "
+            "from create_task."
+        ),
+    }
+    selection = select_evidence(
+        [candidate],
+        question=question,
+        config=library_docs_selection_config(800),
+    )
+
+    projection, _ = project_docs_answer(
+        question=question,
+        retrieval={
+            "status": "success",
+            "answer_available": True,
+            "selection_profile": "library_docs_answer",
+            "selection_decision": selection,
+            "context_pack": [candidate],
+        },
+    )
+
+    selected_ids = list(selection.support_decision.selected_evidence_ids)
+    assert projection["status"] == "ok"
+    assert [source["evidence_id"] for source in projection["sources"]] == selected_ids
+    assert projection["answer_evidence_ids"] == selected_ids
+    assert projection["selected_evidence_ids"] == selected_ids
+
+
+def test_tiny_budget_preserves_complete_canonical_support_envelope():
+    from docmancer.docs.application.evidence_selection import (
+        library_docs_selection_config,
+        select_evidence,
+    )
+
+    question = "Compare create_task with gather and explain how the scheduled task result is obtained"
+    candidate = {
+        "stable_id": "runtime-witness",
+        "source": "docs/runtime.md",
+        "content": (
+            "Compare create_task with gather; obtain the scheduled task result "
+            "from create_task."
+        ),
+    }
+    selection = select_evidence(
+        [candidate],
+        question=question,
+        config=library_docs_selection_config(800),
+    )
+    retrieval = {
+        "status": "success",
+        "answer_available": True,
+        "selection_profile": "library_docs_answer",
+        "selection_decision": selection,
+        "context_pack": [candidate],
+    }
+
+    normal, _ = project_docs_answer(
+        question=question, retrieval=retrieval, max_tokens=800,
+    )
+    tiny, _ = project_docs_answer(
+        question=question, retrieval=retrieval, max_tokens=100,
+    )
+    expected_support = selection.support_decision.as_payload()
+
+    assert {key: normal[key] for key in expected_support} == expected_support
+    assert tiny["status"] == "insufficient_evidence"
+    assert estimate_projection_tokens(tiny) <= 300
+    assert validate_model_visible_projection(tiny, snapshot={}, max_tokens=300) == []
+    assert _decode_support_envelope(tiny["support_envelope"]) == expected_support
+
+
+def test_library_projection_materializes_display_text_only_witness():
+    from docmancer.docs.application.evidence_selection import (
+        library_docs_selection_config,
+        select_evidence,
+    )
+
+    question = "Compare create_task with gather and explain how the scheduled task result is obtained"
+    text = "Compare create_task with gather; obtain the scheduled task result from create_task."
+    candidate = {
+        "stable_chunk_id": "display-only-witness",
+        "parent_logical_id": "runtime",
+        "source": "docs/runtime.md",
+        "display_text": text,
+        "display_content_hash": __import__("hashlib").sha256(text.encode()).hexdigest(),
+        "authority": "official",
+        "docs_exactness": "exact",
+        "version": "3.12",
+        "retrieval_rank": 1,
+        "score": 1.0,
+    }
+    selection = select_evidence(
+        [candidate], question=question, config=library_docs_selection_config(800),
+    )
+
+    projection, snapshot = project_docs_answer(
+        question=question,
+        retrieval={
+            "status": "success", "answer_available": True,
+            "selection_profile": "library_docs_answer",
+            "selection_decision": selection, "context_pack": [candidate],
+        },
+    )
+
+    expected_ids = list(selection.support_decision.selected_evidence_ids)
+    assert selection.support_decision.answer_supported is True
+    assert [source["evidence_id"] for source in projection["sources"]] == expected_ids
+    assert projection["answer_evidence_ids"] == expected_ids
+    assert projection["selected_evidence_ids"] == expected_ids
+    assert projection["sources"][0]["snippet"] == text
+    assert validate_model_visible_projection(projection, snapshot=snapshot, max_tokens=800) == []
+
+
+def test_library_projection_does_not_add_language_specific_code_policy():
+    from docmancer.docs.application.evidence_selection import (
+        library_docs_selection_config,
+        select_evidence,
+    )
+
+    question = "Show code comparing async with launch and explain how to obtain the async result"
+    candidate = {
+        "stable_id": "coroutine-witness", "source": "docs/coroutines.md",
+        "content": "async differs from launch; obtain the async result with await().",
+    }
+    selection = select_evidence(
+        [candidate], question=question, config=library_docs_selection_config(800),
+    )
+    projection, _ = project_docs_answer(
+        question=question,
+        retrieval={
+            "status": "success", "answer_available": True,
+            "selection_profile": "library_docs_answer",
+            "selection_decision": selection, "context_pack": [candidate],
+        },
+    )
+
+    assert "required_code_groups" not in projection
+
+
+def test_generic_projection_retains_compact_canonical_evidence_id():
+    projection, _ = project_docs_answer(
+        question="What is the retry policy?",
+        retrieval={
+            "status": "success", "answer_available": True,
+            "primary_snippet": {
+                "stable_id": "selector-owned-long-stable-chunk-identifier",
+                "source": "docs/retries.md", "content": "Retries are bounded.",
+            },
+        },
+    )
+
+    assert projection["sources"][0]["evidence_id"].startswith("ev-")
 
 
 def test_patch_projection_binds_duplicate_path_sections_by_exact_evidence_id():

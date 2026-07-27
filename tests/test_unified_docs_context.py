@@ -1,9 +1,11 @@
 from __future__ import annotations
 
+import hashlib
 from dataclasses import dataclass, field, replace
 from pathlib import Path
 from typing import Any
 
+from docmancer.docs.application.evidence_selection import library_docs_selection_config, select_evidence
 from docmancer.docs.application.unified_context_service import UnifiedDocsContextService
 from docmancer.docs.models import DocsChunk, DocsResult, LibraryInfo, ProjectContextResult, UnifiedDocsContextResult
 
@@ -124,6 +126,40 @@ def test_auto_with_library_only_routes_to_library_docs():
     assert result.mode_selected == "library"
     assert "get_docs" in _call_names(facade)
     assert result.source_summary["library"] == 1
+
+
+def test_library_context_consumes_selector_support_instead_of_context_presence():
+    facade = FakeFacade()
+    question = "Compare async with launch and explain how to obtain the async result"
+    selection = select_evidence(
+        [{
+            "stable_chunk_id": "launch-only",
+            "parent_logical_id": "docs/launch.md",
+            "source": "docs/launch.md",
+            "content": "launch starts fire-and-forget work.",
+            "display_content_hash": hashlib.sha256(
+                b"launch starts fire-and-forget work."
+            ).hexdigest(),
+        }],
+        question=question,
+        config=library_docs_selection_config(800),
+    )
+    facade.library_result = replace(
+        facade.library_result,
+        topic=question,
+        selection_decision=selection,
+        support_decision=selection.support_decision,
+    )
+
+    result = _service(facade).get_docs_context(question, library="fastapi")
+
+    assert result.context_available is True
+    assert result.answer_supported is False
+    assert result.answer_available is result.answer_supported
+    assert result.support_status == "insufficient_evidence"
+    assert result.mandatory_coverage < 1.0
+    assert result.selected_evidence_ids == ["launch-only"]
+    assert result.decision_hash == selection.support_decision.decision_hash
 
 
 def test_hostile_library_text_cannot_create_typed_lifecycle_action():
@@ -819,6 +855,41 @@ def test_placeholder_preflight_returns_partial_project_context_without_blind_syn
     assert result.context_pack
     assert ("bootstrap_project_docs", {"project_path": "/repo", "question": "architecture"}) in facade.calls
     assert any(call[0] == "get_project_context" for call in facade.calls)
+
+
+def test_project_mode_prioritizes_confirmed_sync_for_discovered_unindexed_docs():
+    class UnindexedPreflightFacade(FakeFacade):
+        def bootstrap_project_docs(self, project_path, question=None) -> Any:
+            self.calls.append(("bootstrap_project_docs", {"project_path": project_path, "question": question}))
+            inspect_result = type("Inspect", (), {
+                "project_docs": {"found": [{"path": "README.md"}], "indexed": []},
+            })()
+            return type("Bootstrap", (), {
+                "requires_confirmation": True,
+                "warnings": [],
+                "reason_code": "project_docs_preflight_confirmation_required",
+                "confirmation_reason": "project_docs_preflight",
+                "next_action": {
+                    "type": "ask_user_to_update_or_confirm_project_docs",
+                    "tool_after_confirmation": "sync_project_docs",
+                },
+                "arguments_patch": {"project_path": project_path, "with_vectors": True},
+                "inspect_result": inspect_result,
+            })()
+
+    facade = UnindexedPreflightFacade()
+    result = _service(facade).get_docs_context("architecture", project_path="/repo", mode="project")
+
+    assert result.status == "confirmation_required"
+    assert result.answer_available is False
+    assert result.next_action == {
+        "type": "prepare_docs",
+        "tool": "prepare_docs",
+        "arguments_patch": {"action": "sync_project_docs", "project_path": "/repo"},
+        "requires_confirmation": True,
+        "confirmation_reason": "project_docs_preflight",
+    }
+    assert _call_names(facade) == ["bootstrap_project_docs"]
 
 
 def test_auto_dependency_question_selects_dependency():

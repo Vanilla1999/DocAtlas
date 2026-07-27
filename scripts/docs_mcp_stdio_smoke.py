@@ -12,6 +12,8 @@ from pathlib import Path
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
 
+from docmancer.mcp.agent_config import AgentTarget, register_server
+
 TOOLS = {"get_docs_context", "prepare_docs", "docs_status"}
 QUESTION = "What does the project README say about deterministic offline release checks?"
 NEEDLE = "The amber lighthouse invariant requires deterministic offline release checks."
@@ -24,6 +26,15 @@ def payload(result: object) -> dict:
     content = getattr(result, "content", [])
     if not content or not hasattr(content[0], "text"):
         raise AssertionError(f"missing JSON tool response: {result!r}")
+    return json.loads(content[0].text)
+
+
+def text_payload(result: object) -> dict:
+    if getattr(result, "structuredContent", None) is not None:
+        raise AssertionError("text-only compatibility response included structuredContent")
+    content = getattr(result, "content", [])
+    if not content or not hasattr(content[0], "text"):
+        raise AssertionError(f"missing JSON text-only tool response: {result!r}")
     return json.loads(content[0].text)
 
 
@@ -59,6 +70,24 @@ async def smoke() -> None:
                 assert NEEDLE in rendered, answer
                 sources = answer.get("selected_sources") or answer.get("context_pack") or []
                 assert any(source.get("path") == "README.md" for source in sources), answer
+        config_path = home / "opencode.json"
+        register_server(AgentTarget("opencode", config_path, "json_opencode_mcp"))
+        entry = json.loads(config_path.read_text())["mcp"]["docmancer"]
+        assert entry["environment"]["DOCATLAS_MCP_TEXT_FALLBACK"] == "1", entry
+        command = entry["command"]
+        opencode_params = StdioServerParameters(
+            command=command[0],
+            args=command[1:],
+            env={**env, **entry["environment"]},
+            cwd=str(root),
+        )
+        async with stdio_client(opencode_params) as streams:
+            async with ClientSession(*streams) as session:
+                await session.initialize()
+                text_answer = text_payload(await session.call_tool("get_docs_context", query))
+                rendered = json.dumps(text_answer, sort_keys=True)
+                assert "README.md" in rendered, text_answer
+                assert NEEDLE in rendered, text_answer
     print("Docs MCP installed-artifact stdio smoke: PASS")
 
 

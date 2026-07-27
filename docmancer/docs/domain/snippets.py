@@ -145,7 +145,7 @@ def extract_snippet_candidates(chunk: Any, *, origin_lane: str, question: str) -
     return candidates
 
 
-def build_snippet_presentation(chunks: list[Any], *, question: str, response_style: str, lane_priority: list[str] | None = None, max_supporting: int = 3) -> SnippetPresentation:
+def build_snippet_presentation(chunks: list[Any], *, question: str, response_style: str, lane_priority: list[str] | None = None, max_supporting: int = 3, support_decision: Any | None = None, requirements: Any | None = None) -> SnippetPresentation:
     requested_style = validate_response_style(response_style)
     intent = infer_snippet_query_intent(question)
     raw_candidates: list[SnippetCandidate] = []
@@ -179,10 +179,13 @@ def build_snippet_presentation(chunks: list[Any], *, question: str, response_sty
     if not selected:
         warning = {"code": "snippet_not_available", "message": "No usable code example was found in the selected cited sources."}
         return SnippetPresentation("evidence-first", None, [], len(raw_candidates), [warning], _snippet_metrics(raw_candidates, [], duplicates_dropped, 0, False, requested_style))
-    primary = _snippet_payload(selected[0], max_chars=MAX_PRIMARY_SNIPPET_CHARS)
-    supporting = [_snippet_payload(candidate, max_chars=MAX_SUPPORTING_SNIPPET_CHARS) for candidate in selected[1:]]
-    primary_candidates = [_snippet_payload(candidate, max_chars=MAX_SUPPORTING_SNIPPET_CHARS) for candidate in selected[:3]]
+    requirement_note = _support_requirement_note(support_decision, requirements)
+    primary = _annotate_requirement_note(_snippet_payload(selected[0], max_chars=MAX_PRIMARY_SNIPPET_CHARS), requirement_note)
+    supporting = [_annotate_requirement_note(_snippet_payload(candidate, max_chars=MAX_SUPPORTING_SNIPPET_CHARS), requirement_note) for candidate in selected[1:]]
+    primary_candidates = [_annotate_requirement_note(_snippet_payload(candidate, max_chars=MAX_SUPPORTING_SNIPPET_CHARS), requirement_note) for candidate in selected[:3]]
     confidence = _primary_snippet_confidence(selected)
+    if _support_is_insufficient(support_decision) and confidence == "high":
+        confidence = "medium"
     truncations = int(bool(primary.get("truncated"))) + sum(1 for item in supporting if item.get("truncated"))
     warnings = [{"code": "snippet_truncated", "message": "One or more snippets were truncated for presentation."}] if truncations else []
     return SnippetPresentation(
@@ -430,6 +433,38 @@ def _primary_snippet_confidence(selected: list[SnippetCandidate]) -> str:
     if primary >= 0.35 and margin >= 0.03:
         return "medium"
     return "low"
+
+
+def _support_is_insufficient(support_decision: Any | None) -> bool:
+    if isinstance(support_decision, dict):
+        return support_decision.get("answer_supported") is False
+    answer_supported = getattr(support_decision, "answer_supported", None)
+    return answer_supported is False or getattr(support_decision, "status", None) == "insufficient_evidence"
+
+
+def _support_requirement_note(support_decision: Any | None, requirements: Any | None) -> str | None:
+    if isinstance(support_decision, dict):
+        missing = support_decision.get("missing_requirement_ids") or support_decision.get("missing_requirements") or ()
+        decision_requirements = support_decision.get("requirements")
+    else:
+        missing = getattr(support_decision, "missing_requirement_ids", None) or getattr(support_decision, "missing_requirements", ())
+        decision_requirements = getattr(support_decision, "requirements", None)
+    requirement_items = getattr(requirements or decision_requirements, "requirements", requirements or decision_requirements or ())
+    required_ids = [str(getattr(item, "requirement_id", item.get("requirement_id", "")) if isinstance(item, dict) else getattr(item, "requirement_id", "")) for item in requirement_items]
+    missing_ids = sorted({str(item) for item in missing if str(item)})
+    matched_ids = sorted(set(required_ids) - set(missing_ids))
+    notes = []
+    if matched_ids:
+        notes.append(f"matched requirements: {', '.join(matched_ids)}")
+    if missing_ids:
+        notes.append(f"missing requirements: {', '.join(missing_ids)}")
+    return "; ".join(notes) or None
+
+
+def _annotate_requirement_note(payload: dict[str, Any], note: str | None) -> dict[str, Any]:
+    if note:
+        payload["why_relevant"] = "; ".join(part for part in (payload.get("why_relevant"), note) if part)
+    return payload
 
 
 def _primary_snippet_selection_reason(candidate: SnippetCandidate, *, confidence: str) -> str:

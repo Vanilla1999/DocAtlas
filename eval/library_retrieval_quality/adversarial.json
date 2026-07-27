@@ -1,0 +1,36 @@
+{
+  "schema_version": "library-retrieval-quality-cases-v1",
+  "cases": [
+    {
+      "case_id": "kotlin_launch_only_gap",
+      "result_kind": "docs_answer",
+      "question": "When should I use async instead of launch, and how do I obtain its result?",
+      "exact_version": "1.8.1",
+      "candidates": [
+        {
+          "stable_chunk_id": "kotlin-launch-only",
+          "parent_logical_id": "basics",
+          "source": "https://github.com/Kotlin/kotlinx.coroutines/blob/fixture-commit/docs/topics/coroutines-basics.md",
+          "display_text": "launch starts a coroutine and returns a Job. job.join() waits for completion.",
+          "authority": "official",
+          "docs_exactness": "exact",
+          "version": "1.8.1",
+          "retrieval_rank": 1
+        }
+      ],
+      "required_facts": ["async", "launch", "await"],
+      "partial_overlap": true,
+      "expected_status": "insufficient_evidence",
+      "output_mode_decisions": {
+        "bounded_direct": {"status": "insufficient_evidence", "selected_evidence_ids": []},
+        "project_docs": {"status": "insufficient_evidence", "selected_evidence_ids": []},
+        "project_docs_answer": {"status": "insufficient_evidence", "selected_evidence_ids": []},
+        "answer": {"status": "insufficient_evidence", "selected_evidence_ids": []},
+        "compact": {"status": "insufficient_evidence", "selected_evidence_ids": []},
+        "full": {"status": "insufficient_evidence", "selected_evidence_ids": []},
+        "debug": {"status": "insufficient_evidence", "selected_evidence_ids": []}
+      },
+      "maximum_visible_tokens": 800
+    }
+  ]
+}

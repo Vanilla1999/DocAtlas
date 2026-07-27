@@ -1,6 +1,12 @@
 from __future__ import annotations
 
+from datetime import datetime, timezone
+from types import SimpleNamespace
+
+from docmancer.docs.application.library_ingest_orchestrator import LibraryIngestOrchestrator
+from docmancer.docs.application.library_ingest_ports import LibraryIngestPorts
 from docmancer.docs.application.library_docs_service import LibraryDocsApplicationService
+from docmancer.docs.models import RefreshResult
 
 
 class FakeLibraryFacade:
@@ -47,3 +53,106 @@ def test_library_application_service_delegates_prune_options():
 
     assert service.prune_library_docs(library="go_router", keep_versions=["1"], older_than_days=30, dry_run=False) == "pruned"
     assert facade.calls == [("prune", {"library": "go_router", "keep_versions": ["1"], "older_than_days": 30, "dry_run": False})]
+
+
+def test_ingest_orchestrator_uses_injected_refresh_port_for_sync_requests():
+    calls = []
+
+    def prefetch(library, **kwargs):
+        calls.append((library, kwargs))
+        return RefreshResult(
+            library_id="pytest",
+            status="updated",
+            docs_url=None,
+            last_refreshed_at=None,
+        )
+
+    orchestrator = LibraryIngestOrchestrator(
+        LibraryIngestPorts(
+            jobs=object(),
+            prefetch=prefetch,
+            timeout_seconds=lambda: 1.0,
+            executor=lambda: None,
+        )
+    )
+
+    result = orchestrator.prefetch_docs("pytest", versions=["8"], force_refresh=True)
+
+    assert result.status == "updated"
+    assert calls == [("pytest", {
+        "ecosystem": None,
+        "versions": ["8"],
+        "docs_url": None,
+        "docs_url_template": None,
+        "source_type": None,
+        "force_refresh": True,
+        "continue_on_error": True,
+    })]
+
+
+def test_ingest_orchestrator_uses_injected_clock_executor_and_job_store():
+    class Jobs:
+        def __init__(self):
+            self.job = SimpleNamespace(job_id="job-1", generation_id="generation-1", status="pending")
+            self.updates = []
+
+        def create(self, *_args, **_kwargs):
+            return self.job
+
+        def get(self, _job_id):
+            return self.job
+
+        def update(self, _job_id, **values):
+            self.updates.append(values)
+            self.job.status = values.get("status", self.job.status)
+
+        def append_error(self, *_args):
+            raise AssertionError("the successful path must not append errors")
+
+        def generation_active(self, *_args):
+            return True
+
+        def cancellation_requested(self, *_args):
+            return False
+
+    class Executor:
+        def __init__(self):
+            self.work = None
+
+        def try_reserve(self):
+            return True
+
+        def release_reservation(self):
+            raise AssertionError("the successful path must not release a reservation")
+
+        def submit_reserved(self, work, **_kwargs):
+            self.work = work
+            return SimpleNamespace(queue_position=1, running=0, queued=1, max_running=1, max_queued=1)
+
+    jobs = Jobs()
+    executor = Executor()
+    calls = []
+
+    def prefetch(_library, **kwargs):
+        calls.append(kwargs)
+        assert kwargs["should_cancel"]() is False
+        assert kwargs["begin_commit"]() is True
+        return RefreshResult(
+            library_id="pytest", status="updated", docs_url=None, last_refreshed_at=None,
+            targets_completed=1,
+        )
+
+    orchestrator = LibraryIngestOrchestrator(
+        LibraryIngestPorts(jobs=jobs, prefetch=prefetch, timeout_seconds=lambda: 30.0, executor=lambda: executor),
+        monotonic=lambda: 100.0,
+        utc_now=lambda: datetime(2026, 7, 27, 12, 0, tzinfo=timezone.utc),
+    )
+
+    result = orchestrator.prefetch_docs("pytest", async_=True)
+    assert result.status == "pending"
+    assert jobs.updates[0]["deadline_at"] == "2026-07-27T12:00:30+00:00"
+
+    executor.work()
+
+    assert calls and calls[0]["staging_owner"] == {"job_id": "job-1", "generation_id": "generation-1"}
+    assert jobs.updates[-1]["status"] == "succeeded"

@@ -151,7 +151,10 @@ def test_register_writes_opencode_and_vscode_project_entries(tmp_path):
     agent_config.register_server(vscode)
 
     assert json.loads(opencode.config_path.read_text())["mcp"]["docmancer"] == {
-        "type": "local", "command": ["doc-atlas", "mcp", "docs-serve"], "enabled": True,
+        "type": "local",
+        "command": ["doc-atlas", "mcp", "docs-serve"],
+        "enabled": True,
+        "environment": {"DOCATLAS_MCP_TEXT_FALLBACK": "1"},
     }
     assert json.loads(vscode.config_path.read_text())["servers"]["docmancer"] == {
         "type": "stdio", "command": "doc-atlas", "args": ["mcp", "docs-serve"],
@@ -175,3 +178,46 @@ def test_register_reenables_disabled_opencode_entry(tmp_path):
 
     assert changed is True
     assert json.loads(cfg.read_text())["mcp"]["docmancer"]["enabled"] is True
+
+
+def test_register_migrates_opencode_environment_without_clobbering_user_settings(tmp_path):
+    cfg = tmp_path / "opencode.json"
+    cfg.write_text(json.dumps({
+        "mcp": {
+            "docmancer": {
+                "type": "local",
+                "command": ["doc-atlas", "mcp", "docs-serve"],
+                "enabled": False,
+                "environment": {
+                    "DOCATLAS_MCP_TEXT_FALLBACK": "0",
+                    "DOCMANCER_TASK_LEVEL_ALLOW_NETWORK": "1",
+                },
+                "timeout": 30,
+            }
+        }
+    }))
+    target = agent_config.AgentTarget("opencode", cfg, "json_opencode_mcp")
+
+    changed, _ = agent_config.register_server(target)
+
+    assert changed is True
+    entry = json.loads(cfg.read_text())["mcp"]["docmancer"]
+    assert entry["enabled"] is True
+    assert entry["timeout"] == 30
+    assert entry["environment"] == {
+        "DOCATLAS_MCP_TEXT_FALLBACK": "1",
+        "DOCMANCER_TASK_LEVEL_ALLOW_NETWORK": "1",
+    }
+    assert agent_config.register_server(target)[0] is False
+
+
+def test_register_refuses_opencode_entry_with_a_different_command(tmp_path):
+    cfg = tmp_path / "opencode.json"
+    original = {"mcp": {"docmancer": {"type": "local", "command": ["custom-docs", "serve"]}}}
+    cfg.write_text(json.dumps(original))
+    target = agent_config.AgentTarget("opencode", cfg, "json_opencode_mcp")
+
+    with pytest.raises(ValueError, match="refusing to overwrite"):
+        agent_config.register_server(target)
+
+    assert json.loads(cfg.read_text()) == original

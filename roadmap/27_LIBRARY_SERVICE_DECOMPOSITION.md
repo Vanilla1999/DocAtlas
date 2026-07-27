@@ -44,3 +44,21 @@ Extract one coherent ingest orchestration boundary while preserving the public M
 - Tests can inject clock, executor, fetcher, and store without real network or sleeps.
 - The original service loses the extracted responsibilities and meets the stated module budget or records a narrowly justified residual.
 - Full related suites and `git diff --check` pass.
+
+## Implementation record
+
+- `LibraryIngestOrchestrator` now owns the asynchronous job lifecycle and receives its
+  clock, executor, timeout, job store, and refresh callable through named ports.
+- `LibraryIndexPublication` owns staging-index creation, atomic publication, rollback,
+  and agent invalidation. `LibraryRefreshOps` calls that component directly instead of
+  dynamically binding publication helpers.
+- `LibraryRefreshPolicy` now owns the frozen manifest/error/diagnostic transformation
+  rules. This keeps `LibraryRefreshOps` at 689 lines, `LibraryIngestOrchestrator` at
+  297 lines, and `LibraryIndexPublication` at 165 lines.
+- Refresh and publication ports receive a monotonic clock; the orchestrator additionally
+  receives its UTC clock and executor. The direct regression tests exercise the injected
+  job store, executor, clock, staging owner, and terminal success state without network,
+  threads, or sleeps.
+- The original `library_docs_service.py` remains the read/query facade. It has lost the
+  asynchronous lifecycle and publication responsibilities; all public and compatibility
+  prefetch entrypoints delegate through the same ingest orchestrator.

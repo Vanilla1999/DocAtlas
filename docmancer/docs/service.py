@@ -189,6 +189,9 @@ class LibraryDocsService:
     def _refresh_record(self, *args: Any, **kwargs: Any):
         return self.library_docs._refresh_record(*args, **kwargs)
 
+    def _refresh_record_unlocked(self, *args: Any, **kwargs: Any):
+        return self.library_docs.refresh_ops.refresh_record(*args, **kwargs)
+
     def refresh_docs(self, *args: Any, **kwargs: Any):
         return self.library_docs.refresh_docs(*args, **kwargs)
 
@@ -308,6 +311,9 @@ class LibraryDocsService:
 
     def _target_urls(self, *args: Any, **kwargs: Any):
         return self.docs_targets.target_urls(*args, **kwargs)
+
+    def _resolve_github_directory_target(self, *args: Any, **kwargs: Any):
+        return self.docs_targets.resolve_github_directory_target(*args, **kwargs)
 
     def _discover_pub_dartdoc_target(self, *args: Any, **kwargs: Any):
         return self.docs_targets.discover_pub_dartdoc_target(*args, **kwargs)

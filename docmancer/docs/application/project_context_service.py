@@ -644,6 +644,27 @@ def project_context_pack(*, question: str = "", project_docs: ProjectDocsResult 
                 source_taxonomy["authority"] = item.authority
             if _should_skip_low_trust_project_source(question, source_taxonomy):
                 continue
+            matching_authoritative_section = next(
+                (
+                    existing
+                    for existing in pack
+                    if source_taxonomy["authority"] == "source_of_truth"
+                    and existing.get("authority") == "source_of_truth"
+                    and existing.get("path") == item.path
+                    and existing.get("heading_path") == item.heading_path
+                ),
+                None,
+            )
+            if matching_authoritative_section is not None:
+                content = "\n".join(
+                    part for part in (matching_authoritative_section["content"], item.content) if part
+                )
+                matching_authoritative_section["content"] = content
+                matching_authoritative_section["display_text"] = content
+                matching_authoritative_section["token_estimate"] = max(1, len(content) // 4)
+                matching_authoritative_section["snippet"] = {"content": content}
+                matching_authoritative_section["surrounding_context"] = content
+                continue
             pack.append({
                 "source_class": "project_doc",
                 "source_type": source_taxonomy["source_type"],
@@ -665,6 +686,7 @@ def project_context_pack(*, question: str = "", project_docs: ProjectDocsResult 
                 "freshness": freshness,
                 "why_selected": project_why_selected(item),
                 "content": item.content,
+                "display_text": item.content,
                 "token_estimate": token_estimate,
                 "source": {
                     "source_class": "project_doc",

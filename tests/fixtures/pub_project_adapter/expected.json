@@ -1,0 +1,149 @@
+{
+  "malformed": {
+    "direct_dependencies": [],
+    "observations": [],
+    "packages": {},
+    "warnings": [
+      "pubspec.lock has no packages map."
+    ]
+  },
+  "valid": {
+    "direct_dependencies": [
+      "flutter",
+      "git_client",
+      "go_router",
+      "local_widgets",
+      "test"
+    ],
+    "observations": [
+      {
+        "dependency_group": "dependencies",
+        "ecosystem": "pub",
+        "package_name": "flutter",
+        "resolved_version": "0.0.0",
+        "source_kind": "sdk",
+        "specifier_kind": "exact",
+        "specifier_raw": "0.0.0",
+        "version_source": "lockfile_exact",
+        "warnings": [],
+        "workspace_member": null
+      },
+      {
+        "dependency_group": "dependencies",
+        "ecosystem": "pub",
+        "package_name": "go_router",
+        "resolved_version": "14.8.1",
+        "source_kind": "registry",
+        "specifier_kind": "exact",
+        "specifier_raw": "14.8.1",
+        "version_source": "lockfile_exact",
+        "warnings": [],
+        "workspace_member": null
+      },
+      {
+        "dependency_group": "dependencies",
+        "ecosystem": "pub",
+        "package_name": "local_widgets",
+        "resolved_version": "1.0.0",
+        "source_kind": "path",
+        "specifier_kind": "exact",
+        "specifier_raw": "1.0.0",
+        "version_source": "lockfile_exact",
+        "warnings": [],
+        "workspace_member": null
+      },
+      {
+        "dependency_group": "dependencies",
+        "ecosystem": "pub",
+        "package_name": "git_client",
+        "resolved_version": "0.4.0",
+        "source_kind": "git",
+        "specifier_kind": "exact",
+        "specifier_raw": "0.4.0",
+        "version_source": "lockfile_exact",
+        "warnings": [],
+        "workspace_member": null
+      },
+      {
+        "dependency_group": "dev",
+        "ecosystem": "pub",
+        "package_name": "test",
+        "resolved_version": "1.25.15",
+        "source_kind": "registry",
+        "specifier_kind": "exact",
+        "specifier_raw": "1.25.15",
+        "version_source": "lockfile_exact",
+        "warnings": [],
+        "workspace_member": null
+      },
+      {
+        "dependency_group": "dependencies",
+        "ecosystem": "pub",
+        "package_name": "flutter",
+        "resolved_version": null,
+        "source_kind": "registry",
+        "specifier_kind": "unknown",
+        "specifier_raw": "{'sdk': 'flutter'}",
+        "version_source": "manifest_range",
+        "warnings": [],
+        "workspace_member": null
+      },
+      {
+        "dependency_group": "dependencies",
+        "ecosystem": "pub",
+        "package_name": "go_router",
+        "resolved_version": null,
+        "source_kind": "registry",
+        "specifier_kind": "range",
+        "specifier_raw": "^14.0.0",
+        "version_source": "manifest_range",
+        "warnings": [],
+        "workspace_member": null
+      },
+      {
+        "dependency_group": "dependencies",
+        "ecosystem": "pub",
+        "package_name": "local_widgets",
+        "resolved_version": null,
+        "source_kind": "path",
+        "specifier_kind": "path",
+        "specifier_raw": "../local_widgets",
+        "version_source": "manifest_range",
+        "warnings": [],
+        "workspace_member": null
+      },
+      {
+        "dependency_group": "dependencies",
+        "ecosystem": "pub",
+        "package_name": "git_client",
+        "resolved_version": null,
+        "source_kind": "git",
+        "specifier_kind": "git",
+        "specifier_raw": "https://example.invalid/git_client.git",
+        "version_source": "manifest_range",
+        "warnings": [],
+        "workspace_member": null
+      },
+      {
+        "dependency_group": "dev",
+        "ecosystem": "pub",
+        "package_name": "test",
+        "resolved_version": null,
+        "source_kind": "registry",
+        "specifier_kind": "range",
+        "specifier_raw": "^1.25.0",
+        "version_source": "manifest_range",
+        "warnings": [],
+        "workspace_member": null
+      }
+    ],
+    "packages": {
+      "flutter": "0.0.0",
+      "git_client": "0.4.0",
+      "go_router": "14.8.1",
+      "local_widgets": "1.0.0",
+      "test": "1.25.15"
+    },
+    "warnings": []
+  }
+}

@@ -287,14 +287,37 @@ if not isinstance(servers, dict):
     print("opencode 'mcp' key must be an object", file=sys.stderr)
     sys.exit(2)
 
-desired = {"type": "local", "command": ["doc-atlas", "mcp", "docs-serve"], "enabled": True}
-if servers.get(name) == desired:
+desired = {
+    "type": "local",
+    "command": ["doc-atlas", "mcp", "docs-serve"],
+    "enabled": True,
+    "environment": {"DOCATLAS_MCP_TEXT_FALLBACK": "1"},
+}
+existing = servers.get(name)
+if existing is not None and not isinstance(existing, dict):
+    print(f"opencode MCP server {name!r} must be an object", file=sys.stderr)
+    sys.exit(2)
+if existing is not None and existing.get("command") not in (
+    ["doc-atlas", "mcp", "docs-serve"],
+    ["docmancer", "mcp", "serve"],
+):
+    print(f"opencode MCP server {name!r} has a different command; refusing to overwrite it", file=sys.stderr)
+    sys.exit(2)
+if existing is None or "environment" not in existing:
+    environment = {}
+else:
+    environment = existing["environment"]
+if not isinstance(environment, dict):
+    print(f"opencode MCP server {name!r} has a non-object environment; refusing to overwrite it", file=sys.stderr)
+    sys.exit(2)
+merged = {**(existing or {}), **desired, "environment": {**environment, **desired["environment"]}}
+if existing == merged:
     print("unchanged")
     sys.exit(0)
 
 if os.path.exists(path):
     shutil.copy2(path, path + ".bak")
-servers[name] = {**(servers.get(name) or {}), **desired}
+servers[name] = merged
 with open(path, "w", encoding="utf-8") as fh:
     fh.write(json.dumps(data, indent=2, sort_keys=True) + "\n")
 print("written")
@@ -303,7 +326,7 @@ PY
     ok "opencode: '$SERVER_NAME' configured in $cfg"
   else
     warn "opencode: could not update $cfg automatically."
-    step "Add manually under the \"mcp\" key: {\"$SERVER_NAME\": {\"type\":\"local\",\"command\":[\"doc-atlas\",\"mcp\",\"docs-serve\"],\"enabled\":true}}"
+    step "Add manually under the \"mcp\" key: {\"$SERVER_NAME\": {\"type\":\"local\",\"command\":[\"doc-atlas\",\"mcp\",\"docs-serve\"],\"enabled\":true,\"environment\":{\"DOCATLAS_MCP_TEXT_FALLBACK\":\"1\"}}}"
   fi
 }
 
