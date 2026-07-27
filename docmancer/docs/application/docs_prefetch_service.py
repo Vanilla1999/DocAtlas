@@ -20,6 +20,7 @@ from docmancer.docs.domain.project_state import create_project_docs_next_action,
 from docmancer.docs.domain.source_identity import docs_exactness, docs_identity, docs_request
 from docmancer.docs.domain.target_security import host_allowed, is_remote_url, path_allowed, url_security_error
 from docmancer.docs.domain.trust_contract import build_project_context_trust_contract
+from docmancer.docs.github_source_manifest import normalize_resolved_github_manifest
 from docmancer.docs.models import DocsChunk, DocsInspectResult, DocsJobStartResult, DocsManifestValidationResult, DocsPruneResult, DocsRemoveResult, DocsResult, DocsSourceResolution, DocsTarget, DocsTargetResult, DocsTargetsPrefetchResult, LibraryInfo, ProjectDocsBootstrapResult, ProjectDocsChunk, ProjectDocsIngestResult, ProjectDocsInspectResult, ProjectDocsResult, ProjectMetadata, ProjectPrefetchResult, RefreshResult
 from docmancer.docs.registry import LibraryRecord
 from docmancer.docs.resolver import canonical_library_id, normalize_library_name, normalize_version
@@ -42,6 +43,8 @@ class DocsPrefetchDependencies(Protocol):
 
     def _target_from_dict(self, value: dict[str, Any] | DocsTarget) -> DocsTarget: ...
     def _discover_pub_dartdoc_target(self, target: DocsTarget, warnings: list[str], job_id: str | None = None, canonical_id: str | None = None) -> DocsTarget: ...
+    def _resolve_github_directory_target(self, target: DocsTarget) -> DocsTarget: ...
+    def _refresh_record_unlocked(self, record: Any, *, force: bool, lock_held: bool = False) -> Any: ...
     def _target_urls(self, target: DocsTarget) -> tuple[list[str], str | None]: ...
     def _target_to_spec(self, target: DocsTarget, urls: list[str] | None = None) -> dict[str, Any]: ...
     def _target_result_summary(self, result: DocsTargetResult) -> dict[str, Any]: ...
@@ -201,7 +204,11 @@ class DocsPrefetchService:
             seen.add(canonical_id)
 
             target = self.deps._discover_pub_dartdoc_target(target, warnings, job_id=job_id, canonical_id=canonical_id)
-            urls, error = self.deps._target_urls(target)
+            try:
+                target = self.deps._resolve_github_directory_target(target)
+                urls, error = self.deps._target_urls(target)
+            except Exception as exc:
+                urls, error = [], str(exc)
             if error:
                 targets_failed += 1
                 result = DocsTargetResult(
@@ -225,6 +232,17 @@ class DocsPrefetchService:
                 continue
 
             target_spec = self.deps._target_to_spec(target, urls)
+            existing = self.registry.get(target.library, target.ecosystem, version, source_type)
+            manifest = target_spec.get("source_manifest") or {}
+            if manifest.get("schema_version") == 2 and manifest.get("digest"):
+                target_spec["last_attempt_manifest_digest"] = manifest["digest"]
+                previous_spec = (existing.target_spec if existing else None) or {}
+                previous_manifest = previous_spec.get("source_manifest") or {}
+                if previous_manifest.get("schema_version") == 2:
+                    target_spec["active_source_manifest"] = previous_manifest
+                    target_spec["source_manifest"] = previous_manifest
+                    target_spec["active_manifest_digest"] = previous_spec.get("active_manifest_digest") or previous_manifest.get("digest")
+                    target_spec["last_complete_manifest_digest"] = previous_spec.get("last_complete_manifest_digest") or previous_manifest.get("digest")
             record = self.registry.upsert(
                 library=target.library,
                 ecosystem=target.ecosystem,
@@ -273,7 +291,25 @@ class DocsPrefetchService:
                             message=f"Fetching target {index}/{len(raw_targets)}.",
                         )
                     progress_callback = self.progress_callback_for(job_id, record.library_id)
-                    for url_index, url in enumerate(urls, start=1):
+                    manifest = (
+                        normalize_resolved_github_manifest(target.source_manifest)
+                        if target.source_manifest.get("schema_version") == 2 else None
+                    )
+                    if manifest:
+                        attempted_spec = self.deps._target_to_spec(target, urls)
+                        attempted_spec["last_attempt_manifest_digest"] = manifest["digest"]
+                        if record.target_spec and record.target_spec.get("active_source_manifest"):
+                            attempted_spec["active_source_manifest"] = record.target_spec["active_source_manifest"]
+                            attempted_spec["active_manifest_digest"] = record.target_spec.get("active_manifest_digest")
+                            attempted_spec["last_complete_manifest_digest"] = record.target_spec.get("last_complete_manifest_digest")
+                        record = replace(record, target_spec=attempted_spec)
+                        refreshed = self.deps._refresh_record_unlocked(record, force=True, lock_held=True)
+                        if refreshed.status not in {"updated", "ok"}:
+                            raise RuntimeError(refreshed.message or "manifest refresh failed")
+                        operation_urls: list[str] = []
+                    else:
+                        operation_urls = urls
+                    for url_index, url in enumerate(operation_urls, start=1):
                         if self.jobs.cancellation_requested(job_id):
                             aborted = True
                             raise KeyboardInterrupt("Docs prefetch job cancelled.")
@@ -289,6 +325,8 @@ class DocsPrefetchService:
                         }
                         if target.doc_format:
                             add_kwargs["doc_format"] = target.doc_format
+                        if manifest:
+                            add_kwargs["source_manifest"] = manifest
                         if progress_callback:
                             add_kwargs["progress_callback"] = progress_callback
                             progress_callback({"phase": "fetching", "message": f"Fetching seed URL {url_index}/{len(urls)}", "url": url, "total_pages": len(urls)})
@@ -316,20 +354,32 @@ class DocsPrefetchService:
                         self.jobs.update(job_id, status="cancelled", phase="done", message="Docs prefetch job cancelled.")
                     break
                 except Exception as exc:
+                    record = self.registry.get(record.library_id, source_type=record.source_type) or record
                     targets_failed += 1
                     pages_failed_total += 1
-                    self.registry.upsert(
-                        library=record.name,
-                        ecosystem=record.ecosystem,
-                        version=record.version,
-                        source_type=record.source_type,
-                        docs_url=record.docs_url,
-                        docs_url_template=record.docs_url_template,
-                        now=self.deps._now(),
-                        status="failed",
-                        last_error=str(exc),
-                        target_spec=record.target_spec,
-                    )
+                    if existing is not None and existing.status == "available":
+                        restored_spec = dict(existing.target_spec or {})
+                        attempted_digest = (record.target_spec or {}).get("last_attempt_manifest_digest")
+                        if attempted_digest:
+                            restored_spec["last_attempt_manifest_digest"] = attempted_digest
+                        attempted_diagnostics = (record.target_spec or {}).get("last_attempt_manifest_diagnostics")
+                        if attempted_diagnostics:
+                            restored_spec["last_attempt_manifest_diagnostics"] = attempted_diagnostics
+                        self.registry.restore(replace(existing, target_spec=restored_spec))
+                        record = self.registry.get(existing.library_id, source_type=existing.source_type) or existing
+                    else:
+                        self.registry.upsert(
+                            library=record.name,
+                            ecosystem=record.ecosystem,
+                            version=record.version,
+                            source_type=record.source_type,
+                            docs_url=record.docs_url,
+                            docs_url_template=record.docs_url_template,
+                            now=self.deps._now(),
+                            status="failed",
+                            last_error=str(exc),
+                            target_spec=record.target_spec,
+                        )
                     results.append(
                         result := DocsTargetResult(
                             canonical_id=record.library_id,
@@ -359,6 +409,7 @@ class DocsPrefetchService:
 
                 targets_completed += 1
                 refreshed_at = self.deps._now()
+                record = self.registry.get(record.library_id, source_type=record.source_type) or record
                 record = self.registry.upsert(
                     library=record.name,
                     ecosystem=record.ecosystem,

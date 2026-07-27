@@ -107,6 +107,29 @@ def _concept_queries(query: str, exact_terms: tuple[ExactTerm, ...]) -> tuple[st
     return (normalized,) if normalized else ()
 
 
+def _requirement_exact_terms(requirements: Any) -> tuple[ExactTerm, ...]:
+    """Project canonical requirements into bounded retrieval hints without rebuilding them."""
+    terms: list[ExactTerm] = []
+    seen: set[str] = set()
+    for requirement in requirements:
+        kind = str(getattr(requirement, "kind", ""))
+        if kind not in {"exact_term", "entity"}:
+            continue
+        value = " ".join(str(getattr(requirement, "value", "")).split())[:160]
+        normalized = _normalize_term(value)
+        if not normalized or normalized in seen:
+            continue
+        terms.append(ExactTerm(
+            value=value,
+            normalized_value=normalized,
+            kind=str(getattr(requirement, "query_extraction_kind", "") or kind),
+        ))
+        seen.add(normalized)
+        if len(terms) >= MAX_EXACT_TERMS:
+            break
+    return tuple(terms)
+
+
 def _filter_spec(filters: Mapping[str, Any] | None) -> FilterSpec:
     filters = filters or {}
 
@@ -211,12 +234,14 @@ def build_query_plan(
     *,
     filters: Mapping[str, Any] | None = None,
     requested_lanes: tuple[str, ...] = ("lexical",),
+    requirements: Any | None = None,
 ) -> QueryPlan:
-    exact_terms = extract_exact_terms(query)
+    exact_terms = _requirement_exact_terms(requirements) if requirements is not None else extract_exact_terms(query)
     concepts = _concept_queries(query, exact_terms)[:MAX_CONCEPT_QUERIES]
     filter_spec = _filter_spec(filters)
     executed_filters_hash = canonical_hash(_canonical_filter_value(filters or {}))
     original_hash = hashlib.sha256(query.encode("utf-8")).hexdigest()
+    requirements_hash = str(getattr(requirements, "requirements_hash", ""))
     payload = {
         "schema_version": QUERY_PLAN_SCHEMA_VERSION,
         "original_query_hash": original_hash,
@@ -225,6 +250,7 @@ def build_query_plan(
         "filters": asdict(filter_spec),
         "executed_filters_hash": executed_filters_hash,
         "requested_lanes": list(requested_lanes),
+        "requirements_hash": requirements_hash,
     }
     return QueryPlan(
         original_query_hash=original_hash,
@@ -234,6 +260,8 @@ def build_query_plan(
         requested_lanes=requested_lanes,
         executed_filters_hash=executed_filters_hash,
         plan_hash=canonical_hash(payload),
+        requirements_hash=requirements_hash,
+        requirements=requirements,
     )
 
 

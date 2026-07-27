@@ -1,9 +1,9 @@
 schema_version: 1
 documents:
-  - path: TASK33C_CAUSAL_BUDGET_CONTRACT.md
-    role: api_contract
+  - path: .hermes/plans/2026-07-20-natural-language-library-retrieval.md
+    role: development
     scope: project
-    description: Authoritative Task33C evaluation, ActionPacket, and causal budget contract.
+    description: Approved implementation plan for natural-language library retrieval, immutable manifests, support semantics, and rollout gates.
     authority: source_of_truth
     status: active
     impact: track

@@ -1,0 +1,8 @@
+{
+  "schema_version": "library-retrieval-quality-digests-v1",
+  "datasets": {
+    "development.json": "567c3c9affd981e174aa43dd7a6b201a5ede5e2d901b16e558bc1b5dfd6bf885",
+    "holdout.json": "8f3c7dbd6e84802e25f3be8fb94e027c011296427d3b5684d49d8e12188bf13a",
+    "adversarial.json": "ffcd554112e5bccdb746559dd45354b51b47b6c7a28e48e97ab379ce4de39a1e"
+  }
+}

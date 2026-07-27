@@ -1,0 +1,86 @@
+{
+  "packages": {
+    "rust:serde": "1.0.228",
+    "rust:serde_json": "1.0.145",
+    "rust:tokio": "1.48.0",
+    "rust:transitive": "0.4.0",
+    "rust:git_helper": "0.2.0"
+  },
+  "observations": [
+    {
+      "dependency_group": "dependencies",
+      "ecosystem": "rust",
+      "package_name": "serde",
+      "resolved_version": "1.0.228",
+      "source_kind": "registry",
+      "specifier_kind": "exact",
+      "specifier_raw": "1.0",
+      "version_source": "lockfile_exact",
+      "warnings": [],
+      "workspace_member": null
+    },
+    {
+      "dependency_group": "dependencies",
+      "ecosystem": "rust",
+      "package_name": "tokio",
+      "resolved_version": "1.48.0",
+      "source_kind": "registry",
+      "specifier_kind": "exact",
+      "specifier_raw": "{ version = \"1\", features = [\"rt\"] }",
+      "version_source": "lockfile_exact",
+      "warnings": [],
+      "workspace_member": null
+    },
+    {
+      "dependency_group": "dependencies",
+      "ecosystem": "rust",
+      "package_name": "serde_json",
+      "resolved_version": "1.0.145",
+      "source_kind": "registry",
+      "specifier_kind": "exact",
+      "specifier_raw": "{ package = \"serde_json\", version = \"1.0\" }",
+      "version_source": "lockfile_exact",
+      "warnings": [],
+      "workspace_member": null
+    },
+    {
+      "dependency_group": "dependencies",
+      "ecosystem": "rust",
+      "package_name": "transitive",
+      "resolved_version": "0.4.0",
+      "source_kind": "registry",
+      "specifier_kind": "exact",
+      "specifier_raw": "0.4.0",
+      "version_source": "lockfile_exact",
+      "warnings": [],
+      "workspace_member": null
+    },
+    {
+      "dependency_group": "dev",
+      "ecosystem": "rust",
+      "package_name": "git_helper",
+      "resolved_version": "0.2.0",
+      "source_kind": "git",
+      "specifier_kind": "git",
+      "specifier_raw": "{ git = \"https://example.invalid/git_helper\" }",
+      "version_source": "lockfile_exact",
+      "warnings": [
+        "git_helper: non-registry dependency source."
+      ],
+      "workspace_member": null
+    },
+    {
+      "dependency_group": "dependencies",
+      "ecosystem": "rust",
+      "package_name": "local_crate",
+      "resolved_version": null,
+      "source_kind": "path",
+      "specifier_kind": "path",
+      "specifier_raw": "{ path = \"../local_crate\" }",
+      "version_source": "manifest_range",
+      "warnings": [],
+      "workspace_member": null
+    }
+  ],
+  "warnings": []
+}

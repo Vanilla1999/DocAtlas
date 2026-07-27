@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import hashlib
 import json
+from types import SimpleNamespace
 from typing import Any, cast
 
 import jsonschema
@@ -356,6 +358,143 @@ def test_document_content_policy_survives_every_output_mode():
         assert result.get("next_actions") in (None, [])
 
 
+def test_support_decision_survives_all_compatibility_and_bounded_modes():
+    from docmancer.docs.application.evidence_selection import (
+        library_docs_selection_config,
+        select_evidence,
+    )
+    from docmancer.docs.application.model_visible_projection import (
+        estimate_projection_tokens,
+    )
+
+    question = "Compare async with launch and explain how to obtain the async result"
+    scenarios = (
+        ("launch starts a coroutine.", "required_evidence_missing"),
+        (
+            "Compare async with launch: async returns a Deferred result, launch returns "
+            "a Job; call await on Deferred to obtain the async result.",
+            None,
+        ),
+    )
+    public_schema = next(
+        tool["outputSchema"] for tool in TOOLS
+        if tool["name"] == "get_docs_context"
+    )
+
+    for text, expected_reason in scenarios:
+        candidate = {
+            "stable_chunk_id": "chunk-dict-witness",
+            "parent_logical_id": "coroutines",
+            "source": "https://example.test/coroutines",
+            "display_text": text,
+            "display_content_hash": hashlib.sha256(text.encode()).hexdigest(),
+            "authority": "official",
+            "docs_exactness": "exact",
+            "version": "1.0",
+        }
+        selection = select_evidence(
+            [candidate],
+            question=question,
+            config=library_docs_selection_config(800),
+        )
+        expected = selection.support_decision.as_payload()
+        shared_retrieval = {
+            "tool": "get_docs_context",
+            "status": "success",
+            "context_available": True,
+            "selection_profile": "library_docs_answer",
+            "selection_decision": selection,
+            "context_pack": [candidate],
+            "trust_contract": {"selected": [], "rejected": [], "risky": []},
+        }
+
+        for result_shape in ("object", "dict"):
+            class Facade:
+                def get_docs_context(self, question, **kwargs):
+                    # Fresh values prevent one serializer call from seeding the next.
+                    if result_shape == "dict":
+                        return dict(shared_retrieval)
+                    return SimpleNamespace(**shared_retrieval)
+
+            observed = [cast(dict[str, Any], handle_context_tool(
+                "get_docs_context",
+                {"question": question, "library": "kotlin", "output_mode": mode},
+                cast(Any, Facade()),
+            )) for mode in ("answer", "compact", "full", "debug")]
+            observed.append(cast(dict[str, Any], handle_context_tool(
+                "get_docs_context",
+                {
+                    "question": question,
+                    "library": "kotlin",
+                    "delivery_strategy": "bounded_direct",
+                },
+                cast(Any, Facade()),
+            )))
+
+            for result in observed:
+                assert {
+                    key: result[key] for key in expected
+                    if key != "reason_code"
+                } == {
+                    key: value for key, value in expected.items()
+                    if key != "reason_code"
+                }
+                if expected_reason is None:
+                    assert "reason_code" not in result
+                else:
+                    assert result["reason_code"] == expected_reason
+                jsonschema.validate(result, public_schema)
+            assert observed[-1]["estimated_tokens"] == estimate_projection_tokens(observed[-1])
+
+
+def test_bounded_library_delivery_at_256_tokens_transports_complete_support_envelope():
+    from docmancer.docs.application.evidence_selection import (
+        library_docs_selection_config,
+        select_evidence,
+    )
+    from docmancer.docs.application.model_visible_projection import (
+        estimate_projection_tokens,
+    )
+
+    question = "Compare create_task with gather and explain how the scheduled task result is obtained"
+    candidate = {
+        "stable_id": "runtime-witness", "source": "docs/runtime.md",
+        "content": "Compare create_task with gather; obtain the scheduled task result from create_task.",
+    }
+    selection = select_evidence(
+        [candidate], question=question, config=library_docs_selection_config(800),
+    )
+
+    class Facade:
+        def get_docs_context(self, question, **kwargs):
+            return SimpleNamespace(
+                status="success", answer_available=True,
+                selection_profile="library_docs_answer",
+                selection_decision=selection, context_pack=[candidate],
+                trust_contract={"selected": [], "rejected": [], "risky": []},
+            )
+
+    result = cast(dict[str, Any], handle_context_tool(
+        "get_docs_context",
+        {
+            "question": question, "library": "runtime",
+            "delivery_strategy": "bounded_direct", "packet_tokens": 256,
+        },
+        cast(Any, Facade()),
+    ))
+
+    assert result.get("reason_code") != "invalid_model_visible_projection"
+    assert estimate_projection_tokens(result) <= 256
+    import base64
+    import zlib
+
+    encoded = result["support_envelope"]["data"]
+    encoded += "=" * (-len(encoded) % 4)
+    assert json.loads(zlib.decompress(base64.urlsafe_b64decode(encoded))) == (
+        selection.support_decision.as_payload()
+    )
+
+
 def test_get_docs_context_default_answer_reports_compaction_without_debug_noise():
     large = "x" * 120_000
 
@@ -560,3 +699,38 @@ def test_get_docs_context_direct_answer_has_agent_instruction():
     assert result["answer_type"] == "direct"
     assert result["safe_to_answer"] is True
     assert result["required_next_step"] == "answer_from_returned_context"
+
+
+def test_answer_mode_cannot_manufacture_support_from_a_snippet():
+    class Facade:
+        def get_docs_context(self, question, **kwargs):
+            return {
+                "tool": "get_docs_context",
+                "status": "success",
+                "answer_available": True,
+                "answer_supported": False,
+                "support_status": "insufficient_evidence",
+                "reason_code": "required_evidence_missing",
+                "missing_requirement_ids": ["result_access"],
+                "satisfied_requirement_ids": ["comparison"],
+                "mandatory_requirement_ids": ["comparison", "result_access"],
+                "mandatory_coverage": 0.5,
+                "selected_evidence_ids": ["partial"],
+                "decision_hash": "decision-1",
+                "primary_snippet": {
+                    "source": "docs/partial.md",
+                    "content": "A comparison without result-access evidence.",
+                },
+            }
+
+    result = cast(dict[str, Any], handle_context_tool(
+        "get_docs_context",
+        {"question": "Compare the APIs and retrieve the result", "library": "example"},
+        cast(Any, Facade()),
+    ))
+
+    assert result["answer_supported"] is False
+    assert result["answer_available"] is False
+    assert result["reason_code"] == "required_evidence_missing"
+    assert result["mandatory_requirement_ids"] == ["comparison", "result_access"]
+    assert result["mandatory_coverage"] == 0.5

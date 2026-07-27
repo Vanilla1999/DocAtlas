@@ -6,8 +6,12 @@ from dataclasses import replace
 import pytest
 
 from docmancer.docs.application.evidence_selection import (
+    EvidenceRequirementSet,
     SelectionConfig,
+    SupportDecision,
+    build_requirements,
     docs_selection_config,
+    library_docs_selection_config,
     patch_selection_config,
     select_evidence,
     validate_evidence_sufficiency,
@@ -34,6 +38,306 @@ def _candidate(stable_id: str, text: str, **overrides):
 
 def _ids(decision):
     return [item.stable_id for item in decision.selected_candidates]
+
+
+def test_selector_returns_one_immutable_auditable_support_decision():
+    question = "Compare create_task with gather and explain how the scheduled task result is obtained"
+    decision = select_evidence(
+        [_candidate(
+            "runtime",
+            "Compare create_task with gather; obtain the scheduled task result from create_task.",
+        )],
+        question=question,
+        config=library_docs_selection_config(800),
+    )
+
+    support = decision.support_decision
+
+    assert isinstance(support, SupportDecision)
+    assert support.answer_supported is True
+    assert support.support_status == "supported"
+    assert support.mandatory_coverage == 1.0
+    assert support.missing_requirement_ids == ()
+    assert support.selected_evidence_ids == ("runtime",)
+    assert support.requirements is decision.requirements
+    assert support.requirements_hash == decision.requirements.requirements_hash
+    assert support.selection_hash == decision.selection_hash
+    assert support.decision_hash
+    with pytest.raises(AttributeError):
+        support.answer_supported = False
+    with pytest.raises(ValueError, match="insufficient support decision"):
+        support.with_insufficient_reason_code("retrieval_miss")
+
+
+def test_support_decision_preserves_full_canonical_requirement_ids_without_collisions():
+    question = "When should I use async instead of launch, and how do I obtain its result?"
+    decision = select_evidence(
+        [_candidate(
+            "launch-only",
+            "launch starts fire-and-forget work and returns a Job.",
+        )],
+        question=question,
+        config=library_docs_selection_config(800),
+    )
+
+    support = decision.support_decision
+    canonical_mandatory = {
+        requirement.requirement_id
+        for requirement in decision.requirements
+        if requirement.mandatory
+    }
+
+    assert set(support.mandatory_requirement_ids) == canonical_mandatory
+    assert set(support.missing_requirement_ids) == set(decision.missing_requirements)
+    assert {
+        "entity:async",
+        "facet:comparison:async:launch",
+        "facet:result_access:async:obtain its result",
+    } <= set(support.missing_requirement_ids)
+    assert "async" not in support.missing_requirement_ids
+    assert "comparison" not in support.missing_requirement_ids
+    assert "result_access" not in support.missing_requirement_ids
+
+
+def test_requirement_set_hash_is_deterministic_under_input_ordering_differences():
+    first = build_requirements(
+        "Update `Client.open` with --dry-run",
+        required_evidence_paths=["docs/b.md", "docs/a.md"],
+        required_target_paths=["src/z.py", "src/a.py"],
+        public_requirements=["preserve compatibility", {"text": "keep audit output"}],
+    )
+    second = build_requirements(
+        "Update `Client.open` with --dry-run",
+        required_evidence_paths=["docs/a.md", "docs/b.md"],
+        required_target_paths=["src/a.py", "src/z.py"],
+        public_requirements=[{"text": "keep audit output"}, "preserve compatibility"],
+    )
+
+    assert isinstance(first, EvidenceRequirementSet)
+    assert first.requirements_hash == second.requirements_hash
+    assert first.query_extraction_provenance == second.query_extraction_provenance
+    assert first.query_extraction_provenance
+    assert EvidenceRequirementSet(tuple(reversed(first.requirements))).requirements_hash == first.requirements_hash
+
+
+def test_requirement_set_extracts_lowercase_comparison_and_result_access_facets():
+    requirements = build_requirements(
+        "When should I use async instead of launch, and how do I obtain its result?"
+    )
+
+    assert requirements.required_entities == ("async", "launch")
+    assert requirements.required_facets == (
+        "comparison:async:launch",
+        "result_access:async:obtain its result",
+    )
+
+
+def test_requirement_set_extracts_non_kotlin_comparison_and_passive_result_access_facets():
+    requirements = build_requirements(
+        "Compare create_task with gather and explain how the scheduled task result is obtained"
+    )
+
+    assert requirements.required_entities == ("create_task", "gather")
+    assert requirements.required_facets == (
+        "comparison:create_task:gather",
+        "result_access:create_task:the scheduled task result is obtained",
+    )
+
+
+def test_library_code_group_is_a_canonical_requirement_and_needs_one_code_block():
+    question = "Show code comparing async with launch and explain how to obtain the async result"
+    requirements = build_requirements(
+        question,
+        profile="library_docs_answer",
+        library_requirement_contract={
+            "entities": ["async", "launch"],
+            "facets": ["comparison", "result_access"],
+            "code_groups": [["async {", ".await()"]],
+        },
+    )
+    code_groups = [item for item in requirements if item.kind == "code_group"]
+
+    assert len(code_groups) == 1
+    assert code_groups[0].mandatory is True
+    assert code_groups[0].requirement_id.startswith("code_group:")
+
+    split = select_evidence(
+        [
+            _candidate(
+                "async-only",
+                "```kotlin\nval deferred = async { computeAnswer() }\n```",
+            ),
+            _candidate(
+                "await-only",
+                "```kotlin\nval answer = deferred.await()\n```",
+            ),
+        ],
+        question=question,
+        config=library_docs_selection_config(800),
+        requirements=requirements,
+    )
+    assert split.support_decision.answer_supported is False
+    assert code_groups[0].requirement_id in split.support_decision.missing_requirement_ids
+
+    complete = select_evidence(
+        [_candidate(
+            "combined",
+            "async instead of launch; await obtains the result.\n"
+            "```kotlin\nval deferred = async { computeAnswer() }\nval answer = deferred.await()\n```",
+        )],
+        question=question,
+        config=library_docs_selection_config(800),
+        requirements=requirements,
+    )
+    assert complete.support_decision.answer_supported is True
+    assert code_groups[0].requirement_id in complete.support_decision.satisfied_requirement_ids
+
+    standalone_question = "Show code using WidgetClient.fetch_record"
+    standalone_requirements = build_requirements(
+        standalone_question,
+        profile="library_docs_answer",
+        library_requirement_contract={
+            "code_groups": [["fetch_record(", "timeout=5"]],
+        },
+    )
+    standalone_group = next(item for item in standalone_requirements if item.kind == "code_group")
+    legacy_metadata = select_evidence(
+        [_candidate(
+            "legacy-code-snippet-count",
+            "```python\nWidgetClient.fetch_record(record_id, timeout=5)\n```",
+            metadata={"code_snippets": 1},
+        )],
+        question=standalone_question,
+        config=library_docs_selection_config(800),
+        requirements=standalone_requirements,
+    )
+    assert standalone_group.requirement_id in legacy_metadata.support_decision.satisfied_requirement_ids
+
+
+def test_comparison_requirement_span_uses_the_matched_repeated_rhs():
+    question = (
+        "gather is familiar. Compare create_task with gather and explain how "
+        "the scheduled task result is obtained"
+    )
+
+    requirements = build_requirements(question, profile="library_docs_answer")
+    comparison = next(
+        item
+        for item in requirements
+        if item.requirement_id == "facet:comparison:create_task:gather"
+    )
+
+    assert comparison.query_span_start == question.index("create_task")
+    assert comparison.query_span_end == question.rindex("gather") + len("gather")
+    assert comparison.query_span_text == "create_task with gather"
+
+
+def test_backticked_comparison_requirement_span_uses_the_raw_matched_identifiers():
+    question = "Compare `create_task` with `gather`"
+
+    requirements = build_requirements(question, profile="library_docs_answer")
+    comparison = next(
+        item
+        for item in requirements
+        if item.requirement_id == "facet:comparison:create_task:gather"
+    )
+
+    assert comparison.query_span_start == question.index("`create_task`")
+    assert comparison.query_span_end == question.index("`gather`") + len("`gather`")
+    assert comparison.query_span_text == "`create_task` with `gather`"
+
+
+@pytest.mark.parametrize(
+    "question",
+    [
+        "When should I use ASYNC instead of Launch, and how do I obtain its result?",
+        "When should I use `ASYNC` instead of `Launch`, and how do I obtain its result?",
+        (
+            "gather is familiar. Compare create_task with gather and explain how "
+            "the scheduled task result is obtained"
+        ),
+        "Compare `create_task` with `gather` and explain how the result is obtained",
+        "I am comparing create_task and gather; how is the result obtained?",
+        "I am comparing `create_task` and `gather`; how is the result obtained?",
+    ],
+)
+def test_every_query_derived_library_requirement_has_one_exact_query_span(question):
+    requirements = build_requirements(question, profile="library_docs_answer")
+    query_requirements = tuple(
+        item for item in requirements if item.public_provenance == "query_exact_term"
+    )
+
+    assert query_requirements
+    assert any(item.kind == "facet" and item.value.startswith("comparison:") for item in query_requirements)
+    for requirement in query_requirements:
+        start = requirement.query_span_start
+        end = requirement.query_span_end
+        assert isinstance(start, int), requirement.requirement_id
+        assert isinstance(end, int), requirement.requirement_id
+        assert 0 <= start < end <= len(question), requirement.requirement_id
+        assert requirement.query_span_text == question[start:end], requirement.requirement_id
+
+
+def test_canonical_requirement_set_preserves_identity_spans_and_scope_through_selection():
+    question = "Compare create_task with gather and explain how the scheduled task result is obtained"
+    requirements = build_requirements(
+        question,
+        profile="library_docs_answer",
+        required_evidence_paths=["docs/runtime.md"],
+        exact_version="3.12",
+        exact_snapshot_required=True,
+        project_identity="project:example",
+        module_id="runtime",
+    )
+
+    decision = select_evidence(
+        [_candidate(
+            "runtime",
+            "create_task schedules work while gather combines tasks and obtains the result.",
+            source="docs/runtime.md",
+            version="3.12",
+            docs_snapshot_exact=True,
+            project_identity="project:example",
+            module_id="runtime",
+        )],
+        question=question,
+        config=library_docs_selection_config(800),
+        requirements=requirements,
+    )
+
+    assert decision.requirements is requirements
+    assert decision.requirements.requirements_hash == requirements.requirements_hash
+    assert requirements.query_requirement_spans
+    assert all(start >= 0 and end > start for _, start, end, _ in requirements.query_requirement_spans)
+    assert {item.kind for item in requirements} >= {
+        "evidence_path", "exact_version", "exact_snapshot", "project_identity", "module_id",
+    }
+    assert requirements.hash_payload["query_requirement_spans"] == [list(item) for item in requirements.query_requirement_spans]
+
+
+def test_library_docs_profile_requires_one_item_to_cover_query_entities_and_facets():
+    complete = select_evidence(
+        [_candidate(
+            "complete",
+            "launch returns a Job, while async returns Deferred. Obtain that result with await().",
+        )],
+        question="When should I use async instead of launch, and how do I obtain its result?",
+        config=library_docs_selection_config(800),
+    )
+    partial = select_evidence(
+        [_candidate("partial", "launch starts a fire-and-forget coroutine and returns a Job.")],
+        question="When should I use async instead of launch, and how do I obtain its result?",
+        config=library_docs_selection_config(800),
+    )
+
+    assert complete.status == "ok"
+    assert complete.missing_requirements == ()
+    assert partial.status == "insufficient_evidence"
+    assert set(partial.missing_requirements) >= {
+        "entity:async",
+        "facet:comparison:async:launch",
+        "facet:result_access:async:obtain its result",
+    }
 
 
 def test_selection_is_byte_deterministic_under_candidate_permutation():
@@ -65,6 +369,23 @@ def test_wrong_exact_version_cannot_win_with_a_higher_score():
     assert decision.status == "ok"
     assert _ids(decision) == ["right"]
     assert any(item.stable_id == "wrong" and item.reason_code == "wrong_version" for item in decision.omissions)
+
+
+def test_registered_exact_version_url_satisfies_the_exact_version_requirement():
+    decision = select_evidence(
+        [_candidate(
+            "registered",
+            "Use API.call() from this versioned documentation source.",
+            version="2.0",
+            docs_exactness="exact_version_url",
+        )],
+        question="How do I call API.call?",
+        config=docs_selection_config(800),
+        exact_version="2.0",
+    )
+
+    assert decision.support_decision.answer_supported is True
+    assert decision.support_decision.missing_requirement_ids == ()
 
 
 def test_forbidden_source_and_instruction_risk_never_reenter_scoring():

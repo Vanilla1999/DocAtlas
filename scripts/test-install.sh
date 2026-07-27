@@ -161,7 +161,12 @@ python3 - "$CFG" <<'PY' || fail "opencode: config content mismatch"
 import json, sys
 d = json.load(open(sys.argv[1]))
 srv = d["mcp"]["docatlas-docs"]
-assert srv == {"type": "local", "command": ["doc-atlas", "mcp", "docs-serve"], "enabled": True}, srv
+assert srv == {
+    "type": "local",
+    "command": ["doc-atlas", "mcp", "docs-serve"],
+    "enabled": True,
+    "environment": {"DOCATLAS_MCP_TEXT_FALLBACK": "1"},
+}, srv
 PY
 pass "agent 'opencode' (via env): JSON config merged"
 
@@ -216,7 +221,12 @@ import json, sys
 d = json.load(open(sys.argv[1]))
 assert d["theme"] == "dark", d
 assert d["mcp"]["other"] == {"type": "local", "command": ["x"], "enabled": True}, d
-assert d["mcp"]["docatlas-docs"] == {"type": "local", "command": ["doc-atlas", "mcp", "docs-serve"], "enabled": True}, d
+assert d["mcp"]["docatlas-docs"] == {
+    "type": "local",
+    "command": ["doc-atlas", "mcp", "docs-serve"],
+    "enabled": True,
+    "environment": {"DOCATLAS_MCP_TEXT_FALLBACK": "1"},
+}, d
 PY
 [ -f "$JC.bak" ] || fail "opencode: JSONC rewrite did not keep a .bak"
 pass "agent 'opencode': JSONC parsed, existing keys preserved, .bak kept"

@@ -12,6 +12,7 @@ from typing import Any
 SERVER_KEY = "docmancer"
 COMMAND = "doc-atlas"
 ARGS = ["mcp", "docs-serve"]
+OPENCODE_MCP_ENVIRONMENT = {"DOCATLAS_MCP_TEXT_FALLBACK": "1"}
 
 
 @dataclass
@@ -83,7 +84,7 @@ def register_server(target: AgentTarget) -> tuple[bool, str]:
         desired = {"command": COMMAND, "args": list(ARGS)}
     elif target.style == "json_opencode_mcp":
         servers = config.setdefault("mcp", {})
-        desired = {"type": "local", "command": [COMMAND, *ARGS], "enabled": True}
+        desired = _desired_server_entry(target.style)
     elif target.style == "json_vscode_servers":
         servers = config.setdefault("servers", {})
         desired = {"type": "stdio", "command": COMMAND, "args": list(ARGS)}
@@ -100,7 +101,15 @@ def register_server(target: AgentTarget) -> tuple[bool, str]:
         raise ValueError(
             f"Existing MCP server {SERVER_KEY!r} in {target.config_path} has a different command; refusing to overwrite it."
         )
-    servers[SERVER_KEY] = {**(existing or {}), **desired}
+    merged = {**(existing or {}), **desired}
+    if target.style == "json_opencode_mcp":
+        environment = {} if existing is None or "environment" not in existing else existing["environment"]
+        if not isinstance(environment, dict):
+            raise ValueError(
+                f"Existing MCP server {SERVER_KEY!r} in {target.config_path} has a non-object environment; refusing to overwrite it."
+            )
+        merged["environment"] = {**environment, **OPENCODE_MCP_ENVIRONMENT}
+    servers[SERVER_KEY] = merged
     _backup_and_write(target.config_path, config)
     return True, f"registered docmancer in {target.config_path}"
 
@@ -148,7 +157,12 @@ def unregister_server(target: AgentTarget) -> bool:
 
 def _desired_server_entry(style: str) -> dict[str, Any]:
     if style == "json_opencode_mcp":
-        return {"type": "local", "command": [COMMAND, *ARGS], "enabled": True}
+        return {
+            "type": "local",
+            "command": [COMMAND, *ARGS],
+            "enabled": True,
+            "environment": dict(OPENCODE_MCP_ENVIRONMENT),
+        }
     return {"command": COMMAND, "args": list(ARGS)}
 
 
@@ -176,7 +190,16 @@ def _load_config(path: Path) -> dict[str, Any]:
 def _matches_command(existing: Any, desired: dict[str, Any]) -> bool:
     if not isinstance(existing, dict):
         return False
-    return all(existing.get(key) == value for key, value in desired.items())
+    for key, value in desired.items():
+        if key == "environment":
+            if not isinstance(existing.get(key), dict) or any(
+                existing[key].get(environment_key) != environment_value
+                for environment_key, environment_value in value.items()
+            ):
+                return False
+        elif existing.get(key) != value:
+            return False
+    return True
 
 
 def _has_same_command(existing: Any, desired: dict[str, Any]) -> bool:
@@ -201,11 +224,7 @@ def has_current_server_entry(config: dict[str, Any], target: AgentTarget) -> boo
     servers = config.get(key)
     if not isinstance(servers, dict):
         return False
-    desired = (
-        {"type": "local", "command": [COMMAND, *ARGS], "enabled": True}
-        if target.style == "json_opencode_mcp"
-        else {"command": COMMAND, "args": list(ARGS)}
-    )
+    desired = _desired_server_entry(target.style)
     return _matches_command(servers.get(SERVER_KEY), desired)
 
 

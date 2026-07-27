@@ -41,6 +41,8 @@ class DispatchResult:
     failures: dict[str, str] = field(default_factory=dict)
     query_plan_hash: str = ""
     fusion_config_hash: str = ""
+    requirements_hash: str = ""
+    requirements: Any | None = field(default=None, repr=False)
 
 
 class HybridRetrievalError(RuntimeError):
@@ -84,6 +86,7 @@ class RetrievalDispatcher:
         budget: int | None = None,
         expand: str | None = None,
         filters: dict | None = None,
+        requirements: Any | None = None,
         allow_degraded: bool = False,
     ) -> DispatchResult:
         configured_mode = getattr(getattr(self.config, "retrieval", None), "default_mode", None)
@@ -107,7 +110,7 @@ class RetrievalDispatcher:
             else (effective_mode,)
         )
         query_plan = build_query_plan(
-            query, filters=merged_filters, requested_lanes=requested_lanes
+            query, filters=merged_filters, requested_lanes=requested_lanes, requirements=requirements,
         )
         # Effective expand: per-call > retrieval.expand > query.default_expand.
         retrieval_expand = (
@@ -134,6 +137,8 @@ class RetrievalDispatcher:
         def finalized(result: DispatchResult) -> DispatchResult:
             result.query_plan_hash = query_plan.plan_hash
             result.fusion_config_hash = fusion_config_hash
+            result.requirements_hash = query_plan.requirements_hash
+            result.requirements = query_plan.requirements
             for final_rank, chunk in enumerate(result.chunks, start=1):
                 metadata = getattr(chunk, "metadata", None)
                 if isinstance(metadata, dict):

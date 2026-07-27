@@ -111,6 +111,13 @@ def test_current_tools_reads_env_each_call(monkeypatch):
     assert ADVANCED_TOOL_NAMES.issubset(advanced_names)
 
 
+def test_current_tools_omits_output_schemas_for_text_fallback_clients():
+    tools = current_tools({"DOCATLAS_MCP_TEXT_FALLBACK": "1"})
+
+    assert {tool["name"] for tool in tools} == PUBLIC_TOOL_NAMES
+    assert all("outputSchema" not in tool for tool in tools)
+
+
 def test_call_docs_tool_payload_classifies_handler_value_error():
     def broken_handler(name, args, service):
         raise ValueError("bad user input")

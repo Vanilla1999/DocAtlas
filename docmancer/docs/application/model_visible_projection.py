@@ -2,16 +2,20 @@
 
 from __future__ import annotations
 
+import base64
 import hashlib
 import json
 import math
 import re
+import zlib
 from copy import deepcopy
 from typing import Any, Iterable
 
 from docmancer.docs.application.action_packet import evidence_identity_for_item
 from docmancer.docs.application.evidence_selection import (
+    SelectionDecision,
     docs_selection_config,
+    library_docs_selection_config,
     select_evidence,
 )
 from docmancer.docs.domain.request_intent import model_projection_kind
@@ -52,6 +56,15 @@ FORBIDDEN_MODEL_KEYS = frozenset({
     "primary_snippet", "primary_snippets", "primary_snippet_alternatives",
     "supporting_snippets", "successful_logs", "indexing_logs", "test_logs",
 })
+SUPPORT_ENVELOPE_KEYS = (
+    "answer_supported", "answer_available", "support_status", "decision",
+    "reason_code", "missing_requirement_ids", "satisfied_requirement_ids",
+    "mandatory_requirement_ids", "mandatory_coverage", "evidence_coverage",
+    "selected_evidence_ids", "requirements_hash", "selector_config_hash",
+    "eligibility_contract_hash", "candidate_trace_hash", "selection_hash",
+    "decision_hash",
+)
+SUPPORT_ENVELOPE_ENCODING = "zlib+base64url"
 
 def canonical_projection_bytes(value: Any) -> bytes:
     return json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
@@ -60,6 +73,42 @@ def canonical_projection_bytes(value: Any) -> bytes:
 def estimate_projection_tokens(value: Any) -> int:
     size = len(canonical_projection_bytes(value))
     return max(1, math.ceil(size / 4))
+
+
+def encode_support_envelope(value: dict[str, Any]) -> dict[str, str]:
+    """Encode a complete canonical support envelope for tiny public budgets."""
+
+    canonical = {
+        key: deepcopy(value[key])
+        for key in SUPPORT_ENVELOPE_KEYS
+        if key in value
+    }
+    compressed = zlib.compress(canonical_projection_bytes(canonical), level=9)
+    return {
+        "encoding": SUPPORT_ENVELOPE_ENCODING,
+        "data": base64.urlsafe_b64encode(compressed).decode("ascii").rstrip("="),
+    }
+
+
+def decode_support_envelope(value: Any) -> dict[str, Any]:
+    """Decode the deterministic bounded transport, rejecting malformed input."""
+
+    if not isinstance(value, dict) or value.get("encoding") != SUPPORT_ENVELOPE_ENCODING:
+        raise ValueError("unsupported support envelope encoding")
+    encoded = value.get("data")
+    if not isinstance(encoded, str) or not encoded or len(encoded) > 8_192:
+        raise ValueError("invalid support envelope data")
+    padded = encoded + "=" * (-len(encoded) % 4)
+    try:
+        raw = zlib.decompress(base64.b64decode(padded, altchars=b"-_", validate=True))
+        decoded = json.loads(raw)
+    except (ValueError, TypeError, zlib.error, json.JSONDecodeError) as exc:
+        raise ValueError("invalid support envelope data") from exc
+    if len(raw) > 32_000 or not isinstance(decoded, dict):
+        raise ValueError("invalid support envelope payload")
+    if set(decoded) != set(SUPPORT_ENVELOPE_KEYS):
+        raise ValueError("incomplete support envelope payload")
+    return decoded
 
 
 def projection_kind(question: str) -> str:
@@ -74,29 +123,71 @@ def project_docs_answer(
     retrieval: dict[str, Any],
     max_tokens: int = DOCS_ANSWER_MAX_TOKENS,
     selection_diagnostics: dict[str, Any] | None = None,
+    canonical_selection: SelectionDecision | None = None,
 ) -> tuple[dict[str, Any], dict[str, dict[str, Any]]]:
     """Create one deduplicated source list and an internal immutable snapshot."""
 
     candidates = _docs_candidates(retrieval)
-    decision = select_evidence(
-        candidates,
-        question=question,
-        config=docs_selection_config(max_tokens),
-        trust_contract=retrieval.get("trust_contract") or {},
-        exact_version=_requested_exact_version(retrieval),
-        required_evidence_paths=retrieval.get("required_evidence_paths") or (),
-        required_target_paths=retrieval.get("required_target_paths") or (),
-        public_requirements=retrieval.get("public_requirements") or (),
-        project_identity=retrieval.get("project_identity"),
-        module_id=retrieval.get("module_id"),
+    selection_config = (
+        library_docs_selection_config(max_tokens)
+        if retrieval.get("selection_profile") == "library_docs_answer"
+        else docs_selection_config(max_tokens)
     )
+    is_library_answer = retrieval.get("selection_profile") == "library_docs_answer"
+    if is_library_answer:
+        decision = canonical_selection
+        if decision is None and isinstance(retrieval.get("selection_decision"), SelectionDecision):
+            decision = retrieval["selection_decision"]
+        if decision is None:
+            payload = project_insufficient(
+                kind="docs_answer",
+                missing=["Canonical library support decision is unavailable."],
+                recommended_next_action=retrieval.get("next_action"),
+                max_tokens=INSUFFICIENT_EVIDENCE_MAX_TOKENS,
+            )
+            payload.update({
+                "operational_status": str(retrieval.get("status") or "unknown"),
+                "context_available": bool(candidates),
+                "answer_supported": False,
+                "answer_available": False,
+                "support_status": "insufficient_evidence",
+                "reason_code": "canonical_support_decision_missing",
+                "missing_requirement_ids": ["canonical_support_decision"],
+                "satisfied_requirement_ids": [],
+                "mandatory_requirement_ids": [],
+                "mandatory_coverage": 0.0,
+                "evidence_coverage": 0.0,
+                "selected_evidence_ids": [],
+                "decision_hash": None,
+            })
+            _refresh_estimate(payload)
+            return payload, {}
+    else:
+        decision = select_evidence(
+            candidates,
+            question=question,
+            config=selection_config,
+            trust_contract=retrieval.get("trust_contract") or {},
+            exact_version=_requested_exact_version(retrieval),
+            required_evidence_paths=retrieval.get("required_evidence_paths") or (),
+            required_target_paths=retrieval.get("required_target_paths") or (),
+            public_requirements=retrieval.get("public_requirements") or (),
+            requirements=retrieval.get("requirements"),
+            library_requirement_contract=retrieval.get("library_requirement_contract"),
+            project_identity=retrieval.get("project_identity"),
+            module_id=retrieval.get("module_id"),
+        )
     if selection_diagnostics is not None:
         selection_diagnostics.update(decision.audit_manifest())
     sources: list[dict[str, Any]] = []
     snapshot: dict[str, dict[str, Any]] = {}
     omitted = len(decision.omissions)
-    for item in decision.selected_items:
-        normalized = _docs_source(item)
+    for candidate in decision.selected_candidates:
+        item = dict(candidate.original)
+        normalized = _docs_source(
+            item,
+            evidence_id=candidate.stable_id if is_library_answer else None,
+        )
         if normalized is None:
             omitted += 1
             continue
@@ -105,19 +196,54 @@ def project_docs_answer(
         snapshot[evidence_id] = _snapshot_entry(item, normalized)
 
     retrieval_issues = _docs_retrieval_issues(retrieval)
+    support = (
+        _docs_support_decision(
+            retrieval=retrieval,
+            decision=decision,
+            context_available=bool(candidates),
+        )
+        if is_library_answer
+        else {}
+    )
+    if is_library_answer and decision.support_decision.answer_supported:
+        selected_ids = list(decision.support_decision.selected_evidence_ids)
+        visible_ids = [source["evidence_id"] for source in sources]
+        if visible_ids != selected_ids:
+            payload = project_insufficient(
+                kind="docs_answer",
+                missing=["A selected support witness could not be materialized safely."],
+                recommended_next_action=None,
+                max_tokens=INSUFFICIENT_EVIDENCE_MAX_TOKENS,
+            )
+            payload.update({
+                "operational_status": str(retrieval.get("status") or "unknown"),
+                "context_available": bool(candidates),
+                "reason_code": "support_witness_not_materialized",
+            })
+            bound_insufficient_projection(
+                payload, max_tokens=INSUFFICIENT_EVIDENCE_MAX_TOKENS,
+            )
+            return payload, snapshot
     if decision.status != "ok" or not sources or retrieval_issues:
         missing = [str(retrieval.get("message") or "No complete source-backed documentation answer is available.")]
         missing.extend(decision.missing_requirements)
         missing.extend(decision.unresolved_conflicts)
         missing.extend(retrieval_issues)
-        return project_insufficient(
+        payload = project_insufficient(
             kind="docs_answer", missing=missing,
             recommended_next_action=retrieval.get("next_action"), max_tokens=INSUFFICIENT_EVIDENCE_MAX_TOKENS,
-        ), snapshot
+        )
+        payload.update(support)
+        bound_insufficient_projection(
+            payload, max_tokens=INSUFFICIENT_EVIDENCE_MAX_TOKENS,
+        )
+        return payload, snapshot
 
     answer, answer_evidence_ids, answer_limited = _answer_text(
         question, retrieval, sources
     )
+    if is_library_answer:
+        answer_evidence_ids = list(decision.support_decision.selected_evidence_ids)
     omitted_counts = {"sources": omitted} if omitted else {}
     if answer_limited:
         omitted_counts["answer_details"] = 1
@@ -128,16 +254,22 @@ def project_docs_answer(
         "answer_evidence_ids": answer_evidence_ids,
         "sources": sources,
         "omitted_counts": omitted_counts,
+        **support,
         "estimated_tokens": 0,
     }
     if answer_limited:
         payload["limitations"] = [_ACTIONABLE_LIMITATION]
     _refresh_estimate(payload)
     if estimate_projection_tokens(payload) > min(DOCS_ANSWER_MAX_TOKENS, max_tokens):
-        return project_insufficient(
+        fallback = project_insufficient(
             kind="docs_answer", missing=["The selected documentation evidence exceeds the bounded answer budget."],
             recommended_next_action=None, max_tokens=INSUFFICIENT_EVIDENCE_MAX_TOKENS,
-        ), snapshot
+        )
+        fallback.update(support)
+        bound_insufficient_projection(
+            fallback, max_tokens=INSUFFICIENT_EVIDENCE_MAX_TOKENS,
+        )
+        return fallback, snapshot
     return payload, snapshot
 
 
@@ -149,6 +281,44 @@ def _requested_exact_version(retrieval: dict[str, Any]) -> str | None:
         return None
     value = retrieval.get("requested_version") or retrieval.get("resolved_version")
     return str(value).strip() if value is not None and str(value).strip() else None
+
+
+def _docs_support_decision(*, retrieval: dict[str, Any], decision: Any, context_available: bool) -> dict[str, Any]:
+    canonical = decision.support_decision
+    support = {
+        **canonical.as_payload(),
+        "operational_status": str(retrieval.get("status") or "unknown"),
+        "context_available": context_available,
+    }
+    return support
+
+
+def bound_insufficient_projection(payload: dict[str, Any], *, max_tokens: int) -> None:
+    """Fit fail-closed delivery without truncating canonical support semantics."""
+
+    limit = min(INSUFFICIENT_EVIDENCE_MAX_TOKENS, max(1, int(max_tokens)))
+    _refresh_estimate(payload)
+    if estimate_projection_tokens(payload) <= limit:
+        return
+    payload.pop("recommended_next_action", None)
+    payload.pop("missing", None)
+    _refresh_estimate(payload)
+    if estimate_projection_tokens(payload) <= limit:
+        return
+    envelope = {
+        key: payload[key]
+        for key in SUPPORT_ENVELOPE_KEYS
+        if key in payload
+    }
+    if envelope:
+        payload["support_envelope"] = encode_support_envelope(envelope)
+        for key in SUPPORT_ENVELOPE_KEYS:
+            payload.pop(key, None)
+        _refresh_estimate(payload)
+    if estimate_projection_tokens(payload) > limit:
+        payload.pop("operational_status", None)
+        payload.pop("context_available", None)
+        _refresh_estimate(payload)
 
 
 def project_patch_context(
@@ -262,11 +432,25 @@ def validate_model_visible_projection(
         errors.append("invalid projection kind")
     if status not in {"ok", "truncated", "insufficient_evidence"}:
         errors.append("invalid projection status")
-    limit = INSUFFICIENT_EVIDENCE_MAX_TOKENS if status == "insufficient_evidence" else max_tokens
+    limit = (
+        min(INSUFFICIENT_EVIDENCE_MAX_TOKENS, max_tokens)
+        if status == "insufficient_evidence"
+        else max_tokens
+    )
     actual = estimate_projection_tokens(payload)
     if payload.get("estimated_tokens") != actual or actual > limit:
         errors.append("projection estimate mismatch or budget exceeded")
     if status == "insufficient_evidence":
+        transport = payload.get("support_envelope")
+        if transport is not None:
+            try:
+                decode_support_envelope(transport)
+            except ValueError as exc:
+                errors.append(str(exc))
+        if transport is not None and any(
+            key in payload for key in SUPPORT_ENVELOPE_KEYS
+        ):
+            errors.append("support envelope must use exactly one public representation")
         if payload.get("implementation_guidance") or payload.get("invariants") or payload.get("targets"):
             errors.append("insufficient evidence must not authorize edits")
         return errors
@@ -353,10 +537,15 @@ def _docs_candidates(retrieval: dict[str, Any]) -> list[dict[str, Any]]:
     return [dict(item) for item in values if isinstance(item, dict)]
 
 
-def _docs_source(item: dict[str, Any]) -> dict[str, Any] | None:
+def _docs_source(
+    item: dict[str, Any], *, evidence_id: str | None = None,
+) -> dict[str, Any] | None:
     path = str(item.get("source_url") or item.get("url") or item.get("path") or item.get("source") or "").strip()
     section = str(item.get("heading_path") or item.get("title") or "document").strip()
-    snippet = item.get("code") or item.get("snippet") or item.get("content")
+    snippet = (
+        item.get("code") or item.get("snippet") or item.get("content")
+        or item.get("display_text")
+    )
     if isinstance(snippet, dict):
         snippet = snippet.get("code") or snippet.get("text")
     snippet = str(snippet or "").strip()
@@ -369,7 +558,7 @@ def _docs_source(item: dict[str, Any]) -> dict[str, Any] | None:
     digest = _source_digest(item)
     identity = canonical_projection_bytes({"path": path, "section": section, "sha256": digest})
     return {
-        "evidence_id": "ev-" + hashlib.sha256(identity).hexdigest()[:16],
+        "evidence_id": evidence_id or "ev-" + hashlib.sha256(identity).hexdigest()[:16],
         "path_or_url": path,
         "section": section,
         "snippet": snippet,
@@ -382,7 +571,7 @@ def _source_digest(item: dict[str, Any]) -> str:
     material = {
         "path": item.get("path") or item.get("source") or item.get("url") or item.get("source_url"),
         "section": item.get("heading_path") or item.get("title"),
-        "content": item.get("content"),
+        "content": item.get("content") or item.get("display_text"),
         "snippet": item.get("snippet") or item.get("code"),
         "version": item.get("version_binding") or item.get("version") or item.get("requested_version"),
     }

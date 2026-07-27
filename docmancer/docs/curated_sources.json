@@ -2,6 +2,56 @@
   "schema_version": 1,
   "sources": [
     {
+      "library": "mcp",
+      "ecosystem": "python",
+      "version_rule": "exact",
+      "locked_versions": [
+        "1.27.2"
+      ],
+      "docs_url": "https://github.com/modelcontextprotocol/python-sdk/blob/62137874ff26dd74d2fea80ff528a7fd9ca7a5e7/docs/index.md",
+      "allowed_domains": [
+        "github.com"
+      ],
+      "path_prefixes": [
+        "/modelcontextprotocol/python-sdk/blob/62137874ff26dd74d2fea80ff528a7fd9ca7a5e7/docs/"
+      ],
+      "preferred_seeds": [],
+      "extraction_format": "markdown",
+      "max_pages": 24,
+      "source_manifest": {
+        "schema_version": 2,
+        "official": true,
+        "discovery": {
+          "kind": "github_directory",
+          "owner": "modelcontextprotocol",
+          "repository": "python-sdk",
+          "requested_ref": "62137874ff26dd74d2fea80ff528a7fd9ca7a5e7",
+          "directory": "docs"
+        }
+      }
+    },
+    {
+      "library": "python",
+      "ecosystem": "python",
+      "version_rule": "exact",
+      "locked_versions": [
+        "3.13"
+      ],
+      "docs_url": "https://docs.python.org/{version}/_sources/library/base64.rst.txt",
+      "allowed_domains": [
+        "docs.python.org"
+      ],
+      "path_prefixes": [
+        "/3.13/_sources/library/"
+      ],
+      "preferred_seeds": [
+        "https://docs.python.org/{version}/_sources/library/zlib.rst.txt"
+      ],
+      "verified_seeds": true,
+      "extraction_format": "direct-text",
+      "max_pages": 24
+    },
+    {
       "library": "fastapi",
       "ecosystem": "python",
       "version_rule": "unversioned",

@@ -1,0 +1,113 @@
+{
+  "requested_ref": "1.8.1",
+  "resolved_commit_sha": "1111111111111111111111111111111111111111",
+  "ref_response": {
+    "object": {
+      "type": "commit",
+      "sha": "1111111111111111111111111111111111111111"
+    }
+  },
+  "commit_response": {
+    "sha": "1111111111111111111111111111111111111111"
+  },
+  "directory_responses": {
+    "docs/topics": [
+      {
+        "name": "coroutines-basics.md",
+        "path": "docs/topics/coroutines-basics.md",
+        "type": "file",
+        "sha": "2222222222222222222222222222222222222222",
+        "size": 210,
+        "download_url": "https://attacker.invalid/ignored",
+        "html_url": "https://attacker.invalid/ignored"
+      },
+      {
+        "name": "advanced",
+        "path": "docs/topics/advanced",
+        "type": "dir",
+        "sha": "3333333333333333333333333333333333333333",
+        "size": 0,
+        "url": "https://attacker.invalid/ignored"
+      },
+      {
+        "name": "README.txt",
+        "path": "docs/topics/README.txt",
+        "type": "file",
+        "sha": "4444444444444444444444444444444444444444",
+        "size": 10
+      },
+      {
+        "name": "linked.md",
+        "path": "docs/topics/linked.md",
+        "type": "symlink",
+        "sha": "5555555555555555555555555555555555555555",
+        "size": 12
+      },
+      {
+        "name": "vendored.md",
+        "path": "docs/topics/vendored.md",
+        "type": "submodule",
+        "sha": "6666666666666666666666666666666666666666",
+        "size": 0
+      }
+    ],
+    "docs/topics/advanced": [
+      {
+        "name": "composing-suspending-functions.mdx",
+        "path": "docs/topics/advanced/composing-suspending-functions.mdx",
+        "type": "file",
+        "sha": "7777777777777777777777777777777777777777",
+        "size": 245
+      }
+    ]
+  },
+  "invalid_entries": {
+    "path_escape": {
+      "name": "escape.md",
+      "path": "docs/topics/../escape.md",
+      "type": "file",
+      "sha": "8888888888888888888888888888888888888888",
+      "size": 1
+    },
+    "wrong_repository": {
+      "owner": "Attacker",
+      "repository": "replacement",
+      "path": "docs/topics/escape.md",
+      "type": "file",
+      "sha": "9999999999999999999999999999999999999999",
+      "size": 1
+    },
+    "wrong_ref": {
+      "resolved_commit_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "path": "docs/topics/escape.md",
+      "type": "file",
+      "sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "size": 1
+    },
+    "malformed_blob_sha": {
+      "name": "bad.md",
+      "path": "docs/topics/bad.md",
+      "type": "file",
+      "sha": "not-a-git-sha",
+      "size": 1
+    },
+    "oversized": {
+      "name": "huge.md",
+      "path": "docs/topics/huge.md",
+      "type": "file",
+      "sha": "cccccccccccccccccccccccccccccccccccccccc",
+      "size": 1000000000
+    },
+    "deep_tree": {
+      "name": "too-deep",
+      "path": "docs/topics/a/b/c/d/e/f",
+      "type": "dir",
+      "sha": "dddddddddddddddddddddddddddddddddddddddd",
+      "size": 0
+    }
+  },
+  "blob_responses": {
+    "2222222222222222222222222222222222222222": "IyBDb3JvdXRpbmUgYmFzaWNzCg==",
+    "7777777777777777777777777777777777777777": "IyBDb21wb3Npbmcgc3VzcGVuZGluZyBmdW5jdGlvbnMK"
+  }
+}

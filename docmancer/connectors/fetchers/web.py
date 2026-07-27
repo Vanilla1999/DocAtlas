@@ -14,6 +14,7 @@ from __future__ import annotations
 import logging
 import time
 import threading
+import hashlib
 from concurrent.futures import FIRST_COMPLETED, ThreadPoolExecutor, wait
 from dataclasses import dataclass, replace
 from datetime import datetime, timezone
@@ -24,7 +25,6 @@ import httpx
 from docmancer.connectors.fetchers.pipeline.detection import Platform, detect_platform
 from docmancer.connectors.fetchers.pipeline.discovery import (
     DiscoveredUrl,
-    DiscoveryResult,
     DiscoveryStrategy,
     discover_urls,
 )
@@ -50,6 +50,10 @@ from docmancer.core.models import Document
 from docmancer.docs.dartdoc import DARTDOC_ENTITY_SUFFIXES
 from docmancer.docs.fetch_policy import DocsFetchPolicy, DocsFetchSecurityError, redact_url
 from docmancer.docs.fetch_transport import DocsHttpClient
+from docmancer.docs.github_source_manifest import (
+    canonical_github_blob_scope_url,
+    normalize_resolved_github_manifest,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -135,6 +139,8 @@ class WebFetcher:
         max_total_seconds: float = 120.0,
         use_env_proxy: bool = False,
         proxy_url: str | None = None,
+        source_manifest: dict | None = None,
+        max_fetched_document_bytes: int = 64 * 1024 * 1024,
     ):
         self._timeout = timeout
         self._max_pages = max_pages
@@ -158,6 +164,10 @@ class WebFetcher:
         self._max_total_seconds = max_total_seconds
         self._use_env_proxy = use_env_proxy
         self._proxy_url = proxy_url
+        self._source_manifest = (
+            normalize_resolved_github_manifest(source_manifest) if source_manifest is not None else None
+        )
+        self._max_fetched_document_bytes = max_fetched_document_bytes
         self.last_discovery_diagnostics: dict | None = None
         self.last_page_ledger: list[dict] = []
         self._ledger_lock = threading.Lock()
@@ -226,11 +236,27 @@ class WebFetcher:
         """
         self.last_fetch_failure: DocsFetchSecurityError | None = None
         self.last_page_ledger = []
-        self._raise_if_cancelled()
         policy = self._policy_for(url)
-        policy.validate_url(url)
         base_url = url.rstrip("/")
         public_base_url = redact_url(base_url)
+        if self._source_manifest is not None:
+            try:
+                self._raise_if_cancelled()
+                policy.validate_url(url)
+            except (DocsFetchSecurityError, RuntimeError) as exc:
+                reason = exc.category if isinstance(exc, DocsFetchSecurityError) else "cancelled"
+                self._record_page(
+                    requested_url=base_url, discovered_url=base_url, canonical_url=base_url,
+                    redirect_url=None, fetch_url=None, fetcher="github-manifest",
+                    outcome="failed", reason_code=reason, bytes=0, chunks=0, elapsed_ms=0,
+                )
+                self.last_discovery_diagnostics = self._with_page_ledger(
+                    {"complete": False, "reason_code": reason}
+                )
+                raise
+            return self._fetch_github_manifest(base_url)
+        self._raise_if_cancelled()
+        policy.validate_url(url)
 
         with self._new_client(policy) as client:
             if self._github_blob_raw_url(base_url):
@@ -347,6 +373,153 @@ class WebFetcher:
             documents = self._fetch_pages(discovered, base_url, client, platform, robots)
             self.last_discovery_diagnostics = self._with_page_ledger(self.last_discovery_diagnostics or {})
             return documents
+
+    def _fetch_github_manifest(self, base_url: str) -> list[Document]:
+        manifest = self._source_manifest
+        assert manifest is not None
+        rows = manifest["documents"]
+        if manifest.get("complete") is not True:
+            reason = "github_manifest_incomplete"
+            self._record_page(
+                requested_url=base_url, discovered_url=base_url, canonical_url=base_url,
+                redirect_url=None, fetch_url=None, fetcher="github-manifest",
+                outcome="failed", reason_code=reason, bytes=0, chunks=0, elapsed_ms=0,
+            )
+            self.last_discovery_diagnostics = self._with_page_ledger(
+                {"complete": False, "reason_code": reason}
+            )
+            raise ValueError("github_manifest_incomplete")
+        if base_url not in {row["blob_url"] for row in rows} and not (
+            not rows and canonical_github_blob_scope_url(base_url, manifest["discovery"])
+        ):
+            reason = "github_manifest_seed_mismatch"
+            self._record_page(
+                requested_url=base_url, discovered_url=base_url, canonical_url=base_url,
+                redirect_url=None, fetch_url=None, fetcher="github-manifest",
+                outcome="failed", reason_code=reason, bytes=0, chunks=0, elapsed_ms=0,
+            )
+            self.last_discovery_diagnostics = self._with_page_ledger(
+                {"complete": False, "reason_code": reason}
+            )
+            raise ValueError("github_manifest_seed_mismatch")
+        if len(rows) > self._max_pages:
+            reason = "max_pages"
+            self._record_page(
+                requested_url=base_url, discovered_url=base_url, canonical_url=base_url,
+                redirect_url=None, fetch_url=None, fetcher="github-manifest",
+                outcome="failed", reason_code=reason, bytes=0, chunks=0, elapsed_ms=0,
+            )
+            self.last_discovery_diagnostics = self._with_page_ledger(
+                {"complete": False, "reason_code": reason}
+            )
+            raise ValueError("github manifest fetch incomplete: max_pages")
+        raw_paths = tuple(urlparse(row["raw_url"]).path for row in rows)
+        policy = replace(
+            self._fetch_policy,
+            allowed_hosts=("raw.githubusercontent.com",),
+            path_prefixes=raw_paths,
+        )
+        documents: list[Document] = []
+        total_bytes = 0
+        operation_started = time.monotonic()
+
+        def bounded_reason() -> str | None:
+            if self._cancellation_callback and self._cancellation_callback():
+                return "cancelled"
+            if time.monotonic() - operation_started >= self._max_total_seconds:
+                return "deadline_exceeded"
+            return None
+
+        with self._new_client(policy) as client:
+            for row in rows:
+                raw_url = row["raw_url"]
+                blob_url = row["blob_url"]
+                started = time.monotonic()
+                reason = "ok"
+                try:
+                    reason = bounded_reason() or "ok"
+                    if reason != "ok":
+                        raise ValueError(reason)
+                    response = client.get(raw_url)
+                    reason = bounded_reason() or "ok"
+                    if reason != "ok":
+                        raise ValueError(reason)
+                    if response.status_code != 200:
+                        reason = "not_found" if response.status_code == 404 else "http_failure"
+                        raise ValueError(reason)
+                    raw = bytes(response.content)
+                    total_bytes += len(raw)
+                    if total_bytes > self._max_fetched_document_bytes:
+                        reason = "max_fetched_document_bytes"
+                        raise ValueError(reason)
+                    if len(raw) != row["size"]:
+                        reason = "document_size_mismatch"
+                        raise ValueError(reason)
+                    git_sha = hashlib.sha1(
+                        b"blob " + str(len(raw)).encode("ascii") + b"\0" + raw
+                    ).hexdigest()
+                    if git_sha != row["git_blob_sha"]:
+                        reason = "git_blob_mismatch"
+                        raise ValueError(reason)
+                    content_sha256 = hashlib.sha256(raw).hexdigest()
+                    content = raw.decode("utf-8")
+                    reason = bounded_reason() or "ok"
+                    if reason != "ok":
+                        raise ValueError(reason)
+                except UnicodeDecodeError:
+                    reason = "invalid_utf8"
+                    self._record_page(
+                        requested_url=blob_url, discovered_url=blob_url, canonical_url=blob_url,
+                        redirect_url=None, fetch_url=raw_url, fetcher="github-manifest",
+                        outcome="failed", reason_code=reason, bytes=0, chunks=0,
+                        elapsed_ms=int((time.monotonic() - started) * 1000),
+                    )
+                    self.last_discovery_diagnostics = self._with_page_ledger(
+                        {"complete": False, "reason_code": reason}
+                    )
+                    raise ValueError(f"github manifest fetch incomplete: {reason}") from None
+                except Exception as exc:
+                    if isinstance(exc, DocsFetchSecurityError):
+                        reason = exc.category
+                    elif reason == "ok":
+                        reason = "network_transport_error"
+                    self._record_page(
+                        requested_url=blob_url, discovered_url=blob_url, canonical_url=blob_url,
+                        redirect_url=None, fetch_url=raw_url, fetcher="github-manifest",
+                        outcome="failed", reason_code=reason, bytes=0, chunks=0,
+                        elapsed_ms=int((time.monotonic() - started) * 1000),
+                    )
+                    self.last_discovery_diagnostics = self._with_page_ledger(
+                        {"complete": False, "reason_code": reason}
+                    )
+                    raise ValueError(f"github manifest fetch incomplete: {reason}") from exc
+                document = Document(
+                    source=blob_url,
+                    content=content,
+                    metadata={
+                        "format": "markdown", "fetch_method": "github-manifest",
+                        "docset_root": blob_url, "platform": Platform.GENERIC.value,
+                        "canonical_url": blob_url, "content_hash": content_sha256,
+                        "content_sha256": content_sha256, "git_blob_sha": git_sha,
+                        "word_count": len(content.split()), "title": None,
+                        "description": None, "section_path": [], "lang": "en",
+                        "http_status": response.status_code,
+                        "fetched_at": datetime.now(timezone.utc).isoformat(),
+                        "requested_url": blob_url, "fetch_url": raw_url,
+                        "resolved_commit_sha": manifest["discovery"]["resolved_commit_sha"],
+                    },
+                )
+                documents.append(document)
+                self._record_page(
+                    requested_url=blob_url, discovered_url=blob_url, canonical_url=blob_url,
+                    redirect_url=None, fetch_url=raw_url, fetcher="github-manifest",
+                    outcome="usable", reason_code="ok", bytes=len(raw), chunks=0,
+                    elapsed_ms=int((time.monotonic() - started) * 1000),
+                )
+        self.last_discovery_diagnostics = self._with_page_ledger(
+            {"complete": True, "reason_code": "ok", "discovery_strategy": "github-manifest"}
+        )
+        return documents
 
     def _with_page_ledger(self, diagnostics: dict) -> dict:
         ledger = list(self.last_page_ledger)
