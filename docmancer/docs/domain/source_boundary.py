@@ -37,6 +37,7 @@ class SourceBoundary:
     scan_deadline_seconds: float = 5.0
     max_directory_depth: int = 20
     gitignore_patterns: tuple[str, ...] = field(default=(), repr=False)
+    enabled: bool = True
 
     @classmethod
     def from_project(cls, root: Path) -> SourceBoundary:
@@ -46,7 +47,7 @@ class SourceBoundary:
             try:
                 configured = DocmancerConfig.from_yaml(config_path).project.source_boundary()
             except (OSError, ValueError):
-                configured = ProjectSourceBoundaryConfig()
+                return cls(enabled=False)
         return cls.from_config(configured, root=root)
 
     @classmethod
@@ -80,6 +81,8 @@ def iter_bounded_source_files(
     include_generated: bool = False,
     clock: Callable[[], float] = time.monotonic,
 ) -> Iterator[Path]:
+    if not boundary.enabled:
+        return
     deadline = clock() + boundary.scan_deadline_seconds
     scanned_files = 0
     scanned_bytes = 0
@@ -184,10 +187,17 @@ def _match_path(relative: str, pattern: str) -> bool:
     normalized = pattern.strip().replace("\\", "/")
     if not normalized or normalized.startswith("#"):
         return False
-    normalized = normalized.lstrip("/")
+    anchored = normalized.startswith("/")
+    normalized = normalized[1:] if anchored else normalized
     if normalized.endswith("/"):
         prefix = normalized.rstrip("/")
-        return relative == prefix or relative.startswith(f"{prefix}/")
+        if anchored or "/" in prefix:
+            return relative == prefix or relative.startswith(f"{prefix}/")
+        parts = relative.rstrip("/").split("/")
+        directory_parts = parts if relative.endswith("/") else parts[:-1]
+        return relative.rstrip("/") == prefix or prefix in directory_parts
+    if anchored:
+        return fnmatch.fnmatchcase(relative, normalized)
     if "/" not in normalized:
         return any(fnmatch.fnmatchcase(part, normalized) for part in relative.split("/"))
     return fnmatch.fnmatchcase(relative, normalized)

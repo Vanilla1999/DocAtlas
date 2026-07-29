@@ -312,6 +312,82 @@ def test_source_boundary_applies_excludes_and_gitignore(tmp_path):
     assert paths == ["src/keep.py"]
 
 
+def test_source_boundary_gitignore_anchored_negation_only_reincludes_root_path(tmp_path):
+    for relative in ("keep.py", "nested/keep.py", "drop.py"):
+        path = tmp_path / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text("class BoundaryFact: pass\n", encoding="utf-8")
+    boundary = SourceBoundary(gitignore_patterns=("*.py", "!/keep.py"))
+
+    paths = [
+        path.relative_to(tmp_path).as_posix()
+        for path in iter_bounded_source_files(
+            tmp_path, boundary=boundary, supported_extensions=frozenset({".py"})
+        )
+    ]
+
+    assert paths == ["keep.py"]
+
+
+def test_source_boundary_distinguishes_anchored_and_nonanchored_directories(tmp_path):
+    for relative in ("ignored/root.py", "nested/ignored/nested.py"):
+        path = tmp_path / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text("class BoundaryFact: pass\n", encoding="utf-8")
+
+    anchored = SourceBoundary(gitignore_patterns=("/ignored/",))
+    nonanchored = SourceBoundary(gitignore_patterns=("ignored/",))
+
+    anchored_paths = [
+        path.relative_to(tmp_path).as_posix()
+        for path in iter_bounded_source_files(
+            tmp_path, boundary=anchored, supported_extensions=frozenset({".py"})
+        )
+    ]
+    nonanchored_paths = list(iter_bounded_source_files(
+        tmp_path, boundary=nonanchored, supported_extensions=frozenset({".py"})
+    ))
+
+    assert anchored_paths == ["nested/ignored/nested.py"]
+    assert nonanchored_paths == []
+
+
+def test_source_boundary_preserves_legacy_positional_source_roots(tmp_path):
+    source = tmp_path / "src/main.py"
+    outside = tmp_path / "other/outside.py"
+    source.parent.mkdir()
+    outside.parent.mkdir()
+    source.write_text("class Included: pass\n", encoding="utf-8")
+    outside.write_text("class Outside: pass\n", encoding="utf-8")
+
+    paths = [
+        path.relative_to(tmp_path).as_posix()
+        for path in iter_bounded_source_files(
+            tmp_path,
+            boundary=SourceBoundary(("src",)),
+            supported_extensions=frozenset({".py"}),
+        )
+    ]
+
+    assert paths == ["src/main.py"]
+
+
+def test_source_boundary_invalid_project_manifest_fails_closed(tmp_path):
+    source = tmp_path / "src/main.py"
+    source.parent.mkdir()
+    source.write_text("class MustNotLeak: pass\n", encoding="utf-8")
+    (tmp_path / "docmancer.yaml").write_text(
+        "project:\n  source_roots: [src]\n  max_scanned_files: 0\n",
+        encoding="utf-8",
+    )
+
+    items = collect_project_source_facts(
+        tmp_path, question="MustNotLeak", include_unmatched=True
+    )
+
+    assert items == []
+
+
 def test_source_boundary_generated_paths_require_explicit_opt_in(tmp_path):
     generated = tmp_path / "artifacts/output.py"
     generated.parent.mkdir()

@@ -265,7 +265,7 @@
     "tests/docs/test_savings_metrics_explanation.py": "21dfdafbb9fd890959ca1337e66b15e54c32d7a65b8035457b16b0e27209e759",
     "tests/docs/test_section_metadata.py": "1e044193850c9d9cc6112d7e9481b22ca59c6e7b134f69a709f62ec637bdf0a4",
     "tests/docs/test_source_identity.py": "98b74906532d3395cb8845ecb79271cb171155457d01df3c86a2d20f995f9507",
-    "tests/docs/test_source_map.py": "2d3f742940325fd9a3a1c68ab703a0c21e55a3320d1ff00093bf16dcf85a2297",
+    "tests/docs/test_source_map.py": "141644d6251db2216bacd0ddb09e9c610bb9dbce35b8df8617abf057d9f0f49d",
     "tests/docs/test_target_security.py": "5c66611c38104127d27f000125900e3cd5b59800ec99f2ab697095c867de4f01",
     "tests/docs/test_task19_project_docs_closure.py": "d4e97d4613fac48d0e97e0fd085b1990720194b67bb341a54efb484ebf7041b4",
     "tests/docs/test_tool_choice_eval.py": "250e7b4ed7124fd982cc1fd504e7ba1f050db61f4c3034464607e8410a9ff171",
