@@ -57,6 +57,15 @@ def test_mcp_public_surface_exposes_prepare_docs_instead_of_prefetch_library_doc
     assert "prefetch_library_docs" not in names
 
 
+def test_mcp_public_prepare_docs_advertises_project_local_library_removal():
+    tool = next(tool for tool in TOOLS if tool["name"] == "prepare_docs")
+    schema = tool["inputSchema"]
+
+    assert "remove_library_docs" in schema["properties"]["action"]["enum"]
+    assert "canonical_id" in schema["properties"]
+    assert "project_path" in schema["properties"]
+
+
 def test_every_raw_tool_has_exactly_one_visibility_class():
     classes = [PUBLIC_TOOL_NAMES, ADVANCED_TOOL_NAMES, ADMIN_TOOL_NAMES, LEGACY_TOOL_NAMES]
     raw_names = {tool["name"] for tool in RAW_TOOLS}

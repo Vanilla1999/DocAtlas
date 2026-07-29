@@ -33,7 +33,7 @@ _PREPARE_ACTION_FIELDS = {
     "prefetch_docs_manifest": {"action", "manifest_path", "project_path", "targets", "force_refresh", "continue_on_error", "async"},
     "refresh_library_docs": {"action", "library", "ecosystem", "version", "source_type", "docs_url", "force"},
     "prune_library_docs": {"action", "library", "keep_versions", "older_than_days", "dry_run"},
-    "remove_library_docs": {"action", "canonical_id"},
+    "remove_library_docs": {"action", "canonical_id", "project_path"},
     "cancel_docs_job": {"action", "job_id", "project_path"},
 }
 _PREPARE_REQUIRED_FIELDS = {

@@ -6786,6 +6786,45 @@ def test_mcp_docs_status_uses_project_local_storage_topology(tmp_path):
     )
 
 
+def test_prepare_docs_removes_project_local_library_target(tmp_path):
+    project = tmp_path / "project"
+    project.mkdir()
+    (project / "docmancer.yaml").write_text(
+        "index:\n  db_path: .docmancer/project.db\n",
+        encoding="utf-8",
+    )
+    fallback_config = DocmancerConfig()
+    fallback_config.index.db_path = str(tmp_path / "fallback.db")
+    fallback_service = LibraryDocsService(config=fallback_config, job_tracker=DocsJobTracker())
+    topology = StorageTopologyResolver().resolve(project)
+    project_service = LibraryDocsService(
+        config=topology.config,
+        library_index_root=topology.library_index_root,
+    )
+    record = project_service.registry.upsert(
+        library="go_router",
+        ecosystem="pub",
+        version="14.8.1",
+        source_type="api",
+        docs_url="https://pub.dev/documentation/go_router/14.8.1/",
+        now=datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        status="available",
+    )
+
+    result = call_docs_tool_payload(
+        "prepare_docs",
+        {
+            "action": "remove_library_docs",
+            "canonical_id": record.canonical_id,
+            "project_path": str(project),
+        },
+        fallback_service,
+    )
+
+    assert result["removed"] is True
+    assert project_service.registry.get(record.canonical_id) is None
+
+
 def test_prepare_docs_cancels_project_local_job_using_project_topology(tmp_path, monkeypatch):
     project = tmp_path / "project"
     project.mkdir()

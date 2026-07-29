@@ -831,6 +831,7 @@ PUBLIC_ADVERTISED_INPUT_SCHEMAS: dict[str, dict[str, Any]] = {
             "library": {"type": ["string", "null"]},
             "ecosystem": {"type": ["string", "null"]},
             "version": {"type": ["string", "null"]},
+            "canonical_id": {"type": ["string", "null"]},
             "job_id": {"type": ["string", "null"]},
             "dry_run": {"type": ["boolean", "null"], "default": True},
         },
