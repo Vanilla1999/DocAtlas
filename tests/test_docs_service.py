@@ -182,7 +182,11 @@ class VectorTrackingAgent(FakeAgent):
         self.sync_calls += 1
         self.sync_db_paths.append(self.config.index.db_path)
         if self.fail_sync:
-            raise VectorSyncFailure('{"api_key": "vector-sync-secret", "password": "other-secret"}')
+            raise VectorSyncFailure(
+                '{"api_key": "vector-sync-secret", "password": "other-secret", '
+                '"AWS_SECRET_ACCESS_KEY": "aws-env-secret", '
+                '"Authorization": "Bearer authorization-secret"}'
+            )
 
 
 class SlowVectorTrackingAgent(SlowIndexingAgent):
@@ -4309,14 +4313,16 @@ def test_vector_sync_failure_keeps_fts_index_and_returns_partial(tmp_path, monke
     assert "vector-sync-secret" not in status.message
     assert status.failure_phase == "staging"
     assert status.failure_operation == "sync_vectors"
-    assert status.exception_type is not None
-    assert len(status.exception_type) <= 200
+    assert status.exception_type == "<redacted exception type>"
+    assert status.exception_message == "<redacted diagnostic text>"
+    assert status.exception_traceback == "<redacted traceback>"
     assert "type-secret" not in status.exception_type
-    assert status.exception_message == '{"api_key": "<redacted>", "password": "<redacted>"}'
-    assert status.exception_traceback is not None
-    assert '"api_key": "<redacted>"' in status.exception_traceback
     assert "other-secret" not in status.exception_traceback
     assert "vector-sync-secret" not in status.exception_traceback
+    assert "aws-env-secret" not in status.exception_message
+    assert "aws-env-secret" not in status.exception_traceback
+    assert "authorization-secret" not in status.exception_message
+    assert "authorization-secret" not in status.exception_traceback
     assert len(status.exception_traceback) <= 4000
     assert service.library_docs.registry_ops.count_index_entries(record) == (0, 0)
 

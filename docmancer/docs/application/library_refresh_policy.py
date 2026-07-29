@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import re
-import traceback
 from typing import Any
 
 import httpx
@@ -14,17 +13,13 @@ from docmancer.docs.models import MANIFEST_INGESTION_POLICY_VERSION
 from docmancer.docs.registry import LibraryRecord
 
 
-_DIAGNOSTIC_URL = re.compile(r"https?://[^\s]+")
-_SENSITIVE_ASSIGNMENT = re.compile(
-    r"(?i)\b(api[_-]?key|access[_-]?token|auth(?:orization)?|token|password|secret)\b\s*([:=])\s*[^\s,;\]\)}]+"
-)
-_SENSITIVE_QUOTED_ASSIGNMENT = re.compile(
-    r'''(?i)(["']?(?:api[_-]?key|access[_-]?token|auth(?:orization)?|token|password|secret)["']?\s*[:=]\s*)(["'])([^"']*)(["'])'''
-)
-_BEARER_TOKEN = re.compile(r"(?i)\bBearer\s+[A-Za-z0-9._~+/=-]+")
+_SAFE_EXCEPTION_TYPE = re.compile(r"[A-Za-z_][A-Za-z0-9_]*")
 _MAX_EXCEPTION_TYPE_CHARS = 200
 _MAX_EXCEPTION_MESSAGE_CHARS = 1000
 _MAX_EXCEPTION_TRACEBACK_CHARS = 4000
+_REDACTED_EXCEPTION_TYPE = "<redacted exception type>"
+_REDACTED_DIAGNOSTIC_TEXT = "<redacted diagnostic text>"
+_REDACTED_TRACEBACK = "<redacted traceback>"
 
 
 def refresh_failure_code(exc: Exception) -> str:
@@ -68,19 +63,21 @@ def bounded_exception_diagnostics(
     return {
         "failure_phase": failure_phase,
         "failure_operation": failure_operation,
-        "exception_type": _redact_diagnostic_text(type(exc).__name__)[:_MAX_EXCEPTION_TYPE_CHARS],
-        "exception_message": _redact_diagnostic_text(str(exc))[:_MAX_EXCEPTION_MESSAGE_CHARS],
-        "exception_traceback": _redact_diagnostic_text(
-            "".join(traceback.format_exception(type(exc), exc, exc.__traceback__))
-        )[:_MAX_EXCEPTION_TRACEBACK_CHARS],
+        "exception_type": _safe_exception_type(exc)[:_MAX_EXCEPTION_TYPE_CHARS],
+        "exception_message": _safe_exception_message(exc)[:_MAX_EXCEPTION_MESSAGE_CHARS],
+        "exception_traceback": _REDACTED_TRACEBACK[:_MAX_EXCEPTION_TRACEBACK_CHARS],
     }
 
 
-def _redact_diagnostic_text(value: str) -> str:
-    value = _DIAGNOSTIC_URL.sub(lambda match: redact_url(match.group(0)), value)
-    value = _SENSITIVE_QUOTED_ASSIGNMENT.sub(r"\1\2<redacted>\4", value)
-    value = _SENSITIVE_ASSIGNMENT.sub(r"\1\2<redacted>", value)
-    return _BEARER_TOKEN.sub("Bearer <redacted>", value)
+def _safe_exception_type(exc: Exception) -> str:
+    name = type(exc).__name__
+    return name if _SAFE_EXCEPTION_TYPE.fullmatch(name) else _REDACTED_EXCEPTION_TYPE
+
+
+def _safe_exception_message(exc: Exception) -> str:
+    if isinstance(exc, DocsFetchSecurityError):
+        return f"{exc.category}: {redact_url(exc.failed_url)}"
+    return _REDACTED_DIAGNOSTIC_TEXT
 
 
 def merged_discovery_diagnostics(items: list[dict[str, Any]]) -> dict[str, Any]:
