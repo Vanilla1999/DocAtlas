@@ -168,6 +168,9 @@ class SlowIndexingAgent(FakeAgent):
         return super().add(docs_url, recreate=recreate, **kwargs)
 
 
+VectorSyncFailure = type("api_key=" + "type-secret" * 100, (RuntimeError,), {})
+
+
 class VectorTrackingAgent(FakeAgent):
     def __init__(self, *, fail_sync: bool = False):
         super().__init__()
@@ -179,7 +182,7 @@ class VectorTrackingAgent(FakeAgent):
         self.sync_calls += 1
         self.sync_db_paths.append(self.config.index.db_path)
         if self.fail_sync:
-            raise RuntimeError("vector backend unavailable")
+            raise VectorSyncFailure('{"api_key": "vector-sync-secret", "password": "other-secret"}')
 
 
 class SlowVectorTrackingAgent(SlowIndexingAgent):
@@ -4303,8 +4306,19 @@ def test_vector_sync_failure_keeps_fts_index_and_returns_partial(tmp_path, monke
     assert status.status == "failed"
     assert status.reason_code == "vector_indexing_failed"
     assert "vector_indexing_failed" in status.message
+    assert "vector-sync-secret" not in status.message
+    assert status.failure_phase == "staging"
+    assert status.failure_operation == "sync_vectors"
+    assert status.exception_type is not None
+    assert len(status.exception_type) <= 200
+    assert "type-secret" not in status.exception_type
+    assert status.exception_message == '{"api_key": "<redacted>", "password": "<redacted>"}'
+    assert status.exception_traceback is not None
+    assert '"api_key": "<redacted>"' in status.exception_traceback
+    assert "other-secret" not in status.exception_traceback
+    assert "vector-sync-secret" not in status.exception_traceback
+    assert len(status.exception_traceback) <= 4000
     assert service.library_docs.registry_ops.count_index_entries(record) == (0, 0)
-
 
 
 def test_vector_sync_failure_retains_existing_active_corpus(tmp_path, monkeypatch):

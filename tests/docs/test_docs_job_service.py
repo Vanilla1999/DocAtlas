@@ -103,6 +103,11 @@ def test_sqlite_job_tracker_persists_terminal_status_and_counters_across_restart
         completed_targets=2,
         completed_pages=7,
         completed_chunks=11,
+        failure_phase="staging",
+        failure_operation="sync_vectors",
+        exception_type="RuntimeError",
+        exception_message="vector backend unavailable",
+        exception_traceback="Traceback: vector backend unavailable",
     )
 
     recovered = DocsJobTracker(db_path=db_path).get(job.job_id)
@@ -112,6 +117,11 @@ def test_sqlite_job_tracker_persists_terminal_status_and_counters_across_restart
     assert recovered.completed_targets == 2
     assert recovered.completed_pages == 7
     assert recovered.completed_chunks == 11
+    assert recovered.failure_phase == "staging"
+    assert recovered.failure_operation == "sync_vectors"
+    assert recovered.exception_type == "RuntimeError"
+    assert recovered.exception_message == "vector backend unavailable"
+    assert recovered.exception_traceback == "Traceback: vector backend unavailable"
     assert recovered.request_identity == "https://example.com/docs"
     assert recovered.generation_id
 

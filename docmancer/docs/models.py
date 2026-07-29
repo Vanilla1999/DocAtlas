@@ -236,6 +236,10 @@ class DocsJob:
     reason_code: str | None = None
     retryable: bool | None = None
     failure_phase: str | None = None
+    failure_operation: str | None = None
+    exception_type: str | None = None
+    exception_message: str | None = None
+    exception_traceback: str | None = None
     failed_url: str | None = None
     http_status: int | None = None
     deadline_at: str | None = None

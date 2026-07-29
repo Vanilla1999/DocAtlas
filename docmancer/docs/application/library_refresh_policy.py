@@ -2,14 +2,29 @@
 
 from __future__ import annotations
 
+import re
+import traceback
 from typing import Any
 
 import httpx
 
 from docmancer.docs.dart_official_docs import build_dart_diagnostics, canonical_dart_ecosystem
-from docmancer.docs.fetch_policy import DocsFetchSecurityError
+from docmancer.docs.fetch_policy import DocsFetchSecurityError, redact_url
 from docmancer.docs.models import MANIFEST_INGESTION_POLICY_VERSION
 from docmancer.docs.registry import LibraryRecord
+
+
+_DIAGNOSTIC_URL = re.compile(r"https?://[^\s]+")
+_SENSITIVE_ASSIGNMENT = re.compile(
+    r"(?i)\b(api[_-]?key|access[_-]?token|auth(?:orization)?|token|password|secret)\b\s*([:=])\s*[^\s,;\]\)}]+"
+)
+_SENSITIVE_QUOTED_ASSIGNMENT = re.compile(
+    r'''(?i)(["']?(?:api[_-]?key|access[_-]?token|auth(?:orization)?|token|password|secret)["']?\s*[:=]\s*)(["'])([^"']*)(["'])'''
+)
+_BEARER_TOKEN = re.compile(r"(?i)\bBearer\s+[A-Za-z0-9._~+/=-]+")
+_MAX_EXCEPTION_TYPE_CHARS = 200
+_MAX_EXCEPTION_MESSAGE_CHARS = 1000
+_MAX_EXCEPTION_TRACEBACK_CHARS = 4000
 
 
 def refresh_failure_code(exc: Exception) -> str:
@@ -41,6 +56,31 @@ def retryable_failure(exc: Exception, reason_code: str) -> bool:
 
 def safe_failure_message(exc: Exception, reason_code: str) -> str:
     return f"{reason_code}: {exc.failed_url}" if isinstance(exc, DocsFetchSecurityError) else reason_code
+
+
+def bounded_exception_diagnostics(
+    exc: Exception,
+    *,
+    failure_phase: str,
+    failure_operation: str,
+) -> dict[str, str]:
+    """Return bounded, secret-safe exception evidence for durable job reporting."""
+    return {
+        "failure_phase": failure_phase,
+        "failure_operation": failure_operation,
+        "exception_type": _redact_diagnostic_text(type(exc).__name__)[:_MAX_EXCEPTION_TYPE_CHARS],
+        "exception_message": _redact_diagnostic_text(str(exc))[:_MAX_EXCEPTION_MESSAGE_CHARS],
+        "exception_traceback": _redact_diagnostic_text(
+            "".join(traceback.format_exception(type(exc), exc, exc.__traceback__))
+        )[:_MAX_EXCEPTION_TRACEBACK_CHARS],
+    }
+
+
+def _redact_diagnostic_text(value: str) -> str:
+    value = _DIAGNOSTIC_URL.sub(lambda match: redact_url(match.group(0)), value)
+    value = _SENSITIVE_QUOTED_ASSIGNMENT.sub(r"\1\2<redacted>\4", value)
+    value = _SENSITIVE_ASSIGNMENT.sub(r"\1\2<redacted>", value)
+    return _BEARER_TOKEN.sub("Bearer <redacted>", value)
 
 
 def merged_discovery_diagnostics(items: list[dict[str, Any]]) -> dict[str, Any]:

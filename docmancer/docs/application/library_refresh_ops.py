@@ -19,6 +19,7 @@ from docmancer.docs.application.library_index_publication import LibraryIndexPub
 from docmancer.docs.application.library_ingest_ports import LibraryRefreshPorts
 from docmancer.docs.application.library_refresh_policy import (
     dart_refresh_diagnostics as _dart_refresh_diagnostics,
+    bounded_exception_diagnostics as _bounded_exception_diagnostics,
     manifest_attempt_spec as _manifest_attempt_spec,
     manifest_rollback_spec as _manifest_rollback_spec,
     merged_discovery_diagnostics as _merged_discovery_diagnostics,
@@ -393,6 +394,11 @@ class LibraryRefreshOps:
             if vector_failure is not None:
                 self.publication.discard_staging(staging)
                 self._persist_manifest_rollback_diagnostics(record, "vector_indexing_failed")
+                failure_diagnostics = _bounded_exception_diagnostics(
+                    vector_failure,
+                    failure_phase="staging",
+                    failure_operation="sync_vectors",
+                )
                 return RefreshResult(
                     library_id=record.library_id,
                     status="failed",
@@ -400,10 +406,17 @@ class LibraryRefreshOps:
                     last_refreshed_at=record.last_refreshed_at,
                     version=record.version,
                     source_type=record.source_type,
-                    message=f"vector_indexing_failed: retained the previous active corpus: {vector_failure}",
+                    message=(
+                        "vector_indexing_failed: retained the previous active corpus: "
+                        f"{failure_diagnostics['exception_message']}"
+                    ),
                     duration_ms=int((self.ports.monotonic() - started) * 1000),
                     targets_failed=1,
                     reason_codes=["vector_indexing_failed"],
+                    preindex={
+                        "reason_code": "vector_indexing_failed",
+                        **failure_diagnostics,
+                    },
                 )
 
         refreshed_at = self.ports.now()
