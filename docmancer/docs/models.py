@@ -643,6 +643,9 @@ class UnifiedDocsContextResult:
     support_decision: Any = None
     answer_type: str | None = None
     answer_completeness: dict[str, Any] = field(default_factory=dict)
+    disposition: str | None = None
+    edit_ready: bool = False
+    source_search_status: str = "not_required"
     context_pack: list[dict[str, Any]] = field(default_factory=list)
     lanes: dict[str, Any] = field(default_factory=dict)
     source_summary: dict[str, int] = field(default_factory=dict)

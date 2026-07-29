@@ -202,7 +202,24 @@ def evaluate_project_answer_completeness(
     matched_terms = [item["term"] for item in coverage_by_requirement if item["matched"]]
     missing_terms = [item["term"] for item in coverage_by_requirement if not item["matched"]]
     coverage_score = (len(matched_terms) / len(requirements)) if requirements else (1.0 if answer_available else 0.0)
-    source_search_required = bool(answer_available and missing_terms and (story_specific_query or fallback_relevance_query))
+    source_or_story_query = (
+        story_specific_query
+        or fallback_relevance_query
+        or bool(_FILE_HINT_RE.search(question))
+        or bool(getattr(intent, "wants_code_symbols", False))
+    )
+    source_search_required = bool(missing_terms and source_or_story_query)
+    has_source_evidence = any(
+        item.get("source_class") in _SOURCE_BACKED_PROOF_SOURCE_CLASSES
+        for item in context_pack
+    )
+    source_search_status = (
+        "required"
+        if source_search_required
+        else "completed"
+        if has_source_evidence
+        else "not_required"
+    )
     navigational_context = _has_navigational_context(context_pack)
 
     has_strong_evidence = any(
@@ -261,6 +278,9 @@ def evaluate_project_answer_completeness(
         "missing_terms": missing_terms,
         "coverage_by_requirement": coverage_by_requirement,
         "source_search_required": source_search_required,
+        "source_search_status": source_search_status,
+        "disposition": "search_local_source" if source_search_required else "use_context",
+        "edit_ready": not source_search_required and status == "exact",
         "reason_codes": reason_codes,
     }
     return {
@@ -450,6 +470,10 @@ def _source_search_action(*, missing_terms: list[str], context_pack: list[dict[s
     return {
         "action": "search_project_sources",
         "tool": "code_search",
+        "type": "search_local_source",
+        "handled_by": "coding_agent",
+        "requires_confirmation": False,
+        "repeat_docs_context": False,
         "reason": "Selected docs are partial/navigational; exact story-specific terms are missing from source-backed snippets.",
         "query_terms": missing_terms[:8],
         "suggested_doc_paths": suggested_paths[:8],

@@ -645,7 +645,10 @@ def _docs_retrieval_issues(retrieval: dict[str, Any]) -> list[str]:
         issues.append("The retrieval result is not a complete source-backed answer.")
     completeness = retrieval.get("answer_completeness")
     if isinstance(completeness, dict):
-        if completeness.get("source_search_required"):
+        if (
+            completeness.get("source_search_required")
+            and completeness.get("source_search_status") != "completed"
+        ):
             issues.append("Source search is required before answering.")
         completeness_status = str(completeness.get("status") or "").strip().lower()
         if completeness_status and completeness_status not in {"exact", "complete"}:
@@ -666,9 +669,10 @@ def _bounded_action(value: Any) -> dict[str, Any] | None:
     if not isinstance(value, dict):
         return None
     allowed = (
-        "tool", "type", "arguments_patch", "question", "requires_confirmation",
+        "tool", "type", "action", "handled_by", "arguments_patch", "question", "requires_confirmation",
         "confirmation_reason", "reason", "observations", "security_scope",
-        "decision_options", "agent_question",
+        "decision_options", "agent_question", "query_terms", "suggested_doc_paths",
+        "suggested_symbols", "suggested_layers", "repeat_docs_context",
     )
     result = {key: deepcopy(value[key]) for key in allowed if value.get(key) not in (None, {}, [])}
     result["auto_execute"] = False

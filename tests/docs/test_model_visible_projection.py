@@ -488,6 +488,22 @@ def test_partial_navigational_docs_result_fails_closed():
                 "answer": "You may safely change the API.",
                 "answer_type": "partial_navigational",
                 "answer_completeness": {"status": "partial", "source_search_required": True},
+                "next_actions": [
+                    {
+                        "action": "search_project_sources",
+                        "type": "search_local_source",
+                        "tool": "code_search",
+                        "handled_by": "coding_agent",
+                        "requires_confirmation": False,
+                        "repeat_docs_context": False,
+                        "query_terms": ["SpeechSegmenter"],
+                        "suggested_doc_paths": ["lib/speech_segmenter.dart"],
+                    },
+                    {
+                        "tool": "prepare_docs",
+                        "arguments_patch": {"action": "sync_project_docs", "project_path": "/repo"},
+                    },
+                ],
                 "primary_snippet": {
                     "path": "docs/navigation.md",
                     "title": "Navigation",
@@ -504,6 +520,14 @@ def test_partial_navigational_docs_result_fails_closed():
 
     assert payload["status"] == "insufficient_evidence"
     assert "answer" not in payload
+    assert payload["disposition"] == "search_local_source"
+    assert payload["edit_ready"] is False
+    assert payload["source_search_status"] == "required"
+    assert payload["requires_confirmation"] is False
+    assert payload["recommended_next_action"]["tool"] == "code_search"
+    assert payload["recommended_next_action"]["repeat_docs_context"] is False
+    assert payload["recommended_next_action"]["query_terms"] == ["SpeechSegmenter"]
+    assert "sync_project_docs" not in str(payload)
 
 
 def test_docs_projection_forwards_host_requirements_and_scope_to_selector():

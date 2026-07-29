@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from docmancer.docs.application.project_context_service import ProjectContextService, context_pack_snippet, project_context_metrics, project_context_pack, project_why_selected
+from docmancer.docs.domain.answer_completeness import evaluate_project_answer_completeness
 from docmancer.docs.interfaces.mcp.project_tools import _compact_project_context
 from docmancer.docs.domain.project_query_intent import classify_project_query_intent
 from docmancer.docs.models import DependencyObservation, DocsChunk, DocsResult, ProjectDocsChunk, ProjectDocsResult, ProjectMetadata
@@ -115,12 +116,61 @@ new_help_request_screen, ToastUtils, and routes.
     assert result.answer_type == "partial_navigational"
     assert result.answer_completeness["status"] == "partial"
     assert result.answer_completeness["source_search_required"] is True
+    assert result.answer_completeness["source_search_status"] == "required"
+    assert result.answer_completeness["disposition"] == "search_local_source"
+    assert result.answer_completeness["edit_ready"] is False
     assert "Вернуть в работу" in result.answer_completeness["missing_terms"]
     assert "Активная" in result.answer_completeness["missing_terms"]
     source_action = result.recommended_next_actions[-1]
     assert source_action["action"] == "search_project_sources"
     assert source_action["tool"] == "code_search"
+    assert source_action["handled_by"] == "coding_agent"
+    assert source_action["requires_confirmation"] is False
+    assert source_action["repeat_docs_context"] is False
     assert "help_request_details_screen" in source_action["suggested_symbols"]
+
+
+def test_source_backed_completeness_marks_local_search_completed():
+    question = 'Where is "SpeechSegmenter" implemented?'
+    result = evaluate_project_answer_completeness(
+        question=question,
+        context_pack=[{
+            "source_class": "source_evidence",
+            "path": "lib/speech_segmenter.dart",
+            "content": "lib/speech_segmenter.dart:10: class SpeechSegmenter",
+        }],
+        answer_available=True,
+        intent=classify_project_query_intent(question),
+    )
+
+    completeness = result["answer_completeness"]
+    assert completeness["status"] == "exact"
+    assert completeness["source_search_required"] is False
+    assert completeness["source_search_status"] == "completed"
+    assert completeness["disposition"] == "use_context"
+    assert completeness["edit_ready"] is True
+    assert result["recommended_next_actions"] == []
+
+
+def test_missing_exact_source_files_require_local_search_even_without_docs_answer():
+    question = "Inspect speech_segmenter.dart and wear_voice_session.dart"
+    result = evaluate_project_answer_completeness(
+        question=question,
+        context_pack=[{
+            "source_class": "source_evidence",
+            "path": "lib/wear_voice_session.dart",
+            "content": "lib/wear_voice_session.dart:10: class WearVoiceSession",
+        }],
+        answer_available=False,
+        intent=classify_project_query_intent(question),
+    )
+
+    completeness = result["answer_completeness"]
+    assert completeness["source_search_required"] is True
+    assert completeness["source_search_status"] == "required"
+    assert completeness["disposition"] == "search_local_source"
+    assert result["recommended_next_actions"][0]["tool"] == "code_search"
+    assert result["recommended_next_actions"][0]["repeat_docs_context"] is False
 
 
 def test_generic_test_query_is_not_trusted():

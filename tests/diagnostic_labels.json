@@ -253,7 +253,7 @@
     "tests/docs/test_project_context_live_quality.py": "84887f937d63a4c9b23b8d759a6127d1335b56f83d1e09f729d91f2633c52835",
     "tests/docs/test_project_context_metrics.py": "0acded064af9cbb8c51c159e0ce5745a90bd1702e70381287d9df55b6e349a1a",
     "tests/docs/test_project_context_quality.py": "0da270aea32cdec68c4f30280742004f1fe12b6914c6259bf8eb6597ab124bb3",
-    "tests/docs/test_project_context_service.py": "c1022f3f408f5df3e4163b4990d4966086c64a7856a132888cb36b275b3f9565",
+    "tests/docs/test_project_context_service.py": "63784734c5ee20c0c35ac170197c67219957c1a2b5d83448feb380d6f74c0c7b",
     "tests/docs/test_project_doc_ranking.py": "ac41381fe5bd0cf98a7ca2b215ea61b641809dc4740903186ba180ba114ac9d6",
     "tests/docs/test_project_docs_catalog.py": "8c3cd087a943b121c5d31d88a6c544bf0fdf8144034ed8d282a54f74efb26aae",
     "tests/docs/test_project_docs_service.py": "272af3feb3e948ac440a691afda05a483a572f3e4176e616c34d35f68c985846",

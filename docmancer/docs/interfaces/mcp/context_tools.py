@@ -110,6 +110,9 @@ def _answer_payload(payload: dict[str, Any]) -> dict[str, Any]:
         "status": payload.get("status"),
         "answer_available": answer_available,
         "answer_type": answer_type,
+        "disposition": payload.get("disposition"),
+        "edit_ready": payload.get("edit_ready"),
+        "source_search_status": payload.get("source_search_status"),
         **_agent_instruction(answer_type),
         "mode_selected": payload.get("mode_selected"),
         "reason_code": payload.get("reason_code"),
@@ -158,6 +161,9 @@ def _compact_payload(payload: dict[str, Any]) -> dict[str, Any]:
         "primary_snippet_alternatives": payload.get("primary_snippet_alternatives") or [],
         "supporting_snippets": payload.get("supporting_snippets") or [],
         "context_pack": payload.get("context_pack") or [],
+        "disposition": payload.get("disposition"),
+        "edit_ready": payload.get("edit_ready"),
+        "source_search_status": payload.get("source_search_status"),
         "next_action": payload.get("next_action"),
         "next_actions": payload.get("next_actions") or [],
         "arguments_patch": payload.get("arguments_patch"),
@@ -328,6 +334,7 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
                     max_tokens=min(INSUFFICIENT_EVIDENCE_MAX_TOKENS, output_budget),
                 )
                 projection.update(support_projection)
+                _annotate_source_search_handoff(projection, recovery)
                 bound_insufficient_projection(projection, max_tokens=output_budget)
             if projection.get("status") == "insufficient_evidence":
                 bound_insufficient_projection(projection, max_tokens=output_budget)
@@ -395,6 +402,7 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
                 recommended_next_action=recovery,
                 max_tokens=min(INSUFFICIENT_EVIDENCE_MAX_TOKENS, output_budget),
             )
+            _annotate_source_search_handoff(projection, recovery)
         _omit_nullable_reason_code(projection)
         _refresh_projection_estimate(projection)
         projection_errors = validate_model_visible_projection(
@@ -429,18 +437,32 @@ def _omit_nullable_reason_code(payload: dict[str, Any]) -> None:
 
 def _bounded_recovery_action(payload: dict[str, Any]) -> dict[str, Any] | None:
     candidates = [payload.get("next_action"), *(payload.get("next_actions") or [])]
+    completeness = (
+        payload.get("answer_completeness")
+        if isinstance(payload.get("answer_completeness"), dict) else {}
+    )
+    source_search_required = bool(completeness.get("source_search_required"))
+    if source_search_required:
+        candidates.sort(key=lambda action: 0 if isinstance(action, dict) and action.get("tool") == "code_search" else 1)
     for action in candidates:
         if not isinstance(action, dict):
             continue
         action_type = str(action.get("type") or "")
-        if action.get("tool") != "prepare_docs" and action_type != "ask_user_for_library_docs_source":
+        tool = action.get("tool")
+        if tool not in {"prepare_docs", "code_search"} and action_type != "ask_user_for_library_docs_source":
             continue
+        if tool == "prepare_docs" and source_search_required and not payload.get("requires_confirmation"):
+            arguments = action.get("arguments_patch") if isinstance(action.get("arguments_patch"), dict) else {}
+            if arguments.get("action") == "sync_project_docs":
+                continue
         bounded = {
             key: deepcopy(action[key])
             for key in (
-                "tool", "type", "arguments_patch", "reason", "message", "question",
+                "tool", "type", "action", "handled_by", "arguments_patch", "reason", "message", "question",
                 "requires_confirmation", "confirmation_reason", "quality_warning",
                 "observations", "security_scope", "agent_question",
+                "query_terms", "suggested_doc_paths", "suggested_symbols",
+                "suggested_layers", "repeat_docs_context",
             )
             if action.get(key) not in (None, {}, [])
         }
@@ -456,6 +478,20 @@ def _bounded_recovery_action(payload: dict[str, Any]) -> dict[str, Any] | None:
         bounded["auto_execute"] = False
         return bounded
     return None
+
+
+def _annotate_source_search_handoff(
+    projection: dict[str, Any], recovery: dict[str, Any]
+) -> None:
+    if recovery.get("tool") != "code_search":
+        return
+    projection.update({
+        "disposition": "search_local_source",
+        "edit_ready": False,
+        "source_search_status": "required",
+        "requires_confirmation": False,
+    })
+    _refresh_projection_estimate(projection)
 
 
 def _bounded_action_mapping(value: dict[str, Any], *, depth: int = 0) -> dict[str, Any]:
@@ -496,7 +532,10 @@ def bounded_retrieval_issues(
     elif payload.get("answer_type") in {"partial", "unavailable"}:
         issues.append("The retrieval result does not contain complete implementation evidence.")
     completeness = payload.get("answer_completeness") if isinstance(payload.get("answer_completeness"), dict) else {}
-    if completeness.get("source_search_required"):
+    if (
+        completeness.get("source_search_required")
+        and completeness.get("source_search_status") != "completed"
+    ):
         issues.append("Source search is required before the documentation evidence can guide an edit.")
     completeness_status = str(completeness.get("status") or "").strip().lower()
     if completeness_status and completeness_status not in {"exact", "complete"}:

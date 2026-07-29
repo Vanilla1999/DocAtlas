@@ -465,6 +465,19 @@ class UnifiedDocsContextService:
             support_decision=support_decision,
             answer_type=getattr(project_result, "answer_type", None) if project_result else None,
             answer_completeness=dict(getattr(project_result, "answer_completeness", None) or {}) if project_result else {},
+            disposition=(
+                (getattr(project_result, "answer_completeness", None) or {}).get("disposition")
+                if project_result else None
+            ),
+            edit_ready=bool(
+                (getattr(project_result, "answer_completeness", None) or {}).get("edit_ready")
+                if project_result else answer_supported
+            ),
+            source_search_status=str(
+                (getattr(project_result, "answer_completeness", None) or {}).get(
+                    "source_search_status", "not_required"
+                ) if project_result else "not_required"
+            ),
             context_pack=context_pack,
             lanes=lanes,
             source_summary=source_summary,
