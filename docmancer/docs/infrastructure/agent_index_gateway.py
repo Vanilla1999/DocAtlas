@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 import hashlib
+from pathlib import Path
 from typing import Any, Callable, Sequence
 
 from docmancer.core.config import DocmancerConfig
@@ -32,6 +33,7 @@ class AgentIndexGateway:
         *,
         default_agent: Any | None = None,
         agent_factory: Callable[..., Any] | None = None,
+        library_index_root: Path | str | None = None,
     ):
         if agent_factory is None:
             from docmancer.agent import DocmancerAgent
@@ -41,10 +43,11 @@ class AgentIndexGateway:
         self._default_agent = default_agent
         self._agents: dict[str, Any] = {}
         self._agent_factory = agent_factory
+        self._library_index_root = Path(library_index_root).expanduser().resolve() if library_index_root else None
 
     def index_config_for(self, record: LibraryRecord) -> DocmancerConfig:
         config = self.config.model_copy(deep=True)
-        root = paths.docmancer_home() / "docs-indexes"
+        root = self._library_index_root or paths.docmancer_home() / "docs-indexes"
         root.mkdir(parents=True, exist_ok=True)
         safe = normalize_library_name(record.library_id) or "library"
         config.index.db_path = str(root / f"{safe}.db")

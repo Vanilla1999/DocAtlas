@@ -18,6 +18,7 @@ from click.testing import CliRunner
 
 from docmancer.cli.__main__ import cli
 from docmancer.core.config import DocmancerConfig
+from docmancer.core.storage_topology import StorageTopologyResolver
 from docmancer.core.models import Document, RetrievedChunk
 from docmancer.core.sqlite_store import SQLiteStore
 from docmancer.agent import DocmancerAgent
@@ -6620,6 +6621,47 @@ def test_remove_library_docs_deletes_physical_index_files(tmp_path, monkeypatch)
     assert result.chunks_removed > 0
     assert not db_path.exists()
     assert not extracted.exists()
+
+
+def test_remove_library_docs_preserves_other_project_library_index(tmp_path, monkeypatch):
+    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
+    now = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    services: list[LibraryDocsService] = []
+    records = []
+    for name in ("project-a", "project-b"):
+        project = tmp_path / name
+        project.mkdir()
+        (project / "docmancer.yaml").write_text(
+            "index:\n  db_path: .docmancer/project.db\n",
+            encoding="utf-8",
+        )
+        topology = StorageTopologyResolver().resolve(project)
+        service = LibraryDocsService(
+            config=topology.config,
+            library_index_root=topology.library_index_root,
+        )
+        record = service.registry.upsert(
+            library="go_router",
+            ecosystem="pub",
+            version="14.8.1",
+            source_type="api",
+            docs_url="https://pub.dev/documentation/go_router/14.8.1/",
+            now=now,
+            status="available",
+        )
+        index_path = Path(service._index_config_for(record).index.db_path)
+        index_path.parent.mkdir(parents=True, exist_ok=True)
+        index_path.write_text(name, encoding="utf-8")
+        services.append(service)
+        records.append(record)
+
+    result = services[0].remove_library_docs(records[0].library_id)
+
+    other_index = Path(services[1]._index_config_for(records[1]).index.db_path)
+    assert result.removed is True
+    assert not Path(services[0]._index_config_for(records[0]).index.db_path).exists()
+    assert other_index.exists()
+    assert other_index.read_text(encoding="utf-8") == "project-b"
 
 
 def test_legacy_record_migrates_to_new_canonical_id(tmp_path, monkeypatch):

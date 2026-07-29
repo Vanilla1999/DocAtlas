@@ -332,7 +332,7 @@
     "tests/test_diagnostic_labels.py": "2541bcbef04f82d3150b1d8e157bcb3429e3f682a371ae786617ea3469ee5e71",
     "tests/test_docs_fetch_policy.py": "459dd705084400309d32fc5bccd9c0a1daaab44cc3f5e2b0908ce13bde92404e",
     "tests/test_docs_fetch_transport.py": "47d1e2e10d0e792f72d88c655639acebd47f02796faf4e9d5783f990b5b8679c",
-    "tests/test_docs_service.py": "3fda82cc02a4c3e09a1c111eef1a0fb555ef168100eb7adb2abf3eab0e05011e",
+    "tests/test_docs_service.py": "0119fda7322ab3a8614bd52bdeb809c0625683b47afb75fdc4d32abf11571a2d",
     "tests/test_embeddings.py": "87831bc93d36b9d1bae033628e5235ec9917b6854b4a05b21ecbbb47c84a13c7",
     "tests/test_embeddings_pipeline.py": "3b1f2926b87b03c2615d81462fa68f6cd60f917fc7abf776b7a6c5e986aecb20",
     "tests/test_eval.py": "c65ac3b2b2f25b29df1beb4dd25431a6d7c78b6dcbe679c98eb9a8705f1467d1",

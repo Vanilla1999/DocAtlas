@@ -981,6 +981,7 @@ def _service_for_project_path(
         agent_factory=service.agent_gateway._agent_factory,
         project_reader=service.project_reader,
         stale_after_days=service.stale_after_days,
+        library_index_root=topology.library_index_root,
     )
 
 

@@ -1842,8 +1842,11 @@ def context_cmd(
     from docmancer.core.storage_topology import StorageTopologyResolver
 
     fallback_config = _load_config(_effective_config(config_path))
-    config = StorageTopologyResolver(fallback_config=fallback_config).resolve(project_path).config
-    result = LibraryDocsService(config=config).get_project_context(
+    topology = StorageTopologyResolver(fallback_config=fallback_config).resolve(project_path)
+    result = LibraryDocsService(
+        config=topology.config,
+        library_index_root=topology.library_index_root,
+    ).get_project_context(
         project_path,
         question,
         tokens=tokens,

@@ -316,8 +316,9 @@ def test_context_cli_uses_project_local_storage_topology(tmp_path):
     captured: dict[str, str] = {}
 
     class CapturingService:
-        def __init__(self, *, config):
+        def __init__(self, *, config, library_index_root=None):
             captured["db_path"] = config.index.db_path
+            captured["library_index_root"] = str(library_index_root)
 
         def get_project_context(self, project_path, question, **_kwargs):
             return ProjectContextResult(project_path=project_path, question=question)
@@ -332,6 +333,7 @@ def test_context_cli_uses_project_local_storage_topology(tmp_path):
 
     assert result.exit_code == 0, result.output
     assert captured["db_path"] == str((project / ".docmancer" / "project.db").resolve())
+    assert captured["library_index_root"] == str((project / ".docmancer" / "docs-indexes").resolve())
 
 
 def test_load_config_prefers_local_docmancer_yaml(tmp_path):
