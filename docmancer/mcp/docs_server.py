@@ -995,6 +995,8 @@ def _service_for_project_path(
     service: LibraryDocsService,
     arguments: dict[str, Any],
 ) -> LibraryDocsService:
+    if arguments.get("action") == "clear_index":
+        return service
     if not isinstance(service, LibraryDocsService):
         return service
     project_path = arguments.get("project_path")
