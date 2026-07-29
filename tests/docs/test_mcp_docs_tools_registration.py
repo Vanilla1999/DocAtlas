@@ -3,6 +3,9 @@ from __future__ import annotations
 from pathlib import Path
 import json
 
+import jsonschema
+import pytest
+
 from docmancer.docs.interfaces.mcp.context_tools import CONTEXT_TOOL_NAMES
 from docmancer.docs.interfaces.mcp.docs_tools import LIBRARY_TOOL_NAMES
 from docmancer.docs.interfaces.mcp.prefetch_tools import PREFETCH_TOOL_NAMES, _bounded_targets
@@ -64,6 +67,22 @@ def test_mcp_public_prepare_docs_advertises_project_local_library_removal():
     assert "remove_library_docs" in schema["properties"]["action"]["enum"]
     assert "canonical_id" in schema["properties"]
     assert "project_path" in schema["properties"]
+
+
+def test_mcp_public_prepare_docs_schema_requires_removal_scope_and_target():
+    tool = next(tool for tool in TOOLS if tool["name"] == "prepare_docs")
+    schema = tool["inputSchema"]
+
+    jsonschema.validate(
+        {
+            "action": "remove_library_docs",
+            "canonical_id": "pub:go_router@14.8.1:api",
+            "project_path": "/project",
+        },
+        schema,
+    )
+    with pytest.raises(jsonschema.ValidationError):
+        jsonschema.validate({"action": "remove_library_docs"}, schema)
 
 
 def test_every_raw_tool_has_exactly_one_visibility_class():

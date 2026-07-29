@@ -836,6 +836,16 @@ PUBLIC_ADVERTISED_INPUT_SCHEMAS: dict[str, dict[str, Any]] = {
             "dry_run": {"type": ["boolean", "null"], "default": True},
         },
         "required": ["action"],
+        "allOf": [{
+            "if": {"properties": {"action": {"const": "remove_library_docs"}}},
+            "then": {
+                "required": ["canonical_id", "project_path"],
+                "properties": {
+                    "canonical_id": {"type": "string", "minLength": 1},
+                    "project_path": {"type": "string", "minLength": 1},
+                },
+            },
+        }],
     },
     "docs_status": {
         "type": "object",
@@ -986,6 +996,18 @@ def _service_for_project_path(
     )
 
 
+def _destructive_project_scope_error(arguments: dict[str, Any]) -> str | None:
+    if arguments.get("action") != "remove_library_docs":
+        return None
+    project_path = arguments.get("project_path")
+    if not isinstance(project_path, str) or not project_path.strip():
+        return "project_path must resolve to a project-owned storage topology for library removal"
+    topology = StorageTopologyResolver().resolve(project_path)
+    if topology.config_source != "project_local":
+        return "project_path must resolve to a project-owned storage topology for library removal"
+    return None
+
+
 def call_docs_tool_payload(
     name: str,
     arguments: dict[str, Any] | None,
@@ -1021,6 +1043,14 @@ def call_docs_tool_payload(
         return build_mcp_error_payload(
             reason_code="validation_error",
             message=f"unknown field(s) for {name}: {', '.join(unknown_fields)}",
+            tool=name,
+            phase="validation",
+        )
+    destructive_scope_error = _destructive_project_scope_error(args)
+    if destructive_scope_error:
+        return build_mcp_error_payload(
+            reason_code="validation_error",
+            message=destructive_scope_error,
             tool=name,
             phase="validation",
         )

@@ -6825,6 +6825,38 @@ def test_prepare_docs_removes_project_local_library_target(tmp_path):
     assert project_service.registry.get(record.canonical_id) is None
 
 
+@pytest.mark.parametrize("scope_kind", ["configless", "nonexistent"])
+def test_prepare_docs_removal_rejects_scope_without_project_owned_topology(tmp_path, scope_kind):
+    project_path = tmp_path / scope_kind
+    if scope_kind == "configless":
+        project_path.mkdir()
+    fallback_config = DocmancerConfig()
+    fallback_config.index.db_path = str(tmp_path / "fallback.db")
+    fallback_service = LibraryDocsService(config=fallback_config, job_tracker=DocsJobTracker())
+    record = fallback_service.registry.upsert(
+        library="go_router",
+        ecosystem="pub",
+        version="14.8.1",
+        source_type="api",
+        docs_url="https://pub.dev/documentation/go_router/14.8.1/",
+        now=datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        status="available",
+    )
+
+    result = call_docs_tool_payload(
+        "prepare_docs",
+        {
+            "action": "remove_library_docs",
+            "canonical_id": record.canonical_id,
+            "project_path": str(project_path),
+        },
+        fallback_service,
+    )
+
+    assert result["reason_code"] == "validation_error"
+    assert fallback_service.registry.get(record.canonical_id) is not None
+
+
 def test_prepare_docs_cancels_project_local_job_using_project_topology(tmp_path, monkeypatch):
     project = tmp_path / "project"
     project.mkdir()
