@@ -1340,7 +1340,7 @@ class ProjectDocsService:
                 if not same_authoritative_source:
                     continue
             chunk_tokens = int((chunk.metadata or {}).get("token_estimate") or 0)
-            if selected and token_total + chunk_tokens > budget:
+            if token_total + chunk_tokens > budget:
                 continue
             selected.append(chunk)
             seen.add(key)

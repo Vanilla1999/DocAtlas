@@ -81,3 +81,4 @@ class LibraryIngestPorts:
     prefetch: Callable[..., RefreshResult]
     timeout_seconds: Callable[[], float]
     executor: Callable[[], LibraryJobExecutorPort]
+    prefetch_targets: Callable[..., Any] | None = None

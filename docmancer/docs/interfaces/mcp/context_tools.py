@@ -440,11 +440,18 @@ def _bounded_recovery_action(payload: dict[str, Any]) -> dict[str, Any] | None:
             for key in (
                 "tool", "type", "arguments_patch", "reason", "message", "question",
                 "requires_confirmation", "confirmation_reason", "quality_warning",
+                "observations", "security_scope", "agent_question",
             )
             if action.get(key) not in (None, {}, [])
         }
         if isinstance(action.get("options"), list):
             bounded["options"] = [_bounded_action_mapping(option) for option in action["options"][:3] if isinstance(option, dict)]
+        if isinstance(action.get("decision_options"), list):
+            bounded["decision_options"] = [
+                _bounded_action_mapping(option)
+                for option in action["decision_options"][:3]
+                if isinstance(option, dict)
+            ]
         bounded = _bounded_action_mapping(bounded)
         bounded["auto_execute"] = False
         return bounded
@@ -603,6 +610,8 @@ def _replace_network_retries_with_prepare_actions(payload: dict[str, Any], reque
             return {**action, "arguments_patch": arguments}
         if action.get("tool") != "get_docs_context" or not arguments.get("allow_network"):
             return action
+        if request.get("mode") == "project":
+            return None
         library = request.get("library")
         if library:
             patch = {
@@ -627,7 +636,7 @@ def _replace_network_retries_with_prepare_actions(payload: dict[str, Any], reque
     actions = []
     for action in updated.get("next_actions") or []:
         candidate = rewrite(action)
-        if candidate not in actions:
+        if candidate is not None and candidate not in actions:
             actions.append(candidate)
     primary = rewrite(updated.get("next_action"))
     if primary is not None and primary not in actions:

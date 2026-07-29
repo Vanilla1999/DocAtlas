@@ -44,6 +44,17 @@ def test_exact_term_extraction_is_bounded_and_classified():
     assert len({term.normalized_value for term in terms}) == len(terms)
 
 
+def test_exact_term_extraction_does_not_treat_prose_as_config_or_path():
+    terms = extract_exact_terms(
+        "Keep the MCP fetch/index pipeline while updating CONFIG_KEY in docs/setup.md"
+    )
+    values = {term.value for term in terms}
+
+    assert "MCP" not in values
+    assert "fetch/index" not in values
+    assert {"CONFIG_KEY", "docs/setup.md"} <= values
+
+
 def test_query_plan_has_bounded_concept_query_and_typed_filters():
     plan = build_query_plan(
         "How can I configure the client retry behavior?",

@@ -846,7 +846,12 @@ class UnifiedDocsContextService:
             "agent_instruction": "Ask the user before prefetching dependency docs. The user can approve prefetching all dependencies or only the recommended top-N.",
             "next_action": {
                 "tool": "prepare_docs",
-                "arguments_patch": {"action": "prefetch_project_dependency_docs", "project_path": project_path, "include_packages": [item["library"] for item in recommended]},
+                "arguments_patch": {
+                    "action": "prefetch_project_dependency_docs",
+                    "project_path": project_path,
+                    "include_packages": [item["library"] for item in recommended],
+                    "include_flutter": False,
+                },
             } if recommended else None,
         }
 

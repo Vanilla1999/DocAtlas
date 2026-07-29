@@ -156,3 +156,88 @@ def test_ingest_orchestrator_uses_injected_clock_executor_and_job_store():
 
     assert calls and calls[0]["staging_owner"] == {"job_id": "job-1", "generation_id": "generation-1"}
     assert jobs.updates[-1]["status"] == "succeeded"
+
+
+def test_flutter_prefetch_uses_one_internal_two_target_plan():
+    class Orchestrator:
+        def __init__(self):
+            self.calls = []
+
+        def prefetch_docs(self, library, **kwargs):
+            self.calls.append((library, kwargs))
+            return "queued"
+
+    service = LibraryDocsApplicationService.__new__(LibraryDocsApplicationService)
+    service._ingest_orchestrator = Orchestrator()
+
+    result = service.prefetch_docs("Flutter", ecosystem="flutter", async_=True)
+
+    assert result == "queued"
+    library, kwargs = service._ingest_orchestrator.calls[0]
+    assert library == "Flutter"
+    assert kwargs["async_"] is True
+    assert [(target.source_type, target.docs_url) for target in kwargs["target_plan"]] == [
+        ("guides", "https://docs.flutter.dev/"),
+        ("api", "https://api.flutter.dev/index.html"),
+    ]
+    assert kwargs["target_plan"][0].allowed_domains == ["docs.flutter.dev"]
+    assert kwargs["target_plan"][1].path_prefixes == ["/"]
+    assert all(target.max_pages == 40 for target in kwargs["target_plan"])
+
+
+def test_custom_flutter_url_preserves_normal_library_ingest():
+    class Orchestrator:
+        def __init__(self):
+            self.calls = []
+
+        def prefetch_docs(self, library, **kwargs):
+            self.calls.append((library, kwargs))
+            return "queued"
+
+    service = LibraryDocsApplicationService.__new__(LibraryDocsApplicationService)
+    service._ingest_orchestrator = Orchestrator()
+
+    service.prefetch_docs(
+        "Flutter",
+        ecosystem="flutter",
+        docs_url="https://example.test/flutter/",
+        async_=True,
+    )
+
+    assert "target_plan" not in service._ingest_orchestrator.calls[0][1]
+
+
+def test_legacy_official_flutter_calls_are_normalized_to_bounded_targets():
+    class Orchestrator:
+        def __init__(self):
+            self.calls = []
+
+        def prefetch_docs(self, library, **kwargs):
+            self.calls.append((library, kwargs))
+            return "queued"
+
+    service = LibraryDocsApplicationService.__new__(LibraryDocsApplicationService)
+    service._ingest_orchestrator = Orchestrator()
+
+    service.prefetch_docs(
+        "Flutter",
+        ecosystem="dart",
+        docs_url="https://docs.flutter.dev/",
+        async_=True,
+    )
+    service.prefetch_docs(
+        "Flutter API",
+        ecosystem="dart",
+        docs_url="https://api.flutter.dev/",
+        async_=True,
+    )
+
+    guides = service._ingest_orchestrator.calls[0][1]
+    api = service._ingest_orchestrator.calls[1][1]
+    assert guides["ecosystem"] == "flutter"
+    assert [(target.source_type, target.docs_url) for target in guides["target_plan"]] == [
+        ("guides", "https://docs.flutter.dev/"),
+    ]
+    assert [(target.source_type, target.docs_url) for target in api["target_plan"]] == [
+        ("api", "https://api.flutter.dev/index.html"),
+    ]

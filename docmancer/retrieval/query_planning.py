@@ -30,6 +30,10 @@ _TERM_PATTERNS = (
     ("symbol", re.compile(r"\b[A-Za-z_]\w*(?:(?:::|\.)[A-Za-z_]\w*)+\b")),
     ("path", re.compile(r"(?<![\w/])(?:[A-Za-z0-9_.-]+/)+[A-Za-z0-9_.-]+")),
 )
+_PATH_ROOTS = frozenset({
+    "app", "bin", "cmd", "config", "docmancer", "docs", "eval", "lib",
+    "packages", "scripts", "src", "test", "tests", "tools", "wiki",
+})
 
 _AUTHORITY_MINIMUMS = {
     "unknown": (
@@ -84,6 +88,10 @@ def extract_exact_terms(query: str) -> tuple[ExactTerm, ...]:
         for match in pattern.finditer(query):
             value = match.group(1) if match.lastindex else match.group(0)
             value = " ".join(value.split())[:160]
+            if kind == "config_key" and "_" not in value:
+                continue
+            if kind == "path" and not _looks_like_source_path(value):
+                continue
             normalized = _normalize_term(value)
             if not normalized or normalized in seen:
                 continue
@@ -92,6 +100,16 @@ def extract_exact_terms(query: str) -> tuple[ExactTerm, ...]:
             if len(found) >= MAX_EXACT_TERMS:
                 return tuple(found)
     return tuple(found)
+
+
+def _looks_like_source_path(value: str) -> bool:
+    normalized = value.replace("\\", "/")
+    first, _, leaf = normalized.partition("/")
+    return (
+        normalized.startswith(("./", "../", "/"))
+        or "." in leaf.rsplit("/", 1)[-1]
+        or first.casefold() in _PATH_ROOTS
+    )
 
 
 def _concept_queries(query: str, exact_terms: tuple[ExactTerm, ...]) -> tuple[str, ...]:

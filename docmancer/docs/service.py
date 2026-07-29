@@ -24,7 +24,7 @@ from docmancer.docs.domain.target_security import host_allowed, is_remote_url, p
 from docmancer.docs.domain.trust_contract import build_project_context_trust_contract
 from docmancer.docs.infrastructure.agent_index_gateway import AgentIndexGateway
 from docmancer.docs.infrastructure.filesystem_locks import FilesystemLockGateway
-from docmancer.docs.models import DocsChunk, DocsInspectResult, DocsJob, DocsJobCancelResult, DocsJobStartResult, DocsManifestValidationResult, DocsPruneResult, DocsRemoveResult, DocsResult, DocsSourceResolution, DocsTarget, DocsTargetResult, DocsTargetsPrefetchResult, LibraryInfo, PatchConstraintPacket, PatchConstraintValidationPacket, ProjectContextResult, ProjectDocsBootstrapResult, ProjectDocsIngestResult, ProjectDocsInspectResult, ProjectDocsResult, ProjectDocsSyncResult, ProjectMetadata, ProjectPrefetchResult, RefreshResult, UnifiedDocsContextResult
+from docmancer.docs.models import DocsChunk, DocsInspectResult, DocsJob, DocsJobCancelResult, DocsJobStartResult, DocsManifestValidationResult, DocsPruneResult, DocsRemoveResult, DocsResult, DocsSourceResolution, DocsTarget, DocsTargetInspectionResult, DocsTargetResult, DocsTargetsPrefetchResult, LibraryInfo, PatchConstraintPacket, PatchConstraintValidationPacket, ProjectContextResult, ProjectDocsBootstrapResult, ProjectDocsIngestResult, ProjectDocsInspectResult, ProjectDocsResult, ProjectDocsSyncResult, ProjectMetadata, ProjectPrefetchResult, RefreshResult, UnifiedDocsContextResult
 from docmancer.docs.project import ProjectMetadataReader
 from docmancer.docs.registry import LibraryRecord, LibraryRegistry
 
@@ -311,6 +311,9 @@ class LibraryDocsService:
 
     def _target_urls(self, *args: Any, **kwargs: Any):
         return self.docs_targets.target_urls(*args, **kwargs)
+
+    def inspect_docs_target(self, *args: Any, **kwargs: Any) -> DocsTargetInspectionResult:
+        return self.docs_targets.inspect_docs_target(*args, **kwargs)
 
     def _resolve_github_directory_target(self, *args: Any, **kwargs: Any):
         return self.docs_targets.resolve_github_directory_target(*args, **kwargs)

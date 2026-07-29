@@ -129,6 +129,7 @@ class WebFetcher:
         seed_urls: list[str] | None = None,
         progress_callback=None,
         cancellation_callback=None,
+        deadline_at: float | None = None,
         fetch_policy: DocsFetchPolicy | None = None,
         allowed_domains: list[str] | None = None,
         path_prefixes: list[str] | None = None,
@@ -153,6 +154,7 @@ class WebFetcher:
         self._seed_urls = list(seed_urls or [])
         self._progress_callback = progress_callback
         self._cancellation_callback = cancellation_callback
+        self._deadline_at = deadline_at
         self._fetch_policy = fetch_policy or DocsFetchPolicy(
             allowed_hosts=tuple(allowed_domains or ()),
             path_prefixes=tuple(path_prefixes or ()),
@@ -210,6 +212,7 @@ class WebFetcher:
             max_response_bytes=self._max_response_bytes,
             max_decoded_text_bytes=self._max_decoded_text_bytes,
             max_total_seconds=self._max_total_seconds,
+            deadline_at=self._deadline_at,
         )
 
     def _policy_for(self, url: str) -> DocsFetchPolicy:

@@ -194,6 +194,58 @@ def test_missing_kotlin_corpus_uses_prepare_docs_through_real_application_bounda
     }
 
 
+def test_bounded_context_preserves_docs_layout_inspection_decision_packet():
+    class Facade:
+        def get_docs_context(self, question, **kwargs):
+            return {
+                "tool": "get_docs_context",
+                "status": "not_found",
+                "answer_available": False,
+                "next_action": {
+                    "tool": "prepare_docs",
+                    "type": "prepare_docs",
+                    "arguments_patch": {
+                        "action": "inspect_docs_target",
+                        "target": {
+                            "library": "sample",
+                            "docs_url": "https://docs.example/api/",
+                            "allowed_domains": ["docs.example"],
+                        },
+                        "max_pages": 3,
+                    },
+                    "observations": {"source_status": "partial", "indexed_chunks": 0},
+                    "security_scope": {
+                        "allowed_domains": ["docs.example"],
+                        "scope_expansion_allowed": False,
+                    },
+                    "decision_options": [
+                        {"id": "inspect_registered_scope", "requires_confirmation": True},
+                        {"id": "stop_with_partial_results", "requires_confirmation": False},
+                    ],
+                    "agent_question": "Inspect the registered scope without indexing?",
+                    "requires_confirmation": True,
+                },
+            }
+
+    payload = cast(dict[str, Any], handle_context_tool(
+        "get_docs_context",
+        {
+            "question": "How does Sample work?",
+            "library": "sample",
+            "delivery_strategy": "bounded_direct",
+        },
+        cast(Any, Facade()),
+    ))
+
+    action = payload["recommended_next_action"]
+    assert action["arguments_patch"]["action"] == "inspect_docs_target"
+    assert action["observations"]["indexed_chunks"] == 0
+    assert action["security_scope"]["scope_expansion_allowed"] is False
+    assert action["decision_options"][0]["id"] == "inspect_registered_scope"
+    assert action["agent_question"] == "Inspect the registered scope without indexing?"
+    assert action["auto_execute"] is False
+
+
 def test_get_docs_context_strips_legacy_network_field_from_prepare_next_action():
     class Facade:
         def get_docs_context(self, question, **kwargs):
@@ -269,6 +321,111 @@ def test_get_docs_context_never_returns_hidden_patch_tool_on_public_surface():
 
     assert result["next_action"] == {"tool": "code_search", "action": "search_project_sources"}
     assert result["next_actions"] == [result["next_action"]]
+
+
+def test_project_mode_does_not_rewrite_network_retry_as_dependency_prefetch():
+    class Facade:
+        def get_docs_context(self, question, **kwargs):
+            return {
+                "tool": "get_docs_context",
+                "status": "not_found",
+                "answer_available": False,
+                "next_action": {
+                    "tool": "get_docs_context",
+                    "arguments_patch": {
+                        "question": question,
+                        "project_path": "/repo",
+                        "allow_network": True,
+                    },
+                },
+            }
+
+    result = cast(dict[str, Any], handle_context_tool(
+        "get_docs_context",
+        {
+            "question": "local architecture",
+            "project_path": "/repo",
+            "mode": "project",
+            "delivery_strategy": "bounded_direct",
+        },
+        cast(Any, Facade()),
+    ))
+
+    assert result["status"] == "insufficient_evidence"
+    assert "recommended_next_action" not in result
+
+
+def test_mixed_mode_can_rewrite_network_retry_as_dependency_prefetch():
+    class Facade:
+        def get_docs_context(self, question, **kwargs):
+            return {
+                "tool": "get_docs_context",
+                "status": "not_found",
+                "answer_available": False,
+                "next_action": {
+                    "tool": "get_docs_context",
+                    "arguments_patch": {"allow_network": True},
+                },
+            }
+
+    result = cast(dict[str, Any], handle_context_tool(
+        "get_docs_context",
+        {
+            "question": "dependency API",
+            "project_path": "/repo",
+            "mode": "mixed",
+            "delivery_strategy": "bounded_direct",
+        },
+        cast(Any, Facade()),
+    ))
+
+    assert result["recommended_next_action"]["arguments_patch"] == {
+        "action": "prefetch_project_dependency_docs",
+        "project_path": "/repo",
+    }
+
+
+def test_project_preflight_recovery_precedes_dependency_prefetch():
+    class Facade:
+        def get_docs_context(self, question, **kwargs):
+            return {
+                "tool": "get_docs_context",
+                "status": "not_found",
+                "requires_confirmation": True,
+                "next_action": {
+                    "type": "ask_user_to_update_or_confirm_project_docs",
+                    "requires_confirmation": True,
+                    "confirmation_reason": "project_docs_preflight",
+                    "tool_after_confirmation": "sync_project_docs",
+                    "arguments_patch_after_confirmation": {
+                        "project_path": "/repo",
+                        "with_vectors": True,
+                    },
+                },
+                "next_actions": [{
+                    "tool": "prefetch_project_docs",
+                    "requires_confirmation": True,
+                    "reason": "Dependency docs may require network access.",
+                }],
+            }
+
+    result = cast(dict[str, Any], handle_context_tool(
+        "get_docs_context",
+        {
+            "question": "local architecture",
+            "project_path": "/repo",
+            "mode": "project",
+            "delivery_strategy": "bounded_direct",
+        },
+        cast(Any, Facade()),
+    ))
+
+    assert result["recommended_next_action"]["tool"] == "prepare_docs"
+    assert result["recommended_next_action"]["arguments_patch"] == {
+        "action": "sync_project_docs",
+        "project_path": "/repo",
+        "with_vectors": True,
+    }
 
 
 def test_get_docs_context_maps_legacy_query_status_and_cancel_actions():

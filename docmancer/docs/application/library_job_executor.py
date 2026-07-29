@@ -68,7 +68,8 @@ class LibraryJobExecutor:
         self,
         work: Callable[[], None],
         *,
-        deadline_seconds: float,
+        deadline_seconds: float | None = None,
+        deadline_at: float | None = None,
         cancelled: Callable[[], bool],
         terminalize: Callable[[str], None],
         on_capacity: Callable[[LibraryJobCapacity], None] | None = None,
@@ -79,6 +80,7 @@ class LibraryJobExecutor:
             self.submit_reserved(
                 work,
                 deadline_seconds=deadline_seconds,
+                deadline_at=deadline_at,
                 cancelled=cancelled,
                 terminalize=terminalize,
                 on_capacity=on_capacity,
@@ -95,16 +97,21 @@ class LibraryJobExecutor:
         self,
         work: Callable[[], None],
         *,
-        deadline_seconds: float,
+        deadline_seconds: float | None = None,
+        deadline_at: float | None = None,
         cancelled: Callable[[], bool],
         terminalize: Callable[[str], None],
         on_capacity: Callable[[LibraryJobCapacity], None] | None = None,
     ) -> LibraryJobCapacity:
         self._ensure_started()
+        if deadline_at is None:
+            if deadline_seconds is None:
+                raise ValueError("deadline_seconds or deadline_at is required")
+            deadline_at = time.monotonic() + deadline_seconds
         token = uuid.uuid4().hex
         with self._lock:
             self._jobs[token] = _Job(
-                deadline=time.monotonic() + deadline_seconds,
+                deadline=deadline_at,
                 cancelled=cancelled,
                 terminalize=terminalize,
                 on_capacity=on_capacity,

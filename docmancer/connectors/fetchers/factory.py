@@ -37,6 +37,7 @@ def build_fetcher(
     max_decoded_text_bytes: int = 16 * 1024 * 1024,
     progress_callback=None,
     cancellation_callback=None,
+    deadline_at: float | None = None,
     source_manifest: dict | None = None,
 ):
     """Build the fetcher shared by the CLI and registry pipeline."""
@@ -67,5 +68,6 @@ def build_fetcher(
         max_decoded_text_bytes=max_decoded_text_bytes,
         progress_callback=progress_callback,
         cancellation_callback=cancellation_callback,
+        deadline_at=deadline_at,
         source_manifest=source_manifest,
     )

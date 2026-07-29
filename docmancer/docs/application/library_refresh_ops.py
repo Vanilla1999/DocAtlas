@@ -82,6 +82,7 @@ class LibraryRefreshOps:
         *,
         force: bool,
         should_cancel: Callable[[], bool] | None = None,
+        deadline_at: float | None = None,
         begin_commit: Callable[[], bool] | None = None,
         staging_owner: dict[str, str] | None = None,
         lock_held: bool = False,
@@ -190,6 +191,7 @@ class LibraryRefreshOps:
                     path_prefixes=target.path_prefixes,
                     metadata=_metadata_for_record(record),
                     cancellation_callback=should_cancel,
+                    deadline_at=deadline_at,
                     source_manifest=manifest,
                     with_vectors=False if staging else True,
                 )
@@ -516,6 +518,7 @@ class LibraryRefreshOps:
         force: bool = True,
         continue_on_error: bool = True,
         should_cancel: Callable[[], bool] | None = None,
+        deadline_at: float | None = None,
         begin_commit: Callable[[], bool] | None = None,
         staging_owner: dict[str, str] | None = None,
     ) -> RefreshResult:
@@ -560,6 +563,7 @@ class LibraryRefreshOps:
                     force=force,
                     continue_on_error=continue_on_error,
                     should_cancel=should_cancel,
+                    deadline_at=deadline_at,
                     begin_commit=begin_commit,
                     staging_owner=staging_owner,
                 )
@@ -628,6 +632,7 @@ class LibraryRefreshOps:
                 record,
                 force=force,
                 should_cancel=should_cancel,
+                deadline_at=deadline_at,
                 begin_commit=begin_commit,
                 staging_owner=staging_owner,
             )
@@ -646,6 +651,7 @@ class LibraryRefreshOps:
         force_refresh: bool = False,
         continue_on_error: bool = True,
         should_cancel: Callable[[], bool] | None = None,
+        deadline_at: float | None = None,
         begin_commit: Callable[[], bool] | None = None,
         staging_owner: dict[str, str] | None = None,
     ) -> RefreshResult:
@@ -660,6 +666,7 @@ class LibraryRefreshOps:
             force=force_refresh,
             continue_on_error=continue_on_error,
             should_cancel=should_cancel,
+            deadline_at=deadline_at,
             begin_commit=begin_commit,
             staging_owner=staging_owner,
         )

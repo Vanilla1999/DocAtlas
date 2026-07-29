@@ -300,6 +300,16 @@ def bound_insufficient_projection(payload: dict[str, Any], *, max_tokens: int) -
     _refresh_estimate(payload)
     if estimate_projection_tokens(payload) <= limit:
         return
+    action = payload.get("recommended_next_action")
+    if isinstance(action, dict):
+        for key in (
+            "type", "reason", "confirmation_reason", "agent_question", "observations",
+            "security_scope", "decision_options",
+        ):
+            action.pop(key, None)
+            _refresh_estimate(payload)
+            if estimate_projection_tokens(payload) <= limit:
+                return
     payload.pop("recommended_next_action", None)
     payload.pop("missing", None)
     _refresh_estimate(payload)
@@ -412,9 +422,7 @@ def project_insufficient(
         payload["missing"].pop()
         _refresh_estimate(payload)
     if estimate_projection_tokens(payload) > min(INSUFFICIENT_EVIDENCE_MAX_TOKENS, max_tokens):
-        payload.pop("recommended_next_action", None)
-        payload["missing"] = ["Required source-backed evidence is unavailable within the response budget."]
-        _refresh_estimate(payload)
+        bound_insufficient_projection(payload, max_tokens=max_tokens)
     return payload
 
 
@@ -547,7 +555,7 @@ def _docs_source(
         or item.get("display_text")
     )
     if isinstance(snippet, dict):
-        snippet = snippet.get("code") or snippet.get("text")
+        snippet = snippet.get("code") or snippet.get("text") or snippet.get("content")
     snippet = str(snippet or "").strip()
     version = str(item.get("version_binding") or item.get("version") or item.get("requested_version") or "unversioned")
     if (
@@ -657,7 +665,11 @@ def _docs_retrieval_issues(retrieval: dict[str, Any]) -> list[str]:
 def _bounded_action(value: Any) -> dict[str, Any] | None:
     if not isinstance(value, dict):
         return None
-    allowed = ("tool", "type", "arguments_patch", "question", "requires_confirmation", "confirmation_reason")
+    allowed = (
+        "tool", "type", "arguments_patch", "question", "requires_confirmation",
+        "confirmation_reason", "reason", "observations", "security_scope",
+        "decision_options", "agent_question",
+    )
     result = {key: deepcopy(value[key]) for key in allowed if value.get(key) not in (None, {}, [])}
     result["auto_execute"] = False
     return result

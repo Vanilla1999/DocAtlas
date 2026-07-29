@@ -54,6 +54,25 @@ def test_identical_retry_uses_fresh_client_and_recovers_in_same_process():
     assert client_factory.call_count == 2
 
 
+def test_every_http_client_inherits_the_absolute_ingest_deadline():
+    raw_client = MagicMock()
+    deadline_at = 1234.5
+    fetcher = WebFetcher(
+        deadline_at=deadline_at,
+        fetch_policy=DocsFetchPolicy(
+            allowed_hosts=("example.com",),
+            resolver=lambda _host: (ipaddress.ip_address("93.184.216.34"),),
+        ),
+    )
+
+    with patch("docmancer.connectors.fetchers.web.httpx.Client", return_value=raw_client):
+        first = fetcher._new_client()
+        second = fetcher._new_client()
+
+    assert first._deadline_at == deadline_at
+    assert second._deadline_at == deadline_at
+
+
 HOMEPAGE_HTML = """<!DOCTYPE html>
 <html lang="en">
 <head><meta name="generator" content="Docusaurus v3.0">

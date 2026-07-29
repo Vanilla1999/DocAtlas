@@ -52,6 +52,7 @@ _LLMS_FULL_MIN_CHARS = 1000
 # triggering the nav-crawl fallback. ReadTheDocs often exposes only the
 # homepage in their sitemap; this threshold ensures a fallback attempt.
 MIN_DOC_PAGES = 5
+_DARTDOC_FALLBACK_LIBRARY_PAGES = 50
 
 
 class DiscoveryStrategy(str, Enum):
@@ -141,7 +142,7 @@ def discover_urls(
         logger.info("Discovery: %s found %d URL(s)", DiscoveryStrategy.LLMS_FULL_TXT.value, len(llms_full))
         return DiscoveryResult(urls=llms_full)
 
-    dartdoc = _try_dartdoc_index(base_url, client, max_pages)
+    dartdoc, dartdoc_diagnostics = _try_dartdoc_index_with_diagnostics(base_url, client, max_pages)
     if dartdoc:
         logger.info("Discovery: dartdoc-index found %d URL(s)", len(dartdoc))
         return DiscoveryResult(
@@ -154,6 +155,7 @@ def discover_urls(
                 "seed_pages": 0,
                 "fallback_pages": 0,
                 "locale_skipped_count": _LOCALE_SKIP_COUNTER[0],
+                **dartdoc_diagnostics,
             },
         )
 
@@ -222,10 +224,14 @@ def discover_urls(
                 "seed_pages": seed_pages,
                 "fallback_pages": len(fallback_results),
                 "locale_skipped_count": _LOCALE_SKIP_COUNTER[0],
+                **dartdoc_diagnostics,
             },
         )
 
-    dartdoc = _try_dartdoc_index(base_url, client, max_pages)
+    if not dartdoc_diagnostics:
+        dartdoc = _try_dartdoc_index(base_url, client, max_pages)
+    else:
+        dartdoc = None
     if dartdoc:
         logger.info("Discovery: dartdoc-index found %d URL(s)", len(dartdoc))
         return DiscoveryResult(
@@ -251,6 +257,7 @@ def discover_urls(
             "seed_pages": 0,
             "fallback_pages": 0,
             "locale_skipped_count": _LOCALE_SKIP_COUNTER[0],
+            **dartdoc_diagnostics,
         },
     )
 
@@ -277,18 +284,123 @@ def _compute_discovery_strategy_label(
 
 
 def _try_dartdoc_index(base_url: str, client: httpx.Client, max_pages: int = 500) -> list[DiscoveredUrl] | None:
+    links, _ = _try_dartdoc_index_with_diagnostics(base_url, client, max_pages)
+    return links
+
+
+def _try_dartdoc_index_with_diagnostics(
+    base_url: str,
+    client: httpx.Client,
+    max_pages: int = 500,
+) -> tuple[list[DiscoveredUrl] | None, dict[str, Any]]:
     try:
         resp = client.get(base_url)
     except httpx.RequestError:
-        return None
+        return None, {}
     if resp.status_code != 200 or not is_dartdoc_html(resp.text, url=base_url):
-        return None
+        return None, {}
     dartdoc_base_url = _html_base_url(resp.text, base_url) or base_url
-    links = discover_dartdoc_candidate_links(resp.text, dartdoc_base_url)
-    links.extend(_discover_dartdoc_index_json(dartdoc_base_url, client, max_pages=max_pages))
+    links = [
+        url for url in discover_dartdoc_candidate_links(resp.text, dartdoc_base_url)
+        if _is_scoped_dartdoc_url(url, dartdoc_base_url)
+    ]
+    diagnostics: dict[str, Any] = {"complete": True, "reason_code": "ok"}
+    try:
+        links.extend(_discover_dartdoc_index_json(dartdoc_base_url, client, max_pages=max_pages))
+    except DocsFetchSecurityError as exc:
+        if exc.category != "response_too_large":
+            raise
+        navigation_links = _discover_dartdoc_navigation_links(resp.text, dartdoc_base_url)
+        links, fallback_pages = _expand_dartdoc_library_links(
+            [*links, *navigation_links],
+            client,
+            dartdoc_base_url=dartdoc_base_url,
+            max_pages=max_pages,
+        )
+        diagnostics = {
+            "complete": False,
+            "reason_code": "discovery_manifest_too_large",
+            "failed_url": exc.redacted_url,
+            "retryable": False,
+            "fallback_pages": fallback_pages,
+        }
     if not links:
-        return None
-    return [DiscoveredUrl(url=url, strategy=DiscoveryStrategy.NAV_CRAWL) for url in links[:max_pages]]
+        return None, diagnostics
+    deduped = list(dict.fromkeys(normalize_url(url) for url in links))
+    return [DiscoveredUrl(url=url, strategy=DiscoveryStrategy.NAV_CRAWL) for url in deduped[:max_pages]], diagnostics
+
+
+def _discover_dartdoc_navigation_links(html: str, base_url: str) -> list[str]:
+    """Find scoped Dartdoc directory links without relying on package names."""
+    links: list[str] = []
+    for anchor in BeautifulSoup(html or "", "html.parser").find_all("a", href=True):
+        href = str(anchor.get("href") or "").strip()
+        if not href or href.startswith(("#", "javascript:", "mailto:")):
+            continue
+        resolved = urljoin(base_url, href)
+        path = urlparse(resolved).path.lower()
+        if not path.endswith("/") or any(part in path for part in ("/static-assets/", "/assets/")):
+            continue
+        url = normalize_url(resolved)
+        if _is_scoped_dartdoc_url(url, base_url):
+            links.append(url)
+    return list(dict.fromkeys(links))
+
+
+def _is_scoped_dartdoc_url(url: str, base_url: str) -> bool:
+    candidate = urlparse(url)
+    base = urlparse(base_url)
+    base_path = base.path if base.path.endswith("/") else f"{base.path}/"
+    return (
+        candidate.scheme == base.scheme
+        and candidate.netloc == base.netloc
+        and (candidate.path == base.path.rstrip("/") or candidate.path.startswith(base_path))
+    )
+
+
+def _expand_dartdoc_library_links(
+    links: list[str],
+    client: httpx.Client,
+    *,
+    dartdoc_base_url: str,
+    max_pages: int,
+) -> tuple[list[str], int]:
+    """Use bounded library-page discovery when the monolithic Dartdoc index is unavailable."""
+    scoped_links = [url for url in links if _is_scoped_dartdoc_url(url, dartdoc_base_url)]
+    discovered_entities: list[str] = []
+    library_urls = (
+        url for url in scoped_links
+        if _is_dartdoc_library_landing_url(url, dartdoc_base_url)
+    )
+    for library_index, library_url in enumerate(library_urls):
+        if library_index >= _DARTDOC_FALLBACK_LIBRARY_PAGES:
+            break
+        try:
+            response = client.get(library_url)
+        except httpx.RequestError:
+            continue
+        except DocsFetchSecurityError as exc:
+            if exc.category == "response_too_large":
+                continue
+            raise
+        if response.status_code != 200:
+            continue
+        discovered_entities.extend(
+            url for url in discover_dartdoc_candidate_links(response.text, library_url)
+            if _is_scoped_dartdoc_url(url, dartdoc_base_url)
+        )
+        if len(discovered_entities) >= max_pages:
+            break
+    expanded = list(dict.fromkeys([*discovered_entities, *scoped_links]))[:max_pages]
+    return expanded, len(set(discovered_entities))
+
+
+def _is_dartdoc_library_landing_url(url: str, base_url: str) -> bool:
+    path = urlparse(url).path.rstrip("/")
+    leaf = path.rsplit("/", 1)[-1].lower()
+    return normalize_url(url) != normalize_url(base_url) and (
+        leaf.endswith("-library.html") or "." not in leaf
+    )
 
 
 def _html_base_url(html: str, page_url: str) -> str | None:
@@ -327,6 +439,8 @@ def _discover_dartdoc_index_json(base_url: str, client: httpx.Client, max_pages:
         if not any(token in lowered for token in ("-class.html", "-library.html", "-mixin.html", "-enum.html", "-extension.html", "-typedef.html", "-function.html")):
             return
         url = normalize_url(urljoin(base_url, href))
+        if not _is_scoped_dartdoc_url(url, base_url):
+            return
         if url in seen:
             return
         seen.add(url)

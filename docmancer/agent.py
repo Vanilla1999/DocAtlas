@@ -575,6 +575,7 @@ class DocmancerAgent:
         path_prefixes: list[str] | None = None,
         progress_callback: Callable[[dict[str, Any]], None] | None = None,
         cancellation_callback: Callable[[], bool] | None = None,
+        deadline_at: float | None = None,
         source_manifest: dict[str, Any] | None = None,
     ):
         if fetcher is not None:
@@ -607,6 +608,7 @@ class DocmancerAgent:
             ),
             progress_callback=progress_callback,
             cancellation_callback=cancellation_callback,
+            deadline_at=deadline_at,
             source_manifest=source_manifest,
         )
 
@@ -630,6 +632,7 @@ class DocmancerAgent:
         metadata: dict[str, Any] | None = None,
         progress_callback: Callable[[dict[str, Any]], None] | None = None,
         cancellation_callback: Callable[[], bool] | None = None,
+        deadline_at: float | None = None,
         with_vectors: bool = True,
         source_manifest: dict[str, Any] | None = None,
     ) -> int:
@@ -646,6 +649,7 @@ class DocmancerAgent:
             path_prefixes=path_prefixes,
             progress_callback=progress_callback,
             cancellation_callback=cancellation_callback,
+            deadline_at=deadline_at,
             source_manifest=source_manifest,
         )
         documents = f.fetch(url)

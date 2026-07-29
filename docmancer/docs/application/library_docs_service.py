@@ -122,6 +122,9 @@ class LibraryDocsApplicationService:
                     prefetch=self.refresh_ops.prefetch_docs,
                     timeout_seconds=self._library_job_timeout_seconds,
                     executor=lambda: self.job_executor,
+                    prefetch_targets=lambda *args, **kwargs: self.facade.docs_prefetch.prefetch_docs_targets_sync(
+                        *args, **kwargs
+                    ),
                 )
             )
         return self._ingest_orchestrator
@@ -609,6 +612,7 @@ class LibraryDocsApplicationService:
             pages_extracted=0,
             chunks_created=0,
         )
+        inspection_action = self._inspection_recovery_action(info)
         return DocsResult(
             library_id=info.library_id,
             library=latest.library,
@@ -634,8 +638,52 @@ class LibraryDocsApplicationService:
             identity=self._docs_identity(info, docs_url_source=docs_url_source),
             policy=self._docs_policy("error", has_registered_source=True),
             diagnostics={**diagnostics_with_dart, "reason_code": "empty_index", "warnings": diagnostic_warnings},
-            next_actions=["Call refresh_library_docs to ingest this library's docs."],
+            next_actions=(
+                [inspection_action]
+                if inspection_action
+                else ["Call refresh_library_docs to ingest this library's docs."]
+            ),
         )
+
+    def _inspection_recovery_action(self, info: LibraryInfo) -> dict[str, Any] | None:
+        record = self._record_from_info(info)
+        if record is None:
+            return None
+        spec = dict(record.target_spec or {})
+        docs_url = spec.get("docs_url") or record.docs_url
+        seed_urls = list(spec.get("seed_urls") or [])[:5]
+        if not docs_url and not seed_urls:
+            return None
+        return {
+            "tool": "prepare_docs",
+            "type": "prepare_docs",
+            "arguments_patch": {
+                "action": "prefetch_library_docs",
+                "library": spec.get("library") or info.library,
+                "ecosystem": spec.get("ecosystem") or info.ecosystem,
+                "version": spec.get("version") or info.version,
+            },
+            "reason": "The registered source produced no usable indexed evidence.",
+            "observations": {
+                "source_status": record.status,
+                "last_error": (record.last_error or "")[:300],
+                "indexed_pages": info.pages,
+                "indexed_chunks": info.chunks,
+            },
+            "security_scope": {
+                "scope_expansion_allowed": False,
+                "registered_source_only": True,
+            },
+            "decision_options": [
+                {"id": "retry_registered_source", "requires_confirmation": True},
+                {"id": "stop_with_partial_results", "requires_confirmation": False},
+            ],
+            "agent_question": (
+                "Retry preparation of the registered documentation source without expanding its scope?"
+            ),
+            "requires_confirmation": True,
+            "confirmation_reason": "Retrying documentation preparation performs network requests and writes the index.",
+        }
 
     def _with_dart_diagnostics(
         self,
@@ -760,7 +808,24 @@ class LibraryDocsApplicationService:
         force_refresh: bool = False,
         continue_on_error: bool = True,
         async_: bool = False,
-    ) -> RefreshResult | DocsJobStartResult:
+    ) -> RefreshResult | DocsTargetsPrefetchResult | DocsJobStartResult:
+        flutter_targets = self._flutter_targets_for_request(
+            library,
+            ecosystem,
+            versions,
+            docs_url,
+            docs_url_template,
+        )
+        if flutter_targets:
+            return self.ingest_orchestrator.prefetch_docs(
+                library,
+                ecosystem="flutter",
+                versions=versions,
+                force_refresh=force_refresh,
+                continue_on_error=continue_on_error,
+                async_=async_,
+                target_plan=flutter_targets,
+            )
         return self.ingest_orchestrator.prefetch_docs(
             library,
             ecosystem=ecosystem,
@@ -772,6 +837,57 @@ class LibraryDocsApplicationService:
             continue_on_error=continue_on_error,
             async_=async_,
         )
+
+    @staticmethod
+    def _flutter_targets_for_request(
+        library: str,
+        ecosystem: str | None,
+        versions: list[str] | None,
+        docs_url: str | None,
+        docs_url_template: str | None,
+    ) -> list[DocsTarget] | None:
+        if docs_url_template is not None:
+            return None
+        normalized_library = re.sub(r"[\s_-]+", " ", library.strip().casefold())
+        normalized_ecosystem = (ecosystem or "flutter").strip().casefold()
+        if normalized_ecosystem not in {"dart", "flutter"}:
+            return None
+        targets = LibraryDocsApplicationService._flutter_source_targets(versions)
+        if docs_url is None:
+            return targets if normalized_library == "flutter" else None
+        host = (urlparse(docs_url).hostname or "").rstrip(".").casefold()
+        if host == "docs.flutter.dev" and normalized_library in {"flutter", "flutter guides"}:
+            return targets[:1]
+        if host == "api.flutter.dev" and normalized_library in {"flutter", "flutter api"}:
+            return targets[1:]
+        return None
+
+    @staticmethod
+    def _flutter_source_targets(versions: list[str] | None) -> list[DocsTarget]:
+        version = versions[0] if versions else "latest"
+        return [
+            DocsTarget(
+                library="Flutter",
+                ecosystem="flutter",
+                version=version,
+                source_type="guides",
+                docs_url="https://docs.flutter.dev/",
+                allowed_domains=["docs.flutter.dev"],
+                path_prefixes=["/"],
+                max_pages=40,
+            ),
+            DocsTarget(
+                library="Flutter",
+                ecosystem="flutter",
+                version=version,
+                source_type="api",
+                docs_url="https://api.flutter.dev/index.html",
+                allowed_domains=["api.flutter.dev"],
+                path_prefixes=["/"],
+                max_pages=40,
+                doc_format="dartdoc",
+            ),
+        ]
 
     def _library_job_timeout_seconds(self) -> float:
         return float(getattr(self.config.web_fetch, "library_job_timeout_seconds", 120.0))
@@ -1323,9 +1439,17 @@ class LibraryDocsApplicationService:
                 chunks_created=0,
             )
             status = "empty_library_index" if dropped > 0 else "no_results"
+            record = self._record_from_info(latest)
+            inspection_action = (
+                self._inspection_recovery_action(latest)
+                if dropped > 0
+                or (record is not None and (record.last_error or "").startswith("partial ingestion:"))
+                else None
+            )
             next_actions = (
                 ["Qualify at least one requested symbol with backticks or a dotted, underscored, or colon-qualified name."]
                 if has_unqualified_explicit_query_list
+                else [inspection_action] if inspection_action
                 else ["Call refresh_library_docs to ingest this library's docs."] if dropped > 0
                 else ["Narrow or rephrase the topic, or inspect_library_docs to verify indexed coverage before refreshing."]
             )

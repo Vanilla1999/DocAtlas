@@ -279,6 +279,18 @@ class DocsManifestValidationResult:
 
 
 @dataclass(frozen=True)
+class DocsTargetInspectionResult:
+    status: str
+    reason_code: str
+    target: dict[str, Any]
+    observations: dict[str, Any] = field(default_factory=dict)
+    pages: list[dict[str, Any]] = field(default_factory=list)
+    decision_options: list[dict[str, Any]] = field(default_factory=list)
+    agent_question: str | None = None
+    warnings: list[str] = field(default_factory=list)
+
+
+@dataclass(frozen=True)
 class DocsInspectResult:
     canonical_id: str
     status: str

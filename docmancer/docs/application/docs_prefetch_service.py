@@ -91,6 +91,14 @@ class DocsPrefetchService:
 
         return _callback
 
+    def _job_cancelled(self, job_id: str | None) -> bool:
+        if not job_id:
+            return False
+        current = self.jobs.get(job_id)
+        return self.jobs.cancellation_requested(job_id) or bool(
+            current and current.status in {"failed", "cancelled", "interrupted"}
+        )
+
     def prefetch_docs_targets(
         self,
         targets: list[dict[str, Any] | DocsTarget],
@@ -139,6 +147,7 @@ class DocsPrefetchService:
         force_refresh: bool = False,
         continue_on_error: bool = True,
         job_id: str | None = None,
+        deadline_at: float | None = None,
     ) -> DocsTargetsPrefetchResult:
         started = time.monotonic()
         results: list[DocsTargetResult] = []
@@ -147,6 +156,7 @@ class DocsPrefetchService:
         warnings: list[str] = []
         aborted = False
         pages_indexed_total = 0
+        chunks_indexed_total = 0
         pages_failed_total = 0
         targets_completed = 0
         targets_failed = 0
@@ -161,7 +171,7 @@ class DocsPrefetchService:
             )
 
         for index, raw_target in enumerate(raw_targets, start=1):
-            if self.jobs.cancellation_requested(job_id):
+            if self._job_cancelled(job_id):
                 aborted = True
                 if job_id:
                     self.jobs.append_warning(job_id, "Docs prefetch job cancelled before the next target started.")
@@ -203,12 +213,18 @@ class DocsPrefetchService:
                 continue
             seen.add(canonical_id)
 
-            target = self.deps._discover_pub_dartdoc_target(target, warnings, job_id=job_id, canonical_id=canonical_id)
             try:
+                target = self.deps._discover_pub_dartdoc_target(target, warnings, job_id=job_id, canonical_id=canonical_id)
                 target = self.deps._resolve_github_directory_target(target)
                 urls, error = self.deps._target_urls(target)
             except Exception as exc:
                 urls, error = [], str(exc)
+            if self._job_cancelled(job_id):
+                aborted = True
+                if job_id:
+                    self.jobs.append_warning(job_id, "Docs prefetch job cancelled during target discovery.")
+                    self.jobs.update(job_id, status="cancelled", phase="done", message="Docs prefetch job cancelled.")
+                break
             if error:
                 targets_failed += 1
                 result = DocsTargetResult(
@@ -256,19 +272,31 @@ class DocsPrefetchService:
             )
 
             with self.deps._lock_for(record.library_id):
+                if self._job_cancelled(job_id):
+                    if existing is not None:
+                        self.registry.restore(existing)
+                    else:
+                        self.registry.delete(record.library_id)
+                    aborted = True
+                    if job_id:
+                        self.jobs.append_warning(job_id, "Docs prefetch job cancelled while waiting for the target lock.")
+                        self.jobs.update(job_id, status="cancelled", phase="done", message="Docs prefetch job cancelled.")
+                    break
                 record = self.registry.get(record.library_id, source_type=record.source_type) or record
                 if not force_refresh and not self.deps._is_stale(record.last_refreshed_at):
                     targets_completed += 1
+                    retained_partial = (record.last_error or "").startswith("partial ingestion:")
                     results.append(
                         result := DocsTargetResult(
                             canonical_id=record.library_id,
-                            status="skipped",
+                            status="partial" if retained_partial else "skipped",
                             library=record.name,
                             ecosystem=record.ecosystem,
                             version=record.version,
                             source_type=record.source_type,
                             docs_url=record.docs_url,
                             warnings=list(target.warnings),
+                            message=record.last_error if retained_partial else None,
                         )
                     )
                     target_summaries.append(self.deps._target_result_summary(result))
@@ -282,6 +310,9 @@ class DocsPrefetchService:
                     continue
                 try:
                     pages_indexed = 0
+                    chunks_indexed = 0
+                    partial_reasons: list[str] = []
+                    empty_seeds = 0
                     per_url_max_pages = target.max_pages if target.doc_format == "dartdoc" else (1 if target.seed_urls and not target.docs_url and not target.docs_url_template else target.max_pages)
                     if job_id:
                         self.jobs.update(
@@ -306,11 +337,15 @@ class DocsPrefetchService:
                         refreshed = self.deps._refresh_record_unlocked(record, force=True, lock_held=True)
                         if refreshed.status not in {"updated", "ok"}:
                             raise RuntimeError(refreshed.message or "manifest refresh failed")
+                        pages_indexed = refreshed.pages_indexed
+                        chunks_indexed = refreshed.chunks_indexed
+                        pages_indexed_total += refreshed.pages_indexed
+                        chunks_indexed_total += refreshed.chunks_indexed
                         operation_urls: list[str] = []
                     else:
                         operation_urls = urls
                     for url_index, url in enumerate(operation_urls, start=1):
-                        if self.jobs.cancellation_requested(job_id):
+                        if self._job_cancelled(job_id):
                             aborted = True
                             raise KeyboardInterrupt("Docs prefetch job cancelled.")
                         add_kwargs: dict[str, Any] = {
@@ -330,31 +365,84 @@ class DocsPrefetchService:
                         if progress_callback:
                             add_kwargs["progress_callback"] = progress_callback
                             progress_callback({"phase": "fetching", "message": f"Fetching seed URL {url_index}/{len(urls)}", "url": url, "total_pages": len(urls)})
-                        pages = self.deps._agent_instance(record).add(
+                        if job_id:
+                            add_kwargs["cancellation_callback"] = lambda: self._job_cancelled(job_id)
+                        if deadline_at is not None:
+                            add_kwargs["deadline_at"] = deadline_at
+                        agent = self.deps._agent_instance(record)
+                        try:
+                            agent.last_fetch_failure = None
+                            agent.last_discovery_diagnostics = {}
+                        except AttributeError:
+                            pass
+                        pages = agent.add(
                             url,
                             recreate=False,
                             **add_kwargs,
                         )
-                        if isinstance(pages, int):
-                            pages_indexed += pages
-                            pages_indexed_total += pages
+                        if self._job_cancelled(job_id):
+                            aborted = True
+                            raise KeyboardInterrupt("Docs prefetch job cancelled.")
+                        fetch_failure = getattr(agent, "last_fetch_failure", None)
+                        diagnostics = dict(getattr(agent, "last_discovery_diagnostics", {}) or {})
+                        page_ledger = [page for page in diagnostics.get("page_ledger") or [] if isinstance(page, dict)]
+                        usable_pages = sum(page.get("outcome") == "usable" for page in page_ledger)
+                        page_failures = int(diagnostics.get("page_failure_count") or 0)
+                        if not page_failures:
+                            page_failures = sum(page.get("outcome") in {"failed", "skipped"} for page in page_ledger)
+                        indexed_chunks = pages if isinstance(pages, int) else 0
+                        indexed_pages = usable_pages if page_ledger else indexed_chunks
+                        pages_indexed += indexed_pages
+                        chunks_indexed += indexed_chunks
+                        pages_indexed_total += indexed_pages
+                        chunks_indexed_total += indexed_chunks
+                        pages_failed_total += page_failures
+                        if isinstance(pages, int) and pages <= 0:
+                            empty_seeds += 1
+                        reason_code = diagnostics.get("reason_code")
+                        if fetch_failure is not None:
+                            partial_reasons.append(str(getattr(fetch_failure, "category", None) or fetch_failure))
+                        if diagnostics.get("complete") is False and reason_code:
+                            partial_reasons.append(str(reason_code))
+                        if page_failures:
+                            partial_reasons.append("page_failures")
                         if job_id:
                             self.jobs.update(
                                 job_id,
                                 phase="indexing",
                                 completed_pages=pages_indexed_total,
-                                completed_chunks=pages_indexed_total,
-                                total_chunks=max(self.jobs.get(job_id).total_chunks if self.jobs.get(job_id) else 0, pages_indexed_total),
+                                failed_pages=pages_failed_total,
+                                completed_chunks=chunks_indexed_total,
+                                total_chunks=max(self.jobs.get(job_id).total_chunks if self.jobs.get(job_id) else 0, chunks_indexed_total),
                                 message=f"Indexed {url_index}/{len(urls)} seed URLs.",
                             )
                             self.jobs.append_event(job_id, {"phase": "indexing", "message": f"Indexed seed URL {url_index}/{len(urls)}", "url": url})
+                    if pages_indexed <= 0:
+                        raise RuntimeError("empty_index: target produced no indexable documentation")
+                    if empty_seeds:
+                        partial_reasons.append("empty_seed")
                 except KeyboardInterrupt:
+                    if existing is not None:
+                        self.registry.restore(existing)
+                    else:
+                        self.registry.delete(record.library_id)
+                    aborted = True
                     if job_id:
                         self.jobs.append_warning(job_id, "Docs prefetch job cancelled before the current target was marked ready.")
                         self.jobs.update(job_id, status="cancelled", phase="done", message="Docs prefetch job cancelled.")
                     break
                 except Exception as exc:
                     record = self.registry.get(record.library_id, source_type=record.source_type) or record
+                    if self._job_cancelled(job_id):
+                        if existing is not None:
+                            self.registry.restore(existing)
+                        else:
+                            self.registry.delete(record.library_id)
+                        aborted = True
+                        if job_id:
+                            self.jobs.append_warning(job_id, "Docs prefetch job cancelled during the current target.")
+                            self.jobs.update(job_id, status="cancelled", phase="done", message="Docs prefetch job cancelled.")
+                        break
                     targets_failed += 1
                     pages_failed_total += 1
                     if existing is not None and existing.status == "available":
@@ -408,6 +496,9 @@ class DocsPrefetchService:
                     continue
 
                 targets_completed += 1
+                partial_message = None
+                if partial_reasons:
+                    partial_message = f"partial ingestion: {', '.join(dict.fromkeys(partial_reasons))}"
                 refreshed_at = self.deps._now()
                 record = self.registry.get(record.library_id, source_type=record.source_type) or record
                 record = self.registry.upsert(
@@ -420,13 +511,13 @@ class DocsPrefetchService:
                     now=refreshed_at,
                     status="available",
                     last_refreshed_at=refreshed_at,
-                    last_error="",
+                    last_error=partial_message or "",
                     target_spec=record.target_spec,
                 )
                 results.append(
                     result := DocsTargetResult(
                         canonical_id=record.library_id,
-                        status="ready",
+                        status="partial" if partial_message else "ready",
                         library=record.name,
                         ecosystem=record.ecosystem,
                         version=record.version,
@@ -434,6 +525,7 @@ class DocsPrefetchService:
                         docs_url=record.docs_url,
                         pages_indexed=pages_indexed,
                         warnings=list(target.warnings),
+                        message=partial_message,
                     )
                 )
                 target_summaries.append(self.deps._target_result_summary(result))
@@ -447,14 +539,17 @@ class DocsPrefetchService:
                     self.jobs.append_event(job_id, {"phase": "indexing", "message": f"Target {index}/{len(raw_targets)} finished", "target": record.library_id})
 
         failed = sum(1 for result in results if result.status == "failed")
+        partial = any(result.status == "partial" for result in results)
         if aborted:
             status = "aborted"
         elif failed:
-            status = "partial" if any(result.status in {"ready", "skipped"} for result in results) else "failed"
+            status = "partial" if any(result.status in {"ready", "partial", "skipped"} for result in results) else "failed"
+        elif partial:
+            status = "partial"
         else:
             status = "ok"
         duration_ms = int((time.monotonic() - started) * 1000)
-        if job_id and not self.jobs.cancellation_requested(job_id):
+        if job_id and not self._job_cancelled(job_id):
             job_status = "succeeded" if status == "ok" else ("partial" if status in {"partial", "aborted"} else "failed")
             self.jobs.update(
                 job_id,
@@ -464,8 +559,8 @@ class DocsPrefetchService:
                 failed_targets=targets_failed,
                 completed_pages=pages_indexed_total,
                 failed_pages=pages_failed_total,
-                completed_chunks=pages_indexed_total,
-                total_chunks=max(self.jobs.get(job_id).total_chunks if self.jobs.get(job_id) else 0, pages_indexed_total),
+                completed_chunks=chunks_indexed_total,
+                total_chunks=max(self.jobs.get(job_id).total_chunks if self.jobs.get(job_id) else 0, chunks_indexed_total),
                 target_results=target_summaries,
                 message="Docs prefetch job finished.",
             )
@@ -474,9 +569,9 @@ class DocsPrefetchService:
             results=results,
             warnings=warnings,
             duration_ms=duration_ms,
-            pages_indexed=pages_indexed_total,
-            pages_failed=pages_failed_total,
-            chunks_indexed=pages_indexed_total,
+                pages_indexed=pages_indexed_total,
+                pages_failed=pages_failed_total,
+                chunks_indexed=chunks_indexed_total,
             targets_completed=targets_completed,
             targets_failed=targets_failed,
         )

@@ -5,7 +5,7 @@ import re
 from pathlib import Path
 from typing import Any
 
-from docmancer.docs.project import EXCLUDED_DIR_NAMES
+from docmancer.docs.domain.source_boundary import SourceBoundary, iter_bounded_source_files
 
 SOURCE_FILE_LANGUAGES = {
     ".py": "python",
@@ -20,7 +20,6 @@ SOURCE_FILE_LANGUAGES = {
     ".kt": "kotlin",
     ".swift": "swift",
 }
-MAX_SOURCE_FILE_BYTES = 256_000
 _DEFAULT_MAX_FILES = 8
 _DEFAULT_TOKEN_BUDGET = 900
 _DEFAULT_SOURCE_EVIDENCE_MAX_ITEMS = 12
@@ -95,6 +94,8 @@ def build_project_repo_map(
     question: str = "",
     max_files: int = _DEFAULT_MAX_FILES,
     token_budget: int = _DEFAULT_TOKEN_BUDGET,
+    source_boundary: SourceBoundary | None = None,
+    include_generated: bool | None = None,
 ) -> list[dict[str, Any]]:
     """Build a deterministic, compact source-file map for project context.
 
@@ -108,6 +109,8 @@ def build_project_repo_map(
         question=question,
         max_files=max_files,
         token_budget=token_budget,
+        source_boundary=source_boundary,
+        include_generated=include_generated,
     )
 
 
@@ -118,6 +121,8 @@ def collect_project_source_facts(
     max_files: int = 24,
     token_budget: int = 4000,
     include_unmatched: bool = False,
+    source_boundary: SourceBoundary | None = None,
+    include_generated: bool | None = None,
 ) -> list[dict[str, Any]]:
     """Collect deterministic source facts for repo_map and future graph layers.
 
@@ -136,6 +141,11 @@ def collect_project_source_facts(
         max_files=max_files,
         token_budget=token_budget,
         include_unmatched=include_unmatched,
+        source_boundary=source_boundary,
+        include_generated=(
+            _question_requests_generated_artifacts(question)
+            if include_generated is None else include_generated
+        ),
     )
 
 
@@ -146,10 +156,12 @@ def _select_project_source_facts(
     max_files: int,
     token_budget: int,
     include_unmatched: bool = False,
+    source_boundary: SourceBoundary | None = None,
+    include_generated: bool = False,
 ) -> list[dict[str, Any]]:
     query_terms = _query_terms(question)
     candidates: list[dict[str, Any]] = []
-    for path in _iter_source_files(root):
+    for path in _iter_source_files(root, source_boundary=source_boundary, include_generated=include_generated):
         item = _map_source_file(root, path)
         if item is None:
             continue
@@ -179,6 +191,8 @@ def build_project_source_evidence(
     requirements: list[str] | None = None,
     max_items: int = _DEFAULT_SOURCE_EVIDENCE_MAX_ITEMS,
     token_budget: int = _DEFAULT_SOURCE_EVIDENCE_TOKEN_BUDGET,
+    source_boundary: SourceBoundary | None = None,
+    include_generated: bool | None = None,
 ) -> list[dict[str, Any]]:
     """Return concrete source snippets and explicit absent facts for requirement terms.
 
@@ -198,7 +212,15 @@ def build_project_source_evidence(
     term_keys = {term: _normalize(term) for term in terms}
     matches: list[dict[str, Any]] = []
     match_counts: dict[str, int] = {}
-    for path in _iter_source_files(root):
+    include_generated_files = (
+        _question_requests_generated_artifacts(question)
+        if include_generated is None else include_generated
+    )
+    for path in _iter_source_files(
+        root,
+        source_boundary=source_boundary,
+        include_generated=include_generated_files,
+    ):
         try:
             text = path.read_text(encoding="utf-8", errors="replace")
         except OSError:
@@ -404,29 +426,27 @@ def _dedupe_normalized_terms(terms: Any) -> list[str]:
     return deduped
 
 
-def _iter_source_files(root: Path) -> list[Path]:
-    paths: list[Path] = []
-    for path in root.rglob("*"):
-        if not path.is_file() or path.is_symlink():
-            continue
-        try:
-            relative = path.relative_to(root)
-        except ValueError:
-            continue
-        parts = relative.parts
-        if any(part in EXCLUDED_DIR_NAMES for part in parts):
-            continue
-        if _is_generated_path(relative.as_posix()):
-            continue
-        if path.suffix.lower() not in SOURCE_FILE_LANGUAGES:
-            continue
-        try:
-            if path.stat().st_size > MAX_SOURCE_FILE_BYTES:
-                continue
-        except OSError:
-            continue
-        paths.append(path)
-    return sorted(paths, key=lambda item: item.relative_to(root).as_posix().lower())
+def _iter_source_files(
+    root: Path,
+    *,
+    source_boundary: SourceBoundary | None = None,
+    include_generated: bool = False,
+) -> list[Path]:
+    boundary = source_boundary or SourceBoundary.from_project(root)
+    return list(iter_bounded_source_files(
+        root,
+        boundary=boundary,
+        supported_extensions=frozenset(SOURCE_FILE_LANGUAGES),
+        include_generated=include_generated,
+    ))
+
+
+def _question_requests_generated_artifacts(question: str) -> bool:
+    normalized = _normalize(question)
+    return any(phrase in normalized for phrase in (
+        "generated artifact", "generated code", "generated file", "generated source",
+        "сгенерированн артефакт", "сгенерированн код", "сгенерированн файл",
+    ))
 
 
 def _map_source_file(root: Path, path: Path) -> dict[str, Any] | None:

@@ -143,6 +143,22 @@ def normalize_public_docs_action(action: Any) -> dict[str, Any] | None:
     if not isinstance(action, dict):
         return None
     normalized = dict(action)
+    confirmed = normalized.get("after_confirmation")
+    confirmed_tool = normalized.get("tool_after_confirmation")
+    confirmed_arguments = normalized.get("arguments_patch_after_confirmation")
+    if isinstance(confirmed, dict):
+        confirmed_tool = confirmed.get("tool") or confirmed_tool
+        confirmed_arguments = confirmed.get("arguments_patch") or confirmed_arguments
+    prepare_action = _PREPARE_ACTION_BY_TOOL.get(str(confirmed_tool or "").strip())
+    if prepare_action:
+        arguments = dict(confirmed_arguments or {})
+        arguments["action"] = prepare_action
+        return {
+            **normalized,
+            "type": "prepare_docs",
+            "tool": "prepare_docs",
+            "arguments_patch": arguments,
+        }
     tool = str(normalized.get("tool") or "").strip()
     if not tool or tool in PUBLIC_DOCS_TOOLS:
         return normalized

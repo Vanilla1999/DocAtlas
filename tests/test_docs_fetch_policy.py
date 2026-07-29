@@ -100,6 +100,19 @@ def test_allowed_domain_includes_its_subdomains_but_not_suffix_confusion():
         policy.validate_url("https://example.com.evil.test/guide")
 
 
+def test_policy_can_require_exact_hosts_for_bounded_inspection():
+    policy = DocsFetchPolicy(
+        resolver=_resolver(str(PUBLIC)),
+        allowed_hosts=("example.com",),
+        allow_subdomains=False,
+    )
+
+    assert policy.allows_scope("https://example.com/docs") is True
+    assert policy.allows_scope("https://docs.example.com/docs") is False
+    with pytest.raises(DocsFetchSecurityError, match="host_not_allowed"):
+        policy.validate_url("https://docs.example.com/docs")
+
+
 def test_policy_rejects_invalid_port_without_resolving():
     called = False
 

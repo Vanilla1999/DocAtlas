@@ -270,6 +270,31 @@ def test_injected_clock_enforces_total_request_budget_before_dispatch():
     transport.get.assert_not_called()
 
 
+def test_shared_deadline_applies_across_multiple_get_calls():
+    ticks = iter([0.0, 0.0, 0.0, 11.0, 11.0])
+    response = httpx.Response(
+        200,
+        headers={"content-type": "text/plain"},
+        content=b"ok",
+        request=httpx.Request("GET", "https://example.com/docs"),
+    )
+    transport = MagicMock()
+    transport.get.return_value = response
+    policy = DocsFetchPolicy(resolver=lambda _host: (__import__("ipaddress").ip_address(PUBLIC),))
+    client = DocsHttpClient(
+        transport,
+        policy,
+        clock=lambda: next(ticks),
+        deadline_at=10.0,
+    )
+
+    assert client.get("https://example.com/docs").status_code == 200
+    with pytest.raises(DocsFetchSecurityError, match="request_timeout"):
+        client.get("https://example.com/docs/next")
+
+    assert transport.get.call_count == 1
+
+
 def test_injected_transfer_counter_enforces_budget():
     raw_client = httpx.Client(
         transport=httpx.MockTransport(

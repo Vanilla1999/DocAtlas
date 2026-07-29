@@ -743,7 +743,14 @@ def test_empty_library_index_returns_controlled_error(tmp_path, monkeypatch):
     assert result.status == "empty_library_index"
     assert result.decision == "stop"
     assert result.diagnostics["reason_code"] == "empty_index"
-    assert result.next_actions == ["Call refresh_library_docs to ingest this library's docs."]
+    action = result.next_actions[0]
+    assert action["arguments_patch"] == {
+        "action": "prefetch_library_docs",
+        "library": "click",
+        "ecosystem": "python",
+        "version": "8.1.7",
+    }
+    assert action["security_scope"]["scope_expansion_allowed"] is False
     assert result.results == []
     assert agent.query_calls == []
 

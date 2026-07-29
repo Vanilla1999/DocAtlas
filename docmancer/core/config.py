@@ -52,6 +52,25 @@ class DocsJobsConfig(BaseSettings):
     model_config = SettingsConfigDict(env_prefix="DOCMANCER_DOCS_JOBS_", extra="ignore")
 
 
+class ProjectSourceBoundaryConfig(BaseModel):
+    source_roots: list[str] = Field(default_factory=list)
+    documentation_roots: list[str] = Field(default_factory=list)
+    exclude_paths: list[str] = Field(default_factory=list)
+    generated_paths: list[str] = Field(default_factory=list)
+    include_extensions: list[str] = Field(default_factory=list)
+    respect_gitignore: bool = True
+    max_scanned_files: int = Field(default=5000, ge=1)
+    max_scanned_bytes: int = Field(default=32 * 1024 * 1024, ge=1)
+    max_file_bytes: int = Field(default=256_000, ge=1)
+    scan_deadline_seconds: float = Field(default=5.0, gt=0)
+    max_directory_depth: int = Field(default=20, ge=1)
+
+
+class ProjectConfig(ProjectSourceBoundaryConfig):
+    def source_boundary(self) -> ProjectSourceBoundaryConfig:
+        return ProjectSourceBoundaryConfig.model_validate(self.model_dump())
+
+
 class LoaderFormatConfig(BaseModel):
     chunk_size: int | None = Field(default=None, ge=100)
     chunk_overlap: int | None = Field(default=None, ge=0)
@@ -154,6 +173,7 @@ class DocmancerConfig(BaseModel):
     query: QueryConfig = Field(default_factory=QueryConfig)
     web_fetch: WebFetchConfig = Field(default_factory=WebFetchConfig)
     docs_jobs: DocsJobsConfig = Field(default_factory=DocsJobsConfig)
+    project: ProjectConfig = Field(default_factory=ProjectConfig)
     loaders: LoadersConfig = Field(default_factory=LoadersConfig)
     vector_store: VectorStoreConfig = Field(default_factory=VectorStoreConfig)
     embeddings: EmbeddingsConfig = Field(default_factory=EmbeddingsConfig)

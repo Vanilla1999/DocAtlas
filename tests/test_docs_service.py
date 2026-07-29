@@ -9,6 +9,7 @@ import os
 from pathlib import Path
 from threading import Event, Thread
 import time
+from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
 import httpx
@@ -1628,6 +1629,46 @@ def test_query_project_docs_filters_by_project_path_and_source_class(tmp_path, m
     assert all(chunk.metadata["project_docs"] is True for chunk in chunks)
     assert any("alpha migration" in chunk.text for chunk in chunks)
     assert not any("beta migration" in chunk.text for chunk in chunks)
+
+
+def test_query_project_docs_skips_oversized_first_authoritative_page(tmp_path):
+    project = tmp_path / "app"
+    project.mkdir()
+
+    class Agent:
+        config = SimpleNamespace(query=SimpleNamespace(default_limit=5))
+
+        def query(self, query, *, limit, budget, expand, filters):
+            assert filters["project_path"] == str(project.resolve())
+            if filters.get("project_doc_authority") == "source_of_truth":
+                return [
+                    RetrievedChunk(
+                        source="large-runbook.md",
+                        chunk_index=0,
+                        text="large authoritative page",
+                        score=1.0,
+                        metadata={"token_estimate": 900},
+                    ),
+                    RetrievedChunk(
+                        source="docs/PATROL_TESTING.md",
+                        chunk_index=0,
+                        text="start_patrol_develop is READY after PASS or FAIL.",
+                        score=0.9,
+                        metadata={"token_estimate": 100},
+                    ),
+                ]
+            return []
+
+    class Facade:
+        def _agent_instance(self):
+            return Agent()
+
+    chunks = ProjectDocsService(Facade()).query_project_docs(
+        str(project), "When is start_patrol_develop READY?", tokens=800, limit=5,
+    )
+
+    assert [chunk.source for chunk in chunks] == ["docs/PATROL_TESTING.md"]
+    assert sum(chunk.metadata["token_estimate"] for chunk in chunks) <= 800
 
 
 def test_project_query_does_not_return_non_project_docs_with_same_terms(tmp_path, monkeypatch):
@@ -3324,7 +3365,9 @@ def test_post_retrieval_guard_empty_result_returns_controlled_error(tmp_path, mo
 
     assert result.status == "empty_library_index"
     assert result.decision == "stop"
-    assert result.next_actions == ["Call refresh_library_docs to ingest this library's docs."]
+    action = result.next_actions[0]
+    assert action["arguments_patch"]["action"] == "prefetch_library_docs"
+    assert action["security_scope"]["scope_expansion_allowed"] is False
 
 
 def test_diagnostic_on_filtered_chunks(tmp_path, monkeypatch):
@@ -3386,6 +3429,28 @@ def test_prefetch_project_docs_prefetches_only_selected_packages(tmp_path, monke
     assert result.detected_ecosystems == ["flutter", "pub"]
     assert result.resolution_summary["dependencies_seen"] >= 2
     assert result.resolution_summary["exact_versions"] >= 2
+
+
+def test_prefetch_project_docs_counts_partial_target_as_completed(tmp_path, monkeypatch):
+    class PartialAgent(FakeAgent):
+        def add(self, docs_url: str, recreate: bool = False, **kwargs) -> int:
+            pages = super().add(docs_url, recreate=recreate, **kwargs)
+            self.last_discovery_diagnostics = {"complete": False, "reason_code": "page_budget_exhausted"}
+            return pages
+
+    project = _flutter_project(tmp_path)
+    service = _service(tmp_path, monkeypatch, PartialAgent())
+    monkeypatch.setattr(service, "_discover_pub_dartdoc_target", lambda target, warnings, job_id=None, canonical_id=None: target)
+
+    result = service.prefetch_project_docs(
+        str(project),
+        include_flutter=False,
+        include_packages=["go_router"],
+    )
+
+    assert result.results[0].status == "partial"
+    assert result.results[0].targets_completed == 1
+    assert result.results[0].targets_failed == 0
 
 
 def test_prefetch_project_docs_prefetches_rust_docs_rs(tmp_path, monkeypatch):
@@ -3644,6 +3709,15 @@ def test_dartdoc_zero_chunk_refresh_fails_safely_without_unrelated_docs(tmp_path
     assert refresh.status == "empty_index"
     assert result.status == "empty_library_index"
     assert result.results == []
+    action = result.next_actions[0]
+    assert action["arguments_patch"] == {
+        "action": "prefetch_library_docs",
+        "library": "flutter_bloc",
+        "ecosystem": "pub",
+        "version": "9.1.1",
+    }
+    assert action["security_scope"]["scope_expansion_allowed"] is False
+    assert action["requires_confirmation"] is True
 
 
 def test_force_refresh_is_per_version(tmp_path, monkeypatch):
@@ -5338,6 +5412,87 @@ def test_cancel_docs_job_cancels_between_targets(tmp_path, monkeypatch):
     assert agent.add_calls == ["https://example.com/one/"]
 
 
+def test_cancel_docs_job_during_fetch_finishes_cancelled_and_removes_new_record(tmp_path, monkeypatch):
+    class CooperativeAgent(FakeAgent):
+        def __init__(self):
+            super().__init__()
+            self.entered = Event()
+
+        def add(self, docs_url: str, recreate: bool = False, **kwargs) -> int:
+            self.add_calls.append(docs_url)
+            self.add_kwargs.append(kwargs)
+            self.entered.set()
+            cancellation_callback = kwargs["cancellation_callback"]
+            for _ in range(100):
+                if cancellation_callback():
+                    raise RuntimeError("Documentation ingestion cancelled before indexing.")
+                time.sleep(0.01)
+            return 1
+
+    agent = CooperativeAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+    started = service.prefetch_docs_targets(
+        [{
+            "library": "cancelled-guides",
+            "ecosystem": "web",
+            "docs_url": "https://example.com/docs/",
+            "allowed_domains": ["example.com"],
+        }],
+        async_=True,
+    )
+    assert agent.entered.wait(timeout=1)
+
+    service.cancel_docs_job(started.job_id)
+    for _ in range(100):
+        status = service.get_docs_job_status(started.job_id)
+        if status and status.status == "cancelled":
+            break
+        time.sleep(0.01)
+
+    status = service.get_docs_job_status(started.job_id)
+    assert status is not None
+    assert status.status == "cancelled"
+    assert status.phase == "done"
+    assert service.registry.get("cancelled-guides", ecosystem="web", source_type="api") is None
+
+
+def test_cancel_docs_job_during_discovery_finishes_cancelled(tmp_path, monkeypatch):
+    entered = Event()
+    release = Event()
+    service = _service(tmp_path, monkeypatch)
+
+    def discover(target, warnings, job_id=None, canonical_id=None):
+        entered.set()
+        release.wait(timeout=1)
+        raise RuntimeError("discovery cancelled")
+
+    monkeypatch.setattr(service, "_discover_pub_dartdoc_target", discover)
+    started = service.prefetch_docs_targets(
+        [{
+            "library": "cancelled-discovery",
+            "ecosystem": "pub",
+            "version": "1.0.0",
+            "docs_url": "https://pub.dev/documentation/cancelled-discovery/1.0.0/",
+            "allowed_domains": ["pub.dev"],
+        }],
+        async_=True,
+    )
+    assert entered.wait(timeout=1)
+
+    service.cancel_docs_job(started.job_id)
+    release.set()
+    for _ in range(100):
+        status = service.get_docs_job_status(started.job_id)
+        if status and status.status == "cancelled":
+            break
+        time.sleep(0.01)
+
+    status = service.get_docs_job_status(started.job_id)
+    assert status is not None
+    assert status.status == "cancelled"
+    assert status.phase == "done"
+
+
 def test_cancel_docs_job_before_first_target_starts(tmp_path, monkeypatch):
     agent = FakeAgent()
     service = _service(tmp_path, monkeypatch, agent)
@@ -5459,6 +5614,191 @@ def test_prefetch_docs_targets_invalid_without_url_seed_or_template(tmp_path, mo
 
     assert result.status == "failed"
     assert result.results[0].message == "target must provide docs_url, docs_url_template, or seed_urls"
+
+
+def test_prefetch_docs_targets_rejects_empty_index(tmp_path, monkeypatch):
+    service = _service(tmp_path, monkeypatch, ZeroPageAgent())
+
+    result = service.prefetch_docs_targets([
+        {
+            "library": "empty-guides",
+            "docs_url": "https://example.com/docs/",
+            "allowed_domains": ["example.com"],
+        }
+    ])
+
+    assert result.status == "failed"
+    assert result.results[0].status == "failed"
+    assert result.results[0].message == "empty_index: target produced no indexable documentation"
+
+
+def test_prefetch_docs_targets_reports_degraded_discovery_as_partial(tmp_path, monkeypatch):
+    class PartialAgent(FakeAgent):
+        def add(self, docs_url: str, recreate: bool = False, **kwargs) -> int:
+            pages = super().add(docs_url, recreate=recreate, **kwargs)
+            self.last_fetch_failure = None
+            self.last_discovery_diagnostics = {
+                "complete": False,
+                "reason_code": "discovery_manifest_too_large",
+            }
+            return pages
+
+    service = _service(tmp_path, monkeypatch, PartialAgent())
+
+    result = service.prefetch_docs_targets([
+        {
+            "library": "flutter-api",
+            "ecosystem": "flutter",
+            "version": "stable",
+            "docs_url": "https://api.flutter.dev/",
+            "allowed_domains": ["api.flutter.dev"],
+            "doc_format": "dartdoc",
+        }
+    ])
+
+    assert result.status == "partial"
+    assert result.results[0].status == "partial"
+    assert result.results[0].pages_indexed == 1
+    assert result.results[0].message == "partial ingestion: discovery_manifest_too_large"
+
+
+def test_prefetch_docs_targets_uses_page_ledger_for_partial_and_counters(tmp_path, monkeypatch):
+    class LedgerAgent(FakeAgent):
+        def add(self, docs_url: str, recreate: bool = False, **kwargs) -> int:
+            super().add(docs_url, recreate=recreate, **kwargs)
+            self.last_fetch_failure = None
+            self.last_discovery_diagnostics = {
+                "complete": True,
+                "reason_code": "ok",
+                "page_failure_count": 1,
+                "page_ledger": [
+                    {"outcome": "usable"},
+                    {"outcome": "usable"},
+                    {"outcome": "failed", "reason_code": "http_failure"},
+                ],
+            }
+            return 4
+
+    service = _service(tmp_path, monkeypatch, LedgerAgent())
+
+    result = service.prefetch_docs_targets([
+        {
+            "library": "partial-guides",
+            "docs_url": "https://example.com/docs/",
+            "allowed_domains": ["example.com"],
+        }
+    ])
+
+    assert result.status == "partial"
+    assert result.results[0].status == "partial"
+    assert result.pages_indexed == 2
+    assert result.pages_failed == 1
+    assert result.chunks_indexed == 4
+
+
+def test_prefetch_docs_targets_reports_zero_seed_as_partial(tmp_path, monkeypatch):
+    class MixedSeedAgent(FakeAgent):
+        def add(self, docs_url: str, recreate: bool = False, **kwargs) -> int:
+            self.add_calls.append(docs_url)
+            self.add_kwargs.append(kwargs)
+            return 0 if docs_url.endswith("empty") else 1
+
+    service = _service(tmp_path, monkeypatch, MixedSeedAgent())
+
+    result = service.prefetch_docs_targets([
+        {
+            "library": "mixed-guides",
+            "seed_urls": ["https://example.com/docs/empty", "https://example.com/docs/ready"],
+            "allowed_domains": ["example.com"],
+            "path_prefixes": ["/docs/"],
+        }
+    ])
+
+    assert result.status == "partial"
+    assert result.results[0].status == "partial"
+    assert result.results[0].message == "partial ingestion: empty_seed"
+
+
+def test_fresh_partial_target_remains_partial_without_refetch(tmp_path, monkeypatch):
+    class PartialAgent(FakeAgent):
+        def add(self, docs_url: str, recreate: bool = False, **kwargs) -> int:
+            pages = super().add(docs_url, recreate=recreate, **kwargs)
+            self.last_discovery_diagnostics = {"complete": False, "reason_code": "page_budget_exhausted"}
+            return pages
+
+    agent = PartialAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+    target = {
+        "library": "partial-guides",
+        "docs_url": "https://example.com/docs/",
+        "allowed_domains": ["example.com"],
+    }
+
+    first = service.prefetch_docs_targets([target])
+    second = service.prefetch_docs_targets([target])
+
+    assert first.status == "partial"
+    assert second.status == "partial"
+    assert second.results[0].status == "partial"
+    assert len(agent.add_calls) == 1
+
+
+def test_prefetch_docs_targets_resets_diagnostics_between_targets(tmp_path, monkeypatch):
+    class ChangingAgent(FakeAgent):
+        def add(self, docs_url: str, recreate: bool = False, **kwargs) -> int:
+            pages = super().add(docs_url, recreate=recreate, **kwargs)
+            if "partial" in docs_url:
+                self.last_discovery_diagnostics = {"complete": False, "reason_code": "page_budget_exhausted"}
+            return pages
+
+    service = _service(tmp_path, monkeypatch, ChangingAgent())
+
+    result = service.prefetch_docs_targets([
+        {
+            "library": "partial-guides",
+            "docs_url": "https://example.com/partial/",
+            "allowed_domains": ["example.com"],
+        },
+        {
+            "library": "ready-guides",
+            "docs_url": "https://example.com/ready/",
+            "allowed_domains": ["example.com"],
+        },
+    ])
+
+    assert result.status == "partial"
+    assert [item.status for item in result.results] == ["partial", "ready"]
+
+
+def test_pub_discovery_failure_does_not_abort_later_target(tmp_path, monkeypatch):
+    agent = FakeAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+
+    def discover(target, warnings, job_id=None, canonical_id=None):
+        if target.library == "broken":
+            raise RuntimeError("discovery failed")
+        return target
+
+    monkeypatch.setattr(service, "_discover_pub_dartdoc_target", discover)
+
+    result = service.prefetch_docs_targets([
+        {
+            "library": "broken",
+            "ecosystem": "pub",
+            "version": "1.0.0",
+            "docs_url": "https://pub.dev/documentation/broken/1.0.0/",
+            "allowed_domains": ["pub.dev"],
+        },
+        {
+            "library": "working",
+            "docs_url": "https://example.com/docs/",
+            "allowed_domains": ["example.com"],
+        },
+    ])
+
+    assert result.status == "partial"
+    assert [item.status for item in result.results] == ["failed", "ready"]
+    assert agent.add_calls == ["https://example.com/docs/"]
 
 
 def test_prefetch_docs_targets_requires_allowed_domains_for_remote(tmp_path, monkeypatch):

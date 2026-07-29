@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import asdict
+from pathlib import PurePosixPath
 from typing import Any
 from urllib.parse import urlparse
 
@@ -27,6 +28,7 @@ _PREPARE_ACTION_FIELDS = {
     "prefetch_project_dependency_docs": {"action", "project_path", "include_flutter", "include_dart", "include_rust", "include_packages", "force_refresh", "continue_on_error", "async"},
     "prefetch_library_docs": {"action", "library", "ecosystem", "version", "source_type", "docs_url", "docs_url_template", "force_refresh", "continue_on_error", "async"},
     "prefetch_docs_targets": {"action", "targets", "force_refresh", "continue_on_error", "async"},
+    "inspect_docs_target": {"action", "target", "max_pages"},
     "validate_docs_manifest": {"action", "manifest_path", "project_path", "targets"},
     "prefetch_docs_manifest": {"action", "manifest_path", "project_path", "targets", "force_refresh", "continue_on_error", "async"},
     "refresh_library_docs": {"action", "library", "ecosystem", "version", "source_type", "docs_url", "force"},
@@ -39,6 +41,7 @@ _PREPARE_REQUIRED_FIELDS = {
     "prefetch_project_dependency_docs": {"project_path"},
     "prefetch_library_docs": {"library"},
     "prefetch_docs_targets": {"targets"},
+    "inspect_docs_target": {"target"},
     "validate_docs_manifest": {"manifest_path"},
     "prefetch_docs_manifest": {"manifest_path"},
     "refresh_library_docs": {"library"},
@@ -144,6 +147,17 @@ def validate_prepare_docs_arguments(args: dict[str, Any]) -> dict[str, Any] | No
                 return _prepare_validation_error(action, f"targets[{index}].max_pages must be an integer")
             if isinstance(max_pages, int) and max_pages <= 0:
                 return _prepare_validation_error(action, f"targets[{index}].max_pages must be positive")
+    if action == "inspect_docs_target":
+        target = args.get("target")
+        if not isinstance(target, dict):
+            return _prepare_validation_error(action, "target must be an object")
+        if not target.get("library"):
+            return _prepare_validation_error(action, "target.library is required")
+        max_pages = args.get("max_pages")
+        if max_pages is not None and (
+            isinstance(max_pages, bool) or not isinstance(max_pages, int) or not 1 <= max_pages <= 5
+        ):
+            return _prepare_validation_error(action, "max_pages must be an integer between 1 and 5")
     return None
 
 
@@ -175,6 +189,30 @@ def _infer_allowed_domains(target: dict[str, Any]) -> list[str]:
         if parsed.scheme in {"http", "https"} and parsed.hostname and parsed.hostname not in domains:
             domains.append(parsed.hostname)
     return domains
+
+
+def _bounded_inspection_target(value: Any) -> dict[str, Any]:
+    if not isinstance(value, dict):
+        return {}
+    target = dict(value)
+    if not target.get("allowed_domains"):
+        target["allowed_domains"] = _infer_allowed_domains(target)
+    if not target.get("path_prefixes"):
+        prefixes: list[str] = []
+        urls = [target.get("docs_url"), *(target.get("seed_urls") or [])]
+        for raw_url in urls:
+            parsed = urlparse(str(raw_url or ""))
+            if parsed.scheme not in {"http", "https"} or not parsed.hostname:
+                continue
+            path = parsed.path or "/"
+            parent = str(PurePosixPath(path).parent)
+            prefix = path if path.endswith("/") else (parent.rstrip("/") + "/" or "/")
+            if prefix not in prefixes:
+                prefixes.append(prefix)
+        if prefixes:
+            target["path_prefixes"] = prefixes[:5]
+    target["max_pages"] = max(1, min(5, int(target.get("max_pages") or 3)))
+    return target
 
 
 def prefetch_tools(tools: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -253,6 +291,9 @@ def handle_prefetch_tool(name: str, args: dict[str, Any], service: LibraryDocsSe
             payload = asdict(docs_manifest_app.prefetch_docs_manifest(args["manifest_path"], project_path=args.get("project_path"), targets=args.get("targets"), force_refresh=bool(args.get("force_refresh") or False), continue_on_error=bool(args.get("continue_on_error") if args.get("continue_on_error") is not None else True), async_=True))
         elif action == "prefetch_docs_targets":
             payload = asdict(docs_prefetch_app.prefetch_docs_targets(_bounded_targets(args.get("targets")), force_refresh=bool(args.get("force_refresh") or False), continue_on_error=bool(args.get("continue_on_error") if args.get("continue_on_error") is not None else True), async_=True))
+        elif action == "inspect_docs_target":
+            target = _bounded_inspection_target(args["target"])
+            payload = asdict(service.inspect_docs_target(target, max_pages=int(args.get("max_pages") or 3)))
         elif action == "sync_project_docs":
             payload = _compact_project_sync(project_docs_app.sync_project_docs(
                 args["project_path"],
@@ -286,7 +327,7 @@ def handle_prefetch_tool(name: str, args: dict[str, Any], service: LibraryDocsSe
                 }
             payload = asdict(service.cancel_docs_job(job_id))
         else:
-            return {"status": "error", "reason_code": "unknown_prepare_action", "message": f"unknown prepare_docs action: {action}", "supported_actions": ["sync_project_docs", "prefetch_project_dependency_docs", "prefetch_library_docs", "prefetch_docs_targets", "validate_docs_manifest", "prefetch_docs_manifest", "refresh_library_docs", "prune_library_docs", "remove_library_docs", "cancel_docs_job"]}
+            return {"status": "error", "reason_code": "unknown_prepare_action", "message": f"unknown prepare_docs action: {action}", "supported_actions": ["sync_project_docs", "prefetch_project_dependency_docs", "prefetch_library_docs", "prefetch_docs_targets", "inspect_docs_target", "validate_docs_manifest", "prefetch_docs_manifest", "refresh_library_docs", "prune_library_docs", "remove_library_docs", "cancel_docs_job"]}
         if isinstance(payload, dict):
             payload.setdefault("action", action)
             payload.setdefault("tool", "prepare_docs")

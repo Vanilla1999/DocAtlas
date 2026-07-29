@@ -8,7 +8,7 @@ import time
 from typing import Any, Callable
 
 from docmancer.docs.fetch_policy import redact_url
-from docmancer.docs.models import DocsJobStartResult, RefreshResult
+from docmancer.docs.models import DocsJobStartResult, DocsTarget, DocsTargetsPrefetchResult, RefreshResult
 from docmancer.docs.application.library_ingest_ports import LibraryIngestPorts
 
 
@@ -41,8 +41,17 @@ class LibraryIngestOrchestrator:
         force_refresh: bool = False,
         continue_on_error: bool = True,
         async_: bool = False,
-    ) -> RefreshResult | DocsJobStartResult:
+        target_plan: list[DocsTarget] | None = None,
+    ) -> RefreshResult | DocsTargetsPrefetchResult | DocsJobStartResult:
+        if target_plan and self.ports.prefetch_targets is None:
+            raise RuntimeError("target prefetch port is not configured")
         if not async_:
+            if target_plan:
+                return self.ports.prefetch_targets(
+                    target_plan,
+                    force_refresh=force_refresh,
+                    continue_on_error=continue_on_error,
+                )
             return self.ports.prefetch(
                 library,
                 ecosystem=ecosystem,
@@ -92,6 +101,7 @@ class LibraryIngestOrchestrator:
             executor.release_reservation()
             raise
         deadline_seconds = self.ports.timeout_seconds()
+        monotonic_deadline = self._monotonic() + deadline_seconds
         deadline_at = self._utc_now() + timedelta(seconds=deadline_seconds)
         self.jobs.update(
             job.job_id,
@@ -148,9 +158,10 @@ class LibraryIngestOrchestrator:
                     source_type,
                     force_refresh,
                     continue_on_error,
-                    deadline_seconds,
+                    monotonic_deadline,
+                    target_plan,
                 ),
-                deadline_seconds=deadline_seconds,
+                deadline_at=monotonic_deadline,
                 cancelled=lambda: self.jobs.cancellation_requested(job.job_id),
                 terminalize=terminalize,
                 on_capacity=update_capacity,
@@ -179,14 +190,32 @@ class LibraryIngestOrchestrator:
         source_type: str | None,
         force_refresh: bool,
         continue_on_error: bool,
-        deadline_seconds: float,
+        deadline: float,
+        target_plan: list[DocsTarget] | None,
     ) -> None:
         initial = self.jobs.get(job_id)
         generation_id = initial.generation_id if initial else None
-        deadline = self._monotonic() + deadline_seconds
         if not self.jobs.generation_active(job_id, generation_id):
             return
-        self.jobs.update(job_id, status="running", phase="resolving", queue_position=None, message="Started library docs prefetch job.")
+        if self._monotonic() >= deadline:
+            return
+        self.jobs.update(
+            job_id,
+            status="running",
+            phase="resolving",
+            queue_position=None,
+            total_targets=max(len(versions or []), 1),
+            current_target=library,
+            current_url=docs_url,
+            message="Started library docs prefetch job.",
+        )
+        if hasattr(self.jobs, "append_event"):
+            self.jobs.append_event(job_id, {
+                "phase": "resolving",
+                "message": "Resolving registered library documentation source.",
+                "target": library,
+                **({"url": docs_url} if docs_url else {}),
+            })
 
         def cancelled() -> bool:
             return (
@@ -202,6 +231,15 @@ class LibraryIngestOrchestrator:
             return not cancelled()
 
         try:
+            if target_plan:
+                self.ports.prefetch_targets(
+                    target_plan,
+                    force_refresh=force_refresh,
+                    continue_on_error=continue_on_error,
+                    job_id=job_id,
+                    deadline_at=deadline,
+                )
+                return
             result = self.ports.prefetch(
                 library,
                 ecosystem=ecosystem,
@@ -212,6 +250,7 @@ class LibraryIngestOrchestrator:
                 force_refresh=force_refresh,
                 continue_on_error=continue_on_error,
                 should_cancel=cancelled,
+                deadline_at=deadline,
                 begin_commit=begin_commit,
                 staging_owner={"job_id": job_id, "generation_id": generation_id or ""},
             )

@@ -359,6 +359,7 @@ def test_missing_dependency_docs_returns_prefetch_guidance_without_network_fetch
     assert result.dependency_docs["network_fetch_required"] is True
     assert result.dependency_docs["missing"] == 1
     assert result.dependency_docs["recommended_prefetch"][0]["library"] == "riverpod"
+    assert result.dependency_docs["next_action"]["arguments_patch"]["include_flutter"] is False
     assert result.dependency_docs["agent_instruction"] == "Ask the user before prefetching dependency docs. The user can approve prefetching all dependencies or only the recommended top-N."
     assert facade.prefetched_dependency_docs is False
 

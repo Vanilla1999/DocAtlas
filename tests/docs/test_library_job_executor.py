@@ -96,3 +96,28 @@ def test_watchdog_retries_after_terminal_callback_failure() -> None:
     assert terminal.wait(timeout=0.2)
     assert attempts >= 2
     release.set()
+
+
+def test_queued_work_does_not_receive_a_fresh_execution_deadline() -> None:
+    release = Event()
+    terminal = Event()
+    queued_entered = Event()
+    executor = LibraryJobExecutor(max_workers=1, max_queued=1, poll_seconds=0.005)
+
+    assert executor.submit(
+        lambda: release.wait(timeout=1),
+        deadline_seconds=1,
+        cancelled=lambda: False,
+        terminalize=lambda _: None,
+    )
+    assert executor.submit(
+        queued_entered.set,
+        deadline_at=time.monotonic() + 0.02,
+        cancelled=lambda: False,
+        terminalize=lambda _reason: terminal.set(),
+    )
+
+    assert terminal.wait(timeout=0.2)
+    release.set()
+    time.sleep(0.02)
+    assert not queued_entered.is_set()

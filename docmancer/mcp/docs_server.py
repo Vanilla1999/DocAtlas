@@ -124,6 +124,8 @@ PUBLIC_GET_DOCS_CONTEXT_OUTPUT_SCHEMA: dict[str, Any] = {
         "kind": {"enum": ["docs_answer", "patch_context"]},
         "estimated_tokens": {"type": "integer"},
         "reason_code": {"type": "string"},
+        "missing": {"type": "array", "items": {"type": "string"}, "maxItems": 5},
+        "recommended_next_action": {"type": "object"},
     },
 }
 
@@ -209,13 +211,15 @@ Agent workflow:
         "inputSchema": {
             "type": "object",
             "properties": {
-                "action": {"type": "string", "enum": ["sync_project_docs", "prefetch_project_dependency_docs", "prefetch_library_docs", "prefetch_docs_targets", "validate_docs_manifest", "prefetch_docs_manifest", "refresh_library_docs", "prune_library_docs", "remove_library_docs", "cancel_docs_job"]},
+                "action": {"type": "string", "enum": ["sync_project_docs", "prefetch_project_dependency_docs", "prefetch_library_docs", "prefetch_docs_targets", "inspect_docs_target", "validate_docs_manifest", "prefetch_docs_manifest", "refresh_library_docs", "prune_library_docs", "remove_library_docs", "cancel_docs_job"]},
                 "project_path": {"type": ["string", "null"]},
                 "library": {"type": ["string", "null"]},
                 "canonical_id": {"type": ["string", "null"]},
                 "manifest_path": {"type": ["string", "null"]},
                 "job_id": {"type": ["string", "null"]},
                 "targets": {"type": ["array", "null"], "items": DOCS_TARGET_INPUT_SCHEMA},
+                "target": {**DOCS_TARGET_INPUT_SCHEMA, "type": ["object", "null"]},
+                "max_pages": {"type": ["integer", "null"], "minimum": 1, "maximum": 5},
                 "ecosystem": {"type": ["string", "null"]},
                 "version": {"type": ["string", "null"]},
                 "source_type": {"type": ["string", "null"]},
@@ -247,6 +251,13 @@ Agent workflow:
                 "dry_run": {"type": ["boolean", "null"], "default": True},
             },
             "required": ["action"],
+            "allOf": [{
+                "if": {"properties": {"action": {"const": "inspect_docs_target"}}},
+                "then": {
+                    "required": ["target"],
+                    "properties": {"target": {**DOCS_TARGET_INPUT_SCHEMA, "type": "object"}},
+                },
+            }],
         },
     },
     {
@@ -809,7 +820,7 @@ PUBLIC_ADVERTISED_INPUT_SCHEMAS: dict[str, dict[str, Any]] = {
                 "type": "string",
                 "enum": [
                     "sync_project_docs", "prefetch_project_dependency_docs",
-                    "prefetch_library_docs", "prefetch_docs_targets",
+                    "prefetch_library_docs",
                     "validate_docs_manifest", "prefetch_docs_manifest",
                     "refresh_library_docs", "prune_library_docs",
                     "remove_library_docs", "cancel_docs_job",

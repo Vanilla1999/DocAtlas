@@ -9,7 +9,7 @@ from urllib.parse import urljoin, urlsplit, urlunsplit
 
 import httpx
 
-from docmancer.docs.fetch_policy import DocsFetchPolicy, DocsFetchSecurityError, ValidatedDocsTarget
+from docmancer.docs.fetch_policy import DocsFetchPolicy, DocsFetchSecurityError, ValidatedDocsTarget, redact_url
 
 _REDIRECT_STATUSES = {301, 302, 303, 307, 308}
 _HTTPX_CLIENT_TYPE = httpx.Client
@@ -38,6 +38,7 @@ class DocsHttpClient:
         max_decoded_text_bytes: int = 16 * 1024 * 1024,
         clock: Callable[[], float] = monotonic,
         max_total_seconds: float | None = None,
+        deadline_at: float | None = None,
         transfer_counter: Callable[[httpx.Response], int] | None = None,
     ) -> None:
         self._client = client
@@ -47,6 +48,7 @@ class DocsHttpClient:
         self._max_decoded_text_bytes = max_decoded_text_bytes
         self._clock = clock
         self._max_total_seconds = max_total_seconds
+        self._deadline_at = deadline_at
         self._transfer_counter = transfer_counter or (lambda response: response.num_bytes_downloaded)
 
     def __enter__(self):
@@ -59,13 +61,19 @@ class DocsHttpClient:
         current = str(url)
         started_at = self._clock()
         for redirects in range(self._max_redirects + 1):
+            deadline = self._deadline_at
+            if deadline is None and self._max_total_seconds is not None:
+                deadline = started_at + self._max_total_seconds
+            if deadline is not None and self._clock() >= deadline:
+                raise DocsFetchSecurityError("request_timeout", redact_url(current))
             first = self._policy.validate_url(current)
             second = self._policy.validate_url(current)
             self._validate_stable_resolution(first, second)
-            if self._max_total_seconds is not None and self._clock() - started_at > self._max_total_seconds:
-                raise DocsFetchSecurityError("request_timeout", first.redacted_url)
+            request_kwargs = dict(kwargs)
+            if deadline is not None:
+                request_kwargs.setdefault("timeout", max(0.001, deadline - self._clock()))
             try:
-                response = self._request_once(current, first, **kwargs)
+                response = self._request_once(current, first, **request_kwargs)
             except httpx.RequestError as exc:
                 raise DocsFetchSecurityError(
                     _network_failure_category(exc),

@@ -10,3 +10,25 @@ web_fetch:
   workers: 8
   default_page_cap: 500
   browser_fallback: false
+project:
+  source_roots:
+    - docmancer
+    - eval
+    - tests
+  documentation_roots:
+    - docs
+  generated_paths:
+    - eval/task_level/results/**
+    - eval/task_level/hidden_tests/**
+    - "**/generated/**"
+  exclude_paths:
+    - .docmancer/**
+    - "**/__pycache__/**"
+    - "**/uv-cache/**"
+  include_extensions:
+    - .py
+  max_scanned_files: 5000
+  max_scanned_bytes: 33554432
+  max_file_bytes: 256000
+  scan_deadline_seconds: 5
+  max_directory_depth: 20

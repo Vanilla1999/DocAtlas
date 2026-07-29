@@ -56,6 +56,65 @@ def test_post_format_sufficiency_fails_closed_when_exact_symbol_is_dropped():
     assert packet["omitted_counts"]["mandatory_requirements"] == 1
 
 
+def test_selected_document_terms_survive_action_packet_formatting():
+    text = (
+        "NativeVoiceCapturePlugin.kt receives PCM samples from the SDK and "
+        "forwards them to the native capture pipeline."
+    )
+    item = {
+        "stable_chunk_id": "native-voice-capture",
+        "parent_logical_id": "parent:native-voice-capture",
+        "source": "docs/native-audio.md",
+        "display_text": text,
+        "display_content_hash": hashlib.sha256(text.encode("utf-8")).hexdigest(),
+        "authority": "official",
+    }
+
+    packet = build_action_packet(
+        question="Update NativeVoiceCapturePlugin.kt for SDK PCM capture",
+        context_pack=[item],
+        max_tokens=1500,
+    )
+
+    assert packet["status"] == "ok"
+    assert packet["implementation_guidance"] == [{
+        "text": text,
+        "evidence_ids": [packet["source_of_truth"][0]["evidence_id"]],
+    }]
+    assert validate_action_packet(packet, evidence_items=[item], max_tokens=1500) == []
+
+
+def test_selected_exact_terms_keep_protected_witness_during_budget_fitting():
+    text = (
+        "Required: MCP ingestion must preserve fetch/index checkpoints. "
+        "Supporting implementation details may be omitted from a bounded packet."
+    )
+    item = {
+        "stable_chunk_id": "resumable-ingestion",
+        "parent_logical_id": "parent:resumable-ingestion",
+        "source": "docs/resumable-ingestion.md",
+        "display_text": text,
+        "display_content_hash": hashlib.sha256(text.encode("utf-8")).hexdigest(),
+        "authority": "canonical",
+    }
+
+    packet = build_action_packet(
+        question="Implement `MCP` resumable `fetch/index` ingestion",
+        context_pack=[item],
+        max_tokens=750,
+    )
+
+    visible = json.dumps(packet, ensure_ascii=False).casefold()
+    assert "mcp" in visible
+    assert "fetch/index" in visible
+    assert packet["omitted_counts"].get("mandatory_requirements", 0) == 0
+    assert not any(
+        "Mandatory selected evidence was not preserved" in message
+        for message in packet["missing_evidence"]
+    )
+    assert validate_action_packet(packet, evidence_items=[item], max_tokens=750) == []
+
+
 def test_post_format_sufficiency_accepts_camel_case_symbol_in_snake_case_source_path():
     text = "Build bounded patch context from selected project evidence."
     item = {

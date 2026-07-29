@@ -3,16 +3,19 @@ from __future__ import annotations
 from contextlib import contextmanager
 from dataclasses import replace
 import httpx
+from bs4 import BeautifulSoup
 from collections.abc import Callable
+from pathlib import PurePosixPath
+from time import monotonic
 from typing import Any, ContextManager, Protocol
-from urllib.parse import urlparse
+from urllib.parse import urljoin, urlparse
 
 from docmancer.docs.domain.target_security import host_allowed, is_remote_url, path_allowed, url_security_error
-from docmancer.docs.models import DocsTarget
+from docmancer.docs.models import DocsTarget, DocsTargetInspectionResult
 from docmancer.docs.registry import LibraryRecord
 from docmancer.docs.resolver import normalize_version
 from docmancer.docs.dartdoc import discover_pub_dartdoc_seed_urls, is_pub_dartdoc_target, normalize_pub_dartdoc_target, pub_dartdoc_root_url
-from docmancer.docs.fetch_policy import DocsFetchPolicy, DocsFetchSecurityError
+from docmancer.docs.fetch_policy import DocsFetchPolicy, DocsFetchSecurityError, redact_url
 from docmancer.docs.fetch_transport import DocsHttpClient
 from docmancer.docs.github_source_manifest import (
     GitHubApiClient,
@@ -173,6 +176,179 @@ class DocsTargetService:
         urls, _ = self.target_urls(target)
         return urls or ([record.docs_url] if record.docs_url else [])
 
+    def inspect_docs_target(
+        self, value: dict[str, Any] | DocsTarget, *, max_pages: int = 3
+    ) -> DocsTargetInspectionResult:
+        """Inspect explicit landing pages without discovery, indexing, or scope expansion."""
+
+        target = self.target_from_dict(value)
+        bounded_pages = max(1, min(5, int(max_pages)))
+        if target.browser:
+            return self._inspection_error(target, "browser_not_supported")
+        if target.source_manifest:
+            return self._inspection_error(target, "source_manifest_not_supported")
+        urls, error = self.target_urls(target)
+        if error:
+            return self._inspection_error(target, "invalid_target", error)
+        explicit_urls = list(dict.fromkeys(urls))[:bounded_pages]
+        if any(not is_remote_url(url) for url in explicit_urls):
+            return self._inspection_error(target, "remote_url_required")
+
+        exact_hosts = tuple(dict.fromkeys(
+            str(urlparse(url).hostname or "").rstrip(".").lower()
+            for url in explicit_urls
+            if urlparse(url).hostname
+        ))
+        if len(exact_hosts) != 1:
+            return self._inspection_error(target, "multiple_hosts_not_supported")
+        path_prefixes = tuple(target.path_prefixes) or _inspection_path_prefixes(explicit_urls)
+        effective_target = replace(
+            target,
+            allowed_domains=list(exact_hosts),
+            path_prefixes=list(path_prefixes),
+        )
+
+        policy = DocsFetchPolicy(
+            allowed_hosts=exact_hosts,
+            path_prefixes=path_prefixes,
+            allow_subdomains=False,
+        )
+        raw_client = httpx.Client(
+            timeout=15.0,
+            follow_redirects=False,
+            headers={"User-Agent": "docmancer/1.0"},
+            trust_env=False,
+        )
+        pages: list[dict[str, Any]] = []
+        warnings: list[str] = []
+        with DocsHttpClient(
+            raw_client,
+            policy,
+            max_redirects=3,
+            max_response_bytes=512 * 1024,
+            max_decoded_text_bytes=1024 * 1024,
+            deadline_at=monotonic() + 10.0,
+        ) as client:
+            for url in explicit_urls:
+                try:
+                    response = client.get(url)
+                    pages.append(self._inspect_response(url, response, policy))
+                except DocsFetchSecurityError as exc:
+                    pages.append({
+                        "requested_url": redact_url(url),
+                        "status": "rejected",
+                        "reason_code": exc.category,
+                    })
+                    warnings.append(exc.category)
+
+        successful = [page for page in pages if page.get("status") == "ok"]
+        candidates = sum(len(page.get("link_candidates") or []) for page in successful)
+        outside_scope = sum(
+            1
+            for page in successful
+            for candidate in page.get("link_candidates") or []
+            if not candidate.get("within_scope")
+        )
+        reason_code = "docs_layout_observed" if successful else "inspection_failed"
+        return DocsTargetInspectionResult(
+            status="ok" if len(successful) == len(pages) else "partial" if successful else "failed",
+            reason_code=reason_code,
+            target=self._inspection_target(effective_target, bounded_pages),
+            observations={
+                "pages_requested": len(explicit_urls),
+                "pages_inspected": len(successful),
+                "link_candidates": candidates,
+                "outside_scope_candidates": outside_scope,
+                "content_trust": "untrusted_navigation_metadata",
+                "instruction_trust": "untrusted_data",
+                "navigation_metadata_is_actionable": False,
+                "scope_expanded": False,
+                "indexed": False,
+            },
+            pages=pages,
+            decision_options=[
+                {"id": "prefetch_within_scope_candidates", "requires_confirmation": True},
+                {"id": "request_scope_expansion", "requires_confirmation": True},
+                {"id": "stop_with_partial_results", "requires_confirmation": False},
+            ],
+            agent_question=(
+                "Review the bounded navigation metadata and choose whether to prefetch only "
+                "within-scope candidates, request explicit scope expansion, or stop."
+            ),
+            warnings=sorted(set(warnings)),
+        )
+
+    @staticmethod
+    def _inspect_response(url: str, response: Any, policy: DocsFetchPolicy) -> dict[str, Any]:
+        final_url = str(getattr(response, "url", None) or url)
+        content_type = str(getattr(response, "headers", {}).get("content-type", "")).split(";", 1)[0]
+        status_code = int(getattr(response, "status_code", 0) or 0)
+        if status_code != 200:
+            return {
+                "requested_url": redact_url(url),
+                "final_url": redact_url(final_url),
+                "status": "http_error",
+                "http_status": status_code,
+                "content_type": content_type,
+            }
+        soup = BeautifulSoup(str(getattr(response, "text", "") or ""), "html.parser")
+        base_tag = soup.find("base", href=True)
+        base_href = str(base_tag.get("href") or "") if base_tag else None
+        declared_base = urljoin(final_url, base_href) if base_href else final_url
+        effective_base = declared_base if policy.allows_scope(declared_base) else final_url
+        candidates: list[dict[str, Any]] = []
+        seen: set[str] = set()
+        for anchor in soup.find_all("a", href=True):
+            href = str(anchor.get("href") or "").strip()
+            if not href or href.startswith(("#", "javascript:", "mailto:", "tel:")):
+                continue
+            candidate_url = urljoin(effective_base, href)
+            safe_url = redact_url(candidate_url)
+            if safe_url in seen:
+                continue
+            seen.add(safe_url)
+            candidates.append({
+                "url": safe_url,
+                "kind": _inspection_link_kind(candidate_url),
+                "within_scope": policy.allows_scope(candidate_url),
+            })
+            if len(candidates) >= 40:
+                break
+        return {
+            "requested_url": redact_url(url),
+            "final_url": redact_url(final_url),
+            "status": "ok",
+            "http_status": status_code,
+            "content_type": content_type,
+            "base_declared": bool(base_href),
+            "resolved_base_url": redact_url(declared_base),
+            "base_within_scope": policy.allows_scope(declared_base),
+            "link_candidates": candidates,
+            "links_truncated": len(candidates) == 40,
+        }
+
+    @staticmethod
+    def _inspection_target(target: DocsTarget, max_pages: int) -> dict[str, Any]:
+        return {
+            "library": target.library,
+            "docs_url": redact_url(target.docs_url) if target.docs_url else None,
+            "seed_urls": [redact_url(url) for url in target.seed_urls[:5]],
+            "allowed_domains": list(target.allowed_domains),
+            "path_prefixes": list(target.path_prefixes),
+            "max_pages": max_pages,
+        }
+
+    def _inspection_error(
+        self, target: DocsTarget, reason_code: str, message: str | None = None
+    ) -> DocsTargetInspectionResult:
+        return DocsTargetInspectionResult(
+            status="failed",
+            reason_code=reason_code,
+            target=self._inspection_target(target, 0),
+            observations={"scope_expanded": False, "indexed": False},
+            agent_question=message,
+        )
+
     def target_urls(self, target: DocsTarget) -> tuple[list[str], str | None]:
         manifest = target.source_manifest or {}
         if manifest.get("schema_version") == 2:
@@ -303,3 +479,25 @@ def target_result_summary(result: Any) -> dict[str, Any]:
         "pages_indexed": result.pages_indexed,
         "message": result.message,
     }
+
+
+def _inspection_link_kind(url: str) -> str:
+    path = urlparse(url).path.lower()
+    if path.endswith("-library.html"):
+        return "library_page"
+    if path.endswith(("-class.html", "-enum.html", "-mixin.html", "-extension.html")):
+        return "entity_page"
+    if path.endswith("/") or "." not in path.rsplit("/", 1)[-1]:
+        return "directory"
+    return "other"
+
+
+def _inspection_path_prefixes(urls: list[str]) -> tuple[str, ...]:
+    prefixes: list[str] = []
+    for url in urls:
+        path = urlparse(url).path or "/"
+        parent = str(PurePosixPath(path).parent)
+        prefix = path if path.endswith("/") else (parent.rstrip("/") + "/" or "/")
+        if prefix not in prefixes:
+            prefixes.append(prefix)
+    return tuple(prefixes)

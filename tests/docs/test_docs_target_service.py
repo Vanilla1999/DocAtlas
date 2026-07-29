@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import httpx
 import pytest
 
 from docmancer.docs.application.docs_target_service import DocsTargetService
@@ -173,3 +174,156 @@ def test_pub_dartdoc_discovery_propagates_security_rejection(monkeypatch):
 
     with pytest.raises(DocsFetchSecurityError, match="private_network_blocked"):
         DocsTargetService(render_docs_url).discover_pub_dartdoc_target(target, [])
+
+
+def test_inspect_docs_target_returns_bounded_navigation_metadata_without_discovery(monkeypatch):
+    class FakeTransport:
+        def __init__(self, *_args, **_kwargs):
+            pass
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_args):
+            pass
+
+        def get(self, url):
+            request = httpx.Request("GET", url)
+            return httpx.Response(
+                200,
+                headers={"content-type": "text/html"},
+                text=(
+                    "<title>Sample API</title><base href='../api/'>"
+                    "<a href='widgets/'>Widgets</a>"
+                    "<a href='https://outside.example/Other-class.html'>Other</a>"
+                ),
+                request=request,
+            )
+
+    monkeypatch.setattr("docmancer.docs.application.docs_target_service.DocsHttpClient", FakeTransport)
+    monkeypatch.setattr("docmancer.docs.application.docs_target_service.httpx.Client", lambda **_kwargs: object())
+    service = DocsTargetService(render_docs_url)
+    monkeypatch.setattr(
+        service,
+        "discover_pub_dartdoc_target",
+        lambda *_args, **_kwargs: (_ for _ in ()).throw(AssertionError("inspection must not discover")),
+    )
+
+    result = service.inspect_docs_target({
+        "library": "sample",
+        "docs_url": "https://docs.example/docs/index.html",
+        "allowed_domains": ["docs.example"],
+        "path_prefixes": ["/docs/"],
+    })
+
+    assert result.status == "ok"
+    assert result.observations == {
+        "pages_requested": 1,
+        "pages_inspected": 1,
+        "link_candidates": 2,
+        "outside_scope_candidates": 1,
+        "content_trust": "untrusted_navigation_metadata",
+        "instruction_trust": "untrusted_data",
+        "navigation_metadata_is_actionable": False,
+        "scope_expanded": False,
+        "indexed": False,
+    }
+    page = result.pages[0]
+    assert page["base_within_scope"] is False
+    assert page["resolved_base_url"] == "https://docs.example/api/"
+    assert page["link_candidates"][0] == {
+        "url": "https://docs.example/docs/widgets/",
+        "kind": "directory",
+        "within_scope": True,
+    }
+    assert result.decision_options[1]["id"] == "request_scope_expansion"
+
+
+def test_inspect_docs_target_rejects_manifests_and_caps_pages_before_fetch(monkeypatch):
+    fetched = []
+
+    class FakeTransport:
+        def __init__(self, *_args, **_kwargs):
+            pass
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_args):
+            pass
+
+        def get(self, url):
+            fetched.append(url)
+            request = httpx.Request("GET", url)
+            return httpx.Response(200, headers={"content-type": "text/html"}, text="<title>Docs</title>", request=request)
+
+    monkeypatch.setattr("docmancer.docs.application.docs_target_service.DocsHttpClient", FakeTransport)
+    monkeypatch.setattr("docmancer.docs.application.docs_target_service.httpx.Client", lambda **_kwargs: object())
+    service = DocsTargetService(render_docs_url)
+    rejected = service.inspect_docs_target({
+        "library": "sample",
+        "docs_url": "https://docs.example/docs/",
+        "allowed_domains": ["docs.example"],
+        "source_manifest": {"schema_version": 2},
+    })
+    result = service.inspect_docs_target({
+        "library": "sample",
+        "seed_urls": [f"https://docs.example/docs/{index}" for index in range(10)],
+        "allowed_domains": ["docs.example"],
+        "path_prefixes": ["/docs/"],
+    }, max_pages=99)
+
+    assert rejected.reason_code == "source_manifest_not_supported"
+    assert len(fetched) == 5
+    assert result.target["max_pages"] == 5
+
+
+def test_inspect_docs_target_does_not_expose_raw_base_href(monkeypatch):
+    class FakeTransport:
+        def __init__(self, *_args, **_kwargs):
+            pass
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_args):
+            pass
+
+        def get(self, url):
+            request = httpx.Request("GET", url)
+            return httpx.Response(
+                200,
+                headers={"content-type": "text/html"},
+                text='<base href="https://user:secret@docs.example/docs/?token=hidden">',
+                request=request,
+            )
+
+    monkeypatch.setattr("docmancer.docs.application.docs_target_service.DocsHttpClient", FakeTransport)
+    monkeypatch.setattr("docmancer.docs.application.docs_target_service.httpx.Client", lambda **_kwargs: object())
+    result = DocsTargetService(render_docs_url).inspect_docs_target({
+        "library": "sample",
+        "docs_url": "https://docs.example/docs/",
+        "allowed_domains": ["docs.example"],
+        "path_prefixes": ["/docs/"],
+    })
+
+    page = result.pages[0]
+    assert "base_href" not in page
+    assert page["resolved_base_url"] == "https://docs.example/docs/"
+    assert "secret" not in str(page)
+    assert "hidden" not in str(page)
+
+
+def test_inspect_docs_target_rejects_multiple_explicit_hosts_before_fetch(monkeypatch):
+    monkeypatch.setattr(
+        "docmancer.docs.application.docs_target_service.httpx.Client",
+        lambda **_kwargs: (_ for _ in ()).throw(AssertionError("transport must not be created")),
+    )
+    result = DocsTargetService(render_docs_url).inspect_docs_target({
+        "library": "sample",
+        "seed_urls": ["https://docs.example/api/", "https://api.example/reference/"],
+        "allowed_domains": ["docs.example", "api.example"],
+    })
+
+    assert result.status == "failed"
+    assert result.reason_code == "multiple_hosts_not_supported"

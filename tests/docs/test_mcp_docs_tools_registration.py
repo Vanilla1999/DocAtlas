@@ -7,7 +7,7 @@ from docmancer.docs.interfaces.mcp.context_tools import CONTEXT_TOOL_NAMES
 from docmancer.docs.interfaces.mcp.docs_tools import LIBRARY_TOOL_NAMES
 from docmancer.docs.interfaces.mcp.prefetch_tools import PREFETCH_TOOL_NAMES, _bounded_targets
 from docmancer.docs.interfaces.mcp.project_tools import PROJECT_TOOL_NAMES
-from docmancer.docs.models import DocsJobCancelResult, DocsJobStartResult
+from docmancer.docs.models import DocsJobCancelResult, DocsJobStartResult, DocsTargetInspectionResult
 from docmancer.mcp.docs_server import (
     ADVANCED_TOOL_NAMES,
     ADMIN_TOOL_NAMES,
@@ -181,9 +181,66 @@ def test_mcp_exposes_prefetch_project_dependency_docs_alias():
     assert "May fetch from the network" in tool["description"]
 
 
-def test_mcp_exposes_prefetch_docs_targets_through_prepare_docs():
+def test_mcp_hides_low_level_target_prefetch_from_public_surface():
     assert "prepare_docs" in {tool["name"] for tool in TOOLS}
     assert "prefetch_docs_targets" not in {tool["name"] for tool in TOOLS}
+    tool = next(tool for tool in TOOLS if tool["name"] == "prepare_docs")
+    assert "prefetch_docs_targets" not in tool["inputSchema"]["properties"]["action"]["enum"]
+
+
+def test_mcp_hides_bounded_inspection_but_keeps_compatibility_dispatch():
+    tool = next(tool for tool in TOOLS if tool["name"] == "prepare_docs")
+
+    assert "inspect_docs_target" not in tool["inputSchema"]["properties"]["action"]["enum"]
+    assert "max_pages" not in tool["inputSchema"]["properties"]
+    assert "target" not in tool["inputSchema"]["properties"]
+
+    class Service:
+        received = None
+
+        def inspect_docs_target(self, target, *, max_pages):
+            self.received = (target, max_pages)
+            return DocsTargetInspectionResult(
+                status="ok",
+                reason_code="docs_layout_observed",
+                target=target,
+                observations={"indexed": False, "scope_expanded": False},
+            )
+
+    service = Service()
+    payload = call_docs_tool_payload(
+        "prepare_docs",
+        {
+            "action": "inspect_docs_target",
+            "target": {"library": "sample", "docs_url": "https://docs.example/api/"},
+            "max_pages": 3,
+        },
+        service,
+    )
+
+    assert service.received == ({
+        "library": "sample",
+        "docs_url": "https://docs.example/api/",
+        "allowed_domains": ["docs.example"],
+        "path_prefixes": ["/api/"],
+        "max_pages": 3,
+    }, 3)
+    assert payload["observations"]["indexed"] is False
+    assert payload["action"] == "inspect_docs_target"
+
+
+def test_prepare_docs_rejects_unbounded_inspection_before_service_call():
+    result = call_docs_tool_payload(
+        "prepare_docs",
+        {
+            "action": "inspect_docs_target",
+            "target": {"library": "sample", "docs_url": "https://docs.example/api/"},
+            "max_pages": 6,
+        },
+        object(),
+    )
+
+    assert result["reason_code"] == "validation_error"
 
 
 def test_mcp_exposes_inspect_project_docs_with_discovery_first_guidance():

@@ -8,6 +8,7 @@ from docmancer.docs.domain.source_map import (
     collect_project_source_facts,
     source_facts_diagnostics,
 )
+from docmancer.docs.domain.source_boundary import SourceBoundary, iter_bounded_source_files
 
 
 def _source_facts_fixture(tmp_path):
@@ -256,6 +257,133 @@ def test_collect_project_source_facts_skips_generated_files(tmp_path):
     assert "lib/screen.dart" in paths
     assert "lib/generated/GeneratedPluginRegistrant.dart" not in paths
     assert "lib/generated/screen.g.dart" not in paths
+
+
+def test_collect_project_source_facts_skips_benchmark_runtime_artifacts(tmp_path):
+    root = _source_facts_fixture(tmp_path)
+    artifact = root / "eval/task_level/results/run/uv-cache/archive-v0/package/source.py"
+    artifact.parent.mkdir(parents=True)
+    artifact.write_text("class RuntimeArtifact: pass\n", encoding="utf-8")
+
+    items = collect_project_source_facts(
+        root,
+        question="RuntimeArtifact HelpRequestScreen",
+        include_unmatched=True,
+    )
+
+    assert all(not item["path"].startswith("eval/task_level/results/") for item in items)
+
+
+def test_source_boundary_loads_project_manifest_and_limits_roots(tmp_path):
+    (tmp_path / "app").mkdir()
+    (tmp_path / "other").mkdir()
+    (tmp_path / "app/main.py").write_text("class Included: pass\n", encoding="utf-8")
+    (tmp_path / "other/ignored.py").write_text("class OutsideRoot: pass\n", encoding="utf-8")
+    (tmp_path / "docmancer.yaml").write_text(
+        "project:\n  source_roots: [app]\n  include_extensions: [.py]\n",
+        encoding="utf-8",
+    )
+
+    items = collect_project_source_facts(
+        tmp_path, question="Included OutsideRoot", include_unmatched=True
+    )
+
+    assert [item["path"] for item in items] == ["app/main.py"]
+
+
+def test_source_boundary_applies_excludes_and_gitignore(tmp_path):
+    for relative in ("src/keep.py", "src/excluded/drop.py", "src/ignored.py"):
+        path = tmp_path / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text("class BoundaryFact: pass\n", encoding="utf-8")
+    (tmp_path / ".gitignore").write_text("src/ignored.py\n", encoding="utf-8")
+    boundary = SourceBoundary(
+        exclude_paths=("src/excluded/**",),
+        gitignore_patterns=("src/ignored.py",),
+    )
+
+    paths = [
+        path.relative_to(tmp_path).as_posix()
+        for path in iter_bounded_source_files(
+            tmp_path, boundary=boundary, supported_extensions=frozenset({".py"})
+        )
+    ]
+
+    assert paths == ["src/keep.py"]
+
+
+def test_source_boundary_generated_paths_require_explicit_opt_in(tmp_path):
+    generated = tmp_path / "artifacts/output.py"
+    generated.parent.mkdir()
+    generated.write_text("class GeneratedFact: pass\n", encoding="utf-8")
+    boundary = SourceBoundary(generated_paths=("artifacts/**",))
+
+    hidden = list(iter_bounded_source_files(
+        tmp_path, boundary=boundary, supported_extensions=frozenset({".py"})
+    ))
+    included = list(iter_bounded_source_files(
+        tmp_path,
+        boundary=boundary,
+        supported_extensions=frozenset({".py"}),
+        include_generated=True,
+    ))
+
+    assert hidden == []
+    assert included == [generated]
+
+
+def test_source_map_includes_generated_path_for_explicit_artifact_question(tmp_path):
+    generated = tmp_path / "generated/model.py"
+    generated.parent.mkdir()
+    generated.write_text("class GeneratedModel: pass\n", encoding="utf-8")
+
+    items = collect_project_source_facts(
+        tmp_path,
+        question="Inspect the generated file GeneratedModel",
+        include_unmatched=True,
+    )
+
+    assert [item["path"] for item in items] == ["generated/model.py"]
+
+
+def test_source_boundary_never_follows_symlink_outside_project(tmp_path):
+    outside = tmp_path.parent / "outside-source-boundary"
+    outside.mkdir(exist_ok=True)
+    (outside / "secret.py").write_text("class OutsideFact: pass\n", encoding="utf-8")
+    (tmp_path / "linked").symlink_to(outside, target_is_directory=True)
+
+    paths = list(iter_bounded_source_files(
+        tmp_path, boundary=SourceBoundary(), supported_extensions=frozenset({".py"})
+    ))
+
+    assert paths == []
+
+
+def test_source_boundary_enforces_file_byte_depth_and_deadline_budgets(tmp_path):
+    for index in range(3):
+        path = tmp_path / f"src/file_{index}.py"
+        path.parent.mkdir(exist_ok=True)
+        path.write_text("value = 'bounded'\n", encoding="utf-8")
+    deep = tmp_path / "src/one/two/deep.py"
+    deep.parent.mkdir(parents=True)
+    deep.write_text("value = 'deep'\n", encoding="utf-8")
+
+    limited = list(iter_bounded_source_files(
+        tmp_path,
+        boundary=SourceBoundary(max_scanned_files=1, max_directory_depth=2),
+        supported_extensions=frozenset({".py"}),
+    ))
+    ticks = iter((0.0, 1.0, 1.0))
+    expired = list(iter_bounded_source_files(
+        tmp_path,
+        boundary=SourceBoundary(scan_deadline_seconds=0.5),
+        supported_extensions=frozenset({".py"}),
+        clock=lambda: next(ticks),
+    ))
+
+    assert len(limited) == 1
+    assert deep not in limited
+    assert expired == []
 
 
 def test_collect_project_source_facts_selection_score_favors_exact_question_term(tmp_path):

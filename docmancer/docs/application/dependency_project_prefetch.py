@@ -138,7 +138,7 @@ class DependencyProjectPrefetch:
                 source_type=item.source_type,
                 message=item.message,
                 pages_indexed=item.pages_indexed,
-                targets_completed=1 if item.status in {"ready", "skipped"} else 0,
+                targets_completed=1 if item.status in {"ready", "partial", "skipped"} else 0,
                 targets_failed=1 if item.status == "failed" else 0,
             )
             for item in batch.results

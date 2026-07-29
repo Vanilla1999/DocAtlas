@@ -49,6 +49,7 @@ class DocsFetchPolicy:
     resolver: Resolver | None = None
     allowed_hosts: tuple[str, ...] = ()
     path_prefixes: tuple[str, ...] = ()
+    allow_subdomains: bool = True
 
     def allows_scope(self, url: str) -> bool:
         try:
@@ -57,11 +58,16 @@ class DocsFetchPolicy:
             parsed.port
         except (TypeError, ValueError):
             return False
-        if parsed.scheme not in {"http", "https"} or not host:
+        if (
+            parsed.scheme not in {"http", "https"}
+            or not host
+            or parsed.username is not None
+            or parsed.password is not None
+        ):
             return False
         normalized_host = host.rstrip(".").lower()
         return bool(
-            (not self.allowed_hosts or _host_allowed(normalized_host, self.allowed_hosts))
+            (not self.allowed_hosts or self._host_allowed(normalized_host))
             and (not self.path_prefixes or _path_allowed(parsed.path or "/", self.path_prefixes))
         )
 
@@ -82,7 +88,7 @@ class DocsFetchPolicy:
         if not host:
             raise DocsFetchSecurityError("missing_host", redacted)
         normalized_host = host.rstrip(".").lower()
-        if self.allowed_hosts and not _host_allowed(normalized_host, self.allowed_hosts):
+        if self.allowed_hosts and not self._host_allowed(normalized_host):
             raise DocsFetchSecurityError("host_not_allowed", redacted)
         if self.path_prefixes and not _path_allowed(parsed.path or "/", self.path_prefixes):
             raise DocsFetchSecurityError("path_not_allowed", redacted)
@@ -111,6 +117,11 @@ class DocsFetchPolicy:
             port=port or (443 if parsed.scheme == "https" else 80),
             resolved_ips=tuple(sorted({str(answer) for answer in answers})),
         )
+
+    def _host_allowed(self, host: str) -> bool:
+        if self.allow_subdomains:
+            return _host_allowed(host, self.allowed_hosts)
+        return host in {allowed.rstrip(".").lower() for allowed in self.allowed_hosts}
 
 
 def resolve_host(host: str) -> tuple[IPAddress, ...]:

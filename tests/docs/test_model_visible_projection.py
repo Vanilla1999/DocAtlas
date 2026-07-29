@@ -88,6 +88,30 @@ def test_docs_answer_is_deterministic_deduplicated_hashed_and_bounded():
     )
 
 
+def test_docs_answer_projects_content_snippet_dicts():
+    retrieval = {
+        "status": "success",
+        "answer_available": True,
+        "context_pack": [{
+            "path": "docs/PATROL_TESTING.md",
+            "heading_path": "Long-Lived Patrol Session",
+            "snippet": {
+                "content": "start_patrol_develop is READY after PASS or FAIL."
+            },
+            "content": "start_patrol_develop is READY after PASS or FAIL.",
+        }],
+    }
+
+    projection, snapshot = project_docs_answer(
+        question="When is start_patrol_develop READY?", retrieval=retrieval,
+    )
+
+    assert projection["status"] == "ok"
+    assert projection["sources"][0]["path_or_url"] == "docs/PATROL_TESTING.md"
+    assert projection["sources"][0]["snippet"] == "start_patrol_develop is READY after PASS or FAIL."
+    assert validate_model_visible_projection(projection, snapshot=snapshot, max_tokens=800) == []
+
+
 def test_patch_projection_retains_validated_citations_without_raw_evidence():
     evidence = [{
         "path": "AGENTS.md",
@@ -377,6 +401,38 @@ def test_insufficient_projection_is_fail_closed_and_at_most_300_tokens():
     assert "targets" not in payload
     assert payload["recommended_next_action"]["auto_execute"] is False
     assert estimate_projection_tokens(payload) <= 300
+    assert validate_model_visible_projection(payload, snapshot={}, max_tokens=300) == []
+
+
+def test_insufficient_projection_preserves_bounded_inspection_decision_context():
+    payload = project_insufficient(
+        kind="docs_answer",
+        missing=["The registered documentation produced no usable evidence."],
+        recommended_next_action={
+            "tool": "prepare_docs",
+            "type": "prepare_docs",
+            "arguments_patch": {
+                "action": "inspect_docs_target",
+                "target": {"library": "sample", "docs_url": "https://docs.example/api/"},
+                "max_pages": 3,
+            },
+            "observations": {"source_status": "partial", "indexed_chunks": 0},
+            "security_scope": {"allowed_domains": ["docs.example"], "scope_expansion_allowed": False},
+            "decision_options": [
+                {"id": "inspect_registered_scope", "requires_confirmation": True},
+                {"id": "stop_with_partial_results", "requires_confirmation": False},
+            ],
+            "agent_question": "Inspect the registered scope without indexing?",
+            "requires_confirmation": True,
+        },
+    )
+
+    action = payload["recommended_next_action"]
+    assert action["arguments_patch"]["action"] == "inspect_docs_target"
+    assert action["observations"]["indexed_chunks"] == 0
+    assert action["security_scope"]["scope_expansion_allowed"] is False
+    assert action["decision_options"][0]["id"] == "inspect_registered_scope"
+    assert action["auto_execute"] is False
     assert validate_model_visible_projection(payload, snapshot={}, max_tokens=300) == []
 
 

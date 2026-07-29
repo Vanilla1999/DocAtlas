@@ -462,6 +462,7 @@ def build_action_packet(
         "omitted_counts": {},
         "estimated_tokens": 0,
     }
+    mandatory_guidance = _add_mandatory_requirement_witnesses(packet, selection)
     if objective_omitted:
         packet["status"] = "insufficient_evidence"
         packet["omitted_counts"]["task_interpretation.objective_characters"] = objective_omitted
@@ -538,13 +539,16 @@ def build_action_packet(
         if message not in packet["missing_evidence"]:
             packet["missing_evidence"].append(message)
 
-    _fit_packet(packet, budget, required_source_keys, required_target_keys)
+    _fit_packet(
+        packet, budget, required_source_keys, required_target_keys,
+        mandatory_guidance,
+    )
     _ensure_post_fit_status(packet, required_source_keys)
     _refresh_estimated_tokens(packet)
     # Account for the estimate field itself. If it crosses the caller budget,
     # remove another complete item and recompute rather than slicing text.
     while packet["estimated_tokens"] > budget and _remove_one_budget_item(
-        packet, required_source_keys, required_target_keys
+        packet, required_source_keys, required_target_keys, mandatory_guidance
     ):
         _refresh_estimated_tokens(packet)
     _ensure_selection_survives_packet(packet, selection)
@@ -564,29 +568,8 @@ def _ensure_selection_survives_packet(
 ) -> None:
     """Fail closed if formatting removed a selector-owned requirement."""
 
-    visible_values: list[str] = []
-    for row in packet.get("source_of_truth") or []:
-        if isinstance(row, dict):
-            visible_values.extend(str(row.get(key) or "") for key in (
-                "path", "symbol_or_section", "version_binding",
-            ))
+    visible_text = _packet_visible_text(packet)
     target = packet.get("target_surface") if isinstance(packet.get("target_surface"), dict) else {}
-    for key, value_key in (("likely_files", "path"), ("symbols", "name")):
-        visible_values.extend(
-            str(row.get(value_key) or "")
-            for row in target.get(key) or []
-            if isinstance(row, dict)
-        )
-    for rows in (
-        (packet.get("task_interpretation") or {}).get("acceptance_conditions"),
-        packet.get("required_invariants"), packet.get("forbidden_changes"),
-        packet.get("implementation_guidance"),
-        *((packet.get("validation") or {}).values()),
-    ):
-        visible_values.extend(
-            str(row.get("text") or "") for row in rows or [] if isinstance(row, dict)
-        )
-    visible_text = "\n".join(visible_values).casefold()
     retained_evidence_ids = {
         str(row.get("evidence_id") or "")
         for row in packet.get("source_of_truth") or []
@@ -954,11 +937,11 @@ def _validate_evidence_fidelity(
         text = str(item.get("text") or "")
         if any(
             text != _snippet_text(evidence_map.get(ref, {}).get("snippet"))[0]
+            and text not in _content_text(evidence_map.get(ref, {}))
             and text not in {
-                fact for fact_type, fact in _extract_facts(
+                fact for _, fact in _extract_facts(
                     _content_text(evidence_map.get(ref, {}))
                 )[0]
-                if fact_type in {"required", "forbidden"}
             }
             for ref in _string_refs(item)
         ):
@@ -1423,6 +1406,118 @@ def _content_text(item: Any) -> str:
     return str(item.get("display_text") or item.get("content") or "")
 
 
+def _add_mandatory_requirement_witnesses(
+    packet: dict[str, Any], selection: SelectionDecision
+) -> set[tuple[str, str]]:
+    """Render bounded source text needed to keep selector requirements visible."""
+
+    visible_text = _packet_visible_text(packet)
+    requirements = {
+        requirement.requirement_id: requirement
+        for requirement in selection.requirements
+        if requirement.mandatory
+        and requirement.kind in {"exact_term", "entity", "canonical_policy"}
+    }
+    source_ids = {
+        str(row.get("evidence_id") or "")
+        for row in packet.get("source_of_truth") or []
+        if isinstance(row, dict)
+    }
+    mandatory_rows: set[tuple[str, str]] = set()
+    for candidate in selection.selected_candidates:
+        evidence = dict(candidate.original)
+        evidence_id = _evidence_id(evidence)
+        if evidence_id not in source_ids or _instruction_risk_flags(evidence):
+            continue
+        canonical_requirement_id = f"canonical_policy:{candidate.stable_id}"
+        if canonical_requirement_id in candidate.covered_requirement_ids:
+            for _, fact in _extract_facts(_content_text(evidence))[0]:
+                if not fact or _content_instruction_risk_flags(fact):
+                    continue
+                packet["implementation_guidance"].append({
+                    "text": fact,
+                    "evidence_ids": [evidence_id],
+                })
+                mandatory_rows.add((fact, evidence_id))
+        remaining = [
+            requirements[requirement_id]
+            for requirement_id in sorted(candidate.covered_requirement_ids)
+            if requirement_id in requirements
+            and requirements[requirement_id].kind in {"exact_term", "entity"}
+        ]
+        while remaining:
+            witness = _requirement_witness(
+                _content_text(evidence), [requirement.value for requirement in remaining]
+            )
+            if not witness or _content_instruction_risk_flags(witness):
+                break
+            packet["implementation_guidance"].append({
+                "text": witness,
+                "evidence_ids": [evidence_id],
+            })
+            mandatory_rows.add((witness, evidence_id))
+            visible_text += "\n" + witness.casefold()
+            remaining = [
+                requirement for requirement in remaining
+                if not requirement_value_visible(requirement.value, visible_text)
+            ]
+    packet["implementation_guidance"] = _dedupe_cited(
+        packet["implementation_guidance"], "text"
+    )
+    return mandatory_rows
+
+
+def _packet_visible_text(packet: dict[str, Any]) -> str:
+    values: list[str] = []
+    for row in packet.get("source_of_truth") or []:
+        if isinstance(row, dict):
+            values.extend(str(row.get(key) or "") for key in (
+                "path", "symbol_or_section", "version_binding",
+            ))
+    target = packet.get("target_surface") or {}
+    for key, value_key in (("likely_files", "path"), ("symbols", "name")):
+        values.extend(
+            str(row.get(value_key) or "")
+            for row in target.get(key) or [] if isinstance(row, dict)
+        )
+    for rows in (
+        (packet.get("task_interpretation") or {}).get("acceptance_conditions"),
+        packet.get("required_invariants"), packet.get("forbidden_changes"),
+        packet.get("implementation_guidance"),
+        *((packet.get("validation") or {}).values()),
+    ):
+        values.extend(
+            str(row.get("text") or "") for row in rows or [] if isinstance(row, dict)
+        )
+    return "\n".join(values).casefold()
+
+
+def _requirement_witness(content: str, values: list[str]) -> str:
+    fragments: list[str] = []
+    for raw_line in content.splitlines():
+        line = raw_line.strip()
+        if not line:
+            continue
+        fragments.extend(
+            segment.strip() for segment in re.split(r"(?<=[.!?])\s+(?=[A-Z0-9])", line)
+            if segment.strip()
+        )
+    matches = [
+        fragment for fragment in fragments
+        if len(fragment) <= 500
+        and any(requirement_value_visible(value, fragment) for value in values)
+    ]
+    if not matches:
+        return ""
+    return max(
+        matches,
+        key=lambda fragment: (
+            sum(requirement_value_visible(value, fragment) for value in values),
+            -len(fragment),
+        ),
+    )
+
+
 def _extract_facts(content: str) -> tuple[list[tuple[str, str]], int]:
     facts: list[tuple[str, str]] = []
     omitted_critical = 0
@@ -1619,9 +1714,10 @@ def _fit_packet(
     budget: int,
     required_source_keys: set[str],
     required_target_keys: set[str],
+    mandatory_guidance: set[tuple[str, str]] | frozenset[tuple[str, str]] = frozenset(),
 ) -> None:
     while estimate_action_packet_tokens(packet) > budget and _remove_one_budget_item(
-        packet, required_source_keys, required_target_keys
+        packet, required_source_keys, required_target_keys, mandatory_guidance
     ):
         pass
     _prune_orphan_sources(packet, required_source_keys)
@@ -1636,10 +1732,17 @@ def _remove_one_budget_item(
     packet: dict[str, Any],
     required_source_keys: set[str],
     required_target_keys: set[str],
+    mandatory_guidance: set[tuple[str, str]] | frozenset[tuple[str, str]] = frozenset(),
 ) -> bool:
     guidance = packet["implementation_guidance"]
-    if guidance:
-        guidance.pop()
+    for index in range(len(guidance) - 1, -1, -1):
+        row = guidance[index]
+        if any(
+            (str(row.get("text") or ""), str(evidence_id)) in mandatory_guidance
+            for evidence_id in row.get("evidence_ids") or []
+        ):
+            continue
+        guidance.pop(index)
         _record_omission(packet, "implementation_guidance")
         _prune_orphan_sources(packet, required_source_keys)
         return True
@@ -1695,6 +1798,15 @@ def _remove_one_budget_item(
                     packet["missing_evidence"].append(message)
             _prune_orphan_sources(packet, required_source_keys)
             return True
+    if guidance:
+        guidance.pop()
+        _record_omission(packet, "mandatory_requirements")
+        packet["status"] = "insufficient_evidence"
+        message = "Mandatory selected evidence did not fit the requested packet budget."
+        if message not in packet["missing_evidence"]:
+            packet["missing_evidence"].append(message)
+        _prune_orphan_sources(packet, required_source_keys)
+        return True
     return False
 
 
