@@ -212,8 +212,10 @@ Agent workflow:
         "inputSchema": {
             "type": "object",
             "properties": {
-                "action": {"type": "string", "enum": ["sync_project_docs", "prefetch_project_dependency_docs", "prefetch_library_docs", "prefetch_docs_targets", "inspect_docs_target", "validate_docs_manifest", "prefetch_docs_manifest", "refresh_library_docs", "prune_library_docs", "remove_library_docs", "cancel_docs_job"]},
+                "action": {"type": "string", "enum": ["sync_project_docs", "prefetch_project_dependency_docs", "prefetch_library_docs", "prefetch_docs_targets", "inspect_docs_target", "validate_docs_manifest", "prefetch_docs_manifest", "refresh_library_docs", "prune_library_docs", "remove_library_docs", "clear_index", "cancel_docs_job"]},
                 "project_path": {"type": ["string", "null"]},
+                "scope": {"type": ["string", "null"], "enum": ["project-local", None]},
+                "confirm": {"type": ["boolean", "null"], "default": False},
                 "library": {"type": ["string", "null"]},
                 "canonical_id": {"type": ["string", "null"]},
                 "manifest_path": {"type": ["string", "null"]},
@@ -827,10 +829,12 @@ PUBLIC_ADVERTISED_INPUT_SCHEMAS: dict[str, dict[str, Any]] = {
                     "prefetch_library_docs",
                     "validate_docs_manifest", "prefetch_docs_manifest",
                     "refresh_library_docs", "prune_library_docs",
-                    "remove_library_docs", "cancel_docs_job",
+                    "remove_library_docs", "clear_index", "cancel_docs_job",
                 ],
             },
             "project_path": {"type": ["string", "null"]},
+            "scope": {"type": ["string", "null"], "enum": ["project-local", None]},
+            "confirm": {"type": ["boolean", "null"], "default": False},
             "library": {"type": ["string", "null"]},
             "ecosystem": {"type": ["string", "null"]},
             "version": {"type": ["string", "null"]},
@@ -840,6 +844,15 @@ PUBLIC_ADVERTISED_INPUT_SCHEMAS: dict[str, dict[str, Any]] = {
         },
         "required": ["action"],
         "allOf": [{
+            "if": {"properties": {"action": {"const": "clear_index"}}},
+            "then": {
+                "required": ["scope", "project_path"],
+                "properties": {
+                    "scope": {"const": "project-local"},
+                    "project_path": {"type": "string", "minLength": 1},
+                },
+            },
+        }, {
             "if": {"properties": {"action": {"const": "remove_library_docs"}}},
             "then": {
                 "required": ["canonical_id", "project_path"],

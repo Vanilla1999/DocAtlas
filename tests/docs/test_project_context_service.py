@@ -71,7 +71,7 @@ def test_project_context_service_returns_selected_project_and_dependency_section
     assert result.reason == "trusted_context_available"
     assert result.trust_contract["policy"]["direct_webfetch"] == "forbidden"
     assert ("docs", "go_router", {"topic": "use go_router", "tokens": 1200, "ecosystem": None, "version": None, "project_path": "/repo"}) in facade.calls
-    assert ("project", "/repo", "use go_router", {"tokens": 1200, "limit": 3, "expand": None, "module": None, "module_path": None, "scope": None}) in facade.calls
+    assert ("project", "/repo", "use go_router", {"tokens": 1200, "limit": 12, "expand": None, "module": None, "module_path": None, "scope": None}) in facade.calls
 
 
 def test_project_context_service_deps_only_skips_project_docs_and_marks_risk():
@@ -82,6 +82,83 @@ def test_project_context_service_deps_only_skips_project_docs_and_marks_risk():
     assert result.project_docs is None
     assert result.dependency_docs is facade.dependency_docs
     assert any(item["reason_code"] == "project_docs_skipped" for item in result.trust_contract["sources"]["risky"])
+
+
+def test_project_context_budget_overflow_keeps_answer_when_retained_trusted_evidence_is_complete(monkeypatch):
+    facade = FakeProjectContextFacade()
+    facade.project_docs = ProjectDocsResult(
+        project_path="/repo",
+        query="MCP boundary owns transport contracts",
+        results=[
+            ProjectDocsChunk(
+                title="MCP boundary owns transport contracts",
+                heading_path="MCP boundary owns transport contracts",
+                content="The MCP boundary owns transport contracts and validates every public request and response.",
+                source="/repo/docs/adr/0001-mcp-boundary-contracts.md", url=None,
+                path="docs/adr/0001-mcp-boundary-contracts.md", authority="source_of_truth",
+                metadata={"score": 1.0},
+            ),
+            ProjectDocsChunk(
+                title="Oversized appendix", content="appendix " * 200,
+                source="/repo/docs/appendix.md", url=None, path="docs/appendix.md",
+                metadata={"score": 0.01},
+            ),
+        ],
+    )
+    monkeypatch.setitem(
+        ProjectContextService.get_project_context.__globals__["fit_stage_items"].__globals__["STAGE_BYTE_LIMITS"],
+        "project_docs", 1200,
+    )
+
+    result = ProjectContextService(facade).get_project_context(
+        "/repo", "MCP boundary owns transport contracts", mode="project-only", limit=2,
+    )
+
+    assert [item["path"] for item in result.context_pack if item["source_class"] == "project_doc"] == [
+        "docs/adr/0001-mcp-boundary-contracts.md"
+    ]
+    assert "retrieval_stage_budget_exceeded" in result.warnings
+    assert result.diagnostics["retrieval_routing"]["stages"]["project_docs"]["status"] == "insufficient"
+    assert result.answer_completeness["missing_terms"] == []
+    assert result.answer_available is True
+    assert result.reason == "trusted_context_available"
+
+
+def test_project_context_budget_overflow_stays_fail_closed_when_required_evidence_is_dropped(monkeypatch):
+    facade = FakeProjectContextFacade()
+    facade.project_docs = ProjectDocsResult(
+        project_path="/repo",
+        query='How does the MCP boundary enforce "mandatory handshake"?',
+        results=[
+            ProjectDocsChunk(
+                title="MCP boundary",
+                content="The MCP boundary owns transport contracts but this summary omits protocol details.",
+                source="/repo/docs/adr/0001-mcp-boundary-contracts.md", url=None,
+                path="docs/adr/0001-mcp-boundary-contracts.md", authority="source_of_truth",
+                metadata={"score": 1.0},
+            ),
+            ProjectDocsChunk(
+                title="Mandatory handshake", heading_path="Mandatory handshake",
+                content=("padding " * 200) + "The mandatory handshake is enforced before dispatch.",
+                source="/repo/docs/adr/0002-handshake.md", url=None,
+                path="docs/adr/0002-handshake.md", authority="source_of_truth",
+                metadata={"score": 0.01},
+            ),
+        ],
+    )
+    monkeypatch.setitem(
+        ProjectContextService.get_project_context.__globals__["fit_stage_items"].__globals__["STAGE_BYTE_LIMITS"],
+        "project_docs", 1200,
+    )
+
+    result = ProjectContextService(facade).get_project_context(
+        "/repo", 'How does the MCP boundary enforce "mandatory handshake"?', mode="project-only", limit=2,
+    )
+
+    assert "retrieval_stage_budget_exceeded" in result.warnings
+    assert result.answer_available is False
+    assert result.answer_completeness["status"] != "exact"
+    assert "mandatory handshake" in result.answer_completeness["missing_terms"]
 
 
 def test_story_specific_project_context_missing_terms_is_partial_navigational():

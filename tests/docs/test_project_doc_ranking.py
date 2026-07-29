@@ -15,6 +15,7 @@ class FakeChunk:
     score: float
     content: str = "content"
     metadata: dict[str, Any] = field(default_factory=dict)
+    authority: str | None = None
 
 
 def fake_chunk(path: str, heading_path: str, score: float, content: str = "content", metadata: dict[str, Any] | None = None) -> FakeChunk:
@@ -83,6 +84,31 @@ def test_docs_mcp_query_demotes_packs():
         limit=3,
     )
     assert ranked[0].path in {"README.md", "docs/mcp-docs-server.md"}
+
+
+def test_exact_heading_outranks_unrelated_source_of_truth():
+    intent = classify_project_query_intent("MCP boundary owns transport contracts")
+    unrelated = fake_chunk(
+        ".hermes/plans/library-retrieval.md",
+        "Natural-language library retrieval",
+        0.95,
+    )
+    unrelated.authority = "source_of_truth"
+    exact = fake_chunk(
+        "docs/adr/0001-mcp-boundary-contracts.md",
+        "MCP boundary owns transport contracts",
+        0.10,
+    )
+    exact.authority = "supporting"
+
+    ranked = rerank_project_doc_chunks(
+        [unrelated, exact],
+        question="MCP boundary owns transport contracts",
+        intent=intent,
+        limit=2,
+    )
+
+    assert ranked[0].path == "docs/adr/0001-mcp-boundary-contracts.md"
 
 
 def test_packs_mcp_query_boosts_packs():

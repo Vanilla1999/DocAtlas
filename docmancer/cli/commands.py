@@ -2185,6 +2185,39 @@ def _format_size(n: int) -> str:
 
 
 @click.command(
+    "clear-index",
+    cls=DocmancerCommand,
+    context_settings=HELP_CONTEXT_SETTINGS,
+    short_help="Preview or clear one project-local Docmancer index.",
+    epilog=format_examples(
+        "doc-atlas clear-index --scope project-local --project-path .",
+        "doc-atlas clear-index --scope project-local --project-path . --apply",
+    ),
+)
+@click.option("--scope", type=click.Choice(["project-local"], case_sensitive=False), required=True)
+@click.option("--project-path", type=click.Path(exists=True, file_okay=False, path_type=str), required=True)
+@click.option("--apply", is_flag=True, default=False, help="Apply the displayed plan; default is preview only.")
+@click.option("output_format", "--format", type=click.Choice(["text", "json"], case_sensitive=False), default="text", show_default=True)
+def clear_index_cmd(scope: str, project_path: str, apply: bool, output_format: str) -> None:
+    """Delete only a project-local derived DB and extracted documents."""
+    from docmancer.docs.application.index_storage_cleanup import IndexStorageCleanup
+
+    cleanup = IndexStorageCleanup()
+    plan = cleanup.preview(scope=scope.lower(), project_path=project_path)
+    payload = cleanup.apply(plan) if apply else cleanup.payload(plan)
+    if output_format == "json":
+        click.echo(json.dumps(payload, ensure_ascii=False, indent=2))
+        return
+    click.echo(f"Scope: {payload['scope']} ({payload['config_source']})")
+    click.echo(f"DB: {payload['db_path']}")
+    click.echo(f"Extracted docs: {payload['extracted_dir']}")
+    click.echo("Plan:")
+    for target in payload["plan"]:
+        click.echo(f"  {target}")
+    click.echo("Applied." if apply else "Preview only; rerun with --apply to delete this scope.")
+
+
+@click.command(
     cls=DocmancerCommand,
     context_settings=HELP_CONTEXT_SETTINGS,
     short_help="Remove all docmancer state from this machine.",

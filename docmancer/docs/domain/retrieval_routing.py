@@ -221,8 +221,10 @@ def fit_stage_items(stage: str, items: Iterable[Any]) -> tuple[list[Any], str | 
     used = 0
     for item in values:
         encoded = len(_canonical_bytes(item))
-        if len(bounded) >= item_limit or used + encoded > byte_limit:
+        if len(bounded) >= item_limit:
             break
+        if used + encoded > byte_limit:
+            continue
         bounded.append(item)
         used += encoded
     if len(bounded) == len(values):

@@ -158,7 +158,11 @@ class ProjectContextService:
         metadata = self.facade.read_project_metadata(str(root))
         project_docs = None
         if mode in {"auto", "project-only"}:
-            project_docs = self.facade.get_project_docs(str(root), question, tokens=tokens, limit=limit, expand=expand, module=module, module_path=module_path, scope=scope)
+            candidate_limit = min(20, max(12, (limit or 4) * 3))
+            project_docs = self.facade.get_project_docs(
+                str(root), question, tokens=tokens, limit=candidate_limit,
+                expand=expand, module=module, module_path=module_path, scope=scope,
+            )
             if project_docs and project_docs.requires_confirmation and project_docs.confirmation_reason == "project_docs_preflight":
                 return _project_docs_preflight_confirmation_result(root=root, question=question, mode=mode, project_docs=project_docs)
             if project_docs and project_docs.results:
@@ -473,7 +477,6 @@ class ProjectContextService:
         )
         answer_available = bool(project_docs and project_docs.answer_available) or bool(dependency_docs and dependency_docs.results) or source_evidence_answer_available
         if routing_budget_issues:
-            answer_available = False
             warnings.append("retrieval_stage_budget_exceeded")
             next_actions.append({
                 "tool": "get_docs_context",

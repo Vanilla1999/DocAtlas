@@ -528,6 +528,18 @@ def rerank_project_doc_chunks(chunks: list[Any], *, question: str, intent: Any, 
         description_overlap = query_terms & description_terms
         if description_overlap:
             score *= 1.0 + min(1.0, 0.2 * len(description_overlap))
+        heading_text = " ".join(
+            str(value or "")
+            for value in (getattr(chunk, "title", None), getattr(chunk, "heading_path", None))
+        )
+        heading_terms = set(re.findall(r"[\w-]+", heading_text.lower()))
+        heading_overlap = query_terms & heading_terms
+        normalized_query = " ".join(re.findall(r"[\w-]+", question.lower()))
+        normalized_heading = " ".join(re.findall(r"[\w-]+", heading_text.lower()))
+        if len(query_terms) >= 3 and normalized_query in normalized_heading:
+            score *= 20.0
+        elif heading_overlap:
+            score *= 1.0 + min(2.0, 0.5 * len(heading_overlap))
         authority = str(getattr(chunk, "authority", None) or "")
         score *= {
             "source_of_truth": 1.5,

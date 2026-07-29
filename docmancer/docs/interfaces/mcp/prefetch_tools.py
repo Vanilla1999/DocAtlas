@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import asdict
-from pathlib import PurePosixPath
+from pathlib import Path, PurePosixPath
 from typing import Any
 from urllib.parse import urlparse
 
@@ -34,6 +34,7 @@ _PREPARE_ACTION_FIELDS = {
     "refresh_library_docs": {"action", "library", "ecosystem", "version", "source_type", "docs_url", "force"},
     "prune_library_docs": {"action", "library", "keep_versions", "older_than_days", "dry_run"},
     "remove_library_docs": {"action", "canonical_id", "project_path"},
+    "clear_index": {"action", "scope", "project_path", "confirm"},
     "cancel_docs_job": {"action", "job_id", "project_path"},
 }
 _PREPARE_REQUIRED_FIELDS = {
@@ -46,6 +47,7 @@ _PREPARE_REQUIRED_FIELDS = {
     "prefetch_docs_manifest": {"manifest_path"},
     "refresh_library_docs": {"library"},
     "remove_library_docs": {"canonical_id", "project_path"},
+    "clear_index": {"scope", "project_path"},
     "cancel_docs_job": {"job_id"},
 }
 _REMOTE_PREPARE_ACTIONS = {
@@ -118,6 +120,8 @@ def validate_prepare_docs_arguments(args: dict[str, Any]) -> dict[str, Any] | No
         return _prepare_validation_error(action, f"missing required field(s) for action '{action}': {', '.join(missing)}")
     if action in _REMOTE_PREPARE_ACTIONS and args.get("async") is False:
         return _prepare_validation_error(action, f"action '{action}' always runs asynchronously; omit async or set it to true")
+    if action == "clear_index" and args.get("scope") != "project-local":
+        return _prepare_validation_error(action, "only scope='project-local' is supported in this release")
     if action == "sync_project_docs":
         for field in ("changed_paths", "deleted_paths", "renamed_paths"):
             value = args.get(field)
@@ -313,6 +317,24 @@ def handle_prefetch_tool(name: str, args: dict[str, Any], service: LibraryDocsSe
             payload = asdict(library_docs_app.prefetch_docs(args["library"], ecosystem=args.get("ecosystem"), versions=versions, docs_url=args.get("docs_url"), docs_url_template=args.get("docs_url_template"), source_type=args.get("source_type"), force_refresh=bool(args.get("force") if args.get("force") is not None else True), continue_on_error=True, async_=True))
         elif action == "remove_library_docs":
             payload = asdict(library_docs_app.remove_library_docs(args["canonical_id"]))
+        elif action == "clear_index":
+            from docmancer.docs.application.index_storage_cleanup import IndexStorageCleanup
+
+            cleanup = IndexStorageCleanup()
+            plan = cleanup.preview(scope="project-local", project_path=args["project_path"])
+            if args.get("confirm") is True:
+                payload = cleanup.apply(plan)
+            else:
+                payload = {
+                    **cleanup.payload(plan, status="confirmation_required"),
+                    "requires_confirmation": True,
+                    "arguments_patch": {
+                        "action": "clear_index",
+                        "scope": "project-local",
+                        "project_path": str(Path(args["project_path"]).resolve()),
+                        "confirm": True,
+                    },
+                }
         elif action == "prune_library_docs":
             payload = asdict(library_docs_app.prune_library_docs(library=args.get("library"), keep_versions=args.get("keep_versions") or [], older_than_days=int(args.get("older_than_days") or 90), dry_run=bool(args.get("dry_run") if args.get("dry_run") is not None else True)))
         elif action == "cancel_docs_job":
@@ -327,7 +349,7 @@ def handle_prefetch_tool(name: str, args: dict[str, Any], service: LibraryDocsSe
                 }
             payload = asdict(service.cancel_docs_job(job_id))
         else:
-            return {"status": "error", "reason_code": "unknown_prepare_action", "message": f"unknown prepare_docs action: {action}", "supported_actions": ["sync_project_docs", "prefetch_project_dependency_docs", "prefetch_library_docs", "prefetch_docs_targets", "inspect_docs_target", "validate_docs_manifest", "prefetch_docs_manifest", "refresh_library_docs", "prune_library_docs", "remove_library_docs", "cancel_docs_job"]}
+            return {"status": "error", "reason_code": "unknown_prepare_action", "message": f"unknown prepare_docs action: {action}", "supported_actions": ["sync_project_docs", "prefetch_project_dependency_docs", "prefetch_library_docs", "prefetch_docs_targets", "inspect_docs_target", "validate_docs_manifest", "prefetch_docs_manifest", "refresh_library_docs", "prune_library_docs", "remove_library_docs", "clear_index", "cancel_docs_job"]}
         if isinstance(payload, dict):
             payload.setdefault("action", action)
             payload.setdefault("tool", "prepare_docs")

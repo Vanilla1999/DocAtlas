@@ -5,6 +5,7 @@ import json
 import docmancer.docs.application.project_context_service as project_context_module
 from docmancer.docs.application.project_context_service import ProjectContextService
 from docmancer.docs.domain.retrieval_routing import (
+    fit_stage_items,
     new_routing_record,
     record_stage,
     route_initial_stages,
@@ -19,6 +20,7 @@ class RoutingFacade:
     def __init__(self, root, *, doc_content="Architecture conventions are documented here."):
         self.root = root
         self.project_calls = 0
+        self.project_kwargs = {}
         self.project_docs = ProjectDocsResult(
             project_path=str(root),
             query="q",
@@ -33,6 +35,7 @@ class RoutingFacade:
 
     def get_project_docs(self, project_path, question, **kwargs):
         self.project_calls += 1
+        self.project_kwargs = kwargs
         return self.project_docs
 
     def get_docs(self, library, **kwargs):
@@ -65,6 +68,18 @@ def test_docs_only_does_not_invoke_source_map_or_code_graph(tmp_path, monkeypatc
     assert routing["stages"]["code_graph"]["status"] == "skipped"
     assert validate_routing_record(routing) == []
     assert "Architecture conventions are documented here" not in json.dumps(routing)
+
+
+def test_project_docs_fetches_bounded_candidate_pool_before_reranking(tmp_path):
+    facade = RoutingFacade(tmp_path)
+
+    result = ProjectContextService(facade).get_project_context(
+        str(tmp_path), "Explain the architecture conventions", mode="project-only", limit=6,
+    )
+
+    assert facade.project_kwargs["limit"] == 18
+    assert result.project_docs is not None
+    assert len(result.project_docs.results) <= 6
 
 
 def test_library_only_does_not_invoke_project_cartography(tmp_path, monkeypatch):
@@ -154,3 +169,17 @@ def test_create_intent_routes_as_patch_and_stage_overflow_is_visible():
     assert record["stages"]["repo_map"]["status"] == "insufficient"
     assert record["stages"]["repo_map"]["observed_item_count"] == 100
     assert validate_routing_record(record) == []
+
+
+def test_stage_budget_skips_non_fitting_item_and_keeps_later_evidence(monkeypatch):
+    monkeypatch.setitem(fit_stage_items.__globals__["STAGE_BYTE_LIMITS"], "project_docs", 120)
+    items = [
+        {"path": "first.md", "content": "x" * 40},
+        {"path": "too-large.md", "content": "x" * 100},
+        {"path": "later.md", "content": "relevant"},
+    ]
+
+    bounded, issue = fit_stage_items("project_docs", items)
+
+    assert [item["path"] for item in bounded] == ["first.md", "later.md"]
+    assert issue is not None

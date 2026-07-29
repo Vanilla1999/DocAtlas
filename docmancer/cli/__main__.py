@@ -5,6 +5,7 @@ from docmancer.cli.commands import (
     add_cmd,
     agent_contract_cmd,
     clear_cmd,
+    clear_index_cmd,
     context_cmd,
     docs_impact_cmd,
     doctor_cmd,
@@ -83,6 +84,7 @@ cli.add_command(inspect_cmd, "inspect")
 cli.add_command(list_cmd, "list")
 cli.add_command(remove_cmd, "remove")
 cli.add_command(clear_cmd, "clear")
+cli.add_command(clear_index_cmd, "clear-index")
 cli.add_command(doctor_cmd, "doctor")
 cli.add_command(init_cmd, "init")
 cli.add_command(fetch_cmd, "fetch")
