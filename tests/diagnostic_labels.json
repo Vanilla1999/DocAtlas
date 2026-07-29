@@ -239,7 +239,7 @@
     "tests/docs/test_library_index_publication.py": "9e017eacb83b0e9c48fe75872eced6707ac3d10b83fa9a910dc6f46fa9e0fb83",
     "tests/docs/test_library_job_executor.py": "86b231e4f34972cd7f17d151e2044acdc4ed71cce3bbd340b1888a10b604d77d",
     "tests/docs/test_mcp_boundary.py": "63891099dc91cbf2eeef7deb2972eb064080f2ddfe8d11b9135df66549b86c20",
-    "tests/docs/test_mcp_docs_tools_registration.py": "7776d9f1e1db83f3e828b82c4afd121dec05b7c745d7be3fb6f730a6d4392ef0",
+    "tests/docs/test_mcp_docs_tools_registration.py": "19b79960bf9f8f81777a0cdd02cdbb6a05e99fbbc4bda7e4ca14d9066e6366e5",
     "tests/docs/test_mcp_error_contract.py": "a0f7f9fe37934b5b6a528e6d6b1ba9bad42b0349a9f901ee50a318308f015ca8",
     "tests/docs/test_mcp_output_contract.py": "3c3d49013141661658cb5b008a3ae59f336523cf1b1f1ee01f2b9c0b62995b6b",
     "tests/docs/test_mcp_token_footprint.py": "34b40986931303bc312678f8e64bb6b3f31129baa6b402508b5181f7e4518833",

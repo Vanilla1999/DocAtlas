@@ -45,7 +45,7 @@ _PREPARE_REQUIRED_FIELDS = {
     "validate_docs_manifest": {"manifest_path"},
     "prefetch_docs_manifest": {"manifest_path"},
     "refresh_library_docs": {"library"},
-    "remove_library_docs": {"canonical_id"},
+    "remove_library_docs": {"canonical_id", "project_path"},
     "cancel_docs_job": {"job_id"},
 }
 _REMOTE_PREPARE_ACTIONS = {

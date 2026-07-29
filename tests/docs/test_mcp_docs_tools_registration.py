@@ -424,6 +424,27 @@ def test_prepare_docs_keeps_async_job_cancellation_on_public_surface():
     }
 
 
+def test_prepare_docs_rejects_unscoped_library_removal_before_service_call():
+    class Service:
+        called = False
+
+        def remove_library_docs(self, canonical_id):
+            self.called = True
+            raise AssertionError("validation should have stopped this call")
+
+    service = Service()
+
+    result = call_docs_tool_payload(
+        "prepare_docs",
+        {"action": "remove_library_docs", "canonical_id": "pub:go_router@14.8.1:api"},
+        service,
+    )
+
+    assert result["reason_code"] == "validation_error"
+    assert "project_path" in result["message"]
+    assert service.called is False
+
+
 def test_prepare_docs_rejects_unknown_and_action_irrelevant_fields_before_service_call():
     class Service:
         called = False
