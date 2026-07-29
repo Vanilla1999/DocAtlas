@@ -677,11 +677,14 @@ Run the relevant tests/linters after this tool.
     },
     {
         "name": "remove_library_docs",
-        "description": "Remove one exact documentation target by canonical id.",
+        "description": "Remove one exact documentation target from project-owned storage by canonical id.",
         "inputSchema": {
             "type": "object",
-            "properties": {"canonical_id": {"type": "string"}},
-            "required": ["canonical_id"],
+            "properties": {
+                "canonical_id": {"type": "string"},
+                "project_path": {"type": "string"},
+            },
+            "required": ["canonical_id", "project_path"],
         },
     },
     {
@@ -996,8 +999,8 @@ def _service_for_project_path(
     )
 
 
-def _destructive_project_scope_error(arguments: dict[str, Any]) -> str | None:
-    if arguments.get("action") != "remove_library_docs":
+def _destructive_project_scope_error(name: str, arguments: dict[str, Any]) -> str | None:
+    if name != "remove_library_docs" and arguments.get("action") != "remove_library_docs":
         return None
     project_path = arguments.get("project_path")
     if not isinstance(project_path, str) or not project_path.strip():
@@ -1046,7 +1049,7 @@ def call_docs_tool_payload(
             tool=name,
             phase="validation",
         )
-    destructive_scope_error = _destructive_project_scope_error(args)
+    destructive_scope_error = _destructive_project_scope_error(name, args)
     if destructive_scope_error:
         return build_mcp_error_payload(
             reason_code="validation_error",

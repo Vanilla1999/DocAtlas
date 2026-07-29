@@ -464,6 +464,54 @@ def test_prepare_docs_rejects_unscoped_library_removal_before_service_call():
     assert service.called is False
 
 
+def test_admin_remove_library_docs_rejects_unscoped_removal_before_service_call():
+    class Service:
+        called = False
+
+        def remove_library_docs(self, canonical_id):
+            self.called = True
+            raise AssertionError("validation should have stopped this call")
+
+    service = Service()
+    surface = build_docs_surface(DocsServerConfig(expose_admin=True))
+
+    result = call_docs_tool_payload(
+        "remove_library_docs",
+        {"canonical_id": "pub:go_router@14.8.1:api"},
+        service,
+        surface=surface,
+    )
+
+    assert result["reason_code"] == "validation_error"
+    assert service.called is False
+
+
+def test_admin_remove_library_docs_rejects_non_project_owned_scope_before_service_call(tmp_path):
+    class Service:
+        called = False
+
+        def remove_library_docs(self, canonical_id):
+            self.called = True
+            raise AssertionError("validation should have stopped this call")
+
+    service = Service()
+    surface = build_docs_surface(DocsServerConfig(expose_admin=True))
+
+    result = call_docs_tool_payload(
+        "remove_library_docs",
+        {
+            "canonical_id": "pub:go_router@14.8.1:api",
+            "project_path": str(tmp_path),
+        },
+        service,
+        surface=surface,
+    )
+
+    assert result["reason_code"] == "validation_error"
+    assert "project_path" in result["message"]
+    assert service.called is False
+
+
 def test_prepare_docs_rejects_unknown_and_action_irrelevant_fields_before_service_call():
     class Service:
         called = False
