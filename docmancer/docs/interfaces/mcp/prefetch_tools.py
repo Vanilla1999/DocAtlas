@@ -34,7 +34,7 @@ _PREPARE_ACTION_FIELDS = {
     "refresh_library_docs": {"action", "library", "ecosystem", "version", "source_type", "docs_url", "force"},
     "prune_library_docs": {"action", "library", "keep_versions", "older_than_days", "dry_run"},
     "remove_library_docs": {"action", "canonical_id"},
-    "cancel_docs_job": {"action", "job_id"},
+    "cancel_docs_job": {"action", "job_id", "project_path"},
 }
 _PREPARE_REQUIRED_FIELDS = {
     "sync_project_docs": {"project_path"},

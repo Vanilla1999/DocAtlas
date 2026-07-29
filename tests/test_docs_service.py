@@ -6700,3 +6700,30 @@ def test_mcp_docs_status_uses_project_local_storage_topology(tmp_path):
     assert result["project"]["diagnostics"]["active_index"]["db_path"] == str(
         (project / ".docmancer" / "project.db").resolve()
     )
+
+
+def test_prepare_docs_cancels_project_local_job_using_project_topology(tmp_path, monkeypatch):
+    project = tmp_path / "project"
+    project.mkdir()
+    (project / "docmancer.yaml").write_text(
+        "index:\n  db_path: .docmancer/project.db\n",
+        encoding="utf-8",
+    )
+    fallback_service = _service(tmp_path, monkeypatch)
+    project_service = LibraryDocsService(config=DocmancerConfig.from_yaml(project / "docmancer.yaml"))
+    job = project_service.jobs.create("prefetch_project_dependency_docs")
+
+    result = call_docs_tool_payload(
+        "prepare_docs",
+        {
+            "action": "cancel_docs_job",
+            "job_id": job.job_id,
+            "project_path": str(project),
+        },
+        fallback_service,
+    )
+
+    assert result["status"] == "cancelling"
+    project_job = project_service.get_docs_job_status(job.job_id)
+    assert project_job is not None
+    assert project_job.status == "cancelling"
