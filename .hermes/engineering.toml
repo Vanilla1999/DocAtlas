@@ -1,0 +1,47 @@
+schema_version = 1
+project_id = "docmancer-task9-pilot"
+profile = "bounded-engineer"
+tenant = "bounded-engineering/v1"
+completion_gate = "bounded-engineering/v1"
+
+[workspace]
+kind = "worktree"
+require_clean_source = true
+require_clean_task_baseline = true
+allow_commits = false
+allow_submodule_changes = false
+allow_new_symlinks = false
+max_changed_files = 3
+max_total_changed_bytes = 65536
+max_single_file_bytes = 32768
+max_binary_files = 0
+
+[context]
+target_bytes = 8192
+hard_bytes = 16384
+project_map_max_bytes = 4096
+latest_failure_max_bytes = 4096
+
+[sandbox]
+network = false
+forward_env = []
+
+[execution]
+max_active_writer_tasks = 1
+default_max_runtime_seconds = 900
+default_max_retries = 0
+allow_delegate_task = false
+
+[policy]
+forbidden_tools = ["delegate_task"]
+forbidden_git_subcommands = ["reset", "rebase", "merge", "checkout", "clean", "restore"]
+forbidden_command_tokens = ["sudo", "curl", "wget", "ssh", "scp"]
+
+[[verification]]
+id = "task9-focused"
+kind = "test"
+argv = ["python", "-m", "pytest", "-q", "tests/docs/test_source_map.py", "tests/test_diagnostic_labels.py", "tests/test_config.py", "tests/docs/test_code_graph.py", "tests/docs/test_retrieval_routing.py", "tests/test_query_planning.py", "--tb=short"]
+timeout_seconds = 300
+parser = "pytest"
+minimum_collected = 100
+required = true
