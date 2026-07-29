@@ -1839,7 +1839,10 @@ def context_cmd(
     from dataclasses import asdict
     from docmancer.docs.service import LibraryDocsService
 
-    config = _load_config(_effective_config(config_path))
+    from docmancer.core.storage_topology import StorageTopologyResolver
+
+    fallback_config = _load_config(_effective_config(config_path))
+    config = StorageTopologyResolver(fallback_config=fallback_config).resolve(project_path).config
     result = LibraryDocsService(config=config).get_project_context(
         project_path,
         question,

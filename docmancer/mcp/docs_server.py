@@ -10,6 +10,7 @@ from typing import Any, Callable, Mapping, cast
 
 import jsonschema
 
+from docmancer.core.storage_topology import StorageTopologyResolver
 from docmancer.docs.application.action_packet import ACTION_PACKET_OUTPUT_SCHEMA
 from docmancer.docs.interfaces.mcp.error_contract import build_mcp_error_payload, debug_errors_enabled
 from docmancer.docs.service import LibraryDocsService
@@ -963,6 +964,26 @@ def _public_handler_arguments(name: str, args: dict[str, Any]) -> dict[str, Any]
     return bounded
 
 
+def _service_for_project_path(
+    service: LibraryDocsService,
+    arguments: dict[str, Any],
+) -> LibraryDocsService:
+    if not isinstance(service, LibraryDocsService):
+        return service
+    project_path = arguments.get("project_path")
+    if not isinstance(project_path, str) or not project_path.strip():
+        return service
+    topology = StorageTopologyResolver(fallback_config=service.config).resolve(project_path)
+    if topology.config.index.db_path == service.config.index.db_path:
+        return service
+    return LibraryDocsService(
+        config=topology.config,
+        agent_factory=service.agent_gateway._agent_factory,
+        project_reader=service.project_reader,
+        stale_after_days=service.stale_after_days,
+    )
+
+
 def call_docs_tool_payload(
     name: str,
     arguments: dict[str, Any] | None,
@@ -1002,8 +1023,9 @@ def call_docs_tool_payload(
             phase="validation",
         )
     handler_args = _public_handler_arguments(name, args)
+    active_service = _service_for_project_path(service, handler_args)
     try:
-        payload = handler(name, handler_args, service)
+        payload = handler(name, handler_args, active_service)
     except Exception as exc:
         reason_code = _exception_reason_code(exc)
         return build_mcp_error_payload(

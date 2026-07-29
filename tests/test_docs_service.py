@@ -6677,3 +6677,26 @@ def test_service_startup_removes_only_old_owned_staging_directories(tmp_path, mo
     assert not old_owned.exists()
     assert fresh_owned.exists()
     assert old_unowned.exists()
+
+
+def test_mcp_docs_status_uses_project_local_storage_topology(tmp_path):
+    project = tmp_path / "project"
+    project.mkdir()
+    (project / "README.md").write_text("# Project\n", encoding="utf-8")
+    (project / "docmancer.yaml").write_text(
+        "index:\n  db_path: .docmancer/project.db\n",
+        encoding="utf-8",
+    )
+    fallback_config = DocmancerConfig()
+    fallback_config.index.db_path = str(tmp_path / "fallback.db")
+    service = LibraryDocsService(config=fallback_config, job_tracker=DocsJobTracker())
+
+    result = call_docs_tool_payload(
+        "docs_status",
+        {"action": "project", "project_path": str(project)},
+        service,
+    )
+
+    assert result["project"]["diagnostics"]["active_index"]["db_path"] == str(
+        (project / ".docmancer" / "project.db").resolve()
+    )

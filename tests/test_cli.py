@@ -301,6 +301,39 @@ def test_load_config_bootstraps_user_config_when_no_local_config(tmp_path):
     assert config.index.db_path == str((fake_home / ".docmancer" / "docmancer.db").resolve())
 
 
+def test_context_cli_uses_project_local_storage_topology(tmp_path):
+    from docmancer.core.config import DocmancerConfig
+    from docmancer.docs.models import ProjectContextResult
+
+    project = tmp_path / "project"
+    project.mkdir()
+    (project / "docmancer.yaml").write_text(
+        "index:\n  db_path: .docmancer/project.db\n",
+        encoding="utf-8",
+    )
+    fallback = DocmancerConfig()
+    fallback.index.db_path = str(tmp_path / "fallback.db")
+    captured: dict[str, str] = {}
+
+    class CapturingService:
+        def __init__(self, *, config):
+            captured["db_path"] = config.index.db_path
+
+        def get_project_context(self, project_path, question, **_kwargs):
+            return ProjectContextResult(project_path=project_path, question=question)
+
+    with patch("docmancer.cli.commands._load_config", return_value=fallback), patch(
+        "docmancer.docs.service.LibraryDocsService", CapturingService
+    ):
+        result = CliRunner().invoke(
+            cli,
+            ["context", str(project), "Where is the index?", "--format", "json"],
+        )
+
+    assert result.exit_code == 0, result.output
+    assert captured["db_path"] == str((project / ".docmancer" / "project.db").resolve())
+
+
 def test_load_config_prefers_local_docmancer_yaml(tmp_path):
     fake_home = tmp_path / "home"
     fake_home.mkdir()
