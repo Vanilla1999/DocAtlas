@@ -299,7 +299,13 @@ class FailingRefreshStaticChunksAgent(StaticChunksAgent):
         raise RuntimeError("refresh failed")
 
 
-def _service(tmp_path, monkeypatch, agent: FakeAgent | None = None) -> LibraryDocsService:
+def _service(
+    tmp_path,
+    monkeypatch,
+    agent: FakeAgent | None = None,
+    *,
+    durable_jobs: bool = False,
+) -> LibraryDocsService:
     monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
     agent = agent or FakeAgent()
     config = DocmancerConfig()
@@ -314,7 +320,7 @@ def _service(tmp_path, monkeypatch, agent: FakeAgent | None = None) -> LibraryDo
         registry=LibraryRegistry(config.index.db_path),
         agent=agent,
         agent_factory=agent_factory,
-        job_tracker=DocsJobTracker(),
+        job_tracker=DocsJobTracker(db_path=config.index.db_path) if durable_jobs else DocsJobTracker(),
     )
 
 
@@ -4421,6 +4427,42 @@ def test_cancelled_library_prefetch_restores_index_state_after_inflight_fetch(tm
     assert after is not None
     assert after.status == "available"
     assert service.library_docs.registry_ops.count_index_entries(after) == (0, 0)
+
+
+def test_cross_service_durable_cancellation_stops_active_library_prefetch(tmp_path, monkeypatch):
+    agent = SlowIndexingAgent()
+    active_service = _service(tmp_path, monkeypatch, agent, durable_jobs=True)
+    cancelling_service = LibraryDocsService(
+        config=active_service.config,
+        registry=active_service.registry,
+        agent=agent,
+        agent_factory=active_service.agent_gateway._agent_factory,
+    )
+    result = active_service.prefetch_docs(
+        "example-docs",
+        ecosystem="web",
+        docs_url="https://example.com/docs/",
+        async_=True,
+    )
+
+    assert agent.entered.wait(timeout=1)
+    cancelling_service.cancel_docs_job(result.job_id)
+    try:
+        assert active_service.jobs.cancellation_requested(result.job_id)
+    finally:
+        agent.release.set()
+
+    status = None
+    for _ in range(30):
+        status = active_service.get_docs_job_status(result.job_id)
+        if status and status.status == "cancelled":
+            break
+        time.sleep(0.02)
+    assert status is not None
+    assert status.status == "cancelled"
+    record = active_service.registry.get("example-docs", "web", "latest")
+    assert record is not None
+    assert active_service.library_docs.registry_ops.count_index_entries(record) == (0, 0)
 
 
 def test_cancel_between_staging_fetch_and_commit_never_publishes_index(tmp_path, monkeypatch):

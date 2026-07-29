@@ -457,7 +457,12 @@ class DocsJobTracker:
         if job_id is None:
             return False
         with self._lock:
-            return job_id in self._cancel_requested
+            if job_id in self._cancel_requested:
+                return True
+            if self._store is None:
+                return False
+            job = self._store.get(job_id)
+            return bool(job and job.status == "cancelling")
 
     def generation_active(self, job_id: str, generation_id: str | None) -> bool:
         job = self.get(job_id)
