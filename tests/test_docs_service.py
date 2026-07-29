@@ -168,7 +168,7 @@ class SlowIndexingAgent(FakeAgent):
         return super().add(docs_url, recreate=recreate, **kwargs)
 
 
-VectorSyncFailure = type("api_key=" + "type-secret" * 100, (RuntimeError,), {})
+VectorSyncFailure = type("aws_secret_access_key_leaked_value", (RuntimeError,), {})
 
 
 class VectorTrackingAgent(FakeAgent):
@@ -4288,7 +4288,7 @@ def test_cancelled_staged_prefetch_never_syncs_vectors(tmp_path, monkeypatch):
     assert agent.sync_calls == 0
 
 
-def test_vector_sync_failure_keeps_fts_index_and_returns_partial(tmp_path, monkeypatch):
+def test_vector_sync_failure_redacts_valid_identifier_secret_from_durable_status(tmp_path, monkeypatch):
     agent = VectorTrackingAgent(fail_sync=True)
     service = _service(tmp_path, monkeypatch, agent)
     result = service.prefetch_docs(
@@ -4317,6 +4317,7 @@ def test_vector_sync_failure_keeps_fts_index_and_returns_partial(tmp_path, monke
     assert status.exception_message == "<redacted diagnostic text>"
     assert status.exception_traceback == "<redacted traceback>"
     assert "type-secret" not in status.exception_type
+    assert "aws_secret_access_key_leaked_value" not in status.exception_type
     assert "other-secret" not in status.exception_traceback
     assert "vector-sync-secret" not in status.exception_traceback
     assert "aws-env-secret" not in status.exception_message

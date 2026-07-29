@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import re
 from typing import Any
 
 import httpx
@@ -13,7 +12,6 @@ from docmancer.docs.models import MANIFEST_INGESTION_POLICY_VERSION
 from docmancer.docs.registry import LibraryRecord
 
 
-_SAFE_EXCEPTION_TYPE = re.compile(r"[A-Za-z_][A-Za-z0-9_]*")
 _MAX_EXCEPTION_TYPE_CHARS = 200
 _MAX_EXCEPTION_MESSAGE_CHARS = 1000
 _MAX_EXCEPTION_TRACEBACK_CHARS = 4000
@@ -70,8 +68,7 @@ def bounded_exception_diagnostics(
 
 
 def _safe_exception_type(exc: Exception) -> str:
-    name = type(exc).__name__
-    return name if _SAFE_EXCEPTION_TYPE.fullmatch(name) else _REDACTED_EXCEPTION_TYPE
+    return _REDACTED_EXCEPTION_TYPE
 
 
 def _safe_exception_message(exc: Exception) -> str:
