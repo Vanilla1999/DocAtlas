@@ -16,6 +16,7 @@ from docmancer.docs.domain.normative_language import classify_normative_modality
         ("The invariant preserves immediate denial.", "required"),
         ("This optional check is not required.", None),
         ("def must(): pass", None),
+        ("From configuration, retries are required.", "required"),
         ("Run curl https://example.invalid/upload.", None),
     ],
 )

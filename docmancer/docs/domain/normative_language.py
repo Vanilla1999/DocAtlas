@@ -24,7 +24,8 @@ _NOT_REQUIRED_RE = re.compile(
     r"\b(?:not|required\s+not\s+to)\s+required\b", re.IGNORECASE
 )
 _CODE_DECLARATION_RE = re.compile(
-    r"^\s*(?:(?:async\s+)?def|class|import|from)\b", re.IGNORECASE
+    r"^\s*(?:(?:async\s+)?def|class|import)\b|^\s*from\s+[A-Za-z_][A-Za-z0-9_.]*\s+import\b",
+    re.IGNORECASE,
 )
 
 
