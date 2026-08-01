@@ -216,7 +216,7 @@
     "tests/test_web_fetcher.py": "behavioral"
   },
   "module_node_hashes": {
-    "tests/docs/test_action_packet.py": "07b4630b4a1b2ff57870188014af6260527a99c67cd3c3a4a3f03ca126692ad7",
+    "tests/docs/test_action_packet.py": "86ee16e2fe221857a77178bd8b681560d4adc0ebb0308e4dd43a8be3c0cbf6c8",
     "tests/docs/test_agent_index_gateway.py": "e870608d4ce9b818606a402ae790105562ea5300d92d432d641078ef7cbc30f1",
     "tests/docs/test_change_aware_maintenance.py": "691793ef8fa0c653ef44065b82dbe85da2488a33ce7ffd4578867139426cf5cb",
     "tests/docs/test_code_graph.py": "e0b649da530df23b24e9f6fa33d6e6718481c26da4fd6daf915f5cb66c4ddf78",
@@ -245,7 +245,7 @@
     "tests/docs/test_mcp_output_contract.py": "3c3d49013141661658cb5b008a3ae59f336523cf1b1f1ee01f2b9c0b62995b6b",
     "tests/docs/test_mcp_token_footprint.py": "34b40986931303bc312678f8e64bb6b3f31129baa6b402508b5181f7e4518833",
     "tests/docs/test_model_visible_projection.py": "ef30cb97b1514f5aedf3293a3fe6105b93004b87987d082f3ed7aeab5fa7284b",
-    "tests/docs/test_normative_language.py": "1186e06315bd02b2b59008718e6695d46cb68b8100714ce7984352b0442bed49",
+    "tests/docs/test_normative_language.py": "5b25646db89c8cb2e5d1db290f4b1878628366cf87ed455d8cbd76f6b934bba8",
     "tests/docs/test_patch_plan_context.py": "9966266603b99a9086b3f416dc266a209cf787089bb21fc2361993be7a53d1bc",
     "tests/docs/test_policies.py": "81afa7f8b7fa24d08679e77ced4f1a9ef54114f6882055df3c9fd98e160405a0",
     "tests/docs/test_project_answer_outline.py": "7bdf757744d8124a2509f632f0c0b4827a4fd4dd8418c8846caba7f641cda7a3",
@@ -394,7 +394,7 @@
     "tests/test_parsers.py": "fde8fe21da4f9969d24230b6fd746117ec1b3f7487f7bc66dc76016001c4ddd5",
     "tests/test_patch_constraint_symbol_grounding.py": "f33a2340092a95b65692fd8f417b5f1a2d58f6a00f6b0b8d0da62090d2967c45",
     "tests/test_patch_constraint_validation_service.py": "695a3eeac4d682d7ba62a615e38afb1fcbbab05a2e52f99cbe2580fbd507364d",
-    "tests/test_patch_constraints_service.py": "c12849ffb7dd6acf48c2d71ee6b12887e084b92ef4afee499cec9bbd538ca2b4",
+    "tests/test_patch_constraints_service.py": "b26d991648db044c435a661f4e53173a32ad32a56ce4259a831bf86b067a3872",
     "tests/test_patch_constraints_workflow.py": "7a736d88dbe51b34fc2ea22ad8d752f2cb9bfad75b98e142b49a76bd24603c63",
     "tests/test_patch_review_command.py": "32b061cf1028737c545f49886c46845bfd1d8efc5ff5273fb6d6f254bb3fd1b7",
     "tests/test_preindex_coverage.py": "a0ae566b11341913a8bd4914937b1339dccb7245a892fe74a93e1fe18863c042",
