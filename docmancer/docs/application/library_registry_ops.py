@@ -281,6 +281,7 @@ class LibraryRegistryOps:
             checkpoint_completed_pages=len(checkpoint.get("completed_urls") or []),
             checkpoint_pending_pages=len(checkpoint.get("pending_urls") or []),
             checkpoint_failed_pages=len(checkpoint.get("failed_urls") or {}),
+            checkpoint_quarantined_pages=len(checkpoint.get("quarantined_urls") or []),
             resumable=bool(checkpoint.get("pending_urls")),
             manifest_expected=manifest_expected,
             manifest_fetched=manifest_fetched,

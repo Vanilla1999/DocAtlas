@@ -126,10 +126,13 @@ def test_dartdoc_index_ignores_out_of_scope_links_before_page_limit() -> None:
                 return Response('<html><body class="dartdoc"></body></html>')
             return Response(
                 '[{"href":"https://evil.example/Fake-class.html"},'
+                '{"href":"widgets/Alpha-class.html"},'
                 '{"href":"widgets/FocusNode-class.html"}]'
             )
 
-    discovered = _try_dartdoc_index(root_url, cast(Any, Client()), max_pages=1)
+    discovered = _try_dartdoc_index(
+        root_url, cast(Any, Client()), max_pages=1, query="How should FocusNode be used?",
+    )
 
     assert discovered is not None
     assert [item.url for item in discovered] == [root_url + "widgets/FocusNode-class.html"]

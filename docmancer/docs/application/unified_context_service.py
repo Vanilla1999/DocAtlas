@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import re
+import hashlib
 from dataclasses import asdict, is_dataclass, replace
 from typing import Any
 
@@ -399,6 +400,27 @@ class UnifiedDocsContextService:
                     item for decision in decisions if decision
                     for item in decision.selected_evidence_ids
                 })
+                aggregate_manifest = [
+                    {
+                        "library_id": result.library_id,
+                        "answer_supported": bool(decision and decision.answer_supported),
+                        "decision_hash": getattr(decision, "decision_hash", None),
+                        "missing_requirement_ids": list(
+                            getattr(decision, "missing_requirement_ids", ()) or ()
+                        ),
+                    }
+                    for result, decision in sorted(
+                        zip(library_results, decisions), key=lambda item: item[0].library_id
+                    )
+                ]
+                aggregate_decision_hash = hashlib.sha256(
+                    json.dumps(
+                        aggregate_manifest,
+                        ensure_ascii=True,
+                        sort_keys=True,
+                        separators=(",", ":"),
+                    ).encode("utf-8")
+                ).hexdigest()
                 support_payload = {
                     "support_status": "supported" if answer_supported else "insufficient_evidence",
                     "reason_code": None if answer_supported else "multi_library_support_incomplete",
@@ -409,7 +431,7 @@ class UnifiedDocsContextService:
                         min((decision.mandatory_coverage for decision in decisions if decision), default=0.0)
                     ),
                     "selected_evidence_ids": selected_ids,
-                    "decision_hash": None,
+                    "decision_hash": aggregate_decision_hash,
                 }
         else:
             project_completeness = dict(

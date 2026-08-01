@@ -39,6 +39,7 @@ def build_fetcher(
     cancellation_callback=None,
     deadline_at: float | None = None,
     source_manifest: dict | None = None,
+    query: str | None = None,
 ):
     """Build the fetcher shared by the CLI and registry pipeline."""
     concrete = detect_fetcher_provider(url, provider)
@@ -70,4 +71,5 @@ def build_fetcher(
         cancellation_callback=cancellation_callback,
         deadline_at=deadline_at,
         source_manifest=source_manifest,
+        query=query,
     )

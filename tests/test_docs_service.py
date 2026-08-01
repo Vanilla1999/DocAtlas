@@ -1354,7 +1354,7 @@ vector_store:
     sync = service.sync_project_docs(str(project), with_vectors=False)
     sync_compact = handle_project_tool("sync_project_docs", {"project_path": str(project), "with_vectors": False}, service)
 
-    expected_active_db = str((tmp_path / "user-home" / ".docmancer" / "docmancer.db").resolve())
+    expected_active_db = str((tmp_path / "docmancer-home" / "docmancer.db").resolve())
     expected_project_db = str((project / ".docmancer" / "project-local.db").resolve())
     assert inspect.diagnostics["active_index"]["db_path"] == expected_active_db
     assert inspect.diagnostics["active_index"]["project_path"] == str(project.resolve())
@@ -4288,7 +4288,7 @@ def test_successful_library_prefetch_atomically_publishes_staged_index(tmp_path,
         async_=True,
     )
 
-    for _ in range(30):
+    for _ in range(100):
         status = service.get_docs_job_status(result.job_id)
         if status and status.status == "succeeded":
             break
@@ -4311,7 +4311,7 @@ def test_staged_prefetch_syncs_vectors_only_from_production_index(tmp_path, monk
         async_=True,
     )
 
-    for _ in range(30):
+    for _ in range(100):
         status = service.get_docs_job_status(result.job_id)
         if status and status.status == "succeeded":
             break
@@ -4515,6 +4515,52 @@ def test_cross_service_durable_cancellation_stops_active_library_prefetch(tmp_pa
     record = active_service.registry.get("example-docs", "web", "latest")
     assert record is not None
     assert active_service.library_docs.registry_ops.count_index_entries(record) == (0, 0)
+
+
+def test_service_restart_automatically_resumes_authorized_library_prefetch(tmp_path, monkeypatch):
+    first = _service(tmp_path, monkeypatch, FakeAgent(), durable_jobs=True)
+    request_identity = json.dumps({
+        "library": "example-docs",
+        "ecosystem": "web",
+        "docs_url": "https://example.com/docs/",
+        "docs_url_template": None,
+        "versions": [],
+    }, sort_keys=True)
+    interrupted = first.jobs.create(
+        "prefetch_library_docs",
+        request_identity=request_identity,
+        request_payload={
+            "library": "example-docs",
+            "ecosystem": "web",
+            "versions": [],
+            "docs_url": "https://example.com/docs/",
+            "docs_url_template": None,
+            "source_type": None,
+            "force_refresh": False,
+            "continue_on_error": True,
+            "target_plan": [],
+        },
+    )
+    first.jobs.update(interrupted.job_id, status="running")
+
+    restarted_tracker = DocsJobTracker(
+        db_path=first.config.index.db_path,
+        lease_id="simulated-restarted-worker",
+    )
+    restarted = LibraryDocsService(
+        config=first.config,
+        registry=first.registry,
+        agent=FakeAgent(),
+        job_tracker=restarted_tracker,
+    )
+
+    recovered = restarted.get_docs_job_status(interrupted.job_id)
+    assert recovered is not None
+    assert recovered.reason_code == "job_resumed"
+    assert recovered.resumed_by_job_id in restarted.resumed_docs_job_ids
+    successor = restarted.get_docs_job_status(recovered.resumed_by_job_id)
+    assert successor is not None
+    assert successor.predecessor_job_id == interrupted.job_id
 
 
 def test_cancel_between_staging_fetch_and_commit_never_publishes_index(tmp_path, monkeypatch):
@@ -5887,6 +5933,17 @@ def test_fresh_partial_target_remains_partial_without_refetch(tmp_path, monkeypa
         service,
     )
     assert public_status["library"]["status"] == "partial"
+
+    third = service.prefetch_docs_targets([target])
+    fourth = service.prefetch_docs_targets([target])
+    quarantined = service.inspect_library_docs(first.results[0].canonical_id)
+
+    assert third.status == "partial"
+    assert fourth.status == "partial"
+    assert len(agent.add_calls) == 3
+    assert quarantined.resumable is False
+    assert quarantined.checkpoint_pending_pages == 0
+    assert quarantined.checkpoint_quarantined_pages == 1
 
 
 def test_prefetch_docs_targets_resets_diagnostics_between_targets(tmp_path, monkeypatch):

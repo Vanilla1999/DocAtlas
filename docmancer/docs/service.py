@@ -69,6 +69,7 @@ class LibraryDocsService:
         self.docs_targets = DocsTargetService(self._render_docs_url, self.jobs)
         self.docs_prefetch = DocsPrefetchService(self)
         self.docs_manifest = DocsManifestService(self)
+        self.resumed_docs_job_ids = self.library_docs.resume_interrupted_jobs()
 
     def _now(self) -> str:
         return datetime.now(timezone.utc).isoformat(timespec="seconds")

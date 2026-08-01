@@ -88,9 +88,11 @@ def test_multi_library_context_requires_every_library_support_decision():
 
     assert supported.answer_supported is True
     assert supported.support_status == "supported"
+    assert supported.decision_hash
     assert incomplete.answer_supported is False
     assert incomplete.reason_code == "multi_library_support_incomplete"
     assert incomplete.missing_requirement_ids == ["beta:required"]
+    assert incomplete.decision_hash
 
 
 def test_get_docs_context_exposes_fail_closed_change_maintenance_brief(tmp_path):

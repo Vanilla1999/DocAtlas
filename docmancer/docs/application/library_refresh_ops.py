@@ -194,7 +194,7 @@ class LibraryRefreshOps:
                     cancellation_callback=should_cancel,
                     deadline_at=deadline_at,
                     source_manifest=manifest,
-                    with_vectors=False if staging else True,
+                    with_vectors=False,
                 )
                 if isinstance(indexed_sections, int):
                     sections_indexed += indexed_sections

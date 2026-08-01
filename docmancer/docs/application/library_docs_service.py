@@ -864,6 +864,41 @@ class LibraryDocsApplicationService:
             async_=async_,
         )
 
+    def resume_interrupted_jobs(self) -> list[str]:
+        resumed: list[str] = []
+        for interrupted in self.jobs.list(status="interrupted"):
+            payload = dict(interrupted.request_payload or {})
+            if (
+                interrupted.kind != "prefetch_library_docs"
+                or interrupted.reason_code != "job_interrupted"
+                or interrupted.resumed_by_job_id
+                or not payload.get("library")
+            ):
+                continue
+            target_plan = [DocsTarget(**item) for item in payload.pop("target_plan", [])]
+            started = self.ingest_orchestrator.prefetch_docs(
+                str(payload.get("library")),
+                ecosystem=payload.get("ecosystem"),
+                versions=list(payload.get("versions") or []),
+                docs_url=payload.get("docs_url"),
+                docs_url_template=payload.get("docs_url_template"),
+                source_type=payload.get("source_type"),
+                force_refresh=bool(payload.get("force_refresh")),
+                continue_on_error=bool(payload.get("continue_on_error", True)),
+                async_=True,
+                target_plan=target_plan or None,
+            )
+            if isinstance(started, DocsJobStartResult):
+                self.jobs.update(
+                    interrupted.job_id,
+                    reason_code="job_resumed",
+                    retryable=False,
+                    resumed_by_job_id=started.job_id,
+                    message=f"Interrupted job resumed as {started.job_id}.",
+                )
+                resumed.append(started.job_id)
+        return resumed
+
     @staticmethod
     def _flutter_targets_for_request(
         library: str,

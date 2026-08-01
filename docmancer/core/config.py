@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import warnings
+import os
 from pathlib import Path
 
 import yaml
@@ -9,7 +10,8 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 def default_user_db_path() -> str:
-    return str(Path.home() / ".docmancer" / "docmancer.db")
+    root = Path(os.environ.get("DOCMANCER_HOME") or (Path.home() / ".docmancer"))
+    return str(root / "docmancer.db")
 
 
 class IndexConfig(BaseSettings):
@@ -108,7 +110,9 @@ class EmbeddingsConfig(BaseSettings):
     model: str = "BAAI/bge-base-en-v1.5"
     dimensions: int = 768
     sparse_model: str | None = None
-    cache: str = Field(default_factory=lambda: str(Path.home() / ".docmancer" / "embeddings-cache"))
+    cache: str = Field(default_factory=lambda: str(
+        Path(os.environ.get("DOCMANCER_HOME") or (Path.home() / ".docmancer")) / "embeddings-cache"
+    ))
     batch_size: int = 64
     model_config = SettingsConfigDict(env_prefix="DOCMANCER_EMBEDDINGS_", extra="ignore")
 

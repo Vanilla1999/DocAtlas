@@ -573,7 +573,7 @@ class ProjectDocsService:
         project_path: str,
         *,
         skip_known: bool = True,
-        with_vectors: bool = True,
+        with_vectors: bool = False,
         _candidate_paths: set[str] | None = None,
     ) -> ProjectDocsIngestResult:
         if hasattr(self.facade, "_project_ingest_project_docs_impl"):
@@ -1008,7 +1008,7 @@ class ProjectDocsService:
         self,
         project_path: str,
         *,
-        with_vectors: bool = True,
+        with_vectors: bool = False,
         changed_paths: list[str] | tuple[str, ...] | None = None,
         deleted_paths: list[str] | tuple[str, ...] | None = None,
         renamed_paths: list[dict[str, str]] | tuple[dict[str, str], ...] | None = None,

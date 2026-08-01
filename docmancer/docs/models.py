@@ -217,6 +217,8 @@ class DocsJob:
     lease_id: str | None = None
     predecessor_job_id: str | None = None
     request_identity: str | None = None
+    request_payload: dict[str, Any] | None = None
+    resumed_by_job_id: str | None = None
     status: str = "pending"
     phase: str = "validating"
     total_targets: int = 0
@@ -321,6 +323,7 @@ class DocsInspectResult:
     checkpoint_completed_pages: int = 0
     checkpoint_pending_pages: int = 0
     checkpoint_failed_pages: int = 0
+    checkpoint_quarantined_pages: int = 0
     resumable: bool = False
     manifest_expected: int = 0
     manifest_fetched: int = 0
