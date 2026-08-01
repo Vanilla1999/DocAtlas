@@ -872,6 +872,34 @@ def test_sync_project_docs_prunes_orphaned_sources_and_indexes_new_docs(tmp_path
     assert "NewSyncNeedle" in new_query.results[0].content
 
 
+def test_sync_project_docs_removes_extracted_artifacts_for_deleted_source(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    (project / "README.md").write_text("# App\n\nCurrent docs.", encoding="utf-8")
+    (project / "docs").mkdir()
+    deleted = project / "docs" / "old.md"
+    deleted.write_text(
+        "# Old\n\nDeletedArtifactNeedle must not remain on disk.",
+        encoding="utf-8",
+    )
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+    service.sync_project_docs(str(project), with_vectors=False)
+
+    with service._agent_instance().store._connect() as conn:
+        row = conn.execute(
+            "SELECT markdown_path, json_path FROM sources WHERE source = ?",
+            (str(deleted),),
+        ).fetchone()
+    assert row is not None
+    extracted_artifacts = [Path(row["markdown_path"]), Path(row["json_path"])]
+    assert all(path.exists() for path in extracted_artifacts)
+
+    deleted.unlink()
+    result = service.sync_project_docs(str(project), with_vectors=False)
+
+    assert result.orphaned_removed == 1
+    assert all(not path.exists() for path in extracted_artifacts)
+
+
 def test_invalid_explicit_catalog_blocks_lifecycle_and_preserves_index(tmp_path, monkeypatch):
     project = _flutter_project(tmp_path)
     (project / "README.md").write_text("# App\n\nExisting indexed docs.", encoding="utf-8")
