@@ -2426,6 +2426,27 @@ class SQLiteStore:
             "extracted_dir": str(self.extracted_dir),
         }
 
+    def orphaned_extraction_artifacts(self) -> list[str]:
+        """Report generated extraction files that no source row references."""
+        with self._connect() as conn:
+            referenced = {
+                Path(str(path_value)).resolve()
+                for row in conn.execute("SELECT markdown_path, json_path FROM sources")
+                for path_value in (row["markdown_path"], row["json_path"])
+                if path_value
+            }
+
+        artifacts = (
+            path
+            for path in self.extracted_dir.iterdir()
+            if path.is_file() and path.suffix in {".json", ".md"}
+        )
+        return [
+            str(path)
+            for path in sorted(artifacts, key=lambda candidate: candidate.name)
+            if path.resolve() not in referenced
+        ]
+
     def index_health(self, collection: str | None = None) -> dict[str, Any]:
         """Audit the active generation, exact spans, FTS parity and vector drift."""
         with self._connect() as conn:

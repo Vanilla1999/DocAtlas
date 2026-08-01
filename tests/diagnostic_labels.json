@@ -389,7 +389,7 @@
     "tests/test_network_guard.py": "3378f2e024f6f4d8c3b82980ca1c835fa0126e603257ccff63ef076ca9d30011",
     "tests/test_openai_embeddings.py": "a1c9f63dd80242fe19d55ce7e6e2da7bd832b0cc2afb37dd6f76bd373d6fb430",
     "tests/test_parent_child_grid.py": "26c48fa72ac635ac52c8d3b2cfca0036d394d2759d330ddf203d36ec809a5b7f",
-    "tests/test_parent_child_index.py": "54584e004688cb242ca7ae0f0e81c19941617ce9f946cfcb1564f5c0a23b4cc6",
+    "tests/test_parent_child_index.py": "c2e7d11296f2440cec811d638ca4dc77881123e8ab26ed0d0c347d91bc9d4dcc",
     "tests/test_parent_child_vectors.py": "71084b4466b6ecdea8bd941c94ed921cdae52361d4e5447abfa97d887cdcc884",
     "tests/test_parsers.py": "fde8fe21da4f9969d24230b6fd746117ec1b3f7487f7bc66dc76016001c4ddd5",
     "tests/test_patch_constraint_symbol_grounding.py": "f33a2340092a95b65692fd8f417b5f1a2d58f6a00f6b0b8d0da62090d2967c45",

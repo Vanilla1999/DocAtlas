@@ -243,6 +243,36 @@ def test_bulk_delete_does_not_unlink_persisted_artifact_outside_extracted_dir(tm
     assert not json_path.exists()
 
 
+def test_orphaned_extraction_artifacts_are_reported_without_mutation(tmp_path):
+    extracted = tmp_path / "extracted"
+    store = SQLiteStore(tmp_path / "index.db", extracted)
+    store.add_documents([_doc("# Keep\n\nreferenced extraction\n")])
+    referenced = sorted(extracted.iterdir())
+    orphan_json = extracted / "a-orphan.json"
+    orphan_markdown = extracted / "z-orphan.md"
+    unrelated = extracted / "notes.txt"
+    nested = extracted / "nested"
+    outside = tmp_path / "outside.md"
+    orphan_json.write_text("{}", encoding="utf-8")
+    orphan_markdown.write_text("orphan", encoding="utf-8")
+    unrelated.write_text("not generated", encoding="utf-8")
+    nested.mkdir()
+    (nested / "nested-orphan.md").write_text("nested", encoding="utf-8")
+    outside.write_text("outside", encoding="utf-8")
+
+    assert store.orphaned_extraction_artifacts() == [
+        str(orphan_json),
+        str(orphan_markdown),
+    ]
+
+    assert all(path.exists() for path in referenced)
+    assert orphan_json.exists()
+    assert orphan_markdown.exists()
+    assert unrelated.exists()
+    assert (nested / "nested-orphan.md").exists()
+    assert outside.exists()
+
+
 def test_unactivated_candidate_cannot_mutate_active_source_snapshot(tmp_path):
     store = SQLiteStore(tmp_path / "index.db")
     store.add_documents([_doc("# Stable\n\nold searchable fact\n")])
