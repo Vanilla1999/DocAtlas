@@ -2436,16 +2436,24 @@ class SQLiteStore:
                 if path_value
             }
 
-        artifacts = (
-            path
+        regular_artifacts = {
+            path.name: path
             for path in self.extracted_dir.iterdir()
-            if path.is_file() and path.suffix in {".json", ".md"}
-        )
-        return [
-            str(path)
-            for path in sorted(artifacts, key=lambda candidate: candidate.name)
-            if path.resolve() not in referenced
-        ]
+            if path.suffix in {".json", ".md"}
+            and not path.is_symlink()
+            and path.is_file()
+        }
+        orphaned: list[Path] = []
+        stems = sorted({Path(name).stem for name in regular_artifacts})
+        for stem in stems:
+            json_artifact = regular_artifacts.get(f"{stem}.json")
+            markdown_artifact = regular_artifacts.get(f"{stem}.md")
+            if json_artifact is None or markdown_artifact is None:
+                continue
+            pair = (json_artifact, markdown_artifact)
+            if all(path.resolve() not in referenced for path in pair):
+                orphaned.extend(pair)
+        return [str(path) for path in orphaned]
 
     def index_health(self, collection: str | None = None) -> dict[str, Any]:
         """Audit the active generation, exact spans, FTS parity and vector drift."""
