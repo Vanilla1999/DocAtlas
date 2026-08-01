@@ -426,7 +426,7 @@
     "tests/test_support_surface_policy.py": "e590f30e582da0241b7ba2a102b0f5c777fec2bb09c2759f31dc20e4a82a2aac",
     "tests/test_tool_selection_policy.py": "33867170e76a90489c37c0e26d19b5f4e8bef63f4ca4b223757d7e7e43842eb1",
     "tests/test_unified_docs_context.py": "a145ab06eaa75a036cb16942336a3fec94b815a4b4325003d64e510edd8d0bfa",
-    "tests/test_unified_docs_context_mcp.py": "e0a2fdfd0b8241806eeb2c4f7897360d98b6c5815acea9039ee704c43d41b72c",
+    "tests/test_unified_docs_context_mcp.py": "64db5341937ca57e0d12630f698a71d9217e5d769aa4b618e6d18e73a5219b03",
     "tests/test_uspto_tm.py": "92f3214036e4547c97bfe9c55398e9f137756c3813fd5d0e9f4497a18f3dc2e1",
     "tests/test_vector_fallback.py": "18314fc3296754c198f39308cc79b501cad3d81f648ca507f09eb3514d424f52",
     "tests/test_web_fetcher.py": "110ac6b4c8a415776f5b37f93c8f91283a3ecad7d25ee455e3d144aa79bc24f1"

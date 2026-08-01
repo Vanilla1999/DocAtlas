@@ -178,6 +178,7 @@ class DocsTarget:
     doc_format: str | None = None
     warnings: list[str] = field(default_factory=list)
     source_manifest: dict[str, Any] = field(default_factory=dict)
+    query: str | None = None
 
 
 @dataclass(frozen=True)
@@ -316,6 +317,11 @@ class DocsInspectResult:
     stale: bool = False
     pages: int = 0
     chunks: int = 0
+    checkpoint_total_pages: int = 0
+    checkpoint_completed_pages: int = 0
+    checkpoint_pending_pages: int = 0
+    checkpoint_failed_pages: int = 0
+    resumable: bool = False
     manifest_expected: int = 0
     manifest_fetched: int = 0
     manifest_indexed: int = 0

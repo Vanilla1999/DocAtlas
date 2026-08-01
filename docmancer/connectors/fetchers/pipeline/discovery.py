@@ -92,6 +92,7 @@ def discover_urls(
     max_pages: int = 500,
     force_strategy: str | None = None,
     seed_urls: list[str] | None = None,
+    root_html: str | None = None,
 ) -> DiscoveryResult:
     """Run discovery strategies in order and return found URLs.
 
@@ -142,7 +143,9 @@ def discover_urls(
         logger.info("Discovery: %s found %d URL(s)", DiscoveryStrategy.LLMS_FULL_TXT.value, len(llms_full))
         return DiscoveryResult(urls=llms_full)
 
-    dartdoc, dartdoc_diagnostics = _try_dartdoc_index_with_diagnostics(base_url, client, max_pages)
+    dartdoc, dartdoc_diagnostics = _try_dartdoc_index_with_diagnostics(
+        base_url, client, max_pages, root_html=root_html,
+    )
     if dartdoc:
         logger.info("Discovery: dartdoc-index found %d URL(s)", len(dartdoc))
         return DiscoveryResult(
@@ -292,16 +295,21 @@ def _try_dartdoc_index_with_diagnostics(
     base_url: str,
     client: httpx.Client,
     max_pages: int = 500,
+    root_html: str | None = None,
 ) -> tuple[list[DiscoveredUrl] | None, dict[str, Any]]:
-    try:
-        resp = client.get(base_url)
-    except httpx.RequestError:
+    if root_html is None:
+        try:
+            resp = client.get(base_url)
+        except httpx.RequestError:
+            return None, {}
+        if resp.status_code != 200:
+            return None, {}
+        root_html = resp.text
+    if not is_dartdoc_html(root_html, url=base_url):
         return None, {}
-    if resp.status_code != 200 or not is_dartdoc_html(resp.text, url=base_url):
-        return None, {}
-    dartdoc_base_url = _html_base_url(resp.text, base_url) or base_url
+    dartdoc_base_url = _html_base_url(root_html, base_url) or base_url
     links = [
-        url for url in discover_dartdoc_candidate_links(resp.text, dartdoc_base_url)
+        url for url in discover_dartdoc_candidate_links(root_html, dartdoc_base_url)
         if _is_scoped_dartdoc_url(url, dartdoc_base_url)
     ]
     diagnostics: dict[str, Any] = {"complete": True, "reason_code": "ok"}
@@ -310,7 +318,7 @@ def _try_dartdoc_index_with_diagnostics(
     except DocsFetchSecurityError as exc:
         if exc.category != "response_too_large":
             raise
-        navigation_links = _discover_dartdoc_navigation_links(resp.text, dartdoc_base_url)
+        navigation_links = _discover_dartdoc_navigation_links(root_html, dartdoc_base_url)
         links, fallback_pages = _expand_dartdoc_library_links(
             [*links, *navigation_links],
             client,

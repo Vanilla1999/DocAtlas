@@ -9,7 +9,7 @@ import jsonschema
 
 from docmancer.docs.interfaces.mcp.context_tools import context_tools, handle_context_tool
 from docmancer.docs.application.unified_context_service import UnifiedDocsContextService
-from docmancer.docs.models import LibraryInfo
+from docmancer.docs.models import DocsChunk, DocsResult, LibraryInfo
 from docmancer.docs.interfaces.mcp.project_tools import MCP_COMPACT_OUTPUT_MAX_BYTES
 from docmancer.docs.models import UnifiedDocsContextResult
 from docmancer.mcp.docs_server import TOOLS, call_docs_tool_payload
@@ -42,6 +42,55 @@ def test_get_docs_context_output_schema_accepts_bounded_and_compatibility_status
         "not_found", "invalid_request",
     ):
         jsonschema.validate({"status": status}, tool["outputSchema"])
+
+
+def test_multi_library_context_requires_every_library_support_decision():
+    class Decision:
+        def __init__(self, supported: bool, library: str):
+            self.answer_supported = supported
+            self.missing_requirement_ids = () if supported else (f"{library}:required",)
+            self.satisfied_requirement_ids = (f"{library}:required",) if supported else ()
+            self.mandatory_requirement_ids = (f"{library}:required",)
+            self.mandatory_coverage = 1.0 if supported else 0.0
+            self.selected_evidence_ids = (f"{library}:evidence",) if supported else ()
+
+    class Facade:
+        def __init__(self, unsupported: set[str] | None = None):
+            self.unsupported = unsupported or set()
+
+        def get_docs(self, library, topic=None, **kwargs):
+            supported = library not in self.unsupported
+            return DocsResult(
+                library_id=f"test:{library}@1:api",
+                library=library,
+                version="1",
+                topic=topic,
+                refreshed=False,
+                stale_before_refresh=False,
+                warning=None,
+                last_refreshed_at=None,
+                results=[DocsChunk(title=library, content=f"{library} exact API evidence", source=f"https://docs.example/{library}", url=f"https://docs.example/{library}")],
+                support_decision=cast(Any, Decision(supported, library)),
+            )
+
+    supported = UnifiedDocsContextService(Facade()).get_docs_context(
+        "How do alpha and beta work?",
+        libraries=["alpha", "beta"],
+        mode="library",
+        allow_network=True,
+    )
+    incomplete = UnifiedDocsContextService(Facade({"beta"})).get_docs_context(
+        "How do alpha and beta work?",
+        libraries=["alpha", "beta"],
+        mode="library",
+        allow_network=True,
+    )
+
+    assert supported.answer_supported is True
+    assert supported.support_status == "supported"
+    assert incomplete.answer_supported is False
+    assert incomplete.reason_code == "multi_library_support_incomplete"
+    assert incomplete.missing_requirement_ids == ["beta:required"]
 
 
 def test_get_docs_context_exposes_fail_closed_change_maintenance_brief(tmp_path):

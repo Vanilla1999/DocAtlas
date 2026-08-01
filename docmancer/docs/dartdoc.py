@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import replace
 from collections.abc import Callable
 import json
+import re
 from urllib.parse import urljoin, urlparse
 
 from bs4 import BeautifulSoup
@@ -167,3 +168,26 @@ def discover_pub_dartdoc_seed_urls(
                 add_html_links(html, base_url=library_url)
 
     return [*entity_urls, *library_urls][:max(1, max_seed_urls)]
+
+
+def rank_dartdoc_seed_urls(urls: list[str], query: str | None, *, limit: int) -> list[str]:
+    """Prefer real Dartdoc URLs whose path names match the user's question."""
+
+    if not query:
+        return urls[:limit]
+    terms = {
+        re.sub(r"[^a-z0-9]", "", term.casefold())
+        for term in re.findall(r"[A-Za-z][A-Za-z0-9_]{3,}", query)
+    }
+    terms -= {"what", "when", "where", "which", "with", "should", "using", "implemented"}
+
+    def score(url: str) -> tuple[int, int]:
+        path = re.sub(r"[^a-z0-9]", "", urlparse(url).path.casefold())
+        matches = sum(term in path for term in terms if len(term) >= 4)
+        entity = int(_is_entity_page(urlparse(url).path))
+        return matches, entity
+
+    ranked = sorted(enumerate(urls), key=lambda item: (*score(item[1]), -item[0]), reverse=True)
+    matched = [url for _, url in ranked if score(url)[0] > 0]
+    fallback = [url for url in urls if url not in matched]
+    return [*matched, *fallback][:max(1, limit)]

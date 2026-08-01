@@ -5774,7 +5774,7 @@ def test_prefetch_docs_targets_reports_degraded_discovery_as_partial(tmp_path, m
     assert result.status == "partial"
     assert result.results[0].status == "partial"
     assert result.results[0].pages_indexed == 1
-    assert result.results[0].message == "partial ingestion: discovery_manifest_too_large"
+    assert result.results[0].message == "partial ingestion: discovery_manifest_too_large, checkpoint_pending"
 
 
 def test_prefetch_docs_targets_uses_page_ledger_for_partial_and_counters(tmp_path, monkeypatch):
@@ -5813,12 +5813,18 @@ def test_prefetch_docs_targets_uses_page_ledger_for_partial_and_counters(tmp_pat
 
 def test_prefetch_docs_targets_reports_zero_seed_as_partial(tmp_path, monkeypatch):
     class MixedSeedAgent(FakeAgent):
+        empty_attempts = 0
+
         def add(self, docs_url: str, recreate: bool = False, **kwargs) -> int:
             self.add_calls.append(docs_url)
             self.add_kwargs.append(kwargs)
-            return 0 if docs_url.endswith("empty") else 1
+            if docs_url.endswith("empty"):
+                self.empty_attempts += 1
+                return 0 if self.empty_attempts == 1 else 1
+            return 1
 
-    service = _service(tmp_path, monkeypatch, MixedSeedAgent())
+    agent = MixedSeedAgent()
+    service = _service(tmp_path, monkeypatch, agent)
 
     result = service.prefetch_docs_targets([
         {
@@ -5831,7 +5837,21 @@ def test_prefetch_docs_targets_reports_zero_seed_as_partial(tmp_path, monkeypatc
 
     assert result.status == "partial"
     assert result.results[0].status == "partial"
-    assert result.results[0].message == "partial ingestion: empty_seed"
+    assert result.results[0].message == "partial ingestion: empty_seed, checkpoint_pending"
+
+    resumed = service.prefetch_docs_targets([{
+        "library": "mixed-guides",
+        "seed_urls": ["https://example.com/docs/empty", "https://example.com/docs/ready"],
+        "allowed_domains": ["example.com"],
+        "path_prefixes": ["/docs/"],
+    }])
+
+    assert resumed.status == "ok"
+    assert agent.add_calls == [
+        "https://example.com/docs/empty",
+        "https://example.com/docs/ready",
+        "https://example.com/docs/empty",
+    ]
 
 
 def test_fresh_partial_target_remains_partial_without_refetch(tmp_path, monkeypatch):
@@ -5855,10 +5875,12 @@ def test_fresh_partial_target_remains_partial_without_refetch(tmp_path, monkeypa
     assert first.status == "partial"
     assert second.status == "partial"
     assert second.results[0].status == "partial"
-    assert len(agent.add_calls) == 1
+    assert len(agent.add_calls) == 2
     inspection = service.inspect_library_docs(first.results[0].canonical_id)
     assert inspection.status == "partial"
     assert inspection.reason_code == "partial_ingestion"
+    assert inspection.resumable is True
+    assert inspection.checkpoint_pending_pages == 1
     public_status = call_docs_tool_payload(
         "docs_status",
         {"action": "library", "canonical_id": first.results[0].canonical_id},

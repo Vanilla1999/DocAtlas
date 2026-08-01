@@ -376,22 +376,41 @@ class UnifiedDocsContextService:
             if len(library_results) == 1 else None
         )
         if library_results:
+            decisions = [result.support_decision for result in library_results]
             answer_supported = bool(
-                support_decision and support_decision.answer_supported
+                decisions and all(decision and decision.answer_supported for decision in decisions)
             )
-            support_payload = (
-                support_decision.as_payload()
-                if support_decision is not None else {
-                    "support_status": "insufficient_evidence",
-                    "reason_code": "canonical_support_decision_missing",
-                    "missing_requirement_ids": [],
-                    "satisfied_requirement_ids": [],
-                    "mandatory_requirement_ids": [],
-                    "mandatory_coverage": 0.0,
-                    "selected_evidence_ids": [],
+            if support_decision is not None:
+                support_payload = support_decision.as_payload()
+            else:
+                missing_ids = sorted({
+                    item for decision in decisions if decision
+                    for item in decision.missing_requirement_ids
+                })
+                satisfied_ids = sorted({
+                    item for decision in decisions if decision
+                    for item in decision.satisfied_requirement_ids
+                })
+                mandatory_ids = sorted({
+                    item for decision in decisions if decision
+                    for item in decision.mandatory_requirement_ids
+                })
+                selected_ids = sorted({
+                    item for decision in decisions if decision
+                    for item in decision.selected_evidence_ids
+                })
+                support_payload = {
+                    "support_status": "supported" if answer_supported else "insufficient_evidence",
+                    "reason_code": None if answer_supported else "multi_library_support_incomplete",
+                    "missing_requirement_ids": missing_ids,
+                    "satisfied_requirement_ids": satisfied_ids,
+                    "mandatory_requirement_ids": mandatory_ids,
+                    "mandatory_coverage": (
+                        min((decision.mandatory_coverage for decision in decisions if decision), default=0.0)
+                    ),
+                    "selected_evidence_ids": selected_ids,
                     "decision_hash": None,
                 }
-            )
         else:
             project_completeness = dict(
                 getattr(project_result, "answer_completeness", None) or {}

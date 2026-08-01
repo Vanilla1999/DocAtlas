@@ -314,6 +314,7 @@ class WebFetcher:
                 max_pages=self._max_pages,
                 force_strategy=self._strategy,
                 seed_urls=self._seed_urls,
+                root_html=root_html,
             )
             discovered = discovery_result.urls
             self._raise_if_cancelled()

@@ -808,6 +808,7 @@ class LibraryDocsApplicationService:
         force_refresh: bool = False,
         continue_on_error: bool = True,
         async_: bool = False,
+        query: str | None = None,
     ) -> RefreshResult | DocsTargetsPrefetchResult | DocsJobStartResult:
         flutter_targets = self._flutter_targets_for_request(
             library,
@@ -817,6 +818,8 @@ class LibraryDocsApplicationService:
             docs_url_template,
         )
         if flutter_targets:
+            if query:
+                flutter_targets = [replace(target, query=query) for target in flutter_targets]
             return self.ingest_orchestrator.prefetch_docs(
                 library,
                 ecosystem="flutter",
@@ -825,6 +828,29 @@ class LibraryDocsApplicationService:
                 continue_on_error=continue_on_error,
                 async_=async_,
                 target_plan=flutter_targets,
+            )
+        if query and ecosystem in {"pub", "dart"} and versions:
+            version = versions[0]
+            query_target = DocsTarget(
+                library=library,
+                ecosystem="pub",
+                version=version,
+                source_type=source_type or "api",
+                docs_url=docs_url or pub_dartdoc_root_url(library, version),
+                allowed_domains=["pub.dev"],
+                path_prefixes=[f"/documentation/{library}/{version}/"],
+                max_pages=40,
+                doc_format="dartdoc",
+                query=query,
+            )
+            return self.ingest_orchestrator.prefetch_docs(
+                library,
+                ecosystem="pub",
+                versions=versions,
+                force_refresh=force_refresh,
+                continue_on_error=continue_on_error,
+                async_=async_,
+                target_plan=[query_target],
             )
         return self.ingest_orchestrator.prefetch_docs(
             library,

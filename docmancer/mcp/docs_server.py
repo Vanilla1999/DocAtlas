@@ -848,6 +848,7 @@ PUBLIC_ADVERTISED_INPUT_SCHEMAS: dict[str, dict[str, Any]] = {
             "manifest_path": {"type": ["string", "null"]},
             "source_type": {"type": ["string", "null"]},
             "docs_url": {"type": ["string", "null"]},
+            "question": {"type": ["string", "null"]},
             "include_flutter": {"type": ["boolean", "null"]},
             "include_dart": {"type": ["boolean", "null"]},
             "include_packages": {"type": ["array", "null"], "items": {"type": "string"}},
