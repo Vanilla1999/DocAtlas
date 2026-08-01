@@ -3336,7 +3336,6 @@ class SQLiteStore:
             ).fetchall()
 
         sources_to_delete: list[str] = []
-        artifact_paths: set[Path] = set()
         for row in rows:
             source = str(row["source"] or "")
             docset_root = str(row["docset_root"] or "")
@@ -3357,21 +3356,11 @@ class SQLiteStore:
                 continue
 
             sources_to_delete.append(source)
-            for path_value in (row["markdown_path"], row["json_path"]):
-                if path_value:
-                    artifact_paths.add(Path(str(path_value)))
 
         deleted = 0
         for source in sources_to_delete:
             if self.delete_source(source):
                 deleted += 1
-
-        for artifact_path in artifact_paths:
-            try:
-                artifact_path.unlink(missing_ok=True)
-            except TypeError:
-                if artifact_path.exists():
-                    artifact_path.unlink()
 
         return deleted
 

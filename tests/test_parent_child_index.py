@@ -223,6 +223,26 @@ def test_delete_source_prunes_parent_rows_and_allows_same_source_reingest(tmp_pa
     assert store.index_health()["ok"] is True
 
 
+def test_bulk_delete_does_not_unlink_persisted_artifact_outside_extracted_dir(tmp_path):
+    extracted = tmp_path / "extracted"
+    store = SQLiteStore(tmp_path / "index.db", extracted)
+    original = _doc("# Remove\n\nexternal path guard\n")
+    store.add_documents([original])
+    json_path = next(extracted.glob("*.json"))
+    outside = tmp_path / "must-survive.md"
+    outside.write_text("not an extraction artifact", encoding="utf-8")
+    with store._connect() as conn:
+        conn.execute(
+            "UPDATE sources SET markdown_path = ? WHERE source = ?",
+            (str(outside), original.source),
+        )
+
+    assert store.delete_sources_under_roots(["docs"]) == 1
+
+    assert outside.read_text(encoding="utf-8") == "not an extraction artifact"
+    assert not json_path.exists()
+
+
 def test_unactivated_candidate_cannot_mutate_active_source_snapshot(tmp_path):
     store = SQLiteStore(tmp_path / "index.db")
     store.add_documents([_doc("# Stable\n\nold searchable fact\n")])
