@@ -25,7 +25,10 @@ def test_get_docs_context_schema():
     schema = tool["inputSchema"]
     assert schema["required"] == ["question"]
     assert {"allow_network", "force_refresh", "prefetch_auto", "prepare_project_docs"}.isdisjoint(schema["properties"])
-    assert set(schema["properties"]) == {"question", "project_path", "library", "version", "mode"}
+    assert set(schema["properties"]) == {
+        "question", "project_path", "library", "libraries", "ecosystem",
+        "version", "source_type", "docs_url", "mode",
+    }
     assert schema["properties"]["mode"]["enum"] == ["auto", "project", "library", "mixed"]
     assert {"delivery_strategy", "packet_tokens", "output_mode", "maintenance", "details"}.isdisjoint(schema["properties"])
 

@@ -166,9 +166,4 @@ def discover_pub_dartdoc_seed_urls(
             if html:
                 add_html_links(html, base_url=library_url)
 
-        for library_url in list(library_urls):
-            html = fetch_and_parse(library_url)
-            if html:
-                add_html_links(html, base_url=library_url)
-
     return [*entity_urls, *library_urls][:max(1, max_seed_urls)]

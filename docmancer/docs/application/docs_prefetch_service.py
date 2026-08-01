@@ -509,7 +509,7 @@ class DocsPrefetchService:
                     docs_url=record.docs_url,
                     docs_url_template=record.docs_url_template,
                     now=refreshed_at,
-                    status="available",
+                    status="partial" if partial_message else "available",
                     last_refreshed_at=refreshed_at,
                     last_error=partial_message or "",
                     target_spec=record.target_spec,

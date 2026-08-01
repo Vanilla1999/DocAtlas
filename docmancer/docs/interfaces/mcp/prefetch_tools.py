@@ -246,6 +246,20 @@ def handle_prefetch_tool(name: str, args: dict[str, Any], service: LibraryDocsSe
                 service,
             )
             return {"tool": "docs_status", "action": action, "project": project}
+        if action == "library":
+            canonical_id = str(args.get("canonical_id") or "").strip()
+            if not canonical_id:
+                return {
+                    "tool": "docs_status",
+                    "status": "error",
+                    "reason_code": "canonical_id_required",
+                    "message": "canonical_id is required for action='library'",
+                }
+            return {
+                "tool": "docs_status",
+                "action": action,
+                "library": asdict(service.inspect_library_docs(canonical_id)),
+            }
         if action == "jobs":
             jobs = service.list_docs_jobs(
                 status=args.get("status"),
@@ -282,7 +296,7 @@ def handle_prefetch_tool(name: str, args: dict[str, Any], service: LibraryDocsSe
             "status": "error",
             "reason_code": "unknown_docs_status_action",
             "message": f"unknown docs_status action: {action}",
-            "supported_actions": ["project", "jobs", "job"],
+            "supported_actions": ["project", "library", "jobs", "job"],
         }
     if name == "prepare_docs":
         action = str(args.get("action") or "").strip()
@@ -301,7 +315,7 @@ def handle_prefetch_tool(name: str, args: dict[str, Any], service: LibraryDocsSe
         elif action == "sync_project_docs":
             payload = _compact_project_sync(project_docs_app.sync_project_docs(
                 args["project_path"],
-                with_vectors=bool(args.get("with_vectors") if args.get("with_vectors") is not None else True),
+                with_vectors=bool(args.get("with_vectors") if args.get("with_vectors") is not None else False),
                 changed_paths=args.get("changed_paths"),
                 deleted_paths=args.get("deleted_paths"),
                 renamed_paths=args.get("renamed_paths"),

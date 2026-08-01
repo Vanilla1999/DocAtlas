@@ -44,8 +44,8 @@ class DependencyProjectPrefetch:
                 if metadata.flutter_version and flutter_version == "stable":
                     warnings.append(FLUTTER_CHANNEL_DOCS_WARNING.format(version=metadata.flutter_version))
                 targets.append(DocsTarget(
-                    library="flutter-api",
-                    ecosystem="flutter",
+                    library="flutter",
+                    ecosystem="dart",
                     version=flutter_version,
                     source_type="api",
                     docs_url=flutter_docs_url_for(metadata.flutter_version, metadata.flutter_channel),

@@ -718,6 +718,7 @@ def test_mcp_exposes_three_public_tools_with_mutually_exclusive_guidance():
     assert tools["docs_status"]["inputSchema"]["required"] == ["action"]
     assert tools["docs_status"]["inputSchema"]["properties"]["action"]["enum"] == [
         "project",
+        "library",
         "jobs",
         "job",
     ]

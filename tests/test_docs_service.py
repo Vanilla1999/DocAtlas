@@ -2260,6 +2260,29 @@ def test_get_project_context_can_return_project_and_dependency_context(tmp_path,
     assert selected_classes == {"project_file", "dependency_docs"}
 
 
+def test_public_context_fails_closed_when_flutter_dependency_docs_are_missing(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path, fvmrc='{"flutter": "3.27.1"}')
+    (project / "README.md").write_text(
+        "# Dogfood Flutter app\n\nThe app uses GoRouter for navigation and Riverpod for state management.\n",
+        encoding="utf-8",
+    )
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+    service.sync_project_docs(str(project), with_vectors=False)
+
+    payload = call_docs_tool_payload(
+        "get_docs_context",
+        {
+            "question": "How should GoRouter redirects and Riverpod providers be implemented?",
+            "project_path": str(project),
+        },
+        service,
+    )
+
+    assert payload["status"] == "insufficient_evidence"
+    assert "answer" not in payload
+    assert payload["missing"]
+
+
 def test_get_project_context_includes_snippet_object_when_metadata_has_code(tmp_path, monkeypatch):
     project = _flutter_project(tmp_path)
     (project / "README.md").write_text("# Routing\n\nUse AppRouter wrappers.", encoding="utf-8")
@@ -5833,6 +5856,15 @@ def test_fresh_partial_target_remains_partial_without_refetch(tmp_path, monkeypa
     assert second.status == "partial"
     assert second.results[0].status == "partial"
     assert len(agent.add_calls) == 1
+    inspection = service.inspect_library_docs(first.results[0].canonical_id)
+    assert inspection.status == "partial"
+    assert inspection.reason_code == "partial_ingestion"
+    public_status = call_docs_tool_payload(
+        "docs_status",
+        {"action": "library", "canonical_id": first.results[0].canonical_id},
+        service,
+    )
+    assert public_status["library"]["status"] == "partial"
 
 
 def test_prefetch_docs_targets_resets_diagnostics_between_targets(tmp_path, monkeypatch):

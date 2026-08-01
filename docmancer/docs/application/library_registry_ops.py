@@ -72,6 +72,8 @@ class LibraryRegistryOps:
     def status_for(self, record: LibraryRecord, size_bytes: int | None = None) -> str:
         if record.status == "failed":
             return "failed"
+        if record.status == "partial" or str(record.last_error or "").startswith("partial ingestion:"):
+            return "partial"
         pages, chunks = self.count_index_entries(record)
         if pages == 0 and chunks == 0 and Path(self.deps._index_config_for(record).index.db_path).exists():
             return "empty_index"
@@ -101,6 +103,8 @@ class LibraryRegistryOps:
             return "needs_refresh"
         if status == "failed":
             return "failed"
+        if status == "partial":
+            return "partial_ingestion"
         if status == "indexed":
             return "healthy"
         return "not_indexed"

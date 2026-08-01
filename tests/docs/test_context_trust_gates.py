@@ -59,6 +59,28 @@ def test_bogus_query_does_not_become_exact_when_only_generic_docs_match():
     assert "high_signal_query_terms_missing_from_context" in completeness["reason_codes"]
 
 
+def test_multi_library_api_question_keeps_each_high_signal_requirement():
+    result = evaluate_project_answer_completeness(
+        question="How should GoRouter redirects and Riverpod providers be implemented?",
+        context_pack=[{
+            "source_class": "project_doc",
+            "authority": "primary",
+            "path": "README.md",
+            "content": "The app uses GoRouter for navigation and Riverpod for state management.",
+        }],
+        answer_available=True,
+        intent=_intent(name="how_to", wants_how_to=True),
+    )
+
+    completeness = result["answer_completeness"]
+    assert {"GoRouter", "Riverpod", "redirects", "providers"}.issubset(
+        set(completeness["matched_terms"] + completeness["missing_terms"])
+    )
+    assert {"redirects", "providers"}.issubset(set(completeness["missing_terms"]))
+    assert result["answer_type"] != "exact"
+    assert completeness["edit_ready"] is False
+
+
 def test_broad_architecture_query_does_not_require_random_word_gate():
     terms = extract_query_relevance_terms(
         "How is this project structured and where should UI changes be made?",

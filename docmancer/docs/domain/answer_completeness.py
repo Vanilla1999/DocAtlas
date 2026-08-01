@@ -114,6 +114,8 @@ _STOPWORDS = {
     "before",
     "does",
     "from",
+    "govern",
+    "governs",
     "have",
     "help",
     "how",
@@ -338,6 +340,12 @@ def _extract_requirements(question: str) -> list[str]:
         term = _clean_term(match)
         if term:
             terms.append(term)
+    # Code-shaped names are only part of an API question.  Keep the other
+    # high-signal product/package names too (for example ``Riverpod`` beside
+    # ``GoRouter``), otherwise a README mention of one symbol can incorrectly
+    # make a multi-library question look complete.
+    if len(_dedupe_terms(terms)) == 1 and not quoted and not _looks_like_story_requirement_question(question):
+        terms.extend(_extract_high_signal_query_terms(question))
     if terms and not quoted and _looks_like_story_requirement_question(question):
         terms.extend(_extract_explicit_story_phrases(question))
         terms.extend(_extract_russian_story_requirement_chunks(question))
