@@ -230,3 +230,31 @@ def test_agent_prunes_exact_chunks_without_embedding_unrelated_sections(tmp_path
     assert deleted == len(removed_ids)
     assert set(store.list_embedding_upserts(collection)) == kept_ids
     assert vector_store.count(collection) == len(kept_ids)
+
+
+def test_agent_reports_primary_vector_work_before_generation_cleanup(
+    tmp_path, monkeypatch
+):
+    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
+    monkeypatch.delenv("DOCMANCER_AUTO_VECTORS", raising=False)
+    monkeypatch.setattr(
+        "docmancer.embeddings.get_embeddings_provider",
+        lambda _config: StubProvider(),
+    )
+    config = _config(tmp_path)
+    agent = DocmancerAgent(config=config)
+
+    indexed = agent.ingest_documents(
+        [_make_parent_child_doc("guide.md", "# Guide\n\nVector telemetry text.\n")],
+        with_vectors=True,
+    )
+
+    metrics = agent.last_vector_sync_metrics
+    assert indexed > 0
+    assert metrics["status"] == "success"
+    assert metrics["upserted"] > 0
+    assert metrics["embedded"] > 0
+    assert metrics["duration_ms"] >= metrics["cleanup"]["duration_ms"]
+    assert metrics["cleanup"]["status"] == "success"
+    assert metrics["cleanup"]["upserted"] == 0
+    assert metrics["collection"]

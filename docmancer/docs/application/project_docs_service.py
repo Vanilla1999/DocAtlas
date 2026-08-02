@@ -116,6 +116,19 @@ class ProjectDocsService:
     def __getattr__(self, name: str) -> Any:
         return getattr(self.facade, name)
 
+    def _vector_sync_enabled(self) -> bool:
+        """Return whether the configured retrieval path can consume vectors."""
+        config = getattr(self.facade, "config", None)
+        retrieval = getattr(config, "retrieval", None)
+        mode = str(getattr(retrieval, "default_mode", "lexical") or "lexical").lower()
+        return mode in {"dense", "sparse", "hybrid"}
+
+    def _project_sync_arguments(self, root: Path) -> dict[str, Any]:
+        return {
+            "project_path": str(root),
+            "with_vectors": self._vector_sync_enabled(),
+        }
+
     def _indexed_project_doc_sources(self, project_path: str) -> list[dict[str, Any]]:
         return self.project_state.indexed_project_doc_sources(project_path)
 
@@ -212,20 +225,23 @@ class ProjectDocsService:
             "validation_errors": list(warnings),
         }
 
-    @staticmethod
-
     def _project_docs_structured_next_action(
+        self,
         *,
         reason_code: str,
         root: Path,
         query: str | None = None,
     ) -> tuple[dict[str, Any], bool, str | None, dict[str, Any], str, str | None]:
-        return project_docs_structured_next_action(reason_code=reason_code, root=root, query=query)
+        return project_docs_structured_next_action(
+            reason_code=reason_code,
+            root=root,
+            query=query,
+            with_vectors=self._vector_sync_enabled(),
+        )
 
-    @staticmethod
-    def _project_docs_preflight_next_action(root: Path, preflight: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any], str, str]:
+    def _project_docs_preflight_next_action(self, root: Path, preflight: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any], str, str]:
         risk_codes = [str(item.get("code")) for item in preflight.get("risks", []) if item.get("code")]
-        sync_args = {"project_path": str(root), "with_vectors": True}
+        sync_args = self._project_sync_arguments(root)
         agent_message = (
             "Project docs preflight found suspicious or risky docs/index state. Ask the user to update the docs "
             "or explicitly confirm sync_project_docs before indexing/reconciling."
@@ -249,8 +265,7 @@ class ProjectDocsService:
             user_message,
         )
 
-    @staticmethod
-    def _project_docs_preflight_recommended_action(root: Path, preflight: dict[str, Any]) -> dict[str, Any]:
+    def _project_docs_preflight_recommended_action(self, root: Path, preflight: dict[str, Any]) -> dict[str, Any]:
         risk_codes = [str(item.get("code")) for item in preflight.get("risks", []) if item.get("code")]
         return {
             "action": "ask_user_to_update_or_confirm_project_docs",
@@ -266,7 +281,7 @@ class ProjectDocsService:
             "after_confirmation": {
                 "tool": "sync_project_docs",
                 "requires_confirmation": False,
-                "arguments_patch": {"project_path": str(root), "with_vectors": True},
+                "arguments_patch": self._project_sync_arguments(root),
             },
         }
 
@@ -477,14 +492,14 @@ class ProjectDocsService:
                 "tool": "sync_project_docs",
                 "requires_confirmation": False,
                 "reason": "Project docs index has stale or orphaned entries; reconcile it with the current repository docs snapshot.",
-                "arguments_patch": {"project_path": str(root), "with_vectors": True},
+                "arguments_patch": self._project_sync_arguments(root),
             })
         elif candidate_sources and missing_candidate_count:
             recommended_next_actions.append({
                 "tool": "sync_project_docs",
                 "requires_confirmation": False,
                 "reason": "Project docs found but not indexed; reconcile the index with current docs.",
-                "arguments_patch": {"project_path": str(root), "with_vectors": True},
+                "arguments_patch": self._project_sync_arguments(root),
             })
         if exact_versions_available:
             recommended_next_actions.append({
@@ -717,6 +732,7 @@ class ProjectDocsService:
             missing_sources=missing_sources,
             skipped_sources=getattr(agent, "last_ingest_skips", []),
             sections_indexed=sections_indexed,
+            vector_sync=dict(getattr(agent, "last_vector_sync_metrics", {})),
             warnings=warnings,
             message=message,
         )
@@ -914,6 +930,7 @@ class ProjectDocsService:
             )
 
         indexed_after = self._indexed_project_doc_sources(str(root))
+        vector_sync: dict[str, Any] = {"status": "not_requested"}
         if with_vectors and changed_candidates:
             changed_source_names = {
                 str(item["source"])
@@ -928,6 +945,9 @@ class ProjectDocsService:
             sync_chunks = getattr(agent, "sync_vector_chunks", None)
             if changed_section_ids and callable(sync_chunks):
                 sync_chunks(changed_section_ids)
+                vector_sync = dict(
+                    getattr(agent, "last_vector_sync_metrics", {})
+                )
             elif changed_section_ids:
                 raise RuntimeError(
                     "incremental vector sync requires an agent with scoped chunk support"
@@ -973,6 +993,7 @@ class ProjectDocsService:
             "unmatched_changed_paths": unmatched_changed,
             "unmatched_deleted_paths": sorted(deleted - set(indexed_by_path)),
             "remaining_deleted_sources": len(remaining_deleted),
+            "vector_sync": vector_sync,
         }
         bounded_tombstones, tombstones_omitted = self._bounded_sync_tombstones(tombstones)
         diagnostics["tombstones_omitted"] = tombstones_omitted
@@ -1148,7 +1169,10 @@ class ProjectDocsService:
             missing_sources=missing_sources,
             removed_sources=removed_sources,
             skipped_sources=ingest_result.skipped_sources,
-            diagnostics={"active_index": self.active_index_diagnostics(str(root))},
+            diagnostics={
+                "active_index": self.active_index_diagnostics(str(root)),
+                "vector_sync": ingest_result.vector_sync,
+            },
             warnings=[*warnings, *ingest_result.warnings],
             message=message,
         )
@@ -1184,10 +1208,11 @@ class ProjectDocsService:
             )
 
         if initial.reason_code in {"project_docs_found_not_indexed", "project_docs_stale"}:
-            sync_result = self.sync_project_docs(str(root), with_vectors=True)
+            with_vectors = self._vector_sync_enabled()
+            sync_result = self.sync_project_docs(str(root), with_vectors=with_vectors)
             actions_taken.append({
                 "tool": "sync_project_docs",
-                "arguments_patch": {"project_path": str(root), "with_vectors": True},
+                "arguments_patch": self._project_sync_arguments(root),
                 "status": sync_result.status,
             })
             warnings.extend(sync_result.warnings)
@@ -1522,7 +1547,7 @@ class ProjectDocsService:
                 next_actions=[{
                     "tool": "sync_project_docs",
                     "requires_confirmation": False,
-                    "arguments_patch": {"project_path": str(root), "with_vectors": True},
+                    "arguments_patch": self._project_sync_arguments(root),
                     "reason": "Project docs candidates were discovered but have not been indexed; reconcile the index.",
                 }],
                 message="Project docs candidates exist but are not indexed. Run sync_project_docs, then retry get_project_docs.",
@@ -1626,7 +1651,7 @@ class ProjectDocsService:
             next_actions.append({
                 "tool": "sync_project_docs",
                 "requires_confirmation": False,
-                "arguments_patch": {"project_path": str(root), "with_vectors": True},
+                "arguments_patch": self._project_sync_arguments(root),
                 "reason": "Some indexed project docs are stale; reconcile before relying on repo-specific answers.",
             })
         if results:
@@ -1692,7 +1717,11 @@ class ProjectDocsService:
             next_actions=[{
                 "tool": "sync_project_docs" if stale_sources else "inspect_project_docs",
                 "requires_confirmation": False,
-                "arguments_patch": {"project_path": str(root), **({"with_vectors": True} if stale_sources else {})},
+                "arguments_patch": (
+                    self._project_sync_arguments(root)
+                    if stale_sources
+                    else {"project_path": str(root)}
+                ),
                 "reason": "Project docs are stale; sync and retry." if stale_sources else "Project docs are indexed, but no indexed project docs matched this query. Inspect candidates or refine the query.",
             }],
             message="Indexed project docs exist, but no results matched this query." + (" Some indexed docs are stale." if stale_sources else ""),

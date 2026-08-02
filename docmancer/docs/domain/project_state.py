@@ -370,9 +370,10 @@ def project_docs_structured_next_action(
     reason_code: str,
     root: Path,
     query: str | None = None,
+    with_vectors: bool = False,
 ) -> tuple[dict[str, Any], bool, str | None, dict[str, Any], str, str | None]:
     project_args = {"project_path": str(root)}
-    sync_args = {"project_path": str(root), "with_vectors": True}
+    sync_args = {"project_path": str(root), "with_vectors": with_vectors}
     if reason_code in {"project_docs_stale", "project_docs_found_not_indexed", "project_docs_needs_sync"}:
         if reason_code == "project_docs_stale":
             message = "Indexed project documentation is stale. Call sync_project_docs before answering project-level questions."

@@ -525,6 +525,7 @@ class ProjectDocsIngestResult:
     sections_indexed: int = 0
     warnings: list[str] = field(default_factory=list)
     message: str | None = None
+    vector_sync: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass(frozen=True)

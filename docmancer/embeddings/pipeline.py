@@ -34,6 +34,9 @@ class SyncResult:
     skipped_cache: int
     skipped_unchanged: int
     pruned: int = 0
+    duration_ms: int = 0
+    backend_setup_ms: int = 0
+    collection: str = ""
 
 
 def _embedding_hash(vector: list[float]) -> str:

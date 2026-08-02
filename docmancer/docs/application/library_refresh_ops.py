@@ -298,18 +298,37 @@ class LibraryRefreshOps:
                 )
 
         vector_failure: Exception | None = None
+        vector_sync: dict[str, Any] = {"status": "not_requested"}
 
         def _sync_vectors_before_commit() -> None:
-            nonlocal vector_failure
+            nonlocal vector_failure, vector_sync
             if staging is None:
+                return
+            retrieval_mode = str(
+                getattr(staging[0].retrieval, "default_mode", "lexical")
+                or "lexical"
+            ).lower()
+            if retrieval_mode not in {"dense", "sparse", "hybrid"}:
+                vector_sync = {
+                    "status": "not_requested",
+                    "retrieval_mode": retrieval_mode,
+                }
                 return
             try:
                 staging_agent = self.ports.agent_gateway.agent_for_config(staging[0])
                 sync_vectors = getattr(staging_agent, "sync_vectors", None)
                 if callable(sync_vectors):
                     sync_vectors()
+                    vector_sync = dict(
+                        getattr(staging_agent, "last_vector_sync_metrics", {})
+                    ) or {"status": "success"}
+                    vector_sync.setdefault("retrieval_mode", retrieval_mode)
             except Exception as exc:
                 vector_failure = exc
+                vector_sync = {
+                    "status": "failed",
+                    "retrieval_mode": retrieval_mode,
+                }
 
         def _commit_registry(**values: Any) -> Any:
             def update() -> Any:
@@ -415,6 +434,7 @@ class LibraryRefreshOps:
                     reason_codes=["vector_indexing_failed"],
                     preindex={
                         "reason_code": "vector_indexing_failed",
+                        "vector_sync": vector_sync,
                         **failure_diagnostics,
                     },
                 )
@@ -451,6 +471,7 @@ class LibraryRefreshOps:
             "index_path": str(db_path) if db_path else None,
             "query_index_path": str(db_path) if db_path else None,
             "reason_code": reason_code,
+            "vector_sync": vector_sync,
             **_dart_refresh_diagnostics(
                 record,
                 pages_discovered=pages_after,
