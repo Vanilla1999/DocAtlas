@@ -345,6 +345,13 @@ class LibraryRefreshOps:
                     "corpus_digest": active_corpus_digest,
                     "vector_sync": {"status": "skipped", "reason": "corpus_unchanged"},
                     "embeddings_avoided": True,
+                    "sync_efficiency": {
+                        "corpus_changed": False,
+                        "pages_changed": 0,
+                        "chunks_changed": 0,
+                        "embedding_work": "avoided",
+                        "publication_work": "avoided",
+                    },
                     **crawl_diagnostics,
                 },
             )

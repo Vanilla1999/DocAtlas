@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+import json
 import tomllib
 from pathlib import Path
 from typing import Any
@@ -21,7 +22,11 @@ def read_python_project(
     uv_lock = root / "uv.lock"
     poetry_lock = root / "poetry.lock"
     pdm_lock = root / "pdm.lock"
-    locks = [("uv.lock", uv_lock), ("poetry.lock", poetry_lock), ("pdm.lock", pdm_lock)]
+    pipfile_lock = root / "Pipfile.lock"
+    locks = [
+        ("uv.lock", uv_lock), ("poetry.lock", poetry_lock),
+        ("pdm.lock", pdm_lock), ("Pipfile.lock", pipfile_lock),
+    ]
     if not pyproject.exists() and not requirements.exists() and not any(path.exists() for _, path in locks):
         return {}, [], []
 
@@ -30,7 +35,11 @@ def read_python_project(
         manifest = _read_requirements_dependencies(requirements, warnings)
     selected_lock = next(((name, path) for name, path in locks if path.exists()), (None, None))
     lock_name, lock_path = selected_lock
-    locked_versions = _read_toml_lock_versions(lock_path, warnings) if lock_path else {}
+    locked_versions = (
+        _read_pipfile_lock_versions(lock_path, warnings)
+        if lock_name == "Pipfile.lock" and lock_path
+        else (_read_toml_lock_versions(lock_path, warnings) if lock_path else {})
+    )
     if manifest and not lock_path:
         warnings.append("Python lockfile not found; exact Python dependency versions may be unavailable.")
 
@@ -38,22 +47,26 @@ def read_python_project(
     observations: list[DependencyObservation] = []
     for name, (group, specifier) in sorted(manifest.items()):
         source_kind = _source_kind(specifier)
+        declared_exact = _exact_version(specifier)
         locked_version = locked_versions.get(name)
         resolved = locked_version if source_kind == "registry" else None
         if resolved:
             packages[f"python:{name}"] = resolved
-            version_source = f"{lock_name}_exact"
+            version_source = f"{str(lock_name).lower()}_exact"
         else:
-            exact = _exact_version(specifier)
-            resolved = exact if source_kind == "registry" else None
-            if resolved:
-                packages[f"python:{name}"] = resolved
-            version_source = "pyproject.toml_exact" if resolved else "pyproject.toml_range"
+            # A pin in pyproject/requirements is requested intent. It is not
+            # proof that an environment actually resolved that version.
+            resolved = None
+            version_source = "manifest_declared_exact" if declared_exact else "pyproject.toml_range"
         observations.append(DependencyObservation(
             ecosystem="python",
             package_name=name,
             dependency_group=group,
-            specifier_kind="exact" if resolved else ("direct_url" if source_kind != "registry" else "range"),
+            specifier_kind=(
+                "resolved_exact" if resolved else
+                ("declared_exact" if declared_exact else
+                 ("direct_url" if source_kind != "registry" else "range"))
+            ),
             specifier_raw=specifier,
             resolved_version=resolved,
             version_source=version_source,
@@ -118,9 +131,42 @@ def _read_toml_lock_versions(path: Path, warnings: list[str]) -> dict[str, str]:
     for entry in data.get("package", []) if isinstance(data, dict) else []:
         if not isinstance(entry, dict):
             continue
+        if not _toml_lock_entry_is_registry(entry):
+            continue
         name, version = entry.get("name"), entry.get("version")
         if isinstance(name, str) and isinstance(version, str) and name.strip() and version.strip():
             versions.setdefault(_normalize_name(name), version.strip())
+    return versions
+
+
+def _toml_lock_entry_is_registry(entry: dict[str, Any]) -> bool:
+    source = entry.get("source")
+    if not isinstance(source, dict):
+        return True
+    if any(key in source for key in ("git", "path", "editable", "url", "directory", "file")):
+        return False
+    source_type = str(source.get("type") or "").casefold()
+    return source_type not in {"git", "directory", "file", "url", "path"}
+
+
+def _read_pipfile_lock_versions(path: Path, warnings: list[str]) -> dict[str, str]:
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        warnings.append(f"Could not parse Pipfile.lock: {exc}")
+        return {}
+    versions: dict[str, str] = {}
+    if not isinstance(data, dict):
+        return versions
+    for section in ("default", "develop"):
+        entries = data.get(section)
+        if not isinstance(entries, dict):
+            continue
+        for name, entry in entries.items():
+            raw = entry.get("version") if isinstance(entry, dict) else None
+            match = re.fullmatch(r"==\s*([^\s;]+)", raw.strip()) if isinstance(raw, str) else None
+            if match:
+                versions[_normalize_name(name)] = match.group(1)
     return versions
 
 

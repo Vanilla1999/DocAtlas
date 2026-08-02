@@ -10,6 +10,7 @@ MANIFEST_AUTHORITIES = {
     "official_registry",
     "official_project",
     "official_product",
+    "registry_mirror",
     "community",
     "user_provided",
 }
@@ -119,13 +120,21 @@ def semantic_manifest_errors(target: dict[str, Any], *, manifest_version: int) -
     if policy == "exact" and binding != "exact":
         errors.append(f"{label}: exact version policy requires source.version_binding='exact'")
     exact_url = str(target.get("docs_url") or target.get("docs_url_template") or "").casefold()
+    version_evidence = target.get("version_evidence") or {}
+    evidence_source = str(version_evidence.get("source") or "") if isinstance(version_evidence, dict) else ""
+    evidence_version = str(version_evidence.get("resolved_version") or "").casefold() if isinstance(version_evidence, dict) else ""
+    evidence_digest = str(version_evidence.get("artifact_digest") or "") if isinstance(version_evidence, dict) else ""
+    valid_external_evidence = bool(
+        evidence_source
+        and (evidence_version == requested or evidence_digest.startswith("sha256:"))
+    )
     if (
         policy == "exact"
         and requested not in exact_url
-        and not target.get("version_evidence")
+        and not valid_external_evidence
     ):
         errors.append(
-            f"{label}: exact source URL does not contain the requested version; source.version_evidence is required"
+            f"{label}: exact source URL does not contain the requested version; structured source.version_evidence is required"
         )
     if policy in {"rolling", "channel"} and binding == "exact":
         errors.append(f"{label}: rolling/channel version policy cannot claim an exact source binding")

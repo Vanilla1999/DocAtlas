@@ -308,6 +308,11 @@ def extract_content(html: str, url: str | None = None, doc_format: str | None = 
         if result:
             return result
 
+    if doc_format == "javadoc":
+        result = extract_javadoc_content(html)
+        if result:
+            return result
+
     # Primary: trafilatura
     result = _extract_with_trafilatura(html, url)
     if result:
@@ -331,6 +336,25 @@ def extract_godoc_content(html: str) -> str:
     if root is None:
         return ""
     for node in root.select("nav, header, footer, aside, script, style, form, button"):
+        node.decompose()
+    return _normalize_whitespace(_extract_with_markdownify(str(root)))
+
+
+def extract_javadoc_content(html: str) -> str:
+    """Extract modern and legacy Javadoc content without navigation chrome."""
+
+    soup = BeautifulSoup(html, "html.parser")
+    root = (
+        soup.select_one("main")
+        or soup.select_one(".class-description")
+        or soup.select_one(".contentContainer")
+        or soup.select_one("body")
+    )
+    if root is None:
+        return ""
+    for node in root.select(
+        "nav, header, footer, script, style, form, button, .top-nav, .sub-nav, .bottom-nav"
+    ):
         node.decompose()
     return _normalize_whitespace(_extract_with_markdownify(str(root)))
 

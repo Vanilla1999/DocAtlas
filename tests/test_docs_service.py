@@ -5048,6 +5048,13 @@ def test_github_manifest_prefetch_and_refresh_use_one_canonical_operation(
 
     assert refreshed.status == "skipped"
     assert refreshed.preindex["reason_code"] == "corpus_unchanged"
+    assert refreshed.preindex["sync_efficiency"] == {
+        "corpus_changed": False,
+        "pages_changed": 0,
+        "chunks_changed": 0,
+        "embedding_work": "avoided",
+        "publication_work": "avoided",
+    }
     assert agent.add_calls == [canonical_manifest["documents"][0]["blob_url"]]
     assert agent.add_kwargs[0]["source_manifest"] == canonical_manifest
     persisted = service.registry.get("sample", "web", "v1", "guides")

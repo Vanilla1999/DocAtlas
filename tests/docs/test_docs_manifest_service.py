@@ -164,6 +164,7 @@ targets:
       url: https://pkg.go.dev/example.com/library
       authority: official_registry
       version_binding: rolling
+      version_evidence: {note: "trust me"}
       format: godoc
     scope:
       allowed_domains: [pkg.go.dev]

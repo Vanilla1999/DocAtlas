@@ -121,6 +121,10 @@ The v2 validator rejects task-specific queries, false exact-version claims, remo
 
 Go projects are detected from `go.mod` and `go.work`. A `go.mod` requirement is treated as a minimum requirement, not as proof of the selected build version. Exact automatic `pkg.go.dev` binding requires a matching vendored `vendor/modules.txt`; local or remote `replace` directives remain unbound until the source is explicitly confirmed.
 
+Python and Java follow the same evidence rule. Python versions become resolved evidence only from `uv.lock`, `poetry.lock`, `pdm.lock`, or `Pipfile.lock`; a `requirements.txt`/`pyproject.toml` pin remains declared intent. Maven/Gradle inspection is static and never executes build scripts. A `pom.xml` or Gradle declaration is not treated as the selected version; `gradle.lockfile` provides exact evidence. Maven coordinates can produce bounded `javadoc.io` candidates, but that registry mirror still requires authority confirmation when the project does not declare its official documentation source.
+
+Documentation evidence is reported separately for package identity, source authority, and version binding with a deterministic `accept`, `confirm`, or `reject` decision. DocAtlas intentionally does not collapse these dimensions into a confidence percentage: an exact version cannot compensate for an unverified source authority.
+
 ### Compact MCP responses
 
 All project-docs lifecycle tools return compact responses by default:

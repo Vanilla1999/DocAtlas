@@ -8,6 +8,7 @@ from typing import Callable, Protocol
 
 from docmancer.docs.cargo_project import read_cargo_project
 from docmancer.docs.go_project import read_go_project
+from docmancer.docs.java_project import read_java_project
 from docmancer.docs.models import DependencyObservation
 from docmancer.docs.node_project import read_node_project
 from docmancer.docs.pub_project import read_pub_project
@@ -66,12 +67,18 @@ def _go(root: Path, warnings: list[str]) -> EcosystemProjectResult:
     return EcosystemProjectResult(packages, direct, observations, roots)
 
 
+def _java(root: Path, warnings: list[str]) -> EcosystemProjectResult:
+    packages, direct, observations = read_java_project(root, warnings)
+    return EcosystemProjectResult(packages, direct, observations)
+
+
 BUILTIN_PROJECT_ECOSYSTEM_ADAPTERS: tuple[ProjectEcosystemAdapter, ...] = (
     FunctionProjectAdapter("pub", _pub),
     FunctionProjectAdapter("rust", _cargo),
     FunctionProjectAdapter("npm", _node),
     FunctionProjectAdapter("python", _python),
     FunctionProjectAdapter("go", _go),
+    FunctionProjectAdapter("maven", _java),
 )
 
 

@@ -242,6 +242,8 @@ def test_inspect_docs_target_returns_bounded_navigation_metadata_without_discove
     assert proposal["source"]["url"] == "https://docs.example/docs/index.html"
     assert proposal["scope"]["path_prefixes"] == ["/docs/"]
     assert result.manifest_proposal["requires_confirmation"] is True
+    assert result.evidence_report["decision"] == "confirm"
+    assert result.evidence_report["authority"]["status"] == "unconfirmed"
 
 
 def test_inspect_docs_target_rejects_manifests_and_caps_pages_before_fetch(monkeypatch):

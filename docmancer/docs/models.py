@@ -303,6 +303,7 @@ class DocsTargetInspectionResult:
     agent_question: str | None = None
     warnings: list[str] = field(default_factory=list)
     manifest_proposal: dict[str, Any] | None = None
+    evidence_report: dict[str, Any] | None = None
 
 
 @dataclass(frozen=True)

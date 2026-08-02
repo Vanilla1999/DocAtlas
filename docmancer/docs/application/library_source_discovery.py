@@ -2,11 +2,13 @@
 
 from __future__ import annotations
 
+import re
 from typing import Any
 from urllib.parse import quote, urlparse
 
 import httpx
 
+from docmancer.docs.documentation_evidence import assess_documentation_evidence
 from docmancer.docs.resolver import normalize_lookup_key, normalize_version
 
 _MAX_METADATA_BYTES = 2 * 1024 * 1024
@@ -24,6 +26,36 @@ def discover_library_docs_sources(
     name = normalize_lookup_key(library)
     selected_version = normalize_version(version)
     normalized_ecosystem = normalize_lookup_key(ecosystem or "")
+    if normalized_ecosystem in {"java", "maven", "gradle"}:
+        coordinate = library.strip()
+        if not _safe_maven_coordinate(coordinate):
+            return {
+                **_result(library, "maven", []),
+                "status": "invalid_package_identity",
+                "message": "Java discovery requires a Maven coordinate such as com.fasterxml.jackson.core:jackson-databind.",
+            }
+        group, artifact = coordinate.split(":", 1)
+        docs_version = version.strip() if isinstance(version, str) and version.strip() else None
+        if not docs_version:
+            return {
+                **_result(library, "maven", []),
+                "status": "version_resolution_required",
+                "message": "Resolve the Maven artifact version from dependency locking or provide an explicit confirmed version.",
+            }
+        return _result(library, "maven", [
+            _candidate(
+                f"https://javadoc.io/doc/{quote(group, safe='.')}/{quote(artifact, safe='.-_')}/{quote(docs_version, safe='.-_+')}/",
+                label="Javadoc artifact published from Maven Central",
+                confidence="medium",
+                source="maven_central_javadoc_artifact",
+                ecosystem="maven",
+                version=docs_version,
+                source_type="api",
+                library=library,
+                authority="registry_mirror",
+                version_binding="exact",
+            )
+        ])
     if normalized_ecosystem in {"go", "golang"}:
         module = library.strip()
         if not _safe_go_module(module):
@@ -45,6 +77,9 @@ def discover_library_docs_sources(
                 ecosystem="go",
                 version=docs_version,
                 source_type="api",
+                library=library,
+                authority="official_registry",
+                version_binding="exact" if docs_version else "rolling",
             )
         ])
     if normalized_ecosystem in {"dart", "flutter", "pub"}:
@@ -58,6 +93,9 @@ def discover_library_docs_sources(
                 ecosystem="pub",
                 version=docs_version,
                 source_type="api",
+                library=library,
+                authority="official_registry",
+                version_binding="exact" if selected_version else "rolling",
             )
         ])
     if normalized_ecosystem == "rust":
@@ -71,13 +109,16 @@ def discover_library_docs_sources(
                 ecosystem="rust",
                 version=docs_version,
                 source_type="api",
+                library=library,
+                authority="official_registry",
+                version_binding="exact" if selected_version else "rolling",
             )
         ])
     if normalized_ecosystem not in {"python", "npm"}:
         return {
             **_result(library, normalized_ecosystem or "unknown", []),
             "status": "unsupported_ecosystem",
-            "message": "Automatic registry discovery is available for Python, npm, Pub/Dart, Go, and Rust. Provide docs_url manually for this ecosystem.",
+            "message": "Automatic registry discovery is available for Python, npm, Pub/Dart, Go, Rust, and Maven coordinates. Provide docs_url manually for this ecosystem.",
         }
 
     endpoint = _registry_endpoint(name, normalized_ecosystem, selected_version)
@@ -212,6 +253,14 @@ def _safe_go_module(value: str) -> bool:
     return "." in first and all(char.isalnum() or char in ".-_/~" for char in value)
 
 
+def _safe_maven_coordinate(value: str) -> bool:
+    if len(value) > 500 or value.count(":") != 1 or any(char.isspace() for char in value):
+        return False
+    group, artifact = value.split(":", 1)
+    safe = re.fullmatch(r"[A-Za-z0-9_.-]+", group or "") and re.fullmatch(r"[A-Za-z0-9_.-]+", artifact or "")
+    return bool(safe and "." in group)
+
+
 def _candidate(
     docs_url: str,
     *,
@@ -222,6 +271,9 @@ def _candidate(
     version: str | None,
     source_type: str,
     library: str | None = None,
+    authority: str | None = None,
+    version_binding: str | None = None,
+    version_source: str | None = None,
 ) -> dict[str, Any]:
     arguments_patch = {
         "action": "prefetch_library_docs",
@@ -231,11 +283,23 @@ def _candidate(
         "source_type": source_type,
         "docs_url": docs_url,
     }
+    evidence = assess_documentation_evidence(
+        library=library or "pending",
+        ecosystem=ecosystem,
+        docs_url=docs_url,
+        authority=authority,
+        requested_version=version,
+        version_binding=version_binding or ("exact" if version else None),
+        version_source=version_source,
+        discovered_from=source,
+    )
     return {
         "label": label,
         "docs_url": docs_url,
         "confidence": confidence,
         "discovered_from": source,
+        "evidence": evidence.to_dict(),
+        "evidence_decision": evidence.decision,
         "requires_confirmation": True,
         "arguments_patch": {key: value for key, value in arguments_patch.items() if value is not None},
     }

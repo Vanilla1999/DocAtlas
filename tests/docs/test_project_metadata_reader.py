@@ -214,6 +214,37 @@ def test_python_project_uses_pdm_lock_when_it_is_the_available_lock(tmp_path: Pa
     assert dependency.version_source == "pdm.lock_exact"
 
 
+def test_python_manifest_pin_is_not_claimed_as_resolved_without_lock(tmp_path: Path) -> None:
+    root = tmp_path / "python_repo"
+    root.mkdir()
+    (root / "requirements.txt").write_text("fastapi==0.115.6\n", encoding="utf-8")
+
+    metadata = ProjectMetadataReader().read(root)
+    dependency = next(item for item in metadata.dependencies if item.package_name == "fastapi")
+
+    assert "python:fastapi" not in metadata.packages
+    assert dependency.specifier_kind == "declared_exact"
+    assert dependency.resolved_version is None
+    assert dependency.version_source == "manifest_declared_exact"
+
+
+def test_python_project_reads_pipfile_lock_exact_versions(tmp_path: Path) -> None:
+    root = tmp_path / "python_repo"
+    root.mkdir()
+    (root / "pyproject.toml").write_text(
+        "[project]\nname='demo'\ndependencies=['fastapi>=0.110']\n", encoding="utf-8"
+    )
+    (root / "Pipfile.lock").write_text(
+        '{"default":{"fastapi":{"version":"==0.115.6"}},"develop":{}}', encoding="utf-8"
+    )
+
+    metadata = ProjectMetadataReader().read(root)
+    dependency = next(item for item in metadata.dependencies if item.package_name == "fastapi")
+
+    assert metadata.packages["python:fastapi"] == "0.115.6"
+    assert dependency.version_source == "pipfile.lock_exact"
+
+
 def test_poetry_path_and_git_dependencies_are_never_registry_version_bindings(tmp_path: Path) -> None:
     root = tmp_path / "poetry_repo"
     root.mkdir()
@@ -254,6 +285,24 @@ version = "4.5.6"
     assert python["local-lib"].resolved_version is None
     assert python["git-lib"].source_kind == "git"
     assert python["git-lib"].resolved_version is None
+
+
+def test_python_git_lock_entry_cannot_bind_registry_documentation(tmp_path: Path) -> None:
+    root = tmp_path / "python_repo"
+    root.mkdir()
+    (root / "pyproject.toml").write_text(
+        "[project]\nname='demo'\ndependencies=['sample>=1']\n", encoding="utf-8"
+    )
+    (root / "uv.lock").write_text(
+        "[[package]]\nname='sample'\nversion='1.2.3'\nsource={git='https://example.test/sample.git'}\n",
+        encoding="utf-8",
+    )
+
+    metadata = ProjectMetadataReader().read(root)
+    dependency = next(item for item in metadata.dependencies if item.package_name == "sample")
+
+    assert "python:sample" not in metadata.packages
+    assert dependency.resolved_version is None
 
 
 def test_flutter_project_reads_pubspec_without_requiring_fvmrc_or_lock(tmp_path: Path) -> None:
