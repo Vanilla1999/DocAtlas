@@ -1320,7 +1320,6 @@ class ProjectDocsService:
         filters: dict[str, Any] = {
             "project_path": str(root),
             "source_class": source_class,
-            "project_docs": True,
         }
         if scope:
             filters["doc_scope"] = scope
@@ -1329,25 +1328,40 @@ class ProjectDocsService:
         agent = self._agent_instance()
         effective_limit = limit or agent.config.query.default_limit
         budget = tokens or DEFAULT_DOC_TOKENS
-        chunks = agent.query(
-            query,
-            limit=effective_limit,
-            budget=budget,
-            expand=expand,
-            filters=filters,
-        )
-        authoritative_chunks = agent.query(
-            query,
-            # Source-of-truth documents often split one bounded implementation
-            # contract across adjacent sections. Recall a bounded superset before
-            # applying the public result limit so canonical selection can see the
-            # complete project-owned contract instead of only its best lexical
-            # fragment.
-            limit=max(effective_limit, 20),
-            budget=budget,
-            expand=expand or "page",
-            filters={**filters, "project_doc_authority": "source_of_truth"},
-        )
+        retrieval = getattr(agent.config, "retrieval", None)
+        mode = str(getattr(retrieval, "default_mode", "lexical") or "lexical").lower()
+        gateway = getattr(self.facade, "agent_gateway", None)
+        if gateway is not None:
+            dispatcher = gateway.dispatcher_for(agent, mode=mode)
+            chunks = dispatcher.run(
+                query,
+                mode=mode,
+                limit=effective_limit,
+                budget=budget,
+                expand=expand,
+                filters=filters,
+            ).chunks
+            authoritative_chunks = dispatcher.run(
+                query,
+                mode=mode,
+                limit=max(effective_limit, 20),
+                budget=budget,
+                expand=expand or "page",
+                filters={**filters, "authority": "source_of_truth"},
+            ).chunks
+        else:
+            # Lightweight facades used by embedders retain the legacy agent
+            # contract.  The production service always owns an agent gateway.
+            chunks = agent.query(
+                query, limit=effective_limit, budget=budget, expand=expand, filters=filters
+            )
+            authoritative_chunks = agent.query(
+                query,
+                limit=max(effective_limit, 20),
+                budget=budget,
+                expand=expand or "page",
+                filters={**filters, "project_doc_authority": "source_of_truth"},
+            )
 
         selected = []
         seen: set[tuple[str, int]] = set()

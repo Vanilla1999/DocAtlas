@@ -13,7 +13,7 @@ from docmancer.docs.application.evidence_selection import (
 from docmancer.docs.registry import LibraryRecord
 from docmancer.docs.resolver import normalize_library_name
 from docmancer.mcp import paths
-from docmancer.retrieval.dispatch import RetrievalDispatcher
+from docmancer.retrieval.runtime import dispatcher_for_agent, effective_retrieval_mode
 
 
 @dataclass(frozen=True, slots=True)
@@ -42,6 +42,7 @@ class AgentIndexGateway:
         self.config = config
         self._default_agent = default_agent
         self._agents: dict[str, Any] = {}
+        self._retrieval_dispatchers: dict[int, tuple[tuple[Any, ...], Any]] = {}
         self._agent_factory = agent_factory
         self._library_index_root = Path(library_index_root).expanduser().resolve() if library_index_root else None
 
@@ -82,14 +83,41 @@ class AgentIndexGateway:
         agent = self.agent_instance(record)
         if not hasattr(agent, "store"):
             return agent.query(topic, budget=budget)
+        mode = effective_retrieval_mode(agent.config)
         dispatch_args: dict[str, Any] = {
-            "mode": "lexical",
+            "mode": mode,
             "budget": budget,
             "filters": filters,
         }
         if requirements is not None:
             dispatch_args["requirements"] = requirements
-        return RetrievalDispatcher(store=agent.store, config=agent.config).run(topic, **dispatch_args)
+        return self.dispatcher_for(agent, mode=mode).run(topic, **dispatch_args)
+
+    def dispatcher_for(self, agent: Any, *, mode: str | None = None) -> Any:
+        """Return the mode-aware dispatcher used by public project-doc queries."""
+        effective_mode = effective_retrieval_mode(agent.config, mode)
+        collection_fn = getattr(agent, "_vector_collection_name", None)
+        collection = collection_fn() if callable(collection_fn) else ""
+        embeddings = getattr(agent.config, "embeddings", None)
+        vector_store = getattr(agent.config, "vector_store", None)
+        cache_key = (
+            effective_mode,
+            collection,
+            getattr(embeddings, "provider", None),
+            getattr(embeddings, "model", None),
+            getattr(vector_store, "provider", None),
+            getattr(vector_store, "url", None),
+        )
+        cached = self._retrieval_dispatchers.get(id(agent))
+        if cached is not None and cached[0] == cache_key:
+            return cached[1]
+        dispatcher = dispatcher_for_agent(agent, mode=effective_mode)
+        self._retrieval_dispatchers[id(agent)] = (cache_key, dispatcher)
+        return dispatcher
+
+    def _drop_dispatcher_for_agent(self, agent: Any | None) -> None:
+        if agent is not None:
+            self._retrieval_dispatchers.pop(id(agent), None)
 
     def probe_library_requirements(
         self,
@@ -167,8 +195,13 @@ class AgentIndexGateway:
 
     def drop_library_agent(self, record_or_library_id: LibraryRecord | str) -> None:
         if isinstance(record_or_library_id, LibraryRecord):
-            self._agents.pop(record_or_library_id.canonical_id or record_or_library_id.library_id, None)
-            self._agents.pop(record_or_library_id.library_id, None)
+            first = self._agents.pop(
+                record_or_library_id.canonical_id or record_or_library_id.library_id,
+                None,
+            )
+            second = self._agents.pop(record_or_library_id.library_id, None)
+            self._drop_dispatcher_for_agent(first)
+            self._drop_dispatcher_for_agent(second)
             return
 
-        self._agents.pop(record_or_library_id, None)
+        self._drop_dispatcher_for_agent(self._agents.pop(record_or_library_id, None))

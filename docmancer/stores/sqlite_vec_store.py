@@ -33,6 +33,11 @@ def _floats_to_blob(vector: list[float]) -> bytes:
 class SqliteVecStore(VectorStore):
     """Small-scale fallback vector store backed by sqlite-vec (vec0)."""
 
+    # The fallback owns one sqlite3 connection.  Keep queries on the thread
+    # that created it unless the store is redesigned around per-thread
+    # connections.
+    supports_concurrent_queries = False
+
     def __init__(self, config: "VectorStoreConfig", embeddings_dim: int = 768) -> None:
         self._config = config
         self._embeddings_dim = embeddings_dim

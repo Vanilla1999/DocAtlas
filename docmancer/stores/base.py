@@ -25,6 +25,8 @@ class VectorHit:
 
 
 class VectorStore(ABC):
+    supports_concurrent_queries: bool = True
+
     """Abstract base class for vector store backends."""
 
     @abstractmethod

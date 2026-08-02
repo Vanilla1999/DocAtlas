@@ -458,7 +458,9 @@ class UnifiedDocsContextService:
                 "selected_evidence_ids": [],
                 "decision_hash": None,
             }
-        answer_available = answer_supported
+        # Library answers must satisfy evidence selection. Project-only context
+        # retains its navigational availability even when it is not edit-ready.
+        answer_available = answer_supported or (not library_results and context_available)
         pending_actions = self._collect_pending_actions(pending_lane_results)
         requested_lanes = [name for name, lane in lanes.items() if lane.get("status") != "not_requested"]
         successful_lanes = [name for name, lane in lanes.items() if self._lane_succeeded(lane)]
@@ -664,8 +666,9 @@ class UnifiedDocsContextService:
     def _ensure_library_safe(self, library: str, ecosystem: str | None, version: str | None, source_type: str | None, docs_url: str | None, force_refresh: bool, allow_network: bool, project_path: str | None = None) -> UnifiedDocsContextResult | None:
         if allow_network:
             return None
-        if project_path and (version is None or docs_url is None):
-            detected_version, detected_docs_url, detected_template, *_ = self.service._project_version_for(
+        project_version_for = getattr(self.service, "_project_version_for", None)
+        if project_path and (version is None or docs_url is None) and callable(project_version_for):
+            detected_version, detected_docs_url, detected_template, *_ = project_version_for(
                 library=library,
                 ecosystem=ecosystem,
                 project_path=project_path,

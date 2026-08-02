@@ -131,8 +131,8 @@ def test_library_query_uses_per_library_agent(tmp_path, monkeypatch):
 def test_query_library_dispatches_raw_topic_in_lexical_mode(tmp_path, monkeypatch):
     monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
     monkeypatch.setattr(
-        "docmancer.docs.infrastructure.agent_index_gateway.RetrievalDispatcher",
-        RecordingDispatcher,
+        "docmancer.docs.infrastructure.agent_index_gateway.dispatcher_for_agent",
+        lambda agent, mode: RecordingDispatcher(store=agent.store, config=agent.config),
         raising=False,
     )
     gateway = AgentIndexGateway(DocmancerConfig(), agent_factory=FakeAgent)
@@ -149,11 +149,65 @@ def test_query_library_dispatches_raw_topic_in_lexical_mode(tmp_path, monkeypatc
     assert run_args == {"mode": "lexical", "budget": 120, "filters": filters}
 
 
+def test_query_library_uses_configured_vector_mode(tmp_path, monkeypatch):
+    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
+    config = DocmancerConfig()
+    config.retrieval.default_mode = "hybrid"
+    resolved_modes = []
+
+    def build_dispatcher(agent, *, mode):
+        resolved_modes.append(mode)
+        return RecordingDispatcher(store=agent.store, config=agent.config)
+
+    monkeypatch.setattr(
+        "docmancer.docs.infrastructure.agent_index_gateway.dispatcher_for_agent",
+        build_dispatcher,
+    )
+    gateway = AgentIndexGateway(config, agent_factory=FakeAgent)
+    record = _record()
+    gateway.agent_instance(record).store = object()
+    RecordingDispatcher.calls.clear()
+
+    gateway.query_library(record, "Provider")
+
+    assert resolved_modes == ["hybrid"]
+    assert RecordingDispatcher.calls[0][2]["mode"] == "hybrid"
+
+
+def test_dispatcher_is_reused_until_library_agent_is_dropped(tmp_path, monkeypatch):
+    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
+    builds = []
+
+    def build_dispatcher(agent, *, mode):
+        builds.append((agent, mode))
+        return RecordingDispatcher(store=agent.store, config=agent.config)
+
+    monkeypatch.setattr(
+        "docmancer.docs.infrastructure.agent_index_gateway.dispatcher_for_agent",
+        build_dispatcher,
+    )
+    gateway = AgentIndexGateway(DocmancerConfig(), agent_factory=FakeAgent)
+    record = _record()
+    agent = gateway.agent_instance(record)
+    agent.store = object()
+
+    first = gateway.dispatcher_for(agent)
+    second = gateway.dispatcher_for(agent)
+    gateway.drop_library_agent(record)
+    replacement = gateway.agent_instance(record)
+    replacement.store = object()
+    third = gateway.dispatcher_for(replacement)
+
+    assert first is second
+    assert third is not first
+    assert len(builds) == 2
+
+
 def test_query_library_preserves_the_canonical_requirement_set_for_dispatch(tmp_path, monkeypatch):
     monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
     monkeypatch.setattr(
-        "docmancer.docs.infrastructure.agent_index_gateway.RetrievalDispatcher",
-        RecordingDispatcher,
+        "docmancer.docs.infrastructure.agent_index_gateway.dispatcher_for_agent",
+        lambda agent, mode: RecordingDispatcher(store=agent.store, config=agent.config),
         raising=False,
     )
     gateway = AgentIndexGateway(DocmancerConfig(), agent_factory=FakeAgent)

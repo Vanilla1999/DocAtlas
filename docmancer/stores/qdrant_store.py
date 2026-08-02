@@ -320,10 +320,27 @@ class QdrantStore(VectorStore):
                     payload=p.payload or {},
                 )
             )
+        if bulk:
+            # Qdrant's upload helper bounds request size, retries transient
+            # failures, and waits for every batch to become visible before
+            # parity is checked by the caller.  A single asynchronous upsert
+            # followed by an immediate count races the server's apply phase.
+            batch_size = max(1, min(256, int(self.options.get("upload_batch_size") or 128)))
+            parallel = max(1, min(8, int(self.options.get("upload_parallel") or 2)))
+            max_retries = max(0, min(10, int(self.options.get("upload_max_retries") or 3)))
+            client.upload_points(
+                collection_name=collection,
+                points=structs,
+                batch_size=batch_size,
+                parallel=parallel,
+                max_retries=max_retries,
+                wait=True,
+            )
+            return
         client.upsert(
             collection_name=collection,
             points=structs,
-            wait=not bulk,
+            wait=True,
         )
 
     def search(

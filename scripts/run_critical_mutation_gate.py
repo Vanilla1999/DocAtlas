@@ -37,7 +37,7 @@ MUTANTS = (
     Mutant(
         "normative_code_declaration_guard",
         "docmancer/docs/domain/normative_language.py",
-        "if _CODE_DECLARATION_RE.search(text):",
+        "if is_python_declaration(text):",
         "if False:  # mutation: disable code declaration guard",
         TARGET_TESTS[0],
     ),

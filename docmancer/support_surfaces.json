@@ -67,6 +67,18 @@
       "failure_budget": "blocks release and local Docs health"
     },
     {
+      "id": "cli:clear-index",
+      "kind": "cli",
+      "tier": "core",
+      "owner": "DocAtlas maintainers",
+      "docs": "docs/support-surface-policy.md",
+      "test_tier": "core-offline",
+      "network_dependencies": [],
+      "compatibility": "stable within the current major release",
+      "removal_rule": "breaking release with migration notes",
+      "failure_budget": "blocks release and local Docs health"
+    },
+    {
       "id": "cli:context",
       "kind": "cli",
       "tier": "core",
