@@ -3,6 +3,7 @@ from __future__ import annotations
 from types import SimpleNamespace
 
 from docmancer.stores.qdrant_store import QdrantStore
+from docmancer.stores.base import VectorPoint
 
 
 class _FakeClient:
@@ -63,3 +64,41 @@ def test_collection_metadata_reads_ownership_sentinel_payload():
         "dim": 768,
         "sparse_model": "prithivida/Splade_PP_en_v1",
     }
+
+
+class _FakeUploadClient:
+    def __init__(self) -> None:
+        self.calls = []
+
+    def upload_points(self, **kwargs):
+        self.calls.append(kwargs)
+
+
+def test_bulk_upsert_uses_bounded_waited_upload_batches():
+    client = _FakeUploadClient()
+    store = object.__new__(QdrantStore)
+    store.options = {
+        "upload_batch_size": 999,
+        "upload_parallel": 99,
+        "upload_max_retries": 99,
+    }
+    store._qm = SimpleNamespace(
+        PointStruct=lambda **kwargs: SimpleNamespace(**kwargs),
+        SparseVector=lambda **kwargs: SimpleNamespace(**kwargs),
+    )
+    store._bulk_client = lambda: client  # type: ignore[method-assign]
+    store._client = object()
+
+    store.upsert(
+        "docs",
+        [VectorPoint(id=1, vector=[1.0, 0.0], payload={"source": "one"})],
+        bulk=True,
+    )
+
+    assert len(client.calls) == 1
+    call = client.calls[0]
+    assert call["collection_name"] == "docs"
+    assert call["batch_size"] == 256
+    assert call["parallel"] == 8
+    assert call["max_retries"] == 10
+    assert call["wait"] is True

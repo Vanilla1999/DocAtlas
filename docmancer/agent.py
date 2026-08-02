@@ -6,6 +6,7 @@ import logging
 import os
 import hashlib
 import fnmatch
+import re
 import time
 from dataclasses import asdict
 from pathlib import Path
@@ -126,6 +127,7 @@ class DocmancerAgent:
                         generation_id=result.generation_id,
                         prune_stale=False,
                     )
+                    self._require_completed_vector_sync(synced)
                     primary_metrics = dict(self.last_vector_sync_metrics)
                     self.store.activate_generation(result.generation_id)
                     if synced:
@@ -141,9 +143,10 @@ class DocmancerAgent:
                             "cleanup": cleanup_metrics,
                         }
                 else:
-                    self._sync_vectors_if_enabled(
+                    synced = self._sync_vectors_if_enabled(
                         generation_id=self.store.active_generation_id()
                     )
+                    self._require_completed_vector_sync(synced)
             except Exception as exc:
                 raise RuntimeError(f"vector indexing failed after FTS5 ingest: {exc}") from exc
         return result.sections
@@ -176,9 +179,10 @@ class DocmancerAgent:
         )
         if with_vectors:
             try:
-                self._sync_vectors_if_enabled(
+                synced = self._sync_vectors_if_enabled(
                     generation_id=self.store.active_generation_id()
                 )
+                self._require_completed_vector_sync(synced)
             except Exception as exc:
                 raise RuntimeError(f"vector indexing failed after FTS5 ingest: {exc}") from exc
         return result.sections
@@ -188,7 +192,10 @@ class DocmancerAgent:
         if explicit:
             return explicit
         slug = Path(self.config.index.db_path).stem or "docmancer"
-        return f"docmancer_{slug}"
+        safe_slug = re.sub(r"[^A-Za-z0-9_]", "_", slug).strip("_") or "docmancer"
+        if safe_slug[0].isdigit():
+            safe_slug = f"index_{safe_slug}"
+        return f"docmancer_{safe_slug}"
 
     def _vector_collection_name(self) -> str:
         """Resolve the collection activated with the SQLite generation."""
@@ -196,6 +203,25 @@ class DocmancerAgent:
         if generation and generation.get("vector_collection"):
             return str(generation["vector_collection"])
         return self._base_vector_collection_name()
+
+    def _vector_retrieval_required(self) -> bool:
+        mode = str(getattr(self.config.retrieval, "default_mode", "lexical") or "lexical").lower()
+        return mode in {"dense", "sparse", "hybrid"}
+
+    def _require_completed_vector_sync(self, result: Any | None) -> None:
+        """Fail closed when the configured read path requires vector parity."""
+        if result is not None or not self._vector_retrieval_required():
+            return
+        reason = str(self.last_vector_sync_metrics.get("reason") or "vector_sync_incomplete")
+        self.last_vector_sync_metrics = {
+            **self.last_vector_sync_metrics,
+            "status": "failed",
+            "reason": reason,
+        }
+        raise RuntimeError(
+            f"vector retrieval mode {self.config.retrieval.default_mode!r} requires a "
+            f"complete vector index, but synchronization did not complete: {reason}"
+        )
 
     def _sync_vectors_if_enabled(
         self,

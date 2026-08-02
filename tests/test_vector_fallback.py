@@ -62,6 +62,31 @@ def test_auto_vectors_zero_skips_vector_path(tmp_path, monkeypatch, caplog):
     assert not any("embedded=" in rec.message for rec in caplog.records)
 
 
+def test_vector_mode_does_not_activate_generation_when_sync_is_skipped(tmp_path, monkeypatch):
+    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
+    monkeypatch.setenv("DOCMANCER_AUTO_VECTORS", "0")
+
+    config = DocmancerConfig()
+    config.index.db_path = str(tmp_path / "docs.db")
+    config.retrieval.default_mode = "hybrid"
+
+    from docmancer.agent import DocmancerAgent
+
+    agent = DocmancerAgent(config=config)
+    doc = Document(
+        source="doc.md",
+        content="# Hybrid\n\nVector-required content.\n",
+        metadata={"format": "markdown"},
+    )
+
+    with pytest.raises(RuntimeError, match="requires a complete vector index"):
+        agent.ingest_documents([doc], with_vectors=True)
+
+    assert agent.store.active_generation_id() is None
+    assert agent.last_vector_sync_metrics["status"] == "failed"
+    assert agent.last_vector_sync_metrics["reason"] == "disabled_by_environment"
+
+
 def test_vector_sync_failure_after_fts_ingest_raises(tmp_path, monkeypatch):
     monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
     monkeypatch.setenv("DOCMANCER_AUTO_VECTORS", "1")

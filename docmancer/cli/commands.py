@@ -436,25 +436,9 @@ def _run_dispatch_query(
     sets ``allow_degraded=True``.
     """
     try:
-        from docmancer.embeddings import get_embeddings_provider
-        from docmancer.retrieval.dispatch import HybridRetrievalError, RetrievalDispatcher
-        from docmancer.runtime.qdrant_manager import ensure_running
-        from docmancer.stores.base import get_vector_store
-    except ImportError:
-        chunks = agent.query(query, limit=limit, budget=budget, expand=expand)
-        return chunks, {}, {}, "lexical", {"lexical": len(chunks)}
+        from docmancer.retrieval.runtime import dispatcher_for_agent
 
-    vs_config = config.vector_store
-    if vs_config.provider == "qdrant" and not vs_config.url:
-        resolution = ensure_running()
-        if resolution.fallback or not resolution.url:
-            vs_config = vs_config.model_copy(update={"provider": "sqlite-vec"})
-        else:
-            vs_config = vs_config.model_copy(update={"url": resolution.url})
-
-    try:
-        vector_store = get_vector_store(vs_config, embeddings_dim=config.embeddings.dimensions)
-        provider = get_embeddings_provider(config.embeddings)
+        dispatcher = dispatcher_for_agent(agent, mode=mode)
     except Exception as exc:
         failures = {"vector": f"{type(exc).__name__}: {exc}"}
         if allow_degraded:
@@ -462,14 +446,6 @@ def _run_dispatch_query(
             return chunks, {}, failures, "lexical", {"lexical": len(chunks)}
         raise HybridRetrievalError(failures) from exc
 
-    collection = agent._vector_collection_name()
-    dispatcher = RetrievalDispatcher(
-        store=agent.store,
-        config=config,
-        vector_store=vector_store,
-        provider=provider,
-        collection=collection,
-    )
     result = dispatcher.run(
         query,
         mode=mode,

@@ -1434,7 +1434,9 @@ class LibraryDocsApplicationService:
             })
         retrieval_diagnostics = {
             "requested": {
-                "mode": "lexical",
+                "mode": str(
+                    getattr(self.config.retrieval, "default_mode", "lexical") or "lexical"
+                ).lower(),
                 "raw_topic_sha256": hashlib.sha256(query.encode()).hexdigest(),
                 "filters": retrieval_filters,
                 "record": {

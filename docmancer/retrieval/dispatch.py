@@ -146,6 +146,10 @@ class RetrievalDispatcher:
                     metadata["fusion_config_hash"] = fusion_config_hash
                     section_id = metadata.get("section_id")
                     metadata["retrieval_trace"] = {
+                        "requested_mode": effective_mode,
+                        "mode_used": result.mode_used,
+                        "candidate_counts": dict(result.candidate_counts),
+                        "failures": dict(result.failures),
                         "component_ranks": dict(result.contributions.get(section_id, {})),
                         "pre_post_rank": metadata.pop("_pre_post_rank", final_rank),
                         "intent_boost": metadata.pop("_intent_boost", 0.0),
@@ -660,91 +664,86 @@ class RetrievalDispatcher:
         from .lexical import lexical_search
         from .sparse import sparse_search
 
-        tasks: dict[str, Any] = {}
+        jobs: dict[str, Any] = {}
         # Backends may score a wider internal window, but only the first
         # verified ``per_source_limit`` hits enter the candidate lane. This is
         # required for sqlite-vec, which cannot push metadata predicates down.
         vector_scoring_limit = min(160, max(40, per_source_limit * 4))
-        with ThreadPoolExecutor(max_workers=3) as ex:
-            if mode in {"hybrid"}:
-                tasks["lexical"] = ex.submit(
-                    lexical_search,
-                    self.store,
-                    query,
-                    limit=min(40, per_source_limit),
-                    budget=10_000,
-                    filters=filters,
+        if mode == "hybrid":
+            jobs["lexical"] = lambda: lexical_search(
+                self.store, query, limit=min(40, per_source_limit), budget=10_000, filters=filters
+            )
+            jobs["dense"] = lambda: dense_search(
+                vector_store=self.vector_store, provider=self.provider,
+                collection=self.collection, query=query,
+                limit=vector_scoring_limit, filters=filters,
+            )
+            if self._sparse_supported():
+                jobs["sparse"] = lambda: sparse_search(
+                    vector_store=self.vector_store, provider=self.provider,
+                    collection=self.collection, query=query,
+                    limit=vector_scoring_limit, filters=filters,
                 )
-                tasks["dense"] = ex.submit(
-                    dense_search,
-                    vector_store=self.vector_store,
-                    provider=self.provider,
-                    collection=self.collection,
-                    query=query,
-                    limit=vector_scoring_limit,
-                    filters=filters,
-                )
-                if self._sparse_supported():
-                    tasks["sparse"] = ex.submit(
-                        sparse_search,
-                        vector_store=self.vector_store,
-                        provider=self.provider,
-                        collection=self.collection,
-                        query=query,
-                        limit=vector_scoring_limit,
-                        filters=filters,
-                    )
-            elif mode == "dense":
-                tasks["dense"] = ex.submit(
-                    dense_search,
-                    vector_store=self.vector_store,
-                        provider=self.provider,
-                        collection=self.collection,
-                        query=query,
-                        limit=vector_scoring_limit,
-                        filters=filters,
-                )
-            elif mode == "sparse":
-                tasks["sparse"] = ex.submit(
-                    sparse_search,
-                    vector_store=self.vector_store,
-                    provider=self.provider,
-                    collection=self.collection,
-                    query=query,
-                    limit=vector_scoring_limit,
-                    filters=filters,
-                )
-            else:
-                return {}, {}, {}
+        elif mode == "dense":
+            jobs["dense"] = lambda: dense_search(
+                vector_store=self.vector_store, provider=self.provider,
+                collection=self.collection, query=query,
+                limit=vector_scoring_limit, filters=filters,
+            )
+        elif mode == "sparse":
+            jobs["sparse"] = lambda: sparse_search(
+                vector_store=self.vector_store, provider=self.provider,
+                collection=self.collection, query=query,
+                limit=vector_scoring_limit, filters=filters,
+            )
+        else:
+            return {}, {}, {}
 
-            candidate_lists: dict[str, list[Any]] = {}
-            counts: dict[str, int] = {}
-            failures: dict[str, str] = {}
-            for source, fut in tasks.items():
-                try:
-                    hits = fut.result()
-                except Exception as exc:
-                    logger.warning("retrieval source %s failed: %s", source, exc)
-                    failures[source] = f"{type(exc).__name__}: {exc}"
-                    hits = []
-                if not hits:
-                    counts[source] = 0
-                    continue
-                if source == "lexical":
-                    hits = self._filter_chunks(hits, verification_filters)
-                else:
-                    hits = [
-                        hit for hit in hits
-                        if metadata_matches_filters(
-                            getattr(hit, "payload", {}) or {},
-                            verification_filters,
-                            source=str((getattr(hit, "payload", {}) or {}).get("source") or ""),
-                        )
-                    ][:per_source_limit]
-                shaped = _shape_for_fusion(source, hits)
-                if shaped:
-                    candidate_lists[source] = shaped
-                    counts[source] = len(shaped)
+        can_parallelize = bool(
+            len(jobs) > 1
+            and getattr(self.vector_store, "supports_concurrent_queries", True)
+        )
+        if can_parallelize:
+            with ThreadPoolExecutor(max_workers=len(jobs)) as executor:
+                outcomes = {
+                    source: executor.submit(job)
+                    for source, job in jobs.items()
+                }
+                resolved = {
+                    source: future.result
+                    for source, future in outcomes.items()
+                }
+        else:
+            resolved = jobs
+
+        candidate_lists: dict[str, list[Any]] = {}
+        counts: dict[str, int] = {}
+        failures: dict[str, str] = {}
+        for source, resolve in resolved.items():
+            try:
+                hits = resolve()
+            except Exception as exc:
+                logger.warning("retrieval source %s failed: %s", source, exc)
+                failures[source] = f"{type(exc).__name__}: {exc}"
+                hits = []
+            if not hits:
+                counts[source] = 0
+                continue
+            if source == "lexical":
+                hits = self._filter_chunks(hits, verification_filters)
+            else:
+                hits = [
+                    hit for hit in hits
+                    if metadata_matches_filters(
+                        getattr(hit, "payload", {}) or {},
+                        verification_filters,
+                        source=str((getattr(hit, "payload", {}) or {}).get("source") or ""),
+                    )
+                ][:per_source_limit]
+            shaped = _shape_for_fusion(source, hits)
+            if shaped:
+                candidate_lists[source] = shaped
+                counts[source] = len(shaped)
         return candidate_lists, counts, failures
 
     def _sparse_supported(self) -> bool:

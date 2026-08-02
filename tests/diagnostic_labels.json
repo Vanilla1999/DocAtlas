@@ -175,6 +175,7 @@
     "tests/test_parent_child_grid.py": "behavioral",
     "tests/test_parent_child_index.py": "behavioral",
     "tests/test_parent_child_vectors.py": "behavioral",
+    "tests/test_public_vector_retrieval.py": "behavioral",
     "tests/test_parsers.py": "behavioral",
     "tests/test_patch_constraint_symbol_grounding.py": "behavioral",
     "tests/test_patch_constraint_validation_service.py": "behavioral",
@@ -217,7 +218,7 @@
   },
   "module_node_hashes": {
     "tests/docs/test_action_packet.py": "86ee16e2fe221857a77178bd8b681560d4adc0ebb0308e4dd43a8be3c0cbf6c8",
-    "tests/docs/test_agent_index_gateway.py": "e870608d4ce9b818606a402ae790105562ea5300d92d432d641078ef7cbc30f1",
+    "tests/docs/test_agent_index_gateway.py": "bb95c6c144ee80f6edf31b8c8e1db3f265e695f5f05882a3b948a6bb204309ce",
     "tests/docs/test_change_aware_maintenance.py": "691793ef8fa0c653ef44065b82dbe85da2488a33ce7ffd4578867139426cf5cb",
     "tests/docs/test_code_graph.py": "e0b649da530df23b24e9f6fa33d6e6718481c26da4fd6daf915f5cb66c4ddf78",
     "tests/docs/test_code_graph_golden.py": "b05c19d8d26bb5ea8e60ad1ed74addf23526ba38baae59c0ba2f094e522f22ea",
@@ -391,6 +392,7 @@
     "tests/test_parent_child_grid.py": "26c48fa72ac635ac52c8d3b2cfca0036d394d2759d330ddf203d36ec809a5b7f",
     "tests/test_parent_child_index.py": "c2e7d11296f2440cec811d638ca4dc77881123e8ab26ed0d0c347d91bc9d4dcc",
     "tests/test_parent_child_vectors.py": "71084b4466b6ecdea8bd941c94ed921cdae52361d4e5447abfa97d887cdcc884",
+    "tests/test_public_vector_retrieval.py": "49c01539f834b6b79fde8f4a929a3671d8e4b73eb316c4093b0fa376e9d33efa",
     "tests/test_parsers.py": "fde8fe21da4f9969d24230b6fd746117ec1b3f7487f7bc66dc76016001c4ddd5",
     "tests/test_patch_constraint_symbol_grounding.py": "f33a2340092a95b65692fd8f417b5f1a2d58f6a00f6b0b8d0da62090d2967c45",
     "tests/test_patch_constraint_validation_service.py": "695a3eeac4d682d7ba62a615e38afb1fcbbab05a2e52f99cbe2580fbd507364d",
@@ -403,7 +405,7 @@
     "tests/test_pytest_collection_hygiene.py": "69dabb33d2206e55b56c029469d1e989ff1f8a9d560fe0313030869395d5e51d",
     "tests/test_qdrant_manager.py": "b6b60949a586e4720e3fc877e0fac6409b24cbe78662a70aeef38156d51b3a0e",
     "tests/test_qdrant_store.py": "905a426e67b3e53e8a7bf6a28dc2d2d06544cf607154b41feea773fe8ac3be6c",
-    "tests/test_qdrant_store_unit.py": "96d221b2e72ef7f885b8162afd293d9c9f3482c10a131af97cf7eed87dfc94b5",
+    "tests/test_qdrant_store_unit.py": "e07708b02dda5540db4e8ade39e4bc461d09968bd36aec34dfc6c7e00415b166",
     "tests/test_query_planning.py": "3383a5aadfdb2049e73a8538f37deaef432eb8864454cda12367806407eca818",
     "tests/test_rate_limit.py": "6280b7af72382a6764a3be16be423e64a3bd33582e0bae398503c84be2574b91",
     "tests/test_redirect.py": "10abbe0784a927d701b431e4541dc9439f070702258485e92b7efaa5625df197",
@@ -428,7 +430,7 @@
     "tests/test_unified_docs_context.py": "a145ab06eaa75a036cb16942336a3fec94b815a4b4325003d64e510edd8d0bfa",
     "tests/test_unified_docs_context_mcp.py": "64db5341937ca57e0d12630f698a71d9217e5d769aa4b618e6d18e73a5219b03",
     "tests/test_uspto_tm.py": "92f3214036e4547c97bfe9c55398e9f137756c3813fd5d0e9f4497a18f3dc2e1",
-    "tests/test_vector_fallback.py": "18314fc3296754c198f39308cc79b501cad3d81f648ca507f09eb3514d424f52",
+    "tests/test_vector_fallback.py": "c026f449f14d09cecd080b131a10d390bebfa94d85b502339e33646597ae40c2",
     "tests/test_web_fetcher.py": "110ac6b4c8a415776f5b37f93c8f91283a3ecad7d25ee455e3d144aa79bc24f1"
   },
   "node_overrides": {
