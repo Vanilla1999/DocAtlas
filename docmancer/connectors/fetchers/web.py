@@ -142,6 +142,7 @@ class WebFetcher:
         proxy_url: str | None = None,
         source_manifest: dict | None = None,
         max_fetched_document_bytes: int = 64 * 1024 * 1024,
+        query: str | None = None,
     ):
         self._timeout = timeout
         self._max_pages = max_pages
@@ -170,6 +171,7 @@ class WebFetcher:
             normalize_resolved_github_manifest(source_manifest) if source_manifest is not None else None
         )
         self._max_fetched_document_bytes = max_fetched_document_bytes
+        self._query = query
         self.last_discovery_diagnostics: dict | None = None
         self.last_page_ledger: list[dict] = []
         self._ledger_lock = threading.Lock()
@@ -314,6 +316,8 @@ class WebFetcher:
                 max_pages=self._max_pages,
                 force_strategy=self._strategy,
                 seed_urls=self._seed_urls,
+                root_html=root_html,
+                query=self._query,
             )
             discovered = discovery_result.urls
             self._raise_if_cancelled()

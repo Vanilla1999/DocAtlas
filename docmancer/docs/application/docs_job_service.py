@@ -142,6 +142,11 @@ class SQLiteDocsJobStore:
             job = self._decode(row["payload_json"])
             if job.lease_id != expected_lease_id:
                 return None
+            if (
+                job.status == "cancelling"
+                and changes.get("status") not in TERMINAL_DOCS_JOB_STATUSES | {"cancelling"}
+            ):
+                changes.pop("status", None)
             if changes.get("status") in TERMINAL_DOCS_JOB_STATUSES and "finished_at" not in changes:
                 changes["finished_at"] = now
             if changes.get("status") == "running" and job.started_at is None and "started_at" not in changes:
@@ -286,6 +291,7 @@ class DocsJobTracker:
         request_identity: str | None = None,
         predecessor_job_id: str | None = None,
         with_generation: bool = True,
+        request_payload: dict[str, Any] | None = None,
     ) -> DocsJob:
         now = self._now()
         request_identity = _safe_text(request_identity) if request_identity else None
@@ -307,6 +313,7 @@ class DocsJobTracker:
             lease_id=self.lease_id,
             predecessor_job_id=predecessor_job_id,
             request_identity=request_identity,
+            request_payload=_safe_event_value(request_payload) if request_payload else None,
             status="pending",
             phase="validating",
             message="Job created.",
@@ -462,7 +469,7 @@ class DocsJobTracker:
             if self._store is None:
                 return False
             job = self._store.get(job_id)
-            return bool(job and job.status == "cancelling")
+            return bool(job and job.status in {"cancelling", "cancelled"})
 
     def generation_active(self, job_id: str, generation_id: str | None) -> bool:
         job = self.get(job_id)

@@ -17,13 +17,19 @@ class StorageTopology:
 class StorageTopologyResolver:
     """Resolve the active index configuration from an explicit project path."""
 
-    def __init__(self, *, fallback_config: DocmancerConfig | None = None):
+    def __init__(
+        self,
+        *,
+        fallback_config: DocmancerConfig | None = None,
+        prefer_fallback: bool = False,
+    ):
         self._fallback_config = fallback_config
+        self._prefer_fallback = prefer_fallback
 
     def resolve(self, project_path: str | Path) -> StorageTopology:
         root = Path(project_path).expanduser().resolve()
         local_config = root / "docmancer.yaml"
-        if local_config.exists():
+        if local_config.exists() and not self._prefer_fallback:
             return StorageTopology(
                 project_path=root,
                 config=DocmancerConfig.from_yaml(local_config),

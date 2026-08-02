@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import re
+import hashlib
 from dataclasses import asdict, is_dataclass, replace
 from typing import Any
 
@@ -261,7 +262,7 @@ class UnifiedDocsContextService:
             routing["dependency_detected"] = bool(getattr(project_result, "dependency_docs", None))
             explicit_library_results = []
             for lib in libs:
-                safe = self._ensure_library_safe(lib, ecosystem, version, source_type, docs_url, force_refresh, effective_allow_network)
+                safe = self._ensure_library_safe(lib, ecosystem, version, source_type, docs_url, force_refresh, effective_allow_network, project_path)
                 if safe is not None:
                     explicit_library_results.append(safe)
                     continue
@@ -284,7 +285,7 @@ class UnifiedDocsContextService:
                 return confirmation
         elif mode_selected == "library":
             for lib in libs:
-                safe = self._ensure_library_safe(lib, ecosystem, version, source_type, docs_url, force_refresh, effective_allow_network)
+                safe = self._ensure_library_safe(lib, ecosystem, version, source_type, docs_url, force_refresh, effective_allow_network, project_path)
                 if safe is not None:
                     return safe
                 result = self._get_library_docs_with_latest_fallback(lib, question=question, tokens=tokens, ecosystem=ecosystem, version=version, docs_url=docs_url, source_type=source_type, force_refresh=force_refresh, project_path=project_path, allow_network=effective_allow_network, allow_latest_fallback=allow_latest_fallback, response_style=response_style)
@@ -376,30 +377,83 @@ class UnifiedDocsContextService:
             if len(library_results) == 1 else None
         )
         if library_results:
+            decisions = [result.support_decision for result in library_results]
             answer_supported = bool(
-                support_decision and support_decision.answer_supported
+                decisions and all(decision and decision.answer_supported for decision in decisions)
             )
-            support_payload = (
-                support_decision.as_payload()
-                if support_decision is not None else {
-                    "support_status": "insufficient_evidence",
-                    "reason_code": "canonical_support_decision_missing",
-                    "missing_requirement_ids": [],
-                    "satisfied_requirement_ids": [],
-                    "mandatory_requirement_ids": [],
-                    "mandatory_coverage": 0.0,
-                    "selected_evidence_ids": [],
-                    "decision_hash": None,
+            if support_decision is not None:
+                support_payload = support_decision.as_payload()
+            else:
+                missing_ids = sorted({
+                    item for decision in decisions if decision
+                    for item in decision.missing_requirement_ids
+                })
+                satisfied_ids = sorted({
+                    item for decision in decisions if decision
+                    for item in decision.satisfied_requirement_ids
+                })
+                mandatory_ids = sorted({
+                    item for decision in decisions if decision
+                    for item in decision.mandatory_requirement_ids
+                })
+                selected_ids = sorted({
+                    item for decision in decisions if decision
+                    for item in decision.selected_evidence_ids
+                })
+                aggregate_manifest = [
+                    {
+                        "library_id": result.library_id,
+                        "answer_supported": bool(decision and decision.answer_supported),
+                        "decision_hash": getattr(decision, "decision_hash", None),
+                        "missing_requirement_ids": list(
+                            getattr(decision, "missing_requirement_ids", ()) or ()
+                        ),
+                    }
+                    for result, decision in sorted(
+                        zip(library_results, decisions), key=lambda item: item[0].library_id
+                    )
+                ]
+                aggregate_decision_hash = hashlib.sha256(
+                    json.dumps(
+                        aggregate_manifest,
+                        ensure_ascii=True,
+                        sort_keys=True,
+                        separators=(",", ":"),
+                    ).encode("utf-8")
+                ).hexdigest()
+                support_payload = {
+                    "support_status": "supported" if answer_supported else "insufficient_evidence",
+                    "reason_code": None if answer_supported else "multi_library_support_incomplete",
+                    "missing_requirement_ids": missing_ids,
+                    "satisfied_requirement_ids": satisfied_ids,
+                    "mandatory_requirement_ids": mandatory_ids,
+                    "mandatory_coverage": (
+                        min((decision.mandatory_coverage for decision in decisions if decision), default=0.0)
+                    ),
+                    "selected_evidence_ids": selected_ids,
+                    "decision_hash": aggregate_decision_hash,
                 }
-            )
         else:
-            answer_supported = context_available
+            project_completeness = dict(
+                getattr(project_result, "answer_completeness", None) or {}
+            ) if project_result else {}
+            answer_supported = bool(
+                project_result
+                and getattr(project_result, "answer_type", None) == "exact"
+                and project_completeness.get("edit_ready") is True
+            )
+            missing_project_terms = [
+                str(term) for term in project_completeness.get("missing_terms", [])
+            ]
             support_payload = {
                 "support_status": "supported" if answer_supported else "insufficient_evidence",
-                "reason_code": None if answer_supported else "no_docs_context_available",
-                "missing_requirement_ids": [],
+                "reason_code": None if answer_supported else (
+                    "project_context_not_answer_ready"
+                    if context_available else "no_docs_context_available"
+                ),
+                "missing_requirement_ids": missing_project_terms,
                 "satisfied_requirement_ids": [],
-                "mandatory_requirement_ids": [],
+                "mandatory_requirement_ids": missing_project_terms,
                 "mandatory_coverage": 1.0 if answer_supported else 0.0,
                 "selected_evidence_ids": [],
                 "decision_hash": None,
@@ -607,9 +661,19 @@ class UnifiedDocsContextService:
         seen = set()
         return [item for item in result if not (item in seen or seen.add(item))]
 
-    def _ensure_library_safe(self, library: str, ecosystem: str | None, version: str | None, source_type: str | None, docs_url: str | None, force_refresh: bool, allow_network: bool) -> UnifiedDocsContextResult | None:
+    def _ensure_library_safe(self, library: str, ecosystem: str | None, version: str | None, source_type: str | None, docs_url: str | None, force_refresh: bool, allow_network: bool, project_path: str | None = None) -> UnifiedDocsContextResult | None:
         if allow_network:
             return None
+        if project_path and (version is None or docs_url is None):
+            detected_version, detected_docs_url, detected_template, *_ = self.service._project_version_for(
+                library=library,
+                ecosystem=ecosystem,
+                project_path=project_path,
+            )
+            version = version or detected_version
+            docs_url = docs_url or detected_docs_url
+            if docs_url is None and detected_template and version:
+                docs_url = detected_template.format(library=library, version=version)
         if ecosystem == "python" and version and str(version).lower() not in _LATEST_ALIASES and docs_url is None:
             normalized = library.lower().replace("-", "_").replace(" ", "_")
             exact = resolve_python_versioned_docs(normalized, version)
@@ -642,7 +706,7 @@ class UnifiedDocsContextService:
                 lanes={**self._empty_lanes(), "library": {"status": "confirmation_required", "source_count": 0, "canonical_ids": [], "requires_confirmation": True, "next_action": next_action}},
                 warnings=[source_required_diagnostics({"code": "library_docs_source_required", "blocking": True, "source_options": source_options})],
             )
-        if status == "failed":
+        if status in {"failed", "partial"}:
             message = getattr(info, "message", None) or "Registered library documentation source is in failed state."
             next_action = {
                 "type": "repair_library_docs_source",
@@ -662,14 +726,14 @@ class UnifiedDocsContextService:
                 mode_requested="library",
                 mode_selected="library",
                 routing={
-                    "reason_code": "library_docs_failed",
+                    "reason_code": "library_docs_partial" if status == "partial" else "library_docs_failed",
                     "project_path_used": False,
                     "libraries_requested": [library],
                     "dependency_detected": False,
                     "failed_status": status,
                     "failed_message": message,
                 },
-                reason_code="library_docs_failed",
+                reason_code="library_docs_partial" if status == "partial" else "library_docs_failed",
                 confirmation_reason="library_docs_repair",
                 next_action=next_action,
                 arguments_patch=next_action["arguments_patch"],

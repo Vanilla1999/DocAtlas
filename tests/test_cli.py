@@ -4,6 +4,7 @@ from pathlib import Path
 import subprocess
 from unittest.mock import MagicMock, patch
 
+import pytest
 import yaml
 from click.testing import CliRunner
 
@@ -333,7 +334,60 @@ def test_context_cli_uses_project_local_storage_topology(tmp_path):
 
     assert result.exit_code == 0, result.output
     assert captured["db_path"] == str((project / ".docmancer" / "project.db").resolve())
-    assert captured["library_index_root"] == str((project / ".docmancer" / "docs-indexes").resolve())
+    assert captured["library_index_root"] == str(
+        (project / ".docmancer" / "docs-indexes").resolve()
+    )
+
+
+@pytest.mark.parametrize("config_placement", ["command", "group"])
+def test_context_cli_explicit_config_overrides_project_local_storage_topology(
+    tmp_path, config_placement
+):
+    from docmancer.core.config import DocmancerConfig
+    from docmancer.docs.models import ProjectContextResult
+
+    project = tmp_path / "project"
+    project.mkdir()
+    (project / "docmancer.yaml").write_text(
+        "index:\n  db_path: .docmancer/project.db\n",
+        encoding="utf-8",
+    )
+    explicit_config = tmp_path / "runtime.yaml"
+    explicit_config.write_text("index:\n  db_path: runtime.db\n", encoding="utf-8")
+    fallback = DocmancerConfig()
+    fallback.index.db_path = str(tmp_path / "runtime.db")
+    captured: dict[str, object] = {}
+
+    class CapturingService:
+        def __init__(self, *, config, library_index_root=None):
+            captured["db_path"] = config.index.db_path
+            captured["library_index_root"] = library_index_root
+
+        def get_project_context(self, project_path, question, **_kwargs):
+            return ProjectContextResult(project_path=project_path, question=question)
+
+    with patch(
+        "docmancer.cli.commands._load_config", return_value=fallback
+    ) as load_config, patch(
+        "docmancer.docs.service.LibraryDocsService", CapturingService
+    ):
+        context_args = [
+            "context",
+            str(project),
+            "Where is the index?",
+            "--format",
+            "json",
+        ]
+        if config_placement == "command":
+            context_args.extend(["--config", str(explicit_config)])
+        else:
+            context_args = ["--config", str(explicit_config), *context_args]
+        result = CliRunner().invoke(cli, context_args)
+
+    assert result.exit_code == 0, result.output
+    load_config.assert_called_once_with(str(explicit_config))
+    assert captured["db_path"] == str(tmp_path / "runtime.db")
+    assert captured["library_index_root"] is None
 
 
 def test_load_config_prefers_local_docmancer_yaml(tmp_path):

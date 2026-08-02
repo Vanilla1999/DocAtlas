@@ -577,6 +577,7 @@ class DocmancerAgent:
         cancellation_callback: Callable[[], bool] | None = None,
         deadline_at: float | None = None,
         source_manifest: dict[str, Any] | None = None,
+        query: str | None = None,
     ):
         if fetcher is not None:
             return fetcher
@@ -610,6 +611,7 @@ class DocmancerAgent:
             cancellation_callback=cancellation_callback,
             deadline_at=deadline_at,
             source_manifest=source_manifest,
+            query=query,
         )
 
     def _auto_detect_provider(self, url: str) -> str:
@@ -635,6 +637,7 @@ class DocmancerAgent:
         deadline_at: float | None = None,
         with_vectors: bool = True,
         source_manifest: dict[str, Any] | None = None,
+        query: str | None = None,
     ) -> int:
         f = self._get_fetcher(
             provider,
@@ -651,6 +654,7 @@ class DocmancerAgent:
             cancellation_callback=cancellation_callback,
             deadline_at=deadline_at,
             source_manifest=source_manifest,
+            query=query,
         )
         documents = f.fetch(url)
         self.last_fetch_failure = getattr(f, "last_fetch_failure", None)

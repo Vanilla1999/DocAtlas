@@ -15,7 +15,10 @@ from docmancer.docs.application.evidence_selection import (
     requirement_value_visible,
     select_evidence,
 )
-from docmancer.docs.domain.normative_language import classify_normative_modality
+from docmancer.docs.domain.normative_language import (
+    classify_normative_modality,
+    python_declaration_line_indexes,
+)
 
 
 ACTION_PACKET_SCHEMA_VERSION = 1
@@ -1522,7 +1525,10 @@ def _extract_facts(content: str) -> tuple[list[tuple[str, str]], int]:
     facts: list[tuple[str, str]] = []
     omitted_critical = 0
     in_fence = False
-    for raw in content.splitlines():
+    python_declaration_lines = python_declaration_line_indexes(content)
+    for line_index, raw in enumerate(content.splitlines()):
+        if line_index in python_declaration_lines:
+            continue
         stripped = raw.strip()
         if stripped.startswith("```") or stripped.startswith("~~~"):
             in_fence = not in_fence

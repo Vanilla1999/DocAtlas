@@ -187,6 +187,39 @@ def test_display_only_canonical_child_is_rendered_and_hash_bound():
     assert packet["status"] == "ok"
     assert packet["required_invariants"][0]["text"] == text
     assert validate_action_packet(packet, evidence_items=[item]) == []
+
+
+def test_python_imports_do_not_create_normative_facts_but_prose_does():
+    text = """from . import required
+from ..policy import forbidden
+from pkg import (
+    required,
+    forbidden,
+)
+From configuration, retries are required."""
+    item = {
+        "stable_chunk_id": "python-import-boundary",
+        "parent_logical_id": "parent:python-import-boundary",
+        "source": "docs/python-policy.md",
+        "display_text": text,
+        "display_content_hash": hashlib.sha256(text.encode("utf-8")).hexdigest(),
+        "authority": "canonical",
+    }
+
+    packet = build_action_packet(
+        question="Configure retries",
+        context_pack=[item],
+        max_tokens=1500,
+    )
+
+    required = [fact["text"] for fact in packet["required_invariants"]]
+    forbidden = [fact["text"] for fact in packet["forbidden_changes"]]
+    assert required == ["From configuration, retries are required."]
+    assert forbidden == []
+    assert packet["status"] == "ok"
+    assert packet["omitted_counts"].get("mandatory_requirements", 0) == 0
+    assert not any("Mandatory selected evidence" in value for value in packet["missing_evidence"])
+    assert validate_action_packet(packet, evidence_items=[item], max_tokens=1500) == []
 from docmancer.docs.application.unified_context_service import UnifiedDocsContextService
 from docmancer.docs.domain.content_trust import annotate_context_pack
 from docmancer.docs.interfaces.mcp.context_tools import handle_context_tool
@@ -212,7 +245,8 @@ def test_public_mcp_errors_are_bounded_and_match_the_advertised_schema():
 def test_bounded_direct_is_one_existing_tool_call_and_returns_only_action_packet():
     tool = next(item for item in TOOLS if item["name"] == "get_docs_context")
     assert set(tool["inputSchema"]["properties"]) == {
-        "question", "project_path", "library", "version", "mode",
+        "question", "project_path", "library", "libraries", "ecosystem",
+        "version", "source_type", "docs_url", "mode",
     }
     assert "delivery_strategy" not in tool["inputSchema"]["properties"]
     assert tool["outputSchema"]["properties"]["kind"]["enum"] == ["docs_answer", "patch_context"]
@@ -239,6 +273,9 @@ def test_bounded_direct_is_one_existing_tool_call_and_returns_only_action_packet
             return ProjectContextResult(
                 project_path=project_path,
                 question=question,
+                answer_available=True,
+                answer_type="exact",
+                answer_completeness={"status": "exact", "edit_ready": True},
                 context_pack=[{
                     "doc_scope": "project",
                     "path": "AGENTS.md",
@@ -398,8 +435,11 @@ def test_bounded_direct_is_one_existing_tool_call_and_returns_only_action_packet
             return ProjectContextResult(
                 project_path=project_path,
                 question=question,
+                answer_available=True,
                 answer_type="exact",
-                answer_completeness={"status": "exact", "source_search_required": False},
+                answer_completeness={
+                    "status": "exact", "source_search_required": False, "edit_ready": True,
+                },
                 context_pack=[
                     {
                         "doc_scope": "project", "source_class": "code_graph", "path": "src/shared.py",

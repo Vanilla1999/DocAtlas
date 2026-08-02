@@ -581,10 +581,10 @@ def handle_project_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
         result = asdict(project_docs_app.inspect_project_docs(args["project_path"]))
         return result if args.get("details") else _compact_inspect_project_docs(result)
     if name == "ingest_project_docs":
-        result = asdict(project_docs_app.ingest_project_docs(args["project_path"], skip_known=bool(args.get("skip_known") if args.get("skip_known") is not None else True), with_vectors=bool(args.get("with_vectors") if args.get("with_vectors") is not None else True)))
+        result = asdict(project_docs_app.ingest_project_docs(args["project_path"], skip_known=bool(args.get("skip_known") if args.get("skip_known") is not None else True), with_vectors=bool(args.get("with_vectors") if args.get("with_vectors") is not None else False)))
         return result if args.get("details") else _compact_ingest_project_docs(result)
     if name == "sync_project_docs":
-        result = asdict(project_docs_app.sync_project_docs(args["project_path"], with_vectors=bool(args.get("with_vectors") if args.get("with_vectors") is not None else True)))
+        result = asdict(project_docs_app.sync_project_docs(args["project_path"], with_vectors=bool(args.get("with_vectors") if args.get("with_vectors") is not None else False)))
         return result if args.get("details") else _compact_sync_project_docs(result)
     if name == "bootstrap_project_docs":
         result = asdict(project_docs_app.bootstrap_project_docs(args["project_path"], question=args.get("question")))

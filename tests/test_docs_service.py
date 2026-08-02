@@ -872,6 +872,34 @@ def test_sync_project_docs_prunes_orphaned_sources_and_indexes_new_docs(tmp_path
     assert "NewSyncNeedle" in new_query.results[0].content
 
 
+def test_sync_project_docs_removes_extracted_artifacts_for_deleted_source(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    (project / "README.md").write_text("# App\n\nCurrent docs.", encoding="utf-8")
+    (project / "docs").mkdir()
+    deleted = project / "docs" / "old.md"
+    deleted.write_text(
+        "# Old\n\nDeletedArtifactNeedle must not remain on disk.",
+        encoding="utf-8",
+    )
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+    service.sync_project_docs(str(project), with_vectors=False)
+
+    with service._agent_instance().store._connect() as conn:
+        row = conn.execute(
+            "SELECT markdown_path, json_path FROM sources WHERE source = ?",
+            (str(deleted),),
+        ).fetchone()
+    assert row is not None
+    extracted_artifacts = [Path(row["markdown_path"]), Path(row["json_path"])]
+    assert all(path.exists() for path in extracted_artifacts)
+
+    deleted.unlink()
+    result = service.sync_project_docs(str(project), with_vectors=False)
+
+    assert result.orphaned_removed == 1
+    assert all(not path.exists() for path in extracted_artifacts)
+
+
 def test_invalid_explicit_catalog_blocks_lifecycle_and_preserves_index(tmp_path, monkeypatch):
     project = _flutter_project(tmp_path)
     (project / "README.md").write_text("# App\n\nExisting indexed docs.", encoding="utf-8")
@@ -1326,7 +1354,7 @@ vector_store:
     sync = service.sync_project_docs(str(project), with_vectors=False)
     sync_compact = handle_project_tool("sync_project_docs", {"project_path": str(project), "with_vectors": False}, service)
 
-    expected_active_db = str((tmp_path / "user-home" / ".docmancer" / "docmancer.db").resolve())
+    expected_active_db = str((tmp_path / "docmancer-home" / "docmancer.db").resolve())
     expected_project_db = str((project / ".docmancer" / "project-local.db").resolve())
     assert inspect.diagnostics["active_index"]["db_path"] == expected_active_db
     assert inspect.diagnostics["active_index"]["project_path"] == str(project.resolve())
@@ -2230,6 +2258,29 @@ def test_get_project_context_can_return_project_and_dependency_context(tmp_path,
     assert result.metrics["dependency_result_count"] >= 1
     selected_classes = {item["source_class"] for item in result.trust_contract["sources"]["selected"]}
     assert selected_classes == {"project_file", "dependency_docs"}
+
+
+def test_public_context_fails_closed_when_flutter_dependency_docs_are_missing(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path, fvmrc='{"flutter": "3.27.1"}')
+    (project / "README.md").write_text(
+        "# Dogfood Flutter app\n\nThe app uses GoRouter for navigation and Riverpod for state management.\n",
+        encoding="utf-8",
+    )
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+    service.sync_project_docs(str(project), with_vectors=False)
+
+    payload = call_docs_tool_payload(
+        "get_docs_context",
+        {
+            "question": "How should GoRouter redirects and Riverpod providers be implemented?",
+            "project_path": str(project),
+        },
+        service,
+    )
+
+    assert payload["status"] == "insufficient_evidence"
+    assert "answer" not in payload
+    assert payload["missing"]
 
 
 def test_get_project_context_includes_snippet_object_when_metadata_has_code(tmp_path, monkeypatch):
@@ -4237,7 +4288,7 @@ def test_successful_library_prefetch_atomically_publishes_staged_index(tmp_path,
         async_=True,
     )
 
-    for _ in range(30):
+    for _ in range(100):
         status = service.get_docs_job_status(result.job_id)
         if status and status.status == "succeeded":
             break
@@ -4260,7 +4311,7 @@ def test_staged_prefetch_syncs_vectors_only_from_production_index(tmp_path, monk
         async_=True,
     )
 
-    for _ in range(30):
+    for _ in range(100):
         status = service.get_docs_job_status(result.job_id)
         if status and status.status == "succeeded":
             break
@@ -4464,6 +4515,52 @@ def test_cross_service_durable_cancellation_stops_active_library_prefetch(tmp_pa
     record = active_service.registry.get("example-docs", "web", "latest")
     assert record is not None
     assert active_service.library_docs.registry_ops.count_index_entries(record) == (0, 0)
+
+
+def test_service_restart_automatically_resumes_authorized_library_prefetch(tmp_path, monkeypatch):
+    first = _service(tmp_path, monkeypatch, FakeAgent(), durable_jobs=True)
+    request_identity = json.dumps({
+        "library": "example-docs",
+        "ecosystem": "web",
+        "docs_url": "https://example.com/docs/",
+        "docs_url_template": None,
+        "versions": [],
+    }, sort_keys=True)
+    interrupted = first.jobs.create(
+        "prefetch_library_docs",
+        request_identity=request_identity,
+        request_payload={
+            "library": "example-docs",
+            "ecosystem": "web",
+            "versions": [],
+            "docs_url": "https://example.com/docs/",
+            "docs_url_template": None,
+            "source_type": None,
+            "force_refresh": False,
+            "continue_on_error": True,
+            "target_plan": [],
+        },
+    )
+    first.jobs.update(interrupted.job_id, status="running")
+
+    restarted_tracker = DocsJobTracker(
+        db_path=first.config.index.db_path,
+        lease_id="simulated-restarted-worker",
+    )
+    restarted = LibraryDocsService(
+        config=first.config,
+        registry=first.registry,
+        agent=FakeAgent(),
+        job_tracker=restarted_tracker,
+    )
+
+    recovered = restarted.get_docs_job_status(interrupted.job_id)
+    assert recovered is not None
+    assert recovered.reason_code == "job_resumed"
+    assert recovered.resumed_by_job_id in restarted.resumed_docs_job_ids
+    successor = restarted.get_docs_job_status(recovered.resumed_by_job_id)
+    assert successor is not None
+    assert successor.predecessor_job_id == interrupted.job_id
 
 
 def test_cancel_between_staging_fetch_and_commit_never_publishes_index(tmp_path, monkeypatch):
@@ -5723,7 +5820,7 @@ def test_prefetch_docs_targets_reports_degraded_discovery_as_partial(tmp_path, m
     assert result.status == "partial"
     assert result.results[0].status == "partial"
     assert result.results[0].pages_indexed == 1
-    assert result.results[0].message == "partial ingestion: discovery_manifest_too_large"
+    assert result.results[0].message == "partial ingestion: discovery_manifest_too_large, checkpoint_pending"
 
 
 def test_prefetch_docs_targets_uses_page_ledger_for_partial_and_counters(tmp_path, monkeypatch):
@@ -5762,12 +5859,18 @@ def test_prefetch_docs_targets_uses_page_ledger_for_partial_and_counters(tmp_pat
 
 def test_prefetch_docs_targets_reports_zero_seed_as_partial(tmp_path, monkeypatch):
     class MixedSeedAgent(FakeAgent):
+        empty_attempts = 0
+
         def add(self, docs_url: str, recreate: bool = False, **kwargs) -> int:
             self.add_calls.append(docs_url)
             self.add_kwargs.append(kwargs)
-            return 0 if docs_url.endswith("empty") else 1
+            if docs_url.endswith("empty"):
+                self.empty_attempts += 1
+                return 0 if self.empty_attempts == 1 else 1
+            return 1
 
-    service = _service(tmp_path, monkeypatch, MixedSeedAgent())
+    agent = MixedSeedAgent()
+    service = _service(tmp_path, monkeypatch, agent)
 
     result = service.prefetch_docs_targets([
         {
@@ -5780,7 +5883,21 @@ def test_prefetch_docs_targets_reports_zero_seed_as_partial(tmp_path, monkeypatc
 
     assert result.status == "partial"
     assert result.results[0].status == "partial"
-    assert result.results[0].message == "partial ingestion: empty_seed"
+    assert result.results[0].message == "partial ingestion: empty_seed, checkpoint_pending"
+
+    resumed = service.prefetch_docs_targets([{
+        "library": "mixed-guides",
+        "seed_urls": ["https://example.com/docs/empty", "https://example.com/docs/ready"],
+        "allowed_domains": ["example.com"],
+        "path_prefixes": ["/docs/"],
+    }])
+
+    assert resumed.status == "ok"
+    assert agent.add_calls == [
+        "https://example.com/docs/empty",
+        "https://example.com/docs/ready",
+        "https://example.com/docs/empty",
+    ]
 
 
 def test_fresh_partial_target_remains_partial_without_refetch(tmp_path, monkeypatch):
@@ -5804,7 +5921,29 @@ def test_fresh_partial_target_remains_partial_without_refetch(tmp_path, monkeypa
     assert first.status == "partial"
     assert second.status == "partial"
     assert second.results[0].status == "partial"
-    assert len(agent.add_calls) == 1
+    assert len(agent.add_calls) == 2
+    inspection = service.inspect_library_docs(first.results[0].canonical_id)
+    assert inspection.status == "partial"
+    assert inspection.reason_code == "partial_ingestion"
+    assert inspection.resumable is True
+    assert inspection.checkpoint_pending_pages == 1
+    public_status = call_docs_tool_payload(
+        "docs_status",
+        {"action": "library", "canonical_id": first.results[0].canonical_id},
+        service,
+    )
+    assert public_status["library"]["status"] == "partial"
+
+    third = service.prefetch_docs_targets([target])
+    fourth = service.prefetch_docs_targets([target])
+    quarantined = service.inspect_library_docs(first.results[0].canonical_id)
+
+    assert third.status == "partial"
+    assert fourth.status == "partial"
+    assert len(agent.add_calls) == 3
+    assert quarantined.resumable is False
+    assert quarantined.checkpoint_pending_pages == 0
+    assert quarantined.checkpoint_quarantined_pages == 1
 
 
 def test_prefetch_docs_targets_resets_diagnostics_between_targets(tmp_path, monkeypatch):

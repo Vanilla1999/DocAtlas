@@ -72,6 +72,8 @@ class LibraryRegistryOps:
     def status_for(self, record: LibraryRecord, size_bytes: int | None = None) -> str:
         if record.status == "failed":
             return "failed"
+        if record.status == "partial" or str(record.last_error or "").startswith("partial ingestion:"):
+            return "partial"
         pages, chunks = self.count_index_entries(record)
         if pages == 0 and chunks == 0 and Path(self.deps._index_config_for(record).index.db_path).exists():
             return "empty_index"
@@ -101,6 +103,8 @@ class LibraryRegistryOps:
             return "needs_refresh"
         if status == "failed":
             return "failed"
+        if status == "partial":
+            return "partial_ingestion"
         if status == "indexed":
             return "healthy"
         return "not_indexed"
@@ -234,6 +238,7 @@ class LibraryRegistryOps:
         active_manifest_digest = (record.target_spec or {}).get("active_manifest_digest") or covered_manifest_digest
         manifest_fetched = self.manifest_fetched(record)
         status = self.status_for(record, size_bytes)
+        checkpoint = (record.target_spec or {}).get("ingestion_checkpoint") or {}
         manifest = ((record.target_spec or {}).get("source_manifest") or {})
         discovery = manifest.get("discovery") or {}
         raw_attempt_diagnostics = (record.target_spec or {}).get("last_attempt_manifest_diagnostics")
@@ -272,6 +277,12 @@ class LibraryRegistryOps:
             stale=self.deps._is_stale(record.last_refreshed_at),
             pages=pages,
             chunks=chunks,
+            checkpoint_total_pages=len(checkpoint.get("resolved_urls") or []),
+            checkpoint_completed_pages=len(checkpoint.get("completed_urls") or []),
+            checkpoint_pending_pages=len(checkpoint.get("pending_urls") or []),
+            checkpoint_failed_pages=len(checkpoint.get("failed_urls") or {}),
+            checkpoint_quarantined_pages=len(checkpoint.get("quarantined_urls") or []),
+            resumable=bool(checkpoint.get("pending_urls")),
             manifest_expected=manifest_expected,
             manifest_fetched=manifest_fetched,
             manifest_indexed=manifest_indexed,

@@ -808,6 +808,7 @@ class LibraryDocsApplicationService:
         force_refresh: bool = False,
         continue_on_error: bool = True,
         async_: bool = False,
+        query: str | None = None,
     ) -> RefreshResult | DocsTargetsPrefetchResult | DocsJobStartResult:
         flutter_targets = self._flutter_targets_for_request(
             library,
@@ -817,6 +818,8 @@ class LibraryDocsApplicationService:
             docs_url_template,
         )
         if flutter_targets:
+            if query:
+                flutter_targets = [replace(target, query=query) for target in flutter_targets]
             return self.ingest_orchestrator.prefetch_docs(
                 library,
                 ecosystem="flutter",
@@ -825,6 +828,29 @@ class LibraryDocsApplicationService:
                 continue_on_error=continue_on_error,
                 async_=async_,
                 target_plan=flutter_targets,
+            )
+        if query and ecosystem in {"pub", "dart"} and versions:
+            version = versions[0]
+            query_target = DocsTarget(
+                library=library,
+                ecosystem="pub",
+                version=version,
+                source_type=source_type or "api",
+                docs_url=docs_url or pub_dartdoc_root_url(library, version),
+                allowed_domains=["pub.dev"],
+                path_prefixes=[f"/documentation/{library}/{version}/"],
+                max_pages=40,
+                doc_format="dartdoc",
+                query=query,
+            )
+            return self.ingest_orchestrator.prefetch_docs(
+                library,
+                ecosystem="pub",
+                versions=versions,
+                force_refresh=force_refresh,
+                continue_on_error=continue_on_error,
+                async_=async_,
+                target_plan=[query_target],
             )
         return self.ingest_orchestrator.prefetch_docs(
             library,
@@ -837,6 +863,41 @@ class LibraryDocsApplicationService:
             continue_on_error=continue_on_error,
             async_=async_,
         )
+
+    def resume_interrupted_jobs(self) -> list[str]:
+        resumed: list[str] = []
+        for interrupted in self.jobs.list(status="interrupted"):
+            payload = dict(interrupted.request_payload or {})
+            if (
+                interrupted.kind != "prefetch_library_docs"
+                or interrupted.reason_code != "job_interrupted"
+                or interrupted.resumed_by_job_id
+                or not payload.get("library")
+            ):
+                continue
+            target_plan = [DocsTarget(**item) for item in payload.pop("target_plan", [])]
+            started = self.ingest_orchestrator.prefetch_docs(
+                str(payload.get("library")),
+                ecosystem=payload.get("ecosystem"),
+                versions=list(payload.get("versions") or []),
+                docs_url=payload.get("docs_url"),
+                docs_url_template=payload.get("docs_url_template"),
+                source_type=payload.get("source_type"),
+                force_refresh=bool(payload.get("force_refresh")),
+                continue_on_error=bool(payload.get("continue_on_error", True)),
+                async_=True,
+                target_plan=target_plan or None,
+            )
+            if isinstance(started, DocsJobStartResult):
+                self.jobs.update(
+                    interrupted.job_id,
+                    reason_code="job_resumed",
+                    retryable=False,
+                    resumed_by_job_id=started.job_id,
+                    message=f"Interrupted job resumed as {started.job_id}.",
+                )
+                resumed.append(started.job_id)
+        return resumed
 
     @staticmethod
     def _flutter_targets_for_request(

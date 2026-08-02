@@ -1,6 +1,6 @@
 from typing import Any, cast
 
-from docmancer.docs.dartdoc import discover_pub_dartdoc_seed_urls
+from docmancer.docs.dartdoc import discover_pub_dartdoc_seed_urls, rank_dartdoc_seed_urls
 
 
 def test_discover_pub_dartdoc_seed_urls_reads_index_json() -> None:
@@ -30,6 +30,8 @@ def test_discover_pub_dartdoc_seed_urls_reads_index_json() -> None:
     assert root_url + "camera/CameraController-class.html" in seeds
     assert root_url + "camera/CameraController/CameraController.html" in seeds
     assert root_url + "camera/CameraController/startVideoRecording.html" in seeds
+    ranked = rank_dartdoc_seed_urls(seeds, "How does startVideoRecording work?", limit=2)
+    assert ranked[0] == root_url + "camera/CameraController/startVideoRecording.html"
 
 
 def test_async_pub_dartdoc_target_still_discovers_seed_urls(monkeypatch) -> None:
@@ -124,10 +126,13 @@ def test_dartdoc_index_ignores_out_of_scope_links_before_page_limit() -> None:
                 return Response('<html><body class="dartdoc"></body></html>')
             return Response(
                 '[{"href":"https://evil.example/Fake-class.html"},'
+                '{"href":"widgets/Alpha-class.html"},'
                 '{"href":"widgets/FocusNode-class.html"}]'
             )
 
-    discovered = _try_dartdoc_index(root_url, cast(Any, Client()), max_pages=1)
+    discovered = _try_dartdoc_index(
+        root_url, cast(Any, Client()), max_pages=1, query="How should FocusNode be used?",
+    )
 
     assert discovered is not None
     assert [item.url for item in discovered] == [root_url + "widgets/FocusNode-class.html"]
@@ -147,12 +152,13 @@ def test_dartdoc_discovery_prefers_base_aware_index_over_root_nav_shell() -> Non
     class Client:
         def get(self, url: str) -> Response:
             if url == root_url:
-                return Response(200, '<html><head><base href="./flutter/"></head><body class="dartdoc"><nav><a href="widgets/">widgets</a></nav></body></html>')
+                raise AssertionError("already fetched Dartdoc root must not be requested again")
             if url == effective_root + "index.json":
                 return Response(200, '[{"href":"widgets/FocusNode-class.html"}]')
             return Response(404, "")
 
-    result = discover_urls(root_url, cast(Any, Client()), max_pages=10)
+    root_html = '<html><head><base href="./flutter/"></head><body class="dartdoc"><nav><a href="widgets/">widgets</a></nav></body></html>'
+    result = discover_urls(root_url, cast(Any, Client()), max_pages=10, root_html=root_html)
 
     assert result.diagnostics["discovery_strategy"] == "dartdoc-index"
     assert [item.url for item in result.urls] == [effective_root + "widgets/FocusNode-class.html"]

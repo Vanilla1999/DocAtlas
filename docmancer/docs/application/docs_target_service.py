@@ -14,7 +14,7 @@ from docmancer.docs.domain.target_security import host_allowed, is_remote_url, p
 from docmancer.docs.models import DocsTarget, DocsTargetInspectionResult
 from docmancer.docs.registry import LibraryRecord
 from docmancer.docs.resolver import normalize_version
-from docmancer.docs.dartdoc import discover_pub_dartdoc_seed_urls, is_pub_dartdoc_target, normalize_pub_dartdoc_target, pub_dartdoc_root_url
+from docmancer.docs.dartdoc import discover_pub_dartdoc_seed_urls, is_pub_dartdoc_target, normalize_pub_dartdoc_target, pub_dartdoc_root_url, rank_dartdoc_seed_urls
 from docmancer.docs.fetch_policy import DocsFetchPolicy, DocsFetchSecurityError, redact_url
 from docmancer.docs.fetch_transport import DocsHttpClient
 from docmancer.docs.github_source_manifest import (
@@ -123,6 +123,7 @@ class DocsTargetService:
             doc_format=value.get("doc_format"),
             warnings=list(value.get("warnings") or []),
             source_manifest=dict(value.get("source_manifest") or {}),
+            query=value.get("query"),
         )
 
     @staticmethod
@@ -146,6 +147,7 @@ class DocsTargetService:
             "doc_format": target.doc_format,
             "warnings": list(target.warnings),
             "source_manifest": source_manifest,
+            "query": target.query,
         }
 
     def target_from_record(self, record: LibraryRecord) -> DocsTarget:
@@ -165,6 +167,7 @@ class DocsTargetService:
             doc_format=spec.get("doc_format"),
             warnings=list(spec.get("warnings") or []),
             source_manifest=dict(spec.get("source_manifest") or {}),
+            query=spec.get("query"),
         )
 
     def record_urls(self, record: LibraryRecord) -> list[str]:
@@ -450,6 +453,7 @@ class DocsTargetService:
                     return fetched.text
 
                 seeds = discover_pub_dartdoc_seed_urls(target.library, version, resp.text, root_url, max_seed_urls=target.max_pages or 500, fetch_url=fetch_url)
+                seeds = rank_dartdoc_seed_urls(seeds, target.query, limit=target.max_pages or 500)
         except DocsFetchSecurityError as exc:
             if exc.category != "transport_error":
                 raise

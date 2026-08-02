@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from dataclasses import asdict
 from datetime import datetime, timedelta, timezone
 import json
 import time
@@ -96,7 +97,21 @@ class LibraryIngestOrchestrator:
             )
 
         try:
-            job = self.jobs.create("prefetch_library_docs", request_identity=request_identity)
+            job = self.jobs.create(
+                "prefetch_library_docs",
+                request_identity=request_identity,
+                request_payload={
+                    "library": library,
+                    "ecosystem": ecosystem,
+                    "versions": versions or [],
+                    "docs_url": docs_url,
+                    "docs_url_template": docs_url_template,
+                    "source_type": source_type,
+                    "force_refresh": force_refresh,
+                    "continue_on_error": continue_on_error,
+                    "target_plan": [asdict(target) for target in target_plan or []],
+                },
+            )
         except Exception:
             executor.release_reservation()
             raise

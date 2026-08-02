@@ -53,6 +53,41 @@ def test_extracts_architecture_must_and_must_not_constraints(tmp_path: Path):
     assert any(c.severity == "must" and c.source.endswith("architecture.md") for c in packet.constraints)
 
 
+def test_python_imports_do_not_become_constraints_but_normative_prose_does(tmp_path: Path):
+    docs = """from . import required
+from ..policy import forbidden
+from pkg import (
+    required,
+    forbidden,
+)
+Retries are required before publishing.
+"""
+
+    packet = _packet(
+        _workspace(tmp_path, docs=docs),
+        question="Update retry publishing policy",
+    )
+    architecture_constraints = [
+        constraint
+        for constraint in packet.constraints
+        if constraint.source.endswith("docs/architecture.md")
+    ]
+
+    assert not any(
+        constraint.instruction.strip().startswith(("from ", "required,", "forbidden,"))
+        for constraint in architecture_constraints
+    )
+
+    service = PatchConstraintsService(LibraryDocsService())
+    candidates = service._iter_constraint_lines(docs, "docs/architecture.md")
+    normative_lines = [
+        candidate["line"]
+        for candidate in candidates
+        if service._has_normative_language(candidate["line"])
+    ]
+    assert normative_lines == ["Retries are required before publishing."]
+
+
 def test_extracts_adr_constraints(tmp_path: Path):
     packet = _packet(_workspace(tmp_path))
     assert any("PermissionService" in c.instruction and "adr/0001" in c.source for c in packet.constraints)

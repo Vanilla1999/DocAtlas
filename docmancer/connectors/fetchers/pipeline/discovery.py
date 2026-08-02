@@ -92,6 +92,8 @@ def discover_urls(
     max_pages: int = 500,
     force_strategy: str | None = None,
     seed_urls: list[str] | None = None,
+    root_html: str | None = None,
+    query: str | None = None,
 ) -> DiscoveryResult:
     """Run discovery strategies in order and return found URLs.
 
@@ -142,7 +144,9 @@ def discover_urls(
         logger.info("Discovery: %s found %d URL(s)", DiscoveryStrategy.LLMS_FULL_TXT.value, len(llms_full))
         return DiscoveryResult(urls=llms_full)
 
-    dartdoc, dartdoc_diagnostics = _try_dartdoc_index_with_diagnostics(base_url, client, max_pages)
+    dartdoc, dartdoc_diagnostics = _try_dartdoc_index_with_diagnostics(
+        base_url, client, max_pages, root_html=root_html, query=query,
+    )
     if dartdoc:
         logger.info("Discovery: dartdoc-index found %d URL(s)", len(dartdoc))
         return DiscoveryResult(
@@ -283,8 +287,8 @@ def _compute_discovery_strategy_label(
     return "+".join(parts)
 
 
-def _try_dartdoc_index(base_url: str, client: httpx.Client, max_pages: int = 500) -> list[DiscoveredUrl] | None:
-    links, _ = _try_dartdoc_index_with_diagnostics(base_url, client, max_pages)
+def _try_dartdoc_index(base_url: str, client: httpx.Client, max_pages: int = 500, query: str | None = None) -> list[DiscoveredUrl] | None:
+    links, _ = _try_dartdoc_index_with_diagnostics(base_url, client, max_pages, query=query)
     return links
 
 
@@ -292,25 +296,35 @@ def _try_dartdoc_index_with_diagnostics(
     base_url: str,
     client: httpx.Client,
     max_pages: int = 500,
+    root_html: str | None = None,
+    query: str | None = None,
 ) -> tuple[list[DiscoveredUrl] | None, dict[str, Any]]:
-    try:
-        resp = client.get(base_url)
-    except httpx.RequestError:
+    if root_html is None:
+        try:
+            resp = client.get(base_url)
+        except httpx.RequestError:
+            return None, {}
+        if resp.status_code != 200:
+            return None, {}
+        root_html = resp.text
+    if not is_dartdoc_html(root_html, url=base_url):
         return None, {}
-    if resp.status_code != 200 or not is_dartdoc_html(resp.text, url=base_url):
-        return None, {}
-    dartdoc_base_url = _html_base_url(resp.text, base_url) or base_url
+    dartdoc_base_url = _html_base_url(root_html, base_url) or base_url
     links = [
-        url for url in discover_dartdoc_candidate_links(resp.text, dartdoc_base_url)
+        url for url in discover_dartdoc_candidate_links(root_html, dartdoc_base_url)
         if _is_scoped_dartdoc_url(url, dartdoc_base_url)
     ]
     diagnostics: dict[str, Any] = {"complete": True, "reason_code": "ok"}
     try:
-        links.extend(_discover_dartdoc_index_json(dartdoc_base_url, client, max_pages=max_pages))
+        links.extend(_discover_dartdoc_index_json(
+            dartdoc_base_url,
+            client,
+            max_pages=max(max_pages, 5000) if query else max_pages,
+        ))
     except DocsFetchSecurityError as exc:
         if exc.category != "response_too_large":
             raise
-        navigation_links = _discover_dartdoc_navigation_links(resp.text, dartdoc_base_url)
+        navigation_links = _discover_dartdoc_navigation_links(root_html, dartdoc_base_url)
         links, fallback_pages = _expand_dartdoc_library_links(
             [*links, *navigation_links],
             client,
@@ -327,7 +341,26 @@ def _try_dartdoc_index_with_diagnostics(
     if not links:
         return None, diagnostics
     deduped = list(dict.fromkeys(normalize_url(url) for url in links))
+    if query:
+        deduped = _rank_dartdoc_urls_for_query(deduped, query)
     return [DiscoveredUrl(url=url, strategy=DiscoveryStrategy.NAV_CRAWL) for url in deduped[:max_pages]], diagnostics
+
+
+def _rank_dartdoc_urls_for_query(urls: list[str], query: str) -> list[str]:
+    terms = {
+        re.sub(r"[^a-z0-9]", "", term.casefold())
+        for term in re.findall(r"[A-Za-z][A-Za-z0-9_]{3,}", query)
+    }
+    terms -= {"what", "when", "where", "which", "with", "should", "using", "implemented"}
+
+    def score(item: tuple[int, str]) -> tuple[int, int, int]:
+        index, url = item
+        path = re.sub(r"[^a-z0-9]", "", urlparse(url).path.casefold())
+        matches = sum(term in path for term in terms if len(term) >= 4)
+        entity = int(any(token in path for token in ("classhtml", "mixinhtml", "enumhtml", "functionhtml")))
+        return matches, entity, -index
+
+    return [url for _, url in sorted(enumerate(urls), key=score, reverse=True)]
 
 
 def _discover_dartdoc_navigation_links(html: str, base_url: str) -> list[str]:

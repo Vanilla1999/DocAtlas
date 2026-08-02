@@ -249,6 +249,36 @@ class DocsPrefetchService:
 
             target_spec = self.deps._target_to_spec(target, urls)
             existing = self.registry.get(target.library, target.ecosystem, version, source_type)
+            previous_checkpoint = (
+                ((existing.target_spec or {}).get("ingestion_checkpoint") or {})
+                if existing is not None and not force_refresh else {}
+            )
+            completed_urls = [
+                url for url in previous_checkpoint.get("completed_urls", [])
+                if url in urls
+            ]
+            quarantined_urls = [
+                url for url in previous_checkpoint.get("quarantined_urls", [])
+                if url in urls and url not in completed_urls
+            ]
+            target_spec["ingestion_checkpoint"] = {
+                "schema_version": 1,
+                "resolved_urls": list(urls),
+                "completed_urls": completed_urls,
+                "pending_urls": [
+                    url for url in urls
+                    if url not in completed_urls and url not in quarantined_urls
+                ],
+                "failed_urls": {
+                    url: reason
+                    for url, reason in (previous_checkpoint.get("failed_urls") or {}).items()
+                    if url in urls and url not in completed_urls
+                },
+                "attempts": int(previous_checkpoint.get("attempts") or 0),
+                "attempts_by_url": dict(previous_checkpoint.get("attempts_by_url") or {}),
+                "quarantined_urls": quarantined_urls,
+                "max_attempts_per_url": 3,
+            }
             manifest = target_spec.get("source_manifest") or {}
             if manifest.get("schema_version") == 2 and manifest.get("digest"):
                 target_spec["last_attempt_manifest_digest"] = manifest["digest"]
@@ -283,7 +313,14 @@ class DocsPrefetchService:
                         self.jobs.update(job_id, status="cancelled", phase="done", message="Docs prefetch job cancelled.")
                     break
                 record = self.registry.get(record.library_id, source_type=record.source_type) or record
-                if not force_refresh and not self.deps._is_stale(record.last_refreshed_at):
+                checkpoint = (record.target_spec or {}).get("ingestion_checkpoint") or {}
+                checkpoint_pending = list(checkpoint.get("pending_urls") or [])
+                if (
+                    not force_refresh
+                    and not self.deps._is_stale(record.last_refreshed_at)
+                    and record.status != "partial"
+                    and not checkpoint_pending
+                ):
                     targets_completed += 1
                     retained_partial = (record.last_error or "").startswith("partial ingestion:")
                     results.append(
@@ -307,6 +344,23 @@ class DocsPrefetchService:
                             phase="indexing",
                             message=f"Skipped fresh target {index}/{len(raw_targets)}.",
                         )
+                    continue
+                if record.status == "partial" and not checkpoint_pending and checkpoint.get("quarantined_urls"):
+                    targets_completed += 1
+                    results.append(
+                        result := DocsTargetResult(
+                            canonical_id=record.library_id,
+                            status="partial",
+                            library=record.name,
+                            ecosystem=record.ecosystem,
+                            version=record.version,
+                            source_type=record.source_type,
+                            docs_url=record.docs_url,
+                            warnings=list(target.warnings),
+                            message=record.last_error or "partial ingestion: checkpoint_quarantined",
+                        )
+                    )
+                    target_summaries.append(self.deps._target_result_summary(result))
                     continue
                 try:
                     pages_indexed = 0
@@ -343,7 +397,13 @@ class DocsPrefetchService:
                         chunks_indexed_total += refreshed.chunks_indexed
                         operation_urls: list[str] = []
                     else:
-                        operation_urls = urls
+                        checkpoint = (record.target_spec or {}).get("ingestion_checkpoint") or {}
+                        completed_checkpoint_urls = set(checkpoint.get("completed_urls") or [])
+                        quarantined_checkpoint_urls = set(checkpoint.get("quarantined_urls") or [])
+                        operation_urls = [
+                            url for url in urls
+                            if url not in completed_checkpoint_urls and url not in quarantined_checkpoint_urls
+                        ]
                     for url_index, url in enumerate(operation_urls, start=1):
                         if self._job_cancelled(job_id):
                             aborted = True
@@ -360,6 +420,8 @@ class DocsPrefetchService:
                         }
                         if target.doc_format:
                             add_kwargs["doc_format"] = target.doc_format
+                        if target.query:
+                            add_kwargs["query"] = target.query
                         if manifest:
                             add_kwargs["source_manifest"] = manifest
                         if progress_callback:
@@ -406,6 +468,59 @@ class DocsPrefetchService:
                             partial_reasons.append(str(reason_code))
                         if page_failures:
                             partial_reasons.append("page_failures")
+                        checkpoint = dict((record.target_spec or {}).get("ingestion_checkpoint") or {})
+                        checkpoint_completed = list(checkpoint.get("completed_urls") or [])
+                        checkpoint_failed = dict(checkpoint.get("failed_urls") or {})
+                        attempts_by_url = dict(checkpoint.get("attempts_by_url") or {})
+                        quarantined_urls = list(checkpoint.get("quarantined_urls") or [])
+                        attempts_by_url[url] = int(attempts_by_url.get(url) or 0) + 1
+                        page_complete = bool(
+                            indexed_pages > 0
+                            and fetch_failure is None
+                            and page_failures == 0
+                            and diagnostics.get("complete") is not False
+                        )
+                        if page_complete:
+                            if url not in checkpoint_completed:
+                                checkpoint_completed.append(url)
+                            checkpoint_failed.pop(url, None)
+                        else:
+                            checkpoint_failed[url] = str(
+                                reason_code
+                                or getattr(fetch_failure, "category", None)
+                                or "incomplete_page"
+                            )
+                            if attempts_by_url[url] >= int(checkpoint.get("max_attempts_per_url") or 3):
+                                if url not in quarantined_urls:
+                                    quarantined_urls.append(url)
+                        checkpoint.update({
+                            "schema_version": 1,
+                            "resolved_urls": list(urls),
+                            "completed_urls": checkpoint_completed,
+                            "pending_urls": [
+                                item for item in urls
+                                if item not in checkpoint_completed and item not in quarantined_urls
+                            ],
+                            "failed_urls": checkpoint_failed,
+                            "attempts": int(checkpoint.get("attempts") or 0) + 1,
+                            "attempts_by_url": attempts_by_url,
+                            "quarantined_urls": quarantined_urls,
+                            "max_attempts_per_url": int(checkpoint.get("max_attempts_per_url") or 3),
+                        })
+                        updated_spec = dict(record.target_spec or {})
+                        updated_spec["ingestion_checkpoint"] = checkpoint
+                        record = self.registry.upsert(
+                            library=record.name,
+                            ecosystem=record.ecosystem,
+                            version=record.version,
+                            source_type=record.source_type,
+                            docs_url=record.docs_url,
+                            docs_url_template=record.docs_url_template,
+                            now=self.deps._now(),
+                            status="partial" if checkpoint["pending_urls"] else "available",
+                            last_error=("partial ingestion: checkpoint_pending" if checkpoint["pending_urls"] else ""),
+                            target_spec=updated_spec,
+                        )
                         if job_id:
                             self.jobs.update(
                                 job_id,
@@ -499,6 +614,19 @@ class DocsPrefetchService:
                 partial_message = None
                 if partial_reasons:
                     partial_message = f"partial ingestion: {', '.join(dict.fromkeys(partial_reasons))}"
+                final_checkpoint = (record.target_spec or {}).get("ingestion_checkpoint") or {}
+                if final_checkpoint.get("pending_urls"):
+                    pending_reason = "checkpoint_pending"
+                    partial_message = (
+                        f"{partial_message}, {pending_reason}"
+                        if partial_message else f"partial ingestion: {pending_reason}"
+                    )
+                if final_checkpoint.get("quarantined_urls"):
+                    quarantine_reason = "checkpoint_quarantined"
+                    partial_message = (
+                        f"{partial_message}, {quarantine_reason}"
+                        if partial_message else f"partial ingestion: {quarantine_reason}"
+                    )
                 refreshed_at = self.deps._now()
                 record = self.registry.get(record.library_id, source_type=record.source_type) or record
                 record = self.registry.upsert(
@@ -509,7 +637,7 @@ class DocsPrefetchService:
                     docs_url=record.docs_url,
                     docs_url_template=record.docs_url_template,
                     now=refreshed_at,
-                    status="available",
+                    status="partial" if partial_message else "available",
                     last_refreshed_at=refreshed_at,
                     last_error=partial_message or "",
                     target_spec=record.target_spec,

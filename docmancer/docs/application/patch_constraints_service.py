@@ -10,7 +10,11 @@ from pathlib import Path
 from typing import Any
 
 from docmancer.docs.domain.code_graph import build_code_graph_context_items, build_project_code_graph
-from docmancer.docs.domain.normative_language import has_normative_language
+from docmancer.docs.domain.normative_language import (
+    has_normative_language,
+    is_python_declaration,
+    python_declaration_line_indexes,
+)
 from docmancer.docs.domain.source_map import build_project_repo_map, build_project_source_evidence
 from docmancer.docs.models import DependencyObservation, PatchConstraint, PatchConstraintPacket
 
@@ -615,6 +619,8 @@ class PatchConstraintsService:
 
     @staticmethod
     def _has_normative_language(line: str) -> bool:
+        if is_python_declaration(line):
+            return False
         return has_normative_language(line) or bool(re.search(
             r"\b(must(?:\s+not)?|should(?:\s+not)?|do\s+not|don't|required|requires|forbidden|never|"
             r"source[- ]of[- ]truth|single\s+source|canonical|owned\s+by|owns|belongs\s+in|"
@@ -638,7 +644,10 @@ class PatchConstraintsService:
         in_code = False
         heading = ""
         authority = self._source_authority(source_path)
-        for raw in (text or "").splitlines():
+        python_declaration_lines = python_declaration_line_indexes(text)
+        for line_index, raw in enumerate((text or "").splitlines()):
+            if line_index in python_declaration_lines:
+                continue
             stripped = raw.strip()
             if stripped.startswith("```") or stripped.startswith("~~~"):
                 in_code = not in_code
