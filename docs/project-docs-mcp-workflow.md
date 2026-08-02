@@ -235,8 +235,12 @@ Checklist:
 2. If docs are new, changed, stale, orphaned, or missing from the index, run:
 
    ```text
-   prepare_docs(action="sync_project_docs", project_path=..., with_vectors=true)
+   prepare_docs(action="sync_project_docs", project_path=..., with_vectors=false)
    ```
+
+   Use the exact `with_vectors` value returned by the next action. Lexical
+   retrieval returns `false` so synchronization does not build an unused
+   vector index. Dense, sparse, and hybrid retrieval return `true`.
 
 3. Run `inspect_project_docs(project_path)` again.
    - Confirm `reason_code` is `project_docs_ready` or follow the returned `next_action`.
@@ -277,7 +281,7 @@ Example: docs exist but are not indexed.
   "arguments_patch": {
     "action": "sync_project_docs",
     "project_path": "/path/to/repo",
-    "with_vectors": true
+    "with_vectors": false
   }
 }
 ```
@@ -296,7 +300,7 @@ Example: stale or orphaned docs.
   },
   "arguments_patch": {
     "project_path": "/path/to/repo",
-    "with_vectors": true
+    "with_vectors": false
   }
 }
 ```

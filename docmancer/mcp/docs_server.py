@@ -1151,8 +1151,9 @@ The default public surface has exactly three tools:
 
    Use broader unbounded output only when the user explicitly asks to explore documentation. Do not repeat bounded retrieval before the first edit unless an explicit `prepare_docs` recovery action was completed.
 
-2. If and only if the response returns `prepare_docs` as its next action, follow it. For example:
-   `prepare_docs(action="sync_project_docs", project_path=..., with_vectors=true)`
+2. If and only if the response returns `prepare_docs` as its next action, follow it with the exact returned arguments. For example, lexical retrieval returns:
+   `prepare_docs(action="sync_project_docs", project_path=..., with_vectors=false)`
+   Dense, sparse, and hybrid retrieval return `with_vectors=true`.
 
 3. Retry `get_docs_context` after successful preparation.
 

@@ -486,7 +486,7 @@ def test_inspect_project_docs_returns_candidates_dependency_sources_and_next_act
     assert result.requires_confirmation is False
     assert result.confirmation_reason is None
     assert result.arguments_patch["project_path"] == str(project.resolve())
-    assert result.arguments_patch["with_vectors"] is True
+    assert result.arguments_patch["with_vectors"] is False
     assert "not indexed" in (result.agent_message or "")
     assert result.user_message is None
     assert result.candidate_sources == result.project_docs["found"]
@@ -648,6 +648,7 @@ def test_ingest_project_docs_indexes_only_discovered_candidates_with_metadata(tm
     result = service.ingest_project_docs(str(project), with_vectors=False)
 
     assert result.status == "success"
+
     assert result.candidate_count == 2
     assert result.sections_indexed == 3
     assert {item["path"] for item in result.indexed_sources} == {"README.md", "docs/testing.md"}
@@ -688,6 +689,20 @@ def test_ingest_project_docs_indexes_only_discovered_candidates_with_metadata(tm
         "content_hash": metadata["project_doc_sections"][1]["content_hash"],
     }]
     assert metadata["project_doc_sections"][0]["content_hash"].startswith("sha256:")
+
+
+@pytest.mark.parametrize("retrieval_mode", ["dense", "sparse", "hybrid"])
+def test_inspect_project_docs_enables_vector_sync_for_vector_retrieval(
+    tmp_path, monkeypatch, retrieval_mode
+):
+    project = _flutter_project(tmp_path)
+    (project / "README.md").write_text("# App", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+    service.config.retrieval.default_mode = retrieval_mode
+
+    result = service.inspect_project_docs(str(project))
+
+    assert result.arguments_patch["with_vectors"] is True
 
 
 def test_ingest_project_docs_reports_missing_candidates_after_verification(tmp_path, monkeypatch):
@@ -1165,7 +1180,20 @@ def test_incremental_vector_sync_is_scoped_to_changed_document(tmp_path, monkeyp
     service = _service_with_real_agent(tmp_path, monkeypatch)
     service.sync_project_docs(str(project), with_vectors=False)
     changed.write_text("# Changed\n\nNew vector content.\n", encoding="utf-8")
-    sync_chunks = MagicMock()
+    def record_vector_sync(_section_ids):
+        service._agent_instance().last_vector_sync_metrics = {
+            "status": "success",
+            "embedded": 1,
+            "upserted": 1,
+            "skipped_cache": 0,
+            "skipped_unchanged": 0,
+            "pruned": 0,
+            "duration_ms": 12,
+            "backend_setup_ms": 2,
+            "collection": "project_vectors",
+        }
+
+    sync_chunks = MagicMock(side_effect=record_vector_sync)
     sync_all = MagicMock()
     service._agent_instance().sync_vector_chunks = sync_chunks
     service._agent_instance().sync_vectors = sync_all
@@ -1182,6 +1210,17 @@ def test_incremental_vector_sync_is_scoped_to_changed_document(tmp_path, monkeyp
     expected_ids = set(service._agent_instance().store.section_ids_for_source(changed_source))
     sync_chunks.assert_called_once_with(expected_ids)
     sync_all.assert_not_called()
+    assert result.diagnostics["vector_sync"] == {
+        "status": "success",
+        "embedded": 1,
+        "upserted": 1,
+        "skipped_cache": 0,
+        "skipped_unchanged": 0,
+        "pruned": 0,
+        "duration_ms": 12,
+        "backend_setup_ms": 2,
+        "collection": "project_vectors",
+    }
     assert result.diagnostics["metrics"]["unrelated_files_reprocessed"] == 0
     budgets = json.loads(
         (Path(__file__).resolve().parents[1] / "eval" / "change_aware" / "maintenance_eval.json")
@@ -2187,7 +2226,7 @@ def test_get_project_context_before_ingest_returns_actionable_remediation(tmp_pa
     assert result.project_docs is not None
     assert result.project_docs.reason_code == "project_docs_found_not_indexed"
     assert result.next_actions[0]["tool"] == "sync_project_docs"
-    assert result.next_actions[0]["arguments_patch"] == {"project_path": str(project.resolve()), "with_vectors": True}
+    assert result.next_actions[0]["arguments_patch"] == {"project_path": str(project.resolve()), "with_vectors": False}
     assert result.trust_contract["next_actions"][0]["tool"] == "sync_project_docs"
     assert "not indexed" in (result.message or "")
 
@@ -2403,11 +2442,11 @@ def test_get_project_docs_returns_sync_next_action_when_candidates_not_indexed(t
     assert result.reason_code == "project_docs_found_not_indexed"
     assert result.next_action == {"type": "sync_project_docs", "tool": "sync_project_docs"}
     assert result.requires_confirmation is False
-    assert result.arguments_patch == {"project_path": str(project.resolve()), "with_vectors": True}
+    assert result.arguments_patch == {"project_path": str(project.resolve()), "with_vectors": False}
     assert result.results == []
     assert result.candidate_sources[0]["path"] == "README.md"
     assert result.next_actions[0]["tool"] == "sync_project_docs"
-    assert result.next_actions[0]["arguments_patch"] == {"project_path": str(project.resolve()), "with_vectors": True}
+    assert result.next_actions[0]["arguments_patch"] == {"project_path": str(project.resolve()), "with_vectors": False}
 
 
 def test_get_project_docs_distinguishes_indexed_no_results_from_not_indexed(tmp_path, monkeypatch):
@@ -4301,9 +4340,16 @@ def test_successful_library_prefetch_atomically_publishes_staged_index(tmp_path,
     assert service.library_docs.registry_ops.count_index_entries(record) == (1, 1)
 
 
-def test_staged_prefetch_syncs_vectors_only_from_production_index(tmp_path, monkeypatch):
+@pytest.mark.parametrize(
+    ("retrieval_mode", "expected_sync_calls"),
+    [("lexical", 0), ("hybrid", 1)],
+)
+def test_staged_prefetch_syncs_vectors_only_from_production_index(
+    tmp_path, monkeypatch, retrieval_mode, expected_sync_calls
+):
     agent = VectorTrackingAgent()
     service = _service(tmp_path, monkeypatch, agent)
+    service.config.retrieval.default_mode = retrieval_mode
     result = service.prefetch_docs(
         "example-docs",
         ecosystem="web",
@@ -4320,13 +4366,15 @@ def test_staged_prefetch_syncs_vectors_only_from_production_index(tmp_path, monk
     assert status is not None
     assert status.status == "succeeded"
     assert agent.add_kwargs[0]["with_vectors"] is False
-    assert agent.sync_calls == 1
-    assert Path(agent.sync_db_paths[0]).parent.name.startswith(".docatlas-staging-")
+    assert agent.sync_calls == expected_sync_calls
+    if expected_sync_calls:
+        assert Path(agent.sync_db_paths[0]).parent.name.startswith(".docatlas-staging-")
 
 
 def test_cancelled_staged_prefetch_never_syncs_vectors(tmp_path, monkeypatch):
     agent = SlowVectorTrackingAgent()
     service = _service(tmp_path, monkeypatch, agent)
+    service.config.retrieval.default_mode = "hybrid"
     result = service.prefetch_docs(
         "example-docs",
         ecosystem="web",
@@ -4349,6 +4397,7 @@ def test_cancelled_staged_prefetch_never_syncs_vectors(tmp_path, monkeypatch):
 def test_vector_sync_failure_redacts_valid_identifier_secret_from_durable_status(tmp_path, monkeypatch):
     agent = VectorTrackingAgent(fail_sync=True)
     service = _service(tmp_path, monkeypatch, agent)
+    service.config.retrieval.default_mode = "hybrid"
     result = service.prefetch_docs(
         "example-docs",
         ecosystem="web",
@@ -4389,6 +4438,7 @@ def test_vector_sync_failure_redacts_valid_identifier_secret_from_durable_status
 def test_vector_sync_failure_retains_existing_active_corpus(tmp_path, monkeypatch):
     agent = VectorTrackingAgent()
     service = _service(tmp_path, monkeypatch, agent)
+    service.config.retrieval.default_mode = "hybrid"
 
     initial = service.prefetch_docs(
         "example-docs", ecosystem="web", docs_url="https://example.com/docs/", async_=True,
@@ -5120,6 +5170,8 @@ def test_failed_manifest_candidates_retain_active_metadata_and_diagnostics(
     tmp_path, monkeypatch, agent, failure, expected_reason,
 ):
     service = _service(tmp_path, monkeypatch, agent)
+    if failure == "vector":
+        service.config.retrieval.default_mode = "hybrid"
     active_docs_url_template = "https://docs.example.com/active/{version}/"
     attempted_docs_url_template = "https://docs.example.com/attempted/{version}/"
     previous_manifest = normalize_resolved_github_manifest({

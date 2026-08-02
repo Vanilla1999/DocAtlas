@@ -6,6 +6,8 @@ import logging
 import os
 import hashlib
 import fnmatch
+import time
+from dataclasses import asdict
 from pathlib import Path
 from typing import Any, Callable
 from datetime import datetime, timezone
@@ -56,6 +58,9 @@ class DocmancerAgent:
         self.last_ingest_report_path: Path | None = None
         self.last_ingest_skips: list[dict[str, str]] = []
         self.last_discovery_diagnostics: dict[str, Any] = {}
+        self.last_vector_sync_metrics: dict[str, Any] = {
+            "status": "not_requested"
+        }
         if not _lazy_init:
             self._init_components()
 
@@ -90,6 +95,9 @@ class DocmancerAgent:
         *,
         with_vectors: bool = True,
     ) -> int:
+        self.last_vector_sync_metrics = {
+            "status": "requested" if with_vectors else "not_requested"
+        }
         for document in documents:
             if str(document.metadata.get("format") or "").casefold() == "markdown":
                 document.metadata.setdefault("chunking_schema", "parent-child-v1")
@@ -118,12 +126,20 @@ class DocmancerAgent:
                         generation_id=result.generation_id,
                         prune_stale=False,
                     )
+                    primary_metrics = dict(self.last_vector_sync_metrics)
                     self.store.activate_generation(result.generation_id)
                     if synced:
                         self._sync_vectors_if_enabled(
                             generation_id=result.generation_id,
                             prune_stale=True,
                         )
+                        cleanup_metrics = dict(self.last_vector_sync_metrics)
+                        self.last_vector_sync_metrics = {
+                            **primary_metrics,
+                            "duration_ms": int(primary_metrics.get("duration_ms", 0))
+                            + int(cleanup_metrics.get("duration_ms", 0)),
+                            "cleanup": cleanup_metrics,
+                        }
                 else:
                     self._sync_vectors_if_enabled(
                         generation_id=self.store.active_generation_id()
@@ -188,14 +204,12 @@ class DocmancerAgent:
         prune_ids: set[int] | None = None,
         generation_id: str | None = None,
         prune_stale: bool = True,
-    ) -> bool:
+    ) -> Any | None:
         """Embed any new chunks and upsert into the configured vector store.
 
-        Vector retrieval is on by default. Bare ``doc-atlas ingest`` will
-        download the pinned Qdrant binary on first run, start it in the
-        background with telemetry disabled, embed every section with the
-        configured provider (default FastEmbed: local, no API key), and
-        upsert into Qdrant.
+        When a caller explicitly requests vectors, this may download the
+        pinned Qdrant binary on first run, start it with telemetry disabled,
+        embed selected sections, and upsert them into the configured store.
 
         Opt-outs (each used by tests and FTS5-only installs):
 
@@ -207,9 +221,17 @@ class DocmancerAgent:
         """
         import os as _os
 
+        started = time.monotonic()
+        self.last_vector_sync_metrics = {"status": "starting"}
+
         if _os.environ.get("DOCMANCER_AUTO_VECTORS") == "0":
             logger.debug("vector sync disabled by DOCMANCER_AUTO_VECTORS=0")
-            return False
+            self.last_vector_sync_metrics = {
+                "status": "skipped",
+                "reason": "disabled_by_environment",
+                "duration_ms": int((time.monotonic() - started) * 1000),
+            }
+            return None
 
         try:
             from docmancer.embeddings import get_embeddings_provider
@@ -218,7 +240,12 @@ class DocmancerAgent:
             from docmancer.stores.base import get_vector_store
         except ImportError as exc:
             logger.info("vector indexing disabled: %s", exc)
-            return False
+            self.last_vector_sync_metrics = {
+                "status": "skipped",
+                "reason": "missing_vector_extra",
+                "duration_ms": int((time.monotonic() - started) * 1000),
+            }
+            return None
 
         # Graceful fallback: cloud embedding providers need an API key. When
         # the configured provider has no key in env, log once and skip the
@@ -238,9 +265,15 @@ class DocmancerAgent:
                 emb_provider,
                 required_key,
             )
-            return False
+            self.last_vector_sync_metrics = {
+                "status": "skipped",
+                "reason": "missing_provider_api_key",
+                "duration_ms": int((time.monotonic() - started) * 1000),
+            }
+            return None
 
         vs_config = self.config.vector_store
+        backend_started = time.monotonic()
         if vs_config.provider == "qdrant" and not vs_config.url:
             resolution = ensure_running()
             if resolution.fallback or not resolution.url:
@@ -256,7 +289,14 @@ class DocmancerAgent:
             vector_store = get_vector_store(vs_config, embeddings_dim=self.config.embeddings.dimensions)
         except ImportError as exc:
             logger.info("vector indexing disabled (missing extra): %s", exc)
-            return False
+            self.last_vector_sync_metrics = {
+                "status": "skipped",
+                "reason": "vector_store_unavailable",
+                "duration_ms": int((time.monotonic() - started) * 1000),
+            }
+            return None
+
+        backend_setup_ms = int((time.monotonic() - backend_started) * 1000)
 
         provider = get_embeddings_provider(self.config.embeddings)
         include_sparse = self.config.retrieval.default_mode in {"sparse", "hybrid"}
@@ -277,6 +317,9 @@ class DocmancerAgent:
             generation_id=generation_id,
             prune_stale=prune_stale,
         )
+        result.duration_ms = int((time.monotonic() - started) * 1000)
+        result.backend_setup_ms = backend_setup_ms
+        result.collection = collection
         if generation_id and section_ids is None:
             expected = len(self.store.list_sections_for_embedding(generation_id))
             actual = vector_store.count(collection)
@@ -303,6 +346,7 @@ class DocmancerAgent:
                     removable.append(stale_generation)
                 if removable:
                     self.store.delete_superseded_generations(removable)
+        self.last_vector_sync_metrics = {"status": "success", **asdict(result)}
         logger.info(
             "vectors: embedded=%d upserted=%d cache_hits=%d unchanged=%d pruned=%d",
             result.embedded,
@@ -311,20 +355,21 @@ class DocmancerAgent:
             result.skipped_unchanged,
             result.pruned,
         )
-        return True
+        return result
 
-    def sync_vectors(self) -> None:
+    def sync_vectors(self) -> Any | None:
         """Synchronize the committed SQLite index into its production vector collection."""
-        self._sync_vectors_if_enabled(generation_id=self.store.active_generation_id())
+        return self._sync_vectors_if_enabled(generation_id=self.store.active_generation_id())
 
-    def sync_vector_chunks(self, section_ids: set[int]) -> None:
+    def sync_vector_chunks(self, section_ids: set[int]) -> Any | None:
         """Upsert only explicitly affected chunks without reconciling unrelated rows."""
         if section_ids:
-            self._sync_vectors_if_enabled(
+            return self._sync_vectors_if_enabled(
                 section_ids=set(section_ids),
                 prune_ids=set(),
                 generation_id=self.store.active_generation_id(),
             )
+        return None
 
     def prune_vector_chunks(self, chunk_ids: set[int]) -> int:
         """Delete exact tracked vector ids without embedding or starting a backend."""
