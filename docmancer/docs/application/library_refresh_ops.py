@@ -190,6 +190,7 @@ class LibraryRefreshOps:
                     url,
                     recreate=False,
                     max_pages=per_url_max_pages,
+                    strategy=(None if target.discovery_strategy in {None, "auto"} else target.discovery_strategy),
                     browser=target.browser,
                     seed_urls=seed_urls_for_discovery if (target.docs_url or target.docs_url_template) else None,
                     allowed_domains=target.allowed_domains,

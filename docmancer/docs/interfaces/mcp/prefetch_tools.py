@@ -25,7 +25,7 @@ _PREPARE_ACTION_FIELDS = {
     "sync_project_docs": {
         "action", "project_path", "with_vectors", "changed_paths", "deleted_paths", "renamed_paths",
     },
-    "prefetch_project_dependency_docs": {"action", "project_path", "include_flutter", "include_dart", "include_rust", "include_packages", "force_refresh", "continue_on_error", "async"},
+    "prefetch_project_dependency_docs": {"action", "project_path", "include_flutter", "include_dart", "include_rust", "include_go", "include_packages", "force_refresh", "continue_on_error", "async"},
     "prefetch_library_docs": {"action", "library", "ecosystem", "version", "source_type", "docs_url", "docs_url_template", "force_refresh", "continue_on_error", "async", "question"},
     "discover_library_docs": {"action", "library", "ecosystem", "version"},
     "prefetch_docs_targets": {"action", "targets", "force_refresh", "continue_on_error", "async"},
@@ -159,6 +159,15 @@ def validate_prepare_docs_arguments(args: dict[str, Any]) -> dict[str, Any] | No
             return _prepare_validation_error(action, "target must be an object")
         if not target.get("library"):
             return _prepare_validation_error(action, "target.library is required")
+        target_max_pages = target.get("max_pages")
+        if target_max_pages is not None and (
+            isinstance(target_max_pages, bool)
+            or not isinstance(target_max_pages, int)
+            or not 1 <= target_max_pages <= 500
+        ):
+            return _prepare_validation_error(
+                action, "target.max_pages must be an integer between 1 and 500"
+            )
         max_pages = args.get("max_pages")
         if max_pages is not None and (
             isinstance(max_pages, bool) or not isinstance(max_pages, int) or not 1 <= max_pages <= 5
@@ -217,7 +226,9 @@ def _bounded_inspection_target(value: Any) -> dict[str, Any]:
                 prefixes.append(prefix)
         if prefixes:
             target["path_prefixes"] = prefixes[:5]
-    target["max_pages"] = max(1, min(5, int(target.get("max_pages") or 3)))
+    # This is the proposed future prefetch limit. The separate action-level
+    # max_pages bounds inspection itself to at most five landing pages.
+    target["max_pages"] = max(1, min(500, int(target.get("max_pages") or 50)))
     return target
 
 
@@ -323,7 +334,7 @@ def handle_prefetch_tool(name: str, args: dict[str, Any], service: LibraryDocsSe
                 renamed_paths=args.get("renamed_paths"),
             ))
         elif action == "prefetch_project_dependency_docs":
-            payload = asdict(dependency_docs_app.prefetch_project_dependency_docs(args["project_path"], include_flutter=bool(args.get("include_flutter") if args.get("include_flutter") is not None else True), include_dart=bool(args.get("include_dart") or False), include_rust=bool(args.get("include_rust") if args.get("include_rust") is not None else True), include_packages=args.get("include_packages") or [], force_refresh=bool(args.get("force_refresh") or False), continue_on_error=bool(args.get("continue_on_error") if args.get("continue_on_error") is not None else True), async_=True))
+            payload = asdict(dependency_docs_app.prefetch_project_dependency_docs(args["project_path"], include_flutter=bool(args.get("include_flutter") if args.get("include_flutter") is not None else True), include_dart=bool(args.get("include_dart") or False), include_rust=bool(args.get("include_rust") if args.get("include_rust") is not None else True), include_go=bool(args.get("include_go") if args.get("include_go") is not None else True), include_packages=args.get("include_packages") or [], force_refresh=bool(args.get("force_refresh") or False), continue_on_error=bool(args.get("continue_on_error") if args.get("continue_on_error") is not None else True), async_=True))
         elif action == "prefetch_library_docs":
             # Public MCP calls must not block the server while a remote source is crawled.
             versions = [args["version"]] if args.get("version") else None
@@ -371,7 +382,7 @@ def handle_prefetch_tool(name: str, args: dict[str, Any], service: LibraryDocsSe
                 }
             payload = asdict(service.cancel_docs_job(job_id))
         else:
-            return {"status": "error", "reason_code": "unknown_prepare_action", "message": f"unknown prepare_docs action: {action}", "supported_actions": ["sync_project_docs", "prefetch_project_dependency_docs", "prefetch_library_docs", "prefetch_docs_targets", "inspect_docs_target", "validate_docs_manifest", "prefetch_docs_manifest", "refresh_library_docs", "prune_library_docs", "remove_library_docs", "clear_index", "cancel_docs_job"]}
+            return {"status": "error", "reason_code": "unknown_prepare_action", "message": f"unknown prepare_docs action: {action}", "supported_actions": ["sync_project_docs", "prefetch_project_dependency_docs", "prefetch_library_docs", "discover_library_docs", "prefetch_docs_targets", "inspect_docs_target", "validate_docs_manifest", "prefetch_docs_manifest", "refresh_library_docs", "prune_library_docs", "remove_library_docs", "clear_index", "cancel_docs_job"]}
         if isinstance(payload, dict):
             payload.setdefault("action", action)
             payload.setdefault("tool", "prepare_docs")

@@ -29,6 +29,7 @@ class DependencyProjectPrefetch:
         include_flutter: bool = True,
         include_dart: bool = False,
         include_rust: bool = True,
+        include_go: bool = True,
         include_packages: list[str] | None = None,
         force_refresh: bool = False,
         continue_on_error: bool = True,
@@ -67,6 +68,24 @@ class DependencyProjectPrefetch:
             warnings.append("Dart SDK documentation version detection is not implemented.")
 
         for package in include_packages or []:
+            go_version = metadata.packages.get(f"go:{package}")
+            if go_version and include_go:
+                targets.append(DocsTarget(
+                    library=package,
+                    ecosystem="go",
+                    version=go_version,
+                    docs_url=f"https://pkg.go.dev/{package}@{go_version}",
+                    source_type="api",
+                    allowed_domains=["pkg.go.dev"],
+                    path_prefixes=[f"/{package}@{go_version}"],
+                    doc_format="godoc",
+                    identity={"kind": "package", "ecosystem": "go", "namespace": package.rpartition("/")[0], "name": package.rpartition("/")[2]},
+                    authority="official_registry",
+                    version_policy="exact",
+                    version_binding="exact",
+                    coverage="bounded",
+                ))
+                continue
             rust_version = metadata.packages.get(f"rust:{package}")
             if rust_version and include_rust:
                 targets.append(DocsTarget(

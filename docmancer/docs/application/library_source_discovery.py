@@ -24,6 +24,29 @@ def discover_library_docs_sources(
     name = normalize_lookup_key(library)
     selected_version = normalize_version(version)
     normalized_ecosystem = normalize_lookup_key(ecosystem or "")
+    if normalized_ecosystem in {"go", "golang"}:
+        module = library.strip()
+        if not _safe_go_module(module):
+            return {
+                **_result(library, "go", []),
+                "status": "invalid_package_identity",
+                "message": "Go discovery requires a full module path such as github.com/gin-gonic/gin.",
+            }
+        # Module versions and paths are preserved for the public URL; the Go
+        # proxy escaping rules are case-sensitive for uppercase characters.
+        docs_version = version.strip() if isinstance(version, str) and version.strip() else None
+        suffix = f"@{quote(docs_version, safe='.-_~+')}" if docs_version else ""
+        return _result(library, "go", [
+            _candidate(
+                f"https://pkg.go.dev/{quote(module, safe='/.-_~')}{suffix}",
+                label="pkg.go.dev module documentation",
+                confidence="high" if docs_version else "medium",
+                source="go_module_registry",
+                ecosystem="go",
+                version=docs_version,
+                source_type="api",
+            )
+        ])
     if normalized_ecosystem in {"dart", "flutter", "pub"}:
         docs_version = selected_version or "latest"
         return _result(library, "pub", [
@@ -54,7 +77,7 @@ def discover_library_docs_sources(
         return {
             **_result(library, normalized_ecosystem or "unknown", []),
             "status": "unsupported_ecosystem",
-            "message": "Automatic registry discovery is available for Python, npm, Pub/Dart, and Rust. Provide docs_url manually for this ecosystem.",
+            "message": "Automatic registry discovery is available for Python, npm, Pub/Dart, Go, and Rust. Provide docs_url manually for this ecosystem.",
         }
 
     endpoint = _registry_endpoint(name, normalized_ecosystem, selected_version)
@@ -178,6 +201,15 @@ def _normalize_repository_url(value: Any) -> str | None:
 def _safe_public_url(value: str) -> bool:
     parsed = urlparse(value.strip())
     return parsed.scheme == "https" and bool(parsed.hostname) and not parsed.username and not parsed.password
+
+
+def _safe_go_module(value: str) -> bool:
+    if not value or len(value) > 500 or value.startswith((".", "/")) or ".." in value:
+        return False
+    if "://" in value or "@" in value or any(char.isspace() for char in value):
+        return False
+    first = value.split("/", 1)[0]
+    return "." in first and all(char.isalnum() or char in ".-_/~" for char in value)
 
 
 def _candidate(

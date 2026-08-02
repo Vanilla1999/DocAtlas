@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 from docmancer.docs.application.docs_manifest_service import DocsManifestService
-from docmancer.docs.models import DocsTarget, DocsTargetsPrefetchResult, ProjectMetadata
+from docmancer.docs.application.docs_target_service import DocsTargetService
+from docmancer.docs.models import DependencyObservation, DocsTarget, DocsTargetResult, DocsTargetsPrefetchResult, ProjectMetadata
 
 
 class FakeJobs:
@@ -27,7 +28,7 @@ class FakeManifestDeps:
 
     def _target_from_dict(self, value):
         self.calls.append(("target", value))
-        return DocsTarget(library=value["library"], version=value.get("version") or "latest", docs_url=value.get("docs_url"), allowed_domains=value.get("allowed_domains") or [])
+        return DocsTargetService.target_from_dict(value)
 
     def _target_urls(self, target):
         return ([target.docs_url], None) if target.docs_url else ([], "target must provide docs_url")
@@ -88,3 +89,182 @@ targets:
     assert validation.targets[0].library == "go_router"
     assert result.status == "ok"
     assert deps.calls[-1][0] == "prefetch"
+
+
+def test_manifest_v2_normalizes_product_identity_and_writes_resolved_lock(tmp_path):
+    manifest = tmp_path / "docmancer.docs.yaml"
+    manifest.write_text(
+        """
+version: 2
+targets:
+  - id: docker-compose-reference
+    identity:
+      kind: product
+      ecosystem: docker
+      namespace: docker
+      name: compose
+    version:
+      requested: rolling
+      policy: rolling
+    source:
+      type: reference
+      url: https://docs.docker.com/reference/compose-file/
+      authority: official_product
+      version_binding: rolling
+      format: html
+    scope:
+      allowed_domains: [docs.docker.com]
+      path_prefixes: [/reference/compose-file/]
+      max_pages: 60
+      coverage: bounded
+      discovery_strategy: llms.txt
+""",
+        encoding="utf-8",
+    )
+    deps = FakeManifestDeps()
+    deps.prefetch_docs_targets = lambda targets, **_kwargs: DocsTargetsPrefetchResult(
+        status="ok",
+        results=[DocsTargetResult(
+            canonical_id="docker:docker-compose@rolling:reference",
+            status="ready",
+            library="docker:compose",
+            ecosystem="docker",
+            version="rolling",
+            source_type="reference",
+        )],
+    )
+    service = DocsManifestService(deps)
+
+    validation = service.validate_docs_manifest(str(manifest))
+    result = service.prefetch_docs_manifest(str(manifest))
+
+    assert validation.valid is True
+    target = validation.targets[0]
+    assert target.library == "docker/compose"
+    assert target.discovery_strategy == "llms.txt"
+    assert target.authority == "official_product"
+    assert result.status == "ok"
+    lock = (tmp_path / ".docatlas/docs.lock.json").read_text(encoding="utf-8")
+    assert '"manifest_digest": "sha256:' in lock
+    assert '"version_policy": "rolling"' in lock
+
+
+def test_manifest_v2_rejects_false_exactness_and_persisted_query(tmp_path):
+    manifest = tmp_path / "docmancer.docs.yaml"
+    manifest.write_text(
+        """
+version: 2
+targets:
+  - id: unsafe
+    query: task-specific question
+    identity: {kind: package, ecosystem: go, name: example.com/library}
+    version: {requested: latest, policy: exact}
+    source:
+      type: api
+      url: https://pkg.go.dev/example.com/library
+      authority: official_registry
+      version_binding: rolling
+      format: godoc
+    scope:
+      allowed_domains: [pkg.go.dev]
+      path_prefixes: [/example.com/library]
+      max_pages: 20
+      coverage: bounded
+""",
+        encoding="utf-8",
+    )
+
+    validation = DocsManifestService(FakeManifestDeps()).validate_docs_manifest(str(manifest))
+
+    assert validation.valid is False
+    assert any("query is task-specific" in error for error in validation.errors)
+    assert any("exact version policy" in error for error in validation.errors)
+
+
+def test_manifest_v2_deep_merges_nested_defaults(tmp_path):
+    manifest = tmp_path / "docmancer.docs.yaml"
+    manifest.write_text(
+        """
+version: 2
+defaults:
+  source: {authority: official_product, version_binding: rolling, format: html}
+  scope: {allowed_domains: [docs.docker.com], max_pages: 40, coverage: bounded}
+targets:
+  - id: dockerfile
+    identity: {kind: product, ecosystem: docker, name: dockerfile}
+    version: {requested: rolling, policy: rolling}
+    source: {type: reference, url: https://docs.docker.com/reference/dockerfile/}
+    scope: {path_prefixes: [/reference/dockerfile/]}
+""",
+        encoding="utf-8",
+    )
+
+    validation = DocsManifestService(FakeManifestDeps()).validate_docs_manifest(str(manifest))
+
+    assert validation.valid is True
+    assert validation.targets[0].allowed_domains == ["docs.docker.com"]
+    assert validation.targets[0].max_pages == 40
+
+
+def test_resolved_lock_detects_changed_project_dependency_evidence(tmp_path):
+    manifest = tmp_path / "docmancer.docs.yaml"
+    manifest.write_text(
+        """
+version: 1
+targets:
+  - id: sample
+    library: sample
+    ecosystem: go
+    version: project-version
+    project_version: {package: "go:example.com/sample", fallback: latest}
+    source_type: api
+    docs_url: https://pkg.go.dev/example.com/sample
+    allowed_domains: [pkg.go.dev]
+""",
+        encoding="utf-8",
+    )
+    deps = FakeManifestDeps()
+    version = {"value": "v1.0.0"}
+
+    def metadata(project_path):
+        selected = version["value"]
+        return ProjectMetadata(
+            project_path=project_path,
+            packages={"go:example.com/sample": selected},
+            dependencies=[DependencyObservation(
+                ecosystem="go",
+                package_name="example.com/sample",
+                specifier_raw=selected,
+                resolved_version=selected,
+                version_source="vendor_modules_exact",
+            )],
+        )
+
+    deps.read_project_metadata = metadata
+    service = DocsManifestService(deps)
+    service.prefetch_docs_manifest(str(manifest), project_path=str(tmp_path))
+    version["value"] = "v1.1.0"
+
+    validation = service.validate_docs_manifest(str(manifest), project_path=str(tmp_path))
+
+    assert any("project dependency evidence changed" in warning for warning in validation.warnings)
+
+
+def test_selected_target_prefetch_preserves_other_resolved_lock_entries(tmp_path):
+    manifest = tmp_path / "docmancer.docs.yaml"
+    manifest.write_text(
+        """
+version: 1
+targets:
+  - {id: first, library: first, docs_url: "https://docs.example/first/", allowed_domains: [docs.example]}
+  - {id: second, library: second, docs_url: "https://docs.example/second/", allowed_domains: [docs.example]}
+""",
+        encoding="utf-8",
+    )
+    service = DocsManifestService(FakeManifestDeps())
+
+    service.prefetch_docs_manifest(str(manifest))
+    service.prefetch_docs_manifest(str(manifest), targets=["first"])
+
+    lock = service._read_lock(manifest)
+    assert {item["library"] for item in lock["targets"]} == {"first", "second"}
