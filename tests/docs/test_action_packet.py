@@ -363,7 +363,11 @@ def test_bounded_direct_is_one_existing_tool_call_and_returns_only_action_packet
     assert missing["recommended_next_action"] == {
         "tool": "prepare_docs",
         "type": "prepare_docs",
-        "arguments_patch": {"action": "prefetch_library_docs", "library": "kotlin"},
+        "arguments_patch": {
+            "action": "prefetch_library_docs",
+            "library": "kotlin",
+            "question": "Kotlin coroutines",
+        },
         "auto_execute": False,
     }
 

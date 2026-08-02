@@ -5,6 +5,7 @@ from __future__ import annotations
 import re
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlparse
 
 import yaml
 
@@ -48,10 +49,16 @@ def _read_pubspec_lock(path: Path, warnings: list[str]) -> tuple[dict[str, str],
             continue
         version = entry.get("version")
         if isinstance(version, str) and version.strip():
-            result[name] = version.strip()
             dependency = str(entry.get("dependency") or "").lower()
             group = "dev" if "dev" in dependency else "dependencies"
             source = str(entry.get("source") or "hosted").lower()
+            # A lockfile version does not prove registry provenance. Pub also
+            # records path, git, SDK, and custom sources in the packages map;
+            # mapping those entries to pub.dev can silently index unrelated
+            # documentation for a package with the same name and version.
+            public_registry = source == "hosted" and _is_public_pub_host(entry.get("description"))
+            if public_registry:
+                result[name] = version.strip()
             observations.append(DependencyObservation(
                 ecosystem="pub",
                 package_name=name,
@@ -60,9 +67,22 @@ def _read_pubspec_lock(path: Path, warnings: list[str]) -> tuple[dict[str, str],
                 specifier_raw=version.strip(),
                 resolved_version=version.strip(),
                 version_source="lockfile_exact",
-                source_kind="registry" if source == "hosted" else source,
+                source_kind="registry" if public_registry else ("custom_hosted" if source == "hosted" else source),
             ))
     return result, observations
+
+
+def _is_public_pub_host(description: Any) -> bool:
+    """Distinguish pub.dev from custom hosted registries in lockfiles."""
+
+    if not isinstance(description, dict):
+        # Older lockfiles store only the package name for the default registry.
+        return True
+    raw_url = description.get("url")
+    if not isinstance(raw_url, str) or not raw_url.strip():
+        return True
+    host = (urlparse(raw_url).hostname or "").lower()
+    return host in {"pub.dev", "pub.dartlang.org"}
 
 
 def _read_pubspec_yaml(path: Path, warnings: list[str]) -> tuple[list[str], list[DependencyObservation]]:

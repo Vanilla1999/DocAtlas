@@ -228,6 +228,7 @@ Agent workflow:
                 "source_type": {"type": ["string", "null"]},
                 "docs_url": {"type": ["string", "null"]},
                 "docs_url_template": {"type": ["string", "null"]},
+                "question": {"type": ["string", "null"], "description": "Optional retrieval question used to prioritize bounded documentation ingestion."},
                 "include_flutter": {"type": ["boolean", "null"]},
                 "include_dart": {"type": ["boolean", "null"]},
                 "include_rust": {"type": ["boolean", "null"]},

@@ -129,11 +129,38 @@ def project_version_for(
         warnings.append(NO_PROJECT_VERSION_WARNING)
         return None, None, None, warnings, observation.specifier_raw, False, observation.version_source, "no_docs"
 
+    if observation and observation.ecosystem == "python":
+        if observation.source_kind != "registry":
+            warnings.append(
+                f"{library}: Python path/git/direct-URL dependencies cannot be "
+                "bound to registry documentation exactly."
+            )
+            return None, None, None, warnings, observation.specifier_raw, False, observation.version_source, "no_docs"
+        if observation.resolved_version:
+            return (
+                observation.resolved_version,
+                None,
+                None,
+                warnings,
+                observation.specifier_raw or observation.resolved_version,
+                None,
+                observation.version_source,
+                "python_registry_version",
+            )
+        warnings.append(NO_PROJECT_VERSION_WARNING)
+        return None, None, None, warnings, observation.specifier_raw, False, observation.version_source, "no_docs"
+
     if ecosystem == "pub" or library in metadata.packages:
         version = metadata.packages.get(library)
-        if version:
+        if version and (observation is None or observation.source_kind == "registry"):
             source = observation.version_source if observation else "lockfile_exact"
             return version, None, PUB_DOCS_URL_TEMPLATE, warnings, version, True, source, "pub_dartdoc"
+        if observation and observation.source_kind != "registry":
+            warnings.append(
+                f"{library}: Pub {observation.source_kind} dependencies cannot be "
+                "bound to pub.dev documentation exactly."
+            )
+            return None, None, None, warnings, observation.specifier_raw, False, observation.version_source, "no_docs"
         warnings.append(PACKAGE_NOT_FOUND_WARNING)
         warnings.append(NO_PROJECT_VERSION_WARNING)
         return None, None, None, warnings, None, None, None, None

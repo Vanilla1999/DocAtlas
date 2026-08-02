@@ -260,7 +260,7 @@
     "tests/docs/test_project_docs_catalog.py": "8c3cd087a943b121c5d31d88a6c544bf0fdf8144034ed8d282a54f74efb26aae",
     "tests/docs/test_project_docs_service.py": "272af3feb3e948ac440a691afda05a483a572f3e4176e616c34d35f68c985846",
     "tests/docs/test_project_evidence_production.py": "d6495a762c9e4aaaf4d3807d0d4fa45c829ce6e75c4ad3cc51ef60a9d97f8882",
-    "tests/docs/test_project_metadata_reader.py": "1da18e18e352208d674896c7e8f50495d0878b1cc32ce43fdffe997631f899c1",
+    "tests/docs/test_project_metadata_reader.py": "f4b6ae302866af34877602b4209e4007d58f61ce2c6cbb6d0c2ab7ccbe8fcce0",
     "tests/docs/test_project_query_intent.py": "e2df0c0c37ef761f434ff8a53b5ded10b5fcf85b270dfad93748706940f7baef",
     "tests/docs/test_project_state.py": "6f6c1919aa25dade27a60c10c9438e3ac2c267dafaeefb14db6308226664a7f2",
     "tests/docs/test_retrieval_routing.py": "83089d4850606077f011967d374a7236f37125235cb45823606914f247e784ba",
