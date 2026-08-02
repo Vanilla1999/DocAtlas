@@ -34,7 +34,10 @@ dependencies = [
     "ultimate-sitemap-parser>=0.12",
     "beautifulsoup4>=4.12.0",
     "jsonschema>=4.0.0",
-    "mcp>=1.27.2",
+    # 1.28 removes the low-level Server decorator API used by the packaged
+    # stdio server. Keep release installs on the verified API until the server
+    # migration lands as a dedicated compatibility change.
+    "mcp>=1.27.2,<1.28",
     "sqlite-vec>=0.1.0",
     "qdrant-client>=1.10.0",
     "fastembed>=0.4.0",
