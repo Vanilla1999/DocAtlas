@@ -3329,6 +3329,23 @@ class SQLiteStore:
             deleted = self.delete_source(source) or deleted
         return deleted
 
+    def delete_docset_sources_except(
+        self, docset_root: str, retained_sources: Iterable[str]
+    ) -> int:
+        """Remove sources no longer present in one successfully fetched docset."""
+
+        retained = {str(source) for source in retained_sources}
+        with self._connect() as conn:
+            stale = [
+                str(row["source"])
+                for row in conn.execute(
+                    "SELECT source FROM sources WHERE docset_root = ? ORDER BY source",
+                    (docset_root,),
+                )
+                if str(row["source"]) not in retained
+            ]
+        return sum(1 for source in stale if self.delete_source(source))
+
     def delete_source(self, source: str) -> bool:
         artifact_paths: set[Path] = set()
         with self._connect() as conn:

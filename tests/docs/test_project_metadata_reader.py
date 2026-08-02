@@ -418,6 +418,124 @@ def test_node_exact_version_is_available_to_project_library_resolution(tmp_path:
     assert warnings == []
 
 
+def test_python_lock_version_is_available_to_project_library_resolution(tmp_path: Path) -> None:
+    root = tmp_path / "python_resolution_repo"
+    root.mkdir()
+    (root / "pyproject.toml").write_text(
+        '[project]\nname = "sample"\ndependencies = ["fastapi>=0.100"]\n',
+        encoding="utf-8",
+    )
+    (root / "uv.lock").write_text(
+        'version = 1\n[[package]]\nname = "fastapi"\nversion = "0.115.6"\n',
+        encoding="utf-8",
+    )
+    metadata = ProjectMetadataReader().read(root)
+
+    version, docs_url, template, warnings, requested, exact, source, binding = project_version_for(
+        library="fastapi",
+        ecosystem="python",
+        project_path=str(root),
+        read_project_metadata=lambda _: metadata,
+    )
+
+    assert version == "0.115.6"
+    assert docs_url is None
+    assert template is None
+    assert requested == "fastapi>=0.100"
+    assert exact is None
+    assert source == "uv.lock_exact"
+    assert binding == "python_registry_version"
+    assert warnings == []
+
+
+def test_pub_git_dependency_is_not_bound_to_pubdev(tmp_path: Path) -> None:
+    root = tmp_path / "pub_git_repo"
+    root.mkdir()
+    (root / "pubspec.yaml").write_text(
+        "dependencies:\n  sample:\n    git: https://example.com/sample.git\n",
+        encoding="utf-8",
+    )
+    (root / "pubspec.lock").write_text(
+        "packages:\n  sample:\n    dependency: direct main\n    source: git\n    version: 1.2.3\n",
+        encoding="utf-8",
+    )
+    metadata = ProjectMetadataReader().read(root)
+
+    version, docs_url, template, warnings, requested, exact, source, binding = project_version_for(
+        library="sample",
+        ecosystem="pub",
+        project_path=str(root),
+        read_project_metadata=lambda _: metadata,
+    )
+
+    assert "sample" not in metadata.packages
+    assert version is None
+    assert docs_url is None
+    assert template is None
+    assert requested == "1.2.3"
+    assert exact is False
+    assert source == "lockfile_exact"
+    assert binding == "no_docs"
+    assert any("cannot be bound to pub.dev" in warning for warning in warnings)
+
+
+def test_pub_custom_hosted_dependency_is_not_bound_to_pubdev(tmp_path: Path) -> None:
+    root = tmp_path / "pub_custom_host_repo"
+    root.mkdir()
+    (root / "pubspec.yaml").write_text(
+        "dependencies:\n  internal_api: 1.2.3\n",
+        encoding="utf-8",
+    )
+    (root / "pubspec.lock").write_text(
+        "packages:\n"
+        "  internal_api:\n"
+        "    dependency: direct main\n"
+        "    description:\n"
+        "      name: internal_api\n"
+        "      url: https://packages.example.com\n"
+        "    source: hosted\n"
+        "    version: 1.2.3\n",
+        encoding="utf-8",
+    )
+    metadata = ProjectMetadataReader().read(root)
+
+    version, docs_url, template, warnings, _, exact, _, binding = project_version_for(
+        library="internal_api",
+        ecosystem="pub",
+        project_path=str(root),
+        read_project_metadata=lambda _: metadata,
+    )
+
+    assert "internal_api" not in metadata.packages
+    assert version is None
+    assert docs_url is None
+    assert template is None
+    assert exact is False
+    assert binding == "no_docs"
+    assert any("custom_hosted" in warning for warning in warnings)
+
+
+def test_project_metadata_exposes_shared_dart_package_source_roots(tmp_path: Path) -> None:
+    root = tmp_path / "dart_repo"
+    dependency = tmp_path / "pub-cache" / "sample-1.2.3"
+    (root / ".dart_tool").mkdir(parents=True)
+    dependency.mkdir(parents=True)
+    (root / ".dart_tool/package_config.json").write_text(
+        json.dumps({
+            "configVersion": 2,
+            "packages": [
+                {"name": "app", "rootUri": "../../dart_repo"},
+                {"name": "sample", "rootUri": dependency.as_uri()},
+            ],
+        }),
+        encoding="utf-8",
+    )
+
+    metadata = ProjectMetadataReader().read(root)
+
+    assert metadata.dependency_source_roots == {"pub:sample": str(dependency.resolve())}
+
+
 def test_node_manifest_ranges_are_never_reported_as_exact_without_lockfile(tmp_path: Path) -> None:
     root = tmp_path / "range_only_repo"
     root.mkdir()

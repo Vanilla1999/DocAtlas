@@ -39,6 +39,7 @@ class FakeAgent:
         self.add_kwargs: list[dict] = []
         self.query_calls: list[tuple[str, int | None]] = []
         self.config = None
+        self.document_content = "# Guide\nUse parametrize for generated cases."
 
     def add(self, docs_url: str, recreate: bool = False, **kwargs) -> int:
         self.add_calls.append(docs_url)
@@ -68,7 +69,7 @@ class FakeAgent:
                     ))
                 store.add_documents(documents, recreate=recreate)
                 return len(documents)
-            store.add_documents([Document(source=docs_url.rstrip("/") + "/guide", content="# Guide\nUse parametrize for generated cases.", metadata=metadata)], recreate=recreate)
+            store.add_documents([Document(source=docs_url.rstrip("/") + "/guide", content=self.document_content, metadata=metadata)], recreate=recreate)
         return 1
 
     def query(self, text: str, limit=None, budget=None, expand=None):
@@ -2814,7 +2815,9 @@ def test_get_docs_unknown_without_url_asks_for_library_docs_source(tmp_path, mon
     assert result.message
     assert result.next_actions[0]["type"] == "ask_user_for_library_docs_source"
     assert any(option["id"] == "manual_docs_url" for option in result.diagnostics["source_options"])
-    assert any(option["id"] == "best_effort_web_discovery" and option["quality_guarantee"] is False for option in result.diagnostics["source_options"])
+    assert any(option["id"] == "registry_metadata_discovery" and option["quality_guarantee"] is False for option in result.diagnostics["source_options"])
+    assert result.next_actions[-1]["tool"] == "prepare_docs"
+    assert result.next_actions[-1]["arguments_patch"]["action"] == "discover_library_docs"
     assert result.policy["direct_webfetch"] == "discovery_only"
     assert result.next_actions
     assert agent.add_calls == []
@@ -4389,6 +4392,36 @@ def test_staged_prefetch_syncs_vectors_only_from_production_index(
         assert Path(agent.sync_db_paths[0]).parent.name.startswith(".docatlas-staging-")
 
 
+def test_unchanged_forced_prefetch_skips_second_vector_sync(tmp_path, monkeypatch):
+    agent = VectorTrackingAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+    service.config.retrieval.default_mode = "hybrid"
+
+    first = service.prefetch_docs(
+        "example-docs", ecosystem="web", docs_url="https://example.com/docs/", async_=True,
+    )
+    for _ in range(100):
+        first_status = service.get_docs_job_status(first.job_id)
+        if first_status and first_status.status == "succeeded":
+            break
+        time.sleep(0.02)
+
+    second = service.prefetch_docs(
+        "example-docs", ecosystem="web", docs_url="https://example.com/docs/",
+        force_refresh=True, async_=True,
+    )
+    for _ in range(100):
+        second_status = service.get_docs_job_status(second.job_id)
+        if second_status and second_status.status == "succeeded":
+            break
+        time.sleep(0.02)
+
+    assert first_status is not None and first_status.status == "succeeded"
+    assert second_status is not None and second_status.status == "succeeded"
+    assert "corpus_unchanged" in second_status.message
+    assert agent.sync_calls == 1
+
+
 def test_cancelled_staged_prefetch_never_syncs_vectors(tmp_path, monkeypatch):
     agent = SlowVectorTrackingAgent()
     service = _service(tmp_path, monkeypatch, agent)
@@ -4472,6 +4505,7 @@ def test_vector_sync_failure_retains_existing_active_corpus(tmp_path, monkeypatc
     refreshed_before = record_before.last_refreshed_at
 
     agent.fail_sync = True
+    agent.document_content = "# Guide\nChanged content that requires a new vector generation."
     failed = service.prefetch_docs(
         "example-docs", ecosystem="web", docs_url="https://example.com/docs/",
         force_refresh=True, async_=True,
@@ -5012,7 +5046,8 @@ def test_github_manifest_prefetch_and_refresh_use_one_canonical_operation(
         force=True,
     )
 
-    assert refreshed.status == "updated"
+    assert refreshed.status == "skipped"
+    assert refreshed.preindex["reason_code"] == "corpus_unchanged"
     assert agent.add_calls == [canonical_manifest["documents"][0]["blob_url"]]
     assert agent.add_kwargs[0]["source_manifest"] == canonical_manifest
     persisted = service.registry.get("sample", "web", "v1", "guides")

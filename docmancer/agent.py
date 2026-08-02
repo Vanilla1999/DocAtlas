@@ -821,6 +821,20 @@ class DocmancerAgent:
                 }
             )
         indexed = self.ingest_documents(documents, recreate=recreate, with_vectors=with_vectors)
+        page_failures = int(diagnostics.get("page_failure_count") or 0)
+        if not recreate and page_failures == 0 and documents:
+            sources_by_root: dict[str, set[str]] = {}
+            for document in documents:
+                root = str((document.metadata or {}).get("docset_root") or "")
+                if root:
+                    sources_by_root.setdefault(root, set()).add(document.source)
+            stale_removed = sum(
+                self.store.delete_docset_sources_except(root, sources)
+                for root, sources in sources_by_root.items()
+            )
+            if stale_removed:
+                diagnostics["stale_sources_removed"] = stale_removed
+                self.last_discovery_diagnostics = diagnostics
         if progress_callback:
             progress_callback(
                 {

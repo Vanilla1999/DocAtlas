@@ -646,6 +646,8 @@ def _replace_network_retries_with_prepare_actions(payload: dict[str, Any], reque
             # Network approval is a user decision, not a callable MCP field.
             # The returned lifecycle action must pass its own public validator.
             arguments.pop("allow_network", None)
+            if arguments.get("action") == "prefetch_library_docs" and not arguments.get("question"):
+                arguments["question"] = request.get("question")
             return {**action, "arguments_patch": arguments}
         if action.get("tool") != "get_docs_context" or not arguments.get("allow_network"):
             return action
@@ -656,6 +658,7 @@ def _replace_network_retries_with_prepare_actions(payload: dict[str, Any], reque
             patch = {
                 "action": "prefetch_library_docs",
                 "library": library,
+                "question": request.get("question"),
                 **{
                     key: request[key]
                     for key in ("ecosystem", "version", "source_type", "docs_url")

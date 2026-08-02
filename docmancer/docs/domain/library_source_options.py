@@ -42,16 +42,15 @@ def library_docs_source_options(
 
     options.append(
         {
-            "id": "best_effort_web_discovery",
-            "label": "Use best-effort web discovery",
+            "id": "registry_metadata_discovery",
+            "label": "Discover from package registry metadata",
             "requires_confirmation": True,
             "quality_guarantee": False,
             "arguments_patch": {
+                "action": "discover_library_docs",
                 "library": library,
                 "ecosystem": ecosystem,
                 "version": version,
-                "source_type": source_type,
-                "allow_network": True,
             },
         }
     )
@@ -91,16 +90,15 @@ def library_docs_source_next_actions(
 
     actions.append(
         {
-            "type": "best_effort_web_discovery",
-            "tool": "get_library_docs",
+            "type": "discover_library_docs",
+            "tool": "prepare_docs",
             "requires_confirmation": True,
-            "reason": "Use only if the user cannot provide an authoritative docs_url.",
+            "reason": "Query bounded package-registry metadata when the user cannot provide an authoritative docs_url.",
             "arguments_patch": {
+                "action": "discover_library_docs",
                 "library": library,
                 "ecosystem": ecosystem,
                 "version": version,
-                "source_type": source_type,
-                "allow_network": True,
             },
         }
     )

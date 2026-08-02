@@ -103,6 +103,10 @@ class LibraryRefreshOps:
             )
         pages, chunks = self.ports.registry_ops.count_index_entries(record)
         index_empty = pages == 0 and chunks == 0
+        corpus_digest = getattr(self.ports.registry_ops, "corpus_digest", None)
+        active_corpus_digest = (
+            corpus_digest(record) if callable(corpus_digest) and not index_empty else None
+        )
         if not force and not self.ports.is_stale(record.last_refreshed_at) and not index_empty:
             return RefreshResult(
                 library_id=record.library_id,
@@ -296,6 +300,53 @@ class LibraryRefreshOps:
                     duration_ms=int((self.ports.monotonic() - started) * 1000),
                     targets_failed=1,
                 )
+
+        staging_corpus_digest = (
+            corpus_digest(record, config=staging[0])
+            if callable(corpus_digest) and staging is not None else None
+        )
+        if (
+            staging is not None
+            and active_corpus_digest
+            and staging_corpus_digest == active_corpus_digest
+            and fetch_failure is None
+            and page_failures == 0
+        ):
+            self.publication.discard_staging(staging)
+            checked_at = self.ports.now()
+            self.ports.registry.upsert(
+                library=record.name,
+                ecosystem=record.ecosystem,
+                version=record.version,
+                docs_url=record.docs_url,
+                docs_url_template=record.docs_url_template,
+                source_type=record.source_type,
+                now=checked_at,
+                status="available",
+                last_refreshed_at=record.last_refreshed_at,
+                last_error="",
+                target_spec=record.target_spec,
+            )
+            return RefreshResult(
+                library_id=record.library_id,
+                status="skipped",
+                docs_url=record.docs_url,
+                last_refreshed_at=record.last_refreshed_at,
+                version=record.version,
+                source_type=record.source_type,
+                message="corpus_unchanged: retained the active index and skipped vector synchronization.",
+                duration_ms=int((self.ports.monotonic() - started) * 1000),
+                pages_indexed=pages_after,
+                chunks_indexed=chunks_after,
+                targets_completed=1,
+                preindex={
+                    "reason_code": "corpus_unchanged",
+                    "corpus_digest": active_corpus_digest,
+                    "vector_sync": {"status": "skipped", "reason": "corpus_unchanged"},
+                    "embeddings_avoided": True,
+                    **crawl_diagnostics,
+                },
+            )
 
         vector_failure: Exception | None = None
         vector_sync: dict[str, Any] = {"status": "not_requested"}
@@ -646,6 +697,8 @@ class LibraryRefreshOps:
             aborted = not continue_on_error and last is not None and last.status in {"failed", "needs_docs_url"}
             status = "aborted" if aborted else ("failed" if failed else ("needs_docs_url" if needs_url else ("partial" if partial else ("updated" if updated else "skipped"))))
             message = f"updated={updated} skipped={skipped} partial={partial} failed={failed} needs_docs_url={needs_url}"
+            if last and last.message and last.status == "skipped":
+                message = f"{message} {last.message}"
             if failure_codes:
                 message = f"{message} reason_code={','.join(failure_codes)}"
             return RefreshResult(

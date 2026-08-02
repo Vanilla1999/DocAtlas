@@ -404,6 +404,7 @@ class ProjectMetadata:
     packages: dict[str, str] = field(default_factory=dict)
     direct_dependencies: list[str] = field(default_factory=list)
     dependencies: list[DependencyObservation] = field(default_factory=list)
+    dependency_source_roots: dict[str, str] = field(default_factory=dict)
     docs_candidates: list[ProjectDocsCandidate] = field(default_factory=list)
     detected_ecosystems: list[str] = field(default_factory=list)
     warnings: list[str] = field(default_factory=list)

@@ -212,6 +212,7 @@ def test_get_docs_context_rewrites_network_retry_to_complete_prepare_action():
         "arguments_patch": {
             "action": "prefetch_library_docs",
             "library": "kotlin",
+            "question": "coroutines",
             "ecosystem": "kotlin",
             "version": "1.8.1",
         },
@@ -243,6 +244,7 @@ def test_missing_kotlin_corpus_uses_prepare_docs_through_real_application_bounda
     assert payload["recommended_next_action"]["arguments_patch"] == {
         "action": "prefetch_library_docs",
         "library": "kotlin",
+        "question": "coroutines",
         "ecosystem": "kotlin",
         "version": "1.8.1",
     }

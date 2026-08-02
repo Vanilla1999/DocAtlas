@@ -69,6 +69,38 @@ class LibraryRegistryOps:
         except sqlite3.Error:
             return 0, 0
 
+    def corpus_digest(self, record: LibraryRecord, *, config: Any | None = None) -> str | None:
+        """Hash the complete fetched corpus identity for no-op publication checks."""
+
+        config = config or self.deps._index_config_for(record)
+        db_path = Path(config.index.db_path)
+        if not db_path.exists():
+            return None
+        try:
+            with sqlite3.connect(db_path) as conn:
+                rows = conn.execute(
+                    "SELECT source, content, metadata_json FROM sources ORDER BY source"
+                ).fetchall()
+        except sqlite3.Error:
+            return None
+        if not rows:
+            return None
+        digest = hashlib.sha256()
+        for source, content, raw_metadata in rows:
+            try:
+                metadata = json.loads(raw_metadata or "{}")
+            except (TypeError, json.JSONDecodeError):
+                metadata = {}
+            canonical = str(metadata.get("canonical_url") or source or "")
+            content_hash = str(metadata.get("content_hash") or "")
+            if not content_hash:
+                content_hash = hashlib.sha256(str(content or "").encode("utf-8")).hexdigest()
+            digest.update(canonical.encode("utf-8"))
+            digest.update(b"\0")
+            digest.update(content_hash.encode("ascii", errors="ignore"))
+            digest.update(b"\n")
+        return f"sha256:{digest.hexdigest()}"
+
     def status_for(self, record: LibraryRecord, size_bytes: int | None = None) -> str:
         if record.status == "failed":
             return "failed"

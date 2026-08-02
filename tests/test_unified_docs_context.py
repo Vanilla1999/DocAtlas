@@ -306,7 +306,7 @@ def test_missing_library_source_asks_user_for_docs_source():
     assert result.next_action["type"] == "ask_user_for_library_docs_source"
     option_ids = [option["id"] for option in result.next_action["options"]]
     assert "manual_docs_url" in option_ids
-    assert "best_effort_web_discovery" in option_ids
+    assert "registry_metadata_discovery" in option_ids
     assert result.next_action["quality_warning"]
 
 

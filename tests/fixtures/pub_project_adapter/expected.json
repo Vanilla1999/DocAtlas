@@ -138,10 +138,7 @@
       }
     ],
     "packages": {
-      "flutter": "0.0.0",
-      "git_client": "0.4.0",
       "go_router": "14.8.1",
-      "local_widgets": "1.0.0",
       "test": "1.25.15"
     },
     "warnings": []

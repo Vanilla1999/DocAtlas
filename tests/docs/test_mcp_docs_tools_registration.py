@@ -67,6 +67,7 @@ def test_mcp_public_prepare_docs_advertises_project_local_library_removal():
     assert "remove_library_docs" in schema["properties"]["action"]["enum"]
     assert "canonical_id" in schema["properties"]
     assert "project_path" in schema["properties"]
+    assert "discover_library_docs" in schema["properties"]["action"]["enum"]
 
 
 def test_mcp_public_prepare_docs_schema_requires_removal_scope_and_target():
@@ -669,12 +670,19 @@ def test_prepare_docs_preserves_singular_version_for_library_prefetch():
     service = Service()
     payload = call_docs_tool_payload(
         "prepare_docs",
-        {"action": "prefetch_library_docs", "library": "kotlin", "ecosystem": "kotlin", "version": "1.8.1"},
+        {
+            "action": "prefetch_library_docs",
+            "library": "kotlin",
+            "ecosystem": "kotlin",
+            "version": "1.8.1",
+            "question": "coroutine cancellation",
+        },
         service,
     )
 
     assert payload["status"] == "running"
     assert service.received["versions"] == ["1.8.1"]
+    assert service.received["query"] == "coroutine cancellation"
     assert service.received["async_"] is True
 
 
