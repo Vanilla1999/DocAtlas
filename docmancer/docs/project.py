@@ -8,12 +8,9 @@ from pathlib import PurePosixPath
 from typing import Any
 from urllib.parse import unquote, urlsplit
 
-from docmancer.docs.cargo_project import read_cargo_project
 from docmancer.docs.dart_package_config import resolve_dart_package_roots
+from docmancer.docs.ecosystem_adapters import read_project_ecosystems
 from docmancer.docs.models import DependencyObservation, ProjectDocsCandidate, ProjectMetadata, SOURCE_CLASS_PROJECT_FILE
-from docmancer.docs.node_project import read_node_project
-from docmancer.docs.python_project import read_python_project
-from docmancer.docs.pub_project import read_pub_project
 from docmancer.docs.project_docs_catalog import (
     MAX_CATALOG_DOCUMENTS,
     ProjectDocCatalogRoot,
@@ -95,10 +92,7 @@ class ProjectMetadataReader:
             return ProjectMetadata(project_path=str(root), warnings=[f"Project path is not a directory: {root}"])
         fvmrc_path = root / ".fvmrc"
         flutter_version, flutter_channel = self._read_fvmrc(fvmrc_path, warnings) if fvmrc_path.exists() else (None, None)
-        packages, direct_dependencies, pub_observations = read_pub_project(root, warnings)
-        cargo_packages, rust_observations = read_cargo_project(root, warnings)
-        npm_packages, npm_direct_dependencies, npm_observations = read_node_project(root, warnings)
-        python_packages, python_direct_dependencies, python_observations = read_python_project(root, warnings)
+        ecosystem_result = read_project_ecosystems(root, warnings)
         dart_package_roots, dart_root_warnings = resolve_dart_package_roots(root)
         warnings.extend(dart_root_warnings)
         catalog = read_project_docs_catalog(root)
@@ -113,9 +107,9 @@ class ProjectMetadataReader:
             ) if catalog.valid else []
         else:
             docs_candidates = self.discover_docs(root, warnings, limit=docs_candidate_limit)
-        all_packages = {**packages, **cargo_packages, **npm_packages, **python_packages}
-        direct_dependencies = sorted({*direct_dependencies, *npm_direct_dependencies, *python_direct_dependencies})
-        dependencies = [*pub_observations, *rust_observations, *npm_observations, *python_observations]
+        all_packages = dict(ecosystem_result.packages)
+        direct_dependencies = list(ecosystem_result.direct_dependencies)
+        dependencies = list(ecosystem_result.observations)
         detected_ecosystems = sorted({item.ecosystem for item in dependencies})
         if flutter_version or flutter_channel or "flutter" in direct_dependencies:
             detected_ecosystems = sorted({*detected_ecosystems, "flutter"})
@@ -128,9 +122,12 @@ class ProjectMetadataReader:
             direct_dependencies=direct_dependencies,
             dependencies=dependencies,
             dependency_source_roots={
-                f"pub:{name}": str(path)
-                for name, path in sorted(dart_package_roots.items())
-                if path != root
+                **{
+                    f"pub:{name}": str(path)
+                    for name, path in sorted(dart_package_roots.items())
+                    if path != root
+                },
+                **{name: str(path) for name, path in sorted(ecosystem_result.source_roots.items())},
             },
             docs_candidates=docs_candidates,
             detected_ecosystems=detected_ecosystems,

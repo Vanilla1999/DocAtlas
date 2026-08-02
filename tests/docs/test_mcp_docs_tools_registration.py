@@ -217,12 +217,12 @@ def test_mcp_hides_low_level_target_prefetch_from_public_surface():
     assert "prefetch_docs_targets" not in tool["inputSchema"]["properties"]["action"]["enum"]
 
 
-def test_mcp_hides_bounded_inspection_but_keeps_compatibility_dispatch():
+def test_mcp_exposes_bounded_inspection_through_prepare_docs():
     tool = next(tool for tool in TOOLS if tool["name"] == "prepare_docs")
 
-    assert "inspect_docs_target" not in tool["inputSchema"]["properties"]["action"]["enum"]
-    assert "max_pages" not in tool["inputSchema"]["properties"]
-    assert "target" not in tool["inputSchema"]["properties"]
+    assert "inspect_docs_target" in tool["inputSchema"]["properties"]["action"]["enum"]
+    assert tool["inputSchema"]["properties"]["max_pages"]["maximum"] == 5
+    assert "target" in tool["inputSchema"]["properties"]
 
     class Service:
         received = None
@@ -252,7 +252,7 @@ def test_mcp_hides_bounded_inspection_but_keeps_compatibility_dispatch():
         "docs_url": "https://docs.example/api/",
         "allowed_domains": ["docs.example"],
         "path_prefixes": ["/api/"],
-        "max_pages": 3,
+        "max_pages": 50,
     }, 3)
     assert payload["observations"]["indexed"] is False
     assert payload["action"] == "inspect_docs_target"

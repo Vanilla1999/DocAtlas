@@ -24,6 +24,7 @@ from docmancer.docs.github_source_manifest import (
     normalize_resolved_github_manifest,
     resolve_github_directory_manifest,
 )
+from docmancer.docs.manifest_contract import manifest_v2_target_from_flat
 
 
 class DocsTargetJobs(Protocol):
@@ -124,6 +125,13 @@ class DocsTargetService:
             warnings=list(value.get("warnings") or []),
             source_manifest=dict(value.get("source_manifest") or {}),
             query=value.get("query"),
+            identity=dict(value.get("identity") or {}),
+            authority=value.get("authority"),
+            version_policy=value.get("version_policy"),
+            version_binding=value.get("version_binding"),
+            coverage=value.get("coverage"),
+            discovery_strategy=value.get("discovery_strategy"),
+            version_evidence=dict(value.get("version_evidence") or {}),
         )
 
     @staticmethod
@@ -148,6 +156,13 @@ class DocsTargetService:
             "warnings": list(target.warnings),
             "source_manifest": source_manifest,
             "query": target.query,
+            "identity": dict(target.identity),
+            "authority": target.authority,
+            "version_policy": target.version_policy,
+            "version_binding": target.version_binding,
+            "coverage": target.coverage,
+            "discovery_strategy": target.discovery_strategy,
+            "version_evidence": dict(target.version_evidence),
         }
 
     def target_from_record(self, record: LibraryRecord) -> DocsTarget:
@@ -168,6 +183,13 @@ class DocsTargetService:
             warnings=list(spec.get("warnings") or []),
             source_manifest=dict(spec.get("source_manifest") or {}),
             query=spec.get("query"),
+            identity=dict(spec.get("identity") or {}),
+            authority=spec.get("authority"),
+            version_policy=spec.get("version_policy"),
+            version_binding=spec.get("version_binding"),
+            coverage=spec.get("coverage"),
+            discovery_strategy=spec.get("discovery_strategy"),
+            version_evidence=dict(spec.get("version_evidence") or {}),
         )
 
     def record_urls(self, record: LibraryRecord) -> list[str]:
@@ -253,6 +275,10 @@ class DocsTargetService:
             if not candidate.get("within_scope")
         )
         reason_code = "docs_layout_observed" if successful else "inspection_failed"
+        proposal_target = {
+            **self.target_to_spec(effective_target),
+            "max_pages": max(1, min(500, int(target.max_pages or 50))),
+        }
         return DocsTargetInspectionResult(
             status="ok" if len(successful) == len(pages) else "partial" if successful else "failed",
             reason_code=reason_code,
@@ -279,6 +305,20 @@ class DocsTargetService:
                 "within-scope candidates, request explicit scope expansion, or stop."
             ),
             warnings=sorted(set(warnings)),
+            manifest_proposal=(
+                {
+                    "version": 2,
+                    "targets": [manifest_v2_target_from_flat(proposal_target)],
+                    "requires_confirmation": True,
+                    "evidence": {
+                        "pages_inspected": len(successful),
+                        "within_scope_links": max(0, candidates - outside_scope),
+                        "outside_scope_links": outside_scope,
+                        "inspection_only": True,
+                    },
+                }
+                if successful else None
+            ),
         )
 
     @staticmethod

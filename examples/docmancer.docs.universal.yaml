@@ -1,0 +1,50 @@
+version: 2
+
+defaults:
+  scope:
+    max_pages: 60
+    coverage: bounded
+
+targets:
+  - id: docker-compose-reference
+    identity:
+      kind: product
+      ecosystem: docker
+      namespace: docker
+      name: compose
+    version:
+      requested: rolling
+      policy: rolling
+    source:
+      type: reference
+      url: https://docs.docker.com/reference/compose-file/
+      authority: official_product
+      version_binding: rolling
+      format: html
+    scope:
+      allowed_domains: [docs.docker.com]
+      path_prefixes: [/reference/compose-file/]
+      seed_urls: [https://docs.docker.com/reference/compose-file/]
+      discovery_strategy: llms.txt
+
+  - id: gin-api
+    identity:
+      kind: package
+      ecosystem: go
+      namespace: github.com/gin-gonic
+      name: gin
+    version:
+      requested: v1.10.0
+      policy: exact
+    source:
+      type: api
+      url: https://pkg.go.dev/github.com/gin-gonic/gin@v1.10.0
+      authority: official_registry
+      version_binding: exact
+      format: godoc
+    scope:
+      allowed_domains: [pkg.go.dev]
+      path_prefixes: [/github.com/gin-gonic/gin@v1.10.0]
+      max_pages: 40
+      coverage: bounded
+      discovery_strategy: nav-crawl

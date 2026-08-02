@@ -20,6 +20,7 @@
     "tests/docs/test_documented_cli_contract.py": "behavioral",
     "tests/docs/test_evidence_selection.py": "behavioral",
     "tests/docs/test_filesystem_locks.py": "behavioral",
+    "tests/docs/test_go_project.py": "behavioral",
     "tests/docs/test_library_docs_service.py": "behavioral",
     "tests/docs/test_library_index_publication.py": "behavioral",
     "tests/docs/test_library_job_executor.py": "behavioral",
@@ -231,7 +232,7 @@
     "tests/docs/test_docs_impact.py": "bd6871a410731053def17da4fad06f2e43182916a78f672455ed36e744591bf8",
     "tests/docs/test_docs_impact_task20.py": "d3f356d69a51e529c746cd592430f136e1b3f74adae7f8dc408bbf6edd1a9c7b",
     "tests/docs/test_docs_job_service.py": "db5f3ac2a6819b172a4a644e6508f7e5a1237334830cefbc4ff02e235d075d0e",
-    "tests/docs/test_docs_manifest_service.py": "8ef342be33b9031eac28a8b6fdbef1eebeb73c9bc162be26607cde37c4b2d12f",
+    "tests/docs/test_docs_manifest_service.py": "7dc442b52150064d4a3af645a1878c3690979602757934d0a1c639b9199ba452",
     "tests/docs/test_docs_prefetch_service.py": "2e9779ac5119f39f46e2816d026c8917dfae05bb8fe543e8febe8abae90a4ac5",
     "tests/docs/test_docs_service_characterization.py": "25e9ca2a93fc47594b90213e1721fb4aa78e4926cf3b4744cc3299b3efdce7ed",
     "tests/docs/test_docs_target_service.py": "05468b2306702ffb68b48ddf18d1ca173ea93e6b21252d0b71a4fca4bac372c0",
@@ -241,9 +242,10 @@
     "tests/docs/test_library_docs_service.py": "a6869313fde464cb1f16d4c0b7911f5d8d029d8aa62c755fab571387003195ab",
     "tests/docs/test_library_index_publication.py": "9e017eacb83b0e9c48fe75872eced6707ac3d10b83fa9a910dc6f46fa9e0fb83",
     "tests/docs/test_library_job_executor.py": "86b231e4f34972cd7f17d151e2044acdc4ed71cce3bbd340b1888a10b604d77d",
-    "tests/docs/test_library_source_discovery.py": "bcf9e6dd7701f2ad84abd5361c2dcdb4d4f96242aef71e866cf1ef693312e0b4",
+    "tests/docs/test_go_project.py": "96a3e1ae32c3ff563460ff1c88f2673a0467c63b4eef84b83d66ddee7b6d28e7",
+    "tests/docs/test_library_source_discovery.py": "7b5ee15a407be8cb21cccd1944b203cddfbd560de1babf7d0aa0f1908fba9613",
     "tests/docs/test_mcp_boundary.py": "63891099dc91cbf2eeef7deb2972eb064080f2ddfe8d11b9135df66549b86c20",
-    "tests/docs/test_mcp_docs_tools_registration.py": "bf6db4b7dbf965c8804b52595bdf9b7e2069b3c11c6f5c29995a5f5dd72b0fb4",
+    "tests/docs/test_mcp_docs_tools_registration.py": "d97478caf7d95a428a3a235e751963a36dff778798fb088736e43cd27613cb14",
     "tests/docs/test_mcp_error_contract.py": "a0f7f9fe37934b5b6a528e6d6b1ba9bad42b0349a9f901ee50a318308f015ca8",
     "tests/docs/test_mcp_output_contract.py": "3c3d49013141661658cb5b008a3ae59f336523cf1b1f1ee01f2b9c0b62995b6b",
     "tests/docs/test_mcp_token_footprint.py": "34b40986931303bc312678f8e64bb6b3f31129baa6b402508b5181f7e4518833",
@@ -433,7 +435,7 @@
     "tests/test_unified_docs_context_mcp.py": "64db5341937ca57e0d12630f698a71d9217e5d769aa4b618e6d18e73a5219b03",
     "tests/test_uspto_tm.py": "92f3214036e4547c97bfe9c55398e9f137756c3813fd5d0e9f4497a18f3dc2e1",
     "tests/test_vector_fallback.py": "44f6de6da958441969f465a6e9537a6ebce4cb24a12de6a34e04eb8831258513",
-    "tests/test_web_fetcher.py": "110ac6b4c8a415776f5b37f93c8f91283a3ecad7d25ee455e3d144aa79bc24f1"
+    "tests/test_web_fetcher.py": "87ce4e298e510cf907d9abe86713b9ce404846e5229473db192e7c5cc98047ac"
   },
   "node_overrides": {
     "tests/docs/test_code_graph.py::test_code_graph_to_context_dict_is_json_serializable": "serialization",

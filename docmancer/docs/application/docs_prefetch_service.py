@@ -418,6 +418,8 @@ class DocsPrefetchService:
                                 "version": record.version,
                             },
                         }
+                        if target.discovery_strategy not in {None, "auto"}:
+                            add_kwargs["strategy"] = target.discovery_strategy
                         if target.doc_format:
                             add_kwargs["doc_format"] = target.doc_format
                         if target.query:

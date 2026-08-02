@@ -113,6 +113,14 @@ For an unknown library, DocAtlas does not guess a documentation site silently. I
 
 Forced/background library refreshes are staged before publication. When the fetched source set and content hashes match the active corpus, DocAtlas discards the candidate index and skips vector synchronization and embedding work with `reason_code="corpus_unchanged"`. Changed, removed, or canonicalized pages still produce a different corpus digest and follow the normal atomic publish path.
 
+### Reproducible documentation manifests
+
+Use `docmancer.docs.yaml` version 2 when automatic discovery is not precise enough or a large product site must be scoped deliberately. Automatic discovery remains a proposal mechanism; a confirmed manifest records structured package/product identity, version policy, source authority, version binding, network scope, coverage, page limits, and discovery strategy. `prepare_docs(action="inspect_docs_target", ...)` performs a bounded inspection without indexing and returns a reviewable v2 manifest proposal. After a successful `prefetch_docs_manifest`, DocAtlas writes `.docatlas/docs.lock.json` with the manifest digest and resolved target results. A changed manifest is reported as `manifest_outdated` until it is prefetched again.
+
+The v2 validator rejects task-specific queries, false exact-version claims, remote sources without `allowed_domains`, unsupported formats/strategies, and page limits above 500. Keep the retrieval question in the runtime `get_docs_context`/prefetch call rather than persisting it in the manifest. See [`examples/docmancer.docs.universal.yaml`](./examples/docmancer.docs.universal.yaml) for bounded Docker Compose and exact Go module targets.
+
+Go projects are detected from `go.mod` and `go.work`. A `go.mod` requirement is treated as a minimum requirement, not as proof of the selected build version. Exact automatic `pkg.go.dev` binding requires a matching vendored `vendor/modules.txt`; local or remote `replace` directives remain unbound until the source is explicitly confirmed.
+
 ### Compact MCP responses
 
 All project-docs lifecycle tools return compact responses by default:

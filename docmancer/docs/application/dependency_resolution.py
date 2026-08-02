@@ -150,6 +150,23 @@ def project_version_for(
         warnings.append(NO_PROJECT_VERSION_WARNING)
         return None, None, None, warnings, observation.specifier_raw, False, observation.version_source, "no_docs"
 
+    if observation and observation.ecosystem == "go":
+        warnings.extend(observation.warnings)
+        if observation.source_kind != "registry":
+            return None, None, None, warnings, observation.specifier_raw, False, observation.version_source, "no_docs"
+        if observation.resolved_version:
+            return (
+                observation.resolved_version,
+                f"https://pkg.go.dev/{library}@{observation.resolved_version}",
+                None,
+                warnings,
+                observation.specifier_raw or observation.resolved_version,
+                True,
+                observation.version_source,
+                "pkg_go_dev",
+            )
+        return None, None, None, warnings, observation.specifier_raw, False, observation.version_source, "go_resolution_required"
+
     if ecosystem == "pub" or library in metadata.packages:
         version = metadata.packages.get(library)
         if version and (observation is None or observation.source_kind == "registry"):

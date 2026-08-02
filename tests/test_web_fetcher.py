@@ -15,6 +15,7 @@ import pytest
 from docmancer.connectors.fetchers.web import WebFetcher
 from docmancer.connectors.fetchers.pipeline.detection import Platform
 from docmancer.connectors.fetchers.pipeline.discovery import DiscoveredUrl, DiscoveryStrategy, discover_urls
+from docmancer.connectors.fetchers.pipeline.extraction import extract_content
 from docmancer.docs.fetch_policy import DocsFetchPolicy, DocsFetchSecurityError
 from docmancer.docs.github_source_manifest import normalize_resolved_github_manifest
 
@@ -52,6 +53,26 @@ def test_identical_retry_uses_fresh_client_and_recovers_in_same_process():
     assert len(documents) == 1
     assert documents[0].source == url
     assert client_factory.call_count == 2
+
+
+def test_godoc_extraction_keeps_package_symbols_and_drops_navigation():
+    html = """
+    <html><body><nav>All packages Account</nav><main>
+      <div class="Documentation">
+        <h1>package gin</h1>
+        <p>Package gin implements an HTTP web framework.</p>
+        <h2>func Default</h2><pre>func Default(opts ...OptionFunc) *Engine</pre>
+        <aside>Repository metadata</aside>
+      </div>
+    </main></body></html>
+    """
+
+    content = extract_content(html, url="https://pkg.go.dev/example.com/gin", doc_format="godoc")
+
+    assert "package gin" in content
+    assert "func Default" in content
+    assert "All packages" not in content
+    assert "Repository metadata" not in content
 
 
 def test_every_http_client_inherits_the_absolute_ingest_deadline():
@@ -667,6 +688,53 @@ class TestWebFetcherProtocol:
 
 
 class TestDiscovery:
+    def test_query_skips_monolithic_llms_full_and_ranks_page_urls(self):
+        calls = []
+
+        def mock_get(url, **_kwargs):
+            calls.append(url)
+            if url.endswith("/llms.txt"):
+                return _mock_response(
+                    "[Overview](https://docs.example/reference/overview/)\n"
+                    "[Compose depends_on](https://docs.example/reference/compose-file/services/depends-on/)",
+                    content_type="text/plain",
+                )
+            if "sitemap" in url:
+                return _mock_response("", status=404, content_type="application/xml")
+            return _mock_response("<nav></nav>")
+
+        client = MagicMock(spec=httpx.Client)
+        client.get.side_effect = mock_get
+
+        result = discover_urls(
+            "https://docs.example/reference",
+            client,
+            Platform.GENERIC,
+            max_pages=2,
+            query="How does Compose depends_on work?",
+        )
+
+        assert not any(url.endswith("llms-full.txt") for url in calls)
+        assert result.urls[0].url.endswith("/compose-file/services/depends-on/")
+
+    def test_oversized_llms_full_falls_back_to_page_index(self):
+        def mock_get(url, **_kwargs):
+            if url.endswith("llms-full.txt"):
+                raise DocsFetchSecurityError("response_too_large", url)
+            if url.endswith("llms.txt"):
+                return _mock_response(
+                    "[Reference](https://docs.example/reference/topic/)",
+                    content_type="text/plain",
+                )
+            return _mock_response("", status=404)
+
+        client = MagicMock(spec=httpx.Client)
+        client.get.side_effect = mock_get
+
+        result = discover_urls("https://docs.example", client, Platform.GENERIC, max_pages=5)
+
+        assert result.urls[0].url == "https://docs.example/reference/topic/"
+
     def test_discovery_merges_llms_sitemap_and_nav(self):
         sitemap = """<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">

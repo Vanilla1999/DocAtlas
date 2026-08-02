@@ -87,3 +87,20 @@ def test_unknown_ecosystem_explains_manual_source_requirement() -> None:
 
     assert result["status"] == "unsupported_ecosystem"
     assert "Provide docs_url manually" in result["message"]
+
+
+def test_go_discovery_preserves_full_module_identity_and_version() -> None:
+    result = discover_library_docs_sources("github.com/gin-gonic/gin", "go", "v1.10.0")
+
+    assert result["status"] == "candidates_found"
+    assert result["candidates"][0]["docs_url"] == (
+        "https://pkg.go.dev/github.com/gin-gonic/gin@v1.10.0"
+    )
+    assert result["candidates"][0]["arguments_patch"]["library"] == "github.com/gin-gonic/gin"
+
+
+def test_go_discovery_requires_a_full_safe_module_path() -> None:
+    result = discover_library_docs_sources("gin", "go", "v1.10.0")
+
+    assert result["status"] == "invalid_package_identity"
+    assert result["candidates"] == []

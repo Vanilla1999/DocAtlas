@@ -179,6 +179,13 @@ class DocsTarget:
     warnings: list[str] = field(default_factory=list)
     source_manifest: dict[str, Any] = field(default_factory=dict)
     query: str | None = None
+    identity: dict[str, Any] = field(default_factory=dict)
+    authority: str | None = None
+    version_policy: str | None = None
+    version_binding: str | None = None
+    coverage: str | None = None
+    discovery_strategy: str | None = None
+    version_evidence: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass(frozen=True)
@@ -295,6 +302,7 @@ class DocsTargetInspectionResult:
     decision_options: list[dict[str, Any]] = field(default_factory=list)
     agent_question: str | None = None
     warnings: list[str] = field(default_factory=list)
+    manifest_proposal: dict[str, Any] | None = None
 
 
 @dataclass(frozen=True)

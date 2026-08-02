@@ -139,7 +139,10 @@ def discover_urls(
 
     _LOCALE_SKIP_COUNTER[0] = 0
 
-    llms_full = _try_llms_full_txt(base_url, client, platform, robots)
+    # A task-specific query benefits from page-level candidates. A monolithic
+    # llms-full response prevents bounded URL ranking and can make a small
+    # question download an entire product manual.
+    llms_full = None if query else _try_llms_full_txt(base_url, client, platform, robots)
     if llms_full:
         logger.info("Discovery: %s found %d URL(s)", DiscoveryStrategy.LLMS_FULL_TXT.value, len(llms_full))
         return DiscoveryResult(urls=llms_full)
@@ -214,6 +217,8 @@ def discover_urls(
 
     if all_results:
         ranked = _dedupe_and_rank(all_results)
+        if query:
+            ranked = _rank_urls_for_query(ranked, query)
         logger.info("Discovery candidates by strategy: %s", strategy_counts)
         discovery_strategy = _compute_discovery_strategy_label(
             strategy_counts, fallback_reason, bool(seed_urls),
@@ -506,6 +511,22 @@ def _dedupe_and_rank(results: list[DiscoveredUrl]) -> list[DiscoveredUrl]:
     return sorted(by_url.values(), key=lambda item: (_strategy_rank(item.strategy), _path_rank(item.url), item.url))
 
 
+def _rank_urls_for_query(results: list[DiscoveredUrl], query: str) -> list[DiscoveredUrl]:
+    terms = {
+        re.sub(r"[^a-z0-9]", "", term.casefold())
+        for term in re.findall(r"[A-Za-z][A-Za-z0-9_.-]{2,}", query)
+    }
+    terms -= {"and", "are", "for", "from", "how", "the", "this", "use", "what", "when", "where", "which", "with"}
+
+    def score(item: tuple[int, DiscoveredUrl]) -> tuple[int, int, int]:
+        index, candidate = item
+        path = re.sub(r"[^a-z0-9]", "", urlparse(candidate.url).path.casefold())
+        matches = sum(term in path for term in terms if len(term) >= 3)
+        return matches, -_strategy_rank(candidate.strategy), -index
+
+    return [item for _, item in sorted(enumerate(results), key=score, reverse=True)]
+
+
 def _strategy_rank(strategy: DiscoveryStrategy) -> int:
     return {
         DiscoveryStrategy.LLMS_TXT: 0,
@@ -548,6 +569,11 @@ def _try_llms_full_txt(
         resp = client.get(url)
     except httpx.RequestError:
         return None
+    except DocsFetchSecurityError as exc:
+        if exc.category in {"response_too_large", "decoded_response_too_large"}:
+            logger.info("Discovery skipped oversized llms-full.txt at %s", url)
+            return None
+        raise
 
     if resp.status_code != 200 or not resp.text.strip():
         return None

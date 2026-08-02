@@ -938,7 +938,11 @@ class WebFetcher:
             raw_html = resp.text
 
         if looks_like_html(raw_html):
-            doc_format = "dartdoc" if self._is_dartdoc_url(url) or is_dartdoc_html(raw_html, url=final_url) else None
+            doc_format = (
+                "dartdoc"
+                if self._is_dartdoc_url(url) or is_dartdoc_html(raw_html, url=final_url)
+                else self._doc_format
+            )
             content = extract_content(raw_html, url=url, doc_format=doc_format)
             meta = extract_metadata(raw_html, url=final_url)
             section_path = extract_section_path(raw_html)
