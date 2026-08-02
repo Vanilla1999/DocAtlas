@@ -299,9 +299,10 @@ class LibraryRefreshOps:
 
         vector_failure: Exception | None = None
         vector_sync: dict[str, Any] = {"status": "not_requested"}
+        staging_vector_agent: Any | None = None
 
         def _sync_vectors_before_commit() -> None:
-            nonlocal vector_failure, vector_sync
+            nonlocal vector_failure, vector_sync, staging_vector_agent
             if staging is None:
                 return
             retrieval_mode = str(
@@ -316,16 +317,30 @@ class LibraryRefreshOps:
                 return
             try:
                 staging_agent = self.ports.agent_gateway.agent_for_config(staging[0])
+                staging_vector_agent = staging_agent
+                prepare_generation = getattr(staging_agent, "prepare_vector_generation", None)
+                if callable(prepare_generation):
+                    prepare_generation()
                 sync_vectors = getattr(staging_agent, "sync_vectors", None)
                 if callable(sync_vectors):
-                    sync_vectors()
+                    result = sync_vectors()
                     vector_sync = dict(
                         getattr(staging_agent, "last_vector_sync_metrics", {})
-                    ) or {"status": "success"}
+                    )
                     vector_sync.setdefault("retrieval_mode", retrieval_mode)
+                    if result is None or vector_sync.get("status") != "success":
+                        reason = str(
+                            vector_sync.get("reason") or "vector_sync_incomplete"
+                        )
+                        raise RuntimeError(
+                            f"vector synchronization did not complete: {reason}"
+                        )
+                else:
+                    raise RuntimeError("staging agent does not support vector synchronization")
             except Exception as exc:
                 vector_failure = exc
                 vector_sync = {
+                    **dict(getattr(staging_vector_agent, "last_vector_sync_metrics", {}) or {}),
                     "status": "failed",
                     "retrieval_mode": retrieval_mode,
                 }
@@ -411,6 +426,9 @@ class LibraryRefreshOps:
         if staging is not None and sections_indexed > 0:
             _sync_vectors_before_commit()
             if vector_failure is not None:
+                cleanup = getattr(staging_vector_agent, "discard_vector_generation", None)
+                if callable(cleanup):
+                    cleanup()
                 self.publication.discard_staging(staging)
                 self._persist_manifest_rollback_diagnostics(record, "vector_indexing_failed")
                 failure_diagnostics = _bounded_exception_diagnostics(

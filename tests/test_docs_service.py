@@ -173,11 +173,17 @@ VectorSyncFailure = type("aws_secret_access_key_leaked_value", (RuntimeError,), 
 
 
 class VectorTrackingAgent(FakeAgent):
-    def __init__(self, *, fail_sync: bool = False):
+    def __init__(self, *, fail_sync: bool = False, skip_sync: bool = False):
         super().__init__()
         self.fail_sync = fail_sync
+        self.skip_sync = skip_sync
         self.sync_calls = 0
+        self.prepare_calls = 0
         self.sync_db_paths: list[str] = []
+
+    def prepare_vector_generation(self):
+        self.prepare_calls += 1
+        return "staging-vector-collection"
 
     def sync_vectors(self):
         self.sync_calls += 1
@@ -188,6 +194,17 @@ class VectorTrackingAgent(FakeAgent):
                 '"AWS_SECRET_ACCESS_KEY": "aws-env-secret", '
                 '"Authorization": "Bearer authorization-secret"}'
             )
+        if self.skip_sync:
+            self.last_vector_sync_metrics = {
+                "status": "skipped",
+                "reason": "missing_vector_extra",
+            }
+            return None
+        self.last_vector_sync_metrics = {
+            "status": "success",
+            "vector_backend": "sqlite-vec",
+        }
+        return SimpleNamespace(upserted=1)
 
 
 class SlowVectorTrackingAgent(SlowIndexingAgent):
@@ -4367,6 +4384,7 @@ def test_staged_prefetch_syncs_vectors_only_from_production_index(
     assert status.status == "succeeded"
     assert agent.add_kwargs[0]["with_vectors"] is False
     assert agent.sync_calls == expected_sync_calls
+    assert agent.prepare_calls == expected_sync_calls
     if expected_sync_calls:
         assert Path(agent.sync_db_paths[0]).parent.name.startswith(".docatlas-staging-")
 
@@ -4472,6 +4490,31 @@ def test_vector_sync_failure_retains_existing_active_corpus(tmp_path, monkeypatc
     assert record_after.target_spec == record_before.target_spec
     assert record_after.last_refreshed_at == refreshed_before
     assert service.library_docs.registry_ops.count_index_entries(record_after) == (1, 1)
+
+
+def test_skipped_vector_sync_never_publishes_hybrid_library_index(tmp_path, monkeypatch):
+    agent = VectorTrackingAgent(skip_sync=True)
+    service = _service(tmp_path, monkeypatch, agent)
+    service.config.retrieval.default_mode = "hybrid"
+
+    result = service.prefetch_docs(
+        "example-docs",
+        ecosystem="web",
+        docs_url="https://example.com/docs/",
+        async_=True,
+    )
+    for _ in range(50):
+        status = service.get_docs_job_status(result.job_id)
+        if status and status.status == "failed":
+            break
+        time.sleep(0.02)
+
+    record = service.registry.get("example-docs", "web", "latest")
+    assert status is not None
+    assert status.status == "failed"
+    assert status.reason_code == "vector_indexing_failed"
+    assert record is not None
+    assert service.library_docs.registry_ops.count_index_entries(record) == (0, 0)
 
 def test_library_prefetch_job_cancellation_reaches_terminal_cancelled_state(tmp_path, monkeypatch):
     agent = SlowAgent()

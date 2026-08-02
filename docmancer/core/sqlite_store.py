@@ -385,6 +385,7 @@ class SQLiteStore:
                     retrieval_config_hash TEXT NOT NULL DEFAULT '',
                     status TEXT NOT NULL,
                     vector_collection TEXT NOT NULL,
+                    vector_backend TEXT NOT NULL DEFAULT '',
                     validation_json TEXT NOT NULL DEFAULT '{}',
                     created_at TEXT NOT NULL,
                     activated_at TEXT
@@ -519,6 +520,7 @@ class SQLiteStore:
             self._ensure_nullable_column(conn, "index_generations", "context_schema_version", "TEXT NOT NULL DEFAULT ''")
             self._ensure_nullable_column(conn, "index_generations", "context_config_hash", "TEXT NOT NULL DEFAULT ''")
             self._ensure_nullable_column(conn, "index_generations", "retrieval_config_hash", "TEXT NOT NULL DEFAULT ''")
+            self._ensure_nullable_column(conn, "index_generations", "vector_backend", "TEXT NOT NULL DEFAULT ''")
             self._ensure_nullable_column(conn, "retrieval_children", "hydration_id", "INTEGER")
             for column, declaration in (
                 ("context_prefix", "TEXT NOT NULL DEFAULT ''"),
@@ -1556,14 +1558,40 @@ class SQLiteStore:
             raise ValueError(f"invalid generation vector collection: {collection!r}")
         with self._connect() as conn:
             row = conn.execute(
-                "SELECT status FROM index_generations WHERE generation_id = ?",
+                "SELECT status, vector_backend FROM index_generations WHERE generation_id = ?",
                 (generation_id,),
             ).fetchone()
-            if row is None or row["status"] not in {"ready", "building"}:
+            mutable_candidate = bool(
+                row is not None
+                and (
+                    row["status"] in {"ready", "building"}
+                    or (row["status"] == "active" and not str(row["vector_backend"] or ""))
+                )
+            )
+            if not mutable_candidate:
                 raise ValueError("only a candidate generation collection can be changed")
             conn.execute(
                 "UPDATE index_generations SET vector_collection = ? WHERE generation_id = ?",
                 (collection, generation_id),
+            )
+
+    def set_generation_vector_backend(
+        self, generation_id: str, backend: str
+    ) -> None:
+        """Bind a generation to the backend that actually received its vectors."""
+        normalized = str(backend or "").strip().lower()
+        if normalized not in {"qdrant", "sqlite-vec"}:
+            raise ValueError(f"invalid generation vector backend: {backend!r}")
+        with self._connect() as conn:
+            row = conn.execute(
+                "SELECT status FROM index_generations WHERE generation_id = ?",
+                (generation_id,),
+            ).fetchone()
+            if row is None or row["status"] not in {"building", "ready", "active"}:
+                raise ValueError("vector backend can only be bound to a usable generation")
+            conn.execute(
+                "UPDATE index_generations SET vector_backend = ? WHERE generation_id = ?",
+                (normalized, generation_id),
             )
 
     @staticmethod

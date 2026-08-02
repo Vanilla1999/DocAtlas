@@ -15,6 +15,9 @@ class _SemanticStubProvider(EmbeddingsProvider):
     dimensions = 2
     max_batch_size = 8
 
+    def __init__(self):
+        self.query_calls = 0
+
     @staticmethod
     def _vector(text: str) -> list[float]:
         normalized = text.casefold()
@@ -26,15 +29,17 @@ class _SemanticStubProvider(EmbeddingsProvider):
         return [self._vector(text) for text in texts]
 
     def embed_query(self, query):
+        self.query_calls += 1
         return self._vector(query)
 
 
 def test_public_project_docs_query_consumes_dense_vector_index(tmp_path, monkeypatch):
     monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
     monkeypatch.setenv("DOCMANCER_AUTO_VECTORS", "1")
+    provider = _SemanticStubProvider()
     monkeypatch.setattr(
         "docmancer.embeddings.get_embeddings_provider",
-        lambda _config: _SemanticStubProvider(),
+        lambda _config: provider,
     )
 
     project = tmp_path / "project"
@@ -51,6 +56,18 @@ def test_public_project_docs_query_consumes_dense_vector_index(tmp_path, monkeyp
     agent = DocmancerAgent(config=config)
     agent.ingest_documents(
         [
+            Document(
+                source=str(project / "guide.md"),
+                content="# Guide\n\nA car guide is useful but only supporting.\n",
+                metadata={
+                    "format": "markdown",
+                    "project_path": str(project),
+                    "project_doc_path": "guide.md",
+                    "project_doc_authority": "supporting",
+                    "source_class": "project_file",
+                    "project_docs": True,
+                },
+            ),
             Document(
                 source=str(project / "architecture.md"),
                 content="# Transport\n\nThe automobile transport contract is authoritative.\n",
@@ -77,10 +94,25 @@ def test_public_project_docs_query_consumes_dense_vector_index(tmp_path, monkeyp
 
     assert chunks
     assert "automobile" in chunks[0].text
+    assert chunks[0].source.endswith("architecture.md")
+    assert provider.query_calls == 1
     trace = chunks[0].metadata["retrieval_trace"]
     assert trace["requested_mode"] == "dense"
     assert trace["mode_used"] == "dense"
     assert "dense" in trace["component_ranks"]
+
+    authoritative = service.agent_gateway.dispatcher_for(agent, mode="dense").run(
+        "car",
+        mode="dense",
+        filters={
+            "project_path": str(project),
+            "source_class": "project_file",
+            "authority": "source_of_truth",
+        },
+    )
+    assert len(authoritative.chunks) == 1
+    assert authoritative.chunks[0].source.endswith("architecture.md")
+    assert provider.query_calls == 1
 
 
 def test_public_library_query_consumes_dense_vector_index(tmp_path, monkeypatch):

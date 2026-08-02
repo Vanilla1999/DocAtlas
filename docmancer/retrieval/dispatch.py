@@ -9,6 +9,8 @@ from __future__ import annotations
 
 import logging
 import re
+import threading
+from collections import OrderedDict
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any
@@ -30,6 +32,49 @@ if TYPE_CHECKING:
     from docmancer.stores.base import VectorStore
 
 logger = logging.getLogger(__name__)
+
+
+class _CachedQueryProvider:
+    """Bound repeated public retrieval passes to one embedding per query."""
+
+    def __init__(self, provider: Any, *, max_entries: int = 16) -> None:
+        self._provider = provider
+        self._max_entries = max(1, int(max_entries))
+        self._dense: OrderedDict[str, Any] = OrderedDict()
+        self._sparse: OrderedDict[str, Any] = OrderedDict()
+        self._dense_lock = threading.RLock()
+        self._sparse_lock = threading.RLock()
+
+    def __getattr__(self, name: str) -> Any:
+        return getattr(self._provider, name)
+
+    def _cached(
+        self,
+        cache: OrderedDict[str, Any],
+        lock: threading.RLock,
+        query: str,
+        build: Any,
+    ) -> Any:
+        with lock:
+            if query in cache:
+                value = cache.pop(query)
+                cache[query] = value
+                return value
+            value = build(query)
+            cache[query] = value
+            while len(cache) > self._max_entries:
+                cache.popitem(last=False)
+            return value
+
+    def embed_query(self, query: str) -> list[float]:
+        return self._cached(
+            self._dense, self._dense_lock, query, self._provider.embed_query
+        )
+
+    def embed_sparse_query(self, query: str) -> Any:
+        return self._cached(
+            self._sparse, self._sparse_lock, query, self._provider.embed_sparse_query
+        )
 
 
 @dataclass
@@ -73,7 +118,7 @@ class RetrievalDispatcher:
         self.store = store
         self.config = config
         self.vector_store = vector_store
-        self.provider = provider
+        self.provider = _CachedQueryProvider(provider) if provider is not None else None
         self.collection = collection
         self._auto_hierarchical_cache: bool | None = None
 
@@ -148,8 +193,6 @@ class RetrievalDispatcher:
                     metadata["retrieval_trace"] = {
                         "requested_mode": effective_mode,
                         "mode_used": result.mode_used,
-                        "candidate_counts": dict(result.candidate_counts),
-                        "failures": dict(result.failures),
                         "component_ranks": dict(result.contributions.get(section_id, {})),
                         "pre_post_rank": metadata.pop("_pre_post_rank", final_rank),
                         "intent_boost": metadata.pop("_intent_boost", 0.0),

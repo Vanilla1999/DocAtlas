@@ -35,6 +35,7 @@ def test_filter_plan_parses_false_and_compiles_hard_constraints():
     assert compiled["source_class"] == {"in": ["project_doc"]}
     assert compiled["docs_snapshot_exact"] is True
     assert "verified" in compiled["authority"]["in"]
+    assert "source_of_truth" in compiled["authority"]["in"]
     assert "community" not in compiled["authority"]["in"]
 
 
@@ -177,3 +178,10 @@ def test_unknown_authority_is_not_embedding_noise_and_boolean_is_strict():
     assert normalized_filter_metadata({"docs_snapshot_exact": "invalid"})[
         "docs_snapshot_exact"
     ] is None
+
+
+@pytest.mark.parametrize("authority", ["source_of_truth", "supporting"])
+def test_project_catalog_authority_survives_filter_normalization(authority):
+    normalized = normalized_filter_metadata({"project_doc_authority": authority})
+
+    assert normalized["authority"] == authority

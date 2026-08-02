@@ -38,12 +38,16 @@ _PATH_ROOTS = frozenset({
 _AUTHORITY_MINIMUMS = {
     "unknown": (
         "unknown", "stale", "external_generic", "mirror", "generated",
-        "community", "verified", "legal", "project_rule", "project_owned", "official",
+        "community", "supporting", "verified", "legal", "project_rule",
+        "source_of_truth", "project_owned", "official",
     ),
-    "community": ("community", "verified", "project_rule", "project_owned", "official"),
-    "verified": ("verified", "project_rule", "project_owned", "official"),
-    "project_rule": ("project_rule", "project_owned", "official"),
-    "project_owned": ("project_owned", "official"),
+    "community": (
+        "community", "supporting", "verified", "project_rule",
+        "source_of_truth", "project_owned", "official",
+    ),
+    "verified": ("verified", "project_rule", "source_of_truth", "project_owned", "official"),
+    "project_rule": ("project_rule", "source_of_truth", "project_owned", "official"),
+    "project_owned": ("source_of_truth", "project_owned", "official"),
     "official": ("official",),
     "legal": ("legal",),
 }
@@ -217,6 +221,9 @@ def metadata_matches_filters(
     """Defense-in-depth evaluator shared by lexical and vector results."""
     spec = _filter_spec(filters)
     values = dict(metadata)
+    # Hydrated chunks retain source-owned project catalog metadata, while
+    # vector payloads expose its normalized promoted filter field.
+    values.setdefault("authority", values.get("project_doc_authority"))
     values.setdefault("source", source)
     for key, expected in compile_backend_filters(filters).items():
         actual = values.get(key)
