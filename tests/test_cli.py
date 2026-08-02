@@ -4,6 +4,7 @@ from pathlib import Path
 import subprocess
 from unittest.mock import MagicMock, patch
 
+import pytest
 import yaml
 from click.testing import CliRunner
 
@@ -338,7 +339,10 @@ def test_context_cli_uses_project_local_storage_topology(tmp_path):
     )
 
 
-def test_context_cli_explicit_config_overrides_project_local_storage_topology(tmp_path):
+@pytest.mark.parametrize("config_placement", ["command", "group"])
+def test_context_cli_explicit_config_overrides_project_local_storage_topology(
+    tmp_path, config_placement
+):
     from docmancer.core.config import DocmancerConfig
     from docmancer.docs.models import ProjectContextResult
 
@@ -362,23 +366,26 @@ def test_context_cli_explicit_config_overrides_project_local_storage_topology(tm
         def get_project_context(self, project_path, question, **_kwargs):
             return ProjectContextResult(project_path=project_path, question=question)
 
-    with patch("docmancer.cli.commands._load_config", return_value=fallback), patch(
+    with patch(
+        "docmancer.cli.commands._load_config", return_value=fallback
+    ) as load_config, patch(
         "docmancer.docs.service.LibraryDocsService", CapturingService
     ):
-        result = CliRunner().invoke(
-            cli,
-            [
-                "context",
-                str(project),
-                "Where is the index?",
-                "--config",
-                str(explicit_config),
-                "--format",
-                "json",
-            ],
-        )
+        context_args = [
+            "context",
+            str(project),
+            "Where is the index?",
+            "--format",
+            "json",
+        ]
+        if config_placement == "command":
+            context_args.extend(["--config", str(explicit_config)])
+        else:
+            context_args = ["--config", str(explicit_config), *context_args]
+        result = CliRunner().invoke(cli, context_args)
 
     assert result.exit_code == 0, result.output
+    load_config.assert_called_once_with(str(explicit_config))
     assert captured["db_path"] == str(tmp_path / "runtime.db")
     assert captured["library_index_root"] is None
 

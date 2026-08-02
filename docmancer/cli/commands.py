@@ -1841,14 +1841,15 @@ def context_cmd(
 
     from docmancer.core.storage_topology import StorageTopologyResolver
 
-    fallback_config = _load_config(_effective_config(config_path))
+    effective_config_path = _effective_config(config_path)
+    fallback_config = _load_config(effective_config_path)
     topology = StorageTopologyResolver(
         fallback_config=fallback_config,
         # An explicit --config is an operator decision.  In particular,
         # read-only sandboxes use it to keep runtime indexes outside the
         # mounted project checkout.  Implicit discovery continues to prefer a
         # project's own docmancer.yaml.
-        prefer_fallback=config_path is not None,
+        prefer_fallback=effective_config_path is not None,
     ).resolve(project_path)
     result = LibraryDocsService(
         config=topology.config,
