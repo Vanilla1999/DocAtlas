@@ -193,14 +193,17 @@ def test_dispatcher_is_reused_until_library_agent_is_dropped(tmp_path, monkeypat
 
     first = gateway.dispatcher_for(agent)
     second = gateway.dispatcher_for(agent)
+    agent.config.vector_store.options = {"db_path": str(tmp_path / "changed-vectors.db")}
+    reconfigured = gateway.dispatcher_for(agent)
     gateway.drop_library_agent(record)
     replacement = gateway.agent_instance(record)
     replacement.store = object()
     third = gateway.dispatcher_for(replacement)
 
     assert first is second
+    assert reconfigured is not first
     assert third is not first
-    assert len(builds) == 2
+    assert len(builds) == 3
 
 
 def test_query_library_preserves_the_canonical_requirement_set_for_dispatch(tmp_path, monkeypatch):

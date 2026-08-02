@@ -324,7 +324,7 @@
     "tests/test_context.py": "194d60ff4d706db408792c83a7e82d7c38e93def2077ca98d5bb215909ba7924",
     "tests/test_context7_parity_eval.py": "3a0b48231848ea1f88af7fc3e14b6e1848516bac885c719ff6c982cde9d2b8de",
     "tests/test_context7_snapshot_benchmark.py": "23e20709bf21d24e0d2fd1eba8793924cddb8d2d650d6e3e5e9ed1e2120fdd3c",
-    "tests/test_contextual_indexing.py": "ae9ba0fd727fc827cb8699cabae8599249fb8eff5da3e7729dcf8db2bbf69cb9",
+    "tests/test_contextual_indexing.py": "3c9efd85d5ec787d062116230bdc543a828e348380ed2db39800be7557b4f416",
     "tests/test_crawl4ai_fetcher.py": "39db99ed0bf8a85f88c5a0be626b15aa2be639099be3bed7d512f86daaa42d5c",
     "tests/test_cross_index_retrieval_mvp.py": "b13d8a4cee44860a003502a2874a65d598ce2033c111ae1e0b1c39626e368e08",
     "tests/test_dart_service_integration.py": "27e08ad0bea2ad6ab89c62bf066844f855e4b56d706b97d47de4d74bff21bb70",
@@ -334,7 +334,7 @@
     "tests/test_diagnostic_labels.py": "2541bcbef04f82d3150b1d8e157bcb3429e3f682a371ae786617ea3469ee5e71",
     "tests/test_docs_fetch_policy.py": "459dd705084400309d32fc5bccd9c0a1daaab44cc3f5e2b0908ce13bde92404e",
     "tests/test_docs_fetch_transport.py": "47d1e2e10d0e792f72d88c655639acebd47f02796faf4e9d5783f990b5b8679c",
-    "tests/test_docs_service.py": "3fec93fb441644042d232cd055462d88e1b599d4412964af655a0ee39027a56c",
+    "tests/test_docs_service.py": "7219b8f693391aedbdc6bc1281a072265be8198dd98b98e35eb45e80fc1214f9",
     "tests/test_embeddings.py": "87831bc93d36b9d1bae033628e5235ec9917b6854b4a05b21ecbbb47c84a13c7",
     "tests/test_embeddings_pipeline.py": "d6c8ae78edc278ec3a73e055a8dc985fe28063fade8f0adc6f22a0a0bf611f0c",
     "tests/test_eval.py": "c65ac3b2b2f25b29df1beb4dd25431a6d7c78b6dcbe679c98eb9a8705f1467d1",
@@ -430,7 +430,7 @@
     "tests/test_unified_docs_context.py": "a145ab06eaa75a036cb16942336a3fec94b815a4b4325003d64e510edd8d0bfa",
     "tests/test_unified_docs_context_mcp.py": "64db5341937ca57e0d12630f698a71d9217e5d769aa4b618e6d18e73a5219b03",
     "tests/test_uspto_tm.py": "92f3214036e4547c97bfe9c55398e9f137756c3813fd5d0e9f4497a18f3dc2e1",
-    "tests/test_vector_fallback.py": "c026f449f14d09cecd080b131a10d390bebfa94d85b502339e33646597ae40c2",
+    "tests/test_vector_fallback.py": "44f6de6da958441969f465a6e9537a6ebce4cb24a12de6a34e04eb8831258513",
     "tests/test_web_fetcher.py": "110ac6b4c8a415776f5b37f93c8f91283a3ecad7d25ee455e3d144aa79bc24f1"
   },
   "node_overrides": {

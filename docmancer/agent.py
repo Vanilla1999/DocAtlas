@@ -114,15 +114,7 @@ class DocmancerAgent:
         if with_vectors:
             try:
                 if result.generation_id:
-                    info = self.store.generation_info(result.generation_id) or {}
-                    collection = (
-                        f"{self._base_vector_collection_name()}_pc_"
-                        f"{str(info.get('retrieval_config_hash') or info.get('config_hash') or '')[:12]}_"
-                        f"{str(result.generation_id).removeprefix('gen-')[:12]}"
-                    )
-                    self.store.set_generation_vector_collection(
-                        result.generation_id, collection
-                    )
+                    self.prepare_vector_generation(result.generation_id)
                     synced = self._sync_vectors_if_enabled(
                         generation_id=result.generation_id,
                         prune_stale=False,
@@ -203,6 +195,21 @@ class DocmancerAgent:
         if generation and generation.get("vector_collection"):
             return str(generation["vector_collection"])
         return self._base_vector_collection_name()
+
+    def prepare_vector_generation(self, generation_id: str | None = None) -> str:
+        """Assign a unique collection before a candidate generation is synchronized."""
+        target = generation_id or self.store.active_generation_id()
+        if not target:
+            raise RuntimeError("cannot prepare vectors without an index generation")
+        info = self.store.generation_info(target) or {}
+        base = self._base_vector_collection_name()[:180].rstrip("._-") or "docmancer"
+        collection = (
+            f"{base}_pc_"
+            f"{str(info.get('retrieval_config_hash') or info.get('config_hash') or '')[:12]}_"
+            f"{str(target).removeprefix('gen-')[:12]}"
+        )
+        self.store.set_generation_vector_collection(target, collection)
+        return collection
 
     def _vector_retrieval_required(self) -> bool:
         mode = str(getattr(self.config.retrieval, "default_mode", "lexical") or "lexical").lower()
@@ -331,6 +338,11 @@ class DocmancerAgent:
             str(generation_info["vector_collection"])
             if generation_info else self._vector_collection_name()
         )
+        self.last_vector_sync_metrics = {
+            "status": "syncing",
+            "vector_backend": vs_config.provider,
+            "collection": collection,
+        }
         result = sync_vector_store(
             store=self.store,
             config=self.config,
@@ -354,6 +366,9 @@ class DocmancerAgent:
                     "candidate vector collection parity failed: "
                     f"expected={expected}, actual={actual}, collection={collection}"
                 )
+            set_backend = getattr(self.store, "set_generation_vector_backend", None)
+            if callable(set_backend):
+                set_backend(generation_id, vs_config.provider)
             if prune_stale and generation_id == self.store.active_generation_id():
                 removable: list[str] = []
                 for candidate in self.store.superseded_generation_candidates(retain=1):
@@ -372,7 +387,11 @@ class DocmancerAgent:
                     removable.append(stale_generation)
                 if removable:
                     self.store.delete_superseded_generations(removable)
-        self.last_vector_sync_metrics = {"status": "success", **asdict(result)}
+        self.last_vector_sync_metrics = {
+            "status": "success",
+            "vector_backend": vs_config.provider,
+            **asdict(result),
+        }
         logger.info(
             "vectors: embedded=%d upserted=%d cache_hits=%d unchanged=%d pruned=%d",
             result.embedded,
@@ -382,6 +401,45 @@ class DocmancerAgent:
             result.pruned,
         )
         return result
+
+    def discard_vector_generation(self, generation_id: str | None = None) -> bool:
+        """Best-effort cleanup for an unpublished candidate vector collection."""
+        info = self.store.generation_info(generation_id) or {}
+        collection = str(
+            info.get("vector_collection")
+            or self.last_vector_sync_metrics.get("collection")
+            or ""
+        )
+        backend = str(
+            info.get("vector_backend")
+            or self.last_vector_sync_metrics.get("vector_backend")
+            or ""
+        ).lower()
+        if not collection or backend not in {"qdrant", "sqlite-vec"}:
+            return False
+        try:
+            from docmancer.runtime.qdrant_manager import ensure_running
+            from docmancer.stores.base import get_vector_store
+
+            vector_config = self.config.vector_store.model_copy(update={"provider": backend})
+            if backend == "qdrant" and not vector_config.url:
+                resolution = ensure_running()
+                if resolution.fallback or not resolution.url:
+                    return False
+                vector_config = vector_config.model_copy(update={"url": resolution.url})
+            vector_store = get_vector_store(
+                vector_config,
+                embeddings_dim=self.config.embeddings.dimensions,
+            )
+            vector_store.delete_collection(collection)
+            return True
+        except Exception as exc:
+            logger.warning(
+                "candidate vector collection cleanup deferred for %s: %s",
+                collection,
+                exc,
+            )
+            return False
 
     def sync_vectors(self) -> Any | None:
         """Synchronize the committed SQLite index into its production vector collection."""

@@ -28,6 +28,8 @@ _AUTHORITIES = {
     "mirror",
     "external_generic",
     "project_rule",
+    "source_of_truth",
+    "supporting",
 }
 _SYMBOL_PATTERNS = (
     re.compile(r"(?<![\w.-])--[a-zA-Z][a-zA-Z0-9-]{1,118}"),

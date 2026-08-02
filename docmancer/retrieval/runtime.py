@@ -33,8 +33,16 @@ def dispatcher_for_agent(agent: Any, *, mode: str | None = None) -> RetrievalDis
         from docmancer.stores.base import get_vector_store
 
         vector_config = config.vector_store
+        generation_info = agent.store.generation_info() or {}
+        persisted_backend = str(generation_info.get("vector_backend") or "").strip().lower()
+        if persisted_backend:
+            vector_config = vector_config.model_copy(update={"provider": persisted_backend})
         if vector_config.provider == "qdrant" and not vector_config.url:
             resolution = ensure_running()
+            if persisted_backend == "qdrant" and (resolution.fallback or not resolution.url):
+                raise RuntimeError(
+                    "active generation requires qdrant, but its managed backend is unavailable"
+                )
             if resolution.fallback or not resolution.url:
                 vector_config = vector_config.model_copy(update={"provider": "sqlite-vec"})
             else:

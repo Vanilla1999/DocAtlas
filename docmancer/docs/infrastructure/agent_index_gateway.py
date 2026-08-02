@@ -14,6 +14,7 @@ from docmancer.docs.registry import LibraryRecord
 from docmancer.docs.resolver import normalize_library_name
 from docmancer.mcp import paths
 from docmancer.retrieval.runtime import dispatcher_for_agent, effective_retrieval_mode
+from docmancer.retrieval.contracts import canonical_hash
 
 
 @dataclass(frozen=True, slots=True)
@@ -105,8 +106,10 @@ class AgentIndexGateway:
             collection,
             getattr(embeddings, "provider", None),
             getattr(embeddings, "model", None),
+            getattr(embeddings, "dimensions", None),
             getattr(vector_store, "provider", None),
             getattr(vector_store, "url", None),
+            canonical_hash(getattr(vector_store, "options", {}) or {}),
         )
         cached = self._retrieval_dispatchers.get(id(agent))
         if cached is not None and cached[0] == cache_key:
