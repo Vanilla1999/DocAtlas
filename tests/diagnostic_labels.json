@@ -317,7 +317,7 @@
     "tests/test_auto_detection.py": "0c1e25884dfc37bda72697d72d47cd66c4c3dcbd6d8c86bc65564d8771381306",
     "tests/test_browser.py": "28f85f5e338990e9cdb1605b079fa2782541d1cceaeb75b5700c24a4bcae7ed9",
     "tests/test_chunking.py": "5bbea5b86199b20b12735ece44ac7cd1ce96e3205afe2eadd04893b4171f6ee0",
-    "tests/test_cli.py": "c06998e947fce0e796a1acb8844a0a324c9b6e0dc8f6082dd99b74fc58bb1202",
+    "tests/test_cli.py": "7cf7592f9a80c958bcefd8c0c22f10091e46e1ed709d93f3b119f381d152e1d0",
     "tests/test_client.py": "6087d915bf583abe27e9a3a7b2ca6beb09da76d1baefb07dd74f149f2f59ac70",
     "tests/test_config.py": "da49502ed0972309a38e657aff4623f08e43c922164bf691eff2141944360a50",
     "tests/test_context.py": "194d60ff4d706db408792c83a7e82d7c38e93def2077ca98d5bb215909ba7924",
