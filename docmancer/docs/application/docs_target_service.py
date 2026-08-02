@@ -25,6 +25,7 @@ from docmancer.docs.github_source_manifest import (
     resolve_github_directory_manifest,
 )
 from docmancer.docs.manifest_contract import manifest_v2_target_from_flat
+from docmancer.docs.documentation_evidence import assess_documentation_evidence
 
 
 class DocsTargetJobs(Protocol):
@@ -279,6 +280,15 @@ class DocsTargetService:
             **self.target_to_spec(effective_target),
             "max_pages": max(1, min(500, int(target.max_pages or 50))),
         }
+        evidence_report = assess_documentation_evidence(
+            library=effective_target.library,
+            ecosystem=effective_target.ecosystem,
+            docs_url=effective_target.docs_url or (explicit_urls[0] if explicit_urls else None),
+            authority=effective_target.authority,
+            requested_version=effective_target.version,
+            version_binding=effective_target.version_binding,
+            version_source=str(effective_target.version_evidence.get("source") or "") or None,
+        )
         return DocsTargetInspectionResult(
             status="ok" if len(successful) == len(pages) else "partial" if successful else "failed",
             reason_code=reason_code,
@@ -319,6 +329,7 @@ class DocsTargetService:
                 }
                 if successful else None
             ),
+            evidence_report=evidence_report.to_dict(),
         )
 
     @staticmethod

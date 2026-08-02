@@ -167,6 +167,23 @@ def project_version_for(
             )
         return None, None, None, warnings, observation.specifier_raw, False, observation.version_source, "go_resolution_required"
 
+    if observation and observation.ecosystem == "maven":
+        warnings.extend(observation.warnings)
+        if observation.source_kind != "registry" or not observation.resolved_version:
+            return None, None, None, warnings, observation.specifier_raw, False, observation.version_source, "java_resolution_required"
+        group, artifact = library.split(":", 1)
+        version = observation.resolved_version
+        return (
+            version,
+            f"https://javadoc.io/doc/{group}/{artifact}/{version}/",
+            None,
+            warnings,
+            observation.specifier_raw or version,
+            True,
+            observation.version_source,
+            "maven_central_javadoc",
+        )
+
     if ecosystem == "pub" or library in metadata.packages:
         version = metadata.packages.get(library)
         if version and (observation is None or observation.source_kind == "registry"):

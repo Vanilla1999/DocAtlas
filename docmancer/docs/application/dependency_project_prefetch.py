@@ -86,6 +86,26 @@ class DependencyProjectPrefetch:
                     coverage="bounded",
                 ))
                 continue
+            maven_version = metadata.packages.get(f"maven:{package}")
+            if maven_version:
+                group, artifact = package.split(":", 1)
+                targets.append(DocsTarget(
+                    library=package,
+                    ecosystem="maven",
+                    version=maven_version,
+                    docs_url=f"https://javadoc.io/doc/{group}/{artifact}/{maven_version}/",
+                    source_type="api",
+                    doc_format="javadoc",
+                    allowed_domains=["javadoc.io"],
+                    path_prefixes=[f"/doc/{group}/{artifact}/{maven_version}/"],
+                    identity={"kind": "package", "ecosystem": "maven", "namespace": group, "name": artifact},
+                    authority="registry_mirror",
+                    version_policy="exact",
+                    version_binding="exact",
+                    version_evidence={"source": "gradle.lockfile_exact"},
+                    coverage="bounded",
+                ))
+                continue
             rust_version = metadata.packages.get(f"rust:{package}")
             if rust_version and include_rust:
                 targets.append(DocsTarget(
@@ -118,6 +138,18 @@ class DependencyProjectPrefetch:
                         break
                     continue
                 targets.append(target)
+                continue
+            python_version = metadata.packages.get(f"python:{package}")
+            if python_version:
+                record = self.registry.get(package, ecosystem="python", version=python_version, source_type="api")
+                if not record or not record.allowed_domains:
+                    warnings.append(
+                        f"{package}: Python {python_version} is resolved, but documentation authority/scope is not registered; inspect and confirm a manifest target."
+                    )
+                    if not continue_on_error:
+                        break
+                    continue
+                targets.append(self._target_from_record(record))
                 continue
             version = metadata.packages.get(package)
             if not version:

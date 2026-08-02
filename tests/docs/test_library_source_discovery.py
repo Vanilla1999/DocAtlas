@@ -104,3 +104,27 @@ def test_go_discovery_requires_a_full_safe_module_path() -> None:
 
     assert result["status"] == "invalid_package_identity"
     assert result["candidates"] == []
+
+
+def test_maven_discovery_requires_coordinate_and_resolved_version() -> None:
+    unresolved = discover_library_docs_sources("jackson-databind", "maven")
+    missing_version = discover_library_docs_sources(
+        "com.fasterxml.jackson.core:jackson-databind", "maven"
+    )
+
+    assert unresolved["status"] == "invalid_package_identity"
+    assert missing_version["status"] == "version_resolution_required"
+
+
+def test_maven_discovery_exposes_exact_but_confirmable_javadoc_evidence() -> None:
+    result = discover_library_docs_sources(
+        "com.fasterxml.jackson.core:jackson-databind", "maven", "2.17.2"
+    )
+
+    candidate = result["candidates"][0]
+    assert candidate["docs_url"] == (
+        "https://javadoc.io/doc/com.fasterxml.jackson.core/jackson-databind/2.17.2/"
+    )
+    assert candidate["evidence"]["version"]["status"] == "confirmed"
+    assert candidate["evidence"]["authority"]["status"] == "unconfirmed"
+    assert candidate["evidence_decision"] == "confirm"

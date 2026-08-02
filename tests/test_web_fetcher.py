@@ -75,6 +75,28 @@ def test_godoc_extraction_keeps_package_symbols_and_drops_navigation():
     assert "Repository metadata" not in content
 
 
+def test_javadoc_extraction_keeps_api_members_and_drops_navigation():
+    html = """
+    <html><body><header>Search</header><nav>Packages Classes</nav><main>
+      <section class="class-description"><h1>Class ObjectMapper</h1>
+      <p>Provides functionality for reading and writing JSON.</p></section>
+      <section><h2>Method Summary</h2><code>readValue(String content)</code></section>
+      <footer>Copyright</footer>
+    </main></body></html>
+    """
+
+    content = extract_content(
+        html,
+        url="https://javadoc.io/doc/example/object-mapper/1.0/",
+        doc_format="javadoc",
+    )
+
+    assert "Class ObjectMapper" in content
+    assert "readValue" in content
+    assert "Packages Classes" not in content
+    assert "Copyright" not in content
+
+
 def test_every_http_client_inherits_the_absolute_ingest_deadline():
     raw_client = MagicMock()
     deadline_at = 1234.5
