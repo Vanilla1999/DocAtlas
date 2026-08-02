@@ -67,6 +67,7 @@ def test_mcp_public_prepare_docs_advertises_project_local_library_removal():
     assert "remove_library_docs" in schema["properties"]["action"]["enum"]
     assert "canonical_id" in schema["properties"]
     assert "project_path" in schema["properties"]
+    assert "discover_library_docs" in schema["properties"]["action"]["enum"]
 
 
 def test_mcp_public_prepare_docs_schema_requires_removal_scope_and_target():

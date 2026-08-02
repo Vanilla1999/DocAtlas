@@ -40,13 +40,17 @@ Docmancer compresses documentation context so coding agents spend tokens on code
 
 ## Workflow
 
-1. **Check indexed docs:** `doc-atlas list`
-2. **Query existing docs:** `doc-atlas query "<question>"`
-3. **Index local docs if needed:** `doc-atlas ingest <path>`
-4. **Fetch URL docs if needed:** `doc-atlas add <url>`
-5. **Use the returned context** to ground your response with source-attributed sections.
+For an installed Docs MCP, use the three-tool contract:
 
-For MCP docs tools, registered sources are registry-owned. If `get_docs_context` returns candidates or `next_actions`, retry through DocAtlas with the returned arguments and guidance. Never WebFetch registered docs before that retry.
+1. Call `get_docs_context(question=..., project_path=... or library=...)` once.
+2. If it returns `recommended_next_action`, follow only that typed action. Ask for confirmation before network work.
+3. For an unknown library source, use the returned `prepare_docs(action="discover_library_docs", ...)` action; review its registry-derived candidates before prefetching one.
+4. Retry the original `get_docs_context` question unchanged after preparation.
+5. Use `docs_status` only for an explicit health, freshness, index, or job-status request.
+
+Do not begin the MCP workflow with `doc-atlas list`, raw CLI ingestion, WebFetch, or speculative `prepare_docs`. Registered sources are registry-owned.
+
+Use the CLI flow below only when the Docs MCP is unavailable or the user explicitly requests direct index administration.
 
 ## Core Commands
 
@@ -83,13 +87,13 @@ Use `add` for documentation URLs and GitHub repositories.
 | `--browser` | Playwright fallback for JS-heavy sites |
 | `--recreate` | Drop and rebuild the index |
 
-### Query Documentation
+### Query Documentation (CLI fallback)
 
 ```bash
 doc-atlas query "<question>"
 ```
 
-Returns a compact markdown context pack with source attribution and token savings. This is the primary command agents should call.
+Returns a compact markdown context pack with source attribution and token savings for CLI-only workflows. MCP-enabled agents should use `get_docs_context` instead.
 
 | Flag | Purpose |
 |------|---------|
@@ -138,7 +142,7 @@ For repository-specific architecture, conventions, runbooks, roadmap, README/wik
 
 - Do not use `doc-atlas add` for new local files. Use `doc-atlas ingest <path>`.
 - Do not use `doc-atlas ingest` for URLs. Use `doc-atlas add <url>`.
-- Do not run `doc-atlas query` before checking indexed sources with `doc-atlas list`.
+- Do not mix the legacy CLI list/query loop into an MCP-enabled coding task.
 - Do not assume docs are indexed. Always verify with `doc-atlas list` before querying.
 - Do not WebFetch registered docs when DocAtlas returns candidates or retry guidance. Retry `get_docs_context` first.
 - Do not call `prepare_docs` speculatively; follow the context response or an explicit lifecycle request.

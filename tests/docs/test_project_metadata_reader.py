@@ -515,6 +515,27 @@ def test_pub_custom_hosted_dependency_is_not_bound_to_pubdev(tmp_path: Path) -> 
     assert any("custom_hosted" in warning for warning in warnings)
 
 
+def test_project_metadata_exposes_shared_dart_package_source_roots(tmp_path: Path) -> None:
+    root = tmp_path / "dart_repo"
+    dependency = tmp_path / "pub-cache" / "sample-1.2.3"
+    (root / ".dart_tool").mkdir(parents=True)
+    dependency.mkdir(parents=True)
+    (root / ".dart_tool/package_config.json").write_text(
+        json.dumps({
+            "configVersion": 2,
+            "packages": [
+                {"name": "app", "rootUri": "../../dart_repo"},
+                {"name": "sample", "rootUri": dependency.as_uri()},
+            ],
+        }),
+        encoding="utf-8",
+    )
+
+    metadata = ProjectMetadataReader().read(root)
+
+    assert metadata.dependency_source_roots == {"pub:sample": str(dependency.resolve())}
+
+
 def test_node_manifest_ranges_are_never_reported_as_exact_without_lockfile(tmp_path: Path) -> None:
     root = tmp_path / "range_only_repo"
     root.mkdir()

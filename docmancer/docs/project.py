@@ -9,6 +9,7 @@ from typing import Any
 from urllib.parse import unquote, urlsplit
 
 from docmancer.docs.cargo_project import read_cargo_project
+from docmancer.docs.dart_package_config import resolve_dart_package_roots
 from docmancer.docs.models import DependencyObservation, ProjectDocsCandidate, ProjectMetadata, SOURCE_CLASS_PROJECT_FILE
 from docmancer.docs.node_project import read_node_project
 from docmancer.docs.python_project import read_python_project
@@ -98,6 +99,8 @@ class ProjectMetadataReader:
         cargo_packages, rust_observations = read_cargo_project(root, warnings)
         npm_packages, npm_direct_dependencies, npm_observations = read_node_project(root, warnings)
         python_packages, python_direct_dependencies, python_observations = read_python_project(root, warnings)
+        dart_package_roots, dart_root_warnings = resolve_dart_package_roots(root)
+        warnings.extend(dart_root_warnings)
         catalog = read_project_docs_catalog(root)
         warnings.extend(catalog.warnings)
         if catalog.present:
@@ -124,6 +127,11 @@ class ProjectMetadataReader:
             packages=all_packages,
             direct_dependencies=direct_dependencies,
             dependencies=dependencies,
+            dependency_source_roots={
+                f"pub:{name}": str(path)
+                for name, path in sorted(dart_package_roots.items())
+                if path != root
+            },
             docs_candidates=docs_candidates,
             detected_ecosystems=detected_ecosystems,
             warnings=warnings,

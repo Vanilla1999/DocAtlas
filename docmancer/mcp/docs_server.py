@@ -212,7 +212,7 @@ Agent workflow:
         "inputSchema": {
             "type": "object",
             "properties": {
-                "action": {"type": "string", "enum": ["sync_project_docs", "prefetch_project_dependency_docs", "prefetch_library_docs", "prefetch_docs_targets", "inspect_docs_target", "validate_docs_manifest", "prefetch_docs_manifest", "refresh_library_docs", "prune_library_docs", "remove_library_docs", "clear_index", "cancel_docs_job"]},
+                "action": {"type": "string", "enum": ["sync_project_docs", "prefetch_project_dependency_docs", "prefetch_library_docs", "discover_library_docs", "prefetch_docs_targets", "inspect_docs_target", "validate_docs_manifest", "prefetch_docs_manifest", "refresh_library_docs", "prune_library_docs", "remove_library_docs", "clear_index", "cancel_docs_job"]},
                 "project_path": {"type": ["string", "null"]},
                 "scope": {"type": ["string", "null"], "enum": ["project-local", None]},
                 "confirm": {"type": ["boolean", "null"], "default": False},
@@ -832,7 +832,7 @@ PUBLIC_ADVERTISED_INPUT_SCHEMAS: dict[str, dict[str, Any]] = {
                 "type": "string",
                 "enum": [
                     "sync_project_docs", "prefetch_project_dependency_docs",
-                    "prefetch_library_docs",
+                    "prefetch_library_docs", "discover_library_docs",
                     "validate_docs_manifest", "prefetch_docs_manifest",
                     "refresh_library_docs", "prune_library_docs",
                     "remove_library_docs", "clear_index", "cancel_docs_job",

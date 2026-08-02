@@ -123,4 +123,15 @@ def test_discovery_candidates_include_next_action(tmp_path):
         "reason": "Use the first discovered candidate only after user confirmation.",
         "arguments_patch": {"docs_url": "https://github.com/modelcontextprotocol/python-sdk", "ecosystem": "python"},
     }
-    assert result.next_actions[2]["type"] == "best_effort_web_discovery"
+    assert result.next_actions[2] == {
+        "type": "discover_library_docs",
+        "tool": "prepare_docs",
+        "requires_confirmation": True,
+        "reason": "Query bounded package-registry metadata when the user cannot provide an authoritative docs_url.",
+        "arguments_patch": {
+            "action": "discover_library_docs",
+            "library": "mcp",
+            "ecosystem": "python",
+            "version": None,
+        },
+    }

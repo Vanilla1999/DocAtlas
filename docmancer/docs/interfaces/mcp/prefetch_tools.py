@@ -27,6 +27,7 @@ _PREPARE_ACTION_FIELDS = {
     },
     "prefetch_project_dependency_docs": {"action", "project_path", "include_flutter", "include_dart", "include_rust", "include_packages", "force_refresh", "continue_on_error", "async"},
     "prefetch_library_docs": {"action", "library", "ecosystem", "version", "source_type", "docs_url", "docs_url_template", "force_refresh", "continue_on_error", "async", "question"},
+    "discover_library_docs": {"action", "library", "ecosystem", "version"},
     "prefetch_docs_targets": {"action", "targets", "force_refresh", "continue_on_error", "async"},
     "inspect_docs_target": {"action", "target", "max_pages"},
     "validate_docs_manifest": {"action", "manifest_path", "project_path", "targets"},
@@ -41,6 +42,7 @@ _PREPARE_REQUIRED_FIELDS = {
     "sync_project_docs": {"project_path"},
     "prefetch_project_dependency_docs": {"project_path"},
     "prefetch_library_docs": {"library"},
+    "discover_library_docs": {"library", "ecosystem"},
     "prefetch_docs_targets": {"targets"},
     "inspect_docs_target": {"target"},
     "validate_docs_manifest": {"manifest_path"},
@@ -326,6 +328,12 @@ def handle_prefetch_tool(name: str, args: dict[str, Any], service: LibraryDocsSe
             # Public MCP calls must not block the server while a remote source is crawled.
             versions = [args["version"]] if args.get("version") else None
             payload = asdict(library_docs_app.prefetch_docs(args["library"], ecosystem=args.get("ecosystem"), versions=versions, docs_url=args.get("docs_url"), docs_url_template=args.get("docs_url_template"), source_type=args.get("source_type"), force_refresh=bool(args.get("force_refresh") or False), continue_on_error=bool(args.get("continue_on_error") if args.get("continue_on_error") is not None else True), async_=True, query=args.get("question")))
+        elif action == "discover_library_docs":
+            from docmancer.docs.application.library_source_discovery import discover_library_docs_sources
+
+            payload = discover_library_docs_sources(
+                args["library"], args.get("ecosystem"), args.get("version")
+            )
         elif action == "refresh_library_docs":
             versions = [args["version"]] if args.get("version") else None
             payload = asdict(library_docs_app.prefetch_docs(args["library"], ecosystem=args.get("ecosystem"), versions=versions, docs_url=args.get("docs_url"), docs_url_template=args.get("docs_url_template"), source_type=args.get("source_type"), force_refresh=bool(args.get("force") if args.get("force") is not None else True), continue_on_error=True, async_=True))

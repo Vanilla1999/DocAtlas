@@ -109,6 +109,10 @@ An optional provider-neutral [one-call host-loop contract](./docs/one-call-agent
 4. indexes new and changed candidates;
 5. returns `current_count`, `new_count`, `changed_count`, `orphaned_removed`, and `indexed_sources`.
 
+For an unknown library, DocAtlas does not guess a documentation site silently. It asks for a source and offers `prepare_docs(action="discover_library_docs", ...)`. After approval, this action reads bounded package-registry metadata (PyPI or npm) or constructs the canonical Pub/docs.rs API URL, returns reviewable candidates, and requires confirmation before indexing one. If registry metadata has no authoritative docs URL, the response explains that `docs_url` must be supplied manually.
+
+Forced/background library refreshes are staged before publication. When the fetched source set and content hashes match the active corpus, DocAtlas discards the candidate index and skips vector synchronization and embedding work with `reason_code="corpus_unchanged"`. Changed, removed, or canonicalized pages still produce a different corpus digest and follow the normal atomic publish path.
+
 ### Compact MCP responses
 
 All project-docs lifecycle tools return compact responses by default:
@@ -172,9 +176,11 @@ Qdrant administration, USPTO ingestion, and benchmark operations are **maintenan
 
 ## Project-aware exact dependency docs
 
-DocAtlas can inspect a local Flutter/Dart project. It reads `.fvmrc` for Flutter channel/version hints and `pubspec.lock` for pub package versions. This enables exact-version documentation for the dependencies your project actually uses.
+DocAtlas can inspect a local Flutter/Dart project. It reads `.fvmrc` for Flutter channel/version hints, `pubspec.lock` for registry package versions, and `.dart_tool/package_config.json` for existing local dependency source roots. Git, path, SDK, and custom-hosted packages are never presented as exact `pub.dev` bindings.
 
 It also reads direct JavaScript/TypeScript dependencies from `package.json` and resolves their exact installed versions from `package-lock.json`, `pnpm-lock.yaml`, or `yarn.lock`. When several lockfiles exist, the `packageManager` declaration selects the authoritative one; local, workspace, and Git dependencies are never presented as exact registry bindings.
+
+Python projects are supported through `pyproject.toml` or `requirements.txt`, with exact versions resolved from `uv.lock`, `poetry.lock`, or `pdm.lock`. Registry dependencies flow into version-aware documentation resolution; path, Git, and direct-URL dependencies remain unbound and require an explicit documentation source.
 
 ## License
 

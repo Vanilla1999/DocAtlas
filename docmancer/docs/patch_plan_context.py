@@ -4,8 +4,8 @@ import json
 import re
 from pathlib import Path
 from typing import Any, Iterator, Sequence
-from urllib.parse import unquote, urlparse
 
+from docmancer.docs.dart_package_config import resolve_dart_package_roots
 from docmancer.docs.domain.code_graph import build_project_code_graph, code_graph_diagnostics
 
 
@@ -688,42 +688,9 @@ def discover_missing_symbols(
 
 
 def _resolved_dart_package_roots(project_root: Path) -> tuple[list[Path], list[str]]:
-    config_path = project_root / ".dart_tool/package_config.json"
-    warnings: list[str] = []
-    if not config_path.exists():
-        return [], warnings
-    try:
-        config = json.loads(config_path.read_text(encoding="utf-8"))
-    except (json.JSONDecodeError, OSError) as exc:
-        return [], [f"Could not read Dart package_config.json: {exc}"]
-
-    roots: list[Path] = []
-    seen: set[Path] = set()
-    for package in config.get("packages", []):
-        root_uri = package.get("rootUri")
-        if not isinstance(root_uri, str):
-            continue
-        package_root = _resolve_package_root_uri(root_uri, config_path.parent)
-        if package_root is None or not package_root.exists() or not package_root.is_dir():
-            name = package.get("name") or "<unknown>"
-            warnings.append(f"Dart package root for {name} was listed but not found: {root_uri}")
-            continue
-        resolved = package_root.resolve()
-        if resolved == project_root.resolve():
-            continue
-        if resolved not in seen:
-            seen.add(resolved)
-            roots.append(resolved)
-    return roots, warnings
-
-
-def _resolve_package_root_uri(root_uri: str, config_dir: Path) -> Path | None:
-    parsed = urlparse(root_uri)
-    if parsed.scheme == "file":
-        return Path(unquote(parsed.path))
-    if parsed.scheme:
-        return None
-    return (config_dir / root_uri).resolve()
+    roots, warnings = resolve_dart_package_roots(project_root)
+    project = project_root.resolve()
+    return list(dict.fromkeys(path for path in roots.values() if path != project)), warnings
 
 
 def _pubspec_lock_packages(project_root: Path) -> set[str]:
