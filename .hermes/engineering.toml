@@ -40,8 +40,8 @@ forbidden_command_tokens = ["sudo", "curl", "wget", "ssh", "scp"]
 [[verification]]
 id = "task9-focused"
 kind = "test"
-argv = ["python", "-m", "pytest", "-q", "tests/docs/test_source_map.py", "tests/test_diagnostic_labels.py", "tests/test_config.py", "tests/docs/test_code_graph.py", "tests/docs/test_retrieval_routing.py", "tests/test_query_planning.py", "--tb=short"]
+argv = ["python", "-m", "pytest", "-q", "tests/docs/test_java_project.py", "tests/docs/test_project_metadata_reader.py", "--tb=short"]
 timeout_seconds = 300
 parser = "pytest"
-minimum_collected = 100
+minimum_collected = 20
 required = true
