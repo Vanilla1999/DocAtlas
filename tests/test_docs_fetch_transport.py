@@ -171,6 +171,27 @@ def test_real_client_connects_to_the_validated_ip_with_original_host_and_sni():
     assert str(response.url) == "https://example.com/docs"
 
 
+def test_real_client_preserves_hostname_for_proxy_transport():
+    observed = {}
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        observed["url"] = str(request.url)
+        observed["host"] = request.headers["host"]
+        return httpx.Response(200, headers={"content-type": "text/plain"}, content=b"docs")
+
+    raw_client = httpx.Client(transport=httpx.MockTransport(handler))
+    policy = DocsFetchPolicy(resolver=lambda _host: (__import__("ipaddress").ip_address(PUBLIC),))
+
+    with DocsHttpClient(raw_client, policy, pin_resolved_ips=False) as client:
+        response = client.get("https://example.com/docs")
+
+    assert observed == {
+        "url": "https://example.com/docs",
+        "host": "example.com",
+    }
+    assert response.status_code == 200
+
+
 def test_real_client_falls_back_only_to_other_prevalidated_ips():
     first = "2001:4860:4860::8888"
     second = PUBLIC
