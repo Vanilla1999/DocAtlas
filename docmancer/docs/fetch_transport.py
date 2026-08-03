@@ -40,6 +40,7 @@ class DocsHttpClient:
         max_total_seconds: float | None = None,
         deadline_at: float | None = None,
         transfer_counter: Callable[[httpx.Response], int] | None = None,
+        pin_resolved_ips: bool = True,
     ) -> None:
         self._client = client
         self._policy = policy
@@ -50,6 +51,7 @@ class DocsHttpClient:
         self._max_total_seconds = max_total_seconds
         self._deadline_at = deadline_at
         self._transfer_counter = transfer_counter or (lambda response: response.num_bytes_downloaded)
+        self._pin_resolved_ips = pin_resolved_ips
 
     def __enter__(self):
         return self
@@ -104,7 +106,8 @@ class DocsHttpClient:
         if not isinstance(self._client, _HTTPX_CLIENT_TYPE):
             return self._client.get(url, **kwargs)
         last_connect_error: httpx.RequestError | None = None
-        for address in target.resolved_ips:
+        addresses = target.resolved_ips if self._pin_resolved_ips else (target.host,)
+        for address in addresses:
             try:
                 return self._request_pinned(url, target, address, **kwargs)
             except (httpx.ConnectError, httpx.ConnectTimeout) as exc:

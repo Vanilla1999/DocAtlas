@@ -215,6 +215,7 @@ class WebFetcher:
             max_decoded_text_bytes=self._max_decoded_text_bytes,
             max_total_seconds=self._max_total_seconds,
             deadline_at=self._deadline_at,
+            pin_resolved_ips=not (self._proxy_url or self._use_env_proxy),
         )
 
     def _policy_for(self, url: str) -> DocsFetchPolicy:

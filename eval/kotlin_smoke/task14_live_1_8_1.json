@@ -1,0 +1,18 @@
+{
+  "canonical_source_identity": "https://github.com/Kotlin/kotlinx.coroutines/blob/1.8.1/docs/topics/coroutines-basics.md",
+  "citations": [
+    "https://github.com/Kotlin/kotlinx.coroutines/blob/1.8.1/docs/topics/coroutines-basics.md"
+  ],
+  "code_match": true,
+  "command": "kotlin_live_smoke.py --mode live --timeout 180 --output eval/kotlin_smoke/task14_live_1_8_1.json",
+  "docatlas_commit": "0a4b6d1ccfa751e4327e6a35e3be88644d374177",
+  "elapsed_ms": 505,
+  "mode": "live",
+  "query": "coroutines launch async example with code",
+  "recorded_at": "2026-08-03T09:42:04+00:00",
+  "requested_version": "1.8.1",
+  "resolved_version": "1.8.1",
+  "schema_version": "kotlin-smoke-1.0",
+  "source_ref": "Kotlin/kotlinx.coroutines@1.8.1",
+  "terminal_status": "succeeded"
+}
