@@ -2,7 +2,7 @@
 
 ## Audit status
 
-Partial. The async mismatch, event-loop blocking path, staging publication, cancellation checks, and GitHub fetch route were improved. Singular version propagation, action validation, hard terminal deadlines, bounded capacity, durable status, real network taxonomy/recovery, reliable partial-page provenance, and the Kotlin live-smoke artifact remain. Tasks 11–14 and 30–31 split those residual acceptance criteria into smaller PRs.
+Closed for the defined reliability scope. Async job dispatch, action validation, hard terminal deadlines, bounded capacity, durable status, network taxonomy and recovery, partial-page publication and provenance, and GitHub blob/raw identity are implemented and covered by the split Tasks 11–14 and 30–31. The pinned Kotlin 1.8.1 live workflow succeeded and its sanitized evidence is committed at `eval/kotlin_smoke/task14_live_1_8_1.json` in PR #82 / merge commit `cebda15c50e57dfa273a345213c9257b97a9f75c`. This closure does not claim support for every arbitrary site or guarantee every future network condition.
 
 ## Priority
 
