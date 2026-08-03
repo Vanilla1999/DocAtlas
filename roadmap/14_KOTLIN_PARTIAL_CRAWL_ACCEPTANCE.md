@@ -6,14 +6,18 @@ P0 acceptance closure for task 09. Complete after tasks 11–13, 28, 30, and 31.
 
 ## Implementation status
 
-Done for the deterministic offline and PR merge gate. The real fetch boundary records
-page-level requested/discovered/canonical/redirect/fetch provenance, preserves usable pages
-under partial failure, reports skipped/failed pages through job status, and routes pinned
-GitHub blob sources through an auditable raw fetch identity. The smoke harness and machine
-schema require isolated execution, exact `1.8.1` provenance, and cited code-bearing evidence.
+Complete. The real fetch boundary records page-level requested/discovered/canonical/redirect/fetch
+provenance, preserves usable pages under partial failure, reports skipped/failed pages through
+job status, and routes pinned GitHub blob sources through an auditable raw fetch identity. The
+smoke harness and machine schema require isolated execution, exact `1.8.1` provenance, and
+cited code-bearing evidence.
 
-The separately owned live evidence gate remains pending. Task 09 and Stable promotion must
-remain open until a successful sanitized pinned live artifact lands in an evidence-only PR.
+The live closure evidence is `eval/kotlin_smoke/task14_live_1_8_1.json`, merged in PR #82 at
+`cebda15c50e57dfa273a345213c9257b97a9f75c`. It records `terminal_status: succeeded`,
+resolved version `1.8.1`, and `code_match: true`. The evidence landed as a separate commit
+in the required proxy-fix PR rather than in a standalone evidence-only PR; this closure records
+that reviewed exception explicitly. Task 09 is closed for its defined reliability scope. Stable
+promotion still requires the separately approved exact-public-PyPI post-publish check.
 
 ## Problem
 
@@ -56,7 +60,10 @@ The live smoke is opt-in. Default CI must run the deterministic offline fixture,
 
 ## Task 09 closure gate
 
-After merge, a maintainer with network access runs the pinned smoke and commits the small sanitized successful result in a separate evidence-only PR. Task 09 remains `Partial`, and a Stable release is blocked, until that artifact proves the repeated exact query returns the required cited code context. A network failure artifact is useful diagnosis but does not satisfy closure.
+The closure gate passed via `eval/kotlin_smoke/task14_live_1_8_1.json`, merged in PR #82 at
+`cebda15c50e57dfa273a345213c9257b97a9f75c`. The pinned live run succeeded and the repeated
+exact query returned official cited code context. Task 09 is therefore closed for its defined
+scope. This does not replace the separately approved exact-public-PyPI post-publish Stable gate.
 
 ## Non-goals
 
