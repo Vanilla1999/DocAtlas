@@ -1254,10 +1254,21 @@ class SQLiteStore:
             "docs_snapshot_exact",
         )
         placeholders = ", ".join("?" for _ in range(len(columns) + 1))
+        values = []
+        for column in columns:
+            if column != "metadata_json":
+                values.append(row[column])
+                continue
+            metadata = json.loads(str(row[column] or "{}"))
+            metadata.update({
+                name: row[name]
+                for name in normalized_filter_metadata(metadata)
+            })
+            values.append(json.dumps(metadata, ensure_ascii=False))
         cursor = conn.execute(
             f"INSERT INTO retrieval_children (generation_id, {', '.join(columns)}) "
             f"VALUES ({placeholders})",
-            (generation_id, *(row[column] for column in columns)),
+            (generation_id, *values),
         )
         return int(cursor.lastrowid)
 

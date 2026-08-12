@@ -17,6 +17,8 @@ _CODE_TERM_RE = re.compile(
     r"|\b[a-z][a-z0-9]+(?:_[a-z0-9]+)+\b"
     r"|\b[A-Za-z][A-Za-z0-9_]*(?:Cubit|Service|Repository|Screen|Controller|Route|Router|Navigator|Module|Utils|Api|API)\b"
 )
+_PRODUCT_TERM_RE = re.compile(r"\b[A-Z][A-Za-z0-9]*(?:[A-Z][A-Za-z0-9]*)+\b|\b[A-Z][a-z][A-Za-z0-9]{3,}\b")
+_SLASH_TERM_RE = re.compile(r"\b([A-Za-z][A-Za-z0-9_-]{2,})/([A-Za-z][A-Za-z0-9_-]{2,})\b")
 _WORD_RE = re.compile(r"[A-Za-zА-Яа-яЁё][A-Za-zА-Яа-яЁё0-9_\-]{3,}")
 _RUSSIAN_WORD_RE = re.compile(r"[А-Яа-яЁёA-Za-z0-9_\-]+")
 _FILE_HINT_RE = re.compile(r"\b(?:[\w.-]+/)*[\w.-]+\.(?:py|dart|js|jsx|ts|tsx|go|rs|java|kt|swift|md)\b")
@@ -363,12 +365,8 @@ def _extract_requirements(question: str) -> list[str]:
         term = _clean_term(match)
         if term:
             terms.append(term)
-    # Code-shaped names are only part of an API question.  Keep the other
-    # high-signal product/package names too (for example ``Riverpod`` beside
-    # ``GoRouter``), otherwise a README mention of one symbol can incorrectly
-    # make a multi-library question look complete.
-    if len(_dedupe_terms(terms)) == 1 and not quoted and not _looks_like_story_requirement_question(question):
-        terms.extend(_extract_high_signal_query_terms(question))
+    if terms and not quoted and not _looks_like_story_requirement_question(question):
+        terms.extend(_extract_technical_anchors(question))
     if terms and not quoted and _looks_like_story_requirement_question(question):
         terms.extend(_extract_explicit_story_phrases(question))
         terms.extend(_extract_russian_story_requirement_chunks(question))
@@ -387,6 +385,16 @@ def _extract_requirements(question: str) -> list[str]:
             if any(marker in normalized for marker in _STORY_MARKERS):
                 terms.append(term)
     return _dedupe_terms(terms)
+
+
+def _extract_technical_anchors(question: str) -> list[str]:
+    anchors = [_clean_term(term) for term in _PRODUCT_TERM_RE.findall(question or "")]
+    for left, right in _SLASH_TERM_RE.findall(question or ""):
+        anchors.extend((_clean_term(left), _clean_term(right)))
+    return [
+        term for term in anchors
+        if term and _normalize_text(term) not in _STOPWORDS
+    ]
 
 
 def _looks_like_story_requirement_question(question: str) -> bool:

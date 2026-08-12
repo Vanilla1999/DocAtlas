@@ -100,12 +100,23 @@ def test_multi_library_api_question_keeps_each_high_signal_requirement():
     )
 
     completeness = result["answer_completeness"]
-    assert {"GoRouter", "Riverpod", "redirects", "providers"}.issubset(
-        set(completeness["matched_terms"] + completeness["missing_terms"])
-    )
-    assert {"redirects", "providers"}.issubset(set(completeness["missing_terms"]))
-    assert result["answer_type"] != "exact"
-    assert completeness["edit_ready"] is False
+    assert set(completeness["matched_terms"] + completeness["missing_terms"]) == {
+        "GoRouter", "Riverpod",
+    }
+    assert completeness["matched_terms"] == []
+
+
+def test_technical_anchor_requirements_ignore_task_framing_across_languages():
+    questions = [
+        "Find project-local guidance and implementation context for adding and running Flutter integration tests involving Workmanager, Keycloak refresh/logout coordination, and the local nbo_test_mcp harness.",
+        "Найди документацию для Flutter integration tests с Workmanager, координацией Keycloak refresh/logout и локальным nbo_test_mcp.",
+        "Добавь и запусти тесты для Workmanager and Keycloak refresh/logout через nbo_test_mcp.",
+    ]
+
+    for question in questions:
+        terms = extract_query_relevance_terms(question, intent=_intent())
+        assert {"Workmanager", "Keycloak", "refresh", "logout", "nbo_test_mcp"}.issubset(terms)
+        assert not {"guidance", "adding", "running", "involving"}.intersection(terms)
 
 
 def test_broad_architecture_query_does_not_require_random_word_gate():

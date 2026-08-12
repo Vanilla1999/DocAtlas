@@ -73,6 +73,31 @@ def test_metadata_only_edit_preserves_child_identity_but_refreshes_context(tmp_p
     assert after["text"].startswith("Document Title: New title")
 
 
+def test_incremental_generation_canonicalizes_metadata_from_promoted_columns(tmp_path):
+    store = SQLiteStore(tmp_path / "index.db")
+    store.add_documents([_doc("# Existing\n\nKeep this chunk.\n", authority="official")])
+
+    with store._connect() as conn:
+        conn.execute(
+            "UPDATE retrieval_children SET metadata_json = json_set(metadata_json, '$.authority', 'community')"
+        )
+
+    store.add_documents([
+        Document(
+            source="docs/new.md",
+            content="# New\n\nAdd another chunk.\n",
+            metadata={
+                "format": "markdown",
+                "chunking_schema": "parent-child-v1",
+                "child_target_tokens": 32,
+                "child_hard_max_tokens": 64,
+            },
+        )
+    ])
+
+    assert store.index_health()["ok"] is True
+
+
 def test_context_generation_persists_provenance_and_filter_columns(tmp_path):
     db = tmp_path / "index.db"
     store = SQLiteStore(db)
