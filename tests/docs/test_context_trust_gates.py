@@ -36,6 +36,33 @@ def test_bogus_query_gets_high_signal_relevance_terms():
     assert "protocol" not in terms
     assert "feature" not in terms
 
+    russian_terms = extract_query_relevance_terms(
+        "Каково назначение wear-модуля? Ответь только на основании проектной "
+        "документации и укажи evidence IDs для утверждений.",
+        intent=_intent(),
+    )
+
+    assert russian_terms == ["назначение", "wear"]
+
+    id_terms = extract_query_relevance_terms(
+        "Which user IDs govern the external evidence mapping?",
+        intent=_intent(),
+    )
+    assert "evidence" in id_terms
+
+    unrelated = evaluate_project_answer_completeness(
+        question="Каково назначение wear-модуля?",
+        context_pack=[{
+            "source_class": "project_doc",
+            "authority": "source_of_truth",
+            "path": "README.md",
+            "content": "Wearable devices are supported.",
+        }],
+        answer_available=True,
+        intent=_intent(),
+    )
+    assert "wear" in unrelated["answer_completeness"]["missing_terms"]
+
 
 def test_bogus_query_does_not_become_exact_when_only_generic_docs_match():
     result = evaluate_project_answer_completeness(

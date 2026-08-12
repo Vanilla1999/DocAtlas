@@ -132,7 +132,12 @@ _STOPWORDS = {
     "with",
     "use",
     "using",
+    "каково",
     "как",
+    "ответь",
+    "только",
+    "укажи",
+    "утверждений",
     "где",
     "для",
     "и",
@@ -153,6 +158,7 @@ _STOPWORDS = {
     "реализовать",
     "сделать",
 }
+_QUERY_SCAFFOLDING_WORDS = {"основании", "evidence", "id", "ids"}
 _GENERIC_RELEVANCE_WORDS = {
     "agent", "answer", "answers", "architecture", "change", "changes", "class", "classes",
     "codebase", "context", "constraint", "constraints", "doc", "docs", "documented",
@@ -161,6 +167,8 @@ _GENERIC_RELEVANCE_WORDS = {
     "repo", "repository", "source", "sources", "structure", "structured",
     "system", "technical", "term", "terms", "test", "tests", "usage", "workflow",
     "архитектура", "архитектуры", "архитектуре", "архитектур", "структура", "структуры", "структуре",
+    "документация", "документации", "документацию", "проектная", "проектной",
+    "модуль", "модуля", "модуле", "модулю", "модули", "модулей",
 }
 
 
@@ -318,19 +326,34 @@ def _skip_high_signal_relevance_gate(question: str, intent: Any | None) -> bool:
 
 def _extract_high_signal_query_terms(question: str) -> list[str]:
     terms: list[str] = []
+    normalized_question = _normalize_text(question)
+    answer_format_request = any(marker in normalized_question.split() for marker in ("ответь", "укажи"))
     for match in _WORD_RE.findall(question or ""):
-        term = _clean_term(match)
-        if not term:
-            continue
-        normalized = _normalize_text(term)
-        if not normalized or normalized in _STOPWORDS or normalized in _GENERIC_RELEVANCE_WORDS:
-            continue
-        has_digit = any(ch.isdigit() for ch in term)
-        has_symbolish_shape = "_" in term or "-" in term or "." in term
-        has_camel_shape = bool(re.search(r"[a-zа-яё][A-ZА-ЯЁ]", term))
-        if len(normalized) >= 5 or has_digit or has_symbolish_shape or has_camel_shape:
-            terms.append(term)
+        mixed_script_hyphenated = _is_mixed_script_hyphenated(match)
+        candidates = re.split(r"-+", match) if mixed_script_hyphenated else [match]
+        for candidate in candidates:
+            term = _clean_term(candidate)
+            if not term:
+                continue
+            normalized = _normalize_text(term)
+            if (
+                not normalized
+                or normalized in _STOPWORDS
+                or (answer_format_request and normalized in _QUERY_SCAFFOLDING_WORDS)
+                or normalized in _GENERIC_RELEVANCE_WORDS
+            ):
+                continue
+            has_digit = any(ch.isdigit() for ch in term)
+            has_symbolish_shape = "_" in term or "-" in term or "." in term
+            has_camel_shape = bool(re.search(r"[a-zа-яё][A-ZА-ЯЁ]", term))
+            mixed_script_identifier = mixed_script_hyphenated and bool(re.search(r"[A-Za-z]", term))
+            if len(normalized) >= 5 or has_digit or has_symbolish_shape or has_camel_shape or mixed_script_identifier:
+                terms.append(term)
     return _dedupe_terms(terms[:8])
+
+
+def _is_mixed_script_hyphenated(term: str) -> bool:
+    return "-" in term and bool(re.search(r"[A-Za-z]", term)) and bool(re.search(r"[А-Яа-яЁё]", term))
 
 
 def _extract_requirements(question: str) -> list[str]:
@@ -454,17 +477,25 @@ def _drop_weak_story_singletons(terms: list[str]) -> list[str]:
 
 def _requirement_coverage(term: str, *, context_pack: list[dict[str, Any]], context_text: str) -> dict[str, Any]:
     normalized_term = _normalize_text(term)
-    matched = normalized_term in context_text if normalized_term else False
+    matched = _term_in_text(normalized_term, context_text)
     source_paths = []
     if matched:
         for item in context_pack:
             item_text = _normalize_text(_item_text(item))
-            if normalized_term in item_text:
+            if _term_in_text(normalized_term, item_text):
                 path = item.get("path") or ((item.get("source") or {}).get("path") if isinstance(item.get("source"), dict) else None)
                 normalized_path = normalize_doc_path(path)
                 if normalized_path and normalized_path not in source_paths:
                     source_paths.append(normalized_path)
     return {"term": term, "matched": matched, "source_paths": source_paths}
+
+
+def _term_in_text(normalized_term: str, text: str) -> bool:
+    if not normalized_term:
+        return False
+    if " " in normalized_term or len(normalized_term) > 4:
+        return normalized_term in text
+    return re.search(rf"(?<!\w){re.escape(normalized_term)}(?!\w)", text) is not None
 
 
 def _source_search_action(*, missing_terms: list[str], context_pack: list[dict[str, Any]]) -> dict[str, Any]:

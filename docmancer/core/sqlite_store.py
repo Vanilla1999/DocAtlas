@@ -49,6 +49,9 @@ _QUERY_STOPWORDS = frozenset({
     "of", "for", "my", "can", "what", "where", "when", "why", "does",
     "should", "would", "could", "with", "this", "that", "are", "was",
     "be", "have", "has", "will", "we", "you", "your", "me",
+    "как", "каково", "на", "для", "и", "или", "что", "это", "его",
+    "ответь", "только", "основании", "проектной", "документации", "укажи",
+    "утверждений", "модуль", "модуля", "модуле", "модулю", "модули", "модулей",
 })
 
 INDEX_SCHEMA_VERSION = "sqlite-sections-v1"
@@ -2021,7 +2024,12 @@ class SQLiteStore:
     def _strip_stopwords(query: str) -> str:
         """Remove common stopwords to reduce noise in BM25 scoring."""
         tokens = re.findall(r"\w+", query)
-        filtered = [t for t in tokens if t.lower() not in _QUERY_STOPWORDS]
+        answer_format_request = any(token.casefold() in {"ответь", "укажи"} for token in tokens)
+        filtered = [
+            token for token in tokens
+            if token.casefold() not in _QUERY_STOPWORDS
+            and not (answer_format_request and token.casefold() in {"evidence", "id", "ids"})
+        ]
         return " ".join(filtered) if filtered else query
 
     def _search_rows(

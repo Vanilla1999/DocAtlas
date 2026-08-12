@@ -215,7 +215,10 @@ Agent workflow:
                 "action": {"type": "string", "enum": ["sync_project_docs", "prefetch_project_dependency_docs", "prefetch_library_docs", "discover_library_docs", "prefetch_docs_targets", "inspect_docs_target", "validate_docs_manifest", "prefetch_docs_manifest", "refresh_library_docs", "prune_library_docs", "remove_library_docs", "clear_index", "cancel_docs_job"]},
                 "project_path": {"type": ["string", "null"]},
                 "scope": {"type": ["string", "null"], "enum": ["project-local", None]},
-                "confirm": {"type": ["boolean", "null"], "default": False},
+                "confirm": {
+                    "type": ["boolean", "null"],
+                    "description": "Second-call apply flag for action='clear_index' only; omit for every other action.",
+                },
                 "library": {"type": ["string", "null"]},
                 "canonical_id": {"type": ["string", "null"]},
                 "manifest_path": {"type": ["string", "null"]},
@@ -262,6 +265,9 @@ Agent workflow:
                     "required": ["target"],
                     "properties": {"target": {**DOCS_TARGET_INPUT_SCHEMA, "type": "object"}},
                 },
+            }, {
+                "if": {"properties": {"action": {"const": "clear_index"}}},
+                "else": {"not": {"required": ["confirm"]}},
             }],
         },
     },
@@ -844,7 +850,10 @@ PUBLIC_ADVERTISED_INPUT_SCHEMAS: dict[str, dict[str, Any]] = {
             },
             "project_path": {"type": ["string", "null"]},
             "scope": {"type": ["string", "null"], "enum": ["project-local", None]},
-            "confirm": {"type": ["boolean", "null"], "default": False},
+            "confirm": {
+                "type": ["boolean", "null"],
+                "description": "Second-call apply flag for action='clear_index' only; omit for every other action.",
+            },
             "library": {"type": ["string", "null"]},
             "ecosystem": {"type": ["string", "null"]},
             "version": {"type": ["string", "null"]},
@@ -877,6 +886,9 @@ PUBLIC_ADVERTISED_INPUT_SCHEMAS: dict[str, dict[str, Any]] = {
                     "project_path": {"type": "string", "minLength": 1},
                 },
             },
+        }, {
+            "if": {"properties": {"action": {"const": "clear_index"}}},
+            "else": {"not": {"required": ["confirm"]}},
         }, {
             "if": {"properties": {"action": {"const": "remove_library_docs"}}},
             "then": {

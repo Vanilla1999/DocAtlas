@@ -63,11 +63,50 @@ def test_mcp_public_surface_exposes_prepare_docs_instead_of_prefetch_library_doc
 def test_mcp_public_prepare_docs_advertises_project_local_library_removal():
     tool = next(tool for tool in TOOLS if tool["name"] == "prepare_docs")
     schema = tool["inputSchema"]
+    confirm = schema["properties"]["confirm"]
 
     assert "remove_library_docs" in schema["properties"]["action"]["enum"]
     assert "canonical_id" in schema["properties"]
     assert "project_path" in schema["properties"]
     assert "discover_library_docs" in schema["properties"]["action"]["enum"]
+    assert "default" not in confirm
+    assert "clear_index" in confirm["description"]
+    assert {tool["name"] for tool in TOOLS} == {
+        "get_docs_context", "prepare_docs", "docs_status",
+    }
+
+    class Service:
+        called = False
+
+        def sync_project_docs(self, *args, **kwargs):
+            self.called = True
+            raise AssertionError("validation should have stopped this call")
+
+    service = Service()
+    for value in (False, None, True):
+        with pytest.raises(jsonschema.ValidationError):
+            jsonschema.validate(
+                {
+                    "action": "sync_project_docs",
+                    "project_path": "/project",
+                    "with_vectors": False,
+                    "confirm": value,
+                },
+                schema,
+            )
+        result = call_docs_tool_payload(
+            "prepare_docs",
+            {
+                "action": "sync_project_docs",
+                "project_path": "/project",
+                "with_vectors": False,
+                "confirm": value,
+            },
+            service,
+        )
+
+        assert result["reason_code"] == "validation_error"
+    assert service.called is False
 
 
 def test_mcp_public_prepare_docs_schema_requires_removal_scope_and_target():
