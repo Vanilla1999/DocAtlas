@@ -136,13 +136,21 @@ def test_retrieval_reuses_persisted_sqlite_backend_after_qdrant_recovers(monkeyp
     config.vector_store.provider = "qdrant"
     config.vector_store.url = None
     captured = {}
-    vector_store = object()
+    class VectorStore:
+        @staticmethod
+        def backend_identity():
+            return "persisted-identity"
+
+    vector_store = VectorStore()
     provider = object()
 
     class Store:
         @staticmethod
         def generation_info():
-            return {"vector_backend": "sqlite-vec"}
+            return {
+                "vector_backend": "sqlite-vec",
+                "vector_backend_identity": "persisted-identity",
+            }
 
     agent = SimpleNamespace(
         config=config,

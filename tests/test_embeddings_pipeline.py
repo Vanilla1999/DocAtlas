@@ -12,6 +12,7 @@ from docmancer.core.sqlite_store import SQLiteStore
 from docmancer.embeddings.base import EmbeddingsProvider
 from docmancer.embeddings.pipeline import sync_vector_store
 from docmancer.stores import get_vector_store
+from docmancer.stores.base import VectorPoint
 
 
 DIM = 4
@@ -258,3 +259,54 @@ def test_agent_reports_primary_vector_work_before_generation_cleanup(
     assert metrics["cleanup"]["status"] == "success"
     assert metrics["cleanup"]["upserted"] == 0
     assert metrics["collection"]
+
+
+def test_generation_activation_rejects_equal_count_wrong_ids(tmp_path, monkeypatch):
+    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
+    monkeypatch.setattr(
+        "docmancer.embeddings.get_embeddings_provider", lambda _config: StubProvider()
+    )
+    config = _config(tmp_path)
+    store = SQLiteStore(config.index.db_path)
+    vector_store = get_vector_store(config.vector_store, embeddings_dim=DIM)
+    result = store.add_documents(
+        [_make_parent_child_doc("guide.md", "# Guide\n\nParity text.\n")],
+        activate_generation=False,
+    )
+    collection = "dm_equal_count_wrong_ids"
+    store.set_generation_vector_collection(result.generation_id, collection)
+    sync_vector_store(
+        store=store, config=config, provider=StubProvider(), vector_store=vector_store,
+        collection=collection, generation_id=result.generation_id, prune_stale=False,
+    )
+    expected_id = next(iter(vector_store.point_ids(collection)))
+    vector_store.delete_points(collection, [expected_id])
+    vector_store.upsert(
+        collection,
+        [VectorPoint(id="wrong-id", vector=[0.0] * DIM, payload={})],
+    )
+
+    with pytest.raises(RuntimeError, match="extra_points=1"):
+        sync_vector_store(
+            store=store, config=config, provider=StubProvider(), vector_store=vector_store,
+            collection=collection, generation_id=result.generation_id, prune_stale=True,
+        )
+
+
+def test_empty_generation_rejects_extra_vector_points(tmp_path, monkeypatch):
+    monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
+    config = _config(tmp_path)
+    store = SQLiteStore(config.index.db_path)
+    vector_store = get_vector_store(config.vector_store, embeddings_dim=DIM)
+    collection = "dm_empty_parity"
+    vector_store.ensure_collection(collection, DIM)
+    vector_store.upsert(
+        collection,
+        [VectorPoint(id="extra-id", vector=[0.0] * DIM, payload={})],
+    )
+
+    with pytest.raises(RuntimeError, match="extra_points=1"):
+        sync_vector_store(
+            store=store, config=config, provider=StubProvider(),
+            vector_store=vector_store, collection=collection,
+        )

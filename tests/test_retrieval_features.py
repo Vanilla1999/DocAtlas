@@ -11,6 +11,7 @@ from docmancer.core.config import (
 )
 from docmancer.core.models import Document, RetrievedChunk
 from docmancer.core.sqlite_store import SQLiteStore
+from docmancer.embeddings.base import SparseEmbeddings
 from docmancer.retrieval.dispatch import HybridRetrievalError, RetrievalDispatcher
 from docmancer.stores.base import VectorHit
 
@@ -34,6 +35,9 @@ class FakeVectorStore:
 
     def count(self, collection):
         return 1
+
+    def point_ids(self, collection):
+        return {"wrong-id"}
 
     def search(self, collection, query_vector, *, limit, filters=None, sparse_vector=None, mode="dense"):
         key = _filter_key(filters)
@@ -93,6 +97,9 @@ class FakeProvider:
 
     def embed_query(self, q):
         return [1.0, 0.0, 0.0, 0.0]
+
+    def embed_sparse_query(self, q):
+        return SparseEmbeddings(indices=[0], values=[1.0])
 
 
 def _filter_key(filters):
@@ -211,7 +218,7 @@ def test_dense_failure_is_hard_error_by_default(tmp_path):
         provider=FakeProvider(),
         collection="c",
     )
-    with pytest.raises(HybridRetrievalError, match="Vector dimension error"):
+    with pytest.raises(HybridRetrievalError, match="<redacted diagnostic text>"):
         dispatcher.run("alpha", mode="dense", limit=1)
 
 
@@ -256,7 +263,7 @@ def test_empty_vector_collection_is_hard_error(tmp_path):
         provider=FakeProvider(),
         collection="c",
     )
-    with pytest.raises(HybridRetrievalError, match="no indexed vectors"):
+    with pytest.raises(HybridRetrievalError, match="empty_collection:no_indexed_vectors"):
         dispatcher.run("alpha", mode="hybrid", limit=1)
 
 
@@ -277,8 +284,27 @@ def test_vector_collection_requires_exact_active_generation_parity(tmp_path):
         provider=FakeProvider(), collection=collection,
     )
 
-    with pytest.raises(HybridRetrievalError, match="point parity"):
+    with pytest.raises(HybridRetrievalError, match="identity_parity_mismatch"):
         dispatcher.run("alpha", mode="dense", limit=1)
+
+
+def test_equal_count_wrong_vector_ids_fail_strict_readiness(tmp_path):
+    config, store = _agent(tmp_path)
+    store.add_documents([Document(
+        source="doc.md", content="# Doc\n\nalpha.\n",
+        metadata={"format": "markdown", "chunking_schema": "parent-child-v1"},
+    )], recreate=True)
+    collection = str(store.generation_info()["vector_collection"])
+    vectors = FakeVectorStore({})
+    assert vectors.count(collection) == len(store.list_sections_for_embedding())
+    dispatcher = RetrievalDispatcher(
+        store=store, config=config, vector_store=vectors,
+        provider=FakeProvider(), collection=collection,
+    )
+
+    with pytest.raises(HybridRetrievalError, match="identity_parity_mismatch"):
+        dispatcher.run("alpha", mode="dense", limit=1)
+    assert vectors.calls == []
 
 
 def test_missing_vector_capabilities_are_explicit_and_require_degraded_opt_in(tmp_path):
@@ -307,7 +333,7 @@ def test_degraded_mismatch_never_queries_unverified_vector_lane(tmp_path):
 
     assert not vstore.calls
     assert result.mode_used == "dense/lexical_fallback_degraded"
-    assert "capability mismatch" in result.failures["vector"]
+    assert result.failures["vector"].startswith("capability_mismatch:")
 
 
 def test_lexical_and_supplemental_paths_enforce_forbidden_sources(tmp_path):
@@ -327,26 +353,99 @@ def test_lexical_and_supplemental_paths_enforce_forbidden_sources(tmp_path):
     assert all("final_rank" in chunk.metadata["retrieval_trace"] for chunk in result.chunks)
 
 
-def test_hybrid_skips_sparse_when_collection_is_dense_only(tmp_path):
+@pytest.mark.parametrize("mode", ["lexical", "dense", "sparse", "hybrid"])
+def test_named_document_filter_is_hard_across_retrieval_modes(tmp_path, mode):
+    config, store = _agent(tmp_path)
+    store.add_documents([
+        Document(
+            source="project::docs/PLAN.md",
+            content="# Plan\n\nSharedTerm requested marker.",
+            metadata={"source_path": "docs/PLAN.md", "project_doc_path": "docs/PLAN.md"},
+        ),
+        Document(
+            source="project::ARCHITECTURE.md",
+            content="# Architecture\n\nSharedTerm forbidden marker.",
+            metadata={"source_path": "ARCHITECTURE.md", "project_doc_path": "ARCHITECTURE.md"},
+        ),
+    ], recreate=True)
+    rows = store.list_sections_for_embedding()
+    vector_hits = [
+        _hit(
+            int(row["section_id"]),
+            project_doc_path=(
+                "docs/PLAN.md"
+                if row["source"] == "project::docs/PLAN.md"
+                else "ARCHITECTURE.md"
+            ),
+        )
+        for row in rows
+    ]
+    class UnfilteredVectorStore(FakeVectorStore):
+        def search(self, collection, query_vector, *, limit, filters=None, sparse_vector=None, mode="dense"):
+            self.calls.append({"mode": mode, "filters": filters, "limit": limit})
+            return list(reversed(vector_hits))[:limit]
+
+    vector_store = UnfilteredVectorStore({})
+    dispatcher = RetrievalDispatcher(
+        store=store,
+        config=config,
+        vector_store=vector_store,
+        provider=FakeProvider(),
+        collection="c",
+    )
+
+    result = dispatcher.run(
+        "SharedTerm", mode=mode, limit=10,
+        filters={"project_doc_path": "docs/PLAN.md"},
+    )
+
+    assert result.chunks
+    assert {chunk.metadata["source_path"] for chunk in result.chunks} == {"docs/PLAN.md"}
+    if mode != "lexical":
+        assert vector_store.calls
+        assert all(call["filters"] == {"project_doc_path": "docs/PLAN.md"} for call in vector_store.calls)
+
+
+def test_named_document_filter_survives_degraded_vector_fallback(tmp_path):
+    config, store = _agent(tmp_path)
+    store.add_documents([
+        Document(
+            source="project::docs/PLAN.md", content="# Plan\n\nSharedTerm requested.",
+            metadata={"source_path": "docs/PLAN.md", "project_doc_path": "docs/PLAN.md"},
+        ),
+        Document(
+            source="project::ARCHITECTURE.md", content="# Architecture\n\nSharedTerm forbidden.",
+            metadata={"source_path": "ARCHITECTURE.md", "project_doc_path": "ARCHITECTURE.md"},
+        ),
+    ], recreate=True)
+
+    result = RetrievalDispatcher(store=store, config=config).run(
+        "SharedTerm", mode="hybrid", limit=10, allow_degraded=True,
+        filters={"project_doc_path": "docs/PLAN.md"},
+    )
+
+    assert result.mode_used == "hybrid/lexical_fallback_degraded"
+    assert result.chunks
+    assert {chunk.metadata["source_path"] for chunk in result.chunks} == {"docs/PLAN.md"}
+
+
+def test_hybrid_rejects_collection_without_sparse_capability(tmp_path):
     config, store = _agent(tmp_path)
     _populate(store, [("Doc", "doc", "# Doc\n\nalpha.")])
     section_id = int(store.list_sections_for_embedding()[0]["section_id"])
     vstore = DenseOnlyVectorStore(hits_by_filter={("dense", None): [_hit(section_id)]})
 
-    result = RetrievalDispatcher(
+    dispatcher = RetrievalDispatcher(
         store=store,
         config=config,
         vector_store=vstore,
         provider=FakeProvider(),
         collection="c",
-    ).run("alpha", mode="hybrid", limit=1)
+    )
 
-    assert "sparse" not in result.candidate_counts
-    assert "sparse" not in result.failures
-    assert [call["mode"] for call in vstore.calls] == ["dense"]
-    assert result.query_plan_hash
-    assert result.fusion_config_hash
-    assert result.chunks[0].metadata["query_plan_hash"] == result.query_plan_hash
+    with pytest.raises(HybridRetrievalError, match="sparse_model"):
+        dispatcher.run("alpha", mode="hybrid", limit=1)
+    assert vstore.calls == []
 
 
 def test_hybrid_fuses_on_stable_child_id_and_hydrates_integer_id(tmp_path):
@@ -374,6 +473,7 @@ def test_hybrid_fuses_on_stable_child_id_and_hydrates_integer_id(tmp_path):
     vstore = DenseOnlyVectorStore(hits_by_filter={
         ("dense", None): [vector_hit],
     })
+    vstore.point_ids = lambda _collection: {str(section["vector_id"])}
 
     result = RetrievalDispatcher(
         store=store,
@@ -381,10 +481,10 @@ def test_hybrid_fuses_on_stable_child_id_and_hydrates_integer_id(tmp_path):
         vector_store=vstore,
         provider=FakeProvider(),
         collection=collection,
-    ).run("alpha", mode="hybrid", limit=1)
+    ).run("alpha", mode="dense", limit=1)
 
     assert result.chunks[0].metadata["section_id"] == section_id
-    assert result.contributions[section_id] == {"lexical": 1, "dense": 1}
+    assert result.contributions[section_id] == {"dense": 1}
 
 
 # ---------------- hierarchical retrieval ----------------

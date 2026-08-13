@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import os
-import traceback
 from typing import Any
 
 
@@ -105,10 +104,7 @@ def build_mcp_error_payload(
         ],
     }
     if debug and exception is not None:
-        error["traceback"] = _bounded_text(
-            "".join(traceback.format_exception(type(exception), exception, exception.__traceback__)),
-            MAX_ERROR_TRACEBACK_CHARS,
-        )
+        error["traceback"] = "<redacted traceback>"
     return {
         "status": "failed",
         "error": error,

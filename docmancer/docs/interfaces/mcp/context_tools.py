@@ -7,7 +7,7 @@ import math
 from typing import Any
 
 from docmancer.docs.application.action_packet import build_action_packet, validate_action_packet
-from docmancer.docs.application.evidence_selection import SelectionDecision
+from docmancer.docs.application.evidence_selection import AggregateMixedSelectionDecision, SelectionDecision
 from docmancer.docs.application.model_visible_projection import (
     DOCS_ANSWER_MAX_TOKENS,
     INSUFFICIENT_EVIDENCE_MAX_TOKENS,
@@ -22,6 +22,7 @@ from docmancer.docs.application.model_visible_projection import (
     validate_model_visible_projection,
 )
 from docmancer.docs.domain.tool_selection import normalize_public_docs_actions
+from docmancer.docs.domain.retrieval_routing import validate_routing_record
 from docmancer.docs.service import LibraryDocsService
 from docmancer.docs.interfaces.mcp.output_contract import normalize_output_mode
 from docmancer.docs.interfaces.mcp.project_tools import _attach_output_contract, _bad_request, _bounded_int_arg, _clean_string, _compact_mcp_payload, _strip_mcp_debug_noise
@@ -66,7 +67,9 @@ def _support_envelope(payload: dict[str, Any]) -> dict[str, Any]:
         for key in SUPPORT_ENVELOPE_KEYS
         if key in payload
     }
-    envelope["answer_available"] = bool(envelope["answer_supported"])
+    envelope["answer_available"] = bool(
+        envelope["answer_supported"] and payload.get("answer_available", True)
+    )
     return envelope
 
 
@@ -104,10 +107,11 @@ def _answer_payload(payload: dict[str, Any]) -> dict[str, Any]:
         if canonical_support is not None
         else bool(payload.get("answer_available")) and has_direct_answer
     )
+    answer_available = bool(answer_available and payload.get("answer_available", True))
     answer_type = "direct" if answer_available and has_direct_answer else "navigation_only"
     answer = {
         "tool": payload.get("tool"),
-        "status": payload.get("status"),
+        "status": payload.get("status") if answer_available else "insufficient_evidence",
         "answer_available": answer_available,
         "answer_type": answer_type,
         "disposition": payload.get("disposition"),
@@ -278,7 +282,7 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
         if isinstance(result, dict)
         else getattr(result, "selection_decision", None)
     )
-    if not isinstance(canonical_selection, SelectionDecision):
+    if not isinstance(canonical_selection, (SelectionDecision, AggregateMixedSelectionDecision)):
         canonical_selection = None
     if is_dataclass(result):
         raw = asdict(result)
@@ -289,9 +293,16 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
         for key in ("tool", "status", "reason_code", "message", "response_style", "primary_snippet", "primary_snippets", "primary_snippet_confidence", "primary_snippet_selection_reason", "primary_snippet_alternatives", "supporting_snippets", "snippet_metrics"):
             if hasattr(result, key):
                 raw[key] = getattr(result, key)
+    operational_answer_available = bool(raw.get("answer_available", True))
+    operational_reason_code = raw.get("reason_code")
     canonical_support = getattr(canonical_selection, "support_decision", None)
     if canonical_support is not None:
         raw.update(canonical_support.as_payload())
+        if not canonical_support.answer_supported and not raw.get("reason_code"):
+            raw["reason_code"] = operational_reason_code
+        raw["answer_available"] = bool(
+            canonical_support.answer_supported and operational_answer_available
+        )
     raw = _align_trust_contract_with_snippets(raw)
     if _clean_string(args.get("library")):
         raw.setdefault("selection_profile", "library_docs_answer")
@@ -323,7 +334,7 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
                     ),
                     **{
                         key: projection[key]
-                        for key in ("operational_status", "context_available")
+                        for key in ("operational_status", "context_available", "reason_code")
                         if key in projection
                     },
                 }
@@ -337,21 +348,24 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
                 _annotate_source_search_handoff(projection, recovery)
                 bound_insufficient_projection(projection, max_tokens=output_budget)
             if projection.get("status") == "insufficient_evidence":
-                bound_insufficient_projection(projection, max_tokens=output_budget)
+                bound_insufficient_projection(
+                    projection, max_tokens=INSUFFICIENT_EVIDENCE_MAX_TOKENS,
+                )
             _omit_nullable_reason_code(projection)
             _refresh_projection_estimate(projection)
             validation_errors = validate_model_visible_projection(
                 projection,
                 snapshot=snapshot,
                 max_tokens=(
-                    min(INSUFFICIENT_EVIDENCE_MAX_TOKENS, output_budget)
+                    INSUFFICIENT_EVIDENCE_MAX_TOKENS
                     if projection.get("status") == "insufficient_evidence"
                     else min(DOCS_ANSWER_MAX_TOKENS, output_budget)
                 ),
+                canonical_selection=canonical_selection,
             )
             if validation_errors:
                 return _bad_request("invalid_model_visible_projection", "; ".join(validation_errors))
-            _record_model_visible_bytes(raw, projection)
+            _record_model_visible_bytes(result, raw, projection)
             return projection
 
         packet_budget = min(PATCH_CONTEXT_HARD_TOKENS, output_budget)
@@ -416,7 +430,7 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
         )
         if projection_errors:
             return _bad_request("invalid_model_visible_projection", "; ".join(projection_errors))
-        _record_model_visible_bytes(raw, projection)
+        _record_model_visible_bytes(result, raw, projection)
         return projection
     _omit_nullable_reason_code(raw)
     mode = _output_mode(args)
@@ -551,13 +565,33 @@ def bounded_retrieval_issues(
     return issues
 
 
-def _record_model_visible_bytes(raw: dict[str, Any], projection: dict[str, Any]) -> None:
+def _record_model_visible_bytes(result: Any, raw: dict[str, Any], projection: dict[str, Any]) -> None:
+    """Record canonical structured projection UTF-8 bytes, excluding transport text."""
+    byte_count = len(canonical_projection_bytes(projection))
+    direct_routing = getattr(result, "retrieval_routing", None)
+    if isinstance(direct_routing, dict):
+        direct_routing["model_visible_bytes"] = byte_count
+        errors = validate_routing_record(direct_routing)
+        if errors:
+            raise ValueError("invalid retrieval routing record after telemetry: " + "; ".join(errors))
+    source_diagnostics = getattr(result, "diagnostics", None)
+    if isinstance(source_diagnostics, dict):
+        source_routing = source_diagnostics.get("retrieval_routing")
+        if isinstance(source_routing, dict):
+            source_routing["model_visible_bytes"] = byte_count
+            errors = validate_routing_record(source_routing)
+            if errors:
+                raise ValueError("invalid retrieval routing record after telemetry: " + "; ".join(errors))
     diagnostics = raw.get("diagnostics")
-    if not isinstance(diagnostics, dict):
-        return
-    routing = diagnostics.get("retrieval_routing")
+    routing = (
+        diagnostics.get("retrieval_routing")
+        if isinstance(diagnostics, dict) else raw.get("retrieval_routing")
+    )
     if isinstance(routing, dict):
-        routing["model_visible_bytes"] = len(canonical_projection_bytes(projection))
+        routing["model_visible_bytes"] = byte_count
+        errors = validate_routing_record(routing)
+        if errors:
+            raise ValueError("invalid retrieval routing record after telemetry: " + "; ".join(errors))
 
 
 def _packet_budget_inside_payload(output_budget: int, *, recovery: dict[str, Any] | None) -> int:

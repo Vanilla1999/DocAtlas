@@ -324,6 +324,7 @@ class LibraryIngestOrchestrator:
             exception_traceback=failure.get("exception_traceback"),
             failed_url=failure.get("failed_url"),
             http_status=failure.get("http_status"),
+            vector_sync=dict(failure.get("vector_sync") or {}),
             message=result.message or f"Library docs prefetch {status}.",
         )
 

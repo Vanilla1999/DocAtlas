@@ -4,6 +4,7 @@ from docmancer.docs.application.evidence_selection import build_requirements
 from docmancer.retrieval.query_planning import (
     MAX_EXACT_TERMS,
     build_query_plan,
+    extract_document_locator,
     extract_exact_terms,
     compile_backend_filters,
     metadata_matches_filters,
@@ -55,10 +56,36 @@ def test_exact_term_extraction_does_not_treat_prose_as_config_or_path():
     assert {"CONFIG_KEY", "docs/setup.md"} <= values
 
 
+def test_path_term_suppresses_overlapping_symbol_and_config_terms():
+    terms = extract_exact_terms("In docs/IOS_TRUSTED_TIME_PLAN.md, explain the policy")
+
+    assert [(term.value, term.kind) for term in terms] == [
+        ("docs/IOS_TRUSTED_TIME_PLAN.md", "path"),
+    ]
+
+
+def test_document_locator_requires_explicit_locative_language():
+    assert extract_document_locator(
+        "According to docs/IOS_TRUSTED_TIME_PLAN.md, what are the conventions?"
+    ) == "docs/IOS_TRUSTED_TIME_PLAN.md"
+    assert extract_document_locator(
+        "Согласно docs/IOS_TRUSTED_TIME_PLAN.md, какой период политики?"
+    ) == "docs/IOS_TRUSTED_TIME_PLAN.md"
+    assert extract_document_locator(
+        "Compare docs/old.md with docs/new.md before implementation"
+    ) is None
+    assert extract_document_locator("From `./docs/PLAN.md`, explain it.") == "docs/PLAN.md"
+    assert extract_document_locator('In "ARCHITECTURE.md", explain it.') == "ARCHITECTURE.md"
+    assert extract_document_locator("В ARCHITECTURE.md: что описано?") == "ARCHITECTURE.md"
+    assert extract_document_locator("In docs/" + "x" * 241 + ".md, explain it") is None
+    assert extract_document_locator("In docs/old.md and from docs/new.md, compare") is None
+
+
 def test_query_plan_has_bounded_concept_query_and_typed_filters():
     plan = build_query_plan(
         "How can I configure the client retry behavior?",
         filters={
+            "project_doc_path": "docs/PLAN.md",
             "source_classes": ["project_file", "official_doc"],
             "module_ids": ["runtime"],
             "exact_snapshot_required": True,
@@ -70,6 +97,7 @@ def test_query_plan_has_bounded_concept_query_and_typed_filters():
     assert len(plan.concept_queries) <= 3
     assert plan.concept_queries == ("configure client retry behavior",)
     assert plan.filters.source_classes == ("official_doc", "project_file")
+    assert plan.filters.project_doc_path == "docs/PLAN.md"
     assert plan.filters.exact_snapshot_required is True
     assert plan.filters.forbidden_sources == ("mirror.example",)
 

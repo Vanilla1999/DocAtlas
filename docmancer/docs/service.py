@@ -5,6 +5,8 @@ import os
 from pathlib import Path
 from typing import Any
 import warnings
+import threading
+from collections import OrderedDict
 
 from docmancer.core.config import DocmancerConfig
 from docmancer.docs.application.docs_job_service import DocsJobService, DocsJobTracker
@@ -33,9 +35,12 @@ DEFAULT_DOC_TOKENS = 4000
 
 
 class LibraryDocsService:
-    def __init__(self, *, config: DocmancerConfig | None = None, registry: LibraryRegistry | None = None, agent: Any | None = None, agent_factory: Any | None = None, project_reader: ProjectMetadataReader | None = None, job_tracker: DocsJobTracker | None = None, stale_after_days: int = STALE_AFTER_DAYS, library_index_root: Path | None = None):
-        self.config_source = "provided" if config is not None else "default"
+    def __init__(self, *, config: DocmancerConfig | None = None, config_source: str | None = None, config_path: str | Path | None = None, registry: LibraryRegistry | None = None, agent: Any | None = None, agent_factory: Any | None = None, project_reader: ProjectMetadataReader | None = None, job_tracker: DocsJobTracker | None = None, stale_after_days: int = STALE_AFTER_DAYS, library_index_root: Path | None = None):
+        self.config_source = config_source or ("provided" if config is not None else "defaults")
+        self.config_path = str(Path(config_path).expanduser().resolve()) if config_path else None
         self.config = config or DocmancerConfig()
+        self._project_service_cache: OrderedDict[tuple[str, str, str], LibraryDocsService] = OrderedDict()
+        self._project_service_cache_lock = threading.RLock()
         self.registry = registry or LibraryRegistry(self.config.index.db_path)
         self.agent_gateway = AgentIndexGateway(
             self.config,
@@ -101,10 +106,12 @@ class LibraryDocsService:
             }
             extracted_dir = stats.get("extracted_dir") or extracted_dir
         except Exception as exc:
+            from docmancer.docs.application.library_refresh_policy import bounded_exception_diagnostics
+            safe = bounded_exception_diagnostics(exc, failure_phase="diagnostics", failure_operation="active_index_stats")
             diagnostic_warnings.append({
                 "code": "index_stats_unavailable",
                 "blocking": False,
-                "message": str(exc),
+                "message": safe["exception_message"],
             })
 
         diagnostics: dict[str, Any] = {
@@ -113,15 +120,36 @@ class LibraryDocsService:
             "db_exists": db_path.exists(),
             "extracted_dir": extracted_dir,
             "config_source": self.config_source,
+            "config_path": self.config_path,
+            "retrieval_mode": self.config.retrieval.default_mode,
             "docmancer_home": os.environ.get("DOCMANCER_HOME"),
             "index_counts": index_counts,
             "warnings": diagnostic_warnings,
         }
+        retrieval_mode = str(self.config.retrieval.default_mode or "lexical").lower()
+        if retrieval_mode == "lexical":
+            diagnostics["vector_readiness"] = {
+                "status": "not_required", "mode": "lexical"
+            }
+        else:
+            try:
+                dispatcher = self.agent_gateway.dispatcher_for(
+                    self._agent_instance(), mode=retrieval_mode
+                )
+                diagnostics["vector_readiness"] = dispatcher.vector_readiness(
+                    retrieval_mode
+                )
+            except Exception as exc:
+                diagnostics["vector_readiness"] = {
+                    "status": "not_ready",
+                    "mode": retrieval_mode,
+                    "reason_code": f"runtime_unavailable:{type(exc).__name__}",
+                }
 
         if root:
             local_config_path = root / "docmancer.yaml"
-            local_config: dict[str, Any] = {"present": local_config_path.exists()}
-            if local_config_path.exists():
+            local_config: dict[str, Any] = {"present": local_config_path.is_file()}
+            if local_config_path.is_file():
                 local_config["path"] = str(local_config_path.resolve())
                 try:
                     with warnings.catch_warnings():
@@ -138,10 +166,12 @@ class LibraryDocsService:
                             "project_config_db_path": str(project_db_path),
                         })
                 except Exception as exc:
+                    from docmancer.docs.application.library_refresh_policy import bounded_exception_diagnostics
+                    safe = bounded_exception_diagnostics(exc, failure_phase="configuration", failure_operation="project_config_parse")
                     diagnostic_warnings.append({
                         "code": "project_local_config_unreadable",
                         "blocking": False,
-                        "message": str(exc),
+                        "message": safe["exception_message"],
                     })
             diagnostics["project_local_config"] = local_config
         return diagnostics
@@ -159,8 +189,8 @@ class LibraryDocsService:
     def get_docs_job_status(self, job_id: str) -> DocsJob | None:
         return self.jobs.get_docs_job_status(job_id)
 
-    def list_docs_jobs(self, status: str | None = None, limit: int | None = None) -> list[DocsJob]:
-        return self.jobs.list_docs_jobs(status=status, limit=limit)
+    def list_docs_jobs(self, status: str | None = None, limit: int | None = None, project_path: str | None = None) -> list[DocsJob]:
+        return self.jobs.list_docs_jobs(status=status, limit=limit, project_path=project_path)
 
     def cancel_docs_job(self, job_id: str) -> DocsJobCancelResult:
         return self.jobs.cancel_docs_job(job_id)

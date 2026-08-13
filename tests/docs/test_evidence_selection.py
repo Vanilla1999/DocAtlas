@@ -9,6 +9,7 @@ from docmancer.docs.application.evidence_selection import (
     EvidenceRequirementSet,
     SelectionConfig,
     SupportDecision,
+    aggregate_mixed_selection,
     build_requirements,
     docs_selection_config,
     library_docs_selection_config,
@@ -38,6 +39,172 @@ def _candidate(stable_id: str, text: str, **overrides):
 
 def _ids(decision):
     return [item.stable_id for item in decision.selected_candidates]
+
+
+def test_project_document_profile_and_explicit_bounds_are_validated():
+    config = replace(
+        docs_selection_config(800),
+        profile="project_document_answer",
+        max_documents=3,
+        max_spans=6,
+    )
+
+    assert config.profile == "project_document_answer"
+    with pytest.raises(ValueError, match="document/span limits"):
+        replace(config, max_spans=0)
+
+
+def test_proof_roles_and_qualifiers_are_bound_into_assignments():
+    requirements = build_requirements(
+        "Policy72Hours",
+        public_requirements=[{
+            "value": "Policy72Hours",
+            "proof_role": "project_rule",
+            "qualifiers": ["proposed", "confirmation_required"],
+        }],
+    )
+    supporting = select_evidence(
+        [_candidate(
+            "supporting",
+            "Policy72Hours is proposed and confirmation is required.",
+            authority="supporting",
+            source_class="project_file",
+        )],
+        question="Policy72Hours",
+        config=docs_selection_config(800),
+        requirements=requirements,
+    )
+    canonical = select_evidence(
+        [_candidate(
+            "canonical",
+            "Policy72Hours is proposed and confirmation is required.",
+            authority="source_of_truth",
+            source_class="project_file",
+        )],
+        question="Policy72Hours",
+        config=docs_selection_config(800),
+        requirements=requirements,
+    )
+
+    assert supporting.support_decision.answer_supported is False
+    assert canonical.support_decision.answer_supported is True
+    assignment = next(item for item in canonical.assignments if item.requirement_id.startswith("public:"))
+    assert assignment.proof_role == "project_rule"
+    assert assignment.qualifiers == ("confirmation_required", "proposed")
+
+
+@pytest.mark.parametrize("proof_role", [
+    "generic_fact", "document_identity", "target_identity", "document_statement",
+    "project_rule", "implementation_fact", "dependency_fact",
+])
+def test_every_proof_role_has_positive_and_negative_authority_proof(proof_role):
+    evidence_paths = ["docs/positive.md"] if proof_role == "document_statement" else []
+    requirements = build_requirements(
+        "BoundFact",
+        required_evidence_paths=evidence_paths,
+        public_requirements=[{"value": "BoundFact", "proof_role": proof_role}],
+    )
+    source_class = "dependency_docs" if proof_role == "dependency_fact" else "project_file"
+    positive = _candidate(
+        "positive", "BoundFact is documented.", source="docs/positive.md", source_class=source_class,
+        authority="source_of_truth",
+    )
+    negative = {
+        **positive,
+        "stable_chunk_id": "negative",
+        "authority": "supporting" if proof_role == "project_rule" else positive["authority"],
+        "source_class": "repo_map" if proof_role in {"implementation_fact", "dependency_fact"} else source_class,
+        "source": "docs/negative.md" if proof_role == "document_statement" else positive["source"],
+    }
+
+    accepted = select_evidence(
+        [positive], question="BoundFact", config=docs_selection_config(800),
+        requirements=requirements,
+    )
+    rejected = select_evidence(
+        [negative], question="BoundFact", config=docs_selection_config(800),
+        requirements=requirements,
+    )
+
+    assert next(item for item in accepted.assignments if item.requirement_id.startswith("public:")).proof_role == proof_role
+    if proof_role in {"document_statement", "project_rule", "implementation_fact", "dependency_fact"}:
+        assert rejected.support_decision.answer_supported is False
+    else:
+        assert rejected.assignments
+
+
+def test_observed_typed_qualifiers_bind_without_a_second_requirement_contract():
+    requirements = build_requirements(
+        "Policy72Hours", required_evidence_paths=["docs/policy.md"],
+        profile="project_document_answer"
+    )
+    decision = select_evidence(
+        [_candidate(
+            "policy", "Policy72Hours is proposed; confirmation is required.",
+            source="docs/policy.md",
+        )],
+        question="Policy72Hours",
+        config=replace(docs_selection_config(800), profile="project_document_answer"),
+        requirements=requirements,
+    )
+
+    assignment = next(item for item in decision.assignments if "policy72hours" in item.requirement_id)
+    assert assignment.proof_role == "document_statement"
+    assert assignment.qualifiers == ("confirmation_required", "proposed")
+
+
+def test_docs_selection_fails_closed_above_document_or_span_bound():
+    requirements = build_requirements(
+        "bundle",
+        public_requirements=[{"value": f"fact-{index}"} for index in range(7)],
+    )
+    candidates = [
+        _candidate(f"item-{index}", f"bundle fact-{index}", source=f"docs/{index}.md")
+        for index in range(7)
+    ]
+    decision = select_evidence(
+        candidates,
+        question="bundle",
+        config=replace(
+            docs_selection_config(2000),
+            max_sources=7,
+            max_items_per_source=7,
+            max_documents=3,
+            max_spans=6,
+        ),
+        requirements=requirements,
+    )
+
+    assert decision.support_decision.answer_supported is False
+    assert decision.support_decision.reason_code == "bounded_evidence_not_materializable"
+    assert "bounded_evidence_not_materializable" in decision.missing_requirements
+
+
+def test_mixed_aggregate_applies_global_document_span_and_token_bounds():
+    def lane(identity, count, text):
+        requirements = build_requirements(
+            identity, public_requirements=[{"value": f"{identity}-{index}"} for index in range(count)]
+        )
+        return select_evidence(
+            [_candidate(f"{identity}-{index}", f"{identity} {identity}-{index} {text}", source=f"docs/{identity}-{index}.md") for index in range(count)],
+            question=identity,
+            config=replace(docs_selection_config(800), max_sources=6, max_items_per_source=6),
+            requirements=requirements,
+        )
+
+    within = aggregate_mixed_selection([
+        ("project", "repo", lane("project", 1, "small")),
+        ("library", "lib", lane("library", 1, "small")),
+    ])
+    overflow = aggregate_mixed_selection([
+        ("project", "repo", lane("project", 2, "small")),
+        ("library", "lib", lane("library", 2, "small")),
+    ])
+
+    assert within.support_decision.answer_supported is True
+    assert all(value.startswith(("project:repo:", "library:lib:")) for value in within.support_decision.selected_evidence_ids)
+    assert overflow.support_decision.answer_supported is False
+    assert overflow.support_decision.reason_code == "bounded_evidence_not_materializable"
 
 
 def test_selector_returns_one_immutable_auditable_support_decision():

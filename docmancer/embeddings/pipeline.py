@@ -37,6 +37,9 @@ class SyncResult:
     duration_ms: int = 0
     backend_setup_ms: int = 0
     collection: str = ""
+    verified: int = 0
+    backfilled: int = 0
+    extra_points: int = 0
 
 
 def _embedding_hash(vector: list[float]) -> str:
@@ -220,21 +223,41 @@ def sync_vector_store(
         else:
             store.delete_embedding_upserts(collection, stale_ids)
 
-    if not sections:
-        return SyncResult(
-            embedded=0, upserted=0, skipped_cache=0, skipped_unchanged=0, pruned=pruned
-        )
-
     pending: list[dict] = []
     carried_records: list[dict] = []
     skipped_unchanged = 0
+    try:
+        backend_ids = vector_store.point_ids(collection)
+    except NotImplementedError:
+        backend_ids = None
+    expected_vector_ids = {
+        str(sec["vector_id"] if generation_mode else sec["section_id"])
+        for sec in sections
+    }
+    missing_backend_ids = (
+        expected_vector_ids - backend_ids if backend_ids is not None else set()
+    )
+    extra_points = (
+        len(backend_ids - expected_vector_ids)
+        if backend_ids is not None and section_ids is None else 0
+    )
+    if not sections:
+        if section_ids is None and prune_stale and backend_ids:
+            raise RuntimeError(
+                f"vector index {collection!r} has identity drift: extra_points={len(backend_ids)}"
+            )
+        return SyncResult(
+            embedded=0, upserted=0, skipped_cache=0, skipped_unchanged=0,
+            pruned=pruned, verified=0, extra_points=extra_points,
+        )
     for sec in sections:
         lookup_id = (
             str(sec.get("stable_chunk_id") or "")
             if generation_mode else int(sec["section_id"])
         )
         prev = existing.get(lookup_id)
-        if prev and prev.get("content_hash") == (sec.get("content_hash") or ""):
+        vector_id = str(sec["vector_id"] if generation_mode else sec["section_id"])
+        if prev and prev.get("content_hash") == (sec.get("content_hash") or "") and vector_id not in missing_backend_ids:
             skipped_unchanged += 1
             if generation_mode:
                 carried_records.append({
@@ -263,12 +286,18 @@ def sync_vector_store(
                 f"indexed points but the vector store reports {count_after}. Rebuild with "
                 f"`doc-atlas ingest <path> --recreate`."
             )
+        if section_ids is None and prune_stale and extra_points:
+            raise RuntimeError(
+                f"vector index {collection!r} has identity drift: extra_points={extra_points}"
+            )
         return SyncResult(
             embedded=0,
             upserted=0,
             skipped_cache=0,
             skipped_unchanged=skipped_unchanged,
             pruned=pruned,
+            verified=len(expected_vector_ids),
+            extra_points=extra_points,
         )
 
     texts = [sec["text"] for sec in pending]
@@ -342,6 +371,18 @@ def sync_vector_store(
         count_after = int(vector_store.count(collection))
     except Exception:
         count_after = count_before
+    if backend_ids is not None:
+        landed_ids = vector_store.point_ids(collection)
+        still_missing = expected_vector_ids - landed_ids
+        landed_extras = (
+            landed_ids - expected_vector_ids
+            if section_ids is None and prune_stale else set()
+        )
+        if still_missing or landed_extras:
+            raise RuntimeError(
+                f"vector upsert into {collection!r} did not establish identity parity: "
+                f"missing_points={len(still_missing)}, extra_points={len(landed_extras)}"
+            )
     expected_total = len(current_stable_ids) if generation_mode else len(current_ids)
     if section_ids is None and expected_total > 0 and count_after < max(1, expected_total):
         raise RuntimeError(
@@ -370,12 +411,18 @@ def sync_vector_store(
     else:
         store.record_embedding_upserts(collection, records)
 
+    final_ids = landed_ids if backend_ids is not None else expected_vector_ids
     return SyncResult(
         embedded=len(pending) - cache_hits_before,
         upserted=len(points),
         skipped_cache=cache_hits_before,
         skipped_unchanged=skipped_unchanged,
         pruned=pruned,
+        verified=len(expected_vector_ids & final_ids),
+        backfilled=len(missing_backend_ids & final_ids),
+        extra_points=(
+            len(final_ids - expected_vector_ids) if section_ids is None else 0
+        ),
     )
 
 

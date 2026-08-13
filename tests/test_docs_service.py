@@ -723,6 +723,25 @@ def test_inspect_project_docs_enables_vector_sync_for_vector_retrieval(
     assert result.arguments_patch["with_vectors"] is True
 
 
+def test_active_index_diagnostics_skips_vector_initialization_in_lexical_mode(
+    tmp_path, monkeypatch
+):
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+    service.config.retrieval.default_mode = "lexical"
+    monkeypatch.setattr(
+        service.agent_gateway,
+        "dispatcher_for",
+        lambda *_args, **_kwargs: pytest.fail("lexical diagnostics initialized vectors"),
+    )
+
+    diagnostics = service.active_index_diagnostics()
+
+    assert diagnostics["vector_readiness"] == {
+        "status": "not_required",
+        "mode": "lexical",
+    }
+
+
 def test_ingest_project_docs_reports_missing_candidates_after_verification(tmp_path, monkeypatch):
     project = _flutter_project(tmp_path)
     (project / "README.md").write_text("# App\n\nIntro", encoding="utf-8")
@@ -1122,6 +1141,44 @@ def test_incremental_sync_is_idempotent_for_unchanged_save(tmp_path, monkeypatch
     assert result.diagnostics["metrics"]["latency_ms"] >= 0
 
 
+def test_unchanged_project_sync_with_vectors_runs_full_parity(tmp_path, monkeypatch):
+    project = _flutter_project(tmp_path)
+    (project / "README.md").write_text("# App\n\nStable vector docs.", encoding="utf-8")
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+    service.sync_project_docs(str(project), with_vectors=False)
+    agent = service._agent_instance()
+    calls = []
+
+    def sync_vectors():
+        calls.append("full")
+        agent.last_vector_sync_metrics = {
+            "status": "success",
+            "verified": 1,
+            "backfilled": 0,
+            "skipped_unchanged": 1,
+            "collection": "project-vectors",
+        }
+        return object()
+
+    monkeypatch.setattr(agent, "sync_vectors", sync_vectors)
+
+    result = service.sync_project_docs(
+        str(project), with_vectors=True, changed_paths=["README.md"]
+    )
+
+    assert calls == ["full"]
+    assert result.sections_indexed == 0
+    assert result.diagnostics["vector_sync"] == {
+        "status": "success",
+        "verified": 1,
+        "backfilled": 0,
+        "skipped_unchanged": 1,
+        "collection": "project-vectors",
+        "requested": True,
+        "retrieval_mode": "lexical",
+    }
+
+
 def test_incremental_sync_handles_rename_and_deletion_without_pruning_unrelated_docs(tmp_path, monkeypatch):
     project = _flutter_project(tmp_path)
     docs = project / "docs"
@@ -1209,7 +1266,10 @@ def test_incremental_vector_sync_is_scoped_to_changed_document(tmp_path, monkeyp
             "duration_ms": 12,
             "backend_setup_ms": 2,
             "collection": "project_vectors",
+            "requested": True,
+            "retrieval_mode": "lexical",
         }
+        return object()
 
     sync_chunks = MagicMock(side_effect=record_vector_sync)
     sync_all = MagicMock()
@@ -1238,6 +1298,8 @@ def test_incremental_vector_sync_is_scoped_to_changed_document(tmp_path, monkeyp
         "duration_ms": 12,
         "backend_setup_ms": 2,
         "collection": "project_vectors",
+        "requested": True,
+        "retrieval_mode": "lexical",
     }
     assert result.diagnostics["metrics"]["unrelated_files_reprocessed"] == 0
     budgets = json.loads(
@@ -1415,7 +1477,7 @@ vector_store:
     expected_project_db = str((project / ".docmancer" / "project-local.db").resolve())
     assert inspect.diagnostics["active_index"]["db_path"] == expected_active_db
     assert inspect.diagnostics["active_index"]["project_path"] == str(project.resolve())
-    assert inspect.diagnostics["active_index"]["config_source"] == "default"
+    assert inspect.diagnostics["active_index"]["config_source"] == "defaults"
     assert inspect.diagnostics["active_index"]["project_local_config"] == {
         "present": True,
         "path": str((project / "docmancer.yaml").resolve()),
@@ -7060,6 +7122,56 @@ def test_mcp_docs_status_uses_project_local_storage_topology(tmp_path):
     assert result["project"]["diagnostics"]["active_index"]["db_path"] == str(
         (project / ".docmancer" / "project.db").resolve()
     )
+    active = result["project"]["diagnostics"]["active_index"]
+    assert active["config_source"] == "project_local"
+    assert active["config_path"] == str((project / "docmancer.yaml").resolve())
+    assert active["retrieval_mode"] == "lexical"
+
+
+def test_project_service_cache_reuses_directory_config_and_invalidates_on_change(tmp_path):
+    project = tmp_path / "project"
+    project.mkdir()
+    config_path = project / "docmancer.yaml"
+    config_path.write_text("index:\n  db_path: .docmancer/one.db\n", encoding="utf-8")
+    fallback = LibraryDocsService(config=DocmancerConfig(), job_tracker=DocsJobTracker())
+    from docmancer.mcp.docs_server import _service_for_project_path
+
+    first = _service_for_project_path(fallback, {"project_path": str(project)})
+    second = _service_for_project_path(fallback, {"project_path": str(project / ".")})
+    config_path.write_text("index:\n  db_path: .docmancer/two.db\n", encoding="utf-8")
+    third = _service_for_project_path(fallback, {"project_path": str(project)})
+
+    assert first is second
+    assert Path(first.config_path) == config_path.resolve()
+    assert Path(first.config.index.db_path) == (project / ".docmancer/one.db").resolve()
+    assert third is not first
+    assert Path(third.config.index.db_path) == (project / ".docmancer/two.db").resolve()
+    assert len(fallback._project_service_cache) == 1
+
+
+def test_project_service_cache_concurrent_first_use_and_config_replacement(tmp_path):
+    from concurrent.futures import ThreadPoolExecutor
+    from docmancer.mcp.docs_server import _service_for_project_path
+
+    project = tmp_path / "project"
+    project.mkdir()
+    config_path = project / "docmancer.yaml"
+    config_path.write_text("index:\n  db_path: .docmancer/one.db\n", encoding="utf-8")
+    fallback = LibraryDocsService(config=DocmancerConfig(), job_tracker=DocsJobTracker())
+
+    def resolve():
+        return _service_for_project_path(fallback, {"project_path": str(project)})
+
+    with ThreadPoolExecutor(max_workers=8) as executor:
+        first_wave = list(executor.map(lambda _: resolve(), range(24)))
+    config_path.write_text("index:\n  db_path: .docmancer/two.db\n", encoding="utf-8")
+    with ThreadPoolExecutor(max_workers=8) as executor:
+        second_wave = list(executor.map(lambda _: resolve(), range(24)))
+
+    assert len({id(item) for item in first_wave}) == 1
+    assert len({id(item) for item in second_wave}) == 1
+    assert first_wave[0] is not second_wave[0]
+    assert len(fallback._project_service_cache) == 1
 
 
 def test_prepare_docs_removes_project_local_library_target(tmp_path):

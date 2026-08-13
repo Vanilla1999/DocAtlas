@@ -6,6 +6,11 @@ from typing import Any
 import re
 
 from docmancer.docs.application.project_answer_outline import build_project_answer_outline
+from docmancer.docs.application.evidence_selection import (
+    build_requirements,
+    docs_selection_config,
+    select_evidence,
+)
 from docmancer.docs.domain.answer_completeness import (
     evaluate_project_answer_completeness,
     extract_project_answer_requirements,
@@ -31,7 +36,7 @@ from docmancer.docs.domain.retrieval_routing import (
     should_run_repo_map,
     validate_routing_record,
 )
-from docmancer.docs.models import SOURCE_CLASS_PROJECT_FILE, DocsChunk, DocsResult, ProjectContextResult, ProjectDocsChunk, ProjectDocsResult, ProjectMetadata
+from docmancer.docs.models import SOURCE_CLASS_PROJECT_FILE, DeliveryDecision, DocsChunk, DocsResult, ProjectContextResult, ProjectDocsChunk, ProjectDocsResult, ProjectMetadata
 
 LOW_TRUST_PROJECT_RISK_FLAGS = frozenset({
     "research_artifact",
@@ -155,26 +160,52 @@ class ProjectContextService:
             raise ValueError("mode must be one of: auto, project-only, deps-only, public-docs")
         root = Path(project_path).expanduser().resolve()
         intent = classify_project_query_intent(question)
+        evidence_path = extract_document_locator(question)
+        canonical_requirements = build_requirements(
+            question,
+            required_evidence_paths=(evidence_path,) if evidence_path else (),
+            profile="project_document_answer" if evidence_path else "generic",
+        )
         metadata = self.facade.read_project_metadata(str(root))
         project_docs = None
         if mode in {"auto", "project-only"}:
             candidate_limit = min(20, max(12, (limit or 4) * 3))
-            project_docs = self.facade.get_project_docs(
-                str(root), question, tokens=tokens, limit=candidate_limit,
-                expand=expand, module=module, module_path=module_path, scope=scope,
-            )
+            project_docs_kwargs = {
+                "tokens": tokens, "limit": candidate_limit, "expand": expand,
+                "module": module, "module_path": module_path, "scope": scope,
+                "requirements": canonical_requirements,
+            }
+            if evidence_path:
+                project_docs_kwargs["evidence_path"] = evidence_path
+            project_docs = self.facade.get_project_docs(str(root), question, **project_docs_kwargs)
             if project_docs and project_docs.requires_confirmation and project_docs.confirmation_reason == "project_docs_preflight":
                 return _project_docs_preflight_confirmation_result(root=root, question=question, mode=mode, project_docs=project_docs)
             if project_docs and project_docs.results:
+                if evidence_path:
+                    evidence_path = project_docs.resolved_evidence_path or evidence_path
+                    normalized_evidence_path = normalize_doc_path(evidence_path)
+                    project_docs = replace(
+                        project_docs,
+                        results=[
+                            chunk for chunk in project_docs.results
+                            if normalize_doc_path(chunk.path) == normalized_evidence_path
+                        ],
+                    )
                 project_docs = _inject_broad_architecture_docs(
-                    project_docs, root=root, intent=intent,
+                    project_docs, root=root, intent=intent, evidence_path=evidence_path,
                     # The mere presence of an explicit catalog disables guessed
                     # architecture sources. An invalid catalog must fail closed.
                     catalog_authoritative=metadata.docs_catalog_present,
                 )
                 project_docs = replace(
                     project_docs,
-                    results=rerank_project_doc_chunks(project_docs.results, question=question, intent=intent, limit=limit),
+                    results=rerank_project_doc_chunks(
+                        project_docs.results,
+                        question=question,
+                        intent=intent,
+                        limit=limit,
+                        broad_max_per_source=4 if evidence_path else 2,
+                    ),
                 )
                 routing_stage_observed["project_docs"] = list(project_docs.results)
                 bounded_results, budget_issue = fit_stage_items("project_docs", project_docs.results)
@@ -364,7 +395,9 @@ class ProjectContextService:
                     items=observed_code_graph_items,
                 )
             except Exception as exc:
-                code_graph_error = f"{type(exc).__name__}: {exc}"
+                from docmancer.docs.application.library_refresh_policy import bounded_exception_diagnostics
+                safe = bounded_exception_diagnostics(exc, failure_phase="retrieval", failure_operation="code_graph")
+                code_graph_error = safe["exception_message"]
                 record_stage(
                     routing_record, "code_graph", status="failed", reason=graph_reason,
                     error=type(exc).__name__,
@@ -418,6 +451,15 @@ class ProjectContextService:
             arguments_patch = {"project_path": str(root)}
         context_pack, content_trust_warnings = annotate_context_pack(context_pack, repository_root=root)
         warnings.extend(warning["code"] for warning in content_trust_warnings)
+        if evidence_path:
+            normalized_evidence_path = normalize_doc_path(evidence_path)
+            context_pack = [
+                item for item in context_pack
+                if normalize_doc_path(
+                    item.get("path")
+                    or ((item.get("source") or {}).get("path") if isinstance(item.get("source"), dict) else None)
+                ) == normalized_evidence_path
+            ]
         trust_contract = build_project_context_trust_contract(
             project_docs=project_docs,
             dependency_docs=dependency_docs,
@@ -425,6 +467,14 @@ class ProjectContextService:
             mode=mode,
             context_pack=context_pack,
         )
+        selection_decision = select_evidence(
+            context_pack,
+            question=question,
+            config=docs_selection_config(tokens or 4000),
+            trust_contract=trust_contract,
+            requirements=canonical_requirements,
+        )
+        support_decision = selection_decision.support_decision
         answer_outline = build_project_answer_outline(question=question, intent=intent, context_pack=context_pack)
         metrics = project_context_metrics(context_pack=context_pack, project_docs=project_docs, dependency_docs=dependency_docs, intent=intent)
         lane_priority = ["project"] if mode == "project-only" else (["dependency"] if mode in {"deps-only", "public-docs"} else ["project", "dependency"])
@@ -476,6 +526,8 @@ class ProjectContextService:
             for item in source_evidence_items
         )
         answer_available = bool(project_docs and project_docs.answer_available) or bool(dependency_docs and dependency_docs.results) or source_evidence_answer_available
+        if dependency_confirmation:
+            answer_available = False
         if routing_budget_issues:
             warnings.append("retrieval_stage_budget_exceeded")
             next_actions.append({
@@ -569,6 +621,8 @@ class ProjectContextService:
             "query_terms_missing": trust_decision.query_terms_missing,
         }
         answer_available = trust_decision.answer_available
+        if dependency_confirmation:
+            answer_available = False
         status = "success" if answer_available else (project_docs.status if project_docs else dependency_docs.status if dependency_docs else "no_results")
         if not answer_available and trust_decision.reason == "no_reliable_context" and _is_low_signal_single_token_query(question):
             status = "no_results"
@@ -579,6 +633,11 @@ class ProjectContextService:
         elif requires_confirmation and not answer_available and status != "stale":
             status = "confirmation_required"
         reason = trust_decision.reason
+        if (
+            project_docs
+            and project_docs.reason_code in {"document_not_indexed", "ambiguous_document_locator"}
+        ):
+            reason = project_docs.reason_code
         if dependency_confirmation and not answer_available:
             reason = "dependency_docs_network_fetch_required"
         elif getattr(intent, "wants_code_symbols", False) and trust_decision.confidence != "trusted":
@@ -588,6 +647,10 @@ class ProjectContextService:
             message = "Returned partial/navigational project context; search project source for missing story-specific terms."
         if dependency_confirmation and not answer_available:
             message = f"Dependency docs for {selected_dependency} require network access; retry with allow_network=true after user confirmation."
+        delivery_decision = DeliveryDecision(
+            deliverable=bool(answer_available),
+            reason_code=None if answer_available else str(reason or "operational_delivery_blocked"),
+        )
         return ProjectContextResult(
             project_path=str(root),
             question=question,
@@ -595,6 +658,10 @@ class ProjectContextService:
             answer_available=answer_available,
             answer_type=answer_type,
             answer_completeness=answer_completeness,
+            requirements=canonical_requirements,
+            selection_decision=selection_decision,
+            support_decision=support_decision,
+            delivery_decision=delivery_decision,
             mode=mode,
             reason=reason,
             context_pack=context_pack,
@@ -624,10 +691,14 @@ class ProjectContextService:
 
     @staticmethod
     def dependency_mentioned_in_question(metadata: ProjectMetadata, question: str) -> str | None:
-        normalized_question = question.lower().replace("-", "_")
+        normalized_question = re.sub(r"[^a-z0-9]+", "", question.casefold())
         for dependency in metadata.dependencies:
             name = dependency.package_name
-            if name.lower() in normalized_question or name.lower().replace("-", "_") in normalized_question:
+            normalized_name = re.sub(r"[^a-z0-9]+", "", name.casefold())
+            aliases = {normalized_name}
+            if name.casefold().startswith("flutter_"):
+                aliases.add(re.sub(r"[^a-z0-9]+", "", name[8:].casefold()))
+            if any(alias and alias in normalized_question for alias in aliases):
                 return name
         return None
 
@@ -669,6 +740,13 @@ def project_context_pack(*, question: str = "", project_docs: ProjectDocsResult 
                 matching_authoritative_section["surrounding_context"] = content
                 continue
             pack.append({
+                "stable_chunk_id": item.stable_chunk_id,
+                "parent_logical_id": item.parent_logical_id,
+                "display_content_hash": item.display_content_hash,
+                "char_start": item.char_start,
+                "char_end": item.char_end,
+                "line_start": item.line_start,
+                "line_end": item.line_end,
                 "source_class": "project_doc",
                 "source_type": source_taxonomy["source_type"],
                 "source_kind": source_taxonomy["source_kind"],
@@ -816,9 +894,10 @@ def _inject_broad_architecture_docs(
     *,
     root: Path,
     intent: Any,
+    evidence_path: str | None = None,
     catalog_authoritative: bool = False,
 ) -> ProjectDocsResult:
-    if not getattr(intent, "wants_architecture", False):
+    if evidence_path or not getattr(intent, "wants_architecture", False):
         return project_docs
     existing = {normalize_doc_path(chunk.path) for chunk in project_docs.results}
     injected: list[ProjectDocsChunk] = []
@@ -1251,3 +1330,4 @@ def _token_savings_metrics(raw_docs_tokens: int, context_pack_tokens: int) -> di
         "agentic_runway_multiplier": round(raw / pack, 2) if pack else None,
         "meaning": "compression_vs_raw_docs_not_relevance_score",
     }
+from docmancer.retrieval.query_planning import extract_document_locator

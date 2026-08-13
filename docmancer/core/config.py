@@ -274,20 +274,6 @@ class DocmancerConfig(BaseModel):
                     data.pop("vector_store", None)
 
         config = cls(**data)
-        # Auto-flip retrieval.default_mode to "hybrid" only when the YAML
-        # explicitly opts into a vector store. Bare configs (no vector_store
-        # block at all) keep the FTS5-only default, which preserves prior
-        # behaviour and avoids triggering managed-Qdrant lifecycle code in
-        # callers that did not ask for it.
-        retrieval_block = data.get("retrieval") if isinstance(data.get("retrieval"), dict) else {}
-        vs_block_raw = data.get("vector_store")
-        if (
-            isinstance(vs_block_raw, dict)
-            and vs_block_raw  # non-empty: user added at least one vector_store key
-            and vs_block_raw.get("provider", "qdrant") == "qdrant"
-            and "default_mode" not in (retrieval_block or {})
-        ):
-            config.retrieval.default_mode = "hybrid"
         db_path = Path(config.index.db_path)
         if not db_path.is_absolute():
             config.index.db_path = str((path.parent / db_path).resolve())

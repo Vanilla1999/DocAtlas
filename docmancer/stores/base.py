@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
+import hashlib
+import json
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -70,6 +72,19 @@ class VectorStore(ABC):
     def delete_points(self, collection: str, ids: list) -> int:
         """Delete points by id. Default no-op; concrete stores should override."""
         return 0
+
+    def point_ids(self, collection: str) -> set[str]:
+        """Return exact point identities for parity verification."""
+        raise NotImplementedError
+
+    def backend_identity(self) -> str:
+        """Return a stable, non-secret identity for the concrete backend."""
+        return hashlib.sha256(
+            json.dumps(self._backend_identity_material(), sort_keys=True).encode("utf-8")
+        ).hexdigest()
+
+    def _backend_identity_material(self) -> dict[str, str]:
+        return {"provider": type(self).__name__}
 
     @abstractmethod
     def delete_collection(self, collection: str) -> None:

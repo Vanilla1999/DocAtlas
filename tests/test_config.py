@@ -174,7 +174,7 @@ index:
     assert config.retrieval.default_mode == "lexical"
 
 
-def test_explicit_qdrant_vector_store_flips_to_hybrid(tmp_path):
+def test_explicit_qdrant_vector_store_does_not_change_retrieval_mode(tmp_path):
     config_file = tmp_path / "docmancer.yaml"
     config_file.write_text(
         """
@@ -183,7 +183,7 @@ vector_store:
 """
     )
     config = DocmancerConfig.from_yaml(config_file)
-    assert config.retrieval.default_mode == "hybrid"
+    assert config.retrieval.default_mode == "lexical"
 
 
 def test_explicit_default_mode_overrides_auto_flip(tmp_path):

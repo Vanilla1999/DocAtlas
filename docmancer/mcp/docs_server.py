@@ -6,6 +6,7 @@ import copy
 import json
 import os
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any, Callable, Mapping, cast
 
 import jsonschema
@@ -301,6 +302,7 @@ Use this only when the user explicitly asks whether docs are indexed/stale/healt
                 "job_id": {"type": ["string", "null"]},
                 "status": {"type": ["string", "null"]},
                 "limit": {"type": ["integer", "null"], "minimum": 1, "maximum": 200},
+                "project_path": {"type": ["string", "null"]},
             },
             "required": ["action"],
         },
@@ -652,7 +654,7 @@ Run the relevant tests/linters after this tool.
         "description": "Return persistent progress for one docs indexing/prefetch job.",
         "inputSchema": {
             "type": "object",
-            "properties": {"job_id": {"type": "string"}},
+            "properties": {"job_id": {"type": "string"}, "project_path": {"type": ["string", "null"]}},
             "required": ["job_id"],
         },
     },
@@ -664,6 +666,7 @@ Run the relevant tests/linters after this tool.
             "properties": {
                 "status": {"type": ["string", "null"]},
                 "limit": {"type": ["integer", "null"], "minimum": 1, "maximum": 200},
+                "project_path": {"type": ["string", "null"]},
             },
         },
     },
@@ -1040,16 +1043,38 @@ def _service_for_project_path(
     project_path = arguments.get("project_path")
     if not isinstance(project_path, str) or not project_path.strip():
         return service
-    topology = StorageTopologyResolver(fallback_config=service.config).resolve(project_path)
-    if topology.config.index.db_path == service.config.index.db_path:
+    project_root = Path(project_path).expanduser().resolve()
+    topology = StorageTopologyResolver(
+        fallback_config=service.config,
+        fallback_source=service.config_source,
+        prefer_fallback=service.config_source == "explicit",
+    ).resolve(project_root)
+    if topology.config == service.config and topology.config_source == service.config_source:
         return service
-    return LibraryDocsService(
+    cache_key = (str(project_root), topology.config_identity, str(topology.library_index_root or ""))
+    cache = service._project_service_cache
+    lock = service._project_service_cache_lock
+    with lock:
+        cached = cache.get(cache_key)
+        if cached is not None:
+            cache.move_to_end(cache_key)
+            return cached
+        # A changed resolved config invalidates the prior service for this root.
+        for stale_key in [key for key in cache if key[0] == str(project_root)]:
+            cache.pop(stale_key, None)
+        project_service = LibraryDocsService(
         config=topology.config,
+        config_source=topology.config_source,
+        config_path=topology.config_path or service.config_path,
         agent_factory=service.agent_gateway._agent_factory,
         project_reader=service.project_reader,
         stale_after_days=service.stale_after_days,
         library_index_root=topology.library_index_root,
-    )
+        )
+        cache[cache_key] = project_service
+        while len(cache) > 8:
+            cache.popitem(last=False)
+        return project_service
 
 
 def _destructive_project_scope_error(name: str, arguments: dict[str, Any]) -> str | None:
@@ -1111,14 +1136,14 @@ def call_docs_tool_payload(
             phase="validation",
         )
     handler_args = _public_handler_arguments(name, args)
-    active_service = _service_for_project_path(service, handler_args)
     try:
+        active_service = _service_for_project_path(service, handler_args)
         payload = handler(name, handler_args, active_service)
     except Exception as exc:
         reason_code = _exception_reason_code(exc)
         return build_mcp_error_payload(
             reason_code=reason_code,
-            message=str(exc),
+            message=f"{reason_code}: request failed",
             exception=exc,
             tool=name,
             phase="execution",
@@ -1472,5 +1497,12 @@ async def _run_async(service: LibraryDocsService) -> None:
         await server.run(read_stream, write_stream, server.create_initialization_options())
 
 
-def serve() -> None:
-    asyncio.run(_run_async(LibraryDocsService()))
+def serve(config_path: str | Path | None = None) -> None:
+    from docmancer.core.config_resolution import resolve_config
+
+    resolved = resolve_config(explicit_path=config_path)
+    asyncio.run(_run_async(LibraryDocsService(
+        config=resolved.config,
+        config_source=resolved.source,
+        config_path=resolved.path,
+    )))

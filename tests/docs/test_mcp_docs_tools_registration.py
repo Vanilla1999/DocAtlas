@@ -667,6 +667,11 @@ def test_prepare_docs_compacts_large_project_sync_inventory():
                 project=ProjectMetadata(project_path=project_path),
                 indexed_sources=[{"path": f"docs/{index}.md", "content": "x" * 500} for index in range(500)],
                 current_count=500,
+                diagnostics={"vector_sync": {
+                    "status": "success", "requested": True, "verified": 500,
+                    "backfilled": 2, "extra_points": 0, "collection": "project-vectors",
+                    "retrieval_mode": "dense",
+                }},
             )
 
     result = call_docs_tool_payload(
@@ -678,6 +683,11 @@ def test_prepare_docs_compacts_large_project_sync_inventory():
     assert len(json.dumps(result, ensure_ascii=False).encode("utf-8")) <= 32_000
     assert result["summary"]["current_count"] == 500
     assert "indexed_sources" not in result
+    assert result["vector_sync"] == {
+        "status": "success", "requested": True, "verified": 500,
+        "backfilled": 2, "extra_points": 0, "collection": "project-vectors",
+        "retrieval_mode": "dense",
+    }
 
 
 def test_prepare_docs_rejects_malformed_incremental_sync_paths():

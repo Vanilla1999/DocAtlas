@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import warnings
 from typing import Any
+from urllib.parse import urlsplit
 
 from .base import VectorHit, VectorPoint, VectorStore
 
@@ -86,6 +87,16 @@ class QdrantStore(VectorStore):
                     prefer_grpc=True,
                 )
         return self._grpc_client
+
+    def _backend_identity_material(self) -> dict[str, str]:
+        parsed = urlsplit(self._url)
+        return {
+            "provider": "qdrant",
+            "scheme": parsed.scheme.lower(),
+            "host": (parsed.hostname or "").lower(),
+            "port": str(parsed.port or (443 if parsed.scheme == "https" else 80)),
+            "path": parsed.path.rstrip("/"),
+        }
 
     def _build_vectors_config(self, dimensions: int, options: dict):
         qm = self._qm
@@ -194,7 +205,23 @@ class QdrantStore(VectorStore):
                 "dim": int(dim or 0),
                 "sparse_model": payload.get(_META_SPARSE_MODEL_KEY) or None,
             }
-        return None
+
+    def point_ids(self, collection: str) -> set[str]:
+        if not self._is_owned(collection):
+            raise ValueError(f"collection {collection!r} is not docmancer-owned")
+        ids: set[str] = set()
+        offset = None
+        while True:
+            records, offset = self._client.scroll(
+                collection_name=collection,
+                limit=256,
+                offset=offset,
+                with_payload=False,
+                with_vectors=False,
+            )
+            ids.update(str(record.id) for record in records if str(record.id) != str(_OWNERSHIP_POINT_ID))
+            if offset is None:
+                return ids
 
     def _to_filter(self, filters: dict | None):
         if not filters:

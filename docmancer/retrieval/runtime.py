@@ -53,6 +53,13 @@ def dispatcher_for_agent(agent: Any, *, mode: str | None = None) -> RetrievalDis
             embeddings_dim=config.embeddings.dimensions,
         )
         provider = get_embeddings_provider(config.embeddings)
+        persisted_identity = str(generation_info.get("vector_backend_identity") or "")
+        if not persisted_identity:
+            raise RuntimeError(
+                "unverified_backend_identity: full vector rebuild required"
+            )
+        if persisted_identity != vector_store.backend_identity():
+            raise RuntimeError("active generation vector backend identity mismatch")
         collection = agent._vector_collection_name()
     except Exception as exc:
         raise HybridRetrievalError(

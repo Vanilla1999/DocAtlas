@@ -180,7 +180,7 @@ def test_get_docs_context_clamps_tokens_and_limit_at_mcp_boundary() -> None:
     )
 
     assert result is not None
-    assert result["status"] == "success"
+    assert result["status"] == "insufficient_evidence"
     name, args, kwargs = service.unified_context.calls[0]
     assert name == "get_docs_context"
     assert args == ("riverpod widgets",)

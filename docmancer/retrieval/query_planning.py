@@ -4,6 +4,7 @@ from __future__ import annotations
 import hashlib
 import re
 from dataclasses import asdict
+from pathlib import Path
 from typing import Any, Mapping
 
 from docmancer.retrieval.contracts import (
@@ -17,6 +18,7 @@ from docmancer.retrieval.contracts import (
 QUERY_PLAN_SCHEMA_VERSION = "deterministic-query-plan-v1"
 MAX_EXACT_TERMS = 12
 MAX_CONCEPT_QUERIES = 3
+MAX_DOCUMENT_LOCATOR_CHARS = 240
 _STOPWORDS = frozenset({
     "a", "an", "and", "are", "be", "can", "do", "does", "for", "how",
     "i", "in", "is", "it", "of", "on", "or", "the", "this", "to",
@@ -29,6 +31,11 @@ _TERM_PATTERNS = (
     ("config_key", re.compile(r"\b[A-Z][A-Z0-9_]{2,119}\b")),
     ("symbol", re.compile(r"\b[A-Za-z_]\w*(?:(?:::|\.)[A-Za-z_]\w*)+\b")),
     ("path", re.compile(r"(?<![\w/])(?:[A-Za-z0-9_.-]+/)+[A-Za-z0-9_.-]+")),
+)
+_DOCUMENT_LOCATOR_RE = re.compile(
+    r"(?:\b(?:in|from|according\s+to)\s+|(?:в|из|согласно)\s+)"
+    r"[`\"']?((?:\.?\.?/)?(?:[A-Za-z0-9_.-]+/)*[A-Za-z0-9_.-]+\.[A-Za-z0-9_-]+)[`\"']?",
+    flags=re.IGNORECASE,
 )
 _PATH_ROOTS = frozenset({
     "app", "bin", "cmd", "config", "docmancer", "docs", "eval", "lib",
@@ -88,8 +95,18 @@ def _canonical_filter_value(value: Any) -> Any:
 def extract_exact_terms(query: str) -> tuple[ExactTerm, ...]:
     found: list[ExactTerm] = []
     seen: set[str] = set()
+    path_spans = [
+        match.span()
+        for match in dict(_TERM_PATTERNS)["path"].finditer(query)
+        if _looks_like_source_path(match.group(0))
+    ]
     for kind, pattern in _TERM_PATTERNS:
         for match in pattern.finditer(query):
+            if kind != "path" and any(
+                start <= match.start() and match.end() <= end
+                for start, end in path_spans
+            ):
+                continue
             value = match.group(1) if match.lastindex else match.group(0)
             value = " ".join(value.split())[:160]
             if kind == "config_key" and "_" not in value:
@@ -106,12 +123,26 @@ def extract_exact_terms(query: str) -> tuple[ExactTerm, ...]:
     return tuple(found)
 
 
+def extract_document_locator(query: str) -> str | None:
+    """Return one explicit locative source path; comparisons remain unscoped."""
+    matches = {
+        match.group(1).replace("\\", "/").removeprefix("./").rstrip(".,;:!?")
+        for match in _DOCUMENT_LOCATOR_RE.finditer(query)
+        if _looks_like_source_path(match.group(1))
+        and len(match.group(1)) <= MAX_DOCUMENT_LOCATOR_CHARS
+        and Path(match.group(1).rstrip(".,;:!?`\"'")).suffix.casefold()
+        in {".md", ".mdx", ".rst", ".txt", ".adoc"}
+    }
+    return next(iter(matches)) if len(matches) == 1 else None
+
+
 def _looks_like_source_path(value: str) -> bool:
     normalized = value.replace("\\", "/")
-    first, _, leaf = normalized.partition("/")
+    first = normalized.partition("/")[0]
+    leaf = normalized.rsplit("/", 1)[-1]
     return (
         normalized.startswith(("./", "../", "/"))
-        or "." in leaf.rsplit("/", 1)[-1]
+        or "." in leaf
         or first.casefold() in _PATH_ROOTS
     )
 
@@ -172,6 +203,7 @@ def _filter_spec(filters: Mapping[str, Any] | None) -> FilterSpec:
 
     return FilterSpec(
         project_identity=text("project_identity"),
+        project_doc_path=text("project_doc_path"),
         library_id=text("library_id"),
         resolved_version=text("resolved_version"),
         version_family=text("version_family"),
@@ -224,6 +256,7 @@ def metadata_matches_filters(
     # Hydrated chunks retain source-owned project catalog metadata, while
     # vector payloads expose its normalized promoted filter field.
     values.setdefault("authority", values.get("project_doc_authority"))
+    values.setdefault("project_doc_path", values.get("source_path"))
     values.setdefault("source", source)
     for key, expected in compile_backend_filters(filters).items():
         actual = values.get(key)
@@ -293,9 +326,11 @@ def build_query_plan(
 __all__ = [
     "MAX_CONCEPT_QUERIES",
     "MAX_EXACT_TERMS",
+    "MAX_DOCUMENT_LOCATOR_CHARS",
     "QUERY_PLAN_SCHEMA_VERSION",
     "build_query_plan",
     "compile_backend_filters",
+    "extract_document_locator",
     "extract_exact_terms",
     "metadata_matches_filters",
 ]

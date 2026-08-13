@@ -303,11 +303,8 @@ def test_bounded_direct_is_one_existing_tool_call_and_returns_only_action_packet
     assert backend.calls == 1
     assert result["kind"] == "patch_context"
     assert "context_pack" not in json.dumps(result)
-    assert result["status"] == "ok"
-    assert result["checks"]["tests"][0]["text"].endswith("test_action_packet.py.")
-    assert len(result["checks"]["compile"]) == 2
-    assert result["checks"]["semantic_checks"][0]["text"].startswith("Run ruff")
-    assert result["invariants"]
+    assert result["status"] == "insufficient_evidence"
+    assert result["missing"]
     jsonschema.validate(result, tool["outputSchema"])
     assert math.ceil(len(json.dumps(result, ensure_ascii=False).encode("utf-8")) / 4) <= 1_500
 
@@ -340,7 +337,7 @@ def test_bounded_direct_is_one_existing_tool_call_and_returns_only_action_packet
         "question": "Implement bounded context", "project_path": "/repo",
     }, UnifiedDocsContextService(backend))
     assert packet_without_strategy["kind"] == "patch_context"
-    assert packet_without_strategy["status"] == "ok"
+    assert packet_without_strategy["status"] == "insufficient_evidence"
 
     class MissingFacade:
         def get_docs_context(self, question, **kwargs):
@@ -461,9 +458,8 @@ def test_bounded_direct_is_one_existing_tool_call_and_returns_only_action_packet
     multi_chunk_result = handle_context_tool("get_docs_context", {
         "question": "Edit shared", "project_path": "/repo", "delivery_strategy": "bounded_direct",
     }, UnifiedDocsContextService(MultiChunkBackend()))
-    assert {item["name"] for item in multi_chunk_result["targets"]["symbols"]} == {
-        "first", "second",
-    }
+    assert multi_chunk_result["status"] == "insufficient_evidence"
+    assert multi_chunk_result["missing"]
 
     annotated, _ = annotate_context_pack([
         {

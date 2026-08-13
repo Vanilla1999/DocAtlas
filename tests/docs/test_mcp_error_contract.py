@@ -49,7 +49,7 @@ def test_unhandled_exception_includes_traceback_in_debug() -> None:
         )
 
     assert payload["error"]["exception_type"] == "RuntimeError"
-    assert "RuntimeError: boom" in payload["error"]["traceback"]
+    assert payload["error"]["traceback"] == "<redacted traceback>"
 
 
 def test_bad_request_error_contract_has_fix_arguments_hint() -> None:

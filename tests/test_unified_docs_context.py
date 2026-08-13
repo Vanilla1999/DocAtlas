@@ -5,7 +5,7 @@ from dataclasses import dataclass, field, replace
 from pathlib import Path
 from typing import Any
 
-from docmancer.docs.application.evidence_selection import library_docs_selection_config, select_evidence
+from docmancer.docs.application.evidence_selection import AggregateMixedSelectionDecision, docs_selection_config, library_docs_selection_config, select_evidence
 from docmancer.docs.application.unified_context_service import UnifiedDocsContextService
 from docmancer.docs.models import DocsChunk, DocsResult, LibraryInfo, ProjectContextResult, UnifiedDocsContextResult
 
@@ -111,7 +111,7 @@ def test_auto_with_project_path_routes_to_project_context():
     result = _service(facade).get_docs_context("How docs work?", project_path="/repo", prepare_project_docs=False)
     assert result.mode_selected == "project"
     assert _call_names(facade) == ["get_project_context"]
-    assert facade.calls[0][1]["mode"] == "project-only"
+    assert facade.calls[0][1]["mode"] == "auto"
 
 
 def test_auto_with_project_path_allows_network_only_when_explicit():
@@ -159,6 +159,45 @@ def test_library_context_consumes_selector_support_instead_of_context_presence()
     assert result.support_status == "insufficient_evidence"
     assert result.mandatory_coverage < 1.0
     assert result.selected_evidence_ids == ["launch-only"]
+    assert result.decision_hash == selection.support_decision.decision_hash
+
+
+def test_project_context_consumes_canonical_support_instead_of_legacy_exact_flag():
+    facade = FakeFacade()
+    question = "Explain CONFIG_KEY and MISSING_KEY"
+    candidate = {
+        "stable_chunk_id": "config-only",
+        "parent_logical_id": "docs/config.md",
+        "path": "docs/config.md",
+        "source_class": "project_doc",
+        "content": "CONFIG_KEY enables the documented behavior.",
+        "display_content_hash": hashlib.sha256(
+            b"CONFIG_KEY enables the documented behavior."
+        ).hexdigest(),
+    }
+    selection = select_evidence(
+        [candidate], question=question, config=docs_selection_config(800)
+    )
+    facade.project_context = replace(
+        facade.project_context,
+        question=question,
+        context_pack=[candidate],
+        answer_type="exact",
+        answer_completeness={"edit_ready": True, "missing_terms": []},
+        requirements=selection.requirements,
+        selection_decision=selection,
+        support_decision=selection.support_decision,
+    )
+
+    result = _service(facade).get_docs_context(
+        question, project_path="/repo", prepare_project_docs=False
+    )
+
+    assert selection.support_decision.answer_supported is False
+    assert result.answer_supported is False
+    assert result.answer_available is False
+    assert result.support_decision is selection.support_decision
+    assert result.selection_decision is selection
     assert result.decision_hash == selection.support_decision.decision_hash
 
 
@@ -481,12 +520,61 @@ def test_mixed_mode_keeps_library_chunks_out_of_project_scope():
     assert library_items and all(item["doc_scope"] == "library" for item in library_items)
 
 
+def test_mixed_mode_exposes_lane_qualified_aggregate_selection():
+    facade = FakeFacade()
+    question = "Explain SharedKey"
+    project_item = {
+        "stable_chunk_id": "shared", "parent_logical_id": "README.md",
+        "path": "README.md", "content": "SharedKey is a project rule.",
+        "display_content_hash": hashlib.sha256(b"SharedKey is a project rule.").hexdigest(),
+    }
+    library_item = {
+        "stable_chunk_id": "shared", "parent_logical_id": "library.md",
+        "source": "https://example.test/library", "content": "SharedKey is a library API.",
+        "display_content_hash": hashlib.sha256(b"SharedKey is a library API.").hexdigest(),
+    }
+    project_selection = select_evidence(
+        [project_item], question=question, config=docs_selection_config(800),
+        public_requirements=["SharedKey"],
+    )
+    library_selection = select_evidence(
+        [library_item], question=question, config=library_docs_selection_config(800),
+        public_requirements=["SharedKey"],
+    )
+    facade.project_context = replace(
+        facade.project_context, question=question, context_pack=[project_item],
+        selection_decision=project_selection,
+        support_decision=project_selection.support_decision,
+    )
+    facade.library_result = replace(
+        facade.library_result, topic=question,
+        results=[DocsChunk(
+            title="SharedKey", content=library_item["content"],
+            source=library_item["source"], url=library_item["source"], metadata={"stable_chunk_id": "shared"},
+        )],
+        selection_decision=library_selection,
+        support_decision=library_selection.support_decision,
+    )
+
+    result = _service(facade).get_docs_context(
+        question, project_path="/repo", library="fastapi", prepare_project_docs=False,
+    )
+
+    assert isinstance(result.selection_decision, AggregateMixedSelectionDecision)
+    assert result.support_decision is result.selection_decision.support_decision
+    assert len(set(result.selected_evidence_ids)) == 2
+    assert all(value.startswith(("project:/repo:", "library:python:fastapi@latest:web:")) for value in result.selected_evidence_ids)
+    assert result.decision_hash == result.selection_decision.support_decision.decision_hash
+    assert result.assignment_hash == result.selection_decision.support_decision.assignment_hash
+
+
 def test_partial_success_when_project_succeeds_and_library_missing():
     facade = FakeFacade()
     facade.library_local = False
     result = _service(facade).get_docs_context("Mixed?", project_path="/repo", library="fastapi", prepare_project_docs=False)
     assert result.status == "partial_success"
-    assert result.answer_available is True
+    assert result.context_available is True
+    assert result.answer_available is False
     assert result.lanes["library"]["status"] == "confirmation_required"
 
 
@@ -754,7 +842,7 @@ def test_auto_project_path_delegates_to_project_context_auto():
     facade = FakeFacade()
     _service(facade).get_docs_context("How docs work?", project_path="/repo", prepare_project_docs=False)
     assert facade.calls[0][0] == "get_project_context"
-    assert facade.calls[0][1]["mode"] == "project-only"
+    assert facade.calls[0][1]["mode"] == "auto"
 
 
 def test_auto_project_question_selects_project():
@@ -843,7 +931,8 @@ def test_placeholder_preflight_returns_partial_project_context_without_blind_syn
     facade = PlaceholderPreflightFacade()
     result = _service(facade).get_docs_context("architecture", project_path="/repo", mode="project")
 
-    assert result.answer_available is True
+    assert result.context_available is True
+    assert result.answer_available is False
     assert result.status == "success"
     assert result.requires_confirmation is False
     assert result.confirmation_reason is None
@@ -913,7 +1002,7 @@ def test_auto_does_not_use_new_keyword_classifier():
     facade = FakeFacade()
     result = _service(facade).get_docs_context("Riverpod autoDispose keyword should not force dependency", project_path="/repo", prepare_project_docs=False)
     assert result.mode_selected == "project"
-    assert facade.calls[0][1]["mode"] == "project-only"
+    assert facade.calls[0][1]["mode"] == "auto"
 
 
 def test_explicit_project_mode_stays_project_only():

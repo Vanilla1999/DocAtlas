@@ -7,6 +7,7 @@ from docmancer.docs.service import LibraryDocsService
 from docmancer.docs.infrastructure.agent_index_gateway import AgentIndexGateway
 from docmancer.docs.registry import LibraryRecord
 from docmancer.embeddings.base import EmbeddingsProvider
+from docmancer.retrieval.dispatch import RetrievalDispatcher
 
 
 class _SemanticStubProvider(EmbeddingsProvider):
@@ -176,3 +177,82 @@ def test_public_library_query_consumes_dense_vector_index(tmp_path, monkeypatch)
     assert "automobile" in result.chunks[0].text
     assert result.mode_used == "dense"
     assert result.candidate_counts["dense"] == 1
+
+
+def test_lexical_vector_readiness_is_bounded_and_does_not_touch_vectors(tmp_path):
+    config = DocmancerConfig()
+    config.index.db_path = str(tmp_path / "docs.db")
+    agent = DocmancerAgent(config=config)
+    dispatcher = RetrievalDispatcher(store=agent.store, config=config)
+
+    assert dispatcher.vector_readiness("lexical") == {
+        "schema_version": "vector-readiness-v1",
+        "status": "not_required",
+        "mode": "lexical",
+    }
+
+
+def test_vector_readiness_does_not_expose_collection_or_point_ids(tmp_path):
+    config = DocmancerConfig()
+    config.index.db_path = str(tmp_path / "docs.db")
+    config.retrieval.default_mode = "dense"
+    agent = DocmancerAgent(config=config)
+    dispatcher = RetrievalDispatcher(
+        store=agent.store, config=config, vector_store=object(),
+        provider=_SemanticStubProvider(), collection="secret-collection-id",
+    )
+
+    diagnostic = dispatcher.vector_readiness()
+
+    assert diagnostic == {
+        "schema_version": "vector-readiness-v1",
+        "status": "not_ready",
+        "mode": "dense",
+        "reason_code": "metadata_unverified",
+        "collection_id": "sha256:63f3b22128229bc0",
+    }
+    assert "secret-collection-id" not in str(diagnostic)
+
+
+def test_legacy_empty_backend_identity_fails_closed(tmp_path):
+    config = DocmancerConfig()
+    config.index.db_path = str(tmp_path / "docs.db")
+    config.retrieval.default_mode = "dense"
+    agent = DocmancerAgent(config=config)
+    agent.store.add_documents([Document(
+        source="old", content="# Old\n\nalpha",
+        metadata={"format": "markdown", "chunking_schema": "parent-child-v1"},
+    )])
+    collection = str(agent.store.generation_info()["vector_collection"])
+
+    diagnostic = RetrievalDispatcher(
+        store=agent.store, config=config, vector_store=object(),
+        provider=_SemanticStubProvider(), collection=collection,
+    ).vector_readiness()
+
+    assert diagnostic["reason_code"] == "unverified_backend_identity"
+
+
+def test_vector_activation_failure_preserves_old_generation(tmp_path):
+    config = DocmancerConfig()
+    config.index.db_path = str(tmp_path / "docs.db")
+    agent = DocmancerAgent(config=config)
+    agent.store.add_documents([Document(
+        source="old", content="# Old\n\nqueryable marker",
+        metadata={"format": "markdown", "chunking_schema": "parent-child-v1"},
+    )])
+    active = agent.store.active_generation_id()
+    candidate = agent.store.add_documents(
+        [Document(source="new", content="# New\n\nreplacement")],
+        activate_generation=False,
+    )
+
+    try:
+        agent.store.activate_generation(candidate.generation_id, require_vector_witness=True)
+    except ValueError:
+        pass
+    else:
+        raise AssertionError("activation without parity witness succeeded")
+
+    assert agent.store.active_generation_id() == active
+    assert agent.store.query("queryable marker", limit=1, budget=1000)

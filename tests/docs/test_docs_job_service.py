@@ -5,7 +5,8 @@ from datetime import datetime, timedelta, timezone
 import sqlite3
 import time
 
-from docmancer.docs.application.docs_job_service import DocsJobService, DocsJobTracker
+from docmancer.docs.application.docs_job_service import DEFAULT_DOCS_JOB_LIST_LIMIT, DocsJobService, DocsJobTracker
+from docmancer.docs.interfaces.mcp.prefetch_tools import handle_prefetch_tool
 from docmancer.docs.service import LibraryDocsService
 
 
@@ -121,7 +122,7 @@ def test_sqlite_job_tracker_persists_terminal_status_and_counters_across_restart
     assert recovered.failure_operation == "sync_vectors"
     assert recovered.exception_type == "RuntimeError"
     assert recovered.exception_message == "vector backend unavailable"
-    assert recovered.exception_traceback == "Traceback: vector backend unavailable"
+    assert recovered.exception_traceback == "<redacted traceback>"
     assert recovered.request_identity == "https://example.com/docs"
     assert recovered.generation_id
 
@@ -220,3 +221,93 @@ def test_persisted_job_events_are_bounded_and_redact_url_credentials(tmp_path):
     assert len(recovered.events[0]["message"]) == 1000
     assert "pass" not in str(recovered.events)
     assert "secret" not in str(recovered.events)
+
+
+def test_persisted_vector_sync_diagnostics_are_bounded_and_drop_raw_ids(tmp_path):
+    tracker = DocsJobTracker(db_path=tmp_path / "jobs.db")
+    job = tracker.create("prefetch_library_docs")
+    tracker.update(
+        job.job_id,
+        vector_sync={
+            "status": "failed",
+            "reason": "identity_parity_mismatch",
+            "vector_backend": "sqlite-vec",
+            "verified": 3,
+            "collection": "raw-collection-id",
+            "point_ids": ["raw-point-id"],
+        },
+    )
+
+    recovered = DocsJobTracker(db_path=tmp_path / "jobs.db").get(job.job_id)
+
+    assert recovered is not None
+    assert recovered.vector_sync == {
+        "status": "failed",
+        "reason": "identity_parity_mismatch",
+        "vector_backend": "sqlite-vec",
+        "verified": 3,
+    }
+    assert "raw-collection-id" not in str(recovered)
+    assert "raw-point-id" not in str(recovered)
+
+
+def test_store_boundary_sanitizes_nested_secrets_and_direct_traceback_update(tmp_path):
+    db_path = tmp_path / "jobs.db"
+    tracker = DocsJobTracker(db_path=db_path)
+    job = tracker.create("any_job", request_payload={"nested": {"api_key": "secret-key"}})
+    tracker.update(
+        job.job_id,
+        status="failed",
+        phase="fetching",
+        message="Bearer bearer-secret https://user:pass@example.com/a?token=query-secret",
+        exception_traceback="Traceback raw-secret",
+        page_failure_summary=[{"reason_code": "fetch_failed", "token": "nested-secret", "count": 1}] * 100,
+    )
+
+    recovered = DocsJobTracker(db_path=db_path).get(job.job_id)
+    raw = sqlite3.connect(db_path).execute("SELECT payload_json FROM docs_jobs").fetchone()[0]
+
+    assert recovered is not None
+    assert recovered.phase == "done"
+    assert recovered.failure_phase == "fetching"
+    assert recovered.reason_code == "job_failed"
+    assert recovered.retryable is False
+    assert recovered.exception_traceback == "<redacted traceback>"
+    assert len(recovered.page_failure_summary) == 20
+    assert all(set(item) == {"reason_code", "count"} for item in recovered.page_failure_summary)
+    assert all(secret not in raw for secret in ("secret-key", "bearer-secret", "pass", "query-secret", "raw-secret", "nested-secret"))
+
+
+def test_default_job_list_is_finite_and_fast_with_1000_retained_jobs(tmp_path):
+    tracker = DocsJobTracker(db_path=tmp_path / "jobs.db", max_history=1000)
+    for index in range(1000):
+        tracker.create("retained", request_payload={"project_path": "/project", "index": index})
+
+    started = time.perf_counter()
+    jobs = tracker.list(project_path="/project")
+
+    assert len(jobs) == DEFAULT_DOCS_JOB_LIST_LIMIT
+    assert time.perf_counter() - started < 1.0
+
+
+def test_public_and_legacy_job_surfaces_share_safe_canonical_projection():
+    service = DocsJobService(DocsJobTracker())
+    job = service.create("prefetch_library_docs", request_payload={"project_path": "/project", "collection": "raw-id"})
+    service.update(job.job_id, status="failed", vector_sync={"vector_backend": "sqlite-vec", "verified": 2, "collection": "raw-id"})
+
+    detail_payloads = [
+        handle_prefetch_tool("docs_status", {"action": "job", "job_id": job.job_id}, service),
+        handle_prefetch_tool("docs_job", {"action": "status", "job_id": job.job_id}, service),
+        handle_prefetch_tool("get_docs_job_status", {"job_id": job.job_id}, service),
+    ]
+    list_payloads = [
+        handle_prefetch_tool("docs_status", {"action": "jobs", "project_path": "/project"}, service),
+        handle_prefetch_tool("docs_job", {"action": "list", "project_path": "/project"}, service),
+        handle_prefetch_tool("list_docs_jobs", {"project_path": "/project"}, service),
+    ]
+
+    canonical = {key: value for key, value in detail_payloads[0].items() if key not in {"tool", "action"}}
+    assert all({key: value for key, value in payload.items() if key not in {"tool", "action"}} == canonical for payload in detail_payloads)
+    assert all(payload["jobs"] == [canonical] for payload in list_payloads)
+    assert "raw-id" not in str([*detail_payloads, *list_payloads])
+    assert not ({"request_payload", "generation_id", "lease_id", "predecessor_job_id"} & canonical.keys())

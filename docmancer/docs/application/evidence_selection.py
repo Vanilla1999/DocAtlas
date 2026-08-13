@@ -18,8 +18,12 @@ from docmancer.retrieval.contracts import canonical_hash
 from docmancer.retrieval.query_planning import extract_exact_terms
 
 
-SELECTOR_SCHEMA_VERSION = "budget-aware-evidence-selector-v2"
+SELECTOR_SCHEMA_VERSION = "budget-aware-evidence-selector-v3"
 MAX_SELECTOR_CANDIDATES = 20
+MAX_VISIBLE_DOCUMENTS = 3
+MAX_VISIBLE_SPANS = 6
+MAX_MIXED_VISIBLE_TOKENS = 800
+MIXED_WRAPPER_RESERVE_TOKENS = 120
 _HEX_SHA256 = re.compile(r"^[0-9a-f]{64}$")
 _TOKEN_RE = re.compile(r"[\w.+:/-]+", re.UNICODE)
 _COMPARISON_IDENTIFIER = r"(?<![a-z0-9_`])(`?[a-z][a-z0-9_]*`?)(?![a-z0-9_`])"
@@ -73,6 +77,38 @@ OmissionReason = Literal[
     "near_duplicate", "source_cap", "zero_marginal_utility", "budget",
     "dominated", "candidate_cap",
 ]
+ProofRole = Literal[
+    "generic_fact", "document_identity", "target_identity", "document_statement",
+    "project_rule", "implementation_fact", "dependency_fact",
+]
+EvidenceQualifier = Literal[
+    "proposed", "not_implemented", "confirmation_required", "negated",
+    "conditional", "deprecated",
+]
+_PROOF_ROLES = frozenset({
+    "generic_fact", "document_identity", "target_identity", "document_statement",
+    "project_rule", "implementation_fact", "dependency_fact",
+})
+_EVIDENCE_QUALIFIERS = frozenset({
+    "proposed", "not_implemented", "confirmation_required", "negated",
+    "conditional", "deprecated",
+})
+_QUALIFIER_PATTERNS = {
+    "proposed": re.compile(r"\bpropos(?:ed|al)\b", re.I),
+    "not_implemented": re.compile(r"\bnot\s+(?:yet\s+)?implemented\b", re.I),
+    "confirmation_required": re.compile(r"\b(?:confirmation|required approval)\s+(?:is\s+)?required\b", re.I),
+    "negated": re.compile(r"\b(?:not|never|no|cannot|must not)\b", re.I),
+    "conditional": re.compile(r"\b(?:if|when|unless|only after|only before)\b", re.I),
+    "deprecated": re.compile(r"\bdeprecated\b", re.I),
+}
+
+
+def _observed_qualifiers(text: str) -> tuple[EvidenceQualifier, ...]:
+    return tuple(sorted(
+        qualifier
+        for qualifier, pattern in _QUALIFIER_PATTERNS.items()
+        if pattern.search(text)
+    ))
 
 
 def _estimated_tokens(value: str) -> int:
@@ -136,12 +172,10 @@ def _section(item: Mapping[str, Any]) -> str:
 
 
 def _display_text(item: Mapping[str, Any]) -> str:
-    return _text(
-        item.get("display_text")
-        or item.get("code")
-        or item.get("snippet")
-        or item.get("content")
-    )
+    value = item.get("display_text") or item.get("code") or item.get("snippet") or item.get("content")
+    if isinstance(value, Mapping):
+        value = value.get("code") or value.get("content") or value.get("text")
+    return str(value or "")
 
 
 def _projected_text(item: Mapping[str, Any], display_text: str, result_kind: str) -> str:
@@ -241,11 +275,13 @@ class SelectionConfig:
     result_kind: Literal["docs_answer", "patch_context"]
     target_tokens: int
     hard_tokens: int
-    profile: Literal["generic", "library_docs_answer"] = "generic"
+    profile: Literal["generic", "library_docs_answer", "project_document_answer"] = "generic"
     schema_version: str = SELECTOR_SCHEMA_VERSION
     max_candidates: int = MAX_SELECTOR_CANDIDATES
     max_sources: int = 3
     max_items_per_source: int = 2
+    max_documents: int = MAX_VISIBLE_DOCUMENTS
+    max_spans: int = MAX_VISIBLE_SPANS
     near_duplicate_threshold: int = 850
     overlap_threshold: int = 800
     marginal_utility_threshold: int = 80
@@ -256,12 +292,16 @@ class SelectionConfig:
     def __post_init__(self) -> None:
         if self.result_kind not in {"docs_answer", "patch_context"}:
             raise ValueError("unsupported evidence result kind")
-        if self.profile not in {"generic", "library_docs_answer"}:
+        if self.profile not in {"generic", "library_docs_answer", "project_document_answer"}:
             raise ValueError("unsupported evidence selection profile")
         if not 1 <= self.target_tokens <= self.hard_tokens:
             raise ValueError("selector token budgets are invalid")
         if not 1 <= self.max_candidates <= MAX_SELECTOR_CANDIDATES:
             raise ValueError("selector candidate limit is invalid")
+        if self.max_sources < 1 or self.max_items_per_source < 1:
+            raise ValueError("selector source limits are invalid")
+        if self.max_documents < 1 or self.max_spans < 1:
+            raise ValueError("selector document/span limits are invalid")
         if not 0 <= self.near_duplicate_threshold <= 1000:
             raise ValueError("near duplicate threshold is invalid")
 
@@ -286,6 +326,17 @@ class EvidenceRequirement:
     query_span_start: int | None = None
     query_span_end: int | None = None
     query_span_text: str | None = None
+    proof_role: ProofRole = "generic_fact"
+    qualifiers: tuple[EvidenceQualifier, ...] = ()
+
+    def __post_init__(self) -> None:
+        if self.proof_role not in _PROOF_ROLES:
+            raise ValueError(f"unsupported evidence proof role: {self.proof_role}")
+        qualifiers = tuple(sorted(set(self.qualifiers)))
+        unknown = set(qualifiers) - _EVIDENCE_QUALIFIERS
+        if unknown:
+            raise ValueError(f"unsupported evidence qualifiers: {', '.join(sorted(unknown))}")
+        object.__setattr__(self, "qualifiers", qualifiers)
 
 
 @dataclass(frozen=True, slots=True)
@@ -410,6 +461,20 @@ class Omission:
 
 
 @dataclass(frozen=True, slots=True)
+class EvidenceAssignment:
+    requirement_id: str
+    evidence_id: str
+    path: str
+    char_start: int | None
+    char_end: int | None
+    line_start: int | None
+    line_end: int | None
+    projected_content_hash: str
+    proof_role: ProofRole
+    qualifiers: tuple[EvidenceQualifier, ...]
+
+
+@dataclass(frozen=True, slots=True)
 class SupportDecision:
     """Immutable public support verdict produced only by ``select_evidence``."""
 
@@ -426,6 +491,7 @@ class SupportDecision:
     eligibility_contract_hash: str
     candidate_trace_hash: str
     selection_hash: str
+    assignment_hash: str
     decision_hash: str
     requirements: EvidenceRequirementSet = field(compare=False, repr=False)
 
@@ -451,6 +517,7 @@ class SupportDecision:
             "eligibility_contract_hash": self.eligibility_contract_hash,
             "candidate_trace_hash": self.candidate_trace_hash,
             "selection_hash": self.selection_hash,
+            "assignment_hash": self.assignment_hash,
             "decision_hash": self.decision_hash,
         }
 
@@ -476,6 +543,7 @@ class SupportDecision:
             "eligibility_contract_hash": self.eligibility_contract_hash,
             "candidate_trace_hash": self.candidate_trace_hash,
             "selection_hash": self.selection_hash,
+            "assignment_hash": self.assignment_hash,
         }
         return replace(
             self,
@@ -496,6 +564,7 @@ class SelectionDecision:
     eligibility_contract_hash: str
     candidate_trace_hash: str
     selection_hash: str
+    assignments: tuple[EvidenceAssignment, ...]
     support_decision: SupportDecision
     requirements: EvidenceRequirementSet = field(
         default_factory=EvidenceRequirementSet, compare=False, repr=False,
@@ -531,15 +600,219 @@ class SelectionDecision:
             "requirements_hash": self.requirements.requirements_hash,
             "candidate_trace_hash": self.candidate_trace_hash,
             "selection_hash": self.selection_hash,
+            "assignments": [asdict(item) for item in self.assignments],
+            "assignment_hash": self.support_decision.assignment_hash,
             "support_decision": self.support_decision.as_payload(),
         }
+
+
+@dataclass(frozen=True, slots=True)
+class MixedSelectionLane:
+    lane: Literal["project", "library"]
+    identity: str
+    decision: SelectionDecision
+
+    @property
+    def qualifier(self) -> str:
+        return f"{self.lane}:{self.identity}"
+
+
+@dataclass(frozen=True, slots=True)
+class AggregateMixedSelectionDecision:
+    """Canonical mixed-lane decision with collision-safe child identities."""
+
+    lanes: tuple[MixedSelectionLane, ...]
+    selection_decision: SelectionDecision
+    child_decision_hash: str
+    child_assignment_hash: str
+
+    @property
+    def requirements(self) -> EvidenceRequirementSet:
+        return self.selection_decision.requirements
+
+    @property
+    def selected_candidates(self) -> tuple[EvidenceCandidate, ...]:
+        return self.selection_decision.selected_candidates
+
+    @property
+    def assignments(self) -> tuple[EvidenceAssignment, ...]:
+        return self.selection_decision.assignments
+
+    @property
+    def support_decision(self) -> SupportDecision:
+        return self.selection_decision.support_decision
+
+    def audit_manifest(self) -> dict[str, Any]:
+        return {
+            **self.selection_decision.audit_manifest(),
+            "mixed_lanes": [
+                {
+                    "lane": lane.lane,
+                    "identity": lane.identity,
+                    "decision_hash": lane.decision.support_decision.decision_hash,
+                    "assignment_hash": lane.decision.support_decision.assignment_hash,
+                }
+                for lane in self.lanes
+            ],
+            "child_decision_hash": self.child_decision_hash,
+            "child_assignment_hash": self.child_assignment_hash,
+        }
+
+
+def aggregate_mixed_selection(
+    entries: Iterable[tuple[Literal["project", "library"], str, SelectionDecision]],
+) -> AggregateMixedSelectionDecision:
+    """Combine canonical lane decisions without allowing cross-lane ID aliasing."""
+
+    lanes = tuple(sorted(
+        (MixedSelectionLane(lane, str(identity), decision) for lane, identity, decision in entries),
+        key=lambda item: (item.lane, item.identity),
+    ))
+    if len(lanes) < 2:
+        raise ValueError("mixed selection requires at least two lane decisions")
+
+    requirements: list[EvidenceRequirement] = []
+    candidates: list[EvidenceCandidate] = []
+    assignments: list[EvidenceAssignment] = []
+    missing: list[str] = []
+    conflicts: list[str] = []
+    omissions: list[Omission] = []
+    for lane in lanes:
+        prefix = lane.qualifier + ":"
+        requirements.extend(
+            replace(requirement, requirement_id=prefix + requirement.requirement_id)
+            for requirement in lane.decision.requirements
+        )
+        candidates.extend(
+            replace(
+                candidate,
+                stable_id=prefix + candidate.stable_id,
+                evidence_id=prefix + candidate.evidence_id,
+                covered_requirement_ids=frozenset(
+                    prefix + requirement_id
+                    for requirement_id in candidate.covered_requirement_ids
+                ),
+            )
+            for candidate in lane.decision.selected_candidates
+        )
+        assignments.extend(
+            replace(
+                assignment,
+                requirement_id=prefix + assignment.requirement_id,
+                evidence_id=prefix + assignment.evidence_id,
+            )
+            for assignment in lane.decision.assignments
+        )
+        missing.extend(prefix + value for value in lane.decision.missing_requirements)
+        conflicts.extend(prefix + value for value in lane.decision.unresolved_conflicts)
+        omissions.extend(
+            replace(
+                omission,
+                stable_id=prefix + omission.stable_id,
+                representative_stable_id=(
+                    prefix + omission.representative_stable_id
+                    if omission.representative_stable_id else None
+                ),
+            )
+            for omission in lane.decision.omissions
+        )
+
+    requirement_set = EvidenceRequirementSet(tuple(requirements))
+    mandatory_ids = tuple(item.requirement_id for item in requirement_set if item.mandatory)
+    satisfied_ids = tuple(sorted({item.requirement_id for item in assignments}))
+    missing_ids = tuple(sorted(set(mandatory_ids) - set(satisfied_ids)))
+    selected_ids = tuple(sorted({item.evidence_id for item in assignments}))
+    child_decision_hash = canonical_hash([
+        (lane.lane, lane.identity, lane.decision.support_decision.decision_hash)
+        for lane in lanes
+    ])
+    child_assignment_hash = canonical_hash([
+        (lane.lane, lane.identity, lane.decision.support_decision.assignment_hash)
+        for lane in lanes
+    ])
+    assignment_hash = canonical_hash({
+        "assignments": [asdict(item) for item in assignments],
+        "child_assignment_hash": child_assignment_hash,
+    })
+    selected_documents = {_normalized_source(item.source_identity) for item in candidates}
+    selected_tokens = sum(item.token_estimate for item in candidates)
+    bounded_materialization_failed = (
+        len(selected_documents) > MAX_VISIBLE_DOCUMENTS
+        or len(candidates) > MAX_VISIBLE_SPANS
+        or selected_tokens + MIXED_WRAPPER_RESERVE_TOKENS > MAX_MIXED_VISIBLE_TOKENS
+    )
+    if bounded_materialization_failed:
+        missing_ids = tuple(sorted({*missing_ids, "bounded_evidence_not_materializable"}))
+        missing.append("bounded_evidence_not_materializable")
+    supported = (
+        not bounded_materialization_failed
+        and all(lane.decision.support_decision.answer_supported for lane in lanes)
+    )
+    base = {
+        "answer_supported": supported,
+        "support_status": "supported" if supported else "insufficient_evidence",
+        "reason_code": (
+            None if supported else
+            "bounded_evidence_not_materializable" if bounded_materialization_failed else
+            "mixed_support_incomplete"
+        ),
+        "missing_requirement_ids": missing_ids,
+        "satisfied_requirement_ids": satisfied_ids,
+        "mandatory_requirement_ids": mandatory_ids,
+        "mandatory_coverage": (
+            len(set(satisfied_ids) & set(mandatory_ids)) / len(mandatory_ids)
+            if mandatory_ids else 1.0
+        ),
+        "selected_evidence_ids": selected_ids,
+        "requirements_hash": requirement_set.requirements_hash,
+        "selector_config_hash": canonical_hash([lane.decision.selector_config_hash for lane in lanes]),
+        "eligibility_contract_hash": canonical_hash([lane.decision.eligibility_contract_hash for lane in lanes]),
+        "candidate_trace_hash": canonical_hash([lane.decision.candidate_trace_hash for lane in lanes]),
+        "selection_hash": canonical_hash({
+            "children": child_decision_hash,
+            "selected_evidence_ids": selected_ids,
+        }),
+        "assignment_hash": assignment_hash,
+    }
+    support = SupportDecision(
+        **base,
+        decision_hash=canonical_hash({**base, "child_decision_hash": child_decision_hash}),
+        requirements=requirement_set,
+    )
+    decision = SelectionDecision(
+        status="ok" if supported else "insufficient_evidence",
+        selected_candidates=tuple(candidates), omissions=tuple(omissions),
+        missing_requirements=tuple(missing), unresolved_conflicts=tuple(conflicts),
+        metrics={
+            "lane_count": len(lanes),
+            "selected_documents": len(selected_documents),
+            "selected_spans": len(candidates),
+            "selected_tokens": selected_tokens,
+            "projected_total_tokens": selected_tokens + MIXED_WRAPPER_RESERVE_TOKENS,
+            "max_documents": MAX_VISIBLE_DOCUMENTS,
+            "max_spans": MAX_VISIBLE_SPANS,
+            "hard_tokens": MAX_MIXED_VISIBLE_TOKENS,
+        },
+        selector_config_hash=support.selector_config_hash,
+        eligibility_contract_hash=support.eligibility_contract_hash,
+        candidate_trace_hash=support.candidate_trace_hash,
+        selection_hash=support.selection_hash, assignments=tuple(assignments),
+        support_decision=support, requirements=requirement_set,
+    )
+    return AggregateMixedSelectionDecision(
+        lanes=lanes, selection_decision=decision,
+        child_decision_hash=child_decision_hash,
+        child_assignment_hash=child_assignment_hash,
+    )
 
 
 def docs_selection_config(max_tokens: int) -> SelectionConfig:
     hard = min(800, max(256, int(max_tokens)))
     return SelectionConfig(
         result_kind="docs_answer", target_tokens=min(650, hard), hard_tokens=hard,
-        max_sources=3, max_items_per_source=2, wrapper_reserve_tokens=120,
+        max_sources=3, max_items_per_source=2,
+        max_documents=MAX_VISIBLE_DOCUMENTS, max_spans=MAX_VISIBLE_SPANS,
+        wrapper_reserve_tokens=120,
         marginal_utility_threshold=100,
     )
 
@@ -627,15 +900,17 @@ def build_requirements(
     exact_snapshot_required: bool = False,
     project_identity: str | None = None,
     module_id: str | None = None,
-    profile: Literal["generic", "library_docs_answer"] = "generic",
+    profile: Literal["generic", "library_docs_answer", "project_document_answer"] = "generic",
     library_requirement_contract: Mapping[str, Iterable[str]] | None = None,
 ) -> EvidenceRequirementSet:
     requirements: list[EvidenceRequirement] = []
     for index, term in enumerate(extract_exact_terms(question)):
         requirements.append(EvidenceRequirement(
             requirement_id=f"query_exact:{index}:{term.normalized_value}",
-            kind="exact_term", value=term.value, public_provenance="query_exact_term",
+            kind="exact_term", value=term.value, mandatory=term.kind != "path",
+            public_provenance="query_exact_term",
             query_extraction_kind=term.kind,
+            proof_role="document_statement" if profile == "project_document_answer" else "generic_fact",
         ))
     existing_exact_values = {
         item.value.casefold() for item in requirements if item.kind == "exact_term"
@@ -654,6 +929,7 @@ def build_requirements(
             requirement_id=f"query_symbol:{index}:{value.casefold()}",
             kind="exact_term", value=value, public_provenance="query_exact_term",
             query_extraction_kind="identifier",
+            proof_role="document_statement" if profile == "project_document_answer" else "generic_fact",
         ))
     for kind, paths, provenance in (
         ("evidence_path", required_evidence_paths, "required_evidence_paths"),
@@ -669,6 +945,7 @@ def build_requirements(
                     kind=kind, value=value, public_provenance=provenance,
                     source_path=value if kind == "evidence_path" else None,
                     target_path=value if kind == "target_path" else None,
+                    proof_role="document_identity" if kind == "evidence_path" else "target_identity",
                 ))
     if exact_version:
         requirements.append(EvidenceRequirement(
@@ -694,17 +971,34 @@ def build_requirements(
             kind = str(raw.get("kind") or "required_fact")
             mandatory = raw.get("mandatory") is not False
             provenance = str(raw.get("public_provenance") or "public_task_contract")
+            proof_role = str(raw.get("proof_role") or "generic_fact")
+            raw_qualifiers = raw.get("qualifiers") or ()
+            qualifiers = tuple(str(item) for item in raw_qualifiers) if isinstance(raw_qualifiers, (list, tuple, set)) else (str(raw_qualifiers),)
         else:
             value, kind, mandatory, provenance = str(raw).strip(), "required_fact", True, "public_task_contract"
+            proof_role, qualifiers = "generic_fact", ()
         if value:
             if provenance not in _ALLOWED_REQUIREMENT_PROVENANCE:
                 raise ValueError(f"unsupported evidence requirement provenance: {provenance}")
             requirements.append(EvidenceRequirement(
                 requirement_id=f"public:{index}:{canonical_hash(value)[:12]}",
                 kind=kind, value=value, mandatory=mandatory, public_provenance=provenance,
+                proof_role=proof_role, qualifiers=qualifiers,
             ))
     unique = {item.requirement_id: item for item in requirements}
     entities, facets = _extract_requirement_entities_and_facets(question)
+    if profile == "project_document_answer" and not any(
+        item.mandatory and item.kind not in {"evidence_path", "target_path"}
+        for item in unique.values()
+    ):
+        unique["document_content_requirement"] = EvidenceRequirement(
+            requirement_id="document_content_requirement",
+            kind="unsupported_query",
+            value="",
+            public_provenance="query_exact_term",
+            query_extraction_kind="no_canonical_document_content_requirement",
+            proof_role="document_statement",
+        )
     if profile == "library_docs_answer":
         comparison_intent = bool(re.search(r"\b(?:compare|comparing|comparison|instead|versus|vs\.?|difference)\b", question, re.IGNORECASE))
         raw_contract = library_requirement_contract or {}
@@ -785,6 +1079,12 @@ def normalize_candidates(
         )
         stable = child_stable or str(item.get("stable_id") or "")
         identity_kind = "stable_child" if child_stable else "legacy"
+        indexed_project_doc = str(item.get("source_class") or "") in {
+            "project_doc", "project_file"
+        } and bool(item.get("metadata"))
+        if indexed_project_doc and not child_stable:
+            omissions.append(Omission(f"invalid:{rank}", "invalid_identity"))
+            continue
         if not stable and path and display:
             stable = "legacy:" + canonical_hash({
                 "path": path,
@@ -1041,6 +1341,12 @@ def select_evidence(
     mandatory = {item.requirement_id for item in requirements if item.mandatory}
     selected, missing, selection_omissions = _reserve_and_select(deduped, mandatory, config)
     omissions.extend(selection_omissions)
+    selected_documents = {_normalized_source(item.source_identity) for item in selected}
+    bounded_materialization_failed = config.result_kind == "docs_answer" and (
+        len(selected) > config.max_spans or len(selected_documents) > config.max_documents
+    )
+    if bounded_materialization_failed:
+        missing.add("bounded_evidence_not_materializable")
     missing.update(critical_failures)
     missing.update(f"stable_identity_collision:{value}" for value in identity_collisions)
     if config.result_kind == "docs_answer" and selected and all(item.navigation_only for item in selected):
@@ -1058,6 +1364,9 @@ def select_evidence(
         "eligible_count": len(eligible),
         "selected_count": len(selected),
         "selected_sources": len({_normalized_source(item.source_identity) for item in selected}),
+        "selected_documents": len(selected_documents),
+        "max_documents": config.max_documents,
+        "max_spans": config.max_spans,
         "selected_tokens": selected_tokens,
         "wrapper_reserve_tokens": config.wrapper_reserve_tokens,
         "projected_total_tokens": selected_tokens + config.wrapper_reserve_tokens,
@@ -1094,6 +1403,35 @@ def select_evidence(
             item.stable_id, item.reason_code, item.representative_stable_id or ""
         ),
     ))
+    assignments = tuple(
+        EvidenceAssignment(
+            requirement_id=requirement_id,
+            evidence_id=candidate.stable_id,
+            path=candidate.path_or_url,
+            char_start=candidate.char_start,
+            char_end=candidate.char_end,
+            line_start=candidate.line_start,
+            line_end=candidate.line_end,
+            projected_content_hash=hashlib.sha256(
+                candidate.projected_text.encode("utf-8")
+            ).hexdigest(),
+            proof_role=next(
+                item.proof_role for item in requirements if item.requirement_id == requirement_id
+            ),
+            qualifiers=(
+                next(item.qualifiers for item in requirements if item.requirement_id == requirement_id)
+                or _observed_qualifiers(candidate.projected_text)
+            ),
+        )
+        for requirement_id in sorted(mandatory)
+        for candidate in selected
+        if requirement_id in candidate.covered_requirement_ids
+    )
+    assigned_requirement_ids = {item.requirement_id for item in assignments}
+    missing.update(mandatory - assigned_requirement_ids)
+    if status == "ok" and mandatory - assigned_requirement_ids:
+        status = "insufficient_evidence"
+    assignment_hash = canonical_hash([asdict(item) for item in assignments])
     selection_hash = canonical_hash({
         "schema_version": SELECTOR_SCHEMA_VERSION,
         "config_hash": config.config_hash,
@@ -1101,6 +1439,7 @@ def select_evidence(
         "candidate_trace_hash": candidate_trace_hash,
         "requirements": requirements.hash_payload,
         "selected": [_selected_identity(item) for item in selected],
+        "assignments": [asdict(item) for item in assignments],
         "omissions": [asdict(item) for item in sorted_omissions],
         "missing": sorted(missing), "conflicts": sorted(conflicts),
     })
@@ -1118,6 +1457,7 @@ def select_evidence(
     public_mandatory = tuple(sorted(mandatory))
     reason_code = (
         None if status == "ok" else
+        "bounded_evidence_not_materializable" if bounded_materialization_failed else
         "authority_conflict" if conflicts else
         "required_evidence_missing" if missing else
         "no_eligible_evidence"
@@ -1136,6 +1476,7 @@ def select_evidence(
         "eligibility_contract_hash": eligibility_contract_hash,
         "candidate_trace_hash": candidate_trace_hash,
         "selection_hash": selection_hash,
+        "assignment_hash": assignment_hash,
     }
     support_decision = SupportDecision(
         **support_payload,
@@ -1148,7 +1489,7 @@ def select_evidence(
         metrics=metrics, selector_config_hash=config.config_hash,
         eligibility_contract_hash=eligibility_contract_hash,
         candidate_trace_hash=candidate_trace_hash, selection_hash=selection_hash,
-        support_decision=support_decision, requirements=requirements,
+        assignments=assignments, support_decision=support_decision, requirements=requirements,
     )
 
 
@@ -1170,6 +1511,9 @@ def validate_evidence_sufficiency(
         errors.append("successful selection requires evidence")
     if decision.status == "ok" and mandatory - covered:
         errors.append("successful selection is missing mandatory requirements")
+    assigned = {item.requirement_id for item in decision.assignments}
+    if decision.status == "ok" and mandatory - assigned:
+        errors.append("successful selection is missing mandatory assignments")
     if decision.status == "ok" and (decision.missing_requirements or decision.unresolved_conflicts):
         errors.append("successful selection cannot contain unresolved requirements or conflicts")
     if len({item.stable_id for item in decision.selected_candidates}) != len(decision.selected_candidates):
@@ -1194,6 +1538,7 @@ def validate_evidence_sufficiency(
         "candidate_trace_hash": decision.candidate_trace_hash,
         "requirements": requirements.hash_payload,
         "selected": [_selected_identity(item) for item in decision.selected_candidates],
+        "assignments": [asdict(item) for item in decision.assignments],
         "omissions": [asdict(item) for item in decision.omissions],
         "missing": list(decision.missing_requirements),
         "conflicts": list(decision.unresolved_conflicts),
@@ -1458,6 +1803,28 @@ def _with_coverage(candidate: EvidenceCandidate, requirements: Sequence[Evidence
             matches = False
         else:
             matches = value in haystack
+        if matches and requirement.proof_role == "document_statement":
+            scoped_paths = {
+                _normalized_source(item.value)
+                for item in requirements
+                if item.kind == "evidence_path"
+            }
+            matches = bool(scoped_paths) and source in scoped_paths
+        if matches and requirement.proof_role == "implementation_fact":
+            matches = candidate.source_class in {"source_snippet", "test", "project_file"}
+        if matches and requirement.proof_role == "project_rule":
+            matches = candidate.authority == "canonical" and candidate.source_class not in {
+                "repo_map", "code_graph", "absent_in_source",
+            }
+        if matches and requirement.proof_role == "dependency_fact":
+            matches = candidate.source_class not in {
+                "repo_map", "code_graph", "absent_in_source", "project_file", "source_snippet", "test",
+            } and _version_rank(candidate.version_binding) == 0
+        if matches and requirement.qualifiers:
+            matches = all(
+                _QUALIFIER_PATTERNS[qualifier].search(candidate.projected_text)
+                for qualifier in requirement.qualifiers
+            )
         if matches:
             covered.add(requirement.requirement_id)
     return replace(candidate, covered_requirement_ids=frozenset(covered))
@@ -1479,6 +1846,9 @@ def _with_canonical_policy_requirements(
         )
         for candidate in candidates
         if candidate.authority == "canonical"
+        and str(candidate.original.get("authority") or "").casefold() in {
+            "source_of_truth", "project_rule", "explicit_agent_policy",
+        }
         and _PATCH_FACT_RE.search(candidate.display_text)
     ]
     unique = {item.requirement_id: item for item in (*requirements, *additions)}
@@ -1491,9 +1861,9 @@ def _candidate_preference(candidate: EvidenceCandidate) -> tuple[Any, ...]:
         _version_rank(candidate.version_binding),
         0 if candidate.docs_snapshot_exact is True else 1,
         -len(candidate.covered_requirement_ids),
+        candidate.token_estimate,
         -candidate.relevance_millis,
         candidate.retrieval_rank,
-        candidate.token_estimate,
         candidate.stable_id,
     )
 

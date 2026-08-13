@@ -2,16 +2,19 @@ from __future__ import annotations
 
 import json
 import re
-import hashlib
 from dataclasses import asdict, is_dataclass, replace
 from typing import Any
 
+from docmancer.docs.application.evidence_selection import (
+    SelectionDecision,
+    aggregate_mixed_selection,
+)
 from docmancer.docs.application.project_context_service import context_pack_snippet
 from docmancer.docs.domain.content_trust import annotate_context_pack
 from docmancer.docs.domain.library_source_options import library_docs_source_options, source_required_diagnostics
 from docmancer.docs.domain.snippets import build_snippet_presentation, validate_response_style
 from docmancer.docs.exact_version import resolve_python_versioned_docs
-from docmancer.docs.models import DocsResult, ProjectContextResult, UnifiedDocsContextResult
+from docmancer.docs.models import DeliveryDecision, DocsResult, ProjectContextResult, UnifiedDocsContextResult
 from docmancer.docs.resolver import docs_snapshot_is_exact
 
 
@@ -238,7 +241,7 @@ class UnifiedDocsContextService:
         project_auto = mode_requested == "auto" and bool(project_path) and not libs
 
         if mode_selected == "project":
-            delegated_mode = "auto" if project_auto and effective_allow_network else "project-only"
+            delegated_mode = "auto" if project_auto else "project-only"
             routing["delegated_mode"] = delegated_mode
             project_result = self.service.get_project_context(project_path, question, tokens=tokens, limit=limit, expand=expand, module=module, module_path=module_path, scope=scope, mode=delegated_mode, response_style=response_style, allow_network=effective_allow_network)
         elif mode_selected == "dependency":
@@ -306,7 +309,11 @@ class UnifiedDocsContextService:
                     "dependency_detected": any(item.get("doc_scope") == "dependency" for item in project_items),
                 })
             context_pack.extend(project_items)
-            lanes["project"] = {"status": project_result.status, "source_count": len([i for i in project_items if i.get("doc_scope") == "project"])}
+            lanes["project"] = {
+                "status": project_result.status,
+                "source_count": len([i for i in project_items if i.get("doc_scope") == "project"]),
+                "reason_code": project_result.reason,
+            }
             dep_count = len([i for i in project_items if i.get("doc_scope") == "dependency"])
             if dep_count:
                 lanes["dependency"] = {"status": getattr(project_result.dependency_docs, "status", "success"), "source_count": dep_count}
@@ -376,14 +383,48 @@ class UnifiedDocsContextService:
             library_results[0].support_decision
             if len(library_results) == 1 else None
         )
+        aggregate_entries: list[tuple[str, str, Any]] = []
+        if project_result is not None:
+            aggregate_entries.append((
+                "project", str(project_result.project_path),
+                getattr(project_result, "support_decision", None),
+            ))
+        aggregate_entries.extend(
+            ("library", result.library_id, result.support_decision)
+            for result in library_results
+        )
+        aggregate_selection = None
+        if len(aggregate_entries) > 1 and all(
+            isinstance(getattr(result, "selection_decision", None), SelectionDecision)
+            for result in ([project_result] if project_result is not None else []) + library_results
+        ):
+            aggregate_selection = aggregate_mixed_selection([
+                (
+                    lane,
+                    identity,
+                    getattr(project_result, "selection_decision")
+                    if lane == "project" else next(
+                        result.selection_decision
+                        for result in library_results if result.library_id == identity
+                    ),
+                )
+                for lane, identity, _ in aggregate_entries
+            ])
         if library_results:
-            decisions = [result.support_decision for result in library_results]
+            decisions = [entry[2] for entry in aggregate_entries]
             answer_supported = bool(
                 decisions and all(decision and decision.answer_supported for decision in decisions)
             )
-            if support_decision is not None:
+            if aggregate_selection is not None:
+                support_decision = aggregate_selection.support_decision
+                support_payload = support_decision.as_payload()
+                answer_supported = support_decision.answer_supported
+            elif len(aggregate_entries) == 1 and support_decision is not None:
                 support_payload = support_decision.as_payload()
             else:
+                canonical_lanes_missing = len(aggregate_entries) > 1 and aggregate_selection is None
+                if canonical_lanes_missing:
+                    answer_supported = False
                 missing_ids = sorted({
                     item for decision in decisions if decision
                     for item in decision.missing_requirement_ids
@@ -400,67 +441,82 @@ class UnifiedDocsContextService:
                     item for decision in decisions if decision
                     for item in decision.selected_evidence_ids
                 })
-                aggregate_manifest = [
-                    {
-                        "library_id": result.library_id,
-                        "answer_supported": bool(decision and decision.answer_supported),
-                        "decision_hash": getattr(decision, "decision_hash", None),
-                        "missing_requirement_ids": list(
-                            getattr(decision, "missing_requirement_ids", ()) or ()
-                        ),
-                    }
-                    for result, decision in sorted(
-                        zip(library_results, decisions), key=lambda item: item[0].library_id
-                    )
-                ]
-                aggregate_decision_hash = hashlib.sha256(
-                    json.dumps(
-                        aggregate_manifest,
-                        ensure_ascii=True,
-                        sort_keys=True,
-                        separators=(",", ":"),
-                    ).encode("utf-8")
-                ).hexdigest()
+                missing_ids.extend(
+                    f"{lane}:{identity}:canonical_support_decision"
+                    for lane, identity, decision in aggregate_entries
+                    if decision is None
+                )
+                missing_ids = sorted(set(missing_ids))
                 support_payload = {
                     "support_status": "supported" if answer_supported else "insufficient_evidence",
-                    "reason_code": None if answer_supported else "multi_library_support_incomplete",
+                    "reason_code": (
+                        "canonical_lane_decision_missing" if canonical_lanes_missing else
+                        None if answer_supported else
+                        "mixed_support_incomplete" if project_result is not None else
+                        "multi_library_support_incomplete"
+                    ),
                     "missing_requirement_ids": missing_ids,
                     "satisfied_requirement_ids": satisfied_ids,
                     "mandatory_requirement_ids": mandatory_ids,
                     "mandatory_coverage": (
-                        min((decision.mandatory_coverage for decision in decisions if decision), default=0.0)
+                        min((decision.mandatory_coverage if decision else 0.0 for decision in decisions), default=0.0)
                     ),
                     "selected_evidence_ids": selected_ids,
-                    "decision_hash": aggregate_decision_hash,
+                    "assignment_hash": None,
+                    "decision_hash": None,
                 }
         else:
-            project_completeness = dict(
-                getattr(project_result, "answer_completeness", None) or {}
-            ) if project_result else {}
-            answer_supported = bool(
-                project_result
-                and getattr(project_result, "answer_type", None) == "exact"
-                and project_completeness.get("edit_ready") is True
+            support_decision = (
+                getattr(project_result, "support_decision", None)
+                if project_result else None
             )
-            missing_project_terms = [
-                str(term) for term in project_completeness.get("missing_terms", [])
-            ]
-            support_payload = {
-                "support_status": "supported" if answer_supported else "insufficient_evidence",
-                "reason_code": None if answer_supported else (
-                    "project_context_not_answer_ready"
-                    if context_available else "no_docs_context_available"
-                ),
-                "missing_requirement_ids": missing_project_terms,
-                "satisfied_requirement_ids": [],
-                "mandatory_requirement_ids": missing_project_terms,
-                "mandatory_coverage": 1.0 if answer_supported else 0.0,
-                "selected_evidence_ids": [],
-                "decision_hash": None,
-            }
-        # Library answers must satisfy evidence selection. Project-only context
-        # retains its navigational availability even when it is not edit-ready.
-        answer_available = answer_supported or (not library_results and context_available)
+            answer_supported = bool(
+                support_decision and support_decision.answer_supported
+            )
+            support_payload = (
+                support_decision.as_payload()
+                if support_decision is not None else {
+                    "support_status": "insufficient_evidence",
+                    "reason_code": (
+                        "canonical_support_decision_missing"
+                        if context_available else "no_docs_context_available"
+                    ),
+                    "missing_requirement_ids": ["canonical_support_decision"] if context_available else [],
+                    "satisfied_requirement_ids": [],
+                    "mandatory_requirement_ids": [],
+                    "mandatory_coverage": 0.0,
+                    "selected_evidence_ids": [],
+                    "decision_hash": None,
+                }
+            )
+            if (
+                support_decision is not None
+                and not support_decision.answer_supported
+                and project_result is not None
+                and (
+                    getattr(project_result, "reason", None)
+                    or getattr(getattr(project_result, "project_docs", None), "reason_code", None)
+                )
+                and (
+                    not support_payload.get("reason_code")
+                    or project_result.reason in {
+                        "document_not_indexed", "ambiguous_document_locator",
+                    }
+                )
+            ):
+                support_payload["reason_code"] = (
+                    project_result.reason or project_result.project_docs.reason_code
+                )
+        project_delivery_available = bool(
+            project_result is None or project_result.answer_available
+        )
+        answer_available = answer_supported and project_delivery_available
+        delivery_decision = DeliveryDecision(
+            deliverable=answer_available,
+            reason_code=None if answer_available else str(
+                support_payload.get("reason_code") or "operational_delivery_blocked"
+            ),
+        )
         pending_actions = self._collect_pending_actions(pending_lane_results)
         requested_lanes = [name for name, lane in lanes.items() if lane.get("status") != "not_requested"]
         successful_lanes = [name for name, lane in lanes.items() if self._lane_succeeded(lane)]
@@ -514,11 +570,17 @@ class UnifiedDocsContextService:
             mandatory_coverage=float(support_payload["mandatory_coverage"]),
             selected_evidence_ids=list(support_payload["selected_evidence_ids"]),
             decision_hash=support_payload["decision_hash"],
+            assignment_hash=support_payload.get("assignment_hash"),
             selection_decision=(
+                aggregate_selection
+                if aggregate_selection is not None else
                 library_results[0].selection_decision
-                if len(library_results) == 1 else None
+                if len(library_results) == 1 else
+                getattr(project_result, "selection_decision", None)
+                if not library_results and project_result else None
             ),
             support_decision=support_decision,
+            delivery_decision=delivery_decision,
             answer_type=getattr(project_result, "answer_type", None) if project_result else None,
             answer_completeness=dict(getattr(project_result, "answer_completeness", None) or {}) if project_result else {},
             disposition=(
@@ -565,6 +627,10 @@ class UnifiedDocsContextService:
             lane_details=lane_details if details else {},
             ingestion_diagnostics=ingestion_diagnostics,
             retrieval_diagnostics=retrieval_diagnostics,
+            retrieval_routing=(
+                project_diagnostics.get("retrieval_routing")
+                if isinstance(project_diagnostics, dict) else None
+            ),
             requirements=(library_results[0].requirements if len(library_results) == 1 else None),
         )
         return payload

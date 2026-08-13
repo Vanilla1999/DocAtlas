@@ -18,7 +18,7 @@ import yaml
 
 from docmancer.core.config import DocmancerConfig
 from docmancer.docs.domain.policies import docs_policy, is_stale
-from docmancer.docs.domain.project_doc_ranking import query_requests_history
+from docmancer.docs.domain.project_doc_ranking import normalize_doc_path, query_requests_history
 from docmancer.docs.domain.project_state import create_project_docs_next_action, has_high_level_project_overview, partition_project_doc_state, project_docs_structured_next_action
 from docmancer.docs.domain.source_identity import docs_exactness, docs_identity, docs_request
 from docmancer.docs.domain.target_security import host_allowed, is_remote_url, path_allowed, url_security_error
@@ -690,6 +690,8 @@ class ProjectDocsService:
                 metadata_for_file=_metadata_for_file,
             )
         except ValueError as exc:
+            from docmancer.docs.application.library_refresh_policy import bounded_exception_diagnostics
+            safe = bounded_exception_diagnostics(exc, failure_phase="ingest", failure_operation="project_docs")
             indexed_sources, stale_sources, _ignored_sources, missing_sources = _verified_state()
             if indexed_sources and not missing_sources and not stale_sources:
                 return ProjectDocsIngestResult(
@@ -711,8 +713,8 @@ class ProjectDocsService:
                 missing_sources=missing_sources,
                 skipped_sources=getattr(agent, "last_ingest_skips", []),
                 sections_indexed=0,
-                warnings=[*warnings, str(exc)],
-                message=str(exc),
+                warnings=[*warnings, safe["exception_message"]],
+                message=safe["exception_message"],
             )
 
         indexed_sources, stale_sources, _ignored_sources, missing_sources = _verified_state()
@@ -931,26 +933,40 @@ class ProjectDocsService:
 
         indexed_after = self._indexed_project_doc_sources(str(root))
         vector_sync: dict[str, Any] = {"status": "not_requested"}
-        if with_vectors and changed_candidates:
-            changed_source_names = {
-                str(item["source"])
-                for item in indexed_after
-                if item.get("path") in changed_candidates and item.get("source")
-            }
-            changed_section_ids = {
-                section_id
-                for source_name in changed_source_names
-                for section_id in agent.store.section_ids_for_source(source_name)
-            }
-            sync_chunks = getattr(agent, "sync_vector_chunks", None)
-            if changed_section_ids and callable(sync_chunks):
-                sync_chunks(changed_section_ids)
-                vector_sync = dict(
-                    getattr(agent, "last_vector_sync_metrics", {})
-                )
-            elif changed_section_ids:
+        if with_vectors:
+            sync_result = None
+            if changed_candidates:
+                changed_source_names = {
+                    str(item["source"])
+                    for item in indexed_after
+                    if item.get("path") in changed_candidates and item.get("source")
+                }
+                changed_section_ids = {
+                    section_id
+                    for source_name in changed_source_names
+                    for section_id in agent.store.section_ids_for_source(source_name)
+                }
+                sync_chunks = getattr(agent, "sync_vector_chunks", None)
+                if changed_section_ids and callable(sync_chunks):
+                    sync_result = sync_chunks(changed_section_ids)
+                elif changed_section_ids:
+                    raise RuntimeError(
+                        "incremental vector sync requires an agent with scoped chunk support"
+                    )
+            else:
+                sync_vectors = getattr(agent, "sync_vectors", None)
+                if not callable(sync_vectors):
+                    raise RuntimeError(
+                        "unchanged vector parity requires an agent with full sync support"
+                    )
+                sync_result = sync_vectors()
+            vector_sync = dict(getattr(agent, "last_vector_sync_metrics", {}))
+            vector_sync.setdefault("requested", True)
+            vector_sync.setdefault("retrieval_mode", self.config.retrieval.default_mode)
+            if sync_result is None or vector_sync.get("status") != "success":
                 raise RuntimeError(
-                    "incremental vector sync requires an agent with scoped chunk support"
+                    "requested vector sync did not complete successfully: "
+                    + str(vector_sync.get("reason") or vector_sync.get("status") or "unknown")
                 )
         indexed_sources, stale_sources, _ignored_sources = self._partition_project_doc_state(
             candidate_sources, indexed_after
@@ -1315,6 +1331,8 @@ class ProjectDocsService:
         source_class: str = "project_file",
         scope: str | None = None,
         module_path: str | None = None,
+        evidence_path: str | None = None,
+        requirements: Any | None = None,
     ):
         root = Path(project_path).expanduser().resolve()
         filters: dict[str, Any] = {
@@ -1325,6 +1343,8 @@ class ProjectDocsService:
             filters["doc_scope"] = scope
         if module_path:
             filters["module_path"] = module_path
+        if evidence_path:
+            filters["project_doc_path"] = evidence_path
         agent = self._agent_instance()
         effective_limit = limit or agent.config.query.default_limit
         budget = tokens or DEFAULT_DOC_TOKENS
@@ -1340,6 +1360,7 @@ class ProjectDocsService:
                 budget=budget,
                 expand=expand,
                 filters=filters,
+                requirements=requirements,
             ).chunks
             authoritative_chunks = dispatcher.run(
                 query,
@@ -1348,6 +1369,7 @@ class ProjectDocsService:
                 budget=budget,
                 expand=expand or "page",
                 filters={**filters, "authority": "source_of_truth"},
+                requirements=requirements,
             ).chunks
         else:
             # Lightweight facades used by embedders retain the legacy agent
@@ -1397,9 +1419,19 @@ class ProjectDocsService:
         module: str | None = None,
         module_path: str | None = None,
         scope: str | None = None,
+        evidence_path: str | None = None,
+        requirements: Any | None = None,
     ) -> ProjectDocsResult:
         if hasattr(self.facade, "_project_get_project_docs_impl"):
-            return self.facade._project_get_project_docs_impl(project_path, query, tokens=tokens, limit=limit, expand=expand, module=module, module_path=module_path, scope=scope)
+            kwargs = {
+                "tokens": tokens, "limit": limit, "expand": expand, "module": module,
+                "module_path": module_path, "scope": scope,
+            }
+            if requirements is not None:
+                kwargs["requirements"] = requirements
+            if evidence_path:
+                kwargs["evidence_path"] = evidence_path
+            return self.facade._project_get_project_docs_impl(project_path, query, **kwargs)
         root = Path(project_path).expanduser().resolve()
         if scope and scope not in {"project", "module", "all"}:
             raise ValueError("scope must be one of: project, module, all")
@@ -1448,6 +1480,36 @@ class ProjectDocsService:
             query_scope = "module"
         indexed_sources_all = self._indexed_project_doc_sources(str(root))
         indexed_sources, stale_sources, ignored_sources = self._partition_project_doc_state(candidate_sources, indexed_sources_all)
+        if evidence_path:
+            requested_path = normalize_doc_path(evidence_path)
+            exact_paths = {
+                str(item.get("path"))
+                for item in indexed_sources
+                if normalize_doc_path(item.get("path")) == requested_path
+            }
+            matching_paths = exact_paths or {
+                str(item.get("path"))
+                for item in indexed_sources
+                if Path(normalize_doc_path(item.get("path"))).name == Path(requested_path).name
+            }
+            if len(matching_paths) != 1:
+                reason_code = (
+                    "ambiguous_document_locator" if matching_paths else "document_not_indexed"
+                )
+                return ProjectDocsResult(
+                    project_path=str(root), query=query, status=reason_code,
+                    reason_code=reason_code, answer_available=False,
+                    reason=reason_code, warnings=metadata.warnings,
+                    candidate_sources=candidate_sources,
+                    indexed_sources=indexed_sources,
+                    source_state_guidance=self._source_state_guidance(),
+                    message=(
+                        f"Document locator {evidence_path!r} matches multiple indexed project documents."
+                        if matching_paths else
+                        f"Document locator {evidence_path!r} is not indexed for this project."
+                    ),
+                )
+            evidence_path = next(iter(matching_paths))
         if query_scope:
             candidate_sources = [item for item in candidate_sources if item.get("doc_scope") == query_scope]
             indexed_sources = [item for item in indexed_sources if item.get("doc_scope") == query_scope]
@@ -1485,6 +1547,7 @@ class ProjectDocsService:
             return ProjectDocsResult(
                 project_path=str(root),
                 query=query,
+                resolved_evidence_path=evidence_path,
                 status=status,
                 reason_code=preflight_inspect.reason_code,
                 next_action=preflight_inspect.next_action,
@@ -1567,7 +1630,11 @@ class ProjectDocsService:
                 message="Project docs candidates exist but are not indexed. Run sync_project_docs, then retry get_project_docs.",
             )
 
-        chunks = self.query_project_docs(str(root), query, tokens=tokens, limit=limit, expand=expand, scope=query_scope, module_path=resolved_module_path)
+        chunks = self.query_project_docs(
+            str(root), query, tokens=tokens, limit=limit, expand=expand,
+            scope=query_scope, module_path=resolved_module_path, evidence_path=evidence_path,
+            requirements=requirements,
+        )
         current_by_path = {
             item.get("path"): item
             for item in indexed_sources
@@ -1623,6 +1690,13 @@ class ProjectDocsService:
                 source=chunk.source,
                 url=None,
                 metadata=chunk.metadata or {},
+                stable_chunk_id=(chunk.metadata or {}).get("stable_chunk_id"),
+                parent_logical_id=(chunk.metadata or {}).get("parent_logical_id"),
+                display_content_hash=(chunk.metadata or {}).get("display_content_hash") or (chunk.metadata or {}).get("content_hash"),
+                char_start=((chunk.metadata or {}).get("char_span") or [None, None])[0],
+                char_end=((chunk.metadata or {}).get("char_span") or [None, None])[1],
+                line_start=((chunk.metadata or {}).get("line_span") or [None, None])[0],
+                line_end=((chunk.metadata or {}).get("line_span") or [None, None])[1],
                 source_class=(chunk.metadata or {}).get("source_class"),
                 path=(chunk.metadata or {}).get("project_doc_path") or (chunk.metadata or {}).get("source_path"),
                 heading_path=(chunk.metadata or {}).get("anchor") or (chunk.metadata or {}).get("title"),
@@ -1714,6 +1788,7 @@ class ProjectDocsService:
         return ProjectDocsResult(
             project_path=str(root),
             query=query,
+            resolved_evidence_path=evidence_path,
             status="stale" if stale_sources else "no_results",
             reason_code=reason_code,
             next_action=next_action,

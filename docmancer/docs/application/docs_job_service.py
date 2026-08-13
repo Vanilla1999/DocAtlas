@@ -14,29 +14,46 @@ from docmancer.docs.models import DocsJob, DocsJobCancelResult
 from docmancer.docs.fetch_policy import redact_url
 
 MAX_DOCS_JOB_HISTORY = 1000
+DEFAULT_DOCS_JOB_LIST_LIMIT = 50
+MAX_DOCS_JOB_LIST_LIMIT = 200
+MAX_DOCS_JOB_PAYLOAD_BYTES = 64_000
 TERMINAL_DOCS_JOB_STATUSES = {"succeeded", "partial", "failed", "cancelled", "interrupted"}
 _DOCS_JOB_SCHEMA_VERSION = 1
 _DOCS_JOB_FIELD_NAMES = {item.name for item in fields(DocsJob)}
 _PROCESS_LEASE_ID = uuid.uuid4().hex
 
 
-def _safe_event_value(value: Any, key: str = "") -> Any:
+_SECRET_KEY = re.compile(r"(?:authorization|api[-_]?key|access[-_]?token|refresh[-_]?token|password|passwd|secret)", re.I)
+_SECRET_VALUE = re.compile(
+    r"(?i)(bearer\s+)[^\s,;]+|((?:api[-_]?key|access[-_]?token|refresh[-_]?token|password|secret)\s*[:=]\s*)[^\s,;&]+"
+)
+
+
+def _safe_event_value(value: Any, key: str = "", depth: int = 0) -> Any:
+    if depth > 5:
+        return "<truncated>"
+    if _SECRET_KEY.search(key):
+        return "<redacted>"
     if isinstance(value, str):
-        safe = redact_url(value) if "url" in key.lower() and "://" in value else value
+        safe = re.sub(r"https?://[^\s]+", lambda match: redact_url(match.group(0)), value)
+        safe = _SECRET_VALUE.sub(lambda match: f"{match.group(1) or match.group(2)}<redacted>", safe)
         return safe[:1000]
     if isinstance(value, dict):
-        return {str(item_key)[:100]: _safe_event_value(item_value, str(item_key)) for item_key, item_value in list(value.items())[:30]}
-    if isinstance(value, list):
-        return [_safe_event_value(item, key) for item in value[:30]]
-    return value
+        max_items = 100 if depth == 0 else 30
+        return {str(item_key)[:100]: _safe_event_value(item_value, str(item_key), depth + 1) for item_key, item_value in list(value.items())[:max_items]}
+    if isinstance(value, (list, tuple)):
+        return [_safe_event_value(item, key, depth + 1) for item in value[:30]]
+    return value if isinstance(value, (bool, int, float)) or value is None else _safe_event_value(str(value), key, depth + 1)
 
 
 def _safe_text(value: str) -> str:
-    return re.sub(r"https?://[^\s]+", lambda match: redact_url(match.group(0)), value)[:1000]
+    return str(_safe_event_value(value))
 
 
 def _safe_changes(changes: dict[str, Any]) -> dict[str, Any]:
-    safe = dict(changes)
+    safe = _safe_event_value(changes)
+    if "exception_traceback" in safe:
+        safe["exception_traceback"] = "<redacted traceback>" if safe["exception_traceback"] else None
     for field_name in ("current_url", "failed_url"):
         value = safe.get(field_name)
         if isinstance(value, str):
@@ -55,7 +72,79 @@ def _safe_changes(changes: dict[str, Any]) -> dict[str, Any]:
     target_results = safe.get("target_results")
     if isinstance(target_results, list):
         safe["target_results"] = [_safe_event_value(result) for result in target_results[-200:]]
+    vector_sync = safe.get("vector_sync")
+    if isinstance(vector_sync, dict):
+        allowed = {
+            "status", "reason", "retrieval_mode", "vector_backend", "embedded",
+            "upserted", "skipped_cache", "skipped_unchanged", "pruned", "verified",
+            "backfilled", "extra_points", "duration_ms", "backend_setup_ms",
+        }
+        safe["vector_sync"] = {
+            key: _safe_event_value(value, key)
+            for key, value in list(vector_sync.items())[:30]
+            if key in allowed
+        }
+    summary = safe.get("page_failure_summary")
+    if isinstance(summary, list):
+        allowed = {"phase", "reason_code", "retryable", "http_status", "count"}
+        safe["page_failure_summary"] = [
+            {key: _safe_event_value(value, key) for key, value in item.items() if key in allowed}
+            for item in summary[-20:] if isinstance(item, dict)
+        ]
     return safe
+
+
+def _sanitize_job(job: DocsJob) -> DocsJob:
+    values = _safe_changes(asdict(job))
+    if values.get("status") == "failed":
+        values["phase"] = "done"
+        values["failure_phase"] = values.get("failure_phase") or job.phase or "unknown"
+        values["reason_code"] = values.get("reason_code") or "job_failed"
+        values["retryable"] = bool(values.get("retryable"))
+    sanitized = DocsJob(**{key: value for key, value in values.items() if key in _DOCS_JOB_FIELD_NAMES})
+    payload = json.dumps(asdict(sanitized), ensure_ascii=True, separators=(",", ":"))
+    if len(payload.encode("utf-8")) <= MAX_DOCS_JOB_PAYLOAD_BYTES:
+        return sanitized
+    return replace(sanitized, request_payload=None, target_results=[], events=[], warnings=sanitized.warnings[-10:], errors=sanitized.errors[-10:])
+
+
+def project_job_diagnostic(job: DocsJob) -> dict[str, Any]:
+    vector = job.vector_sync or {}
+    return {
+        "job_id": job.job_id,
+        "kind": job.kind,
+        "status": job.status,
+        "phase": job.phase,
+        "message": job.message,
+        "reason_code": job.reason_code,
+        "retryable": job.retryable,
+        "failure_phase": job.failure_phase,
+        "page_failure_summary": job.page_failure_summary[:20],
+        "counts": {
+            "targets": {"total": job.total_targets, "completed": job.completed_targets, "failed": job.failed_targets},
+            "pages": {"total": job.total_pages, "completed": job.completed_pages, "failed": job.failed_pages},
+            "chunks": {"total": job.total_chunks, "completed": job.completed_chunks},
+        },
+        "vector": {key: vector[key] for key in ("status", "reason", "vector_backend", "embedded", "upserted", "verified", "backfilled", "extra_points") if key in vector},
+        "backend": vector.get("vector_backend"),
+        "queued_at": job.queued_at,
+        "started_at": job.started_at,
+        "updated_at": job.updated_at,
+        "finished_at": job.finished_at,
+    }
+
+
+def bound_job_diagnostics(jobs: list[DocsJob], max_bytes: int = MAX_DOCS_JOB_PAYLOAD_BYTES) -> list[dict[str, Any]]:
+    result: list[dict[str, Any]] = []
+    size = 2
+    for job in jobs[:MAX_DOCS_JOB_LIST_LIMIT]:
+        item = project_job_diagnostic(job)
+        item_size = len(json.dumps(item, ensure_ascii=True, separators=(",", ":")).encode("utf-8")) + 1
+        if result and size + item_size > max_bytes:
+            break
+        result.append(item)
+        size += item_size
+    return result
 
 
 class SQLiteDocsJobStore:
@@ -108,6 +197,7 @@ class SQLiteDocsJobStore:
 
     @staticmethod
     def _save(connection: sqlite3.Connection, job: DocsJob) -> None:
+        job = _sanitize_job(job)
         payload = json.dumps(asdict(job), ensure_ascii=True, separators=(",", ":"))
         connection.execute(
             """
@@ -191,16 +281,21 @@ class SQLiteDocsJobStore:
             row = connection.execute("SELECT payload_json FROM docs_jobs WHERE job_id = ?", (job_id,)).fetchone()
         return self._decode(row["payload_json"]) if row else None
 
-    def list(self, status: str | None = None, limit: int | None = None) -> list[DocsJob]:
+    def list(self, status: str | None = None, limit: int | None = None, project_path: str | None = None) -> list[DocsJob]:
         sql = "SELECT payload_json FROM docs_jobs"
         args: list[Any] = []
+        clauses = []
         if status:
-            sql += " WHERE status = ?"
+            clauses.append("status = ?")
             args.append(status)
+        if project_path:
+            clauses.append("json_extract(payload_json, '$.request_payload.project_path') = ?")
+            args.append(_safe_text(project_path))
+        if clauses:
+            sql += " WHERE " + " AND ".join(clauses)
         sql += " ORDER BY updated_at DESC, rowid DESC"
-        if limit is not None:
-            sql += " LIMIT ?"
-            args.append(limit)
+        sql += " LIMIT ?"
+        args.append(min(limit or DEFAULT_DOCS_JOB_LIST_LIMIT, MAX_DOCS_JOB_LIST_LIMIT))
         with self._connect() as connection:
             rows = connection.execute(sql, args).fetchall()
         return [self._decode(row["payload_json"]) for row in rows]
@@ -431,15 +526,17 @@ class DocsJobTracker:
                 return self._store.get(job_id)
             return self._jobs.get(job_id)
 
-    def list(self, status: str | None = None, limit: int | None = None) -> list[DocsJob]:
+    def list(self, status: str | None = None, limit: int | None = None, project_path: str | None = None) -> list[DocsJob]:
         if self._store is not None:
-            return self._store.list(status=status, limit=limit)
+            return self._store.list(status=status, limit=limit, project_path=project_path)
         with self._lock:
             jobs = list(self._jobs.values())
         if status:
             jobs = [job for job in jobs if job.status == status]
+        if project_path:
+            jobs = [job for job in jobs if (job.request_payload or {}).get("project_path") == project_path]
         jobs.sort(key=lambda job: (job.updated_at or "", self._job_order.get(job.job_id, 0)), reverse=True)
-        return jobs[:limit] if limit else jobs
+        return jobs[:min(limit or DEFAULT_DOCS_JOB_LIST_LIMIT, MAX_DOCS_JOB_LIST_LIMIT)]
 
     def cancel(self, job_id: str) -> DocsJobCancelResult:
         with self._lock:
@@ -490,8 +587,8 @@ class DocsJobService:
     def get_docs_job_status(self, job_id: str) -> DocsJob | None:
         return self.tracker.get(job_id)
 
-    def list_docs_jobs(self, status: str | None = None, limit: int | None = None) -> list[DocsJob]:
-        return self.tracker.list(status=status, limit=limit)
+    def list_docs_jobs(self, status: str | None = None, limit: int | None = None, project_path: str | None = None) -> list[DocsJob]:
+        return self.tracker.list(status=status, limit=limit, project_path=project_path)
 
     def cancel_docs_job(self, job_id: str) -> DocsJobCancelResult:
         return self.tracker.cancel(job_id)
@@ -514,8 +611,8 @@ class DocsJobService:
     def get(self, job_id: str) -> DocsJob | None:
         return self.tracker.get(job_id)
 
-    def list(self, status: str | None = None, limit: int | None = None) -> list[DocsJob]:
-        return self.tracker.list(status=status, limit=limit)
+    def list(self, status: str | None = None, limit: int | None = None, project_path: str | None = None) -> list[DocsJob]:
+        return self.tracker.list(status=status, limit=limit, project_path=project_path)
 
     def cancel(self, job_id: str) -> DocsJobCancelResult:
         return self.tracker.cancel(job_id)

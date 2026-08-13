@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 import hashlib
+import threading
 from pathlib import Path
 from typing import Any, Callable, Sequence
 
@@ -44,6 +45,7 @@ class AgentIndexGateway:
         self._default_agent = default_agent
         self._agents: dict[str, Any] = {}
         self._retrieval_dispatchers: dict[int, tuple[tuple[Any, ...], Any]] = {}
+        self._cache_lock = threading.RLock()
         self._agent_factory = agent_factory
         self._library_index_root = Path(library_index_root).expanduser().resolve() if library_index_root else None
 
@@ -59,13 +61,15 @@ class AgentIndexGateway:
     def agent_instance(self, record: LibraryRecord | None = None) -> Any:
         if record is not None:
             key = record.canonical_id or record.library_id
-            if key not in self._agents:
-                self._agents[key] = self._agent_factory(config=self.index_config_for(record))
-            return self._agents[key]
+            with self._cache_lock:
+                if key not in self._agents:
+                    self._agents[key] = self._agent_factory(config=self.index_config_for(record))
+                return self._agents[key]
 
-        if self._default_agent is None:
-            self._default_agent = self._agent_factory(config=self.config)
-        return self._default_agent
+        with self._cache_lock:
+            if self._default_agent is None:
+                self._default_agent = self._agent_factory(config=self.config)
+            return self._default_agent
 
     def agent_for_config(self, config: DocmancerConfig) -> Any:
         """Create an uncached agent for an isolated staging index."""
@@ -101,26 +105,27 @@ class AgentIndexGateway:
         collection = collection_fn() if callable(collection_fn) else ""
         embeddings = getattr(agent.config, "embeddings", None)
         vector_store = getattr(agent.config, "vector_store", None)
+        store = getattr(agent, "store", None)
+        generation_info = store.generation_info() if callable(getattr(store, "generation_info", None)) else None
         cache_key = (
+            id(store),
             effective_mode,
             collection,
-            getattr(embeddings, "provider", None),
-            getattr(embeddings, "model", None),
-            getattr(embeddings, "dimensions", None),
-            getattr(vector_store, "provider", None),
-            getattr(vector_store, "url", None),
-            canonical_hash(getattr(vector_store, "options", {}) or {}),
+            canonical_hash(agent.config.model_dump(mode="json")),
+            canonical_hash(generation_info or {}),
         )
-        cached = self._retrieval_dispatchers.get(id(agent))
-        if cached is not None and cached[0] == cache_key:
-            return cached[1]
-        dispatcher = dispatcher_for_agent(agent, mode=effective_mode)
-        self._retrieval_dispatchers[id(agent)] = (cache_key, dispatcher)
-        return dispatcher
+        with self._cache_lock:
+            cached = self._retrieval_dispatchers.get(id(agent))
+            if cached is not None and cached[0] == cache_key:
+                return cached[1]
+            dispatcher = dispatcher_for_agent(agent, mode=effective_mode)
+            self._retrieval_dispatchers[id(agent)] = (cache_key, dispatcher)
+            return dispatcher
 
     def _drop_dispatcher_for_agent(self, agent: Any | None) -> None:
         if agent is not None:
-            self._retrieval_dispatchers.pop(id(agent), None)
+            with self._cache_lock:
+                self._retrieval_dispatchers.pop(id(agent), None)
 
     def probe_library_requirements(
         self,

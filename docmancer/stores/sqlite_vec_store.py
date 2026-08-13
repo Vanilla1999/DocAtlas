@@ -77,6 +77,12 @@ class SqliteVecStore(VectorStore):
         )
         return cur.fetchone() is not None
 
+    def _backend_identity_material(self) -> dict[str, str]:
+        return {
+            "provider": "sqlite-vec",
+            "path": str(Path(self._db_path).expanduser().resolve()),
+        }
+
     def _get_dimensions(self, collection: str) -> int | None:
         cur = self._conn.execute(
             f"SELECT dimensions FROM {_OWNERSHIP_TABLE} WHERE name = ?", (collection,)
@@ -257,6 +263,13 @@ class SqliteVecStore(VectorStore):
         payload_table = f"{collection}_payload"
         cur = self._conn.execute(f"SELECT COUNT(*) FROM {payload_table}")
         return int(cur.fetchone()[0])
+
+    def point_ids(self, collection: str) -> set[str]:
+        _validate_collection_name(collection)
+        if not self._is_owned(collection):
+            raise ValueError(f"collection {collection!r} is not docmancer-owned")
+        payload_table = f"{collection}_payload"
+        return {str(row[0]) for row in self._conn.execute(f"SELECT id FROM {payload_table}")}
 
     def delete_collection(self, collection: str) -> None:
         _validate_collection_name(collection)

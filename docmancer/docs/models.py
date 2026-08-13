@@ -57,6 +57,13 @@ class DocsChunk:
 
 @dataclass(frozen=True)
 class ProjectDocsChunk(DocsChunk):
+    stable_chunk_id: str | None = None
+    parent_logical_id: str | None = None
+    display_content_hash: str | None = None
+    char_start: int | None = None
+    char_end: int | None = None
+    line_start: int | None = None
+    line_end: int | None = None
     source_class: str | None = None
     path: str | None = None
     heading_path: str | None = None
@@ -141,6 +148,7 @@ class DocsResult:
     mandatory_coverage: float = 0.0
     selected_evidence_ids: list[str] = field(default_factory=list)
     decision_hash: str | None = None
+    assignment_hash: str | None = None
 
 
 @dataclass(frozen=True)
@@ -261,6 +269,7 @@ class DocsJob:
     warnings: list[str] = field(default_factory=list)
     errors: list[str] = field(default_factory=list)
     target_results: list[dict[str, Any]] = field(default_factory=list)
+    vector_sync: dict[str, Any] = field(default_factory=dict)
     events: list[dict[str, Any]] = field(default_factory=list)
     queued_at: str | None = None
     started_at: str | None = None
@@ -590,6 +599,7 @@ class ProjectDocsResult:
     status: str = "success"
     tool: str = "get_project_docs"
     reason_code: str | None = None
+    resolved_evidence_path: str | None = None
     next_action: dict[str, Any] = field(default_factory=dict)
     requires_confirmation: bool = False
     confirmation_reason: str | None = None
@@ -609,6 +619,12 @@ class ProjectDocsResult:
 
 
 @dataclass(frozen=True)
+class DeliveryDecision:
+    deliverable: bool
+    reason_code: str | None = None
+
+
+@dataclass(frozen=True)
 class ProjectContextResult:
     project_path: str
     question: str
@@ -618,6 +634,10 @@ class ProjectContextResult:
     answer_available: bool = True
     answer_type: str = "exact"
     answer_completeness: dict[str, Any] = field(default_factory=dict)
+    requirements: Any = None
+    selection_decision: Any = None
+    support_decision: Any = None
+    delivery_decision: DeliveryDecision | None = None
     mode: str = "auto"
     reason: str | None = None
     context_pack: list[dict[str, Any]] = field(default_factory=list)
@@ -663,8 +683,10 @@ class UnifiedDocsContextResult:
     mandatory_coverage: float = 0.0
     selected_evidence_ids: list[str] = field(default_factory=list)
     decision_hash: str | None = None
-    selection_decision: Any = None
+    assignment_hash: str | None = None
+    selection_decision: Any = None  # SelectionDecision or AggregateMixedSelectionDecision
     support_decision: Any = None
+    delivery_decision: DeliveryDecision | None = None
     answer_type: str | None = None
     answer_completeness: dict[str, Any] = field(default_factory=dict)
     disposition: str | None = None
@@ -701,4 +723,5 @@ class UnifiedDocsContextResult:
     lane_details: dict[str, Any] = field(default_factory=dict)
     ingestion_diagnostics: dict[str, Any] = field(default_factory=dict)
     retrieval_diagnostics: dict[str, Any] = field(default_factory=dict)
+    retrieval_routing: dict[str, Any] | None = None
     requirements: Any = None

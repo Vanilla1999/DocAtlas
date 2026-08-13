@@ -121,6 +121,7 @@ class ExactTerm:
 @dataclass(frozen=True, slots=True)
 class FilterSpec:
     project_identity: str | None = None
+    project_doc_path: str | None = None
     library_id: str | None = None
     resolved_version: str | None = None
     version_family: str | None = None

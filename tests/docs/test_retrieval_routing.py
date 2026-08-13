@@ -161,7 +161,7 @@ def test_create_intent_routes_as_patch_and_stage_overflow_is_visible():
     record = new_routing_record(route, project_docs_used=True, dependency_docs_used=False)
     record_stage(
         record, "repo_map", status="used", reason="fixture",
-        items=[{"path": str(index), "blob": "x" * 10_000} for index in range(100)],
+        items=[{"path": str(index), "content": "x" * 10_000} for index in range(100)],
     )
 
     assert route.intent == "patch"
@@ -172,7 +172,7 @@ def test_create_intent_routes_as_patch_and_stage_overflow_is_visible():
 
 
 def test_stage_budget_skips_non_fitting_item_and_keeps_later_evidence(monkeypatch):
-    monkeypatch.setitem(fit_stage_items.__globals__["STAGE_BYTE_LIMITS"], "project_docs", 120)
+    monkeypatch.setitem(fit_stage_items.__globals__["STAGE_BYTE_LIMITS"], "project_docs", 250)
     items = [
         {"path": "first.md", "content": "x" * 40},
         {"path": "too-large.md", "content": "x" * 100},
@@ -183,3 +183,43 @@ def test_stage_budget_skips_non_fitting_item_and_keeps_later_evidence(monkeypatc
 
     assert [item["path"] for item in bounded] == ["first.md", "later.md"]
     assert issue is not None
+
+
+def test_stage_budget_ignores_document_wide_metadata_not_visible_to_routing(monkeypatch):
+    monkeypatch.setitem(fit_stage_items.__globals__["STAGE_BYTE_LIMITS"], "project_docs", 300)
+    item = {
+        "stable_chunk_id": "plan-policy",
+        "path": "docs/plan.md",
+        "heading_path": "Policy",
+        "authority": "supporting",
+        "content": "The proposed policy period is 72 hours.",
+        "token_estimate": 12,
+        "metadata": {
+            "project_doc_sections": ["x" * 10_000 for _ in range(20)],
+            "retrieval_trace": {"payload": "y" * 10_000},
+        },
+    }
+
+    bounded, issue = fit_stage_items("project_docs", [item])
+
+    assert bounded == [item]
+    assert issue is None
+
+
+def test_schema_v2_rejects_wrong_numeric_types_unknown_fields_and_inconsistent_budgets():
+    route = route_initial_stages(
+        question="Explain docs", mode="project-only", dependency_requested=False,
+        project_doc_items=[],
+    )
+    record = new_routing_record(route, project_docs_used=True, dependency_docs_used=False)
+    record["model_visible_bytes"] = "12"
+    record["budget_projection_bytes"] = 99
+    record["stages"]["project_docs"]["item_count"] = True
+    record["stages"]["project_docs"]["unknown"] = 1
+
+    errors = validate_routing_record(record)
+
+    assert "model_visible_bytes: must be a non-negative integer" in errors
+    assert "budget_projection_bytes: inconsistent stage total" in errors
+    assert "project_docs: unexpected stage fields" in errors
+    assert any("project_docs: invalid non-negative integer fields" in error for error in errors)

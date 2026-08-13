@@ -42,6 +42,22 @@ def test_mcp_serve_is_compatibility_alias_for_packs_serve():
     assert "Compatibility alias" in (mcp_commands["serve"].help or "")
 
 
+@pytest.mark.parametrize(
+    ("arguments", "expected"),
+    [
+        (["--config", "root.yaml", "mcp", "docs-serve"], "root.yaml"),
+        (["mcp", "docs-serve", "--config", "child.yaml"], "child.yaml"),
+        (["--config", "root.yaml", "mcp", "docs-serve", "--config", "child.yaml"], "child.yaml"),
+    ],
+)
+def test_docs_serve_accepts_root_and_command_config(arguments, expected):
+    with patch("docmancer.mcp.docs_server.serve") as serve:
+        result = CliRunner().invoke(cli, arguments)
+
+    assert result.exit_code == 0, result.output
+    serve.assert_called_once_with(config_path=expected)
+
+
 def test_install_pack_command_registered():
     runner = CliRunner()
     result = runner.invoke(cli, ["install-pack", "--help"])

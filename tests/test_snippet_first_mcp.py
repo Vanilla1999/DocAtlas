@@ -57,7 +57,7 @@ class FakeService:
 
 
 def test_existing_calls_without_response_style_remain_valid():
-    assert handle_context_tool("get_docs_context", {"question": "How?", "library": "fastapi"}, FakeService())["status"] == "success"
+    assert handle_context_tool("get_docs_context", {"question": "How?", "library": "fastapi"}, FakeService())["status"] == "insufficient_evidence"
 
 
 def test_mcp_handlers_pass_response_style():

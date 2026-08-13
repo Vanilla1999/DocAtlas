@@ -121,7 +121,10 @@ class DocmancerAgent:
                     )
                     self._require_completed_vector_sync(synced)
                     primary_metrics = dict(self.last_vector_sync_metrics)
-                    self.store.activate_generation(result.generation_id)
+                    self.store.activate_generation(
+                        result.generation_id,
+                        require_vector_witness=self._vector_retrieval_required(),
+                    )
                     if synced:
                         self._sync_vectors_if_enabled(
                             generation_id=result.generation_id,
@@ -140,6 +143,9 @@ class DocmancerAgent:
                     )
                     self._require_completed_vector_sync(synced)
             except Exception as exc:
+                if result.generation_id:
+                    if self.discard_vector_generation(result.generation_id):
+                        self.store.discard_candidate_generation(result.generation_id)
                 raise RuntimeError(f"vector indexing failed after FTS5 ingest: {exc}") from exc
         return result.sections
 
@@ -359,21 +365,52 @@ class DocmancerAgent:
         result.backend_setup_ms = backend_setup_ms
         result.collection = collection
         if generation_id and section_ids is None:
-            expected = len(self.store.list_sections_for_embedding(generation_id))
-            actual = vector_store.count(collection)
-            if actual != expected:
+            backend_identity = vector_store.backend_identity()
+            self.store.set_generation_vector_backend(
+                generation_id, vs_config.provider, backend_identity
+            )
+            expected_ids = {
+                str(row.get("vector_id") or row.get("section_id"))
+                for row in self.store.list_sections_for_embedding(generation_id)
+            }
+            actual_ids = vector_store.point_ids(collection)
+            missing_ids = expected_ids - actual_ids
+            extra_ids = actual_ids - expected_ids
+            if missing_ids or extra_ids:
                 raise RuntimeError(
                     "candidate vector collection parity failed: "
-                    f"expected={expected}, actual={actual}, collection={collection}"
+                    f"expected={len(expected_ids)}, actual={len(actual_ids)}, "
+                    f"missing={len(missing_ids)}, extra={len(extra_ids)}"
                 )
-            set_backend = getattr(self.store, "set_generation_vector_backend", None)
-            if callable(set_backend):
-                set_backend(generation_id, vs_config.provider)
+            parity_digest = hashlib.sha256(
+                "\n".join(sorted(expected_ids)).encode("utf-8")
+            ).hexdigest()
+            if str((self.store.generation_info(generation_id) or {}).get("status")) != "active":
+                self.store.record_vector_parity_witness(
+                    generation_id,
+                    digest=parity_digest,
+                    count=len(expected_ids),
+                    backend=vs_config.provider,
+                    backend_identity=backend_identity,
+                    collection=collection,
+                )
             if prune_stale and generation_id == self.store.active_generation_id():
                 removable: list[str] = []
                 for candidate in self.store.superseded_generation_candidates(retain=1):
                     stale_generation = str(candidate["generation_id"])
                     stale_collection = str(candidate.get("vector_collection") or "")
+                    stale_identity = str(candidate.get("vector_backend_identity") or "")
+                    stale_backend = str(candidate.get("vector_backend") or "")
+                    if (
+                        not stale_identity
+                        or stale_identity != backend_identity
+                        or stale_backend != vs_config.provider
+                    ):
+                        logger.warning(
+                            "retaining generation %s because vector backend identity is unverified",
+                            stale_generation,
+                        )
+                        continue
                     if stale_collection and stale_collection != collection:
                         try:
                             vector_store.delete_collection(stale_collection)
@@ -431,6 +468,15 @@ class DocmancerAgent:
                 vector_config,
                 embeddings_dim=self.config.embeddings.dimensions,
             )
+            expected_identity = str(info.get("vector_backend_identity") or "")
+            if (
+                not expected_identity
+                or expected_identity != vector_store.backend_identity()
+            ):
+                logger.warning(
+                    "candidate vector collection cleanup deferred: unverified backend identity"
+                )
+                return False
             vector_store.delete_collection(collection)
             return True
         except Exception as exc:

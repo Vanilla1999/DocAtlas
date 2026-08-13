@@ -4,13 +4,13 @@ from __future__ import annotations
 
 import json
 import re
-from dataclasses import dataclass
-from typing import Any, Iterable
+from dataclasses import dataclass, fields, is_dataclass
+from typing import Any, Iterable, Mapping
 
 from docmancer.docs.domain.request_intent import is_change_request
 
 
-RETRIEVAL_ROUTING_SCHEMA_VERSION = 1
+RETRIEVAL_ROUTING_SCHEMA_VERSION = 2
 STAGE_ITEM_LIMITS = {
     "project_docs": 20,
     "dependency_docs": 20,
@@ -114,10 +114,10 @@ def should_run_repo_map(route: RetrievalRoute, source_items: Iterable[dict[str, 
         return True, "explicit source navigation requires bounded repository paths"
     if route.intent not in {"patch", "mixed"}:
         return False, "documentation/API evidence does not require repository cartography"
-    if any(item.get("evidence_class") == "absent_in_source" for item in items):
-        return True, "required target terms remain unresolved after source evidence"
     if _proven_source_paths(items):
         return False, "bounded source evidence already proves a target path"
+    if any(item.get("evidence_class") == "absent_in_source" for item in items):
+        return True, "required target terms remain unresolved after source evidence"
     if route.use_source_evidence:
         return True, "required patch target remains unresolved after source evidence"
     return False, "no deterministic source signal authorizes repository scanning"
@@ -138,7 +138,10 @@ def should_run_code_graph(
     modules = {_top_module(path) for path in _proven_source_paths([*source, *repo]) if _top_module(path)}
     if len(modules) > 1:
         return True, "earlier evidence supports multiple target modules"
-    unresolved = any(item.get("evidence_class") == "absent_in_source" for item in source)
+    unresolved = (
+        not _proven_source_paths(source)
+        and any(item.get("evidence_class") == "absent_in_source" for item in source)
+    )
     if unresolved and route.intent in {"patch", "source_navigation", "mixed"}:
         return True, "target resolution remains incomplete after bounded source retrieval"
     return False, "one bounded source target is already resolved"
@@ -182,7 +185,7 @@ def new_routing_record(route: RetrievalRoute, *, project_docs_used: bool, depend
             "repo_map": _stage("skipped", "not evaluated"),
             "code_graph": _stage("skipped", "not evaluated"),
         },
-        "raw_retrieval_bytes": 0,
+        "budget_projection_bytes": 0,
         "model_visible_bytes": 0,
     }
 
@@ -195,10 +198,10 @@ def record_stage(
     bounded_items, budget = fit_stage_items(stage, observed_items)
     row = _stage(status, reason)
     row["item_count"] = len(bounded_items)
-    row["raw_bytes"] = sum(len(_canonical_bytes(item)) for item in bounded_items)
-    row["estimated_tokens"] = (row["raw_bytes"] + 3) // 4
+    row["budget_projection_bytes"] = sum(len(_canonical_bytes(item)) for item in bounded_items)
+    row["estimated_tokens"] = (row["budget_projection_bytes"] + 3) // 4
     row["observed_item_count"] = len(observed_items)
-    row["observed_raw_bytes"] = sum(len(_canonical_bytes(item)) for item in observed_items)
+    row["observed_budget_projection_bytes"] = sum(len(_canonical_bytes(item)) for item in observed_items)
     row["budget_exceeded"] = bool(budget)
     if budget:
         row["status"] = "insufficient"
@@ -206,8 +209,8 @@ def record_stage(
     if error:
         row["error_type"] = str(error)[:80]
     record["stages"][stage] = row
-    record["raw_retrieval_bytes"] = sum(
-        int(value.get("raw_bytes") or 0) for value in record["stages"].values()
+    record["budget_projection_bytes"] = sum(
+        int(value.get("budget_projection_bytes") or 0) for value in record["stages"].values()
     )
 
 
@@ -239,28 +242,65 @@ def validate_routing_record(record: Any) -> list[str]:
     errors: list[str] = []
     if not isinstance(record, dict) or record.get("schema_version") != RETRIEVAL_ROUTING_SCHEMA_VERSION:
         return ["invalid retrieval routing record"]
-    if set(record) != {"schema_version", "intent", "stages", "raw_retrieval_bytes", "model_visible_bytes"}:
+    if set(record) != {"schema_version", "intent", "stages", "budget_projection_bytes", "model_visible_bytes"}:
         errors.append("unexpected routing record fields")
     stages = record.get("stages")
     if not isinstance(stages, dict) or set(stages) != set(STAGE_ITEM_LIMITS):
         errors.append("routing record must contain every stage")
         return errors
     for name, row in stages.items():
+        if not isinstance(row, dict):
+            errors.append(f"{name}: stage must be an object")
+            continue
+        allowed_fields = {
+            "status", "reason", "item_count", "budget_projection_bytes", "estimated_tokens",
+            "observed_item_count", "observed_budget_projection_bytes", "budget_exceeded", "error_type",
+        }
+        if set(row) - allowed_fields:
+            errors.append(f"{name}: unexpected stage fields")
         if row.get("status") not in {"used", "skipped", "failed", "insufficient"}:
             errors.append(f"{name}: invalid stage status")
         if not isinstance(row.get("reason"), str) or not row["reason"]:
             errors.append(f"{name}: missing deterministic reason")
         if any(key in row for key in ("content", "snippet", "context_pack", "source")):
             errors.append(f"{name}: raw evidence leaked into routing diagnostics")
-        if int(row.get("item_count") or 0) > STAGE_ITEM_LIMITS[name]:
+        numeric_fields = (
+            "item_count", "budget_projection_bytes", "estimated_tokens",
+            "observed_item_count", "observed_budget_projection_bytes",
+        )
+        invalid_numeric = [
+            key for key in numeric_fields
+            if not isinstance(row.get(key), int) or isinstance(row.get(key), bool) or row[key] < 0
+        ]
+        if invalid_numeric:
+            errors.append(f"{name}: invalid non-negative integer fields: {', '.join(invalid_numeric)}")
+            continue
+        if row["item_count"] > STAGE_ITEM_LIMITS[name]:
             errors.append(f"{name}: item budget exceeded")
-        if int(row.get("raw_bytes") or 0) > STAGE_BYTE_LIMITS[name]:
+        if row["budget_projection_bytes"] > STAGE_BYTE_LIMITS[name]:
             errors.append(f"{name}: byte budget exceeded")
+        if row["observed_item_count"] < row["item_count"]:
+            errors.append(f"{name}: observed item count is below retained count")
+        if row["observed_budget_projection_bytes"] < row["budget_projection_bytes"]:
+            errors.append(f"{name}: observed bytes are below retained bytes")
+        if row["estimated_tokens"] != (row["budget_projection_bytes"] + 3) // 4:
+            errors.append(f"{name}: estimated token budget is inconsistent")
         budget_exceeded = row.get("budget_exceeded")
         if not isinstance(budget_exceeded, bool):
             errors.append(f"{name}: missing budget status")
         elif budget_exceeded and row.get("status") not in {"insufficient", "failed"}:
             errors.append(f"{name}: exceeded budget must fail closed")
+    for key in ("budget_projection_bytes", "model_visible_bytes"):
+        value = record.get(key)
+        if not isinstance(value, int) or isinstance(value, bool) or value < 0:
+            errors.append(f"{key}: must be a non-negative integer")
+    if isinstance(record.get("budget_projection_bytes"), int) and not isinstance(record.get("budget_projection_bytes"), bool):
+        expected = sum(
+            row.get("budget_projection_bytes", 0)
+            for row in stages.values() if isinstance(row, dict) and isinstance(row.get("budget_projection_bytes"), int)
+        )
+        if record["budget_projection_bytes"] != expected:
+            errors.append("budget_projection_bytes: inconsistent stage total")
     return errors
 
 
@@ -269,10 +309,10 @@ def _stage(status: str, reason: str) -> dict[str, Any]:
         "status": status,
         "reason": reason,
         "item_count": 0,
-        "raw_bytes": 0,
+        "budget_projection_bytes": 0,
         "estimated_tokens": 0,
         "observed_item_count": 0,
-        "observed_raw_bytes": 0,
+        "observed_budget_projection_bytes": 0,
         "budget_exceeded": False,
     }
 
@@ -295,4 +335,42 @@ def _top_module(path: str) -> str:
 
 
 def _canonical_bytes(value: Any) -> bytes:
-    return json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"), default=str).encode("utf-8")
+    return json.dumps(
+        _stage_budget_projection(value),
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("utf-8")
+
+
+def _stage_budget_projection(value: Any) -> dict[str, Any]:
+    """Project only routing-relevant fields into deterministic byte accounting."""
+
+    if isinstance(value, Mapping):
+        item = value
+    elif is_dataclass(value) and not isinstance(value, type):
+        item = {field.name: getattr(value, field.name) for field in fields(value)}
+    else:
+        item = {"content": str(value)}
+    metadata = item.get("metadata") if isinstance(item.get("metadata"), Mapping) else {}
+
+    def first(*names: str) -> Any:
+        for name in names:
+            candidate = item.get(name)
+            if candidate is None:
+                candidate = metadata.get(name)
+            if candidate is not None and candidate != "":
+                return candidate
+        return None
+
+    content = first("content", "display_text", "text", "snippet", "code")
+    if isinstance(content, Mapping):
+        content = content.get("content") or content.get("text") or content.get("code")
+    return {
+        "stable_id": str(first("stable_chunk_id", "stable_child_id", "stable_id", "evidence_id") or ""),
+        "path": str(first("path", "project_doc_path", "source_path", "source", "url") or ""),
+        "heading": str(first("heading_path", "title", "section") or ""),
+        "authority": str(first("authority", "project_doc_authority") or ""),
+        "content": str(content or ""),
+        "token_estimate": int(first("token_estimate") or 0),
+    }

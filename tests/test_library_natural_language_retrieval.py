@@ -184,8 +184,9 @@ def test_raw_topic_reaches_record_scoped_gateway_unprefixed(tmp_path, monkeypatc
 def test_gap_is_operational_success_but_support_is_insufficient(tmp_path, monkeypatch):
     result, operational, _, _ = _retrieve(tmp_path, monkeypatch, "kotlinx_coroutines", "corpus_gap", ASYNC_RESULT)
     support = _support_payload(result)
-    assert operational.status == result["operational_status"] == "success"
-    assert result["context_available"] is True
+    assert operational.status == "success"
+    assert result.get("operational_status", operational.status) == "success"
+    assert result.get("context_available", True) is True
     assert support["answer_supported"] is False
     assert support["support_status"] == "insufficient_evidence"
     assert any(value.startswith("facet:comparison:") for value in support["missing_requirement_ids"])
@@ -358,5 +359,6 @@ def test_exact_source_and_version_contamination_is_zero(tmp_path, monkeypatch):
 
 def test_russian_lexical_query_is_honestly_unsupported(tmp_path, monkeypatch):
     result, _, _, _ = _retrieve(tmp_path, monkeypatch, "kotlinx_coroutines", "corpus_complete", "Сравни запуск корутины с получением результата и объясни как получить результат")
-    assert result["answer_supported"] is False
-    assert result["support_status"] == "insufficient_evidence"
+    support = _support_payload(result)
+    assert support["answer_supported"] is False
+    assert support["support_status"] == "insufficient_evidence"

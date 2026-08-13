@@ -575,6 +575,106 @@ def test_docs_projection_uses_the_canonical_requirement_set_without_rebuilding_i
     assert diagnostics["requirements_hash"] == requirements.requirements_hash
 
 
+def test_project_projection_reuses_canonical_selection_and_evidence_ids():
+    from docmancer.docs.application.evidence_selection import docs_selection_config, select_evidence
+
+    question = "Explain CONFIG_KEY"
+    candidate = {
+        "stable_id": "project-config-witness",
+        "source": "docs/config.md",
+        "content": "CONFIG_KEY enables the documented behavior.",
+    }
+    selection = select_evidence(
+        [candidate], question=question, config=docs_selection_config(800)
+    )
+
+    projection, _ = project_docs_answer(
+        question=question,
+        retrieval={
+            "status": "success",
+            "context_pack": [candidate],
+            "selection_decision": selection,
+        },
+        canonical_selection=selection,
+    )
+
+    assert projection["status"] == "ok"
+    assert projection["decision_hash"] == selection.support_decision.decision_hash
+    assert projection["answer_evidence_ids"] == list(
+        selection.support_decision.selected_evidence_ids
+    )
+    assert [source["evidence_id"] for source in projection["sources"]] == projection["answer_evidence_ids"]
+
+
+def test_project_projection_materializes_every_selected_mandatory_witness():
+    from docmancer.docs.application.evidence_selection import docs_selection_config, select_evidence
+
+    question = "Summarize the policy period and implementation status"
+    candidates = [
+        {
+            "stable_id": "policy-period",
+            "source": "docs/plan.md",
+            "title": "Policy period",
+            "content": "The proposed policy period is 72 hours.",
+        },
+        {
+            "stable_id": "implementation-status",
+            "source": "docs/plan.md",
+            "title": "Implementation status",
+            "content": "This policy is not implemented and must be confirmed before implementation.",
+        },
+    ]
+    selection = select_evidence(
+        candidates,
+        question=question,
+        config=docs_selection_config(800),
+        public_requirements=["72 hours", "not implemented"],
+    )
+
+    projection, snapshot = project_docs_answer(
+        question=question,
+        retrieval={"status": "success", "context_pack": candidates},
+        canonical_selection=selection,
+    )
+
+    assert selection.support_decision.answer_supported is True
+    assert projection["status"] == "ok"
+    assert "proposed policy period is 72 hours" in projection["answer"]
+    assert "not implemented and must be confirmed before implementation" in projection["answer"]
+    assert projection["answer_evidence_ids"] == list(selection.support_decision.selected_evidence_ids)
+    assert validate_model_visible_projection(projection, snapshot=snapshot, max_tokens=800) == []
+
+
+def test_explicit_answer_cannot_hide_a_selected_mandatory_witness():
+    from docmancer.docs.application.evidence_selection import docs_selection_config, select_evidence
+
+    question = "Summarize first fact and second fact"
+    candidates = [
+        {"stable_id": "first", "source": "docs/one.md", "content": "The first fact is enabled."},
+        {"stable_id": "second", "source": "docs/two.md", "content": "The second fact is proposed."},
+    ]
+    selection = select_evidence(
+        candidates,
+        question=question,
+        config=docs_selection_config(800),
+        public_requirements=["first fact", "second fact"],
+    )
+
+    projection, _ = project_docs_answer(
+        question=question,
+        retrieval={
+            "status": "success",
+            "answer": "The first fact is enabled.",
+            "context_pack": candidates,
+        },
+        canonical_selection=selection,
+    )
+
+    assert "The first fact is enabled." in projection["answer"]
+    assert "The second fact is proposed." in projection["answer"]
+    assert projection["answer_evidence_ids"] == ["first", "second"]
+
+
 def test_docs_projection_preserves_underlying_support_decision_fields():
     from docmancer.docs.application.evidence_selection import (
         library_docs_selection_config,
@@ -605,8 +705,14 @@ def test_docs_projection_preserves_underlying_support_decision_fields():
         },
     )
 
-    assert {key: projection[key] for key in support} == support
     assert projection["status"] == "insufficient_evidence"
+    if "support_envelope" in projection:
+        from docmancer.docs.application.model_visible_projection import decode_support_envelope
+
+        projected_support = decode_support_envelope(projection["support_envelope"])
+    else:
+        projected_support = projection
+    assert {key: projected_support[key] for key in support} == support
 
 
 def test_supported_library_projection_shares_decision_and_visible_evidence_ids():

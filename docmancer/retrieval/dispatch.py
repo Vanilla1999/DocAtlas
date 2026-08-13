@@ -10,8 +10,9 @@ from __future__ import annotations
 import logging
 import re
 import threading
+import hashlib
 from collections import OrderedDict
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor, TimeoutError as FutureTimeoutError
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any
 
@@ -32,6 +33,15 @@ if TYPE_CHECKING:
     from docmancer.stores.base import VectorStore
 
 logger = logging.getLogger(__name__)
+
+VECTOR_READINESS_SCHEMA = "vector-readiness-v1"
+VECTOR_READINESS_REASONS = frozenset({
+    "unverified_backend_identity", "backend_identity_mismatch",
+    "collection_identity_mismatch", "unverified_parity_witness",
+    "metadata_unavailable", "metadata_unverified", "capability_mismatch",
+    "health_unavailable", "backend_unhealthy", "count_unavailable",
+    "count_mismatch",
+})
 
 
 class _CachedQueryProvider:
@@ -121,6 +131,48 @@ class RetrievalDispatcher:
         self.provider = _CachedQueryProvider(provider) if provider is not None else None
         self.collection = collection
         self._auto_hierarchical_cache: bool | None = None
+
+    def vector_readiness(self, mode: str | None = None) -> dict[str, Any]:
+        """Return the versioned bounded public readiness contract."""
+        effective_mode = str(mode or self.config.retrieval.default_mode or "lexical").lower()
+        if effective_mode == "lexical":
+            return {"schema_version": VECTOR_READINESS_SCHEMA,
+                    "status": "not_required", "mode": "lexical"}
+        failure = self._vector_readiness_failure(effective_mode)
+        if not failure:
+            return {
+                "schema_version": VECTOR_READINESS_SCHEMA,
+                "status": "ready", "mode": effective_mode,
+                "collection_id": self._public_collection_id(),
+            }
+        reason = next(iter(failure.values())).split(":", 1)[0]
+        return {
+            "schema_version": VECTOR_READINESS_SCHEMA,
+            "status": "not_ready",
+            "mode": effective_mode,
+            "reason_code": reason if reason in VECTOR_READINESS_REASONS else "metadata_unavailable",
+            "collection_id": self._public_collection_id(),
+        }
+
+    def _public_collection_id(self) -> str:
+        if not self.collection:
+            return ""
+        return "sha256:" + hashlib.sha256(self.collection.encode("utf-8")).hexdigest()[:16]
+
+    def _bounded_vector_probe(self, operation: Any) -> Any:
+        if not getattr(self.vector_store, "supports_concurrent_queries", True):
+            return operation()
+        options = getattr(getattr(self.config, "vector_store", None), "options", {}) or {}
+        timeout = max(0.01, min(float(options.get("readiness_timeout_seconds", 0.25)), 2.0))
+        executor = ThreadPoolExecutor(max_workers=1, thread_name_prefix="vector-readiness")
+        future = executor.submit(operation)
+        try:
+            return future.result(timeout=timeout)
+        except FutureTimeoutError as exc:
+            future.cancel()
+            raise TimeoutError("vector readiness deadline exceeded") from exc
+        finally:
+            executor.shutdown(wait=False, cancel_futures=True)
 
     def run(
         self,
@@ -365,22 +417,41 @@ class RetrievalDispatcher:
         if generation_info and str(generation_info.get("vector_collection") or "") != self.collection:
             return {
                 "vector": (
-                    "collection identity does not match the active SQLite generation: "
-                    f"expected {generation_info.get('vector_collection')!r}, "
-                    f"got {self.collection!r}"
+                    "collection_identity_mismatch"
                 )
             }
+        if generation_info:
+            backend_identity = str(generation_info.get("vector_backend_identity") or "")
+            if not backend_identity:
+                return {"vector": "unverified_backend_identity"}
+            try:
+                current_identity = self.vector_store.backend_identity()
+            except Exception:
+                return {"vector": "unverified_backend_identity"}
+            if current_identity != backend_identity:
+                return {"vector": "backend_identity_mismatch"}
+            if not (
+                str(generation_info.get("vector_parity_schema") or "") == "vector-parity-v1"
+                and str(generation_info.get("vector_parity_digest") or "")
+                and str(generation_info.get("vector_parity_verified_at") or "")
+                and generation_info.get("vector_parity_count") is not None
+                and str(generation_info.get("vector_parity_backend_identity") or "") == backend_identity
+                and str(generation_info.get("vector_parity_collection") or "") == self.collection
+            ):
+                return {"vector": "unverified_parity_witness"}
         metadata: dict[str, Any] | None = None
         metadata_fn = getattr(self.vector_store, "collection_metadata", None)
         if callable(metadata_fn):
             try:
-                metadata = metadata_fn(self.collection)
+                metadata = self._bounded_vector_probe(
+                    lambda: metadata_fn(self.collection)
+                )
             except Exception as exc:
-                return {"vector": f"collection metadata unavailable: {type(exc).__name__}: {exc}"}
+                return {"vector": f"metadata_unavailable:{type(exc).__name__}"}
         if not metadata:
             metadata = self._sidecar_collection_metadata()
         if not metadata:
-            return {"vector": "collection capability metadata is not verified"}
+            return {"vector": "metadata_unverified"}
         expected_provider = str(getattr(self.provider, "name", ""))
         expected_model = str(getattr(self.provider, "model_name", expected_provider))
         expected_dim = int(getattr(self.provider, "dimensions", 0) or 0)
@@ -391,29 +462,29 @@ class RetrievalDispatcher:
             mismatches.append("model")
         if expected_dim and int(metadata.get("dim") or 0) != expected_dim:
             mismatches.append("dimensions")
-        if mode == "sparse" and not metadata.get("sparse_model"):
+        if mode in {"sparse", "hybrid"} and not metadata.get("sparse_model"):
             mismatches.append("sparse_model")
         if mismatches:
-            return {"vector": "collection capability mismatch: " + ", ".join(mismatches)}
+            return {"vector": "capability_mismatch:" + ",".join(mismatches)}
+        health_fn = getattr(self.vector_store, "health_check", None)
+        if not callable(health_fn):
+            return {"vector": "health_unavailable"}
+        try:
+            if not self._bounded_vector_probe(health_fn):
+                return {"vector": "backend_unhealthy"}
+        except Exception as exc:
+            return {"vector": f"health_unavailable:{type(exc).__name__}"}
         count_fn = getattr(self.vector_store, "count", None)
         if not callable(count_fn):
-            return {}
+            return {"vector": "count_unavailable"}
         try:
-            points = int(count_fn(self.collection))
+            points = int(self._bounded_vector_probe(lambda: count_fn(self.collection)))
         except Exception as exc:
-            return {"vector": f"{type(exc).__name__}: {exc}"}
-        if points <= 0:
-            return {"vector": f"collection {self.collection!r} has no indexed vectors"}
+            return {"vector": f"count_unavailable:{type(exc).__name__}"}
         if generation_info:
-            generation_id = str(generation_info.get("generation_id") or "")
-            expected = len(self.store.list_sections_for_embedding(generation_id))
+            expected = int(generation_info["vector_parity_count"])
             if points != expected:
-                return {
-                    "vector": (
-                        "collection point parity does not match the active SQLite generation: "
-                        f"expected {expected}, got {points}"
-                    )
-                }
+                return {"vector": f"count_mismatch:expected={expected},actual={points}"}
         return {}
 
     def _sidecar_collection_metadata(self) -> dict[str, Any]:
@@ -766,8 +837,8 @@ class RetrievalDispatcher:
             try:
                 hits = resolve()
             except Exception as exc:
-                logger.warning("retrieval source %s failed: %s", source, exc)
-                failures[source] = f"{type(exc).__name__}: {exc}"
+                logger.warning("retrieval source %s failed (%s)", source, type(exc).__name__)
+                failures[source] = f"{type(exc).__name__}: <redacted diagnostic text>"
                 hits = []
             if not hits:
                 counts[source] = 0

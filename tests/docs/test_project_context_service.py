@@ -71,7 +71,13 @@ def test_project_context_service_returns_selected_project_and_dependency_section
     assert result.reason == "trusted_context_available"
     assert result.trust_contract["policy"]["direct_webfetch"] == "forbidden"
     assert ("docs", "go_router", {"topic": "use go_router", "tokens": 1200, "ecosystem": None, "version": None, "project_path": "/repo"}) in facade.calls
-    assert ("project", "/repo", "use go_router", {"tokens": 1200, "limit": 12, "expand": None, "module": None, "module_path": None, "scope": None}) in facade.calls
+    project_call = next(call for call in facade.calls if call[0] == "project")
+    assert project_call[:3] == ("project", "/repo", "use go_router")
+    assert project_call[3]["requirements"] is result.requirements
+    assert {key: value for key, value in project_call[3].items() if key != "requirements"} == {
+        "tokens": 1200, "limit": 12, "expand": None, "module": None,
+        "module_path": None, "scope": None,
+    }
 
 
 def test_project_context_service_deps_only_skips_project_docs_and_marks_risk():
@@ -424,6 +430,63 @@ def test_architecture_query_injects_root_architecture_when_retrieval_misses_it(t
     assert injected.metadata["injection_policy"] == "root_reviewable_project_doc_after_preflight"
 
 
+def test_explicit_document_locator_prevents_broad_architecture_injection(tmp_path):
+    plan_path = "docs/IOS_TRUSTED_TIME_PLAN.md"
+    (tmp_path / "docs").mkdir()
+    (tmp_path / plan_path).write_text("Trusted time conventions use a 72-hour period.\n", encoding="utf-8")
+    (tmp_path / "ARCHITECTURE.md").write_text("Unrelated architecture conventions.\n", encoding="utf-8")
+    facade = FakeProjectContextFacade()
+    facade.project_docs = ProjectDocsResult(
+        project_path=str(tmp_path),
+        query="conventions",
+        results=[
+            ProjectDocsChunk(
+                title="Trusted time plan", content="Trusted time conventions use a 72-hour period.",
+                source=str(tmp_path / plan_path), url=None, path=plan_path,
+            ),
+            ProjectDocsChunk(
+                title="Architecture", content="Unrelated architecture conventions.",
+                source=str(tmp_path / "ARCHITECTURE.md"), url=None, path="ARCHITECTURE.md",
+            ),
+        ],
+        indexed_sources=[
+            {"path": plan_path, "source": str(tmp_path / plan_path)},
+            {"path": "ARCHITECTURE.md", "source": str(tmp_path / "ARCHITECTURE.md")},
+        ],
+    )
+
+    result = ProjectContextService(facade).get_project_context(
+        str(tmp_path), f"In {plan_path}, explain the conventions", mode="project-only"
+    )
+
+    assert result.project_docs is not None
+    assert {chunk.path for chunk in result.project_docs.results} == {plan_path}
+    project_call = next(call for call in facade.calls if call[0] == "project")
+    assert project_call[3]["evidence_path"] == plan_path
+    assert result.requirements is result.selection_decision.requirements
+    assert result.support_decision is result.selection_decision.support_decision
+    assert any(
+        requirement.kind == "evidence_path" and requirement.value == plan_path
+        for requirement in result.requirements
+    )
+    assert set(result.support_decision.selected_evidence_ids) == {
+        candidate.stable_id for candidate in result.selection_decision.selected_candidates
+    }
+
+
+def test_project_shadow_selection_marks_navigation_context_as_non_factual():
+    facade = FakeProjectContextFacade()
+    facade.project_docs = ProjectDocsResult(project_path="/repo", query="missing fact", results=[])
+
+    result = ProjectContextService(facade).get_project_context(
+        "/repo", "Where is MissingFact implemented?", mode="project-only"
+    )
+
+    assert result.selection_decision is not None
+    assert result.support_decision is result.selection_decision.support_decision
+    assert result.support_decision.answer_supported is False
+
+
 def test_architecture_query_only_injects_authoritative_catalog_candidates(tmp_path):
     (tmp_path / "README.md").write_text("# Unlisted readme\n", encoding="utf-8")
     (tmp_path / "handbook").mkdir()
@@ -728,7 +791,9 @@ def test_project_context_code_graph_failure_is_non_fatal(tmp_path, monkeypatch):
     )
 
     assert result.status == "success"
-    assert result.diagnostics["code_graph"] == {"error": "RuntimeError: boom", "selected_items": 0}
+    assert result.diagnostics["code_graph"] == {
+        "error": "<redacted diagnostic text>", "selected_items": 0,
+    }
 
 
 def test_trust_contract_uses_canonical_sources_and_exposes_source_evidence_context_sources(tmp_path):

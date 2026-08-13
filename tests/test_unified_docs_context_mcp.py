@@ -9,6 +9,7 @@ import jsonschema
 
 from docmancer.docs.interfaces.mcp.context_tools import context_tools, handle_context_tool
 from docmancer.docs.application.unified_context_service import UnifiedDocsContextService
+from docmancer.docs.application.model_visible_projection import canonical_projection_bytes, decode_support_envelope
 from docmancer.docs.models import DocsChunk, DocsResult, LibraryInfo
 from docmancer.docs.interfaces.mcp.project_tools import MCP_COMPACT_OUTPUT_MAX_BYTES
 from docmancer.docs.models import UnifiedDocsContextResult
@@ -86,13 +87,13 @@ def test_multi_library_context_requires_every_library_support_decision():
         allow_network=True,
     )
 
-    assert supported.answer_supported is True
-    assert supported.support_status == "supported"
-    assert supported.decision_hash
+    assert supported.answer_supported is False
+    assert supported.support_status == "insufficient_evidence"
+    assert supported.reason_code == "canonical_lane_decision_missing"
     assert incomplete.answer_supported is False
-    assert incomplete.reason_code == "multi_library_support_incomplete"
+    assert incomplete.reason_code == "canonical_lane_decision_missing"
     assert incomplete.missing_requirement_ids == ["beta:required"]
-    assert incomplete.decision_hash
+    assert incomplete.decision_hash is None
 
 
 def test_get_docs_context_exposes_fail_closed_change_maintenance_brief(tmp_path):
@@ -184,6 +185,19 @@ def test_get_docs_context_rejects_legacy_mutation_flags_on_public_surface():
 
     assert payload["reason_code"] == "validation_error"
     assert payload["error"]["where"]["phase"] == "validation"
+
+
+def test_handler_exception_redacts_secret_even_in_debug_mode():
+    class Facade:
+        def get_docs_context(self, question, **kwargs):
+            raise RuntimeError("Authorization: Bearer super-secret")
+
+    payload = call_docs_tool_payload(
+        "get_docs_context", {"question": "How?", "output_mode": "debug"}, cast(Any, Facade()),
+    )
+
+    assert "super-secret" not in json.dumps(payload)
+    assert payload["message"] == "handler_exception: request failed"
 
 
 def test_get_docs_context_rewrites_network_retry_to_complete_prepare_action():
@@ -645,19 +659,83 @@ def test_support_decision_survives_all_compatibility_and_bounded_modes():
             )))
 
             for result in observed:
+                support_result = (
+                    decode_support_envelope(result["support_envelope"])
+                    if result.get("support_envelope") else result
+                )
                 assert {
-                    key: result[key] for key in expected
+                    key: support_result[key] for key in expected
                     if key != "reason_code"
                 } == {
                     key: value for key, value in expected.items()
                     if key != "reason_code"
                 }
                 if expected_reason is None:
-                    assert "reason_code" not in result
+                    assert support_result.get("reason_code") is None
                 else:
-                    assert result["reason_code"] == expected_reason
+                    assert support_result["reason_code"] == expected_reason
                 jsonschema.validate(result, public_schema)
             assert observed[-1]["estimated_tokens"] == estimate_projection_tokens(observed[-1])
+
+
+def test_bounded_delivery_records_exact_model_visible_bytes_end_to_end():
+    from docmancer.docs.domain.retrieval_routing import new_routing_record, route_initial_stages
+
+    routing = new_routing_record(
+        route_initial_stages(
+            question="Explain docs", mode="project-only",
+            dependency_requested=False, project_doc_items=[],
+        ),
+        project_docs_used=True,
+        dependency_docs_used=False,
+    )
+
+    class Facade:
+        def get_docs_context(self, question, **kwargs):
+            return {
+                "tool": "get_docs_context", "status": "success", "context_available": True,
+                "context_pack": [], "trust_contract": {"selected": [], "rejected": [], "risky": []},
+                "diagnostics": {"retrieval_routing": routing},
+            }
+
+    result = cast(dict[str, Any], handle_context_tool(
+        "get_docs_context", {"question": "Explain docs", "delivery_strategy": "bounded_direct"},
+        cast(Any, Facade()),
+    ))
+
+    assert routing["model_visible_bytes"] == len(canonical_projection_bytes(result))
+
+
+def test_bounded_delivery_updates_original_unified_result_telemetry_record():
+    from docmancer.docs.domain.retrieval_routing import new_routing_record, route_initial_stages
+    from docmancer.docs.models import UnifiedDocsContextResult
+
+    routing = new_routing_record(
+        route_initial_stages(
+            question="Explain docs", mode="project-only",
+            dependency_requested=False, project_doc_items=[],
+        ),
+        project_docs_used=True,
+        dependency_docs_used=False,
+    )
+    original = UnifiedDocsContextResult(
+        status="success", context_available=True, context_pack=[],
+        trust_contract={"selected": [], "rejected": [], "risky": []},
+        retrieval_routing=routing,
+    )
+
+    class Facade:
+        def get_docs_context(self, question, **kwargs):
+            return original
+
+    result = cast(dict[str, Any], handle_context_tool(
+        "get_docs_context", {"question": "Explain docs", "delivery_strategy": "bounded_direct"},
+        cast(Any, Facade()),
+    ))
+
+    assert original.retrieval_routing["model_visible_bytes"] == len(
+        canonical_projection_bytes(result)
+    )
 
 
 def test_bounded_library_delivery_at_256_tokens_transports_complete_support_envelope():

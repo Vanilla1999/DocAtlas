@@ -37,10 +37,14 @@ def mcp_serve_cmd() -> None:
 
 
 @mcp_group.command("docs-serve")
-def mcp_docs_serve_cmd() -> None:
+@click.option("--config", "config_path", default=None, help="Path to docmancer.yaml.")
+@click.pass_context
+def mcp_docs_serve_cmd(ctx: click.Context, config_path: str | None) -> None:
     """Run the canonical stdio MCP documentation server."""
     from docmancer.mcp.docs_server import serve
-    serve()
+    root = ctx.find_root()
+    inherited = (root.obj or {}).get("config_path") if isinstance(root.obj, dict) else None
+    serve(config_path=config_path or inherited)
 
 
 @mcp_group.command("doctor")

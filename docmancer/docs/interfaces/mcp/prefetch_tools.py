@@ -6,6 +6,7 @@ from typing import Any
 from urllib.parse import urlparse
 
 from docmancer.docs.service import LibraryDocsService
+from docmancer.docs.application.docs_job_service import bound_job_diagnostics, project_job_diagnostic
 from docmancer.docs.interfaces.mcp.project_tools import _bounded_int_arg, _compact_mcp_payload, handle_project_tool
 
 
@@ -62,12 +63,7 @@ _REMOTE_PREPARE_ACTIONS = {
 
 
 def _job_summary(job: Any) -> dict[str, Any]:
-    fields = (
-        "job_id", "kind", "status", "phase", "message", "reason_code", "retryable",
-        "deadline_at", "queue_position", "running_jobs", "queued_jobs",
-        "max_running_jobs", "max_queued_jobs", "page_failure_summary", "started_at", "updated_at",
-    )
-    return {field: getattr(job, field) for field in fields}
+    return project_job_diagnostic(job)
 
 
 def _compact_project_sync(result: Any) -> dict[str, Any]:
@@ -86,6 +82,7 @@ def _compact_project_sync(result: Any) -> dict[str, Any]:
             )
         },
         "metrics": diagnostics.get("metrics") or {},
+        "vector_sync": diagnostics.get("vector_sync") or {"status": "not_requested"},
         "unmatched_changed_paths": diagnostics.get("unmatched_changed_paths") or [],
         "unmatched_deleted_paths": diagnostics.get("unmatched_deleted_paths") or [],
         "remaining_deleted_sources": diagnostics.get("remaining_deleted_sources") or 0,
@@ -276,15 +273,13 @@ def handle_prefetch_tool(name: str, args: dict[str, Any], service: LibraryDocsSe
         if action == "jobs":
             jobs = service.list_docs_jobs(
                 status=args.get("status"),
-                limit=_bounded_int_arg(args, "limit", default=None, max_value=200),
+                limit=_bounded_int_arg(args, "limit", default=50, max_value=200),
+                project_path=args.get("project_path"),
             )
             return {
                 "tool": "docs_status",
                 "action": action,
-                "jobs": [
-                    _job_summary(job)
-                    for job in jobs
-                ],
+                "jobs": bound_job_diagnostics(jobs),
             }
         if action == "job":
             job_id = str(args.get("job_id") or "").strip()
@@ -303,7 +298,7 @@ def handle_prefetch_tool(name: str, args: dict[str, Any], service: LibraryDocsSe
                     "job_id": job_id,
                     "status": "not_found",
                 }
-            return {"tool": "docs_status", "action": action, **asdict(job)}
+            return {"tool": "docs_status", "action": action, **project_job_diagnostic(job)}
         return {
             "tool": "docs_status",
             "status": "error",
@@ -392,9 +387,9 @@ def handle_prefetch_tool(name: str, args: dict[str, Any], service: LibraryDocsSe
         action = str(args.get("action") or "").strip()
         if action == "status":
             job = service.get_docs_job_status(args["job_id"])
-            return {"tool": "docs_job", "action": action, "job_id": args["job_id"], "status": "not_found"} if job is None else {"tool": "docs_job", "action": action, **asdict(job)}
+            return {"tool": "docs_job", "action": action, "job_id": args["job_id"], "status": "not_found"} if job is None else {"tool": "docs_job", "action": action, **project_job_diagnostic(job)}
         if action == "list":
-            return {"tool": "docs_job", "action": action, "jobs": [_job_summary(job) for job in service.list_docs_jobs(status=args.get("status"), limit=_bounded_int_arg(args, "limit", default=None, max_value=200))]}
+            return {"tool": "docs_job", "action": action, "jobs": bound_job_diagnostics(service.list_docs_jobs(status=args.get("status"), limit=_bounded_int_arg(args, "limit", default=50, max_value=200), project_path=args.get("project_path")))}
         if action == "cancel":
             return {"tool": "docs_job", "action": action, **asdict(service.cancel_docs_job(args["job_id"]))}
         return {"status": "error", "reason_code": "unknown_docs_job_action", "message": f"unknown docs_job action: {action}", "supported_actions": ["list", "status", "cancel"]}
@@ -406,9 +401,9 @@ def handle_prefetch_tool(name: str, args: dict[str, Any], service: LibraryDocsSe
         return asdict(docs_prefetch_app.prefetch_docs_targets(_bounded_targets(args.get("targets")), force_refresh=bool(args.get("force_refresh") or False), continue_on_error=bool(args.get("continue_on_error") if args.get("continue_on_error") is not None else True), async_=bool(args.get("async") or False)))
     if name == "get_docs_job_status":
         job = service.get_docs_job_status(args["job_id"])
-        return {"job_id": args["job_id"], "status": "not_found"} if job is None else asdict(job)
+        return {"job_id": args["job_id"], "status": "not_found"} if job is None else project_job_diagnostic(job)
     if name == "list_docs_jobs":
-        return {"jobs": [_job_summary(job) for job in service.list_docs_jobs(status=args.get("status"), limit=_bounded_int_arg(args, "limit", default=None, max_value=200))]}
+        return {"jobs": bound_job_diagnostics(service.list_docs_jobs(status=args.get("status"), limit=_bounded_int_arg(args, "limit", default=50, max_value=200), project_path=args.get("project_path")))}
     if name == "cancel_docs_job":
         return asdict(service.cancel_docs_job(args["job_id"]))
     return None

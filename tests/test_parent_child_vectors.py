@@ -62,6 +62,9 @@ class MemoryVectorStore(VectorStore):
     def count(self, collection: str) -> int:
         return len(self.points.get(collection, {}))
 
+    def point_ids(self, collection: str) -> set[str]:
+        return set(self.points.get(collection, {}))
+
     def delete_points(self, collection: str, ids: list) -> int:
         target = self.points.setdefault(collection, {})
         deleted = 0
@@ -134,6 +137,24 @@ def test_generation_vector_sync_is_stable_incremental_and_prunes(tmp_path, monke
         for row in store.list_sections_for_embedding(unchanged.generation_id)
     } == first_ids
     store.activate_generation(unchanged.generation_id)
+
+    missing_id = next(iter(vectors.points[collection]))
+    vectors.points[collection].pop(missing_id)
+    drifted = store.add_documents([_doc(before)], activate_generation=False)
+    store.set_generation_vector_collection(str(drifted.generation_id), collection)
+    backfill = sync_vector_store(
+        store=store,
+        config=config,
+        provider=provider,
+        vector_store=vectors,
+        collection=collection,
+        generation_id=drifted.generation_id,
+        prune_stale=False,
+    )
+    assert backfill.upserted == 1
+    assert backfill.backfilled == 1
+    assert backfill.verified == len(first_ids)
+    assert missing_id in vectors.points[collection]
 
     edited = store.add_documents(
         [_doc(before.replace("old value", "new value"))],

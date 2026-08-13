@@ -389,6 +389,13 @@ class SQLiteStore:
                     status TEXT NOT NULL,
                     vector_collection TEXT NOT NULL,
                     vector_backend TEXT NOT NULL DEFAULT '',
+                    vector_backend_identity TEXT NOT NULL DEFAULT '',
+                    vector_parity_schema TEXT NOT NULL DEFAULT '',
+                    vector_parity_digest TEXT NOT NULL DEFAULT '',
+                    vector_parity_verified_at TEXT,
+                    vector_parity_count INTEGER,
+                    vector_parity_backend_identity TEXT NOT NULL DEFAULT '',
+                    vector_parity_collection TEXT NOT NULL DEFAULT '',
                     validation_json TEXT NOT NULL DEFAULT '{}',
                     created_at TEXT NOT NULL,
                     activated_at TEXT
@@ -524,6 +531,16 @@ class SQLiteStore:
             self._ensure_nullable_column(conn, "index_generations", "context_config_hash", "TEXT NOT NULL DEFAULT ''")
             self._ensure_nullable_column(conn, "index_generations", "retrieval_config_hash", "TEXT NOT NULL DEFAULT ''")
             self._ensure_nullable_column(conn, "index_generations", "vector_backend", "TEXT NOT NULL DEFAULT ''")
+            self._ensure_nullable_column(conn, "index_generations", "vector_backend_identity", "TEXT NOT NULL DEFAULT ''")
+            for column, declaration in (
+                ("vector_parity_schema", "TEXT NOT NULL DEFAULT ''"),
+                ("vector_parity_digest", "TEXT NOT NULL DEFAULT ''"),
+                ("vector_parity_verified_at", "TEXT"),
+                ("vector_parity_count", "INTEGER"),
+                ("vector_parity_backend_identity", "TEXT NOT NULL DEFAULT ''"),
+                ("vector_parity_collection", "TEXT NOT NULL DEFAULT ''"),
+            ):
+                self._ensure_nullable_column(conn, "index_generations", column, declaration)
             self._ensure_nullable_column(conn, "retrieval_children", "hydration_id", "INTEGER")
             for column, declaration in (
                 ("context_prefix", "TEXT NOT NULL DEFAULT ''"),
@@ -1489,9 +1506,69 @@ class SQLiteStore:
             (generation_id,),
         )
 
-    def activate_generation(self, generation_id: str) -> None:
+    def activate_generation(
+        self, generation_id: str, *, require_vector_witness: bool = False
+    ) -> None:
         with self._connect() as conn:
+            if require_vector_witness:
+                row = conn.execute(
+                    """SELECT vector_backend, vector_backend_identity,
+                              vector_collection, vector_parity_schema,
+                              vector_parity_digest, vector_parity_verified_at,
+                              vector_parity_count, vector_parity_backend_identity,
+                              vector_parity_collection
+                       FROM index_generations WHERE generation_id = ?""",
+                    (generation_id,),
+                ).fetchone()
+                if row is None or not self._has_verified_vector_witness(row):
+                    raise ValueError(
+                        f"generation {generation_id!r} has no verified vector parity witness"
+                    )
             self._activate_generation(conn, generation_id)
+
+    @staticmethod
+    def _has_verified_vector_witness(row: Any) -> bool:
+        return bool(
+            str(row["vector_backend"] or "")
+            and str(row["vector_backend_identity"] or "")
+            and str(row["vector_parity_schema"] or "") == "vector-parity-v1"
+            and str(row["vector_parity_digest"] or "")
+            and str(row["vector_parity_verified_at"] or "")
+            and row["vector_parity_count"] is not None
+            and int(row["vector_parity_count"]) >= 0
+            and str(row["vector_parity_backend_identity"] or "")
+            == str(row["vector_backend_identity"] or "")
+            and str(row["vector_parity_collection"] or "")
+            == str(row["vector_collection"] or "")
+        )
+
+    def record_vector_parity_witness(
+        self, generation_id: str, *, digest: str, count: int,
+        backend: str, backend_identity: str, collection: str,
+    ) -> None:
+        if not digest or count < 0 or not backend_identity or not collection:
+            raise ValueError("a complete vector parity witness is required")
+        with self._connect() as conn:
+            row = conn.execute(
+                "SELECT status, vector_collection FROM index_generations WHERE generation_id = ?",
+                (generation_id,),
+            ).fetchone()
+            if row is None or row["status"] not in {"building", "ready"}:
+                raise ValueError("vector parity can only be recorded for a candidate")
+            if str(row["vector_collection"] or "") != collection:
+                raise ValueError("vector parity collection does not match candidate")
+            conn.execute(
+                """UPDATE index_generations
+                   SET vector_backend = ?, vector_backend_identity = ?,
+                       vector_parity_schema = 'vector-parity-v1',
+                       vector_parity_digest = ?, vector_parity_verified_at = ?,
+                       vector_parity_count = ?, vector_parity_backend_identity = ?,
+                       vector_parity_collection = ?
+                   WHERE generation_id = ?""",
+                (backend, backend_identity, digest,
+                 datetime.now(timezone.utc).isoformat(timespec="seconds"), count,
+                 backend_identity, collection, generation_id),
+            )
 
     def generation_info(self, generation_id: str | None = None) -> dict[str, Any] | None:
         with self._connect() as conn:
@@ -1510,7 +1587,8 @@ class SQLiteStore:
         with self._connect() as conn:
             rows = list(conn.execute(
                 """
-                SELECT generation_id, vector_collection, activated_at, created_at
+                SELECT generation_id, vector_collection, vector_backend,
+                       vector_backend_identity, activated_at, created_at
                 FROM index_generations
                 WHERE status = 'superseded'
                 ORDER BY COALESCE(activated_at, created_at) DESC, generation_id DESC
@@ -1565,6 +1643,29 @@ class SQLiteStore:
                 ).rowcount
         return deleted
 
+    def discard_candidate_generation(self, generation_id: str) -> bool:
+        """Remove an unpublished candidate after its external collection is cleaned."""
+        with self._connect() as conn:
+            row = conn.execute(
+                "SELECT status FROM index_generations WHERE generation_id = ?",
+                (generation_id,),
+            ).fetchone()
+            if row is None or row["status"] not in {"building", "ready"}:
+                return False
+            child_ids = [int(row["id"]) for row in conn.execute(
+                "SELECT id FROM retrieval_children WHERE generation_id = ?", (generation_id,)
+            )]
+            for child_id in child_ids:
+                conn.execute("DELETE FROM retrieval_children_fts WHERE rowid = ?", (child_id,))
+            for table in (
+                "generation_vector_upserts", "retrieval_children",
+                "retrieval_parents", "generation_sources",
+            ):
+                conn.execute(f"DELETE FROM {table} WHERE generation_id = ?", (generation_id,))
+            return bool(conn.execute(
+                "DELETE FROM index_generations WHERE generation_id = ?", (generation_id,)
+            ).rowcount)
+
     def set_generation_vector_collection(
         self, generation_id: str, collection: str
     ) -> None:
@@ -1590,7 +1691,7 @@ class SQLiteStore:
             )
 
     def set_generation_vector_backend(
-        self, generation_id: str, backend: str
+        self, generation_id: str, backend: str, backend_identity: str = ""
     ) -> None:
         """Bind a generation to the backend that actually received its vectors."""
         normalized = str(backend or "").strip().lower()
@@ -1604,8 +1705,8 @@ class SQLiteStore:
             if row is None or row["status"] not in {"building", "ready", "active"}:
                 raise ValueError("vector backend can only be bound to a usable generation")
             conn.execute(
-                "UPDATE index_generations SET vector_backend = ? WHERE generation_id = ?",
-                (normalized, generation_id),
+                "UPDATE index_generations SET vector_backend = ?, vector_backend_identity = ? WHERE generation_id = ?",
+                (normalized, str(backend_identity or ""), generation_id),
             )
 
     @staticmethod
@@ -1691,14 +1792,22 @@ class SQLiteStore:
                 (generation_id, schema_version, config_hash, config_json,
                  context_schema_version, context_config_hash,
                  retrieval_config_hash, status, vector_collection,
-                 validation_json, created_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, 'building', ?, '{}', ?)
+                  vector_backend, vector_backend_identity,
+                  vector_parity_schema, vector_parity_digest,
+                  vector_parity_verified_at, vector_parity_count,
+                  vector_parity_backend_identity, vector_parity_collection,
+                  validation_json, created_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, 'building', ?, ?, ?, ?, ?, ?, ?, ?, ?, '{}', ?)
             """,
             (
                 generation_id, previous["schema_version"], previous["config_hash"],
                 previous["config_json"], previous["context_schema_version"],
                 previous["context_config_hash"], previous["retrieval_config_hash"],
-                previous["vector_collection"], now,
+                previous["vector_collection"], previous["vector_backend"],
+                previous["vector_backend_identity"], previous["vector_parity_schema"],
+                previous["vector_parity_digest"], previous["vector_parity_verified_at"],
+                previous["vector_parity_count"], previous["vector_parity_backend_identity"],
+                previous["vector_parity_collection"], now,
             ),
         )
         exclusion = f"AND source NOT IN ({placeholders})"

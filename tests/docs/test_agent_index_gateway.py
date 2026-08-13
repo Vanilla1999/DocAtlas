@@ -206,6 +206,38 @@ def test_dispatcher_is_reused_until_library_agent_is_dropped(tmp_path, monkeypat
     assert len(builds) == 3
 
 
+def test_dispatcher_cache_tracks_store_and_generation_identity(monkeypatch):
+    builds = []
+
+    def build_dispatcher(agent, *, mode):
+        builds.append((agent.store, mode))
+        return object()
+
+    class Store:
+        generation = "one"
+
+        def generation_info(self):
+            return {"generation_id": self.generation, "vector_collection": self.generation}
+
+    monkeypatch.setattr(
+        "docmancer.docs.infrastructure.agent_index_gateway.dispatcher_for_agent", build_dispatcher,
+    )
+    gateway = AgentIndexGateway(DocmancerConfig(), agent_factory=FakeAgent)
+    agent = gateway.agent_instance(_record())
+    first_store = Store()
+    agent.store = first_store
+
+    first = gateway.dispatcher_for(agent)
+    first_store.generation = "two"
+    second = gateway.dispatcher_for(agent)
+    agent.store = Store()
+    third = gateway.dispatcher_for(agent)
+
+    assert first is not second
+    assert second is not third
+    assert len(builds) == 3
+
+
 def test_query_library_preserves_the_canonical_requirement_set_for_dispatch(tmp_path, monkeypatch):
     monkeypatch.setenv("DOCMANCER_HOME", str(tmp_path / "home"))
     monkeypatch.setattr(

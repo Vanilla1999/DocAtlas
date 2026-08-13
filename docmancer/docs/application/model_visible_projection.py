@@ -13,6 +13,7 @@ from typing import Any, Iterable
 
 from docmancer.docs.application.action_packet import evidence_identity_for_item
 from docmancer.docs.application.evidence_selection import (
+    AggregateMixedSelectionDecision,
     SelectionDecision,
     docs_selection_config,
     library_docs_selection_config,
@@ -62,7 +63,7 @@ SUPPORT_ENVELOPE_KEYS = (
     "mandatory_requirement_ids", "mandatory_coverage", "evidence_coverage",
     "selected_evidence_ids", "requirements_hash", "selector_config_hash",
     "eligibility_contract_hash", "candidate_trace_hash", "selection_hash",
-    "decision_hash",
+    "assignment_hash", "decision_hash",
 )
 SUPPORT_ENVELOPE_ENCODING = "zlib+base64url"
 
@@ -123,7 +124,7 @@ def project_docs_answer(
     retrieval: dict[str, Any],
     max_tokens: int = DOCS_ANSWER_MAX_TOKENS,
     selection_diagnostics: dict[str, Any] | None = None,
-    canonical_selection: SelectionDecision | None = None,
+    canonical_selection: SelectionDecision | AggregateMixedSelectionDecision | None = None,
 ) -> tuple[dict[str, Any], dict[str, dict[str, Any]]]:
     """Create one deduplicated source list and an internal immutable snapshot."""
 
@@ -134,10 +135,15 @@ def project_docs_answer(
         else docs_selection_config(max_tokens)
     )
     is_library_answer = retrieval.get("selection_profile") == "library_docs_answer"
+    decision = (
+        canonical_selection.selection_decision
+        if isinstance(canonical_selection, AggregateMixedSelectionDecision)
+        else canonical_selection
+    )
+    if decision is None and isinstance(retrieval.get("selection_decision"), SelectionDecision):
+        decision = retrieval["selection_decision"]
+    has_canonical_selection = decision is not None
     if is_library_answer:
-        decision = canonical_selection
-        if decision is None and isinstance(retrieval.get("selection_decision"), SelectionDecision):
-            decision = retrieval["selection_decision"]
         if decision is None:
             payload = project_insufficient(
                 kind="docs_answer",
@@ -162,7 +168,7 @@ def project_docs_answer(
             })
             _refresh_estimate(payload)
             return payload, {}
-    else:
+    elif decision is None:
         decision = select_evidence(
             candidates,
             question=question,
@@ -182,11 +188,22 @@ def project_docs_answer(
     sources: list[dict[str, Any]] = []
     snapshot: dict[str, dict[str, Any]] = {}
     omitted = len(decision.omissions)
-    for candidate in decision.selected_candidates:
+    assigned_ids = {
+        assignment.evidence_id for assignment in decision.assignments
+    } if has_canonical_selection and decision.assignments else {
+        candidate.stable_id for candidate in decision.selected_candidates
+    }
+    selected_candidates = [
+        candidate for candidate in decision.selected_candidates
+        if candidate.stable_id in assigned_ids
+    ]
+    if len(selected_candidates) > 6:
+        selected_candidates = []
+    for candidate in selected_candidates:
         item = dict(candidate.original)
         normalized = _docs_source(
             item,
-            evidence_id=candidate.stable_id if is_library_answer else None,
+            evidence_id=candidate.stable_id if has_canonical_selection else None,
         )
         if normalized is None:
             omitted += 1
@@ -195,17 +212,22 @@ def project_docs_answer(
         sources.append(normalized)
         snapshot[evidence_id] = _snapshot_entry(item, normalized)
 
-    retrieval_issues = _docs_retrieval_issues(retrieval)
+    retrieval_issues = _docs_retrieval_issues(
+        retrieval,
+        canonical_supported=(
+            has_canonical_selection and decision.support_decision.answer_supported
+        ),
+    )
     support = (
         _docs_support_decision(
             retrieval=retrieval,
             decision=decision,
             context_available=bool(candidates),
         )
-        if is_library_answer
+        if has_canonical_selection
         else {}
     )
-    if is_library_answer and decision.support_decision.answer_supported:
+    if has_canonical_selection and decision.support_decision.answer_supported:
         selected_ids = list(decision.support_decision.selected_evidence_ids)
         visible_ids = [source["evidence_id"] for source in sources]
         if visible_ids != selected_ids:
@@ -224,6 +246,23 @@ def project_docs_answer(
                 payload, max_tokens=INSUFFICIENT_EVIDENCE_MAX_TOKENS,
             )
             return payload, snapshot
+        visible_candidates = {candidate.stable_id: candidate for candidate in selected_candidates}
+        invalid_assignments = [
+            assignment for assignment in decision.assignments
+            if assignment.evidence_id not in visible_candidates
+            or assignment.projected_content_hash != hashlib.sha256(
+                visible_candidates[assignment.evidence_id].projected_text.encode("utf-8")
+            ).hexdigest()
+        ]
+        if invalid_assignments:
+            payload = project_insufficient(
+                kind="docs_answer",
+                missing=["A mandatory support assignment could not be materialized safely."],
+                recommended_next_action=None,
+                max_tokens=INSUFFICIENT_EVIDENCE_MAX_TOKENS,
+            )
+            payload["reason_code"] = "support_assignment_not_materialized"
+            return payload, snapshot
     if decision.status != "ok" or not sources or retrieval_issues:
         missing = [str(retrieval.get("message") or "No complete source-backed documentation answer is available.")]
         missing.extend(decision.missing_requirements)
@@ -234,15 +273,20 @@ def project_docs_answer(
             recommended_next_action=retrieval.get("next_action"), max_tokens=INSUFFICIENT_EVIDENCE_MAX_TOKENS,
         )
         payload.update(support)
+        if not payload.get("reason_code") and retrieval.get("reason_code"):
+            payload["reason_code"] = retrieval["reason_code"]
         bound_insufficient_projection(
             payload, max_tokens=INSUFFICIENT_EVIDENCE_MAX_TOKENS,
         )
         return payload, snapshot
 
     answer, answer_evidence_ids, answer_limited = _answer_text(
-        question, retrieval, sources
+        question,
+        retrieval,
+        sources,
+        require_all_sources=has_canonical_selection,
     )
-    if is_library_answer:
+    if has_canonical_selection:
         answer_evidence_ids = list(decision.support_decision.selected_evidence_ids)
     omitted_counts = {"sources": omitted} if omitted else {}
     if answer_limited:
@@ -262,7 +306,7 @@ def project_docs_answer(
     _refresh_estimate(payload)
     if estimate_projection_tokens(payload) > min(DOCS_ANSWER_MAX_TOKENS, max_tokens):
         fallback = project_insufficient(
-            kind="docs_answer", missing=["The selected documentation evidence exceeds the bounded answer budget."],
+            kind="docs_answer", missing=["Selected evidence exceeds the answer budget."],
             recommended_next_action=None, max_tokens=INSUFFICIENT_EVIDENCE_MAX_TOKENS,
         )
         fallback.update(support)
@@ -311,7 +355,18 @@ def bound_insufficient_projection(payload: dict[str, Any], *, max_tokens: int) -
             if estimate_projection_tokens(payload) <= limit:
                 return
     payload.pop("recommended_next_action", None)
-    payload.pop("missing", None)
+    missing = payload.get("missing")
+    while (
+        estimate_projection_tokens(payload) > limit
+        and isinstance(missing, list)
+        and len(missing) > 1
+    ):
+        missing.pop()
+        _refresh_estimate(payload)
+    if estimate_projection_tokens(payload) <= limit:
+        return
+    payload.pop("operational_status", None)
+    payload.pop("context_available", None)
     _refresh_estimate(payload)
     if estimate_projection_tokens(payload) <= limit:
         return
@@ -325,6 +380,8 @@ def bound_insufficient_projection(payload: dict[str, Any], *, max_tokens: int) -
         for key in SUPPORT_ENVELOPE_KEYS:
             payload.pop(key, None)
         _refresh_estimate(payload)
+        if estimate_projection_tokens(payload) <= limit:
+            return
     if estimate_projection_tokens(payload) > limit:
         payload.pop("operational_status", None)
         payload.pop("context_available", None)
@@ -427,7 +484,8 @@ def project_insufficient(
 
 
 def validate_model_visible_projection(
-    payload: Any, *, snapshot: dict[str, dict[str, Any]], max_tokens: int
+    payload: Any, *, snapshot: dict[str, dict[str, Any]], max_tokens: int,
+    canonical_selection: SelectionDecision | AggregateMixedSelectionDecision | None = None,
 ) -> list[str]:
     errors: list[str] = []
     if not isinstance(payload, dict):
@@ -511,6 +569,17 @@ def validate_model_visible_projection(
         answer_refs = payload.get("answer_evidence_ids")
         if not isinstance(answer_refs, list) or not answer_refs or any(ref not in ids for ref in answer_refs):
             errors.append("docs_answer claims require valid evidence IDs")
+        decision = (
+            canonical_selection.selection_decision
+            if isinstance(canonical_selection, AggregateMixedSelectionDecision)
+            else canonical_selection
+        )
+        if decision is not None:
+            assigned_witnesses = {
+                assignment.evidence_id for assignment in decision.assignments
+            }
+            if ids != assigned_witnesses or set(answer_refs or ()) != assigned_witnesses:
+                errors.append("model-visible evidence does not match aggregate assigned witnesses")
     if kind == "patch_context":
         for item in _cited_patch_items(payload):
             refs = item.get("evidence_ids")
@@ -603,7 +672,11 @@ def _snapshot_entry(
 
 
 def _answer_text(
-    question: str, retrieval: dict[str, Any], sources: list[dict[str, Any]]
+    question: str,
+    retrieval: dict[str, Any],
+    sources: list[dict[str, Any]],
+    *,
+    require_all_sources: bool = False,
 ) -> tuple[str, list[str], bool]:
     """Return only text that is directly present in one or more projected sources."""
 
@@ -615,10 +688,17 @@ def _answer_text(
             for source in sources
             if normalized and normalized in " ".join(str(source.get("snippet") or "").split()).casefold()
         ]
-        if refs:
+        required_refs = [str(source["evidence_id"]) for source in sources]
+        if refs and (not require_all_sources or refs == required_refs):
             answer = explicit.strip()
             limited = _needs_actionable_limitation(question, answer)
             return answer, refs, limited
+    if require_all_sources:
+        snippets = [str(source["snippet"]).strip() for source in sources]
+        answer = "\n\n".join(dict.fromkeys(snippet for snippet in snippets if snippet))
+        refs = [str(source["evidence_id"]) for source in sources]
+        limited = _needs_actionable_limitation(question, answer)
+        return answer, refs, limited
     primary = sources[0]
     answer = str(primary["snippet"])
     limited = _needs_actionable_limitation(question, answer)
@@ -632,7 +712,9 @@ def _needs_actionable_limitation(question: str, answer: str) -> bool:
     )
 
 
-def _docs_retrieval_issues(retrieval: dict[str, Any]) -> list[str]:
+def _docs_retrieval_issues(
+    retrieval: dict[str, Any], *, canonical_supported: bool = False
+) -> list[str]:
     issues: list[str] = []
     status = str(retrieval.get("status") or "success").strip().lower()
     if status != "success":
@@ -641,10 +723,10 @@ def _docs_retrieval_issues(retrieval: dict[str, Any]) -> list[str]:
         issues.append("The requested documentation evidence is not currently available.")
     if retrieval.get("requires_confirmation"):
         issues.append("Documentation retrieval requires explicit confirmation.")
-    if retrieval.get("answer_type") in {"navigation_only", "partial_navigational", "partial", "unavailable"}:
+    if not canonical_supported and retrieval.get("answer_type") in {"navigation_only", "partial_navigational", "partial", "unavailable"}:
         issues.append("The retrieval result is not a complete source-backed answer.")
     completeness = retrieval.get("answer_completeness")
-    if isinstance(completeness, dict):
+    if isinstance(completeness, dict) and not canonical_supported:
         if (
             completeness.get("source_search_required")
             and completeness.get("source_search_status") != "completed"
