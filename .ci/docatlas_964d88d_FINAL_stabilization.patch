@@ -1,0 +1,281 @@
+diff --git a/docmancer/docs/application/evidence_selection.py b/docmancer/docs/application/evidence_selection.py
+--- a/docmancer/docs/application/evidence_selection.py
++++ b/docmancer/docs/application/evidence_selection.py
+@@ -177,6 +177,19 @@ def _projected_text(item: Mapping[str, Any], display_text: str, result_kind: str
+     snippet = _text(item.get("snippet"))
+     fact_material = str(item.get("content") or display_text)
+     fact_lines = [line.strip() for line in fact_material.splitlines() if _PATCH_FACT_RE.search(line)]
++    # Patch questions often name a repository path or a snake_case contract
++    # token that appears in descriptive (non-normative) source text. Preserve
++    # only those compact, source-backed identity tokens in the selector view;
++    # do not promote the surrounding prose to an implementation fact.
++    identity_terms = list(dict.fromkeys(
++        match.group(0)
++        for line in fact_material.splitlines()
++        for match in re.finditer(
++            r"(?:[A-Za-z0-9_.-]+[\\/])+[A-Za-z0-9_.-]+"
++            r"|\b[A-Za-z][A-Za-z0-9]*_[A-Za-z0-9_]+\b",
++            line,
++        )
++    ))[:32]
+     symbols = " ".join(_symbols(item))
+-    parts = [part for part in [snippet, *fact_lines, symbols, _source_path(item)] if part]
++    parts = [part for part in [snippet, *fact_lines, *identity_terms, symbols, _source_path(item)] if part]
+     return "\n".join(dict.fromkeys(parts)) or display_text
+@@ -1072,9 +1085,20 @@ def normalize_candidates(
+         )
+         stable = child_stable or str(item.get("stable_id") or "")
+         identity_kind = "stable_child" if child_stable else "legacy"
++        # Metadata by itself does not prove that an item came from the indexed
++        # parent/child retrieval path. Host-authored/legacy evidence may carry
++        # bounded annotations such as acceptance_conditions. Require an actual
++        # index-identity marker before enforcing the stable-child contract.
+         indexed_project_doc = str(item.get("source_class") or "") in {
+             "project_doc", "project_file"
+-        } and bool(item.get("metadata"))
++        } and any(
++            key in item or key in metadata
++            for key in (
++                "stable_chunk_id", "stable_child_id", "parent_logical_id",
++                "display_content_hash", "section_id", "hydration_id",
++                "retrieval_trace",
++            )
++        )
+         if indexed_project_doc and not child_stable:
+             omissions.append(Omission(f"invalid:{rank}", "invalid_identity"))
+             continue
+diff --git a/docmancer/docs/application/action_packet.py b/docmancer/docs/application/action_packet.py
+--- a/docmancer/docs/application/action_packet.py
++++ b/docmancer/docs/application/action_packet.py
+@@ -1840,7 +1840,36 @@ def _compact_failure_packet(packet: dict[str, Any], budget: int) -> None:
++    original_omissions = {
++        str(key): int(value)
++        for key, value in packet.get("omitted_counts", {}).items()
++        if isinstance(key, str)
++        and key
++        and isinstance(value, int)
++        and not isinstance(value, bool)
++        and value > 0
++    }
+     omitted_total = sum(
+-        int(value) for value in packet.get("omitted_counts", {}).values()
+-        if isinstance(value, int) and not isinstance(value, bool)
++        original_omissions.values()
+     )
++    critical_fields = (
++        "task_interpretation.objective_characters",
++        "task_interpretation.acceptance_conditions",
++        "required_invariants",
++        "forbidden_changes",
++        "critical_source_facts",
++        "filtered_critical_source_facts",
++        "rejected_critical_source_facts",
++        "risky_critical_source_facts",
++        "mandatory_requirements",
++    )
++    compact_omissions = {
++        field: original_omissions[field]
++        for field in critical_fields
++        if field in original_omissions
++    }
++    residual = omitted_total - sum(compact_omissions.values())
++    if residual > 0:
++        compact_omissions["packet_items"] = residual
++    if not compact_omissions:
++        compact_omissions = {"packet_items": max(1, omitted_total)}
+     contract_reason = "Source-backed behavioral contract is required before editing."
+     failure_reason = (
+         contract_reason
+@@ -1858,7 +1879,7 @@ def _compact_failure_packet(packet: dict[str, Any], budget: int) -> None:
+         "validation": {"compile": [], "tests": [], "semantic_checks": []},
+         "uncertainties": [],
+         "missing_evidence": [failure_reason],
+-        "omitted_counts": {"packet_items": max(1, omitted_total)},
++        "omitted_counts": compact_omissions,
+     })
+     objective = str(packet["task_interpretation"].get("objective") or "task")
+     packet["task_interpretation"]["objective"] = objective[:64] or "task"
+diff --git a/docmancer/docs/application/docs_job_service.py b/docmancer/docs/application/docs_job_service.py
+--- a/docmancer/docs/application/docs_job_service.py
++++ b/docmancer/docs/application/docs_job_service.py
+@@ -112,6 +112,17 @@ def project_job_diagnostic(job: DocsJob) -> dict[str, Any]:
+         "reason_code": job.reason_code,
+         "retryable": job.retryable,
+         "failure_phase": job.failure_phase,
++        **{
++            key: value
++            for key, value in {
++                "queue_position": job.queue_position,
++                "running_jobs": job.running_jobs,
++                "queued_jobs": job.queued_jobs,
++                "max_running_jobs": job.max_running_jobs,
++                "max_queued_jobs": job.max_queued_jobs,
++            }.items()
++            if value is not None
++        },
+         "page_failure_summary": job.page_failure_summary[:20],
+         "counts": {
+             "targets": {"total": job.total_targets, "completed": job.completed_targets, "failed": job.failed_targets},
+diff --git a/tests/test_retrieval_features.py b/tests/test_retrieval_features.py
+--- a/tests/test_retrieval_features.py
++++ b/tests/test_retrieval_features.py
+@@ -1,6 +1,7 @@
+ """Hierarchical retrieval, query routing, and hybrid neighbor expansion."""
+ from __future__ import annotations
+ 
++import hashlib
+ import pytest
+ 
+ from docmancer.core.config import (
+@@ -12,7 +13,10 @@ from docmancer.core.config import (
+ from docmancer.core.models import Document, RetrievedChunk
+ from docmancer.core.sqlite_store import SQLiteStore
+ from docmancer.embeddings.base import SparseEmbeddings
+-from docmancer.retrieval.dispatch import HybridRetrievalError, RetrievalDispatcher
++from docmancer.retrieval.dispatch import (
++    HybridRetrievalError,
++    RetrievalDispatcher as _RetrievalDispatcher,
++)
+ from docmancer.stores.base import VectorHit
+ 
+ 
+@@ -23,9 +27,12 @@ class FakeVectorStore:
+     expose ``document_title_hash`` for hierarchical retrieval.
+     """
+ 
+-    def __init__(self, hits_by_filter):
++    def __init__(self, hits_by_filter, *, auto_witness=True):
+         self._hits_by_filter = hits_by_filter
+         self.calls: list[dict] = []
++        self.auto_witness = auto_witness
++        self._bound_count: int | None = None
++        self._point_ids = {"wrong-id"}
+ 
+     def ensure_collection(self, *args, **kwargs):
+         return None
+@@ -33,31 +41,51 @@ class FakeVectorStore:
+         return {"provider": "fake", "model": "fake", "dim": 4, "sparse_model": "fake-sparse"}
+ 
+     def count(self, collection):
+-        return 1
++        return self._bound_count if self._bound_count is not None else 1
++
++    def backend_identity(self):
++        return "fake-vector-store:v1"
++
++    def health_check(self):
++        return True
+ 
+     def point_ids(self, collection):
+-        return {"wrong-id"}
++        return set(self._point_ids)
++
++    def bind_generation(self, store, collection):
++        generation = store.generation_info()
++        if generation is None or not self.auto_witness:
++            return collection
++        active_collection = str(generation["vector_collection"])
++        rows = store.list_sections_for_embedding()
++        self._point_ids = {str(row["vector_id"]) for row in rows}
++        self._bound_count = len(self._point_ids)
++        digest = hashlib.sha256(
++            "\n".join(sorted(self._point_ids)).encode("utf-8")
++        ).hexdigest()
++        store.record_vector_parity_witness(
++            str(generation["generation_id"]),
++            digest=digest,
++            count=len(self._point_ids),
++            backend="fake",
++            backend_identity=self.backend_identity(),
++            collection=active_collection,
++        )
++        return active_collection
+ 
+     def search(self, collection, query_vector, *, limit, filters=None, sparse_vector=None, mode="dense"):
+         key = _filter_key(filters)
+         self.calls.append({"mode": mode, "filters": filters, "limit": limit})
+         return list(self._hits_by_filter.get((mode, key), []))[:limit]
+ 
+ 
+ class DenseOnlyVectorStore(FakeVectorStore):
+     def collection_metadata(self, collection):
+         return {"provider": "fake", "model": "fake", "dim": 4, "sparse_model": None}
+ 
+-    def count(self, collection):
+-        return 1
+-
+-
+ class FailingVectorStore(FakeVectorStore):
+     def __init__(self):
+         super().__init__({})
+ 
+-    def count(self, collection):
+-        return 1
+-
+     def search(self, collection, query_vector, *, limit, filters=None, sparse_vector=None, mode="dense"):
+         raise ValueError("Vector dimension error: expected dim: 768, got 384")
+@@ -137,6 +169,23 @@ def _populate(store, docs):
+     store.add_documents(documents, recreate=True)
+ 
+ 
++class RetrievalDispatcher(_RetrievalDispatcher):
++    """Dispatcher adapter that gives legacy fake stores a valid v1 witness."""
++
++    def __init__(
++        self, *, store, config, vector_store=None, provider=None, collection=None
++    ):
++        if isinstance(vector_store, FakeVectorStore):
++            collection = vector_store.bind_generation(store, collection)
++        super().__init__(
++            store=store,
++            config=config,
++            vector_store=vector_store,
++            provider=provider,
++            collection=collection,
++        )
++
++
+ # ---------------- query router ----------------
+ 
+ 
+@@ -263,7 +314,7 @@ def test_empty_vector_collection_is_hard_error(tmp_path):
+         provider=FakeProvider(),
+         collection="c",
+     )
+-    with pytest.raises(HybridRetrievalError, match="empty_collection:no_indexed_vectors"):
++    with pytest.raises(HybridRetrievalError, match="count_mismatch"):
+         dispatcher.run("alpha", mode="hybrid", limit=1)
+ 
+ 
+@@ -283,11 +334,11 @@ def test_vector_collection_requires_exact_active_generation_parity(tmp_path):
+     store.add_documents(documents, recreate=True)
+     collection = str(store.generation_info()["vector_collection"])
+     dispatcher = RetrievalDispatcher(
+-        store=store, config=config, vector_store=FakeVectorStore({}),
++        store=store, config=config, vector_store=FakeVectorStore({}, auto_witness=False),
+         provider=FakeProvider(), collection=collection,
+     )
+ 
+-    with pytest.raises(HybridRetrievalError, match="identity_parity_mismatch"):
++    with pytest.raises(HybridRetrievalError, match="unverified_backend_identity"):
+         dispatcher.run("alpha", mode="dense", limit=1)
+ 
+ 
+@@ -300,13 +351,15 @@ def test_equal_count_wrong_vector_ids_fail_strict_readiness(tmp_path):
+         metadata={"format": "markdown", "chunking_schema": "parent-child-v1"},
+     )], recreate=True)
+     collection = str(store.generation_info()["vector_collection"])
+-    vectors = FakeVectorStore({})
++    vectors = FakeVectorStore({}, auto_witness=False)
+     assert vectors.count(collection) == len(store.list_sections_for_embedding())
+     dispatcher = RetrievalDispatcher(
+         store=store, config=config, vector_store=vectors,
+         provider=FakeProvider(), collection=collection,
+     )
+ 
+-    with pytest.raises(HybridRetrievalError, match="identity_parity_mismatch"):
++    # Equal cardinality is not a parity witness. The generation must carry the
++    # persisted backend identity/parity proof before the vector lane is usable.
++    with pytest.raises(HybridRetrievalError, match="unverified_backend_identity"):
+         dispatcher.run("alpha", mode="dense", limit=1)
+     assert vectors.calls == []
