@@ -17,6 +17,7 @@ from docmancer.docs.application.evidence_selection import (
     SelectionDecision,
     docs_selection_config,
     library_docs_selection_config,
+    project_docs_selection_config,
     select_evidence,
 )
 from docmancer.docs.domain.request_intent import model_projection_kind
@@ -66,6 +67,15 @@ SUPPORT_ENVELOPE_KEYS = (
     "assignment_hash", "decision_hash",
 )
 SUPPORT_ENVELOPE_ENCODING = "zlib+base64url"
+_MINIMAL_MISSING = "Required source-backed evidence is unavailable."
+_INSUFFICIENT_SUPPORT_KEYS = (
+    "answer_supported", "answer_available", "support_status", "reason_code",
+    "decision_hash",
+)
+_OPTIONAL_INSUFFICIENT_KEYS = (
+    "operational_status", "context_available", "disposition", "edit_ready",
+    "source_search_status", "requires_confirmation",
+)
 
 def canonical_projection_bytes(value: Any) -> bytes:
     return json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
@@ -132,6 +142,8 @@ def project_docs_answer(
     selection_config = (
         library_docs_selection_config(max_tokens)
         if retrieval.get("selection_profile") == "library_docs_answer"
+        else project_docs_selection_config(max_tokens)
+        if retrieval.get("selection_profile") == "project_docs_answer"
         else docs_selection_config(max_tokens)
     )
     is_library_answer = retrieval.get("selection_profile") == "library_docs_answer"
@@ -190,7 +202,7 @@ def project_docs_answer(
     omitted = len(decision.omissions)
     assigned_ids = {
         assignment.evidence_id for assignment in decision.assignments
-    } if has_canonical_selection and decision.assignments else {
+    } if has_canonical_selection else {
         candidate.stable_id for candidate in decision.selected_candidates
     }
     selected_candidates = [
@@ -212,11 +224,17 @@ def project_docs_answer(
         sources.append(normalized)
         snapshot[evidence_id] = _snapshot_entry(item, normalized)
 
+    canonical_can_override = (
+        has_canonical_selection
+        and decision.support_decision.answer_supported
+        and bool(decision.support_decision.mandatory_requirement_ids)
+        and {
+            assignment.requirement_id for assignment in decision.assignments
+        }.issuperset(decision.support_decision.mandatory_requirement_ids)
+    )
     retrieval_issues = _docs_retrieval_issues(
         retrieval,
-        canonical_supported=(
-            has_canonical_selection and decision.support_decision.answer_supported
-        ),
+        canonical_supported=canonical_can_override,
     )
     support = (
         _docs_support_decision(
@@ -338,11 +356,19 @@ def _docs_support_decision(*, retrieval: dict[str, Any], decision: Any, context_
 
 
 def bound_insufficient_projection(payload: dict[str, Any], *, max_tokens: int) -> None:
-    """Fit fail-closed delivery without truncating canonical support semantics."""
+    """Produce a valid bounded failure projection for every requested budget."""
 
     limit = min(INSUFFICIENT_EVIDENCE_MAX_TOKENS, max(1, int(max_tokens)))
+    envelope = _compact_insufficient_support(payload)
     _refresh_estimate(payload)
     if estimate_projection_tokens(payload) <= limit:
+        if envelope is not None:
+            payload["support_envelope"] = envelope
+            _refresh_estimate(payload)
+            if estimate_projection_tokens(payload) <= limit:
+                return
+            payload.pop("support_envelope", None)
+            _refresh_estimate(payload)
         return
     action = payload.get("recommended_next_action")
     if isinstance(action, dict):
@@ -365,27 +391,69 @@ def bound_insufficient_projection(payload: dict[str, Any], *, max_tokens: int) -
         _refresh_estimate(payload)
     if estimate_projection_tokens(payload) <= limit:
         return
-    payload.pop("operational_status", None)
-    payload.pop("context_available", None)
-    _refresh_estimate(payload)
-    if estimate_projection_tokens(payload) <= limit:
-        return
-    envelope = {
-        key: payload[key]
-        for key in SUPPORT_ENVELOPE_KEYS
-        if key in payload
-    }
-    if envelope:
-        payload["support_envelope"] = encode_support_envelope(envelope)
-        for key in SUPPORT_ENVELOPE_KEYS:
-            payload.pop(key, None)
+    for key in _OPTIONAL_INSUFFICIENT_KEYS:
+        payload.pop(key, None)
         _refresh_estimate(payload)
         if estimate_projection_tokens(payload) <= limit:
             return
+    payload["missing"] = [_MINIMAL_MISSING]
+    _refresh_estimate(payload)
+    if estimate_projection_tokens(payload) <= limit:
+        return
+    # The terminal fallback contains no unbounded caller data.
+    kind = payload.get("kind")
+    support = {
+        key: payload[key]
+        for key in _INSUFFICIENT_SUPPORT_KEYS
+        if key in payload and key != "reason_code"
+    }
+    payload.clear()
+    payload.update({
+        "status": "insufficient_evidence",
+        "kind": "docs_answer" if kind == "docs_answer" else "patch_context",
+        "missing": [_MINIMAL_MISSING],
+        "answer_supported": False,
+        "answer_available": False,
+        "support_status": "insufficient_evidence",
+        "estimated_tokens": 0,
+    })
+    payload.update(support)
+    payload["answer_supported"] = False
+    payload["answer_available"] = False
+    payload["support_status"] = "insufficient_evidence"
+    _refresh_estimate(payload)
     if estimate_projection_tokens(payload) > limit:
-        payload.pop("operational_status", None)
-        payload.pop("context_available", None)
-        _refresh_estimate(payload)
+        raise ValueError("minimum insufficient-evidence projection exceeds the requested budget")
+
+
+def _compact_insufficient_support(payload: dict[str, Any]) -> dict[str, str] | None:
+    """Replace audit-only support fields with a model-readable summary."""
+
+    envelope_payload = {
+        key: deepcopy(payload[key])
+        for key in SUPPORT_ENVELOPE_KEYS
+        if key in payload and payload[key] is not None
+    }
+    summary = {
+        key: deepcopy(payload[key])
+        for key in _INSUFFICIENT_SUPPORT_KEYS
+        if key in payload and payload[key] is not None
+    }
+    if "answer_supported" in payload:
+        summary.update({
+            "answer_supported": False,
+            "answer_available": False,
+            "support_status": "insufficient_evidence",
+        })
+    for key in SUPPORT_ENVELOPE_KEYS:
+        payload.pop(key, None)
+    payload.pop("support_envelope", None)
+    payload.update(summary)
+    return (
+        encode_support_envelope(envelope_payload)
+        if set(envelope_payload) == set(SUPPORT_ENVELOPE_KEYS)
+        else None
+    )
 
 
 def project_patch_context(
@@ -468,7 +536,7 @@ def project_insufficient(
     payload: dict[str, Any] = {
         "status": "insufficient_evidence",
         "kind": kind,
-        "missing": messages or ["Required source-backed evidence is unavailable."],
+        "missing": messages or [_MINIMAL_MISSING],
         "estimated_tokens": 0,
     }
     action = _bounded_action(recommended_next_action)
@@ -508,17 +576,40 @@ def validate_model_visible_projection(
         errors.append("projection estimate mismatch or budget exceeded")
     if status == "insufficient_evidence":
         transport = payload.get("support_envelope")
+        transport_support: dict[str, Any] | None = None
         if transport is not None:
             try:
-                decode_support_envelope(transport)
+                transport_support = decode_support_envelope(transport)
             except ValueError as exc:
                 errors.append(str(exc))
-        if transport is not None and any(
-            key in payload for key in SUPPORT_ENVELOPE_KEYS
+        for key, expected in (
+            ("answer_supported", False),
+            ("answer_available", False),
+            ("support_status", "insufficient_evidence"),
         ):
-            errors.append("support envelope must use exactly one public representation")
+            if key in payload and payload[key] != expected:
+                errors.append(f"insufficient evidence has inconsistent {key}")
+        if transport_support is not None:
+            for key in _INSUFFICIENT_SUPPORT_KEYS:
+                if key in payload and key in transport_support and payload[key] != transport_support[key]:
+                    errors.append(f"support envelope {key} does not match the model summary")
         if payload.get("implementation_guidance") or payload.get("invariants") or payload.get("targets"):
             errors.append("insufficient evidence must not authorize edits")
+        decision = (
+            canonical_selection.selection_decision
+            if isinstance(canonical_selection, AggregateMixedSelectionDecision)
+            else canonical_selection
+        )
+        if decision is not None:
+            visible_hash = payload.get("decision_hash")
+            envelope_hash = (
+                transport_support.get("decision_hash")
+                if transport_support is not None else None
+            )
+            if visible_hash not in {None, decision.support_decision.decision_hash}:
+                errors.append("projection decision hash does not match canonical selection")
+            if envelope_hash not in {None, decision.support_decision.decision_hash}:
+                errors.append("support envelope decision hash does not match canonical selection")
         return errors
     sources = payload.get("sources")
     if not isinstance(sources, list) or not sources:
@@ -575,6 +666,8 @@ def validate_model_visible_projection(
             else canonical_selection
         )
         if decision is not None:
+            if payload.get("answer_supported") is not True:
+                errors.append("successful docs answer must be supported")
             assigned_witnesses = {
                 assignment.evidence_id for assignment in decision.assignments
             }
@@ -719,7 +812,7 @@ def _docs_retrieval_issues(
     status = str(retrieval.get("status") or "success").strip().lower()
     if status != "success":
         issues.append(f"Documentation retrieval is incomplete (status={status}).")
-    if retrieval.get("answer_available") is False:
+    if not canonical_supported and retrieval.get("answer_available") is False:
         issues.append("The requested documentation evidence is not currently available.")
     if retrieval.get("requires_confirmation"):
         issues.append("Documentation retrieval requires explicit confirmation.")

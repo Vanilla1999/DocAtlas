@@ -189,8 +189,11 @@ def test_gap_is_operational_success_but_support_is_insufficient(tmp_path, monkey
     assert result.get("context_available", True) is True
     assert support["answer_supported"] is False
     assert support["support_status"] == "insufficient_evidence"
-    assert any(value.startswith("facet:comparison:") for value in support["missing_requirement_ids"])
-    assert any(value.startswith("facet:result_access:") for value in support["missing_requirement_ids"])
+    # Full audit-only requirement details remain on the canonical decision;
+    # bounded model-visible output intentionally exposes only a compact summary.
+    missing = operational.selection_decision.support_decision.missing_requirement_ids
+    assert any(value.startswith("facet:comparison:") for value in missing)
+    assert any(value.startswith("facet:result_access:") for value in missing)
 
 
 @pytest.mark.parametrize("corpus_name", ["corpus_gap", "corpus_complete"])
@@ -230,7 +233,7 @@ def test_partial_overlap_cannot_authorize_answer_and_failure_is_bounded(tmp_path
     result, operational, _, _ = _retrieve(tmp_path, monkeypatch, "kotlinx_coroutines", "corpus_gap", "Compare async with launch and show how to obtain the async result")
     support = _support_payload(result)
     assert support["answer_supported"] is False
-    assert support["missing_requirement_ids"]
+    assert operational.selection_decision.support_decision.missing_requirement_ids
     assert "rejected_candidates" not in result
     assert len(operational.selection_decision.omissions) <= 20
 

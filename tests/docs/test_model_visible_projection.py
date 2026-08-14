@@ -7,6 +7,7 @@ import pytest
 from docmancer.docs.application.action_packet import build_action_packet, validate_action_packet
 from docmancer.docs.application.model_visible_projection import (
     FORBIDDEN_MODEL_KEYS,
+    bound_insufficient_projection,
     canonical_projection_bytes,
     estimate_projection_tokens,
     project_docs_answer,
@@ -404,6 +405,88 @@ def test_insufficient_projection_is_fail_closed_and_at_most_300_tokens():
     assert validate_model_visible_projection(payload, snapshot={}, max_tokens=300) == []
 
 
+@pytest.mark.parametrize("budget", [256, 300])
+def test_oversized_insufficient_projection_uses_a_valid_terminal_fallback(budget):
+    payload = {
+        "status": "insufficient_evidence",
+        "kind": "docs_answer",
+        "missing": ["missing " * 2_000],
+        "recommended_next_action": {
+            "tool": "prepare_docs",
+            "observations": {"unbounded": "value " * 2_000},
+        },
+        "answer_supported": False,
+        "answer_available": False,
+        "support_status": "insufficient_evidence",
+        "missing_requirement_ids": [f"requirement-{index}" for index in range(100)],
+        "requirements_hash": "a" * 64,
+        "selector_config_hash": "b" * 64,
+        "eligibility_contract_hash": "c" * 64,
+        "candidate_trace_hash": "d" * 64,
+        "selection_hash": "e" * 64,
+        "assignment_hash": "f" * 64,
+        "decision_hash": "0" * 64,
+    }
+
+    bound_insufficient_projection(payload, max_tokens=budget)
+
+    assert estimate_projection_tokens(payload) <= budget
+    assert "support_envelope" not in payload
+    assert "missing_requirement_ids" not in payload
+    assert validate_model_visible_projection(payload, snapshot={}, max_tokens=budget) == []
+
+
+def test_bounded_projection_keeps_audit_envelope_when_it_fits():
+    payload = {
+        "status": "insufficient_evidence",
+        "kind": "docs_answer",
+        "missing": ["No source is available."],
+        "answer_supported": False,
+        "answer_available": False,
+        "support_status": "insufficient_evidence",
+        "decision": "insufficient_evidence",
+        "reason_code": "required_evidence_missing",
+        "missing_requirement_ids": [],
+        "satisfied_requirement_ids": [],
+        "mandatory_requirement_ids": [],
+        "mandatory_coverage": 0.0,
+        "evidence_coverage": 0.0,
+        "selected_evidence_ids": [],
+        "requirements_hash": "1" * 64,
+        "selector_config_hash": "2" * 64,
+        "eligibility_contract_hash": "3" * 64,
+        "candidate_trace_hash": "4" * 64,
+        "selection_hash": "5" * 64,
+        "assignment_hash": "6" * 64,
+        "decision_hash": "0" * 64,
+    }
+
+    bound_insufficient_projection(payload, max_tokens=300)
+
+    assert estimate_projection_tokens(payload) <= 300
+    assert payload["support_envelope"]["encoding"] == "zlib+base64url"
+    assert validate_model_visible_projection(payload, snapshot={}, max_tokens=300) == []
+
+
+def test_validator_rejects_inconsistent_insufficient_support_summary():
+    payload = project_insufficient(
+        kind="docs_answer", missing=["No source is available."],
+        recommended_next_action=None, max_tokens=300,
+    )
+    payload.update({
+        "answer_supported": True,
+        "answer_available": True,
+        "support_status": "ok",
+    })
+    payload["estimated_tokens"] = estimate_projection_tokens(payload)
+
+    errors = validate_model_visible_projection(payload, snapshot={}, max_tokens=300)
+
+    assert "insufficient evidence has inconsistent answer_supported" in errors
+    assert "insufficient evidence has inconsistent answer_available" in errors
+    assert "insufficient evidence has inconsistent support_status" in errors
+
+
 def test_insufficient_projection_preserves_bounded_inspection_decision_context():
     payload = project_insufficient(
         kind="docs_answer",
@@ -473,8 +556,8 @@ def test_library_public_call_without_canonical_decision_fails_closed():
     assert payload["answer_supported"] is False
     assert payload["answer_available"] is False
     assert payload["reason_code"] == "canonical_support_decision_missing"
-    assert payload["mandatory_coverage"] == 0.0
-    assert payload["selected_evidence_ids"] == []
+    assert "mandatory_coverage" not in payload
+    assert "selected_evidence_ids" not in payload
     assert "answer" not in payload
     assert not _forbidden_occurrences(payload)
 
@@ -606,6 +689,109 @@ def test_project_projection_reuses_canonical_selection_and_evidence_ids():
     assert [source["evidence_id"] for source in projection["sources"]] == projection["answer_evidence_ids"]
 
 
+def test_assignment_backed_canonical_support_overrides_legacy_answer_availability_heuristic():
+    from docmancer.docs.application.evidence_selection import build_requirements, project_docs_selection_config, select_evidence
+
+    question = "What is the documented workflow?"
+    candidate = {
+        "stable_id": "workflow-witness",
+        "source": "docs/workflow.md",
+        "content": "The documented workflow is: run get_docs_context, follow prepare_docs, then retry the original question.",
+    }
+    requirements = build_requirements(
+        question,
+        public_requirements=["get_docs_context", "prepare_docs"],
+        profile="project_docs_answer",
+    )
+    selection = select_evidence(
+        [candidate], question=question, config=project_docs_selection_config(800),
+        requirements=requirements,
+    )
+
+    projection, snapshot = project_docs_answer(
+        question=question,
+        retrieval={
+            "status": "success",
+            "answer_available": False,
+            "answer_type": "partial_navigational",
+            "selection_profile": "project_docs_answer",
+            "context_pack": [candidate],
+        },
+        canonical_selection=selection,
+    )
+
+    assert selection.support_decision.answer_supported is True
+    assert projection["status"] == "ok"
+    assert projection["answer_evidence_ids"] == ["workflow-witness"]
+    assert validate_model_visible_projection(
+        projection,
+        snapshot=snapshot,
+        max_tokens=800,
+        canonical_selection=selection,
+    ) == []
+
+
+def test_empty_assignment_canonical_selection_cannot_override_partial_retrieval():
+    from docmancer.docs.application.evidence_selection import docs_selection_config, select_evidence
+
+    candidate = {
+        "stable_id": "workflow-heading",
+        "source": "docs/workflow.md",
+        "content": "Workflow",
+    }
+    selection = select_evidence(
+        [candidate], question="What is the documented workflow?", config=docs_selection_config(800),
+    )
+
+    projection, _ = project_docs_answer(
+        question="What is the documented workflow?",
+        retrieval={
+            "status": "success",
+            "answer_available": False,
+            "answer_type": "partial_navigational",
+            "context_pack": [candidate],
+        },
+        canonical_selection=selection,
+    )
+
+    assert selection.assignments == ()
+    assert projection["status"] == "insufficient_evidence"
+
+
+def test_docs_selector_accounts_for_serialized_projection_cost():
+    from docmancer.docs.application.evidence_selection import docs_selection_config, select_evidence
+
+    candidates = [
+        {
+            "stable_id": f"source-{index}",
+            "source": f"docs/source-{index}.md",
+            "title": f"Source {index}",
+            "relevance_score": 1.0 - index / 10,
+            "content": " ".join(
+                f"documented_{index}_{word}" for word in range(24)
+            ),
+        }
+        for index in range(1, 4)
+    ]
+    selection = select_evidence(
+        candidates,
+        question="Summarize the documented facts",
+        config=docs_selection_config(800),
+    )
+
+    projection, snapshot = project_docs_answer(
+        question="Summarize the documented facts",
+        retrieval={"status": "success", "context_pack": candidates},
+        canonical_selection=selection,
+    )
+
+    assert selection.status == "ok"
+    assert len(selection.selected_candidates) < len(candidates)
+    # Generic selection has no claim assignments and cannot become a docs answer.
+    assert projection["status"] == "insufficient_evidence"
+    assert validate_model_visible_projection(projection, snapshot=snapshot, max_tokens=800) == []
+
+
 def test_project_projection_materializes_every_selected_mandatory_witness():
     from docmancer.docs.application.evidence_selection import docs_selection_config, select_evidence
 
@@ -675,7 +861,7 @@ def test_explicit_answer_cannot_hide_a_selected_mandatory_witness():
     assert projection["answer_evidence_ids"] == ["first", "second"]
 
 
-def test_docs_projection_preserves_underlying_support_decision_fields():
+def test_docs_projection_exposes_a_compact_model_visible_support_summary():
     from docmancer.docs.application.evidence_selection import (
         library_docs_selection_config,
         select_evidence,
@@ -706,13 +892,13 @@ def test_docs_projection_preserves_underlying_support_decision_fields():
     )
 
     assert projection["status"] == "insufficient_evidence"
-    if "support_envelope" in projection:
-        from docmancer.docs.application.model_visible_projection import decode_support_envelope
-
-        projected_support = decode_support_envelope(projection["support_envelope"])
-    else:
-        projected_support = projection
-    assert {key: projected_support[key] for key in support} == support
+    assert {key: projection[key] for key in (
+        "answer_supported", "answer_available", "support_status", "reason_code", "decision_hash",
+    )} == {key: support[key] for key in (
+        "answer_supported", "answer_available", "support_status", "reason_code", "decision_hash",
+    )}
+    assert "support_envelope" not in projection
+    assert "missing_requirement_ids" not in projection
 
 
 def test_supported_library_projection_shares_decision_and_visible_evidence_ids():
@@ -754,7 +940,7 @@ def test_supported_library_projection_shares_decision_and_visible_evidence_ids()
     assert projection["selected_evidence_ids"] == selected_ids
 
 
-def test_tiny_budget_preserves_complete_canonical_support_envelope():
+def test_tiny_budget_uses_a_compact_model_visible_support_summary():
     from docmancer.docs.application.evidence_selection import (
         library_docs_selection_config,
         select_evidence,
@@ -794,7 +980,9 @@ def test_tiny_budget_preserves_complete_canonical_support_envelope():
     assert tiny["status"] == "insufficient_evidence"
     assert estimate_projection_tokens(tiny) <= 300
     assert validate_model_visible_projection(tiny, snapshot={}, max_tokens=300) == []
-    assert _decode_support_envelope(tiny["support_envelope"]) == expected_support
+    assert tiny["decision_hash"] == expected_support["decision_hash"]
+    assert tiny["answer_supported"] is False
+    assert "support_envelope" not in tiny
 
 
 def test_library_projection_materializes_display_text_only_witness():

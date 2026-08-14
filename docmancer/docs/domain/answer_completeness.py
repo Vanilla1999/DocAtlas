@@ -303,6 +303,58 @@ def evaluate_project_answer_completeness(
     }
 
 
+def derive_project_answer_completeness(
+    *,
+    question: str,
+    context_pack: list[dict[str, Any]],
+    answer_available: bool,
+    intent: Any,
+    support_decision: Any,
+    assigned_requirement_ids: list[str],
+) -> dict[str, Any]:
+    """Expose legacy coverage diagnostics without granting them verdict authority."""
+
+    result = evaluate_project_answer_completeness(
+        question=question,
+        context_pack=context_pack,
+        answer_available=answer_available,
+        intent=intent,
+    )
+    completeness = result["answer_completeness"]
+    legacy_diagnostics = dict(completeness)
+    supported = bool(getattr(support_decision, "answer_supported", False))
+    if supported:
+        answer_type = "exact"
+        status = "exact"
+    elif context_pack:
+        answer_type = "partial_navigational" if _has_navigational_context(context_pack) else "partial"
+        status = "partial"
+    else:
+        answer_type = "unavailable"
+        status = "unavailable"
+    completeness.update({
+        "status": status,
+        "answer_type": answer_type,
+        "coverage_score": float(getattr(support_decision, "mandatory_coverage", 0.0)),
+        "canonical_support": {
+            "answer_supported": supported,
+            "mandatory_requirement_ids": list(
+                getattr(support_decision, "mandatory_requirement_ids", ())
+            ),
+            "assigned_requirement_ids": sorted(assigned_requirement_ids),
+        },
+        "source_search_required": not supported,
+        "source_search_status": "not_required" if supported else "required",
+        "disposition": "answer" if supported else "search_local_source",
+        "edit_ready": supported,
+        "legacy_diagnostics": legacy_diagnostics,
+    })
+    if supported:
+        result["recommended_next_actions"] = []
+    result["answer_type"] = answer_type
+    return result
+
+
 def _skip_high_signal_relevance_gate(question: str, intent: Any | None) -> bool:
     q = _normalize_text(question)
     if not q:

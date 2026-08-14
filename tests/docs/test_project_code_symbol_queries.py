@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import hashlib
+
 from docmancer.docs.application.project_context_service import ProjectContextService
 from docmancer.docs.models import ProjectDocsChunk, ProjectDocsResult
 from tests.docs.test_project_context_service import FakeProjectContextFacade
@@ -17,9 +19,16 @@ def test_code_symbol_query_does_not_accept_generic_wiki_only_context():
 
 def test_code_symbol_query_boosts_docs_with_python_file_references():
     facade = FakeProjectContextFacade()
+    implementation = "docmancer/mcp/docs_server.py defines class DocsServer and def handle_tool for MCP server tools."
     facade.project_docs = ProjectDocsResult(project_path="/repo", query="classes", results=[
         ProjectDocsChunk(title="Wiki", content="Generic architecture overview with responsibilities and components.", source="/repo/wiki/Architecture.md", url=None, path="wiki/Architecture.md"),
-        ProjectDocsChunk(title="Server implementation", content="docmancer/mcp/docs_server.py defines class DocsServer and def handle_tool for MCP tools.", source="/repo/docs/server.md", url=None, path="docs/server.md"),
+        ProjectDocsChunk(
+            title="Server implementation", content=implementation,
+            stable_chunk_id="server-implementation", parent_logical_id="parent:server",
+            display_content_hash=hashlib.sha256(implementation.encode()).hexdigest(),
+            char_start=0, char_end=len(implementation), line_start=1, line_end=1,
+            source="/repo/docs/server.md", url=None, path="docs/server.md",
+        ),
     ])
 
     result = ProjectContextService(facade).get_project_context("/repo", "What classes and functions implement the MCP server?", mode="project-only")

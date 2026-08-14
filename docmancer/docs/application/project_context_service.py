@@ -8,11 +8,11 @@ import re
 from docmancer.docs.application.project_answer_outline import build_project_answer_outline
 from docmancer.docs.application.evidence_selection import (
     build_requirements,
-    docs_selection_config,
+    project_docs_selection_config,
     select_evidence,
 )
 from docmancer.docs.domain.answer_completeness import (
-    evaluate_project_answer_completeness,
+    derive_project_answer_completeness,
     extract_project_answer_requirements,
     extract_query_relevance_terms,
 )
@@ -164,7 +164,7 @@ class ProjectContextService:
         canonical_requirements = build_requirements(
             question,
             required_evidence_paths=(evidence_path,) if evidence_path else (),
-            profile="project_document_answer" if evidence_path else "generic",
+            profile="project_document_answer" if evidence_path else "project_docs_answer",
         )
         metadata = self.facade.read_project_metadata(str(root))
         project_docs = None
@@ -470,7 +470,7 @@ class ProjectContextService:
         selection_decision = select_evidence(
             context_pack,
             question=question,
-            config=docs_selection_config(tokens or 4000),
+            config=project_docs_selection_config(tokens or 4000),
             trust_contract=trust_contract,
             requirements=canonical_requirements,
         )
@@ -579,11 +579,19 @@ class ProjectContextService:
                 {"tool": "code_search", "reason": "Use code search / ripgrep for MCP server classes and functions"},
                 {"tool": "project_docs", "reason": "Add module docs or ADR linking MCP server implementation files"},
             ])
-        completeness_result = evaluate_project_answer_completeness(
+        answer_available = answer_available and (
+            support_decision.answer_supported
+            or bool(dependency_docs and dependency_docs.results)
+        )
+        completeness_result = derive_project_answer_completeness(
             question=question,
             context_pack=context_pack,
             answer_available=answer_available,
             intent=intent,
+            support_decision=support_decision,
+            assigned_requirement_ids=[
+                assignment.requirement_id for assignment in selection_decision.assignments
+            ],
         )
         answer_type = completeness_result["answer_type"]
         answer_completeness = completeness_result["answer_completeness"]
@@ -607,8 +615,6 @@ class ProjectContextService:
             relevance_gate=relevance_gate,
             answer_available=answer_available,
             answer_type=answer_type,
-            source_search_required=bool(answer_completeness.get("source_search_required")),
-            completeness_reason_codes=list(answer_completeness.get("reason_codes") or []),
             intent=intent,
         )
         diagnostics["trust_decision"] = {
@@ -658,6 +664,7 @@ class ProjectContextService:
             answer_available=answer_available,
             answer_type=answer_type,
             answer_completeness=answer_completeness,
+            selection_profile="project_docs_answer",
             requirements=canonical_requirements,
             selection_decision=selection_decision,
             support_decision=support_decision,
@@ -1043,8 +1050,6 @@ def _make_context_trust_decision(
     relevance_gate: dict[str, Any],
     answer_available: bool,
     answer_type: str,
-    source_search_required: bool,
-    completeness_reason_codes: list[str],
     intent: Any,
 ) -> ContextTrustDecision:
     max_project_score = _max_project_ranking_score(project_docs)
@@ -1058,12 +1063,7 @@ def _make_context_trust_decision(
     has_dependency_answer = bool(dependency_docs and dependency_docs.results)
     has_source_evidence = any(item.get("evidence_class") == "source_snippet" for item in source_evidence_items)
     has_strong_project_answer = bool(project_docs and project_docs.answer_available and _score_is_strong(max_project_score))
-    source_search_is_simple_relevance_gap = (
-        source_search_required
-        and not getattr(intent, "wants_code_symbols", False)
-        and "high_signal_query_terms_missing_from_context" in completeness_reason_codes
-    )
-    if answer_available and not missing_terms and passed and (has_dependency_answer or has_source_evidence or (has_strong_project_answer and (not source_search_required or source_search_is_simple_relevance_gap))):
+    if answer_available and not missing_terms and passed and (has_dependency_answer or has_source_evidence or has_strong_project_answer):
         return ContextTrustDecision(True, "trusted_context_available", "trusted", passed, max_project_score, matched_terms, missing_terms)
 
     if context_pack and (passed or getattr(intent, "broad", False) or answer_type in {"partial", "partial_navigational"}):

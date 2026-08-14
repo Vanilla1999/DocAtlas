@@ -327,16 +327,13 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
             raw.setdefault("retrieval_diagnostics", {})["evidence_selection"] = selection_trace
             if projection.get("status") == "insufficient_evidence" and recovery:
                 support_projection = {
-                    **_support_envelope(projection),
-                    **(
-                        {"support_envelope": deepcopy(projection["support_envelope"])}
-                        if "support_envelope" in projection else {}
-                    ),
-                    **{
-                        key: projection[key]
-                        for key in ("operational_status", "context_available", "reason_code")
-                        if key in projection
-                    },
+                    key: projection[key]
+                    for key in (
+                        "answer_supported", "answer_available", "support_status",
+                        "reason_code", "decision_hash", "operational_status",
+                        "context_available",
+                    )
+                    if key in projection
                 }
                 projection = project_insufficient(
                     kind="docs_answer",
@@ -349,7 +346,7 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
                 bound_insufficient_projection(projection, max_tokens=output_budget)
             if projection.get("status") == "insufficient_evidence":
                 bound_insufficient_projection(
-                    projection, max_tokens=INSUFFICIENT_EVIDENCE_MAX_TOKENS,
+                    projection, max_tokens=output_budget,
                 )
             _omit_nullable_reason_code(projection)
             _refresh_projection_estimate(projection)
@@ -357,7 +354,7 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
                 projection,
                 snapshot=snapshot,
                 max_tokens=(
-                    INSUFFICIENT_EVIDENCE_MAX_TOKENS
+                    output_budget
                     if projection.get("status") == "insufficient_evidence"
                     else min(DOCS_ANSWER_MAX_TOKENS, output_budget)
                 ),
@@ -423,7 +420,7 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
             projection,
             snapshot=snapshot,
             max_tokens=(
-                INSUFFICIENT_EVIDENCE_MAX_TOKENS
+                    output_budget
                 if projection.get("status") == "insufficient_evidence"
                 else min(PATCH_CONTEXT_HARD_TOKENS, output_budget)
             ),

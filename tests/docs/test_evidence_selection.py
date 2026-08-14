@@ -6,6 +6,7 @@ from dataclasses import replace
 import pytest
 
 from docmancer.docs.application.evidence_selection import (
+    EvidenceRequirement,
     EvidenceRequirementSet,
     SelectionConfig,
     SupportDecision,
@@ -13,6 +14,7 @@ from docmancer.docs.application.evidence_selection import (
     build_requirements,
     docs_selection_config,
     library_docs_selection_config,
+    project_docs_selection_config,
     patch_selection_config,
     select_evidence,
     validate_evidence_sufficiency,
@@ -52,6 +54,128 @@ def test_project_document_profile_and_explicit_bounds_are_validated():
     assert config.profile == "project_document_answer"
     with pytest.raises(ValueError, match="document/span limits"):
         replace(config, max_spans=0)
+
+
+def test_project_docs_profile_requires_question_derived_evidence_and_assignments():
+    config = project_docs_selection_config(800)
+    requirements = build_requirements("Explain the documented workflow", profile="project_docs_answer")
+    decision = select_evidence(
+        [_candidate("heading", "No detailed procedure is available.", title="documented workflow")],
+        question="Explain the documented workflow",
+        config=config,
+        requirements=requirements,
+    )
+
+    assert requirements.required_entities == ()
+    assert decision.support_decision.answer_supported is False
+    assert decision.support_decision.reason_code == "required_evidence_missing"
+    assert decision.assignments == ()
+
+
+def test_metadata_does_not_prove_project_answer_term():
+    requirements = build_requirements("Explain docs_status", profile="project_docs_answer")
+    decision = select_evidence(
+        [_candidate("metadata-only", "This section describes status checks.", title="docs_status")],
+        question="Explain docs_status",
+        config=project_docs_selection_config(800),
+        requirements=requirements,
+    )
+
+    assert decision.support_decision.answer_supported is False
+    assert "query_symbol:0:docs_status" in decision.missing_requirements
+
+
+def test_project_term_and_query_symbol_share_one_canonical_obligation():
+    requirements = build_requirements(
+        "How does model_visible_projection serialize evidence?",
+        profile="project_docs_answer",
+    )
+
+    matches = [
+        item for item in requirements
+        if item.kind == "exact_term" and item.value.casefold() == "model_visible_projection"
+    ]
+
+    assert len(matches) == 1
+    assert matches[0].requirement_id == "query_symbol:0:model_visible_projection"
+    assert (
+        matches[0].requirement_id,
+        "project_answer_term",
+        "model_visible_projection",
+    ) in requirements.query_extraction_provenance
+
+
+def test_project_answer_requires_behavior_and_usage_facets_in_visible_text():
+    question = "What does docs_status report and when should it be used?"
+    requirements = build_requirements(question, profile="project_docs_answer")
+    complete = select_evidence(
+        [_candidate(
+            "status", "docs_status reports index freshness and should be used for health checks.",
+        )],
+        question=question,
+        config=project_docs_selection_config(800),
+        requirements=requirements,
+    )
+    incomplete = select_evidence(
+        [_candidate("status", "docs_status reports index freshness.")],
+        question=question,
+        config=project_docs_selection_config(800),
+        requirements=requirements,
+    )
+
+    assert {item.value for item in requirements if item.kind == "facet"} == {
+        "behavior:docs_status", "usage:docs_status",
+    }
+    assert complete.support_decision.answer_supported is True
+    assert incomplete.support_decision.answer_supported is False
+
+
+def test_project_answer_requires_recall_and_authority_invariant_facets():
+    question = "How does exact-term recall improve without widening authority?"
+    requirements = build_requirements(question, profile="project_docs_answer")
+    complete = select_evidence(
+        [_candidate(
+            "recall", "Exact-term retrieval improves recall while authority scope remains unchanged.",
+        )],
+        question=question,
+        config=project_docs_selection_config(800),
+        requirements=requirements,
+    )
+    incomplete = select_evidence(
+        [_candidate("recall", "Exact-term retrieval improves recall.")],
+        question=question,
+        config=project_docs_selection_config(800),
+        requirements=requirements,
+    )
+
+    assert {item.value for item in requirements if item.kind == "facet"} == {
+        "recall_mechanism", "authority_invariant",
+    }
+    assert complete.support_decision.answer_supported is True
+    assert incomplete.support_decision.answer_supported is False
+
+
+def test_project_answer_requires_relational_comparison_proof():
+    question = "Compare async with launch"
+    requirements = build_requirements(question, profile="project_docs_answer")
+    complete = select_evidence(
+        [_candidate("comparison", "async returns a result, whereas launch schedules background work.")],
+        question=question,
+        config=project_docs_selection_config(800),
+        requirements=requirements,
+    )
+    incomplete = select_evidence(
+        [_candidate("names", "async and launch are available APIs.")],
+        question=question,
+        config=project_docs_selection_config(800),
+        requirements=requirements,
+    )
+
+    assert "facet:comparison:async:launch" in {
+        item.requirement_id for item in requirements
+    }
+    assert complete.support_decision.answer_supported is True
+    assert incomplete.support_decision.answer_supported is False
 
 
 def test_proof_roles_and_qualifiers_are_bound_into_assignments():
@@ -940,3 +1064,218 @@ def test_malformed_rank_is_bounded_and_hashes_bind_scores_symbols_and_invalid_ro
         "reason_code": "invalid_identity",
         "representative_stable_id": None,
     }]
+
+
+def test_project_usage_negation_does_not_prove_usage():
+    question = "When should docs_status be used?"
+    requirements = build_requirements(question, profile="project_docs_answer")
+    decision = select_evidence(
+        [_candidate("negative", "docs_status should not be used for health checks.")],
+        question=question,
+        config=project_docs_selection_config(800),
+        requirements=requirements,
+    )
+
+    assert decision.support_decision.answer_supported is False
+    assert "facet:usage:docs_status" in decision.missing_requirements
+
+
+def test_project_heading_with_colon_does_not_prove_exact_term():
+    question = "Explain CONFIG_KEY"
+    requirements = build_requirements(question, profile="project_docs_answer")
+    decision = select_evidence(
+        [_candidate("heading", "CONFIG_KEY:")],
+        question=question,
+        config=project_docs_selection_config(800),
+        requirements=requirements,
+    )
+
+    assert decision.support_decision.answer_supported is False
+
+
+def test_project_markdown_heading_does_not_prove_exact_term():
+    question = "Explain MCP server"
+    requirements = build_requirements(question, profile="project_docs_answer")
+    decision = select_evidence(
+        [_candidate("heading", "### Keep the MCP server responsive")],
+        question=question,
+        config=project_docs_selection_config(800),
+        requirements=requirements,
+    )
+
+    assert decision.support_decision.answer_supported is False
+
+
+def test_project_request_query_requires_mcp_server_as_well_as_request():
+    requirements = build_requirements(
+        "How does the MCP server process a tool request?",
+        profile="project_docs_answer",
+    )
+
+    assert {item.value.casefold() for item in requirements if item.kind == "exact_term"} >= {
+        "mcp server",
+        "request",
+    }
+
+
+@pytest.mark.parametrize(
+    ("question", "complete", "incomplete", "facet"),
+    [
+        (
+            "How does the MCP server process a tool request?",
+            "The MCP server routes each tool request to a handler, which validates and dispatches it.",
+            "The MCP server receives a tool request.",
+            "request_handling",
+        ),
+        (
+            "What is the architecture of the MCP server?",
+            "The server routes requests through the transport to the handler service.",
+            "The MCP server architecture has a service.",
+            "architecture",
+        ),
+        (
+            "What keeps the MCP server responsive?",
+            "A background worker processes queued tasks asynchronously so the event loop does not block.",
+            "The MCP server is responsive.",
+            "responsiveness",
+        ),
+    ],
+)
+def test_project_relation_facets_require_a_concrete_mechanism(
+    question, complete, incomplete, facet,
+):
+    requirements = build_requirements(question, profile="project_docs_answer")
+    accepted = select_evidence(
+        [_candidate("complete", complete)], question=question,
+        config=project_docs_selection_config(800), requirements=requirements,
+    )
+    rejected = select_evidence(
+        [_candidate("incomplete", incomplete)], question=question,
+        config=project_docs_selection_config(800), requirements=requirements,
+    )
+
+    assert f"facet:{facet}" in {item.requirement_id for item in requirements}
+    assert f"facet:{facet}" in accepted.support_decision.satisfied_requirement_ids
+    assert f"facet:{facet}" in rejected.missing_requirements
+
+
+def test_requirement_input_limits_are_bounded_and_fail_closed():
+    question = "Show code for " + " ".join(
+        f"Symbol_{index}" for index in range(20)
+    )
+    requirements = build_requirements(
+        question,
+        required_evidence_paths=[f"docs/evidence-{index}.md" for index in range(20)],
+        required_target_paths=[f"src/target-{index}.py" for index in range(20)],
+        public_requirements=[f"public fact {index}" for index in range(20)],
+        library_requirement_contract={
+            "code_groups": [[f"fragment_{index}"] for index in range(20)],
+        },
+        profile="library_docs_answer",
+    )
+    decision = select_evidence(
+        [_candidate("candidate", "Symbol_0 and every public fact are documented.")],
+        question=question,
+        config=library_docs_selection_config(800),
+        requirements=requirements,
+    )
+
+    assert len([item for item in requirements if item.kind == "evidence_path"]) == 12
+    assert len([item for item in requirements if item.kind == "target_path"]) == 12
+    assert len([item for item in requirements if item.requirement_id.startswith("public:")]) == 12
+    assert len([item for item in requirements if item.kind == "code_group"]) == 6
+    assert {item.requirement_id for item in requirements if item.requirement_id.startswith("input_limit:")} == {
+        "input_limit:code_groups", "input_limit:identifiers", "input_limit:paths",
+        "input_limit:public_requirements",
+    }
+    assert decision.support_decision.answer_supported is False
+    assert "input_limit:paths" in decision.missing_requirements
+
+
+def test_project_behavior_question_requires_behavior_for_every_entity():
+    question = "What do get_docs_context and docs_status return?"
+    requirements = build_requirements(question, profile="project_docs_answer")
+    values = {item.value for item in requirements}
+
+    assert "behavior:get_docs_context" in values
+    assert "behavior:docs_status" in values
+
+    decision = select_evidence(
+        [_candidate("partial", "get_docs_context returns source-backed context and mentions docs_status.")],
+        question=question,
+        config=project_docs_selection_config(800),
+        requirements=requirements,
+    )
+    assert decision.support_decision.answer_supported is False
+    assert "facet:behavior:docs_status" in decision.missing_requirements
+
+
+def test_project_mechanism_how_question_does_not_require_workflow():
+    question = "How does docs_status report index freshness?"
+    requirements = build_requirements(question, profile="project_docs_answer")
+    assert "workflow:docs_status" not in {item.value for item in requirements}
+
+    decision = select_evidence(
+        [_candidate("answer", "docs_status reports index freshness from job records.")],
+        question=question,
+        config=project_docs_selection_config(800),
+        requirements=requirements,
+    )
+    assert decision.support_decision.answer_supported is True
+
+
+def test_requirement_set_rejects_conflicting_duplicate_ids():
+    with pytest.raises(ValueError, match="conflicting evidence requirement ID: fact"):
+        EvidenceRequirementSet((
+            EvidenceRequirement("fact", "exact_term", "first"),
+            EvidenceRequirement("fact", "exact_term", "second"),
+        ))
+
+
+def test_each_requirement_has_one_deterministic_witness():
+    requirements = EvidenceRequirementSet((
+        EvidenceRequirement("shared", "exact_term", "shared"),
+        EvidenceRequirement("alpha", "exact_term", "alpha"),
+        EvidenceRequirement("beta", "exact_term", "beta"),
+    ))
+    decision = select_evidence(
+        [_candidate("second", "shared beta"), _candidate("first", "shared alpha")],
+        question="shared alpha beta",
+        config=docs_selection_config(800), requirements=requirements,
+    )
+
+    shared_witnesses = [
+        assignment.evidence_id for assignment in decision.assignments
+        if assignment.requirement_id == "shared"
+    ]
+    assert shared_witnesses == ["first"]
+
+
+@pytest.mark.parametrize(
+    ("question", "candidate", "facet"),
+    [
+        (
+            "Explain the docs_status workflow",
+            "docs_status then runs health checks.",
+            "workflow:docs_status",
+        ),
+        (
+            "What is the architecture of the MCP server?",
+            "The MCP server exists. The service exists. Requests route through transport.",
+            "architecture",
+        ),
+        (
+            "What keeps the MCP server responsive?",
+            "The MCP server is asynchronous. A worker handles metrics.",
+            "responsiveness",
+        ),
+    ],
+)
+def test_relation_facets_reject_unrelated_or_single_step_matches(question, candidate, facet):
+    requirements = build_requirements(question, profile="project_docs_answer")
+    decision = select_evidence(
+        [_candidate("partial", candidate)], question=question,
+        config=project_docs_selection_config(800), requirements=requirements,
+    )
+
+    assert f"facet:{facet}" in decision.missing_requirements

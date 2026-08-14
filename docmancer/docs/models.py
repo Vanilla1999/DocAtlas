@@ -634,6 +634,7 @@ class ProjectContextResult:
     answer_available: bool = True
     answer_type: str = "exact"
     answer_completeness: dict[str, Any] = field(default_factory=dict)
+    selection_profile: str = "project_docs_answer"
     requirements: Any = None
     selection_decision: Any = None
     support_decision: Any = None

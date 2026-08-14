@@ -18,12 +18,17 @@ from docmancer.retrieval.contracts import canonical_hash
 from docmancer.retrieval.query_planning import extract_exact_terms
 
 
-SELECTOR_SCHEMA_VERSION = "budget-aware-evidence-selector-v3"
+SELECTOR_SCHEMA_VERSION = "budget-aware-evidence-selector-v5"
 MAX_SELECTOR_CANDIDATES = 20
 MAX_VISIBLE_DOCUMENTS = 3
 MAX_VISIBLE_SPANS = 6
 MAX_MIXED_VISIBLE_TOKENS = 800
 MIXED_WRAPPER_RESERVE_TOKENS = 120
+MAX_REQUIREMENT_IDENTIFIERS = 12
+MAX_REQUIREMENT_PATHS = 12
+MAX_PUBLIC_REQUIREMENTS = 12
+MAX_CODE_GROUPS = 6
+DOCS_SERIALIZATION_RESERVE_TOKENS = 350
 _HEX_SHA256 = re.compile(r"^[0-9a-f]{64}$")
 _TOKEN_RE = re.compile(r"[\w.+:/-]+", re.UNICODE)
 _COMPARISON_IDENTIFIER = r"(?<![a-z0-9_`])(`?[a-z][a-z0-9_]*`?)(?![a-z0-9_`])"
@@ -113,6 +118,25 @@ def _observed_qualifiers(text: str) -> tuple[EvidenceQualifier, ...]:
 
 def _estimated_tokens(value: str) -> int:
     return max(1, math.ceil(len(value.encode("utf-8")) / 4))
+
+
+def _docs_answer_candidate_tokens(
+    *, stable_id: str, path: str, section: str, projected: str,
+    version_binding: str,
+) -> int:
+    source_row = {
+        "evidence_id": stable_id,
+        "path_or_url": path,
+        "section": section,
+        "snippet": projected,
+        "version_binding": version_binding,
+        "content_sha256": "0" * 64,
+    }
+    serialized_source = json.dumps(
+        source_row, ensure_ascii=False, sort_keys=True, separators=(",", ":"),
+    )
+    # A docs answer exposes both the cited source row and its extractive text.
+    return _estimated_tokens(serialized_source) + _estimated_tokens(projected)
 
 
 def _positive_int(value: Any, *, default: int) -> int:
@@ -294,7 +318,7 @@ class SelectionConfig:
     result_kind: Literal["docs_answer", "patch_context"]
     target_tokens: int
     hard_tokens: int
-    profile: Literal["generic", "library_docs_answer", "project_document_answer"] = "generic"
+    profile: Literal["generic", "library_docs_answer", "project_document_answer", "project_docs_answer"] = "generic"
     schema_version: str = SELECTOR_SCHEMA_VERSION
     max_candidates: int = MAX_SELECTOR_CANDIDATES
     max_sources: int = 3
@@ -311,7 +335,7 @@ class SelectionConfig:
     def __post_init__(self) -> None:
         if self.result_kind not in {"docs_answer", "patch_context"}:
             raise ValueError("unsupported evidence result kind")
-        if self.profile not in {"generic", "library_docs_answer", "project_document_answer"}:
+        if self.profile not in {"generic", "library_docs_answer", "project_document_answer", "project_docs_answer"}:
             raise ValueError("unsupported evidence selection profile")
         if not 1 <= self.target_tokens <= self.hard_tokens:
             raise ValueError("selector token budgets are invalid")
@@ -373,7 +397,15 @@ class EvidenceRequirementSet(Sequence[EvidenceRequirement]):
     query_requirement_spans: tuple[tuple[str, int, int, str], ...] = ()
 
     def __post_init__(self) -> None:
-        canonical_requirements = tuple(sorted(self.requirements, key=lambda item: item.requirement_id))
+        requirements_by_id: dict[str, EvidenceRequirement] = {}
+        for item in self.requirements:
+            existing = requirements_by_id.get(item.requirement_id)
+            if existing is not None and existing != item:
+                raise ValueError(f"conflicting evidence requirement ID: {item.requirement_id}")
+            requirements_by_id[item.requirement_id] = item
+        canonical_requirements = tuple(sorted(
+            requirements_by_id.values(), key=lambda item: item.requirement_id,
+        ))
         entities = tuple(sorted({str(value).strip() for value in self.required_entities if str(value).strip()}))
         facets = tuple(sorted({str(value).strip() for value in self.required_facets if str(value).strip()}))
         provenance = tuple(sorted({
@@ -447,6 +479,7 @@ class EvidenceCandidate:
     display_text: str
     projected_text: str
     token_estimate: int
+    fit_token_estimate: int
     reported_token_estimate: int | None
     char_start: int | None
     char_end: int | None
@@ -840,6 +873,10 @@ def library_docs_selection_config(max_tokens: int) -> SelectionConfig:
     return replace(docs_selection_config(max_tokens), profile="library_docs_answer")
 
 
+def project_docs_selection_config(max_tokens: int) -> SelectionConfig:
+    return replace(docs_selection_config(max_tokens), profile="project_docs_answer")
+
+
 def patch_selection_config(max_tokens: int) -> SelectionConfig:
     hard = min(2000, max(256, int(max_tokens)))
     return SelectionConfig(
@@ -863,6 +900,47 @@ def _extract_requirement_entities_and_facets(question: str) -> tuple[tuple[str, 
         if comparison_entities:
             facets.add(f"result_access:{comparison_entities[-1]}:{match.group(0).casefold()}")
     return tuple(sorted(entities)), tuple(sorted(facets))
+
+
+def _project_answer_facets(question: str, entities: Sequence[str]) -> tuple[str, ...]:
+    """Derive small, auditable answer facets for common documentation questions."""
+
+    normalized = question.casefold()
+    facets: set[str] = set()
+    if "exact" in normalized and re.search(r"\b(?:recall|retrieve|retrieval)\b", normalized):
+        facets.add("recall_mechanism")
+    if re.search(r"\b(?:authority|scope)\b", normalized) and re.search(r"\b(?:widen|expand|broaden|without)\b", normalized):
+        facets.add("authority_invariant")
+    if re.search(r"\b(?:handle|handling|process|processing|dispatch|route)\b", normalized) and re.search(
+        r"\brequest\b|\bзапрос", normalized,
+    ):
+        facets.add("request_handling")
+    if re.search(r"\barchitecture\b|\bархитектур", normalized):
+        facets.add("architecture")
+    if re.search(r"\b(?:responsive|responsiveness|non-blocking|nonblocking)\b|\bотзывчив", normalized):
+        facets.add("responsiveness")
+    facet_entities = tuple(value for value in entities if value)
+    if not facet_entities:
+        return tuple(sorted(facets))
+    if re.search(
+        r"\bwhat\s+(?:does|do|is|are)\b|\b(?:report|return|provide|show)\b"
+        r"|\b(?:что\s+(?:возвращает|показывает|сообщает)|возвращает|показывает|сообщает)\b",
+        normalized,
+    ):
+        facets.update(f"behavior:{entity}" for entity in facet_entities)
+    if re.search(
+        r"\bwhen\s+(?:should|do|to)\b|\bwhen\s+is\b|\buse\b"
+        r"|\bкогда\b|\bиспользова(?:ть|н|но)\b|\bприменя(?:ть|ется)\b",
+        normalized,
+    ):
+        facets.update(f"usage:{entity}" for entity in facet_entities)
+    if re.search(
+        r"\bworkflow\b|\bafter\b|\bthen\b|\bsteps?\b|\bsequence\b"
+        r"|\bпроцесс\b|\bпосле\b|\bзатем\b|\bшаг(?:и|ов)?\b|\bпоследовательност(?:ь|и)\b",
+        normalized,
+    ):
+        facets.update(f"workflow:{entity}" for entity in facet_entities)
+    return tuple(sorted(facets))
 
 
 def _comparison_query_span(question: str, left: str, right: str) -> tuple[int, int] | None:
@@ -909,6 +987,21 @@ def _with_query_requirement_spans(
     return tuple(spanned)
 
 
+def _semantic_requirement_key(requirement: EvidenceRequirement) -> tuple[Any, ...]:
+    """Return the proof obligation identity, independent of extraction alias."""
+
+    return (
+        requirement.kind,
+        requirement.value.casefold(),
+        requirement.mandatory,
+        requirement.proof_role,
+        requirement.qualifiers,
+        requirement.source_path,
+        requirement.target_path,
+        requirement.version_binding,
+    )
+
+
 def build_requirements(
     question: str,
     *,
@@ -919,10 +1012,11 @@ def build_requirements(
     exact_snapshot_required: bool = False,
     project_identity: str | None = None,
     module_id: str | None = None,
-    profile: Literal["generic", "library_docs_answer", "project_document_answer"] = "generic",
+    profile: Literal["generic", "library_docs_answer", "project_document_answer", "project_docs_answer"] = "generic",
     library_requirement_contract: Mapping[str, Iterable[str]] | None = None,
 ) -> EvidenceRequirementSet:
     requirements: list[EvidenceRequirement] = []
+    input_limits: set[str] = set()
     for index, term in enumerate(extract_exact_terms(question)):
         requirements.append(EvidenceRequirement(
             requirement_id=f"query_exact:{index}:{term.normalized_value}",
@@ -943,6 +1037,9 @@ def build_requirements(
         )
         and token.casefold() not in existing_exact_values
     }, key=str.casefold)
+    if len(identifier_values) > MAX_REQUIREMENT_IDENTIFIERS:
+        input_limits.add("identifiers")
+        identifier_values = identifier_values[:MAX_REQUIREMENT_IDENTIFIERS]
     for index, value in enumerate(identifier_values):
         requirements.append(EvidenceRequirement(
             requirement_id=f"query_symbol:{index}:{value.casefold()}",
@@ -954,18 +1051,21 @@ def build_requirements(
         ("evidence_path", required_evidence_paths, "required_evidence_paths"),
         ("target_path", required_target_paths, "required_target_paths"),
     ):
-        for index, path in enumerate(sorted(
-            paths, key=lambda value: (_normalized_source(str(value)), str(value))
-        )):
-            value = str(path).strip()
-            if value:
-                requirements.append(EvidenceRequirement(
-                    requirement_id=f"{kind}:{index}:{_normalized_source(value)}",
-                    kind=kind, value=value, public_provenance=provenance,
-                    source_path=value if kind == "evidence_path" else None,
-                    target_path=value if kind == "target_path" else None,
-                    proof_role="document_identity" if kind == "evidence_path" else "target_identity",
-                ))
+        normalized_paths = sorted(
+            {str(path).strip() for path in paths if str(path).strip()},
+            key=lambda value: (_normalized_source(value), value),
+        )
+        if len(normalized_paths) > MAX_REQUIREMENT_PATHS:
+            input_limits.add("paths")
+            normalized_paths = normalized_paths[:MAX_REQUIREMENT_PATHS]
+        for index, value in enumerate(normalized_paths):
+            requirements.append(EvidenceRequirement(
+                requirement_id=f"{kind}:{index}:{_normalized_source(value)}",
+                kind=kind, value=value, public_provenance=provenance,
+                source_path=value if kind == "evidence_path" else None,
+                target_path=value if kind == "target_path" else None,
+                proof_role="document_identity" if kind == "evidence_path" else "target_identity",
+            ))
     if exact_version:
         requirements.append(EvidenceRequirement(
             requirement_id=f"exact_version:{exact_version}", kind="exact_version",
@@ -984,7 +1084,11 @@ def build_requirements(
                 value=str(value).strip(),
                 public_provenance="selector_scope_requirement",
             ))
-    for index, raw in enumerate(sorted(public_requirements, key=canonical_hash)):
+    sorted_public_requirements = sorted(public_requirements, key=canonical_hash)
+    if len(sorted_public_requirements) > MAX_PUBLIC_REQUIREMENTS:
+        input_limits.add("public_requirements")
+        sorted_public_requirements = sorted_public_requirements[:MAX_PUBLIC_REQUIREMENTS]
+    for index, raw in enumerate(sorted_public_requirements):
         if isinstance(raw, Mapping):
             value = str(raw.get("value") or raw.get("text") or "").strip()
             kind = str(raw.get("kind") or "required_fact")
@@ -1004,7 +1108,12 @@ def build_requirements(
                 kind=kind, value=value, mandatory=mandatory, public_provenance=provenance,
                 proof_role=proof_role, qualifiers=qualifiers,
             ))
-    unique = {item.requirement_id: item for item in requirements}
+    unique: dict[str, EvidenceRequirement] = {}
+    for item in requirements:
+        existing = unique.get(item.requirement_id)
+        if existing is not None and existing != item:
+            raise ValueError(f"conflicting evidence requirement ID: {item.requirement_id}")
+        unique[item.requirement_id] = item
     entities, facets = _extract_requirement_entities_and_facets(question)
     if profile == "project_document_answer" and not any(
         item.mandatory and item.kind not in {"evidence_path", "target_path"}
@@ -1043,6 +1152,9 @@ def build_requirements(
         raw_groups = (raw_contract.get("code_groups") or ()) if _CODE_REQUEST_RE.search(question) else ()
         if not raw_groups and _CODE_REQUEST_RE.search(question) and raw_contract.get("required_code_group"):
             raw_groups = (raw_contract["required_code_group"],)
+        if len(raw_groups) > MAX_CODE_GROUPS:
+            input_limits.add("code_groups")
+            raw_groups = raw_groups[:MAX_CODE_GROUPS]
         for index, raw_group in enumerate(raw_groups):
             fragments = tuple(
                 str(value).strip() for value in raw_group
@@ -1066,13 +1178,104 @@ def build_requirements(
                 requirement_id="library_query_coverage", kind="unsupported_query", value="",
                 public_provenance="query_exact_term", query_extraction_kind="no_canonical_library_requirement",
             )
+    if profile == "project_docs_answer":
+        # A generic retrieval hit is not a proof of an answer. Bind the
+        # project question's explicit terms into the canonical contract.
+        from docmancer.docs.domain.answer_completeness import (
+            extract_project_answer_requirements,
+            extract_query_relevance_terms,
+        )
+
+        semantic_terms = extract_project_answer_requirements(question)
+        semantic_terms = tuple(dict.fromkeys((*semantic_terms, *re.findall(
+            r"\b(?:mcp\s+server|mcp\s+сервер|architecture|архитектура|workflow|процесс|protocol|протокол)\b",
+            question,
+            re.IGNORECASE,
+        ))))
+        if (
+            not semantic_terms
+            and not any(item.mandatory for item in unique.values())
+            and not entities
+            and not facets
+            and not _project_answer_facets(question, ())
+        ):
+            semantic_terms = extract_query_relevance_terms(question)
+        for index, term in enumerate(semantic_terms):
+            unique[f"project_term:{index}:{term.casefold()}"] = EvidenceRequirement(
+                requirement_id=f"project_term:{index}:{term.casefold()}",
+                kind="exact_term", value=term, public_provenance="query_exact_term",
+                query_extraction_kind="project_answer_term",
+            )
+        facet_entities = tuple(
+            term for term in semantic_terms
+            if re.search(r"[_:.]|[a-z][A-Z]", term)
+        )
+        for facet in _project_answer_facets(question, facet_entities):
+            unique[f"facet:{facet}"] = EvidenceRequirement(
+                requirement_id=f"facet:{facet}", kind="facet", value=facet,
+                public_provenance="query_exact_term", query_extraction_kind="project_answer_facet",
+            )
+        # Project answers need the same relational proof as library answers;
+        # selecting two named terms alone does not establish a comparison.
+        for entity in entities:
+            unique[f"entity:{entity}"] = EvidenceRequirement(
+                requirement_id=f"entity:{entity}", kind="entity", value=entity,
+                public_provenance="query_exact_term", query_extraction_kind="comparison_anchor",
+            )
+        for facet in facets:
+            unique[f"facet:{facet}"] = EvidenceRequirement(
+                requirement_id=f"facet:{facet}", kind="facet", value=facet,
+                public_provenance="query_exact_term", query_extraction_kind="comparison_facet",
+            )
+        if not any(item.mandatory for item in unique.values()):
+            unique["project_answer_requirement"] = EvidenceRequirement(
+                requirement_id="project_answer_requirement", kind="unsupported_query", value="",
+                public_provenance="query_exact_term",
+                query_extraction_kind="no_project_answer_requirement",
+            )
+    for category in sorted(input_limits):
+        # Preserve a deterministic fail-closed reason without accepting an
+        # unbounded input set into the selector/audit contract.
+        unique[f"input_limit:{category}"] = EvidenceRequirement(
+            requirement_id=f"input_limit:{category}",
+            kind="unsupported_query",
+            value=category,
+            public_provenance="selector_scope_requirement",
+            query_extraction_kind="input_limit_exceeded",
+        )
+    canonical_by_obligation: dict[tuple[Any, ...], EvidenceRequirement] = {}
+    extraction_provenance: list[tuple[str, str, str]] = []
+    for requirement in unique.values():
+        key = _semantic_requirement_key(requirement)
+        canonical = canonical_by_obligation.get(key)
+        # Query extractors can discover the same exact obligation through a
+        # symbol and a project-answer term. Keep both audit provenance records
+        # but select and score the obligation only once.
+        if (
+            canonical is not None
+            and canonical.public_provenance == requirement.public_provenance == "query_exact_term"
+        ):
+            if requirement.query_extraction_kind:
+                extraction_provenance.append((
+                    canonical.requirement_id,
+                    requirement.query_extraction_kind,
+                    requirement.value.casefold(),
+                ))
+            continue
+        canonical_by_obligation.setdefault(key, requirement)
     canonical_requirements = _with_query_requirement_spans(
-        question, tuple(unique[key] for key in sorted(unique))
+        question, tuple(sorted(canonical_by_obligation.values(), key=lambda item: item.requirement_id))
+    )
+    extraction_provenance.extend(
+        (item.requirement_id, item.query_extraction_kind, item.value.casefold())
+        for item in canonical_requirements
+        if item.public_provenance == "query_exact_term" and item.query_extraction_kind
     )
     return EvidenceRequirementSet(
         canonical_requirements,
         required_entities=entities,
         required_facets=facets,
+        query_extraction_provenance=tuple(extraction_provenance),
     )
 
 
@@ -1186,7 +1389,19 @@ def normalize_candidates(
             # hand the formatter a bundle that only fits as raw chunk text.
             token_estimate=(
                 _estimated_tokens(projected)
-                + (88 if result_kind == "patch_context" else 0)
+                if result_kind == "docs_answer"
+                else _estimated_tokens(projected) + 88
+            ),
+            fit_token_estimate=(
+                _docs_answer_candidate_tokens(
+                    stable_id=stable,
+                    path=path,
+                    section=section,
+                    projected=projected,
+                    version_binding=_version_binding(item),
+                )
+                if result_kind == "docs_answer"
+                else _estimated_tokens(projected) + 88
             ),
             reported_token_estimate=int(reported) if isinstance(reported, int) and not isinstance(reported, bool) else None,
             char_start=char_start, char_end=char_end, line_start=line_start, line_end=line_end,
@@ -1358,7 +1573,17 @@ def select_evidence(
     policy_requirements = _with_canonical_policy_requirements(requirements, eligible, config.result_kind)
     if policy_requirements != requirements.requirements:
         requirements = EvidenceRequirementSet(policy_requirements)
-    covered = [_with_coverage(candidate, requirements) for candidate in eligible]
+    covered = [
+        _with_coverage(
+            candidate,
+            requirements,
+            factual_only=(
+                config.profile == "project_docs_answer"
+                and not any(item.proof_role == "document_statement" for item in requirements)
+            ),
+        )
+        for candidate in eligible
+    ]
     mandatory_ids = {item.requirement_id for item in requirements if item.mandatory}
     ordered = sorted(covered, key=lambda candidate: (
         0 if candidate.covered_requirement_ids & mandatory_ids else 1,
@@ -1384,6 +1609,8 @@ def select_evidence(
     missing.update(f"stable_identity_collision:{value}" for value in identity_collisions)
     if config.result_kind == "docs_answer" and selected and all(item.navigation_only for item in selected):
         missing.add("factual_source_evidence")
+    if config.profile == "project_docs_answer" and not mandatory:
+        missing.add("project_answer_requirement")
     status: Literal["ok", "insufficient_evidence"] = (
         "ok" if selected and not missing and not conflicts else "insufficient_evidence"
     )
@@ -1392,6 +1619,7 @@ def select_evidence(
         *_candidate_preference(item),
     ))
     selected_tokens = sum(item.token_estimate for item in selected)
+    selected_fit_tokens = sum(item.fit_token_estimate for item in selected)
     metrics = {
         "candidate_count": len(raw_candidates),
         "eligible_count": len(eligible),
@@ -1403,6 +1631,11 @@ def select_evidence(
         "selected_tokens": selected_tokens,
         "wrapper_reserve_tokens": config.wrapper_reserve_tokens,
         "projected_total_tokens": selected_tokens + config.wrapper_reserve_tokens,
+        "serialized_projected_tokens": (
+            selected_fit_tokens + DOCS_SERIALIZATION_RESERVE_TOKENS
+            if config.result_kind == "docs_answer"
+            else selected_tokens + config.wrapper_reserve_tokens
+        ),
         "hard_tokens": config.hard_tokens,
         "mandatory_requirements": len(mandatory),
         "mandatory_covered": len(mandatory & set().union(*(
@@ -1438,7 +1671,7 @@ def select_evidence(
     ))
     assignments = tuple(
         EvidenceAssignment(
-            requirement_id=requirement_id,
+            requirement_id=requirement.requirement_id,
             evidence_id=candidate.stable_id,
             path=candidate.path_or_url,
             char_start=candidate.char_start,
@@ -1448,17 +1681,21 @@ def select_evidence(
             projected_content_hash=hashlib.sha256(
                 candidate.projected_text.encode("utf-8")
             ).hexdigest(),
-            proof_role=next(
-                item.proof_role for item in requirements if item.requirement_id == requirement_id
-            ),
-            qualifiers=(
-                next(item.qualifiers for item in requirements if item.requirement_id == requirement_id)
-                or _observed_qualifiers(candidate.projected_text)
-            ),
+            proof_role=requirement.proof_role,
+            qualifiers=requirement.qualifiers or _observed_qualifiers(candidate.projected_text),
         )
-        for requirement_id in sorted(mandatory)
-        for candidate in selected
-        if requirement_id in candidate.covered_requirement_ids
+        for requirement in sorted(
+            (item for item in requirements if item.requirement_id in mandatory),
+            key=lambda item: item.requirement_id,
+        )
+        for candidate in [next(
+            (
+                item for item in sorted(selected, key=lambda item: item.stable_id)
+                if requirement.requirement_id in item.covered_requirement_ids
+            ),
+            None,
+        )]
+        if candidate is not None
     )
     assigned_requirement_ids = {item.requirement_id for item in assignments}
     missing.update(mandatory - assigned_requirement_ids)
@@ -1741,6 +1978,80 @@ def _facet_requirement_matches(value: str, haystack: str) -> bool:
             and "result" in haystack
             and re.search(r"\b(?:obtain|get|retrieve|await)\b", haystack)
         )
+    if kind == "request_handling":
+        return any(
+            re.search(r"\brequest\b|\bзапрос", sentence)
+            and re.search(r"\b(?:handles?|process(?:es|ing)?|dispatch(?:es|ing)?|routes?|validates?|forwards?)\b", sentence)
+            and re.search(r"\b(?:handler|router|server|tool|transport|service|registry)\b", sentence)
+            for sentence in re.split(r"(?<=[.!?])\s+|\n+", haystack)
+        )
+    if kind == "architecture":
+        component_pattern = (
+            r"\b(?:server|handler|router|service|transport|registry|adapter|layer|module|"
+            r"ui|application|domain|infrastructure)\b"
+        )
+        relation_pattern = (
+            r"\b(?:routes?|dispatch(?:es)?|coordinates?|connects?|composes?|through|"
+            r"состоит|связывает)\b|->"
+        )
+        return any(
+            len(set(re.findall(component_pattern, sentence))) >= 2
+            and re.search(relation_pattern, sentence)
+            for sentence in re.split(r"(?<=[.!?])\s+|\n+", haystack)
+        )
+    if kind == "responsiveness":
+        return any(
+            re.search(r"\b(?:non[- ]blocking|asynchronous|async|does\s+not\s+block)\b", sentence)
+            and re.search(r"\b(?:worker|background|event\s+loop|queue|thread|task)\b", sentence)
+            for sentence in re.split(r"(?<=[.!?])\s+|\n+", haystack)
+        )
+    if kind in {"behavior", "usage", "workflow"}:
+        patterns = {
+            "behavior": r"\b(?:reports?|returns?|provides?|shows?|contains?|lists?|возвращает|показывает|сообщает|содержит|перечисляет)\b",
+            "usage": r"\b(?:use|used|call|called|when|should|использовать|используется|применять|применяется|когда)\b",
+            "workflow": r"\b(?:run|follow|then|after|before|retry|prepare|first|next|запустить|выполнить|затем|после|перед|повторить|сначала)\b",
+        }
+        for sentence in re.split(r"(?<=[.!?])\s+|\n+", haystack):
+            if not requirement_value_visible(detail, sentence):
+                continue
+            if re.search(
+                r"\b(?:does|do|did|is|are|was|were|should|must|can|could|would|will)\s+not\b"
+                r"|\b(?:never|cannot|can't|mustn't|shouldn't)\b"
+                r"|\b(?:не\s+следует|не\s+нужно|нельзя|никогда\s+не)\b",
+                sentence,
+            ):
+                continue
+            entity_pattern = re.escape(detail.casefold())
+            marker_pattern = patterns[kind]
+            if kind == "behavior":
+                relational_match = re.search(
+                    rf"{entity_pattern}(?:\W+\w+){{0,6}}?\W+{marker_pattern}", sentence,
+                )
+            else:
+                relational_match = re.search(
+                    rf"(?:{entity_pattern}(?:\W+\w+){{0,6}}?\W+{marker_pattern}"
+                    rf"|{marker_pattern}(?:\W+\w+){{0,6}}?\W+{entity_pattern})",
+                    sentence,
+                )
+            if kind == "workflow":
+                markers = re.findall(marker_pattern, sentence)
+                has_sequence = re.search(
+                    r"\b(?:then|after|before|first|next|затем|после|перед|сначала)\b",
+                    sentence,
+                )
+                relational_match = bool(relational_match and len(markers) >= 2 and has_sequence)
+            if relational_match:
+                return True
+        return False
+    if kind == "recall_mechanism":
+        return bool(re.search(r"\b(?:exact[- ]term|exact match|exact query)\b", haystack) and re.search(
+            r"\b(?:recall|retrieve|retrieval|match|lookup)\b", haystack,
+        ))
+    if kind == "authority_invariant":
+        return bool(re.search(r"\b(?:authority|scope)\b", haystack) and re.search(
+            r"\b(?:unchanged|preserv(?:e|es|ed)|without\s+(?:widening|expanding|broadening)|does\s+not\s+(?:widen|expand|broaden))\b",
+            haystack,
+        ))
     return False
 
 
@@ -1802,11 +2113,30 @@ def requirement_probe_query(requirement: EvidenceRequirement) -> str | None:
     return None
 
 
-def _with_coverage(candidate: EvidenceCandidate, requirements: Sequence[EvidenceRequirement]) -> EvidenceCandidate:
-    haystack = "\n".join([
+def _with_coverage(
+    candidate: EvidenceCandidate,
+    requirements: Sequence[EvidenceRequirement],
+    *,
+    factual_only: bool,
+) -> EvidenceCandidate:
+    # Paths, headings, and symbols aid retrieval but cannot prove a factual
+    # answer. Requirements must match model-visible source text.
+    haystack = candidate.display_text.casefold() if factual_only else "\n".join([
         candidate.display_text, candidate.path_or_url, candidate.section,
         " ".join(candidate.symbols), candidate.version_binding, candidate.resolved_version,
     ]).casefold()
+    stripped_display = candidate.display_text.strip()
+    display_words = re.findall(r"\w+", stripped_display, re.UNICODE)
+    incomplete_span = factual_only and bool(
+        len(stripped_display) <= 80
+        and "\n" not in stripped_display
+        and (
+            re.fullmatch(r"#{1,6}\s+\S.*", stripped_display) is not None
+            or
+            stripped_display.endswith(':')
+            or (len(display_words) <= 2 and not re.search(r"[.!?;]", stripped_display))
+        )
+    )
     source = _normalized_source(candidate.path_or_url)
     covered: set[str] = set()
     for requirement in requirements:
@@ -1836,6 +2166,8 @@ def _with_coverage(candidate: EvidenceCandidate, requirements: Sequence[Evidence
             matches = False
         else:
             matches = value in haystack
+        if matches and incomplete_span and requirement.kind not in {"evidence_path", "target_path"}:
+            matches = False
         if matches and requirement.proof_role == "document_statement":
             scoped_paths = {
                 _normalized_source(item.value)
@@ -2063,7 +2395,12 @@ def _reserve_and_select(
     mandatory: set[str],
     config: SelectionConfig,
 ) -> tuple[list[EvidenceCandidate], set[str], list[Omission]]:
-    available = max(1, config.hard_tokens - config.wrapper_reserve_tokens)
+    fit_reserve = (
+        DOCS_SERIALIZATION_RESERVE_TOKENS
+        if config.result_kind == "docs_answer"
+        else config.wrapper_reserve_tokens
+    )
+    available = max(1, config.hard_tokens - fit_reserve)
     selected: list[EvidenceCandidate] = []
     remaining = set(mandatory)
     pool = list(candidates)
@@ -2091,13 +2428,13 @@ def _reserve_and_select(
     remaining = mandatory - covered_after_repair
     selected_ids = {item.stable_id for item in selected}
     pool = [item for item in candidates if item.stable_id not in selected_ids]
-    if sum(item.token_estimate for item in selected) > available:
+    if sum(item.fit_token_estimate for item in selected) > available:
         remaining.add("mandatory_evidence_does_not_fit")
         for candidate in candidates:
             omissions.append(Omission(candidate.stable_id, "budget"))
         return [], remaining, omissions
 
-    spent = sum(item.token_estimate for item in selected)
+    spent = sum(item.fit_token_estimate for item in selected)
     selected_sources = {_normalized_source(item.source_identity) for item in selected}
     source_counts: dict[str, int] = {}
     for item in selected:
@@ -2142,11 +2479,11 @@ def _reserve_and_select(
         if utility_ratio < config.marginal_utility_threshold:
             omissions.append(Omission(best.stable_id, "zero_marginal_utility"))
             continue
-        if spent + best.token_estimate > available:
+        if spent + best.fit_token_estimate > available:
             omissions.append(Omission(best.stable_id, "budget"))
             continue
         selected.append(best)
-        spent += best.token_estimate
+        spent += best.fit_token_estimate
         selected_sources.add(source_key)
         source_counts[source_key] = source_counts.get(source_key, 0) + 1
         selected_terms = _selection_terms(selected)
@@ -2318,6 +2655,6 @@ def _count_reasons(omissions: Sequence[Omission]) -> dict[str, int]:
 __all__ = [
     "MAX_SELECTOR_CANDIDATES", "SELECTOR_SCHEMA_VERSION", "EvidenceCandidate",
     "EvidenceRequirement", "EvidenceRequirementSet", "Omission", "SelectionConfig", "SelectionDecision",
-    "build_requirements", "docs_selection_config", "library_docs_selection_config", "normalize_candidates",
+    "build_requirements", "docs_selection_config", "library_docs_selection_config", "project_docs_selection_config", "normalize_candidates",
     "patch_selection_config", "select_evidence", "validate_evidence_sufficiency",
 ]

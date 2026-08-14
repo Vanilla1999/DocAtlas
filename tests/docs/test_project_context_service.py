@@ -1,7 +1,12 @@
 from __future__ import annotations
 
+import hashlib
+
 from docmancer.docs.application.project_context_service import ProjectContextService, context_pack_snippet, project_context_metrics, project_context_pack, project_why_selected
-from docmancer.docs.domain.answer_completeness import evaluate_project_answer_completeness
+from docmancer.docs.domain.answer_completeness import (
+    derive_project_answer_completeness,
+    evaluate_project_answer_completeness,
+)
 from docmancer.docs.interfaces.mcp.project_tools import _compact_project_context
 from docmancer.docs.domain.project_query_intent import classify_project_query_intent
 from docmancer.docs.models import DependencyObservation, DocsChunk, DocsResult, ProjectDocsChunk, ProjectDocsResult, ProjectMetadata
@@ -28,7 +33,7 @@ class FakeProjectContextFacade:
             stale_before_refresh=False,
             warning=None,
             last_refreshed_at=None,
-            results=[DocsChunk(title="GoRouter", content="go_router content with enough words to be useful for dependency documentation context selection and stable regression testing across quality filters", source="https://pub.dev", url="https://pub.dev")],
+            results=[DocsChunk(title="GoRouter", content="Use go_router for routing; this dependency documentation contains enough words for stable context selection and quality filters.", source="https://pub.dev", url="https://pub.dev")],
             requested_version="14.8.1",
             resolved_version="14.8.1",
             version_source="lockfile_exact",
@@ -96,10 +101,19 @@ def test_project_context_budget_overflow_keeps_answer_when_retained_trusted_evid
         project_path="/repo",
         query="MCP boundary owns transport contracts",
         results=[
-            ProjectDocsChunk(
-                title="MCP boundary owns transport contracts",
-                heading_path="MCP boundary owns transport contracts",
-                content="The MCP boundary owns transport contracts and validates every public request and response.",
+                ProjectDocsChunk(
+                    title="MCP boundary owns transport contracts",
+                    heading_path="MCP boundary owns transport contracts",
+                    content="The MCP boundary owns transport contracts and validates every public request and response.",
+                    stable_chunk_id="boundary",
+                    parent_logical_id="parent:boundary",
+                    char_start=0,
+                    char_end=89,
+                    line_start=1,
+                    line_end=1,
+                    display_content_hash=hashlib.sha256(
+                        b"The MCP boundary owns transport contracts and validates every public request and response."
+                    ).hexdigest(),
                 source="/repo/docs/adr/0001-mcp-boundary-contracts.md", url=None,
                 path="docs/adr/0001-mcp-boundary-contracts.md", authority="source_of_truth",
                 metadata={"score": 1.0},
@@ -211,6 +225,31 @@ new_help_request_screen, ToastUtils, and routes.
     assert source_action["requires_confirmation"] is False
     assert source_action["repeat_docs_context"] is False
     assert "help_request_details_screen" in source_action["suggested_symbols"]
+
+
+def test_canonical_support_overrides_conflicting_legacy_recovery_fields():
+    from types import SimpleNamespace
+
+    result = derive_project_answer_completeness(
+        question='How do I implement "missing action"?',
+        context_pack=[{"content": "Architecture overview."}],
+        answer_available=True,
+        intent=SimpleNamespace(wants_code_symbols=False, broad=False),
+        support_decision=SimpleNamespace(
+            answer_supported=True,
+            mandatory_coverage=1.0,
+            mandatory_requirement_ids=("required",),
+        ),
+        assigned_requirement_ids=["required"],
+    )
+
+    completeness = result["answer_completeness"]
+    assert completeness["legacy_diagnostics"]["source_search_required"] is True
+    assert completeness["source_search_required"] is False
+    assert completeness["source_search_status"] == "not_required"
+    assert completeness["disposition"] == "answer"
+    assert completeness["edit_ready"] is True
+    assert result["recommended_next_actions"] == []
 
 
 def test_source_backed_completeness_marks_local_search_completed():
@@ -383,9 +422,18 @@ def test_russian_architecture_query_prefers_architecture_docs_over_feature_plans
                 url=None,
                 path="docs/EXTERNAL_OIDC_BROWSER_SELECTION_FIX_PLAN.md",
             ),
-            ProjectDocsChunk(
-                title="Architecture",
-                content="Project architecture overview: UI -> application -> domain -> infrastructure.",
+                ProjectDocsChunk(
+                    title="Architecture",
+                    content="Архитектура проекта: UI -> application -> domain -> infrastructure.",
+                    stable_chunk_id="architecture",
+                    parent_logical_id="parent:architecture",
+                    char_start=0,
+                    char_end=len("Архитектура проекта: UI -> application -> domain -> infrastructure."),
+                    line_start=1,
+                    line_end=1,
+                    display_content_hash=hashlib.sha256(
+                        "Архитектура проекта: UI -> application -> domain -> infrastructure.".encode()
+                    ).hexdigest(),
                 source="/repo/ARCHITECTURE.md",
                 url=None,
                 path="ARCHITECTURE.md",

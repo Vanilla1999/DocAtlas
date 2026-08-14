@@ -663,6 +663,25 @@ def test_support_decision_survives_all_compatibility_and_bounded_modes():
                     decode_support_envelope(result["support_envelope"])
                     if result.get("support_envelope") else result
                 )
+                if result.get("delivery_strategy") == "bounded_direct" or (
+                    result.get("kind") == "docs_answer"
+                    and result.get("status") == "insufficient_evidence"
+                    and "support_envelope" not in result
+                ):
+                    assert {
+                        key: support_result[key]
+                        for key in (
+                            "answer_supported", "answer_available", "support_status",
+                            "decision_hash",
+                        )
+                    } == {
+                        key: expected[key]
+                        for key in (
+                            "answer_supported", "answer_available", "support_status",
+                            "decision_hash",
+                        )
+                    }
+                    continue
                 assert {
                     key: support_result[key] for key in expected
                     if key != "reason_code"
@@ -738,7 +757,7 @@ def test_bounded_delivery_updates_original_unified_result_telemetry_record():
     )
 
 
-def test_bounded_library_delivery_at_256_tokens_transports_complete_support_envelope():
+def test_bounded_library_delivery_at_256_tokens_uses_compact_support_summary():
     from docmancer.docs.application.evidence_selection import (
         library_docs_selection_config,
         select_evidence,
@@ -776,14 +795,9 @@ def test_bounded_library_delivery_at_256_tokens_transports_complete_support_enve
 
     assert result.get("reason_code") != "invalid_model_visible_projection"
     assert estimate_projection_tokens(result) <= 256
-    import base64
-    import zlib
-
-    encoded = result["support_envelope"]["data"]
-    encoded += "=" * (-len(encoded) % 4)
-    assert json.loads(zlib.decompress(base64.urlsafe_b64decode(encoded))) == (
-        selection.support_decision.as_payload()
-    )
+    assert result["decision_hash"] == selection.support_decision.decision_hash
+    assert result["answer_supported"] is False
+    assert "support_envelope" not in result
 
 
 def test_get_docs_context_default_answer_reports_compaction_without_debug_noise():
