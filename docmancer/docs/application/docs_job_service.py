@@ -119,6 +119,17 @@ def project_job_diagnostic(job: DocsJob) -> dict[str, Any]:
         "reason_code": job.reason_code,
         "retryable": job.retryable,
         "failure_phase": job.failure_phase,
+        **{
+            key: value
+            for key, value in {
+                "queue_position": job.queue_position,
+                "running_jobs": job.running_jobs,
+                "queued_jobs": job.queued_jobs,
+                "max_running_jobs": job.max_running_jobs,
+                "max_queued_jobs": job.max_queued_jobs,
+            }.items()
+            if value is not None
+        },
         "page_failure_summary": job.page_failure_summary[:20],
         "counts": {
             "targets": {"total": job.total_targets, "completed": job.completed_targets, "failed": job.failed_targets},

@@ -1348,8 +1348,15 @@ class ProjectDocsService:
         agent = self._agent_instance()
         effective_limit = limit or agent.config.query.default_limit
         budget = tokens or DEFAULT_DOC_TOKENS
+        effective_expand = (expand or "none") if requirements is not None else expand
         retrieval = getattr(agent.config, "retrieval", None)
         mode = str(getattr(retrieval, "default_mode", "lexical") or "lexical").lower()
+        mandatory_values = tuple(
+            str(requirement.value)
+            for requirement in requirements or ()
+            if getattr(requirement, "mandatory", False)
+            and str(getattr(requirement, "value", "")).strip()
+        )
         gateway = getattr(self.facade, "agent_gateway", None)
         if gateway is not None:
             dispatcher = gateway.dispatcher_for(agent, mode=mode)
@@ -1358,7 +1365,7 @@ class ProjectDocsService:
                 mode=mode,
                 limit=effective_limit,
                 budget=budget,
-                expand=expand,
+                expand=effective_expand,
                 filters=filters,
                 requirements=requirements,
             ).chunks
@@ -1367,28 +1374,60 @@ class ProjectDocsService:
                 mode=mode,
                 limit=max(effective_limit, 20),
                 budget=budget,
-                expand=expand or "page",
+                expand=effective_expand or "page",
                 filters={**filters, "authority": "source_of_truth"},
                 requirements=requirements,
             ).chunks
+            requirement_chunks = [
+                chunk
+                for value in mandatory_values[:8]
+                for chunk in dispatcher.run(
+                    value,
+                    mode=mode,
+                    limit=4,
+                    budget=budget,
+                    expand="none",
+                    filters=filters,
+                    requirements=requirements,
+                ).chunks
+            ]
         else:
             # Lightweight facades used by embedders retain the legacy agent
             # contract.  The production service always owns an agent gateway.
             chunks = agent.query(
-                query, limit=effective_limit, budget=budget, expand=expand, filters=filters
+                query, limit=effective_limit, budget=budget, expand=effective_expand, filters=filters
             )
             authoritative_chunks = agent.query(
                 query,
                 limit=max(effective_limit, 20),
                 budget=budget,
-                expand=expand or "page",
+                expand=effective_expand or "page",
                 filters={**filters, "project_doc_authority": "source_of_truth"},
             )
+            requirement_chunks = [
+                chunk
+                for value in mandatory_values[:8]
+                for chunk in agent.query(
+                    value,
+                    limit=4,
+                    budget=budget,
+                    expand="none",
+                    filters=filters,
+                )
+            ]
 
+        candidates = [*requirement_chunks, *authoritative_chunks, *chunks]
+        if mandatory_values:
+            candidates.sort(
+                key=lambda chunk: -sum(
+                    value.casefold() in str(chunk.text or "").casefold()
+                    for value in mandatory_values
+                )
+            )
         selected = []
         seen: set[tuple[str, int]] = set()
         token_total = 0
-        for chunk in [*authoritative_chunks, *chunks]:
+        for chunk in candidates:
             key = (chunk.source, chunk.chunk_index)
             if key in seen:
                 continue
@@ -1692,7 +1731,7 @@ class ProjectDocsService:
                 metadata=chunk.metadata or {},
                 stable_chunk_id=(chunk.metadata or {}).get("stable_chunk_id"),
                 parent_logical_id=(chunk.metadata or {}).get("parent_logical_id"),
-                display_content_hash=(chunk.metadata or {}).get("display_content_hash") or (chunk.metadata or {}).get("content_hash"),
+                display_content_hash=hashlib.sha256(chunk.text.encode("utf-8")).hexdigest(),
                 char_start=((chunk.metadata or {}).get("char_span") or [None, None])[0],
                 char_end=((chunk.metadata or {}).get("char_span") or [None, None])[1],
                 line_start=((chunk.metadata or {}).get("line_span") or [None, None])[0],

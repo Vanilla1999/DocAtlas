@@ -422,7 +422,7 @@
     "tests/test_rate_limit.py": "6280b7af72382a6764a3be16be423e64a3bd33582e0bae398503c84be2574b91",
     "tests/test_redirect.py": "10abbe0784a927d701b431e4541dc9439f070702258485e92b7efaa5625df197",
     "tests/test_release_gate.py": "086ba3d764a6aedac511ad81ac7346ffcff486b95e3ce07c88172da8bb5ca714",
-    "tests/test_retrieval_features.py": "68b6cf7f15802e053cf666f915257150c2e8110005d2cd57379c44bb1f9be70e",
+    "tests/test_retrieval_features.py": "c16fa782abf9040c6de5dc324cc38fbedf9391a1af78274b915435aa6955b60c",
     "tests/test_retrieval_fusion.py": "21f3c0308ee42cc7a50eb15e09c87823e07b0539cf8c6ebd077383a2cce56869",
     "tests/test_retrieval_quality_baseline.py": "c3dcea90a994ae0d622858c0f9acb386374657291d03de3f5dbe1da9cba514d0",
     "tests/test_robots.py": "82837571d6c399544cb5543a69c77e4f41a43707442afd8fe1836f63779e09c9",

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import signal
 from datetime import datetime, timezone
@@ -210,6 +211,12 @@ def test_task33_host_evidence_augments_project_docs_with_deterministic_local_evi
         "answer_completeness": {"status": "complete", "source_search_required": False},
         "lanes": {"project": {"status": "success"}},
         "context_pack": [{
+            "stable_chunk_id": "fixture-readme",
+            "parent_logical_id": "fixture-readme-parent",
+            "display_content_hash": hashlib.sha256(
+                b"Browser permission gate and offline sync overview."
+            ).hexdigest(),
+            "display_text": "Browser permission gate and offline sync overview.",
             "path": "README.md",
             "source_class": "project_doc",
             "content": "Browser permission gate and offline sync overview.",

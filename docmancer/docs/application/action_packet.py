@@ -320,7 +320,9 @@ def build_action_packet(
     )
     selection_budget_critical_facts = 0
     budget_omission_ids = {
-        omission.stable_id for omission in selection.omissions if omission.reason_code == "budget"
+        omission.stable_id
+        for omission in selection.omissions
+        if omission.reason_code in {"budget", "zero_marginal_utility"}
     }
     if budget_omission_ids:
         selection_budget_critical_facts = sum(
@@ -482,6 +484,7 @@ def build_action_packet(
         ("risky_document_items", risky_content_omissions),
         ("risky_critical_source_facts", risky_critical_omissions),
         ("untrusted_validation_commands", untrusted_validation_omissions),
+        ("critical_source_facts", selection_budget_critical_facts),
         ("required_invariants", selection_budget_critical_facts),
     ):
         if count:
@@ -489,7 +492,13 @@ def build_action_packet(
             if packet["status"] == "ok":
                 packet["status"] = "truncated"
 
-    if critical_fact_omissions or filtered_critical_facts or rejected_critical_facts or risky_critical_omissions:
+    if (
+        critical_fact_omissions
+        or filtered_critical_facts
+        or rejected_critical_facts
+        or risky_critical_omissions
+        or selection_budget_critical_facts
+    ):
         packet["status"] = "insufficient_evidence"
         packet["missing_evidence"].append(
             "At least one critical canonical fact was filtered, rejected, risky, or too large to include safely."
@@ -1838,10 +1847,35 @@ def _ensure_post_fit_status(
 
 
 def _compact_failure_packet(packet: dict[str, Any], budget: int) -> None:
-    omitted_total = sum(
-        int(value) for value in packet.get("omitted_counts", {}).values()
-        if isinstance(value, int) and not isinstance(value, bool)
+    original_omissions = {
+        str(key): int(value)
+        for key, value in packet.get("omitted_counts", {}).items()
+        if isinstance(key, str)
+        and key
+        and isinstance(value, int)
+        and not isinstance(value, bool)
+        and value > 0
+    }
+    omitted_total = sum(original_omissions.values())
+
+    required_invariants_omitted = (
+        original_omissions.get("required_invariants", 0)
+        + original_omissions.get("mandatory_requirements", 0)
     )
+    compact_omissions: dict[str, int] = {}
+    if required_invariants_omitted:
+        compact_omissions["required_invariants"] = (
+            required_invariants_omitted
+        )
+
+    residual = max(0, omitted_total - required_invariants_omitted)
+    if residual > 0:
+        compact_omissions["packet_items"] = residual
+    if not compact_omissions:
+        compact_omissions = {
+            "packet_items": max(1, omitted_total)
+        }
+
     contract_reason = "Source-backed behavioral contract is required before editing."
     failure_reason = (
         contract_reason
@@ -1858,7 +1892,7 @@ def _compact_failure_packet(packet: dict[str, Any], budget: int) -> None:
         "validation": {"compile": [], "tests": [], "semantic_checks": []},
         "uncertainties": [],
         "missing_evidence": [failure_reason],
-        "omitted_counts": {"packet_items": max(1, omitted_total)},
+        "omitted_counts": compact_omissions,
     })
     objective = str(packet["task_interpretation"].get("objective") or "task")
     packet["task_interpretation"]["objective"] = objective[:64] or "task"

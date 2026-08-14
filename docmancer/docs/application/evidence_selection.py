@@ -184,8 +184,27 @@ def _projected_text(item: Mapping[str, Any], display_text: str, result_kind: str
     snippet = _text(item.get("snippet"))
     fact_material = str(item.get("content") or display_text)
     fact_lines = [line.strip() for line in fact_material.splitlines() if _PATCH_FACT_RE.search(line)]
+    identity_terms = list(dict.fromkeys(
+        match.group(0)
+        for line in fact_material.splitlines()
+        for match in re.finditer(
+            r"(?:[A-Za-z0-9_.-]+[\\/])+[A-Za-z0-9_.-]+"
+            r"|\b[A-Za-z][A-Za-z0-9]*_[A-Za-z0-9_]+\b",
+            line,
+        )
+    ))[:32]
     symbols = " ".join(_symbols(item))
-    parts = [part for part in [snippet, *fact_lines, symbols, _source_path(item)] if part]
+    parts = [
+        part
+        for part in [
+            snippet,
+            *fact_lines,
+            *identity_terms,
+            symbols,
+            _source_path(item),
+        ]
+        if part
+    ]
     return "\n".join(dict.fromkeys(parts)) or display_text
 
 
@@ -1079,9 +1098,23 @@ def normalize_candidates(
         )
         stable = child_stable or str(item.get("stable_id") or "")
         identity_kind = "stable_child" if child_stable else "legacy"
-        indexed_project_doc = str(item.get("source_class") or "") in {
+        source_class = str(item.get("source_class") or "")
+        scoped_host_policy = (
+            path.startswith("host-policy://")
+            and bool(
+                item.get("scope_verified")
+                or metadata.get("scope_verified")
+            )
+            and str(
+                item.get("repository_authority") or ""
+            ).strip().casefold() == "explicit_agent_policy"
+            and str(
+                item.get("instruction_trust") or ""
+            ).strip().casefold() == "scoped_agent_policy"
+        )
+        indexed_project_doc = source_class in {
             "project_doc", "project_file"
-        } and bool(item.get("metadata"))
+        } and bool(metadata) and not scoped_host_policy
         if indexed_project_doc and not child_stable:
             omissions.append(Omission(f"invalid:{rank}", "invalid_identity"))
             continue

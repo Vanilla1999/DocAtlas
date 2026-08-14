@@ -314,6 +314,10 @@ def test_task33c_three_lane_plan_and_flags_are_frozen(tmp_path):
     ]
     evidence = [
         {
+            "stable_chunk_id": "task33-" + hashlib.sha256(path.encode()).hexdigest()[:40],
+            "parent_logical_id": "task33-parent-" + hashlib.sha256(path.encode()).hexdigest()[:32],
+            "display_content_hash": hashlib.sha256(b"Task33 source evidence.").hexdigest(),
+            "display_text": "Task33 source evidence.",
             "path": path,
             "heading_path": "Task33 contract",
             "authority": "canonical",

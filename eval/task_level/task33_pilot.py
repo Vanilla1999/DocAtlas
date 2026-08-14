@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import math
 from pathlib import Path
@@ -39,7 +40,14 @@ TASK33C_AGENT_TURN_LIMIT = 12
 
 
 def build_task33c_validation_evidence(test_command: str) -> dict[str, Any]:
+    content = f"Run {test_command}"
     return {
+        "stable_chunk_id": "task33-validation-" + hashlib.sha256(
+            content.encode("utf-8")
+        ).hexdigest()[:32],
+        "parent_logical_id": "task33-validation-policy",
+        "display_content_hash": hashlib.sha256(content.encode("utf-8")).hexdigest(),
+        "display_text": content,
         "path": "host-policy://task33c/validation",
         "heading_path": "Public validation",
         "authority": "canonical",
@@ -47,7 +55,7 @@ def build_task33c_validation_evidence(test_command: str) -> dict[str, Any]:
         "instruction_trust": "scoped_agent_policy",
         "scope_verified": True,
         "source_class": "project_doc",
-        "content": f"Run {test_command}",
+        "content": content,
         "metadata": {
             "acceptance_conditions": [
                 "Sync flow must call evaluateFlowEntry with allowOfflineFallback: false."

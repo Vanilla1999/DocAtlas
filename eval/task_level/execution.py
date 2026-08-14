@@ -2154,6 +2154,14 @@ def _augment_task33_host_context(
             module_path=candidate.module_path,
         )
         item = {
+            "stable_chunk_id": "local-doc-" + hashlib.sha256(
+                f"{relative}\0{content}".encode("utf-8")
+            ).hexdigest()[:40],
+            "parent_logical_id": "local-parent-" + hashlib.sha256(
+                relative.encode("utf-8")
+            ).hexdigest()[:40],
+            "display_content_hash": hashlib.sha256(content.encode("utf-8")).hexdigest(),
+            "display_text": content,
             "source_class": "project_doc",
             "source_type": taxonomy["source_type"],
             "source_kind": taxonomy["source_kind"],
@@ -2361,7 +2369,10 @@ def build_bounded_direct_packet(
         max_tokens=2_000,
         project_path=str(workspace),
         retrieval_issues=evidence.retrieval_issues,
-        required_evidence_paths=TASK33C_REQUIRED_EVIDENCE_PATHS,
+        required_evidence_paths=(
+            *TASK33C_REQUIRED_EVIDENCE_PATHS,
+            "host-policy://task33c/validation",
+        ),
         required_target_paths=TASK33C_REQUIRED_TARGET_PATHS,
         behavioral_contract_required=True,
     )

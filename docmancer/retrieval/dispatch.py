@@ -975,13 +975,15 @@ class RetrievalDispatcher:
         query_terms = _query_api_terms(query)
         if not query_terms:
             return chunks
-        try:
-            supplemental = self.store.query(
-                " ".join(sorted(query_terms)), limit=10, budget=budget,
-                expand=expand, filters=backend_filters,
-            )
-        except Exception:
-            return chunks
+        supplemental: list[Any] = []
+        for term in sorted(query_terms)[:8]:
+            try:
+                supplemental.extend(self.store.query(
+                    term, limit=4, budget=budget,
+                    expand=expand, filters=backend_filters,
+                ))
+            except Exception:
+                continue
         supplemental = self._filter_chunks(supplemental, verification_filters)
         for rank, chunk in enumerate(supplemental, start=1):
             metadata = getattr(chunk, "metadata", None)

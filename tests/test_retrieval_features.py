@@ -1,6 +1,8 @@
 """Hierarchical retrieval, query routing, and hybrid neighbor expansion."""
 from __future__ import annotations
 
+import hashlib
+
 import pytest
 
 from docmancer.core.config import (
@@ -12,7 +14,10 @@ from docmancer.core.config import (
 from docmancer.core.models import Document, RetrievedChunk
 from docmancer.core.sqlite_store import SQLiteStore
 from docmancer.embeddings.base import SparseEmbeddings
-from docmancer.retrieval.dispatch import HybridRetrievalError, RetrievalDispatcher
+from docmancer.retrieval.dispatch import (
+    HybridRetrievalError,
+    RetrievalDispatcher as _RetrievalDispatcher,
+)
 from docmancer.stores.base import VectorHit
 
 
@@ -23,9 +28,18 @@ class FakeVectorStore:
     expose ``document_title_hash`` for hierarchical retrieval.
     """
 
-    def __init__(self, hits_by_filter):
+    def __init__(
+        self,
+        hits_by_filter,
+        *,
+        contract="ready",
+        count_override=None,
+    ):
         self._hits_by_filter = hits_by_filter
         self.calls: list[dict] = []
+        self.contract = contract
+        self.count_override = count_override
+        self._bound_count: int | None = None
 
     def ensure_collection(self, *args, **kwargs):
         return None
@@ -34,7 +48,53 @@ class FakeVectorStore:
         return {"provider": "fake", "model": "fake", "dim": 4, "sparse_model": "fake-sparse"}
 
     def count(self, collection):
-        return 1
+        if self.count_override is not None:
+            return self.count_override
+        return self._bound_count if self._bound_count is not None else 1
+
+    def backend_identity(self):
+        return "fake-vector-store:v1"
+
+    def health_check(self):
+        return True
+
+    def generation_contract(self, store):
+        generation = store.generation_info()
+        if generation is None:
+            return None
+
+        info = dict(generation)
+        rows = store.list_sections_for_embedding()
+        expected_ids = {
+            str(row["vector_id"])
+            for row in rows
+        }
+        self._bound_count = len(expected_ids)
+
+        if self.contract == "legacy":
+            return info
+
+        backend_identity = self.backend_identity()
+        info["vector_backend_identity"] = backend_identity
+
+        if self.contract == "identity_only":
+            return info
+
+        collection = str(info["vector_collection"])
+        digest = hashlib.sha256(
+            "\n".join(sorted(expected_ids)).encode("utf-8")
+        ).hexdigest()
+
+        info.update({
+            "vector_parity_schema": "vector-parity-v1",
+            "vector_parity_digest": digest,
+            "vector_parity_count": len(expected_ids),
+            "vector_parity_backend": "fake",
+            "vector_parity_backend_identity": backend_identity,
+            "vector_parity_collection": collection,
+            "vector_parity_verified_at": "2026-01-01T00:00:00+00:00",
+        })
+        return info
 
     def point_ids(self, collection):
         return {"wrong-id"}
@@ -49,16 +109,10 @@ class DenseOnlyVectorStore(FakeVectorStore):
     def collection_metadata(self, collection):
         return {"provider": "fake", "model": "fake", "dim": 4, "sparse_model": None}
 
-    def count(self, collection):
-        return 1
-
 
 class FailingVectorStore(FakeVectorStore):
     def __init__(self):
         super().__init__({})
-
-    def count(self, collection):
-        return 1
 
     def search(self, collection, query_vector, *, limit, filters=None, sparse_vector=None, mode="dense"):
         raise ValueError("Vector dimension error: expected dim: 768, got 384")
@@ -66,10 +120,7 @@ class FailingVectorStore(FakeVectorStore):
 
 class EmptyVectorStore(FakeVectorStore):
     def __init__(self):
-        super().__init__({})
-
-    def count(self, collection):
-        return 0
+        super().__init__({}, count_override=0)
 
 
 class MismatchedVectorStore(FakeVectorStore):
@@ -135,6 +186,52 @@ def _populate(store, docs):
         for title, src, content in docs
     ]
     store.add_documents(documents, recreate=True)
+
+
+class _GenerationInfoView:
+    """Read-side view of a successfully published generation contract."""
+
+    def __init__(self, store, generation_info):
+        self._store = store
+        self._generation_info = dict(generation_info)
+
+    def generation_info(self):
+        return dict(self._generation_info)
+
+    def __getattr__(self, name):
+        return getattr(self._store, name)
+
+
+class RetrievalDispatcher(_RetrievalDispatcher):
+    """Make legacy dispatcher fixtures explicit about publication readiness."""
+
+    def __init__(
+        self,
+        *,
+        store,
+        config,
+        vector_store=None,
+        provider=None,
+        collection=None,
+    ):
+        if isinstance(vector_store, FakeVectorStore):
+            generation_info = vector_store.generation_contract(store)
+            if generation_info is not None:
+                active_collection = str(
+                    generation_info.get("vector_collection") or ""
+                )
+                # Historical positive fixtures used "c" as a placeholder.
+                # Deliberate stale/wrong collections must remain untouched.
+                if collection == "c":
+                    collection = active_collection
+                store = _GenerationInfoView(store, generation_info)
+        super().__init__(
+            store=store,
+            config=config,
+            vector_store=vector_store,
+            provider=provider,
+            collection=collection,
+        )
 
 
 # ---------------- query router ----------------
@@ -255,7 +352,10 @@ def test_dense_zero_hits_stays_empty_in_strict_mode(tmp_path):
 
 def test_empty_vector_collection_is_hard_error(tmp_path):
     config, store = _agent(tmp_path)
-    _populate(store, [("Doc", "doc", "# Doc\n\nalpha.\n")])
+    store.add_documents([Document(
+        source="doc", content="# Doc\n\nalpha.\n",
+        metadata={"chunking_schema": "parent-child-v1"},
+    )], recreate=True)
     dispatcher = RetrievalDispatcher(
         store=store,
         config=config,
@@ -263,8 +363,9 @@ def test_empty_vector_collection_is_hard_error(tmp_path):
         provider=FakeProvider(),
         collection="c",
     )
-    with pytest.raises(HybridRetrievalError, match="empty_collection:no_indexed_vectors"):
+    with pytest.raises(HybridRetrievalError, match="count_mismatch"):
         dispatcher.run("alpha", mode="hybrid", limit=1)
+    assert dispatcher.vector_store.calls == []
 
 
 def test_vector_collection_requires_exact_active_generation_parity(tmp_path):
@@ -280,29 +381,30 @@ def test_vector_collection_requires_exact_active_generation_parity(tmp_path):
     store.add_documents(documents, recreate=True)
     collection = str(store.generation_info()["vector_collection"])
     dispatcher = RetrievalDispatcher(
-        store=store, config=config, vector_store=FakeVectorStore({}),
+        store=store, config=config,
+        vector_store=FakeVectorStore({}, contract="identity_only"),
         provider=FakeProvider(), collection=collection,
     )
 
-    with pytest.raises(HybridRetrievalError, match="identity_parity_mismatch"):
+    with pytest.raises(HybridRetrievalError, match="unverified_parity_witness"):
         dispatcher.run("alpha", mode="dense", limit=1)
 
 
-def test_equal_count_wrong_vector_ids_fail_strict_readiness(tmp_path):
+def test_equal_count_without_persisted_witness_fails_strict_readiness(tmp_path):
     config, store = _agent(tmp_path)
     store.add_documents([Document(
         source="doc.md", content="# Doc\n\nalpha.\n",
         metadata={"format": "markdown", "chunking_schema": "parent-child-v1"},
     )], recreate=True)
     collection = str(store.generation_info()["vector_collection"])
-    vectors = FakeVectorStore({})
+    vectors = FakeVectorStore({}, contract="identity_only")
     assert vectors.count(collection) == len(store.list_sections_for_embedding())
     dispatcher = RetrievalDispatcher(
         store=store, config=config, vector_store=vectors,
         provider=FakeProvider(), collection=collection,
     )
 
-    with pytest.raises(HybridRetrievalError, match="identity_parity_mismatch"):
+    with pytest.raises(HybridRetrievalError, match="unverified_parity_witness"):
         dispatcher.run("alpha", mode="dense", limit=1)
     assert vectors.calls == []
 
