@@ -25,6 +25,7 @@ from docmancer.docs.domain.mutation_intent import (
     build_mutation_intent,
     evaluate_mutation_readiness,
     resolve_mutation_targets,
+    with_explicit_path_targets,
 )
 
 
@@ -272,6 +273,13 @@ def build_action_packet(
     )
     mutation_intent = mutation_intent_contract or build_mutation_intent(question)
     required_evidence_paths = tuple(required_evidence_paths)
+    required_target_paths = tuple(required_target_paths)
+    if mutation_intent_contract is None and required_target_paths:
+        mutation_intent = with_explicit_path_targets(
+            mutation_intent,
+            required_target_paths,
+            provenance="explicit_required_target",
+        )
     requested_path_targets = tuple(
         target.value
         for target in mutation_intent.requested_targets

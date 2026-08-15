@@ -18,7 +18,6 @@ from docmancer.retrieval.contracts import (
 
 
 _AUTHORITIES = {
-    "canonical",
     "official",
     "project_owned",
     "verified",
@@ -33,6 +32,11 @@ _AUTHORITIES = {
     "source_of_truth",
     "supporting",
 }
+# Canonical is a valid typed filter authority, but intentionally remains out of
+# the model-visible context prefix.  Adding `Authority: canonical` to every
+# canonical document changes FTS token statistics and breaks the frozen Task 41
+# candidate trace without improving evidence semantics.
+_FILTER_AUTHORITIES = _AUTHORITIES | {"canonical"}
 _SYMBOL_PATTERNS = (
     re.compile(r"(?<![\w.-])--[a-zA-Z][a-zA-Z0-9-]{1,118}"),
     re.compile(r"\b[A-Z][A-Z0-9_]{2,119}\b"),
@@ -194,7 +198,7 @@ def normalized_filter_metadata(metadata: Mapping[str, Any]) -> dict[str, str | i
         or metadata.get("project_doc_authority")
         or "unknown"
     ).casefold().replace("-", "_")
-    if authority not in _AUTHORITIES:
+    if authority not in _FILTER_AUTHORITIES:
         authority = "unknown"
     resolved_version = _single_line(metadata.get("resolved_version"))
     if resolved_version.casefold() == "latest":

@@ -212,6 +212,60 @@ def build_mutation_intent(question: str) -> MutationIntentContract:
     )
 
 
+def with_explicit_path_targets(
+    contract: MutationIntentContract,
+    paths: Iterable[str],
+    *,
+    provenance: str = "explicit_task_contract",
+) -> MutationIntentContract:
+    """Bind caller-declared target paths without pretending they came from query text.
+
+    Public MCP ingress normally supplies a complete mutation contract built once
+    from the user request.  Direct/internal callers (for example frozen task
+    evaluation contracts) may instead provide explicit ``required_target_paths``.
+    Those paths are legitimate requested targets only when their provenance is
+    retained; they must never be reconstructed from retrieved documentation.
+    """
+
+    existing = {item.value.casefold() for item in contract.requested_targets}
+    requested = list(contract.requested_targets)
+    for raw in paths:
+        value = _normal_path(str(raw or "").strip())
+        if not value or value.casefold() in existing:
+            continue
+        requested.append(RequestedTarget(
+            value=value,
+            kind="path",
+            query_span_start=-1,
+            query_span_end=-1,
+            provenance=provenance,
+        ))
+        existing.add(value.casefold())
+        if len(requested) >= MAX_MUTATION_TARGETS:
+            break
+    if tuple(requested) == contract.requested_targets:
+        return contract
+    path_targets = tuple(item.value for item in requested if item.kind == "path")
+    artifact = contract.artifact_kind
+    if artifact == "unknown":
+        inferred = {_artifact_for_target(value) for value in path_targets} - {"unknown"}
+        if len(inferred) == 1:
+            artifact = next(iter(inferred))
+    destination = contract.destination
+    if contract.operation == "rename" and not destination and len(path_targets) >= 2:
+        destination = path_targets[-1]
+    elif contract.operation == "create" and not destination and path_targets:
+        destination = path_targets[-1]
+    return MutationIntentContract(
+        operation=contract.operation,
+        artifact_kind=artifact,
+        requested_targets=tuple(requested),
+        resolved_targets=contract.resolved_targets,
+        destination=destination,
+        acceptance_conditions=contract.acceptance_conditions,
+    )
+
+
 def resolve_mutation_targets(
     contract: MutationIntentContract,
     evidence_items: Iterable[Mapping[str, Any]],
@@ -359,4 +413,5 @@ __all__ = [
     "ArtifactKind", "MUTATION_INTENT_SCHEMA", "MutationIntentContract",
     "MutationOperation", "MutationReadiness", "RequestedTarget", "ResolvedTarget",
     "build_mutation_intent", "evaluate_mutation_readiness", "resolve_mutation_targets",
+    "with_explicit_path_targets",
 ]
