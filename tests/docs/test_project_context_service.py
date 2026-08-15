@@ -141,7 +141,7 @@ def test_project_context_budget_overflow_keeps_answer_when_retained_trusted_evid
     assert result.diagnostics["retrieval_routing"]["stages"]["project_docs"]["status"] == "insufficient"
     assert result.answer_completeness["missing_terms"] == []
     assert result.answer_available is True
-    assert result.reason == "trusted_context_available"
+    assert result.reason == "typed_evidence_contract_satisfied"
 
 
 def test_project_context_budget_overflow_stays_fail_closed_when_required_evidence_is_dropped(monkeypatch):
@@ -445,7 +445,7 @@ def test_russian_architecture_query_prefers_architecture_docs_over_feature_plans
 
     assert result.diagnostics["query_intent"] == "architecture"
     assert result.context_pack[0]["path"] == "ARCHITECTURE.md"
-    assert result.diagnostics["trust_decision"]["reason"] == "trusted_context_available"
+    assert result.diagnostics["trust_decision"]["reason"] == "typed_evidence_contract_satisfied"
     assert result.diagnostics["trust_decision"]["query_terms_missing"] == []
 
 

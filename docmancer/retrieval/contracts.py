@@ -129,6 +129,9 @@ class FilterSpec:
     minimum_authority: str | None = None
     module_ids: tuple[str, ...] = ()
     doc_scopes: tuple[str, ...] = ()
+    lifecycle_statuses: tuple[str, ...] = ()
+    temporal_relevance: tuple[str, ...] = ()
+    index_freshness: tuple[str, ...] = ()
     exact_snapshot_required: bool = False
     forbidden_sources: tuple[str, ...] = ()
 

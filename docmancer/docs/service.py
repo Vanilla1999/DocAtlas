@@ -22,6 +22,7 @@ from docmancer.docs.application.patch_constraints_service import PatchConstraint
 from docmancer.docs.application.unified_context_service import UnifiedDocsContextService
 from docmancer.docs.patch_plan_context import PatchPlanContextService
 from docmancer.docs.domain.policies import is_stale
+from docmancer.docs.domain.project_path_validation import validate_project_path
 from docmancer.docs.domain.target_security import host_allowed, is_remote_url, path_allowed, url_security_error
 from docmancer.docs.domain.trust_contract import build_project_context_trust_contract
 from docmancer.docs.infrastructure.agent_index_gateway import AgentIndexGateway
@@ -89,41 +90,68 @@ class LibraryDocsService:
         return self.agent_gateway.agent_instance(record)
 
     def active_index_diagnostics(self, project_path: str | None = None) -> dict[str, Any]:
-        root = Path(project_path).expanduser().resolve() if project_path else None
+        root = validate_project_path(project_path).path if project_path else None
         db_path = Path(self.config.index.db_path).expanduser().resolve()
+        db_exists = db_path.exists()
         extracted_dir = (
             str(Path(self.config.index.extracted_dir).expanduser().resolve())
             if self.config.index.extracted_dir
             else None
         )
         diagnostic_warnings: list[dict[str, Any]] = []
-        index_counts = {"sources": 0, "sections": 0}
-        try:
-            stats = self._agent_instance().store.collection_stats()
-            index_counts = {
-                "sources": int(stats.get("sources_count") or 0),
-                "sections": int(stats.get("sections_count") or stats.get("points_count") or 0),
-            }
-            extracted_dir = stats.get("extracted_dir") or extracted_dir
-        except Exception as exc:
-            from docmancer.docs.application.library_refresh_policy import bounded_exception_diagnostics
-            safe = bounded_exception_diagnostics(exc, failure_phase="diagnostics", failure_operation="active_index_stats")
-            diagnostic_warnings.append({
-                "code": "index_stats_unavailable",
-                "blocking": False,
-                "message": safe["exception_message"],
-            })
+        shared_index_counts = {"sources": 0, "sections": 0}
+        project_index_counts = {"sources": 0, "sections": 0}
+        index_ownership = "absent" if not db_exists else "shared_only"
+        agent = None
 
+        # Read-only diagnostics must not instantiate SQLite merely to report an
+        # absent index.  Agent/store construction is allowed only after the
+        # configured DB has been proven to exist.
+        if db_exists:
+            try:
+                agent = self._agent_instance()
+                stats = agent.store.collection_stats()
+                shared_index_counts = {
+                    "sources": int(stats.get("sources_count") or 0),
+                    "sections": int(stats.get("sections_count") or stats.get("points_count") or 0),
+                }
+                extracted_dir = stats.get("extracted_dir") or extracted_dir
+                if root and hasattr(agent.store, "project_scope_stats"):
+                    scoped = agent.store.project_scope_stats(project_path=str(root))
+                    project_index_counts = {
+                        "sources": int(scoped.get("sources_count") or 0),
+                        "sections": int(scoped.get("sections_count") or 0),
+                    }
+                    index_ownership = str(scoped.get("ownership") or "no_project_rows")
+                elif root:
+                    index_ownership = "scope_unknown"
+                else:
+                    index_ownership = "shared_service"
+            except Exception as exc:
+                from docmancer.docs.application.library_refresh_policy import bounded_exception_diagnostics
+                safe = bounded_exception_diagnostics(exc, failure_phase="diagnostics", failure_operation="active_index_stats")
+                diagnostic_warnings.append({
+                    "code": "index_stats_unavailable",
+                    "blocking": False,
+                    "message": safe["exception_message"],
+                })
+                index_ownership = "unavailable"
+
+        index_counts = project_index_counts if root else shared_index_counts
         diagnostics: dict[str, Any] = {
             "project_path": str(root) if root else None,
             "db_path": str(db_path),
-            "db_exists": db_path.exists(),
+            "db_exists": db_exists,
+            "index_state": "available" if db_exists else "absent",
+            "index_ownership": index_ownership,
             "extracted_dir": extracted_dir,
             "config_source": self.config_source,
             "config_path": self.config_path,
             "retrieval_mode": self.config.retrieval.default_mode,
             "docmancer_home": os.environ.get("DOCMANCER_HOME"),
             "index_counts": index_counts,
+            "project_index_counts": project_index_counts if root else None,
+            "shared_index_counts": shared_index_counts,
             "warnings": diagnostic_warnings,
         }
         retrieval_mode = str(self.config.retrieval.default_mode or "lexical").lower()
@@ -131,10 +159,17 @@ class LibraryDocsService:
             diagnostics["vector_readiness"] = {
                 "status": "not_required", "mode": "lexical"
             }
+        elif not db_exists:
+            diagnostics["vector_readiness"] = {
+                "status": "not_ready",
+                "mode": retrieval_mode,
+                "reason_code": "index_absent",
+            }
         else:
             try:
+                agent = agent or self._agent_instance()
                 dispatcher = self.agent_gateway.dispatcher_for(
-                    self._agent_instance(), mode=retrieval_mode
+                    agent, mode=retrieval_mode
                 )
                 diagnostics["vector_readiness"] = dispatcher.vector_readiness(
                     retrieval_mode
@@ -143,7 +178,8 @@ class LibraryDocsService:
                 diagnostics["vector_readiness"] = {
                     "status": "not_ready",
                     "mode": retrieval_mode,
-                    "reason_code": f"runtime_unavailable:{type(exc).__name__}",
+                    "reason_code": "vector_readiness_unavailable",
+                    "error_type": type(exc).__name__,
                 }
 
         if root:
@@ -161,13 +197,18 @@ class LibraryDocsService:
                         diagnostic_warnings.append({
                             "code": "project_local_config_shadowed",
                             "blocking": False,
-                            "message": "A repo-local docmancer.yaml exists, but this service is using a different active SQLite index path.",
+                            "message": (
+                                "A repo-local docmancer.yaml exists, but this service is using "
+                                "a different active SQLite index path."
+                            ),
                             "active_db_path": str(db_path),
                             "project_config_db_path": str(project_db_path),
                         })
                 except Exception as exc:
                     from docmancer.docs.application.library_refresh_policy import bounded_exception_diagnostics
-                    safe = bounded_exception_diagnostics(exc, failure_phase="configuration", failure_operation="project_config_parse")
+                    safe = bounded_exception_diagnostics(
+                        exc, failure_phase="configuration", failure_operation="project_config_parse"
+                    )
                     diagnostic_warnings.append({
                         "code": "project_local_config_unreadable",
                         "blocking": False,

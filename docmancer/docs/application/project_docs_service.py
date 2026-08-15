@@ -17,8 +17,16 @@ import httpx
 import yaml
 
 from docmancer.core.config import DocmancerConfig
+from docmancer.docs.application.evidence_selection import requirement_probe_query
+from docmancer.docs.domain.lifecycle_policy import (
+    lifecycle_allows,
+    lifecycle_filters_for_intent,
+    lifecycle_intent,
+    temporal_relevance_for_status,
+)
 from docmancer.docs.domain.policies import docs_policy, is_stale
-from docmancer.docs.domain.project_doc_ranking import normalize_doc_path, query_requests_history
+from docmancer.docs.domain.project_path_validation import validate_project_path
+from docmancer.docs.domain.project_doc_ranking import normalize_doc_path
 from docmancer.docs.domain.project_state import create_project_docs_next_action, has_high_level_project_overview, partition_project_doc_state, project_docs_structured_next_action
 from docmancer.docs.domain.source_identity import docs_exactness, docs_identity, docs_request
 from docmancer.docs.domain.target_security import host_allowed, is_remote_url, path_allowed, url_security_error
@@ -417,9 +425,9 @@ class ProjectDocsService:
         }
 
     def inspect_project_docs(self, project_path: str) -> ProjectDocsInspectResult:
+        root = validate_project_path(project_path).path
         if hasattr(self.facade, "_project_inspect_project_docs_impl"):
-            return self.facade._project_inspect_project_docs_impl(project_path)
-        root = Path(project_path).expanduser().resolve()
+            return self.facade._project_inspect_project_docs_impl(str(root))
         metadata = self.read_project_metadata(str(root))
         catalog_invalid = metadata.docs_catalog_present and not metadata.docs_catalog_valid
         candidate_sources = [asdict(item) for item in metadata.docs_candidates]
@@ -591,12 +599,12 @@ class ProjectDocsService:
         with_vectors: bool = False,
         _candidate_paths: set[str] | None = None,
     ) -> ProjectDocsIngestResult:
+        root = validate_project_path(project_path).path
         if hasattr(self.facade, "_project_ingest_project_docs_impl"):
             kwargs: dict[str, Any] = {"skip_known": skip_known, "with_vectors": with_vectors}
             if _candidate_paths is not None:
                 kwargs["_candidate_paths"] = _candidate_paths
-            return self.facade._project_ingest_project_docs_impl(project_path, **kwargs)
-        root = Path(project_path).expanduser().resolve()
+            return self.facade._project_ingest_project_docs_impl(str(root), **kwargs)
         metadata = self.read_project_metadata(str(root))
         repository_identity = self._repository_identity(root)
         warnings = list(metadata.warnings)
@@ -663,6 +671,9 @@ class ProjectDocsService:
                     "project_doc_description": candidate.description,
                     "project_doc_authority": candidate.authority,
                     "project_doc_lifecycle_status": candidate.lifecycle_status,
+                    "lifecycle_status": candidate.lifecycle_status,
+                    "temporal_relevance": temporal_relevance_for_status(candidate.lifecycle_status),
+                    "index_freshness": "synchronized",
                     "project_doc_impact_policy": candidate.impact_policy,
                     "project_doc_catalog_entry_hash": candidate.catalog_entry_hash,
                     "project_doc_sections": section_result.sections,
@@ -1050,6 +1061,7 @@ class ProjectDocsService:
         deleted_paths: list[str] | tuple[str, ...] | None = None,
         renamed_paths: list[dict[str, str]] | tuple[dict[str, str], ...] | None = None,
     ) -> ProjectDocsSyncResult:
+        root = validate_project_path(project_path).path
         if hasattr(self.facade, "_project_sync_project_docs_impl"):
             kwargs: dict[str, Any] = {"with_vectors": with_vectors}
             if changed_paths is not None:
@@ -1058,8 +1070,7 @@ class ProjectDocsService:
                 kwargs["deleted_paths"] = deleted_paths
             if renamed_paths is not None:
                 kwargs["renamed_paths"] = renamed_paths
-            return self.facade._project_sync_project_docs_impl(project_path, **kwargs)
-        root = Path(project_path).expanduser().resolve()
+            return self.facade._project_sync_project_docs_impl(str(root), **kwargs)
         metadata = self.read_project_metadata(str(root))
         warnings = list(metadata.warnings)
         candidate_sources = [asdict(item) for item in metadata.docs_candidates]
@@ -1194,7 +1205,7 @@ class ProjectDocsService:
         )
 
     def bootstrap_project_docs(self, project_path: str, question: str | None = None) -> ProjectDocsBootstrapResult:
-        root = Path(project_path).expanduser().resolve()
+        root = validate_project_path(project_path).path
         actions_taken: list[dict[str, Any]] = []
         initial = self.inspect_project_docs(str(root))
         actions_taken.append({"tool": "inspect_project_docs", "arguments_patch": {"project_path": str(root)}})
@@ -1334,10 +1345,15 @@ class ProjectDocsService:
         evidence_path: str | None = None,
         requirements: Any | None = None,
     ):
-        root = Path(project_path).expanduser().resolve()
+        root = validate_project_path(project_path).path
+        answer_lifecycle_intent = str(
+            getattr(requirements, "lifecycle_intent", "") or lifecycle_intent(query)
+        )
         filters: dict[str, Any] = {
             "project_path": str(root),
+            "project_identity": self._repository_identity(root),
             "source_class": source_class,
+            **lifecycle_filters_for_intent(answer_lifecycle_intent),
         }
         if scope:
             filters["doc_scope"] = scope
@@ -1351,83 +1367,120 @@ class ProjectDocsService:
         effective_expand = (expand or "none") if requirements is not None else expand
         retrieval = getattr(agent.config, "retrieval", None)
         mode = str(getattr(retrieval, "default_mode", "lexical") or "lexical").lower()
-        mandatory_values = tuple(
-            str(requirement.value)
+
+        mandatory_requirements = tuple(
+            requirement
             for requirement in requirements or ()
             if getattr(requirement, "mandatory", False)
-            and str(getattr(requirement, "value", "")).strip()
         )
+        probe_queries = tuple(dict.fromkeys(
+            probe
+            for requirement in mandatory_requirements
+            if (probe := requirement_probe_query(requirement))
+        ))[:8]
+        retrieval_hints = tuple(dict.fromkeys(
+            str(value).strip()
+            for value in getattr(requirements, "retrieval_hints", ())
+            if str(value).strip()
+        ))[:4]
+        contract_concepts = tuple(dict.fromkeys(
+            str(value).strip()
+            for value in getattr(requirements, "concept_queries", ())
+            if str(value).strip()
+        ))[:4]
+        supplemental_queries = tuple(dict.fromkeys((
+            *probe_queries,
+            *contract_concepts,
+            *retrieval_hints,
+        )))[:12]
+        supplemental_budget = min(budget, max(128, budget // 4))
+
         gateway = getattr(self.facade, "agent_gateway", None)
         if gateway is not None:
             dispatcher = gateway.dispatcher_for(agent, mode=mode)
-            chunks = dispatcher.run(
-                query,
-                mode=mode,
-                limit=effective_limit,
-                budget=budget,
-                expand=effective_expand,
-                filters=filters,
-                requirements=requirements,
-            ).chunks
-            authoritative_chunks = dispatcher.run(
-                query,
-                mode=mode,
-                limit=max(effective_limit, 20),
-                budget=budget,
-                expand=effective_expand or "page",
-                filters={**filters, "authority": "source_of_truth"},
-                requirements=requirements,
-            ).chunks
-            requirement_chunks = [
-                chunk
-                for value in mandatory_values[:8]
-                for chunk in dispatcher.run(
-                    value,
+
+            def _run(
+                text: str,
+                *,
+                query_limit: int,
+                query_budget: int,
+                query_expand: str | None,
+                query_filters: dict[str, Any],
+            ):
+                return dispatcher.run(
+                    text,
                     mode=mode,
-                    limit=4,
-                    budget=budget,
-                    expand="none",
-                    filters=filters,
+                    limit=query_limit,
+                    budget=query_budget,
+                    expand=query_expand,
+                    filters=query_filters,
                     requirements=requirements,
                 ).chunks
-            ]
+
         else:
             # Lightweight facades used by embedders retain the legacy agent
             # contract.  The production service always owns an agent gateway.
-            chunks = agent.query(
-                query, limit=effective_limit, budget=budget, expand=effective_expand, filters=filters
-            )
-            authoritative_chunks = agent.query(
-                query,
-                limit=max(effective_limit, 20),
-                budget=budget,
-                expand=effective_expand or "page",
-                filters={**filters, "project_doc_authority": "source_of_truth"},
-            )
-            requirement_chunks = [
-                chunk
-                for value in mandatory_values[:8]
-                for chunk in agent.query(
-                    value,
-                    limit=4,
-                    budget=budget,
-                    expand="none",
-                    filters=filters,
+            def _run(
+                text: str,
+                *,
+                query_limit: int,
+                query_budget: int,
+                query_expand: str | None,
+                query_filters: dict[str, Any],
+            ):
+                return agent.query(
+                    text,
+                    limit=query_limit,
+                    budget=query_budget,
+                    expand=query_expand,
+                    filters=query_filters,
                 )
-            ]
 
-        candidates = [*requirement_chunks, *authoritative_chunks, *chunks]
-        if mandatory_values:
+        chunks = _run(
+            query,
+            query_limit=effective_limit,
+            query_budget=budget,
+            query_expand=effective_expand,
+            query_filters=filters,
+        )
+        authoritative_chunks = _run(
+            query,
+            query_limit=max(effective_limit, 20),
+            query_budget=budget,
+            query_expand=effective_expand or "page",
+            query_filters={**filters, "authority": "source_of_truth"},
+        )
+        supplemental_chunks = [
+            chunk
+            for supplemental_query in supplemental_queries
+            for chunk in _run(
+                supplemental_query,
+                query_limit=4,
+                query_budget=supplemental_budget,
+                query_expand="none",
+                query_filters=filters,
+            )
+        ]
+
+        candidates = [*supplemental_chunks, *authoritative_chunks, *chunks]
+        if probe_queries:
+            probe_terms = tuple({
+                term.casefold()
+                for probe in probe_queries
+                for term in re.findall(r"[A-Za-zА-Яа-я0-9_.:/+-]{3,}", probe)
+            })
             candidates.sort(
                 key=lambda chunk: -sum(
-                    value.casefold() in str(chunk.text or "").casefold()
-                    for value in mandatory_values
+                    term in str(chunk.text or "").casefold()
+                    for term in probe_terms
                 )
             )
         selected = []
         seen: set[tuple[str, int]] = set()
         token_total = 0
         for chunk in candidates:
+            if not lifecycle_allows(chunk.metadata or {}, answer_lifecycle_intent):
+                continue
             key = (chunk.source, chunk.chunk_index)
             if key in seen:
                 continue
@@ -1461,6 +1514,7 @@ class ProjectDocsService:
         evidence_path: str | None = None,
         requirements: Any | None = None,
     ) -> ProjectDocsResult:
+        root = validate_project_path(project_path).path
         if hasattr(self.facade, "_project_get_project_docs_impl"):
             kwargs = {
                 "tokens": tokens, "limit": limit, "expand": expand, "module": module,
@@ -1470,8 +1524,7 @@ class ProjectDocsService:
                 kwargs["requirements"] = requirements
             if evidence_path:
                 kwargs["evidence_path"] = evidence_path
-            return self.facade._project_get_project_docs_impl(project_path, query, **kwargs)
-        root = Path(project_path).expanduser().resolve()
+            return self.facade._project_get_project_docs_impl(str(root), query, **kwargs)
         if scope and scope not in {"project", "module", "all"}:
             raise ValueError("scope must be one of: project, module, all")
         metadata = self.read_project_metadata(str(root))
@@ -1681,7 +1734,9 @@ class ProjectDocsService:
         }
         safe_chunks = []
         dropped_placeholder_chunks = 0
-        history_requested = query_requests_history(query)
+        answer_lifecycle_intent = str(
+            getattr(requirements, "lifecycle_intent", "") or lifecycle_intent(query)
+        )
         for chunk in chunks:
             metadata_for_chunk = chunk.metadata or {}
             chunk_path = metadata_for_chunk.get("project_doc_path") or metadata_for_chunk.get("source_path")
@@ -1690,8 +1745,7 @@ class ProjectDocsService:
                 continue
             if metadata_for_chunk.get("project_doc_content_hash") != current_source.get("content_hash"):
                 continue
-            lifecycle_status = metadata_for_chunk.get("project_doc_lifecycle_status") or "active"
-            if lifecycle_status != "active" and not history_requested:
+            if not lifecycle_allows(metadata_for_chunk, answer_lifecycle_intent):
                 continue
             if self._looks_like_placeholder_search_result(chunk_path, chunk.text):
                 dropped_placeholder_chunks += 1

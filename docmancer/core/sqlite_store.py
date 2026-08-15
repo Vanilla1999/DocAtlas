@@ -489,6 +489,9 @@ class SQLiteStore:
                     doc_scope TEXT,
                     source_class TEXT,
                     authority TEXT,
+                    lifecycle_status TEXT,
+                    temporal_relevance TEXT,
+                    index_freshness TEXT,
                     docs_snapshot_exact INTEGER,
                     metadata_json TEXT NOT NULL DEFAULT '{}',
                     UNIQUE (generation_id, stable_chunk_id),
@@ -558,6 +561,9 @@ class SQLiteStore:
                 ("doc_scope", "TEXT"),
                 ("source_class", "TEXT"),
                 ("authority", "TEXT"),
+                ("lifecycle_status", "TEXT"),
+                ("temporal_relevance", "TEXT"),
+                ("index_freshness", "TEXT"),
                 ("docs_snapshot_exact", "INTEGER"),
             ):
                 self._ensure_nullable_column(conn, "retrieval_children", column, declaration)
@@ -600,7 +606,8 @@ class SQLiteStore:
                 CREATE INDEX IF NOT EXISTS idx_retrieval_children_filters
                     ON retrieval_children(
                         generation_id, project_identity, library_id,
-                        resolved_version, version_family, source_class, authority
+                        resolved_version, version_family, source_class, authority,
+                        lifecycle_status, temporal_relevance, index_freshness
                     );
                 CREATE INDEX IF NOT EXISTS idx_retrieval_children_project_scope
                     ON retrieval_children(generation_id, module_id, doc_scope);
@@ -1145,6 +1152,7 @@ class SQLiteStore:
                 context_manifest = context_prefix.manifest()
                 child_metadata = {
                     **metadata,
+                    **filter_metadata,
                     "section_title": parent.title,
                     "section_level": parent.level,
                     "source_path": source_path,
@@ -1200,9 +1208,9 @@ class SQLiteStore:
                          line_end, source_path, document_title, format, anchor,
                          library_id, resolved_version, version_family,
                          project_identity, project_path, module_id, doc_scope,
-                         source_class, authority, docs_snapshot_exact,
-                         metadata_json)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                         source_class, authority, lifecycle_status, temporal_relevance,
+                         index_freshness, docs_snapshot_exact, metadata_json)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     """,
                     (
                         generation_id, child.sqlite_id, child.stable_id, child.vector_id,
@@ -1225,6 +1233,9 @@ class SQLiteStore:
                         filter_metadata["project_path"],
                         filter_metadata["module_id"], filter_metadata["doc_scope"],
                         filter_metadata["source_class"], filter_metadata["authority"],
+                        filter_metadata["lifecycle_status"],
+                        filter_metadata["temporal_relevance"],
+                        filter_metadata["index_freshness"],
                         filter_metadata["docs_snapshot_exact"],
                         json.dumps(child_metadata, ensure_ascii=False),
                     ),
@@ -1268,6 +1279,7 @@ class SQLiteStore:
             "source_path", "document_title", "format", "anchor", "metadata_json",
             "library_id", "resolved_version", "version_family", "project_identity",
             "project_path", "module_id", "doc_scope", "source_class", "authority",
+            "lifecycle_status", "temporal_relevance", "index_freshness",
             "docs_snapshot_exact",
         )
         placeholders = ", ".join("?" for _ in range(len(columns) + 1))
@@ -2323,6 +2335,7 @@ class SQLiteStore:
             column = str(key) if promoted and key in {
                 "library_id", "resolved_version", "version_family", "project_identity",
                 "project_path", "module_id", "doc_scope", "source_class", "authority",
+                "lifecycle_status", "temporal_relevance", "index_freshness",
                 "docs_snapshot_exact", "source", "source_identity",
             } else None
             expression = f"sections.{column}" if column else "json_extract(sections.metadata_json, ?)"
@@ -2519,6 +2532,100 @@ class SQLiteStore:
                     unique_sources,
                 ).fetchone()
             return int(row["total"] or 0)
+
+    def project_scope_stats(
+        self,
+        *,
+        project_path: str | None = None,
+        project_identity: str | None = None,
+    ) -> dict[str, Any]:
+        """Return counts owned by one project without conflating shared rows."""
+
+        normalized_path = str(project_path or "").strip()
+        normalized_identity = str(project_identity or "").strip()
+        if not normalized_path and not normalized_identity:
+            return {
+                "sources_count": 0,
+                "sections_count": 0,
+                "active_generation_id": None,
+                "ownership": "unscoped",
+            }
+        with self._connect() as conn:
+            active_generation = self._active_generation_id(conn)
+            clauses: list[str] = []
+            params: list[Any] = []
+            if normalized_path:
+                clauses.append("project_path = ?")
+                params.append(normalized_path)
+            if normalized_identity:
+                clauses.append("project_identity = ?")
+                params.append(normalized_identity)
+            ownership_sql = "(" + " OR ".join(clauses) + ")"
+            child_sources: set[str] = set()
+            child_sections = 0
+            if active_generation:
+                rows = conn.execute(
+                    f"""
+                    SELECT DISTINCT source
+                    FROM retrieval_children
+                    WHERE generation_id = ? AND {ownership_sql}
+                    """,
+                    (active_generation, *params),
+                ).fetchall()
+                child_sources = {str(row["source"]) for row in rows}
+                child_sections = int(conn.execute(
+                    f"""
+                    SELECT COUNT(*) AS count
+                    FROM retrieval_children
+                    WHERE generation_id = ? AND {ownership_sql}
+                    """,
+                    (active_generation, *params),
+                ).fetchone()["count"] or 0)
+
+            legacy_conditions: list[str] = []
+            legacy_params: list[Any] = []
+            if normalized_path:
+                legacy_conditions.append("json_extract(metadata_json, '$.project_path') = ?")
+                legacy_params.append(normalized_path)
+            if normalized_identity:
+                legacy_conditions.append(
+                    "COALESCE(json_extract(metadata_json, '$.project_identity'), "
+                    "json_extract(metadata_json, '$.repository_identity')) = ?"
+                )
+                legacy_params.append(normalized_identity)
+            legacy_sql = "(" + " OR ".join(legacy_conditions) + ")"
+            exclusion = ""
+            exclusion_params: list[Any] = []
+            if active_generation:
+                exclusion = (
+                    " AND source NOT IN (SELECT source FROM retrieval_children "
+                    "WHERE generation_id = ?)"
+                )
+                exclusion_params.append(active_generation)
+            legacy_rows = conn.execute(
+                f"""
+                SELECT DISTINCT source
+                FROM sections
+                WHERE {legacy_sql}{exclusion}
+                """,
+                (*legacy_params, *exclusion_params),
+            ).fetchall()
+            legacy_sources = {str(row["source"]) for row in legacy_rows}
+            legacy_sections = int(conn.execute(
+                f"""
+                SELECT COUNT(*) AS count
+                FROM sections
+                WHERE {legacy_sql}{exclusion}
+                """,
+                (*legacy_params, *exclusion_params),
+            ).fetchone()["count"] or 0)
+        sources = child_sources | legacy_sources
+        return {
+            "sources_count": len(sources),
+            "sections_count": child_sections + legacy_sections,
+            "active_generation_id": active_generation,
+            "ownership": "project_owned" if sources else "no_project_rows",
+        }
 
     def collection_stats(self) -> dict:
         with self._connect() as conn:
@@ -3265,6 +3372,7 @@ class SQLiteStore:
                            source_identity, library_id, resolved_version,
                            version_family, project_identity, project_path,
                            module_id, doc_scope, source_class, authority,
+                           lifecycle_status, temporal_relevance, index_freshness,
                            docs_snapshot_exact
                     FROM retrieval_children
                     WHERE generation_id = ?
@@ -3324,6 +3432,9 @@ class SQLiteStore:
                         "doc_scope": str(row["doc_scope"] or ""),
                         "source_class": str(row["source_class"] or ""),
                         "authority": str(row["authority"] or "unknown"),
+                        "lifecycle_status": str(row["lifecycle_status"] or "active"),
+                        "temporal_relevance": str(row["temporal_relevance"] or "current"),
+                        "index_freshness": str(row["index_freshness"] or "synchronized"),
                         "docs_snapshot_exact": (
                             bool(row["docs_snapshot_exact"])
                             if row["docs_snapshot_exact"] is not None else None

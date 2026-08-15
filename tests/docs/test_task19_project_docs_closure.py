@@ -277,7 +277,7 @@ def test_completed_roadmap_is_searchable_only_for_explicit_history_intent():
 
     assert [item.path for item in normal] == ["AGENTS.md"]
     assert [item.path for item in current_roadmap] == ["AGENTS.md"]
-    assert {item.path for item in history} == {"AGENTS.md", "roadmap/OLD_TASK.md"}
+    assert [item.path for item in history] == ["roadmap/OLD_TASK.md"]
 
 
 def test_operational_completed_and_browser_history_api_are_not_history_intent():

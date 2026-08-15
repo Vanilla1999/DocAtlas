@@ -12,6 +12,7 @@ from docmancer.docs.application.evidence_selection import (
 from docmancer.docs.application.project_context_service import context_pack_snippet
 from docmancer.docs.domain.content_trust import annotate_context_pack
 from docmancer.docs.domain.library_source_options import library_docs_source_options, source_required_diagnostics
+from docmancer.docs.domain.mutation_intent import MutationIntentContract, build_mutation_intent
 from docmancer.docs.domain.snippets import build_snippet_presentation, validate_response_style
 from docmancer.docs.exact_version import resolve_python_versioned_docs
 from docmancer.docs.models import DeliveryDecision, DocsResult, ProjectContextResult, UnifiedDocsContextResult
@@ -157,8 +158,10 @@ class UnifiedDocsContextService:
         prefetch_auto: bool | None = None,
         details: bool | None = None,
         response_style: str | None = None,
+        mutation_intent: MutationIntentContract | None = None,
     ) -> UnifiedDocsContextResult:
         response_style = validate_response_style(response_style)
+        mutation_intent = mutation_intent or build_mutation_intent(question)
         mode_requested = (mode or "auto").lower()
         prepare_project_docs = True if prepare_project_docs is None else bool(prepare_project_docs)
         allow_network = bool(allow_network) if allow_network is not None else False
@@ -243,7 +246,7 @@ class UnifiedDocsContextService:
         if mode_selected == "project":
             delegated_mode = "auto" if project_auto else "project-only"
             routing["delegated_mode"] = delegated_mode
-            project_result = self.service.get_project_context(project_path, question, tokens=tokens, limit=limit, expand=expand, module=module, module_path=module_path, scope=scope, mode=delegated_mode, response_style=response_style, allow_network=effective_allow_network)
+            project_result = self.service.get_project_context(project_path, question, tokens=tokens, limit=limit, expand=expand, module=module, module_path=module_path, scope=scope, mode=delegated_mode, response_style=response_style, allow_network=effective_allow_network, mutation_intent=mutation_intent)
         elif mode_selected == "dependency":
             if not effective_allow_network and self._dependency_prefetch_needed(project_path):
                 lanes["dependency"] = {"status": "confirmation_required", "source_count": 0}
@@ -259,9 +262,9 @@ class UnifiedDocsContextService:
                     lanes=lanes,
                     lane_details=lane_details if details else {},
                 )
-            project_result = self.service.get_project_context(project_path, question, tokens=tokens, limit=limit, expand=expand, library=library, libraries=libraries, ecosystem=ecosystem, version=version, module=module, module_path=module_path, scope=scope, mode="deps-only", response_style=response_style, allow_network=effective_allow_network)
+            project_result = self.service.get_project_context(project_path, question, tokens=tokens, limit=limit, expand=expand, library=library, libraries=libraries, ecosystem=ecosystem, version=version, module=module, module_path=module_path, scope=scope, mode="deps-only", response_style=response_style, allow_network=effective_allow_network, mutation_intent=mutation_intent)
         elif mode_selected == "mixed":
-            project_result = self.service.get_project_context(project_path, question, tokens=tokens, limit=limit, expand=expand, library=library, libraries=libraries, ecosystem=ecosystem, version=version, module=module, module_path=module_path, scope=scope, mode="auto", response_style=response_style, allow_network=effective_allow_network)
+            project_result = self.service.get_project_context(project_path, question, tokens=tokens, limit=limit, expand=expand, library=library, libraries=libraries, ecosystem=ecosystem, version=version, module=module, module_path=module_path, scope=scope, mode="auto", response_style=response_style, allow_network=effective_allow_network, mutation_intent=mutation_intent)
             routing["dependency_detected"] = bool(getattr(project_result, "dependency_docs", None))
             explicit_library_results = []
             for lib in libs:

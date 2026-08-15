@@ -82,7 +82,31 @@ def test_metadata_does_not_prove_project_answer_term():
     )
 
     assert decision.support_decision.answer_supported is False
-    assert "query_symbol:0:docs_status" in decision.missing_requirements
+    behavior = next(
+        item for item in requirements
+        if item.kind == "proof_obligation" and item.obligation_kind == "behavior"
+    )
+    assert behavior.requirement_id in decision.missing_requirements
+
+
+def test_authoritative_source_identity_can_bind_behavior_subject():
+    question = "What does the project README say about deterministic offline release checks?"
+    requirements = build_requirements(question, profile="project_docs_answer")
+    decision = select_evidence(
+        [_candidate(
+            "readme",
+            "The amber lighthouse invariant requires deterministic offline release checks.",
+            source="README.md",
+            authority="source_of_truth",
+        )],
+        question=question,
+        config=project_docs_selection_config(800),
+        requirements=requirements,
+    )
+
+    assert decision.support_decision.answer_supported is True
+    assert decision.assignments[0].unit_id is not None
+    assert decision.assignments[0].unit_content_hash is not None
 
 
 def test_project_term_and_query_symbol_share_one_canonical_obligation():
@@ -97,10 +121,17 @@ def test_project_term_and_query_symbol_share_one_canonical_obligation():
     ]
 
     assert len(matches) == 1
+    assert matches[0].mandatory is False
     assert matches[0].requirement_id == "query_symbol:0:model_visible_projection"
+    typed = next(
+        item for item in requirements
+        if item.kind == "proof_obligation" and item.obligation_kind == "behavior"
+    )
+    assert typed.subject == "model_visible_projection"
+    assert "model_visible_projection" in {value.casefold() for value in requirements.retrieval_hints}
     assert (
         matches[0].requirement_id,
-        "project_answer_term",
+        "identifier",
         "model_visible_projection",
     ) in requirements.query_extraction_provenance
 
@@ -123,9 +154,10 @@ def test_project_answer_requires_behavior_and_usage_facets_in_visible_text():
         requirements=requirements,
     )
 
-    assert {item.value for item in requirements if item.kind == "facet"} == {
-        "behavior:docs_status", "usage:docs_status",
-    }
+    assert {
+        (item.obligation_kind, item.subject)
+        for item in requirements if item.kind == "proof_obligation"
+    } == {("behavior", "docs_status"), ("usage", "docs_status")}
     assert complete.support_decision.answer_supported is True
     assert incomplete.support_decision.answer_supported is False
 
@@ -148,9 +180,9 @@ def test_project_answer_requires_recall_and_authority_invariant_facets():
         requirements=requirements,
     )
 
-    assert {item.value for item in requirements if item.kind == "facet"} == {
-        "recall_mechanism", "authority_invariant",
-    }
+    assert {
+        item.relation for item in requirements if item.kind == "proof_obligation"
+    } == {"recall_mechanism", "authority_invariant"}
     assert complete.support_decision.answer_supported is True
     assert incomplete.support_decision.answer_supported is False
 
@@ -171,9 +203,12 @@ def test_project_answer_requires_relational_comparison_proof():
         requirements=requirements,
     )
 
-    assert "facet:comparison:async:launch" in {
-        item.requirement_id for item in requirements
-    }
+    comparison = next(
+        item for item in requirements
+        if item.kind == "proof_obligation" and item.obligation_kind == "comparison"
+    )
+    assert comparison.subject == "async"
+    assert comparison.obligation_target == "launch"
     assert complete.support_decision.answer_supported is True
     assert incomplete.support_decision.answer_supported is False
 
@@ -1077,7 +1112,11 @@ def test_project_usage_negation_does_not_prove_usage():
     )
 
     assert decision.support_decision.answer_supported is False
-    assert "facet:usage:docs_status" in decision.missing_requirements
+    usage = next(
+        item for item in requirements
+        if item.kind == "proof_obligation" and item.obligation_kind == "usage"
+    )
+    assert usage.requirement_id in decision.missing_requirements
 
 
 def test_project_heading_with_colon_does_not_prove_exact_term():
@@ -1112,10 +1151,14 @@ def test_project_request_query_requires_mcp_server_as_well_as_request():
         profile="project_docs_answer",
     )
 
-    assert {item.value.casefold() for item in requirements if item.kind == "exact_term"} >= {
-        "mcp server",
-        "request",
+    assert {value.casefold() for value in requirements.retrieval_hints} >= {
+        "mcp server", "request",
     }
+    relation = next(
+        item for item in requirements
+        if item.kind == "proof_obligation" and item.relation == "request_handling"
+    )
+    assert relation.subject == "MCP server"
 
 
 @pytest.mark.parametrize(
@@ -1154,9 +1197,23 @@ def test_project_relation_facets_require_a_concrete_mechanism(
         config=project_docs_selection_config(800), requirements=requirements,
     )
 
-    assert f"facet:{facet}" in {item.requirement_id for item in requirements}
-    assert f"facet:{facet}" in accepted.support_decision.satisfied_requirement_ids
-    assert f"facet:{facet}" in rejected.missing_requirements
+    typed = next(
+        item for item in requirements
+        if item.kind == "proof_obligation" and item.relation == facet
+    )
+    assert typed.requirement_id in accepted.support_decision.satisfied_requirement_ids
+    assignment = next(
+        item for item in accepted.assignments
+        if item.requirement_id == typed.requirement_id
+    )
+    assert assignment.unit_id
+    assert assignment.unit_kind in {"sentence", "bullet", "table_row", "key_value", "code"}
+    assert assignment.unit_char_start is not None
+    assert assignment.unit_char_end is not None
+    assert assignment.unit_char_end > assignment.unit_char_start
+    assert assignment.unit_content_hash == assignment.projected_content_hash
+    assert len(assignment.unit_content_hash or "") == 64
+    assert typed.requirement_id in rejected.missing_requirements
 
 
 def test_requirement_input_limits_are_bounded_and_fail_closed():
@@ -1195,10 +1252,12 @@ def test_requirement_input_limits_are_bounded_and_fail_closed():
 def test_project_behavior_question_requires_behavior_for_every_entity():
     question = "What do get_docs_context and docs_status return?"
     requirements = build_requirements(question, profile="project_docs_answer")
-    values = {item.value for item in requirements}
+    subjects = {
+        item.subject for item in requirements
+        if item.kind == "proof_obligation" and item.obligation_kind == "behavior"
+    }
 
-    assert "behavior:get_docs_context" in values
-    assert "behavior:docs_status" in values
+    assert subjects == {"get_docs_context", "docs_status"}
 
     decision = select_evidence(
         [_candidate("partial", "get_docs_context returns source-backed context and mentions docs_status.")],
@@ -1207,13 +1266,22 @@ def test_project_behavior_question_requires_behavior_for_every_entity():
         requirements=requirements,
     )
     assert decision.support_decision.answer_supported is False
-    assert "facet:behavior:docs_status" in decision.missing_requirements
+    missing = next(
+        item for item in requirements
+        if item.kind == "proof_obligation"
+        and item.obligation_kind == "behavior"
+        and item.subject == "docs_status"
+    )
+    assert missing.requirement_id in decision.missing_requirements
 
 
 def test_project_mechanism_how_question_does_not_require_workflow():
     question = "How does docs_status report index freshness?"
     requirements = build_requirements(question, profile="project_docs_answer")
-    assert "workflow:docs_status" not in {item.value for item in requirements}
+    assert not any(
+        item.kind == "proof_obligation" and item.obligation_kind == "workflow"
+        for item in requirements
+    )
 
     decision = select_evidence(
         [_candidate("answer", "docs_status reports index freshness from job records.")],
@@ -1278,4 +1346,9 @@ def test_relation_facets_reject_unrelated_or_single_step_matches(question, candi
         config=project_docs_selection_config(800), requirements=requirements,
     )
 
-    assert f"facet:{facet}" in decision.missing_requirements
+    typed = next(
+        item for item in requirements
+        if item.kind == "proof_obligation"
+        and (item.relation == facet or f"{item.obligation_kind}:{item.subject}" == facet)
+    )
+    assert typed.requirement_id in decision.missing_requirements

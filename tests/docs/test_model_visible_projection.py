@@ -40,6 +40,44 @@ def _decode_support_envelope(value):
     return json.loads(zlib.decompress(base64.urlsafe_b64decode(encoded)))
 
 
+def _ready_patch_fixture(*, policy_content: str | None = None):
+    policy_text = policy_content or (
+        "The patch must preserve source IDs.\n"
+        "Run pytest tests/docs/test_mcp_boundary.py."
+    )
+    policy = {
+        "path": "AGENTS.md",
+        "heading_path": "Rules",
+        "authority": "canonical",
+        "repository_authority": "explicit_agent_policy",
+        "instruction_trust": "scoped_agent_policy",
+        "scope_verified": True,
+        "policy_scope": "/project",
+        "content": policy_text,
+    }
+    target = {
+        "path": "src/projection.py",
+        "heading_path": "project_patch_context",
+        "authority": "official",
+        "source_class": "code_graph",
+        "symbols": ["project_patch_context"],
+        "content": "def project_patch_context(packet, evidence_items): pass",
+        "snippet": "def project_patch_context(packet, evidence_items): pass",
+    }
+    evidence = [policy, target]
+    packet = build_action_packet(
+        question="Update src/projection.py canonical projection",
+        context_pack=evidence,
+        project_path="/project",
+    )
+    assert packet["status"] == "ok"
+    assert packet["mutation_intent"]["ready"] is True
+    assert validate_action_packet(
+        packet, evidence_items=evidence, project_path="/project",
+    ) == []
+    return packet, evidence
+
+
 def test_docs_answer_is_deterministic_deduplicated_hashed_and_bounded():
     snippet = {
         "source": "https://example.test/api",
@@ -114,21 +152,7 @@ def test_docs_answer_projects_content_snippet_dicts():
 
 
 def test_patch_projection_retains_validated_citations_without_raw_evidence():
-    evidence = [{
-        "path": "AGENTS.md",
-        "heading_path": "Rules",
-        "authority": "canonical",
-        "repository_authority": "explicit_agent_policy",
-        "instruction_trust": "scoped_agent_policy",
-        "scope_verified": True,
-        "policy_scope": "/project",
-        "content": "The patch must preserve source IDs.\nRun pytest tests/docs/test_mcp_boundary.py.",
-    }]
-    packet = build_action_packet(
-        question="Implement canonical projection", context_pack=evidence, project_path="/project",
-    )
-    assert validate_action_packet(packet, evidence_items=evidence, project_path="/project") == []
-
+    packet, evidence = _ready_patch_fixture()
     projection, snapshot = project_patch_context(packet=packet, evidence_items=evidence)
 
     assert projection["kind"] == "patch_context"
@@ -233,24 +257,7 @@ def test_docs_projection_rejects_deleted_source_fields(field):
     ],
 )
 def test_patch_projection_rejects_every_mutated_source_field(field, value):
-    evidence = [{
-        "path": "AGENTS.md",
-        "heading_path": "Rules",
-        "authority": "canonical",
-        "repository_authority": "explicit_agent_policy",
-        "instruction_trust": "scoped_agent_policy",
-        "scope_verified": True,
-        "policy_scope": "/project",
-        "content": (
-            "The patch must preserve source IDs.\n"
-            "Run pytest tests/docs/test_mcp_boundary.py."
-        ),
-    }]
-    packet = build_action_packet(
-        question="Implement canonical projection",
-        context_pack=evidence,
-        project_path="/project",
-    )
+    packet, evidence = _ready_patch_fixture()
     projection, snapshot = project_patch_context(
         packet=packet, evidence_items=evidence
     )
@@ -283,20 +290,8 @@ def test_patch_projection_rejects_every_mutated_source_field(field, value):
     ],
 )
 def test_patch_projection_rejects_deleted_source_fields(field):
-    evidence = [{
-        "path": "AGENTS.md",
-        "heading_path": "Rules",
-        "authority": "canonical",
-        "repository_authority": "explicit_agent_policy",
-        "instruction_trust": "scoped_agent_policy",
-        "scope_verified": True,
-        "policy_scope": "/project",
-        "content": "The patch must preserve source IDs.",
-    }]
-    packet = build_action_packet(
-        question="Implement canonical projection",
-        context_pack=evidence,
-        project_path="/project",
+    packet, evidence = _ready_patch_fixture(
+        policy_content="The patch must preserve source IDs.",
     )
     projection, snapshot = project_patch_context(
         packet=packet, evidence_items=evidence
@@ -405,7 +400,7 @@ def test_insufficient_projection_is_fail_closed_and_at_most_300_tokens():
     assert validate_model_visible_projection(payload, snapshot={}, max_tokens=300) == []
 
 
-@pytest.mark.parametrize("budget", [256, 300])
+@pytest.mark.parametrize("budget", [256, 300, 1_500, 2_000])
 def test_oversized_insufficient_projection_uses_a_valid_terminal_fallback(budget):
     payload = {
         "status": "insufficient_evidence",
@@ -1071,17 +1066,22 @@ def test_generic_projection_retains_compact_canonical_evidence_id():
 def test_patch_projection_binds_duplicate_path_sections_by_exact_evidence_id():
     evidence = [
         {
-            "path": "src/a.py", "heading_path": "same", "source_class": "source_code",
+            "path": "src/a.py", "heading_path": "same", "source_class": "code_graph",
             "authority": "canonical", "instruction_trust": "scoped_agent_policy",
+            "symbols": ["first"],
             "content": "Must preserve FIRST behavior.", "snippet": "FIRST",
         },
         {
-            "path": "src/a.py", "heading_path": "same", "source_class": "source_code",
+            "path": "src/a.py", "heading_path": "same", "source_class": "code_graph",
             "authority": "canonical", "instruction_trust": "scoped_agent_policy",
+            "symbols": ["second"],
             "content": "Must preserve SECOND behavior.", "snippet": "SECOND",
         },
     ]
-    packet = build_action_packet(question="Fix a", context_pack=evidence, project_path="/repo")
+    packet = build_action_packet(
+        question="Fix src/a.py", context_pack=evidence, project_path="/repo",
+    )
+    assert packet["status"] == "ok"
     assert validate_action_packet(packet, evidence_items=evidence, project_path="/repo") == []
 
     projection, snapshot = project_patch_context(packet=packet, evidence_items=evidence)

@@ -24,6 +24,13 @@ _PAYLOAD_INDEX_FIELDS = (
     "format",
     "document_title_hash",
     "docset_root",
+    "project_identity",
+    "project_path",
+    "source_class",
+    "authority",
+    "lifecycle_status",
+    "temporal_relevance",
+    "index_freshness",
 )
 
 

@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import json
+
 import sqlite3
 
 from docmancer.core.models import Document
@@ -127,7 +129,9 @@ def test_context_generation_persists_provenance_and_filter_columns(tmp_path):
         assert row is not None
         assert row["library_id"] == "example-sdk"
         assert row["resolved_version"] == "2.4.1"
-        assert row["project_path"] == "docs/guide.md"
+        assert row["project_path"] == ""
+        metadata = json.loads(row["metadata_json"])
+        assert metadata["project_doc_path"] == "docs/guide.md"
         assert row["authority"] == "official"
         assert row["docs_snapshot_exact"] == 1
         assert "/tmp/" not in row["context_prefix"]

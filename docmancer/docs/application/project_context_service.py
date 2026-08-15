@@ -16,6 +16,12 @@ from docmancer.docs.domain.answer_completeness import (
     extract_project_answer_requirements,
     extract_query_relevance_terms,
 )
+from docmancer.docs.domain.mutation_intent import MutationIntentContract, build_mutation_intent
+from docmancer.docs.domain.lifecycle_policy import (
+    lifecycle_allows,
+    lifecycle_intent as lifecycle_intent_for_question,
+    temporal_relevance_for_status,
+)
 from docmancer.docs.domain.project_doc_ranking import is_changelog_path, normalize_doc_path, project_source_taxonomy, rerank_project_doc_chunks
 from docmancer.docs.domain.project_query_intent import classify_project_query_intent
 from docmancer.docs.domain.project_state import bound_project_docs_handoff, evaluate_documentation_sections
@@ -151,8 +157,10 @@ class ProjectContextService:
         mode: str = "auto",
         response_style: str | None = None,
         allow_network: bool = False,
+        mutation_intent: MutationIntentContract | None = None,
     ) -> ProjectContextResult:
         response_style = validate_response_style(response_style)
+        mutation_intent = mutation_intent or build_mutation_intent(question)
         routing_budget_issues: list[str] = []
         routing_stage_observed: dict[str, list[Any]] = {}
         mode = mode.lower()
@@ -161,9 +169,17 @@ class ProjectContextService:
         root = Path(project_path).expanduser().resolve()
         intent = classify_project_query_intent(question)
         evidence_path = extract_document_locator(question)
+        mutation_target_paths = tuple(
+            target.value
+            for target in mutation_intent.requested_targets
+            if target.kind == "path"
+            and mutation_intent.operation in {"modify", "delete", "rename"}
+            and target.value.casefold() != str(mutation_intent.destination or "").casefold()
+        )
         canonical_requirements = build_requirements(
             question,
             required_evidence_paths=(evidence_path,) if evidence_path else (),
+            required_target_paths=mutation_target_paths,
             profile="project_document_answer" if evidence_path else "project_docs_answer",
         )
         metadata = self.facade.read_project_metadata(str(root))
@@ -193,6 +209,7 @@ class ProjectContextService:
                     )
                 project_docs = _inject_broad_architecture_docs(
                     project_docs, root=root, intent=intent, evidence_path=evidence_path,
+                    lifecycle_intent_value=canonical_requirements.lifecycle_intent,
                     # The mere presence of an explicit catalog disables guessed
                     # architecture sources. An invalid catalog must fail closed.
                     catalog_authoritative=metadata.docs_catalog_present,
@@ -542,7 +559,11 @@ class ProjectContextService:
             relevance_terms=relevance_terms,
         )
         diagnostics["relevance_gate"] = relevance_gate
-        if answer_available and not relevance_gate["passed"]:
+        if (
+            answer_available
+            and not relevance_gate["passed"]
+            and not support_decision.answer_supported
+        ):
             warning = {
                 "code": "no_query_relevance_evidence",
                 "message": (
@@ -616,6 +637,7 @@ class ProjectContextService:
             answer_available=answer_available,
             answer_type=answer_type,
             intent=intent,
+            support_decision=support_decision,
         )
         diagnostics["trust_decision"] = {
             "answer_available": trust_decision.answer_available,
@@ -712,8 +734,12 @@ class ProjectContextService:
 
 def project_context_pack(*, question: str = "", project_docs: ProjectDocsResult | None, dependency_docs: DocsResult | None) -> list[dict[str, Any]]:
     pack: list[dict[str, Any]] = []
+    answer_lifecycle_intent = lifecycle_intent_for_question(question)
     if project_docs:
         for item in project_docs.results:
+            lifecycle_metadata = {"lifecycle_status": item.lifecycle_status or "active"}
+            if not lifecycle_allows(lifecycle_metadata, answer_lifecycle_intent):
+                continue
             if _drop_placeholder_context_doc(item):
                 continue
             if _drop_low_value_context_section(item.content, item.title, item.heading_path):
@@ -744,7 +770,9 @@ def project_context_pack(*, question: str = "", project_docs: ProjectDocsResult 
                 "module_path": item.module_path,
                 "module_type": item.module_type,
                 "description": item.description,
-                "lifecycle_status": item.lifecycle_status,
+                "lifecycle_status": item.lifecycle_status or "active",
+                "temporal_relevance": temporal_relevance_for_status(item.lifecycle_status),
+                "index_freshness": "stale" if item.stale else "synchronized",
                 "impact_policy": item.impact_policy,
                 "path": item.path,
                 "url": item.url,
@@ -767,7 +795,9 @@ def project_context_pack(*, question: str = "", project_docs: ProjectDocsResult 
                     "module_path": item.module_path,
                     "module_type": item.module_type,
                     "description": item.description,
-                    "lifecycle_status": item.lifecycle_status,
+                    "lifecycle_status": item.lifecycle_status or "active",
+                    "temporal_relevance": temporal_relevance_for_status(item.lifecycle_status),
+                    "index_freshness": "stale" if item.stale else "synchronized",
                     "impact_policy": item.impact_policy,
                     "path": item.path,
                     "url": item.url,
@@ -881,6 +911,7 @@ def _inject_broad_architecture_docs(
     root: Path,
     intent: Any,
     evidence_path: str | None = None,
+    lifecycle_intent_value: str = "current",
     catalog_authoritative: bool = False,
 ) -> ProjectDocsResult:
     if evidence_path or not getattr(intent, "wants_architecture", False):
@@ -893,13 +924,17 @@ def _inject_broad_architecture_docs(
             for item in project_docs.candidate_sources
             if item.get("reason") in {"overview", "project_architecture"}
             and item.get("doc_scope") == "project"
-            and (item.get("lifecycle_status") or "active") == "active"
+            and lifecycle_allows(item, lifecycle_intent_value)
         ][:3]
     else:
-        injection_rows = [
-            {"path": rel, "doc_scope": "project"}
-            for rel in ("ARCHITECTURE.md", "docs/INDEX.md", "README.md")
-        ]
+        injection_rows = (
+            [
+                {"path": rel, "doc_scope": "project", "lifecycle_status": "active"}
+                for rel in ("ARCHITECTURE.md", "docs/INDEX.md", "README.md")
+            ]
+            if lifecycle_intent_value != "historical"
+            else []
+        )
     for row in injection_rows:
         rel = str(row.get("path") or "")
         if normalize_doc_path(rel) in existing:
@@ -915,7 +950,14 @@ def _inject_broad_architecture_docs(
             content=text[:12_000],
             source=str(path),
             url=None,
-            metadata={"score": 1.0, "injected_for": "broad_architecture_query", "injection_policy": "root_reviewable_project_doc_after_preflight"},
+            metadata={
+                "score": 1.0,
+                "injected_for": "broad_architecture_query",
+                "injection_policy": "root_reviewable_project_doc_after_preflight",
+                "lifecycle_status": row.get("lifecycle_status") or "active",
+                "temporal_relevance": temporal_relevance_for_status(row.get("lifecycle_status")),
+                "index_freshness": "synchronized",
+            },
             source_class=SOURCE_CLASS_PROJECT_FILE,
             path=rel,
             doc_scope=str(row.get("doc_scope") or "project"),
@@ -1051,6 +1093,7 @@ def _make_context_trust_decision(
     answer_available: bool,
     answer_type: str,
     intent: Any,
+    support_decision: Any | None = None,
 ) -> ContextTrustDecision:
     max_project_score = _max_project_ranking_score(project_docs)
     matched_terms = list(relevance_gate.get("matched_terms") or [])
@@ -1059,6 +1102,21 @@ def _make_context_trust_decision(
 
     if _is_low_signal_single_token_query(question):
         return ContextTrustDecision(False, "no_reliable_context", "low", passed, max_project_score, matched_terms, missing_terms)
+
+    # The typed selector has already revalidated a bounded, model-visible answer
+    # unit for every mandatory obligation.  Legacy lexical relevance remains a
+    # diagnostic, but cannot veto that stronger proof contract merely because
+    # an interrogative word such as ``value`` is not repeated in the answer.
+    if (
+        bool(getattr(support_decision, "answer_supported", False))
+        and context_pack
+        and project_docs
+        and project_docs.answer_available
+    ):
+        return ContextTrustDecision(
+            True, "typed_evidence_contract_satisfied", "trusted", passed,
+            max_project_score, matched_terms, missing_terms,
+        )
 
     has_dependency_answer = bool(dependency_docs and dependency_docs.results)
     has_source_evidence = any(item.get("evidence_class") == "source_snippet" for item in source_evidence_items)

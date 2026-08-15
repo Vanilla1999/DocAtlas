@@ -192,9 +192,11 @@ def _filter_spec(filters: Mapping[str, Any] | None) -> FilterSpec:
 
     def texts(name: str) -> tuple[str, ...]:
         value = filters.get(name)
+        if isinstance(value, Mapping) and "in" in value:
+            value = value.get("in")
         if isinstance(value, str):
             return (value[:240],)
-        if isinstance(value, (list, tuple, set)):
+        if isinstance(value, (list, tuple, set, frozenset)):
             normalized = {
                 str(item).strip()[:240] for item in value if str(item).strip()
             }
@@ -211,6 +213,13 @@ def _filter_spec(filters: Mapping[str, Any] | None) -> FilterSpec:
         minimum_authority=text("minimum_authority"),
         module_ids=texts("module_id") or texts("module_ids"),
         doc_scopes=texts("doc_scope") or texts("doc_scopes"),
+        lifecycle_statuses=(
+            texts("lifecycle_status")
+            or texts("lifecycle_statuses")
+            or texts("project_doc_lifecycle_status")
+        ),
+        temporal_relevance=texts("temporal_relevance"),
+        index_freshness=texts("index_freshness"),
         exact_snapshot_required=_strict_bool(filters.get("exact_snapshot_required", False)),
         forbidden_sources=texts("forbidden_sources"),
     )
@@ -227,6 +236,7 @@ def compile_backend_filters(filters: Mapping[str, Any] | None) -> dict[str, Any]
     spec = _filter_spec(raw)
     for alias in (
         "source_classes", "module_ids", "doc_scopes", "minimum_authority",
+        "lifecycle_statuses", "project_doc_lifecycle_status",
         "exact_snapshot_required", "forbidden_sources",
     ):
         raw.pop(alias, None)
@@ -236,6 +246,12 @@ def compile_backend_filters(filters: Mapping[str, Any] | None) -> dict[str, Any]
         raw["module_id"] = {"in": list(spec.module_ids)}
     if spec.doc_scopes:
         raw["doc_scope"] = {"in": list(spec.doc_scopes)}
+    if spec.lifecycle_statuses:
+        raw["lifecycle_status"] = {"in": list(spec.lifecycle_statuses)}
+    if spec.temporal_relevance:
+        raw["temporal_relevance"] = {"in": list(spec.temporal_relevance)}
+    if spec.index_freshness:
+        raw["index_freshness"] = {"in": list(spec.index_freshness)}
     if spec.exact_snapshot_required:
         raw["docs_snapshot_exact"] = True
     if spec.minimum_authority:
@@ -257,6 +273,15 @@ def metadata_matches_filters(
     # vector payloads expose its normalized promoted filter field.
     values.setdefault("authority", values.get("project_doc_authority"))
     values.setdefault("project_doc_path", values.get("source_path"))
+    values.setdefault(
+        "lifecycle_status",
+        values.get("project_doc_lifecycle_status") or "active",
+    )
+    values.setdefault(
+        "temporal_relevance",
+        "current" if str(values.get("lifecycle_status") or "active").casefold() in {"active", "current"} else "historical",
+    )
+    values.setdefault("index_freshness", "synchronized")
     values.setdefault("source", source)
     for key, expected in compile_backend_filters(filters).items():
         actual = values.get(key)

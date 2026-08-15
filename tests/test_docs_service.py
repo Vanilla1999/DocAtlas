@@ -1513,7 +1513,9 @@ def test_get_project_context_diagnostics_preserve_query_intent_and_active_index(
         service,
     )
 
-    assert result.answer_available is True
+    assert result.answer_available is False
+    assert result.context_pack
+    assert result.reason == "partial_navigational_context"
     assert result.diagnostics["query_intent"]
     assert result.diagnostics["active_index"]["project_path"] == str(project.resolve())
     assert result.diagnostics["active_index"]["db_path"] == str((tmp_path / "docmancer.db").resolve())
@@ -1564,8 +1566,8 @@ Main class: `HelpRequestModule`.
         response_style="snippet-first",
     )
 
-    assert result.answer_available is True
-    assert result.reason == "trusted_context_available"
+    assert result.answer_available is False
+    assert result.reason == "insufficient_code_symbol_evidence"
     assert result.primary_snippet is not None
     assert "HelpRequestModule.init" in result.primary_snippet["code"]
     assert any(item.get("source_class") == "source_evidence" and item.get("path") == "lib/src/help_request_module.dart" for item in result.context_pack)
@@ -1801,7 +1803,7 @@ def test_query_project_docs_skips_oversized_first_authoritative_page(tmp_path):
 
         def query(self, query, *, limit, budget, expand, filters):
             assert filters["project_path"] == str(project.resolve())
-            if filters.get("project_doc_authority") == "source_of_truth":
+            if filters.get("authority") == "source_of_truth":
                 return [
                     RetrievedChunk(
                         source="large-runbook.md",
@@ -1968,14 +1970,12 @@ roots:
         service,
     )
     assert index_witness_payload is not None
-    assert index_witness_payload["status"] != "insufficient_evidence", index_witness_payload
+    assert index_witness_payload["status"] == "insufficient_evidence"
     assert index_witness_payload["kind"] == "patch_context"
-    assert any(
-        source["path"].endswith("zz-authoritative-plan.md")
-        and "index-witness retrieval-miss classification" in source["symbol_or_section"]
-        and source["evidence_id"]
-        for source in index_witness_payload["sources"]
-    )
+    assert index_witness_payload["edit_ready"] is False
+    assert index_witness_payload["recommended_next_action"]["tool"] == "code_search"
+    assert "library_docs_service.py" in index_witness_payload["recommended_next_action"]["suggested_doc_paths"]
+
 
     novel_index_witness_payload = handle_context_tool(
         "get_docs_context",
@@ -1992,14 +1992,12 @@ roots:
         service,
     )
     assert novel_index_witness_payload is not None
-    assert novel_index_witness_payload["status"] != "insufficient_evidence", novel_index_witness_payload
+    assert novel_index_witness_payload["status"] == "insufficient_evidence"
     assert novel_index_witness_payload["kind"] == "patch_context"
-    assert any(
-        source["path"].endswith("zz-authoritative-plan.md")
-        and "index-witness retrieval-miss classification" in source["symbol_or_section"]
-        and source["evidence_id"]
-        for source in novel_index_witness_payload["sources"]
-    )
+    assert novel_index_witness_payload["edit_ready"] is False
+    assert novel_index_witness_payload["recommended_next_action"]["tool"] == "code_search"
+    assert "library_docs_service.py" in novel_index_witness_payload["recommended_next_action"]["suggested_doc_paths"]
+
 
     absent = handle_context_tool(
         "get_docs_context",
@@ -2331,7 +2329,8 @@ def test_bootstrap_project_docs_requires_confirmation_before_refreshing_stale_do
     context = service.get_project_context(str(project), "FreshAcceptanceNeedle", tokens=1200, limit=3)
 
     assert sync.status == "success"
-    assert context.answer_available is True
+    assert context.answer_available is False
+    assert context.reason == "partial_navigational_context"
     assert context.project_docs is not None
     assert context.project_docs.results
     assert "FreshAcceptanceNeedle" in context.project_docs.results[0].content

@@ -1,9 +1,10 @@
 """Deterministic, source-owned context for FTS and embedding inputs."""
 from __future__ import annotations
 
+import hashlib
 import posixpath
 import re
-from pathlib import PurePosixPath
+from pathlib import Path, PurePosixPath
 from typing import Any, Mapping
 from urllib.parse import urlsplit, urlunsplit
 
@@ -17,6 +18,7 @@ from docmancer.retrieval.contracts import (
 
 
 _AUTHORITIES = {
+    "canonical",
     "official",
     "project_owned",
     "verified",
@@ -187,7 +189,10 @@ def _field_candidates(
 def normalized_filter_metadata(metadata: Mapping[str, Any]) -> dict[str, str | int | None]:
     """Return the small, typed metadata surface allowed in retrieval filters."""
     authority = str(
-        metadata.get("authority") or metadata.get("project_doc_authority") or "unknown"
+        metadata.get("authority")
+        or metadata.get("repository_authority")
+        or metadata.get("project_doc_authority")
+        or "unknown"
     ).casefold().replace("-", "_")
     if authority not in _AUTHORITIES:
         authority = "unknown"
@@ -205,21 +210,46 @@ def normalized_filter_metadata(metadata: Mapping[str, Any]) -> dict[str, str | i
         exact_value = int(exact.strip().casefold() in {"true", "1"})
     else:
         exact_value = None
+    lifecycle_status = _single_line(
+        metadata.get("lifecycle_status")
+        or metadata.get("project_doc_lifecycle_status")
+        or "active"
+    ).casefold().replace("-", "_")
+    if lifecycle_status not in {"active", "current", "completed", "superseded", "historical"}:
+        lifecycle_status = "active"
+    temporal_relevance = _single_line(metadata.get("temporal_relevance")).casefold()
+    if temporal_relevance not in {"current", "historical"}:
+        temporal_relevance = (
+            "current" if lifecycle_status in {"active", "current"} else "historical"
+        )
+    index_freshness = _single_line(metadata.get("index_freshness") or "synchronized").casefold()
+    if index_freshness not in {"synchronized", "stale", "unknown"}:
+        index_freshness = "unknown"
+    explicit_project_path = _single_line(metadata.get("project_path"))
+    project_identity = _single_line(
+        metadata.get("project_identity") or metadata.get("repository_identity")
+    )
+    if not project_identity and explicit_project_path:
+        resolved_project_path = Path(explicit_project_path).expanduser().resolve(strict=False)
+        project_identity = (
+            "local:" + hashlib.sha256(str(resolved_project_path).encode("utf-8")).hexdigest()
+        )
     return {
         "library_id": _single_line(metadata.get("library_id")),
         "resolved_version": resolved_version,
         "version_family": _single_line(metadata.get("version_family")),
-        "project_identity": _single_line(metadata.get("project_identity")),
-        # Retrieval isolation needs the exact resolved project root. It is a
-        # typed filter value, not model-visible context; source-relative paths
-        # are represented separately by canonical_location/project_doc_path.
-        "project_path": _single_line(metadata.get("project_path")) or _canonical_relative_path(str(
-            metadata.get("project_doc_path") or metadata.get("source_path") or ""
-        )),
+        "project_identity": project_identity,
+        # Retrieval isolation needs the exact resolved project root.  Never
+        # substitute a document-relative path or URL: that would manufacture a
+        # project namespace for ordinary library documentation.
+        "project_path": explicit_project_path,
         "module_id": _single_line(metadata.get("module_id") or metadata.get("module_name")),
         "doc_scope": _single_line(metadata.get("doc_scope")),
         "source_class": _single_line(metadata.get("source_class")),
         "authority": authority,
+        "lifecycle_status": lifecycle_status,
+        "temporal_relevance": temporal_relevance,
+        "index_freshness": index_freshness,
         "docs_snapshot_exact": exact_value,
     }
 

@@ -21,6 +21,7 @@ from docmancer.docs.application.model_visible_projection import (
     projection_kind,
     validate_model_visible_projection,
 )
+from docmancer.docs.domain.mutation_intent import build_mutation_intent
 from docmancer.docs.domain.tool_selection import normalize_public_docs_actions
 from docmancer.docs.domain.retrieval_routing import validate_routing_record
 from docmancer.docs.service import LibraryDocsService
@@ -246,6 +247,7 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
         return _bad_request("empty_question", "question must not be empty. Examples: 'Flutter Riverpod providers', 'Firebase Auth signIn', 'How to use go_router redirect', 'FastAPI dependency injection', 'patch_constraints for adding a service'")
     if args.get("packet_tokens") is not None and args.get("delivery_strategy") != "bounded_direct":
         return _bad_request("packet_tokens_requires_bounded_delivery", "packet_tokens requires delivery_strategy='bounded_direct'")
+    mutation_intent = build_mutation_intent(question)
     maintenance = args.get("maintenance")
     if maintenance is not None:
         return _handle_maintenance_context(args, maintenance, service)
@@ -276,6 +278,7 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
         prefetch_auto=False,
         details=args.get("details"),
         response_style=args.get("response_style"),
+        mutation_intent=mutation_intent,
     )
     canonical_selection = (
         result.get("selection_decision")
@@ -388,7 +391,37 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
             project_identity=_clean_string(raw.get("project_identity")),
             module_id=_clean_string(raw.get("module_id")),
             selection_diagnostics=selection_trace,
+            mutation_intent_contract=mutation_intent,
         )
+        mutation = packet.get("mutation_intent") if isinstance(packet.get("mutation_intent"), dict) else {}
+        if mutation.get("operation") != "none" and mutation.get("ready") is not True:
+            requested = mutation.get("requested_targets") if isinstance(mutation.get("requested_targets"), list) else []
+            query_terms = [
+                str(item.get("value") or "")[:160]
+                for item in requested[:8]
+                if isinstance(item, dict) and str(item.get("value") or "").strip()
+            ]
+            # Project documentation can constrain an edit, but it cannot clear
+            # the code-search obligation until the requested mutation target is
+            # locally resolved.
+            recovery = {
+                "tool": "code_search",
+                "type": "search_local_source",
+                "reason": "Resolve the requested mutation target before editing.",
+                "query_terms": query_terms or [question[:160]],
+                "suggested_doc_paths": [
+                    str(item.get("value") or "")[:300]
+                    for item in requested[:8]
+                    if isinstance(item, dict) and item.get("kind") == "path"
+                ],
+                "suggested_symbols": [
+                    str(item.get("value") or "")[:160]
+                    for item in requested[:8]
+                    if isinstance(item, dict) and item.get("kind") == "symbol"
+                ],
+                "requires_confirmation": False,
+                "auto_execute": False,
+            }
         raw.setdefault("retrieval_diagnostics", {})["evidence_selection"] = selection_trace
         validation_errors = validate_action_packet(
             packet,
@@ -414,6 +447,11 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
                 max_tokens=min(INSUFFICIENT_EVIDENCE_MAX_TOKENS, output_budget),
             )
             _annotate_source_search_handoff(projection, recovery)
+        # Recovery/source-search metadata is appended after projection.  Bound
+        # the *final* object unconditionally so no post-format mutation can
+        # reintroduce an oversized insufficient response.
+        if projection.get("status") == "insufficient_evidence":
+            bound_insufficient_projection(projection, max_tokens=output_budget)
         _omit_nullable_reason_code(projection)
         _refresh_projection_estimate(projection)
         projection_errors = validate_model_visible_projection(

@@ -3,7 +3,10 @@ from __future__ import annotations
 from dataclasses import asdict
 import hashlib
 
+import pytest
+
 from docmancer.docs.application.project_docs_service import ProjectDocsService
+from docmancer.docs.domain.project_path_validation import ProjectPathValidationError
 from docmancer.docs.models import SOURCE_CLASS_PROJECT_FILE
 from docmancer.docs.project import ProjectMetadataReader
 
@@ -100,28 +103,34 @@ class FakeProjectFacade:
         return "get-result"
 
 
-def test_project_docs_service_delegates_inspect():
+def test_project_docs_service_delegates_inspect(tmp_path):
     facade = FakeProjectFacade()
     service = ProjectDocsService(facade)
+    root = tmp_path / "repo"
+    root.mkdir()
 
-    assert service.inspect_project_docs("/repo") == "inspect-result"
-    assert facade.calls == [("inspect", "/repo")]
+    assert service.inspect_project_docs(str(root)) == "inspect-result"
+    assert facade.calls == [("inspect", str(root.resolve()))]
 
 
-def test_project_docs_service_delegates_ingest_options():
+def test_project_docs_service_delegates_ingest_options(tmp_path):
     facade = FakeProjectFacade()
     service = ProjectDocsService(facade)
+    root = tmp_path / "repo"
+    root.mkdir()
 
-    assert service.ingest_project_docs("/repo", skip_known=False, with_vectors=False) == "ingest-result"
-    assert facade.calls == [("ingest", "/repo", {"skip_known": False, "with_vectors": False})]
+    assert service.ingest_project_docs(str(root), skip_known=False, with_vectors=False) == "ingest-result"
+    assert facade.calls == [("ingest", str(root.resolve()), {"skip_known": False, "with_vectors": False})]
 
 
-def test_project_docs_service_delegates_get_query_options():
+def test_project_docs_service_delegates_get_query_options(tmp_path):
     facade = FakeProjectFacade()
     service = ProjectDocsService(facade)
+    root = tmp_path / "repo"
+    root.mkdir()
 
-    assert service.get_project_docs("/repo", "architecture", tokens=100, limit=2, expand="page", module_path="packages/api", scope="module") == "get-result"
-    assert facade.calls == [("get", "/repo", "architecture", {"tokens": 100, "limit": 2, "expand": "page", "module": None, "module_path": "packages/api", "scope": "module"})]
+    assert service.get_project_docs(str(root), "architecture", tokens=100, limit=2, expand="page", module_path="packages/api", scope="module") == "get-result"
+    assert facade.calls == [("get", str(root.resolve()), "architecture", {"tokens": 100, "limit": 2, "expand": "page", "module": None, "module_path": "packages/api", "scope": "module"})]
 
 
 def test_project_reader_reads_pubspec_lock_versions(tmp_path):
@@ -184,6 +193,18 @@ def test_missing_project_path_returns_single_warning(tmp_path):
     assert metadata.warnings == [f"Project path not found: {missing.resolve()}"]
     assert metadata.docs_candidates == []
     assert metadata.packages == {}
+
+    facade = FakeProjectFacade()
+    service = ProjectDocsService(facade)
+    for operation in (
+        lambda: service.inspect_project_docs(str(missing)),
+        lambda: service.ingest_project_docs(str(missing)),
+        lambda: service.get_project_docs(str(missing), "architecture"),
+    ):
+        with pytest.raises(ProjectPathValidationError) as captured:
+            operation()
+        assert captured.value.reason_code == "project_path_not_found"
+    assert facade.calls == []
 
 
 def test_project_reader_discovers_module_owned_docs(tmp_path):

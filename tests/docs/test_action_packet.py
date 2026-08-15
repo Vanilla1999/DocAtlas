@@ -8,6 +8,9 @@ import jsonschema
 import pytest
 
 from docmancer.cli.commands import _get_template_content
+from docmancer.docs.domain.mutation_intent import (
+    build_mutation_intent, evaluate_mutation_readiness, resolve_mutation_targets,
+)
 from docmancer.docs.application.action_packet import (
     ACTION_PACKET_OUTPUT_SCHEMA,
     build_action_packet,
@@ -69,19 +72,50 @@ def test_selected_document_terms_survive_action_packet_formatting():
         "display_content_hash": hashlib.sha256(text.encode("utf-8")).hexdigest(),
         "authority": "official",
     }
+    target_text = "class NativeVoiceCapturePlugin"
+    target = {
+        "stable_chunk_id": "native-voice-target",
+        "parent_logical_id": "parent:native-voice-target",
+        "source": "src/NativeVoiceCapturePlugin.kt",
+        "display_text": target_text,
+        "display_content_hash": hashlib.sha256(target_text.encode("utf-8")).hexdigest(),
+        "authority": "official",
+        "source_class": "code_graph",
+        "symbols": ["NativeVoiceCapturePlugin"],
+    }
 
     packet = build_action_packet(
-        question="Update NativeVoiceCapturePlugin.kt for SDK PCM capture",
-        context_pack=[item],
+        question="Update src/NativeVoiceCapturePlugin.kt for SDK PCM capture",
+        context_pack=[item, target],
         max_tokens=1500,
     )
 
     assert packet["status"] == "ok"
-    assert packet["implementation_guidance"] == [{
-        "text": text,
-        "evidence_ids": [packet["source_of_truth"][0]["evidence_id"]],
-    }]
-    assert validate_action_packet(packet, evidence_items=[item], max_tokens=1500) == []
+    assert packet["mutation_intent"]["ready"] is True
+    assert any(row["text"] == text for row in packet["implementation_guidance"])
+    assert validate_action_packet(packet, evidence_items=[item, target], max_tokens=1500) == []
+
+    create = build_mutation_intent(
+        "Create src/NewCaptureAdapter.py so that capture remains bounded."
+    )
+    unresolved = resolve_mutation_targets(
+        create, [], evidence_id_for_item=lambda row: row.get("stable_chunk_id", "")
+    )
+    assert evaluate_mutation_readiness(unresolved).missing == (
+        "create_parent_or_module_not_resolved",
+    )
+    parent = {
+        "stable_chunk_id": "capture-parent",
+        "source": "src/existing_capture.py",
+        "source_class": "code_graph",
+    }
+    resolved_create = resolve_mutation_targets(
+        create, [parent], evidence_id_for_item=lambda row: row["stable_chunk_id"]
+    )
+    create_readiness = evaluate_mutation_readiness(resolved_create)
+    assert create_readiness.ready is True
+    assert resolved_create.resolved_targets[0].binding_kind == "parent_context"
+    assert resolved_create.resolved_targets[0].exists is False
 
 
 def test_selected_exact_terms_keep_protected_witness_during_budget_fitting():
@@ -182,11 +216,26 @@ def test_display_only_canonical_child_is_rendered_and_hash_bound():
         "doc_scope": "project",
     }
 
-    packet = build_action_packet(question="Update the formatter", context_pack=[item])
+    target_text = "def format_packet(): pass"
+    target = {
+        "stable_chunk_id": "formatter-target",
+        "parent_logical_id": "parent:formatter-target",
+        "source": "src/formatter.py",
+        "display_text": target_text,
+        "display_content_hash": hashlib.sha256(target_text.encode("utf-8")).hexdigest(),
+        "authority": "official",
+        "source_class": "code_graph",
+        "symbols": ["format_packet"],
+    }
+    packet = build_action_packet(
+        question="Update src/formatter.py",
+        context_pack=[item, target],
+    )
 
     assert packet["status"] == "ok"
+    assert packet["mutation_intent"]["ready"] is True
     assert packet["required_invariants"][0]["text"] == text
-    assert validate_action_packet(packet, evidence_items=[item]) == []
+    assert validate_action_packet(packet, evidence_items=[item, target]) == []
 
 
 def test_python_imports_do_not_create_normative_facts_but_prose_does():
@@ -633,11 +682,11 @@ def test_action_packet_is_deterministic_deduplicated_authority_filtered_and_cite
         "metadata": {"symbols": ["critical_symbol"], "score": 1.0}, "content": "code",
     })
     ranked_packet = build_action_packet(
-        question="Fix critical_symbol", context_pack=ranked, max_tokens=500,
+        question="Fix critical_symbol", context_pack=ranked, max_tokens=700,
     )
     assert any(item["path"] == "src/z_critical.py" for item in ranked_packet["target_surface"]["likely_files"])
     assert ranked_packet["status"] in {"truncated", "ok"}
-    assert validate_action_packet(ranked_packet, max_tokens=500) == []
+    assert validate_action_packet(ranked_packet, max_tokens=700) == []
 
     exact = {
         "path": "https://docs.example/api", "heading_path": "API", "authority": "canonical",

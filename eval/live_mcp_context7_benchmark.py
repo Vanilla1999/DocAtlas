@@ -16,9 +16,6 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import urlparse
 
-from mcp import ClientSession, StdioServerParameters
-from mcp.client.stdio import stdio_client
-
 ROOT = Path(__file__).resolve().parents[1]
 RESULTS_ROOT = ROOT / "eval" / "results" / "live"
 
@@ -1297,15 +1294,21 @@ class Context7MCPProvider(BenchmarkProvider):
         self.provider_id = "context7_zero_setup"
         self.provider_mode = "live_mcp_stdio"
         self.benchmark_mode = "zero-setup"
-        self._session: ClientSession | None = None
+        self._session: Any = None
         self._lib_cache: dict[str, str] = {}
         self._stdio_ctx: Any = None
         self._session_ctx: Any = None
         self._read: Any = None
         self._write: Any = None
 
-    async def _ensure_session(self) -> ClientSession:
+    async def _ensure_session(self) -> Any:
         if self._session is None:
+            # The provider-backed benchmark is optional.  Keep the MCP SDK
+            # import on the live execution path so provider-free metrics and
+            # regression tests remain importable from a minimal sdist.
+            from mcp import ClientSession, StdioServerParameters
+            from mcp.client.stdio import stdio_client
+
             params = StdioServerParameters(
                 command="context7-mcp",
                 args=["--transport", "stdio"],

@@ -1,0 +1,399 @@
+{
+  "schema_version": "project-answer-quality-corpus-v1",
+  "cases": [
+    {
+      "case_id": "definition_over_name_distractor",
+      "question": "What is CedarRuntime?",
+      "files": {
+        "README.md": "# CedarRuntime\n\nCedarRuntime is a local, version-aware documentation runtime for build agents.\n",
+        "docs/migration.md": "# Migration tracker\n\nThe CedarRuntime product name appears in this migration tracker, but this section does not define the product.\n"
+      },
+      "documents": [
+        {
+          "path": "README.md",
+          "role": "overview",
+          "authority": "source_of_truth",
+          "status": "active",
+          "impact": "track"
+        },
+        {
+          "path": "docs/migration.md",
+          "role": "other",
+          "authority": "supporting",
+          "status": "active",
+          "impact": "track"
+        }
+      ],
+      "expected": {
+        "status": "ok",
+        "evidence_paths": [
+          "README.md"
+        ],
+        "required_fragments": [
+          "CedarRuntime is a local, version-aware documentation runtime"
+        ],
+        "forbidden_fragments": [
+          "does not define the product"
+        ],
+        "forbidden_paths": [
+          "docs/migration.md"
+        ]
+      }
+    },
+    {
+      "case_id": "version_value_over_generic_mention",
+      "question": "What Python version does CedarRuntime require?",
+      "files": {
+        "README.md": "# CedarRuntime\n\nCedarRuntime is implemented in Python and has a versioned runtime contract.\n",
+        "docs/runtime.md": "# Runtime contract\n\nCedarRuntime requires Python >=3.11.\n"
+      },
+      "documents": [
+        {
+          "path": "README.md",
+          "role": "overview",
+          "authority": "supporting",
+          "status": "active",
+          "impact": "track"
+        },
+        {
+          "path": "docs/runtime.md",
+          "role": "other",
+          "authority": "source_of_truth",
+          "status": "active",
+          "impact": "track"
+        }
+      ],
+      "expected": {
+        "status": "ok",
+        "evidence_paths": [
+          "docs/runtime.md"
+        ],
+        "required_fragments": [
+          "Python >=3.11"
+        ],
+        "forbidden_fragments": [
+          "implemented in Python"
+        ],
+        "forbidden_paths": [
+          "README.md"
+        ]
+      }
+    },
+    {
+      "case_id": "named_inventory_over_count_only",
+      "question": "Which exactly three public tools does Cedar MCP expose?",
+      "files": {
+        "docs/tools.md": "# Public tools\n\nCedar MCP exposes exactly three public tools: fetch_context, prepare_index, and index_status.\n",
+        "docs/compatibility.md": "# Compatibility\n\nThe compatibility server has exactly three public tools.\n",
+        "ARCHITECTURE.md": "# Repository architecture\n\nThe repository architecture is documented by the authoritative files under docs/.\n"
+      },
+      "documents": [
+        {
+          "path": "ARCHITECTURE.md",
+          "role": "project_architecture",
+          "authority": "source_of_truth",
+          "status": "active",
+          "impact": "track"
+        },
+        {
+          "path": "docs/tools.md",
+          "role": "other",
+          "authority": "source_of_truth",
+          "status": "active",
+          "impact": "track"
+        },
+        {
+          "path": "docs/compatibility.md",
+          "role": "other",
+          "authority": "supporting",
+          "status": "active",
+          "impact": "track"
+        }
+      ],
+      "expected": {
+        "status": "ok",
+        "evidence_paths": [
+          "docs/tools.md"
+        ],
+        "required_fragments": [
+          "fetch_context",
+          "prepare_index",
+          "index_status"
+        ],
+        "forbidden_fragments": [
+          "compatibility server"
+        ],
+        "forbidden_paths": [
+          "docs/compatibility.md"
+        ]
+      }
+    },
+    {
+      "case_id": "task_status_over_unrelated_status",
+      "question": "What is the status of Task 43?",
+      "files": {
+        "docs/task-43.md": "# Task 43\n\nTask 43 status is Accepted.\n",
+        "docs/task-17.md": "# Task 17\n\nTask 17 status is Accepted.\n",
+        "ARCHITECTURE.md": "# Repository architecture\n\nThe repository architecture is documented by the authoritative files under docs/.\n"
+      },
+      "documents": [
+        {
+          "path": "ARCHITECTURE.md",
+          "role": "project_architecture",
+          "authority": "source_of_truth",
+          "status": "active",
+          "impact": "track"
+        },
+        {
+          "path": "docs/task-43.md",
+          "role": "roadmap",
+          "authority": "source_of_truth",
+          "status": "active",
+          "impact": "track"
+        },
+        {
+          "path": "docs/task-17.md",
+          "role": "roadmap",
+          "authority": "supporting",
+          "status": "active",
+          "impact": "track"
+        }
+      ],
+      "expected": {
+        "status": "ok",
+        "evidence_paths": [
+          "docs/task-43.md"
+        ],
+        "required_fragments": [
+          "Task 43 status is Accepted"
+        ],
+        "forbidden_fragments": [
+          "Task 17 status"
+        ],
+        "forbidden_paths": [
+          "docs/task-17.md"
+        ]
+      }
+    },
+    {
+      "case_id": "timeout_value_over_request_handling",
+      "question": "What is the provider request timeout?",
+      "files": {
+        "docs/provider.md": "# Provider request\n\nThe provider request timeout is 15 seconds.\n",
+        "docs/dispatch.md": "# Request handling\n\nGeneric request handling validates input before dispatch.\n",
+        "ARCHITECTURE.md": "# Repository architecture\n\nThe repository architecture is documented by the authoritative files under docs/.\n"
+      },
+      "documents": [
+        {
+          "path": "ARCHITECTURE.md",
+          "role": "project_architecture",
+          "authority": "source_of_truth",
+          "status": "active",
+          "impact": "track"
+        },
+        {
+          "path": "docs/provider.md",
+          "role": "other",
+          "authority": "source_of_truth",
+          "status": "active",
+          "impact": "track"
+        },
+        {
+          "path": "docs/dispatch.md",
+          "role": "other",
+          "authority": "supporting",
+          "status": "active",
+          "impact": "track"
+        }
+      ],
+      "expected": {
+        "status": "ok",
+        "evidence_paths": [
+          "docs/provider.md"
+        ],
+        "required_fragments": [
+          "15 seconds"
+        ],
+        "forbidden_fragments": [
+          "validates input before dispatch"
+        ],
+        "forbidden_paths": [
+          "docs/dispatch.md"
+        ]
+      }
+    },
+    {
+      "case_id": "current_over_completed_lifecycle",
+      "question": "What value does RetryPolicy use currently?",
+      "files": {
+        "docs/current-policy.md": "# Current policy\n\nRetryPolicy uses RetryBudget=4 in the current rollout.\n",
+        "docs/completed-policy.md": "# Completed policy\n\nRetryPolicy used RetryBudget=2 in the completed rollout.\n",
+        "ARCHITECTURE.md": "# Repository architecture\n\nThe repository architecture is documented by the authoritative files under docs/.\n"
+      },
+      "documents": [
+        {
+          "path": "ARCHITECTURE.md",
+          "role": "project_architecture",
+          "authority": "source_of_truth",
+          "status": "active",
+          "impact": "track"
+        },
+        {
+          "path": "docs/current-policy.md",
+          "role": "other",
+          "authority": "source_of_truth",
+          "status": "active",
+          "impact": "track"
+        },
+        {
+          "path": "docs/completed-policy.md",
+          "role": "roadmap",
+          "authority": "historical",
+          "status": "completed",
+          "impact": "search_only"
+        }
+      ],
+      "expected": {
+        "status": "ok",
+        "evidence_paths": [
+          "docs/current-policy.md"
+        ],
+        "required_fragments": [
+          "RetryBudget=4"
+        ],
+        "forbidden_fragments": [
+          "RetryBudget=2"
+        ],
+        "forbidden_paths": [
+          "docs/completed-policy.md"
+        ]
+      }
+    },
+    {
+      "case_id": "explicit_historical_lifecycle",
+      "question": "What value did RetryPolicy use in the completed rollout?",
+      "files": {
+        "docs/current-policy.md": "# Current policy\n\nRetryPolicy uses RetryBudget=4 in the current rollout.\n",
+        "docs/completed-policy.md": "# Completed policy\n\nRetryPolicy used RetryBudget=2 in the completed rollout.\n",
+        "ARCHITECTURE.md": "# Repository architecture\n\nThe repository architecture is documented by the authoritative files under docs/.\n"
+      },
+      "documents": [
+        {
+          "path": "ARCHITECTURE.md",
+          "role": "project_architecture",
+          "authority": "source_of_truth",
+          "status": "active",
+          "impact": "track"
+        },
+        {
+          "path": "docs/current-policy.md",
+          "role": "other",
+          "authority": "source_of_truth",
+          "status": "active",
+          "impact": "track"
+        },
+        {
+          "path": "docs/completed-policy.md",
+          "role": "roadmap",
+          "authority": "historical",
+          "status": "completed",
+          "impact": "search_only"
+        }
+      ],
+      "expected": {
+        "status": "ok",
+        "evidence_paths": [
+          "docs/completed-policy.md"
+        ],
+        "required_fragments": [
+          "RetryBudget=2"
+        ],
+        "forbidden_fragments": [
+          "RetryBudget=4"
+        ],
+        "forbidden_paths": [
+          "docs/current-policy.md"
+        ]
+      }
+    },
+    {
+      "case_id": "unsupported_exact_fact_abstains",
+      "question": "What exact value does MissingContractValue use?",
+      "files": {
+        "docs/missing.md": "# MissingContractValue\n\nMissingContractValue is referenced by the architecture, but no value is defined in this corpus.\n",
+        "ARCHITECTURE.md": "# Repository architecture\n\nThe repository architecture is documented by the authoritative files under docs/.\n"
+      },
+      "documents": [
+        {
+          "path": "ARCHITECTURE.md",
+          "role": "project_architecture",
+          "authority": "source_of_truth",
+          "status": "active",
+          "impact": "track"
+        },
+        {
+          "path": "docs/missing.md",
+          "role": "other",
+          "authority": "source_of_truth",
+          "status": "active",
+          "impact": "track"
+        }
+      ],
+      "expected": {
+        "status": "insufficient_evidence",
+        "evidence_paths": [],
+        "required_fragments": [],
+        "forbidden_fragments": [
+          "no value is defined"
+        ],
+        "forbidden_paths": [
+          "docs/missing.md"
+        ]
+      }
+    },
+    {
+      "case_id": "heading_only_abstains",
+      "question": "What does RareHeadingOnly specify?",
+      "files": {
+        "docs/heading.md": "# RareHeadingOnly\n",
+        "docs/navigation.md": "# Navigation\n\nSee RareHeadingOnly for details.\n",
+        "ARCHITECTURE.md": "# Repository architecture\n\nThe repository architecture is documented by the authoritative files under docs/.\n"
+      },
+      "documents": [
+        {
+          "path": "ARCHITECTURE.md",
+          "role": "project_architecture",
+          "authority": "source_of_truth",
+          "status": "active",
+          "impact": "track"
+        },
+        {
+          "path": "docs/heading.md",
+          "role": "other",
+          "authority": "source_of_truth",
+          "status": "active",
+          "impact": "track"
+        },
+        {
+          "path": "docs/navigation.md",
+          "role": "other",
+          "authority": "supporting",
+          "status": "active",
+          "impact": "track"
+        }
+      ],
+      "expected": {
+        "status": "insufficient_evidence",
+        "evidence_paths": [],
+        "required_fragments": [],
+        "forbidden_fragments": [
+          "See RareHeadingOnly for details"
+        ],
+        "forbidden_paths": [
+          "docs/heading.md",
+          "docs/navigation.md"
+        ]
+      }
+    }
+  ]
+}

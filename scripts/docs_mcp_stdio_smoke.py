@@ -9,9 +9,6 @@ import sys
 import tempfile
 from pathlib import Path
 
-from mcp import ClientSession, StdioServerParameters
-from mcp.client.stdio import stdio_client
-
 from docmancer.mcp.agent_config import AgentTarget, register_server
 
 TOOLS = {"get_docs_context", "prepare_docs", "docs_status"}
@@ -39,6 +36,11 @@ def text_payload(result: object) -> dict:
 
 
 async def smoke() -> None:
+    # The parsers below are provider-free release contracts. Import the MCP
+    # client only when the installed-artifact smoke is actually executed.
+    from mcp import ClientSession, StdioServerParameters
+    from mcp.client.stdio import stdio_client
+
     with tempfile.TemporaryDirectory(prefix="docatlas-release-smoke-") as raw:
         root = Path(raw)
         project = root / "project"
@@ -53,23 +55,33 @@ async def smoke() -> None:
                 await session.initialize()
                 names = {tool.name for tool in (await session.list_tools()).tools}
                 assert names == TOOLS, f"unexpected public Docs tools: {sorted(names)}"
-                query = {
+                # Canonical public default: advertised fields only.  Do not
+                # accidentally exercise the hidden compatibility projection.
+                canonical_query = {
                     "question": QUESTION,
                     "project_path": str(project),
                     "mode": "project",
-                    "output_mode": "compact",
                 }
-                await session.call_tool("get_docs_context", query)
+                compatibility_query = {**canonical_query, "output_mode": "compact"}
+                assert set(canonical_query) == {"question", "project_path", "mode"}
+                await session.call_tool("get_docs_context", canonical_query)
                 sync = payload(await session.call_tool("prepare_docs", {
                     "action": "sync_project_docs", "project_path": str(project), "with_vectors": False,
                 }))
                 assert sync.get("status") not in {"error", "failed"}, sync
-                answer = payload(await session.call_tool("get_docs_context", query))
+                answer = payload(await session.call_tool("get_docs_context", canonical_query))
                 rendered = json.dumps(answer, sort_keys=True)
                 assert "README.md" in rendered, answer
                 assert NEEDLE in rendered, answer
-                sources = answer.get("selected_sources") or answer.get("context_pack") or []
-                assert any(source.get("path") == "README.md" for source in sources), answer
+                sources = answer.get("sources") or answer.get("selected_sources") or answer.get("context_pack") or []
+                assert any(
+                    source.get("path_or_url") == "README.md" or source.get("path") == "README.md"
+                    for source in sources
+                ), answer
+                compatibility_answer = payload(
+                    await session.call_tool("get_docs_context", compatibility_query)
+                )
+                assert compatibility_answer.get("output_mode") == "compact", compatibility_answer
         config_path = home / "opencode.json"
         register_server(AgentTarget("opencode", config_path, "json_opencode_mcp"))
         entry = json.loads(config_path.read_text())["mcp"]["docmancer"]
@@ -84,7 +96,16 @@ async def smoke() -> None:
         async with stdio_client(opencode_params) as streams:
             async with ClientSession(*streams) as session:
                 await session.initialize()
-                text_answer = text_payload(await session.call_tool("get_docs_context", query))
+                # Text fallback remains a separate compatibility smoke.
+                compatibility_query = {
+                    "question": QUESTION,
+                    "project_path": str(project),
+                    "mode": "project",
+                    "output_mode": "compact",
+                }
+                text_answer = text_payload(
+                    await session.call_tool("get_docs_context", compatibility_query)
+                )
                 rendered = json.dumps(text_answer, sort_keys=True)
                 assert "README.md" in rendered, text_answer
                 assert NEEDLE in rendered, text_answer

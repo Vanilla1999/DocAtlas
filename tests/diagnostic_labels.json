@@ -242,7 +242,7 @@
     "tests/docs/test_docs_target_service.py": "05468b2306702ffb68b48ddf18d1ca173ea93e6b21252d0b71a4fca4bac372c0",
     "tests/docs/test_documentation_evidence.py": "02c6c8ed6982ba1528050a39092895a73c9196437806e3edead876d882ea3925",
     "tests/docs/test_documented_cli_contract.py": "d7eaff517ba35ccb62a38b1648ce3f7d8ea2c39526d98c4880f963047a1f5cb8",
-    "tests/docs/test_evidence_selection.py": "0143980d80977812698fed718fa66a0ccd10bd60e943dfaa25e322a3f6c55f9a",
+    "tests/docs/test_evidence_selection.py": "7cd8c33adee7ccff62d551345f35768586133fbc0cf537a4ff41920e6d401daa",
     "tests/docs/test_filesystem_locks.py": "03f0471042c68a8d12436b5d02c16377e83be3303821829082ff9802fee9d275",
     "tests/docs/test_library_docs_service.py": "a6869313fde464cb1f16d4c0b7911f5d8d029d8aa62c755fab571387003195ab",
     "tests/docs/test_library_index_publication.py": "9e017eacb83b0e9c48fe75872eced6707ac3d10b83fa9a910dc6f46fa9e0fb83",

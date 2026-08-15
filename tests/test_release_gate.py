@@ -61,6 +61,10 @@ def test_publish_runs_exact_public_version_smoke() -> None:
 def test_stdio_smoke_requires_cited_content() -> None:
     text = (ROOT / "scripts/docs_mcp_stdio_smoke.py").read_text()
     assert "assert NEEDLE in rendered" in text
+    assert 'assert set(canonical_query) == {"question", "project_path", "mode"}' in text
+    canonical_block = text[text.index("canonical_query = {"):text.index("compatibility_query =", text.index("canonical_query = {"))]
+    assert "output_mode" not in canonical_block
+    assert 'compatibility_query = {**canonical_query, "output_mode": "compact"}' in text
 
 
 def test_stdio_smoke_accepts_structured_content_and_legacy_json_text() -> None:

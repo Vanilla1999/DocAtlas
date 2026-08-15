@@ -6,6 +6,7 @@ from collections import Counter
 from dataclasses import replace
 from typing import Any
 
+from docmancer.docs.domain.lifecycle_policy import lifecycle_allows, lifecycle_intent
 from docmancer.docs.domain.quality import has_code_symbol_evidence, internal_noise_score
 
 
@@ -504,13 +505,13 @@ def ensure_broad_query_sources(selected: list[Any], candidates: list[Any], *, qu
 def rerank_project_doc_chunks(chunks: list[Any], *, question: str, intent: Any, limit: int | None = None, broad_max_per_source: int = 2, narrow_max_per_source: int = 4) -> list[Any]:
     if not chunks:
         return []
-    history_requested = query_requests_history(question)
+    answer_lifecycle_intent = lifecycle_intent(question)
     chunks = [
         chunk
         for chunk in chunks
-        if (
-            (getattr(chunk, "lifecycle_status", None) or "active") == "active"
-            or history_requested
+        if lifecycle_allows(
+            {"lifecycle_status": getattr(chunk, "lifecycle_status", None) or "active"},
+            answer_lifecycle_intent,
         )
         and not bool(getattr(chunk, "stale", False))
     ]

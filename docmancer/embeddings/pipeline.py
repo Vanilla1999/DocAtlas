@@ -85,6 +85,7 @@ def _payload_for_section(section: dict, *, docset_root: str | None = None) -> di
     for key in (
         "library_id", "resolved_version", "version_family", "project_identity",
         "project_path", "module_id", "doc_scope", "source_class", "authority",
+        "lifecycle_status", "temporal_relevance", "index_freshness",
         "docs_snapshot_exact", "source_identity", "canonical_url", "source_url",
     ):
         value = section.get(key)

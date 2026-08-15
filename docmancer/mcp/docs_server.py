@@ -13,6 +13,7 @@ import jsonschema
 
 from docmancer.core.storage_topology import StorageTopologyResolver
 from docmancer.docs.application.action_packet import ACTION_PACKET_OUTPUT_SCHEMA
+from docmancer.docs.domain.project_path_validation import validate_project_path
 from docmancer.docs.interfaces.mcp.error_contract import build_mcp_error_payload, debug_errors_enabled
 from docmancer.docs.service import LibraryDocsService
 from docmancer.docs.interfaces.mcp.context_tools import (
@@ -1008,6 +1009,9 @@ def current_tools(env: Mapping[str, str] | None = None) -> list[dict[str, Any]]:
 
 
 def _exception_reason_code(exc: Exception) -> str:
+    typed_reason = getattr(exc, "reason_code", None)
+    if isinstance(typed_reason, str) and typed_reason:
+        return typed_reason
     if isinstance(exc, ValueError):
         return "bad_request"
     if isinstance(exc, TimeoutError):
@@ -1043,7 +1047,7 @@ def _service_for_project_path(
     project_path = arguments.get("project_path")
     if not isinstance(project_path, str) or not project_path.strip():
         return service
-    project_root = Path(project_path).expanduser().resolve()
+    project_root = validate_project_path(project_path).path
     topology = StorageTopologyResolver(
         fallback_config=service.config,
         fallback_source=service.config_source,

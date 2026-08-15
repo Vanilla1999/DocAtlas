@@ -14,11 +14,15 @@ from typing import Any, Iterable
 from docmancer.docs.application.action_packet import evidence_identity_for_item
 from docmancer.docs.application.evidence_selection import (
     AggregateMixedSelectionDecision,
+    EvidenceAssignment,
+    EvidenceCandidate,
     SelectionDecision,
     docs_selection_config,
     library_docs_selection_config,
     project_docs_selection_config,
+    resolve_assignment_unit,
     select_evidence,
+    validate_assignment_binding,
 )
 from docmancer.docs.domain.request_intent import model_projection_kind
 
@@ -128,6 +132,44 @@ def projection_kind(question: str) -> str:
     return model_projection_kind(question)
 
 
+def _unit_materialized_item(
+    candidate: EvidenceCandidate,
+    assignments: Iterable[EvidenceAssignment],
+) -> dict[str, Any] | None:
+    """Return a source item containing only canonically assigned answer units."""
+
+    units = []
+    seen: set[str] = set()
+    for assignment in sorted(
+        assignments,
+        key=lambda item: (
+            item.unit_char_start if item.unit_char_start is not None else 10**9,
+            item.requirement_id,
+        ),
+    ):
+        unit = resolve_assignment_unit(candidate, assignment)
+        if unit is None or unit.unit_id in seen:
+            continue
+        seen.add(unit.unit_id)
+        units.append(unit)
+    if not units:
+        return None
+    material = "\n\n".join(unit.text for unit in units)
+    if not material.strip():
+        return None
+    item = dict(candidate.original)
+    # ``_docs_source`` prefers code/snippet/content in that order.  Remove any
+    # whole-chunk aliases before installing the bounded assigned material.
+    item.pop("code", None)
+    item["snippet"] = material
+    item["content"] = material
+    item["display_text"] = material
+    item["heading_path"] = candidate.section
+    item["source_url"] = candidate.path_or_url
+    item["version_binding"] = candidate.version_binding
+    return item
+
+
 def project_docs_answer(
     *,
     question: str,
@@ -146,7 +188,9 @@ def project_docs_answer(
         if retrieval.get("selection_profile") == "project_docs_answer"
         else docs_selection_config(max_tokens)
     )
-    is_library_answer = retrieval.get("selection_profile") == "library_docs_answer"
+    selection_profile = str(retrieval.get("selection_profile") or "generic")
+    is_library_answer = selection_profile == "library_docs_answer"
+    strict_selection_profile = selection_profile in {"library_docs_answer", "project_docs_answer"}
     decision = (
         canonical_selection.selection_decision
         if isinstance(canonical_selection, AggregateMixedSelectionDecision)
@@ -154,7 +198,8 @@ def project_docs_answer(
     )
     if decision is None and isinstance(retrieval.get("selection_decision"), SelectionDecision):
         decision = retrieval["selection_decision"]
-    has_canonical_selection = decision is not None
+    canonical_decision_supplied = decision is not None
+    has_canonical_selection = strict_selection_profile or canonical_decision_supplied
     if is_library_answer:
         if decision is None:
             payload = project_insufficient(
@@ -195,24 +240,45 @@ def project_docs_answer(
             project_identity=retrieval.get("project_identity"),
             module_id=retrieval.get("module_id"),
         )
+    has_canonical_selection = strict_selection_profile or canonical_decision_supplied
     if selection_diagnostics is not None:
         selection_diagnostics.update(decision.audit_manifest())
     sources: list[dict[str, Any]] = []
     snapshot: dict[str, dict[str, Any]] = {}
     omitted = len(decision.omissions)
+    use_unit_projection = (
+        retrieval.get("selection_profile") == "project_docs_answer"
+        or any(assignment.unit_id for assignment in decision.assignments)
+    )
     assigned_ids = {
         assignment.evidence_id for assignment in decision.assignments
     } if has_canonical_selection else {
         candidate.stable_id for candidate in decision.selected_candidates
     }
+    candidates_by_id = {candidate.stable_id: candidate for candidate in decision.selected_candidates}
     selected_candidates = [
+        candidates_by_id[evidence_id]
+        for evidence_id in decision.support_decision.selected_evidence_ids
+        if evidence_id in candidates_by_id and evidence_id in assigned_ids
+    ] if has_canonical_selection else [
         candidate for candidate in decision.selected_candidates
         if candidate.stable_id in assigned_ids
     ]
     if len(selected_candidates) > 6:
         selected_candidates = []
     for candidate in selected_candidates:
-        item = dict(candidate.original)
+        candidate_assignments = tuple(
+            assignment for assignment in decision.assignments
+            if assignment.evidence_id == candidate.stable_id
+        )
+        item = (
+            _unit_materialized_item(candidate, candidate_assignments)
+            if has_canonical_selection and use_unit_projection
+            else dict(candidate.original)
+        )
+        if item is None:
+            omitted += 1
+            continue
         normalized = _docs_source(
             item,
             evidence_id=candidate.stable_id if has_canonical_selection else None,
@@ -265,12 +331,28 @@ def project_docs_answer(
             )
             return payload, snapshot
         visible_candidates = {candidate.stable_id: candidate for candidate in selected_candidates}
+        requirements_by_id = {
+            requirement.requirement_id: requirement
+            for requirement in decision.requirements
+        }
         invalid_assignments = [
             assignment for assignment in decision.assignments
             if assignment.evidence_id not in visible_candidates
-            or assignment.projected_content_hash != hashlib.sha256(
-                visible_candidates[assignment.evidence_id].projected_text.encode("utf-8")
-            ).hexdigest()
+            or assignment.requirement_id not in requirements_by_id
+            or not validate_assignment_binding(
+                requirements_by_id[assignment.requirement_id],
+                visible_candidates[assignment.evidence_id],
+                assignment,
+            )
+            or (
+                assignment.unit_id is not None
+                and resolve_assignment_unit(
+                    visible_candidates[assignment.evidence_id], assignment,
+                ).text not in next(
+                    source["snippet"] for source in sources
+                    if source["evidence_id"] == assignment.evidence_id
+                )
+            )
         ]
         if invalid_assignments:
             payload = project_insufficient(
@@ -502,6 +584,7 @@ def project_patch_context(
         "forbidden_changes": deepcopy(packet.get("forbidden_changes") or []),
         "implementation_guidance": deepcopy(packet.get("implementation_guidance") or []),
         "checks": deepcopy(packet.get("validation") or {"compile": [], "tests": [], "semantic_checks": []}),
+        "mutation_intent": deepcopy(packet.get("mutation_intent") or {}),
         "uncertainties": deepcopy(packet.get("uncertainties") or []),
         "omitted_counts": deepcopy(packet.get("omitted_counts") or {}),
         "estimated_tokens": 0,
@@ -673,7 +756,37 @@ def validate_model_visible_projection(
             }
             if ids != assigned_witnesses or set(answer_refs or ()) != assigned_witnesses:
                 errors.append("model-visible evidence does not match aggregate assigned witnesses")
+            visible_sources = {
+                str(source.get("evidence_id") or ""): source
+                for source in sources if isinstance(source, dict)
+            }
+            candidates_by_id = {
+                candidate.stable_id: candidate
+                for candidate in decision.selected_candidates
+            }
+            requirements_by_id = {
+                requirement.requirement_id: requirement
+                for requirement in decision.requirements
+            }
+            for assignment in decision.assignments:
+                candidate = candidates_by_id.get(assignment.evidence_id)
+                requirement = requirements_by_id.get(assignment.requirement_id)
+                visible = visible_sources.get(assignment.evidence_id)
+                if candidate is None or requirement is None or visible is None:
+                    errors.append("model-visible assignment does not resolve to canonical evidence")
+                    continue
+                if not validate_assignment_binding(requirement, candidate, assignment):
+                    errors.append("model-visible assignment failed unit proof revalidation")
+                    continue
+                unit = resolve_assignment_unit(candidate, assignment)
+                if unit is not None and unit.text not in str(visible.get("snippet") or ""):
+                    errors.append("model-visible assignment unit is absent from its cited source")
     if kind == "patch_context":
+        mutation = payload.get("mutation_intent")
+        if not isinstance(mutation, dict):
+            errors.append("patch context requires a mutation intent contract")
+        elif mutation.get("operation") != "none" and mutation.get("ready") is not True:
+            errors.append("successful patch context requires operation-aware target readiness")
         for item in _cited_patch_items(payload):
             refs = item.get("evidence_ids")
             if not isinstance(refs, list) or not refs or any(ref not in ids for ref in refs):

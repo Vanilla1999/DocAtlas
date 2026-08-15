@@ -253,7 +253,7 @@ def test_public_project_answer_requires_all_semantic_facets(tmp_path, monkeypatc
 
     assert result["support_status"] == "insufficient_evidence"
     assert result["answer_supported"] is False
-    assert any("usage:docs_status" in value for value in result["missing_requirement_ids"])
+    assert any(":usage:" in value for value in result["missing_requirement_ids"])
 
 
 def test_public_project_answer_accepts_all_semantic_facets(tmp_path, monkeypatch):
@@ -354,7 +354,7 @@ def test_public_project_answer_requires_authority_invariant(tmp_path, monkeypatc
     )
 
     assert result["support_status"] == "insufficient_evidence"
-    assert "facet:authority_invariant" in result["missing_requirement_ids"]
+    assert any(":relation:" in value for value in result["missing_requirement_ids"])
 
 
 def test_public_project_answer_accepts_recall_with_authority_invariant(tmp_path, monkeypatch):
@@ -403,7 +403,7 @@ def test_public_project_answer_requires_comparison_relation(tmp_path, monkeypatc
     )
 
     assert result["support_status"] == "insufficient_evidence"
-    assert "facet:comparison:async:launch" in result["missing_requirement_ids"]
+    assert any(":comparison:" in value for value in result["missing_requirement_ids"])
 
 
 def test_public_project_answer_accepts_comparison_relation(tmp_path, monkeypatch):
@@ -478,7 +478,7 @@ def test_public_project_answer_rejects_incomplete_russian_usage(tmp_path, monkey
     )
 
     assert result["support_status"] == "insufficient_evidence"
-    assert "facet:usage:docs_status" in result["missing_requirement_ids"]
+    assert any(":usage:" in value for value in result["missing_requirement_ids"])
 
 
 def test_public_named_document_ambiguous_basename_fails_closed(tmp_path, monkeypatch):

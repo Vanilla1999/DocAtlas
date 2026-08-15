@@ -32,6 +32,14 @@ documents:
     status: active
     impact: track
 
+  - path: roadmap/README.md
+    role: roadmap
+    scope: project
+    description: Current execution roadmap, active task status, sequencing, and implementation policy.
+    authority: source_of_truth
+    status: active
+    impact: track
+
 roots:
   - path: docs
     scope: project
@@ -39,7 +47,8 @@ roots:
 
   - path: roadmap
     scope: project
-    authority: supporting
+    authority: historical
+    status: completed
 
   - path: wiki
     scope: project

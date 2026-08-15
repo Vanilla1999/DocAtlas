@@ -5,6 +5,7 @@ import json
 import math
 import os
 import re
+from dataclasses import asdict
 from pathlib import Path
 from typing import Any, Iterable
 
@@ -19,9 +20,15 @@ from docmancer.docs.domain.normative_language import (
     classify_normative_modality,
     python_declaration_line_indexes,
 )
+from docmancer.docs.domain.mutation_intent import (
+    MutationIntentContract,
+    build_mutation_intent,
+    evaluate_mutation_readiness,
+    resolve_mutation_targets,
+)
 
 
-ACTION_PACKET_SCHEMA_VERSION = 1
+ACTION_PACKET_SCHEMA_VERSION = 2
 DEFAULT_ACTION_PACKET_TOKENS = 1_500
 HARD_ACTION_PACKET_TOKENS = 2_000
 MIN_ACTION_PACKET_TOKENS = 128
@@ -97,7 +104,7 @@ ACTION_PACKET_OUTPUT_SCHEMA: dict[str, Any] = {
     "required": [
         "schema_version", "status", "task_interpretation", "source_of_truth", "target_surface",
         "required_invariants", "forbidden_changes", "implementation_guidance", "validation",
-        "uncertainties", "missing_evidence", "omitted_counts", "estimated_tokens",
+        "mutation_intent", "uncertainties", "missing_evidence", "omitted_counts", "estimated_tokens",
     ],
     "properties": {
         "schema_version": {"const": ACTION_PACKET_SCHEMA_VERSION},
@@ -151,6 +158,27 @@ ACTION_PACKET_OUTPUT_SCHEMA: dict[str, Any] = {
                 "compile": {"type": "array", "items": _cited_item_schema("text")},
                 "tests": {"type": "array", "items": _cited_item_schema("text")},
                 "semantic_checks": {"type": "array", "items": _cited_item_schema("text")},
+            },
+        },
+        "mutation_intent": {
+            "type": "object",
+            "additionalProperties": False,
+            "required": [
+                "operation", "artifact_kind", "requested_targets", "resolved_targets",
+                "destination", "acceptance_conditions", "ready", "constraints_only",
+                "missing", "contract_hash",
+            ],
+            "properties": {
+                "operation": {"enum": ["none", "modify", "create", "delete", "rename"]},
+                "artifact_kind": {"enum": ["source", "docs", "config", "test", "generated_answer", "unknown"]},
+                "requested_targets": {"type": "array", "maxItems": 12, "items": {"type": "object"}},
+                "resolved_targets": {"type": "array", "maxItems": 12, "items": {"type": "object"}},
+                "destination": {"type": ["string", "null"], "maxLength": 500},
+                "acceptance_conditions": {"type": "array", "maxItems": 8, "items": {"type": "string", "maxLength": 500}},
+                "ready": {"type": "boolean"},
+                "constraints_only": {"type": "boolean"},
+                "missing": {"type": "array", "maxItems": 12, "items": {"type": "string", "maxLength": 120}},
+                "contract_hash": {"type": "string", "pattern": r"^[0-9a-f]{64}$"},
             },
         },
         "uncertainties": {
@@ -230,6 +258,7 @@ def build_action_packet(
     module_id: str | None = None,
     selection_diagnostics: dict[str, Any] | None = None,
     behavioral_contract_required: bool = False,
+    mutation_intent_contract: MutationIntentContract | None = None,
 ) -> dict[str, Any]:
     """Render selected retrieval evidence into a bounded, deterministic packet.
 
@@ -241,8 +270,19 @@ def build_action_packet(
         HARD_ACTION_PACKET_TOKENS,
         max(MIN_ACTION_PACKET_TOKENS, int(max_tokens or DEFAULT_ACTION_PACKET_TOKENS)),
     )
+    mutation_intent = mutation_intent_contract or build_mutation_intent(question)
     required_evidence_paths = tuple(required_evidence_paths)
-    required_target_paths = tuple(required_target_paths)
+    requested_path_targets = tuple(
+        target.value
+        for target in mutation_intent.requested_targets
+        if target.kind == "path"
+        and mutation_intent.operation in {"modify", "delete", "rename"}
+        and target.value.casefold() != str(mutation_intent.destination or "").casefold()
+    )
+    required_target_paths = tuple(dict.fromkeys((
+        *required_target_paths,
+        *requested_path_targets,
+    )))
     public_requirements = tuple(public_requirements)
     raw_items = [dict(item) for item in context_pack if isinstance(item, dict)]
     retrieval_issue_list = [str(issue) for issue in (retrieval_issues or []) if str(issue).strip()]
@@ -353,6 +393,12 @@ def build_action_packet(
         1 if _normalized_source_key(_source_path(item)) in required_target_keys else
         2
     ))
+    resolved_mutation = resolve_mutation_targets(
+        mutation_intent,
+        items if mutation_intent.operation != "create" else scoped_items,
+        evidence_id_for_item=_evidence_id,
+    )
+    mutation_readiness = evaluate_mutation_readiness(resolved_mutation)
     objective, objective_omitted = _bounded_text(question.strip(), 1_000)
     source_rows = [_source_row(item) for item in items if _source_path(item)]
     source_rows = _dedupe_dicts(source_rows, ("evidence_id",))
@@ -462,6 +508,18 @@ def build_action_packet(
             "tests": _dedupe_cited(test_checks, "text"),
             "semantic_checks": _dedupe_cited(semantic_checks, "text"),
         },
+        "mutation_intent": {
+            "operation": resolved_mutation.operation,
+            "artifact_kind": resolved_mutation.artifact_kind,
+            "requested_targets": [asdict(item) for item in resolved_mutation.requested_targets],
+            "resolved_targets": [asdict(item) for item in resolved_mutation.resolved_targets],
+            "destination": resolved_mutation.destination,
+            "acceptance_conditions": list(resolved_mutation.acceptance_conditions),
+            "ready": mutation_readiness.ready,
+            "constraints_only": mutation_readiness.constraints_only,
+            "missing": list(mutation_readiness.missing),
+            "contract_hash": mutation_readiness.contract_hash,
+        },
         "uncertainties": [],
         "missing_evidence": [],
         "omitted_counts": {},
@@ -519,6 +577,17 @@ def build_action_packet(
     if packet["missing_evidence"]:
         packet["status"] = "insufficient_evidence"
 
+    if resolved_mutation.operation != "none" and not mutation_readiness.ready:
+        packet["status"] = "insufficient_evidence"
+        for reason in mutation_readiness.missing:
+            message = f"Mutation target readiness is incomplete: {reason}."
+            if message not in packet["missing_evidence"]:
+                packet["missing_evidence"].append(message)
+        if mutation_readiness.constraints_only:
+            message = "Documentation constraints do not authorize or identify the requested edit target."
+            if message not in packet["missing_evidence"]:
+                packet["missing_evidence"].append(message)
+
     available_paths = {_normalized_source_key(_source_path(item)) for item in items}
     missing_required_sources = sorted(required_source_keys - available_paths)
     missing_required_targets = sorted(required_target_keys - available_paths)
@@ -572,6 +641,14 @@ def build_action_packet(
     _refresh_estimated_tokens(packet)
     if packet["estimated_tokens"] > budget:
         _compact_failure_packet(packet, budget)
+    if selection_diagnostics is not None:
+        selection_diagnostics["mutation_intent"] = {
+            "contract_hash": mutation_readiness.contract_hash,
+            "operation": resolved_mutation.operation,
+            "artifact_kind": resolved_mutation.artifact_kind,
+            "ready": mutation_readiness.ready,
+            "missing": list(mutation_readiness.missing),
+        }
     return packet
 
 
@@ -648,7 +725,7 @@ def validate_action_packet(
     required_keys = {
         "schema_version", "status", "task_interpretation", "source_of_truth", "target_surface",
         "required_invariants", "forbidden_changes", "implementation_guidance", "validation",
-        "uncertainties", "missing_evidence", "omitted_counts", "estimated_tokens",
+        "mutation_intent", "uncertainties", "missing_evidence", "omitted_counts", "estimated_tokens",
     }
     missing = sorted(required_keys - set(packet))
     extra = sorted(set(packet) - required_keys)
@@ -678,6 +755,29 @@ def validate_action_packet(
     if validation:
         for key in ("compile", "tests", "semantic_checks"):
             _validate_cited_items(validation.get(key), f"validation.{key}", "text", errors)
+
+    mutation = packet.get("mutation_intent")
+    mutation_fields = {
+        "operation", "artifact_kind", "requested_targets", "resolved_targets",
+        "destination", "acceptance_conditions", "ready", "constraints_only",
+        "missing", "contract_hash",
+    }
+    if not isinstance(mutation, dict) or set(mutation) != mutation_fields:
+        errors.append("mutation_intent must be a complete bounded mutation contract")
+        mutation = {}
+    else:
+        if mutation.get("operation") not in {"none", "modify", "create", "delete", "rename"}:
+            errors.append("mutation_intent.operation is invalid")
+        if mutation.get("artifact_kind") not in {"source", "docs", "config", "test", "generated_answer", "unknown"}:
+            errors.append("mutation_intent.artifact_kind is invalid")
+        if not isinstance(mutation.get("ready"), bool) or not isinstance(mutation.get("constraints_only"), bool):
+            errors.append("mutation_intent readiness flags must be booleans")
+        if not re.fullmatch(r"[0-9a-f]{64}", str(mutation.get("contract_hash") or "")):
+            errors.append("mutation_intent.contract_hash is invalid")
+        for key, limit in (("requested_targets", 12), ("resolved_targets", 12), ("acceptance_conditions", 8), ("missing", 12)):
+            value = mutation.get(key)
+            if not isinstance(value, list) or len(value) > limit:
+                errors.append(f"mutation_intent.{key} exceeds its bounded contract")
 
     sources = packet.get("source_of_truth") if isinstance(packet.get("source_of_truth"), list) else []
     if not isinstance(packet.get("source_of_truth"), list):
@@ -779,6 +879,12 @@ def validate_action_packet(
         errors.append("missing evidence requires insufficient_evidence status")
     if status == "ok" and (not sources or not _has_actionable_items(packet)):
         errors.append("ok packets require cited actionable evidence")
+    if (
+        status == "ok"
+        and mutation.get("operation") != "none"
+        and mutation.get("ready") is not True
+    ):
+        errors.append("ok mutation packets require a resolved operation-aware target")
     if status == "ok" and uncertainties:
         errors.append("ok packets cannot report uncertainties")
     if status == "truncated" and not omitted_counts:
@@ -1862,13 +1968,21 @@ def _compact_failure_packet(packet: dict[str, Any], budget: int) -> None:
         original_omissions.get("required_invariants", 0)
         + original_omissions.get("mandatory_requirements", 0)
     )
+    objective_characters_omitted = original_omissions.get(
+        "task_interpretation.objective_characters", 0
+    )
     compact_omissions: dict[str, int] = {}
     if required_invariants_omitted:
-        compact_omissions["required_invariants"] = (
-            required_invariants_omitted
+        compact_omissions["required_invariants"] = required_invariants_omitted
+    if objective_characters_omitted:
+        compact_omissions["task_interpretation.objective_characters"] = (
+            objective_characters_omitted
         )
 
-    residual = max(0, omitted_total - required_invariants_omitted)
+    residual = max(
+        0,
+        omitted_total - required_invariants_omitted - objective_characters_omitted,
+    )
     if residual > 0:
         compact_omissions["packet_items"] = residual
     if not compact_omissions:
@@ -1894,6 +2008,20 @@ def _compact_failure_packet(packet: dict[str, Any], budget: int) -> None:
         "missing_evidence": [failure_reason],
         "omitted_counts": compact_omissions,
     })
+    mutation = packet.get("mutation_intent")
+    if isinstance(mutation, dict):
+        packet["mutation_intent"] = {
+            "operation": mutation.get("operation", "none"),
+            "artifact_kind": mutation.get("artifact_kind", "unknown"),
+            "requested_targets": [],
+            "resolved_targets": [],
+            "destination": mutation.get("destination"),
+            "acceptance_conditions": [],
+            "ready": False,
+            "constraints_only": bool(mutation.get("constraints_only")),
+            "missing": list(mutation.get("missing") or [])[:3],
+            "contract_hash": mutation.get("contract_hash") or "0" * 64,
+        }
     objective = str(packet["task_interpretation"].get("objective") or "task")
     packet["task_interpretation"]["objective"] = objective[:64] or "task"
     packet["task_interpretation"]["acceptance_conditions"] = []

@@ -30,6 +30,35 @@ def _floats_to_blob(vector: list[float]) -> bytes:
     return struct.pack(f"{len(vector)}f", *vector)
 
 
+def _payload_matches_filters(payload: dict, filters: dict | None) -> bool:
+    """Apply the same exact/``in`` payload contract as the Qdrant backend.
+
+    sqlite-vec does not expose payload indexes in the current collection
+    layout.  The fallback therefore evaluates KNN over the owned collection
+    and applies the typed filter before publishing candidates.  This is
+    intentionally exact rather than returning an unfiltered top-k window.
+    """
+
+    if not filters:
+        return True
+    for key, expected in filters.items():
+        actual = payload.get(key)
+        if isinstance(expected, dict) and "in" in expected:
+            allowed = tuple(expected.get("in") or ())
+            if isinstance(actual, (list, tuple, set, frozenset)):
+                if not any(value in allowed for value in actual):
+                    return False
+            elif actual not in allowed:
+                return False
+            continue
+        if isinstance(actual, (list, tuple, set, frozenset)):
+            if expected not in actual:
+                return False
+        elif actual != expected:
+            return False
+    return True
+
+
 class SqliteVecStore(VectorStore):
     """Small-scale fallback vector store backed by sqlite-vec (vec0)."""
 
@@ -207,6 +236,16 @@ class SqliteVecStore(VectorStore):
         vec_table = f"{collection}_vec"
         payload_table = f"{collection}_payload"
         blob = _floats_to_blob(query_vector)
+        requested_limit = max(0, int(limit))
+        if requested_limit == 0:
+            return []
+        # A filtered query must not let an ineligible top-k window hide an
+        # eligible lower-ranked point.  sqlite-vec's current payload side table
+        # cannot participate in the KNN constraint, so the small-scale fallback
+        # searches the whole owned collection and filters before truncation.
+        search_limit = self.count(collection) if filters else requested_limit
+        if search_limit <= 0:
+            return []
         cur = self._conn.execute(
             f"""
             SELECT v.rowid, v.distance, p.id, p.payload
@@ -215,7 +254,7 @@ class SqliteVecStore(VectorStore):
             WHERE v.embedding MATCH ? AND k = ?
             ORDER BY v.distance
             """,
-            (blob, int(limit)),
+            (blob, search_limit),
         )
         hits: list[VectorHit] = []
         for _rowid, distance, point_id, payload_json in cur.fetchall():
@@ -223,10 +262,14 @@ class SqliteVecStore(VectorStore):
                 payload = json.loads(payload_json) if payload_json else {}
             except json.JSONDecodeError:
                 payload = {}
+            if not isinstance(payload, dict) or not _payload_matches_filters(payload, filters):
+                continue
             # vec0 returns a distance; smaller is closer. Convert to a similarity-like
             # score so callers can sort descending consistently.
             score = -float(distance)
             hits.append(VectorHit(id=str(point_id), score=score, payload=payload))
+            if len(hits) >= requested_limit:
+                break
         return hits
 
     def delete_points(self, collection: str, ids: list) -> int:
