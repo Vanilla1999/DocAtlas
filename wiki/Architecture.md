@@ -12,9 +12,9 @@ For the full command reference, see [Commands](./Commands.md). For configuration
 
 ## Indexing
 
-Documentation is fetched from URLs or read from local files, then normalized into semantic sections based on heading structure. Each section is stored in SQLite with its title, heading level, source URL, content hash, and token estimate. A FTS5 virtual table indexes titles and section text for fast full-text search.
+Markdown indexing first normalizes fetched or local documentation into semantic parent sections based on heading structure. The production `parent-child-v1` chunker then splits each parent section into token-bounded child chunks (target 160 estimated visible tokens, hard maximum 512, zero visible overlap) while preserving the parent identity and source offsets. Retrieval ranks those child chunks and can hydrate parent or adjacent context without changing the exact display text.
 
-Extracted markdown and JSON files are written to `.docmancer/extracted/` so the indexed content is always inspectable on disk.
+Each section/chunk identity is stored in SQLite with its title, heading path, source URL, content hash, offsets, and token estimate. A FTS5 virtual table indexes retrieval text for fast full-text search. Extracted markdown and JSON files are written to `.docmancer/extracted/` so the indexed content is always inspectable on disk.
 
 Alongside the FTS5 index, each section is embedded with FastEmbed (local dense + SPLADE sparse) and upserted into a managed local Qdrant. The dispatcher reads both stores at query time. For which documentation sites and file types work with `add`, see [Supported Sources](./Supported-Sources.md).
 

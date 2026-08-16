@@ -1,8 +1,18 @@
 # Cleaning DocAtlas index state safely
 
-`doc-atlas clear-index` removes derived index state without deleting project
-sources or silently widening the cleanup scope. The command is preview-only
+`doc-atlas clear-index` removes derived index state while preserving project
+sources, `docmancer.yaml`, configuration, and unrelated files; it never
+silently widens the cleanup scope. The command is preview-only
 unless `--apply` is supplied.
+
+`clear-index` supports exactly two scopes: `project-local` and `global`.
+Quarantine is the same-filesystem staging area used before final deletion so
+moved targets can be restored if the move phase fails. In `clear-index`,
+`--allow-incomplete` acknowledges that reported unverified vector or cache
+state will remain; it never bypasses live-process blockers or authorizes remote
+deletion. `clear-index` deletes only derived SQLite, extracted-document, cache,
+and verified local vector state. `clear-index` preserves project sources,
+`docmancer.yaml`, configuration, and unrelated files.
 
 ## Clear one project-local index
 
@@ -78,8 +88,7 @@ caches.
 
 - Preview does not create a missing storage home or an empty database.
 - Execution rejects a stale `plan_digest` or changed target fingerprint.
-- A live DocAtlas, MCP, synchronization, or managed-Qdrant PID is a hard
-  blocker. `--allow-incomplete` does not bypass a live-process blocker.
+- `clear-index` refuses to apply a cleanup plan while a live DocAtlas, MCP, synchronization, or managed-Qdrant process holds the index; a recorded live PID is a hard blocker. `--allow-incomplete` does not bypass this live-process blocker.
 - Targets are moved into same-filesystem quarantine before final deletion. If
   the move phase fails, already moved targets are restored.
 - Filesystem roots, the user's home directory, and the current working
@@ -87,7 +96,8 @@ caches.
 - Remote Qdrant collections are never deleted by this command. Local vector
   state without an ownership marker is reported as incomplete and retained.
 - `--allow-incomplete` only acknowledges that reported vector or cache state
-  will remain; it does not authorize an unverified deletion.
+  will remain; it never bypasses live-process blockers or authorizes unverified
+  or remote deletion.
 
 For an MCP client, the same operation remains available through the existing
 three-tool surface:

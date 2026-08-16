@@ -9,6 +9,8 @@ For how each surface fits into the overall system, see [Architecture](./Architec
 
 ## Docs Source Types
 
+DocAtlas Docs supports exactly five source types: `GitBook sites`, `Mintlify sites`, `Generic web docs`, `GitHub repos`, and `Local files`.
+
 | Source | Strategy | Command |
 |--------|----------|---------|
 | GitBook sites | `--provider gitbook`: `/llms-full.txt` then `/llms.txt` | `doc-atlas add <url>` |

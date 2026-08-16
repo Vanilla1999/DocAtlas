@@ -26,6 +26,8 @@ Public service surfaces must also be registered in `SHIPPED_SERVICE_SURFACE_IDS`
 
 ## CI tiers
 
+`DOCMANCER_OFFLINE=1` enables the fail-closed offline verification policy for core CI. `DOCMANCER_OFFLINE` should be used when the suite must prove that no unregistered network fallback is required. It does not make live/advanced tests offline-capable.
+
 Core offline CI runs `pytest tests/ -m "not advanced and not live and not live_network"` with `DOCMANCER_OFFLINE=1`. The test harness also blocks unregistered outbound DNS and sockets and redirects the hosted registry fallback to loopback. Missing optional artifacts therefore fail locally or produce typed fallback state instead of fetching a hosted registry.
 
 The `advanced-contract` job runs advanced and maintenance contract tests separately. It is still offline and preserves shared security coverage. Real provider tests require an explicit live workflow and must never be added to the core job.

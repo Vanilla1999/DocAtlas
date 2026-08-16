@@ -40,6 +40,46 @@ documents:
     status: active
     impact: track
 
+  - path: eval/project_answer_quality_v1/README.md
+    role: development
+    scope: project
+    description: Provider-free project-answer quality protocol, execution command, metrics, and contamination gate.
+    authority: source_of_truth
+    status: active
+    impact: search_only
+
+  - path: eval/project_answer_quality_v2/README.md
+    role: development
+    scope: project
+    description: Frozen project-answer v2 protocol and production-path failure classes.
+    authority: source_of_truth
+    status: active
+    impact: search_only
+
+  - path: eval/project_answer_quality_v3/README.md
+    role: development
+    scope: project
+    description: Frozen project-answer v3 protocol for technical terms and operational questions.
+    authority: source_of_truth
+    status: active
+    impact: search_only
+
+  - path: eval/project_answer_quality_v4/README.md
+    role: development
+    scope: project
+    description: QuestionPlan safety protocol covering fail-closed parsing, compound facets, proof specificity, and paraphrase invariants.
+    authority: source_of_truth
+    status: active
+    impact: search_only
+
+  - path: eval/task_level/README.md
+    role: development
+    scope: project
+    description: Task-level benchmark runbook including the local two-cell smoke and event-artifact cardinality audit.
+    authority: source_of_truth
+    status: active
+    impact: search_only
+
 roots:
   - path: docs
     scope: project

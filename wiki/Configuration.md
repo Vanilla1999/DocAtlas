@@ -2,6 +2,8 @@
 
 **Resolution order:** `--config` flag, then `./docmancer.yaml` in the current directory, then `~/.docmancer/docmancer.yaml` (auto-created by `doc-atlas setup`). For details on what each command does, see [Commands](./Commands.md).
 
+A project is configured in `docmancer.yaml` by setting documented keys such as `index.provider: sqlite`, `query.default_budget: 2400`, and optional vector/retrieval settings. Relative index paths are resolved from the location of that `docmancer.yaml`.
+
 ## Configuration Reference
 
 ### Index

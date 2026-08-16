@@ -22,6 +22,27 @@ from docmancer.docs.domain.answer_units import (
     local_proof_for_obligation,
     materialize_answer_units,
 )
+from docmancer.docs.application.evidence_models import (
+    SELECTOR_SCHEMA_VERSION, MAX_SELECTOR_CANDIDATES, MAX_VISIBLE_DOCUMENTS, MAX_VISIBLE_SPANS,
+    OmissionReason, ProofRole, EvidenceQualifier, SelectionConfig, EvidenceRequirement,
+    EvidenceRequirementSet, EvidenceCandidate, Omission, EvidenceAssignment,
+    RequirementWitness, SupportDecision,
+)
+from docmancer.docs.application.evidence_candidates import (
+    docs_answer_candidate_tokens as _docs_answer_candidate_tokens,
+    estimated_tokens as _estimated_tokens,
+    normalized_source as _normalized_source,
+    normalize_candidates,
+    observed_qualifiers as _observed_qualifiers,
+    positive_int as _positive_int,
+    requirement_value_visible,
+    display_text as _display_text,
+    source_path as _source_path,
+    symbols as _symbols,
+    version_rank as _version_rank,
+)
+from docmancer.docs.application.evidence_requirements import build_requirements
+
 from docmancer.docs.domain.project_answer_contract import (
     LifecycleIntent,
     ProofObligation,
@@ -32,10 +53,6 @@ from docmancer.retrieval.contracts import canonical_hash
 from docmancer.retrieval.query_planning import extract_exact_terms
 
 
-SELECTOR_SCHEMA_VERSION = "budget-aware-evidence-selector-v6"
-MAX_SELECTOR_CANDIDATES = 20
-MAX_VISIBLE_DOCUMENTS = 3
-MAX_VISIBLE_SPANS = 6
 MAX_MIXED_VISIBLE_TOKENS = 800
 MIXED_WRAPPER_RESERVE_TOKENS = 120
 MAX_REQUIREMENT_IDENTIFIERS = 12
@@ -88,30 +105,6 @@ _ALLOWED_REQUIREMENT_PROVENANCE = frozenset({
     "disclosed_authority_version_conflict",
 })
 
-OmissionReason = Literal[
-    "wrong_version", "unknown_version", "forbidden_source", "outside_scope",
-    "stale", "instruction_risk", "invalid_identity", "navigation_only",
-    "query_identifier_conflict", "query_intent_mismatch",
-    "authority_conflict", "exact_duplicate", "overlap_duplicate",
-    "near_duplicate", "source_cap", "zero_marginal_utility", "budget",
-    "dominated", "candidate_cap",
-]
-ProofRole = Literal[
-    "generic_fact", "document_identity", "target_identity", "document_statement",
-    "project_rule", "implementation_fact", "dependency_fact",
-]
-EvidenceQualifier = Literal[
-    "proposed", "not_implemented", "confirmation_required", "negated",
-    "conditional", "deprecated",
-]
-_PROOF_ROLES = frozenset({
-    "generic_fact", "document_identity", "target_identity", "document_statement",
-    "project_rule", "implementation_fact", "dependency_fact",
-})
-_EVIDENCE_QUALIFIERS = frozenset({
-    "proposed", "not_implemented", "confirmation_required", "negated",
-    "conditional", "deprecated",
-})
 _QUALIFIER_PATTERNS = {
     "proposed": re.compile(r"\bpropos(?:ed|al)\b", re.I),
     "not_implemented": re.compile(r"\bnot\s+(?:yet\s+)?implemented\b", re.I),
@@ -122,585 +115,44 @@ _QUALIFIER_PATTERNS = {
 }
 
 
-def _observed_qualifiers(text: str) -> tuple[EvidenceQualifier, ...]:
-    return tuple(sorted(
-        qualifier
-        for qualifier, pattern in _QUALIFIER_PATTERNS.items()
-        if pattern.search(text)
-    ))
-
-
-def _estimated_tokens(value: str) -> int:
-    return max(1, math.ceil(len(value.encode("utf-8")) / 4))
-
-
-def _docs_answer_candidate_tokens(
-    *, stable_id: str, path: str, section: str, projected: str,
-    version_binding: str,
-) -> int:
-    source_row = {
-        "evidence_id": stable_id,
-        "path_or_url": path,
-        "section": section,
-        "snippet": projected,
-        "version_binding": version_binding,
-        "content_sha256": "0" * 64,
-    }
-    serialized_source = json.dumps(
-        source_row, ensure_ascii=False, sort_keys=True, separators=(",", ":"),
-    )
-    # A docs answer exposes both the cited source row and its extractive text.
-    return _estimated_tokens(serialized_source) + _estimated_tokens(projected)
-
-
-def _positive_int(value: Any, *, default: int) -> int:
-    if isinstance(value, bool):
-        return default
-    try:
-        parsed = int(value)
-    except (TypeError, ValueError, OverflowError):
-        return default
-    return parsed if parsed > 0 else default
-
-
-def _normalized_source(value: Any) -> str:
-    return str(value or "").strip().replace("\\", "/").rstrip("/").casefold()
-
-
-def requirement_value_visible(value: str, text: str) -> bool:
-    """Match exact query terms, including a bounded CamelCase→snake_case alias."""
-
-    wanted = str(value or "").strip()
-    haystack = str(text or "")
-    if not wanted:
-        return False
-    if re.search(rf"(?<![\w]){re.escape(wanted)}(?![\w])", haystack, re.I):
-        return True
-    if not (
-        re.fullmatch(r"[A-Za-z][A-Za-z0-9]*", wanted)
-        and any(char.isupper() for char in wanted[1:])
-        and any(char.islower() for char in wanted)
-    ):
-        return False
-    acronym_split = re.sub(r"(.)([A-Z][a-z]+)", r"\1_\2", wanted)
-    snake_case = re.sub(r"([a-z0-9])([A-Z])", r"\1_\2", acronym_split).casefold()
-    return bool(re.search(rf"(?<![\w]){re.escape(snake_case)}(?![\w])", haystack, re.I))
-
-
-def _text(value: Any) -> str:
-    if isinstance(value, Mapping):
-        value = value.get("code") or value.get("content") or value.get("text")
-    return str(value or "").strip()
-
-
-def _source_path(item: Mapping[str, Any]) -> str:
-    value = item.get("source_url") or item.get("url") or item.get("path") or item.get("source") or ""
-    if isinstance(value, Mapping):
-        value = value.get("path") or value.get("source") or value.get("url") or ""
-    return str(value).strip()
-
-
-def _section(item: Mapping[str, Any]) -> str:
-    value = item.get("heading_path") or item.get("title") or item.get("section") or "document"
-    if isinstance(value, Mapping):
-        value = value.get("heading_path") or value.get("title") or "document"
-    if isinstance(value, (list, tuple)):
-        return " > ".join(str(part) for part in value)
-    return str(value)
-
-
-def _display_text(item: Mapping[str, Any]) -> str:
-    value = item.get("display_text") or item.get("code") or item.get("snippet") or item.get("content")
-    if isinstance(value, Mapping):
-        value = value.get("code") or value.get("content") or value.get("text")
-    return str(value or "")
-
-
-def _projected_text(item: Mapping[str, Any], display_text: str, result_kind: str) -> str:
-    if result_kind == "docs_answer":
-        return display_text
-    snippet = _text(item.get("snippet"))
-    fact_material = str(item.get("content") or display_text)
-    fact_lines = [line.strip() for line in fact_material.splitlines() if _PATCH_FACT_RE.search(line)]
-    identity_terms = list(dict.fromkeys(
-        match.group(0)
-        for line in fact_material.splitlines()
-        for match in re.finditer(
-            r"(?:[A-Za-z0-9_.-]+[\\/])+[A-Za-z0-9_.-]+"
-            r"|\b[A-Za-z][A-Za-z0-9]*_[A-Za-z0-9_]+\b",
-            line,
-        )
-    ))[:32]
-    symbols = " ".join(_symbols(item))
-    parts = [
-        part
-        for part in [
-            snippet,
-            *fact_lines,
-            *identity_terms,
-            symbols,
-            _source_path(item),
-        ]
-        if part
-    ]
-    return "\n".join(dict.fromkeys(parts)) or display_text
-
-
-def _symbols(item: Mapping[str, Any]) -> tuple[str, ...]:
-    metadata = item.get("metadata") if isinstance(item.get("metadata"), Mapping) else {}
-    values: list[Any] = []
-    for source in (item, metadata):
-        for key in ("symbols", "matched_symbols", "symbol_names", "symbol"):
-            value = source.get(key)
-            values.extend(value if isinstance(value, (list, tuple, set)) else [value] if value else [])
-    names = [value.get("name") if isinstance(value, Mapping) else value for value in values]
-    return tuple(dict.fromkeys(str(value) for value in names if str(value or "").strip()))
-
-
-def _authority(item: Mapping[str, Any]) -> str:
-    values = {
-        str(item.get("authority") or "").casefold(),
-        str(item.get("repository_authority") or "").casefold(),
-        str(item.get("_packet_authority") or "").casefold(),
-    }
-    return "canonical" if values & {
-        "canonical", "source_of_truth", "explicit_agent_policy", "primary",
-        "official", "project_owned", "project_rule",
-    } else "supporting"
-
-
-def _version_binding(item: Mapping[str, Any]) -> str:
-    return str(
-        item.get("docs_exactness")
-        or item.get("version_binding")
-        or item.get("resolved_version")
-        or item.get("version")
-        or "not_applicable"
-    ).strip()
-
-
-def _resolved_version(item: Mapping[str, Any]) -> str:
-    return str(item.get("resolved_version") or item.get("version") or item.get("requested_version") or "").strip()
-
-
-def _version_rank(value: str) -> int:
-    normalized = value.casefold().replace("-", "_")
-    if normalized in {
-        "exact", "exact_snapshot", "exact_version", "exact_version_indexed",
-        "exact_version_url", "version_exact",
-    }:
-        return 0
-    if normalized in {"", "unknown", "latest", "unversioned", "not_applicable"} or "fallback" in normalized:
-        return 2
-    return 1
-
-
-def _risk_flags(item: Mapping[str, Any]) -> tuple[str, ...]:
-    values: list[Any] = []
-    for key in ("instruction_risk_flags", "risk_flags"):
-        value = item.get(key)
-        values.extend(value if isinstance(value, (list, tuple, set)) else [value] if value else [])
-    return tuple(sorted(str(value) for value in values if value))
-
-
-def _span(item: Mapping[str, Any], name: str) -> tuple[int | None, int | None]:
-    start, end = item.get(f"{name}_start"), item.get(f"{name}_end")
-    packed = item.get(f"{name}_span")
-    if (start is None or end is None) and isinstance(packed, (list, tuple)) and len(packed) == 2:
-        start, end = packed
-    try:
-        return (int(start), int(end)) if start is not None and end is not None else (None, None)
-    except (TypeError, ValueError):
-        return None, None
-
-
-def _span_was_supplied(item: Mapping[str, Any], name: str) -> bool:
-    return any(key in item for key in (f"{name}_start", f"{name}_end", f"{name}_span"))
-
-
-def _identity_aliases(item: Mapping[str, Any], path: str) -> tuple[str, ...]:
-    values = (
-        item.get("source_identity"), path, item.get("source"), item.get("path"),
-        item.get("url"), item.get("source_url"), item.get("canonical_id"),
-        item.get("library_id"), item.get("library"),
-    )
-    return tuple(sorted({key for value in values if (key := _normalized_source(value))}))
-
-
-@dataclass(frozen=True, slots=True)
-class SelectionConfig:
-    result_kind: Literal["docs_answer", "patch_context"]
-    target_tokens: int
-    hard_tokens: int
-    profile: Literal["generic", "library_docs_answer", "project_document_answer", "project_docs_answer"] = "generic"
-    schema_version: str = SELECTOR_SCHEMA_VERSION
-    max_candidates: int = MAX_SELECTOR_CANDIDATES
-    max_sources: int = 3
-    max_items_per_source: int = 2
-    max_documents: int = MAX_VISIBLE_DOCUMENTS
-    max_spans: int = MAX_VISIBLE_SPANS
-    near_duplicate_threshold: int = 850
-    overlap_threshold: int = 800
-    marginal_utility_threshold: int = 80
-    shingle_size: int = 5
-    wrapper_reserve_tokens: int = 120
-    cache_enabled: bool = False
-
-    def __post_init__(self) -> None:
-        if self.result_kind not in {"docs_answer", "patch_context"}:
-            raise ValueError("unsupported evidence result kind")
-        if self.profile not in {"generic", "library_docs_answer", "project_document_answer", "project_docs_answer"}:
-            raise ValueError("unsupported evidence selection profile")
-        if not 1 <= self.target_tokens <= self.hard_tokens:
-            raise ValueError("selector token budgets are invalid")
-        if not 1 <= self.max_candidates <= MAX_SELECTOR_CANDIDATES:
-            raise ValueError("selector candidate limit is invalid")
-        if self.max_sources < 1 or self.max_items_per_source < 1:
-            raise ValueError("selector source limits are invalid")
-        if self.max_documents < 1 or self.max_spans < 1:
-            raise ValueError("selector document/span limits are invalid")
-        if not 0 <= self.near_duplicate_threshold <= 1000:
-            raise ValueError("near duplicate threshold is invalid")
-
-    @property
-    def config_hash(self) -> str:
-        return canonical_hash(asdict(self))
-
-
-@dataclass(frozen=True, slots=True)
-class EvidenceRequirement:
-    requirement_id: str
-    kind: str
-    value: str
-    mandatory: bool = True
-    public_provenance: str = "public_task_contract"
-    source_path: str | None = None
-    target_path: str | None = None
-    version_binding: str | None = None
-    # Hash-bound provenance from the pure query analyser; it does not alter
-    # selection semantics.
-    query_extraction_kind: str | None = None
-    query_span_start: int | None = None
-    query_span_end: int | None = None
-    query_span_text: str | None = None
-    proof_role: ProofRole = "generic_fact"
-    qualifiers: tuple[EvidenceQualifier, ...] = ()
-    obligation_kind: str | None = None
-    subject: str | None = None
-    attribute: str | None = None
-    relation: str | None = None
-    obligation_target: str | None = None
-    value_kind: str | None = None
-    expected_value: str | None = None
-    item_kind: str | None = None
-    cardinality: int | None = None
-    response_mode: str = "value"
-    lifecycle_intent: LifecycleIntent = "current"
-
-    def __post_init__(self) -> None:
-        if self.proof_role not in _PROOF_ROLES:
-            raise ValueError(f"unsupported evidence proof role: {self.proof_role}")
-        qualifiers = tuple(sorted(set(self.qualifiers)))
-        unknown = set(qualifiers) - _EVIDENCE_QUALIFIERS
-        if unknown:
-            raise ValueError(f"unsupported evidence qualifiers: {', '.join(sorted(unknown))}")
-        if self.kind == "proof_obligation":
-            if not self.obligation_kind or not self.subject or not self.value_kind:
-                raise ValueError("typed proof obligation is incomplete")
-            if self.cardinality is not None and not 1 <= self.cardinality <= 32:
-                raise ValueError("typed proof obligation cardinality is invalid")
-            if self.response_mode not in {
-                "value", "count", "names", "count_and_names", "call", "path", "workflow",
-            }:
-                raise ValueError("typed proof obligation response mode is invalid")
-        object.__setattr__(self, "qualifiers", qualifiers)
-
-    def as_proof_obligation(self) -> ProofObligation | None:
-        if self.kind != "proof_obligation":
-            return None
-        return ProofObligation(
-            obligation_id=self.requirement_id,
-            kind=self.obligation_kind,  # type: ignore[arg-type]
-            subject=str(self.subject),
-            attribute=self.attribute,
-            relation=self.relation,
-            target=self.obligation_target,
-            value_kind=self.value_kind,  # type: ignore[arg-type]
-            expected_value=self.expected_value,
-            item_kind=self.item_kind,
-            cardinality=self.cardinality,
-            response_mode=self.response_mode,
-            mandatory=self.mandatory,
-            query_span_start=self.query_span_start,
-            query_span_end=self.query_span_end,
-            query_span_text=self.query_span_text,
-            lifecycle_intent=self.lifecycle_intent,
-        )
-
-
-@dataclass(frozen=True, slots=True)
-class EvidenceRequirementSet(Sequence[EvidenceRequirement]):
-    """Canonical immutable requirements owned by evidence selection.
-
-    Entity and facet fields reserve the canonical contract surface for later
-    analysis. They intentionally have no selection semantics in this phase.
-    """
-
-    requirements: tuple[EvidenceRequirement, ...] = ()
-    required_entities: tuple[str, ...] = ()
-    required_facets: tuple[str, ...] = ()
-    query_extraction_provenance: tuple[tuple[str, str, str], ...] = ()
-    query_requirement_spans: tuple[tuple[str, int, int, str], ...] = ()
-    retrieval_hints: tuple[str, ...] = ()
-    concept_queries: tuple[str, ...] = ()
-    answer_contract_hash: str | None = None
-    lifecycle_intent: LifecycleIntent = "current"
-
-    def __post_init__(self) -> None:
-        requirements_by_id: dict[str, EvidenceRequirement] = {}
-        for item in self.requirements:
-            existing = requirements_by_id.get(item.requirement_id)
-            if existing is not None and existing != item:
-                raise ValueError(f"conflicting evidence requirement ID: {item.requirement_id}")
-            requirements_by_id[item.requirement_id] = item
-        canonical_requirements = tuple(sorted(
-            requirements_by_id.values(), key=lambda item: item.requirement_id,
-        ))
-        entities = tuple(sorted({str(value).strip() for value in self.required_entities if str(value).strip()}))
-        facets = tuple(sorted({str(value).strip() for value in self.required_facets if str(value).strip()}))
-        provenance = tuple(sorted({
-            (item.requirement_id, item.query_extraction_kind, item.value.casefold())
-            for item in canonical_requirements
-            if item.public_provenance == "query_exact_term" and item.query_extraction_kind
-        }))
-        if self.query_extraction_provenance:
-            provenance = tuple(sorted({
-                (str(requirement_id), str(kind), str(value).casefold())
-                for requirement_id, kind, value in self.query_extraction_provenance
-            }))
-        spans = tuple(sorted({
-            (item.requirement_id, item.query_span_start, item.query_span_end, item.query_span_text)
-            for item in canonical_requirements
-            if item.query_span_start is not None
-            and item.query_span_end is not None
-            and item.query_span_text is not None
-        }))
-        if self.query_requirement_spans:
-            spans = tuple(sorted({
-                (str(requirement_id), int(start), int(end), str(text))
-                for requirement_id, start, end, text in self.query_requirement_spans
-                if int(start) >= 0 and int(end) > int(start) and str(text)
-            }))
-        object.__setattr__(self, "requirements", canonical_requirements)
-        object.__setattr__(self, "required_entities", entities)
-        object.__setattr__(self, "required_facets", facets)
-        object.__setattr__(self, "query_extraction_provenance", provenance)
-        object.__setattr__(self, "query_requirement_spans", spans)
-        object.__setattr__(self, "retrieval_hints", tuple(dict.fromkeys(
-            str(value).strip()[:160]
-            for value in self.retrieval_hints
-            if str(value).strip()
-        ))[:24])
-        object.__setattr__(self, "concept_queries", tuple(dict.fromkeys(
-            str(value).strip()[:320]
-            for value in self.concept_queries
-            if str(value).strip()
-        ))[:4])
-
-    def __len__(self) -> int:
-        return len(self.requirements)
-
-    @overload
-    def __getitem__(self, index: int) -> EvidenceRequirement: ...
-
-    @overload
-    def __getitem__(self, index: slice) -> tuple[EvidenceRequirement, ...]: ...
-
-    def __getitem__(self, index: int | slice) -> EvidenceRequirement | tuple[EvidenceRequirement, ...]:
-        return self.requirements[index]
-
-    @property
-    def hash_payload(self) -> dict[str, Any]:
-        return {
-            "requirements": [
-                {key: value for key, value in asdict(item).items() if key != "response_mode" or value != "value"}
-                for item in self.requirements
-            ],
-            "required_entities": list(self.required_entities),
-            "required_facets": list(self.required_facets),
-            "query_extraction_provenance": [list(item) for item in self.query_extraction_provenance],
-            "query_requirement_spans": [list(item) for item in self.query_requirement_spans],
-            "retrieval_hints": list(self.retrieval_hints),
-            "concept_queries": list(self.concept_queries),
-            "answer_contract_hash": self.answer_contract_hash,
-            "lifecycle_intent": self.lifecycle_intent,
-        }
-
-    @property
-    def requirements_hash(self) -> str:
-        return canonical_hash(self.hash_payload)
-
-
-@dataclass(frozen=True, slots=True)
-class EvidenceCandidate:
-    stable_id: str
-    evidence_id: str
-    hydration_id: int | None
-    identity_kind: str
-    source_identity: str
-    identity_aliases: tuple[str, ...]
-    path_or_url: str
-    section: str
-    parent_logical_id: str
-    content_sha256: str
-    display_text: str
-    projected_text: str
-    token_estimate: int
-    fit_token_estimate: int
-    reported_token_estimate: int | None
-    char_start: int | None
-    char_end: int | None
-    line_start: int | None
-    line_end: int | None
-    retrieval_rank: int
-    component_ranks: tuple[tuple[str, int], ...]
-    relevance_millis: int
-    authority: str
-    source_class: str
-    version_binding: str
-    resolved_version: str
-    docs_snapshot_exact: bool | None
-    project_identity: str
-    module_id: str
-    doc_scope: str
-    symbols: tuple[str, ...]
-    exact_terms: tuple[str, ...]
-    instruction_risk_flags: tuple[str, ...]
-    freshness: str
-    navigation_only: bool
-    answer_units: tuple[AnswerUnit, ...] = ()
-    requirement_witnesses: tuple["RequirementWitness", ...] = ()
-    covered_requirement_ids: frozenset[str] = frozenset()
-    original: Mapping[str, Any] = field(default_factory=dict, compare=False, repr=False)
-
-
-@dataclass(frozen=True, slots=True)
-class Omission:
-    stable_id: str
-    reason_code: OmissionReason
-    representative_stable_id: str | None = None
-
-
-@dataclass(frozen=True, slots=True)
-class EvidenceAssignment:
-    requirement_id: str
-    evidence_id: str
-    path: str
-    char_start: int | None
-    char_end: int | None
-    line_start: int | None
-    line_end: int | None
-    projected_content_hash: str
-    proof_role: ProofRole
-    qualifiers: tuple[EvidenceQualifier, ...]
-    unit_id: str | None = None
-    unit_kind: str | None = None
-    unit_char_start: int | None = None
-    unit_char_end: int | None = None
-    unit_content_hash: str | None = None
-
-
-@dataclass(frozen=True, slots=True)
-class RequirementWitness:
-    requirement_id: str
-    unit_id: str
-    unit_kind: str
-    unit_text: str = field(compare=False, repr=False)
-    unit_char_start: int | None
-    unit_char_end: int | None
-    unit_content_hash: str
-    subject_score: int
-    relation_score: int
-    value_score: int
-    completeness_score: int
-
-
-@dataclass(frozen=True, slots=True)
-class SupportDecision:
-    """Immutable public support verdict produced only by ``select_evidence``."""
-
-    answer_supported: bool
-    support_status: Literal["supported", "insufficient_evidence"]
-    reason_code: str | None
-    missing_requirement_ids: tuple[str, ...]
-    satisfied_requirement_ids: tuple[str, ...]
-    mandatory_requirement_ids: tuple[str, ...]
-    mandatory_coverage: float
-    selected_evidence_ids: tuple[str, ...]
-    requirements_hash: str
-    selector_config_hash: str
-    eligibility_contract_hash: str
-    candidate_trace_hash: str
-    selection_hash: str
-    assignment_hash: str
-    decision_hash: str
-    requirements: EvidenceRequirementSet = field(compare=False, repr=False)
-
-    @property
-    def answer_available(self) -> bool:
-        return self.answer_supported
-
-    def as_payload(self) -> dict[str, Any]:
-        return {
-            "answer_supported": self.answer_supported,
-            "answer_available": self.answer_supported,
-            "support_status": self.support_status,
-            "decision": self.support_status,
-            "reason_code": self.reason_code,
-            "missing_requirement_ids": list(self.missing_requirement_ids),
-            "satisfied_requirement_ids": list(self.satisfied_requirement_ids),
-            "mandatory_requirement_ids": list(self.mandatory_requirement_ids),
-            "mandatory_coverage": self.mandatory_coverage,
-            "evidence_coverage": self.mandatory_coverage,
-            "selected_evidence_ids": list(self.selected_evidence_ids),
-            "requirements_hash": self.requirements_hash,
-            "selector_config_hash": self.selector_config_hash,
-            "eligibility_contract_hash": self.eligibility_contract_hash,
-            "candidate_trace_hash": self.candidate_trace_hash,
-            "selection_hash": self.selection_hash,
-            "assignment_hash": self.assignment_hash,
-            "decision_hash": self.decision_hash,
-        }
-
-    def with_insufficient_reason_code(self, reason_code: str) -> "SupportDecision":
-        """Return an insufficient verdict with one audited runtime reason."""
-
-        if self.answer_supported or self.support_status != "insufficient_evidence":
-            raise ValueError("only an insufficient support decision can carry an insufficiency reason")
-        if not reason_code:
-            raise ValueError("an insufficiency reason code is required")
-
-        payload = {
-            "answer_supported": self.answer_supported,
-            "support_status": self.support_status,
-            "reason_code": reason_code,
-            "missing_requirement_ids": self.missing_requirement_ids,
-            "satisfied_requirement_ids": self.satisfied_requirement_ids,
-            "mandatory_requirement_ids": self.mandatory_requirement_ids,
-            "mandatory_coverage": self.mandatory_coverage,
-            "selected_evidence_ids": self.selected_evidence_ids,
-            "requirements_hash": self.requirements_hash,
-            "selector_config_hash": self.selector_config_hash,
-            "eligibility_contract_hash": self.eligibility_contract_hash,
-            "candidate_trace_hash": self.candidate_trace_hash,
-            "selection_hash": self.selection_hash,
-            "assignment_hash": self.assignment_hash,
-        }
-        return replace(
-            self,
-            reason_code=str(reason_code),
-            decision_hash=canonical_hash(payload),
-        )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 @dataclass(frozen=True, slots=True)
@@ -1021,577 +473,20 @@ def patch_selection_config(max_tokens: int) -> SelectionConfig:
     )
 
 
-def _extract_requirement_entities_and_facets(question: str) -> tuple[tuple[str, ...], tuple[str, ...]]:
-    entities: set[str] = set()
-    facets: set[str] = set()
-    comparison_entities: list[str] = []
-    for pattern in (_LOWERCASE_COMPARISON_RE, _COMPARE_WITH_RE, _COMPARING_AND_RE):
-        for match in pattern.finditer(question):
-            left, right = (match.group(1).strip("`").casefold(), match.group(2).strip("`").casefold())
-            entities.update((left, right))
-            comparison_entities.append(left)
-            facets.add(f"comparison:{left}:{right}")
-    for match in itertools.chain(_RESULT_ACCESS_RE.finditer(question), _PASSIVE_RESULT_ACCESS_RE.finditer(question)):
-        if comparison_entities:
-            facets.add(f"result_access:{comparison_entities[-1]}:{match.group(0).casefold()}")
-    return tuple(sorted(entities)), tuple(sorted(facets))
 
 
-def _project_answer_facets(question: str, entities: Sequence[str]) -> tuple[str, ...]:
-    """Derive small, auditable answer facets for common documentation questions."""
-
-    normalized = question.casefold()
-    facets: set[str] = set()
-    if "exact" in normalized and re.search(r"\b(?:recall|retrieve|retrieval)\b", normalized):
-        facets.add("recall_mechanism")
-    if re.search(r"\b(?:authority|scope)\b", normalized) and re.search(r"\b(?:widen|expand|broaden|without)\b", normalized):
-        facets.add("authority_invariant")
-    if re.search(r"\b(?:handle|handling|process|processing|dispatch|route)\b", normalized) and re.search(
-        r"\brequest\b|\bзапрос", normalized,
-    ):
-        facets.add("request_handling")
-    if re.search(r"\barchitecture\b|\bархитектур", normalized):
-        facets.add("architecture")
-    if re.search(r"\b(?:responsive|responsiveness|non-blocking|nonblocking)\b|\bотзывчив", normalized):
-        facets.add("responsiveness")
-    facet_entities = tuple(value for value in entities if value)
-    if not facet_entities:
-        return tuple(sorted(facets))
-    if re.search(
-        r"\bwhat\s+(?:does|do|is|are)\b|\b(?:report|return|provide|show)\b"
-        r"|\b(?:что\s+(?:возвращает|показывает|сообщает)|возвращает|показывает|сообщает)\b",
-        normalized,
-    ):
-        facets.update(f"behavior:{entity}" for entity in facet_entities)
-    if re.search(
-        r"\bwhen\s+(?:should|do|to)\b|\bwhen\s+is\b|\buse\b"
-        r"|\bкогда\b|\bиспользова(?:ть|н|но)\b|\bприменя(?:ть|ется)\b",
-        normalized,
-    ):
-        facets.update(f"usage:{entity}" for entity in facet_entities)
-    if re.search(
-        r"\bworkflow\b|\bafter\b|\bthen\b|\bsteps?\b|\bsequence\b"
-        r"|\bпроцесс\b|\bпосле\b|\bзатем\b|\bшаг(?:и|ов)?\b|\bпоследовательност(?:ь|и)\b",
-        normalized,
-    ):
-        facets.update(f"workflow:{entity}" for entity in facet_entities)
-    return tuple(sorted(facets))
 
 
-def _comparison_query_span(question: str, left: str, right: str) -> tuple[int, int] | None:
-    for pattern in (_LOWERCASE_COMPARISON_RE, _COMPARE_WITH_RE, _COMPARING_AND_RE):
-        for match in pattern.finditer(question):
-            matched_values = (match.group(1).strip("`").casefold(), match.group(2).strip("`").casefold())
-            if matched_values == (left, right):
-                return match.start(1), match.end(2)
-    return None
 
 
-def _with_query_requirement_spans(
-    question: str,
-    requirements: tuple[EvidenceRequirement, ...],
-) -> tuple[EvidenceRequirement, ...]:
-    folded = question.casefold()
-    spanned: list[EvidenceRequirement] = []
-    for requirement in requirements:
-        if requirement.public_provenance != "query_exact_term":
-            spanned.append(requirement)
-            continue
-        if (
-            requirement.query_span_start is not None
-            and requirement.query_span_end is not None
-            and requirement.query_span_text
-        ):
-            spanned.append(requirement)
-            continue
-        value = requirement.value.casefold()
-        if requirement.kind == "facet":
-            _, _, detail = value.partition(":")
-            if value.startswith("comparison:"):
-                left, _, right = detail.partition(":")
-                comparison_span = _comparison_query_span(question, left, right)
-                start, end = comparison_span if comparison_span is not None else (-1, -1)
-            else:
-                _, _, phrase = detail.partition(":")
-                start, end = folded.find(phrase), -1
-                if start >= 0:
-                    end = start + len(phrase)
-        else:
-            start, end = folded.find(value), -1
-            if start >= 0:
-                end = start + len(value)
-        spanned.append(replace(
-            requirement,
-            query_span_start=start if start >= 0 else None,
-            query_span_end=end if end > start else None,
-            query_span_text=question[start:end] if start >= 0 and end > start else None,
-        ))
-    return tuple(spanned)
 
 
-def _semantic_requirement_key(requirement: EvidenceRequirement) -> tuple[Any, ...]:
-    """Return the proof obligation identity, independent of extraction alias."""
-
-    return (
-        requirement.kind,
-        requirement.value.casefold(),
-        requirement.mandatory,
-        requirement.proof_role,
-        requirement.qualifiers,
-        requirement.source_path,
-        requirement.target_path,
-        requirement.version_binding,
-        requirement.obligation_kind,
-        requirement.subject,
-        requirement.attribute,
-        requirement.relation,
-        requirement.obligation_target,
-        requirement.value_kind,
-        requirement.expected_value,
-        requirement.item_kind,
-        requirement.cardinality,
-        requirement.response_mode if requirement.response_mode != "value" else None,
-        requirement.lifecycle_intent,
-    )
 
 
-def _requirement_from_obligation(obligation: ProofObligation) -> EvidenceRequirement:
-    return EvidenceRequirement(
-        requirement_id=obligation.obligation_id,
-        kind="proof_obligation",
-        value=" ".join(filter(None, (
-            obligation.subject,
-            obligation.attribute,
-            obligation.relation,
-            obligation.target,
-            obligation.item_kind,
-        ))),
-        mandatory=obligation.mandatory,
-        public_provenance="query_exact_term",
-        query_extraction_kind=f"typed_{obligation.kind}",
-        query_span_start=obligation.query_span_start,
-        query_span_end=obligation.query_span_end,
-        query_span_text=obligation.query_span_text,
-        obligation_kind=obligation.kind,
-        subject=obligation.subject,
-        attribute=obligation.attribute,
-        relation=obligation.relation,
-        obligation_target=obligation.target,
-        value_kind=obligation.value_kind,
-        expected_value=obligation.expected_value,
-        item_kind=obligation.item_kind,
-        cardinality=obligation.cardinality,
-        response_mode=obligation.response_mode,
-        lifecycle_intent=obligation.lifecycle_intent,
-    )
 
 
-def build_requirements(
-    question: str,
-    *,
-    required_evidence_paths: Iterable[str] = (),
-    required_target_paths: Iterable[str] = (),
-    public_requirements: Iterable[Mapping[str, Any] | str] = (),
-    exact_version: str | None = None,
-    exact_snapshot_required: bool = False,
-    project_identity: str | None = None,
-    module_id: str | None = None,
-    profile: Literal["generic", "library_docs_answer", "project_document_answer", "project_docs_answer"] = "generic",
-    library_requirement_contract: Mapping[str, Iterable[str]] | None = None,
-) -> EvidenceRequirementSet:
-    requirements: list[EvidenceRequirement] = []
-    input_limits: set[str] = set()
-    answer_contract: ProjectAnswerContract | None = None
-    for index, term in enumerate(extract_exact_terms(question)):
-        requirements.append(EvidenceRequirement(
-            requirement_id=f"query_exact:{index}:{term.normalized_value}",
-            kind="exact_term", value=term.value,
-            mandatory=term.kind != "path" and profile != "project_docs_answer",
-            public_provenance="query_exact_term",
-            query_extraction_kind=term.kind,
-            proof_role="document_statement" if profile == "project_document_answer" else "generic_fact",
-        ))
-    existing_exact_values = {
-        item.value.casefold() for item in requirements if item.kind == "exact_term"
-    }
-    identifier_values = sorted({
-        token
-        for token in re.findall(r"\b[A-Za-z_][A-Za-z0-9_]*(?:(?:::|\.)[A-Za-z_]\w*)*\b", question)
-        if (
-            "_" in token or "." in token or "::" in token
-            or (any(char.isupper() for char in token[1:]) and any(char.islower() for char in token))
-        )
-        and token.casefold() not in existing_exact_values
-    }, key=str.casefold)
-    if len(identifier_values) > MAX_REQUIREMENT_IDENTIFIERS:
-        input_limits.add("identifiers")
-        identifier_values = identifier_values[:MAX_REQUIREMENT_IDENTIFIERS]
-    for index, value in enumerate(identifier_values):
-        requirements.append(EvidenceRequirement(
-            requirement_id=f"query_symbol:{index}:{value.casefold()}",
-            kind="exact_term", value=value,
-            mandatory=profile != "project_docs_answer",
-            public_provenance="query_exact_term",
-            query_extraction_kind="identifier",
-            proof_role="document_statement" if profile == "project_document_answer" else "generic_fact",
-        ))
-    for kind, paths, provenance in (
-        ("evidence_path", required_evidence_paths, "required_evidence_paths"),
-        ("target_path", required_target_paths, "required_target_paths"),
-    ):
-        normalized_paths = sorted(
-            {str(path).strip() for path in paths if str(path).strip()},
-            key=lambda value: (_normalized_source(value), value),
-        )
-        if len(normalized_paths) > MAX_REQUIREMENT_PATHS:
-            input_limits.add("paths")
-            normalized_paths = normalized_paths[:MAX_REQUIREMENT_PATHS]
-        for index, value in enumerate(normalized_paths):
-            requirements.append(EvidenceRequirement(
-                requirement_id=f"{kind}:{index}:{_normalized_source(value)}",
-                kind=kind, value=value, public_provenance=provenance,
-                source_path=value if kind == "evidence_path" else None,
-                target_path=value if kind == "target_path" else None,
-                proof_role="document_identity" if kind == "evidence_path" else "target_identity",
-            ))
-    if exact_version:
-        requirements.append(EvidenceRequirement(
-            requirement_id=f"exact_version:{exact_version}", kind="exact_version",
-            value=str(exact_version), public_provenance="exact_dependency_binding",
-            version_binding=str(exact_version),
-        ))
-    for kind, value in (
-        ("exact_snapshot", "true" if exact_snapshot_required else ""),
-        ("project_identity", project_identity or ""),
-        ("module_id", module_id or ""),
-    ):
-        if str(value).strip():
-            requirements.append(EvidenceRequirement(
-                requirement_id=f"{kind}:{str(value).strip()}",
-                kind=kind,
-                value=str(value).strip(),
-                public_provenance="selector_scope_requirement",
-            ))
-    sorted_public_requirements = sorted(public_requirements, key=canonical_hash)
-    if len(sorted_public_requirements) > MAX_PUBLIC_REQUIREMENTS:
-        input_limits.add("public_requirements")
-        sorted_public_requirements = sorted_public_requirements[:MAX_PUBLIC_REQUIREMENTS]
-    for index, raw in enumerate(sorted_public_requirements):
-        if isinstance(raw, Mapping):
-            value = str(raw.get("value") or raw.get("text") or "").strip()
-            kind = str(raw.get("kind") or "required_fact")
-            mandatory = raw.get("mandatory") is not False
-            provenance = str(raw.get("public_provenance") or "public_task_contract")
-            proof_role = str(raw.get("proof_role") or "generic_fact")
-            raw_qualifiers = raw.get("qualifiers") or ()
-            qualifiers = tuple(str(item) for item in raw_qualifiers) if isinstance(raw_qualifiers, (list, tuple, set)) else (str(raw_qualifiers),)
-        else:
-            value, kind, mandatory, provenance = str(raw).strip(), "required_fact", True, "public_task_contract"
-            proof_role, qualifiers = "generic_fact", ()
-        if value:
-            if provenance not in _ALLOWED_REQUIREMENT_PROVENANCE:
-                raise ValueError(f"unsupported evidence requirement provenance: {provenance}")
-            requirements.append(EvidenceRequirement(
-                requirement_id=f"public:{index}:{canonical_hash(value)[:12]}",
-                kind=kind, value=value, mandatory=mandatory, public_provenance=provenance,
-                proof_role=proof_role, qualifiers=qualifiers,
-            ))
-    unique: dict[str, EvidenceRequirement] = {}
-    for item in requirements:
-        existing = unique.get(item.requirement_id)
-        if existing is not None and existing != item:
-            raise ValueError(f"conflicting evidence requirement ID: {item.requirement_id}")
-        unique[item.requirement_id] = item
-    entities, facets = _extract_requirement_entities_and_facets(question)
-    if profile == "project_document_answer" and not any(
-        item.mandatory and item.kind not in {"evidence_path", "target_path"}
-        for item in unique.values()
-    ):
-        unique["document_content_requirement"] = EvidenceRequirement(
-            requirement_id="document_content_requirement",
-            kind="unsupported_query",
-            value="",
-            public_provenance="query_exact_term",
-            query_extraction_kind="no_canonical_document_content_requirement",
-            proof_role="document_statement",
-        )
-    if profile == "library_docs_answer":
-        comparison_intent = bool(re.search(r"\b(?:compare|comparing|comparison|instead|versus|vs\.?|difference)\b", question, re.IGNORECASE))
-        raw_contract = library_requirement_contract or {}
-        contract = raw_contract if comparison_intent else {}
-        contract_entities = tuple(sorted({str(value).casefold() for value in contract.get("entities", ()) if str(value).strip()}))
-        entities = tuple(sorted(set(entities) | set(contract_entities)))
-        if len(contract_entities) == 2:
-            for facet in contract.get("facets", ()):
-                if str(facet) == "comparison":
-                    facets = tuple(sorted(set(facets) | {f"comparison:{contract_entities[0]}:{contract_entities[1]}"}))
-                if str(facet) == "result_access":
-                    facets = tuple(sorted(set(facets) | {f"result_access:{contract_entities[0]}:contract"}))
-        for entity in entities:
-            unique[f"entity:{entity}"] = EvidenceRequirement(
-                requirement_id=f"entity:{entity}", kind="entity", value=entity,
-                public_provenance="query_exact_term", query_extraction_kind="lowercase_comparison_anchor",
-            )
-        for facet in facets:
-            unique[f"facet:{facet}"] = EvidenceRequirement(
-                requirement_id=f"facet:{facet}", kind="facet", value=facet,
-                public_provenance="query_exact_term", query_extraction_kind="answer_facet",
-            )
-        raw_groups = (raw_contract.get("code_groups") or ()) if _CODE_REQUEST_RE.search(question) else ()
-        if not raw_groups and _CODE_REQUEST_RE.search(question) and raw_contract.get("required_code_group"):
-            raw_groups = (raw_contract["required_code_group"],)
-        if len(raw_groups) > MAX_CODE_GROUPS:
-            input_limits.add("code_groups")
-            raw_groups = raw_groups[:MAX_CODE_GROUPS]
-        for index, raw_group in enumerate(raw_groups):
-            fragments = tuple(
-                str(value).strip() for value in raw_group
-                if str(value).strip()
-            ) if isinstance(raw_group, (list, tuple, set)) else ()
-            if not fragments:
-                continue
-            encoded_group = json.dumps(
-                sorted(set(fragments), key=str.casefold),
-                ensure_ascii=False,
-                separators=(",", ":"),
-            )
-            unique[f"code_group:{index}:{canonical_hash(encoded_group)[:12]}"] = EvidenceRequirement(
-                requirement_id=f"code_group:{index}:{canonical_hash(encoded_group)[:12]}",
-                kind="code_group",
-                value=encoded_group,
-                public_provenance="public_task_contract",
-            )
-        if not entities and not facets and re.search(r"[\u0400-\u04ff]", question):
-            unique["library_query_coverage"] = EvidenceRequirement(
-                requirement_id="library_query_coverage", kind="unsupported_query", value="",
-                public_provenance="query_exact_term", query_extraction_kind="no_canonical_library_requirement",
-            )
-    if profile == "project_docs_answer":
-        answer_contract = build_project_answer_contract(question)
-        for obligation in answer_contract.proof_obligations:
-            typed = _requirement_from_obligation(obligation)
-            unique[typed.requirement_id] = typed
-        if not any(item.mandatory for item in unique.values()):
-            unique["project_answer_requirement"] = EvidenceRequirement(
-                requirement_id="project_answer_requirement", kind="unsupported_query", value="",
-                public_provenance="query_exact_term",
-                query_extraction_kind="no_project_answer_requirement",
-            )
-    for category in sorted(input_limits):
-        # Preserve a deterministic fail-closed reason without accepting an
-        # unbounded input set into the selector/audit contract.
-        unique[f"input_limit:{category}"] = EvidenceRequirement(
-            requirement_id=f"input_limit:{category}",
-            kind="unsupported_query",
-            value=category,
-            public_provenance="selector_scope_requirement",
-            query_extraction_kind="input_limit_exceeded",
-        )
-    canonical_by_obligation: dict[tuple[Any, ...], EvidenceRequirement] = {}
-    extraction_provenance: list[tuple[str, str, str]] = []
-    for requirement in unique.values():
-        key = _semantic_requirement_key(requirement)
-        canonical = canonical_by_obligation.get(key)
-        # Query extractors can discover the same exact obligation through a
-        # symbol and a project-answer term. Keep both audit provenance records
-        # but select and score the obligation only once.
-        if (
-            canonical is not None
-            and canonical.public_provenance == requirement.public_provenance == "query_exact_term"
-        ):
-            if requirement.query_extraction_kind:
-                extraction_provenance.append((
-                    canonical.requirement_id,
-                    requirement.query_extraction_kind,
-                    requirement.value.casefold(),
-                ))
-            continue
-        canonical_by_obligation.setdefault(key, requirement)
-    canonical_requirements = _with_query_requirement_spans(
-        question, tuple(sorted(canonical_by_obligation.values(), key=lambda item: item.requirement_id))
-    )
-    extraction_provenance.extend(
-        (item.requirement_id, item.query_extraction_kind, item.value.casefold())
-        for item in canonical_requirements
-        if item.public_provenance == "query_exact_term" and item.query_extraction_kind
-    )
-    return EvidenceRequirementSet(
-        canonical_requirements,
-        required_entities=entities,
-        required_facets=facets,
-        query_extraction_provenance=tuple(extraction_provenance),
-        retrieval_hints=answer_contract.retrieval_hints if answer_contract else (),
-        concept_queries=answer_contract.concept_queries if answer_contract else (),
-        answer_contract_hash=answer_contract.contract_hash if answer_contract else None,
-        lifecycle_intent=answer_contract.lifecycle_intent if answer_contract else "current",
-    )
 
 
-def normalize_candidates(
-    items: Iterable[Mapping[str, Any]],
-    *,
-    result_kind: Literal["docs_answer", "patch_context"],
-) -> tuple[list[EvidenceCandidate], list[Omission]]:
-    candidates: list[EvidenceCandidate] = []
-    omissions: list[Omission] = []
-    for rank, raw in enumerate(items, start=1):
-        if not isinstance(raw, Mapping):
-            continue
-        item = dict(raw)
-        path, section, display = _source_path(item), _section(item), _display_text(item)
-        digest = hashlib.sha256(display.encode("utf-8")).hexdigest()
-        metadata = item.get("metadata") if isinstance(item.get("metadata"), Mapping) else {}
-        child_stable = str(
-            item.get("stable_chunk_id")
-            or item.get("stable_child_id")
-            or metadata.get("stable_chunk_id")
-            or ""
-        )
-        stable = child_stable or str(item.get("stable_id") or "")
-        identity_kind = "stable_child" if child_stable else "legacy"
-        source_class = str(item.get("source_class") or "")
-        scoped_host_policy = (
-            path.startswith("host-policy://")
-            and bool(
-                item.get("scope_verified")
-                or metadata.get("scope_verified")
-            )
-            and str(
-                item.get("repository_authority") or ""
-            ).strip().casefold() == "explicit_agent_policy"
-            and str(
-                item.get("instruction_trust") or ""
-            ).strip().casefold() == "scoped_agent_policy"
-        )
-        indexed_project_doc = source_class in {
-            "project_doc", "project_file"
-        } and bool(metadata) and not scoped_host_policy
-        if indexed_project_doc and not child_stable:
-            omissions.append(Omission(f"invalid:{rank}", "invalid_identity"))
-            continue
-        if not stable and path and display:
-            stable = "legacy:" + canonical_hash({
-                "path": path,
-                "section": section,
-                "content": digest,
-                # Legacy retrieval rows do not expose Task 40 child identity.
-                # Preserve distinct code-graph aliases that share prose.
-                "symbols": sorted(_symbols(item)),
-            })[:40]
-        char_start, char_end = _span(item, "char")
-        line_start, line_end = _span(item, "line")
-        invalid_span = (
-            (_span_was_supplied(item, "char") and (char_start is None or char_end is None))
-            or (_span_was_supplied(item, "line") and (line_start is None or line_end is None))
-            or (char_start is None) != (char_end is None)
-            or (char_start is not None and (char_start < 0 or char_end <= char_start))
-            or (line_start is None) != (line_end is None)
-            or (line_start is not None and (line_start < 0 or line_end < line_start))
-        )
-        expected_hash = str(item.get("display_content_hash") or "").casefold()
-        missing_parent = identity_kind == "stable_child" and not str(
-            item.get("parent_logical_id") or metadata.get("parent_logical_id") or ""
-        ).strip()
-        invalid_hash = (identity_kind == "stable_child" and not expected_hash) or bool(expected_hash) and (
-            _HEX_SHA256.fullmatch(expected_hash) is None or expected_hash != digest
-        )
-        if not path or not display or not stable or invalid_span or missing_parent or invalid_hash:
-            omissions.append(Omission(stable or f"invalid:{rank}", "invalid_identity"))
-            continue
-        score = next((value for value in (
-            item.get("score"), item.get("relevance_score"), metadata.get("score"), metadata.get("relevance_score")
-        ) if isinstance(value, (int, float)) and not isinstance(value, bool) and math.isfinite(float(value))), 0.0)
-        projected = _projected_text(item, display, result_kind)
-        reported = item.get("token_estimate") or metadata.get("token_estimate")
-        trace = metadata.get("retrieval_trace") if isinstance(metadata.get("retrieval_trace"), Mapping) else {}
-        component_values = item.get("component_ranks") or trace.get("component_ranks") or {}
-        component_ranks = tuple(sorted(
-            (str(name), int(value))
-            for name, value in component_values.items()
-            if isinstance(value, int) and not isinstance(value, bool) and value > 0
-        )) if isinstance(component_values, Mapping) else ()
-        exact_values = item.get("exact_terms") or metadata.get("exact_terms") or ()
-        if isinstance(exact_values, str):
-            exact_values = (exact_values,)
-        candidates.append(EvidenceCandidate(
-            stable_id=stable,
-            evidence_id=str(item.get("evidence_id") or ""),
-            hydration_id=(
-                int(item.get("hydration_id"))
-                if isinstance(item.get("hydration_id"), int) and not isinstance(item.get("hydration_id"), bool)
-                else int(item.get("section_id"))
-                if isinstance(item.get("section_id"), int) and not isinstance(item.get("section_id"), bool)
-                else None
-            ),
-            identity_kind=identity_kind,
-            source_identity=str(item.get("source_identity") or path),
-            identity_aliases=_identity_aliases(item, path),
-            path_or_url=path,
-            section=section,
-            parent_logical_id=str(item.get("parent_logical_id") or metadata.get("parent_logical_id") or ""),
-            content_sha256=digest,
-            display_text=display,
-            projected_text=projected,
-            # Patch evidence is rendered into cited source, target and guidance
-            # objects. Reserve their structural cost here so selection cannot
-            # hand the formatter a bundle that only fits as raw chunk text.
-            token_estimate=(
-                _estimated_tokens(projected)
-                if result_kind == "docs_answer"
-                else _estimated_tokens(projected) + 88
-            ),
-            fit_token_estimate=(
-                _docs_answer_candidate_tokens(
-                    stable_id=stable,
-                    path=path,
-                    section=section,
-                    projected=projected,
-                    version_binding=_version_binding(item),
-                )
-                if result_kind == "docs_answer"
-                else _estimated_tokens(projected) + 88
-            ),
-            reported_token_estimate=int(reported) if isinstance(reported, int) and not isinstance(reported, bool) else None,
-            char_start=char_start, char_end=char_end, line_start=line_start, line_end=line_end,
-            # Absence of an explicit retrieval rank must not make selection
-            # depend on the caller's iteration order.
-            retrieval_rank=_positive_int(
-                item.get("retrieval_rank") if item.get("retrieval_rank") is not None else item.get("rank"),
-                default=10_000,
-            ),
-            component_ranks=component_ranks,
-            relevance_millis=int(round(float(score) * 1000)),
-            authority=_authority(item),
-            source_class=str(
-                item.get("source_class")
-                or (
-                    "legal"
-                    if str(item.get("authority") or "").casefold() == "legal"
-                    else ""
-                )
-            ),
-            version_binding=_version_binding(item),
-            resolved_version=_resolved_version(item),
-            docs_snapshot_exact=(item.get("docs_snapshot_exact") if isinstance(item.get("docs_snapshot_exact"), bool) else None),
-            project_identity=str(item.get("project_identity") or ""),
-            module_id=str(item.get("module_id") or ""), doc_scope=str(item.get("doc_scope") or ""),
-            symbols=_symbols(item),
-            exact_terms=tuple(sorted({str(value) for value in exact_values if str(value).strip()})),
-            instruction_risk_flags=_risk_flags(item),
-            freshness=str(item.get("freshness") or "current"),
-            navigation_only=bool(item.get("navigation_only")) or str(item.get("answer_type") or "") in {
-                "navigation_only", "partial_navigational",
-            },
-            answer_units=extract_answer_units(
-                display,
-                source_fields={
-                    "path_or_url": path,
-                    "section": section,
-                },
-            ),
-            original=item,
-        ))
-    return candidates, omissions
 
 
 def select_evidence(
@@ -1641,8 +536,16 @@ def select_evidence(
         raise ValueError(
             "unsupported evidence requirement provenance: " + ", ".join(invalid_provenance)
         )
+    v3_answer_units = any(
+        item.obligation_kind in {"purpose", "effect"}
+        or item.subject_kind is not None
+        or (item.obligation_kind == "inventory" and item.item_kind not in {None, "public_tool"})
+        for item in requirements
+    )
     raw_candidates, omissions = normalize_candidates(
-        materialized_items, result_kind=config.result_kind
+        materialized_items,
+        result_kind=config.result_kind,
+        include_soft_wrapped_prose=v3_answer_units,
     )
     eligibility_contract_hash = canonical_hash({
         "trust_contract": _canonical_contract_value(trust_contract or {}),
@@ -1750,10 +653,30 @@ def select_evidence(
         for candidate in eligible
     ]
     mandatory_ids = {item.requirement_id for item in requirements if item.mandatory}
-    ordered = sorted(covered, key=lambda candidate: (
-        0 if candidate.covered_requirement_ids & mandatory_ids else 1,
-        *_candidate_preference(candidate),
-    ))
+    compositional_question = bool(getattr(requirements, "parse_trace", ()))
+
+    def ordering_key(candidate: EvidenceCandidate) -> tuple[Any, ...]:
+        base = (
+            0 if candidate.covered_requirement_ids & mandatory_ids else 1,
+        )
+        if compositional_question:
+            # QuestionPlan candidates are deduplicated only after local proof
+            # has been computed.  Prefer the candidate carrying the strongest
+            # complete mandatory witness before token compactness/retrieval
+            # rank, otherwise a short command from the same parent can hide a
+            # more complete procedure summary.  Legacy v1-v3 ordering stays
+            # byte-for-byte compatible.
+            mandatory_witnesses = tuple(
+                witness for witness in candidate.requirement_witnesses
+                if witness.requirement_id in mandatory_ids
+            )
+            base += (
+                -len(candidate.covered_requirement_ids & mandatory_ids),
+                -sum(witness.completeness_score for witness in mandatory_witnesses),
+            )
+        return (*base, *_candidate_preference(candidate))
+
+    ordered = sorted(covered, key=ordering_key)
     if len(ordered) > config.max_candidates:
         for candidate in ordered[config.max_candidates:]:
             omissions.append(Omission(candidate.stable_id, "candidate_cap"))
@@ -1762,7 +685,12 @@ def select_evidence(
     omissions.extend(dedupe_omissions)
     conflicts = _authority_conflicts(deduped)
     mandatory = {item.requirement_id for item in requirements if item.mandatory}
-    selected, missing, selection_omissions = _reserve_and_select(deduped, mandatory, config)
+    selected, missing, selection_omissions = _reserve_and_select(
+        deduped,
+        mandatory,
+        config,
+        prefer_proof_completeness=compositional_question,
+    )
     omissions.extend(selection_omissions)
     selected_documents = {_normalized_source(item.source_identity) for item in selected}
     bounded_materialization_failed = config.result_kind == "docs_answer" and (
@@ -1920,8 +848,13 @@ def select_evidence(
     public_missing = tuple(sorted(missing))
     public_satisfied = tuple(sorted(covered_ids))
     public_mandatory = tuple(sorted(mandatory))
+    unresolved_reason = next((
+        reason for reason in requirements.unresolved_parts
+        if reason in {"unresolved_query_subject", "unresolved_requested_operation", "unsupported_compound_clause"}
+    ), None)
     reason_code = (
         None if status == "ok" else
+        unresolved_reason if unresolved_reason else
         "bounded_evidence_not_materializable" if bounded_materialization_failed else
         "authority_conflict" if conflicts else
         "required_evidence_missing" if missing else
@@ -2326,11 +1259,13 @@ def requirement_probe_query(requirement: EvidenceRequirement) -> str | None:
     if obligation is not None:
         parts = (
             obligation.subject,
+            *obligation.subject_aliases,
             obligation.attribute,
             obligation.relation,
             obligation.target,
             obligation.expected_value,
             obligation.item_kind,
+            obligation.context,
         )
         value = " ".join(dict.fromkeys(
             str(part).strip() for part in parts if str(part or "").strip()
@@ -2829,6 +1764,8 @@ def _reserve_and_select(
     candidates: Sequence[EvidenceCandidate],
     mandatory: set[str],
     config: SelectionConfig,
+    *,
+    prefer_proof_completeness: bool = False,
 ) -> tuple[list[EvidenceCandidate], set[str], list[Omission]]:
     fit_reserve = (
         DOCS_SERIALIZATION_RESERVE_TOKENS
@@ -2856,19 +1793,41 @@ def _reserve_and_select(
         options = [candidate for candidate in pool if candidate.covered_requirement_ids & remaining]
         if not options:
             break
-        best = min(options, key=lambda candidate: (
-            -len(candidate.covered_requirement_ids & remaining),
-            0 if candidate.authority == "canonical" else 1,
-            _version_rank(candidate.version_binding),
-            0 if candidate.docs_snapshot_exact is True else 1,
-            candidate.token_estimate,
-            candidate.retrieval_rank,
-            candidate.stable_id,
-        ))
+        def mandatory_choice_key(candidate: EvidenceCandidate) -> tuple[Any, ...]:
+            key: tuple[Any, ...] = (
+                -len(candidate.covered_requirement_ids & remaining),
+            )
+            if prefer_proof_completeness:
+                # A compositional QuestionPlan may have several witnesses that
+                # satisfy the same mandatory facet.  Selection must prefer the
+                # strongest local proof before compactness; otherwise a short
+                # command example can hide a complete procedure summary from
+                # the same source.  Legacy v1-v3 selection keeps its frozen
+                # ordering by leaving this flag false.
+                key += (-sum(
+                    witness.completeness_score
+                    for witness in candidate.requirement_witnesses
+                    if witness.requirement_id in remaining
+                ),)
+            return (*key,
+                0 if candidate.authority == "canonical" else 1,
+                _version_rank(candidate.version_binding),
+                0 if candidate.docs_snapshot_exact is True else 1,
+                candidate.token_estimate,
+                candidate.retrieval_rank,
+                candidate.stable_id,
+            )
+
+        best = min(options, key=mandatory_choice_key)
         selected.append(best)
         pool.remove(best)
         remaining -= best.covered_requirement_ids
-    selected = _repair_mandatory_selection(selected, candidates, mandatory)
+    selected = _repair_mandatory_selection(
+        selected,
+        candidates,
+        mandatory,
+        prefer_proof_completeness=prefer_proof_completeness,
+    )
     covered_after_repair = set().union(*(
         item.covered_requirement_ids for item in selected
     )) if selected else set()
@@ -2956,6 +1915,8 @@ def _repair_mandatory_selection(
     selected: Sequence[EvidenceCandidate],
     candidates: Sequence[EvidenceCandidate],
     mandatory: set[str],
+    *,
+    prefer_proof_completeness: bool = False,
 ) -> list[EvidenceCandidate]:
     """One bounded 1/2-item replacement pass for a smaller complete cover."""
 
@@ -2970,7 +1931,16 @@ def _repair_mandatory_selection(
         return mandatory <= coverage
 
     def quality(rows: Sequence[EvidenceCandidate]) -> tuple[Any, ...]:
+        proof_quality: tuple[Any, ...] = ()
+        if prefer_proof_completeness:
+            proof_quality = (-sum(
+                witness.completeness_score
+                for item in rows
+                for witness in item.requirement_witnesses
+                if witness.requirement_id in mandatory
+            ),)
         return (
+            *proof_quality,
             sum(item.authority != "canonical" for item in rows),
             sum(_version_rank(item.version_binding) for item in rows),
             sum(item.token_estimate for item in rows),

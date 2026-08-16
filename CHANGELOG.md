@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 
+- **Project answer contract v3:** normalize bounded CLI/environment technical identities, distinguish purpose and supported-value questions, require every coordinated effect facet, and validate relation-local polarity without changing frozen v1/v2 protocols.
 - **Project answer contract v2:** distinguish inventory counts, closed tool-name lists, singular command bindings, source-field locations, and bounded workflow groups so a retrieval hit cannot authorize an unrelated answer.
 - **Safe index cleanup:** extend the existing `doc-atlas clear-index` and `prepare_docs(action="clear_index")` surfaces with digest-bound previews, SQLite sidecar cleanup, verified local vector/cache cleanup, stale-plan and live-process protection, and index-only global scope.
 - **Bounded direct context delivery:** coding agents can request a versioned, source-attributed `ActionPacket`; wrapper and recovery metadata are included in the 2,000 estimated-token payload ceiling, and raw retrieval content does not enter the parent coding session.

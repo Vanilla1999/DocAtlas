@@ -17,6 +17,7 @@ from docmancer.docs.github_source_manifest import normalize_resolved_github_mani
 from docmancer.docs.registry import LibraryRecord
 from docmancer.docs.application.library_index_publication import LibraryIndexPublication
 from docmancer.docs.application.library_ingest_ports import LibraryRefreshPorts
+from docmancer.docs.infrastructure.storage_mutation_lock import storage_writer_lease
 from docmancer.docs.application.library_refresh_policy import (
     dart_refresh_diagnostics as _dart_refresh_diagnostics,
     bounded_exception_diagnostics as _bounded_exception_diagnostics,
@@ -739,19 +740,24 @@ class LibraryRefreshOps:
                 duration_ms=int((self.ports.monotonic() - started) * 1000),
                 targets_failed=1,
             )
-        if should_cancel:
-            record = self.ports.registry.get(record.library_id, None, source_type=record.source_type) or record
-            return self.refresh_record(
-                record,
-                force=force,
-                should_cancel=should_cancel,
-                deadline_at=deadline_at,
-                begin_commit=begin_commit,
-                staging_owner=staging_owner,
-            )
-        with self.ports.lock_for(record.library_id):
-            record = self.ports.registry.get(record.library_id, None, source_type=record.source_type) or record
-            return self.refresh_record(record, force=force, lock_held=True)
+        with storage_writer_lease(
+            self.ports.storage_identity(),
+            timeout=1.0,
+            operation=f"library docs refresh {record.library_id}",
+        ):
+            if should_cancel:
+                record = self.ports.registry.get(record.library_id, None, source_type=record.source_type) or record
+                return self.refresh_record(
+                    record,
+                    force=force,
+                    should_cancel=should_cancel,
+                    deadline_at=deadline_at,
+                    begin_commit=begin_commit,
+                    staging_owner=staging_owner,
+                )
+            with self.ports.lock_for(record.library_id):
+                record = self.ports.registry.get(record.library_id, None, source_type=record.source_type) or record
+                return self.refresh_record(record, force=force, lock_held=True)
 
     def prefetch_docs(
         self,

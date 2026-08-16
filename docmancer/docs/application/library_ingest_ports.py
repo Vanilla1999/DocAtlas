@@ -55,6 +55,7 @@ class LibraryPublicationPorts:
 @dataclass(frozen=True)
 class LibraryRefreshPorts:
     staging_parent: Callable[[], Path]
+    storage_identity: Callable[[], str | Path]
     jobs: LibraryJobStorePort
     registry: LibraryRegistryPort
     registry_ops: LibraryRegistryOpsPort

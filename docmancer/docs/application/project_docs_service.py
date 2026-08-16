@@ -38,6 +38,7 @@ from docmancer.docs.registry import LibraryRecord
 from docmancer.docs.resolver import canonical_library_id, normalize_library_name, normalize_version
 from docmancer.docs.dartdoc import discover_pub_dartdoc_seed_urls, is_pub_dartdoc_target, normalize_pub_dartdoc_target, pub_dartdoc_root_url
 from docmancer.docs.application.project_docs_state import ProjectDocsState
+from docmancer.docs.infrastructure.storage_mutation_lock import storage_mutation_lock, storage_writer_lease
 
 STALE_AFTER_DAYS = 30
 DEFAULT_DOC_TOKENS = 4000
@@ -598,8 +599,23 @@ class ProjectDocsService:
         skip_known: bool = True,
         with_vectors: bool = False,
         _candidate_paths: set[str] | None = None,
+        _coordination_held: bool = False,
     ) -> ProjectDocsIngestResult:
         root = validate_project_path(project_path).path
+        mutation_config = getattr(self.facade, "config", None)
+        mutation_index = getattr(mutation_config, "index", None)
+        mutation_db_path = getattr(mutation_index, "db_path", None)
+        if not _coordination_held and mutation_db_path:
+            with storage_writer_lease(
+                mutation_db_path, timeout=0, operation="project docs ingest",
+            ):
+                with storage_mutation_lock(
+                    mutation_db_path, timeout=0, operation="project docs ingest",
+                ):
+                    return self.ingest_project_docs(
+                    str(root), skip_known=skip_known, with_vectors=with_vectors,
+                    _candidate_paths=_candidate_paths, _coordination_held=True,
+                )
         if hasattr(self.facade, "_project_ingest_project_docs_impl"):
             kwargs: dict[str, Any] = {"skip_known": skip_known, "with_vectors": with_vectors}
             if _candidate_paths is not None:
@@ -933,6 +949,7 @@ class ProjectDocsService:
                 skip_known=True,
                 with_vectors=False,
                 _candidate_paths=changed_candidates,
+                _coordination_held=True,
             )
         else:
             ingest_result = ProjectDocsIngestResult(
@@ -1060,8 +1077,24 @@ class ProjectDocsService:
         changed_paths: list[str] | tuple[str, ...] | None = None,
         deleted_paths: list[str] | tuple[str, ...] | None = None,
         renamed_paths: list[dict[str, str]] | tuple[dict[str, str], ...] | None = None,
+        _coordination_held: bool = False,
     ) -> ProjectDocsSyncResult:
         root = validate_project_path(project_path).path
+        mutation_config = getattr(self.facade, "config", None)
+        mutation_index = getattr(mutation_config, "index", None)
+        mutation_db_path = getattr(mutation_index, "db_path", None)
+        if not _coordination_held and mutation_db_path:
+            with storage_writer_lease(
+                mutation_db_path, timeout=0, operation="project docs sync",
+            ):
+                with storage_mutation_lock(
+                    mutation_db_path, timeout=0, operation="project docs sync",
+                ):
+                    return self.sync_project_docs(
+                    str(root), with_vectors=with_vectors,
+                    changed_paths=changed_paths, deleted_paths=deleted_paths,
+                    renamed_paths=renamed_paths, _coordination_held=True,
+                )
         if hasattr(self.facade, "_project_sync_project_docs_impl"):
             kwargs: dict[str, Any] = {"with_vectors": with_vectors}
             if changed_paths is not None:
@@ -1161,7 +1194,9 @@ class ProjectDocsService:
                 message=message,
             )
 
-        ingest_result = self.ingest_project_docs(str(root), skip_known=True, with_vectors=with_vectors)
+        ingest_result = self.ingest_project_docs(
+            str(root), skip_known=True, with_vectors=with_vectors, _coordination_held=True,
+        )
         after_indexed_all = self._indexed_project_doc_sources(str(root))
         indexed_sources, stale_sources, _ignored_sources = self._partition_project_doc_state(candidate_sources, after_indexed_all)
         indexed_paths = {item.get("path") for item in [*indexed_sources, *stale_sources] if item.get("path")}
@@ -1462,7 +1497,20 @@ class ProjectDocsService:
             )
         ]
 
-        candidates = [*supplemental_chunks, *authoritative_chunks, *chunks]
+        # Compositional QuestionPlan queries need candidate diversity before
+        # proof selection.  Do not let an authority-only lane consume the
+        # entire bounded pool before the original question or obligation probes
+        # can contribute candidates.  Legacy v1-v3 queries retain their frozen
+        # ordering and hashes.
+        if requirements is not None and getattr(requirements, "parse_trace", ()):
+            lanes = [list(chunks), list(supplemental_chunks), list(authoritative_chunks)]
+            candidates = []
+            while any(lanes):
+                for lane in lanes:
+                    if lane:
+                        candidates.append(lane.pop(0))
+        else:
+            candidates = [*supplemental_chunks, *authoritative_chunks, *chunks]
         if probe_queries:
             probe_terms = tuple({
                 term.casefold()

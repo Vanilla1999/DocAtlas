@@ -25,7 +25,8 @@ This wiki is the deep-dive reference for DocAtlas's local, version-aware documen
 - **`~/.docmancer/embeddings-cache/`**: content-hash-keyed cache of embedded chunks.
 - **`./docmancer.yaml`**: project-local config when present (overrides the global one).
 
-Override the storage root with `DOCMANCER_HOME=/some/path`.
+`DOCMANCER_HOME` overrides the storage root and defaults to `~/.docmancer`;
+set `DOCMANCER_HOME=/some/path` to use another local root.
 
 ## Licensing
 

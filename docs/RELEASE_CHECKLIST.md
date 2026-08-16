@@ -1,6 +1,6 @@
 # DocAtlas release checklist
 
-Use this checklist before promoting a release. A source checkout passing tests is not enough: users install the built package.
+The DocAtlas release checklist is used before publication to verify a release artifact and its release gates. Release is blocked until the required artifact, CI, approval, and explicit Stable gates below pass. A source checkout passing tests is not enough: users install the built package.
 
 ## Version and documentation
 

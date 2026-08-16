@@ -9,9 +9,14 @@ import shutil
 import uuid
 from typing import Any, Iterable
 
-from filelock import FileLock, Timeout
 
 from docmancer.core.storage_topology import StorageTopologyResolver
+from docmancer.docs.infrastructure.storage_mutation_lock import (
+    StorageMutationBusy,
+    active_storage_writer_leases,
+    storage_cleanup_barrier,
+    storage_mutation_lock,
+)
 
 
 _QDRANT_OWNERSHIP_TOKEN = "docmancer-managed-qdrant"
@@ -218,55 +223,73 @@ class IndexStorageCleanup:
                 + "; rerun with allow_incomplete only if retaining that state is intentional"
             )
 
-        lock_path = root.parent / f".{root.name}.index-cleanup.lock"
-        lock = FileLock(str(lock_path), timeout=0)
-        try:
-            lock.acquire()
-        except Timeout as exc:
-            raise RuntimeError("another index cleanup is already running") from exc
+        # An already-empty/missing storage root is an idempotent no-op.  Do not
+        # create it merely to host the coordination lock.
+        if not root.exists() and all(not target.exists for target in plan.targets):
+            self._validate_plan_is_current(plan)
+            payload = self.payload(plan, status="applied")
+            payload["removed"] = []
+            payload["quarantine_retained"] = None
+            payload["retained_incomplete_state"] = (
+                list(plan.incomplete_reasons) if allow_incomplete else []
+            )
+            return payload
 
         quarantine = root.parent / f".{root.name}.cleanup-trash-{uuid.uuid4().hex}"
         moved: list[tuple[Path, Path]] = []
         removed: list[str] = []
         quarantine_retained: str | None = None
-        try:
-            live_blockers = self._live_process_blockers(root)
-            if live_blockers:
-                raise RuntimeError("index cleanup blocked: " + "; ".join(live_blockers))
-            self._validate_plan_is_current(plan)
-            quarantine.mkdir(mode=0o700)
-            try:
-                for index, target in enumerate(plan.targets):
-                    source = Path(target.path)
-                    self._require_within(root, source.resolve(strict=False))
-                    if not source.exists() and not source.is_symlink():
-                        continue
-                    destination = quarantine / f"{index:04d}-{source.name}"
-                    source.rename(destination)
-                    moved.append((source, destination))
-                    removed.append(str(source))
-            except Exception:
-                for source, destination in reversed(moved):
-                    if destination.exists() or destination.is_symlink():
-                        source.parent.mkdir(parents=True, exist_ok=True)
-                        destination.rename(source)
-                if quarantine.exists():
-                    shutil.rmtree(quarantine, ignore_errors=True)
-                raise
-            try:
-                shutil.rmtree(quarantine)
-            except OSError:
-                # The index is already detached from its live paths. Keep the
-                # same-filesystem quarantine for explicit manual removal rather
-                # than claiming that rollback remained possible after deletion
-                # began.
-                quarantine_retained = str(quarantine)
-        finally:
-            lock.release()
-            try:
-                lock_path.unlink()
-            except OSError:
-                pass
+        with storage_cleanup_barrier(
+            plan.db_path, timeout=0, operation="index cleanup", create_parent=False,
+        ):
+            active_writers = active_storage_writer_leases(plan.db_path)
+            if active_writers:
+                raise StorageMutationBusy(
+                    "index cleanup blocked: active index writer lease(s): "
+                    + "; ".join(active_writers)
+                )
+            with storage_mutation_lock(
+                plan.db_path, timeout=0, operation="index cleanup", create_parent=False,
+            ):
+                live_blockers = self._live_process_blockers(root)
+                if live_blockers:
+                    raise RuntimeError("index cleanup blocked: " + "; ".join(live_blockers))
+                self._validate_plan_is_current(plan)
+                quarantine.mkdir(mode=0o700)
+                try:
+                    for index, target in enumerate(plan.targets):
+                        source = Path(target.path)
+                        self._require_within(root, source.resolve(strict=False))
+                        # Revalidate immediately before each atomic detach. This
+                        # closes the window between the plan-wide check and rename
+                        # for non-cooperating external writers.
+                        current = self._target_snapshot(source, target.kind)
+                        if current.fingerprint != target.fingerprint:
+                            raise RuntimeError(
+                                f"stale cleanup plan: target changed before removal: {target.path}"
+                            )
+                        if not source.exists() and not source.is_symlink():
+                            continue
+                        destination = quarantine / f"{index:04d}-{source.name}"
+                        source.rename(destination)
+                        moved.append((source, destination))
+                        removed.append(str(source))
+                except Exception:
+                    for source, destination in reversed(moved):
+                        if destination.exists() or destination.is_symlink():
+                            source.parent.mkdir(parents=True, exist_ok=True)
+                            destination.rename(source)
+                    if quarantine.exists():
+                        shutil.rmtree(quarantine, ignore_errors=True)
+                    raise
+                try:
+                    shutil.rmtree(quarantine)
+                except OSError:
+                    # The index is already detached from its live paths. Keep the
+                    # same-filesystem quarantine for explicit manual removal rather
+                    # than claiming that rollback remained possible after deletion
+                    # began.
+                    quarantine_retained = str(quarantine)
 
         payload = self.payload(
             plan,

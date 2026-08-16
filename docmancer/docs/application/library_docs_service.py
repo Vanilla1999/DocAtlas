@@ -84,6 +84,7 @@ class LibraryDocsApplicationService:
         if self._refresh_ops is None:
             ports = LibraryRefreshPorts(
                 staging_parent=lambda: Path(self.config.index.db_path).expanduser().resolve().parent,
+                storage_identity=lambda: str(Path(self.config.index.db_path).expanduser().resolve()),
                 jobs=self.jobs,
                 registry=self.registry,
                 registry_ops=self.registry_ops,

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from contextlib import contextmanager
 from datetime import datetime, timedelta, timezone
 import hashlib
 import json
@@ -17,15 +18,24 @@ from docmancer.docs.models import (
 )
 from docmancer.docs.registry import LibraryRecord
 from docmancer.docs.resolver import normalize_library_name, normalize_version
+from docmancer.docs.infrastructure.storage_mutation_lock import (
+    StorageMutationBusy,
+    active_storage_writer_leases,
+    storage_cleanup_barrier,
+    storage_mutation_lock,
+)
 
 
 class LibraryRegistryOpsDependencies(Protocol):
     registry: Any
     agent_gateway: Any
+    config: Any
 
     def _index_config_for(self, record: LibraryRecord) -> Any: ...
 
     def _is_stale(self, last_refreshed_at: str | None) -> bool: ...
+
+    def _lock_for(self, library_id: str) -> Any: ...
 
 
 class LibraryRegistryOps:
@@ -43,8 +53,23 @@ class LibraryRegistryOps:
             total += sum(path.stat().st_size for path in extracted.rglob("*") if path.is_file())
         return total
 
-    def delete_index_for(self, record: LibraryRecord) -> int:
-        config = self.deps._index_config_for(record)
+    @contextmanager
+    def _mutation_guard(self, record: LibraryRecord, *, operation: str):
+        storage_identity = Path(self.deps.config.index.db_path).expanduser().resolve(strict=False)
+        with storage_cleanup_barrier(storage_identity, timeout=0, operation=operation):
+            active_writers = active_storage_writer_leases(storage_identity)
+            if active_writers:
+                raise StorageMutationBusy(
+                    f"{operation} blocked: active index writer lease(s): "
+                    + "; ".join(active_writers)
+                )
+            with self.deps._lock_for(record.library_id):
+                config = self.deps._index_config_for(record)
+                with storage_mutation_lock(config.index.db_path, timeout=0, operation=operation):
+                    yield config
+
+    @staticmethod
+    def _delete_index_unlocked(config: Any) -> int:
         removed = 0
         db_path = Path(config.index.db_path)
         if db_path.exists():
@@ -55,6 +80,10 @@ class LibraryRegistryOps:
             removed += sum(path.stat().st_size for path in extracted.rglob("*") if path.is_file())
             shutil.rmtree(extracted)
         return removed
+
+    def delete_index_for(self, record: LibraryRecord) -> int:
+        with self._mutation_guard(record, operation="library docs index removal") as config:
+            return self._delete_index_unlocked(config)
 
     def count_index_entries(self, record: LibraryRecord) -> tuple[int, int]:
         config = self.deps._index_config_for(record)
@@ -339,9 +368,10 @@ class LibraryRegistryOps:
         record = self.deps.registry.get(canonical_id)
         if record is None:
             return DocsRemoveResult(canonical_id=canonical_id, removed=False, message="library docs target not found")
-        removed_bytes = self.delete_index_for(record)
-        removed = self.deps.registry.delete(record.library_id)
-        self.deps.agent_gateway.drop_library_agent(record)
+        with self._mutation_guard(record, operation="library docs removal") as config:
+            removed_bytes = self._delete_index_unlocked(config)
+            removed = self.deps.registry.delete(record.library_id)
+            self.deps.agent_gateway.drop_library_agent(record)
         return DocsRemoveResult(canonical_id=record.library_id, removed=removed, chunks_removed=removed_bytes)
 
     @staticmethod

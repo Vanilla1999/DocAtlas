@@ -7269,3 +7269,30 @@ def test_prepare_docs_cancels_project_local_job_using_project_topology(tmp_path,
     project_job = project_service.get_docs_job_status(job.job_id)
     assert project_job is not None
     assert project_job.status == "cancelling"
+
+
+def test_inflight_library_refresh_registers_storage_writer_lease_and_blocks_remove(tmp_path, monkeypatch):
+    from docmancer.docs.infrastructure.storage_mutation_lock import (
+        StorageMutationBusy,
+        active_storage_writer_leases,
+    )
+
+    agent = SlowIndexingAgent()
+    service = _service(tmp_path, monkeypatch, agent)
+    result = service.prefetch_docs(
+        "lease-docs",
+        ecosystem="web",
+        docs_url="https://example.com/lease/",
+        async_=True,
+    )
+    assert agent.entered.wait(timeout=1)
+    try:
+        leases = active_storage_writer_leases(service.config.index.db_path)
+        assert any("library docs refresh" in item for item in leases)
+        record = service.registry.get("lease-docs", "web", "latest")
+        assert record is not None
+        with pytest.raises(StorageMutationBusy, match="active index writer lease"):
+            service.remove_library_docs(record.library_id)
+    finally:
+        service.cancel_docs_job(result.job_id)
+        agent.release.set()

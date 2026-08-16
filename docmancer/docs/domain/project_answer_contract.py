@@ -12,11 +12,21 @@ from dataclasses import asdict, dataclass
 import re
 from typing import Any, Literal
 
+from docmancer.docs.domain.question_plan import QuestionPlan, compile_question_plan
+from docmancer.docs.domain.technical_terms import (
+    TechnicalTerm,
+    TechnicalTermKind,
+    coerce_technical_term,
+    controlled_noun_forms,
+    extract_technical_terms,
+)
 from docmancer.retrieval.contracts import canonical_hash
 from docmancer.retrieval.query_planning import extract_exact_terms
 
 
-PROJECT_ANSWER_CONTRACT_SCHEMA = "project-answer-contract-v2"
+PROJECT_ANSWER_CONTRACT_SCHEMA = "project-answer-contract-v3"
+PROJECT_ANSWER_CONTRACT_SCHEMA_V4 = "project-answer-contract-v4"
+PROJECT_ANSWER_CONTRACT_SCHEMA_V2 = "project-answer-contract-v2"
 MAX_RETRIEVAL_HINTS = 24
 MAX_CONCEPT_QUERIES = 4
 MAX_PROOF_OBLIGATIONS = 12
@@ -26,14 +36,14 @@ MAX_CONTRACT_TEXT = 160
 ObligationKind = Literal[
     "definition", "attribute", "inventory", "status", "relation",
     "comparison", "behavior", "usage", "workflow", "exact_fact",
-    "command", "location",
+    "command", "location", "purpose", "effect",
 ]
 ValueKind = Literal[
     "text", "version_range", "number", "duration", "identifier_list",
     "status", "boolean", "path", "code", "call_expression",
 ]
 ResponseMode = Literal[
-    "value", "count", "names", "count_and_names", "call", "path", "workflow",
+    "value", "count", "names", "count_and_names", "call", "path", "workflow", "purpose",
 ]
 LifecycleIntent = Literal["current", "historical", "either"]
 
@@ -55,6 +65,31 @@ _TOOL_RE = re.compile(r"\b(?:tools?|commands?|methods?|инструмент(?:ы
 _PLURAL_TOOL_RE = re.compile(r"\b(?:tools|commands|methods|инструмент(?:ы|ов)|команд(?:ы|ах))\b", re.I)
 _COMMAND_QUESTION_RE = re.compile(
     r"\b(?:which|what|какую|какой)\s+(?:single\s+)?(?:command|method|invocation|call|команд[ау]|метод)\b",
+    re.I,
+)
+_USED_FOR_RE = re.compile(
+    r"^\s*(?:what\s+is|what\s+are|что\s+такое)\s+(.+?)\s+used\s+for\s*[?!.]*$",
+    re.I,
+)
+_FEATURE_CONTEXT_RE = re.compile(
+    r"^\s*(?:what\s+is|explain|describe|что\s+такое|объясни)\s+"
+    r"(?:the\s+)?(.+?)\s+feature\s+in\s+(.+?)\s*[?!.]*$",
+    re.I,
+)
+_TERM_IN_CONTEXT_RE = re.compile(
+    r"^\s*(?:what\s+is|explain|describe|что\s+такое|объясни)\s+"
+    r"(.+?)\s+in\s+(.+?)\s*[?!.]*$",
+    re.I,
+)
+_SUPPORTED_VALUES_RE = re.compile(
+    r"^\s*(?:which|what|какие)\s+([A-Za-z][A-Za-z-]{1,80})\s+"
+    r"(?:does|do|can|может)\s+(.+?)\s+(?:support|accept|allow|поддержива(?:ет|ют)|принима(?:ет|ют))\s*[?!.]*$",
+    re.I,
+)
+_COORDINATED_EFFECT_RE = re.compile(
+    r"^\s*(?:what\s+does|what\s+do|что\s+делает)\s+(.+?)\s+"
+    r"(delete|remove|clear|purge|preserve|keep|retain)\s+and\s+"
+    r"(delete|remove|clear|purge|preserve|keep|retain)\s*[?!.]*$",
     re.I,
 )
 _LOCATION_QUESTION_RE = re.compile(r"^\s*(?:where\s+is|where\s+are|где\s+находится|где)\b", re.I)
@@ -176,6 +211,49 @@ def _span(question: str, value: str) -> tuple[int | None, int | None, str | None
     return match.start(), match.end(), question[match.start():match.end()]
 
 
+def _technical_terms(question: str) -> tuple[TechnicalTerm, ...]:
+    return extract_technical_terms(question)
+
+
+def _technical_term_for_value(
+    value: str,
+    terms: tuple[TechnicalTerm, ...],
+    *,
+    preferred_kind: TechnicalTermKind | None = None,
+) -> TechnicalTerm | None:
+    normalized = _normal(value).strip("`\"'")
+    for term in terms:
+        aliases = {_normal(alias).strip("`\"'") for alias in term.aliases}
+        if normalized in aliases or normalized == _normal(term.raw):
+            return coerce_technical_term(term.raw, preferred_kind) if preferred_kind else term
+    if preferred_kind and value.strip():
+        return coerce_technical_term(value, preferred_kind)
+    return None
+
+
+def _subject_fields(
+    subject: str,
+    term: TechnicalTerm | None,
+) -> dict[str, Any]:
+    if term is None:
+        return {}
+    return {
+        "subject_kind": term.kind,
+        "subject_aliases": term.aliases,
+    }
+
+
+def _clean_phrase(value: str) -> str:
+    cleaned = _bounded(str(value or "").strip(" ?!.,:`\"'"))
+    cleaned = re.sub(r"^(?:the|a|an)\s+", "", cleaned, flags=re.I)
+    return cleaned
+
+
+def _effect_relation(value: str) -> str:
+    normalized = _normal(value)
+    return "preserve" if normalized in {"preserve", "keep", "retain"} else "delete"
+
+
 @dataclass(frozen=True, slots=True)
 class ProofObligation:
     obligation_id: str
@@ -189,6 +267,9 @@ class ProofObligation:
     item_kind: str | None = None
     cardinality: int | None = None
     response_mode: ResponseMode = "value"
+    subject_kind: TechnicalTermKind | None = None
+    subject_aliases: tuple[str, ...] = ()
+    context: str | None = None
     mandatory: bool = True
     query_span_start: int | None = None
     query_span_end: int | None = None
@@ -203,10 +284,19 @@ class ProofObligation:
         if self.cardinality is not None and not 1 <= self.cardinality <= 32:
             raise ValueError("project answer obligation cardinality is invalid")
         if self.response_mode not in {
-            "value", "count", "names", "count_and_names", "call", "path", "workflow",
+            "value", "count", "names", "count_and_names", "call", "path", "workflow", "purpose",
         }:
             raise ValueError("project answer obligation response mode is invalid")
-        for field_name in ("attribute", "relation", "target", "expected_value", "item_kind"):
+        if self.subject_kind is not None and self.subject_kind not in {
+            "cli_command", "cli_flag", "env_var", "config_key", "code_symbol", "plain_term",
+        }:
+            raise ValueError("project answer subject kind is invalid")
+        if len(self.subject_aliases) > 8:
+            raise ValueError("project answer subject aliases exceed bounds")
+        object.__setattr__(self, "subject_aliases", tuple(dict.fromkeys(
+            _bounded(value) for value in self.subject_aliases if _bounded(value)
+        )))
+        for field_name in ("attribute", "relation", "target", "expected_value", "item_kind", "context"):
             value = getattr(self, field_name)
             if value is not None and (not str(value).strip() or len(str(value)) > MAX_CONTRACT_TEXT):
                 raise ValueError(f"invalid project answer obligation {field_name}")
@@ -220,7 +310,14 @@ class ProofObligation:
 
     @property
     def canonical_payload(self) -> dict[str, Any]:
-        return asdict(self)
+        payload = asdict(self)
+        if self.subject_kind is None:
+            payload.pop("subject_kind", None)
+        if not self.subject_aliases:
+            payload.pop("subject_aliases", None)
+        if self.context is None:
+            payload.pop("context", None)
+        return payload
 
 
 @dataclass(frozen=True, slots=True)
@@ -233,6 +330,8 @@ class ProjectAnswerContract:
     lifecycle_intent: LifecycleIntent = "current"
     schema_version: str = PROJECT_ANSWER_CONTRACT_SCHEMA
     input_limits: tuple[str, ...] = ()
+    parse_trace: tuple[str, ...] = ()
+    unresolved_parts: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
         hints = tuple(dict.fromkeys(_bounded(value) for value in self.retrieval_hints if _bounded(value)))
@@ -252,10 +351,12 @@ class ProjectAnswerContract:
         object.__setattr__(self, "subjects", subjects)
         object.__setattr__(self, "proof_obligations", tuple(sorted(obligations_by_id.values(), key=lambda item: item.obligation_id)))
         object.__setattr__(self, "input_limits", tuple(sorted(set(self.input_limits))))
+        object.__setattr__(self, "parse_trace", tuple(dict.fromkeys(str(value)[:160] for value in self.parse_trace if str(value))))
+        object.__setattr__(self, "unresolved_parts", tuple(dict.fromkeys(str(value)[:160] for value in self.unresolved_parts if str(value))))
 
     @property
     def hash_payload(self) -> dict[str, Any]:
-        return {
+        payload = {
             "schema_version": self.schema_version,
             "question_hash": self.question_hash,
             "retrieval_hints": list(self.retrieval_hints),
@@ -265,6 +366,11 @@ class ProjectAnswerContract:
             "lifecycle_intent": self.lifecycle_intent,
             "input_limits": list(self.input_limits),
         }
+        if self.parse_trace:
+            payload["parse_trace"] = list(self.parse_trace)
+        if self.unresolved_parts:
+            payload["unresolved_parts"] = list(self.unresolved_parts)
+        return payload
 
     @property
     def contract_hash(self) -> str:
@@ -336,16 +442,25 @@ def _obligation(
     target: str | None = None, value_kind: ValueKind = "text",
     expected_value: str | None = None, item_kind: str | None = None,
     cardinality: int | None = None, response_mode: ResponseMode = "value",
+    subject_kind: TechnicalTermKind | None = None,
+    subject_aliases: tuple[str, ...] = (), context: str | None = None,
     lifecycle_intent: LifecycleIntent,
     span_value: str | None = None,
 ) -> ProofObligation:
     start, end, raw = _span(question, span_value or subject)
-    identity = canonical_hash({
+    identity_payload: dict[str, Any] = {
         "kind": kind, "subject": _normal(subject), "attribute": attribute,
         "relation": relation, "target": _normal(target or ""), "value_kind": value_kind,
         "expected_value": expected_value, "item_kind": item_kind, "cardinality": cardinality,
         "response_mode": response_mode,
-    })[:16]
+    }
+    if subject_kind is not None:
+        identity_payload["subject_kind"] = subject_kind
+    if subject_aliases:
+        identity_payload["subject_aliases"] = list(subject_aliases)
+    if context:
+        identity_payload["context"] = _normal(context)
+    identity = canonical_hash(identity_payload)[:16]
     return ProofObligation(
         obligation_id=f"project_answer:{index}:{kind}:{identity}",
         kind=kind,
@@ -358,6 +473,9 @@ def _obligation(
         item_kind=_bounded(item_kind) if item_kind else None,
         cardinality=cardinality,
         response_mode=response_mode,
+        subject_kind=subject_kind,
+        subject_aliases=subject_aliases,
+        context=_bounded(context) if context else None,
         query_span_start=start,
         query_span_end=end,
         query_span_text=raw,
@@ -365,8 +483,14 @@ def _obligation(
     )
 
 
-def _retrieval_hints(question: str, subjects: list[str]) -> tuple[str, ...]:
+def _retrieval_hints(
+    question: str,
+    subjects: list[str],
+    technical_terms: tuple[TechnicalTerm, ...] = (),
+) -> tuple[str, ...]:
     hints: list[str] = [*subjects]
+    for term in technical_terms:
+        hints.extend(term.aliases)
     hints.extend(term.value for term in extract_exact_terms(question))
     for token in re.findall(r"[A-Za-zА-Яа-яЁё][A-Za-zА-Яа-яЁё0-9_+-]{2,}", question):
         normalized = _normal(token)
@@ -384,6 +508,10 @@ def _concept_queries(question: str, hints: tuple[str, ...], obligations: list[Pr
         "sequence": "workflow steps process",
         "location": "document path location",
         "contract_fact": "requirement rule contract",
+        "purpose": "purpose used for controls overrides acknowledges",
+        "delete": "delete remove clear purge derived state",
+        "preserve": "preserve keep retain without deleting",
+        "scope": "supported scopes values project-local global",
     }
     for obligation in obligations:
         parts = [
@@ -392,6 +520,7 @@ def _concept_queries(question: str, hints: tuple[str, ...], obligations: list[Pr
             semantic_aliases.get(str(obligation.relation), obligation.relation),
             obligation.target,
             semantic_aliases.get(str(obligation.item_kind), obligation.item_kind),
+            obligation.context,
         ]
         concept = " ".join(part for part in parts if part)
         if concept:
@@ -417,7 +546,7 @@ def _explicit_subjects(question: str, subjects: list[str]) -> list[str]:
         value for value in subjects
         if _normal(value) not in excluded
         and (
-            re.search(r"[_:.]|[a-z][A-Z]", value)
+            re.search(r"[-_:.]|[a-z][A-Z]", value)
             or " " in value
             or value.casefold().startswith("task ")
         )
@@ -505,6 +634,57 @@ def _compound_workflow_subjects(question: str) -> tuple[str | None, str | None]:
     return (explicit[0], None) if explicit else (None, None)
 
 
+def _contract_from_question_plan(
+    question: str,
+    plan: QuestionPlan,
+    *,
+    lifecycle: LifecycleIntent,
+    input_limits: tuple[str, ...],
+) -> ProjectAnswerContract:
+    obligations: list[ProofObligation] = []
+    subjects: list[str] = []
+    technical_terms: list[TechnicalTerm] = []
+    for facet in plan.facets:
+        if facet.subject and facet.subject not in subjects:
+            subjects.append(facet.subject)
+        if facet.subject_kind is not None:
+            technical_terms.append(coerce_technical_term(
+                facet.subject, facet.subject_kind, context=question,
+            ))
+        obligations.append(_obligation(
+            question=question,
+            index=len(obligations),
+            kind=facet.kind,  # type: ignore[arg-type]
+            subject=facet.subject,
+            attribute=facet.attribute,
+            relation=facet.relation,
+            target=facet.target,
+            value_kind=facet.value_kind,  # type: ignore[arg-type]
+            expected_value=facet.expected_value,
+            item_kind=facet.item_kind,
+            response_mode=facet.response_mode,  # type: ignore[arg-type]
+            subject_kind=facet.subject_kind,
+            subject_aliases=facet.subject_aliases,
+            context=facet.context,
+            lifecycle_intent=lifecycle,
+            span_value=facet.span_text or facet.subject,
+        ))
+    hints = _retrieval_hints(question, subjects, tuple(technical_terms))
+    concepts = _concept_queries(question, hints, obligations)
+    return ProjectAnswerContract(
+        question_hash=canonical_hash(question),
+        retrieval_hints=hints,
+        concept_queries=concepts,
+        subjects=tuple(subjects),
+        proof_obligations=tuple(obligations),
+        lifecycle_intent=lifecycle,
+        schema_version=PROJECT_ANSWER_CONTRACT_SCHEMA_V4,
+        input_limits=input_limits,
+        parse_trace=plan.parse_trace,
+        unresolved_parts=plan.unresolved_parts,
+    )
+
+
 def build_project_answer_contract(question: str) -> ProjectAnswerContract:
     """Build a bounded deterministic answer contract from the public question."""
 
@@ -512,6 +692,13 @@ def build_project_answer_contract(question: str) -> ProjectAnswerContract:
     raw_question = source_question[:4_000]
     input_limits: list[str] = ["question"] if len(source_question) > 4_000 else []
     lifecycle = lifecycle_intent_for_question(raw_question)
+    question_plan = compile_question_plan(raw_question)
+    if question_plan.handled:
+        return _contract_from_question_plan(
+            raw_question, question_plan, lifecycle=lifecycle,
+            input_limits=tuple(input_limits),
+        )
+    technical_terms = _technical_terms(raw_question)
     subjects = _subjects(raw_question)
     obligations: list[ProofObligation] = []
 
@@ -589,6 +776,87 @@ def build_project_answer_contract(question: str) -> ProjectAnswerContract:
             subject=subject, attribute="timeout", value_kind="duration",
             lifecycle_intent=lifecycle, span_value=timeout_match.group(0),
         ))
+
+    used_for = _USED_FOR_RE.match(raw_question)
+    if used_for and not obligations:
+        raw_subject = _clean_phrase(used_for.group(1))
+        term = _technical_term_for_value(raw_subject, technical_terms)
+        subject = term.raw if term is not None else raw_subject
+        obligations.append(_obligation(
+            question=raw_question, index=len(obligations), kind="purpose",
+            subject=subject, relation="purpose", value_kind="text", response_mode="purpose",
+            lifecycle_intent=lifecycle, span_value=used_for.group(1),
+            **_subject_fields(subject, term),
+        ))
+
+    feature_context = _FEATURE_CONTEXT_RE.match(raw_question)
+    if feature_context and not obligations:
+        raw_subject = _clean_phrase(feature_context.group(1))
+        context = _clean_phrase(feature_context.group(2))
+        term = _technical_term_for_value(raw_subject, technical_terms)
+        subject = term.raw if term is not None else raw_subject
+        obligations.append(_obligation(
+            question=raw_question, index=len(obligations), kind="purpose",
+            subject=subject, relation="purpose", context=context, value_kind="text", response_mode="purpose",
+            lifecycle_intent=lifecycle, span_value=feature_context.group(1),
+            **_subject_fields(subject, term),
+        ))
+
+    term_in_context = _TERM_IN_CONTEXT_RE.match(raw_question)
+    if term_in_context and not obligations:
+        raw_subject = _clean_phrase(term_in_context.group(1))
+        context = _clean_phrase(term_in_context.group(2))
+        context_term = _technical_term_for_value(context, technical_terms)
+        preferred_kind: TechnicalTermKind | None = None
+        if context_term is not None and context_term.kind == "cli_command" and re.fullmatch(
+            r"[A-Za-z][A-Za-z0-9_-]{2,120}", raw_subject,
+        ):
+            preferred_kind = "cli_flag"
+        term = _technical_term_for_value(
+            raw_subject, technical_terms, preferred_kind=preferred_kind,
+        )
+        if (
+            term is not None
+            and context_term is not None
+            and context_term.kind == "cli_command"
+        ):
+            subject = term.raw
+            obligations.append(_obligation(
+                question=raw_question, index=len(obligations), kind="purpose",
+                subject=subject, relation="purpose", context=context, value_kind="text", response_mode="purpose",
+                lifecycle_intent=lifecycle, span_value=term_in_context.group(1),
+                **_subject_fields(subject, term),
+            ))
+
+    supported_values = _SUPPORTED_VALUES_RE.match(raw_question)
+    if supported_values and not obligations:
+        raw_attribute = _clean_phrase(supported_values.group(1))
+        forms = controlled_noun_forms(raw_attribute)
+        attribute = next((value for value in forms if value != raw_attribute.casefold()), raw_attribute.casefold())
+        raw_subject = _clean_phrase(supported_values.group(2))
+        term = _technical_term_for_value(raw_subject, technical_terms)
+        subject = term.raw if term is not None else raw_subject
+        obligations.append(_obligation(
+            question=raw_question, index=len(obligations), kind="inventory",
+            subject=subject, attribute=attribute, item_kind=attribute,
+            value_kind="identifier_list", response_mode="names",
+            lifecycle_intent=lifecycle, span_value=supported_values.group(1),
+            **_subject_fields(subject, term),
+        ))
+
+    coordinated_effect = _COORDINATED_EFFECT_RE.match(raw_question)
+    if coordinated_effect and not obligations:
+        raw_subject = _clean_phrase(coordinated_effect.group(1))
+        term = _technical_term_for_value(raw_subject, technical_terms)
+        subject = term.raw if term is not None else raw_subject
+        for raw_relation in (coordinated_effect.group(2), coordinated_effect.group(3)):
+            relation = _effect_relation(raw_relation)
+            obligations.append(_obligation(
+                question=raw_question, index=len(obligations), kind="effect",
+                subject=subject, relation=relation, value_kind="text",
+                lifecycle_intent=lifecycle, span_value=raw_relation,
+                **_subject_fields(subject, term),
+            ))
 
     command_question = _COMMAND_QUESTION_RE.search(raw_question)
     if command_question:
@@ -715,7 +983,7 @@ def build_project_answer_contract(question: str) -> ProjectAnswerContract:
     if behavior_requested and not any(
         item.kind in {
             "attribute", "status", "inventory", "comparison", "relation", "exact_fact",
-            "command", "location", "workflow",
+            "command", "location", "workflow", "purpose", "effect",
         }
         for item in obligations
     ):
@@ -751,25 +1019,72 @@ def build_project_answer_contract(question: str) -> ProjectAnswerContract:
             obligation.kind, _normal(obligation.subject), obligation.attribute,
             obligation.relation, _normal(obligation.target or ""), obligation.value_kind,
             obligation.expected_value, obligation.item_kind, obligation.cardinality,
-            obligation.response_mode,
+            obligation.response_mode, obligation.subject_kind, obligation.subject_aliases,
+            _normal(obligation.context or ""),
         )
         unique.setdefault(key, obligation)
     obligations = list(unique.values())[:MAX_PROOF_OBLIGATIONS]
-    hints = _retrieval_hints(raw_question, subjects)
+    synthetic_subjects = {"project", "request", "workflow", "requested operation", "the"}
+    unresolved_synthetic = tuple(sorted({
+        obligation.subject
+        for obligation in obligations
+        if _normal(obligation.subject) in synthetic_subjects
+        and (not subjects or _normal(obligation.subject) == "requested operation")
+    }))
+    if unresolved_synthetic:
+        safe_subjects = [value for value in subjects if _normal(value) not in synthetic_subjects]
+        hints = _retrieval_hints(raw_question, safe_subjects, technical_terms)
+        return ProjectAnswerContract(
+            question_hash=canonical_hash(raw_question),
+            retrieval_hints=hints,
+            concept_queries=(),
+            subjects=tuple(safe_subjects),
+            proof_obligations=(),
+            lifecycle_intent=lifecycle,
+            schema_version=PROJECT_ANSWER_CONTRACT_SCHEMA_V4,
+            input_limits=tuple(input_limits),
+            parse_trace=("fail_closed:synthetic_subject",),
+            unresolved_parts=tuple(
+                "unresolved_requested_operation" if value == "requested operation"
+                else "unresolved_query_subject"
+                for value in unresolved_synthetic
+            ),
+        )
+    uses_v3 = any(
+        obligation.kind in {"purpose", "effect"}
+        or obligation.subject_kind is not None
+        or obligation.context is not None
+        or (obligation.kind == "inventory" and obligation.item_kind not in {None, "public_tool"})
+        for obligation in obligations
+    )
+    contract_subjects = list(subjects)
+    if uses_v3:
+        contract_subjects.extend(term.raw for term in technical_terms)
+        contract_subjects = list(dict.fromkeys(contract_subjects))[:MAX_SUBJECTS]
+    hints = _retrieval_hints(
+        raw_question,
+        contract_subjects,
+        technical_terms if uses_v3 else (),
+    )
     concepts = _concept_queries(raw_question, hints, obligations)
     return ProjectAnswerContract(
         question_hash=canonical_hash(raw_question),
         retrieval_hints=hints,
         concept_queries=concepts,
-        subjects=tuple(subjects[:MAX_SUBJECTS]),
+        subjects=tuple(contract_subjects[:MAX_SUBJECTS]),
         proof_obligations=tuple(obligations),
         lifecycle_intent=lifecycle,
+        schema_version=(
+            PROJECT_ANSWER_CONTRACT_SCHEMA
+            if uses_v3 else PROJECT_ANSWER_CONTRACT_SCHEMA_V2
+        ),
         input_limits=tuple(input_limits),
     )
 
 
 __all__ = [
     "LifecycleIntent", "ObligationKind", "PROJECT_ANSWER_CONTRACT_SCHEMA",
+    "PROJECT_ANSWER_CONTRACT_SCHEMA_V2", "PROJECT_ANSWER_CONTRACT_SCHEMA_V4",
     "ProjectAnswerContract", "ProofObligation", "ResponseMode", "ValueKind",
     "build_project_answer_contract", "lifecycle_intent_for_question",
 ]

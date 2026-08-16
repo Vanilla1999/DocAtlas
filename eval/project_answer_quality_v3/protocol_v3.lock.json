@@ -1,0 +1,28 @@
+{
+  "schema_version": "project-answer-quality-protocol-v3",
+  "case_file": "cases.json",
+  "case_file_sha256": "c52f53eeb8faf11529e4bd82bfd68856b6844ee584dbe9f20c96c45e530c5d24",
+  "public_argument_fields": [
+    "mode",
+    "project_path",
+    "question"
+  ],
+  "supported_token_limit": 1500,
+  "insufficient_token_limit": 300,
+  "case_ids": [
+    "quarantine_purpose_over_domain_distractor",
+    "allow_incomplete_flag_alias_and_limits",
+    "clear_index_supported_scopes_closed_inventory",
+    "clear_index_delete_and_preserve_facets",
+    "docmancer_home_purpose_and_default",
+    "unrelated_quarantine_cannot_answer_cleanup",
+    "plain_allow_incomplete_words_do_not_prove_flag",
+    "single_scope_is_not_complete_plural_inventory",
+    "delete_only_does_not_answer_delete_and_preserve",
+    "home_path_mention_without_variable_purpose_abstains",
+    "allow_incomplete_underscore_source_alias",
+    "unrelated_delete_in_adjacent_sentence_abstains",
+    "env_var_identity_without_purpose_abstains",
+    "env_var_negated_purpose_abstains"
+  ]
+}

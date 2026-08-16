@@ -92,6 +92,8 @@ For directional local iteration without an API key, an explicitly non-causal Cod
 
 Use this procedure to compare `repo_only_strict_offline` with `docatlas_bounded_direct`. Do not substitute the legacy three-cell exploratory pilot or expand to a matrix without explicit approval.
 
+The two-cell smoke procedure is: run a provider-free preflight, run one canary followed by exactly the repo-only and bounded-direct cells, do not retry failed cells in the same cycle, audit exactly three provider event streams, then verify the harness and frozen lock before comparing correctness and token metrics.
+
 1. Run a provider-free preflight with a unique ID:
 
    ```bash
