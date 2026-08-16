@@ -36,7 +36,7 @@ _PREPARE_ACTION_FIELDS = {
     "refresh_library_docs": {"action", "library", "ecosystem", "version", "source_type", "docs_url", "force"},
     "prune_library_docs": {"action", "library", "keep_versions", "older_than_days", "dry_run"},
     "remove_library_docs": {"action", "canonical_id", "project_path"},
-    "clear_index": {"action", "scope", "project_path", "confirm"},
+    "clear_index": {"action", "scope", "project_path", "confirm", "plan_digest", "allow_incomplete"},
     "cancel_docs_job": {"action", "job_id", "project_path"},
 }
 _PREPARE_REQUIRED_FIELDS = {
@@ -351,7 +351,11 @@ def handle_prefetch_tool(name: str, args: dict[str, Any], service: LibraryDocsSe
             cleanup = IndexStorageCleanup()
             plan = cleanup.preview(scope="project-local", project_path=args["project_path"])
             if args.get("confirm") is True:
-                payload = cleanup.apply(plan)
+                payload = cleanup.apply(
+                    plan,
+                    expected_plan_digest=args.get("plan_digest"),
+                    allow_incomplete=bool(args.get("allow_incomplete") or False),
+                )
             else:
                 payload = {
                     **cleanup.payload(plan, status="confirmation_required"),
@@ -360,6 +364,7 @@ def handle_prefetch_tool(name: str, args: dict[str, Any], service: LibraryDocsSe
                         "action": "clear_index",
                         "scope": "project-local",
                         "project_path": str(Path(args["project_path"]).resolve()),
+                        "plan_digest": plan.plan_digest,
                         "confirm": True,
                     },
                 }

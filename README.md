@@ -167,6 +167,16 @@ The report includes a bounded authoring brief for the host model: exact files/se
 
 The bundled GitHub Actions workflow publishes the advisory report in every pull request summary. It highlights module docs that need review and module changes with no maintained documentation, while leaving the final documentation edit to an explicit, reviewable change.
 
+### Safe index cleanup
+
+`doc-atlas clear-index` previews a bounded cleanup plan before removing derived
+SQLite, extracted-document, cache, and verified local vector state. Use
+`--scope project-local --project-path ...` for one project or `--scope global`
+for all local indexes while preserving configuration. Applying a reviewed plan
+can be bound to its `plan_digest`, and live processes, stale plans, remote
+Qdrant, and unowned vector directories fail closed. See
+[Cleaning DocAtlas index state safely](./docs/index-cleanup.md).
+
 ### Agent contract for a local project
 
 Before handing a repository to a coding agent, generate a compact, machine-readable contract. It tells the agent which local documents are authoritative, which dependency versions were detected, and how to select the minimal DocAtlas MCP tool surface:

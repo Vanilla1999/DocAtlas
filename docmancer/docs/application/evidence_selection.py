@@ -20,6 +20,7 @@ from docmancer.docs.domain.answer_units import (
     best_local_proof,
     extract_answer_units,
     local_proof_for_obligation,
+    materialize_answer_units,
 )
 from docmancer.docs.domain.project_answer_contract import (
     LifecycleIntent,
@@ -393,6 +394,7 @@ class EvidenceRequirement:
     expected_value: str | None = None
     item_kind: str | None = None
     cardinality: int | None = None
+    response_mode: str = "value"
     lifecycle_intent: LifecycleIntent = "current"
 
     def __post_init__(self) -> None:
@@ -407,6 +409,10 @@ class EvidenceRequirement:
                 raise ValueError("typed proof obligation is incomplete")
             if self.cardinality is not None and not 1 <= self.cardinality <= 32:
                 raise ValueError("typed proof obligation cardinality is invalid")
+            if self.response_mode not in {
+                "value", "count", "names", "count_and_names", "call", "path", "workflow",
+            }:
+                raise ValueError("typed proof obligation response mode is invalid")
         object.__setattr__(self, "qualifiers", qualifiers)
 
     def as_proof_obligation(self) -> ProofObligation | None:
@@ -423,6 +429,7 @@ class EvidenceRequirement:
             expected_value=self.expected_value,
             item_kind=self.item_kind,
             cardinality=self.cardinality,
+            response_mode=self.response_mode,
             mandatory=self.mandatory,
             query_span_start=self.query_span_start,
             query_span_end=self.query_span_end,
@@ -515,7 +522,10 @@ class EvidenceRequirementSet(Sequence[EvidenceRequirement]):
     @property
     def hash_payload(self) -> dict[str, Any]:
         return {
-            "requirements": [asdict(item) for item in self.requirements],
+            "requirements": [
+                {key: value for key, value in asdict(item).items() if key != "response_mode" or value != "value"}
+                for item in self.requirements
+            ],
             "required_entities": list(self.required_entities),
             "required_facets": list(self.required_facets),
             "query_extraction_provenance": [list(item) for item in self.query_extraction_provenance],
@@ -606,8 +616,8 @@ class RequirementWitness:
     unit_id: str
     unit_kind: str
     unit_text: str = field(compare=False, repr=False)
-    unit_char_start: int
-    unit_char_end: int
+    unit_char_start: int | None
+    unit_char_end: int | None
     unit_content_hash: str
     subject_score: int
     relation_score: int
@@ -1140,6 +1150,7 @@ def _semantic_requirement_key(requirement: EvidenceRequirement) -> tuple[Any, ..
         requirement.expected_value,
         requirement.item_kind,
         requirement.cardinality,
+        requirement.response_mode if requirement.response_mode != "value" else None,
         requirement.lifecycle_intent,
     )
 
@@ -1170,6 +1181,7 @@ def _requirement_from_obligation(obligation: ProofObligation) -> EvidenceRequire
         expected_value=obligation.expected_value,
         item_kind=obligation.item_kind,
         cardinality=obligation.cardinality,
+        response_mode=obligation.response_mode,
         lifecycle_intent=obligation.lifecycle_intent,
     )
 
@@ -1570,7 +1582,13 @@ def normalize_candidates(
             navigation_only=bool(item.get("navigation_only")) or str(item.get("answer_type") or "") in {
                 "navigation_only", "partial_navigational",
             },
-            answer_units=extract_answer_units(display),
+            answer_units=extract_answer_units(
+                display,
+                source_fields={
+                    "path_or_url": path,
+                    "section": section,
+                },
+            ),
             original=item,
         ))
     return candidates, omissions
@@ -1832,19 +1850,22 @@ def select_evidence(
         matching.sort(key=lambda pair: _assignment_preference(requirement, pair[0], pair[1]))
         candidate, witness = matching[0]
         if witness is not None:
-            absolute_start = (
-                candidate.char_start + witness.unit_char_start
-                if candidate.char_start is not None else witness.unit_char_start
-            )
-            absolute_end = (
-                candidate.char_start + witness.unit_char_end
-                if candidate.char_start is not None else witness.unit_char_end
-            )
-            relative_line = candidate.display_text[:witness.unit_char_start].count("\n")
-            absolute_line = (
-                candidate.line_start + relative_line
-                if candidate.line_start is not None else relative_line
-            )
+            if witness.unit_char_start is None or witness.unit_char_end is None:
+                absolute_start = absolute_end = absolute_line = None
+            else:
+                absolute_start = (
+                    candidate.char_start + witness.unit_char_start
+                    if candidate.char_start is not None else witness.unit_char_start
+                )
+                absolute_end = (
+                    candidate.char_start + witness.unit_char_end
+                    if candidate.char_start is not None else witness.unit_char_end
+                )
+                relative_line = candidate.display_text[:witness.unit_char_start].count("\n")
+                absolute_line = (
+                    candidate.line_start + relative_line
+                    if candidate.line_start is not None else relative_line
+                )
             projected_hash = witness.unit_content_hash
             qualifier_text = witness.unit_text
         else:
@@ -2415,7 +2436,7 @@ def _witness_for_requirement(
         matching_units.sort(key=lambda unit: (
             0 if unit.proposition else 1,
             len(unit.text),
-            unit.char_start,
+            unit.char_start if unit.char_start is not None else 10**9,
             unit.unit_id,
         ))
         unit = matching_units[0]
@@ -2531,13 +2552,38 @@ def _with_coverage(
             covered.add(requirement.requirement_id)
             if witness is not None:
                 witnesses.append(witness)
+    ordered_witnesses = tuple(sorted(
+        witnesses,
+        key=lambda item: (
+            item.requirement_id,
+            item.unit_char_start if item.unit_char_start is not None else 10**9,
+            item.unit_id,
+        ),
+    ))
+    witness_units = tuple(
+        unit
+        for witness in ordered_witnesses
+        for unit in candidate.answer_units
+        if unit.unit_id == witness.unit_id
+    )
+    material = materialize_answer_units(candidate.display_text, witness_units)
+    fit_tokens = candidate.fit_token_estimate
+    visible_tokens = candidate.token_estimate
+    if material:
+        visible_tokens = _estimated_tokens(material)
+        fit_tokens = _docs_answer_candidate_tokens(
+            stable_id=candidate.stable_id,
+            path=candidate.path_or_url,
+            section=candidate.section,
+            projected=material,
+            version_binding=candidate.version_binding,
+        )
     return replace(
         candidate,
+        token_estimate=visible_tokens,
+        fit_token_estimate=fit_tokens,
         covered_requirement_ids=frozenset(covered),
-        requirement_witnesses=tuple(sorted(
-            witnesses,
-            key=lambda item: (item.requirement_id, item.unit_char_start, item.unit_id),
-        )),
+        requirement_witnesses=ordered_witnesses,
     )
 
 

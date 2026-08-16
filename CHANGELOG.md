@@ -8,6 +8,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 
+- **Project answer contract v2:** distinguish inventory counts, closed tool-name lists, singular command bindings, source-field locations, and bounded workflow groups so a retrieval hit cannot authorize an unrelated answer.
+- **Safe index cleanup:** extend the existing `doc-atlas clear-index` and `prepare_docs(action="clear_index")` surfaces with digest-bound previews, SQLite sidecar cleanup, verified local vector/cache cleanup, stale-plan and live-process protection, and index-only global scope.
 - **Bounded direct context delivery:** coding agents can request a versioned, source-attributed `ActionPacket`; wrapper and recovery metadata are included in the 2,000 estimated-token payload ceiling, and raw retrieval content does not enter the parent coding session.
 - **Documentation contract gate:** active user documentation is checked against the real Click command tree and option inventory, while branding, Git trackability, canonical-workflow ownership, and documentation-size budgets remain regression-tested.
 - **Project documentation roots:** reviewable project-doc catalogs can select bounded monorepo documentation roots and optional local indexes without allowing traversal, symlink expansion, or index loops.
@@ -22,6 +24,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Fixed
 
+- **Project answer evidence:** reject branding and troubleshooting distractors for public-tool and sync-command questions, preserve interrogative subject boundaries, and fit minimal assigned witnesses instead of charging the full surrounding chunk.
 - **Kotlin acceptance provenance:** preserve the original GitHub blob request separately from its raw fetch identity, and make the pinned live-smoke gate reject echoed questions, unrelated citations, missing exact-version provenance, unpinned machine artifacts, and non-isolated live runs.
 - **Project documentation authority:** keep incomplete evidence handoffs honest per section, cap them at 12 KiB with deterministic omission accounting, and exclude completed or superseded project plans from ordinary retrieval unless history is explicitly requested.
 

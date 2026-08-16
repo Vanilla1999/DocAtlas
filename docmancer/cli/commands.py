@@ -2172,32 +2172,102 @@ def _format_size(n: int) -> str:
     "clear-index",
     cls=DocmancerCommand,
     context_settings=HELP_CONTEXT_SETTINGS,
-    short_help="Preview or clear one project-local Docmancer index.",
+    short_help="Preview or safely clear derived DocAtlas index state.",
     epilog=format_examples(
         "doc-atlas clear-index --scope project-local --project-path .",
         "doc-atlas clear-index --scope project-local --project-path . --apply",
+        "doc-atlas clear-index --scope global --format json",
+        "doc-atlas clear-index --scope global --apply",
     ),
 )
-@click.option("--scope", type=click.Choice(["project-local"], case_sensitive=False), required=True)
-@click.option("--project-path", type=click.Path(exists=True, file_okay=False, path_type=str), required=True)
+@click.option(
+    "--scope",
+    type=click.Choice(["project-local", "global"], case_sensitive=False),
+    required=True,
+)
+@click.option(
+    "--project-path",
+    type=click.Path(exists=True, file_okay=False, path_type=str),
+    required=False,
+    help="Project root for --scope project-local; forbidden for --scope global.",
+)
 @click.option("--apply", is_flag=True, default=False, help="Apply the displayed plan; default is preview only.")
-@click.option("output_format", "--format", type=click.Choice(["text", "json"], case_sensitive=False), default="text", show_default=True)
-def clear_index_cmd(scope: str, project_path: str, apply: bool, output_format: str) -> None:
-    """Delete only a project-local derived DB and extracted documents."""
+@click.option(
+    "--plan-digest",
+    default=None,
+    help="Require the applied plan to match a previously reviewed preview digest.",
+)
+@click.option(
+    "--allow-incomplete",
+    is_flag=True,
+    default=False,
+    help="Retain explicitly reported remote or unowned vector state instead of failing.",
+)
+@click.option(
+    "output_format", "--format",
+    type=click.Choice(["text", "json"], case_sensitive=False),
+    default="text", show_default=True,
+)
+def clear_index_cmd(
+    scope: str,
+    project_path: str | None,
+    apply: bool,
+    plan_digest: str | None,
+    allow_incomplete: bool,
+    output_format: str,
+) -> None:
+    """Delete derived indexes while preserving configuration and source files."""
+    from docmancer.core.config_resolution import resolve_config
     from docmancer.docs.application.index_storage_cleanup import IndexStorageCleanup
 
     cleanup = IndexStorageCleanup()
-    plan = cleanup.preview(scope=scope.lower(), project_path=project_path)
-    payload = cleanup.apply(plan) if apply else cleanup.payload(plan)
+    normalized_scope = scope.lower()
+    if normalized_scope == "project-local":
+        if not project_path:
+            raise click.UsageError("--project-path is required for --scope project-local")
+        plan = cleanup.preview(scope=normalized_scope, project_path=project_path)
+    else:
+        if project_path:
+            raise click.UsageError("--project-path is not allowed for --scope global")
+        explicit = _effective_config(None)
+        if explicit:
+            resolved = resolve_config(explicit_path=explicit)
+        else:
+            home = Path(os.environ.get("DOCMANCER_HOME") or (Path.home() / ".docmancer"))
+            resolved = resolve_config(
+                cwd=home / ".no-project-config",
+                user_config_path=home / "docmancer.yaml",
+            )
+        plan = cleanup.preview(
+            scope="global",
+            global_config=resolved.config,
+            global_config_source=resolved.source,
+            global_config_path=resolved.path,
+        )
+
+    try:
+        payload = cleanup.apply(
+            plan,
+            expected_plan_digest=plan_digest,
+            allow_incomplete=allow_incomplete,
+        ) if apply else cleanup.payload(plan)
+    except (RuntimeError, ValueError) as exc:
+        raise click.ClickException(str(exc)) from exc
+
     if output_format == "json":
         click.echo(json.dumps(payload, ensure_ascii=False, indent=2))
         return
     click.echo(f"Scope: {payload['scope']} ({payload['config_source']})")
-    click.echo(f"DB: {payload['db_path']}")
-    click.echo(f"Extracted docs: {payload['extracted_dir']}")
+    click.echo(f"Storage root: {payload['storage_root']}")
+    click.echo(f"Plan digest: {payload['plan_digest']}")
     click.echo("Plan:")
-    for target in payload["plan"]:
-        click.echo(f"  {target}")
+    for target in payload.get("targets", []):
+        state = "present" if target["exists"] else "missing"
+        click.echo(f"  [{target['kind']}] {target['path']} ({state}, {target['size_bytes']} bytes)")
+    for reason in payload.get("incomplete_reasons", []):
+        click.echo(f"Incomplete: {reason}", err=True)
+    for reason in payload.get("blocking_reasons", []):
+        click.echo(f"Blocked: {reason}", err=True)
     click.echo("Applied." if apply else "Preview only; rerun with --apply to delete this scope.")
 
 

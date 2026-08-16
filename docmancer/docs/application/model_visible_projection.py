@@ -24,6 +24,7 @@ from docmancer.docs.application.evidence_selection import (
     select_evidence,
     validate_assignment_binding,
 )
+from docmancer.docs.domain.answer_units import materialize_answer_units
 from docmancer.docs.domain.request_intent import model_projection_kind
 
 
@@ -154,7 +155,7 @@ def _unit_materialized_item(
         units.append(unit)
     if not units:
         return None
-    material = "\n\n".join(unit.text for unit in units)
+    material = materialize_answer_units(candidate.display_text, units)
     if not material.strip():
         return None
     item = dict(candidate.original)

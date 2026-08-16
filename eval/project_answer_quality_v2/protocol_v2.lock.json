@@ -1,0 +1,31 @@
+{
+  "schema_version": "project-answer-quality-protocol-v2",
+  "case_file": "cases.json",
+  "case_file_sha256": "da169e98baca1d30dadcc05cdede8673cbc4c33cf55b1a814139788e3a926a3c",
+  "public_argument_fields": [
+    "mode",
+    "project_path",
+    "question"
+  ],
+  "supported_token_limit": 1500,
+  "insufficient_token_limit": 300,
+  "case_ids": [
+    "inventory_count_over_branding_distractor",
+    "inventory_names_over_count_only",
+    "singular_command_over_troubleshooting_distractor",
+    "long_chunk_uses_short_assigned_witness",
+    "task_requirement_without_phantom_subject",
+    "roadmap_location_from_source_field",
+    "compound_workflow_uses_contiguous_group",
+    "missing_entity_abstains",
+    "provider_timeout_absent_abstains",
+    "missing_task_status_abstains",
+    "task43_status_is_source_backed",
+    "insufficient_evidence_return_contract",
+    "prepare_docs_replacement_contract",
+    "config_query_budget_outside_docs_lane",
+    "dependency_extension_outside_docs_lane",
+    "config_provider_outside_docs_lane",
+    "candidate_trace_internal_fact_abstains"
+  ]
+}

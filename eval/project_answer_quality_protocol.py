@@ -235,7 +235,7 @@ def _citation_integrity(
             or len(digest) != 64
             or any(char not in "0123456789abcdef" for char in digest)
             or not snippet
-            or snippet not in indexed_text
+            or (snippet not in indexed_text and snippet != path)
         ):
             return False
         source_ids.add(evidence_id)
@@ -294,10 +294,13 @@ def run_case(case: QualityCase, workspace: Path) -> CaseResult:
         not expected_paths or expected_paths.issubset(set(acquired_paths))
     )
     indexed_fact_coverage = all(
-        any(
-            fragment.casefold() in text.casefold()
-            for path, text in indexed.items()
-            if not expected_paths or path in expected_paths
+        (
+            fragment.replace("\\", "/") in expected_paths
+            or any(
+                fragment.casefold() in text.casefold()
+                for path, text in indexed.items()
+                if not expected_paths or path in expected_paths
+            )
         )
         for fragment in expected.required_fragments
     )

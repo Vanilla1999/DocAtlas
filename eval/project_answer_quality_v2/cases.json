@@ -1,0 +1,628 @@
+{
+  "schema_version": "project-answer-quality-corpus-v2",
+  "cases": [
+    {
+      "case_id": "inventory_count_over_branding_distractor",
+      "question": "How many public MCP tools does DocAtlas expose?",
+      "files": {
+        "CONTRIBUTING.md": "# Naming\n\nNew user-facing docs should use DocAtlas and the doc-atlas CLI command.\n",
+        "roadmap/README.md": "# Public surface\n\nPreserve the three-tool public Docs MCP surface: `get_docs_context`, `prepare_docs`, `docs_status`.\n",
+        "ARCHITECTURE.md": "# Architecture\n\nThis file defines the repository architecture and points to authoritative project documents.\n"
+      },
+      "documents": [
+        {
+          "path": "CONTRIBUTING.md",
+          "role": "other",
+          "authority": "supporting",
+          "status": "active",
+          "impact": "track"
+        },
+        {
+          "path": "roadmap/README.md",
+          "role": "roadmap",
+          "authority": "source_of_truth",
+          "status": "active",
+          "impact": "track"
+        },
+        {
+          "path": "ARCHITECTURE.md",
+          "role": "project_architecture",
+          "authority": "source_of_truth",
+          "status": "active",
+          "impact": "track"
+        }
+      ],
+      "expected": {
+        "status": "ok",
+        "evidence_paths": [
+          "roadmap/README.md"
+        ],
+        "required_fragments": [
+          "three-tool public Docs MCP surface"
+        ],
+        "forbidden_fragments": [
+          "user-facing docs should use DocAtlas"
+        ],
+        "forbidden_paths": [
+          "CONTRIBUTING.md"
+        ]
+      }
+    },
+    {
+      "case_id": "inventory_names_over_count_only",
+      "question": "What are the public tools of the Docs MCP server?",
+      "files": {
+        "docs/tools.md": "# Public tools\n\nThe public tools are `get_docs_context`, `prepare_docs`, and `docs_status`.\n",
+        "docs/compatibility.md": "# Compatibility\n\nThe compatibility server has exactly three public tools.\n",
+        "ARCHITECTURE.md": "# Architecture\n\nThis file defines the repository architecture and points to authoritative project documents.\n"
+      },
+      "documents": [
+        {
+          "path": "docs/tools.md",
+          "role": "other",
+          "authority": "source_of_truth",
+          "status": "active",
+          "impact": "track"
+        },
+        {
+          "path": "docs/compatibility.md",
+          "role": "other",
+          "authority": "supporting",
+          "status": "active",
+          "impact": "track"
+        },
+        {
+          "path": "ARCHITECTURE.md",
+          "role": "project_architecture",
+          "authority": "source_of_truth",
+          "status": "active",
+          "impact": "track"
+        }
+      ],
+      "expected": {
+        "status": "ok",
+        "evidence_paths": [
+          "docs/tools.md"
+        ],
+        "required_fragments": [
+          "get_docs_context",
+          "prepare_docs",
+          "docs_status"
+        ],
+        "forbidden_fragments": [
+          "compatibility server"
+        ],
+        "forbidden_paths": [
+          "docs/compatibility.md"
+        ]
+      }
+    },
+    {
+      "case_id": "singular_command_over_troubleshooting_distractor",
+      "question": "Which command does doc-atlas use to sync project docs after file changes?",
+      "files": {
+        "README.md": "# Incremental synchronization\n\nCall `prepare_docs(action=\"sync_project_docs\", changed_paths=[...], deleted_paths=[...], renamed_paths=[...])` after file changes.\n",
+        "wiki/Troubleshooting.md": "# Troubleshooting\n\nThe agent does not use the Docs MCP workflow when the server is not registered.\n",
+        "ARCHITECTURE.md": "# Architecture\n\nThis file defines the repository architecture and points to authoritative project documents.\n"
+      },
+      "documents": [
+        {
+          "path": "README.md",
+          "role": "overview",
+          "authority": "source_of_truth",
+          "status": "active",
+          "impact": "track"
+        },
+        {
+          "path": "wiki/Troubleshooting.md",
+          "role": "other",
+          "authority": "supporting",
+          "status": "active",
+          "impact": "track"
+        },
+        {
+          "path": "ARCHITECTURE.md",
+          "role": "project_architecture",
+          "authority": "source_of_truth",
+          "status": "active",
+          "impact": "track"
+        }
+      ],
+      "expected": {
+        "status": "ok",
+        "evidence_paths": [
+          "README.md"
+        ],
+        "required_fragments": [
+          "prepare_docs",
+          "sync_project_docs"
+        ],
+        "forbidden_fragments": [
+          "does not use the Docs MCP workflow"
+        ],
+        "forbidden_paths": [
+          "wiki/Troubleshooting.md"
+        ]
+      }
+    },
+    {
+      "case_id": "long_chunk_uses_short_assigned_witness",
+      "question": "What is the three-tool public Docs MCP surface?",
+      "files": {
+        "roadmap/README.md": "# Roadmap context\n\nBackground material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory. Background material describes repository conventions without naming the public tool inventory.\n\n- Preserve the three-tool public Docs MCP surface: `get_docs_context`, `prepare_docs`, `docs_status`.\n",
+        "ARCHITECTURE.md": "# Architecture\n\nThis file defines the repository architecture and points to authoritative project documents.\n"
+      },
+      "documents": [
+        {
+          "path": "roadmap/README.md",
+          "role": "roadmap",
+          "authority": "source_of_truth",
+          "status": "active",
+          "impact": "track"
+        },
+        {
+          "path": "ARCHITECTURE.md",
+          "role": "project_architecture",
+          "authority": "source_of_truth",
+          "status": "active",
+          "impact": "track"
+        }
+      ],
+      "expected": {
+        "status": "ok",
+        "evidence_paths": [
+          "roadmap/README.md"
+        ],
+        "required_fragments": [
+          "get_docs_context",
+          "prepare_docs",
+          "docs_status"
+        ],
+        "forbidden_fragments": [],
+        "forbidden_paths": []
+      }
+    },
+    {
+      "case_id": "task_requirement_without_phantom_subject",
+      "question": "Does Task 43 require a verified local adapter before the production-model gate can pass?",
+      "files": {
+        "roadmap/README.md": "# Task 43\n\nTask 43 remains INCONCLUSIVE until a verified local adapter, model credentials, and evaluator boundary are available.\n",
+        "ARCHITECTURE.md": "# Architecture\n\nThis file defines the repository architecture and points to authoritative project documents.\n"
+      },
+      "documents": [
+        {
+          "path": "roadmap/README.md",
+          "role": "roadmap",
+          "authority": "source_of_truth",
+          "status": "active",
+          "impact": "track"
+        },
+        {
+          "path": "ARCHITECTURE.md",
+          "role": "project_architecture",
+          "authority": "source_of_truth",
+          "status": "active",
+          "impact": "track"
+        }
+      ],
+      "expected": {
+        "status": "ok",
+        "evidence_paths": [
+          "roadmap/README.md"
+        ],
+        "required_fragments": [
+          "verified local adapter"
+        ],
+        "forbidden_fragments": [],
+        "forbidden_paths": []
+      }
+    },
+    {
+      "case_id": "roadmap_location_from_source_field",
+      "question": "Where is the DocAtlas execution roadmap?",
+      "files": {
+        "roadmap/README.md": "# DocAtlas execution roadmap\n\nCurrent execution tasks and sequencing are maintained in this document.\n",
+        "docs/overview.md": "# Overview\n\nDocAtlas provides project documentation retrieval.\n",
+        "ARCHITECTURE.md": "# Architecture\n\nThis file defines the repository architecture and points to authoritative project documents.\n"
+      },
+      "documents": [
+        {
+          "path": "roadmap/README.md",
+          "role": "roadmap",
+          "authority": "source_of_truth",
+          "status": "active",
+          "impact": "track"
+        },
+        {
+          "path": "docs/overview.md",
+          "role": "overview",
+          "authority": "supporting",
+          "status": "active",
+          "impact": "track"
+        },
+        {
+          "path": "ARCHITECTURE.md",
+          "role": "project_architecture",
+          "authority": "source_of_truth",
+          "status": "active",
+          "impact": "track"
+        }
+      ],
+      "expected": {
+        "status": "ok",
+        "evidence_paths": [
+          "roadmap/README.md"
+        ],
+        "required_fragments": [
+          "roadmap/README.md"
+        ],
+        "forbidden_fragments": [
+          "docs/overview.md"
+        ],
+        "forbidden_paths": [
+          "docs/overview.md"
+        ]
+      }
+    },
+    {
+      "case_id": "compound_workflow_uses_contiguous_group",
+      "question": "How does prepare_docs sync_project_docs work?",
+      "files": {
+        "README.md": "# Project docs workflow\n\n`prepare_docs(action=\"sync_project_docs\")` first discovers changed project documents. Then it removes deleted pages, reindexes changed sections, and publishes the new generation.\n",
+        "docs/api.md": "# API names\n\nThe names prepare_docs and sync_project_docs are part of the documentation API.\n",
+        "ARCHITECTURE.md": "# Architecture\n\nThis file defines the repository architecture and points to authoritative project documents.\n"
+      },
+      "documents": [
+        {
+          "path": "README.md",
+          "role": "overview",
+          "authority": "source_of_truth",
+          "status": "active",
+          "impact": "track"
+        },
+        {
+          "path": "docs/api.md",
+          "role": "other",
+          "authority": "supporting",
+          "status": "active",
+          "impact": "track"
+        },
+        {
+          "path": "ARCHITECTURE.md",
+          "role": "project_architecture",
+          "authority": "source_of_truth",
+          "status": "active",
+          "impact": "track"
+        }
+      ],
+      "expected": {
+        "status": "ok",
+        "evidence_paths": [
+          "README.md"
+        ],
+        "required_fragments": [
+          "discovers changed project documents",
+          "publishes the new generation"
+        ],
+        "forbidden_fragments": [
+          "part of the documentation API"
+        ],
+        "forbidden_paths": [
+          "docs/api.md"
+        ]
+      }
+    },
+    {
+      "case_id": "missing_entity_abstains",
+      "question": "What is CedarRuntime?",
+      "files": {
+        "README.md": "# PineRuntime\n\nPineRuntime is the only runtime defined by this repository.\n",
+        "ARCHITECTURE.md": "# Architecture\n\nThis file defines the repository architecture and points to authoritative project documents.\n"
+      },
+      "documents": [
+        {
+          "path": "README.md",
+          "role": "overview",
+          "authority": "source_of_truth",
+          "status": "active",
+          "impact": "track"
+        },
+        {
+          "path": "ARCHITECTURE.md",
+          "role": "project_architecture",
+          "authority": "source_of_truth",
+          "status": "active",
+          "impact": "track"
+        }
+      ],
+      "expected": {
+        "status": "insufficient_evidence",
+        "evidence_paths": [],
+        "required_fragments": [],
+        "forbidden_fragments": [
+          "PineRuntime is"
+        ],
+        "forbidden_paths": []
+      }
+    },
+    {
+      "case_id": "provider_timeout_absent_abstains",
+      "question": "What is the provider request timeout?",
+      "files": {
+        "README.md": "# Provider requests\n\nProvider requests use bounded retry policy, but this repository does not publish a request timeout.\n",
+        "ARCHITECTURE.md": "# Architecture\n\nThis file defines the repository architecture and points to authoritative project documents.\n"
+      },
+      "documents": [
+        {
+          "path": "README.md",
+          "role": "overview",
+          "authority": "source_of_truth",
+          "status": "active",
+          "impact": "track"
+        },
+        {
+          "path": "ARCHITECTURE.md",
+          "role": "project_architecture",
+          "authority": "source_of_truth",
+          "status": "active",
+          "impact": "track"
+        }
+      ],
+      "expected": {
+        "status": "insufficient_evidence",
+        "evidence_paths": [],
+        "required_fragments": [],
+        "forbidden_fragments": [
+          "seconds",
+          "minutes"
+        ],
+        "forbidden_paths": []
+      }
+    },
+    {
+      "case_id": "missing_task_status_abstains",
+      "question": "What is Task 17 status?",
+      "files": {
+        "roadmap/README.md": "# Current tasks\n\nTask 43 remains active. The roadmap lists only currently defined tasks.\n",
+        "ARCHITECTURE.md": "# Architecture\n\nThis file defines the repository architecture and points to authoritative project documents.\n"
+      },
+      "documents": [
+        {
+          "path": "roadmap/README.md",
+          "role": "roadmap",
+          "authority": "source_of_truth",
+          "status": "active",
+          "impact": "track"
+        },
+        {
+          "path": "ARCHITECTURE.md",
+          "role": "project_architecture",
+          "authority": "source_of_truth",
+          "status": "active",
+          "impact": "track"
+        }
+      ],
+      "expected": {
+        "status": "insufficient_evidence",
+        "evidence_paths": [],
+        "required_fragments": [],
+        "forbidden_fragments": [
+          "Task 43 remains active"
+        ],
+        "forbidden_paths": []
+      }
+    },
+    {
+      "case_id": "task43_status_is_source_backed",
+      "question": "What is the status of Task 43?",
+      "files": {
+        "roadmap/README.md": "# Task 43\n\nTask 43's provider-free gate is local; the production-model gate remains INCONCLUSIVE until a verified local adapter is available.\n",
+        "ARCHITECTURE.md": "# Architecture\n\nThis file defines the repository architecture and points to authoritative project documents.\n"
+      },
+      "documents": [
+        {
+          "path": "roadmap/README.md",
+          "role": "roadmap",
+          "authority": "source_of_truth",
+          "status": "active",
+          "impact": "track"
+        },
+        {
+          "path": "ARCHITECTURE.md",
+          "role": "project_architecture",
+          "authority": "source_of_truth",
+          "status": "active",
+          "impact": "track"
+        }
+      ],
+      "expected": {
+        "status": "ok",
+        "evidence_paths": [
+          "roadmap/README.md"
+        ],
+        "required_fragments": [
+          "INCONCLUSIVE",
+          "verified local adapter"
+        ],
+        "forbidden_fragments": [],
+        "forbidden_paths": []
+      }
+    },
+    {
+      "case_id": "insufficient_evidence_return_contract",
+      "question": "What does get_docs_context return when evidence is insufficient?",
+      "files": {
+        "docs/project-docs-mcp-workflow.md": "# Insufficient evidence\n\nWhen evidence is insufficient, `get_docs_context` returns a compact Trust Contract with selected, rejected, and risky sources plus `next_actions`.\n",
+        "ARCHITECTURE.md": "# Architecture\n\nThis file defines the repository architecture and points to authoritative project documents.\n"
+      },
+      "documents": [
+        {
+          "path": "docs/project-docs-mcp-workflow.md",
+          "role": "other",
+          "authority": "source_of_truth",
+          "status": "active",
+          "impact": "track"
+        },
+        {
+          "path": "ARCHITECTURE.md",
+          "role": "project_architecture",
+          "authority": "source_of_truth",
+          "status": "active",
+          "impact": "track"
+        }
+      ],
+      "expected": {
+        "status": "ok",
+        "evidence_paths": [
+          "docs/project-docs-mcp-workflow.md"
+        ],
+        "required_fragments": [
+          "compact Trust Contract",
+          "next_actions"
+        ],
+        "forbidden_fragments": [],
+        "forbidden_paths": []
+      }
+    },
+    {
+      "case_id": "prepare_docs_replacement_contract",
+      "question": "What does prepare_docs replace?",
+      "files": {
+        "docs/mcp-docs-server.md": "# Project synchronization\n\n`prepare_docs(action=\"sync_project_docs\")` replaces the old two-step `inspect -> ingest` loop and indexes existing reviewable repository files.\n",
+        "ARCHITECTURE.md": "# Architecture\n\nThis file defines the repository architecture and points to authoritative project documents.\n"
+      },
+      "documents": [
+        {
+          "path": "docs/mcp-docs-server.md",
+          "role": "other",
+          "authority": "source_of_truth",
+          "status": "active",
+          "impact": "track"
+        },
+        {
+          "path": "ARCHITECTURE.md",
+          "role": "project_architecture",
+          "authority": "source_of_truth",
+          "status": "active",
+          "impact": "track"
+        }
+      ],
+      "expected": {
+        "status": "ok",
+        "evidence_paths": [
+          "docs/mcp-docs-server.md"
+        ],
+        "required_fragments": [
+          "replaces the old two-step",
+          "inspect -> ingest"
+        ],
+        "forbidden_fragments": [],
+        "forbidden_paths": []
+      }
+    },
+    {
+      "case_id": "config_query_budget_outside_docs_lane",
+      "question": "What is the default query budget in docmancer.yaml?",
+      "files": {
+        "docmancer.yaml": "retrieval:\n  default_budget: 2400\n",
+        "ARCHITECTURE.md": "# Architecture\n\nThis file defines the repository architecture and points to authoritative project documents.\n"
+      },
+      "documents": [
+        {
+          "path": "ARCHITECTURE.md",
+          "role": "project_architecture",
+          "authority": "source_of_truth",
+          "status": "active",
+          "impact": "track"
+        }
+      ],
+      "expected": {
+        "status": "insufficient_evidence",
+        "evidence_paths": [],
+        "required_fragments": [],
+        "forbidden_fragments": [
+          "2400"
+        ],
+        "forbidden_paths": []
+      }
+    },
+    {
+      "case_id": "dependency_extension_outside_docs_lane",
+      "question": "What SQLite extension does DocAtlas use for vector search?",
+      "files": {
+        "pyproject.toml": "[project]\ndependencies = [\"sqlite-vec>=0.1.0\"]\n",
+        "ARCHITECTURE.md": "# Architecture\n\nThis file defines the repository architecture and points to authoritative project documents.\n"
+      },
+      "documents": [
+        {
+          "path": "ARCHITECTURE.md",
+          "role": "project_architecture",
+          "authority": "source_of_truth",
+          "status": "active",
+          "impact": "track"
+        }
+      ],
+      "expected": {
+        "status": "insufficient_evidence",
+        "evidence_paths": [],
+        "required_fragments": [],
+        "forbidden_fragments": [
+          "sqlite-vec"
+        ],
+        "forbidden_paths": []
+      }
+    },
+    {
+      "case_id": "config_provider_outside_docs_lane",
+      "question": "What is the default indexing provider in docmancer.yaml?",
+      "files": {
+        "docmancer.yaml": "index:\n  provider: sqlite\n",
+        "ARCHITECTURE.md": "# Architecture\n\nThis file defines the repository architecture and points to authoritative project documents.\n"
+      },
+      "documents": [
+        {
+          "path": "ARCHITECTURE.md",
+          "role": "project_architecture",
+          "authority": "source_of_truth",
+          "status": "active",
+          "impact": "track"
+        }
+      ],
+      "expected": {
+        "status": "insufficient_evidence",
+        "evidence_paths": [],
+        "required_fragments": [],
+        "forbidden_fragments": [
+          "provider: sqlite"
+        ],
+        "forbidden_paths": []
+      }
+    },
+    {
+      "case_id": "candidate_trace_internal_fact_abstains",
+      "question": "What is a candidate trace hash used for in Task 41?",
+      "files": {
+        "docmancer/retrieval/contracts.py": "CANDIDATE_TRACE_SCHEMA = \"task41\"\n",
+        "ARCHITECTURE.md": "# Architecture\n\nThis file defines the repository architecture and points to authoritative project documents.\n"
+      },
+      "documents": [
+        {
+          "path": "ARCHITECTURE.md",
+          "role": "project_architecture",
+          "authority": "source_of_truth",
+          "status": "active",
+          "impact": "track"
+        }
+      ],
+      "expected": {
+        "status": "insufficient_evidence",
+        "evidence_paths": [],
+        "required_fragments": [],
+        "forbidden_fragments": [
+          "task41"
+        ],
+        "forbidden_paths": []
+      }
+    }
+  ]
+}

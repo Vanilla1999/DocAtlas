@@ -9,8 +9,8 @@ from typing import Any, Iterable, Mapping
 from docmancer.docs.domain.project_answer_contract import ProofObligation
 
 
-ANSWER_UNIT_SCHEMA = "answer-unit-v1"
-MAX_ANSWER_UNITS = 40
+ANSWER_UNIT_SCHEMA = "answer-unit-v2"
+MAX_ANSWER_UNITS = 64
 MAX_ANSWER_UNIT_CHARS = 1_500
 
 _HEADING_RE = re.compile(r"^(#{1,6})\s+(.+?)\s*$")
@@ -51,7 +51,7 @@ _COPULA_RE = re.compile(
 _BEHAVIOR_RE = re.compile(
     r"\b(?:returns?|reports?|shows?|reads?|writes?|loads?|indexes?|retrieves?|selects?|"
     r"validates?|handles?|processes?|dispatches?|routes?|creates?|updates?|deletes?|use(?:s|d)?|exposes?|"
-    r"invokes?|supplies?|calls?|preserves?|keeps?|sets?|configures?|requires?|governs?|"
+    r"invokes?|supplies?|calls?|replaces?|preserves?|keeps?|sets?|configures?|requires?|governs?|"
     r"возвращает|показывает|сообщает|читает|записывает|индексирует|извлекает|выбирает|"
     r"проверяет|обрабатывает|маршрутизирует|создает|обновляет|удаляет)\b",
     re.I,
@@ -72,6 +72,16 @@ _CONTRAST_RE = re.compile(
     re.I,
 )
 _TOOL_WORD_RE = re.compile(r"\b(?:tools?|commands?|methods?|инструмент(?:ы|ов|а)?|команд(?:ы|а|ах)?)\b", re.I)
+_INVENTORY_ANCHOR_RE = re.compile(
+    r"\b(?:public\s+)?(?:tools|commands|methods|инструмент(?:ы|ов)|команд(?:ы|ах))\b"
+    r"|\b(?:three|3)[- ]tool(?:[- ]\w+){0,5}\s+surface\b",
+    re.I,
+)
+_EXPLICIT_COUNT_RE = re.compile(
+    r"\b(?:exactly\s+)?(\d{1,2}|one|two|three|four|five|six|seven|eight|nine|ten|"
+    r"один|одна|два|две|три|четыре|пять|шесть|семь|восемь|девять|десять)\b",
+    re.I,
+)
 _NEGATION_RE = re.compile(
     r"\b(?:does|do|did|is|are|was|were|should|must|can|could|would|will)\s+not\b"
     r"|\b(?:never|cannot|can't|mustn't|shouldn't)\b"
@@ -79,8 +89,10 @@ _NEGATION_RE = re.compile(
     re.I,
 )
 _ACTION_RE = re.compile(
-    r"\b(?:run|follow|retry|prepare|call|validate|dispatch|route|process|load|read|write|"
-    r"запустить|выполнить|повторить|подготовить|вызвать|проверить|обработать)\b",
+    r"\b(?:runs?|follows?|retries?|prepares?|calls?|validates?|dispatches?|routes?|processes?|loads?|reads?|writes?|"
+    r"syncs?|synchronizes?|indexes?|reindexes?|discovers?|removes?|publishes?|activates?|creates?|updates?|deletes?|"
+    r"запустить|выполнить|повторить|подготовить|вызвать|проверить|обработать|"
+    r"синхронизировать|индексировать|удалить|опубликовать)\b",
     re.I,
 )
 _ARCH_COMPONENT_RE = re.compile(
@@ -108,19 +120,101 @@ class AnswerUnit:
     unit_id: str
     kind: str
     text: str
-    char_start: int
-    char_end: int
+    char_start: int | None
+    char_end: int | None
     content_sha256: str
     proposition: bool
+    source_field: str | None = None
 
     def __post_init__(self) -> None:
-        if not self.unit_id or not self.text or self.char_start < 0 or self.char_end <= self.char_start:
+        if not self.unit_id or not self.text:
             raise ValueError("invalid answer unit")
+        if self.source_field is not None:
+            if self.char_start is not None or self.char_end is not None:
+                raise ValueError("source-field answer units do not use content offsets")
+        elif (
+            self.char_start is None or self.char_end is None
+            or self.char_start < 0 or self.char_end <= self.char_start
+        ):
+            raise ValueError("invalid answer unit offsets")
         if len(self.text) > MAX_ANSWER_UNIT_CHARS:
             raise ValueError("answer unit exceeds bound")
         expected = hashlib.sha256(self.text.encode("utf-8")).hexdigest()
         if expected != self.content_sha256:
             raise ValueError("answer unit hash mismatch")
+
+
+def materialize_answer_units(
+    source_text: str,
+    units: Iterable[AnswerUnit],
+    *,
+    max_gap_chars: int = 400,
+) -> str:
+    """Render the exact bounded material represented by assigned answer units.
+
+    Nearby content units are expanded to their contiguous source span.  This
+    preserves short connective sentences between two assigned propositions and
+    keeps selection-time token fitting identical to final projection.  Distant
+    units remain separate so an assignment cannot expose an unrelated middle of
+    the chunk.  Source-field witnesses are appended independently because they
+    have no content offsets.
+    """
+
+    source = str(source_text or "")
+    unique: dict[str, AnswerUnit] = {}
+    for unit in units:
+        unique.setdefault(unit.unit_id, unit)
+    ordered = sorted(
+        unique.values(),
+        key=lambda item: (
+            item.char_start if item.char_start is not None else 10**9,
+            item.char_end if item.char_end is not None else 10**9,
+            item.unit_id,
+        ),
+    )
+    content_units = [
+        item for item in ordered
+        if item.char_start is not None and item.char_end is not None
+    ]
+    parts: list[str] = []
+    if content_units:
+        cluster: list[AnswerUnit] = []
+        for unit in content_units:
+            if not cluster:
+                cluster = [unit]
+                continue
+            cluster_start = cluster[0].char_start or 0
+            cluster_end = cluster[-1].char_end or cluster_start
+            unit_start = unit.char_start or cluster_end
+            unit_end = unit.char_end or unit_start
+            if (
+                unit_start - cluster_end <= max_gap_chars
+                and unit_end - cluster_start <= MAX_ANSWER_UNIT_CHARS
+            ):
+                cluster.append(unit)
+                continue
+            start = cluster[0].char_start or 0
+            end = cluster[-1].char_end or start
+            material = source[start:end].strip() or "\n\n".join(item.text for item in cluster)
+            if material:
+                parts.append(material)
+            cluster = [unit]
+        if cluster:
+            start = cluster[0].char_start or 0
+            end = cluster[-1].char_end or start
+            material = source[start:end].strip() or "\n\n".join(item.text for item in cluster)
+            if material:
+                parts.append(material)
+
+    seen_parts = {part.strip() for part in parts}
+    for unit in ordered:
+        if unit.source_field is None:
+            continue
+        value = unit.text.strip()
+        if value and value not in seen_parts:
+            parts.append(value)
+            seen_parts.add(value)
+    return "\n\n".join(part for part in parts if part.strip())
 
 
 @dataclass(frozen=True, slots=True)
@@ -152,7 +246,28 @@ def _make_unit(kind: str, raw: str, start: int, end: int, *, proposition: bool) 
     )
 
 
-def extract_answer_units(text: str) -> tuple[AnswerUnit, ...]:
+def _make_source_field_unit(name: str, value: Any) -> AnswerUnit | None:
+    text = _bounded_text(str(value or ""))
+    if not text:
+        return None
+    identity = hashlib.sha256(f"source_field\0{name}\0{text}".encode("utf-8")).hexdigest()
+    return AnswerUnit(
+        unit_id=f"unit-{identity[:20]}",
+        kind="source_field",
+        text=text,
+        char_start=None,
+        char_end=None,
+        content_sha256=hashlib.sha256(text.encode("utf-8")).hexdigest(),
+        proposition=True,
+        source_field=name,
+    )
+
+
+def extract_answer_units(
+    text: str,
+    *,
+    source_fields: Mapping[str, Any] | None = None,
+) -> tuple[AnswerUnit, ...]:
     """Extract deterministic local propositions without merging unrelated chunks."""
 
     source = str(text or "")
@@ -255,12 +370,57 @@ def extract_answer_units(text: str) -> tuple[AnswerUnit, ...]:
         if len(candidate) <= MAX_ANSWER_UNIT_CHARS:
             add("heading_context", candidate, heading_start, block_end, proposition=True)
 
+    # Preserve a bounded contiguous multi-unit witness for workflows.  The group
+    # is an exact source slice; it never concatenates unrelated or reordered text.
+    positional = sorted(
+        (unit for unit in units if unit.char_start is not None and unit.char_end is not None),
+        key=lambda item: (item.char_start, item.char_end, item.kind, item.unit_id),
+    )
+    runs: list[list[AnswerUnit]] = []
+    current: list[AnswerUnit] = []
+    for unit in positional:
+        if unit.kind == "heading_context":
+            continue
+        if not current:
+            current = [unit]
+            continue
+        previous = current[-1]
+        gap = source[previous.char_end:unit.char_start]
+        if (
+            len(current) < 6
+            and not gap.strip()
+            and unit.char_end - current[0].char_start <= MAX_ANSWER_UNIT_CHARS
+        ):
+            current.append(unit)
+        else:
+            if len(current) >= 2:
+                runs.append(current)
+            current = [unit]
+    if len(current) >= 2:
+        runs.append(current)
+    for run in runs[:12]:
+        start = run[0].char_start
+        end = run[-1].char_end
+        if start is None or end is None:
+            continue
+        material = source[start:end]
+        bullet_count = sum(item.kind == "bullet" for item in run)
+        if bullet_count >= 2 or _SEQUENCE_RE.search(material) or len(_ACTION_RE.findall(material)) >= 2:
+            add("unit_group", material, start, end, proposition=True)
+
+    for field_name, value in sorted((source_fields or {}).items()):
+        unit = _make_source_field_unit(str(field_name), value)
+        if unit is not None:
+            units.append(unit)
+
     # Stable de-duplication: prefer the smaller local unit for identical text.
-    by_key: dict[tuple[str, int, int], AnswerUnit] = {}
+    by_key: dict[tuple[str, int | None, int | None, str | None], AnswerUnit] = {}
     for unit in units:
-        by_key.setdefault((unit.content_sha256, unit.char_start, unit.char_end), unit)
+        by_key.setdefault((unit.content_sha256, unit.char_start, unit.char_end, unit.source_field), unit)
     ordered = sorted(by_key.values(), key=lambda item: (
-        item.char_start, item.char_end, item.kind, item.unit_id,
+        item.char_start if item.char_start is not None else 10**9,
+        item.char_end if item.char_end is not None else 10**9,
+        item.kind, item.source_field or "", item.unit_id,
     ))
     return tuple(ordered[:MAX_ANSWER_UNITS])
 
@@ -291,6 +451,54 @@ def _attribute_present(attribute: str | None, text: str) -> bool:
     return any(_contains_term(alias, text) for alias in _attribute_aliases(attribute))
 
 
+_NUMBER_WORD_VALUES = {
+    "one": 1, "two": 2, "three": 3, "four": 4, "five": 5, "six": 6,
+    "seven": 7, "eight": 8, "nine": 9, "ten": 10,
+    "один": 1, "одна": 1, "два": 2, "две": 2, "три": 3, "четыре": 4,
+    "пять": 5, "шесть": 6, "семь": 7, "восемь": 8, "девять": 9, "десять": 10,
+}
+
+
+def _inventory_facts(text: str) -> tuple[int | None, tuple[str, ...], bool]:
+    anchor = _INVENTORY_ANCHOR_RE.search(text)
+    if anchor is None:
+        return None, (), False
+    window = text[max(0, anchor.start() - 40):anchor.end() + 700]
+    explicit_count: int | None = None
+    count_match = _EXPLICIT_COUNT_RE.search(window)
+    if count_match:
+        raw = count_match.group(1).casefold()
+        explicit_count = int(raw) if raw.isdigit() else _NUMBER_WORD_VALUES.get(raw)
+    names: list[str] = []
+    tail = window[window.casefold().find(anchor.group(0).casefold()) + len(anchor.group(0)):]
+    # Closed inventories are introduced by punctuation/copula and contain
+    # code-shaped or quoted names.  Ordinary identifiers elsewhere in a
+    # branding sentence are deliberately ignored.
+    introduced = re.search(r"(?:\b(?:are|include|consist\s+of|namely)\b|[:=-])\s*(.+)$", tail, re.I | re.S)
+    if introduced:
+        material = introduced.group(1).split("\n\n", 1)[0]
+        for match in re.finditer(r"`([^`\n]{2,120})`", material):
+            candidate = match.group(1).strip().rstrip("()")
+            if re.fullmatch(r"[A-Za-z_][A-Za-z0-9_.:-]{1,119}", candidate):
+                names.append(_normal(candidate))
+        for part in re.split(r"\s*[,;]\s*|\s+(?:and|or|и|или)\s+", material):
+            candidate = re.sub(r"^(?:and|or|и|или)\s+", "", part.strip(), flags=re.I)
+            candidate = candidate.strip(" `.'\"()[]")
+            if re.fullmatch(r"[A-Za-z_][A-Za-z0-9_.:-]{1,80}", candidate) and (
+                "_" in candidate or "." in candidate or ":" in candidate or candidate.islower()
+            ):
+                names.append(_normal(candidate))
+    unique = tuple(dict.fromkeys(value for value in names if value))
+    return explicit_count, unique, True
+
+
+def _subject_token_overlap(subject: str, text: str) -> int:
+    ignored = {"docatlas", "the", "a", "an", "execution", "document", "docs"}
+    wanted = [token for token in re.findall(r"[a-z0-9_]+", _normal(subject)) if token not in ignored and len(token) > 2]
+    haystack = _normal(text)
+    return sum(1 for token in set(wanted) if token in haystack)
+
+
 def _value_score(value_kind: str, text: str, *, cardinality: int | None = None) -> int:
     if value_kind == "version_range":
         return 3 if _VERSION_VALUE_RE.search(text) else 0
@@ -304,38 +512,20 @@ def _value_score(value_kind: str, text: str, *, cardinality: int | None = None) 
         return 2 if re.search(r"\b(?:true|false|yes|no|enabled|disabled|да|нет|включен|выключен)\b", text, re.I) else 0
     if value_kind == "path":
         return 2 if re.search(r"(?:[A-Za-z0-9_.-]+/)+[A-Za-z0-9_.-]+", text) else 0
-    if value_kind == "code":
+    if value_kind in {"code", "call_expression"}:
         return 2 if (
             re.search(r"`[^`]+`|\b[A-Za-z_]\w*(?:(?:::|\.)[A-Za-z_]\w*)+", text)
             or _CODE_DECL_RE.match(text)
             or re.search(r"\b(?:const|let|var|final)\s+[A-Za-z_]\w*\s*=", text, re.I)
         ) else 0
     if value_kind == "identifier_list":
-        # Inventory proof needs actual item identities, not a sentence that
-        # merely contains several ordinary words.  Prefer quoted/code-shaped
-        # names; a plain token counts only inside an explicit comma/semicolon
-        # list introduced by an inventory delimiter.
-        identifiers: list[str] = []
-        for match in _IDENTIFIER_RE.finditer(text):
-            value = next((group for group in match.groups() if group), "")
-            raw = value.strip()
-            code_shaped = bool(
-                match.group(1)
-                or re.search(r"[_:.]|[a-z][A-Z]|\(\)$", raw)
-            )
-            if code_shaped:
-                identifiers.append(_normal(raw.rstrip("()")))
-        list_match = re.search(r"(?:tools?|commands?|methods?|инструмент(?:ы|ов|а)?|команд(?:ы|а|ах)?)\s*[:=-]\s*(.+)$", text, re.I)
-        if list_match:
-            for part in re.split(r"\s*[,;]\s*|\s+(?:and|or|и|или)\s+", list_match.group(1)):
-                candidate = part.strip(" `.'\"()")
-                if re.fullmatch(r"[A-Za-zА-Яа-яЁё_][\w.:-]{1,80}", candidate):
-                    identifiers.append(_normal(candidate))
-        count = len(set(value for value in identifiers if value))
-        required = cardinality or 2
+        _count, identifiers, anchored = _inventory_facts(text)
+        if not anchored:
+            return 0
+        count = len(identifiers)
         if cardinality is not None:
             return 3 if count == cardinality else 0
-        return 3 if count >= required else 0
+        return 3 if count >= 2 else 0
     # text values need a predicate/content beyond a bare identity.
     return 1 if len(re.findall(r"\w+", text, re.UNICODE)) >= 3 else 0
 
@@ -430,10 +620,47 @@ def local_proof_for_obligation(
         return LocalProof(local_binding, subject_score, attribute, value, subject_score + attribute + value, "attribute" if local_binding else "attribute_value_not_locally_bound")
 
     if obligation.kind == "inventory":
-        attribute = 2 if (_attribute_present(obligation.attribute, text) or _TOOL_WORD_RE.search(text)) else 0
-        value = _value_score("identifier_list", text, cardinality=obligation.cardinality)
-        valid = subject_score >= 2 and attribute > 0 and value > 0
-        return LocalProof(valid, subject_score, attribute, value, subject_score + attribute + value, "inventory" if valid else "inventory_names_or_subject_missing")
+        explicit_count, names, anchored = _inventory_facts(text)
+        attribute = 3 if anchored else 0
+        names_valid = len(names) >= 2 and (
+            obligation.cardinality is None or len(names) == obligation.cardinality
+        )
+        derived_count = explicit_count if explicit_count is not None else (len(names) if names_valid else None)
+        count_valid = derived_count is not None and (
+            obligation.cardinality is None or derived_count == obligation.cardinality
+        )
+        mode = obligation.response_mode
+        value = (
+            3 if mode == "count" and count_valid else
+            3 if mode == "names" and names_valid else
+            3 if mode == "count_and_names" and count_valid and names_valid else 0
+        )
+        valid = subject_score >= 1 and attribute > 0 and value > 0
+        reason = "inventory" if valid else "inventory_not_closed_or_not_locally_bound"
+        return LocalProof(valid, subject_score, attribute, value, subject_score + attribute + value, reason)
+
+    if obligation.kind == "command":
+        expected = obligation.expected_value or obligation.subject
+        expected_present = _contains_term(expected, text)
+        normalized = _normal(text)
+        action_binding = bool(
+            re.search(rf"\baction\s*=\s*[\"']{re.escape(expected)}[\"']", text, re.I)
+            or re.search(rf"\b[A-Za-z_][A-Za-z0-9_]*\s*\([^)]*{re.escape(expected)}", text, re.I | re.S)
+            or ("doc-atlas" in normalized and expected.replace("_", " ") in normalized)
+        )
+        call_shape = bool(re.search(r"\b[A-Za-z_][A-Za-z0-9_]*\s*\(", text) or "doc-atlas" in normalized)
+        relation = 3 if expected_present and action_binding and call_shape else 0
+        valid = relation > 0 and unit.proposition and unit.source_field is None
+        return LocalProof(valid, 3 if expected_present else 0, relation, 3 if call_shape else 0, relation + (3 if expected_present else 0) + (3 if call_shape else 0), "command" if valid else "command_operation_not_locally_bound")
+
+    if obligation.kind == "location":
+        if unit.source_field not in {"path_or_url", "path", "source_path"}:
+            return LocalProof(False, reason="location_requires_source_field")
+        source_identity_text = source_text + "\n" + text
+        overlap = _subject_token_overlap(obligation.subject, source_identity_text)
+        value = _value_score("path", text)
+        valid = overlap > 0 and value > 0
+        return LocalProof(valid, min(3, overlap + 1), 3 if overlap else 0, value, overlap + value + 3, "location" if valid else "location_subject_not_bound_to_source")
 
     if obligation.kind == "status":
         attribute = 2 if _attribute_present("status", text) else 1 if _STATUS_VALUE_RE.search(text) else 0
@@ -473,11 +700,19 @@ def local_proof_for_obligation(
 
     if obligation.kind == "workflow":
         negated = bool(_NEGATION_RE.search(text))
-        sequence = bool(_SEQUENCE_RE.search(text))
+        target_score = 3 if not obligation.target or _contains_term(obligation.target, text) else 0
+        sequence = bool(_SEQUENCE_RE.search(text)) or text.count("\n-") + len(re.findall(r"^\s*\d+[.)]\s+", text, re.M)) >= 2
         action_count = len(_ACTION_RE.findall(text))
-        relation = 3 if not negated and sequence and action_count >= 2 else 0
-        valid = subject_score > 0 and relation > 0 and unit.proposition
-        return LocalProof(valid, subject_score, relation, action_count, subject_score + relation + action_count, "workflow" if valid else "sequence_or_second_action_missing")
+        relation = 3 if (
+            not negated
+            and target_score > 0
+            and action_count >= 2
+            and (sequence or unit.kind in {"unit_group", "heading_context", "code_block"})
+        ) else 0
+        valid = subject_score > 0 and relation > 0 and unit.proposition and unit.kind in {
+            "unit_group", "heading_context", "code_block", "bullet", "sentence", "key_value",
+        }
+        return LocalProof(valid, subject_score, relation, action_count + target_score, subject_score + relation + action_count + target_score, "workflow" if valid else "workflow_subject_target_or_sequence_missing")
 
     if obligation.kind == "relation":
         special_valid = _special_relation_valid(obligation.relation, text)
@@ -521,7 +756,7 @@ def best_local_proof(
         -pair[1].completeness_score,
         0 if pair[0].proposition else 1,
         len(pair[0].text),
-        pair[0].char_start,
+        pair[0].char_start if pair[0].char_start is not None else 10**9,
         pair[0].unit_id,
     ))
     return matches[0]
