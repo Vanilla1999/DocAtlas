@@ -230,3 +230,114 @@ def test_new_probing_paraphrases_have_locally_provable_units():
     }
     assert local_proof_for_obligation(rows[0], validation_only, source=source).valid is False
     assert local_proof_for_obligation(rows[0], full_run, source=source).valid is True
+
+
+def test_reusable_frames_are_paraphrase_invariant_for_inventory_requirements_and_sync():
+    families = (
+        (
+            (
+                "What source types are supported for indexing?",
+                "Which source types are supported for indexing?",
+                "List the source types supported for indexing.",
+                "Какие типы источников поддерживаются для индексации?",
+            ),
+            ("inventory", "source types", None, "source", "source", None),
+        ),
+        (
+            (
+                "What test markers are available?",
+                "Which pytest markers are available?",
+                "List the test markers.",
+                "Какие pytest-маркеры доступны?",
+            ),
+            ("inventory", "test suite", None, "marker", "marker", None),
+        ),
+        (
+            (
+                "What does the two-cell smoke procedure require?",
+                "What is required by the two-cell smoke procedure?",
+                "What are the requirements for the two-cell smoke procedure?",
+                "Что требуется для two-cell smoke procedure?",
+            ),
+            ("relation", "two-cell smoke procedure", "requirements", None, None, None),
+        ),
+        (
+            (
+                "How do I sync project docs after changing a file?",
+                "How should I refresh project documentation after editing a file?",
+                "Как синхронизировать документацию проекта после изменения файла?",
+            ),
+            ("command", "sync_project_docs", "invocation", None, None, "sync_project_docs"),
+        ),
+    )
+    for questions, expected in families:
+        signatures = []
+        for question in questions:
+            contract = build_project_answer_contract(question)
+            assert contract.schema_version == PROJECT_ANSWER_CONTRACT_SCHEMA_V4
+            assert not contract.unresolved_parts
+            assert len(contract.proof_obligations) == 1
+            row = contract.proof_obligations[0]
+            signatures.append((
+                row.kind, row.subject, row.relation, row.attribute,
+                row.item_kind, row.expected_value,
+            ))
+        assert signatures == [expected] * len(signatures)
+
+
+def test_compound_clause_composition_preserves_single_facet_semantics():
+    single = build_project_answer_contract("What test markers are available?")
+    compound = build_project_answer_contract(
+        "What test markers are available and how do I run the offline suite?"
+    )
+    assert single.proof_obligations
+    assert compound.proof_obligations
+    assert (
+        single.proof_obligations[0].kind,
+        single.proof_obligations[0].subject,
+        single.proof_obligations[0].attribute,
+        single.proof_obligations[0].item_kind,
+    ) == (
+        compound.proof_obligations[0].kind,
+        compound.proof_obligations[0].subject,
+        compound.proof_obligations[0].attribute,
+        compound.proof_obligations[0].item_kind,
+    )
+    assert len(compound.proof_obligations) == 2
+    assert not compound.unresolved_parts
+
+
+def test_known_clause_with_unknown_tail_fails_closed_instead_of_partial_supported():
+    contract = build_project_answer_contract(
+        "Which command syncs project docs after file changes, "
+        "and what is the current Bitcoin price?"
+    )
+    assert contract.schema_version == PROJECT_ANSWER_CONTRACT_SCHEMA_V4
+    assert contract.proof_obligations
+    assert contract.unresolved_parts
+    assert any("unresolved_question_clause" in row for row in contract.unresolved_parts)
+
+    requirements = build_requirements(
+        "Which command syncs project docs after file changes, "
+        "and what is the current Bitcoin price?",
+        profile="project_docs_answer",
+    )
+    assert any(row.kind == "unsupported_query" for row in requirements)
+
+
+def test_requirements_relation_needs_named_subject_and_multiple_requirement_details():
+    contract = build_project_answer_contract(
+        "What does the two-cell smoke procedure require?"
+    )
+    obligation = contract.proof_obligations[0]
+    exact = _unit(
+        "The two-cell smoke procedure requires a provider-free preflight, one canary, "
+        "exactly two cells, no retries, an event-stream audit, and harness verification."
+    )
+    weak = _unit("The two-cell smoke procedure is documented here.")
+    unrelated = _unit(
+        "Another procedure requires a preflight, exactly two cells, and verification."
+    )
+    assert local_proof_for_obligation(obligation, exact).valid is True
+    assert local_proof_for_obligation(obligation, weak).valid is False
+    assert local_proof_for_obligation(obligation, unrelated).valid is False

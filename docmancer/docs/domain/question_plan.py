@@ -12,6 +12,12 @@ from dataclasses import dataclass
 import re
 from typing import Callable, Literal
 
+from docmancer.docs.domain.question_frame_core import (
+    match_action_frame,
+    match_inventory_frame,
+    match_requirements_frame,
+    split_question_clauses,
+)
 from docmancer.docs.domain.technical_terms import TechnicalTermKind, coerce_technical_term
 
 PlanKind = Literal[
@@ -512,13 +518,95 @@ _RULES: tuple[Rule, ...] = (
 )
 
 
-def compile_question_plan(question: str) -> QuestionPlan:
-    q = " ".join(str(question or "").split())[:4000]
+def _reusable_frame_plan(q: str) -> QuestionPlan | None:
+    inventory = match_inventory_frame(q)
+    if inventory is not None:
+        return QuestionPlan(
+            facets=(PlannedFacet(
+                "inventory", inventory.subject, attribute=inventory.attribute,
+                item_kind=inventory.item_kind, value_kind="identifier_list",
+                response_mode="names", context=inventory.context, span_text=q,
+            ),),
+            clauses=(q,),
+            parse_trace=(f"frame:inventory:{inventory.item_kind}",),
+        )
+
+    requirements = match_requirements_frame(q)
+    if requirements is not None:
+        return QuestionPlan(
+            facets=(PlannedFacet(
+                "relation", requirements.subject, relation="requirements",
+                response_mode="value", span_text=q,
+            ),),
+            clauses=(q,),
+            parse_trace=("frame:requirements",),
+        )
+
+    action = match_action_frame(q)
+    if action is not None:
+        if action.operation == "sync_project_docs":
+            return QuestionPlan(
+                facets=(PlannedFacet(
+                    "command", "sync_project_docs", relation="invocation",
+                    value_kind="call_expression", expected_value="sync_project_docs",
+                    response_mode="call", subject_kind="code_symbol",
+                    subject_aliases=(
+                        "sync_project_docs", "sync-project-docs",
+                        "sync project docs", "refresh project documentation",
+                    ),
+                    span_text=q,
+                ),),
+                clauses=(q,),
+                parse_trace=("frame:action:sync_project_docs",),
+            )
+    return None
+
+
+def _compile_atomic_question(q: str) -> QuestionPlan | None:
+    framed = _reusable_frame_plan(q)
+    if framed is not None and framed.handled:
+        return framed
     for rule in _RULES:
         plan = rule(q)
         if plan is not None and plan.handled:
             return plan
-    return QuestionPlan()
+    return None
+
+
+def _combine_clause_plans(question: str, clauses: tuple[str, ...]) -> QuestionPlan | None:
+    if len(clauses) <= 1:
+        return None
+    plans = tuple(_compile_atomic_question(clause) for clause in clauses)
+    handled = tuple(plan for plan in plans if plan is not None and plan.handled)
+    if not handled:
+        return None
+
+    facets = tuple(facet for plan in handled for facet in plan.facets)
+    trace = tuple(row for plan in handled for row in plan.parse_trace)
+    unresolved = tuple(
+        f"unresolved_question_clause:{clause}"
+        for clause, plan in zip(clauses, plans)
+        if plan is None or not plan.handled
+    )
+    unresolved += tuple(
+        row for plan in handled for row in plan.unresolved_parts
+    )
+    return QuestionPlan(
+        facets=facets,
+        clauses=clauses,
+        unresolved_parts=unresolved,
+        parse_trace=("frame:compound", *trace),
+    )
+
+
+def compile_question_plan(question: str) -> QuestionPlan:
+    q = " ".join(str(question or "").split())[:4000]
+    clauses = split_question_clauses(q)
+    compound = _combine_clause_plans(q, clauses)
+    if compound is not None:
+        return compound
+    atomic = _compile_atomic_question(q)
+    return atomic if atomic is not None else QuestionPlan()
 
 
 __all__ = ["PlannedFacet", "QuestionPlan", "compile_question_plan"]

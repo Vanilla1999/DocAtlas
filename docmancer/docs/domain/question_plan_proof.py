@@ -46,13 +46,36 @@ def relation_proof(
     if relation not in {
         "blocking_gates", "token_bounding", "per_tool_usage", "verification",
         "conditional_behavior", "release_line_limit", "storage_coordination",
-        "conditional_library_removal",
+        "conditional_library_removal", "requirements",
     }:
         return None
     normalized = _norm(text)
     source_text = _norm(" ".join(str((source or {}).get(key) or "") for key in (
         "path", "source", "title", "heading_path", "project_doc_path",
     )))
+
+    if relation == "requirements":
+        subject_present = _has(obligation.subject, text)
+        requirement_shape = bool(re.search(
+            r"\b(?:require(?:s|d)?|required|must|mandatory|need(?:s|ed)?|"
+            r"preflight|canary|exactly|do\s+not|verify|audit|step|steps)\b",
+            normalized,
+        ))
+        # A named procedure requirement should expose more than a bare label.
+        # Multi-step summaries and numbered/bulleted requirement blocks are
+        # accepted, while a single unrelated mention of the subject is not.
+        detail_count = len(re.findall(
+            r"\b(?:require(?:s|d)?|must|mandatory|preflight|canary|exactly|"
+            r"retry|audit|verify|stream|cell|step)\w*\b",
+            normalized,
+        ))
+        list_shape = len(re.findall(r"^\s*(?:[-*+]|\d+[.)])\s+", text, re.M)) >= 2
+        valid = subject_present and requirement_shape and (detail_count >= 2 or list_shape)
+        return PlannedProof(
+            valid, 4 if valid else 0, min(6, detail_count) if valid else 0,
+            "requirements" if valid else "requirements_evidence_missing",
+            3 if valid else 0,
+        )
 
     if relation == "blocking_gates":
         valid = bool(

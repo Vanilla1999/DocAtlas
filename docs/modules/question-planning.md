@@ -6,7 +6,7 @@
 
 ## Responsibility
 
-The question-planning module converts a bounded natural-language project-doc question into explicit clauses and proof facets before retrieval evidence is allowed to authorize an answer. Its implementation boundary is `docmancer/docs/domain/question_plan.py` together with the project-answer contract and technical-term normalization modules in `docmancer/docs/domain/`.
+The question-planning module converts a bounded natural-language project-doc question into explicit clauses and proof facets before retrieval evidence is allowed to authorize an answer. Its implementation boundary is `docmancer/docs/domain/question_plan.py` plus `question_frame_core.py`; the first composes clauses and proof facets while the second owns reusable inventory, requirements, and action frames. The project-answer contract and technical-term normalization modules remain downstream compatibility boundaries in `docmancer/docs/domain/`.
 
 The module must fail closed when it cannot resolve a subject or requested operation. It must not invent generic identities such as `project` or `requested operation` that could later be proven by unrelated text.
 
@@ -21,7 +21,8 @@ Question planning produces the obligations consumed by the evidence-selection mo
 ## Invariants
 
 - unresolved subjects and operations cannot authorize `supported`;
-- compound questions expose every mandatory facet;
+- compound questions expose every mandatory facet and any unparsed clause becomes `unresolved_question_clause`;
+- equivalent surface forms such as `What`/`Which`, standalone/compound inventory, and `Which command`/`How do I` resolve to compatible canonical intents;
 - technical aliases are bounded and kind-aware;
 - frozen v1–v3 contracts remain compatibility inputs until explicitly migrated.
 

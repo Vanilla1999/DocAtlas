@@ -251,7 +251,8 @@
     "tests/test_unified_docs_context_part02.py": "behavioral",
     "tests/test_uspto_tm.py": "behavioral",
     "tests/test_vector_fallback.py": "behavioral",
-    "tests/test_web_fetcher.py": "behavioral"
+    "tests/test_web_fetcher.py": "behavioral",
+    "tests/docs/test_question_frame_paraphrase_e2e.py": "behavioral"
   },
   "module_node_hashes": {
     "tests/docs/test_action_packet.py": "6878993aca63375e986516644fbca97947c56e27112147de7c45a820b585b02f",
@@ -316,7 +317,7 @@
     "tests/docs/test_project_query_intent.py": "0eafbe4965943e7383f0c62a27355463fc62e564d25b1e1c5c9275e44718ce60",
     "tests/docs/test_project_state.py": "6f6c1919aa25dade27a60c10c9438e3ac2c267dafaeefb14db6308226664a7f2",
     "tests/docs/test_python_module_policy_and_manifest.py": "3c283c23fab5cd09d5aded7e39e8c155e06a2eda69c6bdac39e15d682ebe17da",
-    "tests/docs/test_question_plan_v4.py": "27eb0472d47e4fa7841db1c74be742233dc36cbdc250916634230d031ff5e33e",
+    "tests/docs/test_question_plan_v4.py": "fbef7e60161b5da042ed69397454bab206279c75321d2590008b75bad9ebb511",
     "tests/docs/test_retrieval_routing.py": "c0dc0d70e45b7967c280f7d15a74f1e9e36a8a6417fd149d52acc8947f38fcab",
     "tests/docs/test_savings_metrics_explanation.py": "21dfdafbb9fd890959ca1337e66b15e54c32d7a65b8035457b16b0e27209e759",
     "tests/docs/test_section_metadata.py": "1e044193850c9d9cc6112d7e9481b22ca59c6e7b134f69a709f62ec637bdf0a4",
@@ -505,7 +506,8 @@
     "tests/test_unified_docs_context_part02.py": "6927c5e57b51c17b11e55d715b1c4868ba123239f96cb9544dbc4a6659f9ab74",
     "tests/test_uspto_tm.py": "92f3214036e4547c97bfe9c55398e9f137756c3813fd5d0e9f4497a18f3dc2e1",
     "tests/test_vector_fallback.py": "44f6de6da958441969f465a6e9537a6ebce4cb24a12de6a34e04eb8831258513",
-    "tests/test_web_fetcher.py": "83a06465f2bab1e48fc02d9a2b330e9f5795b0ad9c953744c597c1e20cab58c7"
+    "tests/test_web_fetcher.py": "83a06465f2bab1e48fc02d9a2b330e9f5795b0ad9c953744c597c1e20cab58c7",
+    "tests/docs/test_question_frame_paraphrase_e2e.py": "91fa910c5bc5d44d34221819cd5527cdd4e9dd5ba139392e7cc8891112569bda"
   },
   "node_overrides": {
     "tests/docs/test_code_graph.py::test_code_graph_to_context_dict_is_json_serializable": "serialization",
