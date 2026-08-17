@@ -45,7 +45,8 @@ def relation_proof(
     relation = str(obligation.relation or "")
     if relation not in {
         "blocking_gates", "token_bounding", "per_tool_usage", "verification",
-        "conditional_behavior",
+        "conditional_behavior", "release_line_limit", "storage_coordination",
+        "conditional_library_removal",
     }:
         return None
     normalized = _norm(text)
@@ -119,6 +120,53 @@ def relation_proof(
         valid = live_condition and live_evidence and blocking
         return PlannedProof(valid, 4 if valid else 0, 3 if valid else 0, "conditional_behavior" if valid else "conditional_behavior_missing")
 
+    if relation == "release_line_limit":
+        line_limit = bool(re.search(r"\b(?:1,?000|1000)\s+lines?\b", normalized))
+        canonical_set = "canonical user-facing release set" in normalized
+        members = sum(
+            phrase in normalized
+            for phrase in (
+                "readme", "product brief", "docs mcp reference",
+                "capability reference", "release checklist",
+            )
+        )
+        valid = line_limit and canonical_set and members >= 3
+        return PlannedProof(
+            valid,
+            4 if valid else 0,
+            members if valid else 0,
+            "release_line_limit" if valid else "release_line_limit_missing",
+            3 if valid else 0,
+        )
+
+    if relation == "storage_coordination":
+        subject_present = _has(obligation.subject, text)
+        writer_lease = bool(re.search(r"\bwriter\s+lease\b", normalized))
+        cleanup_barrier = bool(re.search(r"\bcleanup\s+barrier\b", normalized))
+        refresh = bool(re.search(r"\b(?:library\s+refresh|project\s+sync|index\s+writer)\b", normalized))
+        blocking = bool(re.search(r"\b(?:fail(?:s)?\s+closed|block(?:s|ed)?|refus(?:e|es))\b", normalized))
+        valid = subject_present and writer_lease and cleanup_barrier and refresh and blocking
+        return PlannedProof(
+            valid,
+            4 if valid else 0,
+            4 if valid else 0,
+            "storage_coordination" if valid else "storage_coordination_missing",
+            3 if valid else 0,
+        )
+
+    if relation == "conditional_library_removal":
+        subject = _has(obligation.subject, text)
+        refresh = bool(re.search(r"\b(?:library\s+refresh|writer\s+lease|active\s+index\s+writer)\b", normalized))
+        refusal = bool(re.search(r"\b(?:refus(?:e|es)|block(?:s|ed)?|fails?\s+closed|does\s+not\s+remove)\b", normalized))
+        valid = subject and refresh and refusal
+        return PlannedProof(
+            valid,
+            4 if valid else 0,
+            3 if valid else 0,
+            "conditional_library_removal" if valid else "conditional_library_removal_missing",
+            3 if valid else 0,
+        )
+
     return None
 
 
@@ -154,7 +202,7 @@ def workflow_proof(
     source: Mapping[str, object] | None = None,
 ) -> PlannedProof | None:
     relation = str(obligation.relation or "")
-    if relation not in {"procedure", "configuration"}:
+    if relation not in {"procedure", "configuration", "protocol_run"}:
         return None
     normalized = _norm(text)
     source_text = _norm(" ".join(str((source or {}).get(key) or "") for key in (
@@ -174,6 +222,24 @@ def workflow_proof(
         )
         valid = subject_present and config_shape and concrete_setting
         return PlannedProof(valid, 4 if valid else 0, 3 if valid else 0, "configuration_workflow" if valid else "configuration_workflow_missing")
+
+    if relation == "protocol_run":
+        command = bool(re.search(
+            r"python\s+(?:(?:-m\s+eval\.)|(?:eval/))?project_answer_quality_v4_protocol(?:\.py)?\b",
+            text,
+            re.I,
+        ))
+        produces_report = "--output" in text
+        validation_only = "--validate-protocol" in text and not produces_report
+        source_matches = all(token in source_text for token in ("project", "answer", "quality", "v4"))
+        valid = command and produces_report and not validation_only and source_matches
+        return PlannedProof(
+            valid,
+            4 if valid else 0,
+            4 if valid else 0,
+            "protocol_run" if valid else "protocol_run_command_missing",
+            3 if valid else 0,
+        )
 
     # Procedure proof requires a named topic plus either an executable/checkable
     # step or a locally bound multi-stage summary.  The latter prevents a

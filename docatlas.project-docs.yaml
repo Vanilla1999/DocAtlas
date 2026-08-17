@@ -80,6 +80,41 @@ documents:
     status: active
     impact: search_only
 
+  - path: docs/modules/question-planning.md
+    role: module_architecture
+    scope: module
+    module_path: docmancer/docs/domain
+    description: Question parsing, explicit facets, technical identities, and fail-closed project-answer planning.
+    authority: source_of_truth
+    status: active
+    impact: track
+
+  - path: docs/modules/evidence-selection.md
+    role: module_architecture
+    scope: module
+    module_path: docmancer/docs/application
+    description: Candidate normalization, proof assignment, deterministic selection, and visible evidence projection.
+    authority: source_of_truth
+    status: active
+    impact: track
+
+  - path: docs/modules/storage-mutation-coordination.md
+    role: module_architecture
+    scope: module
+    module_path: docmancer/docs/infrastructure
+    description: Writer leases, cleanup barriers, mutation locks, and shared-storage race prevention.
+    authority: source_of_truth
+    status: active
+    impact: track
+
+  - path: docs/development/python-module-size-policy.md
+    role: development
+    scope: project
+    description: Python module line budget, responsibility boundaries, façade compatibility, and module documentation policy.
+    authority: source_of_truth
+    status: active
+    impact: track
+
 roots:
   - path: docs
     scope: project

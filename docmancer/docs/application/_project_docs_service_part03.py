@@ -1,0 +1,597 @@
+"""ProjectDocsService implementation shard 3."""
+from __future__ import annotations
+
+from ._project_docs_service_shared import *  # noqa: F401,F403
+
+
+class _ProjectDocsServicePart03:
+    def query_project_docs(
+        self,
+        project_path: str,
+        query: str,
+        *,
+        tokens: int | None = None,
+        limit: int | None = None,
+        expand: str | None = None,
+        source_class: str = "project_file",
+        scope: str | None = None,
+        module_path: str | None = None,
+        evidence_path: str | None = None,
+        requirements: Any | None = None,
+    ):
+        root = validate_project_path(project_path).path
+        answer_lifecycle_intent = str(
+            getattr(requirements, "lifecycle_intent", "") or lifecycle_intent(query)
+        )
+        filters: dict[str, Any] = {
+            "project_path": str(root),
+            "project_identity": self._repository_identity(root),
+            "source_class": source_class,
+            **lifecycle_filters_for_intent(answer_lifecycle_intent),
+        }
+        if scope:
+            filters["doc_scope"] = scope
+        if module_path:
+            filters["module_path"] = module_path
+        if evidence_path:
+            filters["project_doc_path"] = evidence_path
+        agent = self._agent_instance()
+        effective_limit = limit or agent.config.query.default_limit
+        budget = tokens or DEFAULT_DOC_TOKENS
+        effective_expand = (expand or "none") if requirements is not None else expand
+        retrieval = getattr(agent.config, "retrieval", None)
+        mode = str(getattr(retrieval, "default_mode", "lexical") or "lexical").lower()
+
+        mandatory_requirements = tuple(
+            requirement
+            for requirement in requirements or ()
+            if getattr(requirement, "mandatory", False)
+        )
+        probe_queries = tuple(dict.fromkeys(
+            probe
+            for requirement in mandatory_requirements
+            if (probe := requirement_probe_query(requirement))
+        ))[:8]
+        retrieval_hints = tuple(dict.fromkeys(
+            str(value).strip()
+            for value in getattr(requirements, "retrieval_hints", ())
+            if str(value).strip()
+        ))[:4]
+        contract_concepts = tuple(dict.fromkeys(
+            str(value).strip()
+            for value in getattr(requirements, "concept_queries", ())
+            if str(value).strip()
+        ))[:4]
+        supplemental_queries = tuple(dict.fromkeys((
+            *probe_queries,
+            *contract_concepts,
+            *retrieval_hints,
+        )))[:12]
+        supplemental_budget = min(budget, max(128, budget // 4))
+
+        gateway = getattr(self.facade, "agent_gateway", None)
+        if gateway is not None:
+            dispatcher = gateway.dispatcher_for(agent, mode=mode)
+
+            def _run(
+                text: str,
+                *,
+                query_limit: int,
+                query_budget: int,
+                query_expand: str | None,
+                query_filters: dict[str, Any],
+            ):
+                return dispatcher.run(
+                    text,
+                    mode=mode,
+                    limit=query_limit,
+                    budget=query_budget,
+                    expand=query_expand,
+                    filters=query_filters,
+                    requirements=requirements,
+                ).chunks
+
+        else:
+            # Lightweight facades used by embedders retain the legacy agent
+            # contract.  The production service always owns an agent gateway.
+            def _run(
+                text: str,
+                *,
+                query_limit: int,
+                query_budget: int,
+                query_expand: str | None,
+                query_filters: dict[str, Any],
+            ):
+                return agent.query(
+                    text,
+                    limit=query_limit,
+                    budget=query_budget,
+                    expand=query_expand,
+                    filters=query_filters,
+                )
+
+        chunks = _run(
+            query,
+            query_limit=effective_limit,
+            query_budget=budget,
+            query_expand=effective_expand,
+            query_filters=filters,
+        )
+        authoritative_chunks = _run(
+            query,
+            query_limit=max(effective_limit, 20),
+            query_budget=budget,
+            query_expand=effective_expand or "page",
+            query_filters={**filters, "authority": "source_of_truth"},
+        )
+        supplemental_chunks = [
+            chunk
+            for supplemental_query in supplemental_queries
+            for chunk in _run(
+                supplemental_query,
+                query_limit=4,
+                query_budget=supplemental_budget,
+                query_expand="none",
+                query_filters=filters,
+            )
+        ]
+
+        # Compositional QuestionPlan queries need candidate diversity before
+        # proof selection.  Do not let an authority-only lane consume the
+        # entire bounded pool before the original question or obligation probes
+        # can contribute candidates.  Legacy v1-v3 queries retain their frozen
+        # ordering and hashes.
+        if requirements is not None and getattr(requirements, "parse_trace", ()):
+            lanes = [list(chunks), list(supplemental_chunks), list(authoritative_chunks)]
+            candidates = []
+            while any(lanes):
+                for lane in lanes:
+                    if lane:
+                        candidates.append(lane.pop(0))
+        else:
+            candidates = [*supplemental_chunks, *authoritative_chunks, *chunks]
+        if probe_queries:
+            probe_terms = tuple({
+                term.casefold()
+                for probe in probe_queries
+                for term in re.findall(r"[A-Za-zА-Яа-я0-9_.:/+-]{3,}", probe)
+            })
+            candidates.sort(
+                key=lambda chunk: -sum(
+                    term in str(chunk.text or "").casefold()
+                    for term in probe_terms
+                )
+            )
+        selected = []
+        seen: set[tuple[str, int]] = set()
+        token_total = 0
+        for chunk in candidates:
+            if not lifecycle_allows(chunk.metadata or {}, answer_lifecycle_intent):
+                continue
+            key = (chunk.source, chunk.chunk_index)
+            if key in seen:
+                continue
+            if len(selected) >= effective_limit:
+                anchor = selected[0]
+                same_authoritative_source = (
+                    chunk.source == anchor.source
+                    and len(selected) < max(effective_limit, 4)
+                )
+                if not same_authoritative_source:
+                    continue
+            chunk_tokens = int((chunk.metadata or {}).get("token_estimate") or 0)
+            if token_total + chunk_tokens > budget:
+                continue
+            selected.append(chunk)
+            seen.add(key)
+            token_total += chunk_tokens
+        return selected
+
+    def get_project_docs(
+        self,
+        project_path: str,
+        query: str,
+        *,
+        tokens: int | None = None,
+        limit: int | None = None,
+        expand: str | None = None,
+        module: str | None = None,
+        module_path: str | None = None,
+        scope: str | None = None,
+        evidence_path: str | None = None,
+        requirements: Any | None = None,
+    ) -> ProjectDocsResult:
+        root = validate_project_path(project_path).path
+        if hasattr(self.facade, "_project_get_project_docs_impl"):
+            kwargs = {
+                "tokens": tokens, "limit": limit, "expand": expand, "module": module,
+                "module_path": module_path, "scope": scope,
+            }
+            if requirements is not None:
+                kwargs["requirements"] = requirements
+            if evidence_path:
+                kwargs["evidence_path"] = evidence_path
+            return self.facade._project_get_project_docs_impl(str(root), query, **kwargs)
+        if scope and scope not in {"project", "module", "all"}:
+            raise ValueError("scope must be one of: project, module, all")
+        metadata = self.read_project_metadata(str(root))
+        if metadata.docs_catalog_present and not metadata.docs_catalog_valid:
+            next_action = self._invalid_project_docs_catalog_action(root, metadata.warnings)
+            return ProjectDocsResult(
+                project_path=str(root),
+                query=query,
+                status="invalid_project_docs_catalog",
+                reason_code="invalid_project_docs_catalog",
+                next_action=next_action,
+                arguments_patch={"project_path": str(root)},
+                answer_available=False,
+                reason="invalid_project_docs_catalog",
+                warnings=metadata.warnings,
+                next_actions=[next_action],
+                message="docatlas.project-docs.yaml is invalid; fix the catalog before retrieving project documentation.",
+            )
+        candidate_sources = [asdict(item) for item in metadata.docs_candidates]
+        module_summaries = self._module_summaries(candidate_sources)
+        resolved_module_path, module_error = self._resolve_module_filter(module_summaries, module=module, module_path=module_path)
+        if module_error:
+            return ProjectDocsResult(
+                project_path=str(root),
+                query=query,
+                status=module_error["reason_code"],
+                reason_code=module_error["reason_code"],
+                next_action={"type": "inspect_project_docs", "tool": "inspect_project_docs"},
+                arguments_patch={"project_path": str(root)},
+                reason=module_error["reason_code"],
+                answer_available=False,
+                warnings=metadata.warnings,
+                candidate_sources=candidate_sources,
+                source_state_guidance=self._source_state_guidance(),
+                next_actions=[{
+                    "tool": "inspect_project_docs",
+                    "requires_confirmation": False,
+                    "arguments_patch": {"project_path": str(root)},
+                    "reason": "Inspect available modules, then retry with an exact module_path.",
+                }],
+                message=module_error["message"],
+            )
+        query_scope = scope if scope != "all" else None
+        if resolved_module_path:
+            query_scope = "module"
+        indexed_sources_all = self._indexed_project_doc_sources(str(root))
+        indexed_sources, stale_sources, ignored_sources = self._partition_project_doc_state(candidate_sources, indexed_sources_all)
+        if evidence_path:
+            requested_path = normalize_doc_path(evidence_path)
+            exact_paths = {
+                str(item.get("path"))
+                for item in indexed_sources
+                if normalize_doc_path(item.get("path")) == requested_path
+            }
+            matching_paths = exact_paths or {
+                str(item.get("path"))
+                for item in indexed_sources
+                if Path(normalize_doc_path(item.get("path"))).name == Path(requested_path).name
+            }
+            if len(matching_paths) != 1:
+                reason_code = (
+                    "ambiguous_document_locator" if matching_paths else "document_not_indexed"
+                )
+                return ProjectDocsResult(
+                    project_path=str(root), query=query, status=reason_code,
+                    reason_code=reason_code, answer_available=False,
+                    reason=reason_code, warnings=metadata.warnings,
+                    candidate_sources=candidate_sources,
+                    indexed_sources=indexed_sources,
+                    source_state_guidance=self._source_state_guidance(),
+                    message=(
+                        f"Document locator {evidence_path!r} matches multiple indexed project documents."
+                        if matching_paths else
+                        f"Document locator {evidence_path!r} is not indexed for this project."
+                    ),
+                )
+            evidence_path = next(iter(matching_paths))
+        if query_scope:
+            candidate_sources = [item for item in candidate_sources if item.get("doc_scope") == query_scope]
+            indexed_sources = [item for item in indexed_sources if item.get("doc_scope") == query_scope]
+            stale_sources = [item for item in stale_sources if (item.get("candidate") or item).get("doc_scope") == query_scope]
+            ignored_sources = [item for item in ignored_sources if item.get("doc_scope") == query_scope]
+        if resolved_module_path:
+            candidate_sources = [item for item in candidate_sources if item.get("module_path") == resolved_module_path]
+            indexed_sources = [item for item in indexed_sources if item.get("module_path") == resolved_module_path]
+            stale_sources = [item for item in stale_sources if (item.get("candidate") or item).get("module_path") == resolved_module_path]
+            ignored_sources = [item for item in ignored_sources if item.get("module_path") == resolved_module_path]
+            if not candidate_sources:
+                return ProjectDocsResult(
+                    project_path=str(root),
+                    query=query,
+                    status="no_module_docs",
+                    reason_code="no_module_docs",
+                    next_action={"type": "inspect_project_docs", "tool": "inspect_project_docs"},
+                    arguments_patch={"project_path": str(root)},
+                    reason="no_module_docs",
+                    answer_available=False,
+                    warnings=metadata.warnings,
+                    candidate_sources=[asdict(item) for item in metadata.docs_candidates],
+                    source_state_guidance=self._source_state_guidance(),
+                    message=f"Module {resolved_module_path!r} exists, but no module docs were discovered for this scope.",
+                )
+
+        preflight_inspect: ProjectDocsInspectResult | None = None
+        if not indexed_sources_all or stale_sources or ignored_sources:
+            inspect_result = self.inspect_project_docs(str(root))
+            if inspect_result.requires_confirmation and inspect_result.confirmation_reason == "project_docs_preflight":
+                preflight_inspect = inspect_result
+
+        def _confirmation_required_result(*, status: str, reason: str) -> ProjectDocsResult:
+            assert preflight_inspect is not None
+            return ProjectDocsResult(
+                project_path=str(root),
+                query=query,
+                resolved_evidence_path=evidence_path,
+                status=status,
+                reason_code=preflight_inspect.reason_code,
+                next_action=preflight_inspect.next_action,
+                requires_confirmation=True,
+                confirmation_reason=preflight_inspect.confirmation_reason,
+                arguments_patch=preflight_inspect.arguments_patch,
+                reason=reason,
+                answer_available=False,
+                warnings=metadata.warnings,
+                candidate_sources=candidate_sources,
+                indexed_sources=indexed_sources,
+                stale_sources=stale_sources,
+                ignored_sources=ignored_sources,
+                source_state_guidance=self._source_state_guidance(),
+                diagnostics=preflight_inspect.diagnostics,
+                next_actions=preflight_inspect.recommended_next_actions,
+                message=preflight_inspect.user_message or preflight_inspect.agent_message,
+            )
+
+        if not candidate_sources:
+            if preflight_inspect:
+                return _confirmation_required_result(
+                    status="confirmation_required",
+                    reason="project_docs_preflight_confirmation_required",
+                )
+            next_action, requires_confirmation, confirmation_reason, arguments_patch, _, user_message = self._project_docs_structured_next_action(
+                reason_code="no_project_docs",
+                root=root,
+                query=query,
+            )
+            return ProjectDocsResult(
+                project_path=str(root),
+                query=query,
+                status="no_project_docs",
+                reason_code="no_project_docs",
+                next_action=next_action,
+                requires_confirmation=requires_confirmation,
+                confirmation_reason=confirmation_reason,
+                arguments_patch=arguments_patch,
+                reason="no_project_docs",
+                answer_available=False,
+                warnings=metadata.warnings,
+                next_actions=[{
+                    **self._create_project_docs_next_action(root, query),
+                    "reason": "No project-owned docs candidates were discovered for this repository. Create a reviewable architecture doc before indexing.",
+                }],
+                message=user_message or "No project-owned docs were found. Ask before creating a reviewable ARCHITECTURE.md, then run inspect_project_docs and sync_project_docs.",
+            )
+
+        if not indexed_sources_all:
+            if preflight_inspect:
+                return _confirmation_required_result(
+                    status="confirmation_required",
+                    reason="project_docs_preflight_confirmation_required",
+                )
+            next_action, requires_confirmation, confirmation_reason, arguments_patch, _, _ = self._project_docs_structured_next_action(
+                reason_code="project_docs_found_not_indexed",
+                root=root,
+                query=query,
+            )
+            return ProjectDocsResult(
+                project_path=str(root),
+                query=query,
+                status="not_indexed",
+                reason_code="project_docs_found_not_indexed",
+                next_action=next_action,
+                requires_confirmation=requires_confirmation,
+                confirmation_reason=confirmation_reason,
+                arguments_patch=arguments_patch,
+                reason="project_docs_not_indexed",
+                answer_available=False,
+                warnings=metadata.warnings,
+                candidate_sources=candidate_sources,
+                next_actions=[{
+                    "tool": "sync_project_docs",
+                    "requires_confirmation": False,
+                    "arguments_patch": self._project_sync_arguments(root),
+                    "reason": "Project docs candidates were discovered but have not been indexed; reconcile the index.",
+                }],
+                message="Project docs candidates exist but are not indexed. Run sync_project_docs, then retry get_project_docs.",
+            )
+
+        chunks = self.query_project_docs(
+            str(root), query, tokens=tokens, limit=limit, expand=expand,
+            scope=query_scope, module_path=resolved_module_path, evidence_path=evidence_path,
+            requirements=requirements,
+        )
+        current_by_path = {
+            item.get("path"): item
+            for item in indexed_sources
+            if item.get("path")
+        }
+        safe_chunks = []
+        dropped_placeholder_chunks = 0
+        answer_lifecycle_intent = str(
+            getattr(requirements, "lifecycle_intent", "") or lifecycle_intent(query)
+        )
+        for chunk in chunks:
+            metadata_for_chunk = chunk.metadata or {}
+            chunk_path = metadata_for_chunk.get("project_doc_path") or metadata_for_chunk.get("source_path")
+            current_source = current_by_path.get(chunk_path)
+            if not current_source:
+                continue
+            if metadata_for_chunk.get("project_doc_content_hash") != current_source.get("content_hash"):
+                continue
+            if not lifecycle_allows(metadata_for_chunk, answer_lifecycle_intent):
+                continue
+            if self._looks_like_placeholder_search_result(chunk_path, chunk.text):
+                dropped_placeholder_chunks += 1
+                continue
+            safe_chunks.append(chunk)
+        chunks = safe_chunks
+        seen_sources: set[str] = set()
+        result_indexed_sources = []
+        for chunk in chunks:
+            source = chunk.source
+            if source in seen_sources:
+                continue
+            seen_sources.add(source)
+            result_indexed_sources.append({
+                "source": source,
+                "path": (chunk.metadata or {}).get("project_doc_path"),
+                "source_class": (chunk.metadata or {}).get("source_class"),
+                "content_hash": (chunk.metadata or {}).get("project_doc_content_hash"),
+                "mtime_ns": (chunk.metadata or {}).get("project_doc_mtime_ns"),
+                "doc_scope": (chunk.metadata or {}).get("doc_scope") or "project",
+                "module_id": (chunk.metadata or {}).get("module_id"),
+                "module_name": (chunk.metadata or {}).get("module_name"),
+                "module_path": (chunk.metadata or {}).get("module_path"),
+                "module_type": (chunk.metadata or {}).get("module_type"),
+                "description": (chunk.metadata or {}).get("project_doc_description"),
+                "authority": (chunk.metadata or {}).get("project_doc_authority"),
+                "lifecycle_status": (chunk.metadata or {}).get("project_doc_lifecycle_status"),
+                "impact_policy": (chunk.metadata or {}).get("project_doc_impact_policy"),
+            })
+        stale_paths = {item.get("path") for item in stale_sources}
+        results = [
+            ProjectDocsChunk(
+                title=(chunk.metadata or {}).get("title"),
+                content=chunk.text,
+                source=chunk.source,
+                url=None,
+                metadata=chunk.metadata or {},
+                stable_chunk_id=(chunk.metadata or {}).get("stable_chunk_id"),
+                parent_logical_id=(chunk.metadata or {}).get("parent_logical_id"),
+                display_content_hash=hashlib.sha256(chunk.text.encode("utf-8")).hexdigest(),
+                char_start=((chunk.metadata or {}).get("char_span") or [None, None])[0],
+                char_end=((chunk.metadata or {}).get("char_span") or [None, None])[1],
+                line_start=((chunk.metadata or {}).get("line_span") or [None, None])[0],
+                line_end=((chunk.metadata or {}).get("line_span") or [None, None])[1],
+                source_class=(chunk.metadata or {}).get("source_class"),
+                path=(chunk.metadata or {}).get("project_doc_path") or (chunk.metadata or {}).get("source_path"),
+                heading_path=(chunk.metadata or {}).get("anchor") or (chunk.metadata or {}).get("title"),
+                content_hash=(chunk.metadata or {}).get("project_doc_content_hash"),
+                mtime_ns=(chunk.metadata or {}).get("project_doc_mtime_ns"),
+                stale=((chunk.metadata or {}).get("project_doc_path") in stale_paths),
+                doc_scope=(chunk.metadata or {}).get("doc_scope") or "project",
+                module_id=(chunk.metadata or {}).get("module_id"),
+                module_name=(chunk.metadata or {}).get("module_name"),
+                module_path=(chunk.metadata or {}).get("module_path"),
+                module_type=(chunk.metadata or {}).get("module_type"),
+                description=(chunk.metadata or {}).get("project_doc_description"),
+                authority=(chunk.metadata or {}).get("project_doc_authority"),
+                lifecycle_status=(chunk.metadata or {}).get("project_doc_lifecycle_status"),
+                impact_policy=(chunk.metadata or {}).get("project_doc_impact_policy"),
+            )
+            for chunk in chunks
+        ]
+        next_actions: list[dict[str, Any]] = []
+        next_action: dict[str, Any] = {}
+        requires_confirmation = False
+        confirmation_reason = None
+        arguments_patch: dict[str, Any] = {}
+        preflight_diagnostics: dict[str, Any] = {}
+        if dropped_placeholder_chunks:
+            preflight_diagnostics["dropped_placeholder_project_docs"] = dropped_placeholder_chunks
+        if preflight_inspect:
+            next_action = preflight_inspect.next_action
+            requires_confirmation = True
+            confirmation_reason = preflight_inspect.confirmation_reason
+            arguments_patch = preflight_inspect.arguments_patch
+            next_actions.extend(preflight_inspect.recommended_next_actions)
+            preflight_diagnostics = preflight_inspect.diagnostics
+        elif stale_sources:
+            next_action, requires_confirmation, confirmation_reason, arguments_patch, _, _ = self._project_docs_structured_next_action(
+                reason_code="project_docs_stale",
+                root=root,
+                query=query,
+            )
+            next_actions.append({
+                "tool": "sync_project_docs",
+                "requires_confirmation": False,
+                "arguments_patch": self._project_sync_arguments(root),
+                "reason": "Some indexed project docs are stale; reconcile before relying on repo-specific answers.",
+            })
+        if results:
+            status = "stale" if stale_sources else ("confirmation_required" if preflight_inspect else "success")
+            reason_code = preflight_inspect.reason_code if preflight_inspect else ("project_docs_stale" if stale_sources else "project_docs_ready")
+            reason = "project_docs_stale" if stale_sources else ("project_docs_preflight_confirmation_required" if preflight_inspect else None)
+            return ProjectDocsResult(
+                project_path=str(root),
+                query=query,
+                status=status,
+                reason_code=reason_code,
+                next_action=next_action,
+                requires_confirmation=requires_confirmation,
+                confirmation_reason=confirmation_reason,
+                arguments_patch=arguments_patch,
+                reason=reason,
+                answer_available=True,
+                results=results,
+                warnings=metadata.warnings,
+                candidate_sources=candidate_sources,
+                indexed_sources=result_indexed_sources or indexed_sources,
+                stale_sources=stale_sources,
+                ignored_sources=ignored_sources,
+                source_state_guidance=self._source_state_guidance(),
+                diagnostics=preflight_diagnostics,
+                next_actions=next_actions,
+                message=f"Returned {len(results)} project docs result(s)." + (" Project docs preflight requires confirmation before sync/reconcile." if preflight_inspect else (" Some indexed project docs are stale." if stale_sources else "")),
+            )
+        if preflight_inspect:
+            return _confirmation_required_result(
+                status="stale" if stale_sources else "confirmation_required",
+                reason="project_docs_stale" if stale_sources else "project_docs_preflight_confirmation_required",
+            )
+        reason_code = "project_docs_stale" if stale_sources else "no_project_docs_results"
+        if stale_sources:
+            next_action, requires_confirmation, confirmation_reason, arguments_patch, _, _ = self._project_docs_structured_next_action(
+                reason_code="project_docs_stale",
+                root=root,
+                query=query,
+            )
+        else:
+            next_action = {"type": "inspect_project_docs", "tool": "inspect_project_docs"}
+            requires_confirmation = False
+            confirmation_reason = None
+            arguments_patch = {"project_path": str(root)}
+        return ProjectDocsResult(
+            project_path=str(root),
+            query=query,
+            resolved_evidence_path=evidence_path,
+            status="stale" if stale_sources else "no_results",
+            reason_code=reason_code,
+            next_action=next_action,
+            requires_confirmation=requires_confirmation,
+            confirmation_reason=confirmation_reason,
+            arguments_patch=arguments_patch,
+            reason="project_docs_stale" if stale_sources else "no_project_docs_results",
+            answer_available=False,
+            warnings=metadata.warnings,
+            candidate_sources=candidate_sources,
+            indexed_sources=indexed_sources,
+            stale_sources=stale_sources,
+            ignored_sources=ignored_sources,
+            source_state_guidance=self._source_state_guidance(),
+            next_actions=[{
+                "tool": "sync_project_docs" if stale_sources else "inspect_project_docs",
+                "requires_confirmation": False,
+                "arguments_patch": (
+                    self._project_sync_arguments(root)
+                    if stale_sources
+                    else {"project_path": str(root)}
+                ),
+                "reason": "Project docs are stale; sync and retry." if stale_sources else "Project docs are indexed, but no indexed project docs matched this query. Inspect candidates or refine the query.",
+            }],
+            message="Indexed project docs exist, but no results matched this query." + (" Some indexed docs are stale." if stale_sources else ""),
+        )

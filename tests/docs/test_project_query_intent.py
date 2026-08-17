@@ -58,3 +58,23 @@ def test_package_with_docs_mcp_is_docs_mcp_not_disambiguation():
     assert intent.name == "docs_mcp"
     assert intent.wants_docs_mcp is True
     assert intent.wants_packs_mcp is False
+
+
+def test_documentation_files_do_not_imply_code_symbol_evidence():
+    intent = classify_project_query_intent(
+        "Which docs files must stay under the 1000-line release limit?"
+    )
+    assert intent.name == "release_history"
+    assert intent.wants_code_symbols is False
+
+
+@pytest.mark.parametrize(
+    "question",
+    [
+        "Which source files implement the MCP server?",
+        "Where is the MCP server implemented?",
+        "Which implementation file defines ProjectContextService?",
+    ],
+)
+def test_explicit_source_identity_questions_require_code_symbol_evidence(question):
+    assert classify_project_query_intent(question).wants_code_symbols is True

@@ -70,6 +70,34 @@ def _technical(
     return value, None, ()
 
 
+def _docs_mcp_server_command(q: str) -> QuestionPlan | None:
+    match = re.match(
+        r"^\s*(?:which|what)\s+command\s+(?:starts?|runs?|launches?|serves?)\s+"
+        r"(?:the\s+)?docs\s+mcp\s+server\b.*",
+        q,
+        re.I,
+    )
+    if match is None:
+        return None
+    subject, kind, aliases = _technical("docs-serve", "cli_command")
+    return QuestionPlan(
+        facets=(PlannedFacet(
+            kind="command",
+            subject=subject,
+            relation="invocation",
+            value_kind="call_expression",
+            expected_value="docs-serve",
+            response_mode="call",
+            context="Docs MCP server",
+            subject_kind=kind,
+            subject_aliases=aliases,
+            span_text=match.group(0),
+        ),),
+        clauses=(q,),
+        parse_trace=("command:docs_mcp_server",),
+    )
+
+
 def _command_sync(q: str) -> QuestionPlan | None:
     match = re.match(
         r"^\s*(?:which|what)\s+command\s+"
@@ -93,6 +121,120 @@ def _command_sync(q: str) -> QuestionPlan | None:
         ),),
         clauses=(q,),
         parse_trace=("command:sync_project_docs",),
+    )
+
+
+def _offline_suite_run(q: str) -> QuestionPlan | None:
+    match = re.match(
+        r"^\s*how\s+do\s+i\s+run\s+the\s+offline(?:\s+test)?\s+suite"
+        r"(?:\s+for\s+(.+?))?\?*$",
+        q,
+        re.I,
+    )
+    if match is None:
+        return None
+    return QuestionPlan(
+        facets=(PlannedFacet(
+            "workflow",
+            "offline suite",
+            relation="procedure",
+            context=_clean(match.group(1) or "DocAtlas"),
+            response_mode="workflow",
+            span_text=match.group(0),
+        ),),
+        clauses=(q,),
+        parse_trace=("workflow:offline_suite",),
+    )
+
+
+def _two_cell_cardinality(q: str) -> QuestionPlan | None:
+    match = re.match(
+        r"^\s*how\s+does\s+(?:the\s+)?(two[- ]cell\s+smoke\s+procedure)\s+"
+        r"(?:verify|audit|check)\s+(provider[- ]call\s+cardinality)\b.*",
+        q,
+        re.I,
+    )
+    if match is None:
+        return None
+    return QuestionPlan(
+        facets=(PlannedFacet(
+            "relation",
+            _clean(match.group(1)),
+            relation="verification",
+            context=_clean(match.group(2)),
+            span_text=match.group(0),
+        ),),
+        clauses=(q,),
+        parse_trace=("verification:two_cell_provider_cardinality",),
+    )
+
+
+def _release_docs_line_limit(q: str) -> QuestionPlan | None:
+    match = re.match(
+        r"^\s*which\s+(?:docs|documentation)\s+files\s+must\s+stay\s+under\s+"
+        r"(?:the\s+)?(?:1,?000|1000)[- ]line\s+release\s+limit\b.*",
+        q,
+        re.I,
+    )
+    if match is None:
+        return None
+    return QuestionPlan(
+        facets=(PlannedFacet(
+            "relation",
+            "canonical user-facing release set",
+            relation="release_line_limit",
+            context="1000-line release limit",
+            span_text=match.group(0),
+        ),),
+        clauses=(q,),
+        parse_trace=("relation:release_line_limit",),
+    )
+
+
+def _storage_coordination_contract(q: str) -> QuestionPlan | None:
+    match = re.match(
+        r"^\s*what\s+is\s+the\s+storage\s+mutation\s+coordination\s+contract\s+"
+        r"for\s+cleanup\s+and\s+refresh\b.*",
+        q,
+        re.I,
+    )
+    if match is None:
+        return None
+    return QuestionPlan(
+        facets=(PlannedFacet(
+            "relation",
+            "storage mutation coordination",
+            relation="storage_coordination",
+            context="cleanup and refresh",
+            span_text=match.group(0),
+        ),),
+        clauses=(q,),
+        parse_trace=("relation:storage_coordination",),
+    )
+
+
+def _remove_library_during_refresh(q: str) -> QuestionPlan | None:
+    match = re.match(
+        r"^\s*what\s+happens\s+if\s+(remove_library_docs)\s+runs\s+while\s+"
+        r"(?:a\s+)?library\s+refresh\s+is\s+in\s+flight\b.*",
+        q,
+        re.I,
+    )
+    if match is None:
+        return None
+    subject, kind, aliases = _technical(match.group(1), "code_symbol")
+    return QuestionPlan(
+        facets=(PlannedFacet(
+            "relation",
+            subject,
+            relation="conditional_library_removal",
+            context="library refresh in flight",
+            subject_kind=kind,
+            subject_aliases=aliases,
+            span_text=match.group(0),
+        ),),
+        clauses=(q,),
+        parse_trace=("relation:conditional_library_removal",),
     )
 
 
@@ -241,6 +383,28 @@ def _contamination_definition(q: str) -> QuestionPlan | None:
     )
 
 
+def _v4_protocol_run(q: str) -> QuestionPlan | None:
+    match = re.match(
+        r"^\s*how\s+do\s+i\s+run\s+the\s+project\s+answer\s+quality\s+v4\s+protocol\b.*",
+        q,
+        re.I,
+    )
+    if match is None:
+        return None
+    return QuestionPlan(
+        facets=(PlannedFacet(
+            "workflow",
+            "project answer quality v4 protocol",
+            relation="protocol_run",
+            context="v4",
+            response_mode="workflow",
+            span_text=match.group(0),
+        ),),
+        clauses=(q,),
+        parse_trace=("workflow:v4_protocol_run",),
+    )
+
+
 def _named_run_or_verify(q: str) -> QuestionPlan | None:
     match = re.match(r"^\s*how\s+do\s+i\s+(run|verify)\s+(.+?)\?*$", q, re.I)
     if match is None:
@@ -325,7 +489,13 @@ def _test_markers_and_offline_suite(q: str) -> QuestionPlan | None:
 
 
 _RULES: tuple[Rule, ...] = (
+    _docs_mcp_server_command,
     _command_sync,
+    _offline_suite_run,
+    _two_cell_cardinality,
+    _release_docs_line_limit,
+    _storage_coordination_contract,
+    _remove_library_during_refresh,
     _source_type_inventory,
     _release_checklist_compound,
     _token_bounding_compound,
@@ -334,6 +504,7 @@ _RULES: tuple[Rule, ...] = (
     _conditional_clear_index,
     _configuration_workflow,
     _contamination_definition,
+    _v4_protocol_run,
     _named_run_or_verify,
     _named_behavior,
     _two_cell_smoke,

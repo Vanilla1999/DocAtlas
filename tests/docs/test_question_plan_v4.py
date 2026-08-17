@@ -31,8 +31,15 @@ def _unit(text: str) -> AnswerUnit:
 def test_question_plan_compiles_previously_unrepresentable_queries_without_generic_subjects():
     cases = {
         "Which command syncs project docs after file changes?": [("command", "sync_project_docs", "invocation")],
+        "Which command starts the Docs MCP server?": [("command", "docs-serve", "invocation")],
+        "Which docs files must stay under the 1000-line release limit?": [("relation", "canonical user-facing release set", "release_line_limit")],
         "What source types are supported for indexing?": [("inventory", "source types", None)],
         "How do I configure a project in docmancer.yaml?": [("workflow", "docmancer.yaml", "configuration")],
+        "How do I run the offline test suite for DocAtlas?": [("workflow", "offline suite", "procedure")],
+        "How do I run the project answer quality v4 protocol?": [("workflow", "project answer quality v4 protocol", "protocol_run")],
+        "How does the two-cell smoke procedure verify provider-call cardinality?": [("relation", "two-cell smoke procedure", "verification")],
+        "What is the storage mutation coordination contract for cleanup and refresh?": [("relation", "storage mutation coordination", "storage_coordination")],
+        "What happens if remove_library_docs runs while a library refresh is in flight?": [("relation", "remove_library_docs", "conditional_library_removal")],
         "How does evidence selection choose which candidates are selected?": [("behavior", "evidence selection", "selection_policy")],
         "How does indexing split documents into sections and chunks?": [("behavior", "indexing", "chunking")],
         "What does clear-index do when a live process holds the index?": [("relation", "clear-index", "conditional_behavior")],
@@ -147,3 +154,79 @@ def test_named_multistep_procedure_summary_outranks_single_command_shape():
     assert summary_proof.valid is True
     assert command_proof.valid is True
     assert summary_proof.completeness_score > command_proof.completeness_score
+
+
+def test_new_probing_paraphrases_have_locally_provable_units():
+    _contract, rows = _rows("Which command starts the Docs MCP server?")
+    assert local_proof_for_obligation(
+        rows[0], _unit("Start the local stdio server with `doc-atlas mcp docs-serve`.")
+    ).valid is True
+
+    _contract, rows = _rows("How do I run the offline test suite for DocAtlas?")
+    assert local_proof_for_obligation(
+        rows[0],
+        _unit(
+            'Run the fail-closed offline suite with `DOCMANCER_OFFLINE=1 pytest tests/ '
+            '-m "not advanced and not live and not live_network"`.'
+        ),
+        source={"title": "Test tiers and markers", "path": "docs/testing.md"},
+    ).valid is True
+
+    _contract, rows = _rows(
+        "How does the two-cell smoke procedure verify provider-call cardinality?"
+    )
+    assert local_proof_for_obligation(
+        rows[0],
+        _unit(
+            "The two-cell smoke procedure audits exactly three provider event streams "
+            "before reporting metrics and then verifies the harness."
+        ),
+    ).valid is True
+
+    _contract, rows = _rows(
+        "Which docs files must stay under the 1000-line release limit?"
+    )
+    assert local_proof_for_obligation(
+        rows[0],
+        _unit(
+            "The canonical user-facing release set (`README.md`, product brief, Docs MCP "
+            "reference, capability reference, release checklist) is at most 1,000 lines."
+        ),
+    ).valid is True
+
+    _contract, rows = _rows(
+        "What is the storage mutation coordination contract for cleanup and refresh?"
+    )
+    assert local_proof_for_obligation(
+        rows[0],
+        _unit(
+            "Storage mutation coordination is fail-closed: a project sync or library refresh "
+            "registers a writer lease; clear-index takes the cleanup barrier and refuses "
+            "cleanup while an index writer is active."
+        ),
+    ).valid is True
+
+    _contract, rows = _rows(
+        "What happens if remove_library_docs runs while a library refresh is in flight?"
+    )
+    assert local_proof_for_obligation(
+        rows[0],
+        _unit(
+            "`remove_library_docs` refuses removal while a writer lease for the shared "
+            "storage is active during a library refresh."
+        ),
+    ).valid is True
+
+    _contract, rows = _rows("How do I run the project answer quality v4 protocol?")
+    validation_only = _unit(
+        "python eval/project_answer_quality_v4_protocol.py --validate-protocol"
+    )
+    full_run = _unit(
+        "python eval/project_answer_quality_v4_protocol.py --output /tmp/project-answer-quality-v4.json"
+    )
+    source = {
+        "title": "Project answer quality protocol v4",
+        "path": "eval/project_answer_quality_v4/README.md",
+    }
+    assert local_proof_for_obligation(rows[0], validation_only, source=source).valid is False
+    assert local_proof_for_obligation(rows[0], full_run, source=source).valid is True

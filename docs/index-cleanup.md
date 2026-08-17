@@ -99,6 +99,12 @@ caches.
   will remain; it never bypasses live-process blockers or authorizes unverified
   or remote deletion.
 
+### Coordination with index writers
+
+Storage mutation coordination is fail-closed: a project sync or library refresh registers a writer lease, while `clear-index` takes the cleanup barrier and refuses cleanup while any live writer lease exists.
+
+The short per-database mutation lock is used only around publication/removal, so independent fetch/staging work is not serialized for its full duration. `remove_library_docs` refuses removal while a library-refresh writer lease is active; after the barrier is clear it takes the per-index mutation lock before deleting SQLite/extracted state. Writer leases from dead processes are cleaned during the barrier check; an unreadable lease remains a blocker rather than being ignored.
+
 For an MCP client, the same operation remains available through the existing
 three-tool surface:
 

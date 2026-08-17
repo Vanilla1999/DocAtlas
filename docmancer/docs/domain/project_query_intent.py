@@ -55,7 +55,23 @@ def classify_project_query_intent(question: str) -> ProjectQueryIntent:
     wants_release = has_any(["changelog", "release", "released", "changed", "added", "removed", "breaking", "migration", "version history", "what changed", "recently changed"])
     explicit_release = has_any(["changelog", "release", "version history", "what changed", "recently changed"])
     wants_troubleshooting = has_any(["error", "bug", "fail", "failed", "why doesn't", "why does not", "not working", "stale", "missing", "diagnose", "doctor", "fix", "troubleshoot"])
-    wants_code_symbols = has_any(["class", "classes", "function", "functions", "method", "methods", "file", "files", "module", "implementation", "implements", "where is implemented", "key files", "responsibilities"])
+    # Code-symbol routing must be explicit.  Treating every occurrence of
+    # ``file``/``files`` as source-navigation intent makes ordinary
+    # documentation questions (for example "Which docs files must stay under
+    # the release line limit?") require implementation evidence and therefore
+    # fail closed even when a canonical documentation answer is already
+    # selected.  Keep file-based routing only for phrases that actually ask
+    # about source/implementation identity.
+    wants_code_symbols = has_any([
+        "class", "classes", "function", "functions", "method", "methods",
+        "module", "implementation", "implements", "implemented", "defined",
+        "responsibilities",
+    ]) or _contains_phrase(q, [
+        "source file", "source files", "code file", "code files",
+        "implementation file", "implementation files", "key file", "key files",
+        "where is implemented", "where is defined", "implemented in", "defined in",
+        "file path", "source path",
+    ])
     wants_docs_mcp = has_any(["docs mcp", "documentation mcp", "mcp docs", "docs serve", "docs serve", "get project context", "get project docs", "get library docs", "resolve library id", "context7"])
     wants_packs_mcp = _contains_phrase(q, PACKS_MCP_PHRASES) or _contains_phrase(q_raw, PACKS_MCP_PHRASES)
     wants_packs_mcp = wants_packs_mcp or ("mcp" in q and _contains_word(q, ["packs"]))
