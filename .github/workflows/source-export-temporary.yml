@@ -1,0 +1,27 @@
+name: Source Export Temporary
+
+on:
+  push:
+    branches:
+      - fix/project-docs-final-closure
+
+permissions:
+  contents: read
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 1
+      - name: Build source archive
+        run: tar --exclude=.git -czf docatlas-source-8903f631.tar.gz .
+      - uses: actions/upload-artifact@v4
+        with:
+          name: docatlas-source-8903f631
+          path: docatlas-source-8903f631.tar.gz
+          if-no-files-found: error
