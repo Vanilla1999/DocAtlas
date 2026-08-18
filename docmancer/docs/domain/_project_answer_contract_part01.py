@@ -255,8 +255,23 @@ def _obligation(
     subject_aliases: tuple[str, ...] = (), context: str | None = None,
     lifecycle_intent: LifecycleIntent,
     span_value: str | None = None,
+    query_span_start: int | None = None,
+    query_span_end: int | None = None,
 ) -> ProofObligation:
-    start, end, raw = _span(question, span_value or subject)
+    explicit_span = query_span_start is not None or query_span_end is not None
+    if explicit_span:
+        if (
+            query_span_start is None
+            or query_span_end is None
+            or query_span_start < 0
+            or query_span_end <= query_span_start
+            or query_span_end > len(question)
+        ):
+            raise ValueError("invalid explicit project answer query span")
+        start, end = query_span_start, query_span_end
+        raw = question[start:end]
+    else:
+        start, end, raw = _span(question, span_value or subject)
     identity_payload: dict[str, Any] = {
         "kind": kind, "subject": _normal(subject), "attribute": attribute,
         "relation": relation, "target": _normal(target or ""), "value_kind": value_kind,
@@ -477,6 +492,8 @@ def _contract_from_question_plan(
             context=facet.context,
             lifecycle_intent=lifecycle,
             span_value=facet.span_text or facet.subject,
+            query_span_start=facet.query_span_start,
+            query_span_end=facet.query_span_end,
         ))
     hints = _retrieval_hints(question, subjects, tuple(technical_terms))
     concepts = _concept_queries(question, hints, obligations)

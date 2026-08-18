@@ -8,16 +8,20 @@ another rule's order inside one long conditional chain.
 """
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 import re
 from typing import Callable, Literal
 
 from docmancer.docs.domain.question_frame_core import (
+    QuestionClause,
     ambiguous_frame_reason,
+    clean_phrase,
     match_action_frame,
     match_inventory_frame,
     match_requirements_frame,
-    split_question_clauses,
+    semantic_tail_is_safe,
+    split_question_clause_spans,
+    strip_request_wrapper,
 )
 from docmancer.docs.domain.technical_terms import TechnicalTermKind, coerce_technical_term
 
@@ -42,6 +46,18 @@ class PlannedFacet:
     subject_kind: TechnicalTermKind | None = None
     subject_aliases: tuple[str, ...] = ()
     span_text: str | None = None
+    query_span_start: int | None = None
+    query_span_end: int | None = None
+
+    def __post_init__(self) -> None:
+        if (self.query_span_start is None) != (self.query_span_end is None):
+            raise ValueError("planned facet query span must be complete")
+        if (
+            self.query_span_start is not None
+            and self.query_span_end is not None
+            and (self.query_span_start < 0 or self.query_span_end <= self.query_span_start)
+        ):
+            raise ValueError("planned facet query span is invalid")
 
 
 @dataclass(frozen=True, slots=True)
@@ -50,6 +66,12 @@ class QuestionPlan:
     clauses: tuple[str, ...] = ()
     unresolved_parts: tuple[str, ...] = ()
     parse_trace: tuple[str, ...] = ()
+    consumed_spans: tuple[tuple[int, int], ...] = ()
+
+    def __post_init__(self) -> None:
+        for start, end in self.consumed_spans:
+            if start < 0 or end <= start:
+                raise ValueError("question plan consumed span is invalid")
 
     @property
     def handled(self) -> bool:
@@ -77,10 +99,82 @@ def _technical(
     return value, None, ()
 
 
+def _normalized_clause(
+    clause: QuestionClause,
+    *,
+    compound: bool = False,
+) -> str:
+    value = " ".join(clause.text.split())
+    value = strip_request_wrapper(value)
+    return clean_phrase(value) if compound else value
+
+
+def _span_pattern(value: str) -> re.Pattern[str] | None:
+    tokens = str(value or "").split()
+    if not tokens:
+        return None
+    return re.compile(r"\s+".join(re.escape(token) for token in tokens), re.I)
+
+
+def _bind_plan_to_clause(plan: QuestionPlan, clause: QuestionClause) -> QuestionPlan:
+    """Attach exact source offsets without changing the canonical facet identity."""
+
+    facets: list[PlannedFacet] = []
+    cursor = 0
+    for facet in plan.facets:
+        pattern = _span_pattern(facet.span_text or facet.subject)
+        match = pattern.search(clause.text, cursor) if pattern is not None else None
+        if match is None and pattern is not None:
+            match = pattern.search(clause.text)
+        if match is None:
+            start, end = clause.start, clause.end
+        else:
+            start, end = clause.start + match.start(), clause.start + match.end()
+            cursor = match.end()
+        facets.append(replace(
+            facet,
+            query_span_start=start,
+            query_span_end=end,
+        ))
+    return replace(
+        plan,
+        facets=tuple(facets),
+        consumed_spans=((clause.start, clause.end),) if facets else (),
+    )
+
+
+def _bind_whole_plan(
+    plan: QuestionPlan,
+    question: str,
+    clauses: tuple[QuestionClause, ...],
+) -> QuestionPlan:
+    """Bind a frozen whole-question rule while retaining every clause span."""
+
+    whole = QuestionClause(question, 0, len(question))
+    bound = _bind_plan_to_clause(plan, whole)
+    return replace(
+        bound,
+        consumed_spans=tuple((clause.start, clause.end) for clause in clauses),
+    )
+
+
+def _unsafe_free_text(
+    value: str,
+    *,
+    allow_initial_request_head: bool = False,
+) -> bool:
+    """Reject free text that contains evidence of another request."""
+
+    return not semantic_tail_is_safe(
+        value,
+        allow_initial_request_head=allow_initial_request_head,
+    )
+
+
 def _docs_mcp_server_command(q: str) -> QuestionPlan | None:
     match = re.match(
         r"^\s*(?:which|what)\s+command\s+(?:starts?|runs?|launches?|serves?)\s+"
-        r"(?:the\s+)?docs\s+mcp\s+server\b.*",
+        r"(?:the\s+)?docs\s+mcp\s+server\s*[?!.]*\s*$",
         q,
         re.I,
     )
@@ -108,7 +202,9 @@ def _docs_mcp_server_command(q: str) -> QuestionPlan | None:
 def _command_sync(q: str) -> QuestionPlan | None:
     match = re.match(
         r"^\s*(?:which|what)\s+command\s+"
-        r"(?:does\s+[^?]+?\s+use\s+to\s+)?syncs?\s+project\s+docs?\b.*",
+        r"(?:does\s+[^?]+?\s+use\s+to\s+)?syncs?\s+project\s+docs?"
+        r"(?:\s+after\s+(?:file\s+changes|(?:changing|editing|updating|modifying)\s+(?:a\s+|the\s+)?file))?"
+        r"\s*[?!.]*\s*$",
         q,
         re.I,
     )
@@ -131,21 +227,33 @@ def _command_sync(q: str) -> QuestionPlan | None:
     )
 
 
+_OFFLINE_SUITE_CONTEXT_RE = re.compile(
+    r"(?:DocAtlas|[A-Za-z][A-Za-z0-9_.-]{1,80})",
+    re.I,
+)
+
+
 def _offline_suite_run(q: str) -> QuestionPlan | None:
     match = re.match(
         r"^\s*how\s+do\s+i\s+run\s+the\s+offline(?:\s+test)?\s+suite"
-        r"(?:\s+for\s+(.+?))?\?*$",
+        r"(?:\s+for\s+(.+?))?\s*[?!.]*\s*$",
         q,
         re.I,
     )
     if match is None:
+        return None
+    context = _clean(match.group(1) or "DocAtlas")
+    if (
+        _unsafe_free_text(context)
+        or _OFFLINE_SUITE_CONTEXT_RE.fullmatch(context) is None
+    ):
         return None
     return QuestionPlan(
         facets=(PlannedFacet(
             "workflow",
             "offline suite",
             relation="procedure",
-            context=_clean(match.group(1) or "DocAtlas"),
+            context=context,
             response_mode="workflow",
             span_text=match.group(0),
         ),),
@@ -153,11 +261,10 @@ def _offline_suite_run(q: str) -> QuestionPlan | None:
         parse_trace=("workflow:offline_suite",),
     )
 
-
 def _two_cell_cardinality(q: str) -> QuestionPlan | None:
     match = re.match(
         r"^\s*how\s+does\s+(?:the\s+)?(two[- ]cell\s+smoke\s+procedure)\s+"
-        r"(?:verify|audit|check)\s+(provider[- ]call\s+cardinality)\b.*",
+        r"(?:verify|audit|check)\s+(provider[- ]call\s+cardinality)\s*[?!.]*\s*$",
         q,
         re.I,
     )
@@ -179,7 +286,7 @@ def _two_cell_cardinality(q: str) -> QuestionPlan | None:
 def _release_docs_line_limit(q: str) -> QuestionPlan | None:
     match = re.match(
         r"^\s*which\s+(?:docs|documentation)\s+files\s+must\s+stay\s+under\s+"
-        r"(?:the\s+)?(?:1,?000|1000)[- ]line\s+release\s+limit\b.*",
+        r"(?:the\s+)?(?:1,?000|1000)[- ]line\s+release\s+limit\s*[?!.]*\s*$",
         q,
         re.I,
     )
@@ -201,7 +308,7 @@ def _release_docs_line_limit(q: str) -> QuestionPlan | None:
 def _storage_coordination_contract(q: str) -> QuestionPlan | None:
     match = re.match(
         r"^\s*what\s+is\s+the\s+storage\s+mutation\s+coordination\s+contract\s+"
-        r"for\s+cleanup\s+and\s+refresh\b.*",
+        r"for\s+cleanup\s+and\s+refresh\s*[?!.]*\s*$",
         q,
         re.I,
     )
@@ -223,7 +330,7 @@ def _storage_coordination_contract(q: str) -> QuestionPlan | None:
 def _remove_library_during_refresh(q: str) -> QuestionPlan | None:
     match = re.match(
         r"^\s*what\s+happens\s+if\s+(remove_library_docs)\s+runs\s+while\s+"
-        r"(?:a\s+)?library\s+refresh\s+is\s+in\s+flight\b.*",
+        r"(?:a\s+)?library\s+refresh\s+is\s+in\s+flight\s*[?!.]*\s*$",
         q,
         re.I,
     )
@@ -246,7 +353,7 @@ def _remove_library_during_refresh(q: str) -> QuestionPlan | None:
 
 
 def _source_type_inventory(q: str) -> QuestionPlan | None:
-    if re.match(r"^\s*what\s+source\s+types?\s+are\s+supported\s+for\s+indexing\b", q, re.I) is None:
+    if re.match(r"^\s*what\s+source\s+types?\s+are\s+supported\s+for\s+indexing\s*[?!.]*\s*$", q, re.I) is None:
         return None
     return QuestionPlan(
         facets=(PlannedFacet(
@@ -264,11 +371,11 @@ def _source_type_inventory(q: str) -> QuestionPlan | None:
 
 
 def _release_checklist_compound(q: str) -> QuestionPlan | None:
-    match = re.match(r"^\s*what\s+is\s+(.+?)\s+and\s+what\s+(.+?)\?*$", q, re.I)
+    match = re.match(r"^\s*what\s+is\s+(.+?)\s+and\s+what\s+(.+?)\s*[?!.]*\s*$", q, re.I)
     if match is None:
         return None
     left, right = _clean(match.group(1)), _clean(match.group(2))
-    if re.search(r"\bgates?\s+block\s+release\b", right, re.I) is None:
+    if re.fullmatch(r".*?gates?\s+(?:that\s+)?block\s+release", right, re.I) is None:
         return None
     return QuestionPlan(
         facets=(
@@ -279,13 +386,12 @@ def _release_checklist_compound(q: str) -> QuestionPlan | None:
         parse_trace=("compound:purpose", "compound:blocking_gates"),
     )
 
-
 def _token_bounding_compound(q: str) -> QuestionPlan | None:
-    match = re.match(r"^\s*what\s+is\s+(.+?)\s+and\s+how\s+is\s+(.+?)\?*$", q, re.I)
+    match = re.match(r"^\s*what\s+is\s+(.+?)\s+and\s+how\s+is\s+(.+?)\s*[?!.]*\s*$", q, re.I)
     if match is None:
         return None
     left, right = _clean(match.group(1)), _clean(match.group(2))
-    if re.search(r"token[- ]bounded", right, re.I) is None:
+    if re.fullmatch(r".*?token[- ]bounded", right, re.I) is None:
         return None
     return QuestionPlan(
         facets=(
@@ -296,11 +402,10 @@ def _token_bounding_compound(q: str) -> QuestionPlan | None:
         parse_trace=("compound:definition", "compound:token_bounding"),
     )
 
-
 def _public_tools_with_usage(q: str) -> QuestionPlan | None:
     if re.match(
         r"^\s*what\s+are\s+the\s+three\s+public\s+docs\s+mcp\s+tools\s+"
-        r"and\s+when\s+do\s+i\s+use\s+each\s+one",
+        r"and\s+when\s+do\s+i\s+use\s+each\s+one\s*[?!.]*\s*$",
         q,
         re.I,
     ) is None:
@@ -321,7 +426,7 @@ def _public_tools_with_usage(q: str) -> QuestionPlan | None:
 
 def _env_var_purpose_usage(q: str) -> QuestionPlan | None:
     match = re.match(
-        r"^\s*what\s+is\s+(DOCMANCER_[A-Z0-9_]+)\s+and\s+when\s+should\s+it\s+be\s+used",
+        r"^\s*what\s+is\s+(DOCMANCER_[A-Z0-9_]+)\s+and\s+when\s+should\s+it\s+be\s+used\s*[?!.]*\s*$",
         q,
         re.I,
     )
@@ -344,9 +449,32 @@ def _env_var_purpose_usage(q: str) -> QuestionPlan | None:
     )
 
 
+_CLEAR_INDEX_CONDITION_RE = re.compile(
+    r"(?:"
+    r"(?:a\s+)?live(?:\s+mcp)?\s+process(?:\s+pid)?\s+"
+    r"(?:holds|owns|locks)\s+(?:the\s+)?index|"
+    r"(?:a\s+)?live(?:\s+mcp)?\s+process(?:\s+pid)?\s+is\s+"
+    r"(?:holding|using)\s+(?:the\s+)?index|"
+    r"(?:an?\s+)?index\s+writer\s+is\s+active|"
+    r"(?:the\s+)?index\s+is\s+held\s+by\s+"
+    r"(?:a\s+)?live(?:\s+mcp)?\s+process(?:\s+pid)?"
+    r")",
+    re.I,
+)
+
+
 def _conditional_clear_index(q: str) -> QuestionPlan | None:
-    match = re.match(r"^\s*what\s+does\s+(clear-index)\s+do\s+when\s+(.+?)\?*$", q, re.I)
-    if match is None:
+    match = re.match(
+        r"^\s*what\s+does\s+(clear-index)\s+do\s+when\s+"
+        r"(.+?)\s*[?!.]*\s*$",
+        q,
+        re.I,
+    )
+    if (
+        match is None
+        or _unsafe_free_text(match.group(2))
+        or _CLEAR_INDEX_CONDITION_RE.fullmatch(_clean(match.group(2))) is None
+    ):
         return None
     subject, kind, aliases = _technical(match.group(1), "cli_command")
     return QuestionPlan(
@@ -358,13 +486,27 @@ def _conditional_clear_index(q: str) -> QuestionPlan | None:
         parse_trace=("relation:conditional_behavior",),
     )
 
+_CONFIG_TARGET_RE = (
+    r"(?:[A-Za-z]:[\\/])?"
+    r"(?:[A-Za-z0-9_.-]+[\\/])*[A-Za-z0-9_.-]+"
+)
+
 
 def _configuration_workflow(q: str) -> QuestionPlan | None:
-    match = re.match(r"^\s*how\s+do\s+i\s+configure\s+(?:a\s+)?project\s+in\s+([^?]+?)\?*$", q, re.I)
-    if match is None:
+    match = re.match(
+        rf"^\s*how\s+do\s+i\s+configure\s+(?:a\s+)?project\s+in\s+"
+        rf"([`\"']?{_CONFIG_TARGET_RE}[`\"']?)\s*[?!.]*\s*$",
+        q,
+        re.I,
+    )
+    if match is None or _unsafe_free_text(match.group(1)):
         return None
-    raw = _clean(match.group(1))
-    preferred: TechnicalTermKind | None = "config_key" if "." in match.group(1) and not match.group(1).endswith(".yaml") else None
+    raw = _clean(match.group(1)).strip("`\"'")
+    preferred: TechnicalTermKind | None = (
+        "config_key"
+        if "." in match.group(1) and not match.group(1).endswith(".yaml")
+        else None
+    )
     subject, kind, aliases = _technical(raw, preferred)
     return QuestionPlan(
         facets=(PlannedFacet(
@@ -378,7 +520,12 @@ def _configuration_workflow(q: str) -> QuestionPlan | None:
 
 
 def _contamination_definition(q: str) -> QuestionPlan | None:
-    if re.match(r"^\s*what\s+is\s+contamination\s+protection\s+in\s+(?:the\s+)?eval\s+protocols", q, re.I) is None:
+    if re.match(
+        r"^\s*what\s+is\s+contamination\s+protection\s+in\s+"
+        r"(?:the\s+)?eval\s+protocols\s*[?!.]*\s*$",
+        q,
+        re.I,
+    ) is None:
         return None
     return QuestionPlan(
         facets=(PlannedFacet(
@@ -392,7 +539,7 @@ def _contamination_definition(q: str) -> QuestionPlan | None:
 
 def _v4_protocol_run(q: str) -> QuestionPlan | None:
     match = re.match(
-        r"^\s*how\s+do\s+i\s+run\s+the\s+project\s+answer\s+quality\s+v4\s+protocol\b.*",
+        r"^\s*how\s+do\s+i\s+run\s+the\s+project\s+answer\s+quality\s+v4\s+protocol\s*[?!.]*\s*$",
         q,
         re.I,
     )
@@ -413,8 +560,11 @@ def _v4_protocol_run(q: str) -> QuestionPlan | None:
 
 
 def _named_run_or_verify(q: str) -> QuestionPlan | None:
-    match = re.match(r"^\s*how\s+do\s+i\s+(run|verify)\s+(.+?)\?*$", q, re.I)
-    if match is None:
+    match = re.match(r"^\s*how\s+do\s+i\s+(run|verify)\s+(.+?)\s*[?!.]*\s*$", q, re.I)
+    if match is None or _unsafe_free_text(
+        match.group(2),
+        allow_initial_request_head=True,
+    ):
         return None
     action, subject = match.group(1).casefold(), _clean(match.group(2))
     if subject.casefold() == "project answer quality protocols":
@@ -435,17 +585,49 @@ def _named_run_or_verify(q: str) -> QuestionPlan | None:
         parse_trace=(f"{action}:{subject}",),
     )
 
+_CHOICE_TAIL_RE = re.compile(
+    r"(?:(?:which|what)\s+)?"
+    r"(?:evidence\s+)?(?:candidates?|witnesses?|proofs?|items?|results?|"
+    r"sources?|documents?|chunks?|units?)"
+    r"(?:\s+(?:are|should\s+be)\s+(?:selected|chosen|ranked))?"
+    r"|(?:which|what)\s+(?:evidence|candidates?|items?|results?)\s+"
+    r"(?:to\s+)?(?:use|select|choose|rank)",
+    re.I,
+)
+_SPLIT_TAIL_RE = re.compile(
+    r"(?:documents?|input|text|content|files?|pages?|questions?|queries?|"
+    r"results?|evidence)"
+    r"(?:\s+(?:into|by|across)\s+"
+    r"(?:sections?|chunks?|clauses?|units?|groups?)"
+    r"(?:\s+and\s+(?:sections?|chunks?|clauses?|units?|groups?))?"
+    r"|\s+(?:sections?|chunks?|clauses?|units?))",
+    re.I,
+)
+
 
 def _named_behavior(q: str) -> QuestionPlan | None:
-    match = re.match(r"^\s*how\s+does\s+(.+?)\s+(work|choose|split)\b.*", q, re.I)
+    match = re.match(
+        r"^\s*how\s+does\s+(.+?)\s+(work|choose|split)"
+        r"(?:\s+(.+?))?\s*[?!.]*\s*$",
+        q,
+        re.I,
+    )
     if match is None:
         return None
     subject = _clean(match.group(1))
     action = match.group(2).casefold()
+    tail = _clean(match.group(3) or "")
     if subject.casefold() == "prepare_docs sync_project_docs":
         return None
-    if not subject or subject.casefold() in {"the project", "project"}:
+    if not subject or _unsafe_free_text(subject):
         return None
+    if action == "work" and tail:
+        return None
+    if action == "choose" and (not tail or _CHOICE_TAIL_RE.fullmatch(tail) is None):
+        return None
+    if action == "split" and (not tail or _SPLIT_TAIL_RE.fullmatch(tail) is None):
+        return None
+
     relation = "behavior"
     if subject.casefold() == "indexing" and action == "split":
         relation = "chunking"
@@ -458,9 +640,27 @@ def _named_behavior(q: str) -> QuestionPlan | None:
     )
 
 
+_SMOKE_CONTEXT_RE = re.compile(
+    r"(?:"
+    r"(?:local\s+)?Task\s+\d+(?:\.\d+)*\s+benchmarks?|"
+    r"(?:local\s+)?benchmarks?|DocAtlas"
+    r")",
+    re.I,
+)
+
+
 def _two_cell_smoke(q: str) -> QuestionPlan | None:
-    match = re.match(r"^\s*what\s+is\s+the\s+(.+?smoke\s+procedure)\s+for\s+(.+?)\?*$", q, re.I)
-    if match is None:
+    match = re.match(
+        r"^\s*what\s+is\s+the\s+(.+?smoke\s+procedure)\s+for\s+"
+        r"(.+?)\s*[?!.]*\s*$",
+        q,
+        re.I,
+    )
+    if (
+        match is None
+        or _unsafe_free_text(match.group(2))
+        or _SMOKE_CONTEXT_RE.fullmatch(_clean(match.group(2))) is None
+    ):
         return None
     return QuestionPlan(
         facets=(PlannedFacet(
@@ -471,10 +671,9 @@ def _two_cell_smoke(q: str) -> QuestionPlan | None:
         parse_trace=("workflow:smoke_procedure",),
     )
 
-
 def _test_markers_and_offline_suite(q: str) -> QuestionPlan | None:
     if re.match(
-        r"^\s*what\s+test\s+markers\s+are\s+available\s+and\s+how\s+do\s+i\s+run\s+the\s+offline\s+suite",
+        r"^\s*what\s+test\s+markers\s+are\s+available\s+and\s+how\s+do\s+i\s+run\s+the\s+offline\s+suite\s*[?!.]*\s*$",
         q,
         re.I,
     ) is None:
@@ -495,7 +694,7 @@ def _test_markers_and_offline_suite(q: str) -> QuestionPlan | None:
     )
 
 
-_RULES: tuple[Rule, ...] = (
+_SPECIFIC_RULES: tuple[Rule, ...] = (
     _docs_mcp_server_command,
     _command_sync,
     _offline_suite_run,
@@ -512,11 +711,16 @@ _RULES: tuple[Rule, ...] = (
     _configuration_workflow,
     _contamination_definition,
     _v4_protocol_run,
-    _named_run_or_verify,
-    _named_behavior,
     _two_cell_smoke,
     _test_markers_and_offline_suite,
 )
+
+_GENERIC_RULES: tuple[Rule, ...] = (
+    _named_run_or_verify,
+    _named_behavior,
+)
+
+
 
 
 def _reusable_frame_plan(q: str) -> QuestionPlan | None:
@@ -600,15 +804,33 @@ def _guard_plan_subjects(plan: QuestionPlan) -> QuestionPlan:
     )
 
 
-def _compile_atomic_question(q: str) -> QuestionPlan | None:
+def _compile_specific_question(q: str) -> QuestionPlan | None:
     framed = _reusable_frame_plan(q)
     if framed is not None and framed.handled:
         return _guard_plan_subjects(framed)
-    for rule in _RULES:
+
+    for rule in _SPECIFIC_RULES:
         plan = rule(q)
         if plan is not None and plan.handled:
             return _guard_plan_subjects(plan)
+
     return None
+
+
+def _compile_generic_question(q: str) -> QuestionPlan | None:
+    for rule in _GENERIC_RULES:
+        plan = rule(q)
+        if plan is not None and plan.handled:
+            return _guard_plan_subjects(plan)
+
+    return None
+
+
+def _compile_atomic_question(q: str) -> QuestionPlan | None:
+    specific = _compile_specific_question(q)
+    if specific is not None:
+        return specific
+    return _compile_generic_question(q)
 
 
 def _unresolved_compound(clauses: tuple[str, ...], *, trace: str) -> QuestionPlan:
@@ -621,18 +843,30 @@ def _unresolved_compound(clauses: tuple[str, ...], *, trace: str) -> QuestionPla
     )
 
 
-def _combine_clause_plans(question: str, clauses: tuple[str, ...]) -> QuestionPlan | None:
+def _combine_clause_plans(
+    question: str,
+    clauses: tuple[QuestionClause, ...],
+) -> QuestionPlan | None:
     if len(clauses) <= 1:
         return None
-    plans = tuple(_compile_atomic_question(clause) for clause in clauses)
+
+    clause_texts = tuple(
+        _normalized_clause(clause, compound=True) for clause in clauses
+    )
+    raw_plans = tuple(_compile_atomic_question(text) for text in clause_texts)
+    plans = tuple(
+        _bind_plan_to_clause(plan, clause) if plan is not None else None
+        for clause, plan in zip(clauses, raw_plans)
+    )
     handled = tuple(plan for plan in plans if plan is not None and plan.handled)
 
-    if handled:
+    if handled and any(plan.facets for plan in handled):
         facets = tuple(facet for plan in handled for facet in plan.facets)
         trace = tuple(row for plan in handled for row in plan.parse_trace)
+        consumed = tuple(span for plan in handled for span in plan.consumed_spans)
         unresolved = tuple(
             f"unresolved_question_clause:{clause}"
-            for clause, plan in zip(clauses, plans)
+            for clause, plan in zip(clause_texts, plans)
             if plan is None or not plan.handled
         )
         unresolved += tuple(
@@ -640,53 +874,190 @@ def _combine_clause_plans(question: str, clauses: tuple[str, ...]) -> QuestionPl
         )
         return _guard_plan_subjects(QuestionPlan(
             facets=facets,
-            clauses=clauses,
+            clauses=clause_texts,
             unresolved_parts=tuple(dict.fromkeys(unresolved)),
             parse_trace=("frame:compound", *trace),
+            consumed_spans=tuple(sorted(set(consumed))),
         ))
 
     # Some frozen compound rules are intentionally recognized as a whole
     # (for example the three public Docs MCP tools + per-tool usage). Permit
     # that only when the whole rule produces at least one mandatory facet per
     # detected clause. A one-facet prefix match cannot authorize two clauses.
-    whole = _compile_atomic_question(question)
+    normalized_question = " ".join(question.split())
+    whole = _compile_atomic_question(normalized_question)
     if (
         whole is not None
         and whole.handled
         and not whole.unresolved_parts
         and len(whole.facets) >= len(clauses)
     ):
-        return _guard_plan_subjects(QuestionPlan(
-            facets=whole.facets,
-            clauses=clauses,
+        bound = _bind_whole_plan(whole, question, clauses)
+        return _guard_plan_subjects(replace(
+            bound,
+            clauses=clause_texts,
             parse_trace=("frame:whole_compound", *whole.parse_trace),
         ))
     if whole is not None and whole.handled:
         unresolved = tuple(
-            f"unresolved_question_clause:{clause}"
-            for clause in clauses[1:]
+            f"unresolved_question_clause:{clause}" for clause in clause_texts[1:]
         ) or tuple(
-            f"unresolved_question_clause:{clause}" for clause in clauses
+            f"unresolved_question_clause:{clause}" for clause in clause_texts
         )
-        return _guard_plan_subjects(QuestionPlan(
-            facets=whole.facets,
-            clauses=clauses,
+        if whole.facets:
+            bound = _bind_plan_to_clause(
+                whole,
+                QuestionClause(question, 0, len(question)),
+            )
+            bound = replace(bound, consumed_spans=())
+        else:
+            bound = whole
+        return _guard_plan_subjects(replace(
+            bound,
+            clauses=clause_texts,
             unresolved_parts=tuple(dict.fromkeys((*whole.unresolved_parts, *unresolved))),
             parse_trace=("fail_closed:partial_question", *whole.parse_trace),
         ))
-    return _unresolved_compound(clauses, trace="fail_closed:unresolved_compound")
+    if handled:
+        unresolved = tuple(
+            row for plan in handled for row in plan.unresolved_parts
+        )
+        return QuestionPlan(
+            clauses=clause_texts,
+            unresolved_parts=tuple(dict.fromkeys(unresolved)),
+            parse_trace=("fail_closed:unresolved_compound",),
+        )
+    return None
+
+
+def _prefix_plan_is_owned(plan: QuestionPlan) -> bool:
+    """Only exact parser-owned frames may turn an extension into fail-closed."""
+
+    if not plan.facets or plan.unresolved_parts:
+        return False
+    traces = set(plan.parse_trace)
+    if "frame:requirements" in traces:
+        # Generic requirements still have supported legacy extensions such as
+        # ``What does Phase 3.1 require for ...?``.  Only the already-modelled
+        # two-cell procedure owns a strict prefix until generic trailing
+        # requirement relations are represented explicitly.
+        return all(
+            facet.subject.casefold() == "two-cell smoke procedure"
+            for facet in plan.facets
+        )
+    if any(row.startswith(("run:", "verify:", "behavior:behavior:")) for row in traces):
+        return False
+    return True
+
+
+def _recognized_prefix_residue_plan(q: str) -> QuestionPlan | None:
+    """Fail closed only when an exact new-parser question is a strict prefix.
+
+    This replaces regex ownership lists.  A legacy-only surface is never
+    claimed merely because it resembles a new frame.
+    """
+
+    normalized = " ".join(str(q or "").split())
+    if not normalized:
+        return None
+    cut_points = [match.start() for match in re.finditer(r"\s+", normalized)]
+    for cut in reversed(cut_points):
+        prefix = normalized[:cut].rstrip(" \t\r\n,;:.!?/\u2013\u2014")
+        if not prefix:
+            continue
+        plan = _compile_atomic_question(prefix)
+        if plan is None or not _prefix_plan_is_owned(plan):
+            continue
+        residue = normalized[len(prefix):].strip()
+        if not residue:
+            continue
+        return QuestionPlan(
+            clauses=(normalized,),
+            unresolved_parts=(f"unresolved_question_clause:{_clean(residue)}",),
+            parse_trace=("fail_closed:recognized_prefix_residue",),
+        )
+    return None
+
+
+def _safe_coverage_gap(value: str) -> bool:
+    residue = re.sub(
+        r"\b(?:and\s+also|while\s+also|as\s+well\s+as|along\s+with|"
+        r"and|but|plus|then|also|и\s+также|а\s+также|и|но|плюс|затем)\b",
+        "",
+        value,
+        flags=re.I,
+    )
+    residue = re.sub(r"[\s,;:.!?/\u2013\u2014]+", "", residue)
+    return not residue
+
+
+def _finalize_full_span_coverage(question: str, plan: QuestionPlan) -> QuestionPlan:
+    """Fail closed unless every non-separator source span was consumed."""
+
+    if not plan.facets or plan.unresolved_parts:
+        return plan
+    spans = sorted(set(plan.consumed_spans))
+    if not spans:
+        return replace(
+            plan,
+            unresolved_parts=("unresolved_question_clause:missing_consumed_span",),
+            parse_trace=(*plan.parse_trace, "fail_closed:missing_consumed_span"),
+        )
+
+    cursor = 0
+    gaps: list[str] = []
+    for start, end in spans:
+        if start < cursor or start < 0 or end <= start or end > len(question):
+            gaps.append("invalid_consumed_span")
+            continue
+        gap = question[cursor:start]
+        if gap and not _safe_coverage_gap(gap):
+            gaps.append(_clean(gap))
+        cursor = end
+    tail = question[cursor:]
+    if tail and not _safe_coverage_gap(tail):
+        gaps.append(_clean(tail))
+    if not gaps:
+        return plan
+    return replace(
+        plan,
+        unresolved_parts=tuple(dict.fromkeys(
+            f"unresolved_question_clause:{gap}" for gap in gaps if gap
+        )),
+        parse_trace=(*plan.parse_trace, "fail_closed:unconsumed_span"),
+    )
 
 
 def compile_question_plan(question: str) -> QuestionPlan:
     raw = str(question or "")[:4000]
-    q = " ".join(raw.split())
-    clauses = split_question_clauses(raw)
+    normalized = " ".join(raw.split())
+    clauses = split_question_clause_spans(raw)
     if len(clauses) > 1:
-        compound = _combine_clause_plans(q, clauses)
+        compound = _combine_clause_plans(raw, clauses)
         if compound is not None:
-            return compound
-    atomic = _compile_atomic_question(q)
-    return atomic if atomic is not None else QuestionPlan()
+            return _finalize_full_span_coverage(raw, compound)
+        residue = _recognized_prefix_residue_plan(normalized)
+        if residue is not None:
+            return residue
+        return QuestionPlan()
+    clause = clauses[0]
+    norm_clause = _normalized_clause(clause)
+    atomic = _compile_atomic_question(norm_clause)
+    if atomic is not None:
+        # A generic run/verify rule takes an arbitrary subject and could
+        # swallow a strict extension of an owned specific frame.
+        if any(row.startswith(("run:", "verify:")) for row in atomic.parse_trace):
+            residue = _recognized_prefix_residue_plan(norm_clause)
+            if residue is not None:
+                return residue
+        return _finalize_full_span_coverage(
+            raw,
+            _bind_plan_to_clause(atomic, clause),
+        )
+    residue = _recognized_prefix_residue_plan(norm_clause)
+    if residue is not None:
+        return residue
+    return QuestionPlan()
 
 
 __all__ = ["PlannedFacet", "QuestionPlan", "compile_question_plan"]
