@@ -68,9 +68,10 @@ def test_question_plan_splits_compound_questions_into_mandatory_facets():
     ]
 
     _contract, rows = _rows("What are the three public Docs MCP tools and when do I use each one?")
-    assert [(r.kind, r.relation) for r in rows] == [
-        ("inventory", None),
-        ("relation", "per_tool_usage"),
+    assert [(r.kind, r.subject, r.relation) for r in rows] == [
+        ("relation", "get_docs_context", "public_tool_usage"),
+        ("relation", "prepare_docs", "public_tool_usage"),
+        ("relation", "docs_status", "public_tool_usage"),
     ]
 
 
@@ -441,7 +442,7 @@ def test_existing_compounds_and_noun_coordination_survive_stricter_clause_covera
         "What are the three public Docs MCP tools and when do I use each one?"
     )
     assert not public_tools.unresolved_parts
-    assert len(public_tools.proof_obligations) == 2
+    assert len(public_tools.proof_obligations) == 3
 
     markers = build_project_answer_contract(
         "What test markers are available and how do I run the offline suite?"
@@ -462,3 +463,37 @@ def test_existing_compounds_and_noun_coordination_survive_stricter_clause_covera
     )
     assert not storage.unresolved_parts
     assert len(storage.proof_obligations) == 1
+
+
+def test_semantic_cycle_frames_compile_into_typed_obligations():
+    comparison = build_project_answer_contract(
+        "How does evidence selection differ from question planning?"
+    )
+    assert not comparison.unresolved_parts
+    assert [(row.kind, row.subject, row.target) for row in comparison.proof_obligations] == [
+        ("comparison", "evidence selection", "question planning")
+    ]
+
+    location = build_project_answer_contract(
+        "Where is the project answer contract documented?"
+    )
+    assert not location.unresolved_parts
+    assert [(row.kind, row.subject, row.relation) for row in location.proof_obligations] == [
+        ("location", "project answer contract", "location")
+    ]
+
+    condition = build_project_answer_contract(
+        "What happens when the preview plan is stale?"
+    )
+    assert not condition.unresolved_parts
+    assert [(row.subject, row.relation) for row in condition.proof_obligations] == [
+        ("preview plan", "conditional_outcome")
+    ]
+
+    premise = build_project_answer_contract(
+        "Why does clear-index always delete remote Qdrant collections?"
+    )
+    assert not premise.unresolved_parts
+    assert [(row.subject, row.relation) for row in premise.proof_obligations] == [
+        ("clear-index", "premise_check")
+    ]

@@ -23,11 +23,17 @@ from docmancer.docs.domain.question_frame_core import (
     split_question_clause_spans,
     strip_request_wrapper,
 )
+from docmancer.docs.domain.question_semantic_frames import (
+    match_comparison_frame,
+    match_condition_frame,
+    match_location_frame,
+    match_premise_frame,
+)
 from docmancer.docs.domain.technical_terms import TechnicalTermKind, coerce_technical_term
 
 PlanKind = Literal[
     "definition", "purpose", "behavior", "usage", "workflow", "inventory",
-    "command", "relation",
+    "command", "relation", "comparison", "location",
 ]
 
 
@@ -410,17 +416,25 @@ def _public_tools_with_usage(q: str) -> QuestionPlan | None:
         re.I,
     ) is None:
         return None
+    # Decompose the compound request into atomic mandatory facets.  The selector
+    # can then satisfy each tool from a different bounded evidence candidate
+    # without weakening local proof or inventing a cross-document AnswerUnit.
+    tools = ("get_docs_context", "prepare_docs", "docs_status")
     return QuestionPlan(
-        facets=(
+        facets=tuple(
             PlannedFacet(
-                "inventory", "Docs MCP", attribute="public_tools", item_kind="public_tool",
-                value_kind="identifier_list", response_mode="names",
+                "relation",
+                tool,
+                relation="public_tool_usage",
+                context="Docs MCP public tools",
+                subject_kind="code_symbol",
+                subject_aliases=(tool,),
                 span_text="three public Docs MCP tools",
-            ),
-            PlannedFacet("relation", "Docs MCP", relation="per_tool_usage", span_text="when do I use each one"),
+            )
+            for tool in tools
         ),
         clauses=(q,),
-        parse_trace=("inventory:public_tools", "relation:per_tool_usage"),
+        parse_trace=("frame:public_tools_atomic_usage",),
     )
 
 
@@ -694,7 +708,68 @@ def _test_markers_and_offline_suite(q: str) -> QuestionPlan | None:
     )
 
 
+def _semantic_comparison(q: str) -> QuestionPlan | None:
+    frame = match_comparison_frame(q)
+    if frame is None:
+        return None
+    return QuestionPlan(
+        facets=(PlannedFacet(
+            "comparison", frame.left, relation="contrast", target=frame.right,
+            span_text=q,
+        ),),
+        clauses=(q,),
+        parse_trace=("frame:comparison",),
+    )
+
+
+def _semantic_location(q: str) -> QuestionPlan | None:
+    frame = match_location_frame(q)
+    if frame is None:
+        return None
+    return QuestionPlan(
+        facets=(PlannedFacet(
+            "location", frame.subject, relation="location",
+            value_kind="path", response_mode="path", span_text=q,
+        ),),
+        clauses=(q,),
+        parse_trace=("frame:location",),
+    )
+
+
+def _semantic_condition(q: str) -> QuestionPlan | None:
+    frame = match_condition_frame(q)
+    if frame is None:
+        return None
+    return QuestionPlan(
+        facets=(PlannedFacet(
+            "relation", frame.subject, relation=frame.relation,
+            context=frame.condition, span_text=q,
+        ),),
+        clauses=(q,),
+        parse_trace=(f"frame:condition:{frame.relation}",),
+    )
+
+
+def _semantic_premise(q: str) -> QuestionPlan | None:
+    frame = match_premise_frame(q)
+    if frame is None:
+        return None
+    return QuestionPlan(
+        facets=(PlannedFacet(
+            "relation", frame.subject, relation=frame.relation,
+            target=frame.target, expected_value=frame.expected_value,
+            span_text=q,
+        ),),
+        clauses=(q,),
+        parse_trace=(f"frame:premise:{frame.relation}",),
+    )
+
+
 _SPECIFIC_RULES: tuple[Rule, ...] = (
+    _semantic_premise,
+    _semantic_comparison,
+    _semantic_location,
+    _semantic_condition,
     _docs_mcp_server_command,
     _command_sync,
     _offline_suite_run,

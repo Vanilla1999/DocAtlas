@@ -26,6 +26,9 @@ Question planning produces the obligations consumed by the evidence-selection mo
 - inventory categories stay typed: source types, file formats, and test markers are never interchangeable proof subjects;
 - ambiguous surface nouns such as bare `markers` or `formats`, generic subjects such as `project`, and unqualified `docs index` actions fail closed instead of being guessed;
 - technical aliases are bounded and kind-aware;
+- parser ownership is explicit: a new QuestionPlan frame may replace a legacy surface only through a reviewed ownership migration with canonical-contract parity;
+- comparison, location, condition, and premise frames are complete-surface parsers and therefore inherit full-span fail-closed coverage;
+- compound facts may be decomposed into atomic mandatory facets so the selector can use bounded witnesses from different candidates without merging unrelated evidence;
 - frozen v1–v3 contracts remain compatibility inputs until explicitly migrated.
 
 ## Tests

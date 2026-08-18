@@ -46,13 +46,116 @@ def relation_proof(
     if relation not in {
         "blocking_gates", "token_bounding", "per_tool_usage", "verification",
         "conditional_behavior", "release_line_limit", "storage_coordination",
-        "conditional_library_removal", "requirements",
+        "conditional_library_removal", "requirements", "conditional_outcome",
+        "blocking_conditions", "premise_check", "premise_cardinality",
+        "public_tool_usage",
     }:
         return None
     normalized = _norm(text)
     source_text = _norm(" ".join(str((source or {}).get(key) or "") for key in (
         "path", "source", "title", "heading_path", "project_doc_path",
     )))
+
+    if relation == "public_tool_usage":
+        subject = _has(obligation.subject, text)
+        context = bool(
+            re.search(r"\b(?:docs\s+mcp|public\s+tools?|mcp\s+tools?)\b", normalized)
+            or "docs mcp" in source_text
+        )
+        usage = bool(
+            re.search(
+                rf"(?:use\s+`?{re.escape(obligation.subject)}`?|"
+                rf"`?{re.escape(obligation.subject)}`?\s+(?:for|when|to))",
+                text,
+                re.I,
+            )
+        )
+        valid = subject and context and usage
+        return PlannedProof(
+            valid, 4 if valid else 0, 3 if valid else 0,
+            "public_tool_usage" if valid else "public_tool_usage_missing",
+            3 if valid else 0,
+        )
+
+    if relation == "conditional_outcome":
+        subject = _has(obligation.subject, text)
+        context_tokens = {
+            token for token in re.findall(r"[a-zа-яё0-9_-]{3,}", _norm(obligation.context))
+            if token not in {"when", "while", "если", "когда", "пока", "the"}
+        }
+        context_hits = sum(token in normalized for token in context_tokens)
+        consequence = bool(re.search(
+            r"\b(?:then|therefore|returns?|refuses?|blocks?|fails?|rebuilds?|"
+            r"retries?|cannot|must|becomes?|stays?|remains?|"
+            r"затем|поэтому|возвращает|отказывает|блокирует|становится|нельзя)\b",
+            normalized,
+        ))
+        valid = subject and bool(context_tokens) and context_hits >= min(2, len(context_tokens)) and consequence
+        return PlannedProof(
+            valid, 4 if valid else 0, context_hits if valid else 0,
+            "conditional_outcome" if valid else "conditional_outcome_missing",
+            3 if valid else 0,
+        )
+
+    if relation == "blocking_conditions":
+        subject = _has(obligation.subject, text)
+        blocking = bool(re.search(
+            r"\b(?:block(?:s|ed|ing)?|refus(?:e|es|ed)|cannot|must\s+not|"
+            r"hard\s+blocker|блокир\w*|нельзя|отказ\w*)\b",
+            normalized,
+        ))
+        condition = bool(re.search(
+            r"\b(?:when|while|if|unless|until|condition|only\s+when|"
+            r"когда|если|пока|при\s+условии|до\s+тех\s+пор)\b",
+            normalized,
+        ))
+        valid = subject and blocking and condition
+        return PlannedProof(
+            valid, 4 if valid else 0, 3 if valid else 0,
+            "blocking_conditions" if valid else "blocking_conditions_missing",
+            3 if valid else 0,
+        )
+
+    if relation == "premise_check":
+        subject = _has(obligation.subject, text)
+        target_tokens = {
+            token for token in re.findall(r"[a-zа-яё0-9_-]{3,}", _norm(obligation.target))
+            if token not in {"does", "always", "never", "всегда", "никогда"}
+        }
+        target_hits = sum(token in normalized for token in target_tokens)
+        polarity = bool(re.search(
+            r"\b(?:always|never|does\s+not|do\s+not|cannot|only|unless|"
+            r"всегда|никогда|не\s+\w+|только)\b",
+            normalized,
+        ))
+        valid = subject and bool(target_tokens) and target_hits >= min(2, len(target_tokens)) and polarity
+        return PlannedProof(
+            valid, 4 if valid else 0, target_hits if valid else 0,
+            "premise_check" if valid else "premise_evidence_missing",
+            3 if valid else 0,
+        )
+
+    if relation == "premise_cardinality":
+        target_tokens = {
+            token for token in re.findall(r"[a-zа-яё0-9_-]{3,}", _norm(obligation.target))
+            if token not in {"there", "public"}
+        }
+        target_hits = sum(token in normalized for token in target_tokens)
+        cardinality = bool(re.search(
+            r"\b(?:exactly\s+)?(?:one|two|three|four|five|six|seven|eight|nine|ten|"
+            r"\d{1,2}|один|одна|два|две|три|четыре|пять|шесть|семь|восемь|девять|десять)\b",
+            normalized,
+        ))
+        context = bool(
+            re.search(r"\b(?:public\s+docs\s+mcp\s+tools?|docs\s+mcp\s+public\s+tools?|mcp\s+tools?)\b", normalized)
+            or "docs mcp" in source_text
+        )
+        valid = bool(target_tokens) and target_hits >= min(2, len(target_tokens)) and cardinality and context
+        return PlannedProof(
+            valid, 4 if valid else 0, target_hits if valid else 0,
+            "premise_cardinality" if valid else "premise_cardinality_missing",
+            2 if valid else 0,
+        )
 
     if relation == "requirements":
         subject_present = _has(obligation.subject, text)

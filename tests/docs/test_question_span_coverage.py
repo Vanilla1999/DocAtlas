@@ -5,6 +5,7 @@ import pytest
 from docmancer.docs.application.evidence_selection import build_requirements
 from docmancer.docs.domain.project_answer_contract import build_project_answer_contract
 from docmancer.docs.domain.question_frame_core import split_question_clause_spans
+from docmancer.docs.domain.question_ownership import frozen_ownership_mismatches
 from docmancer.docs.domain.question_plan import compile_question_plan
 
 
@@ -125,7 +126,7 @@ def test_clause_scanner_preserves_original_offsets_and_noun_coordination() -> No
 
 def test_existing_compounds_and_paraphrases_remain_supported() -> None:
     questions_and_counts = (
-        ("What are the three public Docs MCP tools and when do I use each one?", 2),
+        ("What are the three public Docs MCP tools and when do I use each one?", 3),
         ("What test markers are available and how do I run the offline suite?", 2),
         ("How does indexing split documents into sections and chunks?", 1),
         ("What is the storage mutation coordination contract for cleanup and refresh?", 1),
@@ -176,4 +177,5 @@ def test_russian_ambiguous_inventory_and_action_frames_fail_closed() -> None:
 def test_legacy_fallback_questions_remain_unclaimed_by_question_plan(question: str) -> None:
     plan = compile_question_plan(question)
     assert not plan.handled, (question, plan)
+    assert not frozen_ownership_mismatches()
 
