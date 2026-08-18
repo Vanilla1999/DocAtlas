@@ -1,0 +1,36 @@
+name: Question Probe 100 E2E V2
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - scripts/question_probe_100.py
+      - scripts/question_probe_100_e2e_v2.py
+      - .github/workflows/question-probe-100-e2e-v2.yml
+
+permissions:
+  contents: read
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+  DOCMANCER_OFFLINE: "1"
+
+jobs:
+  e2e-probe-v2:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - name: Install DocAtlas
+        run: pip install -e .
+      - name: Run corrected public MCP probe
+        run: python scripts/question_probe_100_e2e_v2.py
+      - name: Upload corrected public MCP report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: question-probe-100-e2e-v2-results
+          path: question-probe-100-e2e-v2-results.json
+          if-no-files-found: warn
