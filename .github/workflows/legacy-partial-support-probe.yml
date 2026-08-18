@@ -1,0 +1,32 @@
+name: Legacy Partial Support Probe
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - scripts/legacy_partial_support_probe.py
+      - .github/workflows/legacy-partial-support-probe.yml
+
+permissions:
+  contents: read
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+  DOCMANCER_OFFLINE: "1"
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - run: pip install -e .
+      - run: python scripts/legacy_partial_support_probe.py
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: legacy-partial-support-probe-results
+          path: legacy-partial-support-probe-results.json
+          if-no-files-found: warn
