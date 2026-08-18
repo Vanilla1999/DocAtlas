@@ -1,0 +1,41 @@
+name: Question Probe 100
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - scripts/question_probe_100.py
+      - .github/workflows/question-probe-100.yml
+
+permissions:
+  contents: read
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+  DOCMANCER_OFFLINE: "1"
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Install DocAtlas
+        run: pip install -e .
+
+      - name: Run 100-question project QA probe
+        run: python scripts/question_probe_100.py
+
+      - name: Upload complete probe report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: question-probe-100-results
+          path: question-probe-100-results.json
+          if-no-files-found: warn
