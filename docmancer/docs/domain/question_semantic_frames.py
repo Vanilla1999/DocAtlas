@@ -143,7 +143,13 @@ def match_premise_frame(question: str) -> PremiseFrame | None:
         if subject and target:
             return PremiseFrame(subject, target, "premise_check", match.group(2).casefold())
 
-    match = re.fullmatch(r"why\s+are\s+there\s+(\d{1,2}|one|two|three|four|five)\s+(.+)", q, re.I)
+    match = re.fullmatch(
+        r"why\s+are\s+there\s+"
+        r"(\d{1,2}|one|two|three|four|five|six|seven|eight|nine|ten)\s+"
+        r"((?:(?:public\s+)?docs\s+mcp\s+tools?)|(?:docs\s+mcp\s+public\s+tools?))",
+        q,
+        re.I,
+    )
     if match is not None:
         target = _entity(match.group(2))
         if target:

@@ -11,6 +11,7 @@ import re
 from typing import Mapping
 
 from docmancer.docs.domain.project_answer_contract import ProofObligation
+from docmancer.docs.domain.question_premise_proof import premise_relation_proof
 from docmancer.docs.domain.technical_terms import term_sequence_present
 
 
@@ -43,6 +44,9 @@ def relation_proof(
     """Validate relations introduced only by the compositional planner."""
 
     relation = str(obligation.relation or "")
+    premise = premise_relation_proof(obligation, text, source=source)
+    if premise is not None:
+        return PlannedProof(*premise)
     if relation not in {
         "blocking_gates", "token_bounding", "per_tool_usage", "verification",
         "conditional_behavior", "release_line_limit", "storage_coordination",

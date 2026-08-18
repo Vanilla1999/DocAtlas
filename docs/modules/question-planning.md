@@ -28,6 +28,7 @@ Question planning produces the obligations consumed by the evidence-selection mo
 - technical aliases are bounded and kind-aware;
 - parser ownership is explicit: a new QuestionPlan frame may replace a legacy surface only through a reviewed ownership migration with canonical-contract parity;
 - comparison, location, condition, and premise frames are complete-surface parsers and therefore inherit full-span fail-closed coverage;
+- premise questions are discharged only by a locally bound contradiction/correction or by a matching premise with an explicit causal explanation; a bare premise restatement cannot authorize `supported`;
 - compound facts may be decomposed into atomic mandatory facets so the selector can use bounded witnesses from different candidates without merging unrelated evidence;
 - frozen v1–v3 contracts remain compatibility inputs until explicitly migrated.
 

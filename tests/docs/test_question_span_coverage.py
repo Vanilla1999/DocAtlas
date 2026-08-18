@@ -1,8 +1,11 @@
 from __future__ import annotations
 
+import hashlib
+
 import pytest
 
 from docmancer.docs.application.evidence_selection import build_requirements
+from docmancer.docs.domain.answer_units import AnswerUnit, local_proof_for_obligation
 from docmancer.docs.domain.project_answer_contract import build_project_answer_contract
 from docmancer.docs.domain.question_frame_core import split_question_clause_spans
 from docmancer.docs.domain.question_ownership import frozen_ownership_mismatches
@@ -27,6 +30,18 @@ _ADVERSARIAL_TAILS = (
     ". Tell me the Bitcoin price.",
     "\nWhat is the Bitcoin price?",
 )
+
+
+def _unit(text: str) -> AnswerUnit:
+    return AnswerUnit(
+        unit_id="premise-proof-test",
+        kind="sentence",
+        text=text,
+        char_start=0,
+        char_end=len(text),
+        content_sha256=hashlib.sha256(text.encode()).hexdigest(),
+        proposition=True,
+    )
 
 
 @pytest.mark.parametrize(
@@ -148,6 +163,58 @@ def test_existing_compounds_and_paraphrases_remain_supported() -> None:
         assert not plan.unresolved_parts, (question, plan.unresolved_parts)
         assert len(plan.facets) == count, question
         assert plan.consumed_spans, question
+
+    premise = build_project_answer_contract(
+        "Why does clear-index always delete remote Qdrant collections?"
+    ).proof_obligations[0]
+    assert premise.expected_value == "always"
+    assert local_proof_for_obligation(
+        premise,
+        _unit("`clear-index` never deletes remote Qdrant collections; remote collections are preserved."),
+    ).valid is True
+    assert local_proof_for_obligation(
+        premise,
+        _unit("`clear-index` always deletes remote Qdrant collections."),
+    ).valid is False
+    assert local_proof_for_obligation(
+        premise,
+        _unit("`clear-index` always deletes remote Qdrant collections because the remote store is explicitly configured for purge."),
+    ).valid is True
+    assert local_proof_for_obligation(
+        premise,
+        _unit("`clear-index` deletes remote Qdrant collections only when --force is set."),
+    ).valid is True
+    assert local_proof_for_obligation(
+        premise,
+        _unit("`clear-index` never deletes local cache entries."),
+    ).valid is False
+
+    russian_premise = build_project_answer_contract(
+        "Почему clear-index всегда удаляет remote Qdrant collections?"
+    ).proof_obligations[0]
+    assert russian_premise.expected_value == "always"
+    assert local_proof_for_obligation(
+        russian_premise,
+        _unit("`clear-index` never deletes remote Qdrant collections."),
+    ).valid is True
+
+    cardinality = build_project_answer_contract(
+        "Why are there four public Docs MCP tools?"
+    ).proof_obligations[0]
+    assert cardinality.expected_value == "four"
+    assert local_proof_for_obligation(
+        cardinality,
+        _unit("Docs MCP exposes exactly three public tools: get_docs_context, prepare_docs, and docs_status."),
+    ).valid is True
+    assert local_proof_for_obligation(
+        cardinality,
+        _unit("Docs MCP exposes exactly four public tools."),
+    ).valid is False
+    assert local_proof_for_obligation(
+        cardinality,
+        _unit("Docs MCP exposes exactly four public tools because the fourth tool is a dedicated audit surface."),
+    ).valid is True
+    assert not compile_question_plan("Why are there four storage layers?").handled
 
 
 def test_russian_ambiguous_inventory_and_action_frames_fail_closed() -> None:
