@@ -1,0 +1,32 @@
+name: Self Hosting Project Docs Debug
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - scripts/self_hosting_project_docs_debug.py
+      - .github/workflows/self-hosting-project-docs-debug.yml
+
+permissions:
+  contents: read
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+  DOCMANCER_OFFLINE: "1"
+
+jobs:
+  trace:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - run: pip install -e .
+      - run: python scripts/self_hosting_project_docs_debug.py
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: self-hosting-project-docs-debug
+          path: self-hosting-project-docs-debug.json
+          if-no-files-found: warn
