@@ -18,9 +18,9 @@ jobs:
         with:
           fetch-depth: 1
       - name: Build source archive
-        run: tar --exclude=.git -czf docatlas-source-8903f631.tar.gz .
+        run: tar --exclude=.git -czf /tmp/docatlas-source-8903f631.tar.gz .
       - uses: actions/upload-artifact@v4
         with:
           name: docatlas-source-8903f631
-          path: docatlas-source-8903f631.tar.gz
+          path: /tmp/docatlas-source-8903f631.tar.gz
           if-no-files-found: error
