@@ -13,6 +13,7 @@ import re
 from typing import Callable, Literal
 
 from docmancer.docs.domain.question_frame_core import (
+    ambiguous_frame_reason,
     match_action_frame,
     match_inventory_frame,
     match_requirements_frame,
@@ -519,6 +520,14 @@ _RULES: tuple[Rule, ...] = (
 
 
 def _reusable_frame_plan(q: str) -> QuestionPlan | None:
+    ambiguity = ambiguous_frame_reason(q)
+    if ambiguity is not None:
+        return QuestionPlan(
+            clauses=(q,),
+            unresolved_parts=(ambiguity,),
+            parse_trace=("fail_closed:ambiguous_frame",),
+        )
+
     inventory = match_inventory_frame(q)
     if inventory is not None:
         return QuestionPlan(
@@ -543,34 +552,73 @@ def _reusable_frame_plan(q: str) -> QuestionPlan | None:
         )
 
     action = match_action_frame(q)
-    if action is not None:
-        if action.operation == "sync_project_docs":
-            return QuestionPlan(
-                facets=(PlannedFacet(
-                    "command", "sync_project_docs", relation="invocation",
-                    value_kind="call_expression", expected_value="sync_project_docs",
-                    response_mode="call", subject_kind="code_symbol",
-                    subject_aliases=(
-                        "sync_project_docs", "sync-project-docs",
-                        "sync project docs", "refresh project documentation",
-                    ),
-                    span_text=q,
-                ),),
-                clauses=(q,),
-                parse_trace=("frame:action:sync_project_docs",),
-            )
+    if action is not None and action.operation == "sync_project_docs":
+        return QuestionPlan(
+            facets=(PlannedFacet(
+                "command", "sync_project_docs", relation="invocation",
+                value_kind="call_expression", expected_value="sync_project_docs",
+                response_mode="call", subject_kind="code_symbol",
+                subject_aliases=(
+                    "sync_project_docs", "sync-project-docs",
+                    "sync project docs", "refresh project documentation",
+                    "project docs index",
+                ),
+                span_text=q,
+            ),),
+            clauses=(q,),
+            parse_trace=("frame:action:sync_project_docs",),
+        )
     return None
+
+
+_UNSAFE_GENERIC_SUBJECTS = frozenset({
+    "project", "system", "workflow", "request", "requested operation",
+    "the", "it", "this", "thing",
+})
+
+
+def _normal_subject(value: str) -> str:
+    return " ".join(str(value or "").casefold().split())
+
+
+def _guard_plan_subjects(plan: QuestionPlan) -> QuestionPlan:
+    unsafe = tuple(dict.fromkeys(
+        facet.subject
+        for facet in plan.facets
+        if _normal_subject(facet.subject) in _UNSAFE_GENERIC_SUBJECTS
+    ))
+    if not unsafe:
+        return plan
+    unresolved = tuple(dict.fromkeys((
+        *plan.unresolved_parts,
+        *("unresolved_query_subject" for _ in unsafe),
+    )))
+    return QuestionPlan(
+        clauses=plan.clauses,
+        unresolved_parts=unresolved,
+        parse_trace=(*plan.parse_trace, "fail_closed:generic_subject"),
+    )
 
 
 def _compile_atomic_question(q: str) -> QuestionPlan | None:
     framed = _reusable_frame_plan(q)
     if framed is not None and framed.handled:
-        return framed
+        return _guard_plan_subjects(framed)
     for rule in _RULES:
         plan = rule(q)
         if plan is not None and plan.handled:
-            return plan
+            return _guard_plan_subjects(plan)
     return None
+
+
+def _unresolved_compound(clauses: tuple[str, ...], *, trace: str) -> QuestionPlan:
+    return QuestionPlan(
+        clauses=clauses,
+        unresolved_parts=tuple(
+            f"unresolved_question_clause:{clause}" for clause in clauses
+        ),
+        parse_trace=(trace,),
+    )
 
 
 def _combine_clause_plans(question: str, clauses: tuple[str, ...]) -> QuestionPlan | None:
@@ -578,33 +626,65 @@ def _combine_clause_plans(question: str, clauses: tuple[str, ...]) -> QuestionPl
         return None
     plans = tuple(_compile_atomic_question(clause) for clause in clauses)
     handled = tuple(plan for plan in plans if plan is not None and plan.handled)
-    if not handled:
-        return None
 
-    facets = tuple(facet for plan in handled for facet in plan.facets)
-    trace = tuple(row for plan in handled for row in plan.parse_trace)
-    unresolved = tuple(
-        f"unresolved_question_clause:{clause}"
-        for clause, plan in zip(clauses, plans)
-        if plan is None or not plan.handled
-    )
-    unresolved += tuple(
-        row for plan in handled for row in plan.unresolved_parts
-    )
-    return QuestionPlan(
-        facets=facets,
-        clauses=clauses,
-        unresolved_parts=unresolved,
-        parse_trace=("frame:compound", *trace),
-    )
+    if handled:
+        facets = tuple(facet for plan in handled for facet in plan.facets)
+        trace = tuple(row for plan in handled for row in plan.parse_trace)
+        unresolved = tuple(
+            f"unresolved_question_clause:{clause}"
+            for clause, plan in zip(clauses, plans)
+            if plan is None or not plan.handled
+        )
+        unresolved += tuple(
+            row for plan in handled for row in plan.unresolved_parts
+        )
+        return _guard_plan_subjects(QuestionPlan(
+            facets=facets,
+            clauses=clauses,
+            unresolved_parts=tuple(dict.fromkeys(unresolved)),
+            parse_trace=("frame:compound", *trace),
+        ))
+
+    # Some frozen compound rules are intentionally recognized as a whole
+    # (for example the three public Docs MCP tools + per-tool usage). Permit
+    # that only when the whole rule produces at least one mandatory facet per
+    # detected clause. A one-facet prefix match cannot authorize two clauses.
+    whole = _compile_atomic_question(question)
+    if (
+        whole is not None
+        and whole.handled
+        and not whole.unresolved_parts
+        and len(whole.facets) >= len(clauses)
+    ):
+        return _guard_plan_subjects(QuestionPlan(
+            facets=whole.facets,
+            clauses=clauses,
+            parse_trace=("frame:whole_compound", *whole.parse_trace),
+        ))
+    if whole is not None and whole.handled:
+        unresolved = tuple(
+            f"unresolved_question_clause:{clause}"
+            for clause in clauses[1:]
+        ) or tuple(
+            f"unresolved_question_clause:{clause}" for clause in clauses
+        )
+        return _guard_plan_subjects(QuestionPlan(
+            facets=whole.facets,
+            clauses=clauses,
+            unresolved_parts=tuple(dict.fromkeys((*whole.unresolved_parts, *unresolved))),
+            parse_trace=("fail_closed:partial_question", *whole.parse_trace),
+        ))
+    return _unresolved_compound(clauses, trace="fail_closed:unresolved_compound")
 
 
 def compile_question_plan(question: str) -> QuestionPlan:
-    q = " ".join(str(question or "").split())[:4000]
-    clauses = split_question_clauses(q)
-    compound = _combine_clause_plans(q, clauses)
-    if compound is not None:
-        return compound
+    raw = str(question or "")[:4000]
+    q = " ".join(raw.split())
+    clauses = split_question_clauses(raw)
+    if len(clauses) > 1:
+        compound = _combine_clause_plans(q, clauses)
+        if compound is not None:
+            return compound
     atomic = _compile_atomic_question(q)
     return atomic if atomic is not None else QuestionPlan()
 

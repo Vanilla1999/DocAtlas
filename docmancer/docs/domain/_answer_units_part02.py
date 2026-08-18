@@ -14,8 +14,12 @@ def _attribute_aliases(attribute: str | None) -> tuple[str, ...]:
         "status": ("status", "state", "статус", "состояние"),
         "public tools": ("public tools", "tools", "commands", "methods", "инструменты", "команды"),
         "scope": ("scope", "scopes", "область", "области"),
-        "marker": ("marker", "markers", "test marker", "test markers"),
+        "marker": ("marker", "markers", "test marker", "test markers", "pytest marker", "pytest markers"),
         "source": ("source", "sources", "source type", "source types"),
+        "file format": (
+            "file format", "file formats", "document format", "document formats",
+            "local file format", "local file formats",
+        ),
     }
     return aliases.get(normalized, (attribute,) if attribute else ())
 

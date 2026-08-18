@@ -21,8 +21,10 @@ Question planning produces the obligations consumed by the evidence-selection mo
 ## Invariants
 
 - unresolved subjects and operations cannot authorize `supported`;
-- compound questions expose every mandatory facet and any unparsed clause becomes `unresolved_question_clause`;
+- compound questions expose every mandatory facet and any unparsed independent clause becomes `unresolved_question_clause`, including punctuation- and action-delimited tails;
 - equivalent surface forms such as `What`/`Which`, standalone/compound inventory, and `Which command`/`How do I` resolve to compatible canonical intents;
+- inventory categories stay typed: source types, file formats, and test markers are never interchangeable proof subjects;
+- ambiguous surface nouns such as bare `markers` or `formats`, generic subjects such as `project`, and unqualified `docs index` actions fail closed instead of being guessed;
 - technical aliases are bounded and kind-aware;
 - frozen v1–v3 contracts remain compatibility inputs until explicitly migrated.
 

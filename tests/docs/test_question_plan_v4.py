@@ -341,3 +341,124 @@ def test_requirements_relation_needs_named_subject_and_multiple_requirement_deta
     assert local_proof_for_obligation(obligation, exact).valid is True
     assert local_proof_for_obligation(obligation, weak).valid is False
     assert local_proof_for_obligation(obligation, unrelated).valid is False
+
+
+def test_inventory_categories_are_typed_and_do_not_conflate_sources_formats_or_markers():
+    source = build_project_answer_contract(
+        "Which source types are supported for indexing?"
+    )
+    file_format = build_project_answer_contract(
+        "Which file formats are supported for indexing?"
+    )
+    document_format = build_project_answer_contract(
+        "Which document formats are supported for indexing?"
+    )
+
+    source_row = source.proof_obligations[0]
+    format_row = file_format.proof_obligations[0]
+    document_row = document_format.proof_obligations[0]
+    assert (source_row.subject, source_row.attribute, source_row.item_kind) == (
+        "source types", "source", "source",
+    )
+    assert (format_row.subject, format_row.attribute, format_row.item_kind) == (
+        "file formats", "file format", "format",
+    )
+    assert (
+        document_row.subject, document_row.attribute, document_row.item_kind
+    ) == (
+        "file formats", "file format", "format",
+    )
+
+    format_unit = _unit(
+        "Local file formats are `.md`, `.pdf`, `.docx`, and `.rtf`."
+    )
+    source_unit = _unit(
+        "DocAtlas Docs supports exactly five source types: `GitBook sites`, "
+        "`Mintlify sites`, `Generic web docs`, `GitHub repos`, and `Local files`."
+    )
+    assert local_proof_for_obligation(
+        format_row,
+        format_unit,
+        source={"authority": "source_of_truth", "heading_path": "Local file formats"},
+    ).valid is True
+    assert local_proof_for_obligation(
+        format_row,
+        source_unit,
+        source={"authority": "source_of_truth", "heading_path": "Docs Source Types"},
+    ).valid is False
+
+
+
+def test_ambiguous_inventory_action_and_generic_subjects_fail_closed():
+    cases = (
+        ("What markers are available?", "unresolved_inventory_category:markers"),
+        ("Which formats are supported?", "unresolved_inventory_category:formats"),
+        ("How do I update the docs index?", "unresolved_requested_operation"),
+        ("What does the project require?", "unresolved_query_subject"),
+        ("What does the system require?", "unresolved_query_subject"),
+    )
+    for question, reason in cases:
+        contract = build_project_answer_contract(question)
+        assert contract.schema_version == PROJECT_ANSWER_CONTRACT_SCHEMA_V4
+        assert not contract.proof_obligations
+        assert reason in contract.unresolved_parts
+
+    resolved = build_project_answer_contract(
+        "How do I update the project docs index after changing a file?"
+    )
+    assert not resolved.unresolved_parts
+    assert len(resolved.proof_obligations) == 1
+    assert resolved.proof_obligations[0].expected_value == "sync_project_docs"
+
+
+
+def test_full_question_coverage_rejects_unknown_tails_across_boundary_forms():
+    questions = (
+        "Which command syncs project docs after file changes; what is the Bitcoin price?",
+        "Which command syncs project docs after file changes. What is the Bitcoin price?",
+        "Which command syncs project docs after file changes? What is the Bitcoin price?",
+        "Which command syncs project docs after file changes plus tell me the Bitcoin price?",
+        "Which command syncs project docs after file changes then calculate 2+2.",
+        "Which command syncs project docs after file changes as well as tell me the Bitcoin price?",
+        "Which command syncs project docs after file changes along with tell me the Bitcoin price?",
+        "How do I sync project docs after changing a file and rebuild vectors?",
+    )
+    for question in questions:
+        contract = build_project_answer_contract(question)
+        assert contract.schema_version == PROJECT_ANSWER_CONTRACT_SCHEMA_V4
+        assert contract.unresolved_parts, question
+        assert any(
+            row.startswith("unresolved_question_clause:")
+            for row in contract.unresolved_parts
+        ), (question, contract.unresolved_parts)
+        requirements = build_requirements(question, profile="project_docs_answer")
+        assert any(row.kind == "unsupported_query" for row in requirements), question
+
+
+
+def test_existing_compounds_and_noun_coordination_survive_stricter_clause_coverage():
+    public_tools = build_project_answer_contract(
+        "What are the three public Docs MCP tools and when do I use each one?"
+    )
+    assert not public_tools.unresolved_parts
+    assert len(public_tools.proof_obligations) == 2
+
+    markers = build_project_answer_contract(
+        "What test markers are available and how do I run the offline suite?"
+    )
+    assert not markers.unresolved_parts
+    assert len(markers.proof_obligations) == 2
+
+    chunking = build_project_answer_contract(
+        "How does indexing split documents into sections and chunks?"
+    )
+    assert not chunking.unresolved_parts
+    assert [(row.subject, row.relation) for row in chunking.proof_obligations] == [
+        ("indexing", "chunking")
+    ]
+
+    storage = build_project_answer_contract(
+        "What is the storage mutation coordination contract for cleanup and refresh?"
+    )
+    assert not storage.unresolved_parts
+    assert len(storage.proof_obligations) == 1

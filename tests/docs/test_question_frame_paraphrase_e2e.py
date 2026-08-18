@@ -32,6 +32,11 @@ def test_reusable_question_frames_survive_real_manifest_sync_and_public_mcp(tmp_
         "`Mintlify sites`, `Generic web docs`, `GitHub repos`, and `Local files`.\n",
         encoding="utf-8",
     )
+    (docs / "formats.md").write_text(
+        "# Local file formats\n\n"
+        "Local file formats are `.md`, `.pdf`, `.docx`, `.rtf`, `.txt`, and `.html`.\n",
+        encoding="utf-8",
+    )
     (docs / "testing.md").write_text(
         "# Test markers\n\n"
         "The test suite markers are `integration`, `advanced`, `live`, and `live_network`.\n",
@@ -52,6 +57,7 @@ def test_reusable_question_frames_survive_real_manifest_sync_and_public_mcp(tmp_
     entries = (
         ("README.md", "overview"),
         ("docs/sources.md", "other"),
+        ("docs/formats.md", "other"),
         ("docs/testing.md", "development"),
         ("docs/sync.md", "runbook"),
         ("docs/smoke.md", "runbook"),
@@ -76,6 +82,8 @@ def test_reusable_question_frames_survive_real_manifest_sync_and_public_mcp(tmp_
         ("What source types are supported for indexing?", "GitBook sites"),
         ("Which source types are supported for indexing?", "GitBook sites"),
         ("Какие типы источников поддерживаются для индексации?", "GitBook sites"),
+        ("Which file formats are supported for indexing?", ".docx"),
+        ("Which document formats are supported for indexing?", ".rtf"),
         ("What test markers are available?", "live_network"),
         ("Which pytest markers are available?", "live_network"),
         ("What does the two-cell smoke procedure require?", "exactly two cells"),
@@ -83,22 +91,37 @@ def test_reusable_question_frames_survive_real_manifest_sync_and_public_mcp(tmp_
         ("How do I sync project docs after changing a file?", "sync_project_docs"),
         ("Как синхронизировать документацию проекта после изменения файла?", "sync_project_docs"),
     )
-    for question, expected in cases:
-        payload = call_docs_tool_payload(
-            "get_docs_context",
-            {"question": question, "project_path": str(project), "mode": "project"},
-            service,
-        )
-        assert payload["status"] == "ok", (question, payload)
-        assert expected in str(payload), (question, payload)
+    for mode in (None, "project"):
+        for question, expected in cases:
+            arguments = {"question": question, "project_path": str(project)}
+            if mode is not None:
+                arguments["mode"] = mode
+            payload = call_docs_tool_payload(
+                "get_docs_context",
+                arguments,
+                service,
+            )
+            assert payload["status"] == "ok", (mode, question, payload)
+            assert expected in str(payload), (mode, question, payload)
 
-    unsupported_tail = call_docs_tool_payload(
-        "get_docs_context",
-        {
-            "question": "Which source types are supported for indexing, and what is the Bitcoin price?",
-            "project_path": str(project),
-            "mode": "project",
-        },
-        service,
+    rejected = (
+        "What markers are available?",
+        "Which formats are supported?",
+        "How do I update the docs index?",
+        "What does the project require?",
+        "Which source types are supported for indexing; what is the Bitcoin price?",
+        "Which source types are supported for indexing. What is the Bitcoin price?",
+        "Which source types are supported for indexing plus tell me the Bitcoin price?",
+        "How do I sync project docs after changing a file and rebuild vectors?",
     )
-    assert unsupported_tail["status"] != "ok", unsupported_tail
+    for mode in (None, "project"):
+        for question in rejected:
+            arguments = {"question": question, "project_path": str(project)}
+            if mode is not None:
+                arguments["mode"] = mode
+            payload = call_docs_tool_payload(
+                "get_docs_context",
+                arguments,
+                service,
+            )
+            assert payload["status"] != "ok", (mode, question, payload)
