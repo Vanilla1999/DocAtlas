@@ -1,0 +1,192 @@
+diff --git a/.github/workflows/ci.yml b/.github/workflows/ci.yml
+index e185b50..5e3412a 100644
+--- a/.github/workflows/ci.yml
++++ b/.github/workflows/ci.yml
+@@ -110,6 +110,9 @@ jobs:
+       - name: Run question surface regression gate
+         run: python scripts/run_question_surface_gate.py
+ 
++      - name: Run Agent Developer Protocol gate
++        run: python scripts/run_agent_developer_gate.py
++
+       - name: Run critical mutation gate
+         run: python scripts/run_critical_mutation_gate.py
+ 
+diff --git a/eval/agent_developer_v1/README.md b/eval/agent_developer_v1/README.md
+index 9e4b58f..5735060 100644
+--- a/eval/agent_developer_v1/README.md
++++ b/eval/agent_developer_v1/README.md
+@@ -37,14 +37,15 @@ python scripts/run_agent_developer_gate.py
+ 
+ The run is provider-free and uses an isolated temporary `DOCMANCER_HOME`. It copies each fixture before indexing so stale-doc mutations never alter committed files.
+ 
+-Expected first-commit summary:
++Final acceptance summary:
+ 
+ ```text
+-Agent Developer Protocol v1: BASELINE PASS
++target closure: 11/11 tasks; named target gaps=0; false-supported=0; forbidden-source-contamination=0
++Agent Developer Protocol v1: TARGET PASS
+ ```
+ 
+-followed by a target-closure count and named gaps. Later commits should reduce the named target gaps without changing the safety contract.
++The runner is a hard CI gate: any remaining target gap, baseline/target contract drift, false-supported result, wrong recovery action, missing required source, or forbidden-source contamination exits non-zero. The historical baseline remains in the oracle only to distinguish reviewed behavior changes from regressions; it no longer permits a baseline-only CI pass.
+ 
+ ## Current closure
+ 
+-After the scope/recovery contract hardening, the provider-free oracle closes all **11/11** reviewed trajectories. Module ambiguity remains fail-closed, but the bounded response preserves `operational_reason_code=module_ambiguous`, returns at most eight exact `module_candidates`, recommends public `docs_status`, and requires the agent to retry with an exact `module_path`.
++After the scope/recovery contract hardening, the provider-free oracle closes all **11/11** reviewed trajectories. Module ambiguity remains fail-closed, but the bounded response preserves `operational_reason_code=module_ambiguous`, returns at most eight exact `module_candidates`, recommends public `docs_status`, and requires the agent to retry with an exact `module_path`. The permanent `advanced-contract` CI job runs this protocol on every pull request and push to `main`.
+diff --git a/scripts/run_agent_developer_gate.py b/scripts/run_agent_developer_gate.py
+index 9ed36db..7d9d4f9 100644
+--- a/scripts/run_agent_developer_gate.py
++++ b/scripts/run_agent_developer_gate.py
+@@ -385,10 +385,18 @@ def run_protocol() -> dict[str, Any]:
+             os.environ["DOCMANCER_HOME"] = previous_home
+ 
+     target_closed_tasks = sum(1 for item in task_results if item["target_closed"])
++    target_ok = (
++        not errors
++        and target_closed_tasks == len(protocol["tasks"])
++        and not target_gaps
++        and false_supported == 0
++        and contamination == 0
++    )
+     return {
+         "schema_version": 1,
+         "protocol": "agent-developer-v1",
+         "baseline_ok": not errors,
++        "target_ok": target_ok,
+         "task_count": len(protocol["tasks"]),
+         "executed_task_count": len(task_results),
+         "target_closed_tasks": target_closed_tasks,
+@@ -410,12 +418,6 @@ def main() -> int:
+             f" gap={task['known_gap']}" if not task["target_closed"] and task.get("known_gap") else ""
+         )
+         print(f"{task['task_id']}: {state}{gap}")
+-    if report["errors"]:
+-        print("Agent Developer Protocol v1: BASELINE FAIL")
+-        for error in report["errors"]:
+-            print(f"- {error}")
+-        return 1
+-    print("Agent Developer Protocol v1: BASELINE PASS")
+     print(
+         f"target closure: {report['target_closed_tasks']}/{report['task_count']} tasks; "
+         f"named target gaps={report['target_gap_count']}; "
+@@ -427,6 +429,12 @@ def main() -> int:
+             f"- target gap {gap['task_id']}: {gap['gap']} "
+             f"actual={gap['actual_status']} target={gap['target_status']}"
+         )
++    if not report["target_ok"]:
++        print("Agent Developer Protocol v1: TARGET FAIL")
++        for error in report["errors"]:
++            print(f"- {error}")
++        return 1
++    print("Agent Developer Protocol v1: TARGET PASS")
+     return 0
+ 
+ 
+diff --git a/tests/diagnostic_labels.json b/tests/diagnostic_labels.json
+index 6f69f08..607fe5b 100644
+--- a/tests/diagnostic_labels.json
++++ b/tests/diagnostic_labels.json
+@@ -471,7 +471,7 @@
+     "tests/test_patch_review_command_part03.py": "b196cdff0728dfaf16e7b4f197c00eca373ae899ac892bdf2e65717656f57ee9",
+     "tests/test_patch_review_command_part04.py": "1f2f2d3b6d7779d255b018def7c9a6df01c74d3d628286b99b136100e0b007a9",
+     "tests/test_preindex_coverage.py": "a0ae566b11341913a8bd4914937b1339dccb7245a892fe74a93e1fe18863c042",
+-    "tests/test_product_scope.py": "60bbf0152ee2fbd169cbab24ab58cc3d381feef7871920a1b7a3118049aa47c5",
++    "tests/test_product_scope.py": "76a944583a4b65036e56a6e8578ce5959a9e0fd2f8ba5f2d444f561dfea63ed7",
+     "tests/test_project_answer_quality_v2_protocol.py": "f1a672c3d87730946683ae5bc55754574dec13932003026af67707217e9cb207",
+     "tests/test_project_answer_quality_v3_protocol.py": "23bc5f2ea8932b0b88d179c7bf77659ed674ef0cdc2ae7c287d6cef1e33b1242",
+     "tests/test_project_answer_quality_v4_protocol.py": "202ee0468d96b5dc1d0fd69b621577de21d3a57176e93a1448f46bd75d5de416",
+diff --git a/tests/docs/test_action_packet.py b/tests/docs/test_action_packet.py
+index 9e0ea03..aae8b6f 100644
+--- a/tests/docs/test_action_packet.py
++++ b/tests/docs/test_action_packet.py
+@@ -273,7 +273,8 @@ def test_bounded_direct_is_one_existing_tool_call_and_returns_only_action_packet
+     tool = next(item for item in TOOLS if item["name"] == "get_docs_context")
+     assert set(tool["inputSchema"]["properties"]) == {
+         "question", "project_path", "library", "libraries", "ecosystem",
+-        "version", "source_type", "docs_url", "mode",
++        "version", "source_type", "docs_url", "module", "module_path",
++        "scope", "mode",
+     }
+     assert "delivery_strategy" not in tool["inputSchema"]["properties"]
+     assert tool["outputSchema"]["properties"]["kind"]["enum"] == ["docs_answer", "patch_context"]
+diff --git a/tests/test_product_scope.py b/tests/test_product_scope.py
+index 1d4b943..ad843cf 100644
+--- a/tests/test_product_scope.py
++++ b/tests/test_product_scope.py
+@@ -3,7 +3,7 @@ from __future__ import annotations
+ import json
+ from pathlib import Path
+ 
+-from scripts.run_agent_developer_gate import run_protocol
++import scripts.run_agent_developer_gate as agent_gate
+ 
+ 
+ ROOT = Path(__file__).resolve().parents[1]
+@@ -107,8 +107,9 @@ def _assert_agent_developer_protocol_baseline() -> None:
+         "module_plus_dependency", "negative_contamination", "recovery",
+     } <= {task["class"] for task in tasks}
+ 
+-    report = run_protocol()
++    report = agent_gate.run_protocol()
+     assert report["baseline_ok"] is True, report["errors"]
++    assert report["target_ok"] is True, report["target_gaps"]
+     assert report["task_count"] == 11
+     assert report["executed_task_count"] == 11
+     assert report["target_closed_tasks"] == 11
+@@ -116,3 +117,33 @@ def _assert_agent_developer_protocol_baseline() -> None:
+     assert report["forbidden_source_contamination"] == 0
+     assert report["errors"] == []
+     assert report["target_gaps"] == []
++
++
++def test_agent_developer_protocol_is_a_hard_ci_gate(monkeypatch, capsys) -> None:
++    ci = (ROOT / ".github" / "workflows" / "ci.yml").read_text(encoding="utf-8")
++    assert "python scripts/run_agent_developer_gate.py" in ci
++
++    partial_report = {
++        "tasks": [{
++            "task_id": "ambiguous_module_recovery_named_gap",
++            "target_closed": False,
++            "known_gap": "bounded_module_ambiguity_projection",
++        }],
++        "errors": [],
++        "target_ok": False,
++        "target_closed_tasks": 10,
++        "task_count": 11,
++        "target_gap_count": 1,
++        "target_gaps": [{
++            "task_id": "ambiguous_module_recovery_named_gap",
++            "gap": "bounded_module_ambiguity_projection",
++            "actual_status": "insufficient_evidence",
++            "target_status": "insufficient_evidence",
++        }],
++        "false_supported": 0,
++        "forbidden_source_contamination": 0,
++    }
++    monkeypatch.setattr(agent_gate, "run_protocol", lambda: partial_report)
++
++    assert agent_gate.main() == 1
++    assert "Agent Developer Protocol v1: TARGET FAIL" in capsys.readouterr().out
+diff --git a/tests/test_unified_docs_context_mcp.py b/tests/test_unified_docs_context_mcp.py
+index 5f53357..b19caed 100644
+--- a/tests/test_unified_docs_context_mcp.py
++++ b/tests/test_unified_docs_context_mcp.py
+@@ -14,9 +14,13 @@ def test_get_docs_context_schema():
+     assert {"allow_network", "force_refresh", "prefetch_auto", "prepare_project_docs"}.isdisjoint(schema["properties"])
+     assert set(schema["properties"]) == {
+         "question", "project_path", "library", "libraries", "ecosystem",
+-        "version", "source_type", "docs_url", "mode",
++        "version", "source_type", "docs_url", "module", "module_path",
++        "scope", "mode",
+     }
+-    assert schema["properties"]["mode"]["enum"] == ["auto", "project", "library", "mixed"]
++    assert schema["properties"]["scope"]["enum"] == ["project", "module", "all"]
++    assert schema["properties"]["mode"]["enum"] == [
++        "auto", "project", "library", "dependency", "mixed",
++    ]
+     assert {"delivery_strategy", "packet_tokens", "output_mode", "maintenance", "details"}.isdisjoint(schema["properties"])
+ 
+ 
