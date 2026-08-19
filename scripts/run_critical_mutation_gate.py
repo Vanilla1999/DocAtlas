@@ -50,7 +50,7 @@ MUTANTS = (
     ),
     Mutant(
         "github_models_host_turn_limit",
-        "eval/task_level/github_models.py",
+        "eval/task_level/_github_models_part02.py",
         "for turn in range(1, request.max_turns + 1):",
         "for turn in range(1, request.max_turns + 2):",
         TARGET_TESTS[2],
