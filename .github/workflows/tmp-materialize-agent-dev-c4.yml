@@ -1,19 +1,19 @@
 name: TEMP materialize Agent Developer Commit 4
 
 on:
-  push:
-    branches: ["tmp/materialize-agent-dev-c4"]
+  pull_request:
+    branches: [main]
 
 permissions:
   contents: write
 
 jobs:
   materialize:
-    if: github.event.head_commit.message != 'TEMP materialize Agent Developer Commit 4'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
         with:
+          ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0
       - name: Apply reviewed Commit 4 patch
         shell: bash
@@ -28,4 +28,4 @@ jobs:
           git config user.email '41183994+Vanilla1999@users.noreply.github.com'
           git add -A
           git commit -m 'TEMP materialize Agent Developer Commit 4'
-          git push origin HEAD:${GITHUB_REF_NAME}
+          git push origin HEAD:${{ github.event.pull_request.head.ref }}
