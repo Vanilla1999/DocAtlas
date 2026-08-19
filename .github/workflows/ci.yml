@@ -11,6 +11,55 @@ env:
   DOCMANCER_OFFLINE: "1"
 
 jobs:
+  signature-dump:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - run: pip install -e .
+      - name: Dump current canonical signatures
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from docmancer.docs.domain.project_answer_contract import build_project_answer_contract
+          from docmancer.docs.domain.question_plan import compile_question_plan
+          questions = [
+              "How does prepare_docs sync_project_docs work?",
+              "What does Phase 3.1 require for RetrievalDispatcher, the raw topic, EvidenceRequirementSet hints, and vector or embedding calls?",
+              "What does docs_status report and when should it be used?",
+              "What are the three public Docs MCP tools?",
+              "Which source types are supported for indexing?",
+              "How do I sync project docs after changing a file?",
+              "What are the three public Docs MCP tools and when do I use each one?",
+              "How does evidence selection differ from question planning?",
+              "Where is the project answer contract documented?",
+              "What happens when the preview plan is stale?",
+              "Why does clear-index always delete remote Qdrant collections?",
+              "What are the public tools and their purposes?",
+              "Назови три публичных инструмента Docs MCP и когда использовать каждый.",
+              "What is the difference between evidence selection and question planning?",
+              "Explain the storage mutation coordination contract.",
+          ]
+          for q in questions:
+              p = compile_question_plan(q)
+              c = build_project_answer_contract(q)
+              sig = [(
+                  x.kind, x.subject, x.attribute, x.relation, x.target,
+                  x.value_kind, x.expected_value, x.item_kind,
+                  x.cardinality, x.response_mode, x.context,
+              ) for x in c.proof_obligations]
+              print("SIGNATURE=" + json.dumps({
+                  "question": q,
+                  "owner": "question_plan" if p.handled else "legacy",
+                  "parse_trace": list(p.parse_trace),
+                  "unresolved": list(c.unresolved_parts),
+                  "signature": sig,
+              }, ensure_ascii=False, sort_keys=True))
+          PY
+
   docs-contract:
     runs-on: ubuntu-latest
 
