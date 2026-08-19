@@ -1,0 +1,32 @@
+name: Temporary apply Commit D
+
+on:
+  push:
+    branches:
+      - tmp/question-surface-build
+
+permissions:
+  contents: write
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+jobs:
+  apply:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: tmp/question-surface-build
+      - name: Materialize reviewed Commit D patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          gzip -dc .tmp/commit-d.patch.gz | git apply --index
+          git rm .tmp/commit-d.patch.gz .github/workflows/tmp_apply_commit_d.yml
+          git diff --cached --check
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git commit -m "stage: materialize Commit D"
+          git push origin HEAD:tmp/question-surface-build
