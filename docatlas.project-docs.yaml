@@ -72,6 +72,14 @@ documents:
     status: active
     impact: search_only
 
+  - path: eval/project_answer_surface_v1/README.md
+    role: development
+    scope: project
+    description: Frozen 100-case EN/RU question-surface protocol covering canonical signatures, ownership, and fail-closed unsupported outcomes.
+    authority: source_of_truth
+    status: active
+    impact: search_only
+
   - path: eval/task_level/README.md
     role: development
     scope: project

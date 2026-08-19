@@ -25,6 +25,7 @@ from docmancer.docs.domain.question_semantic_frames import (
     match_location_frame,
     match_premise_frame,
 )
+from docmancer.docs.domain.question_surface_normalization import normalize_question_surface
 from docmancer.docs.domain.technical_terms import TechnicalTermKind
 
 from docmancer.docs.domain.question_plan_core import (
@@ -44,6 +45,13 @@ from docmancer.docs.domain.question_plan_command_rules import (
     _docs_mcp_server_command,
     _offline_suite_run,
     _two_cell_cardinality,
+)
+from docmancer.docs.domain.question_plan_surface_rules import (
+    mcp_request_handling,
+    provider_request_timeout,
+    public_tool_usage,
+    public_tools_with_purposes,
+    python_version_support,
 )
 
 
@@ -71,8 +79,11 @@ def _release_docs_line_limit(q: str) -> QuestionPlan | None:
 
 def _storage_coordination_contract(q: str) -> QuestionPlan | None:
     match = re.match(
-        r"^\s*what\s+is\s+the\s+storage\s+mutation\s+coordination\s+contract\s+"
-        r"for\s+cleanup\s+and\s+refresh\s*[?!.]*\s*$",
+        r"^\s*(?:"
+        r"what\s+is\s+the\s+storage\s+mutation\s+coordination\s+contract"
+        r"(?:\s+for\s+cleanup\s+and\s+refresh)?|"
+        r"explain\s+the\s+storage\s+mutation\s+coordination\s+contract"
+        r")\s*[?!.]*\s*$",
         q,
         re.I,
     )
@@ -528,6 +539,11 @@ _SPECIFIC_RULES: tuple[Rule, ...] = (
     _semantic_comparison,
     _semantic_location,
     _semantic_condition,
+    public_tool_usage,
+    public_tools_with_purposes,
+    python_version_support,
+    mcp_request_handling,
+    provider_request_timeout,
     _docs_mcp_server_command,
     _command_sync,
     _offline_suite_run,
@@ -557,14 +573,9 @@ _GENERIC_RULES: tuple[Rule, ...] = (
 
 
 def _reusable_frame_plan(q: str) -> QuestionPlan | None:
-    ambiguity = ambiguous_frame_reason(q)
-    if ambiguity is not None:
-        return QuestionPlan(
-            clauses=(q,),
-            unresolved_parts=(ambiguity,),
-            parse_trace=("fail_closed:ambiguous_frame",),
-        )
-
+    # Exact typed frames take precedence over broad ambiguity sentinels.  A
+    # phrase such as "file formats" or "pytest markers" is already a closed
+    # category; only bare "formats"/"markers" remain ambiguous.
     inventory = match_inventory_frame(q)
     if inventory is not None:
         return QuestionPlan(
@@ -575,6 +586,14 @@ def _reusable_frame_plan(q: str) -> QuestionPlan | None:
             ),),
             clauses=(q,),
             parse_trace=(f"frame:inventory:{inventory.item_kind}",),
+        )
+
+    ambiguity = ambiguous_frame_reason(q)
+    if ambiguity is not None:
+        return QuestionPlan(
+            clauses=(q,),
+            unresolved_parts=(ambiguity,),
+            parse_trace=("fail_closed:ambiguous_frame",),
         )
 
     requirements = match_requirements_frame(q)
@@ -861,10 +880,11 @@ def _finalize_full_span_coverage(question: str, plan: QuestionPlan) -> QuestionP
     )
 
 
-def compile_question_plan(question: str) -> QuestionPlan:
-    raw = str(question or "")[:4000]
+def _compile_question_plan_core(raw: str) -> QuestionPlan:
     normalized = " ".join(raw.split())
     clauses = split_question_clause_spans(raw)
+    if not clauses:
+        return QuestionPlan()
     if len(clauses) > 1:
         compound = _combine_clause_plans(raw, clauses)
         if compound is not None:
@@ -891,6 +911,50 @@ def compile_question_plan(question: str) -> QuestionPlan:
     if residue is not None:
         return residue
     return QuestionPlan()
+
+
+def _bind_surface_plan(
+    plan: QuestionPlan,
+    *,
+    raw: str,
+    rule: str,
+) -> QuestionPlan:
+    """Rebind a canonical surface plan to the complete original user span."""
+
+    if plan.unresolved_parts:
+        return QuestionPlan(
+            clauses=(raw,),
+            unresolved_parts=plan.unresolved_parts,
+            parse_trace=(f"surface:{rule}", *plan.parse_trace),
+        )
+    clauses = split_question_clause_spans(raw)
+    if not plan.facets or not clauses:
+        return plan
+    rebound = replace(
+        plan,
+        facets=tuple(replace(facet, span_text=raw) for facet in plan.facets),
+    )
+    rebound = _bind_whole_plan(rebound, raw, clauses)
+    return _finalize_full_span_coverage(
+        raw,
+        replace(
+            rebound,
+            clauses=tuple(_normalized_clause(clause, compound=True) for clause in clauses),
+            parse_trace=(f"surface:{rule}", *plan.parse_trace),
+        ),
+    )
+
+
+def compile_question_plan(question: str) -> QuestionPlan:
+    raw = str(question or "")[:4000]
+    surface = normalize_question_surface(raw)
+    if surface is not None:
+        normalized_plan = _compile_question_plan_core(surface.text)
+        if normalized_plan.handled:
+            return _guard_plan_subjects(_bind_surface_plan(
+                normalized_plan, raw=raw, rule=surface.rule,
+            ))
+    return _compile_question_plan_core(raw)
 
 
 __all__ = ["PlannedFacet", "QuestionPlan", "compile_question_plan"]

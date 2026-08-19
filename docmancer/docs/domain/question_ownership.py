@@ -156,39 +156,55 @@ FROZEN_OWNERSHIP_CASES = (
     ),
     FrozenOwnershipCase(
         "What are the public tools and their purposes?",
-        "unsupported",
-        ((
-            "inventory", "Docs MCP", "public_tools", None, None,
-            "identifier_list", None, "public_tool", None, "names", None,
-        ),),
-        ("legacy_unresolved:purpose",),
+        "question_plan",
+        (
+            (
+                "purpose", "get_docs_context", None, "purpose", None,
+                "text", None, None, None, "purpose", "Docs MCP public tools",
+            ),
+            (
+                "purpose", "prepare_docs", None, "purpose", None,
+                "text", None, None, None, "purpose", "Docs MCP public tools",
+            ),
+            (
+                "purpose", "docs_status", None, "purpose", None,
+                "text", None, None, None, "purpose", "Docs MCP public tools",
+            ),
+        ),
     ),
     FrozenOwnershipCase(
         "Назови три публичных инструмента Docs MCP и когда использовать каждый.",
-        "unsupported",
-        ((
-            "usage", "Docs MCP", None, "usage", None,
-            "text", None, None, None, "value", None,
-        ),),
-        ("legacy_unresolved:inventory",),
+        "question_plan",
+        (
+            (
+                "relation", "get_docs_context", None, "public_tool_usage", None,
+                "text", None, None, None, "value", "Docs MCP public tools",
+            ),
+            (
+                "relation", "prepare_docs", None, "public_tool_usage", None,
+                "text", None, None, None, "value", "Docs MCP public tools",
+            ),
+            (
+                "relation", "docs_status", None, "public_tool_usage", None,
+                "text", None, None, None, "value", "Docs MCP public tools",
+            ),
+        ),
     ),
     FrozenOwnershipCase(
         "What is the difference between evidence selection and question planning?",
-        "unsupported",
+        "question_plan",
         ((
-            "definition", "the difference between evidence selection and question planning",
-            None, None, None, "text", None, None, None, "value", None,
+            "comparison", "evidence selection", None, "contrast",
+            "question planning", "text", None, None, None, "value", None,
         ),),
-        ("legacy_unresolved:comparison",),
     ),
     FrozenOwnershipCase(
         "Explain the storage mutation coordination contract.",
-        "unsupported",
+        "question_plan",
         ((
-            "exact_fact", "storage", None, "contract_fact", None,
-            "text", None, None, None, "value", None,
+            "relation", "storage mutation coordination", None, "storage_coordination", None,
+            "text", None, None, None, "value", "cleanup and refresh",
         ),),
-        ("legacy_unresolved:contract_scope",),
     ),
     FrozenOwnershipCase(
         (

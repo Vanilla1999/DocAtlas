@@ -46,6 +46,8 @@ def match_comparison_frame(question: str) -> ComparisonFrame | None:
     q = clean_phrase(question)
     patterns = (
         r"how\s+does\s+(.+?)\s+differ\s+from\s+(.+)",
+        r"what\s+is\s+the\s+difference\s+between\s+(.+?)\s+and\s+(.+)",
+        r"(.+?)\s+vs\.?\s+(.+?)[,:]?\s+what\s+differs",
         r"compare\s+(.+?)\s+(?:with|to|and)\s+(.+)",
         r"чем\s+(.+?)\s+отличается\s+от\s+(.+)",
         r"сравни\s+(.+?)\s+(?:с|и)\s+(.+)",
@@ -64,6 +66,7 @@ def match_location_frame(question: str) -> LocationFrame | None:
     q = clean_phrase(question)
     patterns = (
         r"where\s+is\s+(.+?)\s+documented",
+        r"where\s+is\s+(.+?)\s+(?:defined|configured)",
         r"which\s+file\s+(?:documents|describes|defines)\s+(.+)",
         r"where\s+can\s+i\s+find\s+(.+)",
         r"где\s+документирован[аоы]?\s+(.+)",
@@ -86,7 +89,10 @@ def match_condition_frame(question: str) -> ConditionFrame | None:
     if match is not None:
         condition = _entity(match.group(1))
         subject_match = re.fullmatch(
-            r"(?:the\s+)?(.+?)\s+(?:is|becomes|gets)\s+([A-Za-z0-9_.-]+)", condition, re.I
+            r"(?:the\s+)?(.+?)\s+(?:is|becomes|gets)\s+([A-Za-z0-9_.-]+)"
+            r"(?:\s+and\s+.+)?",
+            condition,
+            re.I,
         )
         if condition and subject_match is not None:
             subject = _entity(subject_match.group(1))
@@ -98,6 +104,18 @@ def match_condition_frame(question: str) -> ConditionFrame | None:
         subject, condition = _entity(match.group(1)), _entity(match.group(2))
         if subject and condition:
             return ConditionFrame(subject, condition, "conditional_outcome")
+
+    match = re.fullmatch(r"is\s+(.+?)\s+allowed\s+while\s+(.+)", q, re.I)
+    if match is not None:
+        subject, condition = _entity(match.group(1)), _entity(match.group(2))
+        if subject and condition:
+            return ConditionFrame(subject, condition, "conditional_outcome")
+
+    match = re.fullmatch(r"when\s+is\s+(.+?)\s+blocked", q, re.I)
+    if match is not None:
+        subject = _entity(match.group(1))
+        if subject:
+            return ConditionFrame(subject, None, "blocking_conditions")
 
     match = re.fullmatch(r"under\s+which\s+conditions\s+is\s+(.+?)\s+blocked", q, re.I)
     if match is not None:

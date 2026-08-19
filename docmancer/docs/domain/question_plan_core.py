@@ -15,7 +15,7 @@ from docmancer.docs.domain.technical_terms import TechnicalTermKind, coerce_tech
 
 PlanKind = Literal[
     "definition", "purpose", "behavior", "usage", "workflow", "inventory",
-    "command", "relation", "comparison", "location",
+    "command", "relation", "comparison", "location", "attribute",
 ]
 
 
