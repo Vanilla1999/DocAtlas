@@ -1,0 +1,35 @@
+name: TEMP clean validated agent protocol carrier
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  cleanup:
+    if: github.event.pull_request.head.ref == 'tmp/agent-protocol-review-fixes-20260820'
+    runs-on: ubuntu-24.04
+    env:
+      GH_TOKEN: ${{ github.token }}
+      TARGET_BRANCH: experiment/agent-developer-protocol-v1
+      PASS_BRANCH: tmp/agent-protocol-validation-passed-20260820
+      CARRIER_BRANCH: tmp/agent-protocol-review-fixes-20260820
+    steps:
+      - name: Close and remove only after exact validated-SHA match
+        run: |
+          set -euo pipefail
+          TARGET=$(git ls-remote "https://github.com/${{ github.repository }}.git" "refs/heads/$TARGET_BRANCH" | awk '{print $1}')
+          PASS=$(git ls-remote "https://github.com/${{ github.repository }}.git" "refs/heads/$PASS_BRANCH" | awk '{print $1}')
+          test -n "$TARGET"
+          test "$TARGET" = "$PASS"
+          gh api --method PATCH \
+            "repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}" \
+            -f state=closed >/dev/null
+          git init cleanup
+          cd cleanup
+          git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git"
+          git push origin --delete "$CARRIER_BRANCH"
+          git push origin --delete "$PASS_BRANCH"
