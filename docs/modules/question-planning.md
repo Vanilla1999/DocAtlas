@@ -14,7 +14,7 @@ The module must fail closed when it cannot resolve a subject or requested operat
 
 The durable output is the project-answer requirement contract: resolved subjects, intents, mandatory facets, conditions, technical identities, parse trace, and unresolved parts. Retrieval ranking is not owned here.
 
-## Relationship to evidence selection
+## Relationship to evidence-selection
 
 Question planning defines **what must be proven**, whereas evidence selection determines **whether the available evidence proves it**. **Evidence selection may prove or reject an obligation, but it must not reinterpret the user's question or silently create replacement obligations.** This one-way contract is the architectural seam between the two modules.
 
