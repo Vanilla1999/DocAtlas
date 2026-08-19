@@ -1,0 +1,40 @@
+name: Temp Agent Developer C3 Materialization
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  materialize:
+    if: github.head_ref == 'tmp/agent-developer-c3-build'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+      - name: Decode and validate patch
+        run: |
+          base64 -d .tmp/c3.patch.gz.b64 | gzip -d > /tmp/c3.patch
+          git apply --check /tmp/c3.patch
+      - name: Apply and push candidate tree
+        run: |
+          git apply /tmp/c3.patch
+          git diff --check
+          git config user.name 'docatlas-temp-builder'
+          git config user.email 'actions@users.noreply.github.com'
+          git add \
+            docmancer/docs/application/_unified_context_service_part01.py \
+            docmancer/docs/interfaces/mcp/context_tools.py \
+            docmancer/mcp/_docs_server_schema.py \
+            docmancer/mcp/_docs_server_tool_data.py \
+            eval/agent_developer_v1/README.md \
+            eval/agent_developer_v1/expected_trajectories.json \
+            scripts/run_agent_developer_gate.py \
+            tests/docs/test_mcp_docs_tools_registration.py \
+            tests/test_product_scope.py
+          git commit -m 'Materialize Agent Developer Commit 3 candidate'
+          git push origin HEAD:${{ github.head_ref }}
