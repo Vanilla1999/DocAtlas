@@ -15,11 +15,11 @@ def _rows(question: str):
     return contract, contract.proof_obligations
 
 
-def _unit(text: str) -> AnswerUnit:
+def _unit(text: str, *, kind: str = "sentence") -> AnswerUnit:
     import hashlib
     return AnswerUnit(
         unit_id="unit-test",
-        kind="sentence",
+        kind=kind,
         text=text,
         char_start=0,
         char_end=len(text),
@@ -339,9 +339,24 @@ def test_requirements_relation_needs_named_subject_and_multiple_requirement_deta
     unrelated = _unit(
         "Another procedure requires a preflight, exactly two cells, and verification."
     )
+    cross_clause = _unit(
+        "The two-cell smoke procedure is documented here. "
+        "Another workflow requires a preflight, canary, exactly two cells, "
+        "audit, and verification.",
+        kind="unit_group",
+    )
+    structured = _unit(
+        "The two-cell smoke procedure requires:\n"
+        "- a provider-free preflight\n"
+        "- one canary and exactly two cells\n"
+        "- an event audit and verification",
+        kind="unit_group",
+    )
     assert local_proof_for_obligation(obligation, exact).valid is True
     assert local_proof_for_obligation(obligation, weak).valid is False
     assert local_proof_for_obligation(obligation, unrelated).valid is False
+    assert local_proof_for_obligation(obligation, cross_clause).valid is False
+    assert local_proof_for_obligation(obligation, structured).valid is True
 
 
 def test_inventory_categories_are_typed_and_do_not_conflate_sources_formats_or_markers():
@@ -497,3 +512,57 @@ def test_semantic_cycle_frames_compile_into_typed_obligations():
     assert [(row.subject, row.relation) for row in premise.proof_obligations] == [
         ("clear-index", "premise_check")
     ]
+
+    condition_obligation = condition.proof_obligations[0]
+    assert local_proof_for_obligation(
+        condition_obligation,
+        _unit(
+            "The preview plan is stale. Another cache then rebuilds itself.",
+            kind="unit_group",
+        ),
+    ).valid is False
+    assert local_proof_for_obligation(
+        condition_obligation,
+        _unit(
+            "When the preview plan is stale, the runtime rebuilds the plan before continuing."
+        ),
+    ).valid is True
+
+    blocking_obligation = build_project_answer_contract(
+        "Under which conditions is cleanup blocked?"
+    ).proof_obligations[0]
+    assert local_proof_for_obligation(
+        blocking_obligation,
+        _unit(
+            "Cleanup is described here. If a cache is stale, another service blocks requests.",
+            kind="unit_group",
+        ),
+    ).valid is False
+    assert local_proof_for_obligation(
+        blocking_obligation,
+        _unit("Cleanup is blocked when an index writer is active."),
+    ).valid is True
+
+    comparison_obligation = comparison.proof_obligations[0]
+    assert local_proof_for_obligation(
+        comparison_obligation,
+        _unit(
+            "Evidence selection returns candidates. Question planning returns candidates.",
+            kind="unit_group",
+        ),
+    ).valid is False
+    assert local_proof_for_obligation(
+        comparison_obligation,
+        _unit(
+            "Evidence selection selects proof-bearing candidates. "
+            "Question planning converts user wording into obligations.",
+            kind="unit_group",
+        ),
+    ).valid is True
+    assert local_proof_for_obligation(
+        comparison_obligation,
+        _unit(
+            "Evidence selection chooses proof-bearing candidates, whereas question planning "
+            "converts user wording into obligations."
+        ),
+    ).valid is True

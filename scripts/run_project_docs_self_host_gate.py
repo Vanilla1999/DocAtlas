@@ -28,7 +28,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 # question, allowed supporting source paths. Empty means status/source-backed
 # closure is mandatory but the exact source identity is intentionally flexible.
 GOLD_CASES: tuple[tuple[str, tuple[str, ...]], ...] = (
-    ("Which source types are supported for indexing?", ("docs/modules/question-planning.md",)),
+    ("Which source types are supported for indexing?", ("docs/modules/question-planning.md", "wiki/Supported-Sources.md")),
     ("Which command syncs project docs after file changes?", ("README.md", "docs/capabilities.md")),
     ("Which command starts the Docs MCP server?", ("README.md", "docs/project-docs-demo.md")),
     ("How do I run the offline test suite for DocAtlas?", ("docs/testing.md",)),

@@ -3,7 +3,19 @@ from __future__ import annotations
 
 from ._answer_units_shared import *  # noqa: F401,F403
 
-from ._answer_units_part01 import AnswerUnit, LocalProof, _contains_term, _context_score, _effect_relation_valid, _normal, _purpose_clause, _subject_present
+from ._answer_units_part01 import (
+    AnswerUnit,
+    LocalProof,
+    _bounded_clauses,
+    _contains_term,
+    _context_score,
+    _effect_relation_valid,
+    _normal,
+    _purpose_clause,
+    _subject_present,
+    _subject_spans,
+    _word_distance,
+)
 
 def _attribute_aliases(attribute: str | None) -> tuple[str, ...]:
     normalized = _normal(attribute)
@@ -156,6 +168,60 @@ def _subject_before_pattern(subject: str, pattern: re.Pattern[str], text: str, *
         normalized,
         pattern.flags,
     ) is not None
+
+
+_COMPARISON_PREDICATE_RE = re.compile(
+    r"\b(?:returns?|selects?|chooses?|converts?|creates?|blocks?|awaits?|"
+    r"schedules?|produces?|emits?|builds?|ranks?|retrieves?|validates?|plans?)\b",
+    re.I,
+)
+
+
+def _comparison_predicate_name(value: str) -> str:
+    normalized = value.casefold()
+    if normalized.endswith("ies") and len(normalized) > 4:
+        return normalized[:-3] + "y"
+    if normalized.endswith("s") and not normalized.endswith("ss") and len(normalized) > 3:
+        return normalized[:-1]
+    return normalized
+
+
+def _comparison_predicates(
+    obligation: ProofObligation,
+    text: str,
+) -> tuple[set[str], set[str]]:
+    """Bind comparison predicates to each side inside bounded clauses."""
+
+    left: set[str] = set()
+    right: set[str] = set()
+    for _start, _end, clause in _bounded_clauses(text):
+        predicates = [
+            (match.span(), _comparison_predicate_name(match.group(0)))
+            for match in _COMPARISON_PREDICATE_RE.finditer(clause)
+        ]
+        if not predicates:
+            continue
+        for subject_span in _subject_spans(obligation, clause):
+            for predicate_span, predicate in predicates:
+                if _word_distance(subject_span, predicate_span, clause) <= 8:
+                    left.add(predicate)
+        for target_span in term_sequence_spans(obligation.target or "", clause):
+            for predicate_span, predicate in predicates:
+                if _word_distance(target_span, predicate_span, clause) <= 8:
+                    right.add(predicate)
+    return left, right
+
+
+def _explicit_comparison_is_local(
+    obligation: ProofObligation,
+    text: str,
+) -> bool:
+    return any(
+        _subject_present(obligation, clause)
+        and _contains_term(obligation.target, clause)
+        and _CONTRAST_RE.search(clause) is not None
+        for _start, _end, clause in _bounded_clauses(text)
+    )
 
 
 def _special_relation_valid(relation: str | None, text: str) -> bool:
@@ -341,12 +407,20 @@ def local_proof_for_obligation(
 
     if obligation.kind == "comparison":
         target = 3 if _contains_term(obligation.target, text) else 0
-        relation = 3 if _CONTRAST_RE.search(text) else 0
-        # Two clauses can establish contrast even without an explicit marker.
-        if relation == 0 and subject_score and target and len(re.findall(r"\b(?:returns?|schedules?|creates?|blocks?|awaits?)\b", text, re.I)) >= 2:
-            relation = 2
+        explicit = _explicit_comparison_is_local(obligation, text)
+        left_predicates, right_predicates = _comparison_predicates(obligation, text)
+        implicit_difference = bool(
+            left_predicates
+            and right_predicates
+            and any(left != right for left in left_predicates for right in right_predicates)
+        )
+        relation = 3 if explicit else 2 if implicit_difference else 0
         valid = subject_score > 0 and target > 0 and relation > 0 and unit.proposition
-        return LocalProof(valid, subject_score, relation, target, subject_score + relation + target, "comparison" if valid else "comparison_relation_missing")
+        return LocalProof(
+            valid, subject_score, relation, target,
+            subject_score + relation + target,
+            "comparison" if valid else "comparison_relation_missing",
+        )
 
     if obligation.kind == "behavior":
         planned = planned_behavior_proof(obligation, text, source=source)
