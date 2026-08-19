@@ -44,3 +44,7 @@ Agent Developer Protocol v1: BASELINE PASS
 ```
 
 followed by a target-closure count and named gaps. Later commits should reduce the named target gaps without changing the safety contract.
+
+## Current closure
+
+After the scope/recovery contract hardening, the provider-free oracle closes all **11/11** reviewed trajectories. Module ambiguity remains fail-closed, but the bounded response preserves `operational_reason_code=module_ambiguous`, returns at most eight exact `module_candidates`, recommends public `docs_status`, and requires the agent to retry with an exact `module_path`.

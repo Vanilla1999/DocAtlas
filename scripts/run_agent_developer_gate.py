@@ -172,6 +172,19 @@ def _matches_sources(actual: tuple[str, ...], expected: list[Any] | tuple[Any, .
     return not required or all(required_path in actual for required_path in required)
 
 
+def _module_candidate_paths(payload: dict[str, Any] | None) -> tuple[str, ...]:
+    if not isinstance(payload, dict):
+        return ()
+    rows = payload.get("module_candidates")
+    if not isinstance(rows, list):
+        return ()
+    return tuple(
+        str(row.get("module_path") or "").strip()
+        for row in rows[:8]
+        if isinstance(row, dict) and str(row.get("module_path") or "").strip()
+    )
+
+
 def _call_matches_target(call: dict[str, Any], payload: dict[str, Any] | None) -> bool:
     if not isinstance(payload, dict):
         return False
@@ -202,6 +215,12 @@ def _call_matches_target(call: dict[str, Any], payload: dict[str, Any] | None) -
     if target_confirmation and str(
         action.get("confirmation_reason") or payload.get("confirmation_reason") or ""
     ) != target_confirmation:
+        return False
+    target_operational_reason = str(call.get("target_operational_reason_code") or "")
+    if target_operational_reason and str(payload.get("operational_reason_code") or "") != target_operational_reason:
+        return False
+    target_candidates = tuple(str(value) for value in call.get("target_module_candidates") or ())
+    if target_candidates and tuple(sorted(_module_candidate_paths(payload))) != tuple(sorted(target_candidates)):
         return False
     return True
 
@@ -265,6 +284,7 @@ def run_protocol() -> dict[str, Any]:
                         "libraries",
                         "ecosystem",
                         "version",
+                        "packet_tokens",
                     ):
                         if call.get(key) is not None:
                             args[key] = call[key]
@@ -340,6 +360,11 @@ def run_protocol() -> dict[str, Any]:
                             "sources": list(paths),
                             "next_action_tool": action_tool or None,
                             "confirmation_reason": confirmation_reason or None,
+                            "operational_reason_code": (
+                                str((payload or {}).get("operational_reason_code") or "") or None
+                                if isinstance(payload, dict) else None
+                            ),
+                            "module_candidates": list(_module_candidate_paths(payload)),
                             "target_closed": target_closed,
                         }
                     )
