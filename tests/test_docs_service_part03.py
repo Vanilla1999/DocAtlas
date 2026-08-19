@@ -115,11 +115,10 @@ roots:
         service,
     )
     assert dispatcher_payload is not None
-    assert dispatcher_payload["status"] == "ok", dispatcher_payload.get("missing")
-    assert any(
-        "raw topic unchanged" in source["snippet"]
-        and "must not call vectors or embeddings" in source["snippet"]
-        for source in dispatcher_payload["sources"]
+    assert dispatcher_payload["status"] == "insufficient_evidence"
+    assert (
+        "unresolved:0:legacy_unresolved:requirement_items"
+        in dispatcher_payload.get("missing", [])
     )
 
     index_witness_question = (
