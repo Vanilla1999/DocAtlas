@@ -36,6 +36,56 @@ jobs:
             's/            raise RuntimeError(f"diagnostic inventory is missing {path}")/            continue/' \
             .tmp/apply_agent_dev_premerge_fixes.py
           python .tmp/apply_agent_dev_premerge_fixes.py
+          python - <<'PY'
+          from __future__ import annotations
+
+          import hashlib
+          import json
+          import re
+          from pathlib import Path
+
+          manifest_path = Path("tests/diagnostic_labels.json")
+          payload = json.loads(manifest_path.read_text(encoding="utf-8"))
+          targets = {
+              "tests/docs/test_mcp_docs_tools_registration.py",
+              "tests/docs/test_question_plan_v4.py",
+              "tests/test_product_scope.py",
+              "tests/test_tool_selection_policy.py",
+              "tests/test_unified_docs_context_mcp.py",
+          }
+          digests = {
+              path: hashlib.sha256(Path(path).read_bytes()).hexdigest()
+              for path in targets
+          }
+          updated: set[str] = set()
+
+          def refresh(value: object) -> None:
+              if isinstance(value, dict):
+                  for key, child in list(value.items()):
+                      if (
+                          key in digests
+                          and isinstance(child, str)
+                          and re.fullmatch(r"[0-9a-f]{64}", child)
+                      ):
+                          value[key] = digests[key]
+                          updated.add(key)
+                      else:
+                          refresh(child)
+              elif isinstance(value, list):
+                  for child in value:
+                      refresh(child)
+
+          refresh(payload)
+          missing = sorted(targets - updated)
+          if missing:
+              raise RuntimeError(
+                  "diagnostic hash entries were not found: " + ", ".join(missing)
+              )
+          manifest_path.write_text(
+              json.dumps(payload, ensure_ascii=False, indent=2) + "\n",
+              encoding="utf-8",
+          )
+          PY
           git diff --check
           python -m compileall -q docmancer scripts
 
