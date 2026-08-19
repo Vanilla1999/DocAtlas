@@ -273,7 +273,8 @@ def test_bounded_direct_is_one_existing_tool_call_and_returns_only_action_packet
     tool = next(item for item in TOOLS if item["name"] == "get_docs_context")
     assert set(tool["inputSchema"]["properties"]) == {
         "question", "project_path", "library", "libraries", "ecosystem",
-        "version", "source_type", "docs_url", "mode",
+        "version", "source_type", "docs_url", "module", "module_path",
+        "scope", "mode",
     }
     assert "delivery_strategy" not in tool["inputSchema"]["properties"]
     assert tool["outputSchema"]["properties"]["kind"]["enum"] == ["docs_answer", "patch_context"]

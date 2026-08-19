@@ -385,10 +385,18 @@ def run_protocol() -> dict[str, Any]:
             os.environ["DOCMANCER_HOME"] = previous_home
 
     target_closed_tasks = sum(1 for item in task_results if item["target_closed"])
+    target_ok = (
+        not errors
+        and target_closed_tasks == len(protocol["tasks"])
+        and not target_gaps
+        and false_supported == 0
+        and contamination == 0
+    )
     return {
         "schema_version": 1,
         "protocol": "agent-developer-v1",
         "baseline_ok": not errors,
+        "target_ok": target_ok,
         "task_count": len(protocol["tasks"]),
         "executed_task_count": len(task_results),
         "target_closed_tasks": target_closed_tasks,
@@ -410,12 +418,6 @@ def main() -> int:
             f" gap={task['known_gap']}" if not task["target_closed"] and task.get("known_gap") else ""
         )
         print(f"{task['task_id']}: {state}{gap}")
-    if report["errors"]:
-        print("Agent Developer Protocol v1: BASELINE FAIL")
-        for error in report["errors"]:
-            print(f"- {error}")
-        return 1
-    print("Agent Developer Protocol v1: BASELINE PASS")
     print(
         f"target closure: {report['target_closed_tasks']}/{report['task_count']} tasks; "
         f"named target gaps={report['target_gap_count']}; "
@@ -427,6 +429,12 @@ def main() -> int:
             f"- target gap {gap['task_id']}: {gap['gap']} "
             f"actual={gap['actual_status']} target={gap['target_status']}"
         )
+    if not report["target_ok"]:
+        print("Agent Developer Protocol v1: TARGET FAIL")
+        for error in report["errors"]:
+            print(f"- {error}")
+        return 1
+    print("Agent Developer Protocol v1: TARGET PASS")
     return 0
 
 

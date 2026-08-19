@@ -37,14 +37,15 @@ python scripts/run_agent_developer_gate.py
 
 The run is provider-free and uses an isolated temporary `DOCMANCER_HOME`. It copies each fixture before indexing so stale-doc mutations never alter committed files.
 
-Expected first-commit summary:
+Final acceptance summary:
 
 ```text
-Agent Developer Protocol v1: BASELINE PASS
+target closure: 11/11 tasks; named target gaps=0; false-supported=0; forbidden-source-contamination=0
+Agent Developer Protocol v1: TARGET PASS
 ```
 
-followed by a target-closure count and named gaps. Later commits should reduce the named target gaps without changing the safety contract.
+The runner is a hard CI gate: any remaining target gap, baseline/target contract drift, false-supported result, wrong recovery action, missing required source, or forbidden-source contamination exits non-zero. The historical baseline remains in the oracle only to distinguish reviewed behavior changes from regressions; it no longer permits a baseline-only CI pass.
 
 ## Current closure
 
-After the scope/recovery contract hardening, the provider-free oracle closes all **11/11** reviewed trajectories. Module ambiguity remains fail-closed, but the bounded response preserves `operational_reason_code=module_ambiguous`, returns at most eight exact `module_candidates`, recommends public `docs_status`, and requires the agent to retry with an exact `module_path`.
+After the scope/recovery contract hardening, the provider-free oracle closes all **11/11** reviewed trajectories. Module ambiguity remains fail-closed, but the bounded response preserves `operational_reason_code=module_ambiguous`, returns at most eight exact `module_candidates`, recommends public `docs_status`, and requires the agent to retry with an exact `module_path`. The permanent `advanced-contract` CI job runs this protocol on every pull request and push to `main`.

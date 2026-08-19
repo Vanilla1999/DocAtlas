@@ -471,7 +471,7 @@
     "tests/test_patch_review_command_part03.py": "b196cdff0728dfaf16e7b4f197c00eca373ae899ac892bdf2e65717656f57ee9",
     "tests/test_patch_review_command_part04.py": "1f2f2d3b6d7779d255b018def7c9a6df01c74d3d628286b99b136100e0b007a9",
     "tests/test_preindex_coverage.py": "a0ae566b11341913a8bd4914937b1339dccb7245a892fe74a93e1fe18863c042",
-    "tests/test_product_scope.py": "60bbf0152ee2fbd169cbab24ab58cc3d381feef7871920a1b7a3118049aa47c5",
+    "tests/test_product_scope.py": "76a944583a4b65036e56a6e8578ce5959a9e0fd2f8ba5f2d444f561dfea63ed7",
     "tests/test_project_answer_quality_v2_protocol.py": "f1a672c3d87730946683ae5bc55754574dec13932003026af67707217e9cb207",
     "tests/test_project_answer_quality_v3_protocol.py": "23bc5f2ea8932b0b88d179c7bf77659ed674ef0cdc2ae7c287d6cef1e33b1242",
     "tests/test_project_answer_quality_v4_protocol.py": "202ee0468d96b5dc1d0fd69b621577de21d3a57176e93a1448f46bd75d5de416",
