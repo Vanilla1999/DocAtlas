@@ -23,8 +23,22 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          gzip -dc .tmp/commit-d.patch.gz | git apply --index
-          git rm .tmp/commit-d.patch.gz .github/workflows/tmp_apply_commit_d.yml .tmp/trigger-d
+          cat \
+            .tmp/commit-d.patch.gz.b64.1 \
+            .tmp/commit-d.patch.gz.b64.2 \
+            .tmp/commit-d.patch.gz.b64.3 \
+            .tmp/commit-d.patch.gz.b64.4 \
+            | base64 -d > /tmp/commit-d.patch.gz
+          gzip -t /tmp/commit-d.patch.gz
+          gzip -dc /tmp/commit-d.patch.gz | git apply --index
+          git rm \
+            .tmp/commit-d.patch.gz \
+            .tmp/commit-d.patch.gz.b64.1 \
+            .tmp/commit-d.patch.gz.b64.2 \
+            .tmp/commit-d.patch.gz.b64.3 \
+            .tmp/commit-d.patch.gz.b64.4 \
+            .tmp/trigger-d \
+            .github/workflows/tmp_apply_commit_d.yml
           git diff --cached --check
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
