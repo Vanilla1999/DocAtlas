@@ -42,40 +42,41 @@ jobs:
           path = Path("docmancer/docs/domain/question_plan_proof.py")
           text = path.read_text(encoding="utf-8")
 
-          old_words = '''        words = [
-              word.casefold()
-              for word in _REQUIREMENT_CONTENT_WORD_RE.findall(part)
-              if word.casefold() not in _REQUIREMENT_STOP_WORDS
-          ]'''
-          new_words = '''        words = [
-              word.casefold()
-              for word in _REQUIREMENT_CONTENT_WORD_RE.findall(part)
-              if word.casefold() not in _REQUIREMENT_STOP_WORDS
-              and any(character.isalnum() for character in word)
-          ]'''
-          if text.count(old_words) != 1:
+          word_line = "            if word.casefold() not in _REQUIREMENT_STOP_WORDS\n"
+          if text.count(word_line) != 1:
               raise RuntimeError("requirement word filter changed unexpectedly")
-          text = text.replace(old_words, new_words, 1)
+          text = text.replace(
+              word_line,
+              word_line
+              + "            and any(character.isalnum() for character in word)\n",
+              1,
+          )
 
-          old_binding = '''            if match.start() < subject_end:
-                  continue
-              between = clause[subject_end:match.start()]
-              if len(_REQUIREMENT_CONTENT_WORD_RE.findall(between)) > 8:
-                  continue
-              return clause[match.end():].strip()'''
-          new_binding = '''            if match.start() < subject_end:
-                  continue
-              if match.group(0).casefold() == "required":
-                  prefix = clause[max(subject_end, match.start() - 16):match.start()]
-                  if re.search(r"\\b(?:is|are|was|were)\\s+$", prefix, re.I):
-                      continue
-              between = clause[subject_end:match.start()]
-              if len(_REQUIREMENT_CONTENT_WORD_RE.findall(between)) > 8:
-                  continue
-              return clause[match.end():].strip()'''
-          if text.count(old_binding) != 1:
+          binding = (
+              "            if match.start() < subject_end:\n"
+              "                continue\n"
+              "            between = clause[subject_end:match.start()]\n"
+          )
+          if text.count(binding) != 1:
               raise RuntimeError("requirement binding changed unexpectedly")
-          path.write_text(text.replace(old_binding, new_binding, 1), encoding="utf-8")
+          text = text.replace(
+              binding,
+              (
+                  "            if match.start() < subject_end:\n"
+                  "                continue\n"
+                  "            if match.group(0).casefold() == \"required\":\n"
+                  "                prefix = clause[\n"
+                  "                    max(subject_end, match.start() - 16):match.start()\n"
+                  "                ]\n"
+                  "                if re.search(\n"
+                  "                    r\"\\b(?:is|are|was|were)\\s+$\", prefix, re.I\n"
+                  "                ):\n"
+                  "                    continue\n"
+                  "            between = clause[subject_end:match.start()]\n"
+              ),
+              1,
+          )
+          path.write_text(text, encoding="utf-8")
           PY
           git diff --check
           python -m compileall -q docmancer scripts
