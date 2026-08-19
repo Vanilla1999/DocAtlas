@@ -1,0 +1,53 @@
+name: Temp Agent Developer C2 Release Smoke Fix
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  materialize:
+    if: github.head_ref == 'tmp/agent-developer-c2-release-smoke-fix'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+      - name: Add narrow source-document behavior binding
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          proof = Path('docmancer/docs/domain/_answer_units_part02.py')
+          text = proof.read_text(encoding='utf-8')
+          marker = 'def _special_relation_valid(relation: str | None, text: str) -> bool:\n'
+          helper = '''_SOURCE_DOCUMENT_SUBJECT_RE = re.compile(\n    r"^(?:readme|architecture|changelog|contributing|roadmap|runbook)$",\n    re.I,\n)\n\n\ndef _source_document_behavior_clause(\n    obligation: ProofObligation,\n    text: str,\n    source_text: str,\n) -> tuple[str, bool] | None:\n    """Bind conventional document subjects to behavior stated by that document.\n\n    Queries such as ``What does the README say about X?`` name the source\n    document itself as the semantic subject. Preserve that source-subject\n    contract only for conventional maintained-document identities; arbitrary\n    code-shaped filenames must still carry their subject in the proposition.\n    """\n\n    if not _SOURCE_DOCUMENT_SUBJECT_RE.fullmatch(_normal(obligation.subject)):\n        return None\n    if not _subject_present(obligation, source_text):\n        return None\n    for _start, _end, clause in _bounded_clauses(text):\n        for match in _GENERIC_BEHAVIOR_RE.finditer(clause):\n            if _predicate_has_local_value(match, clause):\n                return clause, _predicate_is_negated(match, clause)\n    return None\n\n\n'''
+          if marker not in text:
+              raise SystemExit('special relation marker not found')
+          text = text.replace(marker, helper + marker, 1)
+          old = '''        bound_behavior = _behavior_clause(obligation, text)\n        relation = 3 if bound_behavior is not None else 0\n        local_subject_score = 3 if bound_behavior is not None else 0\n        valid = local_subject_score > 0 and relation > 0 and unit.proposition\n        negated = bool(bound_behavior and bound_behavior[1])\n        return LocalProof(\n            valid, local_subject_score, relation, 1 if unit.proposition and valid else 0,\n            local_subject_score + relation + int(unit.proposition and valid),\n            (\n                "behavior_negative_constraint" if valid and negated else\n                "behavior" if valid else\n                "behavior_not_locally_bound"\n            ),\n        )\n'''
+          new = '''        bound_behavior = _behavior_clause(obligation, text)\n        source_document_behavior = (\n            _source_document_behavior_clause(obligation, text, source_text)\n            if bound_behavior is None and authoritative_identity\n            else None\n        )\n        proof_behavior = bound_behavior or source_document_behavior\n        relation = 3 if proof_behavior is not None else 0\n        local_subject_score = (\n            3 if bound_behavior is not None else\n            2 if source_document_behavior is not None else\n            0\n        )\n        valid = local_subject_score > 0 and relation > 0 and unit.proposition\n        negated = bool(proof_behavior and proof_behavior[1])\n        return LocalProof(\n            valid, local_subject_score, relation, 1 if unit.proposition and valid else 0,\n            local_subject_score + relation + int(unit.proposition and valid),\n            (\n                "behavior_negative_constraint" if valid and negated else\n                "behavior_source_document" if valid and source_document_behavior is not None else\n                "behavior" if valid else\n                "behavior_not_locally_bound"\n            ),\n        )\n'''
+          if old not in text:
+              raise SystemExit('behavior block not found')
+          proof.write_text(text.replace(old, new, 1), encoding='utf-8')
+
+          tests = Path('tests/docs/test_question_plan_v4.py')
+          text = tests.read_text(encoding='utf-8')
+          needle = '''    assert [\n        local_proof_for_obligation(row, unit).valid\n        for row, unit, _expected in probes\n    ] == [expected for _row, _unit_value, expected in probes]\n'''
+          replacement = needle + '''\n    readme_behavior = build_project_answer_contract(\n        "What does the project README say about deterministic offline release checks?"\n    ).proof_obligations[0]\n    assert local_proof_for_obligation(\n        readme_behavior,\n        _unit("The amber lighthouse invariant requires deterministic offline release checks."),\n        source={"authority": "source_of_truth", "path": "README.md"},\n    ).valid is True\n    assert local_proof_for_obligation(\n        behavior,\n        _unit("PaymentOutbox validates payments."),\n        source={"authority": "source_of_truth", "path": "OrderSubmission.md"},\n    ).valid is False\n'''
+          if needle not in text:
+              raise SystemExit('proof regression assertion block not found')
+          tests.write_text(text.replace(needle, replacement, 1), encoding='utf-8')
+          PY
+          python -m py_compile docmancer/docs/domain/_answer_units_part02.py tests/docs/test_question_plan_v4.py
+          git diff --check
+      - name: Push candidate tree
+        run: |
+          git config user.name 'docatlas-temp-builder'
+          git config user.email 'actions@users.noreply.github.com'
+          git add docmancer/docs/domain/_answer_units_part02.py tests/docs/test_question_plan_v4.py
+          git commit -m 'Materialize Commit 2 source-document compatibility fix'
+          git push origin HEAD:${{ github.head_ref }}
