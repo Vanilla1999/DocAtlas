@@ -31,16 +31,16 @@ jobs:
             | base64 -d > /tmp/commit-d.patch.gz
           gzip -t /tmp/commit-d.patch.gz
           gzip -dc /tmp/commit-d.patch.gz | git apply --index
+          git restore --source=HEAD --staged --worktree .github/workflows/ci.yml
           git rm \
             .tmp/commit-d.patch.gz \
             .tmp/commit-d.patch.gz.b64.1 \
             .tmp/commit-d.patch.gz.b64.2 \
             .tmp/commit-d.patch.gz.b64.3 \
             .tmp/commit-d.patch.gz.b64.4 \
-            .tmp/trigger-d \
-            .github/workflows/tmp_apply_commit_d.yml
+            .tmp/trigger-d
           git diff --cached --check
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git commit -m "stage: materialize Commit D"
+          git commit -m "stage: materialize Commit D without workflow files"
           git push origin HEAD:tmp/question-surface-build
