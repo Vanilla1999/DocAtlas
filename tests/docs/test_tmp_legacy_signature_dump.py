@@ -6,6 +6,7 @@ from docmancer.docs.domain.project_answer_contract import build_project_answer_c
 from docmancer.docs.domain.question_plan import compile_question_plan
 
 
+# Temporary diagnostic only; intentionally fails to expose the exact signatures.
 def test_dump_current_contract_signatures() -> None:
     questions = [
         "How does prepare_docs sync_project_docs work?",
