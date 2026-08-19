@@ -101,6 +101,9 @@ jobs:
       - name: Run offline advanced contract and shared-security tests
         run: pytest tests/ -m advanced -v
 
+      - name: Run legacy contract completeness gate
+        run: python scripts/run_legacy_contract_gate.py
+
       - name: Run critical mutation gate
         run: python scripts/run_critical_mutation_gate.py
 
