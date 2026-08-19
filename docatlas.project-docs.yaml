@@ -72,6 +72,14 @@ documents:
     status: active
     impact: search_only
 
+  - path: eval/project_answer_surface_v1/README.md
+    role: development
+    scope: project
+    description: Frozen 100-case EN/RU question-surface protocol covering canonical signatures, ownership, and fail-closed unsupported outcomes.
+    authority: source_of_truth
+    status: active
+    impact: search_only
+
   - path: eval/task_level/README.md
     role: development
     scope: project
@@ -103,6 +111,14 @@ documents:
     scope: module
     module_path: docmancer/docs/infrastructure
     description: Writer leases, cleanup barriers, mutation locks, and shared-storage race prevention.
+    authority: source_of_truth
+    status: active
+    impact: track
+
+  - path: docs/index-cleanup.md
+    role: development
+    scope: project
+    description: Preview-first clear-index contract, stale-plan rejection, local ownership limits, and live-process blockers.
     authority: source_of_truth
     status: active
     impact: track

@@ -87,14 +87,14 @@ caches.
 ## Safety rules
 
 - Preview does not create a missing storage home or an empty database.
-- Execution rejects a stale `plan_digest` or changed target fingerprint.
+- If the preview plan is stale, execution rejects it before any destructive move; a stale `plan_digest` or changed target fingerprint cannot be applied.
 - `clear-index` refuses to apply a cleanup plan while a live DocAtlas, MCP, synchronization, or managed-Qdrant process holds the index; a recorded live PID is a hard blocker. `--allow-incomplete` does not bypass this live-process blocker.
 - Targets are moved into same-filesystem quarantine before final deletion. If
   the move phase fails, already moved targets are restored.
 - Filesystem roots, the user's home directory, and the current working
   directory cannot be selected as the DocAtlas storage root.
-- Remote Qdrant collections are never deleted by this command. Local vector
-  state without an ownership marker is reported as incomplete and retained.
+- `clear-index` never deletes remote Qdrant collections. Local vector state
+  without an ownership marker is reported as incomplete and retained.
 - `--allow-incomplete` only acknowledges that reported vector or cache state
   will remain; it never bypasses live-process blockers or authorizes unverified
   or remote deletion.

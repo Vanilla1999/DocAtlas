@@ -8,20 +8,16 @@ another rule's order inside one long conditional chain.
 """
 from __future__ import annotations
 
-from dataclasses import dataclass, replace
+from dataclasses import replace
 import re
-from typing import Callable, Literal
 
 from docmancer.docs.domain.question_frame_core import (
     QuestionClause,
     ambiguous_frame_reason,
-    clean_phrase,
     match_action_frame,
     match_inventory_frame,
     match_requirements_frame,
-    semantic_tail_is_safe,
     split_question_clause_spans,
-    strip_request_wrapper,
 )
 from docmancer.docs.domain.question_semantic_frames import (
     match_comparison_frame,
@@ -29,264 +25,34 @@ from docmancer.docs.domain.question_semantic_frames import (
     match_location_frame,
     match_premise_frame,
 )
-from docmancer.docs.domain.technical_terms import TechnicalTermKind, coerce_technical_term
+from docmancer.docs.domain.question_surface_normalization import normalize_question_surface
+from docmancer.docs.domain.technical_terms import TechnicalTermKind
 
-PlanKind = Literal[
-    "definition", "purpose", "behavior", "usage", "workflow", "inventory",
-    "command", "relation", "comparison", "location",
-]
-
-
-@dataclass(frozen=True, slots=True)
-class PlannedFacet:
-    kind: PlanKind
-    subject: str
-    relation: str | None = None
-    attribute: str | None = None
-    target: str | None = None
-    value_kind: str = "text"
-    expected_value: str | None = None
-    item_kind: str | None = None
-    response_mode: str = "value"
-    context: str | None = None
-    subject_kind: TechnicalTermKind | None = None
-    subject_aliases: tuple[str, ...] = ()
-    span_text: str | None = None
-    query_span_start: int | None = None
-    query_span_end: int | None = None
-
-    def __post_init__(self) -> None:
-        if (self.query_span_start is None) != (self.query_span_end is None):
-            raise ValueError("planned facet query span must be complete")
-        if (
-            self.query_span_start is not None
-            and self.query_span_end is not None
-            and (self.query_span_start < 0 or self.query_span_end <= self.query_span_start)
-        ):
-            raise ValueError("planned facet query span is invalid")
-
-
-@dataclass(frozen=True, slots=True)
-class QuestionPlan:
-    facets: tuple[PlannedFacet, ...] = ()
-    clauses: tuple[str, ...] = ()
-    unresolved_parts: tuple[str, ...] = ()
-    parse_trace: tuple[str, ...] = ()
-    consumed_spans: tuple[tuple[int, int], ...] = ()
-
-    def __post_init__(self) -> None:
-        for start, end in self.consumed_spans:
-            if start < 0 or end <= start:
-                raise ValueError("question plan consumed span is invalid")
-
-    @property
-    def handled(self) -> bool:
-        return bool(self.facets or self.unresolved_parts)
-
-
-Rule = Callable[[str], QuestionPlan | None]
-
-
-def _clean(value: str) -> str:
-    value = " ".join(str(value or "").strip(" ?!.,:").split())
-    return re.sub(r"^(?:the|a|an)\s+", "", value, flags=re.I)[:160]
-
-
-def _technical(
-    value: str,
-    kind: TechnicalTermKind | None = None,
-) -> tuple[str, TechnicalTermKind | None, tuple[str, ...]]:
-    value = _clean(value)
-    if not value:
-        return "", None, ()
-    if kind is not None or re.search(r"[_-]|^[A-Z][A-Z0-9_]+$|\.yaml$", value):
-        term = coerce_technical_term(value, kind, context=value)
-        return term.raw, term.kind, term.aliases
-    return value, None, ()
-
-
-def _normalized_clause(
-    clause: QuestionClause,
-    *,
-    compound: bool = False,
-) -> str:
-    value = " ".join(clause.text.split())
-    value = strip_request_wrapper(value)
-    return clean_phrase(value) if compound else value
-
-
-def _span_pattern(value: str) -> re.Pattern[str] | None:
-    tokens = str(value or "").split()
-    if not tokens:
-        return None
-    return re.compile(r"\s+".join(re.escape(token) for token in tokens), re.I)
-
-
-def _bind_plan_to_clause(plan: QuestionPlan, clause: QuestionClause) -> QuestionPlan:
-    """Attach exact source offsets without changing the canonical facet identity."""
-
-    facets: list[PlannedFacet] = []
-    cursor = 0
-    for facet in plan.facets:
-        pattern = _span_pattern(facet.span_text or facet.subject)
-        match = pattern.search(clause.text, cursor) if pattern is not None else None
-        if match is None and pattern is not None:
-            match = pattern.search(clause.text)
-        if match is None:
-            start, end = clause.start, clause.end
-        else:
-            start, end = clause.start + match.start(), clause.start + match.end()
-            cursor = match.end()
-        facets.append(replace(
-            facet,
-            query_span_start=start,
-            query_span_end=end,
-        ))
-    return replace(
-        plan,
-        facets=tuple(facets),
-        consumed_spans=((clause.start, clause.end),) if facets else (),
-    )
-
-
-def _bind_whole_plan(
-    plan: QuestionPlan,
-    question: str,
-    clauses: tuple[QuestionClause, ...],
-) -> QuestionPlan:
-    """Bind a frozen whole-question rule while retaining every clause span."""
-
-    whole = QuestionClause(question, 0, len(question))
-    bound = _bind_plan_to_clause(plan, whole)
-    return replace(
-        bound,
-        consumed_spans=tuple((clause.start, clause.end) for clause in clauses),
-    )
-
-
-def _unsafe_free_text(
-    value: str,
-    *,
-    allow_initial_request_head: bool = False,
-) -> bool:
-    """Reject free text that contains evidence of another request."""
-
-    return not semantic_tail_is_safe(
-        value,
-        allow_initial_request_head=allow_initial_request_head,
-    )
-
-
-def _docs_mcp_server_command(q: str) -> QuestionPlan | None:
-    match = re.match(
-        r"^\s*(?:which|what)\s+command\s+(?:starts?|runs?|launches?|serves?)\s+"
-        r"(?:the\s+)?docs\s+mcp\s+server\s*[?!.]*\s*$",
-        q,
-        re.I,
-    )
-    if match is None:
-        return None
-    subject, kind, aliases = _technical("docs-serve", "cli_command")
-    return QuestionPlan(
-        facets=(PlannedFacet(
-            kind="command",
-            subject=subject,
-            relation="invocation",
-            value_kind="call_expression",
-            expected_value="docs-serve",
-            response_mode="call",
-            context="Docs MCP server",
-            subject_kind=kind,
-            subject_aliases=aliases,
-            span_text=match.group(0),
-        ),),
-        clauses=(q,),
-        parse_trace=("command:docs_mcp_server",),
-    )
-
-
-def _command_sync(q: str) -> QuestionPlan | None:
-    match = re.match(
-        r"^\s*(?:which|what)\s+command\s+"
-        r"(?:does\s+[^?]+?\s+use\s+to\s+)?syncs?\s+project\s+docs?"
-        r"(?:\s+after\s+(?:file\s+changes|(?:changing|editing|updating|modifying)\s+(?:a\s+|the\s+)?file))?"
-        r"\s*[?!.]*\s*$",
-        q,
-        re.I,
-    )
-    if match is None:
-        return None
-    return QuestionPlan(
-        facets=(PlannedFacet(
-            kind="command",
-            subject="sync_project_docs",
-            relation="invocation",
-            value_kind="call_expression",
-            expected_value="sync_project_docs",
-            response_mode="call",
-            subject_kind="code_symbol",
-            subject_aliases=("sync_project_docs", "sync-project-docs", "sync project docs"),
-            span_text=match.group(0),
-        ),),
-        clauses=(q,),
-        parse_trace=("command:sync_project_docs",),
-    )
-
-
-_OFFLINE_SUITE_CONTEXT_RE = re.compile(
-    r"(?:DocAtlas|[A-Za-z][A-Za-z0-9_.-]{1,80})",
-    re.I,
+from docmancer.docs.domain.question_plan_core import (
+    PlanKind,
+    PlannedFacet,
+    QuestionPlan,
+    Rule,
+    _bind_plan_to_clause,
+    _bind_whole_plan,
+    _clean,
+    _normalized_clause,
+    _technical,
+    _unsafe_free_text,
 )
-
-
-def _offline_suite_run(q: str) -> QuestionPlan | None:
-    match = re.match(
-        r"^\s*how\s+do\s+i\s+run\s+the\s+offline(?:\s+test)?\s+suite"
-        r"(?:\s+for\s+(.+?))?\s*[?!.]*\s*$",
-        q,
-        re.I,
-    )
-    if match is None:
-        return None
-    context = _clean(match.group(1) or "DocAtlas")
-    if (
-        _unsafe_free_text(context)
-        or _OFFLINE_SUITE_CONTEXT_RE.fullmatch(context) is None
-    ):
-        return None
-    return QuestionPlan(
-        facets=(PlannedFacet(
-            "workflow",
-            "offline suite",
-            relation="procedure",
-            context=context,
-            response_mode="workflow",
-            span_text=match.group(0),
-        ),),
-        clauses=(q,),
-        parse_trace=("workflow:offline_suite",),
-    )
-
-def _two_cell_cardinality(q: str) -> QuestionPlan | None:
-    match = re.match(
-        r"^\s*how\s+does\s+(?:the\s+)?(two[- ]cell\s+smoke\s+procedure)\s+"
-        r"(?:verify|audit|check)\s+(provider[- ]call\s+cardinality)\s*[?!.]*\s*$",
-        q,
-        re.I,
-    )
-    if match is None:
-        return None
-    return QuestionPlan(
-        facets=(PlannedFacet(
-            "relation",
-            _clean(match.group(1)),
-            relation="verification",
-            context=_clean(match.group(2)),
-            span_text=match.group(0),
-        ),),
-        clauses=(q,),
-        parse_trace=("verification:two_cell_provider_cardinality",),
-    )
+from docmancer.docs.domain.question_plan_command_rules import (
+    _command_sync,
+    _docs_mcp_server_command,
+    _offline_suite_run,
+    _two_cell_cardinality,
+)
+from docmancer.docs.domain.question_plan_surface_rules import (
+    mcp_request_handling,
+    provider_request_timeout,
+    public_tool_usage,
+    public_tools_with_purposes,
+    python_version_support,
+)
 
 
 def _release_docs_line_limit(q: str) -> QuestionPlan | None:
@@ -313,8 +79,11 @@ def _release_docs_line_limit(q: str) -> QuestionPlan | None:
 
 def _storage_coordination_contract(q: str) -> QuestionPlan | None:
     match = re.match(
-        r"^\s*what\s+is\s+the\s+storage\s+mutation\s+coordination\s+contract\s+"
-        r"for\s+cleanup\s+and\s+refresh\s*[?!.]*\s*$",
+        r"^\s*(?:"
+        r"what\s+is\s+the\s+storage\s+mutation\s+coordination\s+contract"
+        r"(?:\s+for\s+cleanup\s+and\s+refresh)?|"
+        r"explain\s+the\s+storage\s+mutation\s+coordination\s+contract"
+        r")\s*[?!.]*\s*$",
         q,
         re.I,
     )
@@ -770,6 +539,11 @@ _SPECIFIC_RULES: tuple[Rule, ...] = (
     _semantic_comparison,
     _semantic_location,
     _semantic_condition,
+    public_tool_usage,
+    public_tools_with_purposes,
+    python_version_support,
+    mcp_request_handling,
+    provider_request_timeout,
     _docs_mcp_server_command,
     _command_sync,
     _offline_suite_run,
@@ -799,14 +573,9 @@ _GENERIC_RULES: tuple[Rule, ...] = (
 
 
 def _reusable_frame_plan(q: str) -> QuestionPlan | None:
-    ambiguity = ambiguous_frame_reason(q)
-    if ambiguity is not None:
-        return QuestionPlan(
-            clauses=(q,),
-            unresolved_parts=(ambiguity,),
-            parse_trace=("fail_closed:ambiguous_frame",),
-        )
-
+    # Exact typed frames take precedence over broad ambiguity sentinels.  A
+    # phrase such as "file formats" or "pytest markers" is already a closed
+    # category; only bare "formats"/"markers" remain ambiguous.
     inventory = match_inventory_frame(q)
     if inventory is not None:
         return QuestionPlan(
@@ -817,6 +586,14 @@ def _reusable_frame_plan(q: str) -> QuestionPlan | None:
             ),),
             clauses=(q,),
             parse_trace=(f"frame:inventory:{inventory.item_kind}",),
+        )
+
+    ambiguity = ambiguous_frame_reason(q)
+    if ambiguity is not None:
+        return QuestionPlan(
+            clauses=(q,),
+            unresolved_parts=(ambiguity,),
+            parse_trace=("fail_closed:ambiguous_frame",),
         )
 
     requirements = match_requirements_frame(q)
@@ -1103,10 +880,11 @@ def _finalize_full_span_coverage(question: str, plan: QuestionPlan) -> QuestionP
     )
 
 
-def compile_question_plan(question: str) -> QuestionPlan:
-    raw = str(question or "")[:4000]
+def _compile_question_plan_core(raw: str) -> QuestionPlan:
     normalized = " ".join(raw.split())
     clauses = split_question_clause_spans(raw)
+    if not clauses:
+        return QuestionPlan()
     if len(clauses) > 1:
         compound = _combine_clause_plans(raw, clauses)
         if compound is not None:
@@ -1133,6 +911,50 @@ def compile_question_plan(question: str) -> QuestionPlan:
     if residue is not None:
         return residue
     return QuestionPlan()
+
+
+def _bind_surface_plan(
+    plan: QuestionPlan,
+    *,
+    raw: str,
+    rule: str,
+) -> QuestionPlan:
+    """Rebind a canonical surface plan to the complete original user span."""
+
+    if plan.unresolved_parts:
+        return QuestionPlan(
+            clauses=(raw,),
+            unresolved_parts=plan.unresolved_parts,
+            parse_trace=(f"surface:{rule}", *plan.parse_trace),
+        )
+    clauses = split_question_clause_spans(raw)
+    if not plan.facets or not clauses:
+        return plan
+    rebound = replace(
+        plan,
+        facets=tuple(replace(facet, span_text=raw) for facet in plan.facets),
+    )
+    rebound = _bind_whole_plan(rebound, raw, clauses)
+    return _finalize_full_span_coverage(
+        raw,
+        replace(
+            rebound,
+            clauses=tuple(_normalized_clause(clause, compound=True) for clause in clauses),
+            parse_trace=(f"surface:{rule}", *plan.parse_trace),
+        ),
+    )
+
+
+def compile_question_plan(question: str) -> QuestionPlan:
+    raw = str(question or "")[:4000]
+    surface = normalize_question_surface(raw)
+    if surface is not None:
+        normalized_plan = _compile_question_plan_core(surface.text)
+        if normalized_plan.handled:
+            return _guard_plan_subjects(_bind_surface_plan(
+                normalized_plan, raw=raw, rule=surface.rule,
+            ))
+    return _compile_question_plan_core(raw)
 
 
 __all__ = ["PlannedFacet", "QuestionPlan", "compile_question_plan"]
