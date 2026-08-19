@@ -177,13 +177,28 @@ def _call_matches_target(call: dict[str, Any], payload: dict[str, Any] | None) -
         return False
     if str(payload.get("status") or "") != str(call.get("target_expected_status") or ""):
         return False
-    if not _matches_sources(_source_paths(payload), call.get("target_required_sources")):
+    target_sources = (
+        call.get("target_required_sources")
+        if "target_required_sources" in call
+        else call.get("required_sources")
+    )
+    if not _matches_sources(_source_paths(payload), target_sources):
         return False
     action = _recommended_action(payload)
-    target_tool = str(call.get("target_next_action_tool") or "")
+    target_tool_value = (
+        call.get("target_next_action_tool")
+        if "target_next_action_tool" in call
+        else call.get("baseline_next_action_tool")
+    )
+    target_tool = str(target_tool_value or "")
     if target_tool and str(action.get("tool") or "") != target_tool:
         return False
-    target_confirmation = str(call.get("target_confirmation_reason") or "")
+    target_confirmation_value = (
+        call.get("target_confirmation_reason")
+        if "target_confirmation_reason" in call
+        else call.get("baseline_confirmation_reason")
+    )
+    target_confirmation = str(target_confirmation_value or "")
     if target_confirmation and str(
         action.get("confirmation_reason") or payload.get("confirmation_reason") or ""
     ) != target_confirmation:
@@ -271,40 +286,43 @@ def run_protocol() -> dict[str, Any]:
                         else ""
                     )
 
+                    target_closed = _call_matches_target(call, payload)
                     if actual_status != baseline_status:
-                        errors.append(
-                            f"{task_id}:{index}: baseline status drift "
-                            f"{actual_status!r} != {baseline_status!r}"
-                        )
-                    if baseline_status == "ok" and not paths:
-                        errors.append(f"{task_id}:{index}: ok without source-backed evidence")
-                    if not _matches_sources(paths, call.get("required_sources")):
-                        errors.append(
-                            f"{task_id}:{index}: required baseline source missing; paths={paths!r}"
-                        )
-                    baseline_tool = str(call.get("baseline_next_action_tool") or "")
-                    if baseline_tool and action_tool != baseline_tool:
-                        errors.append(
-                            f"{task_id}:{index}: recovery tool drift "
-                            f"{action_tool!r} != {baseline_tool!r}"
-                        )
-                    baseline_confirmation = str(call.get("baseline_confirmation_reason") or "")
-                    if baseline_confirmation and confirmation_reason != baseline_confirmation:
-                        errors.append(
-                            f"{task_id}:{index}: confirmation drift "
-                            f"{confirmation_reason!r} != {baseline_confirmation!r}"
-                        )
+                        if not target_closed:
+                            errors.append(
+                                f"{task_id}:{index}: neither frozen baseline nor target status matched; "
+                                f"actual={actual_status!r} baseline={baseline_status!r} "
+                                f"target={call.get('target_expected_status')!r}"
+                            )
+                    elif not target_closed:
+                        if baseline_status == "ok" and not paths:
+                            errors.append(f"{task_id}:{index}: ok without source-backed evidence")
+                        if not _matches_sources(paths, call.get("required_sources")):
+                            errors.append(
+                                f"{task_id}:{index}: required baseline source missing; paths={paths!r}"
+                            )
+                        baseline_tool = str(call.get("baseline_next_action_tool") or "")
+                        if baseline_tool and action_tool != baseline_tool:
+                            errors.append(
+                                f"{task_id}:{index}: recovery tool drift "
+                                f"{action_tool!r} != {baseline_tool!r}"
+                            )
+                        baseline_confirmation = str(call.get("baseline_confirmation_reason") or "")
+                        if baseline_confirmation and confirmation_reason != baseline_confirmation:
+                            errors.append(
+                                f"{task_id}:{index}: confirmation drift "
+                                f"{confirmation_reason!r} != {baseline_confirmation!r}"
+                            )
                     contaminated = sorted(source for source in paths if source in forbidden)
                     if contaminated:
                         contamination += 1
                         errors.append(
                             f"{task_id}:{index}: forbidden source contamination: {contaminated!r}"
                         )
-                    if baseline_status != "ok" and actual_status == "ok":
+                    if baseline_status != "ok" and actual_status == "ok" and not target_closed:
                         false_supported += 1
-                        errors.append(f"{task_id}:{index}: false-supported baseline negative case")
+                        errors.append(f"{task_id}:{index}: unexpected supported result outside target contract")
 
-                    target_closed = _call_matches_target(call, payload)
                     task_target_closed = task_target_closed and target_closed
                     if not target_closed:
                         target_gaps.append(
@@ -363,7 +381,9 @@ def main() -> int:
     report = run_protocol()
     for task in report["tasks"]:
         state = "TARGET-CLOSED" if task["target_closed"] else "BASELINE-ONLY"
-        gap = f" gap={task['known_gap']}" if task.get("known_gap") else ""
+        gap = (
+            f" gap={task['known_gap']}" if not task["target_closed"] and task.get("known_gap") else ""
+        )
         print(f"{task['task_id']}: {state}{gap}")
     if report["errors"]:
         print("Agent Developer Protocol v1: BASELINE FAIL")
