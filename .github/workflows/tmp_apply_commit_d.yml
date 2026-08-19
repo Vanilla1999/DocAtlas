@@ -1,9 +1,9 @@
 name: Temporary apply Commit D
 
 on:
-  push:
+  pull_request:
     branches:
-      - tmp/question-surface-build
+      - main
 
 permissions:
   contents: write
@@ -13,7 +13,7 @@ env:
 
 jobs:
   apply:
-    if: github.actor != 'github-actions[bot]'
+    if: github.head_ref == 'tmp/question-surface-build' && github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -24,7 +24,7 @@ jobs:
         run: |
           set -euo pipefail
           gzip -dc .tmp/commit-d.patch.gz | git apply --index
-          git rm .tmp/commit-d.patch.gz .github/workflows/tmp_apply_commit_d.yml
+          git rm .tmp/commit-d.patch.gz .github/workflows/tmp_apply_commit_d.yml .tmp/trigger-d
           git diff --cached --check
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
