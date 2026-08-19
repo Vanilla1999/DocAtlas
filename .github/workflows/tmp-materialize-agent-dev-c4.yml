@@ -23,8 +23,9 @@ jobs:
             echo 'patch not staged yet; no-op'
             exit 0
           fi
-          git apply --check .tmp/c4.patch
-          git apply .tmp/c4.patch
+          printf '\n' >> .tmp/c4.patch
+          git apply --check --recount .tmp/c4.patch
+          git apply --recount .tmp/c4.patch
           git diff --check
           git rm .tmp/c4.patch .github/workflows/tmp-materialize-agent-dev-c4.yml
           git config user.name 'Vanilla1999'
