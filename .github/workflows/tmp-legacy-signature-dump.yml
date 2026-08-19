@@ -1,0 +1,83 @@
+name: Temporary Legacy Signature Dump
+
+on:
+  push:
+    branches: [tmp/legacy-coverage-signatures]
+
+permissions:
+  contents: read
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+  DOCMANCER_OFFLINE: "1"
+
+jobs:
+  dump:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - run: pip install -e .
+      - name: Dump canonical contracts
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from docmancer.docs.domain.project_answer_contract import build_project_answer_contract
+          from docmancer.docs.domain.question_plan import compile_question_plan
+
+          questions = [
+              "How does prepare_docs sync_project_docs work?",
+              "What does Phase 3.1 require for RetrievalDispatcher, the raw topic, EvidenceRequirementSet hints, and vector or embedding calls?",
+              "What does docs_status report and when should it be used?",
+              "What are the three public Docs MCP tools?",
+              "Which source types are supported for indexing?",
+              "How do I sync project docs after changing a file?",
+              "What are the three public Docs MCP tools and when do I use each one?",
+              "How does evidence selection differ from question planning?",
+              "Where is the project answer contract documented?",
+              "What happens when the preview plan is stale?",
+              "Why does clear-index always delete remote Qdrant collections?",
+              "What are the public tools and their purposes?",
+              "Назови три публичных инструмента Docs MCP и когда использовать каждый.",
+              "What is the difference between evidence selection and question planning?",
+              "Explain the storage mutation coordination contract.",
+          ]
+          def row(q):
+              p = compile_question_plan(q)
+              c = build_project_answer_contract(q)
+              return {
+                  "question": q,
+                  "plan_handled": p.handled,
+                  "plan_trace": list(p.parse_trace),
+                  "plan_unresolved": list(p.unresolved_parts),
+                  "contract_trace": list(c.parse_trace),
+                  "contract_unresolved": list(c.unresolved_parts),
+                  "signature": [
+                      {
+                          "kind": x.kind,
+                          "subject": x.subject,
+                          "attribute": x.attribute,
+                          "relation": x.relation,
+                          "target": x.target,
+                          "value_kind": x.value_kind,
+                          "expected_value": x.expected_value,
+                          "item_kind": x.item_kind,
+                          "cardinality": x.cardinality,
+                          "response_mode": x.response_mode,
+                          "context": x.context,
+                      }
+                      for x in c.proof_obligations
+                  ],
+              }
+          report = [row(q) for q in questions]
+          print("SIGNATURE_DUMP=" + json.dumps(report, ensure_ascii=False, sort_keys=True))
+          with open("legacy-signatures.json", "w", encoding="utf-8") as f:
+              json.dump(report, f, ensure_ascii=False, indent=2)
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: legacy-signatures
+          path: legacy-signatures.json
