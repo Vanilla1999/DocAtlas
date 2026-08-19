@@ -36,6 +36,47 @@ jobs:
             's/            raise RuntimeError(f"diagnostic inventory is missing {path}")/            continue/' \
             .tmp/apply_agent_dev_premerge_fixes.py
           python .tmp/apply_agent_dev_premerge_fixes.py
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path("docmancer/docs/domain/question_plan_proof.py")
+          text = path.read_text(encoding="utf-8")
+
+          old_words = '''        words = [
+              word.casefold()
+              for word in _REQUIREMENT_CONTENT_WORD_RE.findall(part)
+              if word.casefold() not in _REQUIREMENT_STOP_WORDS
+          ]'''
+          new_words = '''        words = [
+              word.casefold()
+              for word in _REQUIREMENT_CONTENT_WORD_RE.findall(part)
+              if word.casefold() not in _REQUIREMENT_STOP_WORDS
+              and any(character.isalnum() for character in word)
+          ]'''
+          if text.count(old_words) != 1:
+              raise RuntimeError("requirement word filter changed unexpectedly")
+          text = text.replace(old_words, new_words, 1)
+
+          old_binding = '''            if match.start() < subject_end:
+                  continue
+              between = clause[subject_end:match.start()]
+              if len(_REQUIREMENT_CONTENT_WORD_RE.findall(between)) > 8:
+                  continue
+              return clause[match.end():].strip()'''
+          new_binding = '''            if match.start() < subject_end:
+                  continue
+              if match.group(0).casefold() == "required":
+                  prefix = clause[max(subject_end, match.start() - 16):match.start()]
+                  if re.search(r"\\b(?:is|are|was|were)\\s+$", prefix, re.I):
+                      continue
+              between = clause[subject_end:match.start()]
+              if len(_REQUIREMENT_CONTENT_WORD_RE.findall(between)) > 8:
+                  continue
+              return clause[match.end():].strip()'''
+          if text.count(old_binding) != 1:
+              raise RuntimeError("requirement binding changed unexpectedly")
+          path.write_text(text.replace(old_binding, new_binding, 1), encoding="utf-8")
+          PY
           git diff --check
           python -m compileall -q docmancer scripts
 
@@ -119,6 +160,24 @@ jobs:
           PY
           rm -f .tmp/diagnostic-nodeids.txt
           git diff --check
+
+      - name: Trace Agent Developer recovery
+        run: |
+          python - <<'PY'
+          import json
+          from scripts.run_agent_developer_gate import run_protocol
+
+          report = run_protocol()
+          ambiguity = next(
+              task for task in report["tasks"]
+              if task["task_id"] == "ambiguous_module_recovery_named_gap"
+          )
+          print(json.dumps({
+              "errors": report["errors"],
+              "target_gaps": report["target_gaps"],
+              "ambiguity": ambiguity,
+          }, ensure_ascii=False, indent=2))
+          PY
 
       - name: Run affected regression suite
         run: |
