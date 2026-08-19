@@ -1,0 +1,2505 @@
+{
+  "schema_version": 1,
+  "name": "project-answer-surface-v1",
+  "scope": {
+    "case_count": 100,
+    "categories": 10,
+    "cases_per_category": 10,
+    "intent": "bounded EN/RU surface invariance with fail-closed unsupported outcomes",
+    "intentional_unsupported_ids": [
+      53,
+      55,
+      58,
+      72
+    ]
+  },
+  "signature_fields": [
+    "kind",
+    "subject",
+    "attribute",
+    "relation",
+    "target",
+    "value_kind",
+    "expected_value",
+    "item_kind",
+    "cardinality",
+    "response_mode",
+    "context"
+  ],
+  "cases": [
+    {
+      "id": 1,
+      "category": "inventory",
+      "question": "What source types are supported for indexing?",
+      "baseline_expectation": "plan",
+      "expected_owner": "question_plan",
+      "expected_signature": [
+        {
+          "kind": "inventory",
+          "subject": "source types",
+          "attribute": "source",
+          "relation": null,
+          "target": null,
+          "value_kind": "identifier_list",
+          "expected_value": null,
+          "item_kind": "source",
+          "cardinality": null,
+          "response_mode": "names",
+          "context": "indexing"
+        }
+      ],
+      "expected_unresolved": []
+    },
+    {
+      "id": 2,
+      "category": "inventory",
+      "question": "Which source types can DocAtlas index?",
+      "baseline_expectation": "support",
+      "expected_owner": "question_plan",
+      "expected_signature": [
+        {
+          "kind": "inventory",
+          "subject": "source types",
+          "attribute": "source",
+          "relation": null,
+          "target": null,
+          "value_kind": "identifier_list",
+          "expected_value": null,
+          "item_kind": "source",
+          "cardinality": null,
+          "response_mode": "names",
+          "context": "indexing"
+        }
+      ],
+      "expected_unresolved": []
+    },
+    {
+      "id": 3,
+      "category": "inventory",
+      "question": "List the supported source types.",
+      "baseline_expectation": "support",
+      "expected_owner": "question_plan",
+      "expected_signature": [
+        {
+          "kind": "inventory",
+          "subject": "source types",
+          "attribute": "source",
+          "relation": null,
+          "target": null,
+          "value_kind": "identifier_list",
+          "expected_value": null,
+          "item_kind": "source",
+          "cardinality": null,
+          "response_mode": "names",
+          "context": "indexing"
+        }
+      ],
+      "expected_unresolved": []
+    },
+    {
+      "id": 4,
+      "category": "inventory",
+      "question": "What file formats are supported for local files?",
+      "baseline_expectation": "support",
+      "expected_owner": "question_plan",
+      "expected_signature": [
+        {
+          "kind": "inventory",
+          "subject": "file formats",
+          "attribute": "file format",
+          "relation": null,
+          "target": null,
+          "value_kind": "identifier_list",
+          "expected_value": null,
+          "item_kind": "format",
+          "cardinality": null,
+          "response_mode": "names",
+          "context": "indexing"
+        }
+      ],
+      "expected_unresolved": []
+    },
+    {
+      "id": 5,
+      "category": "inventory",
+      "question": "Which document formats does indexing accept?",
+      "baseline_expectation": "support",
+      "expected_owner": "question_plan",
+      "expected_signature": [
+        {
+          "kind": "inventory",
+          "subject": "file formats",
+          "attribute": "file format",
+          "relation": null,
+          "target": null,
+          "value_kind": "identifier_list",
+          "expected_value": null,
+          "item_kind": "format",
+          "cardinality": null,
+          "response_mode": "names",
+          "context": "indexing"
+        }
+      ],
+      "expected_unresolved": []
+    },
+    {
+      "id": 6,
+      "category": "inventory",
+      "question": "List the pytest markers.",
+      "baseline_expectation": "plan",
+      "expected_owner": "question_plan",
+      "expected_signature": [
+        {
+          "kind": "inventory",
+          "subject": "test suite",
+          "attribute": "marker",
+          "relation": null,
+          "target": null,
+          "value_kind": "identifier_list",
+          "expected_value": null,
+          "item_kind": "marker",
+          "cardinality": null,
+          "response_mode": "names",
+          "context": null
+        }
+      ],
+      "expected_unresolved": []
+    },
+    {
+      "id": 7,
+      "category": "inventory",
+      "question": "What markers does the offline suite define?",
+      "baseline_expectation": "support",
+      "expected_owner": "question_plan",
+      "expected_signature": [
+        {
+          "kind": "inventory",
+          "subject": "test suite",
+          "attribute": "marker",
+          "relation": null,
+          "target": null,
+          "value_kind": "identifier_list",
+          "expected_value": null,
+          "item_kind": "marker",
+          "cardinality": null,
+          "response_mode": "names",
+          "context": "offline suite"
+        }
+      ],
+      "expected_unresolved": []
+    },
+    {
+      "id": 8,
+      "category": "inventory",
+      "question": "Какие типы источников можно индексировать?",
+      "baseline_expectation": "support",
+      "expected_owner": "question_plan",
+      "expected_signature": [
+        {
+          "kind": "inventory",
+          "subject": "source types",
+          "attribute": "source",
+          "relation": null,
+          "target": null,
+          "value_kind": "identifier_list",
+          "expected_value": null,
+          "item_kind": "source",
+          "cardinality": null,
+          "response_mode": "names",
+          "context": "indexing"
+        }
+      ],
+      "expected_unresolved": []
+    },
+    {
+      "id": 9,
+      "category": "inventory",
+      "question": "Какие форматы локальных файлов поддерживаются?",
+      "baseline_expectation": "support",
+      "expected_owner": "question_plan",
+      "expected_signature": [
+        {
+          "kind": "inventory",
+          "subject": "file formats",
+          "attribute": "file format",
+          "relation": null,
+          "target": null,
+          "value_kind": "identifier_list",
+          "expected_value": null,
+          "item_kind": "format",
+          "cardinality": null,
+          "response_mode": "names",
+          "context": "indexing"
+        }
+      ],
+      "expected_unresolved": []
+    },
+    {
+      "id": 10,
+      "category": "inventory",
+      "question": "Какие pytest-маркеры есть в проекте?",
+      "baseline_expectation": "support",
+      "expected_owner": "question_plan",
+      "expected_signature": [
+        {
+          "kind": "inventory",
+          "subject": "test suite",
+          "attribute": "marker",
+          "relation": null,
+          "target": null,
+          "value_kind": "identifier_list",
+          "expected_value": null,
+          "item_kind": "marker",
+          "cardinality": null,
+          "response_mode": "names",
+          "context": null
+        }
+      ],
+      "expected_unresolved": []
+    },
+    {
+      "id": 11,
+      "category": "workflow",
+      "question": "How do I sync project docs after editing a file?",
+      "baseline_expectation": "plan",
+      "expected_owner": "question_plan",
+      "expected_signature": [
+        {
+          "kind": "command",
+          "subject": "sync_project_docs",
+          "attribute": null,
+          "relation": "invocation",
+          "target": null,
+          "value_kind": "call_expression",
+          "expected_value": "sync_project_docs",
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "call",
+          "context": null
+        }
+      ],
+      "expected_unresolved": []
+    },
+    {
+      "id": 12,
+      "category": "workflow",
+      "question": "Which command should I run after project docs change?",
+      "baseline_expectation": "support",
+      "expected_owner": "question_plan",
+      "expected_signature": [
+        {
+          "kind": "command",
+          "subject": "sync_project_docs",
+          "attribute": null,
+          "relation": "invocation",
+          "target": null,
+          "value_kind": "call_expression",
+          "expected_value": "sync_project_docs",
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "call",
+          "context": null
+        }
+      ],
+      "expected_unresolved": []
+    },
+    {
+      "id": 13,
+      "category": "workflow",
+      "question": "Refresh project documentation after a file changes.",
+      "baseline_expectation": "support",
+      "expected_owner": "question_plan",
+      "expected_signature": [
+        {
+          "kind": "command",
+          "subject": "sync_project_docs",
+          "attribute": null,
+          "relation": "invocation",
+          "target": null,
+          "value_kind": "call_expression",
+          "expected_value": "sync_project_docs",
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "call",
+          "context": null
+        }
+      ],
+      "expected_unresolved": []
+    },
+    {
+      "id": 14,
+      "category": "workflow",
+      "question": "Как обновить документацию проекта после изменения файла?",
+      "baseline_expectation": "plan",
+      "expected_owner": "question_plan",
+      "expected_signature": [
+        {
+          "kind": "command",
+          "subject": "sync_project_docs",
+          "attribute": null,
+          "relation": "invocation",
+          "target": null,
+          "value_kind": "call_expression",
+          "expected_value": "sync_project_docs",
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "call",
+          "context": null
+        }
+      ],
+      "expected_unresolved": []
+    },
+    {
+      "id": 15,
+      "category": "workflow",
+      "question": "Какой командой синхронизировать документацию проекта?",
+      "baseline_expectation": "support",
+      "expected_owner": "question_plan",
+      "expected_signature": [
+        {
+          "kind": "command",
+          "subject": "sync_project_docs",
+          "attribute": null,
+          "relation": "invocation",
+          "target": null,
+          "value_kind": "call_expression",
+          "expected_value": "sync_project_docs",
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "call",
+          "context": null
+        }
+      ],
+      "expected_unresolved": []
+    },
+    {
+      "id": 16,
+      "category": "workflow",
+      "question": "How do I run the offline suite?",
+      "baseline_expectation": "plan",
+      "expected_owner": "question_plan",
+      "expected_signature": [
+        {
+          "kind": "workflow",
+          "subject": "offline suite",
+          "attribute": null,
+          "relation": "procedure",
+          "target": null,
+          "value_kind": "text",
+          "expected_value": null,
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "workflow",
+          "context": "DocAtlas"
+        }
+      ],
+      "expected_unresolved": []
+    },
+    {
+      "id": 17,
+      "category": "workflow",
+      "question": "How can I run the offline suite?",
+      "baseline_expectation": "support",
+      "expected_owner": "question_plan",
+      "expected_signature": [
+        {
+          "kind": "workflow",
+          "subject": "offline suite",
+          "attribute": null,
+          "relation": "procedure",
+          "target": null,
+          "value_kind": "text",
+          "expected_value": null,
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "workflow",
+          "context": "DocAtlas"
+        }
+      ],
+      "expected_unresolved": []
+    },
+    {
+      "id": 18,
+      "category": "workflow",
+      "question": "How do I configure project docs in docmancer.yaml?",
+      "baseline_expectation": "support",
+      "expected_owner": "question_plan",
+      "expected_signature": [
+        {
+          "kind": "workflow",
+          "subject": "docmancer.yaml",
+          "attribute": null,
+          "relation": "configuration",
+          "target": null,
+          "value_kind": "text",
+          "expected_value": null,
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "workflow",
+          "context": "project configuration"
+        }
+      ],
+      "expected_unresolved": []
+    },
+    {
+      "id": 19,
+      "category": "workflow",
+      "question": "Where is project docs configuration defined?",
+      "baseline_expectation": "plan",
+      "expected_owner": "question_plan",
+      "expected_signature": [
+        {
+          "kind": "location",
+          "subject": "project docs configuration",
+          "attribute": null,
+          "relation": "location",
+          "target": null,
+          "value_kind": "path",
+          "expected_value": null,
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "path",
+          "context": null
+        }
+      ],
+      "expected_unresolved": []
+    },
+    {
+      "id": 20,
+      "category": "workflow",
+      "question": "What command starts the Docs MCP server?",
+      "baseline_expectation": "plan",
+      "expected_owner": "question_plan",
+      "expected_signature": [
+        {
+          "kind": "command",
+          "subject": "docs-serve",
+          "attribute": null,
+          "relation": "invocation",
+          "target": null,
+          "value_kind": "call_expression",
+          "expected_value": "docs-serve",
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "call",
+          "context": "Docs MCP server"
+        }
+      ],
+      "expected_unresolved": []
+    },
+    {
+      "id": 21,
+      "category": "public_tools",
+      "question": "What are the three public Docs MCP tools and when do I use each one?",
+      "baseline_expectation": "plan",
+      "expected_owner": "question_plan",
+      "expected_signature": [
+        {
+          "kind": "relation",
+          "subject": "get_docs_context",
+          "attribute": null,
+          "relation": "public_tool_usage",
+          "target": null,
+          "value_kind": "text",
+          "expected_value": null,
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "value",
+          "context": "Docs MCP public tools"
+        },
+        {
+          "kind": "relation",
+          "subject": "prepare_docs",
+          "attribute": null,
+          "relation": "public_tool_usage",
+          "target": null,
+          "value_kind": "text",
+          "expected_value": null,
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "value",
+          "context": "Docs MCP public tools"
+        },
+        {
+          "kind": "relation",
+          "subject": "docs_status",
+          "attribute": null,
+          "relation": "public_tool_usage",
+          "target": null,
+          "value_kind": "text",
+          "expected_value": null,
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "value",
+          "context": "Docs MCP public tools"
+        }
+      ],
+      "expected_unresolved": []
+    },
+    {
+      "id": 22,
+      "category": "public_tools",
+      "question": "Which public Docs MCP tools are available?",
+      "baseline_expectation": "support",
+      "expected_owner": "legacy",
+      "expected_signature": [
+        {
+          "kind": "inventory",
+          "subject": "Docs MCP",
+          "attribute": "public_tools",
+          "relation": null,
+          "target": null,
+          "value_kind": "identifier_list",
+          "expected_value": null,
+          "item_kind": "public_tool",
+          "cardinality": null,
+          "response_mode": "names",
+          "context": null
+        }
+      ],
+      "expected_unresolved": []
+    },
+    {
+      "id": 23,
+      "category": "public_tools",
+      "question": "List the public Docs MCP tools.",
+      "baseline_expectation": "support",
+      "expected_owner": "legacy",
+      "expected_signature": [
+        {
+          "kind": "inventory",
+          "subject": "Docs MCP",
+          "attribute": "public_tools",
+          "relation": null,
+          "target": null,
+          "value_kind": "identifier_list",
+          "expected_value": null,
+          "item_kind": "public_tool",
+          "cardinality": null,
+          "response_mode": "names",
+          "context": null
+        }
+      ],
+      "expected_unresolved": []
+    },
+    {
+      "id": 24,
+      "category": "public_tools",
+      "question": "What does get_docs_context do?",
+      "baseline_expectation": "support",
+      "expected_owner": "legacy",
+      "expected_signature": [
+        {
+          "kind": "behavior",
+          "subject": "get_docs_context",
+          "attribute": null,
+          "relation": "behavior",
+          "target": null,
+          "value_kind": "text",
+          "expected_value": null,
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "value",
+          "context": null
+        }
+      ],
+      "expected_unresolved": []
+    },
+    {
+      "id": 25,
+      "category": "public_tools",
+      "question": "When should I use get_docs_context?",
+      "baseline_expectation": "support",
+      "expected_owner": "question_plan",
+      "expected_signature": [
+        {
+          "kind": "usage",
+          "subject": "get_docs_context",
+          "attribute": null,
+          "relation": "usage",
+          "target": null,
+          "value_kind": "text",
+          "expected_value": null,
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "value",
+          "context": null
+        }
+      ],
+      "expected_unresolved": []
+    },
+    {
+      "id": 26,
+      "category": "public_tools",
+      "question": "What does prepare_docs do and when should I use it?",
+      "baseline_expectation": "support",
+      "expected_owner": "legacy",
+      "expected_signature": [
+        {
+          "kind": "behavior",
+          "subject": "prepare_docs",
+          "attribute": null,
+          "relation": "behavior",
+          "target": null,
+          "value_kind": "text",
+          "expected_value": null,
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "value",
+          "context": null
+        },
+        {
+          "kind": "usage",
+          "subject": "prepare_docs",
+          "attribute": null,
+          "relation": "usage",
+          "target": null,
+          "value_kind": "text",
+          "expected_value": null,
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "value",
+          "context": null
+        }
+      ],
+      "expected_unresolved": []
+    },
+    {
+      "id": 27,
+      "category": "public_tools",
+      "question": "What does docs_status report and when should it be used?",
+      "baseline_expectation": "legacy",
+      "expected_owner": "legacy",
+      "expected_signature": [
+        {
+          "kind": "behavior",
+          "subject": "docs_status",
+          "attribute": null,
+          "relation": "behavior",
+          "target": null,
+          "value_kind": "text",
+          "expected_value": null,
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "value",
+          "context": null
+        },
+        {
+          "kind": "usage",
+          "subject": "docs_status",
+          "attribute": null,
+          "relation": "usage",
+          "target": null,
+          "value_kind": "text",
+          "expected_value": null,
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "value",
+          "context": null
+        }
+      ],
+      "expected_unresolved": []
+    },
+    {
+      "id": 28,
+      "category": "public_tools",
+      "question": "What are the public tools and their purposes?",
+      "baseline_expectation": "support",
+      "expected_owner": "question_plan",
+      "expected_signature": [
+        {
+          "kind": "purpose",
+          "subject": "get_docs_context",
+          "attribute": null,
+          "relation": "purpose",
+          "target": null,
+          "value_kind": "text",
+          "expected_value": null,
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "purpose",
+          "context": "Docs MCP public tools"
+        },
+        {
+          "kind": "purpose",
+          "subject": "prepare_docs",
+          "attribute": null,
+          "relation": "purpose",
+          "target": null,
+          "value_kind": "text",
+          "expected_value": null,
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "purpose",
+          "context": "Docs MCP public tools"
+        },
+        {
+          "kind": "purpose",
+          "subject": "docs_status",
+          "attribute": null,
+          "relation": "purpose",
+          "target": null,
+          "value_kind": "text",
+          "expected_value": null,
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "purpose",
+          "context": "Docs MCP public tools"
+        }
+      ],
+      "expected_unresolved": []
+    },
+    {
+      "id": 29,
+      "category": "public_tools",
+      "question": "Назови три публичных инструмента Docs MCP и когда использовать каждый.",
+      "baseline_expectation": "support",
+      "expected_owner": "question_plan",
+      "expected_signature": [
+        {
+          "kind": "relation",
+          "subject": "get_docs_context",
+          "attribute": null,
+          "relation": "public_tool_usage",
+          "target": null,
+          "value_kind": "text",
+          "expected_value": null,
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "value",
+          "context": "Docs MCP public tools"
+        },
+        {
+          "kind": "relation",
+          "subject": "prepare_docs",
+          "attribute": null,
+          "relation": "public_tool_usage",
+          "target": null,
+          "value_kind": "text",
+          "expected_value": null,
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "value",
+          "context": "Docs MCP public tools"
+        },
+        {
+          "kind": "relation",
+          "subject": "docs_status",
+          "attribute": null,
+          "relation": "public_tool_usage",
+          "target": null,
+          "value_kind": "text",
+          "expected_value": null,
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "value",
+          "context": "Docs MCP public tools"
+        }
+      ],
+      "expected_unresolved": []
+    },
+    {
+      "id": 30,
+      "category": "public_tools",
+      "question": "Какие публичные инструменты есть у Docs MCP?",
+      "baseline_expectation": "support",
+      "expected_owner": "legacy",
+      "expected_signature": [
+        {
+          "kind": "inventory",
+          "subject": "Docs MCP",
+          "attribute": "public_tools",
+          "relation": null,
+          "target": null,
+          "value_kind": "identifier_list",
+          "expected_value": null,
+          "item_kind": "public_tool",
+          "cardinality": null,
+          "response_mode": "names",
+          "context": null
+        }
+      ],
+      "expected_unresolved": []
+    },
+    {
+      "id": 31,
+      "category": "comparison_location",
+      "question": "How does evidence selection differ from question planning?",
+      "baseline_expectation": "plan",
+      "expected_owner": "question_plan",
+      "expected_signature": [
+        {
+          "kind": "comparison",
+          "subject": "evidence selection",
+          "attribute": null,
+          "relation": "contrast",
+          "target": "question planning",
+          "value_kind": "text",
+          "expected_value": null,
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "value",
+          "context": null
+        }
+      ],
+      "expected_unresolved": []
+    },
+    {
+      "id": 32,
+      "category": "comparison_location",
+      "question": "Compare evidence selection with question planning.",
+      "baseline_expectation": "plan",
+      "expected_owner": "question_plan",
+      "expected_signature": [
+        {
+          "kind": "comparison",
+          "subject": "evidence selection",
+          "attribute": null,
+          "relation": "contrast",
+          "target": "question planning",
+          "value_kind": "text",
+          "expected_value": null,
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "value",
+          "context": null
+        }
+      ],
+      "expected_unresolved": []
+    },
+    {
+      "id": 33,
+      "category": "comparison_location",
+      "question": "What is the difference between evidence selection and question planning?",
+      "baseline_expectation": "support",
+      "expected_owner": "question_plan",
+      "expected_signature": [
+        {
+          "kind": "comparison",
+          "subject": "evidence selection",
+          "attribute": null,
+          "relation": "contrast",
+          "target": "question planning",
+          "value_kind": "text",
+          "expected_value": null,
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "value",
+          "context": null
+        }
+      ],
+      "expected_unresolved": []
+    },
+    {
+      "id": 34,
+      "category": "comparison_location",
+      "question": "Evidence selection vs question planning: what differs?",
+      "baseline_expectation": "support",
+      "expected_owner": "question_plan",
+      "expected_signature": [
+        {
+          "kind": "comparison",
+          "subject": "evidence selection",
+          "attribute": null,
+          "relation": "contrast",
+          "target": "question planning",
+          "value_kind": "text",
+          "expected_value": null,
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "value",
+          "context": null
+        }
+      ],
+      "expected_unresolved": []
+    },
+    {
+      "id": 35,
+      "category": "comparison_location",
+      "question": "Чем evidence selection отличается от question planning?",
+      "baseline_expectation": "plan",
+      "expected_owner": "question_plan",
+      "expected_signature": [
+        {
+          "kind": "comparison",
+          "subject": "evidence selection",
+          "attribute": null,
+          "relation": "contrast",
+          "target": "question planning",
+          "value_kind": "text",
+          "expected_value": null,
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "value",
+          "context": null
+        }
+      ],
+      "expected_unresolved": []
+    },
+    {
+      "id": 36,
+      "category": "comparison_location",
+      "question": "Сравни evidence selection и question planning.",
+      "baseline_expectation": "plan",
+      "expected_owner": "question_plan",
+      "expected_signature": [
+        {
+          "kind": "comparison",
+          "subject": "evidence selection",
+          "attribute": null,
+          "relation": "contrast",
+          "target": "question planning",
+          "value_kind": "text",
+          "expected_value": null,
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "value",
+          "context": null
+        }
+      ],
+      "expected_unresolved": []
+    },
+    {
+      "id": 37,
+      "category": "comparison_location",
+      "question": "Where is the project answer contract documented?",
+      "baseline_expectation": "plan",
+      "expected_owner": "question_plan",
+      "expected_signature": [
+        {
+          "kind": "location",
+          "subject": "project answer contract",
+          "attribute": null,
+          "relation": "location",
+          "target": null,
+          "value_kind": "path",
+          "expected_value": null,
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "path",
+          "context": null
+        }
+      ],
+      "expected_unresolved": []
+    },
+    {
+      "id": 38,
+      "category": "comparison_location",
+      "question": "Which file defines the project answer contract?",
+      "baseline_expectation": "plan",
+      "expected_owner": "question_plan",
+      "expected_signature": [
+        {
+          "kind": "location",
+          "subject": "project answer contract",
+          "attribute": null,
+          "relation": "location",
+          "target": null,
+          "value_kind": "path",
+          "expected_value": null,
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "path",
+          "context": null
+        }
+      ],
+      "expected_unresolved": []
+    },
+    {
+      "id": 39,
+      "category": "comparison_location",
+      "question": "Where can I find the project answer contract?",
+      "baseline_expectation": "plan",
+      "expected_owner": "question_plan",
+      "expected_signature": [
+        {
+          "kind": "location",
+          "subject": "project answer contract",
+          "attribute": null,
+          "relation": "location",
+          "target": null,
+          "value_kind": "path",
+          "expected_value": null,
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "path",
+          "context": null
+        }
+      ],
+      "expected_unresolved": []
+    },
+    {
+      "id": 40,
+      "category": "comparison_location",
+      "question": "В каком файле описан project answer contract?",
+      "baseline_expectation": "plan",
+      "expected_owner": "question_plan",
+      "expected_signature": [
+        {
+          "kind": "location",
+          "subject": "project answer contract",
+          "attribute": null,
+          "relation": "location",
+          "target": null,
+          "value_kind": "path",
+          "expected_value": null,
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "path",
+          "context": null
+        }
+      ],
+      "expected_unresolved": []
+    },
+    {
+      "id": 41,
+      "category": "condition",
+      "question": "What happens when the preview plan is stale?",
+      "baseline_expectation": "plan",
+      "expected_owner": "question_plan",
+      "expected_signature": [
+        {
+          "kind": "relation",
+          "subject": "preview plan",
+          "attribute": null,
+          "relation": "conditional_outcome",
+          "target": null,
+          "value_kind": "text",
+          "expected_value": null,
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "value",
+          "context": "preview plan is stale"
+        }
+      ],
+      "expected_unresolved": []
+    },
+    {
+      "id": 42,
+      "category": "condition",
+      "question": "What happens if the preview plan becomes stale?",
+      "baseline_expectation": "plan",
+      "expected_owner": "question_plan",
+      "expected_signature": [
+        {
+          "kind": "relation",
+          "subject": "preview plan",
+          "attribute": null,
+          "relation": "conditional_outcome",
+          "target": null,
+          "value_kind": "text",
+          "expected_value": null,
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "value",
+          "context": "preview plan becomes stale"
+        }
+      ],
+      "expected_unresolved": []
+    },
+    {
+      "id": 43,
+      "category": "condition",
+      "question": "What happens when the preview plan expires?",
+      "baseline_expectation": "support",
+      "expected_owner": "question_plan",
+      "expected_signature": [
+        {
+          "kind": "relation",
+          "subject": "preview plan",
+          "attribute": null,
+          "relation": "conditional_outcome",
+          "target": null,
+          "value_kind": "text",
+          "expected_value": null,
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "value",
+          "context": "preview plan is stale"
+        }
+      ],
+      "expected_unresolved": []
+    },
+    {
+      "id": 44,
+      "category": "condition",
+      "question": "Can clear-index run while the MCP server is alive?",
+      "baseline_expectation": "plan",
+      "expected_owner": "question_plan",
+      "expected_signature": [
+        {
+          "kind": "relation",
+          "subject": "clear-index",
+          "attribute": null,
+          "relation": "conditional_outcome",
+          "target": null,
+          "value_kind": "text",
+          "expected_value": null,
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "value",
+          "context": "MCP server is alive"
+        }
+      ],
+      "expected_unresolved": []
+    },
+    {
+      "id": 45,
+      "category": "condition",
+      "question": "Is clear-index allowed while the MCP server is running?",
+      "baseline_expectation": "support",
+      "expected_owner": "question_plan",
+      "expected_signature": [
+        {
+          "kind": "relation",
+          "subject": "clear-index",
+          "attribute": null,
+          "relation": "conditional_outcome",
+          "target": null,
+          "value_kind": "text",
+          "expected_value": null,
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "value",
+          "context": "MCP server is running"
+        }
+      ],
+      "expected_unresolved": []
+    },
+    {
+      "id": 46,
+      "category": "condition",
+      "question": "Under which conditions is cleanup blocked?",
+      "baseline_expectation": "plan",
+      "expected_owner": "question_plan",
+      "expected_signature": [
+        {
+          "kind": "relation",
+          "subject": "cleanup",
+          "attribute": null,
+          "relation": "blocking_conditions",
+          "target": null,
+          "value_kind": "text",
+          "expected_value": null,
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "value",
+          "context": null
+        }
+      ],
+      "expected_unresolved": []
+    },
+    {
+      "id": 47,
+      "category": "condition",
+      "question": "When is cleanup blocked?",
+      "baseline_expectation": "support",
+      "expected_owner": "question_plan",
+      "expected_signature": [
+        {
+          "kind": "relation",
+          "subject": "cleanup",
+          "attribute": null,
+          "relation": "blocking_conditions",
+          "target": null,
+          "value_kind": "text",
+          "expected_value": null,
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "value",
+          "context": null
+        }
+      ],
+      "expected_unresolved": []
+    },
+    {
+      "id": 48,
+      "category": "condition",
+      "question": "Что происходит, когда preview plan устарел?",
+      "baseline_expectation": "plan",
+      "expected_owner": "question_plan",
+      "expected_signature": [
+        {
+          "kind": "relation",
+          "subject": "preview plan",
+          "attribute": null,
+          "relation": "conditional_outcome",
+          "target": null,
+          "value_kind": "text",
+          "expected_value": null,
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "value",
+          "context": "preview plan is stale"
+        }
+      ],
+      "expected_unresolved": []
+    },
+    {
+      "id": 49,
+      "category": "condition",
+      "question": "Можно ли запустить clear-index, пока MCP server работает?",
+      "baseline_expectation": "plan",
+      "expected_owner": "question_plan",
+      "expected_signature": [
+        {
+          "kind": "relation",
+          "subject": "clear-index",
+          "attribute": null,
+          "relation": "conditional_outcome",
+          "target": null,
+          "value_kind": "text",
+          "expected_value": null,
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "value",
+          "context": "MCP server is alive"
+        }
+      ],
+      "expected_unresolved": []
+    },
+    {
+      "id": 50,
+      "category": "condition",
+      "question": "При каких условиях cleanup блокируется?",
+      "baseline_expectation": "plan",
+      "expected_owner": "question_plan",
+      "expected_signature": [
+        {
+          "kind": "relation",
+          "subject": "cleanup",
+          "attribute": null,
+          "relation": "blocking_conditions",
+          "target": null,
+          "value_kind": "text",
+          "expected_value": null,
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "value",
+          "context": null
+        }
+      ],
+      "expected_unresolved": []
+    },
+    {
+      "id": 51,
+      "category": "premise",
+      "question": "Why does clear-index always delete remote Qdrant collections?",
+      "baseline_expectation": "plan",
+      "expected_owner": "question_plan",
+      "expected_signature": [
+        {
+          "kind": "relation",
+          "subject": "clear-index",
+          "attribute": null,
+          "relation": "premise_check",
+          "target": "delete remote Qdrant collections",
+          "value_kind": "text",
+          "expected_value": "always",
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "value",
+          "context": null
+        }
+      ],
+      "expected_unresolved": []
+    },
+    {
+      "id": 52,
+      "category": "premise",
+      "question": "Why does clear-index never delete remote Qdrant collections?",
+      "baseline_expectation": "plan",
+      "expected_owner": "question_plan",
+      "expected_signature": [
+        {
+          "kind": "relation",
+          "subject": "clear-index",
+          "attribute": null,
+          "relation": "premise_check",
+          "target": "delete remote Qdrant collections",
+          "value_kind": "text",
+          "expected_value": "never",
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "value",
+          "context": null
+        }
+      ],
+      "expected_unresolved": []
+    },
+    {
+      "id": 53,
+      "category": "premise",
+      "question": "Why does clear-index delete remote Qdrant collections?",
+      "baseline_expectation": "support",
+      "expected_owner": "unsupported",
+      "expected_signature": [],
+      "expected_unresolved": [
+        "unsupported_query:legacy_no_contract"
+      ]
+    },
+    {
+      "id": 54,
+      "category": "premise",
+      "question": "Why does clear-index always preserve remote Qdrant collections?",
+      "baseline_expectation": "plan",
+      "expected_owner": "question_plan",
+      "expected_signature": [
+        {
+          "kind": "relation",
+          "subject": "clear-index",
+          "attribute": null,
+          "relation": "premise_check",
+          "target": "preserve remote Qdrant collections",
+          "value_kind": "text",
+          "expected_value": "always",
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "value",
+          "context": null
+        }
+      ],
+      "expected_unresolved": []
+    },
+    {
+      "id": 55,
+      "category": "premise",
+      "question": "Why does clear-index sometimes delete remote Qdrant collections?",
+      "baseline_expectation": "support",
+      "expected_owner": "unsupported",
+      "expected_signature": [],
+      "expected_unresolved": [
+        "unsupported_query:legacy_no_contract"
+      ]
+    },
+    {
+      "id": 56,
+      "category": "premise",
+      "question": "Why are there four public Docs MCP tools?",
+      "baseline_expectation": "plan",
+      "expected_owner": "question_plan",
+      "expected_signature": [
+        {
+          "kind": "relation",
+          "subject": "Docs MCP",
+          "attribute": null,
+          "relation": "premise_cardinality",
+          "target": "public Docs MCP tools",
+          "value_kind": "text",
+          "expected_value": "four",
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "value",
+          "context": null
+        }
+      ],
+      "expected_unresolved": []
+    },
+    {
+      "id": 57,
+      "category": "premise",
+      "question": "Why are there three public Docs MCP tools?",
+      "baseline_expectation": "plan",
+      "expected_owner": "question_plan",
+      "expected_signature": [
+        {
+          "kind": "relation",
+          "subject": "Docs MCP",
+          "attribute": null,
+          "relation": "premise_cardinality",
+          "target": "public Docs MCP tools",
+          "value_kind": "text",
+          "expected_value": "three",
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "value",
+          "context": null
+        }
+      ],
+      "expected_unresolved": []
+    },
+    {
+      "id": 58,
+      "category": "premise",
+      "question": "Why are there four storage layers?",
+      "baseline_expectation": "support",
+      "expected_owner": "unsupported",
+      "expected_signature": [],
+      "expected_unresolved": [
+        "unsupported_query:legacy_no_contract"
+      ]
+    },
+    {
+      "id": 59,
+      "category": "premise",
+      "question": "Почему clear-index всегда удаляет удалённые коллекции Qdrant?",
+      "baseline_expectation": "plan",
+      "expected_owner": "question_plan",
+      "expected_signature": [
+        {
+          "kind": "relation",
+          "subject": "clear-index",
+          "attribute": null,
+          "relation": "premise_check",
+          "target": "delete remote Qdrant collections",
+          "value_kind": "text",
+          "expected_value": "always",
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "value",
+          "context": null
+        }
+      ],
+      "expected_unresolved": []
+    },
+    {
+      "id": 60,
+      "category": "premise",
+      "question": "Почему у Docs MCP четыре публичных инструмента?",
+      "baseline_expectation": "support",
+      "expected_owner": "question_plan",
+      "expected_signature": [
+        {
+          "kind": "relation",
+          "subject": "Docs MCP",
+          "attribute": null,
+          "relation": "premise_cardinality",
+          "target": "public Docs MCP tools",
+          "value_kind": "text",
+          "expected_value": "four",
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "value",
+          "context": null
+        }
+      ],
+      "expected_unresolved": []
+    },
+    {
+      "id": 61,
+      "category": "compound",
+      "question": "Which source types are supported for indexing, what is the Bitcoin price?",
+      "baseline_expectation": "abstain",
+      "expected_owner": "unsupported",
+      "expected_signature": [
+        {
+          "kind": "inventory",
+          "subject": "source types",
+          "attribute": "source",
+          "relation": null,
+          "target": null,
+          "value_kind": "identifier_list",
+          "expected_value": null,
+          "item_kind": "source",
+          "cardinality": null,
+          "response_mode": "names",
+          "context": "indexing"
+        }
+      ],
+      "expected_unresolved": [
+        "unresolved_question_clause:what is the Bitcoin price"
+      ]
+    },
+    {
+      "id": 62,
+      "category": "compound",
+      "question": "Which source types are supported for indexing and explain clear-index.",
+      "baseline_expectation": "support",
+      "expected_owner": "question_plan",
+      "expected_signature": [
+        {
+          "kind": "inventory",
+          "subject": "source types",
+          "attribute": "source",
+          "relation": null,
+          "target": null,
+          "value_kind": "identifier_list",
+          "expected_value": null,
+          "item_kind": "source",
+          "cardinality": null,
+          "response_mode": "names",
+          "context": "indexing"
+        },
+        {
+          "kind": "behavior",
+          "subject": "clear-index",
+          "attribute": null,
+          "relation": "behavior",
+          "target": null,
+          "value_kind": "text",
+          "expected_value": null,
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "value",
+          "context": null
+        }
+      ],
+      "expected_unresolved": []
+    },
+    {
+      "id": 63,
+      "category": "compound",
+      "question": "Where is the project answer contract documented and what is the Bitcoin price?",
+      "baseline_expectation": "abstain",
+      "expected_owner": "unsupported",
+      "expected_signature": [
+        {
+          "kind": "location",
+          "subject": "project answer contract",
+          "attribute": null,
+          "relation": "location",
+          "target": null,
+          "value_kind": "path",
+          "expected_value": null,
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "path",
+          "context": null
+        }
+      ],
+      "expected_unresolved": [
+        "unresolved_question_clause:what is the Bitcoin price"
+      ]
+    },
+    {
+      "id": 64,
+      "category": "compound",
+      "question": "How does evidence selection differ from question planning and what is the Bitcoin price?",
+      "baseline_expectation": "abstain",
+      "expected_owner": "unsupported",
+      "expected_signature": [
+        {
+          "kind": "comparison",
+          "subject": "evidence selection",
+          "attribute": null,
+          "relation": "contrast",
+          "target": "question planning",
+          "value_kind": "text",
+          "expected_value": null,
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "value",
+          "context": null
+        }
+      ],
+      "expected_unresolved": [
+        "unresolved_question_clause:what is the Bitcoin price"
+      ]
+    },
+    {
+      "id": 65,
+      "category": "compound",
+      "question": "What happens when the preview plan is stale, also tell me the Bitcoin price?",
+      "baseline_expectation": "abstain",
+      "expected_owner": "unsupported",
+      "expected_signature": [
+        {
+          "kind": "relation",
+          "subject": "preview plan",
+          "attribute": null,
+          "relation": "conditional_outcome",
+          "target": null,
+          "value_kind": "text",
+          "expected_value": null,
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "value",
+          "context": "preview plan is stale"
+        }
+      ],
+      "expected_unresolved": [
+        "unresolved_question_clause:tell me the Bitcoin price"
+      ]
+    },
+    {
+      "id": 66,
+      "category": "compound",
+      "question": "Why does clear-index always delete remote Qdrant collections; calculate 2+2.",
+      "baseline_expectation": "abstain",
+      "expected_owner": "unsupported",
+      "expected_signature": [
+        {
+          "kind": "relation",
+          "subject": "clear-index",
+          "attribute": null,
+          "relation": "premise_check",
+          "target": "delete remote Qdrant collections",
+          "value_kind": "text",
+          "expected_value": "always",
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "value",
+          "context": null
+        }
+      ],
+      "expected_unresolved": [
+        "unresolved_question_clause:calculate 2+2"
+      ]
+    },
+    {
+      "id": 67,
+      "category": "compound",
+      "question": "What test markers are available and how do I run the offline suite?",
+      "baseline_expectation": "plan",
+      "expected_owner": "question_plan",
+      "expected_signature": [
+        {
+          "kind": "inventory",
+          "subject": "test suite",
+          "attribute": "marker",
+          "relation": null,
+          "target": null,
+          "value_kind": "identifier_list",
+          "expected_value": null,
+          "item_kind": "marker",
+          "cardinality": null,
+          "response_mode": "names",
+          "context": null
+        },
+        {
+          "kind": "workflow",
+          "subject": "offline suite",
+          "attribute": null,
+          "relation": "procedure",
+          "target": null,
+          "value_kind": "text",
+          "expected_value": null,
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "workflow",
+          "context": "DocAtlas"
+        }
+      ],
+      "expected_unresolved": []
+    },
+    {
+      "id": 68,
+      "category": "compound",
+      "question": "Which source types are supported for indexing; which file formats are supported for indexing?",
+      "baseline_expectation": "plan",
+      "expected_owner": "question_plan",
+      "expected_signature": [
+        {
+          "kind": "inventory",
+          "subject": "source types",
+          "attribute": "source",
+          "relation": null,
+          "target": null,
+          "value_kind": "identifier_list",
+          "expected_value": null,
+          "item_kind": "source",
+          "cardinality": null,
+          "response_mode": "names",
+          "context": "indexing"
+        },
+        {
+          "kind": "inventory",
+          "subject": "file formats",
+          "attribute": "file format",
+          "relation": null,
+          "target": null,
+          "value_kind": "identifier_list",
+          "expected_value": null,
+          "item_kind": "format",
+          "cardinality": null,
+          "response_mode": "names",
+          "context": "indexing"
+        }
+      ],
+      "expected_unresolved": []
+    },
+    {
+      "id": 69,
+      "category": "compound",
+      "question": "Where is the project answer contract documented and where is question planning documented?",
+      "baseline_expectation": "plan",
+      "expected_owner": "question_plan",
+      "expected_signature": [
+        {
+          "kind": "location",
+          "subject": "project answer contract",
+          "attribute": null,
+          "relation": "location",
+          "target": null,
+          "value_kind": "path",
+          "expected_value": null,
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "path",
+          "context": null
+        },
+        {
+          "kind": "location",
+          "subject": "question planning",
+          "attribute": null,
+          "relation": "location",
+          "target": null,
+          "value_kind": "path",
+          "expected_value": null,
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "path",
+          "context": null
+        }
+      ],
+      "expected_unresolved": []
+    },
+    {
+      "id": 70,
+      "category": "compound",
+      "question": "What happens when the preview plan is stale and the index writer is active?",
+      "baseline_expectation": "support",
+      "expected_owner": "question_plan",
+      "expected_signature": [
+        {
+          "kind": "relation",
+          "subject": "preview plan",
+          "attribute": null,
+          "relation": "conditional_outcome",
+          "target": null,
+          "value_kind": "text",
+          "expected_value": null,
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "value",
+          "context": "preview plan is stale and the index writer is active"
+        }
+      ],
+      "expected_unresolved": []
+    },
+    {
+      "id": 71,
+      "category": "ownership",
+      "question": "How does prepare_docs sync_project_docs work?",
+      "baseline_expectation": "legacy",
+      "expected_owner": "legacy",
+      "expected_signature": [
+        {
+          "kind": "workflow",
+          "subject": "prepare_docs",
+          "attribute": null,
+          "relation": "sequence",
+          "target": "sync_project_docs",
+          "value_kind": "text",
+          "expected_value": null,
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "workflow",
+          "context": null
+        }
+      ],
+      "expected_unresolved": []
+    },
+    {
+      "id": 72,
+      "category": "ownership",
+      "question": "What does Phase 3.1 require for RetrievalDispatcher, the raw topic, EvidenceRequirementSet hints, and vector or embedding calls?",
+      "baseline_expectation": "legacy",
+      "expected_owner": "unsupported",
+      "expected_signature": [
+        {
+          "kind": "exact_fact",
+          "subject": "vectors",
+          "attribute": null,
+          "relation": "contract_fact",
+          "target": null,
+          "value_kind": "text",
+          "expected_value": null,
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "value",
+          "context": null
+        },
+        {
+          "kind": "exact_fact",
+          "subject": "RetrievalDispatcher",
+          "attribute": null,
+          "relation": "contract_fact",
+          "target": null,
+          "value_kind": "text",
+          "expected_value": null,
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "value",
+          "context": null
+        },
+        {
+          "kind": "exact_fact",
+          "subject": "EvidenceRequirementSet",
+          "attribute": null,
+          "relation": "contract_fact",
+          "target": null,
+          "value_kind": "text",
+          "expected_value": null,
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "value",
+          "context": null
+        }
+      ],
+      "expected_unresolved": [
+        "legacy_unresolved:requirement_items"
+      ]
+    },
+    {
+      "id": 73,
+      "category": "ownership",
+      "question": "What does docs_status report and when should it be used?",
+      "baseline_expectation": "legacy",
+      "expected_owner": "legacy",
+      "expected_signature": [
+        {
+          "kind": "behavior",
+          "subject": "docs_status",
+          "attribute": null,
+          "relation": "behavior",
+          "target": null,
+          "value_kind": "text",
+          "expected_value": null,
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "value",
+          "context": null
+        },
+        {
+          "kind": "usage",
+          "subject": "docs_status",
+          "attribute": null,
+          "relation": "usage",
+          "target": null,
+          "value_kind": "text",
+          "expected_value": null,
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "value",
+          "context": null
+        }
+      ],
+      "expected_unresolved": []
+    },
+    {
+      "id": 74,
+      "category": "ownership",
+      "question": "What are the three public Docs MCP tools?",
+      "baseline_expectation": "legacy",
+      "expected_owner": "legacy",
+      "expected_signature": [
+        {
+          "kind": "inventory",
+          "subject": "Docs MCP",
+          "attribute": "public_tools",
+          "relation": null,
+          "target": null,
+          "value_kind": "identifier_list",
+          "expected_value": null,
+          "item_kind": "public_tool",
+          "cardinality": 3,
+          "response_mode": "names",
+          "context": null
+        }
+      ],
+      "expected_unresolved": []
+    },
+    {
+      "id": 75,
+      "category": "ownership",
+      "question": "What does the project require?",
+      "baseline_expectation": "abstain",
+      "expected_owner": "unsupported",
+      "expected_signature": [],
+      "expected_unresolved": [
+        "unresolved_query_subject"
+      ]
+    },
+    {
+      "id": 76,
+      "category": "ownership",
+      "question": "How does the project work?",
+      "baseline_expectation": "abstain",
+      "expected_owner": "unsupported",
+      "expected_signature": [],
+      "expected_unresolved": [
+        "unresolved_query_subject"
+      ]
+    },
+    {
+      "id": 77,
+      "category": "ownership",
+      "question": "What does the system do?",
+      "baseline_expectation": "abstain",
+      "expected_owner": "unsupported",
+      "expected_signature": [],
+      "expected_unresolved": [
+        "unresolved_query_subject"
+      ]
+    },
+    {
+      "id": 78,
+      "category": "ownership",
+      "question": "What is the architecture of the MCP server?",
+      "baseline_expectation": "support",
+      "expected_owner": "legacy",
+      "expected_signature": [
+        {
+          "kind": "relation",
+          "subject": "MCP server",
+          "attribute": null,
+          "relation": "architecture",
+          "target": null,
+          "value_kind": "text",
+          "expected_value": null,
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "value",
+          "context": null
+        }
+      ],
+      "expected_unresolved": []
+    },
+    {
+      "id": 79,
+      "category": "ownership",
+      "question": "How does the MCP server handle requests?",
+      "baseline_expectation": "support",
+      "expected_owner": "question_plan",
+      "expected_signature": [
+        {
+          "kind": "relation",
+          "subject": "MCP server",
+          "attribute": null,
+          "relation": "request_handling",
+          "target": null,
+          "value_kind": "text",
+          "expected_value": null,
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "value",
+          "context": null
+        }
+      ],
+      "expected_unresolved": []
+    },
+    {
+      "id": 80,
+      "category": "ownership",
+      "question": "What is the timeout for provider requests?",
+      "baseline_expectation": "support",
+      "expected_owner": "question_plan",
+      "expected_signature": [
+        {
+          "kind": "attribute",
+          "subject": "provider requests",
+          "attribute": "timeout",
+          "relation": null,
+          "target": null,
+          "value_kind": "duration",
+          "expected_value": null,
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "value",
+          "context": null
+        }
+      ],
+      "expected_unresolved": []
+    },
+    {
+      "id": 81,
+      "category": "russian",
+      "question": "Какие типы источников поддерживает DocAtlas?",
+      "baseline_expectation": "support",
+      "expected_owner": "question_plan",
+      "expected_signature": [
+        {
+          "kind": "inventory",
+          "subject": "source types",
+          "attribute": "source",
+          "relation": null,
+          "target": null,
+          "value_kind": "identifier_list",
+          "expected_value": null,
+          "item_kind": "source",
+          "cardinality": null,
+          "response_mode": "names",
+          "context": "indexing"
+        }
+      ],
+      "expected_unresolved": []
+    },
+    {
+      "id": 82,
+      "category": "russian",
+      "question": "Какие форматы файлов поддерживает DocAtlas?",
+      "baseline_expectation": "support",
+      "expected_owner": "question_plan",
+      "expected_signature": [
+        {
+          "kind": "inventory",
+          "subject": "file formats",
+          "attribute": "file format",
+          "relation": null,
+          "target": null,
+          "value_kind": "identifier_list",
+          "expected_value": null,
+          "item_kind": "format",
+          "cardinality": null,
+          "response_mode": "names",
+          "context": "indexing"
+        }
+      ],
+      "expected_unresolved": []
+    },
+    {
+      "id": 83,
+      "category": "russian",
+      "question": "Какие тестовые маркеры доступны?",
+      "baseline_expectation": "plan",
+      "expected_owner": "question_plan",
+      "expected_signature": [
+        {
+          "kind": "inventory",
+          "subject": "test suite",
+          "attribute": "marker",
+          "relation": null,
+          "target": null,
+          "value_kind": "identifier_list",
+          "expected_value": null,
+          "item_kind": "marker",
+          "cardinality": null,
+          "response_mode": "names",
+          "context": null
+        }
+      ],
+      "expected_unresolved": []
+    },
+    {
+      "id": 84,
+      "category": "russian",
+      "question": "Как синхронизировать проектную документацию?",
+      "baseline_expectation": "plan",
+      "expected_owner": "question_plan",
+      "expected_signature": [
+        {
+          "kind": "command",
+          "subject": "sync_project_docs",
+          "attribute": null,
+          "relation": "invocation",
+          "target": null,
+          "value_kind": "call_expression",
+          "expected_value": "sync_project_docs",
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "call",
+          "context": null
+        }
+      ],
+      "expected_unresolved": []
+    },
+    {
+      "id": 85,
+      "category": "russian",
+      "question": "Как запустить офлайн-тесты DocAtlas?",
+      "baseline_expectation": "support",
+      "expected_owner": "question_plan",
+      "expected_signature": [
+        {
+          "kind": "workflow",
+          "subject": "offline suite",
+          "attribute": null,
+          "relation": "procedure",
+          "target": null,
+          "value_kind": "text",
+          "expected_value": null,
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "workflow",
+          "context": "DocAtlas"
+        }
+      ],
+      "expected_unresolved": []
+    },
+    {
+      "id": 86,
+      "category": "russian",
+      "question": "Где документирован контракт ответа проекта?",
+      "baseline_expectation": "plan",
+      "expected_owner": "question_plan",
+      "expected_signature": [
+        {
+          "kind": "location",
+          "subject": "project answer contract",
+          "attribute": null,
+          "relation": "location",
+          "target": null,
+          "value_kind": "path",
+          "expected_value": null,
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "path",
+          "context": null
+        }
+      ],
+      "expected_unresolved": []
+    },
+    {
+      "id": 87,
+      "category": "russian",
+      "question": "Чем выбор доказательств отличается от планирования вопроса?",
+      "baseline_expectation": "plan",
+      "expected_owner": "question_plan",
+      "expected_signature": [
+        {
+          "kind": "comparison",
+          "subject": "evidence selection",
+          "attribute": null,
+          "relation": "contrast",
+          "target": "question planning",
+          "value_kind": "text",
+          "expected_value": null,
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "value",
+          "context": null
+        }
+      ],
+      "expected_unresolved": []
+    },
+    {
+      "id": 88,
+      "category": "russian",
+      "question": "Что произойдёт, если план предпросмотра устарел?",
+      "baseline_expectation": "support",
+      "expected_owner": "question_plan",
+      "expected_signature": [
+        {
+          "kind": "relation",
+          "subject": "preview plan",
+          "attribute": null,
+          "relation": "conditional_outcome",
+          "target": null,
+          "value_kind": "text",
+          "expected_value": null,
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "value",
+          "context": "preview plan is stale"
+        }
+      ],
+      "expected_unresolved": []
+    },
+    {
+      "id": 89,
+      "category": "russian",
+      "question": "Почему clear-index никогда не удаляет удалённые коллекции Qdrant?",
+      "baseline_expectation": "plan",
+      "expected_owner": "question_plan",
+      "expected_signature": [
+        {
+          "kind": "relation",
+          "subject": "clear-index",
+          "attribute": null,
+          "relation": "premise_check",
+          "target": "delete remote Qdrant collections",
+          "value_kind": "text",
+          "expected_value": "never",
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "value",
+          "context": null
+        }
+      ],
+      "expected_unresolved": []
+    },
+    {
+      "id": 90,
+      "category": "russian",
+      "question": "При каких условиях clear-index нельзя запускать?",
+      "baseline_expectation": "support",
+      "expected_owner": "question_plan",
+      "expected_signature": [
+        {
+          "kind": "relation",
+          "subject": "clear-index",
+          "attribute": null,
+          "relation": "blocking_conditions",
+          "target": null,
+          "value_kind": "text",
+          "expected_value": null,
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "value",
+          "context": null
+        }
+      ],
+      "expected_unresolved": []
+    },
+    {
+      "id": 91,
+      "category": "general",
+      "question": "What Python versions does DocAtlas support?",
+      "baseline_expectation": "support",
+      "expected_owner": "question_plan",
+      "expected_signature": [
+        {
+          "kind": "attribute",
+          "subject": "DocAtlas",
+          "attribute": "python_version",
+          "relation": null,
+          "target": null,
+          "value_kind": "version_range",
+          "expected_value": null,
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "value",
+          "context": null
+        }
+      ],
+      "expected_unresolved": []
+    },
+    {
+      "id": 92,
+      "category": "general",
+      "question": "Which Python versions are supported?",
+      "baseline_expectation": "support",
+      "expected_owner": "question_plan",
+      "expected_signature": [
+        {
+          "kind": "attribute",
+          "subject": "DocAtlas",
+          "attribute": "python_version",
+          "relation": null,
+          "target": null,
+          "value_kind": "version_range",
+          "expected_value": null,
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "value",
+          "context": null
+        }
+      ],
+      "expected_unresolved": []
+    },
+    {
+      "id": 93,
+      "category": "general",
+      "question": "Where is DOCMANCER_OFFLINE documented?",
+      "baseline_expectation": "plan",
+      "expected_owner": "question_plan",
+      "expected_signature": [
+        {
+          "kind": "location",
+          "subject": "DOCMANCER_OFFLINE",
+          "attribute": null,
+          "relation": "location",
+          "target": null,
+          "value_kind": "path",
+          "expected_value": null,
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "path",
+          "context": null
+        }
+      ],
+      "expected_unresolved": []
+    },
+    {
+      "id": 94,
+      "category": "general",
+      "question": "What is DOCMANCER_OFFLINE and when should it be used?",
+      "baseline_expectation": "plan",
+      "expected_owner": "question_plan",
+      "expected_signature": [
+        {
+          "kind": "purpose",
+          "subject": "DOCMANCER_OFFLINE",
+          "attribute": null,
+          "relation": "purpose",
+          "target": null,
+          "value_kind": "text",
+          "expected_value": null,
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "purpose",
+          "context": null
+        },
+        {
+          "kind": "usage",
+          "subject": "DOCMANCER_OFFLINE",
+          "attribute": null,
+          "relation": "usage",
+          "target": null,
+          "value_kind": "text",
+          "expected_value": null,
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "value",
+          "context": null
+        }
+      ],
+      "expected_unresolved": []
+    },
+    {
+      "id": 95,
+      "category": "general",
+      "question": "What does clear-index delete and preserve?",
+      "baseline_expectation": "support",
+      "expected_owner": "legacy",
+      "expected_signature": [
+        {
+          "kind": "effect",
+          "subject": "clear-index",
+          "attribute": null,
+          "relation": "delete",
+          "target": null,
+          "value_kind": "text",
+          "expected_value": null,
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "value",
+          "context": null
+        },
+        {
+          "kind": "effect",
+          "subject": "clear-index",
+          "attribute": null,
+          "relation": "preserve",
+          "target": null,
+          "value_kind": "text",
+          "expected_value": null,
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "value",
+          "context": null
+        }
+      ],
+      "expected_unresolved": []
+    },
+    {
+      "id": 96,
+      "category": "general",
+      "question": "What source types and file formats are supported?",
+      "baseline_expectation": "support",
+      "expected_owner": "question_plan",
+      "expected_signature": [
+        {
+          "kind": "inventory",
+          "subject": "source types",
+          "attribute": "source",
+          "relation": null,
+          "target": null,
+          "value_kind": "identifier_list",
+          "expected_value": null,
+          "item_kind": "source",
+          "cardinality": null,
+          "response_mode": "names",
+          "context": "indexing"
+        },
+        {
+          "kind": "inventory",
+          "subject": "file formats",
+          "attribute": "file format",
+          "relation": null,
+          "target": null,
+          "value_kind": "identifier_list",
+          "expected_value": null,
+          "item_kind": "format",
+          "cardinality": null,
+          "response_mode": "names",
+          "context": "indexing"
+        }
+      ],
+      "expected_unresolved": []
+    },
+    {
+      "id": 97,
+      "category": "general",
+      "question": "How does indexing split documents into sections and chunks?",
+      "baseline_expectation": "plan",
+      "expected_owner": "question_plan",
+      "expected_signature": [
+        {
+          "kind": "behavior",
+          "subject": "indexing",
+          "attribute": null,
+          "relation": "chunking",
+          "target": null,
+          "value_kind": "text",
+          "expected_value": null,
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "value",
+          "context": null
+        }
+      ],
+      "expected_unresolved": []
+    },
+    {
+      "id": 98,
+      "category": "general",
+      "question": "How does evidence selection choose candidates?",
+      "baseline_expectation": "plan",
+      "expected_owner": "question_plan",
+      "expected_signature": [
+        {
+          "kind": "behavior",
+          "subject": "evidence selection",
+          "attribute": null,
+          "relation": "selection_policy",
+          "target": null,
+          "value_kind": "text",
+          "expected_value": null,
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "value",
+          "context": null
+        }
+      ],
+      "expected_unresolved": []
+    },
+    {
+      "id": 99,
+      "category": "general",
+      "question": "How do I verify project answer quality protocols?",
+      "baseline_expectation": "support",
+      "expected_owner": "question_plan",
+      "expected_signature": [
+        {
+          "kind": "relation",
+          "subject": "project answer quality protocol",
+          "attribute": null,
+          "relation": "verification",
+          "target": null,
+          "value_kind": "text",
+          "expected_value": null,
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "value",
+          "context": null
+        }
+      ],
+      "expected_unresolved": []
+    },
+    {
+      "id": 100,
+      "category": "general",
+      "question": "Explain the storage mutation coordination contract.",
+      "baseline_expectation": "support",
+      "expected_owner": "question_plan",
+      "expected_signature": [
+        {
+          "kind": "relation",
+          "subject": "storage mutation coordination",
+          "attribute": null,
+          "relation": "storage_coordination",
+          "target": null,
+          "value_kind": "text",
+          "expected_value": null,
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "value",
+          "context": "cleanup and refresh"
+        }
+      ],
+      "expected_unresolved": []
+    }
+  ]
+}

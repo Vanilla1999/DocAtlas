@@ -6,7 +6,7 @@
 
 ## Responsibility
 
-The question-planning module converts a bounded natural-language project-doc question into explicit clauses and proof facets before retrieval evidence is allowed to authorize an answer. Its implementation boundary is `docmancer/docs/domain/question_plan.py` plus `question_frame_core.py`; the first composes clauses and proof facets while the second owns reusable inventory, requirements, and action frames. The project-answer contract and technical-term normalization modules remain downstream compatibility boundaries in `docmancer/docs/domain/`.
+The question-planning module converts a bounded natural-language project-doc question into explicit clauses and proof facets before retrieval evidence is allowed to authorize an answer. Its implementation boundary is `docmancer/docs/domain/question_plan.py` plus the reusable frame/rule modules and `question_surface_normalization.py`. `question_plan.py` composes clauses and proof facets, reusable frames own semantic intent families, and the surface-normalization layer maps only audited complete EN/RU surface families to already-owned canonical questions. The project-answer contract remains the downstream compatibility boundary in `docmancer/docs/domain/`.
 
 The module must fail closed when it cannot resolve a subject or requested operation. It must not invent generic identities such as `project` or `requested operation` that could later be proven by unrelated text.
 
@@ -22,11 +22,11 @@ Question planning produces the obligations consumed by the evidence-selection mo
 
 - unresolved subjects and operations cannot authorize `supported`;
 - compound questions expose every mandatory facet and any unparsed independent clause becomes `unresolved_question_clause`, including punctuation- and action-delimited tails;
-- equivalent surface forms such as `What`/`Which`, standalone/compound inventory, and `Which command`/`How do I` resolve to compatible canonical intents;
+- equivalent surface forms such as `What`/`Which`, standalone/compound inventory, `Which command`/`How do I`, and reviewed EN/RU variants resolve to compatible canonical intents; bounded surface normalization must rebind the canonical plan to the complete original user span and may not hide an unresolved tail;
 - inventory categories stay typed: source types, file formats, and test markers are never interchangeable proof subjects;
 - ambiguous surface nouns such as bare `markers` or `formats`, generic subjects such as `project`, and unqualified `docs index` actions fail closed instead of being guessed;
 - technical aliases are bounded and kind-aware;
-- parser ownership is explicit: a new QuestionPlan frame may replace a legacy surface only through a reviewed ownership migration with canonical-contract parity;
+- parser ownership is explicit: a new QuestionPlan frame may replace a legacy surface only through a reviewed ownership migration with canonical-contract parity; the 100-case surface corpus freezes owner, full proof signature, and unresolved diagnostics so same-owner semantic drift also fails CI;
 - comparison, location, condition, and premise frames are complete-surface parsers and therefore inherit full-span fail-closed coverage;
 - premise questions are discharged only by a locally bound contradiction/correction or by a matching premise with an explicit causal explanation; a bare premise restatement cannot authorize `supported`;
 - compound facts may be decomposed into atomic mandatory facets so the selector can use bounded witnesses from different candidates without merging unrelated evidence;
@@ -34,4 +34,4 @@ Question planning produces the obligations consumed by the evidence-selection mo
 
 ## Tests
 
-`tests/docs/test_question_plan_v4.py`, project-answer protocol v1–v4 tests, and real MCP probing protect this boundary.
+`tests/docs/test_question_plan_v4.py`, project-answer protocol v1–v4 tests, `scripts/run_question_surface_gate.py`, and real MCP/self-hosting probing protect this boundary.

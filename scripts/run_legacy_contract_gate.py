@@ -7,25 +7,17 @@ import sys
 from docmancer.docs.application.evidence_selection import build_requirements
 from docmancer.docs.domain.project_answer_contract import build_project_answer_contract
 from docmancer.docs.domain.question_ownership import frozen_ownership_mismatches
+from docmancer.docs.domain.question_plan import compile_question_plan
 
+
+MIGRATED_PARTIAL_CASES = (
+    "What are the public tools and their purposes?",
+    "Назови три публичных инструмента Docs MCP и когда использовать каждый.",
+    "What is the difference between evidence selection and question planning?",
+    "Explain the storage mutation coordination contract.",
+)
 
 PARTIAL_LEGACY_CASES = (
-    (
-        "What are the public tools and their purposes?",
-        "legacy_unresolved:purpose",
-    ),
-    (
-        "Назови три публичных инструмента Docs MCP и когда использовать каждый.",
-        "legacy_unresolved:inventory",
-    ),
-    (
-        "What is the difference between evidence selection and question planning?",
-        "legacy_unresolved:comparison",
-    ),
-    (
-        "Explain the storage mutation coordination contract.",
-        "legacy_unresolved:contract_scope",
-    ),
     (
         "What does Phase 3.1 require for RetrievalDispatcher, the raw topic, "
         "EvidenceRequirementSet hints, and vector or embedding calls?",
@@ -51,6 +43,21 @@ def _unsupported_requirement_present(question: str) -> bool:
 
 def main() -> int:
     errors: list[str] = []
+
+    for question in MIGRATED_PARTIAL_CASES:
+        plan = compile_question_plan(question)
+        contract = build_project_answer_contract(question)
+        if not plan.handled:
+            errors.append(f"reviewed legacy migration lost QuestionPlan ownership: {question!r}")
+        if contract.unresolved_parts:
+            errors.append(
+                f"reviewed legacy migration regressed to unresolved: {question!r}; "
+                f"unresolved={contract.unresolved_parts!r}"
+            )
+        if not contract.proof_obligations:
+            errors.append(f"reviewed legacy migration produced no obligations: {question!r}")
+        if "fail_closed:legacy_coverage" in contract.parse_trace:
+            errors.append(f"reviewed legacy migration still traversed legacy coverage: {question!r}")
 
     for question, reason in PARTIAL_LEGACY_CASES:
         contract = build_project_answer_contract(question)
@@ -101,8 +108,9 @@ def main() -> int:
         return 1
 
     print(
-        "PASS: 5 partial legacy contracts fail closed; 3 complete legacy controls "
-        "remain supported; silent-empty is explicit; canonical ownership signatures stable"
+        "PASS: 4 reviewed partial-legacy cases migrated to QuestionPlan; 1 remaining "
+        "partial legacy contract fails closed; 3 complete legacy controls remain "
+        "supported; silent-empty is explicit; canonical ownership signatures stable"
     )
     return 0
 
