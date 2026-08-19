@@ -104,6 +104,9 @@ jobs:
       - name: Run legacy contract completeness gate
         run: python scripts/run_legacy_contract_gate.py
 
+      - name: Run self-hosting production-path gate
+        run: python scripts/run_self_hosting_project_docs_gate.py
+
       - name: Run critical mutation gate
         run: python scripts/run_critical_mutation_gate.py
 
