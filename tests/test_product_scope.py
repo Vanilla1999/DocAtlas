@@ -111,12 +111,10 @@ def _assert_agent_developer_protocol_baseline() -> None:
     assert report["baseline_ok"] is True, report["errors"]
     assert report["task_count"] == 11
     assert report["executed_task_count"] == 11
-    assert report["target_closed_tasks"] == 8
+    assert report["target_closed_tasks"] == 10
     assert report["false_supported"] == 0
     assert report["forbidden_source_contamination"] == 0
     assert report["errors"] == []
     assert {(gap["task_id"], gap["gap"]) for gap in report["target_gaps"]} == {
-        ("module_behavior_named_gap", "generic_behavior_predicate_stores"),
-        ("module_requirements_named_gap", "domain_neutral_requirements"),
         ("ambiguous_module_recovery_named_gap", "bounded_module_ambiguity_projection"),
     }
