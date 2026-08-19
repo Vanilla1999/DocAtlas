@@ -177,13 +177,28 @@ def _call_matches_target(call: dict[str, Any], payload: dict[str, Any] | None) -
         return False
     if str(payload.get("status") or "") != str(call.get("target_expected_status") or ""):
         return False
-    if not _matches_sources(_source_paths(payload), call.get("target_required_sources")):
+    target_sources = (
+        call.get("target_required_sources")
+        if "target_required_sources" in call
+        else call.get("required_sources")
+    )
+    if not _matches_sources(_source_paths(payload), target_sources):
         return False
     action = _recommended_action(payload)
-    target_tool = str(call.get("target_next_action_tool") or "")
+    target_tool_value = (
+        call.get("target_next_action_tool")
+        if "target_next_action_tool" in call
+        else call.get("baseline_next_action_tool")
+    )
+    target_tool = str(target_tool_value or "")
     if target_tool and str(action.get("tool") or "") != target_tool:
         return False
-    target_confirmation = str(call.get("target_confirmation_reason") or "")
+    target_confirmation_value = (
+        call.get("target_confirmation_reason")
+        if "target_confirmation_reason" in call
+        else call.get("baseline_confirmation_reason")
+    )
+    target_confirmation = str(target_confirmation_value or "")
     if target_confirmation and str(
         action.get("confirmation_reason") or payload.get("confirmation_reason") or ""
     ) != target_confirmation:
