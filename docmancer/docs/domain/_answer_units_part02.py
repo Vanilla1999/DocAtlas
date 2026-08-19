@@ -301,6 +301,36 @@ def _behavior_clause(
     return None
 
 
+_SOURCE_DOCUMENT_SUBJECT_RE = re.compile(
+    r"^(?:readme|architecture|changelog|contributing|roadmap|runbook)$",
+    re.I,
+)
+
+
+def _source_document_behavior_clause(
+    obligation: ProofObligation,
+    text: str,
+    source_text: str,
+) -> tuple[str, bool] | None:
+    """Bind conventional document subjects to behavior stated by that document.
+
+    Queries such as ``What does the README say about X?`` name the source
+    document itself as the semantic subject. Preserve that source-subject
+    contract only for conventional maintained-document identities; arbitrary
+    code-shaped filenames must still carry their subject in the proposition.
+    """
+
+    if not _SOURCE_DOCUMENT_SUBJECT_RE.fullmatch(_normal(obligation.subject)):
+        return None
+    if not _subject_present(obligation, source_text):
+        return None
+    for _start, _end, clause in _bounded_clauses(text):
+        for match in _GENERIC_BEHAVIOR_RE.finditer(clause):
+            if _predicate_has_local_value(match, clause):
+                return clause, _predicate_is_negated(match, clause)
+    return None
+
+
 def _special_relation_valid(relation: str | None, text: str) -> bool:
     normalized = _normal(text)
     if relation == "recall_mechanism":
@@ -517,15 +547,26 @@ def local_proof_for_obligation(
                 planned.reason if valid else f"{planned.reason}_subject_not_bound",
             )
         bound_behavior = _behavior_clause(obligation, text)
-        relation = 3 if bound_behavior is not None else 0
-        local_subject_score = 3 if bound_behavior is not None else 0
+        source_document_behavior = (
+            _source_document_behavior_clause(obligation, text, source_text)
+            if bound_behavior is None and authoritative_identity
+            else None
+        )
+        proof_behavior = bound_behavior or source_document_behavior
+        relation = 3 if proof_behavior is not None else 0
+        local_subject_score = (
+            3 if bound_behavior is not None else
+            2 if source_document_behavior is not None else
+            0
+        )
         valid = local_subject_score > 0 and relation > 0 and unit.proposition
-        negated = bool(bound_behavior and bound_behavior[1])
+        negated = bool(proof_behavior and proof_behavior[1])
         return LocalProof(
             valid, local_subject_score, relation, 1 if unit.proposition and valid else 0,
             local_subject_score + relation + int(unit.proposition and valid),
             (
                 "behavior_negative_constraint" if valid and negated else
+                "behavior_source_document" if valid and source_document_behavior is not None else
                 "behavior" if valid else
                 "behavior_not_locally_bound"
             ),

@@ -161,6 +161,20 @@ def test_question_plan_proof_requires_local_subject_binding():
         for row, unit, _expected in probes
     ] == [expected for _row, _unit_value, expected in probes]
 
+    readme_behavior = build_project_answer_contract(
+        "What does the project README say about deterministic offline release checks?"
+    ).proof_obligations[0]
+    assert local_proof_for_obligation(
+        readme_behavior,
+        _unit("The amber lighthouse invariant requires deterministic offline release checks."),
+        source={"authority": "source_of_truth", "path": "README.md"},
+    ).valid is True
+    assert local_proof_for_obligation(
+        behavior,
+        _unit("PaymentOutbox validates payments."),
+        source={"authority": "source_of_truth", "path": "OrderSubmission.md"},
+    ).valid is False
+
 
 def test_conditional_behavior_requires_requested_condition_and_blocking_effect():
     _contract, rows = _rows("What does clear-index do when a live process holds the index?")
