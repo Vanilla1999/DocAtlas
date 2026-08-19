@@ -1,0 +1,115 @@
+name: TEMP validate corrected agent protocol head
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: temp-agent-protocol-full-validation
+  cancel-in-progress: true
+
+jobs:
+  resolve:
+    if: github.event.pull_request.head.ref == 'tmp/agent-protocol-review-fixes-20260820'
+    runs-on: ubuntu-24.04
+    outputs:
+      sha: ${{ steps.target.outputs.sha }}
+    steps:
+      - id: target
+        env:
+          TARGET_BRANCH: experiment/agent-developer-protocol-v1
+        run: |
+          set -euo pipefail
+          SHA=$(git ls-remote "https://github.com/${{ github.repository }}.git" "refs/heads/$TARGET_BRANCH" | awk '{print $1}')
+          test -n "$SHA"
+          echo "sha=$SHA" >> "$GITHUB_OUTPUT"
+
+  core:
+    needs: resolve
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ['3.11', '3.12']
+    runs-on: ubuntu-24.04
+    env:
+      DOCMANCER_OFFLINE: '1'
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ needs.resolve.outputs.sha }}
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python }}
+      - run: pip install -e '.[dev]'
+      - name: Verify corrected tree and run full core
+        run: |
+          set -euo pipefail
+          grep -q 'requested_topic = obligation.context or obligation.target' \
+            docmancer/docs/domain/_answer_units_part02.py
+          python -m compileall -q docmancer scripts
+          pytest -q -m 'not advanced'
+
+  advanced:
+    needs: resolve
+    runs-on: ubuntu-24.04
+    env:
+      DOCMANCER_OFFLINE: '1'
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ needs.resolve.outputs.sha }}
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - run: pip install -e '.[dev]'
+      - name: Run advanced and release-critical contracts
+        run: |
+          set -euo pipefail
+          pytest -q tests/ -m advanced
+          python scripts/run_legacy_contract_gate.py
+          python scripts/run_project_docs_self_host_gate.py
+          python scripts/run_question_surface_gate.py
+          python scripts/run_agent_developer_gate.py
+          python scripts/run_critical_mutation_gate.py
+          python scripts/check_python_module_size.py
+          git diff --check
+
+  release:
+    needs: resolve
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ['3.11', '3.12', '3.13']
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ needs.resolve.outputs.sha }}
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python }}
+      - run: python -m pip install build 'hatchling<1.27'
+      - run: python -m build
+      - run: python -m pip install --force-reinstall dist/*.whl
+      - run: python scripts/release_gate.py
+
+  mark-pass:
+    needs: [resolve, core, advanced, release]
+    runs-on: ubuntu-24.04
+    env:
+      TARGET_SHA: ${{ needs.resolve.outputs.sha }}
+      PASS_BRANCH: tmp/agent-protocol-validation-passed-20260820
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ env.TARGET_SHA }}
+          fetch-depth: 0
+          persist-credentials: true
+      - name: Publish immutable validation pointer
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$TARGET_SHA"
+          git push --force origin "HEAD:refs/heads/$PASS_BRANCH"
