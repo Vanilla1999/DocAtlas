@@ -35,6 +35,82 @@ def _has(value: str, text: str) -> bool:
     return term_sequence_present(value, text)
 
 
+def _proposition_clauses(text: str) -> tuple[str, ...]:
+    """Split one visible unit into conservative proposition-local clauses.
+
+    Sentence terminators, semicolons, and physical line boundaries end a
+    proposition. Dotted identifiers and versions stay intact because a period
+    is a boundary only before whitespace or the end of the unit.
+    """
+
+    source = str(text or "")
+    if not source:
+        return ()
+    clauses: list[str] = []
+    start = 0
+    for boundary in re.finditer(r"(?:[.!?](?=\s|$)|;|\n)", source):
+        end = boundary.end()
+        clause = source[start:end].strip()
+        if clause:
+            clauses.append(clause)
+        start = end
+    tail = source[start:].strip()
+    if tail:
+        clauses.append(tail)
+    return tuple(clauses)
+
+
+_REQUIREMENT_RELATION_RE = re.compile(
+    r"\b(?:require(?:s|d)?|required|must|mandatory|need(?:s|ed)?|do\s+not)\b",
+    re.I,
+)
+
+
+def _requirement_detail_count(text: str) -> int:
+    return len(re.findall(
+        r"\b(?:preflight|canary|exactly|retry|audit|verify|stream|cell|step)\w*\b",
+        _norm(text),
+    ))
+
+
+def _structured_requirement_proof(
+    obligation: ProofObligation,
+    text: str,
+) -> tuple[bool, int]:
+    """Accept only a subject-bound requirement clause or its explicit list."""
+
+    best_detail_count = 0
+    for clause in _proposition_clauses(text):
+        if not _has(obligation.subject, clause):
+            continue
+        if _REQUIREMENT_RELATION_RE.search(clause) is None:
+            continue
+        detail_count = _requirement_detail_count(clause)
+        if detail_count >= 2:
+            best_detail_count = max(best_detail_count, detail_count)
+
+    if best_detail_count >= 2:
+        return True, best_detail_count
+
+    lines = [line for line in str(text or "").splitlines() if line.strip()]
+    for index, line in enumerate(lines):
+        if not _has(obligation.subject, line):
+            continue
+        if _REQUIREMENT_RELATION_RE.search(line) is None:
+            continue
+        bullets: list[str] = []
+        for following in lines[index + 1:]:
+            if re.match(r"^\s*(?:[-*+]|\d+[.)])\s+", following) is None:
+                break
+            bullets.append(following)
+        if len(bullets) < 2:
+            continue
+        detail_count = _requirement_detail_count("\n".join(bullets))
+        if detail_count >= 2:
+            return True, detail_count
+    return False, 0
+
+
 def relation_proof(
     obligation: ProofObligation,
     text: str,
@@ -82,38 +158,53 @@ def relation_proof(
         )
 
     if relation == "conditional_outcome":
-        subject = _has(obligation.subject, text)
         context_tokens = {
             token for token in re.findall(r"[a-zа-яё0-9_-]{3,}", _norm(obligation.context))
             if token not in {"when", "while", "если", "когда", "пока", "the"}
         }
-        context_hits = sum(token in normalized for token in context_tokens)
-        consequence = bool(re.search(
-            r"\b(?:then|therefore|returns?|refuses?|blocks?|fails?|rebuilds?|"
-            r"retries?|cannot|must|becomes?|stays?|remains?|"
-            r"затем|поэтому|возвращает|отказывает|блокирует|становится|нельзя)\b",
-            normalized,
-        ))
-        valid = subject and bool(context_tokens) and context_hits >= min(2, len(context_tokens)) and consequence
+        best_context_hits = 0
+        valid = False
+        for clause in _proposition_clauses(text):
+            clause_normalized = _norm(clause)
+            context_hits = sum(token in clause_normalized for token in context_tokens)
+            consequence = bool(re.search(
+                r"\b(?:then|therefore|returns?|refuses?|blocks?|fails?|rebuilds?|"
+                r"retries?|cannot|must|becomes?|stays?|remains?|"
+                r"затем|поэтому|возвращает|отказывает|блокирует|становится|нельзя)\b",
+                clause_normalized,
+            ))
+            local = (
+                _has(obligation.subject, clause)
+                and bool(context_tokens)
+                and context_hits >= min(2, len(context_tokens))
+                and consequence
+            )
+            if local:
+                valid = True
+                best_context_hits = max(best_context_hits, context_hits)
         return PlannedProof(
-            valid, 4 if valid else 0, context_hits if valid else 0,
+            valid, 4 if valid else 0, best_context_hits if valid else 0,
             "conditional_outcome" if valid else "conditional_outcome_missing",
             3 if valid else 0,
         )
 
     if relation == "blocking_conditions":
-        subject = _has(obligation.subject, text)
-        blocking = bool(re.search(
-            r"\b(?:block(?:s|ed|ing)?|refus(?:e|es|ed)|cannot|must\s+not|"
-            r"hard\s+blocker|блокир\w*|нельзя|отказ\w*)\b",
-            normalized,
-        ))
-        condition = bool(re.search(
-            r"\b(?:when|while|if|unless|until|condition|only\s+when|"
-            r"когда|если|пока|при\s+условии|до\s+тех\s+пор)\b",
-            normalized,
-        ))
-        valid = subject and blocking and condition
+        valid = False
+        for clause in _proposition_clauses(text):
+            clause_normalized = _norm(clause)
+            blocking = bool(re.search(
+                r"\b(?:block(?:s|ed|ing)?|refus(?:e|es|ed)|cannot|must\s+not|"
+                r"hard\s+blocker|блокир\w*|нельзя|отказ\w*)\b",
+                clause_normalized,
+            ))
+            condition = bool(re.search(
+                r"\b(?:when|while|if|unless|until|condition|only\s+when|"
+                r"когда|если|пока|при\s+условии|до\s+тех\s+пор)\b",
+                clause_normalized,
+            ))
+            if _has(obligation.subject, clause) and blocking and condition:
+                valid = True
+                break
         return PlannedProof(
             valid, 4 if valid else 0, 3 if valid else 0,
             "blocking_conditions" if valid else "blocking_conditions_missing",
@@ -162,22 +253,7 @@ def relation_proof(
         )
 
     if relation == "requirements":
-        subject_present = _has(obligation.subject, text)
-        requirement_shape = bool(re.search(
-            r"\b(?:require(?:s|d)?|required|must|mandatory|need(?:s|ed)?|"
-            r"preflight|canary|exactly|do\s+not|verify|audit|step|steps)\b",
-            normalized,
-        ))
-        # A named procedure requirement should expose more than a bare label.
-        # Multi-step summaries and numbered/bulleted requirement blocks are
-        # accepted, while a single unrelated mention of the subject is not.
-        detail_count = len(re.findall(
-            r"\b(?:require(?:s|d)?|must|mandatory|preflight|canary|exactly|"
-            r"retry|audit|verify|stream|cell|step)\w*\b",
-            normalized,
-        ))
-        list_shape = len(re.findall(r"^\s*(?:[-*+]|\d+[.)])\s+", text, re.M)) >= 2
-        valid = subject_present and requirement_shape and (detail_count >= 2 or list_shape)
+        valid, detail_count = _structured_requirement_proof(obligation, text)
         return PlannedProof(
             valid, 4 if valid else 0, min(6, detail_count) if valid else 0,
             "requirements" if valid else "requirements_evidence_missing",

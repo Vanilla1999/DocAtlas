@@ -16,7 +16,7 @@ The durable output is the project-answer requirement contract: resolved subjects
 
 ## Relationship to evidence selection
 
-Question planning produces the obligations consumed by the evidence-selection module. **Evidence selection may prove or reject an obligation, but it must not reinterpret the user's question or silently create replacement obligations.** This one-way contract is the architectural seam between the two modules.
+Question planning defines **what must be proven**, whereas evidence selection determines **whether the available evidence proves it**. **Evidence selection may prove or reject an obligation, but it must not reinterpret the user's question or silently create replacement obligations.** This one-way contract is the architectural seam between the two modules.
 
 ## Invariants
 
@@ -29,6 +29,7 @@ Question planning produces the obligations consumed by the evidence-selection mo
 - parser ownership is explicit: a new QuestionPlan frame may replace a legacy surface only through a reviewed ownership migration with canonical-contract parity; the 100-case surface corpus freezes owner, full proof signature, and unresolved diagnostics so same-owner semantic drift also fails CI;
 - comparison, location, condition, and premise frames are complete-surface parsers and therefore inherit full-span fail-closed coverage;
 - premise questions are discharged only by a locally bound contradiction/correction or by a matching premise with an explicit causal explanation; a bare premise restatement cannot authorize `supported`;
+- semantic evidence is proposition-local: condition, blocking-condition, requirements, and comparison proof cannot union unrelated neighboring clauses; multi-line requirements are accepted only as an explicitly subject-bound structured list;
 - compound facts may be decomposed into atomic mandatory facets so the selector can use bounded witnesses from different candidates without merging unrelated evidence;
 - frozen v1–v3 contracts remain compatibility inputs until explicitly migrated.
 
