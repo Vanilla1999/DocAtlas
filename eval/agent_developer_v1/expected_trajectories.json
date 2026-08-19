@@ -56,7 +56,7 @@
       "id": "wrong_module_isolation",
       "required_scopes": [{"scope": "module", "module_path": "packages/orders"}],
       "forbidden_sources": ["packages/payments/README.md"],
-      "calls": [{"question": "What is PaymentOutbox?", "mode": "project", "scope": "module", "module_path": "packages/orders", "baseline_expected_status": "insufficient_evidence", "target_expected_status": "insufficient_evidence"}]
+      "calls": [{"question": "What is PaymentOutbox?", "mode": "project", "scope": "module", "module_path": "packages/orders", "baseline_expected_status": "insufficient_evidence", "target_expected_status": "insufficient_evidence", "target_expected_edit_ready": false}]
     },
     {
       "id": "autodiscovery_module_supported",
@@ -66,23 +66,59 @@
     },
     {
       "id": "ambiguous_module_recovery_named_gap",
-      "required_scopes": [{"scope": "module", "module": "auth"}],
+      "required_scopes": [
+        {"scope": "module", "module": "auth"},
+        {"scope": "module", "module_path": "packages/auth"}
+      ],
       "forbidden_sources": ["packages/auth/README.md", "services/auth/README.md"],
       "known_gap": "bounded_module_ambiguity_projection",
-      "calls": [{"question": "What is PackageAuthBoundary?", "mode": "project", "scope": "module", "module": "auth", "packet_tokens": 256, "baseline_expected_status": "insufficient_evidence", "target_expected_status": "insufficient_evidence", "baseline_next_action_tool": "code_search", "target_next_action_tool": "docs_status", "target_operational_reason_code": "module_ambiguous", "target_module_candidates": ["packages/auth", "services/auth"]}]
+      "calls": [{
+        "question": "What is PackageAuthBoundary?",
+        "mode": "project",
+        "scope": "module",
+        "module": "auth",
+        "packet_tokens": 256,
+        "baseline_expected_status": "insufficient_evidence",
+        "target_expected_status": "insufficient_evidence",
+        "baseline_next_action_tool": "code_search",
+        "target_next_action_tool": "docs_status",
+        "target_next_action_arguments": {
+          "action": "project",
+          "project_path": "$PROJECT_PATH",
+          "details": true
+        },
+        "target_requires_confirmation": false,
+        "target_expected_edit_ready": false,
+        "target_operational_reason_code": "module_ambiguous",
+        "target_module_candidates": ["packages/auth", "services/auth"],
+        "target_recovery": {
+          "tool": "docs_status",
+          "required_module_paths": ["packages/auth", "services/auth"],
+          "retry": {
+            "question": "What is PackageAuthBoundary?",
+            "mode": "project",
+            "scope": "module",
+            "module_path": "packages/auth",
+            "packet_tokens": 800,
+            "target_expected_status": "ok",
+            "target_required_sources": ["packages/auth/README.md"],
+            "forbidden_sources": ["README.md", "services/auth/README.md"]
+          }
+        }
+      }]
     },
     {
       "id": "stale_module_docs_recovery",
       "required_scopes": [{"scope": "module", "module_path": "packages/orders"}],
       "forbidden_sources": ["packages/payments/README.md"],
       "mutation_before_calls": {"path": "packages/orders/README.md", "append": "\nStaleProtocolFact is added after indexing.\n"},
-      "calls": [{"question": "What is OrdersDraftStore?", "mode": "project", "scope": "module", "module_path": "packages/orders", "baseline_expected_status": "insufficient_evidence", "target_expected_status": "insufficient_evidence", "baseline_next_action_tool": "prepare_docs", "target_next_action_tool": "prepare_docs", "baseline_confirmation_reason": "project_docs_preflight", "target_confirmation_reason": "project_docs_preflight"}]
+      "calls": [{"question": "What is OrdersDraftStore?", "mode": "project", "scope": "module", "module_path": "packages/orders", "baseline_expected_status": "insufficient_evidence", "target_expected_status": "insufficient_evidence", "baseline_next_action_tool": "prepare_docs", "target_next_action_tool": "prepare_docs", "baseline_confirmation_reason": "project_docs_preflight", "target_confirmation_reason": "project_docs_preflight", "target_expected_edit_ready": false}]
     },
     {
       "id": "dependency_prefetch_recovery",
       "required_scopes": [{"scope": "dependency"}],
       "forbidden_sources": ["packages/payments/README.md"],
-      "calls": [{"question": "What is tenacity.Retrying?", "mode": "dependency", "baseline_expected_status": "insufficient_evidence", "target_expected_status": "insufficient_evidence", "baseline_next_action_tool": "prepare_docs", "target_next_action_tool": "prepare_docs", "baseline_confirmation_reason": "network_fetch", "target_confirmation_reason": "network_fetch"}]
+      "calls": [{"question": "What is tenacity.Retrying?", "mode": "dependency", "baseline_expected_status": "insufficient_evidence", "target_expected_status": "insufficient_evidence", "baseline_next_action_tool": "prepare_docs", "target_next_action_tool": "prepare_docs", "baseline_confirmation_reason": "network_fetch", "target_confirmation_reason": "network_fetch", "target_expected_edit_ready": false}]
     }
   ]
 }

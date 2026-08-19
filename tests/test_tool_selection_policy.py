@@ -3,6 +3,7 @@ from __future__ import annotations
 from eval.tool_selection_benchmark import evaluate, load_cases
 from docmancer.docs.domain.tool_selection import (
     PUBLIC_DOCS_TOOLS,
+    normalize_public_docs_action,
     select_public_docs_tool,
 )
 
@@ -28,14 +29,30 @@ def test_tool_selection_golden_meets_target():
     assert report["accuracy"] >= 0.95, report["failures"]
 
 
-def test_returned_prepare_next_action_has_priority():
-    decision = select_public_docs_tool(
-        "How does authentication work?",
-        next_action_tool="prepare_docs",
-    )
+def test_returned_public_next_action_has_priority():
+    for tool in ("prepare_docs", "docs_status"):
+        decision = select_public_docs_tool(
+            "How does authentication work?",
+            next_action_tool=tool,
+        )
 
-    assert decision.tool == "prepare_docs"
-    assert decision.reason_code == "returned_next_action"
+        assert decision.tool == tool
+        assert decision.reason_code == "returned_next_action"
+
+
+def test_project_inspection_normalizes_to_detailed_docs_status():
+    action = normalize_public_docs_action({
+        "tool": "inspect_project_docs",
+        "arguments_patch": {"project_path": "/repo"},
+    })
+
+    assert action is not None
+    assert action["tool"] == "docs_status"
+    assert action["arguments_patch"] == {
+        "project_path": "/repo",
+        "action": "project",
+        "details": True,
+    }
 
 
 def test_natural_docs_question_defaults_to_context():

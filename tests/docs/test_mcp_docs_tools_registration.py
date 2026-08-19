@@ -782,6 +782,12 @@ def test_mcp_exposes_three_public_tools_with_mutually_exclusive_guidance():
     output_properties = context_tool["outputSchema"]["properties"]
     assert output_properties["module_candidates"]["maxItems"] == 8
     assert output_properties["module_candidates"]["items"]["required"] == ["module_path"]
+    assert (
+        output_properties["module_candidates"]["items"]["properties"]["module_path"][
+            "maxLength"
+        ]
+        == 240
+    )
     assert "Call only from get_docs_context" in tools["prepare_docs"]["description"]
     assert "explicitly asks" in tools["docs_status"]["description"]
     assert tools["docs_status"]["inputSchema"]["required"] == ["action"]

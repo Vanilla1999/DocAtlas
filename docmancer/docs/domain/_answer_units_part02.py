@@ -324,7 +324,10 @@ def _source_document_behavior_clause(
         return None
     if not _subject_present(obligation, source_text):
         return None
+    requested_topic = str(obligation.context or "").strip()
     for _start, _end, clause in _bounded_clauses(text):
+        if requested_topic and not _contains_term(requested_topic, clause):
+            continue
         for match in _GENERIC_BEHAVIOR_RE.finditer(clause):
             if _predicate_has_local_value(match, clause):
                 return clause, _predicate_is_negated(match, clause)

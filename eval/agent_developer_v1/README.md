@@ -2,7 +2,7 @@
 
 This protocol evaluates DocAtlas as an evidence runtime for a coding agent, not as a human-facing question-answering interface.
 
-The unit under test is a **coding trajectory**: a developer task has a working path, one or more evidence scopes, bounded `get_docs_context` calls, required source identities, forbidden source identities, and a target support/recovery outcome. The provider-free CI lane executes the reviewed oracle trajectory. A future model-backed lane may let a coding model choose the calls itself, but it must be scored against the same task contract.
+The unit under test is a **coding trajectory**: a developer task has a working path, one or more evidence scopes, bounded `get_docs_context` calls, required source identities, forbidden source identities, and a target support/recovery outcome. The provider-free CI lane executes the reviewed oracle trajectory, including public recovery tools and exact-scope retries. A future model-backed lane may let a coding model choose the calls itself, but it must be scored against the same task contract.
 
 ## Why this protocol exists
 
@@ -27,7 +27,7 @@ This corpus therefore freezes agent-oriented invariants:
 
 The frozen baseline remains a historical reference while later commits close named safe gaps. The runner accepts a changed result only when the **complete target contract** matches, including target status, required sources, recovery tool, and confirmation reason. This prevents an `insufficient_evidence → ok` improvement from being mislabeled as false support while still rejecting an unsupported `ok` that lacks its target evidence.
 
-The runner exits non-zero when a call matches neither its frozen baseline nor its complete target contract, or when it produces false support, missing required evidence, a wrong recovery action, or forbidden-source contamination. A target gap is reported until the complete target contract is closed.
+The runner exits non-zero when a call matches neither its frozen baseline nor its complete target contract, when the declared working path or scope trajectory is invalid, when an action's arguments or confirmation contract drifts, when recovery cannot inspect and retry successfully, or when it produces false support, edit authorization, missing required evidence, or forbidden-source contamination. Target metrics are computed from the executed trajectories rather than stored as decorative metadata.
 
 ## Run
 
@@ -44,8 +44,8 @@ target closure: 11/11 tasks; named target gaps=0; false-supported=0; forbidden-s
 Agent Developer Protocol v1: TARGET PASS
 ```
 
-The runner is a hard CI gate: any remaining target gap, baseline/target contract drift, false-supported result, wrong recovery action, missing required source, or forbidden-source contamination exits non-zero. The historical baseline remains in the oracle only to distinguish reviewed behavior changes from regressions; it no longer permits a baseline-only CI pass.
+The runner is a hard CI gate: any remaining target gap, baseline/target contract drift, invalid working path or scope sequence, wrong recovery action or arguments, edit-ready insufficient result, missing required source, target-metric miss, or forbidden-source contamination exits non-zero. The historical baseline remains in the oracle only to distinguish reviewed behavior changes from regressions; it no longer permits a baseline-only CI pass.
 
 ## Current closure
 
-After the scope/recovery contract hardening, the provider-free oracle closes all **11/11** reviewed trajectories. Module ambiguity remains fail-closed, but the bounded response preserves `operational_reason_code=module_ambiguous`, returns at most eight exact `module_candidates`, recommends public `docs_status`, and requires the agent to retry with an exact `module_path`. The permanent `advanced-contract` CI job runs this protocol on every pull request and push to `main`.
+After the scope/recovery contract hardening, the provider-free oracle closes all **11/11** reviewed trajectories. Module ambiguity remains fail-closed: the bounded response preserves `operational_reason_code=module_ambiguous`, keeps complete exact paths within the response budget, returns executable `docs_status(action="project", details=true)` guidance, verifies both discovered modules, and performs an exact `module_path` retry without sibling contamination. The permanent `advanced-contract` CI job runs this protocol on every pull request and push to `main`.

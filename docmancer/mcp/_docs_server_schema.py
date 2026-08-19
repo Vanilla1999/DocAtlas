@@ -135,7 +135,10 @@ PUBLIC_GET_DOCS_CONTEXT_OUTPUT_SCHEMA: dict[str, Any] = {
                 "type": "object",
                 "required": ["module_path"],
                 "properties": {
-                    "module_path": {"type": "string"},
+                    "module_path": {
+                        "type": "string",
+                        "maxLength": 240,
+                    },
                     "module_name": {"type": "string"},
                     "module_type": {"type": "string"},
                 },

@@ -298,8 +298,19 @@ def build_project_answer_contract(question: str) -> ProjectAnswerContract:
             span_value=(workflow.group(0) if workflow else subject),
         ))
 
+    source_document_behavior = re.fullmatch(
+        r"\s*what\s+does\s+(?:the\s+)?(?:project\s+)?"
+        r"(?P<subject>README|ARCHITECTURE|CHANGELOG|CONTRIBUTING|ROADMAP|RUNBOOK)"
+        r"\s+say\s+about\s+(?P<context>.+?)\s*[?!.]*\s*",
+        raw_question,
+        re.I,
+    )
     behavior = _BEHAVIOR_RE.search(raw_question)
-    behavior_requested = bool(behavior or (_EXPLAIN_RE.search(raw_question) and explicit_subjects))
+    behavior_requested = bool(
+        source_document_behavior
+        or behavior
+        or (_EXPLAIN_RE.search(raw_question) and explicit_subjects)
+    )
     if behavior_requested and not any(
         item.kind in {
             "attribute", "status", "inventory", "comparison", "relation", "exact_fact",
@@ -307,11 +318,19 @@ def build_project_answer_contract(question: str) -> ProjectAnswerContract:
         }
         for item in obligations
     ):
-        behavior_subjects = explicit_subjects or [_best_subject(raw_question, subjects, fallback="project")]
+        if source_document_behavior:
+            behavior_subjects = [_clean_phrase(source_document_behavior.group("subject"))]
+            source_context = _clean_phrase(source_document_behavior.group("context"))
+        else:
+            behavior_subjects = explicit_subjects or [
+                _best_subject(raw_question, subjects, fallback="project")
+            ]
+            source_context = None
         for subject in behavior_subjects:
             obligations.append(_obligation(
                 question=raw_question, index=len(obligations), kind="behavior",
                 subject=subject, relation="behavior", value_kind="text",
+                context=source_context,
                 lifecycle_intent=lifecycle,
                 span_value=subject if subject.casefold() in raw_question.casefold() else (behavior.group(0) if behavior else _EXPLAIN_RE.search(raw_question).group(0)),
             ))

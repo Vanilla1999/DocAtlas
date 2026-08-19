@@ -115,8 +115,24 @@ def _assert_agent_developer_protocol_baseline() -> None:
     assert report["target_closed_tasks"] == 11
     assert report["false_supported"] == 0
     assert report["forbidden_source_contamination"] == 0
+    assert report["target_metrics"] == oracle["target_metrics"]
+    assert report["target_metric_errors"] == []
     assert report["errors"] == []
     assert report["target_gaps"] == []
+
+    ambiguity = next(
+        item
+        for item in report["tasks"]
+        if item["task_id"] == "ambiguous_module_recovery_named_gap"
+    )
+    assert ambiguity["context_call_count"] == 2
+    recovery = ambiguity["calls"][0]["recovery"]
+    assert recovery["tool"] == "docs_status"
+    assert recovery["arguments"]["details"] is True
+    assert set(recovery["module_paths"]) >= {"packages/auth", "services/auth"}
+    assert recovery["retry"]["status"] == "ok"
+    assert recovery["retry"]["sources"] == ["packages/auth/README.md"]
+    assert recovery["retry"]["target_closed"] is True
 
 
 def test_agent_developer_protocol_is_a_hard_ci_gate(monkeypatch, capsys) -> None:

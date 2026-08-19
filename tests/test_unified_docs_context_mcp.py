@@ -34,6 +34,51 @@ def test_get_docs_context_output_schema_accepts_bounded_and_compatibility_status
     ):
         jsonschema.validate({"status": status}, tool["outputSchema"])
 
+    module_path = tool["outputSchema"]["properties"]["module_candidates"][
+        "items"
+    ]["properties"]["module_path"]
+    assert module_path["maxLength"] == 240
+
+
+def test_module_recovery_projection_keeps_complete_paths_at_256_tokens():
+    from docmancer.docs.application.model_visible_projection import (
+        estimate_projection_tokens,
+    )
+    from docmancer.docs.interfaces.mcp.context_tools import (
+        _bound_module_recovery_projection,
+    )
+
+    paths = [f"packages/{index}-" + ("x" * 180) for index in range(8)]
+    payload = {
+        "status": "insufficient_evidence",
+        "kind": "docs_answer",
+        "missing": ["long generic failure detail"] * 5,
+        "answer_supported": False,
+        "answer_available": False,
+        "support_status": "insufficient_evidence",
+        "operational_reason_code": "module_ambiguous",
+        "recommended_next_action": {
+            "tool": "docs_status",
+            "arguments_patch": {
+                "action": "project",
+                "project_path": "/" + ("p" * 299),
+                "details": True,
+            },
+            "requires_confirmation": False,
+            "auto_execute": False,
+        },
+        "module_candidates": [{"module_path": path} for path in paths],
+        "estimated_tokens": 0,
+    }
+
+    assert _bound_module_recovery_projection(payload, max_tokens=256) is True
+    assert payload["operational_reason_code"] == "module_ambiguous"
+    assert payload["recommended_next_action"]["tool"] == "docs_status"
+    assert payload["recommended_next_action"]["arguments_patch"]["details"] is True
+    assert payload["module_candidates"]
+    assert all(row["module_path"] in paths for row in payload["module_candidates"])
+    assert estimate_projection_tokens(payload) <= 256
+
 
 def test_multi_library_context_requires_every_library_support_decision():
     class Decision:

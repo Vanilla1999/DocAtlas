@@ -39,6 +39,7 @@ BOUNDED_STRUCTURED_CONTENT_MARKER = "Structured DocAtlas result attached in stru
 _MODULE_RECOVERY_REASON_CODES = frozenset({
     "module_ambiguous", "module_not_found", "no_module_docs",
 })
+_MODULE_RECOVERY_MAX_PATH_CHARS = 240
 
 
 def _bounded_project_operational_diagnostics(payload: dict[str, Any]) -> dict[str, Any]:
@@ -54,11 +55,15 @@ def _bounded_project_operational_diagnostics(payload: dict[str, Any]) -> dict[st
     if isinstance(rows, list):
         candidates: list[dict[str, str]] = []
         seen: set[str] = set()
-        for row in rows[:8]:
+        for row in rows[:64]:
             if not isinstance(row, dict):
                 continue
             module_path = str(row.get("module_path") or "").strip()
-            if not module_path or module_path in seen:
+            if (
+                not module_path
+                or len(module_path) > _MODULE_RECOVERY_MAX_PATH_CHARS
+                or module_path in seen
+            ):
                 continue
             seen.add(module_path)
             item = {"module_path": module_path}
@@ -67,8 +72,9 @@ def _bounded_project_operational_diagnostics(payload: dict[str, Any]) -> dict[st
                 if value:
                     item[key] = value[:120]
             candidates.append(item)
+        candidates.sort(key=lambda item: (len(item["module_path"]), item["module_path"]))
         if candidates:
-            result["module_candidates"] = candidates
+            result["module_candidates"] = candidates[:8]
     return result
 
 
@@ -80,6 +86,90 @@ def _prioritize_module_recovery_projection(payload: dict[str, Any]) -> None:
     missing = payload.get("missing")
     if isinstance(missing, list) and len(missing) > 2:
         payload["missing"] = missing[:2]
+
+
+def _bound_module_recovery_projection(
+    payload: dict[str, Any],
+    *,
+    max_tokens: int,
+) -> bool:
+    """Keep executable recovery and complete exact paths inside tiny budgets."""
+
+    reason = str(payload.get("operational_reason_code") or "")
+    action = payload.get("recommended_next_action")
+    if reason not in _MODULE_RECOVERY_REASON_CODES or not isinstance(action, dict):
+        return False
+    if action.get("tool") != "docs_status":
+        return False
+
+    action_arguments = (
+        deepcopy(action.get("arguments_patch"))
+        if isinstance(action.get("arguments_patch"), dict)
+        else {}
+    )
+    bounded_action = {
+        "tool": "docs_status",
+        "arguments_patch": action_arguments,
+        "requires_confirmation": bool(action.get("requires_confirmation", False)),
+        "auto_execute": False,
+    }
+    bounded: dict[str, Any] = {
+        "status": "insufficient_evidence",
+        "kind": (
+            "patch_context"
+            if payload.get("kind") == "patch_context"
+            else "docs_answer"
+        ),
+        "missing": ["Select an exact module_path and retry."],
+        "answer_supported": False,
+        "answer_available": False,
+        "support_status": "insufficient_evidence",
+        "operational_reason_code": reason,
+        "recommended_next_action": bounded_action,
+        "estimated_tokens": 0,
+    }
+    _refresh_projection_estimate(bounded)
+    if int(bounded["estimated_tokens"]) > max_tokens:
+        bounded.pop("missing", None)
+        bounded.pop("answer_available", None)
+        bounded.pop("support_status", None)
+        _refresh_projection_estimate(bounded)
+    if int(bounded["estimated_tokens"]) > max_tokens:
+        return False
+
+    rows = payload.get("module_candidates")
+    candidates = sorted(
+        (
+            {"module_path": str(row.get("module_path") or "").strip()}
+            for row in rows or []
+            if isinstance(row, dict)
+            and 0 < len(str(row.get("module_path") or "").strip())
+            <= _MODULE_RECOVERY_MAX_PATH_CHARS
+        ),
+        key=lambda item: (len(item["module_path"]), item["module_path"]),
+    )
+    accepted: list[dict[str, str]] = []
+    for candidate in candidates[:8]:
+        bounded["module_candidates"] = [*accepted, candidate]
+        _refresh_projection_estimate(bounded)
+        if int(bounded["estimated_tokens"]) > max_tokens:
+            if not accepted:
+                bounded.pop("missing", None)
+                bounded.pop("answer_available", None)
+                bounded.pop("support_status", None)
+                _refresh_projection_estimate(bounded)
+            if int(bounded["estimated_tokens"]) > max_tokens:
+                bounded["module_candidates"] = accepted
+                _refresh_projection_estimate(bounded)
+                break
+        accepted.append(candidate)
+    if not accepted:
+        bounded.pop("module_candidates", None)
+        _refresh_projection_estimate(bounded)
+
+    payload.clear()
+    payload.update(bounded)
+    return True
 
 
 def _tuple_value(value: Any) -> tuple[Any, ...]:
@@ -394,13 +484,21 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
                 )
                 projection.update(support_projection)
                 _annotate_source_search_handoff(projection, recovery)
-                _prioritize_module_recovery_projection(projection)
-                bound_insufficient_projection(projection, max_tokens=output_budget)
-            if projection.get("status") == "insufficient_evidence":
-                _prioritize_module_recovery_projection(projection)
-                bound_insufficient_projection(
+                if not _bound_module_recovery_projection(
                     projection, max_tokens=output_budget,
-                )
+                ):
+                    _prioritize_module_recovery_projection(projection)
+                    bound_insufficient_projection(
+                        projection, max_tokens=output_budget,
+                    )
+            if projection.get("status") == "insufficient_evidence":
+                if not _bound_module_recovery_projection(
+                    projection, max_tokens=output_budget,
+                ):
+                    _prioritize_module_recovery_projection(projection)
+                    bound_insufficient_projection(
+                        projection, max_tokens=output_budget,
+                    )
             _omit_nullable_reason_code(projection)
             _refresh_projection_estimate(projection)
             validation_errors = validate_model_visible_projection(
