@@ -166,7 +166,13 @@ jobs:
         run: |
           python - <<'PY'
           import json
-          from scripts.run_agent_developer_gate import run_protocol
+          import os
+          import shutil
+          from pathlib import Path
+          from tempfile import TemporaryDirectory
+
+          from docmancer.docs.interfaces.mcp.context_tools import handle_context_tool
+          from scripts.run_agent_developer_gate import PROJECTS_ROOT, _service, run_protocol
 
           report = run_protocol()
           ambiguity = next(
@@ -178,6 +184,53 @@ jobs:
               "target_gaps": report["target_gaps"],
               "ambiguity": ambiguity,
           }, ensure_ascii=False, indent=2))
+
+          previous_home = os.environ.get("DOCMANCER_HOME")
+          try:
+              with TemporaryDirectory(prefix="docatlas-retry-budget-") as raw_tmp:
+                  tmp = Path(raw_tmp)
+                  project = tmp / "project"
+                  shutil.copytree(
+                      PROJECTS_ROOT / "ambiguous_modules_monorepo", project
+                  )
+                  os.environ["DOCMANCER_HOME"] = str(tmp / "home")
+                  service = _service(tmp)
+                  sync = service.sync_project_docs(
+                      str(project), with_vectors=False
+                  )
+                  assert sync.status == "success"
+                  for budget in (256, None, 800):
+                      args = {
+                          "question": "What is PackageAuthBoundary?",
+                          "project_path": str(project),
+                          "mode": "project",
+                          "scope": "module",
+                          "module_path": "packages/auth",
+                          "delivery_strategy": "bounded_direct",
+                          "prepare_project_docs": False,
+                      }
+                      if budget is not None:
+                          args["packet_tokens"] = budget
+                      payload = handle_context_tool(
+                          "get_docs_context", args, service
+                      )
+                      print(json.dumps({
+                          "budget": budget,
+                          "status": payload.get("status"),
+                          "reason_code": payload.get("reason_code"),
+                          "operational_status": payload.get("operational_status"),
+                          "missing": payload.get("missing"),
+                          "sources": payload.get("sources"),
+                          "recommended_next_action": payload.get(
+                              "recommended_next_action"
+                          ),
+                          "estimated_tokens": payload.get("estimated_tokens"),
+                      }, ensure_ascii=False, indent=2))
+          finally:
+              if previous_home is None:
+                  os.environ.pop("DOCMANCER_HOME", None)
+              else:
+                  os.environ["DOCMANCER_HOME"] = previous_home
           PY
 
       - name: Run affected regression suite
