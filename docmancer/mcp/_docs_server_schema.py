@@ -127,6 +127,21 @@ PUBLIC_GET_DOCS_CONTEXT_OUTPUT_SCHEMA: dict[str, Any] = {
         "kind": {"enum": ["docs_answer", "patch_context"]},
         "estimated_tokens": {"type": "integer"},
         "reason_code": {"type": "string"},
+        "operational_reason_code": {"type": "string"},
+        "module_candidates": {
+            "type": "array",
+            "maxItems": 8,
+            "items": {
+                "type": "object",
+                "required": ["module_path"],
+                "properties": {
+                    "module_path": {"type": "string"},
+                    "module_name": {"type": "string"},
+                    "module_type": {"type": "string"},
+                },
+                "additionalProperties": False,
+            },
+        },
         "missing": {"type": "array", "items": {"type": "string"}, "maxItems": 5},
         "recommended_next_action": {"type": "object"},
     },

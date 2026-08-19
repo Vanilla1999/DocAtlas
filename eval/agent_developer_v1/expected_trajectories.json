@@ -69,7 +69,7 @@
       "required_scopes": [{"scope": "module", "module": "auth"}],
       "forbidden_sources": ["packages/auth/README.md", "services/auth/README.md"],
       "known_gap": "bounded_module_ambiguity_projection",
-      "calls": [{"question": "What is PackageAuthBoundary?", "mode": "project", "scope": "module", "module": "auth", "baseline_expected_status": "insufficient_evidence", "target_expected_status": "insufficient_evidence", "baseline_next_action_tool": "code_search", "target_next_action_tool": "docs_status"}]
+      "calls": [{"question": "What is PackageAuthBoundary?", "mode": "project", "scope": "module", "module": "auth", "packet_tokens": 256, "baseline_expected_status": "insufficient_evidence", "target_expected_status": "insufficient_evidence", "baseline_next_action_tool": "code_search", "target_next_action_tool": "docs_status", "target_operational_reason_code": "module_ambiguous", "target_module_candidates": ["packages/auth", "services/auth"]}]
     },
     {
       "id": "stale_module_docs_recovery",
