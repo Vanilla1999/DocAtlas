@@ -1,0 +1,32 @@
+schema_version: 1
+documents:
+  - path: README.md
+    role: overview
+    scope: project
+    description: Shop monorepo overview.
+    authority: supporting
+    status: active
+    impact: track
+  - path: ARCHITECTURE.md
+    role: project_architecture
+    scope: project
+    description: Project-wide architecture, ownership, and retry policy.
+    authority: source_of_truth
+    status: active
+    impact: track
+  - path: packages/orders/README.md
+    role: module_architecture
+    scope: module
+    module_path: packages/orders
+    description: Orders module behavior and validation contract.
+    authority: source_of_truth
+    status: active
+    impact: track
+  - path: packages/payments/README.md
+    role: module_architecture
+    scope: module
+    module_path: packages/payments
+    description: Payments module behavior.
+    authority: source_of_truth
+    status: active
+    impact: track

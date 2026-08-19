@@ -1,0 +1,88 @@
+{
+  "schema_version": 1,
+  "protocol": "agent-developer-v1-oracle",
+  "description": "Evaluator-only scope, source, baseline, target, and recovery expectations. Do not expose this file to the model-backed agent lane.",
+  "target_metrics": {
+    "false_supported": 0,
+    "forbidden_source_contamination": 0,
+    "module_only_expected_evidence_rate": 1.0,
+    "module_project_max_context_calls": 2,
+    "cross_module_scope_accuracy": 1.0,
+    "recovery_contract_accuracy": 1.0
+  },
+  "trajectories": [
+    {
+      "id": "module_definition_supported",
+      "required_scopes": [{"scope": "module", "module_path": "packages/orders"}],
+      "forbidden_sources": ["packages/payments/README.md", "ARCHITECTURE.md"],
+      "calls": [{"question": "What is OrdersDraftStore?", "mode": "project", "scope": "module", "module_path": "packages/orders", "baseline_expected_status": "ok", "target_expected_status": "ok", "required_sources": ["packages/orders/README.md"]}]
+    },
+    {
+      "id": "module_behavior_named_gap",
+      "required_scopes": [{"scope": "module", "module_path": "packages/orders"}],
+      "forbidden_sources": ["packages/payments/README.md", "ARCHITECTURE.md"],
+      "known_gap": "generic_behavior_predicate_stores",
+      "calls": [{"question": "What does OrdersDraftStore do?", "mode": "project", "scope": "module", "module_path": "packages/orders", "baseline_expected_status": "insufficient_evidence", "target_expected_status": "ok", "target_required_sources": ["packages/orders/README.md"]}]
+    },
+    {
+      "id": "module_requirements_named_gap",
+      "required_scopes": [{"scope": "module", "module_path": "packages/orders"}],
+      "forbidden_sources": ["packages/payments/README.md", "ARCHITECTURE.md"],
+      "known_gap": "domain_neutral_requirements",
+      "calls": [{"question": "What does OrderValidationContract require?", "mode": "project", "scope": "module", "module_path": "packages/orders", "baseline_expected_status": "insufficient_evidence", "target_expected_status": "ok", "target_required_sources": ["packages/orders/README.md"]}]
+    },
+    {
+      "id": "project_policy_supported",
+      "required_scopes": [{"scope": "project"}],
+      "forbidden_sources": ["packages/orders/README.md", "packages/payments/README.md"],
+      "calls": [{"question": "What is ProjectRetryPolicy?", "mode": "project", "scope": "project", "baseline_expected_status": "ok", "target_expected_status": "ok", "required_sources": ["ARCHITECTURE.md"]}]
+    },
+    {
+      "id": "module_plus_project_two_call_trajectory",
+      "required_scopes": [{"scope": "module", "module_path": "packages/orders"}, {"scope": "project"}],
+      "forbidden_sources": ["packages/payments/README.md"],
+      "calls": [
+        {"question": "What is OrdersDraftStore?", "mode": "project", "scope": "module", "module_path": "packages/orders", "baseline_expected_status": "ok", "target_expected_status": "ok", "required_sources": ["packages/orders/README.md"]},
+        {"question": "What is ProjectRetryPolicy?", "mode": "project", "scope": "project", "baseline_expected_status": "ok", "target_expected_status": "ok", "required_sources": ["ARCHITECTURE.md"]}
+      ]
+    },
+    {
+      "id": "cross_module_comparison_supported",
+      "required_scopes": [{"scope": "all"}],
+      "forbidden_sources": [],
+      "calls": [{"question": "How does OrdersDraftStore differ from PaymentOutbox?", "mode": "project", "scope": "all", "baseline_expected_status": "ok", "target_expected_status": "ok", "required_sources": ["ARCHITECTURE.md"]}]
+    },
+    {
+      "id": "wrong_module_isolation",
+      "required_scopes": [{"scope": "module", "module_path": "packages/orders"}],
+      "forbidden_sources": ["packages/payments/README.md"],
+      "calls": [{"question": "What is PaymentOutbox?", "mode": "project", "scope": "module", "module_path": "packages/orders", "baseline_expected_status": "insufficient_evidence", "target_expected_status": "insufficient_evidence"}]
+    },
+    {
+      "id": "autodiscovery_module_supported",
+      "required_scopes": [{"scope": "module", "module_path": "services/catalog"}],
+      "forbidden_sources": ["README.md"],
+      "calls": [{"question": "What does CatalogReader do?", "mode": "project", "scope": "module", "module_path": "services/catalog", "baseline_expected_status": "ok", "target_expected_status": "ok", "required_sources": ["services/catalog/README.md"]}]
+    },
+    {
+      "id": "ambiguous_module_recovery_named_gap",
+      "required_scopes": [{"scope": "module", "module": "auth"}],
+      "forbidden_sources": ["packages/auth/README.md", "services/auth/README.md"],
+      "known_gap": "bounded_module_ambiguity_projection",
+      "calls": [{"question": "What is PackageAuthBoundary?", "mode": "project", "scope": "module", "module": "auth", "baseline_expected_status": "insufficient_evidence", "target_expected_status": "insufficient_evidence", "baseline_next_action_tool": "code_search", "target_next_action_tool": "docs_status"}]
+    },
+    {
+      "id": "stale_module_docs_recovery",
+      "required_scopes": [{"scope": "module", "module_path": "packages/orders"}],
+      "forbidden_sources": ["packages/payments/README.md"],
+      "mutation_before_calls": {"path": "packages/orders/README.md", "append": "\nStaleProtocolFact is added after indexing.\n"},
+      "calls": [{"question": "What is OrdersDraftStore?", "mode": "project", "scope": "module", "module_path": "packages/orders", "baseline_expected_status": "insufficient_evidence", "target_expected_status": "insufficient_evidence", "baseline_next_action_tool": "prepare_docs", "target_next_action_tool": "prepare_docs", "baseline_confirmation_reason": "project_docs_preflight", "target_confirmation_reason": "project_docs_preflight"}]
+    },
+    {
+      "id": "dependency_prefetch_recovery",
+      "required_scopes": [{"scope": "dependency"}],
+      "forbidden_sources": ["packages/payments/README.md"],
+      "calls": [{"question": "What is tenacity.Retrying?", "mode": "dependency", "baseline_expected_status": "insufficient_evidence", "target_expected_status": "insufficient_evidence", "baseline_next_action_tool": "prepare_docs", "target_next_action_tool": "prepare_docs", "baseline_confirmation_reason": "network_fetch", "target_confirmation_reason": "network_fetch"}]
+    }
+  ]
+}

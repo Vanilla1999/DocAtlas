@@ -3,6 +3,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+from scripts.run_agent_developer_gate import run_protocol
+
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -84,3 +86,37 @@ def test_three_real_project_task_designs_are_fairness_screened_and_distributed()
             "No hidden requirement is oracle-only" in fairness
             or "Fairness clean for strict-offline screening" in fairness
         )
+
+    _assert_agent_developer_protocol_baseline()
+
+
+def _assert_agent_developer_protocol_baseline() -> None:
+    public = json.loads((ROOT / "eval" / "agent_developer_v1" / "tasks.json").read_text(encoding="utf-8"))
+    oracle = json.loads((ROOT / "eval" / "agent_developer_v1" / "expected_trajectories.json").read_text(encoding="utf-8"))
+    tasks = public["tasks"]
+    trajectories = oracle["trajectories"]
+
+    assert public["schema_version"] == 1
+    assert public["protocol"] == "agent-developer-v1"
+    assert oracle["protocol"] == "agent-developer-v1-oracle"
+    assert len(tasks) == 11
+    assert {task["id"] for task in tasks} == {item["id"] for item in trajectories}
+    assert all(not ({"calls", "required_scopes", "forbidden_sources", "known_gap"} & set(task)) for task in tasks)
+    assert {
+        "module_only", "project_only", "module_plus_project", "cross_module",
+        "module_plus_dependency", "negative_contamination", "recovery",
+    } <= {task["class"] for task in tasks}
+
+    report = run_protocol()
+    assert report["baseline_ok"] is True, report["errors"]
+    assert report["task_count"] == 11
+    assert report["executed_task_count"] == 11
+    assert report["target_closed_tasks"] == 8
+    assert report["false_supported"] == 0
+    assert report["forbidden_source_contamination"] == 0
+    assert report["errors"] == []
+    assert {(gap["task_id"], gap["gap"]) for gap in report["target_gaps"]} == {
+        ("module_behavior_named_gap", "generic_behavior_predicate_stores"),
+        ("module_requirements_named_gap", "domain_neutral_requirements"),
+        ("ambiguous_module_recovery_named_gap", "bounded_module_ambiguity_projection"),
+    }
