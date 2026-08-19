@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import json
 
 import pytest
 
@@ -246,3 +247,51 @@ def test_legacy_fallback_questions_remain_unclaimed_by_question_plan(question: s
     assert not plan.handled, (question, plan)
     assert not frozen_ownership_mismatches()
 
+
+def test_temporary_dump_current_contract_signatures() -> None:
+    questions = [
+        "How does prepare_docs sync_project_docs work?",
+        "What does Phase 3.1 require for RetrievalDispatcher, the raw topic, EvidenceRequirementSet hints, and vector or embedding calls?",
+        "What does docs_status report and when should it be used?",
+        "What are the three public Docs MCP tools?",
+        "Which source types are supported for indexing?",
+        "How do I sync project docs after changing a file?",
+        "What are the three public Docs MCP tools and when do I use each one?",
+        "How does evidence selection differ from question planning?",
+        "Where is the project answer contract documented?",
+        "What happens when the preview plan is stale?",
+        "Why does clear-index always delete remote Qdrant collections?",
+        "What are the public tools and their purposes?",
+        "Назови три публичных инструмента Docs MCP и когда использовать каждый.",
+        "What is the difference between evidence selection and question planning?",
+        "Explain the storage mutation coordination contract.",
+    ]
+    rows = []
+    for question in questions:
+        plan = compile_question_plan(question)
+        contract = build_project_answer_contract(question)
+        rows.append({
+            "question": question,
+            "plan_handled": plan.handled,
+            "plan_trace": list(plan.parse_trace),
+            "plan_unresolved": list(plan.unresolved_parts),
+            "contract_trace": list(contract.parse_trace),
+            "contract_unresolved": list(contract.unresolved_parts),
+            "signature": [
+                (
+                    item.kind,
+                    item.subject,
+                    item.attribute,
+                    item.relation,
+                    item.target,
+                    item.value_kind,
+                    item.expected_value,
+                    item.item_kind,
+                    item.cardinality,
+                    item.response_mode,
+                    item.context,
+                )
+                for item in contract.proof_obligations
+            ],
+        })
+    raise AssertionError("SIGNATURE_DUMP=" + json.dumps(rows, ensure_ascii=False, sort_keys=True))
