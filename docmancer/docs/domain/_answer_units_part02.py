@@ -224,6 +224,113 @@ def _explicit_comparison_is_local(
     )
 
 
+_GENERIC_BEHAVIOR_RE = re.compile(
+    r"\b(?:returns?|reports?|shows?|reads?|writes?|loads?|indexes?|retrieves?|selects?|"
+    r"validates?|handles?|processes?|dispatches?|routes?|creates?|updates?|deletes?|use(?:s|d)?|exposes?|"
+    r"invokes?|supplies?|calls?|replaces?|preserves?|keeps?|sets?|configures?|requires?|governs?|"
+    r"owns?|manages?|controls?|stores?|persists?|saves?|delegates?|maps?|emits?|publishes?|enqueues?|"
+    r"accepts?|rejects?|allows?|denies?|coordinates?|schedules?|forwards?|assigns?|applies?|resolves?|"
+    r"возвращает|показывает|сообщает|читает|записывает|индексирует|извлекает|выбирает|"
+    r"проверяет|обрабатывает|маршрутизирует|создает|обновляет|удаляет|хранит|сохраняет|"
+    r"владеет|управляет|делегирует|публикует|отклоняет|разрешает|координирует)\b",
+    re.I,
+)
+
+
+def _predicate_has_local_value(match: re.Match[str], clause: str) -> bool:
+    """Require a non-empty complement after one locally bound predicate."""
+
+    tail = clause[match.end():]
+    words = re.findall(r"[A-Za-zА-Яа-яЁё0-9_~:+.-]+", tail)
+    return bool(words)
+
+
+def _predicate_is_negated(match: re.Match[str], clause: str) -> bool:
+    """Return whether the matched predicate is locally negated in its clause."""
+
+    prefix = clause[max(0, match.start() - 48):match.start()]
+    return bool(re.search(
+        r"\b(?:not|never|cannot|can't|does\s+not|do\s+not|did\s+not|"
+        r"must\s+not|should\s+not|will\s+not|не|никогда\s+не|нельзя)\s+"
+        r"(?:\w+\s+){0,2}$",
+        prefix,
+        re.I,
+    ))
+
+
+def _definition_clause(obligation: ProofObligation, text: str) -> str | None:
+    """Find one proposition that binds definition subject, predicate, and value."""
+
+    for _start, _end, clause in _bounded_clauses(text):
+        subject_spans = _subject_spans(obligation, clause)
+        if not subject_spans:
+            continue
+        for match in _COPULA_RE.finditer(clause):
+            if not _predicate_has_local_value(match, clause):
+                continue
+            if re.match(r"\s+(?:not|never|не)\b", clause[match.end():], re.I):
+                continue
+            if any(
+                subject[0] <= match.start()
+                and _word_distance(subject, match.span(), clause) <= 10
+                for subject in subject_spans
+            ):
+                return clause
+    return None
+
+
+def _behavior_clause(
+    obligation: ProofObligation,
+    text: str,
+) -> tuple[str, bool] | None:
+    """Find one subject-bound generic behavior proposition and its local polarity."""
+
+    for _start, _end, clause in _bounded_clauses(text):
+        subject_spans = _subject_spans(obligation, clause)
+        if not subject_spans:
+            continue
+        for match in _GENERIC_BEHAVIOR_RE.finditer(clause):
+            if not _predicate_has_local_value(match, clause):
+                continue
+            if any(
+                subject[0] <= match.start()
+                and _word_distance(subject, match.span(), clause) <= 10
+                for subject in subject_spans
+            ):
+                return clause, _predicate_is_negated(match, clause)
+    return None
+
+
+_SOURCE_DOCUMENT_SUBJECT_RE = re.compile(
+    r"^(?:readme|architecture|changelog|contributing|roadmap|runbook)$",
+    re.I,
+)
+
+
+def _source_document_behavior_clause(
+    obligation: ProofObligation,
+    text: str,
+    source_text: str,
+) -> tuple[str, bool] | None:
+    """Bind conventional document subjects to behavior stated by that document.
+
+    Queries such as ``What does the README say about X?`` name the source
+    document itself as the semantic subject. Preserve that source-subject
+    contract only for conventional maintained-document identities; arbitrary
+    code-shaped filenames must still carry their subject in the proposition.
+    """
+
+    if not _SOURCE_DOCUMENT_SUBJECT_RE.fullmatch(_normal(obligation.subject)):
+        return None
+    if not _subject_present(obligation, source_text):
+        return None
+    for _start, _end, clause in _bounded_clauses(text):
+        for match in _GENERIC_BEHAVIOR_RE.finditer(clause):
+            if _predicate_has_local_value(match, clause):
+                return clause, _predicate_is_negated(match, clause)
+    return None
+
+
 def _special_relation_valid(relation: str | None, text: str) -> bool:
     normalized = _normal(text)
     if relation == "recall_mechanism":
@@ -332,10 +439,16 @@ def local_proof_for_obligation(
         )
 
     if obligation.kind == "definition":
-        relation = 3 if _COPULA_RE.search(text) else 0
-        value = _value_score("text", text)
-        valid = subject_score > 0 and relation > 0 and value > 0 and unit.proposition
-        return LocalProof(valid, subject_score, relation, value, subject_score + relation + value, "definition" if valid else "definition_incomplete")
+        bound_clause = _definition_clause(obligation, text)
+        relation = 3 if bound_clause is not None else 0
+        value = _value_score("text", bound_clause or "")
+        local_subject_score = 3 if bound_clause is not None else 0
+        valid = local_subject_score > 0 and relation > 0 and value > 0 and unit.proposition
+        return LocalProof(
+            valid, local_subject_score, relation, value,
+            local_subject_score + relation + value,
+            "definition" if valid else "definition_not_locally_bound",
+        )
 
     if obligation.kind == "attribute":
         attribute = 3 if _attribute_present(obligation.attribute, text) else 0
@@ -433,13 +546,31 @@ def local_proof_for_obligation(
                 effective_subject_score + (planned.relation_score if valid else 0) + (planned.value_score if valid else 0),
                 planned.reason if valid else f"{planned.reason}_subject_not_bound",
             )
-        negated = bool(_NEGATION_RE.search(text))
-        relation = 3 if not negated and (
-            _subject_before_pattern(obligation.subject, _BEHAVIOR_RE, text)
-            or (authoritative_identity and bool(_BEHAVIOR_RE.search(text)))
-        ) else 0
-        valid = subject_score > 0 and relation > 0 and unit.proposition
-        return LocalProof(valid, subject_score, relation, 1 if unit.proposition else 0, subject_score + relation + int(unit.proposition), "behavior" if valid else "behavior_missing_or_negated")
+        bound_behavior = _behavior_clause(obligation, text)
+        source_document_behavior = (
+            _source_document_behavior_clause(obligation, text, source_text)
+            if bound_behavior is None and authoritative_identity
+            else None
+        )
+        proof_behavior = bound_behavior or source_document_behavior
+        relation = 3 if proof_behavior is not None else 0
+        local_subject_score = (
+            3 if bound_behavior is not None else
+            2 if source_document_behavior is not None else
+            0
+        )
+        valid = local_subject_score > 0 and relation > 0 and unit.proposition
+        negated = bool(proof_behavior and proof_behavior[1])
+        return LocalProof(
+            valid, local_subject_score, relation, 1 if unit.proposition and valid else 0,
+            local_subject_score + relation + int(unit.proposition and valid),
+            (
+                "behavior_negative_constraint" if valid and negated else
+                "behavior_source_document" if valid and source_document_behavior is not None else
+                "behavior" if valid else
+                "behavior_not_locally_bound"
+            ),
+        )
 
     if obligation.kind == "usage":
         planned = planned_usage_proof(obligation, text, source=source)

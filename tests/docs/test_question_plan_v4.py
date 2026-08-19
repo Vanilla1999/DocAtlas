@@ -98,6 +98,83 @@ def test_question_plan_proof_requires_local_subject_binding():
     )
     assert proof.valid is False
 
+    definition = build_project_answer_contract("What is ErrorCodeRegistry?").proof_obligations[0]
+    behavior = build_project_answer_contract("What does OrderSubmission do?").proof_obligations[0]
+    auth_behavior = build_project_answer_contract("What does AuthService do?").proof_obligations[0]
+    store_behavior = build_project_answer_contract("What does OrdersDraftStore do?").proof_obligations[0]
+    requirements = build_project_answer_contract(
+        "What does OrderValidationContract require?"
+    ).proof_obligations[0]
+    probes = (
+        (
+            definition,
+            _unit(
+                "ErrorCodeRegistry owns public application error codes. "
+                "PaymentOutbox defines payment states.",
+                kind="unit_group",
+            ),
+            False,
+        ),
+        (
+            definition,
+            _unit("ErrorCodeRegistry is the registry for public application error codes."),
+            True,
+        ),
+        (
+            behavior,
+            _unit(
+                "OrderSubmission is mentioned here. PaymentOutbox validates payments.",
+                kind="unit_group",
+            ),
+            False,
+        ),
+        (
+            behavior,
+            _unit(
+                "OrderSubmission validates the draft. "
+                "It never persists authentication tokens.",
+                kind="unit_group",
+            ),
+            True,
+        ),
+        (
+            auth_behavior,
+            _unit("AuthService owns token issue, refresh, revocation, and secure persistence."),
+            True,
+        ),
+        (
+            store_behavior,
+            _unit("OrdersDraftStore stores draft orders as JSON records keyed by order id."),
+            True,
+        ),
+        (
+            requirements,
+            _unit(
+                "OrderValidationContract requires a non-empty customer id, "
+                "at least one line item, and a positive total."
+            ),
+            True,
+        ),
+    )
+    assert [
+        local_proof_for_obligation(row, unit).valid
+        for row, unit, _expected in probes
+    ] == [expected for _row, _unit_value, expected in probes]
+
+    readme_behavior = build_project_answer_contract(
+        "What does the project README say about deterministic offline release checks?"
+    ).proof_obligations[0]
+    assert local_proof_for_obligation(
+        readme_behavior,
+        _unit("The amber lighthouse invariant requires deterministic offline release checks."),
+        source={"authority": "source_of_truth", "path": "README.md"},
+    ).valid is True
+    assert local_proof_for_obligation(
+        behavior,
+        _unit("PaymentOutbox validates payments."),
+        source={"authority": "source_of_truth", "path": "OrderSubmission.md"},
+    ).valid is False
+
 
 def test_conditional_behavior_requires_requested_condition_and_blocking_effect():
     _contract, rows = _rows("What does clear-index do when a live process holds the index?")

@@ -25,7 +25,9 @@ This corpus therefore freezes agent-oriented invariants:
 
 `expected_trajectories.json` is evaluator-only oracle data. It keeps **baseline** and **target** expectations separate. Baseline expectations freeze what the current released engine is known to do. A known safe false-negative is represented with `known_gap` rather than being hidden or converted into a passing answer. Target expectations define the desired behavior after later production commits. A future model-backed lane must not expose this file to the coding model.
 
-The runner exits non-zero for baseline drift, false-supported outcomes, missing required baseline sources, wrong recovery actions, or forbidden-source contamination. A target gap is reported but does not fail this first diagnostic commit.
+The frozen baseline remains a historical reference while later commits close named safe gaps. The runner accepts a changed result only when the **complete target contract** matches, including target status, required sources, recovery tool, and confirmation reason. This prevents an `insufficient_evidence → ok` improvement from being mislabeled as false support while still rejecting an unsupported `ok` that lacks its target evidence.
+
+The runner exits non-zero when a call matches neither its frozen baseline nor its complete target contract, or when it produces false support, missing required evidence, a wrong recovery action, or forbidden-source contamination. A target gap is reported until the complete target contract is closed.
 
 ## Run
 
