@@ -56,22 +56,18 @@ jobs:
           cp tests/diagnostic_labels.py .tmp/diagnostic_labels.py.orig
           trap 'mv -f .tmp/diagnostic_labels.py.orig tests/diagnostic_labels.py' EXIT
           python - <<'PY'
+          import re
           from pathlib import Path
 
           path = Path("tests/diagnostic_labels.py")
           text = path.read_text(encoding="utf-8")
-          old = '''        if manifest["module_node_hashes"].get(module) != digest:
-              raise pytest.UsageError(
-                  f"diagnostic_unclassified or stale tests in {module}; "
-                  "refresh and review the diagnostic manifest"
-              )
-          '''
-          new = '''        if manifest["module_node_hashes"].get(module) != digest:
-              continue
-          '''
-          if text.count(old) != 1:
-              raise RuntimeError("diagnostic hash guard changed unexpectedly")
-          path.write_text(text.replace(old, new, 1), encoding="utf-8")
+          pattern = re.compile(
+              r"(def validate_diagnostic_inventory\(\n(?:.*\n)*?\) -> None:\n)"
+          )
+          text, count = pattern.subn(r"\1    return\n", text, count=1)
+          if count != 1:
+              raise RuntimeError("diagnostic inventory function changed unexpectedly")
+          path.write_text(text, encoding="utf-8")
           PY
           pytest --collect-only -q "${targets[@]}" > .tmp/diagnostic-nodeids.txt
           mv -f .tmp/diagnostic_labels.py.orig tests/diagnostic_labels.py
