@@ -6,8 +6,27 @@ from docmancer.docs.tool_choice_eval import (
     main,
     public_tool_schemas,
 )
+from eval.agent_developer_v1.model_report_contract import validate_report
+import httpx
 import json
 from pathlib import Path
+
+from scripts.openai_live_support import (
+    OpenAILiveHTTPError,
+    safe_openai_http_diagnostic,
+    should_retry_openai_response,
+)
+from scripts.run_agent_developer_openai_benchmark import (
+    REASONING_EFFORT as AGENT_REASONING_EFFORT,
+    _output_text,
+    _request_payload as _agent_request_payload,
+)
+from scripts.run_agent_developer_opencode_chat import benchmark_contract_sha256
+from scripts.run_task21_openai_live import (
+    REASONING_EFFORT as TASK21_REASONING_EFFORT,
+    _responses_input,
+    _responses_request_payload,
+)
 
 
 class _Adapter:
@@ -53,6 +72,98 @@ def test_public_tool_schemas_are_the_published_mcp_surface():
         tool for tool in TOOLS if tool["name"] in PUBLIC_TOOL_NAMES
     ]
 
+    items = _responses_input(
+        "use docs tools",
+        {
+            "prompt": "Question",
+            "messages": [
+                {"role": "user", "content": "Question"},
+                {
+                    "role": "assistant",
+                    "content": None,
+                    "tool_calls": [
+                        {
+                            "id": "context-1",
+                            "type": "function",
+                            "function": {
+                                "name": "get_docs_context",
+                                "arguments": '{"question":"Question"}',
+                            },
+                        }
+                    ],
+                },
+                {
+                    "role": "tool",
+                    "tool_call_id": "context-1",
+                    "name": "get_docs_context",
+                    "content": '{"status":"insufficient_evidence"}',
+                },
+            ],
+        },
+    )
+    assert items[2]["type"] == "function_call"
+    assert items[2]["call_id"] == "context-1"
+    assert items[3] == {
+        "type": "function_call_output",
+        "call_id": "context-1",
+        "output": '{"status":"insufficient_evidence"}',
+    }
+
+    task21_payload = _responses_request_payload(
+        model="gpt-5.6-luna",
+        guidance="use docs tools",
+        scenario={"prompt": "Question"},
+        tools=[],
+    )
+    assert TASK21_REASONING_EFFORT == "medium"
+    assert task21_payload["model"] == "gpt-5.6-luna"
+    assert task21_payload["reasoning"] == {"effort": "medium"}
+
+    agent_payload = _agent_request_payload(
+        [{"role": "user", "content": "Plan evidence"}],
+        model="gpt-5.6-luna",
+    )
+    assert AGENT_REASONING_EFFORT == "medium"
+    assert agent_payload["model"] == "gpt-5.6-luna"
+    assert agent_payload["reasoning"] == {"effort": "medium"}
+    assert agent_payload["text"]["format"]["type"] == "json_schema"
+    assert agent_payload["text"]["format"]["strict"] is True
+
+    output = {
+        "output": [
+            {"type": "reasoning", "summary": []},
+            {
+                "type": "message",
+                "content": [
+                    {"type": "output_text", "text": '{"action":"finish"}'},
+                ],
+            },
+        ]
+    }
+    assert _output_text(output) == '{"action":"finish"}'
+
+    quota = httpx.Response(
+        429,
+        headers={"retry-after": "7", "x-request-id": "req-test"},
+        json={
+            "error": {
+                "type": "insufficient_quota",
+                "code": "insufficient_quota",
+                "message": "do-not-persist-provider-message",
+            }
+        },
+    )
+    diagnostic = safe_openai_http_diagnostic(quota)
+    assert diagnostic == {
+        "status": 429,
+        "error_type": "insufficient_quota",
+        "error_code": "insufficient_quota",
+        "retry_after": "7",
+        "request_id": "req-test",
+    }
+    assert should_retry_openai_response(quota) is False
+    assert "do-not-persist-provider-message" not in str(OpenAILiveHTTPError(quota))
+
 
 def test_retry_metric_requires_the_exact_original_question():
     class WrongRetryAdapter(_Adapter):
@@ -92,11 +203,66 @@ def test_implementation_fact_scenarios_do_not_expect_a_docs_tool():
 def test_committed_live_report_is_explicit_and_matches_frozen_scenarios():
     report_path = Path("eval/results/task21_tool_choice_gate.json")
     report = json.loads(report_path.read_text(encoding="utf-8"))
-    assert report["passed"] is False
+    results = report["results"]
+
     assert report["tool_schema_version"].startswith("sha256:")
-    assert {item["scenario_id"] for item in report["results"]} == {
+    assert report["scenario_count"] == len(SCENARIOS)
+    assert report["repeats"] == REPEATS
+    assert len(results) == len(SCENARIOS) * REPEATS
+    assert {item["scenario_id"] for item in results} == {
         scenario.scenario_id for scenario in SCENARIOS
     }
+
+    model_version = str((report.get("adapter") or {}).get("model_version") or "")
+    if model_version == "not-run":
+        assert report["passed"] is False
+        assert all(item.get("status") == "not_run" for item in results)
+        return
+
+    assert model_version == "gpt-5.6-luna"
+    assert report.get("reasoning_effort") == "medium"
+    assert report["passed"] is True
+    assert all(item.get("status") != "not_run" for item in results)
+
+    metrics = report["metrics"]
+    thresholds = report["thresholds"]
+    assert metrics["first_tool_accuracy"] >= thresholds["first_tool_accuracy"]
+    assert metrics["unnecessary_prepare_or_status_rate"] <= thresholds["unnecessary_prepare_or_status_rate"]
+    assert metrics["legacy_tool_hallucination_rate"] <= thresholds["legacy_tool_hallucination_rate"]
+    assert metrics["next_action_copy_accuracy"] >= thresholds["next_action_copy_accuracy"]
+    assert metrics["original_question_retry_rate"] >= thresholds["original_question_retry_rate"]
+
+    agent_path = Path("eval/agent_developer_v1/results/model-benchmark.json")
+    assert agent_path.is_file()
+    agent_report = json.loads(agent_path.read_text(encoding="utf-8"))
+    summary = validate_report(
+        agent_report,
+        expected_model="gpt-5.6-luna",
+        min_pass_rate=0.0,
+        require_full=True,
+    )
+    assert summary["task_count"] == 11
+    assert agent_report["provider_id"] in {"openai-api", "opencode-chat"}
+    assert agent_report["infrastructure_errors"] == []
+    assert agent_report["false_supported"] == 0
+    assert agent_report["forbidden_source_contamination"] == 0
+    assert all(
+        row.get("reasoning_effort") == "medium"
+        for task in agent_report["tasks"]
+        for row in task.get("usage") or ()
+    )
+    if agent_report["provider_id"] == "opencode-chat":
+        expected_contract = benchmark_contract_sha256()
+        usage_rows = [
+            row
+            for task in agent_report["tasks"]
+            for row in task.get("usage") or ()
+        ]
+        assert usage_rows
+        assert all(
+            row.get("benchmark_contract_sha256") == expected_contract
+            for row in usage_rows
+        )
 
 
 def test_live_evaluation_failure_replaces_a_stale_passing_report(tmp_path, monkeypatch):

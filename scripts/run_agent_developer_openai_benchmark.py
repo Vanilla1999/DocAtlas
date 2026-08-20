@@ -1,0 +1,201 @@
+#!/usr/bin/env python3
+from __future__ import annotations
+
+import argparse
+import hashlib
+import json
+import os
+import time
+from pathlib import Path
+from typing import Any
+
+import httpx
+
+from eval.agent_developer_v1.model_benchmark import action_schema, run_benchmark
+from scripts.openai_live_support import (
+    OpenAILiveHTTPError,
+    retry_delay_seconds,
+    should_retry_openai_response,
+)
+
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+DEFAULT_MODEL = "gpt-5.6-luna"
+DEFAULT_API_BASE = "https://api.openai.com/v1"
+REASONING_EFFORT = "medium"
+
+
+def _output_text(response: dict[str, Any]) -> str:
+    chunks: list[str] = []
+    for item in response.get("output") or []:
+        if not isinstance(item, dict) or item.get("type") != "message":
+            continue
+        for content in item.get("content") or []:
+            if isinstance(content, dict) and content.get("type") == "output_text":
+                chunks.append(str(content.get("text") or ""))
+    return "".join(chunks)
+
+
+def _strict_nonnegative_int(value: Any, name: str) -> int:
+    if isinstance(value, bool) or not isinstance(value, int) or value < 0:
+        raise RuntimeError(f"OpenAI Responses usage omitted valid {name}")
+    return value
+
+
+def _request_payload(messages: list[dict[str, str]], *, model: str) -> dict[str, Any]:
+    return {
+        "model": model,
+        "input": messages,
+        "reasoning": {"effort": REASONING_EFFORT},
+        "max_output_tokens": 768,
+        "text": {
+            "format": {
+                "type": "json_schema",
+                "name": "agent_developer_evidence_action_v1",
+                "strict": True,
+                "schema": action_schema(),
+            }
+        },
+    }
+
+
+class OpenAIAPIPlanner:
+    provider_id = "openai-api"
+
+    def __init__(
+        self,
+        token: str,
+        *,
+        model: str = DEFAULT_MODEL,
+        api_base: str = DEFAULT_API_BASE,
+    ) -> None:
+        if not token.strip():
+            raise ValueError("OpenAI API token is required")
+        self.model = model
+        self._token = token
+        self._api_base = api_base.rstrip("/")
+
+    def choose(self, messages: list[dict[str, str]]) -> tuple[dict[str, Any], dict[str, Any]]:
+        request_payload = _request_payload(messages, model=self.model)
+        serialized = json.dumps(
+            request_payload,
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+        ).encode("utf-8")
+        response: httpx.Response | None = None
+        for attempt in range(4):
+            response = httpx.post(
+                self._api_base + "/responses",
+                headers={
+                    "Authorization": f"Bearer {self._token}",
+                    "Content-Type": "application/json",
+                },
+                content=serialized,
+                timeout=90,
+            )
+            if response.status_code < 400:
+                break
+            if attempt < 3 and should_retry_openai_response(response):
+                time.sleep(retry_delay_seconds(response, attempt))
+                continue
+            raise OpenAILiveHTTPError(response)
+        assert response is not None
+        if response.status_code >= 400:
+            raise OpenAILiveHTTPError(response)
+
+        request_id = str(response.headers.get("x-request-id") or "").strip()
+        if not request_id:
+            raise RuntimeError("OpenAI Responses result omitted x-request-id")
+
+        body = response.json()
+        text = _output_text(body)
+        if not text:
+            raise RuntimeError("OpenAI Responses result omitted structured output text")
+        action = json.loads(text)
+        if not isinstance(action, dict):
+            raise RuntimeError("OpenAI Responses structured output is not an object")
+
+        raw_usage = body.get("usage")
+        if not isinstance(raw_usage, dict):
+            raise RuntimeError("OpenAI Responses result omitted usage")
+        input_tokens = _strict_nonnegative_int(raw_usage.get("input_tokens"), "input_tokens")
+        output_tokens = _strict_nonnegative_int(raw_usage.get("output_tokens"), "output_tokens")
+        total_tokens = _strict_nonnegative_int(raw_usage.get("total_tokens"), "total_tokens")
+        if total_tokens != input_tokens + output_tokens:
+            raise RuntimeError("OpenAI Responses usage totals are inconsistent")
+        details = raw_usage.get("output_tokens_details")
+        reasoning_tokens = None
+        if isinstance(details, dict) and details.get("reasoning_tokens") is not None:
+            reasoning_tokens = _strict_nonnegative_int(
+                details.get("reasoning_tokens"), "reasoning_tokens"
+            )
+
+        response_id = str(body.get("id") or "").strip()
+        request_ids = {"x-request-id": request_id}
+        if response_id:
+            request_ids["response-id"] = response_id
+        usage = {
+            "request_id": request_id,
+            "request_ids": request_ids,
+            "model": str(body.get("model") or self.model),
+            "reasoning_effort": REASONING_EFFORT,
+            "input_tokens": input_tokens,
+            "output_tokens": output_tokens,
+            "reasoning_tokens": reasoning_tokens,
+            "request_payload_sha256": hashlib.sha256(serialized).hexdigest(),
+            "estimated_input_tokens": max(1, len(serialized) // 4),
+        }
+        return action, usage
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(
+        description="Run the model-backed Agent Developer benchmark through the OpenAI Responses API"
+    )
+    parser.add_argument("--model", default=DEFAULT_MODEL)
+    parser.add_argument("--api-base", default=DEFAULT_API_BASE)
+    parser.add_argument(
+        "--output",
+        type=Path,
+        default=REPO_ROOT / "eval" / "agent_developer_v1" / "results" / "model-benchmark.json",
+    )
+    parser.add_argument("--task", action="append", dest="tasks")
+    parser.add_argument("--min-pass-rate", type=float, default=0.0)
+    args = parser.parse_args(argv)
+    if args.model != DEFAULT_MODEL:
+        parser.error(f"live closure is pinned to {DEFAULT_MODEL}")
+    if not 0.0 <= args.min_pass_rate <= 1.0:
+        parser.error("--min-pass-rate must be between 0 and 1")
+
+    token = os.environ.get("OPENAI_API_KEY") or ""
+    if not token.strip():
+        print("Agent Developer OpenAI benchmark: missing OPENAI_API_KEY")
+        return 2
+
+    planner = OpenAIAPIPlanner(
+        token,
+        model=args.model,
+        api_base=args.api_base,
+    )
+    report = run_benchmark(planner, task_ids=set(args.tasks) if args.tasks else None)
+    args.output.parent.mkdir(parents=True, exist_ok=True)
+    args.output.write_text(
+        json.dumps(report, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    print(
+        f"Agent Developer OpenAI benchmark: model={args.model}; reasoning={REASONING_EFFORT}; "
+        f"{report['passed_tasks']}/{report['task_count']} pass; "
+        f"scope={report['scope_accuracy']:.3f}; recovery={report['recovery_accuracy']:.3f}; "
+        f"false-supported={report['false_supported']}; contamination={report['forbidden_source_contamination']}"
+    )
+    if report["infrastructure_errors"]:
+        for error in report["infrastructure_errors"]:
+            print(f"- infrastructure: {error}")
+        return 2
+    return 0 if float(report["pass_rate"]) >= args.min_pass_rate else 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

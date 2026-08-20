@@ -61,19 +61,55 @@ The model-visible surface is intentionally smaller than the evaluator surface:
 
 The scorer compares model-chosen calls with the same evaluator-owned target contract used by the provider-free protocol. It checks call budgets, exact scope/module selection, target status and sources, forbidden-source contamination, false support, and ambiguity recovery. For an ambiguity task it also accepts a strictly safer shortcut when the model derives the exact module path from the supplied working path and directly obtains the same target evidence; the benchmark does not force an unnecessary ambiguous-name call merely to imitate the oracle path.
 
-A trusted GitHub Models run is manual by design:
+The live closure is pinned to **`gpt-5.6-luna` with the `medium` variant**. The preferred local path uses the authenticated OpenCode chat session instead of requiring a direct API key. `scripts/opencode_chat_support.py` invokes `opencode run --format json --model <provider>/gpt-5.6-luna --variant medium` inside an isolated temporary project whose OpenCode permissions are denied, so the model cannot inspect repository/evaluator files or call shell, web, MCP, skills, or other tools.
+
+### One-command local closure
+
+From the repository root, with OpenCode already authenticated:
 
 ```bash
-AGENT_DEVELOPER_GITHUB_TOKEN=... \
-python scripts/run_agent_developer_model_benchmark.py \
-  --model openai/gpt-4o-mini \
-  --output eval/agent_developer_v1/results/model-benchmark.json
+uv run python scripts/run_live_model_closure.py \
+  --opencode-model openai/gpt-5.6-luna
 ```
 
-The repository workflow `.github/workflows/agent-developer-model-benchmark.yml` uses `workflow_dispatch`, read-only repository permission plus `models: read`, Python 3.13, and SHA-pinned Actions. It first reruns the provider-free product-scope contract, then executes the model benchmark and uploads the JSON report. It is intentionally **not** a required pull-request gate: provider availability, rate limits, and model behavior must not make deterministic CI non-reproducible. An explicit `--min-pass-rate`/workflow input can turn a trusted benchmark run into a chosen quality threshold without changing the permanent provider-free release gates.
+The orchestrator reuses an already complete passing Task 21 report unless `--force-task21` is supplied, runs all missing Agent Developer tasks, seals/verifies the Agent report, and then runs the provider-free committed-evidence contract test.
 
-The report records pass rate, scope accuracy, recovery accuracy, false support, forbidden-source contamination, provider/model identity, per-turn token usage, and the bounded model-chosen trajectories. Provider/transport failures are reported separately as infrastructure errors rather than being counted as a model-quality failure.
+Agent resume is provenance-bound. Every reusable OpenCode Agent turn must contain the exact current `benchmark_contract_sha256`, derived from the evaluator corpus/fixtures, OpenCode transport/runner, provider-free oracle gate, and DocAtlas Python runtime. If any of that contract changes, the old row is not reused and that task is run again. Result files, local caches, and this README are excluded from the fingerprint so recording/documenting evidence does not invalidate it.
+
+On evidence-complete success the files are:
+
+```text
+eval/results/task21_tool_choice_gate.json
+eval/agent_developer_v1/results/model-benchmark.json
+```
+
+The Agent Developer result directory may be ignored by repository defaults, so use `git add -f` for that report when recording evidence.
+
+The Agent benchmark deliberately has no retrospectively invented minimum pass-rate: the frozen verifier currently uses `--min-pass-rate 0.0`. A low pass-rate is retained as model-quality evidence rather than converted into an infrastructure failure. Closure still requires all 11 tasks to execute, no infrastructure errors, zero false-supported outcomes, zero forbidden-source contamination, current sealed task/oracle fingerprints, `medium` on every usage row, and exact benchmark-contract provenance for OpenCode rows.
+
+### Individual local OpenCode run
+
+```bash
+uv run python scripts/run_agent_developer_opencode_chat.py \
+  --opencode-model openai/gpt-5.6-luna \
+  --resume \
+  --output eval/agent_developer_v1/results/model-benchmark.json
+
+uv run python scripts/verify_agent_developer_model_report.py \
+  eval/agent_developer_v1/results/model-benchmark.json \
+  --seal \
+  --expected-model gpt-5.6-luna \
+  --min-pass-rate 0.0
+```
+
+### Optional direct OpenAI API path
+
+The direct Responses API runners and manual GitHub Actions workflows remain available as an optional transport. They are fixed to Luna/medium and use `OPENAI_API_KEY`, but they are intentionally **not** required pull-request gates: provider availability, credentials, rate limits, and model behavior must not make deterministic CI non-reproducible.
+
+GitHub Models is not a supported live provider for this benchmark anymore: its inference service was retired in July 2026. Historical GitHub Models report/provider code may remain for audit compatibility, but new live evidence must use an active provider.
+
+The report records pass rate, scope accuracy, recovery accuracy, false support, forbidden-source contamination, provider/model identity, per-turn token usage, reasoning effort, request/session identifiers, and the bounded model-chosen trajectories. Provider/transport failures are reported separately as infrastructure errors rather than being counted as model-quality failures.
 
 ## Current closure
 
-After the scope/recovery contract hardening, the provider-free oracle closes all **11/11** reviewed trajectories. Module ambiguity remains fail-closed, but the bounded response preserves `operational_reason_code=module_ambiguous`, returns at most eight exact `module_candidates`, recommends public `docs_status(action="project", details=true)`, verifies both module identities in that response, and performs the successful retry with an exact `module_path`. The dependency trajectory now proves both module-local evidence and the exact dependency-prefetch recovery within two context calls. The permanent `advanced-contract` CI job runs this protocol on every pull request and push to `main`; the separate manual model-backed lane measures autonomous planning without replacing that deterministic gate.
+After the scope/recovery contract hardening, the provider-free oracle closes all **11/11** reviewed trajectories. Module ambiguity remains fail-closed, but the bounded response preserves `operational_reason_code=module_ambiguous`, returns at most eight exact `module_candidates`, recommends public `docs_status(action="project", details=true)`, verifies both module identities in that response, and performs the successful retry with an exact `module_path`. The dependency trajectory now proves both module-local evidence and the exact dependency-prefetch recovery within two context calls. The permanent `advanced-contract` CI job runs this protocol on every pull request and push to `main`; the separate model-backed lane measures autonomous planning without replacing that deterministic gate.

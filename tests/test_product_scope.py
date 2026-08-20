@@ -7,6 +7,8 @@ import pytest
 
 import eval.agent_developer_v1.model_benchmark as model_benchmark
 import scripts.run_agent_developer_gate as agent_gate
+from scripts.opencode_chat_support import OpenCodeModelOutputError
+from scripts.run_agent_developer_opencode_chat import OpenCodeChatPlanner
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -243,6 +245,34 @@ def _assert_agent_developer_model_benchmark_contract() -> None:
     ):
         assert forbidden_tool not in serialized_schema
 
+    usage = {
+        "request_id": "ses-format-failure",
+        "request_ids": {"opencode-session-1": "ses-format-failure"},
+        "model": "gpt-5.6-luna",
+        "reasoning_effort": "medium",
+        "input_tokens": 10,
+        "output_tokens": 2,
+        "reasoning_tokens": 1,
+        "request_payload_sha256": "a" * 64,
+        "estimated_input_tokens": 10,
+    }
+    planner = OpenCodeChatPlanner.__new__(OpenCodeChatPlanner)
+
+    class _FormatFailingClient:
+        def complete_json(self, **_kwargs):
+            raise OpenCodeModelOutputError(
+                "no schema-valid JSON",
+                usage=usage,
+            )
+
+    planner.model_id = "openai/gpt-5.6-luna"
+    planner._client = _FormatFailingClient()
+    invalid_action, invalid_usage = planner.choose(messages)
+    assert invalid_action["action"] == "invalid_model_output"
+    assert invalid_usage["model_output_valid"] is False
+    assert invalid_usage["model_output_error"] == "schema_invalid_after_format_repair"
+    assert invalid_usage["request_id"] == "ses-format-failure"
+
     module_task = _agent_model_oracle_task("module_definition_supported")
     exact = _model_context_record(
         question="What is OrdersDraftStore?",
@@ -300,10 +330,12 @@ def _assert_agent_developer_model_benchmark_contract() -> None:
     assert "  workflow_dispatch:" in trigger_block
     assert "pull_request:" not in trigger_block
     assert "push:" not in trigger_block
-    assert "models: read" in workflow
-    assert "AGENT_DEVELOPER_GITHUB_TOKEN: ${{ github.token }}" in workflow
-    assert "python scripts/run_agent_developer_model_benchmark.py" in workflow
-    assert "python -m pytest tests/test_product_scope.py -q" in workflow
+    assert "OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}" in workflow
+    assert "python scripts/run_agent_developer_openai_benchmark.py" in workflow
+    assert (
+        "python -m pytest tests/test_product_scope.py tests/docs/test_tool_choice_eval.py -q"
+        in workflow
+    )
     for line in workflow.splitlines():
         if "uses:" in line:
             ref = line.split("@", 1)[1].split()[0]
