@@ -26,18 +26,26 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 
 
 def benchmark_contract_sha256() -> str:
-    """Fingerprint the code/data that can change Agent Developer live evidence.
+    """Fingerprint files that can change Agent Developer live evidence.
 
-    Resume is intentionally invalidated by any change to the evaluator corpus,
-    OpenCode transport/runner, provider-free oracle gate, or DocAtlas Python
-    runtime. Result files are excluded so recording evidence does not change the
-    contract it attests to.
+    Resume is invalidated by evaluator corpus/fixture changes, OpenCode
+    transport/runner changes, provider-free oracle changes, or DocAtlas Python
+    runtime changes. Result files, local caches, and the protocol README are
+    excluded so the fingerprint is machine-stable and recording evidence does
+    not change the contract it attests to.
     """
     paths: set[Path] = set()
     agent_root = REPO_ROOT / "eval" / "agent_developer_v1"
     for path in agent_root.rglob("*"):
-        if path.is_file() and "results" not in path.relative_to(agent_root).parts:
-            paths.add(path)
+        if not path.is_file():
+            continue
+        relative = path.relative_to(agent_root)
+        if "results" in relative.parts or "__pycache__" in relative.parts:
+            continue
+        if relative == Path("README.md"):
+            continue
+        paths.add(path)
+
     for relative in (
         "scripts/opencode_chat_support.py",
         "scripts/run_agent_developer_opencode_chat.py",
@@ -45,7 +53,7 @@ def benchmark_contract_sha256() -> str:
     ):
         paths.add(REPO_ROOT / relative)
     for path in (REPO_ROOT / "docmancer").rglob("*.py"):
-        if path.is_file():
+        if path.is_file() and "__pycache__" not in path.parts:
             paths.add(path)
 
     digest = hashlib.sha256()
@@ -69,11 +77,10 @@ class OpenCodeChatPlanner:
 
     def _bind_contract(self, usage: dict[str, Any]) -> dict[str, Any]:
         bound = dict(usage)
-        bound["benchmark_contract_sha256"] = getattr(
-            self,
-            "_benchmark_contract_sha256",
-            benchmark_contract_sha256(),
-        )
+        contract = getattr(self, "_benchmark_contract_sha256", None)
+        if not isinstance(contract, str) or not contract:
+            contract = benchmark_contract_sha256()
+        bound["benchmark_contract_sha256"] = contract
         return bound
 
     def choose(
