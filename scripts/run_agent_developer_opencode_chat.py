@@ -64,8 +64,6 @@ def main(argv: list[str] | None = None) -> int:
         planner,
         task_ids=set(args.tasks) if args.tasks else None,
     )
-    report["opencode_model_id"] = args.opencode_model
-    report["reasoning_effort"] = OPENCODE_VARIANT
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(
         json.dumps(report, indent=2, sort_keys=True) + "\n",
