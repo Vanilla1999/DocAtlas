@@ -7,7 +7,6 @@ on:
 
 permissions:
   contents: write
-  models: read
 
 jobs:
   live:
@@ -27,17 +26,16 @@ jobs:
       - name: Run both trusted live evaluations
         id: live
         env:
-          TASK21_GITHUB_TOKEN: ${{ github.token }}
-          AGENT_DEVELOPER_GITHUB_TOKEN: ${{ github.token }}
-          MODEL: openai/gpt-4o-mini
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          MODEL: gpt-5.4-mini
         run: |
           set +e
-          python scripts/run_task21_github_models_live.py \
+          python scripts/run_task21_openai_live.py \
             --model "$MODEL" \
             --output eval/results/task21_tool_choice_gate.json
           task21_rc=$?
 
-          python scripts/run_agent_developer_model_benchmark.py \
+          python scripts/run_agent_developer_openai_benchmark.py \
             --model "$MODEL" \
             --min-pass-rate 0.0 \
             --output eval/agent_developer_v1/results/model-benchmark.json
@@ -110,7 +108,7 @@ jobs:
           if git diff --cached --quiet; then
             exit 0
           fi
-          git commit -m "Record trusted live model evaluation evidence"
+          git commit -m "Record trusted OpenAI live evaluation evidence"
           git push origin HEAD:eval/live-model-closure
       - name: Enforce successful live closure
         if: always()
