@@ -21,6 +21,8 @@ Hard invariants:
 - stale or dependency-missing evidence returns typed recovery instead of edit authorization;
 - setup-only adversarial fixture files are path-bounded, byte-bounded, temporary, and never alter the frozen v1 corpus.
 
+The bounded `docs_status` projection keeps recovery metadata small while preserving the existing active-index identity contract (`db_path`, `config_source`, `config_path`, and `retrieval_mode`) required by current clients.
+
 The companion mutation gate:
 
 ```bash
