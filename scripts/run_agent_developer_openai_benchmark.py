@@ -156,6 +156,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--task", action="append", dest="tasks")
     parser.add_argument("--min-pass-rate", type=float, default=0.0)
     args = parser.parse_args(argv)
+    if args.model != DEFAULT_MODEL:
+        parser.error(f"live closure is pinned to {DEFAULT_MODEL}")
     if not 0.0 <= args.min_pass_rate <= 1.0:
         parser.error("--min-pass-rate must be between 0 and 1")
 
