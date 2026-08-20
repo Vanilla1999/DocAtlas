@@ -61,7 +61,28 @@ The model-visible surface is intentionally smaller than the evaluator surface:
 
 The scorer compares model-chosen calls with the same evaluator-owned target contract used by the provider-free protocol. It checks call budgets, exact scope/module selection, target status and sources, forbidden-source contamination, false support, and ambiguity recovery. For an ambiguity task it also accepts a strictly safer shortcut when the model derives the exact module path from the supplied working path and directly obtains the same target evidence; the benchmark does not force an unnecessary ambiguous-name call merely to imitate the oracle path.
 
-A trusted OpenAI Responses API run is manual by design and is pinned to **`gpt-5.6-luna` with `reasoning.effort="medium"`**:
+The live closure is pinned to **`gpt-5.6-luna` with `reasoning.effort="medium"`** through the OpenAI Responses API. Both request builders set the effort explicitly, and provider-free tests assert the Luna/medium contract.
+
+### One-command local closure
+
+With `OPENAI_API_KEY` available in the local environment, run from the repository root:
+
+```bash
+python scripts/run_live_model_closure.py
+```
+
+The orchestrator runs the frozen Task 21 **20 × 3** tool-choice evaluation, all **11** Agent Developer tasks, seals/verifies the Agent Developer report, and then runs the provider-free committed-evidence contract tests. Failed reports are left in place for inspection but must not be committed as passing evidence.
+
+On success the two evidence files are:
+
+```text
+eval/results/task21_tool_choice_gate.json
+eval/agent_developer_v1/results/model-benchmark.json
+```
+
+The Agent Developer result directory may be ignored by the repository defaults, so use `git add -f` for that report when recording the passing evidence.
+
+### Individual/manual runs
 
 ```bash
 OPENAI_API_KEY=... \
@@ -76,12 +97,12 @@ python scripts/verify_agent_developer_model_report.py \
   --min-pass-rate 0.0
 ```
 
-The repository workflow `.github/workflows/agent-developer-model-benchmark.yml` uses `workflow_dispatch`, read-only repository permission, Python 3.13, SHA-pinned Actions, and the repository `OPENAI_API_KEY` secret. The model is not selectable in the workflow: the live lane is fixed to `gpt-5.6-luna`, while the runner fixes Responses reasoning effort to `medium`. It first reruns the provider-free product-scope contract, then executes the OpenAI Responses API benchmark, seals and verifies the report, and uploads the JSON artifact. It is intentionally **not** a required pull-request gate: provider availability, credentials, rate limits, and model behavior must not make deterministic CI non-reproducible. The `min_pass_rate` workflow input can turn a trusted benchmark run into a chosen quality threshold without changing the permanent provider-free release gates.
+The repository workflows `.github/workflows/task21-live-tool-choice.yml` and `.github/workflows/agent-developer-model-benchmark.yml` remain optional manual equivalents. They are fixed to Luna/medium and are intentionally **not** required pull-request gates: provider availability, credentials, rate limits, and model behavior must not make deterministic CI non-reproducible.
 
-The live policy uses `gpt-5.6-luna` with medium reasoning for both Task 21 and Agent Developer. GitHub Models is not a supported live provider for this benchmark anymore: its inference service was retired in July 2026. Historical GitHub Models report/provider code may remain for audit compatibility, but new live evidence must use the active OpenAI Responses API path.
+GitHub Models is not a supported live provider for this benchmark anymore: its inference service was retired in July 2026. Historical GitHub Models report/provider code may remain for audit compatibility, but new live evidence must use an active provider.
 
-The report records pass rate, scope accuracy, recovery accuracy, false support, forbidden-source contamination, provider/model identity, per-turn token usage (including the pinned reasoning effort), and the bounded model-chosen trajectories. Provider/transport failures are reported separately as infrastructure errors rather than being counted as a model-quality failure.
+The report records pass rate, scope accuracy, recovery accuracy, false support, forbidden-source contamination, provider/model identity, per-turn token usage, reasoning effort, and the bounded model-chosen trajectories. Provider/transport failures are reported separately as infrastructure errors rather than being counted as a model-quality failure.
 
 ## Current closure
 
-After the scope/recovery contract hardening, the provider-free oracle closes all **11/11** reviewed trajectories. Module ambiguity remains fail-closed, but the bounded response preserves `operational_reason_code=module_ambiguous`, returns at most eight exact `module_candidates`, recommends public `docs_status(action="project", details=true)`, verifies both module identities in that response, and performs the successful retry with an exact `module_path`. The dependency trajectory now proves both module-local evidence and the exact dependency-prefetch recovery within two context calls. The permanent `advanced-contract` CI job runs this protocol on every pull request and push to `main`; the separate manual model-backed lane measures autonomous planning without replacing that deterministic gate.
+After the scope/recovery contract hardening, the provider-free oracle closes all **11/11** reviewed trajectories. Module ambiguity remains fail-closed, but the bounded response preserves `operational_reason_code=module_ambiguous`, returns at most eight exact `module_candidates`, recommends public `docs_status(action="project", details=true)`, verifies both module identities in that response, and performs the successful retry with an exact `module_path`. The dependency trajectory now proves both module-local evidence and the exact dependency-prefetch recovery within two context calls. The permanent `advanced-contract` CI job runs this protocol on every pull request and push to `main`; the separate model-backed lane measures autonomous planning without replacing that deterministic gate.
