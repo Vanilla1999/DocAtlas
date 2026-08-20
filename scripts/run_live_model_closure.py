@@ -23,13 +23,13 @@ AGENT_REPORT = (
 
 
 def _run(label: str, args: Sequence[str]) -> int:
-    print(f"\n== {label} ==")
+    print(f"\n== {label} ==", flush=True)
     completed = subprocess.run(
         list(args),
         cwd=REPO_ROOT,
         check=False,
     )
-    print(f"{label}: exit={completed.returncode}")
+    print(f"{label}: exit={completed.returncode}", flush=True)
     return completed.returncode
 
 
@@ -77,7 +77,8 @@ def main() -> int:
 
     print(
         f"DocAtlas live closure: model={MODEL}; reasoning={REASONING_EFFORT}; "
-        "Task21=20x3; AgentDeveloper=11 tasks"
+        "Task21=20x3; AgentDeveloper=11 tasks",
+        flush=True,
     )
 
     task21_rc = _run(
