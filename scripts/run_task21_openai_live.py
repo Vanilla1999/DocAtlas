@@ -13,7 +13,6 @@ import httpx
 from docmancer.docs.tool_choice_eval import (
     OpenAICompatibleLowCostAdapter,
     _failure_report,
-    _openai_completion,
     evaluate_tool_choice,
     installed_guidance,
     public_tool_schemas,
@@ -21,9 +20,93 @@ from docmancer.docs.tool_choice_eval import (
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_MODEL = "gpt-5.4-mini"
+DEFAULT_MODEL = "gpt-5.6-luna"
 DEFAULT_API_BASE = "https://api.openai.com/v1"
 _RETRYABLE_STATUS_CODES = frozenset({429, 500, 502, 503, 504})
+
+
+def _responses_input(guidance: str, scenario: dict[str, Any]) -> list[dict[str, Any]]:
+    items: list[dict[str, Any]] = [{"role": "system", "content": guidance}]
+    messages = scenario.get("messages") or [
+        {"role": "user", "content": scenario["prompt"]}
+    ]
+    for message in messages:
+        role = str(message.get("role") or "")
+        if role in {"system", "developer", "user"}:
+            items.append({"role": role, "content": str(message.get("content") or "")})
+            continue
+        if role == "assistant":
+            calls = message.get("tool_calls") or []
+            if calls:
+                for call in calls:
+                    function = call.get("function") or {}
+                    items.append(
+                        {
+                            "type": "function_call",
+                            "call_id": str(call.get("id") or ""),
+                            "name": str(function.get("name") or ""),
+                            "arguments": str(function.get("arguments") or "{}"),
+                        }
+                    )
+            elif message.get("content") is not None:
+                items.append({"role": "assistant", "content": str(message["content"])})
+            continue
+        if role == "tool":
+            items.append(
+                {
+                    "type": "function_call_output",
+                    "call_id": str(message.get("tool_call_id") or ""),
+                    "output": str(message.get("content") or ""),
+                }
+            )
+    return items
+
+
+def _responses_completion(
+    *, api_base: str, api_key: str, model: str
+) -> Callable[[dict[str, Any]], dict[str, Any]]:
+    def complete(payload: dict[str, Any]) -> dict[str, Any]:
+        tools = [
+            {
+                "type": "function",
+                "name": tool["name"],
+                "description": tool["description"],
+                "parameters": tool["inputSchema"],
+            }
+            for tool in payload["tools"]
+        ]
+        response = httpx.post(
+            api_base.rstrip("/") + "/responses",
+            headers={
+                "Authorization": f"Bearer {api_key}",
+                "Content-Type": "application/json",
+            },
+            json={
+                "model": model,
+                "input": _responses_input(payload["guidance"], payload["scenario"]),
+                "tools": tools,
+                "tool_choice": "auto",
+                "parallel_tool_calls": False,
+                "max_output_tokens": 768,
+            },
+            timeout=90,
+        )
+        response.raise_for_status()
+        body = response.json()
+        calls = [
+            item
+            for item in body.get("output") or []
+            if isinstance(item, dict) and item.get("type") == "function_call"
+        ]
+        if not calls:
+            return {"tool": None}
+        call = calls[0]
+        return {
+            "tool": call.get("name"),
+            "arguments": json.loads(call.get("arguments") or "{}"),
+        }
+
+    return complete
 
 
 def _retrying_completion(
@@ -50,7 +133,7 @@ def _retrying_completion(
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
-        description="Run the frozen Task 21 tool-choice evaluation through the OpenAI API"
+        description="Run the frozen Task 21 tool-choice evaluation through the OpenAI Responses API"
     )
     parser.add_argument("--model", default=DEFAULT_MODEL)
     parser.add_argument("--api-base", default=DEFAULT_API_BASE)
@@ -69,14 +152,15 @@ def main(argv: list[str] | None = None) -> int:
             raise ValueError("OPENAI_API_KEY is required")
         guidance = installed_guidance()
         schemas = public_tool_schemas()
-        raw_completion = _openai_completion(
-            api_base=args.api_base,
-            api_key=token,
-            model=args.model,
-        )
         adapter = OpenAICompatibleLowCostAdapter(
             model_version=args.model,
-            completion=_retrying_completion(raw_completion),
+            completion=_retrying_completion(
+                _responses_completion(
+                    api_base=args.api_base,
+                    api_key=token,
+                    model=args.model,
+                )
+            ),
         )
         report = evaluate_tool_choice(
             adapter,
