@@ -92,11 +92,26 @@ def test_implementation_fact_scenarios_do_not_expect_a_docs_tool():
 def test_committed_live_report_is_explicit_and_matches_frozen_scenarios():
     report_path = Path("eval/results/task21_tool_choice_gate.json")
     report = json.loads(report_path.read_text(encoding="utf-8"))
-    assert report["passed"] is False
+    results = report["results"]
+
     assert report["tool_schema_version"].startswith("sha256:")
-    assert {item["scenario_id"] for item in report["results"]} == {
+    assert report["scenario_count"] == len(SCENARIOS)
+    assert report["repeats"] == REPEATS
+    assert len(results) == len(SCENARIOS) * REPEATS
+    assert {item["scenario_id"] for item in results} == {
         scenario.scenario_id for scenario in SCENARIOS
     }
+
+    model_version = str((report.get("adapter") or {}).get("model_version") or "")
+    if model_version == "not-run":
+        assert report["passed"] is False
+        assert all(item.get("status") == "not_run" for item in results)
+        return
+
+    assert model_version == "gpt-5.6-luna"
+    assert report.get("reasoning_effort") == "medium"
+    assert report["passed"] is True
+    assert all(item.get("status") != "not_run" for item in results)
 
 
 def test_live_evaluation_failure_replaces_a_stale_passing_report(tmp_path, monkeypatch):
