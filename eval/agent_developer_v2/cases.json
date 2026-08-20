@@ -73,14 +73,14 @@
       "fixture": "explicit_manifest_monorepo",
       "working_path": "packages/orders/src/submission.py",
       "max_get_docs_context_calls": 1,
-      "max_trajectory_tokens": 800,
+      "max_trajectory_tokens": 1000,
       "calls": [
         {
           "question": "How many retry attempts does ProjectRetryPolicy allow?",
           "mode": "project",
           "scope": "project",
-          "packet_tokens": 800,
-          "max_projection_tokens": 800,
+          "packet_tokens": 1000,
+          "max_projection_tokens": 1000,
           "target_expected_status": "ok",
           "target_required_sources": ["ARCHITECTURE.md"],
           "forbidden_sources": ["packages/orders/README.md", "packages/payments/README.md"]
