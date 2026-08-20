@@ -1,17 +1,23 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+import argparse
 import json
-import os
+import shutil
 import subprocess
 import sys
 from pathlib import Path
 from typing import Sequence
 
+from scripts.opencode_chat_support import (
+    DEFAULT_OPENCODE_MODEL,
+    OPENCODE_VARIANT,
+    REPORT_MODEL,
+    canonical_model_name,
+)
+
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-MODEL = "gpt-5.6-luna"
-REASONING_EFFORT = "medium"
 TASK21_REPORT = REPO_ROOT / "eval" / "results" / "task21_tool_choice_gate.json"
 AGENT_REPORT = (
     REPO_ROOT
@@ -44,8 +50,9 @@ def _print_summary() -> None:
         print(
             "Task 21: "
             f"passed={report.get('passed')}; "
+            f"provider={report.get('provider_id')}; "
             f"model={(report.get('adapter') or {}).get('model_version')}; "
-            f"reasoning={report.get('reasoning_effort')}; "
+            f"variant={report.get('reasoning_effort')}; "
             f"first-tool={metrics.get('first_tool_accuracy')}; "
             f"copy={metrics.get('next_action_copy_accuracy')}; "
             f"retry={metrics.get('original_question_retry_rate')}"
@@ -61,6 +68,7 @@ def _print_summary() -> None:
         report = _load(AGENT_REPORT)
         print(
             "Agent Developer: "
+            f"provider={report.get('provider_id')}; "
             f"executed={report.get('executed_task_count')}/{report.get('task_count')}; "
             f"passed={report.get('passed_tasks')}; "
             f"pass-rate={report.get('pass_rate')}; "
@@ -84,17 +92,25 @@ def _agent_report_complete() -> bool:
     )
 
 
-def main() -> int:
-    if not (os.environ.get("OPENAI_API_KEY") or "").strip():
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(
+        description="Run DocAtlas live closure through the authenticated OpenCode chat provider"
+    )
+    parser.add_argument("--opencode-model", default=DEFAULT_OPENCODE_MODEL)
+    args = parser.parse_args(argv)
+
+    if canonical_model_name(args.opencode_model) != REPORT_MODEL:
+        parser.error(f"live closure is pinned to {REPORT_MODEL}")
+    if not shutil.which("opencode"):
         print(
-            "OPENAI_API_KEY is not set in this shell. "
-            "No live evaluation was started.",
+            "opencode executable was not found in PATH. No live evaluation was started.",
             file=sys.stderr,
         )
         return 2
 
     print(
-        f"DocAtlas live closure: model={MODEL}; reasoning={REASONING_EFFORT}; "
+        f"DocAtlas live closure: provider=opencode-chat; "
+        f"model={args.opencode_model}; variant={OPENCODE_VARIANT}; "
         "Task21=20x3; AgentDeveloper=11 tasks",
         flush=True,
     )
@@ -103,9 +119,9 @@ def main() -> int:
         "Task 21 live tool choice",
         [
             sys.executable,
-            "scripts/run_task21_openai_live.py",
-            "--model",
-            MODEL,
+            "scripts/run_task21_opencode_chat.py",
+            "--opencode-model",
+            args.opencode_model,
             "--output",
             str(TASK21_REPORT),
         ],
@@ -115,9 +131,9 @@ def main() -> int:
         "Agent Developer live benchmark",
         [
             sys.executable,
-            "scripts/run_agent_developer_openai_benchmark.py",
-            "--model",
-            MODEL,
+            "scripts/run_agent_developer_opencode_chat.py",
+            "--opencode-model",
+            args.opencode_model,
             "--min-pass-rate",
             "0.0",
             "--output",
@@ -135,7 +151,7 @@ def main() -> int:
                 str(AGENT_REPORT),
                 "--seal",
                 "--expected-model",
-                MODEL,
+                REPORT_MODEL,
                 "--min-pass-rate",
                 "0.0",
             ],
