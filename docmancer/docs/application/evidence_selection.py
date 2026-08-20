@@ -16,4 +16,6 @@ from ._evidence_selection_part03 import *  # noqa: F401,F403
 
 from ._evidence_selection_part04 import *  # noqa: F401,F403
 
+from .proofability import *  # noqa: F401,F403
+
 __all__=[n for n in globals() if not n.startswith("__")]
