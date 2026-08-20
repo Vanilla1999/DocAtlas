@@ -130,7 +130,7 @@ jobs:
     if: github.event_name == 'workflow_dispatch'
     needs: [required-release]
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
     environment: release
     permissions:
       contents: read
@@ -148,16 +148,108 @@ jobs:
         with:
           name: release-dist
           path: dist
+      - name: Capture exact artifacts submitted to PyPI
+        run: |
+          python - <<'PY'
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+
+          artifacts = sorted([
+              *Path("dist").glob("*.whl"),
+              *Path("dist").glob("*.tar.gz"),
+          ])
+          if len(artifacts) != 2:
+              raise SystemExit(f"expected one wheel and one sdist, found: {[p.name for p in artifacts]}")
+          expected = {
+              path.name: hashlib.sha256(path.read_bytes()).hexdigest()
+              for path in artifacts
+          }
+          target = Path(os.environ["RUNNER_TEMP"]) / "docatlas-expected-public-artifacts.json"
+          target.write_text(json.dumps(expected, sort_keys=True), encoding="utf-8")
+          print(json.dumps(expected, indent=2, sort_keys=True))
+          PY
       - run: rm dist/release-manifest.json
       - uses: actions/attest-build-provenance@e8998f949152b193b063cb0ec769d69d929409be # v2.4.0
         with:
           subject-path: "dist/*"
       - uses: pypa/gh-action-pypi-publish@ed0c53931b1dc9bd32cbe73a98c7f6766f8a527e # release/v1
-      - name: Verify the exact public release
+      - name: Verify exact public wheel and sdist bytes
+        env:
+          RELEASE_TAG: ${{ inputs.tag }}
+        run: |
+          python - <<'PY'
+          import hashlib
+          import json
+          import os
+          import time
+          import urllib.error
+          import urllib.request
+          from pathlib import Path
+
+          version = os.environ["RELEASE_TAG"].removeprefix("v")
+          expected_path = Path(os.environ["RUNNER_TEMP"]) / "docatlas-expected-public-artifacts.json"
+          expected = json.loads(expected_path.read_text(encoding="utf-8"))
+          metadata_url = f"https://pypi.org/pypi/doc-atlas/{version}/json"
+          last_error = None
+
+          for attempt in range(1, 6):
+              try:
+                  request = urllib.request.Request(
+                      metadata_url,
+                      headers={"Cache-Control": "no-cache", "User-Agent": "DocAtlas-release-verifier/1"},
+                  )
+                  with urllib.request.urlopen(request, timeout=30) as response:
+                      metadata = json.load(response)
+                  rows = {
+                      row["filename"]: row
+                      for row in metadata.get("urls", [])
+                      if row.get("packagetype") in {"bdist_wheel", "sdist"}
+                  }
+                  if set(rows) != set(expected):
+                      raise RuntimeError(
+                          f"registry artifact names do not match submitted artifacts: "
+                          f"expected={sorted(expected)} actual={sorted(rows)}"
+                      )
+
+                  actual = {}
+                  for filename, row in sorted(rows.items()):
+                      with urllib.request.urlopen(row["url"], timeout=60) as response:
+                          data = response.read()
+                      digest = hashlib.sha256(data).hexdigest()
+                      metadata_digest = str((row.get("digests") or {}).get("sha256") or "")
+                      if metadata_digest != digest:
+                          raise RuntimeError(
+                              f"PyPI metadata/content hash mismatch for {filename}: "
+                              f"metadata={metadata_digest} downloaded={digest}"
+                          )
+                      actual[filename] = digest
+
+                  if actual != expected:
+                      raise RuntimeError(
+                          f"published artifact bytes differ from gated build: "
+                          f"expected={expected} actual={actual}"
+                      )
+                  print("Exact published-artifact verification: PASS")
+                  print(json.dumps(actual, indent=2, sort_keys=True))
+                  break
+              except (urllib.error.URLError, TimeoutError, RuntimeError) as exc:
+                  last_error = exc
+                  if attempt == 5:
+                      raise SystemExit(
+                          f"exact public artifact verification failed after {attempt} attempts: {exc}"
+                      ) from exc
+                  time.sleep(attempt * 15)
+          else:
+              raise SystemExit(f"exact public artifact verification failed: {last_error}")
+          PY
+      - name: Verify the exact public release installation and MCP surface
         env:
           RELEASE_TAG: ${{ inputs.tag }}
         run: |
           RELEASE_VERSION="${RELEASE_TAG#v}"
+          export PIP_NO_CACHE_DIR=1
           for attempt in 1 2 3 4 5; do
             if DOCATLAS_INSTALL_VERSION="$RELEASE_VERSION" \
               DOCATLAS_EXPECT_VERSION="$RELEASE_VERSION" \
@@ -171,4 +263,5 @@ jobs:
             sleep "$((attempt * 15))"
           done
           cd "$(mktemp -d)"
+          doc-atlas --version
           python "$GITHUB_WORKSPACE/scripts/docs_mcp_stdio_smoke.py"

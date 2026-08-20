@@ -80,6 +80,38 @@ jobs:
       - name: Installer smoke tests
         run: sh scripts/test-install.sh
 
+  platform-smoke:
+    name: platform-smoke (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-latest]
+
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.12"
+
+      - name: Install cross-platform smoke dependencies
+        run: python -m pip install -e ".[dev]"
+
+      - name: Verify package and CLI surface
+        run: |
+          python -m compileall -q docmancer eval scripts
+          doc-atlas --help
+          doc-atlas --version
+          python -m pytest -q tests/docs/test_mcp_docs_tools_registration.py tests/test_cli.py tests/test_support_surface_policy.py
+
+      - name: Verify installed Docs MCP over stdio
+        run: python scripts/docs_mcp_stdio_smoke.py
+
   test:
     runs-on: ubuntu-latest
     timeout-minutes: 35
@@ -177,12 +209,13 @@ jobs:
           python -m compileall -q docmancer eval scripts tests
           python scripts/check_python_module_size.py
           python scripts/verify_agent_developer_model_report.py --self-test
+          python scripts/main_ruleset.py --self-test
           git diff --check
 
   required-ci:
     name: required-ci
     if: always()
-    needs: [docs-contract, installer-smoke, test, advanced-contract, static-contract]
+    needs: [docs-contract, installer-smoke, platform-smoke, test, advanced-contract, static-contract]
     runs-on: ubuntu-latest
     timeout-minutes: 5
 
@@ -191,10 +224,11 @@ jobs:
         env:
           DOCS_CONTRACT: ${{ needs.docs-contract.result }}
           INSTALLER_SMOKE: ${{ needs.installer-smoke.result }}
+          PLATFORM_SMOKE: ${{ needs.platform-smoke.result }}
           CORE_TESTS: ${{ needs.test.result }}
           ADVANCED_CONTRACT: ${{ needs.advanced-contract.result }}
           STATIC_CONTRACT: ${{ needs.static-contract.result }}
         run: |
-          for result in "$DOCS_CONTRACT" "$INSTALLER_SMOKE" "$CORE_TESTS" "$ADVANCED_CONTRACT" "$STATIC_CONTRACT"; do
+          for result in "$DOCS_CONTRACT" "$INSTALLER_SMOKE" "$PLATFORM_SMOKE" "$CORE_TESTS" "$ADVANCED_CONTRACT" "$STATIC_CONTRACT"; do
             test "$result" = "success"
           done
