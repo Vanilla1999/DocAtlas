@@ -3,11 +3,6 @@ name: Agent Developer model benchmark
 on:
   workflow_dispatch:
     inputs:
-      model:
-        description: OpenAI API model id
-        required: true
-        default: gpt-5.6-luna
-        type: string
       min_pass_rate:
         description: Optional quality threshold between 0 and 1
         required: true
@@ -35,23 +30,22 @@ jobs:
       - name: Install benchmark dependencies
         run: python -m pip install -e ".[dev]"
       - name: Verify provider-free benchmark contract
-        run: python -m pytest tests/test_product_scope.py -q
-      - name: Run and verify model-backed Agent Developer benchmark
+        run: python -m pytest tests/test_product_scope.py tests/test_live_evaluation_evidence.py -q
+      - name: Run and verify Agent Developer benchmark (gpt-5.6-luna, medium)
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          MODEL: ${{ inputs.model }}
           MIN_PASS_RATE: ${{ inputs.min_pass_rate }}
         run: |
           set +e
           python scripts/run_agent_developer_openai_benchmark.py \
-            --model "$MODEL" \
+            --model gpt-5.6-luna \
             --min-pass-rate 0.0 \
             --output eval/agent_developer_v1/results/model-benchmark.json
           benchmark_rc=$?
           python scripts/verify_agent_developer_model_report.py \
             eval/agent_developer_v1/results/model-benchmark.json \
             --seal \
-            --expected-model "$MODEL" \
+            --expected-model gpt-5.6-luna \
             --min-pass-rate "$MIN_PASS_RATE"
           verify_rc=$?
           set -e
