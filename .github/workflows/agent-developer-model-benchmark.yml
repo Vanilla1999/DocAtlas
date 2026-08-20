@@ -6,7 +6,7 @@ on:
       model:
         description: OpenAI API model id
         required: true
-        default: gpt-5.4-mini
+        default: gpt-5.6-luna
         type: string
       min_pass_rate:
         description: Optional quality threshold between 0 and 1
