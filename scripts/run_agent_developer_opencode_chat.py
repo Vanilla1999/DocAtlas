@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 from pathlib import Path
 from typing import Any
@@ -24,6 +25,39 @@ from scripts.opencode_chat_support import (
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
 
+def benchmark_contract_sha256() -> str:
+    """Fingerprint the code/data that can change Agent Developer live evidence.
+
+    Resume is intentionally invalidated by any change to the evaluator corpus,
+    OpenCode transport/runner, provider-free oracle gate, or DocAtlas Python
+    runtime. Result files are excluded so recording evidence does not change the
+    contract it attests to.
+    """
+    paths: set[Path] = set()
+    agent_root = REPO_ROOT / "eval" / "agent_developer_v1"
+    for path in agent_root.rglob("*"):
+        if path.is_file() and "results" not in path.relative_to(agent_root).parts:
+            paths.add(path)
+    for relative in (
+        "scripts/opencode_chat_support.py",
+        "scripts/run_agent_developer_opencode_chat.py",
+        "scripts/run_agent_developer_gate.py",
+    ):
+        paths.add(REPO_ROOT / relative)
+    for path in (REPO_ROOT / "docmancer").rglob("*.py"):
+        if path.is_file():
+            paths.add(path)
+
+    digest = hashlib.sha256()
+    for path in sorted(paths, key=lambda item: item.relative_to(REPO_ROOT).as_posix()):
+        relative = path.relative_to(REPO_ROOT).as_posix().encode("utf-8")
+        digest.update(relative)
+        digest.update(b"\0")
+        digest.update(path.read_bytes())
+        digest.update(b"\0")
+    return digest.hexdigest()
+
+
 class OpenCodeChatPlanner:
     provider_id = "opencode-chat"
     model = REPORT_MODEL
@@ -31,23 +65,34 @@ class OpenCodeChatPlanner:
     def __init__(self, *, model_id: str = DEFAULT_OPENCODE_MODEL) -> None:
         self.model_id = model_id
         self._client = OpenCodeJSONClient(model_id=model_id)
+        self._benchmark_contract_sha256 = benchmark_contract_sha256()
+
+    def _bind_contract(self, usage: dict[str, Any]) -> dict[str, Any]:
+        bound = dict(usage)
+        bound["benchmark_contract_sha256"] = getattr(
+            self,
+            "_benchmark_contract_sha256",
+            benchmark_contract_sha256(),
+        )
+        return bound
 
     def choose(
         self,
         messages: list[dict[str, str]],
     ) -> tuple[dict[str, Any], dict[str, Any]]:
         try:
-            return self._client.complete_json(
+            action, usage = self._client.complete_json(
                 messages=[dict(message) for message in messages],
                 schema=action_schema(),
                 purpose="Agent Developer next read-only DocAtlas evidence action",
             )
+            return action, self._bind_contract(usage)
         except OpenCodeModelOutputError as exc:
             # A normal model response that still violates the structured-output
             # contract after bounded format repair is model-quality evidence, not
             # an infrastructure outage. Return a deliberately invalid action so
             # the existing scorer fails this task and continues to the next one.
-            usage = dict(exc.usage)
+            usage = self._bind_contract(exc.usage)
             usage["model_output_valid"] = False
             usage["model_output_error"] = "schema_invalid_after_format_repair"
             return (
@@ -81,6 +126,8 @@ def _load_reusable_results(
         or report.get("protocol") != REPORT_PROTOCOL
     ):
         return []
+
+    current_contract = benchmark_contract_sha256()
     reusable: list[dict[str, Any]] = []
     seen: set[str] = set()
     for result in report.get("tasks") or []:
@@ -91,7 +138,14 @@ def _load_reusable_results(
             continue
         if not isinstance(result.get("score"), dict):
             continue
-        if not isinstance(result.get("usage"), list) or not result["usage"]:
+        usage = result.get("usage")
+        if not isinstance(usage, list) or not usage:
+            continue
+        if not all(
+            isinstance(row, dict)
+            and row.get("benchmark_contract_sha256") == current_contract
+            for row in usage
+        ):
             continue
         reusable.append(result)
         seen.add(task_id)
@@ -188,7 +242,10 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--resume",
         action="store_true",
-        help="reuse already executed OpenCode task results from --output",
+        help=(
+            "reuse only task results produced by the exact current benchmark "
+            "contract fingerprint"
+        ),
     )
     args = parser.parse_args(argv)
     if not 0.0 <= args.min_pass_rate <= 1.0:
@@ -208,11 +265,11 @@ def main(argv: list[str] | None = None) -> int:
     )
     reusable_ids = {str(result["task_id"]) for result in reusable}
     remaining_ids = selected_ids - reusable_ids
-    if reusable:
+    if args.resume:
         print(
-            "Resuming Agent Developer: "
-            f"reusing {len(reusable)}/{len(selected_tasks)} completed tasks; "
-            f"running {len(remaining_ids)} remaining."
+            "Agent Developer resume provenance: "
+            f"reusing {len(reusable)}/{len(selected_tasks)} exact-contract tasks; "
+            f"running {len(remaining_ids)}."
         )
 
     planner = OpenCodeChatPlanner(model_id=args.opencode_model)
