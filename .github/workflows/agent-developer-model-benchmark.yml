@@ -4,9 +4,9 @@ on:
   workflow_dispatch:
     inputs:
       model:
-        description: GitHub Models model id
+        description: OpenAI API model id
         required: true
-        default: openai/gpt-4o-mini
+        default: gpt-5.4-mini
         type: string
       min_pass_rate:
         description: Optional quality threshold between 0 and 1
@@ -16,7 +16,6 @@ on:
 
 permissions:
   contents: read
-  models: read
 
 concurrency:
   group: agent-developer-model-${{ github.ref }}
@@ -39,12 +38,12 @@ jobs:
         run: python -m pytest tests/test_product_scope.py -q
       - name: Run and verify model-backed Agent Developer benchmark
         env:
-          AGENT_DEVELOPER_GITHUB_TOKEN: ${{ github.token }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           MODEL: ${{ inputs.model }}
           MIN_PASS_RATE: ${{ inputs.min_pass_rate }}
         run: |
           set +e
-          python scripts/run_agent_developer_model_benchmark.py \
+          python scripts/run_agent_developer_openai_benchmark.py \
             --model "$MODEL" \
             --min-pass-rate 0.0 \
             --output eval/agent_developer_v1/results/model-benchmark.json
