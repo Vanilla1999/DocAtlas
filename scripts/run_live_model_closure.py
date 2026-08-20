@@ -43,6 +43,26 @@ def _load(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def _task21_report_reusable() -> bool:
+    if not TASK21_REPORT.is_file():
+        return False
+    try:
+        report = _load(TASK21_REPORT)
+    except (OSError, json.JSONDecodeError):
+        return False
+    results = report.get("results") or []
+    return (
+        report.get("passed") is True
+        and report.get("provider_id") == "opencode-chat"
+        and (report.get("adapter") or {}).get("model_version") == REPORT_MODEL
+        and report.get("reasoning_effort") == OPENCODE_VARIANT
+        and report.get("scenario_count") == 20
+        and report.get("repeats") == 3
+        and len(results) == 60
+        and all(item.get("status") != "not_run" for item in results)
+    )
+
+
 def _print_summary() -> None:
     if TASK21_REPORT.is_file():
         report = _load(TASK21_REPORT)
@@ -97,6 +117,11 @@ def main(argv: list[str] | None = None) -> int:
         description="Run DocAtlas live closure through the authenticated OpenCode chat provider"
     )
     parser.add_argument("--opencode-model", default=DEFAULT_OPENCODE_MODEL)
+    parser.add_argument(
+        "--force-task21",
+        action="store_true",
+        help="rerun Task 21 even when a complete passing OpenCode report already exists",
+    )
     args = parser.parse_args(argv)
 
     if canonical_model_name(args.opencode_model) != REPORT_MODEL:
@@ -115,17 +140,26 @@ def main(argv: list[str] | None = None) -> int:
         flush=True,
     )
 
-    task21_rc = _run(
-        "Task 21 live tool choice",
-        [
-            sys.executable,
-            "scripts/run_task21_opencode_chat.py",
-            "--opencode-model",
-            args.opencode_model,
-            "--output",
-            str(TASK21_REPORT),
-        ],
-    )
+    if not args.force_task21 and _task21_report_reusable():
+        print("\n== Task 21 live tool choice ==", flush=True)
+        print(
+            "Reusing existing complete passing Task 21 OpenCode evidence; "
+            "use --force-task21 to rerun 20x3.",
+            flush=True,
+        )
+        task21_rc = 0
+    else:
+        task21_rc = _run(
+            "Task 21 live tool choice",
+            [
+                sys.executable,
+                "scripts/run_task21_opencode_chat.py",
+                "--opencode-model",
+                args.opencode_model,
+                "--output",
+                str(TASK21_REPORT),
+            ],
+        )
 
     agent_rc = _run(
         "Agent Developer live benchmark",
