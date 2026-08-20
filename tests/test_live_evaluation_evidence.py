@@ -5,10 +5,74 @@ from pathlib import Path
 
 import pytest
 
+from scripts.run_agent_developer_openai_benchmark import _output_text
+from scripts.run_task21_openai_live import _responses_input
+
 
 TASK21_REPORT = Path("eval/results/task21_tool_choice_gate.json")
 AGENT_REPORT = Path("eval/agent_developer_v1/results/model-benchmark.json")
 EXPECTED_MODEL = "gpt-5.6-luna"
+
+
+def test_task21_responses_input_preserves_function_history():
+    items = _responses_input(
+        "use docs tools",
+        {
+            "prompt": "Question",
+            "messages": [
+                {"role": "user", "content": "Question"},
+                {
+                    "role": "assistant",
+                    "content": None,
+                    "tool_calls": [
+                        {
+                            "id": "context-1",
+                            "type": "function",
+                            "function": {
+                                "name": "get_docs_context",
+                                "arguments": '{"question":"Question"}',
+                            },
+                        }
+                    ],
+                },
+                {
+                    "role": "tool",
+                    "tool_call_id": "context-1",
+                    "name": "get_docs_context",
+                    "content": '{"status":"insufficient_evidence"}',
+                },
+            ],
+        },
+    )
+
+    assert items[0] == {"role": "system", "content": "use docs tools"}
+    assert items[1] == {"role": "user", "content": "Question"}
+    assert items[2] == {
+        "type": "function_call",
+        "call_id": "context-1",
+        "name": "get_docs_context",
+        "arguments": '{"question":"Question"}',
+    }
+    assert items[3] == {
+        "type": "function_call_output",
+        "call_id": "context-1",
+        "output": '{"status":"insufficient_evidence"}',
+    }
+
+
+def test_agent_responses_output_text_reads_only_message_text():
+    response = {
+        "output": [
+            {"type": "reasoning", "summary": []},
+            {
+                "type": "message",
+                "content": [
+                    {"type": "output_text", "text": '{"action":"finish"}'},
+                ],
+            },
+        ]
+    }
+    assert _output_text(response) == '{"action":"finish"}'
 
 
 def test_task21_committed_live_report_is_complete_and_meets_frozen_thresholds():
