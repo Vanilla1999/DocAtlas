@@ -209,6 +209,7 @@ jobs:
           python -m compileall -q docmancer eval scripts tests
           python scripts/check_python_module_size.py
           python scripts/verify_agent_developer_model_report.py --self-test
+          python scripts/main_ruleset.py --self-test
           git diff --check
 
   required-ci:

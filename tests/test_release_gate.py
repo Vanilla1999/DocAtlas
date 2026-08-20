@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+import copy
 import subprocess
 import sys
 from pathlib import Path
 
 import pytest
+
+from scripts import main_ruleset
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -70,7 +73,10 @@ def test_stdio_smoke_requires_cited_content() -> None:
     text = (ROOT / "scripts/docs_mcp_stdio_smoke.py").read_text()
     assert "assert NEEDLE in rendered" in text
     assert 'assert set(canonical_query) == {"question", "project_path", "mode"}' in text
-    canonical_block = text[text.index("canonical_query = {"):text.index("compatibility_query =", text.index("canonical_query = {"))]
+    canonical_block = text[
+        text.index("canonical_query = {"):
+        text.index("compatibility_query =", text.index("canonical_query = {"))
+    ]
     assert "output_mode" not in canonical_block
     assert 'compatibility_query = {**canonical_query, "output_mode": "compact"}' in text
 
@@ -115,5 +121,95 @@ def test_installer_accepts_pinned_and_local_sources() -> None:
     assert "DOCATLAS_EXPECT_VERSION" in text
 
 
-def test_release_gate_help() -> None:
-    subprocess.run([sys.executable, str(ROOT / "scripts/release_gate.py"), "--help"], check=True)
+def _assert_main_ruleset_contract(monkeypatch, capsys) -> None:
+    desired = main_ruleset._load(main_ruleset.DEFAULT_CONFIG)
+    main_ruleset.validate_contract(desired)
+    checks = main_ruleset._rule(
+        main_ruleset.canonical_policy(desired),
+        "required_status_checks",
+    )["parameters"]["required_status_checks"]
+    assert checks == [
+        {
+            "context": "required-ci",
+            "integration_id": main_ruleset.GITHUB_ACTIONS_APP_ID,
+        },
+        {
+            "context": "required-release",
+            "integration_id": main_ruleset.GITHUB_ACTIONS_APP_ID,
+        },
+    ]
+
+    mutations = [
+        (
+            lambda payload: payload["rules"][2]["parameters"].__setitem__(
+                "dismiss_stale_reviews_on_push", True
+            ),
+            "pull request rule differs",
+        ),
+        (
+            lambda payload: payload["rules"][3]["parameters"].__setitem__(
+                "do_not_enforce_on_create", True
+            ),
+            "required checks must be strict",
+        ),
+        (
+            lambda payload: payload["rules"][3]["parameters"][
+                "required_status_checks"
+            ][0].__setitem__("integration_id", None),
+            "integration_id must be an integer",
+        ),
+    ]
+    for mutator, message in mutations:
+        payload = copy.deepcopy(desired)
+        mutator(payload)
+        with pytest.raises(ValueError, match=message):
+            main_ruleset.validate_contract(payload)
+
+    calls: list[tuple[str, str, str | None]] = []
+
+    def fake_request(repo: str, path: str, *, token: str | None, **_: object):
+        calls.append((repo, path, token))
+        return [{"id": 7, "name": "protect-main"}]
+
+    monkeypatch.setattr(main_ruleset, "_request", fake_request)
+    result = main_ruleset._find_ruleset(
+        "owner/repo",
+        "protect-main",
+        token="token",
+    )
+    assert result == {"id": 7, "name": "protect-main"}
+    assert calls == [
+        (
+            "owner/repo",
+            "/rulesets?includes_parents=false&per_page=100",
+            "token",
+        )
+    ]
+
+    remote = copy.deepcopy(desired)
+    remote.pop("bypass_actors")
+    monkeypatch.setattr(
+        main_ruleset,
+        "_find_ruleset",
+        lambda *_args, **_kwargs: {"id": 7, "name": "protect-main"},
+    )
+    monkeypatch.setattr(
+        main_ruleset,
+        "_request",
+        lambda *_args, **_kwargs: remote,
+    )
+    with pytest.raises(RuntimeError, match="omitted bypass_actors"):
+        main_ruleset.check("owner/repo", desired, token="token")
+
+    monkeypatch.delenv("GH_TOKEN", raising=False)
+    monkeypatch.delenv("GITHUB_TOKEN", raising=False)
+    assert main_ruleset.main(["--check"]) == 1
+    assert "Administration: write" in capsys.readouterr().err
+
+
+def test_release_gate_help(monkeypatch, capsys) -> None:
+    subprocess.run(
+        [sys.executable, str(ROOT / "scripts/release_gate.py"), "--help"],
+        check=True,
+    )
+    _assert_main_ruleset_contract(monkeypatch, capsys)
