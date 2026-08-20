@@ -6,7 +6,7 @@ from pathlib import Path
 
 TASK21_REPORT = Path("eval/results/task21_tool_choice_gate.json")
 AGENT_REPORT = Path("eval/agent_developer_v1/results/model-benchmark.json")
-EXPECTED_MODEL = "openai/gpt-4o-mini"
+EXPECTED_MODEL = "gpt-5.4-mini"
 
 
 def test_task21_committed_live_report_is_complete_and_meets_frozen_thresholds():
@@ -33,7 +33,7 @@ def test_agent_developer_committed_live_report_is_complete_and_safe():
 
     assert report["schema_version"] == 1
     assert report["protocol"] == "agent-developer-model-v1"
-    assert report["provider_id"] == "github-models"
+    assert report["provider_id"] == "openai-api"
     assert report["model"] == EXPECTED_MODEL
     assert report["task_count"] == 11
     assert report["executed_task_count"] == 11
