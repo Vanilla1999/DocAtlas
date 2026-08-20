@@ -22,6 +22,7 @@ from docmancer.docs.tool_choice_eval import (
 REPO_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_MODEL = "gpt-5.6-luna"
 DEFAULT_API_BASE = "https://api.openai.com/v1"
+REASONING_EFFORT = "medium"
 _RETRYABLE_STATUS_CODES = frozenset({429, 500, 502, 503, 504})
 
 
@@ -62,6 +63,24 @@ def _responses_input(guidance: str, scenario: dict[str, Any]) -> list[dict[str, 
     return items
 
 
+def _responses_request_payload(
+    *,
+    model: str,
+    guidance: str,
+    scenario: dict[str, Any],
+    tools: list[dict[str, Any]],
+) -> dict[str, Any]:
+    return {
+        "model": model,
+        "input": _responses_input(guidance, scenario),
+        "tools": tools,
+        "tool_choice": "auto",
+        "parallel_tool_calls": False,
+        "reasoning": {"effort": REASONING_EFFORT},
+        "max_output_tokens": 768,
+    }
+
+
 def _responses_completion(
     *, api_base: str, api_key: str, model: str
 ) -> Callable[[dict[str, Any]], dict[str, Any]]:
@@ -81,14 +100,12 @@ def _responses_completion(
                 "Authorization": f"Bearer {api_key}",
                 "Content-Type": "application/json",
             },
-            json={
-                "model": model,
-                "input": _responses_input(payload["guidance"], payload["scenario"]),
-                "tools": tools,
-                "tool_choice": "auto",
-                "parallel_tool_calls": False,
-                "max_output_tokens": 768,
-            },
+            json=_responses_request_payload(
+                model=model,
+                guidance=payload["guidance"],
+                scenario=payload["scenario"],
+                tools=tools,
+            ),
             timeout=90,
         )
         response.raise_for_status()
@@ -173,12 +190,14 @@ def main(argv: list[str] | None = None) -> int:
             reason="live evaluation failed",
             tool_schemas=schemas,
         )
+        report["reasoning_effort"] = REASONING_EFFORT
         args.output.write_text(
             json.dumps(report, indent=2, sort_keys=True) + "\n",
             encoding="utf-8",
         )
         return 2
 
+    report["reasoning_effort"] = REASONING_EFFORT
     args.output.write_text(
         json.dumps(report, indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
@@ -186,6 +205,7 @@ def main(argv: list[str] | None = None) -> int:
     metrics = report["metrics"]
     print(
         "Task 21 live tool-choice: "
+        f"model={args.model}; reasoning={REASONING_EFFORT}; "
         f"first-tool={metrics['first_tool_accuracy']:.3f}; "
         f"unnecessary={metrics['unnecessary_prepare_or_status_rate']:.3f}; "
         f"legacy={metrics['legacy_tool_hallucination_rate']:.3f}; "
