@@ -61,7 +61,7 @@ The model-visible surface is intentionally smaller than the evaluator surface:
 
 The scorer compares model-chosen calls with the same evaluator-owned target contract used by the provider-free protocol. It checks call budgets, exact scope/module selection, target status and sources, forbidden-source contamination, false support, and ambiguity recovery. For an ambiguity task it also accepts a strictly safer shortcut when the model derives the exact module path from the supplied working path and directly obtains the same target evidence; the benchmark does not force an unnecessary ambiguous-name call merely to imitate the oracle path.
 
-A trusted OpenAI Responses API run is manual by design:
+A trusted OpenAI Responses API run is manual by design and is pinned to **`gpt-5.6-luna` with `reasoning.effort="medium"`**:
 
 ```bash
 OPENAI_API_KEY=... \
@@ -76,11 +76,11 @@ python scripts/verify_agent_developer_model_report.py \
   --min-pass-rate 0.0
 ```
 
-The repository workflow `.github/workflows/agent-developer-model-benchmark.yml` uses `workflow_dispatch`, read-only repository permission, Python 3.13, SHA-pinned Actions, and the repository `OPENAI_API_KEY` secret. It first reruns the provider-free product-scope contract, then executes the OpenAI Responses API benchmark, seals and verifies the report, and uploads the JSON artifact. It is intentionally **not** a required pull-request gate: provider availability, credentials, rate limits, and model behavior must not make deterministic CI non-reproducible. An explicit `--min-pass-rate`/workflow input can turn a trusted benchmark run into a chosen quality threshold without changing the permanent provider-free release gates.
+The repository workflow `.github/workflows/agent-developer-model-benchmark.yml` uses `workflow_dispatch`, read-only repository permission, Python 3.13, SHA-pinned Actions, and the repository `OPENAI_API_KEY` secret. The model is not selectable in the workflow: the live lane is fixed to `gpt-5.6-luna`, while the runner fixes Responses reasoning effort to `medium`. It first reruns the provider-free product-scope contract, then executes the OpenAI Responses API benchmark, seals and verifies the report, and uploads the JSON artifact. It is intentionally **not** a required pull-request gate: provider availability, credentials, rate limits, and model behavior must not make deterministic CI non-reproducible. The `min_pass_rate` workflow input can turn a trusted benchmark run into a chosen quality threshold without changing the permanent provider-free release gates.
 
-The default live model is `gpt-5.6-luna`, the cost-sensitive GPT-5.6 lane used for the frozen low-cost-model evaluation. GitHub Models is not a supported live provider for this benchmark anymore: its inference service was retired in July 2026. Historical GitHub Models report/provider code may remain for audit compatibility, but new live evidence must use an active provider.
+The live policy uses `gpt-5.6-luna` with medium reasoning for both Task 21 and Agent Developer. GitHub Models is not a supported live provider for this benchmark anymore: its inference service was retired in July 2026. Historical GitHub Models report/provider code may remain for audit compatibility, but new live evidence must use the active OpenAI Responses API path.
 
-The report records pass rate, scope accuracy, recovery accuracy, false support, forbidden-source contamination, provider/model identity, per-turn token usage, and the bounded model-chosen trajectories. Provider/transport failures are reported separately as infrastructure errors rather than being counted as a model-quality failure.
+The report records pass rate, scope accuracy, recovery accuracy, false support, forbidden-source contamination, provider/model identity, per-turn token usage (including the pinned reasoning effort), and the bounded model-chosen trajectories. Provider/transport failures are reported separately as infrastructure errors rather than being counted as a model-quality failure.
 
 ## Current closure
 
