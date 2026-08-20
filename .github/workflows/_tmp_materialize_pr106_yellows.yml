@@ -1,0 +1,46 @@
+name: TEMP materialize PR106 yellows
+
+on:
+  push:
+    branches:
+      - agent/adversarial-token-mutation-v2
+
+permissions:
+  contents: write
+
+concurrency:
+  group: tmp-materialize-pr106-yellows
+  cancel-in-progress: false
+
+jobs:
+  materialize:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: true
+          ref: agent/adversarial-token-mutation-v2
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.12'
+      - name: Install test dependencies
+        run: python -m pip install -e '.[dev]'
+      - name: Materialize reviewed changes
+        run: python scripts/_materialize_pr106_yellows.py
+      - name: Verify focused compatibility and adversarial gates
+        run: |
+          python scripts/run_agent_developer_adversarial_gate.py --self-test
+          python -m pytest tests/test_docs_service_part10.py::test_mcp_docs_status_uses_project_local_storage_topology -q
+          python scripts/run_agent_developer_adversarial_gate.py
+          git diff --check
+      - name: Commit semantic tree only
+        run: |
+          rm scripts/_materialize_pr106_yellows.py
+          rm .github/workflows/_tmp_materialize_pr106_yellows.yml
+          git add -A
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'Complete Agent Developer adversarial and token gates'
+          git push origin HEAD:agent/adversarial-token-mutation-v2
