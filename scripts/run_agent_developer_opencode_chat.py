@@ -12,6 +12,7 @@ from scripts.opencode_chat_support import (
     OPENCODE_VARIANT,
     REPORT_MODEL,
     OpenCodeJSONClient,
+    OpenCodeModelOutputError,
 )
 
 
@@ -30,11 +31,33 @@ class OpenCodeChatPlanner:
         self,
         messages: list[dict[str, str]],
     ) -> tuple[dict[str, Any], dict[str, Any]]:
-        return self._client.complete_json(
-            messages=[dict(message) for message in messages],
-            schema=action_schema(),
-            purpose="Agent Developer next read-only DocAtlas evidence action",
-        )
+        try:
+            return self._client.complete_json(
+                messages=[dict(message) for message in messages],
+                schema=action_schema(),
+                purpose="Agent Developer next read-only DocAtlas evidence action",
+            )
+        except OpenCodeModelOutputError as exc:
+            # The provider returned normally but the model failed the structured
+            # response contract even after the bounded format-repair attempt.
+            # That is model-quality evidence, not an infrastructure outage. Return
+            # a deliberately invalid action so the existing benchmark scorer marks
+            # this task failed and continues with the remaining public tasks.
+            usage = dict(exc.usage)
+            usage["model_output_valid"] = False
+            usage["model_output_error"] = "schema_invalid_after_format_repair"
+            return (
+                {
+                    "action": "invalid_model_output",
+                    "question": "",
+                    "scope": "",
+                    "mode": "",
+                    "module": "",
+                    "module_path": "",
+                    "reason": "model did not return one schema-valid JSON object",
+                },
+                usage,
+            )
 
 
 def main(argv: list[str] | None = None) -> int:
