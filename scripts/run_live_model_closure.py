@@ -122,6 +122,11 @@ def main(argv: list[str] | None = None) -> int:
         action="store_true",
         help="rerun Task 21 even when a complete passing OpenCode report already exists",
     )
+    parser.add_argument(
+        "--fresh-agent",
+        action="store_true",
+        help="ignore a partial Agent Developer report and rerun all 11 tasks",
+    )
     args = parser.parse_args(argv)
 
     if canonical_model_name(args.opencode_model) != REPORT_MODEL:
@@ -161,19 +166,19 @@ def main(argv: list[str] | None = None) -> int:
             ],
         )
 
-    agent_rc = _run(
-        "Agent Developer live benchmark",
-        [
-            sys.executable,
-            "scripts/run_agent_developer_opencode_chat.py",
-            "--opencode-model",
-            args.opencode_model,
-            "--min-pass-rate",
-            "0.0",
-            "--output",
-            str(AGENT_REPORT),
-        ],
-    )
+    agent_args = [
+        sys.executable,
+        "scripts/run_agent_developer_opencode_chat.py",
+        "--opencode-model",
+        args.opencode_model,
+        "--min-pass-rate",
+        "0.0",
+        "--output",
+        str(AGENT_REPORT),
+    ]
+    if not args.fresh_agent:
+        agent_args.append("--resume")
+    agent_rc = _run("Agent Developer live benchmark", agent_args)
 
     verify_rc = 0
     if _agent_report_complete():
