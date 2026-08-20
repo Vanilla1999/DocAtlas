@@ -62,6 +62,7 @@ def test_publish_runs_exact_public_version_smoke() -> None:
     assert 'RELEASE_VERSION="${{ inputs.tag }}"' not in publish
     assert "DOCATLAS_INSTALL_VERSION=\"$RELEASE_VERSION\"" in publish
     assert "for attempt in 1 2 3 4 5" in publish
+    assert "PIP_NO_CACHE_DIR=1" in publish
     assert "scripts/docs_mcp_stdio_smoke.py" in publish
 
 
