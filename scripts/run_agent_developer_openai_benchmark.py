@@ -17,6 +17,7 @@ from eval.agent_developer_v1.model_benchmark import action_schema, run_benchmark
 REPO_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_MODEL = "gpt-5.6-luna"
 DEFAULT_API_BASE = "https://api.openai.com/v1"
+REASONING_EFFORT = "medium"
 _RETRYABLE_STATUS_CODES = frozenset({429, 500, 502, 503, 504})
 
 
@@ -37,6 +38,23 @@ def _strict_nonnegative_int(value: Any, name: str) -> int:
     return value
 
 
+def _request_payload(messages: list[dict[str, str]], *, model: str) -> dict[str, Any]:
+    return {
+        "model": model,
+        "input": messages,
+        "reasoning": {"effort": REASONING_EFFORT},
+        "max_output_tokens": 768,
+        "text": {
+            "format": {
+                "type": "json_schema",
+                "name": "agent_developer_evidence_action_v1",
+                "strict": True,
+                "schema": action_schema(),
+            }
+        },
+    }
+
+
 class OpenAIAPIPlanner:
     provider_id = "openai-api"
 
@@ -54,19 +72,7 @@ class OpenAIAPIPlanner:
         self._api_base = api_base.rstrip("/")
 
     def choose(self, messages: list[dict[str, str]]) -> tuple[dict[str, Any], dict[str, Any]]:
-        request_payload = {
-            "model": self.model,
-            "input": messages,
-            "max_output_tokens": 768,
-            "text": {
-                "format": {
-                    "type": "json_schema",
-                    "name": "agent_developer_evidence_action_v1",
-                    "strict": True,
-                    "schema": action_schema(),
-                }
-            },
-        }
+        request_payload = _request_payload(messages, model=self.model)
         serialized = json.dumps(
             request_payload,
             ensure_ascii=False,
@@ -126,6 +132,7 @@ class OpenAIAPIPlanner:
             "request_id": request_id,
             "request_ids": request_ids,
             "model": str(body.get("model") or self.model),
+            "reasoning_effort": REASONING_EFFORT,
             "input_tokens": input_tokens,
             "output_tokens": output_tokens,
             "reasoning_tokens": reasoning_tokens,
@@ -169,8 +176,9 @@ def main(argv: list[str] | None = None) -> int:
         encoding="utf-8",
     )
     print(
-        f"Agent Developer OpenAI benchmark: {report['passed_tasks']}/{report['task_count']} "
-        f"pass; scope={report['scope_accuracy']:.3f}; recovery={report['recovery_accuracy']:.3f}; "
+        f"Agent Developer OpenAI benchmark: model={args.model}; reasoning={REASONING_EFFORT}; "
+        f"{report['passed_tasks']}/{report['task_count']} pass; "
+        f"scope={report['scope_accuracy']:.3f}; recovery={report['recovery_accuracy']:.3f}; "
         f"false-supported={report['false_supported']}; contamination={report['forbidden_source_contamination']}"
     )
     if report["infrastructure_errors"]:
