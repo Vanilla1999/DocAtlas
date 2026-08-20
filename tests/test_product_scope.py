@@ -5,6 +5,7 @@ from pathlib import Path
 
 import pytest
 
+import eval.agent_developer_v1.model_benchmark as model_benchmark
 import scripts.run_agent_developer_gate as agent_gate
 
 
@@ -204,3 +205,147 @@ def test_agent_developer_protocol_is_a_hard_ci_gate(monkeypatch, capsys) -> None
 
     assert agent_gate.main() == 1
     assert "Agent Developer Protocol v1: TARGET FAIL" in capsys.readouterr().out
+
+
+def _agent_model_oracle_task(task_id: str) -> dict:
+    return next(
+        task for task in agent_gate._load_protocol()["tasks"]
+        if task["id"] == task_id
+    )
+
+
+def _model_context_record(
+    *,
+    question: str,
+    scope: str,
+    mode: str,
+    module: str = "",
+    module_path: str = "",
+    status: str,
+    sources: list[str],
+) -> dict:
+    return {
+        "tool": "get_docs_context",
+        "action": {
+            "action": "get_docs_context",
+            "question": question,
+            "scope": scope,
+            "mode": mode,
+            "module": module,
+            "module_path": module_path,
+            "reason": "test",
+        },
+        "payload": {
+            "status": status,
+            "sources": [{"path_or_url": source} for source in sources],
+        },
+        "project_path": "/tmp/project",
+    }
+
+
+def test_agent_developer_model_prompt_is_oracle_isolated() -> None:
+    task = next(
+        task for task in model_benchmark.load_public_tasks()
+        if task["id"] == "module_plus_project_two_call_trajectory"
+    )
+    messages = model_benchmark.task_messages(task)
+    model_view = json.loads(messages[1]["content"])
+
+    assert set(model_view) == {
+        "task_id", "developer_task", "working_path", "max_get_docs_context_calls",
+    }
+    assert "class" not in model_view
+    assert "fixture" not in model_view
+    serialized = json.dumps(messages, ensure_ascii=False)
+    for evaluator_term in (
+        "expected_trajectories", "required_scopes", "forbidden_sources",
+        "required_sources", "known_gap", "mutation_before_calls",
+    ):
+        assert evaluator_term not in serialized
+
+
+def test_agent_developer_model_action_schema_is_read_only() -> None:
+    schema = model_benchmark.action_schema()
+    assert set(schema["properties"]["action"]["enum"]) == {
+        "get_docs_context", "docs_status", "finish",
+    }
+    serialized = json.dumps(schema, sort_keys=True)
+    for forbidden_tool in (
+        "prepare_docs", "sync_project_docs", "prefetch_project_dependency_docs",
+        "replace_text", "write_file", "run_tests", "shell",
+    ):
+        assert forbidden_tool not in serialized
+
+
+def test_agent_developer_model_scorer_accepts_exact_module_and_rejects_scope_drift() -> None:
+    task = _agent_model_oracle_task("module_definition_supported")
+    exact = _model_context_record(
+        question="What is OrdersDraftStore?",
+        scope="module",
+        mode="project",
+        module_path="packages/orders",
+        status="ok",
+        sources=["packages/orders/README.md"],
+    )
+    accepted = model_benchmark.score_task(task, [exact])
+    assert accepted["passed"] is True, accepted["errors"]
+
+    drift = json.loads(json.dumps(exact))
+    drift["action"]["scope"] = "project"
+    drift["action"]["module_path"] = ""
+    rejected = model_benchmark.score_task(task, [drift])
+    assert rejected["passed"] is False
+    assert any("missing required scope" in error for error in rejected["errors"])
+
+    contaminated = json.loads(json.dumps(exact))
+    contaminated["payload"]["sources"].append(
+        {"path_or_url": "packages/payments/README.md"}
+    )
+    rejected = model_benchmark.score_task(task, [contaminated])
+    assert rejected["passed"] is False
+    assert rejected["forbidden_source_contamination"] == 1
+
+
+def test_agent_developer_model_scorer_accepts_safe_exact_ambiguity_shortcut() -> None:
+    task = _agent_model_oracle_task("ambiguous_module_recovery_named_gap")
+    exact = _model_context_record(
+        question="What is PackageAuthBoundary?",
+        scope="module",
+        mode="project",
+        module_path="packages/auth",
+        status="ok",
+        sources=["packages/auth/README.md"],
+    )
+    accepted = model_benchmark.score_task(task, [exact])
+    assert accepted["passed"] is True, accepted["errors"]
+    assert accepted["direct_recovery_shortcut"] is True
+    assert accepted["recovery_contract_ok"] is True
+
+    wrong_module = json.loads(json.dumps(exact))
+    wrong_module["action"]["module_path"] = "services/auth"
+    wrong_module["payload"]["sources"] = [
+        {"path_or_url": "services/auth/README.md"}
+    ]
+    rejected = model_benchmark.score_task(task, [wrong_module])
+    assert rejected["passed"] is False
+    assert rejected["direct_recovery_shortcut"] is False
+
+
+def test_agent_developer_model_workflow_is_manual_trusted_and_sha_pinned() -> None:
+    text = (
+        ROOT / ".github" / "workflows" / "agent-developer-model-benchmark.yml"
+    ).read_text(encoding="utf-8")
+    trigger_block = text.split("\non:\n", 1)[1].split("\npermissions:\n", 1)[0]
+
+    assert "  workflow_dispatch:" in trigger_block
+    assert "pull_request:" not in trigger_block
+    assert "push:" not in trigger_block
+    assert "models: read" in text
+    assert "AGENT_DEVELOPER_GITHUB_TOKEN: ${{ github.token }}" in text
+    assert "python scripts/run_agent_developer_model_benchmark.py" in text
+    assert "python -m pytest tests/test_product_scope.py -q" in text
+    for line in text.splitlines():
+        if "uses:" in line:
+            ref = line.split("@", 1)[1].split()[0]
+            assert len(ref) == 40
+            assert all(char in "0123456789abcdef" for char in ref)
