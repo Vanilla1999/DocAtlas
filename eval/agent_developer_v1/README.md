@@ -61,47 +61,54 @@ The model-visible surface is intentionally smaller than the evaluator surface:
 
 The scorer compares model-chosen calls with the same evaluator-owned target contract used by the provider-free protocol. It checks call budgets, exact scope/module selection, target status and sources, forbidden-source contamination, false support, and ambiguity recovery. For an ambiguity task it also accepts a strictly safer shortcut when the model derives the exact module path from the supplied working path and directly obtains the same target evidence; the benchmark does not force an unnecessary ambiguous-name call merely to imitate the oracle path.
 
-The live closure is pinned to **`gpt-5.6-luna` with `reasoning.effort="medium"`** through the OpenAI Responses API. Both request builders set the effort explicitly, and provider-free tests assert the Luna/medium contract.
+The live closure is pinned to **`gpt-5.6-luna` with the `medium` variant**. The preferred local path uses the authenticated OpenCode chat session instead of requiring a direct API key. `scripts/opencode_chat_support.py` invokes `opencode run --format json --model <provider>/gpt-5.6-luna --variant medium` inside an isolated temporary project whose OpenCode permissions are denied, so the model cannot inspect repository/evaluator files or call shell, web, MCP, skills, or other tools.
 
 ### One-command local closure
 
-With `OPENAI_API_KEY` available in the local environment, run from the repository root:
+From the repository root, with OpenCode already authenticated:
 
 ```bash
-python scripts/run_live_model_closure.py
+uv run python scripts/run_live_model_closure.py \
+  --opencode-model openai/gpt-5.6-luna
 ```
 
-The orchestrator runs the frozen Task 21 **20 × 3** tool-choice evaluation, all **11** Agent Developer tasks, seals/verifies the Agent Developer report, and then runs the provider-free committed-evidence contract tests. Failed reports are left in place for inspection but must not be committed as passing evidence.
+The orchestrator reuses an already complete passing Task 21 report unless `--force-task21` is supplied, runs all missing Agent Developer tasks, seals/verifies the Agent report, and then runs the provider-free committed-evidence contract test.
 
-On success the two evidence files are:
+Agent resume is provenance-bound. Every reusable OpenCode Agent turn must contain the exact current `benchmark_contract_sha256`, derived from the evaluator corpus/fixtures, OpenCode transport/runner, provider-free oracle gate, and DocAtlas Python runtime. If any of that contract changes, the old row is not reused and that task is run again. Result files, local caches, and this README are excluded from the fingerprint so recording/documenting evidence does not invalidate it.
+
+On evidence-complete success the files are:
 
 ```text
 eval/results/task21_tool_choice_gate.json
 eval/agent_developer_v1/results/model-benchmark.json
 ```
 
-The Agent Developer result directory may be ignored by the repository defaults, so use `git add -f` for that report when recording the passing evidence.
+The Agent Developer result directory may be ignored by repository defaults, so use `git add -f` for that report when recording evidence.
 
-### Individual/manual runs
+The Agent benchmark deliberately has no retrospectively invented minimum pass-rate: the frozen verifier currently uses `--min-pass-rate 0.0`. A low pass-rate is retained as model-quality evidence rather than converted into an infrastructure failure. Closure still requires all 11 tasks to execute, no infrastructure errors, zero false-supported outcomes, zero forbidden-source contamination, current sealed task/oracle fingerprints, `medium` on every usage row, and exact benchmark-contract provenance for OpenCode rows.
+
+### Individual local OpenCode run
 
 ```bash
-OPENAI_API_KEY=... \
-python scripts/run_agent_developer_openai_benchmark.py \
-  --model gpt-5.6-luna \
+uv run python scripts/run_agent_developer_opencode_chat.py \
+  --opencode-model openai/gpt-5.6-luna \
+  --resume \
   --output eval/agent_developer_v1/results/model-benchmark.json
 
-python scripts/verify_agent_developer_model_report.py \
+uv run python scripts/verify_agent_developer_model_report.py \
   eval/agent_developer_v1/results/model-benchmark.json \
   --seal \
   --expected-model gpt-5.6-luna \
   --min-pass-rate 0.0
 ```
 
-The repository workflows `.github/workflows/task21-live-tool-choice.yml` and `.github/workflows/agent-developer-model-benchmark.yml` remain optional manual equivalents. They are fixed to Luna/medium and are intentionally **not** required pull-request gates: provider availability, credentials, rate limits, and model behavior must not make deterministic CI non-reproducible.
+### Optional direct OpenAI API path
+
+The direct Responses API runners and manual GitHub Actions workflows remain available as an optional transport. They are fixed to Luna/medium and use `OPENAI_API_KEY`, but they are intentionally **not** required pull-request gates: provider availability, credentials, rate limits, and model behavior must not make deterministic CI non-reproducible.
 
 GitHub Models is not a supported live provider for this benchmark anymore: its inference service was retired in July 2026. Historical GitHub Models report/provider code may remain for audit compatibility, but new live evidence must use an active provider.
 
-The report records pass rate, scope accuracy, recovery accuracy, false support, forbidden-source contamination, provider/model identity, per-turn token usage, reasoning effort, and the bounded model-chosen trajectories. Provider/transport failures are reported separately as infrastructure errors rather than being counted as a model-quality failure.
+The report records pass rate, scope accuracy, recovery accuracy, false support, forbidden-source contamination, provider/model identity, per-turn token usage, reasoning effort, request/session identifiers, and the bounded model-chosen trajectories. Provider/transport failures are reported separately as infrastructure errors rather than being counted as model-quality failures.
 
 ## Current closure
 
