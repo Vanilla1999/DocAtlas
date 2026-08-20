@@ -125,7 +125,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--fresh-agent",
         action="store_true",
-        help="ignore a partial Agent Developer report and rerun all 11 tasks",
+        help="ignore even exact-contract reusable Agent Developer results and rerun all 11 tasks",
     )
     args = parser.parse_args(argv)
 
@@ -212,6 +212,7 @@ def main(argv: list[str] | None = None) -> int:
                 "-m",
                 "pytest",
                 "tests/docs/test_tool_choice_eval.py",
+                "tests/test_opencode_live_provenance.py",
                 "-q",
             ],
         )
@@ -227,12 +228,16 @@ def main(argv: list[str] | None = None) -> int:
     failures = {name: code for name, code in failed.items() if code != 0}
     if failures:
         print(f"\nLive closure is NOT ready: {failures}")
-        print("Reports were left in place for inspection; do not commit them as passing evidence yet.")
+        print("Reports were left in place for inspection; do not commit them as complete evidence yet.")
         return 1
 
-    print("\nLive closure PASS. Evidence is ready to commit:")
+    print("\nLive closure EVIDENCE COMPLETE. Evidence is ready to commit:")
     print(f"  {TASK21_REPORT.relative_to(REPO_ROOT)}")
     print(f"  {AGENT_REPORT.relative_to(REPO_ROOT)}")
+    print(
+        "Agent pass-rate is reported as model-quality evidence; the frozen closure "
+        "contract intentionally does not impose a retrospective minimum pass-rate."
+    )
     print("Use git add -f for the Agent Developer report if your ignore rules require it.")
     return 0
 
