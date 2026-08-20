@@ -26,28 +26,73 @@ def canonical_model_name(model_id: str) -> str:
     return str(model_id).strip().rsplit("/", 1)[-1]
 
 
-def _parse_json_object(text: str) -> dict[str, Any]:
-    raw = str(text or "").strip()
-    candidates = [raw]
-    if raw.startswith("```"):
-        lines = raw.splitlines()
-        if lines and lines[0].startswith("```"):
-            lines = lines[1:]
-        if lines and lines[-1].strip() == "```":
-            lines = lines[:-1]
-        candidates.append("\n".join(lines).strip())
-    start = raw.find("{")
-    end = raw.rfind("}")
-    if 0 <= start < end:
-        candidates.append(raw[start : end + 1])
-    for candidate in candidates:
+def _json_object_candidates(text: str) -> list[dict[str, Any]]:
+    """Extract distinct JSON objects without trusting surrounding prose/fences."""
+    raw = str(text or "")
+    decoder = json.JSONDecoder()
+    found: dict[str, dict[str, Any]] = {}
+
+    def add(value: Any) -> None:
+        if not isinstance(value, dict):
+            return
+        key = json.dumps(
+            value,
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+        )
+        found[key] = value
+
+    stripped = raw.strip()
+    if stripped:
         try:
-            value = json.loads(candidate)
+            add(json.loads(stripped))
+        except json.JSONDecodeError:
+            pass
+
+    # OpenCode/model output may contain prose, ```json fences, or several text
+    # chunks concatenated together. raw_decode from every object boundary keeps
+    # extraction tolerant while schema validation below remains fail-closed.
+    for index, char in enumerate(raw):
+        if char != "{":
+            continue
+        try:
+            value, _end = decoder.raw_decode(raw[index:])
         except json.JSONDecodeError:
             continue
-        if isinstance(value, dict):
-            return value
-    raise OpenCodeChatError("OpenCode response did not contain one valid JSON object")
+        add(value)
+
+    return list(found.values())
+
+
+def _schema_json_object(
+    texts: list[str],
+    schema: dict[str, Any],
+) -> dict[str, Any]:
+    valid: dict[str, dict[str, Any]] = {}
+    for text in texts:
+        for candidate in _json_object_candidates(text):
+            try:
+                jsonschema.validate(candidate, schema)
+            except jsonschema.ValidationError:
+                continue
+            key = json.dumps(
+                candidate,
+                ensure_ascii=False,
+                sort_keys=True,
+                separators=(",", ":"),
+            )
+            valid[key] = candidate
+
+    if len(valid) == 1:
+        return next(iter(valid.values()))
+    if not valid:
+        raise OpenCodeChatError(
+            "OpenCode response did not contain one schema-valid JSON object"
+        )
+    raise OpenCodeChatError(
+        "OpenCode response contained multiple distinct schema-valid JSON objects"
+    )
 
 
 def build_opencode_prompt(
@@ -110,7 +155,12 @@ def _walk_text(value: Any) -> list[str]:
     return found
 
 
-def _export_json_text(executable: str, session_id: str, env: dict[str, str]) -> str:
+def _export_schema_text(
+    executable: str,
+    session_id: str,
+    env: dict[str, str],
+    schema: dict[str, Any],
+) -> str:
     completed = subprocess.run(
         [executable, "export", session_id],
         env=env,
@@ -128,7 +178,7 @@ def _export_json_text(executable: str, session_id: str, env: dict[str, str]) -> 
         return ""
     for candidate in reversed(_walk_text(payload)):
         try:
-            _parse_json_object(candidate)
+            _schema_json_object([candidate], schema)
         except OpenCodeChatError:
             continue
         return candidate
@@ -148,11 +198,14 @@ class OpenCodeJSONClient:
         variant: str = OPENCODE_VARIANT,
         executable: str = "opencode",
         timeout_seconds: int = 180,
+        format_attempts: int = 2,
     ) -> None:
         if canonical_model_name(model_id) != REPORT_MODEL:
             raise ValueError(f"OpenCode live closure is pinned to {REPORT_MODEL}")
         if variant != OPENCODE_VARIANT:
             raise ValueError(f"OpenCode live closure is pinned to variant {OPENCODE_VARIANT}")
+        if format_attempts < 1:
+            raise ValueError("format_attempts must be positive")
         resolved = shutil.which(executable)
         if not resolved:
             raise OpenCodeChatError(f"OpenCode executable not found: {executable}")
@@ -161,6 +214,7 @@ class OpenCodeJSONClient:
         self.variant = variant
         self.executable = resolved
         self.timeout_seconds = timeout_seconds
+        self.format_attempts = format_attempts
 
     def complete_json(
         self,
@@ -169,67 +223,116 @@ class OpenCodeJSONClient:
         schema: dict[str, Any],
         purpose: str,
     ) -> tuple[dict[str, Any], dict[str, Any]]:
-        prompt = build_opencode_prompt(messages=messages, schema=schema, purpose=purpose)
-        digest = hashlib.sha256(prompt.encode("utf-8")).hexdigest()
+        base_prompt = build_opencode_prompt(
+            messages=messages,
+            schema=schema,
+            purpose=purpose,
+        )
+        digest = hashlib.sha256(base_prompt.encode("utf-8")).hexdigest()
         env = os.environ.copy()
-        with TemporaryDirectory(prefix="docatlas-opencode-eval-") as raw_tmp:
-            workspace = Path(raw_tmp)
-            (workspace / "opencode.json").write_text(
-                json.dumps(
-                    {
-                        "$schema": "https://opencode.ai/config.json",
-                        "permission": "deny",
-                    },
-                    indent=2,
-                    sort_keys=True,
-                )
-                + "\n",
-                encoding="utf-8",
-            )
-            completed = subprocess.run(
-                [
-                    self.executable,
-                    "run",
-                    "--format",
-                    "json",
-                    "--model",
-                    self.model_id,
-                    "--variant",
-                    self.variant,
-                    "--dir",
-                    str(workspace),
-                    prompt,
-                ],
-                cwd=workspace,
-                env=env,
-                text=True,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                timeout=self.timeout_seconds,
-                check=False,
-            )
-        text, session_id, tokens = _event_text_and_usage(completed.stdout)
-        if completed.returncode != 0:
-            raise OpenCodeChatError(
-                f"opencode run failed exit={completed.returncode}: "
-                f"{_safe_failure_detail(completed.stderr)}"
-            )
-        if not text and session_id:
-            text = _export_json_text(self.executable, session_id, env)
-        if not text:
-            raise OpenCodeChatError(
-                "opencode run completed without a recoverable assistant JSON response"
-            )
-        result = _parse_json_object(text)
-        try:
-            jsonschema.validate(result, schema)
-        except jsonschema.ValidationError as exc:
-            raise OpenCodeChatError(
-                f"OpenCode JSON did not match benchmark schema: {exc.message}"
-            ) from exc
+        last_parse_error: OpenCodeChatError | None = None
 
+        for attempt in range(self.format_attempts):
+            prompt = base_prompt
+            if attempt:
+                prompt += (
+                    "\n\nFORMAT RETRY: Return one complete JSON object only. "
+                    "Do not truncate it, wrap it in markdown, or emit a second object."
+                )
+
+            with TemporaryDirectory(prefix="docatlas-opencode-eval-") as raw_tmp:
+                workspace = Path(raw_tmp)
+                (workspace / "opencode.json").write_text(
+                    json.dumps(
+                        {
+                            "$schema": "https://opencode.ai/config.json",
+                            "permission": "deny",
+                        },
+                        indent=2,
+                        sort_keys=True,
+                    )
+                    + "\n",
+                    encoding="utf-8",
+                )
+                completed = subprocess.run(
+                    [
+                        self.executable,
+                        "run",
+                        "--format",
+                        "json",
+                        "--model",
+                        self.model_id,
+                        "--variant",
+                        self.variant,
+                        "--dir",
+                        str(workspace),
+                        prompt,
+                    ],
+                    cwd=workspace,
+                    env=env,
+                    text=True,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    timeout=self.timeout_seconds,
+                    check=False,
+                )
+
+            text, session_id, tokens = _event_text_and_usage(completed.stdout)
+            if completed.returncode != 0:
+                raise OpenCodeChatError(
+                    f"opencode run failed exit={completed.returncode}: "
+                    f"{_safe_failure_detail(completed.stderr)}"
+                )
+
+            candidate_texts = [text] if text else []
+            try:
+                result = _schema_json_object(candidate_texts, schema)
+            except OpenCodeChatError as exc:
+                last_parse_error = exc
+                if session_id:
+                    exported = _export_schema_text(
+                        self.executable,
+                        session_id,
+                        env,
+                        schema,
+                    )
+                    if exported:
+                        try:
+                            result = _schema_json_object(
+                                [*candidate_texts, exported],
+                                schema,
+                            )
+                        except OpenCodeChatError as export_exc:
+                            last_parse_error = export_exc
+                        else:
+                            return result, self._usage(
+                                session_id=session_id,
+                                digest=digest,
+                                tokens=tokens,
+                            )
+                if attempt + 1 < self.format_attempts:
+                    continue
+                raise last_parse_error
+            else:
+                return result, self._usage(
+                    session_id=session_id,
+                    digest=digest,
+                    tokens=tokens,
+                )
+
+        raise last_parse_error or OpenCodeChatError(
+            "OpenCode response did not contain one schema-valid JSON object"
+        )
+
+    def _usage(
+        self,
+        *,
+        session_id: str | None,
+        digest: str,
+        tokens: dict[str, int],
+    ) -> dict[str, Any]:
         request_id = session_id or f"opencode-{digest[:24]}"
-        usage = {
+        return {
             "request_id": request_id,
             "request_ids": {"opencode-session": request_id},
             "model": self.model,
@@ -238,6 +341,5 @@ class OpenCodeJSONClient:
             "output_tokens": int(tokens.get("output") or 0),
             "reasoning_tokens": int(tokens.get("reasoning") or 0),
             "request_payload_sha256": digest,
-            "estimated_input_tokens": max(1, len(prompt) // 4),
+            "estimated_input_tokens": max(1, len(digest) // 4),
         }
-        return result, usage
