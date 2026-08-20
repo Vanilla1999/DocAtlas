@@ -769,10 +769,25 @@ def test_mcp_exposes_three_public_tools_with_mutually_exclusive_guidance():
     tools = {tool["name"]: tool for tool in TOOLS}
 
     assert set(tools) == PUBLIC_TOOL_NAMES
-    assert "Default source-grounded" in tools["get_docs_context"]["description"]
+    context_tool = tools["get_docs_context"]
+    assert "Default source-grounded" in context_tool["description"]
+    assert 'module_path always implies module scope' in context_tool["description"]
+    assert 'make two bounded calls (module then project)' in context_tool["description"]
+    assert 'scope=all without module filters' in context_tool["description"]
+    context_properties = context_tool["inputSchema"]["properties"]
+    assert "ambiguous names fail closed" in context_properties["module"]["description"]
+    assert "always implies module scope" in context_properties["module_path"]["description"]
+    assert "repo-level docs only" in context_properties["scope"]["description"]
+    assert "project-pinned dependency docs" in context_properties["mode"]["description"]
+    output_properties = context_tool["outputSchema"]["properties"]
+    assert output_properties["module_candidates"]["maxItems"] == 8
+    assert output_properties["module_candidates"]["items"]["required"] == ["module_path"]
     assert "Call only from get_docs_context" in tools["prepare_docs"]["description"]
     assert "explicitly asks" in tools["docs_status"]["description"]
     assert tools["docs_status"]["inputSchema"]["required"] == ["action"]
+    assert "discovered module identities" in (
+        tools["docs_status"]["inputSchema"]["properties"]["details"]["description"]
+    )
     assert tools["docs_status"]["inputSchema"]["properties"]["action"]["enum"] == [
         "project",
         "library",

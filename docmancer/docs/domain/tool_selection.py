@@ -176,6 +176,8 @@ def normalize_public_docs_action(action: Any) -> dict[str, Any] | None:
     if status_action:
         arguments = dict(normalized.get("arguments_patch") or {})
         arguments["action"] = status_action
+        if tool == "inspect_project_docs":
+            arguments.setdefault("details", True)
         normalized.update({
             "type": "docs_status",
             "tool": "docs_status",
@@ -228,9 +230,9 @@ def select_public_docs_tool(
     Status is read-only and reserved for explicit health/progress requests.
     """
 
-    if next_action_tool == "prepare_docs":
+    if next_action_tool in PUBLIC_DOCS_TOOLS:
         return ToolSelectionDecision(
-            tool="prepare_docs",
+            tool=next_action_tool,
             reason_code="returned_next_action",
             confidence=1.0,
         )

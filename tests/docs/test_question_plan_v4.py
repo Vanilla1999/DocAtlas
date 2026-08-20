@@ -164,15 +164,65 @@ def test_question_plan_proof_requires_local_subject_binding():
     readme_behavior = build_project_answer_contract(
         "What does the project README say about deterministic offline release checks?"
     ).proof_obligations[0]
+    assert readme_behavior.context == "deterministic offline release checks"
     assert local_proof_for_obligation(
         readme_behavior,
         _unit("The amber lighthouse invariant requires deterministic offline release checks."),
         source={"authority": "source_of_truth", "path": "README.md"},
     ).valid is True
     assert local_proof_for_obligation(
+        readme_behavior,
+        _unit(
+            "Deterministic offline release checks appear in this section. "
+            "PaymentOutbox validates payments.",
+            kind="unit_group",
+        ),
+        source={"authority": "source_of_truth", "path": "README.md"},
+    ).valid is False
+    assert local_proof_for_obligation(
+        readme_behavior,
+        _unit("PaymentOutbox validates payments."),
+        source={"authority": "source_of_truth", "path": "README.md"},
+    ).valid is False
+    assert local_proof_for_obligation(
         behavior,
         _unit("PaymentOutbox validates payments."),
         source={"authority": "source_of_truth", "path": "OrderSubmission.md"},
+    ).valid is False
+
+
+def test_generic_requirements_accept_one_meaningful_object_or_list_item():
+    obligation = build_project_answer_contract(
+        "What does OrderValidationContract require?"
+    ).proof_obligations[0]
+
+    assert local_proof_for_obligation(
+        obligation,
+        _unit("OrderValidationContract requires a positive total."),
+    ).valid is True
+    assert local_proof_for_obligation(
+        obligation,
+        _unit("OrderValidationContract requires:\n- a positive total.", kind="unit_group"),
+    ).valid is True
+    assert local_proof_for_obligation(
+        obligation,
+        _unit("PaymentContract requires a positive total."),
+    ).valid is False
+    assert local_proof_for_obligation(
+        obligation,
+        _unit("OrderValidationContract is required."),
+    ).valid is False
+    assert local_proof_for_obligation(
+        obligation,
+        _unit("OrderValidationContract is required by deployment."),
+    ).valid is False
+    assert local_proof_for_obligation(
+        obligation,
+        _unit("OrderValidationContract is mandatory for deployment."),
+    ).valid is False
+    assert local_proof_for_obligation(
+        obligation,
+        _unit("OrderValidationContract requires."),
     ).valid is False
 
 

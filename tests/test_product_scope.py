@@ -3,7 +3,9 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from scripts.run_agent_developer_gate import run_protocol
+import pytest
+
+import scripts.run_agent_developer_gate as agent_gate
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -107,14 +109,98 @@ def _assert_agent_developer_protocol_baseline() -> None:
         "module_plus_dependency", "negative_contamination", "recovery",
     } <= {task["class"] for task in tasks}
 
-    report = run_protocol()
+    report = agent_gate.run_protocol()
     assert report["baseline_ok"] is True, report["errors"]
+    assert report["target_ok"] is True, report["target_gaps"]
     assert report["task_count"] == 11
     assert report["executed_task_count"] == 11
-    assert report["target_closed_tasks"] == 10
+    assert report["target_closed_tasks"] == 11
     assert report["false_supported"] == 0
     assert report["forbidden_source_contamination"] == 0
     assert report["errors"] == []
-    assert {(gap["task_id"], gap["gap"]) for gap in report["target_gaps"]} == {
-        ("ambiguous_module_recovery_named_gap", "bounded_module_ambiguity_projection"),
+    assert report["target_gaps"] == []
+    assert report["metrics"] == report["target_metrics"]
+
+    ambiguity = next(
+        task for task in report["tasks"]
+        if task["task_id"] == "ambiguous_module_recovery_named_gap"
+    )
+    assert ambiguity["context_call_count"] == 2
+    assert ambiguity["recovery_contract_ok"] is True
+    recovery = ambiguity["calls"][0]["recovery"]
+    assert recovery["errors"] == []
+    assert recovery["docs_status_modules"] == ["packages/auth", "services/auth"]
+    assert recovery["retry"] == {
+        "status": "ok",
+        "sources": ["packages/auth/README.md"],
+        "module_path": "packages/auth",
     }
+
+    dependency = next(
+        task for task in report["tasks"]
+        if task["task_id"] == "dependency_prefetch_recovery"
+    )
+    assert dependency["context_call_count"] == 2
+    assert [call["status"] for call in dependency["calls"]] == [
+        "ok", "insufficient_evidence",
+    ]
+
+
+def test_agent_developer_protocol_rejects_scope_and_working_path_drift(
+    monkeypatch, tmp_path,
+) -> None:
+    public = json.loads(agent_gate.TASKS_PATH.read_text(encoding="utf-8"))
+    oracle = json.loads(agent_gate.ORACLE_PATH.read_text(encoding="utf-8"))
+    public_path = tmp_path / "tasks.json"
+    oracle_path = tmp_path / "oracle.json"
+    public_path.write_text(json.dumps(public), encoding="utf-8")
+
+    drifted_oracle = json.loads(json.dumps(oracle))
+    drifted_oracle["trajectories"][0]["required_scopes"] = [{"scope": "project"}]
+    oracle_path.write_text(json.dumps(drifted_oracle), encoding="utf-8")
+    monkeypatch.setattr(agent_gate, "TASKS_PATH", public_path)
+    monkeypatch.setattr(agent_gate, "ORACLE_PATH", oracle_path)
+    with pytest.raises(ValueError, match="required_scopes do not match"):
+        agent_gate._load_protocol()
+
+    drifted_public = json.loads(json.dumps(public))
+    drifted_public["tasks"][0]["working_path"] = "packages/payments/src/outbox.py"
+    public_path.write_text(json.dumps(drifted_public), encoding="utf-8")
+    oracle_path.write_text(json.dumps(oracle), encoding="utf-8")
+    with pytest.raises(ValueError, match="outside every exact module scope"):
+        agent_gate._load_protocol()
+
+    drifted_public["tasks"][0]["working_path"] = "../outside.py"
+    public_path.write_text(json.dumps(drifted_public), encoding="utf-8")
+    with pytest.raises(ValueError, match="missing or unsafe"):
+        agent_gate._load_protocol()
+
+
+def test_agent_developer_protocol_is_a_hard_ci_gate(monkeypatch, capsys) -> None:
+    ci = (ROOT / ".github" / "workflows" / "ci.yml").read_text(encoding="utf-8")
+    assert "python scripts/run_agent_developer_gate.py" in ci
+
+    partial_report = {
+        "tasks": [{
+            "task_id": "ambiguous_module_recovery_named_gap",
+            "target_closed": False,
+            "known_gap": "bounded_module_ambiguity_projection",
+        }],
+        "errors": [],
+        "target_ok": False,
+        "target_closed_tasks": 10,
+        "task_count": 11,
+        "target_gap_count": 1,
+        "target_gaps": [{
+            "task_id": "ambiguous_module_recovery_named_gap",
+            "gap": "bounded_module_ambiguity_projection",
+            "actual_status": "insufficient_evidence",
+            "target_status": "insufficient_evidence",
+        }],
+        "false_supported": 0,
+        "forbidden_source_contamination": 0,
+    }
+    monkeypatch.setattr(agent_gate, "run_protocol", lambda: partial_report)
+
+    assert agent_gate.main() == 1
+    assert "Agent Developer Protocol v1: TARGET FAIL" in capsys.readouterr().out

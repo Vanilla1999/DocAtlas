@@ -5,6 +5,28 @@ from ._project_answer_contract_shared import *  # noqa: F401,F403
 
 from ._project_answer_contract_part01 import ProjectAnswerContract, ProofObligation, _append_relation_obligation, _best_subject, _bounded, _cardinality, _clean_phrase, _command_operation, _compound_workflow_subjects, _concept_queries, _contract_from_question_plan, _effect_relation, _explicit_subjects, _inventory_subject, _location_subject, _normal, _obligation, _retrieval_hints, _subject_fields, _subjects, _technical_term_for_value, _technical_terms, lifecycle_intent_for_question
 
+
+_SOURCE_DOCUMENT_SUBJECTS = frozenset({
+    "readme", "architecture", "changelog", "contributing", "roadmap", "runbook",
+})
+_SOURCE_DOCUMENT_CONTEXT_RE = re.compile(
+    r"\b(?:say|says|state|states|report|reports|describe|describes)\s+"
+    r"(?:about|regarding|on)\s+(.+?)(?:[?!.]|$)",
+    re.I,
+)
+
+
+def _source_document_behavior_context(question: str, subject: str) -> str | None:
+    """Return the requested topic for a conventional source-document query."""
+
+    if _normal(subject) not in _SOURCE_DOCUMENT_SUBJECTS:
+        return None
+    match = _SOURCE_DOCUMENT_CONTEXT_RE.search(question)
+    if match is None:
+        return None
+    return _clean_phrase(match.group(1)) or None
+
+
 def build_project_answer_contract(question: str) -> ProjectAnswerContract:
     """Build a bounded deterministic answer contract from the public question."""
 
@@ -312,6 +334,7 @@ def build_project_answer_contract(question: str) -> ProjectAnswerContract:
             obligations.append(_obligation(
                 question=raw_question, index=len(obligations), kind="behavior",
                 subject=subject, relation="behavior", value_kind="text",
+                context=_source_document_behavior_context(raw_question, subject),
                 lifecycle_intent=lifecycle,
                 span_value=subject if subject.casefold() in raw_question.casefold() else (behavior.group(0) if behavior else _EXPLAIN_RE.search(raw_question).group(0)),
             ))

@@ -86,6 +86,7 @@ def _requirement_item_count(value: str) -> int:
             word.casefold()
             for word in _REQUIREMENT_CONTENT_WORD_RE.findall(part)
             if word.casefold() not in _REQUIREMENT_STOP_WORDS
+            and re.search(r"[A-Za-zА-Яа-яЁё0-9_]", word)
         ]
         if words:
             count += 1
@@ -110,6 +111,11 @@ def _subject_bound_requirement_tail(
             between = clause[subject_end:match.start()]
             if len(_REQUIREMENT_CONTENT_WORD_RE.findall(between)) > 8:
                 continue
+            if (
+                match.group(0).casefold() in {"required", "mandatory"}
+                and re.search(r"\b(?:is|are|was|were|be|been|being)\s*$", between, re.I)
+            ):
+                continue
             return clause[match.end():].strip()
     return None
 
@@ -118,7 +124,7 @@ def _structured_requirement_proof(
     obligation: ProofObligation,
     text: str,
 ) -> tuple[bool, int]:
-    """Accept a subject-bound multi-item requirement clause or explicit list."""
+    """Accept one or more subject-bound requirements in a clause or explicit list."""
 
     best_detail_count = 0
     for clause in _proposition_clauses(text):
@@ -126,10 +132,10 @@ def _structured_requirement_proof(
         if tail is None:
             continue
         detail_count = _requirement_item_count(tail)
-        if detail_count >= 2:
+        if detail_count >= 1:
             best_detail_count = max(best_detail_count, detail_count)
 
-    if best_detail_count >= 2:
+    if best_detail_count >= 1:
         return True, best_detail_count
 
     lines = [line for line in str(text or "").splitlines() if line.strip()]
@@ -144,7 +150,7 @@ def _structured_requirement_proof(
                 break
             bullets.append(match.group(1))
         detail_count = sum(_requirement_item_count(item) > 0 for item in bullets)
-        if detail_count >= 2:
+        if detail_count >= 1:
             return True, detail_count
     return False, 0
 

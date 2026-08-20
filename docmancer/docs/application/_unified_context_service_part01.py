@@ -4,6 +4,53 @@ from __future__ import annotations
 from ._unified_context_service_shared import *  # noqa: F401,F403
 
 
+_MODULE_RECOVERY_REASON_CODES = frozenset({
+    "module_ambiguous", "module_not_found", "no_module_docs",
+})
+
+
+def _project_module_recovery_metadata(
+    project_result: Any,
+    *,
+    module: str | None,
+    module_path: str | None,
+) -> tuple[str | None, list[dict[str, str]]]:
+    """Return bounded module-recovery metadata already discovered by Project Docs."""
+
+    project_docs = getattr(project_result, "project_docs", None)
+    reason = str(getattr(project_docs, "reason_code", None) or "").strip()
+    if not reason and str(getattr(project_result, "status", "")) in _MODULE_RECOVERY_REASON_CODES:
+        reason = str(project_result.status)
+    if reason not in _MODULE_RECOVERY_REASON_CODES:
+        return None, []
+
+    candidates: list[dict[str, str]] = []
+    seen: set[str] = set()
+    requested_name = str(module or "").strip()
+    for source in getattr(project_docs, "candidate_sources", ()) or ():
+        if not isinstance(source, dict):
+            continue
+        candidate_path = str(source.get("module_path") or "").strip()
+        if not candidate_path or candidate_path in seen:
+            continue
+        if reason == "module_ambiguous" and requested_name and not module_path:
+            if requested_name not in {
+                str(source.get("module_name") or "").strip(),
+                str(source.get("module_id") or "").strip(),
+            }:
+                continue
+        seen.add(candidate_path)
+        candidate = {"module_path": candidate_path}
+        for key in ("module_name", "module_type"):
+            value = str(source.get(key) or "").strip()
+            if value:
+                candidate[key] = value
+        candidates.append(candidate)
+        if len(candidates) >= 8:
+            break
+    return reason, candidates
+
+
 class _UnifiedDocsContextServicePart01:
     def __init__(self, service: Any):
         self.service = service
@@ -187,10 +234,14 @@ class _UnifiedDocsContextServicePart01:
                     "dependency_detected": any(item.get("doc_scope") == "dependency" for item in project_items),
                 })
             context_pack.extend(project_items)
+            operational_reason_code, module_candidates = _project_module_recovery_metadata(
+                project_result, module=module, module_path=module_path,
+            )
             lanes["project"] = {
                 "status": project_result.status,
                 "source_count": len([i for i in project_items if i.get("doc_scope") in {"project", "module"}]),
-                "reason_code": project_result.reason,
+                "reason_code": operational_reason_code or project_result.reason,
+                **({"module_candidates": module_candidates} if module_candidates else {}),
             }
             dep_count = len([i for i in project_items if i.get("doc_scope") == "dependency"])
             if dep_count:

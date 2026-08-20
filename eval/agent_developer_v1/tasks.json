@@ -71,9 +71,9 @@
       "id": "ambiguous_module_recovery_named_gap",
       "class": "recovery",
       "fixture": "ambiguous_modules_monorepo",
-      "working_path": "services/auth/src/auth.py",
+      "working_path": "packages/auth/src/auth.py",
       "developer_task": "Resolve an ambiguous auth module name without choosing silently.",
-      "max_get_docs_context_calls": 1
+      "max_get_docs_context_calls": 2
     },
     {
       "id": "stale_module_docs_recovery",
@@ -89,7 +89,7 @@
       "fixture": "explicit_manifest_monorepo",
       "working_path": "packages/orders/src/submission.py",
       "developer_task": "Use the pinned tenacity dependency only after exact dependency docs are available.",
-      "max_get_docs_context_calls": 1
+      "max_get_docs_context_calls": 2
     }
   ]
 }
