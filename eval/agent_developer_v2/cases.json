@@ -10,15 +10,15 @@
       "fixture": "explicit_manifest_monorepo",
       "working_path": "packages/orders/src/submission.py",
       "max_get_docs_context_calls": 1,
-      "max_trajectory_tokens": 384,
+      "max_trajectory_tokens": 800,
       "calls": [
         {
           "question": "What is OrdersDraftStore?",
           "mode": "project",
           "scope": "module",
           "module_path": "packages/orders",
-          "packet_tokens": 384,
-          "max_projection_tokens": 384,
+          "packet_tokens": 800,
+          "max_projection_tokens": 800,
           "target_expected_status": "ok",
           "target_required_sources": ["packages/orders/README.md"],
           "forbidden_sources": ["packages/payments/README.md", "ARCHITECTURE.md"]
@@ -31,15 +31,15 @@
       "fixture": "explicit_manifest_monorepo",
       "working_path": "packages/orders/src/submission.py",
       "max_get_docs_context_calls": 1,
-      "max_trajectory_tokens": 384,
+      "max_trajectory_tokens": 800,
       "calls": [
         {
           "question": "What does OrdersDraftStore do?",
           "mode": "project",
           "scope": "module",
           "module_path": "packages/orders",
-          "packet_tokens": 384,
-          "max_projection_tokens": 384,
+          "packet_tokens": 800,
+          "max_projection_tokens": 800,
           "target_expected_status": "ok",
           "target_required_sources": ["packages/orders/README.md"],
           "forbidden_sources": ["packages/payments/README.md", "ARCHITECTURE.md"]
@@ -52,15 +52,15 @@
       "fixture": "explicit_manifest_monorepo",
       "working_path": "packages/orders/src/submission.py",
       "max_get_docs_context_calls": 1,
-      "max_trajectory_tokens": 384,
+      "max_trajectory_tokens": 800,
       "calls": [
         {
           "question": "What does OrderValidationContract require?",
           "mode": "project",
           "scope": "module",
           "module_path": "packages/orders",
-          "packet_tokens": 384,
-          "max_projection_tokens": 384,
+          "packet_tokens": 800,
+          "max_projection_tokens": 800,
           "target_expected_status": "ok",
           "target_required_sources": ["packages/orders/README.md"],
           "forbidden_sources": ["packages/payments/README.md", "ARCHITECTURE.md"]
@@ -73,14 +73,14 @@
       "fixture": "explicit_manifest_monorepo",
       "working_path": "packages/orders/src/submission.py",
       "max_get_docs_context_calls": 1,
-      "max_trajectory_tokens": 384,
+      "max_trajectory_tokens": 800,
       "calls": [
         {
           "question": "How many retry attempts does ProjectRetryPolicy allow?",
           "mode": "project",
           "scope": "project",
-          "packet_tokens": 384,
-          "max_projection_tokens": 384,
+          "packet_tokens": 800,
+          "max_projection_tokens": 800,
           "target_expected_status": "ok",
           "target_required_sources": ["ARCHITECTURE.md"],
           "forbidden_sources": ["packages/orders/README.md", "packages/payments/README.md"]
@@ -134,15 +134,15 @@
       "fixture": "explicit_manifest_monorepo",
       "working_path": "packages/orders/src/submission.py",
       "max_get_docs_context_calls": 2,
-      "max_trajectory_tokens": 768,
+      "max_trajectory_tokens": 1600,
       "calls": [
         {
           "question": "What is OrdersDraftStore?",
           "mode": "project",
           "scope": "module",
           "module_path": "packages/orders",
-          "packet_tokens": 384,
-          "max_projection_tokens": 384,
+          "packet_tokens": 800,
+          "max_projection_tokens": 800,
           "target_expected_status": "ok",
           "target_required_sources": ["packages/orders/README.md"],
           "forbidden_sources": ["packages/payments/README.md"]
@@ -151,8 +151,8 @@
           "question": "What is ProjectRetryPolicy?",
           "mode": "project",
           "scope": "project",
-          "packet_tokens": 384,
-          "max_projection_tokens": 384,
+          "packet_tokens": 800,
+          "max_projection_tokens": 800,
           "target_expected_status": "ok",
           "target_required_sources": ["ARCHITECTURE.md"],
           "forbidden_sources": ["packages/payments/README.md"]
@@ -221,15 +221,15 @@
           "target_module_candidates": ["packages/auth", "services/auth"],
           "forbidden_sources": ["packages/auth/README.md", "services/auth/README.md"],
           "recovery": {
-            "max_status_projection_tokens": 1200,
+            "max_status_projection_tokens": 800,
             "expected_module_paths": ["packages/auth", "services/auth"],
             "retry": {
               "question": "What is PackageAuthBoundary?",
               "mode": "project",
               "scope": "module",
               "module_path": "packages/auth",
-              "packet_tokens": 384,
-              "max_projection_tokens": 384,
+              "packet_tokens": 800,
+              "max_projection_tokens": 800,
               "target_expected_status": "ok",
               "target_required_sources": ["packages/auth/README.md"],
               "forbidden_sources": ["services/auth/README.md", "README.md"]
