@@ -1,6 +1,6 @@
 {
   "adapter": {
-    "model_version": "gpt-5.4-mini",
+    "model_version": "not-run",
     "name": "openai-compatible-low-cost"
   },
   "metrics": {
@@ -324,5 +324,5 @@
     "original_question_retry_rate": 0.95,
     "unnecessary_prepare_or_status_rate": 0.05
   },
-  "tool_schema_version": "unavailable"
+  "tool_schema_version": "sha256:7e73cc53037c02e6"
 }
