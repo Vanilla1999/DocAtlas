@@ -2,6 +2,9 @@
 from tests import _shared_test_docs_service as _shared
 globals().update({k: v for k, v in vars(_shared).items() if not k.startswith("__")})
 
+from tests._async_job_wait import wait_for_docs_job_status
+
+
 def test_prefetch_docs_batch_partial_failure_continue_true(tmp_path, monkeypatch):
     agent = FailingAgent()
     service = _service(tmp_path, monkeypatch, agent)
@@ -292,14 +295,12 @@ def test_prepare_library_docs_resolves_curated_github_manifest_before_indexing(t
         service,
     )
 
-    status = None
-    for _ in range(50):
-        status = service.get_docs_job_status(payload["job_id"])
-        if status and status.status in {"succeeded", "failed"}:
-            break
-        time.sleep(0.02)
+    status = wait_for_docs_job_status(
+        service,
+        payload["job_id"],
+        {"succeeded", "failed"},
+    )
 
-    assert status is not None
     assert status.status == "succeeded", status.message
     assert len(client.get.call_args_list) == 2
     manifest = agent.add_kwargs[0]["source_manifest"]
@@ -403,14 +404,12 @@ def test_prepare_library_docs_rejects_resolved_manifest_missing_documents(tmp_pa
         service,
     )
 
-    status = None
-    for _ in range(50):
-        status = service.get_docs_job_status(payload["job_id"])
-        if status and status.status in {"succeeded", "failed"}:
-            break
-        time.sleep(0.02)
+    status = wait_for_docs_job_status(
+        service,
+        payload["job_id"],
+        {"succeeded", "failed"},
+    )
 
-    assert status is not None
     assert status.status == "failed"
     assert status.message == "documents must be a list"
     assert resolver_calls == []
@@ -425,15 +424,10 @@ def test_successful_library_prefetch_atomically_publishes_staged_index(tmp_path,
         async_=True,
     )
 
-    for _ in range(100):
-        status = service.get_docs_job_status(result.job_id)
-        if status and status.status == "succeeded":
-            break
-        time.sleep(0.02)
+    status = wait_for_docs_job_status(service, result.job_id, "succeeded")
 
     record = service.registry.get("example-docs", "web", "latest")
     assert record is not None
-    assert status is not None
     assert status.status == "succeeded"
     assert service.library_docs.registry_ops.count_index_entries(record) == (1, 1)
 
@@ -455,13 +449,8 @@ def test_staged_prefetch_syncs_vectors_only_from_production_index(
         async_=True,
     )
 
-    for _ in range(100):
-        status = service.get_docs_job_status(result.job_id)
-        if status and status.status == "succeeded":
-            break
-        time.sleep(0.02)
+    status = wait_for_docs_job_status(service, result.job_id, "succeeded")
 
-    assert status is not None
     assert status.status == "succeeded"
     assert agent.add_kwargs[0]["with_vectors"] is False
     assert agent.sync_calls == expected_sync_calls
@@ -478,24 +467,16 @@ def test_unchanged_forced_prefetch_skips_second_vector_sync(tmp_path, monkeypatc
     first = service.prefetch_docs(
         "example-docs", ecosystem="web", docs_url="https://example.com/docs/", async_=True,
     )
-    for _ in range(100):
-        first_status = service.get_docs_job_status(first.job_id)
-        if first_status and first_status.status == "succeeded":
-            break
-        time.sleep(0.02)
+    first_status = wait_for_docs_job_status(service, first.job_id, "succeeded")
 
     second = service.prefetch_docs(
         "example-docs", ecosystem="web", docs_url="https://example.com/docs/",
         force_refresh=True, async_=True,
     )
-    for _ in range(100):
-        second_status = service.get_docs_job_status(second.job_id)
-        if second_status and second_status.status == "succeeded":
-            break
-        time.sleep(0.02)
+    second_status = wait_for_docs_job_status(service, second.job_id, "succeeded")
 
-    assert first_status is not None and first_status.status == "succeeded"
-    assert second_status is not None and second_status.status == "succeeded"
+    assert first_status.status == "succeeded"
+    assert second_status.status == "succeeded"
     assert "corpus_unchanged" in second_status.message
     assert agent.sync_calls == 1
 
@@ -514,11 +495,7 @@ def test_cancelled_staged_prefetch_never_syncs_vectors(tmp_path, monkeypatch):
     assert agent.entered.wait(timeout=1)
     service.cancel_docs_job(result.job_id)
     agent.release.set()
-    for _ in range(30):
-        status = service.get_docs_job_status(result.job_id)
-        if status and status.status == "cancelled":
-            break
-        time.sleep(0.02)
+    wait_for_docs_job_status(service, result.job_id, "cancelled")
 
     assert agent.sync_calls == 0
 
@@ -534,15 +511,10 @@ def test_vector_sync_failure_redacts_valid_identifier_secret_from_durable_status
         async_=True,
     )
 
-    for _ in range(30):
-        status = service.get_docs_job_status(result.job_id)
-        if status and status.status == "failed":
-            break
-        time.sleep(0.02)
+    status = wait_for_docs_job_status(service, result.job_id, "failed")
 
     record = service.registry.get("example-docs", "web", "latest")
     assert record is not None
-    assert status is not None
     assert status.status == "failed"
     assert status.reason_code == "vector_indexing_failed"
     assert "vector_indexing_failed" in status.message
@@ -572,12 +544,9 @@ def test_vector_sync_failure_retains_existing_active_corpus(tmp_path, monkeypatc
     initial = service.prefetch_docs(
         "example-docs", ecosystem="web", docs_url="https://example.com/docs/", async_=True,
     )
-    for _ in range(30):
-        initial_status = service.get_docs_job_status(initial.job_id)
-        if initial_status and initial_status.status == "succeeded":
-            break
-        time.sleep(0.02)
+    initial_status = wait_for_docs_job_status(service, initial.job_id, "succeeded")
     record_before = service.registry.get("example-docs", "web", "latest")
+    assert initial_status.status == "succeeded"
     assert record_before is not None
     assert service.library_docs.registry_ops.count_index_entries(record_before) == (1, 1)
     refreshed_before = record_before.last_refreshed_at
@@ -588,14 +557,9 @@ def test_vector_sync_failure_retains_existing_active_corpus(tmp_path, monkeypatc
         "example-docs", ecosystem="web", docs_url="https://example.com/docs/",
         force_refresh=True, async_=True,
     )
-    for _ in range(30):
-        failed_status = service.get_docs_job_status(failed.job_id)
-        if failed_status and failed_status.status == "failed":
-            break
-        time.sleep(0.02)
+    failed_status = wait_for_docs_job_status(service, failed.job_id, "failed")
 
     record_after = service.registry.get("example-docs", "web", "latest")
-    assert failed_status is not None
     assert failed_status.status == "failed"
     assert record_after is not None
     assert record_after.status == record_before.status
@@ -615,14 +579,9 @@ def test_skipped_vector_sync_never_publishes_hybrid_library_index(tmp_path, monk
         docs_url="https://example.com/docs/",
         async_=True,
     )
-    for _ in range(50):
-        status = service.get_docs_job_status(result.job_id)
-        if status and status.status == "failed":
-            break
-        time.sleep(0.02)
+    status = wait_for_docs_job_status(service, result.job_id, "failed")
 
     record = service.registry.get("example-docs", "web", "latest")
-    assert status is not None
     assert status.status == "failed"
     assert status.reason_code == "vector_indexing_failed"
     assert record is not None
@@ -645,14 +604,8 @@ def test_library_prefetch_job_cancellation_reaches_terminal_cancelled_state(tmp_
     assert status is not None
     assert status.status == "cancelling"
     agent.release.set()
-    for _ in range(30):
-        status = service.get_docs_job_status(result.job_id)
-        if status and status.status == "cancelled":
-            break
-        time.sleep(0.02)
+    status = wait_for_docs_job_status(service, result.job_id, "cancelled")
 
-    status = service.get_docs_job_status(result.job_id)
-    assert status is not None
     assert status.status == "cancelled"
     assert status.reason_code == "cancelled"
     assert status.retryable is True
@@ -670,11 +623,7 @@ def test_cancelled_library_prefetch_restores_index_state_after_inflight_fetch(tm
 
     assert agent.entered.wait(timeout=1)
     service.cancel_docs_job(result.job_id)
-    for _ in range(30):
-        status = service.get_docs_job_status(result.job_id)
-        if status and status.status == "cancelled":
-            break
-        time.sleep(0.02)
+    wait_for_docs_job_status(service, result.job_id, "cancelled")
     before = service.registry.get("example-docs", "web", "latest")
     assert before is not None
     assert before.status == "available"
@@ -710,13 +659,7 @@ def test_cross_service_durable_cancellation_stops_active_library_prefetch(tmp_pa
     finally:
         agent.release.set()
 
-    status = None
-    for _ in range(30):
-        status = active_service.get_docs_job_status(result.job_id)
-        if status and status.status == "cancelled":
-            break
-        time.sleep(0.02)
-    assert status is not None
+    status = wait_for_docs_job_status(active_service, result.job_id, "cancelled")
     assert status.status == "cancelled"
     record = active_service.registry.get("example-docs", "web", "latest")
     assert record is not None
