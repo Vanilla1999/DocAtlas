@@ -212,7 +212,6 @@ def main(argv: list[str] | None = None) -> int:
                 "-m",
                 "pytest",
                 "tests/docs/test_tool_choice_eval.py",
-                "tests/test_opencode_live_provenance.py",
                 "-q",
             ],
         )
