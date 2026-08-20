@@ -1,6 +1,9 @@
 name: TEMP materialize PR106 yellows
 
 on:
+  pull_request:
+    branches:
+      - main
   push:
     branches:
       - agent/adversarial-token-mutation-v2
@@ -14,7 +17,6 @@ concurrency:
 
 jobs:
   materialize:
-    if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
