@@ -5,13 +5,22 @@ from pathlib import Path
 
 import pytest
 
-from scripts.run_agent_developer_openai_benchmark import _output_text
-from scripts.run_task21_openai_live import _responses_input
+from scripts.run_agent_developer_openai_benchmark import (
+    REASONING_EFFORT as AGENT_REASONING_EFFORT,
+    _output_text,
+    _request_payload as _agent_request_payload,
+)
+from scripts.run_task21_openai_live import (
+    REASONING_EFFORT as TASK21_REASONING_EFFORT,
+    _responses_input,
+    _responses_request_payload,
+)
 
 
 TASK21_REPORT = Path("eval/results/task21_tool_choice_gate.json")
 AGENT_REPORT = Path("eval/agent_developer_v1/results/model-benchmark.json")
 EXPECTED_MODEL = "gpt-5.6-luna"
+EXPECTED_REASONING_EFFORT = "medium"
 
 
 def test_task21_responses_input_preserves_function_history():
@@ -60,6 +69,19 @@ def test_task21_responses_input_preserves_function_history():
     }
 
 
+def test_task21_responses_request_pins_luna_medium():
+    payload = _responses_request_payload(
+        model=EXPECTED_MODEL,
+        guidance="use docs tools",
+        scenario={"prompt": "Question"},
+        tools=[],
+    )
+
+    assert TASK21_REASONING_EFFORT == EXPECTED_REASONING_EFFORT
+    assert payload["model"] == EXPECTED_MODEL
+    assert payload["reasoning"] == {"effort": EXPECTED_REASONING_EFFORT}
+
+
 def test_agent_responses_output_text_reads_only_message_text():
     response = {
         "output": [
@@ -73,6 +95,19 @@ def test_agent_responses_output_text_reads_only_message_text():
         ]
     }
     assert _output_text(response) == '{"action":"finish"}'
+
+
+def test_agent_responses_request_pins_luna_medium():
+    payload = _agent_request_payload(
+        [{"role": "user", "content": "Plan evidence"}],
+        model=EXPECTED_MODEL,
+    )
+
+    assert AGENT_REASONING_EFFORT == EXPECTED_REASONING_EFFORT
+    assert payload["model"] == EXPECTED_MODEL
+    assert payload["reasoning"] == {"effort": EXPECTED_REASONING_EFFORT}
+    assert payload["text"]["format"]["type"] == "json_schema"
+    assert payload["text"]["format"]["strict"] is True
 
 
 def test_task21_committed_live_report_is_complete_and_meets_frozen_thresholds():
@@ -90,6 +125,7 @@ def test_task21_committed_live_report_is_complete_and_meets_frozen_thresholds():
 
     assert report["passed"] is True
     assert model_version == EXPECTED_MODEL
+    assert report["reasoning_effort"] == EXPECTED_REASONING_EFFORT
     assert report["scenario_count"] == 20
     assert report["repeats"] == 3
     assert len(results) == 60
@@ -124,3 +160,8 @@ def test_agent_developer_committed_live_report_is_complete_and_safe():
     assert 0.0 <= report["scope_accuracy"] <= 1.0
     assert 0.0 <= report["recovery_accuracy"] <= 1.0
     assert all(task.get("usage") for task in report["tasks"])
+    assert all(
+        row.get("reasoning_effort") == EXPECTED_REASONING_EFFORT
+        for task in report["tasks"]
+        for row in task.get("usage") or ()
+    )
