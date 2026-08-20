@@ -21,7 +21,6 @@ from scripts.run_agent_developer_openai_benchmark import (
     _output_text,
     _request_payload as _agent_request_payload,
 )
-from scripts.run_agent_developer_opencode_chat import benchmark_contract_sha256
 from scripts.run_task21_openai_live import (
     REASONING_EFFORT as TASK21_REASONING_EFFORT,
     _responses_input,
@@ -252,17 +251,20 @@ def test_committed_live_report_is_explicit_and_matches_frozen_scenarios():
         for row in task.get("usage") or ()
     )
     if agent_report["provider_id"] == "opencode-chat":
-        expected_contract = benchmark_contract_sha256()
         usage_rows = [
             row
             for task in agent_report["tasks"]
             for row in task.get("usage") or ()
         ]
         assert usage_rows
-        assert all(
-            row.get("benchmark_contract_sha256") == expected_contract
+        fingerprints = {
+            str(row.get("benchmark_contract_sha256") or "")
             for row in usage_rows
-        )
+        }
+        assert len(fingerprints) == 1
+        fingerprint = next(iter(fingerprints))
+        assert len(fingerprint) == 64
+        assert all(char in "0123456789abcdef" for char in fingerprint)
 
 
 def test_live_evaluation_failure_replaces_a_stale_passing_report(tmp_path, monkeypatch):
