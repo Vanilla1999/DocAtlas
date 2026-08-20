@@ -4,14 +4,13 @@ on:
   workflow_dispatch:
     inputs:
       model:
-        description: GitHub Models model id
+        description: OpenAI API model id
         required: true
-        default: openai/gpt-4o-mini
+        default: gpt-5.4-mini
         type: string
 
 permissions:
   contents: read
-  models: read
 
 concurrency:
   group: task21-live-${{ github.ref }}
@@ -34,10 +33,10 @@ jobs:
         run: python -m pytest tests/docs/test_tool_choice_eval.py -q
       - name: Run live Task 21 tool-choice evaluation
         env:
-          TASK21_GITHUB_TOKEN: ${{ github.token }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           MODEL: ${{ inputs.model }}
         run: |
-          python scripts/run_task21_github_models_live.py \
+          python scripts/run_task21_openai_live.py \
             --model "$MODEL" \
             --output eval/results/task21_tool_choice_gate.json
       - name: Upload live Task 21 report
