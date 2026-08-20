@@ -12,9 +12,16 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def test_publish_workflow_is_manual_build_once_and_oidc() -> None:
     text = (ROOT / ".github/workflows/publish.yml").read_text()
-    assert "workflow_dispatch:" in text
-    assert "pull_request:" in text
-    assert "release:" not in text and "tags:" not in text
+    trigger_block = text.split("\non:\n", 1)[1].split("\npermissions:\n", 1)[0]
+    trigger_events = {
+        line.strip()[:-1]
+        for line in trigger_block.splitlines()
+        if line.startswith("  ")
+        and not line.startswith("    ")
+        and line.strip().endswith(":")
+    }
+    assert trigger_events == {"workflow_dispatch", "pull_request"}
+    assert "    tags:" not in trigger_block
     assert text.count("python -m build") == 1
     assert 'python: ["3.11", "3.12", "3.13"]' in text
     assert "id-token: write" in text
