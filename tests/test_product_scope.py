@@ -177,36 +177,6 @@ def test_agent_developer_protocol_rejects_scope_and_working_path_drift(
         agent_gate._load_protocol()
 
 
-def test_agent_developer_protocol_is_a_hard_ci_gate(monkeypatch, capsys) -> None:
-    ci = (ROOT / ".github" / "workflows" / "ci.yml").read_text(encoding="utf-8")
-    assert "python scripts/run_agent_developer_gate.py" in ci
-
-    partial_report = {
-        "tasks": [{
-            "task_id": "ambiguous_module_recovery_named_gap",
-            "target_closed": False,
-            "known_gap": "bounded_module_ambiguity_projection",
-        }],
-        "errors": [],
-        "target_ok": False,
-        "target_closed_tasks": 10,
-        "task_count": 11,
-        "target_gap_count": 1,
-        "target_gaps": [{
-            "task_id": "ambiguous_module_recovery_named_gap",
-            "gap": "bounded_module_ambiguity_projection",
-            "actual_status": "insufficient_evidence",
-            "target_status": "insufficient_evidence",
-        }],
-        "false_supported": 0,
-        "forbidden_source_contamination": 0,
-    }
-    monkeypatch.setattr(agent_gate, "run_protocol", lambda: partial_report)
-
-    assert agent_gate.main() == 1
-    assert "Agent Developer Protocol v1: TARGET FAIL" in capsys.readouterr().out
-
-
 def _agent_model_oracle_task(task_id: str) -> dict:
     return next(
         task for task in agent_gate._load_protocol()["tasks"]
@@ -243,42 +213,37 @@ def _model_context_record(
     }
 
 
-def test_agent_developer_model_prompt_is_oracle_isolated() -> None:
+def _assert_agent_developer_model_benchmark_contract() -> None:
     task = next(
         task for task in model_benchmark.load_public_tasks()
         if task["id"] == "module_plus_project_two_call_trajectory"
     )
     messages = model_benchmark.task_messages(task)
     model_view = json.loads(messages[1]["content"])
-
     assert set(model_view) == {
         "task_id", "developer_task", "working_path", "max_get_docs_context_calls",
     }
     assert "class" not in model_view
     assert "fixture" not in model_view
-    serialized = json.dumps(messages, ensure_ascii=False)
+    serialized_messages = json.dumps(messages, ensure_ascii=False)
     for evaluator_term in (
         "expected_trajectories", "required_scopes", "forbidden_sources",
         "required_sources", "known_gap", "mutation_before_calls",
     ):
-        assert evaluator_term not in serialized
+        assert evaluator_term not in serialized_messages
 
-
-def test_agent_developer_model_action_schema_is_read_only() -> None:
     schema = model_benchmark.action_schema()
     assert set(schema["properties"]["action"]["enum"]) == {
         "get_docs_context", "docs_status", "finish",
     }
-    serialized = json.dumps(schema, sort_keys=True)
+    serialized_schema = json.dumps(schema, sort_keys=True)
     for forbidden_tool in (
         "prepare_docs", "sync_project_docs", "prefetch_project_dependency_docs",
         "replace_text", "write_file", "run_tests", "shell",
     ):
-        assert forbidden_tool not in serialized
+        assert forbidden_tool not in serialized_schema
 
-
-def test_agent_developer_model_scorer_accepts_exact_module_and_rejects_scope_drift() -> None:
-    task = _agent_model_oracle_task("module_definition_supported")
+    module_task = _agent_model_oracle_task("module_definition_supported")
     exact = _model_context_record(
         question="What is OrdersDraftStore?",
         scope="module",
@@ -287,13 +252,13 @@ def test_agent_developer_model_scorer_accepts_exact_module_and_rejects_scope_dri
         status="ok",
         sources=["packages/orders/README.md"],
     )
-    accepted = model_benchmark.score_task(task, [exact])
+    accepted = model_benchmark.score_task(module_task, [exact])
     assert accepted["passed"] is True, accepted["errors"]
 
     drift = json.loads(json.dumps(exact))
     drift["action"]["scope"] = "project"
     drift["action"]["module_path"] = ""
-    rejected = model_benchmark.score_task(task, [drift])
+    rejected = model_benchmark.score_task(module_task, [drift])
     assert rejected["passed"] is False
     assert any("missing required scope" in error for error in rejected["errors"])
 
@@ -301,14 +266,12 @@ def test_agent_developer_model_scorer_accepts_exact_module_and_rejects_scope_dri
     contaminated["payload"]["sources"].append(
         {"path_or_url": "packages/payments/README.md"}
     )
-    rejected = model_benchmark.score_task(task, [contaminated])
+    rejected = model_benchmark.score_task(module_task, [contaminated])
     assert rejected["passed"] is False
     assert rejected["forbidden_source_contamination"] == 1
 
-
-def test_agent_developer_model_scorer_accepts_safe_exact_ambiguity_shortcut() -> None:
-    task = _agent_model_oracle_task("ambiguous_module_recovery_named_gap")
-    exact = _model_context_record(
+    ambiguity_task = _agent_model_oracle_task("ambiguous_module_recovery_named_gap")
+    exact_ambiguity = _model_context_record(
         question="What is PackageAuthBoundary?",
         scope="module",
         mode="project",
@@ -316,36 +279,64 @@ def test_agent_developer_model_scorer_accepts_safe_exact_ambiguity_shortcut() ->
         status="ok",
         sources=["packages/auth/README.md"],
     )
-    accepted = model_benchmark.score_task(task, [exact])
+    accepted = model_benchmark.score_task(ambiguity_task, [exact_ambiguity])
     assert accepted["passed"] is True, accepted["errors"]
     assert accepted["direct_recovery_shortcut"] is True
     assert accepted["recovery_contract_ok"] is True
 
-    wrong_module = json.loads(json.dumps(exact))
+    wrong_module = json.loads(json.dumps(exact_ambiguity))
     wrong_module["action"]["module_path"] = "services/auth"
     wrong_module["payload"]["sources"] = [
         {"path_or_url": "services/auth/README.md"}
     ]
-    rejected = model_benchmark.score_task(task, [wrong_module])
+    rejected = model_benchmark.score_task(ambiguity_task, [wrong_module])
     assert rejected["passed"] is False
     assert rejected["direct_recovery_shortcut"] is False
 
-
-def test_agent_developer_model_workflow_is_manual_trusted_and_sha_pinned() -> None:
-    text = (
+    workflow = (
         ROOT / ".github" / "workflows" / "agent-developer-model-benchmark.yml"
     ).read_text(encoding="utf-8")
-    trigger_block = text.split("\non:\n", 1)[1].split("\npermissions:\n", 1)[0]
-
+    trigger_block = workflow.split("\non:\n", 1)[1].split("\npermissions:\n", 1)[0]
     assert "  workflow_dispatch:" in trigger_block
     assert "pull_request:" not in trigger_block
     assert "push:" not in trigger_block
-    assert "models: read" in text
-    assert "AGENT_DEVELOPER_GITHUB_TOKEN: ${{ github.token }}" in text
-    assert "python scripts/run_agent_developer_model_benchmark.py" in text
-    assert "python -m pytest tests/test_product_scope.py -q" in text
-    for line in text.splitlines():
+    assert "models: read" in workflow
+    assert "AGENT_DEVELOPER_GITHUB_TOKEN: ${{ github.token }}" in workflow
+    assert "python scripts/run_agent_developer_model_benchmark.py" in workflow
+    assert "python -m pytest tests/test_product_scope.py -q" in workflow
+    for line in workflow.splitlines():
         if "uses:" in line:
             ref = line.split("@", 1)[1].split()[0]
             assert len(ref) == 40
             assert all(char in "0123456789abcdef" for char in ref)
+
+
+def test_agent_developer_protocol_is_a_hard_ci_gate(monkeypatch, capsys) -> None:
+    ci = (ROOT / ".github" / "workflows" / "ci.yml").read_text(encoding="utf-8")
+    assert "python scripts/run_agent_developer_gate.py" in ci
+    _assert_agent_developer_model_benchmark_contract()
+
+    partial_report = {
+        "tasks": [{
+            "task_id": "ambiguous_module_recovery_named_gap",
+            "target_closed": False,
+            "known_gap": "bounded_module_ambiguity_projection",
+        }],
+        "errors": [],
+        "target_ok": False,
+        "target_closed_tasks": 10,
+        "task_count": 11,
+        "target_gap_count": 1,
+        "target_gaps": [{
+            "task_id": "ambiguous_module_recovery_named_gap",
+            "gap": "bounded_module_ambiguity_projection",
+            "actual_status": "insufficient_evidence",
+            "target_status": "insufficient_evidence",
+        }],
+        "false_supported": 0,
+        "forbidden_source_contamination": 0,
+    }
+    monkeypatch.setattr(agent_gate, "run_protocol", lambda: partial_report)
+
+    assert agent_gate.main() == 1
+    assert "Agent Developer Protocol v1: TARGET FAIL" in capsys.readouterr().out
