@@ -12,16 +12,22 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: release-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           ref: ${{ inputs.tag && format('refs/tags/{0}', inputs.tag) || github.sha }}
+          persist-credentials: false
       - uses: actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38 # v5.4.0
         with:
           python-version: "3.11"
@@ -43,7 +49,9 @@ jobs:
 
   wheel:
     needs: build
+    timeout-minutes: 20
     strategy:
+      fail-fast: false
       matrix:
         python: ["3.11", "3.12", "3.13"]
     runs-on: ubuntu-latest
@@ -51,6 +59,7 @@ jobs:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           ref: ${{ inputs.tag && format('refs/tags/{0}', inputs.tag) || github.sha }}
+          persist-credentials: false
       - uses: actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38 # v5.4.0
         with:
           python-version: ${{ matrix.python }}
@@ -69,10 +78,12 @@ jobs:
   sdist-and-installer:
     needs: build
     runs-on: ubuntu-latest
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           ref: ${{ inputs.tag && format('refs/tags/{0}', inputs.tag) || github.sha }}
+          persist-credentials: false
       - uses: actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38 # v5.4.0
         with:
           python-version: "3.11"
@@ -98,10 +109,28 @@ jobs:
           doc-atlas --help
           python "$GITHUB_WORKSPACE/scripts/docs_mcp_stdio_smoke.py"
 
+  required-release:
+    name: required-release
+    if: always()
+    needs: [build, wheel, sdist-and-installer]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Enforce required release validation
+        env:
+          BUILD: ${{ needs.build.result }}
+          WHEEL: ${{ needs.wheel.result }}
+          SDIST_INSTALLER: ${{ needs.sdist-and-installer.result }}
+        run: |
+          for result in "$BUILD" "$WHEEL" "$SDIST_INSTALLER"; do
+            test "$result" = "success"
+          done
+
   publish:
     if: github.event_name == 'workflow_dispatch'
-    needs: [wheel, sdist-and-installer]
+    needs: [required-release]
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     environment: release
     permissions:
       contents: read
@@ -111,6 +140,7 @@ jobs:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           ref: refs/tags/${{ inputs.tag }}
+          persist-credentials: false
       - uses: actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38 # v5.4.0
         with:
           python-version: "3.11"
