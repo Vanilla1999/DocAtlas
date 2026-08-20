@@ -75,6 +75,20 @@ MUTANTS = (
         "        if False and len(paths) > 1:  # mutation: silently select ambiguous module\n            return None, {",
         FULL_GATE,
     ),
+    Mutant(
+        "project_status_module_projection_guard",
+        "docmancer/docs/interfaces/mcp/prefetch_tools.py",
+        "_DOCS_STATUS_MODULE_LIMIT = 8",
+        "_DOCS_STATUS_MODULE_LIMIT = 0  # mutation: hide module recovery inventory",
+        FULL_GATE,
+    ),
+    Mutant(
+        "module_recovery_reason_projection_guard",
+        "docmancer/docs/interfaces/mcp/context_tools.py",
+        "_MODULE_RECOVERY_REASON_CODES = frozenset({\n    \"module_ambiguous\", \"module_not_found\", \"no_module_docs\",\n})",
+        "_MODULE_RECOVERY_REASON_CODES = frozenset({\n    \"module_not_found\", \"no_module_docs\",\n})  # mutation: hide ambiguous-module recovery metadata",
+        FULL_GATE,
+    ),
 )
 
 

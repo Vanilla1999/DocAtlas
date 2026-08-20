@@ -74,6 +74,11 @@ def self_test() -> None:
     )
     assert _edit_safe({"status": "insufficient_evidence", "edit_ready": False})
     assert not _edit_safe({"status": "insufficient_evidence", "edit_ready": True})
+    with TemporaryDirectory(prefix="docatlas-v2-setup-selftest-") as raw_tmp:
+        root = Path(raw_tmp)
+        assert _safe_setup_path(root, "packages/auth/README.md") is not None
+        assert _safe_setup_path(root, "../outside.md") is None
+        assert _safe_setup_path(root, "/absolute.md") is None
 
 
 def _normalized_for_tokens(value: Any, project_path: str) -> Any:
@@ -174,6 +179,26 @@ def _load_cases() -> dict[str, Any]:
                 planned_calls += 1
         if planned_calls > max_calls:
             raise ValueError(f"{case_id}: planned calls exceed call budget")
+        setup_files = case.get("setup_files")
+        if setup_files is not None:
+            if not isinstance(setup_files, list) or len(setup_files) > 24:
+                raise ValueError(f"{case_id}: invalid setup_files bound")
+            seen_setup_paths: set[str] = set()
+            for index, row in enumerate(setup_files):
+                if not isinstance(row, dict) or set(row) != {"path", "content"}:
+                    raise ValueError(f"{case_id}: invalid setup_files[{index}]")
+                raw_path = str(row.get("path") or "").replace("\\", "/")
+                parts = Path(raw_path).parts
+                if (
+                    not raw_path or raw_path.startswith("/") or ".." in parts
+                    or (parts and str(parts[0]).endswith(":"))
+                    or raw_path in seen_setup_paths
+                ):
+                    raise ValueError(f"{case_id}: unsafe setup_files[{index}] path")
+                content = row.get("content")
+                if not isinstance(content, str) or len(content.encode("utf-8")) > 4096:
+                    raise ValueError(f"{case_id}: invalid setup_files[{index}] content")
+                seen_setup_paths.add(raw_path)
     return payload
 
 
@@ -330,22 +355,47 @@ def _case_scope(call: dict[str, Any]) -> dict[str, str]:
     return base._scope_signature(call)
 
 
+def _safe_setup_path(project: Path, raw_path: Any) -> Path | None:
+    return base._safe_fixture_path(project, raw_path)
+
+
+def _apply_setup_files(project: Path, rows: Any) -> None:
+    if rows in (None, []):
+        return
+    if not isinstance(rows, list) or len(rows) > 24:
+        raise ValueError("setup_files must contain at most 24 files")
+    seen: set[Path] = set()
+    for index, row in enumerate(rows):
+        if not isinstance(row, dict) or set(row) != {"path", "content"}:
+            raise ValueError(f"setup_files[{index}] must contain exactly path and content")
+        target = _safe_setup_path(project, row.get("path"))
+        content = row.get("content")
+        if target is None:
+            raise ValueError(f"setup_files[{index}] path is unsafe")
+        if target in seen:
+            raise ValueError(f"setup_files[{index}] duplicates a prior path")
+        if not isinstance(content, str) or len(content.encode("utf-8")) > 4096:
+            raise ValueError(f"setup_files[{index}] content exceeds the 4096-byte bound")
+        seen.add(target)
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text(content, encoding="utf-8")
+
+
 def _run_adversarial_case(case: dict[str, Any]) -> dict[str, Any]:
     case_id = str(case["id"])
     fixture = base.PROJECTS_ROOT / str(case["fixture"])
-    working = base._safe_fixture_path(fixture, case.get("working_path"))
     errors: list[str] = []
     events: list[dict[str, Any]] = []
     trajectory_tokens = 0
     context_calls = 0
     previous_home = os.environ.get("DOCMANCER_HOME")
 
-    if working is None or not working.is_file():
+    if not fixture.is_dir():
         return {
             "case_id": case_id,
             "passed": False,
             "trajectory_tokens": 0,
-            "errors": ["working_path is missing or unsafe"],
+            "errors": ["fixture is missing"],
             "events": [],
         }
 
@@ -354,6 +404,16 @@ def _run_adversarial_case(case: dict[str, Any]) -> dict[str, Any]:
             tmp = Path(raw_tmp)
             project = tmp / "project"
             shutil.copytree(fixture, project)
+            _apply_setup_files(project, case.get("setup_files"))
+            working = _safe_setup_path(project, case.get("working_path"))
+            if working is None or not working.is_file():
+                return {
+                    "case_id": case_id,
+                    "passed": False,
+                    "trajectory_tokens": 0,
+                    "errors": ["working_path is missing or unsafe"],
+                    "events": [],
+                }
             os.environ["DOCMANCER_HOME"] = str(tmp / "home")
             service = base._service(tmp)
             sync = service.sync_project_docs(str(project), with_vectors=False)

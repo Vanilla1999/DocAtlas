@@ -117,6 +117,11 @@ def _bounded_project_status(project: Any, *, details: bool) -> dict[str, Any]:
                 if row.get(key) not in (None, "")
             })
     module_count = len(modules)
+    raw_diagnostics = project.get("diagnostics")
+    diagnostics = raw_diagnostics if isinstance(raw_diagnostics, dict) else {}
+    raw_active_index = diagnostics.get("active_index")
+    active_index = raw_active_index if isinstance(raw_active_index, dict) else {}
+    active_db_path = active_index.get("db_path")
     compact: dict[str, Any] = {
         "project_path": project.get("project_path"),
         "project_detected": project.get("project_detected"),
@@ -134,6 +139,16 @@ def _bounded_project_status(project: Any, *, details: bool) -> dict[str, Any]:
             "modules": visible_modules,
             "modules_omitted": max(0, module_count - len(visible_modules)) if details else module_count,
         },
+        "diagnostics": (
+            {
+                "active_index": {
+                    key: active_index.get(key)
+                    for key in ("db_path", "config_source", "config_path", "retrieval_mode")
+                    if active_index.get(key) not in (None, "")
+                }
+            }
+            if active_db_path not in (None, "") else {}
+        ),
         "warnings": list(project.get("warnings") or [])[:_DOCS_STATUS_WARNING_LIMIT],
     }
     if project.get("requires_confirmation"):
