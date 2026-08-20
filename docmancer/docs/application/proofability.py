@@ -1,8 +1,9 @@
 """Bounded diagnostics for why source-backed proof could not be completed.
 
 The classifier is deliberately derived from an already-computed selection
-verdict.  It never changes selection, support hashes, or answer semantics; it
-only explains the failed stage without exposing raw document content.
+verdict or its audit manifest. It never changes selection, support hashes, or
+answer semantics; it only explains the failed stage without exposing raw
+document content.
 """
 from __future__ import annotations
 
@@ -27,6 +28,12 @@ _ELIGIBILITY_REASON_ORDER = (
 )
 
 
+def _field(value: Any, name: str, default: Any = None) -> Any:
+    if isinstance(value, Mapping):
+        return value.get(name, default)
+    return getattr(value, name, default)
+
+
 def _nonnegative_int(value: Any, default: int = 0) -> int:
     if isinstance(value, bool):
         return default
@@ -38,9 +45,17 @@ def _nonnegative_int(value: Any, default: int = 0) -> int:
 
 
 def _omission_counts(decision: Any) -> dict[str, int]:
+    existing = _field(decision, "omission_counts")
+    if isinstance(existing, Mapping):
+        return dict(sorted(
+            (str(key), _nonnegative_int(value))
+            for key, value in existing.items()
+            if str(key) and _nonnegative_int(value) > 0
+        ))
+
     counts: dict[str, int] = {}
-    for omission in getattr(decision, "omissions", ()) or ():
-        code = str(getattr(omission, "reason_code", "") or "").strip()
+    for omission in _field(decision, "omissions", ()) or ():
+        code = str(_field(omission, "reason_code", "") or "").strip()
         if code:
             counts[code] = counts.get(code, 0) + 1
     return dict(sorted(counts.items()))
@@ -49,13 +64,17 @@ def _omission_counts(decision: Any) -> dict[str, int]:
 def _missing_values(decision: Any) -> tuple[str, ...]:
     return tuple(
         str(value).strip()
-        for value in getattr(decision, "missing_requirements", ()) or ()
+        for value in _field(decision, "missing_requirements", ()) or ()
         if str(value).strip()
     )
 
 
 def _has_missing_suffix(values: tuple[str, ...], suffix: str) -> bool:
     return any(value == suffix or value.endswith(":" + suffix) for value in values)
+
+
+def _support(decision: Any) -> Any:
+    return _field(decision, "support_decision", {}) or {}
 
 
 def diagnose_proofability(decision: Any) -> dict[str, Any]:
@@ -67,12 +86,17 @@ def diagnose_proofability(decision: Any) -> dict[str, Any]:
     cannot fit the bounded proof, or selected evidence that cannot localize all
     mandatory propositions. Retrieval and policy failures remain separate so a
     documentation author is not blamed for an indexing/routing problem.
+
+    ``decision`` may be the immutable ``SelectionDecision`` object or its
+    ``audit_manifest()`` mapping. Supporting both forms lets debug/reporting
+    code persist and re-evaluate the same bounded diagnosis without document
+    bodies or provider state.
     """
 
-    support = getattr(decision, "support_decision", None)
+    support = _support(decision)
     if (
-        str(getattr(decision, "status", "")) == "ok"
-        and bool(getattr(support, "answer_supported", False))
+        str(_field(decision, "status", "")) == "ok"
+        and bool(_field(support, "answer_supported", False))
     ):
         return {
             "schema_version": PROOFABILITY_SCHEMA_VERSION,
@@ -82,20 +106,19 @@ def diagnose_proofability(decision: Any) -> dict[str, Any]:
             "reason_codes": [],
         }
 
-    metrics: Mapping[str, Any] = (
-        getattr(decision, "metrics", {})
-        if isinstance(getattr(decision, "metrics", {}), Mapping)
-        else {}
-    )
+    raw_metrics = _field(decision, "metrics", {})
+    metrics: Mapping[str, Any] = raw_metrics if isinstance(raw_metrics, Mapping) else {}
     omissions = _omission_counts(decision)
     missing = _missing_values(decision)
     conflicts = tuple(
         str(value).strip()
-        for value in getattr(decision, "unresolved_conflicts", ()) or ()
+        for value in _field(decision, "unresolved_conflicts", ()) or ()
         if str(value).strip()
     )
-    selected_candidates = tuple(getattr(decision, "selected_candidates", ()) or ())
-    assignments = tuple(getattr(decision, "assignments", ()) or ())
+    selected_candidates = tuple(_field(decision, "selected_candidates", ()) or ())
+    if not selected_candidates:
+        selected_candidates = tuple(_field(decision, "selected_stable_ids", ()) or ())
+    assignments = tuple(_field(decision, "assignments", ()) or ())
 
     selected_count = _nonnegative_int(
         metrics.get("selected_count", metrics.get("selected_spans")),
@@ -109,12 +132,12 @@ def diagnose_proofability(decision: Any) -> dict[str, Any]:
 
     mandatory_ids = tuple(
         str(value)
-        for value in getattr(support, "mandatory_requirement_ids", ()) or ()
+        for value in _field(support, "mandatory_requirement_ids", ()) or ()
         if str(value)
     )
     missing_ids = tuple(
         str(value)
-        for value in getattr(support, "missing_requirement_ids", ()) or ()
+        for value in _field(support, "missing_requirement_ids", ()) or ()
         if str(value)
     )
 
@@ -187,6 +210,9 @@ def diagnose_proofability(decision: Any) -> dict[str, Any]:
     }
     if recommended_doc_action:
         result["recommended_doc_action"] = recommended_doc_action
+    decision_hash = str(_field(support, "decision_hash", "") or "").strip()
+    if decision_hash:
+        result["decision_hash"] = decision_hash
     return result
 
 
