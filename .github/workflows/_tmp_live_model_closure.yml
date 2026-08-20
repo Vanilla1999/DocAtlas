@@ -35,7 +35,7 @@ jobs:
         id: live
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          MODEL: gpt-5.4-mini
+          MODEL: gpt-5.6-luna
         run: |
           set +e
           python scripts/run_task21_openai_live.py \
