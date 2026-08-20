@@ -8,7 +8,7 @@ import pytest
 
 TASK21_REPORT = Path("eval/results/task21_tool_choice_gate.json")
 AGENT_REPORT = Path("eval/agent_developer_v1/results/model-benchmark.json")
-EXPECTED_MODEL = "gpt-5.4-mini"
+EXPECTED_MODEL = "gpt-5.6-luna"
 
 
 def test_task21_committed_live_report_is_complete_and_meets_frozen_thresholds():
