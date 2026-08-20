@@ -160,6 +160,8 @@ def main(argv: list[str] | None = None) -> int:
         default=REPO_ROOT / "eval" / "results" / "task21_tool_choice_gate.json",
     )
     args = parser.parse_args(argv)
+    if args.model != DEFAULT_MODEL:
+        parser.error(f"live closure is pinned to {DEFAULT_MODEL}")
     args.output.parent.mkdir(parents=True, exist_ok=True)
 
     token = os.environ.get("OPENAI_API_KEY") or ""
