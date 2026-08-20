@@ -19,7 +19,15 @@ OPENCODE_VARIANT = "medium"
 
 
 class OpenCodeChatError(RuntimeError):
-    pass
+    """Infrastructure/provider failure while invoking OpenCode."""
+
+
+class OpenCodeModelOutputError(OpenCodeChatError):
+    """The model answered, but never produced one schema-valid JSON object."""
+
+    def __init__(self, message: str, *, usage: dict[str, Any]) -> None:
+        super().__init__(message)
+        self.usage = usage
 
 
 def canonical_model_name(model_id: str) -> str:
@@ -228,9 +236,12 @@ class OpenCodeJSONClient:
             schema=schema,
             purpose=purpose,
         )
-        digest = hashlib.sha256(base_prompt.encode("utf-8")).hexdigest()
         env = os.environ.copy()
         last_parse_error: OpenCodeChatError | None = None
+        session_ids: list[str] = []
+        prompt_digests: list[str] = []
+        total_tokens = {"input": 0, "output": 0, "reasoning": 0}
+        estimated_input_tokens = 0
 
         for attempt in range(self.format_attempts):
             prompt = base_prompt
@@ -239,6 +250,8 @@ class OpenCodeJSONClient:
                     "\n\nFORMAT RETRY: Return one complete JSON object only. "
                     "Do not truncate it, wrap it in markdown, or emit a second object."
                 )
+            prompt_digests.append(hashlib.sha256(prompt.encode("utf-8")).hexdigest())
+            estimated_input_tokens += max(1, len(prompt) // 4)
 
             with TemporaryDirectory(prefix="docatlas-opencode-eval-") as raw_tmp:
                 workspace = Path(raw_tmp)
@@ -278,6 +291,11 @@ class OpenCodeJSONClient:
                 )
 
             text, session_id, tokens = _event_text_and_usage(completed.stdout)
+            if session_id:
+                session_ids.append(session_id)
+            for key in total_tokens:
+                total_tokens[key] += int(tokens.get(key) or 0)
+
             if completed.returncode != 0:
                 raise OpenCodeChatError(
                     f"opencode run failed exit={completed.returncode}: "
@@ -306,40 +324,69 @@ class OpenCodeJSONClient:
                             last_parse_error = export_exc
                         else:
                             return result, self._usage(
-                                session_id=session_id,
-                                digest=digest,
-                                tokens=tokens,
+                                session_ids=session_ids,
+                                prompt_digests=prompt_digests,
+                                tokens=total_tokens,
+                                estimated_input_tokens=estimated_input_tokens,
                             )
                 if attempt + 1 < self.format_attempts:
                     continue
-                raise last_parse_error
+                raise OpenCodeModelOutputError(
+                    str(last_parse_error),
+                    usage=self._usage(
+                        session_ids=session_ids,
+                        prompt_digests=prompt_digests,
+                        tokens=total_tokens,
+                        estimated_input_tokens=estimated_input_tokens,
+                    ),
+                ) from last_parse_error
             else:
                 return result, self._usage(
-                    session_id=session_id,
-                    digest=digest,
-                    tokens=tokens,
+                    session_ids=session_ids,
+                    prompt_digests=prompt_digests,
+                    tokens=total_tokens,
+                    estimated_input_tokens=estimated_input_tokens,
                 )
 
-        raise last_parse_error or OpenCodeChatError(
-            "OpenCode response did not contain one schema-valid JSON object"
+        raise OpenCodeModelOutputError(
+            str(last_parse_error or "OpenCode response did not contain one schema-valid JSON object"),
+            usage=self._usage(
+                session_ids=session_ids,
+                prompt_digests=prompt_digests,
+                tokens=total_tokens,
+                estimated_input_tokens=estimated_input_tokens,
+            ),
         )
 
     def _usage(
         self,
         *,
-        session_id: str | None,
-        digest: str,
+        session_ids: list[str],
+        prompt_digests: list[str],
         tokens: dict[str, int],
+        estimated_input_tokens: int,
     ) -> dict[str, Any]:
-        request_id = session_id or f"opencode-{digest[:24]}"
+        if len(prompt_digests) == 1:
+            digest = prompt_digests[0]
+        else:
+            digest = hashlib.sha256("|".join(prompt_digests).encode("utf-8")).hexdigest()
+        request_ids = {
+            f"opencode-session-{index}": session_id
+            for index, session_id in enumerate(session_ids, start=1)
+        }
+        if request_ids:
+            request_id = session_ids[-1]
+        else:
+            request_id = f"opencode-{digest[:24]}"
+            request_ids = {"opencode-attempt": request_id}
         return {
             "request_id": request_id,
-            "request_ids": {"opencode-session": request_id},
+            "request_ids": request_ids,
             "model": self.model,
             "reasoning_effort": self.variant,
             "input_tokens": int(tokens.get("input") or 0),
             "output_tokens": int(tokens.get("output") or 0),
             "reasoning_tokens": int(tokens.get("reasoning") or 0),
             "request_payload_sha256": digest,
-            "estimated_input_tokens": max(1, len(digest) // 4),
+            "estimated_input_tokens": max(1, int(estimated_input_tokens)),
         }
