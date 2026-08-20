@@ -1,0 +1,131 @@
+name: Dependency drift monitor
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 3 * * 1"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: dependency-drift-main
+  cancel-in-progress: false
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+  UV_PYTHON_DOWNLOADS: "never"
+  UV_VERSION: "0.9.25"
+
+jobs:
+  resolve-latest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.12"
+
+      - name: Resolve latest allowed dependency graph
+        run: |
+          python -m pip install "uv==$UV_VERSION"
+          cp uv.lock uv.lock.baseline
+          uv lock --upgrade
+          git diff --no-ext-diff -- uv.lock > dependency-lock.diff || true
+          uv tree --locked > dependency-tree.txt
+          sha256sum uv.lock.baseline uv.lock > dependency-lock.sha256
+
+      - name: Upload dependency drift evidence
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: dependency-drift-lock-${{ github.run_id }}
+          path: |
+            uv.lock
+            uv.lock.baseline
+            dependency-lock.diff
+            dependency-tree.txt
+            dependency-lock.sha256
+          if-no-files-found: error
+          retention-days: 14
+
+  core-latest:
+    needs: resolve-latest
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Download upgraded lock
+        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
+        with:
+          name: dependency-drift-lock-${{ github.run_id }}
+          path: dependency-drift
+
+      - name: Test latest allowed dependencies
+        env:
+          DOCMANCER_OFFLINE: "1"
+        run: |
+          cp dependency-drift/uv.lock uv.lock
+          python -m pip install "uv==$UV_VERSION"
+          uv sync --locked --extra dev --python "${{ matrix.python-version }}"
+          uv run --locked --extra dev pytest tests/ -m "not advanced and not live and not live_network" -v
+
+  advanced-latest:
+    needs: resolve-latest
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.12"
+
+      - name: Download upgraded lock
+        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
+        with:
+          name: dependency-drift-lock-${{ github.run_id }}
+          path: dependency-drift
+
+      - name: Test advanced contracts with latest allowed dependencies
+        env:
+          DOCMANCER_OFFLINE: "1"
+        run: |
+          cp dependency-drift/uv.lock uv.lock
+          python -m pip install "uv==$UV_VERSION"
+          uv sync --locked --extra dev --python "3.12"
+          uv run --locked --extra dev pytest tests/ -m advanced -v
+          uv run --locked --extra dev python scripts/run_legacy_contract_gate.py
+          uv run --locked --extra dev python scripts/run_project_docs_self_host_gate.py
+          uv run --locked --extra dev python scripts/run_question_surface_gate.py
+          uv run --locked --extra dev python scripts/run_agent_developer_gate.py
+          uv run --locked --extra dev python scripts/run_critical_mutation_gate.py
+
+  installer-latest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+      - name: Install from current declared dependency ranges
+        run: sh scripts/test-install.sh
