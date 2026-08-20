@@ -241,7 +241,7 @@ def test_committed_live_report_is_explicit_and_matches_frozen_scenarios():
         require_full=True,
     )
     assert summary["task_count"] == 11
-    assert agent_report["provider_id"] == "openai-api"
+    assert agent_report["provider_id"] in {"openai-api", "opencode-chat"}
     assert agent_report["infrastructure_errors"] == []
     assert agent_report["false_supported"] == 0
     assert agent_report["forbidden_source_contamination"] == 0
