@@ -110,6 +110,9 @@ jobs:
       - name: Run question surface regression gate
         run: python scripts/run_question_surface_gate.py
 
+      - name: Run Agent Developer Protocol gate
+        run: python scripts/run_agent_developer_gate.py
+
       - name: Run critical mutation gate
         run: python scripts/run_critical_mutation_gate.py
 

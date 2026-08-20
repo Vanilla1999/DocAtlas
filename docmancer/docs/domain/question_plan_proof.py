@@ -12,7 +12,7 @@ from typing import Mapping
 
 from docmancer.docs.domain.project_answer_contract import ProofObligation
 from docmancer.docs.domain.question_premise_proof import premise_relation_proof
-from docmancer.docs.domain.technical_terms import term_sequence_present
+from docmancer.docs.domain.technical_terms import term_sequence_present, term_sequence_spans
 
 
 @dataclass(frozen=True, slots=True)
@@ -66,47 +66,91 @@ _REQUIREMENT_RELATION_RE = re.compile(
 )
 
 
-def _requirement_detail_count(text: str) -> int:
-    return len(re.findall(
-        r"\b(?:preflight|canary|exactly|retry|audit|verify|stream|cell|step)\w*\b",
-        _norm(text),
-    ))
+_REQUIREMENT_CONTENT_WORD_RE = re.compile(r"[A-Za-zА-Яа-яЁё0-9_~:+.-]+")
+_REQUIREMENT_STOP_WORDS = {
+    "a", "an", "the", "both", "either", "and", "or", "of", "to", "for",
+    "и", "или", "а", "в", "на", "для", "из",
+}
+
+
+def _requirement_item_count(value: str) -> int:
+    """Count reviewable requirement items without domain-specific vocabulary."""
+
+    source = str(value or "").strip().strip(":")
+    if not source:
+        return 0
+    parts = re.split(r"\s*,\s*|\s*;\s*|\s+(?:and|or|и|или)\s+", source, flags=re.I)
+    count = 0
+    for part in parts:
+        words = [
+            word.casefold()
+            for word in _REQUIREMENT_CONTENT_WORD_RE.findall(part)
+            if word.casefold() not in _REQUIREMENT_STOP_WORDS
+            and re.search(r"[A-Za-zА-Яа-яЁё0-9_]", word)
+        ]
+        if words:
+            count += 1
+    return count
+
+
+def _subject_bound_requirement_tail(
+    obligation: ProofObligation,
+    clause: str,
+) -> str | None:
+    """Return a requirement value only when subject and anchor share a clause."""
+
+    subject_spans = term_sequence_spans(obligation.subject, clause)
+    if not subject_spans:
+        return None
+    anchors = [*_REQUIREMENT_RELATION_RE.finditer(clause)]
+    anchors.extend(re.finditer(r"\b(?:is|are)\s*:\s*", clause, re.I))
+    for subject_start, subject_end in subject_spans:
+        for match in sorted(anchors, key=lambda item: item.start()):
+            if match.start() < subject_end:
+                continue
+            between = clause[subject_end:match.start()]
+            if len(_REQUIREMENT_CONTENT_WORD_RE.findall(between)) > 8:
+                continue
+            if (
+                match.group(0).casefold() in {"required", "mandatory"}
+                and re.search(r"\b(?:is|are|was|were|be|been|being)\s*$", between, re.I)
+            ):
+                continue
+            return clause[match.end():].strip()
+    return None
 
 
 def _structured_requirement_proof(
     obligation: ProofObligation,
     text: str,
 ) -> tuple[bool, int]:
-    """Accept only a subject-bound requirement clause or its explicit list."""
+    """Accept one or more subject-bound requirements in a clause or explicit list."""
 
     best_detail_count = 0
     for clause in _proposition_clauses(text):
-        if not _has(obligation.subject, clause):
+        tail = _subject_bound_requirement_tail(obligation, clause)
+        if tail is None:
             continue
-        if _REQUIREMENT_RELATION_RE.search(clause) is None:
-            continue
-        detail_count = _requirement_detail_count(clause)
-        if detail_count >= 2:
+        detail_count = _requirement_item_count(tail)
+        if detail_count >= 1:
             best_detail_count = max(best_detail_count, detail_count)
 
-    if best_detail_count >= 2:
+    if best_detail_count >= 1:
         return True, best_detail_count
 
     lines = [line for line in str(text or "").splitlines() if line.strip()]
     for index, line in enumerate(lines):
-        if not _has(obligation.subject, line):
-            continue
-        if _REQUIREMENT_RELATION_RE.search(line) is None:
+        tail = _subject_bound_requirement_tail(obligation, line)
+        if tail is None:
             continue
         bullets: list[str] = []
         for following in lines[index + 1:]:
-            if re.match(r"^\s*(?:[-*+]|\d+[.)])\s+", following) is None:
+            match = re.match(r"^\s*(?:[-*+]|\d+[.)])\s+(\S.*)$", following)
+            if match is None:
                 break
-            bullets.append(following)
-        if len(bullets) < 2:
-            continue
-        detail_count = _requirement_detail_count("\n".join(bullets))
-        if detail_count >= 2:
+            bullets.append(match.group(1))
+        detail_count = sum(_requirement_item_count(item) > 0 for item in bullets)
+        if detail_count >= 1:
             return True, detail_count
     return False, 0
 

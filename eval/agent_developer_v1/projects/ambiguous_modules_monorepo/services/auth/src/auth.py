@@ -1,0 +1,2 @@
+class ServiceAuthBoundary:
+    pass

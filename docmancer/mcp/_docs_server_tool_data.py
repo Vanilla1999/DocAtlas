@@ -12,7 +12,8 @@ Agent workflow:
 - For coding/API questions, set response_style=\"snippet-first\".
 - For coding and patch tasks, use delivery_strategy=\"bounded_direct\" as the default pre-edit handoff; raw retrieval stays hidden and only a validated ActionPacket plus bounded recovery metadata enters model context.
 - In bounded delivery call prepare_docs only from recommended_next_action; unbounded compatibility output may use next_action.
-- Use docs_status only for explicit health, freshness, source-state, or job-status requests.
+- Use docs_status only for explicit health, freshness, source-state, or job-status requests, or when get_docs_context returns it as recommended_next_action.
+- Scope planning: for one known module use scope="module" plus exact module_path; module_path always implies module scope. For project-wide policy use scope="project" and omit module/module_path. If a task needs both module-local and project-wide evidence, make two bounded calls (module then project) rather than widening one module call. For cross-module questions use scope="all" without module filters, or separate exact module calls. On module_ambiguous, follow docs_status and retry with an exact returned module_path.
 - In bounded delivery, stop before editing when action_packet.status is insufficient_evidence. In unbounded exploration, navigation_only or partial_navigational requires source search before answering.
 - This tool provides source-grounded context, not a full code audit or test substitute.
 - For change-aware documentation maintenance, pass maintenance with either base/head or explicit changed_paths; obey its fail-closed authoring brief.
@@ -31,10 +32,10 @@ Agent workflow:
                 "version": {"type": ["string", "null"]},
                 "source_type": {"type": ["string", "null"]},
                 "docs_url": {"type": ["string", "null"]},
-                "module": {"type": ["string", "null"]},
-                "module_path": {"type": ["string", "null"]},
-                "scope": {"type": ["string", "null"], "enum": ["project", "module", "all", None]},
-                "mode": {"type": ["string", "null"], "enum": ["auto", "project", "library", "dependency", "mixed", None]},
+                "module": {"type": ["string", "null"], "description": "Module id/name lookup for module-scoped project docs. Prefer exact module_path when known; an ambiguous name fails closed instead of being guessed."},
+                "module_path": {"type": ["string", "null"], "description": "Exact discovered module path such as packages/orders. Supplying module_path always implies module scope and never widens into project or sibling modules."},
+                "scope": {"type": ["string", "null"], "enum": ["project", "module", "all", None], "description": "Project-doc scope: project = repo-level docs only; module = one module (use exact module_path); all = repo-level plus modules only when no module filter is supplied. For module + project obligations prefer two bounded calls."},
+                "mode": {"type": ["string", "null"], "enum": ["auto", "project", "library", "dependency", "mixed", None], "description": "Evidence lane selection: project for repository/module documentation, dependency for project-pinned dependency docs, library for an explicit external library, mixed only when both project and library evidence are intentionally required."},
                 "tokens": {"type": ["integer", "null"], "minimum": 1, "maximum": 20000},
                 "limit": {"type": ["integer", "null"], "minimum": 1, "maximum": 20},
                 "expand": {"type": ["string", "null"]},
@@ -683,17 +684,21 @@ CLASSIFIED_TOOL_NAMES = PUBLIC_TOOL_NAMES | ADVANCED_TOOL_NAMES | ADMIN_TOOL_NAM
 
 PUBLIC_ADVERTISED_DESCRIPTIONS: dict[str, str] = {
     "get_docs_context": (
-        "Default source-grounded documentation tool. Call once before a coding edit or for a "
-        "documentation/API question. The server returns bounded structured context; stop before "
-        "editing on insufficient_evidence."
+        "Default source-grounded documentation tool. Call before a coding edit or for a documentation/API question. "
+        "For one known module use scope=module with exact module_path; module_path always implies module scope. "
+        "For project-wide policy use scope=project without module filters. If a task needs both module-local and "
+        "project-wide evidence, make two bounded calls (module then project). For cross-module questions use "
+        "scope=all without module filters. On module ambiguity follow the returned docs_status recovery and retry "
+        "with an exact module_path. Stop before editing on insufficient_evidence."
     ),
     "prepare_docs": (
         "Confirmation-first documentation preparation. Call only from get_docs_context "
         "recommended_next_action or an explicit user sync, refresh, index, or prefetch request."
     ),
     "docs_status": (
-        "Read-only project documentation or background-job status. Use only when the user "
-        "explicitly asks about health, freshness, indexing, or job progress."
+        "Read-only project documentation or background-job status. Use when the user explicitly asks about "
+        "health, freshness, indexing, or job progress, or when get_docs_context returns docs_status as its "
+        "recommended_next_action."
     ),
 }
 
@@ -709,9 +714,23 @@ PUBLIC_ADVERTISED_INPUT_SCHEMAS: dict[str, dict[str, Any]] = {
             "version": {"type": ["string", "null"]},
             "source_type": {"type": ["string", "null"]},
             "docs_url": {"type": ["string", "null"]},
+            "module": {
+                "type": ["string", "null"],
+                "description": "Module id/name lookup. Prefer exact module_path; ambiguous names fail closed.",
+            },
+            "module_path": {
+                "type": ["string", "null"],
+                "description": "Exact discovered module path. Supplying it always implies module scope.",
+            },
+            "scope": {
+                "type": ["string", "null"],
+                "enum": ["project", "module", "all", None],
+                "description": "project = repo-level docs only; module = one module; all = repo-level plus modules only without a module filter. Use two calls for module + project obligations.",
+            },
             "mode": {
                 "type": ["string", "null"],
-                "enum": ["auto", "project", "library", "mixed", None],
+                "enum": ["auto", "project", "library", "dependency", "mixed", None],
+                "description": "Select project/module docs, explicit library docs, project-pinned dependency docs, or intentional mixed evidence.",
             },
         },
         "required": ["question"],
@@ -791,6 +810,10 @@ PUBLIC_ADVERTISED_INPUT_SCHEMAS: dict[str, dict[str, Any]] = {
             "project_path": {"type": ["string", "null"]},
             "canonical_id": {"type": ["string", "null"]},
             "job_id": {"type": ["string", "null"]},
+            "details": {
+                "type": ["boolean", "null"],
+                "description": "For action=project, include discovered module identities used for exact module_path recovery.",
+            },
         },
         "required": ["action"],
     },

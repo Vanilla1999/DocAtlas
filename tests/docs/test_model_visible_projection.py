@@ -1,6 +1,7 @@
 """Split test module; helpers live in _shared_test_model_visible_projection.py."""
 from tests.docs import _shared_test_model_visible_projection as _shared
 globals().update({k: v for k, v in vars(_shared).items() if not k.startswith("__")})
+from docmancer.docs.interfaces.mcp.context_tools import _bound_module_recovery_projection
 
 def test_docs_answer_is_deterministic_deduplicated_hashed_and_bounded():
     snippet = {
@@ -353,6 +354,58 @@ def test_oversized_insufficient_projection_uses_a_valid_terminal_fallback(budget
     assert "support_envelope" not in payload
     assert "missing_requirement_ids" not in payload
     assert validate_model_visible_projection(payload, snapshot={}, max_tokens=budget) == []
+
+
+def test_module_recovery_keeps_action_and_one_complete_exact_path_at_tiny_budget():
+    paths = [
+        "packages/" + (f"very-long-module-segment-{index}/" * 7) + "auth"
+        for index in range(8)
+    ]
+    payload = {
+        "status": "insufficient_evidence",
+        "kind": "docs_answer",
+        "missing": ["No complete source-backed documentation answer is available." * 8],
+        "recommended_next_action": {
+            "tool": "docs_status",
+            "type": "docs_status",
+            "arguments_patch": {
+                "action": "project",
+                "details": True,
+                "project_path": "/repo/project",
+            },
+            "requires_confirmation": False,
+            "reason": "Inspect modules and retry.",
+            "auto_execute": False,
+        },
+        "operational_reason_code": "module_ambiguous",
+        "module_candidates": [
+            {"module_path": path, "module_name": "auth", "module_type": "package"}
+            for path in paths
+        ],
+        "answer_supported": False,
+        "answer_available": False,
+        "support_status": "insufficient_evidence",
+        "reason_code": "required_evidence_missing",
+        "decision_hash": "0" * 64,
+        "estimated_tokens": 0,
+    }
+
+    _bound_module_recovery_projection(payload, max_tokens=256)
+    bound_insufficient_projection(payload, max_tokens=256)
+
+    visible_paths = [row["module_path"] for row in payload["module_candidates"]]
+    assert visible_paths
+    assert set(visible_paths) <= set(paths)
+    assert all(not path.endswith("…") for path in visible_paths)
+    assert payload["operational_reason_code"] == "module_ambiguous"
+    assert payload["recommended_next_action"]["tool"] == "docs_status"
+    assert payload["recommended_next_action"]["arguments_patch"] == {
+        "action": "project",
+        "details": True,
+        "project_path": "/repo/project",
+    }
+    assert estimate_projection_tokens(payload) <= 256
+    assert validate_model_visible_projection(payload, snapshot={}, max_tokens=256) == []
 
 
 def test_bounded_projection_keeps_audit_envelope_when_it_fits():

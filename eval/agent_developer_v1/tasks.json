@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "protocol": "agent-developer-v1",
+  "description": "Public coding-agent task prompts. This file intentionally omits oracle scopes, source identities, and expected tool trajectories.",
+  "tasks": [
+    {
+      "id": "module_definition_supported",
+      "class": "module_only",
+      "fixture": "explicit_manifest_monorepo",
+      "working_path": "packages/orders/src/submission.py",
+      "developer_task": "Inspect the orders draft storage contract before changing order submission code.",
+      "max_get_docs_context_calls": 1
+    },
+    {
+      "id": "module_behavior_named_gap",
+      "class": "module_only",
+      "fixture": "explicit_manifest_monorepo",
+      "working_path": "packages/orders/src/submission.py",
+      "developer_task": "Understand what OrdersDraftStore does before changing persistence code.",
+      "max_get_docs_context_calls": 1
+    },
+    {
+      "id": "module_requirements_named_gap",
+      "class": "module_only",
+      "fixture": "explicit_manifest_monorepo",
+      "working_path": "packages/orders/src/submission.py",
+      "developer_task": "Read the validation contract before modifying order validation.",
+      "max_get_docs_context_calls": 1
+    },
+    {
+      "id": "project_policy_supported",
+      "class": "project_only",
+      "fixture": "explicit_manifest_monorepo",
+      "working_path": "packages/orders/src/submission.py",
+      "developer_task": "Resolve the project-wide retry policy before adding retries to orders.",
+      "max_get_docs_context_calls": 1
+    },
+    {
+      "id": "module_plus_project_two_call_trajectory",
+      "class": "module_plus_project",
+      "fixture": "explicit_manifest_monorepo",
+      "working_path": "packages/orders/src/submission.py",
+      "developer_task": "Add retry handling to orders without violating the project-wide retry policy.",
+      "max_get_docs_context_calls": 2
+    },
+    {
+      "id": "cross_module_comparison_supported",
+      "class": "cross_module",
+      "fixture": "explicit_manifest_monorepo",
+      "working_path": "packages/orders/src/submission.py",
+      "developer_task": "Compare orders and payments persistence boundaries before introducing a shared abstraction.",
+      "max_get_docs_context_calls": 1
+    },
+    {
+      "id": "wrong_module_isolation",
+      "class": "negative_contamination",
+      "fixture": "explicit_manifest_monorepo",
+      "working_path": "packages/orders/src/submission.py",
+      "developer_task": "Ensure an orders-scoped retrieval cannot silently answer from payments docs.",
+      "max_get_docs_context_calls": 1
+    },
+    {
+      "id": "autodiscovery_module_supported",
+      "class": "module_only",
+      "fixture": "autodiscovery_monorepo",
+      "working_path": "services/catalog/src/reader.py",
+      "developer_task": "Use module docs discovered without an explicit catalog.",
+      "max_get_docs_context_calls": 1
+    },
+    {
+      "id": "ambiguous_module_recovery_named_gap",
+      "class": "recovery",
+      "fixture": "ambiguous_modules_monorepo",
+      "working_path": "packages/auth/src/auth.py",
+      "developer_task": "Resolve an ambiguous auth module name without choosing silently.",
+      "max_get_docs_context_calls": 2
+    },
+    {
+      "id": "stale_module_docs_recovery",
+      "class": "recovery",
+      "fixture": "explicit_manifest_monorepo",
+      "working_path": "packages/orders/src/submission.py",
+      "developer_task": "Refuse stale module evidence and request a reviewed project-doc sync.",
+      "max_get_docs_context_calls": 1
+    },
+    {
+      "id": "dependency_prefetch_recovery",
+      "class": "module_plus_dependency",
+      "fixture": "explicit_manifest_monorepo",
+      "working_path": "packages/orders/src/submission.py",
+      "developer_task": "Use the pinned tenacity dependency only after exact dependency docs are available.",
+      "max_get_docs_context_calls": 2
+    }
+  ]
+}
