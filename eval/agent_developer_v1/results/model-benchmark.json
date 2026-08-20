@@ -1,0 +1,469 @@
+{
+  "executed_task_count": 11,
+  "false_supported": 0,
+  "forbidden_source_contamination": 0,
+  "infrastructure_errors": [],
+  "input_tokens": 29002,
+  "model": "gpt-5.6-luna",
+  "oracle_contract_sha256": "e7bba83f624d9f382486275a8b9f8ab50bf63b301a18bc3fd78530626d21854c",
+  "output_tokens": 998,
+  "pass_rate": 0.0,
+  "passed_tasks": 0,
+  "protocol": "agent-developer-model-v1",
+  "provider_id": "opencode-chat",
+  "public_tasks_sha256": "517853c15d0a234307199ccd4dfdbd8cb8f8dee56f7a1e12bee247a02634a9b8",
+  "recovery_accuracy": 0.6666666666666666,
+  "report_contract_version": 1,
+  "schema_version": 1,
+  "scope_accuracy": 0.09090909090909091,
+  "task_count": 11,
+  "tasks": [
+    {
+      "passed": false,
+      "score": {
+        "context_call_count": 0,
+        "direct_recovery_shortcut": false,
+        "errors": [
+          "module retrieval requires exactly one of module or module_path",
+          "missing required scope: {'scope': 'module', 'module_path': 'packages/orders'}"
+        ],
+        "false_supported": 0,
+        "forbidden_source_contamination": 0,
+        "passed": false,
+        "recovery_contract_ok": true,
+        "scope_contract_ok": false
+      },
+      "task_id": "module_definition_supported",
+      "trajectory": [],
+      "usage": [
+        {
+          "estimated_input_tokens": 16,
+          "input_tokens": 2480,
+          "model": "gpt-5.6-luna",
+          "output_tokens": 65,
+          "reasoning_effort": "medium",
+          "reasoning_tokens": 107,
+          "request_id": "ses_fe0863babffe2bX6M6g7y4trG8",
+          "request_ids": {
+            "opencode-session": "ses_fe0863babffe2bX6M6g7y4trG8"
+          },
+          "request_payload_sha256": "2075ceb2a563e95d19bf79cb722c5272a7a7ad5f5da075fc95ba2502f03d266e",
+          "turn": 1
+        }
+      ]
+    },
+    {
+      "passed": false,
+      "score": {
+        "context_call_count": 0,
+        "direct_recovery_shortcut": false,
+        "errors": [
+          "module retrieval requires exactly one of module or module_path",
+          "missing required scope: {'scope': 'module', 'module_path': 'packages/orders'}"
+        ],
+        "false_supported": 0,
+        "forbidden_source_contamination": 0,
+        "passed": false,
+        "recovery_contract_ok": true,
+        "scope_contract_ok": false
+      },
+      "task_id": "module_behavior_named_gap",
+      "trajectory": [],
+      "usage": [
+        {
+          "estimated_input_tokens": 16,
+          "input_tokens": 2479,
+          "model": "gpt-5.6-luna",
+          "output_tokens": 79,
+          "reasoning_effort": "medium",
+          "reasoning_tokens": 82,
+          "request_id": "ses_fe0861a23ffeKCbubTnqZ0Rsrk",
+          "request_ids": {
+            "opencode-session": "ses_fe0861a23ffeKCbubTnqZ0Rsrk"
+          },
+          "request_payload_sha256": "6ad5900ccb339802ad39002e87c7954af244eea93103ec735bb79704aeaa1b9e",
+          "turn": 1
+        }
+      ]
+    },
+    {
+      "passed": false,
+      "score": {
+        "context_call_count": 0,
+        "direct_recovery_shortcut": false,
+        "errors": [
+          "module retrieval requires exactly one of module or module_path",
+          "missing required scope: {'scope': 'module', 'module_path': 'packages/orders'}"
+        ],
+        "false_supported": 0,
+        "forbidden_source_contamination": 0,
+        "passed": false,
+        "recovery_contract_ok": true,
+        "scope_contract_ok": false
+      },
+      "task_id": "module_requirements_named_gap",
+      "trajectory": [],
+      "usage": [
+        {
+          "estimated_input_tokens": 16,
+          "input_tokens": 2480,
+          "model": "gpt-5.6-luna",
+          "output_tokens": 61,
+          "reasoning_effort": "medium",
+          "reasoning_tokens": 116,
+          "request_id": "ses_fe085f549ffeIb10dRsqpdBEUM",
+          "request_ids": {
+            "opencode-session": "ses_fe085f549ffeIb10dRsqpdBEUM"
+          },
+          "request_payload_sha256": "227c237b8fac6378e88266bf764a5eb84c84a91e7693cb111827f735f5b1da15",
+          "turn": 1
+        }
+      ]
+    },
+    {
+      "passed": false,
+      "score": {
+        "context_call_count": 1,
+        "direct_recovery_shortcut": false,
+        "errors": [
+          "call {'scope': 'project'}: status='insufficient_evidence' expected='ok'",
+          "call {'scope': 'project'}: required sources missing from ()"
+        ],
+        "false_supported": 0,
+        "forbidden_source_contamination": 0,
+        "passed": false,
+        "recovery_contract_ok": true,
+        "scope_contract_ok": true
+      },
+      "task_id": "project_policy_supported",
+      "trajectory": [
+        {
+          "action": {
+            "action": "get_docs_context",
+            "mode": "project",
+            "module": "",
+            "module_path": "",
+            "question": "What is the project-wide retry policy, including retryable failures, limits, backoff, and required constraints for adding retries to orders?",
+            "reason": "The task explicitly requires resolving project-wide retry policy before code changes.",
+            "scope": "project"
+          },
+          "module_candidates": [],
+          "next_action_tool": "code_search",
+          "operational_reason_code": null,
+          "sources": [],
+          "status": "insufficient_evidence",
+          "tool": "get_docs_context"
+        }
+      ],
+      "usage": [
+        {
+          "estimated_input_tokens": 16,
+          "input_tokens": 2479,
+          "model": "gpt-5.6-luna",
+          "output_tokens": 72,
+          "reasoning_effort": "medium",
+          "reasoning_tokens": 38,
+          "request_id": "ses_fe085d4c9ffedE1iPBWrrxNDD6",
+          "request_ids": {
+            "opencode-session": "ses_fe085d4c9ffedE1iPBWrrxNDD6"
+          },
+          "request_payload_sha256": "8db11b32d83865edb1df18a5bb6effabf77955dd5974f7e5255ccf57737651ce",
+          "turn": 1
+        }
+      ]
+    },
+    {
+      "passed": false,
+      "score": {
+        "context_call_count": 0,
+        "direct_recovery_shortcut": false,
+        "errors": [
+          "module retrieval requires exactly one of module or module_path",
+          "missing required scope: {'scope': 'module', 'module_path': 'packages/orders'}",
+          "missing required scope: {'scope': 'project'}"
+        ],
+        "false_supported": 0,
+        "forbidden_source_contamination": 0,
+        "passed": false,
+        "recovery_contract_ok": true,
+        "scope_contract_ok": false
+      },
+      "task_id": "module_plus_project_two_call_trajectory",
+      "trajectory": [],
+      "usage": [
+        {
+          "estimated_input_tokens": 16,
+          "input_tokens": 694,
+          "model": "gpt-5.6-luna",
+          "output_tokens": 78,
+          "reasoning_effort": "medium",
+          "reasoning_tokens": 105,
+          "request_id": "ses_fe085b879ffeREt3GHew0H4tmT",
+          "request_ids": {
+            "opencode-session": "ses_fe085b879ffeREt3GHew0H4tmT"
+          },
+          "request_payload_sha256": "9907f179e5cbc779cd08d6a1ae7401d254e53221c581b7e7c5b251c268e5c9a1",
+          "turn": 1
+        }
+      ]
+    },
+    {
+      "passed": false,
+      "score": {
+        "context_call_count": 0,
+        "direct_recovery_shortcut": false,
+        "errors": [
+          "module filters are only valid with module scope",
+          "missing required scope: {'scope': 'all'}"
+        ],
+        "false_supported": 0,
+        "forbidden_source_contamination": 0,
+        "passed": false,
+        "recovery_contract_ok": true,
+        "scope_contract_ok": false
+      },
+      "task_id": "cross_module_comparison_supported",
+      "trajectory": [],
+      "usage": [
+        {
+          "estimated_input_tokens": 16,
+          "input_tokens": 2483,
+          "model": "gpt-5.6-luna",
+          "output_tokens": 91,
+          "reasoning_effort": "medium",
+          "reasoning_tokens": 214,
+          "request_id": "ses_fe08594feffep1I78hk61R0W8B",
+          "request_ids": {
+            "opencode-session": "ses_fe08594feffep1I78hk61R0W8B"
+          },
+          "request_payload_sha256": "67a45298704c34f8e0d647e96d5c7ec9d1785e84cc635ec03907dbf1d11cf287",
+          "turn": 1
+        }
+      ]
+    },
+    {
+      "passed": false,
+      "score": {
+        "context_call_count": 0,
+        "direct_recovery_shortcut": false,
+        "errors": [
+          "module retrieval requires exactly one of module or module_path",
+          "missing required scope: {'scope': 'module', 'module_path': 'packages/orders'}"
+        ],
+        "false_supported": 0,
+        "forbidden_source_contamination": 0,
+        "passed": false,
+        "recovery_contract_ok": true,
+        "scope_contract_ok": false
+      },
+      "task_id": "wrong_module_isolation",
+      "trajectory": [],
+      "usage": [
+        {
+          "estimated_input_tokens": 16,
+          "input_tokens": 2482,
+          "model": "gpt-5.6-luna",
+          "output_tokens": 90,
+          "reasoning_effort": "medium",
+          "reasoning_tokens": 58,
+          "request_id": "ses_fe085618affeyUs2W1XT4CVZPv",
+          "request_ids": {
+            "opencode-session": "ses_fe085618affeyUs2W1XT4CVZPv"
+          },
+          "request_payload_sha256": "6d6180e15145da98c730bb3bde8b5a0d6b79dd4927b3e4884e93d10e7b0a3b90",
+          "turn": 1
+        }
+      ]
+    },
+    {
+      "passed": false,
+      "score": {
+        "context_call_count": 0,
+        "direct_recovery_shortcut": false,
+        "errors": [
+          "module retrieval requires exactly one of module or module_path",
+          "missing required scope: {'scope': 'module', 'module_path': 'services/catalog'}"
+        ],
+        "false_supported": 0,
+        "forbidden_source_contamination": 0,
+        "passed": false,
+        "recovery_contract_ok": true,
+        "scope_contract_ok": false
+      },
+      "task_id": "autodiscovery_module_supported",
+      "trajectory": [],
+      "usage": [
+        {
+          "estimated_input_tokens": 542,
+          "input_tokens": 2479,
+          "model": "gpt-5.6-luna",
+          "output_tokens": 69,
+          "reasoning_effort": "medium",
+          "reasoning_tokens": 78,
+          "request_id": "ses_fe0758726ffe0iqPJobtn8QAFe",
+          "request_ids": {
+            "opencode-session-1": "ses_fe0758726ffe0iqPJobtn8QAFe"
+          },
+          "request_payload_sha256": "e4db1859767f642c5dc2879c8eda6fb944882d508d2ca3bc04851f4565a496ac",
+          "turn": 1
+        }
+      ]
+    },
+    {
+      "passed": false,
+      "score": {
+        "context_call_count": 0,
+        "direct_recovery_shortcut": false,
+        "errors": [
+          "module retrieval requires exactly one of module or module_path",
+          "missing required scope: {'scope': 'module', 'module': 'auth'}",
+          "missing required scope: {'scope': 'module', 'module_path': 'packages/auth'}"
+        ],
+        "false_supported": 0,
+        "forbidden_source_contamination": 0,
+        "passed": false,
+        "recovery_contract_ok": false,
+        "scope_contract_ok": false
+      },
+      "task_id": "ambiguous_module_recovery_named_gap",
+      "trajectory": [],
+      "usage": [
+        {
+          "estimated_input_tokens": 544,
+          "input_tokens": 2481,
+          "model": "gpt-5.6-luna",
+          "output_tokens": 88,
+          "reasoning_effort": "medium",
+          "reasoning_tokens": 195,
+          "request_id": "ses_fe0756936ffeX9InJpoy5WMJS1",
+          "request_ids": {
+            "opencode-session-1": "ses_fe0756936ffeX9InJpoy5WMJS1"
+          },
+          "request_payload_sha256": "37eb91cfb8f4a7ad99469b9d93c6d0e89e1b54f0d5d4c2f062f830035821dd10",
+          "turn": 1
+        }
+      ]
+    },
+    {
+      "passed": false,
+      "score": {
+        "context_call_count": 0,
+        "direct_recovery_shortcut": false,
+        "errors": [
+          "module retrieval requires exactly one of module or module_path",
+          "missing required scope: {'scope': 'module', 'module_path': 'packages/orders'}"
+        ],
+        "false_supported": 0,
+        "forbidden_source_contamination": 0,
+        "passed": false,
+        "recovery_contract_ok": true,
+        "scope_contract_ok": false
+      },
+      "task_id": "stale_module_docs_recovery",
+      "trajectory": [],
+      "usage": [
+        {
+          "estimated_input_tokens": 1120,
+          "input_tokens": 4998,
+          "model": "gpt-5.6-luna",
+          "output_tokens": 172,
+          "reasoning_effort": "medium",
+          "reasoning_tokens": 434,
+          "request_id": "ses_fe0751508ffe5nGXW5blyY936p",
+          "request_ids": {
+            "opencode-session-1": "ses_fe07541a7ffeQbtUvY1hVZaIVR",
+            "opencode-session-2": "ses_fe0751508ffe5nGXW5blyY936p"
+          },
+          "request_payload_sha256": "06360e7e24b17390219285eda43968394f202bfa8e457e1cab7a612e6b545db1",
+          "turn": 1
+        }
+      ]
+    },
+    {
+      "passed": false,
+      "score": {
+        "context_call_count": 1,
+        "direct_recovery_shortcut": false,
+        "errors": [
+          "missing required scope: {'scope': 'module', 'module_path': 'packages/orders'}",
+          "call {'scope': 'dependency'}: next action tool='code_search' expected='prepare_docs'",
+          "call {'scope': 'dependency'}: next action arguments=None expected={'action': 'prefetch_project_dependency_docs', 'project_path': '/tmp/docatlas-agent-model-dependency_prefetch_recovery-83rpn6la/project'}",
+          "call {'scope': 'dependency'}: confirmation reason does not match 'network_fetch'",
+          "call {'scope': 'dependency'}: requires_confirmation=False expected=True"
+        ],
+        "false_supported": 0,
+        "forbidden_source_contamination": 0,
+        "passed": false,
+        "recovery_contract_ok": true,
+        "scope_contract_ok": false
+      },
+      "task_id": "dependency_prefetch_recovery",
+      "trajectory": [
+        {
+          "action": {
+            "action": "get_docs_context",
+            "mode": "dependency",
+            "module": "",
+            "module_path": "",
+            "question": "Provide the exact pinned dependency documentation for tenacity, including the version and relevant usage/API guidance.",
+            "reason": "The task explicitly requires exact dependency documentation for the pinned tenacity dependency before code changes.",
+            "scope": ""
+          },
+          "module_candidates": [],
+          "next_action_tool": "code_search",
+          "operational_reason_code": null,
+          "sources": [],
+          "status": "insufficient_evidence",
+          "tool": "get_docs_context"
+        },
+        {
+          "action": {
+            "action": "finish",
+            "mode": "dependency",
+            "module": "",
+            "module_path": "",
+            "question": "Exact pinned tenacity dependency documentation is unavailable from DocAtlas; no permitted next evidence action remains.",
+            "reason": "DocAtlas returned insufficient evidence and recommended a source search, which is prohibited by the evidence-planning policy.",
+            "scope": ""
+          },
+          "module_candidates": [],
+          "next_action_tool": null,
+          "operational_reason_code": null,
+          "sources": [],
+          "status": null,
+          "tool": "finish"
+        }
+      ],
+      "usage": [
+        {
+          "estimated_input_tokens": 549,
+          "input_tokens": 693,
+          "model": "gpt-5.6-luna",
+          "output_tokens": 65,
+          "reasoning_effort": "medium",
+          "reasoning_tokens": 60,
+          "request_id": "ses_fe074ec6bffeCEfwSkzI4H01IE",
+          "request_ids": {
+            "opencode-session-1": "ses_fe074ec6bffeCEfwSkzI4H01IE"
+          },
+          "request_payload_sha256": "bc56ac494bff3ca0f30a4454265060b93332e4a43d7979ede7759983c7e7985e",
+          "turn": 1
+        },
+        {
+          "estimated_input_tokens": 796,
+          "input_tokens": 2774,
+          "model": "gpt-5.6-luna",
+          "output_tokens": 68,
+          "reasoning_effort": "medium",
+          "reasoning_tokens": 158,
+          "request_id": "ses_fe074c840ffeUsmEb2s3c9puce",
+          "request_ids": {
+            "opencode-session-1": "ses_fe074c840ffeUsmEb2s3c9puce"
+          },
+          "request_payload_sha256": "e05d74bbd9a6063bd1664a429c8158d278597203539cab64c70971075cd1d259",
+          "turn": 2
+        }
+      ]
+    }
+  ]
+}
