@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import sys
 import time
 from pathlib import Path
 from typing import Any, Callable
@@ -17,13 +18,17 @@ from docmancer.docs.tool_choice_eval import (
     installed_guidance,
     public_tool_schemas,
 )
+from scripts.openai_live_support import (
+    OpenAILiveHTTPError,
+    retry_delay_seconds,
+    should_retry_openai_response,
+)
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_MODEL = "gpt-5.6-luna"
 DEFAULT_API_BASE = "https://api.openai.com/v1"
 REASONING_EFFORT = "medium"
-_RETRYABLE_STATUS_CODES = frozenset({429, 500, 502, 503, 504})
 
 
 def _responses_input(guidance: str, scenario: dict[str, Any]) -> list[dict[str, Any]]:
@@ -139,13 +144,37 @@ def _retrying_completion(
             try:
                 return completion(payload)
             except httpx.HTTPStatusError as exc:
-                status = exc.response.status_code
-                if status not in _RETRYABLE_STATUS_CODES or attempt + 1 >= max_attempts:
-                    raise
-                time.sleep(2.0 * (2**attempt))
+                response = exc.response
+                if (
+                    attempt + 1 >= max_attempts
+                    or not should_retry_openai_response(response)
+                ):
+                    raise OpenAILiveHTTPError(response) from None
+                time.sleep(retry_delay_seconds(response, attempt))
         raise RuntimeError("unreachable retry state")
 
     return complete
+
+
+def _write_failure(
+    *,
+    output: Path,
+    model: str,
+    schemas: list[dict[str, Any]] | None,
+    provider_error: dict[str, Any] | None,
+) -> None:
+    report = _failure_report(
+        model_version=model,
+        reason="live evaluation failed",
+        tool_schemas=schemas,
+    )
+    report["reasoning_effort"] = REASONING_EFFORT
+    if provider_error is not None:
+        report["provider_error"] = provider_error
+    output.write_text(
+        json.dumps(report, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -186,16 +215,32 @@ def main(argv: list[str] | None = None) -> int:
             guidance=guidance,
             tool_schemas=schemas,
         )
-    except Exception:
-        report = _failure_report(
-            model_version=args.model,
-            reason="live evaluation failed",
-            tool_schemas=schemas,
+    except OpenAILiveHTTPError as exc:
+        _write_failure(
+            output=args.output,
+            model=args.model,
+            schemas=schemas,
+            provider_error=exc.diagnostic,
         )
-        report["reasoning_effort"] = REASONING_EFFORT
-        args.output.write_text(
-            json.dumps(report, indent=2, sort_keys=True) + "\n",
-            encoding="utf-8",
+        print(
+            "Task 21 provider error: "
+            + json.dumps(exc.diagnostic, sort_keys=True),
+            file=sys.stderr,
+        )
+        return 2
+    except Exception as exc:
+        _write_failure(
+            output=args.output,
+            model=args.model,
+            schemas=schemas,
+            provider_error={
+                "kind": "non_http",
+                "error_class": exc.__class__.__name__,
+            },
+        )
+        print(
+            f"Task 21 provider error: class={exc.__class__.__name__}",
+            file=sys.stderr,
         )
         return 2
 

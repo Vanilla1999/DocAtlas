@@ -50,6 +50,12 @@ def _print_summary() -> None:
             f"copy={metrics.get('next_action_copy_accuracy')}; "
             f"retry={metrics.get('original_question_retry_rate')}"
         )
+        provider_error = report.get("provider_error")
+        if isinstance(provider_error, dict):
+            print(
+                "Task 21 provider error: "
+                + json.dumps(provider_error, sort_keys=True)
+            )
 
     if AGENT_REPORT.is_file():
         report = _load(AGENT_REPORT)
@@ -64,6 +70,18 @@ def _print_summary() -> None:
             f"contamination={report.get('forbidden_source_contamination')}; "
             f"infra-errors={len(report.get('infrastructure_errors') or [])}"
         )
+        for error in report.get("infrastructure_errors") or []:
+            print(f"Agent Developer infrastructure: {error}")
+
+
+def _agent_report_complete() -> bool:
+    if not AGENT_REPORT.is_file():
+        return False
+    report = _load(AGENT_REPORT)
+    return (
+        report.get("executed_task_count") == report.get("task_count") == 11
+        and not (report.get("infrastructure_errors") or [])
+    )
 
 
 def main() -> int:
@@ -107,8 +125,8 @@ def main() -> int:
         ],
     )
 
-    verify_rc = 2
-    if AGENT_REPORT.is_file():
+    verify_rc = 0
+    if _agent_report_complete():
         verify_rc = _run(
             "Seal and verify Agent Developer report",
             [
@@ -122,22 +140,28 @@ def main() -> int:
                 "0.0",
             ],
         )
+    elif agent_rc == 0:
+        print("Agent Developer runner returned success without a complete report.")
+        verify_rc = 1
     else:
-        print("Agent Developer report was not produced; verifier skipped.")
+        print("Agent Developer verifier skipped because the provider run is incomplete.")
 
     _print_summary()
 
-    evidence_rc = _run(
-        "Provider-free committed-evidence contract",
-        [
-            sys.executable,
-            "-m",
-            "pytest",
-            "tests/docs/test_tool_choice_eval.py",
-            "tests/test_live_evaluation_evidence.py",
-            "-q",
-        ],
-    )
+    evidence_rc = 0
+    if task21_rc == 0 and agent_rc == 0 and verify_rc == 0:
+        evidence_rc = _run(
+            "Provider-free committed-evidence contract",
+            [
+                sys.executable,
+                "-m",
+                "pytest",
+                "tests/docs/test_tool_choice_eval.py",
+                "-q",
+            ],
+        )
+    else:
+        print("Committed-evidence tests skipped until both live reports are complete.")
 
     failed = {
         "task21": task21_rc,

@@ -12,13 +12,17 @@ from typing import Any
 import httpx
 
 from eval.agent_developer_v1.model_benchmark import action_schema, run_benchmark
+from scripts.openai_live_support import (
+    OpenAILiveHTTPError,
+    retry_delay_seconds,
+    should_retry_openai_response,
+)
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_MODEL = "gpt-5.6-luna"
 DEFAULT_API_BASE = "https://api.openai.com/v1"
 REASONING_EFFORT = "medium"
-_RETRYABLE_STATUS_CODES = frozenset({429, 500, 502, 503, 504})
 
 
 def _output_text(response: dict[str, Any]) -> str:
@@ -90,13 +94,16 @@ class OpenAIAPIPlanner:
                 content=serialized,
                 timeout=90,
             )
-            if response.status_code not in _RETRYABLE_STATUS_CODES:
+            if response.status_code < 400:
                 break
-            if attempt == 3:
-                break
-            time.sleep(2.0 * (2**attempt))
+            if attempt < 3 and should_retry_openai_response(response):
+                time.sleep(retry_delay_seconds(response, attempt))
+                continue
+            raise OpenAILiveHTTPError(response)
         assert response is not None
-        response.raise_for_status()
+        if response.status_code >= 400:
+            raise OpenAILiveHTTPError(response)
+
         request_id = str(response.headers.get("x-request-id") or "").strip()
         if not request_id:
             raise RuntimeError("OpenAI Responses result omitted x-request-id")
