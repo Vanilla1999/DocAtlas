@@ -106,7 +106,7 @@ jobs:
 
   advanced-contract:
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    timeout-minutes: 45
 
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
@@ -136,15 +136,23 @@ jobs:
       - name: Run Agent Developer Protocol gate
         run: python scripts/run_agent_developer_gate.py
 
+      - name: Run Agent Developer adversarial/token gate
+        run: python scripts/run_agent_developer_adversarial_gate.py
+
       - name: Run critical mutation gate
         run: python scripts/run_critical_mutation_gate.py
+
+      - name: Run Agent Developer adversarial mutation gate
+        run: python scripts/run_agent_developer_adversarial_mutation_gate.py
 
       - name: Upload critical mutation gate artifacts
         if: failure()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: critical-mutation-gate-${{ github.run_id }}
-          path: ${{ runner.temp }}/docmancer-mutation-*
+          path: |
+            ${{ runner.temp }}/docmancer-mutation-*
+            ${{ runner.temp }}/docatlas-agent-v2-mutant-*
           if-no-files-found: warn
           retention-days: 14
 
@@ -169,6 +177,7 @@ jobs:
           python -m compileall -q docmancer eval scripts tests
           python scripts/check_python_module_size.py
           python scripts/verify_agent_developer_model_report.py --self-test
+          python scripts/run_agent_developer_adversarial_gate.py --self-test
           git diff --check
 
   required-ci:
