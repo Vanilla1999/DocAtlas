@@ -60,6 +60,8 @@ _REMOTE_PREPARE_ACTIONS = {
     "prefetch_docs_manifest",
     "refresh_library_docs",
 }
+_DOCS_STATUS_MODULE_LIMIT = 8
+_DOCS_STATUS_WARNING_LIMIT = 4
 
 
 def _job_summary(job: Any) -> dict[str, Any]:
@@ -90,6 +92,72 @@ def _compact_project_sync(result: Any) -> dict[str, Any]:
         "tombstones_omitted": diagnostics.get("tombstones_omitted") or 0,
         "warnings": raw.get("warnings") or [],
         "message": raw.get("message"),
+    }
+
+
+def _bounded_project_status(project: Any, *, details: bool) -> dict[str, Any]:
+    """Project status for agents: preserve exact module identity without dumping inspect state."""
+    if not isinstance(project, dict):
+        return {}
+    project_docs = project.get("project_docs")
+    if not isinstance(project_docs, dict):
+        project_docs = {}
+    raw_modules = project_docs.get("modules")
+    modules = raw_modules if isinstance(raw_modules, list) else []
+    visible_modules: list[dict[str, Any]] = []
+    if details:
+        for row in modules[:_DOCS_STATUS_MODULE_LIMIT]:
+            if not isinstance(row, dict):
+                continue
+            visible_modules.append({
+                key: row.get(key)
+                for key in (
+                    "module_id", "module_name", "module_path", "module_type", "doc_count",
+                )
+                if row.get(key) not in (None, "")
+            })
+    module_count = len(modules)
+    raw_diagnostics = project.get("diagnostics")
+    diagnostics = raw_diagnostics if isinstance(raw_diagnostics, dict) else {}
+    raw_active_index = diagnostics.get("active_index")
+    active_index = raw_active_index if isinstance(raw_active_index, dict) else {}
+    active_db_path = active_index.get("db_path")
+    compact: dict[str, Any] = {
+        "project_path": project.get("project_path"),
+        "project_detected": project.get("project_detected"),
+        "reason_code": project.get("reason_code"),
+        "next_action": project.get("next_action") or {},
+        "arguments_patch": project.get("arguments_patch") or {},
+        "source_summary": {
+            "candidates": len(project.get("candidate_sources") or []),
+            "indexed": len(project.get("indexed_sources") or []),
+            "stale": len(project.get("stale_sources") or []),
+            "ignored": len(project.get("ignored_sources") or []),
+        },
+        "project_docs": {
+            "module_count": module_count,
+            "modules": visible_modules,
+            "modules_omitted": max(0, module_count - len(visible_modules)) if details else module_count,
+        },
+        "diagnostics": (
+            {
+                "active_index": {
+                    key: active_index.get(key)
+                    for key in ("db_path", "config_source", "config_path", "retrieval_mode")
+                    if active_index.get(key) not in (None, "")
+                }
+            }
+            if active_db_path not in (None, "") else {}
+        ),
+        "warnings": list(project.get("warnings") or [])[:_DOCS_STATUS_WARNING_LIMIT],
+    }
+    if project.get("requires_confirmation"):
+        compact["requires_confirmation"] = project.get("requires_confirmation")
+        compact["confirmation_reason"] = project.get("confirmation_reason")
+    return {
+        key: value
+        for key, value in compact.items()
+        if value not in (None, {}, [])
     }
 
 
@@ -250,12 +318,17 @@ def handle_prefetch_tool(name: str, args: dict[str, Any], service: LibraryDocsSe
                     "reason_code": "project_path_required",
                     "message": "project_path is required for action='project'",
                 }
+            details = bool(args.get("details") or False)
             project = handle_project_tool(
                 "inspect_project_docs",
-                {"project_path": project_path, "details": bool(args.get("details") or False)},
+                {"project_path": project_path, "details": True},
                 service,
             )
-            return {"tool": "docs_status", "action": action, "project": project}
+            return {
+                "tool": "docs_status",
+                "action": action,
+                "project": _bounded_project_status(project, details=details),
+            }
         if action == "library":
             canonical_id = str(args.get("canonical_id") or "").strip()
             if not canonical_id:

@@ -89,7 +89,7 @@ jobs:
   advanced-latest:
     needs: resolve-latest
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 50
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
         with:
@@ -118,7 +118,9 @@ jobs:
           uv run --locked --extra dev python scripts/run_project_docs_self_host_gate.py
           uv run --locked --extra dev python scripts/run_question_surface_gate.py
           uv run --locked --extra dev python scripts/run_agent_developer_gate.py
+          uv run --locked --extra dev python scripts/run_agent_developer_adversarial_gate.py
           uv run --locked --extra dev python scripts/run_critical_mutation_gate.py
+          uv run --locked --extra dev python scripts/run_agent_developer_adversarial_mutation_gate.py
 
   installer-latest:
     runs-on: ubuntu-latest

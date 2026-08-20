@@ -1,0 +1,916 @@
+{
+  "schema_version": 1,
+  "protocol": "agent-developer-adversarial-v2",
+  "description": "Reviewed provider-free adversarial trajectories. These extend, but never replace, Agent Developer Protocol v1.",
+  "global_max_trajectory_tokens": 2000,
+  "cases": [
+    {
+      "id": "module_definition_tiny_budget",
+      "class": "budget_module",
+      "fixture": "explicit_manifest_monorepo",
+      "working_path": "packages/orders/src/submission.py",
+      "max_get_docs_context_calls": 1,
+      "max_trajectory_tokens": 800,
+      "calls": [
+        {
+          "question": "What is OrdersDraftStore?",
+          "mode": "project",
+          "scope": "module",
+          "module_path": "packages/orders",
+          "packet_tokens": 800,
+          "max_projection_tokens": 800,
+          "target_expected_status": "ok",
+          "target_required_sources": [
+            "packages/orders/README.md"
+          ],
+          "forbidden_sources": [
+            "packages/payments/README.md",
+            "ARCHITECTURE.md"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "module_behavior_tiny_budget",
+      "class": "budget_module",
+      "fixture": "explicit_manifest_monorepo",
+      "working_path": "packages/orders/src/submission.py",
+      "max_get_docs_context_calls": 1,
+      "max_trajectory_tokens": 800,
+      "calls": [
+        {
+          "question": "What does OrdersDraftStore do?",
+          "mode": "project",
+          "scope": "module",
+          "module_path": "packages/orders",
+          "packet_tokens": 800,
+          "max_projection_tokens": 800,
+          "target_expected_status": "ok",
+          "target_required_sources": [
+            "packages/orders/README.md"
+          ],
+          "forbidden_sources": [
+            "packages/payments/README.md",
+            "ARCHITECTURE.md"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "module_requirements_tiny_budget",
+      "class": "budget_module",
+      "fixture": "explicit_manifest_monorepo",
+      "working_path": "packages/orders/src/submission.py",
+      "max_get_docs_context_calls": 1,
+      "max_trajectory_tokens": 800,
+      "calls": [
+        {
+          "question": "What does OrderValidationContract require?",
+          "mode": "project",
+          "scope": "module",
+          "module_path": "packages/orders",
+          "packet_tokens": 800,
+          "max_projection_tokens": 800,
+          "target_expected_status": "ok",
+          "target_required_sources": [
+            "packages/orders/README.md"
+          ],
+          "forbidden_sources": [
+            "packages/payments/README.md",
+            "ARCHITECTURE.md"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "project_policy_tiny_budget",
+      "class": "budget_project",
+      "fixture": "explicit_manifest_monorepo",
+      "working_path": "packages/orders/src/submission.py",
+      "max_get_docs_context_calls": 1,
+      "max_trajectory_tokens": 800,
+      "calls": [
+        {
+          "question": "What is ProjectRetryPolicy?",
+          "mode": "project",
+          "scope": "project",
+          "packet_tokens": 800,
+          "max_projection_tokens": 800,
+          "target_expected_status": "ok",
+          "target_required_sources": [
+            "ARCHITECTURE.md"
+          ],
+          "forbidden_sources": [
+            "packages/orders/README.md",
+            "packages/payments/README.md"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "module_scope_rejects_project_policy_detail",
+      "class": "scope_isolation",
+      "fixture": "explicit_manifest_monorepo",
+      "working_path": "packages/orders/src/submission.py",
+      "max_get_docs_context_calls": 1,
+      "max_trajectory_tokens": 300,
+      "calls": [
+        {
+          "question": "How many retry attempts does ProjectRetryPolicy allow?",
+          "mode": "project",
+          "scope": "module",
+          "module_path": "packages/orders",
+          "packet_tokens": 300,
+          "max_projection_tokens": 300,
+          "target_expected_status": "insufficient_evidence",
+          "target_edit_ready": false,
+          "forbidden_sources": [
+            "ARCHITECTURE.md",
+            "packages/payments/README.md"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cross_module_comparison_tiny_budget",
+      "class": "budget_cross_module",
+      "fixture": "explicit_manifest_monorepo",
+      "working_path": "packages/orders/src/submission.py",
+      "max_get_docs_context_calls": 1,
+      "max_trajectory_tokens": 512,
+      "calls": [
+        {
+          "question": "How does OrdersDraftStore differ from PaymentOutbox?",
+          "mode": "project",
+          "scope": "all",
+          "packet_tokens": 512,
+          "max_projection_tokens": 512,
+          "target_expected_status": "ok",
+          "target_required_sources": [
+            "ARCHITECTURE.md"
+          ],
+          "forbidden_sources": []
+        }
+      ]
+    },
+    {
+      "id": "module_plus_project_two_tiny_packets",
+      "class": "budget_multi_scope",
+      "fixture": "explicit_manifest_monorepo",
+      "working_path": "packages/orders/src/submission.py",
+      "max_get_docs_context_calls": 2,
+      "max_trajectory_tokens": 1600,
+      "calls": [
+        {
+          "question": "What is OrdersDraftStore?",
+          "mode": "project",
+          "scope": "module",
+          "module_path": "packages/orders",
+          "packet_tokens": 800,
+          "max_projection_tokens": 800,
+          "target_expected_status": "ok",
+          "target_required_sources": [
+            "packages/orders/README.md"
+          ],
+          "forbidden_sources": [
+            "packages/payments/README.md"
+          ]
+        },
+        {
+          "question": "What is ProjectRetryPolicy?",
+          "mode": "project",
+          "scope": "project",
+          "packet_tokens": 800,
+          "max_projection_tokens": 800,
+          "target_expected_status": "ok",
+          "target_required_sources": [
+            "ARCHITECTURE.md"
+          ],
+          "forbidden_sources": [
+            "packages/payments/README.md"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "stale_project_policy_recovery",
+      "class": "stale_recovery",
+      "fixture": "explicit_manifest_monorepo",
+      "working_path": "packages/orders/src/submission.py",
+      "max_get_docs_context_calls": 1,
+      "max_trajectory_tokens": 300,
+      "mutation_before_calls": {
+        "path": "ARCHITECTURE.md",
+        "append": "\nPostIndexPolicyFact is added after indexing.\n"
+      },
+      "calls": [
+        {
+          "question": "What is ProjectRetryPolicy?",
+          "mode": "project",
+          "scope": "project",
+          "packet_tokens": 300,
+          "max_projection_tokens": 300,
+          "target_expected_status": "insufficient_evidence",
+          "target_next_action_tool": "prepare_docs",
+          "target_next_action_arguments": {
+            "action": "sync_project_docs",
+            "project_path": "$PROJECT_PATH",
+            "with_vectors": false
+          },
+          "target_requires_confirmation": true,
+          "target_auto_execute": false,
+          "target_edit_ready": false,
+          "target_confirmation_reason": "project_docs_preflight",
+          "forbidden_sources": [
+            "packages/orders/README.md",
+            "packages/payments/README.md"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ambiguity_recovery_whole_trajectory_budget",
+      "class": "ambiguity_recovery_budget",
+      "fixture": "ambiguous_modules_monorepo",
+      "working_path": "packages/auth/src/auth.py",
+      "max_get_docs_context_calls": 2,
+      "max_trajectory_tokens": 1900,
+      "calls": [
+        {
+          "question": "What is PackageAuthBoundary?",
+          "mode": "project",
+          "scope": "module",
+          "module": "auth",
+          "packet_tokens": 256,
+          "max_projection_tokens": 256,
+          "target_expected_status": "insufficient_evidence",
+          "target_next_action_tool": "docs_status",
+          "target_next_action_arguments": {
+            "action": "project",
+            "details": true,
+            "project_path": "$PROJECT_PATH"
+          },
+          "target_requires_confirmation": false,
+          "target_auto_execute": false,
+          "target_edit_ready": false,
+          "target_operational_reason_code": "module_ambiguous",
+          "target_module_candidates": [
+            "packages/auth",
+            "services/auth"
+          ],
+          "forbidden_sources": [
+            "packages/auth/README.md",
+            "services/auth/README.md"
+          ],
+          "recovery": {
+            "max_status_projection_tokens": 800,
+            "expected_module_paths": [
+              "packages/auth",
+              "services/auth"
+            ],
+            "retry": {
+              "question": "What is PackageAuthBoundary?",
+              "mode": "project",
+              "scope": "module",
+              "module_path": "packages/auth",
+              "packet_tokens": 800,
+              "max_projection_tokens": 800,
+              "target_expected_status": "ok",
+              "target_required_sources": [
+                "packages/auth/README.md"
+              ],
+              "forbidden_sources": [
+                "services/auth/README.md",
+                "README.md"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "wrong_module_orders_rejects_payment",
+      "class": "scope_isolation",
+      "fixture": "explicit_manifest_monorepo",
+      "working_path": "packages/orders/src/submission.py",
+      "max_get_docs_context_calls": 1,
+      "max_trajectory_tokens": 300,
+      "calls": [
+        {
+          "question": "What is PaymentOutbox?",
+          "mode": "project",
+          "packet_tokens": 300,
+          "max_projection_tokens": 300,
+          "target_expected_status": "insufficient_evidence",
+          "forbidden_sources": [
+            "packages/payments/README.md",
+            "ARCHITECTURE.md"
+          ],
+          "scope": "module",
+          "module_path": "packages/orders",
+          "target_edit_ready": false
+        }
+      ]
+    },
+    {
+      "id": "wrong_module_payments_rejects_orders",
+      "class": "scope_isolation",
+      "fixture": "explicit_manifest_monorepo",
+      "working_path": "packages/payments/src/outbox.py",
+      "max_get_docs_context_calls": 1,
+      "max_trajectory_tokens": 300,
+      "calls": [
+        {
+          "question": "What is OrdersDraftStore?",
+          "mode": "project",
+          "packet_tokens": 300,
+          "max_projection_tokens": 300,
+          "target_expected_status": "insufficient_evidence",
+          "forbidden_sources": [
+            "packages/orders/README.md",
+            "ARCHITECTURE.md"
+          ],
+          "scope": "module",
+          "module_path": "packages/payments",
+          "target_edit_ready": false
+        }
+      ]
+    },
+    {
+      "id": "project_scope_rejects_module_detail",
+      "class": "scope_isolation",
+      "fixture": "explicit_manifest_monorepo",
+      "working_path": "packages/orders/src/submission.py",
+      "max_get_docs_context_calls": 1,
+      "max_trajectory_tokens": 300,
+      "calls": [
+        {
+          "question": "What is OrdersDraftStore?",
+          "mode": "project",
+          "packet_tokens": 300,
+          "max_projection_tokens": 300,
+          "target_expected_status": "insufficient_evidence",
+          "forbidden_sources": [
+            "packages/orders/README.md",
+            "packages/payments/README.md"
+          ],
+          "scope": "project",
+          "target_edit_ready": false
+        }
+      ]
+    },
+    {
+      "id": "module_name_orders_supported",
+      "class": "module_name_resolution",
+      "fixture": "explicit_manifest_monorepo",
+      "working_path": "packages/orders/src/submission.py",
+      "max_get_docs_context_calls": 1,
+      "max_trajectory_tokens": 900,
+      "calls": [
+        {
+          "question": "What is OrdersDraftStore?",
+          "mode": "project",
+          "packet_tokens": 900,
+          "max_projection_tokens": 900,
+          "target_expected_status": "ok",
+          "forbidden_sources": [
+            "packages/payments/README.md",
+            "ARCHITECTURE.md"
+          ],
+          "scope": "module",
+          "module": "orders",
+          "target_required_sources": [
+            "packages/orders/README.md"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "module_name_payments_supported",
+      "class": "module_name_resolution",
+      "fixture": "explicit_manifest_monorepo",
+      "working_path": "packages/payments/src/outbox.py",
+      "max_get_docs_context_calls": 1,
+      "max_trajectory_tokens": 900,
+      "calls": [
+        {
+          "question": "What is PaymentOutbox?",
+          "mode": "project",
+          "packet_tokens": 900,
+          "max_projection_tokens": 900,
+          "target_expected_status": "ok",
+          "forbidden_sources": [
+            "packages/orders/README.md",
+            "ARCHITECTURE.md"
+          ],
+          "scope": "module",
+          "module": "payments",
+          "target_required_sources": [
+            "packages/payments/README.md"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "stale_orders_module_recovery",
+      "class": "stale_recovery",
+      "fixture": "explicit_manifest_monorepo",
+      "working_path": "packages/orders/src/submission.py",
+      "max_get_docs_context_calls": 1,
+      "max_trajectory_tokens": 300,
+      "calls": [
+        {
+          "question": "What is OrdersDraftStore?",
+          "mode": "project",
+          "packet_tokens": 300,
+          "max_projection_tokens": 300,
+          "target_expected_status": "insufficient_evidence",
+          "forbidden_sources": [
+            "packages/payments/README.md"
+          ],
+          "scope": "module",
+          "module_path": "packages/orders",
+          "target_next_action_tool": "prepare_docs",
+          "target_next_action_arguments": {
+            "action": "sync_project_docs",
+            "project_path": "$PROJECT_PATH",
+            "with_vectors": false
+          },
+          "target_requires_confirmation": true,
+          "target_auto_execute": false,
+          "target_edit_ready": false,
+          "target_confirmation_reason": "project_docs_preflight"
+        }
+      ],
+      "mutation_before_calls": {
+        "path": "packages/orders/README.md",
+        "append": "\nPostIndexOrdersFact is added after indexing.\n"
+      }
+    },
+    {
+      "id": "stale_payments_module_recovery",
+      "class": "stale_recovery",
+      "fixture": "explicit_manifest_monorepo",
+      "working_path": "packages/payments/src/outbox.py",
+      "max_get_docs_context_calls": 1,
+      "max_trajectory_tokens": 300,
+      "calls": [
+        {
+          "question": "What is PaymentOutbox?",
+          "mode": "project",
+          "packet_tokens": 300,
+          "max_projection_tokens": 300,
+          "target_expected_status": "insufficient_evidence",
+          "forbidden_sources": [
+            "packages/orders/README.md"
+          ],
+          "scope": "module",
+          "module_path": "packages/payments",
+          "target_next_action_tool": "prepare_docs",
+          "target_next_action_arguments": {
+            "action": "sync_project_docs",
+            "project_path": "$PROJECT_PATH",
+            "with_vectors": false
+          },
+          "target_requires_confirmation": true,
+          "target_auto_execute": false,
+          "target_edit_ready": false,
+          "target_confirmation_reason": "project_docs_preflight"
+        }
+      ],
+      "mutation_before_calls": {
+        "path": "packages/payments/README.md",
+        "append": "\nPostIndexPaymentsFact is added after indexing.\n"
+      }
+    },
+    {
+      "id": "dependency_only_prefetch_recovery",
+      "class": "dependency_recovery",
+      "fixture": "explicit_manifest_monorepo",
+      "working_path": "packages/orders/src/submission.py",
+      "max_get_docs_context_calls": 1,
+      "max_trajectory_tokens": 300,
+      "calls": [
+        {
+          "question": "What is tenacity.Retrying?",
+          "mode": "dependency",
+          "packet_tokens": 300,
+          "max_projection_tokens": 300,
+          "target_expected_status": "insufficient_evidence",
+          "forbidden_sources": [
+            "packages/orders/README.md",
+            "packages/payments/README.md"
+          ],
+          "target_next_action_tool": "prepare_docs",
+          "target_next_action_arguments": {
+            "action": "prefetch_project_dependency_docs",
+            "project_path": "$PROJECT_PATH"
+          },
+          "target_requires_confirmation": true,
+          "target_auto_execute": false,
+          "target_edit_ready": false,
+          "target_confirmation_reason": "network_fetch"
+        }
+      ]
+    },
+    {
+      "id": "module_plus_dependency_bounded",
+      "class": "dependency_multi_scope",
+      "fixture": "explicit_manifest_monorepo",
+      "working_path": "packages/orders/src/submission.py",
+      "max_get_docs_context_calls": 2,
+      "max_trajectory_tokens": 1100,
+      "calls": [
+        {
+          "question": "What is OrdersDraftStore?",
+          "mode": "project",
+          "packet_tokens": 800,
+          "max_projection_tokens": 800,
+          "target_expected_status": "ok",
+          "forbidden_sources": [
+            "packages/payments/README.md"
+          ],
+          "scope": "module",
+          "module_path": "packages/orders",
+          "target_required_sources": [
+            "packages/orders/README.md"
+          ]
+        },
+        {
+          "question": "What is tenacity.Retrying?",
+          "mode": "dependency",
+          "packet_tokens": 300,
+          "max_projection_tokens": 300,
+          "target_expected_status": "insufficient_evidence",
+          "forbidden_sources": [
+            "packages/payments/README.md"
+          ],
+          "target_next_action_tool": "prepare_docs",
+          "target_next_action_arguments": {
+            "action": "prefetch_project_dependency_docs",
+            "project_path": "$PROJECT_PATH"
+          },
+          "target_requires_confirmation": true,
+          "target_auto_execute": false,
+          "target_edit_ready": false,
+          "target_confirmation_reason": "network_fetch"
+        }
+      ]
+    },
+    {
+      "id": "traversal_module_path_rejected",
+      "class": "path_security",
+      "fixture": "explicit_manifest_monorepo",
+      "working_path": "packages/orders/src/submission.py",
+      "max_get_docs_context_calls": 1,
+      "max_trajectory_tokens": 300,
+      "calls": [
+        {
+          "question": "What is PaymentOutbox?",
+          "mode": "project",
+          "packet_tokens": 300,
+          "max_projection_tokens": 300,
+          "target_expected_status": "insufficient_evidence",
+          "forbidden_sources": [
+            "packages/payments/README.md"
+          ],
+          "scope": "module",
+          "module_path": "packages/orders/../payments",
+          "target_operational_reason_code": "module_not_found",
+          "target_edit_ready": false
+        }
+      ]
+    },
+    {
+      "id": "absolute_module_path_rejected",
+      "class": "path_security",
+      "fixture": "explicit_manifest_monorepo",
+      "working_path": "packages/orders/src/submission.py",
+      "max_get_docs_context_calls": 1,
+      "max_trajectory_tokens": 300,
+      "calls": [
+        {
+          "question": "What is OrdersDraftStore?",
+          "mode": "project",
+          "packet_tokens": 300,
+          "max_projection_tokens": 300,
+          "target_expected_status": "insufficient_evidence",
+          "forbidden_sources": [
+            "packages/orders/README.md"
+          ],
+          "scope": "module",
+          "module_path": "/packages/orders",
+          "target_operational_reason_code": "module_not_found",
+          "target_edit_ready": false
+        }
+      ]
+    },
+    {
+      "id": "prefix_collision_module_path_rejected",
+      "class": "path_collision",
+      "fixture": "explicit_manifest_monorepo",
+      "working_path": "packages/orders/src/submission.py",
+      "max_get_docs_context_calls": 1,
+      "max_trajectory_tokens": 300,
+      "calls": [
+        {
+          "question": "What is OrdersDraftStore?",
+          "mode": "project",
+          "packet_tokens": 300,
+          "max_projection_tokens": 300,
+          "target_expected_status": "insufficient_evidence",
+          "forbidden_sources": [
+            "packages/orders/README.md"
+          ],
+          "scope": "module",
+          "module_path": "packages/order",
+          "target_operational_reason_code": "module_not_found",
+          "target_edit_ready": false
+        }
+      ]
+    },
+    {
+      "id": "case_collision_module_path_rejected",
+      "class": "path_collision",
+      "fixture": "explicit_manifest_monorepo",
+      "working_path": "packages/orders/src/submission.py",
+      "max_get_docs_context_calls": 1,
+      "max_trajectory_tokens": 300,
+      "calls": [
+        {
+          "question": "What is OrdersDraftStore?",
+          "mode": "project",
+          "packet_tokens": 300,
+          "max_projection_tokens": 300,
+          "target_expected_status": "insufficient_evidence",
+          "forbidden_sources": [
+            "packages/orders/README.md"
+          ],
+          "scope": "module",
+          "module_path": "packages/Orders",
+          "target_operational_reason_code": "module_not_found",
+          "target_edit_ready": false
+        }
+      ]
+    },
+    {
+      "id": "long_missing_module_path_bounded",
+      "class": "path_security",
+      "fixture": "explicit_manifest_monorepo",
+      "working_path": "packages/orders/src/submission.py",
+      "max_get_docs_context_calls": 1,
+      "max_trajectory_tokens": 256,
+      "calls": [
+        {
+          "question": "What is OrdersDraftStore?",
+          "mode": "project",
+          "packet_tokens": 256,
+          "max_projection_tokens": 256,
+          "target_expected_status": "insufficient_evidence",
+          "forbidden_sources": [
+            "packages/orders/README.md"
+          ],
+          "scope": "module",
+          "module_path": "packages/module_very_long_safe_segment_very_long_safe_segment_very_long_safe_segment_very_long_safe_segment_very_long_safe_segment_end_missing",
+          "target_operational_reason_code": "module_not_found",
+          "target_edit_ready": false
+        }
+      ]
+    },
+    {
+      "id": "long_exact_module_path_supported",
+      "class": "long_path",
+      "fixture": "ambiguous_modules_monorepo",
+      "working_path": "packages/module_very_long_safe_segment_very_long_safe_segment_very_long_safe_segment_very_long_safe_segment_very_long_safe_segment_end/src/worker.py",
+      "max_get_docs_context_calls": 1,
+      "max_trajectory_tokens": 1000,
+      "calls": [
+        {
+          "question": "What is LongPathBoundary?",
+          "mode": "project",
+          "packet_tokens": 1000,
+          "max_projection_tokens": 1000,
+          "target_expected_status": "ok",
+          "forbidden_sources": [
+            "packages/auth/README.md",
+            "services/auth/README.md"
+          ],
+          "scope": "module",
+          "module_path": "packages/module_very_long_safe_segment_very_long_safe_segment_very_long_safe_segment_very_long_safe_segment_very_long_safe_segment_end",
+          "target_required_sources": [
+            "packages/module_very_long_safe_segment_very_long_safe_segment_very_long_safe_segment_very_long_safe_segment_very_long_safe_segment_end/README.md"
+          ]
+        }
+      ],
+      "setup_files": [
+        {
+          "path": "packages/module_very_long_safe_segment_very_long_safe_segment_very_long_safe_segment_very_long_safe_segment_very_long_safe_segment_end/README.md",
+          "content": "# Long module\n\nLongPathBoundary is the exact long-path module boundary.\n"
+        },
+        {
+          "path": "packages/module_very_long_safe_segment_very_long_safe_segment_very_long_safe_segment_very_long_safe_segment_very_long_safe_segment_end/src/worker.py",
+          "content": "class LongPathBoundary:\n    pass\n"
+        }
+      ]
+    },
+    {
+      "id": "many_auth_ambiguity_bounded_recovery",
+      "class": "many_ambiguity",
+      "fixture": "ambiguous_modules_monorepo",
+      "working_path": "packages/auth/src/auth.py",
+      "max_get_docs_context_calls": 2,
+      "max_trajectory_tokens": 1950,
+      "calls": [
+        {
+          "question": "What is AppAuthBoundary?",
+          "mode": "project",
+          "packet_tokens": 256,
+          "max_projection_tokens": 256,
+          "target_expected_status": "insufficient_evidence",
+          "forbidden_sources": [
+            "apps/auth/README.md",
+            "lib/features/auth/docs/flow.md",
+            "lib/modules/auth/README.md",
+            "packages/auth/README.md",
+            "services/auth/README.md"
+          ],
+          "scope": "module",
+          "module": "auth",
+          "target_next_action_tool": "docs_status",
+          "target_next_action_arguments": {
+            "action": "project",
+            "details": true,
+            "project_path": "$PROJECT_PATH"
+          },
+          "target_requires_confirmation": false,
+          "target_auto_execute": false,
+          "target_edit_ready": false,
+          "target_operational_reason_code": "module_ambiguous",
+          "target_module_candidates": [
+            "apps/auth",
+            "lib/features/auth",
+            "lib/modules/auth",
+            "packages/auth",
+            "services/auth"
+          ],
+          "recovery": {
+            "max_status_projection_tokens": 900,
+            "expected_module_paths": [
+              "apps/auth",
+              "lib/features/auth",
+              "lib/modules/auth",
+              "packages/auth",
+              "services/auth"
+            ],
+            "retry": {
+              "question": "What is AppAuthBoundary?",
+              "mode": "project",
+              "packet_tokens": 800,
+              "max_projection_tokens": 800,
+              "target_expected_status": "ok",
+              "forbidden_sources": [
+                "lib/features/auth/docs/flow.md",
+                "lib/modules/auth/README.md",
+                "packages/auth/README.md",
+                "services/auth/README.md"
+              ],
+              "scope": "module",
+              "module_path": "apps/auth",
+              "target_required_sources": [
+                "apps/auth/README.md"
+              ]
+            }
+          }
+        }
+      ],
+      "setup_files": [
+        {
+          "path": "apps/auth/README.md",
+          "content": "# Auth app\n\nAppAuthBoundary is the client authentication application boundary.\n"
+        },
+        {
+          "path": "apps/auth/src/app.py",
+          "content": "class AppAuthBoundary:\n    pass\n"
+        },
+        {
+          "path": "lib/modules/auth/README.md",
+          "content": "# Auth library module\n\nModuleAuthBoundary is the reusable authentication module boundary.\n"
+        },
+        {
+          "path": "lib/modules/auth/src/module.py",
+          "content": "class ModuleAuthBoundary:\n    pass\n"
+        },
+        {
+          "path": "lib/features/auth/docs/flow.md",
+          "content": "# Auth feature\n\nFeatureAuthBoundary is the feature-local authentication flow boundary.\n"
+        },
+        {
+          "path": "lib/features/auth/src/feature.py",
+          "content": "class FeatureAuthBoundary:\n    pass\n"
+        }
+      ]
+    },
+    {
+      "id": "many_auth_exact_feature_collision",
+      "class": "many_ambiguity_exact",
+      "fixture": "ambiguous_modules_monorepo",
+      "working_path": "lib/features/auth/src/feature.py",
+      "max_get_docs_context_calls": 1,
+      "max_trajectory_tokens": 900,
+      "calls": [
+        {
+          "question": "What is FeatureAuthBoundary?",
+          "mode": "project",
+          "packet_tokens": 900,
+          "max_projection_tokens": 900,
+          "target_expected_status": "ok",
+          "forbidden_sources": [
+            "apps/auth/README.md",
+            "lib/modules/auth/README.md",
+            "packages/auth/README.md",
+            "services/auth/README.md"
+          ],
+          "scope": "module",
+          "module_path": "lib/features/auth",
+          "target_required_sources": [
+            "lib/features/auth/docs/flow.md"
+          ]
+        }
+      ],
+      "setup_files": [
+        {
+          "path": "apps/auth/README.md",
+          "content": "# Auth app\n\nAppAuthBoundary is the client authentication application boundary.\n"
+        },
+        {
+          "path": "apps/auth/src/app.py",
+          "content": "class AppAuthBoundary:\n    pass\n"
+        },
+        {
+          "path": "lib/modules/auth/README.md",
+          "content": "# Auth library module\n\nModuleAuthBoundary is the reusable authentication module boundary.\n"
+        },
+        {
+          "path": "lib/modules/auth/src/module.py",
+          "content": "class ModuleAuthBoundary:\n    pass\n"
+        },
+        {
+          "path": "lib/features/auth/docs/flow.md",
+          "content": "# Auth feature\n\nFeatureAuthBoundary is the feature-local authentication flow boundary.\n"
+        },
+        {
+          "path": "lib/features/auth/src/feature.py",
+          "content": "class FeatureAuthBoundary:\n    pass\n"
+        }
+      ]
+    },
+    {
+      "id": "many_auth_exact_service_collision",
+      "class": "many_ambiguity_exact",
+      "fixture": "ambiguous_modules_monorepo",
+      "working_path": "services/auth/src/auth.py",
+      "max_get_docs_context_calls": 1,
+      "max_trajectory_tokens": 900,
+      "calls": [
+        {
+          "question": "What is ServiceAuthBoundary?",
+          "mode": "project",
+          "packet_tokens": 900,
+          "max_projection_tokens": 900,
+          "target_expected_status": "ok",
+          "forbidden_sources": [
+            "packages/auth/README.md"
+          ],
+          "scope": "module",
+          "module_path": "services/auth",
+          "target_required_sources": [
+            "services/auth/README.md"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "project_policy_detail_fails_closed",
+      "class": "semantic_fail_closed",
+      "fixture": "explicit_manifest_monorepo",
+      "working_path": "packages/orders/src/submission.py",
+      "max_get_docs_context_calls": 1,
+      "max_trajectory_tokens": 300,
+      "calls": [
+        {
+          "question": "How many retry attempts does ProjectRetryPolicy allow?",
+          "mode": "project",
+          "scope": "project",
+          "packet_tokens": 300,
+          "max_projection_tokens": 300,
+          "target_expected_status": "insufficient_evidence",
+          "forbidden_sources": [
+            "packages/orders/README.md",
+            "packages/payments/README.md"
+          ],
+          "target_edit_ready": false
+        }
+      ]
+    }
+  ]
+}
