@@ -4,7 +4,11 @@ from __future__ import annotations
 
 import sys
 
-from docmancer.docs.application.evidence_selection import build_requirements
+from docmancer.docs.application.evidence_selection import (
+    build_requirements,
+    project_docs_selection_config,
+    select_evidence,
+)
 from docmancer.docs.domain.project_answer_contract import build_project_answer_contract
 from docmancer.docs.domain.question_ownership import frozen_ownership_mismatches
 from docmancer.docs.domain.question_plan import compile_question_plan
@@ -59,6 +63,24 @@ GENERIC_FORBIDDEN_SCAFFOLD = {
     "returns", "safely", "select", "accepting",
 }
 
+GENERIC_PROJECT_WITNESSES = {
+    GENERIC_PROJECT_CASES[0]: (
+        "Treasure campaigns use trip positions to record location. "
+        "Campaign progress is stored at checkpoints. "
+        "Encounters follow campaign safety rules. "
+        "Gold and gem targets remain unchanged across the trip."
+    ),
+    GENERIC_PROJECT_CASES[1]: (
+        "Treasure campaign safety rules require `trip.take` to update checkpoint counters. "
+        "`meet.accept` accepts only approved gold/gem meet types. "
+        "`trip.back` restores the documented checkpoint state."
+    ),
+    GENERIC_PROJECT_CASES[2]: (
+        "`takeAPicture` is handled by the NBO scanner. "
+        "The scanner returns an image to the caller."
+    ),
+}
+
 SILENT_EMPTY_PROBES = (
     "xyzzy",
     "Bitcoin price",
@@ -83,6 +105,14 @@ def _requirements(question: str):
 
 def _unsupported_requirement_present(question: str) -> bool:
     return any(row.kind == "unsupported_query" for row in _requirements(question))
+
+
+def _generic_witness_candidate(index: int, content: str) -> dict[str, str]:
+    return {
+        "stable_id": f"generic-project-witness-{index}",
+        "source": f"docs/generic-project-witness-{index}.md",
+        "content": content,
+    }
 
 
 def main() -> int:
@@ -131,7 +161,7 @@ def main() -> int:
         if not contract.proof_obligations:
             errors.append(f"complete legacy contract became empty: {question!r}")
 
-    for question in GENERIC_PROJECT_CASES:
+    for index, question in enumerate(GENERIC_PROJECT_CASES):
         plan = compile_question_plan(question)
         contract = build_project_answer_contract(question)
         requirements = _requirements(question)
@@ -186,6 +216,20 @@ def main() -> int:
                 f"mandatory={len(mandatory)} obligations={len(contract.proof_obligations)}"
             )
 
+        witness = _generic_witness_candidate(index, GENERIC_PROJECT_WITNESSES[question])
+        decision = select_evidence(
+            [witness],
+            question=question,
+            config=project_docs_selection_config(800),
+            requirements=requirements,
+        )
+        if decision.status != "ok" or not decision.support_decision.answer_supported:
+            errors.append(
+                f"generic project contract is not satisfiable by natural project documentation: "
+                f"{question!r}; missing={decision.missing_requirements!r}; "
+                f"subjects={sorted(subjects)!r}"
+            )
+
     adversarial_contract = build_project_answer_contract(GENERIC_ADVERSARIAL_TAIL)
     if not adversarial_contract.unresolved_parts:
         guarded_terms = " ".join(
@@ -237,9 +281,9 @@ def main() -> int:
     print(
         "PASS: reviewed QuestionPlan migrations remain stable; partial legacy semantics fail "
         "closed; complete legacy controls remain supported; 3 novel project-specific questions "
-        "receive bounded mandatory anchor contracts with exact query spans; unrelated tails are "
-        "represented or rejected; silent-empty and causal-why probes remain unsupported; "
-        "canonical ownership signatures stable"
+        "receive bounded mandatory anchor contracts with exact query spans and natural-doc "
+        "witnesses; unrelated tails are represented or rejected; silent-empty and causal-why "
+        "probes remain unsupported; canonical ownership signatures stable"
     )
     return 0
 
