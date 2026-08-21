@@ -33,7 +33,7 @@ jobs:
           python scripts/run_legacy_contract_gate.py
           python -m pytest -q tests/test_named_document_context_integration.py tests/docs/test_mcp_docs_tools_registration.py
           git diff --check
-      - name: Remove one-shot materializer
+      - name: Remove one-shot materializers
         run: |
           rm scripts/_materialize_recoverable_docs_failures.py
           rm scripts/_materialize_recoverable_docs_failures_v2.py
@@ -52,9 +52,12 @@ jobs:
           rm scripts/_materialize_recoverable_docs_failures_v15.py
           rm scripts/_materialize_recoverable_docs_failures_v16.py
           rm scripts/_materialize_recoverable_docs_failures_v17.py
-          rm .github/workflows/materialize-recoverable-docs-failures.yml
       - name: Commit semantic tree
         run: |
+          # GitHub Actions tokens cannot push workflow changes in this repository.
+          # Keep workflow files identical on this push; the connected GitHub API
+          # applies/removes the reviewed workflow changes separately.
+          git checkout HEAD -- .github/workflows/ci.yml
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add -A
