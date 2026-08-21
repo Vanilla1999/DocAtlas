@@ -43,9 +43,11 @@ def test_config_resolution_precedence_is_explicit_project_cwd_user_defaults(tmp_
     monkeypatch.delenv("DOCMANCER_HOME", raising=False)
 
     assert resolve_home().path == user_home.resolve()
-    assert resolve_config(
+    explicit_result = resolve_config(
         explicit_path=explicit, project_path=project, cwd=cwd
-    ).source == "explicit"
+    )
+    assert explicit_result.source == "explicit"
+    assert explicit_result.legacy_compatibility is False
     project_result = resolve_config(project_path=project, cwd=cwd)
     assert project_result.source == "project_local"
     assert project_result.legacy_compatibility is False
@@ -74,6 +76,24 @@ def test_config_resolution_precedence_is_explicit_project_cwd_user_defaults(tmp_
         legacy = resolve_config(project_path=project, cwd=cwd)
     assert legacy.path == (project / "docmancer.yaml").resolve()
     assert legacy.legacy_compatibility is True
+
+    explicit_legacy = tmp_path / "explicit-legacy" / "docmancer.yaml"
+    _write_config(explicit_legacy, mode="lexical", db_path="legacy-explicit.db")
+    with pytest.warns(DeprecationWarning, match="docmancer.yaml"):
+        explicit_legacy_result = resolve_config(explicit_path=explicit_legacy)
+    assert explicit_legacy_result.source == "explicit"
+    assert explicit_legacy_result.path == explicit_legacy.resolve()
+    assert explicit_legacy_result.legacy_compatibility is True
+
+    isolated_cwd = tmp_path / "isolated-cwd"
+    isolated_cwd.mkdir()
+    with pytest.warns(DeprecationWarning, match="docmancer.yaml"):
+        user_legacy_result = resolve_config(
+            cwd=isolated_cwd,
+            user_config_path=explicit_legacy,
+        )
+    assert user_legacy_result.source == "user"
+    assert user_legacy_result.legacy_compatibility is True
 
 
 def test_config_identity_includes_retrieval_settings_not_only_db_path(tmp_path):
