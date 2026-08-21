@@ -28,7 +28,7 @@ from .question_plan import compile_question_plan as _compile_question_plan
 from .technical_terms import extract_technical_terms as _extract_technical_terms
 
 
-_GENERIC_PROJECT_TERM_LIMIT = 12
+_GENERIC_PROJECT_TERM_LIMIT = MAX_PROOF_OBLIGATIONS
 _GENERIC_PROJECT_INTENT_RE = _re.compile(
     r"\b(?:how|what|which|when|where|should|must|does|do|is|are|"
     r"behav(?:e|es|ior)|handle(?:d|s)?|configure(?:d|s)?|persist(?:s|ed)?|"
@@ -172,6 +172,12 @@ def _generic_term_obligations(
     return tuple(obligations)
 
 
+def _merge_bounded(existing: tuple[str, ...], additions: tuple[str, ...], limit: int) -> tuple[str, ...]:
+    """Append fallback identity without breaking the contract's existing hard bounds."""
+
+    return tuple(dict.fromkeys((*existing, *additions)))[:limit]
+
+
 def build_project_answer_contract(question: str) -> ProjectAnswerContract:
     """Build the contract and fail closed when legacy semantics are incomplete."""
 
@@ -186,8 +192,10 @@ def build_project_answer_contract(question: str) -> ProjectAnswerContract:
         if generic_terms:
             contract = _replace(
                 contract,
-                subjects=tuple(dict.fromkeys((*contract.subjects, *generic_terms))),
-                retrieval_hints=tuple(dict.fromkeys((*contract.retrieval_hints, *generic_terms))),
+                subjects=_merge_bounded(contract.subjects, generic_terms, MAX_SUBJECTS),
+                retrieval_hints=_merge_bounded(
+                    contract.retrieval_hints, generic_terms, MAX_RETRIEVAL_HINTS,
+                ),
                 proof_obligations=_generic_term_obligations(raw_question, generic_terms),
                 parse_trace=(*contract.parse_trace, "fallback:generic_project_terms"),
             )
