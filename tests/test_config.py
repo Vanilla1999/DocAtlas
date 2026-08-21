@@ -9,7 +9,7 @@ from docmancer.core.config import DocmancerConfig, IndexConfig, QueryConfig
 def test_default_config_uses_sqlite_index():
     config = DocmancerConfig()
     assert config.index.provider == "sqlite"
-    assert config.index.db_path.endswith(".docmancer/docmancer.db")
+    assert config.index.db_path.endswith(".docatlas/docmancer.db")
     assert config.query.default_budget == 2400
     assert config.web_fetch.default_page_cap == 500
     assert config.web_fetch.max_redirects == 5
