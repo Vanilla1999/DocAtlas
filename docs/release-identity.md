@@ -21,7 +21,7 @@ The intended next public release is:
 doc-atlas 1.3.0
 ```
 
-The source version and changelog are prepared in the P0.5 release PR. Tag creation and publication remain separate post-merge repository operations and must use one protected `main` commit.
+The source version and changelog are prepared in the P0.5 release PR. Tag creation and publication remain separate post-merge repository operations and must use one protected `main` commit. The manual release workflow independently fails closed unless the tagged commit is reachable from remote `main` and GitHub reports that branch as protected; the admin-capable exact-ruleset check remains the stronger P0.1 proof.
 
 Before `1.3.0` is published, all of the following must be true:
 
