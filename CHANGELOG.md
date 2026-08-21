@@ -6,7 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-08-21
+
 ### Added
+
+- **DocAtlas-owned state and integrations:** fresh installs use `DOCATLAS_HOME` / `~/.docatlas`, `docatlas.yaml`, the `docatlas` MCP registration and skill identity; legacy `docmancer` state is compatibility-only, ownership-checked, and never implicitly overwritten.
+- **Preview-first home migration:** `doc-atlas migrate-home` previews a hash-bound copy plan, requires the reviewed digest to apply, preserves source state, and fails closed on foreign, ambiguous, symlinked, stale, or tampered state.
+- **Runtime-derived agent workflow contract:** the installed three-tool Docs MCP contract (`get_docs_context`, `prepare_docs`, `docs_status`) is fingerprinted from the advertised runtime ToolSpecs so guidance/schema drift is detectable.
 
 - **Project answer contract v3:** normalize bounded CLI/environment technical identities, distinguish purpose and supported-value questions, require every coordinated effect facet, and validate relation-local polarity without changing frozen v1/v2 protocols.
 - **Project answer contract v2:** distinguish inventory counts, closed tool-name lists, singular command bindings, source-field locations, and bounded workflow groups so a retrieval hit cannot authorize an unrelated answer.
@@ -17,7 +23,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Changed
 
-- **MCP SDK floor:** require `mcp>=1.27.2`, matching the structured tool output and output-schema transport used by bounded delivery.
+- **Public release truth:** keep the distribution at Beta, publish only through the OIDC/Trusted Publishing release environment, verify exact public wheel/sdist SHA-256 identity, and rerun the exact public three-tool MCP smoke on Linux, macOS, and Windows.
+- **MCP SDK maintenance line:** require `mcp>=1.28,<2` for the maintained v1 SDK line used by the public Docs MCP transport.
 - **Release maturity truth:** clarify that artifact-level Task 15 evidence is complete while a Stable claim still requires Task 14 live external-ingest evidence and an approved post-publish verification of the exact public release.
 - **Section-impact roadmap truth:** reconcile the active roadmap with the merged hash-bound section index, automatic base/head symbol extraction, conservative fallback, and bounded evidence-bearing ranking gates.
 - **Change-aware maintenance roadmap truth:** record the merged evidence-bounded authoring handoff, hash-idempotent incremental sync, exact-diff acceptance guard, scoped derived work, and three-tool MCP boundary as complete for local scope.
