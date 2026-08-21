@@ -39,14 +39,24 @@ def test_publish_workflow_is_manual_build_once_and_oidc() -> None:
 
 
 def test_dispatched_release_source_must_be_on_protected_main() -> None:
+    # Historical node id retained for the diagnostic inventory. The release
+    # policy now requires main ancestry while branch protection is an explicit
+    # accepted risk rather than a hidden or falsely-green control.
     text = (ROOT / ".github/workflows/publish.yml").read_text()
     build = text[text.index("  build:"):text.index("  wheel:")]
     assert "fetch-depth: 0" in build
     assert "if: github.event_name == 'workflow_dispatch'" in build
     assert "git fetch --no-tags origin main:refs/remotes/origin/main" in build
     assert "git merge-base --is-ancestor HEAD refs/remotes/origin/main" in build
-    assert 'branch.get("protected") is not True' in build
-    assert "Release source ancestry/protection: PASS" in build
+    assert 'branch.get("protected")' not in build
+    assert "remote main is not protected" not in build
+    assert "Release source ancestry: PASS" in build
+
+    roadmap = (ROOT / "roadmap" / "README.md").read_text(encoding="utf-8")
+    scorecard = (ROOT / "docs" / "public-truth-scorecard.md").read_text(encoding="utf-8")
+    assert "P0.1 — Remote `main` ruleset: accepted risk" in roadmap
+    assert "| Branch protection | `accepted_risk` |" in scorecard
+    assert "Status: **INCOMPLETE**" in scorecard
 
 
 def test_installer_smoke_passes_an_existing_wheel_path() -> None:

@@ -46,20 +46,23 @@ A green deterministic/oracle gate must never be presented as proof that a live c
 
 P0 establishes one trustworthy public product before further R&D. During P0, retrieval expansion, public-tool expansion, code-graph work, and benchmark-driven API changes are frozen.
 
-## P0.1 — Activate the remote `main` ruleset
+## P0.1 — Remote `main` ruleset: accepted risk
 
-**Type:** repository operation, not a feature PR.
+**Status:** `accepted_risk` for the `1.3.0` P0 closure.
 
-The canonical ruleset already exists in `.github/rulesets/protect-main.json` and is checked by `scripts/main_ruleset.py`. Apply it remotely and verify it with an admin-capable token.
+On 2026-08-21 the maintainer explicitly chose not to activate remote branch protection for `main`. This is recorded as an operational risk, not misreported as a green protection control.
 
-Acceptance:
+The canonical optional hardening policy remains in `.github/rulesets/protect-main.json` and `scripts/main_ruleset.py`, so protection can be enabled later without reconstructing the contract.
 
-- remote `protect-main` ruleset is active;
-- no bypass actors;
-- deletion and non-fast-forward updates are blocked;
-- PR/thread policy matches the committed contract;
-- strict `required-ci` and `required-release` checks are enforced;
-- the remote check passes after application.
+Compensating release controls:
+
+- a release tag must resolve to a commit reachable from remote `main`;
+- PR/release CI remains the reviewed engineering evidence before merge;
+- publication remains manual through the `release` environment;
+- PyPI publication uses OIDC/Trusted Publishing with no long-lived PyPI token;
+- exact public artifacts and installed behavior are verified after publication.
+
+P0 does **not** claim that `main` is protected. The residual risk must remain visible in the P0.6 scorecard.
 
 ## P0.2 — Product direction, active roadmap, and release identity
 
@@ -157,9 +160,11 @@ Acceptance:
 
 ## P0.6 — Public-truth closure scorecard
 
-Record a short evidence table covering branch protection, artifact identity, public MCP behavior, namespace isolation, cross-platform install smoke, and unresolved product claims.
+Maintain [`docs/public-truth-scorecard.md`](../docs/public-truth-scorecard.md) as the single closure record for P0.
 
-P0 exits only when all public-truth rows are green while product maturity remains honestly Beta.
+Scorecard states are `green`, `pending`, and `accepted_risk`. Branch protection is the one explicitly accepted residual risk for `1.3.0`; it must never be rendered as green. Artifact/public-install rows remain pending until the exact PyPI release exists and post-publish verification completes.
+
+P0 exits when every row is `green` or an explicitly documented `accepted_risk`, no row is `pending`, and product maturity remains honestly **Beta**. An accepted risk does not become evidence that the missing control exists.
 
 ---
 

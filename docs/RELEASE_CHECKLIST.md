@@ -18,8 +18,8 @@ Artifact/release correctness is necessary for every public release. A **Stable**
 
 Before the next public release candidate:
 
-- [ ] The remote `protect-main` ruleset matches `.github/rulesets/protect-main.json`; `python scripts/main_ruleset.py --check` passes with admin-capable visibility.
-- [ ] The release commit is reachable only through the protected `main` workflow; deletion/non-fast-forward and strict required checks are enforced remotely.
+- [ ] The release tag commit is reachable from remote `main`; the release workflow verifies this ancestry before building a dispatched release.
+- [ ] The unprotected-`main` decision is recorded as `accepted_risk` in `public-truth-scorecard.md`; release documentation must not claim that branch protection is active.
 - [ ] New DocAtlas state/integration identity is isolated from the active `docmancer` product namespace; clean installs do not implicitly write to foreign `~/.docmancer` state.
 - [ ] Legacy state/config migration is ownership-checked, preview-first, fail-closed on ambiguous/foreign state, and covered by installed tests.
 - [ ] Installed agent guidance and examples validate against the real three-tool public MCP schema.
@@ -60,7 +60,7 @@ These technical gates establish artifact and bounded ingest truth. They do **not
 
 Do not call the product Stable until all of the following are true:
 
-1. P0 public truth is green: protected source, namespace/state isolation, contract consistency, exact public artifact, and cross-platform installed smoke.
+1. P0 public truth is closed: release-source provenance is explicit, the unprotected-`main` residual risk is recorded rather than hidden, namespace/state isolation and contract consistency are green, and the exact public artifact plus cross-platform installed smoke are green.
 2. P1 agent truth demonstrates that a real coding model can acquire the intended evidence through the installed public MCP contract under a frozen benchmark.
 3. P2 product truth demonstrates real coding-task value or a material reduction in unsupported/wrong-version claims at acceptable total trajectory cost.
 4. Context7 parity is claimed only if a separate comparable parity protocol demonstrates it; parity is not a prerequisite for Stable unless the active product decision makes it one.
