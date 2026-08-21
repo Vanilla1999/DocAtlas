@@ -102,7 +102,15 @@ def register_server(target: AgentTarget) -> tuple[bool, str]:
     desired = _desired_server_entry(target.style)
 
     existing = servers.get(SERVER_KEY)
+    legacy = servers.get(LEGACY_SERVER_KEY)
     if _matches_command(existing, desired):
+        # If both names point at exact installer-owned entries, converge to the
+        # primary namespace. Extra fields make the legacy entry user-modified,
+        # so leave it untouched rather than deleting user configuration.
+        if legacy == desired:
+            del servers[LEGACY_SERVER_KEY]
+            _backup_and_write(target.config_path, config)
+            return True, f"removed duplicate legacy DocAtlas MCP registration from {target.config_path}"
         return False, f"already registered in {target.config_path}"
     if existing is not None and not _has_same_command(existing, desired):
         raise ValueError(
@@ -112,7 +120,6 @@ def register_server(target: AgentTarget) -> tuple[bool, str]:
 
     migrated = False
     source = existing
-    legacy = servers.get(LEGACY_SERVER_KEY)
     if source is None and _is_proven_docatlas_entry(legacy, target.style):
         source = legacy
         del servers[LEGACY_SERVER_KEY]
@@ -295,7 +302,17 @@ def _register_toml_server(target: AgentTarget) -> tuple[bool, str]:
     servers = servers or {}
     desired = _desired_server_entry(target.style)
     existing = servers.get(SERVER_KEY)
+    legacy = servers.get(LEGACY_SERVER_KEY)
     if _matches_command(existing, desired):
+        if legacy == desired:
+            updated = _remove_toml_server_block(text, LEGACY_SERVER_KEY)
+            if updated != text:
+                shutil.copy2(
+                    target.config_path,
+                    target.config_path.with_suffix(target.config_path.suffix + ".bak"),
+                )
+                target.config_path.write_text(updated, encoding="utf-8")
+                return True, f"removed duplicate legacy DocAtlas MCP registration from {target.config_path}"
         return False, f"already registered in {target.config_path}"
     if existing is not None:
         raise ValueError(
@@ -303,7 +320,6 @@ def _register_toml_server(target: AgentTarget) -> tuple[bool, str]:
             "refusing to overwrite it."
         )
 
-    legacy = servers.get(LEGACY_SERVER_KEY)
     if _is_proven_docatlas_entry(legacy, target.style):
         if target.config_path.exists():
             shutil.copy2(target.config_path, target.config_path.with_suffix(target.config_path.suffix + ".bak"))
