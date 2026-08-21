@@ -44,6 +44,22 @@ def main() -> None:
 ''',
     )
 
+    # Keep the large projector orchestration-only: budget-sensitive recovery
+    # compaction lives in the bounded helper module extracted by base.apply().
+    base.replace_once(
+        "docmancer/docs/application/model_visible_projection.py",
+        '''from docmancer.docs.application.insufficient_projection import (
+    apply_terminal_insufficient_projection,
+    bounded_missing_value,
+)
+''',
+        '''from docmancer.docs.application.insufficient_projection import (
+    apply_terminal_insufficient_projection,
+    bounded_missing_value,
+    compact_recovery_action_for_budget,
+)
+''',
+    )
     base.replace_once(
         "docmancer/docs/application/model_visible_projection.py",
         '''    action = payload.get("recommended_next_action")
@@ -63,18 +79,11 @@ def main() -> None:
 ''',
         '''    action = payload.get("recommended_next_action")
     original_action = deepcopy(action) if isinstance(action, dict) else None
-    protected_confirmation = bool(isinstance(action, dict) and action.get("requires_confirmation") and action.get("confirmation_reason"))
-    if isinstance(action, dict):
-        for key in ("observations", "decision_options", "agent_question", "security_scope", "reason"):
-            action.pop(key, None)
-            _refresh_estimate(payload)
-            if estimate_projection_tokens(payload) <= limit:
-                return
-        if not protected_confirmation:
-            action.pop("confirmation_reason", None)
-            _refresh_estimate(payload)
-            if estimate_projection_tokens(payload) <= limit:
-                return
+    action_fits, protected_confirmation = compact_recovery_action_for_budget(
+        payload, limit, estimate_tokens=estimate_projection_tokens, refresh_estimate=_refresh_estimate
+    )
+    if action_fits:
+        return
     if not protected_confirmation:
         payload.pop("recommended_next_action", None)
     missing = payload.get("missing")
@@ -84,9 +93,39 @@ def main() -> None:
 
     path = "docmancer/docs/application/insufficient_projection.py"
     text = base.read(path)
+    insert_at = text.index("\ndef _minimal_rephrase_action")
+    compact_helper = '''
+
+def compact_recovery_action_for_budget(
+    payload: dict[str, Any],
+    limit: int,
+    *,
+    estimate_tokens: Any,
+    refresh_estimate: Any,
+) -> tuple[bool, bool]:
+    """Compact a recovery action without splitting confirmation semantics."""
+    action = payload.get("recommended_next_action")
+    if not isinstance(action, dict):
+        return False, False
+    protected = bool(
+        action.get("requires_confirmation") and action.get("confirmation_reason")
+    )
+    removable = [
+        "observations", "decision_options", "agent_question", "security_scope", "reason"
+    ]
+    if not protected:
+        removable.append("confirmation_reason")
+    for key in removable:
+        action.pop(key, None)
+        refresh_estimate(payload)
+        if estimate_tokens(payload) <= limit:
+            return True, protected
+    return False, protected
+'''
+    text = text[:insert_at] + compact_helper + text[insert_at:]
     start = text.index("def _minimal_rephrase_action")
     end = text.index("\n\ndef apply_terminal_insufficient_projection", start)
-    new = '''def _minimal_recovery_action(value: Any) -> dict[str, Any] | None:
+    recovery_helper = '''def _minimal_recovery_action(value: Any) -> dict[str, Any] | None:
     if not isinstance(value, dict):
         return None
     if value.get("requires_confirmation") and value.get("confirmation_reason"):
@@ -114,7 +153,7 @@ def main() -> None:
         "auto_execute": False,
     }
 '''
-    text = text[:start] + new + text[end:]
+    text = text[:start] + recovery_helper + text[end:]
     if text.count("_minimal_rephrase_action(original_action)") != 1:
         raise SystemExit("terminal recovery call target drifted")
     text = text.replace(
