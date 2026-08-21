@@ -24,7 +24,7 @@ jobs:
       - name: Install dependencies
         run: python -m pip install -e '.[dev]'
       - name: Materialize reviewed implementation
-        run: python scripts/_materialize_recoverable_docs_failures_v15.py
+        run: python scripts/_materialize_recoverable_docs_failures_v16.py
       - name: Focused validation
         run: |
           python -m compileall -q docmancer scripts
@@ -50,6 +50,7 @@ jobs:
           rm scripts/_materialize_recoverable_docs_failures_v13.py
           rm scripts/_materialize_recoverable_docs_failures_v14.py
           rm scripts/_materialize_recoverable_docs_failures_v15.py
+          rm scripts/_materialize_recoverable_docs_failures_v16.py
           rm .github/workflows/materialize-recoverable-docs-failures.yml
       - name: Commit semantic tree
         run: |
