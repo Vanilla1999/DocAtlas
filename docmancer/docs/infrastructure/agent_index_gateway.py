@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any, Callable, Sequence
 
 from docmancer.core.config import DocmancerConfig
+from docmancer.core.product_identity import ensure_owned_home, resolve_home
 from docmancer.docs.application.evidence_selection import (
     EvidenceRequirementSet,
     requirement_probe_query,
@@ -51,7 +52,15 @@ class AgentIndexGateway:
 
     def index_config_for(self, record: LibraryRecord) -> DocmancerConfig:
         config = self.config.model_copy(deep=True)
-        root = self._library_index_root or paths.docmancer_home() / "docs-indexes"
+        if self._library_index_root is not None:
+            root = self._library_index_root
+        else:
+            home_resolution = resolve_home()
+            owned_home = ensure_owned_home(
+                home_resolution.path,
+                allow_legacy_claim=home_resolution.compatibility_legacy,
+            )
+            root = owned_home / "docs-indexes"
         root.mkdir(parents=True, exist_ok=True)
         safe = normalize_library_name(record.library_id) or "library"
         config.index.db_path = str(root / f"{safe}.db")
