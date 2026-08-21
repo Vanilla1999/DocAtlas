@@ -5,6 +5,11 @@ from pathlib import Path
 
 from docmancer.core.config import DocmancerConfig
 from docmancer.core.config_resolution import ResolvedConfig, resolve_config
+from docmancer.core.product_identity import (
+    DEFAULT_HOME_NAME,
+    LEGACY_CONFIG_NAME,
+    PRIMARY_CONFIG_NAME,
+)
 
 
 @dataclass(frozen=True)
@@ -33,8 +38,11 @@ class StorageTopologyResolver:
 
     def resolve(self, project_path: str | Path) -> StorageTopology:
         root = Path(project_path).expanduser().resolve()
-        local_config = root / "docmancer.yaml"
-        if local_config.is_file() and not self._prefer_fallback:
+        local_configs = (
+            root / PRIMARY_CONFIG_NAME,
+            root / LEGACY_CONFIG_NAME,
+        )
+        if any(path.is_file() for path in local_configs) and not self._prefer_fallback:
             resolved = resolve_config(project_path=root)
             return StorageTopology(
                 project_path=root,
@@ -42,7 +50,7 @@ class StorageTopologyResolver:
                 config_source=resolved.source,
                 config_path=resolved.path,
                 config_identity=resolved.identity,
-                library_index_root=root / ".docmancer" / "docs-indexes",
+                library_index_root=root / DEFAULT_HOME_NAME / "docs-indexes",
             )
         config = (
             self._fallback_config.model_copy(deep=True)
