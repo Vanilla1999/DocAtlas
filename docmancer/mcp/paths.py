@@ -100,10 +100,12 @@ def secrets_env_file(package: str) -> Path:
 
 def ensure_dirs() -> None:
     resolution = resolve_home()
-    ensure_owned_home(
+    root = ensure_owned_home(
         resolution.path,
         allow_legacy_claim=resolution.compatibility_legacy,
     )
-    mcp_dir().mkdir(parents=True, exist_ok=True)
-    servers_dir().mkdir(parents=True, exist_ok=True)
-    registry_dir().mkdir(parents=True, exist_ok=True)
+    (root / "mcp").mkdir(parents=True, exist_ok=True)
+    (root / "servers").mkdir(parents=True, exist_ok=True)
+    registry_override = os.environ.get("DOCATLAS_REGISTRY_DIR") or os.environ.get("DOCMANCER_REGISTRY_DIR")
+    registry = Path(registry_override).expanduser() if registry_override else root / "registry"
+    registry.mkdir(parents=True, exist_ok=True)
