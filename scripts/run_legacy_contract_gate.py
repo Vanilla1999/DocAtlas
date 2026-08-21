@@ -48,6 +48,12 @@ SILENT_EMPTY_PROBES = (
     "Bitcoin price",
 )
 
+CAUSAL_UNSUPPORTED_PROBES = (
+    "Why does clear-index delete remote Qdrant collections?",
+    "Why does clear-index sometimes delete remote Qdrant collections?",
+    "Why are there four storage layers?",
+)
+
 GENERIC_ADVERSARIAL_TAIL = (
     "How should treasure campaigns configure trip positions, persist campaign progress, "
     "and safely select encounters while preserving gold and gem targets? "
@@ -164,6 +170,21 @@ def main() -> int:
         if not _unsupported_requirement_present(question):
             errors.append(f"silent-empty probe did not reach unsupported requirement gate: {question!r}")
 
+    for question in CAUSAL_UNSUPPORTED_PROBES:
+        contract = build_project_answer_contract(question)
+        if contract.proof_obligations:
+            errors.append(
+                f"causal why probe must not use exact-fact fallback: {question!r}; "
+                f"obligations={contract.proof_obligations!r}"
+            )
+        if "unsupported_query:legacy_no_contract" not in contract.unresolved_parts:
+            errors.append(
+                f"causal why probe lost fail-closed status: {question!r}; "
+                f"unresolved={contract.unresolved_parts!r}"
+            )
+        if not _unsupported_requirement_present(question):
+            errors.append(f"causal why probe did not reach unsupported requirement gate: {question!r}")
+
     errors.extend(frozen_ownership_mismatches())
 
     if errors:
@@ -175,7 +196,7 @@ def main() -> int:
         "PASS: reviewed QuestionPlan migrations remain stable; partial legacy semantics fail "
         "closed; complete legacy controls remain supported; 3 novel project-specific questions "
         "receive bounded mandatory fallback contracts; unrelated tails are represented or rejected; "
-        "silent-empty probes remain unsupported; canonical ownership signatures stable"
+        "silent-empty and causal-why probes remain unsupported; canonical ownership signatures stable"
     )
     return 0
 
