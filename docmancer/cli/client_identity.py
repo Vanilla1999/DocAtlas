@@ -6,6 +6,7 @@ from docmancer.core.product_identity import (
     DEFAULT_HOME_NAME,
     LEGACY_CONFIG_NAME,
     PRIMARY_CONFIG_NAME,
+    ensure_owned_home,
     resolve_home,
 )
 
@@ -29,6 +30,12 @@ def resolved_user_home(*, home_dir: str | Path | None = None) -> Path:
     """Resolve the user-level DocAtlas root without implicit ~/.docmancer fallback."""
 
     return resolve_home(home_dir=home_dir).path
+
+
+def ensure_user_home(*, home_dir: str | Path | None = None) -> Path:
+    """Establish ownership before creating new user-level DocAtlas state."""
+
+    return ensure_owned_home(resolved_user_home(home_dir=home_dir))
 
 
 def primary_user_config_path(*, home_dir: str | Path | None = None) -> Path:
@@ -155,6 +162,7 @@ __all__ = [
     "SKILL_FILE_OWNER",
     "SKILL_ID",
     "current_managed_block",
+    "ensure_user_home",
     "is_proven_docatlas_text",
     "legacy_managed_block",
     "legacy_project_config_path",
