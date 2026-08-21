@@ -3,7 +3,7 @@
 Agent workflow contract schema: `docatlas-agent-contract-v1`  
 Agent workflow contract identity: `{{DOCATLAS_AGENT_CONTRACT_ID}}`
 
-Use the three-tool Docs MCP router.
+Use the three-tool Docs MCP router. `get_docs_context` returns bounded structured evidence for the normal agent workflow.
 
 1. For documentation questions and coding or patch tasks, call `get_docs_context` before the first edit.
 2. Call `prepare_docs` only from `recommended_next_action` or when the user explicitly requests documentation lifecycle work such as sync, refresh, index, or prefetch.
