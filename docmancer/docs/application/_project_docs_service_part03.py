@@ -13,6 +13,7 @@ def _exact_document_index_chunks(
     *,
     root: Path,
     evidence_path: str,
+    indexed_source: str,
     requirements: Any | None,
 ) -> list[RetrievedChunk]:
     """Return bounded canonical stored sections for one resolved indexed document.
@@ -24,7 +25,9 @@ def _exact_document_index_chunks(
     """
 
     try:
-        rows = list(agent.store.list_sections_for_embedding())
+        rows = list(
+            agent.store.list_sections_for_source(indexed_source, limit=64)
+        )
     except (AttributeError, OSError, RuntimeError):
         return []
 
@@ -542,10 +545,12 @@ class _ProjectDocsServicePart03:
             and not chunks
             and current_by_path.get(normalize_doc_path(evidence_path))
         ):
+            exact_source = current_by_path[normalize_doc_path(evidence_path)]
             chunks = _exact_document_index_chunks(
                 self._agent_instance(),
                 root=root,
-                evidence_path=evidence_path,
+                evidence_path=str(exact_source.get("path") or evidence_path),
+                indexed_source=str(exact_source.get("source") or ""),
                 requirements=requirements,
             )
             exact_document_fallback_used = bool(chunks)

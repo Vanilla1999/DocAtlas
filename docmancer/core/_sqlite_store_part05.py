@@ -413,6 +413,72 @@ class _SQLiteStorePart05:
                 for row in rows
             ]
 
+    def list_sections_for_source(
+        self,
+        source: str,
+        *,
+        generation_id: str | None = None,
+        limit: int = 64,
+    ) -> list[dict[str, Any]]:
+        """Return a bounded active-generation projection for one exact source."""
+        source = str(source or "").strip()
+        if not source:
+            return []
+        try:
+            bounded_limit = max(1, min(int(limit), 128))
+        except (TypeError, ValueError):
+            bounded_limit = 64
+        with self._connect() as conn:
+            target_generation = generation_id or self._active_generation_id(conn)
+            if not target_generation:
+                return []
+            source_row = conn.execute(
+                "SELECT id FROM sources WHERE source = ?",
+                (source,),
+            ).fetchone()
+            if not source_row:
+                return []
+            rows = conn.execute(
+                """
+                SELECT source, chunk_index, title, level, display_text,
+                       retrieval_text, display_token_estimate, source_path,
+                       anchor, stable_chunk_id, parent_logical_id,
+                       char_start, char_end, project_identity, project_path,
+                       module_id, doc_scope, source_class, authority,
+                       lifecycle_status
+                FROM retrieval_children
+                WHERE generation_id = ? AND source_id = ?
+                ORDER BY chunk_index
+                LIMIT ?
+                """,
+                (target_generation, int(source_row["id"]), bounded_limit),
+            )
+            return [
+                {
+                    "source": str(row["source"]),
+                    "chunk_index": int(row["chunk_index"]),
+                    "title": str(row["title"] or ""),
+                    "level": int(row["level"] or 0),
+                    "text": str(row["retrieval_text"] or ""),
+                    "display_text": str(row["display_text"] or ""),
+                    "token_estimate": int(row["display_token_estimate"] or 0),
+                    "source_path": str(row["source_path"] or ""),
+                    "anchor": str(row["anchor"] or ""),
+                    "stable_chunk_id": str(row["stable_chunk_id"] or ""),
+                    "parent_logical_id": str(row["parent_logical_id"] or ""),
+                    "char_start": int(row["char_start"]),
+                    "char_end": int(row["char_end"]),
+                    "project_identity": str(row["project_identity"] or ""),
+                    "project_path": str(row["project_path"] or ""),
+                    "module_id": str(row["module_id"] or ""),
+                    "doc_scope": str(row["doc_scope"] or ""),
+                    "source_class": str(row["source_class"] or ""),
+                    "authority": str(row["authority"] or "unknown"),
+                    "lifecycle_status": str(row["lifecycle_status"] or "active"),
+                }
+                for row in rows
+            ]
+
     def get_document_content(self, source: str) -> str | None:
         with self._connect() as conn:
             row = conn.execute("SELECT content FROM sources WHERE source = ?", (source,)).fetchone()

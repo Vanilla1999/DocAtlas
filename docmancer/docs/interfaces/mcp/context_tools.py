@@ -8,7 +8,12 @@ from typing import Any
 
 from docmancer.docs.application.action_packet import build_action_packet, validate_action_packet
 from docmancer.docs.application.evidence_selection import AggregateMixedSelectionDecision, SelectionDecision
-from docmancer.docs.application.recovery import build_recovery_diagnosis, recovery_action
+from docmancer.docs.interfaces.mcp.recovery_projection import (
+    _annotate_recovery_handoff,
+    _attach_recovery_diagnosis,
+    _recovery_summary,
+    is_operational_recovery_action,
+)
 from docmancer.docs.application.model_visible_projection import (
     DOCS_ANSWER_MAX_TOKENS,
     INSUFFICIENT_EVIDENCE_MAX_TOKENS,
@@ -658,99 +663,6 @@ def _omit_nullable_reason_code(payload: dict[str, Any]) -> None:
         payload.pop("reason_code", None)
 
 
-_RECOVERY_SUMMARY_KEYS = (
-    "documentation_supported", "investigation_allowed", "hard_stop",
-    "recovery_origin", "recovery_reason_code", "recovery_disposition",
-)
-
-
-def _attach_recovery_diagnosis(
-    payload: dict[str, Any],
-    *,
-    question: str,
-    request: dict[str, Any],
-    canonical_selection: SelectionDecision | AggregateMixedSelectionDecision | None,
-    operational_reason_code: Any = None,
-) -> dict[str, Any]:
-    if canonical_selection is None:
-        return payload
-    support = getattr(canonical_selection, "support_decision", None)
-    if support is not None and bool(getattr(support, "answer_supported", False)):
-        return payload
-    diagnosis = build_recovery_diagnosis(
-        question,
-        canonical_selection,
-        operational_reason_code=(
-            payload.get("operational_reason_code")
-            or operational_reason_code
-            or payload.get("reason_code")
-        ),
-    )
-    if not diagnosis:
-        return payload
-    updated = dict(payload)
-    updated.update({
-        "documentation_supported": bool(diagnosis.get("documentation_supported")),
-        "investigation_allowed": bool(diagnosis.get("investigation_allowed", True)),
-        "hard_stop": bool(diagnosis.get("hard_stop")),
-        "recovery_origin": str(diagnosis.get("origin") or "selection"),
-        "recovery_reason_code": str(diagnosis.get("reason_code") or "support_not_provable"),
-        "recovery_disposition": str(diagnosis.get("disposition") or "search_local_source"),
-    })
-    action = recovery_action(
-        diagnosis,
-        project_path=_clean_string(request.get("project_path")),
-        scope=_clean_string(request.get("scope")),
-        mode=_clean_string(request.get("mode")),
-    )
-    if action:
-        existing = [
-            item for item in updated.get("next_actions") or []
-            if isinstance(item, dict) and item != action
-        ]
-        updated["next_action"] = action
-        updated["next_actions"] = [action, *existing]
-    return updated
-
-
-def _recovery_summary(payload: dict[str, Any]) -> dict[str, Any]:
-    return {
-        key: deepcopy(payload[key])
-        for key in _RECOVERY_SUMMARY_KEYS
-        if key in payload
-    }
-
-
-def _annotate_recovery_handoff(
-    projection: dict[str, Any], recovery: dict[str, Any] | None
-) -> None:
-    hard_stop = bool(projection.get("hard_stop"))
-    if hard_stop:
-        projection.update({
-            "disposition": "resolve_authoritative_conflict",
-            "edit_ready": False,
-            "source_search_status": "blocked",
-        })
-        _refresh_projection_estimate(projection)
-        return
-    if not isinstance(recovery, dict):
-        return
-    if recovery.get("type") == "rephrase_question":
-        projection.update({
-            "disposition": "rephrase_question",
-            "edit_ready": False,
-            "source_search_status": "not_required",
-            "requires_confirmation": False,
-        })
-    elif recovery.get("tool") == "code_search":
-        projection.update({
-            "disposition": "search_local_source",
-            "edit_ready": False,
-            "source_search_status": "required",
-            "requires_confirmation": False,
-        })
-    _refresh_projection_estimate(projection)
-
 
 def _bounded_recovery_action(payload: dict[str, Any]) -> dict[str, Any] | None:
     candidates = [payload.get("next_action"), *(payload.get("next_actions") or [])]
@@ -764,6 +676,11 @@ def _bounded_recovery_action(payload: dict[str, Any]) -> dict[str, Any] | None:
         candidates.sort(
             key=lambda action: 0
             if isinstance(action, dict) and action.get("tool") == "docs_status" else 1
+        )
+    elif any(is_operational_recovery_action(action) for action in candidates):
+        candidates.sort(
+            key=lambda action: 0
+            if is_operational_recovery_action(action) else 1
         )
     elif payload.get("recovery_disposition") == "rephrase_question":
         candidates.sort(key=lambda action: 0 if isinstance(action, dict) and action.get("type") == "rephrase_question" else 1)
@@ -984,7 +901,12 @@ def _replace_network_retries_with_prepare_actions(payload: dict[str, Any], reque
             arguments.pop("allow_network", None)
             if arguments.get("action") == "prefetch_library_docs" and not arguments.get("question"):
                 arguments["question"] = request.get("question")
-            return {**action, "arguments_patch": arguments}
+            prepared = {**action, "arguments_patch": arguments}
+            if payload.get("requires_confirmation") and "requires_confirmation" not in prepared:
+                prepared["requires_confirmation"] = True
+            if payload.get("confirmation_reason") and not prepared.get("confirmation_reason"):
+                prepared["confirmation_reason"] = payload["confirmation_reason"]
+            return prepared
         if action.get("tool") != "get_docs_context" or not arguments.get("allow_network"):
             return action
         if request.get("mode") == "project":
@@ -1008,7 +930,14 @@ def _replace_network_retries_with_prepare_actions(payload: dict[str, Any], reque
             }
         else:
             return action
-        return {**action, "type": "prepare_docs", "tool": "prepare_docs", "arguments_patch": patch}
+        return {
+            **action,
+            "type": "prepare_docs",
+            "tool": "prepare_docs",
+            "arguments_patch": patch,
+            **({"requires_confirmation": True} if payload.get("requires_confirmation") else {}),
+            **({"confirmation_reason": payload["confirmation_reason"]} if payload.get("confirmation_reason") else {}),
+        }
 
     updated = dict(payload)
     actions = []

@@ -13,6 +13,9 @@ from docmancer.docs.application.docs_job_service import DocsJobTracker
 from docmancer.docs.application.evidence_selection import build_requirements, project_docs_selection_config, select_evidence
 from docmancer.docs.application.model_visible_projection import estimate_projection_tokens
 from docmancer.docs.application.recovery import build_recovery_diagnosis, recovery_action
+from docmancer.docs.interfaces.mcp.recovery_projection import (
+    _attach_recovery_diagnosis,
+)
 from docmancer.docs.registry import LibraryRegistry
 from docmancer.docs.service import LibraryDocsService
 from docmancer.mcp.docs_server import call_docs_tool_payload
@@ -138,7 +141,33 @@ def main() -> int:
     assert action["auto_execute"] is False
     assert action["arguments_patch"]["question"] == suggestions[0]
 
-    # 2. Unknown modifier fuzz: recovery must not depend on adding words to a
+    # 2. A concrete operational recovery must outrank semantic rephrase.
+    operational_action = {
+        "type": "prepare_docs",
+        "tool": "prepare_docs",
+        "requires_confirmation": True,
+        "confirmation_reason": "network_fetch",
+        "arguments_patch": {
+            "action": "prefetch_project_dependency_docs",
+            "project_path": "/repo",
+        },
+    }
+    operational_payload = {
+        "next_action": operational_action,
+        "next_actions": [operational_action],
+        "requires_confirmation": True,
+    }
+    preserved = _attach_recovery_diagnosis(
+        operational_payload,
+        question=TREASURE,
+        request={"question": TREASURE, "project_path": "/repo", "mode": "auto"},
+        canonical_selection=decision,
+    )
+    assert preserved["next_action"]["tool"] == "prepare_docs", preserved
+    assert preserved["next_action"]["confirmation_reason"] == "network_fetch", preserved
+    assert preserved["recovery_disposition"] == "use_operational_recovery", preserved
+
+    # 3. Unknown modifier fuzz: recovery must not depend on adding words to a
     # special stop-word dictionary.
     for index in range(100):
         nonce = f"zxqv{index}"
@@ -147,7 +176,7 @@ def main() -> int:
         assert d["hard_stop"] is False, (question, d)
         assert d["origin"] in {"parsing", "retrieval", "selection"}, (question, d)
 
-    # 3. Circuit breaker: one server-generated rephrase may not recursively
+    # 4. Circuit breaker: one server-generated rephrase may not recursively
     # propose another rephrase.
     retried = suggestions[0]
     exhausted = build_recovery_diagnosis(retried, _decision(retried, []))
@@ -157,7 +186,7 @@ def main() -> int:
     assert exhausted_action and exhausted_action["tool"] == "code_search"
     assert exhausted_action["repeat_docs_context"] is False
 
-    # 4. Eligibility is a concrete evidence-state problem, not a wording problem.
+    # 5. Eligibility is a concrete evidence-state problem, not a wording problem.
     known = "What are the public tools of the Docs MCP server?"
     stale = _decision(known, [{
         "stable_id": "stale",
@@ -170,7 +199,7 @@ def main() -> int:
     assert stale_diag["disposition"] == "repair_evidence_state"
     assert "suggested_questions" not in stale_diag
 
-    # 5. Documentation gaps are not disguised as parser/retrieval failures.
+    # 6. Documentation gaps are not disguised as parser/retrieval failures.
     navigation = _decision(known, [{
         "stable_id": "navigation",
         "source": "docs/index.md",
@@ -183,7 +212,7 @@ def main() -> int:
     assert nav_diag["disposition"] == "search_local_source"
     assert "suggested_questions" not in nav_diag
 
-    # 6. Positive authoritative conflict is the hard-stop class.
+    # 7. Positive authoritative conflict is the hard-stop class.
     conflict = {
         "status": "insufficient_evidence",
         "metrics": {"candidate_count": 2, "eligible_count": 2, "selected_count": 0},
@@ -200,7 +229,7 @@ def main() -> int:
     assert conflict_diag["disposition"] == "resolve_authoritative_conflict"
     assert recovery_action(conflict_diag, project_path="/repo") is None
 
-    # 7. Explicit locator grammar and exact indexed-source fallback. Force the
+    # 8. Explicit locator grammar and exact indexed-source fallback. Force the
     # normal lexical lane to zero so success can only come from canonical stored
     # sections for the resolved source.
     locator_question = (
@@ -251,7 +280,16 @@ def main() -> int:
     with tempfile.TemporaryDirectory(prefix="docatlas-recovery-") as tmp:
         service, project = _service(Path(tmp))
         original_query = service.project_docs.query_project_docs
+        store = service.project_docs._agent_instance().store
+        original_full_scan = store.list_sections_for_embedding
         service.project_docs.query_project_docs = lambda *args, **kwargs: []
+        store.list_sections_for_embedding = lambda *args, **kwargs: (
+            (_ for _ in ()).throw(
+                AssertionError(
+                    "exact-document fallback must not enumerate the active generation"
+                )
+            )
+        )
         try:
             result = call_docs_tool_payload(
                 "get_docs_context",
@@ -266,6 +304,7 @@ def main() -> int:
             )
         finally:
             service.project_docs.query_project_docs = original_query
+            store.list_sections_for_embedding = original_full_scan
         assert result["status"] == "ok", json.dumps(result, indent=2, default=str)
         assert result["answer_supported"] is True
         assert result.get("recovery_reason_code") in (None, "")
@@ -278,7 +317,7 @@ def main() -> int:
         )
         assert "meet_type" in result["answer"]
 
-        # 8. Public parser recovery is bounded to the insufficient-evidence budget.
+        # 9. Public parser recovery is bounded to the insufficient-evidence budget.
         parser_result = call_docs_tool_payload(
             "get_docs_context",
             {
