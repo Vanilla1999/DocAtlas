@@ -38,6 +38,17 @@ def test_publish_workflow_is_manual_build_once_and_oidc() -> None:
             assert len(ref) == 40 and all(c in "0123456789abcdef" for c in ref)
 
 
+def test_dispatched_release_source_must_be_on_protected_main() -> None:
+    text = (ROOT / ".github/workflows/publish.yml").read_text()
+    build = text[text.index("  build:"):text.index("  wheel:")]
+    assert "fetch-depth: 0" in build
+    assert "if: github.event_name == 'workflow_dispatch'" in build
+    assert "git fetch --no-tags origin main:refs/remotes/origin/main" in build
+    assert "git merge-base --is-ancestor HEAD refs/remotes/origin/main" in build
+    assert 'branch.get("protected") is not True' in build
+    assert "Release source ancestry/protection: PASS" in build
+
+
 def test_installer_smoke_passes_an_existing_wheel_path() -> None:
     text = (ROOT / ".github/workflows/publish.yml").read_text()
     assert 'DOCATLAS_INSTALL_SOURCE="$(find "$PWD/dist" -name \'*.whl\' -print -quit)"' in text
@@ -104,6 +115,8 @@ def test_stdio_smoke_requires_cited_content() -> None:
 
 def test_stdio_smoke_uses_primary_docatlas_home_without_legacy_writes() -> None:
     text = (ROOT / "scripts/docs_mcp_stdio_smoke.py").read_text()
+    assert '"HOME": str(user_home)' in text
+    assert '"USERPROFILE": str(user_home)' in text
     assert '"DOCATLAS_HOME": str(docatlas_home)' in text
     assert 'env.pop("DOCMANCER_HOME", None)' in text
     assert 'not (user_home / ".docmancer").exists()' in text
