@@ -53,6 +53,7 @@ async def smoke() -> None:
         env = {
             **os.environ,
             "HOME": str(user_home),
+            "USERPROFILE": str(user_home),
             "DOCATLAS_HOME": str(docatlas_home),
             "NO_PROXY": "*",
         }
