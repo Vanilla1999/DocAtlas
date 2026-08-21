@@ -4,7 +4,7 @@
 
 DocAtlas is a **local, version-bound documentation authority and evidence delivery layer for coding agents**.
 
-It turns reviewable repository documentation, dependency state from the repository, and approved dependency documentation into compact source-attributed evidence. DocAtlas keeps authority, scope, and version binding explicit and fails closed when mandatory evidence is unavailable.
+It remains a local-first documentation context runtime at the transport/storage level, but its product responsibility is narrower and stricter: it turns reviewable repository documentation, dependency state from the repository, and approved dependency documentation into compact source-attributed evidence. DocAtlas keeps authority, scope, and version binding explicit and fails closed when mandatory evidence is unavailable.
 
 The product is intentionally narrower than a general repository intelligence engine. Source-code search, LSPs, code graphs, test runners, static analyzers, web search, and coding agents remain complementary systems. DocAtlas supplies documentation/version evidence and provenance rather than claiming to replace those systems.
 
@@ -92,7 +92,9 @@ Patch constraints are advisory/non-blocking evidence helpers. They do not prove 
 
 DocAtlas is currently **Beta** for the primary Docs MCP workflow.
 
-Stable promotion now requires more than artifact correctness. P0 must first make source protection, release identity, installed behavior, product namespace/state, and agent guidance internally consistent. P1 must then demonstrate that a real coding model can acquire the intended evidence through the installed public MCP contract. P2 must demonstrate real coding-task value or a material reduction in unsupported/wrong-version claims at acceptable total trajectory cost.
+The existing technical release gates remain necessary. Task 15 proves the wheel/sdist/installer and installed stdio MCP artifact path; Task 14 owns the bounded live external-ingest acceptance evidence; and the exact public release still requires post-publish verification of the published package. Those gates protect artifact/release truth, but they are no longer sufficient by themselves for a Stable product claim.
+
+Stable promotion now also requires the newer validation layers. P0 must make source protection, release identity, installed behavior, product namespace/state, and agent guidance internally consistent. P1 must then demonstrate that a real coding model can acquire the intended evidence through the installed public MCP contract. P2 must demonstrate real coding-task value or a material reduction in unsupported/wrong-version claims at acceptable total trajectory cost.
 
 Until those gates are satisfied, `Stable`, `Context7 replacement/parity`, and `proven patch improvement` are out-of-scope public claims.
 
