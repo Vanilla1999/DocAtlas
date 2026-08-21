@@ -12,6 +12,10 @@ from ._commands_part04 import *  # noqa: F401,F403
 
 from ._commands_part05 import *  # noqa: F401,F403
 
+# P0.3B state-identity overrides intentionally reuse existing public command
+# names so the support-surface inventory does not change in this slice.
+from .state_commands import clear_index_cmd  # noqa: F401,E402
+
 __all__=[n for n in globals() if not n.startswith("__")]
 
 # Preserve the historical monkeypatch surface after splitting command callbacks
