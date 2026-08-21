@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import warnings
-import os
 from pathlib import Path
 
 import yaml
