@@ -52,11 +52,12 @@ _FOREIGN_TOP_LEVEL = frozenset({
     "tree",
     "memory.db",
 })
+# Only product-specific managed MCP state is strong enough to auto-classify
+# an unowned legacy root as DocAtlas. Generic names such as ``servers`` or
+# ``secrets`` are intentionally not ownership evidence by themselves.
 _LEGACY_STRONG_PATHS = (
     Path("mcp") / "manifest.json",
     Path("mcp") / "idempotency.db",
-    Path("servers"),
-    Path("secrets"),
 )
 
 
