@@ -29,6 +29,7 @@ from docmancer.cli.client_identity import (
     SKILL_FILE_OWNER as _SKILL_FILE_OWNER,
     SKILL_ID,
     current_managed_block as _current_managed_block,
+    ensure_user_home as _ensure_user_home,
     is_proven_docatlas_text as _is_proven_docatlas_text,
     legacy_managed_block as _legacy_managed_block,
     legacy_project_config_path as _legacy_project_config_path,
