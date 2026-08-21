@@ -9,7 +9,7 @@ from ._commands_part02 import _create_claude_desktop_zip, _install_project_boots
 @click.command(
     cls=DocmancerCommand,
     context_settings=HELP_CONTEXT_SETTINGS,
-    short_help="Install docmancer skills into an AI agent.",
+    short_help="Install DocAtlas skills into an AI agent.",
     epilog=format_examples(
         "doc-atlas install claude-code",
         "doc-atlas install codex",
@@ -27,9 +27,9 @@ from ._commands_part02 import _create_claude_desktop_zip, _install_project_boots
               help="Install in project-level settings when the agent supports them.")
 @click.option("--uninstall", "uninstall", is_flag=True, default=False,
               help="Remove only DocAtlas-managed project guidance for this agent.")
-@click.option("--config", "config_path", default=None, help="Path to docmancer.yaml.")
+@click.option("--config", "config_path", default=None, help="Path to DocAtlas YAML config.")
 def install_cmd(agent: str, project: bool, uninstall: bool, config_path: str | None):
-    """Install docmancer skill files into an AI agent.
+    """Install DocAtlas skill files into an AI agent.
 
     Installs the canonical three-tool Docs MCP workflow and registers the local
     `doc-atlas mcp docs-serve` entry in the agent's MCP config.
@@ -70,7 +70,7 @@ def install_cmd(agent: str, project: bool, uninstall: bool, config_path: str | N
         zip_path = _create_claude_desktop_zip(effective_config_path)
         _emit_install_summary(
             "Package skill for Claude Desktop.",
-            [("Created docmancer skill package at", zip_path)],
+            [("Created DocAtlas skill package at", zip_path)],
             created_user_config,
             effective_config_path,
             f"Upload {display_path(zip_path)} in Claude Desktop > Customize > Skills.",
@@ -85,15 +85,15 @@ def install_cmd(agent: str, project: bool, uninstall: bool, config_path: str | N
 
     if normalized == "claude-code":
         if project:
-            dest = Path(".claude") / "skills" / "docmancer" / "SKILL.md"
+            dest = Path(".claude") / "skills" / SKILL_ID / "SKILL.md"
         else:
-            dest = home / ".claude" / "skills" / "docmancer" / "SKILL.md"
+            dest = home / ".claude" / "skills" / SKILL_ID / "SKILL.md"
         content = _build_skill_content("claude_code_skill.md", effective_config_path)
         _install_skill_file(content, dest)
         bootstrap_dest = _install_project_bootstrap(normalized) if project else None
         if project:
             _record_project_install(normalized)
-        installed = [("Installed docmancer skill at", dest)]
+        installed = [("Installed DocAtlas skill at", dest)]
         if bootstrap_dest:
             installed.append(("Updated project instructions at", bootstrap_dest))
         _emit_install_summary(
@@ -101,8 +101,8 @@ def install_cmd(agent: str, project: bool, uninstall: bool, config_path: str | N
             installed,
             created_user_config,
             effective_config_path,
-            "Claude Code can use docmancer immediately. No restart needed.",
-            extra_lines=["Claude Code will automatically use docmancer commands."],
+            "Claude Code can use DocAtlas immediately. No restart needed.",
+            extra_lines=["Claude Code will automatically use the DocAtlas Docs MCP workflow."],
         )
         return
 
@@ -118,7 +118,7 @@ def install_cmd(agent: str, project: bool, uninstall: bool, config_path: str | N
             _install_skill_file(content, dest)
             _install_skill_file(content, shared_dest)
             installed = [
-                ("Installed docmancer skill at", dest),
+                ("Installed DocAtlas skill at", dest),
                 ("Also installed shared compatibility skill at", shared_dest),
             ]
         _emit_install_summary(
@@ -133,9 +133,9 @@ def install_cmd(agent: str, project: bool, uninstall: bool, config_path: str | N
 
     if normalized == "cursor":
         dest = (
-            Path(".cursor") / "skills" / "docmancer" / "SKILL.md"
+            Path(".cursor") / "skills" / SKILL_ID / "SKILL.md"
             if project
-            else home / ".cursor" / "skills" / "docmancer" / "SKILL.md"
+            else home / ".cursor" / "skills" / SKILL_ID / "SKILL.md"
         )
         content = _build_skill_content("skill.md", effective_config_path)
         _install_skill_file(content, dest)
@@ -153,7 +153,7 @@ def install_cmd(agent: str, project: bool, uninstall: bool, config_path: str | N
         _emit_install_summary(
             "Install skill for Cursor.",
             [
-                ("Installed docmancer skill at", dest),
+                ("Installed DocAtlas skill at", dest),
                 ("Updated fallback at", agents_md),
             ],
             created_user_config,
@@ -164,15 +164,15 @@ def install_cmd(agent: str, project: bool, uninstall: bool, config_path: str | N
 
     if normalized == "cline":
         if project:
-            dest = Path(".cline") / "skills" / "docmancer" / "SKILL.md"
+            dest = Path(".cline") / "skills" / SKILL_ID / "SKILL.md"
         else:
-            dest = home / ".cline" / "skills" / "docmancer" / "SKILL.md"
+            dest = home / ".cline" / "skills" / SKILL_ID / "SKILL.md"
         content = _build_skill_content("skill.md", effective_config_path)
         _install_skill_file(content, dest)
         bootstrap_dest = _install_project_bootstrap(normalized) if project else None
         if project:
             _record_project_install(normalized)
-        installed = [("Installed docmancer skill at", dest)]
+        installed = [("Installed DocAtlas skill at", dest)]
         if bootstrap_dest:
             installed.append(("Updated project instructions at", bootstrap_dest))
         _emit_install_summary(
@@ -240,16 +240,16 @@ def install_cmd(agent: str, project: bool, uninstall: bool, config_path: str | N
 
     if normalized == "gemini":
         if project:
-            dest = Path(".gemini") / "skills" / "docmancer" / "SKILL.md"
+            dest = Path(".gemini") / "skills" / SKILL_ID / "SKILL.md"
         else:
-            dest = home / ".gemini" / "skills" / "docmancer" / "SKILL.md"
+            dest = home / ".gemini" / "skills" / SKILL_ID / "SKILL.md"
         content = _build_skill_content("skill.md", effective_config_path)
         _install_skill_file(content, dest)
         bootstrap_dest = _install_project_bootstrap(normalized) if project else None
 
         if project:
             _record_project_install(normalized)
-        installed_paths = [("Installed docmancer skill at", dest)]
+        installed_paths = [("Installed DocAtlas skill at", dest)]
         if bootstrap_dest:
             installed_paths.append(("Updated project instructions at", bootstrap_dest))
 
@@ -269,10 +269,10 @@ def install_cmd(agent: str, project: bool, uninstall: bool, config_path: str | N
             _record_project_install(normalized)
             installed_paths = [("Updated project instructions at", bootstrap_dest)]
         else:
-            dest = home / ".config" / "opencode" / "skills" / "docmancer" / "SKILL.md"
+            dest = home / ".config" / "opencode" / "skills" / SKILL_ID / "SKILL.md"
             content = _build_skill_content("skill.md", effective_config_path)
             _install_skill_file(content, dest)
-            installed_paths = [("Installed docmancer skill at", dest)]
+            installed_paths = [("Installed DocAtlas skill at", dest)]
 
         _emit_install_summary(
             "Install skill for OpenCode.",
@@ -323,11 +323,17 @@ def _ensure_config_and_db(config_path: str | None) -> Path:
 
 
 def _ensure_project_config() -> Path:
-    config_file = Path("docmancer.yaml").resolve()
-    if not config_file.exists():
+    primary = Path(PRIMARY_CONFIG_NAME).resolve()
+    legacy = Path(LEGACY_CONFIG_NAME).resolve()
+    if primary.exists():
+        config_file = primary
+    elif legacy.exists():
+        config_file = legacy
+    else:
+        config_file = primary
         config = _build_user_bootstrap_config()
-        config.index.db_path = str((Path.cwd() / ".docmancer" / "docmancer.db").resolve())
-        config.index.extracted_dir = str((Path.cwd() / ".docmancer" / "extracted").resolve())
+        config.index.db_path = str((Path.cwd() / ".docatlas" / "docatlas.db").resolve())
+        config.index.extracted_dir = str((Path.cwd() / ".docatlas" / "extracted").resolve())
         _write_config_yaml(config, config_file)
     config = _get_config_class().from_yaml(config_file)
     agent = _get_agent_class()(config=config)
@@ -383,7 +389,7 @@ def _emit_setup_readiness_summary(config, *, selected_agents: list[str], profile
 @click.option("--offline", is_flag=True, default=False, help="Avoid network/model setup and prefer lexical retrieval.")
 @click.option("--vectors", type=click.Choice(["auto", "on", "off"], case_sensitive=False), default="auto", show_default=True, help="Vector setup policy.")
 @click.option("--project-local", is_flag=True, default=False, help="Create/use ./docmancer.yaml and project-local state.")
-@click.option("--config", "config_path", default=None, help="Path to docmancer.yaml.")
+@click.option("--config", "config_path", default=None, help="Path to DocAtlas YAML config.")
 def setup_cmd(
     install_all: bool,
     agents: tuple[str, ...],

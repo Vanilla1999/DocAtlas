@@ -26,27 +26,27 @@ def _get_config_class():
 
 
 def _get_user_config_dir() -> Path:
-    return Path.home() / ".docmancer"
+    return _resolved_user_home(home_dir=Path.home())
 
 
 def _get_user_config_path() -> Path:
-    return _get_user_config_dir() / "docmancer.yaml"
+    return _primary_user_config_path(home_dir=Path.home())
 
 
 def _get_codex_skill_path() -> Path:
-    return Path.home() / ".codex" / "skills" / "docmancer" / "SKILL.md"
+    return Path.home() / ".codex" / "skills" / SKILL_ID / "SKILL.md"
 
 
 def _get_shared_agent_skill_path() -> Path:
-    return Path.home() / ".agents" / "skills" / "docmancer" / "SKILL.md"
+    return Path.home() / ".agents" / "skills" / SKILL_ID / "SKILL.md"
 
 
 def _get_gemini_skill_path() -> Path:
-    return Path.home() / ".gemini" / "skills" / "docmancer" / "SKILL.md"
+    return Path.home() / ".gemini" / "skills" / SKILL_ID / "SKILL.md"
 
 
 def _get_cline_skill_path() -> Path:
-    return Path.home() / ".cline" / "skills" / "docmancer" / "SKILL.md"
+    return Path.home() / ".cline" / "skills" / SKILL_ID / "SKILL.md"
 
 
 def _get_copilot_user_instructions_path() -> Path:
@@ -56,7 +56,7 @@ def _get_copilot_user_instructions_path() -> Path:
 def _build_user_bootstrap_config():
     DocmancerConfig = _get_config_class()
     config = DocmancerConfig()
-    config.index.db_path = str((_get_user_config_dir() / "docmancer.db").resolve())
+    config.index.db_path = str((_get_user_config_dir() / "docatlas.db").resolve())
     config.index.extracted_dir = str((_get_user_config_dir() / "extracted").resolve())
     return config
 
@@ -67,11 +67,20 @@ def _ensure_user_config() -> Path:
     config_path = _get_user_config_path()
     if config_path.exists():
         return config_path
+    legacy_path = _legacy_user_config_path(home_dir=Path.home())
+    if legacy_path.exists():
+        warnings.warn(
+            f"Legacy DocAtlas config {legacy_path} is deprecated; rename it to {config_path.name!r}.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return legacy_path
 
-    config_path.parent.mkdir(parents=True, exist_ok=True)
+    owned_home = _ensure_user_home(home_dir=Path.home())
+    config_path = owned_home / PRIMARY_CONFIG_NAME
     config = _build_user_bootstrap_config()
-    with open(config_path, "w") as f:
-        _yaml.dump(config.model_dump(), f, default_flow_style=False, sort_keys=False)
+    with open(config_path, "w", encoding="utf-8") as handle:
+        _yaml.dump(config.model_dump(), handle, default_flow_style=False, sort_keys=False)
     return config_path
 
 
@@ -79,17 +88,26 @@ def _load_config(config_path: str | None):
     DocmancerConfig = _get_config_class()
     if config_path:
         return DocmancerConfig.from_yaml(config_path)
-    default_yaml = Path("docmancer.yaml")
-    if default_yaml.exists():
-        return DocmancerConfig.from_yaml(default_yaml)
+    for name in (PRIMARY_CONFIG_NAME, LEGACY_CONFIG_NAME):
+        candidate = Path(name)
+        if candidate.exists():
+            if name == LEGACY_CONFIG_NAME:
+                warnings.warn(
+                    f"Legacy DocAtlas config name {LEGACY_CONFIG_NAME!r} is deprecated; use {PRIMARY_CONFIG_NAME!r}.",
+                    DeprecationWarning,
+                    stacklevel=2,
+                )
+            return DocmancerConfig.from_yaml(candidate)
     return DocmancerConfig.from_yaml(_ensure_user_config())
 
 
 def _resolve_config_file(config_path: str | None) -> Path:
     if config_path:
         return Path(config_path).resolve()
-    if Path("docmancer.yaml").exists():
-        return Path("docmancer.yaml").resolve()
+    for name in (PRIMARY_CONFIG_NAME, LEGACY_CONFIG_NAME):
+        candidate = Path(name)
+        if candidate.exists():
+            return candidate.resolve()
     return _ensure_user_config().resolve()
 
 
@@ -131,22 +149,22 @@ def _agent_install_path(target: str, *, project: bool = False) -> Path:
     home = Path.home()
     normalized = target.lower()
     if normalized == "claude-code":
-        return Path(".claude") / "skills" / "docmancer" / "SKILL.md" if project else home / ".claude" / "skills" / "docmancer" / "SKILL.md"
+        return Path(".claude") / "skills" / SKILL_ID / "SKILL.md" if project else home / ".claude" / "skills" / SKILL_ID / "SKILL.md"
     if normalized == "cursor":
-        return home / ".cursor" / "skills" / "docmancer" / "SKILL.md"
+        return Path(".cursor") / "skills" / SKILL_ID / "SKILL.md" if project else home / ".cursor" / "skills" / SKILL_ID / "SKILL.md"
     if normalized == "cline":
-        return Path(".cline") / "skills" / "docmancer" / "SKILL.md" if project else _get_cline_skill_path()
+        return Path(".cline") / "skills" / SKILL_ID / "SKILL.md" if project else _get_cline_skill_path()
     if normalized in {"codex", "codex-app", "codex-desktop"}:
         return _get_codex_skill_path()
     if normalized == "gemini":
-        return Path(".gemini") / "skills" / "docmancer" / "SKILL.md" if project else _get_gemini_skill_path()
+        return Path(".gemini") / "skills" / SKILL_ID / "SKILL.md" if project else _get_gemini_skill_path()
     if normalized == "github-copilot":
         return Path(".github") / "copilot-instructions.md" if project else _get_copilot_user_instructions_path()
     if normalized == "opencode":
-        return home / ".config" / "opencode" / "skills" / "docmancer" / "SKILL.md"
+        return home / ".config" / "opencode" / "skills" / SKILL_ID / "SKILL.md"
     if normalized == "claude-desktop":
-        return _get_user_config_dir() / "exports" / "claude-desktop" / "docmancer.zip"
-    return home / ".docmancer" / normalized
+        return _get_user_config_dir() / "exports" / "claude-desktop" / "docatlas.zip"
+    return _get_user_config_dir() / normalized
 
 
 def _source_rows(config, *, grouped: bool = True) -> list[dict]:
@@ -261,10 +279,14 @@ def _doctor_issue(code: str, group: str, severity: str, impact: str, fix_command
 def _collect_doctor_report(config, config_path: str | None, *, profile: str = "cli-docs") -> dict:
     if config_path:
         effective_config = Path(config_path).resolve()
-    elif Path("docmancer.yaml").exists():
-        effective_config = Path("docmancer.yaml").resolve()
+    elif Path(PRIMARY_CONFIG_NAME).exists():
+        effective_config = Path(PRIMARY_CONFIG_NAME).resolve()
+    elif Path(LEGACY_CONFIG_NAME).exists():
+        effective_config = Path(LEGACY_CONFIG_NAME).resolve()
     else:
-        effective_config = _get_user_config_path()
+        primary_user = _get_user_config_path()
+        legacy_user = _legacy_user_config_path(home_dir=Path.home())
+        effective_config = primary_user if primary_user.exists() or not legacy_user.exists() else legacy_user
     issues: list[dict] = []
     checks: list[dict] = []
 
@@ -275,7 +297,7 @@ def _collect_doctor_report(config, config_path: str | None, *, profile: str = "c
         add_check("config", "ok", f"Config exists at {effective_config}")
     else:
         add_check("config", "failed", f"Config missing at {effective_config}")
-        issues.append(_doctor_issue("CONFIG_MISSING", "config", "BLOCKER", "Docmancer has no config to load paths and retrieval defaults.", "doc-atlas setup --yes", "docmancer.yaml exists and doctor can read it.", auto_fix=True))
+        issues.append(_doctor_issue("CONFIG_MISSING", "config", "BLOCKER", "DocAtlas has no config to load paths and retrieval defaults.", "doc-atlas setup --yes", "docatlas.yaml exists and doctor can read it.", auto_fix=True))
 
     db_path = Path(config.index.db_path)
     add_check("storage", "ok" if db_path.parent.exists() else "failed", f"Index path: {db_path}")
@@ -305,12 +327,12 @@ def _collect_doctor_report(config, config_path: str | None, *, profile: str = "c
     for label, available, hint in _loader_availability():
         add_check("extraction", "ok" if available else "missing", f"{label}: {'available' if available else hint}")
         if not available:
-            issues.append(_doctor_issue(f"LOADER_{label.upper().replace(' ', '_')}_MISSING", "extraction", "WARN", f"{label} documents may not extract correctly.", f"pip install docmancer", f"{label} loader is available."))
+            issues.append(_doctor_issue(f"LOADER_{label.upper().replace(' ', '_')}_MISSING", "extraction", "WARN", f"{label} documents may not extract correctly.", f"pip install doc-atlas", f"{label} loader is available."))
 
     retrieval_mode = _effective_retrieval_mode(None, config)
     if retrieval_mode != "lexical":
         if find_spec("fastembed") is None:
-            issues.append(_doctor_issue("FASTEMBED_MISSING", "embeddings", "DEGRADED", "Dense/sparse retrieval cannot embed queries locally.", "pip install docmancer", "doctor shows embeddings provider available."))
+            issues.append(_doctor_issue("FASTEMBED_MISSING", "embeddings", "DEGRADED", "Dense/sparse retrieval cannot embed queries locally.", "pip install doc-atlas", "doctor shows embeddings provider available."))
         add_check("embeddings", "ok" if find_spec("fastembed") else "missing", f"provider={config.embeddings.provider} model={config.embeddings.model}")
         try:
             from docmancer.runtime.qdrant_manager import QdrantManager
@@ -501,11 +523,11 @@ def _emit_next_step(text: str) -> None:
 
 def _loader_availability() -> list[tuple[str, bool, str]]:
     checks = [
-        ("txt", find_spec("charset_normalizer") is not None, "reinstall docmancer; charset-normalizer ships in core"),
-        ("pdf", find_spec("pypdf") is not None, "reinstall docmancer; pypdf ships in core"),
-        ("pdf fallback", find_spec("pdfplumber") is not None, "reinstall docmancer; pdfplumber ships in core"),
-        ("docx", find_spec("docx") is not None, "reinstall docmancer; python-docx ships in core"),
-        ("rtf", find_spec("striprtf") is not None, "reinstall docmancer; striprtf ships in core"),
+        ("txt", find_spec("charset_normalizer") is not None, "reinstall doc-atlas; charset-normalizer ships in core"),
+        ("pdf", find_spec("pypdf") is not None, "reinstall doc-atlas; pypdf ships in core"),
+        ("pdf fallback", find_spec("pdfplumber") is not None, "reinstall doc-atlas; pdfplumber ships in core"),
+        ("docx", find_spec("docx") is not None, "reinstall doc-atlas; python-docx ships in core"),
+        ("rtf", find_spec("striprtf") is not None, "reinstall doc-atlas; striprtf ships in core"),
         ("html", True, "built in"),
         ("markdown", True, "built in"),
     ]
@@ -579,7 +601,7 @@ def _get_template_content(template_name: str) -> str:
 
 
 def _resolve_docmancer_executable() -> str:
-    resolved = shutil.which("docmancer")
+    resolved = shutil.which("doc-atlas") or shutil.which("docmancer")
     if resolved:
         return str(Path(resolved).resolve())
     return f"{sys.executable} -m docmancer"
@@ -596,9 +618,10 @@ def _resolve_install_config_path(config_path: str | None, project: bool) -> Path
     if config_path:
         return Path(config_path).resolve()
     if project:
-        default_yaml = Path("docmancer.yaml")
-        if default_yaml.exists():
-            return default_yaml.resolve()
+        for name in (PRIMARY_CONFIG_NAME, LEGACY_CONFIG_NAME):
+            candidate = Path(name)
+            if candidate.exists():
+                return candidate.resolve()
         return None
     return _ensure_user_config().resolve()
 
@@ -609,38 +632,67 @@ def _build_skill_content(template_name: str, config_path: str | Path | None) -> 
 
 
 def _install_skill_file(content: str, dest: Path) -> None:
+    try:
+        _migrate_legacy_skill_file(dest)
+    except ValueError as exc:
+        raise click.ClickException(str(exc)) from exc
+
     front_matter, body = _split_front_matter(content)
-    marker_block = f"{_AGENTS_MD_START}\n{body.strip()}\n{_AGENTS_MD_END}\n"
+    marker_block = f"{_AGENTS_MD_START}
+{body.strip()}
+{_AGENTS_MD_END}
+"
     if not dest.exists():
         dest.parent.mkdir(parents=True, exist_ok=True)
-        dest.write_text(front_matter + _SKILL_FILE_OWNER + "\n" + marker_block, encoding="utf-8")
+        dest.write_text(front_matter + _SKILL_FILE_OWNER + "
+" + marker_block, encoding="utf-8")
         return
 
     existing = dest.read_text(encoding="utf-8")
-    # Migrate the invalid legacy layout that put a marker before YAML.
-    if existing.startswith(_AGENTS_MD_START):
-        end_idx = existing.find(_AGENTS_MD_END)
-        if end_idx != -1:
-            managed = existing[len(_AGENTS_MD_START):end_idx].strip()
-            old_front_matter, _ = _split_front_matter(managed)
-            if old_front_matter:
-                suffix = existing[end_idx + len(_AGENTS_MD_END):]
-                dest.write_text(front_matter + _SKILL_FILE_OWNER + "\n" + marker_block + suffix, encoding="utf-8")
-                return
+    for start_marker, end_marker in (
+        (_AGENTS_MD_START, _AGENTS_MD_END),
+        (_LEGACY_AGENTS_MD_START, _LEGACY_AGENTS_MD_END),
+    ):
+        if existing.startswith(start_marker):
+            end_idx = existing.find(end_marker)
+            if end_idx != -1:
+                managed = existing[len(start_marker):end_idx].strip()
+                old_front_matter, _ = _split_front_matter(managed)
+                if old_front_matter and _is_proven_docatlas_text(managed):
+                    suffix = existing[end_idx + len(end_marker):]
+                    dest.write_text(front_matter + _SKILL_FILE_OWNER + "
+" + marker_block + suffix, encoding="utf-8")
+                    return
+
+    try:
+        legacy = _legacy_managed_block(existing)
+    except ValueError as exc:
+        raise click.ClickException(f"Could not update {display_path(dest)} because {exc}.") from exc
+    if legacy is not None:
+        start_idx, end_idx = legacy
+        existing = (
+            existing[:start_idx]
+            + marker_block.rstrip("
+")
+            + existing[end_idx + len(_LEGACY_AGENTS_MD_END):]
+        )
+        existing = existing.replace(_LEGACY_SKILL_FILE_OWNER, _SKILL_FILE_OWNER, 1)
+        dest.write_text(existing, encoding="utf-8")
 
     existing_front_matter, _ = _split_front_matter(existing)
     if _SKILL_FILE_OWNER in existing and existing_front_matter:
-        start_idx = existing.find(_AGENTS_MD_START)
-        end_idx = existing.find(_AGENTS_MD_END)
-        if start_idx == -1 or end_idx == -1 or start_idx > end_idx:
-            raise click.ClickException(
-                f"Could not update {display_path(dest)} because its DocAtlas markers are incomplete or out of order."
-            )
+        try:
+            block = _current_managed_block(existing)
+        except ValueError as exc:
+            raise click.ClickException(f"Could not update {display_path(dest)} because {exc}.") from exc
+        if block is None:
+            raise click.ClickException(f"Could not update {display_path(dest)} because its DocAtlas markers are missing.")
+        start_idx, end_idx = block
         suffix = existing[end_idx + len(_AGENTS_MD_END):]
-        dest.write_text(front_matter + _SKILL_FILE_OWNER + "\n" + marker_block + suffix, encoding="utf-8")
+        dest.write_text(front_matter + _SKILL_FILE_OWNER + "
+" + marker_block + suffix, encoding="utf-8")
         return
     if front_matter and not existing_front_matter:
-        # Do not prepend metadata to a user-authored non-skill file.
         _install_or_append_agents_md(dest, content)
         return
     _install_or_append_agents_md(dest, body if existing_front_matter else content)
@@ -658,34 +710,39 @@ def _split_front_matter(content: str) -> tuple[str, str]:
 
 
 def _install_or_append_agents_md(dest: Path, content_body: str) -> None:
-    marker_block = f"{_AGENTS_MD_START}\n{content_body.strip()}\n{_AGENTS_MD_END}"
+    marker_block = f"{_AGENTS_MD_START}
+{content_body.strip()}
+{_AGENTS_MD_END}"
     dest.parent.mkdir(parents=True, exist_ok=True)
 
-    if dest.exists():
-        existing = dest.read_text(encoding="utf-8")
-        start_idx = existing.find(_AGENTS_MD_START)
-        end_idx = existing.find(_AGENTS_MD_END)
-        if start_idx != -1 and end_idx != -1 and start_idx < end_idx:
-            # Replace existing block
-            new_content = (
-                existing[:start_idx]
-                + marker_block
-                + existing[end_idx + len(_AGENTS_MD_END):]
-            )
-            dest.write_text(new_content, encoding="utf-8")
-        elif start_idx == -1 and end_idx == -1:
-            # Append to file
-            separator = "\n\n" if existing and not existing.endswith("\n\n") else ""
-            dest.write_text(
-                existing + separator + marker_block + "\n",
-                encoding="utf-8",
-            )
-        else:
-            raise click.ClickException(
-                f"Could not update {display_path(dest)} because its DocAtlas markers are incomplete or out of order."
-            )
+    if not dest.exists():
+        dest.write_text(marker_block + "
+", encoding="utf-8")
+        return
+
+    existing = dest.read_text(encoding="utf-8")
+    try:
+        current = _current_managed_block(existing)
+        legacy = None if current is not None else _legacy_managed_block(existing)
+    except ValueError as exc:
+        raise click.ClickException(f"Could not update {display_path(dest)} because {exc}.") from exc
+    if current is not None:
+        start_idx, end_idx = current
+        new_content = existing[:start_idx] + marker_block + existing[end_idx + len(_AGENTS_MD_END):]
+        dest.write_text(new_content, encoding="utf-8")
+    elif legacy is not None:
+        start_idx, end_idx = legacy
+        new_content = existing[:start_idx] + marker_block + existing[end_idx + len(_LEGACY_AGENTS_MD_END):]
+        new_content = new_content.replace(_LEGACY_SKILL_FILE_OWNER, _SKILL_FILE_OWNER, 1)
+        dest.write_text(new_content, encoding="utf-8")
     else:
-        dest.write_text(marker_block + "\n", encoding="utf-8")
+        separator = "
+
+" if existing and not existing.endswith("
+
+") else ""
+        dest.write_text(existing + separator + marker_block + "
+", encoding="utf-8")
 
 
 def _format_size(n: int) -> str:
