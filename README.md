@@ -24,6 +24,8 @@ install → get_docs_context → follow a returned prepare_docs action when need
 
 For a normal repository question, the agent starts with `get_docs_context`. If it returns a `prepare_docs` next action, the agent follows it, retries the question, and cites the selected project or dependency sources. This is the product's default workflow.
 
+The advertised runtime ToolSpec objects are the source of truth for the three public tool descriptions and schemas. The packaged `docatlas-agent-contract-v1` workflow fingerprints those exact runtime specs; installed agent guidance carries its SHA-256 identity so schema/guidance drift is detectable.
+
 ```text
 get_docs_context → follow a returned prepare_docs action when needed → retry get_docs_context
 ```

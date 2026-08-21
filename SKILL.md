@@ -1,5 +1,5 @@
 ---
-name: docmancer
+name: docatlas
 description: Search and query local documentation knowledge bases using the DocAtlas CLI. Use when the user asks about third-party library docs, API references, vendor documentation, version-specific API behavior, GitBook or Mintlify public docs, offline or local doc search, or needs to ground agent responses in up-to-date external documentation.
 version: 0.4.6
 author: docmancer
@@ -15,6 +15,8 @@ install: pipx install doc-atlas --python python3.13
 # Documentation context runtime for coding agents
 
 DocAtlas is the source-grounded documentation entry point for repository, library, dependency, and mixed questions.
+
+The advertised runtime ToolSpec contract is the schema source of truth. Installed skills carry the `docatlas-agent-contract-v1` SHA-256 identity.
 
 The default Docs MCP surface has exactly three tools:
 
@@ -115,7 +117,7 @@ Returns a compact markdown context pack with source attribution and token saving
 | `doc-atlas remove --all` | Clear the entire index |
 | `doc-atlas update [source]` | Re-fetch and re-index all sources, or one specific source |
 | `doc-atlas doctor` | Check config, loader availability, index health, and agent skill installs |
-| `doc-atlas init` | Create project-local `docmancer.yaml` |
+| `doc-atlas init` | Create project-local `docatlas.yaml` |
 | `doc-atlas fetch <url> --output <dir>` | Download docs to markdown files without indexing |
 
 ## Advanced: API Tools via MCP
@@ -131,7 +133,7 @@ For API tasks, search first, inspect the returned schema and safety block, then 
 
 For repository-specific architecture, conventions, runbooks, roadmap, README/wiki, or module-doc questions, use the Docs MCP tools before generic WebFetch or model memory:
 
-1. For coding and patch tasks, call `get_docs_context(project_path=..., question=..., mode="project", delivery_strategy="bounded_direct")` first. Use the unbounded presentation only for explicit broader documentation exploration.
+1. For coding and patch tasks, call `get_docs_context(project_path=..., question=..., mode="project")` first; bounded delivery is server-owned policy.
 2. Follow bounded `recommended_next_action`: ask its source-choice question, or obtain confirmation, call its exact typed action, and retry the same bounded request.
 3. Use `docs_status` only when the user explicitly asks about health, freshness, index state, or a background job.
 4. For bounded responses, inspect `action_packet.status`, `missing_evidence`, and `omitted_counts`; do not edit when status is `insufficient_evidence`.
