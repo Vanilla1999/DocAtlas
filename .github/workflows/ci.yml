@@ -159,6 +159,12 @@ jobs:
       - name: Run legacy contract completeness gate
         run: python scripts/run_legacy_contract_gate.py
 
+      - name: Run recoverable documentation failure gate
+        run: python scripts/run_recovery_contract_gate.py
+
+      - name: Run recoverable documentation failure mutation gate
+        run: python scripts/run_recovery_mutation_gate.py
+
       - name: Run Project Docs self-hosting closure gate
         run: python scripts/run_project_docs_self_host_gate.py
 
