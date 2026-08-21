@@ -1,0 +1,1 @@
+P0.3 migrate-home: preview-first, source-preserving, hash-verified, fail-closed migration CLI.
