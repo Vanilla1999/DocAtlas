@@ -11,6 +11,8 @@ At the 2026-08-21 roadmap reset:
 - the repository changelog contains a `1.2.0` milestone, but no corresponding public PyPI release exists;
 - current `main` contains substantial work after that milestone.
 
+The existing changelog heading `## [1.2.0] - 2026-07-12` records the repository milestone date; it is **not** evidence that a matching PyPI artifact was published. This roadmap-reset slice keeps that historical changelog body intact and makes the publication distinction explicit here. The later P0 release-preparation slice must cut `1.3.0` from one protected commit and preserve this distinction rather than retroactively turning the historical `1.2.0` milestone into a public release.
+
 Therefore repository `1.2.0` is treated as an **unpublished repository milestone**. Current `main` must not be published retroactively as `1.2.0`, because that would make the public artifact contain changes beyond the historical `1.2.0` milestone while reusing the same release identity.
 
 ## Next intended public release
