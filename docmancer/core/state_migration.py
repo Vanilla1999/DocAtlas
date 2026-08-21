@@ -4,11 +4,13 @@ import hashlib
 import json
 import os
 import shutil
+import tempfile
 from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any
 
 import yaml
+from filelock import FileLock, Timeout
 
 from docmancer._version import __version__
 from docmancer.core.product_identity import (
@@ -214,14 +216,13 @@ def plan_home_migration(
     source_state = inspect_state(source_path)
     target_state = inspect_state(target_path)
     eligible_source = source_state.classification in {"legacy_docatlas", "owned_docatlas"}
-    eligible_target = target_state.classification in {"missing", "empty"}
     if not eligible_source:
         return HomeMigrationPlan(
             str(source_path), str(target_path), source_state.classification,
             target_state.classification, 0, 0, "", "", False,
             "source_not_proven_docatlas", (),
         )
-    if not eligible_target:
+    if target_state.classification not in {"missing", "empty", "owned_docatlas"}:
         return HomeMigrationPlan(
             str(source_path), str(target_path), source_state.classification,
             target_state.classification, 0, 0, "", "", False,
@@ -238,11 +239,25 @@ def plan_home_migration(
         source_fingerprint=fingerprint,
         entries=entries,
     )))
-    return HomeMigrationPlan(
+    candidate = HomeMigrationPlan(
         str(source_path), str(target_path), source_state.classification,
         target_state.classification, len(entries), total, fingerprint, digest,
         True, None, entries,
     )
+    if target_state.classification == "owned_docatlas":
+        try:
+            if _already_applied(candidate):
+                return candidate
+        except HomeMigrationError:
+            pass
+        return HomeMigrationPlan(
+            candidate.source, candidate.target, candidate.source_classification,
+            candidate.target_classification, candidate.file_count,
+            candidate.total_source_bytes, candidate.source_fingerprint,
+            candidate.plan_digest, False, "target_not_matching_migration",
+            candidate.entries,
+        )
+    return candidate
 
 
 def _migration_record(target: Path) -> dict[str, Any] | None:
@@ -297,12 +312,19 @@ def _already_applied(plan: HomeMigrationPlan) -> bool:
     return True
 
 
-def apply_home_migration(plan: HomeMigrationPlan) -> HomeMigrationResult:
-    if not plan.can_apply:
-        raise HomeMigrationError(f"migration plan is not applicable: {plan.reason}")
-    source = Path(plan.source)
-    target = Path(plan.target)
+def _migration_lock_path(source: Path, target: Path) -> Path:
+    identity = _sha256(
+        _canonical_json({"source": str(source), "target": str(target)})
+    )[:24]
+    return Path(tempfile.gettempdir()) / f"docatlas-home-migration-{identity}.lock"
 
+
+def _apply_home_migration_locked(
+    plan: HomeMigrationPlan,
+    *,
+    source: Path,
+    target: Path,
+) -> HomeMigrationResult:
     if target.exists() and _already_applied(plan):
         return HomeMigrationResult(
             "already_applied", plan.source, plan.target, plan.plan_digest,
@@ -382,6 +404,21 @@ def apply_home_migration(plan: HomeMigrationPlan) -> HomeMigrationResult:
         "applied", plan.source, plan.target, plan.plan_digest,
         plan.file_count, plan.total_source_bytes,
     )
+
+
+def apply_home_migration(plan: HomeMigrationPlan) -> HomeMigrationResult:
+    if not plan.can_apply:
+        raise HomeMigrationError(f"migration plan is not applicable: {plan.reason}")
+    source = Path(plan.source)
+    target = Path(plan.target)
+    lock_path = _migration_lock_path(source, target)
+    try:
+        with FileLock(str(lock_path), timeout=0):
+            return _apply_home_migration_locked(plan, source=source, target=target)
+    except Timeout as exc:
+        raise HomeMigrationError(
+            f"another DocAtlas home migration is already in progress for {target}"
+        ) from exc
 
 
 __all__ = [

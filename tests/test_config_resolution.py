@@ -3,6 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
+from filelock import FileLock
 
 from docmancer.core.config_resolution import resolve_config
 from docmancer.core.product_identity import (
@@ -14,6 +15,7 @@ from docmancer.core.product_identity import (
 )
 from docmancer.core.state_migration import (
     HomeMigrationError,
+    _migration_lock_path,
     apply_home_migration,
     plan_home_migration,
 )
@@ -107,7 +109,7 @@ def test_config_identity_includes_retrieval_settings_not_only_db_path(tmp_path):
 
     # A strongly identified legacy DocAtlas home can be copied into the new
     # namespace without deleting or rewriting the source. Config paths are
-    # rebound and repeated application is idempotent.
+    # rebound and repeated application is idempotent across fresh plans.
     source = tmp_path / ".docmancer"
     target = tmp_path / ".docatlas"
     (source / "mcp").mkdir(parents=True)
@@ -135,7 +137,25 @@ def test_config_identity_includes_retrieval_settings_not_only_db_path(tmp_path):
     owner = inspect_state(target)
     assert owner.classification == "owned_docatlas"
     assert owner.owner and owner.owner["product_id"] == PRODUCT_ID
-    assert apply_home_migration(plan).status == "already_applied"
+
+    repeat_plan = plan_home_migration(source, target)
+    assert repeat_plan.can_apply is True
+    assert repeat_plan.plan_digest == plan.plan_digest
+    assert repeat_plan.target_classification == "owned_docatlas"
+
+    migration_lock = FileLock(
+        str(_migration_lock_path(Path(repeat_plan.source), Path(repeat_plan.target))),
+        timeout=0,
+    )
+    with migration_lock:
+        with pytest.raises(HomeMigrationError, match="already in progress"):
+            apply_home_migration(repeat_plan)
+    assert apply_home_migration(repeat_plan).status == "already_applied"
+
+    (target / "docmancer.db").write_bytes(b"tampered")
+    tampered_plan = plan_home_migration(source, target)
+    assert tampered_plan.can_apply is False
+    assert tampered_plan.reason == "target_not_matching_migration"
 
 
 def test_explicit_config_must_be_a_file(tmp_path):
