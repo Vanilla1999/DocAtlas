@@ -1,0 +1,580 @@
+name: TEMP finalize PR 122
+
+on:
+  push:
+    branches:
+      - p0/recoverable-docs-failures
+
+permissions:
+  contents: write
+
+jobs:
+  finalize:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          ref: p0/recoverable-docs-failures
+          fetch-depth: 0
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: python -m pip install -e ".[dev]"
+      - name: Apply reviewed integration fixes
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          def read(path: str) -> str:
+              return Path(path).read_text(encoding="utf-8")
+
+          def write(path: str, text: str) -> None:
+              Path(path).write_text(text, encoding="utf-8")
+
+          def replace_once(path: str, old: str, new: str) -> None:
+              text = read(path)
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f"{path}: expected one replacement target, found {count}: {old[:80]!r}")
+              write(path, text.replace(old, new, 1))
+
+          recovery_projection = '''"""MCP projection helpers for bounded documentation-failure recovery.
+
+This module only explains failed canonical support. It never grants support and
+never replaces a concrete lifecycle/status/user-confirmation recovery with a
+semantic rephrase.
+"""
+from __future__ import annotations
+
+from copy import deepcopy
+from typing import Any
+
+from docmancer.docs.application.model_visible_projection import estimate_projection_tokens
+from docmancer.docs.application.recovery import build_recovery_diagnosis, recovery_action
+
+_RECOVERY_SUMMARY_KEYS = (
+    "documentation_supported", "investigation_allowed", "hard_stop",
+    "recovery_origin", "recovery_reason_code", "recovery_disposition",
+)
+
+
+def is_operational_recovery_action(value: Any) -> bool:
+    if not isinstance(value, dict):
+        return False
+    return bool(
+        value.get("tool") in {"prepare_docs", "docs_status"}
+        or value.get("type") == "ask_user_for_library_docs_source"
+        or value.get("requires_confirmation")
+    )
+
+
+def _first_operational_action(payload: dict[str, Any]) -> dict[str, Any] | None:
+    candidates = [payload.get("next_action"), *(payload.get("next_actions") or [])]
+    return next((item for item in candidates if is_operational_recovery_action(item)), None)
+
+
+def _clean_string(value: Any) -> str | None:
+    text = str(value or "").strip()
+    return text or None
+
+
+def _refresh_estimate(payload: dict[str, Any]) -> None:
+    payload["estimated_tokens"] = 0
+    for _ in range(3):
+        actual = estimate_projection_tokens(payload)
+        if payload["estimated_tokens"] == actual:
+            break
+        payload["estimated_tokens"] = actual
+
+
+def _attach_recovery_diagnosis(
+    payload: dict[str, Any],
+    *,
+    question: str,
+    request: dict[str, Any],
+    canonical_selection: Any,
+    operational_reason_code: Any = None,
+) -> dict[str, Any]:
+    if canonical_selection is None:
+        return payload
+    support = getattr(canonical_selection, "support_decision", None)
+    if support is not None and bool(getattr(support, "answer_supported", False)):
+        return payload
+    diagnosis = build_recovery_diagnosis(
+        question,
+        canonical_selection,
+        operational_reason_code=(
+            payload.get("operational_reason_code")
+            or operational_reason_code
+            or payload.get("reason_code")
+        ),
+    )
+    if not diagnosis:
+        return payload
+
+    updated = dict(payload)
+    updated.update({
+        "documentation_supported": bool(diagnosis.get("documentation_supported")),
+        "investigation_allowed": bool(diagnosis.get("investigation_allowed", True)),
+        "hard_stop": bool(diagnosis.get("hard_stop")),
+        "recovery_origin": str(diagnosis.get("origin") or "selection"),
+        "recovery_reason_code": str(diagnosis.get("reason_code") or "support_not_provable"),
+        "recovery_disposition": str(diagnosis.get("disposition") or "search_local_source"),
+    })
+
+    # Lifecycle/status/user-confirmation recovery is more precise than changing
+    # wording. Preserve it even if parser diagnostics would otherwise suggest a
+    # rephrase. Authoritative conflicts remain hard stops and do not enter here.
+    operational = _first_operational_action(updated)
+    if operational is not None and not bool(diagnosis.get("hard_stop")):
+        updated.update({
+            "recovery_origin": "operational",
+            "recovery_reason_code": str(
+                updated.get("operational_reason_code") or "operational_recovery_precedence"
+            ),
+            "recovery_disposition": "use_operational_recovery",
+        })
+        return updated
+
+    action = recovery_action(
+        diagnosis,
+        project_path=_clean_string(request.get("project_path")),
+        scope=_clean_string(request.get("scope")),
+        mode=_clean_string(request.get("mode")),
+    )
+    if action:
+        existing = [
+            item for item in updated.get("next_actions") or []
+            if isinstance(item, dict) and item != action
+        ]
+        updated["next_action"] = action
+        updated["next_actions"] = [action, *existing]
+    return updated
+
+
+def _recovery_summary(payload: dict[str, Any]) -> dict[str, Any]:
+    return {
+        key: deepcopy(payload[key])
+        for key in _RECOVERY_SUMMARY_KEYS
+        if key in payload
+    }
+
+
+def _annotate_recovery_handoff(
+    projection: dict[str, Any], recovery: dict[str, Any] | None
+) -> None:
+    if bool(projection.get("hard_stop")):
+        projection.update({
+            "disposition": "resolve_authoritative_conflict",
+            "edit_ready": False,
+            "source_search_status": "blocked",
+        })
+        _refresh_estimate(projection)
+        return
+    if not isinstance(recovery, dict):
+        return
+    if recovery.get("type") == "rephrase_question":
+        projection.update({
+            "disposition": "rephrase_question",
+            "edit_ready": False,
+            "source_search_status": "not_required",
+            "requires_confirmation": False,
+        })
+    elif recovery.get("tool") == "code_search":
+        projection.update({
+            "disposition": "search_local_source",
+            "edit_ready": False,
+            "source_search_status": "required",
+            "requires_confirmation": False,
+        })
+    _refresh_estimate(projection)
+
+
+__all__ = [
+    "_annotate_recovery_handoff",
+    "_attach_recovery_diagnosis",
+    "_recovery_summary",
+    "is_operational_recovery_action",
+]
+'''
+          write("docmancer/docs/interfaces/mcp/recovery_projection.py", recovery_projection)
+
+          insufficient_projection = '''"""Terminal bounded projection helpers for insufficient documentation evidence."""
+from __future__ import annotations
+
+import re
+from copy import deepcopy
+from typing import Any, Iterable
+
+_SAFE_MISSING_ID_RE = re.compile(r"^[A-Za-z0-9_.:/=-]{1,180}$")
+_RECOVERY_SUMMARY_KEYS = (
+    "documentation_supported", "investigation_allowed", "hard_stop",
+    "recovery_origin", "recovery_reason_code", "recovery_disposition",
+)
+
+
+def bounded_missing_value(value: Any, *, default: str) -> str:
+    if isinstance(value, list):
+        for item in value:
+            text = str(item or "").strip()
+            if _SAFE_MISSING_ID_RE.fullmatch(text):
+                return text
+    return default
+
+
+def _minimal_rephrase_action(value: Any) -> dict[str, Any] | None:
+    if not isinstance(value, dict) or value.get("type") != "rephrase_question":
+        return None
+    arguments = value.get("arguments_patch") if isinstance(value.get("arguments_patch"), dict) else {}
+    question = str(arguments.get("question") or "")[:320]
+    if not question:
+        return None
+    return {
+        "tool": "get_docs_context",
+        "type": "rephrase_question",
+        "arguments_patch": {"question": question},
+        "auto_execute": False,
+    }
+
+
+def apply_terminal_insufficient_projection(
+    payload: dict[str, Any],
+    *,
+    kind: Any,
+    missing: str,
+    original_action: Any,
+    support_keys: Iterable[str],
+) -> None:
+    recovery_summary = {
+        key: deepcopy(payload[key])
+        for key in _RECOVERY_SUMMARY_KEYS
+        if key in payload
+    }
+    support = {
+        key: payload[key]
+        for key in support_keys
+        if key in payload and key != "reason_code"
+    }
+    payload.clear()
+    payload.update({
+        "status": "insufficient_evidence",
+        "kind": "docs_answer" if kind == "docs_answer" else "patch_context",
+        "missing": [missing],
+        "answer_supported": False,
+        "answer_available": False,
+        "support_status": "insufficient_evidence",
+        "estimated_tokens": 0,
+        **support,
+        **recovery_summary,
+    })
+    minimal_recovery = _minimal_rephrase_action(original_action)
+    if minimal_recovery is not None:
+        payload["recommended_next_action"] = minimal_recovery
+
+
+__all__ = ["apply_terminal_insufficient_projection", "bounded_missing_value"]
+'''
+          write("docmancer/docs/application/insufficient_projection.py", insufficient_projection)
+
+          # MCP orchestration delegates recovery projection to its own bounded helper.
+          replace_once(
+              "docmancer/docs/interfaces/mcp/context_tools.py",
+              "from docmancer.docs.application.recovery import build_recovery_diagnosis, recovery_action\n",
+              "from docmancer.docs.interfaces.mcp.recovery_projection import (\n"
+              "    _annotate_recovery_handoff, _attach_recovery_diagnosis, _recovery_summary,\n"
+              "    is_operational_recovery_action,\n"
+              ")\n",
+          )
+          path = "docmancer/docs/interfaces/mcp/context_tools.py"
+          text = read(path)
+          start = text.index("\n_RECOVERY_SUMMARY_KEYS = (")
+          end = text.index("\ndef _bounded_recovery_action", start)
+          text = text[:start] + "\n" + text[end:]
+          write(path, text)
+          replace_once(
+              path,
+              "    if operational_reason in _MODULE_RECOVERY_REASON_CODES:\n"
+              "        candidates.sort(\n"
+              "            key=lambda action: 0\n"
+              "            if isinstance(action, dict) and action.get(\"tool\") == \"docs_status\" else 1\n"
+              "        )\n"
+              "    elif payload.get(\"recovery_disposition\") == \"rephrase_question\":\n",
+              "    if operational_reason in _MODULE_RECOVERY_REASON_CODES:\n"
+              "        candidates.sort(\n"
+              "            key=lambda action: 0\n"
+              "            if isinstance(action, dict) and action.get(\"tool\") == \"docs_status\" else 1\n"
+              "        )\n"
+              "    elif any(is_operational_recovery_action(action) for action in candidates):\n"
+              "        candidates.sort(\n"
+              "            key=lambda action: 0 if is_operational_recovery_action(action) else 1\n"
+              "        )\n"
+              "    elif payload.get(\"recovery_disposition\") == \"rephrase_question\":\n",
+          )
+
+          # Move terminal failure construction out of the large projection module
+          # and preserve one compact machine-readable missing requirement id.
+          path = "docmancer/docs/application/model_visible_projection.py"
+          replace_once(
+              path,
+              "from docmancer.docs.domain.request_intent import model_projection_kind\n",
+              "from docmancer.docs.domain.request_intent import model_projection_kind\n"
+              "from docmancer.docs.application.insufficient_projection import (\n"
+              "    apply_terminal_insufficient_projection, bounded_missing_value,\n"
+              ")\n",
+          )
+          replace_once(
+              path,
+              "    action = payload.get(\"recommended_next_action\")\n"
+              "    if isinstance(action, dict):\n",
+              "    action = payload.get(\"recommended_next_action\")\n"
+              "    original_action = deepcopy(action) if isinstance(action, dict) else None\n"
+              "    if isinstance(action, dict):\n",
+          )
+          replace_once(
+              path,
+              "    missing = payload.get(\"missing\")\n",
+              "    missing = payload.get(\"missing\")\n"
+              "    bounded_missing = bounded_missing_value(missing, default=_MINIMAL_MISSING)\n",
+          )
+          replace_once(
+              path,
+              "    payload[\"missing\"] = [_MINIMAL_MISSING]\n",
+              "    payload[\"missing\"] = [bounded_missing]\n",
+          )
+          text = read(path)
+          start = text.index("    # The terminal fallback contains no unbounded caller data.")
+          end = text.index("\n\ndef _compact_insufficient_support", start)
+          replacement = '''    # Terminal fallback retains only bounded support/recovery metadata and, when
+    # it fits, one compact machine-readable missing requirement id.
+    apply_terminal_insufficient_projection(
+        payload,
+        kind=payload.get("kind"),
+        missing=bounded_missing,
+        original_action=original_action,
+        support_keys=_INSUFFICIENT_SUPPORT_KEYS,
+    )
+    _refresh_estimate(payload)
+    if estimate_projection_tokens(payload) > limit:
+        payload.pop("recommended_next_action", None)
+        _refresh_estimate(payload)
+    if estimate_projection_tokens(payload) > limit and bounded_missing != _MINIMAL_MISSING:
+        payload["missing"] = [_MINIMAL_MISSING]
+        _refresh_estimate(payload)
+    if estimate_projection_tokens(payload) > limit:
+        raise ValueError("minimum insufficient-evidence projection exceeds the requested budget")
+'''
+          write(path, text[:start] + replacement + text[end:])
+
+          # Exact-document fallback now asks SQLite for one already-resolved source,
+          # using the existing (generation_id, source_id, chunk_index) index instead
+          # of materializing the entire active generation.
+          path = "docmancer/core/_sqlite_store_part05.py"
+          text = read(path)
+          marker = "    def get_document_content(self, source: str) -> str | None:\n"
+          if marker not in text:
+              raise SystemExit("sqlite store insertion marker missing")
+          method = '''    def list_sections_for_source(
+        self,
+        source: str,
+        *,
+        generation_id: str | None = None,
+        limit: int = 64,
+    ) -> list[dict[str, Any]]:
+        """Return a bounded active-generation projection for one exact source."""
+        source = str(source or "").strip()
+        if not source:
+            return []
+        bounded_limit = max(1, min(int(limit), 128))
+        with self._connect() as conn:
+            target_generation = generation_id or self._active_generation_id(conn)
+            if not target_generation:
+                return []
+            source_row = conn.execute(
+                "SELECT id FROM sources WHERE source = ?",
+                (source,),
+            ).fetchone()
+            if not source_row:
+                return []
+            rows = conn.execute(
+                """
+                SELECT source, chunk_index, title, level, display_text,
+                       retrieval_text, display_token_estimate, source_path,
+                       anchor, stable_chunk_id, parent_logical_id,
+                       char_start, char_end, project_identity, project_path,
+                       module_id, doc_scope, source_class, authority,
+                       lifecycle_status
+                FROM retrieval_children
+                WHERE generation_id = ? AND source_id = ?
+                ORDER BY chunk_index
+                LIMIT ?
+                """,
+                (target_generation, int(source_row["id"]), bounded_limit),
+            )
+            return [
+                {
+                    "source": str(row["source"]),
+                    "chunk_index": int(row["chunk_index"]),
+                    "title": str(row["title"] or ""),
+                    "level": int(row["level"] or 0),
+                    "text": str(row["retrieval_text"] or ""),
+                    "display_text": str(row["display_text"] or ""),
+                    "token_estimate": int(row["display_token_estimate"] or 0),
+                    "source_path": str(row["source_path"] or ""),
+                    "anchor": str(row["anchor"] or ""),
+                    "stable_chunk_id": str(row["stable_chunk_id"] or ""),
+                    "parent_logical_id": str(row["parent_logical_id"] or ""),
+                    "char_start": int(row["char_start"]),
+                    "char_end": int(row["char_end"]),
+                    "project_identity": str(row["project_identity"] or ""),
+                    "project_path": str(row["project_path"] or ""),
+                    "module_id": str(row["module_id"] or ""),
+                    "doc_scope": str(row["doc_scope"] or ""),
+                    "source_class": str(row["source_class"] or ""),
+                    "authority": str(row["authority"] or "unknown"),
+                    "lifecycle_status": str(row["lifecycle_status"] or "active"),
+                }
+                for row in rows
+            ]
+
+'''
+          write(path, text.replace(marker, method + marker, 1))
+
+          path = "docmancer/docs/application/_project_docs_service_part03.py"
+          replace_once(
+              path,
+              "    evidence_path: str,\n    requirements: Any | None,\n",
+              "    evidence_path: str,\n    indexed_source: str,\n    requirements: Any | None,\n",
+          )
+          replace_once(
+              path,
+              "        rows = list(agent.store.list_sections_for_embedding())\n",
+              "        rows = list(agent.store.list_sections_for_source(indexed_source, limit=64))\n",
+          )
+          replace_once(
+              path,
+              "            chunks = _exact_document_index_chunks(\n"
+              "                self._agent_instance(),\n"
+              "                root=root,\n"
+              "                evidence_path=evidence_path,\n"
+              "                requirements=requirements,\n"
+              "            )\n",
+              "            exact_source = current_by_path[normalize_doc_path(evidence_path)]\n"
+              "            chunks = _exact_document_index_chunks(\n"
+              "                self._agent_instance(),\n"
+              "                root=root,\n"
+              "                evidence_path=str(exact_source.get(\"path\") or evidence_path),\n"
+              "                indexed_source=str(exact_source.get(\"source\") or \"\"),\n"
+              "                requirements=requirements,\n"
+              "            )\n",
+          )
+
+          # Recovery gate now proves operational precedence and proves the exact
+          # fallback does not call the old whole-generation enumeration API.
+          path = "scripts/run_recovery_contract_gate.py"
+          replace_once(
+              path,
+              "from docmancer.docs.application.recovery import build_recovery_diagnosis, recovery_action\n",
+              "from docmancer.docs.application.recovery import build_recovery_diagnosis, recovery_action\n"
+              "from docmancer.docs.interfaces.mcp.recovery_projection import _attach_recovery_diagnosis\n",
+          )
+          replace_once(
+              path,
+              "    # 2. Unknown modifier fuzz: recovery must not depend on adding words to a\n",
+              '''    # 2. A concrete operational recovery must outrank semantic rephrase.
+    operational_action = {
+        "type": "prepare_docs",
+        "tool": "prepare_docs",
+        "requires_confirmation": True,
+        "confirmation_reason": "network_fetch",
+        "arguments_patch": {"action": "prefetch_project_dependency_docs", "project_path": "/repo"},
+    }
+    operational_payload = {
+        "next_action": operational_action,
+        "next_actions": [operational_action],
+        "requires_confirmation": True,
+    }
+    preserved = _attach_recovery_diagnosis(
+        operational_payload,
+        question=TREASURE,
+        request={"question": TREASURE, "project_path": "/repo", "mode": "auto"},
+        canonical_selection=decision,
+    )
+    assert preserved["next_action"]["tool"] == "prepare_docs", preserved
+    assert preserved["next_action"]["confirmation_reason"] == "network_fetch", preserved
+    assert preserved["recovery_disposition"] == "use_operational_recovery", preserved
+
+    # 3. Unknown modifier fuzz: recovery must not depend on adding words to a
+''',
+          )
+          # Renumber only comments; semantics are unchanged.
+          for old, new in (("    # 3. Circuit breaker:", "    # 4. Circuit breaker:"),
+                           ("    # 4. Eligibility", "    # 5. Eligibility"),
+                           ("    # 5. Documentation", "    # 6. Documentation"),
+                           ("    # 6. Positive", "    # 7. Positive"),
+                           ("    # 7. Explicit", "    # 8. Explicit"),
+                           ("        # 8. Public", "        # 9. Public")):
+              text = read(path)
+              if old in text:
+                  write(path, text.replace(old, new, 1))
+          replace_once(
+              path,
+              "        original_query = service.project_docs.query_project_docs\n"
+              "        service.project_docs.query_project_docs = lambda *args, **kwargs: []\n"
+              "        try:\n",
+              "        original_query = service.project_docs.query_project_docs\n"
+              "        store = service.project_docs._agent_instance().store\n"
+              "        original_full_scan = store.list_sections_for_embedding\n"
+              "        service.project_docs.query_project_docs = lambda *args, **kwargs: []\n"
+              "        store.list_sections_for_embedding = lambda *args, **kwargs: (_ for _ in ()).throw(\n"
+              "            AssertionError(\"exact-document fallback must not enumerate the active generation\")\n"
+              "        )\n"
+              "        try:\n",
+          )
+          replace_once(
+              path,
+              "        finally:\n"
+              "            service.project_docs.query_project_docs = original_query\n",
+              "        finally:\n"
+              "            service.project_docs.query_project_docs = original_query\n"
+              "            store.list_sections_for_embedding = original_full_scan\n",
+          )
+
+          # Sanity: no accidental workflow/materializer semantics in production tree.
+          for required in (
+              "docmancer/docs/interfaces/mcp/recovery_projection.py",
+              "docmancer/docs/application/insufficient_projection.py",
+          ):
+              if not Path(required).is_file():
+                  raise SystemExit(f"missing generated helper: {required}")
+          PY
+      - name: Focused validation
+        run: |
+          python -m compileall -q docmancer scripts tests
+          python scripts/check_python_module_size.py
+          python scripts/run_recovery_contract_gate.py
+          python scripts/run_recovery_mutation_gate.py
+          python scripts/run_agent_developer_gate.py
+          pytest -q \
+            tests/test_docs_service_part03.py::test_project_query_does_not_return_non_project_docs_with_same_terms \
+            tests/test_product_scope.py::test_three_real_project_task_designs_are_fairness_screened_and_distributed \
+            tests/docs/test_python_module_policy_and_manifest.py::test_all_repository_python_modules_stay_within_hard_line_budget \
+            tests/docs/test_mcp_docs_tools_registration.py
+          git diff --check
+      - name: Commit semantic fixes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add \
+            docmancer/docs/interfaces/mcp/recovery_projection.py \
+            docmancer/docs/interfaces/mcp/context_tools.py \
+            docmancer/docs/application/insufficient_projection.py \
+            docmancer/docs/application/model_visible_projection.py \
+            docmancer/core/_sqlite_store_part05.py \
+            docmancer/docs/application/_project_docs_service_part03.py \
+            scripts/run_recovery_contract_gate.py
+          git diff --cached --quiet && exit 0
+          git commit -m "fix: close PR 122 integration blockers"
+          git push origin HEAD:p0/recoverable-docs-failures
