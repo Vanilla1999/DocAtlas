@@ -28,12 +28,23 @@ def test_register_is_idempotent(tmp_path):
 
 def test_register_preserves_other_servers(tmp_path):
     cfg = tmp_path / "settings.json"
-    cfg.write_text(json.dumps({"mcpServers": {"other": {"command": "x"}}}))
+    desired = {"command": "doc-atlas", "args": ["mcp", "docs-serve"]}
+    cfg.write_text(json.dumps({
+        "mcpServers": {
+            "other": {"command": "x"},
+            "docatlas": desired,
+            "docmancer": desired,
+        }
+    }))
     target = agent_config.AgentTarget("test", cfg, "json_mcpServers")
-    agent_config.register_server(target)
+
+    changed, _ = agent_config.register_server(target)
+
+    assert changed is True
     payload = json.loads(cfg.read_text())
     assert payload["mcpServers"]["other"] == {"command": "x"}
-    assert "docatlas" in payload["mcpServers"]
+    assert payload["mcpServers"]["docatlas"] == desired
+    assert "docmancer" not in payload["mcpServers"]
 
 
 def test_register_preserves_existing_env(tmp_path):
