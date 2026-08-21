@@ -1,5 +1,4 @@
 """Section 25: doctor output for healthy and unhealthy states."""
-import hashlib
 import json
 
 import pytest
@@ -66,10 +65,19 @@ def test_doctor_rejects_stale_docmancer_mcp_command(healthy_pack, tmp_path, monk
 def test_doctor_accepts_current_doc_atlas_mcp_command(healthy_pack, tmp_path, monkeypatch):
     cfg = tmp_path / "settings.json"
     cfg.write_text(json.dumps({"mcpServers": {"docatlas": {"command": "doc-atlas", "args": ["mcp", "docs-serve"]}}}))
-    target = agent_config.AgentTarget("test", cfg, "json_mcpServers")
-    monkeypatch.setattr(agent_config, "known_agents", lambda: [target])
+    json_target = agent_config.AgentTarget("test-json", cfg, "json_mcpServers")
+
+    codex_cfg = tmp_path / "config.toml"
+    codex_cfg.write_text(
+        '[mcp_servers.docatlas]\n'
+        'command = "doc-atlas"\n'
+        'args = ["mcp", "docs-serve"]\n'
+    )
+    codex_target = agent_config.AgentTarget("test-codex", codex_cfg, "toml_mcp_servers")
+    monkeypatch.setattr(agent_config, "known_agents", lambda: [json_target, codex_target])
 
     results = doctor.run()
     by_name = {r.name: r for r in results}
 
-    assert by_name["agent test"].ok is True
+    assert by_name["agent test-json"].ok is True
+    assert by_name["agent test-codex"].ok is True
