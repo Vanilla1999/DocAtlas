@@ -3,7 +3,7 @@
 
 # DocAtlas
 
-**Local-first documentation context for coding agents — project docs and exact dependency evidence with source attribution.**
+**Local-first, version-bound documentation authority and evidence delivery for coding agents.**
 
 [![License: MIT](https://img.shields.io/github/license/Vanilla1999/DocAtlas?style=for-the-badge)](https://github.com/Vanilla1999/DocAtlas/blob/main/LICENSE)
 [![Python 3.11 | 3.12 | 3.13](https://img.shields.io/badge/python-3.11%20|%203.12%20|%203.13-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://pypi.org/project/doc-atlas/)
@@ -14,7 +14,7 @@
 
 ---
 
-DocAtlas turns reviewable project docs, lockfiles, and dependency documentation into compact, source-attributed context for coding agents. Its default MCP surface is deliberately small so agents select the correct operation reliably.
+Local-first documentation context remains the runtime foundation: DocAtlas turns reviewable project docs, lockfiles, and approved dependency documentation into compact, source-attributed evidence for coding agents. It keeps authority, scope, and version binding explicit and fails closed when mandatory evidence is unavailable. Its default MCP surface is deliberately small so agents select the correct operation reliably.
 
 The primary journey is:
 

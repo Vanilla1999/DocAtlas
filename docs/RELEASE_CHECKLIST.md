@@ -1,6 +1,8 @@
 # DocAtlas release checklist
 
-The DocAtlas release checklist is used before publication to verify a release artifact and its release gates. Release is blocked until the required artifact, CI, approval, and explicit Stable gates below pass. A source checkout passing tests is not enough: users install the built package.
+The DocAtlas release checklist is used before publication to verify a release artifact and its release gates. A source checkout passing tests is not enough: users install the built package.
+
+Artifact/release correctness is necessary for every public release. A **Stable** product claim additionally requires the active public-truth, agent-truth, and product-truth gates in [`../roadmap/README.md`](../roadmap/README.md).
 
 ## Version and documentation
 
@@ -10,6 +12,18 @@ The DocAtlas release checklist is used before publication to verify a release ar
 - [ ] Advanced Packs and patch constraints are labelled advanced/advisory.
 - [ ] New active documentation is tracked by Git and does not duplicate the canonical Docs MCP workflow.
 - [ ] The canonical user-facing release set (`README.md`, product brief, Docs MCP reference, capability reference, release checklist) is at most 1,000 lines, or this release records a reviewed exception and removal plan.
+- [ ] Product claims remain inside the current evidence boundary: no Context7 parity, proven patch-improvement, or Stable claim is introduced without its named decision gate.
+
+## P0 public-truth prerequisites
+
+Before the next public release candidate:
+
+- [ ] The remote `protect-main` ruleset matches `.github/rulesets/protect-main.json`; `python scripts/main_ruleset.py --check` passes with admin-capable visibility.
+- [ ] The release commit is reachable only through the protected `main` workflow; deletion/non-fast-forward and strict required checks are enforced remotely.
+- [ ] New DocAtlas state/integration identity is isolated from the active `docmancer` product namespace; clean installs do not implicitly write to foreign `~/.docmancer` state.
+- [ ] Legacy state/config migration is ownership-checked, preview-first, fail-closed on ambiguous/foreign state, and covered by installed tests.
+- [ ] Installed agent guidance and examples validate against the real three-tool public MCP schema.
+- [ ] The active release identity note and changelog agree on the intended public version. Repository `1.2.0` is an unpublished milestone; the next intended public release is `1.3.0` unless a later reviewed release-preparation change supersedes it.
 
 ## Built artifact
 
@@ -19,14 +33,36 @@ The DocAtlas release checklist is used before publication to verify a release ar
 - [ ] Start the installed Docs MCP server through stdio and verify its public inventory is exactly `get_docs_context`, `prepare_docs`, `docs_status`.
 - [ ] Run a deterministic temporary-repository smoke: `get_docs_context → prepare_docs(sync_project_docs) → get_docs_context` with a cited local source.
 - [ ] Verify the installer resolves and health-checks the same published package version.
+- [ ] Verify the installed default state/config/integration identity is DocAtlas-owned and does not modify foreign legacy state.
 
 ## Release controls
 
 - [ ] CI is green for every claimed Python version.
-- [ ] A maintainer creates the version tag, then manually dispatches `Release artifact gate and publish` with that exact tag.
+- [ ] A maintainer creates the immutable version tag from the reviewed release commit, then manually dispatches `Release artifact gate and publish` with that exact tag.
 - [ ] The protected `release` environment approval is granted only after all artifact jobs pass; this is the explicit human publication authorization.
-- [ ] Publish has one explicit trigger (`workflow_dispatch`); neither tag pushes nor pull requests publish.
+- [ ] Publish has one explicit publication trigger (`workflow_dispatch`); neither tag pushes nor pull requests publish.
 - [ ] Trusted Publishing is configured for the repository/environment in PyPI; no long-lived PyPI token is stored.
 - [ ] Download `release-manifest.json` and retain its wheel/sdist SHA-256 values with the release record.
-- [ ] Public artifacts, tag, changelog, and release metadata agree after publishing.
-- [ ] Do not call the release Stable until [Task 14](../roadmap/14_KOTLIN_PARTIAL_CRAWL_ACCEPTANCE.md)'s required live external-ingest evidence and the explicitly approved post-publish check of the exact public PyPI version are green.
+- [ ] Public artifacts, tag, changelog, release metadata, and installed `doc-atlas --version` agree after publishing.
+- [ ] Download the public wheel and sdist and verify their bytes/SHA-256 values match the gated artifacts before accepting the publication.
+- [ ] Reinstall the exact public version with pip cache disabled and rerun the installed Docs MCP stdio smoke.
+- [ ] Verify the exact public package on Linux, macOS, and Windows for the claimed primary MCP/install surface.
+
+## Technical release evidence retained from the infrastructure roadmap
+
+- [ ] Task 15 artifact-level evidence remains green for wheel/sdist/installer/MCP packaging.
+- [ ] [Task 14](../roadmap/14_KOTLIN_PARTIAL_CRAWL_ACCEPTANCE.md)'s required live external-ingest evidence remains green for the bounded external-ingest claim.
+- [ ] The explicitly approved post-publish verification of the exact public PyPI version is green.
+
+These technical gates establish artifact and bounded ingest truth. They do **not** by themselves establish autonomous agent usability or real coding-task value.
+
+## Stable promotion gate
+
+Do not call the product Stable until all of the following are true:
+
+1. P0 public truth is green: protected source, namespace/state isolation, contract consistency, exact public artifact, and cross-platform installed smoke.
+2. P1 agent truth demonstrates that a real coding model can acquire the intended evidence through the installed public MCP contract under a frozen benchmark.
+3. P2 product truth demonstrates real coding-task value or a material reduction in unsupported/wrong-version claims at acceptable total trajectory cost.
+4. Context7 parity is claimed only if a separate comparable parity protocol demonstrates it; parity is not a prerequisite for Stable unless the active product decision makes it one.
+
+Until then, public maturity remains **Beta** even when all artifact/release checks are green.
