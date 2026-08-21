@@ -138,6 +138,19 @@ def _read_owner(path: Path) -> tuple[dict[str, object] | None, str | None]:
     return payload, None
 
 
+def _signature_uses_symlink(root: Path, relative: Path) -> bool:
+    """Reject evidence reached through a symlink before trusting its identity."""
+
+    current = root
+    for part in relative.parts:
+        current = current / part
+        if current.is_symlink():
+            return True
+        if not current.exists():
+            return False
+    return False
+
+
 def inspect_state(path: str | Path) -> StateInspection:
     raw = _absolute(path)
     if raw.is_symlink():
@@ -169,6 +182,19 @@ def inspect_state(path: str | Path) -> StateInspection:
         return StateInspection(root, "ambiguous", (f"cannot inspect state root: {exc.__class__.__name__}",))
     if not entries:
         return StateInspection(root, "empty")
+
+    signature_paths = tuple(Path(name) for name in _FOREIGN_TOP_LEVEL) + _LEGACY_STRONG_PATHS
+    symlinked = sorted(
+        relative.as_posix()
+        for relative in signature_paths
+        if _signature_uses_symlink(root, relative)
+    )
+    if symlinked:
+        return StateInspection(
+            root,
+            "ambiguous",
+            ("identity signature traverses symlink: " + ", ".join(symlinked),),
+        )
 
     foreign = sorted(name for name in _FOREIGN_TOP_LEVEL if (root / name).exists())
     legacy = sorted(path.as_posix() for path in _LEGACY_STRONG_PATHS if (root / path).exists())
