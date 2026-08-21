@@ -9,7 +9,7 @@ The advertised runtime `ToolSpec` objects for the default Docs MCP surface are t
 1. For documentation questions and coding or patch tasks, call `get_docs_context(project_path=..., question=..., mode="project")` before the first edit.
 2. Call `prepare_docs` only from `recommended_next_action`, or when the user explicitly requests documentation lifecycle work such as sync, refresh, index, or prefetch. After preparation succeeds, retry the original `get_docs_context` question unchanged.
 3. Use `docs_status` only for an explicit health, freshness, index, or background-job status request, or when `get_docs_context` returns it as `recommended_next_action`; it is not discovery.
-4. Inspect the returned status and do not edit when it is `insufficient_evidence`.
+4. If the result is `insufficient_evidence`, do not claim documentation support. Follow at most one non-automatic `rephrase_question` recovery for parser/retrieval uncertainty; if it still fails and `hard_stop=false`, continue repository investigation with local source/tests while keeping the documentary claim unproved. Stop before an edit when `hard_stop=true` or when the task explicitly requires a documentary contract that remains unproved.
 
 ## Library and dependency questions
 

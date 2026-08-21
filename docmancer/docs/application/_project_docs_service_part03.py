@@ -2,6 +2,123 @@
 from __future__ import annotations
 
 from ._project_docs_service_shared import *  # noqa: F401,F403
+from docmancer.core.models import RetrievedChunk
+
+
+_EXACT_DOCUMENT_FALLBACK_LIMIT = 12
+
+
+def _exact_document_index_chunks(
+    agent: Any,
+    *,
+    root: Path,
+    evidence_path: str,
+    requirements: Any | None,
+) -> list[RetrievedChunk]:
+    """Return bounded canonical stored sections for one resolved indexed document.
+
+    This fallback is used only after the normal retrieval lane returned no
+    candidates. It reads the active generation's already-indexed display text,
+    never reparses the working-tree file, and therefore cannot create a second
+    source of truth. Canonical evidence selection still decides support.
+    """
+
+    try:
+        rows = list(agent.store.list_sections_for_embedding())
+    except (AttributeError, OSError, RuntimeError):
+        return []
+
+    normalized_path = normalize_doc_path(evidence_path)
+    probes = tuple(dict.fromkeys(
+        probe
+        for requirement in requirements or ()
+        if getattr(requirement, "mandatory", False)
+        and (probe := requirement_probe_query(requirement))
+    ))[:8]
+    terms = tuple(dict.fromkeys(
+        token.casefold()
+        for probe in probes
+        for token in re.findall(r"[A-Za-zА-Яа-яЁё0-9_.:/=+-]{3,}", probe)
+    ))[:24]
+
+    metadata_cache: dict[str, dict[str, Any]] = {}
+    candidates: list[RetrievedChunk] = []
+    for row in rows:
+        source = str(row.get("source") or "")
+        if not source:
+            continue
+        if source not in metadata_cache:
+            try:
+                metadata_cache[source] = dict(agent.store.source_metadata(source) or {})
+            except (AttributeError, OSError, RuntimeError):
+                metadata_cache[source] = {}
+        source_metadata = metadata_cache[source]
+        row_path = normalize_doc_path(
+            source_metadata.get("project_doc_path") or row.get("source_path")
+        )
+        if row_path != normalized_path:
+            continue
+        indexed_project_path = str(
+            source_metadata.get("project_path") or row.get("project_path") or ""
+        )
+        if indexed_project_path != str(root):
+            continue
+        source_class = str(
+            source_metadata.get("source_class") or row.get("source_class") or ""
+        )
+        if source_class != "project_file":
+            continue
+        display_text = str(row.get("display_text") or row.get("text") or "").strip()
+        if not display_text:
+            continue
+
+        searchable = " ".join((
+            str(row.get("title") or ""),
+            str(row.get("anchor") or ""),
+            str(row.get("text") or ""),
+            display_text,
+        )).casefold()
+        hit_count = sum(term in searchable for term in terms)
+        metadata = {**source_metadata}
+        metadata.update({
+            "project_doc_path": row_path,
+            "source_path": row_path,
+            "source_class": source_class,
+            "project_path": indexed_project_path,
+            "project_identity": (
+                source_metadata.get("project_identity")
+                or row.get("project_identity")
+            ),
+            "doc_scope": source_metadata.get("doc_scope") or row.get("doc_scope") or "project",
+            "module_id": source_metadata.get("module_id") or row.get("module_id"),
+            "project_doc_authority": (
+                source_metadata.get("project_doc_authority")
+                or row.get("authority")
+            ),
+            "project_doc_lifecycle_status": (
+                source_metadata.get("project_doc_lifecycle_status")
+                or row.get("lifecycle_status")
+                or "active"
+            ),
+            "title": row.get("title"),
+            "anchor": row.get("anchor"),
+            "token_estimate": int(row.get("token_estimate") or 0),
+            "stable_chunk_id": row.get("stable_chunk_id"),
+            "parent_logical_id": row.get("parent_logical_id"),
+        })
+        start, end = row.get("char_start"), row.get("char_end")
+        if isinstance(start, int) and isinstance(end, int) and 0 <= start < end:
+            metadata["char_span"] = [start, end]
+        candidates.append(RetrievedChunk(
+            source=source,
+            chunk_index=int(row.get("chunk_index") or 0),
+            text=display_text,
+            score=float(1000 + hit_count),
+            metadata=metadata,
+        ))
+
+    candidates.sort(key=lambda item: (-item.score, item.chunk_index, item.source))
+    return candidates[:_EXACT_DOCUMENT_FALLBACK_LIMIT]
 
 
 class _ProjectDocsServicePart03:
@@ -415,10 +532,23 @@ class _ProjectDocsServicePart03:
             requirements=requirements,
         )
         current_by_path = {
-            item.get("path"): item
+            normalize_doc_path(item.get("path")): item
             for item in indexed_sources
             if item.get("path")
         }
+        exact_document_fallback_used = False
+        if (
+            evidence_path
+            and not chunks
+            and current_by_path.get(normalize_doc_path(evidence_path))
+        ):
+            chunks = _exact_document_index_chunks(
+                self._agent_instance(),
+                root=root,
+                evidence_path=evidence_path,
+                requirements=requirements,
+            )
+            exact_document_fallback_used = bool(chunks)
         safe_chunks = []
         dropped_placeholder_chunks = 0
         answer_lifecycle_intent = str(
@@ -426,18 +556,31 @@ class _ProjectDocsServicePart03:
         )
         for chunk in chunks:
             metadata_for_chunk = chunk.metadata or {}
-            chunk_path = metadata_for_chunk.get("project_doc_path") or metadata_for_chunk.get("source_path")
-            current_source = current_by_path.get(chunk_path)
+            chunk_path = (
+                metadata_for_chunk.get("project_doc_path")
+                or metadata_for_chunk.get("source_path")
+            )
+            normalized_chunk_path = normalize_doc_path(chunk_path)
+            current_source = current_by_path.get(normalized_chunk_path)
             if not current_source:
                 continue
             if metadata_for_chunk.get("project_doc_content_hash") != current_source.get("content_hash"):
                 continue
             if not lifecycle_allows(metadata_for_chunk, answer_lifecycle_intent):
                 continue
-            if self._looks_like_placeholder_search_result(chunk_path, chunk.text):
+            canonical_path = str(current_source.get("path") or chunk_path or "")
+            if self._looks_like_placeholder_search_result(canonical_path, chunk.text):
                 dropped_placeholder_chunks += 1
                 continue
-            safe_chunks.append(chunk)
+            # Retrieval/index internals may normalize path case. Once the chunk
+            # is rebound to the exact current catalog entry, restore that
+            # canonical identity before projection and evidence-path checks.
+            canonical_metadata = {
+                **metadata_for_chunk,
+                "project_doc_path": canonical_path,
+                "source_path": canonical_path,
+            }
+            safe_chunks.append(chunk.model_copy(update={"metadata": canonical_metadata}))
         chunks = safe_chunks
         seen_sources: set[str] = set()
         result_indexed_sources = []
@@ -462,7 +605,11 @@ class _ProjectDocsServicePart03:
                 "lifecycle_status": (chunk.metadata or {}).get("project_doc_lifecycle_status"),
                 "impact_policy": (chunk.metadata or {}).get("project_doc_impact_policy"),
             })
-        stale_paths = {item.get("path") for item in stale_sources}
+        stale_paths = {
+            normalize_doc_path(item.get("path"))
+            for item in stale_sources
+            if item.get("path")
+        }
         results = [
             ProjectDocsChunk(
                 title=(chunk.metadata or {}).get("title"),
@@ -482,7 +629,10 @@ class _ProjectDocsServicePart03:
                 heading_path=(chunk.metadata or {}).get("anchor") or (chunk.metadata or {}).get("title"),
                 content_hash=(chunk.metadata or {}).get("project_doc_content_hash"),
                 mtime_ns=(chunk.metadata or {}).get("project_doc_mtime_ns"),
-                stale=((chunk.metadata or {}).get("project_doc_path") in stale_paths),
+                stale=(
+                    normalize_doc_path((chunk.metadata or {}).get("project_doc_path"))
+                    in stale_paths
+                ),
                 doc_scope=(chunk.metadata or {}).get("doc_scope") or "project",
                 module_id=(chunk.metadata or {}).get("module_id"),
                 module_name=(chunk.metadata or {}).get("module_name"),
@@ -503,6 +653,8 @@ class _ProjectDocsServicePart03:
         preflight_diagnostics: dict[str, Any] = {}
         if dropped_placeholder_chunks:
             preflight_diagnostics["dropped_placeholder_project_docs"] = dropped_placeholder_chunks
+        if exact_document_fallback_used:
+            preflight_diagnostics["exact_document_index_fallback"] = True
         if preflight_inspect:
             next_action = preflight_inspect.next_action
             requires_confirmation = True
@@ -529,6 +681,7 @@ class _ProjectDocsServicePart03:
             return ProjectDocsResult(
                 project_path=str(root),
                 query=query,
+                resolved_evidence_path=evidence_path,
                 status=status,
                 reason_code=reason_code,
                 next_action=next_action,
@@ -553,7 +706,13 @@ class _ProjectDocsServicePart03:
                 status="stale" if stale_sources else "confirmation_required",
                 reason="project_docs_stale" if stale_sources else "project_docs_preflight_confirmation_required",
             )
-        reason_code = "project_docs_stale" if stale_sources else "no_project_docs_results"
+        reason_code = (
+            "project_docs_stale"
+            if stale_sources
+            else "resolved_document_no_witness"
+            if evidence_path
+            else "no_project_docs_results"
+        )
         if stale_sources:
             next_action, requires_confirmation, confirmation_reason, arguments_patch, _, _ = self._project_docs_structured_next_action(
                 reason_code="project_docs_stale",
@@ -575,7 +734,13 @@ class _ProjectDocsServicePart03:
             requires_confirmation=requires_confirmation,
             confirmation_reason=confirmation_reason,
             arguments_patch=arguments_patch,
-            reason="project_docs_stale" if stale_sources else "no_project_docs_results",
+            reason=(
+                "project_docs_stale"
+                if stale_sources
+                else "resolved_document_no_witness"
+                if evidence_path
+                else "no_project_docs_results"
+            ),
             answer_available=False,
             warnings=metadata.warnings,
             candidate_sources=candidate_sources,
@@ -593,5 +758,9 @@ class _ProjectDocsServicePart03:
                 ),
                 "reason": "Project docs are stale; sync and retry." if stale_sources else "Project docs are indexed, but no indexed project docs matched this query. Inspect candidates or refine the query.",
             }],
-            message="Indexed project docs exist, but no results matched this query." + (" Some indexed docs are stale." if stale_sources else ""),
+            message=(
+                f"Indexed document {evidence_path!r} was resolved, but no bounded witness matched the requested requirements."
+                if evidence_path and not stale_sources
+                else "Indexed project docs exist, but no results matched this query."
+            ) + (" Some indexed docs are stale." if stale_sources else ""),
         )

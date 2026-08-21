@@ -128,6 +128,12 @@ PUBLIC_GET_DOCS_CONTEXT_OUTPUT_SCHEMA: dict[str, Any] = {
         "estimated_tokens": {"type": "integer"},
         "reason_code": {"type": "string"},
         "operational_reason_code": {"type": "string"},
+        "documentation_supported": {"type": "boolean"},
+        "investigation_allowed": {"type": "boolean"},
+        "hard_stop": {"type": "boolean"},
+        "recovery_origin": {"type": "string"},
+        "recovery_reason_code": {"type": "string"},
+        "recovery_disposition": {"type": "string"},
         "module_candidates": {
             "type": "array",
             "maxItems": 8,

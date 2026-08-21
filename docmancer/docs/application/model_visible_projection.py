@@ -456,8 +456,8 @@ def bound_insufficient_projection(payload: dict[str, Any], *, max_tokens: int) -
     action = payload.get("recommended_next_action")
     if isinstance(action, dict):
         for key in (
-            "type", "reason", "confirmation_reason", "agent_question", "observations",
-            "security_scope", "decision_options",
+            "observations", "decision_options", "agent_question", "security_scope",
+            "reason", "confirmation_reason",
         ):
             action.pop(key, None)
             _refresh_estimate(payload)
@@ -483,8 +483,29 @@ def bound_insufficient_projection(payload: dict[str, Any], *, max_tokens: int) -
     _refresh_estimate(payload)
     if estimate_projection_tokens(payload) <= limit:
         return
-    # The terminal fallback contains no unbounded caller data.
+    # The terminal fallback contains no unbounded caller data. Recovery
+    # keeps only fixed enums/booleans and one complete server-generated retry.
     kind = payload.get("kind")
+    recovery_summary = {
+        key: deepcopy(payload[key])
+        for key in (
+            "documentation_supported", "investigation_allowed", "hard_stop",
+            "recovery_origin", "recovery_reason_code", "recovery_disposition",
+        )
+        if key in payload
+    }
+    minimal_recovery = None
+    action = payload.get("recommended_next_action")
+    if isinstance(action, dict) and action.get("type") == "rephrase_question":
+        args = action.get("arguments_patch") if isinstance(action.get("arguments_patch"), dict) else {}
+        question = str(args.get("question") or "")[:320]
+        if question:
+            minimal_recovery = {
+                "tool": "get_docs_context",
+                "type": "rephrase_question",
+                "arguments_patch": {"question": question},
+                "auto_execute": False,
+            }
     support = {
         key: payload[key]
         for key in _INSUFFICIENT_SUPPORT_KEYS
@@ -501,6 +522,9 @@ def bound_insufficient_projection(payload: dict[str, Any], *, max_tokens: int) -
         "estimated_tokens": 0,
     })
     payload.update(support)
+    payload.update(recovery_summary)
+    if minimal_recovery is not None:
+        payload["recommended_next_action"] = minimal_recovery
     payload["answer_supported"] = False
     payload["answer_available"] = False
     payload["support_status"] = "insufficient_evidence"

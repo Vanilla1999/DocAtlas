@@ -135,6 +135,14 @@ def _suggested_questions(
             candidates.append(hint)
     if not candidates:
         candidates = _problem_spans(question, requirements)
+    if evidence_path:
+        normalized_locator = evidence_path.replace("\\", "/").casefold()
+        locator_leaf = normalized_locator.rsplit("/", 1)[-1]
+        candidates = [
+            value for value in candidates
+            if _clean_fragment(value, max_chars=240).replace("\\", "/").casefold()
+            not in {normalized_locator, locator_leaf}
+        ]
 
     result: list[str] = []
     for fragment in candidates:

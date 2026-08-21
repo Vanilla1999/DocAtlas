@@ -184,10 +184,14 @@ def project_context_pack(*, question: str = "", project_docs: ProjectDocsResult 
                 "stable_chunk_id": item.stable_chunk_id,
                 "parent_logical_id": item.parent_logical_id,
                 "display_content_hash": item.display_content_hash,
-                "char_start": item.char_start,
-                "char_end": item.char_end,
-                "line_start": item.line_start,
-                "line_end": item.line_end,
+                **({
+                    "char_start": item.char_start,
+                    "char_end": item.char_end,
+                } if item.char_start is not None and item.char_end is not None else {}),
+                **({
+                    "line_start": item.line_start,
+                    "line_end": item.line_end,
+                } if item.line_start is not None and item.line_end is not None else {}),
                 "source_class": "project_doc",
                 "source_type": source_taxonomy["source_type"],
                 "source_kind": source_taxonomy["source_kind"],

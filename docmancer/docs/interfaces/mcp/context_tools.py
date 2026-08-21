@@ -8,6 +8,7 @@ from typing import Any
 
 from docmancer.docs.application.action_packet import build_action_packet, validate_action_packet
 from docmancer.docs.application.evidence_selection import AggregateMixedSelectionDecision, SelectionDecision
+from docmancer.docs.application.recovery import build_recovery_diagnosis, recovery_action
 from docmancer.docs.application.model_visible_projection import (
     DOCS_ANSWER_MAX_TOKENS,
     INSUFFICIENT_EVIDENCE_MAX_TOKENS,
@@ -457,6 +458,13 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
     raw = normalize_public_docs_actions(raw)
     raw.update(_bounded_project_operational_diagnostics(raw))
     raw = _replace_network_retries_with_prepare_actions(raw, args)
+    raw = _attach_recovery_diagnosis(
+        raw,
+        question=question,
+        request=args,
+        canonical_selection=canonical_selection,
+        operational_reason_code=operational_reason_code,
+    )
     if args.get("delivery_strategy") == "bounded_direct":
         output_budget = _bounded_int_arg(
             args, "packet_tokens", default=1_500, min_value=256, max_value=2_000
@@ -475,6 +483,7 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
             raw.setdefault("retrieval_diagnostics", {})["evidence_selection"] = selection_trace
             if projection.get("status") == "insufficient_evidence":
                 projection.update(_bounded_project_operational_diagnostics(raw))
+                projection.update(_recovery_summary(raw))
             if projection.get("status") == "insufficient_evidence" and recovery:
                 support_projection = {
                     key: projection[key]
@@ -493,13 +502,16 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
                     max_tokens=min(INSUFFICIENT_EVIDENCE_MAX_TOKENS, output_budget),
                 )
                 projection.update(support_projection)
-                _annotate_source_search_handoff(projection, recovery)
+                projection.update(_recovery_summary(raw))
+                _annotate_recovery_handoff(projection, recovery)
                 _prioritize_module_recovery_projection(projection)
                 _bound_module_recovery_projection(
                     projection, max_tokens=output_budget,
                 )
                 bound_insufficient_projection(projection, max_tokens=output_budget)
             if projection.get("status") == "insufficient_evidence":
+                projection.update(_recovery_summary(raw))
+                _annotate_recovery_handoff(projection, recovery)
                 _prioritize_module_recovery_projection(projection)
                 _bound_module_recovery_projection(
                     projection, max_tokens=output_budget,
@@ -602,11 +614,14 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
                 recommended_next_action=recovery,
                 max_tokens=min(INSUFFICIENT_EVIDENCE_MAX_TOKENS, output_budget),
             )
-            _annotate_source_search_handoff(projection, recovery)
+            projection.update(_recovery_summary(raw))
+            _annotate_recovery_handoff(projection, recovery)
         # Recovery/source-search metadata is appended after projection.  Bound
         # the *final* object unconditionally so no post-format mutation can
         # reintroduce an oversized insufficient response.
         if projection.get("status") == "insufficient_evidence":
+            projection.update(_recovery_summary(raw))
+            _annotate_recovery_handoff(projection, recovery)
             _bound_module_recovery_projection(
                 projection, max_tokens=output_budget,
             )
@@ -643,6 +658,100 @@ def _omit_nullable_reason_code(payload: dict[str, Any]) -> None:
         payload.pop("reason_code", None)
 
 
+_RECOVERY_SUMMARY_KEYS = (
+    "documentation_supported", "investigation_allowed", "hard_stop",
+    "recovery_origin", "recovery_reason_code", "recovery_disposition",
+)
+
+
+def _attach_recovery_diagnosis(
+    payload: dict[str, Any],
+    *,
+    question: str,
+    request: dict[str, Any],
+    canonical_selection: SelectionDecision | AggregateMixedSelectionDecision | None,
+    operational_reason_code: Any = None,
+) -> dict[str, Any]:
+    if canonical_selection is None:
+        return payload
+    support = getattr(canonical_selection, "support_decision", None)
+    if support is not None and bool(getattr(support, "answer_supported", False)):
+        return payload
+    diagnosis = build_recovery_diagnosis(
+        question,
+        canonical_selection,
+        operational_reason_code=(
+            payload.get("operational_reason_code")
+            or operational_reason_code
+            or payload.get("reason_code")
+        ),
+    )
+    if not diagnosis:
+        return payload
+    updated = dict(payload)
+    updated.update({
+        "documentation_supported": bool(diagnosis.get("documentation_supported")),
+        "investigation_allowed": bool(diagnosis.get("investigation_allowed", True)),
+        "hard_stop": bool(diagnosis.get("hard_stop")),
+        "recovery_origin": str(diagnosis.get("origin") or "selection"),
+        "recovery_reason_code": str(diagnosis.get("reason_code") or "support_not_provable"),
+        "recovery_disposition": str(diagnosis.get("disposition") or "search_local_source"),
+    })
+    action = recovery_action(
+        diagnosis,
+        project_path=_clean_string(request.get("project_path")),
+        scope=_clean_string(request.get("scope")),
+        mode=_clean_string(request.get("mode")),
+    )
+    if action:
+        existing = [
+            item for item in updated.get("next_actions") or []
+            if isinstance(item, dict) and item != action
+        ]
+        updated["next_action"] = action
+        updated["next_actions"] = [action, *existing]
+    return updated
+
+
+def _recovery_summary(payload: dict[str, Any]) -> dict[str, Any]:
+    return {
+        key: deepcopy(payload[key])
+        for key in _RECOVERY_SUMMARY_KEYS
+        if key in payload
+    }
+
+
+def _annotate_recovery_handoff(
+    projection: dict[str, Any], recovery: dict[str, Any] | None
+) -> None:
+    hard_stop = bool(projection.get("hard_stop"))
+    if hard_stop:
+        projection.update({
+            "disposition": "resolve_authoritative_conflict",
+            "edit_ready": False,
+            "source_search_status": "blocked",
+        })
+        _refresh_projection_estimate(projection)
+        return
+    if not isinstance(recovery, dict):
+        return
+    if recovery.get("type") == "rephrase_question":
+        projection.update({
+            "disposition": "rephrase_question",
+            "edit_ready": False,
+            "source_search_status": "not_required",
+            "requires_confirmation": False,
+        })
+    elif recovery.get("tool") == "code_search":
+        projection.update({
+            "disposition": "search_local_source",
+            "edit_ready": False,
+            "source_search_status": "required",
+            "requires_confirmation": False,
+        })
+    _refresh_projection_estimate(projection)
+
+
 def _bounded_recovery_action(payload: dict[str, Any]) -> dict[str, Any] | None:
     candidates = [payload.get("next_action"), *(payload.get("next_actions") or [])]
     completeness = (
@@ -656,6 +765,8 @@ def _bounded_recovery_action(payload: dict[str, Any]) -> dict[str, Any] | None:
             key=lambda action: 0
             if isinstance(action, dict) and action.get("tool") == "docs_status" else 1
         )
+    elif payload.get("recovery_disposition") == "rephrase_question":
+        candidates.sort(key=lambda action: 0 if isinstance(action, dict) and action.get("type") == "rephrase_question" else 1)
     elif source_search_required:
         candidates.sort(key=lambda action: 0 if isinstance(action, dict) and action.get("tool") == "code_search" else 1)
     for action in candidates:
@@ -663,7 +774,12 @@ def _bounded_recovery_action(payload: dict[str, Any]) -> dict[str, Any] | None:
             continue
         action_type = str(action.get("type") or "")
         tool = action.get("tool")
-        if tool not in {"prepare_docs", "code_search", "docs_status"} and action_type != "ask_user_for_library_docs_source":
+        rephrase = tool == "get_docs_context" and action_type == "rephrase_question"
+        if (
+            tool not in {"prepare_docs", "code_search", "docs_status"}
+            and action_type != "ask_user_for_library_docs_source"
+            and not rephrase
+        ):
             continue
         if tool == "prepare_docs" and source_search_required and not payload.get("requires_confirmation"):
             arguments = action.get("arguments_patch") if isinstance(action.get("arguments_patch"), dict) else {}
@@ -692,20 +808,6 @@ def _bounded_recovery_action(payload: dict[str, Any]) -> dict[str, Any] | None:
         bounded["auto_execute"] = False
         return bounded
     return None
-
-
-def _annotate_source_search_handoff(
-    projection: dict[str, Any], recovery: dict[str, Any]
-) -> None:
-    if recovery.get("tool") != "code_search":
-        return
-    projection.update({
-        "disposition": "search_local_source",
-        "edit_ready": False,
-        "source_search_status": "required",
-        "requires_confirmation": False,
-    })
-    _refresh_projection_estimate(projection)
 
 
 def _bounded_action_mapping(value: dict[str, Any], *, depth: int = 0) -> dict[str, Any]:
