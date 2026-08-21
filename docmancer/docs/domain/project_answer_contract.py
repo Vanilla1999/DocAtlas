@@ -30,17 +30,18 @@ from .technical_terms import extract_technical_terms as _extract_technical_terms
 
 _GENERIC_PROJECT_TERM_LIMIT = 12
 _GENERIC_PROJECT_INTENT_RE = _re.compile(
-    r"\b(?:how|what|which|when|where|why|should|must|does|do|is|are|"
+    r"\b(?:how|what|which|when|where|should|must|does|do|is|are|"
     r"behav(?:e|es|ior)|handle(?:d|s)?|configure(?:d|s)?|persist(?:s|ed)?|"
     r"select(?:s|ed)?|preserv(?:e|es|ed)|accept(?:s|ed)?|return(?:s|ed)?|"
     r"report(?:s|ed)?|apply|applies|work(?:s|ed)?)\b",
     _re.I,
 )
+_CAUSAL_WHY_RE = _re.compile(r"^\s*(?:why|почему)\b", _re.I)
 _TAIL_STOP_TOKENS = frozenset({
     "about", "after", "also", "and", "are", "before", "does", "for", "from",
     "have", "how", "into", "is", "must", "of", "or", "project", "question",
     "should", "that", "the", "this", "what", "when", "where", "which", "while",
-    "with", "как", "какие", "когда", "про", "проект", "что", "чтобы",
+    "why", "with", "как", "какие", "когда", "почему", "про", "проект", "что", "чтобы",
 })
 
 
@@ -86,10 +87,11 @@ def _generic_project_terms(
     domain-local technical identities plus the legacy parser's own bounded
     retrieval hints. It deliberately samples both the beginning and end of the
     question so a late unrelated request cannot disappear behind a front-only
-    term cap.
+    term cap. Causal ``why`` questions remain fail-closed because a bag of
+    exact facts is not a sufficient proof contract for causality.
     """
 
-    if not _GENERIC_PROJECT_INTENT_RE.search(question):
+    if _CAUSAL_WHY_RE.search(question) or not _GENERIC_PROJECT_INTENT_RE.search(question):
         return ()
 
     technical = tuple(term.raw for term in _extract_technical_terms(question))
