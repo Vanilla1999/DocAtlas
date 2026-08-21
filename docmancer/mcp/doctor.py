@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import hashlib
-import json
 import shutil
 from dataclasses import dataclass
 
@@ -72,14 +71,14 @@ def run() -> list[CheckResult]:
                 f"resolved via {res.source}" if res.value else f"missing; checked: {', '.join(res.checked)}",
             ))
 
-    # Agent config presence
+    # Agent config presence. Let the registration layer parse each target's
+    # actual format (JSON, OpenCode JSON, or Codex TOML) instead of assuming JSON.
     for agent in agent_config.known_agents():
         if not agent.config_path.exists():
             results.append(CheckResult(f"agent {agent.name}", True, "no config file (skipped)"))
             continue
         try:
-            payload = json.loads(agent.config_path.read_text())
-            ok = agent_config.has_current_server_entry(payload, agent)
+            ok = agent_config.target_has_current_server_entry(agent)
             results.append(CheckResult(
                 f"agent {agent.name}",
                 ok,
