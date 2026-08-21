@@ -267,7 +267,7 @@ class DocmancerConfig(BaseModel):
                     if legacy_path.suffix.lower() in {".db", ".sqlite", ".sqlite3"}:
                         data["index"] = {"db_path": local_path}
                     else:
-                        data["index"] = {"db_path": "docmancer.db"}
+                        data["index"] = {"db_path": str(legacy_path.parent / "docmancer.db")}
                 if not vector_store:
                     data.pop("vector_store", None)
 
