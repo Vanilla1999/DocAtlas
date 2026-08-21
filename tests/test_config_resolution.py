@@ -145,6 +145,23 @@ def test_explicit_config_must_be_a_file(tmp_path):
     with pytest.raises(StateOwnershipError, match="refusing to write unowned state root"):
         ensure_owned_home(foreign)
 
+    # A legacy-looking marker reached through a symlink is not ownership proof.
+    external = tmp_path / "external"
+    external.mkdir()
+    (external / "manifest.json").write_text("{}", encoding="utf-8")
+    symlinked = tmp_path / "symlinked"
+    symlinked.mkdir()
+    try:
+        (symlinked / "mcp").symlink_to(external, target_is_directory=True)
+    except OSError:
+        pass
+    else:
+        inspection = inspect_state(symlinked)
+        assert inspection.classification == "ambiguous"
+        assert "symlink" in " ".join(inspection.reasons)
+        with pytest.raises(StateOwnershipError, match="refusing to write unowned state root"):
+            ensure_owned_home(symlinked, allow_legacy_claim=True)
+
     legacy = tmp_path / "bounded"
     (legacy / "mcp").mkdir(parents=True)
     (legacy / "mcp" / "manifest.json").write_text("{}", encoding="utf-8")
