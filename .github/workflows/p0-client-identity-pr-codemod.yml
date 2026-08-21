@@ -1,0 +1,31 @@
+name: P0 client identity PR codemod
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  codemod:
+    if: github.event.pull_request.head.ref == 'p0/docatlas-config-skill-identity'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          ref: p0/docatlas-config-skill-identity
+          fetch-depth: 1
+      - run: python scripts/p0_client_identity_codemod.py
+      - run: git diff --check
+      - name: Commit deterministic codemod
+        run: |
+          if git diff --quiet; then
+            echo 'codemod produced no diff'
+            exit 1
+          fi
+          git config user.name 'DocAtlas P0 automation'
+          git config user.email 'actions@users.noreply.github.com'
+          git add docmancer/cli/_commands_part01.py docmancer/cli/_commands_part02.py docmancer/cli/_commands_part05.py
+          git commit -m 'Apply DocAtlas config and skill identity'
+          git push origin HEAD:p0/docatlas-config-skill-identity
