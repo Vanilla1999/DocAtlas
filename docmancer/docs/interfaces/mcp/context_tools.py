@@ -157,20 +157,18 @@ def _bound_module_recovery_projection(
     if payload["estimated_tokens"] <= limit:
         return
 
-    # Never truncate an exact locator. Prefer the shortest complete candidate
-    # when the full ambiguity set cannot fit the model-visible budget.
-    candidates.sort(key=lambda row: (len(str(row["module_path"])), str(row["module_path"])))
-    payload["module_candidates"] = [candidates[0]]
-    _refresh_projection_estimate(payload)
-    if payload["estimated_tokens"] <= limit:
-        return
-
+    # Module ambiguity is itself the recovery contract: preserve every complete
+    # candidate path and compact surrounding diagnostics before sacrificing the
+    # ambiguity set. A caller cannot choose safely from a truncated candidate list.
     for key in (
         "operational_status", "context_available", "disposition", "edit_ready",
         "source_search_status", "requires_confirmation", "decision_hash", "reason_code",
+        "documentation_supported", "investigation_allowed", "hard_stop",
+        "recovery_origin", "recovery_reason_code", "recovery_disposition",
     ):
         payload.pop(key, None)
     payload["missing"] = [_MODULE_RECOVERY_MISSING]
+    payload["module_candidates"] = candidates
     _refresh_projection_estimate(payload)
     if payload["estimated_tokens"] <= limit:
         return
@@ -192,14 +190,14 @@ def _bound_module_recovery_projection(
         "answer_available": False,
         "support_status": "insufficient_evidence",
         "operational_reason_code": reason,
-        "module_candidates": [candidates[0]],
+        "module_candidates": candidates,
         "estimated_tokens": 0,
     })
     if minimal_action:
         payload["recommended_next_action"] = minimal_action
     _refresh_projection_estimate(payload)
     if payload["estimated_tokens"] > limit:
-        raise ValueError("minimum module-recovery projection exceeds the requested budget")
+        raise ValueError("complete module-recovery projection exceeds the requested budget")
 
 
 def context_tools(tools: list[dict[str, Any]]) -> list[dict[str, Any]]:
