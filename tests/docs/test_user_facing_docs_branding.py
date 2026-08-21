@@ -129,11 +129,19 @@ def test_readme_keeps_mcp_packs_out_of_hero_path():
 
 def test_product_brief_positions_docs_mcp_before_advanced_patch_constraints():
     text = (ROOT / "docs" / "DOCMANCER_PRODUCT_BRIEF.md").read_text(encoding="utf-8")
+    lowered = text.lower()
     assert "local-first documentation context" in text
     assert "get_docs_context" in text
     assert "Patch constraints" in text
     assert "advanced compatibility" in text
     assert "Project Patch Contract Runtime" not in text
+    assert "local, version-bound documentation authority and evidence delivery layer for coding agents" in lowered
+    assert "source-code search" in lowered
+    assert "code graph" in lowered
+    assert "recorded model-backed Agent Developer result is 0/11" in text
+    assert "historical Task 23 product decision is formally `INCONCLUSIVE`" in text
+    assert "Context7 parity is **not demonstrated**" in text
+    assert "out-of-scope public claims" in text
 
 
 def test_active_docs_are_not_silently_ignored_by_gitignore():
@@ -164,10 +172,30 @@ def test_active_docs_stay_within_the_documentation_size_budget():
 def test_maturity_docs_name_the_remaining_stable_release_gates():
     brief = (ROOT / "docs" / "DOCMANCER_PRODUCT_BRIEF.md").read_text(encoding="utf-8")
     checklist = (ROOT / "docs" / "RELEASE_CHECKLIST.md").read_text(encoding="utf-8")
+    release_identity = (ROOT / "docs" / "release-identity.md").read_text(encoding="utf-8")
+    roadmap = (ROOT / "roadmap" / "README.md").read_text(encoding="utf-8")
+    history = (ROOT / "roadmap" / "history" / "README.md").read_text(encoding="utf-8")
+    historical_commit = "d565d8e75af2cbc56bc00fdc9df19dd1ae66863a"
+
     assert "Task 15" in brief
     assert "Task 14" in brief
     assert "post-publish" in brief
     assert "Task 14" in checklist
+    assert "# P0 — PUBLIC TRUTH" in roadmap
+    assert roadmap.index("# P0 — PUBLIC TRUTH") < roadmap.index("# P1 — AGENT TRUTH") < roadmap.index("# P2 — PRODUCT TRUTH")
+    assert "Agent Developer 0/11 first-divergence atlas" in roadmap
+    assert "Agent Contract v2 ablation" in roadmap
+    assert "Real-repository coding benchmark" in roadmap
+    assert historical_commit in roadmap
+    assert historical_commit in history
+    assert f"git show {historical_commit}:roadmap/README.md" in history
+    assert "unpublished repository milestone" in release_identity.lower()
+    assert "doc-atlas 1.3.0" in release_identity
+    assert "does not change `docmancer/_version.py`" in release_identity
+    assert "does not create or move a tag" in release_identity
+    assert "P0 public truth" in checklist
+    assert "P1 agent truth" in checklist
+    assert "P2 product truth" in checklist
 
 
 def test_mcp_reference_remains_the_only_canonical_detailed_workflow():
