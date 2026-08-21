@@ -1,0 +1,83 @@
+name: PR116 migrate-home surface updater
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'docmancer/cli/**'
+      - 'docmancer/support_surfaces.json'
+      - 'tests/test_config_resolution.py'
+      - '.github/workflows/pr116-migrate-home-surface.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  update-surface:
+    if: github.event.pull_request.head.ref == 'p0/docatlas-migrate-home-cli'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          ref: p0/docatlas-migrate-home-cli
+          fetch-depth: 0
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.12'
+      - name: Add exact support surface
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          path = Path('docmancer/support_surfaces.json')
+          data = json.loads(path.read_text(encoding='utf-8'))
+          surfaces = data.get('surfaces')
+          if not isinstance(surfaces, list):
+              raise SystemExit('support surfaces must be a list')
+          ids = [item.get('id') for item in surfaces if isinstance(item, dict)]
+          if 'cli:migrate-home' in ids:
+              raise SystemExit('cli:migrate-home already exists; refusing duplicate update')
+          try:
+              index = ids.index('cli:mcp')
+          except ValueError as exc:
+              raise SystemExit('cli:mcp anchor missing') from exc
+          record = {
+              'id': 'cli:migrate-home',
+              'kind': 'cli',
+              'tier': 'core',
+              'owner': 'DocAtlas maintainers',
+              'docs': 'docs/support-surface-policy.md',
+              'test_tier': 'core-offline',
+              'network_dependencies': [],
+              'compatibility': 'stable within the current major release',
+              'removal_rule': 'breaking release with migration notes',
+              'failure_budget': 'blocks release and local Docs health',
+          }
+          surfaces.insert(index, record)
+          path.write_text(json.dumps(data, indent=2, ensure_ascii=False) + '\n', encoding='utf-8')
+          reread = json.loads(path.read_text(encoding='utf-8'))
+          matches = [item for item in reread['surfaces'] if item.get('id') == 'cli:migrate-home']
+          if matches != [record]:
+              raise SystemExit('support surface verification failed')
+          PY
+
+          python -m pip install -e '.[dev]'
+          python -m compileall -q docmancer
+          python -m pytest -q \
+            tests/test_config_resolution.py \
+            tests/test_support_surface_policy.py \
+            tests/docs/test_documented_cli_contract.py
+
+      - name: Commit product-only result
+        shell: bash
+        run: |
+          git rm .github/workflows/pr116-migrate-home-surface.yml
+          git diff --check
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add docmancer/support_surfaces.json
+          git commit -m 'Classify migrate-home as a core CLI surface'
+          git push origin HEAD:p0/docatlas-migrate-home-cli
