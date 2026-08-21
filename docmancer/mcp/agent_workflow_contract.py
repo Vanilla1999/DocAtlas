@@ -1,3 +1,4 @@
+"""Runtime-derived identity for the default three-tool Docs MCP agent workflow."""
 from __future__ import annotations
 
 import hashlib
