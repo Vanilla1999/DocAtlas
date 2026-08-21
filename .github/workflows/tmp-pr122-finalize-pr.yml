@@ -27,21 +27,29 @@ jobs:
           python - <<'PY'
           import subprocess
           from pathlib import Path
-          import yaml
 
-          payload = yaml.safe_load(Path('.github/workflows/tmp-pr122-finalize.yml').read_text(encoding='utf-8'))
-          steps = payload['jobs']['finalize']['steps']
-          wanted = {
-              'Apply reviewed integration fixes',
-              'Focused validation',
-              'Commit semantic fixes',
-          }
-          selected = [step for step in steps if isinstance(step, dict) and step.get('name') in wanted]
-          if {step.get('name') for step in selected} != wanted:
-              raise SystemExit('TEMP source workflow does not contain the expected finalizer steps')
-          for name in ('Apply reviewed integration fixes', 'Focused validation', 'Commit semantic fixes'):
-              command = next(step['run'] for step in selected if step['name'] == name)
+          text = Path('.github/workflows/tmp-pr122-finalize.yml').read_text(encoding='utf-8')
+
+          def block(name: str, next_name: str | None) -> str:
+              step = f'      - name: {name}\n'
+              start = text.index(step) + len(step)
+              run_marker = '        run: |\n'
+              start = text.index(run_marker, start) + len(run_marker)
+              end = text.index(f'      - name: {next_name}\n', start) if next_name else len(text)
+              lines = text[start:end].splitlines()
+              normalized = [line[10:] if line.startswith('          ') else line for line in lines]
+              return '\n'.join(normalized).rstrip() + '\n'
+
+          sequence = (
+              ('Apply reviewed integration fixes', 'Focused validation'),
+              ('Focused validation', 'Commit semantic fixes'),
+              ('Commit semantic fixes', None),
+          )
+          for name, next_name in sequence:
               print(f'::group::{name}')
-              subprocess.run(['bash', '-euo', 'pipefail', '-c', command], check=True)
+              subprocess.run(
+                  ['bash', '-euo', 'pipefail', '-c', block(name, next_name)],
+                  check=True,
+              )
               print('::endgroup::')
           PY
