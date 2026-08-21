@@ -38,14 +38,8 @@ def main() -> None:
             "type": "prepare_docs",
             "tool": "prepare_docs",
             "arguments_patch": patch,
-            **(
-                {"requires_confirmation": True}
-                if payload.get("requires_confirmation") else {}
-            ),
-            **(
-                {"confirmation_reason": payload["confirmation_reason"]}
-                if payload.get("confirmation_reason") else {}
-            ),
+            **({"requires_confirmation": True} if payload.get("requires_confirmation") else {}),
+            **({"confirmation_reason": payload["confirmation_reason"]} if payload.get("confirmation_reason") else {}),
         }
 ''',
     )
@@ -69,16 +63,9 @@ def main() -> None:
 ''',
         '''    action = payload.get("recommended_next_action")
     original_action = deepcopy(action) if isinstance(action, dict) else None
-    protected_confirmation = bool(
-        isinstance(action, dict)
-        and action.get("requires_confirmation")
-        and action.get("confirmation_reason")
-    )
+    protected_confirmation = bool(isinstance(action, dict) and action.get("requires_confirmation") and action.get("confirmation_reason"))
     if isinstance(action, dict):
-        for key in (
-            "observations", "decision_options", "agent_question", "security_scope",
-            "reason",
-        ):
+        for key in ("observations", "decision_options", "agent_question", "security_scope", "reason"):
             action.pop(key, None)
             _refresh_estimate(payload)
             if estimate_projection_tokens(payload) <= limit:
@@ -104,11 +91,7 @@ def main() -> None:
         return None
     if value.get("requires_confirmation") and value.get("confirmation_reason"):
         tool = value.get("tool")
-        arguments = (
-            value.get("arguments_patch")
-            if isinstance(value.get("arguments_patch"), dict)
-            else {}
-        )
+        arguments = value.get("arguments_patch") if isinstance(value.get("arguments_patch"), dict) else {}
         if tool in {"prepare_docs", "docs_status"} and arguments:
             return {
                 "tool": tool,
@@ -120,11 +103,7 @@ def main() -> None:
             }
     if value.get("type") != "rephrase_question":
         return None
-    arguments = (
-        value.get("arguments_patch")
-        if isinstance(value.get("arguments_patch"), dict)
-        else {}
-    )
+    arguments = value.get("arguments_patch") if isinstance(value.get("arguments_patch"), dict) else {}
     question = str(arguments.get("question") or "")[:320]
     if not question:
         return None
