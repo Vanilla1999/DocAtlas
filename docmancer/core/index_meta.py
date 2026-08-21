@@ -79,12 +79,11 @@ def _load_raw() -> dict:
 
 def _save_raw(data: dict) -> None:
     resolution = resolve_home()
-    ensure_owned_home(
+    owned_home = ensure_owned_home(
         resolution.path,
         allow_legacy_claim=resolution.compatibility_legacy,
     )
-    path = _meta_path()
-    path.parent.mkdir(parents=True, exist_ok=True)
+    path = owned_home / "index-meta.json"
     tmp = path.with_suffix(".json.tmp")
     with open(tmp, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2, sort_keys=False)
