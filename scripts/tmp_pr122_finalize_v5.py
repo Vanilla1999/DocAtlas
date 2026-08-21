@@ -44,6 +44,23 @@ def main() -> None:
 ''',
     )
 
+    # Canonical requirement identifiers are the most actionable missing evidence.
+    # Put the human summary last so ordinary bounded list compaction cannot erase
+    # the machine-readable blocker while preserving only generic prose.
+    base.replace_once(
+        "docmancer/docs/application/model_visible_projection.py",
+        '''        missing = [str(retrieval.get("message") or "No complete source-backed documentation answer is available.")]
+        missing.extend(decision.missing_requirements)
+        missing.extend(decision.unresolved_conflicts)
+        missing.extend(retrieval_issues)
+''',
+        '''        missing = list(decision.missing_requirements)
+        missing.extend(decision.unresolved_conflicts)
+        missing.extend(retrieval_issues)
+        missing.append(str(retrieval.get("message") or "No complete source-backed documentation answer is available."))
+''',
+    )
+
     # Keep the large projector orchestration-only: budget-sensitive recovery
     # compaction lives in the bounded helper module extracted by base.apply().
     base.replace_once(
