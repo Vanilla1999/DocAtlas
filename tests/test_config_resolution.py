@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 import pytest
+from click.testing import CliRunner
 from filelock import FileLock
 
+from docmancer.cli.__main__ import cli
 from docmancer.core.config_resolution import resolve_config
 from docmancer.core.product_identity import (
     PRODUCT_ID,
@@ -108,8 +111,8 @@ def test_config_identity_includes_retrieval_settings_not_only_db_path(tmp_path):
     assert resolve_config(explicit_path=first).identity != resolve_config(explicit_path=second).identity
 
     # A strongly identified legacy DocAtlas home can be copied into the new
-    # namespace without deleting or rewriting the source. Config paths are
-    # rebound and repeated application is idempotent across fresh plans.
+    # namespace without deleting or rewriting the source. The public CLI is
+    # preview-first and requires the exact reviewed digest before applying.
     source = tmp_path / ".docmancer"
     target = tmp_path / ".docatlas"
     (source / "mcp").mkdir(parents=True)
@@ -128,8 +131,50 @@ def test_config_identity_includes_retrieval_settings_not_only_db_path(tmp_path):
         "docmancer.db",
         "mcp/manifest.json",
     }
-    applied = apply_home_migration(plan)
-    assert applied.status == "applied"
+
+    runner = CliRunner()
+    args = [
+        "migrate-home",
+        "--source",
+        str(source),
+        "--target",
+        str(target),
+    ]
+    preview = runner.invoke(cli, [*args, "--format", "json"])
+    assert preview.exit_code == 0, preview.output
+    preview_payload = json.loads(preview.output)
+    assert preview_payload["status"] == "preview"
+    assert preview_payload["plan_digest"] == plan.plan_digest
+    assert not target.exists()
+
+    missing_digest = runner.invoke(cli, [*args, "--apply"])
+    assert missing_digest.exit_code == 2
+    assert "--plan-digest is required" in missing_digest.output
+    assert not target.exists()
+
+    wrong_digest = runner.invoke(
+        cli,
+        [*args, "--apply", "--plan-digest", "0" * 64],
+    )
+    assert wrong_digest.exit_code == 1
+    assert "digest no longer matches" in wrong_digest.output
+    assert not target.exists()
+
+    applied_cli = runner.invoke(
+        cli,
+        [
+            *args,
+            "--apply",
+            "--plan-digest",
+            plan.plan_digest,
+            "--format",
+            "json",
+        ],
+    )
+    assert applied_cli.exit_code == 0, applied_cli.output
+    applied_payload = json.loads(applied_cli.output)
+    assert applied_payload["status"] == "applied"
+    assert applied_payload["source_preserved"] is True
     assert source.exists()
     assert (source / "docmancer.yaml").exists()
     assert not (target / "docmancer.yaml").exists()
@@ -137,6 +182,40 @@ def test_config_identity_includes_retrieval_settings_not_only_db_path(tmp_path):
     owner = inspect_state(target)
     assert owner.classification == "owned_docatlas"
     assert owner.owner and owner.owner["product_id"] == PRODUCT_ID
+
+    # Default migration source may deliberately inspect the legacy env, while
+    # target resolution is strictly DocAtlas-owned and never inherits it.
+    env_target = tmp_path / "env-docatlas"
+    env_preview = runner.invoke(
+        cli,
+        ["migrate-home", "--format", "json"],
+        env={
+            "DOCMANCER_HOME": str(source),
+            "DOCATLAS_HOME": str(env_target),
+        },
+    )
+    assert env_preview.exit_code == 0, env_preview.output
+    env_payload = json.loads(env_preview.output)
+    assert Path(env_payload["source"]) == source.resolve()
+    assert Path(env_payload["target"]) == env_target.resolve()
+    assert not env_target.exists()
+
+    fake_home = tmp_path / "fresh-home"
+    default_target_preview = runner.invoke(
+        cli,
+        ["migrate-home", "--format", "json"],
+        env={
+            "HOME": str(fake_home),
+            "USERPROFILE": str(fake_home),
+            "DOCMANCER_HOME": str(source),
+            "DOCATLAS_HOME": "",
+        },
+    )
+    assert default_target_preview.exit_code == 0, default_target_preview.output
+    default_payload = json.loads(default_target_preview.output)
+    assert Path(default_payload["source"]) == source.resolve()
+    assert Path(default_payload["target"]) == (fake_home / ".docatlas").resolve()
+    assert not (fake_home / ".docatlas").exists()
 
     repeat_plan = plan_home_migration(source, target)
     assert repeat_plan.can_apply is True
@@ -150,12 +229,30 @@ def test_config_identity_includes_retrieval_settings_not_only_db_path(tmp_path):
     with migration_lock:
         with pytest.raises(HomeMigrationError, match="already in progress"):
             apply_home_migration(repeat_plan)
-    assert apply_home_migration(repeat_plan).status == "already_applied"
+
+    repeated_cli = runner.invoke(
+        cli,
+        [
+            *args,
+            "--apply",
+            "--plan-digest",
+            plan.plan_digest,
+            "--format",
+            "json",
+        ],
+    )
+    assert repeated_cli.exit_code == 0, repeated_cli.output
+    assert json.loads(repeated_cli.output)["status"] == "already_applied"
 
     (target / "docmancer.db").write_bytes(b"tampered")
     tampered_plan = plan_home_migration(source, target)
     assert tampered_plan.can_apply is False
     assert tampered_plan.reason == "target_not_matching_migration"
+    blocked_cli = runner.invoke(cli, [*args, "--format", "json"])
+    assert blocked_cli.exit_code == 1
+    blocked_payload = json.loads(blocked_cli.output)
+    assert blocked_payload["status"] == "blocked"
+    assert blocked_payload["reason"] == "target_not_matching_migration"
 
 
 def test_explicit_config_must_be_a_file(tmp_path):
