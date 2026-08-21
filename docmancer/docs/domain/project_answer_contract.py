@@ -53,6 +53,8 @@ _GENERIC_PROJECT_STOP_TOKENS = frozenset({
     "на", "не", "о", "по", "после", "почему", "при", "про", "проект", "с", "что",
     "чтобы",
 })
+_GENERIC_COMPOUND_SEPARATOR_RE = _re.compile(r"[_.:/+-]")
+_GENERIC_ANCHOR_PART_RE = _re.compile(r"[A-Za-zА-Яа-яЁё0-9]+")
 
 
 def _clean_term(value: object) -> str:
@@ -64,9 +66,32 @@ def _project_anchor(value: object) -> str:
     return "" if term.casefold() in _GENERIC_PROJECT_STOP_TOKENS else term
 
 
+def _compound_anchor_parts(value: str) -> frozenset[str]:
+    if not _GENERIC_COMPOUND_SEPARATOR_RE.search(value):
+        return frozenset()
+    return frozenset(
+        part.casefold()
+        for part in _GENERIC_ANCHOR_PART_RE.findall(value)
+        if part
+    )
+
+
+def _bare_anchor_is_redundant(term: str, rows: list[str]) -> bool:
+    """Prefer `trip.take`/`gold/gem` over duplicate bare `trip`/`gold` anchors."""
+
+    if _GENERIC_COMPOUND_SEPARATOR_RE.search(term):
+        return False
+    normalized = term.casefold()
+    return any(normalized in _compound_anchor_parts(row) for row in rows)
+
+
 def _append_unique(rows: list[str], value: object) -> None:
     term = _project_anchor(value)
-    if not term or any(term.casefold() == row.casefold() for row in rows):
+    if (
+        not term
+        or any(term.casefold() == row.casefold() for row in rows)
+        or _bare_anchor_is_redundant(term, rows)
+    ):
         return
     if len(rows) < _GENERIC_PROJECT_TERM_LIMIT:
         rows.append(term)
@@ -84,7 +109,7 @@ def _tail_guard_terms(question: str) -> tuple[str, ...]:
         normalized = token.casefold()
         if normalized in _GENERIC_PROJECT_STOP_TOKENS:
             continue
-        if len(normalized) < 3 and not _re.search(r"[_.:/+-]", token):
+        if len(normalized) < 3 and not _GENERIC_COMPOUND_SEPARATOR_RE.search(token):
             continue
         tail.append(token)
         if len(tail) >= 4:
@@ -101,7 +126,9 @@ def _generic_project_terms(
     Existing QuestionPlan/legacy obligations always win. This path uses only
     domain-local technical identities plus the legacy parser's own bounded
     retrieval hints. Query scaffolding and action verbs can identify intent but
-    never become mandatory proof facts. The term set samples both the beginning
+    never become mandatory proof facts. More precise compound/code anchors are
+    kept ahead of redundant bare components so the bounded proof surface spends
+    capacity on independent semantics. The term set samples both the beginning
     and end of the question so a late unrelated request cannot disappear behind
     a front-only cap. Causal ``why`` questions remain fail-closed because a bag
     of exact facts is not a sufficient proof contract for causality.
