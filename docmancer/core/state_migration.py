@@ -196,6 +196,10 @@ def plan_home_migration(
     max_files: int = DEFAULT_MAX_FILES,
     max_bytes: int = DEFAULT_MAX_BYTES,
 ) -> HomeMigrationPlan:
+    if not 1 <= max_files <= DEFAULT_MAX_FILES:
+        raise HomeMigrationError(f"max_files must be between 1 and {DEFAULT_MAX_FILES}")
+    if not 1 <= max_bytes <= DEFAULT_MAX_BYTES:
+        raise HomeMigrationError(f"max_bytes must be between 1 and {DEFAULT_MAX_BYTES}")
     raw_source = Path(source).expanduser()
     raw_target = Path(target).expanduser()
     if raw_source.is_symlink() or raw_target.is_symlink():
@@ -243,7 +247,7 @@ def plan_home_migration(
 
 def _migration_record(target: Path) -> dict[str, Any] | None:
     path = target / MIGRATION_RECORD_FILENAME
-    if not path.is_file():
+    if path.is_symlink() or not path.is_file():
         return None
     try:
         payload = json.loads(path.read_text(encoding="utf-8"))
@@ -259,6 +263,21 @@ def _verify_target_file(path: Path, expected_sha256: str) -> None:
         raise HomeMigrationError(f"staged migration hash mismatch: {path}")
 
 
+def _current_source_fingerprint(source: Path, target: Path) -> str:
+    entries, _ = _enumerate_entries(
+        source,
+        target,
+        max_files=DEFAULT_MAX_FILES,
+        max_bytes=DEFAULT_MAX_BYTES,
+    )
+    return _source_fingerprint(entries)
+
+
+def _assert_source_unchanged(plan: HomeMigrationPlan) -> None:
+    if _current_source_fingerprint(Path(plan.source), Path(plan.target)) != plan.source_fingerprint:
+        raise HomeMigrationError("legacy source changed after the reviewed migration plan")
+
+
 def _already_applied(plan: HomeMigrationPlan) -> bool:
     source = Path(plan.source)
     target = Path(plan.target)
@@ -272,11 +291,7 @@ def _already_applied(plan: HomeMigrationPlan) -> bool:
         and record.get("plan_digest") == plan.plan_digest
     ):
         return False
-    current_entries, _ = _enumerate_entries(
-        source, target, max_files=DEFAULT_MAX_FILES, max_bytes=DEFAULT_MAX_BYTES
-    )
-    if _source_fingerprint(current_entries) != plan.source_fingerprint:
-        raise HomeMigrationError("legacy source changed after migration; refusing to report idempotent success")
+    _assert_source_unchanged(plan)
     for entry in plan.entries:
         _verify_target_file(target / entry.target_relative, entry.target_sha256)
     return True
@@ -322,6 +337,11 @@ def apply_home_migration(plan: HomeMigrationPlan) -> HomeMigrationResult:
                 pass
             _verify_target_file(destination, entry.target_sha256)
 
+        # Re-read the complete source after the copy. This closes the common
+        # TOCTOU case where an earlier SQLite/WAL file changes after it was
+        # copied but before the candidate state is published.
+        _assert_source_unchanged(plan)
+
         (staging / STATE_OWNER_FILENAME).write_text(
             json.dumps(ownership_payload(), indent=2, sort_keys=True) + "\n",
             encoding="utf-8",
@@ -344,6 +364,8 @@ def apply_home_migration(plan: HomeMigrationPlan) -> HomeMigrationResult:
         if inspect_state(staging).classification != "owned_docatlas":
             raise HomeMigrationError("staged migration ownership verification failed")
 
+        # Check once more immediately before the atomic directory publish.
+        _assert_source_unchanged(plan)
         if target.exists():
             target_state = inspect_state(target)
             if target_state.classification != "empty":
