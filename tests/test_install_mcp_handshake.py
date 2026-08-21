@@ -1,4 +1,4 @@
-"""Section 13: agent install also registers the docmancer MCP entry."""
+"""Section 13: agent install also registers the DocAtlas MCP entry."""
 from __future__ import annotations
 
 import json
@@ -29,8 +29,9 @@ def test_install_claude_code_registers_mcp_entry():
         cfg = fake_home / ".claude" / "settings.json"
         assert cfg.exists()
         payload = json.loads(cfg.read_text())
-        assert payload["mcpServers"]["docmancer"]["command"] == "doc-atlas"
-        assert payload["mcpServers"]["docmancer"]["args"] == ["mcp", "docs-serve"]
+        assert payload["mcpServers"]["docatlas"]["command"] == "doc-atlas"
+        assert payload["mcpServers"]["docatlas"]["args"] == ["mcp", "docs-serve"]
+        assert "docmancer" not in payload["mcpServers"]
 
 
 def test_install_cursor_registers_mcp_entry():
@@ -41,11 +42,11 @@ def test_install_cursor_registers_mcp_entry():
         cfg = fake_home / ".cursor" / "mcp.json"
         assert cfg.exists()
         payload = json.loads(cfg.read_text())
-        assert "docmancer" in payload["mcpServers"]
+        assert "docatlas" in payload["mcpServers"]
 
 
 def test_install_unknown_to_mcp_agent_does_not_break_install():
-    """github-copilot is not in agent_config.known_agents; install should still succeed."""
+    """OpenCode registration remains best-effort from the install surface."""
     runner = CliRunner()
     with runner.isolated_filesystem() as tmp_dir:
         fake_home, result = _run_install(tmp_dir, "opencode")
@@ -63,4 +64,4 @@ def test_project_install_cline_and_gemini_register_docs_mcp():
                 result = runner.invoke(cli, ["install", agent, "--project"])
             assert result.exit_code == 0, result.output
             payload = json.loads(Path(path).read_text())
-            assert "docmancer" in payload["mcpServers"]
+            assert "docatlas" in payload["mcpServers"]

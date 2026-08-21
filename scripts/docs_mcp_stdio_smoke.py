@@ -84,7 +84,9 @@ async def smoke() -> None:
                 assert compatibility_answer.get("output_mode") == "compact", compatibility_answer
         config_path = home / "opencode.json"
         register_server(AgentTarget("opencode", config_path, "json_opencode_mcp"))
-        entry = json.loads(config_path.read_text())["mcp"]["docmancer"]
+        registrations = json.loads(config_path.read_text())["mcp"]
+        assert "docmancer" not in registrations, registrations
+        entry = registrations["docatlas"]
         assert entry["environment"]["DOCATLAS_MCP_TEXT_FALLBACK"] == "1", entry
         command = entry["command"]
         opencode_params = StdioServerParameters(

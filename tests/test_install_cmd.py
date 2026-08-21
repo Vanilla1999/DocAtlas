@@ -294,9 +294,10 @@ def test_claude_project_uninstall_preserves_global_mcp_registration():
         assert project_install.exit_code == 0, project_install.output
         assert uninstall.exit_code == 0, uninstall.output
         global_config = json.loads((fake_home / ".claude/settings.json").read_text())
-        assert "docmancer" in global_config["mcpServers"]
+        assert "docatlas" in global_config["mcpServers"]
+        assert "docmancer" not in global_config["mcpServers"]
         project_config = json.loads(Path(".mcp.json").read_text())
-        assert "docmancer" not in project_config["mcpServers"]
+        assert "docatlas" not in project_config["mcpServers"]
 
 
 def test_global_uninstall_preserves_unmanaged_skill_text():
@@ -327,7 +328,7 @@ def test_project_uninstall_removes_codex_mcp_registration():
         assert install.exit_code == 0, install.output
         assert uninstall.exit_code == 0, uninstall.output
         config = Path(".codex/config.toml").read_text(encoding="utf-8")
-        assert "[mcp_servers.docmancer]" not in config
+        assert "[mcp_servers.docatlas]" not in config
         assert "Removed DocAtlas MCP registration." in uninstall.output
 
 
@@ -495,7 +496,8 @@ def test_project_install_registers_docs_mcp_without_global_skill(agent: str, con
             payload = tomllib.loads(config.read_text(encoding="utf-8"))
         else:
             payload = json.loads(config.read_text(encoding="utf-8"))
-        assert "docmancer" in payload[container_key]
+        assert "docatlas" in payload[container_key]
+        assert "docmancer" not in payload[container_key]
         if agent == "codex":
             assert not (fake_home / ".codex" / "skills" / "docmancer" / "SKILL.md").exists()
         if agent == "opencode":

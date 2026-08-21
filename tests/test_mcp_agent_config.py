@@ -13,8 +13,9 @@ def test_register_writes_entry(tmp_path):
     changed, _ = agent_config.register_server(target)
     assert changed is True
     payload = json.loads(cfg.read_text())
-    assert payload["mcpServers"]["docmancer"]["command"] == "doc-atlas"
-    assert payload["mcpServers"]["docmancer"]["args"] == ["mcp", "docs-serve"]
+    assert payload["mcpServers"]["docatlas"]["command"] == "doc-atlas"
+    assert payload["mcpServers"]["docatlas"]["args"] == ["mcp", "docs-serve"]
+    assert "docmancer" not in payload["mcpServers"]
 
 
 def test_register_is_idempotent(tmp_path):
@@ -27,23 +28,12 @@ def test_register_is_idempotent(tmp_path):
 
 def test_register_preserves_other_servers(tmp_path):
     cfg = tmp_path / "settings.json"
-    cfg.write_text(json.dumps({"mcpServers": {"other": {"command": "x"}}}))
-    target = agent_config.AgentTarget("test", cfg, "json_mcpServers")
-    agent_config.register_server(target)
-    payload = json.loads(cfg.read_text())
-    assert payload["mcpServers"]["other"] == {"command": "x"}
-    assert "docmancer" in payload["mcpServers"]
-
-
-def test_register_preserves_existing_env(tmp_path):
-    cfg = tmp_path / "settings.json"
+    desired = {"command": "doc-atlas", "args": ["mcp", "docs-serve"]}
     cfg.write_text(json.dumps({
         "mcpServers": {
-            "docmancer": {
-                "command": "docmancer",
-                "args": ["mcp", "serve"],
-                "env": {"DOCMANCER_HOME": "/custom/home"},
-            }
+            "other": {"command": "x"},
+            "docatlas": desired,
+            "docmancer": desired,
         }
     }))
     target = agent_config.AgentTarget("test", cfg, "json_mcpServers")
@@ -52,16 +42,42 @@ def test_register_preserves_existing_env(tmp_path):
 
     assert changed is True
     payload = json.loads(cfg.read_text())
-    assert payload["mcpServers"]["docmancer"] == {
+    assert payload["mcpServers"]["other"] == {"command": "x"}
+    assert payload["mcpServers"]["docatlas"] == desired
+    assert "docmancer" not in payload["mcpServers"]
+
+
+def test_register_preserves_existing_env(tmp_path):
+    cfg = tmp_path / "settings.json"
+    legacy = {
+        "command": "docmancer",
+        "args": ["mcp", "serve"],
+        "env": {"DOCMANCER_HOME": "/custom/home"},
+    }
+    cfg.write_text(json.dumps({"mcpServers": {"docmancer": legacy}}))
+    target = agent_config.AgentTarget("test", cfg, "json_mcpServers")
+
+    changed, _ = agent_config.register_server(target)
+
+    assert changed is True
+    payload = json.loads(cfg.read_text())
+    # The old spelling is ambiguous with upstream Docmancer, so registration
+    # must never rewrite or delete it automatically.
+    assert payload["mcpServers"]["docmancer"] == legacy
+    assert payload["mcpServers"]["docatlas"] == {
         "command": "doc-atlas",
         "args": ["mcp", "docs-serve"],
-        "env": {"DOCMANCER_HOME": "/custom/home"},
     }
 
 
 def test_register_refuses_to_overwrite_unrelated_docmancer_entry(tmp_path):
     cfg = tmp_path / "settings.json"
-    original = {"mcpServers": {"docmancer": {"command": "custom-docs", "args": ["serve"]}}}
+    original = {
+        "mcpServers": {
+            "docmancer": {"command": "custom-upstream", "args": ["serve"]},
+            "docatlas": {"command": "custom-docatlas", "args": ["serve"]},
+        }
+    }
     cfg.write_text(json.dumps(original))
     target = agent_config.AgentTarget("test", cfg, "json_mcpServers")
 
@@ -84,7 +100,7 @@ def test_unregister_removes(tmp_path):
     agent_config.register_server(target)
     assert agent_config.unregister_server(target) is True
     payload = json.loads(cfg.read_text())
-    assert "docmancer" not in payload["mcpServers"]
+    assert "docatlas" not in payload["mcpServers"]
 
 
 def test_unregister_preserves_a_user_modified_docmancer_entry(tmp_path):
@@ -111,12 +127,12 @@ def test_unregister_preserves_codex_entry_with_user_nested_tables(tmp_path):
     agent_config.register_server(target)
     cfg.write_text(
         cfg.read_text()
-        + '\n[mcp_servers.docmancer.env]\nTOKEN = "secret"\n\n[other]\nvalue = 1\n'
+        + '\n[mcp_servers.docatlas.env]\nTOKEN = "secret"\n\n[other]\nvalue = 1\n'
     )
 
     assert agent_config.unregister_server(target) is False
     payload = tomllib.loads(cfg.read_text())
-    assert payload["mcp_servers"]["docmancer"]["env"]["TOKEN"] == "secret"
+    assert payload["mcp_servers"]["docatlas"]["env"]["TOKEN"] == "secret"
     assert payload["other"]["value"] == 1
 
 
@@ -125,22 +141,34 @@ def test_unregister_preserves_json_entry_with_user_fields(tmp_path):
     target = agent_config.AgentTarget("test", cfg, "json_mcpServers")
     agent_config.register_server(target)
     payload = json.loads(cfg.read_text())
-    payload["mcpServers"]["docmancer"]["env"] = {"TOKEN": "secret"}
+    payload["mcpServers"]["docatlas"]["env"] = {"TOKEN": "secret"}
     cfg.write_text(json.dumps(payload))
 
     assert agent_config.unregister_server(target) is False
-    assert json.loads(cfg.read_text())["mcpServers"]["docmancer"]["env"] == {"TOKEN": "secret"}
+    assert json.loads(cfg.read_text())["mcpServers"]["docatlas"]["env"] == {"TOKEN": "secret"}
 
 
 def test_register_writes_codex_toml_entry(tmp_path):
     cfg = tmp_path / "config.toml"
+    cfg.write_text(
+        '[mcp_servers.docmancer]\n'
+        'command = "doc-atlas"\n'
+        'args = ["mcp", "docs-serve"]\n\n'
+        '[mcp_servers.docmancer.env]\n'
+        'TOKEN = "secret"\n'
+    )
     target = agent_config.AgentTarget("codex", cfg, "toml_mcp_servers")
 
     changed, _ = agent_config.register_server(target)
 
     assert changed is True
     payload = tomllib.loads(cfg.read_text())
-    assert payload["mcp_servers"]["docmancer"] == {"command": "doc-atlas", "args": ["mcp", "docs-serve"]}
+    assert "docmancer" not in payload["mcp_servers"]
+    assert payload["mcp_servers"]["docatlas"] == {
+        "command": "doc-atlas",
+        "args": ["mcp", "docs-serve"],
+        "env": {"TOKEN": "secret"},
+    }
 
 
 def test_register_writes_opencode_and_vscode_project_entries(tmp_path):
@@ -150,14 +178,16 @@ def test_register_writes_opencode_and_vscode_project_entries(tmp_path):
     agent_config.register_server(opencode)
     agent_config.register_server(vscode)
 
-    assert json.loads(opencode.config_path.read_text())["mcp"]["docmancer"] == {
+    assert json.loads(opencode.config_path.read_text())["mcp"]["docatlas"] == {
         "type": "local",
         "command": ["doc-atlas", "mcp", "docs-serve"],
         "enabled": True,
         "environment": {"DOCATLAS_MCP_TEXT_FALLBACK": "1"},
     }
-    assert json.loads(vscode.config_path.read_text())["servers"]["docmancer"] == {
-        "type": "stdio", "command": "doc-atlas", "args": ["mcp", "docs-serve"],
+    assert json.loads(vscode.config_path.read_text())["servers"]["docatlas"] == {
+        "type": "stdio",
+        "command": "doc-atlas",
+        "args": ["mcp", "docs-serve"],
     }
 
 
@@ -177,7 +207,9 @@ def test_register_reenables_disabled_opencode_entry(tmp_path):
     changed, _ = agent_config.register_server(target)
 
     assert changed is True
-    assert json.loads(cfg.read_text())["mcp"]["docmancer"]["enabled"] is True
+    payload = json.loads(cfg.read_text())["mcp"]
+    assert "docmancer" not in payload
+    assert payload["docatlas"]["enabled"] is True
 
 
 def test_register_migrates_opencode_environment_without_clobbering_user_settings(tmp_path):
@@ -201,7 +233,9 @@ def test_register_migrates_opencode_environment_without_clobbering_user_settings
     changed, _ = agent_config.register_server(target)
 
     assert changed is True
-    entry = json.loads(cfg.read_text())["mcp"]["docmancer"]
+    payload = json.loads(cfg.read_text())["mcp"]
+    assert "docmancer" not in payload
+    entry = payload["docatlas"]
     assert entry["enabled"] is True
     assert entry["timeout"] == 30
     assert entry["environment"] == {
@@ -213,7 +247,14 @@ def test_register_migrates_opencode_environment_without_clobbering_user_settings
 
 def test_register_refuses_opencode_entry_with_a_different_command(tmp_path):
     cfg = tmp_path / "opencode.json"
-    original = {"mcp": {"docmancer": {"type": "local", "command": ["custom-docs", "serve"]}}}
+    original = {
+        "mcp": {
+            "docatlas": {
+                "type": "local",
+                "command": ["custom-docs", "serve"],
+            }
+        }
+    }
     cfg.write_text(json.dumps(original))
     target = agent_config.AgentTarget("opencode", cfg, "json_opencode_mcp")
 
