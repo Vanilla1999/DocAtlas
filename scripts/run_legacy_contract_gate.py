@@ -43,6 +43,22 @@ GENERIC_PROJECT_CASES = (
     "How should takeAPicture be handled when the NBO scanner returns an image?",
 )
 
+GENERIC_REQUIRED_ANCHORS = {
+    GENERIC_PROJECT_CASES[0]: {
+        "treasure", "trip", "positions", "campaign", "progress", "encounters",
+        "gold", "gem", "targets",
+    },
+    GENERIC_PROJECT_CASES[1]: {
+        "trip.take", "meet.accept", "trip.back", "checkpoint", "counters", "types",
+    },
+    GENERIC_PROJECT_CASES[2]: {"takeapicture", "nbo", "scanner", "image"},
+}
+
+GENERIC_FORBIDDEN_SCAFFOLD = {
+    "and", "an", "be", "configure", "documented", "handled", "persist", "preserving",
+    "returns", "safely", "select", "accepting",
+}
+
 SILENT_EMPTY_PROBES = (
     "xyzzy",
     "Bitcoin price",
@@ -135,6 +151,32 @@ def main() -> int:
             )
         if any(row.kind != "exact_fact" for row in contract.proof_obligations):
             errors.append(f"generic project fallback produced a non-exact-fact obligation: {question!r}")
+
+        subjects = {row.subject.casefold() for row in contract.proof_obligations}
+        missing_anchors = GENERIC_REQUIRED_ANCHORS[question] - subjects
+        if missing_anchors:
+            errors.append(
+                f"generic project fallback lost required anchors: {question!r}; "
+                f"missing={sorted(missing_anchors)!r}; subjects={sorted(subjects)!r}"
+            )
+        leaked_scaffold = subjects & GENERIC_FORBIDDEN_SCAFFOLD
+        if leaked_scaffold:
+            errors.append(
+                f"generic project fallback promoted query scaffolding to proof: {question!r}; "
+                f"leaked={sorted(leaked_scaffold)!r}"
+            )
+        for row in contract.proof_obligations:
+            if (
+                row.query_span_start is None
+                or row.query_span_end is None
+                or row.query_span_text is None
+                or row.query_span_text.casefold() != row.subject.casefold()
+            ):
+                errors.append(
+                    f"generic project obligation is not bound to its exact query span: "
+                    f"{question!r}; obligation={row!r}"
+                )
+
         if any(row.kind == "unsupported_query" for row in requirements):
             errors.append(f"generic project case still reached unsupported requirement gate: {question!r}")
         mandatory = [row for row in requirements if row.mandatory]
@@ -195,8 +237,9 @@ def main() -> int:
     print(
         "PASS: reviewed QuestionPlan migrations remain stable; partial legacy semantics fail "
         "closed; complete legacy controls remain supported; 3 novel project-specific questions "
-        "receive bounded mandatory fallback contracts; unrelated tails are represented or rejected; "
-        "silent-empty and causal-why probes remain unsupported; canonical ownership signatures stable"
+        "receive bounded mandatory anchor contracts with exact query spans; unrelated tails are "
+        "represented or rejected; silent-empty and causal-why probes remain unsupported; "
+        "canonical ownership signatures stable"
     )
     return 0
 
