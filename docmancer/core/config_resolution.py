@@ -39,6 +39,10 @@ def _legacy_config_warning(path: Path) -> None:
     )
 
 
+def _is_legacy_config_path(path: Path) -> bool:
+    return path.name == LEGACY_CONFIG_NAME
+
+
 def resolve_config(
     *,
     explicit_path: str | Path | None = None,
@@ -59,7 +63,15 @@ def resolve_config(
         path = Path(explicit_path).expanduser().resolve()
         if not path.is_file():
             raise ValueError(f"explicit config path is not a file: {path}")
-        return ResolvedConfig(DocmancerConfig.from_yaml(path), "explicit", path)
+        legacy = _is_legacy_config_path(path)
+        if legacy:
+            _legacy_config_warning(path)
+        return ResolvedConfig(
+            DocmancerConfig.from_yaml(path),
+            "explicit",
+            path,
+            legacy_compatibility=legacy,
+        )
 
     candidates: list[tuple[str, Path, bool]] = []
     if project_path is not None:
@@ -78,7 +90,8 @@ def resolve_config(
         ]
     )
     if user_config_path is not None:
-        candidates.append(("user", Path(user_config_path).expanduser().resolve(), False))
+        user_path = Path(user_config_path).expanduser().resolve()
+        candidates.append(("user", user_path, _is_legacy_config_path(user_path)))
     else:
         home_resolution = resolve_home()
         warn_if_legacy_home(home_resolution)
