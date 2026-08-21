@@ -37,11 +37,21 @@ _GENERIC_PROJECT_INTENT_RE = _re.compile(
     _re.I,
 )
 _CAUSAL_WHY_RE = _re.compile(r"^\s*(?:why|почему)\b", _re.I)
-_TAIL_STOP_TOKENS = frozenset({
-    "about", "after", "also", "and", "are", "before", "does", "for", "from",
-    "have", "how", "into", "is", "must", "of", "or", "project", "question",
-    "should", "that", "the", "this", "what", "when", "where", "which", "while",
-    "why", "with", "как", "какие", "когда", "почему", "про", "проект", "что", "чтобы",
+_GENERIC_PROJECT_STOP_TOKENS = frozenset({
+    "a", "about", "after", "also", "an", "and", "apply", "applied", "applies",
+    "applying", "are", "as", "at", "be", "before", "being", "been", "by", "can",
+    "configure", "configured", "configures", "configuring", "could", "do", "does",
+    "documented", "for", "from", "handle", "handled", "handles", "handling", "have",
+    "how", "in", "into", "is", "must", "of", "on", "or", "persist", "persisted",
+    "persisting", "persists", "preserve", "preserved", "preserves", "preserving",
+    "project", "question", "report", "reported", "reporting", "reports", "return",
+    "returned", "returning", "returns", "safely", "select", "selected", "selecting",
+    "selects", "should", "that", "the", "this", "to", "what", "when", "where",
+    "which", "while", "why", "with", "without", "work", "worked", "working", "works",
+    "accept", "accepted", "accepting", "accepts",
+    "а", "без", "в", "для", "до", "и", "из", "или", "как", "какие", "когда",
+    "на", "не", "о", "по", "после", "почему", "при", "про", "проект", "с", "что",
+    "чтобы",
 })
 
 
@@ -49,8 +59,13 @@ def _clean_term(value: object) -> str:
     return " ".join(str(value or "").split()).strip("`'\".,:;!?()[]{}")[:160]
 
 
-def _append_unique(rows: list[str], value: object) -> None:
+def _project_anchor(value: object) -> str:
     term = _clean_term(value)
+    return "" if term.casefold() in _GENERIC_PROJECT_STOP_TOKENS else term
+
+
+def _append_unique(rows: list[str], value: object) -> None:
+    term = _project_anchor(value)
     if not term or any(term.casefold() == row.casefold() for row in rows):
         return
     if len(rows) < _GENERIC_PROJECT_TERM_LIMIT:
@@ -67,9 +82,9 @@ def _tail_guard_terms(question: str) -> tuple[str, ...]:
     tail: list[str] = []
     for token in reversed(tokens):
         normalized = token.casefold()
-        if normalized in _TAIL_STOP_TOKENS:
+        if normalized in _GENERIC_PROJECT_STOP_TOKENS:
             continue
-        if len(normalized) < 4 and not _re.search(r"[_.:/+-]", token):
+        if len(normalized) < 3 and not _re.search(r"[_.:/+-]", token):
             continue
         tail.append(token)
         if len(tail) >= 4:
@@ -85,17 +100,25 @@ def _generic_project_terms(
 
     Existing QuestionPlan/legacy obligations always win. This path uses only
     domain-local technical identities plus the legacy parser's own bounded
-    retrieval hints. It deliberately samples both the beginning and end of the
-    question so a late unrelated request cannot disappear behind a front-only
-    term cap. Causal ``why`` questions remain fail-closed because a bag of
-    exact facts is not a sufficient proof contract for causality.
+    retrieval hints. Query scaffolding and action verbs can identify intent but
+    never become mandatory proof facts. The term set samples both the beginning
+    and end of the question so a late unrelated request cannot disappear behind
+    a front-only cap. Causal ``why`` questions remain fail-closed because a bag
+    of exact facts is not a sufficient proof contract for causality.
     """
 
     if _CAUSAL_WHY_RE.search(question) or not _GENERIC_PROJECT_INTENT_RE.search(question):
         return ()
 
-    technical = tuple(term.raw for term in _extract_technical_terms(question))
-    hints = tuple(_clean_term(value) for value in contract.retrieval_hints if _clean_term(value))
+    technical = tuple(
+        term.raw for term in _extract_technical_terms(question)
+        if _project_anchor(term.raw)
+    )
+    hints = tuple(
+        term
+        for value in contract.retrieval_hints
+        if (term := _project_anchor(value))
+    )
     if not technical and len(hints) < 3:
         return ()
     if len(technical) > _GENERIC_PROJECT_TERM_LIMIT:
