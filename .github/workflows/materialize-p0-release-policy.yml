@@ -1,0 +1,250 @@
+name: TEMP materialize release policy and P0.6 scorecard
+
+on:
+  push:
+    branches: [p0/release-main-ancestry-scorecard]
+
+permissions:
+  contents: write
+
+jobs:
+  materialize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          ref: p0/release-main-ancestry-scorecard
+      - name: Materialize reviewed policy change
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          def replace(path: str, old: str, new: str) -> None:
+              target = Path(path)
+              text = target.read_text(encoding="utf-8")
+              if old not in text:
+                  raise SystemExit(f"expected block not found in {path}: {old[:100]!r}")
+              target.write_text(text.replace(old, new, 1), encoding="utf-8")
+
+          replace(
+              ".github/workflows/publish.yml",
+              '''      - name: Verify dispatched release source is on protected main
+                if: github.event_name == 'workflow_dispatch'
+                env:
+                  RELEASE_REPOSITORY: ${{ github.repository }}
+                run: |
+                  git fetch --no-tags origin main:refs/remotes/origin/main
+                  if ! git merge-base --is-ancestor HEAD refs/remotes/origin/main; then
+                    echo "::error::Release tag commit is not reachable from main"
+                    exit 1
+                  fi
+                  python - <<'PY'
+                  import json
+                  import os
+                  import urllib.request
+
+                  repo = os.environ["RELEASE_REPOSITORY"]
+                  request = urllib.request.Request(
+                      f"https://api.github.com/repos/{repo}/branches/main",
+                      headers={
+                          "Accept": "application/vnd.github+json",
+                          "User-Agent": "DocAtlas-release-source-verifier/1",
+                          "X-GitHub-Api-Version": "2022-11-28",
+                      },
+                  )
+                  with urllib.request.urlopen(request, timeout=30) as response:
+                      branch = json.load(response)
+                  if branch.get("protected") is not True:
+                      raise SystemExit("release source verification failed: remote main is not protected")
+                  print("Release source ancestry/protection: PASS")
+                  PY
+''',
+              '''      - name: Verify dispatched release source is on main
+                if: github.event_name == 'workflow_dispatch'
+                run: |
+                  git fetch --no-tags origin main:refs/remotes/origin/main
+                  if ! git merge-base --is-ancestor HEAD refs/remotes/origin/main; then
+                    echo "::error::Release tag commit is not reachable from main"
+                    exit 1
+                  fi
+                  echo "Release source ancestry: PASS"
+''',
+          )
+
+          replace(
+              "roadmap/README.md",
+              '''## P0.1 — Activate the remote `main` ruleset
+
+          **Type:** repository operation, not a feature PR.
+
+          The canonical ruleset already exists in `.github/rulesets/protect-main.json` and is checked by `scripts/main_ruleset.py`. Apply it remotely and verify it with an admin-capable token.
+
+          Acceptance:
+
+          - remote `protect-main` ruleset is active;
+          - no bypass actors;
+          - deletion and non-fast-forward updates are blocked;
+          - PR/thread policy matches the committed contract;
+          - strict `required-ci` and `required-release` checks are enforced;
+          - the remote check passes after application.
+'''.replace('          ', ''),
+              '''## P0.1 — Remote `main` ruleset: accepted risk
+
+          **Status:** `accepted_risk` for the `1.3.0` P0 closure.
+
+          On 2026-08-21 the maintainer explicitly chose not to activate remote branch protection for `main`. This is recorded as an operational risk, not misreported as a green protection control.
+
+          The canonical optional hardening policy remains in `.github/rulesets/protect-main.json` and `scripts/main_ruleset.py`, so protection can be enabled later without reconstructing the contract.
+
+          Compensating release controls:
+
+          - a release tag must resolve to a commit reachable from remote `main`;
+          - PR/release CI remains the reviewed engineering evidence before merge;
+          - publication remains manual through the `release` environment;
+          - PyPI publication uses OIDC/Trusted Publishing with no long-lived PyPI token;
+          - exact public artifacts and installed behavior are verified after publication.
+
+          P0 does **not** claim that `main` is protected. The residual risk must remain visible in the P0.6 scorecard.
+'''.replace('          ', ''),
+          )
+
+          replace(
+              "roadmap/README.md",
+              '''## P0.6 — Public-truth closure scorecard
+
+          Record a short evidence table covering branch protection, artifact identity, public MCP behavior, namespace isolation, cross-platform install smoke, and unresolved product claims.
+
+          P0 exits only when all public-truth rows are green while product maturity remains honestly Beta.
+'''.replace('          ', ''),
+              '''## P0.6 — Public-truth closure scorecard
+
+          Maintain [`docs/public-truth-scorecard.md`](../docs/public-truth-scorecard.md) as the single closure record for P0.
+
+          Scorecard states are `green`, `pending`, and `accepted_risk`. Branch protection is the one explicitly accepted residual risk for `1.3.0`; it must never be rendered as green. Artifact/public-install rows remain pending until the exact PyPI release exists and post-publish verification completes.
+
+          P0 exits when every row is `green` or an explicitly documented `accepted_risk`, no row is `pending`, and product maturity remains honestly **Beta**. An accepted risk does not become evidence that the missing control exists.
+'''.replace('          ', ''),
+          )
+
+          replace(
+              "docs/release-identity.md",
+              '- no `v1.3.0` tag or public `1.3.0` artifact is evidence until the protected release flow creates and verifies them.',
+              '- no `v1.3.0` tag or public `1.3.0` artifact is evidence until the reviewed release flow creates and verifies them.',
+          )
+          replace(
+              "docs/release-identity.md",
+              '''The source version and changelog are prepared in the P0.5 release PR. Tag creation and publication remain separate post-merge repository operations and must use one protected `main` commit. The manual release workflow independently fails closed unless the tagged commit is reachable from remote `main` and GitHub reports that branch as protected; the admin-capable exact-ruleset check remains the stronger P0.1 proof.
+
+          Before `1.3.0` is published, all of the following must be true:
+
+          1. the remote `protect-main` ruleset is active and `python scripts/main_ruleset.py --check` passes with admin-capable visibility;
+          2. the release PR is merged through that protected `main` policy with strict `required-ci` and `required-release` green;
+          3. a maintainer creates immutable tag `v1.3.0` from that exact protected release commit;
+          4. `Release artifact gate and publish` is manually dispatched for exactly `v1.3.0` and authorized through the protected `release` environment;
+          5. publication uses the repository OIDC/Trusted Publishing path, not a long-lived PyPI token;
+          6. public wheel and sdist bytes match the gated SHA-256 values;
+          7. a no-cache install of exact public `doc-atlas==1.3.0` passes the three-tool Docs MCP stdio smoke on Linux, macOS, and Windows.
+'''.replace('          ', ''),
+              '''The source version and changelog are prepared in the P0.5 release PR. Tag creation and publication remain separate post-merge repository operations. For `1.3.0`, the maintainer explicitly accepts the residual risk of an unprotected `main`; [`public-truth-scorecard.md`](./public-truth-scorecard.md) records that decision. The manual release workflow still fails closed unless the tagged commit is reachable from remote `main`.
+
+          Before `1.3.0` is published, all of the following must be true:
+
+          1. the release commit is reviewed on `main` with `required-ci` and `required-release` evidence green before merge;
+          2. a maintainer creates immutable tag `v1.3.0` from a commit reachable from remote `main`;
+          3. `Release artifact gate and publish` is manually dispatched for exactly `v1.3.0` and authorized through the `release` environment;
+          4. publication uses the repository OIDC/Trusted Publishing path, not a long-lived PyPI token;
+          5. public wheel and sdist bytes match the gated SHA-256 values;
+          6. a no-cache install of exact public `doc-atlas==1.3.0` passes the three-tool Docs MCP stdio smoke on Linux, macOS, and Windows;
+          7. the P0.6 scorecard records the final public artifact/install evidence and retains branch protection as `accepted_risk`, not green.
+'''.replace('          ', ''),
+          )
+
+          replace(
+              "docs/RELEASE_CHECKLIST.md",
+              '''- [ ] The remote `protect-main` ruleset matches `.github/rulesets/protect-main.json`; `python scripts/main_ruleset.py --check` passes with admin-capable visibility.
+          - [ ] The release commit is reachable only through the protected `main` workflow; deletion/non-fast-forward and strict required checks are enforced remotely.
+'''.replace('          ', ''),
+              '''- [ ] The release tag commit is reachable from remote `main`; the release workflow verifies this ancestry before building a dispatched release.
+          - [ ] The unprotected-`main` decision is recorded as `accepted_risk` in `public-truth-scorecard.md`; release documentation must not claim that branch protection is active.
+'''.replace('          ', ''),
+          )
+          replace(
+              "docs/RELEASE_CHECKLIST.md",
+              '1. P0 public truth is green: protected source, namespace/state isolation, contract consistency, exact public artifact, and cross-platform installed smoke.',
+              '1. P0 public truth is closed: release-source provenance is explicit, the unprotected-`main` residual risk is recorded rather than hidden, namespace/state isolation and contract consistency are green, and the exact public artifact plus cross-platform installed smoke are green.',
+          )
+
+          replace(
+              "tests/test_release_gate.py",
+              '''def test_dispatched_release_source_must_be_on_protected_main() -> None:
+              text = (ROOT / ".github/workflows/publish.yml").read_text()
+              build = text[text.index("  build:"):text.index("  wheel:")]
+              assert "fetch-depth: 0" in build
+              assert "if: github.event_name == 'workflow_dispatch'" in build
+              assert "git fetch --no-tags origin main:refs/remotes/origin/main" in build
+              assert "git merge-base --is-ancestor HEAD refs/remotes/origin/main" in build
+              assert 'branch.get("protected") is not True' in build
+              assert "Release source ancestry/protection: PASS" in build
+'''.replace('              ', ''),
+              '''def test_dispatched_release_source_must_be_on_protected_main() -> None:
+              # Historical node id retained for the diagnostic inventory. The policy now
+              # requires main ancestry while branch protection is an explicit accepted risk.
+              text = (ROOT / ".github/workflows/publish.yml").read_text()
+              build = text[text.index("  build:"):text.index("  wheel:")]
+              assert "fetch-depth: 0" in build
+              assert "if: github.event_name == 'workflow_dispatch'" in build
+              assert "git fetch --no-tags origin main:refs/remotes/origin/main" in build
+              assert "git merge-base --is-ancestor HEAD refs/remotes/origin/main" in build
+              assert 'branch.get("protected")' not in build
+              assert "remote main is not protected" not in build
+              assert "Release source ancestry: PASS" in build
+'''.replace('              ', ''),
+          )
+
+          replace(
+              "tests/docs/test_user_facing_docs_branding.py",
+              '    history = (ROOT / "roadmap" / "history" / "README.md").read_text(encoding="utf-8")\n',
+              '    history = (ROOT / "roadmap" / "history" / "README.md").read_text(encoding="utf-8")\n    scorecard = (ROOT / "docs" / "public-truth-scorecard.md").read_text(encoding="utf-8")\n',
+          )
+          replace(
+              "tests/docs/test_user_facing_docs_branding.py",
+              '    assert "# P0 — PUBLIC TRUTH" in roadmap\n',
+              '    assert "# P0 — PUBLIC TRUTH" in roadmap\n    assert "P0.1 — Remote `main` ruleset: accepted risk" in roadmap\n    assert "P0 exits when every row is `green` or an explicitly documented `accepted_risk`" in roadmap\n    assert "Status: **INCOMPLETE**" in scorecard\n    assert "| Branch protection | `accepted_risk` |" in scorecard\n    assert "| Exact public artifact identity | `pending` |" in scorecard\n',
+          )
+
+          Path("docs/public-truth-scorecard.md").write_text('''# P0 public-truth closure scorecard
+
+          Status: **INCOMPLETE** — the `1.3.0` source release candidate is merged, but the exact public PyPI release and post-publish verification do not exist yet.
+
+          This document is the P0.6 closure record. It distinguishes proven public truth from an explicitly accepted operational risk. `accepted_risk` never means that the missing control exists.
+
+          | Public-truth row | State | Evidence / closure requirement |
+          |---|---|---|
+          | Release source identity | `green` | `main` reports source version `1.3.0`; the changelog has the `1.3.0` cut; pre-public release gates build one wheel and one sdist with matching metadata. |
+          | Branch protection | `accepted_risk` | Maintainer decision on 2026-08-21: do not activate remote `protect-main` for `1.3.0`. The release workflow instead requires the tag commit to be reachable from remote `main`. The canonical ruleset remains available for future hardening. |
+          | Namespace / state isolation | `green` | Fresh release smoke uses `DOCATLAS_HOME`, removes inherited `DOCMANCER_HOME`, checks `docatlas` MCP registration identity, and rejects implicit foreign `~/.docmancer` writes. |
+          | Installed agent contract | `green` | The default public Docs MCP inventory remains exactly `get_docs_context`, `prepare_docs`, `docs_status`, with runtime-derived contract identity and installed guidance alignment. |
+          | Exact public artifact identity | `pending` | After publication, record immutable `v1.3.0`, PyPI wheel/sdist filenames, gated SHA-256 values, downloaded public SHA-256 values, and the successful publish workflow run. |
+          | Exact public MCP behavior | `pending` | No-cache install of `doc-atlas==1.3.0` from public PyPI must pass the installed Docs MCP stdio smoke and exact three-tool inventory check. |
+          | Cross-platform public install | `pending` | The exact public package must pass the post-publish smoke on Linux, macOS, and Windows. Pre-public PR platform smoke is supporting evidence, not a substitute. |
+          | Product claim boundary | `green` | Public maturity remains **Beta**. Autonomous live evidence planning, real coding-task improvement, and Context7 parity remain unproven and are deferred to P1/P2 or a separate parity protocol. |
+
+          ## Closure rule
+
+          P0 is closed only when every `pending` row above is replaced by concrete `green` evidence. The `accepted_risk` branch-protection row remains visible and does not block `1.3.0` under the maintainer's explicit decision.
+
+          When publication completes, update this file with exact tag, workflow-run identities, artifact filenames/SHA-256 values, and Linux/macOS/Windows public-smoke evidence before marking the overall status **CLOSED**.
+          '''.replace('          ', ''), encoding="utf-8")
+
+          Path(".github/workflows/materialize-p0-release-policy.yml").unlink()
+          PY
+          git diff --check
+          git status --short
+      - name: Commit semantic tree
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "Align release source policy and add P0.6 scorecard"
+          git push origin HEAD:p0/release-main-ancestry-scorecard
