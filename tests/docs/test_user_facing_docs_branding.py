@@ -175,8 +175,13 @@ def test_maturity_docs_name_the_remaining_stable_release_gates():
     release_identity = (ROOT / "docs" / "release-identity.md").read_text(encoding="utf-8")
     roadmap = (ROOT / "roadmap" / "README.md").read_text(encoding="utf-8")
     history = (ROOT / "roadmap" / "history" / "README.md").read_text(encoding="utf-8")
+    changelog = (ROOT / "CHANGELOG.md").read_text(encoding="utf-8")
+    version_text = (ROOT / "docmancer" / "_version.py").read_text(encoding="utf-8")
+    source_version = re.search(r'__version__\s*=\s*["\']([^"\']+)', version_text)
     historical_commit = "d565d8e75af2cbc56bc00fdc9df19dd1ae66863a"
 
+    assert source_version is not None
+    assert source_version.group(1) == "1.3.0"
     assert "Task 15" in brief
     assert "Task 14" in brief
     assert "post-publish" in brief
@@ -189,10 +194,11 @@ def test_maturity_docs_name_the_remaining_stable_release_gates():
     assert historical_commit in roadmap
     assert historical_commit in history
     assert f"git show {historical_commit}:roadmap/README.md" in history
-    assert "unpublished repository milestone" in release_identity.lower()
-    assert "doc-atlas 1.3.0" in release_identity
-    assert "does not change `docmancer/_version.py`" in release_identity
-    assert "does not create or move a tag" in release_identity
+    assert "unpublished historical milestone" in release_identity.lower()
+    assert f"doc-atlas {source_version.group(1)}" in release_identity
+    assert "release candidate in source" in release_identity
+    assert "no `v1.3.0` tag or public `1.3.0` artifact is evidence" in release_identity
+    assert f"## [{source_version.group(1)}] - 2026-08-21" in changelog
     assert "P0 public truth" in checklist
     assert "P1 agent truth" in checklist
     assert "P2 product truth" in checklist

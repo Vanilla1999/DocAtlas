@@ -46,9 +46,21 @@ async def smoke() -> None:
         project = root / "project"
         project.mkdir()
         (project / "README.md").write_text(f"# Release contract\n\n{NEEDLE}\n")
-        home = root / "home"
-        home.mkdir()
-        env = {**os.environ, "HOME": str(home), "DOCMANCER_HOME": str(home), "NO_PROXY": "*"}
+        user_home = root / "user-home"
+        user_home.mkdir()
+        docatlas_home = root / "docatlas-home"
+        docatlas_home.mkdir()
+        env = {
+            **os.environ,
+            "HOME": str(user_home),
+            "USERPROFILE": str(user_home),
+            "DOCATLAS_HOME": str(docatlas_home),
+            "NO_PROXY": "*",
+        }
+        # A release smoke proves the primary DocAtlas identity. Do not inherit
+        # a legacy override from the runner and accidentally exercise 1.x
+        # compatibility state instead.
+        env.pop("DOCMANCER_HOME", None)
         params = StdioServerParameters(command="doc-atlas", args=["mcp", "docs-serve"], env=env, cwd=str(root))
         async with stdio_client(params) as streams:
             async with ClientSession(*streams) as session:
@@ -82,7 +94,7 @@ async def smoke() -> None:
                     await session.call_tool("get_docs_context", compatibility_query)
                 )
                 assert compatibility_answer.get("output_mode") == "compact", compatibility_answer
-        config_path = home / "opencode.json"
+        config_path = user_home / "opencode.json"
         register_server(AgentTarget("opencode", config_path, "json_opencode_mcp"))
         registrations = json.loads(config_path.read_text())["mcp"]
         assert "docmancer" not in registrations, registrations
@@ -111,6 +123,9 @@ async def smoke() -> None:
                 rendered = json.dumps(text_answer, sort_keys=True)
                 assert "README.md" in rendered, text_answer
                 assert NEEDLE in rendered, text_answer
+        assert not (user_home / ".docmancer").exists(), (
+            "installed release smoke wrote implicit foreign ~/.docmancer state"
+        )
     print("Docs MCP installed-artifact stdio smoke: PASS")
 
 

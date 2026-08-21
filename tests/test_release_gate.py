@@ -38,6 +38,17 @@ def test_publish_workflow_is_manual_build_once_and_oidc() -> None:
             assert len(ref) == 40 and all(c in "0123456789abcdef" for c in ref)
 
 
+def test_dispatched_release_source_must_be_on_protected_main() -> None:
+    text = (ROOT / ".github/workflows/publish.yml").read_text()
+    build = text[text.index("  build:"):text.index("  wheel:")]
+    assert "fetch-depth: 0" in build
+    assert "if: github.event_name == 'workflow_dispatch'" in build
+    assert "git fetch --no-tags origin main:refs/remotes/origin/main" in build
+    assert "git merge-base --is-ancestor HEAD refs/remotes/origin/main" in build
+    assert 'branch.get("protected") is not True' in build
+    assert "Release source ancestry/protection: PASS" in build
+
+
 def test_installer_smoke_passes_an_existing_wheel_path() -> None:
     text = (ROOT / ".github/workflows/publish.yml").read_text()
     assert 'DOCATLAS_INSTALL_SOURCE="$(find "$PWD/dist" -name \'*.whl\' -print -quit)"' in text
@@ -59,7 +70,7 @@ def test_sdist_gate_builds_and_smokes_its_own_wheel() -> None:
 
 def test_publish_runs_exact_public_version_smoke() -> None:
     text = (ROOT / ".github/workflows/publish.yml").read_text()
-    publish = text[text.index("  publish:"):]
+    publish = text[text.index("  publish:"):text.index("  public-platform-smoke:")]
     assert "RELEASE_TAG: ${{ inputs.tag }}" in publish
     assert 'RELEASE_VERSION="${RELEASE_TAG#v}"' in publish
     assert 'RELEASE_VERSION="${{ inputs.tag }}"' not in publish
@@ -67,6 +78,27 @@ def test_publish_runs_exact_public_version_smoke() -> None:
     assert "for attempt in 1 2 3 4 5" in publish
     assert "PIP_NO_CACHE_DIR=1" in publish
     assert "scripts/docs_mcp_stdio_smoke.py" in publish
+
+
+def test_publish_verifies_exact_public_release_on_all_primary_platforms() -> None:
+    text = (ROOT / ".github/workflows/publish.yml").read_text()
+    public = text[text.index("  public-platform-smoke:"):]
+    assert "if: github.event_name == 'workflow_dispatch'" in public
+    assert "needs: [publish]" in public
+    assert "os: [ubuntu-latest, macos-latest, windows-latest]" in public
+    assert "ref: refs/tags/${{ inputs.tag }}" in public
+    assert 'run: python scripts/public_release_smoke.py --tag "${{ inputs.tag }}"' in public
+
+
+def test_public_release_smoke_is_exact_public_and_no_cache() -> None:
+    text = (ROOT / "scripts/public_release_smoke.py").read_text()
+    assert 'PYPI_INDEX = "https://pypi.org/simple"' in text
+    assert '"--isolated"' in text
+    assert '"--no-cache-dir"' in text
+    assert 'f"doc-atlas=={version}"' in text
+    assert "source_version() != version" in text
+    assert 'expected = f"doc-atlas {version}"' in text
+    assert 'ROOT / "scripts" / "docs_mcp_stdio_smoke.py"' in text
 
 
 def test_stdio_smoke_requires_cited_content() -> None:
@@ -79,6 +111,15 @@ def test_stdio_smoke_requires_cited_content() -> None:
     ]
     assert "output_mode" not in canonical_block
     assert 'compatibility_query = {**canonical_query, "output_mode": "compact"}' in text
+
+
+def test_stdio_smoke_uses_primary_docatlas_home_without_legacy_writes() -> None:
+    text = (ROOT / "scripts/docs_mcp_stdio_smoke.py").read_text()
+    assert '"HOME": str(user_home)' in text
+    assert '"USERPROFILE": str(user_home)' in text
+    assert '"DOCATLAS_HOME": str(docatlas_home)' in text
+    assert 'env.pop("DOCMANCER_HOME", None)' in text
+    assert 'not (user_home / ".docmancer").exists()' in text
 
 
 def test_stdio_smoke_accepts_structured_content_and_legacy_json_text() -> None:
