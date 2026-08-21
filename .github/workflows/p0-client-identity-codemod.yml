@@ -1,0 +1,157 @@
+name: P0 client identity codemod
+
+on:
+  push:
+    branches: [p0/docatlas-config-skill-identity]
+
+permissions:
+  contents: write
+
+jobs:
+  codemod:
+    if: github.event.head_commit.message == 'Run P0 client identity codemod'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          fetch-depth: 1
+      - name: Apply deterministic client identity changes
+        shell: python
+        run: |
+          from pathlib import Path
+          import re
+
+          def sub_once(path, pattern, replacement):
+              p = Path(path)
+              text = p.read_text(encoding="utf-8")
+              new, count = re.subn(pattern, replacement, text, count=1, flags=re.S)
+              if count != 1:
+                  raise SystemExit(f"{path}: expected one match for {pattern!r}, got {count}")
+              p.write_text(new, encoding="utf-8")
+
+          def replace(path, old, new, *, expected=None):
+              p = Path(path)
+              text = p.read_text(encoding="utf-8")
+              count = text.count(old)
+              if expected is not None and count != expected:
+                  raise SystemExit(f"{path}: expected {expected} occurrences of {old!r}, got {count}")
+              if count == 0:
+                  raise SystemExit(f"{path}: missing {old!r}")
+              p.write_text(text.replace(old, new), encoding="utf-8")
+
+          p1 = "docmancer/cli/_commands_part01.py"
+          sub_once(
+              p1,
+              r"def _get_user_config_dir\(\) -> Path:.*?def _get_copilot_user_instructions_path\(\) -> Path:\n    return Path\.home\(\) / \"\.copilot\" / \"copilot-instructions\.md\"\n",
+              '''def _get_user_config_dir() -> Path:\n    return _resolved_user_home(home_dir=Path.home())\n\n\ndef _get_user_config_path() -> Path:\n    return _primary_user_config_path(home_dir=Path.home())\n\n\ndef _get_codex_skill_path() -> Path:\n    return Path.home() / ".codex" / "skills" / SKILL_ID / "SKILL.md"\n\n\ndef _get_shared_agent_skill_path() -> Path:\n    return Path.home() / ".agents" / "skills" / SKILL_ID / "SKILL.md"\n\n\ndef _get_gemini_skill_path() -> Path:\n    return Path.home() / ".gemini" / "skills" / SKILL_ID / "SKILL.md"\n\n\ndef _get_cline_skill_path() -> Path:\n    return Path.home() / ".cline" / "skills" / SKILL_ID / "SKILL.md"\n\n\ndef _get_copilot_user_instructions_path() -> Path:\n    return Path.home() / ".copilot" / "copilot-instructions.md"\n'''
+          )
+          replace(p1, '_get_user_config_dir() / "docmancer.db"', '_get_user_config_dir() / "docatlas.db"', expected=1)
+          sub_once(
+              p1,
+              r"def _ensure_user_config\(\) -> Path:.*?\n\ndef _load_config",
+              '''def _ensure_user_config() -> Path:\n    import yaml as _yaml\n\n    config_path = _get_user_config_path()\n    if config_path.exists():\n        return config_path\n    legacy_path = _legacy_user_config_path(home_dir=Path.home())\n    if legacy_path.exists():\n        warnings.warn(\n            f"Legacy DocAtlas config {legacy_path} is deprecated; rename it to {config_path.name!r}.",\n            DeprecationWarning,\n            stacklevel=2,\n        )\n        return legacy_path\n\n    owned_home = _ensure_user_home(home_dir=Path.home())\n    config_path = owned_home / PRIMARY_CONFIG_NAME\n    config = _build_user_bootstrap_config()\n    with open(config_path, "w", encoding="utf-8") as f:\n        _yaml.dump(config.model_dump(), f, default_flow_style=False, sort_keys=False)\n    return config_path\n\n\ndef _load_config'''
+          )
+          sub_once(
+              p1,
+              r"def _load_config\(config_path: str \| None\):.*?\n\ndef _describe_index",
+              '''def _load_config(config_path: str | None):\n    DocmancerConfig = _get_config_class()\n    if config_path:\n        return DocmancerConfig.from_yaml(config_path)\n    for name in (PRIMARY_CONFIG_NAME, LEGACY_CONFIG_NAME):\n        candidate = Path(name)\n        if candidate.exists():\n            if name == LEGACY_CONFIG_NAME:\n                warnings.warn(\n                    f"Legacy DocAtlas config name {LEGACY_CONFIG_NAME!r} is deprecated; use {PRIMARY_CONFIG_NAME!r}.",\n                    DeprecationWarning,\n                    stacklevel=2,\n                )\n            return DocmancerConfig.from_yaml(candidate)\n    return DocmancerConfig.from_yaml(_ensure_user_config())\n\n\ndef _resolve_config_file(config_path: str | None) -> Path:\n    if config_path:\n        return Path(config_path).resolve()\n    for name in (PRIMARY_CONFIG_NAME, LEGACY_CONFIG_NAME):\n        candidate = Path(name)\n        if candidate.exists():\n            return candidate.resolve()\n    return _ensure_user_config().resolve()\n\n\ndef _describe_index'''
+          )
+          sub_once(
+              p1,
+              r"def _agent_install_path\(target: str, \*, project: bool = False\) -> Path:.*?\n\ndef _source_rows",
+              '''def _agent_install_path(target: str, *, project: bool = False) -> Path:\n    home = Path.home()\n    normalized = target.lower()\n    if normalized == "claude-code":\n        return Path(".claude") / "skills" / SKILL_ID / "SKILL.md" if project else home / ".claude" / "skills" / SKILL_ID / "SKILL.md"\n    if normalized == "cursor":\n        return Path(".cursor") / "skills" / SKILL_ID / "SKILL.md" if project else home / ".cursor" / "skills" / SKILL_ID / "SKILL.md"\n    if normalized == "cline":\n        return Path(".cline") / "skills" / SKILL_ID / "SKILL.md" if project else _get_cline_skill_path()\n    if normalized in {"codex", "codex-app", "codex-desktop"}:\n        return _get_codex_skill_path()\n    if normalized == "gemini":\n        return Path(".gemini") / "skills" / SKILL_ID / "SKILL.md" if project else _get_gemini_skill_path()\n    if normalized == "github-copilot":\n        return Path(".github") / "copilot-instructions.md" if project else _get_copilot_user_instructions_path()\n    if normalized == "opencode":\n        return home / ".config" / "opencode" / "skills" / SKILL_ID / "SKILL.md"\n    if normalized == "claude-desktop":\n        return _get_user_config_dir() / "exports" / "claude-desktop" / "docatlas.zip"\n    return _get_user_config_dir() / normalized\n\n\ndef _source_rows'''
+          )
+          replace(
+              p1,
+              '''    if config_path:\n        effective_config = Path(config_path).resolve()\n    elif Path("docmancer.yaml").exists():\n        effective_config = Path("docmancer.yaml").resolve()\n    else:\n        effective_config = _get_user_config_path()''',
+              '''    if config_path:\n        effective_config = Path(config_path).resolve()\n    elif Path(PRIMARY_CONFIG_NAME).exists():\n        effective_config = Path(PRIMARY_CONFIG_NAME).resolve()\n    elif Path(LEGACY_CONFIG_NAME).exists():\n        effective_config = Path(LEGACY_CONFIG_NAME).resolve()\n    else:\n        primary_user = _get_user_config_path()\n        legacy_user = _legacy_user_config_path(home_dir=Path.home())\n        effective_config = primary_user if primary_user.exists() or not legacy_user.exists() else legacy_user''',
+              expected=1,
+          )
+          replace(p1, '"Docmancer has no config to load paths and retrieval defaults."', '"DocAtlas has no config to load paths and retrieval defaults."', expected=1)
+          replace(p1, '"docmancer.yaml exists and doctor can read it."', '"docatlas.yaml exists and doctor can read it."', expected=1)
+          replace(p1, 'reinstall docmancer', 'reinstall doc-atlas')
+          replace(p1, 'pip install docmancer', 'pip install doc-atlas')
+          sub_once(
+              p1,
+              r"def _resolve_docmancer_executable\(\) -> str:.*?\n\ndef _resolve_skill_command",
+              '''def _resolve_docmancer_executable() -> str:\n    resolved = shutil.which("doc-atlas") or shutil.which("docmancer")\n    if resolved:\n        return str(Path(resolved).resolve())\n    return f"{sys.executable} -m docmancer"\n\n\ndef _resolve_skill_command'''
+          )
+          sub_once(
+              p1,
+              r"def _resolve_install_config_path\(config_path: str \| None, project: bool\) -> Path \| None:.*?\n\ndef _build_skill_content",
+              '''def _resolve_install_config_path(config_path: str | None, project: bool) -> Path | None:\n    if config_path:\n        return Path(config_path).resolve()\n    if project:\n        for name in (PRIMARY_CONFIG_NAME, LEGACY_CONFIG_NAME):\n            candidate = Path(name)\n            if candidate.exists():\n                return candidate.resolve()\n        return None\n    return _ensure_user_config().resolve()\n\n\ndef _build_skill_content'''
+          )
+          sub_once(
+              p1,
+              r"def _install_skill_file\(content: str, dest: Path\) -> None:.*?\n\ndef _split_front_matter",
+              '''def _install_skill_file(content: str, dest: Path) -> None:\n    try:\n        _migrate_legacy_skill_file(dest)\n    except ValueError as exc:\n        raise click.ClickException(str(exc)) from exc\n\n    front_matter, body = _split_front_matter(content)\n    marker_block = f"{_AGENTS_MD_START}\\n{body.strip()}\\n{_AGENTS_MD_END}\\n"\n    if not dest.exists():\n        dest.parent.mkdir(parents=True, exist_ok=True)\n        dest.write_text(front_matter + _SKILL_FILE_OWNER + "\\n" + marker_block, encoding="utf-8")\n        return\n\n    existing = dest.read_text(encoding="utf-8")\n    # Old DocAtlas releases briefly wrote the marker before YAML front matter.\n    for start_marker, end_marker in (\n        (_AGENTS_MD_START, _AGENTS_MD_END),\n        (_LEGACY_AGENTS_MD_START, _LEGACY_AGENTS_MD_END),\n    ):\n        if existing.startswith(start_marker):\n            end_idx = existing.find(end_marker)\n            if end_idx != -1:\n                managed = existing[len(start_marker):end_idx].strip()\n                old_front_matter, _ = _split_front_matter(managed)\n                if old_front_matter and _is_proven_docatlas_text(managed):\n                    suffix = existing[end_idx + len(end_marker):]\n                    dest.write_text(front_matter + _SKILL_FILE_OWNER + "\\n" + marker_block + suffix, encoding="utf-8")\n                    return\n\n    try:\n        legacy = _legacy_managed_block(existing)\n    except ValueError as exc:\n        raise click.ClickException(\n            f"Could not update {display_path(dest)} because {exc}."\n        ) from exc\n    if legacy is not None:\n        start_idx, end_idx = legacy\n        existing = (\n            existing[:start_idx]\n            + marker_block.rstrip("\\n")\n            + existing[end_idx + len(_LEGACY_AGENTS_MD_END):]\n        )\n        existing = existing.replace(_LEGACY_SKILL_FILE_OWNER, _SKILL_FILE_OWNER, 1)\n        dest.write_text(existing, encoding="utf-8")\n\n    existing_front_matter, _ = _split_front_matter(existing)\n    if _SKILL_FILE_OWNER in existing and existing_front_matter:\n        try:\n            block = _current_managed_block(existing)\n        except ValueError as exc:\n            raise click.ClickException(\n                f"Could not update {display_path(dest)} because {exc}."\n            ) from exc\n        if block is None:\n            raise click.ClickException(\n                f"Could not update {display_path(dest)} because its DocAtlas markers are missing."\n            )\n        start_idx, end_idx = block\n        suffix = existing[end_idx + len(_AGENTS_MD_END):]\n        dest.write_text(front_matter + _SKILL_FILE_OWNER + "\\n" + marker_block + suffix, encoding="utf-8")\n        return\n    if front_matter and not existing_front_matter:\n        _install_or_append_agents_md(dest, content)\n        return\n    _install_or_append_agents_md(dest, body if existing_front_matter else content)\n\n\ndef _split_front_matter'''
+          )
+          sub_once(
+              p1,
+              r"def _install_or_append_agents_md\(dest: Path, content_body: str\) -> None:.*?\n\ndef _format_size",
+              '''def _install_or_append_agents_md(dest: Path, content_body: str) -> None:\n    marker_block = f"{_AGENTS_MD_START}\\n{content_body.strip()}\\n{_AGENTS_MD_END}"\n    dest.parent.mkdir(parents=True, exist_ok=True)\n\n    if not dest.exists():\n        dest.write_text(marker_block + "\\n", encoding="utf-8")\n        return\n\n    existing = dest.read_text(encoding="utf-8")\n    try:\n        current = _current_managed_block(existing)\n        legacy = None if current is not None else _legacy_managed_block(existing)\n    except ValueError as exc:\n        raise click.ClickException(\n            f"Could not update {display_path(dest)} because {exc}."\n        ) from exc\n    if current is not None:\n        start_idx, end_idx = current\n        new_content = existing[:start_idx] + marker_block + existing[end_idx + len(_AGENTS_MD_END):]\n        dest.write_text(new_content, encoding="utf-8")\n    elif legacy is not None:\n        start_idx, end_idx = legacy\n        new_content = existing[:start_idx] + marker_block + existing[end_idx + len(_LEGACY_AGENTS_MD_END):]\n        new_content = new_content.replace(_LEGACY_SKILL_FILE_OWNER, _SKILL_FILE_OWNER, 1)\n        dest.write_text(new_content, encoding="utf-8")\n    else:\n        separator = "\\n\\n" if existing and not existing.endswith("\\n\\n") else ""\n        dest.write_text(existing + separator + marker_block + "\\n", encoding="utf-8")\n\n\ndef _format_size'''
+          )
+          replace(p1, 'help="Path to docmancer.yaml."', 'help="Path to DocAtlas YAML config."')
+
+          p2 = "docmancer/cli/_commands_part02.py"
+          replace(p2, 'zip_path = export_dir / "docmancer.zip"', 'zip_path = export_dir / "docatlas.zip"', expected=1)
+          replace(p2, 'zf.writestr("docmancer/Skill.md", content)', 'zf.writestr("docatlas/Skill.md", content)', expected=1)
+          sub_once(
+              p2,
+              r"def _project_install_agents\(\) -> set\[str\]:.*?\n\ndef _write_project_install_agents",
+              '''def _project_install_agents() -> set[str]:\n    state_path = (\n        _PROJECT_INSTALL_STATE\n        if _PROJECT_INSTALL_STATE.exists()\n        else _LEGACY_PROJECT_INSTALL_STATE\n        if _LEGACY_PROJECT_INSTALL_STATE.exists()\n        else None\n    )\n    if state_path is None:\n        try:\n            from docmancer.mcp.agent_config import known_agents, target_has_current_server_entry\n\n            return {\n                target.name\n                for target in known_agents(project=True)\n                if _project_bootstrap_dest(target.name) is not None\n                and target_has_current_server_entry(target)\n            }\n        except (OSError, ValueError):\n            return {\n                "claude-code", "codex", "cursor", "opencode",\n                "cline", "gemini", "github-copilot",\n            }\n    try:\n        payload = json.loads(state_path.read_text(encoding="utf-8"))\n        agents = payload.get("agents", [])\n        return {str(agent) for agent in agents if str(agent) in INSTALL_TARGETS}\n    except (json.JSONDecodeError, OSError, AttributeError):\n        return set()\n\n\ndef _write_project_install_agents'''
+          )
+          sub_once(
+              p2,
+              r"def _write_project_install_agents\(agents: set\[str\]\) -> None:.*?\n\ndef _record_project_install",
+              '''def _write_project_install_agents(agents: set[str]) -> None:\n    if not agents and not _LEGACY_PROJECT_INSTALL_STATE.exists():\n        if _PROJECT_INSTALL_STATE.exists():\n            _PROJECT_INSTALL_STATE.unlink()\n        return\n    # When legacy state exists, an explicit empty primary file shadows it\n    # without deleting or claiming the old .docmancer namespace.\n    _PROJECT_INSTALL_STATE.parent.mkdir(parents=True, exist_ok=True)\n    _PROJECT_INSTALL_STATE.write_text(\n        json.dumps({"agents": sorted(agents)}, indent=2) + "\\n", encoding="utf-8"\n    )\n\n\ndef _record_project_install'''
+          )
+          sub_once(
+              p2,
+              r"def _managed_instruction_paths\(agent: str, \*, project: bool\) -> list\[Path\]:.*?\n\ndef _remove_managed_instruction_block",
+              '''def _managed_instruction_paths(agent: str, *, project: bool) -> list[Path]:\n    def include_legacy(paths: list[Path]) -> list[Path]:\n        expanded: list[Path] = []\n        for path in paths:\n            expanded.append(path)\n            legacy = _legacy_skill_path(path)\n            if legacy is not None:\n                expanded.append(legacy)\n        return list(dict.fromkeys(expanded))\n\n    if project:\n        normalized = agent.lower()\n        if normalized == "github-copilot":\n            return [Path(".github") / "copilot-instructions.md", Path("AGENTS.md")]\n        bootstrap = _project_bootstrap_dest(agent)\n        skill_paths = {\n            "claude-code": Path(".claude") / "skills" / SKILL_ID / "SKILL.md",\n            "cursor": Path(".cursor") / "skills" / SKILL_ID / "SKILL.md",\n            "cline": Path(".cline") / "skills" / SKILL_ID / "SKILL.md",\n            "gemini": Path(".gemini") / "skills" / SKILL_ID / "SKILL.md",\n        }\n        paths = [path for path in (skill_paths.get(normalized), bootstrap) if path is not None]\n        return include_legacy(paths)\n    home = Path.home()\n    normalized = agent.lower()\n    paths = {\n        "claude-code": [home / ".claude" / "skills" / SKILL_ID / "SKILL.md"],\n        "cursor": [home / ".cursor" / "skills" / SKILL_ID / "SKILL.md", home / ".cursor" / "AGENTS.md"],\n        "codex": [_get_codex_skill_path(), _get_shared_agent_skill_path()],\n        "codex-app": [_get_codex_skill_path(), _get_shared_agent_skill_path()],\n        "codex-desktop": [_get_codex_skill_path(), _get_shared_agent_skill_path()],\n        "cline": [home / ".cline" / "skills" / SKILL_ID / "SKILL.md"],\n        "gemini": [home / ".gemini" / "skills" / SKILL_ID / "SKILL.md"],\n        "github-copilot": [_get_copilot_user_instructions_path()],\n        "opencode": [home / ".config" / "opencode" / "skills" / SKILL_ID / "SKILL.md"],\n    }\n    return include_legacy(paths.get(normalized, []))\n\n\ndef _remove_managed_instruction_block'''
+          )
+          sub_once(
+              p2,
+              r"def _remove_managed_instruction_block\(dest: Path\) -> bool:.*?\n\ndef _register_mcp_for_agent",
+              '''def _remove_managed_instruction_block(dest: Path) -> bool:\n    if not dest.exists():\n        return False\n    existing = dest.read_text(encoding="utf-8")\n    try:\n        block = _current_managed_block(existing)\n        marker_end = _AGENTS_MD_END\n        if block is None:\n            block = _legacy_managed_block(existing)\n            marker_end = _LEGACY_AGENTS_MD_END\n    except ValueError as exc:\n        raise click.ClickException(\n            f"Could not uninstall from {display_path(dest)} because {exc}."\n        ) from exc\n    if block is None:\n        return False\n    start_idx, end_idx = block\n    remaining = existing[:start_idx] + existing[end_idx + len(marker_end):]\n    updated = remaining.strip()\n    front_matter, body = _split_front_matter(remaining.lstrip())\n    owned_skill_file = _SKILL_FILE_OWNER in remaining or _LEGACY_SKILL_FILE_OWNER in remaining\n    cleaned_body = body.replace(_SKILL_FILE_OWNER, "").replace(_LEGACY_SKILL_FILE_OWNER, "")\n    if owned_skill_file and front_matter and not cleaned_body.strip():\n        dest.unlink()\n    elif updated:\n        dest.write_text(updated + "\\n", encoding="utf-8")\n    else:\n        dest.unlink()\n    return True\n\n\ndef _register_mcp_for_agent'''
+          )
+          sub_once(
+              p2,
+              r"def init_cmd\(directory: str \| None\):.*?\n\n\n@click\.command\(",
+              '''def init_cmd(directory: str | None):\n    """Initialize a DocAtlas project with the primary config identity."""\n    import yaml as _yaml\n\n    dir_path = Path(directory or ".")\n    dir_path.mkdir(parents=True, exist_ok=True)\n    config_path = dir_path / PRIMARY_CONFIG_NAME\n    legacy_path = dir_path / LEGACY_CONFIG_NAME\n    if config_path.exists():\n        click.echo(f"Config already exists at {display_path(config_path)}")\n        return\n    if legacy_path.exists():\n        click.echo(\n            f"Legacy config already exists at {display_path(legacy_path)}; "\n            f"refusing to create parallel {PRIMARY_CONFIG_NAME}. Rename it explicitly after review."\n        )\n        return\n    DocmancerConfig = _get_config_class()\n    config = DocmancerConfig()\n    config.index.db_path = ".docatlas/docatlas.db"\n    config.index.extracted_dir = ".docatlas/extracted"\n    data = config.model_dump()\n    with open(config_path, "w", encoding="utf-8") as f:\n        _yaml.dump(data, f, default_flow_style=False, sort_keys=False)\n    click.echo(f"Created config at {display_path(config_path)}")\n    click.echo("Local SQLite FTS5 index configured at .docatlas/docatlas.db")\n\n\n@click.command('''
+          )
+          replace(p2, 'help="Path to docmancer.yaml."', 'help="Path to DocAtlas YAML config."')
+
+          p5 = "docmancer/cli/_commands_part05.py"
+          replace(p5, 'short_help="Install docmancer skills into an AI agent."', 'short_help="Install DocAtlas skills into an AI agent."', expected=1)
+          replace(p5, '"""Install docmancer skill files into an AI agent.', '"""Install DocAtlas skill files into an AI agent.', expected=1)
+          replace(p5, 'help="Path to docmancer.yaml."', 'help="Path to DocAtlas YAML config."')
+          replace(p5, '/ "skills" / "docmancer" / "SKILL.md"', '/ "skills" / SKILL_ID / "SKILL.md"')
+          replace(p5, '"Installed docmancer skill at"', '"Installed DocAtlas skill at"')
+          replace(p5, '"Created docmancer skill package at"', '"Created DocAtlas skill package at"', expected=1)
+          replace(p5, '"Claude Code can use docmancer immediately. No restart needed."', '"Claude Code can use DocAtlas immediately. No restart needed."', expected=1)
+          replace(p5, '"Claude Code will automatically use docmancer commands."', '"Claude Code will automatically use the DocAtlas Docs MCP workflow."', expected=1)
+          sub_once(
+              p5,
+              r"def _ensure_project_config\(\) -> Path:.*?\n\ndef _emit_setup_readiness_summary",
+              '''def _ensure_project_config() -> Path:\n    primary = Path(PRIMARY_CONFIG_NAME).resolve()\n    legacy = Path(LEGACY_CONFIG_NAME).resolve()\n    if primary.exists():\n        config_file = primary\n    elif legacy.exists():\n        config_file = legacy\n    else:\n        config_file = primary\n        config = _build_user_bootstrap_config()\n        config.index.db_path = str((Path.cwd() / ".docatlas" / "docatlas.db").resolve())\n        config.index.extracted_dir = str((Path.cwd() / ".docatlas" / "extracted").resolve())\n        _write_config_yaml(config, config_file)\n    config = _get_config_class().from_yaml(config_file)\n    agent = _get_agent_class()(config=config)\n    agent.collection_stats()\n    return config_file\n\n\ndef _emit_setup_readiness_summary'''
+          )
+
+          for template in [
+              "docmancer/templates/skill.md",
+              "docmancer/templates/claude_code_skill.md",
+              "docmancer/templates/claude_desktop_skill.md",
+          ]:
+              text = Path(template).read_text(encoding="utf-8")
+              if "name: docatlas" not in text:
+                  raise SystemExit(f"{template}: primary skill name missing")
+
+      - name: Commit codemod
+        run: |
+          git config user.name "DocAtlas P0 automation"
+          git config user.email "actions@users.noreply.github.com"
+          git add docmancer/cli/_commands_part01.py docmancer/cli/_commands_part02.py docmancer/cli/_commands_part05.py
+          git diff --cached --check
+          git commit -m "Apply DocAtlas config and skill identity"
+          git push origin HEAD:p0/docatlas-config-skill-identity
