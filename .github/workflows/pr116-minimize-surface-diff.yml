@@ -1,0 +1,75 @@
+name: PR116 minimize support surface diff
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'docmancer/support_surfaces.json'
+      - '.github/workflows/pr116-minimize-surface-diff.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  minimize:
+    if: github.event.pull_request.head.ref == 'p0/docatlas-migrate-home-cli'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          ref: p0/docatlas-migrate-home-cli
+          fetch-depth: 0
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.12'
+      - name: Restore main formatting and insert one record
+        shell: bash
+        run: |
+          git show origin/main:docmancer/support_surfaces.json > docmancer/support_surfaces.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          path = Path('docmancer/support_surfaces.json')
+          text = path.read_text(encoding='utf-8')
+          anchor = '''    {
+      "id": "cli:mcp",
+      "kind": "cli",
+'''
+          if text.count(anchor) != 1:
+              raise SystemExit(f'expected one cli:mcp anchor, found {text.count(anchor)}')
+          record = '''    {
+      "id": "cli:migrate-home",
+      "kind": "cli",
+      "tier": "core",
+      "owner": "DocAtlas maintainers",
+      "docs": "docs/support-surface-policy.md",
+      "test_tier": "core-offline",
+      "network_dependencies": [],
+      "compatibility": "stable within the current major release",
+      "removal_rule": "breaking release with migration notes",
+      "failure_budget": "blocks release and local Docs health"
+    },
+'''
+          text = text.replace(anchor, record + anchor, 1)
+          path.write_text(text, encoding='utf-8')
+          data = json.loads(text)
+          matches = [item for item in data['surfaces'] if item.get('id') == 'cli:migrate-home']
+          if len(matches) != 1 or matches[0].get('tier') != 'core':
+              raise SystemExit('migrate-home support surface verification failed')
+          PY
+
+          python -m pip install -e '.[dev]'
+          python -m pytest -q tests/test_support_surface_policy.py tests/docs/test_documented_cli_contract.py
+
+      - name: Commit minimal product diff
+        shell: bash
+        run: |
+          git rm .github/workflows/pr116-minimize-surface-diff.yml
+          git diff --check
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add docmancer/support_surfaces.json
+          git commit -m 'Minimize migrate-home support surface diff'
+          git push origin HEAD:p0/docatlas-migrate-home-cli
