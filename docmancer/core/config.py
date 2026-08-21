@@ -1,16 +1,17 @@
 from __future__ import annotations
 
 import warnings
-import os
 from pathlib import Path
 
 import yaml
 from pydantic import BaseModel, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+from docmancer.core.product_identity import docatlas_home
+
 
 def default_user_db_path() -> str:
-    root = Path(os.environ.get("DOCMANCER_HOME") or (Path.home() / ".docmancer"))
+    root = docatlas_home()
     return str(root / "docmancer.db")
 
 
@@ -111,7 +112,7 @@ class EmbeddingsConfig(BaseSettings):
     dimensions: int = 768
     sparse_model: str | None = None
     cache: str = Field(default_factory=lambda: str(
-        Path(os.environ.get("DOCMANCER_HOME") or (Path.home() / ".docmancer")) / "embeddings-cache"
+        docatlas_home() / "embeddings-cache"
     ))
     batch_size: int = 64
     model_config = SettingsConfigDict(env_prefix="DOCMANCER_EMBEDDINGS_", extra="ignore")
@@ -241,16 +242,13 @@ class DocmancerConfig(BaseModel):
             if has_legacy and has_new:
                 # Forgiving migration: keep the new fields (provider, url,
                 # collection, ...) and drop the legacy ones. The managed
-                # Qdrant lifecycle owns its storage path under
-                # `~/.docmancer/qdrant`; a user-supplied legacy `local_path`
-                # is ignored. This used to be a hard error, but in practice
-                # it strands anyone upgrading from a pre-0.5.0 install with
-                # a leftover `~/.docmancer/docmancer.yaml`.
+                # Qdrant lifecycle owns its storage path under the configured
+                # DocAtlas state root; a user-supplied legacy `local_path`
+                # is ignored.
                 warnings.warn(
                     "vector_store has both legacy fields (db_path/local_path) and new fields "
                     "(provider/url/collection/api_key_env/options); keeping the new fields and "
-                    "dropping the legacy ones. Managed Qdrant ignores local_path; the binary "
-                    "lives under ~/.docmancer/qdrant.",
+                    "dropping the legacy ones. Managed Qdrant ignores local_path.",
                     DeprecationWarning,
                     stacklevel=2,
                 )
@@ -269,7 +267,7 @@ class DocmancerConfig(BaseModel):
                     if legacy_path.suffix.lower() in {".db", ".sqlite", ".sqlite3"}:
                         data["index"] = {"db_path": local_path}
                     else:
-                        data["index"] = {"db_path": ".docmancer/docmancer.db"}
+                        data["index"] = {"db_path": str(legacy_path.parent / "docmancer.db")}
                 if not vector_store:
                     data.pop("vector_store", None)
 

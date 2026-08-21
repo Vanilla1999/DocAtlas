@@ -1,33 +1,21 @@
 """Sidecar metadata for the local vector index.
 
-Records which embedder built each Qdrant collection so docmancer can refuse
+Records which embedder built each Qdrant collection so DocAtlas can refuse
 ingest / query against an index built with a different model. Without this
 sidecar, a default-model bump (or a stale collection from a previous install)
-silently produces dimension mismatches that fail silently inside Qdrant and
-surface as empty / nonsense search results.
+silently produces dimension mismatches that surface as empty / nonsense
+search results.
 
-Schema (``~/.docmancer/index-meta.json``)::
-
-    {
-      "version": 1,
-      "collections": {
-        "<collection_name>": {
-          "provider": "fastembed",
-          "model": "BAAI/bge-small-en-v1.5",
-          "dim": 384,
-          "sparse_model": "prithivida/Splade_PP_en_v1",
-          "created_at": "2026-05-16T20:11:00+00:00"
-        }
-      }
-    }
+The sidecar lives under the DocAtlas-owned machine state root.
 """
 from __future__ import annotations
 
 import json
-import os
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from pathlib import Path
+
+from docmancer.core.product_identity import docatlas_home, ensure_owned_home, resolve_home
 
 SCHEMA_VERSION = 1
 
@@ -66,15 +54,13 @@ class IndexMismatchError(RuntimeError):
             f"Index {collection!r} was built with a different embedder ({change}). "
             f"Rebuild it before running queries:\n"
             f"  doc-atlas ingest <path> --recreate\n"
-            f"or, to start fresh, drop docmancer state and re-ingest:\n"
+            f"or, to start fresh, drop DocAtlas state and re-ingest:\n"
             f"  doc-atlas clear --keep-config --keep-models && doc-atlas ingest <path>"
         )
 
 
 def _meta_path() -> Path:
-    home = os.environ.get("DOCMANCER_HOME")
-    base = Path(home).expanduser() if home else Path.home() / ".docmancer"
-    return base / "index-meta.json"
+    return docatlas_home() / "index-meta.json"
 
 
 def _load_raw() -> dict:
@@ -92,8 +78,12 @@ def _load_raw() -> dict:
 
 
 def _save_raw(data: dict) -> None:
-    path = _meta_path()
-    path.parent.mkdir(parents=True, exist_ok=True)
+    resolution = resolve_home()
+    owned_home = ensure_owned_home(
+        resolution.path,
+        allow_legacy_claim=resolution.compatibility_legacy,
+    )
+    path = owned_home / "index-meta.json"
     tmp = path.with_suffix(".json.tmp")
     with open(tmp, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2, sort_keys=False)

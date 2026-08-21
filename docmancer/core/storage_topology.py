@@ -5,6 +5,12 @@ from pathlib import Path
 
 from docmancer.core.config import DocmancerConfig
 from docmancer.core.config_resolution import ResolvedConfig, resolve_config
+from docmancer.core.product_identity import (
+    DEFAULT_HOME_NAME,
+    LEGACY_CONFIG_NAME,
+    LEGACY_HOME_NAME,
+    PRIMARY_CONFIG_NAME,
+)
 
 
 @dataclass(frozen=True)
@@ -33,16 +39,27 @@ class StorageTopologyResolver:
 
     def resolve(self, project_path: str | Path) -> StorageTopology:
         root = Path(project_path).expanduser().resolve()
-        local_config = root / "docmancer.yaml"
-        if local_config.is_file() and not self._prefer_fallback:
+        local_configs = (
+            root / PRIMARY_CONFIG_NAME,
+            root / LEGACY_CONFIG_NAME,
+        )
+        if any(path.is_file() for path in local_configs) and not self._prefer_fallback:
             resolved = resolve_config(project_path=root)
+            # Do not strand already-indexed legacy projects. A project that is
+            # still explicitly configured through ``docmancer.yaml`` retains
+            # its historical derived index root until P0.3B migrates the
+            # config and state together. New/primary ``docatlas.yaml`` projects
+            # are isolated under the DocAtlas namespace immediately.
+            state_dir_name = (
+                LEGACY_HOME_NAME if resolved.legacy_compatibility else DEFAULT_HOME_NAME
+            )
             return StorageTopology(
                 project_path=root,
                 config=resolved.config,
                 config_source=resolved.source,
                 config_path=resolved.path,
                 config_identity=resolved.identity,
-                library_index_root=root / ".docmancer" / "docs-indexes",
+                library_index_root=root / state_dir_name / "docs-indexes",
             )
         config = (
             self._fallback_config.model_copy(deep=True)

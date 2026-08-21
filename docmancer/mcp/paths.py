@@ -4,12 +4,16 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
+from docmancer.core.product_identity import (
+    docatlas_home,
+    ensure_owned_home,
+    resolve_home,
+)
+
 
 def docmancer_home() -> Path:
-    override = os.environ.get("DOCMANCER_HOME")
-    if override:
-        return Path(override).expanduser()
-    return Path.home() / ".docmancer"
+    """Compatibility alias for the DocAtlas machine-state root."""
+    return docatlas_home()
 
 
 def mcp_dir() -> Path:
@@ -37,8 +41,8 @@ def servers_dir() -> Path:
 
 
 def registry_dir() -> Path:
-    """Default local registry root: `$DOCMANCER_REGISTRY_DIR` or `~/.docmancer/registry`."""
-    override = os.environ.get("DOCMANCER_REGISTRY_DIR")
+    """Default local registry root under the DocAtlas machine-state home."""
+    override = os.environ.get("DOCATLAS_REGISTRY_DIR") or os.environ.get("DOCMANCER_REGISTRY_DIR")
     if override:
         return Path(override).expanduser()
     return docmancer_home() / "registry"
@@ -48,8 +52,8 @@ def _validate_pack_component(value: str, *, kind: str) -> str:
     """Reject pack/version components that could escape the storage root.
 
     Path-traversal segments (`..`), backslashes, NULs, and absolute paths would let
-    `package_dir()` resolve outside `~/.docmancer/servers`, which a later
-    `uninstall_package()` would happily `rmtree`. Forward slashes are allowed for
+    `package_dir()` resolve outside the managed servers root, which a later
+    `uninstall_package()` would remove recursively. Forward slashes are allowed for
     npm-style scoped names (`@scope/pkg`); the resolve+containment check below
     catches anything that still escapes.
     """
@@ -95,6 +99,13 @@ def secrets_env_file(package: str) -> Path:
 
 
 def ensure_dirs() -> None:
-    mcp_dir().mkdir(parents=True, exist_ok=True)
-    servers_dir().mkdir(parents=True, exist_ok=True)
-    registry_dir().mkdir(parents=True, exist_ok=True)
+    resolution = resolve_home()
+    root = ensure_owned_home(
+        resolution.path,
+        allow_legacy_claim=resolution.compatibility_legacy,
+    )
+    (root / "mcp").mkdir(parents=True, exist_ok=True)
+    (root / "servers").mkdir(parents=True, exist_ok=True)
+    registry_override = os.environ.get("DOCATLAS_REGISTRY_DIR") or os.environ.get("DOCMANCER_REGISTRY_DIR")
+    registry = Path(registry_override).expanduser() if registry_override else root / "registry"
+    registry.mkdir(parents=True, exist_ok=True)

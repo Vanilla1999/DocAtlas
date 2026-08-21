@@ -11,6 +11,8 @@ coverage/
 .worktrees/
 .docmancer/
 .docmancer-home-test/
+# Keep .docatlas/docs.lock.json reviewable; only derived per-project indexes are ignored.
+.docatlas/docs-indexes/
 .docs-kit/
 downloaded-docs/
 /release-patch-pypi.sh
