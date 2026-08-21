@@ -97,20 +97,8 @@ def main() -> None:
 
     path = "docmancer/docs/application/insufficient_projection.py"
     text = base.read(path)
-    old = '''def _minimal_rephrase_action(value: Any) -> dict[str, Any] | None:
-    if not isinstance(value, dict) or value.get("type") != "rephrase_question":
-        return None
-    arguments = value.get("arguments_patch") if isinstance(value.get("arguments_patch"), dict) else {}
-    question = str(arguments.get("question") or "")[:320]
-    if not question:
-        return None
-    return {
-        "tool": "get_docs_context",
-        "type": "rephrase_question",
-        "arguments_patch": {"question": question},
-        "auto_execute": False,
-    }
-'''
+    start = text.index("def _minimal_rephrase_action")
+    end = text.index("\n\ndef apply_terminal_insufficient_projection", start)
     new = '''def _minimal_recovery_action(value: Any) -> dict[str, Any] | None:
     if not isinstance(value, dict):
         return None
@@ -147,12 +135,12 @@ def main() -> None:
         "auto_execute": False,
     }
 '''
-    if text.count(old) != 1:
-        raise SystemExit("insufficient projection recovery helper target drifted")
-    text = text.replace(old, new, 1)
+    text = text[:start] + new + text[end:]
+    if text.count("_minimal_rephrase_action(original_action)") != 1:
+        raise SystemExit("terminal recovery call target drifted")
     text = text.replace(
-        "    minimal_recovery = _minimal_rephrase_action(original_action)\n",
-        "    minimal_recovery = _minimal_recovery_action(original_action)\n",
+        "_minimal_rephrase_action(original_action)",
+        "_minimal_recovery_action(original_action)",
         1,
     )
     base.write(path, text)
