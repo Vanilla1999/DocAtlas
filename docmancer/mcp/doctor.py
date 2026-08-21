@@ -83,7 +83,7 @@ def run() -> list[CheckResult]:
             results.append(CheckResult(
                 f"agent {agent.name}",
                 ok,
-                "registered" if ok else "config exists but current docmancer MCP entry not found",
+                "registered" if ok else "config exists but current DocAtlas MCP entry not found",
             ))
         except Exception as exc:
             results.append(CheckResult(f"agent {agent.name}", False, str(exc)))
