@@ -1,0 +1,47 @@
+name: TEMP run PR 122 finalizer
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  finalize:
+    if: github.event.pull_request.head.ref == 'p0/recoverable-docs-failures' && github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          ref: p0/recoverable-docs-failures
+          fetch-depth: 0
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: python -m pip install -e ".[dev]"
+      - name: Execute reviewed finalizer
+        run: |
+          python - <<'PY'
+          import subprocess
+          from pathlib import Path
+          import yaml
+
+          payload = yaml.safe_load(Path('.github/workflows/tmp-pr122-finalize.yml').read_text(encoding='utf-8'))
+          steps = payload['jobs']['finalize']['steps']
+          wanted = {
+              'Apply reviewed integration fixes',
+              'Focused validation',
+              'Commit semantic fixes',
+          }
+          selected = [step for step in steps if isinstance(step, dict) and step.get('name') in wanted]
+          if {step.get('name') for step in selected} != wanted:
+              raise SystemExit('TEMP source workflow does not contain the expected finalizer steps')
+          for name in ('Apply reviewed integration fixes', 'Focused validation', 'Commit semantic fixes'):
+              command = next(step['run'] for step in selected if step['name'] == name)
+              print(f'::group::{name}')
+              subprocess.run(['bash', '-euo', 'pipefail', '-c', command], check=True)
+              print('::endgroup::')
+          PY
