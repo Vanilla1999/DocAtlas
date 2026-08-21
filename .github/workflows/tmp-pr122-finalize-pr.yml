@@ -23,4 +23,4 @@ jobs:
       - name: Install dependencies
         run: python -m pip install -e ".[dev]"
       - name: Execute reviewed finalizer
-        run: python scripts/tmp_pr122_finalize_v2.py
+        run: python scripts/tmp_pr122_finalize_v3.py
