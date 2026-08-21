@@ -16,6 +16,7 @@ WORKFLOW_POLICY: dict[str, Any] = {
         "tool": "get_docs_context",
         "for": ["documentation_question", "coding_task", "patch_task"],
         "before_first_edit": True,
+        "max_calls_before_first_edit": 1,
     },
     "prepare_docs": {
         "tool": "prepare_docs",
