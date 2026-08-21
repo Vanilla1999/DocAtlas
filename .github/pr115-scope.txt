@@ -1,1 +1,0 @@
-Scope: public migrate-home binding only; no retrieval or MCP surface changes.
