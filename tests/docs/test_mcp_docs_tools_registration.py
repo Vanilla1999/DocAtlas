@@ -390,10 +390,40 @@ def test_mcp_exposes_get_project_context_with_trust_contract():
 
 
 def test_agent_templates_include_three_tool_selection_guidance():
+    import re
     from importlib.resources import files
-    from docmancer.cli.commands import _get_template_content
 
-    canonical = files("docmancer.templates").joinpath("agent_contract.md").read_text(encoding="utf-8").strip()
+    from docmancer.cli.commands import _get_template_content
+    from docmancer.mcp.agent_workflow_contract import (
+        CONTRACT_SCHEMA,
+        PUBLIC_TOOL_ORDER,
+        public_agent_contract,
+        runtime_public_tool_dicts,
+    )
+
+    contract = public_agent_contract()
+    assert contract["schema"] == CONTRACT_SCHEMA == "docatlas-agent-contract-v1"
+    assert re.fullmatch(r"sha256:[0-9a-f]{64}", contract["identity"])
+    assert public_agent_contract() == contract
+    assert tuple(item["name"] for item in contract["tools"]) == PUBLIC_TOOL_ORDER
+
+    runtime_tools = {tool["name"]: tool for tool in runtime_public_tool_dicts()}
+    assert tuple(runtime_tools) == PUBLIC_TOOL_ORDER
+    for example in contract["examples"]:
+        jsonschema.validate(example["arguments"], runtime_tools[example["tool"]]["inputSchema"])
+
+    workflow = contract["workflow"]
+    assert workflow["first_call"]["tool"] == "get_docs_context"
+    assert workflow["first_call"]["before_first_edit"] is True
+    assert workflow["prepare_docs"]["speculative"] is False
+    assert workflow["docs_status"]["discovery"] is False
+    assert workflow["recovery"]["stop_before_edit_status"] == "insufficient_evidence"
+
+    canonical_raw = files("docmancer.templates").joinpath("agent_contract.md").read_text(encoding="utf-8").strip()
+    assert canonical_raw.count("{{DOCATLAS_AGENT_CONTRACT_ID}}") == 1
+    assert "delivery_strategy" not in canonical_raw
+    assert "output_mode" not in canonical_raw
+
     for name in (
         "skill.md", "claude_code_skill.md", "claude_desktop_skill.md",
         "cursor_agents_md.md", "copilot_instructions.md", "project_bootstrap.md",
@@ -401,14 +431,28 @@ def test_agent_templates_include_three_tool_selection_guidance():
         raw = files("docmancer.templates").joinpath(name).read_text(encoding="utf-8")
         assert raw.count("{{CANONICAL_AGENT_CONTRACT}}") == 1
         assert "get_docs_context" not in raw.replace("{{CANONICAL_AGENT_CONTRACT}}", "")
-        text = _get_template_content(name)
-        assert text.count(canonical) == 1
-        assert "get_docs_context" in text
-        assert "prepare_docs" in text
-        assert "docs_status" in text
-        assert "retry the original `get_docs_context` question unchanged" in text
-        assert "repository code search" in text
-        assert "legacy direct documentation tools" in text
+        rendered = _get_template_content(name)
+        assert contract["identity"] in rendered
+        assert "{{DOCATLAS_AGENT_CONTRACT_ID}}" not in rendered
+        assert "get_docs_context" in rendered
+        assert "prepare_docs" in rendered
+        assert "docs_status" in rendered
+
+    root = Path(__file__).resolve().parents[2]
+    normal_agent_docs = (
+        root / "README.md",
+        root / "SKILL.md",
+        root / "docs" / "AGENT_DOCS_WORKFLOW.md",
+        root / "docs" / "mcp-docs-server.md",
+    )
+    for path in normal_agent_docs:
+        doc = path.read_text(encoding="utf-8")
+        assert "get_docs_context" in doc
+        assert "prepare_docs" in doc
+        assert "docs_status" in doc
+        assert "recommended_next_action" in doc
+        for hidden in ("delivery_strategy", "packet_tokens", "output_mode", "response_style", "include_sections"):
+            assert hidden not in doc, f"{path}: normal-agent guidance advertises hidden {hidden}"
 
 
 def test_project_docs_workflow_documents_index_template_and_verification_loop():

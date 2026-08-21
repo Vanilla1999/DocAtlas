@@ -1,40 +1,28 @@
 # Agent documentation workflow
 
-This is the maintained, public workflow for coding agents using the DocAtlas
-documentation server.
+This is the maintained public workflow for coding agents using the DocAtlas documentation server.
+
+The advertised runtime `ToolSpec` objects for the default Docs MCP surface are the source of truth for tool names, descriptions, and schemas. `docatlas-agent-contract-v1` fingerprints those runtime specs plus the workflow policy; installed skills carry the resulting SHA-256 identity so stale guidance is detectable.
 
 ## Repository questions
 
-1. For coding and patch tasks, call `get_docs_context(project_path=..., question=..., mode="project")`; bounded structured delivery is the server default.
-2. Follow `recommended_next_action`: ask its source-choice question, or obtain
-   confirmation, call its exact typed action, and retry the same bounded request.
-3. Use `docs_status` only for an explicit health, freshness, index, or
-   background-job status request.
-4. Inspect canonical `status` and `kind`, cite `sources` through factual
-   `evidence_ids`, and do not edit when status is `insufficient_evidence`.
-   Trust Contract and navigation fields belong to explicit unbounded exploration.
+1. For documentation questions and coding or patch tasks, call `get_docs_context(project_path=..., question=..., mode="project")` before the first edit.
+2. Call `prepare_docs` only from `recommended_next_action`, or when the user explicitly requests documentation lifecycle work such as sync, refresh, index, or prefetch. After preparation succeeds, retry the original `get_docs_context` question unchanged.
+3. Use `docs_status` only for an explicit health, freshness, index, or background-job status request, or when `get_docs_context` returns it as `recommended_next_action`; it is not discovery.
+4. Inspect the returned status and do not edit when it is `insufficient_evidence`.
 
 ## Library and dependency questions
 
-Call
-`get_docs_context(question=..., library=..., version=..., mode="library")`.
+Call `get_docs_context(question=..., library=..., version=..., mode="library")`.
 
-Network access is opt-in. If documentation must be fetched or refreshed, ask the
-user and then use `prepare_docs` with the returned action and arguments.
+Network access is opt-in. If documentation must be fetched or refreshed, ask the user and then use the exact `prepare_docs` action returned by `get_docs_context`.
 
 ## Patch tasks
 
-Documentation context is evidence, not proof that a patch is correct. For
-patch-like tasks, retrieve context and constraints before editing, validate
-advisory constraints after editing, and still run the project's tests and
-linters.
+Documentation context is evidence, not proof that a patch is correct. Retrieve the required documentation evidence before editing and still run the project's source search, tests, linters, and review after editing.
 
 ## Tool boundary
 
-The default Docs MCP surface consists only of `get_docs_context`,
-`prepare_docs`, and `docs_status`. Advanced inspection and patch-contract
-compatibility tools require `DOCMANCER_MCP_ADVANCED_TOOLS=1`.
+The default Docs MCP surface consists only of `get_docs_context`, `prepare_docs`, and `docs_status`. Normal-agent guidance must use only arguments advertised by those runtime schemas; compatibility-only server fields are not part of this workflow.
 
-Use the Docs MCP server for documentation and source-grounded context. The
-advanced Packs gateway is a separate surface for explicitly installed API
-action packs. Neither surface is a static analyzer or a test runner.
+Advanced inspection and patch-contract compatibility tools require `DOCMANCER_MCP_ADVANCED_TOOLS=1`. The advanced Packs gateway is a separate surface for explicitly installed API action packs. Neither surface is a static analyzer or a test runner.

@@ -595,7 +595,13 @@ def _get_template_content(template_name: str) -> str:
     templates = files("docmancer.templates")
     content = templates.joinpath(template_name).read_text(encoding="utf-8")
     if "{{CANONICAL_AGENT_CONTRACT}}" in content:
+        from docmancer.mcp.agent_workflow_contract import public_agent_contract_identity
+
         canonical = templates.joinpath("agent_contract.md").read_text(encoding="utf-8").strip()
+        canonical = canonical.replace(
+            "{{DOCATLAS_AGENT_CONTRACT_ID}}",
+            public_agent_contract_identity(),
+        )
         content = content.replace("{{CANONICAL_AGENT_CONTRACT}}", canonical)
     return content
 
