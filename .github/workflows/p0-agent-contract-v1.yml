@@ -1,0 +1,112 @@
+name: P0.4 agent contract integration
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  integrate:
+    if: github.event.pull_request.head.ref == 'p0/agent-contract-v1'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          ref: p0/agent-contract-v1
+          fetch-depth: 0
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.12'
+      - name: Integrate runtime contract identity and public guidance
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          def replace_exact(path: str, old: str, new: str, *, count: int = 1) -> None:
+              p = Path(path)
+              text = p.read_text(encoding='utf-8')
+              actual = text.count(old)
+              if actual != count:
+                  raise SystemExit(f'{path}: expected {count} occurrence(s), found {actual}: {old[:100]!r}')
+              p.write_text(text.replace(old, new), encoding='utf-8')
+
+          # Installed guidance: resolve the reproducible runtime-derived identity
+          # inside the canonical contract before embedding it in any agent template.
+          replace_exact(
+              'docmancer/cli/_commands_part01.py',
+              '''    if "{{CANONICAL_AGENT_CONTRACT}}" in content:\n        canonical = templates.joinpath("agent_contract.md").read_text(encoding="utf-8").strip()\n        content = content.replace("{{CANONICAL_AGENT_CONTRACT}}", canonical)\n''',
+              '''    if "{{CANONICAL_AGENT_CONTRACT}}" in content:\n        from docmancer.mcp.agent_workflow_contract import public_agent_contract_identity\n\n        canonical = templates.joinpath("agent_contract.md").read_text(encoding="utf-8").strip()\n        canonical = canonical.replace(\n            "{{DOCATLAS_AGENT_CONTRACT_ID}}",\n            public_agent_contract_identity(),\n        )\n        content = content.replace("{{CANONICAL_AGENT_CONTRACT}}", canonical)\n''',
+          )
+
+          # README: bind public narrative to runtime specs without exposing compatibility knobs.
+          replace_exact(
+              'README.md',
+              '''For a normal repository question, the agent starts with `get_docs_context`. If it returns a `prepare_docs` next action, the agent follows it, retries the question, and cites the selected project or dependency sources. This is the product's default workflow.\n''',
+              '''For a normal repository question, the agent starts with `get_docs_context`. If it returns a `prepare_docs` next action, the agent follows it, retries the question, and cites the selected project or dependency sources. This is the product's default workflow.\n\nThe advertised runtime ToolSpec objects are the source of truth for the three public tool descriptions and schemas. The packaged `docatlas-agent-contract-v1` workflow fingerprints those exact runtime specs; installed agent guidance carries its SHA-256 identity so schema/guidance drift is detectable.\n''',
+          )
+
+          # Root skill: remove the hidden delivery knob and align identity/name leftovers.
+          replace_exact('SKILL.md', 'name: docmancer\n', 'name: docatlas\n')
+          replace_exact(
+              'SKILL.md',
+              '1. For coding and patch tasks, call `get_docs_context(project_path=..., question=..., mode="project", delivery_strategy="bounded_direct")` first. Use the unbounded presentation only for explicit broader documentation exploration.\n',
+              '1. For coding and patch tasks, call `get_docs_context(project_path=..., question=..., mode="project")` first; bounded delivery is server-owned policy.\n',
+          )
+          replace_exact(
+              'SKILL.md',
+              '| `doc-atlas init` | Create project-local `docmancer.yaml` |',
+              '| `doc-atlas init` | Create project-local `docatlas.yaml` |',
+          )
+          replace_exact(
+              'SKILL.md',
+              'The default Docs MCP surface has exactly three tools:\n',
+              'The advertised runtime ToolSpec contract is the schema source of truth. Installed skills carry the `docatlas-agent-contract-v1` SHA-256 identity.\n\nThe default Docs MCP surface has exactly three tools:\n',
+          )
+
+          # Detailed reference: keep compatibility support without teaching hidden args.
+          replace_exact(
+              'docs/mcp-docs-server.md',
+              'The Docs MCP server exposes exactly three public tools. Retrieval is read-only; lifecycle and network work require the explicit `prepare_docs` boundary.\n',
+              'The Docs MCP server exposes exactly three public tools. Retrieval is read-only; lifecycle and network work require the explicit `prepare_docs` boundary. The advertised runtime ToolSpec objects are the source of truth for names, descriptions, and schemas; `docatlas-agent-contract-v1` fingerprints those specs together with the workflow policy.\n',
+          )
+          replace_exact(
+              'docs/mcp-docs-server.md',
+              '- `response_style=auto`, `snippet-first`, and `evidence-first` control presentation, not provenance.\n',
+              '',
+          )
+          replace_exact(
+              'docs/mcp-docs-server.md',
+              '''The public catalog intentionally omits legacy formatting, pagination, maintenance, delivery, and packet-budget arguments. Existing integrations may still pass those fields during the transition, but ordinary coding calls should omit them and accept the server-owned bounded result. Integrations that explicitly request `output_mode`, pagination, sections, details, or maintenance retain the broader compatibility response.\n''',
+              '''The public catalog intentionally omits server-owned compatibility arguments. Existing integrations retain bounded transition support, but normal-agent documentation does not advertise those fields; new coding workflows use only the arguments present in the advertised runtime schemas.\n''',
+          )
+
+          # Expand the existing test node rather than creating a new diagnostic node.
+          p = Path('tests/docs/test_mcp_docs_tools_registration.py')
+          text = p.read_text(encoding='utf-8')
+          start = text.index('def test_agent_templates_include_three_tool_selection_guidance():')
+          end = text.find('\n\ndef ', start + 1)
+          if end == -1:
+              raise SystemExit('could not bound existing agent template contract test')
+          replacement = '''def test_agent_templates_include_three_tool_selection_guidance():\n    import re\n    from importlib.resources import files\n\n    from docmancer.cli.commands import _get_template_content\n    from docmancer.mcp.agent_workflow_contract import (\n        CONTRACT_SCHEMA,\n        PUBLIC_TOOL_ORDER,\n        public_agent_contract,\n        runtime_public_tool_dicts,\n    )\n\n    contract = public_agent_contract()\n    assert contract["schema"] == CONTRACT_SCHEMA == "docatlas-agent-contract-v1"\n    assert re.fullmatch(r"sha256:[0-9a-f]{64}", contract["identity"])\n    assert public_agent_contract() == contract\n    assert tuple(item["name"] for item in contract["tools"]) == PUBLIC_TOOL_ORDER\n\n    runtime_tools = {tool["name"]: tool for tool in runtime_public_tool_dicts()}\n    assert tuple(runtime_tools) == PUBLIC_TOOL_ORDER\n    for example in contract["examples"]:\n        jsonschema.validate(example["arguments"], runtime_tools[example["tool"]]["inputSchema"])\n\n    workflow = contract["workflow"]\n    assert workflow["first_call"]["tool"] == "get_docs_context"\n    assert workflow["first_call"]["before_first_edit"] is True\n    assert workflow["prepare_docs"]["speculative"] is False\n    assert workflow["docs_status"]["discovery"] is False\n    assert workflow["recovery"]["stop_before_edit_status"] == "insufficient_evidence"\n\n    canonical_raw = files("docmancer.templates").joinpath("agent_contract.md").read_text(encoding="utf-8").strip()\n    assert canonical_raw.count("{{DOCATLAS_AGENT_CONTRACT_ID}}") == 1\n    assert "delivery_strategy" not in canonical_raw\n    assert "output_mode" not in canonical_raw\n\n    for name in (\n        "skill.md", "claude_code_skill.md", "claude_desktop_skill.md",\n        "cursor_agents_md.md", "copilot_instructions.md", "project_bootstrap.md",\n    ):\n        raw = files("docmancer.templates").joinpath(name).read_text(encoding="utf-8")\n        assert raw.count("{{CANONICAL_AGENT_CONTRACT}}") == 1\n        assert "get_docs_context" not in raw.replace("{{CANONICAL_AGENT_CONTRACT}}", "")\n        rendered = _get_template_content(name)\n        assert contract["identity"] in rendered\n        assert "{{DOCATLAS_AGENT_CONTRACT_ID}}" not in rendered\n        assert "get_docs_context" in rendered\n        assert "prepare_docs" in rendered\n        assert "docs_status" in rendered\n\n    root = Path(__file__).resolve().parents[2]\n    normal_agent_docs = (\n        root / "README.md",\n        root / "SKILL.md",\n        root / "docs" / "AGENT_DOCS_WORKFLOW.md",\n        root / "docs" / "mcp-docs-server.md",\n    )\n    for path in normal_agent_docs:\n        doc = path.read_text(encoding="utf-8")\n        assert "get_docs_context" in doc\n        assert "prepare_docs" in doc\n        assert "docs_status" in doc\n        assert "recommended_next_action" in doc\n        for hidden in ("delivery_strategy", "packet_tokens", "output_mode", "response_style", "include_sections"):\n            assert hidden not in doc, f"{path}: normal-agent guidance advertises hidden {hidden}"\n'''
+          text = text[:start] + replacement + text[end:]
+          p.write_text(text, encoding='utf-8')
+          PY
+
+          python -m compileall -q docmancer
+          python -m pip install -e '.[dev]'
+          python -m pytest -q tests/docs/test_mcp_docs_tools_registration.py tests/docs/test_documented_cli_contract.py tests/test_install_cmd.py
+          git diff --check
+
+      - name: Commit product-only result
+        shell: bash
+        run: |
+          git rm .github/workflows/p0-agent-contract-v1.yml
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add docmancer README.md SKILL.md docs tests
+          git commit -m 'Integrate runtime-derived agent workflow contract'
+          git push origin HEAD:p0/agent-contract-v1
