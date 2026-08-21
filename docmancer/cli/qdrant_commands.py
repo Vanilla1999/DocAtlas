@@ -12,12 +12,18 @@ import click
 
 
 def _manager():
+    from docmancer.core.product_identity import ensure_owned_home, resolve_home
     from docmancer.runtime.qdrant_manager import QdrantManager
 
-    return QdrantManager()
+    resolution = resolve_home()
+    owned_home = ensure_owned_home(
+        resolution.path,
+        allow_legacy_claim=resolution.compatibility_legacy,
+    )
+    return QdrantManager(home=owned_home / "qdrant")
 
 
-@click.group(name="qdrant", help="Manage the local docmancer-owned Qdrant process.")
+@click.group(name="qdrant", help="Manage the local DocAtlas-owned Qdrant process.")
 def qdrant_group() -> None:
     pass
 
@@ -58,7 +64,7 @@ def qdrant_down_cmd() -> None:
     mgr = _manager()
     stopped = mgr.stop()
     if not stopped:
-        click.echo("no docmancer-managed qdrant was running")
+        click.echo("no DocAtlas-managed qdrant was running")
         return
     click.echo("stopped managed qdrant")
 
@@ -77,7 +83,7 @@ def qdrant_status_cmd(as_json: bool) -> None:
         f"port:         {st['port']}",
         f"url:          {st['url']}",
         f"alive:        {st['alive']}",
-        f"docmancer-owned: {st['owned']}",
+        f"docatlas-owned: {st['owned']}",
         f"healthy:      {st['healthy']}",
         f"version:      {st['version']}",
     ]
